@@ -1,0 +1,49 @@
+---
+read_when:
+    - Розгортання OpenClaw на Northflank
+    - Ви хочете хмарне розгортання в один клік із веб-based Control UI
+summary: Розгорніть OpenClaw на Northflank за допомогою шаблону в один клік
+title: Northflank
+x-i18n:
+    generated_at: "2026-04-05T18:08:14Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 6b659607621ad2b38e61644f41cf3e5ae1a32761469223c460952a832d3b93fe
+    source_path: install/northflank.mdx
+    workflow: 15
+---
+
+Розгорніть OpenClaw на Northflank за допомогою шаблону в один клік і отримайте доступ через вебінтерфейс Control UI.
+Це найпростіший шлях «без термінала на сервері»: Northflank запускає Gateway за вас.
+
+## Як почати
+
+1. Натисніть [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw), щоб відкрити шаблон.
+2. Створіть [обліковий запис на Northflank](https://app.northflank.com/signup), якщо у вас його ще немає.
+3. Натисніть **Deploy OpenClaw now**.
+4. Установіть обов’язкову змінну середовища: `OPENCLAW_GATEWAY_TOKEN` (використовуйте сильне випадкове значення).
+5. Натисніть **Deploy stack**, щоб зібрати й запустити шаблон OpenClaw.
+6. Дочекайтеся завершення розгортання, потім натисніть **View resources**.
+7. Відкрийте сервіс OpenClaw.
+8. Відкрийте публічний URL OpenClaw за шляхом `/openclaw` і підключіться, використовуючи налаштований спільний секрет. Цей шаблон типово використовує `OPENCLAW_GATEWAY_TOKEN`; якщо ви заміните його на автентифікацію паролем, використовуйте натомість цей пароль.
+
+## Що ви отримаєте
+
+- Розміщені OpenClaw Gateway + Control UI
+- Постійне сховище через Northflank Volume (`/data`), тож `openclaw.json`,
+  `auth-profiles.json` для окремих агентів, стан каналів/провайдерів, сесії та
+  workspace зберігаються після повторних розгортань
+
+## Підключення каналу
+
+Використовуйте Control UI за шляхом `/openclaw` або запустіть `openclaw onboard` через SSH, щоб отримати інструкції з налаштування каналу:
+
+- [Telegram](/channels/telegram) (найшвидше — потрібен лише токен бота)
+- [Discord](/channels/discord)
+- [Усі канали](/channels)
+
+## Наступні кроки
+
+- Налаштуйте канали обміну повідомленнями: [Канали](/channels)
+- Налаштуйте Gateway: [Конфігурація Gateway](/gateway/configuration)
+- Підтримуйте OpenClaw в актуальному стані: [Оновлення](/install/updating)
