@@ -1,0 +1,49 @@
+---
+read_when:
+    - Implantando o OpenClaw na Northflank
+    - Você quer uma implantação em nuvem com um clique e UI de controle no navegador
+summary: Implante o OpenClaw na Northflank com um template de um clique
+title: Northflank
+x-i18n:
+    generated_at: "2026-04-05T12:45:44Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 6b659607621ad2b38e61644f41cf3e5ae1a32761469223c460952a832d3b93fe
+    source_path: install/northflank.mdx
+    workflow: 15
+---
+
+Implante o OpenClaw na Northflank com um template de um clique e acesse-o pela UI web de controle.
+Este é o caminho mais fácil de “sem terminal no servidor”: a Northflank executa o Gateway para você.
+
+## Como começar
+
+1. Clique em [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw) para abrir o template.
+2. Crie uma [conta na Northflank](https://app.northflank.com/signup) se ainda não tiver uma.
+3. Clique em **Deploy OpenClaw now**.
+4. Defina a variável de ambiente obrigatória: `OPENCLAW_GATEWAY_TOKEN` (use um valor aleatório forte).
+5. Clique em **Deploy stack** para fazer build e executar o template do OpenClaw.
+6. Aguarde a implantação ser concluída e clique em **View resources**.
+7. Abra o serviço OpenClaw.
+8. Abra a URL pública do OpenClaw em `/openclaw` e conecte-se usando o segredo compartilhado configurado. Este template usa `OPENCLAW_GATEWAY_TOKEN` por padrão; se você substituí-lo por autenticação por senha, use essa senha em vez disso.
+
+## O que você recebe
+
+- Gateway OpenClaw hospedado + UI de controle
+- Armazenamento persistente por meio do Northflank Volume (`/data`), para que `openclaw.json`,
+  `auth-profiles.json` por agente, estado de canal/provedor, sessões e
+  workspace sobrevivam a reimplantações
+
+## Conectar um canal
+
+Use a UI de controle em `/openclaw` ou execute `openclaw onboard` via SSH para obter instruções de configuração de canal:
+
+- [Telegram](/channels/telegram) (mais rápido — apenas um token de bot)
+- [Discord](/channels/discord)
+- [Todos os canais](/channels)
+
+## Próximas etapas
+
+- Configurar canais de mensagens: [Canais](/channels)
+- Configurar o Gateway: [Configuração do Gateway](/gateway/configuration)
+- Manter o OpenClaw atualizado: [Atualizando](/install/updating)
