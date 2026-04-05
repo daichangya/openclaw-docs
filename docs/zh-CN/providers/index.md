@@ -5,10 +5,10 @@ read_when:
 summary: OpenClaw 支持的模型提供商（LLM）
 title: 提供商目录
 x-i18n:
-    generated_at: "2026-04-05T22:29:57Z"
+    generated_at: "2026-04-05T23:52:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 83911cf9bba0d0711fd49081529becf4eb1eea08b61079d71eac927a1d069061
+    source_hash: 93aa6ecf3c6f34e01654e45140eaf57b76b371bc4a215c643418da543bb769f5
     source_path: providers/index.md
     workflow: 15
 ---
@@ -32,7 +32,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 
 ## 提供商文档
 
-- [Alibaba Model Studio](/zh-CN/providers/alibaba)
+- [阿里巴巴 Model Studio](/zh-CN/providers/alibaba)
 - [Amazon Bedrock](/zh-CN/providers/bedrock)
 - [Anthropic（API + Claude CLI）](/zh-CN/providers/anthropic)
 - [BytePlus（国际版）](/zh-CN/concepts/model-providers#byteplus-international)
@@ -45,7 +45,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 - [GLM 模型](/zh-CN/providers/glm)
 - [Google（Gemini）](/zh-CN/providers/google)
 - [Groq（LPU 推理）](/zh-CN/providers/groq)
-- [Hugging Face（推理）](/zh-CN/providers/huggingface)
+- [Hugging Face（Inference）](/zh-CN/providers/huggingface)
 - [Kilocode](/zh-CN/providers/kilocode)
 - [LiteLLM（统一 Gateway 网关）](/zh-CN/providers/litellm)
 - [MiniMax](/zh-CN/providers/minimax)
@@ -60,6 +60,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 - [Perplexity（网页搜索）](/zh-CN/providers/perplexity-provider)
 - [Qianfan](/zh-CN/providers/qianfan)
 - [Qwen Cloud](/zh-CN/providers/qwen)
+- [Runway](/providers/runway)
 - [SGLang（本地模型）](/zh-CN/providers/sglang)
 - [StepFun](/zh-CN/providers/stepfun)
 - [Synthetic](/zh-CN/providers/synthetic)
