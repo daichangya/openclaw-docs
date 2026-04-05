@@ -1,13 +1,13 @@
 # OpenClaw docs i18n assets
 
-This folder stores translation config plus generated zh-CN artifacts for the publish repo.
+This folder stores translation config for the source docs repo.
 
-English docs are mirrored from the source repo (`openclaw/openclaw`). zh-CN pages and zh-CN translation memory are generated here.
+Generated zh-CN pages and the live zh-CN translation memory now live in the publish repo (`openclaw/docs`, local sibling checkout `~/Projects/openclaw-docs`).
 
 ## Files
 
 - `glossary.<lang>.json` — preferred term mappings (used in prompt guidance).
-- `<lang>.tm.jsonl` — translation memory (cache) keyed by workflow + model + text hash.
+- `<lang>.tm.jsonl` — translation memory (cache) keyed by workflow + model + text hash. In this repo, zh-CN TM is no longer committed.
 
 ## Glossary format
 
@@ -30,5 +30,5 @@ Fields:
 ## Notes
 
 - Glossary entries are passed to the model as **prompt guidance** (no deterministic rewrites).
-- The translation memory is updated by `scripts/docs-i18n`.
-- Source metadata for each sync lives under `.openclaw-sync/source.json`.
+- `scripts/docs-i18n` still owns translation generation.
+- The source repo syncs English docs into the publish repo; zh-CN generation runs there on push and hourly.
