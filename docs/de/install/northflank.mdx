@@ -1,0 +1,49 @@
+---
+read_when:
+    - Bereitstellen von OpenClaw auf Northflank
+    - Sie eine One-Click-Cloud-Bereitstellung mit browserbasierter Control UI möchten
+summary: OpenClaw auf Northflank mit einer One-Click-Vorlage bereitstellen
+title: Northflank
+x-i18n:
+    generated_at: "2026-04-05T12:47:20Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 6b659607621ad2b38e61644f41cf3e5ae1a32761469223c460952a832d3b93fe
+    source_path: install/northflank.mdx
+    workflow: 15
+---
+
+Stellen Sie OpenClaw auf Northflank mit einer One-Click-Vorlage bereit und greifen Sie über die webbasierte Control UI darauf zu.
+Dies ist der einfachste Weg „ohne Terminal auf dem Server“: Northflank führt das Gateway für Sie aus.
+
+## Erste Schritte
+
+1. Klicken Sie auf [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw), um die Vorlage zu öffnen.
+2. Erstellen Sie ein [Konto bei Northflank](https://app.northflank.com/signup), falls Sie noch keines haben.
+3. Klicken Sie auf **Deploy OpenClaw now**.
+4. Setzen Sie die erforderliche Umgebungsvariable: `OPENCLAW_GATEWAY_TOKEN` (verwenden Sie einen starken Zufallswert).
+5. Klicken Sie auf **Deploy stack**, um die OpenClaw-Vorlage zu bauen und auszuführen.
+6. Warten Sie, bis die Bereitstellung abgeschlossen ist, und klicken Sie dann auf **View resources**.
+7. Öffnen Sie den OpenClaw-Dienst.
+8. Öffnen Sie die öffentliche OpenClaw-URL unter `/openclaw` und verbinden Sie sich mit dem konfigurierten gemeinsamen Geheimnis. Diese Vorlage verwendet standardmäßig `OPENCLAW_GATEWAY_TOKEN`; wenn Sie es durch Passwort-Auth ersetzen, verwenden Sie stattdessen dieses Passwort.
+
+## Was Sie erhalten
+
+- Gehostetes OpenClaw-Gateway + Control UI
+- Persistenter Speicher über Northflank Volume (`/data`), sodass `openclaw.json`,
+  `auth-profiles.json` pro Agent, Kanal-/Provider-Status, Sitzungen und
+  Workspace erneute Bereitstellungen überstehen
+
+## Einen Kanal verbinden
+
+Verwenden Sie die Control UI unter `/openclaw` oder führen Sie `openclaw onboard` über SSH aus, um Anweisungen für die Kanaleinrichtung zu erhalten:
+
+- [Telegram](/channels/telegram) (am schnellsten — nur ein Bot-Token)
+- [Discord](/channels/discord)
+- [Alle Kanäle](/channels)
+
+## Nächste Schritte
+
+- Messaging-Kanäle einrichten: [Kanäle](/channels)
+- Das Gateway konfigurieren: [Gateway-Konfiguration](/gateway/configuration)
+- OpenClaw aktuell halten: [Aktualisieren](/install/updating)
