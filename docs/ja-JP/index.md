@@ -1,15 +1,15 @@
 ---
 read_when:
-  - 新規ユーザーにOpenClawを紹介するとき
-summary: OpenClawは、あらゆるOSで動作するAIエージェント向けのマルチチャネルgatewayです。
+    - OpenClaw を初めて使う人に紹介する場合
+summary: OpenClaw は、あらゆる OS で動作する、AI エージェント向けのマルチチャネル Gateway です。
 title: OpenClaw
 x-i18n:
-  generated_at: "2026-02-08T17:15:47Z"
-  model: claude-opus-4-6
-  provider: pi
-  source_hash: fc8babf7885ef91d526795051376d928599c4cf8aff75400138a0d7d9fa3b75f
-  source_path: index.md
-  workflow: 15
+    generated_at: "2026-04-05T12:46:45Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 9c29a8d9fc41a94b650c524bb990106f134345560e6d615dac30e8815afff481
+    source_path: index.md
+    workflow: 15
 ---
 
 # OpenClaw 🦞
@@ -32,103 +32,120 @@ x-i18n:
 > _「EXFOLIATE! EXFOLIATE!」_ — たぶん宇宙ロブスター
 
 <p align="center">
-  <strong>WhatsApp、Telegram、Discord、iMessageなどに対応した、あらゆるOS向けのAIエージェントgateway。</strong><br />
-  メッセージを送信すれば、ポケットからエージェントの応答を受け取れます。プラグインでMattermostなどを追加できます。
+  <strong>Discord、Google Chat、iMessage、Matrix、Microsoft Teams、Signal、Slack、Telegram、WhatsApp、Zalo などにまたがって AI エージェントを使える、あらゆる OS 向けの Gateway。</strong><br />
+  メッセージを送ると、ポケットからエージェントの応答を受け取れます。組み込みチャネル、バンドルされたチャネル plugin、WebChat、モバイルノードをまたいで、1 つの Gateway を実行できます。
 </p>
 
 <Columns>
-  <Card title="はじめに" href="/start/getting-started" icon="rocket">
-    OpenClawをインストールし、数分でGatewayを起動できます。
+  <Card title="はじめに" href="/ja-JP/start/getting-started" icon="rocket">
+    OpenClaw をインストールし、数分で Gateway を起動します。
   </Card>
-  <Card title="ウィザードを実行" href="/start/wizard" icon="sparkles">
-    `openclaw onboard`とペアリングフローによるガイド付きセットアップ。
+  <Card title="オンボーディングを実行" href="/ja-JP/start/wizard" icon="sparkles">
+    `openclaw onboard` とペアリングフローによるガイド付きセットアップ。
   </Card>
-  <Card title="Control UIを開く" href="/web/control-ui" icon="layout-dashboard">
+  <Card title="Control UI を開く" href="/web/control-ui" icon="layout-dashboard">
     チャット、設定、セッション用のブラウザダッシュボードを起動します。
   </Card>
 </Columns>
 
-OpenClawは、単一のGatewayプロセスを通じてチャットアプリをPiのようなコーディングエージェントに接続します。OpenClawアシスタントを駆動し、ローカルまたはリモートのセットアップをサポートします。
+## OpenClaw とは?
+
+OpenClaw は、Discord、Google Chat、iMessage、Matrix、Microsoft Teams、Signal、Slack、Telegram、WhatsApp、Zalo などの組み込みチャネルに加え、バンドルまたは外部のチャネル plugin など、お気に入りのチャットアプリやチャネルサーフェスを、Pi のような AI コーディングエージェントに接続する**セルフホスト型 Gateway**です。自分のマシン（またはサーバー）上で単一の Gateway プロセスを実行すると、それがメッセージングアプリと常時利用可能な AI アシスタントとの橋渡しになります。
+
+**どんな人向けか?** データの制御を手放さず、ホスト型サービスに頼ることなく、どこからでもメッセージできる個人用 AI アシスタントを求める開発者やパワーユーザー向けです。
+
+**何が違うのか?**
+
+- **セルフホスト**: 自分のハードウェアで、自分のルールで動作
+- **マルチチャネル**: 1 つの Gateway で、組み込みチャネルに加えてバンドルまたは外部のチャネル plugin を同時に提供
+- **エージェントネイティブ**: ツール利用、セッション、メモリ、マルチエージェントルーティングを備えたコーディングエージェント向けに設計
+- **オープンソース**: MIT ライセンス、コミュニティ主導
+
+**何が必要か?** Node 24（推奨）、または互換性のための Node 22 LTS（`22.14+`）、選択したプロバイダーの API キー、そして 5 分です。品質とセキュリティを最大限にするには、利用可能な最新世代の最も強力なモデルを使ってください。
 
 ## 仕組み
 
 ```mermaid
 flowchart LR
-  A["チャットアプリ + プラグイン"] --> B["Gateway"]
-  B --> C["Piエージェント"]
+  A["チャットアプリ + plugins"] --> B["Gateway"]
+  B --> C["Pi agent"]
   B --> D["CLI"]
   B --> E["Web Control UI"]
-  B --> F["macOSアプリ"]
-  B --> G["iOSおよびAndroidノード"]
+  B --> F["macOS app"]
+  B --> G["iOS and Android nodes"]
 ```
 
-Gatewayは、セッション、ルーティング、チャネル接続の信頼できる唯一の情報源です。
+Gateway は、セッション、ルーティング、チャネル接続の単一の信頼できる情報源です。
 
 ## 主な機能
 
 <Columns>
-  <Card title="マルチチャネルgateway" icon="network">
-    単一のGatewayプロセスでWhatsApp、Telegram、Discord、iMessageに対応。
+  <Card title="マルチチャネル Gateway" icon="network">
+    Discord、iMessage、Signal、Slack、Telegram、WhatsApp、WebChat などを、単一の Gateway プロセスで利用できます。
   </Card>
-  <Card title="プラグインチャネル" icon="plug">
-    拡張パッケージでMattermostなどを追加。
+  <Card title="Plugin チャネル" icon="plug">
+    バンドルされた plugins により、通常の現行リリースで Matrix、Nostr、Twitch、Zalo などが追加されます。
   </Card>
   <Card title="マルチエージェントルーティング" icon="route">
-    エージェント、ワークスペース、送信者ごとに分離されたセッション。
+    エージェント、ワークスペース、または送信者ごとに分離されたセッション。
   </Card>
-  <Card title="メディアサポート" icon="image">
-    画像、音声、ドキュメントの送受信。
+  <Card title="メディア対応" icon="image">
+    画像、音声、ドキュメントを送受信できます。
   </Card>
   <Card title="Web Control UI" icon="monitor">
     チャット、設定、セッション、ノード用のブラウザダッシュボード。
   </Card>
   <Card title="モバイルノード" icon="smartphone">
-    Canvas対応のiOSおよびAndroidノードをペアリング。
+    Canvas、カメラ、音声対応ワークフローのために iOS と Android ノードをペアリングします。
   </Card>
 </Columns>
 
 ## クイックスタート
 
 <Steps>
-  <Step title="OpenClawをインストール">
+  <Step title="OpenClaw をインストール">
     ```bash
     npm install -g openclaw@latest
     ```
   </Step>
-  <Step title="オンボーディングとサービスのインストール">
+  <Step title="オンボーディングを実行してサービスをインストール">
     ```bash
     openclaw onboard --install-daemon
     ```
   </Step>
-  <Step title="WhatsAppをペアリングしてGatewayを起動">
+  <Step title="チャットする">
+    ブラウザで Control UI を開いて、メッセージを送信します:
+
     ```bash
-    openclaw channels login
-    openclaw gateway --port 18789
+    openclaw dashboard
     ```
+
+    またはチャネルを接続し（[Telegram](/ja-JP/channels/telegram) が最速です）、スマートフォンからチャットします。
+
   </Step>
 </Steps>
 
-完全なインストールと開発セットアップが必要ですか？[クイックスタート](/start/quickstart)をご覧ください。
+完全なインストール手順と開発セットアップが必要ですか? [はじめに](/ja-JP/start/getting-started) を参照してください。
 
 ## ダッシュボード
 
-Gatewayの起動後、ブラウザでControl UIを開きます。
+Gateway の起動後に、ブラウザの Control UI を開きます。
 
 - ローカルデフォルト: [http://127.0.0.1:18789/](http://127.0.0.1:18789/)
-- リモートアクセス: [Webサーフェス](/web)および[Tailscale](/gateway/tailscale)
+- リモートアクセス: [Web surfaces](/web) と [Tailscale](/gateway/tailscale)
 
 <p align="center">
   <img src="/whatsapp-openclaw.jpg" alt="OpenClaw" width="420" />
 </p>
 
-## 設定（オプション）
+## 設定（任意）
 
-設定は`~/.openclaw/openclaw.json`にあります。
+設定は `~/.openclaw/openclaw.json` にあります。
 
-- **何もしなければ**、OpenClawはバンドルされたPiバイナリをRPCモードで使用し、送信者ごとのセッションを作成します。
-- 制限を設けたい場合は、`channels.whatsapp.allowFrom`と（グループの場合）メンションルールから始めてください。
+- **何もしない** 場合、OpenClaw は RPC モードのバンドルされた Pi バイナリと、送信者ごとのセッションを使用します。
+- 制限を強めたい場合は、`channels.whatsapp.allowFrom` と（グループ向けの）メンションルールから始めてください。
 
-例：
+例:
 
 ```json5
 {
@@ -146,39 +163,39 @@ Gatewayの起動後、ブラウザでControl UIを開きます。
 
 <Columns>
   <Card title="ドキュメントハブ" href="/start/hubs" icon="book-open">
-    ユースケース別に整理されたすべてのドキュメントとガイド。
+    ユースケース別に整理された、すべてのドキュメントとガイド。
   </Card>
   <Card title="設定" href="/gateway/configuration" icon="settings">
-    Gatewayのコア設定、トークン、プロバイダー設定。
+    中核となる Gateway 設定、トークン、プロバイダー設定。
   </Card>
   <Card title="リモートアクセス" href="/gateway/remote" icon="globe">
-    SSHおよびtailnetアクセスパターン。
+    SSH と tailnet のアクセスパターン。
   </Card>
-  <Card title="チャネル" href="/channels/telegram" icon="message-square">
-    WhatsApp、Telegram、Discordなどのチャネル固有のセットアップ。
+  <Card title="チャネル" href="/ja-JP/channels/telegram" icon="message-square">
+    Feishu、Microsoft Teams、WhatsApp、Telegram、Discord などのチャネル固有セットアップ。
   </Card>
   <Card title="ノード" href="/nodes" icon="smartphone">
-    ペアリングとCanvas対応のiOSおよびAndroidノード。
+    ペアリング、Canvas、カメラ、デバイス操作に対応した iOS と Android ノード。
   </Card>
   <Card title="ヘルプ" href="/help" icon="life-buoy">
-    一般的な修正とトラブルシューティングのエントリーポイント。
+    一般的な修正方法とトラブルシューティングの入口。
   </Card>
 </Columns>
 
-## 詳細
+## さらに詳しく
 
 <Columns>
-  <Card title="全機能リスト" href="/concepts/features" icon="list">
-    チャネル、ルーティング、メディア機能の完全な一覧。
+  <Card title="完全な機能一覧" href="/concepts/features" icon="list">
+    チャネル、ルーティング、メディア機能の全体像。
   </Card>
   <Card title="マルチエージェントルーティング" href="/concepts/multi-agent" icon="route">
-    ワークスペースの分離とエージェントごとのセッション。
+    ワークスペース分離とエージェントごとのセッション。
   </Card>
   <Card title="セキュリティ" href="/gateway/security" icon="shield">
-    トークン、許可リスト、安全制御。
+    トークン、allowlist、安全制御。
   </Card>
   <Card title="トラブルシューティング" href="/gateway/troubleshooting" icon="wrench">
-    Gatewayの診断と一般的なエラー。
+    Gateway の診断と一般的なエラー。
   </Card>
   <Card title="概要とクレジット" href="/reference/credits" icon="info">
     プロジェクトの起源、貢献者、ライセンス。

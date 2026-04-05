@@ -1,44 +1,47 @@
 ---
 read_when:
-  - ゼロからの初回セットアップ
-  - 動作するチャットへの最短ルートを知りたい
-summary: OpenClawをインストールし、数分で最初のチャットを実行しましょう。
+    - 何もない状態から初めてセットアップするとき
+    - 動くチャットまで最短でたどり着きたいとき
+summary: OpenClaw をインストールして、数分で最初のチャットを始めましょう。
 title: はじめに
 x-i18n:
-  generated_at: "2026-02-08T17:15:16Z"
-  model: claude-opus-4-6
-  provider: pi
-  source_hash: 27aeeb3d18c495380e94e6b011b0df3def518535c9f1eee504f04871d8a32269
-  source_path: start/getting-started.md
-  workflow: 15
+    generated_at: "2026-04-05T12:57:14Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c43eee6f0d3f593e3cf0767bfacb3e0ae38f51a2615d594303786ae1d4a6d2c3
+    source_path: start/getting-started.md
+    workflow: 15
 ---
 
 # はじめに
 
-目標：ゼロから最小限のセットアップで最初の動作するチャットを実現する。
+OpenClaw をインストールし、オンボーディングを実行して、AI アシスタントとチャットしましょう。所要時間はおよそ 5 分です。完了時には、稼働中の Gateway、設定済みの認証情報、そして動作するチャットセッションが手に入ります。
 
-<Info>
-最速のチャット方法：Control UIを開く（チャンネル設定は不要）。`openclaw dashboard`を実行してブラウザでチャットするか、<Tooltip headline="Gatewayホスト" tip="OpenClaw Gatewayサービスを実行しているマシン。">Gatewayホスト</Tooltip>で`http://127.0.0.1:18789/`を開きます。
-ドキュメント：[Dashboard](/web/dashboard)と[Control UI](/web/control-ui)。
-</Info>
+## 必要なもの
 
-## 前提条件
-
-- Node 22以降
+- **Node.js** — Node 24 推奨（Node 22.14+ もサポート）
+- **モデルプロバイダーの API キー**（Anthropic、OpenAI、Google など）— オンボーディング中に入力を求められます
 
 <Tip>
-不明な場合は`node --version`でNodeのバージョンを確認してください。
+`node --version` で Node のバージョンを確認してください。
+**Windows ユーザー:** ネイティブ Windows と WSL2 の両方に対応しています。フル機能を使うには WSL2 のほうが安定しており、推奨です。[Windows](/ja-JP/platforms/windows) を参照してください。
+Node のインストールが必要ですか？ [Node setup](/ja-JP/install/node) を参照してください。
 </Tip>
 
-## クイックセットアップ（CLI）
+## クイックセットアップ
 
 <Steps>
-  <Step title="OpenClawをインストール（推奨）">
+  <Step title="OpenClaw をインストール">
     <Tabs>
-      <Tab title="macOS/Linux">
+      <Tab title="macOS / Linux">
         ```bash
         curl -fsSL https://openclaw.ai/install.sh | bash
         ```
+        <img
+  src="/assets/install-script.svg"
+  alt="インストールスクリプトの処理"
+  className="rounded-lg"
+/>
       </Tab>
       <Tab title="Windows (PowerShell)">
         ```powershell
@@ -48,78 +51,99 @@ x-i18n:
     </Tabs>
 
     <Note>
-    その他のインストール方法と要件：[インストール](/install)。
+    ほかのインストール方法（Docker、Nix、npm）: [インストール](/ja-JP/install)。
     </Note>
 
   </Step>
-  <Step title="オンボーディングウィザードを実行">
+  <Step title="オンボーディングを実行">
     ```bash
     openclaw onboard --install-daemon
     ```
 
-    ウィザードは認証、Gateway設定、およびオプションのチャンネルを構成します。
-    詳細は[オンボーディングウィザード](/start/wizard)を参照してください。
+    このウィザードでは、モデルプロバイダーの選択、API キーの設定、Gateway の構成を順に進めます。所要時間はおよそ 2 分です。
+
+    完全なリファレンスは [オンボーディング（CLI）](/ja-JP/start/wizard) を参照してください。
 
   </Step>
-  <Step title="Gatewayを確認">
-    サービスをインストールした場合、すでに実行されているはずです：
-
+  <Step title="Gateway が動作していることを確認">
     ```bash
     openclaw gateway status
     ```
 
+    Gateway がポート 18789 で待ち受けていることが表示されるはずです。
+
   </Step>
-  <Step title="Control UIを開く">
+  <Step title="ダッシュボードを開く">
     ```bash
     openclaw dashboard
     ```
+
+    これによりブラウザーでコントロール UI が開きます。読み込まれれば、すべて正常に動作しています。
+
+  </Step>
+  <Step title="最初のメッセージを送る">
+    コントロール UI のチャットにメッセージを入力すると、AI の返信が返ってくるはずです。
+
+    代わりにスマートフォンからチャットしたいですか？ 最もすばやく設定できるチャンネルは [Telegram](/ja-JP/channels/telegram) です（必要なのは bot token だけです）。すべての選択肢は [チャンネル](/ja-JP/channels) を参照してください。
+
   </Step>
 </Steps>
 
-<Check>
-Control UIが読み込まれれば、Gatewayは使用可能な状態です。
-</Check>
+<Accordion title="高度な設定: カスタムのコントロール UI ビルドをマウントする">
+  ローカライズ版またはカスタマイズ版のダッシュボードビルドを管理している場合は、
+  ビルド済みの静的アセットと `index.html` を含むディレクトリーを
+  `gateway.controlUi.root` に指定してください。
 
-## オプションの確認と追加機能
+```bash
+mkdir -p "$HOME/.openclaw/control-ui-custom"
+# そのディレクトリーにビルド済みの静的ファイルをコピーします。
+```
 
-<AccordionGroup>
-  <Accordion title="Gatewayをフォアグラウンドで実行">
-    クイックテストやトラブルシューティングに便利です。
+次に、以下を設定します。
 
-    ```bash
-    openclaw gateway --port 18789
-    ```
+```json
+{
+  "gateway": {
+    "controlUi": {
+      "enabled": true,
+      "root": "$HOME/.openclaw/control-ui-custom"
+    }
+  }
+}
+```
 
-  </Accordion>
-  <Accordion title="テストメッセージを送信">
-    構成済みのチャンネルが必要です。
+Gateway を再起動して、ダッシュボードを再度開きます。
 
-    ```bash
-    openclaw message send --target +15555550123 --message "Hello from OpenClaw"
-    ```
+```bash
+openclaw gateway restart
+openclaw dashboard
+```
 
-  </Accordion>
-</AccordionGroup>
+</Accordion>
 
-## さらに詳しく
+## 次にやること
 
 <Columns>
-  <Card title="オンボーディングウィザード（詳細）" href="/start/wizard">
-    完全なCLIウィザードリファレンスと高度なオプション。
+  <Card title="チャンネルを接続" href="/ja-JP/channels" icon="message-square">
+    Discord、Feishu、iMessage、Matrix、Microsoft Teams、Signal、Slack、Telegram、WhatsApp、Zalo など。
   </Card>
-  <Card title="macOSアプリのオンボーディング" href="/start/onboarding">
-    macOSアプリの初回実行フロー。
+  <Card title="ペアリングと安全性" href="/ja-JP/channels/pairing" icon="shield">
+    だれがあなたのエージェントにメッセージを送れるかを制御します。
+  </Card>
+  <Card title="Gateway を設定" href="/ja-JP/gateway/configuration" icon="settings">
+    モデル、ツール、sandbox、高度な設定。
+  </Card>
+  <Card title="ツールを見る" href="/tools" icon="wrench">
+    Browser、exec、web search、Skills、plugins。
   </Card>
 </Columns>
 
-## 完了後の状態
+<Accordion title="高度な設定: 環境変数">
+  OpenClaw をサービスアカウントとして実行する場合や、カスタムパスを使いたい場合:
 
-- 実行中のGateway
-- 構成済みの認証
-- Control UIアクセスまたは接続済みのチャンネル
+- `OPENCLAW_HOME` — 内部パス解決用のホームディレクトリー
+- `OPENCLAW_STATE_DIR` — state ディレクトリーを上書き
+- `OPENCLAW_CONFIG_PATH` — config ファイルのパスを上書き
 
-## 次のステップ
-
-- DMの安全性と承認：[ペアリング](/channels/pairing)
-- さらにチャンネルを接続：[チャンネル](/channels)
-- 高度なワークフローとソースからのビルド：[セットアップ](/start/setup)
+完全なリファレンス: [環境変数](/ja-JP/help/environment)。
+</Accordion>
