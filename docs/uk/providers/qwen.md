@@ -1,28 +1,24 @@
 ---
+read_when:
+    - Ви хочете використовувати Qwen з OpenClaw
+    - Ви раніше використовували Qwen OAuth
+summary: Використовуйте Qwen Cloud через вбудований провайдер qwen в OpenClaw
+title: Qwen
 x-i18n:
-    generated_at: "2026-04-05T18:14:53Z"
+    generated_at: "2026-04-05T22:23:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 813c4401d02b0a8a2708d30d6c31e4d375036244141d9e55458479f24723e0a5
+    source_hash: c1e1022a368513fd09474a2c2b8394911787a6bc5e325868da590a3d32446a34
     source_path: providers/qwen.md
     workflow: 15
----
-
-summary: "Використання Qwen Cloud через вбудований провайдер qwen в OpenClaw"
-read_when:
-
-- Ви хочете використовувати Qwen з OpenClaw
-- Ви раніше використовували Qwen OAuth
-  title: "Qwen"
-
 ---
 
 # Qwen
 
 <Warning>
 
-**Qwen OAuth видалено.** Інтеграція OAuth безкоштовного рівня
-(`qwen-portal`), яка використовувала endpoint'и `portal.qwen.ai`, більше недоступна.
+**Qwen OAuth було видалено.** Інтеграція OAuth безкоштовного рівня
+(`qwen-portal`), яка використовувала ендпоінти `portal.qwen.ai`, більше недоступна.
 Див. [Issue #49557](https://github.com/openclaw/openclaw/issues/49557) для
 додаткового контексту.
 
@@ -30,36 +26,36 @@ read_when:
 
 ## Рекомендовано: Qwen Cloud
 
-OpenClaw тепер розглядає Qwen як першокласного вбудованого провайдера з канонічним id
-`qwen`. Вбудований провайдер націлений на endpoint'и Qwen Cloud / Alibaba DashScope і
-Coding Plan та зберігає застарілі id `modelstudio` як
-compatibility alias.
+Тепер OpenClaw розглядає Qwen як вбудований провайдер першого класу з канонічним id
+`qwen`. Вбудований провайдер націлено на ендпоінти Qwen Cloud / Alibaba DashScope і
+Coding Plan та зберігає роботу застарілих id `modelstudio` як
+аліаса сумісності.
 
 - Провайдер: `qwen`
-- Бажана env-змінна: `QWEN_API_KEY`
+- Бажана змінна середовища: `QWEN_API_KEY`
 - Також приймаються для сумісності: `MODELSTUDIO_API_KEY`, `DASHSCOPE_API_KEY`
-- Стиль API: OpenAI-сумісний
+- Стиль API: сумісний з OpenAI
 
-Якщо вам потрібна `qwen3.6-plus`, віддавайте перевагу endpoint'у **Standard (pay-as-you-go)**.
+Якщо ви хочете використовувати `qwen3.6-plus`, надавайте перевагу ендпоінту **Standard (оплата за використання)**.
 Підтримка Coding Plan може відставати від публічного каталогу.
 
 ```bash
-# Global Coding Plan endpoint
+# Глобальний ендпоінт Coding Plan
 openclaw onboard --auth-choice qwen-api-key
 
-# China Coding Plan endpoint
+# Китайський ендпоінт Coding Plan
 openclaw onboard --auth-choice qwen-api-key-cn
 
-# Global Standard (pay-as-you-go) endpoint
+# Глобальний ендпоінт Standard (оплата за використання)
 openclaw onboard --auth-choice qwen-standard-api-key
 
-# China Standard (pay-as-you-go) endpoint
+# Китайський ендпоінт Standard (оплата за використання)
 openclaw onboard --auth-choice qwen-standard-api-key-cn
 ```
 
-Застарілі id auth-choice `modelstudio-*` і посилання на моделі `modelstudio/...` усе ще
-працюють як compatibility aliases, але в нових потоках налаштування слід віддавати перевагу канонічним
-id auth-choice `qwen-*` і посиланням на моделі `qwen/...`.
+Застарілі id `auth-choice` у форматі `modelstudio-*` і посилання на моделі `modelstudio/...` досі
+працюють як аліаси сумісності, але в нових сценаріях налаштування слід надавати перевагу канонічним
+id `auth-choice` у форматі `qwen-*` і посиланням на моделі `qwen/...`.
 
 Після онбордингу встановіть типову модель:
 
@@ -75,16 +71,16 @@ id auth-choice `qwen-*` і посиланням на моделі `qwen/...`.
 
 ## План можливостей
 
-Розширення `qwen` позиціонується як вендорський дім для всієї поверхні Qwen
+Розширення `qwen` позиціонується як основне середовище постачальника для всієї поверхні Qwen
 Cloud, а не лише для моделей кодування/тексту.
 
-- Текстові/chat-моделі: уже вбудовано
-- Виклик інструментів, структурований вивід, thinking: успадковуються від OpenAI-сумісного транспорту
-- Генерація зображень: заплановано на рівні provider-plugin
-- Розуміння зображень/відео: уже вбудовано на endpoint'і Standard
-- Speech/audio: заплановано на рівні provider-plugin
-- Memory embeddings/reranking: заплановано через поверхню embedding adapter
-- Генерація відео: уже вбудовано через спільну можливість video-generation
+- Текстові/чат-моделі: уже вбудовано
+- Виклик інструментів, структурований вивід, thinking: успадковуються від сумісного з OpenAI транспорту
+- Генерація зображень: заплановано на рівні плагіна провайдера
+- Розуміння зображень/відео: уже вбудовано в ендпоінті Standard
+- Мовлення/аудіо: заплановано на рівні плагіна провайдера
+- Ембеддинги пам’яті/переранжування: заплановано через поверхню адаптера ембеддингів
+- Генерація відео: уже вбудовано через спільну можливість генерації відео
 
 ## Мультимодальні доповнення
 
@@ -98,11 +94,11 @@ Cloud, а не лише для моделей кодування/тексту.
   - `wan2.6-r2v-flash`
   - `wan2.7-r2v`
 
-Ці мультимодальні поверхні використовують endpoint'и DashScope **Standard**, а не
-endpoint'и Coding Plan.
+Ці мультимодальні поверхні використовують ендпоінти DashScope **Standard**, а не
+ендпоінти Coding Plan.
 
-- Global/Intl Standard base URL: `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`
-- China Standard base URL: `https://dashscope.aliyuncs.com/compatible-mode/v1`
+- Базовий URL Global/Intl Standard: `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`
+- Базовий URL China Standard: `https://dashscope.aliyuncs.com/compatible-mode/v1`
 
 Для генерації відео OpenClaw зіставляє налаштований регіон Qwen з відповідним
 хостом DashScope AIGC перед надсиланням завдання:
@@ -111,8 +107,8 @@ endpoint'и Coding Plan.
 - China: `https://dashscope.aliyuncs.com`
 
 Це означає, що звичайний `models.providers.qwen.baseUrl`, який вказує або на
-хости Qwen для Coding Plan, або на хости Standard, усе одно зберігає генерацію відео на правильному
-регіональному DashScope video endpoint.
+хости Qwen Coding Plan, або на Standard, усе одно забезпечує генерацію відео через правильний
+регіональний відеоендпоінт DashScope.
 
 Для генерації відео явно встановіть типову модель:
 
@@ -131,11 +127,14 @@ endpoint'и Coding Plan.
 - До **1** вихідного відео на запит
 - До **1** вхідного зображення
 - До **4** вхідних відео
-- До **10 секунд** тривалості
+- Тривалість до **10 секунд**
 - Підтримує `size`, `aspectRatio`, `resolution`, `audio` і `watermark`
 - Режим еталонного зображення/відео наразі вимагає **віддалених URL http(s)**. Локальні
-  шляхи до файлів відхиляються одразу, оскільки video endpoint DashScope не
-  приймає завантажені локальні буфери для цих еталонів.
+  шляхи до файлів відхиляються одразу, оскільки відеоендпоінт DashScope не
+  приймає завантажені локальні буфери для таких еталонів.
 
-Див. [Qwen / Model Studio](/providers/qwen_modelstudio) для деталей на рівні endpoint'ів
+Див. [Video Generation](/uk/tools/video-generation) щодо спільних параметрів
+інструмента, вибору провайдера та поведінки перемикання при збоях.
+
+Див. [Qwen / Model Studio](/uk/providers/qwen_modelstudio) щодо деталей на рівні ендпоінтів
 і приміток щодо сумісності.
