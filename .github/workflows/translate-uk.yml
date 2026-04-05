@@ -1,28 +1,28 @@
-name: Translate zh-CN
+name: Translate uk
 
 on:
   push:
     branches:
       - main
     paths-ignore:
-      - docs/zh-CN/**
-      - docs/.i18n/zh-CN.tm.jsonl
+      - docs/uk/**
+      - docs/.i18n/uk.tm.jsonl
   schedule:
-    - cron: "17 * * * *"
+    - cron: "29 * * * *"
   repository_dispatch:
     types:
-      - translate-zh-cn-release
+      - translate-uk-release
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: translate-zh-cn
+  group: translate-uk
   cancel-in-progress: false
 
 jobs:
-  translate-zh-cn:
+  translate-uk:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout publish repo
@@ -62,24 +62,24 @@ jobs:
         with:
           go-version: "1.23"
 
-      - name: Prune stale zh-CN pages
+      - name: Prune stale uk pages
         run: |
           python - <<'PY'
           from pathlib import Path
           root = Path("docs")
-          zh_root = root / "zh-CN"
-          if not zh_root.exists():
+          locale_root = root / "uk"
+          if not locale_root.exists():
             raise SystemExit(0)
-          for path in sorted(zh_root.rglob("*"), reverse=True):
+          for path in sorted(locale_root.rglob("*"), reverse=True):
             if path.is_dir():
               if not any(path.iterdir()):
                 path.rmdir()
               continue
-            rel = path.relative_to(zh_root)
+            rel = path.relative_to(locale_root)
             source = root / rel
             if not source.exists():
               path.unlink()
-          for path in sorted(zh_root.rglob("*"), reverse=True):
+          for path in sorted(locale_root.rglob("*"), reverse=True):
             if path.is_dir() and not any(path.iterdir()):
               path.rmdir()
           PY
@@ -125,9 +125,9 @@ jobs:
               continue
             all_files.append(str(path.resolve()))
 
-            zh_path = Path("docs") / "zh-CN" / rel_doc
+            locale_path = Path("docs") / "uk" / rel_doc
             source_hash = hashlib.sha256(path.read_bytes()).hexdigest()
-            if stored_source_hash(zh_path) != source_hash:
+            if stored_source_hash(locale_path) != source_hash:
               pending_files.append(str(path.resolve()))
 
           Path(".openclaw-sync").mkdir(exist_ok=True)
@@ -138,7 +138,7 @@ jobs:
             fh.write(f"pending_count={len(pending_files)}\n")
           PY
 
-      - name: Translate changed docs into zh-CN
+      - name: Translate changed docs into uk
         if: steps.pending.outputs.pending_count != '0'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENCLAW_DOCS_I18N_OPENAI_API_KEY }}
@@ -160,7 +160,7 @@ jobs:
               cd source/scripts/docs-i18n
               go run . \
                 --docs "$GITHUB_WORKSPACE/docs" \
-                --lang zh-CN \
+                --lang uk \
                 --src en \
                 --mode doc \
                 --thinking low \
@@ -179,15 +179,15 @@ jobs:
             sleep 5
           done
 
-      - name: Commit zh-CN refresh
+      - name: Commit uk refresh
         run: |
-          if git diff --quiet -- docs/zh-CN docs/.i18n/zh-CN.tm.jsonl; then
-            echo "No zh-CN translation changes."
+          if git diff --quiet -- docs/uk docs/.i18n/uk.tm.jsonl; then
+            echo "No uk translation changes."
             exit 0
           fi
 
           git config user.name "openclaw-docs-i18n[bot]"
           git config user.email "openclaw-docs-i18n[bot]@users.noreply.github.com"
-          git add docs/zh-CN docs/.i18n/zh-CN.tm.jsonl
-          git commit -m "chore(i18n): refresh zh-CN translations"
+          git add docs/uk docs/.i18n/uk.tm.jsonl
+          git commit -m "chore(i18n): refresh uk translations"
           git push origin HEAD:main
