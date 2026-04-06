@@ -1170,6 +1170,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "tools/media-overview",
                   "tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -2536,6 +2537,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "ja-JP/tools/media-overview",
                   "ja-JP/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -3287,6 +3289,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "es/tools/media-overview",
                   "es/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -4038,6 +4041,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "pt-BR/tools/media-overview",
                   "pt-BR/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -4789,6 +4793,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "ko/tools/media-overview",
                   "ko/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -5540,6 +5545,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "de/tools/media-overview",
                   "de/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -6291,6 +6297,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "fr/tools/media-overview",
                   "fr/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -7042,6 +7049,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "ar/tools/media-overview",
                   "ar/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -7793,6 +7801,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "it/tools/media-overview",
                   "it/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -8544,6 +8553,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "tr/tools/media-overview",
                   "tr/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -9295,6 +9305,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "uk/tools/media-overview",
                   "uk/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -10046,6 +10057,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "id/tools/media-overview",
                   "id/tools/apply-patch",
                   {
                     "group": "Web Browser",
@@ -10797,6 +10809,7 @@
               {
                 "group": "Tools",
                 "pages": [
+                  "pl/tools/media-overview",
                   "pl/tools/apply-patch",
                   {
                     "group": "Web Browser",
