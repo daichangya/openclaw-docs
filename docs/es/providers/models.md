@@ -5,23 +5,23 @@ read_when:
 summary: Proveedores de modelos (LLM) compatibles con OpenClaw
 title: Inicio rápido de proveedores de modelos
 x-i18n:
-    generated_at: "2026-04-05T12:51:28Z"
+    generated_at: "2026-04-06T03:10:41Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 83e372193b476c7cee6eb9f5c443b03563d863043f47c633ac0096bca642cc6f
+    source_hash: c0314fb1c754171e5fc252d30f7ba9bb6acdbb978d97e9249264d90351bac2e7
     source_path: providers/models.md
     workflow: 15
 ---
 
 # Proveedores de modelos
 
-OpenClaw puede usar muchos proveedores de LLM. Elige uno, autentícalo y luego configura el
+OpenClaw puede usar muchos proveedores de LLM. Elige uno, autentícate y luego establece el
 modelo predeterminado como `provider/model`.
 
 ## Inicio rápido (dos pasos)
 
 1. Autentícate con el proveedor (normalmente mediante `openclaw onboard`).
-2. Configura el modelo predeterminado:
+2. Establece el modelo predeterminado:
 
 ```json5
 {
@@ -31,33 +31,36 @@ modelo predeterminado como `provider/model`.
 
 ## Proveedores compatibles (conjunto inicial)
 
-- [Anthropic (API + Claude CLI)](/providers/anthropic)
-- [Amazon Bedrock](/providers/bedrock)
-- [BytePlus (internacional)](/concepts/model-providers#byteplus-international)
-- [Chutes](/providers/chutes)
-- [Cloudflare AI Gateway](/providers/cloudflare-ai-gateway)
-- [Fireworks](/providers/fireworks)
-- [Modelos GLM](/providers/glm)
-- [MiniMax](/providers/minimax)
-- [Mistral](/providers/mistral)
-- [Moonshot AI (Kimi + Kimi Coding)](/providers/moonshot)
-- [OpenAI (API + Codex)](/providers/openai)
-- [OpenCode (Zen + Go)](/providers/opencode)
-- [OpenRouter](/providers/openrouter)
-- [Qianfan](/providers/qianfan)
-- [Qwen](/providers/qwen)
-- [StepFun](/providers/stepfun)
-- [Synthetic](/providers/synthetic)
-- [Vercel AI Gateway](/providers/vercel-ai-gateway)
-- [Venice (Venice AI)](/providers/venice)
-- [xAI](/providers/xai)
-- [Z.AI](/providers/zai)
+- [Alibaba Model Studio](/providers/alibaba)
+- [Anthropic (API + Claude CLI)](/es/providers/anthropic)
+- [Amazon Bedrock](/es/providers/bedrock)
+- [BytePlus (Internacional)](/es/concepts/model-providers#byteplus-international)
+- [Chutes](/es/providers/chutes)
+- [ComfyUI](/providers/comfy)
+- [Cloudflare AI Gateway](/es/providers/cloudflare-ai-gateway)
+- [fal](/providers/fal)
+- [Fireworks](/es/providers/fireworks)
+- [modelos GLM](/es/providers/glm)
+- [MiniMax](/es/providers/minimax)
+- [Mistral](/es/providers/mistral)
+- [Moonshot AI (Kimi + Kimi Coding)](/es/providers/moonshot)
+- [OpenAI (API + Codex)](/es/providers/openai)
+- [OpenCode (Zen + Go)](/es/providers/opencode)
+- [OpenRouter](/es/providers/openrouter)
+- [Qianfan](/es/providers/qianfan)
+- [Qwen](/es/providers/qwen)
+- [Runway](/providers/runway)
+- [StepFun](/es/providers/stepfun)
+- [Synthetic](/es/providers/synthetic)
+- [Vercel AI Gateway](/es/providers/vercel-ai-gateway)
+- [Venice (Venice AI)](/es/providers/venice)
+- [xAI](/es/providers/xai)
+- [Z.AI](/es/providers/zai)
 
-## Variantes adicionales de proveedores incluidos
+## Variantes adicionales de proveedores empaquetados
 
-- `anthropic-vertex` - compatibilidad implícita de Anthropic en Google Vertex cuando hay credenciales de Vertex disponibles; no hay una opción de autenticación de onboarding independiente
+- `anthropic-vertex` - compatibilidad implícita de Anthropic en Google Vertex cuando hay credenciales de Vertex disponibles; no hay una opción de autenticación independiente en el onboarding
 - `copilot-proxy` - puente local de VS Code Copilot Proxy; usa `openclaw onboard --auth-choice copilot-proxy`
-- `google-gemini-cli` - flujo OAuth no oficial de Gemini CLI; requiere una instalación local de `gemini` (`brew install gemini-cli` o `npm install -g @google/gemini-cli`); modelo predeterminado `google-gemini-cli/gemini-3.1-pro-preview`; usa `openclaw onboard --auth-choice google-gemini-cli` o `openclaw models auth login --provider google-gemini-cli --set-default`
 
 Para ver el catálogo completo de proveedores (xAI, Groq, Mistral, etc.) y la configuración avanzada,
-consulta [Model providers](/concepts/model-providers).
+consulta [Proveedores de modelos](/es/concepts/model-providers).
