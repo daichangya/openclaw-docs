@@ -1,23 +1,23 @@
 ---
 read_when:
-    - Відповіді на поширені запитання щодо налаштування, встановлення, онбордингу або підтримки під час роботи
+    - Відповідь на поширені запитання щодо налаштування, встановлення, онбордингу або підтримки під час роботи
     - Тріаж проблем, про які повідомляють користувачі, перед глибшим налагодженням
 summary: Часті запитання про налаштування, конфігурацію та використання OpenClaw
-title: Поширені запитання
+title: ЧаПи
 x-i18n:
-    generated_at: "2026-04-05T18:22:04Z"
+    generated_at: "2026-04-06T00:38:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f1004466a417ae57373048f4353ab4040a5c567980542375fbf55ff93132de31
+    source_hash: 4d6d09621c6033d580cbcf1ff46f81587d69404d6f64c8d8fd8c3f09185bb920
     source_path: help/faq.md
     workflow: 15
 ---
 
-# Поширені запитання
+# ЧаПи
 
-Швидкі відповіді та глибше усунення несправностей для реальних сценаріїв налаштування (локальна розробка, VPS, multi-agent, OAuth/API-ключі, резервне перемикання моделей). Для діагностики під час роботи див. [Troubleshooting](/uk/gateway/troubleshooting). Повний довідник з конфігурації див. у [Configuration](/uk/gateway/configuration).
+Швидкі відповіді та глибше усунення проблем для реальних сценаріїв налаштування (локальна розробка, VPS, multi-agent, OAuth/API-ключі, резервне перемикання моделей). Для діагностики під час роботи див. [Усунення проблем](/uk/gateway/troubleshooting). Повний довідник конфігурації див. у [Конфігурація](/uk/gateway/configuration).
 
-## Перші 60 секунд, якщо щось зламано
+## Перші 60 секунд, якщо щось зламалося
 
 1. **Швидкий статус (перша перевірка)**
 
@@ -25,23 +25,23 @@ x-i18n:
    openclaw status
    ```
 
-   Швидке локальне зведення: ОС + оновлення, доступність gateway/service, agents/sessions, конфігурація провайдера + проблеми під час роботи (коли gateway доступний).
+   Швидке локальне зведення: ОС + оновлення, доступність gateway/сервісу, agents/sessions, конфігурація провайдера + проблеми під час роботи (коли gateway доступний).
 
-2. **Звіт, який можна вставити й безпечно поширити**
+2. **Звіт, який можна вставити (безпечний для поширення)**
 
    ```bash
    openclaw status --all
    ```
 
-   Діагностика лише для читання з хвостом логів (токени приховано).
+   Діагностика лише для читання з хвостом логів (токени приховані).
 
-3. **Стан демона та порту**
+3. **Стан демона + порту**
 
    ```bash
    openclaw gateway status
    ```
 
-   Показує runtime супервізора порівняно з доступністю RPC, цільову URL-адресу probe і яку конфігурацію сервіс імовірно використовував.
+   Показує runtime супервізора порівняно з доступністю RPC, URL цілі probe та яку конфігурацію сервіс, імовірно, використав.
 
 4. **Глибокі probe-перевірки**
 
@@ -49,22 +49,22 @@ x-i18n:
    openclaw status --deep
    ```
 
-   Виконує live gateway health probe, включно з перевірками каналів, коли це підтримується
-   (потрібен доступний gateway). Див. [Health](/uk/gateway/health).
+   Запускає live probe перевірки health gateway, включно з probe перевірками каналів, коли це підтримується
+   (потрібен доступний gateway). Див. [Стан](/uk/gateway/health).
 
-5. **Перегляд найновішого журналу**
+5. **Переглянути останній лог у реальному часі**
 
    ```bash
    openclaw logs --follow
    ```
 
-   Якщо RPC недоступний, використовуйте:
+   Якщо RPC недоступний, використайте запасний варіант:
 
    ```bash
    tail -f "$(ls -t /tmp/openclaw/openclaw-*.log | head -1)"
    ```
 
-   Файлові логи відокремлені від логів сервісу; див. [Logging](/uk/logging) і [Troubleshooting](/uk/gateway/troubleshooting).
+   Файлові логи відокремлені від логів сервісу; див. [Логування](/uk/logging) та [Усунення проблем](/uk/gateway/troubleshooting).
 
 6. **Запустити doctor (виправлення)**
 
@@ -72,48 +72,48 @@ x-i18n:
    openclaw doctor
    ```
 
-   Виправляє/мігрує config/state + запускає health checks. Див. [Doctor](/uk/gateway/doctor).
+   Виправляє/мігрує config/state + запускає перевірки health. Див. [Doctor](/uk/gateway/doctor).
 
-7. **Знімок Gateway**
+7. **Знімок gateway**
 
    ```bash
    openclaw health --json
-   openclaw health --verbose   # показує цільову URL-адресу + шлях до config у разі помилок
+   openclaw health --verbose   # shows the target URL + config path on errors
    ```
 
-   Запитує у запущеного gateway повний знімок (лише WS). Див. [Health](/uk/gateway/health).
+   Запитує у запущеного gateway повний знімок (лише WS). Див. [Стан](/uk/gateway/health).
 
-## Швидкий старт і початкове налаштування
+## Швидкий старт і перше налаштування
 
 <AccordionGroup>
-  <Accordion title="Я застряг, найшвидший спосіб розблокуватися">
-    Скористайтеся локальним AI-агентом, який може **бачити вашу машину**. Це набагато ефективніше, ніж питати
-    у Discord, бо більшість випадків «я застряг» — це **проблеми локальної конфігурації або середовища**,
+  <Accordion title="Я застряг(ла), який найшвидший спосіб розблокуватися">
+    Використайте локального AI-агента, який може **бачити вашу машину**. Це значно ефективніше, ніж питати
+    в Discord, тому що більшість випадків "я застряг(ла)" — це **локальні проблеми конфігурації або середовища**,
     які віддалені помічники не можуть перевірити.
 
     - **Claude Code**: [https://www.anthropic.com/claude-code/](https://www.anthropic.com/claude-code/)
     - **OpenAI Codex**: [https://openai.com/codex/](https://openai.com/codex/)
 
-    Ці інструменти можуть читати репозиторій, запускати команди, перевіряти логи та допомагати виправляти
-    налаштування на рівні машини (PATH, сервіси, дозволи, auth-файли). Надайте їм **повну копію вихідного коду**
-    через hackable (git) install:
+    Ці інструменти можуть читати репозиторій, виконувати команди, перевіряти логи й допомагати виправляти
+    налаштування на рівні машини (PATH, сервіси, дозволи, auth-файли). Надайте їм **повний checkout вихідного коду** через
+    hackable-встановлення (git):
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git
     ```
 
-    Це встановлює OpenClaw **із git checkout**, тому агент може читати код і документацію та
-    міркувати про точну версію, яку ви використовуєте. Пізніше ви завжди можете повернутися до stable,
+    Це встановлює OpenClaw **із git checkout**, тож агент може читати код + документацію і
+    міркувати про точну версію, яку ви запускаєте. Ви завжди можете повернутися до stable пізніше,
     повторно запустивши інсталятор без `--install-method git`.
 
     Порада: попросіть агента **спланувати й супроводжувати** виправлення (крок за кроком), а потім виконати лише
-    потрібні команди. Це зберігає зміни невеликими й полегшує аудит.
+    потрібні команди. Це зменшує масштаб змін і спрощує аудит.
 
-    Якщо ви виявите реальний баг або виправлення, будь ласка, створіть GitHub issue або надішліть PR:
+    Якщо ви знайдете реальний баг або виправлення, будь ласка, створіть issue на GitHub або надішліть PR:
     [https://github.com/openclaw/openclaw/issues](https://github.com/openclaw/openclaw/issues)
     [https://github.com/openclaw/openclaw/pulls](https://github.com/openclaw/openclaw/pulls)
 
-    Почніть із цих команд (діліться виводом, коли просите про допомогу):
+    Почніть із цих команд (поділіться виводом, коли просите про допомогу):
 
     ```bash
     openclaw status
@@ -123,15 +123,15 @@ x-i18n:
 
     Що вони роблять:
 
-    - `openclaw status`: швидкий знімок здоров’я gateway/agent + базової конфігурації.
+    - `openclaw status`: швидкий знімок health gateway/agent + базової конфігурації.
     - `openclaw models status`: перевіряє auth провайдера + доступність моделей.
-    - `openclaw doctor`: перевіряє та виправляє поширені проблеми config/state.
+    - `openclaw doctor`: перевіряє та виправляє типові проблеми config/state.
 
     Інші корисні перевірки CLI: `openclaw status --all`, `openclaw logs --follow`,
     `openclaw gateway status`, `openclaw health --verbose`.
 
-    Швидкий цикл налагодження: [Перші 60 секунд, якщо щось зламано](#перші-60-секунд-якщо-щось-зламано).
-    Документація зі встановлення: [Install](/uk/install), [Installer flags](/uk/install/installer), [Updating](/uk/install/updating).
+    Швидкий цикл налагодження: [Перші 60 секунд, якщо щось зламалося](#перші-60-секунд-якщо-щось-зламалося).
+    Документація зі встановлення: [Встановлення](/uk/install), [Прапорці інсталятора](/uk/install/installer), [Оновлення](/uk/install/updating).
 
   </Accordion>
 
@@ -139,122 +139,122 @@ x-i18n:
     Поширені причини пропуску heartbeat:
 
     - `quiet-hours`: поза налаштованим вікном active-hours
-    - `empty-heartbeat-file`: `HEARTBEAT.md` існує, але містить лише порожній/заголовковий каркас
-    - `no-tasks-due`: у `HEARTBEAT.md` активний режим задач, але жоден з інтервалів задач ще не настав
-    - `alerts-disabled`: вся видимість heartbeat вимкнена (`showOk`, `showAlerts` і `useIndicator` вимкнені)
+    - `empty-heartbeat-file`: `HEARTBEAT.md` існує, але містить лише порожній/заголовковий шаблон
+    - `no-tasks-due`: режим задач `HEARTBEAT.md` активний, але жоден із інтервалів задач ще не настав
+    - `alerts-disabled`: уся видимість heartbeat вимкнена (`showOk`, `showAlerts` і `useIndicator` усі вимкнені)
 
-    У режимі задач часові мітки настання оновлюються лише після завершення реального heartbeat-запуску.
-    Пропущені запуски не позначають задачі як виконані.
+    У режимі задач часові мітки due оновлюються лише після завершення
+    реального запуску heartbeat. Пропущені запуски не позначають задачі як виконані.
 
-    Документація: [Heartbeat](/uk/gateway/heartbeat), [Automation & Tasks](/uk/automation).
+    Документація: [Heartbeat](/uk/gateway/heartbeat), [Автоматизація та задачі](/uk/automation).
 
   </Accordion>
 
-  <Accordion title="Рекомендований спосіб встановлення та налаштування OpenClaw">
-    У репозиторії рекомендується запуск із вихідного коду та використання onboarding:
+  <Accordion title="Рекомендований спосіб встановлення й налаштування OpenClaw">
+    Репозиторій рекомендує запуск із вихідного коду та використання онбордингу:
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash
     openclaw onboard --install-daemon
     ```
 
-    Майстер також може автоматично зібрати UI assets. Після onboarding ви зазвичай запускаєте Gateway на порту **18789**.
+    Майстер також може автоматично зібрати UI-ресурси. Після онбордингу ви зазвичай запускаєте Gateway на порту **18789**.
 
-    Із вихідного коду (для учасників/розробників):
+    Із вихідного коду (contributors/dev):
 
     ```bash
     git clone https://github.com/openclaw/openclaw.git
     cd openclaw
     pnpm install
     pnpm build
-    pnpm ui:build # автоматично встановлює UI deps під час першого запуску
+    pnpm ui:build # auto-installs UI deps on first run
     openclaw onboard
     ```
 
-    Якщо у вас ще немає глобального встановлення, запускайте через `pnpm openclaw onboard`.
+    Якщо у вас ще немає глобального встановлення, запустіть через `pnpm openclaw onboard`.
 
   </Accordion>
 
-  <Accordion title="Як відкрити dashboard після onboarding?">
-    Майстер відкриває браузер із чистою (без токена) URL-адресою dashboard одразу після onboarding і також друкує посилання в підсумку. Залиште цю вкладку відкритою; якщо її не було запущено, скопіюйте та вставте надруковану URL-адресу на тій самій машині.
+  <Accordion title="Як відкрити dashboard після онбордингу?">
+    Майстер відкриває у вашому браузері чисту (без токенізованого URL) адресу dashboard одразу після онбордингу, а також друкує посилання в підсумку. Тримайте цю вкладку відкритою; якщо вона не запустилася, скопіюйте й вставте надрукований URL на тій самій машині.
   </Accordion>
 
   <Accordion title="Як автентифікувати dashboard на localhost і віддалено?">
     **Localhost (та сама машина):**
 
     - Відкрийте `http://127.0.0.1:18789/`.
-    - Якщо запитується shared-secret auth, вставте налаштований токен або пароль у налаштуваннях Control UI.
+    - Якщо запитує auth через shared secret, вставте налаштований токен або пароль у налаштуваннях Control UI.
     - Джерело токена: `gateway.auth.token` (або `OPENCLAW_GATEWAY_TOKEN`).
     - Джерело пароля: `gateway.auth.password` (або `OPENCLAW_GATEWAY_PASSWORD`).
-    - Якщо shared secret ще не налаштовано, згенеруйте токен командою `openclaw doctor --generate-gateway-token`.
+    - Якщо shared secret ще не налаштовано, згенеруйте токен через `openclaw doctor --generate-gateway-token`.
 
     **Не на localhost:**
 
-    - **Tailscale Serve** (рекомендовано): залиште bind loopback, виконайте `openclaw gateway --tailscale serve`, відкрийте `https://<magicdns>/`. Якщо `gateway.auth.allowTailscale` має значення `true`, identity headers задовольняють auth для Control UI/WebSocket (без вставляння shared secret, за умови довіри до gateway host); HTTP API усе одно потребують shared-secret auth, якщо ви навмисно не використовуєте private-ingress `none` або trusted-proxy HTTP auth.
-      Невдалі одночасні спроби автентифікації Serve з одного клієнта серіалізуються до того, як лімітатор failed-auth зафіксує їх, тож уже друга невдала повторна спроба може показати `retry later`.
-    - **Tailnet bind**: виконайте `openclaw gateway --bind tailnet --token "<token>"` (або налаштуйте auth паролем), відкрийте `http://<tailscale-ip>:18789/`, потім вставте відповідний shared secret у налаштуваннях dashboard.
-    - **Identity-aware reverse proxy**: залиште Gateway за non-loopback trusted proxy, налаштуйте `gateway.auth.mode: "trusted-proxy"`, а потім відкрийте URL-адресу proxy.
-    - **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host`, потім відкрийте `http://127.0.0.1:18789/`. Shared-secret auth усе ще застосовується через tunnel; якщо буде запит, вставте налаштований токен або пароль.
+    - **Tailscale Serve** (рекомендовано): залиште bind loopback, виконайте `openclaw gateway --tailscale serve`, відкрийте `https://<magicdns>/`. Якщо `gateway.auth.allowTailscale` має значення `true`, заголовки ідентичності задовольняють auth для Control UI/WebSocket (без вставляння shared secret, за умови довіреного gateway host); HTTP API, як і раніше, вимагають auth через shared secret, якщо ви навмисно не використовуєте private-ingress `none` або auth HTTP через trusted-proxy.
+      Некоректні одночасні спроби auth від того самого клієнта через Serve серіалізуються до того, як limiter невдалої auth їх зафіксує, тому вже друга помилкова повторна спроба може показати `retry later`.
+    - **Bind tailnet**: виконайте `openclaw gateway --bind tailnet --token "<token>"` (або налаштуйте auth через пароль), відкрийте `http://<tailscale-ip>:18789/`, потім вставте відповідний shared secret у налаштування dashboard.
+    - **Identity-aware reverse proxy**: залиште Gateway за trusted proxy без loopback, налаштуйте `gateway.auth.mode: "trusted-proxy"`, потім відкрийте URL proxy.
+    - **SSH tunnel**: `ssh -N -L 18789:127.0.0.1:18789 user@host` потім відкрийте `http://127.0.0.1:18789/`. Auth через shared secret і далі застосовується через tunnel; вставте налаштований токен або пароль, якщо буде запит.
 
-    Див. [Dashboard](/web/dashboard) і [Web surfaces](/web) щодо режимів bind і подробиць auth.
-
-  </Accordion>
-
-  <Accordion title="Чому для chat approvals існують дві конфігурації exec approval?">
-    Вони керують різними шарами:
-
-    - `approvals.exec`: пересилає approval prompts у chat destinations
-    - `channels.<channel>.execApprovals`: робить цей channel нативним approval client для exec approvals
-
-    Host exec policy усе ще є справжнім approval gate. Конфігурація чату лише визначає, де з’являються
-    approval prompts і як люди можуть на них відповідати.
-
-    У більшості сценаріїв вам **не** потрібні обидві:
-
-    - Якщо чат уже підтримує команди та відповіді, `/approve` у тому самому чаті працює через спільний шлях.
-    - Якщо підтримуваний native channel може безпечно визначити approvers, OpenClaw тепер автоматично вмикає native approvals у DM-first режимі, коли `channels.<channel>.execApprovals.enabled` не задано або має значення `"auto"`.
-    - Коли доступні native approval cards/buttons, цей native UI є основним шляхом; агент має включати ручну команду `/approve`, лише якщо результат інструмента каже, що chat approvals недоступні або ручне approval — єдиний шлях.
-    - Використовуйте `approvals.exec` лише тоді, коли prompts також треба пересилати в інші чати або окремі ops rooms.
-    - Використовуйте `channels.<channel>.execApprovals.target: "channel"` або `"both"` лише якщо ви явно хочете, щоб approval prompts публікувалися назад у початкову room/topic.
-    - Plugin approvals ще окремі: вони типово використовують `/approve` у тому самому чаті, необов’язкове пересилання `approvals.plugin`, і лише деякі native channels додатково підтримують plugin-approval-native handling.
-
-    Коротко: forwarding — для маршрутизації, native client config — для багатшого channel-specific UX.
-    Див. [Exec Approvals](/tools/exec-approvals).
+    Див. [Dashboard](/web/dashboard) і [Web surfaces](/web) для подробиць щодо режимів bind і auth.
 
   </Accordion>
 
-  <Accordion title="Яке runtime мені потрібне?">
+  <Accordion title="Чому є дві конфігурації approval для exec-approval у чаті?">
+    Вони керують різними рівнями:
+
+    - `approvals.exec`: пересилає запити на approval до призначень чату
+    - `channels.<channel>.execApprovals`: робить цей канал нативним approval-клієнтом для exec-approval
+
+    Політика host exec усе ще є реальною перепоною approval. Конфігурація чату лише керує тим,
+    де з’являються запити на approval і як люди можуть на них відповідати.
+
+    У більшості налаштувань вам **не** потрібні обидві:
+
+    - Якщо чат уже підтримує команди й відповіді, `/approve` у тому самому чаті працює через спільний шлях.
+    - Якщо підтримуваний нативний канал може безпечно визначити approver-ів, OpenClaw тепер автоматично вмикає DM-first native approvals, коли `channels.<channel>.execApprovals.enabled` не задано або дорівнює `"auto"`.
+    - Коли доступні нативні картки/кнопки approval, цей нативний UI є основним шляхом; агент має включати ручну команду `/approve` лише тоді, коли результат інструмента каже, що approvals у чаті недоступні або ручний approval — єдиний шлях.
+    - Використовуйте `approvals.exec` лише коли запити також потрібно пересилати в інші чати або явні ops-room.
+    - Використовуйте `channels.<channel>.execApprovals.target: "channel"` або `"both"` лише тоді, коли ви явно хочете, щоб запити на approval публікувалися назад у вихідну кімнату/тему.
+    - approvals для plugins знову ж таки окремі: вони за замовчуванням використовують `/approve` у тому самому чаті, необов’язкове пересилання `approvals.plugin`, і лише деякі нативні канали зберігають додаткову обробку plugin-approval-native.
+
+    Коротко: пересилання — це про маршрутизацію, конфігурація нативного клієнта — про багатший UX, специфічний для каналу.
+    Див. [Exec Approvals](/uk/tools/exec-approvals).
+
+  </Accordion>
+
+  <Accordion title="Яке середовище виконання потрібне?">
     Потрібен Node **>= 22**. Рекомендовано `pnpm`. Bun **не рекомендовано** для Gateway.
   </Accordion>
 
   <Accordion title="Чи працює це на Raspberry Pi?">
-    Так. Gateway легкий — у документації вказано, що для особистого використання достатньо **512MB-1GB RAM**, **1 core** і приблизно **500MB**
-    диска, а також зазначено, що **Raspberry Pi 4 може це запускати**.
+    Так. Gateway легкий — у документації вказано, що для особистого використання достатньо **512MB-1GB RAM**, **1 ядра** і близько **500MB**
+    диска, і зазначено, що **Raspberry Pi 4 може це запускати**.
 
-    Якщо вам потрібен додатковий запас (логи, медіа, інші сервіси), **рекомендується 2GB**, але це
+    Якщо вам потрібен додатковий запас (логи, медіа, інші сервіси), **рекомендовано 2GB**, але це
     не жорсткий мінімум.
 
-    Порада: невеликий Pi/VPS може розміщувати Gateway, а ви можете під’єднати **nodes** на ноутбуці/телефоні для
+    Порада: невеликий Pi/VPS може хостити Gateway, а ви можете підключати **nodes** на ноутбуці/телефоні для
     локального screen/camera/canvas або виконання команд. Див. [Nodes](/uk/nodes).
 
   </Accordion>
 
-  <Accordion title="Чи є поради щодо встановлення на Raspberry Pi?">
-    Коротко: це працює, але очікуйте шорсткостей.
+  <Accordion title="Є поради для встановлення на Raspberry Pi?">
+    Коротко: працює, але очікуйте шерехів.
 
     - Використовуйте **64-bit** ОС і Node >= 22.
     - Надавайте перевагу **hackable (git) install**, щоб бачити логи й швидко оновлюватися.
-    - Починайте без channels/skills, а потім додавайте їх по одному.
-    - Якщо натрапили на дивні проблеми з бінарниками, зазвичай це проблема **ARM compatibility**.
+    - Почніть без channels/Skills, потім додавайте їх по одному.
+    - Якщо натрапите на дивні проблеми з бінарниками, це зазвичай проблема **ARM-сумісності**.
 
-    Документація: [Linux](/uk/platforms/linux), [Install](/uk/install).
+    Документація: [Linux](/uk/platforms/linux), [Встановлення](/uk/install).
 
   </Accordion>
 
-  <Accordion title="Зависло на wake up my friend / onboarding не завершується. Що робити?">
-    Цей екран залежить від доступності та автентифікації Gateway. TUI також надсилає
-    «Wake up, my friend!» автоматично під час першого hatch. Якщо ви бачите цей рядок і **не маєте відповіді**,
-    а токени залишаються 0, агент так і не запустився.
+  <Accordion title="Застрягає на wake up my friend / onboarding не проходить. Що робити?">
+    Цей екран залежить від доступності й автентифікації Gateway. TUI також автоматично надсилає
+    "Wake up, my friend!" під час першого hatch. Якщо ви бачите цей рядок **без відповіді**
+    і токени лишаються 0, агент так і не запустився.
 
     1. Перезапустіть Gateway:
 
@@ -262,7 +262,7 @@ x-i18n:
     openclaw gateway restart
     ```
 
-    2. Перевірте статус і auth:
+    2. Перевірте статус + auth:
 
     ```bash
     openclaw status
@@ -276,31 +276,31 @@ x-i18n:
     openclaw doctor
     ```
 
-    Якщо Gateway віддалений, переконайтеся, що tunnel/Tailscale connection активне і що UI
-    спрямовано на правильний Gateway. Див. [Remote access](/uk/gateway/remote).
+    Якщо Gateway віддалений, переконайтеся, що tunnel/Tailscale-з’єднання активне і що UI
+    спрямовано на правильний Gateway. Див. [Віддалений доступ](/uk/gateway/remote).
 
   </Accordion>
 
   <Accordion title="Чи можу я перенести своє налаштування на нову машину (Mac mini), не проходячи onboarding заново?">
-    Так. Скопіюйте **state directory** і **workspace**, а потім один раз запустіть Doctor. Це
-    збереже вашого бота «точно таким самим» (memory, session history, auth і channel
-    state), якщо ви скопіюєте **обидва** розташування:
+    Так. Скопіюйте **каталог state** і **workspace**, потім один раз запустіть Doctor. Це
+    збереже вашого бота "точно таким самим" (memory, history сесій, auth і channel
+    state), якщо ви скопіюєте **обидва** місця:
 
-    1. Встановіть OpenClaw на новій машині.
+    1. Встановіть OpenClaw на нову машину.
     2. Скопіюйте `$OPENCLAW_STATE_DIR` (типово: `~/.openclaw`) зі старої машини.
-    3. Скопіюйте свій workspace (типово: `~/.openclaw/workspace`).
-    4. Виконайте `openclaw doctor` і перезапустіть сервіс Gateway.
+    3. Скопіюйте ваш workspace (типово: `~/.openclaw/workspace`).
+    4. Запустіть `openclaw doctor` і перезапустіть сервіс Gateway.
 
-    Це зберігає config, auth profiles, облікові дані WhatsApp, sessions і memory. Якщо ви у
-    remote mode, пам’ятайте, що gateway host володіє session store і workspace.
+    Це збереже config, auth-профілі, облікові дані WhatsApp, sessions і memory. Якщо ви в
+    remote mode, пам’ятайте, що саме gateway host володіє сховищем сесій і workspace.
 
-    **Важливо:** якщо ви лише commit/push свій workspace у GitHub, ви робите резервну копію
-    **memory + bootstrap files**, але **не** session history чи auth. Вони зберігаються
-    в `~/.openclaw/` (наприклад, `~/.openclaw/agents/<agentId>/sessions/`).
+    **Важливо:** якщо ви лише commit/push ваш workspace на GitHub, ви резервуєте
+    **memory + bootstrap-файли**, але **не** history сесій і не auth. Вони живуть
+    у `~/.openclaw/` (наприклад, `~/.openclaw/agents/<agentId>/sessions/`).
 
-    Пов’язане: [Migrating](/uk/install/migrating), [Де що зберігається на диску](#де-що-зберігається-на-диску),
-    [Agent workspace](/uk/concepts/agent-workspace), [Doctor](/uk/gateway/doctor),
-    [Remote mode](/uk/gateway/remote).
+    Пов’язане: [Міграція](/uk/install/migrating), [Де що лежить на диску](#де-що-лежить-на-диску),
+    [Workspace агента](/uk/concepts/agent-workspace), [Doctor](/uk/gateway/doctor),
+    [Віддалений режим](/uk/gateway/remote).
 
   </Accordion>
 
@@ -308,16 +308,16 @@ x-i18n:
     Перевірте changelog на GitHub:
     [https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md](https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md)
 
-    Найновіші записи — вгорі. Якщо верхній розділ позначено як **Unreleased**, наступний датований
-    розділ — це остання випущена версія. Записи згруповано за **Highlights**, **Changes** і
-    **Fixes** (а також за документацією/іншими розділами за потреби).
+    Найновіші записи зверху. Якщо верхню секцію позначено як **Unreleased**, наступна датована
+    секція — це остання випущена версія. Записи згруповано за **Highlights**, **Changes** та
+    **Fixes** (а також docs/іншими секціями за потреби).
 
   </Accordion>
 
-  <Accordion title="Не вдається відкрити docs.openclaw.ai (SSL-помилка)">
-    Деякі з’єднання Comcast/Xfinity некоректно блокують `docs.openclaw.ai` через Xfinity
-    Advanced Security. Вимкніть її або додайте `docs.openclaw.ai` до allowlist, а потім спробуйте ще раз.
-    Будь ласка, допоможіть нам розблокувати сайт, повідомивши тут: [https://spa.xfinity.com/check_url_status](https://spa.xfinity.com/check_url_status).
+  <Accordion title="Не вдається відкрити docs.openclaw.ai (помилка SSL)">
+    Деякі з’єднання Comcast/Xfinity помилково блокують `docs.openclaw.ai` через Xfinity
+    Advanced Security. Вимкніть її або додайте `docs.openclaw.ai` до allowlist, а потім повторіть спробу.
+    Будь ласка, допоможіть нам розблокувати це, повідомивши тут: [https://spa.xfinity.com/check_url_status](https://spa.xfinity.com/check_url_status).
 
     Якщо ви все ще не можете відкрити сайт, документація дзеркалюється на GitHub:
     [https://github.com/openclaw/openclaw/tree/main/docs](https://github.com/openclaw/openclaw/tree/main/docs)
@@ -331,20 +331,20 @@ x-i18n:
     - `beta` = рання збірка для тестування
 
     Зазвичай stable-реліз спочатку потрапляє в **beta**, а потім явний
-    крок просування переміщує цю саму версію до `latest`. За потреби мейнтейнери також можуть
-    публікувати одразу в `latest`. Саме тому після просування beta і stable можуть
-    вказувати на **одну й ту саму версію**.
+    крок просування переносить цю саму версію в `latest`. Maintainers також можуть
+    за потреби публікувати відразу в `latest`. Саме тому beta і stable можуть
+    вказувати на **ту саму версію** після просування.
 
-    Подивіться, що змінилося:
+    Подивитися, що змінилося:
     [https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md](https://github.com/openclaw/openclaw/blob/main/CHANGELOG.md)
 
-    Однорядкові команди встановлення та різницю між beta і dev див. в accordion нижче.
+    Однорядкові команди для встановлення і різницю між beta та dev дивіться в акордеоні нижче.
 
   </Accordion>
 
   <Accordion title="Як встановити beta-версію і в чому різниця між beta та dev?">
-    **Beta** — це npm dist-tag `beta` (після просування може збігатися з `latest`).
-    **Dev** — це рухома голова `main` (git); при публікації вона використовує npm dist-tag `dev`.
+    **Beta** — це npm dist-tag `beta` (може збігатися з `latest` після просування).
+    **Dev** — це рухома голова `main` (git); коли її публікують, вона використовує npm dist-tag `dev`.
 
     Однорядкові команди (macOS/Linux):
 
@@ -356,14 +356,14 @@ x-i18n:
     curl -fsSL --proto '=https' --tlsv1.2 https://openclaw.ai/install.sh | bash -s -- --install-method git
     ```
 
-    Інсталятор для Windows (PowerShell):
+    Windows installer (PowerShell):
     [https://openclaw.ai/install.ps1](https://openclaw.ai/install.ps1)
 
-    Докладніше: [Development channels](/uk/install/development-channels) і [Installer flags](/uk/install/installer).
+    Докладніше: [Канали розробки](/uk/install/development-channels) і [Прапорці інсталятора](/uk/install/installer).
 
   </Accordion>
 
-  <Accordion title="Як спробувати найновіші зміни?">
+  <Accordion title="Як спробувати найсвіжіші збірки?">
     Є два варіанти:
 
     1. **Dev channel (git checkout):**
@@ -380,9 +380,9 @@ x-i18n:
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git
     ```
 
-    Це дає вам локальний репозиторій, який можна редагувати, а потім оновлювати через git.
+    Це дає вам локальний repo, який можна редагувати, а потім оновлювати через git.
 
-    Якщо ви віддаєте перевагу чистому ручному clone, використовуйте:
+    Якщо ви віддаєте перевагу чистому clone вручну, використайте:
 
     ```bash
     git clone https://github.com/openclaw/openclaw.git
@@ -391,36 +391,36 @@ x-i18n:
     pnpm build
     ```
 
-    Документація: [Update](/cli/update), [Development channels](/uk/install/development-channels),
-    [Install](/uk/install).
+    Документація: [Оновлення](/cli/update), [Канали розробки](/uk/install/development-channels),
+    [Встановлення](/uk/install).
 
   </Accordion>
 
-  <Accordion title="Скільки зазвичай триває встановлення й onboarding?">
+  <Accordion title="Скільки зазвичай тривають встановлення та onboarding?">
     Орієнтовно:
 
     - **Встановлення:** 2-5 хвилин
     - **Onboarding:** 5-15 хвилин залежно від кількості channels/models, які ви налаштовуєте
 
-    Якщо зависає, скористайтеся [Installer stuck](#швидкий-старт-і-початкове-налаштування)
-    і швидким циклом налагодження в [Я застряг](#швидкий-старт-і-початкове-налаштування).
+    Якщо все зависло, скористайтеся [Застряг інсталятор](#швидкий-старт-і-перше-налаштування)
+    і швидким циклом налагодження в [Я застряг(ла)](#швидкий-старт-і-перше-налаштування).
 
   </Accordion>
 
-  <Accordion title="Інсталятор завис? Як отримати більше зворотного зв’язку?">
-    Повторно запустіть інсталятор із **детальним виводом**:
+  <Accordion title="Інсталятор застряг? Як отримати більше зворотного зв’язку?">
+    Повторно запустіть інсталятор із **докладним виводом**:
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --verbose
     ```
 
-    Встановлення beta з детальним виводом:
+    Beta-встановлення з verbose:
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --beta --verbose
     ```
 
-    Для hackable (git) install:
+    Для hackable-встановлення (git):
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git --verbose
@@ -429,48 +429,48 @@ x-i18n:
     Еквівалент для Windows (PowerShell):
 
     ```powershell
-    # install.ps1 поки що не має окремого прапорця -Verbose.
+    # install.ps1 has no dedicated -Verbose flag yet.
     Set-PSDebug -Trace 1
     & ([scriptblock]::Create((iwr -useb https://openclaw.ai/install.ps1))) -NoOnboard
     Set-PSDebug -Trace 0
     ```
 
-    Більше варіантів: [Installer flags](/uk/install/installer).
+    Більше варіантів: [Прапорці інсталятора](/uk/install/installer).
 
   </Accordion>
 
   <Accordion title="Під час встановлення на Windows пише git not found або openclaw not recognized">
-    Дві поширені проблеми Windows:
+    Дві поширені проблеми у Windows:
 
     **1) npm error spawn git / git not found**
 
     - Встановіть **Git for Windows** і переконайтеся, що `git` є у вашому PATH.
-    - Закрийте та знову відкрийте PowerShell, потім повторно запустіть інсталятор.
+    - Закрийте й знову відкрийте PowerShell, потім повторно запустіть інсталятор.
 
-    **2) openclaw is not recognized після встановлення**
+    **2) openclaw is not recognized after install**
 
-    - Ваша глобальна папка npm bin відсутня в PATH.
+    - Ваша глобальна тека bin npm не додана до PATH.
     - Перевірте шлях:
 
       ```powershell
       npm config get prefix
       ```
 
-    - Додайте цей каталог до вашого PATH користувача (суфікс `\bin` у Windows не потрібен; на більшості систем це `%AppData%\npm`).
-    - Після оновлення PATH закрийте й знову відкрийте PowerShell.
+    - Додайте цей каталог до PATH користувача (суфікс `\bin` у Windows не потрібен; у більшості систем це `%AppData%\npm`).
+    - Закрийте й знову відкрийте PowerShell після оновлення PATH.
 
-    Якщо ви хочете найгладше налаштування Windows, використовуйте **WSL2** замість нативного Windows.
+    Якщо ви хочете найгладше налаштування у Windows, використовуйте **WSL2**, а не нативну Windows.
     Документація: [Windows](/uk/platforms/windows).
 
   </Accordion>
 
-  <Accordion title="У Windows вивід exec показує спотворений китайський текст — що робити?">
-    Зазвичай це невідповідність code page консолі в нативних оболонках Windows.
+  <Accordion title="На Windows вивід exec показує спотворений китайський текст — що робити?">
+    Зазвичай це невідповідність кодової сторінки консолі в нативних оболонках Windows.
 
     Симптоми:
 
-    - вивід `system.run`/`exec` відображає китайський текст як mojibake
-    - та сама команда виглядає нормально в іншому профілі термінала
+    - Вивід `system.run`/`exec` відображає китайський текст як mojibake
+    - Та сама команда виглядає нормально в іншому профілі термінала
 
     Швидкий обхідний шлях у PowerShell:
 
@@ -487,66 +487,66 @@ x-i18n:
     openclaw gateway restart
     ```
 
-    Якщо ви все ще відтворюєте це на останній версії OpenClaw, відстежуйте/повідомте про це тут:
+    Якщо на останній версії OpenClaw проблема все ще відтворюється, відстежуйте/повідомляйте тут:
 
     - [Issue #30640](https://github.com/openclaw/openclaw/issues/30640)
 
   </Accordion>
 
   <Accordion title="Документація не відповіла на моє запитання — як отримати кращу відповідь?">
-    Використовуйте **hackable (git) install**, щоб мати повний вихідний код і документацію локально, а потім поставте
-    запитання своєму боту (або Claude/Codex) _з цієї папки_, щоб він міг читати репозиторій і точно відповідати.
+    Використайте **hackable (git) install**, щоб мати повні локальні вихідні коди й документацію, а потім запитайте
+    свого бота (або Claude/Codex) _з цієї теки_, щоб він міг читати repo і відповісти точно.
 
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash -s -- --install-method git
     ```
 
-    Докладніше: [Install](/uk/install) і [Installer flags](/uk/install/installer).
+    Докладніше: [Встановлення](/uk/install) і [Прапорці інсталятора](/uk/install/installer).
 
   </Accordion>
 
   <Accordion title="Як встановити OpenClaw на Linux?">
-    Коротка відповідь: дотримуйтесь посібника для Linux, а потім запустіть onboarding.
+    Коротка відповідь: дотримуйтеся інструкції для Linux, потім запустіть onboarding.
 
     - Швидкий шлях для Linux + встановлення сервісу: [Linux](/uk/platforms/linux).
-    - Повний покроковий посібник: [Getting Started](/start/getting-started).
-    - Інсталятор + оновлення: [Install & updates](/uk/install/updating).
+    - Повний покроковий посібник: [Початок роботи](/uk/start/getting-started).
+    - Інсталятор + оновлення: [Встановлення та оновлення](/uk/install/updating).
 
   </Accordion>
 
   <Accordion title="Як встановити OpenClaw на VPS?">
-    Підійде будь-який Linux VPS. Встановіть на сервері, а потім використовуйте SSH/Tailscale для доступу до Gateway.
+    Підійде будь-який Linux VPS. Встановіть на сервері, потім використовуйте SSH/Tailscale для доступу до Gateway.
 
     Посібники: [exe.dev](/uk/install/exe-dev), [Hetzner](/uk/install/hetzner), [Fly.io](/uk/install/fly).
-    Віддалений доступ: [Gateway remote](/uk/gateway/remote).
+    Віддалений доступ: [Віддалений Gateway](/uk/gateway/remote).
 
   </Accordion>
 
-  <Accordion title="Де посібники зі встановлення в хмарі/VPS?">
-    Ми підтримуємо **хаб хостингу** з поширеними провайдерами. Виберіть одного й дотримуйтесь посібника:
+  <Accordion title="Де гайди зі встановлення в хмарі/VPS?">
+    Ми підтримуємо **хаб хостингів** із поширеними провайдерами. Оберіть один і дотримуйтеся інструкції:
 
-    - [VPS hosting](/vps) (усі провайдери в одному місці)
+    - [VPS hosting](/uk/vps) (усі провайдери в одному місці)
     - [Fly.io](/uk/install/fly)
     - [Hetzner](/uk/install/hetzner)
     - [exe.dev](/uk/install/exe-dev)
 
-    Як це працює в хмарі: **Gateway працює на сервері**, а ви отримуєте до нього доступ
-    зі свого ноутбука/телефона через Control UI (або Tailscale/SSH). Ваші state + workspace
-    живуть на сервері, тож ставтеся до хоста як до джерела істини та робіть резервні копії.
+    Як це працює в хмарі: **Gateway працює на сервері**, а ви отримуєте доступ до нього
+    з ноутбука/телефона через Control UI (або Tailscale/SSH). Ваші state + workspace
+    живуть на сервері, тож сприймайте host як джерело істини й робіть резервні копії.
 
-    Ви можете під’єднати **nodes** (Mac/iOS/Android/headless) до цього хмарного Gateway, щоб отримати доступ до
-    локального screen/camera/canvas або запускати команди на ноутбуці, залишаючи
+    Ви можете підключати **nodes** (Mac/iOS/Android/headless) до цього хмарного Gateway, щоб отримати доступ до
+    локальних screen/camera/canvas або виконувати команди на ноутбуці, залишаючи
     Gateway у хмарі.
 
-    Хаб: [Platforms](/uk/platforms). Віддалений доступ: [Gateway remote](/uk/gateway/remote).
+    Хаб: [Платформи](/uk/platforms). Віддалений доступ: [Віддалений Gateway](/uk/gateway/remote).
     Nodes: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes).
 
   </Accordion>
 
-  <Accordion title="Чи можу я попросити OpenClaw оновитися самостійно?">
-    Коротка відповідь: **можливо, але не рекомендовано**. Потік оновлення може перезапустити
-    Gateway (що розірве активну сесію), може потребувати чистого git checkout, а також
-    може вимагати підтвердження. Безпечніше запускати оновлення з оболонки як оператор.
+  <Accordion title="Чи можу я попросити OpenClaw оновити самого себе?">
+    Коротка відповідь: **можливо, але не рекомендовано**. Процес оновлення може перезапустити
+    Gateway (що розірве активну сесію), може вимагати чистого git checkout і
+    може запитати підтвердження. Безпечніше: запускати оновлення з оболонки як оператор.
 
     Використовуйте CLI:
 
@@ -558,86 +558,86 @@ x-i18n:
     openclaw update --no-restart
     ```
 
-    Якщо вам потрібно автоматизувати це через агента:
+    Якщо вже треба автоматизувати з агента:
 
     ```bash
     openclaw update --yes --no-restart
     openclaw gateway restart
     ```
 
-    Документація: [Update](/cli/update), [Updating](/uk/install/updating).
+    Документація: [Оновлення](/cli/update), [Оновлення](/uk/install/updating).
 
   </Accordion>
 
   <Accordion title="Що насправді робить onboarding?">
     `openclaw onboard` — рекомендований шлях налаштування. У **local mode** він проводить вас через:
 
-    - **Налаштування model/auth** (OAuth провайдера, API-ключі, застарілий Anthropic setup-token, а також варіанти локальних моделей, такі як LM Studio)
-    - Розташування **workspace** + bootstrap files
+    - **Налаштування model/auth** (OAuth провайдера, API-ключі, legacy setup-token Anthropic, а також варіанти локальних моделей, такі як LM Studio)
+    - Розташування **workspace** + bootstrap-файли
     - **Налаштування Gateway** (bind/port/auth/tailscale)
     - **Channels** (WhatsApp, Telegram, Discord, Mattermost, Signal, iMessage, а також bundled channel plugins, як-от QQ Bot)
-    - **Встановлення демона** (LaunchAgent на macOS; systemd user unit на Linux/WSL2)
-    - **Health checks** і вибір **skills**
+    - **Встановлення daemon** (LaunchAgent на macOS; systemd user unit на Linux/WSL2)
+    - **Перевірки health** і вибір **Skills**
 
-    Він також попереджає, якщо ваша налаштована модель невідома або для неї відсутня auth.
+    Він також попереджає, якщо налаштована модель невідома або для неї бракує auth.
 
   </Accordion>
 
   <Accordion title="Чи потрібна мені підписка Claude або OpenAI, щоб це запускати?">
     Ні. Ви можете запускати OpenClaw з **API-ключами** (Anthropic/OpenAI/інші) або з
-    **лише локальними моделями**, щоб ваші дані залишалися на вашому пристрої. Підписки (Claude
-    Pro/Max або OpenAI Codex) — це необов’язкові способи автентифікації цих провайдерів.
+    **лише локальними моделями**, щоб ваші дані лишалися на вашому пристрої. Підписки (Claude
+    Pro/Max або OpenAI Codex) — це необов’язкові способи автентифікації в цих провайдерів.
 
     Для Anthropic в OpenClaw практичний поділ такий:
 
-    - **Anthropic API key**: звичайна Anthropic API billing
-    - **Claude subscription auth в OpenClaw**: Anthropic повідомив користувачам OpenClaw
-      **4 квітня 2026 року о 12:00 PT / 20:00 BST**, що це потребує
-      **Extra Usage**, яка оплачується окремо від підписки
+    - **Anthropic API key**: звичайна тарифікація Anthropic API
+    - **Claude subscription auth in OpenClaw**: Anthropic повідомила користувачам OpenClaw
+      **4 квітня 2026 о 12:00 PT / 20:00 BST**, що для цього потрібне
+      **Extra Usage**, яке виставляється окремо від підписки
 
     Наші локальні відтворення також показують, що `claude -p --append-system-prompt ...` може
     натрапляти на той самий захист Extra Usage, коли доданий prompt ідентифікує
     OpenClaw, тоді як той самий рядок prompt **не** відтворює це блокування на
-    шляху Anthropic SDK + API-key. OpenAI Codex OAuth явно
+    шляху Anthropic SDK + API-key. OpenAI Codex OAuth офіційно
     підтримується для зовнішніх інструментів, таких як OpenClaw.
 
-    OpenClaw також підтримує інші hosted підпискові варіанти, зокрема
-    **Qwen Cloud Coding Plan**, **MiniMax Coding Plan** і
+    OpenClaw також підтримує інші hosted-варіанти з підписочною моделлю, включно з
+    **Qwen Cloud Coding Plan**, **MiniMax Coding Plan**, і
     **Z.AI / GLM Coding Plan**.
 
     Документація: [Anthropic](/uk/providers/anthropic), [OpenAI](/uk/providers/openai),
     [Qwen Cloud](/uk/providers/qwen),
     [MiniMax](/uk/providers/minimax), [GLM Models](/uk/providers/glm),
-    [Local models](/uk/gateway/local-models), [Models](/uk/concepts/models).
+    [Локальні моделі](/uk/gateway/local-models), [Моделі](/uk/concepts/models).
 
   </Accordion>
 
   <Accordion title="Чи можу я використовувати підписку Claude Max без API-ключа?">
-    Так, але сприймайте це як **Claude subscription auth з Extra Usage**.
+    Так, але сприймайте це як **Claude subscription auth with Extra Usage**.
 
-    Підписки Claude Pro/Max не включають API-ключ. У OpenClaw це
-    означає, що застосовується Anthropic-специфічне повідомлення про billing для OpenClaw:
-    трафік за підпискою потребує **Extra Usage**. Якщо ви хочете Anthropic-трафік без
-    цього шляху Extra Usage, натомість використовуйте Anthropic API key.
+    Підписки Claude Pro/Max не включають API-ключ. В OpenClaw це
+    означає, що застосовується специфічне для OpenClaw повідомлення Anthropic про тарифікацію:
+    трафік за підпискою потребує **Extra Usage**. Якщо ви хочете трафік Anthropic без
+    цього шляху Extra Usage, натомість використовуйте API-ключ Anthropic.
 
   </Accordion>
 
   <Accordion title="Чи підтримуєте ви Claude subscription auth (Claude Pro або Max)?">
-    Так, але підтримуване трактування тепер таке:
+    Так, але тепер підтримуване трактування таке:
 
     - Anthropic в OpenClaw із підпискою означає **Extra Usage**
     - Anthropic в OpenClaw без цього шляху означає **API key**
 
-    Anthropic setup-token усе ще доступний як застарілий/ручний шлях OpenClaw,
-    і Anthropic-специфічне повідомлення про billing для OpenClaw все ще застосовується тут. Ми
-    також локально відтворили той самий billing guard при прямому
-    використанні `claude -p --append-system-prompt ...`, коли доданий prompt
-    ідентифікує OpenClaw, тоді як той самий рядок prompt **не** відтворювався на
+    Setup-token Anthropic усе ще доступний як legacy/manual-шлях OpenClaw,
+    і специфічне для OpenClaw повідомлення Anthropic про тарифікацію тут також діє. Ми
+    також локально відтворили той самий захист тарифікації за прямого використання
+    `claude -p --append-system-prompt ...`, коли доданий prompt
+    ідентифікує OpenClaw, тоді як той самий рядок prompt **не** відтворився на
     шляху Anthropic SDK + API-key.
 
-    Для production або multi-user workloads auth через Anthropic API key —
-    безпечніший і рекомендований вибір. Якщо ви хочете інші hosted
-    subscription-style варіанти в OpenClaw, див. [OpenAI](/uk/providers/openai), [Qwen / Model
+    Для production або multi-user-навантажень auth через API-ключ Anthropic —
+    безпечніший і рекомендований вибір. Якщо вам потрібні інші hosted-варіанти
+    з підписочною моделлю в OpenClaw, див. [OpenAI](/uk/providers/openai), [Qwen / Model
     Cloud](/uk/providers/qwen), [MiniMax](/uk/providers/minimax) і
     [GLM Models](/uk/providers/glm).
 
@@ -646,135 +646,133 @@ x-i18n:
 <a id="why-am-i-seeing-http-429-ratelimiterror-from-anthropic"></a>
 <Accordion title="Чому я бачу HTTP 429 rate_limit_error від Anthropic?">
 Це означає, що вашу **квоту/ліміт швидкості Anthropic** вичерпано для поточного вікна. Якщо ви
-використовуєте **Claude CLI**, дочекайтеся скидання вікна або оновіть план. Якщо ви
+використовуєте **Claude CLI**, дочекайтеся скидання вікна або підвищте свій тариф. Якщо ви
 використовуєте **Anthropic API key**, перевірте Anthropic Console
-щодо використання/billing і за потреби підвищте ліміти.
+на використання/тарифікацію та за потреби підвищте ліміти.
 
     Якщо повідомлення конкретно таке:
-    `Extra usage is required for long context requests`, запит намагається використати
-    1M context beta від Anthropic (`context1m: true`). Це працює лише тоді, коли ваші
-    облікові дані підходять для long-context billing (billing через API key або
+    `Extra usage is required for long context requests`, запит намагається використовувати
+    beta 1M context Anthropic (`context1m: true`). Це працює лише коли ваш
+    credential має право на long-context billing (тарифікація через API-ключ або
     шлях OpenClaw Claude-login з увімкненим Extra Usage).
 
-    Порада: задайте **fallback model**, щоб OpenClaw міг продовжувати відповідати, коли провайдер упирається в rate limit.
-    Див. [Models](/cli/models), [OAuth](/uk/concepts/oauth) і
+    Порада: налаштуйте **fallback model**, щоб OpenClaw міг продовжувати відповідати, коли провайдер упирається в rate limit.
+    Див. [Моделі](/cli/models), [OAuth](/uk/concepts/oauth) і
     [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/uk/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
 
   </Accordion>
 
   <Accordion title="Чи підтримується AWS Bedrock?">
-    Так. OpenClaw має bundled провайдер **Amazon Bedrock (Converse)**. Якщо присутні AWS env markers, OpenClaw може автоматично виявити Bedrock catalog для streaming/text і об’єднати його як неявний провайдер `amazon-bedrock`; інакше ви можете явно ввімкнути `plugins.entries.amazon-bedrock.config.discovery.enabled` або додати ручний запис провайдера. Див. [Amazon Bedrock](/uk/providers/bedrock) і [Model providers](/uk/providers/models). Якщо ви віддаєте перевагу керованому потоку ключів, OpenAI-compatible proxy перед Bedrock також є коректним варіантом.
+    Так. OpenClaw має bundled-провайдера **Amazon Bedrock (Converse)**. Якщо присутні AWS env-маркери, OpenClaw може автоматично виявити streaming/text-каталог Bedrock і об’єднати його як неявного провайдера `amazon-bedrock`; інакше ви можете явно ввімкнути `plugins.entries.amazon-bedrock.config.discovery.enabled` або додати ручний запис провайдера. Див. [Amazon Bedrock](/uk/providers/bedrock) і [Провайдери моделей](/uk/providers/models). Якщо ви віддаєте перевагу керованому потоку ключів, OpenAI-сумісний proxy перед Bedrock також є коректним варіантом.
   </Accordion>
 
   <Accordion title="Як працює auth Codex?">
-    OpenClaw підтримує **OpenAI Code (Codex)** через OAuth (вхід через ChatGPT). Onboarding може запустити OAuth flow і встановить модель за замовчуванням на `openai-codex/gpt-5.4`, коли це доречно. Див. [Model providers](/uk/concepts/model-providers) і [Onboarding (CLI)](/start/wizard).
+    OpenClaw підтримує **OpenAI Code (Codex)** через OAuth (вхід через ChatGPT). Onboarding може провести OAuth-flow і встановить модель за замовчуванням `openai-codex/gpt-5.4`, коли це доречно. Див. [Провайдери моделей](/uk/concepts/model-providers) і [Onboarding (CLI)](/uk/start/wizard).
   </Accordion>
 
   <Accordion title="Чи підтримуєте ви OpenAI subscription auth (Codex OAuth)?">
-    Так. OpenClaw повністю підтримує **OpenAI Code (Codex) subscription OAuth**.
-    OpenAI явно дозволяє використання subscription OAuth у зовнішніх інструментах/workflows
-    на кшталт OpenClaw. Onboarding може запустити OAuth flow за вас.
+    Так. OpenClaw повністю підтримує **subscription OAuth OpenAI Code (Codex)**.
+    OpenAI явно дозволяє використання subscription OAuth у зовнішніх інструментах/робочих процесах,
+    як-от OpenClaw. Onboarding може провести OAuth-flow за вас.
 
-    Див. [OAuth](/uk/concepts/oauth), [Model providers](/uk/concepts/model-providers) і [Onboarding (CLI)](/start/wizard).
+    Див. [OAuth](/uk/concepts/oauth), [Провайдери моделей](/uk/concepts/model-providers) і [Onboarding (CLI)](/uk/start/wizard).
 
   </Accordion>
 
   <Accordion title="Як налаштувати Gemini CLI OAuth?">
-    Gemini CLI використовує **plugin auth flow**, а не client id чи secret у `openclaw.json`.
+    Gemini CLI використовує **plugin auth flow**, а не client id або secret у `openclaw.json`.
 
     Натомість використовуйте провайдера Gemini API:
 
     1. Увімкніть plugin: `openclaw plugins enable google`
-    2. Виконайте `openclaw onboard --auth-choice gemini-api-key`
+    2. Запустіть `openclaw onboard --auth-choice gemini-api-key`
     3. Встановіть модель Google, наприклад `google/gemini-3.1-pro-preview`
 
   </Accordion>
 
   <Accordion title="Чи підходить локальна модель для невимушених чатів?">
-    Зазвичай ні. OpenClaw потребує великого контексту + сильної безпеки; невеликі картки обрізають і протікають. Якщо мусите, запускайте **найбільшу** збірку моделі, яку можете локально (LM Studio), і дивіться [/gateway/local-models](/uk/gateway/local-models). Менші/квантовані моделі підвищують ризик prompt injection — див. [Security](/uk/gateway/security).
+    Зазвичай ні. OpenClaw потребує великого context + сильного безпекового профілю; малі картки обрізаються й протікають. Якщо вже дуже треба, запускайте **найбільшу** збірку моделі, яку можете локально (LM Studio), і див. [/gateway/local-models](/uk/gateway/local-models). Менші/квантовані моделі збільшують ризик prompt injection — див. [Безпека](/uk/gateway/security).
   </Accordion>
 
-  <Accordion title="Як зберегти трафік hosted model у певному регіоні?">
-    Вибирайте endpoint-адреси, прив’язані до регіону. OpenRouter надає варіанти, розміщені у США, для MiniMax, Kimi та GLM; вибирайте варіант, розміщений у США, щоб зберігати дані в межах регіону. Ви все одно можете перелічити Anthropic/OpenAI поряд із ними, використовуючи `models.mode: "merge"`, щоб fallbacks залишалися доступними з урахуванням вибраного регіонального провайдера.
+  <Accordion title="Як тримати трафік hosted-моделей у конкретному регіоні?">
+    Обирайте endpoint-и з прив’язкою до регіону. OpenRouter надає розміщені в США варіанти для MiniMax, Kimi і GLM; оберіть варіант, розміщений у США, щоб зберегти дані в регіоні. Ви все одно можете перелічувати Anthropic/OpenAI поруч із ними, використовуючи `models.mode: "merge"`, щоб fallbacks лишалися доступними, водночас поважаючи обраного вами регіонального провайдера.
   </Accordion>
 
-  <Accordion title="Чи потрібно купувати Mac Mini, щоб це встановити?">
-    Ні. OpenClaw працює на macOS або Linux (Windows через WSL2). Mac mini — необов’язковий варіант:
-    деякі купують його як постійно увімкнений хост, але невеликий VPS, домашній сервер або машина класу Raspberry Pi також підійде.
+  <Accordion title="Чи обов’язково купувати Mac Mini, щоб це встановити?">
+    Ні. OpenClaw працює на macOS або Linux (Windows через WSL2). Mac mini — необов’язковий;
+    дехто купує його як хост, що працює постійно, але підійде й невеликий VPS, домашній сервер або box рівня Raspberry Pi.
 
-    Mac потрібен лише **для macOS-only tools**. Для iMessage використовуйте [BlueBubbles](/uk/channels/bluebubbles) (рекомендовано) —
-    сервер BlueBubbles працює на будь-якому Mac, а Gateway може працювати на Linux або деінде. Якщо вам потрібні інші macOS-only tools, запускайте Gateway на Mac або під’єднайте macOS node.
+    Mac потрібен лише для **інструментів, доступних тільки на macOS**. Для iMessage використовуйте [BlueBubbles](/uk/channels/bluebubbles) (рекомендовано) — сервер BlueBubbles працює на будь-якому Mac, а Gateway може працювати на Linux або деінде. Якщо вам потрібні інші macOS-only tools, запускайте Gateway на Mac або підключайте macOS node.
 
-    Документація: [BlueBubbles](/uk/channels/bluebubbles), [Nodes](/uk/nodes), [Mac remote mode](/uk/platforms/mac/remote).
+    Документація: [BlueBubbles](/uk/channels/bluebubbles), [Nodes](/uk/nodes), [Віддалений режим Mac](/uk/platforms/mac/remote).
 
   </Accordion>
 
   <Accordion title="Чи потрібен мені Mac mini для підтримки iMessage?">
-    Вам потрібен **якийсь пристрій macOS**, увійшовший у Messages. Це **не обов’язково** має бути Mac mini —
-    підійде будь-який Mac. **Використовуйте [BlueBubbles](/uk/channels/bluebubbles)** (рекомендовано) для iMessage —
-    сервер BlueBubbles працює на macOS, тоді як Gateway може працювати на Linux або будь-де ще.
+    Вам потрібен **якийсь пристрій macOS**, увійдений у Messages. Це **не обов’язково** Mac mini —
+    підійде будь-який Mac. Для iMessage **використовуйте [BlueBubbles](/uk/channels/bluebubbles)** (рекомендовано) — сервер BlueBubbles працює на macOS, а Gateway може працювати на Linux або деінде.
 
-    Поширені сценарії:
+    Типові варіанти:
 
-    - Запускайте Gateway на Linux/VPS, а сервер BlueBubbles — на будь-якому Mac, увійшовшому в Messages.
+    - Запускайте Gateway на Linux/VPS, а сервер BlueBubbles — на будь-якому Mac, увійденому в Messages.
     - Запускайте все на Mac, якщо хочете найпростішу одно-машинну конфігурацію.
 
     Документація: [BlueBubbles](/uk/channels/bluebubbles), [Nodes](/uk/nodes),
-    [Mac remote mode](/uk/platforms/mac/remote).
+    [Віддалений режим Mac](/uk/platforms/mac/remote).
 
   </Accordion>
 
-  <Accordion title="Якщо я куплю Mac mini для OpenClaw, чи зможу підключити його до свого MacBook Pro?">
-    Так. **Mac mini може запускати Gateway**, а ваш MacBook Pro може підключатися як
-    **node** (супутній пристрій). Nodes не запускають Gateway — вони надають додаткові
-    можливості, такі як screen/camera/canvas і `system.run` на цьому пристрої.
+  <Accordion title="Якщо я куплю Mac mini для запуску OpenClaw, чи зможу я підключити його до свого MacBook Pro?">
+    Так. **Mac mini може запускати Gateway**, а ваш MacBook Pro може підключитися як
+    **node** (companion device). Nodes не запускають Gateway — вони надають додаткові
+    можливості, як-от screen/camera/canvas і `system.run` на цьому пристрої.
 
-    Типовий шаблон:
+    Типова схема:
 
-    - Gateway на Mac mini (always-on).
-    - MacBook Pro запускає застосунок macOS або host вузла й під’єднується до Gateway.
-    - Використовуйте `openclaw nodes status` / `openclaw nodes list`, щоб побачити його.
+    - Gateway на Mac mini (завжди увімкнений).
+    - MacBook Pro запускає macOS-app або node host і з’єднується з Gateway.
+    - Для перегляду використовуйте `openclaw nodes status` / `openclaw nodes list`.
 
     Документація: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes).
 
   </Accordion>
 
-  <Accordion title="Чи можу я використовувати Bun?">
-    Bun **не рекомендовано**. Ми спостерігаємо баги під час роботи, особливо з WhatsApp і Telegram.
-    Для стабільних gateway використовуйте **Node**.
+  <Accordion title="Чи можна використовувати Bun?">
+    Bun **не рекомендовано**. Ми бачимо баги під час роботи, особливо з WhatsApp і Telegram.
+    Для stable gateway використовуйте **Node**.
 
-    Якщо ви все ж хочете поекспериментувати з Bun, робіть це на non-production gateway
+    Якщо ви все ж хочете експериментувати з Bun, робіть це на non-production gateway
     без WhatsApp/Telegram.
 
   </Accordion>
 
   <Accordion title="Telegram: що вказувати в allowFrom?">
-    `channels.telegram.allowFrom` — це **Telegram user ID людини-відправника** (числовий). Це не ім’я користувача бота.
+    `channels.telegram.allowFrom` — це **Telegram user ID людини-відправника** (числовий). Це не username бота.
 
-    Onboarding приймає введення `@username` і перетворює його на числовий ID, але авторизація OpenClaw використовує лише числові ID.
+    Onboarding приймає ввід `@username` і перетворює його на числовий ID, але авторизація OpenClaw використовує лише числові ID.
 
     Безпечніше (без стороннього бота):
 
-    - Напишіть вашому боту в DM, а потім виконайте `openclaw logs --follow` і подивіться `from.id`.
+    - Напишіть боту в DM, потім виконайте `openclaw logs --follow` і прочитайте `from.id`.
 
     Офіційний Bot API:
 
-    - Напишіть вашому боту в DM, а потім викличте `https://api.telegram.org/bot<bot_token>/getUpdates` і прочитайте `message.from.id`.
+    - Напишіть боту в DM, потім викличте `https://api.telegram.org/bot<bot_token>/getUpdates` і прочитайте `message.from.id`.
 
     Сторонній варіант (менш приватний):
 
-    - Напишіть `@userinfobot` або `@getidsbot`.
+    - Напишіть у DM `@userinfobot` або `@getidsbot`.
 
     Див. [/channels/telegram](/uk/channels/telegram#access-control-and-activation).
 
   </Accordion>
 
-  <Accordion title="Чи можуть кілька людей використовувати один номер WhatsApp з різними інстансами OpenClaw?">
-    Так, через **multi-agent routing**. Прив’яжіть **DM** WhatsApp кожного відправника (peer `kind: "direct"`, sender E.164 на кшталт `+15551234567`) до окремого `agentId`, щоб кожна людина мала власний workspace і session store. Відповіді все одно надходитимуть з **того самого акаунта WhatsApp**, а контроль доступу для DM (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) є глобальним для кожного акаунта WhatsApp. Див. [Multi-Agent Routing](/uk/concepts/multi-agent) і [WhatsApp](/uk/channels/whatsapp).
+  <Accordion title="Чи можуть кілька людей використовувати один номер WhatsApp з різними екземплярами OpenClaw?">
+    Так, через **multi-agent routing**. Прив’яжіть **DM** WhatsApp кожного відправника (peer `kind: "direct"`, E.164 відправника, як-от `+15551234567`) до іншого `agentId`, щоб кожна людина мала власний workspace і сховище сесій. Відповіді все одно надходитимуть із **того самого облікового запису WhatsApp**, а контроль доступу для DM (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) є глобальним для цього облікового запису WhatsApp. Див. [Multi-Agent Routing](/uk/concepts/multi-agent) і [WhatsApp](/uk/channels/whatsapp).
   </Accordion>
 
-  <Accordion title='Чи можу я запустити агента "fast chat" і агента "Opus for coding"?'>
-    Так. Використовуйте multi-agent routing: задайте кожному агенту власну модель за замовчуванням, а потім прив’яжіть вхідні маршрути (акаунт провайдера або конкретні peers) до кожного агента. Приклад конфігурації є в [Multi-Agent Routing](/uk/concepts/multi-agent). Див. також [Models](/uk/concepts/models) і [Configuration](/uk/gateway/configuration).
+  <Accordion title='Чи можу я запускати агента "fast chat" і агента "Opus for coding"?'>
+    Так. Використовуйте multi-agent routing: дайте кожному agent його власну модель за замовчуванням, а потім прив’яжіть вхідні routes (обліковий запис провайдера або конкретних peers) до кожного agent. Приклад конфігурації наведено в [Multi-Agent Routing](/uk/concepts/multi-agent). Див. також [Моделі](/uk/concepts/models) і [Конфігурація](/uk/gateway/configuration).
   </Accordion>
 
   <Accordion title="Чи працює Homebrew на Linux?">
@@ -787,27 +785,27 @@ x-i18n:
     brew install <formula>
     ```
 
-    Якщо ви запускаєте OpenClaw через systemd, переконайтеся, що PATH сервісу містить `/home/linuxbrew/.linuxbrew/bin` (або ваш brew prefix), щоб інструменти, встановлені через `brew`, знаходилися в non-login shells.
-    Останні збірки також додають поширені user bin dirs у префікс для Linux systemd services (наприклад `~/.local/bin`, `~/.npm-global/bin`, `~/.local/share/pnpm`, `~/.bun/bin`) і враховують `PNPM_HOME`, `NPM_CONFIG_PREFIX`, `BUN_INSTALL`, `VOLTA_HOME`, `ASDF_DATA_DIR`, `NVM_DIR` та `FNM_DIR`, якщо вони задані.
+    Якщо ви запускаєте OpenClaw через systemd, переконайтеся, що PATH сервісу включає `/home/linuxbrew/.linuxbrew/bin` (або ваш префікс brew), щоб інструменти, встановлені через `brew`, визначалися в non-login оболонках.
+    Останні збірки також додають попереду поширені user bin-каталоги в Linux systemd-сервісах (наприклад, `~/.local/bin`, `~/.npm-global/bin`, `~/.local/share/pnpm`, `~/.bun/bin`) і враховують `PNPM_HOME`, `NPM_CONFIG_PREFIX`, `BUN_INSTALL`, `VOLTA_HOME`, `ASDF_DATA_DIR`, `NVM_DIR` і `FNM_DIR`, якщо їх задано.
 
   </Accordion>
 
   <Accordion title="Різниця між hackable git install і npm install">
-    - **Hackable (git) install:** повна копія вихідного коду, можна редагувати, найкраще для учасників.
-      Ви збираєте локально й можете патчити код/документацію.
-    - **npm install:** глобальне встановлення CLI, без репозиторію, найкраще для сценарію «просто запустити».
+    - **Hackable (git) install:** повний checkout вихідного коду, редагований, найкраще для contributors.
+      Ви локально виконуєте збирання і можете патчити код/документацію.
+    - **npm install:** глобальне встановлення CLI без repo, найкраще для сценарію "просто запустити".
       Оновлення приходять із npm dist-tags.
 
-    Документація: [Getting started](/start/getting-started), [Updating](/uk/install/updating).
+    Документація: [Початок роботи](/uk/start/getting-started), [Оновлення](/uk/install/updating).
 
   </Accordion>
 
-  <Accordion title="Чи можу я пізніше перемикатися між npm і git install?">
-    Так. Встановіть інший варіант, а потім запустіть Doctor, щоб сервіс gateway вказував на нову entrypoint.
-    Це **не видаляє ваші дані** — воно лише змінює інсталяцію коду OpenClaw. Ваш state
+  <Accordion title="Чи можу я пізніше переключатися між npm і git-встановленням?">
+    Так. Встановіть інший варіант, потім запустіть Doctor, щоб сервіс gateway вказував на новий entrypoint.
+    Це **не видаляє ваші дані** — воно лише змінює встановлення коду OpenClaw. Ваш state
     (`~/.openclaw`) і workspace (`~/.openclaw/workspace`) залишаються недоторканими.
 
-    З npm на git:
+    Із npm на git:
 
     ```bash
     git clone https://github.com/openclaw/openclaw.git
@@ -818,7 +816,7 @@ x-i18n:
     openclaw gateway restart
     ```
 
-    З git на npm:
+    Із git на npm:
 
     ```bash
     npm install -g openclaw@latest
@@ -826,67 +824,67 @@ x-i18n:
     openclaw gateway restart
     ```
 
-    Doctor виявляє невідповідність entrypoint сервісу gateway і пропонує переписати конфігурацію сервісу так, щоб вона відповідала поточному install (в automation використовуйте `--repair`).
+    Doctor виявляє невідповідність entrypoint сервісу gateway і пропонує переписати конфігурацію сервісу відповідно до поточного встановлення (в automation використовуйте `--repair`).
 
-    Поради щодо резервного копіювання: див. [Стратегія резервного копіювання](#де-що-зберігається-на-диску).
+    Поради щодо резервних копій: див. [Стратегія резервного копіювання](#де-що-лежить-на-диску).
 
   </Accordion>
 
   <Accordion title="Чи варто запускати Gateway на ноутбуці чи на VPS?">
-    Коротка відповідь: **якщо вам потрібна надійність 24/7, використовуйте VPS**. Якщо ви хочете
-    мінімум тертя й вас влаштовують sleep/restarts, запускайте локально.
+    Коротка відповідь: **якщо вам потрібна надійність 24/7, використовуйте VPS**. Якщо вам потрібне
+    найменше тертя й вас влаштовують сон/перезапуски, запускайте локально.
 
     **Ноутбук (локальний Gateway)**
 
-    - **Плюси:** немає витрат на сервер, прямий доступ до локальних файлів, видиме вікно браузера.
-    - **Мінуси:** sleep/розриви мережі = відключення, оновлення ОС/перезавантаження переривають роботу, машина має не засинати.
+    - **Плюси:** без вартості сервера, прямий доступ до локальних файлів, видиме вікно браузера.
+    - **Мінуси:** сон/обриви мережі = розриви з’єднання, оновлення/перезавантаження ОС переривають роботу, машину треба тримати активною.
 
     **VPS / хмара**
 
-    - **Плюси:** always-on, стабільна мережа, немає проблем через sleep ноутбука, простіше підтримувати в роботі.
-    - **Мінуси:** часто працює headless (використовуйте скриншоти), доступ до файлів лише віддалений, для оновлень треба SSH.
+    - **Плюси:** завжди ввімкнено, стабільна мережа, немає проблем через сон ноутбука, легше підтримувати постійну роботу.
+    - **Мінуси:** часто headless-режим (використовуйте скриншоти), доступ до файлів лише віддалено, для оновлень потрібен SSH.
 
-    **Примітка для OpenClaw:** WhatsApp/Telegram/Slack/Mattermost/Discord чудово працюють із VPS. Єдиний реальний компроміс — **headless browser** проти видимого вікна. Див. [Browser](/tools/browser).
+    **Примітка, специфічна для OpenClaw:** WhatsApp/Telegram/Slack/Mattermost/Discord усі добре працюють із VPS. Єдиний реальний компроміс — **headless browser** проти видимого вікна. Див. [Браузер](/uk/tools/browser).
 
-    **Рекомендований варіант за замовчуванням:** VPS, якщо у вас уже були відключення gateway. Локально чудово працює, коли ви активно користуєтеся Mac і хочете доступ до локальних файлів або UI automation з видимим браузером.
+    **Рекомендовано за замовчуванням:** VPS, якщо у вас уже були розриви gateway. Локальний запуск чудово підходить, коли ви активно користуєтеся Mac і хочете доступ до локальних файлів або UI-автоматизацію з видимим браузером.
 
   </Accordion>
 
   <Accordion title="Наскільки важливо запускати OpenClaw на окремій машині?">
-    Це не обов’язково, але **рекомендується для надійності та ізоляції**.
+    Не обов’язково, але **рекомендовано для надійності та ізоляції**.
 
-    - **Окремий хост (VPS/Mac mini/Pi):** always-on, менше переривань через sleep/reboot, чистіші дозволи, простіше підтримувати роботу.
-    - **Спільний ноутбук/десктоп:** цілком підходить для тестування й активного використання, але очікуйте пауз під час сну машини або оновлень.
+    - **Окремий host (VPS/Mac mini/Pi):** завжди ввімкнений, менше переривань через сон/перезавантаження, чистіші дозволи, простіше підтримувати роботу.
+    - **Спільний ноутбук/desktop:** цілком підходить для тестування та активного використання, але очікуйте пауз, коли машина засинає або оновлюється.
 
-    Якщо ви хочете найкраще з обох світів, тримайте Gateway на окремому хості й під’єднайте ноутбук як **node** для локальних screen/camera/exec tools. Див. [Nodes](/uk/nodes).
-    Для рекомендацій із безпеки читайте [Security](/uk/gateway/security).
+    Якщо ви хочете поєднати найкраще з обох світів, тримайте Gateway на окремому host і підключайте ноутбук як **node** для локальних інструментів screen/camera/exec. Див. [Nodes](/uk/nodes).
+    Поради з безпеки див. у [Безпека](/uk/gateway/security).
 
   </Accordion>
 
-  <Accordion title="Які мінімальні вимоги до VPS і яка ОС рекомендована?">
-    OpenClaw легкий. Для базового Gateway + одного chat channel:
+  <Accordion title="Які мінімальні вимоги до VPS і яку ОС рекомендуєте?">
+    OpenClaw легкий. Для базового Gateway + одного chat-каналу:
 
     - **Абсолютний мінімум:** 1 vCPU, 1GB RAM, ~500MB диска.
-    - **Рекомендовано:** 1-2 vCPU, 2GB RAM або більше для запасу (логи, медіа, кілька channels). Node tools і browser automation можуть бути ресурсомісткими.
+    - **Рекомендовано:** 1-2 vCPU, 2GB RAM або більше для запасу (логи, медіа, кілька каналів). Node tools і browser automation можуть потребувати багато ресурсів.
 
-    ОС: використовуйте **Ubuntu LTS** (або будь-який сучасний Debian/Ubuntu). Саме цей шлях встановлення на Linux найкраще протестований.
+    ОС: використовуйте **Ubuntu LTS** (або будь-яку сучасну Debian/Ubuntu). Шлях встановлення для Linux там протестовано найкраще.
 
-    Документація: [Linux](/uk/platforms/linux), [VPS hosting](/vps).
+    Документація: [Linux](/uk/platforms/linux), [VPS hosting](/uk/vps).
 
   </Accordion>
 
-  <Accordion title="Чи можна запускати OpenClaw у VM і які вимоги?">
-    Так. Ставтеся до VM так само, як до VPS: вона має бути постійно увімкнена, доступна й мати достатньо
-    RAM для Gateway та будь-яких увімкнених channels.
+  <Accordion title="Чи можу я запускати OpenClaw у VM і які вимоги?">
+    Так. Ставтеся до VM так само, як до VPS: вона має бути постійно увімкнена, доступна і мати достатньо
+    RAM для Gateway та будь-яких увімкнених каналів.
 
-    Базові рекомендації:
+    Базові орієнтири:
 
     - **Абсолютний мінімум:** 1 vCPU, 1GB RAM.
-    - **Рекомендовано:** 2GB RAM або більше, якщо ви запускаєте кілька channels, browser automation чи media tools.
-    - **ОС:** Ubuntu LTS або інший сучасний Debian/Ubuntu.
+    - **Рекомендовано:** 2GB RAM або більше, якщо ви запускаєте кілька каналів, browser automation або media tools.
+    - **ОС:** Ubuntu LTS або інша сучасна Debian/Ubuntu.
 
-    Якщо ви працюєте на Windows, **WSL2 — найпростіше VM-подібне налаштування** і має найкращу
-    сумісність інструментів. Див. [Windows](/uk/platforms/windows), [VPS hosting](/vps).
+    Якщо ви на Windows, **WSL2 — найпростіший стиль налаштування VM** і має найкращу
+    сумісність інструментів. Див. [Windows](/uk/platforms/windows), [VPS hosting](/uk/vps).
     Якщо ви запускаєте macOS у VM, див. [macOS VM](/uk/install/macos-vm).
 
   </Accordion>
@@ -895,154 +893,154 @@ x-i18n:
 ## Що таке OpenClaw?
 
 <AccordionGroup>
-  <Accordion title="Що таке OpenClaw, одним абзацом?">
-    OpenClaw — це персональний AI-помічник, який ви запускаєте на власних пристроях. Він відповідає на вже знайомих вам платформах обміну повідомленнями (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat і bundled channel plugins, як-от QQ Bot), а також може працювати з голосом + live Canvas на підтримуваних платформах. **Gateway** — це always-on control plane; помічник і є самим продуктом.
+  <Accordion title="Що таке OpenClaw, в одному абзаці?">
+    OpenClaw — це персональний AI-помічник, який ви запускаєте на власних пристроях. Він відповідає на поверхнях обміну повідомленнями, якими ви вже користуєтеся (WhatsApp, Telegram, Slack, Mattermost, Discord, Google Chat, Signal, iMessage, WebChat і bundled channel plugins, такі як QQ Bot), а також може працювати з голосом + live Canvas на підтримуваних платформах. **Gateway** — це постійно увімкнена control plane; помічник і є продуктом.
   </Accordion>
 
   <Accordion title="Ціннісна пропозиція">
-    OpenClaw — це не «просто обгортка над Claude». Це **local-first control plane**, яка дозволяє запускати
-    потужного помічника на **вашому власному обладнанні**, доступного з уже використовуваних вами чат-застосунків, зі
-    session state, memory і tools — без передавання контролю над вашими процесами hosted
+    OpenClaw — це не "просто обгортка для Claude". Це **local-first control plane**, яка дозволяє вам запускати
+    потужного помічника на **власному обладнанні**, доступного з chat-застосунків, якими ви вже користуєтесь, зі
+    stateful sessions, memory та tools — без передачі контролю над вашими workflow хостинговому
     SaaS.
 
     Основні переваги:
 
-    - **Ваші пристрої, ваші дані:** запускайте Gateway де завгодно (Mac, Linux, VPS) і зберігайте
-      workspace + session history локально.
-    - **Реальні канали, а не веб-пісочниця:** WhatsApp/Telegram/Slack/Discord/Signal/iMessage тощо,
+    - **Ваші пристрої, ваші дані:** запускайте Gateway де завгодно (Mac, Linux, VPS) і тримайте
+      workspace + history сесій локально.
+    - **Реальні канали, а не web-пісочниця:** WhatsApp/Telegram/Slack/Discord/Signal/iMessage тощо,
       а також mobile voice і Canvas на підтримуваних платформах.
-    - **Незалежність від моделі:** використовуйте Anthropic, OpenAI, MiniMax, OpenRouter тощо з маршрутизацією
+    - **Незалежність від моделі:** використовуйте Anthropic, OpenAI, MiniMax, OpenRouter тощо, з маршрутизацією
       та failover на рівні agent.
-    - **Варіант лише локально:** запускайте локальні моделі, щоб **усі дані могли залишатися на вашому пристрої**, якщо ви цього хочете.
-    - **Multi-agent routing:** окремі агенти для channel, account або task, кожен зі своїм
-      workspace і налаштуваннями за замовчуванням.
-    - **Відкритий код і можливість змінювати:** перевіряйте, розширюйте й self-host без vendor lock-in.
+    - **Лише локальний варіант:** запускайте локальні моделі, щоб **усі дані могли лишатися на вашому пристрої**, якщо бажаєте.
+    - **Multi-agent routing:** окремі agents за каналом, обліковим записом або задачею, кожен із власним
+      workspace і параметрами за замовчуванням.
+    - **Відкритий код і hackable:** перевіряйте, розширюйте й self-host без vendor lock-in.
 
-    Документація: [Gateway](/uk/gateway), [Channels](/uk/channels), [Multi-agent](/uk/concepts/multi-agent),
-    [Memory](/uk/concepts/memory).
+    Документація: [Gateway](/uk/gateway), [Канали](/uk/channels), [Multi-agent](/uk/concepts/multi-agent),
+    [Пам’ять](/uk/concepts/memory).
 
   </Accordion>
 
-  <Accordion title="Я щойно все налаштував — що робити спочатку?">
+  <Accordion title="Я щойно все налаштував(ла) — що робити спочатку?">
     Хороші перші проєкти:
 
-    - Створити сайт (WordPress, Shopify або простий статичний сайт).
+    - Створити вебсайт (WordPress, Shopify або простий статичний сайт).
     - Прототипувати мобільний застосунок (структура, екрани, план API).
-    - Упорядкувати файли й папки (очищення, найменування, теги).
-    - Підключити Gmail і автоматизувати підсумки чи follow ups.
+    - Упорядкувати файли й теки (очищення, найменування, теги).
+    - Підключити Gmail і автоматизувати зведення чи follow-up.
 
-    Він може обробляти великі задачі, але найкраще працює, коли ви розбиваєте їх на фази й
+    Він може впоратися з великими задачами, але найкраще працює, коли ви ділите їх на фази й
     використовуєте sub agents для паралельної роботи.
 
   </Accordion>
 
-  <Accordion title="Які п’ять найпоширеніших повсякденних сценаріїв використання OpenClaw?">
-    Повсякденні переваги зазвичай виглядають так:
+  <Accordion title="Які п’ять найкращих повсякденних сценаріїв використання OpenClaw?">
+    Повсякденні виграші зазвичай виглядають так:
 
-    - **Особисті брифінги:** підсумки inbox, календаря та новин, які вас цікавлять.
-    - **Дослідження та підготовка чернеток:** швидкі дослідження, резюме й перші чернетки для листів або документів.
-    - **Нагадування та follow ups:** nudges і чеклісти, керовані cron або heartbeat.
-    - **Browser automation:** заповнення форм, збір даних і повторювані веб-задачі.
-    - **Координація між пристроями:** надішліть задачу з телефону, дозвольте Gateway виконати її на сервері й отримайте результат назад у чат.
+    - **Персональні зведення:** підсумки inbox, календаря й важливих для вас новин.
+    - **Дослідження й чернетки:** швидкий ресерч, зведення та перші чернетки листів або документів.
+    - **Нагадування і follow-up:** nudges і чеклісти на базі cron або heartbeat.
+    - **Автоматизація браузера:** заповнення форм, збирання даних і повторення web-задач.
+    - **Координація між пристроями:** надішліть задачу з телефону, дайте Gateway виконати її на сервері й отримайте результат назад у чаті.
 
   </Accordion>
 
-  <Accordion title="Чи може OpenClaw допомогти з lead gen, outreach, ads і blogs для SaaS?">
-    Так — для **дослідження, кваліфікації та підготовки чернеток**. Він може сканувати сайти, складати shortlists,
-    підсумовувати інформацію про потенційних клієнтів і писати чернетки outreach або ad copy.
+  <Accordion title="Чи може OpenClaw допомогти з lead gen, outreach, ads і блогами для SaaS?">
+    Так — для **дослідження, кваліфікації та створення чернеток**. Він може сканувати сайти, будувати shortlists,
+    підсумовувати prospects і писати чернетки outreach або рекламних текстів.
 
-    Для **outreach або ad runs** залишайте людину в циклі. Уникайте спаму, дотримуйтеся місцевих законів і
-    політик платформ, а також переглядайте все перед відправленням. Найбезпечніший шаблон — дозволити
-    OpenClaw підготувати чернетку, а вам — затвердити її.
+    Для **outreach або запуску реклами** тримайте людину в циклі. Уникайте спаму, дотримуйтеся місцевих законів і
+    політик платформ, і перевіряйте все перед надсиланням. Найбезпечніший шаблон — нехай
+    OpenClaw створює чернетку, а ви схвалюєте.
 
-    Документація: [Security](/uk/gateway/security).
+    Документація: [Безпека](/uk/gateway/security).
 
   </Accordion>
 
   <Accordion title="Які переваги порівняно з Claude Code для веброзробки?">
-    OpenClaw — це **персональний помічник** і координаційний шар, а не заміна IDE. Використовуйте
-    Claude Code або Codex для найшвидшого прямого циклу програмування всередині репозиторію. Використовуйте OpenClaw, коли вам
-    потрібні довговічна пам’ять, міжпристроєвий доступ і оркестрація інструментів.
+    OpenClaw — це **персональний помічник** і координаційний рівень, а не заміна IDE. Використовуйте
+    Claude Code або Codex для найшвидшого прямого циклу кодування всередині repo. Використовуйте OpenClaw, коли вам
+    потрібні довготривала memory, доступ із різних пристроїв і orchestration tools.
 
     Переваги:
 
-    - **Постійна memory + workspace** між сесіями
-    - **Багатоплатформний доступ** (WhatsApp, Telegram, TUI, WebChat)
-    - **Оркестрація інструментів** (browser, файли, планування, hooks)
-    - **Always-on Gateway** (запускайте на VPS, взаємодійте звідусіль)
-    - **Nodes** для локальних browser/screen/camera/exec
+    - **Стійка memory + workspace** між сесіями
+    - **Multi-platform access** (WhatsApp, Telegram, TUI, WebChat)
+    - **Оркестрація інструментів** (browser, files, scheduling, hooks)
+    - **Постійно увімкнений Gateway** (запуск на VPS, взаємодія звідусіль)
+    - **Nodes** для локального browser/screen/camera/exec
 
     Вітрина: [https://openclaw.ai/showcase](https://openclaw.ai/showcase)
 
   </Accordion>
 </AccordionGroup>
 
-## Skills та automation
+## Skills і автоматизація
 
 <AccordionGroup>
-  <Accordion title="Як налаштовувати skills, не забруднюючи репозиторій?">
-    Використовуйте керовані overrides замість редагування копії в репозиторії. Розміщуйте свої зміни в `~/.openclaw/skills/<name>/SKILL.md` (або додайте папку через `skills.load.extraDirs` у `~/.openclaw/openclaw.json`). Пріоритет такий: `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`, тож керовані overrides усе одно мають перевагу над bundled skills без змін у git. Якщо вам потрібно, щоб skill було встановлено глобально, але видимо лише для деяких agents, тримайте спільну копію в `~/.openclaw/skills` і керуйте видимістю через `agents.defaults.skills` і `agents.list[].skills`. Лише зміни, гідні upstream, мають жити в репозиторії та надсилатися як PR.
+  <Accordion title="Як кастомізувати Skills, не забруднюючи repo?">
+    Використовуйте керовані override-и замість редагування копії в repo. Розміщуйте свої зміни в `~/.openclaw/skills/<name>/SKILL.md` (або додайте теку через `skills.load.extraDirs` у `~/.openclaw/openclaw.json`). Пріоритет такий: `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`, тож керовані override-и все одно мають перевагу над bundled Skills без втручання в git. Якщо вам потрібно, щоб Skill був встановлений глобально, але видимий лише деяким agents, тримайте спільну копію в `~/.openclaw/skills` і керуйте видимістю через `agents.defaults.skills` та `agents.list[].skills`. Лише зміни, гідні upstream, мають жити в repo і виходити як PR.
   </Accordion>
 
-  <Accordion title="Чи можу я завантажувати skills із власної папки?">
-    Так. Додайте додаткові каталоги через `skills.load.extraDirs` у `~/.openclaw/openclaw.json` (найнижчий пріоритет). Типовий порядок пріоритету: `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`. `clawhub` за замовчуванням встановлює в `./skills`, яке OpenClaw сприймає як `<workspace>/skills` у наступній сесії. Якщо skill має бути видимим лише певним agents, поєднайте це з `agents.defaults.skills` або `agents.list[].skills`.
+  <Accordion title="Чи можу я завантажувати Skills з власної теки?">
+    Так. Додайте додаткові каталоги через `skills.load.extraDirs` у `~/.openclaw/openclaw.json` (найнижчий пріоритет). Стандартний пріоритет: `<workspace>/skills` → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → bundled → `skills.load.extraDirs`. `clawhub` типово встановлює у `./skills`, які OpenClaw розглядає як `<workspace>/skills` у наступній сесії. Якщо Skill має бути видимим лише певним agents, поєднайте це з `agents.defaults.skills` або `agents.list[].skills`.
   </Accordion>
 
-  <Accordion title="Як використовувати різні моделі для різних завдань?">
-    Наразі підтримуються такі шаблони:
+  <Accordion title="Як використовувати різні моделі для різних задач?">
+    Сьогодні підтримуються такі шаблони:
 
-    - **Cron jobs**: ізольовані завдання можуть задавати override `model` для кожного job.
-    - **Sub-agents**: маршрутизуйте задачі до окремих agents з різними моделями за замовчуванням.
-    - **On-demand switch**: використовуйте `/model`, щоб у будь-який момент переключити модель поточної сесії.
+    - **Cron jobs**: ізольовані jobs можуть задавати override `model` для кожної job.
+    - **Sub-agents**: маршрутизуйте задачі до окремих agents із різними моделями за замовчуванням.
+    - **Перемикання на вимогу**: використовуйте `/model`, щоб змінити модель поточної сесії в будь-який момент.
 
-    Див. [Cron jobs](/uk/automation/cron-jobs), [Multi-Agent Routing](/uk/concepts/multi-agent) і [Slash commands](/tools/slash-commands).
+    Див. [Cron jobs](/uk/automation/cron-jobs), [Multi-Agent Routing](/uk/concepts/multi-agent) і [Слеш-команди](/uk/tools/slash-commands).
 
   </Accordion>
 
-  <Accordion title="Бот зависає під час важкої роботи. Як це винести окремо?">
+  <Accordion title="Бот зависає під час важкої роботи. Як це винести?">
     Використовуйте **sub-agents** для довгих або паралельних задач. Sub-agents працюють у власній сесії,
-    повертають зведення й зберігають чутливість вашого основного чату.
+    повертають підсумок і зберігають чутливість вашого основного чату.
 
-    Попросіть бота «spawn a sub-agent for this task» або використайте `/subagents`.
-    Використовуйте `/status` у чаті, щоб побачити, що зараз робить Gateway (і чи він зайнятий).
+    Попросіть бота "spawn a sub-agent for this task" або використайте `/subagents`.
+    Використовуйте `/status` у чаті, щоб побачити, що Gateway робить просто зараз (і чи він зайнятий).
 
-    Порада щодо токенів: і довгі задачі, і sub-agents споживають токени. Якщо вас хвилює вартість, задайте
+    Порада щодо токенів: як довгі задачі, так і sub-agents споживають токени. Якщо вартість критична, задайте
     дешевшу модель для sub-agents через `agents.defaults.subagents.model`.
 
-    Документація: [Sub-agents](/tools/subagents), [Background Tasks](/uk/automation/tasks).
+    Документація: [Sub-agents](/uk/tools/subagents), [Фонові задачі](/uk/automation/tasks).
 
   </Accordion>
 
-  <Accordion title="Як працюють прив’язані до threads subagent sessions у Discord?">
-    Використовуйте прив’язки threads. Ви можете прив’язати Discord thread до subagent або session target, щоб подальші повідомлення в цьому thread залишалися на цій прив’язаній сесії.
+  <Accordion title="Як працюють прив’язані до thread сесії subagent у Discord?">
+    Використовуйте thread bindings. Ви можете прив’язати Discord thread до subagent або цілі session, щоб наступні повідомлення в цьому thread лишалися в межах прив’язаної session.
 
-    Базовий потік:
+    Базовий процес:
 
-    - Запускайте через `sessions_spawn` із `thread: true` (і за бажанням `mode: "session"` для сталого follow-up).
-    - Або вручну прив’яжіть через `/focus <target>`.
-    - Використовуйте `/agents` для перегляду стану прив’язки.
-    - Використовуйте `/session idle <duration|off>` і `/session max-age <duration|off>`, щоб керувати auto-unfocus.
+    - Створіть через `sessions_spawn` з `thread: true` (і за потреби `mode: "session"` для стійкого follow-up).
+    - Або прив’яжіть вручну через `/focus <target>`.
+    - Використовуйте `/agents`, щоб перевірити стан прив’язки.
+    - Використовуйте `/session idle <duration|off>` і `/session max-age <duration|off>`, щоб керувати автоматичним unfocus.
     - Використовуйте `/unfocus`, щоб від’єднати thread.
 
     Потрібна конфігурація:
 
     - Глобальні значення за замовчуванням: `session.threadBindings.enabled`, `session.threadBindings.idleHours`, `session.threadBindings.maxAgeHours`.
-    - Discord overrides: `channels.discord.threadBindings.enabled`, `channels.discord.threadBindings.idleHours`, `channels.discord.threadBindings.maxAgeHours`.
-    - Автоприв’язка під час spawn: задайте `channels.discord.threadBindings.spawnSubagentSessions: true`.
+    - Override-и Discord: `channels.discord.threadBindings.enabled`, `channels.discord.threadBindings.idleHours`, `channels.discord.threadBindings.maxAgeHours`.
+    - Автоприв’язка під час spawn: встановіть `channels.discord.threadBindings.spawnSubagentSessions: true`.
 
-    Документація: [Sub-agents](/tools/subagents), [Discord](/uk/channels/discord), [Configuration Reference](/uk/gateway/configuration-reference), [Slash commands](/tools/slash-commands).
+    Документація: [Sub-agents](/uk/tools/subagents), [Discord](/uk/channels/discord), [Довідник конфігурації](/uk/gateway/configuration-reference), [Слеш-команди](/uk/tools/slash-commands).
 
   </Accordion>
 
-  <Accordion title="Subagent завершився, але повідомлення про завершення надійшло не туди або взагалі не було надіслано. Що перевірити?">
-    Спочатку перевірте resolved requester route:
+  <Accordion title="Subagent завершився, але оновлення про завершення пішло не туди або взагалі не було опубліковане. Що перевірити?">
+    Спочатку перевірте визначений requester route:
 
-    - Доставка завершення для subagent у режимі completion віддає перевагу будь-якому прив’язаному thread або conversation route, якщо такий існує.
-    - Якщо origin завершення містить лише channel, OpenClaw повертається до збереженого route сесії requester (`lastChannel` / `lastTo` / `lastAccountId`), щоб пряма доставка все ще могла спрацювати.
-    - Якщо немає ні прив’язаного route, ні придатного збереженого route, пряма доставка може не вдатися, і результат повертається до queued session delivery замість негайної публікації в чат.
-    - Недійсні або застарілі targets усе ще можуть примусити fallback на queue або остаточну помилку доставки.
-    - Якщо остання видима відповідь assistant у дочірньому агенті — це точний silent token `NO_REPLY` / `no_reply` або рівно `ANNOUNCE_SKIP`, OpenClaw навмисно пригнічує announce замість публікації застарілого попереднього прогресу.
-    - Якщо дочірній агент завершився за таймаутом після одних лише tool calls, announce може згорнути це в коротке зведення часткового прогресу замість відтворення сирого tool output.
+    - Доставка completion-mode subagent надає перевагу будь-якому прив’язаному thread або conversation route, якщо він існує.
+    - Якщо походження completion містить лише канал, OpenClaw відступає до збереженого route requester session (`lastChannel` / `lastTo` / `lastAccountId`), тож пряма доставка все одно може спрацювати.
+    - Якщо немає ні прив’язаного route, ні придатного збереженого route, пряма доставка може не вдатися, і результат переходить до queued session delivery замість негайної публікації в чат.
+    - Невалідні або застарілі цілі все одно можуть змусити перейти до queue fallback або остаточної невдачі доставки.
+    - Якщо остання видима відповідь assistant у child — це точний тихий токен `NO_REPLY` / `no_reply`, або точно `ANNOUNCE_SKIP`, OpenClaw навмисно пригнічує announce замість публікації застарілого ранішого progress.
+    - Якщо child перевищив timeout лише після викликів tools, announce може згорнути це в короткий підсумок часткового progress замість відтворення сирого виводу tools.
 
     Налагодження:
 
@@ -1050,19 +1048,19 @@ x-i18n:
     openclaw tasks show <runId-or-sessionKey>
     ```
 
-    Документація: [Sub-agents](/tools/subagents), [Background Tasks](/uk/automation/tasks), [Session Tools](/uk/concepts/session-tool).
+    Документація: [Sub-agents](/uk/tools/subagents), [Фонові задачі](/uk/automation/tasks), [Session Tools](/uk/concepts/session-tool).
 
   </Accordion>
 
   <Accordion title="Cron або нагадування не спрацьовують. Що перевірити?">
-    Cron працює всередині процесу Gateway. Якщо Gateway не працює безперервно,
+    Cron виконується всередині процесу Gateway. Якщо Gateway не працює безперервно,
     заплановані jobs не запускатимуться.
 
-    Чекліст:
+    Контрольний список:
 
-    - Переконайтеся, що cron увімкнено (`cron.enabled`) і `OPENCLAW_SKIP_CRON` не задано.
-    - Перевірте, що Gateway працює 24/7 (без sleep/restarts).
-    - Перевірте налаштування timezone для job (`--tz` проти timezone хоста).
+    - Підтвердьте, що cron увімкнено (`cron.enabled`) і `OPENCLAW_SKIP_CRON` не задано.
+    - Переконайтеся, що Gateway працює 24/7 (без сну/перезапусків).
+    - Перевірте налаштування часового поясу для job (`--tz` проти часового поясу host).
 
     Налагодження:
 
@@ -1071,22 +1069,22 @@ x-i18n:
     openclaw cron runs --id <jobId> --limit 50
     ```
 
-    Документація: [Cron jobs](/uk/automation/cron-jobs), [Automation & Tasks](/uk/automation).
+    Документація: [Cron jobs](/uk/automation/cron-jobs), [Автоматизація та задачі](/uk/automation).
 
   </Accordion>
 
-  <Accordion title="Cron спрацював, але нічого не надіслано в channel. Чому?">
-    Спочатку перевірте delivery mode:
+  <Accordion title="Cron спрацював, але в канал нічого не було надіслано. Чому?">
+    Спочатку перевірте режим доставки:
 
     - `--no-deliver` / `delivery.mode: "none"` означає, що зовнішнє повідомлення не очікується.
-    - Відсутній або недійсний announce target (`channel` / `to`) означає, що runner пропустив outbound delivery.
-    - Помилки auth каналу (`unauthorized`, `Forbidden`) означають, що runner намагався доставити, але облікові дані це заблокували.
-    - Тихий ізольований результат (`NO_REPLY` / `no_reply` лише) вважається навмисно недоставлюваним, тож runner також пригнічує queued fallback delivery.
+    - Відсутня або невалідна announce-ціль (`channel` / `to`) означає, що runner пропустив outbound delivery.
+    - Збої auth каналу (`unauthorized`, `Forbidden`) означають, що runner спробував доставити, але credentials заблокували це.
+    - Тихий ізольований результат (`NO_REPLY` / `no_reply` only) вважається навмисно недоставним, тож runner також пригнічує queued fallback delivery.
 
-    Для ізольованих cron jobs остаточною доставкою керує runner. Від агента очікується
-    повернення plain-text summary для надсилання runner-ом. `--no-deliver` зберігає
-    цей результат внутрішнім; це не дозволяє агенту напряму надсилати його
-    через message tool.
+    Для ізольованих cron jobs фінальною доставкою володіє runner. Очікується,
+    що agent поверне plain-text summary, який runner надішле. `--no-deliver` зберігає
+    цей результат внутрішнім; це не дозволяє agent натомість напряму надсилати через
+    message tool.
 
     Налагодження:
 
@@ -1095,27 +1093,27 @@ x-i18n:
     openclaw tasks show <runId-or-sessionKey>
     ```
 
-    Документація: [Cron jobs](/uk/automation/cron-jobs), [Background Tasks](/uk/automation/tasks).
+    Документація: [Cron jobs](/uk/automation/cron-jobs), [Фонові задачі](/uk/automation/tasks).
 
   </Accordion>
 
-  <Accordion title="Чому ізольований запуск cron перемкнув моделі або повторив спробу один раз?">
-    Зазвичай це шлях live model-switch, а не дубльоване планування.
+  <Accordion title="Чому ізольований cron run перемкнув моделі або один раз повторився?">
+    Зазвичай це шлях live model-switch, а не дублювання розкладу.
 
-    Ізольований cron може зберігати runtime handoff моделі й повторювати спробу, коли активний
-    запуск викидає `LiveSessionModelSwitchError`. Повторна спроба зберігає переключений
-    provider/model, і якщо перемикання містило новий override auth profile, cron
+    Ізольований cron може зберігати runtime handoff моделі та повторювати спробу, коли активний
+    запуск викидає `LiveSessionModelSwitchError`. Повторна спроба зберігає перемкненого
+    provider/model, а якщо switch ніс новий override auth profile, cron
     також зберігає його перед повторною спробою.
 
     Пов’язані правила вибору:
 
-    - Спочатку перемагає override моделі Gmail hook, коли це застосовується.
-    - Потім per-job `model`.
+    - Override моделі Gmail hook має найвищий пріоритет, коли застосовно.
+    - Потім `model` для job.
     - Потім будь-який збережений override моделі cron-session.
     - Потім звичайний вибір моделі agent/default.
 
-    Цикл повторних спроб обмежений. Після початкової спроби плюс 2 повторні спроби через switch
-    cron переривається замість нескінченного циклу.
+    Цикл повторних спроб обмежений. Після початкової спроби плюс 2 switch-повторів
+    cron завершується замість нескінченного циклу.
 
     Налагодження:
 
@@ -1128,9 +1126,9 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="Як встановити skills на Linux?">
-    Використовуйте нативні команди `openclaw skills` або поміщайте skills у свій workspace. UI Skills для macOS недоступний на Linux.
-    Перегляд skills: [https://clawhub.ai](https://clawhub.ai).
+  <Accordion title="Як встановити Skills на Linux?">
+    Використовуйте нативні команди `openclaw skills` або просто кладіть Skills у свій workspace. UI Skills для macOS недоступний на Linux.
+    Переглянути Skills можна на [https://clawhub.ai](https://clawhub.ai).
 
     ```bash
     openclaw skills search "calendar"
@@ -1143,41 +1141,41 @@ x-i18n:
     openclaw skills check
     ```
 
-    Нативна команда `openclaw skills install` записує в каталог `skills/`
+    Нативний `openclaw skills install` записує в каталог `skills/`
     активного workspace. Встановлюйте окремий CLI `clawhub` лише якщо хочете публікувати або
-    синхронізувати власні skills. Для спільного встановлення між agents покладіть skill у
+    синхронізувати власні Skills. Для спільних встановлень між agents кладіть Skill у
     `~/.openclaw/skills` і використовуйте `agents.defaults.skills` або
-    `agents.list[].skills`, якщо хочете звузити, які агенти можуть її бачити.
+    `agents.list[].skills`, якщо хочете обмежити видимість певним agents.
 
   </Accordion>
 
-  <Accordion title="Чи може OpenClaw запускати задачі за розкладом або безперервно у фоні?">
+  <Accordion title="Чи може OpenClaw запускати задачі за розкладом або безперервно у фоновому режимі?">
     Так. Використовуйте планувальник Gateway:
 
     - **Cron jobs** для запланованих або повторюваних задач (зберігаються після перезапусків).
-    - **Heartbeat** для періодичних перевірок «main session».
-    - **Isolated jobs** для автономних агентів, які публікують підсумки або доставляють їх у чати.
+    - **Heartbeat** для періодичних перевірок "головної session".
+    - **Ізольовані jobs** для автономних agents, які публікують підсумки або доставляють їх у чати.
 
-    Документація: [Cron jobs](/uk/automation/cron-jobs), [Automation & Tasks](/uk/automation),
+    Документація: [Cron jobs](/uk/automation/cron-jobs), [Автоматизація та задачі](/uk/automation),
     [Heartbeat](/uk/gateway/heartbeat).
 
   </Accordion>
 
-  <Accordion title="Чи можна запускати Apple macOS-only skills з Linux?">
-    Не напряму. Skills для macOS обмежуються `metadata.openclaw.os` плюс потрібними binaries, і skills з’являються в system prompt лише тоді, коли вони придатні на **Gateway host**. У Linux skills лише для `darwin` (наприклад `apple-notes`, `apple-reminders`, `things-mac`) не завантажуватимуться, якщо ви не перевизначите обмеження.
+  <Accordion title="Чи можу я запускати Apple macOS-only Skills з Linux?">
+    Не напряму. Skills на macOS обмежуються через `metadata.openclaw.os` плюс потрібні бінарники, і Skills з’являються в system prompt лише тоді, коли вони доступні на **Gateway host**. На Linux Skills лише для `darwin` (як-от `apple-notes`, `apple-reminders`, `things-mac`) не завантажаться, якщо ви не перевизначите це обмеження.
 
     Є три підтримувані шаблони:
 
     **Варіант A — запускати Gateway на Mac (найпростіше).**
-    Запускайте Gateway там, де існують macOS binaries, а потім підключайтеся з Linux у [remote mode](#gateway-ports-already-running-and-remote-mode) або через Tailscale. Skills завантажуються нормально, бо Gateway host — це macOS.
+    Запускайте Gateway там, де існують бінарники macOS, а потім підключайтеся з Linux у [віддаленому режимі](#gateway-ports-already-running-and-remote-mode) або через Tailscale. Skills завантажуються як зазвичай, бо Gateway host — це macOS.
 
-    **Варіант B — використовуйте macOS node (без SSH).**
-    Запускайте Gateway на Linux, під’єднайте macOS node (menubar app) і задайте **Node Run Commands** як "Always Ask" або "Always Allow" на Mac. OpenClaw може вважати macOS-only skills придатними, коли потрібні binaries існують на node. Агент запускає ці skills через інструмент `nodes`. Якщо ви оберете "Always Ask", підтвердження "Always Allow" у підказці додасть цю команду до allowlist.
+    **Варіант B — використовувати macOS node (без SSH).**
+    Запускайте Gateway на Linux, під’єднайте macOS node (menubar app) і встановіть **Node Run Commands** у "Always Ask" або "Always Allow" на Mac. OpenClaw може вважати macOS-only Skills доступними, коли потрібні бінарники існують на node. Агент запускає ці Skills через інструмент `nodes`. Якщо ви виберете "Always Ask", підтвердження "Always Allow" у prompt додає цю команду до allowlist.
 
-    **Варіант C — проксувати macOS binaries через SSH (просунуто).**
-    Залиште Gateway на Linux, але зробіть так, щоб потрібні CLI binaries дозволялися до SSH wrappers, які запускаються на Mac. Потім перевизначте skill, щоб дозволити Linux і зберегти його придатним.
+    **Варіант C — проксувати бінарники macOS через SSH (просунуто).**
+    Тримайте Gateway на Linux, але зробіть так, щоб потрібні CLI-бінарники визначалися як SSH-обгортки, які виконуються на Mac. Потім перевизначте Skill, щоб дозволити Linux і він лишався доступним.
 
-    1. Створіть SSH wrapper для binary (приклад: `memo` для Apple Notes):
+    1. Створіть SSH-обгортку для бінарника (приклад: `memo` для Apple Notes):
 
        ```bash
        #!/usr/bin/env bash
@@ -1185,8 +1183,8 @@ x-i18n:
        exec ssh -T user@mac-host /opt/homebrew/bin/memo "$@"
        ```
 
-    2. Додайте wrapper у `PATH` на Linux host (наприклад `~/bin/memo`).
-    3. Перевизначте metadata skill, щоб дозволити Linux:
+    2. Додайте обгортку в `PATH` на Linux host (наприклад, `~/bin/memo`).
+    3. Перевизначте metadata Skill (workspace або `~/.openclaw/skills`) так, щоб дозволити Linux:
 
        ```markdown
        ---
@@ -1196,211 +1194,210 @@ x-i18n:
        ---
        ```
 
-    4. Почніть нову сесію, щоб оновився snapshot skills.
+    4. Почніть нову session, щоб snapshot Skills оновився.
 
   </Accordion>
 
-  <Accordion title="Чи є у вас інтеграція з Notion або HeyGen?">
-    Наразі вбудованої немає.
+  <Accordion title="Чи є інтеграція з Notion або HeyGen?">
+    Вбудованої зараз немає.
 
     Варіанти:
 
     - **Custom skill / plugin:** найкраще для надійного доступу до API (і Notion, і HeyGen мають API).
-    - **Browser automation:** працює без коду, але повільніше і крихкіше.
+    - **Автоматизація браузера:** працює без коду, але повільніше й крихкіше.
 
-    Якщо ви хочете зберігати контекст для кожного клієнта (сценарії agency), простий шаблон такий:
+    Якщо ви хочете зберігати context для кожного клієнта (workflows агентства), простий шаблон такий:
 
-    - Одна сторінка Notion на клієнта (контекст + уподобання + активна робота).
-    - Просіть агента отримувати цю сторінку на початку сесії.
+    - Одна сторінка Notion на клієнта (context + preferences + активна робота).
+    - Попросіть agent витягувати цю сторінку на початку session.
 
-    Якщо ви хочете нативну інтеграцію, відкрийте feature request або створіть skill,
-    націлений на ці API.
+    Якщо хочете нативну інтеграцію, відкрийте feature request або створіть Skill,
+    який працює з цими API.
 
-    Встановлення skills:
+    Встановлення Skills:
 
     ```bash
     openclaw skills install <skill-slug>
     openclaw skills update --all
     ```
 
-    Нативні встановлення потрапляють у каталог `skills/` активного workspace. Для спільних skills між agents розміщуйте їх у `~/.openclaw/skills/<name>/SKILL.md`. Якщо спільне встановлення мають бачити лише деякі agents, налаштуйте `agents.defaults.skills` або `agents.list[].skills`. Деякі skills очікують binaries, встановлені через Homebrew; у Linux це означає Linuxbrew (див. запис FAQ про Homebrew для Linux вище). Див. [Skills](/tools/skills), [Skills config](/tools/skills-config) і [ClawHub](/tools/clawhub).
+    Нативні встановлення потрапляють у каталог `skills/` активного workspace. Для спільних Skills між agents розміщуйте їх у `~/.openclaw/skills/<name>/SKILL.md`. Якщо спільне встановлення мають бачити лише деякі agents, налаштуйте `agents.defaults.skills` або `agents.list[].skills`. Деякі Skills очікують бінарники, встановлені через Homebrew; на Linux це означає Linuxbrew (див. запис ЧаП про Homebrew Linux вище). Див. [Skills](/uk/tools/skills), [Конфігурація Skills](/uk/tools/skills-config) і [ClawHub](/uk/tools/clawhub).
 
   </Accordion>
 
-  <Accordion title="Як використовувати мій уже авторизований Chrome з OpenClaw?">
-    Використовуйте вбудований browser profile `user`, який під’єднується через Chrome DevTools MCP:
+  <Accordion title="Як використовувати вже авторизований Chrome з OpenClaw?">
+    Використовуйте вбудований профіль браузера `user`, який підключається через Chrome DevTools MCP:
 
     ```bash
     openclaw browser --browser-profile user tabs
     openclaw browser --browser-profile user snapshot
     ```
 
-    Якщо ви хочете власну назву, створіть явний MCP profile:
+    Якщо ви хочете власну назву, створіть явний MCP-профіль:
 
     ```bash
     openclaw browser create-profile --name chrome-live --driver existing-session
     openclaw browser --browser-profile chrome-live tabs
     ```
 
-    Цей шлях локальний для хоста. Якщо Gateway працює деінде, або запускайте node host на машині з браузером, або використовуйте remote CDP.
+    Цей шлях є локальним для host. Якщо Gateway працює деінде, або запускайте node host на машині з браузером, або використовуйте remote CDP.
 
     Поточні обмеження `existing-session` / `user`:
 
-    - дії керуються через ref, а не CSS-selector
-    - uploads потребують `ref` / `inputRef` і наразі підтримують лише один файл за раз
-    - `responsebody`, експорт PDF, перехоплення завантажень і batch actions усе ще потребують managed browser або raw CDP profile
+    - дії базуються на ref, а не на CSS-selector
+    - завантаження файлів потребує `ref` / `inputRef` і зараз підтримує лише один файл за раз
+    - `responsebody`, експорт PDF, interception завантажень і batch-дії все ще потребують керованого браузера або сирого CDP-профілю
 
   </Accordion>
 </AccordionGroup>
 
-## Sandboxing і memory
+## Пісочниця і пам’ять
 
 <AccordionGroup>
-  <Accordion title="Чи є окремий документ про sandboxing?">
-    Так. Див. [Sandboxing](/uk/gateway/sandboxing). Для Docker-specific setup (повний gateway у Docker або sandbox images) див. [Docker](/uk/install/docker).
+  <Accordion title="Чи є окремий документ про пісочницю?">
+    Так. Див. [Пісочниця](/uk/gateway/sandboxing). Для налаштування, специфічного для Docker (повний gateway у Docker або sandbox images), див. [Docker](/uk/install/docker).
   </Accordion>
 
-  <Accordion title="Docker здається обмеженим — як увімкнути повну функціональність?">
-    Образ за замовчуванням орієнтований на безпеку й працює від імені користувача `node`, тому він не
-    містить system packages, Homebrew або bundled browsers. Для повнішого налаштування:
+  <Accordion title="Docker здається обмеженим — як увімкнути повні можливості?">
+    Образ за замовчуванням орієнтований на безпеку і працює від користувача `node`, тому він не
+    містить системних пакетів, Homebrew або bundled-браузерів. Для повнішого налаштування:
 
-    - Збережіть `/home/node` через `OPENCLAW_HOME_VOLUME`, щоб кеші переживали перезапуски.
-    - Вбудуйте system deps у образ за допомогою `OPENCLAW_DOCKER_APT_PACKAGES`.
+    - Збережіть `/home/node` у `OPENCLAW_HOME_VOLUME`, щоб кеші переживали перезапуски.
+    - Запікайте системні залежності в образ через `OPENCLAW_DOCKER_APT_PACKAGES`.
     - Встановіть браузери Playwright через bundled CLI:
       `node /app/node_modules/playwright-core/cli.js install chromium`
-    - Задайте `PLAYWRIGHT_BROWSERS_PATH` і переконайтеся, що цей шлях зберігається.
+    - Встановіть `PLAYWRIGHT_BROWSERS_PATH` і переконайтеся, що цей шлях зберігається.
 
-    Документація: [Docker](/uk/install/docker), [Browser](/tools/browser).
-
-  </Accordion>
-
-  <Accordion title="Чи можу я зберегти приватність у DM, але зробити групи публічними/ізольованими з одним агентом?">
-    Так — якщо ваш приватний трафік це **DMs**, а публічний трафік — **groups**.
-
-    Використовуйте `agents.defaults.sandbox.mode: "non-main"`, щоб group/channel sessions (ключі не-main) працювали в Docker, а основна DM session залишалася на host. Потім обмежте, які інструменти доступні в ізольованих сесіях, через `tools.sandbox.tools`.
-
-    Покрокове налаштування + приклад config: [Groups: personal DMs + public groups](/uk/channels/groups#pattern-personal-dms-public-groups-single-agent)
-
-    Ключовий довідник конфігурації: [Gateway configuration](/uk/gateway/configuration-reference#agentsdefaultssandbox)
+    Документація: [Docker](/uk/install/docker), [Браузер](/uk/tools/browser).
 
   </Accordion>
 
-  <Accordion title="Як прив’язати папку хоста до sandbox?">
-    Задайте `agents.defaults.sandbox.docker.binds` як `["host:path:mode"]` (наприклад `"/home/user/src:/src:ro"`). Global + per-agent binds об’єднуються; per-agent binds ігноруються, коли `scope: "shared"`. Для всього чутливого використовуйте `:ro` і пам’ятайте, що binds обходять файлові стіни sandbox.
+  <Accordion title="Чи можу я залишити DM приватними, а групи зробити публічними/ізольованими з одним agent?">
+    Так — якщо ваш приватний трафік це **DM**, а публічний трафік — **groups**.
 
-    OpenClaw перевіряє джерела bind як за нормалізованим шляхом, так і за канонічним шляхом, визначеним через найглибшого наявного предка. Це означає, що виходи через symlink-parent усе ще надійно блокуються, навіть якщо останній сегмент шляху ще не існує, а перевірки allowed-root усе ще застосовуються після розв’язання symlink.
+    Використайте `agents.defaults.sandbox.mode: "non-main"`, щоб group/channel sessions (ключі не main) запускалися в Docker, а головна DM-session лишалася на host. Потім обмежте, які tools доступні в sandboxed sessions, через `tools.sandbox.tools`.
 
-    Приклади та примітки щодо безпеки див. у [Sandboxing](/uk/gateway/sandboxing#custom-bind-mounts) і [Sandbox vs Tool Policy vs Elevated](/uk/gateway/sandbox-vs-tool-policy-vs-elevated#bind-mounts-security-quick-check).
+    Покрокове налаштування + приклад конфігурації: [Групи: особисті DM + публічні групи](/uk/channels/groups#pattern-personal-dms-public-groups-single-agent)
+
+    Ключове посилання на конфігурацію: [Конфігурація Gateway](/uk/gateway/configuration-reference#agentsdefaultssandbox)
 
   </Accordion>
 
-  <Accordion title="Як працює memory?">
-    Memory в OpenClaw — це просто Markdown files у workspace агента:
+  <Accordion title="Як примонтувати host-теку в sandbox?">
+    Встановіть `agents.defaults.sandbox.docker.binds` у `["host:path:mode"]` (наприклад, `"/home/user/src:/src:ro"`). Global + per-agent bind-и об’єднуються; bind-и per-agent ігноруються, коли `scope: "shared"`. Використовуйте `:ro` для всього чутливого й пам’ятайте, що bind-и обходять файлові стіни sandbox.
+
+    OpenClaw перевіряє джерела bind і за нормалізованим шляхом, і за канонічним шляхом, визначеним через найглибшого наявного предка. Це означає, що вихід через symlink-parent усе одно буде fail closed, навіть якщо останній сегмент шляху ще не існує, а перевірки allowed-root і далі застосовуються після розв’язання symlink.
+
+    Див. [Пісочниця](/uk/gateway/sandboxing#custom-bind-mounts) і [Sandbox vs Tool Policy vs Elevated](/uk/gateway/sandbox-vs-tool-policy-vs-elevated#bind-mounts-security-quick-check) для прикладів і зауваг із безпеки.
+
+  </Accordion>
+
+  <Accordion title="Як працює пам’ять?">
+    Пам’ять OpenClaw — це просто Markdown-файли в workspace агента:
 
     - Щоденні нотатки в `memory/YYYY-MM-DD.md`
     - Кураторські довгострокові нотатки в `MEMORY.md` (лише main/private sessions)
 
-    OpenClaw також виконує **тихий pre-compaction memory flush**, щоб нагадати моделі
-    записати тривкі нотатки перед auto-compaction. Це запускається лише тоді, коли workspace
-    доступний для запису (read-only sandboxes пропускають це). Див. [Memory](/uk/concepts/memory).
+    OpenClaw також запускає **тихий pre-compaction memory flush**, щоб нагадати моделі
+    записати стійкі нотатки перед auto-compaction. Це виконується лише тоді, коли workspace
+    доступний на запис (read-only sandbox пропускає це). Див. [Пам’ять](/uk/concepts/memory).
 
   </Accordion>
 
-  <Accordion title="Memory постійно забуває речі. Як зробити, щоб вони закріплювалися?">
-    Попросіть бота **записати факт у memory**. Довгострокові нотатки мають бути в `MEMORY.md`,
-    короткостроковий контекст — у `memory/YYYY-MM-DD.md`.
+  <Accordion title="Пам’ять постійно все забуває. Як зробити, щоб це закріпилося?">
+    Попросіть бота **записати факт у memory**. Довгострокові нотатки належать у `MEMORY.md`,
+    короткостроковий context — у `memory/YYYY-MM-DD.md`.
 
-    Це ще сфера, яку ми покращуємо. Корисно нагадувати моделі зберігати спогади;
-    вона знатиме, що робити. Якщо вона все одно забуває, перевірте, що Gateway використовує той самий
-    workspace під час кожного запуску.
+    Це все ще напрям, який ми покращуємо. Допомагає нагадувати моделі зберігати спогади;
+    вона знатиме, що робити. Якщо все одно забуває, перевірте, чи Gateway використовує той самий
+    workspace щоразу під час запуску.
 
-    Документація: [Memory](/uk/concepts/memory), [Agent workspace](/uk/concepts/agent-workspace).
+    Документація: [Пам’ять](/uk/concepts/memory), [Workspace агента](/uk/concepts/agent-workspace).
 
   </Accordion>
 
-  <Accordion title="Чи зберігається memory назавжди? Які обмеження?">
-    Файли memory живуть на диску і зберігаються, доки ви їх не видалите. Обмеженням є ваше
+  <Accordion title="Пам’ять зберігається назавжди? Які обмеження?">
+    Файли пам’яті живуть на диску і зберігаються, доки ви їх не видалите. Обмеження — це ваше
     сховище, а не модель. **Контекст сесії** все одно обмежений вікном контексту моделі,
-    тому довгі розмови можуть стискатися або обрізатися. Саме тому існує
-    пошук по memory — він повертає в контекст лише потрібні частини.
+    тому довгі розмови можуть стискатися або обрізатися. Саме тому існує memory search —
+    він повертає в context лише релевантні частини.
 
-    Документація: [Memory](/uk/concepts/memory), [Context](/uk/concepts/context).
+    Документація: [Пам’ять](/uk/concepts/memory), [Контекст](/uk/concepts/context).
 
   </Accordion>
 
-  <Accordion title="Чи вимагає semantic memory search OpenAI API key?">
+  <Accordion title="Чи потрібен для semantic memory search API-ключ OpenAI?">
     Лише якщо ви використовуєте **OpenAI embeddings**. Codex OAuth покриває chat/completions і
-    **не** надає доступ до embeddings, тож **вхід через Codex (OAuth або
-    Codex CLI login)** не допомагає для semantic memory search. Для OpenAI embeddings
-    усе ще потрібен справжній API key (`OPENAI_API_KEY` або `models.providers.openai.apiKey`).
+    **не** надає доступу до embeddings, тож **вхід через Codex (OAuth або
+    вхід через Codex CLI)** не допомагає для semantic memory search. Для embeddings OpenAI
+    усе ще потрібен справжній API-ключ (`OPENAI_API_KEY` або `models.providers.openai.apiKey`).
 
-    Якщо ви явно не задаєте provider, OpenClaw автоматично вибирає provider, коли
-    може знайти API key (auth profiles, `models.providers.*.apiKey` або env vars).
-    Він надає перевагу OpenAI, якщо знаходиться ключ OpenAI, інакше Gemini, якщо є ключ Gemini,
-    потім Voyage, потім Mistral. Якщо віддалений ключ недоступний, memory
-    search залишається вимкненим, доки ви його не налаштуєте. Якщо у вас налаштовано й доступний
-    шлях до локальної моделі, OpenClaw
-    надає перевагу `local`. Ollama підтримується, коли ви явно задаєте
+    Якщо ви явно не задаєте провайдера, OpenClaw автоматично вибирає провайдера, коли
+    може знайти API-ключ (auth profiles, `models.providers.*.apiKey` або env vars).
+    Він надає перевагу OpenAI, якщо є ключ OpenAI, інакше Gemini, якщо є ключ Gemini,
+    потім Voyage, потім Mistral. Якщо жодного віддаленого ключа немає, memory
+    search лишається вимкненим, доки ви його не налаштуєте. Якщо у вас налаштований і наявний шлях до локальної моделі, OpenClaw
+    надає перевагу `local`. Ollama підтримується, якщо ви явно задаєте
     `memorySearch.provider = "ollama"`.
 
-    Якщо ви хочете залишитися локально, задайте `memorySearch.provider = "local"` (і за бажанням
-    `memorySearch.fallback = "none"`). Якщо вам потрібні Gemini embeddings, задайте
+    Якщо ви волієте залишитися локально, встановіть `memorySearch.provider = "local"` (і необов’язково
+    `memorySearch.fallback = "none"`). Якщо вам потрібні embeddings Gemini, встановіть
     `memorySearch.provider = "gemini"` і надайте `GEMINI_API_KEY` (або
     `memorySearch.remote.apiKey`). Ми підтримуємо embedding-моделі **OpenAI, Gemini, Voyage, Mistral, Ollama або local** —
-    подробиці налаштування див. у [Memory](/uk/concepts/memory).
+    див. [Пам’ять](/uk/concepts/memory) для деталей налаштування.
 
   </Accordion>
 </AccordionGroup>
 
-## Де що зберігається на диску
+## Де що лежить на диску
 
 <AccordionGroup>
-  <Accordion title="Чи всі дані, які використовує OpenClaw, зберігаються локально?">
+  <Accordion title="Чи всі дані, що використовуються з OpenClaw, зберігаються локально?">
     Ні — **стан OpenClaw локальний**, але **зовнішні сервіси все одно бачать те, що ви їм надсилаєте**.
 
-    - **Локально за замовчуванням:** sessions, memory files, config і workspace живуть на Gateway host
-      (`~/.openclaw` + каталог вашого workspace).
-    - **Віддалено за необхідністю:** повідомлення, які ви надсилаєте model providers (Anthropic/OpenAI тощо), ідуть до
-      їхніх API, а chat platforms (WhatsApp/Telegram/Slack тощо) зберігають дані повідомлень на своїх
-      серверах.
-    - **Ви контролюєте обсяг:** використання локальних моделей залишає prompts на вашій машині, але channel
-      traffic усе одно проходить через сервери цього channel.
+    - **Локально за замовчуванням:** sessions, memory-файли, config і workspace живуть на Gateway host
+      (`~/.openclaw` + ваш каталог workspace).
+    - **Віддалено за необхідністю:** повідомлення, які ви надсилаєте модельним провайдерам (Anthropic/OpenAI тощо), ідуть
+      до їхніх API, а chat-платформи (WhatsApp/Telegram/Slack тощо) зберігають дані повідомлень на
+      своїх серверах.
+    - **Ви контролюєте слід:** використання локальних моделей залишає prompts на вашій машині, але трафік
+      каналів усе одно проходить через сервери каналу.
 
-    Пов’язане: [Agent workspace](/uk/concepts/agent-workspace), [Memory](/uk/concepts/memory).
+    Пов’язане: [Workspace агента](/uk/concepts/agent-workspace), [Пам’ять](/uk/concepts/memory).
 
   </Accordion>
 
   <Accordion title="Де OpenClaw зберігає свої дані?">
-    Усе зберігається в `$OPENCLAW_STATE_DIR` (типово: `~/.openclaw`):
+    Усе живе під `$OPENCLAW_STATE_DIR` (типово: `~/.openclaw`):
 
-    | Path                                                            | Призначення                                                       |
-    | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-    | `$OPENCLAW_STATE_DIR/openclaw.json`                             | Основний config (JSON5)                                           |
-    | `$OPENCLAW_STATE_DIR/credentials/oauth.json`                    | Застарілий імпорт OAuth (копіюється в auth profiles під час першого використання) |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys і необов’язкові `keyRef`/`tokenRef`) |
-    | `$OPENCLAW_STATE_DIR/secrets.json`                              | Необов’язковий file-backed secret payload для `file` SecretRef providers |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth.json`          | Файл застарілої сумісності (статичні записи `api_key` очищаються) |
-    | `$OPENCLAW_STATE_DIR/credentials/`                              | Стан провайдерів (наприклад `whatsapp/<accountId>/creds.json`)    |
-    | `$OPENCLAW_STATE_DIR/agents/`                                   | Стан кожного агента окремо (agentDir + sessions)                  |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/`                | Історія розмов і стан (для кожного агента)                        |
-    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Метадані сесій (для кожного агента)                               |
+    | Path                                                            | Purpose                                                            |
+    | --------------------------------------------------------------- | ------------------------------------------------------------------ |
+    | `$OPENCLAW_STATE_DIR/openclaw.json`                             | Основна конфігурація (JSON5)                                       |
+    | `$OPENCLAW_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (копіюється в auth profiles при першому використанні) |
+    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth, API keys та необов’язкові `keyRef`/`tokenRef`) |
+    | `$OPENCLAW_STATE_DIR/secrets.json`                              | Необов’язковий file-backed payload secret для провайдерів `file` SecretRef |
+    | `$OPENCLAW_STATE_DIR/agents/<agentId>/agent/auth.json`          | Файл legacy compatibility (статичні записи `api_key` очищені)      |
+    | `$OPENCLAW_STATE_DIR/credentials/`                              | Стан провайдера (наприклад, `whatsapp/<accountId>/creds.json`)     |
+    | `$OPENCLAW_STATE_DIR/agents/`                                   | Стан на рівні agent (agentDir + sessions)                          |
+    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/`                | History розмов і state (для кожного agent)                         |
+    | `$OPENCLAW_STATE_DIR/agents/<agentId>/sessions/sessions.json`   | Metadata сесій (для кожного agent)                                 |
 
-    Застарілий шлях single-agent: `~/.openclaw/agent/*` (мігрується через `openclaw doctor`).
+    Legacy single-agent path: `~/.openclaw/agent/*` (мігрується через `openclaw doctor`).
 
-    Ваш **workspace** (`AGENTS.md`, memory files, skills тощо) зберігається окремо й налаштовується через `agents.defaults.workspace` (типово: `~/.openclaw/workspace`).
+    Ваш **workspace** (AGENTS.md, memory-файли, Skills тощо) є окремим і налаштовується через `agents.defaults.workspace` (типово: `~/.openclaw/workspace`).
 
   </Accordion>
 
-  <Accordion title="Де мають зберігатися AGENTS.md / SOUL.md / USER.md / MEMORY.md?">
+  <Accordion title="Де мають лежати AGENTS.md / SOUL.md / USER.md / MEMORY.md?">
     Ці файли живуть у **workspace агента**, а не в `~/.openclaw`.
 
-    - **Workspace (для кожного агента):** `AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `USER.md`,
-      `MEMORY.md` (або застарілий fallback `memory.md`, коли `MEMORY.md` відсутній),
+    - **Workspace (для кожного agent):** `AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `USER.md`,
+      `MEMORY.md` (або legacy fallback `memory.md`, коли `MEMORY.md` відсутній),
       `memory/YYYY-MM-DD.md`, необов’язковий `HEARTBEAT.md`.
-    - **State dir (`~/.openclaw`)**: config, стан channels/providers, auth profiles, sessions, logs,
-      і спільні skills (`~/.openclaw/skills`).
+    - **Каталог state (`~/.openclaw`)**: config, state каналів/провайдерів, auth profiles, sessions, logs,
+      та спільні Skills (`~/.openclaw/skills`).
 
-    Workspace за замовчуванням — `~/.openclaw/workspace`, налаштовується так:
+    Workspace за замовчуванням — `~/.openclaw/workspace`, це можна налаштувати через:
 
     ```json5
     {
@@ -1408,42 +1405,42 @@ x-i18n:
     }
     ```
 
-    Якщо бот «забуває» після перезапуску, переконайтеся, що Gateway під час кожного запуску використовує той самий
-    workspace (і пам’ятайте: у remote mode використовується **workspace gateway host**, а
-    не вашого локального ноутбука).
+    Якщо бот "забуває" після перезапуску, підтвердьте, що Gateway використовує той самий
+    workspace під час кожного запуску (і пам’ятайте: remote mode використовує **gateway host**
+    workspace, а не ваш локальний ноутбук).
 
-    Порада: якщо ви хочете закріпити певну поведінку або вподобання, попросіть бота **записати це в
-    AGENTS.md або MEMORY.md**, а не покладатися лише на історію чату.
+    Порада: якщо ви хочете стійку поведінку або вподобання, попросіть бота **записати це в
+    AGENTS.md або MEMORY.md**, а не покладатися на history чату.
 
-    Див. [Agent workspace](/uk/concepts/agent-workspace) і [Memory](/uk/concepts/memory).
+    Див. [Workspace агента](/uk/concepts/agent-workspace) і [Пам’ять](/uk/concepts/memory).
 
   </Accordion>
 
   <Accordion title="Рекомендована стратегія резервного копіювання">
-    Помістіть свій **agent workspace** у **приватний** git repo і робіть його резервні копії кудись
-    приватно (наприклад у GitHub private). Це захоплює memory + файли AGENTS/SOUL/USER
-    і дозволяє пізніше відновити «розум» помічника.
+    Помістіть ваш **workspace агента** в **приватний** git repo і робіть його резервну копію десь
+    приватно (наприклад, у GitHub private). Це зберігає memory + файли AGENTS/SOUL/USER
+    і дозволяє відновити "розум" помічника пізніше.
 
-    **Не** комітьте нічого з `~/.openclaw` (credentials, sessions, tokens або encrypted secrets payloads).
-    Якщо вам потрібне повне відновлення, окремо робіть резервні копії як workspace, так і state directory
+    **Не** commit-те нічого з `~/.openclaw` (credentials, sessions, tokens або encrypted payload secrets).
+    Якщо вам потрібне повне відновлення, окремо робіть резервні копії і workspace, і каталогу state
     (див. питання про міграцію вище).
 
-    Документація: [Agent workspace](/uk/concepts/agent-workspace).
+    Документація: [Workspace агента](/uk/concepts/agent-workspace).
 
   </Accordion>
 
   <Accordion title="Як повністю видалити OpenClaw?">
-    Див. окремий посібник: [Uninstall](/uk/install/uninstall).
+    Див. окрему інструкцію: [Видалення](/uk/install/uninstall).
   </Accordion>
 
-  <Accordion title="Чи можуть агенти працювати поза workspace?">
-    Так. Workspace — це **cwd за замовчуванням** і опора для memory, а не жорстка sandbox.
-    Відносні шляхи розв’язуються всередині workspace, але абсолютні шляхи можуть отримувати доступ до інших
-    розташувань на host, якщо sandboxing не ввімкнено. Якщо вам потрібна ізоляція, використовуйте
-    [`agents.defaults.sandbox`](/uk/gateway/sandboxing) або per-agent налаштування sandbox. Якщо ви
-    хочете, щоб репозиторій був working directory за замовчуванням, вкажіть у цього агента
-    `workspace` як корінь репозиторію. Репозиторій OpenClaw — це лише вихідний код; тримайте
-    workspace окремо, якщо тільки ви свідомо не хочете, щоб агент працював усередині нього.
+  <Accordion title="Чи можуть agents працювати поза workspace?">
+    Так. Workspace — це **cwd за замовчуванням** і якір memory, а не жорстка sandbox.
+    Відносні шляхи розв’язуються всередині workspace, але абсолютні шляхи можуть звертатися до інших
+    місць на host, якщо sandboxing не увімкнено. Якщо вам потрібна ізоляція, використовуйте
+    [`agents.defaults.sandbox`](/uk/gateway/sandboxing) або sandbox-налаштування для окремих agents. Якщо ви
+    хочете, щоб repo був робочим каталогом за замовчуванням, вкажіть для цього agent
+    `workspace` як корінь repo. Repo OpenClaw — це лише вихідний код; тримайте
+    workspace окремо, якщо тільки ви навмисно не хочете, щоб agent працював усередині нього.
 
     Приклад (repo як cwd за замовчуванням):
 
@@ -1459,16 +1456,16 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="Remote mode: де знаходиться session store?">
-    Станом сесій володіє **gateway host**. Якщо ви працюєте в remote mode, потрібний вам session store знаходиться на віддаленій машині, а не на вашому локальному ноутбуці. Див. [Session management](/uk/concepts/session).
+  <Accordion title="Віддалений режим: де знаходиться сховище сесій?">
+    Станом session володіє **gateway host**. Якщо ви працюєте у віддаленому режимі, потрібне вам сховище сесій знаходиться на віддаленій машині, а не на вашому локальному ноутбуці. Див. [Керування сесіями](/uk/concepts/session).
   </Accordion>
 </AccordionGroup>
 
-## Основи config
+## Основи конфігурації
 
 <AccordionGroup>
-  <Accordion title="Який формат має config? Де він знаходиться?">
-    OpenClaw читає необов’язковий **JSON5** config з `$OPENCLAW_CONFIG_PATH` (типово: `~/.openclaw/openclaw.json`):
+  <Accordion title="Який формат конфігурації? Де вона знаходиться?">
+    OpenClaw читає необов’язкову конфігурацію **JSON5** з `$OPENCLAW_CONFIG_PATH` (типово: `~/.openclaw/openclaw.json`):
 
     ```
     $OPENCLAW_CONFIG_PATH
@@ -1478,11 +1475,11 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title='Я встановив gateway.bind: "lan" (або "tailnet"), і тепер нічого не слухає / UI каже unauthorized'>
-    Non-loopback binds **вимагають коректного gateway auth path**. На практиці це означає:
+  <Accordion title='Я встановив(ла) gateway.bind: "lan" (або "tailnet"), і тепер ніщо не слухає / UI каже unauthorized'>
+    Bind-и без loopback **вимагають валідного шляху auth для gateway**. На практиці це означає:
 
-    - shared-secret auth: токен або пароль
-    - `gateway.auth.mode: "trusted-proxy"` за правильно налаштованим non-loopback identity-aware reverse proxy
+    - auth через shared secret: токен або пароль
+    - `gateway.auth.mode: "trusted-proxy"` за правильно налаштованим identity-aware reverse proxy без loopback
 
     ```json5
     {
@@ -1499,31 +1496,31 @@ x-i18n:
     Примітки:
 
     - `gateway.remote.token` / `.password` самі по собі **не** вмикають auth локального gateway.
-    - Локальні шляхи виклику можуть використовувати `gateway.remote.*` як fallback лише тоді, коли `gateway.auth.*` не задано.
-    - Для auth паролем задайте `gateway.auth.mode: "password"` плюс `gateway.auth.password` (або `OPENCLAW_GATEWAY_PASSWORD`).
-    - Якщо `gateway.auth.token` / `gateway.auth.password` явно налаштовано через SecretRef і не може бути розв’язано, розв’язання завершується в закритий спосіб (жоден remote fallback не маскує це).
-    - Конфігурації Control UI зі shared-secret автентифікуються через `connect.params.auth.token` або `connect.params.auth.password` (зберігаються в налаштуваннях app/UI). Режими з ідентичністю, такі як Tailscale Serve або `trusted-proxy`, натомість використовують request headers. Уникайте розміщення shared secrets в URL.
-    - З `gateway.auth.mode: "trusted-proxy"` reverse proxies через loopback на тому ж host **не** задовольняють trusted-proxy auth. Trusted proxy має бути налаштованим non-loopback source.
+    - Локальні шляхи виклику можуть використовувати `gateway.remote.*` як fallback лише коли `gateway.auth.*` не задано.
+    - Для auth через пароль замість цього встановіть `gateway.auth.mode: "password"` плюс `gateway.auth.password` (або `OPENCLAW_GATEWAY_PASSWORD`).
+    - Якщо `gateway.auth.token` / `gateway.auth.password` явно налаштовано через SecretRef і його неможливо визначити, визначення завершується fail closed (без маскування через remote fallback).
+    - Налаштування shared-secret у Control UI автентифікуються через `connect.params.auth.token` або `connect.params.auth.password` (зберігаються в налаштуваннях app/UI). Режими з ідентичністю, як-от Tailscale Serve або `trusted-proxy`, натомість використовують заголовки запиту. Уникайте розміщення shared secrets у URL.
+    - З `gateway.auth.mode: "trusted-proxy"` same-host reverse proxy через loopback все одно **не** задовольняє auth trusted-proxy. Trusted proxy має бути налаштованим джерелом без loopback.
 
   </Accordion>
 
   <Accordion title="Чому тепер мені потрібен токен на localhost?">
-    OpenClaw за замовчуванням вимагає gateway auth, включно з loopback. У звичайному стандартному шляху це означає auth токеном: якщо явний auth path не налаштовано, запуск gateway переходить у режим токена й автоматично генерує його, зберігаючи в `gateway.auth.token`, тож **локальні WS clients мають автентифікуватися**. Це блокує інші локальні процеси від виклику Gateway.
+    OpenClaw примусово вимагає auth для gateway за замовчуванням, включно з loopback. У звичайному сценарії за замовчуванням це означає auth через токен: якщо не налаштовано явний шлях auth, запуск gateway переходить у режим токена і автоматично генерує його, зберігаючи в `gateway.auth.token`, тому **локальні WS-клієнти мають автентифікуватися**. Це блокує інші локальні процеси від виклику Gateway.
 
-    Якщо ви віддаєте перевагу іншому auth path, ви можете явно вибрати режим пароля (або, для non-loopback identity-aware reverse proxies, `trusted-proxy`). Якщо ви **справді** хочете відкритий loopback, явно задайте `gateway.auth.mode: "none"` у config. Doctor може будь-коли згенерувати токен: `openclaw doctor --generate-gateway-token`.
-
-  </Accordion>
-
-  <Accordion title="Чи потрібно перезапускати після зміни config?">
-    Gateway відстежує config і підтримує hot-reload:
-
-    - `gateway.reload.mode: "hybrid"` (типово): hot-apply для безпечних змін, restart для критичних
-    - Також підтримуються `hot`, `restart`, `off`
+    Якщо ви віддаєте перевагу іншому шляху auth, ви можете явно вибрати режим пароля (або, для identity-aware reverse proxy без loopback, `trusted-proxy`). Якщо ви **справді** хочете відкритий loopback, явно встановіть `gateway.auth.mode: "none"` у своїй config. Doctor може згенерувати токен у будь-який момент: `openclaw doctor --generate-gateway-token`.
 
   </Accordion>
 
-  <Accordion title="Як вимкнути кумедні tagline у CLI?">
-    Установіть `cli.banner.taglineMode` в config:
+  <Accordion title="Чи треба перезапускати після зміни конфігурації?">
+    Gateway стежить за config і підтримує hot-reload:
+
+    - `gateway.reload.mode: "hybrid"` (за замовчуванням): безпечні зміни застосовуються hot, критичні — через перезапуск
+    - також підтримуються `hot`, `restart`, `off`
+
+  </Accordion>
+
+  <Accordion title="Як вимкнути кумедні слогани CLI?">
+    Встановіть `cli.banner.taglineMode` у config:
 
     ```json5
     {
@@ -1535,23 +1532,23 @@ x-i18n:
     }
     ```
 
-    - `off`: приховує текст tagline, але залишає рядок із заголовком/версією banner.
-    - `default`: завжди використовує `All your chats, one OpenClaw.`.
-    - `random`: ротація кумедних/сезонних tagline (поведінка за замовчуванням).
-    - Якщо ви хочете повністю прибрати banner, задайте env `OPENCLAW_HIDE_BANNER=1`.
+    - `off`: приховує текст слогана, але зберігає рядок із назвою/версією banner.
+    - `default`: щоразу використовує `All your chats, one OpenClaw.`.
+    - `random`: змінні кумедні/сезонні слогани (поведінка за замовчуванням).
+    - Якщо ви не хочете banner взагалі, встановіть env `OPENCLAW_HIDE_BANNER=1`.
 
   </Accordion>
 
   <Accordion title="Як увімкнути web search (і web fetch)?">
-    `web_fetch` працює без API key. `web_search` залежить від вибраного
-    provider:
+    `web_fetch` працює без API-ключа. `web_search` залежить від вибраного
+    провайдера:
 
-    - Провайдери з API, такі як Brave, Exa, Firecrawl, Gemini, Grok, Kimi, MiniMax Search, Perplexity і Tavily, потребують звичайного налаштування API key.
-    - Ollama Web Search не потребує ключа, але використовує налаштований Ollama host і вимагає `ollama signin`.
-    - DuckDuckGo не потребує ключа, але це неофіційна HTML-based інтеграція.
+    - Провайдери з API, такі як Brave, Exa, Firecrawl, Gemini, Grok, Kimi, MiniMax Search, Perplexity і Tavily, потребують звичайного налаштування API-ключа.
+    - Ollama Web Search не потребує ключа, але використовує налаштований host Ollama і вимагає `ollama signin`.
+    - DuckDuckGo не потребує ключа, але це неофіційна інтеграція на основі HTML.
     - SearXNG не потребує ключа / може бути self-hosted; налаштуйте `SEARXNG_BASE_URL` або `plugins.entries.searxng.config.webSearch.baseUrl`.
 
-    **Рекомендовано:** виконайте `openclaw configure --section web` і виберіть provider.
+    **Рекомендовано:** виконайте `openclaw configure --section web` і виберіть провайдера.
     Альтернативи через environment:
 
     - Brave: `BRAVE_API_KEY`
@@ -1587,66 +1584,66 @@ x-i18n:
             },
             fetch: {
               enabled: true,
-              provider: "firecrawl", // необов’язково; пропустіть для auto-detect
+              provider: "firecrawl", // optional; omit for auto-detect
             },
           },
         },
     }
     ```
 
-    Конфігурація web-search для конкретного provider тепер живе в `plugins.entries.<plugin>.config.webSearch.*`.
-    Застарілі шляхи provider у `tools.web.search.*` тимчасово все ще завантажуються для сумісності, але не повинні використовуватися в нових configs.
-    Конфігурація fallback web-fetch для Firecrawl живе в `plugins.entries.firecrawl.config.webFetch.*`.
+    Специфічна для провайдера конфігурація web-search тепер живе в `plugins.entries.<plugin>.config.webSearch.*`.
+    Legacy-шляхи провайдера `tools.web.search.*` все ще тимчасово завантажуються для сумісності, але їх не слід використовувати в нових config.
+    Конфігурація fallback для web-fetch Firecrawl живе в `plugins.entries.firecrawl.config.webFetch.*`.
 
     Примітки:
 
-    - Якщо ви використовуєте allowlists, додайте `web_search`/`web_fetch`/`x_search` або `group:web`.
-    - `web_fetch` увімкнено за замовчуванням (якщо його явно не вимкнути).
-    - Якщо `tools.web.fetch.provider` пропущено, OpenClaw автоматично визначає першого готового fallback provider для fetch з доступних credentials. Наразі bundled provider — Firecrawl.
-    - Демони читають env vars з `~/.openclaw/.env` (або з середовища сервісу).
+    - Якщо ви використовуєте allowlist, додайте `web_search`/`web_fetch`/`x_search` або `group:web`.
+    - `web_fetch` увімкнено за замовчуванням (якщо його явно не вимкнено).
+    - Якщо `tools.web.fetch.provider` пропущено, OpenClaw автоматично визначає першого готового fallback-провайдера fetch на основі доступних credentials. Зараз bundled-провайдер — це Firecrawl.
+    - Демони читають env vars із `~/.openclaw/.env` (або з environment сервісу).
 
-    Документація: [Web tools](/tools/web).
+    Документація: [Web tools](/uk/tools/web).
 
   </Accordion>
 
-  <Accordion title="config.apply стер мій config. Як відновитися і як цього уникнути?">
-    `config.apply` замінює **весь config**. Якщо ви надсилаєте частковий об’єкт, усе
+  <Accordion title="config.apply стер мою конфігурацію. Як відновити і як цього уникнути?">
+    `config.apply` замінює **всю конфігурацію повністю**. Якщо ви надсилаєте частковий об’єкт, усе
     інше видаляється.
 
     Відновлення:
 
-    - Відновіть із резервної копії (git або збережений `~/.openclaw/openclaw.json`).
-    - Якщо резервної копії немає, повторно запустіть `openclaw doctor` і заново налаштуйте channels/models.
-    - Якщо це стало несподіванкою, створіть bug report і додайте ваш останній відомий config або будь-яку резервну копію.
-    - Локальний coding agent часто може відновити робочий config з логів або історії.
+    - Відновіть із резервної копії (git або скопійований `~/.openclaw/openclaw.json`).
+    - Якщо резервної копії немає, знову запустіть `openclaw doctor` і переналаштуйте channels/models.
+    - Якщо це сталося неочікувано, створіть bug-report і додайте вашу останню відому config або будь-яку резервну копію.
+    - Локальний coding agent часто може відновити робочу config з логів або history.
 
     Як уникнути:
 
     - Використовуйте `openclaw config set` для невеликих змін.
     - Використовуйте `openclaw configure` для інтерактивного редагування.
-    - Спочатку використовуйте `config.schema.lookup`, якщо ви не впевнені щодо точного шляху або форми поля; він повертає shallow schema node плюс підсумки безпосередніх дочірніх елементів для drill-down.
+    - Використовуйте `config.schema.lookup` спочатку, коли не впевнені в точному path або формі поля; він повертає вузол shallow schema плюс короткі підсумки безпосередніх дочірніх елементів для подальшого заглиблення.
     - Використовуйте `config.patch` для часткових RPC-редагувань; залишайте `config.apply` лише для повної заміни config.
-    - Якщо ви використовуєте owner-only інструмент `gateway` із запуску агента, він усе одно відхилятиме записи до `tools.exec.ask` / `tools.exec.security` (включно із застарілими aliases `tools.bash.*`, які нормалізуються до тих самих захищених exec paths).
+    - Якщо ви використовуєте owner-only інструмент `gateway` із запуску agent, він усе одно відхилятиме записи в `tools.exec.ask` / `tools.exec.security` (включно з legacy-аліасами `tools.bash.*`, які нормалізуються до тих самих захищених exec-шляхів).
 
     Документація: [Config](/cli/config), [Configure](/cli/configure), [Doctor](/uk/gateway/doctor).
 
   </Accordion>
 
   <Accordion title="Як запустити центральний Gateway зі спеціалізованими workers на різних пристроях?">
-    Поширений шаблон — **один Gateway** (наприклад Raspberry Pi) плюс **nodes** і **agents**:
+    Поширений шаблон — **один Gateway** (наприклад, Raspberry Pi) плюс **nodes** і **agents**:
 
-    - **Gateway (центральний):** володіє channels (Signal/WhatsApp), маршрутизацією та sessions.
-    - **Nodes (пристрої):** Macs/iOS/Android підключаються як периферія й надають локальні tools (`system.run`, `canvas`, `camera`).
-    - **Agents (workers):** окремі brains/workspaces для спеціальних ролей (наприклад, «Hetzner ops», «Personal data»).
-    - **Sub-agents:** запускайте фонову роботу з головного агента, коли потрібен паралелізм.
-    - **TUI:** підключайтеся до Gateway і перемикайте agents/sessions.
+    - **Gateway (центральний):** володіє channels (Signal/WhatsApp), routing і sessions.
+    - **Nodes (пристрої):** Macs/iOS/Android підключаються як периферія й відкривають локальні tools (`system.run`, `canvas`, `camera`).
+    - **Agents (workers):** окремі мозки/workspaces для спеціальних ролей (наприклад, "Hetzner ops", "Personal data").
+    - **Sub-agents:** породжують фонову роботу з main agent, коли потрібен паралелізм.
+    - **TUI:** підключається до Gateway і перемикає agents/sessions.
 
-    Документація: [Nodes](/uk/nodes), [Remote access](/uk/gateway/remote), [Multi-Agent Routing](/uk/concepts/multi-agent), [Sub-agents](/tools/subagents), [TUI](/web/tui).
+    Документація: [Nodes](/uk/nodes), [Віддалений доступ](/uk/gateway/remote), [Multi-Agent Routing](/uk/concepts/multi-agent), [Sub-agents](/uk/tools/subagents), [TUI](/web/tui).
 
   </Accordion>
 
-  <Accordion title="Чи може браузер OpenClaw працювати в headless режимі?">
-    Так. Це параметр config:
+  <Accordion title="Чи може браузер OpenClaw працювати headless?">
+    Так. Це параметр конфігурації:
 
     ```json5
     {
@@ -1659,46 +1656,46 @@ x-i18n:
     }
     ```
 
-    За замовчуванням — `false` (headful). Headless частіше викликає anti-bot перевірки на деяких сайтах. Див. [Browser](/tools/browser).
+    За замовчуванням `false` (із вікном). Headless частіше викликає anti-bot перевірки на деяких сайтах. Див. [Браузер](/uk/tools/browser).
 
-    Headless використовує **той самий Chromium engine** і працює для більшості сценаріїв automation (форми, кліки, скрейпінг, логіни). Основні відмінності:
+    Headless використовує **той самий Chromium engine** і працює для більшості automation-сценаріїв (форми, кліки, scraping, logins). Основні відмінності:
 
-    - Немає видимого вікна браузера (використовуйте скриншоти, якщо потрібна візуалізація).
-    - Деякі сайти суворіше ставляться до automation у headless режимі (CAPTCHA, anti-bot).
+    - Немає видимого вікна браузера (використовуйте скриншоти, якщо вам потрібні візуальні підтвердження).
+    - Деякі сайти суворіше ставляться до automation у headless-режимі (CAPTCHA, anti-bot).
       Наприклад, X/Twitter часто блокує headless sessions.
 
   </Accordion>
 
   <Accordion title="Як використовувати Brave для керування браузером?">
-    Задайте `browser.executablePath` як шлях до вашого binary Brave (або будь-якого Chromium-based browser) і перезапустіть Gateway.
-    Повні приклади config див. в [Browser](/tools/browser#use-brave-or-another-chromium-based-browser).
+    Встановіть `browser.executablePath` на ваш бінарник Brave (або будь-який браузер на базі Chromium) і перезапустіть Gateway.
+    Повні приклади конфігурації див. у [Браузер](/uk/tools/browser#use-brave-or-another-chromium-based-browser).
   </Accordion>
 </AccordionGroup>
 
-## Віддалені gateways і nodes
+## Віддалені gateway і nodes
 
 <AccordionGroup>
   <Accordion title="Як команди проходять між Telegram, gateway і nodes?">
-    Повідомлення Telegram обробляються **gateway**. Gateway запускає агента і
-    лише потім викликає nodes через **Gateway WebSocket**, коли потрібен інструмент node:
+    Повідомлення Telegram обробляються **gateway**. Gateway запускає agent і
+    лише потім викликає nodes через **Gateway WebSocket**, коли потрібен node tool:
 
     Telegram → Gateway → Agent → `node.*` → Node → Gateway → Telegram
 
-    Nodes не бачать вхідний traffic провайдера; вони отримують лише node RPC calls.
+    Nodes не бачать вхідний трафік провайдерів; вони отримують лише виклики node RPC.
 
   </Accordion>
 
-  <Accordion title="Як мій агент може отримати доступ до мого комп’ютера, якщо Gateway розміщений віддалено?">
-    Коротка відповідь: **під’єднайте свій комп’ютер як node**. Gateway працює деінде, але він може
+  <Accordion title="Як мій agent може отримати доступ до мого комп’ютера, якщо Gateway хоститься віддалено?">
+    Коротка відповідь: **підключіть свій комп’ютер як node**. Gateway працює деінде, але він може
     викликати інструменти `node.*` (screen, camera, system) на вашій локальній машині через Gateway WebSocket.
 
     Типове налаштування:
 
-    1. Запустіть Gateway на always-on host (VPS/home server).
-    2. Розмістіть gateway host і ваш комп’ютер в одній tailnet.
-    3. Переконайтеся, що Gateway WS доступний (tailnet bind або SSH tunnel).
-    4. Відкрийте застосунок macOS локально й підключіться в режимі **Remote over SSH** (або напряму через tailnet),
-       щоб він міг зареєструватися як node.
+    1. Запустіть Gateway на host, який завжди увімкнений (VPS/home server).
+    2. Додайте Gateway host і ваш комп’ютер в один tailnet.
+    3. Переконайтеся, що Gateway WS доступний (bind tailnet або SSH tunnel).
+    4. Відкрийте macOS-app локально і підключіться в режимі **Remote over SSH** (або напряму через tailnet),
+       щоб вона могла зареєструватися як node.
     5. Підтвердьте node на Gateway:
 
        ```bash
@@ -1706,107 +1703,107 @@ x-i18n:
        openclaw devices approve <requestId>
        ```
 
-    Окремий TCP bridge не потрібен; nodes підключаються через Gateway WebSocket.
+    Окремий TCP-bridge не потрібен; nodes підключаються через Gateway WebSocket.
 
-    Нагадування про безпеку: pairing macOS node дозволяє `system.run` на цій машині. Підключайте
-    лише ті пристрої, яким довіряєте, і перегляньте [Security](/uk/gateway/security).
+    Нагадування щодо безпеки: підключення macOS node дозволяє `system.run` на цій машині. Підключайте
+    лише пристрої, яким довіряєте, і перегляньте [Безпека](/uk/gateway/security).
 
-    Документація: [Nodes](/uk/nodes), [Gateway protocol](/uk/gateway/protocol), [macOS remote mode](/uk/platforms/mac/remote), [Security](/uk/gateway/security).
+    Документація: [Nodes](/uk/nodes), [Протокол Gateway](/uk/gateway/protocol), [віддалений режим macOS](/uk/platforms/mac/remote), [Безпека](/uk/gateway/security).
 
   </Accordion>
 
-  <Accordion title="Tailscale підключений, але я не отримую відповідей. Що тепер?">
+  <Accordion title="Tailscale підключено, але я не отримую відповідей. Що тепер?">
     Перевірте базові речі:
 
     - Gateway працює: `openclaw gateway status`
-    - Стан Gateway: `openclaw status`
-    - Стан channels: `openclaw channels status`
+    - Health Gateway: `openclaw status`
+    - Health каналів: `openclaw channels status`
 
-    Потім перевірте auth і маршрутизацію:
+    Потім перевірте auth і routing:
 
     - Якщо ви використовуєте Tailscale Serve, переконайтеся, що `gateway.auth.allowTailscale` налаштовано правильно.
-    - Якщо підключаєтеся через SSH tunnel, переконайтеся, що локальний tunnel піднято й він спрямований на правильний порт.
-    - Переконайтеся, що ваші allowlists (DM або group) містять ваш account.
+    - Якщо підключаєтеся через SSH tunnel, підтвердьте, що локальний tunnel активний і вказує на правильний порт.
+    - Підтвердьте, що ваші allowlist-и (DM або group) включають ваш обліковий запис.
 
-    Документація: [Tailscale](/uk/gateway/tailscale), [Remote access](/uk/gateway/remote), [Channels](/uk/channels).
+    Документація: [Tailscale](/uk/gateway/tailscale), [Віддалений доступ](/uk/gateway/remote), [Канали](/uk/channels).
 
   </Accordion>
 
-  <Accordion title="Чи можуть два інстанси OpenClaw спілкуватися між собою (локальний + VPS)?">
-    Так. Вбудованого bridge «bot-to-bot» немає, але це можна організувати кількома
+  <Accordion title="Чи можуть два екземпляри OpenClaw спілкуватися між собою (локальний + VPS)?">
+    Так. Вбудованого bridge "bot-to-bot" немає, але це можна з’єднати кількома
     надійними способами:
 
-    **Найпростіше:** використовуйте звичайний chat channel, до якого мають доступ обидва боти (Telegram/Slack/WhatsApp).
-    Нехай Bot A надсилає повідомлення Bot B, а потім Bot B відповідає як зазвичай.
+    **Найпростіше:** використовуйте звичайний chat-канал, до якого мають доступ обидва боти (Telegram/Slack/WhatsApp).
+    Нехай Bot A надсилає повідомлення Bot B, а далі Bot B відповідає як зазвичай.
 
-    **CLI bridge (універсальний):** запустіть скрипт, який викликає інший Gateway через
-    `openclaw agent --message ... --deliver`, націлившись на чат, де слухає інший бот.
-    Якщо один бот працює на віддаленому VPS, націльте свій CLI на той віддалений Gateway
-    через SSH/Tailscale (див. [Remote access](/uk/gateway/remote)).
+    **CLI bridge (універсально):** запустіть скрипт, який викликає інший Gateway через
+    `openclaw agent --message ... --deliver`, націлюючись на чат, де інший бот
+    слухає. Якщо один бот працює на віддаленому VPS, націльте ваш CLI на той віддалений Gateway
+    через SSH/Tailscale (див. [Віддалений доступ](/uk/gateway/remote)).
 
-    Приклад шаблону (запускається з машини, яка може дістатися до цільового Gateway):
+    Приклад шаблону (запускайте на машині, яка може дістатися до цільового Gateway):
 
     ```bash
     openclaw agent --message "Hello from local bot" --deliver --channel telegram --reply-to <chat-id>
     ```
 
-    Порада: додайте захист, щоб два боти не зациклилися безкінечно (лише згадування, channel
-    allowlists або правило «не відповідати на повідомлення ботів»).
+    Порада: додайте запобіжник, щоб два боти не зациклилися безкінечно (лише згадування, channel
+    allowlists або правило "не відповідати на повідомлення ботів").
 
-    Документація: [Remote access](/uk/gateway/remote), [Agent CLI](/cli/agent), [Agent send](/tools/agent-send).
+    Документація: [Віддалений доступ](/uk/gateway/remote), [Agent CLI](/cli/agent), [Agent send](/uk/tools/agent-send).
 
   </Accordion>
 
   <Accordion title="Чи потрібні окремі VPS для кількох agents?">
-    Ні. Один Gateway може розміщувати кількох agents, кожен зі своїм workspace, model defaults
-    і маршрутизацією. Це нормальне налаштування, і воно набагато дешевше та простіше, ніж запускати
-    один VPS на агента.
+    Ні. Один Gateway може хостити кілька agents, кожен із власним workspace, моделями за замовчуванням
+    і routing. Це стандартне налаштування, і воно значно дешевше та простіше, ніж запускати
+    один VPS на agent.
 
     Використовуйте окремі VPS лише тоді, коли вам потрібна жорстка ізоляція (межі безпеки) або дуже
-    різні configs, якими ви не хочете ділитися. В іншому разі зберігайте один Gateway і
-    використовуйте кількох agents або sub-agents.
+    різні config, якими ви не хочете ділитися. Інакше тримайте один Gateway і
+    використовуйте кілька agents або sub-agents.
 
   </Accordion>
 
-  <Accordion title="Чи є перевага у використанні node на моєму особистому ноутбуці замість SSH із VPS?">
+  <Accordion title="Чи є сенс використовувати node на моєму особистому ноутбуці замість SSH із VPS?">
     Так — nodes є first-class способом доступу до вашого ноутбука з віддаленого Gateway, і вони
-    відкривають більше, ніж просто shell access. Gateway працює на macOS/Linux (Windows через WSL2) і є
-    легким (достатньо невеликого VPS або машини рівня Raspberry Pi; 4 GB RAM цілком вистачає), тож поширений
-    сценарій — always-on host плюс ваш ноутбук як node.
+    дають більше, ніж просто доступ до shell. Gateway працює на macOS/Linux (Windows через WSL2) і є
+    легким (достатньо невеликого VPS або box рівня Raspberry Pi; 4 GB RAM більш ніж достатньо), тому поширене
+    налаштування — це host, який завжди увімкнений, плюс ваш ноутбук як node.
 
-    - **Не потрібен вхідний SSH.** Nodes самі підключаються до Gateway WebSocket і використовують device pairing.
-    - **Безпечніший контроль виконання.** `system.run` на цьому ноутбуці захищений allowlists/approvals node.
-    - **Більше device tools.** Nodes надають `canvas`, `camera` і `screen` на додачу до `system.run`.
-    - **Локальна browser automation.** Тримайте Gateway на VPS, але запускайте Chrome локально через node host на ноутбуці або під’єднуйтеся до локального Chrome на host через Chrome MCP.
+    - **Не потрібен вхідний SSH.** Nodes самі підключаються до Gateway WebSocket і використовують pairing пристрою.
+    - **Безпечніший контроль виконання.** `system.run` контролюється allowlist-ами/approval на node на цьому ноутбуці.
+    - **Більше інструментів пристрою.** Nodes відкривають `canvas`, `camera` і `screen` на додачу до `system.run`.
+    - **Локальна автоматизація браузера.** Тримайте Gateway на VPS, але запускайте Chrome локально через node host на ноутбуці або під’єднуйтеся до локального Chrome на host через Chrome MCP.
 
-    SSH підходить для разового shell access, але nodes простіші для постійних workflows агентів і
-    automation пристроїв.
+    SSH підходить для епізодичного доступу до shell, але nodes простіші для постійних workflow агентів і
+    автоматизації пристроїв.
 
-    Документація: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes), [Browser](/tools/browser).
+    Документація: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes), [Браузер](/uk/tools/browser).
 
   </Accordion>
 
-  <Accordion title="Чи запускають nodes gateway service?">
-    Ні. На одному host зазвичай має працювати лише **один gateway**, якщо ви навмисно не запускаєте ізольовані профілі (див. [Multiple gateways](/uk/gateway/multiple-gateways)). Nodes — це периферія, яка підключається
-    до gateway (nodes iOS/Android або macOS у режимі "node mode" в menubar app). Для headless node
+  <Accordion title="Чи запускають nodes сервіс gateway?">
+    Ні. Лише **один gateway** має працювати на host, якщо тільки ви навмисно не запускаєте ізольовані profiles (див. [Кілька gateway](/uk/gateway/multiple-gateways)). Nodes — це периферія, яка підключається
+    до gateway (nodes iOS/Android, або macOS "node mode" у menubar app). Для headless node
     hosts і керування через CLI див. [Node host CLI](/cli/node).
 
-    Для змін `gateway`, `discovery` і `canvasHost` потрібен повний restart.
+    Повний перезапуск потрібен для змін `gateway`, `discovery` і `canvasHost`.
 
   </Accordion>
 
-  <Accordion title="Чи є API / RPC спосіб застосувати config?">
+  <Accordion title="Чи є API / RPC-спосіб застосувати конфігурацію?">
     Так.
 
-    - `config.schema.lookup`: перевірити одне config subtree з його shallow schema node, відповідною UI hint і підсумками безпосередніх дочірніх елементів перед записом
+    - `config.schema.lookup`: перевірити одне піддерево config разом із його вузлом shallow schema, відповідною UI-підказкою та короткими підсумками безпосередніх дочірніх елементів перед записом
     - `config.get`: отримати поточний snapshot + hash
     - `config.patch`: безпечне часткове оновлення (рекомендовано для більшості RPC-редагувань)
-    - `config.apply`: перевірити + замінити повний config, а потім перезапустити
-    - Owner-only runtime tool `gateway` усе ще відмовляється переписувати `tools.exec.ask` / `tools.exec.security`; застарілі aliases `tools.bash.*` нормалізуються до тих самих захищених exec paths
+    - `config.apply`: перевірити + повністю замінити config, потім перезапустити
+    - Owner-only runtime tool `gateway` і далі відмовляється переписувати `tools.exec.ask` / `tools.exec.security`; legacy-аліаси `tools.bash.*` нормалізуються до тих самих захищених exec-шляхів
 
   </Accordion>
 
-  <Accordion title="Мінімальний адекватний config для першого встановлення">
+  <Accordion title="Мінімальна осмислена конфігурація для першого встановлення">
     ```json5
     {
       agents: { defaults: { workspace: "~/.openclaw/workspace" } },
@@ -1814,25 +1811,25 @@ x-i18n:
     }
     ```
 
-    Це задає ваш workspace і обмежує, хто може активувати бота.
+    Це задає ваш workspace і обмежує, хто може запускати бота.
 
   </Accordion>
 
   <Accordion title="Як налаштувати Tailscale на VPS і підключитися з Mac?">
     Мінімальні кроки:
 
-    1. **Встановіть + увійдіть на VPS**
+    1. **Встановити + увійти на VPS**
 
        ```bash
        curl -fsSL https://tailscale.com/install.sh | sh
        sudo tailscale up
        ```
 
-    2. **Встановіть + увійдіть на Mac**
-       - Скористайтеся застосунком Tailscale і увійдіть у ту саму tailnet.
-    3. **Увімкніть MagicDNS (рекомендовано)**
-       - У Tailscale admin console увімкніть MagicDNS, щоб VPS мав стабільне ім’я.
-    4. **Використовуйте hostname tailnet**
+    2. **Встановити + увійти на Mac**
+       - Використайте застосунок Tailscale і ввійдіть у той самий tailnet.
+    3. **Увімкнути MagicDNS (рекомендовано)**
+       - У консолі адміністратора Tailscale увімкніть MagicDNS, щоб VPS мав стабільне ім’я.
+    4. **Використовувати hostname tailnet**
        - SSH: `ssh user@your-vps.tailnet-xxxx.ts.net`
        - Gateway WS: `ws://your-vps.tailnet-xxxx.ts.net:18789`
 
@@ -1847,13 +1844,13 @@ x-i18n:
   </Accordion>
 
   <Accordion title="Як підключити Mac node до віддаленого Gateway (Tailscale Serve)?">
-    Serve відкриває **Gateway Control UI + WS**. Nodes підключаються через ту саму endpoint Gateway WS.
+    Serve відкриває **Gateway Control UI + WS**. Nodes підключаються через той самий endpoint Gateway WS.
 
     Рекомендоване налаштування:
 
-    1. **Переконайтеся, що VPS + Mac знаходяться в одній tailnet**.
-    2. **Використовуйте застосунок macOS у Remote mode** (SSH target може бути hostname tailnet).
-       Застосунок прокине port gateway і підключиться як node.
+    1. **Переконайтеся, що VPS + Mac перебувають в одному tailnet**.
+    2. **Використовуйте macOS-app у Remote mode** (SSH target може бути hostname tailnet).
+       App зробить tunnel порту Gateway і підключиться як node.
     3. **Підтвердьте node** на gateway:
 
        ```bash
@@ -1861,18 +1858,18 @@ x-i18n:
        openclaw devices approve <requestId>
        ```
 
-    Документація: [Gateway protocol](/uk/gateway/protocol), [Discovery](/uk/gateway/discovery), [macOS remote mode](/uk/platforms/mac/remote).
+    Документація: [Протокол Gateway](/uk/gateway/protocol), [Виявлення](/uk/gateway/discovery), [віддалений режим macOS](/uk/platforms/mac/remote).
 
   </Accordion>
 
-  <Accordion title="Чи варто встановлювати на другий ноутбук чи просто додати node?">
+  <Accordion title="Чи краще встановити на другий ноутбук, чи просто додати node?">
     Якщо вам потрібні лише **локальні tools** (screen/camera/exec) на другому ноутбуці, додайте його як
-    **node**. Це зберігає один Gateway і уникає дублювання config. Локальні node tools
-    наразі доступні лише на macOS, але ми плануємо розширити їх на інші ОС.
+    **node**. Це дозволяє залишити один Gateway і уникнути дублювання config. Локальні node tools
+    наразі доступні лише на macOS, але ми плануємо поширити їх і на інші ОС.
 
     Встановлюйте другий Gateway лише тоді, коли вам потрібна **жорстка ізоляція** або два повністю окремі боти.
 
-    Документація: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes), [Multiple gateways](/uk/gateway/multiple-gateways).
+    Документація: [Nodes](/uk/nodes), [Nodes CLI](/cli/nodes), [Кілька gateway](/uk/gateway/multiple-gateways).
 
   </Accordion>
 </AccordionGroup>
@@ -1881,14 +1878,14 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Як OpenClaw завантажує environment variables?">
-    OpenClaw читає env vars з батьківського процесу (shell, launchd/systemd, CI тощо) і додатково завантажує:
+    OpenClaw читає env vars із батьківського процесу (shell, launchd/systemd, CI тощо) і додатково завантажує:
 
-    - `.env` з поточного working directory
-    - глобальний fallback `.env` з `~/.openclaw/.env` (тобто `$OPENCLAW_STATE_DIR/.env`)
+    - `.env` із поточного робочого каталогу
+    - глобальний fallback `.env` із `~/.openclaw/.env` (тобто `$OPENCLAW_STATE_DIR/.env`)
 
-    Жоден із `.env` files не перевизначає вже наявні env vars.
+    Жоден із `.env` файлів не перевизначає вже наявні env vars.
 
-    Ви також можете визначати inline env vars у config (застосовуються лише якщо вони відсутні в process env):
+    Ви також можете визначити inline env vars у config (застосовуються лише якщо відсутні в process env):
 
     ```json5
     {
@@ -1899,15 +1896,15 @@ x-i18n:
     }
     ```
 
-    Повний порядок пріоритету і джерела див. у [/environment](/uk/help/environment).
+    Див. [/environment](/uk/help/environment) для повного порядку пріоритетів і джерел.
 
   </Accordion>
 
-  <Accordion title="Я запустив Gateway через сервіс, і мої env vars зникли. Що тепер?">
+  <Accordion title="Я запустив(ла) Gateway через сервіс, і мої env vars зникли. Що тепер?">
     Два поширені виправлення:
 
-    1. Помістіть відсутні ключі в `~/.openclaw/.env`, щоб вони підхоплювалися, навіть коли сервіс не успадковує env вашої оболонки.
-    2. Увімкніть import shell env (добровільна зручність):
+    1. Помістіть відсутні ключі в `~/.openclaw/.env`, щоб вони підхоплювалися, навіть коли сервіс не успадковує env вашої shell.
+    2. Увімкніть імпорт shell env (зручно, але лише за бажанням):
 
     ```json5
     {
@@ -1920,18 +1917,18 @@ x-i18n:
     }
     ```
 
-    Це запускає вашу login shell і імпортує лише очікувані відсутні ключі (ніколи не перевизначає). Еквіваленти env vars:
+    Це запускає вашу login shell і імпортує лише відсутні очікувані ключі (ніколи не перевизначає). Еквіваленти env var:
     `OPENCLAW_LOAD_SHELL_ENV=1`, `OPENCLAW_SHELL_ENV_TIMEOUT_MS=15000`.
 
   </Accordion>
 
-  <Accordion title='Я встановив COPILOT_GITHUB_TOKEN, але models status показує "Shell env: off." Чому?'>
-    `openclaw models status` повідомляє, чи увімкнено **shell env import**. "Shell env: off"
-    **не** означає, що ваших env vars немає — це лише означає, що OpenClaw не завантажуватиме
+  <Accordion title='Я встановив(ла) COPILOT_GITHUB_TOKEN, але models status показує "Shell env: off." Чому?'>
+    `openclaw models status` повідомляє, чи увімкнено **імпорт shell env**. "Shell env: off"
+    **не** означає, що env vars відсутні — це лише означає, що OpenClaw не завантажуватиме
     вашу login shell автоматично.
 
     Якщо Gateway працює як сервіс (launchd/systemd), він не успадковує ваше shell
-    environment. Виправте це одним із таких способів:
+    environment. Виправлення: зробіть одне з цього:
 
     1. Помістіть токен у `~/.openclaw/.env`:
 
@@ -1939,8 +1936,8 @@ x-i18n:
        COPILOT_GITHUB_TOKEN=...
        ```
 
-    2. Або увімкніть import shell (`env.shellEnv.enabled: true`).
-    3. Або додайте його в блок `env` вашого config (застосовується лише якщо відсутній).
+    2. Або увімкніть імпорт shell (`env.shellEnv.enabled: true`).
+    3. Або додайте його до блоку `env` у config (застосовується лише якщо відсутній).
 
     Потім перезапустіть gateway і перевірте знову:
 
@@ -1948,7 +1945,7 @@ x-i18n:
     openclaw models status
     ```
 
-    Токени Copilot читаються з `COPILOT_GITHUB_TOKEN` (також `GH_TOKEN` / `GITHUB_TOKEN`).
+    Copilot-токени читаються з `COPILOT_GITHUB_TOKEN` (також `GH_TOKEN` / `GITHUB_TOKEN`).
     Див. [/concepts/model-providers](/uk/concepts/model-providers) і [/environment](/uk/help/environment).
 
   </Accordion>
@@ -1958,14 +1955,14 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Як почати нову розмову?">
-    Надішліть `/new` або `/reset` як окреме повідомлення. Див. [Session management](/uk/concepts/session).
+    Надішліть `/new` або `/reset` окремим повідомленням. Див. [Керування сесіями](/uk/concepts/session).
   </Accordion>
 
   <Accordion title="Чи сесії скидаються автоматично, якщо я ніколи не надсилаю /new?">
-    Сесії можуть завершуватися після `session.idleMinutes`, але це **вимкнено за замовчуванням** (типове значення **0**).
-    Задайте додатне значення, щоб увімкнути завершення через бездіяльність. Коли це ввімкнено, **наступне**
-    повідомлення після періоду бездіяльності починає новий session id для цього chat key.
-    Це не видаляє transcript — просто починає нову session.
+    Сесії можуть завершуватися після `session.idleMinutes`, але це **вимкнено за замовчуванням** (типово **0**).
+    Встановіть додатне значення, щоб увімкнути завершення через простій. Коли це увімкнено, **наступне**
+    повідомлення після періоду простою створює новий session id для цього ключа чату.
+    Це не видаляє транскрипти — лише починає нову session.
 
     ```json5
     {
@@ -1977,30 +1974,30 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="Чи є спосіб створити команду інстансів OpenClaw (один CEO і багато агентів)?">
+  <Accordion title="Чи є спосіб зробити команду з екземплярів OpenClaw (один CEO і багато агентів)?">
     Так, через **multi-agent routing** і **sub-agents**. Ви можете створити одного координатора
-    й кількох worker-агентів зі своїми workspace і models.
+    agent і кількох робочих agents із власними workspaces і моделями.
 
-    Втім, найкраще сприймати це як **цікавий експеримент**. Це витрачає багато токенів і часто
-    менш ефективно, ніж використання одного бота з окремими сесіями. Типова модель, яку
-    ми уявляємо, — один бот, із яким ви спілкуєтеся, і різні сесії для паралельної роботи. Цей
-    бот також може запускати sub-agents за потреби.
+    Водночас це краще сприймати як **цікавий експеримент**. Це витрачає багато токенів і часто
+    менш ефективно, ніж використання одного бота з окремими сесіями. Типова модель, яку ми
+    уявляємо, — один бот, з яким ви говорите, але з різними сесіями для паралельної роботи. Цей
+    бот також може породжувати sub-agents за потреби.
 
-    Документація: [Multi-agent routing](/uk/concepts/multi-agent), [Sub-agents](/tools/subagents), [Agents CLI](/cli/agents).
+    Документація: [Multi-agent routing](/uk/concepts/multi-agent), [Sub-agents](/uk/tools/subagents), [Agents CLI](/cli/agents).
 
   </Accordion>
 
-  <Accordion title="Чому контекст урізався посеред задачі? Як цьому запобігти?">
-    Контекст сесії обмежений вікном моделі. Довгі чати, великі tool outputs або багато
-    файлів можуть запустити compaction або truncation.
+  <Accordion title="Чому контекст обрізався посеред задачі? Як цьому запобігти?">
+    Контекст сесії обмежений вікном моделі. Довгі чати, великі виводи tools або багато
+    файлів можуть викликати compaction або truncation.
 
     Що допомагає:
 
     - Попросіть бота підсумувати поточний стан і записати його у файл.
-    - Використовуйте `/compact` перед довгими задачами й `/new` при зміні теми.
-    - Тримайте важливий контекст у workspace й просіть бота зчитати його назад.
-    - Використовуйте sub-agents для довгої або паралельної роботи, щоб основний чат залишався меншим.
-    - Виберіть модель із більшим context window, якщо це трапляється часто.
+    - Використовуйте `/compact` перед довгими задачами і `/new` під час зміни тем.
+    - Тримайте важливий context у workspace і просіть бота перечитати його.
+    - Використовуйте sub-agents для довгих або паралельних робіт, щоб основний чат лишався меншим.
+    - Обирайте модель із більшим вікном контексту, якщо це трапляється часто.
 
   </Accordion>
 
@@ -2011,7 +2008,7 @@ x-i18n:
     openclaw reset
     ```
 
-    Неінтерактивний повний reset:
+    Неінтерактивне повне скидання:
 
     ```bash
     openclaw reset --scope full --yes --non-interactive
@@ -2025,76 +2022,76 @@ x-i18n:
 
     Примітки:
 
-    - Onboarding також пропонує **Reset**, якщо бачить наявний config. Див. [Onboarding (CLI)](/start/wizard).
-    - Якщо ви використовували profiles (`--profile` / `OPENCLAW_PROFILE`), скиньте кожен state dir (типово це `~/.openclaw-<profile>`).
+    - Onboarding також пропонує **Reset**, якщо бачить наявну config. Див. [Onboarding (CLI)](/uk/start/wizard).
+    - Якщо ви використовували profiles (`--profile` / `OPENCLAW_PROFILE`), скидайте кожен каталог state окремо (типово це `~/.openclaw-<profile>`).
     - Dev reset: `openclaw gateway --dev --reset` (лише для dev; стирає dev config + credentials + sessions + workspace).
 
   </Accordion>
 
   <Accordion title='Я отримую помилки "context too large" — як скинути або стиснути?'>
-    Використовуйте один із цих варіантів:
+    Використайте один із варіантів:
 
-    - **Compact** (зберігає розмову, але підсумовує старіші turns):
+    - **Стиснення** (зберігає розмову, але підсумовує старіші ходи):
 
       ```
       /compact
       ```
 
-      або `/compact <instructions>`, щоб спрямувати summary.
+      або `/compact <instructions>`, щоб спрямувати підсумок.
 
-    - **Reset** (новий session ID для того самого chat key):
+    - **Скидання** (новий session ID для того самого ключа чату):
 
       ```
       /new
       /reset
       ```
 
-    Якщо це трапляється постійно:
+    Якщо це повторюється:
 
-    - Увімкніть або налаштуйте **session pruning** (`agents.defaults.contextPruning`), щоб обрізати старий tool output.
-    - Використовуйте модель із більшим context window.
+    - Увімкніть або налаштуйте **обрізання сесій** (`agents.defaults.contextPruning`) для підрізання старого виводу tools.
+    - Використовуйте модель із більшим вікном контексту.
 
-    Документація: [Compaction](/uk/concepts/compaction), [Session pruning](/uk/concepts/session-pruning), [Session management](/uk/concepts/session).
+    Документація: [Compaction](/uk/concepts/compaction), [Обрізання сесій](/uk/concepts/session-pruning), [Керування сесіями](/uk/concepts/session).
 
   </Accordion>
 
   <Accordion title='Чому я бачу "LLM request rejected: messages.content.tool_use.input field required"?'>
     Це помилка валідації провайдера: модель видала блок `tool_use` без обов’язкового
-    `input`. Зазвичай це означає, що history сесії застаріла або пошкоджена (часто після довгих threads
-    або змін tool/schema).
+    `input`. Зазвичай це означає, що history сесії застаріла або пошкоджена (часто після довгих thread-ів
+    або зміни tool/schema).
 
-    Виправлення: почніть нову сесію через `/new` (окреме повідомлення).
+    Виправлення: почніть нову session через `/new` (окремим повідомленням).
 
   </Accordion>
 
   <Accordion title="Чому я отримую heartbeat-повідомлення кожні 30 хвилин?">
-    Heartbeats за замовчуванням запускаються кожні **30m** (**1h** при використанні OAuth auth). Налаштуйте або вимкніть їх:
+    За замовчуванням heartbeats запускаються кожні **30m** (**1h** у разі використання OAuth auth). Налаштуйте або вимкніть їх:
 
     ```json5
     {
       agents: {
         defaults: {
           heartbeat: {
-            every: "2h", // або "0m", щоб вимкнути
+            every: "2h", // or "0m" to disable
           },
         },
       },
     }
     ```
 
-    Якщо `HEARTBEAT.md` існує, але фактично порожній (лише порожні рядки та markdown
-    headers на кшталт `# Heading`), OpenClaw пропускає heartbeat run, щоб зекономити API calls.
-    Якщо файлу немає, heartbeat все одно запускається, а модель вирішує, що робити.
+    Якщо `HEARTBEAT.md` існує, але фактично порожній (лише пусті рядки й markdown-заголовки
+    на кшталт `# Heading`), OpenClaw пропускає запуск heartbeat, щоб зекономити API-виклики.
+    Якщо файл відсутній, heartbeat усе одно запускається, а модель сама вирішує, що робити.
 
-    Для per-agent overrides використовуйте `agents.list[].heartbeat`. Документація: [Heartbeat](/uk/gateway/heartbeat).
+    Override-и для окремих agents використовують `agents.list[].heartbeat`. Документація: [Heartbeat](/uk/gateway/heartbeat).
 
   </Accordion>
 
   <Accordion title='Чи потрібно додавати "bot account" до групи WhatsApp?'>
-    Ні. OpenClaw працює від **вашого власного account**, тож якщо ви є в групі, OpenClaw може її бачити.
-    За замовчуванням групові відповіді блокуються, доки ви не дозволите senders (`groupPolicy: "allowlist"`).
+    Ні. OpenClaw працює з **вашим власним обліковим записом**, тож якщо ви є в групі, OpenClaw може її бачити.
+    За замовчуванням відповіді в групах заблоковані, доки ви не дозволите відправників (`groupPolicy: "allowlist"`).
 
-    Якщо ви хочете, щоб у групі лише **ви** могли активувати відповіді:
+    Якщо ви хочете, щоб лише **ви** могли запускати відповіді в групі:
 
     ```json5
     {
@@ -2110,7 +2107,7 @@ x-i18n:
   </Accordion>
 
   <Accordion title="Як отримати JID групи WhatsApp?">
-    Варіант 1 (найшвидший): дивіться логи й надішліть тестове повідомлення в групу:
+    Варіант 1 (найшвидший): переглядайте логи й надішліть тестове повідомлення в групу:
 
     ```bash
     openclaw logs --follow --json
@@ -2119,196 +2116,136 @@ x-i18n:
     Шукайте `chatId` (або `from`), що закінчується на `@g.us`, наприклад:
     `1234567890-1234567890@g.us`.
 
-    Варіант 2 (якщо вже налаштовано/додано до allowlist): виведіть групи з config:
+    Варіант 2 (якщо вже налаштовано/є в allowlist): перелічіть групи з config:
 
     ```bash
     openclaw directory groups list --channel whatsapp
     ```
 
-    Документація: [WhatsApp](/uk/channels/whatsapp), [Directory](/cli/directory), [Logs](/cli/logs).
+    Документація: [WhatsApp](/uk/channels/whatsapp), [Directory](/cli/directory), [Логи](/cli/logs).
 
   </Accordion>
 
   <Accordion title="Чому OpenClaw не відповідає в групі?">
-    Є дві поширені причини:
+    Дві типові причини:
 
-    - Увімкнено gating за згадуванням (за замовчуванням). Ви маєте @mention бота (або збігтися з `mentionPatterns`).
-    - Ви налаштували `channels.whatsapp.groups` без `"*"`, і групу не додано до allowlist.
+    - Увімкнено gating за згадкою (за замовчуванням). Ви повинні @згадати бота (або відповідати `mentionPatterns`).
+    - Ви налаштували `channels.whatsapp.groups` без `"*"`, і група не входить до allowlist.
 
-    Див. [Groups](/uk/channels/groups) і [Group messages](/uk/channels/group-messages).
+    Див. [Групи](/uk/channels/groups) і [Групові повідомлення](/uk/channels/group-messages).
 
   </Accordion>
 
-  <Accordion title="Чи ділять groups/threads контекст з DM?">
-    Direct chats за замовчуванням згортаються в main session. Groups/channels мають власні session keys, а topics Telegram / threads Discord є окремими сесіями. Див. [Groups](/uk/channels/groups) і [Group messages](/uk/channels/group-messages).
+  <Accordion title="Чи ділять групи/thread-и контекст із DM?">
+    Direct-чати за замовчуванням згортаються до main session. Groups/channels мають власні session keys, а теми Telegram / thread-и Discord — це окремі sessions. Див. [Групи](/uk/channels/groups) і [Групові повідомлення](/uk/channels/group-messages).
   </Accordion>
 
   <Accordion title="Скільки workspaces і agents я можу створити?">
-    Жорстких обмежень немає. Десятки (навіть сотні) — це нормально, але стежте за:
+    Жорстких обмежень немає. Десятки (навіть сотні) — це нормально, але слідкуйте за:
 
-    - **Зростанням диска:** sessions + transcripts зберігаються в `~/.openclaw/agents/<agentId>/sessions/`.
+    - **Зростанням диска:** sessions + transcripts живуть у `~/.openclaw/agents/<agentId>/sessions/`.
     - **Вартістю токенів:** більше agents означає більше одночасного використання моделей.
-    - **Операційними витратами:** auth profiles, workspaces і channel routing для кожного агента.
+    - **Операційними накладними витратами:** auth profiles, workspaces і channel routing на рівні agent.
 
     Поради:
 
-    - Тримайте один **активний** workspace на агента (`agents.defaults.workspace`).
-    - Очищайте старі sessions (видаляйте JSONL або записи store), якщо диск росте.
+    - Тримайте один **активний** workspace на agent (`agents.defaults.workspace`).
+    - Очищайте старі sessions (видаляйте JSONL або записи зі сховища), якщо диск розростається.
     - Використовуйте `openclaw doctor`, щоб знаходити зайві workspaces і невідповідності profiles.
 
   </Accordion>
 
-  <Accordion title="Чи можу я запускати кілька ботів або чатів одночасно (Slack), і як це налаштувати?">
-    Так. Використовуйте **Multi-Agent Routing**, щоб запускати кількох ізольованих agents і маршрутизувати вхідні повідомлення за
-    channel/account/peer. Slack підтримується як channel і може бути прив’язаний до конкретних agents.
+  <Accordion title="Чи можу я запускати кілька ботів або чатів одночасно (Slack), і як це краще налаштувати?">
+    Так. Використовуйте **Multi-Agent Routing**, щоб запускати кілька ізольованих agents і маршрутизувати вхідні повідомлення за
+    channel/account/peer. Slack підтримується як канал і може бути прив’язаний до конкретних agents.
 
-    Доступ до браузера потужний, але це не «робити все, що може людина» — anti-bot, CAPTCHA та MFA
-    усе ще можуть блокувати automation. Для найнадійнішого керування браузером використовуйте локальний Chrome MCP на host
+    Доступ до браузера потужний, але це не "може все, що може людина" — anti-bot, CAPTCHA та MFA все
+    ще можуть блокувати automation. Для найнадійнішого керування браузером використовуйте локальний Chrome MCP на host,
     або CDP на машині, яка фактично запускає браузер.
 
-    Рекомендоване налаштування:
+    Найкраща практика налаштування:
 
-    - Always-on Gateway host (VPS/Mac mini).
-    - Один агент на роль (bindings).
-    - Канал(и) Slack, прив’язані до цих агентів.
+    - Host Gateway, який завжди увімкнений (VPS/Mac mini).
+    - Один agent на роль (bindings).
+    - Канал(и) Slack, прив’язані до цих agents.
     - Локальний браузер через Chrome MCP або node за потреби.
 
     Документація: [Multi-Agent Routing](/uk/concepts/multi-agent), [Slack](/uk/channels/slack),
-    [Browser](/tools/browser), [Nodes](/uk/nodes).
+    [Браузер](/uk/tools/browser), [Nodes](/uk/nodes).
 
   </Accordion>
 </AccordionGroup>
 
-## Моделі: значення за замовчуванням, вибір, aliases, перемикання
+## Моделі: значення за замовчуванням, вибір, аліаси, перемикання
 
 <AccordionGroup>
   <Accordion title='Що таке "default model"?'>
-    Default model в OpenClaw — це те, що ви встановили як:
+    Модель OpenClaw за замовчуванням — це те, що ви встановили в:
 
     ```
     agents.defaults.model.primary
     ```
 
-    На моделі посилаються у форматі `provider/model` (приклад: `openai/gpt-5.4`). Якщо ви опускаєте provider, OpenClaw спочатку пробує alias, потім — унікальний configured-provider match для точного model id, і лише потім переходить до configured default provider як застарілого шляху сумісності. Якщо цей provider більше не надає configured default model, OpenClaw переходить до першого configured provider/model замість показу застарілого default від видаленого provider. Утім, вам усе одно слід **явно** задавати `provider/model`.
+    На моделі посилаються як `provider/model` (приклад: `openai/gpt-5.4`). Якщо ви пропускаєте провайдера, OpenClaw спочатку пробує alias, потім — унікальний збіг налаштованого provider для цього точного model id, і лише після цього відступає до налаштованого провайдера за замовчуванням як до застарілого compatibility-path. Якщо цей provider більше не відкриває налаштовану default model, OpenClaw відступає до першого налаштованого provider/model замість того, щоб показувати застаріле default від видаленого provider. Однак вам усе одно слід **явно** встановлювати `provider/model`.
 
   </Accordion>
 
   <Accordion title="Яку модель ви рекомендуєте?">
-    **Рекомендовано за замовчуванням:** використовуйте найсильнішу модель останнього покоління, доступну у вашому стеку provider.
-    **Для агентів із увімкненими tools або недовіреним входом:** ставте силу моделі вище за вартість.
-    **Для рутинного/низькоризикового чату:** використовуйте дешевші fallback models і маршрутизуйте за ролями agent.
+    **Рекомендовано за замовчуванням:** використовуйте найсильнішу модель останнього покоління, доступну у вашому стеку провайдерів.
+    **Для агентів із tools або недовіреним вводом:** віддавайте перевагу силі моделі над вартістю.
+    **Для рутинного/низькоризикового чату:** використовуйте дешевші fallback-моделі й маршрутизуйте за роллю agent.
 
-    MiniMax має власну документацію: [MiniMax](/uk/providers/minimax) і
-    [Local models](/uk/gateway/local-models).
+    Для MiniMax є окрема документація: [MiniMax](/uk/providers/minimax) і
+    [Локальні моделі](/uk/gateway/local-models).
 
-    Практичне правило: використовуйте **найкращу модель, яку можете собі дозволити** для задач із високими ставками, і дешевшу
-    модель для рутинного чату або summary. Ви можете маршрутизувати моделі на рівні agent і використовувати sub-agents для
-    паралелізації довгих задач (кожен sub-agent споживає токени). Див. [Models](/uk/concepts/models) і
-    [Sub-agents](/tools/subagents).
+    Загальне правило: використовуйте **найкращу модель, яку можете собі дозволити** для високоризикової роботи, а дешевшу
+    модель — для рутинного чату або підсумків. Ви можете маршрутизувати моделі по agents і використовувати sub-agents для
+    паралелізації довгих задач (кожен sub-agent споживає токени). Див. [Моделі](/uk/concepts/models) і
+    [Sub-agents](/uk/tools/subagents).
 
-    Важливе попередження: слабші/надмірно квантизовані моделі більш вразливі до prompt
-    injection і небезпечної поведінки. Див. [Security](/uk/gateway/security).
+    Сильне попередження: слабші/надто квантовані моделі вразливіші до prompt
+    injection і небезпечної поведінки. Див. [Безпека](/uk/gateway/security).
 
-    Більше контексту: [Models](/uk/concepts/models).
+    Більше контексту: [Моделі](/uk/concepts/models).
 
   </Accordion>
 
-  <Accordion title="Як перемикати моделі, не стираючи config?">
-    Використовуйте **команди моделі** або редагуйте лише поля **model**. Уникайте повної заміни config.
+  <Accordion title="Як перемикати моделі, не стираючи конфігурацію?">
+    Використовуйте **команди моделей** або редагуйте лише поля **model**. Уникайте повної заміни config.
 
     Безпечні варіанти:
 
-    - `/model` у чаті (швидко, для окремої сесії)
+    - `/model` у чаті (швидко, для однієї session)
     - `openclaw models set ...` (оновлює лише config моделі)
     - `openclaw configure --section model` (інтерактивно)
-    - редагуйте `agents.defaults.model` у `~/.openclaw/openclaw.json`
+    - редагування `agents.defaults.model` у `~/.openclaw/openclaw.json`
 
-    Уникайте `config.apply` з частковим об’єктом, якщо ви не збираєтеся замінювати весь config.
-    Для RPC-редагувань спочатку перевіряйте через `config.schema.lookup` і надавайте перевагу `config.patch`. Payload lookup дає нормалізований шлях, shallow schema docs/constraints і підсумки безпосередніх дочірніх елементів
+    Уникайте `config.apply` із частковим об’єктом, якщо ви не маєте наміру замінити всю config.
+    Для RPC-редагувань спочатку перевіряйте через `config.schema.lookup` і віддавайте перевагу `config.patch`. Payload lookup дає нормалізований path, документи/обмеження shallow schema та короткі підсумки безпосередніх дочірніх елементів.
     для часткових оновлень.
-    Якщо ви все ж перезаписали config, відновіть його з резервної копії або повторно запустіть `openclaw doctor` для виправлення.
+    Якщо ви таки перезаписали config, відновіть її з резервної копії або повторно запустіть `openclaw doctor` для виправлення.
 
-    Документація: [Models](/uk/concepts/models), [Configure](/cli/configure), [Config](/cli/config), [Doctor](/uk/gateway/doctor).
+    Документація: [Моделі](/uk/concepts/models), [Configure](/cli/configure), [Config](/cli/config), [Doctor](/uk/gateway/doctor).
 
   </Accordion>
 
-  <Accordion title="Чи можу я використовувати self-hosted models (llama.cpp, vLLM, Ollama)?">
-    Так. Ollama — найпростіший шлях для локальних моделей.
+  <Accordion title="Чи можу я використовувати self-hosted моделі (llama.cpp, vLLM, Ollama)?">
+    Так. Ollama — найпростіший шлях до локальних моделей.
 
     Найшвидше налаштування:
 
     1. Встановіть Ollama з `https://ollama.com/download`
     2. Завантажте локальну модель, наприклад `ollama pull glm-4.7-flash`
-    3. Якщо ви хочете ще й cloud models, виконайте `ollama signin`
+    3. Якщо вам потрібні також cloud-моделі, виконайте `ollama signin`
     4. Запустіть `openclaw onboard` і виберіть `Ollama`
     5. Виберіть `Local` або `Cloud + Local`
 
     Примітки:
 
-    - `Cloud + Local` дає вам cloud models плюс ваші локальні моделі Ollama
-    - cloud models, такі як `kimi-k2.5:cloud`, не потребують локального pull
+    - `Cloud + Local` дає вам cloud-моделі плюс ваші локальні моделі Ollama
+    - cloud-моделі, як-от `kimi-k2.5:cloud`, не потребують локального pull
     - для ручного перемикання використовуйте `openclaw models list` і `openclaw models set ollama/<model>`
 
-    Примітка щодо безпеки: менші або сильно квантизовані моделі більш вразливі до prompt
+    Примітка з безпеки: менші або сильно квантовані моделі вразливіші до prompt
     injection. Ми наполегливо рекомендуємо **великі моделі** для будь-якого бота, який може використовувати tools.
-    Якщо ви все ж хочете малі моделі, увімкніть sandboxing і суворі tool allowlists.
-
-    Документація: [Ollama](/uk/providers/ollama), [Local models](/uk/gateway/local-models),
-    [Model providers](/uk/concepts/model-providers), [Security](/uk/gateway/security),
-    [Sandboxing](/uk/gateway/sandboxing).
-
-  </Accordion>
-
-  <Accordion title="Які моделі використовують OpenClaw, Flawd і Krill?">
-    - Ці розгортання можуть відрізнятися й змінюватися з часом; фіксованої рекомендації щодо provider немає.
-    - Перевіряйте поточне налаштування runtime на кожному gateway за допомогою `openclaw models status`.
-    - Для безпеково чутливих агентів із tools використовуйте найсильнішу доступну модель останнього покоління.
-  </Accordion>
-
-  <Accordion title="Як перемикати моделі на льоту (без перезапуску)?">
-    Використовуйте команду `/model` як окреме повідомлення:
-
-    ```
-    /model sonnet
-    /model opus
-    /model gpt
-    /model gpt-mini
-    /model gemini
-    /model gemini-flash
-    /model gemini-flash-lite
-    ```
-
-    Це вбудовані aliases. Власні aliases можна додати через `agents.defaults.models`.
-
-    Ви можете переглянути доступні моделі через `/model`, `/model list` або `/model status`.
-
-    `/model` (і `/model list`) показує компактний пронумерований picker. Вибирайте за номером:
-
-    ```
-    /model 3
-    ```
-
-    Ви також можете примусово використати конкретний auth profile для provider (для окремої сесії):
-
-    ```
-    /model opus@anthropic:default
-    /model opus@anthropic:work
-    ```
-
-    Порада: `/model status` показує, який agent активний, який файл `auth-profiles.json` використовується і який auth profile буде спробувано наступним.
-    Він також показує налаштований endpoint provider (`baseUrl`) і режим API (`api`), коли це доступно.
-
-    **Як зняти закріплення profile, який я встановив через @profile?**
-
-    Повторно запустіть `/model` **без** суфікса `@profile`:
-
-    ```
-    /model anthropic/claude-opus-4-6
-    ```
-
-    Якщо ви хочете повернутися до значення за замовчуванням, виберіть його через `/model` (або надішліть `/model <default provider/model>`).
-    Використовуйте `/model status`, щоб підтвердити, який auth profile активний.
-
-  </Accordion>
-
-  <Accordion title="Чи можу я використовувати GPT 5.2 для повсяк
+    Якщо ви все ж хочете малі моделі, увімк
