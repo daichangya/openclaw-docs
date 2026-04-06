@@ -1252,6 +1252,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "providers/alibaba",
                   "providers/anthropic",
                   "providers/bedrock",
                   "providers/bedrock-mantle",
@@ -1260,6 +1261,7 @@
                   "providers/cloudflare-ai-gateway",
                   "providers/deepgram",
                   "providers/deepseek",
+                  "providers/fal",
                   "providers/github-copilot",
                   "providers/glm",
                   "providers/google",
@@ -1279,6 +1281,7 @@
                   "providers/perplexity-provider",
                   "providers/qianfan",
                   "providers/qwen",
+                  "providers/runway",
                   "providers/sglang",
                   "providers/stepfun",
                   "providers/synthetic",
@@ -2609,6 +2612,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "ja-JP/providers/alibaba",
                   "ja-JP/providers/anthropic",
                   "ja-JP/providers/bedrock",
                   "ja-JP/providers/bedrock-mantle",
@@ -2617,6 +2621,7 @@
                   "ja-JP/providers/cloudflare-ai-gateway",
                   "ja-JP/providers/deepgram",
                   "ja-JP/providers/deepseek",
+                  "ja-JP/providers/fal",
                   "ja-JP/providers/github-copilot",
                   "ja-JP/providers/glm",
                   "ja-JP/providers/google",
@@ -2636,6 +2641,7 @@
                   "ja-JP/providers/perplexity-provider",
                   "ja-JP/providers/qianfan",
                   "ja-JP/providers/qwen",
+                  "ja-JP/providers/runway",
                   "ja-JP/providers/sglang",
                   "ja-JP/providers/stepfun",
                   "ja-JP/providers/synthetic",
@@ -3351,6 +3357,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "es/providers/alibaba",
                   "es/providers/anthropic",
                   "es/providers/bedrock",
                   "es/providers/bedrock-mantle",
@@ -3359,6 +3366,7 @@
                   "es/providers/cloudflare-ai-gateway",
                   "es/providers/deepgram",
                   "es/providers/deepseek",
+                  "es/providers/fal",
                   "es/providers/github-copilot",
                   "es/providers/glm",
                   "es/providers/google",
@@ -3378,6 +3386,7 @@
                   "es/providers/perplexity-provider",
                   "es/providers/qianfan",
                   "es/providers/qwen",
+                  "es/providers/runway",
                   "es/providers/sglang",
                   "es/providers/stepfun",
                   "es/providers/synthetic",
@@ -4093,6 +4102,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "pt-BR/providers/alibaba",
                   "pt-BR/providers/anthropic",
                   "pt-BR/providers/bedrock",
                   "pt-BR/providers/bedrock-mantle",
@@ -4101,6 +4111,7 @@
                   "pt-BR/providers/cloudflare-ai-gateway",
                   "pt-BR/providers/deepgram",
                   "pt-BR/providers/deepseek",
+                  "pt-BR/providers/fal",
                   "pt-BR/providers/github-copilot",
                   "pt-BR/providers/glm",
                   "pt-BR/providers/google",
@@ -4120,6 +4131,7 @@
                   "pt-BR/providers/perplexity-provider",
                   "pt-BR/providers/qianfan",
                   "pt-BR/providers/qwen",
+                  "pt-BR/providers/runway",
                   "pt-BR/providers/sglang",
                   "pt-BR/providers/stepfun",
                   "pt-BR/providers/synthetic",
@@ -4835,6 +4847,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "ko/providers/alibaba",
                   "ko/providers/anthropic",
                   "ko/providers/bedrock",
                   "ko/providers/bedrock-mantle",
@@ -4843,6 +4856,7 @@
                   "ko/providers/cloudflare-ai-gateway",
                   "ko/providers/deepgram",
                   "ko/providers/deepseek",
+                  "ko/providers/fal",
                   "ko/providers/github-copilot",
                   "ko/providers/glm",
                   "ko/providers/google",
@@ -4862,6 +4876,7 @@
                   "ko/providers/perplexity-provider",
                   "ko/providers/qianfan",
                   "ko/providers/qwen",
+                  "ko/providers/runway",
                   "ko/providers/sglang",
                   "ko/providers/stepfun",
                   "ko/providers/synthetic",
@@ -5577,6 +5592,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "de/providers/alibaba",
                   "de/providers/anthropic",
                   "de/providers/bedrock",
                   "de/providers/bedrock-mantle",
@@ -5585,6 +5601,7 @@
                   "de/providers/cloudflare-ai-gateway",
                   "de/providers/deepgram",
                   "de/providers/deepseek",
+                  "de/providers/fal",
                   "de/providers/github-copilot",
                   "de/providers/glm",
                   "de/providers/google",
@@ -5604,6 +5621,7 @@
                   "de/providers/perplexity-provider",
                   "de/providers/qianfan",
                   "de/providers/qwen",
+                  "de/providers/runway",
                   "de/providers/sglang",
                   "de/providers/stepfun",
                   "de/providers/synthetic",
@@ -6319,6 +6337,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "fr/providers/alibaba",
                   "fr/providers/anthropic",
                   "fr/providers/bedrock",
                   "fr/providers/bedrock-mantle",
@@ -6327,6 +6346,7 @@
                   "fr/providers/cloudflare-ai-gateway",
                   "fr/providers/deepgram",
                   "fr/providers/deepseek",
+                  "fr/providers/fal",
                   "fr/providers/github-copilot",
                   "fr/providers/glm",
                   "fr/providers/google",
@@ -6346,6 +6366,7 @@
                   "fr/providers/perplexity-provider",
                   "fr/providers/qianfan",
                   "fr/providers/qwen",
+                  "fr/providers/runway",
                   "fr/providers/sglang",
                   "fr/providers/stepfun",
                   "fr/providers/synthetic",
@@ -7061,6 +7082,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "ar/providers/alibaba",
                   "ar/providers/anthropic",
                   "ar/providers/bedrock",
                   "ar/providers/bedrock-mantle",
@@ -7069,6 +7091,7 @@
                   "ar/providers/cloudflare-ai-gateway",
                   "ar/providers/deepgram",
                   "ar/providers/deepseek",
+                  "ar/providers/fal",
                   "ar/providers/github-copilot",
                   "ar/providers/glm",
                   "ar/providers/google",
@@ -7088,6 +7111,7 @@
                   "ar/providers/perplexity-provider",
                   "ar/providers/qianfan",
                   "ar/providers/qwen",
+                  "ar/providers/runway",
                   "ar/providers/sglang",
                   "ar/providers/stepfun",
                   "ar/providers/synthetic",
@@ -7803,6 +7827,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "it/providers/alibaba",
                   "it/providers/anthropic",
                   "it/providers/bedrock",
                   "it/providers/bedrock-mantle",
@@ -7811,6 +7836,7 @@
                   "it/providers/cloudflare-ai-gateway",
                   "it/providers/deepgram",
                   "it/providers/deepseek",
+                  "it/providers/fal",
                   "it/providers/github-copilot",
                   "it/providers/glm",
                   "it/providers/google",
@@ -7830,6 +7856,7 @@
                   "it/providers/perplexity-provider",
                   "it/providers/qianfan",
                   "it/providers/qwen",
+                  "it/providers/runway",
                   "it/providers/sglang",
                   "it/providers/stepfun",
                   "it/providers/synthetic",
@@ -8545,6 +8572,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "tr/providers/alibaba",
                   "tr/providers/anthropic",
                   "tr/providers/bedrock",
                   "tr/providers/bedrock-mantle",
@@ -8553,6 +8581,7 @@
                   "tr/providers/cloudflare-ai-gateway",
                   "tr/providers/deepgram",
                   "tr/providers/deepseek",
+                  "tr/providers/fal",
                   "tr/providers/github-copilot",
                   "tr/providers/glm",
                   "tr/providers/google",
@@ -8572,6 +8601,7 @@
                   "tr/providers/perplexity-provider",
                   "tr/providers/qianfan",
                   "tr/providers/qwen",
+                  "tr/providers/runway",
                   "tr/providers/sglang",
                   "tr/providers/stepfun",
                   "tr/providers/synthetic",
@@ -9287,6 +9317,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "uk/providers/alibaba",
                   "uk/providers/anthropic",
                   "uk/providers/bedrock",
                   "uk/providers/bedrock-mantle",
@@ -9295,6 +9326,7 @@
                   "uk/providers/cloudflare-ai-gateway",
                   "uk/providers/deepgram",
                   "uk/providers/deepseek",
+                  "uk/providers/fal",
                   "uk/providers/github-copilot",
                   "uk/providers/glm",
                   "uk/providers/google",
@@ -9314,6 +9346,7 @@
                   "uk/providers/perplexity-provider",
                   "uk/providers/qianfan",
                   "uk/providers/qwen",
+                  "uk/providers/runway",
                   "uk/providers/sglang",
                   "uk/providers/stepfun",
                   "uk/providers/synthetic",
@@ -10029,6 +10062,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "id/providers/alibaba",
                   "id/providers/anthropic",
                   "id/providers/bedrock",
                   "id/providers/bedrock-mantle",
@@ -10037,6 +10071,7 @@
                   "id/providers/cloudflare-ai-gateway",
                   "id/providers/deepgram",
                   "id/providers/deepseek",
+                  "id/providers/fal",
                   "id/providers/github-copilot",
                   "id/providers/glm",
                   "id/providers/google",
@@ -10056,6 +10091,7 @@
                   "id/providers/perplexity-provider",
                   "id/providers/qianfan",
                   "id/providers/qwen",
+                  "id/providers/runway",
                   "id/providers/sglang",
                   "id/providers/stepfun",
                   "id/providers/synthetic",
@@ -10771,6 +10807,7 @@
               {
                 "group": "Providers",
                 "pages": [
+                  "pl/providers/alibaba",
                   "pl/providers/anthropic",
                   "pl/providers/bedrock",
                   "pl/providers/bedrock-mantle",
@@ -10779,6 +10816,7 @@
                   "pl/providers/cloudflare-ai-gateway",
                   "pl/providers/deepgram",
                   "pl/providers/deepseek",
+                  "pl/providers/fal",
                   "pl/providers/github-copilot",
                   "pl/providers/glm",
                   "pl/providers/google",
@@ -10798,6 +10836,7 @@
                   "pl/providers/perplexity-provider",
                   "pl/providers/qianfan",
                   "pl/providers/qwen",
+                  "pl/providers/runway",
                   "pl/providers/sglang",
                   "pl/providers/stepfun",
                   "pl/providers/synthetic",
