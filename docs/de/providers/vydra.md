@@ -2,13 +2,13 @@
 read_when:
     - Sie möchten Vydra-Mediengenerierung in OpenClaw verwenden
     - Sie benötigen Hinweise zur Einrichtung des Vydra-API-Schlüssels
-summary: Vydra-Bild-, Video- und Sprachfunktionen in OpenClaw verwenden
+summary: Vydra-Bild, -Video und -Sprache in OpenClaw verwenden
 title: Vydra
 x-i18n:
-    generated_at: "2026-04-06T03:11:26Z"
+    generated_at: "2026-04-07T06:18:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0fe999e8a5414b8a31a6d7d127bc6bcfc3b4492b8f438ab17dfa9680c5b079b7
+    source_hash: 24006a687ed6f9792e7b2b10927cc7ad71c735462a92ce03d5fa7c2b2ee2fcc2
     source_path: providers/vydra.md
     workflow: 15
 ---
@@ -21,13 +21,13 @@ Das gebündelte Vydra-Plugin fügt Folgendes hinzu:
 - Videogenerierung über `vydra/veo3` und `vydra/kling`
 - Sprachsynthese über Vydras ElevenLabs-gestützte TTS-Route
 
-OpenClaw verwendet denselben `VYDRA_API_KEY` für alle drei Funktionen.
+OpenClaw verwendet für alle drei Funktionen denselben `VYDRA_API_KEY`.
 
 ## Wichtige Basis-URL
 
 Verwenden Sie `https://www.vydra.ai/api/v1`.
 
-Der Apex-Host von Vydra (`https://vydra.ai/api/v1`) leitet derzeit auf `www` um. Einige HTTP-Clients verwerfen `Authorization` bei dieser hostübergreifenden Weiterleitung, wodurch ein gültiger API-Schlüssel zu einem irreführenden Authentifizierungsfehler wird. Das gebündelte Plugin verwendet die `www`-Basis-URL daher direkt, um dies zu vermeiden.
+Der Apex-Host von Vydra (`https://vydra.ai/api/v1`) leitet derzeit auf `www` um. Manche HTTP-Clients verwerfen `Authorization` bei dieser hostübergreifenden Umleitung, wodurch ein gültiger API-Schlüssel zu einem irreführenden Authentifizierungsfehler wird. Das gebündelte Plugin verwendet direkt die Basis-URL mit `www`, um dies zu vermeiden.
 
 ## Einrichtung
 
@@ -49,7 +49,7 @@ Standard-Bildmodell:
 
 - `vydra/grok-imagine`
 
-Legen Sie es als Standard-Bildprovider fest:
+Als Standard-Bildprovider festlegen:
 
 ```json5
 {
@@ -63,9 +63,9 @@ Legen Sie es als Standard-Bildprovider fest:
 }
 ```
 
-Die aktuell gebündelte Unterstützung ist nur Text-zu-Bild. Die gehosteten Bearbeitungsrouten von Vydra erwarten entfernte Bild-URLs, und OpenClaw fügt im gebündelten Plugin derzeit noch keine Vydra-spezifische Upload-Bridge hinzu.
+Die aktuelle gebündelte Unterstützung umfasst nur Text-zu-Bild. Die gehosteten Bearbeitungsrouten von Vydra erwarten Remote-Bild-URLs, und OpenClaw fügt im gebündelten Plugin noch keine Vydra-spezifische Upload-Brücke hinzu.
 
-Siehe [Image Generation](/de/tools/image-generation) für gemeinsames Tool-Verhalten.
+Siehe [Image Generation](/de/tools/image-generation) für das gemeinsame Tool-Verhalten.
 
 ## Videogenerierung
 
@@ -74,7 +74,7 @@ Registrierte Videomodelle:
 - `vydra/veo3` für Text-zu-Video
 - `vydra/kling` für Bild-zu-Video
 
-Legen Sie Vydra als Standard-Video-Provider fest:
+Vydra als Standard-Videoprovider festlegen:
 
 ```json5
 {
@@ -91,14 +91,34 @@ Legen Sie Vydra als Standard-Video-Provider fest:
 Hinweise:
 
 - `vydra/veo3` ist gebündelt nur als Text-zu-Video verfügbar.
-- `vydra/kling` erfordert derzeit eine Referenz auf eine entfernte Bild-URL. Uploads lokaler Dateien werden vorab abgelehnt.
-- Das gebündelte Plugin bleibt konservativ und leitet nicht dokumentierte Stilparameter wie Seitenverhältnis, Auflösung, Wasserzeichen oder generiertes Audio nicht weiter.
+- `vydra/kling` erfordert derzeit eine Remote-Bild-URL als Referenz. Uploads lokaler Dateien werden sofort abgelehnt.
+- Die aktuelle HTTP-Route `kling` von Vydra ist uneinheitlich darin, ob sie `image_url` oder `video_url` erfordert; der gebündelte Provider ordnet dieselbe Remote-Bild-URL beiden Feldern zu.
+- Das gebündelte Plugin bleibt konservativ und leitet keine undokumentierten Stilparameter wie Seitenverhältnis, Auflösung, Wasserzeichen oder generiertes Audio weiter.
 
-Siehe [Video Generation](/tools/video-generation) für gemeinsames Tool-Verhalten.
+Provider-spezifische Live-Abdeckung:
+
+```bash
+OPENCLAW_LIVE_TEST=1 \
+OPENCLAW_LIVE_VYDRA_VIDEO=1 \
+pnpm test:live -- extensions/vydra/vydra.live.test.ts
+```
+
+Die gebündelte Vydra-Live-Datei deckt jetzt Folgendes ab:
+
+- `vydra/veo3` Text-zu-Video
+- `vydra/kling` Bild-zu-Video mit einer Remote-Bild-URL
+
+Überschreiben Sie bei Bedarf die Remote-Bild-Fixture:
+
+```bash
+export OPENCLAW_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
+```
+
+Siehe [Video Generation](/de/tools/video-generation) für das gemeinsame Tool-Verhalten.
 
 ## Sprachsynthese
 
-Legen Sie Vydra als Sprachprovider fest:
+Vydra als Sprachprovider festlegen:
 
 ```json5
 {
@@ -121,10 +141,10 @@ Standardwerte:
 - Modell: `elevenlabs/tts`
 - Voice-ID: `21m00Tcm4TlvDq8ikWAM`
 
-Das gebündelte Plugin stellt derzeit eine bekannte, funktionierende Standardstimme bereit und gibt MP3-Audiodateien zurück.
+Das gebündelte Plugin stellt derzeit eine bekannte, funktionierende Standardstimme bereit und liefert MP3-Audiodateien zurück.
 
 ## Verwandt
 
 - [Provider Directory](/de/providers/index)
 - [Image Generation](/de/tools/image-generation)
-- [Video Generation](/tools/video-generation)
+- [Video Generation](/de/tools/video-generation)

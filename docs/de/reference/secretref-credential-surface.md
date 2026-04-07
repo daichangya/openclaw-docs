@@ -1,31 +1,31 @@
 ---
 read_when:
-    - Überprüfen der SecretRef-Credential-Abdeckung
-    - Prüfen, ob eine Credential für `secrets configure` oder `secrets apply` infrage kommt
-    - Überprüfen, warum eine Credential außerhalb der unterstützten Oberfläche liegt
-summary: Kanonische unterstützte bzw. nicht unterstützte SecretRef-Credential-Oberfläche
-title: SecretRef-Credential-Oberfläche
+    - Überprüfen der SecretRef-Abdeckung für Anmeldedaten
+    - Prüfen, ob Anmeldedaten für `secrets configure` oder `secrets apply` geeignet sind
+    - Prüfen, warum Anmeldedaten außerhalb der unterstützten Oberfläche liegen
+summary: Kanonische unterstützte vs. nicht unterstützte SecretRef-Anmeldedatenoberfläche
+title: SecretRef-Anmeldedatenoberfläche
 x-i18n:
-    generated_at: "2026-04-05T12:54:48Z"
+    generated_at: "2026-04-07T06:18:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bf997389de1dae8c059d8dfbf186eda979f864de632a033177d6cd5e5544675d
+    source_hash: 211f4b504c5808f7790683066fc2c8b700c705c598f220a264daf971b81cc593
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
 
-# SecretRef-Credential-Oberfläche
+# SecretRef-Anmeldedatenoberfläche
 
-Diese Seite definiert die kanonische SecretRef-Credential-Oberfläche.
+Diese Seite definiert die kanonische SecretRef-Anmeldedatenoberfläche.
 
-Beabsichtigter Umfang:
+Beabsichtigter Geltungsbereich:
 
-- Im Umfang: ausschließlich vom Benutzer bereitgestellte Credentials, die OpenClaw weder erstellt noch rotiert.
-- Außerhalb des Umfangs: zur Laufzeit erstellte oder rotierende Credentials, OAuth-Refresh-Material und sitzungsähnliche Artefakte.
+- Im Geltungsbereich: ausschließlich vom Benutzer bereitgestellte Anmeldedaten, die OpenClaw weder erstellt noch rotiert.
+- Außerhalb des Geltungsbereichs: zur Laufzeit erstellte oder rotierende Anmeldedaten, OAuth-Aktualisierungsmaterial und sitzungsähnliche Artefakte.
 
-## Unterstützte Credentials
+## Unterstützte Anmeldedaten
 
-### Ziele in `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### `openclaw.json`-Ziele (`secrets configure` + `secrets apply` + `secrets audit`)
 
 [//]: # "secretref-supported-list-start"
 
@@ -48,7 +48,6 @@ Beabsichtigter Umfang:
 - `talk.providers.*.apiKey`
 - `messages.tts.providers.*.apiKey`
 - `tools.web.fetch.firecrawl.apiKey`
-- `plugins.entries.firecrawl.config.webFetch.apiKey`
 - `plugins.entries.brave.config.webSearch.apiKey`
 - `plugins.entries.google.config.webSearch.apiKey`
 - `plugins.entries.xai.config.webSearch.apiKey`
@@ -111,7 +110,7 @@ Beabsichtigter Umfang:
 - `channels.googlechat.serviceAccount` über benachbartes `serviceAccountRef` (Kompatibilitätsausnahme)
 - `channels.googlechat.accounts.*.serviceAccount` über benachbartes `serviceAccountRef` (Kompatibilitätsausnahme)
 
-### Ziele in `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### `auth-profiles.json`-Ziele (`secrets configure` + `secrets apply` + `secrets audit`)
 
 - `profiles.*.keyRef` (`type: "api_key"`; nicht unterstützt, wenn `auth.profiles.<id>.mode = "oauth"`)
 - `profiles.*.tokenRef` (`type: "token"`; nicht unterstützt, wenn `auth.profiles.<id>.mode = "oauth"`)
@@ -120,21 +119,21 @@ Beabsichtigter Umfang:
 
 Hinweise:
 
-- Ziele für Auth-Profile-Pläne erfordern `agentId`.
+- Ziele für Auth-Profile im Plan erfordern `agentId`.
 - Planeinträge zielen auf `profiles.*.key` / `profiles.*.token` und schreiben benachbarte Refs (`keyRef` / `tokenRef`).
-- Auth-Profil-Refs sind in die Laufzeitauflösung und Audit-Abdeckung einbezogen.
-- OAuth-Richtlinien-Schranke: `auth.profiles.<id>.mode = "oauth"` kann nicht mit SecretRef-Eingaben für dieses Profil kombiniert werden. Start/Reload und Auflösung des Auth-Profils schlagen schnell fehl, wenn diese Richtlinie verletzt wird.
-- Für SecretRef-verwaltete Modell-Provider persistieren generierte Einträge in `agents/*/agent/models.json` nicht geheime Marker (nicht aufgelöste Secret-Werte) für `apiKey`-/Header-Oberflächen.
-- Die Persistierung von Markern ist quellenautoritativ: OpenClaw schreibt Marker aus dem aktiven Konfigurations-Snapshot der Quelle (vor der Auflösung), nicht aus aufgelösten Laufzeit-Secret-Werten.
-- Für die Websuche:
-  - Im expliziten Provider-Modus (wenn `tools.web.search.provider` gesetzt ist) ist nur der ausgewählte Provider-Schlüssel aktiv.
-  - Im Auto-Modus (wenn `tools.web.search.provider` nicht gesetzt ist) ist nur der erste Provider-Schlüssel aktiv, der gemäß Priorität aufgelöst wird.
+- Auth-Profil-Refs sind in der Laufzeitauflösung und Audit-Abdeckung enthalten.
+- OAuth-Richtlinien-Guard: `auth.profiles.<id>.mode = "oauth"` kann nicht mit SecretRef-Eingaben für dieses Profil kombiniert werden. Startup/Reload und Auth-Profil-Auflösung schlagen schnell fehl, wenn gegen diese Richtlinie verstoßen wird.
+- Für SecretRef-verwaltete Modell-Provider enthalten generierte `agents/*/agent/models.json`-Einträge nicht geheime Marker (keine aufgelösten geheimen Werte) für `apiKey`-/Header-Oberflächen.
+- Marker-Persistenz ist quellautoritative Persistenz: OpenClaw schreibt Marker aus dem aktiven Quellkonfigurations-Snapshot (vor der Auflösung), nicht aus aufgelösten geheimen Laufzeitwerten.
+- Für Web Search:
+  - Im expliziten Provider-Modus (wenn `tools.web.search.provider` gesetzt ist) ist nur der Schlüssel des ausgewählten Providers aktiv.
+  - Im Auto-Modus (wenn `tools.web.search.provider` nicht gesetzt ist) ist nur der erste Provider-Schlüssel aktiv, der entsprechend der Priorität aufgelöst wird.
   - Im Auto-Modus werden Refs nicht ausgewählter Provider als inaktiv behandelt, bis sie ausgewählt werden.
-  - Alte Provider-Pfade unter `tools.web.search.*` werden während des Kompatibilitätsfensters weiterhin aufgelöst, aber die kanonische SecretRef-Oberfläche ist `plugins.entries.<plugin>.config.webSearch.*`.
+  - Legacy-Provider-Pfade unter `tools.web.search.*` werden während des Kompatibilitätsfensters weiterhin aufgelöst, aber die kanonische SecretRef-Oberfläche ist `plugins.entries.<plugin>.config.webSearch.*`.
 
-## Nicht unterstützte Credentials
+## Nicht unterstützte Anmeldedaten
 
-Credentials außerhalb des Umfangs umfassen:
+Anmeldedaten außerhalb des Geltungsbereichs umfassen:
 
 [//]: # "secretref-unsupported-list-start"
 
@@ -152,4 +151,4 @@ Credentials außerhalb des Umfangs umfassen:
 
 Begründung:
 
-- Diese Credentials gehören zu Klassen, die erstellt, rotiert, sitzungsbehaftet oder dauerhaftes OAuth-Material sind und nicht zur schreibgeschützten externen SecretRef-Auflösung passen.
+- Diese Anmeldedaten werden erstellt, rotiert, sind sitzungstragend oder gehören zu langlebigen OAuth-Klassen, die nicht zu einer schreibgeschützten externen SecretRef-Auflösung passen.
