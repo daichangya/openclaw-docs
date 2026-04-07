@@ -1,31 +1,30 @@
 ---
 read_when:
     - Anda ingin menggunakan model Google Gemini dengan OpenClaw
-    - Anda memerlukan alur auth API key
-summary: Setup Google Gemini (API key, pembuatan image, pemahaman media, pencarian web)
+    - Anda memerlukan alur autentikasi kunci API atau OAuth
+summary: Penyiapan Google Gemini (kunci API + OAuth, pembuatan gambar, pemahaman media, pencarian web)
 title: Google (Gemini)
 x-i18n:
-    generated_at: "2026-04-06T03:10:17Z"
+    generated_at: "2026-04-07T09:18:31Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 358d33a68275b01ebd916a3621dd651619cb9a1d062e2fb6196a7f3c501c015a
+    source_hash: 36cc7c7d8d19f6d4a3fb223af36c8402364fc309d14ffe922bd004203ceb1754
     source_path: providers/google.md
     workflow: 15
 ---
 
 # Google (Gemini)
 
-Plugin Google menyediakan akses ke model Gemini melalui Google AI Studio, serta
-pembuatan image, pemahaman media (image/audio/video), dan pencarian web melalui
-Gemini Grounding.
+Plugin Google menyediakan akses ke model Gemini melalui Google AI Studio, serta pembuatan gambar, pemahaman media (gambar/audio/video), dan pencarian web melalui Gemini Grounding.
 
 - Provider: `google`
-- Auth: `GEMINI_API_KEY` atau `GOOGLE_API_KEY`
+- Autentikasi: `GEMINI_API_KEY` atau `GOOGLE_API_KEY`
 - API: Google Gemini API
+- Provider alternatif: `google-gemini-cli` (OAuth)
 
 ## Mulai cepat
 
-1. Tetapkan API key:
+1. Tetapkan kunci API:
 
 ```bash
 openclaw onboard --auth-choice gemini-api-key
@@ -52,30 +51,60 @@ openclaw onboard --non-interactive \
   --gemini-api-key "$GEMINI_API_KEY"
 ```
 
-## Kapabilitas
+## OAuth (Gemini CLI)
 
-| Capability             | Supported         |
+Provider alternatif `google-gemini-cli` menggunakan PKCE OAuth alih-alih kunci API. Ini adalah integrasi tidak resmi; beberapa pengguna melaporkan pembatasan akun. Gunakan dengan risiko Anda sendiri.
+
+- Model default: `google-gemini-cli/gemini-3.1-pro-preview`
+- Alias: `gemini-cli`
+- Prasyarat instalasi: Gemini CLI lokal tersedia sebagai `gemini`
+  - Homebrew: `brew install gemini-cli`
+  - npm: `npm install -g @google/gemini-cli`
+- Login:
+
+```bash
+openclaw models auth login --provider google-gemini-cli --set-default
+```
+
+Variabel lingkungan:
+
+- `OPENCLAW_GEMINI_OAUTH_CLIENT_ID`
+- `OPENCLAW_GEMINI_OAUTH_CLIENT_SECRET`
+
+(Atau varian `GEMINI_CLI_*`.)
+
+Jika permintaan OAuth Gemini CLI gagal setelah login, tetapkan `GOOGLE_CLOUD_PROJECT` atau `GOOGLE_CLOUD_PROJECT_ID` di host gateway lalu coba lagi.
+
+Jika login gagal sebelum alur browser dimulai, pastikan perintah `gemini` lokal sudah terinstal dan ada di `PATH`. OpenClaw mendukung instalasi Homebrew dan instalasi npm global, termasuk tata letak Windows/npm yang umum.
+
+Catatan penggunaan JSON Gemini CLI:
+
+- Teks balasan berasal dari field JSON CLI `response`.
+- Penggunaan akan menggunakan fallback ke `stats` saat CLI membiarkan `usage` kosong.
+- `stats.cached` dinormalisasi menjadi OpenClaw `cacheRead`.
+- Jika `stats.input` tidak ada, OpenClaw menurunkan token input dari `stats.input_tokens - stats.cached`.
+
+## Kemampuan
+
+| Kemampuan              | Didukung          |
 | ---------------------- | ----------------- |
-| Chat completions       | Ya                |
-| Image generation       | Ya                |
-| Music generation       | Ya                |
-| Image understanding    | Ya                |
-| Audio transcription    | Ya                |
-| Video understanding    | Ya                |
-| Web search (Grounding) | Ya                |
+| Penyelesaian chat      | Ya                |
+| Pembuatan gambar       | Ya                |
+| Pembuatan musik        | Ya                |
+| Pemahaman gambar       | Ya                |
+| Transkripsi audio      | Ya                |
+| Pemahaman video        | Ya                |
+| Pencarian web (Grounding) | Ya             |
 | Thinking/reasoning     | Ya (Gemini 3.1+)  |
 
 ## Penggunaan ulang cache Gemini langsung
 
-Untuk run API Gemini langsung (`api: "google-generative-ai"`), OpenClaw kini
-meneruskan handle `cachedContent` yang dikonfigurasi ke permintaan Gemini.
+Untuk menjalankan Gemini API langsung (`api: "google-generative-ai"`), OpenClaw kini meneruskan handle `cachedContent` yang dikonfigurasi ke permintaan Gemini.
 
-- Konfigurasikan param per-model atau global dengan
-  `cachedContent` atau `cached_content` legacy
+- Konfigurasikan per model atau parameter global dengan `cachedContent` atau `cached_content` lama
 - Jika keduanya ada, `cachedContent` yang diprioritaskan
 - Contoh nilai: `cachedContents/prebuilt-context`
-- Penggunaan cache-hit Gemini dinormalisasi ke OpenClaw `cacheRead` dari
-  `cachedContentTokenCount` upstream
+- Penggunaan cache-hit Gemini dinormalisasi menjadi OpenClaw `cacheRead` dari `cachedContentTokenCount` upstream
 
 Contoh:
 
@@ -95,20 +124,19 @@ Contoh:
 }
 ```
 
-## Pembuatan image
+## Pembuatan gambar
 
-Provider pembuatan image `google` bawaan secara default menggunakan
+Provider pembuatan gambar `google` bawaan secara default menggunakan
 `google/gemini-3.1-flash-image-preview`.
 
 - Juga mendukung `google/gemini-3-pro-image-preview`
-- Generate: hingga 4 image per permintaan
-- Mode edit: diaktifkan, hingga 5 image input
+- Generate: hingga 4 gambar per permintaan
+- Mode edit: diaktifkan, hingga 5 gambar input
 - Kontrol geometri: `size`, `aspectRatio`, dan `resolution`
 
-Pembuatan image, pemahaman media, dan Gemini Grounding semuanya tetap berada pada
-id provider `google`.
+Provider `google-gemini-cli` yang hanya mendukung OAuth adalah permukaan inferensi teks yang terpisah. Pembuatan gambar, pemahaman media, dan Gemini Grounding tetap berada pada id provider `google`.
 
-Untuk menggunakan Google sebagai provider image default:
+Untuk menggunakan Google sebagai provider gambar default:
 
 ```json5
 {
@@ -122,16 +150,14 @@ Untuk menggunakan Google sebagai provider image default:
 }
 ```
 
-Lihat [Pembuatan Image](/id/tools/image-generation) untuk parameter tool bersama,
-pemilihan provider, dan perilaku failover.
+Lihat [Image Generation](/id/tools/image-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
 
 ## Pembuatan video
 
-Plugin `google` bawaan juga mendaftarkan pembuatan video melalui tool bersama
-`video_generate`.
+Plugin `google` bawaan juga mendaftarkan pembuatan video melalui tool bersama `video_generate`.
 
 - Model video default: `google/veo-3.1-fast-generate-preview`
-- Mode: text-to-video, image-to-video, dan alur referensi video tunggal
+- Mode: text-to-video, image-to-video, dan alur referensi satu video
 - Mendukung `aspectRatio`, `resolution`, dan `audio`
 - Clamp durasi saat ini: **4 hingga 8 detik**
 
@@ -149,20 +175,18 @@ Untuk menggunakan Google sebagai provider video default:
 }
 ```
 
-Lihat [Pembuatan Video](/tools/video-generation) untuk parameter tool bersama,
-pemilihan provider, dan perilaku failover.
+Lihat [Video Generation](/id/tools/video-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
 
 ## Pembuatan musik
 
-Plugin `google` bawaan juga mendaftarkan pembuatan musik melalui tool bersama
-`music_generate`.
+Plugin `google` bawaan juga mendaftarkan pembuatan musik melalui tool bersama `music_generate`.
 
 - Model musik default: `google/lyria-3-clip-preview`
 - Juga mendukung `google/lyria-3-pro-preview`
 - Kontrol prompt: `lyrics` dan `instrumental`
-- Format output: `mp3` secara default, serta `wav` pada `google/lyria-3-pro-preview`
-- Input referensi: hingga 10 image
-- Run berbasis sesi dipisahkan melalui alur task/status bersama, termasuk `action: "status"`
+- Format output: default `mp3`, serta `wav` pada `google/lyria-3-pro-preview`
+- Input referensi: hingga 10 gambar
+- Proses yang didukung sesi dilepas melalui alur tugas/status bersama, termasuk `action: "status"`
 
 Untuk menggunakan Google sebagai provider musik default:
 
@@ -178,8 +202,7 @@ Untuk menggunakan Google sebagai provider musik default:
 }
 ```
 
-Lihat [Pembuatan Musik](/tools/music-generation) untuk parameter tool bersama,
-pemilihan provider, dan perilaku failover.
+Lihat [Music Generation](/id/tools/music-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
 
 ## Catatan lingkungan
 

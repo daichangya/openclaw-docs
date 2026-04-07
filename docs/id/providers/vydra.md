@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Anda ingin media generation Vydra di OpenClaw
+    - Anda menginginkan pembuatan media Vydra di OpenClaw
     - Anda memerlukan panduan penyiapan API key Vydra
-summary: Gunakan image, video, dan speech Vydra di OpenClaw
+summary: Gunakan gambar, video, dan speech Vydra di OpenClaw
 title: Vydra
 x-i18n:
-    generated_at: "2026-04-06T03:10:39Z"
+    generated_at: "2026-04-07T09:18:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0fe999e8a5414b8a31a6d7d127bc6bcfc3b4492b8f438ab17dfa9680c5b079b7
+    source_hash: 24006a687ed6f9792e7b2b10927cc7ad71c735462a92ce03d5fa7c2b2ee2fcc2
     source_path: providers/vydra.md
     workflow: 15
 ---
 
 # Vydra
 
-Bundled plugin Vydra menambahkan:
+Plugin Vydra bawaan menambahkan:
 
-- image generation melalui `vydra/grok-imagine`
-- video generation melalui `vydra/veo3` dan `vydra/kling`
-- sintesis speech melalui rute TTS Vydra berbasis ElevenLabs
+- pembuatan gambar melalui `vydra/grok-imagine`
+- pembuatan video melalui `vydra/veo3` dan `vydra/kling`
+- sintesis speech melalui rute TTS Vydra yang didukung ElevenLabs
 
 OpenClaw menggunakan `VYDRA_API_KEY` yang sama untuk ketiga kapabilitas tersebut.
 
@@ -27,7 +27,7 @@ OpenClaw menggunakan `VYDRA_API_KEY` yang sama untuk ketiga kapabilitas tersebut
 
 Gunakan `https://www.vydra.ai/api/v1`.
 
-Host apex Vydra (`https://vydra.ai/api/v1`) saat ini mengarahkan ke `www`. Beberapa klien HTTP menghapus `Authorization` pada redirect lintas host tersebut, yang mengubah API key valid menjadi kegagalan auth yang menyesatkan. Bundled plugin menggunakan URL dasar `www` secara langsung untuk menghindari hal ini.
+Host apex Vydra (`https://vydra.ai/api/v1`) saat ini mengalihkan ke `www`. Beberapa klien HTTP menghapus `Authorization` pada pengalihan lintas host tersebut, yang membuat API key yang valid tampak seperti kegagalan auth yang menyesatkan. Plugin bawaan menggunakan URL dasar `www` secara langsung untuk menghindari hal itu.
 
 ## Penyiapan
 
@@ -37,19 +37,19 @@ Onboarding interaktif:
 openclaw onboard --auth-choice vydra-api-key
 ```
 
-Atau atur env var secara langsung:
+Atau set env var secara langsung:
 
 ```bash
 export VYDRA_API_KEY="vydra_live_..."
 ```
 
-## Image generation
+## Pembuatan gambar
 
-Model image default:
+Model gambar default:
 
 - `vydra/grok-imagine`
 
-Atur sebagai provider image default:
+Set sebagai penyedia gambar default:
 
 ```json5
 {
@@ -63,18 +63,18 @@ Atur sebagai provider image default:
 }
 ```
 
-Dukungan bundled saat ini hanya untuk teks-ke-gambar. Rute edit hosted Vydra mengharapkan URL gambar remote, dan OpenClaw belum menambahkan bridge upload khusus Vydra di bundled plugin.
+Dukungan bawaan saat ini hanya untuk text-to-image. Rute edit yang dihosting Vydra mengharapkan URL gambar jarak jauh, dan OpenClaw belum menambahkan bridge upload khusus Vydra di plugin bawaan.
 
-Lihat [Image Generation](/id/tools/image-generation) untuk perilaku tool bersama.
+Lihat [Image Generation](/id/tools/image-generation) untuk perilaku alat bersama.
 
-## Video generation
+## Pembuatan video
 
 Model video yang terdaftar:
 
-- `vydra/veo3` untuk teks-ke-video
-- `vydra/kling` untuk gambar-ke-video
+- `vydra/veo3` untuk text-to-video
+- `vydra/kling` untuk image-to-video
 
-Atur Vydra sebagai provider video default:
+Set Vydra sebagai penyedia video default:
 
 ```json5
 {
@@ -90,15 +90,35 @@ Atur Vydra sebagai provider video default:
 
 Catatan:
 
-- `vydra/veo3` dibundel hanya sebagai teks-ke-video.
-- `vydra/kling` saat ini memerlukan referensi URL gambar remote. Unggahan file lokal ditolak sejak awal.
-- Bundled plugin tetap konservatif dan tidak meneruskan knob style yang tidak terdokumentasi seperti rasio aspek, resolusi, watermark, atau audio yang dihasilkan.
+- `vydra/veo3` dibundel hanya sebagai text-to-video.
+- `vydra/kling` saat ini memerlukan referensi URL gambar jarak jauh. Upload file lokal ditolak di awal.
+- Rute HTTP `kling` Vydra saat ini tidak konsisten mengenai apakah memerlukan `image_url` atau `video_url`; penyedia bawaan memetakan URL gambar jarak jauh yang sama ke kedua field tersebut.
+- Plugin bawaan tetap konservatif dan tidak meneruskan knob style yang tidak terdokumentasi seperti aspect ratio, resolution, watermark, atau audio yang dihasilkan.
 
-Lihat [Video Generation](/tools/video-generation) untuk perilaku tool bersama.
+Cakupan live khusus penyedia:
+
+```bash
+OPENCLAW_LIVE_TEST=1 \
+OPENCLAW_LIVE_VYDRA_VIDEO=1 \
+pnpm test:live -- extensions/vydra/vydra.live.test.ts
+```
+
+File live Vydra bawaan sekarang mencakup:
+
+- `vydra/veo3` text-to-video
+- `vydra/kling` image-to-video menggunakan URL gambar jarak jauh
+
+Override fixture gambar jarak jauh bila diperlukan:
+
+```bash
+export OPENCLAW_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
+```
+
+Lihat [Video Generation](/id/tools/video-generation) untuk perilaku alat bersama.
 
 ## Sintesis speech
 
-Atur Vydra sebagai provider speech:
+Set Vydra sebagai penyedia speech:
 
 ```json5
 {
@@ -119,12 +139,12 @@ Atur Vydra sebagai provider speech:
 Default:
 
 - model: `elevenlabs/tts`
-- voice id: `21m00Tcm4TlvDq8ikWAM`
+- id suara: `21m00Tcm4TlvDq8ikWAM`
 
-Bundled plugin saat ini mengekspos satu suara default yang sudah terbukti baik dan mengembalikan file audio MP3.
+Plugin bawaan saat ini mengekspos satu suara default yang sudah teruji baik dan mengembalikan file audio MP3.
 
 ## Terkait
 
-- [Direktori Provider](/id/providers/index)
+- [Provider Directory](/id/providers/index)
 - [Image Generation](/id/tools/image-generation)
-- [Video Generation](/tools/video-generation)
+- [Video Generation](/id/tools/video-generation)
