@@ -1,24 +1,23 @@
 ---
 read_when:
     - Ви хочете вибрати постачальника моделей
-    - Вам потрібен швидкий огляд підтримуваних бекендів LLM
+    - Вам потрібен короткий огляд підтримуваних бекендів LLM
 summary: Постачальники моделей (LLM), які підтримує OpenClaw
 title: Каталог постачальників
 x-i18n:
-    generated_at: "2026-04-06T18:54:57Z"
+    generated_at: "2026-04-07T14:58:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 39d9ace35fd9452a4fb510fd980d251b6e51480e4647f051020bee2f1f2222e1
+    source_hash: e7bee5528b7fc9a982b3d0eaa4930cb77f7bded19a47aec00572b6fcbd823a70
     source_path: providers/index.md
     workflow: 15
 ---
 
 # Постачальники моделей
 
-OpenClaw може використовувати багато постачальників LLM. Виберіть постачальника, пройдіть автентифікацію, а потім задайте
-модель за замовчуванням як `provider/model`.
+OpenClaw може використовувати багато постачальників LLM. Виберіть постачальника, пройдіть автентифікацію, а потім задайте модель за замовчуванням як `provider/model`.
 
-Шукаєте документацію про канали чату (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/etc.)? Див. [Канали](/uk/channels).
+Шукаєте документацію щодо каналів чату (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/тощо)? Див. [Канали](/uk/channels).
 
 ## Швидкий старт
 
@@ -37,7 +36,7 @@ OpenClaw може використовувати багато постачаль
 - [Amazon Bedrock](/uk/providers/bedrock)
 - [Anthropic (API + Claude CLI)](/uk/providers/anthropic)
 - [Arcee AI (моделі Trinity)](/uk/providers/arcee)
-- [BytePlus (міжнародний)](/uk/concepts/model-providers#byteplus-international)
+- [BytePlus (міжнародна версія)](/uk/concepts/model-providers#byteplus-international)
 - [Chutes](/uk/providers/chutes)
 - [ComfyUI](/uk/providers/comfy)
 - [Cloudflare AI Gateway](/uk/providers/cloudflare-ai-gateway)
@@ -45,17 +44,18 @@ OpenClaw може використовувати багато постачаль
 - [fal](/uk/providers/fal)
 - [Fireworks](/uk/providers/fireworks)
 - [GitHub Copilot](/uk/providers/github-copilot)
-- [Моделі GLM](/uk/providers/glm)
+- [моделі GLM](/uk/providers/glm)
 - [Google (Gemini)](/uk/providers/google)
 - [Groq (LPU-інференс)](/uk/providers/groq)
 - [Hugging Face (інференс)](/uk/providers/huggingface)
+- [inferrs (локальні моделі)](/uk/providers/inferrs)
 - [Kilocode](/uk/providers/kilocode)
 - [LiteLLM (уніфікований шлюз)](/uk/providers/litellm)
 - [MiniMax](/uk/providers/minimax)
 - [Mistral](/uk/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/uk/providers/moonshot)
 - [NVIDIA](/uk/providers/nvidia)
-- [Ollama (хмарні + локальні моделі)](/uk/providers/ollama)
+- [Ollama (хмарні та локальні моделі)](/uk/providers/ollama)
 - [OpenAI (API + Codex)](/uk/providers/openai)
 - [OpenCode](/uk/providers/opencode)
 - [OpenCode Go](/uk/providers/opencode-go)
@@ -68,7 +68,7 @@ OpenClaw може використовувати багато постачаль
 - [StepFun](/uk/providers/stepfun)
 - [Synthetic](/uk/providers/synthetic)
 - [Together AI](/uk/providers/together)
-- [Venice (Venice AI, орієнтований на конфіденційність)](/uk/providers/venice)
+- [Venice (Venice AI, орієнтований на приватність)](/uk/providers/venice)
 - [Vercel AI Gateway](/uk/providers/vercel-ai-gateway)
 - [Vydra](/uk/providers/vydra)
 - [vLLM (локальні моделі)](/uk/providers/vllm)
