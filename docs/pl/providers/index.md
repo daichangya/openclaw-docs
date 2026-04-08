@@ -1,29 +1,29 @@
 ---
 read_when:
-    - Chcesz wybrać providera modeli
+    - Chcesz wybrać dostawcę modelu
     - Potrzebujesz szybkiego przeglądu obsługiwanych backendów LLM
-summary: Providerzy modeli (LLM-y) obsługiwani przez OpenClaw
-title: Katalog providerów
+summary: Dostawcy modeli (LLM) obsługiwani przez OpenClaw
+title: Katalog dostawców
 x-i18n:
-    generated_at: "2026-04-07T09:48:56Z"
+    generated_at: "2026-04-08T02:17:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 39d9ace35fd9452a4fb510fd980d251b6e51480e4647f051020bee2f1f2222e1
+    source_hash: e7bee5528b7fc9a982b3d0eaa4930cb77f7bded19a47aec00572b6fcbd823a70
     source_path: providers/index.md
     workflow: 15
 ---
 
-# Providerzy modeli
+# Dostawcy modeli
 
-OpenClaw może korzystać z wielu providerów LLM. Wybierz providera, uwierzytelnij się, a następnie ustaw
-model domyślny jako `provider/model`.
+OpenClaw może korzystać z wielu dostawców LLM. Wybierz dostawcę, uwierzytelnij się, a następnie ustaw
+domyślny model jako `provider/model`.
 
-Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/itd.)? Zobacz [Channels](/pl/channels).
+Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/itp.)? Zobacz [Kanały](/pl/channels).
 
 ## Szybki start
 
-1. Uwierzytelnij się u providera (zwykle przez `openclaw onboard`).
-2. Ustaw model domyślny:
+1. Uwierzytelnij się u dostawcy (zwykle przez `openclaw onboard`).
+2. Ustaw domyślny model:
 
 ```json5
 {
@@ -31,7 +31,7 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 }
 ```
 
-## Dokumentacja providerów
+## Dokumentacja dostawców
 
 - [Alibaba Model Studio](/pl/providers/alibaba)
 - [Amazon Bedrock](/pl/providers/bedrock)
@@ -47,15 +47,16 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 - [GitHub Copilot](/pl/providers/github-copilot)
 - [Modele GLM](/pl/providers/glm)
 - [Google (Gemini)](/pl/providers/google)
-- [Groq (wnioskowanie LPU)](/pl/providers/groq)
-- [Hugging Face (Inference)](/pl/providers/huggingface)
+- [Groq (inferencja LPU)](/pl/providers/groq)
+- [Hugging Face (inferencja)](/pl/providers/huggingface)
+- [inferrs (modele lokalne)](/pl/providers/inferrs)
 - [Kilocode](/pl/providers/kilocode)
-- [LiteLLM (ujednolicony gateway)](/pl/providers/litellm)
+- [LiteLLM (ujednolicona brama)](/pl/providers/litellm)
 - [MiniMax](/pl/providers/minimax)
 - [Mistral](/pl/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/pl/providers/moonshot)
 - [NVIDIA](/pl/providers/nvidia)
-- [Ollama (modele chmurowe + lokalne)](/pl/providers/ollama)
+- [Ollama (chmura + modele lokalne)](/pl/providers/ollama)
 - [OpenAI (API + Codex)](/pl/providers/openai)
 - [OpenCode](/pl/providers/opencode)
 - [OpenCode Go](/pl/providers/opencode-go)
@@ -80,16 +81,16 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 ## Wspólne strony przeglądowe
 
 - [Dodatkowe dołączone warianty](/pl/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy i Gemini CLI OAuth
-- [Generowanie obrazów](/pl/tools/image-generation) - Wspólne narzędzie `image_generate`, wybór providera i failover
-- [Generowanie muzyki](/pl/tools/music-generation) - Wspólne narzędzie `music_generate`, wybór providera i failover
-- [Generowanie wideo](/pl/tools/video-generation) - Wspólne narzędzie `video_generate`, wybór providera i failover
+- [Generowanie obrazów](/pl/tools/image-generation) - Współdzielone narzędzie `image_generate`, wybór dostawcy i failover
+- [Generowanie muzyki](/pl/tools/music-generation) - Współdzielone narzędzie `music_generate`, wybór dostawcy i failover
+- [Generowanie wideo](/pl/tools/video-generation) - Współdzielone narzędzie `video_generate`, wybór dostawcy i failover
 
-## Providerzy transkrypcji
+## Dostawcy transkrypcji
 
 - [Deepgram (transkrypcja audio)](/pl/providers/deepgram)
 
 ## Narzędzia społeczności
 
-- [Claude Max API Proxy](/pl/providers/claude-max-api-proxy) - Proxy społecznościowe dla poświadczeń subskrypcji Claude (przed użyciem zweryfikuj zasady/warunki Anthropic)
+- [Claude Max API Proxy](/pl/providers/claude-max-api-proxy) - Społecznościowy proxy dla poświadczeń subskrypcji Claude (przed użyciem zweryfikuj zasady/warunki Anthropic)
 
-Pełny katalog providerów (xAI, Groq, Mistral itd.) oraz zaawansowaną konfigurację znajdziesz w [Model providers](/pl/concepts/model-providers).
+Pełny katalog dostawców (xAI, Groq, Mistral itd.) oraz zaawansowaną konfigurację znajdziesz w [Dostawcy modeli](/pl/concepts/model-providers).
