@@ -1,28 +1,29 @@
 ---
 read_when:
     - plugin에서 코어 헬퍼(TTS, STT, 이미지 생성, 웹 검색, subagent)를 호출해야 할 때
-    - '`api.runtime`가 무엇을 노출하는지 이해하고 싶을 때'
-    - plugin 코드에서 config, agent 또는 media 헬퍼에 접근할 때
+    - api.runtime이 무엇을 노출하는지 이해하고 싶을 때
+    - plugin 코드에서 config, agent 또는 미디어 헬퍼에 접근하고 있을 때
 sidebarTitle: Runtime Helpers
-summary: '`api.runtime` -- 모든 plugin에 주입되는 런타임 헬퍼'
+summary: api.runtime -- plugin에서 사용할 수 있는 주입된 런타임 헬퍼
 title: Plugin 런타임 헬퍼
 x-i18n:
-    generated_at: "2026-04-05T12:50:21Z"
+    generated_at: "2026-04-08T02:17:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 667edff734fd30f9b05d55eae6360830a45ae8f3012159f88a37b5e05404e666
+    source_hash: acb9e56678e9ed08d0998dfafd7cd1982b592be5bc34d9e2d2c1f70274f8f248
     source_path: plugins/sdk-runtime.md
     workflow: 15
 ---
 
 # Plugin 런타임 헬퍼
 
-등록 중 모든 plugin에 주입되는 `api.runtime` 객체에 대한 참조 문서입니다. 호스트 내부 구현을 직접 import하지 말고 이 헬퍼를 사용하세요.
+등록 중 모든 plugin에 주입되는 `api.runtime` 객체의 참조 문서입니다.
+호스트 내부를 직접 import하는 대신 이 헬퍼를 사용하세요.
 
 <Tip>
-  **단계별 설명이 필요하신가요?** [Channel Plugins](/plugins/sdk-channel-plugins)
-  또는 [Provider Plugins](/plugins/sdk-provider-plugins)에서
-  이 헬퍼들이 실제로 어떻게 사용되는지 단계별로 확인할 수 있습니다.
+  **사용 방법 안내를 찾고 있나요?** 이 헬퍼가 실제로 어떻게 쓰이는지 단계별로 보여주는
+  [Channel Plugins](/ko/plugins/sdk-channel-plugins)
+  또는 [Provider Plugins](/ko/plugins/sdk-provider-plugins)를 참조하세요.
 </Tip>
 
 ```typescript
@@ -35,35 +36,35 @@ register(api) {
 
 ### `api.runtime.agent`
 
-에이전트 ID, 디렉터리, 세션 관리.
+Agent 정체성, 디렉터리, 세션 관리.
 
 ```typescript
-// 에이전트 작업 디렉터리 해석
+// agent의 작업 디렉터리 확인
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 
-// 에이전트 워크스페이스 해석
+// agent 워크스페이스 확인
 const workspaceDir = api.runtime.agent.resolveAgentWorkspaceDir(cfg);
 
-// 에이전트 ID 가져오기
+// agent 정체성 가져오기
 const identity = api.runtime.agent.resolveAgentIdentity(cfg);
 
 // 기본 thinking 수준 가져오기
 const thinking = api.runtime.agent.resolveThinkingDefault(cfg, provider, model);
 
-// 에이전트 타임아웃 가져오기
+// agent 타임아웃 가져오기
 const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 
-// 워크스페이스 존재 보장
+// 워크스페이스가 존재하도록 보장
 await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-// 임베디드 Pi 에이전트 실행
+// 내장된 Pi agent 실행
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 const result = await api.runtime.agent.runEmbeddedPiAgent({
   sessionId: "my-plugin:task-1",
   runId: crypto.randomUUID(),
   sessionFile: path.join(agentDir, "sessions", "my-plugin-task-1.jsonl"),
   workspaceDir: api.runtime.agent.resolveAgentWorkspaceDir(cfg),
-  prompt: "최신 변경 사항을 요약해 줘",
+  prompt: "최신 변경 사항을 요약해 주세요",
   timeoutMs: api.runtime.agent.resolveAgentTimeoutMs(cfg),
 });
 ```
@@ -94,7 +95,7 @@ const provider = api.runtime.agent.defaults.provider; // 예: "anthropic"
 // subagent 실행 시작
 const { runId } = await api.runtime.subagent.run({
   sessionKey: "agent:main:subagent:search-helper",
-  message: "이 쿼리를 집중된 후속 검색으로 확장해 줘.",
+  message: "이 쿼리를 더 집중된 후속 검색으로 확장해 주세요.",
   provider: "openai", // 선택적 재정의
   model: "gpt-4.1-mini", // 선택적 재정의
   deliver: false,
@@ -117,14 +118,15 @@ await api.runtime.subagent.deleteSession({
 
 <Warning>
   모델 재정의(`provider`/`model`)는 config의
-  `plugins.entries.<id>.subagent.allowModelOverride: true`를 통한 운영자 opt-in이 필요합니다.
-  신뢰되지 않은 plugins도 subagent를 실행할 수는 있지만 재정의 요청은 거부됩니다.
+  `plugins.entries.<id>.subagent.allowModelOverride: true`를 통한
+  운영자 opt-in이 필요합니다.
+  신뢰되지 않은 plugin도 subagent를 실행할 수는 있지만 재정의 요청은 거부됩니다.
 </Warning>
 
 ### `api.runtime.taskFlow`
 
-기존 OpenClaw 세션 키 또는 신뢰된 도구
-컨텍스트에 Task Flow 런타임을 바인딩한 다음, 매 호출마다 소유자를 전달하지 않고 Task Flow를 생성하고 관리합니다.
+Task Flow 런타임을 기존 OpenClaw 세션 키 또는 신뢰된 도구 컨텍스트에 바인딩한 뒤,
+호출마다 owner를 전달하지 않고도 Task Flow를 생성하고 관리합니다.
 
 ```typescript
 const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
@@ -151,34 +153,35 @@ const waiting = taskFlow.setWaiting({
 });
 ```
 
-자체 바인딩 계층에서 이미 신뢰된 OpenClaw 세션 키가 있는 경우
-`bindSession({ sessionKey, requesterOrigin })`를 사용하세요. 원시 사용자 입력으로부터 바인딩하지 마세요.
+자체 바인딩 레이어에서 이미 신뢰된 OpenClaw 세션 키를 갖고 있다면
+`bindSession({ sessionKey, requesterOrigin })`을 사용하세요. 원시 사용자 입력에서
+직접 바인딩하지 마세요.
 
 ### `api.runtime.tts`
 
-텍스트 음성 합성.
+텍스트 음성 변환.
 
 ```typescript
 // 표준 TTS
 const clip = await api.runtime.tts.textToSpeech({
-  text: "OpenClaw에서 안녕하세요",
+  text: "OpenClaw에서 인사드립니다",
   cfg: api.config,
 });
 
-// 전화 최적화 TTS
+// 전화용으로 최적화된 TTS
 const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
-  text: "OpenClaw에서 안녕하세요",
+  text: "OpenClaw에서 인사드립니다",
   cfg: api.config,
 });
 
-// 사용 가능한 음성 나열
+// 사용 가능한 음성 목록
 const voices = await api.runtime.tts.listVoices({
   provider: "elevenlabs",
   cfg: api.config,
 });
 ```
 
-코어 `messages.tts` 구성과 provider 선택을 사용합니다. PCM 오디오
+코어 `messages.tts` config와 provider 선택을 사용합니다. PCM 오디오
 버퍼 + 샘플 레이트를 반환합니다.
 
 ### `api.runtime.mediaUnderstanding`
@@ -197,7 +200,7 @@ const image = await api.runtime.mediaUnderstanding.describeImageFile({
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  mime: "audio/ogg", // 선택 사항, MIME을 추론할 수 없을 때
+  mime: "audio/ogg", // MIME을 추론할 수 없을 때 선택 사항
 });
 
 // 비디오 설명
@@ -213,11 +216,11 @@ const result = await api.runtime.mediaUnderstanding.runFile({
 });
 ```
 
-출력이 생성되지 않은 경우(예: 입력 건너뜀) `{ text: undefined }`를 반환합니다.
+출력이 생성되지 않으면(예: 입력이 건너뛰어진 경우) `{ text: undefined }`를 반환합니다.
 
 <Info>
-  `api.runtime.stt.transcribeAudioFile(...)`는 호환성 별칭으로 계속 유지되며,
-  `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`의 별칭입니다.
+  `api.runtime.stt.transcribeAudioFile(...)`는 호환성 별칭으로 남아 있으며
+  `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`를 가리킵니다.
 </Info>
 
 ### `api.runtime.imageGeneration`
@@ -248,7 +251,7 @@ const result = await api.runtime.webSearch.search({
 
 ### `api.runtime.media`
 
-저수준 media 유틸리티.
+저수준 미디어 유틸리티.
 
 ```typescript
 const webMedia = await api.runtime.media.loadWebMedia(url);
@@ -261,7 +264,7 @@ const resized = await api.runtime.media.resizeToJpeg(buffer, { maxWidth: 800 });
 
 ### `api.runtime.config`
 
-Config 로드 및 기록.
+Config 로드 및 쓰기.
 
 ```typescript
 const cfg = await api.runtime.config.loadConfig();
@@ -303,7 +306,7 @@ const childLogger = api.runtime.logging.getChildLogger({ plugin: "my-plugin" }, 
 
 ### `api.runtime.modelAuth`
 
-모델 및 provider 인증 해석.
+모델 및 provider 인증 확인.
 
 ```typescript
 const auth = await api.runtime.modelAuth.getApiKeyForModel({ model, cfg });
@@ -315,7 +318,7 @@ const providerAuth = await api.runtime.modelAuth.resolveApiKeyForProvider({
 
 ### `api.runtime.state`
 
-상태 디렉터리 해석.
+상태 디렉터리 확인.
 
 ```typescript
 const stateDir = api.runtime.state.resolveStateDir();
@@ -335,6 +338,46 @@ api.runtime.tools.registerMemoryCli(/* ... */);
 
 채널 전용 런타임 헬퍼(채널 plugin이 로드된 경우 사용 가능).
 
+`api.runtime.channel.mentions`는 런타임 주입을 사용하는 번들 채널 plugin을 위한
+공유 수신 멘션 정책 표면입니다:
+
+```typescript
+const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
+  mentionRegexes,
+  mentionPatterns,
+});
+
+const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
+  facts: {
+    canDetectMention: true,
+    wasMentioned: mentionMatch.matched,
+    implicitMentionKinds: api.runtime.channel.mentions.implicitMentionKindWhen(
+      "reply_to_bot",
+      isReplyToBot,
+    ),
+  },
+  policy: {
+    isGroup,
+    requireMention,
+    allowTextCommands,
+    hasControlCommand,
+    commandAuthorized,
+  },
+});
+```
+
+사용 가능한 멘션 헬퍼:
+
+- `buildMentionRegexes`
+- `matchesMentionPatterns`
+- `matchesMentionWithExplicit`
+- `implicitMentionKindWhen`
+- `resolveInboundMentionDecision`
+
+`api.runtime.channel.mentions`는 의도적으로 이전의
+`resolveMentionGating*` 호환성 헬퍼를 노출하지 않습니다. 정규화된
+`{ facts, policy }` 경로를 사용하세요.
+
 ## 런타임 참조 저장
 
 `register` 콜백 외부에서 사용할 런타임 참조를 저장하려면
@@ -350,14 +393,14 @@ const store = createPluginRuntimeStore<PluginRuntime>("my-plugin runtime not ini
 export default defineChannelPluginEntry({
   id: "my-plugin",
   name: "My Plugin",
-  description: "예시",
+  description: "Example",
   plugin: myPlugin,
   setRuntime: store.setRuntime,
 });
 
 // 다른 파일에서
 export function getRuntime() {
-  return store.getRuntime(); // 초기화되지 않았으면 throw
+  return store.getRuntime(); // 초기화되지 않았으면 예외 발생
 }
 
 export function tryGetRuntime() {
@@ -369,18 +412,18 @@ export function tryGetRuntime() {
 
 `api.runtime` 외에도 API 객체는 다음을 제공합니다:
 
-| 필드 | 타입 | 설명 |
+| Field                    | Type                      | Description                                                                                 |
 | ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | Plugin ID |
-| `api.name`               | `string`                  | Plugin 표시 이름 |
-| `api.config`             | `OpenClawConfig`          | 현재 config 스냅샷(사용 가능한 경우 활성 메모리 내 런타임 스냅샷) |
-| `api.pluginConfig`       | `Record<string, unknown>` | `plugins.entries.<id>.config`의 plugin 전용 config |
-| `api.logger`             | `PluginLogger`            | 범위 지정 로거(`debug`, `info`, `warn`, `error`) |
-| `api.registrationMode`   | `PluginRegistrationMode`  | 현재 로드 모드, `"setup-runtime"`은 가벼운 사전 전체 진입점 시작/설정 구간 |
-| `api.resolvePath(input)` | `(string) => string`      | plugin 루트를 기준으로 경로 해석 |
+| `api.id`                 | `string`                  | Plugin id                                                                                   |
+| `api.name`               | `string`                  | Plugin 표시 이름                                                                            |
+| `api.config`             | `OpenClawConfig`          | 현재 config 스냅샷(사용 가능한 경우 활성 인메모리 런타임 스냅샷)                            |
+| `api.pluginConfig`       | `Record<string, unknown>` | `plugins.entries.<id>.config`의 plugin 전용 config                                          |
+| `api.logger`             | `PluginLogger`            | 범위가 지정된 로거(`debug`, `info`, `warn`, `error`)                                       |
+| `api.registrationMode`   | `PluginRegistrationMode`  | 현재 로드 모드; `"setup-runtime"`은 전체 엔트리 이전의 경량 시작/설정 창입니다              |
+| `api.resolvePath(input)` | `(string) => string`      | plugin 루트를 기준으로 경로 확인                                                            |
 
-## 관련
+## 관련 문서
 
-- [SDK Overview](/plugins/sdk-overview) -- 하위 경로 참조
-- [SDK Entry Points](/plugins/sdk-entrypoints) -- `definePluginEntry` 옵션
-- [Plugin Internals](/plugins/architecture) -- 기능 모델 및 레지스트리
+- [SDK Overview](/ko/plugins/sdk-overview) -- 서브패스 참조
+- [SDK Entry Points](/ko/plugins/sdk-entrypoints) -- `definePluginEntry` 옵션
+- [Plugin Internals](/ko/plugins/architecture) -- 기능 모델 및 레지스트리

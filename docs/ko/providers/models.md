@@ -1,27 +1,27 @@
 ---
 read_when:
-    - 모델 제공자를 선택하려는 경우
-    - LLM 인증 + 모델 선택을 위한 빠른 설정 예시가 필요한 경우
-summary: OpenClaw에서 지원하는 모델 제공자(LLM)
-title: 모델 제공자 빠른 시작
+    - 모델 provider를 선택하려는 경우
+    - LLM 인증 + 모델 선택을 위한 빠른 설정 예시를 원하는 경우
+summary: OpenClaw에서 지원하는 모델 provider(LLM)
+title: 모델 Provider 빠른 시작
 x-i18n:
-    generated_at: "2026-04-07T05:59:48Z"
+    generated_at: "2026-04-08T02:17:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 500191bfe853241096f97928ced2327a13b6f7f62003cb7452b24886c272e6ba
+    source_hash: 59ee4c2f993fe0ae05fe34f52bc6f3e0fc9a76b10760f56b20ad251e25ee9f20
     source_path: providers/models.md
     workflow: 15
 ---
 
-# 모델 제공자
+# 모델 Provider
 
-OpenClaw는 많은 LLM 제공자를 사용할 수 있습니다. 하나를 선택하고 인증한 다음,
-기본 모델을 `provider/model` 형식으로 설정하세요.
+OpenClaw는 많은 LLM provider를 사용할 수 있습니다. 하나를 선택하고, 인증한 다음,
+기본 모델을 `provider/model`로 설정하세요.
 
 ## 빠른 시작(두 단계)
 
-1. 제공자에 인증합니다(보통 `openclaw onboard`를 통해).
-2. 기본 모델을 설정합니다.
+1. provider로 인증합니다(보통 `openclaw onboard` 사용).
+2. 기본 모델을 설정합니다:
 
 ```json5
 {
@@ -29,7 +29,7 @@ OpenClaw는 많은 LLM 제공자를 사용할 수 있습니다. 하나를 선택
 }
 ```
 
-## 지원되는 제공자(시작용 세트)
+## 지원되는 provider(시작용)
 
 - [Alibaba Model Studio](/ko/providers/alibaba)
 - [Anthropic (API + Claude CLI)](/ko/providers/anthropic)
@@ -40,7 +40,7 @@ OpenClaw는 많은 LLM 제공자를 사용할 수 있습니다. 하나를 선택
 - [Cloudflare AI Gateway](/ko/providers/cloudflare-ai-gateway)
 - [fal](/ko/providers/fal)
 - [Fireworks](/ko/providers/fireworks)
-- [GLM 모델](/ko/providers/glm)
+- [GLM models](/ko/providers/glm)
 - [MiniMax](/ko/providers/minimax)
 - [Mistral](/ko/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/ko/providers/moonshot)
@@ -57,11 +57,11 @@ OpenClaw는 많은 LLM 제공자를 사용할 수 있습니다. 하나를 선택
 - [xAI](/ko/providers/xai)
 - [Z.AI](/ko/providers/zai)
 
-## 추가 번들 제공자 변형
+## 추가 번들 provider 변형
 
-- `anthropic-vertex` - Vertex 자격 증명을 사용할 수 있을 때 Google Vertex에서 Anthropic을 암묵적으로 지원합니다. 별도의 온보딩 인증 선택은 없습니다.
-- `copilot-proxy` - 로컬 VS Code Copilot Proxy 브리지입니다. `openclaw onboard --auth-choice copilot-proxy`를 사용하세요.
-- `google-gemini-cli` - 비공식 Gemini CLI OAuth 흐름입니다. 로컬 `gemini` 설치가 필요합니다(`brew install gemini-cli` 또는 `npm install -g @google/gemini-cli`). 기본 모델은 `google-gemini-cli/gemini-3.1-pro-preview`이며, `openclaw onboard --auth-choice google-gemini-cli` 또는 `openclaw models auth login --provider google-gemini-cli --set-default`를 사용하세요.
+- `anthropic-vertex` - Vertex 자격 증명을 사용할 수 있을 때 암묵적인 Anthropic on Google Vertex 지원; 별도 온보딩 인증 선택 없음
+- `copilot-proxy` - 로컬 VS Code Copilot Proxy 브리지; `openclaw onboard --auth-choice copilot-proxy` 사용
+- `google-gemini-cli` - 비공식 Gemini CLI OAuth 흐름; 로컬 `gemini` 설치 필요(`brew install gemini-cli` 또는 `npm install -g @google/gemini-cli`); 기본 모델 `google-gemini-cli/gemini-3-flash-preview`; `openclaw onboard --auth-choice google-gemini-cli` 또는 `openclaw models auth login --provider google-gemini-cli --set-default` 사용
 
-전체 제공자 카탈로그(xAI, Groq, Mistral 등)와 고급 구성은
-[모델 제공자](/ko/concepts/model-providers)를 참조하세요.
+전체 provider 카탈로그(xAI, Groq, Mistral 등)와 고급 구성은
+[Model providers](/ko/concepts/model-providers)를 참조하세요.
