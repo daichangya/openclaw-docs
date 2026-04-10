@@ -1,29 +1,26 @@
 ---
 read_when:
-    - Anda ingin memahami cara kerja memory_search
-    - Anda ingin memilih provider embedding
+    - Anda ingin memahami cara kerja `memory_search`
+    - Anda ingin memilih penyedia embedding
     - Anda ingin menyetel kualitas pencarian
-summary: Cara pencarian memori menemukan catatan yang relevan menggunakan embeddings dan pengambilan hibrida
+summary: Bagaimana pencarian memori menemukan catatan yang relevan menggunakan embeddings dan pengambilan hibrida
 title: Pencarian Memori
 x-i18n:
-    generated_at: "2026-04-06T03:06:29Z"
+    generated_at: "2026-04-10T09:13:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b6541cd702bff41f9a468dad75ea438b70c44db7c65a4b793cbacaf9e583c7e9
+    source_hash: ca0237f4f1ee69dcbfb12e6e9527a53e368c0bf9b429e506831d4af2f3a3ac6f
     source_path: concepts/memory-search.md
     workflow: 15
 ---
 
 # Pencarian Memori
 
-`memory_search` menemukan catatan yang relevan dari file memori Anda, bahkan saat
-susunan katanya berbeda dari teks aslinya. Fitur ini bekerja dengan mengindeks memori ke dalam
-potongan-potongan kecil dan mencarinya menggunakan embedding, kata kunci, atau keduanya.
+`memory_search` menemukan catatan yang relevan dari file memori Anda, bahkan ketika susunan katanya berbeda dari teks aslinya. Fitur ini bekerja dengan mengindeks memori ke dalam potongan-potongan kecil dan mencarinya menggunakan embedding, kata kunci, atau keduanya.
 
 ## Mulai cepat
 
-Jika Anda telah mengonfigurasi kunci API OpenAI, Gemini, Voyage, atau Mistral, pencarian memori
-akan bekerja secara otomatis. Untuk menetapkan provider secara eksplisit:
+Jika Anda memiliki kunci API OpenAI, Gemini, Voyage, atau Mistral yang sudah dikonfigurasi, pencarian memori akan bekerja secara otomatis. Untuk menetapkan penyedia secara eksplisit:
 
 ```json5
 {
@@ -37,18 +34,17 @@ akan bekerja secara otomatis. Untuk menetapkan provider secara eksplisit:
 }
 ```
 
-Untuk embedding lokal tanpa kunci API, gunakan `provider: "local"` (memerlukan
-node-llama-cpp).
+Untuk embedding lokal tanpa kunci API, gunakan `provider: "local"` (memerlukan `node-llama-cpp`).
 
-## Provider yang didukung
+## Penyedia yang didukung
 
-| Provider | ID        | Memerlukan kunci API | Catatan                                             |
+| Penyedia | ID        | Memerlukan kunci API | Catatan                                             |
 | -------- | --------- | -------------------- | --------------------------------------------------- |
 | OpenAI   | `openai`  | Ya                   | Terdeteksi otomatis, cepat                          |
 | Gemini   | `gemini`  | Ya                   | Mendukung pengindeksan gambar/audio                 |
 | Voyage   | `voyage`  | Ya                   | Terdeteksi otomatis                                 |
 | Mistral  | `mistral` | Ya                   | Terdeteksi otomatis                                 |
-| Bedrock  | `bedrock` | Tidak                | Terdeteksi otomatis saat rantai kredensial AWS terselesaikan |
+| Bedrock  | `bedrock` | Tidak                | Terdeteksi otomatis saat rantai kredensial AWS terurai |
 | Ollama   | `ollama`  | Tidak                | Lokal, harus ditetapkan secara eksplisit            |
 | Local    | `local`   | Tidak                | Model GGUF, unduhan ~0.6 GB                         |
 
@@ -67,36 +63,29 @@ flowchart LR
     M --> R["Top Results"]
 ```
 
-- **Pencarian vektor** menemukan catatan dengan makna yang serupa ("gateway host" cocok dengan
-  "mesin yang menjalankan OpenClaw").
-- **Pencarian kata kunci BM25** menemukan kecocokan yang persis (ID, string error, config
-  key).
+- **Pencarian vektor** menemukan catatan dengan makna yang serupa ("gateway host" cocok dengan "mesin yang menjalankan OpenClaw").
+- **Pencarian kata kunci BM25** menemukan kecocokan persis (ID, string kesalahan, kunci konfigurasi).
 
-Jika hanya satu jalur yang tersedia (tanpa embedding atau tanpa FTS), jalur lainnya akan berjalan sendiri.
+Jika hanya satu jalur yang tersedia (tidak ada embedding atau tidak ada FTS), jalur lainnya akan berjalan sendiri.
 
 ## Meningkatkan kualitas pencarian
 
-Dua fitur opsional membantu saat Anda memiliki riwayat catatan yang besar:
+Dua fitur opsional membantu ketika Anda memiliki riwayat catatan yang besar:
 
 ### Peluruhan temporal
 
-Catatan lama secara bertahap kehilangan bobot peringkat sehingga informasi terbaru muncul lebih dulu.
-Dengan half-life default 30 hari, skor catatan dari bulan lalu menjadi 50% dari
-bobot aslinya. File evergreen seperti `MEMORY.md` tidak pernah mengalami peluruhan.
+Catatan lama secara bertahap kehilangan bobot peringkat sehingga informasi terbaru muncul lebih dulu. Dengan half-life bawaan 30 hari, skor catatan dari bulan lalu menjadi 50% dari bobot aslinya. File permanen seperti `MEMORY.md` tidak pernah dikenai peluruhan.
 
 <Tip>
-Aktifkan peluruhan temporal jika agen Anda memiliki catatan harian selama berbulan-bulan dan informasi usang
-terus berada di atas konteks terbaru.
+Aktifkan peluruhan temporal jika agen Anda memiliki catatan harian selama berbulan-bulan dan informasi usang terus mendapat peringkat lebih tinggi daripada konteks terbaru.
 </Tip>
 
 ### MMR (keragaman)
 
-Mengurangi hasil yang redundan. Jika lima catatan semuanya menyebut config router yang sama, MMR
-memastikan hasil teratas mencakup topik yang berbeda alih-alih berulang.
+Mengurangi hasil yang berulang. Jika lima catatan semuanya menyebut konfigurasi router yang sama, MMR memastikan hasil teratas mencakup topik yang berbeda alih-alih mengulang hal yang sama.
 
 <Tip>
-Aktifkan MMR jika `memory_search` terus mengembalikan cuplikan yang hampir duplikat dari
-catatan harian yang berbeda.
+Aktifkan MMR jika `memory_search` terus mengembalikan cuplikan yang hampir duplikat dari catatan harian yang berbeda.
 </Tip>
 
 ### Aktifkan keduanya
@@ -120,30 +109,22 @@ catatan harian yang berbeda.
 
 ## Memori multimodal
 
-Dengan Gemini Embedding 2, Anda dapat mengindeks gambar dan file audio bersama
-Markdown. Query pencarian tetap berupa teks, tetapi akan dicocokkan dengan konten visual dan audio.
-Lihat [referensi konfigurasi memori](/id/reference/memory-config) untuk
-penyiapannya.
+Dengan Gemini Embedding 2, Anda dapat mengindeks file gambar dan audio bersama Markdown. Kuery pencarian tetap berupa teks, tetapi akan dicocokkan dengan konten visual dan audio. Lihat [referensi konfigurasi Memori](/id/reference/memory-config) untuk penyiapan.
 
 ## Pencarian memori sesi
 
-Anda dapat secara opsional mengindeks transkrip sesi agar `memory_search` dapat mengingat
-percakapan sebelumnya. Fitur ini bersifat opt-in melalui
-`memorySearch.experimental.sessionMemory`. Lihat
-[referensi konfigurasi](/id/reference/memory-config) untuk detailnya.
+Anda dapat secara opsional mengindeks transkrip sesi sehingga `memory_search` dapat mengingat percakapan sebelumnya. Ini bersifat opt-in melalui `memorySearch.experimental.sessionMemory`. Lihat [referensi konfigurasi](/id/reference/memory-config) untuk detailnya.
 
 ## Pemecahan masalah
 
-**Tidak ada hasil?** Jalankan `openclaw memory status` untuk memeriksa indeks. Jika kosong, jalankan
-`openclaw memory index --force`.
+**Tidak ada hasil?** Jalankan `openclaw memory status` untuk memeriksa indeks. Jika kosong, jalankan `openclaw memory index --force`.
 
-**Hanya cocok dengan kata kunci?** Provider embedding Anda mungkin belum dikonfigurasi. Periksa
-`openclaw memory status --deep`.
+**Hanya kecocokan kata kunci?** Penyedia embedding Anda mungkin belum dikonfigurasi. Periksa `openclaw memory status --deep`.
 
-**Teks CJK tidak ditemukan?** Bangun ulang indeks FTS dengan
-`openclaw memory index --force`.
+**Teks CJK tidak ditemukan?** Bangun ulang indeks FTS dengan `openclaw memory index --force`.
 
 ## Bacaan lanjutan
 
+- [Memori Aktif](/id/concepts/active-memory) -- memori sub-agen untuk sesi obrolan interaktif
 - [Memori](/id/concepts/memory) -- tata letak file, backend, alat
-- [Referensi konfigurasi memori](/id/reference/memory-config) -- semua opsi konfigurasi
+- [Referensi konfigurasi Memori](/id/reference/memory-config) -- semua opsi konfigurasi
