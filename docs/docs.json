@@ -1084,6 +1084,7 @@
                       "concepts/memory-qmd",
                       "concepts/memory-honcho",
                       "concepts/memory-search",
+                      "concepts/active-memory",
                       "concepts/dreaming"
                     ]
                   },
@@ -2452,6 +2453,7 @@
                       "ja-JP/concepts/memory-qmd",
                       "ja-JP/concepts/memory-honcho",
                       "ja-JP/concepts/memory-search",
+                      "ja-JP/concepts/active-memory",
                       "ja-JP/concepts/dreaming"
                     ]
                   },
@@ -3205,6 +3207,7 @@
                       "es/concepts/memory-qmd",
                       "es/concepts/memory-honcho",
                       "es/concepts/memory-search",
+                      "es/concepts/active-memory",
                       "es/concepts/dreaming"
                     ]
                   },
@@ -3958,6 +3961,7 @@
                       "pt-BR/concepts/memory-qmd",
                       "pt-BR/concepts/memory-honcho",
                       "pt-BR/concepts/memory-search",
+                      "pt-BR/concepts/active-memory",
                       "pt-BR/concepts/dreaming"
                     ]
                   },
@@ -4711,6 +4715,7 @@
                       "ko/concepts/memory-qmd",
                       "ko/concepts/memory-honcho",
                       "ko/concepts/memory-search",
+                      "ko/concepts/active-memory",
                       "ko/concepts/dreaming"
                     ]
                   },
@@ -5464,6 +5469,7 @@
                       "de/concepts/memory-qmd",
                       "de/concepts/memory-honcho",
                       "de/concepts/memory-search",
+                      "de/concepts/active-memory",
                       "de/concepts/dreaming"
                     ]
                   },
@@ -6217,6 +6223,7 @@
                       "fr/concepts/memory-qmd",
                       "fr/concepts/memory-honcho",
                       "fr/concepts/memory-search",
+                      "fr/concepts/active-memory",
                       "fr/concepts/dreaming"
                     ]
                   },
@@ -6970,6 +6977,7 @@
                       "ar/concepts/memory-qmd",
                       "ar/concepts/memory-honcho",
                       "ar/concepts/memory-search",
+                      "ar/concepts/active-memory",
                       "ar/concepts/dreaming"
                     ]
                   },
@@ -7723,6 +7731,7 @@
                       "it/concepts/memory-qmd",
                       "it/concepts/memory-honcho",
                       "it/concepts/memory-search",
+                      "it/concepts/active-memory",
                       "it/concepts/dreaming"
                     ]
                   },
@@ -8476,6 +8485,7 @@
                       "tr/concepts/memory-qmd",
                       "tr/concepts/memory-honcho",
                       "tr/concepts/memory-search",
+                      "tr/concepts/active-memory",
                       "tr/concepts/dreaming"
                     ]
                   },
@@ -9229,6 +9239,7 @@
                       "uk/concepts/memory-qmd",
                       "uk/concepts/memory-honcho",
                       "uk/concepts/memory-search",
+                      "uk/concepts/active-memory",
                       "uk/concepts/dreaming"
                     ]
                   },
@@ -9982,6 +9993,7 @@
                       "id/concepts/memory-qmd",
                       "id/concepts/memory-honcho",
                       "id/concepts/memory-search",
+                      "id/concepts/active-memory",
                       "id/concepts/dreaming"
                     ]
                   },
@@ -10735,6 +10747,7 @@
                       "pl/concepts/memory-qmd",
                       "pl/concepts/memory-honcho",
                       "pl/concepts/memory-search",
+                      "pl/concepts/active-memory",
                       "pl/concepts/dreaming"
                     ]
                   },
