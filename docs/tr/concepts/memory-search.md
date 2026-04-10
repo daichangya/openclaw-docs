@@ -1,26 +1,26 @@
 ---
 read_when:
-    - '`memory_search` işleyişini anlamak istiyorsunuz'
-    - Bir embedding sağlayıcısı seçmek istiyorsunuz
-    - Arama kalitesini ayarlamak istiyorsunuz
-summary: Bellek aramasının, gömmeler ve hibrit getirme kullanarak ilgili notları nasıl bulduğu
+    - '`memory_search` işleyişini anlamak istiyorsunuz.'
+    - Bir gömme sağlayıcısı seçmek istiyorsunuz.
+    - Arama kalitesini ayarlamak istiyorsunuz.
+summary: Bellek araması, ilgili notları gömmeler ve hibrit erişim kullanarak nasıl bulur?
 title: Bellek Araması
 x-i18n:
-    generated_at: "2026-04-06T03:06:38Z"
+    generated_at: "2026-04-10T08:50:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b6541cd702bff41f9a468dad75ea438b70c44db7c65a4b793cbacaf9e583c7e9
+    source_hash: ca0237f4f1ee69dcbfb12e6e9527a53e368c0bf9b429e506831d4af2f3a3ac6f
     source_path: concepts/memory-search.md
     workflow: 15
 ---
 
 # Bellek Araması
 
-`memory_search`, ifade biçimi özgün metinden farklı olsa bile bellek dosyalarınızdan ilgili notları bulur. Bunu, belleği küçük parçalara dizinleyip bunları embedding'ler, anahtar kelimeler veya her ikisiyle arayarak yapar.
+`memory_search`, ifade biçimi özgün metinden farklı olsa bile bellek dosyalarınızdan ilgili notları bulur. Bunu, belleği küçük parçalara ayırarak dizinleyip gömmeler, anahtar kelimeler ya da her ikisini kullanarak arayarak yapar.
 
 ## Hızlı başlangıç
 
-Bir OpenAI, Gemini, Voyage veya Mistral API anahtarınız yapılandırılmışsa bellek araması otomatik olarak çalışır. Bir sağlayıcıyı açıkça ayarlamak için:
+Yapılandırılmış bir OpenAI, Gemini, Voyage veya Mistral API anahtarınız varsa bellek araması otomatik olarak çalışır. Bir sağlayıcıyı açıkça ayarlamak için:
 
 ```json5
 {
@@ -34,7 +34,7 @@ Bir OpenAI, Gemini, Voyage veya Mistral API anahtarınız yapılandırılmışsa
 }
 ```
 
-API anahtarı olmadan yerel embedding'ler için `provider: "local"` kullanın (`node-llama-cpp` gerektirir).
+API anahtarı olmadan yerel gömmeler için `provider: "local"` kullanın (`node-llama-cpp` gerektirir).
 
 ## Desteklenen sağlayıcılar
 
@@ -46,49 +46,49 @@ API anahtarı olmadan yerel embedding'ler için `provider: "local"` kullanın (`
 | Mistral   | `mistral`  | Evet                 | Otomatik algılanır                                   |
 | Bedrock   | `bedrock`  | Hayır                | AWS kimlik bilgisi zinciri çözümlendiğinde otomatik algılanır |
 | Ollama    | `ollama`   | Hayır                | Yerel, açıkça ayarlanmalıdır                         |
-| Local     | `local`    | Hayır                | GGUF modeli, ~0.6 GB indirme                         |
+| Local     | `local`    | Hayır                | GGUF model, ~0.6 GB indirme                          |
 
 ## Arama nasıl çalışır
 
-OpenClaw iki getirme yolunu paralel çalıştırır ve sonuçları birleştirir:
+OpenClaw iki erişim yolunu paralel olarak çalıştırır ve sonuçları birleştirir:
 
 ```mermaid
 flowchart LR
-    Q["Query"] --> E["Embedding"]
-    Q --> T["Tokenize"]
-    E --> VS["Vector Search"]
-    T --> BM["BM25 Search"]
-    VS --> M["Weighted Merge"]
+    Q["Sorgu"] --> E["Gömme"]
+    Q --> T["Tokenleştir"]
+    E --> VS["Vektör Araması"]
+    T --> BM["BM25 Araması"]
+    VS --> M["Ağırlıklı Birleştirme"]
     BM --> M
-    M --> R["Top Results"]
+    M --> R["En İyi Sonuçlar"]
 ```
 
-- **Vektör araması**, anlam olarak benzer notları bulur ("gateway host", "OpenClaw'ı çalıştıran makine" ile eşleşir).
+- **Vektör araması**, benzer anlama sahip notları bulur ("gateway host", "OpenClaw çalıştıran makine" ile eşleşir).
 - **BM25 anahtar kelime araması**, tam eşleşmeleri bulur (kimlikler, hata dizeleri, yapılandırma anahtarları).
 
-Yalnızca bir yol kullanılabiliyorsa (embedding yoksa veya FTS yoksa), diğeri tek başına çalışır.
+Yalnızca bir yol kullanılabiliyorsa (gömme yoksa veya FTS yoksa), diğeri tek başına çalışır.
 
 ## Arama kalitesini iyileştirme
 
-İsteğe bağlı iki özellik, geniş bir not geçmişiniz olduğunda yardımcı olur:
+Büyük bir not geçmişiniz varsa iki isteğe bağlı özellik yardımcı olur:
 
 ### Zamansal azalma
 
-Eski notlar sıralama ağırlığını kademeli olarak kaybeder, böylece son bilgiler önce öne çıkar. Varsayılan 30 günlük yarı ömür ile geçen aydan bir not özgün ağırlığının %50'siyle puanlanır. `MEMORY.md` gibi her zaman geçerli dosyalara hiçbir zaman azalma uygulanmaz.
+Eski notlar sıralama ağırlığını kademeli olarak kaybeder, böylece son bilgiler önce görünür. Varsayılan 30 günlük yarı ömürle, geçen aydan bir not özgün ağırlığının %50’siyle puanlanır. `MEMORY.md` gibi her zaman geçerli dosyalar hiçbir zaman azaltılmaz.
 
 <Tip>
-Aracınızın aylara yayılan günlük notları varsa ve eski bilgiler sürekli daha yeni bağlamın önüne geçiyorsa zamansal azalmayı etkinleştirin.
+Aracınızın aylarca günlük notu varsa ve eski bilgiler sürekli son bağlamın önüne geçiyorsa zamansal azalmayı etkinleştirin.
 </Tip>
 
 ### MMR (çeşitlilik)
 
-Tekrarlayan sonuçları azaltır. Beş notun da aynı yönlendirici yapılandırmasından söz etmesi durumunda MMR, üst sonuçların tekrar etmek yerine farklı konuları kapsamasını sağlar.
+Tekrarlayan sonuçları azaltır. Beş notun hepsi aynı yönlendirici yapılandırmasından söz ediyorsa MMR, en üstteki sonuçların tekrar etmek yerine farklı konuları kapsamasını sağlar.
 
 <Tip>
-`memory_search`, farklı günlük notlardan sürekli birbirine çok benzeyen parçaları döndürüyorsa MMR'yi etkinleştirin.
+`memory_search`, farklı günlük notlardan birbirine çok benzeyen parçaları sürekli döndürüyorsa MMR’yi etkinleştirin.
 </Tip>
 
-### Her ikisini de etkinleştirme
+### İkisini de etkinleştirme
 
 ```json5
 {
@@ -107,23 +107,24 @@ Tekrarlayan sonuçları azaltır. Beş notun da aynı yönlendirici yapılandır
 }
 ```
 
-## Çok modlu bellek
+## Çok kipli bellek
 
-Gemini Embedding 2 ile görselleri ve ses dosyalarını Markdown ile birlikte dizinleyebilirsiniz. Arama sorguları metin olarak kalır, ancak görsel ve ses içeriğiyle eşleşir. Kurulum için [Bellek yapılandırma başvurusu](/tr/reference/memory-config) sayfasına bakın.
+Gemini Embedding 2 ile görselleri ve ses dosyalarını Markdown ile birlikte dizinleyebilirsiniz. Arama sorguları metin olarak kalır, ancak görsel ve ses içeriğiyle eşleşir. Kurulum için [Bellek yapılandırma başvurusu](/tr/reference/memory-config) bölümüne bakın.
 
 ## Oturum belleği araması
 
-İsterseniz oturum dökümlerini dizinleyebilirsiniz; böylece `memory_search` önceki konuşmaları geri çağırabilir. Bu, `memorySearch.experimental.sessionMemory` ile isteğe bağlı olarak etkinleştirilir. Ayrıntılar için [yapılandırma başvurusu](/tr/reference/memory-config) sayfasına bakın.
+İsteğe bağlı olarak oturum dökümlerini dizinleyebilirsiniz; böylece `memory_search` önceki konuşmaları hatırlayabilir. Bu özellik `memorySearch.experimental.sessionMemory` üzerinden isteğe bağlı olarak etkinleştirilir. Ayrıntılar için [yapılandırma başvurusu](/tr/reference/memory-config) bölümüne bakın.
 
 ## Sorun giderme
 
 **Sonuç yok mu?** Dizini kontrol etmek için `openclaw memory status` çalıştırın. Boşsa `openclaw memory index --force` çalıştırın.
 
-**Yalnızca anahtar kelime eşleşmeleri mi var?** Embedding sağlayıcınız yapılandırılmamış olabilir. `openclaw memory status --deep` ile kontrol edin.
+**Yalnızca anahtar kelime eşleşmeleri mi var?** Gömme sağlayıcınız yapılandırılmamış olabilir. `openclaw memory status --deep` ile kontrol edin.
 
 **CJK metni bulunamıyor mu?** FTS dizinini `openclaw memory index --force` ile yeniden oluşturun.
 
 ## Daha fazla bilgi
 
+- [Etkin Bellek](/tr/concepts/active-memory) -- etkileşimli sohbet oturumları için alt aracı belleği
 - [Bellek](/tr/concepts/memory) -- dosya düzeni, arka uçlar, araçlar
 - [Bellek yapılandırma başvurusu](/tr/reference/memory-config) -- tüm yapılandırma seçenekleri
