@@ -1,67 +1,92 @@
 ---
 read_when:
-    - Ви хочете запускати OpenClaw проти локального сервера vLLM
-    - Ви хочете сумісні з OpenAI endpoint `/v1` зі своїми власними моделями
-summary: Запуск OpenClaw із vLLM (локальний сервер, сумісний з OpenAI)
+    - Ви хочете запустити OpenClaw із локальним сервером vLLM
+    - Ви хочете OpenAI-сумісні ендпойнти `/v1` із власними моделями
+summary: Запустіть OpenClaw із vLLM (сумісний із OpenAI локальний сервер)
 title: vLLM
 x-i18n:
-    generated_at: "2026-04-05T18:15:15Z"
+    generated_at: "2026-04-12T10:22:35Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ebde34d0453586d10340680b8d51465fdc98bd28e8a96acfaeb24606886b50f4
+    source_hash: a43be9ae879158fcd69d50fb3a47616fd560e3c6fe4ecb3a109bdda6a63a6a80
     source_path: providers/vllm.md
     workflow: 15
 ---
 
 # vLLM
 
-vLLM може обслуговувати моделі з відкритим кодом (і деякі користувацькі моделі) через **HTTP API, сумісний з OpenAI**. OpenClaw може підключатися до vLLM за допомогою API `openai-completions`.
+vLLM може обслуговувати open-source (і деякі кастомні) моделі через **OpenAI-сумісний** HTTP API. OpenClaw підключається до vLLM за допомогою API `openai-completions`.
 
-OpenClaw також може **автоматично виявляти** доступні моделі з vLLM, якщо ви явно погодилися на це через `VLLM_API_KEY` (підійде будь-яке значення, якщо ваш сервер не вимагає auth) і не визначили явний запис `models.providers.vllm`.
+OpenClaw також може **автоматично виявляти** доступні моделі з vLLM, коли ви явно вмикаєте це за допомогою `VLLM_API_KEY` (підійде будь-яке значення, якщо ваш сервер не вимагає автентифікації) і не визначаєте явний запис `models.providers.vllm`.
 
-## Швидкий початок
+| Властивість      | Значення                                 |
+| ---------------- | ---------------------------------------- |
+| ID провайдера    | `vllm`                                   |
+| API              | `openai-completions` (OpenAI-сумісний)   |
+| Автентифікація   | змінна середовища `VLLM_API_KEY`         |
+| Базовий URL за замовчуванням | `http://127.0.0.1:8000/v1`     |
 
-1. Запустіть vLLM із сервером, сумісним з OpenAI.
+## Початок роботи
 
-Ваша base URL має надавати endpoint `/v1` (наприклад `/v1/models`, `/v1/chat/completions`). vLLM часто працює за адресою:
+<Steps>
+  <Step title="Запустіть vLLM з OpenAI-сумісним сервером">
+    Ваш базовий URL має надавати ендпойнти `/v1` (наприклад, `/v1/models`, `/v1/chat/completions`). vLLM зазвичай працює на:
 
-- `http://127.0.0.1:8000/v1`
+    ```
+    http://127.0.0.1:8000/v1
+    ```
 
-2. Увімкніть це (підійде будь-яке значення, якщо auth не налаштовано):
+  </Step>
+  <Step title="Установіть змінну середовища для API-ключа">
+    Підійде будь-яке значення, якщо ваш сервер не вимагає автентифікації:
 
-```bash
-export VLLM_API_KEY="vllm-local"
-```
+    ```bash
+    export VLLM_API_KEY="vllm-local"
+    ```
 
-3. Виберіть модель (замініть на один з ідентифікаторів моделей вашого vLLM):
+  </Step>
+  <Step title="Виберіть модель">
+    Замініть на один із ID моделей вашого vLLM:
 
-```json5
-{
-  agents: {
-    defaults: {
-      model: { primary: "vllm/your-model-id" },
-    },
-  },
-}
-```
+    ```json5
+    {
+      agents: {
+        defaults: {
+          model: { primary: "vllm/your-model-id" },
+        },
+      },
+    }
+    ```
+
+  </Step>
+  <Step title="Перевірте, що модель доступна">
+    ```bash
+    openclaw models list --provider vllm
+    ```
+  </Step>
+</Steps>
 
 ## Виявлення моделей (неявний провайдер)
 
-Коли задано `VLLM_API_KEY` (або існує профіль auth) і ви **не** визначили `models.providers.vllm`, OpenClaw виконає запит:
+Коли `VLLM_API_KEY` встановлено (або існує профіль автентифікації) і ви **не** визначаєте `models.providers.vllm`, OpenClaw виконує запит:
 
-- `GET http://127.0.0.1:8000/v1/models`
+```
+GET http://127.0.0.1:8000/v1/models
+```
 
-…і перетворить повернені ID на записи моделей.
+і перетворює повернуті ID на записи моделей.
 
-Якщо ви явно задасте `models.providers.vllm`, автовиявлення буде пропущено, і вам доведеться визначати моделі вручну.
+<Note>
+Якщо ви явно задаєте `models.providers.vllm`, автоматичне виявлення пропускається, і вам потрібно визначити моделі вручну.
+</Note>
 
-## Явна конфігурація (ручне визначення моделей)
+## Явна конфігурація (моделі вручну)
 
 Використовуйте явну конфігурацію, коли:
 
-- vLLM працює на іншому хості/порту.
-- Ви хочете зафіксувати значення `contextWindow`/`maxTokens`.
-- Ваш сервер вимагає справжній API-ключ (або ви хочете керувати заголовками).
+- vLLM працює на іншому хості або порту
+- Ви хочете зафіксувати значення `contextWindow` або `maxTokens`
+- Ваш сервер вимагає справжній API-ключ (або ви хочете керувати заголовками)
 
 ```json5
 {
@@ -74,7 +99,7 @@ export VLLM_API_KEY="vllm-local"
         models: [
           {
             id: "your-model-id",
-            name: "Локальна модель vLLM",
+            name: "Local vLLM Model",
             reasoning: false,
             input: ["text"],
             cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
@@ -88,20 +113,99 @@ export VLLM_API_KEY="vllm-local"
 }
 ```
 
+## Додаткові примітки
+
+<AccordionGroup>
+  <Accordion title="Поведінка в стилі проксі">
+    vLLM розглядається як OpenAI-сумісний бекенд `/v1` у стилі проксі, а не як нативний
+    ендпойнт OpenAI. Це означає:
+
+    | Поведінка | Застосовується? |
+    |----------|----------|
+    | Нативне формування запитів OpenAI | Ні |
+    | `service_tier` | Не надсилається |
+    | Відповіді `store` | Не надсилаються |
+    | Підказки кешу промптів | Не надсилаються |
+    | Формування payload для сумісності з reasoning OpenAI | Не застосовується |
+    | Приховані заголовки атрибуції OpenClaw | Не додаються в кастомні базові URL |
+
+  </Accordion>
+
+  <Accordion title="Кастомний базовий URL">
+    Якщо ваш сервер vLLM працює на нестандартному хості або порту, установіть `baseUrl` у явній конфігурації провайдера:
+
+    ```json5
+    {
+      models: {
+        providers: {
+          vllm: {
+            baseUrl: "http://192.168.1.50:9000/v1",
+            apiKey: "${VLLM_API_KEY}",
+            api: "openai-completions",
+            models: [
+              {
+                id: "my-custom-model",
+                name: "Remote vLLM Model",
+                reasoning: false,
+                input: ["text"],
+                contextWindow: 64000,
+                maxTokens: 4096,
+              },
+            ],
+          },
+        },
+      },
+    }
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
 ## Усунення неполадок
 
-- Перевірте, що сервер доступний:
+<AccordionGroup>
+  <Accordion title="Сервер недоступний">
+    Переконайтеся, що сервер vLLM запущений і доступний:
 
-```bash
-curl http://127.0.0.1:8000/v1/models
-```
+    ```bash
+    curl http://127.0.0.1:8000/v1/models
+    ```
 
-- Якщо запити завершуються помилками auth, задайте справжній `VLLM_API_KEY`, який відповідає конфігурації вашого сервера, або явно налаштуйте провайдера в `models.providers.vllm`.
+    Якщо ви бачите помилку з’єднання, перевірте хост, порт і те, що vLLM запущено в режимі OpenAI-сумісного сервера.
 
-## Поведінка в стилі проксі
+  </Accordion>
 
-vLLM розглядається як backend `/v1`, сумісний з OpenAI, у стилі проксі, а не як нативний endpoint OpenAI.
+  <Accordion title="Помилки автентифікації в запитах">
+    Якщо запити завершуються помилками автентифікації, установіть справжній `VLLM_API_KEY`, який відповідає конфігурації вашого сервера, або явно налаштуйте провайдера в `models.providers.vllm`.
 
-- нативне формування запитів лише для OpenAI тут не застосовується
-- немає `service_tier`, немає `store` для Responses, немає підказок для prompt-cache і немає формування payload для сумісності reasoning OpenAI
-- приховані заголовки атрибуції OpenClaw (`originator`, `version`, `User-Agent`) не додаються до користувацьких base URL vLLM
+    <Tip>
+    Якщо ваш сервер vLLM не вимагає автентифікації, будь-яке непорожнє значення `VLLM_API_KEY` працює як сигнал явного ввімкнення для OpenClaw.
+    </Tip>
+
+  </Accordion>
+
+  <Accordion title="Моделі не виявлено">
+    Для автоматичного виявлення потрібно, щоб `VLLM_API_KEY` було встановлено **і** не було явного запису конфігурації `models.providers.vllm`. Якщо ви визначили провайдера вручну, OpenClaw пропускає виявлення й використовує лише оголошені вами моделі.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+Більше допомоги: [Усунення неполадок](/uk/help/troubleshooting) і [FAQ](/uk/help/faq).
+</Warning>
+
+## Пов’язане
+
+<CardGroup cols={2}>
+  <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
+    Вибір провайдерів, посилань на моделі та поведінки failover.
+  </Card>
+  <Card title="OpenAI" href="/uk/providers/openai" icon="bolt">
+    Нативний провайдер OpenAI і поведінка OpenAI-сумісного маршруту.
+  </Card>
+  <Card title="OAuth і автентифікація" href="/uk/gateway/authentication" icon="key">
+    Деталі автентифікації та правила повторного використання облікових даних.
+  </Card>
+  <Card title="Усунення неполадок" href="/uk/help/troubleshooting" icon="wrench">
+    Поширені проблеми та способи їх вирішення.
+  </Card>
+</CardGroup>
