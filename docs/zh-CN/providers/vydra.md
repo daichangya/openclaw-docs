@@ -5,17 +5,17 @@ read_when:
 summary: 在 OpenClaw 中使用 Vydra 图像、视频和语音
 title: Vydra
 x-i18n:
-    generated_at: "2026-04-06T18:49:20Z"
+    generated_at: "2026-04-12T10:19:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 24006a687ed6f9792e7b2b10927cc7ad71c735462a92ce03d5fa7c2b2ee2fcc2
+    source_hash: ab623d14b656ce0b68d648a6393fcee3bb880077d6583e0d5c1012e91757f20e
     source_path: providers/vydra.md
     workflow: 15
 ---
 
 # Vydra
 
-内置的 Vydra 插件新增了以下功能：
+内置的 Vydra 插件新增了：
 
 - 通过 `vydra/grok-imagine` 进行图像生成
 - 通过 `vydra/veo3` 和 `vydra/kling` 进行视频生成
@@ -23,128 +23,159 @@ x-i18n:
 
 OpenClaw 对这三种能力都使用同一个 `VYDRA_API_KEY`。
 
-## 重要基础 URL
+<Warning>
+请使用 `https://www.vydra.ai/api/v1` 作为基础 URL。
 
-使用 `https://www.vydra.ai/api/v1`。
-
-Vydra 的顶级主机（`https://vydra.ai/api/v1`）当前会重定向到 `www`。某些 HTTP 客户端会在这种跨主机重定向时丢弃 `Authorization`，从而让有效的 API 密钥表现成具有误导性的认证失败。内置插件会直接使用 `www` 基础 URL 以避免这个问题。
+Vydra 的顶级主机（`https://vydra.ai/api/v1`）目前会重定向到 `www`。某些 HTTP 客户端会在这种跨主机重定向时丢弃 `Authorization`，从而让有效的 API 密钥看起来像是误导性的认证失败。内置插件会直接使用 `www` 基础 URL，以避免这个问题。
+</Warning>
 
 ## 设置
 
-交互式新手引导：
+<Steps>
+  <Step title="运行交互式新手引导">
+    ```bash
+    openclaw onboard --auth-choice vydra-api-key
+    ```
 
-```bash
-openclaw onboard --auth-choice vydra-api-key
-```
+    或者直接设置环境变量：
 
-或者直接设置环境变量：
+    ```bash
+    export VYDRA_API_KEY="vydra_live_..."
+    ```
 
-```bash
-export VYDRA_API_KEY="vydra_live_..."
-```
+  </Step>
+  <Step title="选择默认能力">
+    从以下能力中选择一个或多个（图像、视频或语音），并应用对应的配置。
+  </Step>
+</Steps>
 
-## 图像生成
+## 能力
 
-默认图像模型：
+<AccordionGroup>
+  <Accordion title="图像生成">
+    默认图像模型：
 
-- `vydra/grok-imagine`
+    - `vydra/grok-imagine`
 
-将其设为默认图像提供商：
+    将它设为默认图像提供商：
 
-```json5
-{
-  agents: {
-    defaults: {
-      imageGenerationModel: {
-        primary: "vydra/grok-imagine",
-      },
-    },
-  },
-}
-```
-
-当前内置支持仅限文生图。Vydra 托管的编辑路由需要远程图像 URL，而 OpenClaw 在内置插件中尚未添加 Vydra 专用的上传桥接。
-
-共享工具行为请参见 [图像生成](/zh-CN/tools/image-generation)。
-
-## 视频生成
-
-已注册的视频模型：
-
-- `vydra/veo3` 用于文生视频
-- `vydra/kling` 用于图生视频
-
-将 Vydra 设为默认视频提供商：
-
-```json5
-{
-  agents: {
-    defaults: {
-      videoGenerationModel: {
-        primary: "vydra/veo3",
-      },
-    },
-  },
-}
-```
-
-注意：
-
-- `vydra/veo3` 在内置中仅作为文生视频提供。
-- `vydra/kling` 当前需要远程图像 URL 引用。本地文件上传会被直接拒绝。
-- Vydra 当前的 `kling` HTTP 路由在是否要求 `image_url` 或 `video_url` 方面表现并不一致；内置提供商会将同一个远程图像 URL 同时映射到这两个字段。
-- 内置插件保持保守处理，不会转发诸如宽高比、分辨率、水印或生成音频等未文档化的样式控制参数。
-
-提供商专属的实时覆盖：
-
-```bash
-OPENCLAW_LIVE_TEST=1 \
-OPENCLAW_LIVE_VYDRA_VIDEO=1 \
-pnpm test:live -- extensions/vydra/vydra.live.test.ts
-```
-
-内置的 Vydra 实时测试文件现在覆盖：
-
-- `vydra/veo3` 文生视频
-- 使用远程图像 URL 的 `vydra/kling` 图生视频
-
-需要时可覆盖远程图像测试夹具：
-
-```bash
-export OPENCLAW_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
-```
-
-共享工具行为请参见 [视频生成](/zh-CN/tools/video-generation)。
-
-## 语音合成
-
-将 Vydra 设为语音提供商：
-
-```json5
-{
-  messages: {
-    tts: {
-      provider: "vydra",
-      providers: {
-        vydra: {
-          apiKey: "${VYDRA_API_KEY}",
-          voiceId: "21m00Tcm4TlvDq8ikWAM",
+    ```json5
+    {
+      agents: {
+        defaults: {
+          imageGenerationModel: {
+            primary: "vydra/grok-imagine",
+          },
         },
       },
-    },
-  },
-}
-```
+    }
+    ```
 
-默认值：
+    当前内置支持仅限文生图。Vydra 托管的编辑路由需要远程图像 URL，而 OpenClaw 目前尚未在内置插件中添加 Vydra 专用的上传桥接。
 
-- 模型：`elevenlabs/tts`
-- 语音 ID：`21m00Tcm4TlvDq8ikWAM`
+    <Note>
+    请参阅 [Image Generation](/zh-CN/tools/image-generation)，了解共享工具参数、提供商选择和故障切换行为。
+    </Note>
 
-内置插件当前会暴露一个已知稳定可用的默认语音，并返回 MP3 音频文件。
+  </Accordion>
+
+  <Accordion title="视频生成">
+    已注册的视频模型：
+
+    - `vydra/veo3` 用于文生视频
+    - `vydra/kling` 用于图生视频
+
+    将 Vydra 设为默认视频提供商：
+
+    ```json5
+    {
+      agents: {
+        defaults: {
+          videoGenerationModel: {
+            primary: "vydra/veo3",
+          },
+        },
+      },
+    }
+    ```
+
+    说明：
+
+    - `vydra/veo3` 内置时仅支持文生视频。
+    - `vydra/kling` 目前需要远程图像 URL 引用。会在前端直接拒绝本地文件上传。
+    - Vydra 当前的 `kling` HTTP 路由在是否需要 `image_url` 还是 `video_url` 方面一直不太一致；内置提供商会将同一个远程图像 URL 映射到这两个字段。
+    - 内置插件保持保守，不会转发未文档化的风格控制项，例如宽高比、分辨率、水印或生成音频。
+
+    <Note>
+    请参阅 [Video Generation](/zh-CN/tools/video-generation)，了解共享工具参数、提供商选择和故障切换行为。
+    </Note>
+
+  </Accordion>
+
+  <Accordion title="视频实时测试">
+    提供商专属的实时覆盖范围：
+
+    ```bash
+    OPENCLAW_LIVE_TEST=1 \
+    OPENCLAW_LIVE_VYDRA_VIDEO=1 \
+    pnpm test:live -- extensions/vydra/vydra.live.test.ts
+    ```
+
+    内置的 Vydra 实时测试文件现在覆盖：
+
+    - `vydra/veo3` 文生视频
+    - `vydra/kling` 使用远程图像 URL 的图生视频
+
+    如有需要，可覆盖远程图像夹具：
+
+    ```bash
+    export OPENCLAW_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
+    ```
+
+  </Accordion>
+
+  <Accordion title="语音合成">
+    将 Vydra 设为语音提供商：
+
+    ```json5
+    {
+      messages: {
+        tts: {
+          provider: "vydra",
+          providers: {
+            vydra: {
+              apiKey: "${VYDRA_API_KEY}",
+              voiceId: "21m00Tcm4TlvDq8ikWAM",
+            },
+          },
+        },
+      },
+    }
+    ```
+
+    默认值：
+
+    - 模型：`elevenlabs/tts`
+    - Voice id：`21m00Tcm4TlvDq8ikWAM`
+
+    内置插件目前提供一个已知可用的默认语音，并返回 MP3 音频文件。
+
+  </Accordion>
+</AccordionGroup>
 
 ## 相关内容
 
-- [提供商目录](/zh-CN/providers/index)
-- [图像生成](/zh-CN/tools/image-generation)
-- [视频生成](/zh-CN/tools/video-generation)
+<CardGroup cols={2}>
+  <Card title="提供商目录" href="/zh-CN/providers/index" icon="list">
+    浏览所有可用提供商。
+  </Card>
+  <Card title="图像生成" href="/zh-CN/tools/image-generation" icon="image">
+    共享图像工具参数和提供商选择。
+  </Card>
+  <Card title="视频生成" href="/zh-CN/tools/video-generation" icon="video">
+    共享视频工具参数和提供商选择。
+  </Card>
+  <Card title="配置参考" href="/zh-CN/gateway/configuration-reference#agent-defaults" icon="gear">
+    智能体默认值和模型配置。
+  </Card>
+</CardGroup>
