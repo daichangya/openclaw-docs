@@ -1,50 +1,53 @@
 ---
 read_when:
-    - 你想将 Groq 与 OpenClaw 一起使用
-    - 你需要 API 密钥环境变量或 CLI 认证选项
-summary: Groq 设置（认证 + 模型选择）
+    - 你想将 Groq 与 OpenClaw 搭配使用
+    - 你需要 API 密钥环境变量或 CLI 凭证选择
+summary: Groq 设置（凭证 + 模型选择）
 title: Groq
 x-i18n:
-    generated_at: "2026-04-05T08:42:11Z"
+    generated_at: "2026-04-12T10:22:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7e27532cafcdaf1ac336fa310e08e4e3245d2d0eb0e94e0bcf42c532c6a9a80b
+    source_hash: 613289efc36fedd002e1ebf9366e0e7119ea1f9e14a1dae773b90ea57100baee
     source_path: providers/groq.md
     workflow: 15
 ---
 
 # Groq
 
-[Groq](https://groq.com) 使用自定义的 LPU 硬件，在开源模型
-（Llama、Gemma、Mistral 等）上提供超高速推理。OpenClaw 通过其兼容 OpenAI 的 API 连接到 Groq。
+[Groq](https://groq.com) 使用自定义的 LPU 硬件，在开源模型（Llama、Gemma、Mistral 等）上提供超高速推理。OpenClaw 通过与 OpenAI 兼容的 API 连接到 Groq。
 
-- 提供商：`groq`
-- 认证：`GROQ_API_KEY`
-- API：兼容 OpenAI
+| 属性 | 值 |
+| -------- | ----------------- |
+| 提供商 | `groq` |
+| 凭证 | `GROQ_API_KEY` |
+| API | 与 OpenAI 兼容 |
 
-## 快速开始
+## 入门指南
 
-1. 从 [console.groq.com/keys](https://console.groq.com/keys) 获取 API 密钥。
+<Steps>
+  <Step title="获取 API 密钥">
+    在 [console.groq.com/keys](https://console.groq.com/keys) 创建一个 API 密钥。
+  </Step>
+  <Step title="设置 API 密钥">
+    ```bash
+    export GROQ_API_KEY="gsk_..."
+    ```
+  </Step>
+  <Step title="设置默认模型">
+    ```json5
+    {
+      agents: {
+        defaults: {
+          model: { primary: "groq/llama-3.3-70b-versatile" },
+        },
+      },
+    }
+    ```
+  </Step>
+</Steps>
 
-2. 设置 API 密钥：
-
-```bash
-export GROQ_API_KEY="gsk_..."
-```
-
-3. 设置默认模型：
-
-```json5
-{
-  agents: {
-    defaults: {
-      model: { primary: "groq/llama-3.3-70b-versatile" },
-    },
-  },
-}
-```
-
-## 配置文件示例
+### 配置文件示例
 
 ```json5
 {
@@ -57,9 +60,24 @@ export GROQ_API_KEY="gsk_..."
 }
 ```
 
+## 可用模型
+
+Groq 的模型目录经常变化。运行 `openclaw models list | grep groq` 可查看当前可用的模型，或者查看 [console.groq.com/docs/models](https://console.groq.com/docs/models)。
+
+| 模型 | 说明 |
+| --------------------------- | ---------------------------------- |
+| **Llama 3.3 70B Versatile** | 通用型，大上下文 |
+| **Llama 3.1 8B Instant** | 快速、轻量 |
+| **Gemma 2 9B** | 紧凑、高效 |
+| **Mixtral 8x7B** | MoE 架构，推理能力强 |
+
+<Tip>
+使用 `openclaw models list --provider groq` 获取你的账户当前可用模型的最新列表。
+</Tip>
+
 ## 音频转录
 
-Groq 还提供基于 Whisper 的高速音频转录。配置为媒体理解提供商后，OpenClaw 会使用 Groq 的 `whisper-large-v3-turbo` 模型，通过共享的 `tools.media.audio` 接口来转录语音消息。
+Groq 还提供基于 Whisper 的快速音频转录。配置为媒体理解提供商后，OpenClaw 会使用 Groq 的 `whisper-large-v3-turbo` 模型，通过共享的 `tools.media.audio` 接口转录语音消息。
 
 ```json5
 {
@@ -73,34 +91,39 @@ Groq 还提供基于 Whisper 的高速音频转录。配置为媒体理解提供
 }
 ```
 
-## 环境说明
+<AccordionGroup>
+  <Accordion title="音频转录详情">
+    | 属性 | 值 |
+    |----------|-------|
+    | 共享配置路径 | `tools.media.audio` |
+    | 默认基础 URL | `https://api.groq.com/openai/v1` |
+    | 默认模型 | `whisper-large-v3-turbo` |
+    | API 端点 | 与 OpenAI 兼容的 `/audio/transcriptions` |
+  </Accordion>
 
-如果 Gateway 网关以守护进程（launchd/systemd）方式运行，请确保 `GROQ_API_KEY` 对该进程可用（例如在 `~/.openclaw/.env` 中，或通过 `env.shellEnv` 提供）。
+  <Accordion title="环境说明">
+    如果 Gateway 网关以守护进程（launchd/systemd）方式运行，请确保 `GROQ_API_KEY` 对该进程可用（例如放在 `~/.openclaw/.env` 中，或通过 `env.shellEnv`）。
 
-## 音频说明
+    <Warning>
+    仅在你的交互式 shell 中设置的密钥，对由守护进程管理的 Gateway 网关进程不可见。请使用 `~/.openclaw/.env` 或 `env.shellEnv` 配置来确保持续可用。
+    </Warning>
 
-- 共享配置路径：`tools.media.audio`
-- 默认的 Groq 音频基础 URL：`https://api.groq.com/openai/v1`
-- 默认的 Groq 音频模型：`whisper-large-v3-turbo`
-- Groq 音频转录使用兼容 OpenAI 的 `/audio/transcriptions`
-  路径
+  </Accordion>
+</AccordionGroup>
 
-## 可用模型
+## 相关内容
 
-Groq 的模型目录经常变化。运行 `openclaw models list | grep groq`
-查看当前可用模型，或查看
-[console.groq.com/docs/models](https://console.groq.com/docs/models)。
-
-热门选择包括：
-
-- **Llama 3.3 70B Versatile** - 通用型，大上下文
-- **Llama 3.1 8B Instant** - 速度快，轻量级
-- **Gemma 2 9B** - 紧凑，高效
-- **Mixtral 8x7B** - MoE 架构，推理能力强
-
-## 链接
-
-- [Groq Console](https://console.groq.com)
-- [API 文档](https://console.groq.com/docs)
-- [模型列表](https://console.groq.com/docs/models)
-- [定价](https://groq.com/pricing)
+<CardGroup cols={2}>
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障切换行为。
+  </Card>
+  <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
+    完整的配置 schema，包括提供商和音频设置。
+  </Card>
+  <Card title="Groq Console" href="https://console.groq.com" icon="arrow-up-right-from-square">
+    Groq 控制台、API 文档和定价。
+  </Card>
+  <Card title="Groq 模型列表" href="https://console.groq.com/docs/models" icon="list">
+    官方 Groq 模型目录。
+  </Card>
+</CardGroup>
