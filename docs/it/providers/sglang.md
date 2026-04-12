@@ -1,75 +1,85 @@
 ---
 read_when:
-    - Vuoi eseguire OpenClaw contro un server SGLang locale
+    - Vuoi eseguire OpenClaw usando un server SGLang locale
     - Vuoi endpoint `/v1` compatibili con OpenAI con i tuoi modelli
 summary: Esegui OpenClaw con SGLang (server self-hosted compatibile con OpenAI)
 title: SGLang
 x-i18n:
-    generated_at: "2026-04-05T14:02:10Z"
+    generated_at: "2026-04-12T23:32:41Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9850277c6c5e318e60237688b4d8a5b1387d4e9586534ae2eb6ad953abba8948
+    source_hash: e0a2e50a499c3d25dcdc3af425fb023c6e3f19ed88f533ecf0eb8a2cb7ec8b0d
     source_path: providers/sglang.md
     workflow: 15
 ---
 
 # SGLang
 
-SGLang può servire modelli open-source tramite un'API HTTP **compatibile con OpenAI**.
+SGLang può esporre modelli open source tramite un'API HTTP **compatibile con OpenAI**.
 OpenClaw può connettersi a SGLang usando l'API `openai-completions`.
 
-OpenClaw può anche **rilevare automaticamente** i modelli disponibili da SGLang quando effettui l'opt-in
-con `SGLANG_API_KEY` (qualsiasi valore funziona se il tuo server non impone autenticazione)
+OpenClaw può anche **rilevare automaticamente** i modelli disponibili da SGLang se scegli
+di abilitarlo con `SGLANG_API_KEY` (qualsiasi valore funziona se il tuo server non impone autenticazione)
 e non definisci una voce esplicita `models.providers.sglang`.
 
-## Avvio rapido
+## Per iniziare
 
-1. Avvia SGLang con un server compatibile con OpenAI.
+<Steps>
+  <Step title="Avvia SGLang">
+    Avvia SGLang con un server compatibile con OpenAI. Il tuo URL di base dovrebbe esporre
+    endpoint `/v1` (per esempio `/v1/models`, `/v1/chat/completions`). SGLang
+    di solito viene eseguito su:
 
-Il tuo URL di base dovrebbe esporre endpoint `/v1` (ad esempio `/v1/models`,
-`/v1/chat/completions`). SGLang viene comunemente eseguito su:
+    - `http://127.0.0.1:30000/v1`
 
-- `http://127.0.0.1:30000/v1`
+  </Step>
+  <Step title="Imposta una chiave API">
+    Qualsiasi valore funziona se sul tuo server non è configurata alcuna autenticazione:
 
-2. Effettua l'opt-in (qualsiasi valore funziona se non è configurata l'autenticazione):
+    ```bash
+    export SGLANG_API_KEY="sglang-local"
+    ```
 
-```bash
-export SGLANG_API_KEY="sglang-local"
-```
+  </Step>
+  <Step title="Esegui l'onboarding o imposta direttamente un modello">
+    ```bash
+    openclaw onboard
+    ```
 
-3. Esegui l'onboarding e scegli `SGLang`, oppure imposta direttamente un modello:
+    Oppure configura manualmente il modello:
 
-```bash
-openclaw onboard
-```
+    ```json5
+    {
+      agents: {
+        defaults: {
+          model: { primary: "sglang/your-model-id" },
+        },
+      },
+    }
+    ```
 
-```json5
-{
-  agents: {
-    defaults: {
-      model: { primary: "sglang/your-model-id" },
-    },
-  },
-}
-```
+  </Step>
+</Steps>
 
 ## Rilevamento dei modelli (provider implicito)
 
-Quando `SGLANG_API_KEY` è impostato (oppure esiste un profilo di autenticazione) e **non**
-definisci `models.providers.sglang`, OpenClaw interrogherà:
+Quando `SGLANG_API_KEY` è impostato (o esiste un profilo di autenticazione) e **non**
+definisci `models.providers.sglang`, OpenClaw interroga:
 
 - `GET http://127.0.0.1:30000/v1/models`
 
-e convertirà gli ID restituiti in voci di modello.
+e converte gli ID restituiti in voci modello.
 
+<Note>
 Se imposti esplicitamente `models.providers.sglang`, il rilevamento automatico viene saltato e
-devi definire manualmente i modelli.
+devi definire i modelli manualmente.
+</Note>
 
 ## Configurazione esplicita (modelli manuali)
 
-Usa una configurazione esplicita quando:
+Usa la configurazione esplicita quando:
 
-- SGLang è in esecuzione su un host/porta diversi.
+- SGLang è in esecuzione su host/porta diversi.
 - Vuoi fissare i valori `contextWindow`/`maxTokens`.
 - Il tuo server richiede una vera chiave API (oppure vuoi controllare gli header).
 
@@ -84,7 +94,7 @@ Usa una configurazione esplicita quando:
         models: [
           {
             id: "your-model-id",
-            name: "Local SGLang Model",
+            name: "Modello SGLang locale",
             reasoning: false,
             input: ["text"],
             cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
@@ -98,25 +108,52 @@ Usa una configurazione esplicita quando:
 }
 ```
 
-## Troubleshooting
+## Configurazione avanzata
 
-- Controlla che il server sia raggiungibile:
+<AccordionGroup>
+  <Accordion title="Comportamento in stile proxy">
+    SGLang viene trattato come un backend `/v1` compatibile con OpenAI in stile proxy, non come un
+    endpoint OpenAI nativo.
 
-```bash
-curl http://127.0.0.1:30000/v1/models
-```
+    | Comportamento | SGLang |
+    |----------|--------|
+    | Modellamento delle richieste solo OpenAI | Non applicato |
+    | `service_tier`, Responses `store`, suggerimenti per la prompt cache | Non inviati |
+    | Modellamento del payload di compatibilità del ragionamento | Non applicato |
+    | Header di attribuzione nascosti (`originator`, `version`, `User-Agent`) | Non iniettati negli URL base SGLang personalizzati |
 
-- Se le richieste falliscono con errori di autenticazione, imposta una vera `SGLANG_API_KEY` che corrisponda
-  alla configurazione del tuo server, oppure configura esplicitamente il provider sotto
-  `models.providers.sglang`.
+  </Accordion>
 
-## Comportamento in stile proxy
+  <Accordion title="Risoluzione dei problemi">
+    **Server non raggiungibile**
 
-SGLang viene trattato come un backend `/v1` in stile proxy compatibile con OpenAI, non come un
-endpoint OpenAI nativo.
+    Verifica che il server sia in esecuzione e risponda:
 
-- il model shaping nativo delle richieste solo-OpenAI non si applica qui
-- niente `service_tier`, niente `store` di Responses, niente suggerimenti di prompt-cache e nessun
-  payload shaping di compatibilità OpenAI per il reasoning
-- gli header nascosti di attribuzione OpenClaw (`originator`, `version`, `User-Agent`)
-  non vengono iniettati su URL base SGLang personalizzati
+    ```bash
+    curl http://127.0.0.1:30000/v1/models
+    ```
+
+    **Errori di autenticazione**
+
+    Se le richieste falliscono con errori di autenticazione, imposta una vera `SGLANG_API_KEY` che corrisponda
+    alla configurazione del tuo server, oppure configura esplicitamente il provider sotto
+    `models.providers.sglang`.
+
+    <Tip>
+    Se esegui SGLang senza autenticazione, qualsiasi valore non vuoto per
+    `SGLANG_API_KEY` è sufficiente per abilitare il rilevamento dei modelli.
+    </Tip>
+
+  </Accordion>
+</AccordionGroup>
+
+## Correlati
+
+<CardGroup cols={2}>
+  <Card title="Selezione del modello" href="/it/concepts/model-providers" icon="layers">
+    Scelta dei provider, riferimenti ai modelli e comportamento di failover.
+  </Card>
+  <Card title="Riferimento della configurazione" href="/it/gateway/configuration-reference" icon="gear">
+    Schema completo della configurazione, incluse le voci provider.
+  </Card>
+</CardGroup>

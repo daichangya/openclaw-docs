@@ -6,10 +6,10 @@ read_when:
 summary: Come la ricerca nella memoria trova note pertinenti usando embeddings e recupero ibrido
 title: Ricerca nella memoria
 x-i18n:
-    generated_at: "2026-04-10T08:13:31Z"
+    generated_at: "2026-04-12T23:28:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ca0237f4f1ee69dcbfb12e6e9527a53e368c0bf9b429e506831d4af2f3a3ac6f
+    source_hash: 71fde251b7d2dc455574aa458e7e09136f30613609ad8dafeafd53b2729a0310
     source_path: concepts/memory-search.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 # Ricerca nella memoria
 
 `memory_search` trova note pertinenti dai tuoi file di memoria, anche quando la
-formulazione è diversa dal testo originale. Funziona indicizzando la memoria in
+formulazione differisce dal testo originale. Funziona indicizzando la memoria in
 piccoli blocchi e cercandoli tramite embeddings, parole chiave o entrambi.
 
 ## Avvio rapido
@@ -38,19 +38,19 @@ nella memoria funziona automaticamente. Per impostare esplicitamente un provider
 ```
 
 Per embeddings locali senza chiave API, usa `provider: "local"` (richiede
-`node-llama-cpp`).
+node-llama-cpp).
 
 ## Provider supportati
 
-| Provider | ID        | Richiede una chiave API | Note                                                 |
-| -------- | --------- | ----------------------- | ---------------------------------------------------- |
-| OpenAI   | `openai`  | Sì                      | Rilevato automaticamente, veloce                     |
-| Gemini   | `gemini`  | Sì                      | Supporta l'indicizzazione di immagini/audio          |
-| Voyage   | `voyage`  | Sì                      | Rilevato automaticamente                             |
-| Mistral  | `mistral` | Sì                      | Rilevato automaticamente                             |
-| Bedrock  | `bedrock` | No                      | Rilevato automaticamente quando la catena di credenziali AWS viene risolta |
-| Ollama   | `ollama`  | No                      | Locale, deve essere impostato esplicitamente         |
-| Local    | `local`   | No                      | Modello GGUF, download di ~0,6 GB                    |
+| Provider | ID        | Richiede chiave API | Note                                                 |
+| -------- | --------- | ------------------- | ---------------------------------------------------- |
+| OpenAI   | `openai`  | Sì                  | Rilevato automaticamente, veloce                     |
+| Gemini   | `gemini`  | Sì                  | Supporta l'indicizzazione di immagini/audio          |
+| Voyage   | `voyage`  | Sì                  | Rilevato automaticamente                             |
+| Mistral  | `mistral` | Sì                  | Rilevato automaticamente                             |
+| Bedrock  | `bedrock` | No                  | Rilevato automaticamente quando la catena di credenziali AWS si risolve |
+| Ollama   | `ollama`  | No                  | Locale, deve essere impostato esplicitamente         |
+| Local    | `local`   | No                  | Modello GGUF, download di ~0,6 GB                    |
 
 ## Come funziona la ricerca
 
@@ -67,26 +67,28 @@ flowchart LR
     M --> R["Top Results"]
 ```
 
-- **Ricerca vettoriale** trova note con significato simile ("gateway host" corrisponde a
-  "la macchina che esegue OpenClaw").
-- **Ricerca per parole chiave BM25** trova corrispondenze esatte (ID, stringhe di errore, chiavi
-  di configurazione).
+- **Ricerca vettoriale** trova note con significato simile ("gateway host"
+  corrisponde a "la macchina che esegue OpenClaw").
+- **Ricerca per parole chiave BM25** trova corrispondenze esatte (ID, stringhe
+  di errore, chiavi di configurazione).
 
-Se è disponibile solo un percorso (nessun embeddings o nessun FTS), l'altro viene eseguito da solo.
+Se è disponibile un solo percorso (nessun embedding o nessun FTS), l'altro non viene usato.
+
+Quando gli embeddings non sono disponibili, OpenClaw usa comunque il ranking lessicale sui risultati FTS invece di ripiegare solo sull'ordinamento grezzo per corrispondenza esatta. Questa modalità degradata dà priorità ai blocchi con una copertura più forte dei termini della query e percorsi file pertinenti, mantenendo utile il richiamo anche senza `sqlite-vec` o un provider di embedding.
 
 ## Migliorare la qualità della ricerca
 
-Due funzionalità opzionali aiutano quando hai una cronologia delle note molto ampia:
+Due funzionalità opzionali aiutano quando hai una cronologia note molto ampia:
 
 ### Decadimento temporale
 
-Le note vecchie perdono gradualmente peso nel ranking, così le informazioni
+Le note vecchie perdono gradualmente peso nel ranking, così le informazioni più
 recenti emergono per prime. Con l'emivita predefinita di 30 giorni, una nota
-del mese scorso ottiene il 50% del suo peso originale. I file sempre validi come
+del mese scorso ottiene il 50% del suo peso originale. I file permanenti come
 `MEMORY.md` non subiscono mai decadimento.
 
 <Tip>
-Abilita il decadimento temporale se il tuo agente ha mesi di note quotidiane e
+Abilita il decadimento temporale se il tuo agente ha mesi di note giornaliere e
 le informazioni obsolete continuano a superare nel ranking il contesto recente.
 </Tip>
 
@@ -98,10 +100,10 @@ diversi invece di ripetersi.
 
 <Tip>
 Abilita MMR se `memory_search` continua a restituire frammenti quasi duplicati
-provenienti da note quotidiane diverse.
+da note giornaliere diverse.
 </Tip>
 
-### Abilita entrambi
+### Abilitare entrambi
 
 ```json5
 {
@@ -124,14 +126,13 @@ provenienti da note quotidiane diverse.
 
 Con Gemini Embedding 2, puoi indicizzare immagini e file audio insieme al
 Markdown. Le query di ricerca restano testuali, ma corrispondono a contenuti
-visivi e audio. Vedi il [riferimento della configurazione della memoria](/it/reference/memory-config) per
-la configurazione.
+visivi e audio. Consulta il [riferimento della configurazione della memoria](/it/reference/memory-config) per la configurazione.
 
 ## Ricerca nella memoria di sessione
 
 Puoi facoltativamente indicizzare le trascrizioni delle sessioni così che
 `memory_search` possa richiamare conversazioni precedenti. Questa opzione è
-attivabile tramite `memorySearch.experimental.sessionMemory`. Vedi il
+attivabile tramite `memorySearch.experimental.sessionMemory`. Consulta il
 [riferimento della configurazione](/it/reference/memory-config) per i dettagli.
 
 ## Risoluzione dei problemi
@@ -147,6 +148,6 @@ attivabile tramite `memorySearch.experimental.sessionMemory`. Vedi il
 
 ## Approfondimenti
 
-- [Memoria attiva](/it/concepts/active-memory) -- memoria del sub-agente per sessioni di chat interattive
-- [Memoria](/it/concepts/memory) -- layout dei file, backend, strumenti
+- [Active Memory](/it/concepts/active-memory) -- memoria del sotto-agente per sessioni di chat interattive
+- [Memory](/it/concepts/memory) -- layout dei file, backend, strumenti
 - [Riferimento della configurazione della memoria](/it/reference/memory-config) -- tutte le opzioni di configurazione
