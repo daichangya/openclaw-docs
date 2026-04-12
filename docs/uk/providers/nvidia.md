@@ -1,35 +1,49 @@
 ---
 read_when:
     - Ви хочете безкоштовно використовувати відкриті моделі в OpenClaw
-    - Вам потрібно налаштувати NVIDIA_API_KEY
-summary: Використовуйте сумісний з OpenAI API від NVIDIA в OpenClaw
+    - Вам потрібно налаштувати `NVIDIA_API_KEY`
+summary: Використовуйте OpenAI-сумісний API від NVIDIA в OpenClaw
 title: NVIDIA
 x-i18n:
-    generated_at: "2026-04-07T14:49:11Z"
+    generated_at: "2026-04-12T10:38:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b00f8cedaf223a33ba9f6a6dd8cf066d88cebeea52d391b871e435026182228a
+    source_hash: 45048037365138141ee82cefa0c0daaf073a1c2ae3aa7b23815f6ca676fc0d3e
     source_path: providers/nvidia.md
     workflow: 15
 ---
 
 # NVIDIA
 
-NVIDIA надає сумісний з OpenAI API за адресою `https://integrate.api.nvidia.com/v1` для безкоштовного використання відкритих моделей. Автентифікуйтеся за допомогою API-ключа з [build.nvidia.com](https://build.nvidia.com/settings/api-keys).
+NVIDIA надає OpenAI-сумісний API за адресою `https://integrate.api.nvidia.com/v1` для
+безкоштовного використання відкритих моделей. Автентифікація виконується за допомогою API-ключа з
+[build.nvidia.com](https://build.nvidia.com/settings/api-keys).
 
-## Налаштування CLI
+## Початок роботи
 
-Експортуйте ключ один раз, потім виконайте онбординг і встановіть модель NVIDIA:
+<Steps>
+  <Step title="Отримайте свій API-ключ">
+    Створіть API-ключ на [build.nvidia.com](https://build.nvidia.com/settings/api-keys).
+  </Step>
+  <Step title="Експортуйте ключ і запустіть онбординг">
+    ```bash
+    export NVIDIA_API_KEY="nvapi-..."
+    openclaw onboard --auth-choice skip
+    ```
+  </Step>
+  <Step title="Встановіть модель NVIDIA">
+    ```bash
+    openclaw models set nvidia/nvidia/nemotron-3-super-120b-a12b
+    ```
+  </Step>
+</Steps>
 
-```bash
-export NVIDIA_API_KEY="nvapi-..."
-openclaw onboard --auth-choice skip
-openclaw models set nvidia/nvidia/nemotron-3-super-120b-a12b
-```
+<Warning>
+Якщо ви передасте `--token` замість змінної середовища, значення потрапить до історії оболонки та
+виводу `ps`. За можливості надавайте перевагу змінній середовища `NVIDIA_API_KEY`.
+</Warning>
 
-Якщо ви все ще передаєте `--token`, пам’ятайте, що він потрапляє в історію оболонки та вивід `ps`; за можливості надавайте перевагу змінній середовища.
-
-## Фрагмент конфігурації
+## Приклад конфігурації
 
 ```json5
 {
@@ -50,7 +64,7 @@ openclaw models set nvidia/nvidia/nemotron-3-super-120b-a12b
 }
 ```
 
-## Ідентифікатори моделей
+## Вбудований каталог
 
 | Посилання на модель                         | Назва                        | Контекст | Макс. вивід |
 | ------------------------------------------ | ---------------------------- | -------- | ----------- |
@@ -59,8 +73,38 @@ openclaw models set nvidia/nvidia/nemotron-3-super-120b-a12b
 | `nvidia/minimaxai/minimax-m2.5`            | Minimax M2.5                 | 196,608  | 8,192       |
 | `nvidia/z-ai/glm5`                         | GLM 5                        | 202,752  | 8,192       |
 
-## Примітки
+## Додаткові примітки
 
-- Сумісна з OpenAI кінцева точка `/v1`; використовуйте API-ключ із [build.nvidia.com](https://build.nvidia.com/).
-- Провайдер автоматично вмикається, коли встановлено `NVIDIA_API_KEY`.
-- Вбудований каталог є статичним; у вихідному коді вартість за замовчуванням дорівнює `0`.
+<AccordionGroup>
+  <Accordion title="Поведінка автоматичного ввімкнення">
+    Провайдера автоматично ввімкнено, коли встановлено змінну середовища `NVIDIA_API_KEY`.
+    Жодна явна конфігурація провайдера, окрім ключа, не потрібна.
+  </Accordion>
+
+  <Accordion title="Каталог і ціни">
+    Вбудований каталог є статичним. У вихідному коді для вартості за замовчуванням встановлено `0`, оскільки NVIDIA
+    наразі пропонує безкоштовний доступ до API для перелічених моделей.
+  </Accordion>
+
+  <Accordion title="OpenAI-сумісна кінцева точка">
+    NVIDIA використовує стандартну кінцеву точку completions `/v1`. Будь-які OpenAI-сумісні
+    інструменти мають працювати одразу з базовою URL-адресою NVIDIA.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Наразі моделі NVIDIA можна використовувати безкоштовно. Перевіряйте
+[build.nvidia.com](https://build.nvidia.com/) на предмет актуальної доступності та
+відомостей про обмеження швидкості.
+</Tip>
+
+## Пов’язане
+
+<CardGroup cols={2}>
+  <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
+    Вибір провайдерів, посилань на моделі та поведінки перемикання при відмові.
+  </Card>
+  <Card title="Довідник із конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
+    Повний довідник із конфігурації для агентів, моделей і провайдерів.
+  </Card>
+</CardGroup>
