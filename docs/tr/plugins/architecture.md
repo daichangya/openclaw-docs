@@ -1,180 +1,198 @@
 ---
 read_when:
-    - Yerel OpenClaw plugin’lerini oluşturma veya hata ayıklama
-    - Plugin yetenek modelini veya sahiplik sınırlarını anlama
-    - Plugin yükleme işlem hattı veya kayıt defteri üzerinde çalışma
-    - Sağlayıcı çalışma zamanı kancalarını veya kanal plugin’lerini uygulama
+    - Yerel OpenClaw eklentileri oluşturma veya hata ayıklama
+    - Eklenti yetenek modelini veya sahiplik sınırlarını anlama
+    - Eklenti yükleme hattı veya kayıt sistemi üzerinde çalışma
+    - Sağlayıcı çalışma zamanı kancalarını veya kanal eklentilerini uygulama
 sidebarTitle: Internals
-summary: 'Plugin iç bileşenleri: yetenek modeli, sahiplik, sözleşmeler, yükleme işlem hattı ve çalışma zamanı yardımcıları'
-title: Plugin İç Bileşenleri
+summary: 'Eklenti iç yapıları: yetenek modeli, sahiplik, sözleşmeler, yükleme hattı ve çalışma zamanı yardımcıları'
+title: Eklenti İç Yapıları
 x-i18n:
-    generated_at: "2026-04-11T15:16:00Z"
+    generated_at: "2026-04-12T08:32:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7cac67984d0d729c0905bcf5c18372fb0d9b02bbd3a531580b7e2ef483ef40a6
+    source_hash: 6f4f8e6bcb14358b3aaa698d03faf456bbeebc04a6d70d1ae6451b02ab17cf09
     source_path: plugins/architecture.md
     workflow: 15
 ---
 
-# Plugin İç Bileşenleri
+# Eklenti İç Yapıları
 
 <Info>
-  Bu, **derin mimari başvuru** sayfasıdır. Pratik kılavuzlar için şunlara bakın:
-  - [Plugin’leri yükleme ve kullanma](/tr/tools/plugin) — kullanıcı kılavuzu
-  - [Başlangıç](/tr/plugins/building-plugins) — ilk plugin öğreticisi
-  - [Kanal Plugin’leri](/tr/plugins/sdk-channel-plugins) — bir mesajlaşma kanalı oluşturun
-  - [Sağlayıcı Plugin’leri](/tr/plugins/sdk-provider-plugins) — bir model sağlayıcısı oluşturun
-  - [SDK Genel Bakış](/tr/plugins/sdk-overview) — içe aktarma eşlemesi ve kayıt API’si
+  Bu, **derin mimari başvuru kaynağıdır**. Pratik kılavuzlar için şunlara bakın:
+  - [Eklentileri yükleyin ve kullanın](/tr/tools/plugin) — kullanıcı kılavuzu
+  - [Başlangıç](/tr/plugins/building-plugins) — ilk eklenti eğitimi
+  - [Kanal Eklentileri](/tr/plugins/sdk-channel-plugins) — bir mesajlaşma kanalı oluşturun
+  - [Sağlayıcı Eklentileri](/tr/plugins/sdk-provider-plugins) — bir model sağlayıcısı oluşturun
+  - [SDK Genel Bakış](/tr/plugins/sdk-overview) — içe aktarma haritası ve kayıt API'si
 </Info>
 
-Bu sayfa, OpenClaw plugin sisteminin iç mimarisini kapsar.
+Bu sayfa, OpenClaw eklenti sisteminin iç mimarisini kapsar.
 
 ## Genel yetenek modeli
 
-Yetenekler, OpenClaw içindeki genel **yerel plugin** modelidir. Her
-yerel OpenClaw plugin’i bir veya daha fazla yetenek türüne kayıt olur:
+Yetenekler, OpenClaw içindeki genel **yerel eklenti** modelidir. Her
+yerel OpenClaw eklentisi bir veya daha fazla yetenek türüne kayıt olur:
 
-| Yetenek               | Kayıt yöntemi                                    | Örnek plugin’ler                     |
-| --------------------- | ------------------------------------------------ | ------------------------------------ |
-| Metin çıkarımı        | `api.registerProvider(...)`                      | `openai`, `anthropic`                |
-| CLI çıkarım arka ucu  | `api.registerCliBackend(...)`                    | `openai`, `anthropic`                |
-| Konuşma               | `api.registerSpeechProvider(...)`                | `elevenlabs`, `microsoft`            |
-| Gerçek zamanlı yazıya dökme | `api.registerRealtimeTranscriptionProvider(...)` | `openai`                             |
-| Gerçek zamanlı ses    | `api.registerRealtimeVoiceProvider(...)`         | `openai`                             |
-| Medya anlama          | `api.registerMediaUnderstandingProvider(...)`    | `openai`, `google`                   |
-| Görsel oluşturma      | `api.registerImageGenerationProvider(...)`       | `openai`, `google`, `fal`, `minimax` |
-| Müzik oluşturma       | `api.registerMusicGenerationProvider(...)`       | `google`, `minimax`                  |
-| Video oluşturma       | `api.registerVideoGenerationProvider(...)`       | `qwen`                               |
-| Web getirme           | `api.registerWebFetchProvider(...)`              | `firecrawl`                          |
-| Web arama             | `api.registerWebSearchProvider(...)`             | `google`                             |
-| Kanal / mesajlaşma    | `api.registerChannel(...)`                       | `msteams`, `matrix`                  |
+| Yetenek               | Kayıt yöntemi                                   | Örnek eklentiler                     |
+| --------------------- | ----------------------------------------------- | ------------------------------------ |
+| Metin çıkarımı        | `api.registerProvider(...)`                     | `openai`, `anthropic`                |
+| CLI çıkarım arka ucu  | `api.registerCliBackend(...)`                   | `openai`, `anthropic`                |
+| Konuşma               | `api.registerSpeechProvider(...)`               | `elevenlabs`, `microsoft`            |
+| Gerçek zamanlı yazıya döküm | `api.registerRealtimeTranscriptionProvider(...)` | `openai`                       |
+| Gerçek zamanlı ses    | `api.registerRealtimeVoiceProvider(...)`        | `openai`                             |
+| Medya anlama          | `api.registerMediaUnderstandingProvider(...)`   | `openai`, `google`                   |
+| Görsel oluşturma      | `api.registerImageGenerationProvider(...)`      | `openai`, `google`, `fal`, `minimax` |
+| Müzik oluşturma       | `api.registerMusicGenerationProvider(...)`      | `google`, `minimax`                  |
+| Video oluşturma       | `api.registerVideoGenerationProvider(...)`      | `qwen`                               |
+| Web getirme           | `api.registerWebFetchProvider(...)`             | `firecrawl`                          |
+| Web arama             | `api.registerWebSearchProvider(...)`            | `google`                             |
+| Kanal / mesajlaşma    | `api.registerChannel(...)`                      | `msteams`, `matrix`                  |
 
 Sıfır yetenek kaydeden ancak kancalar, araçlar veya
-servisler sağlayan bir plugin, **eski yalnızca-kanca** plugin’idir. Bu desen hâlâ tamamen desteklenmektedir.
+hizmetler sağlayan bir eklenti, **eski yalnızca kanca** eklentisidir. Bu desen
+hala tamamen desteklenmektedir.
 
-### Harici uyumluluk yaklaşımı
+### Harici uyumluluk duruşu
 
-Yetenek modeli çekirdeğe eklenmiştir ve bugün paketlenmiş/yerel plugin’ler
-tarafından kullanılmaktadır, ancak harici plugin uyumluluğu için
-“dışa aktarılıyor, dolayısıyla dondurulmuştur” yaklaşımından daha sıkı bir çıta gerekir.
+Yetenek modeli çekirdeğe yerleşmiştir ve bugün paketlenmiş/yerel eklentiler
+tarafından kullanılmaktadır, ancak harici eklenti uyumluluğu için "dışa
+aktarılmışsa dondurulmuştur" yaklaşımından daha sıkı bir çıta hâlâ gereklidir.
 
-Güncel yönlendirme:
+Geçerli rehberlik:
 
-- **mevcut harici plugin’ler:** kanca tabanlı entegrasyonları çalışır durumda tutun; bunu
-  uyumluluk tabanı olarak değerlendirin
-- **yeni paketlenmiş/yerel plugin’ler:** satıcıya özgü iç erişimler veya yeni yalnızca-kanca tasarımları yerine
-  açık yetenek kaydını tercih edin
-- **yetenek kaydını benimseyen harici plugin’ler:** izin verilir, ancak belgeler bir sözleşmeyi açıkça kararlı olarak işaretlemedikçe
-  yeteneğe özgü yardımcı yüzeyleri gelişen yapılar olarak değerlendirin
+- **mevcut harici eklentiler:** kanca tabanlı entegrasyonları çalışır durumda
+  tutun; bunu uyumluluk temel çizgisi olarak değerlendirin
+- **yeni paketlenmiş/yerel eklentiler:** satıcıya özgü iç erişimler veya yeni
+  yalnızca kanca tasarımları yerine açık yetenek kaydını tercih edin
+- **yetenek kaydını benimseyen harici eklentiler:** izin verilir, ancak
+  belgeler açıkça bir sözleşmenin kararlı olduğunu belirtmedikçe
+  yeteneğe özgü yardımcı yüzeyleri gelişmekte olan yüzeyler olarak değerlendirin
 
 Pratik kural:
 
-- yetenek kayıt API’leri hedeflenen yöndür
-- geçiş sürecinde, eski kancalar harici plugin’ler için kesintisizliğin en güvenli yoludur
-- dışa aktarılan yardımcı alt yolların hepsi eşdeğer değildir; tesadüfi yardımcı dışa aktarımlarını değil,
-  dar ve belgelenmiş sözleşmeyi tercih edin
+- yetenek kayıt API'leri amaçlanan yöndür
+- geçiş sırasında eski kancalar, harici eklentiler için en güvenli
+  bozulmama yoludur
+- dışa aktarılan yardımcı alt yolların hepsi eşit değildir; tesadüfi yardımcı
+  dışa aktarımlarını değil, belgelenmiş dar sözleşmeyi tercih edin
 
-### Plugin biçimleri
+### Eklenti şekilleri
 
-OpenClaw, yüklenen her plugin’i gerçek
-kayıt davranışına göre bir biçime ayırır (yalnızca statik meta verilere göre değil):
+OpenClaw, yüklenen her eklentiyi gerçek kayıt davranışına göre (yalnızca
+statik meta veriye göre değil) bir şekle sınıflandırır:
 
-- **plain-capability** -- tam olarak bir yetenek türü kaydeder (örneğin,
-  `mistral` gibi yalnızca sağlayıcı olan bir plugin)
+- **plain-capability** -- tam olarak bir yetenek türü kaydeder (örneğin
+  `mistral` gibi yalnızca sağlayıcı eklentisi)
 - **hybrid-capability** -- birden fazla yetenek türü kaydeder (örneğin
-  `openai`, metin çıkarımı, konuşma, medya anlama ve görsel
-  oluşturmayı sahiplenir)
+  `openai`; metin çıkarımı, konuşma, medya anlama ve görsel
+  oluşturmanın sahibidir)
 - **hook-only** -- yalnızca kancalar kaydeder (türlü veya özel), yetenek,
-  araç, komut ya da servis kaydetmez
-- **non-capability** -- yetenek olmadan araçlar, komutlar, servisler veya rotalar kaydeder
+  araç, komut veya hizmet yoktur
+- **non-capability** -- yetenek olmadan araçlar, komutlar, hizmetler veya
+  yollar kaydeder
 
-Bir plugin’in biçimini ve yetenek
-dökümünü görmek için `openclaw plugins inspect <id>` komutunu kullanın. Ayrıntılar için [CLI başvurusu](/cli/plugins#inspect) sayfasına bakın.
+Bir eklentinin şeklini ve yetenek dökümünü görmek için
+`openclaw plugins inspect <id>` kullanın. Ayrıntılar için
+[CLI reference](/cli/plugins#inspect) bölümüne bakın.
 
 ### Eski kancalar
 
-`before_agent_start` kancası, yalnızca-kanca plugin’leri için bir uyumluluk yolu olarak desteklenmeye devam eder. Eski gerçek dünya plugin’leri hâlâ buna bağımlıdır.
+`before_agent_start` kancası, yalnızca kanca kullanan eklentiler için bir
+uyumluluk yolu olarak desteklenmeye devam eder. Eski gerçek dünya eklentileri
+hala buna bağımlıdır.
 
 Yön:
 
 - çalışır durumda tutun
-- eski olarak belgelendirin
-- model/sağlayıcı geçersiz kılma işleri için `before_model_resolve` kullanmayı tercih edin
-- istem değiştirme işleri için `before_prompt_build` kullanmayı tercih edin
-- yalnızca gerçek kullanım azaldığında ve fixture kapsamı geçiş güvenliğini kanıtladığında kaldırın
+- bunu eski olarak belgeleyin
+- model/sağlayıcı geçersiz kılma işleri için `before_model_resolve` tercih edin
+- istem değişikliği işleri için `before_prompt_build` tercih edin
+- yalnızca gerçek kullanım düştükten ve fixture kapsamı geçiş güvenliğini
+  kanıtladıktan sonra kaldırın
 
 ### Uyumluluk sinyalleri
 
-`openclaw doctor` veya `openclaw plugins inspect <id>` komutunu çalıştırdığınızda,
-şu etiketlerden birini görebilirsiniz:
+`openclaw doctor` veya `openclaw plugins inspect <id>` çalıştırdığınızda şu
+etiketlerden birini görebilirsiniz:
 
 | Sinyal                     | Anlamı                                                       |
 | -------------------------- | ------------------------------------------------------------ |
-| **config valid**           | Yapılandırma sorunsuz ayrıştırılır ve plugin’ler çözülür     |
-| **compatibility advisory** | Plugin desteklenen ancak daha eski bir desen kullanıyor (ör. `hook-only`) |
-| **legacy warning**         | Plugin, kullanımdan kaldırılmış olan `before_agent_start` kullanıyor |
-| **hard error**             | Yapılandırma geçersiz veya plugin yüklenemedi                |
+| **config valid**           | Yapılandırma sorunsuz ayrıştırılır ve eklentiler çözülür     |
+| **compatibility advisory** | Eklenti desteklenen ama daha eski bir desen kullanıyor (örn. `hook-only`) |
+| **legacy warning**         | Eklenti `before_agent_start` kullanıyor; bu kullanım kullanımdan kaldırılmıştır |
+| **hard error**             | Yapılandırma geçersizdir veya eklenti yüklenememiştir        |
 
-Ne `hook-only` ne de `before_agent_start` bugün plugin’inizi bozmaz --
-`hook-only` bir tavsiye niteliğindedir ve `before_agent_start` yalnızca uyarı üretir. Bu
-sinyaller `openclaw status --all` ve `openclaw plugins doctor` içinde de görünür.
+Ne `hook-only` ne de `before_agent_start` bugün eklentinizi bozmaz --
+`hook-only` tavsiye niteliğindedir ve `before_agent_start` yalnızca bir uyarı
+tetikler. Bu sinyaller `openclaw status --all` ve `openclaw plugins doctor`
+çıktılarında da görünür.
 
 ## Mimariye genel bakış
 
-OpenClaw’ın plugin sistemi dört katmana sahiptir:
+OpenClaw'ın eklenti sistemi dört katmandan oluşur:
 
 1. **Manifest + keşif**
    OpenClaw, yapılandırılmış yollardan, çalışma alanı köklerinden,
-   genel uzantı köklerinden ve paketlenmiş uzantılardan aday plugin’leri bulur.
-   Keşif önce yerel `openclaw.plugin.json` manifestlerini ve desteklenen paket manifestlerini okur.
+   genel uzantı köklerinden ve paketlenmiş uzantılardan aday eklentileri bulur.
+   Keşif, önce yerel `openclaw.plugin.json` manifestlerini ve desteklenen
+   paket manifestlerini okur.
 2. **Etkinleştirme + doğrulama**
-   Çekirdek, keşfedilen bir plugin’in etkin, devre dışı, engellenmiş
-   veya bellek gibi özel bir yuva için seçilmiş olup olmadığına karar verir.
+   Çekirdek, keşfedilmiş bir eklentinin etkin, devre dışı, engellenmiş veya
+   bellek gibi özel bir yuva için seçilmiş olup olmadığına karar verir.
 3. **Çalışma zamanı yükleme**
-   Yerel OpenClaw plugin’leri jiti aracılığıyla süreç içinde yüklenir ve
-   yetenekleri merkezi bir kayıt defterine kaydeder. Uyumlu paketler, çalışma zamanı kodu içe aktarılmadan
-   kayıt defteri kayıtlarına normalize edilir.
+   Yerel OpenClaw eklentileri jiti aracılığıyla aynı süreç içinde yüklenir ve
+   yetenekleri merkezi bir kayıt sistemine kaydeder. Uyumlu paketler, çalışma
+   zamanı kodu içe aktarılmadan kayıt sistemi kayıtlarına normalize edilir.
 4. **Yüzey tüketimi**
-   OpenClaw’ın geri kalanı, araçları, kanalları, sağlayıcı
-   kurulumunu, kancaları, HTTP rotalarını, CLI komutlarını ve servisleri sunmak için kayıt defterini okur.
+   OpenClaw'ın geri kalanı; araçları, kanalları, sağlayıcı kurulumunu,
+   kancaları, HTTP yollarını, CLI komutlarını ve hizmetleri ortaya çıkarmak
+   için kayıt sistemini okur.
 
-Özellikle plugin CLI için, kök komut keşfi iki aşamada bölünür:
+Özellikle eklenti CLI için, kök komut keşfi iki aşamaya ayrılmıştır:
 
-- ayrıştırma zamanı meta verisi `registerCli(..., { descriptors: [...] })` üzerinden gelir
-- gerçek plugin CLI modülü tembel kalabilir ve ilk çağrıda kaydolabilir
+- ayrıştırma zamanı meta verisi `registerCli(..., { descriptors: [...] })`
+  içinden gelir
+- gerçek eklenti CLI modülü tembel kalabilir ve ilk çağrıda kaydolabilir
 
-Bu, plugin’e ait CLI kodunu plugin’in içinde tutarken OpenClaw’ın
-ayrıştırmadan önce kök komut adlarını ayırmasına olanak tanır.
+Bu, eklentiye ait CLI kodunu eklentinin içinde tutarken OpenClaw'ın ayrıştırma
+öncesinde kök komut adlarını ayırmasına yine de izin verir.
 
 Önemli tasarım sınırı:
 
-- keşif + yapılandırma doğrulaması, plugin kodunu çalıştırmadan
-  **manifest/şema meta verilerinden** çalışabilmelidir
-- yerel çalışma zamanı davranışı, plugin modülünün `register(api)` yolundan gelir
+- keşif + yapılandırma doğrulaması, eklenti kodu çalıştırılmadan
+  **manifest/schema meta verisi** üzerinden çalışabilmelidir
+- yerel çalışma zamanı davranışı eklenti modülünün `register(api)` yolundan gelir
 
-Bu ayrım, OpenClaw’ın yapılandırmayı doğrulamasına, eksik/devre dışı plugin’leri açıklamasına ve
-tam çalışma zamanı etkinleşmeden önce UI/şema ipuçları oluşturmasına olanak tanır.
+Bu ayrım, tam çalışma zamanı etkinleşmeden önce OpenClaw'ın yapılandırmayı
+doğrulamasına, eksik/devre dışı eklentileri açıklamasına ve UI/schema ipuçları
+oluşturmasına olanak tanır.
 
-### Kanal plugin’leri ve paylaşılan message aracı
+### Kanal eklentileri ve paylaşılan message aracı
 
-Kanal plugin’lerinin, normal sohbet eylemleri için ayrı bir gönder/düzenle/tepki aracı kaydetmesi gerekmez. OpenClaw, çekirdekte tek bir paylaşılan `message` aracı tutar ve kanal plugin’leri bunun arkasındaki kanala özgü keşif ve yürütmeyi sahiplenir.
+Kanal eklentilerinin, normal sohbet eylemleri için ayrı bir gönder/düzenle/tepki
+aracı kaydetmesi gerekmez. OpenClaw çekirdekte tek bir paylaşılan `message`
+aracı tutar ve kanal eklentileri bunun arkasındaki kanala özgü keşif ve yürütmenin
+sahibidir.
 
-Mevcut sınır şöyledir:
+Geçerli sınır şöyledir:
 
-- çekirdek, paylaşılan `message` araç ana makinesini, istem kablolamasını, oturum/iş parçacığı
-  kayıtlarını ve yürütme sevkini sahiplenir
-- kanal plugin’leri kapsamlı eylem keşfini, yetenek keşfini ve
-  kanala özgü tüm şema parçalarını sahiplenir
-- kanal plugin’leri, konuşma kimliklerinin iş parçacığı kimliklerini nasıl kodladığı veya üst konuşmalardan nasıl miras aldığı gibi
-  sağlayıcıya özgü oturum konuşma dil bilgisini sahiplenir
-- kanal plugin’leri son eylemi kendi eylem bağdaştırıcıları üzerinden yürütür
+- çekirdek; paylaşılan `message` araç barındırıcısının, istem bağlamasının,
+  oturum/iş parçacığı kayıtlarının ve yürütme dağıtımının sahibidir
+- kanal eklentileri; kapsamlı eylem keşfinin, yetenek keşfinin ve kanala özgü
+  tüm şema parçalarının sahibidir
+- kanal eklentileri; konuşma kimliklerinin iş parçacığı kimliklerini nasıl
+  kodladığı veya üst konuşmalardan nasıl miras aldığı gibi, sağlayıcıya özgü
+  oturum konuşma dil bilgisinin sahibidir
+- kanal eklentileri son eylemi kendi eylem bağdaştırıcıları üzerinden yürütür
 
-Kanal plugin’leri için SDK yüzeyi
-`ChannelMessageActionAdapter.describeMessageTool(...)` şeklindedir. Bu birleşik keşif
-çağrısı, bir plugin’in görünür eylemlerini, yeteneklerini ve şema katkılarını
-birlikte döndürmesine olanak tanır; böylece bu parçalar birbirinden kopmaz.
+Kanal eklentileri için SDK yüzeyi
+`ChannelMessageActionAdapter.describeMessageTool(...)` şeklindedir. Bu birleşik
+keşif çağrısı, bir eklentinin görünür eylemlerini, yeteneklerini ve şema
+katkılarını birlikte döndürmesine olanak tanır; böylece bu parçalar birbirinden
+kopmaz.
 
-Çekirdek, çalışma zamanı kapsamını bu keşif adımına aktarır. Önemli alanlar şunlardır:
+Çekirdek, çalışma zamanı kapsamını bu keşif adımına geçirir. Önemli alanlar:
 
 - `accountId`
 - `currentChannelId`
@@ -185,120 +203,137 @@ birlikte döndürmesine olanak tanır; böylece bu parçalar birbirinden kopmaz.
 - `agentId`
 - güvenilir gelen `requesterSenderId`
 
-Bu, bağlama duyarlı plugin’ler için önemlidir. Bir kanal,
-çekirdekteki `message` aracında kanala özgü dallanmaları sabit kodlamadan,
-etkin hesaba, geçerli odaya/iş parçacığına/mesaja veya
-güvenilir istek sahibi kimliğine göre mesaj eylemlerini gizleyebilir ya da gösterebilir.
+Bu, bağlama duyarlı eklentiler için önemlidir. Bir kanal, etkin hesaba,
+geçerli odaya/iş parçacığına/mesaja veya güvenilir istemci kimliğine göre
+mesaj eylemlerini gizleyebilir ya da gösterebilir; bunu çekirdek `message`
+aracında kanala özgü dallanmaları sabit kodlamadan yapar.
 
-Bu nedenle gömülü çalıştırıcı yönlendirme değişiklikleri hâlâ plugin işidir: çalıştırıcı,
-paylaşılan `message` aracının geçerli tur için doğru kanala ait
-yüzeyi göstermesi amacıyla mevcut sohbet/oturum kimliğini plugin
-keşif sınırına iletmekten sorumludur.
+Bu nedenle gömülü çalıştırıcı yönlendirme değişiklikleri hâlâ eklenti işidir:
+çalıştırıcı, paylaşılan `message` aracının geçerli tur için doğru kanal sahipli
+yüzeyi göstermesi amacıyla geçerli sohbet/oturum kimliğini eklenti keşif
+sınırına iletmekten sorumludur.
 
-Kanala ait yürütme yardımcıları için, paketlenmiş plugin’ler yürütme
-çalışma zamanını kendi uzantı modülleri içinde tutmalıdır. Çekirdek artık `src/agents/tools` altında
-Discord, Slack, Telegram veya WhatsApp mesaj-eylemi çalışma zamanlarını sahiplenmez.
-Ayrı `plugin-sdk/*-action-runtime` alt yolları yayımlamıyoruz ve paketlenmiş
-plugin’ler kendi yerel çalışma zamanı kodlarını doğrudan
-uzantıya ait modüllerinden içe aktarmalıdır.
+Kanala ait yürütme yardımcıları için, paketlenmiş eklentiler yürütme çalışma
+zamanını kendi uzantı modülleri içinde tutmalıdır. Çekirdek artık
+`src/agents/tools` altında Discord, Slack, Telegram veya WhatsApp mesaj-eylem
+çalışma zamanlarının sahibi değildir. Ayrı `plugin-sdk/*-action-runtime` alt
+yolları yayımlamıyoruz ve paketlenmiş eklentiler kendi yerel çalışma zamanı
+kodlarını doğrudan kendi uzantı sahipli modüllerinden içe aktarmalıdır.
 
-Aynı sınır, genel olarak sağlayıcı adlı SDK yüzeyleri için de geçerlidir: çekirdek,
-Slack, Discord, Signal, WhatsApp veya benzeri uzantılar için kanala özgü kolaylık paketlerini içe aktarmamalıdır.
-Çekirdeğin bir davranışa ihtiyacı varsa ya paketlenmiş plugin’in kendi `api.ts` / `runtime-api.ts`
-paketini tüketmeli ya da ihtiyacı paylaşılan SDK’da dar bir genel yeteneğe dönüştürmelidir.
+Aynı sınır genel olarak sağlayıcı adlı SDK bağlantı yüzeyleri için de geçerlidir:
+çekirdek; Slack, Discord, Signal, WhatsApp veya benzeri uzantılar için kanala
+özgü kolaylık barrel'larını içe aktarmamalıdır. Çekirdeğin bir davranışa
+ihtiyacı varsa ya paketlenmiş eklentinin kendi `api.ts` / `runtime-api.ts`
+barrel'ını tüketmeli ya da bu ihtiyacı paylaşılan SDK'da dar bir genel
+yeteneğe yükseltmelidir.
 
 Özellikle anketler için iki yürütme yolu vardır:
 
-- `outbound.sendPoll`, ortak anket modeline uyan kanallar için paylaşılan temel yoldur
-- `actions.handleAction("poll")`, kanala özgü anket anlambilimi veya ek anket parametreleri için tercih edilen yoldur
+- `outbound.sendPoll`, ortak anket modeline uyan kanallar için paylaşılan temel
+  yoldur
+- `actions.handleAction("poll")`, kanala özgü anket anlamları veya ek anket
+  parametreleri için tercih edilen yoldur
 
-Çekirdek artık, plugin’e ait anket gönderimi eylemi reddettikten sonra
-paylaşılan anket ayrıştırmasını erteler; böylece plugin’e ait anket işleyicileri,
-önce genel anket ayrıştırıcısı tarafından engellenmeden kanala özgü anket alanlarını kabul edebilir.
+Çekirdek artık paylaşılan anket ayrıştırmasını, eklenti sahipli anket dağıtımı
+eylemi reddettikten sonraya erteler; böylece eklenti sahipli anket işleyicileri
+önce genel anket ayrıştırıcısı tarafından engellenmeden kanala özgü anket
+alanlarını kabul edebilir.
 
-Tam başlangıç dizisi için [Yükleme işlem hattı](#load-pipeline) bölümüne bakın.
+Tam başlangıç dizisi için [Yükleme hattı](#load-pipeline) bölümüne bakın.
 
 ## Yetenek sahipliği modeli
 
-OpenClaw, yerel bir plugin’i ilgisiz entegrasyonların karışık bir topluluğu olarak değil,
-bir **şirketin** veya bir **özelliğin** sahiplik sınırı olarak ele alır.
+OpenClaw, yerel bir eklentiyi ilişkisiz entegrasyonların bir karması olarak
+değil, bir **şirketin** veya bir **özelliğin** sahiplik sınırı olarak ele alır.
 
 Bu şu anlama gelir:
 
-- bir şirket plugin’i genellikle o şirketin OpenClaw’a dönük tüm
-  yüzeylerine sahip olmalıdır
-- bir özellik plugin’i genellikle sunduğu özelliğin tam yüzeyine sahip olmalıdır
-- kanallar, sağlayıcı davranışını geçici olarak yeniden uygulamak yerine paylaşılan çekirdek yetenekleri tüketmelidir
+- bir şirket eklentisi, genellikle o şirketin OpenClaw'a dönük tüm
+  yüzeylerinin sahibi olmalıdır
+- bir özellik eklentisi, genellikle getirdiği tam özellik yüzeyinin sahibi
+  olmalıdır
+- kanallar, sağlayıcı davranışını plansız şekilde yeniden uygulamak yerine
+  paylaşılan çekirdek yetenekleri tüketmelidir
 
 Örnekler:
 
-- paketlenmiş `openai` plugin’i, OpenAI model-sağlayıcı davranışını ve OpenAI
-  konuşma + gerçek zamanlı ses + medya anlama + görsel oluşturma davranışını sahiplenir
-- paketlenmiş `elevenlabs` plugin’i ElevenLabs konuşma davranışını sahiplenir
-- paketlenmiş `microsoft` plugin’i Microsoft konuşma davranışını sahiplenir
-- paketlenmiş `google` plugin’i, Google model-sağlayıcı davranışının yanı sıra Google
-  medya anlama + görsel oluşturma + web arama davranışını sahiplenir
-- paketlenmiş `firecrawl` plugin’i Firecrawl web-getirme davranışını sahiplenir
-- paketlenmiş `minimax`, `mistral`, `moonshot` ve `zai` plugin’leri kendi
-  medya anlama arka uçlarına sahiptir
-- paketlenmiş `qwen` plugin’i, Qwen metin-sağlayıcı davranışının yanı sıra
-  medya anlama ve video oluşturma davranışını sahiplenir
-- `voice-call` plugin’i bir özellik plugin’idir: çağrı aktarımını, araçları,
-  CLI’yi, rotaları ve Twilio medya-akışı köprüsünü sahiplenir, ancak satıcı plugin’lerini doğrudan
-  içe aktarmak yerine paylaşılan konuşma ile gerçek zamanlı yazıya dökme ve gerçek zamanlı ses yeteneklerini tüketir
+- paketlenmiş `openai` eklentisi, OpenAI model-sağlayıcı davranışının ve
+  OpenAI konuşma + gerçek zamanlı ses + medya anlama + görsel oluşturma
+  davranışının sahibidir
+- paketlenmiş `elevenlabs` eklentisi, ElevenLabs konuşma davranışının sahibidir
+- paketlenmiş `microsoft` eklentisi, Microsoft konuşma davranışının sahibidir
+- paketlenmiş `google` eklentisi, Google model-sağlayıcı davranışının yanı sıra
+  Google medya anlama + görsel oluşturma + web arama davranışının sahibidir
+- paketlenmiş `firecrawl` eklentisi, Firecrawl web getirme davranışının sahibidir
+- paketlenmiş `minimax`, `mistral`, `moonshot` ve `zai` eklentileri,
+  medya anlama arka uçlarının sahibidir
+- paketlenmiş `qwen` eklentisi, Qwen metin sağlayıcı davranışının yanı sıra
+  medya anlama ve video oluşturma davranışının sahibidir
+- `voice-call` eklentisi bir özellik eklentisidir: çağrı taşıması, araçlar,
+  CLI, yollar ve Twilio medya akışı köprülemesinin sahibidir, ancak satıcı
+  eklentilerini doğrudan içe aktarmak yerine paylaşılan konuşma ile gerçek
+  zamanlı yazıya döküm ve gerçek zamanlı ses yeteneklerini tüketir
 
-Hedeflenen son durum şudur:
+Amaçlanan son durum şudur:
 
-- OpenAI, metin modellerini, konuşmayı, görselleri ve gelecekte videoyu kapsasa bile tek bir plugin içinde yer alır
+- OpenAI, metin modellerini, konuşmayı, görselleri ve gelecekte videoyu
+  kapsasa bile tek bir eklentide yer alır
 - başka bir satıcı da kendi yüzey alanı için aynısını yapabilir
-- kanallar, sağlayıcının hangi satıcı plugin’ine ait olduğunu umursamaz; çekirdek tarafından sunulan
-  paylaşılan yetenek sözleşmesini tüketirler
+- kanallar, sağlayıcının sahibi olan satıcı eklentisinin hangisi olduğunu
+  önemsemez; çekirdek tarafından sunulan paylaşılan yetenek sözleşmesini
+  tüketirler
 
 Temel ayrım şudur:
 
-- **plugin** = sahiplik sınırı
-- **capability** = birden çok plugin’in uygulayabildiği veya tüketebildiği çekirdek sözleşmesi
+- **eklenti** = sahiplik sınırı
+- **yetenek** = birden fazla eklentinin uygulayabildiği veya tüketebildiği
+  çekirdek sözleşmesi
 
-Dolayısıyla OpenClaw, video gibi yeni bir alan eklediğinde ilk soru
-“hangi sağlayıcı video işleyişini sabit kodlamalı?” değildir. İlk soru “çekirdekteki
-video yetenek sözleşmesi nedir?” olmalıdır. Bu sözleşme var olduğunda, satıcı plugin’leri
-ona kayıt olabilir ve kanal/özellik plugin’leri bunu tüketebilir.
+Dolayısıyla OpenClaw video gibi yeni bir alan eklediğinde ilk soru
+"hangi sağlayıcı video işlemeyi sabit kodlamalı?" değildir. İlk soru
+"çekirdeğin video yetenek sözleşmesi nedir?" olmalıdır. Bu sözleşme bir kez
+var olduğunda, satıcı eklentileri buna karşı kayıt olabilir ve kanal/özellik
+eklentileri bunu tüketebilir.
 
 Yetenek henüz mevcut değilse, doğru adım genellikle şudur:
 
 1. eksik yeteneği çekirdekte tanımlamak
-2. bunu plugin API’si/çalışma zamanı üzerinden türlenmiş şekilde sunmak
-3. kanalları/özellikleri bu yeteneğe göre bağlamak
-4. satıcı plugin’lerinin uygulamaları kaydetmesine izin vermek
+2. bunu eklenti API'si/çalışma zamanı üzerinden türlenmiş şekilde sunmak
+3. kanalları/özellikleri bu yeteneğe karşı bağlamak
+4. satıcı eklentilerinin uygulamaları kaydetmesine izin vermek
 
-Bu yaklaşım, sahipliği açık tutarken çekirdek davranışının
-tek bir satıcıya veya bir defalık plugin’e özgü bir kod yoluna bağımlı olmasını önler.
+Bu, tek bir satıcıya veya tek seferlik eklentiye özgü bir kod yoluna bağlı
+çekirdek davranışlardan kaçınırken sahipliği açık tutar.
 
-### Yetenek katmanlaması
+### Yetenek katmanları
 
 Kodun nereye ait olduğuna karar verirken şu zihinsel modeli kullanın:
 
-- **çekirdek yetenek katmanı**: paylaşılan orkestrasyon, politika, geri dönüş, yapılandırma
-  birleştirme kuralları, teslim semantiği ve türlenmiş sözleşmeler
-- **satıcı plugin katmanı**: satıcıya özgü API’ler, kimlik doğrulama, model katalogları, konuşma
-  sentezi, görsel üretimi, gelecekteki video arka uçları, kullanım uç noktaları
-- **kanal/özellik plugin katmanı**: Slack/Discord/voice-call/vb. entegrasyonu;
-  çekirdek yetenekleri tüketir ve bunları bir yüzeyde sunar
+- **çekirdek yetenek katmanı**: paylaşılan orkestrasyon, politika, geri
+  dönüş, yapılandırma birleştirme kuralları, teslim semantiği ve türlenmiş
+  sözleşmeler
+- **satıcı eklenti katmanı**: satıcıya özgü API'ler, kimlik doğrulama, model
+  katalogları, konuşma sentezi, görsel oluşturma, gelecekteki video arka
+  uçları, kullanım uç noktaları
+- **kanal/özellik eklenti katmanı**: Slack/Discord/voice-call/vb.
+  entegrasyonu; çekirdek yetenekleri tüketir ve bunları bir yüzeyde sunar
 
-Örneğin TTS şu yapıyı izler:
+Örneğin, TTS şu yapıyı izler:
 
-- çekirdek, yanıt zamanındaki TTS politikasını, geri dönüş sırasını, tercihleri ve kanal teslimini sahiplenir
-- `openai`, `elevenlabs` ve `microsoft` sentez uygulamalarını sahiplenir
+- çekirdek, yanıt zamanındaki TTS politikasının, geri dönüş sırasının,
+  tercihlerin ve kanal tesliminin sahibidir
+- `openai`, `elevenlabs` ve `microsoft`, sentez uygulamalarının sahibidir
 - `voice-call`, telefon TTS çalışma zamanı yardımcısını tüketir
 
 Aynı desen gelecekteki yetenekler için de tercih edilmelidir.
 
-### Çok yetenekli şirket plugin’i örneği
+### Çoklu yetenekli şirket eklentisi örneği
 
-Bir şirket plugin’i dışarıdan bakıldığında bütünlüklü hissettirmelidir. OpenClaw’da
-modeller, konuşma, gerçek zamanlı yazıya dökme, gerçek zamanlı ses, medya
-anlama, görsel oluşturma, video oluşturma, web getirme ve web arama için paylaşılan
-sözleşmeler varsa, bir satıcı tüm yüzeylerine tek bir yerden sahip olabilir:
+Bir şirket eklentisi dışarıdan bakıldığında tutarlı hissettirmelidir. Eğer
+OpenClaw; modeller, konuşma, gerçek zamanlı yazıya döküm, gerçek zamanlı ses,
+medya anlama, görsel oluşturma, video oluşturma, web getirme ve web arama için
+paylaşılan sözleşmelere sahipse, bir satıcı tüm yüzeylerinin sahibi tek bir
+yerde olabilir:
 
 ```ts
 import type { OpenClawPluginDefinition } from "openclaw/plugin-sdk/plugin-entry";
@@ -352,116 +387,128 @@ const plugin: OpenClawPluginDefinition = {
 export default plugin;
 ```
 
-Önemli olan tam yardımcı adları değildir. Önemli olan yapı şeklidir:
+Önemli olan yardımcı adlarının tam olarak ne olduğu değildir. Yapı önemlidir:
 
-- tek bir plugin satıcı yüzeyine sahip olur
-- çekirdek yine de yetenek sözleşmelerine sahip olur
-- kanallar ve özellik plugin’leri satıcı kodunu değil, `api.runtime.*` yardımcılarını tüketir
-- sözleşme testleri, plugin’in sahip olduğunu iddia ettiği yetenekleri kaydettiğini
-  doğrulayabilir
+- tek bir eklenti satıcı yüzeyinin sahibidir
+- çekirdek yine de yetenek sözleşmelerinin sahibidir
+- kanallar ve özellik eklentileri, satıcı kodunu değil, `api.runtime.*`
+  yardımcılarını tüketir
+- sözleşme testleri, eklentinin sahibi olduğunu iddia ettiği yetenekleri
+  kaydettiğini doğrulayabilir
 
 ### Yetenek örneği: video anlama
 
-OpenClaw, görsel/ses/video anlamayı zaten tek bir paylaşılan
-yetenek olarak ele alır. Aynı sahiplik modeli burada da geçerlidir:
+OpenClaw zaten görsel/ses/video anlamayı tek bir paylaşılan yetenek olarak ele
+alır. Aynı sahiplik modeli burada da geçerlidir:
 
 1. çekirdek medya-anlama sözleşmesini tanımlar
-2. satıcı plugin’leri uygun olduğu durumlarda `describeImage`, `transcribeAudio` ve
+2. satıcı eklentileri uygun olduğunda `describeImage`, `transcribeAudio` ve
    `describeVideo` kaydeder
-3. kanal ve özellik plugin’leri doğrudan satıcı koduna bağlanmak yerine
-   paylaşılan çekirdek davranışını tüketir
+3. kanallar ve özellik eklentileri, doğrudan satıcı koduna bağlanmak yerine
+   paylaşılan çekirdek davranışı tüketir
 
-Bu, tek bir sağlayıcının video varsayımlarının çekirdeğe gömülmesini önler. Plugin,
-satıcı yüzeyine sahip olur; çekirdek ise yetenek sözleşmesine ve geri dönüş davranışına sahip olur.
+Bu, tek bir sağlayıcının video varsayımlarının çekirdeğe gömülmesini önler.
+Eklenti satıcı yüzeyinin sahibidir; çekirdek ise yetenek sözleşmesinin ve geri
+dönüş davranışının sahibidir.
 
-Video oluşturma zaten aynı sırayı kullanır: çekirdek, türlenmiş
-yetenek sözleşmesine ve çalışma zamanı yardımcısına sahiptir ve satıcı plugin’leri
-`api.registerVideoGenerationProvider(...)` uygulamalarını buna karşı kaydeder.
+Video oluşturma da zaten aynı diziyi kullanır: çekirdek türlenmiş yetenek
+sözleşmesinin ve çalışma zamanı yardımcısının sahibidir, satıcı eklentileri de
+buna karşı `api.registerVideoGenerationProvider(...)` uygulamalarını kaydeder.
 
-Somut bir devreye alma denetim listesine mi ihtiyacınız var? Bkz.
-[Capability Cookbook](/tr/plugins/architecture).
+Somut bir devreye alma kontrol listesine mi ihtiyacınız var? Bkz.
+[Yetenek Yemek Kitabı](/tr/plugins/architecture).
 
-## Sözleşmeler ve zorunlu uygulama
+## Sözleşmeler ve zorunlu kılma
 
-Plugin API yüzeyi, kasıtlı olarak türlenmiştir ve
-`OpenClawPluginApi` içinde merkezileştirilmiştir. Bu sözleşme, desteklenen kayıt noktalarını ve
-bir plugin’in güvenebileceği çalışma zamanı yardımcılarını tanımlar.
+Eklenti API yüzeyi, kasıtlı olarak `OpenClawPluginApi` içinde türlenmiş ve
+merkezileştirilmiştir. Bu sözleşme, desteklenen kayıt noktalarını ve bir
+eklentinin güvenebileceği çalışma zamanı yardımcılarını tanımlar.
 
 Bunun önemi:
 
-- plugin yazarları tek bir kararlı iç standart elde eder
-- çekirdek, aynı sağlayıcı kimliğini iki plugin’in kaydetmesi gibi
-  yinelenen sahiplikleri reddedebilir
-- başlangıç, hatalı kayıtlar için uygulanabilir tanı bilgileri gösterebilir
-- sözleşme testleri, paketlenmiş plugin sahipliğini zorunlu kılabilir ve sessiz kaymayı önleyebilir
+- eklenti yazarları tek bir kararlı dahili standart elde eder
+- çekirdek, aynı sağlayıcı kimliğini iki eklentinin kaydetmesi gibi yinelenen
+  sahipliği reddedebilir
+- başlangıç süreci, hatalı biçimlendirilmiş kayıtlar için uygulanabilir
+  tanılar sunabilir
+- sözleşme testleri, paketlenmiş eklenti sahipliğini zorunlu kılabilir ve sessiz
+  sapmayı önleyebilir
 
-İki zorunlu uygulama katmanı vardır:
+İki katmanlı bir zorunlu kılma vardır:
 
-1. **çalışma zamanı kayıt zorunluluğu**
-   Plugin kayıt defteri, plugin’ler yüklenirken kayıtları doğrular. Örnekler:
-   yinelenen sağlayıcı kimlikleri, yinelenen konuşma sağlayıcısı kimlikleri ve hatalı
-   kayıtlar, tanımsız davranış yerine plugin tanı bilgileri üretir.
+1. **çalışma zamanı kayıt zorunlu kılma**
+   Eklenti kayıt sistemi, eklentiler yüklenirken kayıtları doğrular.
+   Örnekler: yinelenen sağlayıcı kimlikleri, yinelenen konuşma sağlayıcı
+   kimlikleri ve hatalı kayıtlar tanımsız davranış yerine eklenti tanıları
+   üretir.
 2. **sözleşme testleri**
-   Paketlenmiş plugin’ler, test çalıştırmaları sırasında sözleşme kayıt defterlerinde yakalanır; böylece
-   OpenClaw sahipliği açıkça doğrulayabilir. Bugün bu, model
-   sağlayıcıları, konuşma sağlayıcıları, web arama sağlayıcıları ve paketlenmiş kayıt
-   sahipliği için kullanılmaktadır.
+   Paketlenmiş eklentiler, test çalıştırmaları sırasında sözleşme kayıt
+   sistemlerinde yakalanır; böylece OpenClaw sahipliği açıkça doğrulayabilir.
+   Bu bugün model sağlayıcıları, konuşma sağlayıcıları, web arama
+   sağlayıcıları ve paketlenmiş kayıt sahipliği için kullanılır.
 
-Bunun pratik etkisi, OpenClaw’ın baştan itibaren hangi plugin’in hangi
-yüzeye sahip olduğunu bilmesidir. Bu sayede çekirdek ve kanallar sorunsuz biçimde birleşebilir;
-çünkü sahiplik örtük değil, bildirilmiş, türlenmiş ve test edilebilirdir.
+Pratik etkisi şudur: OpenClaw, hangi eklentinin hangi yüzeye sahip olduğunu
+baştan bilir. Bu, sahiplik örtük değil beyan edilmiş, türlenmiş ve test
+edilebilir olduğundan çekirdeğin ve kanalların sorunsuz şekilde birleştirilmesini
+sağlar.
 
-### Bir sözleşmede ne bulunmalıdır
+### Bir sözleşmeye ne aittir
 
-İyi plugin sözleşmeleri şunlardır:
+İyi eklenti sözleşmeleri:
 
-- türlenmiş
-- küçük
-- yeteneğe özgü
-- çekirdeğe ait
-- birden çok plugin tarafından yeniden kullanılabilir
+- türlenmiştir
+- küçüktür
+- yeteneğe özgüdür
+- çekirdeğe aittir
+- birden fazla eklenti tarafından yeniden kullanılabilir
 - satıcı bilgisi olmadan kanallar/özellikler tarafından tüketilebilir
 
-Kötü plugin sözleşmeleri şunlardır:
+Kötü eklenti sözleşmeleri:
 
 - çekirdekte gizlenmiş satıcıya özgü politika
-- kayıt defterini baypas eden tek seferlik plugin kaçış kapıları
-- kanal kodunun doğrudan satıcı uygulamasına ulaşması
-- `OpenClawPluginApi` veya
-  `api.runtime` parçası olmayan geçici çalışma zamanı nesneleri
+- kayıt sistemini atlayan tek seferlik eklenti kaçış delikleri
+- bir satıcı uygulamasına doğrudan erişen kanal kodu
+- `OpenClawPluginApi` veya `api.runtime` parçası olmayan plansız çalışma zamanı
+  nesneleri
 
-Emin değilseniz soyutlama düzeyini yükseltin: önce yeteneği tanımlayın, sonra
-plugin’lerin buna bağlanmasına izin verin.
+Kararsız kaldığınızda soyutlama seviyesini yükseltin: önce yeteneği tanımlayın,
+sonra eklentilerin buna bağlanmasına izin verin.
 
 ## Yürütme modeli
 
-Yerel OpenClaw plugin’leri, Gateway ile **aynı süreç içinde** çalışır. Yalıtılmış
-değillerdir. Yüklenmiş bir yerel plugin, çekirdek kodla aynı süreç düzeyinde güven sınırına sahiptir.
+Yerel OpenClaw eklentileri, Gateway ile **aynı süreç içinde** çalışır. Korumalı
+alan içinde değildirler. Yüklenmiş yerel bir eklenti, çekirdek kodla aynı
+süreç düzeyi güven sınırına sahiptir.
 
 Sonuçları:
 
-- bir yerel plugin araçlar, ağ işleyicileri, kancalar ve servisler kaydedebilir
-- bir yerel plugin hatası gateway’i çökertilebilir veya kararsızlaştırabilir
-- kötü amaçlı bir yerel plugin, OpenClaw süreci içinde keyfi kod yürütmeye eşdeğerdir
+- yerel bir eklenti araçlar, ağ işleyicileri, kancalar ve hizmetler
+  kaydedebilir
+- yerel bir eklenti hatası gateway'i çökertebilir veya kararsızlaştırabilir
+- kötü amaçlı bir yerel eklenti, OpenClaw süreci içinde rastgele kod
+  yürütmeye eşdeğerdir
 
-Uyumlu paketler varsayılan olarak daha güvenlidir; çünkü OpenClaw şu anda bunları
-meta veri/içerik paketleri olarak ele alır. Güncel sürümlerde bu çoğunlukla
+Uyumlu paketler varsayılan olarak daha güvenlidir çünkü OpenClaw şu anda onları
+meta veri/içerik paketleri olarak ele alır. Geçerli sürümlerde bu çoğunlukla
 paketlenmiş Skills anlamına gelir.
 
-Paketlenmemiş plugin’ler için izin listelerini ve açık kurulum/yükleme yollarını kullanın. Çalışma alanı plugin’lerini
-üretim varsayılanları değil, geliştirme zamanı kodu olarak değerlendirin.
+Paketlenmemiş eklentiler için izin listeleri ve açık kurulum/yükleme yolları
+kullanın. Çalışma alanı eklentilerini üretim varsayılanları değil, geliştirme
+zamanı kodu olarak değerlendirin.
 
-Paketlenmiş çalışma alanı paket adları için, plugin kimliğini npm
-adına bağlayın: varsayılan olarak `@openclaw/<id>`, ya da paket
-kasıtlı olarak daha dar bir plugin rolü sunuyorsa `-provider`, `-plugin`, `-speech`, `-sandbox` veya
-`-media-understanding` gibi onaylı türlenmiş sonekler.
+Paketlenmiş çalışma alanı paket adları için, eklenti kimliğini npm adına bağlı
+tutun: varsayılan olarak `@openclaw/<id>` veya paket bilinçli olarak daha dar bir
+eklenti rolü sunuyorsa `-provider`, `-plugin`, `-speech`, `-sandbox` ya da
+`-media-understanding` gibi onaylı türlenmiş son eklerden biri.
 
 Önemli güven notu:
 
-- `plugins.allow`, **kaynak kökenine** değil **plugin kimliklerine** güvenir.
-- Paketlenmiş bir plugin ile aynı kimliğe sahip bir çalışma alanı plugin’i, bu çalışma alanı plugin’i etkinleştirildiğinde/izin listesine alındığında
-  paketlenmiş kopyayı kasıtlı olarak gölgeler.
-- Bu normaldir ve yerel geliştirme, yama testi ve hızlı düzeltmeler için faydalıdır.
+- `plugins.allow`, **eklenti kimliklerine** güvenir; kaynak kökenine değil.
+- Paketlenmiş bir eklentiyle aynı kimliğe sahip bir çalışma alanı eklentisi,
+  o çalışma alanı eklentisi etkinse/izin listesindeyse paketlenmiş kopyayı
+  bilinçli olarak gölgeler.
+- Bu normaldir ve yerel geliştirme, yama testi ve hızlı düzeltmeler için
+  kullanışlıdır.
 
 ## Dışa aktarma sınırı
 
@@ -469,109 +516,126 @@ OpenClaw, uygulama kolaylıklarını değil, yetenekleri dışa aktarır.
 
 Yetenek kaydını genel tutun. Sözleşme dışı yardımcı dışa aktarımları azaltın:
 
-- paketlenmiş plugin’e özgü yardımcı alt yollar
-- genel API olması amaçlanmayan çalışma zamanı tesisat alt yolları
+- paketlenmiş eklentiye özgü yardımcı alt yollar
+- genel API olarak amaçlanmamış çalışma zamanı altyapısı alt yolları
 - satıcıya özgü kolaylık yardımcıları
-- uygulama ayrıntısı olan kurulum/ilk yapılandırma yardımcıları
+- uygulama ayrıntısı olan kurulum/ilk katılım yardımcıları
 
-Bazı paketlenmiş plugin yardımcı alt yolları, uyumluluk ve paketlenmiş plugin bakımı için oluşturulmuş SDK dışa aktarma
-eşlemesinde hâlâ kalmaktadır. Güncel örnekler arasında
-`plugin-sdk/feishu`, `plugin-sdk/feishu-setup`, `plugin-sdk/zalo`,
-`plugin-sdk/zalo-setup` ve birkaç `plugin-sdk/matrix*` yüzeyi bulunur. Bunları,
-yeni üçüncü taraf plugin’ler için önerilen SDK deseni olarak değil, ayrılmış
-uygulama ayrıntısı dışa aktarımları olarak değerlendirin.
+Bazı paketlenmiş eklenti yardımcı alt yolları, uyumluluk ve paketlenmiş eklenti
+bakımı için oluşturulmuş SDK dışa aktarma haritasında hâlâ kalmaktadır. Güncel
+örnekler arasında `plugin-sdk/feishu`, `plugin-sdk/feishu-setup`,
+`plugin-sdk/zalo`, `plugin-sdk/zalo-setup` ve birkaç `plugin-sdk/matrix*`
+bağlantı yüzeyi yer alır. Bunları, yeni üçüncü taraf eklentiler için önerilen
+SDK deseni olarak değil, ayrılmış uygulama ayrıntısı dışa aktarımları olarak
+değerlendirin.
 
-## Yükleme işlem hattı
+## Yükleme hattı
 
 Başlangıçta OpenClaw kabaca şunları yapar:
 
-1. aday plugin köklerini keşfeder
+1. aday eklenti köklerini keşfeder
 2. yerel veya uyumlu paket manifestlerini ve paket meta verilerini okur
 3. güvenli olmayan adayları reddeder
-4. plugin yapılandırmasını normalize eder (`plugins.enabled`, `allow`, `deny`, `entries`,
+4. eklenti yapılandırmasını normalize eder (`plugins.enabled`, `allow`, `deny`, `entries`,
    `slots`, `load.paths`)
-5. her aday için etkinleştirme durumuna karar verir
+5. her aday için etkinleştirme kararını verir
 6. etkin yerel modülleri jiti aracılığıyla yükler
-7. yerel `register(api)` (veya `activate(api)` — eski bir takma ad) kancalarını çağırır ve kayıtları plugin kayıt defterinde toplar
-8. kayıt defterini komut/çalışma zamanı yüzeylerine sunar
+7. yerel `register(api)` (veya `activate(api)` — eski bir takma ad) kancalarını çağırır ve kayıtları eklenti kayıt sisteminde toplar
+8. kayıt sistemini komutlara/çalışma zamanı yüzeylerine sunar
 
 <Note>
-`activate`, `register` için eski bir takma addır — yükleyici hangisi mevcutsa onu çözer (`def.register ?? def.activate`) ve aynı noktada çağırır. Tüm paketlenmiş plugin’ler `register` kullanır; yeni plugin’ler için `register` tercih edin.
+`activate`, `register` için eski bir takma addır — yükleyici mevcut olanı (`def.register ?? def.activate`) çözümler ve aynı noktada çağırır. Tüm paketlenmiş eklentiler `register` kullanır; yeni eklentiler için `register` tercih edin.
 </Note>
 
-Güvenlik kapıları **çalışma zamanı yürütmesinden önce** devreye girer. Giriş plugin kökünden çıkıyorsa,
-yol dünya tarafından yazılabilirse veya paketlenmemiş plugin’ler için yol
-sahipliği şüpheli görünüyorsa adaylar engellenir.
+Güvenlik kapıları **çalışma zamanı yürütmesinden önce** gerçekleşir. Girdi
+eklenti kökünün dışına çıkarsa, yol dünya tarafından yazılabilirse veya
+paketlenmemiş eklentiler için yol sahipliği şüpheli görünüyorsa adaylar
+engellenir.
 
 ### Önce manifest davranışı
 
-Manifest, kontrol düzlemi için doğruluk kaynağıdır. OpenClaw bunu şunlar için kullanır:
+Manifest, kontrol düzleminin doğruluk kaynağıdır. OpenClaw bunu şunlar için
+kullanır:
 
-- plugin’i tanımlamak
-- bildirilen kanalları/Skills/yapılandırma şemasını veya paket yeteneklerini keşfetmek
-- `plugins.entries.<id>.config` değerini doğrulamak
+- eklentiyi tanımlamak
+- beyan edilmiş kanalları/Skills/yapılandırma şemasını veya paket
+  yeteneklerini keşfetmek
+- `plugins.entries.<id>.config` doğrulamak
 - Control UI etiketlerini/yer tutucularını zenginleştirmek
 - kurulum/katalog meta verilerini göstermek
-- plugin çalışma zamanını yüklemeden düşük maliyetli etkinleştirme ve kurulum tanımlayıcılarını korumak
+- eklenti çalışma zamanını yüklemeden ucuz etkinleştirme ve kurulum
+  tanımlayıcılarını korumak
 
-Yerel plugin’lerde çalışma zamanı modülü veri düzlemi parçasıdır. Kancalar, araçlar, komutlar veya sağlayıcı akışları gibi
-gerçek davranışları kaydeder.
+Yerel eklentiler için, çalışma zamanı modülü veri düzlemi parçasıdır. Kancalar,
+araçlar, komutlar veya sağlayıcı akışları gibi gerçek davranışları kaydeder.
 
-İsteğe bağlı manifest `activation` ve `setup` blokları kontrol düzleminde kalır.
-Bunlar etkinleştirme planlaması ve kurulum keşfi için yalnızca meta veri tanımlayıcılarıdır;
-çalışma zamanı kaydının, `register(...)` işlevinin veya `setupEntry` işlevinin yerine geçmezler.
+İsteğe bağlı manifest `activation` ve `setup` blokları kontrol düzleminde
+kalır. Bunlar, etkinleştirme planlaması ve kurulum keşfi için yalnızca meta
+veri tanımlayıcılarıdır; çalışma zamanı kaydının, `register(...)` veya
+`setupEntry`'nin yerini almazlar. İlk etkinleştirme tüketicisi artık, birincil
+bir komut bilindiğinde her zaman tüm CLI özellikli eklentileri önden yüklemek
+yerine CLI eklenti yüklemeyi daraltmak için manifest komut ipuçlarını kullanır.
+
+Kurulum keşfi artık, kurulum zamanında çalışma zamanı kancalarına hâlâ ihtiyaç
+duyan eklentiler için `setup-api`'ye geri dönmeden önce aday eklentileri
+daraltmak amacıyla `setup.providers` ve `setup.cliBackends` gibi tanımlayıcı
+sahipli kimlikleri tercih eder. Keşfedilen birden fazla eklenti aynı normalize
+edilmiş kurulum sağlayıcısı veya CLI arka uç kimliğini talep ederse, kurulum
+araması keşif sırasına güvenmek yerine belirsiz sahibi reddeder.
 
 ### Yükleyicinin önbelleğe aldığı şeyler
 
-OpenClaw, süreç içinde kısa ömürlü önbellekleri şunlar için tutar:
+OpenClaw süreç içinde kısa ömürlü önbellekler tutar:
 
 - keşif sonuçları
-- manifest kayıt defteri verileri
-- yüklenmiş plugin kayıt defterleri
+- manifest kayıt sistemi verileri
+- yüklenmiş eklenti kayıt sistemleri
 
-Bu önbellekler ani başlangıç yükünü ve tekrarlanan komut ek yükünü azaltır. Bunları
-kalıcılık olarak değil, kısa ömürlü performans önbellekleri olarak düşünmek güvenlidir.
+Bu önbellekler, ani başlangıç yükünü ve yinelenen komut ek yükünü azaltır.
+Bunları kalıcılık olarak değil, kısa ömürlü performans önbellekleri olarak
+düşünmek güvenlidir.
 
 Performans notu:
 
-- Bu önbellekleri devre dışı bırakmak için `OPENCLAW_DISABLE_PLUGIN_DISCOVERY_CACHE=1` veya
+- Bu önbellekleri devre dışı bırakmak için
+  `OPENCLAW_DISABLE_PLUGIN_DISCOVERY_CACHE=1` veya
   `OPENCLAW_DISABLE_PLUGIN_MANIFEST_CACHE=1` ayarlayın.
 - Önbellek pencerelerini `OPENCLAW_PLUGIN_DISCOVERY_CACHE_MS` ve
   `OPENCLAW_PLUGIN_MANIFEST_CACHE_MS` ile ayarlayın.
 
-## Kayıt defteri modeli
+## Kayıt sistemi modeli
 
-Yüklenmiş plugin’ler rastgele çekirdek genel durumlarını doğrudan değiştirmez. Merkezi bir
-plugin kayıt defterine kayıt olurlar.
+Yüklenen eklentiler rastgele çekirdek genel durumlarını doğrudan değiştirmez.
+Merkezi bir eklenti kayıt sistemine kaydolurlar.
 
-Kayıt defteri şunları izler:
+Kayıt sistemi şunları izler:
 
-- plugin kayıtları (kimlik, kaynak, köken, durum, tanı bilgileri)
+- eklenti kayıtları (kimlik, kaynak, köken, durum, tanılar)
 - araçlar
 - eski kancalar ve türlenmiş kancalar
 - kanallar
 - sağlayıcılar
 - gateway RPC işleyicileri
-- HTTP rotaları
+- HTTP yolları
 - CLI kaydedicileri
-- arka plan servisleri
-- plugin’e ait komutlar
+- arka plan hizmetleri
+- eklenti sahipli komutlar
 
-Daha sonra çekirdek özellikler, plugin modülleriyle doğrudan konuşmak yerine bu kayıt defterinden okur.
-Bu, yüklemeyi tek yönlü tutar:
+Çekirdek özellikler daha sonra eklenti modülleriyle doğrudan konuşmak yerine bu
+kayıt sisteminden okur. Bu, yüklemeyi tek yönlü tutar:
 
-- plugin modülü -> kayıt defterine kayıt
-- çekirdek çalışma zamanı -> kayıt defterinden tüketim
+- eklenti modülü -> kayıt sistemi kaydı
+- çekirdek çalışma zamanı -> kayıt sistemi tüketimi
 
-Bu ayrım bakım yapılabilirlik için önemlidir. Bu, çoğu çekirdek yüzeyin yalnızca tek bir
-entegrasyon noktasına ihtiyaç duyması anlamına gelir: “kayıt defterini oku”;
-“her plugin modülü için özel durum yaz” değil.
+Bu ayrım bakım yapılabilirlik için önemlidir. Çekirdek yüzeylerin çoğunun
+yalnızca tek bir entegrasyon noktasına ihtiyaç duyması anlamına gelir:
+"her eklenti modülü için özel durum yaz" değil, "kayıt sistemini oku".
 
 ## Konuşma bağlama geri çağrıları
 
-Bir konuşmayı bağlayan plugin’ler, bir onay çözümlendiğinde tepki verebilir.
+Bir konuşmayı bağlayan eklentiler, bir onay çözümlendiğinde tepki verebilir.
 
-Bağlama isteği onaylandıktan veya reddedildikten sonra bir geri çağrı almak için
+Bir bağlama isteği onaylandıktan veya reddedildikten sonra geri çağrı almak için
 `api.onConversationBindingResolved(...)` kullanın:
 
 ```ts
@@ -580,12 +644,12 @@ export default {
   register(api) {
     api.onConversationBindingResolved(async (event) => {
       if (event.status === "approved") {
-        // Artık bu plugin + conversation için bir bağlama var.
+        // A binding now exists for this plugin + conversation.
         console.log(event.binding?.conversationId);
         return;
       }
 
-      // İstek reddedildi; yerel bekleyen durumu temizleyin.
+      // The request was denied; clear any local pending state.
       console.log(event.request.conversation.conversationId);
     });
   },
@@ -597,22 +661,26 @@ Geri çağrı yükü alanları:
 - `status`: `"approved"` veya `"denied"`
 - `decision`: `"allow-once"`, `"allow-always"` veya `"deny"`
 - `binding`: onaylanan istekler için çözümlenmiş bağlama
-- `request`: özgün istek özeti, ayırma ipucu, gönderen kimliği ve
+- `request`: özgün istek özeti, ayırma ipucu, gönderici kimliği ve
   konuşma meta verileri
 
-Bu geri çağrı yalnızca bildirim amaçlıdır. Bir konuşmayı kimin bağlayabileceğini değiştirmez
-ve çekirdek onay işleme tamamlandıktan sonra çalışır.
+Bu geri çağrı yalnızca bildirim amaçlıdır. Bir konuşmayı kimin bağlamasına izin
+verildiğini değiştirmez ve çekirdeğin onay işleme süreci tamamlandıktan sonra
+çalışır.
 
 ## Sağlayıcı çalışma zamanı kancaları
 
-Sağlayıcı plugin’lerinin artık iki katmanı vardır:
+Sağlayıcı eklentilerinin artık iki katmanı vardır:
 
-- manifest meta verileri: çalışma zamanı yüklenmeden önce ucuz sağlayıcı ortam kimlik doğrulama araması için `providerAuthEnvVars`,
-  kimlik doğrulamayı paylaşan sağlayıcı varyantları için `providerAuthAliases`,
-  çalışma zamanı yüklenmeden önce ucuz kanal ortamı/kurulum araması için `channelEnvVars`,
-  ayrıca çalışma zamanı yüklenmeden önce ucuz ilk kurulum/kimlik doğrulama seçimi etiketleri ve
-  CLI bayrak meta verileri için `providerAuthChoices`
-- yapılandırma zamanı kancaları: `catalog` / eski `discovery` ile `applyConfigDefaults`
+- manifest meta verileri: çalışma zamanı yüklenmeden önce ucuz sağlayıcı
+  ortam-kimlik doğrulama araması için `providerAuthEnvVars`, kimlik
+  doğrulamayı paylaşan sağlayıcı varyantları için `providerAuthAliases`,
+  çalışma zamanı yüklenmeden önce ucuz kanal ortam/kurulum araması için
+  `channelEnvVars`, ayrıca çalışma zamanı yüklenmeden önce ucuz ilk katılım /
+  kimlik doğrulama seçimi etiketleri ve CLI bayrak meta verileri için
+  `providerAuthChoices`
+- yapılandırma zamanı kancaları: `catalog` / eski `discovery` ve
+  `applyConfigDefaults`
 - çalışma zamanı kancaları: `normalizeModelId`, `normalizeTransport`,
   `normalizeConfig`,
   `applyNativeStreamingUsageCompat`, `resolveConfigApiKey`,
@@ -633,89 +701,93 @@ Sağlayıcı plugin’lerinin artık iki katmanı vardır:
   `buildReplayPolicy`,
   `sanitizeReplayHistory`, `validateReplayTurns`, `onModelSelected`
 
-OpenClaw hâlâ genel ajan döngüsüne, yük devrine, döküm işleme sürecine ve
-araç politikasına sahiptir. Bu kancalar, tam bir özel çıkarım aktarımına ihtiyaç
-duymadan sağlayıcıya özgü davranış için uzantı yüzeyidir.
+OpenClaw hâlâ genel ajan döngüsünün, yük devretmenin, transkript işlemenin ve
+araç politikasının sahibidir. Bu kancalar, tümüyle özel bir çıkarım taşımasına
+gerek olmadan sağlayıcıya özgü davranışlar için uzantı yüzeyidir.
 
-Sağlayıcının, genel kimlik doğrulama/durum/model seçici yollarının
-plugin çalışma zamanını yüklemeden görebilmesi gereken ortam tabanlı kimlik bilgileri varsa
-manifest `providerAuthEnvVars` kullanın. Bir sağlayıcı kimliği başka bir sağlayıcı kimliğinin
-ortam değişkenlerini, kimlik doğrulama profillerini, yapılandırma destekli kimlik doğrulamayı ve API anahtarı ilk kurulum seçimini yeniden kullanacaksa
-manifest `providerAuthAliases` kullanın. İlk kurulum/kimlik doğrulama seçimi
-CLI yüzeylerinin, sağlayıcının seçim kimliğini, grup etiketlerini ve basit
-tek bayraklı kimlik doğrulama bağlantısını sağlayıcı çalışma zamanını yüklemeden bilmesi gerektiğinde
-manifest `providerAuthChoices` kullanın. Sağlayıcı çalışma zamanı
-`envVars` alanını, ilk kurulum etiketleri veya OAuth
-istemci kimliği/istemci sırrı kurulum değişkenleri gibi operatöre dönük ipuçları için koruyun.
+Sağlayıcının, genel kimlik doğrulama/durum/model seçici yollarının eklenti
+çalışma zamanını yüklemeden görmesi gereken ortam tabanlı kimlik bilgileri
+varsa manifest `providerAuthEnvVars` kullanın. Bir sağlayıcı kimliği başka bir
+sağlayıcı kimliğinin ortam değişkenlerini, kimlik doğrulama profillerini,
+yapılandırma tabanlı kimlik doğrulamayı ve API anahtarı ilk katılım seçimini
+yeniden kullanacaksa manifest `providerAuthAliases` kullanın. İlk katılım /
+kimlik doğrulama seçimi CLI yüzeylerinin, sağlayıcının seçim kimliğini, grup
+etiketlerini ve basit tek bayraklı kimlik doğrulama bağlantısını sağlayıcı
+çalışma zamanını yüklemeden bilmesi gerekiyorsa manifest `providerAuthChoices`
+kullanın. Sağlayıcı çalışma zamanı `envVars` alanını, ilk katılım etiketleri
+veya OAuth istemci kimliği/istemci gizli anahtarı kurulum değişkenleri gibi
+operatöre dönük ipuçları için saklayın.
 
-Bir kanalın, genel kabuk-ortamı geri dönüşü, yapılandırma/durum denetimleri veya kurulum istemlerinin
-kanal çalışma zamanını yüklemeden görmesi gereken ortam güdümlü kimlik doğrulaması veya kurulumu varsa
-manifest `channelEnvVars` kullanın.
+Bir kanalın, genel kabuk ortamı geri dönüşünün, yapılandırma/durum
+denetimlerinin veya kurulum istemlerinin çalışma zamanı yüklenmeden görmesi
+gereken ortam güdümlü kimlik doğrulaması ya da kurulumu varsa manifest
+`channelEnvVars` kullanın.
 
 ### Kanca sırası ve kullanım
 
-Model/sağlayıcı plugin’leri için OpenClaw, kancaları kabaca şu sırayla çağırır.
-“Ne zaman kullanılır” sütunu hızlı karar kılavuzudur.
+Model/sağlayıcı eklentileri için OpenClaw kancaları kabaca şu sırayla çağırır.
+"Ne zaman kullanılır" sütunu hızlı karar kılavuzudur.
 
 | #   | Kanca                             | Ne yapar                                                                                                       | Ne zaman kullanılır                                                                                                                         |
 | --- | --------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `catalog`                         | `models.json` oluşturulurken sağlayıcı yapılandırmasını `models.providers` içine yayımlar                     | Sağlayıcının bir kataloğa veya temel URL varsayılanlarına sahip olduğu durumlarda                                                           |
-| 2   | `applyConfigDefaults`             | Yapılandırma somutlaştırması sırasında sağlayıcıya ait genel yapılandırma varsayılanlarını uygular            | Varsayılanlar kimlik doğrulama moduna, ortama veya sağlayıcı model ailesi anlambilimine bağlıysa                                           |
-| --  | _(yerleşik model araması)_        | OpenClaw önce normal kayıt defteri/katalog yolunu dener                                                       | _(bir plugin kancası değildir)_                                                                                                             |
-| 3   | `normalizeModelId`                | Aramadan önce eski veya önizleme model kimliği takma adlarını normalleştirir                                  | Sağlayıcı, kanonik model çözümlemesinden önce takma ad temizliğine sahipse                                                                  |
-| 4   | `normalizeTransport`              | Genel model birleştirmesinden önce sağlayıcı ailesine ait `api` / `baseUrl` değerlerini normalleştirir       | Sağlayıcı, aynı aktarım ailesindeki özel sağlayıcı kimlikleri için aktarım temizliğini sahipleniyorsa                                      |
-| 5   | `normalizeConfig`                 | Çalışma zamanı/sağlayıcı çözümlemesinden önce `models.providers.<id>` değerini normalleştirir                 | Sağlayıcının plugin ile birlikte yaşaması gereken yapılandırma temizliğine ihtiyacı varsa; paketlenmiş Google ailesi yardımcıları da desteklenen Google yapılandırma girdilerini arka planda destekler |
-| 6   | `applyNativeStreamingUsageCompat` | Yerel akış kullanımı uyumluluk yeniden yazımlarını yapılandırma sağlayıcılarına uygular                       | Sağlayıcının uç nokta güdümlü yerel akış kullanım meta verisi düzeltmelerine ihtiyacı varsa                                                |
-| 7   | `resolveConfigApiKey`             | Çalışma zamanı kimlik doğrulaması yüklenmeden önce yapılandırma sağlayıcıları için ortam işaretleyicili kimlik doğrulamayı çözümler | Sağlayıcının sağlayıcıya ait ortam işaretleyicili API anahtarı çözümlemesine ihtiyacı varsa; `amazon-bedrock` için de burada yerleşik bir AWS ortam işaretleyici çözümleyicisi bulunur |
-| 8   | `resolveSyntheticAuth`            | Düz metni kalıcılaştırmadan yerel/kendi kendine barındırılan veya yapılandırma destekli kimlik doğrulamayı görünür kılar | Sağlayıcı sentetik/yerel bir kimlik bilgisi işaretleyicisiyle çalışabiliyorsa                                                              |
-| 9   | `resolveExternalAuthProfiles`     | Sağlayıcıya ait harici kimlik doğrulama profillerini bindirir; varsayılan `persistence`, CLI/uygulamaya ait kimlik bilgileri için `runtime-only` olur | Sağlayıcı, kopyalanmış yenileme belirteçlerini kalıcılaştırmadan harici kimlik doğrulama kimlik bilgilerini yeniden kullanıyorsa          |
-| 10  | `shouldDeferSyntheticProfileAuth` | Kaydedilmiş sentetik profil yer tutucularını ortam/yapılandırma destekli kimlik doğrulamanın arkasına indirir | Sağlayıcı, öncelik kazanmaması gereken sentetik yer tutucu profiller saklıyorsa                                                             |
-| 11  | `resolveDynamicModel`             | Henüz yerel kayıt defterinde olmayan sağlayıcıya ait model kimlikleri için eşzamanlı geri dönüş sağlar        | Sağlayıcı, yukarı akıştan gelen keyfi model kimliklerini kabul ediyorsa                                                                     |
-| 12  | `prepareDynamicModel`             | Zaman uyumsuz hazırlık yapar, ardından `resolveDynamicModel` yeniden çalışır                                  | Sağlayıcının bilinmeyen kimlikleri çözümlemeden önce ağ meta verisine ihtiyacı varsa                                                        |
-| 13  | `normalizeResolvedModel`          | Gömülü çalıştırıcı çözümlenmiş modeli kullanmadan önce son yeniden yazımı yapar                              | Sağlayıcının aktarım yeniden yazımlarına ihtiyacı varsa ancak yine de çekirdek bir aktarım kullanıyorsa                                    |
-| 14  | `contributeResolvedModelCompat`   | Başka bir uyumlu aktarım arkasındaki satıcı modelleri için uyumluluk bayrakları katkısı sağlar                | Sağlayıcı, sağlayıcıyı devralmadan ara sunucu aktarımlarındaki kendi modellerini tanıyorsa                                                  |
-| 15  | `capabilities`                    | Paylaşılan çekirdek mantığı tarafından kullanılan, sağlayıcıya ait döküm/araç meta verileri                  | Sağlayıcının döküm/sağlayıcı ailesi tuhaflıklarına ihtiyacı varsa                                                                           |
-| 16  | `normalizeToolSchemas`            | Gömülü çalıştırıcı bunları görmeden önce araç şemalarını normalleştirir                                        | Sağlayıcının aktarım ailesine ait şema temizliğine ihtiyacı varsa                                                                           |
-| 17  | `inspectToolSchemas`              | Normalleştirmeden sonra sağlayıcıya ait şema tanılarını görünür kılar                                         | Sağlayıcı, çekirdeğe sağlayıcıya özgü kurallar öğretmeden anahtar sözcük uyarıları istiyorsa                                                |
-| 18  | `resolveReasoningOutputMode`      | Yerel ile etiketli akıl yürütme çıktısı sözleşmesi arasında seçim yapar                                        | Sağlayıcının yerel alanlar yerine etiketli akıl yürütme/nihai çıktı istemesi durumunda                                                     |
-| 19  | `prepareExtraParams`              | Genel akış seçenek sarmalayıcılarından önce istek parametresi normalleştirmesi yapar                          | Sağlayıcının varsayılan istek parametrelerine veya sağlayıcı başına parametre temizliğine ihtiyacı varsa                                   |
-| 20  | `createStreamFn`                  | Normal akış yolunu özel bir aktarımla tamamen değiştirir                                                       | Sağlayıcının yalnızca bir sarmalayıcıya değil, özel bir kablo protokolüne ihtiyacı varsa                                                   |
-| 21  | `wrapStreamFn`                    | Genel sarmalayıcılar uygulandıktan sonra akışı sarar                                                           | Sağlayıcının özel bir aktarım olmadan istek üst bilgileri/gövdesi/model uyumluluğu sarmalayıcılarına ihtiyacı varsa                        |
-| 22  | `resolveTransportTurnState`       | Yerel tur başına aktarım üst bilgilerini veya meta veriyi ekler                                               | Sağlayıcının genel aktarımların sağlayıcıya özgü tur kimliğini göndermesini istemesi durumunda                                             |
-| 23  | `resolveWebSocketSessionPolicy`   | Yerel WebSocket üst bilgilerini veya oturum soğuma politikasını ekler                                         | Sağlayıcının genel WS aktarımlarını oturum üst bilgileri veya geri dönüş politikası için ayarlamak istemesi durumunda                     |
-| 24  | `formatApiKey`                    | Kimlik doğrulama profili biçimlendiricisi: kaydedilmiş profil, çalışma zamanındaki `apiKey` dizesine dönüşür | Sağlayıcı ek kimlik doğrulama meta verisi saklıyorsa ve özel bir çalışma zamanı belirteci biçimine ihtiyaç duyuyorsa                      |
-| 25  | `refreshOAuth`                    | Özel yenileme uç noktaları veya yenileme-hatası politikası için OAuth yenilemesini geçersiz kılar             | Sağlayıcı paylaşılan `pi-ai` yenileyicilerine uymuyorsa                                                                                     |
-| 26  | `buildAuthDoctorHint`             | OAuth yenilemesi başarısız olduğunda eklenen onarım ipucu                                                      | Sağlayıcının yenileme hatasından sonra sağlayıcıya ait kimlik doğrulama onarım yönlendirmesine ihtiyacı varsa                             |
-| 27  | `matchesContextOverflowError`     | Sağlayıcıya ait bağlam penceresi taşması eşleyicisi                                                            | Sağlayıcının genel sezgilerin kaçıracağı ham taşma hataları varsa                                                                           |
-| 28  | `classifyFailoverReason`          | Sağlayıcıya ait yük devri nedeni sınıflandırması                                                               | Sağlayıcının ham API/aktarım hatalarını hız sınırı/aşırı yük/vb. nedenlere eşleyebilmesi durumunda                                        |
-| 29  | `isCacheTtlEligible`              | Ara sunucu/arka taşıma sağlayıcıları için istem önbelleği politikası                                           | Sağlayıcının ara sunucuya özgü önbellek TTL geçitlemesine ihtiyacı varsa                                                                    |
-| 30  | `buildMissingAuthMessage`         | Genel eksik kimlik doğrulama kurtarma iletisinin yerine geçer                                                  | Sağlayıcının sağlayıcıya özgü eksik kimlik doğrulama kurtarma ipucuna ihtiyacı varsa                                                       |
-| 31  | `suppressBuiltInModel`            | Eski yukarı akış modelini bastırma ve isteğe bağlı kullanıcıya dönük hata ipucu                               | Sağlayıcının eski yukarı akış satırlarını gizlemesi veya bunları bir satıcı ipucuyla değiştirmesi gerekiyorsa                              |
-| 32  | `augmentModelCatalog`             | Keşiften sonra eklenen sentetik/nihai katalog satırları                                                        | Sağlayıcının `models list` ve seçiciler içinde sentetik ileri uyumluluk satırlarına ihtiyacı varsa                                        |
-| 33  | `isBinaryThinking`                | İkili düşünme sağlayıcıları için açık/kapalı akıl yürütme geçişi                                                | Sağlayıcı yalnızca ikili düşünme açık/kapalı desteği sunuyorsa                                                                              |
-| 34  | `supportsXHighThinking`           | Seçili modeller için `xhigh` akıl yürütme desteği                                                              | Sağlayıcı yalnızca modellerin bir alt kümesinde `xhigh` istiyorsa                                                                           |
-| 35  | `resolveDefaultThinkingLevel`     | Belirli bir model ailesi için varsayılan `/think` düzeyi                                                       | Sağlayıcı bir model ailesi için varsayılan `/think` politikasına sahipse                                                                    |
-| 36  | `isModernModelRef`                | Canlı profil filtreleri ve smoke seçimi için modern-model eşleyicisi                                           | Sağlayıcı canlı/smoke tercih edilen model eşlemesini sahipleniyorsa                                                                         |
-| 37  | `prepareRuntimeAuth`              | Çıkarımdan hemen önce yapılandırılmış bir kimlik bilgisini gerçek çalışma zamanı belirtecine/anahtarına dönüştürür | Sağlayıcının bir belirteç değişimine veya kısa ömürlü istek kimlik bilgisine ihtiyacı varsa                                                |
-| 38  | `resolveUsageAuth`                | `/usage` ve ilgili durum yüzeyleri için kullanım/faturalama kimlik bilgilerini çözümler                       | Sağlayıcının özel kullanım/kota belirteci ayrıştırmasına veya farklı bir kullanım kimlik bilgisine ihtiyacı varsa                          |
-| 39  | `fetchUsageSnapshot`              | Kimlik doğrulama çözümlendikten sonra sağlayıcıya özgü kullanım/kota anlık görüntülerini getirir ve normalleştirir | Sağlayıcının sağlayıcıya özgü bir kullanım uç noktasına veya yük ayrıştırıcısına ihtiyacı varsa                                           |
-| 40  | `createEmbeddingProvider`         | Bellek/arama için sağlayıcıya ait bir embedding bağdaştırıcısı oluşturur                                       | Bellek embedding davranışı sağlayıcı plugin’iyle birlikte bulunmalıdır                                                                      |
-| 41  | `buildReplayPolicy`               | Sağlayıcı için döküm işlemeyi denetleyen bir replay politikası döndürür                                        | Sağlayıcının özel döküm politikasına ihtiyacı varsa (örneğin, düşünme bloğu çıkarma)                                                       |
-| 42  | `sanitizeReplayHistory`           | Genel döküm temizliğinden sonra replay geçmişini yeniden yazar                                                 | Sağlayıcının paylaşılan sıkıştırma yardımcılarının ötesinde sağlayıcıya özgü replay yeniden yazımlarına ihtiyacı varsa                    |
-| 43  | `validateReplayTurns`             | Gömülü çalıştırıcıdan önce son replay turu doğrulaması veya yeniden şekillendirmesi yapar                     | Sağlayıcı aktarımının, genel temizlemeden sonra daha sıkı tur doğrulamasına ihtiyacı varsa                                                 |
-| 44  | `onModelSelected`                 | Sağlayıcıya ait seçim sonrası yan etkileri çalıştırır                                                          | Bir model etkin olduğunda sağlayıcının telemetriye veya sağlayıcıya ait duruma ihtiyacı varsa                                              |
+| 1   | `catalog`                         | `models.json` oluşturma sırasında sağlayıcı yapılandırmasını `models.providers` içine yayımlar                | Sağlayıcı bir kataloğun veya temel URL varsayılanlarının sahibiyse                                                                          |
+| 2   | `applyConfigDefaults`             | Yapılandırma somutlaştırması sırasında sağlayıcıya ait genel yapılandırma varsayılanlarını uygular            | Varsayılanlar kimlik doğrulama moduna, ortama veya sağlayıcının model ailesi semantiğine bağlıysa                                          |
+| --  | _(yerleşik model araması)_        | OpenClaw önce normal kayıt sistemi/katalog yolunu dener                                                       | _(bir eklenti kancası değil)_                                                                                                               |
+| 3   | `normalizeModelId`                | Aramadan önce eski veya önizleme model kimliği takma adlarını normalize eder                                  | Sağlayıcı, kurallı model çözümlemesinden önce takma ad temizliğinin sahibiyse                                                               |
+| 4   | `normalizeTransport`              | Genel model derlemesinden önce sağlayıcı ailesine ait `api` / `baseUrl` değerlerini normalize eder           | Sağlayıcı, aynı taşıma ailesindeki özel sağlayıcı kimlikleri için taşıma temizliğinin sahibiyse                                            |
+| 5   | `normalizeConfig`                 | Çalışma zamanı/sağlayıcı çözümlemesinden önce `models.providers.<id>` değerini normalize eder                | Sağlayıcı, eklentiyle birlikte yaşaması gereken yapılandırma temizliğine ihtiyaç duyuyorsa; paketlenmiş Google ailesi yardımcıları da desteklenen Google yapılandırma girdilerini burada destekler |
+| 6   | `applyNativeStreamingUsageCompat` | Yapılandırma sağlayıcılarına yerel akış kullanım uyumluluğu yeniden yazımlarını uygular                       | Sağlayıcı, uç nokta güdümlü yerel akış kullanım meta verisi düzeltmelerine ihtiyaç duyuyorsa                                               |
+| 7   | `resolveConfigApiKey`             | Çalışma zamanı kimlik doğrulaması yüklenmeden önce yapılandırma sağlayıcıları için ortam işaretleyici kimlik doğrulamasını çözer | Sağlayıcının, sağlayıcı sahipli ortam işaretleyici API anahtarı çözümlemesi varsa; `amazon-bedrock` burada yerleşik bir AWS ortam işaretleyici çözücüsüne de sahiptir |
+| 8   | `resolveSyntheticAuth`            | Düz metni kalıcılaştırmadan yerel/kendi barındırılan veya yapılandırma destekli kimlik doğrulamayı yüzeye çıkarır | Sağlayıcı, sentetik/yerel bir kimlik bilgisi işaretleyicisiyle çalışabiliyorsa                                                             |
+| 9   | `resolveExternalAuthProfiles`     | Sağlayıcı sahipli harici kimlik doğrulama profillerini kaplar; varsayılan `persistence`, CLI/uygulama sahipli kimlik bilgileri için `runtime-only` olur | Sağlayıcı, kopyalanmış yenileme belirteçlerini kalıcılaştırmadan harici kimlik doğrulama bilgilerini yeniden kullanıyorsa                 |
+| 10  | `shouldDeferSyntheticProfileAuth` | Saklanan sentetik profil yer tutucularını ortam/yapılandırma destekli kimlik doğrulamanın altına indirir     | Sağlayıcı, öncelik kazanmaması gereken sentetik yer tutucu profiller saklıyorsa                                                             |
+| 11  | `resolveDynamicModel`             | Henüz yerel kayıt sisteminde olmayan sağlayıcı sahipli model kimlikleri için eşzamanlı geri dönüş sağlar      | Sağlayıcı, keyfi yukarı akış model kimliklerini kabul ediyorsa                                                                              |
+| 12  | `prepareDynamicModel`             | Eşzamansız hazırlık yapar, ardından `resolveDynamicModel` yeniden çalışır                                      | Sağlayıcı, bilinmeyen kimlikleri çözümlemeden önce ağ meta verisine ihtiyaç duyuyorsa                                                       |
+| 13  | `normalizeResolvedModel`          | Gömülü çalıştırıcı çözülmüş modeli kullanmadan önce son yeniden yazımı yapar                                  | Sağlayıcı, taşıma yeniden yazımlarına ihtiyaç duyuyor ama yine de çekirdek taşımasını kullanıyorsa                                         |
+| 14  | `contributeResolvedModelCompat`   | Başka bir uyumlu taşımanın arkasındaki satıcı modelleri için uyumluluk bayrakları katkısı yapar              | Sağlayıcı, sağlayıcıyı devralmadan kendi modellerini ara sunucu taşımalarında tanıyorsa                                                    |
+| 15  | `capabilities`                    | Paylaşılan çekirdek mantığı tarafından kullanılan sağlayıcı sahipli transkript/araç meta verisi               | Sağlayıcının transkript/sağlayıcı ailesi farklılıklarına ihtiyacı varsa                                                                     |
+| 16  | `normalizeToolSchemas`            | Gömülü çalıştırıcı bunları görmeden önce araç şemalarını normalize eder                                       | Sağlayıcı, taşıma ailesi şema temizliğine ihtiyaç duyuyorsa                                                                                 |
+| 17  | `inspectToolSchemas`              | Normalize etmeden sonra sağlayıcı sahipli şema tanılarını yüzeye çıkarır                                      | Sağlayıcı, çekirdeğe sağlayıcıya özgü kurallar öğretmeden anahtar sözcük uyarıları istiyorsa                                               |
+| 18  | `resolveReasoningOutputMode`      | Yerel ve etiketli akıl yürütme-çıktısı sözleşmesi arasında seçim yapar                                        | Sağlayıcı, yerel alanlar yerine etiketli akıl yürütme/nihai çıktı istiyorsa                                                                |
+| 19  | `prepareExtraParams`              | Genel akış seçenek sarmalayıcılarından önce istek parametresi normalizasyonu yapar                            | Sağlayıcı, varsayılan istek parametrelerine veya sağlayıcı başına parametre temizliğine ihtiyaç duyuyorsa                                  |
+| 20  | `createStreamFn`                  | Normal akış yolunu özel bir taşımayla tamamen değiştirir                                                       | Sağlayıcının yalnızca bir sarmalayıcıya değil, özel bir tel protokolüne ihtiyacı varsa                                                     |
+| 21  | `wrapStreamFn`                    | Genel sarmalayıcılar uygulandıktan sonra akışı sarar                                                          | Sağlayıcı, özel taşıma olmadan istek üstbilgileri/gövdesi/model uyumluluk sarmalayıcılarına ihtiyaç duyuyorsa                             |
+| 22  | `resolveTransportTurnState`       | Yerel tur başına taşıma üstbilgilerini veya meta veriyi ekler                                                  | Sağlayıcı, genel taşımaların sağlayıcıya özgü tur kimliğini göndermesini istiyorsa                                                         |
+| 23  | `resolveWebSocketSessionPolicy`   | Yerel WebSocket üstbilgilerini veya oturum soğuma politikasını ekler                                           | Sağlayıcı, genel WS taşımalarının oturum üstbilgilerini veya geri dönüş politikasını ayarlamasını istiyorsa                               |
+| 24  | `formatApiKey`                    | Kimlik doğrulama profili biçimlendiricisi: saklanan profil, çalışma zamanı `apiKey` dizesi olur              | Sağlayıcı ek kimlik doğrulama meta verisi saklıyor ve özel bir çalışma zamanı belirteç biçimine ihtiyaç duyuyorsa                         |
+| 25  | `refreshOAuth`                    | Özel yenileme uç noktaları veya yenileme başarısızlığı politikası için OAuth yenileme geçersiz kılması       | Sağlayıcı, paylaşılan `pi-ai` yenileyicilerine uymuyorsa                                                                                   |
+| 26  | `buildAuthDoctorHint`             | OAuth yenilemesi başarısız olduğunda eklenen onarım ipucunu oluşturur                                         | Sağlayıcının yenileme başarısızlığından sonra sağlayıcı sahipli kimlik doğrulama onarım rehberliğine ihtiyacı varsa                       |
+| 27  | `matchesContextOverflowError`     | Sağlayıcı sahipli bağlam penceresi taşması eşleyicisi                                                          | Sağlayıcının, genel sezgisel yöntemlerin kaçıracağı ham taşma hataları varsa                                                               |
+| 28  | `classifyFailoverReason`          | Sağlayıcı sahipli yük devretme nedeni sınıflandırması                                                          | Sağlayıcı, ham API/taşıma hatalarını hız sınırı/aşırı yük/vb. olarak eşleyebiliyorsa                                                       |
+| 29  | `isCacheTtlEligible`              | Ara sunucu/geri taşıma sağlayıcıları için istem önbelleği politikası                                           | Sağlayıcı, ara sunucuya özgü önbellek TTL kapılamasına ihtiyaç duyuyorsa                                                                   |
+| 30  | `buildMissingAuthMessage`         | Genel eksik kimlik doğrulama kurtarma iletisinin yerine geçer                                                  | Sağlayıcının sağlayıcıya özgü bir eksik kimlik doğrulama kurtarma ipucuna ihtiyacı varsa                                                   |
+| 31  | `suppressBuiltInModel`            | Eski yukarı akış model bastırması ve isteğe bağlı kullanıcıya dönük hata ipucu                                | Sağlayıcının eski yukarı akış satırlarını gizlemesi veya bunları satıcı ipucuyla değiştirmesi gerekiyorsa                                 |
+| 32  | `augmentModelCatalog`             | Keşiften sonra eklenen sentetik/nihai katalog satırları                                                       | Sağlayıcının `models list` ve seçicilerde sentetik ileri uyumluluk satırlarına ihtiyacı varsa                                             |
+| 33  | `isBinaryThinking`                | İkili düşünme sağlayıcıları için açık/kapalı akıl yürütme geçişi                                               | Sağlayıcı yalnızca ikili düşünme aç/kapat sunuyorsa                                                                                        |
+| 34  | `supportsXHighThinking`           | Seçili modeller için `xhigh` akıl yürütme desteği                                                              | Sağlayıcı `xhigh` özelliğini yalnızca modellerin bir alt kümesinde istiyorsa                                                               |
+| 35  | `resolveDefaultThinkingLevel`     | Belirli bir model ailesi için varsayılan `/think` düzeyi                                                      | Sağlayıcı, bir model ailesi için varsayılan `/think` politikasının sahibiyse                                                               |
+| 36  | `isModernModelRef`                | Canlı profil filtreleri ve smoke seçimi için modern model eşleyicisi                                          | Sağlayıcı, canlı/smoke tercih edilen model eşlemesinin sahibiyse                                                                            |
+| 37  | `prepareRuntimeAuth`              | Çıkarımdan hemen önce yapılandırılmış bir kimlik bilgisini gerçek çalışma zamanı belirtecine/anahtarına dönüştürür | Sağlayıcının belirteç değişimine veya kısa ömürlü istek kimlik bilgisine ihtiyacı varsa                                                    |
+| 38  | `resolveUsageAuth`                | `/usage` ve ilgili durum yüzeyleri için kullanım/faturalama kimlik bilgilerini çözer                          | Sağlayıcının özel kullanım/kota belirteci ayrıştırmasına veya farklı bir kullanım kimlik bilgisine ihtiyacı varsa                         |
+| 39  | `fetchUsageSnapshot`              | Kimlik doğrulama çözüldükten sonra sağlayıcıya özgü kullanım/kota anlık görüntülerini getirir ve normalize eder | Sağlayıcının sağlayıcıya özgü bir kullanım uç noktasına veya yük ayrıştırıcısına ihtiyacı varsa                                           |
+| 40  | `createEmbeddingProvider`         | Bellek/arama için sağlayıcı sahipli bir embedding bağdaştırıcısı oluşturur                                    | Bellek embedding davranışı sağlayıcı eklentisine aitse                                                                                      |
+| 41  | `buildReplayPolicy`               | Sağlayıcı için transkript işlemeyi kontrol eden bir replay politikası döndürür                                | Sağlayıcının özel transkript politikasına ihtiyacı varsa (örneğin düşünme bloğu çıkarma)                                                  |
+| 42  | `sanitizeReplayHistory`           | Genel transkript temizliğinden sonra replay geçmişini yeniden yazar                                           | Sağlayıcının, paylaşılan sıkıştırma yardımcılarının ötesinde sağlayıcıya özgü replay yeniden yazımlarına ihtiyacı varsa                  |
+| 43  | `validateReplayTurns`             | Gömülü çalıştırıcıdan önce son replay turu doğrulamasını veya yeniden şekillendirmesini yapar                | Sağlayıcı taşımasının, genel temizlemeden sonra daha sıkı tur doğrulamasına ihtiyacı varsa                                                |
+| 44  | `onModelSelected`                 | Sağlayıcı sahipli seçim sonrası yan etkileri çalıştırır                                                       | Bir model etkin olduğunda sağlayıcının telemetriye veya sağlayıcı sahipli duruma ihtiyacı varsa                                           |
 
-`normalizeModelId`, `normalizeTransport` ve `normalizeConfig` önce
-eşleşen sağlayıcı plugin’ini denetler, ardından model kimliğini veya aktarımı/yapılandırmayı gerçekten değiştiren biri bulunana kadar
-kanca destekli diğer sağlayıcı plugin’lerine düşer. Bu, çağıranın yeniden yazımı hangi
-paketlenmiş plugin’in sahiplendiğini bilmesini gerektirmeden takma ad/uyumluluk
-sağlayıcı köprülerinin çalışmasını sağlar. Desteklenen bir Google ailesi yapılandırma girdisini
-hiçbir sağlayıcı kancası yeniden yazmazsa, paketlenmiş Google yapılandırma normalleştiricisi yine de
-bu uyumluluk temizliğini uygular.
+`normalizeModelId`, `normalizeTransport` ve `normalizeConfig` önce eşleşen
+sağlayıcı eklentisini denetler, ardından model kimliğini veya taşıma/yapılandırmayı
+gerçekten değiştiren biri bulunana kadar kanca destekli diğer sağlayıcı
+eklentilerine düşer. Bu, çağıranın hangi paketlenmiş eklentinin yeniden yazımın
+sahibi olduğunu bilmesini gerektirmeden takma ad/uyumluluk sağlayıcı sarmalayıcılarını
+çalışır tutar. Hiçbir sağlayıcı kancası desteklenen bir Google ailesi
+yapılandırma girdisini yeniden yazmazsa, paketlenmiş Google yapılandırma
+normalize edicisi yine de bu uyumluluk temizliğini uygular.
 
-Sağlayıcının tamamen özel bir kablo protokolüne veya özel bir istek yürütücüsüne ihtiyacı varsa,
-bu farklı bir uzantı sınıfıdır. Bu kancalar, hâlâ OpenClaw’ın normal
-çıkarım döngüsü üzerinde çalışan sağlayıcı davranışları içindir.
+Sağlayıcının tamamen özel bir tel protokolüne veya özel istek yürütücüsüne
+ihtiyacı varsa, bu farklı bir uzantı sınıfıdır. Bu kancalar, OpenClaw'ın normal
+çıkarım döngüsünde çalışmaya devam eden sağlayıcı davranışları içindir.
 
 ### Sağlayıcı örneği
 
@@ -773,122 +845,132 @@ api.registerProvider({
 
 ### Yerleşik örnekler
 
-- Anthropic, Claude 4.6 ileri uyumluluğuna,
-  sağlayıcı ailesi ipuçlarına, kimlik doğrulama onarım yönlendirmesine, kullanım uç noktası entegrasyonuna,
-  istem önbelleği uygunluğuna, kimlik doğrulama farkında yapılandırma varsayılanlarına, Claude
-  varsayılan/uyarlanabilir düşünme politikasına ve
-  beta üst bilgileri, `/fast` / `serviceTier` ve `context1m` için Anthropic’e özgü akış şekillendirmesine sahip olduğu için
-  `resolveDynamicModel`, `capabilities`, `buildAuthDoctorHint`,
-  `resolveUsageAuth`, `fetchUsageSnapshot`, `isCacheTtlEligible`,
+- Anthropic; Claude 4.6 ileri uyumluluğunun, sağlayıcı ailesi ipuçlarının,
+  kimlik doğrulama onarım rehberliğinin, kullanım uç noktası entegrasyonunun,
+  istem önbelleği uygunluğunun, kimlik doğrulama farkındalıklı yapılandırma
+  varsayılanlarının, Claude varsayılan/uyarlamalı düşünme politikasının ve beta
+  üstbilgileri, `/fast` / `serviceTier` ve `context1m` için Anthropic'e özgü
+  akış şekillendirmenin sahibi olduğu için `resolveDynamicModel`,
+  `capabilities`, `buildAuthDoctorHint`, `resolveUsageAuth`,
+  `fetchUsageSnapshot`, `isCacheTtlEligible`,
   `resolveDefaultThinkingLevel`, `applyConfigDefaults`, `isModernModelRef`
   ve `wrapStreamFn` kullanır.
-- Anthropic’in Claude’a özgü akış yardımcıları şimdilik
-  paketlenmiş plugin’in kendi genel `api.ts` / `contract-api.ts` yüzeyinde kalır. Bu paket yüzeyi,
-  genel SDK’yı tek bir sağlayıcının beta üst bilgisi kuralları etrafında genişletmek yerine
-  `wrapAnthropicProviderStream`, `resolveAnthropicBetas`,
-  `resolveAnthropicFastMode`, `resolveAnthropicServiceTier` ve daha alt düzey
-  Anthropic sarmalayıcı oluşturucularını dışa aktarır.
-- OpenAI, GPT-5.4 ileri uyumluluğuna, doğrudan OpenAI
-  `openai-completions` -> `openai-responses` normalleştirmesine, Codex farkında kimlik doğrulama
-  ipuçlarına, Spark bastırmasına, sentetik OpenAI liste satırlarına ve GPT-5 düşünme /
-  canlı model politikasına sahip olduğu için `resolveDynamicModel`, `normalizeResolvedModel` ve
-  `capabilities` ile birlikte `buildMissingAuthMessage`, `suppressBuiltInModel`,
+- Anthropic'in Claude'a özgü akış yardımcıları şimdilik paketlenmiş
+  eklentinin kendi genel `api.ts` / `contract-api.ts` bağlantı yüzeyinde
+  kalır. Bu paket yüzeyi, genel SDK'yı tek bir sağlayıcının beta-üstbilgi
+  kuralları etrafında genişletmek yerine `wrapAnthropicProviderStream`,
+  `resolveAnthropicBetas`, `resolveAnthropicFastMode`,
+  `resolveAnthropicServiceTier` ve daha alt düzey Anthropic sarmalayıcı
+  oluşturucularını dışa aktarır.
+- OpenAI; GPT-5.4 ileri uyumluluğunun, doğrudan OpenAI
+  `openai-completions` -> `openai-responses` normalizasyonunun, Codex farkındalıklı
+  kimlik doğrulama ipuçlarının, Spark bastırmasının, sentetik OpenAI liste
+  satırlarının ve GPT-5 düşünme / canlı model politikasının sahibi olduğu için
+  `resolveDynamicModel`, `normalizeResolvedModel` ve `capabilities` ile birlikte
+  `buildMissingAuthMessage`, `suppressBuiltInModel`,
   `augmentModelCatalog`, `supportsXHighThinking` ve `isModernModelRef`
-  kullanır; `openai-responses-defaults` akış ailesi ise
-  ilişkilendirme üst bilgileri, `/fast`/`serviceTier`, metin ayrıntı düzeyi, yerel Codex web araması,
-  akıl yürütme uyumluluğu yük şekillendirmesi ve Responses bağlam yönetimi için
-  paylaşılan yerel OpenAI Responses sarmalayıcılarına sahiptir.
-- OpenRouter, sağlayıcı geçişli olduğu ve OpenClaw’ın statik kataloğu güncellenmeden önce yeni
-  model kimliklerini açığa çıkarabildiği için `catalog` ile birlikte
-  `resolveDynamicModel` ve `prepareDynamicModel` kullanır; ayrıca
-  sağlayıcıya özgü istek üst bilgilerini, yönlendirme meta verilerini, akıl yürütme yamalarını ve
-  istem önbelleği politikasını çekirdeğin dışında tutmak için
-  `capabilities`, `wrapStreamFn` ve `isCacheTtlEligible` kullanır. Replay politikası
-  `passthrough-gemini` ailesinden gelirken, `openrouter-thinking` akış ailesi
-  ara sunucu akıl yürütme eklemesine ve desteklenmeyen model / `auto` atlamalarına sahiptir.
-- GitHub Copilot, sağlayıcıya ait cihazla giriş, model geri dönüş davranışı, Claude döküm
-  tuhaflıkları, GitHub belirteci -> Copilot belirteci değişimi ve sağlayıcıya ait
-  kullanım uç noktasına ihtiyaç duyduğu için `catalog`, `auth`, `resolveDynamicModel` ve
-  `capabilities` ile birlikte `prepareRuntimeAuth` ve `fetchUsageSnapshot` kullanır.
-- OpenAI Codex, hâlâ çekirdek OpenAI aktarımları üzerinde çalışsa da aktarım/temel URL
-  normalleştirmesine, OAuth yenileme geri dönüş politikasına, varsayılan aktarım seçimine,
-  sentetik Codex katalog satırlarına ve ChatGPT kullanım uç noktası entegrasyonuna sahip olduğu için
-  `catalog`, `resolveDynamicModel`,
-  `normalizeResolvedModel`, `refreshOAuth` ve `augmentModelCatalog` ile birlikte
-  `prepareExtraParams`, `resolveUsageAuth` ve `fetchUsageSnapshot` kullanır;
-  doğrudan OpenAI ile aynı `openai-responses-defaults` akış ailesini paylaşır.
-- Google AI Studio ve Gemini CLI OAuth,
-  `google-gemini` replay ailesi Gemini 3.1 ileri uyumluluk geri dönüşüne,
-  yerel Gemini replay doğrulamasına, önyükleme replay temizliğine, etiketli
-  akıl yürütme çıktı moduna ve modern-model eşlemesine sahip olduğu için
-  `resolveDynamicModel`,
+  kullanır; `openai-responses-defaults` akış ailesi ise ilişkilendirme
+  üstbilgileri, `/fast`/`serviceTier`, metin ayrıntı düzeyi, yerel Codex web
+  araması, akıl yürütme uyumluluk yük şekillendirmesi ve Responses bağlam
+  yönetimi için paylaşılan yerel OpenAI Responses sarmalayıcılarının sahibidir.
+- OpenRouter; sağlayıcı geçişli olduğu ve OpenClaw'ın statik kataloğu
+  güncellenmeden önce yeni model kimlikleri sunabildiği için `catalog` ile
+  birlikte `resolveDynamicModel` ve `prepareDynamicModel` kullanır; ayrıca
+  sağlayıcıya özgü istek üstbilgilerini, yönlendirme meta verilerini, akıl
+  yürütme yamalarını ve istem önbelleği politikasını çekirdek dışında tutmak
+  için `capabilities`, `wrapStreamFn` ve `isCacheTtlEligible` de kullanır.
+  Replay politikası `passthrough-gemini` ailesinden gelirken,
+  `openrouter-thinking` akış ailesi ara sunucu akıl yürütme eklemesinin ve
+  desteklenmeyen model / `auto` atlamalarının sahibidir.
+- GitHub Copilot; sağlayıcı sahipli cihaz oturum açmasına, model geri dönüş
+  davranışına, Claude transkript farklılıklarına, GitHub belirteci -> Copilot
+  belirteci değişimine ve sağlayıcı sahipli kullanım uç noktasına ihtiyaç
+  duyduğu için `catalog`, `auth`, `resolveDynamicModel` ve `capabilities` ile
+  birlikte `prepareRuntimeAuth` ve `fetchUsageSnapshot` kullanır.
+- OpenAI Codex; hâlâ çekirdek OpenAI taşımaları üzerinde çalışmasına rağmen
+  taşıma/temel URL normalizasyonunun, OAuth yenileme geri dönüş politikasının,
+  varsayılan taşıma seçiminin, sentetik Codex katalog satırlarının ve ChatGPT
+  kullanım uç noktası entegrasyonunun sahibi olduğu için `catalog`,
+  `resolveDynamicModel`, `normalizeResolvedModel`, `refreshOAuth` ve
+  `augmentModelCatalog` ile birlikte `prepareExtraParams`,
+  `resolveUsageAuth` ve `fetchUsageSnapshot` kullanır; doğrudan OpenAI ile aynı
+  `openai-responses-defaults` akış ailesini paylaşır.
+- Google AI Studio ve Gemini CLI OAuth; `google-gemini` replay ailesi Gemini 3.1
+  ileri uyumluluk geri dönüşünün, yerel Gemini replay doğrulamasının, önyükleme
+  replay temizliğinin, etiketli akıl yürütme-çıktısı modunun ve modern-model
+  eşlemenin sahibi olduğu için `resolveDynamicModel`,
   `buildReplayPolicy`, `sanitizeReplayHistory`,
-  `resolveReasoningOutputMode`, `wrapStreamFn` ve `isModernModelRef` kullanır;
-  `google-thinking` akış ailesi ise Gemini düşünme yükü normalleştirmesine sahiptir;
-  Gemini CLI OAuth ayrıca belirteç biçimlendirme, belirteç ayrıştırma ve kota uç noktası
-  bağlantısı için `formatApiKey`, `resolveUsageAuth` ve
-  `fetchUsageSnapshot` kullanır.
-- Anthropic Vertex, Claude’a özgü replay temizliğinin her `anthropic-messages` aktarımı yerine
-  yalnızca Claude kimlikleriyle sınırlı kalması için
-  `anthropic-by-model` replay ailesi üzerinden `buildReplayPolicy` kullanır.
-- Amazon Bedrock, Anthropic-on-Bedrock trafiği için
-  Bedrock’a özgü kısma/hazır değil/bağlam taşması hata sınıflandırmasına sahip olduğu için
-  `buildReplayPolicy`, `matchesContextOverflowError`,
-  `classifyFailoverReason` ve `resolveDefaultThinkingLevel` kullanır;
-  replay politikası ise yine aynı
-  yalnızca Claude’a özel `anthropic-by-model` korumasını paylaşır.
-- OpenRouter, Kilocode, Opencode ve Opencode Go, Gemini
-  modellerini OpenAI uyumlu aktarımlar üzerinden ara sunucuya yönlendirdikleri ve
-  yerel Gemini replay doğrulaması veya önyükleme yeniden yazımları olmadan Gemini
-  düşünce-imzası temizliğine ihtiyaç duydukları için
-  `passthrough-gemini` replay ailesi üzerinden `buildReplayPolicy` kullanır.
-- MiniMax, bir sağlayıcı hem Anthropic-message hem de OpenAI uyumlu semantiğe sahip olduğu için
-  `hybrid-anthropic-openai` replay ailesi üzerinden `buildReplayPolicy`
-  kullanır; Anthropic tarafında yalnızca Claude’a özgü
-  düşünme bloğu bırakmayı korurken akıl yürütme çıktı modunu yeniden yerel moda döndürür
-  ve `minimax-fast-mode` akış ailesi paylaşılan akış yolundaki
-  hızlı mod model yeniden yazımlarına sahiptir.
-- Moonshot, hâlâ paylaşılan
-  OpenAI aktarımını kullandığı ancak sağlayıcıya ait düşünme yükü normalleştirmesine ihtiyaç duyduğu için
-  `catalog` ile birlikte `wrapStreamFn` kullanır; `moonshot-thinking` akış ailesi
-  yapılandırma ile `/think` durumunu kendi yerel ikili düşünme yüküne eşler.
-- Kilocode, sağlayıcıya ait istek üst bilgilerine,
-  akıl yürütme yükü normalleştirmesine, Gemini döküm ipuçlarına ve Anthropic
-  önbellek-TTL geçitlemesine ihtiyaç duyduğu için `catalog`, `capabilities`, `wrapStreamFn` ve
-  `isCacheTtlEligible` kullanır; `kilocode-thinking` akış ailesi
-  Kilo düşünme eklemesini, açık akıl yürütme yüklerini desteklemeyen `kilo/auto` ve
-  diğer ara sunucu model kimliklerini atlarken, paylaşılan ara sunucu akış yolunda tutar.
-- Z.AI, GLM-5 geri dönüşüne,
-  `tool_stream` varsayılanlarına, ikili düşünme UX’ine, modern-model eşlemesine ve hem
-  kullanım kimlik doğrulaması hem de kota getirmeye sahip olduğu için `resolveDynamicModel`, `prepareExtraParams`, `wrapStreamFn`,
-  `isCacheTtlEligible`, `isBinaryThinking`, `isModernModelRef`,
+  `resolveReasoningOutputMode`, `wrapStreamFn` ve `isModernModelRef`
+  kullanır; `google-thinking` akış ailesi ise Gemini düşünme yükü
+  normalizasyonunun sahibidir; Gemini CLI OAuth ayrıca belirteç biçimlendirme,
+  belirteç ayrıştırma ve kota uç noktası bağlantısı için `formatApiKey`,
+  `resolveUsageAuth` ve `fetchUsageSnapshot` kullanır.
+- Anthropic Vertex, Claude'a özgü replay temizliği her
+  `anthropic-messages` taşımasına değil yalnızca Claude kimliklerine özel
+  kalsın diye `anthropic-by-model` replay ailesi üzerinden `buildReplayPolicy`
+  kullanır.
+- Amazon Bedrock; Anthropic-on-Bedrock trafiği için Bedrock'a özgü
+  throttling/hazır değil/bağlam taşması hata sınıflandırmasının sahibi olduğu
+  için `buildReplayPolicy`, `matchesContextOverflowError`,
+  `classifyFailoverReason` ve `resolveDefaultThinkingLevel` kullanır; replay
+  politikası yine de aynı yalnızca-Claude `anthropic-by-model` korumasını
+  paylaşır.
+- OpenRouter, Kilocode, Opencode ve Opencode Go; Gemini modellerini
+  OpenAI uyumlu taşımalar üzerinden ara sunucuya koydukları ve yerel Gemini
+  replay doğrulaması veya önyükleme yeniden yazımları olmadan Gemini
+  thought-signature temizliğine ihtiyaç duydukları için `passthrough-gemini`
+  replay ailesi üzerinden `buildReplayPolicy` kullanır.
+- MiniMax; bir sağlayıcı hem Anthropic-message hem de OpenAI uyumlu
+  semantiklerin sahibi olduğu için `hybrid-anthropic-openai` replay ailesi
+  üzerinden `buildReplayPolicy` kullanır; Anthropic tarafında yalnızca-Claude
+  thinking-block bırakmayı sürdürürken akıl yürütme çıktı modunu yeniden yerel
+  moda geçersiz kılar ve `minimax-fast-mode` akış ailesi, paylaşılan akış
+  yolunda fast-mode model yeniden yazımlarının sahibidir.
+- Moonshot; hâlâ paylaşılan OpenAI taşımasını kullanmasına rağmen sağlayıcı
+  sahipli düşünme yükü normalizasyonuna ihtiyaç duyduğu için `catalog` ile
+  birlikte `wrapStreamFn` kullanır; `moonshot-thinking` akış ailesi yapılandırma
+  ile `/think` durumunu kendi yerel ikili düşünme yüküne eşler.
+- Kilocode; sağlayıcı sahipli istek üstbilgilerine, akıl yürütme yükü
+  normalizasyonuna, Gemini transkript ipuçlarına ve Anthropic önbellek-TTL
+  kapılamasına ihtiyaç duyduğu için `catalog`, `capabilities`, `wrapStreamFn`
+  ve `isCacheTtlEligible` kullanır; `kilocode-thinking` akış ailesi ise açık
+  akıl yürütme yüklerini desteklemeyen `kilo/auto` ve diğer ara sunucu model
+  kimliklerini atlarken paylaşılan ara sunucu akış yolunda Kilo düşünme
+  eklemesini tutar.
+- Z.AI; GLM-5 geri dönüşünün, `tool_stream` varsayılanlarının, ikili düşünme UX'inin,
+  modern model eşlemesinin ve hem kullanım kimlik doğrulaması hem kota getirme
+  davranışının sahibi olduğu için `resolveDynamicModel`, `prepareExtraParams`,
+  `wrapStreamFn`, `isCacheTtlEligible`, `isBinaryThinking`, `isModernModelRef`,
   `resolveUsageAuth` ve `fetchUsageSnapshot` kullanır; `tool-stream-default-on`
-  akış ailesi varsayılan açık `tool_stream` sarmalayıcısını
-  sağlayıcı başına el yazımı yapıştırıcıların dışında tutar.
-- xAI, yerel xAI Responses aktarım normalleştirmesine, Grok hızlı mod
-  takma ad yeniden yazımlarına, varsayılan `tool_stream` ayarına, sıkı araç / akıl yürütme yükü
-  temizliğine, plugin’e ait araçlar için geri dönüş kimlik doğrulama yeniden kullanımına, ileri uyumlu Grok
-  model çözümlemesine ve xAI araç şeması
-  profili, desteklenmeyen şema anahtar sözcükleri, yerel `web_search` ve HTML varlığı
-  araç çağrısı bağımsız değişken çözümleme gibi sağlayıcıya ait uyumluluk yamalarına sahip olduğu için
+  akış ailesi varsayılan açık `tool_stream` sarmalayıcısını sağlayıcı başına
+  el yazımı yapıştırıcı koddan uzak tutar.
+- xAI; yerel xAI Responses taşıma normalizasyonunun, Grok fast-mode takma ad
+  yeniden yazımlarının, varsayılan `tool_stream` davranışının, strict-tool /
+  reasoning-payload temizliğinin, eklenti sahipli araçlar için geri dönüş kimlik
+  doğrulama yeniden kullanımının, ileri uyumlu Grok model çözümlemesinin ve
+  xAI araç-şema profili, desteklenmeyen şema anahtar sözcükleri, yerel
+  `web_search` ve HTML varlığı araç çağrısı bağımsız değişkeni çözme gibi
+  sağlayıcı sahipli uyumluluk yamalarının sahibi olduğu için
   `normalizeResolvedModel`, `normalizeTransport`,
   `contributeResolvedModelCompat`, `prepareExtraParams`, `wrapStreamFn`,
   `resolveSyntheticAuth`, `resolveDynamicModel` ve `isModernModelRef`
   kullanır.
-- Mistral, OpenCode Zen ve OpenCode Go, döküm/araç tuhaflıklarını çekirdeğin dışında tutmak için yalnızca `capabilities` kullanır.
-- `byteplus`, `cloudflare-ai-gateway`,
-  `huggingface`, `kimi-coding`, `nvidia`, `qianfan`,
-  `synthetic`, `together`, `venice`, `vercel-ai-gateway` ve `volcengine` gibi yalnızca katalog kullanan paketlenmiş sağlayıcılar
+- Mistral, OpenCode Zen ve OpenCode Go, transkript/araç farklılıklarını
+  çekirdek dışında tutmak için yalnızca `capabilities` kullanır.
+- `byteplus`, `cloudflare-ai-gateway`, `huggingface`, `kimi-coding`, `nvidia`,
+  `qianfan`, `synthetic`, `together`, `venice`, `vercel-ai-gateway` ve
+  `volcengine` gibi yalnızca katalog kullanan paketlenmiş sağlayıcılar
   yalnızca `catalog` kullanır.
-- Qwen, metin sağlayıcısı için `catalog` ile birlikte çok modlu yüzeyleri için
-  paylaşılan medya-anlama ve video-oluşturma kayıtlarını kullanır.
-- MiniMax ve Xiaomi, çıkarım hâlâ paylaşılan
-  aktarımlar üzerinden çalışsa da `/usage`
-  davranışları plugin’e ait olduğu için `catalog` ile birlikte kullanım kancalarını kullanır.
+- Qwen, metin sağlayıcısı için `catalog` ile birlikte çok kipli yüzeyleri için
+  paylaşılan medya-anlama ve video-oluşturma kayıtları kullanır.
+- MiniMax ve Xiaomi, çıkarım hâlâ paylaşılan taşımalar üzerinden çalışsa da
+  `/usage` davranışları eklenti sahipli olduğu için `catalog` ile birlikte
+  kullanım kancaları kullanır.
 
 ## Çalışma zamanı yardımcıları
 
-Plugin’ler, seçilmiş çekirdek yardımcılarına `api.runtime` üzerinden erişebilir. TTS için:
+Eklentiler, seçili çekirdek yardımcılarına `api.runtime` aracılığıyla
+erişebilir. TTS için:
 
 ```ts
 const clip = await api.runtime.tts.textToSpeech({
@@ -909,14 +991,19 @@ const voices = await api.runtime.tts.listVoices({
 
 Notlar:
 
-- `textToSpeech`, dosya/sesli not yüzeyleri için normal çekirdek TTS çıktı yükünü döndürür.
+- `textToSpeech`, dosya/sesli not yüzeyleri için normal çekirdek TTS çıktı
+  yükünü döndürür.
 - Çekirdek `messages.tts` yapılandırmasını ve sağlayıcı seçimini kullanır.
-- PCM ses arabelleği + örnekleme hızı döndürür. Plugin’ler sağlayıcılar için yeniden örnekleme/kodlama yapmalıdır.
-- `listVoices`, sağlayıcı başına isteğe bağlıdır. Bunu satıcıya ait ses seçicileri veya kurulum akışları için kullanın.
-- Ses listeleri, sağlayıcı farkında seçiciler için yerel ayar, cinsiyet ve kişilik etiketleri gibi daha zengin meta veriler içerebilir.
-- Bugün telefon desteğini OpenAI ve ElevenLabs sağlar. Microsoft sağlamaz.
+- PCM ses arabelleği + örnekleme hızı döndürür. Eklentiler sağlayıcılar için
+  yeniden örnekleme/kodlama yapmalıdır.
+- `listVoices`, sağlayıcı başına isteğe bağlıdır. Bunu satıcı sahipli ses
+  seçicileri veya kurulum akışları için kullanın.
+- Ses listeleri, sağlayıcı farkındalıklı seçiciler için yerel ayar,
+  cinsiyet ve kişilik etiketleri gibi daha zengin meta veriler içerebilir.
+- OpenAI ve ElevenLabs bugün telefon desteği sunar. Microsoft sunmaz.
 
-Plugin’ler ayrıca `api.registerSpeechProvider(...)` üzerinden konuşma sağlayıcıları kaydedebilir.
+Eklentiler ayrıca `api.registerSpeechProvider(...)` aracılığıyla konuşma
+sağlayıcıları da kaydedebilir.
 
 ```ts
 api.registerSpeechProvider({
@@ -937,13 +1024,13 @@ api.registerSpeechProvider({
 Notlar:
 
 - TTS politikasını, geri dönüşü ve yanıt teslimini çekirdekte tutun.
-- Satıcıya ait sentez davranışı için konuşma sağlayıcılarını kullanın.
-- Eski Microsoft `edge` girdisi `microsoft` sağlayıcı kimliğine normalleştirilir.
-- Tercih edilen sahiplik modeli şirket odaklıdır: OpenClaw bu
-  yetenek sözleşmelerini ekledikçe, tek bir satıcı plugin’i
-  metin, konuşma, görsel ve gelecekteki medya sağlayıcılarına sahip olabilir.
+- Satıcı sahipli sentez davranışı için konuşma sağlayıcılarını kullanın.
+- Eski Microsoft `edge` girdisi `microsoft` sağlayıcı kimliğine normalize edilir.
+- Tercih edilen sahiplik modeli şirket odaklıdır: tek bir satıcı eklentisi,
+  OpenClaw bu yetenek sözleşmelerini ekledikçe metin, konuşma, görsel ve
+  gelecekteki medya sağlayıcılarının sahibi olabilir.
 
-Görsel/ses/video anlama için plugin’ler, genel bir anahtar/değer torbası yerine
+Görsel/ses/video anlama için eklentiler genel bir anahtar/değer torbası yerine
 tek bir türlenmiş medya-anlama sağlayıcısı kaydeder:
 
 ```ts
@@ -958,16 +1045,17 @@ api.registerMediaUnderstandingProvider({
 
 Notlar:
 
-- Orkestrasyonu, geri dönüşü, yapılandırmayı ve kanal bağlantısını çekirdekte tutun.
-- Satıcı davranışını sağlayıcı plugin’inde tutun.
-- Artımlı genişleme türlenmiş kalmalıdır: yeni isteğe bağlı yöntemler, yeni isteğe bağlı
-  sonuç alanları, yeni isteğe bağlı yetenekler.
+- Orkestrasyonu, geri dönüşü, yapılandırmayı ve kanal bağlantılarını
+  çekirdekte tutun.
+- Satıcı davranışını sağlayıcı eklentisinde tutun.
+- Toplamsal genişleme türlenmiş kalmalıdır: yeni isteğe bağlı yöntemler, yeni
+  isteğe bağlı sonuç alanları, yeni isteğe bağlı yetenekler.
 - Video oluşturma zaten aynı deseni izler:
-  - çekirdek yetenek sözleşmesine ve çalışma zamanı yardımcısına sahiptir
-  - satıcı plugin’leri `api.registerVideoGenerationProvider(...)` kaydeder
-  - özellik/kanal plugin’leri `api.runtime.videoGeneration.*` kullanır
+  - çekirdek yetenek sözleşmesinin ve çalışma zamanı yardımcısının sahibidir
+  - satıcı eklentileri `api.registerVideoGenerationProvider(...)` kaydeder
+  - özellik/kanal eklentileri `api.runtime.videoGeneration.*` tüketir
 
-Medya-anlama çalışma zamanı yardımcıları için plugin’ler şunları çağırabilir:
+Medya-anlama çalışma zamanı yardımcıları için eklentiler şunları çağırabilir:
 
 ```ts
 const image = await api.runtime.mediaUnderstanding.describeImageFile({
@@ -982,27 +1070,31 @@ const video = await api.runtime.mediaUnderstanding.describeVideoFile({
 });
 ```
 
-Ses yazıya dökme için plugin’ler medya-anlama çalışma zamanını
-veya eski STT takma adını kullanabilir:
+Ses yazıya dökümü için eklentiler ya medya-anlama çalışma zamanını ya da eski
+STT takma adını kullanabilir:
 
 ```ts
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  // MIME güvenilir şekilde çıkarılamadığında isteğe bağlıdır:
+  // Optional when MIME cannot be inferred reliably:
   mime: "audio/ogg",
 });
 ```
 
 Notlar:
 
-- `api.runtime.mediaUnderstanding.*`,
-  görsel/ses/video anlama için tercih edilen paylaşılan yüzeydir.
-- Çekirdek medya-anlama ses yapılandırmasını (`tools.media.audio`) ve sağlayıcı geri dönüş sırasını kullanır.
-- Yazıya dökme çıktısı üretilmediğinde `{ text: undefined }` döndürür (örneğin, atlanan/desteklenmeyen girdi).
-- `api.runtime.stt.transcribeAudioFile(...)` bir uyumluluk takma adı olarak kalır.
+- `api.runtime.mediaUnderstanding.*`, görsel/ses/video anlama için tercih edilen
+  paylaşılan yüzeydir.
+- Çekirdek medya-anlama ses yapılandırmasını (`tools.media.audio`) ve sağlayıcı
+  geri dönüş sırasını kullanır.
+- Yazıya döküm çıktısı üretilmediğinde `{ text: undefined }` döndürür
+  (örneğin atlanan/desteklenmeyen girdi).
+- `api.runtime.stt.transcribeAudioFile(...)` bir uyumluluk takma adı olarak
+  kalır.
 
-Plugin’ler ayrıca `api.runtime.subagent` üzerinden arka plan alt ajan çalıştırmaları başlatabilir:
+Eklentiler ayrıca `api.runtime.subagent` aracılığıyla arka plan alt ajan
+çalıştırmaları başlatabilir:
 
 ```ts
 const result = await api.runtime.subagent.run({
@@ -1016,14 +1108,21 @@ const result = await api.runtime.subagent.run({
 
 Notlar:
 
-- `provider` ve `model`, kalıcı oturum değişiklikleri değil, çalıştırma başına isteğe bağlı geçersiz kılmalardır.
-- OpenClaw bu geçersiz kılma alanlarını yalnızca güvenilir çağıranlar için dikkate alır.
-- Plugin’e ait geri dönüş çalıştırmaları için operatörlerin `plugins.entries.<id>.subagent.allowModelOverride: true` ile açıkça izin vermesi gerekir.
-- Güvenilir plugin’leri belirli kanonik `provider/model` hedefleriyle sınırlamak için `plugins.entries.<id>.subagent.allowedModels` kullanın veya herhangi bir hedefe açıkça izin vermek için `"*"` kullanın.
-- Güvenilmeyen plugin alt ajan çalıştırmaları yine de çalışır, ancak geçersiz kılma istekleri sessizce geri dönmek yerine reddedilir.
+- `provider` ve `model`, kalıcı oturum değişiklikleri değil, çalışma başına
+  geçersiz kılmalardır.
+- OpenClaw bu geçersiz kılma alanlarını yalnızca güvenilir çağıranlar için
+  dikkate alır.
+- Eklenti sahipli geri dönüş çalıştırmaları için operatörlerin
+  `plugins.entries.<id>.subagent.allowModelOverride: true` ile açıkça izin
+  vermesi gerekir.
+- Güvenilir eklentileri belirli kurallı `provider/model` hedefleriyle
+  sınırlamak için `plugins.entries.<id>.subagent.allowedModels` veya herhangi
+  bir hedefe açıkça izin vermek için `"*"` kullanın.
+- Güvenilmeyen eklenti alt ajan çalıştırmaları yine de çalışır, ancak geçersiz
+  kılma istekleri sessizce geri düşmek yerine reddedilir.
 
-Web araması için plugin’ler, ajan araç bağlantısına
-erişmek yerine paylaşılan çalışma zamanı yardımcısını kullanabilir:
+Web arama için eklentiler, ajan araç bağlantısına erişmek yerine paylaşılan
+çalışma zamanı yardımcısını tüketebilir:
 
 ```ts
 const providers = api.runtime.webSearch.listProviders({
@@ -1039,14 +1138,17 @@ const result = await api.runtime.webSearch.search({
 });
 ```
 
-Plugin’ler ayrıca
-`api.registerWebSearchProvider(...)` üzerinden web arama sağlayıcıları kaydedebilir.
+Eklentiler ayrıca `api.registerWebSearchProvider(...)` aracılığıyla web arama
+sağlayıcıları da kaydedebilir.
 
 Notlar:
 
-- Sağlayıcı seçimini, kimlik bilgisi çözümlemesini ve paylaşılan istek semantiğini çekirdekte tutun.
-- Satıcıya özgü arama aktarımları için web arama sağlayıcılarını kullanın.
-- `api.runtime.webSearch.*`, arama davranışına ajan araç sarmalayıcısına bağımlı olmadan ihtiyaç duyan özellik/kanal plugin’leri için tercih edilen paylaşılan yüzeydir.
+- Sağlayıcı seçimini, kimlik bilgisi çözümlemesini ve paylaşılan istek
+  semantiğini çekirdekte tutun.
+- Satıcıya özgü arama taşımaları için web arama sağlayıcılarını kullanın.
+- `api.runtime.webSearch.*`, ajan araç sarmalayıcısına bağımlı olmadan arama
+  davranışına ihtiyaç duyan özellik/kanal eklentileri için tercih edilen
+  paylaşılan yüzeydir.
 
 ### `api.runtime.imageGeneration`
 
@@ -1061,12 +1163,14 @@ const providers = api.runtime.imageGeneration.listProviders({
 });
 ```
 
-- `generate(...)`: yapılandırılmış görsel oluşturma sağlayıcı zincirini kullanarak bir görsel oluşturur.
-- `listProviders(...)`: kullanılabilir görsel oluşturma sağlayıcılarını ve yeteneklerini listeler.
+- `generate(...)`: yapılandırılmış görsel oluşturma sağlayıcı zincirini
+  kullanarak bir görsel oluşturur.
+- `listProviders(...)`: kullanılabilir görsel oluşturma sağlayıcılarını ve
+  yeteneklerini listeler.
 
-## Gateway HTTP rotaları
+## Gateway HTTP yolları
 
-Plugin’ler `api.registerHttpRoute(...)` ile HTTP uç noktaları sunabilir.
+Eklentiler `api.registerHttpRoute(...)` ile HTTP uç noktaları sunabilir.
 
 ```ts
 api.registerHttpRoute({
@@ -1081,37 +1185,55 @@ api.registerHttpRoute({
 });
 ```
 
-Rota alanları:
+Yol alanları:
 
-- `path`: gateway HTTP sunucusu altındaki rota yolu.
-- `auth`: gereklidir. Normal gateway kimlik doğrulamasını gerektirmek için `"gateway"` veya plugin tarafından yönetilen kimlik doğrulama/webhook doğrulaması için `"plugin"` kullanın.
-- `match`: isteğe bağlıdır. `"exact"` (varsayılan) veya `"prefix"`.
-- `replaceExisting`: isteğe bağlıdır. Aynı plugin’in kendi mevcut rota kaydını değiştirmesine izin verir.
-- `handler`: rota isteği işlediyse `true` döndürmelidir.
+- `path`: gateway HTTP sunucusu altındaki yol yolu.
+- `auth`: zorunlu. Normal gateway kimlik doğrulaması gerektirmek için `"gateway"`
+  veya eklenti tarafından yönetilen kimlik doğrulama/webhook doğrulaması için
+  `"plugin"` kullanın.
+- `match`: isteğe bağlı. `"exact"` (varsayılan) veya `"prefix"`.
+- `replaceExisting`: isteğe bağlı. Aynı eklentinin kendi mevcut yol kaydını
+  değiştirmesine izin verir.
+- `handler`: yol isteği işlediğinde `true` döndürün.
 
 Notlar:
 
-- `api.registerHttpHandler(...)` kaldırılmıştır ve plugin yükleme hatasına neden olur. Bunun yerine `api.registerHttpRoute(...)` kullanın.
-- Plugin rotaları `auth` değerini açıkça bildirmelidir.
-- Kesin `path + match` çakışmaları, `replaceExisting: true` olmadıkça reddedilir ve bir plugin başka bir plugin’in rotasını değiştiremez.
-- Farklı `auth` düzeylerine sahip çakışan rotalar reddedilir. `exact`/`prefix` ardışık geçiş zincirlerini yalnızca aynı kimlik doğrulama düzeyinde tutun.
-- `auth: "plugin"` rotaları operatör çalışma zamanı kapsamlarını otomatik olarak almaz. Bunlar ayrıcalıklı Gateway yardımcı çağrıları için değil, plugin tarafından yönetilen webhook’lar/imza doğrulaması içindir.
-- `auth: "gateway"` rotaları bir Gateway istek çalışma zamanı kapsamı içinde çalışır, ancak bu kapsam kasıtlı olarak temkinlidir:
-  - paylaşılan gizli taşıyıcı kimlik doğrulaması (`gateway.auth.mode = "token"` / `"password"`), çağıran `x-openclaw-scopes` gönderse bile plugin-rotası çalışma zamanı kapsamlarını `operator.write` değerine sabitler
-  - güvenilir kimlik taşıyan HTTP kipleri (örneğin `trusted-proxy` veya özel bir girişte `gateway.auth.mode = "none"`), `x-openclaw-scopes` yalnızca üst bilgi açıkça mevcutsa dikkate alır
-  - bu kimlik taşıyan plugin-rotası isteklerinde `x-openclaw-scopes` yoksa, çalışma zamanı kapsamı `operator.write` değerine geri döner
-- Pratik kural: gateway kimlik doğrulamalı bir plugin rotasının örtük bir yönetici yüzeyi olduğunu varsaymayın. Rotanızın yalnızca yöneticiye özel davranışa ihtiyacı varsa, kimlik taşıyan bir kimlik doğrulama kipi gerektirin ve açık `x-openclaw-scopes` üst bilgi sözleşmesini belgelendirin.
+- `api.registerHttpHandler(...)` kaldırıldı ve eklenti yükleme hatasına neden
+  olur. Bunun yerine `api.registerHttpRoute(...)` kullanın.
+- Eklenti yolları `auth` alanını açıkça beyan etmelidir.
+- Tam `path + match` çakışmaları, `replaceExisting: true` olmadıkça reddedilir
+  ve bir eklenti başka bir eklentinin yolunu değiştiremez.
+- Farklı `auth` düzeylerine sahip çakışan yollar reddedilir. `exact`/`prefix`
+  art arda düşme zincirlerini yalnızca aynı kimlik doğrulama düzeyinde tutun.
+- `auth: "plugin"` yolları operatör çalışma zamanı kapsamlarını otomatik olarak
+  almaz. Bunlar ayrıcalıklı Gateway yardımcı çağrıları için değil, eklenti
+  tarafından yönetilen webhook/imza doğrulaması içindir.
+- `auth: "gateway"` yolları bir Gateway istek çalışma zamanı kapsamı içinde
+  çalışır, ancak bu kapsam bilinçli olarak tutucudur:
+  - paylaşılan gizli bearer kimlik doğrulaması (`gateway.auth.mode = "token"` /
+    `"password"`) eklenti-yolu çalışma zamanı kapsamlarını, çağıran
+    `x-openclaw-scopes` gönderse bile `operator.write` düzeyine sabitler
+  - güvenilir kimlik taşıyan HTTP modları (örneğin `trusted-proxy` veya özel
+    bir girişte `gateway.auth.mode = "none"`) `x-openclaw-scopes` başlığını
+    yalnızca başlık açıkça mevcut olduğunda dikkate alır
+  - kimlik taşıyan bu eklenti-yolu isteklerinde `x-openclaw-scopes` yoksa,
+    çalışma zamanı kapsamı `operator.write` düzeyine geri düşer
+- Pratik kural: gateway-kimlik doğrulamalı bir eklenti yolunun örtük bir yönetici
+  yüzeyi olduğunu varsaymayın. Yolunuz yöneticiye özel davranış gerektiriyorsa,
+  kimlik taşıyan bir kimlik doğrulama modu zorunlu kılın ve açık
+  `x-openclaw-scopes` başlık sözleşmesini belgeleyin.
 
 ## Plugin SDK içe aktarma yolları
 
-Plugin yazarken tek parça `openclaw/plugin-sdk` içe aktarması yerine
-SDK alt yollarını kullanın:
+Eklenti yazarken tek parça `openclaw/plugin-sdk` içe aktarımı yerine SDK alt
+yollarını kullanın:
 
-- plugin kayıt ilkel öğeleri için `openclaw/plugin-sdk/plugin-entry`.
-- genel paylaşılan plugin odaklı sözleşme için `openclaw/plugin-sdk/core`.
-- kök `openclaw.json` Zod şema
-  dışa aktarımı (`OpenClawSchema`) için `openclaw/plugin-sdk/config-schema`.
-- `openclaw/plugin-sdk/channel-setup`,
+- Eklenti kayıt ilkel öğeleri için `openclaw/plugin-sdk/plugin-entry`.
+- Genel paylaşılan eklentiye dönük sözleşme için `openclaw/plugin-sdk/core`.
+- Kök `openclaw.json` Zod şema dışa aktarımı (`OpenClawSchema`) için
+  `openclaw/plugin-sdk/config-schema`.
+- Paylaşılan kurulum/kimlik doğrulama/yanıt/webhook bağlantıları için
+  `openclaw/plugin-sdk/channel-setup`,
   `openclaw/plugin-sdk/setup-runtime`,
   `openclaw/plugin-sdk/setup-adapter-runtime`,
   `openclaw/plugin-sdk/setup-tools`,
@@ -1123,18 +1245,21 @@ SDK alt yollarını kullanın:
   `openclaw/plugin-sdk/channel-reply-pipeline`,
   `openclaw/plugin-sdk/command-auth`,
   `openclaw/plugin-sdk/secret-input` ve
-  `openclaw/plugin-sdk/webhook-ingress` gibi kararlı kanal ilkel öğeleri, paylaşılan kurulum/kimlik doğrulama/yanıt/webhook
-  bağlantısı içindir. `channel-inbound`, debounce, bahsetme eşleme,
-  gelen bahsetme politikası yardımcıları, zarf biçimlendirme ve gelen zarf
-  bağlam yardımcıları için paylaşılan merkezdir.
-  `channel-setup`, dar isteğe bağlı kurulum yüzeyidir.
-  `setup-runtime`, `setupEntry` /
-  ertelenmiş başlangıç tarafından kullanılan çalışma zamanı güvenli kurulum yüzeyidir; içe aktarma güvenli kurulum yama bağdaştırıcılarını da içerir.
-  `setup-adapter-runtime`, ortam farkında hesap kurulum bağdaştırıcı yüzeyidir.
-  `setup-tools`, küçük CLI/arşiv/belge yardımcı yüzeyidir (`formatCliCommand`,
-  `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`,
+  `openclaw/plugin-sdk/webhook-ingress` gibi kararlı kanal ilkel öğeleri.
+  `channel-inbound`; debounce, mention eşleme, gelen mention-policy
+  yardımcıları, zarf biçimlendirme ve gelen zarf bağlam yardımcıları için
+  paylaşılan ana bölümdür.
+  `channel-setup`, dar isteğe bağlı kurulum bağlantı yüzeyidir.
+  `setup-runtime`, içe aktarma açısından güvenli kurulum yama bağdaştırıcıları
+  dahil olmak üzere `setupEntry` / ertelenmiş başlangıç tarafından kullanılan
+  çalışma zamanı açısından güvenli kurulum yüzeyidir.
+  `setup-adapter-runtime`, ortam farkındalıklı hesap kurulum bağdaştırıcısı
+  bağlantı yüzeyidir.
+  `setup-tools`, küçük CLI/arşiv/belge yardımcısı bağlantı yüzeyidir
+  (`formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`,
   `CONFIG_DIR`).
-- `openclaw/plugin-sdk/channel-config-helpers`,
+- Paylaşılan çalışma zamanı/yapılandırma yardımcıları için
+  `openclaw/plugin-sdk/channel-config-helpers`,
   `openclaw/plugin-sdk/allow-from`,
   `openclaw/plugin-sdk/channel-config-schema`,
   `openclaw/plugin-sdk/telegram-command-config`,
@@ -1152,194 +1277,222 @@ SDK alt yollarını kullanın:
   `openclaw/plugin-sdk/status-helpers`,
   `openclaw/plugin-sdk/text-runtime`,
   `openclaw/plugin-sdk/runtime-store` ve
-  `openclaw/plugin-sdk/directory-runtime` gibi alan alt yolları, paylaşılan çalışma zamanı/yapılandırma yardımcıları içindir.
-  `telegram-command-config`, Telegram özel
-  komut normalleştirme/doğrulama için dar genel yüzeydir ve paketlenmiş
-  Telegram sözleşme yüzeyi geçici olarak kullanılamasa bile kullanılabilir durumda kalır.
-  `text-runtime`, yardımcıya görünür metin çıkarma, markdown işleme/parçalama yardımcıları, sansürleme
-  yardımcıları, yönerge etiketi yardımcıları ve güvenli metin yardımcılarını içeren
-  paylaşılan metin/markdown/günlükleme yüzeyidir.
-- Onaya özgü kanal yüzeyleri plugin üzerinde tek bir `approvalCapability`
-  sözleşmesini tercih etmelidir. Böylece çekirdek, onay davranışını ilgisiz plugin alanlarına karıştırmak yerine
-  onay kimlik doğrulamasını, teslimi, işlemesini, yerel yönlendirmeyi ve
-  tembel yerel işleyici davranışını bu tek yetenek üzerinden okur.
+  `openclaw/plugin-sdk/directory-runtime` gibi alan alt yolları.
+  `telegram-command-config`, Telegram özel komut normalizasyonu/doğrulaması için
+  dar genel bağlantı yüzeyidir ve paketlenmiş Telegram sözleşme yüzeyi geçici
+  olarak kullanılamasa bile erişilebilir kalır.
+  `text-runtime`, yardımcıya görünür metin temizleme, markdown işleme/parçalama
+  yardımcıları, sansürleme yardımcıları, directive-tag yardımcıları ve güvenli
+  metin yardımcıları dahil olmak üzere paylaşılan metin/markdown/loglama
+  bağlantı yüzeyidir.
+- Onaya özgü kanal bağlantı yüzeyleri, eklenti üzerinde tek bir
+  `approvalCapability` sözleşmesini tercih etmelidir. Böylece çekirdek; onay
+  kimlik doğrulamasını, teslimi, işlemeyi, yerel yönlendirmeyi ve tembel yerel
+  işleyici davranışını ilgisiz eklenti alanlarına karıştırmak yerine bu tek
+  yetenek üzerinden okur.
 - `openclaw/plugin-sdk/channel-runtime` kullanımdan kaldırılmıştır ve yalnızca
-  eski plugin’ler için bir uyumluluk köprüsü olarak kalır. Yeni kod bunun yerine daha dar
-  genel ilkel öğeleri içe aktarmalıdır ve repo kodu köprüye yeni içe aktarmalar eklememelidir.
-- Paketlenmiş uzantı iç bileşenleri özel kalır. Harici plugin’ler yalnızca
-  `openclaw/plugin-sdk/*` alt yollarını kullanmalıdır. OpenClaw çekirdek/test kodu,
-  `index.js`, `api.js`,
-  `runtime-api.js`, `setup-entry.js` ve
-  `login-qr-api.js` gibi dar kapsamlı dosyalar gibi, bir plugin paketi kökü altındaki repo
-  genel giriş noktalarını kullanabilir. Çekirdekten veya başka
-  bir uzantıdan asla bir plugin paketinin `src/*` yolunu içe aktarmayın.
-- Repo giriş noktası ayrımı:
-  `<plugin-package-root>/api.js` yardımcı/tür paketi,
-  `<plugin-package-root>/runtime-api.js` yalnızca çalışma zamanı paketi,
-  `<plugin-package-root>/index.js` paketlenmiş plugin girişi
-  ve `<plugin-package-root>/setup-entry.js` kurulum plugin girişidir.
-- Güncel paketlenmiş sağlayıcı örnekleri:
-  - Anthropic, `wrapAnthropicProviderStream`, beta-header yardımcıları ve `service_tier`
-    ayrıştırması gibi Claude akış yardımcıları için `api.js` / `contract-api.js` kullanır.
-  - OpenAI, sağlayıcı oluşturucular, varsayılan model yardımcıları ve
-    gerçek zamanlı sağlayıcı oluşturucular için `api.js` kullanır.
-  - OpenRouter, sağlayıcı oluşturucusu ile birlikte ilk kurulum/yapılandırma
-    yardımcıları için `api.js` kullanır; buna karşılık `register.runtime.js` repo içi kullanım için yine de genel
-    `plugin-sdk/provider-stream` yardımcılarını yeniden dışa aktarabilir.
-- Cephe yüklemeli genel giriş noktaları, biri varsa etkin çalışma zamanı yapılandırma anlık görüntüsünü tercih eder,
-  sonra OpenClaw henüz çalışma zamanı anlık görüntüsü sunmadığında diskte çözülmüş yapılandırma dosyasına geri döner.
-- Genel paylaşılan ilkel öğeler tercih edilen genel SDK sözleşmesi olarak kalır. Paketlenmiş kanal markalı yardımcı yüzeylerin
-  küçük, ayrılmış bir uyumluluk kümesi hâlâ vardır. Bunları yeni
-  üçüncü taraf içe aktarma hedefleri olarak değil, paketlenmiş bakım/uyumluluk yüzeyleri olarak değerlendirin;
-  yeni çapraz kanal sözleşmeleri yine de genel `plugin-sdk/*` alt yollarına veya plugin’e yerel `api.js` /
-  `runtime-api.js` paketlerine eklenmelidir.
+  eski eklentiler için bir uyumluluk sarmalayıcısı olarak kalır. Yeni kod bunun
+  yerine daha dar genel ilkel öğeleri içe aktarmalıdır ve depo kodu sarmalayıcıya
+  yeni içe aktarımlar eklememelidir.
+- Paketlenmiş uzantı iç yapıları gizli kalır. Harici eklentiler yalnızca
+  `openclaw/plugin-sdk/*` alt yollarını kullanmalıdır. OpenClaw çekirdek/test
+  kodu, bir eklenti paket kökü altındaki `index.js`, `api.js`, `runtime-api.js`,
+  `setup-entry.js` ve `login-qr-api.js` gibi dar kapsamlı dosyalar gibi depo
+  genel giriş noktalarını kullanabilir. Çekirdekten veya başka bir uzantıdan
+  bir eklenti paketinin `src/*` yolunu asla içe aktarmayın.
+- Depo giriş noktası ayrımı:
+  `<plugin-package-root>/api.js` yardımcı/tür barrel'ıdır,
+  `<plugin-package-root>/runtime-api.js` yalnızca çalışma zamanı barrel'ıdır,
+  `<plugin-package-root>/index.js` paketlenmiş eklenti girişidir
+  ve `<plugin-package-root>/setup-entry.js` kurulum eklentisi girişidir.
+- Geçerli paketlenmiş sağlayıcı örnekleri:
+  - Anthropic, `wrapAnthropicProviderStream`, beta-header yardımcıları ve
+    `service_tier` ayrıştırması gibi Claude akış yardımcıları için
+    `api.js` / `contract-api.js` kullanır.
+  - OpenAI, sağlayıcı oluşturucuları, varsayılan model yardımcıları ve gerçek
+    zamanlı sağlayıcı oluşturucuları için `api.js` kullanır.
+  - OpenRouter, sağlayıcı oluşturucusu ile ilk katılım/yapılandırma yardımcıları
+    için `api.js` kullanırken `register.runtime.js` depo içi kullanım için hâlâ
+    genel `plugin-sdk/provider-stream` yardımcılarını yeniden dışa aktarabilir.
+- Facade ile yüklenen genel giriş noktaları, biri varsa etkin çalışma zamanı
+  yapılandırma anlık görüntüsünü tercih eder; OpenClaw henüz bir çalışma zamanı
+  anlık görüntüsü sunmuyorsa diskteki çözümlenmiş yapılandırma dosyasına geri
+  düşer.
+- Genel paylaşılan ilkel öğeler tercih edilen genel SDK sözleşmesi olmaya devam
+  eder. Paketlenmiş kanallara markalanmış küçük bir ayrılmış uyumluluk kümesi
+  hâlâ vardır. Bunları yeni üçüncü taraf içe aktarma hedefleri değil,
+  paketlenmiş bakım/uyumluluk bağlantı yüzeyleri olarak değerlendirin; yeni
+  kanallar arası sözleşmeler yine de genel `plugin-sdk/*` alt yollarına veya
+  eklenti yerel `api.js` / `runtime-api.js` barrel'larına eklenmelidir.
 
 Uyumluluk notu:
 
-- Yeni kod için kök `openclaw/plugin-sdk` paketini kullanmaktan kaçının.
-- Önce dar ve kararlı ilkel öğeleri tercih edin. Daha yeni setup/pairing/reply/
-  feedback/contract/inbound/threading/command/secret-input/webhook/infra/
-  allowlist/status/message-tool alt yolları, yeni
-  paketlenmiş ve harici plugin çalışmaları için hedeflenen sözleşmedir.
-  Hedef ayrıştırma/eşleme `openclaw/plugin-sdk/channel-targets` üzerinde yer almalıdır.
-  Mesaj eylemi kapıları ve tepki mesaj kimliği yardımcıları ise
+- Yeni kod için kök `openclaw/plugin-sdk` barrel'ını kullanmaktan kaçının.
+- Önce dar ve kararlı ilkel öğeleri tercih edin. Daha yeni
+  setup/pairing/reply/feedback/contract/inbound/threading/command/secret-input/webhook/infra/
+  allowlist/status/message-tool alt yolları, yeni paketlenmiş ve harici eklenti
+  çalışmaları için amaçlanan sözleşmedir.
+  Hedef ayrıştırma/eşleme `openclaw/plugin-sdk/channel-targets` üzerinde yer
+  almalıdır.
+  Mesaj eylemi kapıları ve tepki mesaj-kimliği yardımcıları
   `openclaw/plugin-sdk/channel-actions` üzerinde yer almalıdır.
-- Paketlenmiş uzantıya özgü yardımcı paketler varsayılan olarak kararlı değildir. Bir
-  yardımcı yalnızca paketlenmiş bir uzantı tarafından gerekiyorsa, bunu
-  `openclaw/plugin-sdk/<extension>` içine taşımak yerine uzantının
-  yerel `api.js` veya `runtime-api.js` yüzeyinin arkasında tutun.
-- Yeni paylaşılan yardımcı yüzeyleri kanal markalı değil, genel olmalıdır. Paylaşılan hedef
-  ayrıştırma `openclaw/plugin-sdk/channel-targets` üzerinde yer almalıdır; kanala özgü
-  iç bileşenler ise sahip olan plugin’in yerel `api.js` veya `runtime-api.js`
-  yüzeyinin arkasında kalmalıdır.
-- `image-generation`,
-  `media-understanding` ve `speech` gibi yeteneğe özgü alt yollar mevcuttur; çünkü paketlenmiş/yerel plugin’ler
-  bunları bugün kullanmaktadır. Bunların varlığı, tek başına, dışa aktarılan her yardımcının
-  uzun vadede dondurulmuş bir harici sözleşme olduğu anlamına gelmez.
+- Paketlenmiş uzantıya özgü yardımcı barrel'lar varsayılan olarak kararlı
+  değildir. Bir yardımcı yalnızca paketlenmiş bir uzantı tarafından
+  gerekiyorsa, bunu `openclaw/plugin-sdk/<extension>` içine yükseltmek yerine
+  uzantının yerel `api.js` veya `runtime-api.js` bağlantı yüzeyinin arkasında
+  tutun.
+- Yeni paylaşılan yardımcı bağlantı yüzeyleri kanala markalanmış değil, genel
+  olmalıdır. Paylaşılan hedef ayrıştırma
+  `openclaw/plugin-sdk/channel-targets` üzerinde yer alır; kanala özgü iç
+  yapılar ise sahibi olan eklentinin yerel `api.js` veya `runtime-api.js`
+  bağlantı yüzeyinin arkasında kalır.
+- `image-generation`, `media-understanding` ve `speech` gibi yeteneğe özgü alt
+  yollar vardır çünkü paketlenmiş/yerel eklentiler bugün bunları kullanır. Bu
+  yolların varlığı tek başına dışa aktarılan her yardımcının uzun vadeli olarak
+  dondurulmuş bir harici sözleşme olduğu anlamına gelmez.
 
-## Message aracı şemaları
+## Message araç şemaları
 
-Plugin’ler, kanala özgü `describeMessageTool(...)` şema
-katkılarına sahip olmalıdır. Sağlayıcıya özgü alanları paylaşılan çekirdekte değil, plugin içinde tutun.
+Eklentiler kanala özgü `describeMessageTool(...)` şema katkılarının sahibi
+olmalıdır. Sağlayıcıya özgü alanları paylaşılan çekirdekte değil, eklentide
+tutun.
 
 Paylaşılan taşınabilir şema parçaları için,
-`openclaw/plugin-sdk/channel-actions` üzerinden dışa aktarılan genel yardımcıları yeniden kullanın:
+`openclaw/plugin-sdk/channel-actions` üzerinden dışa aktarılan genel
+yardımcıları yeniden kullanın:
 
 - düğme ızgarası tarzı yükler için `createMessageToolButtonsSchema()`
 - yapılandırılmış kart yükleri için `createMessageToolCardSchema()`
 
-Bir şema biçimi yalnızca tek bir sağlayıcı için anlamlıysa, bunu paylaşılan SDK’ya
-taşımak yerine o plugin’in kendi kaynağında tanımlayın.
+Bir şema şekli yalnızca bir sağlayıcı için anlamlıysa, bunu paylaşılan SDK'ya
+yükseltmek yerine o eklentinin kendi kaynağında tanımlayın.
 
 ## Kanal hedef çözümleme
 
-Kanal plugin’leri kanala özgü hedef anlambilimine sahip olmalıdır. Paylaşılan
-giden ana makineyi genel tutun ve sağlayıcı kuralları için mesajlaşma bağdaştırıcı yüzeyini kullanın:
+Kanal eklentileri kanala özgü hedef semantiğinin sahibi olmalıdır. Paylaşılan
+giden barındırıcıyı genel tutun ve sağlayıcı kuralları için mesajlaşma
+bağdaştırıcı yüzeyini kullanın:
 
-- `messaging.inferTargetChatType({ to })`, normalleştirilmiş bir hedefin
-  dizin aramasından önce `direct`, `group` veya `channel` olarak ele alınıp alınmayacağına karar verir.
-- `messaging.targetResolver.looksLikeId(raw, normalized)`, bir
-  girdinin dizin araması yerine doğrudan kimlik benzeri çözümlemeye geçip geçmemesi gerektiğini çekirdeğe bildirir.
-- `messaging.targetResolver.resolveTarget(...)`, çekirdeğin normalleştirmeden sonra veya
-  dizin kaçırmasından sonra sağlayıcıya ait son çözümlemeye ihtiyaç duyduğunda plugin geri dönüş yoludur.
-- `messaging.resolveOutboundSessionRoute(...)`, bir hedef çözümlendikten sonra sağlayıcıya özgü oturum
-  rota kurulumuna sahiptir.
+- `messaging.inferTargetChatType({ to })`, dizin aramasından önce normalize
+  edilmiş bir hedefin `direct`, `group` veya `channel` olarak ele alınıp
+  alınmayacağına karar verir.
+- `messaging.targetResolver.looksLikeId(raw, normalized)`, bir girdinin dizin
+  araması yerine doğrudan kimlik benzeri çözümlemeye geçip geçmemesi
+  gerektiğini çekirdeğe bildirir.
+- `messaging.targetResolver.resolveTarget(...)`, çekirdeğin normalizasyondan
+  sonra veya dizin kaçırmasından sonra son sağlayıcı sahipli çözümlemeye
+  ihtiyaç duyması durumunda eklenti geri dönüşüdür.
+- `messaging.resolveOutboundSessionRoute(...)`, bir hedef çözümlendikten sonra
+  sağlayıcıya özgü oturum rota oluşturmanın sahibidir.
 
 Önerilen ayrım:
 
-- Eşler/gruplar aranmasından önce gerçekleşmesi gereken kategori kararları için `inferTargetChatType` kullanın.
-- “Bunu açık/yerel bir hedef kimliği olarak ele al” denetimleri için `looksLikeId` kullanın.
-- Geniş dizin araması için değil, sağlayıcıya özgü normalleştirme geri dönüşü için `resolveTarget` kullanın.
-- Sohbet kimlikleri, iş parçacığı kimlikleri, JID’ler, tanıtıcılar ve oda kimlikleri gibi sağlayıcıya özgü yerel kimlikleri
-  genel SDK alanlarında değil, `target` değerleri veya sağlayıcıya özgü parametreler içinde tutun.
+- Eşler/gruplar aranmadan önce gerçekleşmesi gereken kategori kararları için
+  `inferTargetChatType` kullanın.
+- "Bunu açık/yerel hedef kimliği olarak ele al" denetimleri için `looksLikeId`
+  kullanın.
+- Geniş dizin araması için değil, sağlayıcıya özgü normalizasyon geri dönüşü
+  için `resolveTarget` kullanın.
+- Sohbet kimlikleri, iş parçacığı kimlikleri, JID'ler, tutamaçlar ve oda
+  kimlikleri gibi sağlayıcı yerel kimlikleri genel SDK alanlarında değil,
+  `target` değerleri veya sağlayıcıya özgü parametreler içinde tutun.
 
 ## Yapılandırma destekli dizinler
 
-Yapılandırmadan dizin girdileri türeten plugin’ler bu mantığı plugin içinde tutmalı
-ve `openclaw/plugin-sdk/directory-runtime`
-altındaki paylaşılan yardımcıları yeniden kullanmalıdır.
+Yapılandırmadan dizin girdileri türeten eklentiler bu mantığı eklentide tutmalı
+ve `openclaw/plugin-sdk/directory-runtime` içindeki paylaşılan yardımcıları
+yeniden kullanmalıdır.
 
-Bunu, bir kanalın şu tür yapılandırma destekli eşlere/gruplara ihtiyaç duyduğu durumlarda kullanın:
+Bir kanalın şu tür yapılandırma destekli eşlere/gruplara ihtiyaç duyduğunda
+bunu kullanın:
 
 - izin listesi güdümlü DM eşleri
 - yapılandırılmış kanal/grup eşlemeleri
 - hesap kapsamlı statik dizin geri dönüşleri
 
-`directory-runtime` içindeki paylaşılan yardımcılar yalnızca genel işlemleri yürütür:
+`directory-runtime` içindeki paylaşılan yardımcılar yalnızca genel işlemleri
+işler:
 
 - sorgu filtreleme
 - sınır uygulama
-- yinelenen kaldırma/normalleştirme yardımcıları
+- tekilleştirme/normalizasyon yardımcıları
 - `ChannelDirectoryEntry[]` oluşturma
 
-Kanala özgü hesap incelemesi ve kimlik normalleştirmesi plugin uygulamasında kalmalıdır.
+Kanala özgü hesap denetimi ve kimlik normalizasyonu eklenti uygulamasında
+kalmalıdır.
 
 ## Sağlayıcı katalogları
 
-Sağlayıcı plugin’leri, çıkarım için model kataloglarını
+Sağlayıcı eklentileri çıkarım için model kataloglarını
 `registerProvider({ catalog: { run(...) { ... } } })` ile tanımlayabilir.
 
-`catalog.run(...)`, OpenClaw’ın
-`models.providers` içine yazdığı yapının aynısını döndürür:
+`catalog.run(...)`, OpenClaw'ın `models.providers` içine yazdığıyla aynı şekli
+döndürür:
 
-- tek bir sağlayıcı girdisi için `{ provider }`
+- bir sağlayıcı girdisi için `{ provider }`
 - birden çok sağlayıcı girdisi için `{ providers }`
 
-Plugin sağlayıcıya özgü model kimliklerine, temel URL
-varsayılanlarına veya kimlik doğrulama kapılı model meta verilerine sahipse `catalog` kullanın.
+Eklenti sağlayıcıya özgü model kimliklerinin, temel URL varsayılanlarının veya
+kimlik doğrulama kapılı model meta verilerinin sahibi olduğunda `catalog`
+kullanın.
 
-`catalog.order`, bir plugin kataloğunun OpenClaw’ın
-yerleşik örtük sağlayıcılarına göre ne zaman birleştirileceğini denetler:
+`catalog.order`, bir eklentinin kataloğunun OpenClaw'ın yerleşik örtük
+sağlayıcılarına göre ne zaman birleştirileceğini kontrol eder:
 
-- `simple`: düz API anahtarlı veya ortam güdümlü sağlayıcılar
-- `profile`: kimlik doğrulama profilleri mevcut olduğunda görünen sağlayıcılar
-- `paired`: birden çok ilişkili sağlayıcı girdisini sentezleyen sağlayıcılar
-- `late`: diğer örtük sağlayıcılardan sonra son geçiş
+- `simple`: düz API anahtarı veya ortam güdümlü sağlayıcılar
+- `profile`: kimlik doğrulama profilleri var olduğunda görünen sağlayıcılar
+- `paired`: birbiriyle ilişkili birden çok sağlayıcı girdisini sentezleyen
+  sağlayıcılar
+- `late`: diğer örtük sağlayıcılardan sonra, son geçiş
 
-Daha sonraki sağlayıcılar anahtar çakışmasında kazanır; böylece plugin’ler aynı sağlayıcı kimliğiyle
-yerleşik bir sağlayıcı girdisini kasıtlı olarak geçersiz kılabilir.
+Daha sonraki sağlayıcılar anahtar çakışmasında kazanır; böylece eklentiler aynı
+sağlayıcı kimliğine sahip yerleşik bir sağlayıcı girdisini bilinçli olarak
+geçersiz kılabilir.
 
 Uyumluluk:
 
-- `discovery`, eski bir takma ad olarak hâlâ çalışır
+- `discovery` eski bir takma ad olarak hâlâ çalışır
 - hem `catalog` hem de `discovery` kaydedilmişse OpenClaw `catalog` kullanır
 
-## Salt okunur kanal incelemesi
+## Salt okunur kanal inceleme
 
-Plugin’iniz bir kanal kaydediyorsa,
-`resolveAccount(...)` ile birlikte `plugin.config.inspectAccount(cfg, accountId)` uygulamayı tercih edin.
+Eklentiniz bir kanal kaydediyorsa, `resolveAccount(...)` yanında
+`plugin.config.inspectAccount(cfg, accountId)` uygulamayı tercih edin.
 
 Neden:
 
-- `resolveAccount(...)` çalışma zamanı yoludur. Kimlik bilgilerinin
-  tamamen somutlaştırıldığını varsayabilir ve gerekli gizli değerler eksik olduğunda hızlıca başarısız olabilir.
+- `resolveAccount(...)` çalışma zamanı yoludur. Kimlik bilgilerinin tamamen
+  somutlaştırıldığını varsaymasına izin verilir ve gerekli sırlar eksikse hızlı
+  başarısız olabilir.
 - `openclaw status`, `openclaw status --all`,
   `openclaw channels status`, `openclaw channels resolve` ve doctor/config
   onarım akışları gibi salt okunur komut yolları, yalnızca yapılandırmayı
-  açıklamak için çalışma zamanı kimlik bilgilerini somutlaştırmak zorunda kalmamalıdır.
+  açıklamak için çalışma zamanı kimlik bilgilerini somutlaştırmaya ihtiyaç
+  duymamalıdır.
 
 Önerilen `inspectAccount(...)` davranışı:
 
-- Yalnızca açıklayıcı hesap durumunu döndürün.
+- Yalnızca açıklayıcı hesap durumu döndürün.
 - `enabled` ve `configured` değerlerini koruyun.
-- Gerekli olduğunda kimlik bilgisi kaynağı/durum alanlarını ekleyin; örneğin:
+- İlgili olduğunda kimlik bilgisi kaynağı/durumu alanlarını ekleyin, örneğin:
   - `tokenSource`, `tokenStatus`
   - `botTokenSource`, `botTokenStatus`
   - `appTokenSource`, `appTokenStatus`
   - `signingSecretSource`, `signingSecretStatus`
-- Salt okunur kullanılabilirliği bildirmek için ham belirteç değerlerini döndürmeniz gerekmez.
-  Durum tarzı komutlar için `tokenStatus: "available"` döndürmek
-  (ve eşleşen kaynak alanı) yeterlidir.
-- Bir kimlik bilgisi SecretRef üzerinden yapılandırılmışsa ancak
-  mevcut komut yolunda kullanılamıyorsa `configured_unavailable` kullanın.
+- Salt okunur kullanılabilirliği bildirmek için ham belirteç değerlerini
+  döndürmeniz gerekmez. Durum tarzı komutlar için `tokenStatus: "available"`
+  (ve eşleşen kaynak alanı) döndürmek yeterlidir.
+- Bir kimlik bilgisi SecretRef aracılığıyla yapılandırılmış ancak geçerli komut
+  yolunda kullanılamıyorsa `configured_unavailable` kullanın.
 
-Bu, salt okunur komutların çökmesi veya hesabı yanlış biçimde yapılandırılmamış olarak
-bildirmesi yerine “yapılandırılmış ancak bu komut yolunda kullanılamıyor”
-şeklinde rapor vermesini sağlar.
+Bu, salt okunur komutların yapılandırılmamış olarak çökmek veya yanlış rapor
+etmek yerine "yapılandırılmış ama bu komut yolunda kullanılamıyor" bilgisini
+raporlamasını sağlar.
 
 ## Paket paketleri
 
-Bir plugin dizini, `openclaw.extensions` içeren bir `package.json` dosyası içerebilir:
+Bir eklenti dizini, `openclaw.extensions` içeren bir `package.json`
+barındırabilir:
 
 ```json
 {
@@ -1351,64 +1504,72 @@ Bir plugin dizini, `openclaw.extensions` içeren bir `package.json` dosyası iç
 }
 ```
 
-Her girdi bir plugin’e dönüşür. Paket birden çok uzantı listeliyorsa plugin kimliği
+Her girdi bir eklenti olur. Paket birden çok uzantı listeliyorsa eklenti kimliği
 `name/<fileBase>` olur.
 
-Plugin’iniz npm bağımlılıkları içe aktarıyorsa, `node_modules`
-kullanılabilir olsun diye bunları o dizinde kurun (`npm install` / `pnpm install`).
+Eklentiniz npm bağımlılıkları içe aktarıyorsa, `node_modules` kullanılabilir
+olsun diye bunları o dizine yükleyin (`npm install` / `pnpm install`).
 
-Güvenlik korkuluğu: her `openclaw.extensions` girdisi, sembolik bağlantı çözümlemesinden sonra
-plugin dizini içinde kalmalıdır. Paket dizininden çıkan girdiler
+Güvenlik korkuluğu: her `openclaw.extensions` girdisi, sembolik bağ çözümlemesinden
+sonra eklenti dizini içinde kalmalıdır. Paket dizininden çıkan girdiler
 reddedilir.
 
-Güvenlik notu: `openclaw plugins install`, plugin bağımlılıklarını
-`npm install --omit=dev --ignore-scripts` ile kurar (yaşam döngüsü betikleri yok, çalışma zamanında geliştirme bağımlılıkları yok). Plugin bağımlılık
-ağaçlarını “saf JS/TS” tutun ve `postinstall` derlemeleri gerektiren paketlerden kaçının.
+Güvenlik notu: `openclaw plugins install`, eklenti bağımlılıklarını
+`npm install --omit=dev --ignore-scripts` ile yükler (yaşam döngüsü betikleri
+yok, çalışma zamanında geliştirme bağımlılıkları yok). Eklenti bağımlılık
+ağaçlarını "saf JS/TS" tutun ve `postinstall` derlemeleri gerektiren
+paketlerden kaçının.
 
-İsteğe bağlı: `openclaw.setupEntry`, hafif bir yalnızca kurulum modülünü işaret edebilir.
-OpenClaw, devre dışı bir kanal plugin’i için kurulum yüzeylerine ihtiyaç duyduğunda veya
-bir kanal plugin’i etkin ancak hâlâ yapılandırılmamış olduğunda,
-tam plugin girdisi yerine `setupEntry` yükler. Bu, ana plugin girdiniz aynı zamanda araçlar, kancalar veya başka yalnızca çalışma zamanı
-kodları da bağlıyorsa başlangıcı ve kurulumu daha hafif tutar.
+İsteğe bağlı: `openclaw.setupEntry` hafif bir yalnızca kurulum modülünü
+işaret edebilir. OpenClaw, devre dışı bir kanal eklentisi için kurulum
+yüzeylerine ihtiyaç duyduğunda veya bir kanal eklentisi etkin ama henüz
+yapılandırılmamış olduğunda, tam eklenti girişi yerine `setupEntry` yükler.
+Bu, ana eklenti girişiniz araçlar, kancalar veya diğer yalnızca çalışma zamanı
+kodlarını da bağlıyorsa başlangıcı ve kurulumu daha hafif tutar.
 
-İsteğe bağlı: `openclaw.startup.deferConfiguredChannelFullLoadUntilAfterListen`,
-bir kanal plugin’ini, kanal zaten yapılandırılmış olsa bile, gateway’in
-dinleme öncesi başlangıç aşamasında aynı `setupEntry` yoluna dahil edebilir.
+İsteğe bağlı:
+`openclaw.startup.deferConfiguredChannelFullLoadUntilAfterListen`, kanal zaten
+yapılandırılmış olsa bile bir kanal eklentisini gateway'in dinleme öncesi
+başlangıç aşamasında aynı `setupEntry` yoluna dahil edebilir.
 
-Bunu yalnızca `setupEntry`, gateway dinlemeye başlamadan
-önce var olması gereken başlangıç yüzeyini tamamen kapsıyorsa kullanın. Pratikte bu, kurulum girdisinin başlangıcın bağlı olduğu
-kanala ait tüm yetenekleri kaydetmesi gerektiği anlamına gelir; örneğin:
+Bunu yalnızca `setupEntry`, gateway dinlemeye başlamadan önce var olması gereken
+başlangıç yüzeyini tamamen kapsıyorsa kullanın. Pratikte bu, kurulum girişinin
+başlangıcın bağımlı olduğu her kanal sahipli yeteneği kaydetmesi gerektiği
+anlamına gelir; örneğin:
 
 - kanal kaydının kendisi
-- gateway dinlemeye başlamadan önce kullanılabilir olması gereken tüm HTTP rotaları
-- aynı zaman penceresinde var olması gereken tüm gateway yöntemleri, araçlar veya servisler
+- gateway dinlemeye başlamadan önce kullanılabilir olması gereken HTTP yolları
+- aynı pencere sırasında var olması gereken herhangi bir gateway yöntemi,
+  aracı veya hizmeti
 
-Tam girdiniz hâlâ gerekli herhangi bir başlangıç yeteneğine sahipse bu bayrağı
-etkinleştirmeyin. Plugin’i varsayılan davranışta bırakın ve OpenClaw’ın başlangıç sırasında
-tam girdiyi yüklemesine izin verin.
+Tam girişiniz hâlâ gerekli bir başlangıç yeteneğinin sahibiyse bu bayrağı
+etkinleştirmeyin. Eklentiyi varsayılan davranışta bırakın ve OpenClaw'ın tam
+girişi başlangıç sırasında yüklemesine izin verin.
 
-Paketlenmiş kanallar, çekirdeğin tam kanal çalışma zamanı yüklenmeden önce
-danışabileceği yalnızca kurulum amaçlı sözleşme-yüzeyi yardımcıları da yayımlayabilir. Güncel kurulum
-yükseltme yüzeyi şudur:
+Paketlenmiş kanallar ayrıca çekirdeğin tam kanal çalışma zamanı yüklenmeden
+önce danışabileceği yalnızca kurulum sözleşme-yüzeyi yardımcıları
+yayımlayabilir. Geçerli kurulum yükseltme yüzeyi şudur:
 
 - `singleAccountKeysToMove`
 - `namedAccountPromotionKeys`
 - `resolveSingleAccountPromotionTarget(...)`
 
-Çekirdek bu yüzeyi, tam plugin girdisini yüklemeden
-eski tek hesaplı kanal yapılandırmasını `channels.<id>.accounts.*` içine yükseltmesi gerektiğinde kullanır.
-Mevcut paketlenmiş örnek Matrix’tir: adlandırılmış hesaplar zaten varken yalnızca auth/bootstrap anahtarlarını
-adlandırılmış bir yükseltilmiş hesaba taşır ve her zaman
-`accounts.default` oluşturmaktansa yapılandırılmış kanonik olmayan bir varsayılan hesap anahtarını koruyabilir.
+Çekirdek, eski tek hesaplı kanal yapılandırmasını tam eklenti girişini
+yüklemeden `channels.<id>.accounts.*` içine yükseltmesi gerektiğinde bu yüzeyi
+kullanır. Matrix şu anki paketlenmiş örnektir: adlandırılmış hesaplar zaten
+varsa yalnızca kimlik doğrulama/önyükleme anahtarlarını adlandırılmış yükseltilmiş
+bir hesaba taşır ve her zaman `accounts.default` oluşturmak yerine
+yapılandırılmış kurallı olmayan bir varsayılan hesap anahtarını koruyabilir.
 
-Bu kurulum yama bağdaştırıcıları, paketlenmiş sözleşme-yüzeyi keşfini tembel tutar.
-İçe aktarma zamanı hafif kalır; yükseltme yüzeyi modül içe aktarmasında paketlenmiş kanal başlangıcına yeniden girmek yerine
-yalnızca ilk kullanımda yüklenir.
+Bu kurulum yama bağdaştırıcıları, paketlenmiş sözleşme-yüzeyi keşfini tembel
+tutar. İçe aktarma zamanı hafif kalır; yükseltme yüzeyi modül içe aktarımı
+sırasında paketlenmiş kanal başlangıcına yeniden girmek yerine yalnızca ilk
+kullanımda yüklenir.
 
-Bu başlangıç yüzeyleri gateway RPC yöntemlerini içerdiğinde, bunları
-plugin’e özgü bir ön ek üzerinde tutun. Çekirdek yönetici ad alanları (`config.*`,
-`exec.approvals.*`, `wizard.*`, `update.*`) ayrılmış kalır ve bir plugin daha dar bir kapsam istese bile
-her zaman `operator.admin` değerine çözülür.
+Bu başlangıç yüzeyleri gateway RPC yöntemleri içerdiğinde, bunları eklentiye
+özgü bir önek üzerinde tutun. Çekirdek yönetici ad alanları (`config.*`,
+`exec.approvals.*`, `wizard.*`, `update.*`) ayrılmış kalır ve bir eklenti daha
+dar bir kapsam istese bile her zaman `operator.admin` olarak çözülür.
 
 Örnek:
 
@@ -1427,8 +1588,9 @@ her zaman `operator.admin` değerine çözülür.
 
 ### Kanal katalog meta verileri
 
-Kanal plugin’leri `openclaw.channel` üzerinden kurulum/keşif meta verileri ve
-`openclaw.install` üzerinden kurulum ipuçları tanıtabilir. Bu, çekirdeği katalog verisinden bağımsız tutar.
+Kanal eklentileri, `openclaw.channel` aracılığıyla kurulum/keşif meta verileri
+ve `openclaw.install` aracılığıyla kurulum ipuçları duyurabilir. Bu, çekirdek
+kataloğu veriden bağımsız tutar.
 
 Örnek:
 
@@ -1456,41 +1618,54 @@ Kanal plugin’leri `openclaw.channel` üzerinden kurulum/keşif meta verileri v
 }
 ```
 
-Asgari örneğin ötesinde kullanışlı `openclaw.channel` alanları:
+En düşük örneğin ötesinde kullanışlı `openclaw.channel` alanları:
 
 - `detailLabel`: daha zengin katalog/durum yüzeyleri için ikincil etiket
-- `docsLabel`: belge bağlantısı için bağlantı metnini geçersiz kılar
-- `preferOver`: bu katalog girdisinin önüne geçmesi gereken daha düşük öncelikli plugin/kanal kimlikleri
-- `selectionDocsPrefix`, `selectionDocsOmitLabel`, `selectionExtras`: seçim yüzeyi metin denetimleri
-- `markdownCapable`: giden biçimlendirme kararları için kanalı markdown yetenekli olarak işaretler
-- `exposure.configured`: `false` olduğunda kanalı yapılandırılmış kanal listeleme yüzeylerinden gizler
-- `exposure.setup`: `false` olduğunda kanalı etkileşimli kurulum/yapılandırma seçicilerinden gizler
-- `exposure.docs`: belge gezinme yüzeyleri için kanalı iç/özel olarak işaretler
-- `showConfigured` / `showInSetup`: eski takma adlar uyumluluk için hâlâ kabul edilir; `exposure` tercih edin
-- `quickstartAllowFrom`: kanalı standart hızlı başlangıç `allowFrom` akışına dahil eder
-- `forceAccountBinding`: yalnızca bir hesap olsa bile açık hesap bağlamasını zorunlu kılar
-- `preferSessionLookupForAnnounceTarget`: duyuru hedefleri çözülürken oturum aramasını tercih eder
+- `docsLabel`: belgeler bağlantısı için bağlantı metnini geçersiz kılar
+- `preferOver`: bu katalog girdisinin geride bırakması gereken daha düşük
+  öncelikli eklenti/kanal kimlikleri
+- `selectionDocsPrefix`, `selectionDocsOmitLabel`, `selectionExtras`: seçim
+  yüzeyi kopya denetimleri
+- `markdownCapable`: giden biçimlendirme kararları için kanalı markdown
+  destekli olarak işaretler
+- `exposure.configured`: `false` olarak ayarlandığında yapılandırılmış kanal
+  listeleme yüzeylerinden kanalı gizler
+- `exposure.setup`: `false` olarak ayarlandığında etkileşimli kurulum/
+  yapılandırma seçicilerinden kanalı gizler
+- `exposure.docs`: belgeler gezinme yüzeyleri için kanalı dahili/özel olarak
+  işaretler
+- `showConfigured` / `showInSetup`: eski takma adlar uyumluluk için hâlâ kabul
+  edilir; `exposure` tercih edin
+- `quickstartAllowFrom`: kanalı standart hızlı başlangıç `allowFrom` akışına
+  dahil eder
+- `forceAccountBinding`: yalnızca tek bir hesap olsa bile açık hesap bağlaması
+  gerektirir
+- `preferSessionLookupForAnnounceTarget`: duyuru hedeflerini çözümlerken oturum
+  aramasını tercih eder
 
-OpenClaw ayrıca **harici kanal kataloglarını** da birleştirebilir (örneğin, bir MPM
-kayıt defteri dışa aktarımı). Şu konumlardan birine bir JSON dosyası bırakın:
+OpenClaw ayrıca **harici kanal kataloglarını** da birleştirebilir (örneğin bir
+MPM kayıt dışa aktarımı). Şu konumlardan birine bir JSON dosyası bırakın:
 
 - `~/.openclaw/mpm/plugins.json`
 - `~/.openclaw/mpm/catalog.json`
 - `~/.openclaw/plugins/catalog.json`
 
-Veya `OPENCLAW_PLUGIN_CATALOG_PATHS` (ya da `OPENCLAW_MPM_CATALOG_PATHS`) değişkenini
-bir veya daha fazla JSON dosyasına yönlendirin (virgül/noktalı virgül/`PATH` ile ayrılmış). Her dosya
-`{ "entries": [ { "name": "@scope/pkg", "openclaw": { "channel": {...}, "install": {...} } } ] }` içermelidir. Ayrıştırıcı, `"entries"` anahtarı için eski takma adlar olarak `"packages"` veya `"plugins"` değerlerini de kabul eder.
+Veya `OPENCLAW_PLUGIN_CATALOG_PATHS` (ya da `OPENCLAW_MPM_CATALOG_PATHS`) ile bir
+veya daha fazla JSON dosyasını işaret edin (virgül/noktalı virgül/`PATH`
+ayrılmış). Her dosya şu yapıyı içermelidir:
+`{ "entries": [ { "name": "@scope/pkg", "openclaw": { "channel": {...}, "install": {...} } } ] }`.
+Ayrıştırıcı, `"entries"` anahtarı için eski takma adlar olarak `"packages"` veya
+`"plugins"` değerlerini de kabul eder.
 
-## Bağlam motoru plugin’leri
+## Bağlam motoru eklentileri
 
-Bağlam motoru plugin’leri, alım, birleştirme ve sıkıştırma için oturum bağlamı orkestrasyonuna sahiptir.
-Bunları plugin’inizden
+Bağlam motoru eklentileri; alma, birleştirme ve sıkıştırma için oturum bağlamı
+orkestrasyonunun sahibidir. Bunları eklentinizden
 `api.registerContextEngine(id, factory)` ile kaydedin, ardından etkin motoru
 `plugins.slots.contextEngine` ile seçin.
 
-Bunu, plugin’inizin yalnızca bellek araması veya kancalar eklemek yerine
-varsayılan bağlam işlem hattısını değiştirmesi ya da genişletmesi gerektiğinde kullanın.
+Bunu, eklentiniz yalnızca bellek araması veya kancalar eklemek yerine varsayılan
+bağlam hattını değiştirmek ya da genişletmek istediğinde kullanın.
 
 ```ts
 import { buildMemorySystemPromptAddition } from "openclaw/plugin-sdk/core";
@@ -1518,8 +1693,8 @@ export default function (api) {
 }
 ```
 
-Motorunuz sıkıştırma algoritmasına **sahip değilse**, `compact()`
-uygulamasını koruyun ve bunu açıkça devredin:
+Motorunuz sıkıştırma algoritmasının sahibi **değilse**, `compact()` yöntemini
+uygulamaya devam edin ve bunu açıkça devredin:
 
 ```ts
 import {
@@ -1556,53 +1731,54 @@ export default function (api) {
 
 ## Yeni bir yetenek ekleme
 
-Bir plugin’in mevcut API’ye uymayan bir davranışa ihtiyacı olduğunda,
-plugin sistemini özel bir iç erişimle baypas etmeyin. Eksik yeteneği ekleyin.
+Bir eklenti mevcut API'ye uymayan bir davranışa ihtiyaç duyduğunda, eklenti
+sistemini özel bir iç erişimle atlamayın. Eksik yeteneği ekleyin.
 
 Önerilen sıra:
 
 1. çekirdek sözleşmeyi tanımlayın
-   Çekirdeğin hangi paylaşılan davranışa sahip olması gerektiğine karar verin: politika, geri dönüş, yapılandırma birleştirme,
-   yaşam döngüsü, kanala dönük anlambilim ve çalışma zamanı yardımcı şekli.
-2. türlenmiş plugin kayıt/çalışma zamanı yüzeyleri ekleyin
-   `OpenClawPluginApi` ve/veya `api.runtime` yüzeyini, yararlı olan en küçük
+   Çekirdeğin hangi paylaşılan davranışın sahibi olması gerektiğine karar verin:
+   politika, geri dönüş, yapılandırma birleştirme, yaşam döngüsü, kanala dönük
+   semantik ve çalışma zamanı yardımcı şekli.
+2. türlenmiş eklenti kayıt/çalışma zamanı yüzeyleri ekleyin
+   `OpenClawPluginApi` ve/veya `api.runtime` öğelerini en küçük yararlı
    türlenmiş yetenek yüzeyiyle genişletin.
 3. çekirdek + kanal/özellik tüketicilerini bağlayın
-   Kanallar ve özellik plugin’leri yeni yeteneği doğrudan bir satıcı uygulamasını içe aktararak değil,
-   çekirdek üzerinden tüketmelidir.
+   Kanallar ve özellik eklentileri, yeni yeteneği bir satıcı uygulamasını
+   doğrudan içe aktararak değil çekirdek üzerinden tüketmelidir.
 4. satıcı uygulamalarını kaydedin
-   Ardından satıcı plugin’leri arka uçlarını bu yeteneğe karşı kaydeder.
+   Satıcı eklentileri daha sonra arka uçlarını bu yeteneğe karşı kaydeder.
 5. sözleşme kapsamı ekleyin
-   Sahipliğin ve kayıt şeklinin zaman içinde açık kalması için testler ekleyin.
+   Sahiplik ve kayıt şekli zaman içinde açık kalsın diye testler ekleyin.
 
-OpenClaw bu şekilde görüş sahibi kalırken tek bir
-sağlayıcının bakış açısına sabit kodlanmış hâle gelmez. Somut bir dosya denetim listesi ve işlenmiş örnek için
-[Capability Cookbook](/tr/plugins/architecture) sayfasına bakın.
+OpenClaw böylece tek bir sağlayıcının dünya görüşüne sabit kodlanmadan görüş
+sahibi kalır. Somut bir dosya kontrol listesi ve çalışılmış örnek için
+[Yetenek Yemek Kitabı](/tr/plugins/architecture) bölümüne bakın.
 
-### Yetenek denetim listesi
+### Yetenek kontrol listesi
 
-Yeni bir yetenek eklediğinizde, uygulama genellikle şu
-yüzeylere birlikte dokunmalıdır:
+Yeni bir yetenek eklediğinizde, uygulama genellikle bu yüzeylere birlikte
+dokunmalıdır:
 
 - `src/<capability>/types.ts` içindeki çekirdek sözleşme türleri
 - `src/<capability>/runtime.ts` içindeki çekirdek çalıştırıcı/çalışma zamanı yardımcısı
-- `src/plugins/types.ts` içindeki plugin API kayıt yüzeyi
-- `src/plugins/registry.ts` içindeki plugin kayıt defteri bağlantısı
-- özellik/kanal
-  plugin’lerinin bunu tüketmesi gerektiğinde `src/plugins/runtime/*` içindeki plugin çalışma zamanı gösterimi
+- `src/plugins/types.ts` içindeki eklenti API kayıt yüzeyi
+- `src/plugins/registry.ts` içindeki eklenti kayıt sistemi bağlantısı
+- özellik/kanal eklentilerinin bunu tüketmesi gerektiğinde
+  `src/plugins/runtime/*` içindeki eklenti çalışma zamanı sunumu
 - `src/test-utils/plugin-registration.ts` içindeki yakalama/test yardımcıları
 - `src/plugins/contracts/registry.ts` içindeki sahiplik/sözleşme doğrulamaları
-- `docs/` içindeki operatör/plugin belgeleri
+- `docs/` içindeki operatör/eklenti belgeleri
 
-Bu yüzeylerden biri eksikse, bu genellikle yeteneğin
-henüz tam olarak entegre edilmediğinin işaretidir.
+Bu yüzeylerden biri eksikse, bu genellikle yeteneğin henüz tam olarak entegre
+edilmediğinin işaretidir.
 
 ### Yetenek şablonu
 
-Asgari desen:
+En küçük desen:
 
 ```ts
-// çekirdek sözleşme
+// core contract
 export type VideoGenerationProviderPlugin = {
   id: string;
   label: string;
@@ -1618,22 +1794,22 @@ api.registerVideoGenerationProvider({
   },
 });
 
-// özellik/kanal plugin’leri için paylaşılan çalışma zamanı yardımcısı
+// shared runtime helper for feature/channel plugins
 const clip = await api.runtime.videoGeneration.generate({
   prompt: "Show the robot walking through the lab.",
   cfg,
 });
 ```
 
-Sözleşme test deseni:
+Sözleşme testi deseni:
 
 ```ts
 expect(findVideoGenerationProviderIdsForPlugin("openai")).toEqual(["openai"]);
 ```
 
-Bu kuralı basit tutar:
+Bu, kuralı basit tutar:
 
-- çekirdek, yetenek sözleşmesine + orkestrasyona sahiptir
-- satıcı plugin’leri satıcı uygulamalarına sahiptir
-- özellik/kanal plugin’leri çalışma zamanı yardımcılarını tüketir
+- çekirdek yetenek sözleşmesinin + orkestrasyonun sahibidir
+- satıcı eklentileri satıcı uygulamalarının sahibidir
+- özellik/kanal eklentileri çalışma zamanı yardımcılarını tüketir
 - sözleşme testleri sahipliği açık tutar

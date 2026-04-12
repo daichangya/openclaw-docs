@@ -3,13 +3,13 @@ read_when:
     - Etkin belleğin ne için olduğunu anlamak istiyorsunuz
     - Bir konuşma aracısı için etkin belleği açmak istiyorsunuz
     - Etkin bellek davranışını her yerde etkinleştirmeden ayarlamak istiyorsunuz
-summary: Etkileşimli sohbet oturumlarına ilgili belleği ekleyen, eklentiye ait bir engelleyici bellek alt aracısı
+summary: İlgili belleği etkileşimli sohbet oturumlarına enjekte eden eklentiye ait engelleyici bellek alt aracısı
 title: Etkin Bellek
 x-i18n:
-    generated_at: "2026-04-11T08:30:00Z"
+    generated_at: "2026-04-12T08:32:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e8b0e6539e09678e9e8def68795f8bcb992f98509423da3da3123eda88ec1dd5
+    source_hash: 59456805c28daaab394ba2a7f87e1104a1334a5cf32dbb961d5d232d9c471d84
     source_path: concepts/active-memory.md
     workflow: 15
 ---
@@ -18,13 +18,13 @@ x-i18n:
 
 Etkin bellek, uygun konuşma oturumlarında ana yanıttan önce çalışan, eklentiye ait isteğe bağlı bir engelleyici bellek alt aracısıdır.
 
-Bunun nedeni, çoğu bellek sisteminin yetenekli ama tepkisel olmasıdır. Bellekte ne zaman arama yapılacağına ana aracının karar vermesine ya da kullanıcının "bunu hatırla" veya "bellekte ara" gibi şeyler söylemesine dayanırlar. O noktada, belleğin yanıtı doğal hissettireceği an çoktan geçmiş olur.
+Bunun var olma nedeni, çoğu bellek sisteminin yetenekli ama tepkisel olmasıdır. Ana aracının bellekte ne zaman arama yapacağına karar vermesine veya kullanıcının "bunu hatırla" ya da "bellekte ara" gibi şeyler söylemesine dayanırlar. O noktaya gelindiğinde, belleğin yanıtı doğal hissettireceği an çoktan geçmiş olur.
 
-Etkin bellek, ana yanıt oluşturulmadan önce sistemin ilgili belleği ortaya çıkarması için sınırlı tek bir fırsat verir.
+Etkin bellek, ana yanıt oluşturulmadan önce sisteme ilgili belleği ortaya çıkarma konusunda sınırlı bir fırsat verir.
 
 ## Bunu Aracınıza Yapıştırın
 
-Etkin Belleği kendi içinde yeterli, varsayılan olarak güvenli bir kurulumla etkinleştirmek istiyorsanız, bunu aracınıza yapıştırın:
+Etkin Belleği kendi içinde yeterli, güvenli varsayılanlara sahip bir kurulumla etkinleştirmek istiyorsanız bunu aracınıza yapıştırın:
 
 ```json5
 {
@@ -36,7 +36,7 @@ Etkin Belleği kendi içinde yeterli, varsayılan olarak güvenli bir kurulumla 
           enabled: true,
           agents: ["main"],
           allowedChatTypes: ["direct"],
-          modelFallbackPolicy: "default-remote",
+          modelFallback: "google/gemini-3-flash",
           queryMode: "recent",
           promptStyle: "balanced",
           timeoutMs: 15000,
@@ -50,15 +50,15 @@ Etkin Belleği kendi içinde yeterli, varsayılan olarak güvenli bir kurulumla 
 }
 ```
 
-Bu, eklentiyi `main` aracısı için açar, varsayılan olarak yalnızca doğrudan mesaj tarzı oturumlarla sınırlar, önce mevcut oturum modelini devralmasına izin verir ve yine de açık veya devralınmış bir model yoksa yerleşik uzak yedeğe izin verir.
+Bu, eklentiyi `main` aracısı için açar, varsayılan olarak bunu yalnızca doğrudan mesaj tarzı oturumlarla sınırlar, önce geçerli oturum modelini devralmasına izin verir ve yalnızca açıkça belirtilmiş veya devralınmış bir model yoksa yapılandırılmış geri dönüş modelini kullanır.
 
-Ardından, gateway'i yeniden başlatın:
+Ardından gateway'i yeniden başlatın:
 
 ```bash
 openclaw gateway
 ```
 
-Bunu bir konuşma sırasında canlı olarak incelemek için:
+Bunu bir konuşmada canlı olarak incelemek için:
 
 ```text
 /verbose on
@@ -70,7 +70,7 @@ En güvenli kurulum şudur:
 
 1. eklentiyi etkinleştirin
 2. bir konuşma aracısını hedefleyin
-3. yalnızca ayarlama yaparken günlük kaydını açık tutun
+3. ayarlama yaparken günlük kaydını açık tutun
 
 `openclaw.json` içinde şununla başlayın:
 
@@ -83,7 +83,7 @@ En güvenli kurulum şudur:
         config: {
           agents: ["main"],
           allowedChatTypes: ["direct"],
-          modelFallbackPolicy: "default-remote",
+          modelFallback: "google/gemini-3-flash",
           queryMode: "recent",
           promptStyle: "balanced",
           timeoutMs: 15000,
@@ -103,23 +103,23 @@ Ardından gateway'i yeniden başlatın:
 openclaw gateway
 ```
 
-Bunun anlamı:
+Bunun anlamı şudur:
 
 - `plugins.entries.active-memory.enabled: true` eklentiyi açar
 - `config.agents: ["main"]` yalnızca `main` aracısını etkin belleğe dahil eder
-- `config.allowedChatTypes: ["direct"]` etkin belleği varsayılan olarak yalnızca doğrudan mesaj tarzı oturumlarda açık tutar
-- `config.model` ayarlanmamışsa, etkin bellek önce mevcut oturum modelini devralır
-- `config.modelFallbackPolicy: "default-remote"` açık veya devralınmış bir model olmadığında yerleşik uzak yedeği varsayılan olarak korur
+- `config.allowedChatTypes: ["direct"]` varsayılan olarak etkin belleği yalnızca doğrudan mesaj tarzı oturumlar için açık tutar
+- `config.model` ayarlanmamışsa, etkin bellek önce geçerli oturum modelini devralır
+- `config.modelFallback` isteğe bağlı olarak geri çağırma için kendi geri dönüş sağlayıcınızı/modelinizi sunar
 - `config.promptStyle: "balanced"` `recent` modu için varsayılan genel amaçlı istem stilini kullanır
 - etkin bellek yine de yalnızca uygun etkileşimli kalıcı sohbet oturumlarında çalışır
 
 ## Nasıl görebilirsiniz
 
-Etkin bellek, model için gizli sistem bağlamı ekler. Ham `<active_memory_plugin>...</active_memory_plugin>` etiketlerini istemciye göstermez.
+Etkin bellek, model için gizli sistem bağlamı enjekte eder. Ham `<active_memory_plugin>...</active_memory_plugin>` etiketlerini istemciye göstermez.
 
-## Oturum anahtarı
+## Oturum geçişi
 
-Yapılandırmayı düzenlemeden mevcut sohbet oturumu için etkin belleği duraklatmak veya sürdürmek istediğinizde eklenti komutunu kullanın:
+Yapılandırmayı düzenlemeden geçerli sohbet oturumu için etkin belleği duraklatmak veya sürdürmek istediğinizde eklenti komutunu kullanın:
 
 ```text
 /active-memory status
@@ -127,11 +127,11 @@ Yapılandırmayı düzenlemeden mevcut sohbet oturumu için etkin belleği durak
 /active-memory on
 ```
 
-Bu, oturum kapsamındadır. Şunları değiştirmez:
+Bu oturum kapsamındadır. Şunları değiştirmez:
 `plugins.entries.active-memory.enabled`, aracı hedefleme veya diğer genel
 yapılandırmalar.
 
-Komutun yapılandırma yazmasını ve tüm oturumlar için etkin belleği duraklatmasını veya sürdürmesini istiyorsanız, açık genel biçimi kullanın:
+Komutun yapılandırmaya yazmasını ve tüm oturumlar için etkin belleği duraklatmasını veya sürdürmesini istiyorsanız, açık genel biçimi kullanın:
 
 ```text
 /active-memory status --global
@@ -139,9 +139,9 @@ Komutun yapılandırma yazmasını ve tüm oturumlar için etkin belleği durakl
 /active-memory on --global
 ```
 
-Genel biçim `plugins.entries.active-memory.config.enabled` değerini yazar. Komutun daha sonra etkin belleği yeniden açabilmesi için `plugins.entries.active-memory.enabled` değerini açık bırakır.
+Genel biçim `plugins.entries.active-memory.config.enabled` değerini yazar. `plugins.entries.active-memory.enabled` değerini açık bırakır; böylece komut, etkin belleği daha sonra yeniden açmak için kullanılabilir kalır.
 
-Canlı bir oturumda etkin belleğin ne yaptığını görmek istiyorsanız, o oturum için ayrıntılı modu açın:
+Etkin belleğin canlı bir oturumda ne yaptığını görmek istiyorsanız, o oturum için ayrıntılı modu açın:
 
 ```text
 /verbose on
@@ -154,19 +154,19 @@ Ayrıntılı mod etkinleştirildiğinde, OpenClaw şunları gösterebilir:
 
 Bu satırlar, gizli sistem bağlamını besleyen aynı etkin bellek geçişinden türetilir, ancak ham istem işaretlemesini açığa çıkarmak yerine insanlar için biçimlendirilir.
 
-Varsayılan olarak, engelleyici bellek alt aracısı dökümü geçicidir ve çalışma tamamlandıktan sonra silinir.
+Varsayılan olarak, engelleyici bellek alt aracısı dökümü geçicidir ve çalıştırma tamamlandıktan sonra silinir.
 
 Örnek akış:
 
 ```text
 /verbose on
-hangi tavuk kanadını sipariş etmeliyim?
+hangi kanatları sipariş etmeliyim?
 ```
 
 Beklenen görünür yanıt biçimi:
 
 ```text
-...normal yardımcı yanıtı...
+...normal assistant reply...
 
 🧩 Active Memory: ok 842ms recent 34 chars
 🔎 Active Memory Debug: Lemon pepper wings with blue cheese.
@@ -174,16 +174,16 @@ Beklenen görünür yanıt biçimi:
 
 ## Ne zaman çalışır
 
-Etkin bellek iki geçit kullanır:
+Etkin bellek iki eşik kullanır:
 
-1. **Yapılandırma ile dahil etme**
-   Eklenti etkinleştirilmiş olmalı ve mevcut aracı kimliği
+1. **Yapılandırma ile katılım**
+   Eklenti etkin olmalıdır ve geçerli aracı kimliği
    `plugins.entries.active-memory.config.agents` içinde görünmelidir.
-2. **Katı çalışma zamanı uygunluğu**
+2. **Sıkı çalışma zamanı uygunluğu**
    Etkinleştirilmiş ve hedeflenmiş olsa bile, etkin bellek yalnızca uygun
-   etkileşimli kalıcı sohbet oturumlarında çalışır.
+   etkileşimli kalıcı sohbet oturumları için çalışır.
 
-Gerçek kural şudur:
+Asıl kural şudur:
 
 ```text
 eklenti etkin
@@ -201,7 +201,8 @@ Bunlardan herhangi biri başarısız olursa, etkin bellek çalışmaz.
 
 ## Oturum türleri
 
-`config.allowedChatTypes`, Etkin Belleğin hangi tür konuşmalarda überhaupt çalışabileceğini kontrol eder.
+`config.allowedChatTypes`, hangi konuşma türlerinin Etkin Belleği
+çalıştırabileceğini kontrol eder.
 
 Varsayılan değer şudur:
 
@@ -209,7 +210,7 @@ Varsayılan değer şudur:
 allowedChatTypes: ["direct"]
 ```
 
-Bu, Etkin Belleğin varsayılan olarak doğrudan mesaj tarzı oturumlarda çalıştığı, ancak açıkça dahil etmediğiniz sürece grup veya kanal oturumlarında çalışmadığı anlamına gelir.
+Bu, Etkin Belleğin varsayılan olarak doğrudan mesaj tarzı oturumlarda çalıştığı, ancak siz açıkça dahil etmedikçe grup veya kanal oturumlarında çalışmadığı anlamına gelir.
 
 Örnekler:
 
@@ -227,35 +228,35 @@ allowedChatTypes: ["direct", "group", "channel"]
 
 ## Nerede çalışır
 
-Etkin bellek, platform genelinde bir çıkarım özelliği değil, konuşmayı zenginleştirme özelliğidir.
+Etkin bellek, platform genelinde bir çıkarım özelliği değil, konuşmaları zenginleştirme özelliğidir.
 
-| Yüzey                                                              | Etkin bellek çalışır mı?                                |
-| ------------------------------------------------------------------ | ------------------------------------------------------- |
-| Control UI / web sohbeti kalıcı oturumları                         | Evet, eklenti etkinse ve aracı hedeflendiyse            |
-| Aynı kalıcı sohbet yolu üzerindeki diğer etkileşimli kanal oturumları | Evet, eklenti etkinse ve aracı hedeflendiyse            |
-| Başsız tek seferlik çalıştırmalar                                  | Hayır                                                   |
-| Heartbeat/arka plan çalıştırmaları                                 | Hayır                                                   |
-| Genel dahili `agent-command` yolları                               | Hayır                                                   |
-| Alt aracı/dahili yardımcı yürütmesi                                | Hayır                                                   |
+| Surface                                                             | Etkin bellek çalışır mı?                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------- |
+| Control UI / web chat persistent sessions                           | Evet, eklenti etkinse ve aracı hedeflenmişse            |
+| Other interactive channel sessions on the same persistent chat path | Evet, eklenti etkinse ve aracı hedeflenmişse            |
+| Headless one-shot runs                                              | Hayır                                                   |
+| Heartbeat/background runs                                           | Hayır                                                   |
+| Generic internal `agent-command` paths                              | Hayır                                                   |
+| Sub-agent/internal helper execution                                 | Hayır                                                   |
 
 ## Neden kullanılır
 
 Etkin belleği şu durumlarda kullanın:
 
 - oturum kalıcı ve kullanıcıya dönükse
-- aracının aranabilecek anlamlı uzun vadeli belleği varsa
+- aracının aranacak anlamlı uzun vadeli belleği varsa
 - süreklilik ve kişiselleştirme, ham istem belirlenimciliğinden daha önemliyse
 
-Özellikle şu durumlarda iyi çalışır:
+Özellikle şunlar için iyi çalışır:
 
-- kalıcı tercihler
-- yinelenen alışkanlıklar
-- doğal şekilde ortaya çıkması gereken uzun vadeli kullanıcı bağlamı
+- istikrarlı tercihler
+- tekrar eden alışkanlıklar
+- doğal biçimde ortaya çıkması gereken uzun vadeli kullanıcı bağlamı
 
-Şu durumlar için uygun değildir:
+Şunlar için kötü bir seçimdir:
 
 - otomasyon
-- dahili çalışanlar
+- iç çalışanlar
 - tek seferlik API görevleri
 - gizli kişiselleştirmenin şaşırtıcı olacağı yerler
 
@@ -265,11 +266,11 @@ Etkin belleği şu durumlarda kullanın:
 
 ```mermaid
 flowchart LR
-  U["Kullanıcı Mesajı"] --> Q["Bellek Sorgusu Oluştur"]
-  Q --> R["Etkin Bellek Engelleyici Bellek Alt Aracısı"]
-  R -->|NONE veya boş| M["Ana Yanıt"]
-  R -->|ilgili özet| I["Gizli active_memory_plugin Sistem Bağlamı Ekle"]
-  I --> M["Ana Yanıt"]
+  U["User Message"] --> Q["Build Memory Query"]
+  Q --> R["Active Memory Blocking Memory Sub-Agent"]
+  R -->|NONE or empty| M["Main Reply"]
+  R -->|relevant summary| I["Append Hidden active_memory_plugin System Context"]
+  I --> M["Main Reply"]
 ```
 
 Engelleyici bellek alt aracısı yalnızca şunları kullanabilir:
@@ -285,16 +286,16 @@ Bağlantı zayıfsa `NONE` döndürmelidir.
 
 ## İstem stilleri
 
-`config.promptStyle`, engelleyici bellek alt aracısının belleği döndürüp döndürmemeye karar verirken ne kadar istekli veya katı olduğunu kontrol eder.
+`config.promptStyle`, engelleyici bellek alt aracısının belleği döndürüp döndürmeye karar verirken ne kadar istekli veya katı olduğunu kontrol eder.
 
 Kullanılabilir stiller:
 
 - `balanced`: `recent` modu için genel amaçlı varsayılan
-- `strict`: en az istekli; yakın bağlamdan çok az sızıntı istediğinizde en iyisidir
-- `contextual`: sürekliliğe en uygun; konuşma geçmişinin daha önemli olması gerektiğinde en iyisidir
-- `recall-heavy`: daha yumuşak ama yine de makul eşleşmelerde belleği ortaya çıkarmaya daha isteklidir
-- `precision-heavy`: eşleşme açık değilse agresif şekilde `NONE` tercih eder
-- `preference-only`: favoriler, alışkanlıklar, rutinler, zevkler ve tekrarlayan kişisel bilgiler için optimize edilmiştir
+- `strict`: en az istekli; yakın bağlamdan çok az sızıntı istediğinizde en iyisi
+- `contextual`: sürekliliğe en uygun; konuşma geçmişinin daha önemli olması gerektiğinde en iyisi
+- `recall-heavy`: daha zayıf ama yine de makul eşleşmelerde belleği ortaya çıkarmaya daha isteklidir
+- `precision-heavy`: eşleşme bariz olmadıkça agresif biçimde `NONE` tercih eder
+- `preference-only`: favoriler, alışkanlıklar, rutinler, zevkler ve tekrar eden kişisel gerçekler için optimize edilmiştir
 
 `config.promptStyle` ayarlanmamışsa varsayılan eşleme:
 
@@ -312,32 +313,28 @@ full -> contextual
 promptStyle: "preference-only"
 ```
 
-## Model yedek ilkesi
+## Model geri dönüş ilkesi
 
-`config.model` ayarlanmamışsa, Etkin Bellek bir modeli şu sırayla çözmeye çalışır:
+`config.model` ayarlanmamışsa, Etkin Bellek modeli şu sırayla çözümlemeye çalışır:
 
 ```text
 açık eklenti modeli
--> mevcut oturum modeli
+-> geçerli oturum modeli
 -> aracı birincil modeli
--> isteğe bağlı yerleşik uzak yedek
+-> isteğe bağlı yapılandırılmış geri dönüş modeli
 ```
 
-`config.modelFallbackPolicy` son adımı kontrol eder.
+`config.modelFallback`, yapılandırılmış geri dönüş adımını kontrol eder.
 
-Varsayılan:
+İsteğe bağlı özel geri dönüş:
 
 ```json5
-modelFallbackPolicy: "default-remote"
+modelFallback: "google/gemini-3-flash"
 ```
 
-Diğer seçenek:
+Açık, devralınmış veya yapılandırılmış bir geri dönüş modeli çözümlenmezse, Etkin Bellek o tur için geri çağırmayı atlar.
 
-```json5
-modelFallbackPolicy: "resolved-only"
-```
-
-Açık veya devralınmış bir model olmadığında Etkin Belleğin yerleşik uzak varsayılana geri düşmek yerine geri çağırmayı atlamasını istiyorsanız `resolved-only` kullanın.
+`config.modelFallbackPolicy`, yalnızca eski yapılandırmalar için kullanımdan kaldırılmış bir uyumluluk alanı olarak tutulur. Artık çalışma zamanı davranışını değiştirmez.
 
 ## Gelişmiş kaçış kapıları
 
@@ -355,21 +352,21 @@ Varsayılan:
 thinking: "off"
 ```
 
-Bunu varsayılan olarak etkinleştirmeyin. Etkin Bellek yanıt yolunda çalışır, bu nedenle ek düşünme süresi doğrudan kullanıcının gördüğü gecikmeyi artırır.
+Bunu varsayılan olarak etkinleştirmeyin. Etkin Bellek yanıt yolunda çalışır, bu nedenle ek düşünme süresi kullanıcı tarafından görülen gecikmeyi doğrudan artırır.
 
 `config.promptAppend`, varsayılan Etkin Bellek isteminden sonra ve konuşma bağlamından önce ek operatör talimatları ekler:
 
 ```json5
-promptAppend: "Tek seferlik olaylar yerine kalıcı uzun vadeli tercihleri tercih et."
+promptAppend: "Tek seferlik olaylar yerine istikrarlı uzun vadeli tercihleri önceliklendir."
 ```
 
-`config.promptOverride`, varsayılan Etkin Bellek istemini değiştirir. OpenClaw yine de sonrasında konuşma bağlamını ekler:
+`config.promptOverride`, varsayılan Etkin Bellek istemini değiştirir. OpenClaw daha sonra konuşma bağlamını yine ekler:
 
 ```json5
-promptOverride: "Sen bir bellek arama aracısısın. NONE veya tek bir kısa kullanıcı gerçeği döndür."
+promptOverride: "Bir bellek arama aracısısınız. NONE veya tek bir kompakt kullanıcı gerçeği döndürün."
 ```
 
-İstem özelleştirmesi, bilerek farklı bir geri çağırma sözleşmesini test etmiyorsanız önerilmez. Varsayılan istem, ana model için ya `NONE` ya da kısa kullanıcı-gerçeği bağlamı döndürecek şekilde ayarlanmıştır.
+İstem özelleştirmesi, kasıtlı olarak farklı bir geri çağırma sözleşmesini test etmiyorsanız önerilmez. Varsayılan istem, ana model için ya `NONE` ya da kompakt kullanıcı gerçeği bağlamı döndürecek şekilde ayarlanmıştır.
 
 ### `message`
 
@@ -382,8 +379,8 @@ Yalnızca en son kullanıcı mesajı
 Bunu şu durumlarda kullanın:
 
 - en hızlı davranışı istiyorsanız
-- kalıcı tercih geri çağırımına en güçlü yanlılığı istiyorsanız
-- takip turlarının konuşma bağlamına ihtiyacı yoksa
+- istikrarlı tercih geri çağırmaya en güçlü eğilimi istiyorsanız
+- takip turları konuşma bağlamına ihtiyaç duymuyorsa
 
 Önerilen zaman aşımı:
 
@@ -391,10 +388,10 @@ Bunu şu durumlarda kullanın:
 
 ### `recent`
 
-En son kullanıcı mesajı artı küçük bir yakın dönem konuşma kuyruğu gönderilir.
+En son kullanıcı mesajı artı yakın geçmişten küçük bir konuşma kuyruğu gönderilir.
 
 ```text
-Yakın dönem konuşma kuyruğu:
+Yakın konuşma kuyruğu:
 user: ...
 assistant: ...
 user: ...
@@ -406,7 +403,7 @@ En son kullanıcı mesajı:
 Bunu şu durumlarda kullanın:
 
 - hız ve konuşma temellendirmesi arasında daha iyi bir denge istiyorsanız
-- takip soruları sık sık son birkaç tura bağlıysa
+- takip soruları genellikle son birkaç tura bağlıysa
 
 Önerilen zaman aşımı:
 
@@ -427,12 +424,12 @@ user: ...
 Bunu şu durumlarda kullanın:
 
 - en güçlü geri çağırma kalitesi gecikmeden daha önemliyse
-- konuşma, akışın çok gerisinde önemli kurulum içeriyorsa
+- konuşma dizisinin çok gerilerinde önemli kurulum bilgileri varsa
 
 Önerilen zaman aşımı:
 
-- `message` veya `recent` ile karşılaştırıldığında belirgin şekilde artırın
-- ileti dizisi boyutuna bağlı olarak yaklaşık `15000` ms veya daha yüksek bir değerle başlayın
+- bunu `message` veya `recent` ile karşılaştırıldığında belirgin biçimde artırın
+- dizi boyutuna bağlı olarak yaklaşık `15000` ms veya daha yüksek bir değerden başlayın
 
 Genel olarak, zaman aşımı bağlam boyutuyla birlikte artmalıdır:
 
@@ -450,7 +447,7 @@ Varsayılan olarak bu döküm geçicidir:
 - yalnızca engelleyici bellek alt aracısı çalıştırması için kullanılır
 - çalıştırma biter bitmez silinir
 
-Hata ayıklama veya inceleme için bu engelleyici bellek alt aracısı dökümlerini diskte tutmak istiyorsanız, kalıcılığı açıkça etkinleştirin:
+Hata ayıklama veya inceleme amacıyla bu engelleyici bellek alt aracısı dökümlerini diskte tutmak istiyorsanız, kalıcılığı açıkça etkinleştirin:
 
 ```json5
 {
@@ -471,7 +468,7 @@ Hata ayıklama veya inceleme için bu engelleyici bellek alt aracısı dökümle
 
 Etkinleştirildiğinde, etkin bellek dökümleri ana kullanıcı konuşması döküm yolunda değil, hedef aracının oturum klasörü altında ayrı bir dizinde depolar.
 
-Varsayılan düzen kavramsal olarak şöyledir:
+Varsayılan yerleşim kavramsal olarak şöyledir:
 
 ```text
 agents/<agent>/sessions/active-memory/<blocking-memory-sub-agent-session-id>.jsonl
@@ -495,32 +492,32 @@ plugins.entries.active-memory
 
 En önemli alanlar şunlardır:
 
-| Anahtar                    | Tür                                                                                                  | Anlamı                                                                                                 |
-| -------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `enabled`                  | `boolean`                                                                                            | Eklentinin kendisini etkinleştirir                                                                     |
-| `config.agents`            | `string[]`                                                                                           | Etkin belleği kullanabilen aracı kimlikleri                                                            |
-| `config.model`             | `string`                                                                                             | İsteğe bağlı engelleyici bellek alt aracısı model başvurusu; ayarlanmadığında etkin bellek mevcut oturum modelini kullanır |
-| `config.queryMode`         | `"message" \| "recent" \| "full"`                                                                    | Engelleyici bellek alt aracısının konuşmanın ne kadarını gördüğünü kontrol eder                        |
-| `config.promptStyle`       | `"balanced" \| "strict" \| "contextual" \| "recall-heavy" \| "precision-heavy" \| "preference-only"` | Engelleyici bellek alt aracısının belleği döndürüp döndürmemeye karar verirken ne kadar istekli veya katı olduğunu kontrol eder |
-| `config.thinking`          | `"off" \| "minimal" \| "low" \| "medium" \| "high" \| "xhigh" \| "adaptive"`                        | Engelleyici bellek alt aracısı için gelişmiş düşünme geçersiz kılması; hız için varsayılan `off`      |
-| `config.promptOverride`    | `string`                                                                                             | Gelişmiş tam istem değiştirme; normal kullanım için önerilmez                                          |
-| `config.promptAppend`      | `string`                                                                                             | Varsayılan veya geçersiz kılınmış isteme eklenen gelişmiş ek talimatlar                                |
-| `config.timeoutMs`         | `number`                                                                                             | Engelleyici bellek alt aracısı için katı zaman aşımı                                                   |
-| `config.maxSummaryChars`   | `number`                                                                                             | Etkin bellek özetinde izin verilen en fazla toplam karakter sayısı                                     |
-| `config.logging`           | `boolean`                                                                                            | Ayarlama sırasında etkin bellek günlüklerini üretir                                                    |
-| `config.persistTranscripts`| `boolean`                                                                                            | Engelleyici bellek alt aracısı dökümlerini geçici dosyaları silmek yerine diskte tutar                |
-| `config.transcriptDir`     | `string`                                                                                             | Aracı oturum klasörü altındaki göreli engelleyici bellek alt aracısı döküm dizini                     |
+| Key                         | Type                                                                                                 | Anlamı                                                                                                 |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `enabled`                   | `boolean`                                                                                            | Eklentinin kendisini etkinleştirir                                                                     |
+| `config.agents`             | `string[]`                                                                                           | Etkin belleği kullanabilen aracı kimlikleri                                                           |
+| `config.model`              | `string`                                                                                             | İsteğe bağlı engelleyici bellek alt aracısı model başvurusu; ayarlanmamışsa etkin bellek geçerli oturum modelini kullanır |
+| `config.queryMode`          | `"message" \| "recent" \| "full"`                                                                    | Engelleyici bellek alt aracısının konuşmanın ne kadarını gördüğünü kontrol eder                        |
+| `config.promptStyle`        | `"balanced" \| "strict" \| "contextual" \| "recall-heavy" \| "precision-heavy" \| "preference-only"` | Engelleyici bellek alt aracısının belleği döndürüp döndürmeye karar verirken ne kadar istekli veya katı olduğunu kontrol eder |
+| `config.thinking`           | `"off" \| "minimal" \| "low" \| "medium" \| "high" \| "xhigh" \| "adaptive"`                         | Engelleyici bellek alt aracısı için gelişmiş düşünme geçersiz kılması; hız için varsayılan `off`      |
+| `config.promptOverride`     | `string`                                                                                             | Gelişmiş tam istem değiştirme; normal kullanım için önerilmez                                          |
+| `config.promptAppend`       | `string`                                                                                             | Varsayılan veya geçersiz kılınmış isteme eklenen gelişmiş ek talimatlar                                |
+| `config.timeoutMs`          | `number`                                                                                             | Engelleyici bellek alt aracısı için kesin zaman aşımı                                                  |
+| `config.maxSummaryChars`    | `number`                                                                                             | Etkin bellek özeti içinde izin verilen en yüksek toplam karakter sayısı                                |
+| `config.logging`            | `boolean`                                                                                            | Ayarlama sırasında etkin bellek günlüklerini üretir                                                    |
+| `config.persistTranscripts` | `boolean`                                                                                            | Engelleyici bellek alt aracısı dökümlerini geçici dosyaları silmek yerine diskte tutar                |
+| `config.transcriptDir`      | `string`                                                                                             | Aracı oturumları klasörü altındaki göreli engelleyici bellek alt aracısı döküm dizini                 |
 
 Yararlı ayarlama alanları:
 
-| Anahtar                      | Tür      | Anlamı                                                     |
-| ---------------------------- | -------- | ---------------------------------------------------------- |
-| `config.maxSummaryChars`     | `number` | Etkin bellek özetinde izin verilen en fazla toplam karakter sayısı |
-| `config.recentUserTurns`     | `number` | `queryMode` `recent` olduğunda dahil edilecek önceki kullanıcı turları |
-| `config.recentAssistantTurns`| `number` | `queryMode` `recent` olduğunda dahil edilecek önceki yardımcı turları |
-| `config.recentUserChars`     | `number` | Son kullanıcı turu başına en fazla karakter                |
-| `config.recentAssistantChars`| `number` | Son yardımcı turu başına en fazla karakter                 |
-| `config.cacheTtlMs`          | `number` | Tekrarlanan özdeş sorgular için önbellek yeniden kullanımı |
+| Key                           | Type     | Anlamı                                                       |
+| ----------------------------- | -------- | ------------------------------------------------------------ |
+| `config.maxSummaryChars`      | `number` | Etkin bellek özetinde izin verilen en yüksek toplam karakter sayısı |
+| `config.recentUserTurns`      | `number` | `queryMode` `recent` olduğunda dahil edilecek önceki kullanıcı turları |
+| `config.recentAssistantTurns` | `number` | `queryMode` `recent` olduğunda dahil edilecek önceki asistan turları |
+| `config.recentUserChars`      | `number` | Yakın tarihli kullanıcı turu başına en yüksek karakter sayısı |
+| `config.recentAssistantChars` | `number` | Yakın tarihli asistan turu başına en yüksek karakter sayısı  |
+| `config.cacheTtlMs`           | `number` | Yinelenen aynı sorgular için önbellek yeniden kullanımı      |
 
 ## Önerilen kurulum
 
@@ -546,9 +543,9 @@ Yararlı ayarlama alanları:
 }
 ```
 
-Ayarlama yaparken canlı davranışı incelemek istiyorsanız, ayrı bir etkin bellek hata ayıklama komutu aramak yerine oturumda `/verbose on` kullanın.
+Ayarlama yaparken canlı davranışı incelemek istiyorsanız, ayrı bir active-memory hata ayıklama komutu aramak yerine oturumda `/verbose on` kullanın.
 
-Ardından şunlara geçin:
+Ardından şuna geçin:
 
 - daha düşük gecikme istiyorsanız `message`
 - ek bağlamın daha yavaş engelleyici bellek alt aracısına değdiğine karar verirseniz `full`
@@ -557,10 +554,10 @@ Ardından şunlara geçin:
 
 Etkin bellek beklediğiniz yerde görünmüyorsa:
 
-1. Eklentinin `plugins.entries.active-memory.enabled` altında etkinleştirildiğini doğrulayın.
+1. Eklentinin `plugins.entries.active-memory.enabled` altında etkin olduğunu doğrulayın.
 2. Geçerli aracı kimliğinin `config.agents` içinde listelendiğini doğrulayın.
-3. Etkileşimli kalıcı bir sohbet oturumu üzerinden test yaptığınızı doğrulayın.
-4. `config.logging: true` seçeneğini açın ve gateway günlüklerini izleyin.
+3. Testi etkileşimli kalıcı bir sohbet oturumu üzerinden yaptığınızı doğrulayın.
+4. `config.logging: true` ayarını açın ve gateway günlüklerini izleyin.
 5. Bellek aramasının kendisinin `openclaw memory status --deep` ile çalıştığını doğrulayın.
 
 Bellek eşleşmeleri gürültülüyse şunu sıkılaştırın:
@@ -571,7 +568,7 @@ Etkin bellek çok yavaşsa:
 
 - `queryMode` değerini düşürün
 - `timeoutMs` değerini düşürün
-- son tur sayılarını azaltın
+- yakın tarihli tur sayılarını azaltın
 - tur başına karakter sınırlarını azaltın
 
 ## İlgili sayfalar
