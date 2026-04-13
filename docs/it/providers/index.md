@@ -1,14 +1,14 @@
 ---
 read_when:
     - Vuoi scegliere un provider di modelli
-    - Hai bisogno di una rapida panoramica dei backend LLM supportati
+    - Ti serve una rapida panoramica dei backend LLM supportati
 summary: Provider di modelli (LLM) supportati da OpenClaw
 title: Directory dei provider
 x-i18n:
-    generated_at: "2026-04-08T02:17:21Z"
+    generated_at: "2026-04-13T08:27:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e7bee5528b7fc9a982b3d0eaa4930cb77f7bded19a47aec00572b6fcbd823a70
+    source_hash: 3bc682d008119719826f71f74959ab32bedf14214459f5e6ac9cb70371d3c540
     source_path: providers/index.md
     workflow: 15
 ---
@@ -18,9 +18,9 @@ x-i18n:
 OpenClaw può usare molti provider LLM. Scegli un provider, autenticati, quindi imposta il
 modello predefinito come `provider/model`.
 
-Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/ecc.)? Vedi [Channels](/it/channels).
+Cerchi la documentazione dei canali di chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/ecc.)? Vedi [Canali](/it/channels).
 
-## Avvio rapido
+## Guida rapida
 
 1. Autenticati con il provider (di solito tramite `openclaw onboard`).
 2. Imposta il modello predefinito:
@@ -48,10 +48,11 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 - [Modelli GLM](/it/providers/glm)
 - [Google (Gemini)](/it/providers/google)
 - [Groq (inferenza LPU)](/it/providers/groq)
-- [Hugging Face (Inference)](/it/providers/huggingface)
+- [Hugging Face (inferenza)](/it/providers/huggingface)
 - [inferrs (modelli locali)](/it/providers/inferrs)
 - [Kilocode](/it/providers/kilocode)
-- [LiteLLM (gateway unificato)](/it/providers/litellm)
+- [LiteLLM (Gateway unificato)](/it/providers/litellm)
+- [LM Studio (modelli locali)](/it/providers/lmstudio)
 - [MiniMax](/it/providers/minimax)
 - [Mistral](/it/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/it/providers/moonshot)
@@ -69,7 +70,7 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 - [StepFun](/it/providers/stepfun)
 - [Synthetic](/it/providers/synthetic)
 - [Together AI](/it/providers/together)
-- [Venice (Venice AI, focalizzato sulla privacy)](/it/providers/venice)
+- [Venice (Venice AI, orientato alla privacy)](/it/providers/venice)
 - [Vercel AI Gateway](/it/providers/vercel-ai-gateway)
 - [Vydra](/it/providers/vydra)
 - [vLLM (modelli locali)](/it/providers/vllm)
@@ -80,7 +81,7 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 
 ## Pagine panoramiche condivise
 
-- [Ulteriori varianti incluse](/it/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy e Gemini CLI OAuth
+- [Varianti bundle aggiuntive](/it/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy e Gemini CLI OAuth
 - [Generazione di immagini](/it/tools/image-generation) - Strumento condiviso `image_generate`, selezione del provider e failover
 - [Generazione musicale](/it/tools/music-generation) - Strumento condiviso `music_generate`, selezione del provider e failover
 - [Generazione video](/it/tools/video-generation) - Strumento condiviso `video_generate`, selezione del provider e failover
@@ -91,7 +92,7 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 
 ## Strumenti della community
 
-- [Claude Max API Proxy](/it/providers/claude-max-api-proxy) - Proxy della community per credenziali di abbonamento Claude (verifica policy/termini di Anthropic prima dell'uso)
+- [Claude Max API Proxy](/it/providers/claude-max-api-proxy) - Proxy della community per le credenziali di abbonamento Claude (verifica la policy/i termini di Anthropic prima dell'uso)
 
 Per il catalogo completo dei provider (xAI, Groq, Mistral, ecc.) e la configurazione avanzata,
-vedi [Model providers](/it/concepts/model-providers).
+vedi [Provider di modelli](/it/concepts/model-providers).
