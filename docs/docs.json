@@ -1072,7 +1072,8 @@
                   "concepts/agent-workspace",
                   "concepts/soul",
                   "concepts/oauth",
-                  "start/bootstrapping"
+                  "start/bootstrapping",
+                  "concepts/experimental-features"
                 ]
               },
               {
@@ -2453,7 +2454,8 @@
                   "ja-JP/concepts/agent-workspace",
                   "ja-JP/concepts/soul",
                   "ja-JP/concepts/oauth",
-                  "ja-JP/start/bootstrapping"
+                  "ja-JP/start/bootstrapping",
+                  "ja-JP/concepts/experimental-features"
                 ]
               },
               {
@@ -3219,7 +3221,8 @@
                   "es/concepts/agent-workspace",
                   "es/concepts/soul",
                   "es/concepts/oauth",
-                  "es/start/bootstrapping"
+                  "es/start/bootstrapping",
+                  "es/concepts/experimental-features"
                 ]
               },
               {
@@ -3985,7 +3988,8 @@
                   "pt-BR/concepts/agent-workspace",
                   "pt-BR/concepts/soul",
                   "pt-BR/concepts/oauth",
-                  "pt-BR/start/bootstrapping"
+                  "pt-BR/start/bootstrapping",
+                  "pt-BR/concepts/experimental-features"
                 ]
               },
               {
@@ -4751,7 +4755,8 @@
                   "ko/concepts/agent-workspace",
                   "ko/concepts/soul",
                   "ko/concepts/oauth",
-                  "ko/start/bootstrapping"
+                  "ko/start/bootstrapping",
+                  "ko/concepts/experimental-features"
                 ]
               },
               {
@@ -5517,7 +5522,8 @@
                   "de/concepts/agent-workspace",
                   "de/concepts/soul",
                   "de/concepts/oauth",
-                  "de/start/bootstrapping"
+                  "de/start/bootstrapping",
+                  "de/concepts/experimental-features"
                 ]
               },
               {
@@ -6283,7 +6289,8 @@
                   "fr/concepts/agent-workspace",
                   "fr/concepts/soul",
                   "fr/concepts/oauth",
-                  "fr/start/bootstrapping"
+                  "fr/start/bootstrapping",
+                  "fr/concepts/experimental-features"
                 ]
               },
               {
@@ -7049,7 +7056,8 @@
                   "ar/concepts/agent-workspace",
                   "ar/concepts/soul",
                   "ar/concepts/oauth",
-                  "ar/start/bootstrapping"
+                  "ar/start/bootstrapping",
+                  "ar/concepts/experimental-features"
                 ]
               },
               {
@@ -7815,7 +7823,8 @@
                   "it/concepts/agent-workspace",
                   "it/concepts/soul",
                   "it/concepts/oauth",
-                  "it/start/bootstrapping"
+                  "it/start/bootstrapping",
+                  "it/concepts/experimental-features"
                 ]
               },
               {
@@ -8581,7 +8590,8 @@
                   "tr/concepts/agent-workspace",
                   "tr/concepts/soul",
                   "tr/concepts/oauth",
-                  "tr/start/bootstrapping"
+                  "tr/start/bootstrapping",
+                  "tr/concepts/experimental-features"
                 ]
               },
               {
@@ -9347,7 +9357,8 @@
                   "uk/concepts/agent-workspace",
                   "uk/concepts/soul",
                   "uk/concepts/oauth",
-                  "uk/start/bootstrapping"
+                  "uk/start/bootstrapping",
+                  "uk/concepts/experimental-features"
                 ]
               },
               {
@@ -10113,7 +10124,8 @@
                   "id/concepts/agent-workspace",
                   "id/concepts/soul",
                   "id/concepts/oauth",
-                  "id/start/bootstrapping"
+                  "id/start/bootstrapping",
+                  "id/concepts/experimental-features"
                 ]
               },
               {
@@ -10879,7 +10891,8 @@
                   "pl/concepts/agent-workspace",
                   "pl/concepts/soul",
                   "pl/concepts/oauth",
-                  "pl/start/bootstrapping"
+                  "pl/start/bootstrapping",
+                  "pl/concepts/experimental-features"
                 ]
               },
               {
