@@ -2,14 +2,14 @@
 read_when:
     - Verifica della copertura delle credenziali SecretRef
     - Verifica se una credenziale è idonea per `secrets configure` o `secrets apply`
-    - Verifica del motivo per cui una credenziale è fuori dalla superficie supportata
-summary: Superficie canonica delle credenziali SecretRef supportate e non supportate
+    - Verifica del motivo per cui una credenziale è al di fuori della superficie supportata
+summary: Superficie canonica supportata vs non supportata delle credenziali SecretRef
 title: Superficie delle credenziali SecretRef
 x-i18n:
-    generated_at: "2026-04-07T08:16:57Z"
+    generated_at: "2026-04-15T08:18:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 211f4b504c5808f7790683066fc2c8b700c705c598f220a264daf971b81cc593
+    source_hash: dd0b9c379236b17a72f552d6360b8b5a2269009e019c138c6bb50f4f7328ddaf
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
@@ -20,12 +20,12 @@ Questa pagina definisce la superficie canonica delle credenziali SecretRef.
 
 Intento dell'ambito:
 
-- Nell'ambito: credenziali strettamente fornite dall'utente che OpenClaw non genera né ruota.
-- Fuori ambito: credenziali generate a runtime o soggette a rotazione, materiale di refresh OAuth e artefatti simili a sessioni.
+- Nell'ambito: credenziali fornite rigorosamente dall'utente che OpenClaw non genera né ruota.
+- Fuori ambito: credenziali generate in fase di esecuzione o soggette a rotazione, materiale di refresh OAuth e artefatti simili a sessioni.
 
 ## Credenziali supportate
 
-### Destinazioni `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### Target di `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 [//]: # "secretref-supported-list-start"
 
@@ -49,6 +49,7 @@ Intento dell'ambito:
 - `messages.tts.providers.*.apiKey`
 - `tools.web.fetch.firecrawl.apiKey`
 - `plugins.entries.brave.config.webSearch.apiKey`
+- `plugins.entries.exa.config.webSearch.apiKey`
 - `plugins.entries.google.config.webSearch.apiKey`
 - `plugins.entries.xai.config.webSearch.apiKey`
 - `plugins.entries.moonshot.config.webSearch.apiKey`
@@ -110,7 +111,7 @@ Intento dell'ambito:
 - `channels.googlechat.serviceAccount` tramite `serviceAccountRef` sibling (eccezione di compatibilità)
 - `channels.googlechat.accounts.*.serviceAccount` tramite `serviceAccountRef` sibling (eccezione di compatibilità)
 
-### Destinazioni `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### Target di `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 - `profiles.*.keyRef` (`type: "api_key"`; non supportato quando `auth.profiles.<id>.mode = "oauth"`)
 - `profiles.*.tokenRef` (`type: "token"`; non supportato quando `auth.profiles.<id>.mode = "oauth"`)
@@ -119,17 +120,17 @@ Intento dell'ambito:
 
 Note:
 
-- Le destinazioni del piano auth-profile richiedono `agentId`.
-- Le voci del piano puntano a `profiles.*.key` / `profiles.*.token` e scrivono ref sibling (`keyRef` / `tokenRef`).
-- I ref auth-profile sono inclusi nella risoluzione runtime e nella copertura audit.
-- Protezione della policy OAuth: `auth.profiles.<id>.mode = "oauth"` non può essere combinato con input SecretRef per quel profilo. Avvio/ricaricamento e risoluzione auth-profile falliscono rapidamente quando questa policy viene violata.
-- Per i provider di modelli gestiti da SecretRef, le voci generate `agents/*/agent/models.json` persistono marker non segreti (non valori di segreti risolti) per le superfici `apiKey`/header.
-- La persistenza dei marker è autorevole rispetto alla sorgente: OpenClaw scrive i marker dallo snapshot di configurazione della sorgente attiva (pre-risoluzione), non dai valori dei segreti runtime risolti.
+- I target del piano auth-profile richiedono `agentId`.
+- Le voci del piano puntano a `profiles.*.key` / `profiles.*.token` e scrivono i ref sibling (`keyRef` / `tokenRef`).
+- I ref auth-profile sono inclusi nella risoluzione a runtime e nella copertura di audit.
+- Guardia di policy OAuth: `auth.profiles.<id>.mode = "oauth"` non può essere combinato con input SecretRef per quel profilo. Avvio/ricaricamento e risoluzione auth-profile falliscono immediatamente quando questa policy viene violata.
+- Per i provider di modelli gestiti con SecretRef, le voci generate in `agents/*/agent/models.json` mantengono marker non segreti (non valori segreti risolti) per le superfici `apiKey`/header.
+- La persistenza dei marker è autorevole rispetto alla sorgente: OpenClaw scrive i marker dallo snapshot della configurazione sorgente attiva (prima della risoluzione), non dai valori segreti risolti a runtime.
 - Per la ricerca web:
   - In modalità provider esplicita (`tools.web.search.provider` impostato), è attiva solo la chiave del provider selezionato.
-  - In modalità auto (`tools.web.search.provider` non impostato), è attiva solo la prima chiave provider che si risolve per precedenza.
-  - In modalità auto, i ref dei provider non selezionati sono trattati come inattivi finché non vengono selezionati.
-  - I percorsi provider legacy `tools.web.search.*` continuano a risolversi durante la finestra di compatibilità, ma la superficie canonica SecretRef è `plugins.entries.<plugin>.config.webSearch.*`.
+  - In modalità automatica (`tools.web.search.provider` non impostato), è attiva solo la prima chiave provider che si risolve in base alla precedenza.
+  - In modalità automatica, i ref dei provider non selezionati sono trattati come inattivi finché non vengono selezionati.
+  - I percorsi legacy del provider `tools.web.search.*` continuano a risolversi durante la finestra di compatibilità, ma la superficie canonica SecretRef è `plugins.entries.<plugin>.config.webSearch.*`.
 
 ## Credenziali non supportate
 
@@ -151,4 +152,4 @@ Le credenziali fuori ambito includono:
 
 Motivazione:
 
-- Queste credenziali sono generate, soggette a rotazione, legate a sessioni o appartengono a classi OAuth durevoli che non si adattano alla risoluzione SecretRef esterna in sola lettura.
+- Queste credenziali sono generate, ruotate, legate a sessioni o appartengono a classi OAuth durevoli che non si adattano alla risoluzione SecretRef esterna in sola lettura.
