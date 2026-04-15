@@ -1,35 +1,35 @@
 ---
 read_when:
-    - Sie fügen einem Plugin einen Setup-Assistenten hinzu
-    - Sie müssen den Unterschied zwischen setup-entry.ts und index.ts verstehen
-    - Sie definieren Plugin-Konfigurationsschemas oder openclaw-Metadaten in package.json
+    - Du fügst einem Plugin einen Einrichtungsassistenten hinzu.
+    - Du musst `setup-entry.ts` im Vergleich zu `index.ts` verstehen.
+    - Du definierst Plugin-Konfigurationsschemata oder `package.json`-`openclaw`-Metadaten.
 sidebarTitle: Setup and Config
-summary: Setup-Assistenten, setup-entry.ts, Konfigurationsschemas und package.json-Metadaten
-title: Plugin-Setup und Konfiguration
+summary: Einrichtungsassistenten, setup-entry.ts, Konfigurationsschemata und package.json-Metadaten
+title: Plugin-Einrichtung und -Konfiguration
 x-i18n:
-    generated_at: "2026-04-06T03:10:48Z"
+    generated_at: "2026-04-15T19:42:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: eac2586516d27bcd94cc4c259fe6274c792b3f9938c7ddd6dbf04a6dbb988dc9
+    source_hash: ddf28e25e381a4a38ac478e531586f59612e1a278732597375f87c2eeefc521b
     source_path: plugins/sdk-setup.md
     workflow: 15
 ---
 
-# Plugin-Setup und Konfiguration
+# Plugin-Einrichtung und -Konfiguration
 
 Referenz für Plugin-Paketierung (`package.json`-Metadaten), Manifeste
-(`openclaw.plugin.json`), Setup-Einträge und Konfigurationsschemas.
+(`openclaw.plugin.json`), Setup-Einstiegspunkte und Konfigurationsschemata.
 
 <Tip>
-  **Suchen Sie nach einer Schritt-für-Schritt-Anleitung?** Die How-to-Anleitungen behandeln Paketierung im Kontext:
-  [Kanal-Plugins](/de/plugins/sdk-channel-plugins#step-1-package-and-manifest) und
-  [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-1-package-and-manifest).
+  **Suchst du nach einer Schritt-für-Schritt-Anleitung?** Die How-to-Guides behandeln die Paketierung im Kontext:
+  [Channel Plugins](/de/plugins/sdk-channel-plugins#step-1-package-and-manifest) und
+  [Provider Plugins](/de/plugins/sdk-provider-plugins#step-1-package-and-manifest).
 </Tip>
 
-## Paketmetadaten
+## Paket-Metadaten
 
-Ihre `package.json` benötigt ein Feld `openclaw`, das dem Plugin-System mitteilt, was
-Ihr Plugin bereitstellt:
+Deine `package.json` benötigt ein `openclaw`-Feld, das dem Plugin-System mitteilt,
+was dein Plugin bereitstellt:
 
 **Kanal-Plugin:**
 
@@ -50,7 +50,7 @@ Ihr Plugin bereitstellt:
 }
 ```
 
-**Provider-Plugin / ClawHub-Veröffentlichungsbaseline:**
+**Provider Plugin / ClawHub-Veröffentlichungsbasis:**
 
 ```json openclaw-clawhub-package.json
 {
@@ -71,47 +71,47 @@ Ihr Plugin bereitstellt:
 }
 ```
 
-Wenn Sie das Plugin extern auf ClawHub veröffentlichen, sind diese Felder `compat` und `build`
-erforderlich. Die kanonischen Snippets für die Veröffentlichung finden Sie in
+Wenn du das Plugin extern auf ClawHub veröffentlichst, sind diese `compat`- und `build`-
+Felder erforderlich. Die kanonischen Veröffentlichungs-Snippets befinden sich in
 `docs/snippets/plugin-publish/`.
 
 ### `openclaw`-Felder
 
-| Feld         | Typ        | Beschreibung                                                                                             |
-| ------------ | ---------- | -------------------------------------------------------------------------------------------------------- |
-| `extensions` | `string[]` | Einstiegspunktdateien (relativ zum Paketstamm)                                                           |
-| `setupEntry` | `string`   | Leichtgewichtiger Einstiegspunkt nur für Setup (optional)                                                |
-| `channel`    | `object`   | Metadaten des Kanalkatalogs für Setup, Picker, Quickstart- und Statusoberflächen                         |
-| `providers`  | `string[]` | Provider-IDs, die von diesem Plugin registriert werden                                                   |
+| Feld         | Typ        | Beschreibung                                                                                           |
+| ------------ | ---------- | ------------------------------------------------------------------------------------------------------ |
+| `extensions` | `string[]` | Einstiegspunktdateien (relativ zum Paketstamm)                                                         |
+| `setupEntry` | `string`   | Leichtgewichtiger, nur für das Setup verwendeter Einstiegspunkt (optional)                             |
+| `channel`    | `object`   | Kanal-Katalogmetadaten für Setup-, Auswahl-, Schnellstart- und Status-Oberflächen                     |
+| `providers`  | `string[]` | Provider-IDs, die von diesem Plugin registriert werden                                                 |
 | `install`    | `object`   | Installationshinweise: `npmSpec`, `localPath`, `defaultChoice`, `minHostVersion`, `allowInvalidConfigRecovery` |
-| `startup`    | `object`   | Flags für das Startverhalten                                                                             |
+| `startup`    | `object`   | Flags für das Startverhalten                                                                            |
 
 ### `openclaw.channel`
 
-`openclaw.channel` sind kostengünstige Paketmetadaten für Kanalerkennung und Setup-
-Oberflächen, bevor die Laufzeit geladen wird.
+`openclaw.channel` sind kostengünstige Paket-Metadaten für die Kanalerkennung und
+Setup-Oberflächen, bevor die Laufzeit geladen wird.
 
-| Feld                                   | Typ        | Bedeutung                                                                        |
-| -------------------------------------- | ---------- | -------------------------------------------------------------------------------- |
-| `id`                                   | `string`   | Kanonische Kanal-ID.                                                             |
-| `label`                                | `string`   | Primäre Kanalbezeichnung.                                                        |
-| `selectionLabel`                       | `string`   | Bezeichnung für Picker/Setup, wenn sie sich von `label` unterscheiden soll.      |
-| `detailLabel`                          | `string`   | Sekundäre Detailbezeichnung für umfangreichere Kanalkataloge und Statusoberflächen. |
-| `docsPath`                             | `string`   | Docs-Pfad für Setup- und Auswahllinks.                                           |
-| `docsLabel`                            | `string`   | Überschreibungsbezeichnung für Docs-Links, wenn sie sich von der Kanal-ID unterscheiden soll. |
-| `blurb`                                | `string`   | Kurze Beschreibung für Onboarding/Katalog.                                       |
-| `order`                                | `number`   | Sortierreihenfolge in Kanalkatalogen.                                            |
-| `aliases`                              | `string[]` | Zusätzliche Lookup-Aliasse für die Kanalauswahl.                                 |
-| `preferOver`                           | `string[]` | Plugin-/Kanal-IDs mit niedrigerer Priorität, die dieser Kanal übertreffen soll.  |
-| `systemImage`                          | `string`   | Optionaler Symbol-/Systembildname für Kanal-UI-Kataloge.                         |
-| `selectionDocsPrefix`                  | `string`   | Präfixtext vor Docs-Links in Auswahloberflächen.                                 |
-| `selectionDocsOmitLabel`               | `boolean`  | Zeigt den Docs-Pfad direkt anstelle eines beschrifteten Docs-Links im Auswahltext. |
-| `selectionExtras`                      | `string[]` | Zusätzliche kurze Zeichenfolgen, die im Auswahltext angehängt werden.            |
-| `markdownCapable`                      | `boolean`  | Markiert den Kanal als markdownfähig für Entscheidungen zur ausgehenden Formatierung. |
-| `exposure`                             | `object`   | Steuerung der Kanalsichtbarkeit für Setup, konfigurierte Listen und Docs-Oberflächen. |
-| `quickstartAllowFrom`                  | `boolean`  | Meldet diesen Kanal für den standardmäßigen Quickstart-`allowFrom`-Setup-Ablauf an. |
-| `forceAccountBinding`                  | `boolean`  | Erzwingt explizites Account-Binding, selbst wenn nur ein Konto existiert.        |
-| `preferSessionLookupForAnnounceTarget` | `boolean`  | Bevorzugt Session-Lookup beim Auflösen von Ankündigungszielen für diesen Kanal.  |
+| Feld                                   | Typ        | Bedeutung                                                                      |
+| -------------------------------------- | ---------- | ------------------------------------------------------------------------------ |
+| `id`                                   | `string`   | Kanonische Kanal-ID.                                                           |
+| `label`                                | `string`   | Primäre Kanalbezeichnung.                                                      |
+| `selectionLabel`                       | `string`   | Bezeichnung für Auswahl/Setup, wenn sie sich von `label` unterscheiden soll.   |
+| `detailLabel`                          | `string`   | Sekundäre Detailbezeichnung für umfangreichere Kanalkataloge und Statusansichten. |
+| `docsPath`                             | `string`   | Dokumentationspfad für Setup- und Auswahllinks.                                |
+| `docsLabel`                            | `string`   | Überschriebene Bezeichnung für Dokumentationslinks, wenn sie sich von der Kanal-ID unterscheiden soll. |
+| `blurb`                                | `string`   | Kurze Beschreibung für Onboarding/Katalog.                                     |
+| `order`                                | `number`   | Sortierreihenfolge in Kanalkatalogen.                                          |
+| `aliases`                              | `string[]` | Zusätzliche Suchaliase für die Kanalauswahl.                                   |
+| `preferOver`                           | `string[]` | IDs von Plugins/Kanälen mit niedrigerer Priorität, die von diesem Kanal übertroffen werden sollen. |
+| `systemImage`                          | `string`   | Optionaler Symbol-/Systembildname für Kanal-UI-Kataloge.                       |
+| `selectionDocsPrefix`                  | `string`   | Präfixtext vor Dokumentationslinks in Auswahloberflächen.                      |
+| `selectionDocsOmitLabel`               | `boolean`  | Zeigt den Dokumentationspfad direkt anstelle eines beschrifteten Dokumentationslinks im Auswahltext an. |
+| `selectionExtras`                      | `string[]` | Zusätzliche kurze Zeichenfolgen, die im Auswahltext angehängt werden.          |
+| `markdownCapable`                      | `boolean`  | Kennzeichnet den Kanal als Markdown-fähig für Entscheidungen zur ausgehenden Formatierung. |
+| `exposure`                             | `object`   | Sichtbarkeitssteuerung des Kanals für Setup-, konfigurierte Listen- und Dokumentationsoberflächen. |
+| `quickstartAllowFrom`                  | `boolean`  | Nimmt diesen Kanal in den standardmäßigen Schnellstart-`allowFrom`-Setup-Ablauf auf. |
+| `forceAccountBinding`                  | `boolean`  | Erzwingt explizite Kontobindung, selbst wenn nur ein Konto vorhanden ist.      |
+| `preferSessionLookupForAnnounceTarget` | `boolean`  | Bevorzugt die Sitzungssuche beim Auflösen von Ankündigungszielen für diesen Kanal. |
 
 Beispiel:
 
@@ -145,37 +145,37 @@ Beispiel:
 
 `exposure` unterstützt:
 
-- `configured`: schließt den Kanal in Oberflächen für konfigurierte/statusartige Listen ein
-- `setup`: schließt den Kanal in interaktive Setup-/Konfigurations-Picker ein
-- `docs`: markiert den Kanal als öffentlich sichtbar in Docs-/Navigationsoberflächen
+- `configured`: nimmt den Kanal in konfigurierte/statusartige Listenoberflächen auf
+- `setup`: nimmt den Kanal in interaktive Setup-/Konfigurationsauswahlen auf
+- `docs`: markiert den Kanal als öffentlich sichtbar in Dokumentations-/Navigationsoberflächen
 
-`showConfigured` und `showInSetup` werden weiterhin als veraltete Aliasse unterstützt. Bevorzugen Sie
+`showConfigured` und `showInSetup` werden weiterhin als Legacy-Aliase unterstützt. Bevorzuge
 `exposure`.
 
 ### `openclaw.install`
 
-`openclaw.install` sind Paketmetadaten, keine Manifestmetadaten.
+`openclaw.install` sind Paket-Metadaten, keine Manifest-Metadaten.
 
-| Feld                         | Typ                  | Bedeutung                                                                        |
-| ---------------------------- | -------------------- | -------------------------------------------------------------------------------- |
-| `npmSpec`                    | `string`             | Kanonische npm-Spezifikation für Installations-/Aktualisierungsabläufe.          |
-| `localPath`                  | `string`             | Lokaler Entwicklungs- oder gebündelter Installationspfad.                        |
-| `defaultChoice`              | `"npm"` \| `"local"` | Bevorzugte Installationsquelle, wenn beide verfügbar sind.                       |
-| `minHostVersion`             | `string`             | Mindestunterstützte OpenClaw-Version in der Form `>=x.y.z`.                      |
-| `allowInvalidConfigRecovery` | `boolean`            | Ermöglicht Reinstallationsabläufen für gebündelte Plugins die Wiederherstellung nach bestimmten veralteten Konfigurationsfehlern. |
+| Feld                         | Typ                  | Bedeutung                                                                       |
+| ---------------------------- | -------------------- | ------------------------------------------------------------------------------- |
+| `npmSpec`                    | `string`             | Kanonische npm-Spezifikation für Installations-/Update-Abläufe.                 |
+| `localPath`                  | `string`             | Lokaler Entwicklungs- oder gebündelter Installationspfad.                       |
+| `defaultChoice`              | `"npm"` \| `"local"` | Bevorzugte Installationsquelle, wenn beide verfügbar sind.                      |
+| `minHostVersion`             | `string`             | Minimal unterstützte OpenClaw-Version im Format `>=x.y.z`.                      |
+| `allowInvalidConfigRecovery` | `boolean`            | Ermöglicht es Neuinstallationsabläufen gebündelter Plugins, sich von bestimmten Fehlern mit veralteter Konfiguration zu erholen. |
 
-Wenn `minHostVersion` gesetzt ist, erzwingen sowohl Installation als auch das Laden der Manifest-
-Registry diese. Ältere Hosts überspringen das Plugin; ungültige Versionszeichenfolgen werden abgelehnt.
+Wenn `minHostVersion` gesetzt ist, erzwingen sowohl die Installation als auch das Laden der Manifest-Registry
+diese Angabe. Ältere Hosts überspringen das Plugin; ungültige Versionszeichenfolgen werden abgelehnt.
 
 `allowInvalidConfigRecovery` ist keine allgemeine Umgehung für fehlerhafte Konfigurationen. Es ist
-nur für eng gefasste Wiederherstellung gebündelter Plugins gedacht, damit Reinstallation/Setup bekannte Upgrade-
-Überbleibsel wie einen fehlenden Pfad zu einem gebündelten Plugin oder einen veralteten Eintrag `channels.<id>`
-für dasselbe Plugin reparieren können. Wenn die Konfiguration aus anderen Gründen fehlerhaft ist,
-schlägt die Installation weiterhin fehlgeschlossen fehl und weist den Operator an, `openclaw doctor --fix` auszuführen.
+nur für die gezielte Wiederherstellung gebündelter Plugins gedacht, damit Neuinstallation/Setup bekannte
+Upgrade-Überbleibsel reparieren können, wie einen fehlenden gebündelten Plugin-Pfad oder einen veralteten
+`channels.<id>`-Eintrag für genau dieses Plugin. Wenn die Konfiguration aus anderen Gründen fehlerhaft ist,
+schlägt die Installation weiterhin sicher fehl und weist den Operator an, `openclaw doctor --fix` auszuführen.
 
-### Verzögertes vollständiges Laden
+### Aufgeschobenes vollständiges Laden
 
-Kanal-Plugins können sich mit Folgendem für verzögertes Laden anmelden:
+Kanal-Plugins können sich mit Folgendem für aufgeschobenes Laden entscheiden:
 
 ```json
 {
@@ -189,26 +189,26 @@ Kanal-Plugins können sich mit Folgendem für verzögertes Laden anmelden:
 }
 ```
 
-Wenn dies aktiviert ist, lädt OpenClaw in der Startphase vor `listen`
-nur `setupEntry`, selbst für bereits konfigurierte Kanäle. Der vollständige Einstiegspunkt wird geladen, nachdem das
-Gateway mit dem Lauschen begonnen hat.
+Wenn dies aktiviert ist, lädt OpenClaw in der Startphase vor `listen` nur `setupEntry`,
+selbst für bereits konfigurierte Kanäle. Der vollständige Einstiegspunkt wird geladen, nachdem das
+Gateway begonnen hat zu lauschen.
 
 <Warning>
-  Aktivieren Sie verzögertes Laden nur dann, wenn Ihr `setupEntry` alles registriert, was das
-  Gateway benötigt, bevor es mit dem Lauschen beginnt (Kanalregistrierung, HTTP-Routen,
-  Gateway-Methoden). Wenn der vollständige Einstiegspunkt erforderliche Startfähigkeiten besitzt, behalten Sie
-  das Standardverhalten bei.
+  Aktiviere aufgeschobenes Laden nur, wenn dein `setupEntry` alles registriert, was das
+  Gateway benötigt, bevor es beginnt zu lauschen (Kanalregistrierung, HTTP-Routen,
+  Gateway-Methoden). Wenn der vollständige Einstiegspunkt erforderliche Startfähigkeiten besitzt,
+  behalte das Standardverhalten bei.
 </Warning>
 
-Wenn Ihr Setup-/Voll-Einstiegspunkt Gateway-RPC-Methoden registriert, behalten Sie sie auf einem
-plugin-spezifischen Präfix. Reservierte Admin-Namespaces des Kerns (`config.*`,
-`exec.approvals.*`, `wizard.*`, `update.*`) bleiben im Besitz des Kerns und werden immer zu
-`operator.admin` aufgelöst.
+Wenn dein Setup-/vollständiger Einstiegspunkt Gateway-RPC-Methoden registriert, halte sie auf einem
+Plugin-spezifischen Präfix. Reservierte Core-Admin-Namespaces (`config.*`,
+`exec.approvals.*`, `wizard.*`, `update.*`) bleiben im Besitz des Core und werden immer
+zu `operator.admin` aufgelöst.
 
 ## Plugin-Manifest
 
-Jedes native Plugin muss ein `openclaw.plugin.json` im Paketstamm mitliefern.
-OpenClaw verwendet dies, um Konfiguration zu validieren, ohne Plugin-Code auszuführen.
+Jedes native Plugin muss im Paketstamm ein `openclaw.plugin.json` enthalten.
+OpenClaw verwendet dies, um die Konfiguration zu validieren, ohne Plugin-Code auszuführen.
 
 ```json
 {
@@ -228,7 +228,7 @@ OpenClaw verwendet dies, um Konfiguration zu validieren, ohne Plugin-Code auszuf
 }
 ```
 
-Für Kanal-Plugins fügen Sie `kind` und `channels` hinzu:
+Für Kanal-Plugins füge `kind` und `channels` hinzu:
 
 ```json
 {
@@ -243,7 +243,7 @@ Für Kanal-Plugins fügen Sie `kind` und `channels` hinzu:
 }
 ```
 
-Selbst Plugins ohne Konfiguration müssen ein Schema mitliefern. Ein leeres Schema ist gültig:
+Selbst Plugins ohne Konfiguration müssen ein Schema enthalten. Ein leeres Schema ist gültig:
 
 ```json
 {
@@ -255,24 +255,24 @@ Selbst Plugins ohne Konfiguration müssen ein Schema mitliefern. Ein leeres Sche
 }
 ```
 
-Die vollständige Schemareferenz finden Sie unter [Plugin Manifest](/de/plugins/manifest).
+Siehe [Plugin Manifest](/de/plugins/manifest) für die vollständige Schemareferenz.
 
 ## ClawHub-Veröffentlichung
 
-Für Plugin-Pakete verwenden Sie den paketspezifischen ClawHub-Befehl:
+Verwende für Plugin-Pakete den paket-spezifischen ClawHub-Befehl:
 
 ```bash
 clawhub package publish your-org/your-plugin --dry-run
 clawhub package publish your-org/your-plugin
 ```
 
-Der veraltete Alias für die Veröffentlichung nur von Skills ist für Skills gedacht. Plugin-Pakete sollten
+Der ältere, nur auf Skills bezogene Veröffentlichungsalias ist für Skills. Plugin-Pakete sollten
 immer `clawhub package publish` verwenden.
 
-## Setup-Eintrag
+## Setup-Einstiegspunkt
 
 Die Datei `setup-entry.ts` ist eine leichtgewichtige Alternative zu `index.ts`, die
-OpenClaw lädt, wenn es nur Setup-Oberflächen benötigt (Onboarding, Konfigurationsreparatur,
+OpenClaw lädt, wenn nur Setup-Oberflächen benötigt werden (Onboarding, Konfigurationsreparatur,
 Inspektion deaktivierter Kanäle).
 
 ```typescript
@@ -283,75 +283,82 @@ import { myChannelPlugin } from "./src/channel.js";
 export default defineSetupPluginEntry(myChannelPlugin);
 ```
 
-Dadurch wird vermieden, während Setup-Abläufen schweren Laufzeitcode zu laden (Kryptobibliotheken, CLI-Registrierungen,
-Hintergrunddienste).
+Dadurch wird vermieden, schwere Laufzeitkomponenten (Kryptobibliotheken, CLI-Registrierungen,
+Hintergrunddienste) während Setup-Abläufen zu laden.
 
-**Wann OpenClaw `setupEntry` statt des vollständigen Einstiegspunkts verwendet:**
+Gebündelte Workspace-Kanäle, die setup-sichere Exporte in Sidecar-Modulen behalten, können
+`defineBundledChannelSetupEntry(...)` aus
+`openclaw/plugin-sdk/channel-entry-contract` anstelle von
+`defineSetupPluginEntry(...)` verwenden. Dieser gebündelte Vertrag unterstützt auch einen optionalen
+`runtime`-Export, damit die Laufzeitverdrahtung zur Setup-Zeit leichtgewichtig und explizit bleiben kann.
+
+**Wann OpenClaw `setupEntry` anstelle des vollständigen Einstiegspunkts verwendet:**
 
 - Der Kanal ist deaktiviert, benötigt aber Setup-/Onboarding-Oberflächen
 - Der Kanal ist aktiviert, aber nicht konfiguriert
-- Verzögertes Laden ist aktiviert (`deferConfiguredChannelFullLoadUntilAfterListen`)
+- Aufgeschobenes Laden ist aktiviert (`deferConfiguredChannelFullLoadUntilAfterListen`)
 
 **Was `setupEntry` registrieren muss:**
 
 - Das Kanal-Plugin-Objekt (über `defineSetupPluginEntry`)
-- Alle HTTP-Routen, die vor dem Gateway-`listen` erforderlich sind
+- Alle HTTP-Routen, die vor dem Lauschen des Gateways erforderlich sind
 - Alle Gateway-Methoden, die beim Start benötigt werden
 
-Diese Gateway-Methoden beim Start sollten weiterhin reservierte Admin-
-Namespaces des Kerns wie `config.*` oder `update.*` vermeiden.
+Diese Gateway-Methoden für den Start sollten weiterhin reservierte Core-Admin-
+Namespaces wie `config.*` oder `update.*` vermeiden.
 
 **Was `setupEntry` NICHT enthalten sollte:**
 
 - CLI-Registrierungen
 - Hintergrunddienste
-- Schwere Laufzeitimporte (Krypto, SDKs)
+- Schwere Laufzeitimporte (Kryptografie, SDKs)
 - Gateway-Methoden, die erst nach dem Start benötigt werden
 
-### Enge Importe von Setup-Hilfen
+### Schmale Importe für Setup-Hilfsfunktionen
 
-Für heiße Pfade nur für Setup bevorzugen Sie die engen Helper-Seams für Setup gegenüber der breiteren
-übergeordneten `plugin-sdk/setup`-Oberfläche, wenn Sie nur einen Teil der Setup-Oberfläche benötigen:
+Für reine Setup-Hotpaths solltest du die schmalen Hilfsseams für das Setup dem breiteren
+`plugin-sdk/setup`-Umbrella vorziehen, wenn du nur einen Teil der Setup-Oberfläche benötigst:
 
-| Importpfad                        | Verwenden Sie ihn für                                                                  | Wichtige Exporte                                                                                                                                                                                                                                                                               |
-| --------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plugin-sdk/setup-runtime`        | laufzeitsichere Setup-Hilfen, die in `setupEntry` / beim verzögerten Kanalstart verfügbar bleiben | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
-| `plugin-sdk/setup-adapter-runtime` | umgebungsbewusste Account-Setup-Adapter                                               | `createEnvPatchedAccountSetupAdapter`                                                                                                                                                                                                                                                          |
-| `plugin-sdk/setup-tools`          | CLI-/Archiv-/Docs-Hilfen für Setup/Installation                                        | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR`                                                                                                                                                                                |
+| Importpfad                        | Verwende ihn für                                                                         | Wichtige Exporte                                                                                                                                                                                                                                                                             |
+| --------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plugin-sdk/setup-runtime`         | Laufzeit-Hilfsfunktionen zur Setup-Zeit, die in `setupEntry` / beim aufgeschobenen Kanalstart verfügbar bleiben | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
+| `plugin-sdk/setup-adapter-runtime` | umgebungsbewusste Account-Setup-Adapter                                                 | `createEnvPatchedAccountSetupAdapter`                                                                                                                                                                                                                                                        |
+| `plugin-sdk/setup-tools`           | CLI-/Archiv-/Dokumentations-Hilfsfunktionen für Setup/Installation                      | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR`                                                                                                                                                                              |
 
-Verwenden Sie die breitere Naht `plugin-sdk/setup`, wenn Sie die vollständige gemeinsame Setup-
-Werkzeugkiste möchten, einschließlich Hilfen für Konfigurations-Patches wie
+Verwende den breiteren `plugin-sdk/setup`-Seam, wenn du die vollständige gemeinsame Setup-
+Werkzeugkiste haben möchtest, einschließlich Hilfsfunktionen zum Patchen der Konfiguration wie
 `moveSingleAccountChannelSectionToDefaultAccount(...)`.
 
-Die Setup-Patch-Adapter bleiben beim Import für den Hot Path sicher. Ihr gebündeltes
-Lookup der Vertragsoberfläche für Single-Account-Promotion ist lazy, sodass das Importieren von
-`plugin-sdk/setup-runtime` die Discovery der gebündelten Vertragsoberfläche nicht eager lädt, bevor der Adapter tatsächlich verwendet wird.
+Die Setup-Patch-Adapter bleiben beim Import hotpath-sicher. Ihr gebündeltes Nachschlagen der
+Vertragsoberfläche für die Promotion eines Einzelkontos erfolgt lazy, sodass der Import von
+`plugin-sdk/setup-runtime` die Erkennung gebündelter Vertragsoberflächen nicht vorzeitig lädt,
+bevor der Adapter tatsächlich verwendet wird.
 
-### Kanal-eigene Single-Account-Promotion
+### Kanal-eigene Einzelkonto-Promotion
 
-Wenn ein Kanal von einer Top-Level-Konfiguration für ein einzelnes Konto auf
-`channels.<id>.accounts.*` aktualisiert wird, verschiebt das standardmäßige gemeinsame Verhalten die
-hochgestuften kontobezogenen Werte nach `accounts.default`.
+Wenn ein Kanal von einer Konfiguration auf oberster Ebene für ein Einzelkonto auf
+`channels.<id>.accounts.*` umstellt, verschiebt das standardmäßige gemeinsame Verhalten die
+promoteten konto-spezifischen Werte in `accounts.default`.
 
-Gebündelte Kanäle können diese Promotion über ihre Setup-
-Vertragsoberfläche eingrenzen oder überschreiben:
+Gebündelte Kanäle können diese Promotion über ihre Setup-Vertragsoberfläche eingrenzen oder
+überschreiben:
 
-- `singleAccountKeysToMove`: zusätzliche Top-Level-Schlüssel, die in das
-  hochgestufte Konto verschoben werden sollen
+- `singleAccountKeysToMove`: zusätzliche Schlüssel auf oberster Ebene, die in das
+  promotete Konto verschoben werden sollen
 - `namedAccountPromotionKeys`: wenn bereits benannte Konten existieren, werden nur diese
-  Schlüssel in das hochgestufte Konto verschoben; gemeinsame Richtlinien-/Zustellungsschlüssel bleiben im
-  Kanalstamm
-- `resolveSingleAccountPromotionTarget(...)`: wählt aus, welches vorhandene Konto
-  hochgestufte Werte erhält
+  Schlüssel in das promotete Konto verschoben; gemeinsame Richtlinien-/Zustellungsschlüssel
+  bleiben auf der Kanalwurzelebene
+- `resolveSingleAccountPromotionTarget(...)`: wählt aus, welches vorhandene Konto die
+  promoteten Werte erhält
 
-Matrix ist das aktuelle gebündelte Beispiel. Wenn genau ein benanntes Matrix-Konto
-bereits existiert oder wenn `defaultAccount` auf einen vorhandenen nichtkanonischen Schlüssel
-wie `Ops` zeigt, bewahrt die Promotion dieses Konto, statt einen neuen Eintrag
-`accounts.default` zu erzeugen.
+Matrix ist das aktuelle gebündelte Beispiel. Wenn bereits genau ein benanntes Matrix-Konto
+existiert oder wenn `defaultAccount` auf einen vorhandenen nicht-kanonischen Schlüssel wie
+`Ops` zeigt, bewahrt die Promotion dieses Konto, anstatt einen neuen Eintrag
+`accounts.default` zu erstellen.
 
 ## Konfigurationsschema
 
-Die Plugin-Konfiguration wird gegen das JSON-Schema in Ihrem Manifest validiert. Benutzer
+Die Plugin-Konfiguration wird gegen das JSON-Schema in deinem Manifest validiert. Benutzer
 konfigurieren Plugins über:
 
 ```json5
@@ -368,9 +375,9 @@ konfigurieren Plugins über:
 }
 ```
 
-Ihr Plugin erhält diese Konfiguration während der Registrierung als `api.pluginConfig`.
+Dein Plugin erhält diese Konfiguration während der Registrierung als `api.pluginConfig`.
 
-Für kanalspezifische Konfiguration verwenden Sie stattdessen den Kanal-Konfigurationsabschnitt:
+Verwende für kanal-spezifische Konfiguration stattdessen den Kanal-Konfigurationsabschnitt:
 
 ```json5
 {
@@ -383,10 +390,10 @@ Für kanalspezifische Konfiguration verwenden Sie stattdessen den Kanal-Konfigur
 }
 ```
 
-### Kanal-Konfigurationsschemas erstellen
+### Kanal-Konfigurationsschemata erstellen
 
-Verwenden Sie `buildChannelConfigSchema` aus `openclaw/plugin-sdk/core`, um ein
-Zod-Schema in den Wrapper `ChannelConfigSchema` zu konvertieren, den OpenClaw validiert:
+Verwende `buildChannelConfigSchema` aus `openclaw/plugin-sdk/core`, um ein
+Zod-Schema in den `ChannelConfigSchema`-Wrapper umzuwandeln, den OpenClaw validiert:
 
 ```typescript
 import { z } from "zod";
@@ -402,10 +409,10 @@ const accountSchema = z.object({
 const configSchema = buildChannelConfigSchema(accountSchema);
 ```
 
-## Setup-Assistenten
+## Einrichtungsassistenten
 
-Kanal-Plugins können interaktive Setup-Assistenten für `openclaw onboard` bereitstellen.
-Der Assistent ist ein Objekt `ChannelSetupWizard` auf dem `ChannelPlugin`:
+Kanal-Plugins können interaktive Einrichtungsassistenten für `openclaw onboard` bereitstellen.
+Der Assistent ist ein `ChannelSetupWizard`-Objekt auf dem `ChannelPlugin`:
 
 ```typescript
 import type { ChannelSetupWizard } from "openclaw/plugin-sdk/channel-setup";
@@ -440,20 +447,21 @@ const setupWizard: ChannelSetupWizard = {
 
 Der Typ `ChannelSetupWizard` unterstützt `credentials`, `textInputs`,
 `dmPolicy`, `allowFrom`, `groupAccess`, `prepare`, `finalize` und mehr.
-Vollständige Beispiele finden Sie in gebündelten Plugin-Paketen (zum Beispiel im Discord-Plugin `src/channel.setup.ts`).
+Siehe die gebündelten Plugin-Pakete (zum Beispiel das Discord-Plugin `src/channel.setup.ts`) für
+vollständige Beispiele.
 
-Für Abfragen der DM-Allowlist, die nur den Standardablauf
-`note -> prompt -> parse -> merge -> patch` benötigen, bevorzugen Sie die gemeinsamen Setup-
-Hilfen aus `openclaw/plugin-sdk/setup`: `createPromptParsedAllowFromForAccount(...)`,
+Für DM-Allowlist-Abfragen, die nur den Standardablauf
+`note -> prompt -> parse -> merge -> patch` benötigen, solltest du die gemeinsamen Setup-
+Hilfsfunktionen aus `openclaw/plugin-sdk/setup` bevorzugen: `createPromptParsedAllowFromForAccount(...)`,
 `createTopLevelChannelParsedAllowFromPrompt(...)` und
 `createNestedChannelParsedAllowFromPrompt(...)`.
 
-Für Statusblöcke des Kanal-Setups, die sich nur durch Bezeichnungen, Werte und optionale
-zusätzliche Zeilen unterscheiden, bevorzugen Sie `createStandardChannelSetupStatus(...)` aus
-`openclaw/plugin-sdk/setup`, statt in jedem Plugin dasselbe `status`-Objekt
-von Hand zu erstellen.
+Für Kanal-Setup-Statusblöcke, die sich nur in Bezeichnungen, Bewertungen und optionalen
+zusätzlichen Zeilen unterscheiden, solltest du `createStandardChannelSetupStatus(...)` aus
+`openclaw/plugin-sdk/setup` bevorzugen, anstatt in jedem Plugin dasselbe `status`-Objekt
+von Hand zu bauen.
 
-Für optionale Setup-Oberflächen, die nur in bestimmten Kontexten erscheinen sollen, verwenden Sie
+Für optionale Setup-Oberflächen, die nur in bestimmten Kontexten erscheinen sollen, verwende
 `createOptionalChannelSetupSurface` aus `openclaw/plugin-sdk/channel-setup`:
 
 ```typescript
@@ -468,52 +476,52 @@ const setupSurface = createOptionalChannelSetupSurface({
 // Returns { setupAdapter, setupWizard }
 ```
 
-`plugin-sdk/channel-setup` exportiert auch die Low-Level-Builder
+`plugin-sdk/channel-setup` stellt außerdem die Low-Level-Builder
 `createOptionalChannelSetupAdapter(...)` und
-`createOptionalChannelSetupWizard(...)`, wenn Sie nur eine Hälfte
-dieser Oberfläche für optionale Installation benötigen.
+`createOptionalChannelSetupWizard(...)` bereit, wenn du nur eine Hälfte
+dieser optionalen Installationsoberfläche benötigst.
 
-Der erzeugte optionale Adapter/Assistent schlägt bei echten Konfigurationsschreibvorgängen fehlgeschlossen fehl. Er
-verwendet eine einzige Meldung „Installation erforderlich“ über `validateInput`,
-`applyAccountConfig` und `finalize` hinweg wieder und hängt einen Docs-Link an, wenn `docsPath`
+Der generierte optionale Adapter/Assistent schlägt bei echten Konfigurationsschreibvorgängen sicher fehl. Sie
+verwenden dieselbe Meldung „Installation erforderlich“ in `validateInput`,
+`applyAccountConfig` und `finalize` wieder und hängen einen Dokumentationslink an, wenn `docsPath`
 gesetzt ist.
 
-Für binär gestützte Setup-UIs bevorzugen Sie die gemeinsamen delegierten Hilfen, statt
-denselben Binär-/Status-Klebstoff in jeden Kanal zu kopieren:
+Für binärgestützte Setup-UIs solltest du die gemeinsamen delegierten Hilfsfunktionen bevorzugen,
+anstatt dieselbe Binär-/Status-Logik in jeden Kanal zu kopieren:
 
 - `createDetectedBinaryStatus(...)` für Statusblöcke, die sich nur nach Bezeichnungen,
-  Hinweisen, Werten und Binärerkennung unterscheiden
+  Hinweisen, Bewertungen und Binärerkennung unterscheiden
 - `createCliPathTextInput(...)` für pfadgestützte Texteingaben
 - `createDelegatedSetupWizardStatusResolvers(...)`,
   `createDelegatedPrepare(...)`, `createDelegatedFinalize(...)` und
-  `createDelegatedResolveConfigured(...)`, wenn `setupEntry` lazy an einen
-  schwereren vollständigen Assistenten weiterleiten muss
-- `createDelegatedTextInputShouldPrompt(...)`, wenn `setupEntry` nur die Entscheidung
-  `textInputs[*].shouldPrompt` delegieren muss
+  `createDelegatedResolveConfigured(...)`, wenn `setupEntry` lazy an
+  einen schwergewichtigeren vollständigen Assistenten weiterleiten muss
+- `createDelegatedTextInputShouldPrompt(...)`, wenn `setupEntry` nur eine
+  `textInputs[*].shouldPrompt`-Entscheidung delegieren muss
 
 ## Veröffentlichen und installieren
 
-**Externe Plugins:** auf [ClawHub](/de/tools/clawhub) oder npm veröffentlichen, dann installieren:
+**Externe Plugins:** Veröffentliche sie auf [ClawHub](/de/tools/clawhub) oder npm und installiere sie dann:
 
 ```bash
 openclaw plugins install @myorg/openclaw-my-plugin
 ```
 
-OpenClaw versucht zuerst ClawHub und fällt automatisch auf npm zurück. Sie können ClawHub auch
+OpenClaw versucht zuerst ClawHub und greift automatisch auf npm zurück. Du kannst ClawHub auch
 explizit erzwingen:
 
 ```bash
 openclaw plugins install clawhub:@myorg/openclaw-my-plugin   # nur ClawHub
 ```
 
-Es gibt keine passende Überschreibung `npm:`. Verwenden Sie die normale npm-Paketspezifikation, wenn Sie
-nach dem ClawHub-Fallback den npm-Pfad wünschen:
+Es gibt kein entsprechendes `npm:`-Override. Verwende die normale npm-Paketspezifikation, wenn du
+nach dem ClawHub-Fallback den npm-Pfad verwenden möchtest:
 
 ```bash
 openclaw plugins install @myorg/openclaw-my-plugin
 ```
 
-**Plugins im Repository:** Platzieren Sie sie unter dem Workspace-Baum für gebündelte Plugins, dann werden sie beim Build automatisch
+**Plugins im Repository:** Lege sie unter dem gebündelten Plugin-Workspace-Baum ab; dann werden sie beim Build automatisch
 erkannt.
 
 **Benutzer können installieren:**
@@ -523,13 +531,13 @@ openclaw plugins install <package-name>
 ```
 
 <Info>
-  Für Installationen aus npm führt `openclaw plugins install`
-  `npm install --ignore-scripts` aus (keine Lifecycle-Skripte). Halten Sie die Abhängigkeits-
-  Bäume von Plugins bei reinem JS/TS und vermeiden Sie Pakete, die `postinstall`-Builds erfordern.
+  Für Installationen aus npm-Quellen führt `openclaw plugins install`
+  `npm install --ignore-scripts` aus (keine Lifecycle-Skripte). Halte die Abhängigkeitsbäume von Plugins
+  rein in JS/TS und vermeide Pakete, die `postinstall`-Builds erfordern.
 </Info>
 
 ## Verwandt
 
 - [SDK Entry Points](/de/plugins/sdk-entrypoints) -- `definePluginEntry` und `defineChannelPluginEntry`
-- [Plugin Manifest](/de/plugins/manifest) -- vollständige Manifest-Schemareferenz
-- [Building Plugins](/de/plugins/building-plugins) -- Schritt-für-Schritt-Anleitung für den Einstieg
+- [Plugin Manifest](/de/plugins/manifest) -- vollständige Referenz des Manifestschemas
+- [Building Plugins](/de/plugins/building-plugins) -- Schritt-für-Schritt-Einstiegsanleitung
