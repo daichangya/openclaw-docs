@@ -1,37 +1,34 @@
 ---
 read_when:
-    - qa-lab veya qa-channel'ı genişletme
+    - qa-lab veya qa-channel genişletme
     - Depo destekli QA senaryoları ekleme
-    - Gateway panosu etrafında daha yüksek gerçekçiliğe sahip QA otomasyonu oluşturma
-summary: qa-lab, qa-channel, tohumlanmış senaryolar ve protokol raporları için özel QA otomasyon yapısı
-title: QA E2E Otomasyonu
+    - Gateway panosu etrafında daha gerçekçi QA otomasyonu oluşturma
+summary: qa-lab, qa-channel, seeded senaryolar ve protokol raporları için özel QA otomasyon yapısı
+title: QA Uçtan Uca Otomasyonu
 x-i18n:
-    generated_at: "2026-04-13T08:50:47Z"
+    generated_at: "2026-04-16T21:51:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a4a4f5c765163565c95c2a071f201775fd9d8d60cad4ff25d71e4710559c1570
+    source_hash: 7deefda1c90a0d2e21e2155ffd8b585fb999e7416bdbaf0ff57eb33ccc063afc
     source_path: concepts/qa-e2e-automation.md
     workflow: 15
 ---
 
-# QA E2E Otomasyonu
+# QA Uçtan Uca Otomasyonu
 
-Özel QA yığını, OpenClaw'ı tek birim testinin yapabileceğinden daha gerçekçi,
-kanal biçimli bir şekilde çalıştırmayı amaçlar.
+Özel QA yığını, OpenClaw’ı tek birim testinin sağlayabileceğinden daha gerçekçi,
+kanal biçimli bir şekilde çalıştırmak için tasarlanmıştır.
 
 Mevcut parçalar:
 
-- `extensions/qa-channel`: DM, kanal, ileti dizisi,
-  tepki, düzenleme ve silme yüzeylerine sahip sentetik mesaj kanalı.
-- `extensions/qa-lab`: transkripti gözlemlemek,
-  gelen mesajları enjekte etmek ve bir Markdown raporu dışa aktarmak için hata ayıklayıcı UI ve QA veri yolu.
-- `qa/`: başlangıç görevi ve temel QA
-  senaryoları için depo destekli tohum varlıkları.
+- `extensions/qa-channel`: DM, kanal, ileti dizisi, tepki, düzenleme ve silme yüzeylerine sahip sentetik mesaj kanalı.
+- `extensions/qa-lab`: transkripti gözlemlemek, gelen mesajları enjekte etmek ve bir Markdown raporu dışa aktarmak için hata ayıklayıcı arayüzü ve QA veri yolu.
+- `qa/`: başlangıç görevi ve temel QA senaryoları için depo destekli tohum varlıkları.
 
-Mevcut QA operatör akışı iki bölmeli bir QA sitesidir:
+Mevcut QA operatörü akışı iki panelli bir QA sitesidir:
 
 - Sol: ajanla birlikte Gateway panosu (Control UI).
-- Sağ: Slack benzeri transkripti ve senaryo planını gösteren QA Lab.
+- Sağ: Slack benzeri transkript ve senaryo planını gösteren QA Lab.
 
 Bunu şu komutla çalıştırın:
 
@@ -39,12 +36,12 @@ Bunu şu komutla çalıştırın:
 pnpm qa:lab:up
 ```
 
-Bu, QA sitesini oluşturur, Docker destekli gateway hattını başlatır ve
-bir operatörün veya otomasyon döngüsünün ajana bir QA
-görevi verebildiği, gerçek kanal davranışını gözlemleyebildiği ve neyin çalıştığını, başarısız olduğunu veya
-engelli kaldığını kaydedebildiği QA Lab sayfasını açığa çıkarır.
+Bu, QA sitesini derler, Docker destekli Gateway şeridini başlatır ve bir operatörün
+veya otomasyon döngüsünün ajana bir QA görevi verebildiği, gerçek kanal davranışını
+gözlemleyebildiği ve neyin çalıştığını, neyin başarısız olduğunu veya neyin engelli
+kaldığını kaydedebildiği QA Lab sayfasını açığa çıkarır.
 
-Docker image'ını her seferinde yeniden oluşturmadan daha hızlı QA Lab UI yinelemesi için,
+Docker imajını her seferinde yeniden derlemeden daha hızlı QA Lab UI yinelemesi için,
 yığını bind-mounted bir QA Lab paketiyle başlatın:
 
 ```bash
@@ -54,94 +51,96 @@ pnpm qa:lab:up:fast
 pnpm qa:lab:watch
 ```
 
-`qa:lab:up:fast`, Docker servislerini önceden oluşturulmuş bir image üzerinde tutar ve
-`extensions/qa-lab/web/dist` dizinini `qa-lab` container'ına bind-mount eder. `qa:lab:watch`
-değişiklikte bu paketi yeniden oluşturur ve QA Lab
-varlık hash'i değiştiğinde tarayıcı otomatik olarak yeniden yüklenir.
+`qa:lab:up:fast`, Docker servislerini önceden derlenmiş bir imaj üzerinde tutar ve
+`extensions/qa-lab/web/dist` dizinini `qa-lab` kapsayıcısına bind-mount eder. `qa:lab:watch`
+bu paketi değişikliklerde yeniden derler ve QA Lab varlık karması değiştiğinde tarayıcı
+otomatik olarak yeniden yüklenir.
 
-Taşıma açısından gerçek bir Matrix smoke hattı için şunu çalıştırın:
+Taşıma açısından gerçek bir Matrix smoke şeridi için şunu çalıştırın:
 
 ```bash
 pnpm openclaw qa matrix
 ```
 
-Bu hat, Docker içinde tek kullanımlık bir Tuwunel homeserver sağlar, geçici
-sürücü, SUT ve gözlemci kullanıcıları kaydeder, bir özel oda oluşturur, ardından
-gerçek Matrix Plugin'ini bir QA gateway child içinde çalıştırır. Canlı taşıma hattı child config'i
-test edilen taşımaya kapsamlı tutar; bu nedenle Matrix, child config içinde
-`qa-channel` olmadan çalışır.
+Bu şerit, Docker’da tek kullanımlık bir Tuwunel homeserver hazırlar, geçici sürücü, SUT
+ve gözlemci kullanıcılarını kaydeder, bir özel oda oluşturur ve ardından gerçek Matrix
+Plugin’ini bir QA Gateway alt süreci içinde çalıştırır. Canlı taşıma şeridi, alt süreç
+yapılandırmasını test edilen taşımaya göre kapsamlandırılmış tutar; böylece Matrix, alt
+süreç yapılandırmasında `qa-channel` olmadan çalışır. Yapılandırılmış rapor çıktılarını
+ve birleşik stdout/stderr günlüğünü seçilen Matrix QA çıktı dizinine yazar. Dıştaki
+`scripts/run-node.mjs` derleme/başlatıcı çıktısını da yakalamak için,
+`OPENCLAW_RUN_NODE_OUTPUT_LOG=<path>` değişkenini depo içi bir günlük dosyasına ayarlayın.
 
-Taşıma açısından gerçek bir Telegram smoke hattı için şunu çalıştırın:
+Taşıma açısından gerçek bir Telegram smoke şeridi için şunu çalıştırın:
 
 ```bash
 pnpm openclaw qa telegram
 ```
 
-Bu hat, tek kullanımlık bir sunucu sağlamak yerine gerçek bir özel Telegram grubunu hedefler.
-`OPENCLAW_QA_TELEGRAM_GROUP_ID`,
+Bu şerit, tek kullanımlık bir sunucu hazırlamak yerine bir gerçek özel Telegram grubunu
+hedefler. `OPENCLAW_QA_TELEGRAM_GROUP_ID`,
 `OPENCLAW_QA_TELEGRAM_DRIVER_BOT_TOKEN` ve
-`OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN` gerektirir; ayrıca aynı
-özel grupta iki ayrı bot gerekir. SUT botunun bir Telegram kullanıcı adı olmalıdır ve
-botlar arası gözlem, her iki botta da
-`@BotFather` içinde Bot-to-Bot Communication Mode etkinleştirildiğinde en iyi şekilde çalışır.
+`OPENCLAW_QA_TELEGRAM_SUT_BOT_TOKEN` gerektirir; ayrıca aynı özel grupta iki farklı bot
+bulunmalıdır. SUT botunun bir Telegram kullanıcı adı olmalıdır ve bottan-bota gözlem,
+her iki botta da `@BotFather` içinde Bot-to-Bot Communication Mode etkin olduğunda en iyi
+şekilde çalışır.
 
-Canlı taşıma hatları artık her birinin kendi senaryo listesi şeklini
-icat etmesi yerine ortak, daha küçük bir sözleşmeyi paylaşıyor:
+Canlı taşıma şeritleri artık her birinin kendi senaryo listesi biçimini icat etmesi yerine
+tek ve daha küçük bir sözleşmeyi paylaşır:
 
-`qa-channel`, geniş sentetik ürün davranışı paketi olmaya devam eder ve
-canlı taşıma kapsam matriksinin bir parçası değildir.
+`qa-channel`, geniş sentetik ürün davranışı paketidir ve canlı taşıma kapsama matrisinin
+bir parçası değildir.
 
-| Hat      | Canary | Mention gating | Allowlist block | Üst düzey yanıt | Yeniden başlatma sonrası sürdürme | İleti dizisi takibi | İleti dizisi yalıtımı | Tepki gözlemi | Yardım komutu |
-| -------- | ------ | -------------- | --------------- | --------------- | --------------------------------- | ------------------- | -------------------- | ------------- | ------------- |
-| Matrix   | x      | x              | x               | x               | x                                 | x                   | x                    | x             |               |
-| Telegram | x      |                |                 |                 |                                   |                     |                      |               | x             |
+| Şerit    | Canary | Mention gating | Allowlist block | Üst düzey yanıt | Yeniden başlatmada sürdürme | İleti dizisi takibi | İleti dizisi yalıtımı | Tepki gözlemi | Yardım komutu |
+| -------- | ------ | -------------- | --------------- | --------------- | --------------------------- | ------------------- | --------------------- | ------------- | ------------- |
+| Matrix   | x      | x              | x               | x               | x                           | x                   | x                     | x             |               |
+| Telegram | x      |                |                 |                 |                             |                     |                       |               | x             |
 
-Bu, `qa-channel`'ı geniş ürün davranışı paketi olarak korurken Matrix,
-Telegram ve gelecekteki canlı taşımaların tek bir açık
-taşıma sözleşmesi kontrol listesini paylaşmasını sağlar.
+Bu, `qa-channel`’ı geniş ürün davranışı paketi olarak korurken Matrix,
+Telegram ve gelecekteki canlı taşıma türlerinin tek bir açık taşıma sözleşmesi
+kontrol listesini paylaşmasını sağlar.
 
-QA yoluna Docker katmadan tek kullanımlık bir Linux VM hattı için şunu çalıştırın:
+QA yoluna Docker katmadan tek kullanımlık bir Linux VM şeridi için şunu çalıştırın:
 
 ```bash
 pnpm openclaw qa suite --runner multipass --scenario channel-chat-baseline
 ```
 
-Bu, yeni bir Multipass guest'i başlatır, bağımlılıkları kurar, guest içinde OpenClaw'ı oluşturur,
-`qa suite` çalıştırır, ardından normal QA raporunu ve
-özetini host üzerindeki `.artifacts/qa-e2e/...` dizinine geri kopyalar.
-Host üzerindeki `qa suite` ile aynı senaryo seçimi davranışını yeniden kullanır.
-Host ve Multipass suite çalıştırmaları, varsayılan olarak
-yalıtılmış gateway worker'larıyla birden çok seçilmiş senaryoyu paralel çalıştırır; en fazla 64 worker veya seçilen
-senaryo sayısı kullanılır. Worker sayısını ayarlamak için `--concurrency <count>`,
-seri yürütme için ise `--concurrency 1` kullanın.
-Canlı çalıştırmalar, guest için pratik olan desteklenen QA kimlik doğrulama girdilerini iletir:
-env tabanlı sağlayıcı anahtarları, QA canlı sağlayıcı config yolu ve
-varsa `CODEX_HOME`. Guest'in
-bağlı çalışma alanı üzerinden geri yazabilmesi için `--output-dir` değerini depo kökü altında tutun.
+Bu, yeni bir Multipass konuğunu başlatır, bağımlılıkları kurar, konuğun içinde
+OpenClaw’ı derler, `qa suite` çalıştırır, ardından normal QA raporunu ve özeti
+ana makinedeki `.artifacts/qa-e2e/...` içine geri kopyalar.
+Ana makinedeki `qa suite` ile aynı senaryo seçme davranışını yeniden kullanır.
+Ana makine ve Multipass paket çalıştırmaları, varsayılan olarak yalıtılmış Gateway
+çalışanlarıyla birden fazla seçili senaryoyu paralel çalıştırır; üst sınır 64 çalışan
+veya seçilen senaryo sayısıdır. Çalışan sayısını ayarlamak için `--concurrency <count>`,
+seri yürütme içinse `--concurrency 1` kullanın.
+Canlı çalıştırmalar, konuk için pratik olan desteklenen QA kimlik doğrulama girdilerini
+iletir: ortam değişkeni tabanlı sağlayıcı anahtarları, QA canlı sağlayıcı yapılandırma yolu
+ve mevcutsa `CODEX_HOME`. Konuğun bağlanmış çalışma alanı üzerinden geri yazabilmesi için
+`--output-dir` değerini depo kökü altında tutun.
 
 ## Depo destekli tohumlar
 
-Tohum varlıkları `qa/` içinde bulunur:
+Tohum varlıkları `qa/` altında bulunur:
 
 - `qa/scenarios/index.md`
 - `qa/scenarios/*.md`
 
-Bunlar kasıtlı olarak git içindedir; böylece QA planı hem insanlar hem de
-ajan için görünür olur.
+Bunlar, QA planının hem insanlar hem de ajan tarafından görülebilmesi için bilerek git içinde tutulur.
 
-`qa-lab` genel amaçlı bir markdown çalıştırıcısı olarak kalmalıdır. Her senaryo markdown dosyası
-tek bir test çalıştırmasının doğruluk kaynağıdır ve şunları tanımlamalıdır:
+`qa-lab` genel amaçlı bir markdown çalıştırıcısı olarak kalmalıdır. Her senaryo markdown
+dosyası tek bir test çalıştırmasının doğruluk kaynağıdır ve şunları tanımlamalıdır:
 
 - senaryo meta verileri
-- doküman ve kod referansları
+- belge ve kod referansları
 - isteğe bağlı Plugin gereksinimleri
-- isteğe bağlı gateway config yaması
-- yürütülebilir `qa-flow`
+- isteğe bağlı Gateway yapılandırma yaması
+- çalıştırılabilir `qa-flow`
 
-`qa-flow`'u destekleyen yeniden kullanılabilir çalışma zamanı yüzeyinin genel amaçlı
-ve kesitler arası kalmasına izin verilir. Örneğin markdown senaryoları,
-özel durumlu bir çalıştırıcı eklemeden gömülü Control UI'ı
-Gateway `browser.request` yüzeyi üzerinden süren tarayıcı tarafı yardımcılarıyla taşıma tarafı yardımcılarını birleştirebilir.
+`qa-flow`’u destekleyen yeniden kullanılabilir çalışma zamanı yüzeyinin genel ve farklı
+alanları kesen yapıda kalmasına izin verilir. Örneğin markdown senaryoları, özel amaçlı
+bir çalıştırıcı eklemeden, gömülü Control UI’yi Gateway `browser.request` bağlantı yüzeyi
+üzerinden süren tarayıcı tarafı yardımcılarla taşıma tarafı yardımcılarını birleştirebilir.
 
 Temel liste, şunları kapsayacak kadar geniş kalmalıdır:
 
@@ -152,37 +151,37 @@ Temel liste, şunları kapsayacak kadar geniş kalmalıdır:
 - bellekten geri çağırma
 - model değiştirme
 - alt ajan devri
-- depo okuma ve doküman okuma
+- depoyu okuma ve belgeleri okuma
 - Lobster Invaders gibi küçük bir derleme görevi
 
 ## Taşıma bağdaştırıcıları
 
-`qa-lab`, markdown QA senaryoları için genel bir taşıma yüzeyine sahiptir.
-`qa-channel`, bu yüzeydeki ilk bağdaştırıcıdır; ancak tasarım hedefi daha geniştir:
-gelecekteki gerçek veya sentetik kanallar, taşımaya özgü bir QA çalıştırıcısı eklemek yerine
-aynı suite çalıştırıcısına takılmalıdır.
+`qa-lab`, markdown QA senaryoları için genel bir taşıma bağlantı yüzeyine sahiptir.
+`qa-channel` bu bağlantı yüzeyindeki ilk bağdaştırıcıdır, ancak tasarım hedefi daha geniştir:
+gelecekteki gerçek veya sentetik kanallar, taşıma özelinde bir QA çalıştırıcısı eklemek yerine
+aynı paket çalıştırıcıya takılmalıdır.
 
 Mimari düzeyde ayrım şöyledir:
 
-- `qa-lab`, genel senaryo yürütmeyi, worker eşzamanlılığını, artifact yazmayı ve raporlamayı yönetir.
-- taşıma bağdaştırıcısı gateway config'ini, hazır olma durumunu, gelen ve giden gözlemi, taşıma eylemlerini ve normalize edilmiş taşıma durumunu yönetir.
-- `qa/scenarios/` altındaki markdown senaryo dosyaları test çalıştırmasını tanımlar; bunları yürüten yeniden kullanılabilir çalışma zamanı yüzeyini `qa-lab` sağlar.
+- `qa-lab` genel senaryo yürütme, çalışan eşzamanlılığı, çıktı yazma ve raporlamaya sahiptir.
+- taşıma bağdaştırıcısı Gateway yapılandırması, hazır olma durumu, gelen ve giden gözlem, taşıma eylemleri ve normalleştirilmiş taşıma durumuna sahiptir.
+- `qa/scenarios/` altındaki markdown senaryo dosyaları test çalıştırmasını tanımlar; `qa-lab` ise bunu yürüten yeniden kullanılabilir çalışma zamanı yüzeyini sağlar.
 
-Yeni kanal bağdaştırıcıları için bakımcıya yönelik benimseme yönergeleri
-[Testing](/tr/help/testing#adding-a-channel-to-qa) içinde bulunur.
+Yeni kanal bağdaştırıcıları için bakım sorumlularına yönelik uyarlama rehberi
+[Testing](/tr/help/testing#adding-a-channel-to-qa) bölümünde bulunur.
 
 ## Raporlama
 
 `qa-lab`, gözlemlenen veri yolu zaman çizelgesinden bir Markdown protokol raporu dışa aktarır.
 Rapor şu sorulara yanıt vermelidir:
 
-- Ne işe yaradı
+- Ne çalıştı
 - Ne başarısız oldu
 - Ne engelli kaldı
-- Hangi takip senaryolarını eklemeye değer
+- Hangi takip senaryolarını eklemek değerlidir
 
-Karakter ve stil kontrolleri için aynı senaryoyu birden çok canlı model
-ref'i üzerinde çalıştırın ve değerlendirilmiş bir Markdown raporu yazın:
+Karakter ve stil kontrolleri için aynı senaryoyu birden fazla canlı model ref’i üzerinde
+çalıştırın ve değerlendirilmiş bir Markdown raporu yazın:
 
 ```bash
 pnpm openclaw qa character-eval \
@@ -201,39 +200,39 @@ pnpm openclaw qa character-eval \
   --judge-concurrency 16
 ```
 
-Komut, Docker değil, yerel QA gateway child süreçlerini çalıştırır. Character eval
-senaryoları persona'yı `SOUL.md` üzerinden ayarlamalı, ardından sohbet,
-çalışma alanı yardımı ve küçük dosya görevleri gibi sıradan kullanıcı turlarını çalıştırmalıdır. Aday modele
-değerlendirildiği söylenmemelidir. Komut her tam
-transkripti korur, temel çalışma istatistiklerini kaydeder, ardından değerlendirme modellerinden fast mode ile
-`xhigh` akıl yürütme kullanarak çalıştırmaları doğallık, hava ve mizaha göre sıralamalarını ister.
-Sağlayıcıları karşılaştırırken `--blind-judge-models` kullanın: değerlendirme istemi yine de
-her transkripti ve çalışma durumunu alır, ancak aday ref'leri
-`candidate-01` gibi nötr etiketlerle değiştirilir; rapor ayrıştırmadan sonra sıralamaları gerçek ref'lere geri eşler.
-Aday çalıştırmalar varsayılan olarak `high` thinking kullanır; bunu destekleyen OpenAI modelleri için
-`xhigh` kullanılır. Belirli bir adayı satır içinde
-`--model provider/model,thinking=<level>` ile geçersiz kılın. `--thinking <level>` hâlâ
-genel bir yedek değer ayarlar ve eski `--model-thinking <provider/model=level>` biçimi
-uyumluluk için korunur.
-OpenAI aday ref'leri varsayılan olarak fast mode kullanır; böylece sağlayıcının bunu desteklediği yerlerde
-öncelikli işleme kullanılır. Tek bir aday veya değerlendirici için geçersiz kılma gerektiğinde satır içinde
-`,fast`, `,no-fast` veya `,fast=false` ekleyin. Fast mode'u her aday model için
-zorla açmak istediğinizde yalnızca `--fast` geçin. Aday ve değerlendirici süreleri
-kıyaslama analizi için rapora kaydedilir, ancak değerlendirici istemleri açıkça
-hıza göre sıralama yapılmamasını söyler.
-Aday ve değerlendirici model çalıştırmalarının her ikisi de varsayılan olarak 16 eşzamanlılıkla çalışır.
-Sağlayıcı sınırları veya yerel gateway
-yükü bir çalıştırmayı fazla gürültülü hale getiriyorsa `--concurrency` veya `--judge-concurrency` değerini düşürün.
-Aday `--model` geçilmediğinde character eval varsayılan olarak
+Komut, Docker değil, yerel QA Gateway alt süreçleri çalıştırır. Karakter değerlendirme
+senaryoları kişiliği `SOUL.md` üzerinden ayarlamalı, ardından sohbet, çalışma alanı yardımı
+ve küçük dosya görevleri gibi normal kullanıcı dönüşlerini çalıştırmalıdır. Aday modele
+değerlendirildiği söylenmemelidir. Komut her tam transkripti korur, temel çalışma istatistiklerini
+kaydeder, ardından doğal olma, hava ve mizah açısından çalıştırmaları sıralamaları için
+değerlendirici modellere hızlı modda ve `xhigh` akıl yürütmeyle sorar.
+Sağlayıcıları karşılaştırırken `--blind-judge-models` kullanın: değerlendirme istemi yine her
+transkripti ve çalışma durumunu alır, ancak aday ref’leri `candidate-01` gibi nötr etiketlerle
+değiştirilir; rapor, ayrıştırmadan sonra sıralamaları gerçek ref’lere geri eşler.
+Aday çalıştırmaları varsayılan olarak `high` düşünme düzeyi kullanır; bunu destekleyen OpenAI
+modelleri için `xhigh` kullanılır. Belirli bir adayı satır içinde
+`--model provider/model,thinking=<level>` ile geçersiz kılın. `--thinking <level>` hâlâ genel
+bir yedek değer ayarlar ve eski `--model-thinking <provider/model=level>` biçimi uyumluluk için
+korunur.
+OpenAI aday ref’leri varsayılan olarak hızlı mod kullanır; böylece sağlayıcının desteklediği
+yerlerde öncelikli işleme kullanılır. Tek bir aday veya değerlendirici için geçersiz kılma
+gerekiyorsa satır içinde `,fast`, `,no-fast` veya `,fast=false` ekleyin. Hızlı modu her aday model
+için zorla açmak istediğinizde yalnızca `--fast` geçin. Aday ve değerlendirici süreleri kıyaslama
+analizi için rapora kaydedilir, ancak değerlendirici istemleri açıkça hıza göre sıralama
+yapılmamasını söyler.
+Hem aday hem de değerlendirici model çalıştırmaları varsayılan olarak 16 eşzamanlılık kullanır.
+Sağlayıcı sınırları veya yerel Gateway yükü çalıştırmayı fazla gürültülü hale getiriyorsa
+`--concurrency` veya `--judge-concurrency` değerlerini düşürün.
+Aday `--model` geçirilmediğinde karakter değerlendirmesi varsayılan olarak
 `openai/gpt-5.4`, `openai/gpt-5.2`, `openai/gpt-5`, `anthropic/claude-opus-4-6`,
 `anthropic/claude-sonnet-4-6`, `zai/glm-5.1`,
 `moonshot/kimi-k2.5` ve
 `google/gemini-3.1-pro-preview` kullanır.
-Değerlendirici `--judge-model` geçilmediğinde değerlendiriciler varsayılan olarak
+Değerlendirici `--judge-model` geçirilmediğinde değerlendiriciler varsayılan olarak
 `openai/gpt-5.4,thinking=xhigh,fast` ve
 `anthropic/claude-opus-4-6,thinking=high` olur.
 
-## İlgili dokümanlar
+## İlgili belgeler
 
 - [Testing](/tr/help/testing)
 - [QA Channel](/tr/channels/qa-channel)
