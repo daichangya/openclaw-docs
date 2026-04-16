@@ -1,14 +1,14 @@
 ---
 read_when:
     - Anda ingin menggunakan model Google Gemini dengan OpenClaw
-    - Anda memerlukan alur auth API key atau OAuth
-summary: Penyiapan Google Gemini (API key + OAuth, pembuatan gambar, pemahaman media, pencarian web)
+    - Anda memerlukan kunci API atau alur autentikasi OAuth
+summary: Penyiapan Google Gemini (kunci API + OAuth, pembuatan gambar, pemahaman media, TTS, pencarian web)
 title: Google (Gemini)
 x-i18n:
-    generated_at: "2026-04-12T23:30:55Z"
+    generated_at: "2026-04-16T09:14:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 64b848add89061b208a5d6b19d206c433cace5216a0ca4b63d56496aecbde452
+    source_hash: ec2d62855f5e80efda758aad71bcaa95c38b1e41761fa1100d47a06c62881419
     source_path: providers/google.md
     workflow: 15
 ---
@@ -16,7 +16,7 @@ x-i18n:
 # Google (Gemini)
 
 Plugin Google menyediakan akses ke model Gemini melalui Google AI Studio, serta
-pembuatan gambar, pemahaman media (gambar/audio/video), dan pencarian web melalui
+pembuatan gambar, pemahaman media (gambar/audio/video), text-to-speech, dan pencarian web melalui
 Gemini Grounding.
 
 - Provider: `google`
@@ -26,10 +26,10 @@ Gemini Grounding.
 
 ## Memulai
 
-Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
+Pilih metode autentikasi yang Anda inginkan dan ikuti langkah-langkah penyiapan.
 
 <Tabs>
-  <Tab title="API key">
+  <Tab title="Kunci API">
     **Terbaik untuk:** akses API Gemini standar melalui Google AI Studio.
 
     <Steps>
@@ -38,7 +38,7 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
         openclaw onboard --auth-choice gemini-api-key
         ```
 
-        Atau berikan key secara langsung:
+        Atau berikan kunci secara langsung:
 
         ```bash
         openclaw onboard --non-interactive \
@@ -47,7 +47,7 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
           --gemini-api-key "$GEMINI_API_KEY"
         ```
       </Step>
-      <Step title="Setel model default">
+      <Step title="Tetapkan model default">
         ```json5
         {
           agents: {
@@ -58,7 +58,7 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
         }
         ```
       </Step>
-      <Step title="Verifikasi model tersedia">
+      <Step title="Verifikasi bahwa model tersedia">
         ```bash
         openclaw models list --provider google
         ```
@@ -66,13 +66,13 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
     </Steps>
 
     <Tip>
-    Variabel environment `GEMINI_API_KEY` dan `GOOGLE_API_KEY` sama-sama didukung. Gunakan salah satu yang sudah Anda konfigurasikan.
+    Variabel lingkungan `GEMINI_API_KEY` dan `GOOGLE_API_KEY` keduanya didukung. Gunakan mana saja yang sudah Anda konfigurasi.
     </Tip>
 
   </Tab>
 
   <Tab title="Gemini CLI (OAuth)">
-    **Terbaik untuk:** menggunakan kembali login Gemini CLI yang sudah ada melalui PKCE OAuth alih-alih API key terpisah.
+    **Terbaik untuk:** menggunakan kembali login Gemini CLI yang sudah ada melalui PKCE OAuth alih-alih kunci API terpisah.
 
     <Warning>
     Provider `google-gemini-cli` adalah integrasi tidak resmi. Beberapa pengguna
@@ -81,7 +81,7 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
 
     <Steps>
       <Step title="Instal Gemini CLI">
-        Perintah `gemini` lokal harus tersedia di `PATH`.
+        Perintah lokal `gemini` harus tersedia di `PATH`.
 
         ```bash
         # Homebrew
@@ -91,15 +91,15 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
         npm install -g @google/gemini-cli
         ```
 
-        OpenClaw mendukung instalasi Homebrew maupun instalasi npm global, termasuk
-        tata letak Windows/npm yang umum.
+        OpenClaw mendukung instalasi Homebrew dan instalasi npm global, termasuk
+        tata letak umum Windows/npm.
       </Step>
       <Step title="Masuk melalui OAuth">
         ```bash
         openclaw models auth login --provider google-gemini-cli --set-default
         ```
       </Step>
-      <Step title="Verifikasi model tersedia">
+      <Step title="Verifikasi bahwa model tersedia">
         ```bash
         openclaw models list --provider google-gemini-cli
         ```
@@ -109,7 +109,7 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
     - Model default: `google-gemini-cli/gemini-3-flash-preview`
     - Alias: `gemini-cli`
 
-    **Variabel environment:**
+    **Variabel lingkungan:**
 
     - `OPENCLAW_GEMINI_OAUTH_CLIENT_ID`
     - `OPENCLAW_GEMINI_OAUTH_CLIENT_SECRET`
@@ -117,17 +117,17 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
     (Atau varian `GEMINI_CLI_*`.)
 
     <Note>
-    Jika permintaan OAuth Gemini CLI gagal setelah login, setel `GOOGLE_CLOUD_PROJECT` atau
-    `GOOGLE_CLOUD_PROJECT_ID` pada host gateway lalu coba lagi.
+    Jika permintaan OAuth Gemini CLI gagal setelah login, tetapkan `GOOGLE_CLOUD_PROJECT` atau
+    `GOOGLE_CLOUD_PROJECT_ID` pada host Gateway lalu coba lagi.
     </Note>
 
     <Note>
-    Jika login gagal sebelum alur browser dimulai, pastikan perintah `gemini` lokal
+    Jika login gagal sebelum alur browser dimulai, pastikan perintah lokal `gemini`
     terinstal dan ada di `PATH`.
     </Note>
 
-    Provider `google-gemini-cli` yang khusus OAuth adalah
-    surface inferensi teks yang terpisah. Pembuatan gambar, pemahaman media, dan Gemini Grounding tetap berada pada
+    Provider `google-gemini-cli` yang hanya mendukung OAuth adalah
+    surface inferensi teks terpisah. Pembuatan gambar, pemahaman media, dan Gemini Grounding tetap berada pada
     id provider `google`.
 
   </Tab>
@@ -135,11 +135,12 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
 
 ## Kemampuan
 
-| Capability             | Supported         |
+| Kemampuan              | Didukung          |
 | ---------------------- | ----------------- |
-| Chat completions       | Ya                |
+| Penyelesaian chat      | Ya                |
 | Pembuatan gambar       | Ya                |
 | Pembuatan musik        | Ya                |
+| Text-to-speech         | Ya                |
 | Pemahaman gambar       | Ya                |
 | Transkripsi audio      | Ya                |
 | Pemahaman video        | Ya                |
@@ -149,8 +150,8 @@ Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
 
 <Tip>
 Model Gemma 4 (misalnya `gemma-4-26b-a4b-it`) mendukung mode thinking. OpenClaw
-menulis ulang `thinkingBudget` ke `thinkingLevel` Google yang didukung untuk Gemma 4.
-Menyetel thinking ke `off` mempertahankan thinking nonaktif alih-alih memetakannya ke
+menulis ulang `thinkingBudget` menjadi `thinkingLevel` Google yang didukung untuk Gemma 4.
+Menetapkan thinking ke `off` akan mempertahankan thinking dalam keadaan nonaktif alih-alih memetakannya ke
 `MINIMAL`.
 </Tip>
 
@@ -160,8 +161,8 @@ Provider pembuatan gambar `google` bawaan secara default menggunakan
 `google/gemini-3.1-flash-image-preview`.
 
 - Juga mendukung `google/gemini-3-pro-image-preview`
-- Generate: hingga 4 gambar per permintaan
-- Mode edit: aktif, hingga 5 gambar input
+- Hasilkan: hingga 4 gambar per permintaan
+- Mode edit: diaktifkan, hingga 5 gambar masukan
 - Kontrol geometri: `size`, `aspectRatio`, dan `resolution`
 
 Untuk menggunakan Google sebagai provider gambar default:
@@ -179,12 +180,12 @@ Untuk menggunakan Google sebagai provider gambar default:
 ```
 
 <Note>
-Lihat [Image Generation](/id/tools/image-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
+Lihat [Pembuatan Gambar](/id/tools/image-generation) untuk parameter alat bersama, pemilihan provider, dan perilaku failover.
 </Note>
 
 ## Pembuatan video
 
-Plugin `google` bawaan juga mendaftarkan pembuatan video melalui tool bersama
+Plugin `google` bawaan juga mendaftarkan pembuatan video melalui alat bersama
 `video_generate`.
 
 - Model video default: `google/veo-3.1-fast-generate-preview`
@@ -207,20 +208,20 @@ Untuk menggunakan Google sebagai provider video default:
 ```
 
 <Note>
-Lihat [Video Generation](/id/tools/video-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
+Lihat [Pembuatan Video](/id/tools/video-generation) untuk parameter alat bersama, pemilihan provider, dan perilaku failover.
 </Note>
 
 ## Pembuatan musik
 
-Plugin `google` bawaan juga mendaftarkan pembuatan musik melalui tool bersama
+Plugin `google` bawaan juga mendaftarkan pembuatan musik melalui alat bersama
 `music_generate`.
 
 - Model musik default: `google/lyria-3-clip-preview`
 - Juga mendukung `google/lyria-3-pro-preview`
 - Kontrol prompt: `lyrics` dan `instrumental`
-- Format output: `mp3` secara default, ditambah `wav` pada `google/lyria-3-pro-preview`
-- Input referensi: hingga 10 gambar
-- Eksekusi berbasis sesi dilepas melalui alur task/status bersama, termasuk `action: "status"`
+- Format keluaran: `mp3` secara default, ditambah `wav` pada `google/lyria-3-pro-preview`
+- Masukan referensi: hingga 10 gambar
+- Proses berbasis sesi dilepas melalui alur tugas/status bersama, termasuk `action: "status"`
 
 Untuk menggunakan Google sebagai provider musik default:
 
@@ -237,21 +238,65 @@ Untuk menggunakan Google sebagai provider musik default:
 ```
 
 <Note>
-Lihat [Music Generation](/id/tools/music-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
+Lihat [Pembuatan Musik](/id/tools/music-generation) untuk parameter alat bersama, pemilihan provider, dan perilaku failover.
+</Note>
+
+## Text-to-speech
+
+Provider ucapan `google` bawaan menggunakan jalur TTS Google Gemini API dengan
+`gemini-3.1-flash-tts-preview`.
+
+- Suara default: `Kore`
+- Auth: `messages.tts.providers.google.apiKey`, `models.providers.google.apiKey`, `GEMINI_API_KEY`, atau `GOOGLE_API_KEY`
+- Keluaran: WAV untuk lampiran TTS biasa, PCM untuk Talk/teleponi
+- Keluaran catatan suara native: tidak didukung pada jalur Gemini API ini karena API mengembalikan PCM, bukan Opus
+
+Untuk menggunakan Google sebagai provider TTS default:
+
+```json5
+{
+  messages: {
+    tts: {
+      auto: "always",
+      provider: "google",
+      providers: {
+        google: {
+          model: "gemini-3.1-flash-tts-preview",
+          voiceName: "Kore",
+        },
+      },
+    },
+  },
+}
+```
+
+Gemini API TTS menerima tag audio ekspresif dalam tanda kurung siku di dalam teks, seperti
+`[whispers]` atau `[laughs]`. Agar tag tidak muncul di balasan chat yang terlihat sambil
+tetap mengirimkannya ke TTS, letakkan tag tersebut di dalam blok `[[tts:text]]...[[/tts:text]]`:
+
+```text
+Berikut adalah teks balasan yang bersih.
+
+[[tts:text]][whispers] Berikut adalah versi yang diucapkan.[[/tts:text]]
+```
+
+<Note>
+Kunci API Google Cloud Console yang dibatasi untuk Gemini API valid untuk
+provider ini. Ini bukan jalur Cloud Text-to-Speech API yang terpisah.
 </Note>
 
 ## Konfigurasi lanjutan
 
 <AccordionGroup>
-  <Accordion title="Reuse cache Gemini langsung">
-    Untuk eksekusi API Gemini langsung (`api: "google-generative-ai"`), OpenClaw
+  <Accordion title="Penggunaan ulang cache Gemini langsung">
+    Untuk proses Gemini API langsung (`api: "google-generative-ai"`), OpenClaw
     meneruskan handle `cachedContent` yang dikonfigurasi ke permintaan Gemini.
 
-    - Konfigurasikan parameter per-model atau global dengan
+    - Konfigurasikan parameter per model atau global dengan
       `cachedContent` atau `cached_content` lama
     - Jika keduanya ada, `cachedContent` yang diprioritaskan
-    - Nilai contoh: `cachedContents/prebuilt-context`
-    - Penggunaan cache-hit Gemini dinormalisasi ke `cacheRead` OpenClaw dari
+    - Contoh nilai: `cachedContents/prebuilt-context`
+    - Penggunaan cache-hit Gemini dinormalisasi menjadi `cacheRead` OpenClaw dari
       `cachedContentTokenCount` upstream
 
     ```json5
@@ -274,17 +319,17 @@ Lihat [Music Generation](/id/tools/music-generation) untuk parameter tool bersam
 
   <Accordion title="Catatan penggunaan JSON Gemini CLI">
     Saat menggunakan provider OAuth `google-gemini-cli`, OpenClaw menormalisasi
-    output JSON CLI sebagai berikut:
+    keluaran JSON CLI sebagai berikut:
 
-    - Teks balasan berasal dari field JSON `response` milik CLI.
-    - Penggunaan fallback ke `stats` saat CLI membiarkan `usage` kosong.
-    - `stats.cached` dinormalisasi ke `cacheRead` OpenClaw.
-    - Jika `stats.input` tidak ada, OpenClaw menurunkan token input dari
+    - Teks balasan berasal dari field `response` pada JSON CLI.
+    - Penggunaan akan menggunakan `stats` jika CLI membiarkan `usage` kosong.
+    - `stats.cached` dinormalisasi menjadi `cacheRead` OpenClaw.
+    - Jika `stats.input` tidak ada, OpenClaw menurunkan token masukan dari
       `stats.input_tokens - stats.cached`.
 
   </Accordion>
 
-  <Accordion title="Environment dan penyiapan daemon">
+  <Accordion title="Penyiapan lingkungan dan daemon">
     Jika Gateway berjalan sebagai daemon (launchd/systemd), pastikan `GEMINI_API_KEY`
     tersedia untuk proses tersebut (misalnya, di `~/.openclaw/.env` atau melalui
     `env.shellEnv`).
@@ -295,15 +340,15 @@ Lihat [Music Generation](/id/tools/music-generation) untuk parameter tool bersam
 
 <CardGroup cols={2}>
   <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
-    Memilih provider, ref model, dan perilaku failover.
+    Memilih provider, referensi model, dan perilaku failover.
   </Card>
   <Card title="Pembuatan gambar" href="/id/tools/image-generation" icon="image">
-    Parameter tool gambar bersama dan pemilihan provider.
+    Parameter alat gambar bersama dan pemilihan provider.
   </Card>
   <Card title="Pembuatan video" href="/id/tools/video-generation" icon="video">
-    Parameter tool video bersama dan pemilihan provider.
+    Parameter alat video bersama dan pemilihan provider.
   </Card>
   <Card title="Pembuatan musik" href="/id/tools/music-generation" icon="music">
-    Parameter tool musik bersama dan pemilihan provider.
+    Parameter alat musik bersama dan pemilihan provider.
   </Card>
 </CardGroup>

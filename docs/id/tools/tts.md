@@ -1,56 +1,55 @@
 ---
 read_when:
     - Mengaktifkan text-to-speech untuk balasan
-    - Mengonfigurasi provider atau batas TTS
-    - Menggunakan perintah `/tts`
+    - Mengonfigurasi penyedia TTS atau batasan
+    - Menggunakan perintah /tts
 summary: Text-to-speech (TTS) untuk balasan keluar
 title: Text-to-Speech
 x-i18n:
-    generated_at: "2026-04-12T23:33:41Z"
+    generated_at: "2026-04-16T09:14:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad79a6be34879347dc73fdab1bd219823cd7c6aa8504e3e4c73e1a0554c837c5
+    source_hash: de7c1dc8831c1ba307596afd48cb4d36f844724887a13b17e35f41ef5174a86f
     source_path: tools/tts.md
     workflow: 15
 ---
 
 # Text-to-speech (TTS)
 
-OpenClaw dapat mengubah balasan keluar menjadi audio menggunakan ElevenLabs, Microsoft, MiniMax, atau OpenAI.
+OpenClaw dapat mengonversi balasan keluar menjadi audio menggunakan ElevenLabs, Google Gemini, Microsoft, MiniMax, atau OpenAI.
 Fitur ini berfungsi di mana pun OpenClaw dapat mengirim audio.
 
 ## Layanan yang didukung
 
-- **ElevenLabs** (provider utama atau fallback)
-- **Microsoft** (provider utama atau fallback; implementasi bawaan saat ini menggunakan `node-edge-tts`)
-- **MiniMax** (provider utama atau fallback; menggunakan API T2A v2)
-- **OpenAI** (provider utama atau fallback; juga digunakan untuk ringkasan)
+- **ElevenLabs** (penyedia utama atau cadangan)
+- **Google Gemini** (penyedia utama atau cadangan; menggunakan Gemini API TTS)
+- **Microsoft** (penyedia utama atau cadangan; implementasi bawaan saat ini menggunakan `node-edge-tts`)
+- **MiniMax** (penyedia utama atau cadangan; menggunakan API T2A v2)
+- **OpenAI** (penyedia utama atau cadangan; juga digunakan untuk ringkasan)
 
 ### Catatan speech Microsoft
 
-Provider speech Microsoft bawaan saat ini menggunakan layanan TTS neural online Microsoft Edge melalui library `node-edge-tts`. Ini adalah layanan hosted (bukan
-lokal), menggunakan endpoint Microsoft, dan tidak memerlukan API key.
-`node-edge-tts` mengekspos opsi konfigurasi speech dan format output, tetapi
-tidak semua opsi didukung oleh layanan tersebut. Input directive dan config lama yang
-menggunakan `edge` tetap berfungsi dan dinormalisasi ke `microsoft`.
+Penyedia speech Microsoft bawaan saat ini menggunakan layanan neural TTS online Microsoft Edge melalui library `node-edge-tts`. Ini adalah layanan yang di-hosting (bukan lokal), menggunakan endpoint Microsoft, dan tidak memerlukan API key.
+`node-edge-tts` mengekspos opsi konfigurasi speech dan format output, tetapi tidak semua opsi didukung oleh layanan tersebut. Konfigurasi lama dan input directive yang menggunakan `edge` masih berfungsi dan dinormalisasi menjadi `microsoft`.
 
 Karena jalur ini adalah layanan web publik tanpa SLA atau kuota yang dipublikasikan,
-anggap ini sebagai best-effort. Jika Anda memerlukan batas dan dukungan yang terjamin, gunakan OpenAI
+anggap ini sebagai upaya terbaik. Jika Anda memerlukan batas yang terjamin dan dukungan, gunakan OpenAI
 atau ElevenLabs.
 
-## Key opsional
+## Kunci opsional
 
-Jika Anda ingin OpenAI, ElevenLabs, atau MiniMax:
+Jika Anda ingin menggunakan OpenAI, ElevenLabs, Google Gemini, atau MiniMax:
 
 - `ELEVENLABS_API_KEY` (atau `XI_API_KEY`)
+- `GEMINI_API_KEY` (atau `GOOGLE_API_KEY`)
 - `MINIMAX_API_KEY`
 - `OPENAI_API_KEY`
 
 Speech Microsoft **tidak** memerlukan API key.
 
-Jika beberapa provider dikonfigurasi, provider yang dipilih digunakan terlebih dahulu dan yang lainnya menjadi opsi fallback.
+Jika beberapa penyedia dikonfigurasi, penyedia yang dipilih akan digunakan terlebih dahulu dan yang lainnya menjadi opsi cadangan.
 Ringkasan otomatis menggunakan `summaryModel` yang dikonfigurasi (atau `agents.defaults.model.primary`),
-jadi provider tersebut juga harus diautentikasi jika Anda mengaktifkan ringkasan.
+jadi penyedia tersebut juga harus diautentikasi jika Anda mengaktifkan ringkasan.
 
 ## Tautan layanan
 
@@ -64,18 +63,18 @@ jadi provider tersebut juga harus diautentikasi jika Anda mengaktifkan ringkasan
 
 ## Apakah ini diaktifkan secara default?
 
-Tidak. Auto‑TTS **nonaktif** secara default. Aktifkan di config dengan
+Tidak. Auto‑TTS **nonaktif** secara default. Aktifkan di konfigurasi dengan
 `messages.tts.auto` atau secara lokal dengan `/tts on`.
 
-Saat `messages.tts.provider` tidak disetel, OpenClaw memilih provider
-speech pertama yang dikonfigurasi sesuai urutan auto-select registri.
+Saat `messages.tts.provider` tidak disetel, OpenClaw memilih penyedia
+speech pertama dalam urutan pemilihan otomatis registry.
 
-## Config
+## Konfigurasi
 
-Config TTS berada di bawah `messages.tts` di `openclaw.json`.
+Konfigurasi TTS berada di bawah `messages.tts` dalam `openclaw.json`.
 Skema lengkap ada di [Konfigurasi Gateway](/id/gateway/configuration).
 
-### Config minimal (aktifkan + provider)
+### Konfigurasi minimal (aktifkan + penyedia)
 
 ```json5
 {
@@ -88,7 +87,7 @@ Skema lengkap ada di [Konfigurasi Gateway](/id/gateway/configuration).
 }
 ```
 
-### OpenAI utama dengan fallback ElevenLabs
+### OpenAI utama dengan cadangan ElevenLabs
 
 ```json5
 {
@@ -176,7 +175,33 @@ Skema lengkap ada di [Konfigurasi Gateway](/id/gateway/configuration).
 }
 ```
 
-### Nonaktifkan speech Microsoft
+### Google Gemini utama
+
+```json5
+{
+  messages: {
+    tts: {
+      auto: "always",
+      provider: "google",
+      providers: {
+        google: {
+          apiKey: "gemini_api_key",
+          model: "gemini-3.1-flash-tts-preview",
+          voiceName: "Kore",
+        },
+      },
+    },
+  },
+}
+```
+
+Google Gemini TTS menggunakan jalur API key Gemini. API key Google Cloud Console
+yang dibatasi untuk Gemini API valid di sini, dan ini adalah jenis key yang sama
+yang digunakan oleh penyedia pembuatan gambar Google bawaan. Urutan resolusinya adalah
+`messages.tts.providers.google.apiKey` -> `models.providers.google.apiKey` ->
+`GEMINI_API_KEY` -> `GOOGLE_API_KEY`.
+
+### Menonaktifkan speech Microsoft
 
 ```json5
 {
@@ -192,7 +217,7 @@ Skema lengkap ada di [Konfigurasi Gateway](/id/gateway/configuration).
 }
 ```
 
-### Batas kustom + path prefs
+### Batas khusus + jalur prefs
 
 ```json5
 {
@@ -219,7 +244,7 @@ Skema lengkap ada di [Konfigurasi Gateway](/id/gateway/configuration).
 }
 ```
 
-### Nonaktifkan ringkasan otomatis untuk balasan panjang
+### Menonaktifkan ringkasan otomatis untuk balasan panjang
 
 ```json5
 {
@@ -243,57 +268,61 @@ Lalu jalankan:
   - `inbound` hanya mengirim audio setelah pesan suara masuk.
   - `tagged` hanya mengirim audio saat balasan menyertakan directive `[[tts:key=value]]` atau blok `[[tts:text]]...[[/tts:text]]`.
 - `enabled`: toggle lama (doctor memigrasikan ini ke `auto`).
-- `mode`: `"final"` (default) atau `"all"` (termasuk balasan alat/blok).
-- `provider`: id provider speech seperti `"elevenlabs"`, `"microsoft"`, `"minimax"`, atau `"openai"` (fallback otomatis).
-- Jika `provider` **tidak disetel**, OpenClaw menggunakan provider speech pertama yang dikonfigurasi sesuai urutan auto-select registri.
-- `provider: "edge"` lama tetap berfungsi dan dinormalisasi ke `microsoft`.
+- `mode`: `"final"` (default) atau `"all"` (termasuk balasan tool/blok).
+- `provider`: id penyedia speech seperti `"elevenlabs"`, `"google"`, `"microsoft"`, `"minimax"`, atau `"openai"` (cadangan bersifat otomatis).
+- Jika `provider` **tidak disetel**, OpenClaw menggunakan penyedia speech pertama yang dikonfigurasi dalam urutan pemilihan otomatis registry.
+- `provider: "edge"` lama masih berfungsi dan dinormalisasi menjadi `microsoft`.
 - `summaryModel`: model murah opsional untuk ringkasan otomatis; default ke `agents.defaults.model.primary`.
   - Menerima `provider/model` atau alias model yang dikonfigurasi.
-- `modelOverrides`: izinkan model memancarkan directive TTS (aktif secara default).
-  - `allowProvider` default ke `false` (peralihan provider bersifat opt-in).
-- `providers.<id>`: pengaturan milik provider yang dikunci dengan id provider speech.
-- Blok provider langsung lama (`messages.tts.openai`, `messages.tts.elevenlabs`, `messages.tts.microsoft`, `messages.tts.edge`) dimigrasikan otomatis ke `messages.tts.providers.<id>` saat dimuat.
-- `maxTextLength`: batas keras untuk input TTS (karakter). `/tts audio` gagal jika terlampaui.
-- `timeoutMs`: timeout permintaan (md).
-- `prefsPath`: timpa path JSON prefs lokal (provider/batas/ringkasan).
-- Nilai `apiKey` fallback ke env var (`ELEVENLABS_API_KEY`/`XI_API_KEY`, `MINIMAX_API_KEY`, `OPENAI_API_KEY`).
-- `providers.elevenlabs.baseUrl`: timpa base URL API ElevenLabs.
-- `providers.openai.baseUrl`: timpa endpoint OpenAI TTS.
+- `modelOverrides`: izinkan model mengeluarkan directive TTS (aktif secara default).
+  - `allowProvider` default ke `false` (peralihan penyedia bersifat opt-in).
+- `providers.<id>`: pengaturan milik penyedia yang dikunci dengan id penyedia speech.
+- Blok penyedia langsung lama (`messages.tts.openai`, `messages.tts.elevenlabs`, `messages.tts.microsoft`, `messages.tts.edge`) dimigrasikan otomatis ke `messages.tts.providers.<id>` saat dimuat.
+- `maxTextLength`: batas keras untuk input TTS (karakter). `/tts audio` gagal jika melebihi batas.
+- `timeoutMs`: batas waktu permintaan (ms).
+- `prefsPath`: ganti jalur JSON prefs lokal (penyedia/batas/ringkasan).
+- Nilai `apiKey` menggunakan fallback ke env vars (`ELEVENLABS_API_KEY`/`XI_API_KEY`, `GEMINI_API_KEY`/`GOOGLE_API_KEY`, `MINIMAX_API_KEY`, `OPENAI_API_KEY`).
+- `providers.elevenlabs.baseUrl`: ganti base URL API ElevenLabs.
+- `providers.openai.baseUrl`: ganti endpoint OpenAI TTS.
   - Urutan resolusi: `messages.tts.providers.openai.baseUrl` -> `OPENAI_TTS_BASE_URL` -> `https://api.openai.com/v1`
-  - Nilai non-default diperlakukan sebagai endpoint TTS yang kompatibel dengan OpenAI, sehingga nama model dan suara kustom diterima.
+  - Nilai non-default diperlakukan sebagai endpoint TTS yang kompatibel dengan OpenAI, sehingga nama model dan voice khusus diterima.
 - `providers.elevenlabs.voiceSettings`:
   - `stability`, `similarityBoost`, `style`: `0..1`
   - `useSpeakerBoost`: `true|false`
   - `speed`: `0.5..2.0` (1.0 = normal)
 - `providers.elevenlabs.applyTextNormalization`: `auto|on|off`
-- `providers.elevenlabs.languageCode`: ISO 639-1 2 huruf (misalnya `en`, `de`)
-- `providers.elevenlabs.seed`: integer `0..4294967295` (determinisme best-effort)
-- `providers.minimax.baseUrl`: timpa base URL API MiniMax (default `https://api.minimax.io`, env: `MINIMAX_API_HOST`).
+- `providers.elevenlabs.languageCode`: ISO 639-1 2 huruf (mis. `en`, `de`)
+- `providers.elevenlabs.seed`: bilangan bulat `0..4294967295` (determinisme upaya terbaik)
+- `providers.minimax.baseUrl`: ganti base URL API MiniMax (default `https://api.minimax.io`, env: `MINIMAX_API_HOST`).
 - `providers.minimax.model`: model TTS (default `speech-2.8-hd`, env: `MINIMAX_TTS_MODEL`).
-- `providers.minimax.voiceId`: pengenal suara (default `English_expressive_narrator`, env: `MINIMAX_TTS_VOICE_ID`).
+- `providers.minimax.voiceId`: pengenal voice (default `English_expressive_narrator`, env: `MINIMAX_TTS_VOICE_ID`).
 - `providers.minimax.speed`: kecepatan pemutaran `0.5..2.0` (default 1.0).
 - `providers.minimax.vol`: volume `(0, 10]` (default 1.0; harus lebih besar dari 0).
 - `providers.minimax.pitch`: pergeseran pitch `-12..12` (default 0).
+- `providers.google.model`: model TTS Gemini (default `gemini-3.1-flash-tts-preview`).
+- `providers.google.voiceName`: nama voice bawaan Gemini (default `Kore`; `voice` juga diterima).
+- `providers.google.baseUrl`: ganti base URL API Gemini. Hanya `https://generativelanguage.googleapis.com` yang diterima.
+  - Jika `messages.tts.providers.google.apiKey` dihilangkan, TTS dapat menggunakan kembali `models.providers.google.apiKey` sebelum fallback ke env.
 - `providers.microsoft.enabled`: izinkan penggunaan speech Microsoft (default `true`; tanpa API key).
-- `providers.microsoft.voice`: nama suara neural Microsoft (misalnya `en-US-MichelleNeural`).
-- `providers.microsoft.lang`: kode bahasa (misalnya `en-US`).
-- `providers.microsoft.outputFormat`: format output Microsoft (misalnya `audio-24khz-48kbitrate-mono-mp3`).
+- `providers.microsoft.voice`: nama voice neural Microsoft (mis. `en-US-MichelleNeural`).
+- `providers.microsoft.lang`: kode bahasa (mis. `en-US`).
+- `providers.microsoft.outputFormat`: format output Microsoft (mis. `audio-24khz-48kbitrate-mono-mp3`).
   - Lihat format output Microsoft Speech untuk nilai yang valid; tidak semua format didukung oleh transport bawaan berbasis Edge.
-- `providers.microsoft.rate` / `providers.microsoft.pitch` / `providers.microsoft.volume`: string persen (misalnya `+10%`, `-5%`).
-- `providers.microsoft.saveSubtitles`: tulis subtitle JSON di samping berkas audio.
+- `providers.microsoft.rate` / `providers.microsoft.pitch` / `providers.microsoft.volume`: string persentase (mis. `+10%`, `-5%`).
+- `providers.microsoft.saveSubtitles`: tulis subtitle JSON di samping file audio.
 - `providers.microsoft.proxy`: URL proxy untuk permintaan speech Microsoft.
-- `providers.microsoft.timeoutMs`: override timeout permintaan (md).
+- `providers.microsoft.timeoutMs`: ganti batas waktu permintaan (ms).
 - `edge.*`: alias lama untuk pengaturan Microsoft yang sama.
 
-## Override yang digerakkan model (aktif secara default)
+## Override berbasis model (aktif secara default)
 
-Secara default, model **dapat** memancarkan directive TTS untuk satu balasan.
-Saat `messages.tts.auto` adalah `tagged`, directive ini wajib untuk memicu audio.
+Secara default, model **dapat** mengeluarkan directive TTS untuk satu balasan.
+Saat `messages.tts.auto` adalah `tagged`, directive ini diperlukan untuk memicu audio.
 
-Saat diaktifkan, model dapat memancarkan directive `[[tts:...]]` untuk menimpa suara
-untuk satu balasan, ditambah blok `[[tts:text]]...[[/tts:text]]` opsional untuk
-menyediakan tag ekspresif (tawa, isyarat bernyanyi, dll.) yang seharusnya hanya muncul
-di audio.
+Saat diaktifkan, model dapat mengeluarkan directive `[[tts:...]]` untuk mengganti voice
+untuk satu balasan, ditambah blok opsional `[[tts:text]]...[[/tts:text]]` untuk
+memberikan tag ekspresif (tawa, isyarat bernyanyi, dll.) yang seharusnya hanya muncul dalam
+audio.
 
 Directive `provider=...` diabaikan kecuali `modelOverrides.allowProvider: true`.
 
@@ -306,11 +335,11 @@ Ini dia.
 [[tts:text]](tertawa) Bacakan lagunya sekali lagi.[[/tts:text]]
 ```
 
-Key directive yang tersedia (saat diaktifkan):
+Kunci directive yang tersedia (saat diaktifkan):
 
-- `provider` (id provider speech yang terdaftar, misalnya `openai`, `elevenlabs`, `minimax`, atau `microsoft`; memerlukan `allowProvider: true`)
-- `voice` (suara OpenAI) atau `voiceId` (ElevenLabs / MiniMax)
-- `model` (model TTS OpenAI, id model ElevenLabs, atau model MiniMax)
+- `provider` (id penyedia speech terdaftar, misalnya `openai`, `elevenlabs`, `google`, `minimax`, atau `microsoft`; memerlukan `allowProvider: true`)
+- `voice` (voice OpenAI), `voiceName` / `voice_name` / `google_voice` (voice Google), atau `voiceId` (ElevenLabs / MiniMax)
+- `model` (model TTS OpenAI, id model ElevenLabs, atau model MiniMax) atau `google_model` (model TTS Google)
 - `stability`, `similarityBoost`, `style`, `speed`, `useSpeakerBoost`
 - `vol` / `volume` (volume MiniMax, 0-10)
 - `pitch` (pitch MiniMax, -12 hingga 12)
@@ -332,7 +361,7 @@ Nonaktifkan semua override model:
 }
 ```
 
-Allowlist opsional (aktifkan peralihan provider sambil menjaga knob lain tetap dapat dikonfigurasi):
+Allowlist opsional (aktifkan peralihan penyedia sambil tetap menjaga knob lain dapat dikonfigurasi):
 
 ```json5
 {
@@ -350,8 +379,8 @@ Allowlist opsional (aktifkan peralihan provider sambil menjaga knob lain tetap d
 
 ## Preferensi per pengguna
 
-Perintah slash menulis override lokal ke `prefsPath` (default:
-`~/.openclaw/settings/tts.json`, timpa dengan `OPENCLAW_TTS_PREFS` atau
+Slash command menulis override lokal ke `prefsPath` (default:
+`~/.openclaw/settings/tts.json`, ganti dengan `OPENCLAW_TTS_PREFS` atau
 `messages.tts.prefsPath`).
 
 Field yang disimpan:
@@ -361,23 +390,24 @@ Field yang disimpan:
 - `maxLength` (ambang ringkasan; default 1500 karakter)
 - `summarize` (default `true`)
 
-Field ini menimpa `messages.tts.*` untuk host tersebut.
+Ini menimpa `messages.tts.*` untuk host tersebut.
 
 ## Format output (tetap)
 
 - **Feishu / Matrix / Telegram / WhatsApp**: pesan suara Opus (`opus_48000_64` dari ElevenLabs, `opus` dari OpenAI).
   - 48kHz / 64kbps adalah kompromi yang baik untuk pesan suara.
-- **Channel lain**: MP3 (`mp3_44100_128` dari ElevenLabs, `mp3` dari OpenAI).
+- **Saluran lain**: MP3 (`mp3_44100_128` dari ElevenLabs, `mp3` dari OpenAI).
   - 44.1kHz / 128kbps adalah keseimbangan default untuk kejernihan ucapan.
 - **MiniMax**: MP3 (model `speech-2.8-hd`, sample rate 32kHz). Format catatan suara tidak didukung secara native; gunakan OpenAI atau ElevenLabs untuk pesan suara Opus yang terjamin.
+- **Google Gemini**: Gemini API TTS mengembalikan PCM 24kHz mentah. OpenClaw membungkusnya sebagai WAV untuk lampiran audio dan mengembalikan PCM secara langsung untuk Talk/telephony. Format catatan suara Opus native tidak didukung oleh jalur ini.
 - **Microsoft**: menggunakan `microsoft.outputFormat` (default `audio-24khz-48kbitrate-mono-mp3`).
-  - Transport bawaan menerima `outputFormat`, tetapi tidak semua format tersedia dari layanan.
+  - Transport bawaan menerima `outputFormat`, tetapi tidak semua format tersedia dari layanan tersebut.
   - Nilai format output mengikuti format output Microsoft Speech (termasuk Ogg/WebM Opus).
-  - `sendVoice` Telegram menerima OGG/MP3/M4A; gunakan OpenAI/ElevenLabs jika Anda memerlukan
+  - Telegram `sendVoice` menerima OGG/MP3/M4A; gunakan OpenAI/ElevenLabs jika Anda memerlukan
     pesan suara Opus yang terjamin.
-  - Jika format output Microsoft yang dikonfigurasi gagal, OpenClaw mencoba ulang dengan MP3.
+  - Jika format output Microsoft yang dikonfigurasi gagal, OpenClaw akan mencoba lagi dengan MP3.
 
-Format output OpenAI/ElevenLabs bersifat tetap per channel (lihat di atas).
+Format output OpenAI/ElevenLabs tetap per saluran (lihat di atas).
 
 ## Perilaku auto-TTS
 
@@ -385,7 +415,7 @@ Saat diaktifkan, OpenClaw:
 
 - melewati TTS jika balasan sudah berisi media atau directive `MEDIA:`.
 - melewati balasan yang sangat pendek (< 10 karakter).
-- merangkum balasan panjang saat diaktifkan menggunakan `agents.defaults.model.primary` (atau `summaryModel`).
+- meringkas balasan panjang saat diaktifkan menggunakan `agents.defaults.model.primary` (atau `summaryModel`).
 - melampirkan audio yang dihasilkan ke balasan.
 
 Jika balasan melebihi `maxLength` dan ringkasan nonaktif (atau tidak ada API key untuk
@@ -397,19 +427,19 @@ dilewati dan balasan teks normal dikirim.
 ```
 Balasan -> TTS diaktifkan?
   tidak  -> kirim teks
-  ya     -> ada media / MEDIA: / pendek?
-          ya   -> kirim teks
-          tidak -> panjang > batas?
-                   tidak -> TTS -> lampirkan audio
-                   ya    -> ringkasan diaktifkan?
-                            tidak -> kirim teks
-                            ya    -> ringkas (summaryModel atau agents.defaults.model.primary)
+  ya -> ada media / MEDIA: / pendek?
+          ya -> kirim teks
+          tidak  -> panjang > batas?
+                   tidak  -> TTS -> lampirkan audio
+                   ya -> ringkasan diaktifkan?
+                            tidak  -> kirim teks
+                            ya -> ringkas (summaryModel atau agents.defaults.model.primary)
                                       -> TTS -> lampirkan audio
 ```
 
-## Penggunaan perintah slash
+## Penggunaan slash command
 
-Ada satu perintah: `/tts`.
+Hanya ada satu perintah: `/tts`.
 Lihat [Slash commands](/id/tools/slash-commands) untuk detail pengaktifannya.
 
 Catatan Discord: `/tts` adalah perintah bawaan Discord, jadi OpenClaw mendaftarkan
@@ -427,24 +457,24 @@ Catatan Discord: `/tts` adalah perintah bawaan Discord, jadi OpenClaw mendaftark
 
 Catatan:
 
-- Perintah memerlukan pengirim yang berwenang (aturan allowlist/owner tetap berlaku).
+- Perintah memerlukan pengirim yang diotorisasi (aturan allowlist/owner tetap berlaku).
 - `commands.text` atau pendaftaran perintah native harus diaktifkan.
-- Config `messages.tts.auto` menerima `off|always|inbound|tagged`.
-- `/tts on` menulis preferensi TTS lokal ke `always`; `/tts off` menulisnya ke `off`.
-- Gunakan config jika Anda menginginkan default `inbound` atau `tagged`.
-- `limit` dan `summary` disimpan di prefs lokal, bukan config utama.
+- Konfigurasi `messages.tts.auto` menerima `off|always|inbound|tagged`.
+- `/tts on` menulis preferensi TTS lokal menjadi `always`; `/tts off` menulisnya menjadi `off`.
+- Gunakan konfigurasi jika Anda menginginkan default `inbound` atau `tagged`.
+- `limit` dan `summary` disimpan di prefs lokal, bukan konfigurasi utama.
 - `/tts audio` menghasilkan balasan audio sekali pakai (tidak mengaktifkan TTS).
-- `/tts status` menyertakan visibilitas fallback untuk percobaan terbaru:
+- `/tts status` mencakup visibilitas fallback untuk percobaan terbaru:
   - fallback berhasil: `Fallback: <primary> -> <used>` plus `Attempts: ...`
-  - kegagalan: `Error: ...` plus `Attempts: ...`
-  - diagnostik rinci: `Attempt details: provider:outcome(reasonCode) latency`
-- Kegagalan API OpenAI dan ElevenLabs kini menyertakan detail galat provider yang telah di-parse dan request id (saat dikembalikan oleh provider), yang ditampilkan dalam galat/log TTS.
+  - gagal: `Error: ...` plus `Attempts: ...`
+  - diagnostik terperinci: `Attempt details: provider:outcome(reasonCode) latency`
+- Kegagalan API OpenAI dan ElevenLabs sekarang menyertakan detail error penyedia yang sudah diurai dan request id (saat dikembalikan oleh penyedia), yang ditampilkan dalam error/log TTS.
 
-## Alat agen
+## Tool agen
 
-Alat `tts` mengubah teks menjadi ucapan dan mengembalikan lampiran audio untuk
-pengiriman balasan. Saat channel adalah Feishu, Matrix, Telegram, atau WhatsApp,
-audio dikirim sebagai pesan suara, bukan sebagai lampiran berkas.
+Tool `tts` mengonversi teks menjadi ucapan dan mengembalikan lampiran audio untuk
+pengiriman balasan. Saat salurannya adalah Feishu, Matrix, Telegram, atau WhatsApp,
+audio dikirim sebagai pesan suara, bukan lampiran file.
 
 ## Gateway RPC
 
