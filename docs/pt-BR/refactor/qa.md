@@ -1,9 +1,9 @@
 ---
 x-i18n:
-    generated_at: "2026-04-08T05:27:22Z"
+    generated_at: "2026-04-18T05:25:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4a9066b2a939c5a9ba69141d75405f0e8097997b523164340e2f0e9a0d5060dd
+    source_hash: dbb2c70c82da7f6f12d90e25666635ff4147c52e8a94135e902d1de4f5cbccca
     source_path: refactor/qa.md
     workflow: 15
 ---
@@ -14,21 +14,21 @@ Status: migração fundamental concluída.
 
 ## Objetivo
 
-Mover o QA do OpenClaw de um modelo de definição dividida para uma única fonte da verdade:
+Mover o QA do OpenClaw de um modelo de definição dividido para uma única fonte da verdade:
 
 - metadados do cenário
 - prompts enviados ao modelo
-- configuração e desmontagem
+- setup e teardown
 - lógica do harness
 - asserções e critérios de sucesso
-- artefatos e sugestões de relatório
+- artifacts e dicas de relatório
 
-O estado final desejado é um harness de QA genérico que carrega arquivos poderosos de definição de cenários em vez de codificar a maior parte do comportamento em TypeScript.
+O estado final desejado é um harness de QA genérico que carregue arquivos poderosos de definição de cenário em vez de codificar a maior parte do comportamento em TypeScript.
 
 ## Estado atual
 
-A fonte primária da verdade agora vive em `qa/scenarios/index.md` mais um arquivo por
-cenário em `qa/scenarios/*.md`.
+A principal fonte da verdade agora vive em `qa/scenarios/index.md` mais um arquivo por
+cenário em `qa/scenarios/<theme>/*.md`.
 
 Implementado:
 
@@ -36,99 +36,99 @@ Implementado:
   - metadados canônicos do pacote de QA
   - identidade do operador
   - missão inicial
-- `qa/scenarios/*.md`
+- `qa/scenarios/<theme>/*.md`
   - um arquivo Markdown por cenário
   - metadados do cenário
   - associações de handlers
   - configuração de execução específica do cenário
 - `extensions/qa-lab/src/scenario-catalog.ts`
-  - parser do pacote Markdown + validação com zod
+  - parser de pacote Markdown + validação com zod
 - `extensions/qa-lab/src/qa-agent-bootstrap.ts`
   - renderização do plano a partir do pacote Markdown
 - `extensions/qa-lab/src/qa-agent-workspace.ts`
-  - gera arquivos de compatibilidade semeados mais `QA_SCENARIOS.md`
+  - semeia arquivos de compatibilidade gerados mais `QA_SCENARIOS.md`
 - `extensions/qa-lab/src/suite.ts`
   - seleciona cenários executáveis por meio de associações de handlers definidas em Markdown
-- protocolo do barramento de QA + UI
+- Protocolo do barramento de QA + UI
   - anexos inline genéricos para renderização de imagem/vídeo/áudio/arquivo
 
 Superfícies divididas restantes:
 
 - `extensions/qa-lab/src/suite.ts`
-  - ainda concentra a maior parte da lógica executável de handlers personalizados
+  - ainda controla a maior parte da lógica executável de handlers personalizados
 - `extensions/qa-lab/src/report.ts`
-  - ainda deriva a estrutura do relatório a partir das saídas em tempo de execução
+  - ainda deriva a estrutura do relatório a partir das saídas de runtime
 
-Portanto, a divisão da fonte da verdade foi corrigida, mas a execução ainda é majoritariamente baseada em handlers, e não totalmente declarativa.
+Então a divisão da fonte da verdade foi corrigida, mas a execução ainda é em grande parte baseada em handlers, e não totalmente declarativa.
 
 ## Como é a superfície real de cenários
 
-Ao ler a suíte atual, é possível ver algumas classes distintas de cenários.
+Ler a suíte atual mostra algumas classes distintas de cenários.
 
 ### Interação simples
 
-- linha de base de canal
-- linha de base de MD
+- baseline de canal
+- baseline de DM
 - acompanhamento em thread
 - troca de modelo
-- continuidade após aprovação
+- continuidade de aprovação
 - reação/edição/exclusão
 
-### Mutação de configuração e tempo de execução
+### Configuração e mutação de runtime
 
 - patch de configuração para desabilitar skill
-- aplicação de configuração com reativação após reinício
-- inversão de capacidade após reinício da configuração
-- verificação de divergência do inventário em tempo de execução
+- config apply restart wake-up
+- config restart capability flip
+- verificação de desvio do inventário de runtime
 
 ### Asserções de sistema de arquivos e repositório
 
-- relatório de descoberta de código/documentação
-- compilar Lobster Invaders
-- busca de artefato de imagem gerada
+- relatório de descoberta de source/docs
+- build do Lobster Invaders
+- busca de artifact de imagem gerada
 
 ### Orquestração de memória
 
 - recuperação de memória
 - ferramentas de memória em contexto de canal
-- fallback em falha de memória
+- fallback de falha de memória
 - classificação de memória de sessão
-- isolamento de memória de thread
-- varredura de sonho de memória
+- isolamento de memória por thread
+- varredura de Dreaming da memória
 
 ### Integração de ferramentas e plugins
 
-- chamada de plugin-tools do MCP
+- chamada de plugin-tools MCP
 - visibilidade de skill
-- instalação dinâmica de skill
+- hot install de skill
 - geração nativa de imagem
 - roundtrip de imagem
-- compreensão de imagem a partir de anexo
+- entendimento de imagem a partir de anexo
 
-### Vários turnos e vários atores
+### Multiturno e multiautor
 
-- transferência para subagente
-- síntese com distribuição para subagentes
-- fluxos no estilo recuperação após reinício
+- handoff de subagente
+- síntese de fanout de subagente
+- fluxos no estilo de recuperação após reinício
 
-Essas categorias são importantes porque orientam os requisitos da DSL. Uma lista simples de prompt + texto esperado não é suficiente.
+Essas categorias importam porque orientam os requisitos da DSL. Uma lista plana de prompt + texto esperado não é suficiente.
 
 ## Direção
 
 ### Fonte única da verdade
 
-Usar `qa/scenarios/index.md` mais `qa/scenarios/*.md` como a fonte da verdade
-autoral.
+Usar `qa/scenarios/index.md` mais `qa/scenarios/<theme>/*.md` como a
+fonte da verdade criada manualmente.
 
-O pacote deve permanecer:
+O pacote deve continuar sendo:
 
-- legível para humanos em revisão
-- analisável por máquina
+- legível por humanos em revisão
+- parseável por máquina
 - rico o suficiente para orientar:
   - execução da suíte
   - bootstrap do workspace de QA
   - metadados da UI do QA Lab
-  - prompts de documentação/descoberta
+  - prompts de docs/discovery
   - geração de relatórios
 
 ### Formato de autoria preferido
@@ -142,9 +142,9 @@ Formato recomendado:
   - title
   - surface
   - tags
-  - refs de documentação
+  - refs de docs
   - refs de código
-  - substituições de modelo/provedor
+  - sobrescritas de modelo/provider
   - pré-requisitos
 - seções em prosa
   - objetivo
@@ -158,7 +158,7 @@ Formato recomendado:
 
 Isso oferece:
 
-- melhor legibilidade em PR do que um JSON gigante
+- melhor legibilidade em PR do que JSON gigante
 - contexto mais rico do que YAML puro
 - parsing estrito e validação com zod
 
@@ -171,7 +171,7 @@ Exemplo:
 ````md
 ---
 id: image-generation-roundtrip
-title: Image generation roundtrip
+title: Roundtrip de geração de imagem
 surface: image
 tags: [media, image, roundtrip]
 models:
@@ -187,9 +187,9 @@ codeRefs:
   - src/gateway/chat-attachments.ts
 ---
 
-# Objective
+# Objetivo
 
-Verify generated media is reattached on the follow-up turn.
+Verificar se a mídia gerada é reanexada no turno de acompanhamento.
 
 # Setup
 
@@ -210,15 +210,15 @@ Verify generated media is reattached on the follow-up turn.
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Image generation check: generate a QA lighthouse image and summarize it in one short sentence.
+    Verificação de geração de imagem: gere uma imagem de um farol de QA e resuma-a em uma frase curta.
 - action: artifact.capture
   kind: generated-image
-  promptSnippet: Image generation check
+  promptSnippet: Verificação de geração de imagem
   saveAs: lighthouseImage
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Roundtrip image inspection check: describe the generated lighthouse attachment in one short sentence.
+    Verificação de inspeção de roundtrip de imagem: descreva o anexo da imagem do farol gerado em uma frase curta.
   attachments:
     - fromArtifact: lighthouseImage
 ```
@@ -227,21 +227,21 @@ Verify generated media is reattached on the follow-up turn.
 
 ```yaml scenario.expect
 - assert: outbound.textIncludes
-  value: lighthouse
+  value: farol
 - assert: requestLog.matches
   where:
-    promptIncludes: Roundtrip image inspection check
+    promptIncludes: Verificação de inspeção de roundtrip de imagem
   imageInputCountGte: 1
 - assert: artifact.exists
   ref: lighthouseImage
 ```
 ````
 
-## Capacidades do runner que a DSL precisa cobrir
+## Recursos de runner que a DSL precisa cobrir
 
-Com base na suíte atual, o runner genérico precisa de mais do que execução de prompt.
+Com base na suíte atual, o runner genérico precisa de mais do que execução de prompts.
 
-### Ações de ambiente e configuração
+### Ações de ambiente e setup
 
 - `bus.reset`
 - `gateway.waitHealthy`
@@ -257,7 +257,7 @@ Com base na suíte atual, o runner genérico precisa de mais do que execução d
 - `bus.injectInbound`
 - `bus.injectOutbound`
 
-### Ações de configuração e tempo de execução
+### Ações de configuração e runtime
 
 - `config.get`
 - `config.patch`
@@ -266,7 +266,7 @@ Com base na suíte atual, o runner genérico precisa de mais do que execução d
 - `tools.effective`
 - `skills.status`
 
-### Ações de arquivo e artefato
+### Ações de arquivo e artifact
 
 - `file.write`
 - `file.read`
@@ -275,7 +275,7 @@ Com base na suíte atual, o runner genérico precisa de mais do que execução d
 - `artifact.captureGeneratedImage`
 - `artifact.capturePath`
 
-### Ações de memória e cron
+### Ações de memória e Cron
 
 - `memory.indexForce`
 - `memory.searchCli`
@@ -305,60 +305,60 @@ Com base na suíte atual, o runner genérico precisa de mais do que execução d
 - `cron.managedPresent`
 - `artifact.exists`
 
-## Variáveis e referências a artefatos
+## Variáveis e referências de artifact
 
-A DSL deve dar suporte a saídas salvas e referências posteriores.
+A DSL precisa oferecer suporte a saídas salvas e referências posteriores.
 
 Exemplos da suíte atual:
 
 - criar uma thread e depois reutilizar `threadId`
 - criar uma sessão e depois reutilizar `sessionKey`
-- gerar uma imagem e depois anexar o arquivo no turno seguinte
-- gerar uma string de marcador de reativação e depois verificar que ela aparece mais tarde
+- gerar uma imagem e depois anexar o arquivo no próximo turno
+- gerar uma string de marcador de wake e depois verificar que ela aparece mais tarde
 
-Capacidades necessárias:
+Recursos necessários:
 
 - `saveAs`
 - `${vars.name}`
 - `${artifacts.name}`
-- referências tipadas para caminhos, chaves de sessão, ids de thread, marcadores e saídas de ferramentas
+- referências tipadas para caminhos, chaves de sessão, ids de thread, marcadores, saídas de ferramentas
 
-Sem suporte a variáveis, o harness continuará deixando a lógica de cenário vazar de volta para o TypeScript.
+Sem suporte a variáveis, o harness continuará vazando lógica de cenário de volta para o TypeScript.
 
 ## O que deve permanecer como escape hatch
 
-Um runner totalmente declarativo e puro não é realista na fase 1.
+Um runner totalmente declarativo puro não é realista na fase 1.
 
 Alguns cenários são inerentemente pesados em orquestração:
 
-- varredura de sonho de memória
-- aplicação de configuração com reativação após reinício
-- inversão de capacidade após reinício da configuração
-- resolução de artefato de imagem gerada por timestamp/caminho
+- varredura de Dreaming da memória
+- config apply restart wake-up
+- config restart capability flip
+- resolução de artifact de imagem gerada por timestamp/caminho
 - avaliação de relatório de descoberta
 
-Por enquanto, eles devem usar handlers personalizados explícitos.
+Por enquanto, estes devem usar handlers personalizados explícitos.
 
 Regra recomendada:
 
 - 85-90% declarativo
-- etapas `customHandler` explícitas para o restante mais difícil
+- steps com `customHandler` explícito para o restante mais difícil
 - apenas handlers personalizados nomeados e documentados
 - nenhum código inline anônimo no arquivo de cenário
 
-Isso mantém o mecanismo genérico limpo e ainda permite progresso.
+Isso mantém o mecanismo genérico limpo e ainda permite avançar.
 
 ## Mudança de arquitetura
 
 ### Atual
 
-O Markdown de cenário já é a fonte da verdade para:
+O Markdown de cenários já é a fonte da verdade para:
 
 - execução da suíte
 - arquivos de bootstrap do workspace
 - catálogo de cenários da UI do QA Lab
-- metadados do relatório
-- prompts de descoberta
+- metadados de relatório
+- prompts de discovery
 
 Compatibilidade gerada:
 
@@ -373,8 +373,8 @@ Compatibilidade gerada:
 Concluído.
 
 - adicionado `qa/scenarios/index.md`
-- cenários divididos em `qa/scenarios/*.md`
-- adicionado parser para conteúdo nomeado do pacote Markdown YAML
+- cenários divididos em `qa/scenarios/<theme>/*.md`
+- adicionado parser para conteúdo nomeado de pacote Markdown YAML
 - validado com zod
 - consumidores alterados para usar o pacote parseado
 - removidos `qa/seed-scenarios.json` e `qa/QA_KICKOFF_TASK.md` no nível do repositório
@@ -383,7 +383,7 @@ Concluído.
 
 - dividir `extensions/qa-lab/src/suite.ts` em:
   - loader
-  - mecanismo
+  - mechanism
   - registro de ações
   - registro de asserções
   - handlers personalizados
@@ -396,46 +396,46 @@ Entregável:
 Começar com cenários que são principalmente prompt + espera + asserção:
 
 - acompanhamento em thread
-- compreensão de imagem a partir de anexo
+- entendimento de imagem a partir de anexo
 - visibilidade e invocação de skill
-- linha de base de canal
+- baseline de canal
 
 Entregável:
 
-- primeiros cenários reais definidos em Markdown enviados pelo mecanismo genérico
+- primeiros cenários reais definidos em Markdown sendo entregues pelo mecanismo genérico
 
 ### Fase 4: migrar cenários intermediários
 
 - roundtrip de geração de imagem
 - ferramentas de memória em contexto de canal
 - classificação de memória de sessão
-- transferência para subagente
-- síntese com distribuição para subagentes
+- handoff de subagente
+- síntese de fanout de subagente
 
 Entregável:
 
-- variáveis, artefatos, asserções de ferramenta e asserções de log de requisição comprovados
+- variáveis, artifacts, asserções de ferramenta e asserções de log de requisição comprovados
 
 ### Fase 5: manter cenários difíceis em handlers personalizados
 
-- varredura de sonho de memória
-- aplicação de configuração com reativação após reinício
-- inversão de capacidade após reinício da configuração
-- divergência do inventário em tempo de execução
+- varredura de Dreaming da memória
+- config apply restart wake-up
+- config restart capability flip
+- desvio de inventário de runtime
 
 Entregável:
 
-- mesmo formato de autoria, mas com blocos de etapas personalizadas explícitas quando necessário
+- mesmo formato de autoria, mas com blocos explícitos de steps personalizados quando necessário
 
-### Fase 6: excluir o mapa de cenários codificado
+### Fase 6: excluir mapa de cenários codificado
 
-Quando a cobertura do pacote estiver boa o suficiente:
+Quando a cobertura do pacote for boa o suficiente:
 
-- remover a maior parte da ramificação TypeScript específica de cenários de `extensions/qa-lab/src/suite.ts`
+- remover a maior parte do branching específico por cenário em TypeScript de `extensions/qa-lab/src/suite.ts`
 
-## Suporte a Slack falso / rich media
+## Suporte a Fake Slack / mídia rica
 
-O barramento de QA atual é focado em texto.
+O barramento de QA atual é orientado a texto.
 
 Arquivos relevantes:
 
@@ -445,7 +445,7 @@ Arquivos relevantes:
 - `extensions/qa-lab/src/bus-server.ts`
 - `extensions/qa-lab/web/src/ui-render.ts`
 
-Hoje, o barramento de QA oferece suporte a:
+Hoje o barramento de QA oferece suporte a:
 
 - texto
 - reações
@@ -482,36 +482,36 @@ Depois adicionar `attachments?: QaBusAttachment[]` a:
 
 ### Por que genérico primeiro
 
-Não construir um modelo de mídia exclusivo para Slack.
+Não criar um modelo de mídia exclusivo para Slack.
 
 Em vez disso:
 
 - um modelo genérico de transporte de QA
-- vários renderizadores sobre ele
+- múltiplos renderizadores sobre ele
   - chat atual do QA Lab
-  - futuro web de Slack falso
-  - qualquer outra visualização de transporte falsa
+  - futuro fake Slack web
+  - quaisquer outras visualizações de transporte fake
 
-Isso evita lógica duplicada e permite que cenários de mídia permaneçam agnósticos ao transporte.
+Isso evita lógica duplicada e permite que cenários de mídia permaneçam independentes do transporte.
 
 ### Trabalho de UI necessário
 
 Atualizar a UI de QA para renderizar:
 
-- pré-visualização de imagem inline
+- pré-visualização inline de imagem
 - player de áudio inline
 - player de vídeo inline
 - chip de anexo de arquivo
 
-A UI atual já consegue renderizar threads e reações, então a renderização de anexos deve ser adicionada sobre o mesmo modelo de cartão de mensagem.
+A UI atual já consegue renderizar threads e reações, então a renderização de anexos deve se sobrepor ao mesmo modelo de cartão de mensagem.
 
 ### Trabalho de cenário habilitado pelo transporte de mídia
 
-Quando os anexos passarem pelo barramento de QA, poderemos adicionar cenários mais ricos de chat falso:
+Assim que os anexos passarem pelo barramento de QA, poderemos adicionar cenários mais ricos de chat fake:
 
-- resposta com imagem inline em Slack falso
-- compreensão de anexo de áudio
-- compreensão de anexo de vídeo
+- resposta inline com imagem em fake Slack
+- entendimento de anexo de áudio
+- entendimento de anexo de vídeo
 - ordenação mista de anexos
 - resposta em thread com mídia preservada
 
@@ -528,13 +528,13 @@ O próximo bloco de implementação deve ser:
 
 Este é o menor caminho que comprova ambos os objetivos:
 
-- QA genérico definido por Markdown
-- superfícies de mensagens falsas mais ricas
+- QA genérico definido em Markdown
+- superfícies mais ricas de mensagens fake
 
 ## Perguntas em aberto
 
-- se os arquivos de cenário devem permitir templates de prompt em Markdown embutidos com interpolação de variáveis
+- se os arquivos de cenário devem permitir templates de prompt em Markdown incorporados com interpolação de variáveis
 - se setup/cleanup devem ser seções nomeadas ou apenas listas ordenadas de ações
-- se referências a artefatos devem ser fortemente tipadas no schema ou baseadas em string
-- se handlers personalizados devem viver em um único registro ou em registros por superfície
-- se o arquivo de compatibilidade JSON gerado deve permanecer versionado durante a migração
+- se as referências de artifacts devem ser fortemente tipadas no schema ou baseadas em string
+- se handlers personalizados devem ficar em um único registro ou em registros por surface
+- se o arquivo de compatibilidade JSON gerado deve continuar versionado durante a migração
