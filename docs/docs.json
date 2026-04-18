@@ -457,6 +457,14 @@
       "destination": "/channels/telegram"
     },
     {
+      "source": "/channels/openclaw-weixin",
+      "destination": "/channels/wechat"
+    },
+    {
+      "source": "/channels/weixin",
+      "destination": "/channels/wechat"
+    },
+    {
       "source": "/group-messages",
       "destination": "/channels/group-messages"
     },
@@ -1038,6 +1046,7 @@
                   "channels/telegram",
                   "channels/tlon",
                   "channels/twitch",
+                  "channels/wechat",
                   "channels/whatsapp",
                   "channels/zalo",
                   "channels/zalouser"
@@ -2420,6 +2429,7 @@
                   "ja-JP/channels/telegram",
                   "ja-JP/channels/tlon",
                   "ja-JP/channels/twitch",
+                  "ja-JP/channels/wechat",
                   "ja-JP/channels/whatsapp",
                   "ja-JP/channels/zalo",
                   "ja-JP/channels/zalouser"
@@ -3187,6 +3197,7 @@
                   "es/channels/telegram",
                   "es/channels/tlon",
                   "es/channels/twitch",
+                  "es/channels/wechat",
                   "es/channels/whatsapp",
                   "es/channels/zalo",
                   "es/channels/zalouser"
@@ -3954,6 +3965,7 @@
                   "pt-BR/channels/telegram",
                   "pt-BR/channels/tlon",
                   "pt-BR/channels/twitch",
+                  "pt-BR/channels/wechat",
                   "pt-BR/channels/whatsapp",
                   "pt-BR/channels/zalo",
                   "pt-BR/channels/zalouser"
@@ -4721,6 +4733,7 @@
                   "ko/channels/telegram",
                   "ko/channels/tlon",
                   "ko/channels/twitch",
+                  "ko/channels/wechat",
                   "ko/channels/whatsapp",
                   "ko/channels/zalo",
                   "ko/channels/zalouser"
@@ -5488,6 +5501,7 @@
                   "de/channels/telegram",
                   "de/channels/tlon",
                   "de/channels/twitch",
+                  "de/channels/wechat",
                   "de/channels/whatsapp",
                   "de/channels/zalo",
                   "de/channels/zalouser"
@@ -6255,6 +6269,7 @@
                   "fr/channels/telegram",
                   "fr/channels/tlon",
                   "fr/channels/twitch",
+                  "fr/channels/wechat",
                   "fr/channels/whatsapp",
                   "fr/channels/zalo",
                   "fr/channels/zalouser"
@@ -7022,6 +7037,7 @@
                   "ar/channels/telegram",
                   "ar/channels/tlon",
                   "ar/channels/twitch",
+                  "ar/channels/wechat",
                   "ar/channels/whatsapp",
                   "ar/channels/zalo",
                   "ar/channels/zalouser"
@@ -7789,6 +7805,7 @@
                   "it/channels/telegram",
                   "it/channels/tlon",
                   "it/channels/twitch",
+                  "it/channels/wechat",
                   "it/channels/whatsapp",
                   "it/channels/zalo",
                   "it/channels/zalouser"
@@ -8556,6 +8573,7 @@
                   "tr/channels/telegram",
                   "tr/channels/tlon",
                   "tr/channels/twitch",
+                  "tr/channels/wechat",
                   "tr/channels/whatsapp",
                   "tr/channels/zalo",
                   "tr/channels/zalouser"
@@ -9323,6 +9341,7 @@
                   "uk/channels/telegram",
                   "uk/channels/tlon",
                   "uk/channels/twitch",
+                  "uk/channels/wechat",
                   "uk/channels/whatsapp",
                   "uk/channels/zalo",
                   "uk/channels/zalouser"
@@ -10090,6 +10109,7 @@
                   "id/channels/telegram",
                   "id/channels/tlon",
                   "id/channels/twitch",
+                  "id/channels/wechat",
                   "id/channels/whatsapp",
                   "id/channels/zalo",
                   "id/channels/zalouser"
@@ -10857,6 +10877,7 @@
                   "pl/channels/telegram",
                   "pl/channels/tlon",
                   "pl/channels/twitch",
+                  "pl/channels/wechat",
                   "pl/channels/whatsapp",
                   "pl/channels/zalo",
                   "pl/channels/zalouser"
