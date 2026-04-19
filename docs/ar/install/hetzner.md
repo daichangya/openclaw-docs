@@ -1,103 +1,103 @@
 ---
 read_when:
-    - تريد تشغيل OpenClaw طوال الوقت على VPS سحابي (وليس على حاسوبك المحمول)
-    - تريد Gateway جاهزة للإنتاج وتعمل دائمًا على VPS خاص بك
-    - تريد تحكمًا كاملًا في الاستمرارية، والملفات التنفيذية، وسلوك إعادة التشغيل
-    - أنت تشغّل OpenClaw داخل Docker على Hetzner أو مزود مشابه
-summary: شغّل OpenClaw Gateway على Hetzner VPS (باستخدام Docker) طوال الوقت مع حالة مستدامة وملفات تنفيذية مضمّنة
+    - تريد تشغيل OpenClaw على مدار الساعة طوال أيام الأسبوع على VPS سحابي (وليس على حاسوبك المحمول)
+    - تريد Gateway بمستوى إنتاج، يعمل دائمًا، على VPS خاص بك
+    - تريد تحكمًا كاملًا في الاستمرارية، والثنائيات، وسلوك إعادة التشغيل
+    - أنت تشغّل OpenClaw في Docker على Hetzner أو مزود مشابه
+summary: شغّل OpenClaw Gateway على مدار الساعة طوال أيام الأسبوع على VPS رخيص من Hetzner (Docker) مع حالة دائمة وثنائيات مدمجة
 title: Hetzner
 x-i18n:
-    generated_at: "2026-04-05T12:47:03Z"
+    generated_at: "2026-04-19T01:11:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d859e4c0943040b022835f320708f879a11eadef70f2816cf0f2824eaaf165ef
+    source_hash: 32f5e552ea87970b89c762059bc27f22e0aa3abf001307cae8829b9f1c713a42
     source_path: install/hetzner.md
     workflow: 15
 ---
 
-# OpenClaw على Hetzner (Docker، دليل VPS للإنتاج)
+# OpenClaw على Hetzner (دليل VPS للإنتاج باستخدام Docker)
 
 ## الهدف
 
-تشغيل OpenClaw Gateway دائمة على Hetzner VPS باستخدام Docker، مع حالة مستدامة، وملفات تنفيذية مضمّنة، وسلوك آمن لإعادة التشغيل.
+شغّل OpenClaw Gateway بشكل دائم على VPS من Hetzner باستخدام Docker، مع حالة دائمة، وثنائيات مدمجة، وسلوك آمن لإعادة التشغيل.
 
-إذا كنت تريد "OpenClaw تعمل 24/7 مقابل حوالي 5 دولارات"، فهذا هو أبسط إعداد موثوق.
-تتغير أسعار Hetzner؛ اختر أصغر VPS بنظام Debian/Ubuntu ثم وسّع الموارد إذا واجهت حالات OOM.
+إذا كنت تريد “OpenClaw يعمل على مدار الساعة طوال أيام الأسبوع مقابل حوالي 5 دولارات”، فهذا هو أبسط إعداد موثوق.
+تتغير أسعار Hetzner؛ اختر أصغر VPS بنظام Debian/Ubuntu ثم قم بالترقية إذا واجهت حالات نفاد الذاكرة (OOM).
 
 تذكير بنموذج الأمان:
 
-- الوكلاء المشتركون على مستوى الشركة مناسبون عندما يكون الجميع ضمن حد ثقة واحد ويكون وقت التشغيل مخصصًا للأعمال فقط.
-- حافظ على فصل صارم: VPS/وقت تشغيل مخصص + حسابات مخصصة؛ لا تستخدم ملفات تعريف Apple/Google/browser/password-manager الشخصية على ذلك المضيف.
-- إذا كان المستخدمون خصومًا لبعضهم البعض، فقسّم حسب gateway/المضيف/مستخدم نظام التشغيل.
+- الوكلاء المشتركون على مستوى الشركة مناسبون عندما يكون الجميع ضمن نفس نطاق الثقة ويكون وقت التشغيل مخصصًا للأعمال فقط.
+- حافظ على فصل صارم: VPS/وقت تشغيل مخصص + حسابات مخصصة؛ لا تستخدم ملفات Apple/Google/المتصفح/مدير كلمات المرور الشخصية على ذلك المضيف.
+- إذا كان المستخدمون خصومًا لبعضهم البعض، فافصل بينهم حسب Gateway/المضيف/مستخدم نظام التشغيل.
 
-راجع [الأمان](/gateway/security) و[VPS hosting](/vps).
+راجع [الأمان](/ar/gateway/security) و[VPS hosting](/ar/vps).
 
-## ماذا نفعل هنا (بكلمات بسيطة)؟
+## ماذا نفعل هنا (بشكل مبسط)؟
 
-- استئجار خادم Linux صغير (Hetzner VPS)
+- استئجار خادم Linux صغير (VPS من Hetzner)
 - تثبيت Docker (وقت تشغيل تطبيق معزول)
 - تشغيل OpenClaw Gateway داخل Docker
-- الإبقاء على `~/.openclaw` + `~/.openclaw/workspace` على المضيف (لتبقى بعد إعادة التشغيل/إعادة البناء)
-- الوصول إلى Control UI من حاسوبك المحمول عبر نفق SSH
+- حفظ `~/.openclaw` + `~/.openclaw/workspace` على المضيف (لتبقى بعد إعادة التشغيل/إعادة البناء)
+- الوصول إلى واجهة Control UI من حاسوبك المحمول عبر نفق SSH
 
-تتضمن حالة `~/.openclaw` المركبة هذه الملفات `openclaw.json` و
+تتضمن حالة `~/.openclaw` المركّبة هذه `openclaw.json`، وملف
 `agents/<agentId>/agent/auth-profiles.json` لكل وكيل، و`.env`.
 
 يمكن الوصول إلى Gateway عبر:
 
 - إعادة توجيه منفذ SSH من حاسوبك المحمول
-- كشف المنفذ مباشرة إذا كنت تدير الجدار الناري وtokens بنفسك
+- تعريض المنفذ مباشرة إذا كنت تدير الجدار الناري والرموز المميزة بنفسك
 
 يفترض هذا الدليل استخدام Ubuntu أو Debian على Hetzner.  
-إذا كنت تستخدم Linux VPS أخرى، فطابق الحزم وفقًا لذلك.
-وللتدفق العام الخاص بـ Docker، راجع [Docker](/install/docker).
+إذا كنت تستخدم VPS بنظام Linux آخر، فقم بمواءمة الحزم وفقًا لذلك.
+للتدفق العام باستخدام Docker، راجع [Docker](/ar/install/docker).
 
 ---
 
 ## المسار السريع (للمشغلين ذوي الخبرة)
 
-1. جهّز Hetzner VPS
-2. ثبّت Docker
-3. انسخ مستودع OpenClaw
-4. أنشئ أدلة مضيف مستدامة
-5. كوّن `.env` و`docker-compose.yml`
-6. ضمّن الملفات التنفيذية المطلوبة داخل الصورة
-7. نفّذ `docker compose up -d`
-8. تحقّق من الاستمرارية والوصول إلى Gateway
+1. تجهيز VPS من Hetzner
+2. تثبيت Docker
+3. استنساخ مستودع OpenClaw
+4. إنشاء أدلة مضيف دائمة
+5. إعداد `.env` و`docker-compose.yml`
+6. تضمين الثنائيات المطلوبة داخل الصورة
+7. `docker compose up -d`
+8. التحقق من الاستمرارية وإمكانية الوصول إلى Gateway
 
 ---
 
-## ما الذي تحتاجه
+## ما الذي تحتاج إليه
 
-- Hetzner VPS مع وصول root
+- VPS من Hetzner مع صلاحية root
 - وصول SSH من حاسوبك المحمول
-- راحة أساسية في استخدام SSH + النسخ/اللصق
+- إلمام أساسي بـ SSH + النسخ/اللصق
 - حوالي 20 دقيقة
 - Docker وDocker Compose
 - بيانات اعتماد مصادقة النموذج
-- بيانات اعتماد المزوّدين اختياريًا
-  - WhatsApp QR
-  - Telegram bot token
+- بيانات اعتماد موفر اختيارية
+  - رمز QR لـ WhatsApp
+  - رمز bot لـ Telegram
   - Gmail OAuth
 
 ---
 
 <Steps>
-  <Step title="جهّز VPS">
-    أنشئ Ubuntu أو Debian VPS في Hetzner.
+  <Step title="تجهيز VPS">
+    أنشئ VPS بنظام Ubuntu أو Debian في Hetzner.
 
-    اتصل كمستخدم root:
+    اتصل بصلاحية root:
 
     ```bash
     ssh root@YOUR_VPS_IP
     ```
 
-    يفترض هذا الدليل أن VPS تحتفظ بالحالة.
-    لا تتعامل معها على أنها بنية تحتية قابلة للاستبدال.
+    يفترض هذا الدليل أن VPS يحتفظ بالحالة.
+    لا تتعامل معه على أنه بنية تحتية قابلة للاستبدال.
 
   </Step>
 
-  <Step title="ثبّت Docker (على VPS)">
+  <Step title="تثبيت Docker (على VPS)">
     ```bash
     apt-get update
     apt-get install -y git curl ca-certificates
@@ -113,18 +113,18 @@ x-i18n:
 
   </Step>
 
-  <Step title="انسخ مستودع OpenClaw">
+  <Step title="استنساخ مستودع OpenClaw">
     ```bash
     git clone https://github.com/openclaw/openclaw.git
     cd openclaw
     ```
 
-    يفترض هذا الدليل أنك ستبني صورة مخصصة لضمان استمرارية الملفات التنفيذية.
+    يفترض هذا الدليل أنك ستبني صورة مخصصة لضمان استمرارية الثنائيات.
 
   </Step>
 
-  <Step title="أنشئ أدلة مضيف مستدامة">
-    حاويات Docker مؤقتة.
+  <Step title="إنشاء أدلة مضيف دائمة">
+    حاويات Docker مؤقتة بطبيعتها.
     يجب أن تعيش كل حالة طويلة الأمد على المضيف.
 
     ```bash
@@ -136,37 +136,40 @@ x-i18n:
 
   </Step>
 
-  <Step title="كوّن متغيرات البيئة">
+  <Step title="إعداد متغيرات البيئة">
     أنشئ ملف `.env` في جذر المستودع.
 
     ```bash
     OPENCLAW_IMAGE=openclaw:latest
-    OPENCLAW_GATEWAY_TOKEN=change-me-now
+    OPENCLAW_GATEWAY_TOKEN=
     OPENCLAW_GATEWAY_BIND=lan
     OPENCLAW_GATEWAY_PORT=18789
 
     OPENCLAW_CONFIG_DIR=/root/.openclaw
     OPENCLAW_WORKSPACE_DIR=/root/.openclaw/workspace
 
-    GOG_KEYRING_PASSWORD=change-me-now
+    GOG_KEYRING_PASSWORD=
     XDG_CONFIG_HOME=/home/node/.openclaw
     ```
 
-    أنشئ أسرارًا قوية:
+    اترك `OPENCLAW_GATEWAY_TOKEN` فارغًا ما لم تكن تريد صراحةً
+    إدارته من خلال `.env`؛ يكتب OpenClaw رمزًا مميزًا عشوائيًا لـ Gateway في
+    الإعدادات عند أول تشغيل. أنشئ كلمة مرور لسلسلة المفاتيح والصقها في
+    `GOG_KEYRING_PASSWORD`:
 
     ```bash
     openssl rand -hex 32
     ```
 
-    **لا تلتزم بهذا الملف في المستودع.**
+    **لا تقم بعمل commit لهذا الملف.**
 
-    ملف `.env` هذا مخصص لبيئة الحاوية/وقت التشغيل مثل `OPENCLAW_GATEWAY_TOKEN`.
-    أما مصادقة OAuth/API-key المخزنة للمزوّدين فتوجد في
-    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` المركبة.
+    ملف `.env` هذا مخصص لمتغيرات بيئة الحاوية/وقت التشغيل مثل `OPENCLAW_GATEWAY_TOKEN`.
+    أما مصادقة OAuth/مفاتيح API الخاصة بالموفرات المخزنة فتوجد في
+    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` المركّب.
 
   </Step>
 
-  <Step title="تكوين Docker Compose">
+  <Step title="إعداد Docker Compose">
     أنشئ أو حدّث `docker-compose.yml`.
 
     ```yaml
@@ -191,8 +194,8 @@ x-i18n:
           - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
           - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
         ports:
-          # الموصى به: أبقِ Gateway مقتصرة على loopback على VPS؛ وادخل إليها عبر نفق SSH.
-          # لكشفها علنًا، احذف السابقة `127.0.0.1:` واضبط الجدار الناري وفقًا لذلك.
+          # يُوصى بإبقاء Gateway مقصورًا على loopback في VPS؛ والوصول إليه عبر نفق SSH.
+          # لتعريضه للعامة، أزل البادئة `127.0.0.1:` واضبط الجدار الناري وفقًا لذلك.
           - "127.0.0.1:${OPENCLAW_GATEWAY_PORT}:18789"
         command:
           [
@@ -207,22 +210,22 @@ x-i18n:
           ]
     ```
 
-    إن `--allow-unconfigured` مخصص فقط لتسهيل bootstrap، وليس بديلًا عن تكوين gateway صحيح. ما زال عليك ضبط المصادقة (`gateway.auth.token` أو كلمة مرور) واستخدام إعدادات bind آمنة لعملية النشر لديك.
+    الخيار `--allow-unconfigured` مخصص فقط لتسهيل التهيئة الأولية، وليس بديلًا عن إعداد مناسب لـ gateway. استمر في ضبط المصادقة (`gateway.auth.token` أو كلمة المرور) واستخدم إعدادات bind آمنة لبيئة النشر الخاصة بك.
 
   </Step>
 
-  <Step title="خطوات وقت التشغيل المشتركة لـ Docker VM">
-    استخدم دليل وقت التشغيل المشترك لتدفق مضيف Docker الشائع:
+  <Step title="خطوات وقت تشغيل Docker VM المشتركة">
+    استخدم دليل وقت التشغيل المشترك لتدفق مضيف Docker العام:
 
-    - [ضمّن الملفات التنفيذية المطلوبة داخل الصورة](/install/docker-vm-runtime#bake-required-binaries-into-the-image)
-    - [البناء والتشغيل](/install/docker-vm-runtime#build-and-launch)
-    - [ما الذي يبقى وأين](/install/docker-vm-runtime#what-persists-where)
-    - [التحديثات](/install/docker-vm-runtime#updates)
+    - [تضمين الثنائيات المطلوبة داخل الصورة](/ar/install/docker-vm-runtime#bake-required-binaries-into-the-image)
+    - [البناء والتشغيل](/ar/install/docker-vm-runtime#build-and-launch)
+    - [ما الذي يُحفَظ وأين](/ar/install/docker-vm-runtime#what-persists-where)
+    - [التحديثات](/ar/install/docker-vm-runtime#updates)
 
   </Step>
 
   <Step title="الوصول الخاص بـ Hetzner">
-    بعد تنفيذ خطوات البناء والتشغيل المشتركة، أنشئ نفقًا من حاسوبك المحمول:
+    بعد خطوات البناء والتشغيل المشتركة، أنشئ نفقًا من حاسوبك المحمول:
 
     ```bash
     ssh -N -L 18789:127.0.0.1:18789 root@YOUR_VPS_IP
@@ -232,35 +235,35 @@ x-i18n:
 
     `http://127.0.0.1:18789/`
 
-    ثم الصق السر المشترك المكوَّن. يستخدم هذا الدليل gateway token
-    افتراضيًا؛ وإذا بدّلت إلى مصادقة password، فاستخدم تلك الكلمة بدلًا من ذلك.
+    الصق السر المشترك الذي قمت بإعداده. يستخدم هذا الدليل رمز gateway
+    المميز افتراضيًا؛ وإذا انتقلت إلى المصادقة بكلمة مرور، فاستخدم كلمة المرور تلك بدلًا منه.
 
   </Step>
 </Steps>
 
-توجد خريطة الاستمرارية المشتركة في [Docker VM Runtime](/install/docker-vm-runtime#what-persists-where).
+خريطة الاستمرارية المشتركة موجودة في [Docker VM Runtime](/ar/install/docker-vm-runtime#what-persists-where).
 
-## البنية التحتية كتعريف برمجي (Terraform)
+## البنية التحتية كرمز (Terraform)
 
-بالنسبة إلى الفرق التي تفضل سير عمل البنية التحتية كتعريف برمجي، يوفر إعداد Terraform تُديره المجتمع ما يلي:
+بالنسبة للفرق التي تفضّل تدفقات العمل الخاصة بالبنية التحتية كرمز، يوفّر إعداد Terraform تُديره جهة من المجتمع ما يلي:
 
-- تكوين Terraform معياري مع إدارة للحالة البعيدة
-- تهيئة آلية عبر cloud-init
-- scripts للنشر (bootstrap، وdeploy، وbackup/restore)
-- تقوية أمنية (الجدار الناري، وUFW، ووصول SSH فقط)
-- تكوين نفق SSH للوصول إلى gateway
+- إعداد Terraform معياري مع إدارة للحالة البعيدة
+- تجهيز آلي عبر cloud-init
+- نصوص نشر (bootstrap وdeploy وbackup/restore)
+- تقوية أمنية (جدار ناري وUFW ووصول SSH فقط)
+- إعداد نفق SSH للوصول إلى gateway
 
 **المستودعات:**
 
 - البنية التحتية: [openclaw-terraform-hetzner](https://github.com/andreesg/openclaw-terraform-hetzner)
-- تكوين Docker: [openclaw-docker-config](https://github.com/andreesg/openclaw-docker-config)
+- إعداد Docker: [openclaw-docker-config](https://github.com/andreesg/openclaw-docker-config)
 
-يكمل هذا النهج إعداد Docker أعلاه عبر عمليات نشر قابلة لإعادة الإنتاج، وبنية تحتية مضبوطة بالإصدارات، واستعادة كوارث آلية.
+يكمل هذا النهج إعداد Docker أعلاه من خلال نشرات قابلة لإعادة الإنتاج، وبنية تحتية مُدارة بالإصدارات، وتعافٍ تلقائي من الكوارث.
 
-> **ملاحظة:** تتم صيانته من المجتمع. وبالنسبة إلى المشكلات أو المساهمات، راجع روابط المستودعات أعلاه.
+> **ملاحظة:** تتم صيانته من قبل المجتمع. للمشكلات أو المساهمات، راجع روابط المستودعات أعلاه.
 
 ## الخطوات التالية
 
-- إعداد قنوات المراسلة: [القنوات](/channels)
-- تكوين Gateway: [تكوين Gateway](/gateway/configuration)
-- الحفاظ على تحديث OpenClaw: [التحديث](/install/updating)
+- إعداد قنوات المراسلة: [القنوات](/ar/channels)
+- إعداد Gateway: [إعداد Gateway](/ar/gateway/configuration)
+- حافظ على تحديث OpenClaw: [التحديث](/ar/install/updating)
