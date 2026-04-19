@@ -3,13 +3,13 @@ read_when:
     - Menginstal OpenClaw di Windows
     - Memilih antara Windows native dan WSL2
     - Mencari status aplikasi pendamping Windows
-summary: 'Dukungan Windows: jalur instalasi native dan WSL2, daemon, dan keterbatasan saat ini'
+summary: 'Dukungan Windows: jalur instalasi native dan WSL2, daemon, serta keterbatasan saat ini'
 title: Windows
 x-i18n:
-    generated_at: "2026-04-05T14:01:08Z"
+    generated_at: "2026-04-19T09:06:48Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7d9819206bdd65cf03519c1bc73ed0c7889b0ab842215ea94343262300adfd14
+    source_hash: 1e7451c785a1d75c809522ad93e2c44a00b211f77f14c5c489fd0b01840d3fe2
     source_path: platforms/windows.md
     workflow: 15
 ---
@@ -19,25 +19,25 @@ x-i18n:
 OpenClaw mendukung **Windows native** dan **WSL2**. WSL2 adalah jalur yang lebih
 stabil dan direkomendasikan untuk pengalaman penuh — CLI, Gateway, dan
 tooling berjalan di dalam Linux dengan kompatibilitas penuh. Windows native berfungsi untuk
-penggunaan inti CLI dan Gateway, dengan beberapa keterbatasan yang dicatat di bawah.
+penggunaan CLI dan Gateway inti, dengan beberapa keterbatasan yang dicatat di bawah ini.
 
-Aplikasi pendamping Windows native direncanakan.
+Aplikasi pendamping Windows native sedang direncanakan.
 
 ## WSL2 (direkomendasikan)
 
-- [Getting Started](/start/getting-started) (gunakan di dalam WSL)
-- [Instalasi & pembaruan](/install/updating)
+- [Memulai](/id/start/getting-started) (gunakan di dalam WSL)
+- [Instalasi & pembaruan](/id/install/updating)
 - Panduan resmi WSL2 (Microsoft): [https://learn.microsoft.com/windows/wsl/install](https://learn.microsoft.com/windows/wsl/install)
 
 ## Status Windows native
 
-Alur CLI Windows native terus membaik, tetapi WSL2 tetap menjadi jalur yang direkomendasikan.
+Alur CLI Windows native terus ditingkatkan, tetapi WSL2 masih menjadi jalur yang direkomendasikan.
 
 Yang saat ini berfungsi dengan baik di Windows native:
 
-- installer situs web melalui `install.ps1`
+- penginstal situs web melalui `install.ps1`
 - penggunaan CLI lokal seperti `openclaw --version`, `openclaw doctor`, dan `openclaw plugins list --json`
-- smoke embedded local-agent/provider seperti:
+- smoke test local-agent/provider tertanam seperti:
 
 ```powershell
 openclaw agent --local --agent main --thinking low -m "Reply with exactly WINDOWS-HATCH-OK."
@@ -47,25 +47,25 @@ Keterbatasan saat ini:
 
 - `openclaw onboard --non-interactive` masih mengharapkan gateway lokal yang dapat dijangkau kecuali Anda meneruskan `--skip-health`
 - `openclaw onboard --non-interactive --install-daemon` dan `openclaw gateway install` mencoba Windows Scheduled Tasks terlebih dahulu
-- jika pembuatan Scheduled Task ditolak, OpenClaw akan fallback ke item login Startup-folder per pengguna dan langsung memulai gateway
-- jika `schtasks` sendiri macet atau berhenti merespons, OpenClaw sekarang membatalkan jalur itu dengan cepat dan melakukan fallback alih-alih hang selamanya
-- Scheduled Tasks tetap lebih disukai jika tersedia karena memberikan status supervisor yang lebih baik
+- jika pembuatan Scheduled Task ditolak, OpenClaw akan beralih ke item login Startup-folder per pengguna dan segera memulai gateway
+- jika `schtasks` sendiri macet atau berhenti merespons, OpenClaw sekarang segera membatalkan jalur tersebut dan beralih agar tidak hang selamanya
+- Scheduled Tasks tetap lebih dipilih jika tersedia karena memberikan status supervisor yang lebih baik
 
-Jika Anda hanya menginginkan CLI native, tanpa instalasi layanan gateway, gunakan salah satu dari ini:
+Jika Anda hanya ingin CLI native, tanpa instalasi layanan gateway, gunakan salah satu dari ini:
 
 ```powershell
 openclaw onboard --non-interactive --skip-health
 openclaw gateway run
 ```
 
-Jika Anda memang menginginkan startup terkelola di Windows native:
+Jika Anda memang ingin startup terkelola di Windows native:
 
 ```powershell
 openclaw gateway install
 openclaw gateway status --json
 ```
 
-Jika pembuatan Scheduled Task diblokir, mode layanan fallback tetap akan auto-start setelah login melalui folder Startup pengguna saat ini.
+Jika pembuatan Scheduled Task diblokir, mode layanan fallback tetap otomatis dimulai setelah login melalui folder Startup milik pengguna saat ini.
 
 ## Gateway
 
@@ -92,7 +92,7 @@ Atau:
 openclaw configure
 ```
 
-Pilih **Gateway service** saat diminta.
+Pilih **Layanan Gateway** saat diminta.
 
 Perbaiki/migrasikan:
 
@@ -102,7 +102,7 @@ openclaw doctor
 
 ## Gateway auto-start sebelum login Windows
 
-Untuk penyiapan headless, pastikan seluruh rantai boot berjalan bahkan saat tidak ada yang login ke
+Untuk penyiapan headless, pastikan seluruh rantai boot berjalan bahkan ketika tidak ada yang login ke
 Windows.
 
 ### 1) Biarkan layanan pengguna tetap berjalan tanpa login
@@ -113,7 +113,7 @@ Di dalam WSL:
 sudo loginctl enable-linger "$(whoami)"
 ```
 
-### 2) Instal layanan pengguna gateway OpenClaw
+### 2) Instal layanan pengguna Gateway OpenClaw
 
 Di dalam WSL:
 
@@ -137,14 +137,14 @@ wsl --list --verbose
 
 ### Verifikasi rantai startup
 
-Setelah reboot (sebelum sign-in Windows), periksa dari WSL:
+Setelah reboot (sebelum masuk ke Windows), periksa dari WSL:
 
 ```bash
 systemctl --user is-enabled openclaw-gateway.service
 systemctl --user status openclaw-gateway.service --no-pager
 ```
 
-## Lanjutan: ekspos layanan WSL melalui LAN (portproxy)
+## Lanjutan: mengekspos layanan WSL melalui LAN (portproxy)
 
 WSL memiliki jaringan virtualnya sendiri. Jika mesin lain perlu menjangkau layanan
 yang berjalan **di dalam WSL** (SSH, server TTS lokal, atau Gateway), Anda harus
@@ -165,14 +165,14 @@ netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=$ListenPor
   connectaddress=$WslIp connectport=$TargetPort
 ```
 
-Izinkan port tersebut melalui Windows Firewall (sekali saja):
+Izinkan port tersebut melewati Windows Firewall (sekali saja):
 
 ```powershell
 New-NetFirewallRule -DisplayName "WSL SSH $ListenPort" -Direction Inbound `
   -Protocol TCP -LocalPort $ListenPort -Action Allow
 ```
 
-Segarkan portproxy setelah WSL restart:
+Segarkan portproxy setelah WSL dimulai ulang:
 
 ```powershell
 netsh interface portproxy delete v4tov4 listenport=$ListenPort listenaddress=0.0.0.0 | Out-Null
@@ -183,11 +183,11 @@ netsh interface portproxy add v4tov4 listenport=$ListenPort listenaddress=0.0.0.
 Catatan:
 
 - SSH dari mesin lain menargetkan **IP host Windows** (contoh: `ssh user@windows-host -p 2222`).
-- Node remote harus menunjuk ke URL Gateway yang **dapat dijangkau** (bukan `127.0.0.1`); gunakan
+- Node jarak jauh harus mengarah ke URL Gateway yang **dapat dijangkau** (bukan `127.0.0.1`); gunakan
   `openclaw status --all` untuk mengonfirmasi.
-- Gunakan `listenaddress=0.0.0.0` untuk akses LAN; `127.0.0.1` membuatnya tetap hanya lokal.
-- Jika Anda ingin ini otomatis, daftarkan Scheduled Task untuk menjalankan langkah refresh
-  saat login.
+- Gunakan `listenaddress=0.0.0.0` untuk akses LAN; `127.0.0.1` membuatnya tetap lokal saja.
+- Jika Anda ingin ini otomatis, daftarkan Scheduled Task untuk menjalankan langkah
+  penyegaran saat login.
 
 ## Instalasi WSL2 langkah demi langkah
 
@@ -229,18 +229,28 @@ systemctl --user status
 
 ### 3) Instal OpenClaw (di dalam WSL)
 
-Ikuti alur Getting Started Linux di dalam WSL:
+Untuk penyiapan pertama kali normal di dalam WSL, ikuti alur Memulai Linux:
 
 ```bash
 git clone https://github.com/openclaw/openclaw.git
 cd openclaw
 pnpm install
-pnpm ui:build # otomatis menginstal dependensi UI saat pertama kali dijalankan
 pnpm build
-openclaw onboard
+pnpm ui:build
+pnpm openclaw onboard --install-daemon
 ```
 
-Panduan lengkap: [Getting Started](/start/getting-started)
+Jika Anda mengembangkan dari source alih-alih melakukan onboarding pertama kali, gunakan
+alur pengembangan source dari [Penyiapan](/id/start/setup):
+
+```bash
+pnpm install
+# Hanya saat pertama kali dijalankan (atau setelah mereset konfigurasi/ruang kerja OpenClaw lokal)
+pnpm openclaw setup
+pnpm gateway:watch
+```
+
+Panduan lengkap: [Memulai](/id/start/getting-started)
 
 ## Aplikasi pendamping Windows
 
