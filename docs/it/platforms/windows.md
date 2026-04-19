@@ -1,15 +1,15 @@
 ---
 read_when:
-    - Installare OpenClaw su Windows
+    - Installazione di OpenClaw su Windows
     - Scegliere tra Windows nativo e WSL2
-    - Cercare lo stato dell'app companion per Windows
-summary: 'Supporto Windows: percorsi di installazione nativi e WSL2, daemon e limitazioni attuali'
+    - Cerchi lo stato dell'app companion per Windows
+summary: 'Supporto per Windows: percorsi di installazione nativi e WSL2, daemon e avvertenze attuali'
 title: Windows
 x-i18n:
-    generated_at: "2026-04-05T13:59:03Z"
+    generated_at: "2026-04-19T08:09:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7d9819206bdd65cf03519c1bc73ed0c7889b0ab842215ea94343262300adfd14
+    source_hash: 1e7451c785a1d75c809522ad93e2c44a00b211f77f14c5c489fd0b01840d3fe2
     source_path: platforms/windows.md
     workflow: 15
 ---
@@ -17,41 +17,42 @@ x-i18n:
 # Windows
 
 OpenClaw supporta sia **Windows nativo** sia **WSL2**. WSL2 è il percorso più
-stabile ed è consigliato per l'esperienza completa: la CLI, il Gateway e gli
-strumenti vengono eseguiti all'interno di Linux con piena compatibilità. Windows nativo funziona per
-l'uso principale di CLI e Gateway, con alcune limitazioni indicate di seguito.
+stabile ed è consigliato per l'esperienza completa: la CLI, Gateway e gli
+strumenti vengono eseguiti all'interno di Linux con piena compatibilità. Windows
+nativo funziona per l'uso principale di CLI e Gateway, con alcune avvertenze
+indicate di seguito.
 
-Le app companion native per Windows sono pianificate.
+Sono previste app companion native per Windows.
 
 ## WSL2 (consigliato)
 
-- [Getting Started](/start/getting-started) (da usare all'interno di WSL)
-- [Install & updates](/install/updating)
+- [Per iniziare](/it/start/getting-started) (da usare all'interno di WSL)
+- [Installazione e aggiornamenti](/it/install/updating)
 - Guida ufficiale a WSL2 (Microsoft): [https://learn.microsoft.com/windows/wsl/install](https://learn.microsoft.com/windows/wsl/install)
 
 ## Stato di Windows nativo
 
-I flussi della CLI nativa su Windows stanno migliorando, ma WSL2 resta ancora il percorso consigliato.
+I flussi CLI nativi su Windows stanno migliorando, ma WSL2 resta ancora il percorso consigliato.
 
 Cosa funziona bene oggi su Windows nativo:
 
-- installer dal sito tramite `install.ps1`
+- installer del sito web tramite `install.ps1`
 - uso locale della CLI come `openclaw --version`, `openclaw doctor` e `openclaw plugins list --json`
-- smoke test locali incorporati di agent/provider come:
+- smoke test locali embedded di agent/provider come:
 
 ```powershell
 openclaw agent --local --agent main --thinking low -m "Reply with exactly WINDOWS-HATCH-OK."
 ```
 
-Limitazioni attuali:
+Avvertenze attuali:
 
-- `openclaw onboard --non-interactive` si aspetta ancora un gateway locale raggiungibile a meno che tu non passi `--skip-health`
-- `openclaw onboard --non-interactive --install-daemon` e `openclaw gateway install` provano prima con le Attività pianificate di Windows
-- se la creazione dell'Attività pianificata viene negata, OpenClaw ricade su un elemento di avvio all'accesso nella cartella Startup per utente e avvia immediatamente il gateway
-- se `schtasks` stesso si blocca o smette di rispondere, OpenClaw ora interrompe rapidamente quel percorso e ripiega invece di restare appeso per sempre
-- le Attività pianificate restano preferite quando disponibili perché forniscono un migliore stato del supervisore
+- `openclaw onboard --non-interactive` si aspetta ancora un Gateway locale raggiungibile a meno che non passi `--skip-health`
+- `openclaw onboard --non-interactive --install-daemon` e `openclaw gateway install` provano prima a usare le Windows Scheduled Tasks
+- se la creazione della Scheduled Task viene negata, OpenClaw ripiega su un elemento di accesso per utente nella cartella Startup e avvia immediatamente il Gateway
+- se `schtasks` stesso si blocca o smette di rispondere, OpenClaw ora interrompe rapidamente quel percorso e ripiega invece di restare bloccato per sempre
+- le Scheduled Tasks restano comunque preferite quando disponibili perché forniscono uno stato del supervisore migliore
 
-Se vuoi solo la CLI nativa, senza installazione del servizio gateway, usa uno di questi:
+Se vuoi solo la CLI nativa, senza installare il servizio Gateway, usa uno di questi:
 
 ```powershell
 openclaw onboard --non-interactive --skip-health
@@ -65,16 +66,16 @@ openclaw gateway install
 openclaw gateway status --json
 ```
 
-Se la creazione dell'Attività pianificata è bloccata, la modalità di servizio fallback continua comunque ad avviarsi automaticamente dopo il login tramite la cartella Startup dell'utente corrente.
+Se la creazione della Scheduled Task è bloccata, la modalità di servizio di fallback si avvia comunque automaticamente dopo il login tramite la cartella Startup dell'utente corrente.
 
 ## Gateway
 
-- [Gateway runbook](/gateway)
-- [Configuration](/gateway/configuration)
+- [Runbook del Gateway](/it/gateway)
+- [Configurazione](/it/gateway/configuration)
 
 ## Installazione del servizio Gateway (CLI)
 
-Dentro WSL2:
+All'interno di WSL2:
 
 ```
 openclaw onboard --install-daemon
@@ -94,7 +95,7 @@ openclaw configure
 
 Seleziona **Gateway service** quando richiesto.
 
-Riparazione/migrazione:
+Riparare/migrare:
 
 ```
 openclaw doctor
@@ -102,40 +103,40 @@ openclaw doctor
 
 ## Avvio automatico del Gateway prima del login a Windows
 
-Per configurazioni headless, assicurati che l'intera catena di avvio venga eseguita anche quando nessuno accede a
+Per configurazioni headless, assicurati che l'intera catena di avvio venga eseguita anche quando nessuno effettua l'accesso a
 Windows.
 
-### 1) Mantieni i servizi utente in esecuzione senza login
+### 1) Mantieni in esecuzione i servizi utente senza login
 
-Dentro WSL:
+All'interno di WSL:
 
 ```bash
 sudo loginctl enable-linger "$(whoami)"
 ```
 
-### 2) Installa il servizio utente del gateway OpenClaw
+### 2) Installa il servizio utente del Gateway OpenClaw
 
-Dentro WSL:
+All'interno di WSL:
 
 ```bash
 openclaw gateway install
 ```
 
-### 3) Avvia automaticamente WSL all'avvio di Windows
+### 3) Avvia WSL automaticamente all'avvio di Windows
 
-In PowerShell come Amministratore:
+In PowerShell come Administrator:
 
 ```powershell
 schtasks /create /tn "WSL Boot" /tr "wsl.exe -d Ubuntu --exec /bin/true" /sc onstart /ru SYSTEM
 ```
 
-Sostituisci `Ubuntu` con il nome della tua distribuzione da:
+Sostituisci `Ubuntu` con il nome della tua distribuzione preso da:
 
 ```powershell
 wsl --list --verbose
 ```
 
-### Verifica della catena di avvio
+### Verificare la catena di avvio
 
 Dopo un riavvio (prima dell'accesso a Windows), controlla da WSL:
 
@@ -144,14 +145,14 @@ systemctl --user is-enabled openclaw-gateway.service
 systemctl --user status openclaw-gateway.service --no-pager
 ```
 
-## Avanzato: esporre servizi WSL sulla LAN (portproxy)
+## Avanzato: esporre i servizi WSL sulla LAN (portproxy)
 
 WSL ha una propria rete virtuale. Se un'altra macchina deve raggiungere un servizio
 in esecuzione **all'interno di WSL** (SSH, un server TTS locale o il Gateway), devi
-inoltrare una porta Windows verso l'IP WSL corrente. L'IP WSL cambia dopo i riavvii,
-quindi potresti dover aggiornare la regola di inoltro.
+inoltrare una porta di Windows all'attuale IP di WSL. L'IP di WSL cambia dopo i riavvii,
+quindi potrebbe essere necessario aggiornare la regola di inoltro.
 
-Esempio (PowerShell **come Amministratore**):
+Esempio (PowerShell **come Administrator**):
 
 ```powershell
 $Distro = "Ubuntu-24.04"
@@ -165,7 +166,7 @@ netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=$ListenPor
   connectaddress=$WslIp connectport=$TargetPort
 ```
 
-Consenti la porta nel firewall di Windows (una sola volta):
+Consenti la porta nel Windows Firewall (una sola volta):
 
 ```powershell
 New-NetFirewallRule -DisplayName "WSL SSH $ListenPort" -Direction Inbound `
@@ -182,11 +183,11 @@ netsh interface portproxy add v4tov4 listenport=$ListenPort listenaddress=0.0.0.
 
 Note:
 
-- SSH da un'altra macchina deve puntare all'**IP dell'host Windows** (ad esempio: `ssh user@windows-host -p 2222`).
-- I nodi remoti devono puntare a un URL Gateway **raggiungibile** (non `127.0.0.1`); usa
+- Le connessioni SSH da un'altra macchina devono puntare all'**IP dell'host Windows** (esempio: `ssh user@windows-host -p 2222`).
+- I Node remoti devono puntare a un URL del Gateway **raggiungibile** (non `127.0.0.1`); usa
   `openclaw status --all` per confermare.
-- Usa `listenaddress=0.0.0.0` per accesso LAN; `127.0.0.1` lo mantiene solo locale.
-- Se vuoi automatizzare questo passaggio, registra un'Attività pianificata per eseguire l'aggiornamento
+- Usa `listenaddress=0.0.0.0` per l'accesso LAN; `127.0.0.1` lo mantiene solo locale.
+- Se vuoi automatizzare questa procedura, registra una Scheduled Task per eseguire il passaggio di aggiornamento
   al login.
 
 ## Installazione WSL2 passo per passo
@@ -204,7 +205,7 @@ wsl --install -d Ubuntu-24.04
 
 Riavvia se Windows lo richiede.
 
-### 2) Abilita systemd (richiesto per l'installazione del gateway)
+### 2) Abilita systemd (necessario per l'installazione del Gateway)
 
 Nel terminale WSL:
 
@@ -227,22 +228,32 @@ Riapri Ubuntu, quindi verifica:
 systemctl --user status
 ```
 
-### 3) Installa OpenClaw (dentro WSL)
+### 3) Installa OpenClaw (all'interno di WSL)
 
-Segui il flusso Linux Getting Started all'interno di WSL:
+Per una normale configurazione iniziale all'interno di WSL, segui il flusso Linux Per iniziare:
 
 ```bash
 git clone https://github.com/openclaw/openclaw.git
 cd openclaw
 pnpm install
-pnpm ui:build # installa automaticamente le dipendenze UI alla prima esecuzione
 pnpm build
-openclaw onboard
+pnpm ui:build
+pnpm openclaw onboard --install-daemon
 ```
 
-Guida completa: [Getting Started](/start/getting-started)
+Se stai sviluppando dal sorgente invece di eseguire il primo onboarding, usa il
+ciclo di sviluppo dai sorgenti indicato in [Configurazione](/it/start/setup):
+
+```bash
+pnpm install
+# Solo alla prima esecuzione (o dopo aver reimpostato la configurazione/workspace locale di OpenClaw)
+pnpm openclaw setup
+pnpm gateway:watch
+```
+
+Guida completa: [Per iniziare](/it/start/getting-started)
 
 ## App companion per Windows
 
 Non abbiamo ancora un'app companion per Windows. I contributi sono benvenuti se vuoi
-aiutare a realizzarla.
+contribuire a renderla possibile.
