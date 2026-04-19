@@ -1,31 +1,31 @@
 ---
 read_when:
-    - Depurando scripts de desenvolvimento somente com Node ou falhas no modo watch
-    - Investigando falhas do loader tsx/esbuild no OpenClaw
-summary: Notas e soluções alternativas para falha "__name is not a function" com Node + tsx
-title: Falha com Node + tsx
+    - Depuração de scripts de desenvolvimento somente com Node ou falhas no modo de observação
+    - Investigando falhas do carregador tsx/esbuild no OpenClaw
+summary: Notas sobre falha do Node + tsx com "__name is not a function" e soluções alternativas
+title: Falha do Node + tsx
 x-i18n:
-    generated_at: "2026-04-05T12:40:49Z"
+    generated_at: "2026-04-19T01:11:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f5beab7cdfe7679680f65176234a617293ce495886cfffb151518adfa61dc8dc
+    source_hash: ca45c795c356ada8f81e75b394ec82743d3d1bf1bbe83a24ec6699946b920f01
     source_path: debug/node-issue.md
     workflow: 15
 ---
 
-# Falha com Node + tsx "\_\_name is not a function"
+# Falha do Node + tsx com "\_\_name is not a function"
 
 ## Resumo
 
 Executar o OpenClaw via Node com `tsx` falha na inicialização com:
 
-```
+```bash
 [openclaw] Failed to start CLI: TypeError: __name is not a function
     at createSubsystemLogger (.../src/logging/subsystem.ts:203:25)
     at .../src/agents/auth-profiles/constants.ts:25:20
 ```
 
-Isso começou após a troca dos scripts de desenvolvimento de Bun para `tsx` (commit `2871657e`, 2026-01-06). O mesmo caminho de runtime funcionava com Bun.
+Isso começou após a troca dos scripts de desenvolvimento de Bun para `tsx` (commit `2871657e`, 2026-01-06). O mesmo caminho de execução funcionava com Bun.
 
 ## Ambiente
 
@@ -36,7 +36,7 @@ Isso começou após a troca dos scripts de desenvolvimento de Bun para `tsx` (co
 ## Reprodução (somente Node)
 
 ```bash
-# in repo root
+# na raiz do repositório
 node --version
 pnpm install
 node --import tsx src/entry.ts status
@@ -54,30 +54,30 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 - Node 22.22.0 (Homebrew `node@22`): falha
 - Node 24: ainda não instalado aqui; precisa de verificação
 
-## Observações / hipótese
+## Notas / hipótese
 
 - `tsx` usa esbuild para transformar TS/ESM. O `keepNames` do esbuild emite um helper `__name` e envolve definições de função com `__name(...)`.
-- A falha indica que `__name` existe, mas não é uma função em runtime, o que implica que o helper está ausente ou foi sobrescrito para esse módulo no caminho do loader do Node 25.
+- A falha indica que `__name` existe, mas não é uma função em tempo de execução, o que implica que o helper está ausente ou foi sobrescrito para esse módulo no caminho do carregador do Node 25.
 - Problemas semelhantes com o helper `__name` já foram relatados em outros consumidores do esbuild quando o helper está ausente ou é reescrito.
 
 ## Histórico da regressão
 
-- `2871657e` (2026-01-06): scripts mudaram de Bun para tsx para tornar Bun opcional.
+- `2871657e` (2026-01-06): os scripts foram alterados de Bun para tsx para tornar o Bun opcional.
 - Antes disso (caminho com Bun), `openclaw status` e `gateway:watch` funcionavam.
 
 ## Soluções alternativas
 
-- Use Bun para scripts de desenvolvimento (reversão temporária atual).
-- Use Node + watch do tsc e depois execute a saída compilada:
+- Usar Bun para scripts de desenvolvimento (reversão temporária atual).
+- Usar `tsgo` para a verificação de tipos do repositório e, em seguida, executar a saída compilada:
 
   ```bash
-  pnpm exec tsc --watch --preserveWatchOutput
-  node --watch openclaw.mjs status
+  pnpm tsgo
+  node openclaw.mjs status
   ```
 
-- Confirmado localmente: `pnpm exec tsc -p tsconfig.json` + `node openclaw.mjs status` funciona no Node 25.
-- Desative `keepNames` do esbuild no loader TS, se possível (isso evita a inserção do helper `__name`); atualmente o tsx não expõe isso.
-- Teste Node LTS (22/24) com `tsx` para verificar se o problema é específico do Node 25.
+- Nota histórica: `tsc` foi usado aqui durante a depuração desse problema de Node/tsx, mas as faixas de verificação de tipos do repositório agora usam `tsgo`.
+- Desabilitar `keepNames` do esbuild no carregador TS, se possível (isso evita a inserção do helper `__name`); o tsx atualmente não expõe isso.
+- Testar Node LTS (22/24) com `tsx` para ver se o problema é específico do Node 25.
 
 ## Referências
 
@@ -87,6 +87,6 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 
 ## Próximos passos
 
-- Reproduzir em Node 22/24 para confirmar regressão no Node 25.
-- Testar `tsx` nightly ou fixar uma versão anterior se existir uma regressão conhecida.
-- Se reproduzir em Node LTS, abrir uma reprodução mínima upstream com o stack trace de `__name`.
+- Reproduzir no Node 22/24 para confirmar uma regressão do Node 25.
+- Testar o `tsx` nightly ou fixar em uma versão anterior, se houver uma regressão conhecida.
+- Se também reproduzir no Node LTS, abrir um relatório upstream com uma reprodução mínima e o stack trace de `__name`.
