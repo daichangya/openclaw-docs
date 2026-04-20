@@ -1,52 +1,52 @@
 ---
 read_when:
-    - Gateway sürecini çalıştırırken veya hata ayıklarken
-summary: Gateway hizmeti, yaşam döngüsü ve operasyonları için runbook
+    - Gateway sürecini çalıştırma veya hata ayıklama
+summary: Gateway hizmeti, yaşam döngüsü ve operasyonlar için runbook
 title: Gateway Runbook
 x-i18n:
-    generated_at: "2026-04-07T08:45:11Z"
+    generated_at: "2026-04-20T09:03:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: fd2c21036e88612861ef2195b8ff7205aca31386bb11558614ade8d1a54fdebd
+    source_hash: e1004cdd43b1db6794f3ca83da38dbdb231a1976329d9d6d851e2b02405278d8
     source_path: gateway/index.md
     workflow: 15
 ---
 
 # Gateway runbook
 
-Gateway hizmetinin ilk gün başlatılması ve sonraki operasyonları için bu sayfayı kullanın.
+Gateway hizmetinin ilk gün başlatılması ve ikinci gün operasyonları için bu sayfayı kullanın.
 
 <CardGroup cols={2}>
-  <Card title="Derin sorun giderme" icon="siren" href="/tr/gateway/troubleshooting">
-    Belirti odaklı tanılama; tam komut sıraları ve log imzalarıyla.
+  <Card title="Derinlemesine sorun giderme" icon="siren" href="/tr/gateway/troubleshooting">
+    Belirti odaklı tanılama; tam komut sıraları ve günlük imzalarıyla.
   </Card>
   <Card title="Yapılandırma" icon="sliders" href="/tr/gateway/configuration">
-    Görev odaklı kurulum kılavuzu + tam yapılandırma referansı.
+    Görev odaklı kurulum kılavuzu + tam yapılandırma başvurusu.
   </Card>
-  <Card title="Secrets yönetimi" icon="key-round" href="/tr/gateway/secrets">
-    SecretRef sözleşmesi, çalışma zamanı snapshot davranışı ve migrate/reload işlemleri.
+  <Card title="Gizli bilgi yönetimi" icon="key-round" href="/tr/gateway/secrets">
+    SecretRef sözleşmesi, çalışma zamanı anlık görüntü davranışı ve taşıma/yeniden yükleme işlemleri.
   </Card>
-  <Card title="Secrets plan sözleşmesi" icon="shield-check" href="/tr/gateway/secrets-plan-contract">
-    Tam `secrets apply` hedef/yol kuralları ve yalnızca ref kullanan auth-profile davranışı.
+  <Card title="Gizli bilgi planı sözleşmesi" icon="shield-check" href="/tr/gateway/secrets-plan-contract">
+    Kesin `secrets apply` hedef/yol kuralları ve yalnızca referanslı auth-profile davranışı.
   </Card>
 </CardGroup>
 
-## 5 dakikalık yerel başlangıç
+## 5 dakikada yerel başlatma
 
 <Steps>
-  <Step title="Gateway'i başlat">
+  <Step title="Gateway'i başlatın">
 
 ```bash
 openclaw gateway --port 18789
 # debug/trace stdio'ya yansıtılır
 openclaw gateway --port 18789 --verbose
-# seçilen porttaki dinleyiciyi zorla sonlandır, sonra başlat
+# seçili bağlantı noktasındaki dinleyiciyi zorla öldür, sonra başlat
 openclaw gateway --force
 ```
 
   </Step>
 
-  <Step title="Hizmet sağlığını doğrula">
+  <Step title="Hizmet sağlığını doğrulayın">
 
 ```bash
 openclaw gateway status
@@ -54,44 +54,44 @@ openclaw status
 openclaw logs --follow
 ```
 
-Sağlıklı temel durum: `Runtime: running` ve `RPC probe: ok`.
+Sağlıklı temel durum: `Runtime: running`, `Connectivity probe: ok` ve beklediğinizle eşleşen `Capability: ...`. Yalnızca erişilebilirlik değil, okuma kapsamlı RPC kanıtı gerektiğinde `openclaw gateway status --require-rpc` kullanın.
 
   </Step>
 
-  <Step title="Kanal hazır oluşunu doğrula">
+  <Step title="Kanal hazırlığını doğrulayın">
 
 ```bash
 openclaw channels status --probe
 ```
 
-Erişilebilir bir gateway ile bu, hesap başına canlı kanal problarını ve isteğe bağlı denetimleri çalıştırır.
-Gateway'e ulaşılamazsa, CLI canlı prob çıktısı yerine yalnızca yapılandırma tabanlı kanal özetlerine geri düşer.
+Erişilebilir bir Gateway ile bu, hesap başına canlı kanal yoklamaları ve isteğe bağlı denetimler çalıştırır.
+Gateway'e ulaşılamıyorsa, CLI canlı yoklama çıktısı yerine yalnızca yapılandırma tabanlı kanal özetlerine geri döner.
 
   </Step>
 </Steps>
 
 <Note>
-Gateway config reload, etkin config dosyası yolunu izler (profil/durum varsayılanlarından çözülür veya ayarlanmışsa `OPENCLAW_CONFIG_PATH` kullanılır).
+Gateway yapılandırma yeniden yükleme özelliği etkin yapılandırma dosyası yolunu izler (profil/durum varsayılanlarından çözümlenir veya ayarlıysa `OPENCLAW_CONFIG_PATH` kullanılır).
 Varsayılan mod `gateway.reload.mode="hybrid"` şeklindedir.
-İlk başarılı yüklemeden sonra çalışan süreç, etkin bellek içi config snapshot'unu sunar; başarılı bir reload bu snapshot'u atomik olarak değiştirir.
+İlk başarılı yüklemeden sonra çalışan süreç etkin bellek içi yapılandırma anlık görüntüsünü sunar; başarılı yeniden yükleme bu anlık görüntüyü atomik olarak değiştirir.
 </Note>
 
 ## Çalışma zamanı modeli
 
-- Yönlendirme, kontrol düzlemi ve kanal bağlantıları için sürekli çalışan tek bir süreç.
-- Şunlar için tek, çoklamalı port:
-  - WebSocket kontrol/RPC
+- Yönlendirme, denetim düzlemi ve kanal bağlantıları için her zaman açık tek süreç.
+- Şunlar için tek çoklanmış bağlantı noktası:
+  - WebSocket denetimi/RPC
   - HTTP API'leri, OpenAI uyumlu (`/v1/models`, `/v1/embeddings`, `/v1/chat/completions`, `/v1/responses`, `/tools/invoke`)
-  - Control UI ve hook'lar
-- Varsayılan bind modu: `loopback`.
-- Varsayılan olarak auth gereklidir. Ortak gizli anahtar kullanan kurulumlar
+  - Control UI ve kancalar
+- Varsayılan bağlama modu: `loopback`.
+- Kimlik doğrulama varsayılan olarak gereklidir. Paylaşılan gizli anahtar kurulumları
   `gateway.auth.token` / `gateway.auth.password` (veya
-  `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`) kullanır; loopback olmayan
-  reverse-proxy kurulumları ise `gateway.auth.mode: "trusted-proxy"` kullanabilir.
+  `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`) kullanır; loopback dışı
+  ters vekil kurulumları ise `gateway.auth.mode: "trusted-proxy"` kullanabilir.
 
 ## OpenAI uyumlu uç noktalar
 
-OpenClaw'un en yüksek etkili uyumluluk yüzeyi artık şudur:
+OpenClaw’ın en yüksek etkili uyumluluk yüzeyi artık şudur:
 
 - `GET /v1/models`
 - `GET /v1/models/{id}`
@@ -99,35 +99,35 @@ OpenClaw'un en yüksek etkili uyumluluk yüzeyi artık şudur:
 - `POST /v1/chat/completions`
 - `POST /v1/responses`
 
-Bu kümenin önemli olma nedeni:
+Bu kümenin neden önemli olduğu:
 
-- Çoğu Open WebUI, LobeChat ve LibreChat entegrasyonu önce `/v1/models` yolunu prob eder.
-- Birçok RAG ve bellek pipeline'ı `/v1/embeddings` bekler.
-- Aracı odaklı istemciler giderek daha fazla `/v1/responses` tercih ediyor.
+- Çoğu Open WebUI, LobeChat ve LibreChat entegrasyonu önce `/v1/models` uç noktasını yoklar.
+- Birçok RAG ve bellek hattı `/v1/embeddings` bekler.
+- Agent yerel istemciler giderek daha fazla `/v1/responses` tercih ediyor.
 
 Planlama notu:
 
-- `/v1/models` önce aracı yaklaşımını benimser: `openclaw`, `openclaw/default` ve `openclaw/<agentId>` döndürür.
-- `openclaw/default`, yapılandırılmış varsayılan aracıya her zaman eşlenen kararlı takma addır.
-- Bir backend sağlayıcı/model geçersiz kılması istediğinizde `x-openclaw-model` kullanın; aksi takdirde seçili aracının normal model ve embedding kurulumu kontrolü elinde tutar.
+- `/v1/models` agent önceliklidir: `openclaw`, `openclaw/default` ve `openclaw/<agentId>` döndürür.
+- `openclaw/default`, yapılandırılmış varsayılan agent ile her zaman eşlenen kararlı takma addır.
+- Arka uç sağlayıcı/model geçersiz kılması istediğinizde `x-openclaw-model` kullanın; aksi takdirde seçili agent'ın normal model ve embedding kurulumu denetimi elinde tutar.
 
-Bunların tümü ana Gateway portunda çalışır ve Gateway HTTP API'sinin geri kalanıyla aynı güvenilir operatör auth sınırını kullanır.
+Bunların tümü ana Gateway bağlantı noktasında çalışır ve Gateway HTTP API'sinin geri kalanıyla aynı güvenilen operatör kimlik doğrulama sınırını kullanır.
 
-### Port ve bind önceliği
+### Bağlantı noktası ve bağlama önceliği
 
-| Ayar         | Çözümleme sırası                                              |
-| ------------ | ------------------------------------------------------------- |
-| Gateway port | `--port` → `OPENCLAW_GATEWAY_PORT` → `gateway.port` → `18789` |
-| Bind modu    | CLI/override → `gateway.bind` → `loopback`                    |
+| Ayar           | Çözümleme sırası                                              |
+| -------------- | ------------------------------------------------------------- |
+| Gateway portu  | `--port` → `OPENCLAW_GATEWAY_PORT` → `gateway.port` → `18789` |
+| Bağlama modu   | CLI/override → `gateway.bind` → `loopback`                    |
 
-### Hot reload modları
+### Sıcak yeniden yükleme modları
 
-| `gateway.reload.mode` | Davranış                                 |
-| --------------------- | ---------------------------------------- |
-| `off`                 | Config reload yok                        |
-| `hot`                 | Yalnızca hot-safe değişiklikleri uygula  |
-| `restart`             | Reload gerektiren değişikliklerde yeniden başlat |
-| `hybrid` (varsayılan) | Güvenliyse hot-apply, gerekliyse yeniden başlat |
+| `gateway.reload.mode` | Davranış                                  |
+| --------------------- | ----------------------------------------- |
+| `off`                 | Yapılandırma yeniden yükleme yok          |
+| `hot`                 | Yalnızca sıcak geçerli değişiklikleri uygula |
+| `restart`             | Yeniden yükleme gerektiren değişikliklerde yeniden başlat |
+| `hybrid` (varsayılan) | Güvenliyse sıcak uygula, gerekirse yeniden başlat |
 
 ## Operatör komut kümesi
 
@@ -143,15 +143,15 @@ openclaw logs --follow
 openclaw doctor
 ```
 
-`gateway status --deep`, daha derin bir RPC sağlık probu için değil, ek hizmet keşfi (LaunchDaemons/systemd system
-birimleri/schtasks) içindir.
+`gateway status --deep`, daha derin bir RPC sağlık yoklaması için değil,
+ek hizmet keşfi (LaunchDaemons/systemd sistem birimleri/schtasks) içindir.
 
-## Birden fazla gateway (aynı host)
+## Birden fazla Gateway (aynı ana makinede)
 
-Çoğu kurulum makine başına tek bir gateway çalıştırmalıdır. Tek bir gateway birden çok
-aracı ve kanalı barındırabilir.
+Çoğu kurulumda makine başına bir gateway çalıştırılmalıdır. Tek bir gateway birden
+fazla agent ve kanalı barındırabilir.
 
-Yalnızca özellikle yalıtım veya bir kurtarma botu istediğinizde birden fazla gateway gerekir.
+Yalnızca kasıtlı olarak yalıtım veya kurtarma botu istediğinizde birden fazla gateway gerekir.
 
 Yararlı kontroller:
 
@@ -160,39 +160,39 @@ openclaw gateway status --deep
 openclaw gateway probe
 ```
 
-Beklenmesi gerekenler:
+Beklemeniz gerekenler:
 
 - `gateway status --deep`, `Other gateway-like services detected (best effort)`
-  bildirebilir ve eski launchd/systemd/schtasks kurulumları hâlâ ortadaysa
+  bildirebilir ve eski launchd/systemd/schtasks kurulumları hâlâ mevcutsa
   temizleme ipuçları yazdırabilir.
 - `gateway probe`, birden fazla hedef yanıt verdiğinde `multiple reachable gateways`
-  uyarısı verebilir.
-- Bu kasıtlıysa, gateway başına portları, config/state alanlarını ve workspace köklerini ayırın.
+  konusunda uyarabilir.
+- Bu kasıtlıysa, her gateway için bağlantı noktalarını, yapılandırma/durum dizinlerini ve çalışma alanı köklerini yalıtın.
 
 Ayrıntılı kurulum: [/gateway/multiple-gateways](/tr/gateway/multiple-gateways).
 
 ## Uzak erişim
 
 Tercih edilen: Tailscale/VPN.
-Yedek: SSH tüneli.
+Yedek seçenek: SSH tüneli.
 
 ```bash
 ssh -N -L 18789:127.0.0.1:18789 user@host
 ```
 
-Ardından istemcileri yerelde `ws://127.0.0.1:18789` adresine bağlayın.
+Ardından istemcileri yerel olarak `ws://127.0.0.1:18789` adresine bağlayın.
 
 <Warning>
-SSH tünelleri gateway auth'ı atlatmaz. Ortak gizli anahtar auth'ı için istemciler,
-tünel üzerinden bile olsa yine `token`/`password` göndermelidir. Kimlik taşıyan modlarda,
-istek yine de o auth yolunu karşılamak zorundadır.
+SSH tünelleri gateway kimlik doğrulamasını atlatmaz. Paylaşılan gizli anahtar tabanlı kimlik doğrulamada istemciler,
+tünel üzerinden bile `token`/`password` göndermelidir. Kimlik taşıyan modlarda ise
+isteğin yine de o kimlik doğrulama yolunu karşılaması gerekir.
 </Warning>
 
-Bkz.: [Uzak Gateway](/tr/gateway/remote), [Kimlik Doğrulama](/tr/gateway/authentication), [Tailscale](/tr/gateway/tailscale).
+Bkz.: [Remote Gateway](/tr/gateway/remote), [Authentication](/tr/gateway/authentication), [Tailscale](/tr/gateway/tailscale).
 
-## Denetim ve hizmet yaşam döngüsü
+## Gözetim ve hizmet yaşam döngüsü
 
-Üretime benzer güvenilirlik için denetimli çalıştırmalar kullanın.
+Üretime benzer güvenilirlik için gözetimli çalıştırmaları kullanın.
 
 <Tabs>
   <Tab title="macOS (launchd)">
@@ -204,7 +204,7 @@ openclaw gateway restart
 openclaw gateway stop
 ```
 
-LaunchAgent etiketleri `ai.openclaw.gateway` (varsayılan) veya `ai.openclaw.<profile>` (adlandırılmış profil) şeklindedir. `openclaw doctor`, hizmet config kaymasını denetler ve onarır.
+LaunchAgent etiketleri `ai.openclaw.gateway` (varsayılan) veya `ai.openclaw.<profile>` (adlandırılmış profil) şeklindedir. `openclaw doctor`, hizmet yapılandırması sapmalarını denetler ve onarır.
 
   </Tab>
 
@@ -216,13 +216,13 @@ systemctl --user enable --now openclaw-gateway[-<profile>].service
 openclaw gateway status
 ```
 
-Çıkış yaptıktan sonra kalıcılık için lingering'ı etkinleştirin:
+Oturum kapatıldıktan sonra kalıcılık için lingering'i etkinleştirin:
 
 ```bash
 sudo loginctl enable-linger <user>
 ```
 
-Özel bir kurulum yolu gerektiğinde elle user-unit örneği:
+Özel kurulum yolu gerektiğinde el ile kullanıcı birimi örneği:
 
 ```ini
 [Unit]
@@ -256,31 +256,31 @@ openclaw gateway stop
 
 Yerel Windows yönetilen başlangıcı, `OpenClaw Gateway`
 (adlandırılmış profiller için `OpenClaw Gateway (<profile>)`) adlı bir Scheduled Task kullanır. Scheduled Task
-oluşturulması reddedilirse, OpenClaw durum dizini içindeki `gateway.cmd` dosyasına işaret eden
-kullanıcı başına Startup-folder başlatıcısına geri düşer.
+oluşturma reddedilirse, OpenClaw durum dizini içindeki `gateway.cmd` dosyasını işaret eden
+kullanıcı başına Startup-folder başlatıcısına geri döner.
 
   </Tab>
 
   <Tab title="Linux (system service)">
 
-Çok kullanıcılı/sürekli açık host'lar için bir system unit kullanın.
+Çok kullanıcılı/her zaman açık ana makineler için bir sistem birimi kullanın.
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now openclaw-gateway[-<profile>].service
 ```
 
-User unit ile aynı hizmet gövdesini kullanın, ancak bunu
+Kullanıcı birimiyle aynı hizmet gövdesini kullanın, ancak bunu
 `/etc/systemd/system/openclaw-gateway[-<profile>].service` altına kurun ve
-`openclaw` binary'niz başka bir yerdeyse `ExecStart=` değerini ayarlayın.
+`openclaw` ikiliniz başka bir yerdeyse `ExecStart=` değerini ayarlayın.
 
   </Tab>
 </Tabs>
 
-## Tek host üzerinde birden fazla gateway
+## Tek bir ana makinede birden fazla Gateway
 
-Çoğu kurulum **tek** Gateway çalıştırmalıdır.
-Birden fazlasını yalnızca katı yalıtım/yedeklilik için kullanın (örneğin bir kurtarma profili).
+Çoğu kurulum **bir** Gateway çalıştırmalıdır.
+Birden fazla Gateway'i yalnızca katı yalıtım/yedeklilik için kullanın (örneğin bir kurtarma profili).
 
 Örnek başına kontrol listesi:
 
@@ -296,9 +296,9 @@ OPENCLAW_CONFIG_PATH=~/.openclaw/a.json OPENCLAW_STATE_DIR=~/.openclaw-a opencla
 OPENCLAW_CONFIG_PATH=~/.openclaw/b.json OPENCLAW_STATE_DIR=~/.openclaw-b openclaw gateway --port 19002
 ```
 
-Bkz.: [Birden fazla gateway](/tr/gateway/multiple-gateways).
+Bkz.: [Multiple gateways](/tr/gateway/multiple-gateways).
 
-### Geliştirme profili hızlı yol
+### Dev profil hızlı yolu
 
 ```bash
 openclaw --dev setup
@@ -306,34 +306,34 @@ openclaw --dev gateway --allow-unconfigured
 openclaw --dev status
 ```
 
-Varsayılanlar yalıtılmış state/config ve temel gateway portu `19001` içerir.
+Varsayılanlar; yalıtılmış durum/yapılandırma ve temel gateway bağlantı noktası `19001` içerir.
 
 ## Protokol hızlı başvuru (operatör görünümü)
 
 - İlk istemci çerçevesi `connect` olmalıdır.
-- Gateway `hello-ok` snapshot'u döndürür (`presence`, `health`, `stateVersion`, `uptimeMs`, limits/policy).
-- `hello-ok.features.methods` / `events`, çağrılabilir her yardımcı rota için üretilmiş bir döküm değil,
-  temkinli bir keşif listesidir.
+- Gateway, `hello-ok` anlık görüntüsünü döndürür (`presence`, `health`, `stateVersion`, `uptimeMs`, limits/policy).
+- `hello-ok.features.methods` / `events`, çağrılabilir her yardımcı rota için
+  üretilmiş bir döküm değil, tutucu bir keşif listesidir.
 - İstekler: `req(method, params)` → `res(ok/payload|error)`.
 - Yaygın olaylar arasında `connect.challenge`, `agent`, `chat`,
   `session.message`, `session.tool`, `sessions.changed`, `presence`, `tick`,
   `health`, `heartbeat`, eşleştirme/onay yaşam döngüsü olayları ve `shutdown` bulunur.
 
-Aracı çalıştırmaları iki aşamalıdır:
+Agent çalıştırmaları iki aşamalıdır:
 
 1. Anında kabul onayı (`status:"accepted"`)
-2. Arada akış hâlindeki `agent` olaylarıyla son tamamlama yanıtı (`status:"ok"|"error"`).
+2. Arada akış hâlinde `agent` olaylarıyla son tamamlama yanıtı (`status:"ok"|"error"`).
 
-Tam protokol belgeleri: [Gateway Protocol](/tr/gateway/protocol).
+Tam protokol belgeleri için bkz.: [Gateway Protocol](/tr/gateway/protocol).
 
 ## Operasyonel kontroller
 
-### Liveness
+### Canlılık
 
 - WS açın ve `connect` gönderin.
-- Snapshot içeren `hello-ok` yanıtını bekleyin.
+- Anlık görüntüyle `hello-ok` yanıtı bekleyin.
 
-### Readiness
+### Hazırlık
 
 ```bash
 openclaw gateway status
@@ -341,34 +341,34 @@ openclaw channels status --probe
 openclaw health
 ```
 
-### Gap recovery
+### Boşluk kurtarma
 
-Olaylar yeniden oynatılmaz. Sıra boşluklarında, devam etmeden önce durumu yenileyin (`health`, `system-presence`).
+Olaylar yeniden oynatılmaz. Sıra boşluklarında devam etmeden önce durumu yenileyin (`health`, `system-presence`).
 
 ## Yaygın hata imzaları
 
 | İmza                                                           | Olası sorun                                                                     |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `refusing to bind gateway ... without auth`                    | Geçerli bir gateway auth yolu olmadan loopback olmayan bind                     |
-| `another gateway instance is already listening` / `EADDRINUSE` | Port çakışması                                                                  |
-| `Gateway start blocked: set gateway.mode=local`                | Config uzak moda ayarlı veya hasarlı bir config içinde local-mode damgası eksik |
-| `unauthorized` during connect                                  | İstemci ile gateway arasında auth uyumsuzluğu                                   |
+| `refusing to bind gateway ... without auth`                    | Geçerli bir gateway kimlik doğrulama yolu olmadan loopback dışı bağlama         |
+| `another gateway instance is already listening` / `EADDRINUSE` | Bağlantı noktası çakışması                                                       |
+| `Gateway start blocked: set gateway.mode=local`                | Yapılandırma uzak moda ayarlı veya hasarlı bir yapılandırmada local-mode damgası eksik |
+| `unauthorized` during connect                                  | İstemci ile gateway arasında kimlik doğrulama uyuşmazlığı                       |
 
-Tam tanılama sıraları için [Gateway Troubleshooting](/tr/gateway/troubleshooting) kullanın.
+Tam tanılama sıraları için [Gateway Troubleshooting](/tr/gateway/troubleshooting) bölümünü kullanın.
 
 ## Güvenlik garantileri
 
-- Gateway protokol istemcileri, Gateway kullanılamadığında hızlı başarısız olur (örtük doğrudan kanal yedeğine düşme yok).
+- Gateway protokol istemcileri, Gateway kullanılamadığında hızlıca başarısız olur (örtük doğrudan kanal geri dönüşü yoktur).
 - Geçersiz/`connect` olmayan ilk çerçeveler reddedilir ve bağlantı kapatılır.
-- Zarif kapatma, soket kapanmadan önce `shutdown` olayı gönderir.
+- Zarif kapatma, soket kapanmadan önce `shutdown` olayı yayınlar.
 
 ---
 
 İlgili:
 
-- [Sorun Giderme](/tr/gateway/troubleshooting)
+- [Sorun giderme](/tr/gateway/troubleshooting)
 - [Arka Plan Süreci](/tr/gateway/background-process)
 - [Yapılandırma](/tr/gateway/configuration)
-- [Health](/tr/gateway/health)
+- [Sağlık](/tr/gateway/health)
 - [Doctor](/tr/gateway/doctor)
 - [Kimlik Doğrulama](/tr/gateway/authentication)
