@@ -1,23 +1,23 @@
 ---
 read_when:
-    - Додавання або зміна конфігурації Skills
+    - Додавання або змінення конфігурації Skills
     - Налаштування вбудованого allowlist або поведінки встановлення
 summary: Схема конфігурації Skills і приклади
 title: Конфігурація Skills
 x-i18n:
-    generated_at: "2026-04-05T18:20:52Z"
+    generated_at: "2026-04-20T18:30:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7839f39f68c1442dcf4740b09886e0ef55762ce0d4b9f7b4f493a8c130c84579
+    source_hash: 8af3a51af5d6d6af355c529bb8ec0a045046c635d8fff0dec20cd875ec12e88b
     source_path: tools/skills-config.md
     workflow: 15
 ---
 
 # Конфігурація Skills
 
-Більшість конфігурації завантаження/встановлення Skills розташована в `skills` у
-`~/.openclaw/openclaw.json`. Видимість Skills для окремих агентів розташована в
-`agents.defaults.skills` і `agents.list[].skills`.
+Більшість конфігурації завантаження/встановлення Skills розміщується в `skills` у
+`~/.openclaw/openclaw.json`. Видимість Skills для конкретного агента розміщується в
+`agents.defaults.skills` та `agents.list[].skills`.
 
 ```json5
 {
@@ -30,12 +30,12 @@ x-i18n:
     },
     install: {
       preferBrew: true,
-      nodeManager: "npm", // npm | pnpm | yarn | bun (середовище виконання Gateway все одно Node; bun не рекомендовано)
+      nodeManager: "npm", // npm | pnpm | yarn | bun (середовище виконання Gateway усе ще Node; bun не рекомендовано)
     },
     entries: {
       "image-lab": {
         enabled: true,
-        apiKey: { source: "env", provider: "default", id: "GEMINI_API_KEY" }, // або рядок plaintext
+        apiKey: { source: "env", provider: "default", id: "GEMINI_API_KEY" }, // або plaintext string
         env: {
           GEMINI_API_KEY: "GEMINI_KEY_HERE",
         },
@@ -48,7 +48,7 @@ x-i18n:
 ```
 
 Для вбудованої генерації/редагування зображень віддавайте перевагу `agents.defaults.imageGenerationModel`
-разом із core-інструментом `image_generate`. `skills.entries.*` потрібен лише для користувацьких або
+разом із core-інструментом `image_generate`. `skills.entries.*` призначено лише для custom або
 сторонніх робочих процесів Skills.
 
 Якщо ви вибираєте конкретного провайдера/модель зображень, також налаштуйте
@@ -72,8 +72,8 @@ x-i18n:
       skills: ["github", "weather"],
     },
     list: [
-      { id: "writer" }, // успадковує значення за замовчуванням -> github, weather
-      { id: "docs", skills: ["docs-search"] }, // замінює значення за замовчуванням
+      { id: "writer" }, // успадковує defaults -> github, weather
+      { id: "docs", skills: ["docs-search"] }, // замінює defaults
       { id: "locked-down", skills: [] }, // без Skills
     ],
   },
@@ -82,59 +82,59 @@ x-i18n:
 
 Правила:
 
-- `agents.defaults.skills`: спільний базовий allowlist для агентів, у яких пропущено
+- `agents.defaults.skills`: спільний базовий allowlist для агентів, які не вказують
   `agents.list[].skills`.
-- Пропустіть `agents.defaults.skills`, щоб за замовчуванням не обмежувати Skills.
-- `agents.list[].skills`: явний фінальний набір Skills для цього агента; він не
-  зливається зі значеннями за замовчуванням.
+- Не вказуйте `agents.defaults.skills`, щоб за замовчуванням не обмежувати Skills.
+- `agents.list[].skills`: явний кінцевий набір Skills для цього агента; він не
+  об’єднується зі значеннями за замовчуванням.
 - `agents.list[].skills: []`: не надавати жодних Skills для цього агента.
 
 ## Поля
 
-- Вбудовані корені Skills завжди включають `~/.openclaw/skills`, `~/.agents/skills`,
+- Вбудовані кореневі каталоги Skills завжди включають `~/.openclaw/skills`, `~/.agents/skills`,
   `<workspace>/.agents/skills` і `<workspace>/skills`.
-- `allowBundled`: необов’язковий allowlist лише для **вбудованих** Skills. Якщо встановлено, лише
-  вбудовані Skills зі списку будуть доступні (керовані, агентські та Skills робочого простору не зачіпаються).
+- `allowBundled`: необов’язковий allowlist лише для **вбудованих** Skills. Якщо задано, лише
+  вбудовані Skills зі списку можуть використовуватися (керовані Skills, Skills агента та робочого простору не зачіпаються).
 - `load.extraDirs`: додаткові каталоги Skills для сканування (найнижчий пріоритет).
-- `load.watch`: стежити за папками Skills і оновлювати знімок Skills (за замовчуванням: true).
-- `load.watchDebounceMs`: debounce для подій спостерігача Skills у мілісекундах (за замовчуванням: 250).
-- `install.preferBrew`: віддавати перевагу інсталяторам brew, коли вони доступні (за замовчуванням: true).
-- `install.nodeManager`: бажаний інсталятор node (`npm` | `pnpm` | `yarn` | `bun`, за замовчуванням: npm).
-  Це впливає лише на **встановлення Skills**; середовище виконання Gateway все одно має бути Node
-  (Bun не рекомендовано для WhatsApp/Telegram).
-  - `openclaw setup --node-manager` є вужчим параметром і наразі приймає лише `npm`,
+- `load.watch`: стежити за папками Skills і оновлювати знімок Skills (типово: true).
+- `load.watchDebounceMs`: debounce для подій watcher-а Skills у мілісекундах (типово: 250).
+- `install.preferBrew`: віддавати перевагу інсталяторам brew, якщо вони доступні (типово: true).
+- `install.nodeManager`: бажаний інсталятор Node (`npm` | `pnpm` | `yarn` | `bun`, типово: npm).
+  Це впливає лише на **встановлення Skills**; середовище виконання Gateway усе ще має бути Node
+  (`bun` не рекомендовано для WhatsApp/Telegram).
+  - `openclaw setup --node-manager` є вужчим параметром і наразі приймає `npm`,
     `pnpm` або `bun`. Установіть `skills.install.nodeManager: "yarn"` вручну, якщо
     хочете встановлення Skills через Yarn.
-- `entries.<skillKey>`: перевизначення для окремого skill.
+- `entries.<skillKey>`: перевизначення для окремого Skill.
 - `agents.defaults.skills`: необов’язковий allowlist Skills за замовчуванням, який успадковують агенти,
-  у яких пропущено `agents.list[].skills`.
-- `agents.list[].skills`: необов’язковий фінальний allowlist Skills для окремого агента; явні
-  списки замінюють успадковані значення за замовчуванням, а не зливаються з ними.
+  що не вказують `agents.list[].skills`.
+- `agents.list[].skills`: необов’язковий кінцевий allowlist Skills для окремого агента; явні
+  списки замінюють успадковані значення за замовчуванням, а не об’єднуються з ними.
 
-Поля для окремого skill:
+Поля для окремого Skill:
 
-- `enabled`: установіть `false`, щоб вимкнути skill, навіть якщо він вбудований/встановлений.
-- `env`: змінні середовища, які додаються до запуску агента (лише якщо вони ще не встановлені).
-- `apiKey`: необов’язковий зручний параметр для Skills, які оголошують основну env-змінну.
-  Підтримує рядок plaintext або об’єкт SecretRef (`{ source, provider, id }`).
+- `enabled`: установіть `false`, щоб вимкнути Skill, навіть якщо він вбудований/встановлений.
+- `env`: змінні середовища, які додаються під час запуску агента (лише якщо вони ще не встановлені).
+- `apiKey`: необов’язкова зручна опція для Skills, які оголошують основну env-змінну.
+  Підтримує plaintext string або об’єкт SecretRef (`{ source, provider, id }`).
 
 ## Примітки
 
-- Ключі в `entries` за замовчуванням відповідають імені skill. Якщо skill визначає
+- Ключі в `entries` за замовчуванням відповідають імені Skill. Якщо Skill визначає
   `metadata.openclaw.skillKey`, використовуйте натомість цей ключ.
 - Пріоритет завантаження: `<workspace>/skills` → `<workspace>/.agents/skills` →
   `~/.agents/skills` → `~/.openclaw/skills` → вбудовані Skills →
   `skills.load.extraDirs`.
-- Зміни до Skills підхоплюються на наступному ході агента, коли watcher увімкнено.
+- Зміни в Skills застосовуються на наступному ході агента, коли watcher увімкнено.
 
-### Ізольовані Skills + env-змінні
+### Sandbox-овані Skills + env-змінні
 
-Коли сесія **ізольована**, процеси Skills працюють усередині Docker. Ізольоване середовище
-**не** успадковує хостовий `process.env`.
+Коли сесію **sandbox-овано**, процеси Skills працюють усередині налаштованого
+sandbox-бекенда. Sandbox **не** успадковує хостовий `process.env`.
 
-Використовуйте одне з такого:
+Використовуйте один із варіантів:
 
-- `agents.defaults.sandbox.docker.env` (або `agents.list[].sandbox.docker.env` для окремого агента)
-- додайте env у власний образ sandbox
+- `agents.defaults.sandbox.docker.env` для Docker-бекенда (або `agents.list[].sandbox.docker.env` для окремого агента)
+- вбудуйте env у власний образ sandbox або у віддалене sandbox-середовище
 
 Глобальні `env` і `skills.entries.<skill>.env/apiKey` застосовуються **лише** до запусків на хості.
