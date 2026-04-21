@@ -1,77 +1,81 @@
 ---
 read_when:
-    - عند تشغيل الاختبارات أو إصلاحها
-summary: كيفية تشغيل الاختبارات محليًا (vitest) ومتى تستخدم أوضاع force/coverage
+    - تشغيل الاختبارات أو إصلاحها
+summary: كيفية تشغيل الاختبارات محليًا (vitest) ومتى تستخدم وضعي force وcoverage
 title: الاختبارات
 x-i18n:
-    generated_at: "2026-04-08T02:19:21Z"
+    generated_at: "2026-04-21T07:26:48Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f7c19390f7577b3a29796c67514c96fe4c86c9fa0c7686cd4e377c6e31dcd085
+    source_hash: 04bdcbc3a1121f4c460cd9060f581a49dfc6fa65c4b9ddb9c87db81c4a535166
     source_path: reference/test.md
     workflow: 15
 ---
 
 # الاختبارات
 
-- عدة الاختبار الكاملة (الأجنحة، وlive، وDocker): [الاختبار](/ar/help/testing)
+- مجموعة الاختبارات الكاملة (الأجنحة، والاختبارات الحية، وDocker): [الاختبار](/ar/help/testing)
 
-- `pnpm test:force`: يقتل أي عملية gateway متبقية تحتجز منفذ التحكم الافتراضي، ثم يشغّل جناح Vitest الكامل بمنفذ gateway معزول حتى لا تتعارض اختبارات الخادم مع مثيل قيد التشغيل. استخدم هذا عندما يترك تشغيل gateway سابق المنفذ 18789 مشغولًا.
-- `pnpm test:coverage`: يشغّل جناح unit مع تغطية V8 ‏(عبر `vitest.unit.config.ts`). الحدود العامة هي 70% للأسطر/الفروع/الدوال/التعليمات. تستثني التغطية نقاط الدخول الثقيلة على مستوى integration ‏(توصيلات CLI، وجسور gateway/telegram، وخادم webchat الثابت) للإبقاء على الهدف مركزًا على المنطق القابل للاختبار بوحدة.
-- `pnpm test:coverage:changed`: يشغّل تغطية unit فقط للملفات المتغيرة منذ `origin/main`.
-- `pnpm test:changed`: يوسّع مسارات git المتغيرة إلى مسارات Vitest محددة عندما يمس الفرق فقط ملفات المصدر/الاختبار القابلة للتوجيه. أما تغييرات config/setup فتعود إلى تشغيل root projects الأصلي بحيث تعيد تعديلات التوصيل التشغيل على نطاق واسع عند الحاجة.
-- `pnpm test`: يوجّه أهداف الملفات/الأدلة الصريحة عبر مسارات Vitest محددة. أما التشغيلات غير المستهدفة فتنفذ الآن إحدى عشرة إعدادات shard متتابعة (`vitest.full-core-unit-src.config.ts` و`vitest.full-core-unit-security.config.ts` و`vitest.full-core-unit-ui.config.ts` و`vitest.full-core-unit-support.config.ts` و`vitest.full-core-support-boundary.config.ts` و`vitest.full-core-contracts.config.ts` و`vitest.full-core-bundled.config.ts` و`vitest.full-core-runtime.config.ts` و`vitest.full-agentic.config.ts` و`vitest.full-auto-reply.config.ts` و`vitest.full-extensions.config.ts`) بدلًا من عملية root-project ضخمة واحدة.
-- تُوجَّه الآن ملفات الاختبار المحددة في `plugin-sdk` و`commands` عبر مسارات خفيفة مخصصة تُبقي فقط `test/setup.ts`، بينما تبقى الحالات الثقيلة على مستوى runtime في مساراتها الحالية.
-- كما تربط ملفات المصدر المساعدة المحددة في `plugin-sdk` و`commands` بين `pnpm test:changed` واختبارات شقيقة صريحة في تلك المسارات الخفيفة، بحيث تتجنب تعديلات المساعدات الصغيرة إعادة تشغيل الأجنحة الثقيلة المدعومة بـ runtime.
-- ينقسم `auto-reply` الآن أيضًا إلى ثلاثة إعدادات مخصصة (`core` و`top-level` و`reply`) حتى لا تهيمن حاضنة reply على اختبارات الحالة/الرمز/المساعدات الأخف في المستوى الأعلى.
-- أصبح إعداد Vitest الأساسي يستخدم افتراضيًا `pool: "threads"` و`isolate: false`، مع تفعيل المشغّل المشترك غير المعزول عبر إعدادات المستودع.
-- `pnpm test:channels` يشغّل `vitest.channels.config.ts`.
-- `pnpm test:extensions` يشغّل `vitest.extensions.config.ts`.
-- `pnpm test:extensions`: يشغّل أجنحة extension/plugin.
-- `pnpm test:perf:imports`: يفعّل تقارير مدة الاستيراد + تفصيل الاستيراد في Vitest، مع الاستمرار في استخدام توجيه المسارات المحددة لأهداف الملفات/الأدلة الصريحة.
-- `pnpm test:perf:imports:changed`: profiling الاستيراد نفسه، ولكن فقط للملفات المتغيرة منذ `origin/main`.
-- `pnpm test:perf:changed:bench -- --ref <git-ref>` يقيس مسار الوضع المتغير الموجّه مقابل تشغيل root-project الأصلي للفرق نفسه في git بعد الالتزام.
-- `pnpm test:perf:changed:bench -- --worktree` يقيس مجموعة تغييرات worktree الحالية من دون الالتزام أولًا.
-- `pnpm test:perf:profile:main`: يكتب ملف CPU profile لخيط Vitest الرئيسي (`.artifacts/vitest-main-profile`).
-- `pnpm test:perf:profile:runner`: يكتب ملفات CPU + heap profiles لمشغّل unit ‏(`.artifacts/vitest-runner-profile`).
-- Gateway integration: تفعيل اختياري عبر `OPENCLAW_TEST_INCLUDE_GATEWAY=1 pnpm test` أو `pnpm test:gateway`.
-- `pnpm test:e2e`: يشغّل اختبارات الفحص الأساسية end-to-end لـ gateway ‏(تعدد المثيلات، وWS/HTTP، واقتران العقد). يستخدم افتراضيًا `threads` + `isolate: false` مع عمال تكيفيين في `vitest.e2e.config.ts`؛ اضبطه عبر `OPENCLAW_E2E_WORKERS=<n>` واضبط `OPENCLAW_E2E_VERBOSE=1` للحصول على سجلات تفصيلية.
-- `pnpm test:live`: يشغّل اختبارات الموفّرين الحية (`minimax`/`zai`). يتطلب مفاتيح API و`LIVE=1` ‏(أو `*_LIVE_TEST=1` الخاص بكل موفّر) لإلغاء التخطي.
-- `pnpm test:docker:openwebui`: يبدأ OpenClaw + Open WebUI داخل Docker، ويسجل الدخول عبر Open WebUI، ويفحص `/api/models`، ثم يشغّل دردشة حقيقية عبر proxy من خلال `/api/chat/completions`. ويتطلب مفتاح نموذج حي صالحًا (مثل OpenAI في `~/.profile`)، ويجلب صورة Open WebUI خارجية، ولا يُتوقع أن يكون مستقرًا في CI مثل أجنحة unit/e2e العادية.
-- `pnpm test:docker:mcp-channels`: يبدأ حاوية Gateway مهيأة مسبقًا وحاوية عميل ثانية تشغّل `openclaw mcp serve`، ثم يتحقق من اكتشاف المحادثات الموجّهة، وقراءة transcript، وmetadata الخاصة بالمرفقات، وسلوك قائمة الأحداث الحية، وتوجيه الإرسال الصادر، وإشعارات القنوات + الأذونات بأسلوب Claude عبر جسر stdio الحقيقي. ويقرأ تحقق إشعارات Claude إطارات stdio MCP الخام مباشرة بحيث يعكس الفحص ما يصدره الجسر فعليًا.
+- `pnpm test:force`: يوقف أي عملية gateway عالقة تحتفظ بمنفذ التحكم الافتراضي، ثم يشغّل مجموعة Vitest الكاملة مع منفذ Gateway معزول حتى لا تتصادم اختبارات الخادم مع نسخة قيد التشغيل. استخدم هذا عندما يترك تشغيل سابق لـ Gateway المنفذ 18789 مشغولًا.
+- `pnpm test:coverage`: يشغّل مجموعة الوحدات مع تغطية V8 (عبر `vitest.unit.config.ts`). وهذه بوابة تغطية لوحدات الملفات المحمّلة، وليست تغطية لجميع ملفات المستودع. والحدود الدنيا هي 70% للأسطر/الدوال/التعليمات و55% للفروع. ولأن `coverage.all` يساوي false، فإن البوابة تقيس الملفات التي تحمّلها مجموعة تغطية الوحدات بدلًا من اعتبار كل ملفات المصدر في المسارات المقسّمة غير مغطاة.
+- `pnpm test:coverage:changed`: يشغّل تغطية الوحدات فقط للملفات التي تغيّرت منذ `origin/main`.
+- `pnpm test:changed`: يوسّع مسارات git المتغيرة إلى مسارات Vitest محددة النطاق عندما يلمس الفرق فقط ملفات مصدر/اختبار قابلة للتوجيه. أما تغييرات الإعداد/التهيئة فترجع إلى تشغيل مشاريع الجذر الأصلي حتى تؤدي تعديلات الربط إلى إعادة تشغيل واسعة عند الحاجة.
+- `pnpm changed:lanes`: يعرض المسارات المعمارية التي يطلقها الفرق مقارنةً بـ `origin/main`.
+- `pnpm check:changed`: يشغّل بوابة التغييرات الذكية للفرق مقارنةً بـ `origin/main`. فهو يشغّل عمل النواة مع مسارات اختبارات النواة، وعمل extensions مع مسارات اختبارات extension، والعمل الخاص بالاختبارات فقط مع فحص أنواع الاختبار/الاختبارات فقط، ويوسّع تغييرات Plugin SDK العامة أو عقود Plugins إلى التحقق من extensions.
+- `pnpm test`: يوجّه أهداف الملفات/المجلدات الصريحة عبر مسارات Vitest محددة النطاق. أما التشغيلات غير المستهدفة فتستخدم مجموعات شظايا ثابتة وتتوسع إلى إعدادات فرعية للتنفيذ المحلي المتوازي؛ كما أن مجموعة extension تتوسع دائمًا إلى إعدادات الشظايا لكل extension بدلًا من عملية واحدة ضخمة لمشاريع الجذر.
+- تحدّث التشغيلات الكاملة وتشغيلات شظايا extension بيانات التوقيت المحلية في `.artifacts/vitest-shard-timings.json`؛ وتستخدم التشغيلات اللاحقة هذه التوقيتات لموازنة الشظايا البطيئة والسريعة. اضبط `OPENCLAW_TEST_PROJECTS_TIMINGS=0` لتجاهل أثر التوقيت المحلي.
+- أصبحت ملفات اختبار `plugin-sdk` و`commands` المحددة تُوجَّه الآن عبر مسارات خفيفة مخصصة تحتفظ فقط بـ `test/setup.ts`، وتترك الحالات الثقيلة وقت التشغيل في مساراتها الحالية.
+- كما أن ملفات المصدر المساعدة المحددة في `plugin-sdk` و`commands` تربط `pnpm test:changed` باختبارات شقيقة صريحة في تلك المسارات الخفيفة، بحيث تتجنب التعديلات الصغيرة على المساعدات إعادة تشغيل المجموعات الثقيلة المدعومة بوقت التشغيل.
+- ينقسم `auto-reply` الآن أيضًا إلى ثلاثة إعدادات مخصصة (`core`، و`top-level`، و`reply`) حتى لا يهيمن إطار الرد على اختبارات الحالة/الرمز/المساعدات الأخف في المستوى الأعلى.
+- يستخدم إعداد Vitest الأساسي الآن افتراضيًا `pool: "threads"` و`isolate: false`، مع تمكين المشغّل المشترك غير المعزول عبر إعدادات المستودع.
+- يشغّل `pnpm test:channels` الملف `vitest.channels.config.ts`.
+- يشغّل `pnpm test:extensions` و`pnpm test extensions` جميع شظايا extension/Plugin. وتعمل extensions القنوات الثقيلة وOpenAI كشظايا مخصصة؛ بينما تبقى مجموعات extension الأخرى مجمعة. استخدم `pnpm test extensions/<id>` لمسار Plugin مضمّن واحد.
+- `pnpm test:perf:imports`: يفعّل تقارير مدة الاستيراد + تفصيلات الاستيراد في Vitest، مع الاستمرار في استخدام توجيه المسارات المحددة النطاق لأهداف الملفات/المجلدات الصريحة.
+- `pnpm test:perf:imports:changed`: نفس توصيف الاستيراد، لكن فقط للملفات التي تغيّرت منذ `origin/main`.
+- `pnpm test:perf:changed:bench -- --ref <git-ref>` يقيس أداء مسار وضع التغييرات الموجّه مقارنةً بتشغيل مشاريع الجذر الأصلي لنفس فرق git الملتزم.
+- `pnpm test:perf:changed:bench -- --worktree` يقيس مجموعة تغييرات مساحة العمل الحالية من دون الالتزام أولًا.
+- `pnpm test:perf:profile:main`: يكتب ملف تعريف CPU للخيط الرئيسي في Vitest (`.artifacts/vitest-main-profile`).
+- `pnpm test:perf:profile:runner`: يكتب ملفات تعريف CPU + heap لمشغّل الوحدات (`.artifacts/vitest-runner-profile`).
+- تكامل Gateway: الاشتراك اختياري عبر `OPENCLAW_TEST_INCLUDE_GATEWAY=1 pnpm test` أو `pnpm test:gateway`.
+- `pnpm test:e2e`: يشغّل اختبارات smoke الطرفية لـ gateway (إقران WS/HTTP/Node متعدد المثيلات). يستخدم افتراضيًا `threads` + `isolate: false` مع عمّال تكيفيين في `vitest.e2e.config.ts`؛ ويمكنك الضبط عبر `OPENCLAW_E2E_WORKERS=<n>` وتعيين `OPENCLAW_E2E_VERBOSE=1` لسجلات مطولة.
+- `pnpm test:live`: يشغّل اختبارات الموفّرين الحية (minimax/zai). ويتطلب مفاتيح API و`LIVE=1` (أو `*_LIVE_TEST=1` الخاص بالموفّر) لإلغاء التخطي.
+- `pnpm test:docker:openwebui`: يبدأ OpenClaw + Open WebUI داخل Docker، ويسجّل الدخول عبر Open WebUI، ويتحقق من `/api/models`، ثم يشغّل دردشة حقيقية عبر الوكيل من خلال `/api/chat/completions`. ويتطلب مفتاح نموذج حي صالحًا (مثل OpenAI في `~/.profile`)، ويسحب صورة Open WebUI خارجية، وليس من المتوقع أن يكون ثابتًا في CI مثل مجموعات الوحدات/e2e العادية.
+- `pnpm test:docker:mcp-channels`: يبدأ حاوية Gateway مهيأة مسبقًا وحاوية عميل ثانية تشغّل `openclaw mcp serve`، ثم يتحقق من اكتشاف المحادثة الموجّهة، وقراءات النصوص، وبيانات المرفقات الوصفية، وسلوك طابور الأحداث الحية، وتوجيه الإرسال الصادر، وإشعارات القنوات + الأذونات على نمط Claude عبر جسر stdio الحقيقي. وتقرأ مطالبة إشعار Claude إطارات MCP الخام لـ stdio مباشرة حتى يعكس اختبار smoke ما يصدره الجسر فعليًا.
 
 ## بوابة PR المحلية
 
-لإجراء فحوصات بوابة/الهبوط الخاصة بـ PR محليًا، شغّل:
+لإجراء فحوصات بوابة/إدراج PR محليًا، شغّل:
 
+- `pnpm check:changed`
 - `pnpm check`
+- `pnpm check:test-types`
 - `pnpm build`
 - `pnpm test`
 - `pnpm check:docs`
 
-إذا تعطل `pnpm test` بشكل متقطع على مضيف محمّل، فأعد تشغيله مرة واحدة قبل اعتباره تراجعًا، ثم اعزله باستخدام `pnpm test <path/to/test>`. وبالنسبة للمضيفين ذوي الذاكرة المحدودة، استخدم:
+إذا كان `pnpm test` غير مستقر على مضيف مثقل، فأعد تشغيله مرة واحدة قبل اعتباره تراجعًا، ثم اعزل المشكلة باستخدام `pnpm test <path/to/test>`. أما بالنسبة إلى المضيفات المقيّدة بالذاكرة، فاستخدم:
 
 - `OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test`
 - `OPENCLAW_VITEST_FS_MODULE_CACHE_PATH=/tmp/openclaw-vitest-cache pnpm test:changed`
 
-## قياس زمن استجابة النموذج (مفاتيح محلية)
+## قياس زمن تأخر النموذج (مفاتيح محلية)
 
-السكربت: [`scripts/bench-model.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-model.ts)
+البرنامج النصي: [`scripts/bench-model.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-model.ts)
 
 الاستخدام:
 
 - `source ~/.profile && pnpm tsx scripts/bench-model.ts --runs 10`
-- متغيرات بيئة اختيارية: `MINIMAX_API_KEY` و`MINIMAX_BASE_URL` و`MINIMAX_MODEL` و`ANTHROPIC_API_KEY`
-- المطالبة الافتراضية: “Reply with a single word: ok. No punctuation or extra text.”
+- متغيرات البيئة الاختيارية: `MINIMAX_API_KEY`، و`MINIMAX_BASE_URL`، و`MINIMAX_MODEL`، و`ANTHROPIC_API_KEY`
+- الموجّه الافتراضي: “Reply with a single word: ok. No punctuation or extra text.”
 
 آخر تشغيل (2025-12-31، 20 تشغيلًا):
 
-- median لـ minimax هو 1279ms ‏(الحد الأدنى 1114، والحد الأقصى 2431)
-- median لـ opus هو 2454ms ‏(الحد الأدنى 1224، والحد الأقصى 3170)
+- minimax median 1279ms (min 1114, max 2431)
+- opus median 2454ms (min 1224, max 3170)
 
 ## قياس بدء تشغيل CLI
 
-السكربت: [`scripts/bench-cli-startup.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-cli-startup.ts)
+البرنامج النصي: [`scripts/bench-cli-startup.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-cli-startup.ts)
 
 الاستخدام:
 
@@ -90,41 +94,41 @@ x-i18n:
 - `pnpm tsx scripts/bench-cli-startup.ts --preset real --cpu-prof-dir .artifacts/cli-cpu`
 - `pnpm tsx scripts/bench-cli-startup.ts --json`
 
-المجموعات المسبقة:
+الإعدادات المسبقة:
 
-- `startup`: ‏`--version` و`--help` و`health` و`health --json` و`status --json` و`status`
-- `real`: ‏`health` و`status` و`status --json` و`sessions` و`sessions --json` و`agents list --json` و`gateway status` و`gateway status --json` و`gateway health --json` و`config get gateway.port`
-- `all`: كلتا المجموعتين المسبقتين
+- `startup`: ‏`--version`، و`--help`، و`health`، و`health --json`، و`status --json`، و`status`
+- `real`: ‏`health`، و`status`، و`status --json`، و`sessions`، و`sessions --json`، و`agents list --json`، و`gateway status`، و`gateway status --json`، و`gateway health --json`، و`config get gateway.port`
+- `all`: كلا الإعدادين المسبقين
 
-يتضمن الإخراج `sampleCount`، وavg، وp50، وp95، وmin/max، وتوزيع exit-code/signal، وملخصات max RSS لكل أمر. وتكتب الخيارات `--cpu-prof-dir` / `--heap-prof-dir` ملفات V8 profile لكل تشغيل بحيث يستخدم الالتقاط الزمني وprofile الحاضنة نفسها.
+يتضمن الناتج `sampleCount`، وavg، وp50، وp95، والحدين الأدنى/الأقصى، وتوزيع exit-code/signal، وملخصات max RSS لكل أمر. وتكتب الخيارات الاختيارية `--cpu-prof-dir` / `--heap-prof-dir` ملفات تعريف V8 لكل تشغيل حتى يستخدم التقاط التوقيت وملف التعريف إطار العمل نفسه.
 
-اصطلاحات الإخراج المحفوظ:
+اصطلاحات الناتج المحفوظ:
 
-- يكتب `pnpm test:startup:bench:smoke` ملف smoke المستهدف في `.artifacts/cli-startup-bench-smoke.json`
-- يكتب `pnpm test:startup:bench:save` ملف الجناح الكامل في `.artifacts/cli-startup-bench-all.json` باستخدام `runs=5` و`warmup=1`
-- يحدّث `pnpm test:startup:bench:update` baseline fixture الملتزم في `test/fixtures/cli-startup-bench.json` باستخدام `runs=5` و`warmup=1`
+- يكتب `pnpm test:startup:bench:smoke` أثر smoke المستهدف في `.artifacts/cli-startup-bench-smoke.json`
+- يكتب `pnpm test:startup:bench:save` أثر المجموعة الكاملة في `.artifacts/cli-startup-bench-all.json` باستخدام `runs=5` و`warmup=1`
+- يحدّث `pnpm test:startup:bench:update` ملف baseline الملتزم في `test/fixtures/cli-startup-bench.json` باستخدام `runs=5` و`warmup=1`
 
-الـ fixture الملتزم:
+الملف الملتزم:
 
 - `test/fixtures/cli-startup-bench.json`
 - حدّثه عبر `pnpm test:startup:bench:update`
-- قارن النتائج الحالية مع الـ fixture عبر `pnpm test:startup:bench:check`
+- قارن النتائج الحالية بالملف عبر `pnpm test:startup:bench:check`
 
 ## Onboarding E2E ‏(Docker)
 
-Docker اختياري؛ وهذا مطلوب فقط لاختبارات onboarding الأساسية المعتمدة على الحاويات.
+يُعد Docker اختياريًا؛ ولا يلزم هذا إلا لاختبارات smoke الخاصة بالتهيئة داخل الحاويات.
 
-تدفق البدء البارد الكامل داخل حاوية Linux نظيفة:
+التدفق الكامل من بداية باردة داخل حاوية Linux نظيفة:
 
 ```bash
 scripts/e2e/onboard-docker.sh
 ```
 
-يقود هذا السكربت المعالج التفاعلي عبر pseudo-tty، ويتحقق من ملفات config/workspace/session، ثم يبدأ gateway ويشغّل `openclaw health`.
+يقود هذا البرنامج النصي المعالج التفاعلي عبر pseudo-tty، ويتحقق من ملفات الإعداد/مساحة العمل/الجلسة، ثم يبدأ gateway ويشغّل `openclaw health`.
 
-## فحص QR import الأساسي (Docker)
+## Smoke لاستيراد QR ‏(Docker)
 
-يضمن تحميل `qrcode-terminal` تحت بيئات Node المدعومة في Docker ‏(Node 24 افتراضي، وNode 22 متوافق):
+يضمن تحميل `qrcode-terminal` تحت بيئات Node المدعومة في Docker (Node 24 افتراضيًا، وNode 22 متوافقًا):
 
 ```bash
 pnpm test:docker:qr

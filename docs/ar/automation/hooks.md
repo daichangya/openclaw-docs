@@ -1,62 +1,62 @@
 ---
 read_when:
-    - إذا كنت تريد أتمتة قائمة على الأحداث لأوامر `/new` و`/reset` و`/stop` وأحداث دورة حياة الوكيل
-    - إذا كنت تريد إنشاء الخطافات أو تثبيتها أو تصحيح أخطائها
-summary: 'الخطافات: أتمتة قائمة على الأحداث للأوامر وأحداث دورة الحياة'
+    - تريد أتمتة معتمدة على الأحداث لـ `/new` و`/reset` و`/stop` وأحداث دورة حياة الوكيل
+    - تريد إنشاء الخطافات أو تثبيتها أو تصحيحها
+summary: 'الخطافات: الأتمتة المعتمدة على الأحداث للأوامر وأحداث دورة الحياة'
 title: الخطافات
 x-i18n:
-    generated_at: "2026-04-11T02:44:26Z"
+    generated_at: "2026-04-21T07:18:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 14296398e4042d442ebdf071a07c6be99d4afda7cbf3c2b934e76dc5539742c7
+    source_hash: 5269c3ca3a45d23d79232e041c0980ecaab93fd6f0f1e39e0b2a76cb4c8b5c8b
     source_path: automation/hooks.md
     workflow: 15
 ---
 
 # الخطافات
 
-الخطافات هي نصوص برمجية صغيرة تعمل عند حدوث شيء ما داخل Gateway. يتم اكتشافها تلقائيًا من الأدلة ويمكن فحصها باستخدام `openclaw hooks`.
+الخطافات هي برامج نصية صغيرة تعمل عندما يحدث شيء ما داخل Gateway. يمكن اكتشافها من الأدلة وفحصها باستخدام `openclaw hooks`. يحمّل Gateway الخطافات الداخلية فقط بعد تفعيل الخطافات أو تهيئة إدخال خطاف واحد على الأقل، أو حزمة خطافات، أو معالج قديم، أو دليل خطافات إضافي.
 
 يوجد نوعان من الخطافات في OpenClaw:
 
 - **الخطافات الداخلية** (هذه الصفحة): تعمل داخل Gateway عند إطلاق أحداث الوكيل، مثل `/new` أو `/reset` أو `/stop` أو أحداث دورة الحياة.
-- **Webhooks**: نقاط نهاية HTTP خارجية تتيح للأنظمة الأخرى تشغيل العمل في OpenClaw. راجع [Webhooks](/ar/automation/cron-jobs#webhooks).
+- **Webhooks**: نقاط نهاية HTTP خارجية تتيح للأنظمة الأخرى تشغيل أعمال في OpenClaw. راجع [Webhooks](/ar/automation/cron-jobs#webhooks).
 
-يمكن أيضًا تضمين الخطافات داخل plugins. يعرض `openclaw hooks list` كلًا من الخطافات المستقلة والخطافات التي تديرها plugins.
+يمكن أيضًا تجميع الخطافات داخل plugins. يعرض `openclaw hooks list` كلاً من الخطافات المستقلة والخطافات التي تديرها plugins.
 
 ## البدء السريع
 
 ```bash
-# اعرض الخطافات المتاحة
+# عرض الخطافات المتاحة
 openclaw hooks list
 
-# فعّل خطافًا
+# تفعيل خطاف
 openclaw hooks enable session-memory
 
-# تحقّق من حالة الخطاف
+# التحقق من حالة الخطاف
 openclaw hooks check
 
-# احصل على معلومات مفصلة
+# الحصول على معلومات مفصلة
 openclaw hooks info session-memory
 ```
 
 ## أنواع الأحداث
 
-| الحدث                    | وقت إطلاقه                                      |
-| ------------------------ | ------------------------------------------------ |
-| `command:new`            | عند إصدار الأمر `/new`                           |
-| `command:reset`          | عند إصدار الأمر `/reset`                         |
-| `command:stop`           | عند إصدار الأمر `/stop`                          |
-| `command`                | أي حدث أمر (مستمع عام)                           |
-| `session:compact:before` | قبل أن يلخّص الضغط السجل                          |
-| `session:compact:after`  | بعد اكتمال الضغط                                 |
-| `session:patch`          | عند تعديل خصائص الجلسة                           |
-| `agent:bootstrap`        | قبل إدخال ملفات bootstrap لمساحة العمل          |
-| `gateway:startup`        | بعد بدء القنوات وتحميل الخطافات                  |
-| `message:received`       | رسالة واردة من أي قناة                           |
-| `message:transcribed`    | بعد اكتمال نسخ الصوت إلى نص                      |
-| `message:preprocessed`   | بعد اكتمال فهم جميع الوسائط والروابط             |
-| `message:sent`           | بعد تسليم الرسالة الصادرة                        |
+| الحدث                    | وقت إطلاقه                                     |
+| ------------------------ | ---------------------------------------------- |
+| `command:new`            | عند إصدار الأمر `/new`                         |
+| `command:reset`          | عند إصدار الأمر `/reset`                       |
+| `command:stop`           | عند إصدار الأمر `/stop`                        |
+| `command`                | أي حدث أمر (مستمع عام)                         |
+| `session:compact:before` | قبل أن يقوم Compaction بتلخيص السجل             |
+| `session:compact:after`  | بعد اكتمال Compaction                          |
+| `session:patch`          | عند تعديل خصائص الجلسة                         |
+| `agent:bootstrap`        | قبل حقن ملفات bootstrap الخاصة بمساحة العمل     |
+| `gateway:startup`        | بعد بدء القنوات وتحميل الخطافات                |
+| `message:received`       | رسالة واردة من أي قناة                         |
+| `message:transcribed`    | بعد اكتمال النسخ الصوتي                        |
+| `message:preprocessed`   | بعد اكتمال جميع عمليات فهم الوسائط والروابط     |
+| `message:sent`           | تم تسليم الرسالة الصادرة                       |
 
 ## كتابة الخطافات
 
@@ -82,19 +82,19 @@ metadata:
 
 # خطافي
 
-يوضع التوثيق المفصل هنا.
+يوضع هنا التوثيق المفصل.
 ```
 
 **حقول البيانات الوصفية** (`metadata.openclaw`):
 
 | الحقل      | الوصف                                                |
 | ---------- | ---------------------------------------------------- |
-| `emoji`    | الرمز التعبيري المعروض في CLI                        |
-| `events`   | مصفوفة بالأحداث المطلوب الاستماع إليها              |
+| `emoji`    | رمز تعبيري للعرض في CLI                              |
+| `events`   | مصفوفة بالأحداث المطلوب الاستماع إليها               |
 | `export`   | التصدير المسمى المطلوب استخدامه (الافتراضي `"default"`) |
-| `os`       | المنصات المطلوبة (مثل `["darwin", "linux"]`)        |
-| `requires` | مسارات `bins` أو `anyBins` أو `env` أو `config` المطلوبة |
-| `always`   | تجاوز فحوصات الأهلية (قيمة منطقية)                  |
+| `os`       | المنصات المطلوبة (مثل `["darwin", "linux"]`)         |
+| `requires` | المسارات المطلوبة لـ `bins` أو `anyBins` أو `env` أو `config` |
+| `always`   | تجاوز فحوصات الأهلية (قيمة منطقية)                   |
 | `install`  | طرق التثبيت                                          |
 
 ### تنفيذ المعالج
@@ -108,14 +108,14 @@ const handler = async (event) => {
   console.log(`[my-hook] New command triggered`);
   // منطقك هنا
 
-  // اختياريًا أرسل رسالة إلى المستخدم
+  // إرسال رسالة إلى المستخدم اختياريًا
   event.messages.push("تم تنفيذ الخطاف!");
 };
 
 export default handler;
 ```
 
-يتضمن كل حدث: `type` و`action` و`sessionKey` و`timestamp` و`messages` (أضف إليها لإرسالها إلى المستخدم) و`context` (بيانات خاصة بالحدث).
+يتضمن كل حدث: `type` و`action` و`sessionKey` و`timestamp` و`messages` (أضف إليها للإرسال إلى المستخدم) و`context` (بيانات خاصة بالحدث).
 
 ### أبرز عناصر سياق الحدث
 
@@ -131,41 +131,43 @@ export default handler;
 
 **أحداث Bootstrap** (`agent:bootstrap`): `context.bootstrapFiles` (مصفوفة قابلة للتعديل) و`context.agentId`.
 
-**أحداث تصحيح الجلسة** (`session:patch`): `context.sessionEntry` و`context.patch` (الحقول التي تغيّرت فقط) و`context.cfg`. لا يمكن إلا للعملاء ذوي الامتيازات تشغيل أحداث التصحيح.
+**أحداث تصحيح الجلسة** (`session:patch`): `context.sessionEntry` و`context.patch` (الحقول المتغيرة فقط) و`context.cfg`. لا يمكن إلا للعملاء ذوي الامتيازات تشغيل أحداث التصحيح.
 
-**أحداث الضغط**: يتضمن `session:compact:before` القيمتين `messageCount` و`tokenCount`. ويضيف `session:compact:after` القيم `compactedCount` و`summaryLength` و`tokensBefore` و`tokensAfter`.
+**أحداث Compaction**: يتضمن `session:compact:before` القيمتين `messageCount` و`tokenCount`. ويضيف `session:compact:after` القيم `compactedCount` و`summaryLength` و`tokensBefore` و`tokensAfter`.
 
 ## اكتشاف الخطافات
 
-يتم اكتشاف الخطافات من هذه الأدلة، بترتيب تصاعدي لأولوية التجاوز:
+يتم اكتشاف الخطافات من هذه الأدلة، بترتيب تصاعدي في أولوية التجاوز:
 
-1. **الخطافات المضمّنة**: تأتي مع OpenClaw
-2. **خطافات plugins**: خطافات مضمّنة داخل plugins المثبتة
-3. **الخطافات المُدارة**: `~/.openclaw/hooks/` (مثبّتة من المستخدم ومشتركة بين مساحات العمل). تشترك الأدلة الإضافية من `hooks.internal.load.extraDirs` في هذه الأولوية.
-4. **خطافات مساحة العمل**: `<workspace>/hooks/` (لكل وكيل، ومعطلة افتراضيًا حتى يتم تفعيلها صراحةً)
+1. **الخطافات المضمنة**: تأتي مع OpenClaw
+2. **خطافات Plugin**: خطافات مجمعة داخل plugins المثبتة
+3. **الخطافات المُدارة**: `~/.openclaw/hooks/` (مثبتة من المستخدم، ومشتركة بين مساحات العمل). تشترك الأدلة الإضافية من `hooks.internal.load.extraDirs` في هذه الأولوية.
+4. **خطافات مساحة العمل**: `<workspace>/hooks/` (لكل وكيل على حدة، ومعطلة افتراضيًا حتى يتم تفعيلها صراحة)
 
-يمكن لخطافات مساحة العمل إضافة أسماء خطافات جديدة، لكنها لا تستطيع تجاوز الخطافات المضمّنة أو المُدارة أو المقدمة من plugin بالاسم نفسه.
+يمكن لخطافات مساحة العمل إضافة أسماء خطافات جديدة، لكنها لا تستطيع تجاوز الخطافات المضمنة أو المُدارة أو المقدمة من plugin إذا كان لها الاسم نفسه.
 
-### حِزم الخطافات
+يتجاوز Gateway اكتشاف الخطافات الداخلية عند بدء التشغيل إلى أن يتم تهيئة الخطافات الداخلية. فعّل خطافًا مضمنًا أو مُدارًا باستخدام `openclaw hooks enable <name>`، أو ثبّت حزمة خطافات، أو اضبط `hooks.internal.enabled=true` للاشتراك. عند تفعيل خطاف واحد مسمّى، يحمّل Gateway معالج ذلك الخطاف فقط؛ أما `hooks.internal.enabled=true`، وأدلة الخطافات الإضافية، والمعالجات القديمة، فتفعّل الاكتشاف الواسع.
 
-حِزم الخطافات هي حزم npm تصدّر الخطافات عبر `openclaw.hooks` في `package.json`. ثبّتها باستخدام:
+### حزم الخطافات
+
+حزم الخطافات هي حزم npm تصدّر الخطافات عبر `openclaw.hooks` في `package.json`. ثبّتها باستخدام:
 
 ```bash
 openclaw plugins install <path-or-spec>
 ```
 
-تقتصر مواصفات npm على السجل فقط (اسم الحزمة مع إصدار دقيق اختياري أو dist-tag). ويتم رفض مواصفات Git/URL/file ونطاقات semver.
+تقتصر مواصفات npm على السجل فقط (اسم الحزمة مع إصدار محدد اختياريًا أو dist-tag). يتم رفض مواصفات Git/URL/file ونطاقات semver.
 
-## الخطافات المضمّنة
+## الخطافات المضمنة
 
-| الخطاف                | الأحداث                        | ما الذي يفعله                                          |
-| --------------------- | ------------------------------ | ------------------------------------------------------ |
-| session-memory        | `command:new`, `command:reset` | يحفظ سياق الجلسة في `<workspace>/memory/`              |
-| bootstrap-extra-files | `agent:bootstrap`              | يدرج ملفات bootstrap إضافية من أنماط glob             |
-| command-logger        | `command`                      | يسجل جميع الأوامر في `~/.openclaw/logs/commands.log`   |
-| boot-md               | `gateway:startup`              | يشغّل `BOOT.md` عند بدء gateway                        |
+| الخطاف                | الأحداث                        | ما الذي يفعله                                         |
+| --------------------- | ------------------------------ | ----------------------------------------------------- |
+| session-memory        | `command:new`, `command:reset` | يحفظ سياق الجلسة في `<workspace>/memory/`             |
+| bootstrap-extra-files | `agent:bootstrap`              | يحقن ملفات bootstrap إضافية من أنماط glob             |
+| command-logger        | `command`                      | يسجل جميع الأوامر في `~/.openclaw/logs/commands.log`  |
+| boot-md               | `gateway:startup`              | يشغّل `BOOT.md` عند بدء Gateway                       |
 
-لتفعيل أي خطاف مضمّن:
+لتفعيل أي خطاف مضمن:
 
 ```bash
 openclaw hooks enable <hook-name>
@@ -175,7 +177,7 @@ openclaw hooks enable <hook-name>
 
 ### تفاصيل session-memory
 
-يستخرج آخر 15 رسالة من المستخدم/المساعد، ويولّد اسم ملف وصفيًا عبر LLM، ثم يحفظه في `<workspace>/memory/YYYY-MM-DD-slug.md`. يتطلب إعداد `workspace.dir`.
+يستخرج آخر 15 رسالة من المستخدم/المساعد، وينشئ slug وصفيًا لاسم الملف عبر LLM، ثم يحفظه في `<workspace>/memory/YYYY-MM-DD-slug.md`. يتطلب تهيئة `workspace.dir`.
 
 <a id="bootstrap-extra-files"></a>
 
@@ -196,27 +198,27 @@ openclaw hooks enable <hook-name>
 }
 ```
 
-يتم تحليل المسارات نسبةً إلى مساحة العمل. ولا يتم تحميل إلا أسماء ملفات bootstrap الأساسية المعروفة (`AGENTS.md` و`SOUL.md` و`TOOLS.md` و`IDENTITY.md` و`USER.md` و`HEARTBEAT.md` و`BOOTSTRAP.md` و`MEMORY.md`).
+يتم حل المسارات نسبةً إلى مساحة العمل. لا يتم تحميل سوى أسماء ملفات bootstrap الأساسية المعروفة (`AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`, `BOOTSTRAP.md`, `MEMORY.md`).
 
 <a id="command-logger"></a>
 
 ### تفاصيل command-logger
 
-يسجل كل أمر slash في `~/.openclaw/logs/commands.log`.
+يسجل كل أمر مائل في `~/.openclaw/logs/commands.log`.
 
 <a id="boot-md"></a>
 
 ### تفاصيل boot-md
 
-يشغّل `BOOT.md` من مساحة العمل النشطة عند بدء gateway.
+يشغّل `BOOT.md` من مساحة العمل النشطة عند بدء Gateway.
 
-## خطافات plugins
+## خطافات Plugin
 
-يمكن لـ plugins تسجيل الخطافات عبر Plugin SDK لتحقيق تكامل أعمق: اعتراض استدعاءات الأدوات، وتعديل المطالبات، والتحكم في تدفق الرسائل، وغير ذلك. يوفّر Plugin SDK عدد 28 خطافًا تغطي تحليل النموذج، ودورة حياة الوكيل، وتدفق الرسائل، وتنفيذ الأدوات، وتنسيق الوكلاء الفرعيين، ودورة حياة gateway.
+يمكن لـ plugins تسجيل الخطافات عبر Plugin SDK لتحقيق تكامل أعمق: اعتراض استدعاءات الأدوات، وتعديل المطالبات، والتحكم في تدفق الرسائل، وغير ذلك. يوفّر Plugin SDK عدد 28 خطافًا تغطي تحليل النموذج، ودورة حياة الوكيل، وتدفق الرسائل، وتنفيذ الأدوات، وتنسيق الوكلاء الفرعيين، ودورة حياة Gateway.
 
 للاطلاع على المرجع الكامل لخطافات plugin، بما في ذلك `before_tool_call` و`before_agent_reply` و`before_install` وجميع خطافات plugin الأخرى، راجع [Plugin Architecture](/ar/plugins/architecture#provider-runtime-hooks).
 
-## الإعداد
+## التهيئة
 
 ```json
 {
@@ -264,19 +266,19 @@ openclaw hooks enable <hook-name>
 ```
 
 <Note>
-لا تزال صيغة إعداد المصفوفة القديمة `hooks.internal.handlers` مدعومة للتوافق مع الإصدارات السابقة، لكن الخطافات الجديدة يجب أن تستخدم النظام المعتمد على الاكتشاف.
+لا يزال تنسيق التهيئة القديم `hooks.internal.handlers` المدعوم بالمصفوفات مدعومًا للتوافق مع الإصدارات السابقة، لكن ينبغي للخطافات الجديدة استخدام النظام القائم على الاكتشاف.
 </Note>
 
 ## مرجع CLI
 
 ```bash
-# اعرض كل الخطافات (أضف --eligible أو --verbose أو --json)
+# عرض جميع الخطافات (أضف --eligible أو --verbose أو --json)
 openclaw hooks list
 
-# اعرض معلومات مفصلة عن خطاف
+# عرض معلومات مفصلة عن خطاف
 openclaw hooks info <hook-name>
 
-# اعرض ملخص الأهلية
+# عرض ملخص الأهلية
 openclaw hooks check
 
 # تفعيل/تعطيل
@@ -286,21 +288,21 @@ openclaw hooks disable <hook-name>
 
 ## أفضل الممارسات
 
-- **اجعل المعالجات سريعة.** تعمل الخطافات أثناء معالجة الأوامر. شغّل الأعمال الثقيلة في الخلفية بأسلوب fire-and-forget باستخدام `void processInBackground(event)`.
-- **تعامل مع الأخطاء بسلاسة.** غلّف العمليات المحفوفة بالمخاطر داخل try/catch؛ ولا ترمِ الأخطاء حتى تتمكن المعالجات الأخرى من العمل.
-- **صفِّ الأحداث مبكرًا.** أعِد فورًا إذا لم يكن نوع/إجراء الحدث ذا صلة.
-- **استخدم مفاتيح أحداث محددة.** فضّل `"events": ["command:new"]` بدلًا من `"events": ["command"]` لتقليل الحمل.
+- **أبقِ المعالجات سريعة.** تعمل الخطافات أثناء معالجة الأوامر. شغّل الأعمال الثقيلة في الخلفية بطريقة fire-and-forget باستخدام `void processInBackground(event)`.
+- **تعامل مع الأخطاء بسلاسة.** ضع العمليات المحفوفة بالمخاطر داخل try/catch؛ ولا ترمِ الأخطاء حتى تتمكن المعالجات الأخرى من العمل.
+- **رشّح الأحداث مبكرًا.** أعد مباشرة إذا لم يكن نوع/إجراء الحدث ذا صلة.
+- **استخدم مفاتيح أحداث محددة.** فضّل `"events": ["command:new"]` على `"events": ["command"]` لتقليل الحمل.
 
 ## استكشاف الأخطاء وإصلاحها
 
 ### لم يتم اكتشاف الخطاف
 
 ```bash
-# تحقّق من بنية الدليل
+# التحقق من بنية الدليل
 ls -la ~/.openclaw/hooks/my-hook/
-# يجب أن يعرض: HOOK.md, handler.ts
+# يجب أن يظهر: HOOK.md, handler.ts
 
-# اعرض كل الخطافات المكتشفة
+# عرض جميع الخطافات المكتشفة
 openclaw hooks list
 ```
 
@@ -310,17 +312,17 @@ openclaw hooks list
 openclaw hooks info my-hook
 ```
 
-تحقق من وجود ثنائيات مفقودة (PATH)، أو متغيرات بيئة، أو قيم إعداد، أو توافق نظام التشغيل.
+تحقق من وجود ملفات تنفيذية مفقودة (PATH)، أو متغيرات بيئة، أو قيم إعدادات، أو توافق نظام التشغيل.
 
 ### الخطاف لا يعمل
 
-1. تحقّق من أن الخطاف مفعّل: `openclaw hooks list`
-2. أعد تشغيل عملية gateway لكي يُعاد تحميل الخطافات.
-3. افحص سجلات gateway: `./scripts/clawlog.sh | grep hook`
+1. تحقق من أن الخطاف مفعّل: `openclaw hooks list`
+2. أعد تشغيل عملية Gateway حتى تُعاد تحميل الخطافات.
+3. تحقق من سجلات Gateway: `./scripts/clawlog.sh | grep hook`
 
 ## ذو صلة
 
 - [مرجع CLI: hooks](/cli/hooks)
 - [Webhooks](/ar/automation/cron-jobs#webhooks)
 - [Plugin Architecture](/ar/plugins/architecture#provider-runtime-hooks) — المرجع الكامل لخطافات plugin
-- [الإعداد](/ar/gateway/configuration-reference#hooks)
+- [Configuration](/ar/gateway/configuration-reference#hooks)
