@@ -1,108 +1,137 @@
 ---
 read_when:
-    - Aynı makinede birden fazla Gateway çalıştırıyorsunuz
-    - Her Gateway için yalıtılmış config/durum/portlara ihtiyacınız var
-summary: OpenClaw'da tek ana makinede birden fazla Gateway çalıştırma (yalıtım, portlar ve profiller)
+    - Aynı makinede birden fazla Gateway çalıştırma
+    - Her Gateway için yalıtılmış yapılandırma/durum/bağlantı noktaları gerekir
+summary: Tek bir ana bilgisayarda birden fazla OpenClaw Gateway çalıştırın (yalıtım, bağlantı noktaları ve profiller)
 title: Birden Fazla Gateway
 x-i18n:
-    generated_at: "2026-04-05T13:53:11Z"
+    generated_at: "2026-04-21T17:45:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 061f204bf56b28c6bd0e2c9aee6c561a8a162ca219060117fea4d3a007f01899
+    source_hash: 8c3fcb921bc6596040e9249467964bd9dcd40ea7c16e958bb378247b0f994a7b
     source_path: gateway/multiple-gateways.md
     workflow: 15
 ---
 
-# Birden Fazla Gateway (aynı ana makine)
+# Birden Fazla Gateway (aynı ana bilgisayar)
 
-Çoğu kurulum tek bir Gateway kullanmalıdır çünkü tek bir Gateway birden fazla mesajlaşma bağlantısını ve ajanı yönetebilir. Daha güçlü yalıtım veya yedeklilik gerekiyorsa (örneğin bir kurtarma botu), yalıtılmış profiller/portlarla ayrı Gateway'ler çalıştırın.
+Çoğu kurulumda tek bir Gateway kullanılmalıdır çünkü tek bir Gateway birden fazla mesajlaşma bağlantısını ve agent'ı yönetebilir. Daha güçlü yalıtım veya yedeklilik gerekiyorsa (ör. bir kurtarma botu), yalıtılmış profiller/bağlantı noktalarıyla ayrı Gateway'ler çalıştırın.
 
 ## Yalıtım kontrol listesi (zorunlu)
 
-- `OPENCLAW_CONFIG_PATH` — örnek başına config dosyası
+- `OPENCLAW_CONFIG_PATH` — örnek başına yapılandırma dosyası
 - `OPENCLAW_STATE_DIR` — örnek başına oturumlar, kimlik bilgileri, önbellekler
 - `agents.defaults.workspace` — örnek başına çalışma alanı kökü
 - `gateway.port` (veya `--port`) — örnek başına benzersiz
-- Türetilmiş portlar (browser/canvas) çakışmamalıdır
+- Türetilmiş bağlantı noktaları (browser/canvas) çakışmamalıdır
 
-Bunlar paylaşılırsa config yarışları ve port çakışmaları yaşarsınız.
+Bunlar paylaşılırsa, yapılandırma yarışları ve bağlantı noktası çakışmaları yaşarsınız.
 
-## Önerilen: profiller (`--profile`)
+## Önerilen: ana örnek için varsayılan profili, kurtarma için adlandırılmış bir profili kullanın
 
-Profiller `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` kapsamını otomatik ayarlar ve hizmet adlarına sonek ekler.
+Profiller `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` değerlerini otomatik olarak kapsamlandırır ve hizmet adlarına sonek ekler. Çoğu kurtarma botu kurulumu için, ana botu varsayılan profilde tutun ve yalnızca kurtarma botuna `rescue` gibi adlandırılmış bir profil verin.
 
 ```bash
-# ana
-openclaw --profile main setup
-openclaw --profile main gateway --port 18789
+# main (default profile)
+openclaw setup
+openclaw gateway --port 18789
 
-# kurtarma
+# rescue
 openclaw --profile rescue setup
 openclaw --profile rescue gateway --port 19001
 ```
 
-Profil başına hizmetler:
+Hizmetler:
 
 ```bash
-openclaw --profile main gateway install
+openclaw gateway install
 openclaw --profile rescue gateway install
 ```
+
+Her iki Gateway'nin de adlandırılmış profiller kullanmasını istiyorsanız bu da çalışır, ancak gerekli değildir.
 
 ## Kurtarma botu kılavuzu
 
-Aynı ana makinede ikinci bir Gateway'i şu bileşenlerin kendisine ait sürümleriyle çalıştırın:
+Önerilen kurulum:
 
-- profil/config
-- durum dizini
-- çalışma alanı
-- temel port (artı türetilmiş portlar)
+- ana botu varsayılan profilde tutun
+- kurtarma botunu `--profile rescue` ile çalıştırın
+- kurtarma hesabı için tamamen ayrı bir Telegram botu kullanın
+- kurtarma botunu `19001` gibi farklı bir temel bağlantı noktasında tutun
 
-Bu, birincil bot kapalıysa kurtarma botunun hata ayıklama yapabilmesini veya config değişiklikleri uygulayabilmesini sağlayacak şekilde onu ana bottan yalıtılmış tutar.
+Bu, ana bot çalışmıyorsa kurtarma botunun hata ayıklayabilmesi veya yapılandırma değişiklikleri uygulayabilmesi için onu ana bottan yalıtılmış tutar. Türetilmiş browser/canvas/CDP bağlantı noktalarının asla çakışmaması için temel bağlantı noktaları arasında en az 20 bağlantı noktası bırakın.
 
-Port aralığı: türetilmiş browser/canvas/CDP portlarının asla çakışmaması için temel portlar arasında en az 20 port bırakın.
+### Önerilen kurtarma kanalı/hesabı
 
-### Nasıl kurulur (kurtarma botu)
+Çoğu kurulum için, kurtarma profili adına tamamen ayrı bir Telegram botu kullanın.
+
+Telegram neden önerilir:
+
+- yalnızca operatöre açık tutulması kolaydır
+- ayrı bot token'ı ve kimliği
+- ana botun kanalı/uygulama kurulumundan bağımsızdır
+- ana bot bozulduğunda DM tabanlı basit bir kurtarma yolu sağlar
+
+Önemli olan kısım tam bağımsızlıktır: ayrı bot hesabı, ayrı kimlik bilgileri, ayrı OpenClaw profili, ayrı çalışma alanı ve ayrı bağlantı noktası.
+
+### Önerilen kurulum akışı
+
+Bunu, farklı bir şey yapmak için güçlü bir nedeniniz yoksa varsayılan kurulum olarak kullanın:
 
 ```bash
-# Ana bot (mevcut veya yeni, --profile parametresi olmadan)
-# 18789 portunda + Chrome CDC/Canvas/... portlarında çalışır
+# Main bot (default profile, port 18789)
 openclaw onboard
 openclaw gateway install
 
-# Kurtarma botu (yalıtılmış profil + portlar)
+# Rescue bot (separate Telegram bot, separate profile, port 19001)
 openclaw --profile rescue onboard
-# Notlar:
-# - çalışma alanı adı varsayılan olarak -rescue son eki alır
-# - Port en az 18789 + 20 port olmalıdır,
-#   daha iyisi 19789 gibi tamamen farklı bir temel port seçmektir,
-# - ilk kurulumun geri kalanı normal ile aynıdır
-
-# Hizmeti kurmak için (kurulum sırasında otomatik olmadıysa)
 openclaw --profile rescue gateway install
 ```
 
-## Port eşlemesi (türetilmiş)
+`openclaw --profile rescue onboard` sırasında:
 
-Temel port = `gateway.port` (veya `OPENCLAW_GATEWAY_PORT` / `--port`).
+- ayrı Telegram bot token'ını kullanın
+- `rescue` profilini koruyun
+- ana bottan en az 20 daha yüksek bir temel bağlantı noktası kullanın
+- zaten kendiniz yönetmiyorsanız varsayılan kurtarma çalışma alanını kabul edin
 
-- browser kontrol hizmeti portu = temel + 2 (yalnızca loopback)
-- canvas host, Gateway HTTP sunucusunda sunulur (`gateway.port` ile aynı port)
-- Browser profil CDP portları `browser.controlPort + 9 .. + 108` aralığından otomatik tahsis edilir
+Onboarding kurtarma hizmetini zaten sizin için kurduysa, son `gateway install` gerekli değildir.
 
-Bunlardan herhangi birini config veya env içinde geçersiz kılarsanız, örnek başına benzersiz tutmanız gerekir.
+### Onboarding neyi değiştirir
 
-## Browser/CDP notları (yaygın tuzak)
+`openclaw --profile rescue onboard` normal onboarding akışını kullanır, ancak her şeyi ayrı bir profile yazar.
+
+Pratikte bu, kurtarma botunun kendine ait şu bileşenlere sahip olduğu anlamına gelir:
+
+- yapılandırma dosyası
+- durum dizini
+- çalışma alanı (varsayılan olarak `~/.openclaw/workspace-rescue`)
+- yönetilen hizmet adı
+
+Bunun dışındaki istemler normal onboarding ile aynıdır.
+
+## Bağlantı noktası eşlemesi (türetilmiş)
+
+Temel bağlantı noktası = `gateway.port` (veya `OPENCLAW_GATEWAY_PORT` / `--port`).
+
+- browser denetim hizmeti bağlantı noktası = temel + 2 (yalnızca loopback)
+- canvas host, Gateway HTTP sunucusunda sunulur (`gateway.port` ile aynı bağlantı noktası)
+- Browser profil CDP bağlantı noktaları `browser.controlPort + 9 .. + 108` aralığından otomatik olarak ayrılır
+
+Bunlardan herhangi birini yapılandırma veya ortam değişkenlerinde geçersiz kılarsanız, örnek başına benzersiz kalmalarını sağlamalısınız.
+
+## Browser/CDP notları (yaygın hata kaynağı)
 
 - Birden fazla örnekte `browser.cdpUrl` değerini aynı değerlere **sabitlemeyin**.
-- Her örneğin kendi browser kontrol portuna ve CDP aralığına ihtiyacı vardır (gateway portundan türetilir).
-- Açık CDP portlarına ihtiyacınız varsa, örnek başına `browser.profiles.<name>.cdpPort` ayarlayın.
-- Uzak Chrome için `browser.profiles.<name>.cdpUrl` kullanın (profil başına, örnek başına).
+- Her örnek kendi browser denetim bağlantı noktasına ve CDP aralığına ihtiyaç duyar (gateway bağlantı noktasından türetilir).
+- Açık CDP bağlantı noktalarına ihtiyacınız varsa, örnek başına `browser.profiles.<name>.cdpPort` ayarlayın.
+- Uzak Chrome: `browser.profiles.<name>.cdpUrl` kullanın (profil başına, örnek başına).
 
-## Manuel env örneği
+## El ile ortam değişkeni örneği
 
 ```bash
 OPENCLAW_CONFIG_PATH=~/.openclaw/main.json \
-OPENCLAW_STATE_DIR=~/.openclaw-main \
+OPENCLAW_STATE_DIR=~/.openclaw \
 openclaw gateway --port 18789
 
 OPENCLAW_CONFIG_PATH=~/.openclaw/rescue.json \
@@ -110,13 +139,13 @@ OPENCLAW_STATE_DIR=~/.openclaw-rescue \
 openclaw gateway --port 19001
 ```
 
-## Hızlı denetimler
+## Hızlı kontroller
 
 ```bash
-openclaw --profile main gateway status --deep
+openclaw gateway status --deep
 openclaw --profile rescue gateway status --deep
 openclaw --profile rescue gateway probe
-openclaw --profile main status
+openclaw status
 openclaw --profile rescue status
 openclaw --profile rescue browser status
 ```
@@ -124,4 +153,4 @@ openclaw --profile rescue browser status
 Yorumlama:
 
 - `gateway status --deep`, eski kurulumlardan kalmış launchd/systemd/schtasks hizmetlerini yakalamaya yardımcı olur.
-- `multiple reachable gateways detected` gibi `gateway probe` uyarı metinleri yalnızca kasıtlı olarak birden fazla yalıtılmış gateway çalıştırdığınızda beklenir.
+- `gateway probe` uyarı metni; örneğin `multiple reachable gateways detected`, yalnızca kasıtlı olarak birden fazla yalıtılmış gateway çalıştırdığınızda beklenir.
