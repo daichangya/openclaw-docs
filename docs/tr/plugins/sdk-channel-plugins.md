@@ -1,110 +1,112 @@
 ---
 read_when:
     - Yeni bir mesajlaşma kanalı Plugin'i oluşturuyorsunuz
-    - OpenClaw'ı bir mesajlaşma platformuna bağlamak istiyorsunuz
+    - OpenClaw'u bir mesajlaşma platformuna bağlamak istiyorsunuz
     - ChannelPlugin bağdaştırıcı yüzeyini anlamanız gerekiyor
 sidebarTitle: Channel Plugins
-summary: OpenClaw için mesajlaşma kanalı Plugin'i oluşturma adım adım kılavuzu
-title: Kanal Plugin'leri oluşturma
+summary: OpenClaw için bir mesajlaşma kanalı Plugin'i oluşturma adım adım kılavuzu
+title: Kanal Plugin'leri Oluşturma
 x-i18n:
-    generated_at: "2026-04-21T09:02:12Z"
+    generated_at: "2026-04-21T19:20:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 569394aeefa0231ae3157a13406f91c97fe7eeff2b62df0d35a893f1ad4d5d05
+    source_hash: 35cae55c13b69f2219bd2f9bd3ee2f7d8c4075bd87f0be11c35a0fddb070fe1e
     source_path: plugins/sdk-channel-plugins.md
     workflow: 15
 ---
 
 # Kanal Plugin'leri Oluşturma
 
-Bu kılavuz, OpenClaw'ı bir
-mesajlaşma platformuna bağlayan bir kanal Plugin'i oluşturmayı adım adım anlatır. Sonunda DM güvenliği,
-eşleme, yanıt ileti dizileri ve giden mesajlaşma içeren çalışan bir kanalınız olacak.
+Bu kılavuz, OpenClaw'u bir mesajlaşma platformuna bağlayan bir kanal plugin'i oluşturma sürecini adım adım açıklar. Sonunda DM güvenliği,
+eşleştirme, yanıt iş parçacığı oluşturma ve giden mesajlaşma özelliklerine sahip çalışan bir kanalınız olacak.
 
 <Info>
-  Daha önce hiç OpenClaw Plugin'i oluşturmadıysanız, temel paket
-  yapısı ve manifest kurulumu için önce [Başlangıç](/tr/plugins/building-plugins) belgesini okuyun.
+  Daha önce hiç OpenClaw plugin'i oluşturmadıysanız, temel paket
+  yapısı ve manifest kurulumu için önce [Başlangıç](/tr/plugins/building-plugins)
+  bölümünü okuyun.
 </Info>
 
-## Kanal Plugin'leri nasıl çalışır
+## Kanal plugin'leri nasıl çalışır
 
-Kanal Plugin'lerinin kendi send/edit/react araçlarına ihtiyacı yoktur. OpenClaw,
-çekirdekte tek bir paylaşılan `message` aracı tutar. Plugin'iniz şunlara sahip olur:
+Kanal plugin'lerinin kendi send/edit/react araçlarına ihtiyacı yoktur. OpenClaw, çekirdekte tek bir paylaşılan `message` aracını tutar. Plugin'iniz şunlardan sorumludur:
 
 - **Yapılandırma** — hesap çözümleme ve kurulum sihirbazı
-- **Güvenlik** — DM ilkesi ve allowlist'ler
-- **Eşleme** — DM onay akışı
-- **Oturum dil bilgisi** — sağlayıcıya özgü konuşma kimliklerinin temel sohbetlere, ileti dizisi kimliklerine ve üst yedeklere nasıl eşlendiği
+- **Güvenlik** — DM ilkesi ve izin listeleri
+- **Eşleştirme** — DM onay akışı
+- **Oturum dil bilgisi** — sağlayıcıya özgü konuşma kimliklerinin temel sohbetlere, iş parçacığı kimliklerine ve üst geri dönüşlerine nasıl eşlendiği
 - **Giden** — platforma metin, medya ve anket gönderme
-- **İleti dizileri** — yanıtların nasıl ileti dizisine bağlandığı
+- **İş parçacığı oluşturma** — yanıtların nasıl iş parçacığına bağlandığı
 
-Çekirdek; paylaşılan mesaj aracına, prompt bağlamaya, dış oturum-anahtarı biçimine,
-genel `:thread:` muhasebesine ve sevke sahiptir.
+Çekirdek; paylaşılan message aracından, prompt bağlantılarından, dış oturum anahtarı biçiminden,
+genel `:thread:` kayıt tutmadan ve dağıtımdan sorumludur.
 
 Kanalınız medya kaynakları taşıyan message-tool parametreleri ekliyorsa, bu
-parametre adlarını `describeMessageTool(...).mediaSourceParams` üzerinden ortaya çıkarın. Çekirdek, bu açık listeyi sandbox yol normalizasyonu ve giden medya erişim
-ilkesi için kullanır; böylece Plugin'lerin sağlayıcıya özgü
-avatar, ek veya kapak görseli parametreleri için paylaşılan çekirdekte özel durumlara ihtiyacı olmaz.
-Tercihen şu biçimde eylem anahtarlı bir eşleme döndürün:
-`{ "set-profile": ["avatarUrl", "avatarPath"] }`; böylece ilgisiz eylemler başka bir eylemin
-medya bağımsız değişkenlerini devralmaz. Düz bir dizi, kasten
-ortaya çıkarılan tüm eylemler arasında paylaşılan parametreler için yine çalışır.
+parametre adlarını `describeMessageTool(...).mediaSourceParams` üzerinden açığa çıkarın. Çekirdek, sanal alan yol normalleştirmesi ve giden medya erişim ilkesi için
+bu açık listeyi kullanır; böylece plugin'lerin sağlayıcıya özgü
+avatar, ek veya kapak görseli parametreleri için paylaşılan çekirdekte özel durumlara ihtiyacı kalmaz.
+Tercihen
+`{ "set-profile": ["avatarUrl", "avatarPath"] }`
+gibi eylem anahtarlı bir eşleme döndürün; böylece alakasız eylemler başka bir eylemin medya argümanlarını devralmaz. Düz bir dizi de, kasıtlı olarak açığa çıkarılan her eylem arasında paylaşılan parametreler için hâlâ çalışır.
 
 Platformunuz konuşma kimlikleri içinde ek kapsam saklıyorsa, bu ayrıştırmayı
-Plugin içinde `messaging.resolveSessionConversation(...)` ile tutun. Bu, `rawId` değerini temel konuşma kimliğine, isteğe bağlı ileti dizisi
-kimliğine, açık `baseConversationId` değerine ve olası
-`parentConversationCandidates` öğelerine eşlemek için kanonik kancadır.
+plugin içinde `messaging.resolveSessionConversation(...)` ile yapın. Bu,
+`rawId` değerini temel konuşma kimliğine, isteğe bağlı iş parçacığı kimliğine,
+açık `baseConversationId` değerine ve varsa `parentConversationCandidates` değerlerine eşlemek için
+kanonik kancadır.
 `parentConversationCandidates` döndürdüğünüzde, bunları
-en dar üstten en geniş/temel konuşmaya doğru sıralı tutun.
+en dar üst öğeden en geniş/temel konuşmaya doğru sıralı tutun.
 
-Kanal kayıt defteri başlatılmadan önce aynı ayrıştırmaya ihtiyaç duyan paketlenmiş Plugin'ler,
-eşleşen bir `resolveSessionConversation(...)` dışa aktarımı ile üst düzey
-bir `session-key-api.ts` dosyası da sunabilir. Çekirdek, çalışma zamanı Plugin kayıt defteri henüz
-kullanılabilir değilse yalnızca bu bootstrap-safe yüzeyi kullanır.
+Kayıtlı kanal kayıt defteri başlatılmadan önce aynı ayrıştırmaya ihtiyaç duyan
+paketlenmiş plugin'ler, eşleşen bir
+`resolveSessionConversation(...)` dışa aktarımıyla üst düzey bir `session-key-api.ts`
+dosyası da açığa çıkarabilir. Çekirdek, çalışma zamanı plugin kayıt defteri henüz kullanılamıyorsa
+yalnızca bu önyükleme açısından güvenli yüzeyi kullanır.
 
-`messaging.resolveParentConversationCandidates(...)`, bir Plugin yalnızca
-genel/raw kimliğin üstünde üst yedeklere ihtiyaç duyduğunda eski uyumluluk yedeği olarak
-kullanılmaya devam eder. Her iki kanca da varsa çekirdek önce
-`resolveSessionConversation(...).parentConversationCandidates` kullanır ve yalnızca kanonik kanca
-bunları atladığında `resolveParentConversationCandidates(...)` kancasına geri döner.
+`messaging.resolveParentConversationCandidates(...)`, bir plugin'in yalnızca
+genel/raw kimliğin üstüne üst geri dönüşlerine ihtiyaç duyduğu durumlar için eski uyumluluk geri dönüşü olarak kullanılmaya devam eder.
+Her iki kanca da varsa, çekirdek önce
+`resolveSessionConversation(...).parentConversationCandidates` değerini kullanır ve
+yalnızca kanonik kanca bunları atladığında `resolveParentConversationCandidates(...)`
+değerine geri döner.
 
 ## Onaylar ve kanal yetenekleri
 
-Çoğu kanal Plugin'inin onaya özgü koda ihtiyacı yoktur.
+Çoğu kanal plugin'inin onaya özgü koda ihtiyacı yoktur.
 
-- Çekirdek; aynı sohbette `/approve`, paylaşılan onay düğmesi yükleri ve genel yedek teslimata sahiptir.
-- Kanalın onaya özgü davranışa ihtiyacı olduğunda, kanal Plugin'i üzerinde tek bir `approvalCapability` nesnesini tercih edin.
-- `ChannelPlugin.approvals` kaldırıldı. Onay teslimatı/yerel işleme/auth gerçeklerini `approvalCapability` üzerine koyun.
-- `plugin.auth` yalnızca login/logout içindir; çekirdek artık bu nesneden onay auth kancalarını okumaz.
-- `approvalCapability.authorizeActorAction` ve `approvalCapability.getActionAvailabilityState`, kanonik approval-auth hattıdır.
-- Aynı sohbette onay auth kullanılabilirliği için `approvalCapability.getActionAvailabilityState` kullanın.
-- Kanalınız yerel exec onaylarını ortaya çıkarıyorsa, başlatıcı yüzey/yerel istemci durumu aynı sohbet onay auth'undan farklı olduğunda `approvalCapability.getExecInitiatingSurfaceState` kullanın. Çekirdek bu exec'e özgü kancayı `enabled` ve `disabled` ayrımı yapmak, başlatıcı kanalın yerel exec onaylarını destekleyip desteklemediğine karar vermek ve kanalı yerel istemci yedek yönergelerine eklemek için kullanır. `createApproverRestrictedNativeApprovalCapability(...)`, yaygın durum için bunu doldurur.
-- Yinelenen yerel onay istemlerini gizlemek veya teslimat öncesi yazıyor göstergeleri göndermek gibi kanala özgü yük yaşam döngüsü davranışları için `outbound.shouldSuppressLocalPayloadPrompt` veya `outbound.beforeDeliverPayload` kullanın.
-- `approvalCapability.delivery` yalnızca yerel onay yönlendirmesi veya yedek bastırma için kullanılmalıdır.
-- Kanala ait yerel onay gerçekleri için `approvalCapability.nativeRuntime` kullanın. Bunu, sıcak kanal giriş noktalarında `createLazyChannelApprovalNativeRuntimeAdapter(...)` ile tembel tutun; bu, çalışma zamanı modülünüzü isteğe bağlı içe aktarırken çekirdeğin onay yaşam döngüsünü kurmasına da izin verir.
-- `approvalCapability.render` yalnızca bir kanal paylaşılan işleyici yerine gerçekten özel onay yüklerine ihtiyaç duyuyorsa kullanılmalıdır.
-- Yerel exec onaylarını etkinleştirmek için gereken tam yapılandırma düğmelerini devre dışı yol yanıtında açıklamak istiyorsa `approvalCapability.describeExecApprovalSetup` kullanın. Kanca `{ channel, channelLabel, accountId }` alır; adlandırılmış hesaplı kanallar, üst düzey varsayılanlar yerine `channels.<channel>.accounts.<id>.execApprovals.*` gibi hesap kapsamlı yollar göstermelidir.
-- Bir kanal mevcut yapılandırmadan kararlı sahip-benzeri DM kimliklerini çıkarabiliyorsa, onaya özgü çekirdek mantığı eklemeden aynı sohbette `/approve` kısıtlaması yapmak için `openclaw/plugin-sdk/approval-runtime` içindeki `createResolvedApproverActionAuthAdapter` kullanın.
-- Bir kanal yerel onay teslimatına ihtiyaç duyuyorsa, kanal kodunu hedef normalizasyonu ile taşıma/sunum gerçeklerine odaklı tutun. `openclaw/plugin-sdk/approval-runtime` içinden `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver` ve `createApproverRestrictedNativeApprovalCapability` kullanın. Kanala özgü gerçekleri `approvalCapability.nativeRuntime` arkasına koyun; ideal olarak `createChannelApprovalNativeRuntimeAdapter(...)` veya `createLazyChannelApprovalNativeRuntimeAdapter(...)` aracılığıyla, böylece çekirdek işleyiciyi kurabilir ve istek filtreleme, yönlendirme, dedupe, süre sonu, Gateway aboneliği ve başka yere yönlendirildi bildirimlerine sahip olabilir. `nativeRuntime`, birkaç küçük hatta ayrılmıştır:
-- `availability` — hesabın yapılandırılmış olup olmadığı ve bir isteğin ele alınıp alınmaması gerektiği
-- `presentation` — paylaşılan onay görünüm modelini beklemede/çözümlenmiş/süresi dolmuş yerel yüklere veya son eylemlere eşleme
-- `transport` — hedefleri hazırlama ve yerel onay mesajlarını gönderme/güncelleme/silme
-- `interactions` — yerel düğmeler veya reaksiyonlar için isteğe bağlı bind/unbind/clear-action kancaları
-- `observe` — isteğe bağlı teslimat tanılama kancaları
-- Kanalın istemci, belirteç, Bolt uygulaması veya Webhook alıcısı gibi çalışma zamanına ait nesnelere ihtiyacı varsa bunları `openclaw/plugin-sdk/channel-runtime-context` üzerinden kaydedin. Genel runtime-context kayıt defteri, çekirdeğin onaya özgü sarmalayıcı yapıştırıcısı eklemeden kanal başlangıç durumundan yetenek odaklı işleyicileri bootstrap etmesini sağlar.
-- Daha düşük düzey `createChannelApprovalHandler` veya `createChannelNativeApprovalRuntime` araçlarına yalnızca yetenek odaklı hat henüz yeterince ifade gücüne sahip değilse başvurun.
-- Yerel onay kanalları, bu yardımcılar üzerinden hem `accountId` hem `approvalKind` yönlendirmelidir. `accountId`, çok hesaplı onay ilkesini doğru bot hesabına kapsamlı tutar; `approvalKind` ise çekirdekte sabit dallar olmadan exec ve plugin onay davranışını kanal için kullanılabilir tutar.
-- Çekirdek artık onay yeniden yönlendirme bildirimlerine de sahiptir. Kanal Plugin'leri, `createChannelNativeApprovalRuntime` içinden kendi "onay DM'lere / başka bir kanala gitti" takip mesajlarını göndermemelidir; bunun yerine paylaşılan onay yeteneği yardımcıları üzerinden doğru kaynak + onaylayıcı-DM yönlendirmesini ortaya koyun ve başlatıcı sohbete herhangi bir bildirim göndermeden önce çekirdeğin gerçek teslimatları toplamasına izin verin.
+- Çekirdek, aynı sohbette `/approve`, paylaşılan onay düğmesi yüklerini ve genel geri dönüş teslimini yönetir.
+- Kanal onaya özgü davranış gerektiriyorsa, kanal plugin'inde tek bir `approvalCapability` nesnesi tercih edin.
+- `ChannelPlugin.approvals` kaldırılmıştır. Onay teslimi/yerel işleme/render/yetkilendirme bilgilerini `approvalCapability` içine koyun.
+- `plugin.auth` yalnızca giriş/çıkış içindir; çekirdek artık bu nesneden onay auth kancalarını okumaz.
+- `approvalCapability.authorizeActorAction` ve `approvalCapability.getActionAvailabilityState`, kanonik onay auth bağlantı yüzeyidir.
+- Aynı sohbet onay auth kullanılabilirliği için `approvalCapability.getActionAvailabilityState` kullanın.
+- Kanalınız yerel exec onaylarını açığa çıkarıyorsa, başlatıcı yüzey/yerel istemci durumu, aynı sohbet onay auth'undan farklı olduğunda `approvalCapability.getExecInitiatingSurfaceState` kullanın. Çekirdek, `enabled` ile `disabled` ayrımını yapmak, başlatıcı kanalın yerel exec onaylarını destekleyip desteklemediğine karar vermek ve kanalı yerel istemci geri dönüş yönlendirmesine dahil etmek için bu exec'e özgü kancayı kullanır. `createApproverRestrictedNativeApprovalCapability(...)`, yaygın durum için bunu doldurur.
+- Yinelenen yerel onay prompt'larını gizleme veya teslim öncesi yazıyor göstergeleri gönderme gibi kanala özgü yük yaşam döngüsü davranışları için `outbound.shouldSuppressLocalPayloadPrompt` ya da `outbound.beforeDeliverPayload` kullanın.
+- `approvalCapability.delivery` yalnızca yerel onay yönlendirme veya geri dönüş bastırma için kullanılmalıdır.
+- Kanala ait yerel onay bilgileri için `approvalCapability.nativeRuntime` kullanın. Bunu sıcak kanal giriş noktalarında `createLazyChannelApprovalNativeRuntimeAdapter(...)` ile tembel tutun; böylece çekirdek onay yaşam döngüsünü kurmaya devam ederken çalışma zamanı modülünüzü isteğe bağlı içe aktarabilir.
+- Kanalın gerçekten paylaşılan render yerine özel onay yüklerine ihtiyacı varsa yalnızca `approvalCapability.render` kullanın.
+- Kanal, devre dışı yol yanıtının yerel exec onaylarını etkinleştirmek için gereken tam yapılandırma düğmelerini açıklamasını istiyorsa `approvalCapability.describeExecApprovalSetup` kullanın. Kanca `{ channel, channelLabel, accountId }` alır; adlandırılmış hesap kanalları, üst düzey varsayılanlar yerine `channels.<channel>.accounts.<id>.execApprovals.*` gibi hesap kapsamlı yolları render etmelidir.
+- Bir kanal mevcut yapılandırmadan kararlı sahip benzeri DM kimliklerini çıkarabiliyorsa, onaya özgü çekirdek mantığı eklemeden aynı sohbette `/approve` kısıtlaması yapmak için `openclaw/plugin-sdk/approval-runtime` içindeki `createResolvedApproverActionAuthAdapter` kullanın.
+- Bir kanalın yerel onay teslimine ihtiyacı varsa, kanal kodunu hedef normalleştirme ile taşıma/sunum bilgilerine odaklı tutun. `openclaw/plugin-sdk/approval-runtime` içinden `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver` ve `createApproverRestrictedNativeApprovalCapability` kullanın. Kanala özgü bilgileri `approvalCapability.nativeRuntime` arkasına koyun; tercihen `createChannelApprovalNativeRuntimeAdapter(...)` veya `createLazyChannelApprovalNativeRuntimeAdapter(...)` ile, böylece çekirdek işleyiciyi kurabilir ve istek filtreleme, yönlendirme, tekilleştirme, süre sonu, Gateway aboneliği ve başka yere yönlendirildi bildirimlerini yönetebilir. `nativeRuntime` birkaç küçük bağlantı yüzeyine ayrılmıştır:
+- `availability` — hesabın yapılandırılıp yapılandırılmadığı ve bir isteğin işlenip işlenmeyeceği
+- `presentation` — paylaşılan onay görünüm modelini bekleyen/çözümlenmiş/süresi dolmuş yerel yükler veya son eylemlerle eşlemek
+- `transport` — hedefleri hazırlamak ve yerel onay mesajlarını göndermek/güncellemek/silmek
+- `interactions` — yerel düğmeler veya tepkiler için isteğe bağlı bağla/çöz/eylem temizleme kancaları
+- `observe` — isteğe bağlı teslim tanılama kancaları
+- Kanalın istemci, token, Bolt uygulaması veya Webhook alıcısı gibi çalışma zamanına ait nesnelere ihtiyacı varsa, bunları `openclaw/plugin-sdk/channel-runtime-context` üzerinden kaydedin. Genel runtime-context kayıt defteri, çekirdeğin onaya özgü sarmalayıcı yapıştırma kodu eklemeden kanal başlangıç durumundan yetenek odaklı işleyicileri önyüklemesine izin verir.
+- Daha düşük seviyeli `createChannelApprovalHandler` veya `createChannelNativeApprovalRuntime` araçlarına yalnızca yetenek odaklı bağlantı yüzeyi henüz yeterince ifade gücüne sahip değilse başvurun.
+- Yerel onay kanalları, bu yardımcılar üzerinden hem `accountId` hem de `approvalKind` değerini yönlendirmelidir. `accountId`, çok hesaplı onay ilkesinin doğru bot hesabı kapsamında kalmasını sağlar; `approvalKind` ise exec ile plugin onay davranışının çekirdekte sabit kodlu dallar olmadan kanalda kullanılabilir kalmasını sağlar.
+- Çekirdek artık onay yeniden yönlendirme bildirimlerini de yönetiyor. Kanal plugin'leri, `createChannelNativeApprovalRuntime` içinden kendi "onay DM'lere / başka bir kanala gitti" takip mesajlarını göndermemelidir; bunun yerine paylaşılan onay yetenek yardımcıları üzerinden doğru origin + approver-DM yönlendirmesini açığa çıkarmalı ve çekirdeğin başlatan sohbete herhangi bir bildirim göndermeden önce gerçek teslimleri toplamasına izin vermelidir.
 - Teslim edilen onay kimliği türünü uçtan uca koruyun. Yerel istemciler,
-  exec ve plugin onay yönlendirmesini kanala yerel durumdan tahmin etmemeli veya yeniden yazmamalıdır.
-- Farklı onay türleri kasıtlı olarak farklı yerel yüzeyler ortaya çıkarabilir.
-  Geçerli paketlenmiş örnekler:
-  - Slack, yerel onay yönlendirmesini hem exec hem de plugin kimlikleri için kullanılabilir tutar.
-  - Matrix, exec ve plugin onayları için aynı yerel DM/kanal yönlendirmesi ve reaksiyon UX'ini korurken auth'un onay türüne göre farklılaşmasına yine izin verir.
-- `createApproverRestrictedNativeApprovalAdapter` uyumluluk sarmalayıcısı olarak hâlâ vardır, ancak yeni kod yetenek oluşturucuyu tercih etmeli ve Plugin üzerinde `approvalCapability` ortaya çıkarmalıdır.
+  exec ile plugin onay yönlendirmesini kanala özgü durumdan tahmin etmemeli veya yeniden yazmamalıdır.
+- Farklı onay türleri kasıtlı olarak farklı yerel yüzeyler açığa çıkarabilir.
+  Mevcut paketli örnekler:
+  - Slack, hem exec hem de plugin kimlikleri için yerel onay yönlendirmesini kullanılabilir tutar.
+  - Matrix, auth onay türüne göre farklılaşabilse bile exec
+    ve plugin onayları için aynı yerel DM/kanal yönlendirmesini ve reaction UX'ini korur.
+- `createApproverRestrictedNativeApprovalAdapter` hâlâ bir uyumluluk sarmalayıcısı olarak vardır, ancak yeni kod tercih olarak yetenek oluşturucusunu kullanmalı ve plugin üzerinde `approvalCapability` açığa çıkarmalıdır.
 
-Sıcak kanal giriş noktaları için, bu ailenin yalnızca bir parçasına ihtiyaç
-duyduğunuzda daha dar çalışma zamanı alt yollarını tercih edin:
+Sıcak kanal giriş noktalarında, bu ailenin yalnızca tek bir bölümüne
+ihtiyacınız olduğunda daha dar çalışma zamanı alt yollarını tercih edin:
 
 - `openclaw/plugin-sdk/approval-auth-runtime`
 - `openclaw/plugin-sdk/approval-client-runtime`
@@ -122,96 +124,100 @@ yüzeye ihtiyacınız olmadığında `openclaw/plugin-sdk/setup-runtime`,
 `openclaw/plugin-sdk/reply-runtime`,
 `openclaw/plugin-sdk/reply-dispatch-runtime`,
 `openclaw/plugin-sdk/reply-reference` ve
-`openclaw/plugin-sdk/reply-chunking` yollarını tercih edin.
+`openclaw/plugin-sdk/reply-chunking` tercih edin.
 
 Özellikle kurulum için:
 
 - `openclaw/plugin-sdk/setup-runtime`, çalışma zamanı açısından güvenli kurulum yardımcılarını kapsar:
-  import-safe kurulum yama bağdaştırıcıları (`createPatchedAccountSetupAdapter`,
+  içe aktarma açısından güvenli kurulum yama bağdaştırıcıları (`createPatchedAccountSetupAdapter`,
   `createEnvPatchedAccountSetupAdapter`,
-  `createSetupInputPresenceValidator`), lookup-note çıktısı,
+  `createSetupInputPresenceValidator`), arama notu çıktısı,
   `promptResolvedAllowFrom`, `splitSetupEntries` ve devredilmiş
-  setup-proxy oluşturucuları
+  kurulum proxy oluşturucuları
 - `openclaw/plugin-sdk/setup-adapter-runtime`, `createEnvPatchedAccountSetupAdapter`
-  için dar, env farkındalıklı bağdaştırıcı hattıdır
-- `openclaw/plugin-sdk/channel-setup`, isteğe bağlı kurulum setup
-  oluşturucularını ve birkaç setup-safe ilkel öğeyi kapsar:
+  için dar env farkındalıklı bağdaştırıcı bağlantı yüzeyidir
+- `openclaw/plugin-sdk/channel-setup`, isteğe bağlı kurulum oluşturucularını ve birkaç kurulum açısından güvenli ilkel öğeyi kapsar:
   `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`,
 
 Kanalınız env odaklı kurulum veya auth destekliyorsa ve genel başlangıç/yapılandırma
-akışlarının bu env adlarını çalışma zamanı yüklenmeden önce bilmesi gerekiyorsa,
-bunları Plugin manifest içinde `channelEnvVars` ile bildirin. Kanal çalışma zamanı `envVars` veya yerel
-sabitleri yalnızca operatör odaklı kopya için kullanın.
+akışlarının çalışma zamanı yüklenmeden önce bu env adlarını bilmesi gerekiyorsa,
+bunları plugin manifest'inde `channelEnvVars` ile bildirin. Kanal çalışma zamanı `envVars` veya yerel sabitleri yalnızca operatöre dönük kopya için saklayın.
+
+Kanalınız plugin çalışma zamanı başlamadan önce `status`, `channels list`, `channels status` veya
+SecretRef taramalarında görünebiliyorsa, `package.json` içine `openclaw.setupEntry` ekleyin.
+Bu giriş noktası salt okunur komut yollarında içe aktarılabilecek kadar güvenli olmalı
+ve kanal meta verilerini, kurulum açısından güvenli yapılandırma bağdaştırıcısını, durum bağdaştırıcısını ve bu özetler için gerekli kanal secret hedef meta verilerini döndürmelidir. Kurulum girişinden istemci, dinleyici veya taşıma çalışma zamanlarını başlatmayın.
+
 `createOptionalChannelSetupWizard`, `DEFAULT_ACCOUNT_ID`,
 `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled` ve
 `splitSetupEntries`
 
-- yalnızca daha ağır paylaşılan kurulum/yapılandırma yardımcılarına da
-  ihtiyacınız olduğunda daha geniş `openclaw/plugin-sdk/setup` hattını kullanın; örneğin
+- yalnızca şu gibi daha ağır paylaşılan kurulum/yapılandırma yardımcılarına da ihtiyacınız varsa
+  daha geniş `openclaw/plugin-sdk/setup` bağlantı yüzeyini kullanın:
   `moveSingleAccountChannelSectionToDefaultAccount(...)`
 
-Kanalınız yalnızca kurulum yüzeylerinde "önce bu Plugin'i kur" bilgisini
-reklam etmek istiyorsa `createOptionalChannelSetupSurface(...)` tercih edin. Üretilen
-bağdaştırıcı/sihirbaz, yapılandırma yazımları ve sonlandırmada fail-closed davranır ve doğrulama, finalize ve belge bağlantısı
-kopyasında aynı kurulum-gerekli iletisini yeniden kullanır.
+Kanalınız kurulum yüzeylerinde yalnızca "önce bu plugin'i yükleyin" bilgisini göstermek istiyorsa,
+tercihen `createOptionalChannelSetupSurface(...)` kullanın. Üretilen
+bağdaştırıcı/sihirbaz yapılandırma yazımlarında ve sonlandırmada kapalı kalır; ayrıca
+doğrulama, sonlandırma ve docs-link kopyası boyunca aynı kurulum gerekli mesajını yeniden kullanır.
 
-Diğer sıcak kanal yolları için, daha geniş eski
+Diğer sıcak kanal yolları için de, daha geniş eski
 yüzeyler yerine dar yardımcıları tercih edin:
 
 - çok hesaplı yapılandırma ve
-  varsayılan hesap yedeği için `openclaw/plugin-sdk/account-core`,
+  varsayılan hesap geri dönüşü için `openclaw/plugin-sdk/account-core`,
   `openclaw/plugin-sdk/account-id`,
   `openclaw/plugin-sdk/account-resolution` ve
   `openclaw/plugin-sdk/account-helpers`
 - gelen rota/zarf ve
-  kaydet-ve-sevk bağlaması için `openclaw/plugin-sdk/inbound-envelope` ve
+  kaydet-ve-dağıt bağlantısı için `openclaw/plugin-sdk/inbound-envelope` ile
   `openclaw/plugin-sdk/inbound-reply-dispatch`
-- hedef ayrıştırma/eşleme için `openclaw/plugin-sdk/messaging-targets`
+- hedef ayrıştırma/eşleştirme için `openclaw/plugin-sdk/messaging-targets`
 - medya yükleme ile giden
   kimlik/gönderim delegeleri ve yük planlaması için `openclaw/plugin-sdk/outbound-media` ve
   `openclaw/plugin-sdk/outbound-runtime`
-- ileti dizisi bağlama yaşam döngüsü
+- iş parçacığı bağlama yaşam döngüsü
   ve bağdaştırıcı kaydı için `openclaw/plugin-sdk/thread-bindings-runtime`
-- yalnızca eski agent/media
-  yük alan düzeni hâlâ gerekiyorsa `openclaw/plugin-sdk/agent-media-payload`
+- yalnızca eski bir agent/media
+  payload alan düzeni hâlâ gerekiyorsa `openclaw/plugin-sdk/agent-media-payload`
 - Telegram özel komut
-  normalizasyonu, yinelenen/çakışma doğrulaması ve yedek-kararlı komut
+  normalleştirme, yinelenen/çakışma doğrulaması ve geri dönüşte kararlı komut
   yapılandırma sözleşmesi için `openclaw/plugin-sdk/telegram-command-config`
 
-Yalnızca auth kullanan kanallar genellikle varsayılan yolda durabilir: çekirdek onayları ele alır ve Plugin yalnızca giden/auth yeteneklerini ortaya çıkarır. Matrix, Slack, Telegram ve özel sohbet taşıyıcıları gibi yerel onay kanalları, kendi onay yaşam döngülerini yazmak yerine paylaşılan yerel yardımcıları kullanmalıdır.
+Yalnızca auth kullanan kanallar genellikle varsayılan yolda durabilir: onayları çekirdek yönetir ve plugin yalnızca giden/auth yeteneklerini açığa çıkarır. Matrix, Slack, Telegram ve özel sohbet taşıma katmanları gibi yerel onay kanalları, kendi onay yaşam döngülerini oluşturmaktansa paylaşılan yerel yardımcıları kullanmalıdır.
 
-## Gelen bahsetme ilkesi
+## Gelen mention ilkesi
 
-Gelen bahsetme işlemeyi iki katmana bölünmüş tutun:
+Gelen mention işleme mantığını iki katmana bölünmüş tutun:
 
-- Plugin'e ait kanıt toplama
+- plugin'e ait kanıt toplama
 - paylaşılan ilke değerlendirmesi
 
-Bahsetme ilkesi kararları için `openclaw/plugin-sdk/channel-mention-gating` kullanın.
+Mention ilkesi kararları için `openclaw/plugin-sdk/channel-mention-gating` kullanın.
 Daha geniş gelen
-yardımcı barrel'ine yalnızca ihtiyaç duyduğunuzda `openclaw/plugin-sdk/channel-inbound` kullanın.
+yardımcı barrel'ına ihtiyaç duyduğunuzda yalnızca `openclaw/plugin-sdk/channel-inbound` kullanın.
 
-Plugin'e yerel mantık için uygun alanlar:
+Plugin'e özgü mantık için uygun örnekler:
 
-- bota yanıt algılama
-- alıntılanan bot algılama
-- ileti dizisine katılım kontrolleri
-- hizmet/sistem mesajı hariç tutmaları
-- bot katılımını kanıtlamak için gereken platforma özgü yerel önbellekler
+- bot'a yanıt tespiti
+- alıntılanan bot tespiti
+- iş parçacığı katılımı kontrolleri
+- servis/sistem mesajı dışlamaları
+- bot katılımını kanıtlamak için gereken platformun yerel önbellekleri
 
-Paylaşılan yardımcı için uygun alanlar:
+Paylaşılan yardımcı için uygun örnekler:
 
 - `requireMention`
-- açık bahsetme sonucu
-- örtük bahsetme allowlist'i
+- açık mention sonucu
+- örtük mention izin listesi
 - komut baypası
 - son atlama kararı
 
 Tercih edilen akış:
 
-1. Yerel bahsetme gerçeklerini hesaplayın.
-2. Bu gerçekleri `resolveInboundMentionDecision({ facts, policy })` içine geçirin.
-3. Gelen geçidinizde `decision.effectiveWasMentioned`, `decision.shouldBypassMention` ve `decision.shouldSkip` kullanın.
+1. Yerel mention olgularını hesaplayın.
+2. Bu olguları `resolveInboundMentionDecision({ facts, policy })` içine geçirin.
+3. Gelen kapınızda `decision.effectiveWasMentioned`, `decision.shouldBypassMention` ve `decision.shouldSkip` değerlerini kullanın.
 
 ```typescript
 import {
@@ -250,8 +256,8 @@ const decision = resolveInboundMentionDecision({
 if (decision.shouldSkip) return;
 ```
 
-`api.runtime.channel.mentions`, çalışma zamanı enjeksiyonuna zaten bağlı olan
-paketlenmiş kanal Plugin'leri için aynı paylaşılan bahsetme yardımcılarını ortaya çıkarır:
+`api.runtime.channel.mentions`, çalışma zamanı ekleme bağımlılığı zaten olan
+paketlenmiş kanal plugin'leri için aynı paylaşılan mention yardımcılarını açığa çıkarır:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -260,22 +266,24 @@ paketlenmiş kanal Plugin'leri için aynı paylaşılan bahsetme yardımcıları
 - `resolveInboundMentionDecision`
 
 Yalnızca `implicitMentionKindWhen` ve
-`resolveInboundMentionDecision` gerekli ise,
-ilgili olmayan gelen çalışma zamanı
-yardımcılarını yüklememek için `openclaw/plugin-sdk/channel-mention-gating` içinden içe aktarın.
+`resolveInboundMentionDecision` kullanmanız gerekiyorsa,
+ilgisiz gelen çalışma zamanı yardımcılarını yüklemekten kaçınmak için
+`openclaw/plugin-sdk/channel-mention-gating` içinden içe aktarın.
 
 Eski `resolveMentionGating*` yardımcıları,
-yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inbound` üzerinde kalır. Yeni kod,
+yalnızca uyumluluk dışa aktarımları olarak
+`openclaw/plugin-sdk/channel-inbound` üzerinde kalmaya devam eder. Yeni kod,
 `resolveInboundMentionDecision({ facts, policy })` kullanmalıdır.
 
-## Kılavuz
+## Adım adım anlatım
 
 <Steps>
   <a id="step-1-package-and-manifest"></a>
   <Step title="Paket ve manifest">
-    Standart Plugin dosyalarını oluşturun. `package.json` içindeki `channel` alanı,
-    bunu bir kanal Plugin'i yapan şeydir. Tam paket meta veri yüzeyi için
-    bkz. [Plugin Kurulumu ve Yapılandırması](/tr/plugins/sdk-setup#openclaw-channel):
+    Standart plugin dosyalarını oluşturun. `package.json` içindeki `channel` alanı,
+    bunun bir kanal plugin'i olmasını sağlar. Tam paket meta verisi yüzeyi için
+    [Plugin Kurulumu ve Yapılandırma](/tr/plugins/sdk-setup#openclaw-channel)
+    bölümüne bakın:
 
     <CodeGroup>
     ```json package.json
@@ -289,7 +297,7 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
         "channel": {
           "id": "acme-chat",
           "label": "Acme Chat",
-          "blurb": "OpenClaw'ı Acme Chat'e bağlayın."
+          "blurb": "OpenClaw'u Acme Chat'e bağlayın."
         }
       }
     }
@@ -301,7 +309,7 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
       "kind": "channel",
       "channels": ["acme-chat"],
       "name": "Acme Chat",
-      "description": "Acme Chat kanal Plugin'i",
+      "description": "Acme Chat kanal plugin'i",
       "configSchema": {
         "type": "object",
         "additionalProperties": false,
@@ -324,9 +332,9 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
 
   </Step>
 
-  <Step title="Kanal Plugin nesnesini oluşturun">
-    `ChannelPlugin` arayüzünde birçok isteğe bağlı bağdaştırıcı yüzeyi vardır. En azından
-    `id` ve `setup` ile başlayın, sonra ihtiyaç duydukça bağdaştırıcılar ekleyin.
+  <Step title="Kanal plugin nesnesini oluşturun">
+    `ChannelPlugin` arayüzü birçok isteğe bağlı bağdaştırıcı yüzeyi içerir. En
+    düşük seviyeden başlayın — `id` ve `setup` — ve ihtiyacınız oldukça bağdaştırıcılar ekleyin.
 
     `src/channel.ts` oluşturun:
 
@@ -351,7 +359,7 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     ): ResolvedAccount {
       const section = (cfg.channels as Record<string, any>)?.["acme-chat"];
       const token = section?.token;
-      if (!token) throw new Error("acme-chat: token is required");
+      if (!token) throw new Error("acme-chat: token gerekli");
       return {
         accountId: accountId ?? null,
         token,
@@ -377,7 +385,7 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
         },
       }),
 
-      // DM security: bot'a kimin mesaj gönderebileceği
+      // DM güvenliği: bota kim mesaj gönderebilir
       security: {
         dm: {
           channelKey: "acme-chat",
@@ -387,21 +395,21 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
         },
       },
 
-      // Pairing: yeni DM kişileri için onay akışı
+      // Eşleştirme: yeni DM kişileri için onay akışı
       pairing: {
         text: {
           idLabel: "Acme Chat kullanıcı adı",
           message: "Kimliğinizi doğrulamak için bu kodu gönderin:",
           notify: async ({ target, code }) => {
-            await acmeChatApi.sendDm(target, `Eşleme kodu: ${code}`);
+            await acmeChatApi.sendDm(target, `Eşleştirme kodu: ${code}`);
           },
         },
       },
 
-      // Threading: yanıtların nasıl teslim edildiği
+      // İş parçacığı oluşturma: yanıtlar nasıl teslim edilir
       threading: { topLevelReplyToMode: "reply" },
 
-      // Outbound: platforma mesaj gönderme
+      // Giden: platforma mesaj gönder
       outbound: {
         attachedResults: {
           sendText: async (params) => {
@@ -422,18 +430,18 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     ```
 
     <Accordion title="createChatChannelPlugin sizin için ne yapar">
-      Düşük düzey bağdaştırıcı arayüzlerini elle uygulamak yerine,
+      Düşük seviyeli bağdaştırıcı arayüzlerini elle uygulamak yerine,
       bildirimsel seçenekler verirsiniz ve oluşturucu bunları birleştirir:
 
       | Seçenek | Bağladığı şey |
       | --- | --- |
-      | `security.dm` | Yapılandırma alanlarından kapsamlı DM güvenlik çözümleyicisi |
-      | `pairing.text` | Kod alışverişli metin tabanlı DM eşleme akışı |
-      | `threading` | Reply-to-mode çözümleyicisi (sabit, hesap kapsamlı veya özel) |
-      | `outbound.attachedResults` | Sonuç meta verisi döndüren gönderim işlevleri (mesaj kimlikleri) |
+      | `security.dm` | Yapılandırma alanlarından kapsamlı DM güvenlik çözücüsü |
+      | `pairing.text` | Kod değişimiyle metin tabanlı DM eşleştirme akışı |
+      | `threading` | Reply-to-mode çözücüsü (sabit, hesap kapsamlı veya özel) |
+      | `outbound.attachedResults` | Sonuç meta verisi döndüren gönderim fonksiyonları (mesaj kimlikleri) |
 
-      Tam denetime ihtiyacınız varsa, bildirimsel seçenekler yerine ham bağdaştırıcı nesneleri de
-      geçebilirsiniz.
+      Tam denetime ihtiyacınız varsa, bildirimsel seçenekler yerine ham
+      bağdaştırıcı nesneleri de geçebilirsiniz.
     </Accordion>
 
   </Step>
@@ -448,7 +456,7 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     export default defineChannelPluginEntry({
       id: "acme-chat",
       name: "Acme Chat",
-      description: "Acme Chat kanal Plugin'i",
+      description: "Acme Chat kanal plugin'i",
       plugin: acmeChatPlugin,
       registerCliMetadata(api) {
         api.registerCli(
@@ -474,21 +482,22 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     });
     ```
 
-    Kanala ait CLI tanımlayıcılarını `registerCliMetadata(...)` içine koyun; böylece OpenClaw
+    Kanala ait CLI tanımlayıcılarını `registerCliMetadata(...)` içinde tutun; böylece OpenClaw
     tam kanal çalışma zamanını etkinleştirmeden bunları kök yardımda gösterebilir,
-    normal tam yüklemeler ise gerçek komut
-    kaydı için aynı tanımlayıcıları almaya devam eder. `registerFull(...)` yalnızca çalışma zamanı işi için kalsın.
-    `registerFull(...)`, Gateway RPC yöntemleri kaydediyorsa
-    Plugin'e özgü bir önek kullanın. Çekirdek yönetici ad alanları (`config.*`,
-    `exec.approvals.*`, `wizard.*`, `update.*`) ayrılmıştır ve her zaman
-    `operator.admin` çözümüne gider.
-    `defineChannelPluginEntry`, kayıt modu ayrımını otomatik olarak ele alır. Tüm
-    seçenekler için bkz. [Giriş Noktaları](/tr/plugins/sdk-entrypoints#definechannelpluginentry).
+    normal tam yüklemeler de gerçek komut
+    kaydı için aynı tanımlayıcıları almaya devam eder. `registerFull(...)` yalnızca çalışma zamanına özel işler için kullanılmalıdır.
+    `registerFull(...)` Gateway RPC yöntemleri kaydediyorsa,
+    plugin'e özgü bir önek kullanın. Çekirdek yönetici ad alanları (`config.*`,
+    `exec.approvals.*`, `wizard.*`, `update.*`) ayrılmış kalır ve her zaman
+    `operator.admin` olarak çözülür.
+    `defineChannelPluginEntry`, kayıt modu ayrımını otomatik olarak yönetir. Tüm
+    seçenekler için [Giriş Noktaları](/tr/plugins/sdk-entrypoints#definechannelpluginentry)
+    bölümüne bakın.
 
   </Step>
 
-  <Step title="Bir setup girişi ekleyin">
-    İlk katılım sırasında hafif yükleme için `setup-entry.ts` oluşturun:
+  <Step title="Bir kurulum girişi ekleyin">
+    Onboarding sırasında hafif yükleme için `setup-entry.ts` oluşturun:
 
     ```typescript setup-entry.ts
     import { defineSetupPluginEntry } from "openclaw/plugin-sdk/channel-core";
@@ -497,32 +506,34 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     export default defineSetupPluginEntry(acmeChatPlugin);
     ```
 
-    OpenClaw, kanal devre dışı bırakıldığında
-    veya yapılandırılmadığında tam giriş yerine bunu yükler. Bu, kurulum akışları sırasında ağır çalışma zamanı kodunu çekmekten kaçınır.
-    Ayrıntılar için bkz. [Kurulum ve Yapılandırma](/tr/plugins/sdk-setup#setup-entry).
+    OpenClaw, kanal devre dışı olduğunda
+    veya yapılandırılmadığında tam giriş yerine bunu yükler.
+    Bu, kurulum akışları sırasında ağır çalışma zamanı kodunu içeri çekmeyi önler.
+    Ayrıntılar için [Kurulum ve Yapılandırma](/tr/plugins/sdk-setup#setup-entry) bölümüne bakın.
 
-    Setup-safe dışa aktarımları yan modüllere ayıran paketlenmiş çalışma alanı kanalları,
-    açık bir kurulum zamanı çalışma zamanı ayarlayıcısına da ihtiyaç duyduklarında
-    `openclaw/plugin-sdk/channel-entry-contract` içinden `defineBundledChannelSetupEntry(...)` kullanabilir.
+    Kurulum açısından güvenli dışa aktarımları yan modüllere ayıran paketli çalışma alanı kanalları,
+    açık bir kurulum zamanı runtime setter'a da ihtiyaç duyduklarında
+    `openclaw/plugin-sdk/channel-entry-contract` içinden
+    `defineBundledChannelSetupEntry(...)` kullanabilir.
 
   </Step>
 
   <Step title="Gelen mesajları işleyin">
     Plugin'inizin platformdan mesaj alması ve bunları
-    OpenClaw'a iletmesi gerekir. Tipik örüntü, isteği doğrulayan ve
-    kanalınızın gelen işleyicisi üzerinden sevk eden bir Webhook'tur:
+    OpenClaw'a iletmesi gerekir. Tipik desen, isteği doğrulayan ve
+    bunu kanalınızın gelen işleyicisi üzerinden dağıtan bir Webhook'tur:
 
     ```typescript
     registerFull(api) {
       api.registerHttpRoute({
         path: "/acme-chat/webhook",
-        auth: "plugin", // Plugin tarafından yönetilen auth (imzaları kendiniz doğrulayın)
+        auth: "plugin", // plugin tarafından yönetilen auth (imzaları kendiniz doğrulayın)
         handler: async (req, res) => {
           const event = parseWebhookPayload(req);
 
-          // Gelen işleyiciniz mesajı OpenClaw'a sevk eder.
-          // Tam bağlama, platform SDK'nıza bağlıdır —
-          // gerçek örnek için paketlenmiş Microsoft Teams veya Google Chat Plugin paketine bakın.
+          // Gelen işleyiciniz mesajı OpenClaw'a dağıtır.
+          // Tam bağlantı platform SDK'nıza bağlıdır —
+          // gerçek bir örnek için paketlenmiş Microsoft Teams veya Google Chat plugin paketine bakın.
           await handleAcmeChatInbound(api, event);
 
           res.statusCode = 200;
@@ -534,23 +545,24 @@ yalnızca uyumluluk dışa aktarımları olarak `openclaw/plugin-sdk/channel-inb
     ```
 
     <Note>
-      Gelen mesaj işleme kanala özgüdür. Her kanal Plugin'i
-      kendi gelen işlem hattına sahiptir. Gerçek örüntüler için paketlenmiş kanal Plugin'lerine
-      (örneğin Microsoft Teams veya Google Chat Plugin paketi) bakın.
+      Gelen mesaj işleme kanala özeldir. Her kanal plugin'i
+      kendi gelen işlem hattına sahiptir. Gerçek desenler için paketlenmiş kanal plugin'lerine
+      (örneğin Microsoft Teams veya Google Chat plugin paketi)
+      bakın.
     </Note>
 
   </Step>
 
 <a id="step-6-test"></a>
 <Step title="Test">
-Eş konumlu testleri `src/channel.test.ts` içine yazın:
+`src/channel.test.ts` içinde birlikte konumlandırılmış testler yazın:
 
     ```typescript src/channel.test.ts
     import { describe, it, expect } from "vitest";
     import { acmeChatPlugin } from "./channel.js";
 
     describe("acme-chat plugin", () => {
-      it("hesaptan yapılandırmayı çözümler", () => {
+      it("hesabı yapılandırmadan çözümler", () => {
         const cfg = {
           channels: {
             "acme-chat": { token: "test-token", allowFrom: ["user1"] },
@@ -560,7 +572,7 @@ Eş konumlu testleri `src/channel.test.ts` içine yazın:
         expect(account.token).toBe("test-token");
       });
 
-      it("gizli değerleri somutlaştırmadan hesabı inceler", () => {
+      it("gizli bilgileri somutlaştırmadan hesabı inceler", () => {
         const cfg = {
           channels: { "acme-chat": { token: "test-token" } },
         } as any;
@@ -581,7 +593,7 @@ Eş konumlu testleri `src/channel.test.ts` içine yazın:
     pnpm test -- <bundled-plugin-root>/acme-chat/
     ```
 
-    Paylaşılan test yardımcıları için bkz. [Testing](/tr/plugins/sdk-testing).
+    Paylaşılan test yardımcıları için [Test](/tr/plugins/sdk-testing) bölümüne bakın.
 
   </Step>
 </Steps>
@@ -590,46 +602,46 @@ Eş konumlu testleri `src/channel.test.ts` içine yazın:
 
 ```
 <bundled-plugin-root>/acme-chat/
-├── package.json              # openclaw.channel meta verisi
+├── package.json              # openclaw.channel meta verileri
 ├── openclaw.plugin.json      # Yapılandırma şemalı manifest
 ├── index.ts                  # defineChannelPluginEntry
 ├── setup-entry.ts            # defineSetupPluginEntry
-├── api.ts                    # Herkese açık dışa aktarımlar (isteğe bağlı)
-├── runtime-api.ts            # İç çalışma zamanı dışa aktarımları (isteğe bağlı)
+├── api.ts                    # Genel dışa aktarımlar (isteğe bağlı)
+├── runtime-api.ts            # Dahili çalışma zamanı dışa aktarımları (isteğe bağlı)
 └── src/
     ├── channel.ts            # createChatChannelPlugin ile ChannelPlugin
     ├── channel.test.ts       # Testler
     ├── client.ts             # Platform API istemcisi
-    └── runtime.ts            # Çalışma zamanı deposu (gerekirse)
+    └── runtime.ts            # Çalışma zamanı deposu (gerekiyorsa)
 ```
 
 ## İleri konular
 
 <CardGroup cols={2}>
-  <Card title="İleti dizisi seçenekleri" icon="git-branch" href="/tr/plugins/sdk-entrypoints#registration-mode">
+  <Card title="İş parçacığı oluşturma seçenekleri" icon="git-branch" href="/tr/plugins/sdk-entrypoints#registration-mode">
     Sabit, hesap kapsamlı veya özel yanıt modları
   </Card>
-  <Card title="Mesaj aracı entegrasyonu" icon="puzzle" href="/tr/plugins/architecture#channel-plugins-and-the-shared-message-tool">
+  <Card title="Message tool entegrasyonu" icon="puzzle" href="/tr/plugins/architecture#channel-plugins-and-the-shared-message-tool">
     describeMessageTool ve eylem keşfi
   </Card>
   <Card title="Hedef çözümleme" icon="crosshair" href="/tr/plugins/architecture#channel-target-resolution">
     inferTargetChatType, looksLikeId, resolveTarget
   </Card>
   <Card title="Çalışma zamanı yardımcıları" icon="settings" href="/tr/plugins/sdk-runtime">
-    api.runtime aracılığıyla TTS, STT, medya, subagent
+    api.runtime üzerinden TTS, STT, medya, subagent
   </Card>
 </CardGroup>
 
 <Note>
-Bazı paketlenmiş yardımcı hatları, paketlenmiş Plugin bakımı ve
-uyumluluk için hâlâ mevcuttur. Bunlar yeni kanal Plugin'leri için önerilen örüntü değildir;
-o paketlenmiş Plugin ailesini doğrudan sürdürmüyorsanız, ortak SDK
+Bazı paketlenmiş yardımcı bağlantı yüzeyleri, paketlenmiş plugin bakımı ve
+uyumluluk için hâlâ mevcuttur. Bunlar yeni kanal plugin'leri için önerilen desen değildir;
+o paketlenmiş plugin ailesini doğrudan sürdürmüyorsanız, ortak SDK
 yüzeyindeki genel channel/setup/reply/runtime alt yollarını tercih edin.
 </Note>
 
 ## Sonraki adımlar
 
-- [Sağlayıcı Plugin'leri](/tr/plugins/sdk-provider-plugins) — Plugin'iniz ayrıca modeller de sağlıyorsa
+- [Provider Plugin'leri](/tr/plugins/sdk-provider-plugins) — plugin'iniz aynı zamanda modeller de sağlıyorsa
 - [SDK Genel Bakış](/tr/plugins/sdk-overview) — tam alt yol içe aktarma başvurusu
-- [SDK Testing](/tr/plugins/sdk-testing) — test yardımcıları ve sözleşme testleri
+- [SDK Test](/tr/plugins/sdk-testing) — test yardımcıları ve sözleşme testleri
 - [Plugin Manifest](/tr/plugins/manifest) — tam manifest şeması

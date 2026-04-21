@@ -1,31 +1,27 @@
 ---
 read_when:
-    - GitHub Copilot'ı bir model sağlayıcısı olarak kullanmak istiyorsunuz
+    - GitHub Copilot'ı model sağlayıcısı olarak kullanmak istiyorsunuz
     - '`openclaw models auth login-github-copilot` akışına ihtiyacınız var'
-summary: Cihaz akışını kullanarak OpenClaw içinden GitHub Copilot'ta oturum açma
+summary: OpenClaw kullanarak GitHub Copilot'ta cihaz akışıyla oturum açın
 title: GitHub Copilot
 x-i18n:
-    generated_at: "2026-04-21T09:05:08Z"
+    generated_at: "2026-04-21T19:20:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f7faafbd3bdcd8886e75fb0d40c3eec66355df3fca6160ebbbb9a0018b7839fe
+    source_hash: b5169839322f64b24b194302b61c5bad67c6cb6595989f9a1ef65867d8b68659
     source_path: providers/github-copilot.md
     workflow: 15
 ---
 
 # GitHub Copilot
 
-GitHub Copilot, GitHub'ın AI kodlama asistanıdır. GitHub hesabınız ve planınız için Copilot
-modellerine erişim sağlar. OpenClaw, Copilot'ı bir model
-sağlayıcısı olarak iki farklı şekilde kullanabilir.
+GitHub Copilot, GitHub'ın yapay zeka destekli kodlama asistanıdır. GitHub hesabınız ve planınız için Copilot modellerine erişim sağlar. OpenClaw, Copilot'ı iki farklı şekilde model sağlayıcısı olarak kullanabilir.
 
 ## OpenClaw içinde Copilot kullanmanın iki yolu
 
 <Tabs>
   <Tab title="Yerleşik sağlayıcı (github-copilot)">
-    Yerel cihazla oturum açma akışını kullanarak bir GitHub token'ı alın, sonra
-    OpenClaw çalışırken bunu Copilot API token'larıyla değiştirin. Bu, VS Code
-    gerektirmediği için **varsayılan** ve en basit yoldur.
+    Bir GitHub belirteci almak için yerel cihaz oturum açma akışını kullanın, ardından OpenClaw çalıştığında bunu Copilot API belirteçleriyle değiş tokuş edin. Bu **varsayılan** ve en basit yoldur çünkü VS Code gerektirmez.
 
     <Steps>
       <Step title="Oturum açma komutunu çalıştırın">
@@ -33,20 +29,19 @@ sağlayıcısı olarak iki farklı şekilde kullanabilir.
         openclaw models auth login-github-copilot
         ```
 
-        Sizden bir URL'yi ziyaret etmeniz ve tek kullanımlık bir kod girmeniz istenir. İşlem tamamlanana kadar
-        terminali açık tutun.
+        Sizden bir URL'yi ziyaret etmeniz ve tek kullanımlık bir kod girmeniz istenir. İşlem tamamlanana kadar terminali açık tutun.
       </Step>
       <Step title="Varsayılan bir model ayarlayın">
         ```bash
-        openclaw models set github-copilot/claude-opus-4.6
+        openclaw models set github-copilot/claude-opus-4.7
         ```
 
-        Veya yapılandırmada:
+        Ya da yapılandırmada:
 
         ```json5
         {
           agents: {
-            defaults: { model: { primary: "github-copilot/claude-opus-4.6" } },
+            defaults: { model: { primary: "github-copilot/claude-opus-4.7" } },
           },
         }
         ```
@@ -55,13 +50,11 @@ sağlayıcısı olarak iki farklı şekilde kullanabilir.
 
   </Tab>
 
-  <Tab title="Copilot Proxy Plugin'i (copilot-proxy)">
-    **Copilot Proxy** VS Code uzantısını yerel bir köprü olarak kullanın. OpenClaw,
-    proxy'nin `/v1` uç noktasıyla konuşur ve orada yapılandırdığınız model listesini kullanır.
+  <Tab title="Copilot Proxy Plugin (copilot-proxy)">
+    Yerel bir köprü olarak **Copilot Proxy** VS Code uzantısını kullanın. OpenClaw, proxy'nin `/v1` uç noktasına bağlanır ve orada yapılandırdığınız model listesini kullanır.
 
     <Note>
-    Bunu, Copilot Proxy'yi zaten VS Code içinde çalıştırıyorsanız veya
-    bunun üzerinden yönlendirme yapmanız gerekiyorsa seçin. Plugin'i etkinleştirmeniz ve VS Code uzantısını çalışır durumda tutmanız gerekir.
+    Bunu, Copilot Proxy'yi zaten VS Code içinde çalıştırıyorsanız veya trafiği onun üzerinden yönlendirmeniz gerekiyorsa seçin. Plugin'i etkinleştirmeniz ve VS Code uzantısını çalışır durumda tutmanız gerekir.
     </Note>
 
   </Tab>
@@ -69,77 +62,62 @@ sağlayıcısı olarak iki farklı şekilde kullanabilir.
 
 ## İsteğe bağlı bayraklar
 
-| Bayrak         | Açıklama                                              |
-| -------------- | ----------------------------------------------------- |
-| `--yes`        | Onay istemini atla                                    |
-| `--set-default` | Sağlayıcının önerilen varsayılan modelini de uygula  |
+| Bayrak          | Açıklama                                             |
+| --------------- | ---------------------------------------------------- |
+| `--yes`         | Onay istemini atla                                   |
+| `--set-default` | Ayrıca sağlayıcının önerilen varsayılan modelini uygular |
 
 ```bash
 # Onayı atla
 openclaw models auth login-github-copilot --yes
 
-# Tek adımda oturum aç ve varsayılan modeli ayarla
+# Oturum aç ve varsayılan modeli tek adımda ayarla
 openclaw models auth login --provider github-copilot --method device --set-default
 ```
 
 <AccordionGroup>
-  <Accordion title="Etkileşimli TTY gerekli">
-    Cihazla oturum açma akışı etkileşimli bir TTY gerektirir. Bunu etkileşimli olmayan bir betikte veya CI işlem hattında değil,
-    doğrudan bir terminalde çalıştırın.
+  <Accordion title="Etkileşimli TTY gerekir">
+    Cihaz oturum açma akışı etkileşimli bir TTY gerektirir. Bunu etkileşimsiz bir betikte veya CI işlem hattında değil, doğrudan bir terminalde çalıştırın.
   </Accordion>
 
   <Accordion title="Model kullanılabilirliği planınıza bağlıdır">
-    Copilot model kullanılabilirliği GitHub planınıza bağlıdır. Bir model
-    reddedilirse başka bir kimlik deneyin (örneğin `github-copilot/gpt-4.1`).
+    Copilot model kullanılabilirliği GitHub planınıza bağlıdır. Bir model reddedilirse başka bir kimlik deneyin (örneğin `github-copilot/gpt-4.1`).
   </Accordion>
 
-  <Accordion title="Aktarım seçimi">
-    Claude model kimlikleri otomatik olarak Anthropic Messages aktarımını kullanır. GPT,
-    o-serisi ve Gemini modelleri OpenAI Responses aktarımını korur. OpenClaw,
-    model başvurusuna göre doğru aktarımı seçer.
+  <Accordion title="Taşıma seçimi">
+    Claude model kimlikleri otomatik olarak Anthropic Messages taşımasını kullanır. GPT, o-series ve Gemini modelleri OpenAI Responses taşımasını korur. OpenClaw, model ref'ine göre doğru taşımayı seçer.
   </Accordion>
 
   <Accordion title="Ortam değişkeni çözümleme sırası">
-    OpenClaw, Copilot kimlik doğrulamasını ortam değişkenlerinden aşağıdaki
-    öncelik sırasıyla çözümler:
+    OpenClaw, Copilot kimlik doğrulamasını aşağıdaki öncelik sırasına göre ortam değişkenlerinden çözümler:
 
     | Öncelik | Değişken              | Notlar                              |
     | -------- | --------------------- | ----------------------------------- |
     | 1        | `COPILOT_GITHUB_TOKEN` | En yüksek öncelik, Copilot'a özel   |
-    | 2        | `GH_TOKEN`            | GitHub CLI token'ı (yedek)          |
-    | 3        | `GITHUB_TOKEN`        | Standart GitHub token'ı (en düşük)  |
+    | 2        | `GH_TOKEN`            | GitHub CLI belirteci (yedek)        |
+    | 3        | `GITHUB_TOKEN`        | Standart GitHub belirteci (en düşük) |
 
-    Birden çok değişken ayarlandığında OpenClaw en yüksek öncelikli olanı kullanır.
-    Cihazla oturum açma akışı (`openclaw models auth login-github-copilot`),
-    token'ını auth profil deposunda saklar ve tüm ortam
-    değişkenlerinden öncelikli olur.
+    Birden fazla değişken ayarlandığında OpenClaw en yüksek öncelikli olanı kullanır.
+    Cihaz oturum açma akışı (`openclaw models auth login-github-copilot`) belirtecini kimlik doğrulama profil deposunda saklar ve tüm ortam değişkenlerinden öncelikli olur.
 
   </Accordion>
 
-  <Accordion title="Token depolama">
-    Oturum açma, bir GitHub token'ını auth profil deposunda saklar ve OpenClaw çalışırken bunu
-    bir Copilot API token'ıyla değiştirir. Token'ı
-    elle yönetmeniz gerekmez.
+  <Accordion title="Belirteç depolama">
+    Oturum açma işlemi bir GitHub belirtecini kimlik doğrulama profil deposunda saklar ve OpenClaw çalıştığında bunu bir Copilot API belirteciyle değiş tokuş eder. Belirteci manuel olarak yönetmeniz gerekmez.
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Etkileşimli bir TTY gerektirir. Oturum açma komutunu başsız bir betik veya CI işi
-içinde değil, doğrudan bir terminalde çalıştırın.
+Etkileşimli bir TTY gerekir. Oturum açma komutunu başsız bir betik veya CI işi içinde değil, doğrudan bir terminalde çalıştırın.
 </Warning>
 
 ## Bellek arama gömmeleri
 
-GitHub Copilot ayrıca
-[bellek arama](/tr/concepts/memory-search) için bir gömme sağlayıcısı olarak da kullanılabilir. Bir Copilot aboneliğiniz varsa ve
-oturum açtıysanız, OpenClaw bunu ayrı bir API anahtarı olmadan gömmeler için kullanabilir.
+GitHub Copilot ayrıca [bellek arama](/tr/concepts/memory-search) için bir gömme sağlayıcısı olarak da kullanılabilir. Bir Copilot aboneliğiniz varsa ve oturum açtıysanız, OpenClaw bunu ayrı bir API anahtarı olmadan gömmeler için kullanabilir.
 
 ### Otomatik algılama
 
-`memorySearch.provider` `"auto"` olduğunda (varsayılan), GitHub Copilot
-öncelik 15'te denenir -- yerel gömmelerden sonra, ancak OpenAI ve diğer ücretli
-sağlayıcılardan önce. Bir GitHub token'ı mevcutsa OpenClaw, kullanılabilir
-gömme modellerini Copilot API'den keşfeder ve en iyisini otomatik olarak seçer.
+`memorySearch.provider` değeri `"auto"` olduğunda (varsayılan), GitHub Copilot öncelik 15 ile denenir -- yerel gömmelerden sonra, ancak OpenAI ve diğer ücretli sağlayıcılardan önce. Bir GitHub belirteci mevcutsa OpenClaw, kullanılabilir gömme modellerini Copilot API'den keşfeder ve en iyisini otomatik olarak seçer.
 
 ### Açık yapılandırma
 
@@ -159,22 +137,21 @@ gömme modellerini Copilot API'den keşfeder ve en iyisini otomatik olarak seçe
 
 ### Nasıl çalışır
 
-1. OpenClaw GitHub token'ınızı çözümler (ortam değişkenlerinden veya auth profilinden).
-2. Bunu kısa ömürlü bir Copilot API token'ıyla değiştirir.
+1. OpenClaw GitHub belirtecinizi çözümler (ortam değişkenlerinden veya kimlik doğrulama profilinden).
+2. Bunu kısa ömürlü bir Copilot API belirteciyle değiş tokuş eder.
 3. Kullanılabilir gömme modellerini keşfetmek için Copilot `/models` uç noktasını sorgular.
 4. En iyi modeli seçer (`text-embedding-3-small` tercih edilir).
 5. Gömme isteklerini Copilot `/embeddings` uç noktasına gönderir.
 
-Model kullanılabilirliği GitHub planınıza bağlıdır. Kullanılabilir gömme modeli
-yoksa OpenClaw Copilot'ı atlar ve sonraki sağlayıcıyı dener.
+Model kullanılabilirliği GitHub planınıza bağlıdır. Hiçbir gömme modeli mevcut değilse OpenClaw, Copilot'ı atlar ve sonraki sağlayıcıyı dener.
 
 ## İlgili
 
 <CardGroup cols={2}>
   <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model başvurularını ve yük devretme davranışını seçme.
+    Sağlayıcıları, model ref'lerini ve yük devretme davranışını seçme.
   </Card>
-  <Card title="OAuth ve auth" href="/tr/gateway/authentication" icon="key">
-    Auth ayrıntıları ve kimlik bilgisi yeniden kullanım kuralları.
+  <Card title="OAuth ve kimlik doğrulama" href="/tr/gateway/authentication" icon="key">
+    Kimlik doğrulama ayrıntıları ve kimlik bilgisi yeniden kullanım kuralları.
   </Card>
 </CardGroup>
