@@ -6,20 +6,20 @@ read_when:
 summary: 使用已配置的提供商（OpenAI、Google Gemini、fal、MiniMax、ComfyUI、Vydra）生成和编辑图像
 title: 图像生成
 x-i18n:
-    generated_at: "2026-04-06T22:52:16Z"
+    generated_at: "2026-04-21T20:53:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8f7303c199d46e63e88f5f9567478a1025631afb03cb35f44344c12370365e57
+    source_hash: e365cd23f4f8d8c9ce88d57e65f06ac5ae5285b8b7f9ea37f0b08ab5f6ff7235
     source_path: tools/image-generation.md
     workflow: 15
 ---
 
 # 图像生成
 
-`image_generate` 工具让智能体能够使用你已配置的提供商创建和编辑图像。生成的图像会自动作为媒体附件随智能体的回复一并发送。
+`image_generate` 工具允许智能体使用你已配置的提供商来创建和编辑图像。生成的图像会作为媒体附件自动随智能体的回复一并发送。
 
 <Note>
-只有在至少有一个图像生成提供商可用时，此工具才会显示。如果你在智能体的工具中看不到 `image_generate`，请配置 `agents.defaults.imageGenerationModel` 或设置提供商 API 密钥。
+只有在至少有一个图像生成提供商可用时，该工具才会显示。如果你在智能体的工具中看不到 `image_generate`，请配置 `agents.defaults.imageGenerationModel` 或设置提供商 API 密钥。
 </Note>
 
 ## 快速开始
@@ -32,7 +32,7 @@ x-i18n:
   agents: {
     defaults: {
       imageGenerationModel: {
-        primary: "openai/gpt-image-1",
+        primary: "openai/gpt-image-2",
       },
     },
   },
@@ -41,20 +41,20 @@ x-i18n:
 
 3. 向智能体提问：_“生成一张友好的龙虾吉祥物图像。”_
 
-智能体会自动调用 `image_generate`。无需将工具加入允许列表——当有可用提供商时，它默认启用。
+智能体会自动调用 `image_generate`。无需允许工具白名单 —— 只要有可用提供商，它默认就会启用。
 
 ## 支持的提供商
 
-| 提供商 | 默认模型                         | 编辑支持                           | API 密钥                                               |
-| ------ | -------------------------------- | ---------------------------------- | ------------------------------------------------------ |
-| OpenAI | `gpt-image-1`                    | 是（最多 5 张图像）                | `OPENAI_API_KEY`                                       |
-| Google | `gemini-3.1-flash-image-preview` | 是                                 | `GEMINI_API_KEY` 或 `GOOGLE_API_KEY`                   |
-| fal    | `fal-ai/flux/dev`                | 是                                 | `FAL_KEY`                                              |
+| 提供商 | 默认模型                         | 编辑支持                           | API 密钥                                                |
+| ------ | -------------------------------- | ---------------------------------- | ------------------------------------------------------- |
+| OpenAI | `gpt-image-2`                    | 是（最多 5 张图像）                | `OPENAI_API_KEY`                                        |
+| Google | `gemini-3.1-flash-image-preview` | 是                                 | `GEMINI_API_KEY` 或 `GOOGLE_API_KEY`                    |
+| fal    | `fal-ai/flux/dev`                | 是                                 | `FAL_KEY`                                               |
 | MiniMax | `image-01`                      | 是（主体参考）                     | `MINIMAX_API_KEY` 或 MiniMax OAuth（`minimax-portal`） |
 | ComfyUI | `workflow`                      | 是（1 张图像，由工作流配置）       | 云端使用 `COMFY_API_KEY` 或 `COMFY_CLOUD_API_KEY`      |
-| Vydra  | `grok-imagine`                   | 否                                 | `VYDRA_API_KEY`                                        |
+| Vydra  | `grok-imagine`                   | 否                                 | `VYDRA_API_KEY`                                         |
 
-使用 `action: "list"` 可在运行时查看可用的提供商和模型：
+使用 `action: "list"` 可在运行时查看可用提供商和模型：
 
 ```
 /tool image_generate action=list
@@ -62,22 +62,22 @@ x-i18n:
 
 ## 工具参数
 
-| 参数          | 类型     | 描述                                                                                |
-| ------------- | -------- | ----------------------------------------------------------------------------------- |
-| `prompt`      | string   | 图像生成提示词（`action: "generate"` 时必填）                                       |
-| `action`      | string   | `"generate"`（默认）或 `"list"`，用于查看提供商                                     |
-| `model`       | string   | 提供商/模型覆盖，例如 `openai/gpt-image-1`                                          |
-| `image`       | string   | 编辑模式下的单个参考图像路径或 URL                                                  |
-| `images`      | string[] | 编辑模式下的多个参考图像（最多 5 张）                                               |
-| `size`        | string   | 尺寸提示：`1024x1024`、`1536x1024`、`1024x1536`、`1024x1792`、`1792x1024`           |
-| `aspectRatio` | string   | 宽高比：`1:1`、`2:3`、`3:2`、`3:4`、`4:3`、`4:5`、`5:4`、`9:16`、`16:9`、`21:9`     |
-| `resolution`  | string   | 分辨率提示：`1K`、`2K` 或 `4K`                                                      |
-| `count`       | number   | 要生成的图像数量（1–4）                                                             |
-| `filename`    | string   | 输出文件名提示                                                                      |
+| 参数          | 类型     | 说明                                                                                  |
+| ------------- | -------- | ------------------------------------------------------------------------------------- |
+| `prompt`      | string   | 图像生成提示词（`action: "generate"` 时必填）                                         |
+| `action`      | string   | `"generate"`（默认）或 `"list"`，用于查看提供商                                        |
+| `model`       | string   | 提供商/模型覆盖，例如 `openai/gpt-image-2`                                            |
+| `image`       | string   | 编辑模式下的单个参考图像路径或 URL                                                    |
+| `images`      | string[] | 编辑模式下的多个参考图像（最多 5 张）                                                 |
+| `size`        | string   | 尺寸提示：`1024x1024`、`1536x1024`、`1024x1536`、`2048x2048`、`3840x2160`             |
+| `aspectRatio` | string   | 宽高比：`1:1`、`2:3`、`3:2`、`3:4`、`4:3`、`4:5`、`5:4`、`9:16`、`16:9`、`21:9`      |
+| `resolution`  | string   | 分辨率提示：`1K`、`2K` 或 `4K`                                                        |
+| `count`       | number   | 要生成的图像数量（1–4）                                                               |
+| `filename`    | string   | 输出文件名提示                                                                        |
 
-并非所有提供商都支持全部参数。当回退提供商支持的是接近的几何选项而不是精确请求的选项时，OpenClaw 会在提交前重新映射到最接近的受支持尺寸、宽高比或分辨率。确实不受支持的覆盖项仍会在工具结果中报告。
+并非所有提供商都支持所有参数。当回退提供商支持接近的几何选项但不支持你精确请求的值时，OpenClaw 会在提交前重映射为最接近的受支持尺寸、宽高比或分辨率。真正不受支持的覆盖项仍会在工具结果中报告。
 
-工具结果会报告实际应用的设置。当 OpenClaw 在提供商回退期间重新映射几何参数时，返回的 `size`、`aspectRatio` 和 `resolution` 值会反映实际发送的内容，而 `details.normalization` 会记录从请求值到应用值的转换。
+工具结果会报告实际应用的设置。当 OpenClaw 在提供商回退期间重映射几何参数时，返回的 `size`、`aspectRatio` 和 `resolution` 值会反映实际发送的内容，而 `details.normalization` 会记录从请求值到应用值的转换。
 
 ## 配置
 
@@ -88,7 +88,7 @@ x-i18n:
   agents: {
     defaults: {
       imageGenerationModel: {
-        primary: "openai/gpt-image-1",
+        primary: "openai/gpt-image-2",
         fallbacks: ["google/gemini-3.1-flash-image-preview", "fal/fal-ai/flux/dev"],
       },
     },
@@ -103,55 +103,81 @@ x-i18n:
 1. 工具调用中的 **`model` 参数**（如果智能体指定了）
 2. 配置中的 **`imageGenerationModel.primary`**
 3. 按顺序使用 **`imageGenerationModel.fallbacks`**
-4. **自动检测** —— 仅使用基于认证的提供商默认值：
+4. **自动检测** —— 仅使用有凭证支持的提供商默认值：
    - 先使用当前默认提供商
-   - 然后按提供商 ID 顺序使用其余已注册的图像生成提供商
+   - 再按提供商 ID 顺序使用其余已注册的图像生成提供商
 
-如果某个提供商失败（认证错误、速率限制等），系统会自动尝试下一个候选项。如果全部失败，错误中会包含每次尝试的详细信息。
+如果某个提供商失败（凭证错误、速率限制等），会自动尝试下一个候选项。如果全部失败，错误信息会包含每次尝试的详细信息。
 
 说明：
 
-- 自动检测会感知认证状态。只有当 OpenClaw 实际能够验证该提供商时，
-  该提供商默认值才会进入候选列表。
-- 自动检测默认启用。如果你希望图像生成仅使用显式的 `model`、`primary` 和 `fallbacks`
-  条目，请设置
-  `agents.defaults.mediaGenerationAutoProviderFallback: false`。
-- 使用 `action: "list"` 可查看当前已注册的提供商、它们的
-  默认模型以及认证环境变量提示。
+- 自动检测会感知认证状态。只有当 OpenClaw 实际能够认证该提供商时，该提供商默认值才会进入候选列表。
+- 自动检测默认启用。如果你希望图像生成只使用显式的 `model`、`primary` 和 `fallbacks` 条目，请设置 `agents.defaults.mediaGenerationAutoProviderFallback: false`。
+- 使用 `action: "list"` 可查看当前已注册的提供商、它们的默认模型以及认证环境变量提示。
 
 ### 图像编辑
 
 OpenAI、Google、fal、MiniMax 和 ComfyUI 支持编辑参考图像。传入参考图像路径或 URL：
 
 ```
-"把这张照片生成为水彩风格版本" + image: "/path/to/photo.jpg"
+"Generate a watercolor version of this photo" + image: "/path/to/photo.jpg"
 ```
 
 OpenAI 和 Google 通过 `images` 参数最多支持 5 张参考图像。fal、MiniMax 和 ComfyUI 支持 1 张。
 
-MiniMax 图像生成可通过两种内置的 MiniMax 认证路径使用：
+### OpenAI `gpt-image-2`
+
+OpenAI 图像生成默认使用 `openai/gpt-image-2`。较旧的 `openai/gpt-image-1` 模型仍可显式选择，但新的 OpenAI 图像生成和图像编辑请求应使用 `gpt-image-2`。
+
+`gpt-image-2` 同时支持文生图生成和参考图像编辑，均通过同一个 `image_generate` 工具完成。OpenClaw 会将 `prompt`、`count`、`size` 和参考图像转发给 OpenAI。OpenAI 不会直接接收 `aspectRatio` 或 `resolution`；在可能的情况下，OpenClaw 会将它们映射为受支持的 `size`，否则工具会将其报告为被忽略的覆盖项。
+
+生成一张 4K 横版图像：
+
+```
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="A clean editorial poster for OpenClaw image generation" size=3840x2160 count=1
+```
+
+生成两张方形图像：
+
+```
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Two visual directions for a calm productivity app icon" size=1024x1024 count=2
+```
+
+编辑一张本地参考图像：
+
+```
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Keep the subject, replace the background with a bright studio setup" image=/path/to/reference.png size=1024x1536
+```
+
+使用多张参考图像进行编辑：
+
+```
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Combine the character identity from the first image with the color palette from the second" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
+```
+
+MiniMax 图像生成功能可通过两种内置的 MiniMax 认证路径使用：
 
 - `minimax/image-01`，用于 API 密钥配置
 - `minimax-portal/image-01`，用于 OAuth 配置
 
 ## 提供商能力
 
-| 能力                  | OpenAI               | Google               | fal                 | MiniMax                    | ComfyUI                            | Vydra   |
-| --------------------- | -------------------- | -------------------- | ------------------- | -------------------------- | ---------------------------------- | ------- |
-| 生成                  | 是（最多 4 张）      | 是（最多 4 张）      | 是（最多 4 张）     | 是（最多 9 张）            | 是（输出由工作流定义）             | 是（1 张） |
-| 编辑/参考             | 是（最多 5 张图像）  | 是（最多 5 张图像）  | 是（1 张图像）      | 是（1 张图像，主体参考）   | 是（1 张图像，由工作流配置）       | 否      |
-| 尺寸控制              | 是                   | 是                   | 是                  | 否                         | 否                                 | 否      |
-| 宽高比                | 否                   | 是                   | 是（仅生成）        | 是                         | 否                                 | 否      |
-| 分辨率（1K/2K/4K）    | 否                   | 是                   | 是                  | 否                         | 否                                 | 否      |
+| 能力                  | OpenAI          | Google              | fal           | MiniMax              | ComfyUI                     | Vydra   |
+| --------------------- | --------------- | ------------------- | ------------- | -------------------- | --------------------------- | ------- |
+| 生成                  | 是（最多 4 张） | 是（最多 4 张）     | 是（最多 4 张） | 是（最多 9 张）     | 是（由工作流定义输出）      | 是（1 张） |
+| 编辑/参考图           | 是（最多 5 张） | 是（最多 5 张）     | 是（1 张）    | 是（1 张，主体参考） | 是（1 张，由工作流配置）    | 否      |
+| 尺寸控制              | 是（最高 4K）   | 是                  | 是            | 否                   | 否                          | 否      |
+| 宽高比                | 否              | 是                  | 是（仅生成）  | 是                   | 否                          | 否      |
+| 分辨率（1K/2K/4K）    | 否              | 是                  | 是            | 否                   | 否                          | 否      |
 
 ## 相关内容
 
 - [工具概览](/zh-CN/tools) — 所有可用的智能体工具
 - [fal](/zh-CN/providers/fal) — fal 图像和视频提供商设置
 - [ComfyUI](/zh-CN/providers/comfy) — 本地 ComfyUI 和 Comfy Cloud 工作流设置
-- [Google (Gemini)](/zh-CN/providers/google) — Gemini 图像提供商设置
+- [Google（Gemini）](/zh-CN/providers/google) — Gemini 图像提供商设置
 - [MiniMax](/zh-CN/providers/minimax) — MiniMax 图像提供商设置
 - [OpenAI](/zh-CN/providers/openai) — OpenAI Images 提供商设置
 - [Vydra](/zh-CN/providers/vydra) — Vydra 图像、视频和语音设置
 - [配置参考](/zh-CN/gateway/configuration-reference#agent-defaults) — `imageGenerationModel` 配置
-- [模型](/zh-CN/concepts/models) — 模型配置和故障转移
+- [模型](/zh-CN/concepts/models) — 模型配置与故障转移
