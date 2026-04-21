@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Vuoi attivare esecuzioni dell'agente da script o dalla riga di comando
-    - Hai bisogno di recapitare in modo programmatico le risposte dell'agente a un canale di chat
-summary: Esegui turni dell'agente dalla CLI e, facoltativamente, recapita le risposte ai canali
-title: Agent Send
+    - Vuoi attivare le esecuzioni dell'agente dagli script o dalla riga di comando
+    - Devi recapitare programmaticamente le risposte dell'agente a un canale di chat
+summary: Esegui i turni dell'agente dalla CLI e, facoltativamente, recapita le risposte ai canali
+title: Invio dell'agente
 x-i18n:
-    generated_at: "2026-04-05T14:05:18Z"
+    generated_at: "2026-04-21T13:35:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 42ea2977e89fb28d2afd07e5f6b1560ad627aea8b72fde36d8e324215c710afc
+    source_hash: 0550ad38efb2711f267a62b905fd150987a98801247de780ed3df97f27245704
     source_path: tools/agent-send.md
     workflow: 15
 ---
 
-# Agent Send
+# Invio dell'agente
 
 `openclaw agent` esegue un singolo turno dell'agente dalla riga di comando senza richiedere
-un messaggio di chat in ingresso. Usalo per flussi di lavoro con script, test e
+un messaggio di chat in ingresso. Usalo per flussi di lavoro scriptati, test e
 recapito programmatico.
 
-## Avvio rapido
+## Guida rapida
 
 <Steps>
   <Step title="Esegui un semplice turno dell'agente">
@@ -31,15 +31,15 @@ recapito programmatico.
 
   </Step>
 
-  <Step title="Scegli come destinazione un agente o una sessione specifici">
+  <Step title="Indirizza a un agente o a una sessione specifici">
     ```bash
-    # Scegli come destinazione un agente specifico
+    # Target a specific agent
     openclaw agent --agent ops --message "Summarize logs"
 
-    # Scegli come destinazione un numero di telefono (deriva la chiave di sessione)
+    # Target a phone number (derives session key)
     openclaw agent --to +15555550123 --message "Status update"
 
-    # Riutilizza una sessione esistente
+    # Reuse an existing session
     openclaw agent --session-id abc123 --message "Continue the task"
     ```
 
@@ -47,10 +47,10 @@ recapito programmatico.
 
   <Step title="Recapita la risposta a un canale">
     ```bash
-    # Recapita a WhatsApp (canale predefinito)
+    # Deliver to WhatsApp (default channel)
     openclaw agent --to +15555550123 --message "Report ready" --deliver
 
-    # Recapita a Slack
+    # Deliver to Slack
     openclaw agent --agent ops --message "Generate report" \
       --deliver --reply-channel slack --reply-to "#reports"
     ```
@@ -63,45 +63,45 @@ recapito programmatico.
 | Flag                          | Descrizione                                                 |
 | ----------------------------- | ----------------------------------------------------------- |
 | `--message \<text\>`          | Messaggio da inviare (obbligatorio)                         |
-| `--to \<dest\>`               | Deriva la chiave di sessione da una destinazione (telefono, id chat) |
-| `--agent \<id\>`              | Sceglie come destinazione un agente configurato (usa la sua sessione `main`) |
+| `--to \<dest\>`               | Ricava la chiave di sessione da una destinazione (telefono, id chat) |
+| `--agent \<id\>`              | Indirizza a un agente configurato (usa la sua sessione `main`) |
 | `--session-id \<id\>`         | Riutilizza una sessione esistente tramite id                |
-| `--local`                     | Forza il runtime incorporato locale (salta il Gateway)      |
+| `--local`                     | Forza il runtime embedded locale (salta il Gateway)         |
 | `--deliver`                   | Invia la risposta a un canale di chat                       |
 | `--channel \<name\>`          | Canale di recapito (whatsapp, telegram, discord, slack, ecc.) |
-| `--reply-to \<target\>`       | Override della destinazione di recapito                     |
-| `--reply-channel \<name\>`    | Override del canale di recapito                             |
-| `--reply-account \<id\>`      | Override dell'id account di recapito                        |
-| `--thinking \<level\>`        | Imposta il livello di thinking (off, minimal, low, medium, high, xhigh) |
-| `--verbose \<on\|full\|off\>` | Imposta il livello di dettaglio                             |
+| `--reply-to \<target\>`       | Sostituzione della destinazione di recapito                 |
+| `--reply-channel \<name\>`    | Sostituzione del canale di recapito                         |
+| `--reply-account \<id\>`      | Sostituzione dell'id account di recapito                    |
+| `--thinking \<level\>`        | Imposta il livello di thinking per il profilo modello selezionato |
+| `--verbose \<on\|full\|off\>` | Imposta il livello di verbosità                             |
 | `--timeout \<seconds\>`       | Sostituisce il timeout dell'agente                          |
 | `--json`                      | Produce JSON strutturato                                    |
 
 ## Comportamento
 
-- Per impostazione predefinita, la CLI passa **attraverso il Gateway**. Aggiungi `--local` per forzare
-  il runtime incorporato sulla macchina corrente.
-- Se il Gateway non è raggiungibile, la CLI **ripiega** sull'esecuzione incorporata locale.
-- Selezione della sessione: `--to` deriva la chiave di sessione (le destinazioni di gruppo/canale
-  preservano l'isolamento; le chat dirette confluiscono in `main`).
-- I flag thinking e verbose persistono nell'archivio delle sessioni.
-- Output: testo semplice per impostazione predefinita, oppure `--json` per payload strutturato + metadati.
+- Per impostazione predefinita, la CLI passa **attraverso il Gateway**. Aggiungi `--local` per forzare il
+  runtime embedded sulla macchina corrente.
+- Se il Gateway non è raggiungibile, la CLI **ripiega** sull'esecuzione embedded locale.
+- Selezione della sessione: `--to` ricava la chiave di sessione (le destinazioni di gruppo/canale
+  preservano l'isolamento; le chat dirette convergono su `main`).
+- I flag thinking e verbose vengono mantenuti nell'archivio sessioni.
+- Output: testo normale per impostazione predefinita, oppure `--json` per payload strutturato + metadati.
 
 ## Esempi
 
 ```bash
-# Turno semplice con output JSON
+# Simple turn with JSON output
 openclaw agent --to +15555550123 --message "Trace logs" --verbose on --json
 
-# Turno con livello di thinking
+# Turn with thinking level
 openclaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
 
-# Recapita a un canale diverso dalla sessione
+# Deliver to a different channel than the session
 openclaw agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
 ```
 
 ## Correlati
 
-- [Riferimento CLI dell'agente](/cli/agent)
-- [Sotto-agenti](/tools/subagents) — avvio in background di sotto-agenti
+- [Riferimento della CLI dell'agente](/cli/agent)
+- [Sub-agents](/it/tools/subagents) — generazione di sub-agent in background
 - [Sessioni](/it/concepts/session) — come funzionano le chiavi di sessione
