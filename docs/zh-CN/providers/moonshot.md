@@ -1,25 +1,25 @@
 ---
 read_when:
-    - 你想要配置 Moonshot K2（Moonshot 开放平台）与 Kimi Coding。
-    - 你需要了解分别独立的端点、密钥和模型引用。
-    - 你想要适用于任一提供商的可复制粘贴配置。
-summary: 配置 Moonshot K2 与 Kimi Coding（分别使用不同的提供商和密钥）
+    - 你想要设置 Moonshot K2（Moonshot Open Platform）与 Kimi Coding 的对比配置
+    - 你需要了解单独的端点、密钥和模型引用
+    - 你想要适用于任一提供商的可复制粘贴配置
+summary: 配置 Moonshot K2 与 Kimi Coding（使用单独的提供商 + 密钥）
 title: Moonshot AI
 x-i18n:
-    generated_at: "2026-04-21T02:04:40Z"
+    generated_at: "2026-04-21T02:12:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3b7044b2e680ac235a2d60fde6491582d09c3dfdd6a78109ae085932eb97b54d
+    source_hash: 5a04b0c45d55dbf8d56a04a1811f0850b800842ea501b212d44b53ff0680b5a2
     source_path: providers/moonshot.md
     workflow: 15
 ---
 
 # Moonshot AI（Kimi）
 
-Moonshot 提供带有 OpenAI 兼容端点的 Kimi API。配置该提供商，并将默认模型设置为 `moonshot/kimi-k2.6`，或者使用 `kimi/kimi-code` 来配置 Kimi Coding。
+Moonshot 通过与 OpenAI 兼容的端点提供 Kimi API。请配置该提供商，并将默认模型设置为 `moonshot/kimi-k2.6`，或者使用 `kimi/kimi-code` 作为 Kimi Coding。
 
 <Warning>
-Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点不同，模型引用也不同（`moonshot/...` 与 `kimi/...`）。
+Moonshot 和 Kimi Coding 是**单独的提供商**。密钥不能互换，端点不同，模型引用也不同（`moonshot/...` 与 `kimi/...`）。
 </Warning>
 
 ## 内置模型目录
@@ -28,37 +28,37 @@ Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点
 
 | Model ref                         | 名称                   | 推理 | 输入        | 上下文 | 最大输出 |
 | --------------------------------- | ---------------------- | ---- | ----------- | ------ | -------- |
-| `moonshot/kimi-k2.6`              | Kimi K2.6              | 否   | text, image | 262,144 | 262,144  |
-| `moonshot/kimi-k2.5`              | Kimi K2.5              | 否   | text, image | 262,144 | 262,144  |
-| `moonshot/kimi-k2-thinking`       | Kimi K2 Thinking       | 是   | text        | 262,144 | 262,144  |
-| `moonshot/kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo | 是   | text        | 262,144 | 262,144  |
-| `moonshot/kimi-k2-turbo`          | Kimi K2 Turbo          | 否   | text        | 256,000 | 16,384   |
+| `moonshot/kimi-k2.6`              | Kimi K2.6              | 否   | text, image | 262,144 | 262,144    |
+| `moonshot/kimi-k2.5`              | Kimi K2.5              | 否   | text, image | 262,144 | 262,144    |
+| `moonshot/kimi-k2-thinking`       | Kimi K2 Thinking       | 是   | text        | 262,144 | 262,144    |
+| `moonshot/kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo | 是   | text        | 262,144 | 262,144    |
+| `moonshot/kimi-k2-turbo`          | Kimi K2 Turbo          | 否   | text        | 256,000 | 16,384     |
 
 [//]: # "moonshot-kimi-k2-ids:end"
 
-当前由 Moonshot 托管的 K2 模型，其内置成本估算使用 Moonshot 公布的按量计费价格：Kimi K2.6 的缓存命中为 $0.16/MTok，输入为 $0.95/MTok，输出为 $4.00/MTok；Kimi K2.5 的缓存命中为 $0.10/MTok，输入为 $0.60/MTok，输出为 $3.00/MTok。其他旧版目录条目会继续保留零成本占位值，除非你在配置中覆盖它们。
+当前由 Moonshot 托管的 K2 模型，其内置成本估算使用 Moonshot 公布的按量付费价格：Kimi K2.6 为 $0.16/MTok 缓存命中、$0.95/MTok 输入、$4.00/MTok 输出；Kimi K2.5 为 $0.10/MTok 缓存命中、$0.60/MTok 输入、$3.00/MTok 输出。其他旧版目录条目会保留零成本占位值，除非你在配置中覆盖它们。
 
 ## 入门指南
 
-选择你的提供商，并按照设置步骤操作。
+选择你的提供商并按步骤完成设置。
 
 <Tabs>
   <Tab title="Moonshot API">
-    **最适合：** 通过 Moonshot 开放平台使用 Kimi K2 模型。
+    **最适合：** 通过 Moonshot Open Platform 使用 Kimi K2 模型。
 
     <Steps>
       <Step title="选择你的端点区域">
-        | 认证选项              | 端点                           | 区域 |
-        | --------------------- | ------------------------------ | ---- |
-        | `moonshot-api-key`    | `https://api.moonshot.ai/v1`   | 国际 |
-        | `moonshot-api-key-cn` | `https://api.moonshot.cn/v1`   | 中国 |
+        | 鉴权选项               | 端点                         | 区域 |
+        | ---------------------- | ---------------------------- | ---- |
+        | `moonshot-api-key`     | `https://api.moonshot.ai/v1` | 国际 |
+        | `moonshot-api-key-cn`  | `https://api.moonshot.cn/v1` | 中国 |
       </Step>
       <Step title="运行新手引导">
         ```bash
         openclaw onboard --auth-choice moonshot-api-key
         ```
 
-        或者，针对中国端点：
+        或者，如果使用中国端点：
 
         ```bash
         openclaw onboard --auth-choice moonshot-api-key-cn
@@ -75,10 +75,26 @@ Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点
         }
         ```
       </Step>
-      <Step title="验证模型可用">
+      <Step title="验证模型是否可用">
         ```bash
         openclaw models list --provider moonshot
         ```
+      </Step>
+      <Step title="运行实时冒烟测试">
+        当你想在不影响正常会话的情况下验证模型访问和成本跟踪时，请使用独立的状态目录：
+
+        ```bash
+        OPENCLAW_CONFIG_PATH=/tmp/openclaw-kimi/openclaw.json \
+        OPENCLAW_STATE_DIR=/tmp/openclaw-kimi \
+        openclaw agent --local \
+          --session-id live-kimi-cost \
+          --message 'Reply exactly: KIMI_LIVE_OK' \
+          --thinking off \
+          --json
+        ```
+
+        JSON 响应应显示 `provider: "moonshot"` 和
+        `model: "kimi-k2.6"`。当 Moonshot 返回用量元数据时，助手转录条目会在 `usage.cost` 下存储标准化后的 token 用量以及预估成本。
       </Step>
     </Steps>
 
@@ -166,10 +182,10 @@ Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点
   </Tab>
 
   <Tab title="Kimi Coding">
-    **最适合：** 通过 Kimi Coding 端点处理以代码为重点的任务。
+    **最适合：** 通过 Kimi Coding 端点执行以代码为重点的任务。
 
     <Note>
-    Kimi Coding 使用与 Moonshot 不同的 API 密钥和提供商前缀（`kimi/...` 而不是 `moonshot/...`）。旧版模型引用 `kimi/k2p5` 仍然作为兼容 id 被接受。
+    Kimi Coding 使用与 Moonshot 不同的 API 密钥和提供商前缀（`kimi/...`），而 Moonshot 使用 `moonshot/...`。旧版模型引用 `kimi/k2p5` 仍然作为兼容性 id 被接受。
     </Note>
 
     <Steps>
@@ -189,7 +205,7 @@ Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点
         }
         ```
       </Step>
-      <Step title="验证模型可用">
+      <Step title="验证模型是否可用">
         ```bash
         openclaw models list --provider kimi
         ```
@@ -215,27 +231,27 @@ Moonshot 和 Kimi Coding 是**不同的提供商**。密钥不能互换，端点
   </Tab>
 </Tabs>
 
-## Kimi Web 搜索
+## Kimi web 搜索
 
-OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot Web 搜索提供支持。
+OpenClaw 还内置了 **Kimi** 作为 `web_search` 提供商，其底层由 Moonshot web 搜索支持。
 
 <Steps>
-  <Step title="运行交互式 Web 搜索设置">
+  <Step title="运行交互式 web 搜索设置">
     ```bash
     openclaw configure --section web
     ```
 
-    在 Web 搜索部分选择 **Kimi**，以存储
+    在 web 搜索部分选择 **Kimi**，以存储
     `plugins.entries.moonshot.config.webSearch.*`。
 
   </Step>
-  <Step title="配置 Web 搜索区域和模型">
-    交互式设置会提示你输入：
+  <Step title="配置 web 搜索区域和模型">
+    交互式设置会提示以下内容：
 
-    | 设置             | 选项                                                                 |
-    | ---------------- | -------------------------------------------------------------------- |
-    | API 区域         | `https://api.moonshot.ai/v1`（国际）或 `https://api.moonshot.cn/v1`（中国） |
-    | Web 搜索模型     | 默认为 `kimi-k2.6`                                                   |
+    | 设置                | 选项                                                                 |
+    | ------------------- | -------------------------------------------------------------------- |
+    | API 区域            | `https://api.moonshot.ai/v1`（国际）或 `https://api.moonshot.cn/v1`（中国） |
+    | Web 搜索模型        | 默认为 `kimi-k2.6`                                                   |
 
   </Step>
 </Steps>
@@ -249,7 +265,7 @@ OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot We
       moonshot: {
         config: {
           webSearch: {
-            apiKey: "sk-...", // 或使用 KIMI_API_KEY / MOONSHOT_API_KEY
+            apiKey: "sk-...", // or use KIMI_API_KEY / MOONSHOT_API_KEY
             baseUrl: "https://api.moonshot.ai/v1",
             model: "kimi-k2.6",
           },
@@ -270,13 +286,13 @@ OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot We
 ## 高级
 
 <AccordionGroup>
-  <Accordion title="原生思考模式">
-    Moonshot Kimi 支持二元原生思考模式：
+  <Accordion title="原生 thinking 模式">
+    Moonshot Kimi 支持二元原生 thinking：
 
     - `thinking: { type: "enabled" }`
     - `thinking: { type: "disabled" }`
 
-    通过 `agents.defaults.models.<provider/model>.params` 按模型配置：
+    通过 `agents.defaults.models.<provider/model>.params` 为每个模型配置：
 
     ```json5
     {
@@ -296,16 +312,16 @@ OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot We
 
     OpenClaw 还会为 Moonshot 映射运行时 `/think` 级别：
 
-    | `/think` 级别     | Moonshot 行为              |
-    | ----------------- | -------------------------- |
-    | `/think off`      | `thinking.type=disabled`   |
-    | 任何非 off 级别   | `thinking.type=enabled`    |
+    | `/think` 级别       | Moonshot 行为              |
+    | -------------------- | -------------------------- |
+    | `/think off`         | `thinking.type=disabled`   |
+    | 任何非 off 级别      | `thinking.type=enabled`    |
 
     <Warning>
-    当 Moonshot 思考模式启用时，`tool_choice` 必须是 `auto` 或 `none`。OpenClaw 会将不兼容的 `tool_choice` 值规范化为 `auto` 以保持兼容性。
+    当启用 Moonshot thinking 时，`tool_choice` 必须为 `auto` 或 `none`。为保证兼容性，OpenClaw 会将不兼容的 `tool_choice` 值标准化为 `auto`。
     </Warning>
 
-    Kimi K2.6 还接受一个可选的 `thinking.keep` 字段，用于控制 `reasoning_content` 在多轮对话中的保留方式。将其设置为 `"all"` 可在多轮间保留完整推理；省略它（或保留为 `null`）则使用服务器默认策略。OpenClaw 仅会为 `moonshot/kimi-k2.6` 转发 `thinking.keep`，并会从其他模型中移除该字段。
+    Kimi K2.6 还接受一个可选的 `thinking.keep` 字段，用于控制 `reasoning_content` 在多轮对话中的保留方式。将其设置为 `"all"` 可在多轮中保留完整推理；省略它（或保持为 `null`）则使用服务器默认策略。OpenClaw 只会为 `moonshot/kimi-k2.6` 转发 `thinking.keep`，并会从其他模型中移除该字段。
 
     ```json5
     {
@@ -325,20 +341,24 @@ OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot We
 
   </Accordion>
 
-  <Accordion title="流式 usage 兼容性">
-    原生 Moonshot 端点（`https://api.moonshot.ai/v1` 和 `https://api.moonshot.cn/v1`）在共享的 `openai-completions` 传输协议上声明支持流式 usage 兼容性。OpenClaw 根据端点能力判断这一点，因此指向相同原生 Moonshot 主机的兼容自定义提供商 id 也会继承相同的流式 usage 行为。
+  <Accordion title="流式用量兼容性">
+    原生 Moonshot 端点（`https://api.moonshot.ai/v1` 和
+    `https://api.moonshot.cn/v1`）在共享的 `openai-completions` 传输协议上声明支持流式用量兼容性。OpenClaw 会基于端点能力进行判断，因此，指向相同原生 Moonshot 主机的兼容自定义提供商 id 也会继承相同的流式用量行为。
+
+    使用内置的 K2.6 定价时，包含输入、输出和缓存读取 token 的流式用量，也会被转换为本地预估美元成本，用于 `/status`、`/usage full`、`/usage cost` 以及基于转录的会话计费统计。
+
   </Accordion>
 
-  <Accordion title="端点与模型引用参考">
-    | 提供商      | 模型引用前缀    | 端点                         | 认证环境变量        |
-    | ----------- | --------------- | ---------------------------- | ------------------- |
-    | Moonshot    | `moonshot/`     | `https://api.moonshot.ai/v1` | `MOONSHOT_API_KEY`  |
-    | Moonshot CN | `moonshot/`     | `https://api.moonshot.cn/v1` | `MOONSHOT_API_KEY`  |
-    | Kimi Coding | `kimi/`         | Kimi Coding 端点             | `KIMI_API_KEY`      |
-    | Web 搜索    | N/A             | 与 Moonshot API 区域相同     | `KIMI_API_KEY` 或 `MOONSHOT_API_KEY` |
+  <Accordion title="端点与模型引用对照">
+    | 提供商        | 模型引用前缀     | 端点                          | 鉴权环境变量         |
+    | ------------- | ---------------- | ----------------------------- | -------------------- |
+    | Moonshot      | `moonshot/`      | `https://api.moonshot.ai/v1`  | `MOONSHOT_API_KEY`   |
+    | Moonshot CN   | `moonshot/`      | `https://api.moonshot.cn/v1`  | `MOONSHOT_API_KEY`   |
+    | Kimi Coding   | `kimi/`          | Kimi Coding 端点              | `KIMI_API_KEY`       |
+    | Web 搜索      | N/A              | 与 Moonshot API 区域相同      | `KIMI_API_KEY` or `MOONSHOT_API_KEY` |
 
-    - Kimi Web 搜索使用 `KIMI_API_KEY` 或 `MOONSHOT_API_KEY`，默认使用 `https://api.moonshot.ai/v1` 和模型 `kimi-k2.6`。
-    - 如有需要，可在 `models.providers` 中覆盖价格和上下文元数据。
+    - Kimi web 搜索使用 `KIMI_API_KEY` 或 `MOONSHOT_API_KEY`，默认端点为 `https://api.moonshot.ai/v1`，默认模型为 `kimi-k2.6`。
+    - 如有需要，可在 `models.providers` 中覆盖定价和上下文元数据。
     - 如果 Moonshot 为某个模型发布了不同的上下文限制，请相应调整 `contextWindow`。
 
   </Accordion>
@@ -351,12 +371,12 @@ OpenClaw 还内置了作为 `web_search` 提供商的 **Kimi**，由 Moonshot We
     选择提供商、模型引用和故障切换行为。
   </Card>
   <Card title="Web 搜索" href="/tools/web-search" icon="magnifying-glass">
-    配置包括 Kimi 在内的 Web 搜索提供商。
+    配置 web 搜索提供商，包括 Kimi。
   </Card>
   <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
-    提供商、模型和插件的完整配置模式。
+    提供商、模型和插件的完整配置 schema。
   </Card>
-  <Card title="Moonshot 开放平台" href="https://platform.moonshot.ai" icon="globe">
-    Moonshot API 密钥管理和文档。
+  <Card title="Moonshot Open Platform" href="https://platform.moonshot.ai" icon="globe">
+    Moonshot API 密钥管理与文档。
   </Card>
 </CardGroup>
