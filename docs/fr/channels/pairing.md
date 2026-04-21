@@ -1,40 +1,40 @@
 ---
 read_when:
-    - Configurer le contrôle d’accès aux DM
-    - Appairer un nouveau nœud iOS/Android
-    - Examiner la posture de sécurité d’OpenClaw
-summary: 'Vue d’ensemble de l’appairage : approuver qui peut vous envoyer des DM et quels nœuds peuvent rejoindre'
+    - Configuration du contrôle d’accès aux messages privés
+    - Appairage d’un nouveau nœud iOS/Android
+    - Examen de la posture de sécurité d’OpenClaw
+summary: 'Aperçu de l’appairage : approuver qui peut vous envoyer des messages privés + quels nœuds peuvent rejoindre'
 title: Appairage
 x-i18n:
-    generated_at: "2026-04-05T12:36:00Z"
+    generated_at: "2026-04-21T06:57:41Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2bd99240b3530def23c05a26915d07cf8b730565c2822c6338437f8fb3f285c9
+    source_hash: 4161629ead02dc0bdcd283cc125fe6579a579e03740127f4feb22dfe344bd028
     source_path: channels/pairing.md
     workflow: 15
 ---
 
 # Appairage
 
-L’« appairage » est l’étape explicite **d’approbation du propriétaire** d’OpenClaw.
-Il est utilisé à deux endroits :
+L’« appairage » est l’étape explicite **d’approbation par le propriétaire** d’OpenClaw.
+Il est utilisé à deux endroits :
 
 1. **Appairage DM** (qui est autorisé à parler au bot)
-2. **Appairage de nœud** (quels appareils/nœuds sont autorisés à rejoindre le réseau gateway)
+2. **Appairage de nœud** (quels appareils/nœuds sont autorisés à rejoindre le réseau Gateway)
 
-Contexte de sécurité : [Sécurité](/gateway/security)
+Contexte de sécurité : [Security](/fr/gateway/security)
 
-## 1) Appairage DM (accès entrant au chat)
+## 1) Appairage DM (accès au chat entrant)
 
-Lorsqu’un canal est configuré avec la politique DM `pairing`, les expéditeurs inconnus reçoivent un code court et leur message **n’est pas traité** tant que vous ne l’avez pas approuvé.
+Lorsqu’un canal est configuré avec la politique DM `pairing`, les expéditeurs inconnus reçoivent un code court et leur message n’est **pas traité** tant que vous n’avez pas approuvé.
 
-Les politiques DM par défaut sont documentées dans : [Sécurité](/gateway/security)
+Les politiques DM par défaut sont documentées dans : [Security](/fr/gateway/security)
 
-Codes d’appairage :
+Codes d’appairage :
 
 - 8 caractères, en majuscules, sans caractères ambigus (`0O1I`).
 - **Expirent après 1 heure**. Le bot n’envoie le message d’appairage que lorsqu’une nouvelle demande est créée (environ une fois par heure et par expéditeur).
-- Les demandes d’appairage DM en attente sont limitées à **3 par canal** par défaut ; les demandes supplémentaires sont ignorées jusqu’à ce que l’une expire ou soit approuvée.
+- Les demandes d’appairage DM en attente sont limitées à **3 par canal** par défaut ; les demandes supplémentaires sont ignorées jusqu’à ce qu’une demande expire ou soit approuvée.
 
 ### Approuver un expéditeur
 
@@ -43,59 +43,59 @@ openclaw pairing list telegram
 openclaw pairing approve telegram <CODE>
 ```
 
-Canaux pris en charge : `bluebubbles`, `discord`, `feishu`, `googlechat`, `imessage`, `irc`, `line`, `matrix`, `mattermost`, `msteams`, `nextcloud-talk`, `nostr`, `openclaw-weixin`, `signal`, `slack`, `synology-chat`, `telegram`, `twitch`, `whatsapp`, `zalo`, `zalouser`.
+Canaux pris en charge : `bluebubbles`, `discord`, `feishu`, `googlechat`, `imessage`, `irc`, `line`, `matrix`, `mattermost`, `msteams`, `nextcloud-talk`, `nostr`, `openclaw-weixin`, `signal`, `slack`, `synology-chat`, `telegram`, `twitch`, `whatsapp`, `zalo`, `zalouser`.
 
-### Où l’état est stocké
+### Emplacement de l’état
 
-Stocké sous `~/.openclaw/credentials/` :
+Stocké sous `~/.openclaw/credentials/` :
 
-- Demandes en attente : `<channel>-pairing.json`
-- Stockage de liste d’autorisation approuvée :
-  - Compte par défaut : `<channel>-allowFrom.json`
-  - Compte non par défaut : `<channel>-<accountId>-allowFrom.json`
+- Demandes en attente : `<channel>-pairing.json`
+- Magasin de liste d’autorisation approuvée :
+  - Compte par défaut : `<channel>-allowFrom.json`
+  - Compte non par défaut : `<channel>-<accountId>-allowFrom.json`
 
-Comportement de portée par compte :
+Comportement du périmètre des comptes :
 
-- Les comptes non par défaut lisent/écrivent uniquement leur fichier de liste d’autorisation à portée définie.
-- Le compte par défaut utilise le fichier de liste d’autorisation sans portée, à portée du canal.
+- Les comptes non par défaut lisent/écrivent uniquement dans leur fichier de liste d’autorisation délimité.
+- Le compte par défaut utilise le fichier de liste d’autorisation non délimité, propre au canal.
 
 Traitez ces fichiers comme sensibles (ils contrôlent l’accès à votre assistant).
 
-Important : ce stockage concerne l’accès DM. L’autorisation de groupe est distincte.
-L’approbation d’un code d’appairage DM n’autorise pas automatiquement cet expéditeur à exécuter des commandes de groupe ou à contrôler le bot dans des groupes. Pour l’accès de groupe, configurez les listes d’autorisation de groupe explicites du canal (par exemple `groupAllowFrom`, `groups`, ou des remplacements par groupe/par sujet selon le canal).
+Important : ce magasin concerne l’accès DM. L’autorisation des groupes est distincte.
+Approuver un code d’appairage DM n’autorise pas automatiquement cet expéditeur à exécuter des commandes de groupe ou à contrôler le bot dans des groupes. Pour l’accès aux groupes, configurez les listes d’autorisation explicites du canal pour les groupes (par exemple `groupAllowFrom`, `groups`, ou des remplacements par groupe/par sujet selon le canal).
 
-## 2) Appairage d’appareil de nœud (nœuds iOS/Android/macOS/headless)
+## 2) Appairage d’appareils nœuds (nœuds iOS/Android/macOS/headless)
 
-Les nœuds se connectent à Gateway en tant qu’**appareils** avec `role: node`. Gateway
+Les nœuds se connectent à la Gateway comme **appareils** avec `role: node`. La Gateway
 crée une demande d’appairage d’appareil qui doit être approuvée.
 
 ### Appairer via Telegram (recommandé pour iOS)
 
-Si vous utilisez le plugin `device-pair`, vous pouvez effectuer le premier appairage d’appareil entièrement depuis Telegram :
+Si vous utilisez le plugin `device-pair`, vous pouvez effectuer le premier appairage de l’appareil entièrement depuis Telegram :
 
-1. Dans Telegram, envoyez au bot : `/pair`
-2. Le bot répond avec deux messages : un message d’instructions et un message distinct de **code de configuration** (facile à copier/coller dans Telegram).
-3. Sur votre téléphone, ouvrez l’application iOS OpenClaw → Paramètres → Gateway.
+1. Dans Telegram, envoyez à votre bot : `/pair`
+2. Le bot répond avec deux messages : un message d’instructions et un message distinct contenant un **code de configuration** (facile à copier/coller dans Telegram).
+3. Sur votre téléphone, ouvrez l’app OpenClaw iOS → Settings → Gateway.
 4. Collez le code de configuration et connectez-vous.
-5. De retour dans Telegram : `/pair pending` (examinez les ID de demande, le rôle et les portées), puis approuvez.
+5. De retour dans Telegram : `/pair pending` (examinez les ID de demande, le rôle et les scopes), puis approuvez.
 
-Le code de configuration est une charge utile JSON encodée en base64 qui contient :
+Le code de configuration est une charge utile JSON encodée en base64 qui contient :
 
-- `url` : l’URL WebSocket de Gateway (`ws://...` ou `wss://...`)
-- `bootstrapToken` : un jeton bootstrap mono-appareil de courte durée utilisé pour la poignée de main d’appairage initiale
+- `url` : l’URL WebSocket de la Gateway (`ws://...` ou `wss://...`)
+- `bootstrapToken` : un jeton bootstrap temporaire à appareil unique utilisé pour la poignée de main d’appairage initiale
 
-Ce jeton bootstrap transporte le profil bootstrap d’appairage intégré :
+Ce jeton bootstrap transporte le profil bootstrap d’appairage intégré :
 
 - le jeton `node` principal transmis reste `scopes: []`
-- tout jeton `operator` transmis reste limité à la liste d’autorisation bootstrap :
+- tout jeton `operator` transmis reste limité à la liste d’autorisation bootstrap :
   `operator.approvals`, `operator.read`, `operator.talk.secrets`, `operator.write`
-- les vérifications de portée bootstrap sont préfixées par rôle, et non regroupées dans un seul ensemble plat :
-  les entrées de portée operator ne satisfont que les demandes operator, et les rôles non-operator
-  doivent toujours demander des portées sous leur propre préfixe de rôle
+- les vérifications de scope bootstrap sont préfixées par rôle, et non regroupées dans un seul ensemble plat de scopes :
+  les entrées de scope operator ne satisfont que les demandes operator, et les rôles non operator
+  doivent toujours demander des scopes sous leur propre préfixe de rôle
 
-Traitez le code de configuration comme un mot de passe tant qu’il est valide.
+Traitez le code de configuration comme un mot de passe tant qu’il reste valide.
 
-### Approuver un appareil de nœud
+### Approuver un appareil nœud
 
 ```bash
 openclaw devices list
@@ -103,34 +103,40 @@ openclaw devices approve <requestId>
 openclaw devices reject <requestId>
 ```
 
-Si le même appareil réessaie avec des détails d’authentification différents (par exemple un autre
-rôle/des portées différentes/une autre clé publique), la demande en attente précédente est remplacée et un nouveau
+Si le même appareil réessaie avec des détails d’authentification différents (par exemple un
+rôle/des scopes/une clé publique différents), la demande en attente précédente est remplacée et un nouveau
 `requestId` est créé.
 
-### Stockage de l’état d’appairage de nœud
+Important : un appareil déjà appairé n’obtient pas un accès plus large en silence. S’il se
+reconnecte en demandant davantage de scopes ou un rôle plus large, OpenClaw conserve
+l’approbation existante telle quelle et crée une nouvelle demande de mise à niveau en attente. Utilisez
+`openclaw devices list` pour comparer l’accès actuellement approuvé avec le nouvel accès
+demandé avant d’approuver.
 
-Stocké sous `~/.openclaw/devices/` :
+### Stockage de l’état d’appairage des nœuds
 
-- `pending.json` (de courte durée ; les demandes en attente expirent)
+Stocké sous `~/.openclaw/devices/` :
+
+- `pending.json` (de courte durée ; les demandes en attente expirent)
 - `paired.json` (appareils appairés + jetons)
 
-### Notes
+### Remarques
 
-- L’API héritée `node.pair.*` (CLI : `openclaw nodes pending|approve|reject|rename`) est un
-  stockage d’appairage distinct, géré par gateway. Les nœuds WS exigent toujours l’appairage d’appareil.
-- L’enregistrement d’appairage est la source de vérité durable pour les rôles approuvés. Les jetons d’appareil actifs
-  restent limités à cet ensemble de rôles approuvés ; une entrée de jeton isolée
+- L’API héritée `node.pair.*` (CLI : `openclaw nodes pending|approve|reject|rename`) est un
+  magasin d’appairage distinct, détenu par la gateway. Les nœuds WS nécessitent toujours l’appairage des appareils.
+- L’enregistrement d’appairage est la source de vérité durable pour les rôles approuvés. Les
+  jetons d’appareil actifs restent limités à cet ensemble de rôles approuvés ; une entrée de jeton isolée
   en dehors des rôles approuvés ne crée pas de nouvel accès.
 
-## Documents associés
+## Documentation associée
 
-- Modèle de sécurité + injection de prompt : [Sécurité](/gateway/security)
-- Mettre à jour en toute sécurité (exécuter doctor) : [Mise à jour](/install/updating)
-- Configurations de canaux :
-  - Telegram : [Telegram](/channels/telegram)
-  - WhatsApp : [WhatsApp](/channels/whatsapp)
-  - Signal : [Signal](/channels/signal)
-  - BlueBubbles (iMessage) : [BlueBubbles](/channels/bluebubbles)
-  - iMessage (hérité) : [iMessage](/channels/imessage)
-  - Discord : [Discord](/channels/discord)
-  - Slack : [Slack](/channels/slack)
+- Modèle de sécurité + injection de prompt : [Security](/fr/gateway/security)
+- Mettre à jour en toute sécurité (exécuter doctor) : [Updating](/fr/install/updating)
+- Configurations des canaux :
+  - Telegram : [Telegram](/fr/channels/telegram)
+  - WhatsApp : [WhatsApp](/fr/channels/whatsapp)
+  - Signal : [Signal](/fr/channels/signal)
+  - BlueBubbles (iMessage) : [BlueBubbles](/fr/channels/bluebubbles)
+  - iMessage (hérité) : [iMessage](/fr/channels/imessage)
+  - Discord : [Discord](/fr/channels/discord)
+  - Slack : [Slack](/fr/channels/slack)
