@@ -1,22 +1,22 @@
 ---
 read_when:
     - Ви хочете використовувати моделі Mistral в OpenClaw
-    - Вам потрібні онбординг ключа API Mistral і посилання на моделі
+    - Вам потрібні онбординг для ключа API Mistral і посилання на моделі
 summary: Використовуйте моделі Mistral і транскрипцію Voxtral з OpenClaw
 title: Mistral
 x-i18n:
-    generated_at: "2026-04-12T10:33:33Z"
+    generated_at: "2026-04-21T06:04:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0474f55587909ce9bbdd47b881262edbeb1b07eb3ed52de1090a8ec4d260c97b
+    source_hash: e87d04e3d45c04280c90821b1addd87dd612191249836747fba27cde48b9890f
     source_path: providers/mistral.md
     workflow: 15
 ---
 
 # Mistral
 
-OpenClaw підтримує Mistral як для маршрутизації текстових/зображувальних моделей (`mistral/...`), так і для транскрипції аудіо через Voxtral у media understanding.
-Mistral також можна використовувати для ембедингів пам’яті (`memorySearch.provider = "mistral"`).
+OpenClaw підтримує Mistral як для маршрутизації текстових/графічних моделей (`mistral/...`), так і для аудіотранскрипції через Voxtral у media understanding.
+Mistral також можна використовувати для вбудовувань пам’яті (`memorySearch.provider = "mistral"`).
 
 - Провайдер: `mistral`
 - Автентифікація: `MISTRAL_API_KEY`
@@ -26,14 +26,14 @@ Mistral також можна використовувати для ембеди
 
 <Steps>
   <Step title="Отримайте свій ключ API">
-    Створіть ключ API в [Mistral Console](https://console.mistral.ai/).
+    Створіть ключ API у [Mistral Console](https://console.mistral.ai/).
   </Step>
   <Step title="Запустіть онбординг">
     ```bash
     openclaw onboard --auth-choice mistral-api-key
     ```
 
-    Або передайте ключ безпосередньо:
+    Або передайте ключ напряму:
 
     ```bash
     openclaw onboard --mistral-api-key "$MISTRAL_API_KEY"
@@ -48,7 +48,7 @@ Mistral також можна використовувати для ембеди
     }
     ```
   </Step>
-  <Step title="Переконайтеся, що модель доступна">
+  <Step title="Перевірте, що модель доступна">
     ```bash
     openclaw models list --provider mistral
     ```
@@ -61,17 +61,17 @@ Mistral також можна використовувати для ембеди
 
 | Посилання на модель               | Вхідні дані | Контекст | Макс. вивід | Примітки                                                         |
 | --------------------------------- | ----------- | -------- | ----------- | ---------------------------------------------------------------- |
-| `mistral/mistral-large-latest`   | text, image | 262,144  | 16,384      | Модель за замовчуванням                                          |
-| `mistral/mistral-medium-2508`    | text, image | 262,144  | 8,192       | Mistral Medium 3.1                                               |
-| `mistral/mistral-small-latest`   | text, image | 128,000  | 16,384      | Mistral Small 4; регульоване міркування через API `reasoning_effort` |
-| `mistral/pixtral-large-latest`   | text, image | 128,000  | 32,768      | Pixtral                                                          |
-| `mistral/codestral-latest`       | text        | 256,000  | 4,096       | Програмування                                                    |
-| `mistral/devstral-medium-latest` | text        | 262,144  | 32,768      | Devstral 2                                                       |
-| `mistral/magistral-small`        | text        | 128,000  | 40,000      | З увімкненим міркуванням                                         |
+| `mistral/mistral-large-latest`    | текст, зображення | 262,144 | 16,384      | Модель за замовчуванням                                          |
+| `mistral/mistral-medium-2508`     | текст, зображення | 262,144 | 8,192       | Mistral Medium 3.1                                               |
+| `mistral/mistral-small-latest`    | текст, зображення | 128,000 | 16,384      | Mistral Small 4; регульоване мислення через API `reasoning_effort` |
+| `mistral/pixtral-large-latest`    | текст, зображення | 128,000 | 32,768      | Pixtral                                                          |
+| `mistral/codestral-latest`        | текст       | 256,000 | 4,096       | Програмування                                                    |
+| `mistral/devstral-medium-latest`  | текст       | 262,144 | 32,768      | Devstral 2                                                       |
+| `mistral/magistral-small`         | текст       | 128,000 | 40,000      | Із підтримкою міркування                                         |
 
-## Транскрипція аудіо (Voxtral)
+## Аудіотранскрипція (Voxtral)
 
-Використовуйте Voxtral для транскрипції аудіо через конвеєр media understanding.
+Використовуйте Voxtral для аудіотранскрипції через конвеєр media understanding.
 
 ```json5
 {
@@ -93,24 +93,24 @@ Mistral також можна використовувати для ембеди
 ## Розширена конфігурація
 
 <AccordionGroup>
-  <Accordion title="Регульоване міркування (mistral-small-latest)">
-    `mistral/mistral-small-latest` відповідає Mistral Small 4 і підтримує [регульоване міркування](https://docs.mistral.ai/capabilities/reasoning/adjustable) в API Chat Completions через `reasoning_effort` (`none` мінімізує додаткове міркування у виводі; `high` показує повні сліди міркування перед фінальною відповіддю).
+  <Accordion title="Регульоване мислення (mistral-small-latest)">
+    `mistral/mistral-small-latest` відповідає Mistral Small 4 і підтримує [регульоване мислення](https://docs.mistral.ai/capabilities/reasoning/adjustable) в API Chat Completions через `reasoning_effort` (`none` зводить додаткові міркування у виводі до мінімуму; `high` показує повні сліди міркувань перед фінальною відповіддю).
 
-    OpenClaw зіставляє рівень **thinking** сесії з API Mistral:
+    OpenClaw зіставляє рівень **мислення** сесії з API Mistral:
 
-    | Рівень thinking в OpenClaw                    | Mistral `reasoning_effort` |
-    | --------------------------------------------- | -------------------------- |
-    | **off** / **minimal**                         | `none`                     |
-    | **low** / **medium** / **high** / **xhigh** / **adaptive** | `high`             |
+    | Рівень мислення OpenClaw                         | Mistral `reasoning_effort` |
+    | ------------------------------------------------ | -------------------------- |
+    | **off** / **minimal**                            | `none`                     |
+    | **low** / **medium** / **high** / **xhigh** / **adaptive** / **max** | `high`     |
 
     <Note>
-    Інші моделі у вбудованому каталозі Mistral не використовують цей параметр. Продовжуйте використовувати моделі `magistral-*`, якщо вам потрібна нативна поведінка Mistral, орієнтована насамперед на міркування.
+    Інші моделі з вбудованого каталогу Mistral не використовують цей параметр. Продовжуйте використовувати моделі `magistral-*`, якщо вам потрібна рідна для Mistral поведінка, орієнтована насамперед на міркування.
     </Note>
 
   </Accordion>
 
-  <Accordion title="Ембединги пам’яті">
-    Mistral може надавати ембединги пам’яті через `/v1/embeddings` (модель за замовчуванням: `mistral-embed`).
+  <Accordion title="Вбудовування пам’яті">
+    Mistral може надавати вбудовування пам’яті через `/v1/embeddings` (модель за замовчуванням: `mistral-embed`).
 
     ```json5
     {
@@ -123,7 +123,7 @@ Mistral також можна використовувати для ембеди
   <Accordion title="Автентифікація та базовий URL">
     - Автентифікація Mistral використовує `MISTRAL_API_KEY`.
     - Базовий URL провайдера за замовчуванням: `https://api.mistral.ai/v1`.
-    - Модель онбордингу за замовчуванням — `mistral/mistral-large-latest`.
+    - Моделлю за замовчуванням для онбордингу є `mistral/mistral-large-latest`.
     - Z.AI використовує Bearer-автентифікацію з вашим ключем API.
   </Accordion>
 </AccordionGroup>
@@ -135,6 +135,6 @@ Mistral також можна використовувати для ембеди
     Вибір провайдерів, посилань на моделі та поведінки резервного перемикання.
   </Card>
   <Card title="Media understanding" href="/tools/media-understanding" icon="microphone">
-    Налаштування транскрипції аудіо та вибір провайдера.
+    Налаштування аудіотранскрипції та вибір провайдера.
   </Card>
 </CardGroup>
