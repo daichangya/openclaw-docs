@@ -1,25 +1,25 @@
 ---
 read_when:
-    - OpenClaw funktioniert nicht und Sie benötigen den schnellsten Weg zu einer Lösung.
-    - Sie möchten einen Triage-Ablauf, bevor Sie in ausführliche Runbooks einsteigen.
-summary: Symptomorientierter Hub zur Fehlerbehebung für OpenClaw
+    - OpenClaw funktioniert nicht und du brauchst den schnellsten Weg zu einer Lösung
+    - Du möchtest einen Triage-Ablauf, bevor du in ausführliche Runbooks eintauchst
+summary: Symptomorientierter Troubleshooting-Hub für OpenClaw
 title: Allgemeine Fehlerbehebung
 x-i18n:
-    generated_at: "2026-04-11T02:45:48Z"
+    generated_at: "2026-04-21T06:26:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 16b38920dbfdc8d4a79bbb5d6fab2c67c9f218a97c36bb4695310d7db9c4614a
+    source_hash: cc5d8c9f804084985c672c5a003ce866e8142ab99fe81abb7a0d38e22aea4b88
     source_path: help/troubleshooting.md
     workflow: 15
 ---
 
 # Fehlerbehebung
 
-Wenn Sie nur 2 Minuten haben, verwenden Sie diese Seite als Triage-Einstieg.
+Wenn du nur 2 Minuten hast, nutze diese Seite als Triage-Einstieg.
 
 ## Die ersten 60 Sekunden
 
-Führen Sie diese genaue Abfolge in dieser Reihenfolge aus:
+Führe diese genaue Leiter in dieser Reihenfolge aus:
 
 ```bash
 openclaw status
@@ -33,47 +33,45 @@ openclaw logs --follow
 
 Gute Ausgabe in einer Zeile:
 
-- `openclaw status` → zeigt konfigurierte Channels und keine offensichtlichen Auth-Fehler.
-- `openclaw status --all` → vollständiger Bericht ist vorhanden und kann geteilt werden.
-- `openclaw gateway probe` → erwartetes Gateway-Ziel ist erreichbar (`Reachable: yes`). `RPC: limited - missing scope: operator.read` bedeutet eingeschränkte Diagnose, keinen Verbindungsfehler.
-- `openclaw gateway status` → `Runtime: running` und `RPC probe: ok`.
-- `openclaw doctor` → keine blockierenden Konfigurations-/Service-Fehler.
-- `openclaw channels status --probe` → ein erreichbares Gateway liefert den Live-Transportstatus pro Account
-  sowie Probe-/Audit-Ergebnisse wie `works` oder `audit ok`; wenn das
-  Gateway nicht erreichbar ist, fällt der Befehl auf reine Konfigurationszusammenfassungen zurück.
-- `openclaw logs --follow` → stetige Aktivität, keine sich wiederholenden fatalen Fehler.
+- `openclaw status` → zeigt konfigurierte Kanäle und keine offensichtlichen Authentifizierungsfehler.
+- `openclaw status --all` → vollständiger Bericht ist vorhanden und teilbar.
+- `openclaw gateway probe` → erwartetes Gateway-Ziel ist erreichbar (`Reachable: yes`). `Capability: ...` zeigt, welches Authentifizierungsniveau der Probe nachweisen konnte, und `Read probe: limited - missing scope: operator.read` bedeutet eingeschränkte Diagnostik, nicht einen Verbindungsfehler.
+- `openclaw gateway status` → `Runtime: running`, `Connectivity probe: ok` und eine plausible Zeile `Capability: ...`. Verwende `--require-rpc`, wenn du zusätzlich einen RPC-Nachweis mit Leseberechtigung brauchst.
+- `openclaw doctor` → keine blockierenden Konfigurations-/Dienstfehler.
+- `openclaw channels status --probe` → ein erreichbares Gateway gibt den Live-Transportstatus pro Konto plus Probe-/Audit-Ergebnisse wie `works` oder `audit ok` zurück; wenn das Gateway nicht erreichbar ist, fällt der Befehl auf reine Konfigurationszusammenfassungen zurück.
+- `openclaw logs --follow` → stetige Aktivität, keine sich wiederholenden schwerwiegenden Fehler.
 
 ## Anthropic Long-Context-429
 
-Wenn Sie Folgendes sehen:
+Wenn du Folgendes siehst:
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`,
-gehen Sie zu [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/de/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
+gehe zu [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/de/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
 
 ## Lokales OpenAI-kompatibles Backend funktioniert direkt, aber nicht in OpenClaw
 
-Wenn Ihr lokales oder selbstgehostetes `/v1`-Backend kleine direkte
+Wenn dein lokales oder selbstgehostetes `/v1`-Backend kleine direkte
 `/v1/chat/completions`-Probes beantwortet, aber bei `openclaw infer model run` oder normalen
-Agent-Turns fehlschlägt:
+Agent-Zügen fehlschlägt:
 
-1. Wenn der Fehler erwähnt, dass `messages[].content` einen String erwartet, setzen Sie
+1. Wenn der Fehler erwähnt, dass `messages[].content` einen String erwartet, setze
    `models.providers.<provider>.models[].compat.requiresStringContent: true`.
-2. Wenn das Backend weiterhin nur bei OpenClaw-Agent-Turns fehlschlägt, setzen Sie
-   `models.providers.<provider>.models[].compat.supportsTools: false` und versuchen Sie es erneut.
-3. Wenn winzige direkte Aufrufe weiterhin funktionieren, aber größere OpenClaw-Prompts das
-   Backend abstürzen lassen, behandeln Sie das verbleibende Problem als Einschränkung des Upstream-Modells/-Servers und
-   fahren Sie mit dem ausführlichen Runbook fort:
+2. Wenn das Backend weiterhin nur bei OpenClaw-Agent-Zügen fehlschlägt, setze
+   `models.providers.<provider>.models[].compat.supportsTools: false` und versuche es erneut.
+3. Wenn winzige direkte Aufrufe weiterhin funktionieren, größere OpenClaw-Prompts das
+   Backend aber abstürzen lassen, behandle das verbleibende Problem als Upstream-Einschränkung des Modells/Servers und
+   fahre im ausführlichen Runbook fort:
    [/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail](/de/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail)
 
-## Plugin-Installation schlägt mit fehlenden OpenClaw-Erweiterungen fehl
+## Plugin-Installation schlägt fehl mit fehlenden openclaw extensions
 
 Wenn die Installation mit `package.json missing openclaw.extensions` fehlschlägt, verwendet das Plugin-Paket
-eine alte Struktur, die OpenClaw nicht mehr akzeptiert.
+eine alte Form, die OpenClaw nicht mehr akzeptiert.
 
 Behebung im Plugin-Paket:
 
-1. Fügen Sie `openclaw.extensions` zu `package.json` hinzu.
-2. Verweisen Sie Einträge auf gebaute Runtime-Dateien (normalerweise `./dist/index.js`).
-3. Veröffentlichen Sie das Plugin erneut und führen Sie `openclaw plugins install <package>` erneut aus.
+1. Füge `openclaw.extensions` zu `package.json` hinzu.
+2. Lasse Einträge auf gebaute Laufzeitdateien zeigen (normalerweise `./dist/index.js`).
+3. Veröffentliche das Plugin erneut und führe `openclaw plugins install <package>` nochmals aus.
 
 Beispiel:
 
@@ -87,7 +85,7 @@ Beispiel:
 }
 ```
 
-Referenz: [Plugin-Architektur](/de/plugins/architecture)
+Referenz: [Plugin architecture](/de/plugins/architecture)
 
 ## Entscheidungsbaum
 
@@ -95,17 +93,17 @@ Referenz: [Plugin-Architektur](/de/plugins/architecture)
 flowchart TD
   A[OpenClaw funktioniert nicht] --> B{Was bricht zuerst}
   B --> C[Keine Antworten]
-  B --> D[Dashboard oder Control UI verbindet sich nicht]
+  B --> D[Dashboard oder Control UI verbindet nicht]
   B --> E[Gateway startet nicht oder Dienst läuft nicht]
-  B --> F[Channel verbindet sich, aber Nachrichten fließen nicht]
+  B --> F[Kanal verbindet, aber Nachrichten fließen nicht]
   B --> G[Cron oder Heartbeat wurde nicht ausgelöst oder nicht zugestellt]
-  B --> H[Node ist gekoppelt, aber camera canvas screen exec des Tools schlägt fehl]
+  B --> H[Node ist gepairt, aber Kamera Canvas Bildschirm Exec schlägt fehl]
   B --> I[Browser-Tool schlägt fehl]
 
   C --> C1[/Abschnitt Keine Antworten/]
   D --> D1[/Abschnitt Control UI/]
   E --> E1[/Abschnitt Gateway/]
-  F --> F1[/Abschnitt Channel-Fluss/]
+  F --> F1[/Abschnitt Nachrichtenfluss des Kanals/]
   G --> G1[/Abschnitt Automatisierung/]
   H --> H1[/Abschnitt Node-Tools/]
   I --> I1[/Abschnitt Browser/]
@@ -124,15 +122,16 @@ flowchart TD
     Gute Ausgabe sieht so aus:
 
     - `Runtime: running`
-    - `RPC probe: ok`
-    - Ihr Channel zeigt einen verbundenen Transport und, wo unterstützt, `works` oder `audit ok` in `channels status --probe`
-    - Der Absender erscheint als genehmigt (oder die DM-Richtlinie ist open/allowlist)
+    - `Connectivity probe: ok`
+    - `Capability: read-only`, `write-capable` oder `admin-capable`
+    - Dein Kanal zeigt verbundenen Transport und, wo unterstützt, `works` oder `audit ok` in `channels status --probe`
+    - Absender erscheint als genehmigt (oder die DM-Richtlinie ist open/allowlist)
 
     Häufige Log-Signaturen:
 
     - `drop guild message (mention required` → Mention-Gating hat die Nachricht in Discord blockiert.
-    - `pairing request` → Absender ist nicht genehmigt und wartet auf DM-Pairing-Freigabe.
-    - `blocked` / `allowlist` in den Channel-Logs → Absender, Raum oder Gruppe wird gefiltert.
+    - `pairing request` → Absender ist nicht genehmigt und wartet auf DM-Pairing-Genehmigung.
+    - `blocked` / `allowlist` in Kanal-Logs → Absender, Raum oder Gruppe wird gefiltert.
 
     Ausführliche Seiten:
 
@@ -142,7 +141,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Dashboard oder Control UI verbindet sich nicht">
+  <Accordion title="Dashboard oder Control UI verbindet nicht">
     ```bash
     openclaw status
     openclaw gateway status
@@ -154,7 +153,8 @@ flowchart TD
     Gute Ausgabe sieht so aus:
 
     - `Dashboard: http://...` wird in `openclaw gateway status` angezeigt
-    - `RPC probe: ok`
+    - `Connectivity probe: ok`
+    - `Capability: read-only`, `write-capable` oder `admin-capable`
     - Keine Auth-Schleife in den Logs
 
     Häufige Log-Signaturen:
@@ -162,17 +162,11 @@ flowchart TD
     - `device identity required` → HTTP/nicht sicherer Kontext kann Geräteauthentifizierung nicht abschließen.
     - `origin not allowed` → Browser-`Origin` ist für das Gateway-Ziel der Control UI nicht erlaubt.
     - `AUTH_TOKEN_MISMATCH` mit Retry-Hinweisen (`canRetryWithDeviceToken=true`) → ein vertrauenswürdiger Retry mit Gerätetoken kann automatisch erfolgen.
-    - Dieser Retry mit zwischengespeichertem Token verwendet die zwischengespeicherte Scope-Menge wieder, die mit dem gekoppelten
-      Gerätetoken gespeichert wurde. Aufrufer mit explizitem `deviceToken` / expliziten `scopes` behalten stattdessen
-      ihre angeforderte Scope-Menge bei.
-    - Im asynchronen Tailscale-Serve-Control-UI-Pfad werden fehlgeschlagene Versuche für dieselbe
-      `{scope, ip}` serialisiert, bevor der Limiter den Fehlschlag erfasst, sodass ein
-      zweiter gleichzeitiger fehlerhafter Retry bereits `retry later` anzeigen kann.
-    - `too many failed authentication attempts (retry later)` von einer localhost-
-      Browser-Origin → wiederholte Fehlschläge von derselben `Origin` werden vorübergehend
-      gesperrt; eine andere localhost-Origin verwendet einen separaten Bucket.
-    - wiederholtes `unauthorized` nach diesem Retry → falsches Token/Passwort, Auth-Modus stimmt nicht überein oder veraltetes gekoppeltes Gerätetoken.
-    - `gateway connect failed:` → UI zielt auf die falsche URL/den falschen Port oder das Gateway ist nicht erreichbar.
+    - Dieser Retry mit zwischengespeichertem Token verwendet erneut die zwischengespeicherte Scope-Menge, die zusammen mit dem gepairten Gerätetoken gespeichert ist. Aufrufer mit explizitem `deviceToken` / expliziten `scopes` behalten stattdessen ihre angeforderte Scope-Menge.
+    - Im asynchronen Tailscale-Serve-Control-UI-Pfad werden fehlgeschlagene Versuche für dasselbe `{scope, ip}` serialisiert, bevor der Limiter den Fehler aufzeichnet, daher kann ein zweiter gleichzeitiger fehlerhafter Retry bereits `retry later` anzeigen.
+    - `too many failed authentication attempts (retry later)` von einer localhost-Browser-Origin → wiederholte Fehlschläge von derselben `Origin` werden vorübergehend ausgesperrt; eine andere localhost-Origin verwendet einen separaten Bucket.
+    - wiederholtes `unauthorized` nach diesem Retry → falsches Token/Passwort, Auth-Modus stimmt nicht überein oder veraltetes gepairtes Gerätetoken.
+    - `gateway connect failed:` → UI zielt auf falsche URL/falschen Port oder unerreichbares Gateway.
 
     Ausführliche Seiten:
 
@@ -195,12 +189,13 @@ flowchart TD
 
     - `Service: ... (loaded)`
     - `Runtime: running`
-    - `RPC probe: ok`
+    - `Connectivity probe: ok`
+    - `Capability: read-only`, `write-capable` oder `admin-capable`
 
     Häufige Log-Signaturen:
 
-    - `Gateway start blocked: set gateway.mode=local` oder `existing config is missing gateway.mode` → Gateway-Modus ist remote, oder in der Konfigurationsdatei fehlt die Markierung für den lokalen Modus und sie sollte repariert werden.
-    - `refusing to bind gateway ... without auth` → Nicht-Loopback-Bind ohne gültigen Gateway-Auth-Pfad (Token/Passwort oder, falls konfiguriert, trusted-proxy).
+    - `Gateway start blocked: set gateway.mode=local` oder `existing config is missing gateway.mode` → Gateway-Modus ist remote oder der Konfigurationsdatei fehlt die Markierung für den lokalen Modus und sie sollte repariert werden.
+    - `refusing to bind gateway ... without auth` → Nicht-Loopback-Bind ohne gültigen Gateway-Auth-Pfad (Token/Passwort oder, wo konfiguriert, trusted-proxy).
     - `another gateway instance is already listening` oder `EADDRINUSE` → Port ist bereits belegt.
 
     Ausführliche Seiten:
@@ -211,7 +206,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Channel verbindet sich, aber Nachrichten fließen nicht">
+  <Accordion title="Kanal verbindet, aber Nachrichten fließen nicht">
     ```bash
     openclaw status
     openclaw gateway status
@@ -222,15 +217,15 @@ flowchart TD
 
     Gute Ausgabe sieht so aus:
 
-    - Channel-Transport ist verbunden.
+    - Kanaltransport ist verbunden.
     - Pairing-/Allowlist-Prüfungen bestehen.
-    - Erwähnungen werden erkannt, wo erforderlich.
+    - Mentions werden erkannt, wo sie erforderlich sind.
 
     Häufige Log-Signaturen:
 
-    - `mention required` → Mention-Gating hat die Verarbeitung in der Gruppe blockiert.
+    - `mention required` → Mention-Gating hat die Verarbeitung blockiert.
     - `pairing` / `pending` → DM-Absender ist noch nicht genehmigt.
-    - `not_in_channel`, `missing_scope`, `Forbidden`, `401/403` → Problem mit Channel-Berechtigungstoken.
+    - `not_in_channel`, `missing_scope`, `Forbidden`, `401/403` → Problem mit Kanalberechtigungen oder Token.
 
     Ausführliche Seiten:
 
@@ -252,18 +247,18 @@ flowchart TD
     Gute Ausgabe sieht so aus:
 
     - `cron.status` zeigt aktiviert mit nächstem Wake.
-    - `cron runs` zeigt aktuelle `ok`-Einträge.
-    - Heartbeat ist aktiviert und nicht außerhalb der aktiven Stunden.
+    - `cron runs` zeigt aktuelle Einträge `ok`.
+    - Heartbeat ist aktiviert und nicht außerhalb der aktiven Zeiten.
 
     Häufige Log-Signaturen:
 
     - `cron: scheduler disabled; jobs will not run automatically` → Cron ist deaktiviert.
-    - `heartbeat skipped` mit `reason=quiet-hours` → außerhalb der konfigurierten aktiven Stunden.
+    - `heartbeat skipped` mit `reason=quiet-hours` → außerhalb der konfigurierten aktiven Zeiten.
     - `heartbeat skipped` mit `reason=empty-heartbeat-file` → `HEARTBEAT.md` existiert, enthält aber nur leere/header-only-Struktur.
-    - `heartbeat skipped` mit `reason=no-tasks-due` → `HEARTBEAT.md`-Task-Modus ist aktiv, aber noch keine der Task-Intervalle ist fällig.
+    - `heartbeat skipped` mit `reason=no-tasks-due` → der Aufgabenmodus von `HEARTBEAT.md` ist aktiv, aber noch keine Aufgabenintervalle sind fällig.
     - `heartbeat skipped` mit `reason=alerts-disabled` → die gesamte Heartbeat-Sichtbarkeit ist deaktiviert (`showOk`, `showAlerts` und `useIndicator` sind alle aus).
-    - `requests-in-flight` → Main-Lane ist beschäftigt; Heartbeat-Wake wurde verschoben.
-    - `unknown accountId` → Ziel-Account für die Heartbeat-Zustellung existiert nicht.
+    - `requests-in-flight` → Hauptpfad ist beschäftigt; Heartbeat-Wake wurde aufgeschoben.
+    - `unknown accountId` → Zielkonto für die Heartbeat-Zustellung existiert nicht.
 
     Ausführliche Seiten:
 
@@ -273,7 +268,7 @@ flowchart TD
 
     </Accordion>
 
-    <Accordion title="Node ist gekoppelt, aber das Tool schlägt bei camera canvas screen exec fehl">
+    <Accordion title="Node ist gepairt, aber Tool schlägt fehl bei Kamera Canvas Bildschirm Exec">
       ```bash
       openclaw status
       openclaw gateway status
@@ -284,15 +279,15 @@ flowchart TD
 
       Gute Ausgabe sieht so aus:
 
-      - Node ist als verbunden und für die Rolle `node` gekoppelt aufgeführt.
-      - Capability existiert für den Befehl, den Sie aufrufen.
-      - Berechtigungsstatus ist für das Tool erteilt.
+      - Node ist als verbunden und für die Rolle `node` gepairt aufgeführt.
+      - Capability für den aufgerufenen Befehl ist vorhanden.
+      - Berechtigungsstatus ist für das Tool gewährt.
 
       Häufige Log-Signaturen:
 
-      - `NODE_BACKGROUND_UNAVAILABLE` → Node-App in den Vordergrund bringen.
+      - `NODE_BACKGROUND_UNAVAILABLE` → bringe die Node-App in den Vordergrund.
       - `*_PERMISSION_REQUIRED` → OS-Berechtigung wurde verweigert/fehlt.
-      - `SYSTEM_RUN_DENIED: approval required` → Exec-Freigabe steht aus.
+      - `SYSTEM_RUN_DENIED: approval required` → Exec-Genehmigung steht aus.
       - `SYSTEM_RUN_DENIED: allowlist miss` → Befehl steht nicht auf der Exec-Allowlist.
 
       Ausführliche Seiten:
@@ -303,7 +298,7 @@ flowchart TD
 
     </Accordion>
 
-    <Accordion title="Exec fragt plötzlich nach Freigabe">
+    <Accordion title="Exec fragt plötzlich nach Genehmigung">
       ```bash
       openclaw config get tools.exec.host
       openclaw config get tools.exec.security
@@ -313,14 +308,14 @@ flowchart TD
 
       Was sich geändert hat:
 
-      - Wenn `tools.exec.host` nicht gesetzt ist, ist der Standardwert `auto`.
-      - `host=auto` wird zu `sandbox`, wenn eine Sandbox-Runtime aktiv ist, sonst zu `gateway`.
-      - `host=auto` betrifft nur das Routing; das verhaltensseitige „YOLO“ ohne Rückfrage kommt von `security=full` plus `ask=off` auf Gateway/Node.
-      - Bei `gateway` und `node` ist der Standardwert für nicht gesetztes `tools.exec.security` `full`.
-      - Für nicht gesetztes `tools.exec.ask` ist der Standardwert `off`.
-      - Ergebnis: Wenn Sie Freigaben sehen, hat irgendeine hostlokale oder sitzungsspezifische Richtlinie exec gegenüber den aktuellen Standardwerten verschärft.
+      - Wenn `tools.exec.host` nicht gesetzt ist, ist der Standard `auto`.
+      - `host=auto` wird zu `sandbox` aufgelöst, wenn eine Sandbox-Laufzeit aktiv ist, andernfalls zu `gateway`.
+      - `host=auto` betrifft nur das Routing; das promptlose „YOLO“-Verhalten kommt von `security=full` plus `ask=off` auf Gateway/Node.
+      - Bei `gateway` und `node` ist der Standard für nicht gesetztes `tools.exec.security` `full`.
+      - Nicht gesetztes `tools.exec.ask` hat standardmäßig den Wert `off`.
+      - Ergebnis: Wenn du Genehmigungen siehst, hat eine hostlokale oder sitzungsbezogene Richtlinie Exec gegenüber den aktuellen Standards verschärft.
 
-      Aktuelles Standardverhalten ohne Freigabe wiederherstellen:
+      Aktuelles Standardverhalten ohne Genehmigung wiederherstellen:
 
       ```bash
       openclaw config set tools.exec.host gateway
@@ -331,15 +326,15 @@ flowchart TD
 
       Sicherere Alternativen:
 
-      - Setzen Sie nur `tools.exec.host=gateway`, wenn Sie nur stabiles Host-Routing möchten.
-      - Verwenden Sie `security=allowlist` mit `ask=on-miss`, wenn Sie Host-Exec möchten, aber bei Allowlist-Fehlschlägen weiterhin eine Prüfung wünschen.
-      - Aktivieren Sie den Sandbox-Modus, wenn Sie möchten, dass `host=auto` wieder zu `sandbox` aufgelöst wird.
+      - Setze nur `tools.exec.host=gateway`, wenn du nur stabiles Host-Routing möchtest.
+      - Verwende `security=allowlist` mit `ask=on-miss`, wenn du Host-Exec möchtest, aber bei Allowlist-Fehltreffern trotzdem eine Prüfung willst.
+      - Aktiviere den Sandbox-Modus, wenn `host=auto` wieder zu `sandbox` aufgelöst werden soll.
 
       Häufige Log-Signaturen:
 
       - `Approval required.` → Befehl wartet auf `/approve ...`.
-      - `SYSTEM_RUN_DENIED: approval required` → Freigabe für Node-Host-Exec steht aus.
-      - `exec host=sandbox requires a sandbox runtime for this session` → implizite/explizite Sandbox-Auswahl, aber Sandbox-Modus ist deaktiviert.
+      - `SYSTEM_RUN_DENIED: approval required` → Genehmigung für Node-Host-Exec steht aus.
+      - `exec host=sandbox requires a sandbox runtime for this session` → implizite/explizite Sandbox-Auswahl, aber der Sandbox-Modus ist deaktiviert.
 
       Ausführliche Seiten:
 
@@ -360,20 +355,20 @@ flowchart TD
 
       Gute Ausgabe sieht so aus:
 
-      - Der Browser-Status zeigt `running: true` und einen ausgewählten Browser/ein ausgewähltes Profil.
+      - Browser-Status zeigt `running: true` und einen ausgewählten Browser/ein ausgewähltes Profil.
       - `openclaw` startet, oder `user` kann lokale Chrome-Tabs sehen.
 
       Häufige Log-Signaturen:
 
       - `unknown command "browser"` oder `unknown command 'browser'` → `plugins.allow` ist gesetzt und enthält `browser` nicht.
       - `Failed to start Chrome CDP on port` → Start des lokalen Browsers ist fehlgeschlagen.
-      - `browser.executablePath not found` → der konfigurierte Binärpfad ist falsch.
+      - `browser.executablePath not found` → konfigurierter Binärpfad ist falsch.
       - `browser.cdpUrl must be http(s) or ws(s)` → die konfigurierte CDP-URL verwendet ein nicht unterstütztes Schema.
-      - `browser.cdpUrl has invalid port` → die konfigurierte CDP-URL hat einen ungültigen oder außerhalb des Bereichs liegenden Port.
+      - `browser.cdpUrl has invalid port` → die konfigurierte CDP-URL hat einen ungültigen oder außerhalb des zulässigen Bereichs liegenden Port.
       - `No Chrome tabs found for profile="user"` → das Chrome-MCP-Attach-Profil hat keine geöffneten lokalen Chrome-Tabs.
-      - `Remote CDP for profile "<name>" is not reachable` → der konfigurierte Remote-CDP-Endpunkt ist von diesem Host aus nicht erreichbar.
-      - `Browser attachOnly is enabled ... not reachable` oder `Browser attachOnly is enabled and CDP websocket ... is not reachable` → Attach-only-Profil hat kein aktives CDP-Ziel.
-      - veraltete Viewport-/Dark-Mode-/Locale-/Offline-Overrides auf Attach-only- oder Remote-CDP-Profilen → führen Sie `openclaw browser stop --browser-profile <name>` aus, um die aktive Steuerungssitzung zu schließen und den Emulationszustand freizugeben, ohne das Gateway neu zu starten.
+      - `Remote CDP for profile "<name>" is not reachable` → der konfigurierte entfernte CDP-Endpunkt ist von diesem Host aus nicht erreichbar.
+      - `Browser attachOnly is enabled ... not reachable` oder `Browser attachOnly is enabled and CDP websocket ... is not reachable` → für das Attach-only-Profil gibt es kein aktives CDP-Ziel.
+      - veraltete Overrides für Viewport / Dark Mode / Locale / Offline auf Attach-only- oder Remote-CDP-Profilen → führe `openclaw browser stop --browser-profile <name>` aus, um die aktive Steuersitzung zu schließen und den Emulationsstatus freizugeben, ohne das Gateway neu zu starten.
 
       Ausführliche Seiten:
 
@@ -389,7 +384,7 @@ flowchart TD
 ## Verwandt
 
 - [FAQ](/de/help/faq) — häufig gestellte Fragen
-- [Gateway Troubleshooting](/de/gateway/troubleshooting) — Gateway-spezifische Probleme
-- [Doctor](/de/gateway/doctor) — automatisierte Zustandsprüfungen und Reparaturen
-- [Channel Troubleshooting](/de/channels/troubleshooting) — Probleme mit der Channel-Konnektivität
+- [Gateway Troubleshooting](/de/gateway/troubleshooting) — gateway-spezifische Probleme
+- [Doctor](/de/gateway/doctor) — automatisierte Integritätsprüfungen und Reparaturen
+- [Channel Troubleshooting](/de/channels/troubleshooting) — Probleme mit der Kanalverbindung
 - [Automation Troubleshooting](/de/automation/cron-jobs#troubleshooting) — Probleme mit Cron und Heartbeat

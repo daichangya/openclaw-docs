@@ -1,51 +1,53 @@
 ---
 read_when:
-    - Sie möchten GitHub Copilot als Modellanbieter verwenden
-    - Sie benötigen den Ablauf `openclaw models auth login-github-copilot`
-summary: Melden Sie sich über den Gerätefluss von OpenClaw bei GitHub Copilot an
+    - Sie möchten GitHub Copilot als Modell-Provider verwenden.
+    - Sie benötigen den Ablauf `openclaw models auth login-github-copilot`.
+summary: Bei GitHub Copilot aus OpenClaw heraus mit dem Device Flow anmelden
 title: GitHub Copilot
 x-i18n:
-    generated_at: "2026-04-15T14:40:26Z"
+    generated_at: "2026-04-21T06:30:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b8258fecff22fb73b057de878462941f6eb86d0c5f775c5eac4840e95ba5eccf
+    source_hash: f7faafbd3bdcd8886e75fb0d40c3eec66355df3fca6160ebbbb9a0018b7839fe
     source_path: providers/github-copilot.md
     workflow: 15
 ---
 
 # GitHub Copilot
 
-GitHub Copilot ist GitHubs KI-Coding-Assistent. Er bietet Zugriff auf Copilot-
-Modelle für Ihr GitHub-Konto und Ihren Tarif. OpenClaw kann Copilot auf zwei
-verschiedene Arten als Modellanbieter verwenden.
+GitHub Copilot ist der KI-Coding-Assistent von GitHub. Er bietet Zugriff auf Copilot-
+Modelle für Ihr GitHub-Konto und Ihren Tarif. OpenClaw kann Copilot auf zwei verschiedene Arten
+als Modell-Provider verwenden.
 
 ## Zwei Möglichkeiten, Copilot in OpenClaw zu verwenden
 
 <Tabs>
-  <Tab title="Integrierter Anbieter (github-copilot)">
-    Verwenden Sie den nativen Geräteanmeldefluss, um ein GitHub-Token zu erhalten, und tauschen Sie es dann gegen
-    Copilot-API-Token aus, wenn OpenClaw ausgeführt wird. Dies ist der **Standard** und der einfachste Weg,
+  <Tab title="Built-in provider (github-copilot)">
+    Verwenden Sie den nativen Device-Login-Flow, um ein GitHub-Token zu erhalten, und tauschen Sie es dann gegen
+    Copilot-API-Tokens aus, wenn OpenClaw läuft. Dies ist der **Standard** und der einfachste Weg,
     da dafür kein VS Code erforderlich ist.
 
     <Steps>
-      <Step title="Führen Sie den Anmeldebefehl aus">
+      <Step title="Den Login-Befehl ausführen">
         ```bash
         openclaw models auth login-github-copilot
         ```
 
-        Sie werden aufgefordert, eine URL aufzurufen und einen einmaligen Code einzugeben. Lassen Sie das
+        Sie werden aufgefordert, eine URL zu besuchen und einen einmaligen Code einzugeben. Lassen Sie das
         Terminal geöffnet, bis der Vorgang abgeschlossen ist.
       </Step>
-      <Step title="Legen Sie ein Standardmodell fest">
+      <Step title="Ein Standardmodell festlegen">
         ```bash
-        openclaw models set github-copilot/gpt-4o
+        openclaw models set github-copilot/claude-opus-4.6
         ```
 
         Oder in der Konfiguration:
 
         ```json5
         {
-          agents: { defaults: { model: { primary: "github-copilot/gpt-4o" } } },
+          agents: {
+            defaults: { model: { primary: "github-copilot/claude-opus-4.6" } },
+          },
         }
         ```
       </Step>
@@ -53,13 +55,13 @@ verschiedene Arten als Modellanbieter verwenden.
 
   </Tab>
 
-  <Tab title="Copilot Proxy Plugin (copilot-proxy)">
-    Verwenden Sie die VS Code-Erweiterung **Copilot Proxy** als lokale Brücke. OpenClaw kommuniziert mit
+  <Tab title="Copilot Proxy plugin (copilot-proxy)">
+    Verwenden Sie die VS-Code-Extension **Copilot Proxy** als lokale Bridge. OpenClaw kommuniziert mit
     dem `/v1`-Endpunkt des Proxys und verwendet die Modellliste, die Sie dort konfigurieren.
 
     <Note>
-    Wählen Sie dies, wenn Sie Copilot Proxy bereits in VS Code ausführen oder den Datenverkehr
-    darüber leiten müssen. Sie müssen das Plugin aktivieren und die VS Code-Erweiterung weiter ausführen.
+    Wählen Sie dies, wenn Sie Copilot Proxy bereits in VS Code ausführen oder darüber
+    routen müssen. Sie müssen das Plugin aktivieren und die VS-Code-Extension weiter ausführen.
     </Note>
 
   </Tab>
@@ -67,10 +69,10 @@ verschiedene Arten als Modellanbieter verwenden.
 
 ## Optionale Flags
 
-| Flag            | Beschreibung                                      |
-| --------------- | ------------------------------------------------- |
-| `--yes`         | Überspringt die Bestätigungsaufforderung          |
-| `--set-default` | Wendet außerdem das empfohlene Standardmodell des Anbieters an |
+| Flag            | Beschreibung                                        |
+| --------------- | --------------------------------------------------- |
+| `--yes`         | Bestätigungsabfrage überspringen                    |
+| `--set-default` | Zusätzlich das empfohlene Standardmodell des Providers anwenden |
 
 ```bash
 # Bestätigung überspringen
@@ -82,62 +84,61 @@ openclaw models auth login --provider github-copilot --method device --set-defau
 
 <AccordionGroup>
   <Accordion title="Interaktives TTY erforderlich">
-    Der Geräteanmeldefluss erfordert ein interaktives TTY. Führen Sie ihn direkt in einem
-    Terminal aus, nicht in einem nicht-interaktiven Skript oder einer CI-Pipeline.
+    Der Device-Login-Flow erfordert ein interaktives TTY. Führen Sie ihn direkt in einem
+    Terminal aus, nicht in einem nicht interaktiven Skript oder einer CI-Pipeline.
   </Accordion>
 
-  <Accordion title="Die Modellverfügbarkeit hängt von Ihrem Tarif ab">
+  <Accordion title="Modellverfügbarkeit hängt von Ihrem Tarif ab">
     Die Verfügbarkeit von Copilot-Modellen hängt von Ihrem GitHub-Tarif ab. Wenn ein Modell
     abgelehnt wird, versuchen Sie eine andere ID (zum Beispiel `github-copilot/gpt-4.1`).
   </Accordion>
 
   <Accordion title="Transportauswahl">
-    Claude-Modell-IDs verwenden automatisch den Anthropic-Messages-Transport. GPT-,
-    o-series- und Gemini-Modelle verwenden weiterhin den OpenAI-Responses-Transport. OpenClaw
+    Modell-IDs von Claude verwenden automatisch den Transport Anthropic Messages. GPT-,
+    o-series- und Gemini-Modelle verwenden weiterhin den Transport OpenAI Responses. OpenClaw
     wählt den richtigen Transport basierend auf der Modell-Ref aus.
   </Accordion>
 
-  <Accordion title="Auflösungsreihenfolge der Umgebungsvariablen">
-    OpenClaw löst die Copilot-Authentifizierung aus Umgebungsvariablen in der folgenden
-    Prioritätsreihenfolge auf:
+  <Accordion title="Reihenfolge bei der Auflösung von Umgebungsvariablen">
+    OpenClaw löst die Copilot-Authentifizierung in der folgenden
+    Prioritätsreihenfolge aus Umgebungsvariablen auf:
 
-    | Priorität | Variable              | Hinweise                         |
-    | --------- | --------------------- | -------------------------------- |
+    | Priorität | Variable               | Hinweise                         |
+    | --------- | ---------------------- | -------------------------------- |
     | 1         | `COPILOT_GITHUB_TOKEN` | Höchste Priorität, Copilot-spezifisch |
-    | 2         | `GH_TOKEN`            | GitHub-CLI-Token (Fallback)      |
-    | 3         | `GITHUB_TOKEN`        | Standard-GitHub-Token (niedrigste Priorität) |
+    | 2         | `GH_TOKEN`             | GitHub-CLI-Token (Fallback)      |
+    | 3         | `GITHUB_TOKEN`         | Standard-GitHub-Token (niedrigste Priorität) |
 
-    Wenn mehrere Variablen gesetzt sind, verwendet OpenClaw die mit der höchsten Priorität.
-    Der Geräteanmeldefluss (`openclaw models auth login-github-copilot`) speichert
-    sein Token im Auth-Profil-Speicher und hat Vorrang vor allen Umgebungs-
-    variablen.
+    Wenn mehrere Variablen gesetzt sind, verwendet OpenClaw die Variable mit der höchsten Priorität.
+    Der Device-Login-Flow (`openclaw models auth login-github-copilot`) speichert
+    sein Token im Auth-Profil-Store und hat Vorrang vor allen Umgebungsvariablen.
 
   </Accordion>
 
-  <Accordion title="Tokenspeicherung">
-    Die Anmeldung speichert ein GitHub-Token im Auth-Profil-Speicher und tauscht es
-    aus, wenn OpenClaw ausgeführt wird, gegen ein Copilot-API-Token aus. Sie müssen das
+  <Accordion title="Token-Speicherung">
+    Beim Login wird ein GitHub-Token im Auth-Profil-Store gespeichert und beim Ausführen von OpenClaw
+    gegen ein Copilot-API-Token ausgetauscht. Sie müssen das
     Token nicht manuell verwalten.
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Erfordert ein interaktives TTY. Führen Sie den Anmeldebefehl direkt in einem Terminal aus,
-nicht in einem headless Skript oder CI-Job.
+Erfordert ein interaktives TTY. Führen Sie den Login-Befehl direkt in einem Terminal aus, nicht
+innerhalb eines headless Skripts oder CI-Jobs.
 </Warning>
 
-## Einbettungen für die Speicher-Suche
+## Embeddings für die Memory-Suche
 
-GitHub Copilot kann auch als Einbettungsanbieter für die
-[Speicher-Suche](/de/concepts/memory-search) dienen. Wenn Sie ein Copilot-Abonnement haben und
-angemeldet sind, kann OpenClaw es für Einbettungen ohne separaten API-Schlüssel verwenden.
+GitHub Copilot kann auch als Embedding-Provider für die
+[Memory-Suche](/de/concepts/memory-search) dienen. Wenn Sie ein Copilot-Abonnement haben und
+angemeldet sind, kann OpenClaw es ohne separaten API-Key für Embeddings verwenden.
 
 ### Automatische Erkennung
 
-Wenn `memorySearch.provider` `"auto"` ist (der Standard), wird GitHub Copilot
-mit Priorität 15 versucht – nach lokalen Einbettungen, aber vor OpenAI und anderen
-kostenpflichtigen Anbietern. Wenn ein GitHub-Token verfügbar ist, erkennt OpenClaw verfügbare
-Einbettungsmodelle über die Copilot-API und wählt automatisch das beste aus.
+Wenn `memorySearch.provider` auf `"auto"` gesetzt ist (Standard), wird GitHub Copilot
+mit Priorität 15 ausprobiert — nach lokalen Embeddings, aber vor OpenAI und anderen kostenpflichtigen
+Providern. Wenn ein GitHub-Token verfügbar ist, erkennt OpenClaw verfügbare
+Embedding-Modelle über die Copilot-API und wählt automatisch das beste aus.
 
 ### Explizite Konfiguration
 
@@ -157,22 +158,22 @@ Einbettungsmodelle über die Copilot-API und wählt automatisch das beste aus.
 
 ### So funktioniert es
 
-1. OpenClaw löst Ihr GitHub-Token auf (aus Umgebungsvariablen oder dem Auth-Profil).
+1. OpenClaw löst Ihr GitHub-Token auf (aus Env-Variablen oder dem Auth-Profil).
 2. Tauscht es gegen ein kurzlebiges Copilot-API-Token aus.
-3. Fragt den Copilot-`/models`-Endpunkt ab, um verfügbare Einbettungsmodelle zu erkennen.
+3. Fragt den Copilot-Endpunkt `/models` ab, um verfügbare Embedding-Modelle zu erkennen.
 4. Wählt das beste Modell aus (bevorzugt `text-embedding-3-small`).
-5. Sendet Einbettungsanfragen an den Copilot-`/embeddings`-Endpunkt.
+5. Sendet Embedding-Anfragen an den Copilot-Endpunkt `/embeddings`.
 
-Die Modellverfügbarkeit hängt von Ihrem GitHub-Tarif ab. Wenn keine Einbettungsmodelle
-verfügbar sind, überspringt OpenClaw Copilot und versucht den nächsten Anbieter.
+Die Modellverfügbarkeit hängt von Ihrem GitHub-Tarif ab. Wenn keine Embedding-Modelle
+verfügbar sind, überspringt OpenClaw Copilot und probiert den nächsten Provider aus.
 
 ## Verwandt
 
 <CardGroup cols={2}>
   <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
-    Auswahl von Anbietern, Modell-Refs und Failover-Verhalten.
+    Provider, Modell-Refs und Failover-Verhalten auswählen.
   </Card>
-  <Card title="OAuth und Authentifizierung" href="/de/gateway/authentication" icon="key">
-    Details zur Authentifizierung und Regeln zur Wiederverwendung von Anmeldedaten.
+  <Card title="OAuth und Auth" href="/de/gateway/authentication" icon="key">
+    Details zur Authentifizierung und Regeln zur Wiederverwendung von Zugangsdaten.
   </Card>
 </CardGroup>
