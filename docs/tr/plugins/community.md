@@ -1,27 +1,28 @@
 ---
 read_when:
-    - Üçüncü taraf OpenClaw eklentileri bulmak istiyorsunuz
-    - Kendi eklentinizi yayımlamak veya listelemek istiyorsunuz
-summary: 'Topluluk tarafından sürdürülen OpenClaw eklentileri: göz atın, yükleyin ve kendinizinkini gönderin'
-title: Topluluk Eklentileri
+    - Üçüncü taraf OpenClaw Plugin'lerini bulmak istiyorsunuz
+    - Kendi Plugin'inizi yayımlamak veya listelemek istiyorsunuz
+summary: 'Topluluk tarafından sürdürülen OpenClaw Plugin''leri: göz atın, kurun ve kendinizinkini gönderin'
+title: Topluluk Plugin'leri
 x-i18n:
-    generated_at: "2026-04-05T14:01:34Z"
+    generated_at: "2026-04-21T09:01:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 01804563a63399fe564b0cd9b9aadef32e5211b63d8467fdbbd1f988200728de
+    source_hash: 59be629cc5e271cec459eaaaa587487a4225a12f721ec22a3fefa3f29ac057fa
     source_path: plugins/community.md
     workflow: 15
 ---
 
-# Topluluk Eklentileri
+# Topluluk Plugin'leri
 
-Topluluk eklentileri, OpenClaw'ı yeni
-kanallar, araçlar, sağlayıcılar veya diğer yeteneklerle genişleten üçüncü taraf paketlerdir. Bunlar topluluk tarafından geliştirilir ve sürdürülür,
-[ClawHub](/tools/clawhub) veya npm üzerinde yayımlanır ve
-tek bir komutla yüklenebilir.
+Topluluk Plugin'leri, OpenClaw'ı yeni
+kanallar, araçlar, sağlayıcılar veya diğer yeteneklerle genişleten üçüncü taraf paketlerdir. Topluluk tarafından geliştirilir ve sürdürülür,
+[ClawHub](/tr/tools/clawhub) veya npm üzerinde yayımlanır ve
+tek bir komutla kurulabilir.
 
-ClawHub, topluluk eklentileri için kanonik keşif yüzeyidir. Eklentinizi burada keşfedilebilir kılmak için yalnızca belge odaklı PR'ler açmayın;
-bunun yerine ClawHub üzerinde yayımlayın.
+ClawHub, topluluk Plugin'leri için kanonik keşif yüzeyidir. Yalnızca Plugin'inizi burada keşfedilebilir kılmak için
+yalnızca dokümantasyon PR'leri açmayın; bunun yerine
+ClawHub üzerinde yayımlayın.
 
 ```bash
 openclaw plugins install <package-name>
@@ -29,12 +30,26 @@ openclaw plugins install <package-name>
 
 OpenClaw önce ClawHub'ı kontrol eder ve ardından otomatik olarak npm'e geri döner.
 
-## Listelenen eklentiler
+## Listelenen Plugin'ler
+
+### Apify
+
+20.000+ hazır scraper ile herhangi bir web sitesinden veri kazıyın. Agent'ınızın
+Instagram, Facebook, TikTok, YouTube, Google Maps, Google
+Search, e-ticaret siteleri ve daha fazlasından yalnızca sorarak veri çıkarmasını sağlayın.
+
+- **npm:** `@apify/apify-openclaw-plugin`
+- **repo:** [github.com/apify/apify-openclaw-plugin](https://github.com/apify/apify-openclaw-plugin)
+
+```bash
+openclaw plugins install @apify/apify-openclaw-plugin
+```
 
 ### Codex App Server Bridge
 
 Codex App Server konuşmaları için bağımsız OpenClaw köprüsü. Bir sohbeti
-bir Codex ileti dizisine bağlayın, onunla düz metinle konuşun ve sürdürme, planlama, inceleme, model seçimi, sıkıştırma ve daha fazlası için yerel sohbet komutlarıyla kontrol edin.
+bir Codex ileti dizisine bağlayın, bununla düz metinle konuşun ve devam ettirme, planlama, inceleme, model seçimi, Compaction ve daha fazlası için
+sohbete özgü komutlarla denetleyin.
 
 - **npm:** `openclaw-codex-app-server`
 - **repo:** [github.com/pwrdrvr/openclaw-codex-app-server](https://github.com/pwrdrvr/openclaw-codex-app-server)
@@ -45,7 +60,7 @@ openclaw plugins install openclaw-codex-app-server
 
 ### DingTalk
 
-Stream modunu kullanan kurumsal robot entegrasyonu. Herhangi bir DingTalk istemcisi üzerinden metin, görsel ve
+Stream modu kullanan kurumsal robot entegrasyonu. Herhangi bir DingTalk istemcisi üzerinden metin, görüntü ve
 dosya mesajlarını destekler.
 
 - **npm:** `@largezhou/ddingtalk`
@@ -57,8 +72,8 @@ openclaw plugins install @largezhou/ddingtalk
 
 ### Lossless Claw (LCM)
 
-OpenClaw için Lossless Context Management eklentisi. DAG tabanlı konuşma
-özetleme ve artımlı sıkıştırma — token kullanımını azaltırken
+OpenClaw için Lossless Context Management Plugin'i. DAG tabanlı konuşma
+özetleme ve artımlı Compaction — belirteç kullanımını azaltırken
 tam bağlam doğruluğunu korur.
 
 - **npm:** `@martian-engineering/lossless-claw`
@@ -70,8 +85,8 @@ openclaw plugins install @martian-engineering/lossless-claw
 
 ### Opik
 
-Ajan izlerini Opik'e aktaran resmi eklenti. Ajan davranışını,
-maliyeti, tokenları, hataları ve daha fazlasını izleyin.
+Agent izlerini Opik'e aktaran resmî Plugin. Agent davranışını,
+maliyeti, belirteçleri, hataları ve daha fazlasını izleyin.
 
 - **npm:** `@opik/opik-openclaw`
 - **repo:** [github.com/comet-ml/opik-openclaw](https://github.com/comet-ml/opik-openclaw)
@@ -80,10 +95,23 @@ maliyeti, tokenları, hataları ve daha fazlasını izleyin.
 openclaw plugins install @opik/opik-openclaw
 ```
 
+### Prometheus Avatar
+
+OpenClaw agent'ınıza gerçek zamanlı dudak senkronizasyonu, duygu
+ifadeleri ve metinden sese dönüştürme ile bir Live2D avatar verin. AI varlık üretimi
+ve Prometheus Marketplace'e tek tıkla dağıtım için oluşturucu araçları içerir. Şu anda alfa aşamasındadır.
+
+- **npm:** `@prometheusavatar/openclaw-plugin`
+- **repo:** [github.com/myths-labs/prometheus-avatar](https://github.com/myths-labs/prometheus-avatar)
+
+```bash
+openclaw plugins install @prometheusavatar/openclaw-plugin
+```
+
 ### QQbot
 
-OpenClaw'ı QQ Bot API üzerinden QQ'ya bağlayın. Özel sohbetleri, grup
-bahsetmelerini, kanal mesajlarını ve ses, görseller, videolar
+OpenClaw'ı QQ Bot API aracılığıyla QQ'ya bağlayın. Özel sohbetleri, grup
+bahsetmelerini, kanal mesajlarını ve ses, görüntü, video
 ve dosyalar dahil zengin medyayı destekler.
 
 - **npm:** `@tencent-connect/openclaw-qqbot`
@@ -95,8 +123,9 @@ openclaw plugins install @tencent-connect/openclaw-qqbot
 
 ### wecom
 
-Tencent WeCom ekibi tarafından geliştirilen OpenClaw için WeCom kanal eklentisi. WeCom Bot WebSocket kalıcı bağlantılarıyla desteklenir;
-doğrudan mesajları ve grup sohbetlerini, akış yanıtlarını, proaktif mesajlaşmayı, görsel/dosya işlemeyi, Markdown
+Tencent WeCom ekibi tarafından OpenClaw için WeCom kanal Plugin'i. WeCom Bot WebSocket kalıcı bağlantılarıyla desteklenir;
+doğrudan mesajları ve grup sohbetlerini,
+akış yanıtlarını, proaktif mesajlaşmayı, görüntü/dosya işlemeyi, Markdown
 biçimlendirmeyi, yerleşik erişim denetimini ve belge/toplantı/mesajlaşma Skills'lerini destekler.
 
 - **npm:** `@wecom/wecom-openclaw-plugin`
@@ -106,48 +135,49 @@ biçimlendirmeyi, yerleşik erişim denetimini ve belge/toplantı/mesajlaşma Sk
 openclaw plugins install @wecom/wecom-openclaw-plugin
 ```
 
-## Eklentinizi gönderin
+## Plugin'inizi gönderin
 
-Yararlı, belgelenmiş ve güvenli şekilde işletilebilen topluluk eklentilerini memnuniyetle karşılıyoruz.
+Yararlı, belgelenmiş ve işletimi güvenli olan topluluk Plugin'lerini memnuniyetle karşılıyoruz.
 
 <Steps>
   <Step title="ClawHub veya npm üzerinde yayımlayın">
-    Eklentiniz `openclaw plugins install \<package-name\>` ile yüklenebilir olmalıdır.
-    [ClawHub](/tools/clawhub) üzerinde (tercih edilir) veya npm'de yayımlayın.
-    Tam kılavuz için [Eklenti Geliştirme](/plugins/building-plugins) sayfasına bakın.
+    Plugin'iniz `openclaw plugins install \<package-name\>` ile kurulabilir olmalıdır.
+    [ClawHub](/tr/tools/clawhub) üzerinde (tercih edilir) veya npm'de yayımlayın.
+    Tam kılavuz için bkz. [Building Plugins](/tr/plugins/building-plugins).
 
   </Step>
 
   <Step title="GitHub üzerinde barındırın">
-    Kaynak kodu, kurulum belgeleri ve issue
-    takipçisi bulunan herkese açık bir depoda olmalıdır.
+    Kaynak kod, kurulum belgeleri ve issue
+    izleyicisi içeren herkese açık bir depoda bulunmalıdır.
 
   </Step>
 
-  <Step title="Belge PR'lerini yalnızca kaynak belge değişiklikleri için kullanın">
-    Eklentinizi keşfedilebilir kılmak için bir belge PR'sine ihtiyacınız yok. Bunun yerine
+  <Step title="Dokümantasyon PR'lerini yalnızca kaynak belge değişiklikleri için kullanın">
+    Plugin'inizin keşfedilebilir olması için yalnızca bir dokümantasyon PR'sine ihtiyacınız yoktur. Bunun yerine
     ClawHub üzerinde yayımlayın.
 
     Yalnızca OpenClaw'ın kaynak belgelerinde gerçek bir içerik
-    değişikliği gerekiyorsa belge PR'si açın; örneğin kurulum yönergelerini düzeltmek veya ana belge kümesine ait depolar arası
-    belgeler eklemek gibi.
+    değişikliği gerekiyorsa, örneğin kurulum yönergelerini düzeltmek veya
+    ana belge kümesine ait depolar arası
+    belgeleri eklemek gibi durumlarda dokümantasyon PR'si açın.
 
   </Step>
 </Steps>
 
-## Kalite ölçütü
+## Kalite çıtası
 
-| Gereksinim                  | Neden                                         |
+| Gereklilik                  | Neden                                         |
 | --------------------------- | --------------------------------------------- |
 | ClawHub veya npm üzerinde yayımlanmış | Kullanıcıların `openclaw plugins install` komutunun çalışmasına ihtiyacı var |
 | Herkese açık GitHub deposu  | Kaynak incelemesi, issue takibi, şeffaflık    |
 | Kurulum ve kullanım belgeleri | Kullanıcıların bunu nasıl yapılandıracağını bilmesi gerekir |
-| Aktif bakım                 | Yakın tarihli güncellemeler veya duyarlı issue yönetimi |
+| Etkin bakım                 | Yakın tarihli güncellemeler veya duyarlı issue işleme |
 
-Düşük çabalı sarmalayıcılar, belirsiz sahiplik veya bakımı yapılmayan paketler reddedilebilir.
+Düşük çabalı sarmalayıcılar, belirsiz sahiplik veya bakımsız paketler reddedilebilir.
 
 ## İlgili
 
-- [Eklenti Yükleme ve Yapılandırma](/tools/plugin) — herhangi bir eklenti nasıl yüklenir
-- [Eklenti Geliştirme](/plugins/building-plugins) — kendinizinkini oluşturun
-- [Eklenti Manifestosu](/plugins/manifest) — manifesto şeması
+- [Plugin'leri kurma ve yapılandırma](/tr/tools/plugin) — herhangi bir Plugin nasıl kurulur
+- [Building Plugins](/tr/plugins/building-plugins) — kendinizinkini oluşturun
+- [Plugin Manifest](/tr/plugins/manifest) — manifest şeması

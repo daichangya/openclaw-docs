@@ -1,57 +1,57 @@
 ---
 read_when:
-    - Otomatik sıkıştırmayı ve /compact komutunu anlamak istiyorsunuz
-    - Bağlam sınırlarına takılan uzun oturumlarda hata ayıklıyorsunuz
-summary: OpenClaw'un model sınırları içinde kalmak için uzun konuşmaları nasıl özetlediği
-title: Sıkıştırma
+    - Otomatik Compaction ve `/compact` komutunu anlamak istiyorsunuz
+    - Bağlam sınırlarına ulaşan uzun oturumlarda hata ayıklıyorsunuz
+summary: OpenClaw'ın model sınırları içinde kalmak için uzun konuşmaları nasıl özetlediği
+title: Compaction
 x-i18n:
-    generated_at: "2026-04-08T02:14:09Z"
+    generated_at: "2026-04-21T08:58:00Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e6590b82a8c3a9c310998d653459ca4d8612495703ca0a8d8d306d7643142fd1
+    source_hash: 382e4a879e65199bd98d7476bff556571e09344a21e909862a34e6029db6d765
     source_path: concepts/compaction.md
     workflow: 15
 ---
 
-# Sıkıştırma
+# Compaction
 
-Her modelin bir bağlam penceresi vardır -- işleyebileceği en yüksek token sayısı.
-Bir konuşma bu sınıra yaklaştığında, OpenClaw eski mesajları bir özette
-**sıkıştırır**; böylece sohbet devam edebilir.
+Her modelin bir bağlam penceresi vardır -- yani işleyebileceği en yüksek token sayısı.
+Bir konuşma bu sınıra yaklaştığında, OpenClaw sohbetin devam edebilmesi için
+eski mesajları bir özete **sıkıştırır**.
 
 ## Nasıl çalışır
 
-1. Konuşmanın eski bölümleri sıkıştırılmış bir girdide özetlenir.
+1. Eski konuşma dönüşleri bir Compaction girdisinde özetlenir.
 2. Özet, oturum dökümüne kaydedilir.
 3. Son mesajlar olduğu gibi korunur.
 
-OpenClaw geçmişi sıkıştırma parçalarına böldüğünde, asistan araç
-çağrılarını eşleşen `toolResult` girdileriyle eşleştirilmiş halde tutar. Bir bölme noktası
-bir araç bloğunun içine denk gelirse, OpenClaw sınırı kaydırır; böylece çift bir arada kalır ve
-özetlenmemiş mevcut son bölüm korunur.
+OpenClaw geçmişi Compaction parçalarına böldüğünde, asistan araç çağrılarını
+eşleşen `toolResult` girdileriyle eşleştirilmiş halde tutar. Bir bölme noktası
+bir araç bloğunun içine denk gelirse, OpenClaw sınırı çift birlikte kalacak ve
+mevcut özetlenmemiş kuyruk korunacak şekilde kaydırır.
 
-Konuşma geçmişinin tamamı diskte kalır. Sıkıştırma yalnızca
-modelin bir sonraki turda gördüğü şeyi değiştirir.
+Tam konuşma geçmişi diskte kalır. Compaction yalnızca modelin bir sonraki
+dönüşte ne gördüğünü değiştirir.
 
-## Otomatik sıkıştırma
+## Otomatik Compaction
 
-Otomatik sıkıştırma varsayılan olarak açıktır. Oturum bağlam
-sınırına yaklaştığında veya model bir bağlam taşması hatası döndürdüğünde çalışır (bu durumda
-OpenClaw sıkıştırır ve yeniden dener). Yaygın taşma imzaları arasında
+Otomatik Compaction varsayılan olarak açıktır. Oturum bağlam sınırına
+yaklaştığında veya model bir bağlam taşması hatası döndürdüğünde çalışır (bu durumda
+OpenClaw Compaction yapar ve yeniden dener). Tipik taşma imzaları arasında
 `request_too_large`, `context length exceeded`, `input exceeds the maximum
 number of tokens`, `input token count exceeds the maximum number of input
 tokens`, `input is too long for the model` ve `ollama error: context length
 exceeded` bulunur.
 
 <Info>
-Sıkıştırmadan önce OpenClaw, önemli
-notları [memory](/tr/concepts/memory) dosyalarına kaydetmesi için aracıya otomatik olarak hatırlatma yapar. Bu, bağlam kaybını önler.
+Compaction yapmadan önce OpenClaw, önemli notları [memory](/tr/concepts/memory)
+dosyalarına kaydetmesini aracıya otomatik olarak hatırlatır. Bu, bağlam kaybını önler.
 </Info>
 
-Sıkıştırma davranışını yapılandırmak için `openclaw.json` dosyanızdaki `agents.defaults.compaction` ayarını kullanın (mod, hedef token sayısı vb.).
-Sıkıştırma özetleme, varsayılan olarak opak tanımlayıcıları korur (`identifierPolicy: "strict"`). Bunu `identifierPolicy: "off"` ile geçersiz kılabilir veya `identifierPolicy: "custom"` ve `identifierInstructions` ile özel metin sağlayabilirsiniz.
+Compaction davranışını (mod, hedef token sayısı vb.) yapılandırmak için `openclaw.json` dosyanızdaki `agents.defaults.compaction` ayarını kullanın.
+Compaction özetleme varsayılan olarak opak tanımlayıcıları korur (`identifierPolicy: "strict"`). Bunu `identifierPolicy: "off"` ile geçersiz kılabilir veya `identifierPolicy: "custom"` ve `identifierInstructions` ile özel metin sağlayabilirsiniz.
 
-İsteğe bağlı olarak, sıkıştırma özetleme için `agents.defaults.compaction.model` üzerinden farklı bir model belirtebilirsiniz. Bu, birincil modeliniz yerel veya küçük bir model olduğunda ve sıkıştırma özetlerinin daha yetenekli bir model tarafından üretilmesini istediğinizde kullanışlıdır. Geçersiz kılma, herhangi bir `provider/model-id` dizesini kabul eder:
+İsteğe bağlı olarak Compaction özetleme için `agents.defaults.compaction.model` üzerinden farklı bir model belirtebilirsiniz. Bu, birincil modeliniz yerel veya küçük bir model olduğunda ve Compaction özetlerinin daha yetenekli bir model tarafından üretilmesini istediğinizde kullanışlıdır. Geçersiz kılma herhangi bir `provider/model-id` dizesini kabul eder:
 
 ```json
 {
@@ -65,7 +65,7 @@ Sıkıştırma özetleme, varsayılan olarak opak tanımlayıcıları korur (`id
 }
 ```
 
-Bu, yerel modellerle de çalışır; örneğin özetlemeye ayrılmış ikinci bir Ollama modeli veya ince ayarlanmış bir sıkıştırma uzmanı:
+Bu, örneğin özetlemeye ayrılmış ikinci bir Ollama modeli veya ince ayarlı bir Compaction uzmanı gibi yerel modellerle de çalışır:
 
 ```json
 {
@@ -79,11 +79,11 @@ Bu, yerel modellerle de çalışır; örneğin özetlemeye ayrılmış ikinci bi
 }
 ```
 
-Ayarlanmadığında, sıkıştırma aracının birincil modelini kullanır.
+Ayarlanmadığında, Compaction aracının birincil modelini kullanır.
 
-## Takılabilir sıkıştırma sağlayıcıları
+## Takılabilir Compaction sağlayıcıları
 
-Plugins, eklenti API'sindeki `registerCompactionProvider()` aracılığıyla özel bir sıkıştırma sağlayıcısı kaydedebilir. Bir sağlayıcı kaydedilip yapılandırıldığında, OpenClaw özetlemeyi yerleşik LLM işlem hattı yerine ona devreder.
+Plugin'ler, plugin API üzerindeki `registerCompactionProvider()` aracılığıyla özel bir Compaction sağlayıcısı kaydedebilir. Bir sağlayıcı kaydedilip yapılandırıldığında, OpenClaw özetlemeyi yerleşik LLM işlem hattı yerine buna devreder.
 
 Kayıtlı bir sağlayıcıyı kullanmak için yapılandırmanızda sağlayıcı kimliğini ayarlayın:
 
@@ -99,32 +99,33 @@ Kayıtlı bir sağlayıcıyı kullanmak için yapılandırmanızda sağlayıcı 
 }
 ```
 
-Bir `provider` ayarlamak, otomatik olarak `mode: "safeguard"` kullanımını zorunlu kılar. Sağlayıcılar, yerleşik yolla aynı sıkıştırma yönergelerini ve tanımlayıcı koruma ilkesini alır; ayrıca OpenClaw, sağlayıcı çıktısından sonra da son tur ve bölünmüş tur son ek bağlamını korur. Sağlayıcı başarısız olursa veya boş bir sonuç döndürürse, OpenClaw yerleşik LLM özetlemeye geri döner.
+Bir `provider` ayarlamak otomatik olarak `mode: "safeguard"` kullanımını zorunlu kılar. Sağlayıcılar, yerleşik yol ile aynı Compaction yönergelerini ve tanımlayıcı koruma ilkesini alır; OpenClaw ayrıca sağlayıcı çıktısından sonra son dönüş ve bölünmüş dönüş sonek bağlamını korumaya devam eder. Sağlayıcı başarısız olursa veya boş bir sonuç döndürürse, OpenClaw yerleşik LLM özetlemeye geri döner.
 
-## Otomatik sıkıştırma (varsayılan olarak açık)
+## Otomatik Compaction (varsayılan olarak açık)
 
-Bir oturum modelin bağlam penceresine yaklaştığında veya bunu aştığında, OpenClaw otomatik sıkıştırmayı tetikler ve orijinal isteği sıkıştırılmış bağlamı kullanarak yeniden deneyebilir.
+Bir oturum modelin bağlam penceresine yaklaştığında veya onu aştığında, OpenClaw otomatik Compaction'ı tetikler ve özgün isteği sıkıştırılmış bağlamı kullanarak yeniden deneyebilir.
 
 Şunları görürsünüz:
 
-- ayrıntılı modda `🧹 Otomatik sıkıştırma tamamlandı`
-- `/status` içinde `🧹 Sıkıştırmalar: <count>`
+- ayrıntılı modda `🧹 Auto-compaction complete`
+- `/status` içinde `🧹 Compactions: <count>`
 
-Sıkıştırmadan önce OpenClaw, kalıcı notları diske kaydetmek için **sessiz bellek boşaltma** turu çalıştırabilir.
-Ayrıntılar ve yapılandırma için bkz. [Memory](/tr/concepts/memory).
+Compaction'dan önce OpenClaw, kalıcı notları diske kaydetmek için sessiz bir
+**memory flush** dönüşü çalıştırabilir. Ayrıntılar ve yapılandırma için bkz.
+[Memory](/tr/concepts/memory).
 
-## El ile sıkıştırma
+## El ile Compaction
 
-Sıkıştırmayı zorlamak için herhangi bir sohbette `/compact` yazın. Özeti
+Compaction'ı zorlamak için herhangi bir sohbette `/compact` yazın. Özeti
 yönlendirmek için yönergeler ekleyin:
 
 ```
-/compact API tasarım kararlarına odaklan
+/compact Focus on the API design decisions
 ```
 
 ## Farklı bir model kullanma
 
-Varsayılan olarak, sıkıştırma aracınızın birincil modelini kullanır. Daha iyi
+Varsayılan olarak Compaction, aracınızın birincil modelini kullanır. Daha iyi
 özetler için daha yetenekli bir model kullanabilirsiniz:
 
 ```json5
@@ -139,10 +140,11 @@ Varsayılan olarak, sıkıştırma aracınızın birincil modelini kullanır. Da
 }
 ```
 
-## Sıkıştırma başlangıç bildirimi
+## Compaction bildirimleri
 
-Varsayılan olarak, sıkıştırma sessizce çalışır. Sıkıştırma
-başladığında kısa bir bildirim göstermek için `notifyUser` seçeneğini etkinleştirin:
+Varsayılan olarak Compaction sessizce çalışır. Compaction başladığında ve
+tamamlandığında kısa bildirimler göstermek için `notifyUser` özelliğini
+etkinleştirin:
 
 ```json5
 {
@@ -156,36 +158,41 @@ başladığında kısa bir bildirim göstermek için `notifyUser` seçeneğini e
 }
 ```
 
-Etkinleştirildiğinde, kullanıcı her sıkıştırma çalışmasının başında kısa bir mesaj görür (örneğin, "Bağlam sıkıştırılıyor...").
+Etkinleştirildiğinde, kullanıcı her Compaction çalıştırması etrafında kısa
+durum mesajları görür
+(örneğin, "Bağlam sıkıştırılıyor..." ve "Compaction tamamlandı").
 
-## Sıkıştırma ve budama karşılaştırması
+## Compaction ve budama
 
-|                  | Sıkıştırma                    | Budama                           |
-| ---------------- | ----------------------------- | -------------------------------- |
-| **Ne yapar**     | Eski konuşmayı özetler        | Eski araç sonuçlarını kırpar     |
-| **Kaydedilir mi?** | Evet (oturum dökümünde)     | Hayır (yalnızca bellekte, istek başına) |
-| **Kapsam**       | Tüm konuşma                   | Yalnızca araç sonuçları          |
+|                  | Compaction                   | Budama                           |
+| ---------------- | ---------------------------- | -------------------------------- |
+| **Ne yapar**     | Eski konuşmayı özetler       | Eski araç sonuçlarını kırpar     |
+| **Kaydedilir mi?** | Evet (oturum dökümünde)    | Hayır (yalnızca bellekte, istek başına) |
+| **Kapsam**       | Tüm konuşma                  | Yalnızca araç sonuçları          |
 
-[Oturum budama](/tr/concepts/session-pruning), özetleme yapmadan
-araç çıktısını kırpan daha hafif bir tamamlayıcıdır.
+[Oturum budama](/tr/concepts/session-pruning), araç çıktısını özetlemeden kırpan
+daha hafif bir tamamlayıcıdır.
 
 ## Sorun giderme
 
-**Çok sık mı sıkıştırılıyor?** Modelin bağlam penceresi küçük olabilir veya araç
-çıktıları büyük olabilir. Şunu etkinleştirmeyi deneyin:
-[oturum budama](/tr/concepts/session-pruning).
+**Çok mu sık Compaction yapılıyor?** Modelin bağlam penceresi küçük olabilir veya araç
+çıktıları büyük olabilir. [oturum budama](/tr/concepts/session-pruning)
+özelliğini etkinleştirmeyi deneyin.
 
-**Sıkıştırmadan sonra bağlam eski mi geliyor?** Özeti yönlendirmek için `/compact Focus on <topic>` kullanın veya notların kalıcı olmasını sağlamak için [memory flush](/tr/concepts/memory) seçeneğini etkinleştirin.
+**Compaction'dan sonra bağlam eski mi hissediliyor?** Özeti yönlendirmek için
+`/compact Focus on <topic>` kullanın veya notların korunması için
+[memory flush](/tr/concepts/memory) özelliğini etkinleştirin.
 
-**Temiz bir başlangıca mı ihtiyacınız var?** `/new`, sıkıştırma yapmadan yeni bir oturum başlatır.
+**Temiz bir başlangıç mı gerekiyor?** `/new`, Compaction yapmadan yeni bir
+oturum başlatır.
 
 Gelişmiş yapılandırma için (ayrılmış token'lar, tanımlayıcı koruma, özel
-bağlam motorları, OpenAI sunucu tarafı sıkıştırma), bkz.
+bağlam motorları, OpenAI sunucu tarafı Compaction), bkz.
 [Oturum Yönetimi Derinlemesine İnceleme](/tr/reference/session-management-compaction).
 
 ## İlgili
 
 - [Oturum](/tr/concepts/session) — oturum yönetimi ve yaşam döngüsü
 - [Oturum Budama](/tr/concepts/session-pruning) — araç sonuçlarını kırpma
-- [Bağlam](/tr/concepts/context) — aracı turları için bağlamın nasıl oluşturulduğu
-- [Kancalar](/tr/automation/hooks) — sıkıştırma yaşam döngüsü kancaları (`before_compaction`, `after_compaction`)
+- [Bağlam](/tr/concepts/context) — aracı dönüşleri için bağlamın nasıl oluşturulduğu
+- [Kancalar](/tr/automation/hooks) — Compaction yaşam döngüsü kancaları (`before_compaction`, `after_compaction`)

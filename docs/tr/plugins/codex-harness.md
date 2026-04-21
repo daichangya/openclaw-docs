@@ -1,65 +1,63 @@
 ---
 read_when:
-    - Paketlenmiş Codex app-server harness kullanmak istiyorsunuz
-    - Codex model başvurularına ve yapılandırma örneklerine ihtiyacınız var
-    - Yalnızca Codex dağıtımları için PI fallback'i devre dışı bırakmak istiyorsunuz
-summary: OpenClaw gömülü agent turlarını paketlenmiş Codex app-server harness üzerinden çalıştırma
+    - Paketle gelen Codex app-server harness'ı kullanmak istiyorsunuz
+    - Codex model ref'lerine ve yapılandırma örneklerine ihtiyacınız var
+    - Yalnızca Codex dağıtımları için Pi fallback'ini devre dışı bırakmak istiyorsunuz
+summary: Paketle gelen Codex app-server harness üzerinden OpenClaw gömülü ajan dönüşlerini çalıştırın
 title: Codex Harness
 x-i18n:
-    generated_at: "2026-04-11T02:45:49Z"
+    generated_at: "2026-04-21T09:01:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 60e1dcf4f1a00c63c3ef31d72feac44bce255421c032c58fa4fd67295b3daf23
+    source_hash: 3f0cdaf68be3b2257de1046103ff04f53f9d3a65ffc15ab7af5ab1f425643d6c
     source_path: plugins/codex-harness.md
     workflow: 15
 ---
 
 # Codex Harness
 
-Paketlenmiş `codex` plugin'i, OpenClaw'un gömülü agent turlarını yerleşik PI harness yerine
-Codex app-server üzerinden çalıştırmasına olanak tanır.
+Paketle gelen `codex` plugin'i, OpenClaw'un gömülü ajan dönüşlerini yerleşik Pi harness yerine
+Codex app-server üzerinden çalıştırmasını sağlar.
 
-Bunu, düşük düzey agent oturumunun Codex tarafından yönetilmesini istediğinizde kullanın: model
-keşfi, yerel thread devam ettirme, yerel sıkıştırma ve app-server yürütmesi.
-OpenClaw yine de sohbet kanallarını, oturum dosyalarını, model seçimini, araçları,
-onayları, medya teslimini ve görünür döküm aynasını yönetmeye devam eder.
+Bunu, düşük düzey ajan oturumuna Codex'in sahip olmasını istediğinizde kullanın: model
+keşfi, yerel thread sürdürme, yerel Compaction ve app-server yürütmesi.
+OpenClaw yine de sohbet kanallarına, oturum dosyalarına, model seçimine, araçlara,
+onaylara, medya teslimatına ve görünür transcript yansısına sahip olmaya devam eder.
 
 Harness varsayılan olarak kapalıdır. Yalnızca `codex` plugin'i
-etkinleştirildiğinde ve çözümlenen model bir `codex/*` modeli olduğunda ya da
-`embeddedHarness.runtime: "codex"` veya `OPENCLAW_AGENT_RUNTIME=codex` açıkça zorlandığında seçilir.
-Hiç `codex/*` yapılandırmazsanız mevcut PI, OpenAI, Anthropic, Gemini, local
-ve custom-provider çalıştırmaları mevcut davranışlarını korur.
+etkin olduğunda ve çözümlenen model bir `codex/*` modeli olduğunda ya da `embeddedHarness.runtime: "codex"` veya `OPENCLAW_AGENT_RUNTIME=codex` ile açıkça zorladığınızda seçilir.
+Hiçbir zaman `codex/*` yapılandırmazsanız, mevcut Pi, OpenAI, Anthropic, Gemini, yerel
+ve özel sağlayıcı çalıştırmaları mevcut davranışlarını korur.
 
 ## Doğru model önekini seçin
 
-OpenClaw, OpenAI erişimi ile Codex biçimli erişim için ayrı yollar kullanır:
+OpenClaw, OpenAI ve Codex biçimli erişim için ayrı yollara sahiptir:
 
-| Model başvurusu       | Çalışma zamanı yolu                           | Şu durumda kullanın                                                      |
-| --------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
-| `openai/gpt-5.4`      | OpenClaw/PI altyapısı üzerinden OpenAI sağlayıcısı | `OPENAI_API_KEY` ile doğrudan OpenAI Platform API erişimi istiyorsunuz. |
-| `openai-codex/gpt-5.4` | PI üzerinden OpenAI Codex OAuth sağlayıcısı  | Codex app-server harness olmadan ChatGPT/Codex OAuth istiyorsunuz.      |
-| `codex/gpt-5.4`       | Paketlenmiş Codex sağlayıcısı ve Codex harness | Gömülü agent turu için yerel Codex app-server yürütmesi istiyorsunuz.   |
+| Model ref              | Çalışma zamanı yolu                           | Şu durumda kullanın                                                      |
+| ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
+| `openai/gpt-5.4`       | OpenClaw/PI altyapısı üzerinden OpenAI sağlayıcısı | `OPENAI_API_KEY` ile doğrudan OpenAI Platform API erişimi istiyorsunuz. |
+| `openai-codex/gpt-5.4` | PI üzerinden OpenAI Codex OAuth sağlayıcısı   | Codex app-server harness olmadan ChatGPT/Codex OAuth istiyorsunuz.      |
+| `codex/gpt-5.4`        | Paketle gelen Codex sağlayıcısı artı Codex harness | Gömülü ajan dönüşü için yerel Codex app-server yürütmesi istiyorsunuz.  |
 
-Codex harness yalnızca `codex/*` model başvurularını sahiplenir. Mevcut `openai/*`,
-`openai-codex/*`, Anthropic, Gemini, xAI, local ve custom provider başvuruları
+Codex harness yalnızca `codex/*` model ref'lerini sahiplenir. Mevcut `openai/*`,
+`openai-codex/*`, Anthropic, Gemini, xAI, yerel ve özel sağlayıcı ref'leri
 normal yollarını korur.
 
 ## Gereksinimler
 
-- Paketlenmiş `codex` plugin'i kullanılabilir olan OpenClaw.
+- Paketle gelen `codex` plugin'i kullanılabilir olan OpenClaw.
 - Codex app-server `0.118.0` veya daha yeni.
-- App-server süreci için kullanılabilir Codex kimlik doğrulaması.
+- App-server süreci için Codex kimlik doğrulamasının kullanılabilir olması.
 
-Plugin, daha eski veya sürümsüz app-server el sıkışmalarını engeller. Bu, OpenClaw'u
-test edildiği protokol yüzeyinde tutar.
+Plugin, daha eski veya sürümsüz app-server el sıkışmalarını engeller. Bu,
+OpenClaw'u test edildiği protokol yüzeyinde tutar.
 
-Canlı ve Docker smoke testleri için kimlik doğrulaması genellikle `OPENAI_API_KEY` ile, ayrıca
-`~/.codex/auth.json` ve `~/.codex/config.toml` gibi isteğe bağlı Codex CLI dosyalarıyla gelir.
-Yerel Codex app-server'ınızın kullandığı kimlik doğrulama materyalinin aynısını kullanın.
+Canlı ve Docker smoke testleri için kimlik doğrulama genellikle `OPENAI_API_KEY` üzerinden gelir; ayrıca isteğe bağlı Codex CLI dosyaları olan `~/.codex/auth.json` ve
+`~/.codex/config.toml` da kullanılabilir. Yerel Codex app-server'ınızın kullandığı aynı kimlik doğrulama materyalini kullanın.
 
-## Minimum yapılandırma
+## En düşük düzey yapılandırma
 
-`codex/gpt-5.4` kullanın, paketlenmiş plugin'i etkinleştirin ve `codex` harness'i zorlayın:
+`codex/gpt-5.4` kullanın, paketle gelen plugin'i etkinleştirin ve `codex` harness'ı zorlayın:
 
 ```json5
 {
@@ -82,7 +80,7 @@ Yerel Codex app-server'ınızın kullandığı kimlik doğrulama materyalinin ay
 }
 ```
 
-Yapılandırmanız `plugins.allow` kullanıyorsa `codex` öğesini de buraya ekleyin:
+Yapılandırmanız `plugins.allow` kullanıyorsa, `codex` değerini de buraya ekleyin:
 
 ```json5
 {
@@ -97,13 +95,12 @@ Yapılandırmanız `plugins.allow` kullanıyorsa `codex` öğesini de buraya ekl
 }
 ```
 
-`agents.defaults.model` veya bir agent modelini `codex/<model>` olarak ayarlamak da
-paketlenmiş `codex` plugin'ini otomatik etkinleştirir. Açık plugin girdisi, paylaşılan yapılandırmalarda
-dağıtım amacını belirgin hale getirdiği için yine de yararlıdır.
+`agents.defaults.model` veya bir ajan modelini `codex/<model>` olarak ayarlamak da
+paketle gelen `codex` plugin'ini otomatik olarak etkinleştirir. Açık plugin girdisi, paylaşılan yapılandırmalarda yine de kullanışlıdır çünkü dağıtım niyetini açık hâle getirir.
 
-## Diğer modelleri değiştirmeden Codex ekleme
+## Diğer modelleri değiştirmeden Codex ekleyin
 
-`codex/*` modelleri için Codex, diğer her şey için PI istiyorsanız `runtime: "auto"` değerini koruyun:
+`codex/*` modeller için Codex, diğer her şey için Pi istiyorsanız `runtime: "auto"` kullanın:
 
 ```json5
 {
@@ -137,15 +134,15 @@ dağıtım amacını belirgin hale getirdiği için yine de yararlıdır.
 
 Bu yapıyla:
 
-- `/model codex` veya `/model codex/gpt-5.4`, Codex app-server harness'i kullanır.
+- `/model codex` veya `/model codex/gpt-5.4`, Codex app-server harness'ı kullanır.
 - `/model gpt` veya `/model openai/gpt-5.4`, OpenAI sağlayıcı yolunu kullanır.
 - `/model opus`, Anthropic sağlayıcı yolunu kullanır.
-- Codex olmayan bir model seçilirse PI uyumluluk harness'i olarak kalır.
+- Codex olmayan bir model seçilirse Pi, uyumluluk harness'ı olarak kalır.
 
 ## Yalnızca Codex dağıtımları
 
-Her gömülü agent turunun Codex harness kullandığını kanıtlamanız gerekiyorsa
-PI fallback'i devre dışı bırakın:
+Her gömülü ajan dönüşünün Codex harness kullandığını kanıtlamanız gerekiyorsa
+Pi fallback'ini devre dışı bırakın:
 
 ```json5
 {
@@ -169,13 +166,13 @@ OPENCLAW_AGENT_HARNESS_FALLBACK=none \
 openclaw gateway run
 ```
 
-Fallback devre dışıyken, `codex` plugin'i devre dışıysa,
-istenen model bir `codex/*` başvurusu değilse, app-server çok eskiyse veya
-app-server başlatılamıyorsa OpenClaw erken aşamada başarısız olur.
+Fallback devre dışıyken, Codex plugin devre dışıysa,
+istenen model bir `codex/*` ref'i değilse, app-server çok eskiyse veya
+app-server başlatılamıyorsa OpenClaw erken başarısız olur.
 
-## Agent başına Codex
+## Ajan başına Codex
 
-Varsayılan agent normal otomatik seçimi korurken bir agent'ı yalnızca Codex yapabilirsiniz:
+Varsayılan ajan normal otomatik seçimi korurken bir ajanı yalnızca Codex yapabilirsiniz:
 
 ```json5
 {
@@ -206,14 +203,14 @@ Varsayılan agent normal otomatik seçimi korurken bir agent'ı yalnızca Codex 
 }
 ```
 
-Agent ve model değiştirmek için normal oturum komutlarını kullanın. `/new`, yeni bir
+Ajan ve model değiştirmek için normal oturum komutlarını kullanın. `/new`, yeni bir
 OpenClaw oturumu oluşturur ve Codex harness gerektiğinde kendi sidecar app-server
-thread'ini oluşturur veya sürdürür. `/reset`, bu thread için OpenClaw oturum bağlamasını temizler.
+thread'ini oluşturur veya sürdürür. `/reset`, o thread için OpenClaw oturum bağını temizler.
 
 ## Model keşfi
 
-Varsayılan olarak Codex plugin'i, kullanılabilir modelleri app-server'dan ister. Keşif
-başarısız olursa veya zaman aşımına uğrarsa paketlenmiş yedek kataloğu kullanır:
+Varsayılan olarak Codex plugin'i, mevcut modelleri app-server'a sorar. Keşif
+başarısız olursa veya zaman aşımına uğrarsa, paketle gelen fallback kataloğunu kullanır:
 
 - `codex/gpt-5.4`
 - `codex/gpt-5.4-mini`
@@ -239,7 +236,7 @@ Keşfi `plugins.entries.codex.config.discovery` altında ayarlayabilirsiniz:
 }
 ```
 
-Başlangıçta Codex'i yoklamaktan kaçınmak ve yedek kataloğa bağlı kalmak istediğinizde
+Başlangıçta Codex yoklamasından kaçınmak ve fallback kataloğuna bağlı kalmak istediğinizde
 keşfi devre dışı bırakın:
 
 ```json5
@@ -267,7 +264,9 @@ Varsayılan olarak plugin, Codex'i yerelde şu komutla başlatır:
 codex app-server --listen stdio://
 ```
 
-Bu varsayılanı koruyup yalnızca Codex yerel ilkesini ayarlayabilirsiniz:
+Varsayılan olarak OpenClaw, Codex'ten yerel onaylar istemesini ister. Bu
+ilkeyi daha da ayarlayabilirsiniz; örneğin sıkılaştırıp incelemeleri
+guardian üzerinden yönlendirebilirsiniz:
 
 ```json5
 {
@@ -277,7 +276,8 @@ Bu varsayılanı koruyup yalnızca Codex yerel ilkesini ayarlayabilirsiniz:
         enabled: true,
         config: {
           appServer: {
-            approvalPolicy: "on-request",
+            approvalPolicy: "untrusted",
+            approvalsReviewer: "guardian_subagent",
             sandbox: "workspace-write",
             serviceTier: "priority",
           },
@@ -288,7 +288,7 @@ Bu varsayılanı koruyup yalnızca Codex yerel ilkesini ayarlayabilirsiniz:
 }
 ```
 
-Zaten çalışan bir app-server için WebSocket aktarımını kullanın:
+Zaten çalışan bir app-server için WebSocket taşımasını kullanın:
 
 ```json5
 {
@@ -312,22 +312,22 @@ Zaten çalışan bir app-server için WebSocket aktarımını kullanın:
 
 Desteklenen `appServer` alanları:
 
-| Alan                | Varsayılan                               | Anlamı                                                                   |
-| ------------------- | ---------------------------------------- | ------------------------------------------------------------------------ |
-| `transport`         | `"stdio"`                                | `"stdio"` Codex'i başlatır; `"websocket"` `url` adresine bağlanır.      |
-| `command`           | `"codex"`                                | stdio aktarımı için yürütülebilir dosya.                                 |
-| `args`              | `["app-server", "--listen", "stdio://"]` | stdio aktarımı için argümanlar.                                          |
-| `url`               | ayarlanmamış                             | WebSocket app-server URL'si.                                             |
-| `authToken`         | ayarlanmamış                             | WebSocket aktarımı için Bearer token.                                    |
-| `headers`           | `{}`                                     | Ek WebSocket başlıkları.                                                 |
-| `requestTimeoutMs`  | `60000`                                  | App-server control-plane çağrıları için zaman aşımı.                     |
-| `approvalPolicy`    | `"never"`                                | Thread başlatma/devam ettirme/tura gönderilen yerel Codex onay ilkesi.   |
-| `sandbox`           | `"workspace-write"`                      | Thread başlatma/devam ettirmeye gönderilen yerel Codex sandbox modu.     |
+| Alan                | Varsayılan                               | Anlamı                                                                  |
+| ------------------- | ---------------------------------------- | ----------------------------------------------------------------------- |
+| `transport`         | `"stdio"`                                | `"stdio"` Codex'i başlatır; `"websocket"` `url` değerine bağlanır.     |
+| `command`           | `"codex"`                                | stdio taşıması için yürütülebilir dosya.                               |
+| `args`              | `["app-server", "--listen", "stdio://"]` | stdio taşıması için argümanlar.                                        |
+| `url`               | ayarlı değil                             | WebSocket app-server URL'si.                                           |
+| `authToken`         | ayarlı değil                             | WebSocket taşıması için Bearer token.                                  |
+| `headers`           | `{}`                                     | Ek WebSocket başlıkları.                                               |
+| `requestTimeoutMs`  | `60000`                                  | app-server control-plane çağrıları için zaman aşımı.                   |
+| `approvalPolicy`    | `"on-request"`                           | Thread başlatma/sürdürme/dönüşe gönderilen yerel Codex onay ilkesi.    |
+| `sandbox`           | `"workspace-write"`                      | Thread başlatma/sürdürmeye gönderilen yerel Codex sandbox modu.        |
 | `approvalsReviewer` | `"user"`                                 | Yerel onayları Codex guardian'ın incelemesi için `"guardian_subagent"` kullanın. |
-| `serviceTier`       | ayarlanmamış                             | İsteğe bağlı Codex hizmet katmanı, örneğin `"priority"`.                 |
+| `serviceTier`       | ayarlı değil                             | İsteğe bağlı Codex hizmet katmanı, örneğin `"priority"`.               |
 
-Eski ortam değişkenleri, eşleşen yapılandırma alanı ayarlanmamışsa yerel testlerde
-fallback olarak hâlâ çalışır:
+Eski ortam değişkenleri, eşleşen yapılandırma alanı ayarlı değilse
+yerel testler için fallback olarak hâlâ çalışır:
 
 - `OPENCLAW_CODEX_APP_SERVER_BIN`
 - `OPENCLAW_CODEX_APP_SERVER_ARGS`
@@ -339,7 +339,7 @@ Tekrarlanabilir dağıtımlar için yapılandırma tercih edilir.
 
 ## Yaygın tarifler
 
-Varsayılan stdio aktarımıyla yerel Codex:
+Varsayılan stdio taşımasıyla yerel Codex:
 
 ```json5
 {
@@ -353,7 +353,7 @@ Varsayılan stdio aktarımıyla yerel Codex:
 }
 ```
 
-PI fallback devre dışıyken, yalnızca Codex harness doğrulaması:
+Pi fallback devre dışıyken yalnızca Codex harness doğrulaması:
 
 ```json5
 {
@@ -414,76 +414,56 @@ Açık başlıklarla uzak app-server:
 }
 ```
 
-Model değiştirme OpenClaw tarafından yönetilmeye devam eder. Bir OpenClaw oturumu
-mevcut bir Codex thread'ine bağlandığında sonraki tur, şu anda seçili
+Model değiştirme OpenClaw tarafından kontrol edilmeye devam eder. Bir OpenClaw oturumu
+mevcut bir Codex thread'ine bağlı olduğunda, sonraki dönüş seçili
 `codex/*` modelini, sağlayıcıyı, onay ilkesini, sandbox'ı ve hizmet katmanını
 yeniden app-server'a gönderir. `codex/gpt-5.4` modelinden `codex/gpt-5.2` modeline geçmek,
-thread bağını korur ancak Codex'ten yeni seçilen modelle devam etmesini ister.
+thread bağını korur ama Codex'ten yeni seçilen modelle devam etmesini ister.
 
 ## Codex komutu
 
-Paketlenmiş plugin, yetkili slash komutu olarak `/codex` kaydeder. Bu komut
-geneldir ve OpenClaw metin komutlarını destekleyen herhangi bir kanalda çalışır.
+Paketle gelen plugin, yetkili bir slash komutu olarak `/codex` kaydeder. Bu komut
+geneldir ve OpenClaw metin komutlarını destekleyen her kanalda çalışır.
 
 Yaygın biçimler:
 
-- `/codex status`, canlı app-server bağlantısını, modelleri, hesabı, oran sınırlarını, MCP sunucularını ve skills'i gösterir.
+- `/codex status`, canlı app-server bağlantısını, modelleri, hesabı, rate limit'leri, MCP sunucularını ve Skills öğelerini gösterir.
 - `/codex models`, canlı Codex app-server modellerini listeler.
 - `/codex threads [filter]`, son Codex thread'lerini listeler.
 - `/codex resume <thread-id>`, geçerli OpenClaw oturumunu mevcut bir Codex thread'ine bağlar.
-- `/codex compact`, Codex app-server'dan bağlı thread'i sıkıştırmasını ister.
-- `/codex review`, bağlı thread için Codex yerel incelemesini başlatır.
-- `/codex account`, hesap ve oran sınırı durumunu gösterir.
+- `/codex compact`, Codex app-server'dan bağlı thread üzerinde Compaction yapmasını ister.
+- `/codex review`, bağlı thread için yerel Codex incelemesini başlatır.
+- `/codex account`, hesap ve rate-limit durumunu gösterir.
 - `/codex mcp`, Codex app-server MCP sunucu durumunu listeler.
-- `/codex skills`, Codex app-server skills'ini listeler.
+- `/codex skills`, Codex app-server Skills öğelerini listeler.
 
-`/codex resume`, harness'in normal turlar için kullandığı aynı sidecar bağlama dosyasını
-yazar. Sonraki mesajda OpenClaw bu Codex thread'ini sürdürür, şu anda seçili
-OpenClaw `codex/*` modelini app-server'a iletir ve genişletilmiş geçmişi
-etkin tutar.
+`/codex resume`, harness'ın normal dönüşler için kullandığı aynı sidecar binding dosyasını yazar. Sonraki mesajda OpenClaw o Codex thread'ini sürdürür, şu anda seçili OpenClaw `codex/*` modelini app-server'a geçirir ve genişletilmiş geçmişi etkin tutar.
 
-Komut yüzeyi Codex app-server `0.118.0` veya daha yenisini gerektirir. Gelecekteki
-veya özel bir app-server bu JSON-RPC yöntemini sunmuyorsa, tek tek control
-yöntemleri `unsupported by this Codex app-server` olarak bildirilir.
+Komut yüzeyi Codex app-server `0.118.0` veya daha yenisini gerektirir. Gelecekteki veya özel bir app-server ilgili JSON-RPC yöntemini sunmazsa, tekil control yöntemleri `unsupported by this Codex app-server` olarak bildirilir.
 
-## Araçlar, medya ve sıkıştırma
+## Araçlar, medya ve Compaction
 
-Codex harness yalnızca düşük düzey gömülü agent yürütücüsünü değiştirir.
+Codex harness yalnızca düşük düzey gömülü ajan yürütücüsünü değiştirir.
 
-OpenClaw yine de araç listesini oluşturur ve harness'ten dinamik araç sonuçlarını
-alır. Metin, görseller, video, müzik, TTS, onaylar ve mesajlaşma aracı çıktısı
-normal OpenClaw teslim yolu üzerinden devam eder.
+OpenClaw yine de araç listesini oluşturur ve harness'tan dinamik araç sonuçlarını alır. Metin, görseller, video, müzik, TTS, onaylar ve message-tool çıktısı normal OpenClaw teslim yolu üzerinden akmaya devam eder.
 
-Seçilen model Codex harness kullandığında, yerel thread sıkıştırması
-Codex app-server'a devredilir. OpenClaw kanal geçmişi, arama, `/new`, `/reset`
-ve gelecekte model veya harness değiştirme için bir döküm aynası tutar. Bu
-ayna, kullanıcı istemini, son assistant metnini ve app-server bunları yaydığında
-hafif Codex akıl yürütme veya plan kayıtlarını içerir.
+Seçili model Codex harness kullandığında, yerel thread Compaction işlemi Codex app-server'a devredilir. OpenClaw kanal geçmişi, arama, `/new`, `/reset` ve gelecekteki model veya harness değiştirme için bir transcript yansısını korur. Bu yansı, kullanıcı prompt'unu, son asistan metnini ve app-server bunları yayımladığında hafif Codex reasoning veya plan kayıtlarını içerir.
 
-Medya oluşturma PI gerektirmez. Görsel, video, müzik, PDF, TTS ve medya
-anlama; `agents.defaults.imageGenerationModel`, `videoGenerationModel`, `pdfModel`
-ve `messages.tts` gibi eşleşen sağlayıcı/model ayarlarını kullanmaya devam eder.
+Medya üretimi Pi gerektirmez. Görsel, video, müzik, PDF, TTS ve medya anlama; `agents.defaults.imageGenerationModel`, `videoGenerationModel`, `pdfModel` ve `messages.tts` gibi eşleşen sağlayıcı/model ayarlarını kullanmaya devam eder.
 
 ## Sorun giderme
 
-**Codex `/model` içinde görünmüyor:** `plugins.entries.codex.enabled` değerini etkinleştirin,
-bir `codex/*` model başvurusu ayarlayın veya `plugins.allow` değerinin `codex` öğesini
-hariç tutup tutmadığını kontrol edin.
+**Codex `/model` içinde görünmüyor:** `plugins.entries.codex.enabled` ayarını etkinleştirin, bir `codex/*` model ref'i ayarlayın veya `plugins.allow` listesinin `codex` değerini hariç tutup tutmadığını kontrol edin.
 
-**OpenClaw PI'ye fallback yapıyor:** test sırasında `embeddedHarness.fallback: "none"` veya
-`OPENCLAW_AGENT_HARNESS_FALLBACK=none` ayarlayın.
+**OpenClaw Pi'ye geri dönüyor:** test sırasında `embeddedHarness.fallback: "none"` veya `OPENCLAW_AGENT_HARNESS_FALLBACK=none` ayarlayın.
 
-**App-server reddediliyor:** app-server el sıkışmasının
-`0.118.0` veya daha yeni bir sürüm bildirmesi için Codex'i yükseltin.
+**App-server reddediliyor:** app-server el sıkışmasının `0.118.0` veya daha yeni bir sürüm bildirmesi için Codex'i yükseltin.
 
-**Model keşfi yavaş:** `plugins.entries.codex.config.discovery.timeoutMs` değerini düşürün
-veya keşfi devre dışı bırakın.
+**Model keşfi yavaş:** `plugins.entries.codex.config.discovery.timeoutMs` değerini düşürün veya keşfi devre dışı bırakın.
 
-**WebSocket aktarımı hemen başarısız oluyor:** `appServer.url`, `authToken`
-ve uzak app-server'ın aynı Codex app-server protokol sürümünü konuştuğunu kontrol edin.
+**WebSocket taşıması hemen başarısız oluyor:** `appServer.url`, `authToken` ve uzak app-server'ın aynı Codex app-server protokol sürümünü konuştuğunu kontrol edin.
 
-**Codex olmayan bir model PI kullanıyor:** bu beklenen davranıştır. Codex harness yalnızca
-`codex/*` model başvurularını sahiplenir.
+**Codex olmayan bir model Pi kullanıyor:** bu beklenen davranıştır. Codex harness yalnızca `codex/*` model ref'lerini sahiplenir.
 
 ## İlgili
 

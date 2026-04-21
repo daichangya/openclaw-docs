@@ -1,21 +1,21 @@
 ---
 read_when:
     - Sorun giderme merkezi sizi daha derin tanılama için buraya yönlendirdi
-    - Belirtiye dayalı kararlı çalışma kitabı bölümlerine ve kesin komutlara ihtiyacınız var
-summary: Gateway, kanallar, otomasyon, Node'lar ve tarayıcı için ayrıntılı sorun giderme çalışma kitabı
+    - Belirti temelli kararlı runbook bölümlerine ve tam komutlara ihtiyacınız var
+summary: Gateway, kanallar, otomasyon, Node'lar ve tarayıcı için ayrıntılı sorun giderme runbook'u
 title: Sorun giderme
 x-i18n:
-    generated_at: "2026-04-20T09:03:05Z"
+    generated_at: "2026-04-21T08:59:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d93a82407dbb1314b91a809ff9433114e1e9a3b56d46547ef53a8196bac06260
+    source_hash: add7625785e3b78897c750b4785b7fe84a3d91c23c4175de750c4834272967f9
     source_path: gateway/troubleshooting.md
     workflow: 15
 ---
 
 # Gateway sorun giderme
 
-Bu sayfa ayrıntılı çalışma kitabıdır.
+Bu sayfa derin runbook'tur.
 Önce hızlı triyaj akışını istiyorsanız [/help/troubleshooting](/tr/help/troubleshooting) ile başlayın.
 
 ## Komut merdiveni
@@ -33,12 +33,13 @@ openclaw channels status --probe
 Beklenen sağlıklı sinyaller:
 
 - `openclaw gateway status`, `Runtime: running`, `Connectivity probe: ok` ve bir `Capability: ...` satırı gösterir.
-- `openclaw doctor`, engelleyici config/hizmet sorunları bildirmez.
-- `openclaw channels status --probe`, hesap başına canlı taşıma durumu ve desteklenen yerlerde `works` veya `audit ok` gibi probe/denetim sonuçlarını gösterir.
+- `openclaw doctor`, engelleyici yapılandırma/hizmet sorunu bildirmez.
+- `openclaw channels status --probe`, canlı hesap başına taşıma durumu ve,
+  desteklenen yerlerde, `works` veya `audit ok` gibi probe/audit sonuçları gösterir.
 
-## Uzun bağlam için Anthropic 429 ek kullanım gerekli
+## Uzun bağlam için ek kullanım gerektiren Anthropic 429
 
-Günlüklerde/hatalarda şu ifade varsa bunu kullanın:
+Bunu, günlükler/hatalar şunu içerdiğinde kullanın:
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`.
 
 ```bash
@@ -49,15 +50,15 @@ openclaw config get agents.defaults.models
 
 Şunlara bakın:
 
-- Seçilen Anthropic Opus/Sonnet modelinde `params.context1m: true` var.
+- Seçilen Anthropic Opus/Sonnet modeli `params.context1m: true` içeriyor.
 - Geçerli Anthropic kimlik bilgisi uzun bağlam kullanımı için uygun değil.
 - İstekler yalnızca 1M beta yoluna ihtiyaç duyan uzun oturumlarda/model çalıştırmalarında başarısız oluyor.
 
 Düzeltme seçenekleri:
 
-1. Normal bağlam penceresine geri dönmek için o modelde `context1m` öğesini devre dışı bırakın.
-2. Uzun bağlam istekleri için uygun bir Anthropic kimlik bilgisi kullanın veya bir Anthropic API key'e geçin.
-3. Anthropic uzun bağlam istekleri reddedildiğinde çalıştırmaların devam etmesi için fallback modeller yapılandırın.
+1. Normal bağlam penceresine geri dönmek için o modelde `context1m` özelliğini devre dışı bırakın.
+2. Uzun bağlam istekleri için uygun bir Anthropic kimlik bilgisi kullanın veya bir Anthropic API anahtarına geçin.
+3. Anthropic uzun bağlam istekleri reddedildiğinde çalıştırmaların sürmesi için fallback modeller yapılandırın.
 
 İlgili:
 
@@ -67,7 +68,7 @@ Düzeltme seçenekleri:
 
 ## Yerel OpenAI uyumlu backend doğrudan probe'ları geçiyor ama ajan çalıştırmaları başarısız oluyor
 
-Şu durumlarda bunu kullanın:
+Bunu şu durumlarda kullanın:
 
 - `curl ... /v1/models` çalışıyor
 - küçük doğrudan `/v1/chat/completions` çağrıları çalışıyor
@@ -84,22 +85,35 @@ openclaw logs --follow
 
 Şunlara bakın:
 
-- doğrudan küçük çağrılar başarılı oluyor, ancak OpenClaw çalıştırmaları yalnızca daha büyük prompt'larda başarısız oluyor
-- `messages[].content` için string beklendiğini söyleyen backend hataları
-- yalnızca daha büyük prompt token sayılarında veya tam ajan çalışma zamanı prompt'larında görünen backend çökmeleri
+- doğrudan küçük çağrılar başarılı oluyor, ama OpenClaw çalıştırmaları yalnızca daha büyük prompt'larda başarısız oluyor
+- `messages[].content` alanının dize beklediğini söyleyen backend hataları
+- yalnızca daha büyük prompt-token sayılarında veya tam ajan
+  çalışma zamanı prompt'larında görünen backend çökmeleri
 
 Yaygın imzalar:
 
-- `messages[...].content: invalid type: sequence, expected a string` → backend yapılandırılmış Chat Completions içerik parçalarını reddediyor. Düzeltme: `models.providers.<provider>.models[].compat.requiresStringContent: true` ayarlayın.
-- doğrudan küçük istekler başarılı oluyor, ancak OpenClaw ajan çalıştırmaları backend/model çökmeleriyle başarısız oluyor (örneğin bazı `inferrs` derlemelerinde Gemma) → OpenClaw taşıması büyük olasılıkla zaten doğru; backend daha büyük ajan çalışma zamanı prompt biçiminde başarısız oluyor.
-- araçlar devre dışı bırakıldıktan sonra hatalar azalıyor ama kaybolmuyor → araç şemaları baskının bir parçasıydı, ancak kalan sorun hâlâ upstream model/sunucu kapasitesi veya bir backend hatası.
+- `messages[...].content: invalid type: sequence, expected a string` → backend
+  yapılandırılmış Chat Completions içerik parçalarını reddediyor. Düzeltme: şunu ayarlayın:
+  `models.providers.<provider>.models[].compat.requiresStringContent: true`.
+- doğrudan küçük istekler başarılı oluyor, ama OpenClaw ajan çalıştırmaları backend/model
+  çökmeleriyle başarısız oluyor (örneğin bazı `inferrs` derlemelerinde Gemma) → OpenClaw taşıması
+  büyük olasılıkla zaten doğru; backend daha büyük ajan çalışma zamanı
+  prompt biçiminde başarısız oluyor.
+- araçlar devre dışı bırakıldıktan sonra başarısızlıklar azalıyor ama kaybolmuyor →
+  araç şemaları baskının bir parçasıydı, ancak kalan sorun hâlâ üst akış model/sunucu
+  kapasitesi veya bir backend hatası.
 
 Düzeltme seçenekleri:
 
-1. Yalnızca string destekleyen Chat Completions backend'leri için `compat.requiresStringContent: true` ayarlayın.
-2. OpenClaw'ın araç şeması yüzeyini güvenilir biçimde işleyemeyen model/backend'ler için `compat.supportsTools: false` ayarlayın.
-3. Mümkün olan yerlerde prompt baskısını azaltın: daha küçük workspace bootstrap, daha kısa oturum geçmişi, daha hafif yerel model veya daha güçlü uzun bağlam desteğine sahip bir backend.
-4. Doğrudan küçük istekler geçmeye devam ederken OpenClaw ajan dönüşleri backend içinde hâlâ çöküyorsa, bunu bir upstream sunucu/model sınırlaması olarak değerlendirin ve kabul edilen payload biçimiyle birlikte oraya bir repro dosyalayın.
+1. Yalnızca dize destekleyen Chat Completions backend'leri için `compat.requiresStringContent: true` ayarlayın.
+2. OpenClaw'un araç şeması yüzeyini güvenilir biçimde işleyemeyen modeller/backend'ler için
+   `compat.supportsTools: false` ayarlayın.
+3. Mümkün olduğunda prompt baskısını azaltın: daha küçük çalışma alanı bootstrap'i, daha kısa
+   oturum geçmişi, daha hafif yerel model veya daha güçlü uzun bağlam
+   desteğine sahip bir backend.
+4. Küçük doğrudan istekler geçmeye devam ederken OpenClaw ajan dönüşleri backend içinde hâlâ çöküyorsa,
+   bunu üst akış sunucu/model sınırlaması olarak değerlendirin ve
+   kabul edilen payload biçimiyle orada bir repro bildirin.
 
 İlgili:
 
@@ -109,7 +123,7 @@ Düzeltme seçenekleri:
 
 ## Yanıt yok
 
-Kanallar açık ama hiçbir şey yanıt vermiyorsa, bir şeyi yeniden bağlamadan önce yönlendirme ve policy'yi kontrol edin.
+Kanallar çalışıyor ama hiçbir şey yanıt vermiyorsa, herhangi bir şeyi yeniden bağlamadan önce yönlendirme ve ilkeyi kontrol edin.
 
 ```bash
 openclaw status
@@ -121,15 +135,15 @@ openclaw logs --follow
 
 Şunlara bakın:
 
-- DM gönderenleri için eşleştirme beklemede.
-- Grup mention geçitlemesi (`requireMention`, `mentionPatterns`).
-- Kanal/grup allowlist uyuşmazlıkları.
+- DM göndericileri için eşleştirme bekliyor.
+- Grup bahsetme denetimi (`requireMention`, `mentionPatterns`).
+- Kanal/grup allowlist uyumsuzlukları.
 
 Yaygın imzalar:
 
-- `drop guild message (mention required` → grup mesajı mention olana kadar yok sayılır.
-- `pairing request` → gönderenin onaya ihtiyacı var.
-- `blocked` / `allowlist` → gönderen/kanal policy tarafından filtrelendi.
+- `drop guild message (mention required` → grup mesajı, bahsetme olana kadar yok sayılır.
+- `pairing request` → göndericinin onaylanması gerekiyor.
+- `blocked` / `allowlist` → gönderici/kanal ilke tarafından filtrelendi.
 
 İlgili:
 
@@ -137,9 +151,9 @@ Yaygın imzalar:
 - [/channels/pairing](/tr/channels/pairing)
 - [/channels/groups](/tr/channels/groups)
 
-## Dashboard control UI bağlantısı
+## Dashboard kontrol UI bağlantısı
 
-Dashboard/control UI bağlanmıyorsa, URL, auth mode ve secure context varsayımlarını doğrulayın.
+Dashboard/control UI bağlanmıyorsa, URL'yi, kimlik doğrulama modunu ve güvenli bağlam varsayımlarını doğrulayın.
 
 ```bash
 openclaw gateway status
@@ -152,35 +166,47 @@ openclaw gateway status --json
 Şunlara bakın:
 
 - Doğru probe URL'si ve dashboard URL'si.
-- İstemci ile gateway arasındaki auth mode/token uyuşmazlığı.
-- Aygıt kimliğinin gerekli olduğu yerlerde HTTP kullanımı.
+- İstemci ile gateway arasında kimlik doğrulama modu/token uyumsuzluğu.
+- Cihaz kimliği gerektiğinde HTTP kullanımı.
 
 Yaygın imzalar:
 
-- `device identity required` → secure olmayan context veya eksik aygıt auth.
-- `origin not allowed` → tarayıcı `Origin`, `gateway.controlUi.allowedOrigins` içinde değil (veya açık bir allowlist olmadan loopback olmayan bir tarayıcı origin'inden bağlanıyorsunuz).
-- `device nonce required` / `device nonce mismatch` → istemci challenge tabanlı aygıt auth akışını tamamlamıyor (`connect.challenge` + `device.nonce`).
-- `device signature invalid` / `device signature expired` → istemci geçerli handshake için yanlış payload'ı imzaladı (veya zaman damgası eski).
-- `AUTH_TOKEN_MISMATCH` ve `canRetryWithDeviceToken=true` → istemci önbelleğe alınmış aygıt token'ı ile bir güvenilir yeniden deneme yapabilir.
-- Bu önbelleğe alınmış token yeniden denemesi, eşleştirilmiş aygıt token'ı ile saklanan önbelleğe alınmış scope kümesini yeniden kullanır. Açık `deviceToken` / açık `scopes` çağıranlar bunun yerine istedikleri scope kümesini korur.
-- Bu yeniden deneme yolunun dışında, bağlanma auth önceliği sırasıyla önce açık paylaşılan token/password, sonra açık `deviceToken`, sonra saklanan aygıt token'ı, ardından bootstrap token'dır.
-- Eşzamansız Tailscale Serve Control UI yolunda, aynı `{scope, ip}` için başarısız girişimler limiter başarısızlığı kaydetmeden önce serileştirilir. Bu nedenle aynı istemciden gelen iki hatalı eşzamanlı yeniden deneme, ikinci girişimde iki düz uyuşmazlık yerine `retry later` gösterebilir.
-- bir browser-origin loopback istemcisinden gelen `too many failed authentication attempts (retry later)` → aynı normalize edilmiş `Origin` üzerinden tekrarlanan başarısız denemeler geçici olarak kilitlenir; başka bir localhost origin'i ayrı bir bucket kullanır.
-- bu yeniden denemeden sonra tekrarlanan `unauthorized` → paylaşılan token/aygıt token'ı kayması; gerekirse token config'ini yenileyin ve aygıt token'ını yeniden onaylayın/döndürün.
+- `device identity required` → güvenli olmayan bağlam veya eksik cihaz kimlik doğrulaması.
+- `origin not allowed` → tarayıcı `Origin`, `gateway.controlUi.allowedOrigins`
+  içinde değil (veya açık bir allowlist olmadan loopback olmayan bir tarayıcı origin'inden
+  bağlanıyorsunuz).
+- `device nonce required` / `device nonce mismatch` → istemci, challenge tabanlı
+  cihaz kimlik doğrulama akışını (`connect.challenge` + `device.nonce`) tamamlamıyor.
+- `device signature invalid` / `device signature expired` → istemci, geçerli el sıkışma için
+  yanlış payload'ı (veya eski zaman damgasını) imzaladı.
+- `AUTH_TOKEN_MISMATCH` ve `canRetryWithDeviceToken=true` → istemci, önbelleğe alınmış cihaz token'ı ile bir güvenilir yeniden deneme yapabilir.
+- Bu önbelleğe alınmış token yeniden denemesi, eşlenmiş
+  cihaz token'ı ile saklanan önbelleğe alınmış kapsam kümesini yeniden kullanır. Açık `deviceToken` / açık `scopes` çağıranlar ise
+  istenen kapsam kümesini korur.
+- Bu yeniden deneme yolu dışında, bağlanma kimlik doğrulama önceliği
+  önce açık paylaşımlı token/parola, sonra açık `deviceToken`, sonra saklanan cihaz token'ı,
+  sonra bootstrap token'dır.
+- Eşzamansız Tailscale Serve Control UI yolunda, aynı
+  `{scope, ip}` için başarısız denemeler sınırlayıcı başarısızlığı kaydetmeden önce serileştirilir. Aynı istemciden iki hatalı eşzamanlı yeniden deneme bu nedenle ikinci denemede iki düz uyumsuzluk yerine `retry later`
+  gösterebilir.
+- Bir tarayıcı-origin loopback istemcisinden `too many failed authentication attempts (retry later)` →
+  aynı normalize edilmiş `Origin` kaynaklı tekrarlanan hatalar geçici olarak
+  kilitlenir; başka bir localhost origin'i ayrı bir bucket kullanır.
+- Bu yeniden denemeden sonra tekrarlanan `unauthorized` → paylaşımlı token/cihaz token'ı kayması; gerekiyorsa token yapılandırmasını yenileyin ve cihaz token'ını yeniden onaylayın/döndürün.
 - `gateway connect failed:` → yanlış host/port/url hedefi.
 
-### Auth ayrıntı kodları hızlı eşleme
+### Kimlik doğrulama ayrıntı kodları hızlı harita
 
-Sonraki adımı seçmek için başarısız `connect` yanıtındaki `error.details.code` değerini kullanın:
+Sonraki eylemi seçmek için başarısız `connect` yanıtındaki `error.details.code` değerini kullanın:
 
-| Detail code                  | Anlamı                                                                                                                                                                                       | Önerilen işlem                                                                                                                                                                                                                                                                          |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_TOKEN_MISSING`         | İstemci gerekli paylaşılan token'ı göndermedi.                                                                                                                                                | Token'ı istemciye yapıştırın/ayarlayın ve yeniden deneyin. Dashboard yolları için: `openclaw config get gateway.auth.token` ardından bunu Control UI ayarlarına yapıştırın.                                                                                                           |
-| `AUTH_TOKEN_MISMATCH`        | Paylaşılan token, gateway auth token'ı ile eşleşmedi.                                                                                                                                         | Eğer `canRetryWithDeviceToken=true` ise, bir güvenilir yeniden denemeye izin verin. Önbelleğe alınmış token yeniden denemeleri saklanan onaylı scope'ları yeniden kullanır; açık `deviceToken` / `scopes` çağıranlar istedikleri scope'ları korur. Hâlâ başarısız olursa [token drift recovery checklist](/cli/devices#token-drift-recovery-checklist)'i çalıştırın. |
-| `AUTH_DEVICE_TOKEN_MISMATCH` | Önbelleğe alınmış aygıt başına token eski veya iptal edilmiş.                                                                                                                                 | [devices CLI](/cli/devices) kullanarak aygıt token'ını döndürün/yeniden onaylayın, sonra yeniden bağlanın.                                                                                                                                                                             |
-| `PAIRING_REQUIRED`           | Aygıt kimliği onay gerektiriyor. `not-paired`, `scope-upgrade`, `role-upgrade` veya `metadata-upgrade` için `error.details.reason` değerini kontrol edin ve mevcutsa `requestId` / `remediationHint` kullanın. | Bekleyen isteği onaylayın: `openclaw devices list` ardından `openclaw devices approve <requestId>`. Scope/rol yükseltmeleri de istenen erişimi gözden geçirdikten sonra aynı akışı kullanır.                                                                                           |
+| Ayrıntı kodu                | Anlamı                                                                                                                                                                                       | Önerilen eylem                                                                                                                                                                                                                                                                           |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_TOKEN_MISSING`        | İstemci gerekli paylaşımlı token'ı göndermedi.                                                                                                                                               | Token'ı istemciye yapıştırın/ayarlayın ve yeniden deneyin. Dashboard yolları için: `openclaw config get gateway.auth.token`, sonra bunu Control UI ayarlarına yapıştırın.                                                                                                              |
+| `AUTH_TOKEN_MISMATCH`       | Paylaşımlı token, gateway kimlik doğrulama token'ı ile eşleşmedi.                                                                                                                            | `canRetryWithDeviceToken=true` ise bir güvenilir yeniden denemeye izin verin. Önbelleğe alınmış token yeniden denemeleri saklanan onaylı kapsamları yeniden kullanır; açık `deviceToken` / `scopes` çağıranlar istenen kapsamları korur. Hâlâ başarısızsa [token drift recovery checklist](/cli/devices#token-drift-recovery-checklist) çalıştırın. |
+| `AUTH_DEVICE_TOKEN_MISMATCH` | Önbelleğe alınmış cihaz başına token eski veya iptal edilmiş.                                                                                                                               | [devices CLI](/cli/devices) kullanarak cihaz token'ını döndürün/yeniden onaylayın, sonra yeniden bağlanın.                                                                                                                                                                              |
+| `PAIRING_REQUIRED`          | Cihaz kimliği onay gerektiriyor. `not-paired`, `scope-upgrade`, `role-upgrade` veya `metadata-upgrade` için `error.details.reason` değerini kontrol edin ve varsa `requestId` / `remediationHint` kullanın. | Bekleyen isteği onaylayın: `openclaw devices list`, sonra `openclaw devices approve <requestId>`. Kapsam/rol yükseltmeleri, istenen erişimi gözden geçirdikten sonra aynı akışı kullanır.                                                                                             |
 
-Aygıt auth v2 geçiş denetimi:
+Device auth v2 geçiş kontrolü:
 
 ```bash
 openclaw --version
@@ -188,28 +214,30 @@ openclaw doctor
 openclaw gateway status
 ```
 
-Günlükler nonce/signature hataları gösteriyorsa, bağlanan istemciyi güncelleyin ve şunları doğrulayın:
+Günlüklerde nonce/imza hataları görünüyorsa, bağlanan istemciyi güncelleyin ve şunları doğrulayın:
 
-1. `connect.challenge` bekliyor olması
-2. challenge'a bağlı payload'ı imzalıyor olması
-3. aynı challenge nonce ile `connect.params.device.nonce` göndermesi
+1. `connect.challenge` bekliyor
+2. challenge'a bağlı payload'ı imzalıyor
+3. aynı challenge nonce ile `connect.params.device.nonce` gönderiyor
 
-Eğer `openclaw devices rotate` / `revoke` / `remove` beklenmedik şekilde reddediliyorsa:
+`openclaw devices rotate` / `revoke` / `remove` beklenmedik şekilde reddedilirse:
 
-- eşleştirilmiş aygıt token oturumları, yalnızca **kendi** aygıtlarını yönetebilir; çağıranın ayrıca `operator.admin` yetkisi varsa bunun dışına çıkabilir
-- `openclaw devices rotate --scope ...` yalnızca çağıran oturumun zaten sahip olduğu operator scope'larını isteyebilir
+- eşlenmiş cihaz token oturumları yalnızca **kendi** cihazlarını yönetebilir;
+  çağıran ayrıca `operator.admin` yetkisine sahip değilse
+- `openclaw devices rotate --scope ...`, yalnızca
+  çağıran oturumun zaten sahip olduğu operator kapsamlarını isteyebilir
 
 İlgili:
 
 - [/web/control-ui](/web/control-ui)
-- [/gateway/configuration](/tr/gateway/configuration) (gateway auth mode'ları)
+- [/gateway/configuration](/tr/gateway/configuration) (gateway kimlik doğrulama modları)
 - [/gateway/trusted-proxy-auth](/tr/gateway/trusted-proxy-auth)
 - [/gateway/remote](/tr/gateway/remote)
 - [/cli/devices](/cli/devices)
 
 ## Gateway hizmeti çalışmıyor
 
-Hizmet kurulu olduğu halde süreç ayakta kalmıyorsa bunu kullanın.
+Bunu, hizmet kurulu olduğu hâlde süreç ayakta kalmıyorsa kullanın.
 
 ```bash
 openclaw gateway status
@@ -221,23 +249,80 @@ openclaw gateway status --deep   # sistem düzeyi hizmetleri de tarar
 
 Şunlara bakın:
 
-- çıkış ipuçlarıyla birlikte `Runtime: stopped`.
-- Hizmet config uyuşmazlığı (`Config (cli)` ve `Config (service)`).
+- Çıkış ipuçlarıyla birlikte `Runtime: stopped`.
+- Hizmet yapılandırması uyumsuzluğu (`Config (cli)` ile `Config (service)`).
 - Port/dinleyici çakışmaları.
-- `--deep` kullanıldığında fazladan launchd/systemd/schtasks kurulumları.
+- `--deep` kullanıldığında ek launchd/systemd/schtasks kurulumları.
 - `Other gateway-like services detected (best effort)` temizleme ipuçları.
 
 Yaygın imzalar:
 
-- `Gateway start blocked: set gateway.mode=local` veya `existing config is missing gateway.mode` → yerel gateway modu etkin değil ya da config dosyası bozulup `gateway.mode` değerini kaybetmiş. Düzeltme: config dosyanızda `gateway.mode="local"` ayarlayın ya da beklenen yerel mod config'ini yeniden damgalamak için `openclaw onboard --mode local` / `openclaw setup` komutlarını tekrar çalıştırın. OpenClaw'ı Podman ile çalıştırıyorsanız varsayılan config yolu `~/.openclaw/openclaw.json` olur.
-- `refusing to bind gateway ... without auth` → geçerli bir gateway auth yolu olmadan loopback olmayan bind (token/password veya yapılandırılmışsa trusted-proxy).
+- `Gateway start blocked: set gateway.mode=local` veya `existing config is missing gateway.mode` → yerel gateway modu etkin değil ya da yapılandırma dosyası bozuldu ve `gateway.mode` değerini kaybetti. Düzeltme: yapılandırmanızda `gateway.mode="local"` ayarlayın veya beklenen yerel mod yapılandırmasını yeniden damgalamak için `openclaw onboard --mode local` / `openclaw setup` komutlarını yeniden çalıştırın. OpenClaw'u Podman üzerinden çalıştırıyorsanız varsayılan yapılandırma yolu `~/.openclaw/openclaw.json` olur.
+- `refusing to bind gateway ... without auth` → geçerli bir gateway kimlik doğrulama yolu olmadan loopback olmayan bağlama (token/parola veya yapılandırılmışsa trusted-proxy).
 - `another gateway instance is already listening` / `EADDRINUSE` → port çakışması.
-- `Other gateway-like services detected (best effort)` → eski veya paralel launchd/systemd/schtasks birimleri mevcut. Çoğu kurulumda makine başına tek bir gateway tutulmalıdır; birden fazlasına gerçekten ihtiyacınız varsa port + config/state/workspace değerlerini izole edin. Bkz. [/gateway#multiple-gateways-same-host](/tr/gateway#multiple-gateways-same-host).
+- `Other gateway-like services detected (best effort)` → eski veya paralel launchd/systemd/schtasks birimleri mevcut. Çoğu kurulum makine başına tek bir gateway kullanmalıdır; birden fazlasına gerçekten ihtiyacınız varsa port + yapılandırma/durum/çalışma alanını yalıtın. Bkz. [/gateway#multiple-gateways-same-host](/tr/gateway#multiple-gateways-same-host).
 
 İlgili:
 
 - [/gateway/background-process](/tr/gateway/background-process)
 - [/gateway/configuration](/tr/gateway/configuration)
+- [/gateway/doctor](/tr/gateway/doctor)
+
+## Gateway son bilinen iyi yapılandırmayı geri yükledi
+
+Gateway başladığında ama günlükler `openclaw.json` dosyasını geri yüklediğini söylediğinde bunu kullanın.
+
+```bash
+openclaw logs --follow
+openclaw config file
+openclaw config validate
+openclaw doctor
+```
+
+Şunlara bakın:
+
+- `Config auto-restored from last-known-good`
+- `gateway: invalid config was restored from last-known-good backup`
+- `config reload restored last-known-good config after invalid-config`
+- Etkin yapılandırmanın yanında zaman damgalı bir `openclaw.json.clobbered.*` dosyası
+- `Config recovery warning` ile başlayan bir ana ajan sistem olayı
+
+Ne oldu:
+
+- Reddedilen yapılandırma başlangıçta veya sıcak yeniden yükleme sırasında doğrulamadan geçmedi.
+- OpenClaw reddedilen payload'ı `.clobbered.*` olarak korudu.
+- Etkin yapılandırma, son doğrulanmış son bilinen iyi kopyadan geri yüklendi.
+- Sonraki ana ajan dönüşü, reddedilen yapılandırmayı körü körüne yeniden yazmaması için uyarılır.
+
+İnceleyin ve onarın:
+
+```bash
+CONFIG="$(openclaw config file)"
+ls -lt "$CONFIG".clobbered.* "$CONFIG".rejected.* 2>/dev/null | head
+diff -u "$CONFIG" "$(ls -t "$CONFIG".clobbered.* 2>/dev/null | head -n 1)"
+openclaw config validate
+openclaw doctor
+```
+
+Yaygın imzalar:
+
+- `.clobbered.*` mevcut → harici doğrudan düzenleme veya başlangıç okuması geri yüklendi.
+- `.rejected.*` mevcut → OpenClaw'un sahip olduğu bir yapılandırma yazımı, commit öncesinde şema veya clobber denetimlerinde başarısız oldu.
+- `Config write rejected:` → yazma işlemi gerekli yapıyı kaldırmayı, dosyayı keskin biçimde küçültmeyi veya geçersiz yapılandırmayı kalıcı kılmayı denedi.
+- `Config last-known-good promotion skipped` → aday, `***` gibi redakte edilmiş gizli anahtar yer tutucuları içeriyordu.
+
+Düzeltme seçenekleri:
+
+1. Doğruysa geri yüklenen etkin yapılandırmayı koruyun.
+2. Yalnızca amaçlanan anahtarları `.clobbered.*` veya `.rejected.*` dosyasından kopyalayın, ardından bunları `openclaw config set` veya `config.patch` ile uygulayın.
+3. Yeniden başlatmadan önce `openclaw config validate` çalıştırın.
+4. Elle düzenleme yapıyorsanız, değiştirmek istediğiniz kısmi nesneyi değil tam JSON5 yapılandırmasını koruyun.
+
+İlgili:
+
+- [/gateway/configuration#strict-validation](/tr/gateway/configuration#strict-validation)
+- [/gateway/configuration#config-hot-reload](/tr/gateway/configuration#config-hot-reload)
+- [/cli/config](/cli/config)
 - [/gateway/doctor](/tr/gateway/doctor)
 
 ## Gateway probe uyarıları
@@ -253,15 +338,15 @@ openclaw gateway probe --ssh user@gateway-host
 Şunlara bakın:
 
 - JSON çıktısındaki `warnings[].code` ve `primaryTargetId`.
-- Uyarının SSH fallback, birden fazla gateway, eksik scope'lar veya çözümlenmemiş auth ref'leri hakkında olup olmadığı.
+- Uyarının SSH fallback'i, birden fazla gateway, eksik scope'lar veya çözümlenmemiş kimlik doğrulama başvuruları hakkında olup olmadığı.
 
 Yaygın imzalar:
 
-- `SSH tunnel failed to start; falling back to direct probes.` → SSH kurulumu başarısız oldu, ancak komut yine de doğrudan yapılandırılmış/loopback hedefleri denedi.
-- `multiple reachable gateways detected` → birden fazla hedef yanıt verdi. Bu genellikle kasıtlı bir çoklu gateway kurulumu veya eski/çift dinleyiciler anlamına gelir.
-- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → bağlantı çalıştı, ancak ayrıntı RPC'si scope ile sınırlı; aygıt kimliğini eşleştirin veya `operator.read` içeren kimlik bilgileri kullanın.
-- `Capability: pairing-pending` veya `gateway closed (1008): pairing required` → gateway yanıt verdi, ancak bu istemcinin normal operator erişiminden önce hâlâ eşleştirme/onaya ihtiyacı var.
-- çözümlenmemiş `gateway.auth.*` / `gateway.remote.*` SecretRef uyarı metni → başarısız hedef için bu komut yolunda auth materyali kullanılamıyordu.
+- `SSH tunnel failed to start; falling back to direct probes.` → SSH kurulumu başarısız oldu ama komut yine de doğrudan yapılandırılmış/loopback hedefleri denedi.
+- `multiple reachable gateways detected` → birden fazla hedef yanıt verdi. Bu genellikle kasıtlı çoklu gateway kurulumu veya eski/yinelenen dinleyiciler anlamına gelir.
+- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → bağlantı kuruldu ama ayrıntı RPC'si scope ile sınırlı; cihaz kimliğini eşleyin veya `operator.read` içeren kimlik bilgileri kullanın.
+- `Capability: pairing-pending` veya `gateway closed (1008): pairing required` → gateway yanıt verdi ama bu istemcinin normal operatör erişiminden önce hâlâ eşleştirme/onay alması gerekiyor.
+- çözümlenmemiş `gateway.auth.*` / `gateway.remote.*` SecretRef uyarı metni → başarısız hedef için bu komut yolunda kimlik doğrulama materyali kullanılamıyordu.
 
 İlgili:
 
@@ -271,7 +356,7 @@ Yaygın imzalar:
 
 ## Kanal bağlı ama mesajlar akmıyor
 
-Kanal durumu connected olduğu halde mesaj akışı durmuşsa policy, izinler ve kanala özgü teslim kurallarına odaklanın.
+Kanal durumu bağlıysa ama mesaj akışı durmuşsa, ilke, izinler ve kanala özgü teslim kurallarına odaklanın.
 
 ```bash
 openclaw channels status --probe
@@ -283,15 +368,15 @@ openclaw config get channels
 
 Şunlara bakın:
 
-- DM policy (`pairing`, `allowlist`, `open`, `disabled`).
-- Grup allowlist ve mention gereksinimleri.
+- DM ilkesi (`pairing`, `allowlist`, `open`, `disabled`).
+- Grup allowlist'i ve bahsetme gereksinimleri.
 - Eksik kanal API izinleri/scope'ları.
 
 Yaygın imzalar:
 
-- `mention required` → mesaj, grup mention policy'si tarafından yok sayıldı.
-- `pairing` / bekleyen onay izleri → gönderen onaylanmamış.
-- `missing_scope`, `not_in_channel`, `Forbidden`, `401/403` → kanal auth/izin sorunu.
+- `mention required` → mesaj grup bahsetme ilkesi nedeniyle yok sayıldı.
+- `pairing` / bekleyen onay izleri → gönderici onaylanmamış.
+- `missing_scope`, `not_in_channel`, `Forbidden`, `401/403` → kanal kimlik doğrulama/izin sorunu.
 
 İlgili:
 
@@ -302,7 +387,7 @@ Yaygın imzalar:
 
 ## Cron ve Heartbeat teslimatı
 
-Cron veya Heartbeat çalışmadıysa ya da teslim etmediyse, önce zamanlayıcı durumunu, sonra teslim hedefini doğrulayın.
+Cron veya Heartbeat çalışmadıysa ya da teslim edilmediyse önce scheduler durumunu, sonra teslim hedefini doğrulayın.
 
 ```bash
 openclaw cron status
@@ -314,19 +399,19 @@ openclaw logs --follow
 
 Şunlara bakın:
 
-- Cron etkin ve bir sonraki uyanma zamanı mevcut mu.
+- Cron etkin mi ve sonraki uyandırma mevcut mu.
 - İş çalıştırma geçmişi durumu (`ok`, `skipped`, `error`).
 - Heartbeat atlama nedenleri (`quiet-hours`, `requests-in-flight`, `alerts-disabled`, `empty-heartbeat-file`, `no-tasks-due`).
 
 Yaygın imzalar:
 
 - `cron: scheduler disabled; jobs will not run automatically` → Cron devre dışı.
-- `cron: timer tick failed` → zamanlayıcı tick başarısız oldu; dosya/günlük/çalışma zamanı hatalarını kontrol edin.
-- `heartbeat skipped` ve `reason=quiet-hours` → etkin saatler penceresinin dışında.
-- `heartbeat skipped` ve `reason=empty-heartbeat-file` → `HEARTBEAT.md` var ama yalnızca boş satırlar / markdown başlıkları içeriyor, bu yüzden OpenClaw model çağrısını atlıyor.
-- `heartbeat skipped` ve `reason=no-tasks-due` → `HEARTBEAT.md` bir `tasks:` bloğu içeriyor, ancak bu tick sırasında görevlerin hiçbiri vadesi gelmiş değil.
-- `heartbeat: unknown accountId` → Heartbeat teslim hedefi için geçersiz account id.
-- `heartbeat skipped` ve `reason=dm-blocked` → Heartbeat hedefi DM tarzı bir hedefe çözümlendi, ancak `agents.defaults.heartbeat.directPolicy` (veya ajan başına override) `block` olarak ayarlanmış.
+- `cron: timer tick failed` → scheduler tick başarısız oldu; dosya/günlük/çalışma zamanı hatalarını kontrol edin.
+- `heartbeat skipped` ve `reason=quiet-hours` → etkin saat penceresinin dışında.
+- `heartbeat skipped` ve `reason=empty-heartbeat-file` → `HEARTBEAT.md` mevcut ama yalnızca boş satırlar / markdown başlıkları içeriyor, bu yüzden OpenClaw model çağrısını atlıyor.
+- `heartbeat skipped` ve `reason=no-tasks-due` → `HEARTBEAT.md` bir `tasks:` bloğu içeriyor ama bu tick sırasında hiçbir görev zamanı gelmiş değil.
+- `heartbeat: unknown accountId` → Heartbeat teslim hedefi için geçersiz hesap kimliği.
+- `heartbeat skipped` ve `reason=dm-blocked` → Heartbeat hedefi DM tarzı bir hedefe çözümlendi ama `agents.defaults.heartbeat.directPolicy` (veya ajan başına geçersiz kılma) `block` olarak ayarlı.
 
 İlgili:
 
@@ -334,9 +419,9 @@ Yaygın imzalar:
 - [/automation/cron-jobs](/tr/automation/cron-jobs)
 - [/gateway/heartbeat](/tr/gateway/heartbeat)
 
-## Eşleştirilmiş Node aracı başarısız oluyor
+## Eşlenmiş Node aracı başarısız oluyor
 
-Bir Node eşleştirilmiş ama araçlar başarısız oluyorsa foreground, izin ve onay durumunu izole edin.
+Bir Node eşlenmiş ama araçlar başarısız oluyorsa, foreground, izin ve onay durumunu yalıtın.
 
 ```bash
 openclaw nodes status
@@ -348,15 +433,15 @@ openclaw status
 
 Şunlara bakın:
 
-- Beklenen yeteneklerle birlikte Node çevrimiçi mi.
+- Node beklenen yeteneklerle çevrimiçi mi.
 - Kamera/mikrofon/konum/ekran için OS izinleri verilmiş mi.
 - Exec onayları ve allowlist durumu.
 
 Yaygın imzalar:
 
-- `NODE_BACKGROUND_UNAVAILABLE` → Node uygulaması foreground durumda olmalıdır.
+- `NODE_BACKGROUND_UNAVAILABLE` → Node uygulaması foreground'da olmalı.
 - `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → eksik OS izni.
-- `SYSTEM_RUN_DENIED: approval required` → exec onayı beklemede.
+- `SYSTEM_RUN_DENIED: approval required` → exec onayı bekleniyor.
 - `SYSTEM_RUN_DENIED: allowlist miss` → komut allowlist tarafından engellendi.
 
 İlgili:
@@ -365,9 +450,9 @@ Yaygın imzalar:
 - [/nodes/index](/tr/nodes/index)
 - [/tools/exec-approvals](/tr/tools/exec-approvals)
 
-## Tarayıcı aracı başarısız oluyor
+## Browser aracı başarısız oluyor
 
-Gateway'in kendisi sağlıklı olduğu halde tarayıcı aracı eylemleri başarısız oluyorsa bunu kullanın.
+Gateway'in kendisi sağlıklı olduğu hâlde browser aracı eylemleri başarısız oluyorsa bunu kullanın.
 
 ```bash
 openclaw browser status
@@ -379,30 +464,31 @@ openclaw doctor
 
 Şunlara bakın:
 
-- `plugins.allow` ayarlanmış mı ve `browser` içeriyor mu.
-- Geçerli tarayıcı yürütülebilir dosya yolu.
-- CDP profile erişilebilirliği.
+- `plugins.allow` ayarlı mı ve `browser` içeriyor mu.
+- Geçerli browser yürütülebilir dosya yolu.
+- CDP profil erişilebilirliği.
 - `existing-session` / `user` profilleri için yerel Chrome kullanılabilirliği.
 
 Yaygın imzalar:
 
-- `unknown command "browser"` veya `unknown command 'browser'` → paketlenmiş browser Plugin `plugins.allow` tarafından hariç tutulmuş.
-- `browser.enabled=true` olduğu halde browser aracı eksik / kullanılamıyor → `plugins.allow`, `browser` öğesini hariç tutuyor, bu yüzden Plugin hiç yüklenmedi.
-- `Failed to start Chrome CDP on port` → tarayıcı süreci başlatılamadı.
-- `browser.executablePath not found` → yapılandırılan yol geçersiz.
-- `browser.cdpUrl must be http(s) or ws(s)` → yapılandırılan CDP URL'si `file:` veya `ftp:` gibi desteklenmeyen bir şema kullanıyor.
-- `browser.cdpUrl has invalid port` → yapılandırılan CDP URL'sinde hatalı veya aralık dışı bir port var.
-- `No Chrome tabs found for profile="user"` → Chrome MCP attach profilinde açık yerel Chrome sekmesi yok.
-- `Remote CDP for profile "<name>" is not reachable` → yapılandırılan uzak CDP endpoint'i gateway host'tan erişilebilir değil.
-- `Browser attachOnly is enabled ... not reachable` veya `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profilinin erişilebilir bir hedefi yok veya HTTP endpoint yanıt verdi ama CDP WebSocket yine de açılamadı.
-- `Playwright is not available in this gateway build; '<feature>' is unsupported.` → mevcut gateway kurulumu tam Playwright paketine sahip değil; ARIA snapshot'ları ve temel sayfa ekran görüntüleri yine de çalışabilir, ancak gezinme, AI snapshot'ları, CSS selector tabanlı öğe ekran görüntüleri ve PDF dışa aktarma kullanılamaz.
+- `unknown command "browser"` veya `unknown command 'browser'` → paketle gelen browser plugin'i `plugins.allow` tarafından hariç tutulmuş.
+- `browser.enabled=true` olduğu hâlde browser aracı eksik / kullanılamıyor → `plugins.allow`, `browser`'ı hariç tutuyor; bu yüzden plugin hiç yüklenmedi.
+- `Failed to start Chrome CDP on port` → browser süreci başlatılamadı.
+- `browser.executablePath not found` → yapılandırılmış yol geçersiz.
+- `browser.cdpUrl must be http(s) or ws(s)` → yapılandırılmış CDP URL'si `file:` veya `ftp:` gibi desteklenmeyen bir şema kullanıyor.
+- `browser.cdpUrl has invalid port` → yapılandırılmış CDP URL'sinde hatalı veya aralık dışı bir port var.
+- `Could not find DevToolsActivePort for chrome` → Chrome MCP existing-session, seçilen browser veri dizinine henüz bağlanamadı. Browser inceleme sayfasını açın, uzaktan hata ayıklamayı etkinleştirin, browser'ı açık tutun, ilk bağlanma istemini onaylayın, sonra yeniden deneyin. Oturum açılmış durum gerekmiyorsa, yönetilen `openclaw` profilini tercih edin.
+- `No Chrome tabs found for profile="user"` → Chrome MCP bağlanma profilinde açık yerel Chrome sekmesi yok.
+- `Remote CDP for profile "<name>" is not reachable` → yapılandırılmış uzak CDP uç noktasına gateway host'undan erişilemiyor.
+- `Browser attachOnly is enabled ... not reachable` veya `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profilinin erişilebilir bir hedefi yok ya da HTTP uç noktası yanıt verdi ama CDP WebSocket yine de açılamadı.
+- `Playwright is not available in this gateway build; '<feature>' is unsupported.` → geçerli gateway kurulumu tam Playwright paketini içermiyor; ARIA anlık görüntüleri ve temel sayfa ekran görüntüleri yine de çalışabilir, ancak gezinme, AI anlık görüntüleri, CSS seçici öğe ekran görüntüleri ve PDF dışa aktarma kullanılamaz durumda kalır.
 - `fullPage is not supported for element screenshots` → ekran görüntüsü isteği `--full-page` ile `--ref` veya `--element` değerlerini birlikte kullandı.
-- `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session` ekran görüntüsü çağrıları CSS `--element` değil, sayfa yakalama veya bir snapshot `--ref` kullanmalıdır.
-- `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCP yükleme kancaları CSS selector'ları değil, snapshot ref'lerini gerektirir.
+- `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session` ekran görüntüsü çağrıları CSS `--element` değil, sayfa yakalama veya bir anlık görüntü `--ref` değeri kullanmalıdır.
+- `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCP yükleme kancaları CSS seçicileri değil, anlık görüntü ref'lerini gerektirir.
 - `existing-session file uploads currently support one file at a time.` → Chrome MCP profillerinde çağrı başına tek yükleme gönderin.
-- `existing-session dialog handling does not support timeoutMs.` → Chrome MCP profillerindeki diyalog kancaları timeout override'larını desteklemez.
-- `response body is not supported for existing-session profiles yet.` → `responsebody` hâlâ yönetilen bir tarayıcı veya ham CDP profili gerektirir.
-- attach-only veya uzak CDP profillerinde eski viewport / dark-mode / locale / offline override'ları → tüm gateway'i yeniden başlatmadan etkin kontrol oturumunu kapatmak ve Playwright/CDP emülasyon durumunu serbest bırakmak için `openclaw browser stop --browser-profile <name>` çalıştırın.
+- `existing-session dialog handling does not support timeoutMs.` → Chrome MCP profillerindeki iletişim kutusu kancaları timeout geçersiz kılmalarını desteklemez.
+- `response body is not supported for existing-session profiles yet.` → `responsebody` hâlâ yönetilen bir browser veya ham CDP profili gerektirir.
+- attach-only veya uzak CDP profillerinde eski viewport / dark-mode / locale / offline geçersiz kılmaları → etkin denetim oturumunu kapatmak ve Playwright/CDP öykünme durumunu tüm gateway'i yeniden başlatmadan serbest bırakmak için `openclaw browser stop --browser-profile <name>` çalıştırın.
 
 İlgili:
 
@@ -411,9 +497,9 @@ Yaygın imzalar:
 
 ## Yükseltme yaptıysanız ve bir şey aniden bozulduysa
 
-Yükseltme sonrası bozulmaların çoğu config kayması veya artık zorlanan daha sıkı varsayılanlardan kaynaklanır.
+Yükseltme sonrası bozulmaların çoğu yapılandırma kayması veya artık daha katı varsayılanların uygulanmasından kaynaklanır.
 
-### 1) Auth ve URL override davranışı değişti
+### 1) Kimlik doğrulama ve URL geçersiz kılma davranışı değişti
 
 ```bash
 openclaw gateway status
@@ -424,15 +510,15 @@ openclaw config get gateway.auth.mode
 
 Kontrol edilecekler:
 
-- Eğer `gateway.mode=remote` ise CLI çağrıları uzak hedefi işaret ediyor olabilir, yerel hizmetiniz ise iyi durumda olabilir.
-- Açık `--url` çağrıları saklanan kimlik bilgilerine fallback yapmaz.
+- `gateway.mode=remote` ise CLI çağrıları uzaktaki hedefi kullanıyor olabilir; yerel hizmetiniz iyi durumda olsa bile.
+- Açık `--url` çağrıları saklanan kimlik bilgilerine geri dönmez.
 
 Yaygın imzalar:
 
 - `gateway connect failed:` → yanlış URL hedefi.
-- `unauthorized` → endpoint erişilebilir ama auth yanlış.
+- `unauthorized` → uç noktaya ulaşılıyor ama kimlik doğrulama yanlış.
 
-### 2) Bind ve auth guardrail'leri daha sıkı
+### 2) Bağlama ve kimlik doğrulama korkulukları daha katı
 
 ```bash
 openclaw config get gateway.bind
@@ -444,15 +530,15 @@ openclaw logs --follow
 
 Kontrol edilecekler:
 
-- Loopback olmayan bind'ler (`lan`, `tailnet`, `custom`) geçerli bir gateway auth yolu gerektirir: paylaşılan token/password auth veya doğru yapılandırılmış loopback olmayan bir `trusted-proxy` dağıtımı.
+- Loopback olmayan bağlamalar (`lan`, `tailnet`, `custom`) geçerli bir gateway kimlik doğrulama yolu gerektirir: paylaşımlı token/parola kimlik doğrulaması veya doğru yapılandırılmış loopback olmayan bir `trusted-proxy` dağıtımı.
 - `gateway.token` gibi eski anahtarlar `gateway.auth.token` yerine geçmez.
 
 Yaygın imzalar:
 
-- `refusing to bind gateway ... without auth` → geçerli bir gateway auth yolu olmadan loopback olmayan bind.
-- çalışma zamanı çalışırken `Connectivity probe: failed` → gateway canlı ama mevcut auth/url ile erişilemiyor.
+- `refusing to bind gateway ... without auth` → geçerli bir gateway kimlik doğrulama yolu olmadan loopback olmayan bağlama.
+- Çalışma zamanı çalışırken `Connectivity probe: failed` → gateway canlı ama geçerli auth/url ile erişilemiyor.
 
-### 3) Eşleştirme ve aygıt kimliği durumu değişti
+### 3) Eşleştirme ve cihaz kimliği durumu değişti
 
 ```bash
 openclaw devices list
@@ -463,15 +549,15 @@ openclaw doctor
 
 Kontrol edilecekler:
 
-- Dashboard/Node'lar için bekleyen aygıt onayları.
-- Policy veya kimlik değişikliklerinden sonra bekleyen DM eşleştirme onayları.
+- Dashboard/node'lar için bekleyen cihaz onayları.
+- İlke veya kimlik değişikliklerinden sonra bekleyen DM eşleştirme onayları.
 
 Yaygın imzalar:
 
-- `device identity required` → aygıt auth gereksinimi karşılanmadı.
-- `pairing required` → gönderen/aygıt onaylanmalıdır.
+- `device identity required` → cihaz kimlik doğrulaması karşılanmamış.
+- `pairing required` → gönderici/cihaz onaylanmalı.
 
-Kontrollerden sonra hizmet config'i ve çalışma zamanı hâlâ uyuşmuyorsa, aynı profil/state dizininden hizmet metadata'sını yeniden kurun:
+Kontrollerden sonra hizmet yapılandırması ve çalışma zamanı hâlâ uyuşmuyorsa, hizmet meta verilerini aynı profil/durum dizininden yeniden kurun:
 
 ```bash
 openclaw gateway install --force

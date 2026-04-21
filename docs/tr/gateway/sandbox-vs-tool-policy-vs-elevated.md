@@ -1,28 +1,28 @@
 ---
 read_when: You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change.
 status: active
-summary: 'Bir aracın neden engellendiği: sandbox çalışma zamanı, araç izin/engelleme ilkesi ve elevated exec kapıları'
-title: Sandbox ve Araç İlkesi ve Elevated
+summary: 'Bir aracın neden engellendiği: sandbox çalışma zamanı, araç izin/verme politikası ve yükseltilmiş yürütme geçitleri'
+title: Sandbox ve Araç Politikası ve Yükseltilmiş Yetki
 x-i18n:
-    generated_at: "2026-04-06T03:07:39Z"
+    generated_at: "2026-04-21T08:59:12Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 331f5b2f0d5effa1320125d9f29948e16d0deaffa59eb1e4f25a63481cbe22d6
+    source_hash: a85378343df0594be451212cb4c95b349a0cc7cd1f242b9306be89903a450db1
     source_path: gateway/sandbox-vs-tool-policy-vs-elevated.md
     workflow: 15
 ---
 
-# Sandbox ve Araç İlkesi ve Elevated
+# Sandbox ve Araç Politikası ve Yükseltilmiş Yetki
 
-OpenClaw’un birbiriyle ilişkili olan (ama farklı) üç denetimi vardır:
+OpenClaw, birbiriyle ilişkili ama farklı üç denetime sahiptir:
 
-1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`), **araçların nerede çalıştığına** karar verir (Docker veya host).
-2. **Araç ilkesi** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`), **hangi araçların kullanılabilir/izinli olduğuna** karar verir.
-3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`), sandbox içindeyken (`gateway` varsayılan olarak veya exec hedefi `node` olarak yapılandırılmışsa `node`) sandbox dışında çalıştırmak için **yalnızca exec’e özel bir kaçış kapağıdır**.
+1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) araçların **nerede çalışacağını** belirler (sandbox arka ucu veya host).
+2. **Araç politikası** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) **hangi araçların kullanılabilir/izinli** olduğunu belirler.
+3. **Yükseltilmiş** (`tools.elevated.*`, `agents.list[].tools.elevated.*`), sandbox içindeyken sandbox dışında çalıştırmak için **yalnızca `exec` için bir kaçış kapısıdır** (`gateway` varsayılan olarak veya `exec` hedefi `node` olarak yapılandırılmışsa `node`).
 
 ## Hızlı hata ayıklama
 
-OpenClaw’un _gerçekte_ ne yaptığını görmek için denetleyiciyi kullanın:
+OpenClaw'un _gerçekte_ ne yaptığını görmek için denetleyiciyi kullanın:
 
 ```bash
 openclaw sandbox explain
@@ -34,51 +34,51 @@ openclaw sandbox explain --json
 Şunları yazdırır:
 
 - etkin sandbox modu/kapsamı/çalışma alanı erişimi
-- oturumun şu anda sandbox içinde olup olmadığı (main ve non-main)
-- etkin sandbox araç izin/engellemesi (ve bunun agent/global/default kaynağından gelip gelmediği)
-- elevated kapıları ve düzeltme için anahtar yolları
+- oturumun şu anda sandbox içinde olup olmadığı (ana vs ana olmayan)
+- etkin sandbox araç izin/verme durumu (ve bunun ajan/genel/varsayılan kaynaktan gelip gelmediği)
+- yükseltilmiş geçitler ve düzeltme anahtar yolları
 
-## Sandbox: araçların nerede çalıştığı
+## Sandbox: araçların çalıştığı yer
 
-Sandboxing, `agents.defaults.sandbox.mode` ile denetlenir:
+Sandboxing, `agents.defaults.sandbox.mode` tarafından denetlenir:
 
 - `"off"`: her şey host üzerinde çalışır.
-- `"non-main"`: yalnızca non-main oturumlar sandbox içindedir (gruplar/kanallar için yaygın “sürpriz”).
+- `"non-main"`: yalnızca ana olmayan oturumlar sandbox içindedir (gruplar/kanallar için yaygın bir “şaşırtıcı durum”).
 - `"all"`: her şey sandbox içindedir.
 
-Tam matris için bkz. [Sandboxing](/tr/gateway/sandboxing) (kapsam, çalışma alanı mount’ları, görseller).
+Tam matris için [Sandboxing](/tr/gateway/sandboxing) sayfasına bakın (kapsam, çalışma alanı bağlamaları, imajlar).
 
-### Bind mount’lar (hızlı güvenlik kontrolü)
+### Bağlama bağlantıları (hızlı güvenlik kontrolü)
 
-- `docker.binds`, sandbox dosya sistemini _deler_: mount ettiğiniz her şey, belirlediğiniz kipte (`:ro` veya `:rw`) kapsayıcı içinde görünür olur.
-- Kipi belirtmezseniz varsayılan okuma-yazmadır; kaynak kod/gizli veriler için `:ro` tercih edin.
-- `scope: "shared"`, agent başına bind’ları yok sayar (yalnızca global bind’lar uygulanır).
-- OpenClaw bind kaynaklarını iki kez doğrular: önce normalize edilmiş kaynak yolunda, sonra da en derin mevcut üst öğe üzerinden çözümledikten sonra yeniden. Symlink üst öğesi üzerinden kaçışlar, engellenmiş-yol veya izinli-kök denetimlerini atlatamaz.
-- Var olmayan yaprak yollar yine de güvenli şekilde denetlenir. `/workspace/alias-out/new-file`, symlink’lenmiş bir üst öğe üzerinden engellenmiş bir yola veya yapılandırılmış izinli köklerin dışına çözülüyorsa bind reddedilir.
-- `/var/run/docker.sock` bağlamak, fiilen host denetimini sandbox’a verir; bunu yalnızca bilinçli olarak yapın.
-- Çalışma alanı erişimi (`workspaceAccess: "ro"`/`"rw"`), bind kiplerinden bağımsızdır.
+- `docker.binds`, sandbox dosya sistemini _deler_: bağladığınız her şey, ayarladığınız kipte (`:ro` veya `:rw`) kapsayıcı içinde görünür olur.
+- Kipi belirtmezseniz varsayılan okuma-yazmadır; kaynaklar/gizli anahtarlar için `:ro` tercih edin.
+- `scope: "shared"`, ajan başına bağlamaları yok sayar (yalnızca genel bağlamalar uygulanır).
+- OpenClaw, bağlama kaynaklarını iki kez doğrular: önce normalleştirilmiş kaynak yolda, sonra en derin mevcut üst öğe üzerinden çözümlendikten sonra tekrar. Sembolik bağlantı üst öğe kaçışları, engellenmiş yol veya izinli kök denetimlerini aşamaz.
+- Var olmayan yaprak yollar yine de güvenli biçimde denetlenir. `/workspace/alias-out/new-file`, sembolik bağlantılı bir üst öğe üzerinden engellenmiş bir yola veya yapılandırılmış izinli köklerin dışına çözümlenirse bağlama reddedilir.
+- `/var/run/docker.sock` bağlamak, sandbox'a fiilen host denetimi verir; bunu yalnızca bilinçli olarak yapın.
+- Çalışma alanı erişimi (`workspaceAccess: "ro"`/`"rw"`), bağlama kiplerinden bağımsızdır.
 
-## Araç ilkesi: hangi araçlar vardır/çağrılabilir
+## Araç politikası: hangi araçların var olduğu/çağrılabildiği
 
 İki katman önemlidir:
 
 - **Araç profili**: `tools.profile` ve `agents.list[].tools.profile` (temel izin listesi)
 - **Sağlayıcı araç profili**: `tools.byProvider[provider].profile` ve `agents.list[].tools.byProvider[provider].profile`
-- **Global/agent başına araç ilkesi**: `tools.allow`/`tools.deny` ve `agents.list[].tools.allow`/`agents.list[].tools.deny`
-- **Sağlayıcı araç ilkesi**: `tools.byProvider[provider].allow/deny` ve `agents.list[].tools.byProvider[provider].allow/deny`
-- **Sandbox araç ilkesi** (yalnızca sandbox içindeyken uygulanır): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` ve `agents.list[].tools.sandbox.tools.*`
+- **Genel/ajan başına araç politikası**: `tools.allow`/`tools.deny` ve `agents.list[].tools.allow`/`agents.list[].tools.deny`
+- **Sağlayıcı araç politikası**: `tools.byProvider[provider].allow/deny` ve `agents.list[].tools.byProvider[provider].allow/deny`
+- **Sandbox araç politikası** (yalnızca sandbox içindeyken uygulanır): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` ve `agents.list[].tools.sandbox.tools.*`
 
 Temel kurallar:
 
 - `deny` her zaman kazanır.
-- `allow` boş değilse, diğer her şey engellenmiş kabul edilir.
-- Araç ilkesi kesin durdurmadır: `/exec`, reddedilmiş bir `exec` aracını geçersiz kılamaz.
+- `allow` boş değilse geri kalan her şey engellenmiş kabul edilir.
+- Araç politikası kesin durdurmadır: `/exec`, reddedilmiş bir `exec` aracını geçersiz kılamaz.
 - `/exec`, yalnızca yetkili göndericiler için oturum varsayılanlarını değiştirir; araç erişimi vermez.
   Sağlayıcı araç anahtarları `provider` (ör. `google-antigravity`) veya `provider/model` (ör. `openai/gpt-5.4`) kabul eder.
 
-### Araç grupları (kısa yollar)
+### Araç grupları (kısayollar)
 
-Araç ilkeleri (global, agent, sandbox), birden fazla araca açılan `group:*` girdilerini destekler:
+Araç politikaları (genel, ajan, sandbox), birden çok araca genişleyen `group:*` girdilerini destekler:
 
 ```json5
 {
@@ -94,7 +94,8 @@ Araç ilkeleri (global, agent, sandbox), birden fazla araca açılan `group:*` g
 
 Kullanılabilir gruplar:
 
-- `group:runtime`: `exec`, `process`, `code_execution` (`bash`, `exec` için bir takma ad olarak kabul edilir)
+- `group:runtime`: `exec`, `process`, `code_execution` (`bash`, `exec` için
+  diğer ad olarak kabul edilir)
 - `group:fs`: `read`, `write`, `edit`, `apply_patch`
 - `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `sessions_yield`, `subagents`, `session_status`
 - `group:memory`: `memory_search`, `memory_get`
@@ -105,43 +106,43 @@ Kullanılabilir gruplar:
 - `group:nodes`: `nodes`
 - `group:agents`: `agents_list`
 - `group:media`: `image`, `image_generate`, `video_generate`, `tts`
-- `group:openclaw`: tüm yerleşik OpenClaw araçları (sağlayıcı plugin’leri hariç)
+- `group:openclaw`: tüm yerleşik OpenClaw araçları (sağlayıcı Plugin'leri hariç)
 
-## Elevated: yalnızca exec için "host üzerinde çalıştır"
+## Yükseltilmiş: yalnızca `exec` için "host üzerinde çalıştır"
 
-Elevated, ek araçlar vermez; yalnızca `exec` üzerinde etkisi vardır.
+Yükseltilmiş mod ek araçlar vermez; yalnızca `exec` aracını etkiler.
 
-- Sandbox içindeyseniz, `/elevated on` (veya `elevated: true` ile `exec`) sandbox dışında çalıştırır (onaylar yine de geçerli olabilir).
-- Oturum için exec onaylarını atlamak üzere `/elevated full` kullanın.
-- Zaten doğrudan çalışıyorsanız elevated fiilen etkisizdir (yine de kapılar uygulanır).
-- Elevated, **skill kapsamlı değildir** ve araç izin/engellemesini geçersiz kılmaz.
-- Elevated, `host=auto` içinden keyfi çapraz-host geçersiz kılmaları vermez; normal exec hedef kurallarını izler ve yalnızca yapılandırılmış/oturum hedefi zaten `node` ise `node`’u korur.
-- `/exec`, elevated’dan ayrıdır. Yalnızca yetkili göndericiler için oturum başına exec varsayılanlarını ayarlar.
+- Sandbox içindeyseniz `/elevated on` (veya `elevated: true` ile `exec`) sandbox dışında çalıştırır (onaylar yine de geçerli olabilir).
+- Oturum için `exec` onaylarını atlamak üzere `/elevated full` kullanın.
+- Zaten doğrudan çalışıyorsanız yükseltilmiş mod fiilen etkisizdir (yine de geçitlerden geçer).
+- Yükseltilmiş mod **Skills kapsamlı değildir** ve araç izin/verme durumunu **geçersiz kılmaz**.
+- Yükseltilmiş mod, `host=auto` üzerinden keyfi çapraz host geçersiz kılmaları vermez; normal `exec` hedef kurallarını izler ve yalnızca yapılandırılmış/oturum hedefi zaten `node` ise `node` değerini korur.
+- `/exec`, yükseltilmiş moddan ayrıdır. Yalnızca yetkili göndericiler için oturum başına `exec` varsayılanlarını ayarlar.
 
-Kapılar:
+Geçitler:
 
 - Etkinleştirme: `tools.elevated.enabled` (ve isteğe bağlı olarak `agents.list[].tools.elevated.enabled`)
 - Gönderici izin listeleri: `tools.elevated.allowFrom.<provider>` (ve isteğe bağlı olarak `agents.list[].tools.elevated.allowFrom.<provider>`)
 
-Bkz. [Elevated Mode](/tr/tools/elevated).
+Bkz. [Yükseltilmiş Mod](/tr/tools/elevated).
 
-## Yaygın "sandbox jail" düzeltmeleri
+## Yaygın "sandbox hapishanesi" düzeltmeleri
 
-### "Tool X blocked by sandbox tool policy"
+### "Araç X, sandbox araç politikası tarafından engellendi"
 
 Düzeltme anahtarları (birini seçin):
 
-- Sandbox’ı devre dışı bırakın: `agents.defaults.sandbox.mode=off` (veya agent başına `agents.list[].sandbox.mode=off`)
+- Sandbox'ı devre dışı bırakın: `agents.defaults.sandbox.mode=off` (veya ajan başına `agents.list[].sandbox.mode=off`)
 - Araca sandbox içinde izin verin:
-  - `tools.sandbox.tools.deny` içinden kaldırın (veya agent başına `agents.list[].tools.sandbox.tools.deny`)
-  - veya `tools.sandbox.tools.allow` içine ekleyin (veya agent başına allow)
+  - `tools.sandbox.tools.deny` içinden kaldırın (veya ajan başına `agents.list[].tools.sandbox.tools.deny`)
+  - ya da `tools.sandbox.tools.allow` içine ekleyin (veya ajan başına izin listesine)
 
-### "Bunun main olduğunu sanıyordum, neden sandbox içinde?"
+### "Bunun ana olduğunu sanıyordum, neden sandbox içinde?"
 
-`"non-main"` kipinde grup/kanal anahtarları _main_ değildir. Main oturum anahtarını kullanın (`sandbox explain` tarafından gösterilir) veya kipi `"off"` olarak değiştirin.
+`"non-main"` modunda grup/kanal anahtarları _ana_ değildir. Ana oturum anahtarını kullanın (`sandbox explain` tarafından gösterilir) veya modu `"off"` olarak değiştirin.
 
-## Ayrıca bkz.
+## Ayrıca bakın
 
-- [Sandboxing](/tr/gateway/sandboxing) -- tam sandbox başvurusu (kipler, kapsamlar, arka uçlar, görseller)
-- [Multi-Agent Sandbox & Tools](/tr/tools/multi-agent-sandbox-tools) -- agent başına geçersiz kılmalar ve öncelik
-- [Elevated Mode](/tr/tools/elevated)
+- [Sandboxing](/tr/gateway/sandboxing) -- tam sandbox başvurusu (kipler, kapsamlar, arka uçlar, imajlar)
+- [Çok Ajanlı Sandbox ve Araçlar](/tr/tools/multi-agent-sandbox-tools) -- ajan başına geçersiz kılmalar ve öncelik
+- [Yükseltilmiş Mod](/tr/tools/elevated)

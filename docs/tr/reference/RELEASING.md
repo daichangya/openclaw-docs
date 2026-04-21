@@ -1,183 +1,186 @@
 ---
 read_when:
-    - Herkese açık yayın kanalı tanımlarını arıyorum
-    - Sürüm adlandırması ve yayın sıklığını arıyorum
-summary: Herkese açık yayın kanalları, sürüm adlandırması ve yayın sıklığı
-title: Yayın Politikası
+    - Herkese açık sürüm kanalı tanımlarını arıyorsunuz
+    - Sürüm adlandırmasını ve yayın sıklığını arıyorsunuz
+summary: Herkese açık sürüm kanalları, sürüm adlandırması ve yayın sıklığı
+title: Sürüm Politikası
 x-i18n:
-    generated_at: "2026-04-15T08:53:13Z"
+    generated_at: "2026-04-21T09:05:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 88724307269ab783a9fbf8a0540fea198d8a3add68457f4e64d5707114fa518c
+    source_hash: 356844708f6ecdae4acfcce853ce16ae962914a9fdd1cfc38a22ac4c439ba172
     source_path: reference/RELEASING.md
     workflow: 15
 ---
 
-# Yayın Politikası
+# Sürüm Politikası
 
-OpenClaw'ın herkese açık üç yayın kanalı vardır:
+OpenClaw'ın herkese açık üç sürüm hattı vardır:
 
-- stable: varsayılan olarak npm `beta`'ya yayımlanan etiketli sürümler veya açıkça istendiğinde npm `latest`'e yayımlanan sürümler
+- stable: varsayılan olarak npm `beta`'ya yayımlanan etiketli sürümler veya açıkça istendiğinde npm `latest`'e
 - beta: npm `beta`'ya yayımlanan ön sürüm etiketleri
 - dev: `main` dalının hareketli ucu
 
 ## Sürüm adlandırması
 
-- Stable sürüm versiyonu: `YYYY.M.D`
+- Stable sürüm sürümü: `YYYY.M.D`
   - Git etiketi: `vYYYY.M.D`
-- Stable düzeltme sürümü versiyonu: `YYYY.M.D-N`
+- Stable düzeltme sürümü sürümü: `YYYY.M.D-N`
   - Git etiketi: `vYYYY.M.D-N`
-- Beta ön sürüm versiyonu: `YYYY.M.D-beta.N`
+- Beta ön sürüm sürümü: `YYYY.M.D-beta.N`
   - Git etiketi: `vYYYY.M.D-beta.N`
-- Ayı veya günü başına sıfır koymayın
-- `latest`, şu anda öne çıkarılmış stable npm sürümü anlamına gelir
-- `beta`, şu andaki beta kurulum hedefi anlamına gelir
-- Stable ve stable düzeltme sürümleri varsayılan olarak npm `beta`'ya yayımlanır; yayın operatörleri açıkça `latest`'i hedefleyebilir veya doğrulanmış bir beta derlemesini daha sonra öne çıkarabilir
-- Her OpenClaw sürümü, npm paketini ve macOS uygulamasını birlikte yayımlar
+- Ay veya günü sıfırla doldurmayın
+- `latest`, mevcut yükseltilmiş stable npm sürümü anlamına gelir
+- `beta`, mevcut beta kurulum hedefi anlamına gelir
+- Stable ve stable düzeltme sürümleri varsayılan olarak npm `beta`'ya yayımlanır; sürüm operatörleri açıkça `latest`'i hedefleyebilir veya doğrulanmış bir beta derlemesini daha sonra yükseltebilir
+- Her stable OpenClaw sürümü npm paketini ve macOS uygulamasını birlikte gönderir;
+  beta sürümleri normalde önce npm/paket yolunu doğrular ve yayımlar; macOS uygulamasını derleme/imzalama/noter onayı ise açıkça istenmedikçe stable için ayrılır
 
-## Yayın sıklığı
+## Sürüm sıklığı
 
-- Sürümler önce beta olarak ilerler
-- Stable, yalnızca en son beta doğrulandıktan sonra gelir
-- Ayrıntılı yayın prosedürü, onaylar, kimlik bilgileri ve kurtarma notları
-  yalnızca maintainers içindir
+- Sürümler önce beta'ya gider
+- Stable yalnızca en son beta doğrulandıktan sonra gelir
+- Bakımcılar normalde sürümleri geçerli `main` dalından oluşturulan `release/YYYY.M.D` dalından keser; böylece sürüm doğrulaması ve düzeltmeleri `main` üzerindeki yeni geliştirmeyi engellemez
+- Bir beta etiketi push edilmiş veya yayımlanmışsa ve düzeltme gerekiyorsa, bakımcılar eski beta etiketini silmek veya yeniden oluşturmak yerine sonraki `-beta.N` etiketini keser
+- Ayrıntılı sürüm prosedürü, onaylar, kimlik bilgileri ve kurtarma notları yalnızca bakımcılara yöneliktir
 
-## Yayın öncesi kontroller
+## Sürüm ön uçuşu
 
-- Paket doğrulama adımı için beklenen
-  `dist/*` yayın artifaktları ve Control UI paketi mevcut olsun diye
-  `pnpm release:check` öncesinde `pnpm build && pnpm ui:build` çalıştırın
-- Her etiketli sürümden önce `pnpm release:check` çalıştırın
-- Yayın kontrolleri artık ayrı bir manuel workflow içinde çalışır:
+- Daha hızlı yerel `pnpm check` geçidi dışında test TypeScript'inin
+  kapsanmış kalması için sürüm ön uçuşundan önce `pnpm check:test-types` çalıştırın
+- Daha hızlı yerel geçidin dışında daha geniş içe aktarma
+  döngüsü ve mimari sınır denetimlerinin yeşil kalması için sürüm ön uçuşundan önce `pnpm check:architecture` çalıştırın
+- Beklenen `dist/*` sürüm yapıtlarının ve Control UI paketinin
+  paket doğrulama adımı için mevcut olması amacıyla `pnpm release:check` öncesinde `pnpm build && pnpm ui:build` çalıştırın
+- Etiketli her sürümden önce `pnpm release:check` çalıştırın
+- Sürüm denetimleri artık ayrı bir elle çalıştırılan iş akışında çalışır:
   `OpenClaw Release Checks`
-- Platformlar arası kurulum ve yükseltme çalışma zamanı doğrulaması,
-  özel çağırıcı workflow
+- Çapraz OS kurulum ve yükseltme çalışma zamanı doğrulaması,
+  özel çağıran iş akışından
   `openclaw/releases-private/.github/workflows/openclaw-cross-os-release-checks.yml`
-  içinden başlatılır; bu workflow, yeniden kullanılabilir herkese açık workflow
+  dağıtılır; bu iş akışı yeniden kullanılabilir herkese açık iş akışını çağırır:
   `.github/workflows/openclaw-cross-os-release-checks-reusable.yml`
-  dosyasını çağırır
-- Bu ayrım bilerek yapılmıştır: gerçek npm yayın yolunu kısa,
-  deterministik ve artifakt odaklı tutarken daha yavaş canlı kontrolleri kendi
-  kanalında tutmak; böylece yayımlamayı geciktirmez veya engellemezler
-- Yayın kontrolleri `main` workflow ref'inden başlatılmalıdır; böylece
-  workflow mantığı ve secrets kanonik kalır
-- Bu workflow, mevcut bir yayın etiketini veya geçerli tam
-  40 karakterlik `main` commit SHA'sını kabul eder
-- Commit-SHA modunda yalnızca geçerli `origin/main` HEAD kabul edilir; daha eski
-  yayın commit'leri için bir yayın etiketi kullanın
-- `OpenClaw NPM Release` yalnızca doğrulama amaçlı ön kontrolü de, itilmiş bir etiket gerektirmeden,
-  geçerli tam 40 karakterlik `main` commit SHA'sını kabul eder
-- Bu SHA yolu yalnızca doğrulama içindir ve gerçek bir yayıma dönüştürülemez
-- SHA modunda workflow, paket meta verisi kontrolü için yalnızca
-  `v<package.json version>` üretir; gerçek yayımlama yine de gerçek bir yayın etiketi gerektirir
-- Her iki workflow da gerçek yayımlama ve öne çıkarma yolunu GitHub barındırmalı
-  runner'larda tutarken, durum değiştirmeyen doğrulama yolu daha büyük
-  Blacksmith Linux runner'larını kullanabilir
-- Bu workflow,
+- Bu ayrım bilinçlidir: gerçek npm sürüm yolunu kısa,
+  deterministik ve yapıt odaklı tutarken, daha yavaş canlı denetimler kendi
+  hattında kalır, böylece yayını durdurmaz veya engellemez
+- Sürüm denetimleri `main` iş akışı başvurusundan veya
+  `release/YYYY.M.D` iş akışı başvurusundan dağıtılmalıdır; böylece iş akışı mantığı ve sırlar
+  denetim altında kalır
+- Bu iş akışı mevcut bir sürüm etiketini veya geçerli tam
+  40 karakterlik iş akışı dalı commit SHA'sını kabul eder
+- Commit-SHA modunda yalnızca geçerli iş akışı dalı HEAD'i kabul eder;
+  daha eski sürüm commit'leri için sürüm etiketi kullanın
+- `OpenClaw NPM Release` yalnızca doğrulama ön uçuşu da push edilmiş etiket gerektirmeden
+  geçerli tam 40 karakterlik iş akışı dalı commit SHA'sını kabul eder
+- Bu SHA yolu yalnızca doğrulama içindir ve gerçek bir yayına yükseltilemez
+- SHA modunda iş akışı, paket meta veri denetimi için yalnızca
+  `v<package.json version>` sentezler; gerçek yayın yine de gerçek bir sürüm etiketi gerektirir
+- Her iki iş akışı da gerçek yayın ve yükseltme yolunu GitHub barındırmalı
+  çalıştırıcılarda tutarken, durum değiştirmeyen doğrulama yolu daha büyük
+  Blacksmith Linux çalıştırıcılarını kullanabilir
+- Bu iş akışı,
   `OPENCLAW_LIVE_TEST=1 OPENCLAW_LIVE_CACHE_TEST=1 pnpm test:live:cache`
-  komutunu hem `OPENAI_API_KEY` hem de `ANTHROPIC_API_KEY` workflow secrets'ını kullanarak çalıştırır
-- npm yayın ön kontrolü artık ayrı yayın kontrolleri kanalını beklemiyor
+  komutunu hem `OPENAI_API_KEY` hem de `ANTHROPIC_API_KEY` iş akışı sırlarını kullanarak çalıştırır
+- npm sürüm ön uçuşu artık ayrı sürüm denetimleri hattını beklemez
 - Onaydan önce
   `RELEASE_TAG=vYYYY.M.D node --import tsx scripts/openclaw-npm-release-check.ts`
   komutunu (veya eşleşen beta/düzeltme etiketini) çalıştırın
-- npm yayımlandıktan sonra, yayımlanan kayıt defteri
-  kurulum yolunu yeni bir geçici prefix içinde doğrulamak için
+- npm yayımından sonra, yeni yayımlanan kayıt defteri
+  kurulum yolunu yeni bir geçici önek içinde doğrulamak için
   `node --import tsx scripts/openclaw-npm-postpublish-verify.ts YYYY.M.D`
-  komutunu (veya eşleşen beta/düzeltme versiyonunu) çalıştırın
-- Maintainer yayın otomasyonu artık önce ön kontrol sonra öne çıkarma modelini kullanıyor:
-  - gerçek npm yayımlama, başarılı bir npm `preflight_run_id` geçmelidir
-  - stable npm sürümleri varsayılan olarak `beta`'yı kullanır
-  - stable npm yayımlama, workflow girdisiyle açıkça `latest`'i hedefleyebilir
-  - token tabanlı npm dist-tag değişikliği artık güvenlik nedeniyle
+  komutunu (veya eşleşen beta/düzeltme sürümünü) çalıştırın
+- Bakımcı sürüm otomasyonu artık ön uçuş-sonra-yükselt yaklaşımını kullanır:
+  - gerçek npm yayını başarılı bir npm `preflight_run_id` kontrolünden geçmelidir
+  - gerçek npm yayını, başarılı ön uçuş çalıştırmasıyla aynı `main` veya
+    `release/YYYY.M.D` dalından dağıtılmalıdır
+  - stable npm sürümleri varsayılan olarak `beta`'ya gider
+  - stable npm yayını iş akışı girdisi üzerinden açıkça `latest`'i hedefleyebilir
+  - token tabanlı npm dist-tag değiştirme artık
     `openclaw/releases-private/.github/workflows/openclaw-npm-dist-tags.yml`
-    içinde yer alır; çünkü `npm dist-tag add` hâlâ `NPM_TOKEN` gerektirirken
-    herkese açık repo yalnızca OIDC ile yayımlamayı korur
+    içinde bulunur; güvenlik nedeniyle, çünkü `npm dist-tag add` hâlâ `NPM_TOKEN` gerektirirken
+    herkese açık depo yalnızca OIDC yayımını korur
   - herkese açık `macOS Release` yalnızca doğrulama içindir
-  - gerçek özel mac yayımlama, başarılı özel mac
-    `preflight_run_id` ve `validate_run_id` geçmelidir
-  - gerçek yayımlama yolları, artifaktları yeniden derlemek yerine
-    hazırlanmış artifaktları öne çıkarır
-- `YYYY.M.D-N` gibi stable düzeltme sürümleri için, yayımlama sonrası doğrulayıcı
-  ayrıca `YYYY.M.D` sürümünden `YYYY.M.D-N` sürümüne aynı geçici prefix yükseltme yolunu da
-  kontrol eder; böylece sürüm düzeltmeleri, daha eski global kurulumları temel
-  stable yük üzerinde sessizce bırakmaz
-- npm yayın ön kontrolü, tarball hem
-  `dist/control-ui/index.html` hem de boş olmayan bir `dist/control-ui/assets/` yükü içermiyorsa
-  kapalı şekilde başarısız olur; böylece yine boş bir tarayıcı kontrol paneli yayımlamayız
-- `pnpm test:install:smoke` ayrıca aday güncelleme tarball'ında npm pack
-  `unpackedSize` bütçesini de zorunlu kılar; böylece yükleyici e2e, yanlışlıkla oluşan paket şişmesini
-  yayın yayımlama yolundan önce yakalar
-- Yayın çalışması CI planlamasına, eklenti zamanlama manifest'lerine veya
-  eklenti test matrislerine dokunduysa, onaydan önce
-  `.github/workflows/ci.yml` içindeki planner'a ait
-  `checks-node-extensions` workflow matris çıktılarını yeniden üretin ve inceleyin;
-  böylece yayın notları eski bir CI düzenini açıklamaz
-- Stable macOS sürümü için hazır olma durumu ayrıca güncelleyici yüzeylerini de içerir:
-  - GitHub sürümünde paketlenmiş `.zip`, `.dmg` ve `.dSYM.zip` bulunmalıdır
-  - `main` üzerindeki `appcast.xml`, yayımlamadan sonra yeni stable zip'i işaret etmelidir
-  - paketlenmiş uygulama, debug olmayan bir bundle id, boş olmayan bir Sparkle feed
-    URL'si ve o sürüm versiyonu için kanonik Sparkle derleme tabanına eşit veya daha yüksek
-    bir `CFBundleVersion` korumalıdır
+  - gerçek özel mac yayını, başarılı özel mac
+    `preflight_run_id` ve `validate_run_id` kontrollerinden geçmelidir
+  - gerçek yayın yolları, bunları yeniden derlemek yerine hazırlanmış yapıtları yükseltir
+- `YYYY.M.D-N` gibi stable düzeltme sürümlerinde, yayım sonrası doğrulayıcı
+  aynı geçici önek yükseltme yolunu `YYYY.M.D` sürümünden `YYYY.M.D-N` sürümüne de denetler;
+  böylece sürüm düzeltmeleri eski genel kurulumları sessizce
+  temel stable yük üzerinde bırakamaz
+- npm sürüm ön uçuşu, tar arşivi hem
+  `dist/control-ui/index.html` hem de boş olmayan bir `dist/control-ui/assets/` yükü içermedikçe kapalı başarısız olur;
+  böylece yeniden boş bir tarayıcı panosu göndermeyiz
+- `pnpm test:install:smoke` ayrıca aday güncelleme tar arşivinde npm paket
+  `unpackedSize` bütçesini zorlar; böylece kurucu e2e, yanlışlıkla paket şişmesini
+  sürüm yayım yolundan önce yakalar
+- Sürüm çalışması CI planlamasına, uzantı zamanlama manifestlerine veya
+  uzantı test matrislerine dokunduysa, onaydan önce `.github/workflows/ci.yml`
+  içindeki planlayıcıya ait `checks-node-extensions` iş akışı matris çıktılarını yeniden oluşturun ve gözden geçirin;
+  böylece sürüm notları eski bir CI düzenini açıklamaz
+- Stable macOS sürüm hazırlığı, güncelleyici yüzeylerini de içerir:
+  - GitHub sürümü paketlenmiş `.zip`, `.dmg` ve `.dSYM.zip` dosyalarıyla sonuçlanmalıdır
+  - `main` dalındaki `appcast.xml`, yayımdan sonra yeni stable zip'e işaret etmelidir
+  - paketlenmiş uygulama, hata ayıklama olmayan bir bundle id, boş olmayan bir Sparkle besleme
+    URL'si ve bu sürüm sürümü için kurallı Sparkle derleme tabanına eşit veya daha büyük bir `CFBundleVersion` korumalıdır
 
-## NPM workflow girdileri
+## NPM iş akışı girdileri
 
-`OpenClaw NPM Release`, operatör tarafından kontrol edilen şu girdileri kabul eder:
+`OpenClaw NPM Release`, operatör tarafından denetlenen şu girdileri kabul eder:
 
 - `tag`: `v2026.4.2`, `v2026.4.2-1` veya
-  `v2026.4.2-beta.1` gibi gerekli yayın etiketi; `preflight_only=true` olduğunda ayrıca yalnızca doğrulama amaçlı ön kontrol için
-  geçerli tam 40 karakterlik `main` commit SHA'sı da olabilir
+  `v2026.4.2-beta.1` gibi gerekli sürüm etiketi; `preflight_only=true` olduğunda bu ayrıca
+  yalnızca doğrulama ön uçuşu için geçerli tam 40 karakterlik iş akışı dalı commit SHA'sı da olabilir
 - `preflight_only`: yalnızca doğrulama/derleme/paket için `true`, gerçek
-  yayımlama yolu için `false`
-- `preflight_run_id`: gerçek yayımlama yolunda gereklidir; böylece workflow,
-  başarılı ön kontrol çalışmasından hazırlanmış tarball'ı yeniden kullanır
-- `npm_dist_tag`: yayımlama yolu için npm hedef etiketi; varsayılanı `beta`'dır
+  yayın yolu için `false`
+- `preflight_run_id`: gerçek yayın yolunda gereklidir; böylece iş akışı başarılı ön uçuş çalıştırmasından hazırlanmış tar arşivini yeniden kullanır
+- `npm_dist_tag`: yayın yolu için npm hedef etiketi; varsayılan `beta`
 
-`OpenClaw Release Checks`, operatör tarafından kontrol edilen şu girdileri kabul eder:
+`OpenClaw Release Checks`, operatör tarafından denetlenen şu girdileri kabul eder:
 
-- `ref`: doğrulanacak mevcut yayın etiketi veya geçerli tam 40 karakterlik `main` commit
-  SHA'sı
+- `ref`: `main` üzerinden dağıtıldığında doğrulamak için mevcut sürüm etiketi veya
+  geçerli tam 40 karakterlik `main` commit SHA'sı; bir sürüm dalından dağıtıldığında
+  mevcut bir sürüm etiketi veya geçerli tam 40 karakterlik sürüm dalı commit
+  SHA'sı kullanın
 
 Kurallar:
 
 - Stable ve düzeltme etiketleri `beta` veya `latest`'e yayımlanabilir
 - Beta ön sürüm etiketleri yalnızca `beta`'ya yayımlanabilir
-- Tam commit SHA girdisine yalnızca `preflight_only=true` olduğunda izin verilir
-- Yayın kontrolleri commit-SHA modu ayrıca geçerli `origin/main` HEAD'i gerektirir
-- Gerçek yayımlama yolu, ön kontrol sırasında kullanılan aynı `npm_dist_tag` değerini kullanmalıdır;
-  workflow, yayımlama devam etmeden önce bu meta veriyi doğrular
+- `OpenClaw NPM Release` için tam commit SHA girdisine yalnızca
+  `preflight_only=true` olduğunda izin verilir
+- `OpenClaw Release Checks` her zaman yalnızca doğrulama içindir ve ayrıca
+  geçerli iş akışı dalı commit SHA'sını da kabul eder
+- Sürüm denetimleri commit-SHA modu ayrıca geçerli iş akışı dalı HEAD'ini de gerektirir
+- Gerçek yayın yolu, ön uçuş sırasında kullanılan aynı `npm_dist_tag` değerini kullanmalıdır;
+  iş akışı, yayın devam etmeden önce bu meta veriyi doğrular
 
 ## Stable npm sürüm sırası
 
-Bir stable npm sürümü çıkarırken:
+Stable bir npm sürümü keserken:
 
 1. `preflight_only=true` ile `OpenClaw NPM Release` çalıştırın
-   - Henüz bir etiket yoksa, ön kontrol workflow'unun
-     yalnızca doğrulama amaçlı kuru çalıştırması için geçerli tam `main` commit SHA'sını kullanabilirsiniz
-2. Normal beta-first akışı için `npm_dist_tag=beta` seçin veya yalnızca
-   doğrudan stable yayımlamayı özellikle istiyorsanız `latest` seçin
-3. Canlı prompt cache kapsamı istediğinizde,
-   aynı etiketle veya geçerli tam `main` commit SHA'sıyla ayrı olarak
-   `OpenClaw Release Checks` çalıştırın
-   - Bu ayrım bilerek yapılmıştır; böylece canlı kapsam kullanılabilir kalırken
-     uzun süren veya kararsız kontroller yeniden yayımlama workflow'una bağlanmaz
+   - Henüz bir etiket yoksa, ön uçuş iş akışının yalnızca doğrulama amaçlı kuru çalıştırması için geçerli tam iş akışı dalı commit
+     SHA'sını kullanabilirsiniz
+2. Normal beta-önce akışı için `npm_dist_tag=beta` seçin veya yalnızca
+   doğrudan stable yayın istiyorsanız `latest` seçin
+3. Aynı etiketle veya canlı istem önbelleği
+   kapsamını istediğinizde tam geçerli iş akışı dalı commit SHA'sıyla ayrı olarak `OpenClaw Release Checks` çalıştırın
+   - Bu bilerek ayrıdır; böylece canlı kapsam uzun süren veya kararsız denetimleri yayın iş akışına yeniden bağlamadan kullanılabilir kalır
 4. Başarılı `preflight_run_id` değerini kaydedin
 5. `preflight_only=false`, aynı
-   `tag`, aynı `npm_dist_tag` ve kaydedilmiş `preflight_run_id` ile
-   `OpenClaw NPM Release`'i yeniden çalıştırın
-6. Sürüm `beta` üzerinde yayımlandıysa, bu stable sürümü `beta`'dan `latest`'e
-   öne çıkarmak için özel
+   `tag`, aynı `npm_dist_tag` ve kaydedilmiş `preflight_run_id` ile `OpenClaw NPM Release` iş akışını yeniden çalıştırın
+6. Sürüm `beta`'ya indiyse, o stable sürümü `beta`'dan `latest`'e yükseltmek için özel
    `openclaw/releases-private/.github/workflows/openclaw-npm-dist-tags.yml`
-   workflow'unu kullanın
-7. Sürüm kasıtlı olarak doğrudan `latest`'e yayımlandıysa ve `beta`
-   aynı stable derlemeyi hemen takip edecekse, her iki dist-tag'i de stable versiyona işaret ettirmek için
-   aynı özel workflow'u kullanın veya planlanmış
-   self-healing sync'in `beta`yı daha sonra taşımasına izin verin
+   iş akışını kullanın
+7. Sürüm bilerek doğrudan `latest`'e yayımlandıysa ve `beta`
+   aynı stable derlemeyi hemen izlemeliyse, her iki dist-tag'i de stable sürüme işaret ettirmek için yine aynı özel
+   iş akışını kullanın veya zamanlanmış kendi kendini iyileştirme eşzamanlamasının `beta`'yı daha sonra taşımasına izin verin
 
-Dist-tag değişikliği güvenlik nedeniyle özel repo içinde tutulur; çünkü hâlâ
-`NPM_TOKEN` gerektirirken herkese açık repo yalnızca OIDC ile yayımlamayı korur.
+Dist-tag değiştirme güvenlik nedeniyle özel depoda bulunur; çünkü bu işlem hâlâ
+`NPM_TOKEN` gerektirirken, herkese açık depo yalnızca OIDC yayımını korur.
 
-Bu, doğrudan yayımlama yolunu ve beta-first öne çıkarma yolunu hem
-belgelenmiş hem de operatör tarafından görünür halde tutar.
+Bu, hem doğrudan yayın yolunu hem de beta-önce yükseltme yolunu
+belgelenmiş ve operatör tarafından görünür tutar.
 
 ## Herkese açık başvurular
 
@@ -188,6 +191,6 @@ belgelenmiş hem de operatör tarafından görünür halde tutar.
 - [`scripts/package-mac-dist.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/package-mac-dist.sh)
 - [`scripts/make_appcast.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/make_appcast.sh)
 
-Maintainers, gerçek runbook için
+Bakımcılar, gerçek çalışma kitabı için
 [`openclaw/maintainers/release/README.md`](https://github.com/openclaw/maintainers/blob/main/release/README.md)
-içindeki özel yayın belgelerini kullanır.
+içindeki özel sürüm belgelerini kullanır.
