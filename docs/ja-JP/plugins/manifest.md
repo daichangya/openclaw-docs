@@ -1,65 +1,65 @@
 ---
 read_when:
-    - OpenClaw Pluginを構築しています
-    - Pluginの設定スキーマを提供する必要がある、またはPluginのバリデーションエラーをデバッグする必要がある
-summary: Pluginマニフェスト + JSONスキーマの要件（厳格な設定バリデーション）
+    - あなたはOpenClaw Pluginを構築しています
+    - Plugin設定スキーマを提供するか、Pluginの検証エラーをデバッグする必要があります
+summary: Pluginマニフェスト + JSONスキーマの要件（厳格な設定検証）
 title: Pluginマニフェスト
 x-i18n:
-    generated_at: "2026-04-19T01:11:04Z"
+    generated_at: "2026-04-21T19:20:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2dfc00759108ddee7bfcda8c42acf7f2d47451676447ba3caf8b5950f8a1c181
+    source_hash: 304c08035724dfb1ce6349972729b621aafc00880d4d259db78c22b86e9056ba
     source_path: plugins/manifest.md
     workflow: 15
 ---
 
-# Pluginマニフェスト（`openclaw.plugin.json`）
+# Pluginマニフェスト (`openclaw.plugin.json`)
 
 このページは、**ネイティブなOpenClaw Pluginマニフェスト**のみを対象としています。
 
-互換性のあるバンドルレイアウトについては、[Plugin bundles](/ja-JP/plugins/bundles)を参照してください。
+互換バンドルのレイアウトについては、[Plugin bundles](/ja-JP/plugins/bundles)を参照してください。
 
 互換バンドル形式では、異なるマニフェストファイルを使用します。
 
-- Codexバンドル: `.codex-plugin/plugin.json`
-- Claudeバンドル: `.claude-plugin/plugin.json` またはマニフェストなしのデフォルトのClaudeコンポーネントレイアウト
-- Cursorバンドル: `.cursor-plugin/plugin.json`
+- Codex bundle: `.codex-plugin/plugin.json`
+- Claude bundle: `.claude-plugin/plugin.json` またはマニフェストなしのデフォルトのClaude componentレイアウト
+- Cursor bundle: `.cursor-plugin/plugin.json`
 
-OpenClawはそれらのバンドルレイアウトも自動検出しますが、ここで説明する`openclaw.plugin.json`スキーマに対してはバリデーションされません。
+OpenClawはそれらのバンドルレイアウトも自動検出しますが、ここで説明する `openclaw.plugin.json` スキーマに対しては検証されません。
 
-互換バンドルについて、OpenClawは現在、レイアウトがOpenClawランタイムの想定に一致する場合に、バンドルメタデータに加えて、宣言されたskillルート、Claudeコマンドルート、Claudeバンドルの`settings.json`デフォルト、ClaudeバンドルのLSPデフォルト、およびサポートされるhook packを読み取ります。
+互換バンドルについて、OpenClawは現在、レイアウトがOpenClawランタイムの期待に一致している場合に、バンドルメタデータに加えて、宣言されたskillルート、Claude commandルート、Claude bundleの `settings.json` デフォルト値、Claude bundleのLSPデフォルト値、およびサポートされるhook packを読み取ります。
 
-すべてのネイティブなOpenClaw Pluginは、**Pluginルート**に`openclaw.plugin.json`ファイルを必ず含める必要があります。OpenClawはこのマニフェストを使って、**Pluginコードを実行せずに**設定をバリデーションします。マニフェストが存在しない、または無効な場合はPluginエラーとして扱われ、設定バリデーションはブロックされます。
+すべてのネイティブなOpenClaw Pluginは、**pluginルート**に `openclaw.plugin.json` ファイルを**必ず**含める必要があります。OpenClawはこのマニフェストを使用して、**Pluginコードを実行せずに**設定を検証します。マニフェストが存在しない、または無効な場合はPluginエラーとして扱われ、設定の検証がブロックされます。
 
 完全なPluginシステムガイドについては、[Plugins](/ja-JP/tools/plugin)を参照してください。
-ネイティブなcapabilityモデルと現在の外部互換性ガイダンスについては、
+ネイティブなcapability modelと現在の外部互換性ガイダンスについては、
 [Capability model](/ja-JP/plugins/architecture#public-capability-model)を参照してください。
 
 ## このファイルの役割
 
-`openclaw.plugin.json`は、OpenClawがPluginコードをロードする前に読み取るメタデータです。
+`openclaw.plugin.json` は、OpenClawがPluginコードをロードする前に読み取るメタデータです。
 
 用途:
 
 - Pluginの識別情報
-- 設定バリデーション
+- 設定の検証
 - Pluginランタイムを起動せずに利用可能であるべき認証およびオンボーディングのメタデータ
-- ランタイムがロードされる前にコントロールプレーンのサーフェスが確認できる、軽量なアクティベーションヒント
-- ランタイムがロードされる前にセットアップ／オンボーディングのサーフェスが確認できる、軽量なセットアップ記述子
-- Pluginランタイムがロードされる前に解決されるべきエイリアスおよび自動有効化メタデータ
-- ランタイムがロードされる前にPluginを自動アクティベートすべき、省略記法のモデルファミリー所有メタデータ
-- バンドルされた互換性配線およびコントラクトカバレッジで使用される静的なcapability所有スナップショット
-- 共有の`openclaw qa`ホストがPluginランタイムのロード前に確認できる、軽量なQAランナーメタデータ
-- ランタイムをロードせずにカタログおよびバリデーションのサーフェスへマージされるべき、チャネル固有の設定メタデータ
+- コントロールプレーンの画面がランタイムのロード前に確認できる、アクティベーションの軽量なヒント
+- セットアップ/オンボーディングの画面がランタイムのロード前に確認できる、セットアップの軽量な記述子
+- Pluginランタイムのロード前に解決されるべきエイリアスおよび自動有効化メタデータ
+- Pluginランタイムのロード前にPluginを自動アクティベートすべき、モデルファミリー所有権の簡略メタデータ
+- バンドル済み互換配線および契約カバレッジに使用される、静的なcapability ownershipスナップショット
+- 共有の `openclaw qa` ホストがPluginランタイムのロード前に確認できる、軽量なQA runnerメタデータ
+- ランタイムをロードせずに、カタログおよび検証画面にマージされるべきチャネル固有の設定メタデータ
 - 設定UIのヒント
 
 用途ではないもの:
 
 - ランタイム動作の登録
-- コードエントリーポイントの宣言
-- npmインストールメタデータ
+- コードのエントリーポイントの宣言
+- npm installメタデータ
 
-これらはPluginコードと`package.json`に属します。
+これらはPluginコードおよび `package.json` に属します。
 
 ## 最小例
 
@@ -139,64 +139,64 @@ OpenClawはそれらのバンドルレイアウトも自動検出しますが、
 
 ## トップレベルフィールドのリファレンス
 
-| フィールド                          | 必須     | 型                               | 意味                                                                                                                                                                                                         |
+| フィールド | 必須 | 型 | 意味 |
 | ----------------------------------- | -------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `id`                                | はい     | `string`                         | 正規のPlugin idです。このidは`plugins.entries.<id>`で使用されます。                                                                                                                                          |
-| `configSchema`                      | はい     | `object`                         | このPluginの設定に対するインラインJSON Schemaです。                                                                                                                                                          |
-| `enabledByDefault`                  | いいえ   | `true`                           | バンドルされたPluginをデフォルトで有効としてマークします。省略するか、`true`以外の値を設定すると、そのPluginはデフォルトで無効のままになります。                                                            |
-| `legacyPluginIds`                   | いいえ   | `string[]`                       | この正規Plugin idに正規化されるレガシーidです。                                                                                                                                                              |
-| `autoEnableWhenConfiguredProviders` | いいえ   | `string[]`                       | 認証、設定、またはモデル参照でこれらが言及されたときに、このPluginを自動有効化すべきprovider idです。                                                                                                        |
-| `kind`                              | いいえ   | `"memory"` \| `"context-engine"` | `plugins.slots.*`で使用される排他的なPlugin種別を宣言します。                                                                                                                                                |
-| `channels`                          | いいえ   | `string[]`                       | このPluginが所有するチャネルidです。検出と設定バリデーションに使用されます。                                                                                                                                 |
-| `providers`                         | いいえ   | `string[]`                       | このPluginが所有するprovider idです。                                                                                                                                                                        |
-| `modelSupport`                      | いいえ   | `object`                         | ランタイムの前にPluginを自動ロードするために使われる、マニフェスト所有の省略記法モデルファミリーメタデータです。                                                                                             |
-| `providerEndpoints`                 | いいえ   | `object[]`                       | providerランタイムがロードされる前にコアが分類する必要があるproviderルート向けの、マニフェスト所有のendpoint host/baseUrlメタデータです。                                                                   |
-| `cliBackends`                       | いいえ   | `string[]`                       | このPluginが所有するCLI推論バックエンドidです。明示的な設定参照からの起動時自動アクティベーションに使用されます。                                                                                            |
-| `syntheticAuthRefs`                 | いいえ   | `string[]`                       | ランタイムがロードされる前のコールドなモデル検出中に、このPlugin所有のsynthetic auth hookをプローブすべきproviderまたはCLIバックエンド参照です。                                                            |
-| `nonSecretAuthMarkers`              | いいえ   | `string[]`                       | 非シークレットなローカル、OAuth、または環境依存の認証状態を表す、バンドルされたPlugin所有のプレースホルダーAPI key値です。                                                                                   |
-| `commandAliases`                    | いいえ   | `object[]`                       | ランタイムがロードされる前に、Plugin対応の設定およびCLI診断を生成すべき、このPluginが所有するコマンド名です。                                                                                                 |
-| `providerAuthEnvVars`               | いいえ   | `Record<string, string[]>`       | OpenClawがPluginコードをロードせずに確認できる、軽量なprovider認証envメタデータです。                                                                                                                        |
-| `providerAuthAliases`               | いいえ   | `Record<string, string>`         | 認証参照時に別のprovider idを再利用すべきprovider idです。たとえば、ベースproviderのAPI keyと認証プロファイルを共有するcoding providerなどです。                                                            |
-| `channelEnvVars`                    | いいえ   | `Record<string, string[]>`       | OpenClawがPluginコードをロードせずに確認できる、軽量なチャネルenvメタデータです。envベースのチャネルセットアップや、汎用の起動／設定ヘルパーが認識すべき認証サーフェスにはこれを使用してください。        |
-| `providerAuthChoices`               | いいえ   | `object[]`                       | オンボーディングの選択UI、優先providerの解決、単純なCLIフラグ配線のための軽量な認証選択メタデータです。                                                                                                       |
-| `activation`                        | いいえ   | `object`                         | provider、コマンド、チャネル、ルート、capabilityトリガーによるロードのための軽量なアクティベーションヒントです。メタデータのみであり、実際の動作は引き続きPluginランタイムが所有します。                    |
-| `setup`                             | いいえ   | `object`                         | 検出およびセットアップのサーフェスがPluginランタイムをロードせずに確認できる、軽量なセットアップ／オンボーディング記述子です。                                                                                |
-| `qaRunners`                         | いいえ   | `object[]`                       | ランタイムがロードされる前に共有の`openclaw qa`ホストで使用される、軽量なQAランナー記述子です。                                                                                                              |
-| `contracts`                         | いいえ   | `object`                         | speech、realtime transcription、realtime voice、media-understanding、image-generation、music-generation、video-generation、web-fetch、web search、およびtool ownershipに関する静的なバンドルcapabilityスナップショットです。 |
-| `channelConfigs`                    | いいえ   | `Record<string, object>`         | ランタイムがロードされる前に検出およびバリデーションのサーフェスへマージされる、マニフェスト所有のチャネル設定メタデータです。                                                                                |
-| `skills`                            | いいえ   | `string[]`                       | Pluginルートからの相対パスで指定する、ロードするSkillsディレクトリです。                                                                                                                                     |
-| `name`                              | いいえ   | `string`                         | 人間が読めるPlugin名です。                                                                                                                                                                                   |
-| `description`                       | いいえ   | `string`                         | Pluginサーフェスに表示される短い概要です。                                                                                                                                                                   |
-| `version`                           | いいえ   | `string`                         | 情報用のPluginバージョンです。                                                                                                                                                                               |
-| `uiHints`                           | いいえ   | `Record<string, object>`         | 設定フィールドに対するUIラベル、プレースホルダー、および機密性ヒントです。                                                                                                                                    |
+| `id` | はい | `string` | 正規のPlugin IDです。これは `plugins.entries.<id>` で使われるIDです。 |
+| `configSchema` | はい | `object` | このPluginの設定に対するインラインJSON Schemaです。 |
+| `enabledByDefault` | いいえ | `true` | バンドル済みPluginがデフォルトで有効であることを示します。デフォルトで無効のままにするには、省略するか、`true` 以外の任意の値を設定します。 |
+| `legacyPluginIds` | いいえ | `string[]` | この正規Plugin IDに正規化されるレガシーIDです。 |
+| `autoEnableWhenConfiguredProviders` | いいえ | `string[]` | 認証、設定、またはモデル参照でこれらが言及されたときに、このPluginを自動有効化すべきprovider IDです。 |
+| `kind` | いいえ | `"memory"` \| `"context-engine"` | `plugins.slots.*` で使われる排他的なPlugin種別を宣言します。 |
+| `channels` | いいえ | `string[]` | このPluginが所有するchannel IDです。検出および設定検証に使用されます。 |
+| `providers` | いいえ | `string[]` | このPluginが所有するprovider IDです。 |
+| `modelSupport` | いいえ | `object` | ランタイムの前にPluginを自動ロードするために使われる、マニフェスト所有の簡略モデルファミリーメタデータです。 |
+| `providerEndpoints` | いいえ | `object[]` | コアがproviderランタイムのロード前に分類しなければならないproviderルート向けの、マニフェスト所有のendpoint host/baseUrlメタデータです。 |
+| `cliBackends` | いいえ | `string[]` | このPluginが所有するCLI推論backend IDです。明示的な設定参照からの起動時自動アクティベーションに使用されます。 |
+| `syntheticAuthRefs` | いいえ | `string[]` | ランタイムのロード前に、コールドモデル検出中にPlugin所有のsynthetic auth hookを調査すべきproviderまたはCLI backend参照です。 |
+| `nonSecretAuthMarkers` | いいえ | `string[]` | 非シークレットなローカル、OAuth、またはアンビエント認証情報の状態を表す、バンドル済みPlugin所有のプレースホルダーAPIキー値です。 |
+| `commandAliases` | いいえ | `object[]` | ランタイムのロード前に、Plugin対応の設定およびCLI診断を生成すべき、このPluginが所有するコマンド名です。 |
+| `providerAuthEnvVars` | いいえ | `Record<string, string[]>` | OpenClawがPluginコードをロードせずに確認できる、軽量なprovider認証envメタデータです。 |
+| `providerAuthAliases` | いいえ | `Record<string, string>` | 認証参照に別のprovider IDを再利用すべきprovider IDです。たとえば、ベースproviderのAPIキーや認証プロファイルを共有するcoding providerなどです。 |
+| `channelEnvVars` | いいえ | `Record<string, string[]>` | OpenClawがPluginコードをロードせずに確認できる、軽量なchannel envメタデータです。env駆動のchannelセットアップや、汎用の起動/設定ヘルパーが認識すべき認証画面にはこれを使用してください。 |
+| `providerAuthChoices` | いいえ | `object[]` | オンボーディングピッカー、優先provider解決、単純なCLIフラグ配線のための、軽量な認証選択メタデータです。 |
+| `activation` | いいえ | `object` | provider、command、channel、route、およびcapabilityトリガー読み込み向けの軽量なアクティベーションヒントです。メタデータのみであり、実際の動作は引き続きPluginランタイムが所有します。 |
+| `setup` | いいえ | `object` | 検出およびセットアップ画面がPluginランタイムをロードせずに確認できる、軽量なセットアップ/オンボーディング記述子です。 |
+| `qaRunners` | いいえ | `object[]` | 共有の `openclaw qa` ホストがPluginランタイムのロード前に使用する、軽量なQA runner記述子です。 |
+| `contracts` | いいえ | `object` | speech、realtime transcription、realtime voice、media-understanding、image-generation、music-generation、video-generation、web-fetch、web search、およびtool所有権に対する静的なバンドル済みcapabilityスナップショットです。 |
+| `channelConfigs` | いいえ | `Record<string, object>` | ランタイムのロード前に検出および検証画面へマージされる、マニフェスト所有のchannel設定メタデータです。 |
+| `skills` | いいえ | `string[]` | Pluginルートからの相対パスで指定する、ロードするSkillsディレクトリです。 |
+| `name` | いいえ | `string` | 人が読めるPlugin名です。 |
+| `description` | いいえ | `string` | Plugin画面に表示される短い要約です。 |
+| `version` | いいえ | `string` | 情報用のPluginバージョンです。 |
+| `uiHints` | いいえ | `Record<string, object>` | 設定フィールドに対するUIラベル、プレースホルダー、および機密性ヒントです。 |
 
 ## `providerAuthChoices` リファレンス
 
-各`providerAuthChoices`エントリは、1つのオンボーディングまたは認証の選択肢を記述します。
-OpenClawはこれをproviderランタイムがロードされる前に読み取ります。
+各 `providerAuthChoices` エントリは、1つのオンボーディングまたは認証の選択肢を記述します。
+OpenClawはこれをproviderランタイムのロード前に読み取ります。
 
-| フィールド            | 必須     | 型                                              | 意味                                                                                                       |
-| --------------------- | -------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `provider`            | はい     | `string`                                        | この選択肢が属するprovider idです。                                                                        |
-| `method`              | はい     | `string`                                        | ディスパッチ先となる認証方式idです。                                                                       |
-| `choiceId`            | はい     | `string`                                        | オンボーディングおよびCLIフローで使用される安定したauth-choice idです。                                    |
-| `choiceLabel`         | いいえ   | `string`                                        | ユーザー向けラベルです。省略した場合、OpenClawは`choiceId`を代わりに使用します。                           |
-| `choiceHint`          | いいえ   | `string`                                        | ピッカー用の短い補足テキストです。                                                                         |
-| `assistantPriority`   | いいえ   | `number`                                        | アシスタント主導の対話型ピッカーで、値が小さいものほど先に並びます。                                       |
-| `assistantVisibility` | いいえ   | `"visible"` \| `"manual-only"`                  | アシスタントのピッカーからはこの選択肢を隠しつつ、手動CLI選択は引き続き許可します。                        |
-| `deprecatedChoiceIds` | いいえ   | `string[]`                                      | ユーザーをこの置き換え後の選択肢へリダイレクトすべき、レガシーなchoice idです。                             |
-| `groupId`             | いいえ   | `string`                                        | 関連する選択肢をグループ化するための任意のgroup idです。                                                   |
-| `groupLabel`          | いいえ   | `string`                                        | そのグループのユーザー向けラベルです。                                                                     |
-| `groupHint`           | いいえ   | `string`                                        | そのグループ向けの短い補足テキストです。                                                                   |
-| `optionKey`           | いいえ   | `string`                                        | 単一フラグのシンプルな認証フローで使う内部オプションキーです。                                             |
-| `cliFlag`             | いいえ   | `string`                                        | `--openrouter-api-key`のようなCLIフラグ名です。                                                            |
-| `cliOption`           | いいえ   | `string`                                        | `--openrouter-api-key <key>`のような完全なCLIオプション形式です。                                          |
-| `cliDescription`      | いいえ   | `string`                                        | CLIヘルプで使われる説明です。                                                                              |
-| `onboardingScopes`    | いいえ   | `Array<"text-inference" \| "image-generation">` | この選択肢を表示すべきオンボーディングのサーフェスです。省略した場合、デフォルトは`["text-inference"]`です。 |
+| フィールド | 必須 | 型 | 意味 |
+| --------------------- | -------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `provider` | はい | `string` | この選択肢が属するprovider IDです。 |
+| `method` | はい | `string` | ディスパッチ先の認証方式IDです。 |
+| `choiceId` | はい | `string` | オンボーディングおよびCLIフローで使われる安定した認証選択肢IDです。 |
+| `choiceLabel` | いいえ | `string` | ユーザー向けラベルです。省略された場合、OpenClawは `choiceId` にフォールバックします。 |
+| `choiceHint` | いいえ | `string` | ピッカー用の短いヘルパーテキストです。 |
+| `assistantPriority` | いいえ | `number` | assistant主導の対話型ピッカーでは、値が小さいほど先に並びます。 |
+| `assistantVisibility` | いいえ | `"visible"` \| `"manual-only"` | assistantのピッカーではこの選択肢を非表示にしつつ、手動のCLI選択は引き続き可能にします。 |
+| `deprecatedChoiceIds` | いいえ | `string[]` | ユーザーをこの置き換え選択肢へリダイレクトすべきレガシーchoice IDです。 |
+| `groupId` | いいえ | `string` | 関連する選択肢をグループ化するための任意のgroup IDです。 |
+| `groupLabel` | いいえ | `string` | そのグループのユーザー向けラベルです。 |
+| `groupHint` | いいえ | `string` | グループ用の短いヘルパーテキストです。 |
+| `optionKey` | いいえ | `string` | 単一フラグの単純な認証フロー用の内部optionキーです。 |
+| `cliFlag` | いいえ | `string` | `--openrouter-api-key` のようなCLIフラグ名です。 |
+| `cliOption` | いいえ | `string` | `--openrouter-api-key <key>` のような完全なCLIオプション形式です。 |
+| `cliDescription` | いいえ | `string` | CLIヘルプで使われる説明です。 |
+| `onboardingScopes` | いいえ | `Array<"text-inference" \| "image-generation">` | この選択肢を表示すべきオンボーディング画面です。省略された場合、デフォルトは `["text-inference"]` です。 |
 
 ## `commandAliases` リファレンス
 
-Pluginが、ユーザーが誤って`plugins.allow`に入れたり、ルートCLIコマンドとして実行しようとしたりする可能性があるランタイムコマンド名を所有している場合は、`commandAliases`を使用します。OpenClawはこのメタデータを、Pluginランタイムコードをインポートせずに診断に使用します。
+ユーザーがそれを誤って `plugins.allow` に書いたり、ルートCLIコマンドとして実行しようとしたりする可能性がある、Plugin所有のランタイムコマンド名がある場合は `commandAliases` を使います。OpenClawはこのメタデータを、Pluginランタイムコードをimportせずに診断に利用します。
 
 ```json
 {
@@ -210,37 +210,37 @@ Pluginが、ユーザーが誤って`plugins.allow`に入れたり、ルートCL
 }
 ```
 
-| フィールド   | 必須     | 型                | 意味                                                                         |
-| ------------ | -------- | ----------------- | ---------------------------------------------------------------------------- |
-| `name`       | はい     | `string`          | このPluginに属するコマンド名です。                                           |
-| `kind`       | いいえ   | `"runtime-slash"` | そのエイリアスを、ルートCLIコマンドではなくチャットのスラッシュコマンドとして示します。 |
-| `cliCommand` | いいえ   | `string`          | 存在する場合、CLI操作向けに提案する関連するルートCLIコマンドです。            |
+| フィールド | 必須 | 型 | 意味 |
+| ------------ | -------- | ----------------- | ----------------------------------------------------------------------- |
+| `name` | はい | `string` | このPluginに属するコマンド名です。 |
+| `kind` | いいえ | `"runtime-slash"` | このエイリアスを、ルートCLIコマンドではなくチャットのスラッシュコマンドとして示します。 |
+| `cliCommand` | いいえ | `string` | 存在する場合、CLI操作向けに提案する関連ルートCLIコマンドです。 |
 
 ## `activation` リファレンス
 
-Pluginが、どのコントロールプレーンイベントによって後でアクティベートされるべきかを軽量に宣言できる場合は、`activation`を使用します。
+Pluginがどのコントロールプレーンイベントで後からアクティベートされるべきかを低コストで宣言できる場合は、`activation` を使います。
 
 ## `qaRunners` リファレンス
 
-Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポートランナーを提供する場合は、`qaRunners`を使用します。このメタデータは軽量かつ静的に保ってください。実際のCLI登録は引き続きPluginランタイムが所有し、`qaRunnerCliRegistrations`をエクスポートする軽量な`runtime-api.ts`サーフェスを通じて行います。
+Pluginが共有の `openclaw qa` ルート配下に1つ以上のtransport runnerを提供する場合は、`qaRunners` を使います。このメタデータは軽量かつ静的に保ってください。実際のCLI登録は引き続きPluginランタイムが所有し、`qaRunnerCliRegistrations` をexportする軽量な `runtime-api.ts` サーフェスを通じて行います。
 
 ```json
 {
   "qaRunners": [
     {
       "commandName": "matrix",
-      "description": "使い捨てhomeserverに対してDockerベースのMatrixライブQAレーンを実行します"
+      "description": "使い捨てのhomeserverに対してDockerベースのMatrixライブQAレーンを実行します"
     }
   ]
 }
 ```
 
-| フィールド    | 必須     | 型       | 意味                                                                   |
-| ------------- | -------- | -------- | ---------------------------------------------------------------------- |
-| `commandName` | はい     | `string` | `openclaw qa`配下にマウントされるサブコマンドです。たとえば`matrix`です。 |
-| `description` | いいえ   | `string` | 共有ホストがスタブコマンドを必要とするときに使うフォールバックのヘルプテキストです。 |
+| フィールド | 必須 | 型 | 意味 |
+| ------------- | -------- | -------- | ------------------------------------------------------------------ |
+| `commandName` | はい | `string` | `openclaw qa` 配下にマウントされるサブコマンドです。たとえば `matrix` です。 |
+| `description` | いいえ | `string` | 共有ホストがスタブコマンドを必要とする場合に使われるフォールバックのヘルプテキストです。 |
 
-このブロックはメタデータのみです。ランタイム動作を登録するものではなく、`register(...)`、`setupEntry`、その他のランタイム／Pluginエントリーポイントを置き換えるものでもありません。現在の利用側では、より広いPluginロードの前に絞り込みヒントとして使用されるため、activationメタデータが欠けていても通常は性能にのみ影響し、レガシーなマニフェスト所有フォールバックがまだ存在する限り、正しさは変わらないはずです。
+このブロックはメタデータ専用です。ランタイム動作を登録するものではなく、`register(...)`、`setupEntry`、その他のランタイム/Pluginエントリーポイントを置き換えるものでもありません。現在の利用側は、より広いPlugin読み込みの前に絞り込みヒントとしてこれを使用しているため、`activation` メタデータが欠けていても通常は性能コストが増えるだけです。レガシーなマニフェスト所有権フォールバックがまだ存在する間は、正しさは変わらないはずです。
 
 ```json
 {
@@ -254,27 +254,23 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
 }
 ```
 
-| フィールド       | 必須     | 型                                                   | 意味                                                             |
-| ---------------- | -------- | ---------------------------------------------------- | ---------------------------------------------------------------- |
-| `onProviders`    | いいえ   | `string[]`                                           | 要求されたときにこのPluginをアクティベートすべきprovider idです。 |
-| `onCommands`     | いいえ   | `string[]`                                           | このPluginをアクティベートすべきコマンドidです。                 |
-| `onChannels`     | いいえ   | `string[]`                                           | このPluginをアクティベートすべきチャネルidです。                 |
-| `onRoutes`       | いいえ   | `string[]`                                           | このPluginをアクティベートすべきルート種別です。                 |
-| `onCapabilities` | いいえ   | `Array<"provider" \| "channel" \| "tool" \| "hook">` | コントロールプレーンのアクティベーション計画で使われる大まかなcapabilityヒントです。 |
+| フィールド | 必須 | 型 | 意味 |
+| ---------------- | -------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
+| `onProviders` | いいえ | `string[]` | 要求されたときにこのPluginをアクティベートすべきprovider IDです。 |
+| `onCommands` | いいえ | `string[]` | このPluginをアクティベートすべきcommand IDです。 |
+| `onChannels` | いいえ | `string[]` | このPluginをアクティベートすべきchannel IDです。 |
+| `onRoutes` | いいえ | `string[]` | このPluginをアクティベートすべきroute種別です。 |
+| `onCapabilities` | いいえ | `Array<"provider" \| "channel" \| "tool" \| "hook">` | コントロールプレーンのアクティベーション計画で使われる、広範なcapabilityヒントです。 |
 
-現在の実利用側:
+現在のライブ利用側:
 
-- コマンドトリガーのCLI計画は、レガシーな
-  `commandAliases[].cliCommand` または `commandAliases[].name` にフォールバックします
-- チャネルトリガーのセットアップ／チャネル計画は、明示的なチャネルactivationメタデータがない場合、
-  レガシーな `channels[]` 所有にフォールバックします
-- providerトリガーのセットアップ／ランタイム計画は、明示的なprovider
-  activationメタデータがない場合、レガシーな
-  `providers[]` とトップレベルの `cliBackends[]` 所有にフォールバックします
+- commandトリガーのCLI計画は、レガシーな `commandAliases[].cliCommand` または `commandAliases[].name` にフォールバックします
+- channelトリガーのセットアップ/チャネル計画は、明示的なchannel activationメタデータがない場合、レガシーな `channels[]` 所有権にフォールバックします
+- providerトリガーのセットアップ/ランタイム計画は、明示的なprovider activationメタデータがない場合、レガシーな `providers[]` およびトップレベルの `cliBackends[]` 所有権にフォールバックします
 
 ## `setup` リファレンス
 
-ランタイムがロードされる前に、セットアップおよびオンボーディングのサーフェスでPlugin所有の軽量なメタデータが必要な場合は、`setup`を使用します。
+ランタイムのロード前に、セットアップおよびオンボーディング画面で低コストなPlugin所有メタデータが必要な場合は、`setup` を使います。
 
 ```json
 {
@@ -293,32 +289,32 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
 }
 ```
 
-トップレベルの`cliBackends`は引き続き有効で、CLI推論バックエンドを記述し続けます。`setup.cliBackends`は、メタデータのみを維持すべきコントロールプレーン／セットアップフロー向けの、セットアップ専用記述子サーフェスです。
+トップレベルの `cliBackends` は引き続き有効で、CLI推論backendを記述し続けます。`setup.cliBackends` は、メタデータ専用であるべきコントロールプレーン/セットアップフロー向けの、セットアップ固有の記述子サーフェスです。
 
-`setup.providers`と`setup.cliBackends`が存在する場合、それらはセットアップ検出における優先的な記述子ファーストの参照サーフェスになります。記述子が候補Pluginを絞り込むだけで、セットアップにさらに豊富なセットアップ時ランタイムhookが必要な場合は、`requiresRuntime: true`を設定し、フォールバック実行パスとして`setup-api`を維持してください。
+`setup.providers` と `setup.cliBackends` が存在する場合、これらはセットアップ検出における優先的なdescriptor-first lookupサーフェスになります。記述子が候補Pluginの絞り込みだけを行い、それでもセットアップ時により豊富なランタイムhookが必要な場合は、`requiresRuntime: true` を設定し、フォールバック実行パスとして `setup-api` を維持してください。
 
-セットアップ参照ではPlugin所有の`setup-api`コードを実行できるため、正規化された`setup.providers[].id`および`setup.cliBackends[]`の値は、検出されたPlugin全体で一意でなければなりません。所有関係があいまいな場合は、検出順から勝者を選ぶのではなく、安全側に倒して失敗します。
+セットアップlookupはPlugin所有の `setup-api` コードを実行できるため、正規化された `setup.providers[].id` と `setup.cliBackends[]` の値は、検出されたPlugin全体で一意でなければなりません。所有権が曖昧な場合は、検出順で勝者を選ぶのではなく、クローズドに失敗します。
 
 ### `setup.providers` リファレンス
 
-| フィールド    | 必須     | 型         | 意味                                                                                   |
-| ------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
-| `id`          | はい     | `string`   | セットアップまたはオンボーディング中に公開されるprovider idです。正規化されたidは全体で一意に保ってください。 |
-| `authMethods` | いいえ   | `string[]` | フルランタイムをロードせずにこのproviderがサポートするセットアップ／認証方式idです。  |
-| `envVars`     | いいえ   | `string[]` | 汎用のセットアップ／ステータスサーフェスがPluginランタイムのロード前に確認できるenv varです。 |
+| フィールド | 必須 | 型 | 意味 |
+| ------------- | -------- | ---------- | ------------------------------------------------------------------------------------ |
+| `id` | はい | `string` | セットアップまたはオンボーディング中に公開されるprovider IDです。正規化されたIDはグローバルで一意に保ってください。 |
+| `authMethods` | いいえ | `string[]` | 完全なランタイムをロードせずにこのproviderがサポートする、セットアップ/認証方式IDです。 |
+| `envVars` | いいえ | `string[]` | 汎用のセットアップ/ステータス画面がPluginランタイムのロード前に確認できるenv varです。 |
 
 ### `setup` フィールド
 
-| フィールド         | 必須     | 型         | 意味                                                                                                  |
-| ------------------ | -------- | ---------- | ----------------------------------------------------------------------------------------------------- |
-| `providers`        | いいえ   | `object[]` | セットアップおよびオンボーディング中に公開されるproviderセットアップ記述子です。                     |
-| `cliBackends`      | いいえ   | `string[]` | 記述子ファーストのセットアップ参照に使用されるセットアップ時バックエンドidです。正規化されたidは全体で一意に保ってください。 |
-| `configMigrations` | いいえ   | `string[]` | このPluginのセットアップサーフェスが所有する設定migration idです。                                    |
-| `requiresRuntime`  | いいえ   | `boolean`  | 記述子参照の後もセットアップに`setup-api`の実行が必要かどうかです。                                   |
+| フィールド | 必須 | 型 | 意味 |
+| ------------------ | -------- | ---------- | --------------------------------------------------------------------------------------------------- |
+| `providers` | いいえ | `object[]` | セットアップおよびオンボーディング中に公開されるproviderセットアップ記述子です。 |
+| `cliBackends` | いいえ | `string[]` | descriptor-firstなセットアップlookupに使われるセットアップ時backend IDです。正規化されたIDはグローバルで一意に保ってください。 |
+| `configMigrations` | いいえ | `string[]` | このPluginのセットアップ画面が所有する設定migration IDです。 |
+| `requiresRuntime` | いいえ | `boolean` | 記述子lookup後もセットアップに `setup-api` の実行が必要かどうかです。 |
 
 ## `uiHints` リファレンス
 
-`uiHints`は、設定フィールド名から小さなレンダリングヒントへのマップです。
+`uiHints` は、設定フィールド名から小さな描画ヒントへのマップです。
 
 ```json
 {
@@ -335,18 +331,18 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
 
 各フィールドヒントには以下を含められます。
 
-| フィールド    | 型         | 意味                                     |
-| ------------- | ---------- | ---------------------------------------- |
-| `label`       | `string`   | ユーザー向けのフィールドラベルです。     |
-| `help`        | `string`   | 短い補足テキストです。                   |
-| `tags`        | `string[]` | 任意のUIタグです。                       |
-| `advanced`    | `boolean`  | そのフィールドを高度な項目として示します。 |
-| `sensitive`   | `boolean`  | そのフィールドを秘密または機密として示します。 |
-| `placeholder` | `string`   | フォーム入力用のプレースホルダーテキストです。 |
+| フィールド | 型 | 意味 |
+| ------------- | ---------- | --------------------------------------- |
+| `label` | `string` | ユーザー向けのフィールドラベルです。 |
+| `help` | `string` | 短いヘルパーテキストです。 |
+| `tags` | `string[]` | 任意のUIタグです。 |
+| `advanced` | `boolean` | このフィールドを高度な項目として示します。 |
+| `sensitive` | `boolean` | このフィールドを秘密または機密として示します。 |
+| `placeholder` | `string` | フォーム入力用のプレースホルダーテキストです。 |
 
 ## `contracts` リファレンス
 
-`contracts`は、OpenClawがPluginランタイムをインポートせずに読み取れる、静的なcapability所有メタデータにのみ使用してください。
+`contracts` は、OpenClawがPluginランタイムをimportせずに読み取れる、静的なcapability ownershipメタデータにのみ使用してください。
 
 ```json
 {
@@ -366,21 +362,21 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
 
 各リストは任意です。
 
-| フィールド                       | 型         | 意味                                                                 |
-| -------------------------------- | ---------- | -------------------------------------------------------------------- |
-| `speechProviders`                | `string[]` | このPluginが所有するspeech provider idです。                         |
-| `realtimeTranscriptionProviders` | `string[]` | このPluginが所有するrealtime-transcription provider idです。         |
-| `realtimeVoiceProviders`         | `string[]` | このPluginが所有するrealtime-voice provider idです。                 |
-| `mediaUnderstandingProviders`    | `string[]` | このPluginが所有するmedia-understanding provider idです。            |
-| `imageGenerationProviders`       | `string[]` | このPluginが所有するimage-generation provider idです。               |
-| `videoGenerationProviders`       | `string[]` | このPluginが所有するvideo-generation provider idです。               |
-| `webFetchProviders`              | `string[]` | このPluginが所有するweb-fetch provider idです。                      |
-| `webSearchProviders`             | `string[]` | このPluginが所有するweb-search provider idです。                     |
-| `tools`                          | `string[]` | バンドルされたコントラクトチェック用にこのPluginが所有するagent tool名です。 |
+| フィールド | 型 | 意味 |
+| -------------------------------- | ---------- | -------------------------------------------------------------- |
+| `speechProviders` | `string[]` | このPluginが所有するspeech provider IDです。 |
+| `realtimeTranscriptionProviders` | `string[]` | このPluginが所有するrealtime-transcription provider IDです。 |
+| `realtimeVoiceProviders` | `string[]` | このPluginが所有するrealtime-voice provider IDです。 |
+| `mediaUnderstandingProviders` | `string[]` | このPluginが所有するmedia-understanding provider IDです。 |
+| `imageGenerationProviders` | `string[]` | このPluginが所有するimage-generation provider IDです。 |
+| `videoGenerationProviders` | `string[]` | このPluginが所有するvideo-generation provider IDです。 |
+| `webFetchProviders` | `string[]` | このPluginが所有するweb-fetch provider IDです。 |
+| `webSearchProviders` | `string[]` | このPluginが所有するweb-search provider IDです。 |
+| `tools` | `string[]` | バンドル済み契約チェックのためにこのPluginが所有するagent tool名です。 |
 
 ## `channelConfigs` リファレンス
 
-チャネルPluginが、ランタイムがロードされる前に軽量な設定メタデータを必要とする場合は、`channelConfigs`を使用します。
+channel Pluginがランタイムのロード前に低コストな設定メタデータを必要とする場合は、`channelConfigs` を使います。
 
 ```json
 {
@@ -400,26 +396,26 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
         }
       },
       "label": "Matrix",
-      "description": "Matrix homeserver connection",
+      "description": "Matrix homeserver接続",
       "preferOver": ["matrix-legacy"]
     }
   }
 }
 ```
 
-各チャネルエントリには以下を含められます。
+各channelエントリには以下を含められます。
 
-| フィールド    | 型                       | 意味                                                                                         |
-| ------------- | ------------------------ | -------------------------------------------------------------------------------------------- |
-| `schema`      | `object`                 | `channels.<id>`用のJSON Schemaです。宣言された各チャネル設定エントリで必須です。             |
-| `uiHints`     | `Record<string, object>` | そのチャネル設定セクション向けの任意のUIラベル／プレースホルダー／機密性ヒントです。         |
-| `label`       | `string`                 | ランタイムメタデータの準備ができていないときに、ピッカーおよびinspectサーフェスへマージされるチャネルラベルです。 |
-| `description` | `string`                 | inspectおよびcatalogサーフェス向けの短いチャネル説明です。                                   |
-| `preferOver`  | `string[]`               | 選択サーフェスでこのチャネルが優先して上回るべき、レガシーまたは優先度の低いPlugin idです。 |
+| フィールド | 型 | 意味 |
+| ------------- | ------------------------ | ----------------------------------------------------------------------------------------- |
+| `schema` | `object` | `channels.<id>` のJSON Schemaです。宣言された各channel設定エントリで必須です。 |
+| `uiHints` | `Record<string, object>` | そのchannel設定セクション向けの任意のUIラベル/プレースホルダー/機密性ヒントです。 |
+| `label` | `string` | ランタイムメタデータの準備ができていないときに、ピッカーおよび確認画面へマージされるchannelラベルです。 |
+| `description` | `string` | 確認およびカタログ画面向けの短いchannel説明です。 |
+| `preferOver` | `string[]` | 選択画面でこのchannelが優先されるべき、レガシーまたは優先度の低いPlugin IDです。 |
 
 ## `modelSupport` リファレンス
 
-`gpt-5.4`や`claude-sonnet-4.6`のような省略記法モデルidから、Pluginランタイムがロードされる前にOpenClawがprovider Pluginを推論すべき場合は、`modelSupport`を使用します。
+`gpt-5.4` や `claude-sonnet-4.6` のような短縮モデルIDから、Pluginランタイムのロード前にOpenClawがprovider Pluginを推測すべき場合は、`modelSupport` を使います。
 
 ```json
 {
@@ -432,58 +428,60 @@ Pluginが共有の`openclaw qa`ルート配下に1つ以上のトランスポー
 
 OpenClawは次の優先順位を適用します。
 
-- 明示的な`provider/model`参照では、所有する`providers`マニフェストメタデータを使用します
-- `modelPatterns`は`modelPrefixes`より優先されます
-- 1つの非バンドルPluginと1つのバンドルPluginの両方が一致する場合は、非バンドルPluginが優先されます
-- 残るあいまいさは、ユーザーまたは設定がproviderを指定するまで無視されます
+- 明示的な `provider/model` 参照では、所有する `providers` マニフェストメタデータを使用します
+- `modelPatterns` は `modelPrefixes` より優先されます
+- 1つの非バンドルPluginと1つのバンドル済みPluginの両方が一致する場合、非バンドルPluginが優先されます
+- 残る曖昧さは、ユーザーまたは設定がproviderを指定するまで無視されます
 
 フィールド:
 
-| フィールド      | 型         | 意味                                                                              |
-| --------------- | ---------- | --------------------------------------------------------------------------------- |
-| `modelPrefixes` | `string[]` | 省略記法モデルidに対して`startsWith`で一致判定するプレフィックスです。            |
-| `modelPatterns` | `string[]` | プロファイル接尾辞を除去した後の省略記法モデルidに対して一致判定する正規表現ソースです。 |
+| フィールド | 型 | 意味 |
+| --------------- | ---------- | ------------------------------------------------------------------------------- |
+| `modelPrefixes` | `string[]` | 短縮モデルIDに対して `startsWith` で一致させるプレフィックスです。 |
+| `modelPatterns` | `string[]` | プロファイルサフィックスを除去した後の短縮モデルIDに対して一致させる正規表現ソースです。 |
 
-レガシーなトップレベルcapabilityキーは非推奨です。`openclaw doctor --fix`を使用して、`speechProviders`、`realtimeTranscriptionProviders`、`realtimeVoiceProviders`、`mediaUnderstandingProviders`、`imageGenerationProviders`、`videoGenerationProviders`、`webFetchProviders`、および`webSearchProviders`を`contracts`配下へ移動してください。通常のマニフェストロードでは、これらのトップレベルフィールドはもはやcapability所有として扱われません。
+レガシーなトップレベルcapabilityキーは非推奨です。`openclaw doctor --fix` を使って、`speechProviders`、`realtimeTranscriptionProviders`、`realtimeVoiceProviders`、`mediaUnderstandingProviders`、`imageGenerationProviders`、`videoGenerationProviders`、`webFetchProviders`、`webSearchProviders` を `contracts` 配下へ移動してください。通常のマニフェスト読み込みでは、これらのトップレベルフィールドはもはやcapability ownershipとして扱われません。
 
 ## マニフェストとpackage.jsonの違い
 
-この2つのファイルは役割が異なります。
+この2つのファイルは異なる役割を持ちます。
 
-| ファイル                 | 用途                                                                                                                             |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `openclaw.plugin.json`   | 検出、設定バリデーション、auth-choiceメタデータ、およびPluginコード実行前に存在している必要があるUIヒント                      |
-| `package.json`           | npmメタデータ、依存関係のインストール、およびエントリーポイント、インストール制御、セットアップ、またはcatalogメタデータに使う`openclaw`ブロック |
+| ファイル | 用途 |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `openclaw.plugin.json` | Pluginコードの実行前に存在している必要がある、検出、設定検証、認証選択メタデータ、およびUIヒント |
+| `package.json` | npmメタデータ、依存関係のインストール、およびエントリーポイント、インストール制御、セットアップ、またはカタログメタデータに使われる `openclaw` ブロック |
 
-どこに置くべきメタデータか迷う場合は、次のルールを使ってください。
+どこに置くべきメタデータか迷った場合は、次のルールを使ってください。
 
-- OpenClawがPluginコードをロードする前に知っている必要があるなら、`openclaw.plugin.json`に置いてください
-- パッケージ化、エントリーファイル、またはnpmインストール動作に関するものなら、`package.json`に置いてください
+- OpenClawがPluginコードのロード前に知る必要がある場合は、`openclaw.plugin.json` に置きます
+- パッケージ化、エントリーファイル、またはnpm installの動作に関するものであれば、`package.json` に置きます
 
-### 検出に影響する`package.json`フィールド
+### 検出に影響する `package.json` フィールド
 
-一部の事前ランタイムPluginメタデータは、`openclaw.plugin.json`ではなく、`package.json`内の`openclaw`ブロックに意図的に置かれています。
+一部のランタイム前Pluginメタデータは、`openclaw.plugin.json` ではなく、`package.json` 内の `openclaw` ブロックに意図的に置かれています。
 
 重要な例:
 
-| フィールド                                                        | 意味                                                                                                                                   |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `openclaw.extensions`                                             | ネイティブなPluginエントリーポイントを宣言します。                                                                                     |
-| `openclaw.setupEntry`                                             | オンボーディングおよび遅延チャネル起動中に使われる、軽量なセットアップ専用エントリーポイントです。                                     |
-| `openclaw.channel`                                                | ラベル、ドキュメントパス、エイリアス、選択用コピーなどの軽量なチャネルcatalogメタデータです。                                          |
-| `openclaw.channel.configuredState`                                | フルチャネルランタイムをロードせずに「envのみのセットアップがすでに存在するか？」に答えられる、軽量なconfigured-stateチェッカーメタデータです。 |
-| `openclaw.channel.persistedAuthState`                             | フルチャネルランタイムをロードせずに「すでに何かサインイン済みか？」に答えられる、軽量なpersisted-authチェッカーメタデータです。       |
-| `openclaw.install.npmSpec` / `openclaw.install.localPath`         | バンドルPluginおよび外部公開Plugin向けのインストール／更新ヒントです。                                                                  |
-| `openclaw.install.defaultChoice`                                  | 複数のインストール元が利用可能な場合の優先インストールパスです。                                                                       |
-| `openclaw.install.minHostVersion`                                 | `>=2026.3.22`のようなsemver下限で表す、サポートされる最小のOpenClawホストバージョンです。                                               |
-| `openclaw.install.allowInvalidConfigRecovery`                     | 設定が無効な場合に、限定的なバンドルPlugin再インストール回復パスを許可します。                                                          |
-| `openclaw.startup.deferConfiguredChannelFullLoadUntilAfterListen` | 起動中、完全なチャネルPluginの前にセットアップ専用のチャネルサーフェスをロードできるようにします。                                     |
+| フィールド | 意味 |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `openclaw.extensions` | ネイティブPluginのエントリーポイントを宣言します。 |
+| `openclaw.setupEntry` | オンボーディング、遅延channel起動、読み取り専用のchannel status/SecretRef検出で使われる、軽量なセットアップ専用エントリーポイントです。 |
+| `openclaw.channel` | ラベル、docs path、エイリアス、選択用コピーなどの軽量なchannelカタログメタデータです。 |
+| `openclaw.channel.configuredState` | 「envのみのセットアップがすでに存在するか？」に、完全なchannelランタイムをロードせずに答えられる軽量なconfigured-state checkerメタデータです。 |
+| `openclaw.channel.persistedAuthState` | 「すでに何かにサインインしているか？」に、完全なchannelランタイムをロードせずに答えられる軽量なpersisted-auth checkerメタデータです。 |
+| `openclaw.install.npmSpec` / `openclaw.install.localPath` | バンドル済みおよび外部公開Plugin向けのインストール/更新ヒントです。 |
+| `openclaw.install.defaultChoice` | 複数のインストール元が利用可能な場合の優先インストールパスです。 |
+| `openclaw.install.minHostVersion` | `>=2026.3.22` のようなsemver下限を使用する、サポートされる最小のOpenClaw hostバージョンです。 |
+| `openclaw.install.allowInvalidConfigRecovery` | 設定が無効な場合に、限定的なバンドル済みPlugin再インストール回復パスを許可します。 |
+| `openclaw.startup.deferConfiguredChannelFullLoadUntilAfterListen` | 起動中に完全なchannel Pluginより前に、セットアップ専用のchannel画面をロードできるようにします。 |
 
-`openclaw.install.minHostVersion`は、インストール時およびマニフェストレジストリのロード時に強制されます。無効な値は拒否されます。新しいが有効な値の場合、古いホストではそのPluginはスキップされます。
+`openclaw.install.minHostVersion` は、インストール中およびマニフェストレジストリ読み込み中に強制されます。無効な値は拒否されます。新しすぎるが有効な値は、古いhostではそのPluginをスキップします。
 
-`openclaw.install.allowInvalidConfigRecovery`は意図的に限定的です。これによって任意の壊れた設定がインストール可能になるわけではありません。現在は、不足しているバンドルPluginパスや、同じバンドルPluginに対する古い`channels.<id>`エントリなど、特定の古いバンドルPluginアップグレード失敗からインストールフローが回復できるようにするだけです。無関係な設定エラーは引き続きインストールをブロックし、オペレーターは`openclaw doctor --fix`へ案内されます。
+channel Pluginは、status、channel list、またはSecretRefスキャンで完全なランタイムをロードせずに設定済みアカウントを識別する必要がある場合、`openclaw.setupEntry` を提供すべきです。setup entryは、channelメタデータに加えて、セットアップで安全な設定、status、およびsecrets adapterを公開すべきです。ネットワーククライアント、Gatewayリスナー、およびtransport runtimeはメインのextension entrypointに置いてください。
 
-`openclaw.channel.persistedAuthState`は、小さなチェッカーモジュール用のパッケージメタデータです。
+`openclaw.install.allowInvalidConfigRecovery` は意図的に限定的です。任意の壊れた設定をインストール可能にするものではありません。現時点では、バンドル済みPluginパスの欠落や、その同じバンドル済みPluginに対する古い `channels.<id>` エントリのような、特定の古いバンドル済みPluginアップグレード失敗からのインストールフロー回復のみを許可します。無関係な設定エラーは引き続きインストールをブロックし、運用者に `openclaw doctor --fix` を案内します。
+
+`openclaw.channel.persistedAuthState` は、小さなcheckerモジュールのためのpackageメタデータです。
 
 ```json
 {
@@ -499,9 +497,9 @@ OpenClawは次の優先順位を適用します。
 }
 ```
 
-セットアップ、doctor、またはconfigured-stateフローで、完全なチャネルPluginがロードされる前に、安価なyes/no認証プローブが必要な場合にこれを使用します。対象のexportは、永続化状態のみを読み取る小さな関数であるべきです。完全なチャネルランタイムbarrel経由にはしないでください。
+完全なchannel Pluginのロード前に、setup、doctor、またはconfigured-stateフローが低コストなyes/no認証確認を必要とする場合に使います。対象のexportは、永続化された状態のみを読み取る小さな関数にしてください。完全なchannel runtime barrelを経由させないでください。
 
-`openclaw.channel.configuredState`も、安価なenvのみのconfiguredチェックに対して同じ形に従います。
+`openclaw.channel.configuredState` も、低コストなenvのみconfiguredチェック向けに同じ形式に従います。
 
 ```json
 {
@@ -517,43 +515,42 @@ OpenClawは次の優先順位を適用します。
 }
 ```
 
-チャネルが、envまたはその他の小さな非ランタイム入力からconfigured-stateに答えられる場合にこれを使用します。チェックに完全な設定解決または実際のチャネルランタイムが必要なら、そのロジックは代わりにPluginの`config.hasConfiguredState`hookに置いてください。
+channelがenvやその他の小さな非ランタイム入力からconfigured-stateに答えられる場合に使います。チェックに完全な設定解決や実際のchannel runtimeが必要なら、そのロジックは代わりにPluginの `config.hasConfiguredState` hookに置いてください。
 
 ## JSON Schemaの要件
 
-- **すべてのPluginはJSON Schemaを必ず含める必要があります**。設定を受け付けない場合でも同様です。
-- 空のスキーマでも構いません（たとえば、`{ "type": "object", "additionalProperties": false }`）。
-- スキーマはランタイム時ではなく、設定の読み取り／書き込み時にバリデーションされます。
+- **すべてのPluginはJSON Schemaを必ず含める必要があります**。設定をまったく受け付けない場合でも同様です。
+- 空のスキーマでも受け入れられます（たとえば `{ "type": "object", "additionalProperties": false }`）。
+- スキーマはランタイム時ではなく、設定の読み書き時に検証されます。
 
-## バリデーション動作
+## 検証の動作
 
-- 不明な`channels.*`キーは、チャネルidがPluginマニフェストで宣言されていない限り、**エラー**です。
-- `plugins.entries.<id>`、`plugins.allow`、`plugins.deny`、および`plugins.slots.*`は、**検出可能な**Plugin idを参照していなければなりません。不明なidは**エラー**です。
-- Pluginがインストールされていても、マニフェストまたはスキーマが壊れている、または存在しない場合、バリデーションは失敗し、DoctorがPluginエラーを報告します。
-- Plugin設定が存在していても、そのPluginが**無効**である場合、設定は保持され、Doctorとログに**警告**が表示されます。
+- 不明な `channels.*` キーは、channel IDがPluginマニフェストで宣言されていない限り、**エラー**です。
+- `plugins.entries.<id>`、`plugins.allow`、`plugins.deny`、および `plugins.slots.*` は、**検出可能な**Plugin IDを参照していなければなりません。不明なIDは**エラー**です。
+- Pluginがインストールされていても、マニフェストまたはスキーマが壊れているか存在しない場合、検証は失敗し、DoctorがPluginエラーを報告します。
+- Plugin設定が存在していても、そのPluginが**無効**の場合、設定は保持され、Doctorとログで**警告**が表示されます。
 
-完全な`plugins.*`スキーマについては、[Configuration reference](/ja-JP/gateway/configuration)を参照してください。
+完全な `plugins.*` スキーマについては、[Configuration reference](/ja-JP/gateway/configuration)を参照してください。
 
-## 注意事項
+## 注意
 
-- マニフェストは、ローカルファイルシステムからのロードを含め、**ネイティブなOpenClaw Pluginでは必須**です。
-- ランタイムは引き続きPluginモジュールを別個にロードします。マニフェストはあくまで検出とバリデーションのためのものです。
-- ネイティブマニフェストはJSON5で解析されるため、最終的な値がオブジェクトである限り、コメント、末尾カンマ、引用符なしキーを使用できます。
-- マニフェストローダーが読み取るのは、ドキュメント化されたマニフェストフィールドのみです。ここにカスタムのトップレベルキーを追加するのは避けてください。
-- `providerAuthEnvVars`は、認証プローブ、env-markerバリデーション、およびenv名を確認するためだけにPluginランタイムを起動すべきでない類似のprovider認証サーフェス向けの、軽量なメタデータパスです。
-- `providerAuthAliases`により、providerバリアントは、その関係をコアにハードコードすることなく、別のproviderの認証env var、認証プロファイル、設定ベースの認証、およびAPI keyオンボーディング選択肢を再利用できます。
-- `providerEndpoints`により、provider Pluginは単純なendpoint host/baseUrl一致メタデータを所有できます。これはコアがすでにサポートしているendpoint classに対してのみ使用してください。ランタイム動作は引き続きPluginが所有します。
-- `syntheticAuthRefs`は、ランタイムレジストリがまだ存在しない段階のコールドなモデル検出で可視でなければならない、provider所有のsynthetic auth hook向けの軽量なメタデータパスです。ランタイムproviderまたはCLIバックエンドが実際に`resolveSyntheticAuth`を実装している参照だけを列挙してください。
-- `nonSecretAuthMarkers`は、ローカル、OAuth、または環境依存の認証マーカーなど、バンドルされたPlugin所有のプレースホルダーAPI key向けの軽量なメタデータパスです。コアは、所有するproviderをハードコードすることなく、認証表示およびシークレット監査においてこれらを非シークレットとして扱います。
-- `channelEnvVars`は、shell-envフォールバック、セットアッププロンプト、およびenv名を確認するためだけにPluginランタイムを起動すべきでない類似のチャネルサーフェス向けの、軽量なメタデータパスです。
-- `providerAuthChoices`は、providerランタイムがロードされる前のauth-choiceピッカー、`--auth-choice`解決、優先providerマッピング、および単純なオンボーディングCLIフラグ登録向けの軽量なメタデータパスです。providerコードを必要とするランタイムのウィザードメタデータについては、[Provider runtime hooks](/ja-JP/plugins/architecture#provider-runtime-hooks)を参照してください。
-- 排他的なPlugin種別は`plugins.slots.*`を通じて選択されます。
-  - `kind: "memory"` は `plugins.slots.memory` で選択されます。
-  - `kind: "context-engine"` は `plugins.slots.contextEngine` で選択されます
-    （デフォルト: 組み込みの`legacy`）。
-- Pluginが必要としない場合、`channels`、`providers`、`cliBackends`、および`skills`は省略できます。
-- Pluginがネイティブモジュールに依存している場合は、ビルド手順と、必要なパッケージマネージャーの許可リスト要件（たとえば、pnpmの`allow-build-scripts`
-  - `pnpm rebuild <package>`）をドキュメント化してください。
+- マニフェストは、ローカルファイルシステム読み込みを含む**ネイティブなOpenClaw Pluginでは必須**です。
+- ランタイムは引き続きPluginモジュールを個別にロードします。マニフェストは検出と検証のためだけのものです。
+- ネイティブマニフェストはJSON5で解析されるため、最終的な値がオブジェクトである限り、コメント、末尾カンマ、引用符なしキーが許可されます。
+- マニフェストローダーが読み取るのは文書化されたマニフェストフィールドのみです。ここにカスタムのトップレベルキーを追加するのは避けてください。
+- `providerAuthEnvVars` は、認証確認、env-marker検証、およびenv名を確認するためだけにPluginランタイムを起動すべきでない類似のprovider認証画面に向けた、低コストなメタデータパスです。
+- `providerAuthAliases` により、coreにその関係をハードコードせずに、providerバリアントが別のproviderの認証env var、認証プロファイル、設定ベースの認証、およびAPIキーのオンボーディング選択肢を再利用できます。
+- `providerEndpoints` により、provider Pluginが単純なendpoint host/baseUrl一致メタデータを所有できます。coreがすでにサポートしているendpoint classに対してのみ使用してください。ランタイム動作は引き続きPluginが所有します。
+- `syntheticAuthRefs` は、ランタイムレジストリが存在する前のコールドモデル検出で可視である必要がある、provider所有のsynthetic auth hook向けの低コストなメタデータパスです。ランタイムproviderまたはCLI backendが実際に `resolveSyntheticAuth` を実装している参照のみを列挙してください。
+- `nonSecretAuthMarkers` は、ローカル、OAuth、またはアンビエント認証情報マーカーのような、バンドル済みPlugin所有のプレースホルダーAPIキー向けの低コストなメタデータパスです。coreは、所有providerをハードコードせずに、認証表示およびシークレット監査でこれらを非シークレットとして扱います。
+- `channelEnvVars` は、シェルenvフォールバック、セットアッププロンプト、およびenv名を確認するためだけにPluginランタイムを起動すべきでない類似のchannel画面に向けた、低コストなメタデータパスです。
+- `providerAuthChoices` は、認証選択ピッカー、`--auth-choice` 解決、優先providerマッピング、およびproviderランタイムのロード前の単純なオンボーディングCLIフラグ登録に向けた、低コストなメタデータパスです。providerコードを必要とするランタイムのウィザードメタデータについては、[Provider runtime hooks](/ja-JP/plugins/architecture#provider-runtime-hooks)を参照してください。
+- 排他的なPlugin種別は `plugins.slots.*` を通じて選択されます。
+  - `kind: "memory"` は `plugins.slots.memory` によって選択されます。
+  - `kind: "context-engine"` は `plugins.slots.contextEngine` によって選択されます（デフォルト: 組み込みの `legacy`）。
+- Pluginが必要としない場合、`channels`、`providers`、`cliBackends`、および `skills` は省略できます。
+- Pluginがネイティブモジュールに依存する場合は、ビルド手順と、必要なパッケージマネージャーの許可リスト要件を文書化してください（たとえば、pnpmの `allow-build-scripts`
+  - `pnpm rebuild <package>`）。
 
 ## 関連
 

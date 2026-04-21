@@ -1,31 +1,27 @@
 ---
 read_when:
-    - model provider として GitHub Copilot を使いたい場合
-    - '`openclaw models auth login-github-copilot` フローが必要な場合'
-summary: デバイスフローを使って OpenClaw から GitHub Copilot にサインインする
+    - モデルプロバイダーとして GitHub Copilot を使用したい場合
+    - '`openclaw models auth login-github-copilot` フローが必要です'
+summary: デバイスフローを使用して OpenClaw から GitHub Copilot にサインインする
 title: GitHub Copilot
 x-i18n:
-    generated_at: "2026-04-21T04:50:08Z"
+    generated_at: "2026-04-21T19:20:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f7faafbd3bdcd8886e75fb0d40c3eec66355df3fca6160ebbbb9a0018b7839fe
+    source_hash: b5169839322f64b24b194302b61c5bad67c6cb6595989f9a1ef65867d8b68659
     source_path: providers/github-copilot.md
     workflow: 15
 ---
 
 # GitHub Copilot
 
-GitHub Copilot は GitHub の AI コーディングアシスタントです。GitHub アカウントとプランに応じて、Copilot
-model へのアクセスを提供します。OpenClaw は Copilot を model
-provider として 2 つの異なる方法で使用できます。
+GitHub Copilot は GitHub の AI コーディングアシスタントです。GitHub アカウントとプランで Copilot モデルにアクセスできます。OpenClaw は、2 つの異なる方法で Copilot をモデルプロバイダーとして使用できます。
 
 ## OpenClaw で Copilot を使う 2 つの方法
 
 <Tabs>
-  <Tab title="Built-in provider (github-copilot)">
-    ネイティブの device-login フローを使用して GitHub token を取得し、その後 OpenClaw 実行時に
-    Copilot API token へ交換します。これが **デフォルト** で最も簡単な方法です。
-    VS Code を必要としないためです。
+  <Tab title="内蔵プロバイダー (github-copilot)">
+    ネイティブのデバイスログインフローを使用して GitHub トークンを取得し、その後 OpenClaw の実行時にそれを Copilot API トークンと交換します。これは **デフォルト** であり、VS Code を必要としないため最も簡単な方法です。
 
     <Steps>
       <Step title="ログインコマンドを実行する">
@@ -33,20 +29,19 @@ provider として 2 つの異なる方法で使用できます。
         openclaw models auth login-github-copilot
         ```
 
-        URL にアクセスして一時コードを入力するよう求められます。完了するまで
-        terminal は開いたままにしてください。
+        URL にアクセスして 1 回限りのコードを入力するよう求められます。完了するまでターミナルを開いたままにしてください。
       </Step>
-      <Step title="デフォルト model を設定する">
+      <Step title="デフォルトモデルを設定する">
         ```bash
-        openclaw models set github-copilot/claude-opus-4.6
+        openclaw models set github-copilot/claude-opus-4.7
         ```
 
-        または config で:
+        または、config では次のようにします。
 
         ```json5
         {
           agents: {
-            defaults: { model: { primary: "github-copilot/claude-opus-4.6" } },
+            defaults: { model: { primary: "github-copilot/claude-opus-4.7" } },
           },
         }
         ```
@@ -55,90 +50,75 @@ provider として 2 つの異なる方法で使用できます。
 
   </Tab>
 
-  <Tab title="Copilot Proxy plugin (copilot-proxy)">
-    **Copilot Proxy** VS Code 拡張をローカル bridge として使用します。OpenClaw は
-    proxy の `/v1` endpoint と通信し、そこで設定した model 一覧を使用します。
+  <Tab title="Copilot Proxy Plugin (copilot-proxy)">
+    **Copilot Proxy** VS Code 拡張機能をローカルブリッジとして使用します。OpenClaw はプロキシの `/v1` エンドポイントと通信し、そこで設定したモデル一覧を使用します。
 
     <Note>
-    すでに VS Code で Copilot Proxy を動かしている場合や、それ経由でルーティングしたい場合はこれを選んでください。
-    Plugin を有効化し、VS Code 拡張を起動したままにしておく必要があります。
+    すでに VS Code で Copilot Proxy を実行している場合、またはそれを経由する必要がある場合は、こちらを選択してください。Plugin を有効にし、VS Code 拡張機能を実行したままにする必要があります。
     </Note>
 
   </Tab>
 </Tabs>
 
-## 任意フラグ
+## オプションフラグ
 
-| Flag | 説明 |
+| Flag            | 説明                                         |
 | --------------- | --------------------------------------------------- |
-| `--yes` | 確認プロンプトをスキップする |
-| `--set-default` | provider 推奨のデフォルト model も適用する |
+| `--yes`         | 確認プロンプトをスキップする                        |
+| `--set-default` | プロバイダー推奨のデフォルトモデルも適用する |
 
 ```bash
-# Skip confirmation
+# 確認をスキップ
 openclaw models auth login-github-copilot --yes
 
-# Login and set the default model in one step
+# ログインし、デフォルトモデルも 1 ステップで設定
 openclaw models auth login --provider github-copilot --method device --set-default
 ```
 
 <AccordionGroup>
   <Accordion title="対話型 TTY が必要">
-    device-login フローには対話型 TTY が必要です。非対話スクリプトや CI パイプラインではなく、
-    terminal で直接実行してください。
+    デバイスログインフローには対話型 TTY が必要です。非対話型スクリプトや CI パイプラインではなく、ターミナルで直接実行してください。
   </Accordion>
 
-  <Accordion title="model の可用性はプランに依存する">
-    Copilot の model 可用性は GitHub のプランに依存します。model が
-    拒否される場合は、別の ID（たとえば `github-copilot/gpt-4.1`）を試してください。
+  <Accordion title="モデルの利用可否はプランによって異なる">
+    Copilot モデルの利用可否は GitHub プランによって異なります。モデルが拒否された場合は、別の ID を試してください（例: `github-copilot/gpt-4.1`）。
   </Accordion>
 
   <Accordion title="トランスポートの選択">
-    Claude の model ID は自動的に Anthropic Messages transport を使用します。GPT、
-    o-series、Gemini model は OpenAI Responses transport を使い続けます。OpenClaw は
-    model ref に基づいて正しい transport を選択します。
+    Claude モデル ID は自動的に Anthropic Messages トランスポートを使用します。GPT、o-series、Gemini モデルは OpenAI Responses トランスポートのままです。OpenClaw はモデル ref に基づいて正しいトランスポートを選択します。
   </Accordion>
 
   <Accordion title="環境変数の解決順序">
-    OpenClaw は Copilot auth を次の優先順位で環境変数から解決します。
+    OpenClaw は、以下の優先順位で環境変数から Copilot 認証情報を解決します。
 
-    | 優先順位 | 変数 | 注記 |
+    | Priority | Variable              | Notes                            |
     | -------- | --------------------- | -------------------------------- |
-    | 1        | `COPILOT_GITHUB_TOKEN` | 最優先、Copilot 固有 |
-    | 2        | `GH_TOKEN`            | GitHub CLI token（フォールバック） |
-    | 3        | `GITHUB_TOKEN`        | 標準 GitHub token（最下位） |
+    | 1        | `COPILOT_GITHUB_TOKEN` | 最優先、Copilot 専用 |
+    | 2        | `GH_TOKEN`            | GitHub CLI トークン（フォールバック）      |
+    | 3        | `GITHUB_TOKEN`        | 標準の GitHub トークン（最下位）   |
 
-    複数の変数が設定されている場合、OpenClaw は最優先のものを使います。
-    device-login フロー（`openclaw models auth login-github-copilot`）は
-    auth profile store に token を保存し、すべての環境変数より優先されます。
+    複数の変数が設定されている場合、OpenClaw は最優先のものを使用します。デバイスログインフロー (`openclaw models auth login-github-copilot`) はトークンを auth profile store に保存し、すべての環境変数よりも優先されます。
 
   </Accordion>
 
-  <Accordion title="token の保存">
-    ログインでは GitHub token を auth profile store に保存し、OpenClaw 実行時にそれを
-    Copilot API token に交換します。token を手動管理する必要はありません。
+  <Accordion title="トークンの保存">
+    ログインにより GitHub トークンが auth profile store に保存され、OpenClaw の実行時にそれが Copilot API トークンと交換されます。トークンを手動で管理する必要はありません。
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-対話型 TTY が必要です。ログインコマンドは headless script や CI job の中ではなく、
-terminal で直接実行してください。
+対話型 TTY が必要です。ログインコマンドは、ヘッドレススクリプトや CI ジョブの中ではなく、ターミナルで直接実行してください。
 </Warning>
 
-## メモリ検索 embedding
+## メモリ検索の埋め込み
 
-GitHub Copilot は
-[memory search](/ja-JP/concepts/memory-search) 用の embedding provider としても利用できます。Copilot サブスクリプションがあり、
-ログイン済みであれば、OpenClaw は別の API キーなしで embedding に使用できます。
+GitHub Copilot は、[メモリ検索](/ja-JP/concepts/memory-search) の埋め込みプロバイダーとしても使用できます。Copilot サブスクリプションがあり、ログイン済みであれば、OpenClaw は別個の API キーなしで埋め込みにこれを使用できます。
 
 ### 自動検出
 
-`memorySearch.provider` が `"auto"`（デフォルト）の場合、GitHub Copilot は
-優先度 15 で試されます。これはローカル embedding の後、OpenAI や他の有料
-provider の前です。GitHub token が利用可能なら、OpenClaw は
-Copilot API から利用可能な embedding model を検出し、自動で最適なものを選びます。
+`memorySearch.provider` が `"auto"`（デフォルト）の場合、GitHub Copilot は優先度 15 で試されます。これはローカル埋め込みの後、OpenAI やその他の有料プロバイダーの前です。GitHub トークンが利用可能であれば、OpenClaw は Copilot API から利用可能な埋め込みモデルを検出し、最適なものを自動的に選択します。
 
-### 明示的な config
+### 明示的な設定
 
 ```json5
 {
@@ -146,7 +126,7 @@ Copilot API から利用可能な embedding model を検出し、自動で最適
     defaults: {
       memorySearch: {
         provider: "github-copilot",
-        // Optional: override the auto-discovered model
+        // 任意: 自動検出されたモデルを上書き
         model: "text-embedding-3-small",
       },
     },
@@ -156,22 +136,21 @@ Copilot API から利用可能な embedding model を検出し、自動で最適
 
 ### 仕組み
 
-1. OpenClaw が GitHub token を解決します（env var または auth profile から）。
-2. それを短命の Copilot API token に交換します。
-3. Copilot の `/models` endpoint に問い合わせ、利用可能な embedding model を検出します。
-4. 最適な model を選びます（`text-embedding-3-small` を優先）。
-5. embedding リクエストを Copilot の `/embeddings` endpoint に送信します。
+1. OpenClaw が GitHub トークンを解決します（環境変数または auth profile から）。
+2. それを短期間有効な Copilot API トークンと交換します。
+3. Copilot の `/models` エンドポイントを問い合わせて、利用可能な埋め込みモデルを検出します。
+4. 最適なモデルを選択します（`text-embedding-3-small` を優先）。
+5. Copilot の `/embeddings` エンドポイントに埋め込みリクエストを送信します。
 
-model の可用性は GitHub のプランに依存します。embedding model が
-利用できない場合、OpenClaw は Copilot をスキップして次の provider を試します。
+モデルの利用可否は GitHub プランによって異なります。埋め込みモデルが利用できない場合、OpenClaw は Copilot をスキップして次のプロバイダーを試します。
 
 ## 関連
 
 <CardGroup cols={2}>
-  <Card title="model 選択" href="/ja-JP/concepts/model-providers" icon="layers">
-    provider、model ref、failover 動作の選び方。
+  <Card title="モデルの選択" href="/ja-JP/concepts/model-providers" icon="layers">
+    プロバイダー、モデル ref、フェイルオーバー動作の選び方。
   </Card>
-  <Card title="OAuth と auth" href="/ja-JP/gateway/authentication" icon="key">
-    auth の詳細と credential 再利用ルール。
+  <Card title="OAuth と認証" href="/ja-JP/gateway/authentication" icon="key">
+    認証の詳細と認証情報再利用のルール。
   </Card>
 </CardGroup>
