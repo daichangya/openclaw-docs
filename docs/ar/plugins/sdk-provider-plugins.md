@@ -1,44 +1,44 @@
 ---
 read_when:
-    - أنت تبني Plugin جديدًا لموفّر نماذج
-    - أنت تريد إضافة وكيل متوافق مع OpenAI أو LLM مخصص إلى OpenClaw
-    - أنت بحاجة إلى فهم مصادقة الموفّر، والفهارس، وخطافات وقت التشغيل
+    - أنت تبني Plugin جديدًا لمزوّد نماذج
+    - تريد إضافة وكيل متوافق مع OpenAI أو LLM مخصص إلى OpenClaw
+    - تحتاج إلى فهم مصادقة المزوّد، والكتالوجات، ووسائط ربط وقت التشغيل
 sidebarTitle: Provider Plugins
-summary: دليل خطوة بخطوة لبناء Plugin لموفّر نماذج في OpenClaw
-title: بناء Plugins الموفّر
+summary: دليل خطوة بخطوة لبناء Plugin لمزوّد نماذج لـ OpenClaw
+title: بناء Plugins لمزوّدي النماذج
 x-i18n:
-    generated_at: "2026-04-21T07:25:08Z"
+    generated_at: "2026-04-21T13:35:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 459761118c7394c1643c170edfec97c87e1c6323b436183b53ad7a2fed783b04
+    source_hash: 08494658def4a003a1e5752f68d9232bfbbbf76348cf6f319ea1a6855c2ae439
     source_path: plugins/sdk-provider-plugins.md
     workflow: 15
 ---
 
-# بناء Plugins الموفّر
+# بناء Plugins لمزوّدي النماذج
 
-يرشدك هذا الدليل خلال بناء Plugin لموفّر يضيف موفّر نماذج
-(LLM) إلى OpenClaw. وبنهاية هذا الدليل سيكون لديك موفّر مع فهرس نماذج،
+يوضح هذا الدليل كيفية بناء Plugin لمزوّد يضيف مزوّد نماذج
+(LLM) إلى OpenClaw. في النهاية، سيكون لديك مزوّد يحتوي على كتالوج نماذج،
 ومصادقة بمفتاح API، وحل ديناميكي للنماذج.
 
 <Info>
-  إذا لم تكن قد بنيت أي Plugin لـ OpenClaw من قبل، فاقرأ أولًا
-  [البدء](/ar/plugins/building-plugins) لمعرفة بنية الحزمة الأساسية
-  وإعداد manifest.
+  إذا لم تكن قد بنيت أي Plugin لـ OpenClaw من قبل، فاقرأ
+  [البدء](/ar/plugins/building-plugins) أولًا لمعرفة بنية
+  الحزمة الأساسية وإعداد البيان.
 </Info>
 
 <Tip>
-  تضيف Plugins الموفّر النماذج إلى حلقة الاستدلال العادية في OpenClaw. وإذا كان النموذج
-  يجب أن يعمل عبر daemon عامل أصلي يملك السلاسل، أو Compaction، أو
-  أحداث الأدوات، فقم بإقران الموفّر مع [agent harness](/ar/plugins/sdk-agent-harness)
-  بدلًا من وضع تفاصيل بروتوكول daemon في النواة.
+  تضيف Plugins المزوّدين نماذج إلى حلقة الاستدلال العادية في OpenClaw. إذا كان النموذج
+  يجب أن يعمل عبر daemon وكيل أصلي يملك الخيوط، وCompaction، أو أحداث الأدوات،
+  فاربط المزوّد مع [حاضنة وكيل](/ar/plugins/sdk-agent-harness)
+  بدلًا من وضع تفاصيل بروتوكول الـ daemon في النواة.
 </Tip>
 
-## الشرح العملي
+## الشرح التفصيلي
 
 <Steps>
   <a id="step-1-package-and-manifest"></a>
-  <Step title="الحزمة وmanifest">
+  <Step title="الحزمة والبيان">
     <CodeGroup>
     ```json package.json
     {
@@ -96,18 +96,18 @@ x-i18n:
     ```
     </CodeGroup>
 
-    تعلن manifest عن `providerAuthEnvVars` حتى يتمكن OpenClaw من اكتشاف
-    بيانات الاعتماد من دون تحميل وقت تشغيل Plugin الخاص بك. أضف `providerAuthAliases`
-    عندما ينبغي لمتغير موفّر ما أن يعيد استخدام مصادقة معرّف موفّر آخر. ويُعد `modelSupport`
-    اختياريًا ويتيح لـ OpenClaw تحميل Plugin الموفّر لديك تلقائيًا من
-    معرّفات نماذج مختصرة مثل `acme-large` قبل وجود خطافات وقت التشغيل. وإذا نشرت
-    الموفّر على ClawHub، فإن حقلي `openclaw.compat` و`openclaw.build`
-    في `package.json` يصبحان مطلوبين.
+    يعرّف البيان `providerAuthEnvVars` بحيث يتمكن OpenClaw من اكتشاف
+    بيانات الاعتماد دون تحميل وقت تشغيل Plugin الخاص بك. أضف `providerAuthAliases`
+    عندما يجب أن يعيد أحد أشكال المزوّد استخدام مصادقة معرّف مزوّد آخر. يعد `modelSupport`
+    اختياريًا، ويسمح لـ OpenClaw بتحميل Plugin المزوّد تلقائيًا من
+    معرّفات النماذج المختصرة مثل `acme-large` قبل وجود وسائط ربط وقت التشغيل. إذا نشرت
+    المزوّد على ClawHub، فإن حقول `openclaw.compat` و `openclaw.build`
+    مطلوبة في `package.json`.
 
   </Step>
 
-  <Step title="سجّل الموفّر">
-    يحتاج الحد الأدنى من الموفّر إلى `id` و`label` و`auth` و`catalog`:
+  <Step title="تسجيل المزوّد">
+    يحتاج الحد الأدنى من المزوّد إلى `id` و`label` و`auth` و`catalog`:
 
     ```typescript index.ts
     import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
@@ -178,12 +178,12 @@ x-i18n:
     });
     ```
 
-    هذا موفّر عامل. ويمكن للمستخدمين الآن
+    هذا مزوّد يعمل بالفعل. يمكن للمستخدمين الآن
     `openclaw onboard --acme-ai-api-key <key>` ثم اختيار
-    `acme-ai/acme-large` كنموذجهم.
+    `acme-ai/acme-large` كنموذج لهم.
 
-    وإذا كان الموفّر العلوي يستخدم رموز تحكم مختلفة عن OpenClaw، فأضف
-    تحويلًا نصيًا صغيرًا ثنائي الاتجاه بدلًا من استبدال مسار البث:
+    إذا كان المزوّد upstream يستخدم رموز تحكم مختلفة عن OpenClaw، فأضف
+    تحويلًا نصيًا صغيرًا ثنائي الاتجاه بدلًا من استبدال مسار التدفق:
 
     ```typescript
     api.registerTextTransforms({
@@ -200,12 +200,12 @@ x-i18n:
     });
     ```
 
-    يقوم `input` بإعادة كتابة موجّه النظام النهائي ومحتوى الرسائل النصية قبل
-    النقل. ويقوم `output` بإعادة كتابة دلتا نصوص المساعد والنص النهائي قبل
-    أن يحلل OpenClaw علامات التحكم الخاصة به أو تسليم القناة.
+    يعيد `input` كتابة مطالبة النظام النهائية ومحتوى الرسائل النصية قبل
+    النقل. ويعيد `output` كتابة دلتا نصوص المساعد والنص النهائي قبل
+    أن يحلل OpenClaw علامات التحكم الخاصة به أو تسليم القنوات.
 
-    بالنسبة إلى الموفّرين المضمّنين الذين يسجلون فقط موفّر نص واحد مع مصادقة
-    بمفتاح API بالإضافة إلى وقت تشغيل واحد مدعوم بفهرس، ففضّل
+    بالنسبة إلى المزوّدين المضمّنين الذين يسجلون فقط مزوّد نص واحدًا بمصادقة
+    مفتاح API بالإضافة إلى وقت تشغيل واحد مدعوم بكتالوج، ففضّل
     المساعد الأضيق `defineSingleProviderPluginEntry(...)`:
 
     ```typescript
@@ -241,25 +241,26 @@ x-i18n:
     });
     ```
 
-    وإذا كان تدفق المصادقة لديك يحتاج أيضًا إلى تصحيح `models.providers.*`، والأسماء المستعارة، و
-    النموذج الافتراضي للعامل أثناء التهيئة، فاستخدم مساعدات الإعداد المسبق من
-    `openclaw/plugin-sdk/provider-onboard`. وأضيق هذه المساعدات هي
+    إذا كان تدفق المصادقة لديك يحتاج أيضًا إلى تعديل `models.providers.*`، والأسماء المستعارة،
+    والنموذج الافتراضي للوكيل أثناء onboard، فاستخدم مساعدات الإعداد المسبق من
+    `openclaw/plugin-sdk/provider-onboard`. أضيق هذه المساعدات هي
     `createDefaultModelPresetAppliers(...)`،
     و`createDefaultModelsPresetAppliers(...)`، و
     `createModelCatalogPresetAppliers(...)`.
 
-    وعندما تدعم نقطة النهاية الأصلية للموفّر كتل الاستخدام المتدفقة على
-    النقل العادي `openai-completions`، ففضّل المساعدات المشتركة للفهرس في
-    `openclaw/plugin-sdk/provider-catalog-shared` بدلًا من تضمين فحوصات
-    لمعرّف الموفّر بشكل ثابت. إذ يقوم `supportsNativeStreamingUsageCompat(...)` و
+    عندما تدعم نقطة النهاية الأصلية الخاصة بمزوّد ما كتل استخدام متدفقة على
+    نقل `openai-completions` العادي، ففضّل مساعدات الكتالوج المشتركة في
+    `openclaw/plugin-sdk/provider-catalog-shared` بدلًا من ترميز عمليات تحقق
+    معرّف المزوّد بشكل صلب. تقوم
+    `supportsNativeStreamingUsageCompat(...)` و
     `applyProviderNativeStreamingUsageCompat(...)` باكتشاف الدعم من خريطة قدرات
-    نقطة النهاية، بحيث تستمر نقاط النهاية الأصلية على نمط Moonshot/DashScope
-    في الاشتراك حتى عندما يستخدم Plugin معرّف موفّر مخصصًا.
+    نقطة النهاية، بحيث تظل نقاط النهاية الأصلية على نمط Moonshot/DashScope
+    منضمّة حتى عندما يستخدم Plugin معرّف مزوّدًا مخصصًا.
 
   </Step>
 
-  <Step title="أضف حلًا ديناميكيًا للنماذج">
-    إذا كان موفّرك يقبل معرّفات نماذج اعتباطية (مثل الوكيل أو الموجّه)،
+  <Step title="إضافة حل ديناميكي للنموذج">
+    إذا كان مزوّدك يقبل معرّفات نماذج عشوائية (مثل proxy أو router)،
     فأضف `resolveDynamicModel`:
 
     ```typescript
@@ -281,17 +282,17 @@ x-i18n:
     });
     ```
 
-    وإذا كان الحل يتطلب استدعاءً للشبكة، فاستخدم `prepareDynamicModel` من أجل
-    التهيئة غير المتزامنة — إذ يُشغَّل `resolveDynamicModel` مرة أخرى بعد اكتمالها.
+    إذا كان الحل يتطلب استدعاءً للشبكة، فاستخدم `prepareDynamicModel` من أجل
+    الإحماء غير المتزامن — يتم تشغيل `resolveDynamicModel` مرة أخرى بعد اكتماله.
 
   </Step>
 
-  <Step title="أضف خطافات وقت التشغيل (عند الحاجة)">
-    تحتاج معظم الموفّرات فقط إلى `catalog` + `resolveDynamicModel`. وأضف الخطافات
-    تدريجيًا بحسب احتياجات موفّرك.
+  <Step title="إضافة وسائط ربط وقت التشغيل (عند الحاجة)">
+    لا تحتاج معظم المزوّدات إلا إلى `catalog` و`resolveDynamicModel`. أضف الوسائط
+    تدريجيًا بحسب ما يتطلبه مزوّدك.
 
-    تغطي بناة المساعدات المشتركة الآن عائلات إعادة التشغيل/توافق الأدوات
-    الأكثر شيوعًا، لذلك لا تحتاج Plugins عادة إلى ربط كل خطاف يدويًا واحدًا واحدًا:
+    تغطي أدوات البناء المساعدة المشتركة الآن أكثر عائلات إعادة التشغيل/توافق الأدوات
+    شيوعًا، لذلك لا تحتاج Plugins عادةً إلى توصيل كل وسيط ربط يدويًا واحدًا تلو الآخر:
 
     ```typescript
     import { buildProviderReplayFamilyHooks } from "openclaw/plugin-sdk/provider-model-shared";
@@ -311,17 +312,17 @@ x-i18n:
     });
     ```
 
-    عائلات إعادة التشغيل المتاحة حاليًا:
+    عائلات إعادة التشغيل المتاحة اليوم:
 
-    | العائلة | ما الذي تضيفه |
+    | العائلة | ما الذي توصله |
     | --- | --- |
-    | `openai-compatible` | سياسة إعادة تشغيل مشتركة على نمط OpenAI لوسائل النقل المتوافقة مع OpenAI، بما في ذلك تنقية معرّف استدعاء الأداة، وإصلاحات ترتيب المساعد أولًا، والتحقق العام من أدوار Gemini عندما يحتاج النقل إلى ذلك |
-    | `anthropic-by-model` | سياسة إعادة تشغيل واعية بـ Claude تُختار بواسطة `modelId`، بحيث لا تحصل وسائل نقل رسائل Anthropic إلا على تنظيف كتل التفكير الخاصة بـ Claude عندما يكون النموذج المحلول فعلًا معرّف Claude |
-    | `google-gemini` | سياسة إعادة تشغيل Gemini الأصلية بالإضافة إلى تنقية إعادة تشغيل التمهيد ووضع مخرجات الاستدلال الموسومة |
-    | `passthrough-gemini` | تنقية thought-signature الخاصة بـ Gemini للنماذج التي تعمل عبر وسائل نقل وكيلة متوافقة مع OpenAI؛ ولا يفعّل التحقق الأصلي من إعادة تشغيل Gemini أو إعادات كتابة التمهيد |
-    | `hybrid-anthropic-openai` | سياسة هجينة للموفّرين الذين يمزجون بين أسطح نماذج رسائل Anthropic والأسطح المتوافقة مع OpenAI في Plugin واحد؛ ويظل إسقاط كتل التفكير الخاصة بـ Claude فقط اختياريًا ومحصورًا في جانب Anthropic |
+    | `openai-compatible` | سياسة إعادة تشغيل مشتركة على نمط OpenAI لعمليات النقل المتوافقة مع OpenAI، بما في ذلك تنقية tool-call-id، وإصلاحات ترتيب assistant-first، والتحقق العام من أدوار Gemini عندما يحتاج النقل إلى ذلك |
+    | `anthropic-by-model` | سياسة إعادة تشغيل مدركة لـ Claude يتم اختيارها بواسطة `modelId`، بحيث لا تحصل عمليات نقل رسائل Anthropic على تنظيف كتل التفكير الخاصة بـ Claude إلا عندما يكون النموذج الذي تم حله في الواقع معرّف Claude |
+    | `google-gemini` | سياسة إعادة تشغيل Gemini الأصلية بالإضافة إلى تنقية إعادة التشغيل الابتدائية ووضع إخراج الاستدلال الموسوم |
+    | `passthrough-gemini` | تنقية thought-signature الخاصة بـ Gemini للنماذج التي تعمل عبر عمليات نقل proxy متوافقة مع OpenAI؛ ولا يفعّل التحقق الأصلي من إعادة تشغيل Gemini أو إعادة كتابة التهيئة الابتدائية |
+    | `hybrid-anthropic-openai` | سياسة هجينة للمزوّدين الذين يخلطون بين أسطح نماذج رسائل Anthropic والأسطح المتوافقة مع OpenAI داخل Plugin واحد؛ ويظل إسقاط كتل التفكير الاختياري الخاصة بـ Claude محصورًا في جانب Anthropic |
 
-    أمثلة مضمّنة فعلية:
+    أمثلة حقيقية مضمّنة:
 
     - `google` و`google-gemini-cli`: ‏`google-gemini`
     - `openrouter` و`kilocode` و`opencode` و`opencode-go`: ‏`passthrough-gemini`
@@ -329,19 +330,19 @@ x-i18n:
     - `minimax`: ‏`hybrid-anthropic-openai`
     - `moonshot` و`ollama` و`xai` و`zai`: ‏`openai-compatible`
 
-    عائلات البث المتاحة حاليًا:
+    عائلات التدفق المتاحة اليوم:
 
-    | العائلة | ما الذي تضيفه |
+    | العائلة | ما الذي توصله |
     | --- | --- |
-    | `google-thinking` | تطبيع حمولة التفكير الخاصة بـ Gemini على مسار البث المشترك |
-    | `kilocode-thinking` | غلاف الاستدلال الخاص بـ Kilo على مسار البث الوكيل المشترك، مع تخطي التفكير المحقون في `kilo/auto` ومعرّفات الاستدلال الوكيل غير المدعومة |
-    | `moonshot-thinking` | ربط حمولة التفكير الأصلي الثنائي في Moonshot انطلاقًا من الإعداد + مستوى `/think` |
-    | `minimax-fast-mode` | إعادة كتابة نموذج الوضع السريع في MiniMax على مسار البث المشترك |
-    | `openai-responses-defaults` | أغلفة Responses الأصلية المشتركة لـ OpenAI/Codex: ترويسات النسب، و`/fast`/`serviceTier`، وشدة النص، والبحث الأصلي على الويب في Codex، وتشكيل حمولة التوافق مع الاستدلال، وإدارة سياق Responses |
-    | `openrouter-thinking` | غلاف الاستدلال الخاص بـ OpenRouter لمسارات الوكيل، مع معالجة تخطي النماذج غير المدعومة/`auto` مركزيًا |
-    | `tool-stream-default-on` | غلاف `tool_stream` مفعّل افتراضيًا لموفّرين مثل Z.AI يريدون بث الأدوات ما لم يُعطّل صراحة |
+    | `google-thinking` | تطبيع حمولة التفكير الخاصة بـ Gemini على مسار التدفق المشترك |
+    | `kilocode-thinking` | غلاف الاستدلال الخاص بـ Kilo على مسار تدفق proxy المشترك، مع تخطي `kilo/auto` ومعرّفات الاستدلال غير المدعومة للـ proxy لحقن التفكير |
+    | `moonshot-thinking` | تعيين حمولة native-thinking الثنائية الخاصة بـ Moonshot انطلاقًا من الإعداد + مستوى `/think` |
+    | `minimax-fast-mode` | إعادة كتابة نموذج الوضع السريع لـ MiniMax على مسار التدفق المشترك |
+    | `openai-responses-defaults` | أغلفة Responses الأصلية المشتركة لـ OpenAI/Codex: رؤوس الإسناد، و`/fast`/`serviceTier`، ودرجة إسهاب النص، والبحث الأصلي على الويب في Codex، وتشكيل حمولة توافق الاستدلال، وإدارة سياق Responses |
+    | `openrouter-thinking` | غلاف الاستدلال الخاص بـ OpenRouter لمسارات proxy، مع التعامل مركزيًا مع تخطي النماذج غير المدعومة/`auto` |
+    | `tool-stream-default-on` | غلاف `tool_stream` مفعّل افتراضيًا لمزوّدين مثل Z.AI الذين يريدون تدفق الأدوات ما لم يتم تعطيله صراحةً |
 
-    أمثلة مضمّنة فعلية:
+    أمثلة حقيقية مضمّنة:
 
     - `google` و`google-gemini-cli`: ‏`google-thinking`
     - `kilocode`: ‏`kilocode-thinking`
@@ -351,13 +352,13 @@ x-i18n:
     - `openrouter`: ‏`openrouter-thinking`
     - `zai`: ‏`tool-stream-default-on`
 
-    يصدّر `openclaw/plugin-sdk/provider-model-shared` أيضًا تعداد عائلات إعادة التشغيل
-    بالإضافة إلى المساعدات المشتركة التي تُبنى منها هذه العائلات. وتشمل
-    التصديرات العامة الشائعة:
+    يصدّر `openclaw/plugin-sdk/provider-model-shared` أيضًا تعداد
+    عائلات إعادة التشغيل بالإضافة إلى المساعدات المشتركة التي تُبنى منها تلك العائلات. ومن
+    الصادرات العامة الشائعة:
 
     - `ProviderReplayFamily`
     - `buildProviderReplayFamilyHooks(...)`
-    - بناة إعادة التشغيل المشتركة مثل `buildOpenAICompatibleReplayPolicy(...)`،
+    - أدوات بناء إعادة التشغيل المشتركة مثل `buildOpenAICompatibleReplayPolicy(...)`،
       و`buildAnthropicReplayPolicyForModel(...)`،
       و`buildGoogleGeminiReplayPolicy(...)`، و
       `buildHybridAnthropicOrOpenAIReplayPolicy(...)`
@@ -367,9 +368,9 @@ x-i18n:
       و`normalizeProviderId(...)`، و`normalizeGooglePreviewModelId(...)`، و
       `normalizeNativeXaiModelId(...)`
 
-    يوفّر `openclaw/plugin-sdk/provider-stream` كلًا من باني العائلة
-    ومساعدات الأغلفة العامة التي تعيد هذه العائلات استخدامها. وتشمل
-    التصديرات العامة الشائعة:
+    يوفّر `openclaw/plugin-sdk/provider-stream` كلًا من أداة بناء العائلة
+    ومساعدات الأغلفة العامة التي تعيد تلك العائلات استخدامها. وتشمل
+    الصادرات العامة الشائعة:
 
     - `ProviderStreamFamily`
     - `buildProviderStreamFamilyHooks(...)`
@@ -377,55 +378,55 @@ x-i18n:
     - أغلفة OpenAI/Codex المشتركة مثل
       `createOpenAIAttributionHeadersWrapper(...)`،
       و`createOpenAIFastModeWrapper(...)`،
-      و`createOpenAIServiceTierWrapper(...)`،
+      و`createOpenAIServiceTierWrapper(...)`,
       و`createOpenAIResponsesContextManagementWrapper(...)`، و
       `createCodexNativeWebSearchWrapper(...)`
-    - أغلفة الوكيل/الموفّر المشتركة مثل `createOpenRouterWrapper(...)`،
+    - أغلفة proxy/المزوّد المشتركة مثل `createOpenRouterWrapper(...)`،
       و`createToolStreamWrapper(...)`، و`createMinimaxFastModeWrapper(...)`
 
-    تبقى بعض مساعدات البث محلية للموفّر عمدًا. والمثال المضمّن الحالي:
+    تبقى بعض مساعدات التدفق محلية للمزوّد عمدًا. المثال المضمّن الحالي:
     يصدّر `@openclaw/anthropic-provider`
-    الدوال `wrapAnthropicProviderStream`، و`resolveAnthropicBetas`،
-    و`resolveAnthropicFastMode`، و`resolveAnthropicServiceTier`، بالإضافة إلى
-    بناة أغلفة Anthropic منخفضة المستوى من السطح العام `api.ts` /
-    `contract-api.ts`. وتظل هذه المساعدات خاصة بـ Anthropic لأنها
-    ترمز أيضًا إلى معالجة Claude OAuth beta وتقييد `context1m`.
+    `wrapAnthropicProviderStream`، و`resolveAnthropicBetas`،
+    و`resolveAnthropicFastMode`، و`resolveAnthropicServiceTier`، و
+    أدوات بناء الأغلفة الأدنى مستوى الخاصة بـ Anthropic من واجهة `api.ts` /
+    `contract-api.ts` العامة الخاصة به. تظل هذه المساعدات خاصة بـ Anthropic لأن
+    ترمّز أيضًا التعامل مع Claude OAuth beta وضبط `context1m`.
 
-    كما تحتفظ موفّرات مضمّنة أخرى بأغلفة النقل الخاصة بها محليًا عندما
-    لا يمكن مشاركة السلوك بشكل نظيف عبر العائلات. والمثال الحالي: يحتفظ
+    تحتفظ مزوّدات مضمّنة أخرى أيضًا بأغلفة خاصة بالنقل محليًا عندما
+    لا يكون السلوك مشتركًا بصورة نظيفة بين العائلات. المثال الحالي: يحتفظ
     Plugin ‏xAI المضمّن بتشكيل Responses الأصلي الخاص بـ xAI داخل
-    `wrapStreamFn` الخاص به، بما في ذلك إعادة كتابة الأسماء المستعارة `/fast`،
+    `wrapStreamFn` الخاص به، بما في ذلك إعادة كتابة الأسماء المستعارة لـ `/fast`،
     و`tool_stream` الافتراضي، وتنظيف الأدوات الصارمة غير المدعومة، وإزالة
     حمولة الاستدلال الخاصة بـ xAI.
 
-    يوفّر `openclaw/plugin-sdk/provider-tools` حاليًا عائلة مشتركة واحدة
-    لمخطط الأدوات بالإضافة إلى مساعدات مشتركة للمخطط/التوافق:
+    يكشف `openclaw/plugin-sdk/provider-tools` حاليًا عن عائلة مشتركة واحدة
+    لمخططات الأدوات بالإضافة إلى مساعدات المخطط/التوافق المشتركة:
 
-    - يوثّق `ProviderToolCompatFamily` قائمة العائلات المشتركة الحالية.
-    - يربط `buildProviderToolCompatFamilyHooks("gemini")` بين تنظيف مخطط Gemini
-      + التشخيصات للموفّرين الذين يحتاجون إلى مخططات أدوات آمنة لـ Gemini.
-    - يُعد `normalizeGeminiToolSchemas(...)` و`inspectGeminiToolSchemas(...)`
-      المساعدَين العامَّين الأساسيين لمخطط Gemini.
-    - يعيد `resolveXaiModelCompatPatch()` تصحيح التوافق المضمّن لـ xAI:
-      ‏`toolSchemaProfile: "xai"`، والكلمات المفتاحية غير المدعومة في المخطط، والدعم الأصلي
-      لـ `web_search`، وفك ترميز وسائط استدعاء الأدوات ذات كيانات HTML.
-    - يطبق `applyXaiModelCompat(model)` تصحيح التوافق نفسه الخاص بـ xAI على
-      نموذج محلول قبل أن يصل إلى المشغّل.
+    - يوضّح `ProviderToolCompatFamily` قائمة العائلات المشتركة الحالية.
+    - يقوم `buildProviderToolCompatFamilyHooks("gemini")` بتوصيل
+      تنظيف مخطط Gemini + التشخيصات للمزوّدين الذين يحتاجون إلى مخططات أدوات آمنة مع Gemini.
+    - `normalizeGeminiToolSchemas(...)` و`inspectGeminiToolSchemas(...)`
+      هما مساعدا مخطط Gemini العامّان الأساسيان.
+    - يعيد `resolveXaiModelCompatPatch()` تصحيح التوافق المضمّن الخاص بـ xAI:
+      `toolSchemaProfile: "xai"`، وكلمات مخطط أساسية غير مدعومة، ودعم
+      `web_search` الأصلي، وفك ترميز وسائط استدعاء الأدوات بكيانات HTML.
+    - يطبّق `applyXaiModelCompat(model)` تصحيح توافق xAI نفسه على
+      نموذج تم حله قبل أن يصل إلى المشغّل.
 
-    مثال مضمّن فعلي: يستخدم Plugin ‏xAI الدالتين `normalizeResolvedModel` بالإضافة إلى
-    `contributeResolvedModelCompat` لإبقاء بيانات التوافق الوصفية هذه مملوكة من
-    الموفّر بدلًا من تضمين قواعد xAI في النواة.
+    مثال حقيقي مضمّن: يستخدم Plugin ‏xAI كلًا من `normalizeResolvedModel` و
+    `contributeResolvedModelCompat` للإبقاء على بيانات التوافق الوصفية هذه
+    مملوكة للمزوّد بدلًا من ترميز قواعد xAI بشكل صلب داخل النواة.
 
-    ويدعم النمط نفسه القائم على جذر الحزمة موفّرات مضمّنة أخرى أيضًا:
+    ويدعم نمط جذر الحزمة نفسه أيضًا مزوّدات مضمّنة أخرى:
 
-    - `@openclaw/openai-provider`: يصدّر `api.ts` بناة الموفّر،
-      ومساعدات النموذج الافتراضي، وبناة الموفّر اللحظي
-    - `@openclaw/openrouter-provider`: يصدّر `api.ts` باني الموفّر
-      بالإضافة إلى مساعدات التهيئة/الإعداد
+    - `@openclaw/openai-provider`: يصدّر `api.ts` أدوات بناء المزوّد،
+      ومساعدات النموذج الافتراضي، وأدوات بناء المزوّدات اللحظية
+    - `@openclaw/openrouter-provider`: يصدّر `api.ts` أداة بناء المزوّد
+      بالإضافة إلى مساعدات onboard/config
 
     <Tabs>
-      <Tab title="تبادل الرموز">
-        بالنسبة إلى الموفّرين الذين يحتاجون إلى تبادل رمز قبل كل استدعاء استدلال:
+      <Tab title="تبادل الرموز المميّزة">
+        بالنسبة إلى المزوّدين الذين يحتاجون إلى تبادل رمز مميّز قبل كل استدعاء استدلال:
 
         ```typescript
         prepareRuntimeAuth: async (ctx) => {
@@ -438,8 +439,8 @@ x-i18n:
         },
         ```
       </Tab>
-      <Tab title="ترويسات مخصصة">
-        بالنسبة إلى الموفّرين الذين يحتاجون إلى ترويسات طلب مخصصة أو تعديلات على جسم الطلب:
+      <Tab title="رؤوس مخصصة">
+        بالنسبة إلى المزوّدين الذين يحتاجون إلى رؤوس طلبات مخصصة أو تعديلات على جسم الطلب:
 
         ```typescript
         // wrapStreamFn returns a StreamFn derived from ctx.streamFn
@@ -457,8 +458,8 @@ x-i18n:
         ```
       </Tab>
       <Tab title="هوية النقل الأصلية">
-        بالنسبة إلى الموفّرين الذين يحتاجون إلى ترويسات أو بيانات وصفية أصلية للطلب/الجلسة على
-        وسائل النقل العامة HTTP أو WebSocket:
+        بالنسبة إلى المزوّدين الذين يحتاجون إلى رؤوس طلب/جلسة أصلية أو بيانات وصفية على
+        عمليات نقل HTTP أو WebSocket العامة:
 
         ```typescript
         resolveTransportTurnState: (ctx) => ({
@@ -479,7 +480,7 @@ x-i18n:
         ```
       </Tab>
       <Tab title="الاستخدام والفوترة">
-        بالنسبة إلى الموفّرين الذين يعرضون بيانات الاستخدام/الفوترة:
+        بالنسبة إلى المزوّدين الذين يوفّرون بيانات الاستخدام/الفوترة:
 
         ```typescript
         resolveUsageAuth: async (ctx) => {
@@ -493,86 +494,85 @@ x-i18n:
       </Tab>
     </Tabs>
 
-    <Accordion title="جميع خطافات الموفّر المتاحة">
-      يستدعي OpenClaw الخطافات بهذا الترتيب. ومعظم الموفّرين يستخدمون 2-3 فقط:
+    <Accordion title="جميع وسائط ربط المزوّد المتاحة">
+      يستدعي OpenClaw وسائط الربط بهذا الترتيب. تستخدم معظم المزوّدات 2-3 فقط:
 
-      | # | الخطاف | متى يُستخدم |
+      | # | وسيط الربط | متى يُستخدم |
       | --- | --- | --- |
-      | 1 | `catalog` | فهرس النماذج أو افتراضيات عنوان URL الأساسي |
-      | 2 | `applyConfigDefaults` | افتراضيات عامة مملوكة للموفّر أثناء تشكيل الإعداد |
+      | 1 | `catalog` | كتالوج النماذج أو القيم الافتراضية لـ base URL |
+      | 2 | `applyConfigDefaults` | القيم الافتراضية العامة المملوكة للمزوّد أثناء تجسيد config |
       | 3 | `normalizeModelId` | تنظيف الأسماء المستعارة القديمة/المعاينة لمعرّف النموذج قبل البحث |
-      | 4 | `normalizeTransport` | تنظيف `api` / `baseUrl` الخاص بعائلة الموفّر قبل التجميع العام للنموذج |
-      | 5 | `normalizeConfig` | تطبيع إعداد `models.providers.<id>` |
-      | 6 | `applyNativeStreamingUsageCompat` | إعادات كتابة توافق استخدام البث الأصلي لموفّري الإعداد |
-      | 7 | `resolveConfigApiKey` | حل المصادقة بعلامات البيئة المملوك من الموفّر |
-      | 8 | `resolveSyntheticAuth` | مصادقة اصطناعية محلية/مستضافة ذاتيًا أو مدعومة بالإعداد |
-      | 9 | `shouldDeferSyntheticProfileAuth` | إنزال أولوية العناصر النائبة الاصطناعية المخزنة خلف مصادقة البيئة/الإعداد |
-      | 10 | `resolveDynamicModel` | قبول معرّفات نماذج علوية اعتباطية |
+      | 4 | `normalizeTransport` | تنظيف `api` / `baseUrl` الخاص بعائلة المزوّد قبل التجميع العام للنموذج |
+      | 5 | `normalizeConfig` | تطبيع config الخاص بـ `models.providers.<id>` |
+      | 6 | `applyNativeStreamingUsageCompat` | إعادة كتابة توافق الاستخدام المتدفق الأصلي لمزوّدات config |
+      | 7 | `resolveConfigApiKey` | حل مصادقة env-marker المملوكة للمزوّد |
+      | 8 | `resolveSyntheticAuth` | مصادقة اصطناعية محلية/مستضافة ذاتيًا أو مدعومة بـ config |
+      | 9 | `shouldDeferSyntheticProfileAuth` | خفض أولوية العناصر النائبة للملفات الشخصية الاصطناعية المخزنة خلف مصادقة env/config |
+      | 10 | `resolveDynamicModel` | قبول معرّفات نماذج upstream عشوائية |
       | 11 | `prepareDynamicModel` | جلب بيانات وصفية غير متزامن قبل الحل |
-      | 12 | `normalizeResolvedModel` | إعادات كتابة النقل قبل المشغّل |
+      | 12 | `normalizeResolvedModel` | إعادة كتابة النقل قبل المشغّل |
 
-    ملاحظات الرجوع الاحتياطي وقت التشغيل:
+    ملاحظات احتياطية لوقت التشغيل:
 
-    - يتحقق `normalizeConfig` أولًا من الموفّر المطابق، ثم من Plugins
-      الموفّر الأخرى القادرة على استخدام الخطاف حتى يقوم أحدها فعلًا بتغيير
-      الإعداد. وإذا لم يُعد أي خطاف موفّر كتابة إدخال إعداد مدعوم من عائلة Google،
-      فسيظل مطبّع إعداد Google المضمّن يُطبَّق.
-    - يستخدم `resolveConfigApiKey` خطاف الموفّر عندما يكون مكشوفًا. كما يحتوي
-      المسار المضمّن `amazon-bedrock` أيضًا على محلّل مدمج لعلامات بيئة AWS هنا،
-      رغم أن مصادقة وقت تشغيل Bedrock نفسها لا تزال تستخدم السلسلة
-      الافتراضية لـ AWS SDK.
-      | 13 | `contributeResolvedModelCompat` | إشارات التوافق لنماذج المورّد خلف نقل متوافق آخر |
-      | 14 | `capabilities` | حقيبة قدرات ثابتة قديمة؛ للتوافق فقط |
-      | 15 | `normalizeToolSchemas` | تنظيف مخطط الأدوات المملوك من الموفّر قبل التسجيل |
-      | 16 | `inspectToolSchemas` | تشخيصات مخطط الأدوات المملوكة من الموفّر |
-      | 17 | `resolveReasoningOutputMode` | عقد مخرجات الاستدلال الموسومة مقابل الأصلية |
-      | 18 | `prepareExtraParams` | معاملات الطلب الافتراضية |
+    - يتحقق `normalizeConfig` من المزوّد المطابق أولًا، ثم من Plugins المزوّد الأخرى
+      القادرة على استخدام وسائط الربط إلى أن يغيّر أحدها config بالفعل.
+      وإذا لم تعِد كتابة أي من وسائط ربط المزوّد إدخال config مدعومًا لعائلة Google،
+      فسيظل مطبّع config المضمّن الخاص بـ Google مطبقًا.
+    - يستخدم `resolveConfigApiKey` وسيط ربط المزوّد عندما يكون مكشوفًا. كما أن
+      المسار المضمّن لـ `amazon-bedrock` يحتوي هنا أيضًا على محلّل env-marker
+      مضمّن خاص بـ AWS، رغم أن مصادقة وقت تشغيل Bedrock نفسها لا تزال تستخدم
+      سلسلة AWS SDK الافتراضية.
+      | 13 | `contributeResolvedModelCompat` | إشارات توافق لنماذج المورّدين خلف نقل متوافق آخر |
+      | 14 | `capabilities` | حزمة قدرات ثابتة قديمة؛ للتوافق فقط |
+      | 15 | `normalizeToolSchemas` | تنظيف مخططات الأدوات المملوك للمزوّد قبل التسجيل |
+      | 16 | `inspectToolSchemas` | تشخيصات مخططات الأدوات المملوكة للمزوّد |
+      | 17 | `resolveReasoningOutputMode` | عقد إخراج الاستدلال بين الموسوم والأصلي |
+      | 18 | `prepareExtraParams` | معلمات الطلب الافتراضية |
       | 19 | `createStreamFn` | نقل StreamFn مخصص بالكامل |
-      | 20 | `wrapStreamFn` | أغلفة ترويسات/جسم مخصصة على مسار البث العادي |
-      | 21 | `resolveTransportTurnState` | ترويسات/بيانات وصفية أصلية لكل دورة |
-      | 22 | `resolveWebSocketSessionPolicy` | ترويسات جلسة WS أصلية/فترة تهدئة |
+      | 20 | `wrapStreamFn` | أغلفة رؤوس/أجسام مخصصة على مسار التدفق العادي |
+      | 21 | `resolveTransportTurnState` | رؤوس/بيانات وصفية أصلية لكل دور |
+      | 22 | `resolveWebSocketSessionPolicy` | رؤوس جلسة WS الأصلية/فترة التهدئة |
       | 23 | `formatApiKey` | شكل رمز وقت تشغيل مخصص |
       | 24 | `refreshOAuth` | تحديث OAuth مخصص |
       | 25 | `buildAuthDoctorHint` | إرشادات إصلاح المصادقة |
-      | 26 | `matchesContextOverflowError` | كشف تجاوز مملوك من الموفّر |
-      | 27 | `classifyFailoverReason` | تصنيف مملوك من الموفّر لحد المعدل/التحميل الزائد |
-      | 28 | `isCacheTtlEligible` | تقييد TTL لذاكرة التخزين المؤقت للموجّه |
+      | 26 | `matchesContextOverflowError` | اكتشاف تجاوز السعة المملوك للمزوّد |
+      | 27 | `classifyFailoverReason` | تصنيف مملوك للمزوّد لحد المعدّل/زيادة الحمل |
+      | 28 | `isCacheTtlEligible` | ضبط أهلية TTL لذاكرة التخزين المؤقت للمطالبة |
       | 29 | `buildMissingAuthMessage` | تلميح مخصص عند غياب المصادقة |
-      | 30 | `suppressBuiltInModel` | إخفاء الصفوف العلوية القديمة |
-      | 31 | `augmentModelCatalog` | صفوف اصطناعية للتوافق المستقبلي |
-      | 32 | `isBinaryThinking` | التفكير الثنائي تشغيل/إيقاف |
-      | 33 | `supportsXHighThinking` | دعم الاستدلال `xhigh` |
-      | 34 | `supportsAdaptiveThinking` | دعم التفكير التكيفي |
-      | 35 | `supportsMaxThinking` | دعم `max` |
-      | 36 | `resolveDefaultThinkingLevel` | سياسة `/think` الافتراضية |
-      | 37 | `isModernModelRef` | مطابقة النماذج الحية/الاختبارية |
-      | 38 | `prepareRuntimeAuth` | تبادل الرموز قبل الاستدلال |
-      | 39 | `resolveUsageAuth` | تحليل مخصص لبيانات اعتماد الاستخدام |
-      | 40 | `fetchUsageSnapshot` | نقطة نهاية استخدام مخصصة |
-      | 41 | `createEmbeddingProvider` | مهيئ تضمين مملوك من الموفّر للذاكرة/البحث |
-      | 42 | `buildReplayPolicy` | سياسة مخصصة لإعادة تشغيل/Compaction النص |
-      | 43 | `sanitizeReplayHistory` | إعادات كتابة خاصة بالموفّر لسجل إعادة التشغيل بعد التنظيف العام |
-      | 44 | `validateReplayTurns` | تحقق صارم من دورات إعادة التشغيل قبل المشغّل المضمّن |
-      | 45 | `onModelSelected` | callback بعد الاختيار (مثل القياس عن بُعد) |
+      | 30 | `suppressBuiltInModel` | إخفاء الصفوف القديمة من upstream |
+      | 31 | `augmentModelCatalog` | صفوف اصطناعية لتوافق مستقبلي |
+      | 32 | `resolveThinkingProfile` | مجموعة خيارات `/think` خاصة بالنموذج |
+      | 33 | `isBinaryThinking` | توافق تشغيل/إيقاف التفكير الثنائي |
+      | 34 | `supportsXHighThinking` | توافق دعم الاستدلال `xhigh` |
+      | 35 | `resolveDefaultThinkingLevel` | توافق سياسة `/think` الافتراضية |
+      | 36 | `isModernModelRef` | مطابقة النموذج المباشر/الاختبار الدخاني |
+      | 37 | `prepareRuntimeAuth` | تبادل رمز مميّز قبل الاستدلال |
+      | 38 | `resolveUsageAuth` | تحليل بيانات اعتماد الاستخدام المخصص |
+      | 39 | `fetchUsageSnapshot` | نقطة نهاية استخدام مخصصة |
+      | 40 | `createEmbeddingProvider` | موائم embeddings مملوك للمزوّد للذاكرة/البحث |
+      | 41 | `buildReplayPolicy` | سياسة مخصصة لإعادة تشغيل/Compaction النصوص |
+      | 42 | `sanitizeReplayHistory` | إعادة كتابة خاصة بالمزوّد لسجل إعادة التشغيل بعد التنظيف العام |
+      | 43 | `validateReplayTurns` | تحقق صارم من أدوار إعادة التشغيل قبل المشغّل المضمّن |
+      | 44 | `onModelSelected` | رد نداء بعد اختيار النموذج (مثل telemetry) |
 
-      ملاحظة حول ضبط الموجّه:
+      ملاحظة حول ضبط المطالبة:
 
-      - يتيح `resolveSystemPromptContribution` للموفّر حقن
-        إرشادات موجّه نظام واعية بالذاكرة المؤقتة لعائلة نماذج. ويفضَّل استخدامه بدلًا من
-        `before_prompt_build` عندما يكون السلوك تابعًا لموفّر/عائلة نماذج واحدة
-        ويجب أن يحافظ على تقسيم الذاكرة المؤقتة بين المستقر/الديناميكي.
+      - يتيح `resolveSystemPromptContribution` لمزوّد ما حقن
+        إرشادات مطالبة نظام مدركة للذاكرة المؤقتة لعائلة نماذج. فضّله بدلًا من
+        `before_prompt_build` عندما يكون السلوك تابعًا لمزوّد/عائلة نماذج واحدة
+        ويجب أن يحافظ على الفصل المستقر/الديناميكي للذاكرة المؤقتة.
 
-      للاطلاع على أوصاف تفصيلية وأمثلة واقعية، راجع
-      [الداخليات: خطافات وقت تشغيل الموفّر](/ar/plugins/architecture#provider-runtime-hooks).
+      للحصول على أوصاف تفصيلية وأمثلة واقعية، انظر
+      [الداخليات: وسائط ربط وقت تشغيل المزوّد](/ar/plugins/architecture#provider-runtime-hooks).
     </Accordion>
 
   </Step>
 
-  <Step title="أضف قدرات إضافية (اختياري)">
+  <Step title="إضافة قدرات إضافية (اختياري)">
     <a id="step-5-add-extra-capabilities"></a>
-    يمكن لـ Plugin الموفّر تسجيل الكلام، والنسخ الفوري، والصوت الفوري،
-    وفهم الوسائط، وتوليد الصور، وتوليد الفيديو، وجلب الويب،
-    والبحث على الويب إلى جانب الاستدلال النصي:
+    يمكن لـ Plugin المزوّد تسجيل الكلام، والنسخ اللحظي،
+    والصوت اللحظي، وفهم الوسائط، وتوليد الصور، وتوليد الفيديو، وجلب الويب،
+    والبحث على الويب إلى جانب استدلال النص:
 
     ```typescript
     register(api) {
@@ -655,7 +655,7 @@ x-i18n:
       api.registerWebFetchProvider({
         id: "acme-ai-fetch",
         label: "Acme Fetch",
-        hint: "Fetch pages through Acme's rendering backend.",
+        hint: "اجلب الصفحات عبر الواجهة الخلفية الخاصة بالعرض في Acme.",
         envVars: ["ACME_FETCH_API_KEY"],
         placeholder: "acme-...",
         signupUrl: "https://acme.example.com/fetch",
@@ -666,7 +666,7 @@ x-i18n:
           acme.apiKey = value;
         },
         createTool: () => ({
-          description: "Fetch a page through Acme Fetch.",
+          description: "اجلب صفحة عبر Acme Fetch.",
           parameters: {},
           execute: async (args) => ({ content: [] }),
         }),
@@ -680,24 +680,24 @@ x-i18n:
     }
     ```
 
-    يصنّف OpenClaw هذا على أنه Plugin **ذو قدرات هجينة**. وهذا هو
-    النمط الموصى به لـ Plugins الشركات (Plugin واحد لكل مورّد). راجع
+    يصنّف OpenClaw هذا على أنه Plugin **hybrid-capability**. وهذا هو
+    النمط الموصى به لـ Plugins الشركات (Plugin واحد لكل مورّد). انظر
     [الداخليات: ملكية القدرات](/ar/plugins/architecture#capability-ownership-model).
 
-    بالنسبة إلى توليد الفيديو، فضّل شكل القدرات الواعي بالأوضاع الموضح أعلاه:
-    `generate`، و`imageToVideo`، و`videoToVideo`. ولا تكفي الحقول
-    التجميعية المسطحة مثل `maxInputImages`، و`maxInputVideos`، و`maxDurationSeconds`
-    للإعلان عن دعم أوضاع التحويل أو الأوضاع المعطلة بشكل نظيف.
+    بالنسبة إلى توليد الفيديو، ففضّل بنية القدرات الواعية بالأوضاع الموضحة أعلاه:
+    `generate`، و`imageToVideo`، و`videoToVideo`. الحقول التجميعية المسطحة مثل
+    `maxInputImages`، و`maxInputVideos`، و`maxDurationSeconds` ليست
+    كافية للإعلان بوضوح عن دعم أوضاع التحويل أو الأوضاع المعطلة.
 
-    وينبغي لموفّري توليد الموسيقى اتباع النمط نفسه:
-    `generate` للتوليد المعتمد على الموجّه فقط، و`edit` للتوليد المعتمد
-    على صورة مرجعية. ولا تكفي الحقول التجميعية المسطحة مثل `maxInputImages`،
-    و`supportsLyrics`، و`supportsFormat` للإعلان عن دعم التحرير؛ إذ إن كتل
-    `generate` / `edit` الصريحة هي العقد المتوقع.
+    يجب أن تتبع مزوّدات توليد الموسيقى النمط نفسه:
+    `generate` للتوليد المعتمد على المطالبة فقط، و`edit` للتوليد المعتمد على صورة مرجعية.
+    الحقول التجميعية المسطحة مثل `maxInputImages`،
+    و`supportsLyrics`، و`supportsFormat` ليست كافية للإعلان عن دعم
+    التحرير؛ إذ إن كتل `generate` / `edit` الصريحة هي العقد المتوقع.
 
   </Step>
 
-  <Step title="اختبر">
+  <Step title="الاختبار">
     <a id="step-6-test"></a>
     ```typescript src/provider.test.ts
     import { describe, it, expect } from "vitest";
@@ -734,43 +734,43 @@ x-i18n:
 
 ## النشر إلى ClawHub
 
-تُنشر Plugins الموفّر بالطريقة نفسها مثل أي Plugin كود خارجي آخر:
+تُنشر Plugins المزوّدين بالطريقة نفسها مثل أي Plugin برمجي خارجي آخر:
 
 ```bash
 clawhub package publish your-org/your-plugin --dry-run
 clawhub package publish your-org/your-plugin
 ```
 
-لا تستخدم هنا الاسم المستعار القديم المخصص للنشر الخاص بـ Skills فقط؛ إذ يجب أن تستخدم
+لا تستخدم هنا الاسم المستعار القديم للنشر الخاص بالـ Skills فقط؛ يجب أن تستخدم
 حزم Plugins الأمر `clawhub package publish`.
 
 ## بنية الملفات
 
 ```
 <bundled-plugin-root>/acme-ai/
-├── package.json              # بيانات تعريف openclaw.providers
-├── openclaw.plugin.json      # Manifest مع بيانات تعريف مصادقة الموفّر
+├── package.json              # بيانات openclaw.providers الوصفية
+├── openclaw.plugin.json      # بيان مع بيانات وصفية لمصادقة المزوّد
 ├── index.ts                  # definePluginEntry + registerProvider
 └── src/
-    ├── provider.test.ts      # اختبارات
+    ├── provider.test.ts      # الاختبارات
     └── usage.ts              # نقطة نهاية الاستخدام (اختياري)
 ```
 
-## مرجع ترتيب الفهرس
+## مرجع ترتيب الكتالوج
 
-يتحكم `catalog.order` في وقت دمج فهرسك بالنسبة إلى
-الموفّرين المضمّنين:
+يتحكم `catalog.order` في وقت دمج كتالوجك بالنسبة إلى
+المزوّدين المضمّنين:
 
-| الترتيب   | متى            | حالة الاستخدام                                  |
-| --------- | -------------- | ----------------------------------------------- |
-| `simple`  | التمريرة الأولى | موفّرو مفاتيح API البسيطة                       |
-| `profile` | بعد simple     | موفّرون مقيدون بملفات تعريف المصادقة            |
-| `paired`  | بعد profile    | توليف عدة إدخالات مرتبطة                        |
-| `late`    | التمريرة الأخيرة | تجاوز الموفّرين الموجودين (يفوز عند التصادم)    |
+| الترتيب | متى | حالة الاستخدام |
+| --------- | ------------- | ----------------------------------------------- |
+| `simple`  | المرور الأول    | مزوّدات مفاتيح API البسيطة                         |
+| `profile` | بعد simple  | مزوّدات محكومة بملفات تعريف المصادقة                |
+| `paired`  | بعد profile | توليد عدة إدخالات مرتبطة             |
+| `late`    | المرور الأخير     | تجاوز المزوّدين الموجودين (يفوز عند التعارض) |
 
 ## الخطوات التالية
 
 - [Plugins القنوات](/ar/plugins/sdk-channel-plugins) — إذا كان Plugin الخاص بك يوفّر قناة أيضًا
-- [وقت تشغيل SDK](/ar/plugins/sdk-runtime) — مساعدات `api.runtime` ‏(TTS، والبحث، والعامل الفرعي)
-- [نظرة عامة على SDK](/ar/plugins/sdk-overview) — المرجع الكامل للاستيراد عبر المسارات الفرعية
-- [داخليات Plugin](/ar/plugins/architecture#provider-runtime-hooks) — تفاصيل الخطافات والأمثلة المضمّنة
+- [SDK Runtime](/ar/plugins/sdk-runtime) — مساعدات `api.runtime` ‏(TTS، والبحث، والوكيل الفرعي)
+- [نظرة عامة على SDK](/ar/plugins/sdk-overview) — المرجع الكامل لواردات المسارات الفرعية
+- [داخليات Plugin](/ar/plugins/architecture#provider-runtime-hooks) — تفاصيل وسائط الربط والأمثلة المضمّنة

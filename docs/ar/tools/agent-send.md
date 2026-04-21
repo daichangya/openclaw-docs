@@ -1,28 +1,28 @@
 ---
 read_when:
-    - تريد تشغيل الوكيل من السكريبتات أو من سطر الأوامر
-    - تحتاج إلى تسليم ردود الوكيل إلى قناة دردشة برمجيًا
-summary: شغّل أدوار الوكيل من CLI وسلّم الردود اختياريًا إلى القنوات
-title: إرسال الوكيل
+    - تريد تشغيل عمليات العامل من خلال السكربتات أو سطر الأوامر
+    - تحتاج إلى تسليم ردود العامل إلى قناة دردشة برمجيًا
+summary: تشغيل أدوار العامل من خلال CLI مع إمكانية تسليم الردود إلى القنوات اختياريًا
+title: إرسال العامل
 x-i18n:
-    generated_at: "2026-04-05T12:57:09Z"
+    generated_at: "2026-04-21T13:35:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 42ea2977e89fb28d2afd07e5f6b1560ad627aea8b72fde36d8e324215c710afc
+    source_hash: 0550ad38efb2711f267a62b905fd150987a98801247de780ed3df97f27245704
     source_path: tools/agent-send.md
     workflow: 15
 ---
 
-# إرسال الوكيل
+# إرسال العامل
 
-يشغّل `openclaw agent` دور وكيل واحد من سطر الأوامر دون الحاجة إلى
-رسالة دردشة واردة. استخدمه لمسارات العمل المؤتمتة، والاختبار،
+يشغّل `openclaw agent` دورًا واحدًا للعامل من سطر الأوامر دون الحاجة إلى
+رسالة دردشة واردة. استخدمه في مسارات العمل المؤتمتة، والاختبار،
 والتسليم البرمجي.
 
 ## البدء السريع
 
 <Steps>
-  <Step title="تشغيل دور وكيل بسيط">
+  <Step title="تشغيل دور عامل بسيط">
     ```bash
     openclaw agent --message "What is the weather today?"
     ```
@@ -31,15 +31,15 @@ x-i18n:
 
   </Step>
 
-  <Step title="استهداف وكيل أو جلسة محددة">
+  <Step title="استهداف عامل أو جلسة محددة">
     ```bash
-    # استهداف وكيل محدد
+    # Target a specific agent
     openclaw agent --agent ops --message "Summarize logs"
 
-    # استهداف رقم هاتف (لاشتقاق مفتاح الجلسة)
+    # Target a phone number (derives session key)
     openclaw agent --to +15555550123 --message "Status update"
 
-    # إعادة استخدام جلسة موجودة
+    # Reuse an existing session
     openclaw agent --session-id abc123 --message "Continue the task"
     ```
 
@@ -47,10 +47,10 @@ x-i18n:
 
   <Step title="تسليم الرد إلى قناة">
     ```bash
-    # التسليم إلى WhatsApp (القناة الافتراضية)
+    # Deliver to WhatsApp (default channel)
     openclaw agent --to +15555550123 --message "Report ready" --deliver
 
-    # التسليم إلى Slack
+    # Deliver to Slack
     openclaw agent --agent ops --message "Generate report" \
       --deliver --reply-channel slack --reply-to "#reports"
     ```
@@ -60,49 +60,48 @@ x-i18n:
 
 ## العلامات
 
-| العلامة                      | الوصف                                                        |
-| ----------------------------- | ----------------------------------------------------------- |
-| `--message \<text\>`          | الرسالة المراد إرسالها (مطلوبة)                             |
-| `--to \<dest\>`               | اشتقاق مفتاح الجلسة من هدف (هاتف، معرّف دردشة)               |
-| `--agent \<id\>`              | استهداف وكيل مهيأ (يستخدم جلسته `main`)                     |
-| `--session-id \<id\>`         | إعادة استخدام جلسة موجودة حسب المعرّف                       |
-| `--local`                     | فرض runtime المحلي المضمّن (تخطي Gateway)                   |
-| `--deliver`                   | إرسال الرد إلى قناة دردشة                                   |
-| `--channel \<name\>`          | قناة التسليم (whatsapp، telegram، discord، slack، إلخ)      |
-| `--reply-to \<target\>`       | تجاوز هدف التسليم                                           |
-| `--reply-channel \<name\>`    | تجاوز قناة التسليم                                          |
-| `--reply-account \<id\>`      | تجاوز معرّف حساب التسليم                                    |
-| `--thinking \<level\>`        | تعيين مستوى التفكير (off, minimal, low, medium, high, xhigh) |
-| `--verbose \<on\|full\|off\>` | تعيين مستوى verbose                                         |
-| `--timeout \<seconds\>`       | تجاوز مهلة الوكيل                                            |
-| `--json`                      | إخراج JSON منظّم                                            |
+| Flag                          | الوصف                                                        |
+| ----------------------------- | ------------------------------------------------------------ |
+| `--message \<text\>`          | الرسالة المراد إرسالها (مطلوب)                               |
+| `--to \<dest\>`               | اشتقاق مفتاح الجلسة من هدف محدد (هاتف، معرّف دردشة)          |
+| `--agent \<id\>`              | استهداف عامل مضبوط (يستخدم جلسته `main`)                    |
+| `--session-id \<id\>`         | إعادة استخدام جلسة موجودة حسب المعرّف                        |
+| `--local`                     | فرض وقت تشغيل محلي مضمّن (تجاوز Gateway)                    |
+| `--deliver`                   | إرسال الرد إلى قناة دردشة                                    |
+| `--channel \<name\>`          | قناة التسليم (whatsapp وtelegram وdiscord وslack وما إلى ذلك) |
+| `--reply-to \<target\>`       | تجاوز هدف التسليم                                            |
+| `--reply-channel \<name\>`    | تجاوز قناة التسليم                                           |
+| `--reply-account \<id\>`      | تجاوز معرّف حساب التسليم                                     |
+| `--thinking \<level\>`        | ضبط مستوى التفكير لملف النموذج المحدد                        |
+| `--verbose \<on\|full\|off\>` | ضبط مستوى الإسهاب                                            |
+| `--timeout \<seconds\>`       | تجاوز مهلة العامل                                             |
+| `--json`                      | إخراج JSON منظّم                                             |
 
 ## السلوك
 
 - افتراضيًا، يمر CLI **عبر Gateway**. أضف `--local` لفرض
-  runtime المضمّن المحلي على الجهاز الحالي.
-- إذا تعذر الوصول إلى Gateway، فإن CLI **يرجع احتياطيًا**
-  إلى التشغيل المحلي المضمّن.
-- اختيار الجلسة: يشتق `--to` مفتاح الجلسة (أهداف المجموعات/القنوات
-  تحافظ على العزل؛ بينما تُدمج الدردشات المباشرة في `main`).
-- تستمر علامتا التفكير وverbose داخل مخزن الجلسة.
+  وقت التشغيل المحلي المضمّن على الجهاز الحالي.
+- إذا تعذر الوصول إلى Gateway، فإن CLI **يرجع احتياطيًا** إلى التشغيل المحلي المضمّن.
+- اختيار الجلسة: يشتق `--to` مفتاح الجلسة (تحافظ أهداف المجموعات/القنوات
+  على العزل؛ وتُدمَج الدردشات المباشرة في `main`).
+- تستمر علامتا التفكير والإسهاب داخل مخزن الجلسة.
 - الإخراج: نص عادي افتراضيًا، أو `--json` لحمولة منظّمة + بيانات وصفية.
 
 ## أمثلة
 
 ```bash
-# دور بسيط مع إخراج JSON
+# Simple turn with JSON output
 openclaw agent --to +15555550123 --message "Trace logs" --verbose on --json
 
-# دور مع مستوى التفكير
+# Turn with thinking level
 openclaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
 
-# التسليم إلى قناة مختلفة عن الجلسة
+# Deliver to a different channel than the session
 openclaw agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
 ```
 
 ## ذو صلة
 
-- [مرجع CLI للوكيل](/cli/agent)
-- [Sub-agents](/tools/subagents) — إنشاء وكلاء فرعيين في الخلفية
+- [مرجع CLI للعامل](/cli/agent)
+- [الوكلاء الفرعيون](/ar/tools/subagents) — تشغيل وكيل فرعي في الخلفية
 - [الجلسات](/ar/concepts/session) — كيفية عمل مفاتيح الجلسات
