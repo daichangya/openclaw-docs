@@ -1,34 +1,34 @@
 ---
 read_when:
-    - Anda ingin mengaktifkan atau mengonfigurasi `web_search`
-    - Anda ingin mengaktifkan atau mengonfigurasi `x_search`
+    - Anda ingin mengaktifkan atau mengonfigurasi web_search
+    - Anda ingin mengaktifkan atau mengonfigurasi x_search
     - Anda perlu memilih provider pencarian
-    - Anda ingin memahami auto-detection dan fallback provider
+    - Anda ingin memahami deteksi otomatis dan fallback provider
 sidebarTitle: Web Search
 summary: web_search, x_search, dan web_fetch -- cari di web, cari postingan X, atau ambil konten halaman
 title: Pencarian Web
 x-i18n:
-    generated_at: "2026-04-05T14:10:15Z"
+    generated_at: "2026-04-21T09:25:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b8b9a5d641dcdcbe7c099c8862898f12646f43151b6c4152d69c26af9b17e0fa
+    source_hash: 9e88a891ce28a5fe1baf4b9ce8565c59ba2d2695c63d77af232edd7f3fd2cd8a
     source_path: tools/web.md
     workflow: 15
 ---
 
 # Pencarian Web
 
-Tool `web_search` mencari di web menggunakan provider yang Anda konfigurasi dan
-mengembalikan hasil. Hasil di-cache berdasarkan kueri selama 15 menit (dapat dikonfigurasi).
+Tool `web_search` mencari di web menggunakan provider yang Anda konfigurasikan dan
+mengembalikan hasil. Hasil di-cache berdasarkan query selama 15 menit (dapat dikonfigurasi).
 
 OpenClaw juga menyertakan `x_search` untuk postingan X (sebelumnya Twitter) dan
 `web_fetch` untuk pengambilan URL ringan. Pada fase ini, `web_fetch` tetap
 lokal sementara `web_search` dan `x_search` dapat menggunakan xAI Responses di balik layar.
 
 <Info>
-  `web_search` adalah tool HTTP ringan, bukan otomatisasi browser. Untuk
-  situs yang banyak menggunakan JS atau login, gunakan [Browser Web](/tools/browser). Untuk
-  mengambil URL tertentu, gunakan [Web Fetch](/tools/web-fetch).
+  `web_search` adalah tool HTTP ringan, bukan otomasi browser. Untuk
+  situs yang berat di JS atau login, gunakan [Web Browser](/id/tools/browser). Untuk
+  mengambil URL tertentu, gunakan [Web Fetch](/id/tools/web-fetch).
 </Info>
 
 ## Mulai cepat
@@ -39,16 +39,16 @@ lokal sementara `web_search` dan `x_search` dapat menggunakan xAI Responses di b
     tidak memerlukan key, sementara yang lain menggunakan API key. Lihat halaman provider di bawah untuk
     detailnya.
   </Step>
-  <Step title="Konfigurasi">
+  <Step title="Konfigurasikan">
     ```bash
     openclaw configure --section web
     ```
-    Ini menyimpan provider dan kredensial yang diperlukan. Anda juga dapat menyetel env
+    Ini menyimpan provider dan kredensial yang diperlukan. Anda juga dapat mengatur env
     var (misalnya `BRAVE_API_KEY`) dan melewati langkah ini untuk provider
     berbasis API.
   </Step>
   <Step title="Gunakan">
-    Agen kini dapat memanggil `web_search`:
+    Agent kini dapat memanggil `web_search`:
 
     ```javascript
     await web_search({ query: "OpenClaw plugin SDK" });
@@ -66,72 +66,72 @@ lokal sementara `web_search` dan `x_search` dapat menggunakan xAI Responses di b
 ## Memilih provider
 
 <CardGroup cols={2}>
-  <Card title="Brave Search" icon="shield" href="/tools/brave-search">
-    Hasil terstruktur dengan cuplikan. Mendukung mode `llm-context`, filter negara/bahasa. Tersedia tier gratis.
+  <Card title="Brave Search" icon="shield" href="/id/tools/brave-search">
+    Hasil terstruktur dengan snippet. Mendukung mode `llm-context`, filter negara/bahasa. Tier gratis tersedia.
   </Card>
-  <Card title="DuckDuckGo" icon="bird" href="/tools/duckduckgo-search">
-    Fallback tanpa key. Tidak perlu API key. Integrasi tidak resmi berbasis HTML.
+  <Card title="DuckDuckGo" icon="bird" href="/id/tools/duckduckgo-search">
+    Fallback tanpa key. Tidak memerlukan API key. Integrasi tidak resmi berbasis HTML.
   </Card>
-  <Card title="Exa" icon="brain" href="/tools/exa-search">
-    Pencarian neural + kata kunci dengan ekstraksi konten (highlight, teks, ringkasan).
+  <Card title="Exa" icon="brain" href="/id/tools/exa-search">
+    Pencarian neural + keyword dengan ekstraksi konten (highlight, teks, ringkasan).
   </Card>
-  <Card title="Firecrawl" icon="flame" href="/tools/firecrawl">
-    Hasil terstruktur. Paling cocok dipasangkan dengan `firecrawl_search` dan `firecrawl_scrape` untuk ekstraksi mendalam.
+  <Card title="Firecrawl" icon="flame" href="/id/tools/firecrawl">
+    Hasil terstruktur. Paling baik dipasangkan dengan `firecrawl_search` dan `firecrawl_scrape` untuk ekstraksi mendalam.
   </Card>
-  <Card title="Gemini" icon="sparkles" href="/tools/gemini-search">
-    Jawaban yang disintesis AI dengan sitasi melalui grounding Google Search.
+  <Card title="Gemini" icon="sparkles" href="/id/tools/gemini-search">
+    Jawaban hasil sintesis AI dengan sitasi melalui grounding Google Search.
   </Card>
-  <Card title="Grok" icon="zap" href="/tools/grok-search">
-    Jawaban yang disintesis AI dengan sitasi melalui web grounding xAI.
+  <Card title="Grok" icon="zap" href="/id/tools/grok-search">
+    Jawaban hasil sintesis AI dengan sitasi melalui grounding web xAI.
   </Card>
-  <Card title="Kimi" icon="moon" href="/tools/kimi-search">
-    Jawaban yang disintesis AI dengan sitasi melalui pencarian web Moonshot.
+  <Card title="Kimi" icon="moon" href="/id/tools/kimi-search">
+    Jawaban hasil sintesis AI dengan sitasi melalui pencarian web Moonshot.
   </Card>
-  <Card title="MiniMax Search" icon="globe" href="/tools/minimax-search">
+  <Card title="MiniMax Search" icon="globe" href="/id/tools/minimax-search">
     Hasil terstruktur melalui API pencarian MiniMax Coding Plan.
   </Card>
-  <Card title="Ollama Web Search" icon="globe" href="/tools/ollama-search">
+  <Card title="Ollama Web Search" icon="globe" href="/id/tools/ollama-search">
     Pencarian tanpa key melalui host Ollama yang Anda konfigurasi. Memerlukan `ollama signin`.
   </Card>
-  <Card title="Perplexity" icon="search" href="/tools/perplexity-search">
-    Hasil terstruktur dengan kontrol ekstraksi konten dan pemfilteran domain.
+  <Card title="Perplexity" icon="search" href="/id/tools/perplexity-search">
+    Hasil terstruktur dengan kontrol ekstraksi konten dan filter domain.
   </Card>
-  <Card title="SearXNG" icon="server" href="/tools/searxng-search">
-    Meta-search yang di-host sendiri. Tidak perlu API key. Mengagregasikan Google, Bing, DuckDuckGo, dan lainnya.
+  <Card title="SearXNG" icon="server" href="/id/tools/searxng-search">
+    Meta-search self-hosted. Tidak memerlukan API key. Mengagregasi Google, Bing, DuckDuckGo, dan lainnya.
   </Card>
-  <Card title="Tavily" icon="globe" href="/tools/tavily">
-    Hasil terstruktur dengan kedalaman pencarian, pemfilteran topik, dan `tavily_extract` untuk ekstraksi URL.
+  <Card title="Tavily" icon="globe" href="/id/tools/tavily">
+    Hasil terstruktur dengan kedalaman pencarian, penyaringan topik, dan `tavily_extract` untuk ekstraksi URL.
   </Card>
 </CardGroup>
 
 ### Perbandingan provider
 
-| Provider                                  | Gaya hasil                 | Filter                                           | API key                                                                          |
+| Provider                                  | Result style               | Filters                                          | API key                                                                          |
 | ----------------------------------------- | -------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------- |
-| [Brave](/tools/brave-search)              | Cuplikan terstruktur       | Negara, bahasa, waktu, mode `llm-context`        | `BRAVE_API_KEY`                                                                  |
-| [DuckDuckGo](/tools/duckduckgo-search)    | Cuplikan terstruktur       | --                                               | Tidak ada (tanpa key)                                                            |
-| [Exa](/tools/exa-search)                  | Terstruktur + diekstrak    | Mode neural/kata kunci, tanggal, ekstraksi konten | `EXA_API_KEY`                                                                   |
-| [Firecrawl](/tools/firecrawl)             | Cuplikan terstruktur       | Melalui tool `firecrawl_search`                  | `FIRECRAWL_API_KEY`                                                              |
-| [Gemini](/tools/gemini-search)            | Sintesis AI + sitasi       | --                                               | `GEMINI_API_KEY`                                                                 |
-| [Grok](/tools/grok-search)                | Sintesis AI + sitasi       | --                                               | `XAI_API_KEY`                                                                    |
-| [Kimi](/tools/kimi-search)                | Sintesis AI + sitasi       | --                                               | `KIMI_API_KEY` / `MOONSHOT_API_KEY`                                              |
-| [MiniMax Search](/tools/minimax-search)   | Cuplikan terstruktur       | Region (`global` / `cn`)                         | `MINIMAX_CODE_PLAN_KEY` / `MINIMAX_CODING_API_KEY`                               |
-| [Ollama Web Search](/tools/ollama-search) | Cuplikan terstruktur       | --                                               | Tidak ada secara default; `ollama signin` diperlukan, dapat memakai ulang bearer auth provider Ollama |
-| [Perplexity](/tools/perplexity-search)    | Cuplikan terstruktur       | Negara, bahasa, waktu, domain, batas konten      | `PERPLEXITY_API_KEY` / `OPENROUTER_API_KEY`                                      |
-| [SearXNG](/tools/searxng-search)          | Cuplikan terstruktur       | Kategori, bahasa                                 | Tidak ada (self-hosted)                                                          |
-| [Tavily](/tools/tavily)                   | Cuplikan terstruktur       | Melalui tool `tavily_search`                     | `TAVILY_API_KEY`                                                                 |
+| [Brave](/id/tools/brave-search)              | Snippet terstruktur        | Negara, bahasa, waktu, mode `llm-context`        | `BRAVE_API_KEY`                                                                  |
+| [DuckDuckGo](/id/tools/duckduckgo-search)    | Snippet terstruktur        | --                                               | Tidak ada (tanpa key)                                                            |
+| [Exa](/id/tools/exa-search)                  | Terstruktur + diekstrak    | Mode neural/keyword, tanggal, ekstraksi konten   | `EXA_API_KEY`                                                                    |
+| [Firecrawl](/id/tools/firecrawl)             | Snippet terstruktur        | Melalui tool `firecrawl_search`                  | `FIRECRAWL_API_KEY`                                                              |
+| [Gemini](/id/tools/gemini-search)            | Hasil sintesis AI + sitasi | --                                               | `GEMINI_API_KEY`                                                                 |
+| [Grok](/id/tools/grok-search)                | Hasil sintesis AI + sitasi | --                                               | `XAI_API_KEY`                                                                    |
+| [Kimi](/id/tools/kimi-search)                | Hasil sintesis AI + sitasi | --                                               | `KIMI_API_KEY` / `MOONSHOT_API_KEY`                                              |
+| [MiniMax Search](/id/tools/minimax-search)   | Snippet terstruktur        | Region (`global` / `cn`)                         | `MINIMAX_CODE_PLAN_KEY` / `MINIMAX_CODING_API_KEY`                               |
+| [Ollama Web Search](/id/tools/ollama-search) | Snippet terstruktur        | --                                               | Tidak ada secara default; `ollama signin` diperlukan, dapat menggunakan kembali auth bearer provider Ollama |
+| [Perplexity](/id/tools/perplexity-search)    | Snippet terstruktur        | Negara, bahasa, waktu, domain, batas konten      | `PERPLEXITY_API_KEY` / `OPENROUTER_API_KEY`                                      |
+| [SearXNG](/id/tools/searxng-search)          | Snippet terstruktur        | Kategori, bahasa                                 | Tidak ada (self-hosted)                                                          |
+| [Tavily](/id/tools/tavily)                   | Snippet terstruktur        | Melalui tool `tavily_search`                     | `TAVILY_API_KEY`                                                                 |
 
-## Auto-detection
+## Deteksi otomatis
 
 ## Pencarian web Codex native
 
-Model yang mendukung Codex secara opsional dapat menggunakan tool `web_search` Responses native milik provider alih-alih fungsi `web_search` terkelola milik OpenClaw.
+Model yang mendukung Codex secara opsional dapat menggunakan tool Responses `web_search` native milik provider alih-alih fungsi `web_search` terkelola milik OpenClaw.
 
 - Konfigurasikan di bawah `tools.web.search.openaiCodex`
 - Ini hanya aktif untuk model yang mendukung Codex (`openai-codex/*` atau provider yang menggunakan `api: "openai-codex-responses"`)
 - `web_search` terkelola tetap berlaku untuk model non-Codex
 - `mode: "cached"` adalah pengaturan default dan yang direkomendasikan
-- `tools.web.search.enabled: false` menonaktifkan pencarian terkelola dan native
+- `tools.web.search.enabled: false` menonaktifkan pencarian terkelola maupun native
 
 ```json5
 {
@@ -156,14 +156,14 @@ Model yang mendukung Codex secara opsional dapat menggunakan tool `web_search` R
 }
 ```
 
-Jika pencarian Codex native diaktifkan tetapi model saat ini tidak mendukung Codex, OpenClaw tetap mempertahankan perilaku `web_search` terkelola normal.
+Jika pencarian Codex native diaktifkan tetapi model saat ini tidak mendukung Codex, OpenClaw mempertahankan perilaku `web_search` terkelola yang normal.
 
 ## Menyiapkan pencarian web
 
-Daftar provider di dokumen dan alur penyiapan diurutkan secara alfabetis. Auto-detection mempertahankan
-urutan prioritas terpisah.
+Daftar provider dalam dokumen dan alur penyiapan bersifat alfabetis. Deteksi otomatis mempertahankan
+urutan prioritas yang terpisah.
 
-Jika tidak ada `provider` yang disetel, OpenClaw memeriksa provider dalam urutan ini dan menggunakan
+Jika tidak ada `provider` yang diatur, OpenClaw memeriksa provider dalam urutan ini dan menggunakan
 yang pertama yang siap:
 
 Provider berbasis API terlebih dahulu:
@@ -181,19 +181,19 @@ Provider berbasis API terlebih dahulu:
 Fallback tanpa key setelah itu:
 
 10. **DuckDuckGo** -- fallback HTML tanpa key tanpa akun atau API key (urutan 100)
-11. **Ollama Web Search** -- fallback tanpa key melalui host Ollama yang Anda konfigurasi; mengharuskan Ollama dapat dijangkau dan sudah login dengan `ollama signin` serta dapat memakai ulang bearer auth provider Ollama jika host memerlukannya (urutan 110)
+11. **Ollama Web Search** -- fallback tanpa key melalui host Ollama yang Anda konfigurasi; memerlukan Ollama dapat dijangkau dan sudah login dengan `ollama signin` serta dapat menggunakan kembali auth bearer provider Ollama jika host memerlukannya (urutan 110)
 12. **SearXNG** -- `SEARXNG_BASE_URL` atau `plugins.entries.searxng.config.webSearch.baseUrl` (urutan 200)
 
-Jika tidak ada provider yang terdeteksi, sistem akan fallback ke Brave (Anda akan mendapatkan error key hilang
-yang meminta Anda untuk mengonfigurasinya).
+Jika tidak ada provider yang terdeteksi, akan fallback ke Brave (Anda akan mendapat error missing-key
+yang meminta Anda mengonfigurasi salah satunya).
 
 <Note>
-  Semua field key provider mendukung objek SecretRef. Dalam mode auto-detect,
+  Semua field key provider mendukung objek SecretRef. Dalam mode deteksi otomatis,
   OpenClaw hanya me-resolve key provider yang dipilih -- SecretRef yang tidak dipilih
   tetap tidak aktif.
 </Note>
 
-## Konfigurasi
+## Config
 
 ```json5
 {
@@ -201,7 +201,7 @@ yang meminta Anda untuk mengonfigurasinya).
     web: {
       search: {
         enabled: true, // default: true
-        provider: "brave", // or omit for auto-detection
+        provider: "brave", // atau hilangkan untuk deteksi otomatis
         maxResults: 5,
         timeoutSeconds: 30,
         cacheTtlMinutes: 15,
@@ -211,27 +211,26 @@ yang meminta Anda untuk mengonfigurasinya).
 }
 ```
 
-Konfigurasi khusus provider (API key, base URL, mode) berada di bawah
+Config spesifik provider (API key, base URL, mode) berada di bawah
 `plugins.entries.<plugin>.config.webSearch.*`. Lihat halaman provider untuk
-contohnya.
+contoh.
 
 Pemilihan provider fallback `web_fetch` terpisah:
 
 - pilih dengan `tools.web.fetch.provider`
-- atau hilangkan field tersebut dan biarkan OpenClaw melakukan auto-detect provider web-fetch pertama
-  yang siap dari kredensial yang tersedia
-- saat ini provider web-fetch bawaan adalah Firecrawl, dikonfigurasi di bawah
+- atau hilangkan field itu dan biarkan OpenClaw mendeteksi otomatis provider web-fetch pertama yang siap dari kredensial yang tersedia
+- saat ini provider web-fetch bundled adalah Firecrawl, dikonfigurasi di bawah
   `plugins.entries.firecrawl.config.webFetch.*`
 
 Saat Anda memilih **Kimi** selama `openclaw onboard` atau
-`openclaw configure --section web`, OpenClaw juga dapat menanyakan:
+`openclaw configure --section web`, OpenClaw juga dapat meminta:
 
 - region API Moonshot (`https://api.moonshot.ai/v1` atau `https://api.moonshot.cn/v1`)
-- model web-search Kimi default (default ke `kimi-k2.5`)
+- model web-search Kimi default (default ke `kimi-k2.6`)
 
-Untuk `x_search`, konfigurasikan `plugins.entries.xai.config.xSearch.*`. Tool ini menggunakan
+Untuk `x_search`, konfigurasikan `plugins.entries.xai.config.xSearch.*`. Ini menggunakan
 fallback `XAI_API_KEY` yang sama seperti pencarian web Grok.
-Konfigurasi lama `tools.web.x_search.*` dimigrasikan otomatis oleh `openclaw doctor --fix`.
+Config lama `tools.web.x_search.*` dimigrasikan otomatis oleh `openclaw doctor --fix`.
 Saat Anda memilih Grok selama `openclaw onboard` atau `openclaw configure --section web`,
 OpenClaw juga dapat menawarkan penyiapan `x_search` opsional dengan key yang sama.
 Ini adalah langkah lanjutan terpisah di dalam jalur Grok, bukan pilihan provider
@@ -241,8 +240,8 @@ menampilkan prompt `x_search`.
 ### Menyimpan API key
 
 <Tabs>
-  <Tab title="File konfigurasi">
-    Jalankan `openclaw configure --section web` atau setel key secara langsung:
+  <Tab title="File config">
+    Jalankan `openclaw configure --section web` atau atur key secara langsung:
 
     ```json5
     {
@@ -262,7 +261,7 @@ menampilkan prompt `x_search`.
 
   </Tab>
   <Tab title="Environment variable">
-    Setel env var provider di environment proses Gateway:
+    Atur env var provider di environment proses Gateway:
 
     ```bash
     export BRAVE_API_KEY="YOUR_KEY"
@@ -276,31 +275,31 @@ menampilkan prompt `x_search`.
 
 ## Parameter tool
 
-| Parameter             | Deskripsi                                                  |
-| --------------------- | ---------------------------------------------------------- |
-| `query`               | Kueri pencarian (wajib)                                    |
-| `count`               | Hasil yang dikembalikan (1-10, default: 5)                 |
-| `country`             | Kode negara ISO 2 huruf (mis. "US", "DE")                  |
-| `language`            | Kode bahasa ISO 639-1 (mis. "en", "de")                    |
-| `search_lang`         | Kode bahasa pencarian (khusus Brave)                       |
-| `freshness`           | Filter waktu: `day`, `week`, `month`, atau `year`          |
-| `date_after`          | Hasil setelah tanggal ini (YYYY-MM-DD)                     |
-| `date_before`         | Hasil sebelum tanggal ini (YYYY-MM-DD)                     |
-| `ui_lang`             | Kode bahasa UI (khusus Brave)                              |
-| `domain_filter`       | Array allowlist/denylist domain (khusus Perplexity)        |
-| `max_tokens`          | Anggaran total konten, default 25000 (khusus Perplexity)   |
-| `max_tokens_per_page` | Batas token per halaman, default 2048 (khusus Perplexity)  |
+| Parameter             | Description                                           |
+| --------------------- | ----------------------------------------------------- |
+| `query`               | Query pencarian (wajib)                               |
+| `count`               | Hasil yang dikembalikan (1-10, default: 5)            |
+| `country`             | Kode negara ISO 2 huruf (mis. "US", "DE")            |
+| `language`            | Kode bahasa ISO 639-1 (mis. "en", "de")              |
+| `search_lang`         | Kode bahasa pencarian (khusus Brave)                  |
+| `freshness`           | Filter waktu: `day`, `week`, `month`, atau `year`     |
+| `date_after`          | Hasil setelah tanggal ini (YYYY-MM-DD)                |
+| `date_before`         | Hasil sebelum tanggal ini (YYYY-MM-DD)                |
+| `ui_lang`             | Kode bahasa UI (khusus Brave)                         |
+| `domain_filter`       | Array allowlist/denylist domain (khusus Perplexity)   |
+| `max_tokens`          | Total anggaran konten, default 25000 (khusus Perplexity) |
+| `max_tokens_per_page` | Batas token per halaman, default 2048 (khusus Perplexity) |
 
 <Warning>
   Tidak semua parameter berfungsi dengan semua provider. Mode `llm-context` Brave
   menolak `ui_lang`, `freshness`, `date_after`, dan `date_before`.
-  Gemini, Grok, dan Kimi mengembalikan satu jawaban tersintesis dengan sitasi. Mereka
+  Gemini, Grok, dan Kimi mengembalikan satu jawaban hasil sintesis dengan sitasi. Mereka
   menerima `count` untuk kompatibilitas tool bersama, tetapi itu tidak mengubah
-  bentuk jawaban yang di-grounding.
-  Perplexity berperilaku sama ketika Anda menggunakan jalur kompatibilitas Sonar/OpenRouter
-  (`plugins.entries.perplexity.config.webSearch.baseUrl` /
+  bentuk jawaban yang digrounding.
+  Perplexity berperilaku sama saat Anda menggunakan jalur kompatibilitas
+  Sonar/OpenRouter (`plugins.entries.perplexity.config.webSearch.baseUrl` /
   `model` atau `OPENROUTER_API_KEY`).
-  SearXNG menerima `http://` hanya untuk host private-network atau loopback yang tepercaya;
+  SearXNG hanya menerima `http://` untuk host privat tepercaya atau loopback;
   endpoint SearXNG publik harus menggunakan `https://`.
   Firecrawl dan Tavily hanya mendukung `query` dan `count` melalui `web_search`
   -- gunakan tool khusus mereka untuk opsi lanjutan.
@@ -308,21 +307,19 @@ menampilkan prompt `x_search`.
 
 ## x_search
 
-`x_search` mengkueri postingan X (sebelumnya Twitter) menggunakan xAI dan mengembalikan
-jawaban yang disintesis AI dengan sitasi. Tool ini menerima kueri bahasa alami dan
-filter terstruktur opsional. OpenClaw hanya mengaktifkan tool `x_search` xAI bawaan
-pada permintaan yang melayani panggilan tool ini.
+`x_search` menjalankan query pada postingan X (sebelumnya Twitter) menggunakan xAI dan mengembalikan
+jawaban hasil sintesis AI dengan sitasi. Tool ini menerima query bahasa alami dan
+filter terstruktur opsional. OpenClaw hanya mengaktifkan tool bawaan xAI `x_search`
+pada request yang melayani pemanggilan tool ini.
 
 <Note>
-  xAI mendokumentasikan `x_search` sebagai mendukung pencarian kata kunci, pencarian semantik, pencarian pengguna,
-  dan pengambilan thread. Untuk statistik per postingan seperti repost,
-  balasan, bookmark, atau view, lebih baik gunakan pencarian terarah untuk URL postingan yang tepat
-  atau status ID. Pencarian kata kunci yang luas mungkin menemukan postingan yang benar tetapi mengembalikan
-  metadata per postingan yang kurang lengkap. Pola yang baik adalah: cari postingannya terlebih dahulu, lalu
-  jalankan kueri `x_search` kedua yang difokuskan pada postingan tepat tersebut.
+  xAI mendokumentasikan `x_search` sebagai mendukung pencarian keyword, pencarian semantik, pencarian pengguna, dan pengambilan thread. Untuk statistik engagement per-post seperti repost,
+  balasan, bookmark, atau tayangan, utamakan lookup terarah untuk URL postingan yang tepat
+  atau status ID. Pencarian keyword yang luas dapat menemukan postingan yang benar tetapi mengembalikan metadata per-post yang kurang lengkap. Pola yang baik adalah: temukan postingan terlebih dahulu, lalu
+  jalankan query `x_search` kedua yang berfokus pada postingan yang tepat tersebut.
 </Note>
 
-### Konfigurasi x_search
+### Config x_search
 
 ```json5
 {
@@ -339,7 +336,7 @@ pada permintaan yang melayani panggilan tool ini.
             cacheTtlMinutes: 15,
           },
           webSearch: {
-            apiKey: "xai-...", // optional if XAI_API_KEY is set
+            apiKey: "xai-...", // opsional jika XAI_API_KEY diatur
           },
         },
       },
@@ -350,9 +347,9 @@ pada permintaan yang melayani panggilan tool ini.
 
 ### Parameter x_search
 
-| Parameter                    | Deskripsi                                              |
+| Parameter                    | Description                                            |
 | ---------------------------- | ------------------------------------------------------ |
-| `query`                      | Kueri pencarian (wajib)                                |
+| `query`                      | Query pencarian (wajib)                                |
 | `allowed_x_handles`          | Batasi hasil ke handle X tertentu                      |
 | `excluded_x_handles`         | Kecualikan handle X tertentu                           |
 | `from_date`                  | Hanya sertakan postingan pada atau setelah tanggal ini (YYYY-MM-DD) |
@@ -371,7 +368,7 @@ await x_search({
 ```
 
 ```javascript
-// Per-post stats: use the exact status URL or status ID when possible
+// Statistik per-post: gunakan URL status atau status ID yang tepat bila memungkinkan
 await x_search({
   query: "https://x.com/huntharo/status/1905678901234567890",
 });
@@ -380,23 +377,23 @@ await x_search({
 ## Contoh
 
 ```javascript
-// Basic search
+// Pencarian dasar
 await web_search({ query: "OpenClaw plugin SDK" });
 
-// German-specific search
+// Pencarian khusus Jerman
 await web_search({ query: "TV online schauen", country: "DE", language: "de" });
 
-// Recent results (past week)
+// Hasil terbaru (minggu lalu)
 await web_search({ query: "AI developments", freshness: "week" });
 
-// Date range
+// Rentang tanggal
 await web_search({
   query: "climate research",
   date_after: "2024-01-01",
   date_before: "2024-06-30",
 });
 
-// Domain filtering (Perplexity only)
+// Filter domain (khusus Perplexity)
 await web_search({
   query: "product reviews",
   domain_filter: ["-reddit.com", "-pinterest.com"],
@@ -411,14 +408,14 @@ Jika Anda menggunakan profil tool atau allowlist, tambahkan `web_search`, `x_sea
 {
   tools: {
     allow: ["web_search", "x_search"],
-    // or: allow: ["group:web"]  (includes web_search, x_search, and web_fetch)
+    // atau: allow: ["group:web"]  (mencakup web_search, x_search, dan web_fetch)
   },
 }
 ```
 
 ## Terkait
 
-- [Web Fetch](/tools/web-fetch) -- ambil URL dan ekstrak konten yang mudah dibaca
-- [Browser Web](/tools/browser) -- otomatisasi browser penuh untuk situs yang banyak menggunakan JS
-- [Grok Search](/tools/grok-search) -- Grok sebagai provider `web_search`
-- [Ollama Web Search](/tools/ollama-search) -- pencarian web tanpa key melalui host Ollama Anda
+- [Web Fetch](/id/tools/web-fetch) -- ambil URL dan ekstrak konten yang dapat dibaca
+- [Web Browser](/id/tools/browser) -- otomasi browser penuh untuk situs yang berat di JS
+- [Grok Search](/id/tools/grok-search) -- Grok sebagai provider `web_search`
+- [Ollama Web Search](/id/tools/ollama-search) -- pencarian web tanpa key melalui host Ollama Anda

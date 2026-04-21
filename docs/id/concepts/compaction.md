@@ -1,57 +1,57 @@
 ---
 read_when:
-    - Anda ingin memahami pemadatan otomatis dan /compact
+    - Anda ingin memahami Compaction otomatis dan `/compact`
     - Anda sedang men-debug sesi panjang yang mencapai batas konteks
-summary: Bagaimana OpenClaw meringkas percakapan panjang agar tetap berada dalam batas model
+summary: Cara OpenClaw merangkum percakapan panjang agar tetap berada dalam batas model
 title: Compaction
 x-i18n:
-    generated_at: "2026-04-08T02:14:24Z"
+    generated_at: "2026-04-21T09:17:12Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e6590b82a8c3a9c310998d653459ca4d8612495703ca0a8d8d306d7643142fd1
+    source_hash: 382e4a879e65199bd98d7476bff556571e09344a21e909862a34e6029db6d765
     source_path: concepts/compaction.md
     workflow: 15
 ---
 
 # Compaction
 
-Setiap model memiliki jendela konteks -- jumlah maksimum token yang dapat diprosesnya.
-Saat percakapan mendekati batas tersebut, OpenClaw **memadatkan** pesan-pesan lama
-menjadi ringkasan agar chat dapat terus berlanjut.
+Setiap model memiliki jendela konteks -- jumlah token maksimum yang dapat diprosesnya.
+Ketika percakapan mendekati batas itu, OpenClaw akan **melakukan Compaction** pada pesan-pesan lama
+menjadi sebuah ringkasan agar chat dapat terus berlanjut.
 
 ## Cara kerjanya
 
-1. Giliran percakapan yang lebih lama diringkas menjadi entri padat.
+1. Giliran percakapan yang lebih lama diringkas menjadi entri compact.
 2. Ringkasan disimpan dalam transkrip sesi.
 3. Pesan-pesan terbaru tetap dipertahankan utuh.
 
-Saat OpenClaw membagi riwayat menjadi potongan pemadatan, OpenClaw menjaga agar
-pemanggilan tool oleh asisten tetap dipasangkan dengan entri `toolResult` yang sesuai. Jika titik pemisahan jatuh
-di dalam blok tool, OpenClaw memindahkan batasnya agar pasangan tersebut tetap bersama dan
-ekor saat ini yang belum diringkas tetap dipertahankan.
+Saat OpenClaw membagi riwayat menjadi chunk Compaction, OpenClaw menjaga agar tool
+call asisten tetap dipasangkan dengan entri `toolResult` yang sesuai. Jika titik
+pemisahan jatuh di dalam blok tool, OpenClaw memindahkan batasnya agar pasangan itu tetap bersama dan
+bagian akhir saat ini yang belum diringkas tetap dipertahankan.
 
-Riwayat percakapan lengkap tetap tersimpan di disk. Pemadatan hanya mengubah apa yang
+Seluruh riwayat percakapan tetap tersimpan di disk. Compaction hanya mengubah apa yang
 dilihat model pada giliran berikutnya.
 
-## Pemadatan otomatis
+## Compaction otomatis
 
-Pemadatan otomatis aktif secara default. Ini berjalan saat sesi mendekati batas
-konteks, atau saat model mengembalikan error luapan konteks (dalam hal ini
-OpenClaw memadatkan dan mencoba lagi). Tanda tangan luapan yang umum mencakup
+Compaction otomatis aktif secara bawaan. Ini berjalan saat sesi mendekati batas
+konteks, atau saat model mengembalikan error context-overflow (dalam hal ini
+OpenClaw melakukan Compaction dan mencoba ulang). Tanda overflow yang umum meliputi
 `request_too_large`, `context length exceeded`, `input exceeds the maximum
 number of tokens`, `input token count exceeds the maximum number of input
 tokens`, `input is too long for the model`, dan `ollama error: context length
 exceeded`.
 
 <Info>
-Sebelum memadatkan, OpenClaw secara otomatis mengingatkan agen untuk menyimpan
-catatan penting ke file [memory](/id/concepts/memory). Ini mencegah hilangnya konteks.
+Sebelum melakukan Compaction, OpenClaw secara otomatis mengingatkan agen untuk menyimpan
+catatan penting ke file [memory](/id/concepts/memory). Ini mencegah kehilangan konteks.
 </Info>
 
-Gunakan pengaturan `agents.defaults.compaction` di `openclaw.json` Anda untuk mengonfigurasi perilaku pemadatan (mode, token target, dan sebagainya).
-Ringkasan pemadatan mempertahankan pengenal buram secara default (`identifierPolicy: "strict"`). Anda dapat menggantinya dengan `identifierPolicy: "off"` atau memberikan teks kustom dengan `identifierPolicy: "custom"` dan `identifierInstructions`.
+Gunakan pengaturan `agents.defaults.compaction` dalam `openclaw.json` Anda untuk mengonfigurasi perilaku Compaction (mode, token target, dll.).
+Ringkasan Compaction mempertahankan identifier opak secara bawaan (`identifierPolicy: "strict"`). Anda dapat menggantinya dengan `identifierPolicy: "off"` atau memberikan teks kustom dengan `identifierPolicy: "custom"` dan `identifierInstructions`.
 
-Anda juga dapat menentukan model yang berbeda untuk peringkasan pemadatan melalui `agents.defaults.compaction.model`. Ini berguna ketika model utama Anda adalah model lokal atau kecil dan Anda ingin ringkasan pemadatan dihasilkan oleh model yang lebih mampu. Override ini menerima string `provider/model-id` apa pun:
+Anda dapat secara opsional menentukan model berbeda untuk ringkasan Compaction melalui `agents.defaults.compaction.model`. Ini berguna saat model utama Anda adalah model lokal atau kecil dan Anda ingin ringkasan Compaction dihasilkan oleh model yang lebih mampu. Override ini menerima string `provider/model-id` apa pun:
 
 ```json
 {
@@ -65,7 +65,7 @@ Anda juga dapat menentukan model yang berbeda untuk peringkasan pemadatan melalu
 }
 ```
 
-Ini juga berfungsi dengan model lokal, misalnya model Ollama kedua yang didedikasikan untuk peringkasan atau spesialis pemadatan yang telah di-fine-tune:
+Ini juga berfungsi dengan model lokal, misalnya model Ollama kedua yang didedikasikan untuk peringkasan atau spesialis Compaction yang telah di-fine-tune:
 
 ```json
 {
@@ -79,13 +79,13 @@ Ini juga berfungsi dengan model lokal, misalnya model Ollama kedua yang didedika
 }
 ```
 
-Jika tidak disetel, pemadatan menggunakan model utama agen.
+Jika tidak disetel, Compaction menggunakan model utama agen.
 
-## Penyedia pemadatan yang dapat dipasang
+## Provider Compaction yang dapat dipasang
 
-Plugins dapat mendaftarkan penyedia pemadatan kustom melalui `registerCompactionProvider()` pada API plugin. Saat penyedia terdaftar dan dikonfigurasi, OpenClaw mendelegasikan peringkasan kepadanya alih-alih menggunakan pipeline LLM bawaan.
+Plugin dapat mendaftarkan provider Compaction kustom melalui `registerCompactionProvider()` pada API plugin. Saat provider terdaftar dan dikonfigurasi, OpenClaw mendelegasikan peringkasan kepadanya alih-alih ke pipeline LLM bawaan.
 
-Untuk menggunakan penyedia yang terdaftar, setel id penyedia di konfigurasi Anda:
+Untuk menggunakan provider yang terdaftar, setel ID provider dalam config Anda:
 
 ```json
 {
@@ -99,32 +99,32 @@ Untuk menggunakan penyedia yang terdaftar, setel id penyedia di konfigurasi Anda
 }
 ```
 
-Menyetel `provider` secara otomatis memaksa `mode: "safeguard"`. Penyedia menerima instruksi pemadatan dan kebijakan pelestarian pengenal yang sama seperti jalur bawaan, dan OpenClaw tetap mempertahankan konteks sufiks giliran terbaru dan giliran terpisah setelah output penyedia. Jika penyedia gagal atau mengembalikan hasil kosong, OpenClaw kembali ke peringkasan LLM bawaan.
+Menyetel `provider` secara otomatis memaksa `mode: "safeguard"`. Provider menerima instruksi Compaction dan kebijakan preservasi identifier yang sama seperti jalur bawaan, dan OpenClaw tetap mempertahankan konteks sufiks giliran terbaru dan giliran terpisah setelah output provider. Jika provider gagal atau mengembalikan hasil kosong, OpenClaw kembali ke peringkasan LLM bawaan.
 
-## Pemadatan otomatis (aktif secara default)
+## Compaction otomatis (aktif secara bawaan)
 
-Saat sesi mendekati atau melampaui jendela konteks model, OpenClaw memicu pemadatan otomatis dan dapat mencoba lagi permintaan asli dengan menggunakan konteks yang telah dipadatkan.
+Saat sesi mendekati atau melampaui jendela konteks model, OpenClaw memicu Compaction otomatis dan dapat mencoba ulang permintaan asli menggunakan konteks yang sudah di-compact.
 
 Anda akan melihat:
 
 - `🧹 Auto-compaction complete` dalam mode verbose
 - `/status` menampilkan `🧹 Compactions: <count>`
 
-Sebelum pemadatan, OpenClaw dapat menjalankan giliran **silent memory flush** untuk menyimpan
-catatan tahan lama ke disk. Lihat [Memory](/id/concepts/memory) untuk detail dan konfigurasi.
+Sebelum Compaction, OpenClaw dapat menjalankan giliran **memory flush diam-diam** untuk menyimpan
+catatan tahan lama ke disk. Lihat [Memory](/id/concepts/memory) untuk detail dan config.
 
-## Pemadatan manual
+## Compaction manual
 
-Ketik `/compact` di chat mana pun untuk memaksa pemadatan. Tambahkan instruksi untuk memandu
+Ketik `/compact` di chat mana pun untuk memaksa Compaction. Tambahkan instruksi untuk memandu
 ringkasan:
 
 ```
-/compact Focus on the API design decisions
+/compact Fokus pada keputusan desain API
 ```
 
 ## Menggunakan model yang berbeda
 
-Secara default, pemadatan menggunakan model utama agen Anda. Anda dapat menggunakan model yang lebih
+Secara bawaan, Compaction menggunakan model utama agen Anda. Anda dapat menggunakan model yang lebih
 mampu untuk ringkasan yang lebih baik:
 
 ```json5
@@ -139,10 +139,10 @@ mampu untuk ringkasan yang lebih baik:
 }
 ```
 
-## Pemberitahuan mulai pemadatan
+## Notifikasi Compaction
 
-Secara default, pemadatan berjalan tanpa pemberitahuan. Untuk menampilkan pemberitahuan singkat saat pemadatan
-dimulai, aktifkan `notifyUser`:
+Secara bawaan, Compaction berjalan secara diam-diam. Untuk menampilkan notifikasi singkat saat Compaction
+dimulai dan saat selesai, aktifkan `notifyUser`:
 
 ```json5
 {
@@ -156,38 +156,39 @@ dimulai, aktifkan `notifyUser`:
 }
 ```
 
-Jika diaktifkan, pengguna akan melihat pesan singkat (misalnya, "Memadatkan
-konteks...") pada awal setiap proses pemadatan.
+Saat diaktifkan, pengguna akan melihat pesan status singkat di sekitar setiap eksekusi Compaction
+(misalnya, "Memadatkan konteks..." dan "Compaction selesai").
 
-## Pemadatan vs pemangkasan
+## Compaction vs pruning
 
-|                  | Compaction                    | Pemangkasan                      |
+|                  | Compaction                    | Pruning                          |
 | ---------------- | ----------------------------- | -------------------------------- |
-| **Apa yang dilakukan** | Merangkum percakapan lama     | Memangkas hasil tool lama        |
-| **Disimpan?**       | Ya (dalam transkrip sesi)   | Tidak (hanya di memori, per permintaan) |
-| **Cakupan**        | Seluruh percakapan           | Hanya hasil tool                 |
+| **Apa fungsinya** | Merangkum percakapan lama     | Memangkas hasil tool lama        |
+| **Disimpan?**    | Ya (dalam transkrip sesi)     | Tidak (hanya in-memory, per permintaan) |
+| **Cakupan**      | Seluruh percakapan            | Hanya hasil tool                 |
 
-[Pemangkasan sesi](/id/concepts/session-pruning) adalah pelengkap yang lebih ringan
-yang memangkas output tool tanpa merangkum.
+[Session pruning](/id/concepts/session-pruning) adalah pelengkap yang lebih ringan yang
+memangkas output tool tanpa melakukan peringkasan.
 
 ## Pemecahan masalah
 
-**Terlalu sering memadatkan?** Jendela konteks model mungkin kecil, atau output tool
-mungkin besar. Coba aktifkan
-[pemangkasan sesi](/id/concepts/session-pruning).
+**Terlalu sering melakukan Compaction?** Jendela konteks model mungkin kecil, atau output
+tool mungkin besar. Coba aktifkan
+[session pruning](/id/concepts/session-pruning).
 
-**Konteks terasa usang setelah pemadatan?** Gunakan `/compact Focus on <topic>` untuk
+**Konteks terasa usang setelah Compaction?** Gunakan `/compact Fokus pada <topic>` untuk
 memandu ringkasan, atau aktifkan [memory flush](/id/concepts/memory) agar catatan
 tetap tersimpan.
 
-**Butuh mulai dari awal?** `/new` memulai sesi baru tanpa melakukan pemadatan.
+**Butuh mulai bersih?** `/new` memulai sesi baru tanpa melakukan Compaction.
 
-Untuk konfigurasi lanjutan (cadangan token, pelestarian pengenal, engine konteks kustom, pemadatan sisi server OpenAI), lihat
+Untuk konfigurasi lanjutan (reserve token, preservasi identifier, engine
+konteks kustom, Compaction sisi server OpenAI), lihat
 [Pendalaman Manajemen Sesi](/id/reference/session-management-compaction).
 
 ## Terkait
 
-- [Sesi](/id/concepts/session) — manajemen dan siklus hidup sesi
-- [Pemangkasan Sesi](/id/concepts/session-pruning) — memangkas hasil tool
-- [Konteks](/id/concepts/context) — bagaimana konteks dibangun untuk giliran agen
-- [Hooks](/id/automation/hooks) — hook siklus hidup pemadatan (before_compaction, after_compaction)
+- [Session](/id/concepts/session) — manajemen dan siklus hidup sesi
+- [Session Pruning](/id/concepts/session-pruning) — memangkas hasil tool
+- [Context](/id/concepts/context) — cara konteks dibangun untuk giliran agen
+- [Hooks](/id/automation/hooks) — hook siklus hidup Compaction (before_compaction, after_compaction)

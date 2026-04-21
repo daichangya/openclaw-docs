@@ -1,57 +1,57 @@
 ---
 read_when:
-    - Anda ingin memicu eksekusi agen dari skrip atau baris perintah
-    - Anda perlu mengirim balasan agen ke channel chat secara terprogram
-summary: Jalankan turn agen dari CLI dan secara opsional kirim balasan ke channel
-title: Agent Send
+    - Anda ingin memicu run agent dari skrip atau command line
+    - Anda perlu mengirim balasan agent ke channel chat secara terprogram
+summary: Jalankan giliran agent dari CLI dan kirim balasan ke channel secara opsional
+title: Pengiriman Agent
 x-i18n:
-    generated_at: "2026-04-05T14:06:57Z"
+    generated_at: "2026-04-21T09:24:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 42ea2977e89fb28d2afd07e5f6b1560ad627aea8b72fde36d8e324215c710afc
+    source_hash: 0550ad38efb2711f267a62b905fd150987a98801247de780ed3df97f27245704
     source_path: tools/agent-send.md
     workflow: 15
 ---
 
-# Agent Send
+# Pengiriman Agent
 
-`openclaw agent` menjalankan satu turn agen dari baris perintah tanpa memerlukan
-pesan chat masuk. Gunakan untuk alur kerja berbasis skrip, pengujian, dan
+`openclaw agent` menjalankan satu giliran agent dari command line tanpa memerlukan
+pesan chat masuk. Gunakan untuk alur kerja berskrip, pengujian, dan
 pengiriman terprogram.
 
 ## Mulai cepat
 
 <Steps>
-  <Step title="Jalankan turn agen sederhana">
+  <Step title="Jalankan giliran agent sederhana">
     ```bash
-    openclaw agent --message "What is the weather today?"
+    openclaw agent --message "Bagaimana cuaca hari ini?"
     ```
 
     Ini mengirim pesan melalui Gateway dan mencetak balasannya.
 
   </Step>
 
-  <Step title="Targetkan agen atau sesi tertentu">
+  <Step title="Targetkan agent atau sesi tertentu">
     ```bash
-    # Targetkan agen tertentu
-    openclaw agent --agent ops --message "Summarize logs"
+    # Targetkan agent tertentu
+    openclaw agent --agent ops --message "Ringkas log"
 
     # Targetkan nomor telepon (menurunkan session key)
-    openclaw agent --to +15555550123 --message "Status update"
+    openclaw agent --to +15555550123 --message "Pembaruan status"
 
     # Gunakan kembali sesi yang ada
-    openclaw agent --session-id abc123 --message "Continue the task"
+    openclaw agent --session-id abc123 --message "Lanjutkan tugas"
     ```
 
   </Step>
 
-  <Step title="Kirim balasan ke sebuah channel">
+  <Step title="Kirim balasan ke channel">
     ```bash
     # Kirim ke WhatsApp (channel default)
-    openclaw agent --to +15555550123 --message "Report ready" --deliver
+    openclaw agent --to +15555550123 --message "Laporan siap" --deliver
 
     # Kirim ke Slack
-    openclaw agent --agent ops --message "Generate report" \
+    openclaw agent --agent ops --message "Buat laporan" \
       --deliver --reply-channel slack --reply-to "#reports"
     ```
 
@@ -63,45 +63,45 @@ pengiriman terprogram.
 | Flag                          | Deskripsi                                                   |
 | ----------------------------- | ----------------------------------------------------------- |
 | `--message \<text\>`          | Pesan yang akan dikirim (wajib)                             |
-| `--to \<dest\>`               | Turunkan session key dari target (telepon, id chat)         |
-| `--agent \<id\>`              | Targetkan agen yang dikonfigurasi (menggunakan sesi `main`) |
+| `--to \<dest\>`               | Turunkan session key dari target (telepon, chat id)         |
+| `--agent \<id\>`              | Targetkan agent yang dikonfigurasi (menggunakan sesi `main`) |
 | `--session-id \<id\>`         | Gunakan kembali sesi yang ada berdasarkan id                |
-| `--local`                     | Paksa runtime embed lokal (lewati Gateway)                  |
+| `--local`                     | Paksa runtime embedded lokal (lewati Gateway)               |
 | `--deliver`                   | Kirim balasan ke channel chat                               |
 | `--channel \<name\>`          | Channel pengiriman (whatsapp, telegram, discord, slack, dll.) |
 | `--reply-to \<target\>`       | Override target pengiriman                                  |
 | `--reply-channel \<name\>`    | Override channel pengiriman                                 |
-| `--reply-account \<id\>`      | Override id akun pengiriman                                 |
-| `--thinking \<level\>`        | Setel level thinking (off, minimal, low, medium, high, xhigh) |
+| `--reply-account \<id\>`      | Override account id pengiriman                              |
+| `--thinking \<level\>`        | Setel level thinking untuk profil model yang dipilih        |
 | `--verbose \<on\|full\|off\>` | Setel level verbose                                         |
-| `--timeout \<seconds\>`       | Override timeout agen                                       |
-| `--json`                      | Keluarkan JSON terstruktur                                  |
+| `--timeout \<seconds\>`       | Override timeout agent                                      |
+| `--json`                      | Output JSON terstruktur                                     |
 
 ## Perilaku
 
 - Secara default, CLI berjalan **melalui Gateway**. Tambahkan `--local` untuk memaksa
-  runtime embed pada mesin saat ini.
-- Jika Gateway tidak dapat dijangkau, CLI **fallback** ke eksekusi embed lokal.
+  runtime embedded pada mesin saat ini.
+- Jika Gateway tidak dapat dijangkau, CLI **fallback** ke run embedded lokal.
 - Pemilihan sesi: `--to` menurunkan session key (target grup/channel
-  mempertahankan isolasi; chat langsung digabungkan ke `main`).
-- Flag thinking dan verbose dipertahankan ke penyimpanan sesi.
+  mempertahankan isolasi; chat langsung digabung ke `main`).
+- Flag thinking dan verbose dipertahankan ke session store.
 - Output: teks biasa secara default, atau `--json` untuk payload + metadata terstruktur.
 
 ## Contoh
 
 ```bash
-# Turn sederhana dengan output JSON
-openclaw agent --to +15555550123 --message "Trace logs" --verbose on --json
+# Giliran sederhana dengan output JSON
+openclaw agent --to +15555550123 --message "Lacak log" --verbose on --json
 
-# Turn dengan level thinking
-openclaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
+# Giliran dengan level thinking
+openclaw agent --session-id 1234 --message "Ringkas kotak masuk" --thinking medium
 
 # Kirim ke channel yang berbeda dari sesi
-openclaw agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
+openclaw agent --agent ops --message "Peringatan" --deliver --reply-channel telegram --reply-to "@admin"
 ```
 
 ## Terkait
 
-- [Referensi CLI agen](/cli/agent)
-- [Sub-agents](/tools/subagents) — spawning sub-agen latar belakang
+- [Referensi CLI Agent](/cli/agent)
+- [Sub-agents](/id/tools/subagents) — pemunculan sub-agent latar belakang
 - [Sessions](/id/concepts/session) — cara kerja session key

@@ -1,41 +1,41 @@
 ---
 read_when:
-    - Anda memerlukan referensi penyiapan model per penyedia
-    - Anda menginginkan contoh konfigurasi atau perintah onboarding CLI untuk penyedia model
-summary: Ikhtisar penyedia model dengan contoh konfigurasi + alur CLI
-title: Penyedia Model
+    - Anda memerlukan referensi penyiapan model per provider
+    - Anda menginginkan contoh konfigurasi atau perintah onboarding CLI untuk provider model
+summary: Ikhtisar provider model dengan contoh konfigurasi + alur CLI
+title: Provider model
 x-i18n:
-    generated_at: "2026-04-13T08:50:45Z"
+    generated_at: "2026-04-21T09:17:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 66ba688c4b4366eec07667571e835d4cfeee684896e2ffae11d601b5fa0a4b98
+    source_hash: 6732ab672757579c09395583a0f7d110348c909d4e4ab1d2accad68ad054c636
     source_path: concepts/model-providers.md
     workflow: 15
 ---
 
-# Penyedia model
+# Provider model
 
-Halaman ini membahas **penyedia LLM/model** (bukan saluran chat seperti WhatsApp/Telegram).
+Halaman ini membahas **provider LLM/model** (bukan channel obrolan seperti WhatsApp/Telegram).
 Untuk aturan pemilihan model, lihat [/concepts/models](/id/concepts/models).
 
 ## Aturan cepat
 
 - Referensi model menggunakan `provider/model` (contoh: `opencode/claude-opus-4-6`).
-- Jika Anda menetapkan `agents.defaults.models`, itu akan menjadi allowlist.
+- Jika Anda menetapkan `agents.defaults.models`, itu menjadi allowlist.
 - Helper CLI: `openclaw onboard`, `openclaw models list`, `openclaw models set <provider/model>`.
 - Aturan runtime fallback, probe cooldown, dan persistensi override sesi
   didokumentasikan di [/concepts/model-failover](/id/concepts/model-failover).
 - `models.providers.*.models[].contextWindow` adalah metadata model native;
   `models.providers.*.models[].contextTokens` adalah batas runtime efektif.
-- Plugin penyedia dapat menyuntikkan katalog model melalui `registerProvider({ catalog })`;
-  OpenClaw menggabungkan keluaran tersebut ke dalam `models.providers` sebelum menulis
+- Plugin provider dapat menyuntikkan katalog model melalui `registerProvider({ catalog })`;
+  OpenClaw menggabungkan output itu ke dalam `models.providers` sebelum menulis
   `models.json`.
-- Manifes penyedia dapat mendeklarasikan `providerAuthEnvVars` dan
-  `providerAuthAliases` sehingga probe autentikasi generik berbasis env dan varian penyedia
-  tidak perlu memuat runtime Plugin. Peta env-var inti yang tersisa sekarang
-  hanya untuk penyedia non-Plugin/inti dan beberapa kasus prioritas generik
+- Manifes provider dapat mendeklarasikan `providerAuthEnvVars` dan
+  `providerAuthAliases` sehingga probe auth generik berbasis env dan varian provider
+  tidak perlu memuat runtime plugin. Peta env-var inti yang tersisa sekarang
+  hanya untuk provider non-plugin/inti dan beberapa kasus prioritas generik
   seperti onboarding Anthropic yang mengutamakan API key.
-- Plugin penyedia juga dapat memiliki perilaku runtime penyedia melalui
+- Plugin provider juga dapat memiliki perilaku runtime provider melalui
   `normalizeModelId`, `normalizeTransport`, `normalizeConfig`,
   `applyNativeStreamingUsageCompat`, `resolveConfigApiKey`,
   `resolveSyntheticAuth`, `shouldDeferSyntheticProfileAuth`,
@@ -49,181 +49,222 @@ Untuk aturan pemilihan model, lihat [/concepts/models](/id/concepts/models).
   `buildAuthDoctorHint`,
   `matchesContextOverflowError`, `classifyFailoverReason`,
   `isCacheTtlEligible`, `buildMissingAuthMessage`, `suppressBuiltInModel`,
-  `augmentModelCatalog`, `isBinaryThinking`, `supportsXHighThinking`,
-  `resolveDefaultThinkingLevel`, `applyConfigDefaults`, `isModernModelRef`,
+  `augmentModelCatalog`, `resolveThinkingProfile`, `isBinaryThinking`,
+  `supportsXHighThinking`, `resolveDefaultThinkingLevel`,
+  `applyConfigDefaults`, `isModernModelRef`,
   `prepareRuntimeAuth`, `resolveUsageAuth`, `fetchUsageSnapshot`, dan
   `onModelSelected`.
-- Catatan: runtime penyedia `capabilities` adalah metadata runner bersama (keluarga penyedia, kekhasan transkrip/tooling, petunjuk transport/cache). Ini bukan
-  hal yang sama dengan [model capability publik](/id/plugins/architecture#public-capability-model)
-  yang menjelaskan apa yang didaftarkan oleh sebuah Plugin (inferensi teks, ucapan, dll.).
-- Penyedia `codex` bawaan dipasangkan dengan harness agen Codex bawaan.
-  Gunakan `codex/gpt-*` saat Anda menginginkan login yang dimiliki Codex, penemuan model, resume thread native, dan eksekusi server aplikasi. Referensi `openai/gpt-*` biasa tetap
-  menggunakan penyedia OpenAI dan transport penyedia OpenClaw normal.
+- Catatan: runtime provider `capabilities` adalah metadata runner bersama (keluarga provider,
+  kekhasan transkrip/tooling, petunjuk transport/cache). Ini tidak sama
+  dengan [model capability publik](/id/plugins/architecture#public-capability-model)
+  yang menjelaskan apa yang didaftarkan sebuah plugin (inferensi teks, speech, dll.).
+- Provider `codex` bawaan dipasangkan dengan harness agen Codex bawaan.
+  Gunakan `codex/gpt-*` saat Anda menginginkan login milik Codex, penemuan model,
+  pelanjutan thread native, dan eksekusi app-server. Referensi `openai/gpt-*`
+  biasa tetap menggunakan provider OpenAI dan transport provider OpenClaw normal.
   Deployment khusus Codex dapat menonaktifkan fallback PI otomatis dengan
   `agents.defaults.embeddedHarness.fallback: "none"`; lihat
   [Codex Harness](/id/plugins/codex-harness).
 
-## Perilaku penyedia yang dimiliki Plugin
+## Perilaku provider yang dimiliki Plugin
 
-Plugin penyedia kini dapat memiliki sebagian besar logika khusus penyedia sementara OpenClaw mempertahankan
+Plugin provider kini dapat memiliki sebagian besar logika khusus provider sementara OpenClaw mempertahankan
 loop inferensi generik.
 
-Pembagian umum:
+Pembagian yang umum:
 
-- `auth[].run` / `auth[].runNonInteractive`: penyedia memiliki alur onboarding/login
+- `auth[].run` / `auth[].runNonInteractive`: provider memiliki alur onboarding/login
   untuk `openclaw onboard`, `openclaw models auth`, dan penyiapan headless
-- `wizard.setup` / `wizard.modelPicker`: penyedia memiliki label pilihan autentikasi,
+- `wizard.setup` / `wizard.modelPicker`: provider memiliki label pilihan auth,
   alias lama, petunjuk allowlist onboarding, dan entri penyiapan di pemilih onboarding/model
-- `catalog`: penyedia muncul di `models.providers`
-- `normalizeModelId`: penyedia menormalkan id model lama/pratinjau sebelum
-  pencarian atau kanonisasi
-- `normalizeTransport`: penyedia menormalkan `api` / `baseUrl` keluarga transport
-  sebelum perakitan model generik; OpenClaw memeriksa penyedia yang cocok terlebih dahulu,
-  lalu Plugin penyedia lain yang mampu menjalankan hook sampai salah satunya benar-benar mengubah
+- `catalog`: provider muncul di `models.providers`
+- `normalizeModelId`: provider menormalkan id model lama/preview sebelum
+  lookup atau kanonikalisasi
+- `normalizeTransport`: provider menormalkan `api` / `baseUrl` keluarga transport
+  sebelum perakitan model generik; OpenClaw memeriksa provider yang cocok terlebih dahulu,
+  lalu plugin provider lain yang mampu hook sampai salah satunya benar-benar mengubah
   transport
-- `normalizeConfig`: penyedia menormalkan konfigurasi `models.providers.<id>` sebelum
-  runtime menggunakannya; OpenClaw memeriksa penyedia yang cocok terlebih dahulu, lalu Plugin penyedia lain
-  yang mampu menjalankan hook sampai salah satunya benar-benar mengubah konfigurasi. Jika tidak ada
-  hook penyedia yang menulis ulang konfigurasi, helper keluarga Google bawaan tetap
-  menormalkan entri penyedia Google yang didukung.
-- `applyNativeStreamingUsageCompat`: penyedia menerapkan penulisan ulang kompatibilitas penggunaan streaming native berbasis endpoint untuk penyedia konfigurasi
-- `resolveConfigApiKey`: penyedia menyelesaikan autentikasi penanda env untuk penyedia konfigurasi
-  tanpa memaksa pemuatan autentikasi runtime penuh. `amazon-bedrock` juga memiliki
-  resolver penanda env AWS bawaan di sini, meskipun autentikasi runtime Bedrock menggunakan
+- `normalizeConfig`: provider menormalkan konfigurasi `models.providers.<id>` sebelum
+  runtime menggunakannya; OpenClaw memeriksa provider yang cocok terlebih dahulu, lalu plugin provider
+  lain yang mampu hook sampai salah satunya benar-benar mengubah konfigurasi. Jika tidak ada
+  hook provider yang menulis ulang konfigurasi, helper keluarga Google bawaan tetap
+  menormalkan entri provider Google yang didukung.
+- `applyNativeStreamingUsageCompat`: provider menerapkan penulisan ulang kompatibilitas streaming-usage native berbasis endpoint untuk provider konfigurasi
+- `resolveConfigApiKey`: provider me-resolve auth penanda env untuk provider konfigurasi
+  tanpa memaksa pemuatan auth runtime penuh. `amazon-bedrock` juga memiliki
+  resolver penanda env AWS bawaan di sini, walaupun auth runtime Bedrock menggunakan
   rantai default AWS SDK.
-- `resolveSyntheticAuth`: penyedia dapat mengekspos ketersediaan autentikasi lokal/self-hosted atau
-  autentikasi lain yang didukung konfigurasi tanpa menyimpan secret plaintext
-- `shouldDeferSyntheticProfileAuth`: penyedia dapat menandai placeholder profil sintetis yang disimpan
-  sebagai prioritas lebih rendah daripada autentikasi berbasis env/konfigurasi
-- `resolveDynamicModel`: penyedia menerima id model yang belum ada di
-  katalog statis lokal
-- `prepareDynamicModel`: penyedia memerlukan refresh metadata sebelum mencoba lagi
-  resolusi model dinamis
-- `normalizeResolvedModel`: penyedia memerlukan penulisan ulang transport atau base URL
-- `contributeResolvedModelCompat`: penyedia menyumbangkan flag kompatibilitas untuk
-  model vendor mereka bahkan ketika model tersebut datang melalui transport kompatibel lain
-- `capabilities`: penyedia memublikasikan kekhasan transkrip/tooling/keluarga penyedia
-- `normalizeToolSchemas`: penyedia membersihkan skema tool sebelum
+- `resolveSyntheticAuth`: provider dapat mengekspos ketersediaan auth lokal/self-hosted atau auth berbasis konfigurasi lain
+  tanpa menyimpan rahasia plaintext
+- `shouldDeferSyntheticProfileAuth`: provider dapat menandai placeholder profil sintetis yang disimpan
+  sebagai prioritas lebih rendah daripada auth berbasis env/config
+- `resolveDynamicModel`: provider menerima id model yang belum ada di katalog statis lokal
+- `prepareDynamicModel`: provider memerlukan penyegaran metadata sebelum mencoba ulang
+  resolusi dinamis
+- `normalizeResolvedModel`: provider memerlukan penulisan ulang transport atau base URL
+- `contributeResolvedModelCompat`: provider menyumbang flag kompatibilitas untuk
+  model vendor miliknya bahkan saat model itu datang melalui transport kompatibel lain
+- `capabilities`: provider menerbitkan kekhasan transkrip/tooling/keluarga-provider
+- `normalizeToolSchemas`: provider membersihkan skema tool sebelum
   runner tertanam melihatnya
-- `inspectToolSchemas`: penyedia menampilkan peringatan skema khusus transport
+- `inspectToolSchemas`: provider menampilkan peringatan skema khusus transport
   setelah normalisasi
-- `resolveReasoningOutputMode`: penyedia memilih kontrak keluaran reasoning
-  native vs bertag
-- `prepareExtraParams`: penyedia menetapkan default atau menormalkan parameter permintaan per model
-- `createStreamFn`: penyedia mengganti jalur stream normal dengan transport
+- `resolveReasoningOutputMode`: provider memilih kontrak output reasoning native vs bertag
+- `prepareExtraParams`: provider menetapkan default atau menormalkan parameter request per model
+- `createStreamFn`: provider mengganti jalur stream normal dengan transport
   kustom sepenuhnya
-- `wrapStreamFn`: penyedia menerapkan wrapper kompatibilitas header/body/model permintaan
-- `resolveTransportTurnState`: penyedia menyediakan header atau metadata
-  transport native per giliran
-- `resolveWebSocketSessionPolicy`: penyedia menyediakan header sesi WebSocket native
-  atau kebijakan cool-down sesi
-- `createEmbeddingProvider`: penyedia memiliki perilaku embedding memori saat
-  perilaku tersebut seharusnya berada pada Plugin penyedia, bukan switchboard embedding inti
-- `formatApiKey`: penyedia memformat profil autentikasi yang disimpan menjadi string
+- `wrapStreamFn`: provider menerapkan wrapper kompatibilitas request header/body/model
+- `resolveTransportTurnState`: provider menyediakan header atau metadata transport native per giliran
+- `resolveWebSocketSessionPolicy`: provider menyediakan header sesi WebSocket native
+  atau kebijakan cooldown sesi
+- `createEmbeddingProvider`: provider memiliki perilaku embedding memori saat
+  itu lebih tepat berada pada plugin provider daripada switchboard embedding inti
+- `formatApiKey`: provider memformat profil auth yang disimpan ke dalam string
   runtime `apiKey` yang diharapkan oleh transport
-- `refreshOAuth`: penyedia memiliki refresh OAuth ketika refresher bersama `pi-ai`
-  tidak memadai
-- `buildAuthDoctorHint`: penyedia menambahkan panduan perbaikan saat refresh OAuth
+- `refreshOAuth`: provider memiliki refresh OAuth ketika refresher bersama `pi-ai`
+  tidak mencukupi
+- `buildAuthDoctorHint`: provider menambahkan panduan perbaikan ketika refresh OAuth
   gagal
-- `matchesContextOverflowError`: penyedia mengenali error luapan jendela konteks
-  khusus penyedia yang terlewat oleh heuristik generik
-- `classifyFailoverReason`: penyedia memetakan error transport/API mentah khusus penyedia
+- `matchesContextOverflowError`: provider mengenali error overflow context-window
+  khusus provider yang akan terlewat oleh heuristik generik
+- `classifyFailoverReason`: provider memetakan error mentah transport/API khusus provider
   ke alasan failover seperti rate limit atau overload
-- `isCacheTtlEligible`: penyedia menentukan id model upstream mana yang mendukung TTL prompt cache
-- `buildMissingAuthMessage`: penyedia mengganti error auth-store generik
-  dengan petunjuk pemulihan khusus penyedia
-- `suppressBuiltInModel`: penyedia menyembunyikan baris upstream yang usang dan dapat mengembalikan
-  error yang dimiliki vendor untuk kegagalan resolusi langsung
-- `augmentModelCatalog`: penyedia menambahkan baris katalog sintetis/final setelah
-  penemuan dan penggabungan konfigurasi
-- `isBinaryThinking`: penyedia memiliki UX thinking biner nyala/mati
-- `supportsXHighThinking`: penyedia memilih model tertentu agar mendukung `xhigh`
-- `resolveDefaultThinkingLevel`: penyedia memiliki kebijakan default `/think` untuk
-  keluarga model
-- `applyConfigDefaults`: penyedia menerapkan default global khusus penyedia
-  selama materialisasi konfigurasi berdasarkan mode autentikasi, env, atau keluarga model
-- `isModernModelRef`: penyedia memiliki pencocokan model pilihan live/smoke
-- `prepareRuntimeAuth`: penyedia mengubah kredensial yang dikonfigurasi menjadi token runtime
+- `isCacheTtlEligible`: provider memutuskan id model upstream mana yang mendukung prompt-cache TTL
+- `buildMissingAuthMessage`: provider mengganti error auth-store generik
+  dengan petunjuk pemulihan khusus provider
+- `suppressBuiltInModel`: provider menyembunyikan baris upstream yang usang dan dapat mengembalikan
+  error milik vendor untuk kegagalan resolusi langsung
+- `augmentModelCatalog`: provider menambahkan baris katalog sintetis/final setelah
+  discovery dan penggabungan konfigurasi
+- `resolveThinkingProfile`: provider memiliki set level `/think` yang tepat,
+  label tampilan opsional, dan level default untuk model terpilih
+- `isBinaryThinking`: hook kompatibilitas untuk UX thinking biner nyala/mati
+- `supportsXHighThinking`: hook kompatibilitas untuk model `xhigh` yang dipilih
+- `resolveDefaultThinkingLevel`: hook kompatibilitas untuk kebijakan `/think` default
+- `applyConfigDefaults`: provider menerapkan default global khusus provider
+  selama materialisasi konfigurasi berdasarkan mode auth, env, atau keluarga model
+- `isModernModelRef`: provider memiliki pencocokan model pilihan live/smoke
+- `prepareRuntimeAuth`: provider mengubah kredensial yang dikonfigurasi menjadi token runtime
   berumur pendek
-- `resolveUsageAuth`: penyedia menyelesaikan kredensial penggunaan/kuota untuk `/usage`
+- `resolveUsageAuth`: provider me-resolve kredensial usage/quota untuk `/usage`
   dan permukaan status/pelaporan terkait
-- `fetchUsageSnapshot`: penyedia memiliki pengambilan/penguraian endpoint penggunaan sementara
-  inti tetap memiliki shell ringkasan dan pemformatannya
-- `onModelSelected`: penyedia menjalankan efek samping pascapemilihan seperti
-  telemetri atau pembukuan sesi yang dimiliki penyedia
+- `fetchUsageSnapshot`: provider memiliki pengambilan/parsing endpoint usage sementara
+  inti tetap memiliki shell ringkasan dan pemformatan
+- `onModelSelected`: provider menjalankan efek samping pascapemilihan seperti
+  telemetri atau pencatatan sesi milik provider
 
 Contoh bawaan saat ini:
 
-- `anthropic`: fallback kompatibilitas-maju Claude 4.6, petunjuk perbaikan autentikasi, pengambilan endpoint penggunaan, metadata keluarga penyedia/cache-TTL, dan default konfigurasi global yang sadar autentikasi
-- `amazon-bedrock`: pencocokan context-overflow yang dimiliki penyedia dan klasifikasi alasan failover untuk error throttle/not-ready khusus Bedrock, ditambah keluarga replay bersama `anthropic-by-model` untuk guard kebijakan replay khusus Claude pada trafik Anthropic
-- `anthropic-vertex`: guard kebijakan replay khusus Claude pada trafik pesan Anthropic
-- `openrouter`: id model pass-through, wrapper permintaan, petunjuk capability penyedia, sanitasi thought-signature Gemini pada trafik proxy Gemini, injeksi reasoning proxy melalui keluarga stream `openrouter-thinking`, penerusan metadata routing, dan kebijakan cache-TTL
-- `github-copilot`: onboarding/login perangkat, fallback model kompatibilitas-maju, petunjuk transkrip Claude-thinking, pertukaran token runtime, dan pengambilan endpoint penggunaan
-- `openai`: fallback kompatibilitas-maju GPT-5.4, normalisasi transport OpenAI langsung, petunjuk autentikasi hilang yang sadar Codex, penekanan Spark, baris katalog OpenAI/Codex sintetis, kebijakan thinking/model live, normalisasi alias token penggunaan (`input` / `output` dan keluarga `prompt` / `completion`), keluarga stream bersama `openai-responses-defaults` untuk wrapper OpenAI/Codex native, metadata keluarga penyedia, pendaftaran penyedia pembuatan gambar bawaan untuk `gpt-image-1`, dan pendaftaran penyedia pembuatan video bawaan untuk `sora-2`
-- `google` dan `google-gemini-cli`: fallback kompatibilitas-maju Gemini 3.1, validasi replay Gemini native, sanitasi replay bootstrap, mode keluaran reasoning bertag, pencocokan model modern, pendaftaran penyedia pembuatan gambar bawaan untuk model image-preview Gemini, dan pendaftaran penyedia pembuatan video bawaan untuk model Veo; OAuth Gemini CLI juga memiliki pemformatan token profil autentikasi, penguraian token penggunaan, dan pengambilan endpoint kuota untuk permukaan penggunaan
-- `moonshot`: transport bersama, normalisasi muatan thinking yang dimiliki Plugin
-- `kilocode`: transport bersama, header permintaan yang dimiliki Plugin, normalisasi muatan reasoning, sanitasi thought-signature proxy-Gemini, dan kebijakan cache-TTL
-- `zai`: fallback kompatibilitas-maju GLM-5, default `tool_stream`, kebijakan cache-TTL, kebijakan thinking biner/model live, dan autentikasi penggunaan + pengambilan kuota; id `glm-5*` yang tidak dikenal disintesis dari templat `glm-4.7` bawaan
-- `xai`: normalisasi transport Responses native, penulisan ulang alias `/fast` untuk varian cepat Grok, default `tool_stream`, pembersihan skema tool / muatan reasoning khusus xAI, dan pendaftaran penyedia pembuatan video bawaan untuk `grok-imagine-video`
-- `mistral`: metadata capability yang dimiliki Plugin
-- `opencode` dan `opencode-go`: metadata capability yang dimiliki Plugin ditambah sanitasi thought-signature proxy-Gemini
-- `alibaba`: katalog pembuatan video yang dimiliki Plugin untuk referensi model Wan langsung seperti `alibaba/wan2.6-t2v`
-- `byteplus`: katalog yang dimiliki Plugin ditambah pendaftaran penyedia pembuatan video bawaan untuk model Seedance text-to-video/image-to-video
-- `fal`: pendaftaran penyedia pembuatan video bawaan untuk penyedia pembuatan gambar pihak ketiga yang di-hosting untuk model gambar FLUX ditambah pendaftaran penyedia pembuatan video bawaan untuk model video pihak ketiga yang di-hosting
+- `anthropic`: fallback kompatibilitas-maju Claude 4.6, petunjuk perbaikan auth, pengambilan endpoint
+  usage, metadata cache-TTL/keluarga-provider, dan default konfigurasi global
+  yang sadar-auth
+- `amazon-bedrock`: pencocokan context-overflow yang dimiliki provider dan klasifikasi
+  alasan failover untuk error throttle/not-ready khusus Bedrock, ditambah
+  keluarga replay bersama `anthropic-by-model` untuk guard kebijakan replay khusus Claude
+  pada trafik Anthropic
+- `anthropic-vertex`: guard kebijakan replay khusus Claude pada trafik
+  pesan Anthropic
+- `openrouter`: id model pass-through, wrapper request, petunjuk capability provider,
+  sanitasi thought-signature Gemini pada trafik Gemini melalui proxy,
+  injeksi reasoning proxy melalui keluarga stream `openrouter-thinking`, penerusan
+  metadata routing, dan kebijakan cache-TTL
+- `github-copilot`: onboarding/login perangkat, fallback model kompatibilitas-maju,
+  petunjuk transkrip Claude-thinking, pertukaran token runtime, dan pengambilan
+  endpoint usage
+- `openai`: fallback kompatibilitas-maju GPT-5.4, normalisasi transport OpenAI langsung,
+  petunjuk missing-auth yang sadar-Codex, penekanan Spark, baris katalog
+  OpenAI/Codex sintetis, kebijakan thinking/model live, normalisasi alias token usage
+  (`input` / `output` dan keluarga `prompt` / `completion`), keluarga stream bersama
+  `openai-responses-defaults` untuk wrapper OpenAI/Codex native, metadata keluarga-provider,
+  pendaftaran provider generasi gambar bawaan
+  untuk `gpt-image-1`, dan pendaftaran provider generasi video bawaan
+  untuk `sora-2`
+- `google` dan `google-gemini-cli`: fallback kompatibilitas-maju Gemini 3.1,
+  validasi replay Gemini native, sanitasi replay bootstrap, mode output reasoning
+  bertag, pencocokan model modern, pendaftaran provider generasi gambar bawaan
+  untuk model Gemini image-preview, dan pendaftaran provider generasi video bawaan
+  untuk model Veo; Gemini CLI OAuth juga
+  memiliki pemformatan token profil auth, parsing token usage, dan pengambilan endpoint kuota untuk permukaan usage
+- `moonshot`: transport bersama, normalisasi payload thinking milik plugin
+- `kilocode`: transport bersama, header request milik plugin, normalisasi payload reasoning,
+  sanitasi thought-signature proxy-Gemini, dan kebijakan cache-TTL
+- `zai`: fallback kompatibilitas-maju GLM-5, default `tool_stream`, kebijakan cache-TTL,
+  kebijakan thinking biner/model live, serta auth usage + pengambilan kuota;
+  id `glm-5*` yang tidak dikenal disintesis dari templat bawaan `glm-4.7`
+- `xai`: normalisasi transport Responses native, penulisan ulang alias `/fast` untuk
+  varian cepat Grok, default `tool_stream`, pembersihan tool-schema /
+  payload reasoning khusus xAI, dan pendaftaran provider generasi video bawaan
+  untuk `grok-imagine-video`
+- `mistral`: metadata capability milik plugin
+- `opencode` dan `opencode-go`: metadata capability milik plugin ditambah
+  sanitasi thought-signature proxy-Gemini
+- `alibaba`: katalog generasi video milik plugin untuk referensi model Wan langsung
+  seperti `alibaba/wan2.6-t2v`
+- `byteplus`: katalog milik plugin ditambah pendaftaran provider generasi video bawaan
+  untuk model Seedance text-to-video/image-to-video
+- `fal`: pendaftaran provider generasi video bawaan untuk model pihak ketiga ter-host
+  serta pendaftaran provider generasi gambar untuk model gambar FLUX ditambah pendaftaran provider generasi video bawaan untuk model video pihak ketiga ter-host
 - `cloudflare-ai-gateway`, `huggingface`, `kimi`, `nvidia`, `qianfan`,
   `stepfun`, `synthetic`, `venice`, `vercel-ai-gateway`, dan `volcengine`:
-  hanya katalog yang dimiliki Plugin
-- `qwen`: katalog yang dimiliki Plugin untuk model teks ditambah pendaftaran penyedia media-understanding dan pembuatan video bersama untuk permukaan multimodalnya; pembuatan video Qwen menggunakan endpoint video DashScope Standar dengan model Wan bawaan seperti `wan2.6-t2v` dan `wan2.7-r2v`
-- `runway`: pendaftaran penyedia pembuatan video yang dimiliki Plugin untuk model native berbasis tugas Runway seperti `gen4.5`
-- `minimax`: katalog yang dimiliki Plugin, pendaftaran penyedia pembuatan video bawaan untuk model video Hailuo, pendaftaran penyedia pembuatan gambar bawaan untuk `image-01`, pemilihan kebijakan replay hibrida Anthropic/OpenAI, dan logika autentikasi/snapshot penggunaan
-- `together`: katalog yang dimiliki Plugin ditambah pendaftaran penyedia pembuatan video bawaan untuk model video Wan
-- `xiaomi`: katalog yang dimiliki Plugin ditambah logika autentikasi/snapshot penggunaan
+  hanya katalog milik plugin
+- `qwen`: katalog milik plugin untuk model teks ditambah pendaftaran provider
+  pemahaman media dan generasi video bersama untuk permukaan multimodalnya;
+  generasi video Qwen menggunakan endpoint video Standard DashScope dengan model Wan bawaan seperti `wan2.6-t2v` dan `wan2.7-r2v`
+- `runway`: pendaftaran provider generasi video milik plugin untuk model native
+  berbasis tugas Runway seperti `gen4.5`
+- `minimax`: katalog milik plugin, pendaftaran provider generasi video bawaan
+  untuk model video Hailuo, pendaftaran provider generasi gambar bawaan
+  untuk `image-01`, pemilihan kebijakan replay hibrida Anthropic/OpenAI, dan logika auth/snapshot usage
+- `together`: katalog milik plugin ditambah pendaftaran provider generasi video bawaan
+  untuk model video Wan
+- `xiaomi`: katalog milik plugin ditambah logika auth/snapshot usage
 
-Plugin `openai` bawaan sekarang memiliki kedua id penyedia: `openai` dan
+Plugin `openai` bawaan kini memiliki kedua id provider: `openai` dan
 `openai-codex`.
 
-Itu mencakup penyedia yang masih sesuai dengan transport normal OpenClaw. Penyedia
-yang memerlukan eksekutor permintaan kustom sepenuhnya adalah permukaan ekstensi
-terpisah yang lebih mendalam.
+Itu mencakup provider yang masih cocok dengan transport normal OpenClaw. Provider
+yang memerlukan eksekutor request kustom sepenuhnya adalah permukaan extension
+terpisah yang lebih dalam.
 
 ## Rotasi API key
 
-- Mendukung rotasi penyedia generik untuk penyedia tertentu.
+- Mendukung rotasi provider generik untuk provider tertentu.
 - Konfigurasikan beberapa key melalui:
   - `OPENCLAW_LIVE_<PROVIDER>_KEY` (satu override live, prioritas tertinggi)
   - `<PROVIDER>_API_KEYS` (daftar dipisahkan koma atau titik koma)
   - `<PROVIDER>_API_KEY` (key utama)
   - `<PROVIDER>_API_KEY_*` (daftar bernomor, misalnya `<PROVIDER>_API_KEY_1`)
-- Untuk penyedia Google, `GOOGLE_API_KEY` juga disertakan sebagai fallback.
+- Untuk provider Google, `GOOGLE_API_KEY` juga disertakan sebagai fallback.
 - Urutan pemilihan key mempertahankan prioritas dan menghapus duplikasi nilai.
-- Permintaan dicoba ulang dengan key berikutnya hanya pada respons rate-limit (misalnya `429`, `rate_limit`, `quota`, `resource exhausted`, `Too many
+- Request dicoba ulang dengan key berikutnya hanya pada respons rate-limit (misalnya
+  `429`, `rate_limit`, `quota`, `resource exhausted`, `Too many
 concurrent requests`, `ThrottlingException`, `concurrency limit reached`,
-  `workers_ai ... quota limit exceeded`, atau pesan batas penggunaan periodik).
+  `workers_ai ... quota limit exceeded`, atau pesan batas usage berkala).
 - Kegagalan non-rate-limit langsung gagal; tidak ada rotasi key yang dicoba.
-- Saat semua key kandidat gagal, error final dikembalikan dari percobaan terakhir.
+- Ketika semua key kandidat gagal, error akhir dikembalikan dari percobaan terakhir.
 
-## Penyedia bawaan (katalog pi-ai)
+## Provider bawaan (katalog pi-ai)
 
-OpenClaw dikirim dengan katalog pi-ai. Penyedia ini tidak memerlukan
-konfigurasi `models.providers`; cukup tetapkan autentikasi + pilih model.
+OpenClaw dikirim dengan katalog pi‑ai. Provider ini **tidak**
+memerlukan konfigurasi `models.providers`; cukup set auth + pilih model.
 
 ### OpenAI
 
-- Penyedia: `openai`
-- Autentikasi: `OPENAI_API_KEY`
+- Provider: `openai`
+- Auth: `OPENAI_API_KEY`
 - Rotasi opsional: `OPENAI_API_KEYS`, `OPENAI_API_KEY_1`, `OPENAI_API_KEY_2`, ditambah `OPENCLAW_LIVE_OPENAI_KEY` (satu override)
 - Contoh model: `openai/gpt-5.4`, `openai/gpt-5.4-pro`
 - CLI: `openclaw onboard --auth-choice openai-api-key`
 - Transport default adalah `auto` (WebSocket lebih dulu, fallback SSE)
-- Override per model melalui `agents.defaults.models["openai/<model>"].params.transport` (`"sse"`, `"websocket"`, atau `"auto"`)
-- Warm-up WebSocket OpenAI Responses default-nya aktif melalui `params.openaiWsWarmup` (`true`/`false`)
+- Timpa per model melalui `agents.defaults.models["openai/<model>"].params.transport` (`"sse"`, `"websocket"`, atau `"auto"`)
+- Warm-up OpenAI Responses WebSocket default-nya aktif melalui `params.openaiWsWarmup` (`true`/`false`)
 - Pemrosesan prioritas OpenAI dapat diaktifkan melalui `agents.defaults.models["openai/<model>"].params.serviceTier`
-- `/fast` dan `params.fastMode` memetakan permintaan Responses `openai/*` langsung ke `service_tier=priority` pada `api.openai.com`
-- Gunakan `params.serviceTier` saat Anda menginginkan tier eksplisit alih-alih toggle `/fast` bersama
+- `/fast` dan `params.fastMode` memetakan request Responses `openai/*` langsung ke `service_tier=priority` pada `api.openai.com`
+- Gunakan `params.serviceTier` ketika Anda ingin tier eksplisit alih-alih toggle `/fast` bersama
 - Header atribusi OpenClaw tersembunyi (`originator`, `version`,
   `User-Agent`) hanya berlaku pada trafik OpenAI native ke `api.openai.com`, bukan
   proxy generik yang kompatibel dengan OpenAI
-- Rute OpenAI native juga mempertahankan `store` Responses, petunjuk prompt-cache, dan
+- Rute OpenAI native juga mempertahankan Responses `store`, petunjuk prompt-cache, dan
   pembentukan payload kompatibilitas reasoning OpenAI; rute proxy tidak
 - `openai/gpt-5.3-codex-spark` sengaja ditekan di OpenClaw karena API OpenAI live menolaknya; Spark diperlakukan sebagai khusus Codex
 
@@ -235,14 +276,14 @@ konfigurasi `models.providers`; cukup tetapkan autentikasi + pilih model.
 
 ### Anthropic
 
-- Penyedia: `anthropic`
-- Autentikasi: `ANTHROPIC_API_KEY`
+- Provider: `anthropic`
+- Auth: `ANTHROPIC_API_KEY`
 - Rotasi opsional: `ANTHROPIC_API_KEYS`, `ANTHROPIC_API_KEY_1`, `ANTHROPIC_API_KEY_2`, ditambah `OPENCLAW_LIVE_ANTHROPIC_KEY` (satu override)
 - Contoh model: `anthropic/claude-opus-4-6`
 - CLI: `openclaw onboard --auth-choice apiKey`
-- Permintaan Anthropic publik langsung mendukung toggle `/fast` bersama dan `params.fastMode`, termasuk trafik yang diautentikasi dengan API key dan OAuth yang dikirim ke `api.anthropic.com`; OpenClaw memetakannya ke Anthropic `service_tier` (`auto` vs `standard_only`)
-- Catatan Anthropic: staf Anthropic memberi tahu kami bahwa penggunaan Claude CLI gaya OpenClaw diperbolehkan lagi, sehingga OpenClaw memperlakukan penggunaan ulang Claude CLI dan penggunaan `claude -p` sebagai diizinkan untuk integrasi ini kecuali Anthropic menerbitkan kebijakan baru.
-- Setup-token Anthropic tetap tersedia sebagai jalur token OpenClaw yang didukung, tetapi OpenClaw sekarang lebih memilih penggunaan ulang Claude CLI dan `claude -p` saat tersedia.
+- Request Anthropic publik langsung mendukung toggle `/fast` bersama dan `params.fastMode`, termasuk trafik yang diautentikasi dengan API key dan OAuth yang dikirim ke `api.anthropic.com`; OpenClaw memetakannya ke Anthropic `service_tier` (`auto` vs `standard_only`)
+- Catatan Anthropic: staf Anthropic memberi tahu kami bahwa penggunaan Claude CLI gaya OpenClaw diizinkan kembali, jadi OpenClaw memperlakukan penggunaan ulang Claude CLI dan penggunaan `claude -p` sebagai hal yang disetujui untuk integrasi ini kecuali Anthropic menerbitkan kebijakan baru.
+- Setup-token Anthropic tetap tersedia sebagai jalur token OpenClaw yang didukung, tetapi OpenClaw sekarang lebih memilih penggunaan ulang Claude CLI dan `claude -p` bila tersedia.
 
 ```json5
 {
@@ -252,20 +293,20 @@ konfigurasi `models.providers`; cukup tetapkan autentikasi + pilih model.
 
 ### OpenAI Code (Codex)
 
-- Penyedia: `openai-codex`
-- Autentikasi: OAuth (ChatGPT)
+- Provider: `openai-codex`
+- Auth: OAuth (ChatGPT)
 - Contoh model: `openai-codex/gpt-5.4`
 - CLI: `openclaw onboard --auth-choice openai-codex` atau `openclaw models auth login --provider openai-codex`
 - Transport default adalah `auto` (WebSocket lebih dulu, fallback SSE)
-- Override per model melalui `agents.defaults.models["openai-codex/<model>"].params.transport` (`"sse"`, `"websocket"`, atau `"auto"`)
-- `params.serviceTier` juga diteruskan pada permintaan Responses Codex native (`chatgpt.com/backend-api`)
+- Timpa per model melalui `agents.defaults.models["openai-codex/<model>"].params.transport` (`"sse"`, `"websocket"`, atau `"auto"`)
+- `params.serviceTier` juga diteruskan pada request Responses Codex native (`chatgpt.com/backend-api`)
 - Header atribusi OpenClaw tersembunyi (`originator`, `version`,
   `User-Agent`) hanya dilampirkan pada trafik Codex native ke
   `chatgpt.com/backend-api`, bukan proxy generik yang kompatibel dengan OpenAI
-- Berbagi toggle `/fast` dan konfigurasi `params.fastMode` yang sama dengan `openai/*` langsung; OpenClaw memetakannya ke `service_tier=priority`
-- `openai-codex/gpt-5.3-codex-spark` tetap tersedia saat katalog OAuth Codex mengeksposnya; bergantung pada entitlement
-- `openai-codex/gpt-5.4` mempertahankan `contextWindow = 1050000` native dan `contextTokens = 272000` runtime default; override batas runtime dengan `models.providers.openai-codex.models[].contextTokens`
-- Catatan kebijakan: OAuth OpenAI Codex secara eksplisit didukung untuk tool/alur kerja eksternal seperti OpenClaw.
+- Berbagi toggle `/fast` dan konfigurasi `params.fastMode` yang sama seperti `openai/*` langsung; OpenClaw memetakannya ke `service_tier=priority`
+- `openai-codex/gpt-5.3-codex-spark` tetap tersedia ketika katalog OAuth Codex mengeksposnya; bergantung pada entitlement
+- `openai-codex/gpt-5.4` mempertahankan `contextWindow = 1050000` native dan default runtime `contextTokens = 272000`; timpa batas runtime dengan `models.providers.openai-codex.models[].contextTokens`
+- Catatan kebijakan: OpenAI Codex OAuth secara eksplisit didukung untuk alat/alur kerja eksternal seperti OpenClaw.
 
 ```json5
 {
@@ -285,17 +326,17 @@ konfigurasi `models.providers`; cukup tetapkan autentikasi + pilih model.
 }
 ```
 
-### Opsi hosted bergaya langganan lainnya
+### Opsi host bergaya langganan lainnya
 
-- [Qwen Cloud](/id/providers/qwen): permukaan penyedia Qwen Cloud ditambah pemetaan endpoint Alibaba DashScope dan Coding Plan
-- [MiniMax](/id/providers/minimax): OAuth MiniMax Coding Plan atau akses API key
-- [GLM Models](/id/providers/glm): Z.AI Coding Plan atau endpoint API umum
+- [Qwen Cloud](/id/providers/qwen): permukaan provider Qwen Cloud ditambah pemetaan endpoint Alibaba DashScope dan Coding Plan
+- [MiniMax](/id/providers/minimax): akses OAuth atau API key MiniMax Coding Plan
+- [GLM Models](/id/providers/glm): endpoint Z.AI Coding Plan atau API umum
 
 ### OpenCode
 
-- Autentikasi: `OPENCODE_API_KEY` (atau `OPENCODE_ZEN_API_KEY`)
-- Penyedia runtime Zen: `opencode`
-- Penyedia runtime Go: `opencode-go`
+- Auth: `OPENCODE_API_KEY` (atau `OPENCODE_ZEN_API_KEY`)
+- Provider runtime Zen: `opencode`
+- Provider runtime Go: `opencode-go`
 - Contoh model: `opencode/claude-opus-4-6`, `opencode-go/kimi-k2.5`
 - CLI: `openclaw onboard --auth-choice opencode-zen` atau `openclaw onboard --auth-choice opencode-go`
 
@@ -307,91 +348,91 @@ konfigurasi `models.providers`; cukup tetapkan autentikasi + pilih model.
 
 ### Google Gemini (API key)
 
-- Penyedia: `google`
-- Autentikasi: `GEMINI_API_KEY`
+- Provider: `google`
+- Auth: `GEMINI_API_KEY`
 - Rotasi opsional: `GEMINI_API_KEYS`, `GEMINI_API_KEY_1`, `GEMINI_API_KEY_2`, fallback `GOOGLE_API_KEY`, dan `OPENCLAW_LIVE_GEMINI_KEY` (satu override)
 - Contoh model: `google/gemini-3.1-pro-preview`, `google/gemini-3-flash-preview`
-- Kompatibilitas: konfigurasi OpenClaw lama yang menggunakan `google/gemini-3.1-flash-preview` dinormalisasi menjadi `google/gemini-3-flash-preview`
+- Kompatibilitas: konfigurasi OpenClaw lama yang menggunakan `google/gemini-3.1-flash-preview` dinormalkan menjadi `google/gemini-3-flash-preview`
 - CLI: `openclaw onboard --auth-choice gemini-api-key`
 - Eksekusi Gemini langsung juga menerima `agents.defaults.models["google/<model>"].params.cachedContent`
   (atau `cached_content` lama) untuk meneruskan handle
-  `cachedContents/...` native penyedia; cache hit Gemini muncul sebagai OpenClaw `cacheRead`
+  `cachedContents/...` native provider; hit cache Gemini muncul sebagai OpenClaw `cacheRead`
 
 ### Google Vertex dan Gemini CLI
 
-- Penyedia: `google-vertex`, `google-gemini-cli`
-- Autentikasi: Vertex menggunakan gcloud ADC; Gemini CLI menggunakan alur OAuth-nya
-- Perhatian: OAuth Gemini CLI di OpenClaw adalah integrasi tidak resmi. Beberapa pengguna melaporkan pembatasan akun Google setelah menggunakan klien pihak ketiga. Tinjau ketentuan Google dan gunakan akun yang tidak kritis jika Anda memilih untuk melanjutkan.
-- OAuth Gemini CLI dikirim sebagai bagian dari Plugin `google` bawaan.
+- Provider: `google-vertex`, `google-gemini-cli`
+- Auth: Vertex menggunakan gcloud ADC; Gemini CLI menggunakan alur OAuth-nya
+- Perhatian: OAuth Gemini CLI di OpenClaw adalah integrasi tidak resmi. Beberapa pengguna melaporkan pembatasan akun Google setelah menggunakan klien pihak ketiga. Tinjau persyaratan Google dan gunakan akun yang tidak kritis jika Anda memilih untuk melanjutkan.
+- OAuth Gemini CLI dikirim sebagai bagian dari plugin `google` bawaan.
   - Instal Gemini CLI terlebih dahulu:
     - `brew install gemini-cli`
     - atau `npm install -g @google/gemini-cli`
   - Aktifkan: `openclaw plugins enable google`
   - Login: `openclaw models auth login --provider google-gemini-cli --set-default`
   - Model default: `google-gemini-cli/gemini-3-flash-preview`
-  - Catatan: Anda **tidak** menempelkan client id atau secret ke `openclaw.json`. Alur login CLI menyimpan
-    token dalam profil autentikasi di host Gateway.
-  - Jika permintaan gagal setelah login, setel `GOOGLE_CLOUD_PROJECT` atau `GOOGLE_CLOUD_PROJECT_ID` di host Gateway.
-  - Balasan JSON Gemini CLI diurai dari `response`; penggunaan akan fallback ke
-    `stats`, dengan `stats.cached` dinormalisasi menjadi OpenClaw `cacheRead`.
+  - Catatan: Anda **tidak** menempelkan client id atau secret ke dalam `openclaw.json`. Alur login CLI menyimpan
+    token di profil auth pada host gateway.
+  - Jika request gagal setelah login, set `GOOGLE_CLOUD_PROJECT` atau `GOOGLE_CLOUD_PROJECT_ID` pada host gateway.
+  - Balasan JSON Gemini CLI di-parse dari `response`; usage fallback ke
+    `stats`, dengan `stats.cached` dinormalkan menjadi OpenClaw `cacheRead`.
 
 ### Z.AI (GLM)
 
-- Penyedia: `zai`
-- Autentikasi: `ZAI_API_KEY`
+- Provider: `zai`
+- Auth: `ZAI_API_KEY`
 - Contoh model: `zai/glm-5.1`
 - CLI: `openclaw onboard --auth-choice zai-api-key`
-  - Alias: `z.ai/*` dan `z-ai/*` dinormalisasi menjadi `zai/*`
+  - Alias: `z.ai/*` dan `z-ai/*` dinormalkan menjadi `zai/*`
   - `zai-api-key` mendeteksi otomatis endpoint Z.AI yang cocok; `zai-coding-global`, `zai-coding-cn`, `zai-global`, dan `zai-cn` memaksa permukaan tertentu
 
 ### Vercel AI Gateway
 
-- Penyedia: `vercel-ai-gateway`
-- Autentikasi: `AI_GATEWAY_API_KEY`
+- Provider: `vercel-ai-gateway`
+- Auth: `AI_GATEWAY_API_KEY`
 - Contoh model: `vercel-ai-gateway/anthropic/claude-opus-4.6`
 - CLI: `openclaw onboard --auth-choice ai-gateway-api-key`
 
 ### Kilo Gateway
 
-- Penyedia: `kilocode`
-- Autentikasi: `KILOCODE_API_KEY`
+- Provider: `kilocode`
+- Auth: `KILOCODE_API_KEY`
 - Contoh model: `kilocode/kilo/auto`
 - CLI: `openclaw onboard --auth-choice kilocode-api-key`
 - Base URL: `https://api.kilo.ai/api/gateway/`
-- Katalog fallback statis dikirim dengan `kilocode/kilo/auto`; penemuan live
+- Katalog fallback statis menyertakan `kilocode/kilo/auto`; discovery live
   `https://api.kilo.ai/api/gateway/models` dapat memperluas katalog runtime
   lebih lanjut.
-- Routing upstream yang tepat di balik `kilocode/kilo/auto` dimiliki oleh Kilo Gateway,
-  tidak di-hardcode di OpenClaw.
+- Perutean upstream yang tepat di balik `kilocode/kilo/auto` dimiliki oleh Kilo Gateway,
+  bukan dikodekan secara tetap di OpenClaw.
 
 Lihat [/providers/kilocode](/id/providers/kilocode) untuk detail penyiapan.
 
-### Plugin penyedia bawaan lainnya
+### Plugin provider bawaan lainnya
 
 - OpenRouter: `openrouter` (`OPENROUTER_API_KEY`)
 - Contoh model: `openrouter/auto`
-- OpenClaw menerapkan header atribusi aplikasi yang didokumentasikan OpenRouter hanya saat
-  permintaan benar-benar menargetkan `openrouter.ai`
-- Penanda `cache_control` Anthropic khusus OpenRouter juga dibatasi ke
+- OpenClaw menerapkan header atribusi aplikasi yang didokumentasikan OpenRouter hanya ketika
+  request benar-benar menargetkan `openrouter.ai`
+- Penanda Anthropic `cache_control` khusus OpenRouter juga dibatasi ke
   rute OpenRouter yang terverifikasi, bukan URL proxy sembarang
-- OpenRouter tetap berada di jalur kompatibel OpenAI bergaya proxy, sehingga
-  pembentukan permintaan khusus OpenAI native (`serviceTier`, Responses `store`,
+- OpenRouter tetap berada pada jalur kompatibel OpenAI bergaya proxy, sehingga
+  pembentukan request yang hanya native OpenAI (`serviceTier`, Responses `store`,
   petunjuk prompt-cache, payload kompatibilitas reasoning OpenAI) tidak diteruskan
 - Referensi OpenRouter berbasis Gemini hanya mempertahankan sanitasi thought-signature proxy-Gemini;
-  validasi replay Gemini native dan penulisan ulang bootstrap tetap dinonaktifkan
+  validasi replay Gemini native dan penulisan ulang bootstrap tetap nonaktif
 - Kilo Gateway: `kilocode` (`KILOCODE_API_KEY`)
 - Contoh model: `kilocode/kilo/auto`
 - Referensi Kilo berbasis Gemini mempertahankan jalur sanitasi thought-signature
-  proxy-Gemini yang sama; `kilocode/kilo/auto` dan petunjuk proxy-reasoning-tidak-didukung lainnya
+  proxy-Gemini yang sama; `kilocode/kilo/auto` dan petunjuk unsupported proxy-reasoning lainnya
   melewati injeksi reasoning proxy
 - MiniMax: `minimax` (API key) dan `minimax-portal` (OAuth)
-- Autentikasi: `MINIMAX_API_KEY` untuk `minimax`; `MINIMAX_OAUTH_TOKEN` atau `MINIMAX_API_KEY` untuk `minimax-portal`
+- Auth: `MINIMAX_API_KEY` untuk `minimax`; `MINIMAX_OAUTH_TOKEN` atau `MINIMAX_API_KEY` untuk `minimax-portal`
 - Contoh model: `minimax/MiniMax-M2.7` atau `minimax-portal/MiniMax-M2.7`
-- Onboarding MiniMax/penyiapan API key menulis definisi model M2.7 eksplisit dengan
-  `input: ["text", "image"]`; katalog penyedia bawaan mempertahankan referensi chat
-  hanya teks sampai konfigurasi penyedia tersebut dimaterialisasi
+- Onboarding/penyiapan API key MiniMax menulis definisi model M2.7 eksplisit dengan
+  `input: ["text", "image"]`; katalog provider bawaan menjaga referensi chat
+  tetap text-only sampai konfigurasi provider itu dimaterialisasi
 - Moonshot: `moonshot` (`MOONSHOT_API_KEY`)
-- Contoh model: `moonshot/kimi-k2.5`
+- Contoh model: `moonshot/kimi-k2.6`
 - Kimi Coding: `kimi` (`KIMI_API_KEY` atau `KIMICODE_API_KEY`)
 - Contoh model: `kimi/kimi-code`
 - Qianfan: `qianfan` (`QIANFAN_API_KEY`)
@@ -415,10 +456,10 @@ Lihat [/providers/kilocode](/id/providers/kilocode) untuk detail penyiapan.
 - BytePlus: `byteplus` (`BYTEPLUS_API_KEY`)
 - Contoh model: `byteplus-plan/ark-code-latest`
 - xAI: `xai` (`XAI_API_KEY`)
-  - Permintaan xAI native bawaan menggunakan jalur xAI Responses
+  - Request xAI bawaan native menggunakan jalur xAI Responses
   - `/fast` atau `params.fastMode: true` menulis ulang `grok-3`, `grok-3-mini`,
-    `grok-4`, dan `grok-4-0709` ke varian `*-fast` mereka
-  - `tool_stream` aktif secara default; setel
+    `grok-4`, dan `grok-4-0709` ke varian `*-fast` masing-masing
+  - `tool_stream` default-nya aktif; set
     `agents.defaults.models["xai/<model>"].params.tool_stream` ke `false` untuk
     menonaktifkannya
 - Mistral: `mistral` (`MISTRAL_API_KEY`)
@@ -431,30 +472,31 @@ Lihat [/providers/kilocode](/id/providers/kilocode) untuk detail penyiapan.
 - GitHub Copilot: `github-copilot` (`COPILOT_GITHUB_TOKEN` / `GH_TOKEN` / `GITHUB_TOKEN`)
 - Contoh model Hugging Face Inference: `huggingface/deepseek-ai/DeepSeek-R1`; CLI: `openclaw onboard --auth-choice huggingface-api-key`. Lihat [Hugging Face (Inference)](/id/providers/huggingface).
 
-## Penyedia melalui `models.providers` (kustom/base URL)
+## Provider melalui `models.providers` (kustom/base URL)
 
-Gunakan `models.providers` (atau `models.json`) untuk menambahkan penyedia
-**kustom** atau proxy yang kompatibel dengan OpenAI/Anthropic.
+Gunakan `models.providers` (atau `models.json`) untuk menambahkan provider **kustom** atau
+proxy yang kompatibel dengan OpenAI/Anthropic.
 
-Banyak Plugin penyedia bawaan di bawah ini sudah memublikasikan katalog default.
-Gunakan entri `models.providers.<id>` eksplisit hanya saat Anda ingin mengganti
+Banyak plugin provider bawaan di bawah ini sudah menerbitkan katalog default.
+Gunakan entri `models.providers.<id>` eksplisit hanya ketika Anda ingin menimpa
 base URL, header, atau daftar model default.
 
 ### Moonshot AI (Kimi)
 
-Moonshot dikirim sebagai Plugin penyedia bawaan. Gunakan penyedia bawaan secara
-default, dan tambahkan entri `models.providers.moonshot` eksplisit hanya saat Anda
-perlu mengganti base URL atau metadata model:
+Moonshot dikirim sebagai plugin provider bawaan. Gunakan provider bawaan secara
+default, dan tambahkan entri `models.providers.moonshot` eksplisit hanya ketika Anda
+perlu menimpa base URL atau metadata model:
 
-- Penyedia: `moonshot`
-- Autentikasi: `MOONSHOT_API_KEY`
-- Contoh model: `moonshot/kimi-k2.5`
+- Provider: `moonshot`
+- Auth: `MOONSHOT_API_KEY`
+- Contoh model: `moonshot/kimi-k2.6`
 - CLI: `openclaw onboard --auth-choice moonshot-api-key` atau `openclaw onboard --auth-choice moonshot-api-key-cn`
 
 ID model Kimi K2:
 
 [//]: # "moonshot-kimi-k2-model-refs:start"
 
+- `moonshot/kimi-k2.6`
 - `moonshot/kimi-k2.5`
 - `moonshot/kimi-k2-thinking`
 - `moonshot/kimi-k2-thinking-turbo`
@@ -465,7 +507,7 @@ ID model Kimi K2:
 ```json5
 {
   agents: {
-    defaults: { model: { primary: "moonshot/kimi-k2.5" } },
+    defaults: { model: { primary: "moonshot/kimi-k2.6" } },
   },
   models: {
     mode: "merge",
@@ -474,7 +516,7 @@ ID model Kimi K2:
         baseUrl: "https://api.moonshot.ai/v1",
         apiKey: "${MOONSHOT_API_KEY}",
         api: "openai-completions",
-        models: [{ id: "kimi-k2.5", name: "Kimi K2.5" }],
+        models: [{ id: "kimi-k2.6", name: "Kimi K2.6" }],
       },
     },
   },
@@ -485,8 +527,8 @@ ID model Kimi K2:
 
 Kimi Coding menggunakan endpoint Moonshot AI yang kompatibel dengan Anthropic:
 
-- Penyedia: `kimi`
-- Autentikasi: `KIMI_API_KEY`
+- Provider: `kimi`
+- Auth: `KIMI_API_KEY`
 - Contoh model: `kimi/kimi-code`
 
 ```json5
@@ -502,10 +544,10 @@ Kimi Coding menggunakan endpoint Moonshot AI yang kompatibel dengan Anthropic:
 
 ### Volcano Engine (Doubao)
 
-Volcano Engine (火山引擎) menyediakan akses ke Doubao dan model lainnya di Tiongkok.
+Volcano Engine (火山引擎) menyediakan akses ke Doubao dan model lain di Tiongkok.
 
-- Penyedia: `volcengine` (coding: `volcengine-plan`)
-- Autentikasi: `VOLCANO_ENGINE_API_KEY`
+- Provider: `volcengine` (coding: `volcengine-plan`)
+- Auth: `VOLCANO_ENGINE_API_KEY`
 - Contoh model: `volcengine-plan/ark-code-latest`
 - CLI: `openclaw onboard --auth-choice volcengine-api-key`
 
@@ -520,10 +562,10 @@ Volcano Engine (火山引擎) menyediakan akses ke Doubao dan model lainnya di T
 Onboarding secara default menggunakan permukaan coding, tetapi katalog umum `volcengine/*`
 juga didaftarkan pada saat yang sama.
 
-Dalam pemilih onboarding/konfigurasi model, pilihan autentikasi Volcengine lebih mengutamakan baris
-`volcengine/*` dan `volcengine-plan/*`. Jika model-model tersebut belum dimuat,
-OpenClaw akan fallback ke katalog yang tidak difilter alih-alih menampilkan pemilih
-bercakupan penyedia yang kosong.
+Dalam pemilih model onboarding/konfigurasi, pilihan auth Volcengine memprioritaskan kedua
+baris `volcengine/*` dan `volcengine-plan/*`. Jika model tersebut belum dimuat,
+OpenClaw fallback ke katalog tanpa filter alih-alih menampilkan pemilih
+bercakupan provider yang kosong.
 
 Model yang tersedia:
 
@@ -543,10 +585,10 @@ Model coding (`volcengine-plan`):
 
 ### BytePlus (Internasional)
 
-BytePlus ARK menyediakan akses ke model yang sama seperti Volcano Engine untuk pengguna internasional.
+BytePlus ARK menyediakan akses ke model yang sama dengan Volcano Engine untuk pengguna internasional.
 
-- Penyedia: `byteplus` (coding: `byteplus-plan`)
-- Autentikasi: `BYTEPLUS_API_KEY`
+- Provider: `byteplus` (coding: `byteplus-plan`)
+- Auth: `BYTEPLUS_API_KEY`
 - Contoh model: `byteplus-plan/ark-code-latest`
 - CLI: `openclaw onboard --auth-choice byteplus-api-key`
 
@@ -561,10 +603,10 @@ BytePlus ARK menyediakan akses ke model yang sama seperti Volcano Engine untuk p
 Onboarding secara default menggunakan permukaan coding, tetapi katalog umum `byteplus/*`
 juga didaftarkan pada saat yang sama.
 
-Dalam pemilih onboarding/konfigurasi model, pilihan autentikasi BytePlus lebih mengutamakan baris
-`byteplus/*` dan `byteplus-plan/*`. Jika model-model tersebut belum dimuat,
-OpenClaw akan fallback ke katalog yang tidak difilter alih-alih menampilkan pemilih
-bercakupan penyedia yang kosong.
+Dalam pemilih model onboarding/konfigurasi, pilihan auth BytePlus memprioritaskan kedua
+baris `byteplus/*` dan `byteplus-plan/*`. Jika model tersebut belum dimuat,
+OpenClaw fallback ke katalog tanpa filter alih-alih menampilkan pemilih
+bercakupan provider yang kosong.
 
 Model yang tersedia:
 
@@ -582,10 +624,10 @@ Model coding (`byteplus-plan`):
 
 ### Synthetic
 
-Synthetic menyediakan model yang kompatibel dengan Anthropic di balik penyedia `synthetic`:
+Synthetic menyediakan model yang kompatibel dengan Anthropic di balik provider `synthetic`:
 
-- Penyedia: `synthetic`
-- Autentikasi: `SYNTHETIC_API_KEY`
+- Provider: `synthetic`
+- Auth: `SYNTHETIC_API_KEY`
 - Contoh model: `synthetic/hf:MiniMaxAI/MiniMax-M2.5`
 - CLI: `openclaw onboard --auth-choice synthetic-api-key`
 
@@ -612,35 +654,35 @@ Synthetic menyediakan model yang kompatibel dengan Anthropic di balik penyedia `
 
 MiniMax dikonfigurasi melalui `models.providers` karena menggunakan endpoint kustom:
 
-- OAuth MiniMax (Global): `--auth-choice minimax-global-oauth`
-- OAuth MiniMax (CN): `--auth-choice minimax-cn-oauth`
-- API key MiniMax (Global): `--auth-choice minimax-global-api`
-- API key MiniMax (CN): `--auth-choice minimax-cn-api`
-- Autentikasi: `MINIMAX_API_KEY` untuk `minimax`; `MINIMAX_OAUTH_TOKEN` atau
+- MiniMax OAuth (Global): `--auth-choice minimax-global-oauth`
+- MiniMax OAuth (CN): `--auth-choice minimax-cn-oauth`
+- MiniMax API key (Global): `--auth-choice minimax-global-api`
+- MiniMax API key (CN): `--auth-choice minimax-cn-api`
+- Auth: `MINIMAX_API_KEY` untuk `minimax`; `MINIMAX_OAUTH_TOKEN` atau
   `MINIMAX_API_KEY` untuk `minimax-portal`
 
 Lihat [/providers/minimax](/id/providers/minimax) untuk detail penyiapan, opsi model, dan cuplikan konfigurasi.
 
-Pada jalur streaming MiniMax yang kompatibel dengan Anthropic, OpenClaw menonaktifkan thinking secara default
-kecuali Anda menetapkannya secara eksplisit, dan `/fast on` menulis ulang
+Pada jalur streaming MiniMax yang kompatibel dengan Anthropic, OpenClaw menonaktifkan thinking secara
+default kecuali Anda menyetelnya secara eksplisit, dan `/fast on` menulis ulang
 `MiniMax-M2.7` menjadi `MiniMax-M2.7-highspeed`.
 
-Pembagian capability yang dimiliki Plugin:
+Pemisahan capability milik plugin:
 
-- Default teks/chat tetap pada `minimax/MiniMax-M2.7`
-- Pembuatan gambar adalah `minimax/image-01` atau `minimax-portal/image-01`
-- Pemahaman gambar adalah `MiniMax-VL-01` yang dimiliki Plugin pada kedua jalur autentikasi MiniMax
-- Pencarian web tetap pada id penyedia `minimax`
+- Default teks/obrolan tetap pada `minimax/MiniMax-M2.7`
+- Generasi gambar adalah `minimax/image-01` atau `minimax-portal/image-01`
+- Pemahaman gambar adalah `MiniMax-VL-01` milik plugin pada kedua jalur auth MiniMax
+- Pencarian web tetap pada id provider `minimax`
 
 ### LM Studio
 
-LM Studio dikirim sebagai Plugin penyedia bawaan yang menggunakan API native:
+LM Studio dikirim sebagai plugin provider bawaan yang menggunakan API native:
 
-- Penyedia: `lmstudio`
-- Autentikasi: `LM_API_TOKEN`
+- Provider: `lmstudio`
+- Auth: `LM_API_TOKEN`
 - Base URL inferensi default: `http://localhost:1234/v1`
 
-Lalu tetapkan model (ganti dengan salah satu ID yang dikembalikan oleh `http://localhost:1234/api/v1/models`):
+Lalu setel model (ganti dengan salah satu ID yang dikembalikan oleh `http://localhost:1234/api/v1/models`):
 
 ```json5
 {
@@ -650,21 +692,21 @@ Lalu tetapkan model (ganti dengan salah satu ID yang dikembalikan oleh `http://l
 }
 ```
 
-OpenClaw menggunakan `/api/v1/models` dan `/api/v1/models/load` native milik LM Studio
-untuk penemuan + auto-load, dengan `/v1/chat/completions` untuk inferensi secara default.
+OpenClaw menggunakan `/api/v1/models` dan `/api/v1/models/load` native LM Studio
+untuk discovery + auto-load, dengan `/v1/chat/completions` untuk inferensi secara default.
 Lihat [/providers/lmstudio](/id/providers/lmstudio) untuk penyiapan dan pemecahan masalah.
 
 ### Ollama
 
-Ollama dikirim sebagai Plugin penyedia bawaan dan menggunakan API native Ollama:
+Ollama dikirim sebagai plugin provider bawaan dan menggunakan API native Ollama:
 
-- Penyedia: `ollama`
-- Autentikasi: Tidak diperlukan (server lokal)
+- Provider: `ollama`
+- Auth: Tidak diperlukan (server lokal)
 - Contoh model: `ollama/llama3.3`
 - Instalasi: [https://ollama.com/download](https://ollama.com/download)
 
 ```bash
-# Instal Ollama, lalu tarik sebuah model:
+# Install Ollama, then pull a model:
 ollama pull llama3.3
 ```
 
@@ -676,26 +718,26 @@ ollama pull llama3.3
 }
 ```
 
-Ollama dideteksi secara lokal di `http://127.0.0.1:11434` saat Anda memilih ikut serta dengan
-`OLLAMA_API_KEY`, dan Plugin penyedia bawaan menambahkan Ollama langsung ke
+Ollama dideteksi secara lokal di `http://127.0.0.1:11434` saat Anda ikut serta dengan
+`OLLAMA_API_KEY`, dan plugin provider bawaan menambahkan Ollama langsung ke
 `openclaw onboard` dan pemilih model. Lihat [/providers/ollama](/id/providers/ollama)
 untuk onboarding, mode cloud/lokal, dan konfigurasi kustom.
 
 ### vLLM
 
-vLLM dikirim sebagai Plugin penyedia bawaan untuk server lokal/self-hosted yang kompatibel dengan OpenAI:
+vLLM dikirim sebagai plugin provider bawaan untuk server lokal/self-hosted yang kompatibel dengan OpenAI:
 
-- Penyedia: `vllm`
-- Autentikasi: Opsional (tergantung server Anda)
+- Provider: `vllm`
+- Auth: Opsional (tergantung server Anda)
 - Base URL default: `http://127.0.0.1:8000/v1`
 
-Untuk ikut serta dalam auto-discovery secara lokal (nilai apa pun berfungsi jika server Anda tidak menegakkan autentikasi):
+Untuk ikut serta dalam auto-discovery secara lokal (nilai apa pun berfungsi jika server Anda tidak memaksa auth):
 
 ```bash
 export VLLM_API_KEY="vllm-local"
 ```
 
-Lalu tetapkan model (ganti dengan salah satu ID yang dikembalikan oleh `/v1/models`):
+Lalu setel model (ganti dengan salah satu ID yang dikembalikan oleh `/v1/models`):
 
 ```json5
 {
@@ -709,21 +751,20 @@ Lihat [/providers/vllm](/id/providers/vllm) untuk detail.
 
 ### SGLang
 
-SGLang dikirim sebagai Plugin penyedia bawaan untuk server self-hosted cepat
-yang kompatibel dengan OpenAI:
+SGLang dikirim sebagai plugin provider bawaan untuk server self-hosted cepat yang kompatibel dengan OpenAI:
 
-- Penyedia: `sglang`
-- Autentikasi: Opsional (tergantung server Anda)
+- Provider: `sglang`
+- Auth: Opsional (tergantung server Anda)
 - Base URL default: `http://127.0.0.1:30000/v1`
 
 Untuk ikut serta dalam auto-discovery secara lokal (nilai apa pun berfungsi jika server Anda tidak
-menegakkan autentikasi):
+memaksa auth):
 
 ```bash
 export SGLANG_API_KEY="sglang-local"
 ```
 
-Lalu tetapkan model (ganti dengan salah satu ID yang dikembalikan oleh `/v1/models`):
+Lalu setel model (ganti dengan salah satu ID yang dikembalikan oleh `/v1/models`):
 
 ```json5
 {
@@ -772,20 +813,20 @@ Contoh (kompatibel dengan OpenAI):
 
 Catatan:
 
-- Untuk penyedia kustom, `reasoning`, `input`, `cost`, `contextWindow`, dan `maxTokens` bersifat opsional.
+- Untuk provider kustom, `reasoning`, `input`, `cost`, `contextWindow`, dan `maxTokens` bersifat opsional.
   Jika dihilangkan, OpenClaw menggunakan default:
   - `reasoning: false`
   - `input: ["text"]`
   - `cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }`
   - `contextWindow: 200000`
   - `maxTokens: 8192`
-- Disarankan: tetapkan nilai eksplisit yang sesuai dengan batas proxy/model Anda.
-- Untuk `api: "openai-completions"` pada endpoint non-native (setiap `baseUrl` tidak kosong yang host-nya bukan `api.openai.com`), OpenClaw memaksa `compat.supportsDeveloperRole: false` untuk menghindari error 400 dari penyedia untuk peran `developer` yang tidak didukung.
-- Rute kompatibel OpenAI bergaya proxy juga melewati pembentukan permintaan khusus OpenAI native:
-  tidak ada `service_tier`, tidak ada `store` Responses, tidak ada petunjuk prompt-cache, tidak ada
-  pembentukan payload kompatibilitas reasoning OpenAI, dan tidak ada header atribusi OpenClaw tersembunyi.
-- Jika `baseUrl` kosong/dihilangkan, OpenClaw mempertahankan perilaku OpenAI default (yang diselesaikan ke `api.openai.com`).
-- Demi keamanan, `compat.supportsDeveloperRole: true` eksplisit tetap dioverride pada endpoint `openai-completions` non-native.
+- Direkomendasikan: setel nilai eksplisit yang sesuai dengan batas proxy/model Anda.
+- Untuk `api: "openai-completions"` pada endpoint non-native (setiap `baseUrl` tidak kosong yang host-nya bukan `api.openai.com`), OpenClaw memaksa `compat.supportsDeveloperRole: false` untuk menghindari error provider 400 untuk role `developer` yang tidak didukung.
+- Rute kompatibel OpenAI bergaya proxy juga melewati pembentukan request yang hanya native OpenAI:
+  tanpa `service_tier`, tanpa Responses `store`, tanpa petunjuk prompt-cache, tanpa
+  pembentukan payload kompatibilitas reasoning OpenAI, dan tanpa header atribusi OpenClaw tersembunyi.
+- Jika `baseUrl` kosong/tidak diisi, OpenClaw mempertahankan perilaku OpenAI default (yang di-resolve ke `api.openai.com`).
+- Demi keamanan, `compat.supportsDeveloperRole: true` yang eksplisit tetap ditimpa pada endpoint `openai-completions` non-native.
 
 ## Contoh CLI
 
@@ -802,4 +843,4 @@ Lihat juga: [/gateway/configuration](/id/gateway/configuration) untuk contoh kon
 - [Models](/id/concepts/models) — konfigurasi model dan alias
 - [Model Failover](/id/concepts/model-failover) — rantai fallback dan perilaku retry
 - [Configuration Reference](/id/gateway/configuration-reference#agent-defaults) — kunci konfigurasi model
-- [Providers](/id/providers) — panduan penyiapan per penyedia
+- [Providers](/id/providers) — panduan penyiapan per provider
