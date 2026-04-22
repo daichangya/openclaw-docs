@@ -1,93 +1,93 @@
 ---
 read_when:
-    - Вам потрібно зрозуміти, чому завдання CI було або не було запущено
-    - Ви налагоджуєте невдалі перевірки GitHub Actions
-summary: Граф завдань CI, шлюзи охоплення та локальні еквіваленти команд
+    - Вам потрібно зрозуміти, чому завдання CI запустилося або не запустилося
+    - Ви налагоджуєте збої перевірок GitHub Actions
+summary: Граф завдань CI, обмеження за областю змін і локальні еквіваленти команд
 title: Конвеєр CI
 x-i18n:
-    generated_at: "2026-04-22T16:27:40Z"
+    generated_at: "2026-04-22T16:32:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e815d95ff3a5b4cabea76f9f5799e6240c86cc63a653d212b043c21f0d6644bf
+    source_hash: d07714551511319c4ecde300dc817a325a301d24f5727b61001fc17c5d4dbe7a
     source_path: ci.md
     workflow: 15
 ---
 
 # Конвеєр CI
 
-CI запускається для кожного push до `main` і для кожного pull request. Він використовує розумне визначення охоплення, щоб пропускати дорогі завдання, коли змінено лише непов’язані ділянки.
+CI запускається при кожному push до `main` і для кожного pull request. Він використовує розумне обмеження за областю змін, щоб пропускати дорогі завдання, коли змінено лише не пов’язані ділянки.
 
 ## Огляд завдань
 
 | Завдання                         | Призначення                                                                                   | Коли запускається                   |
 | -------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------- |
-| `preflight`                      | Визначає зміни лише в документації, змінені області, змінені extensions і будує маніфест CI  | Завжди для non-draft push і PR      |
-| `security-scm-fast`              | Виявлення приватних ключів і аудит workflow через `zizmor`                                    | Завжди для non-draft push і PR      |
-| `security-dependency-audit`      | Аудит production lockfile без залежностей щодо advisory з npm                                 | Завжди для non-draft push і PR      |
-| `security-fast`                  | Обов’язковий агрегат для швидких завдань безпеки                                              | Завжди для non-draft push і PR      |
+| `preflight`                      | Визначає зміни лише в документації, змінені області, змінені розширення та збирає маніфест CI | Завжди для недрафтових push і PR    |
+| `security-scm-fast`              | Виявлення приватних ключів і аудит workflow через `zizmor`                                    | Завжди для недрафтових push і PR    |
+| `security-dependency-audit`      | Аудит production lockfile без залежностей щодо попереджень npm advisories                     | Завжди для недрафтових push і PR    |
+| `security-fast`                  | Обов’язковий агрегат для швидких завдань безпеки                                              | Завжди для недрафтових push і PR    |
 | `build-artifacts`                | Збирає `dist/` і Control UI один раз, завантажує повторно використовувані артефакти для downstream-завдань | Зміни, релевантні для Node          |
-| `checks-fast-core`               | Швидкі Linux-етапи коректності, наприклад bundled/plugin-contract/protocol перевірки         | Зміни, релевантні для Node          |
-| `checks-fast-contracts-channels` | Шардовані перевірки контрактів каналів зі стабільним агрегованим результатом перевірки       | Зміни, релевантні для Node          |
-| `checks-node-extensions`         | Повні шардовані тести bundled-plugin у всьому наборі extensions                              | Зміни, релевантні для Node          |
-| `checks-node-core-test`          | Шардовані тести core Node, за винятком етапів channel, bundled, contract і extension         | Зміни, релевантні для Node          |
-| `extension-fast`                 | Точкові тести лише для змінених bundled plugins                                               | Коли виявлено зміни в extensions    |
-| `check`                          | Шардований еквівалент основного локального шлюзу: prod types, lint, guards, test types і strict smoke | Зміни, релевантні для Node          |
-| `check-additional`               | Архітектурні перевірки, boundary-перевірки, guards поверхні extension, package-boundary і shard-и gateway-watch | Зміни, релевантні для Node          |
-| `build-smoke`                    | Smoke-тести зібраного CLI і smoke-тест пам’яті під час запуску                                | Зміни, релевантні для Node          |
-| `checks`                         | Решта Linux Node-етапів: тести каналів і сумісність Node 22 лише для push                    | Зміни, релевантні для Node          |
-| `check-docs`                     | Форматування документації, lint і перевірки зламаних посилань                                 | Змінено документацію                |
-| `skills-python`                  | Ruff + pytest для Skills на базі Python                                                       | Зміни, релевантні для Python Skills |
-| `checks-windows`                 | Тести, специфічні для Windows                                                                 | Зміни, релевантні для Windows       |
-| `macos-node`                     | Етап TypeScript-тестів на macOS з використанням спільних зібраних артефактів                 | Зміни, релевантні для macOS         |
-| `macos-swift`                    | Swift lint, build і тести для застосунку macOS                                                | Зміни, релевантні для macOS         |
-| `android`                        | Матриця build і тестів Android                                                                | Зміни, релевантні для Android       |
+| `checks-fast-core`               | Швидкі Linux-лінії коректності, такі як перевірки bundled/plugin-contract/protocol            | Зміни, релевантні для Node          |
+| `checks-fast-contracts-channels` | Шардовані перевірки контрактів каналів зі стабільним агрегованим результатом                  | Зміни, релевантні для Node          |
+| `checks-node-extensions`         | Повні шардовані тести bundled-plugin для всього набору розширень                              | Зміни, релевантні для Node          |
+| `checks-node-core-test`          | Шарди основних Node-тестів, без каналів, bundled, contract і extension-ліній                  | Зміни, релевантні для Node          |
+| `extension-fast`                 | Цільові тести лише для змінених bundled plugins                                               | Коли виявлено зміни розширень       |
+| `check`                          | Шардований еквівалент основної локальної перевірки: production types, lint, guards, test types і strict smoke | Зміни, релевантні для Node          |
+| `check-additional`               | Перевірки архітектури, меж, поверхні розширень, меж пакетів і шарди gateway-watch             | Зміни, релевантні для Node          |
+| `build-smoke`                    | Smoke-тести зібраного CLI і smoke-перевірка пам’яті під час запуску                            | Зміни, релевантні для Node          |
+| `checks`                         | Решта Linux Node-ліній: тести каналів і сумісність лише для push з Node 22                    | Зміни, релевантні для Node          |
+| `check-docs`                     | Форматування документації, lint і перевірки битих посилань                                    | Змінено документацію                |
+| `skills-python`                  | Ruff + pytest для Skills на Python                                                            | Зміни, релевантні для Python Skills |
+| `checks-windows`                 | Специфічні для Windows тестові лінії                                                          | Зміни, релевантні для Windows       |
+| `macos-node`                     | Лінія TypeScript-тестів на macOS із використанням спільних зібраних артефактів                | Зміни, релевантні для macOS         |
+| `macos-swift`                    | Swift lint, збірка і тести для застосунку macOS                                               | Зміни, релевантні для macOS         |
+| `android`                        | Матриця збірки і тестів Android                                                               | Зміни, релевантні для Android       |
 
-## Порядок Fail-Fast
+## Порядок fail-fast
 
-Завдання впорядковано так, щоб дешеві перевірки завершувалися з помилкою раніше, ніж запустяться дорогі:
+Завдання впорядковані так, щоб дешеві перевірки завершувалися з помилкою раніше, ніж запустяться дорогі:
 
-1. `preflight` вирішує, які етапи взагалі існують. Логіка `docs-scope` і `changed-scope` — це кроки всередині цього завдання, а не окремі завдання.
-2. `security-scm-fast`, `security-dependency-audit`, `security-fast`, `check`, `check-additional`, `check-docs` і `skills-python` швидко завершуються з помилкою, не чекаючи важчих завдань артефактів і платформної матриці.
-3. `build-artifacts` виконується паралельно зі швидкими Linux-етапами, щоб downstream-споживачі могли стартувати, щойно спільна збірка буде готова.
-4. Після цього розгалужуються важчі платформні й runtime-етапи: `checks-fast-core`, `checks-fast-contracts-channels`, `checks-node-extensions`, `checks-node-core-test`, `extension-fast`, `checks`, `checks-windows`, `macos-node`, `macos-swift` і `android`.
+1. `preflight` вирішує, які лінії взагалі існують. Логіка `docs-scope` і `changed-scope` — це кроки всередині цього завдання, а не окремі завдання.
+2. `security-scm-fast`, `security-dependency-audit`, `security-fast`, `check`, `check-additional`, `check-docs` і `skills-python` швидко завершуються з помилкою, не чекаючи важчих матричних завдань артефактів і платформ.
+3. `build-artifacts` виконується паралельно зі швидкими Linux-лініями, щоб downstream-споживачі могли почати роботу, щойно спільна збірка буде готова.
+4. Після цього розгалужуються важчі платформені та runtime-лінії: `checks-fast-core`, `checks-fast-contracts-channels`, `checks-node-extensions`, `checks-node-core-test`, `extension-fast`, `checks`, `checks-windows`, `macos-node`, `macos-swift` і `android`.
 
-Логіка охоплення знаходиться в `scripts/ci-changed-scope.mjs` і покривається unit-тестами в `src/scripts/ci-changed-scope.test.ts`.
-Окремий workflow `install-smoke` повторно використовує той самий скрипт охоплення через власне завдання `preflight`. Він обчислює `run_install_smoke` на основі вужчого сигналу changed-smoke, тому Docker/install smoke запускається лише для змін, релевантних для install, packaging і контейнерів.
+Логіка обмеження за областю змін міститься в `scripts/ci-changed-scope.mjs` і покривається unit-тестами в `src/scripts/ci-changed-scope.test.ts`.
+Окремий workflow `install-smoke` повторно використовує той самий скрипт областей через власне завдання `preflight`. Він обчислює `run_install_smoke` на основі вужчого сигналу changed-smoke, тому Docker/install smoke запускається лише для змін, пов’язаних із встановленням, пакуванням і контейнерами.
 
-Локальна логіка changed-lane знаходиться в `scripts/changed-lanes.mjs` і виконується через `scripts/check-changed.mjs`. Цей локальний шлюз суворіший щодо архітектурних меж, ніж широке CI-охоплення платформ: зміни core production запускають prod typecheck для core плюс тести core, зміни лише в core tests запускають лише typecheck/tests для core tests, зміни extension production запускають prod typecheck для extension плюс тести extension, а зміни лише в extension tests запускають лише typecheck/tests для extension tests. Зміни в публічному Plugin SDK або plugin-contract розширюють валідацію на extensions, тому що extensions залежать від цих core-контрактів. Підвищення версії лише в release metadata запускають точкові перевірки version/config/root-dependency. Невідомі зміни в root/config у безпечний спосіб запускають усі етапи.
+Локальна логіка changed-lane міститься в `scripts/changed-lanes.mjs` і виконується через `scripts/check-changed.mjs`. Ця локальна перевірка суворіша щодо архітектурних меж, ніж широка CI-область платформ: зміни в core production запускають typecheck core prod плюс core tests, зміни лише в core tests запускають лише typecheck/tests для core test, зміни в extension production запускають typecheck extension prod плюс extension tests, а зміни лише в extension tests запускають лише typecheck/tests для extension test. Зміни в публічному Plugin SDK або plugin-contract розширюють перевірку на extensions, оскільки extensions залежать від цих контрактів core. Зміни лише в метаданих релізу під час підвищення версії запускають цільові перевірки version/config/root-dependency. Невідомі зміни в root/config безпечно переводять у всі лінії.
 
-Для push матриця `checks` додає етап `compat-node22`, який запускається лише для push. Для pull request цей етап пропускається, і матриця залишається зосередженою на звичайних test/channel-етапах.
+Для push матриця `checks` додає лінію `compat-node22`, яка запускається лише для push. Для pull request цю лінію пропускають, і матриця зосереджується на звичайних test/channel-лініях.
 
-Найповільніші сімейства Node-тестів розділено або збалансовано так, щоб кожне завдання залишалося невеликим: контракти каналів розділяють registry і core coverage на вісім зважених shard-ів кожен, тести команд відповіді auto-reply розділяються на чотири shard-и за include-pattern, інші великі групи префіксів відповіді auto-reply розділяються на два shard-и кожна, а agentic gateway/plugin configs розподіляються по наявних Node-завданнях agentic лише з source-кодом, замість того щоб чекати на built artifacts. `check-additional` також відокремлює compile/canary-роботи package-boundary від runtime topology gateway/architecture-робіт.
+Найповільніші сімейства Node-тестів розділені або збалансовані так, щоб кожне завдання залишалося невеликим: контракти каналів розділяють покриття registry і core на вісім зважених шардів кожне, тести команд відповіді auto-reply розділяються на чотири шарди за include-pattern, інші великі групи префіксів відповідей auto-reply — на два шарди кожна, а agentic gateway/plugin configs розподіляються по наявних source-only agentic Node jobs замість очікування зібраних артефактів. `check-additional` також відокремлює compile/canary-роботу для меж пакетів від runtime topology-роботи gateway/architecture.
 
-GitHub може позначати витіснені завдання як `cancelled`, коли новіший push потрапляє в той самий PR або ref `main`. Вважайте це шумом CI, якщо лише найновіший запуск для того самого ref також не завершується з помилкою. Агреговані shard-перевірки використовують `!cancelled() && always()`, тож вони все одно повідомляють про звичайні помилки shard-ів, але не стають у чергу після того, як увесь workflow вже було витіснено.
-Ключ concurrency для CI версіонований (`CI-v2-*`), щоб zombie-процес на боці GitHub у старій групі черги не міг безкінечно блокувати новіші запуски на main.
+GitHub може позначати витіснені завдання як `cancelled`, коли новіший push потрапляє в той самий ref PR або `main`. Вважайте це шумом CI, якщо тільки найновіший запуск для того самого ref також не завершується з помилкою. Агреговані перевірки шардів використовують `!cancelled() && always()`, тому вони все одно повідомляють про звичайні збої шардів, але не стають у чергу після того, як увесь workflow уже було витіснено.
+Ключ concurrency CI має версію (`CI-v2-*`), щоб zombie-процес на боці GitHub у старій групі черги не міг безстроково блокувати новіші запуски для main.
 
-## Виконавці
+## Runner-и
 
-| Виконавець                       | Завдання                                                                                                                                                                                                                                                                                                                                                                                           |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ubuntu-24.04`                   | `preflight`, швидкі завдання безпеки й агрегати (`security-scm-fast`, `security-dependency-audit`, `security-fast`), шардовані перевірки контрактів каналів, короткі завдання-верифікатори агрегатів (`check`, `check-additional`, `checks-fast-contracts-channels`), workflow-sanity, labeler, auto-response; preflight для install-smoke також використовує Ubuntu від GitHub, щоб матриця Blacksmith могла ставати в чергу раніше |
-| `blacksmith-8vcpu-ubuntu-2404`   | `build-artifacts`, Linux-перевірки, окрім `check-lint` і контрактів каналів, верифікатори довгих матричних агрегатів, перевірки документації, Python Skills, `android`                                                                                                                                                                                                                           |
-| `blacksmith-16vcpu-ubuntu-2404`  | `check-lint`, який залишається достатньо чутливим до CPU, тож 8 vCPU коштували дорожче, ніж заощаджували                                                                                                                                                                                                                                                                                         |
-| `blacksmith-16vcpu-windows-2025` | `checks-windows`                                                                                                                                                                                                                                                                                                                                                                                    |
-| `blacksmith-6vcpu-macos-latest`  | `macos-node` у `openclaw/openclaw`; для fork використовується `macos-latest`                                                                                                                                                                                                                                                                                                                      |
-| `blacksmith-12vcpu-macos-latest` | `macos-swift` у `openclaw/openclaw`; для fork використовується `macos-latest`                                                                                                                                                                                                                                                                                                                     |
+| Runner                           | Завдання                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ubuntu-24.04`                   | `preflight`, швидкі завдання безпеки та їх агрегати (`security-scm-fast`, `security-dependency-audit`, `security-fast`), швидкі перевірки protocol/contract/bundled, шардовані перевірки контрактів каналів, шарди `check` крім lint, шарди й агрегати `check-additional`, перевірки документації, Python Skills, build-smoke, workflow-sanity, labeler, auto-response; preflight для install-smoke також використовує GitHub-hosted Ubuntu, щоб матриця Blacksmith могла стати в чергу раніше |
+| `blacksmith-8vcpu-ubuntu-2404`   | `build-artifacts`, Linux Node test shards, шарди тестів bundled plugin, решта споживачів зібраних артефактів, `android`                                                                                                                                                                                                                                                                                                                               |
+| `blacksmith-16vcpu-ubuntu-2404`  | `check-lint`, який і далі достатньо чутливий до CPU, тож 8 vCPU коштували дорожче, ніж давали виграш                                                                                                                                                                                                                                                                                                                                                  |
+| `blacksmith-16vcpu-windows-2025` | `checks-windows`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `blacksmith-6vcpu-macos-latest`  | `macos-node` у `openclaw/openclaw`; для fork використовується `macos-latest`                                                                                                                                                                                                                                                                                                                                                                          |
+| `blacksmith-12vcpu-macos-latest` | `macos-swift` у `openclaw/openclaw`; для fork використовується `macos-latest`                                                                                                                                                                                                                                                                                                                                                                         |
 
 ## Локальні еквіваленти
 
 ```bash
-pnpm changed:lanes   # перевірити локальний класифікатор changed-lane для origin/main...HEAD
-pnpm check:changed   # розумний локальний шлюз: changed typecheck/lint/tests за boundary-етапом
-pnpm check          # швидкий локальний шлюз: production tsgo + шардований lint + паралельні швидкі guards
+pnpm changed:lanes   # переглянути локальний класифікатор changed-lane для origin/main...HEAD
+pnpm check:changed   # розумна локальна перевірка: changed typecheck/lint/tests за boundary lane
+pnpm check          # швидка локальна перевірка: production tsgo + шардований lint + паралельні fast guards
 pnpm check:test-types
-pnpm check:timed    # той самий шлюз із вимірюванням часу для кожного етапу
+pnpm check:timed    # та сама перевірка з вимірюванням часу для кожного етапу
 pnpm build:strict-smoke
 pnpm check:architecture
 pnpm test:gateway:watch-regression
 pnpm test           # тести vitest
 pnpm test:channels
 pnpm test:contracts:channels
-pnpm check:docs     # форматування документації + lint + перевірка зламаних посилань
-pnpm build          # збірка dist, коли важливі етапи CI artifact/build-smoke
+pnpm check:docs     # форматування документації + lint + биті посилання
+pnpm build          # зібрати dist, коли важливі лінії CI artifact/build-smoke
 ```
