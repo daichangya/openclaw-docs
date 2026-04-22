@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Quieres el catálogo OpenCode Go
-    - Necesitas las refs de modelos de runtime para modelos alojados en Go
-summary: Usa el catálogo OpenCode Go con la configuración compartida de OpenCode
+    - Quieres el catálogo Go de OpenCode
+    - Necesitas las referencias de modelo de tiempo de ejecución para los modelos alojados en Go
+summary: Usa el catálogo Go de OpenCode con la configuración compartida de OpenCode
 title: OpenCode Go
 x-i18n:
-    generated_at: "2026-04-12T23:32:23Z"
+    generated_at: "2026-04-22T04:26:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d1f0f182de81729616ccc19125d93ba0445de2349daf7067b52e8c15b9d3539c
+    source_hash: bb03bc609f0dfff2981eac13b67cbcae066184f4606ce54ba24ca6a5737fdae8
     source_path: providers/opencode-go.md
     workflow: 15
 ---
@@ -16,38 +16,51 @@ x-i18n:
 # OpenCode Go
 
 OpenCode Go es el catálogo Go dentro de [OpenCode](/es/providers/opencode).
-Usa la misma `OPENCODE_API_KEY` que el catálogo Zen, pero mantiene el id de proveedor de runtime `opencode-go` para que el enrutamiento upstream por modelo siga siendo correcto.
+Usa la misma `OPENCODE_API_KEY` que el catálogo Zen, pero mantiene el id del proveedor de tiempo de ejecución
+`opencode-go` para que el enrutamiento ascendente por modelo siga siendo correcto.
 
-| Propiedad        | Valor                         |
-| ---------------- | ----------------------------- |
-| Proveedor de runtime | `opencode-go`             |
-| Autenticación    | `OPENCODE_API_KEY`            |
+| Propiedad        | Valor                           |
+| ---------------- | ------------------------------- |
+| Proveedor de tiempo de ejecución | `opencode-go`                   |
+| Autenticación    | `OPENCODE_API_KEY`              |
 | Configuración principal | [OpenCode](/es/providers/opencode) |
 
 ## Modelos compatibles
 
-| Ref del modelo             | Nombre       |
-| -------------------------- | ------------ |
-| `opencode-go/kimi-k2.5`    | Kimi K2.5    |
-| `opencode-go/glm-5`        | GLM 5        |
-| `opencode-go/minimax-m2.5` | MiniMax M2.5 |
+OpenClaw obtiene el catálogo Go del registro de modelos Pi incluido. Ejecuta
+`openclaw models list --provider opencode-go` para ver la lista actual de modelos.
+
+Según el catálogo Pi incluido, el proveedor incluye:
+
+| Referencia de modelo      | Nombre                |
+| ------------------------- | --------------------- |
+| `opencode-go/glm-5`       | GLM-5                 |
+| `opencode-go/glm-5.1`     | GLM-5.1               |
+| `opencode-go/kimi-k2.5`   | Kimi K2.5             |
+| `opencode-go/kimi-k2.6`   | Kimi K2.6 (límites 3x) |
+| `opencode-go/mimo-v2-omni` | MiMo V2 Omni         |
+| `opencode-go/mimo-v2-pro` | MiMo V2 Pro           |
+| `opencode-go/minimax-m2.5` | MiniMax M2.5         |
+| `opencode-go/minimax-m2.7` | MiniMax M2.7         |
+| `opencode-go/qwen3.5-plus` | Qwen3.5 Plus         |
+| `opencode-go/qwen3.6-plus` | Qwen3.6 Plus         |
 
 ## Primeros pasos
 
 <Tabs>
-  <Tab title="Interactive">
+  <Tab title="Interactivo">
     <Steps>
-      <Step title="Run onboarding">
+      <Step title="Ejecuta la incorporación">
         ```bash
         openclaw onboard --auth-choice opencode-go
         ```
       </Step>
-      <Step title="Set a Go model as default">
+      <Step title="Configura un modelo Go como predeterminado">
         ```bash
         openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
         ```
       </Step>
-      <Step title="Verify models are available">
+      <Step title="Verifica que los modelos estén disponibles">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -55,14 +68,14 @@ Usa la misma `OPENCODE_API_KEY` que el catálogo Zen, pero mantiene el id de pro
     </Steps>
   </Tab>
 
-  <Tab title="Non-interactive">
+  <Tab title="No interactivo">
     <Steps>
-      <Step title="Pass the key directly">
+      <Step title="Pasa la clave directamente">
         ```bash
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Verify models are available">
+      <Step title="Verifica que los modelos estén disponibles">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -83,31 +96,34 @@ Usa la misma `OPENCODE_API_KEY` que el catálogo Zen, pero mantiene el id de pro
 ## Notas avanzadas
 
 <AccordionGroup>
-  <Accordion title="Routing behavior">
-    OpenClaw gestiona automáticamente el enrutamiento por modelo cuando la ref del modelo usa `opencode-go/...`. No se requiere configuración adicional del proveedor.
+  <Accordion title="Comportamiento de enrutamiento">
+    OpenClaw gestiona automáticamente el enrutamiento por modelo cuando la referencia de modelo usa
+    `opencode-go/...`. No se requiere ninguna configuración adicional del proveedor.
   </Accordion>
 
-  <Accordion title="Runtime ref convention">
-    Las refs de runtime siguen siendo explícitas: `opencode/...` para Zen, `opencode-go/...` para Go.
-    Esto mantiene correcto el enrutamiento upstream por modelo en ambos catálogos.
+  <Accordion title="Convención de referencias de tiempo de ejecución">
+    Las referencias de tiempo de ejecución siguen siendo explícitas: `opencode/...` para Zen, `opencode-go/...` para Go.
+    Esto mantiene correcto el enrutamiento ascendente por modelo en ambos catálogos.
   </Accordion>
 
-  <Accordion title="Shared credentials">
-    La misma `OPENCODE_API_KEY` se usa tanto para los catálogos Zen como Go. Introducir la clave durante la configuración almacena credenciales para ambos proveedores de runtime.
+  <Accordion title="Credenciales compartidas">
+    La misma `OPENCODE_API_KEY` es usada por los catálogos Zen y Go. Introducir
+    la clave durante la configuración almacena credenciales para ambos proveedores de tiempo de ejecución.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Consulta [OpenCode](/es/providers/opencode) para ver la descripción general compartida del onboarding y la referencia completa de los catálogos Zen + Go.
+Consulta [OpenCode](/es/providers/opencode) para ver el resumen compartido de incorporación y la referencia completa
+de los catálogos Zen + Go.
 </Tip>
 
 ## Relacionado
 
 <CardGroup cols={2}>
-  <Card title="OpenCode (parent)" href="/es/providers/opencode" icon="server">
-    Onboarding compartido, resumen del catálogo y notas avanzadas.
+  <Card title="OpenCode (principal)" href="/es/providers/opencode" icon="server">
+    Incorporación compartida, resumen del catálogo y notas avanzadas.
   </Card>
-  <Card title="Model selection" href="/es/concepts/model-providers" icon="layers">
-    Cómo elegir proveedores, refs de modelos y comportamiento de failover.
+  <Card title="Selección de modelo" href="/es/concepts/model-providers" icon="layers">
+    Elección de proveedores, referencias de modelo y comportamiento de failover.
   </Card>
 </CardGroup>

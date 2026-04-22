@@ -1,14 +1,14 @@
 ---
 read_when:
     - Quieres elegir un proveedor de modelos
-    - Necesitas una visión general rápida de los backends de LLM compatibles
-summary: Proveedores de modelos (LLMs) compatibles con OpenClaw
+    - Necesitas una visión general rápida de los backends LLM compatibles
+summary: Proveedores de modelos (LLM) compatibles con OpenClaw
 title: Directorio de proveedores
 x-i18n:
-    generated_at: "2026-04-13T08:50:33Z"
+    generated_at: "2026-04-22T04:26:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3bc682d008119719826f71f74959ab32bedf14214459f5e6ac9cb70371d3c540
+    source_hash: 7d77e5da93d71c48ea97460c6be56fbbe8279d9240a8101e1b35fdafb657737e
     source_path: providers/index.md
     workflow: 15
 ---
@@ -39,25 +39,25 @@ modelo predeterminado como `provider/model`.
 - [Arcee AI (modelos Trinity)](/es/providers/arcee)
 - [BytePlus (internacional)](/es/concepts/model-providers#byteplus-international)
 - [Chutes](/es/providers/chutes)
-- [ComfyUI](/es/providers/comfy)
 - [Cloudflare AI Gateway](/es/providers/cloudflare-ai-gateway)
+- [ComfyUI](/es/providers/comfy)
 - [DeepSeek](/es/providers/deepseek)
 - [fal](/es/providers/fal)
 - [Fireworks](/es/providers/fireworks)
 - [GitHub Copilot](/es/providers/github-copilot)
-- [modelos GLM](/es/providers/glm)
+- [Modelos GLM](/es/providers/glm)
 - [Google (Gemini)](/es/providers/google)
 - [Groq (inferencia LPU)](/es/providers/groq)
-- [Hugging Face (inferencia)](/es/providers/huggingface)
+- [Hugging Face (Inference)](/es/providers/huggingface)
 - [inferrs (modelos locales)](/es/providers/inferrs)
 - [Kilocode](/es/providers/kilocode)
-- [LiteLLM (Gateway unificado)](/es/providers/litellm)
+- [LiteLLM (gateway unificado)](/es/providers/litellm)
 - [LM Studio (modelos locales)](/es/providers/lmstudio)
 - [MiniMax](/es/providers/minimax)
 - [Mistral](/es/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/es/providers/moonshot)
 - [NVIDIA](/es/providers/nvidia)
-- [Ollama (nube + modelos locales)](/es/providers/ollama)
+- [Ollama (modelos en la nube + locales)](/es/providers/ollama)
 - [OpenAI (API + Codex)](/es/providers/openai)
 - [OpenCode](/es/providers/opencode)
 - [OpenCode Go](/es/providers/opencode-go)
@@ -72,19 +72,19 @@ modelo predeterminado como `provider/model`.
 - [Together AI](/es/providers/together)
 - [Venice (Venice AI, centrado en la privacidad)](/es/providers/venice)
 - [Vercel AI Gateway](/es/providers/vercel-ai-gateway)
-- [Vydra](/es/providers/vydra)
 - [vLLM (modelos locales)](/es/providers/vllm)
 - [Volcengine (Doubao)](/es/providers/volcengine)
+- [Vydra](/es/providers/vydra)
 - [xAI](/es/providers/xai)
 - [Xiaomi](/es/providers/xiaomi)
 - [Z.AI](/es/providers/zai)
 
-## Páginas generales compartidas
+## Páginas de resumen compartidas
 
-- [Variantes adicionales incluidas](/es/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy y Gemini CLI OAuth
-- [Generación de imágenes](/es/tools/image-generation) - Herramienta compartida `image_generate`, selección de proveedor y conmutación por error
-- [Generación de música](/es/tools/music-generation) - Herramienta compartida `music_generate`, selección de proveedor y conmutación por error
-- [Generación de video](/es/tools/video-generation) - Herramienta compartida `video_generate`, selección de proveedor y conmutación por error
+- [Variantes integradas adicionales](/es/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy y OAuth de Gemini CLI
+- [Generación de imágenes](/es/tools/image-generation) - Herramienta compartida `image_generate`, selección de proveedor y failover
+- [Generación de música](/es/tools/music-generation) - Herramienta compartida `music_generate`, selección de proveedor y failover
+- [Generación de video](/es/tools/video-generation) - Herramienta compartida `video_generate`, selección de proveedor y failover
 
 ## Proveedores de transcripción
 
