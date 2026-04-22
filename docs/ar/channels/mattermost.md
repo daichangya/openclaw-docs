@@ -5,29 +5,29 @@ read_when:
 summary: إعداد بوت Mattermost وتكوين OpenClaw
 title: Mattermost
 x-i18n:
-    generated_at: "2026-04-05T12:36:18Z"
+    generated_at: "2026-04-22T04:20:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f21dc7543176fda0b38b00fab60f0daae38dffcf68fa1cf7930a9f14ec57cb5a
+    source_hash: dd3059c5e64f417edc02c3e850ddd066e38decda0cbdcea31e1c57136e6bcb1d
     source_path: channels/mattermost.md
     workflow: 15
 ---
 
 # Mattermost
 
-الحالة: plugin مضمّن (رمز bot المميز + أحداث WebSocket). القنوات والمجموعات والرسائل الخاصة مدعومة.
-Mattermost هو منصة مراسلة جماعية قابلة للاستضافة الذاتية؛ راجع الموقع الرسمي على
+الحالة: plugin مضمّن (رمز bot المميز + أحداث WebSocket). القنوات والمجموعات والرسائل المباشرة مدعومة.
+Mattermost هي منصة مراسلة فرق قابلة للاستضافة الذاتية؛ راجع الموقع الرسمي على
 [mattermost.com](https://mattermost.com) للحصول على تفاصيل المنتج والتنزيلات.
 
-## plugin المضمّن
+## Plugin المضمّن
 
 يأتي Mattermost كـ plugin مضمّن في إصدارات OpenClaw الحالية، لذلك لا تحتاج
-الإصدارات المعبأة العادية إلى تثبيت منفصل.
+الإصدارات المجمّعة العادية إلى تثبيت منفصل.
 
 إذا كنت تستخدم إصدارًا أقدم أو تثبيتًا مخصصًا لا يتضمن Mattermost،
-فثبّته يدويًا:
+فقم بتثبيته يدويًا:
 
-التثبيت عبر CLI ‏(سجل npm):
+التثبيت عبر CLI (سجل npm):
 
 ```bash
 openclaw plugins install @openclaw/mattermost
@@ -39,16 +39,16 @@ openclaw plugins install @openclaw/mattermost
 openclaw plugins install ./path/to/local/mattermost-plugin
 ```
 
-التفاصيل: [Plugins](/tools/plugin)
+التفاصيل: [Plugins](/ar/tools/plugin)
 
 ## الإعداد السريع
 
-1. تأكد من أن plugin Mattermost متاح.
-   - تتضمن إصدارات OpenClaw المعبأة الحالية هذا plugin بالفعل.
-   - يمكن للتثبيتات الأقدم/المخصصة إضافته يدويًا باستخدام الأوامر أعلاه.
+1. تأكد من أن plugin الخاص بـ Mattermost متاح.
+   - إصدارات OpenClaw المجمّعة الحالية تتضمنه بالفعل.
+   - يمكن لعمليات التثبيت الأقدم/المخصصة إضافته يدويًا باستخدام الأوامر أعلاه.
 2. أنشئ حساب bot في Mattermost وانسخ **رمز bot المميز**.
-3. انسخ **عنوان URL الأساسي** لـ Mattermost (مثل `https://chat.example.com`).
-4. قم بتكوين OpenClaw وابدأ gateway.
+3. انسخ **عنوان URL الأساسي** الخاص بـ Mattermost (مثل: `https://chat.example.com`).
+4. اضبط OpenClaw وابدأ Gateway.
 
 الحد الأدنى من التكوين:
 
@@ -65,10 +65,10 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 }
 ```
 
-## أوامر الشرطة المائلة الأصلية
+## أوامر slash الأصلية
 
-أوامر الشرطة المائلة الأصلية اختيارية. عند تمكينها، يسجل OpenClaw أوامر الشرطة المائلة `oc_*` عبر
-واجهة Mattermost API ويتلقى طلبات POST الراجعة على خادم HTTP الخاص بـ gateway.
+أوامر slash الأصلية اختيارية. عند تفعيلها، يقوم OpenClaw بتسجيل أوامر slash من نوع `oc_*` عبر
+واجهة Mattermost API ويتلقى طلبات POST المرتدة على خادم HTTP الخاص بـ Gateway.
 
 ```json5
 {
@@ -78,7 +78,7 @@ openclaw plugins install ./path/to/local/mattermost-plugin
         native: true,
         nativeSkills: true,
         callbackPath: "/api/channels/mattermost/command",
-        // استخدم هذا عندما لا يتمكن Mattermost من الوصول إلى gateway مباشرة (reverse proxy/عنوان URL عام).
+        // استخدم هذا عندما يتعذر على Mattermost الوصول إلى Gateway مباشرةً (وكيل عكسي/عنوان URL عام).
         callbackUrl: "https://gateway.example.com/api/channels/mattermost/command",
       },
     },
@@ -88,28 +88,28 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ملاحظات:
 
-- تكون القيمة الافتراضية لـ `native: "auto"` هي التعطيل في Mattermost. عيّن `native: true` للتمكين.
-- إذا تم حذف `callbackUrl`، فسيشتق OpenClaw قيمة من مضيف/منفذ gateway + `callbackPath`.
-- في إعدادات الحسابات المتعددة، يمكن تعيين `commands` في المستوى الأعلى أو تحت
-  `channels.mattermost.accounts.<id>.commands` (تتجاوز قيم الحساب حقول المستوى الأعلى).
-- يتم التحقق من عمليات callback الخاصة بالأوامر باستخدام الرموز المميزة لكل أمر التي يعيدها
+- القيمة الافتراضية لـ `native: "auto"` هي التعطيل في Mattermost. اضبط `native: true` للتفعيل.
+- إذا تم حذف `callbackUrl`، فسيشتق OpenClaw القيمة من مضيف/منفذ Gateway + `callbackPath`.
+- في إعدادات الحسابات المتعددة، يمكن ضبط `commands` في المستوى الأعلى أو تحت
+  `channels.mattermost.accounts.<id>.commands` (قيم الحساب تتجاوز حقول المستوى الأعلى).
+- يتم التحقق من صحة callbacks الخاصة بالأوامر باستخدام الرموز المميزة الخاصة بكل أمر التي يعيدها
   Mattermost عندما يسجل OpenClaw أوامر `oc_*`.
-- تفشل عمليات callback الخاصة بأوامر الشرطة المائلة بشكل مغلق عندما يفشل التسجيل، أو يكون بدء التشغيل جزئيًا، أو
-  لا يطابق رمز callback أحد الأوامر المسجلة.
-- متطلب إمكانية الوصول: يجب أن تكون نقطة نهاية callback قابلة للوصول من خادم Mattermost.
-  - لا تعيّن `callbackUrl` إلى `localhost` إلا إذا كان Mattermost يعمل على نفس المضيف/namespace الشبكة مثل OpenClaw.
-  - لا تعيّن `callbackUrl` إلى عنوان URL الأساسي لـ Mattermost إلا إذا كان هذا العنوان يستخدم reverse-proxy للمسار `/api/channels/mattermost/command` إلى OpenClaw.
-  - فحص سريع هو `curl https://<gateway-host>/api/channels/mattermost/command`; يجب أن يعيد طلب GET قيمة `405 Method Not Allowed` من OpenClaw، وليس `404`.
+- تفشل callbacks الخاصة بـ slash بشكل مغلق عندما يفشل التسجيل، أو يكون بدء التشغيل جزئيًا، أو
+  لا يطابق رمز callback المميز أيًا من الأوامر المسجلة.
+- متطلب قابلية الوصول: يجب أن تكون نقطة نهاية callback قابلة للوصول من خادم Mattermost.
+  - لا تضبط `callbackUrl` على `localhost` إلا إذا كان Mattermost يعمل على نفس المضيف/نطاق الشبكة مثل OpenClaw.
+  - لا تضبط `callbackUrl` على عنوان URL الأساسي الخاص بـ Mattermost إلا إذا كان ذلك العنوان يمرر `/api/channels/mattermost/command` عبر وكيل عكسي إلى OpenClaw.
+  - فحص سريع هو `curl https://<gateway-host>/api/channels/mattermost/command`; يجب أن يعيد طلب GET القيمة `405 Method Not Allowed` من OpenClaw، وليس `404`.
 - متطلب قائمة السماح لخروج Mattermost:
-  - إذا كان callback لديك يستهدف عناوين خاصة/tailnet/داخلية، فعيّن
+  - إذا كان callback يستهدف عناوين خاصة/tailnet/داخلية، فاضبط
     `ServiceSettings.AllowedUntrustedInternalConnections` في Mattermost ليشمل مضيف/نطاق callback.
   - استخدم إدخالات المضيف/النطاق، وليس عناوين URL كاملة.
-    - جيد: `gateway.tailnet-name.ts.net`
-    - سيئ: `https://gateway.tailnet-name.ts.net`
+    - صحيح: `gateway.tailnet-name.ts.net`
+    - غير صحيح: `https://gateway.tailnet-name.ts.net`
 
 ## متغيرات البيئة (الحساب الافتراضي)
 
-اضبط هذه المتغيرات على مضيف gateway إذا كنت تفضل استخدام متغيرات البيئة:
+اضبط هذه القيم على مضيف Gateway إذا كنت تفضل استخدام متغيرات البيئة:
 
 - `MATTERMOST_BOT_TOKEN=...`
 - `MATTERMOST_URL=https://chat.example.com`
@@ -118,13 +118,13 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ## أوضاع الدردشة
 
-يرد Mattermost على الرسائل الخاصة تلقائيًا. يتم التحكم في سلوك القنوات بواسطة `chatmode`:
+يرد Mattermost على الرسائل المباشرة تلقائيًا. يتم التحكم في سلوك القنوات بواسطة `chatmode`:
 
-- `oncall` (الافتراضي): الرد فقط عند الإشارة إليه بـ @ في القنوات.
+- `oncall` (الافتراضي): الرد فقط عند الإشارة بـ @ في القنوات.
 - `onmessage`: الرد على كل رسالة في القناة.
 - `onchar`: الرد عندما تبدأ الرسالة ببادئة تشغيل.
 
-مثال على التكوين:
+مثال للتكوين:
 
 ```json5
 {
@@ -139,21 +139,21 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ملاحظات:
 
-- ما زال `onchar` يرد على إشارات @ الصريحة.
-- يتم احترام `channels.mattermost.requireMention` في التكوينات القديمة لكن `chatmode` هو المفضل.
+- يستمر `onchar` في الرد على الإشارات الصريحة بـ @.
+- لا يزال `channels.mattermost.requireMention` مدعومًا للتكوينات القديمة، لكن يُفضَّل `chatmode`.
 
 ## سلاسل الرسائل والجلسات
 
-استخدم `channels.mattermost.replyToMode` للتحكم في ما إذا كانت الردود في القنوات والمجموعات تبقى في
-القناة الرئيسية أو تبدأ سلسلة رسائل تحت المنشور المُشغِّل.
+استخدم `channels.mattermost.replyToMode` للتحكم فيما إذا كانت الردود في القنوات والمجموعات ستبقى في
+القناة الرئيسية أو ستبدأ سلسلة رسائل تحت المنشور الذي تسبب في التشغيل.
 
-- `off` (الافتراضي): لا يتم الرد في سلسلة رسائل إلا عندما يكون المنشور الوارد داخل سلسلة بالفعل.
-- `first`: بالنسبة لمنشورات القنوات/المجموعات ذات المستوى الأعلى، ابدأ سلسلة رسائل تحت ذلك المنشور ووجّه
-  المحادثة إلى جلسة ضمن نطاق السلسلة.
+- `off` (الافتراضي): لا يتم الرد في سلسلة رسائل إلا إذا كان المنشور الوارد موجودًا فيها بالفعل.
+- `first`: بالنسبة لمنشورات القنوات/المجموعات من المستوى الأعلى، ابدأ سلسلة رسائل تحت ذلك المنشور ووجّه
+  المحادثة إلى جلسة ضمن نطاق سلسلة الرسائل.
 - `all`: نفس سلوك `first` في Mattermost حاليًا.
-- تتجاهل الرسائل الخاصة هذا الإعداد وتبقى بدون سلاسل.
+- تتجاهل الرسائل المباشرة هذا الإعداد وتبقى خارج سلاسل الرسائل.
 
-مثال على التكوين:
+مثال للتكوين:
 
 ```json5
 {
@@ -167,27 +167,27 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ملاحظات:
 
-- تستخدم الجلسات ضمن نطاق السلسلة معرّف المنشور المُشغِّل كجذر للسلسلة.
-- `first` و`all` متكافئان حاليًا لأنه بمجرد أن يملك Mattermost جذر سلسلة،
-  تستمر الأجزاء اللاحقة والوسائط في نفس السلسلة.
+- تستخدم الجلسات ضمن نطاق سلسلة الرسائل معرّف المنشور الذي تسبب في التشغيل كجذر للسلسلة.
+- `first` و`all` متكافئان حاليًا لأنه بمجرد أن يمتلك Mattermost جذر سلسلة رسائل،
+  تستمر الأجزاء اللاحقة والوسائط داخل نفس السلسلة.
 
-## التحكم في الوصول (الرسائل الخاصة)
+## التحكم في الوصول (الرسائل المباشرة)
 
-- الافتراضي: `channels.mattermost.dmPolicy = "pairing"` ‏(يحصل المرسلون غير المعروفين على رمز اقتران).
-- وافق عبر:
+- الافتراضي: `channels.mattermost.dmPolicy = "pairing"` (المرسلون غير المعروفين يحصلون على رمز اقتران).
+- الموافقة عبر:
   - `openclaw pairing list mattermost`
   - `openclaw pairing approve mattermost <CODE>`
-- الرسائل الخاصة العامة: `channels.mattermost.dmPolicy="open"` مع `channels.mattermost.allowFrom=["*"]`.
+- الرسائل المباشرة العامة: `channels.mattermost.dmPolicy="open"` بالإضافة إلى `channels.mattermost.allowFrom=["*"]`.
 
 ## القنوات (المجموعات)
 
-- الافتراضي: `channels.mattermost.groupPolicy = "allowlist"` ‏(مقيّد بالإشارة).
-- اسمح للمرسلين عبر `channels.mattermost.groupAllowFrom` (يوصى باستخدام معرّفات المستخدمين).
+- الافتراضي: `channels.mattermost.groupPolicy = "allowlist"` (مقيّد بالإشارة).
+- أضف المرسلين إلى قائمة السماح باستخدام `channels.mattermost.groupAllowFrom` (يوصى بمعرّفات المستخدمين).
 - توجد تجاوزات الإشارة لكل قناة تحت `channels.mattermost.groups.<channelId>.requireMention`
   أو `channels.mattermost.groups["*"].requireMention` كقيمة افتراضية.
-- المطابقة باستخدام `@username` قابلة للتغيير ولا يتم تمكينها إلا عندما تكون `channels.mattermost.dangerouslyAllowNameMatching: true`.
-- القنوات المفتوحة: `channels.mattermost.groupPolicy="open"` ‏(مقيّد بالإشارة).
-- ملاحظة وقت التشغيل: إذا كانت `channels.mattermost` مفقودة بالكامل، فإن وقت التشغيل يعود إلى `groupPolicy="allowlist"` لفحوصات المجموعات (حتى لو كانت `channels.defaults.groupPolicy` معيّنة).
+- مطابقة `@username` قابلة للتغيير ولا يتم تفعيلها إلا عندما تكون `channels.mattermost.dangerouslyAllowNameMatching: true`.
+- القنوات المفتوحة: `channels.mattermost.groupPolicy="open"` (مقيّدة بالإشارة).
+- ملاحظة وقت التشغيل: إذا كانت `channels.mattermost` مفقودة بالكامل، فإن وقت التشغيل يعود إلى `groupPolicy="allowlist"` لفحوصات المجموعات (حتى إذا كانت `channels.defaults.groupPolicy` مضبوطة).
 
 مثال:
 
@@ -207,27 +207,27 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ## الأهداف للتسليم الصادر
 
-استخدم صيغ الأهداف التالية مع `openclaw message send` أو cron/webhooks:
+استخدم تنسيقات الهدف هذه مع `openclaw message send` أو Cron/Webhook:
 
 - `channel:<id>` لقناة
-- `user:<id>` لرسالة خاصة
-- `@username` لرسالة خاصة (يتم حلها عبر Mattermost API)
+- `user:<id>` لرسالة مباشرة
+- `@username` لرسالة مباشرة (يتم حلها عبر Mattermost API)
 
-المعرّفات المعتمة المجردة (مثل `64ifufp...`) **ملتبسة** في Mattermost (معرّف مستخدم أم معرّف قناة).
+المعرّفات الغامضة المجردة (مثل `64ifufp...`) **ملتبسة** في Mattermost (معرّف مستخدم أم معرّف قناة).
 
-يقوم OpenClaw بحلها **كمستخدم أولًا**:
+يقوم OpenClaw بحلها **مستخدم أولًا**:
 
-- إذا كان المعرّف موجودًا كمستخدم (`GET /api/v4/users/<id>` ينجح)، يرسل OpenClaw **رسالة خاصة** عبر حل القناة المباشرة باستخدام `/api/v4/channels/direct`.
-- بخلاف ذلك، يُعامل المعرّف على أنه **معرّف قناة**.
+- إذا كان المعرّف موجودًا كمستخدم (`GET /api/v4/users/<id>` ينجح)، يرسل OpenClaw **رسالة مباشرة** عبر حل القناة المباشرة من خلال `/api/v4/channels/direct`.
+- وإلا فسيتم التعامل مع المعرّف على أنه **معرّف قناة**.
 
-إذا كنت تحتاج إلى سلوك حتمي، فاستخدم دائمًا البوادئ الصريحة (`user:<id>` / `channel:<id>`).
+إذا كنت بحاجة إلى سلوك حتمي، فاستخدم دائمًا البوادئ الصريحة (`user:<id>` / `channel:<id>`).
 
-## إعادة محاولة قناة الرسائل الخاصة
+## إعادة محاولة قناة الرسائل المباشرة
 
-عندما يرسل OpenClaw إلى هدف رسالة خاصة في Mattermost ويحتاج إلى حل القناة المباشرة أولًا، فإنه
-يعيد محاولة إخفاقات إنشاء القناة المباشرة العابرة افتراضيًا.
+عندما يرسل OpenClaw إلى هدف رسالة مباشرة في Mattermost ويحتاج إلى حل القناة المباشرة أولًا، فإنه
+يعيد محاولة حالات الفشل المؤقتة في إنشاء القناة المباشرة افتراضيًا.
 
-استخدم `channels.mattermost.dmChannelRetry` لضبط هذا السلوك عمومًا لـ plugin Mattermost،
+استخدم `channels.mattermost.dmChannelRetry` لضبط هذا السلوك عالميًا لـ plugin الخاص بـ Mattermost،
 أو `channels.mattermost.accounts.<id>.dmChannelRetry` لحساب واحد.
 
 ```json5
@@ -247,17 +247,42 @@ openclaw plugins install ./path/to/local/mattermost-plugin
 
 ملاحظات:
 
-- ينطبق هذا فقط على إنشاء قناة الرسائل الخاصة (`/api/v4/channels/direct`)، وليس على كل استدعاء Mattermost API.
-- تنطبق إعادة المحاولات على الإخفاقات العابرة مثل حدود المعدل، واستجابات 5xx، وأخطاء الشبكة أو انتهاء المهلة.
+- ينطبق هذا فقط على إنشاء قناة الرسائل المباشرة (`/api/v4/channels/direct`)، وليس على كل استدعاء في Mattermost API.
+- تنطبق إعادة المحاولة على حالات الفشل المؤقتة مثل حدود المعدل، واستجابات 5xx، وأخطاء الشبكة أو انتهاء المهلة.
 - تُعامل أخطاء العميل 4xx بخلاف `429` على أنها دائمة ولا تتم إعادة محاولتها.
+
+## بث المعاينة
+
+يقوم Mattermost ببث التفكير ونشاط الأداة والنص الجزئي للرد داخل **منشور معاينة مسودة** واحد يتم تثبيته في مكانه عندما تصبح الإجابة النهائية آمنة للإرسال. تُحدَّث المعاينة على نفس معرّف المنشور بدلًا من إغراق القناة برسائل لكل جزء. تؤدي النهايات التي تحتوي على وسائط/أخطاء إلى إلغاء تعديلات المعاينة المعلقة واستخدام التسليم العادي بدلًا من تفريغ منشور معاينة مؤقت.
+
+فعّل ذلك عبر `channels.mattermost.streaming`:
+
+```json5
+{
+  channels: {
+    mattermost: {
+      streaming: "partial", // off | partial | block | progress
+    },
+  },
+}
+```
+
+ملاحظات:
+
+- `partial` هو الخيار المعتاد: منشور معاينة واحد يتم تعديله مع نمو الرد، ثم يُثبَّت بالإجابة الكاملة.
+- يستخدم `block` أجزاء مسودة بأسلوب الإلحاق داخل منشور المعاينة.
+- يعرض `progress` معاينة حالة أثناء التوليد ثم ينشر الإجابة النهائية فقط عند الاكتمال.
+- يعطّل `off` بث المعاينة.
+- إذا تعذر تثبيت البث في مكانه (على سبيل المثال إذا تم حذف المنشور أثناء البث)، يعود OpenClaw إلى إرسال منشور نهائي جديد حتى لا تضيع الإجابة أبدًا.
+- راجع [Streaming](/ar/concepts/streaming#preview-streaming-modes) للاطلاع على مصفوفة تعيين القنوات.
 
 ## التفاعلات (أداة الرسائل)
 
 - استخدم `message action=react` مع `channel=mattermost`.
 - `messageId` هو معرّف منشور Mattermost.
-- تقبل `emoji` أسماء مثل `thumbsup` أو `:+1:` ‏(النقطتان اختيارية).
-- عيّن `remove=true` ‏(منطقي) لإزالة تفاعل.
-- يتم تمرير أحداث إضافة/إزالة التفاعل كأحداث نظام إلى جلسة الوكيل الموجّهة.
+- يقبل `emoji` أسماء مثل `thumbsup` أو `:+1:` (النقطتان اختيارية).
+- اضبط `remove=true` (منطقي) لإزالة تفاعل.
+- تتم إعادة توجيه أحداث إضافة/إزالة التفاعل كأحداث نظام إلى جلسة الوكيل الموجّهة.
 
 أمثلة:
 
@@ -268,7 +293,7 @@ message action=react channel=mattermost target=channel:<channelId> messageId=<po
 
 التكوين:
 
-- `channels.mattermost.actions.reactions`: تمكين/تعطيل إجراءات التفاعل (الافتراضي true).
+- `channels.mattermost.actions.reactions`: تفعيل/تعطيل إجراءات التفاعل (الافتراضي true).
 - تجاوز لكل حساب: `channels.mattermost.accounts.<id>.actions.reactions`.
 
 ## الأزرار التفاعلية (أداة الرسائل)
@@ -276,7 +301,7 @@ message action=react channel=mattermost target=channel:<channelId> messageId=<po
 أرسل رسائل تحتوي على أزرار قابلة للنقر. عندما ينقر المستخدم زرًا، يتلقى الوكيل
 الاختيار ويمكنه الرد.
 
-قم بتمكين الأزرار بإضافة `inlineButtons` إلى قدرات القناة:
+فعّل الأزرار بإضافة `inlineButtons` إلى قدرات القناة:
 
 ```json5
 {
@@ -297,63 +322,63 @@ message action=send channel=mattermost target=channel:<channelId> buttons=[[{"te
 حقول الزر:
 
 - `text` (مطلوب): تسمية العرض.
-- `callback_data` (مطلوب): القيمة التي تُرسل مرة أخرى عند النقر (تُستخدم كمعرّف الإجراء).
+- `callback_data` (مطلوب): القيمة التي تُرسل عند النقر (تُستخدم كمعرّف الإجراء).
 - `style` (اختياري): `"default"` أو `"primary"` أو `"danger"`.
 
-عندما ينقر المستخدم زرًا:
+عندما ينقر مستخدم زرًا:
 
-1. تُستبدل كل الأزرار بسطر تأكيد (مثل "✓ **Yes** selected by @user").
+1. يتم استبدال جميع الأزرار بسطر تأكيد (مثل: "✓ **Yes** selected by @user").
 2. يتلقى الوكيل الاختيار كرسالة واردة ويرد.
 
 ملاحظات:
 
-- تستخدم عمليات callback الخاصة بالأزرار تحقق HMAC-SHA256 ‏(تلقائي، ولا حاجة إلى تكوين).
-- يزيل Mattermost بيانات callback من استجابات API الخاصة به (ميزة أمان)، لذلك تتم
-  إزالة جميع الأزرار عند النقر — ولا يمكن الإزالة الجزئية.
+- تستخدم callbacks الخاصة بالأزرار التحقق بواسطة HMAC-SHA256 (تلقائي، لا حاجة إلى إعداد).
+- يزيل Mattermost بيانات callback من استجابات API الخاصة به (ميزة أمان)، لذلك تتم إزالة جميع الأزرار
+  عند النقر — ولا يمكن الإزالة الجزئية.
 - يتم تنظيف معرّفات الإجراءات التي تحتوي على شرطات أو شرطات سفلية تلقائيًا
-  (بسبب قيد في توجيه Mattermost).
+  (قيد في التوجيه لدى Mattermost).
 
 التكوين:
 
-- `channels.mattermost.capabilities`: مصفوفة سلاسل للقدرات. أضف `"inlineButtons"` إلى
-  تمكين وصف أداة الأزرار في مطالبة نظام الوكيل.
-- `channels.mattermost.interactions.callbackBaseUrl`: عنوان URL أساسي خارجي اختياري لعمليات callback
-  الخاصة بالأزرار (مثل `https://gateway.example.com`). استخدمه عندما يتعذر على Mattermost
-  الوصول إلى gateway عند مضيف الربط مباشرة.
-- في إعدادات الحسابات المتعددة، يمكنك أيضًا تعيين الحقل نفسه تحت
+- `channels.mattermost.capabilities`: مصفوفة من سلاسل القدرات. أضف `"inlineButtons"` إلى
+  تفعيل وصف أداة الأزرار في system prompt الخاص بالوكيل.
+- `channels.mattermost.interactions.callbackBaseUrl`: عنوان URL أساسي خارجي اختياري لعمليات callback الخاصة بالأزرار
+  (على سبيل المثال `https://gateway.example.com`). استخدم هذا عندما يتعذر على Mattermost
+  الوصول إلى Gateway مباشرةً على مضيف الربط الخاص به.
+- في إعدادات الحسابات المتعددة، يمكنك أيضًا ضبط الحقل نفسه تحت
   `channels.mattermost.accounts.<id>.interactions.callbackBaseUrl`.
-- إذا تم حذف `interactions.callbackBaseUrl`، يشتق OpenClaw عنوان URL الخاص بـ callback من
+- إذا تم حذف `interactions.callbackBaseUrl`، فسيشتق OpenClaw عنوان URL الخاص بـ callback من
   `gateway.customBindHost` + `gateway.port`، ثم يعود إلى `http://localhost:<port>`.
-- قاعدة إمكانية الوصول: يجب أن يكون عنوان URL الخاص بـ callback للأزرار قابلاً للوصول من خادم Mattermost.
-  لا يعمل `localhost` إلا عندما يعمل Mattermost وOpenClaw على نفس المضيف/namespace الشبكة.
-- إذا كان هدف callback لديك خاصًا/tailnet/داخليًا، فأضف مضيفه/نطاقه إلى
+- قاعدة قابلية الوصول: يجب أن يكون عنوان URL الخاص بـ callback للأزرار قابلاً للوصول من خادم Mattermost.
+  لا يعمل `localhost` إلا عندما يعمل Mattermost وOpenClaw على نفس المضيف/نطاق الشبكة.
+- إذا كان هدف callback خاصًا/داخليًا/tailnet، فأضف مضيفه/نطاقه إلى
   `ServiceSettings.AllowedUntrustedInternalConnections` في Mattermost.
 
-### تكامل API مباشر (scripts خارجية)
+### تكامل API مباشر (برامج نصية خارجية)
 
-يمكن لـ scripts وwebhooks الخارجية نشر الأزرار مباشرة عبر Mattermost REST API
+يمكن للبرامج النصية الخارجية وWebhooks نشر الأزرار مباشرةً عبر Mattermost REST API
 بدلًا من المرور عبر أداة `message` الخاصة بالوكيل. استخدم `buildButtonAttachments()` من
-الامتداد عندما يكون ذلك ممكنًا؛ وإذا كنت تنشر JSON خامًا، فاتبع هذه القواعد:
+الامتداد عندما يكون ذلك ممكنًا؛ وإذا كنت سترسل JSON خامًا، فاتبع هذه القواعد:
 
 **بنية الحمولة:**
 
 ```json5
 {
   channel_id: "<channelId>",
-  message: "Choose an option:",
+  message: "اختر خيارًا:",
   props: {
     attachments: [
       {
         actions: [
           {
-            id: "mybutton01", // أبجدي رقمي فقط — راجع أدناه
+            id: "mybutton01", // أحرف وأرقام فقط — انظر أدناه
             type: "button", // مطلوب، وإلا فسيتم تجاهل النقرات بصمت
-            name: "Approve", // تسمية العرض
+            name: "موافقة", // تسمية العرض
             style: "primary", // اختياري: "default" أو "primary" أو "danger"
             integration: {
               url: "https://gateway.example.com/mattermost/interactions/default",
               context: {
-                action_id: "mybutton01", // يجب أن يطابق id الخاص بالزر (لاستخدامه في البحث عن الاسم)
+                action_id: "mybutton01", // يجب أن يطابق معرّف الزر (للبحث عن الاسم)
                 action: "approve",
                 // ... أي حقول مخصصة ...
                 _token: "<hmac>", // راجع قسم HMAC أدناه
@@ -367,29 +392,29 @@ message action=send channel=mattermost target=channel:<channelId> buttons=[[{"te
 }
 ```
 
-**القواعد الحرجة:**
+**قواعد حرجة:**
 
-1. توضع المرفقات في `props.attachments`، وليس في `attachments` على المستوى الأعلى (وإلا يتم تجاهلها بصمت).
-2. يحتاج كل إجراء إلى `type: "button"` — من دونه، يتم ابتلاع النقرات بصمت.
-3. يحتاج كل إجراء إلى حقل `id` — يتجاهل Mattermost الإجراءات من دون معرّفات.
+1. توضع المرفقات في `props.attachments`، وليس في `attachments` على المستوى الأعلى (سيتم تجاهلها بصمت).
+2. يحتاج كل إجراء إلى `type: "button"` — وبدونه سيتم ابتلاع النقرات بصمت.
+3. يحتاج كل إجراء إلى حقل `id` — يتجاهل Mattermost الإجراءات التي لا تحتوي على معرّفات.
 4. يجب أن يكون `id` الخاص بالإجراء **أبجديًا رقميًا فقط** (`[a-zA-Z0-9]`). تؤدي الشرطات والشرطات السفلية إلى كسر
-   توجيه الإجراءات من جهة خادم Mattermost (ويُرجع 404). أزلها قبل الاستخدام.
+   توجيه الإجراءات على جانب خادم Mattermost (ويعيد 404). أزلها قبل الاستخدام.
 5. يجب أن يطابق `context.action_id` قيمة `id` الخاصة بالزر حتى تعرض رسالة التأكيد
-   اسم الزر (مثل "Approve") بدلًا من معرّف خام.
-6. `context.action_id` مطلوب — يعيد معالج التفاعل 400 من دونه.
+   اسم الزر (مثل "موافقة") بدلًا من معرّف خام.
+6. الحقل `context.action_id` مطلوب — يعيد معالج التفاعل 400 بدونه.
 
-**توليد رمز HMAC:**
+**إنشاء رمز HMAC المميز:**
 
-يتحقق gateway من نقرات الأزرار باستخدام HMAC-SHA256. يجب على scripts الخارجية توليد رموز
-تطابق منطق التحقق في gateway:
+يتحقق Gateway من نقرات الأزرار باستخدام HMAC-SHA256. يجب على البرامج النصية الخارجية إنشاء رموز مميزة
+تطابق منطق التحقق في Gateway:
 
 1. اشتق السر من رمز bot المميز:
    `HMAC-SHA256(key="openclaw-mattermost-interactions", data=botToken)`
-2. ابنِ كائن السياق بجميع الحقول **باستثناء** `_token`.
-3. قم بالتسلسل باستخدام **مفاتيح مرتبة** و**من دون مسافات** (يستخدم gateway ‏`JSON.stringify`
-   مع مفاتيح مرتبة، ما ينتج خرجًا مضغوطًا).
-4. وقّع: `HMAC-SHA256(key=secret, data=serializedContext)`
-5. أضف الملخص السداسي الناتج كقيمة `_token` في السياق.
+2. أنشئ كائن context مع جميع الحقول **باستثناء** `_token`.
+3. قم بالتسلسل باستخدام **مفاتيح مرتبة** و**من دون مسافات** (يستخدم Gateway الدالة `JSON.stringify`
+   مع مفاتيح مرتبة، ما ينتج مخرجات مضغوطة).
+4. وقّع باستخدام: `HMAC-SHA256(key=secret, data=serializedContext)`
+5. أضف ملخص hex الناتج كقيمة `_token` في context.
 
 مثال Python:
 
@@ -410,22 +435,22 @@ context = {**ctx, "_token": token}
 
 المشكلات الشائعة في HMAC:
 
-- يضيف `json.dumps` في Python مسافات افتراضيًا (`{"key": "val"}`). استخدم
-  `separators=(",", ":")` لمطابقة الخرج المضغوط في JavaScript ‏(`{"key":"val"}`).
-- وقّع دائمًا **كل** حقول السياق (باستثناء `_token`). يزيل gateway قيمة `_token` ثم
-  يوقّع كل ما تبقى. يؤدي توقيع مجموعة فرعية إلى فشل صامت في التحقق.
-- استخدم `sort_keys=True` — يقوم gateway بترتيب المفاتيح قبل التوقيع، وقد يعيد Mattermost
-  ترتيب حقول السياق عند تخزين الحمولة.
-- اشتق السر من رمز bot المميز (حتمي)، وليس من بايتات عشوائية. يجب أن يكون السر
-  نفسه في كل من العملية التي تنشئ الأزرار وgateway الذي يتحقق منها.
+- تضيف `json.dumps` في Python مسافات افتراضيًا (`{"key": "val"}`). استخدم
+  `separators=(",", ":")` لمطابقة المخرجات المضغوطة في JavaScript (`{"key":"val"}`).
+- وقّع دائمًا **جميع** حقول context (باستثناء `_token`). يزيل Gateway الحقل `_token` ثم
+  يوقّع كل ما تبقى. يؤدي توقيع مجموعة فرعية إلى فشل التحقق بصمت.
+- استخدم `sort_keys=True` — يرتب Gateway المفاتيح قبل التوقيع، وقد يقوم Mattermost
+  بإعادة ترتيب حقول context عند تخزين الحمولة.
+- اشتق السر من رمز bot المميز (بصورة حتمية)، وليس من بايتات عشوائية. يجب أن يكون السر
+  نفسه عبر العملية التي تنشئ الأزرار وGateway الذي يتحقق منها.
 
-## مهايئ الدليل
+## مُهايئ الدليل
 
-يتضمن plugin Mattermost مهايئ دليل يحل أسماء القنوات والمستخدمين
-عبر Mattermost API. يتيح هذا استخدام أهداف `#channel-name` و`@username` في
-`openclaw message send` وعمليات التسليم عبر cron/webhook.
+يتضمن plugin الخاص بـ Mattermost مُهايئ دليل يحل أسماء القنوات والمستخدمين
+عبر Mattermost API. يتيح هذا استخدام الأهداف `#channel-name` و`@username` في
+`openclaw message send` وعمليات التسليم الخاصة بـ Cron/Webhook.
 
-لا يلزم أي تكوين — يستخدم المهايئ رمز bot المميز من تكوين الحساب.
+لا حاجة إلى أي إعداد — يستخدم المُهايئ رمز bot المميز من تكوين الحساب.
 
 ## حسابات متعددة
 
@@ -436,8 +461,8 @@ context = {**ctx, "_token": token}
   channels: {
     mattermost: {
       accounts: {
-        default: { name: "Primary", botToken: "mm-token", baseUrl: "https://chat.example.com" },
-        alerts: { name: "Alerts", botToken: "mm-token-2", baseUrl: "https://alerts.example.com" },
+        default: { name: "أساسي", botToken: "mm-token", baseUrl: "https://chat.example.com" },
+        alerts: { name: "التنبيهات", botToken: "mm-token-2", baseUrl: "https://alerts.example.com" },
       },
     },
   },
@@ -446,34 +471,34 @@ context = {**ctx, "_token": token}
 
 ## استكشاف الأخطاء وإصلاحها
 
-- لا توجد ردود في القنوات: تأكد من وجود bot في القناة واذكره (oncall)، أو استخدم بادئة تشغيل (onchar)، أو عيّن `chatmode: "onmessage"`.
-- أخطاء المصادقة: تحقق من رمز bot المميز وعنوان URL الأساسي وما إذا كان الحساب ممكّنًا.
+- لا توجد ردود في القنوات: تأكد من أن bot موجود في القناة وأنك تشير إليه (oncall)، أو استخدم بادئة تشغيل (onchar)، أو اضبط `chatmode: "onmessage"`.
+- أخطاء المصادقة: تحقق من رمز bot المميز، وعنوان URL الأساسي، وما إذا كان الحساب مفعّلًا.
 - مشكلات الحسابات المتعددة: تنطبق متغيرات البيئة فقط على الحساب `default`.
-- تعيد أوامر الشرطة المائلة الأصلية `Unauthorized: invalid command token.`: لم
-  يقبل OpenClaw رمز callback المميز. الأسباب المعتادة:
-  - فشل تسجيل أوامر الشرطة المائلة أو اكتمل جزئيًا فقط عند بدء التشغيل
-  - يصل callback إلى gateway/الحساب الخطأ
-  - ما زال Mattermost يملك أوامر قديمة تشير إلى هدف callback سابق
-  - أُعيد تشغيل gateway من دون إعادة تنشيط أوامر الشرطة المائلة
-- إذا توقفت أوامر الشرطة المائلة الأصلية عن العمل، فتحقق من السجلات بحثًا عن
+- تعيد أوامر slash الأصلية `Unauthorized: invalid command token.`: لم
+  يقبل OpenClaw رمز callback المميز. من الأسباب الشائعة:
+  - فشل تسجيل أوامر slash أو اكتمل جزئيًا فقط عند بدء التشغيل
+  - يتم توجيه callback إلى Gateway/حساب غير صحيح
+  - لا يزال Mattermost يحتوي على أوامر قديمة تشير إلى هدف callback سابق
+  - تمت إعادة تشغيل Gateway من دون إعادة تنشيط أوامر slash الأصلية
+- إذا توقفت أوامر slash الأصلية عن العمل، فتحقق من السجلات بحثًا عن
   `mattermost: failed to register slash commands` أو
   `mattermost: native slash commands enabled but no commands could be registered`.
 - إذا تم حذف `callbackUrl` وكانت السجلات تحذر من أن callback تم حله إلى
-  `http://127.0.0.1:18789/...`، فمن المحتمل أن يكون عنوان URL هذا قابلاً للوصول فقط عندما
-  يعمل Mattermost على نفس المضيف/namespace الشبكة مثل OpenClaw. عيّن
-  `commands.callbackUrl` صريحًا وقابلًا للوصول من الخارج بدلًا من ذلك.
+  `http://127.0.0.1:18789/...`، فمن المحتمل أن يكون هذا العنوان قابلاً للوصول فقط عندما
+  يعمل Mattermost على نفس المضيف/نطاق الشبكة مثل OpenClaw. اضبط
+  `commands.callbackUrl` صريحًا وقابلاً للوصول خارجيًا بدلًا من ذلك.
 - تظهر الأزرار كمربعات بيضاء: ربما يرسل الوكيل بيانات أزرار غير صحيحة. تحقق من أن كل زر يحتوي على الحقلين `text` و`callback_data`.
-- تُعرض الأزرار لكن النقرات لا تفعل شيئًا: تحقق من أن `AllowedUntrustedInternalConnections` في تكوين خادم Mattermost يتضمن `127.0.0.1 localhost`، وأن `EnablePostActionIntegration` يساوي `true` في ServiceSettings.
-- تُرجع الأزرار 404 عند النقر: من المحتمل أن يحتوي `id` الخاص بالزر على شرطات أو شرطات سفلية. يتعطل موجه إجراءات Mattermost مع المعرّفات غير الأبجدية الرقمية. استخدم `[a-zA-Z0-9]` فقط.
-- تُظهر سجلات gateway الرسالة `invalid _token`: عدم تطابق HMAC. تحقق من أنك توقّع كل حقول السياق (وليس مجموعة فرعية)، وتستخدم مفاتيح مرتبة، وJSON مضغوطًا (من دون مسافات). راجع قسم HMAC أعلاه.
-- تُظهر سجلات gateway الرسالة `missing _token in context`: الحقل `_token` غير موجود في سياق الزر. تأكد من تضمينه عند إنشاء حمولة التكامل.
-- يُظهر التأكيد معرّفًا خامًا بدلًا من اسم الزر: `context.action_id` لا يطابق `id` الخاص بالزر. عيّن الاثنين إلى القيمة المنظفة نفسها.
-- الوكيل لا يعرف الأزرار: أضف `capabilities: ["inlineButtons"]` إلى تكوين قناة Mattermost.
+- تُعرض الأزرار لكن النقرات لا تفعل شيئًا: تحقّق من أن `AllowedUntrustedInternalConnections` في إعدادات خادم Mattermost تتضمن `127.0.0.1 localhost`، وأن `EnablePostActionIntegration` تساوي `true` في ServiceSettings.
+- تعيد الأزرار 404 عند النقر: من المحتمل أن `id` الخاص بالزر يحتوي على شرطات أو شرطات سفلية. يتعطل موجه الإجراءات في Mattermost مع المعرّفات غير الأبجدية الرقمية. استخدم `[a-zA-Z0-9]` فقط.
+- تعرض سجلات Gateway الرسالة `invalid _token`: عدم تطابق HMAC. تحقق من أنك توقّع جميع حقول context (وليس مجموعة فرعية)، وتستخدم مفاتيح مرتبة، وJSON مضغوطًا (من دون مسافات). راجع قسم HMAC أعلاه.
+- تعرض سجلات Gateway الرسالة `missing _token in context`: الحقل `_token` غير موجود في context الخاص بالزر. تأكد من تضمينه عند إنشاء حمولة التكامل.
+- يعرض التأكيد معرّفًا خامًا بدلًا من اسم الزر: لا تطابق قيمة `context.action_id` قيمة `id` الخاصة بالزر. اضبط الاثنين على القيمة المنظفة نفسها.
+- لا يعرف الوكيل الأزرار: أضف `capabilities: ["inlineButtons"]` إلى تكوين قناة Mattermost.
 
 ## ذو صلة
 
-- [نظرة عامة على القنوات](/channels) — جميع القنوات المدعومة
-- [الاقتران](/channels/pairing) — مصادقة الرسائل الخاصة وتدفق الاقتران
-- [المجموعات](/channels/groups) — سلوك الدردشة الجماعية وضبط الإشارات
-- [توجيه القنوات](/channels/channel-routing) — توجيه الجلسات للرسائل
-- [الأمان](/gateway/security) — نموذج الوصول والتقوية
+- [نظرة عامة على القنوات](/ar/channels) — جميع القنوات المدعومة
+- [الاقتران](/ar/channels/pairing) — مصادقة الرسائل المباشرة وتدفق الاقتران
+- [المجموعات](/ar/channels/groups) — سلوك الدردشة الجماعية وتقييد الإشارة
+- [توجيه القنوات](/ar/channels/channel-routing) — توجيه الجلسات للرسائل
+- [الأمان](/ar/gateway/security) — نموذج الوصول والتقوية

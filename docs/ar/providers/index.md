@@ -1,29 +1,29 @@
 ---
 read_when:
-    - تريد اختيار موفّر نماذج
-    - تحتاج إلى نظرة عامة سريعة على الواجهات الخلفية المدعومة لـ LLM
-summary: موفرو النماذج (LLMs) المدعومون بواسطة OpenClaw
+    - أنت تريد اختيار مزوّد نموذج
+    - أنت بحاجة إلى نظرة عامة سريعة على الواجهات الخلفية المدعومة لـ LLM
+summary: مزوّدو النماذج (LLMs) الذين يدعمهم OpenClaw
 title: دليل المزوّدين
 x-i18n:
-    generated_at: "2026-04-13T07:28:50Z"
+    generated_at: "2026-04-22T04:27:46Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3bc682d008119719826f71f74959ab32bedf14214459f5e6ac9cb70371d3c540
+    source_hash: 7d77e5da93d71c48ea97460c6be56fbbe8279d9240a8101e1b35fdafb657737e
     source_path: providers/index.md
     workflow: 15
 ---
 
-# موفرو النماذج
+# مزوّدو النماذج
 
-يمكن لـ OpenClaw استخدام العديد من موفري LLM. اختر موفّرًا، وأكمل المصادقة، ثم عيّن
-النموذج الافتراضي بصيغة `provider/model`.
+يمكن لـ OpenClaw استخدام العديد من مزوّدي LLM. اختر مزوّدًا، وقم بالمصادقة، ثم اضبط
+النموذج الافتراضي على الشكل `provider/model`.
 
 هل تبحث عن وثائق قنوات الدردشة (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/إلخ)؟ راجع [القنوات](/ar/channels).
 
-## البدء السريع
+## بداية سريعة
 
-1. أكمل المصادقة مع المزوّد (عادةً عبر `openclaw onboard`).
-2. عيّن النموذج الافتراضي:
+1. قم بالمصادقة مع المزوّد (عادةً عبر `openclaw onboard`).
+2. اضبط النموذج الافتراضي:
 
 ```json5
 {
@@ -39,8 +39,8 @@ x-i18n:
 - [Arcee AI (نماذج Trinity)](/ar/providers/arcee)
 - [BytePlus (دولي)](/ar/concepts/model-providers#byteplus-international)
 - [Chutes](/ar/providers/chutes)
-- [ComfyUI](/ar/providers/comfy)
 - [Cloudflare AI Gateway](/ar/providers/cloudflare-ai-gateway)
+- [ComfyUI](/ar/providers/comfy)
 - [DeepSeek](/ar/providers/deepseek)
 - [fal](/ar/providers/fal)
 - [Fireworks](/ar/providers/fireworks)
@@ -48,7 +48,7 @@ x-i18n:
 - [نماذج GLM](/ar/providers/glm)
 - [Google (Gemini)](/ar/providers/google)
 - [Groq (استدلال LPU)](/ar/providers/groq)
-- [Hugging Face (الاستدلال)](/ar/providers/huggingface)
+- [Hugging Face (Inference)](/ar/providers/huggingface)
 - [inferrs (نماذج محلية)](/ar/providers/inferrs)
 - [Kilocode](/ar/providers/kilocode)
 - [LiteLLM (بوابة موحّدة)](/ar/providers/litellm)
@@ -62,7 +62,7 @@ x-i18n:
 - [OpenCode](/ar/providers/opencode)
 - [OpenCode Go](/ar/providers/opencode-go)
 - [OpenRouter](/ar/providers/openrouter)
-- [Perplexity (البحث على الويب)](/ar/providers/perplexity-provider)
+- [Perplexity (بحث الويب)](/ar/providers/perplexity-provider)
 - [Qianfan](/ar/providers/qianfan)
 - [Qwen Cloud](/ar/providers/qwen)
 - [Runway](/ar/providers/runway)
@@ -70,29 +70,29 @@ x-i18n:
 - [StepFun](/ar/providers/stepfun)
 - [Synthetic](/ar/providers/synthetic)
 - [Together AI](/ar/providers/together)
-- [Venice (Venice AI، مع تركيز على الخصوصية)](/ar/providers/venice)
+- [Venice (Venice AI، مع التركيز على الخصوصية)](/ar/providers/venice)
 - [Vercel AI Gateway](/ar/providers/vercel-ai-gateway)
-- [Vydra](/ar/providers/vydra)
 - [vLLM (نماذج محلية)](/ar/providers/vllm)
 - [Volcengine (Doubao)](/ar/providers/volcengine)
+- [Vydra](/ar/providers/vydra)
 - [xAI](/ar/providers/xai)
 - [Xiaomi](/ar/providers/xiaomi)
 - [Z.AI](/ar/providers/zai)
 
 ## صفحات النظرة العامة المشتركة
 
-- [متغيرات إضافية مضمّنة](/ar/providers/models#additional-bundled-provider-variants) - Anthropic Vertex وCopilot Proxy وGemini CLI OAuth
-- [توليد الصور](/ar/tools/image-generation) - أداة `image_generate` المشتركة، واختيار المزوّد، والتبديل التلقائي عند الفشل
-- [توليد الموسيقى](/ar/tools/music-generation) - أداة `music_generate` المشتركة، واختيار المزوّد، والتبديل التلقائي عند الفشل
-- [توليد الفيديو](/ar/tools/video-generation) - أداة `video_generate` المشتركة، واختيار المزوّد، والتبديل التلقائي عند الفشل
+- [المتغيرات المضمّنة الإضافية](/ar/providers/models#additional-bundled-provider-variants) - Anthropic Vertex وCopilot Proxy وGemini CLI OAuth
+- [توليد الصور](/ar/tools/image-generation) - أداة `image_generate` المشتركة، واختيار المزوّد، وfailover
+- [توليد الموسيقى](/ar/tools/music-generation) - أداة `music_generate` المشتركة، واختيار المزوّد، وfailover
+- [توليد الفيديو](/ar/tools/video-generation) - أداة `video_generate` المشتركة، واختيار المزوّد، وfailover
 
-## مزودو التفريغ النصي
+## مزوّدو النسخ
 
-- [Deepgram (تفريغ نصي للصوت)](/ar/providers/deepgram)
+- [Deepgram (نسخ الصوت)](/ar/providers/deepgram)
 
 ## أدوات المجتمع
 
-- [Claude Max API Proxy](/ar/providers/claude-max-api-proxy) - وكيل مجتمع لبيانات اعتماد اشتراك Claude (تحقق من سياسة Anthropic/الشروط قبل الاستخدام)
+- [Claude Max API Proxy](/ar/providers/claude-max-api-proxy) - proxy مجتمعي لبيانات اعتماد اشتراك Claude ‏(تحقق من سياسة/شروط Anthropic قبل الاستخدام)
 
-للحصول على فهرس المزوّدين الكامل (xAI وGroq وMistral وما إلى ذلك) والإعدادات المتقدمة،
-راجع [موفرو النماذج](/ar/concepts/model-providers).
+للاطلاع على فهرس المزوّدين الكامل (xAI وGroq وMistral وغيرها) والإعدادات المتقدمة،
+راجع [مزوّدو النماذج](/ar/concepts/model-providers).

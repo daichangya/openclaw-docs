@@ -1,30 +1,30 @@
 ---
 read_when:
-    - أنت بحاجة إلى معرفة أي مسار فرعي من SDK يجب الاستيراد منه
-    - أنت تريد مرجعًا لكل طرائق التسجيل في OpenClawPluginApi
+    - تحتاج إلى معرفة أي مسار فرعي من SDK يجب الاستيراد منه
+    - تريد مرجعًا لجميع أساليب التسجيل في `OpenClawPluginApi`
     - أنت تبحث عن تصدير محدد من SDK
 sidebarTitle: SDK Overview
-summary: خريطة الاستيراد، ومرجع API للتسجيل، ومعمارية SDK
+summary: خريطة الاستيراد، ومرجع واجهة API للتسجيل، وبنية SDK
 title: نظرة عامة على Plugin SDK
 x-i18n:
-    generated_at: "2026-04-21T07:23:34Z"
+    generated_at: "2026-04-22T04:26:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4561c074bb45529cd94d9d23ce7820b668cbc4ff6317230fdd5a5f27c5f14c67
+    source_hash: 8045c11976bbda6afe3303a0aab08caf0d0a86ebcf1aaaf927943b90cc517673
     source_path: plugins/sdk-overview.md
     workflow: 15
 ---
 
 # نظرة عامة على Plugin SDK
 
-يمثل Plugin SDK العقد typed بين Plugins والنواة. هذه الصفحة هي
-المرجع الخاص بـ **ما الذي يجب استيراده** و**ما الذي يمكنك تسجيله**.
+يُعد Plugin SDK العقد المطبّع بين plugins والنواة. وهذه الصفحة هي
+المرجع الخاص بـ **ما يجب استيراده** و**ما الذي يمكنك تسجيله**.
 
 <Tip>
-  **هل تبحث عن دليل عملي؟**
-  - أول Plugin لك؟ ابدأ من [البدء](/ar/plugins/building-plugins)
-  - Plugin قناة؟ راجع [Plugins القنوات](/ar/plugins/sdk-channel-plugins)
-  - Plugin مزود؟ راجع [Plugins المزودات](/ar/plugins/sdk-provider-plugins)
+  **هل تبحث عن دليل إرشادي؟**
+  - أول plugin؟ ابدأ من [البدء](/ar/plugins/building-plugins)
+  - plugin قناة؟ راجع [Channel Plugins](/ar/plugins/sdk-channel-plugins)
+  - plugin مزوّد؟ راجع [Provider Plugins](/ar/plugins/sdk-provider-plugins)
 </Tip>
 
 ## اصطلاح الاستيراد
@@ -36,38 +36,38 @@ import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
 ```
 
-كل مسار فرعي هو وحدة صغيرة مستقلة ذاتيًا. وهذا يحافظ على سرعة بدء التشغيل
-ويمنع مشكلات التبعيات الدائرية. وبالنسبة إلى مساعدات الإدخال/البناء الخاصة بالقنوات،
-فاضّل `openclaw/plugin-sdk/channel-core`، واحتفظ بـ `openclaw/plugin-sdk/core` لـ
+كل مسار فرعي هو وحدة صغيرة ومكتفية ذاتيًا. وهذا يحافظ على سرعة بدء التشغيل
+ويمنع مشكلات التبعيات الدائرية. وبالنسبة إلى وسائل المساعدة الخاصة بإدخال/بناء القنوات،
+ففضّل `openclaw/plugin-sdk/channel-core`؛ وأبقِ `openclaw/plugin-sdk/core` من أجل
 السطح الأشمل والمساعدات المشتركة مثل
 `buildChannelConfigSchema`.
 
-لا تضف أو تعتمد على طبقات تسهيل مسماة باسم مزود مثل
-`openclaw/plugin-sdk/slack` أو `openclaw/plugin-sdk/discord` أو
-`openclaw/plugin-sdk/signal` أو `openclaw/plugin-sdk/whatsapp` أو
-طبقات المساعدة ذات العلامة الخاصة بالقنوات. ينبغي أن تركّب Plugins المجمعة
-المسارات الفرعية العامة لـ SDK داخل حاوياتها `api.ts` أو `runtime-api.ts`،
-وينبغي أن تستخدم النواة إما هذه الحاويات المحلية الخاصة بالـ Plugin أو أن تضيف عقدًا عامًا ضيقًا في SDK
-عندما تكون الحاجة فعلًا عابرة للقنوات.
+لا تُضف أو تعتمد على مسارات convenience seams المسماة باسم المزوّد مثل
+`openclaw/plugin-sdk/slack` أو `openclaw/plugin-sdk/discord`،
+أو `openclaw/plugin-sdk/signal`، أو `openclaw/plugin-sdk/whatsapp`، أو
+المسارات المساعدة ذات العلامة التجارية الخاصة بالقنوات. يجب على plugins المضمّنة أن تركّب
+المسارات الفرعية العامة لـ SDK داخل ملفات `api.ts` أو `runtime-api.ts`
+الخاصة بها، ويجب على النواة إما استخدام تلك الملفات المحلية الخاصة بالplugin أو إضافة
+عقد SDK عامًا ضيقًا عندما تكون الحاجة فعلًا عابرة للقنوات.
 
-لا تزال خريطة التصدير المولّدة تحتوي على مجموعة صغيرة من
-طبقات المساعدة الخاصة بالـ Plugin المجمعة مثل `plugin-sdk/feishu` و`plugin-sdk/feishu-setup`
-و`plugin-sdk/zalo` و`plugin-sdk/zalo-setup` و`plugin-sdk/matrix*`. هذه
-المسارات الفرعية موجودة فقط لصيانة Plugins المجمعة والتوافق؛ وقد تم حذفها عمدًا
-من الجدول الشائع أدناه وليست مسار الاستيراد الموصى به لـ Plugins الخارجية الجديدة.
+ما زالت خريطة التصدير المولدة تحتوي على مجموعة صغيرة من المسارات المساعدة الخاصة بالplugins المضمّنة
+مثل `plugin-sdk/feishu`، و`plugin-sdk/feishu-setup`،
+و`plugin-sdk/zalo`، و`plugin-sdk/zalo-setup`، و`plugin-sdk/matrix*`. توجد هذه
+المسارات الفرعية لصيانة plugins المضمّنة والتوافق فقط؛ وقد تم حذفها عمدًا من الجدول المشترك أدناه
+وليست مسار الاستيراد الموصى به للplugins الجديدة التابعة لجهات خارجية.
 
 ## مرجع المسارات الفرعية
 
-أكثر المسارات الفرعية استخدامًا، مجمعة بحسب الغرض. توجد القائمة الكاملة المولدة التي تضم
-أكثر من 200 مسار فرعي في `scripts/lib/plugin-sdk-entrypoints.json`.
+أكثر المسارات الفرعية استخدامًا، مجمّعة حسب الغرض. وتوجد القائمة الكاملة المولدة
+التي تضم أكثر من 200 مسار فرعي في `scripts/lib/plugin-sdk-entrypoints.json`.
 
-لا تزال المسارات الفرعية المخصصة لمساعدات Plugins المجمعة تظهر في تلك القائمة المولدة.
-تعامل معها على أنها تفاصيل تنفيذ/أسطح توافق ما لم تقم صفحة وثائق
-بترقية أحدها صراحةً إلى سطح عام.
+ما زالت المسارات الفرعية المساعدة المحجوزة الخاصة بالplugins المضمّنة تظهر في هذه القائمة المولدة.
+تعامل معها على أنها تفاصيل تنفيذ/أسطح توافق ما لم تروّج لها صفحة وثائق
+صراحةً باعتبارها عامة.
 
 ### إدخال Plugin
 
-| المسار الفرعي                     | التصديرات الأساسية                                                                                                                            |
+| المسار الفرعي                     | أهم التصديرات                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | `plugin-sdk/plugin-entry`   | `definePluginEntry`                                                                                                                    |
 | `plugin-sdk/core`           | `defineChannelPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase`, `defineSetupPluginEntry`, `buildChannelConfigSchema` |
@@ -76,202 +76,202 @@ import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
 
 <AccordionGroup>
   <Accordion title="المسارات الفرعية للقنوات">
-    | المسار الفرعي | التصديرات الأساسية |
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
     | `plugin-sdk/channel-core` | `defineChannelPluginEntry`, `defineSetupPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase` |
     | `plugin-sdk/config-schema` | تصدير مخطط Zod الجذري لـ `openclaw.json` (`OpenClawSchema`) |
-    | `plugin-sdk/channel-setup` | `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`, `createOptionalChannelSetupWizard`، بالإضافة إلى `DEFAULT_ACCOUNT_ID`, `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled`, `splitSetupEntries` |
-    | `plugin-sdk/setup` | مساعدات مشتركة لمعالج الإعداد، ومطالبات قائمة السماح، وبناة حالة الإعداد |
+    | `plugin-sdk/channel-setup` | `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`, `createOptionalChannelSetupWizard`، بالإضافة إلى `DEFAULT_ACCOUNT_ID` و`createTopLevelChannelDmPolicy` و`setSetupChannelEnabled` و`splitSetupEntries` |
+    | `plugin-sdk/setup` | مساعدات معالج الإعداد المشتركة، ومطالبات قائمة السماح، وبناة حالة الإعداد |
     | `plugin-sdk/setup-runtime` | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
     | `plugin-sdk/setup-adapter-runtime` | `createEnvPatchedAccountSetupAdapter` |
     | `plugin-sdk/setup-tools` | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR` |
-    | `plugin-sdk/account-core` | مساعدات إعدادات/بوابة إجراءات متعددة الحسابات، ومساعدات fallback للحساب الافتراضي |
+    | `plugin-sdk/account-core` | مساعدات تكوين/بوابة الإجراءات متعددة الحسابات، ومساعدات fallback للحساب الافتراضي |
     | `plugin-sdk/account-id` | `DEFAULT_ACCOUNT_ID`، ومساعدات تطبيع معرّف الحساب |
     | `plugin-sdk/account-resolution` | مساعدات البحث عن الحساب + fallback الافتراضي |
-    | `plugin-sdk/account-helpers` | مساعدات ضيقة خاصة بقائمة الحساب/إجراءات الحساب |
+    | `plugin-sdk/account-helpers` | مساعدات ضيقة لقائمة الحسابات/إجراءات الحساب |
     | `plugin-sdk/channel-pairing` | `createChannelPairingController` |
     | `plugin-sdk/channel-reply-pipeline` | `createChannelReplyPipeline` |
     | `plugin-sdk/channel-config-helpers` | `createHybridChannelConfigAdapter` |
-    | `plugin-sdk/channel-config-schema` | أنواع مخطط إعدادات القناة |
-    | `plugin-sdk/telegram-command-config` | مساعدات تطبيع/تحقق أوامر Telegram المخصصة مع fallback لعقدة مجمعة |
+    | `plugin-sdk/channel-config-schema` | أنواع مخطط تكوين القناة |
+    | `plugin-sdk/telegram-command-config` | مساعدات تطبيع/تحقق الأوامر المخصصة في Telegram مع fallback لعقد مضمّن |
     | `plugin-sdk/command-gating` | مساعدات ضيقة لبوابة تفويض الأوامر |
     | `plugin-sdk/channel-policy` | `resolveChannelGroupRequireMention` |
-    | `plugin-sdk/channel-lifecycle` | `createAccountStatusSink` |
-    | `plugin-sdk/inbound-envelope` | مساعدات مشتركة لبناء المسار الوارد + الغلاف |
-    | `plugin-sdk/inbound-reply-dispatch` | مساعدات مشتركة لتسجيل الوارد وإرساله |
-    | `plugin-sdk/messaging-targets` | مساعدات تحليل/مطابقة الهدف |
+    | `plugin-sdk/channel-lifecycle` | `createAccountStatusSink`، ومساعدات دورة حياة/finalization الخاصة ببث المسودات |
+    | `plugin-sdk/inbound-envelope` | مساعدات مشتركة لبناء التوجيه الداخل + envelope |
+    | `plugin-sdk/inbound-reply-dispatch` | مساعدات مشتركة لتسجيل وتوزيع الرسائل الداخلة |
+    | `plugin-sdk/messaging-targets` | مساعدات تحليل/مطابقة الأهداف |
     | `plugin-sdk/outbound-media` | مساعدات مشتركة لتحميل الوسائط الصادرة |
-    | `plugin-sdk/outbound-runtime` | مساعدات هوية الصادر، ومفوّض الإرسال، وتخطيط الحمولة |
+    | `plugin-sdk/outbound-runtime` | مساعدات الهوية الصادرة، ومفوّض الإرسال، وتخطيط الحمولة |
     | `plugin-sdk/poll-runtime` | مساعدات ضيقة لتطبيع الاستطلاعات |
-    | `plugin-sdk/thread-bindings-runtime` | مساعدات دورة حياة thread-binding والمهايئ |
+    | `plugin-sdk/thread-bindings-runtime` | مساعدات دورة حياة ارتباطات الخيوط والمهايئات |
     | `plugin-sdk/agent-media-payload` | باني حمولة وسائط الوكيل القديم |
-    | `plugin-sdk/conversation-runtime` | مساعدات ربط المحادثة/الخيط، والاقتران، والربط المكوّن |
-    | `plugin-sdk/runtime-config-snapshot` | مساعد snapshot لإعدادات وقت التشغيل |
-    | `plugin-sdk/runtime-group-policy` | مساعدات حل سياسة المجموعات في وقت التشغيل |
-    | `plugin-sdk/channel-status` | مساعدات مشتركة للقطات/ملخصات حالة القناة |
-    | `plugin-sdk/channel-config-primitives` | بدائيات ضيقة لمخطط إعدادات القناة |
-    | `plugin-sdk/channel-config-writes` | مساعدات تفويض كتابة إعدادات القناة |
-    | `plugin-sdk/channel-plugin-common` | تصديرات تمهيدية مشتركة لـ Plugin القناة |
-    | `plugin-sdk/allowlist-config-edit` | مساعدات قراءة/تحرير إعدادات قائمة السماح |
-    | `plugin-sdk/group-access` | مساعدات مشتركة لاتخاذ قرار الوصول إلى المجموعة |
-    | `plugin-sdk/direct-dm` | مساعدات مشتركة لحماية/مصادقة الرسائل المباشرة |
-    | `plugin-sdk/interactive-runtime` | مساعدات تطبيع/تقليل حمولة الرد التفاعلي |
-    | `plugin-sdk/channel-inbound` | حاوية توافق لمساعدات inbound debounce، ومطابقة الإشارة، وسياسة الإشارة، ومساعدات الأغلفة |
-    | `plugin-sdk/channel-mention-gating` | مساعدات ضيقة لسياسة الإشارة بدون سطح وقت التشغيل الوارد الأوسع |
-    | `plugin-sdk/channel-location` | مساعدات سياق موقع القناة وتنسيقه |
-    | `plugin-sdk/channel-logging` | مساعدات تسجيل القناة لعمليات إسقاط الوارد وفشل typing/ack |
+    | `plugin-sdk/conversation-runtime` | مساعدات المحادثة/ربط الخيوط، وpairing، والارتباطات المكوّنة |
+    | `plugin-sdk/runtime-config-snapshot` | مساعد snapshot لتكوين وقت التشغيل |
+    | `plugin-sdk/runtime-group-policy` | مساعدات حل سياسة المجموعة في وقت التشغيل |
+    | `plugin-sdk/channel-status` | مساعدات مشتركة لـ snapshot/summary حالة القناة |
+    | `plugin-sdk/channel-config-primitives` | العناصر الأولية الضيقة لمخطط تكوين القناة |
+    | `plugin-sdk/channel-config-writes` | مساعدات تفويض كتابة تكوين القناة |
+    | `plugin-sdk/channel-plugin-common` | تصديرات المقدمة المشتركة لـ plugin القناة |
+    | `plugin-sdk/allowlist-config-edit` | مساعدات تعديل/قراءة تكوين قائمة السماح |
+    | `plugin-sdk/group-access` | مساعدات مشتركة لقرارات وصول المجموعات |
+    | `plugin-sdk/direct-dm` | مساعدات مشتركة لمصادقة/حماية الرسائل المباشرة المباشرة |
+    | `plugin-sdk/interactive-runtime` | العرض الدلالي للرسائل، والتسليم، ومساعدات الردود التفاعلية القديمة. راجع [عرض الرسائل](/ar/plugins/message-presentation) |
+    | `plugin-sdk/channel-inbound` | ملف توافق للتعامل مع debounce للواردات، ومطابقة الذكر، ومساعدات سياسة الذكر، ومساعدات envelope |
+    | `plugin-sdk/channel-mention-gating` | مساعدات ضيقة لسياسة الذكر من دون السطح الأشمل لوقت تشغيل الواردات |
+    | `plugin-sdk/channel-location` | مساعدات سياق الموقع في القناة وتنسيقه |
+    | `plugin-sdk/channel-logging` | مساعدات تسجيل القنوات لحالات إسقاط الواردات وإخفاقات الكتابة/الإقرار |
     | `plugin-sdk/channel-send-result` | أنواع نتائج الرد |
-    | `plugin-sdk/channel-actions` | `createMessageToolButtonsSchema`, `createMessageToolCardSchema` |
-    | `plugin-sdk/channel-targets` | مساعدات تحليل/مطابقة الهدف |
+    | `plugin-sdk/channel-actions` | مساعدات إجراءات رسائل القناة، بالإضافة إلى مساعدات المخطط الأصلية المهجورة التي أُبقي عليها من أجل توافق plugin |
+    | `plugin-sdk/channel-targets` | مساعدات تحليل/مطابقة الأهداف |
     | `plugin-sdk/channel-contract` | أنواع عقد القناة |
-    | `plugin-sdk/channel-feedback` | توصيل feedback/reaction |
-    | `plugin-sdk/channel-secret-runtime` | مساعدات ضيقة لعقد الأسرار مثل `collectSimpleChannelFieldAssignments`, `getChannelSurface`, `pushAssignment`، وأنواع أهداف الأسرار |
+    | `plugin-sdk/channel-feedback` | ربط الملاحظات/التفاعلات |
+    | `plugin-sdk/channel-secret-runtime` | مساعدات ضيقة لعقد الأسرار مثل `collectSimpleChannelFieldAssignments` و`getChannelSurface` و`pushAssignment` وأنواع أهداف الأسرار |
   </Accordion>
 
-  <Accordion title="المسارات الفرعية للمزودات">
-    | المسار الفرعي | التصديرات الأساسية |
+  <Accordion title="المسارات الفرعية للمزوّدين">
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
     | `plugin-sdk/provider-entry` | `defineSingleProviderPluginEntry` |
-    | `plugin-sdk/provider-setup` | مساعدات منسقة لإعداد المزودات المحلية/المستضافة ذاتيًا |
-    | `plugin-sdk/self-hosted-provider-setup` | مساعدات مركزة لإعداد مزودات مستضافة ذاتيًا ومتوافقة مع OpenAI |
-    | `plugin-sdk/cli-backend` | قيم CLI الخلفية الافتراضية + ثوابت watchdog |
-    | `plugin-sdk/provider-auth-runtime` | مساعدات وقت التشغيل لحل API-key الخاصة بـ Plugins المزودات |
-    | `plugin-sdk/provider-auth-api-key` | مساعدات onboarding/كتابة profile الخاصة بـ API-key مثل `upsertApiKeyProfile` |
-    | `plugin-sdk/provider-auth-result` | باني نتائج مصادقة OAuth القياسي |
-    | `plugin-sdk/provider-auth-login` | مساعدات تسجيل الدخول التفاعلي المشتركة لـ Plugins المزودات |
-    | `plugin-sdk/provider-env-vars` | مساعدات البحث عن متغيرات env الخاصة بمصادقة المزود |
+    | `plugin-sdk/provider-setup` | مساعدات منسّقة لإعداد المزوّدات المحلية/ذاتية الاستضافة |
+    | `plugin-sdk/self-hosted-provider-setup` | مساعدات مركزة لإعداد مزوّدات ذاتية الاستضافة متوافقة مع OpenAI |
+    | `plugin-sdk/cli-backend` | الإعدادات الافتراضية لخلفية CLI + ثوابت watchdog |
+    | `plugin-sdk/provider-auth-runtime` | مساعدات حل مفاتيح API في وقت التشغيل لـ plugins المزوّدين |
+    | `plugin-sdk/provider-auth-api-key` | مساعدات إعداد/كتابة ملف تعريف مفتاح API مثل `upsertApiKeyProfile` |
+    | `plugin-sdk/provider-auth-result` | الباني القياسي لنتيجة مصادقة OAuth |
+    | `plugin-sdk/provider-auth-login` | مساعدات تسجيل الدخول التفاعلي المشتركة لـ plugins المزوّدين |
+    | `plugin-sdk/provider-env-vars` | مساعدات البحث عن متغيرات بيئة مصادقة المزوّد |
     | `plugin-sdk/provider-auth` | `createProviderApiKeyAuthMethod`, `ensureApiKeyFromOptionEnvOrPrompt`, `upsertAuthProfile`, `upsertApiKeyProfile`, `writeOAuthCredentials` |
-    | `plugin-sdk/provider-model-shared` | `ProviderReplayFamily`, `buildProviderReplayFamilyHooks`, `normalizeModelCompat`، وبناة replay-policy المشتركة، ومساعدات endpoint الخاصة بالمزود، ومساعدات تطبيع معرّف model مثل `normalizeNativeXaiModelId` |
+    | `plugin-sdk/provider-model-shared` | `ProviderReplayFamily`، و`buildProviderReplayFamilyHooks`، و`normalizeModelCompat`، وبناة سياسة replay المشتركة، ومساعدات نقاط نهاية المزوّد، ومساعدات تطبيع معرّف النموذج مثل `normalizeNativeXaiModelId` |
     | `plugin-sdk/provider-catalog-shared` | `findCatalogTemplate`, `buildSingleProviderApiKeyCatalog`, `supportsNativeStreamingUsageCompat`, `applyProviderNativeStreamingUsageCompat` |
-    | `plugin-sdk/provider-http` | مساعدات HTTP/قدرات endpoint العامة للمزود |
-    | `plugin-sdk/provider-web-fetch-contract` | مساعدات ضيقة لعقد إعداد/اختيار web-fetch مثل `enablePluginInConfig` و`WebFetchProviderPlugin` |
-    | `plugin-sdk/provider-web-fetch` | مساعدات التسجيل/التخزين المؤقت لمزود web-fetch |
-    | `plugin-sdk/provider-web-search-config-contract` | مساعدات ضيقة لإعداد/بيانات اعتماد web-search للمزودات التي لا تحتاج إلى توصيل تمكين Plugin |
-    | `plugin-sdk/provider-web-search-contract` | مساعدات ضيقة لعقد إعداد/بيانات اعتماد web-search مثل `createWebSearchProviderContractFields`, `enablePluginInConfig`, `resolveProviderWebSearchPluginConfig`، وعمليات الضبط/الجلب المقيّدة لبيانات الاعتماد |
-    | `plugin-sdk/provider-web-search` | مساعدات التسجيل/التخزين المؤقت/وقت التشغيل لمزود web-search |
-    | `plugin-sdk/provider-tools` | `ProviderToolCompatFamily`, `buildProviderToolCompatFamilyHooks`، وتنظيف مخطط Gemini + التشخيصات، ومساعدات توافق xAI مثل `resolveXaiModelCompatPatch` / `applyXaiModelCompat` |
+    | `plugin-sdk/provider-http` | مساعدات HTTP/قدرات نقاط نهاية المزوّد العامة |
+    | `plugin-sdk/provider-web-fetch-contract` | مساعدات ضيقة لعقد تكوين/اختيار web-fetch مثل `enablePluginInConfig` و`WebFetchProviderPlugin` |
+    | `plugin-sdk/provider-web-fetch` | مساعدات تسجيل/تخزين مؤقت/وقت تشغيل مزوّد web-fetch |
+    | `plugin-sdk/provider-web-search-config-contract` | مساعدات ضيقة لتكوين/بيانات اعتماد web-search للمزوّدات التي لا تحتاج إلى ربط تمكين plugin |
+    | `plugin-sdk/provider-web-search-contract` | مساعدات ضيقة لعقد تكوين/بيانات اعتماد web-search مثل `createWebSearchProviderContractFields` و`enablePluginInConfig` و`resolveProviderWebSearchPluginConfig` وعمليات تعيين/جلب بيانات الاعتماد ضمن النطاق |
+    | `plugin-sdk/provider-web-search` | مساعدات تسجيل/تخزين مؤقت/وقت تشغيل مزوّد web-search |
+    | `plugin-sdk/provider-tools` | `ProviderToolCompatFamily`، و`buildProviderToolCompatFamilyHooks`، وتنظيف مخطط Gemini + التشخيصات، ومساعدات توافق xAI مثل `resolveXaiModelCompatPatch` / `applyXaiModelCompat` |
     | `plugin-sdk/provider-usage` | `fetchClaudeUsage` وما شابه |
-    | `plugin-sdk/provider-stream` | `ProviderStreamFamily`, `buildProviderStreamFamilyHooks`, `composeProviderStreamWrappers`، وأنواع مغلفات stream، ومساعدات المغلفات المشتركة لـ Anthropic/Bedrock/Google/Kilocode/Moonshot/OpenAI/OpenRouter/Z.A.I/MiniMax/Copilot |
-    | `plugin-sdk/provider-transport-runtime` | مساعدات النقل الأصلية للمزود مثل fetch المحروس، وتحويلات رسائل النقل، وتدفقات أحداث النقل القابلة للكتابة |
-    | `plugin-sdk/provider-onboard` | مساعدات ترقيع إعدادات onboarding |
-    | `plugin-sdk/global-singleton` | مساعدات singleton/map/cache المحلية للعملية |
+    | `plugin-sdk/provider-stream` | `ProviderStreamFamily`، و`buildProviderStreamFamilyHooks`، و`composeProviderStreamWrappers`، وأنواع مغلفات stream، ومساعدات المغلفات المشتركة لـ Anthropic/Bedrock/Google/Kilocode/Moonshot/OpenAI/OpenRouter/Z.A.I/MiniMax/Copilot |
+    | `plugin-sdk/provider-transport-runtime` | مساعدات نقل المزوّد الأصلية مثل fetch المحمي، وتحويلات رسائل النقل، وتيارات أحداث النقل القابلة للكتابة |
+    | `plugin-sdk/provider-onboard` | مساعدات patch لتكوين الإعداد الأولي |
+    | `plugin-sdk/global-singleton` | مساعدات singleton/map/cache محلية للعملية |
   </Accordion>
 
   <Accordion title="المسارات الفرعية للمصادقة والأمان">
-    | المسار الفرعي | التصديرات الأساسية |
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
     | `plugin-sdk/command-auth` | `resolveControlCommandGate`، ومساعدات سجل الأوامر، ومساعدات تفويض المرسل |
     | `plugin-sdk/command-status` | بُناة رسائل الأوامر/المساعدة مثل `buildCommandsMessagePaginated` و`buildHelpMessage` |
-    | `plugin-sdk/approval-auth-runtime` | مساعدات حل approver ومصادقة الإجراءات داخل المحادثة نفسها |
-    | `plugin-sdk/approval-client-runtime` | مساعدات profile/filter الأصلية لموافقات exec |
-    | `plugin-sdk/approval-delivery-runtime` | محوّلات القدرة/التسليم الأصلية للموافقات |
-    | `plugin-sdk/approval-gateway-runtime` | مساعد مشترك لحل Gateway الخاص بالموافقات |
-    | `plugin-sdk/approval-handler-adapter-runtime` | مساعدات خفيفة لتحميل محوّل الموافقات الأصلي لنقاط دخول القنوات السريعة |
-    | `plugin-sdk/approval-handler-runtime` | مساعدات أوسع لوقت تشغيل معالج الموافقات؛ فضّل طبقات المحوّل/Gateway الأضيق عندما تكفي |
+    | `plugin-sdk/approval-auth-runtime` | مساعدات حل الموافقين ومصادقة الإجراءات داخل الدردشة نفسها |
+    | `plugin-sdk/approval-client-runtime` | مساعدات ملفات تعريف/عوامل تصفية موافقات exec الأصلية |
+    | `plugin-sdk/approval-delivery-runtime` | مهايئات القدرة/التسليم الأصلية للموافقات |
+    | `plugin-sdk/approval-gateway-runtime` | مساعد مشترك لحل gateway الخاصة بالموافقات |
+    | `plugin-sdk/approval-handler-adapter-runtime` | مساعدات خفيفة لتحميل مهايئات الموافقات الأصلية لنقاط إدخال القنوات السريعة |
+    | `plugin-sdk/approval-handler-runtime` | مساعدات أوسع لوقت تشغيل معالجات الموافقات؛ فضّل المسارات الأضيق الخاصة بالمهايئ/gateway عندما تكون كافية |
     | `plugin-sdk/approval-native-runtime` | مساعدات الهدف الأصلي للموافقة + ربط الحساب |
-    | `plugin-sdk/approval-reply-runtime` | مساعدات حمولة رد الموافقة الخاصة بـ exec/Plugin |
-    | `plugin-sdk/command-auth-native` | مصادقة الأوامر الأصلية + مساعدات الهدف الأصلي للجلسة |
+    | `plugin-sdk/approval-reply-runtime` | مساعدات حمولة ردود موافقات exec/plugin |
+    | `plugin-sdk/command-auth-native` | مساعدات مصادقة الأوامر الأصلية + أهداف الجلسات الأصلية |
     | `plugin-sdk/command-detection` | مساعدات مشتركة لاكتشاف الأوامر |
-    | `plugin-sdk/command-surface` | تطبيع جسم الأمر ومساعدات سطح الأوامر |
+    | `plugin-sdk/command-surface` | مساعدات تطبيع متن الأوامر وسطح الأوامر |
     | `plugin-sdk/allow-from` | `formatAllowFromLowercase` |
-    | `plugin-sdk/channel-secret-runtime` | مساعدات ضيقة لجمع عقد الأسرار لأسطح أسرار القناة/Plugin |
-    | `plugin-sdk/secret-ref-runtime` | مساعدات ضيقة لـ `coerceSecretRef` وأنواع SecretRef لتحليل عقد الأسرار/الإعدادات |
-    | `plugin-sdk/security-runtime` | مساعدات مشتركة للثقة، وتقييد الرسائل الخاصة، والمحتوى الخارجي، وجمع الأسرار |
-    | `plugin-sdk/ssrf-policy` | مساعدات قائمة سماح المضيف وسياسة SSRF للشبكات الخاصة |
-    | `plugin-sdk/ssrf-dispatcher` | مساعدات ضيقة لـ pinned-dispatcher بدون سطح وقت تشغيل البنية الأوسع |
-    | `plugin-sdk/ssrf-runtime` | مساعدات pinned-dispatcher وfetch المحمي بـ SSRF وسياسة SSRF |
-    | `plugin-sdk/secret-input` | مساعدات تحليل إدخال الأسرار |
-    | `plugin-sdk/webhook-ingress` | مساعدات طلب/هدف Webhook |
-    | `plugin-sdk/webhook-request-guards` | مساعدات حجم جسم الطلب/المهلة |
+    | `plugin-sdk/channel-secret-runtime` | مساعدات ضيقة لتجميع عقود الأسرار لأسطح أسرار القنوات/plugins |
+    | `plugin-sdk/secret-ref-runtime` | مساعدات ضيقة لـ `coerceSecretRef` وأنواع SecretRef لتحليل عقود الأسرار/التكوين |
+    | `plugin-sdk/security-runtime` | مساعدات مشتركة للثقة، وتقييد الرسائل المباشرة، والمحتوى الخارجي، وتجميع الأسرار |
+    | `plugin-sdk/ssrf-policy` | مساعدات سياسة SSRF الخاصة بقائمة سماح المضيفين والشبكات الخاصة |
+    | `plugin-sdk/ssrf-dispatcher` | مساعدات ضيقة لـ pinned-dispatcher من دون السطح الأوسع لوقت تشغيل البنية التحتية |
+    | `plugin-sdk/ssrf-runtime` | مساعدات pinned-dispatcher، وfetch المحمي من SSRF، وسياسة SSRF |
+    | `plugin-sdk/secret-input` | مساعدات تحليل مدخلات الأسرار |
+    | `plugin-sdk/webhook-ingress` | مساعدات طلبات/أهداف Webhook |
+    | `plugin-sdk/webhook-request-guards` | مساعدات حجم متن الطلب/المهلة |
   </Accordion>
 
   <Accordion title="المسارات الفرعية لوقت التشغيل والتخزين">
-    | المسار الفرعي | التصديرات الأساسية |
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
-    | `plugin-sdk/runtime` | مساعدات واسعة لوقت التشغيل/التسجيل/النسخ الاحتياطي/تثبيت Plugin |
-    | `plugin-sdk/runtime-env` | مساعدات ضيقة لبيئة وقت التشغيل، وlogger، والمهلة، وإعادة المحاولة، والتراجع |
+    | `plugin-sdk/runtime` | مساعدات واسعة لوقت التشغيل/التسجيل/النسخ الاحتياطي/تثبيت plugin |
+    | `plugin-sdk/runtime-env` | مساعدات ضيقة لبيئة وقت التشغيل، وlogger، والمهلة، وإعادة المحاولة، وbackoff |
     | `plugin-sdk/channel-runtime-context` | مساعدات عامة لتسجيل والبحث عن سياق وقت تشغيل القناة |
     | `plugin-sdk/runtime-store` | `createPluginRuntimeStore` |
-    | `plugin-sdk/plugin-runtime` | مساعدات مشتركة لأوامر/خطافات/HTTP/تفاعل Plugin |
-    | `plugin-sdk/hook-runtime` | مساعدات مشتركة لخط أنابيب Webhook/الخطافات الداخلية |
+    | `plugin-sdk/plugin-runtime` | مساعدات مشتركة لأوامر/hook/http/التفاعل الخاصة بـ plugin |
+    | `plugin-sdk/hook-runtime` | مساعدات مشتركة لخط أنابيب Webhook/internal hook |
     | `plugin-sdk/lazy-runtime` | مساعدات الاستيراد/الربط الكسول لوقت التشغيل مثل `createLazyRuntimeModule` و`createLazyRuntimeMethod` و`createLazyRuntimeSurface` |
     | `plugin-sdk/process-runtime` | مساعدات تنفيذ العمليات |
-    | `plugin-sdk/cli-runtime` | مساعدات تنسيق CLI والانتظار والإصدار |
-    | `plugin-sdk/gateway-runtime` | مساعدات عميل Gateway وترقيع حالة القناة |
-    | `plugin-sdk/config-runtime` | مساعدات تحميل/كتابة الإعدادات |
-    | `plugin-sdk/telegram-command-config` | تطبيع اسم/وصف أوامر Telegram وفحوصات التكرار/التعارض، حتى عندما لا يكون سطح عقد Telegram المجمّع متاحًا |
-    | `plugin-sdk/text-autolink-runtime` | اكتشاف الروابط التلقائية لمراجع الملفات بدون حاوية text-runtime الأوسع |
-    | `plugin-sdk/approval-runtime` | مساعدات موافقات exec/Plugin، وبناة قدرات الموافقة، ومساعدات المصادقة/profile، ومساعدات التوجيه/وقت التشغيل الأصلية |
-    | `plugin-sdk/reply-runtime` | مساعدات مشتركة لوقت تشغيل الوارد/الرد، والتجزئة، والإرسال، وHeartbeat، ومخطط الرد |
-    | `plugin-sdk/reply-dispatch-runtime` | مساعدات ضيقة لإرسال/إنهاء الرد |
-    | `plugin-sdk/reply-history` | مساعدات مشتركة لسجل الرد ضمن نافذة قصيرة مثل `buildHistoryContext` و`recordPendingHistoryEntry` و`clearHistoryEntriesIfEnabled` |
+    | `plugin-sdk/cli-runtime` | مساعدات تنسيق CLI، والانتظار، والإصدار |
+    | `plugin-sdk/gateway-runtime` | مساعدات عميل Gateway وpatch حالة القناة |
+    | `plugin-sdk/config-runtime` | مساعدات تحميل/كتابة التكوين |
+    | `plugin-sdk/telegram-command-config` | تطبيع أسماء/أوصاف أوامر Telegram والتحقق من التكرار/التعارض، حتى عند عدم توفر سطح عقد Telegram المضمّن |
+    | `plugin-sdk/text-autolink-runtime` | اكتشاف autolink لمراجع الملفات من دون ملف text-runtime الواسع |
+    | `plugin-sdk/approval-runtime` | مساعدات موافقات exec/plugin، وبناة قدرات الموافقة، ومساعدات المصادقة/الملف التعريفي، ومساعدات التوجيه/وقت التشغيل الأصلية |
+    | `plugin-sdk/reply-runtime` | مساعدات مشتركة لوقت تشغيل الوارد/الرد، والتجزئة، والتوزيع، وHeartbeat، ومخطط الرد |
+    | `plugin-sdk/reply-dispatch-runtime` | مساعدات ضيقة لتوزيع/finalize الردود |
+    | `plugin-sdk/reply-history` | مساعدات مشتركة قصيرة النافذة لسجل الردود مثل `buildHistoryContext` و`recordPendingHistoryEntry` و`clearHistoryEntriesIfEnabled` |
     | `plugin-sdk/reply-reference` | `createReplyReferencePlanner` |
     | `plugin-sdk/reply-chunking` | مساعدات ضيقة لتجزئة النص/Markdown |
-    | `plugin-sdk/session-store-runtime` | مساعدات مسار مخزن الجلسة + `updated-at` |
-    | `plugin-sdk/state-paths` | مساعدات مسارات دليل الحالة/OAuth |
+    | `plugin-sdk/session-store-runtime` | مساعدات مسار مخزن الجلسات + `updated-at` |
+    | `plugin-sdk/state-paths` | مساعدات مسارات أدلة state/OAuth |
     | `plugin-sdk/routing` | مساعدات التوجيه/مفتاح الجلسة/ربط الحساب مثل `resolveAgentRoute` و`buildAgentSessionKey` و`resolveDefaultAgentBoundAccountId` |
-    | `plugin-sdk/status-helpers` | مساعدات مشتركة لملخص حالة القناة/الحساب، والقيم الافتراضية لحالة وقت التشغيل، ومساعدات بيانات المشكلة الوصفية |
-    | `plugin-sdk/target-resolver-runtime` | مساعدات مشتركة لمحلّل الهدف |
+    | `plugin-sdk/status-helpers` | مساعدات مشتركة لملخص حالة القناة/الحساب، والقيم الافتراضية لحالة وقت التشغيل، ومساعدات بيانات المشكلات الوصفية |
+    | `plugin-sdk/target-resolver-runtime` | مساعدات مشتركة لحل الأهداف |
     | `plugin-sdk/string-normalization-runtime` | مساعدات تطبيع slug/string |
     | `plugin-sdk/request-url` | استخراج عناوين URL النصية من مدخلات شبيهة بـ fetch/request |
-    | `plugin-sdk/run-command` | مشغّل أوامر موقّت مع نتائج stdout/stderr مطبّعة |
-    | `plugin-sdk/param-readers` | قارئات param شائعة للأدوات/CLI |
+    | `plugin-sdk/run-command` | مشغّل أوامر بزمن محدد مع نتائج stdout/stderr مطبّعة |
+    | `plugin-sdk/param-readers` | قارئات معلمات مشتركة للأدوات/CLI |
     | `plugin-sdk/tool-payload` | استخراج الحمولات المطبّعة من كائنات نتائج الأدوات |
-    | `plugin-sdk/tool-send` | استخراج حقول هدف الإرسال القياسية من وسائط الأدوات |
+    | `plugin-sdk/tool-send` | استخراج حقول هدف الإرسال القياسية من وسائط الأداة |
     | `plugin-sdk/temp-path` | مساعدات مشتركة لمسارات التنزيل المؤقت |
-    | `plugin-sdk/logging-core` | مساعدات logger الخاصة بالأنظمة الفرعية والإخفاء |
-    | `plugin-sdk/markdown-table-runtime` | مساعدات وضع جداول Markdown |
+    | `plugin-sdk/logging-core` | مساعدات logger للنظام الفرعي والتنقيح |
+    | `plugin-sdk/markdown-table-runtime` | مساعدات أوضاع جداول Markdown |
     | `plugin-sdk/json-store` | مساعدات صغيرة لقراءة/كتابة حالة JSON |
-    | `plugin-sdk/file-lock` | مساعدات file-lock قابلة لإعادة الدخول |
-    | `plugin-sdk/persistent-dedupe` | مساعدات تخزين dedupe مدعوم بالقرص |
-    | `plugin-sdk/acp-runtime` | مساعدات وقت تشغيل ACP/الجلسة وإرسال الرد |
-    | `plugin-sdk/acp-binding-resolve-runtime` | حل ربط ACP للقراءة فقط بدون استيرادات بدء دورة الحياة |
-    | `plugin-sdk/agent-config-primitives` | بدائيات ضيقة لمخطط إعدادات وقت تشغيل الوكيل |
-    | `plugin-sdk/boolean-param` | قارئ param مرن للقيم المنطقية |
+    | `plugin-sdk/file-lock` | مساعدات إعادة الدخول إلى file-lock |
+    | `plugin-sdk/persistent-dedupe` | مساعدات cache إزالة التكرار المعتمد على القرص |
+    | `plugin-sdk/acp-runtime` | مساعدات وقت تشغيل/جلسات ACP وتوزيع الردود |
+    | `plugin-sdk/acp-binding-resolve-runtime` | حل ارتباط ACP للقراءة فقط من دون استيرادات بدء تشغيل دورة الحياة |
+    | `plugin-sdk/agent-config-primitives` | عناصر أولية ضيقة لمخطط تكوين وقت تشغيل الوكيل |
+    | `plugin-sdk/boolean-param` | قارئ مرن لمعلمات boolean |
     | `plugin-sdk/dangerous-name-runtime` | مساعدات حل مطابقة الأسماء الخطرة |
-    | `plugin-sdk/device-bootstrap` | مساعدات bootstrap للجهاز ورمز الاقتران |
-    | `plugin-sdk/extension-shared` | بدائيات مساعدة مشتركة للقناة السلبية، والحالة، والوكيل المحيط |
-    | `plugin-sdk/models-provider-runtime` | مساعدات أوامر `/models`/ردود المزود |
-    | `plugin-sdk/skill-commands-runtime` | مساعدات سرد أوامر Skills |
-    | `plugin-sdk/native-command-registry` | مساعدات السجل/البناء/التسلسل للأوامر الأصلية |
-    | `plugin-sdk/agent-harness` | سطح تجريبي لـ Plugin الموثوقة من أجل agent harnesses منخفضة المستوى: أنواع harness، ومساعدات steer/abort للتشغيل النشط، ومساعدات جسر أدوات OpenClaw، وأدوات نتائج المحاولة |
-    | `plugin-sdk/provider-zai-endpoint` | مساعدات اكتشاف endpoint لـ Z.A.I |
+    | `plugin-sdk/device-bootstrap` | مساعدات bootstrap الخاصة بالأجهزة وtoken pairing |
+    | `plugin-sdk/extension-shared` | عناصر أولية مشتركة للمساعدات الخاصة بالقنوات السلبية، والحالة، وambient proxy |
+    | `plugin-sdk/models-provider-runtime` | مساعدات ردود الأمر `/models`/المزوّد |
+    | `plugin-sdk/skill-commands-runtime` | مساعدات إدراج أوامر Skills |
+    | `plugin-sdk/native-command-registry` | مساعدات سجل/بناء/تسلسل الأوامر الأصلية |
+    | `plugin-sdk/agent-harness` | سطح موثوق تجريبي لـ plugin من أجل agent harnesses منخفضة المستوى: أنواع harness، ومساعدات توجيه/إلغاء التشغيلات النشطة، ومساعدات جسر أدوات OpenClaw، وأدوات نتائج المحاولات |
+    | `plugin-sdk/provider-zai-endpoint` | مساعدات اكتشاف نقطة نهاية Z.A.I |
     | `plugin-sdk/infra-runtime` | مساعدات أحداث النظام/Heartbeat |
-    | `plugin-sdk/collection-runtime` | مساعدات صغيرة لذاكرة التخزين المؤقت المحدودة |
-    | `plugin-sdk/diagnostic-runtime` | مساعدات أعلام وأحداث التشخيص |
-    | `plugin-sdk/error-runtime` | الرسم البياني للأخطاء، والتنسيق، ومساعدات تصنيف الأخطاء المشتركة، و`isApprovalNotFoundError` |
-    | `plugin-sdk/fetch-runtime` | مساعدات fetch المغلف، والوكيل، والبحث المثبّت |
-    | `plugin-sdk/runtime-fetch` | fetch لوقت التشغيل مع مراعاة dispatcher بدون استيراد proxy/guarded-fetch |
-    | `plugin-sdk/response-limit-runtime` | قارئ محدود لجسم الاستجابة بدون سطح media runtime الأوسع |
-    | `plugin-sdk/session-binding-runtime` | حالة ربط المحادثة الحالية بدون توجيه الربط المكوّن أو مخازن الاقتران |
-    | `plugin-sdk/session-store-runtime` | مساعدات قراءة مخزن الجلسة بدون استيرادات واسعة لكتابة/صيانة الإعدادات |
-    | `plugin-sdk/context-visibility-runtime` | حل رؤية السياق وترشيح السياق الإضافي بدون استيرادات واسعة للإعدادات/الأمان |
-    | `plugin-sdk/string-coerce-runtime` | مساعدات ضيقة لإجبار/تطبيع السجلات البدائية/النصوص بدون استيرادات Markdown/التسجيل |
-    | `plugin-sdk/host-runtime` | مساعدات اسم المضيف وتطبيع مضيف SCP |
-    | `plugin-sdk/retry-runtime` | مساعدات إعدادات إعادة المحاولة ومشغّل إعادة المحاولة |
-    | `plugin-sdk/agent-runtime` | مساعدات دليل الوكيل/الهوية/مساحة العمل |
-    | `plugin-sdk/directory-runtime` | استعلام/إزالة تكرار الأدلة المدعوم بالإعدادات |
+    | `plugin-sdk/collection-runtime` | مساعدات cache صغيرة محدودة |
+    | `plugin-sdk/diagnostic-runtime` | مساعدات العلامات التشخيصية والأحداث |
+    | `plugin-sdk/error-runtime` | مساعدات رسم الأخطاء، والتنسيق، وتصنيف الأخطاء المشترك، و`isApprovalNotFoundError` |
+    | `plugin-sdk/fetch-runtime` | مساعدات fetch المغلف، وproxy، وlookup المثبت |
+    | `plugin-sdk/runtime-fetch` | fetch لوقت التشغيل مدرك لـ dispatcher من دون استيرادات proxy/guarded-fetch |
+    | `plugin-sdk/response-limit-runtime` | قارئ محدود لمتن الاستجابة من دون السطح الأوسع لوقت تشغيل الوسائط |
+    | `plugin-sdk/session-binding-runtime` | حالة ارتباط المحادثة الحالية من دون توجيه الارتباطات المكوّنة أو مخازن pairing |
+    | `plugin-sdk/session-store-runtime` | مساعدات قراءة مخزن الجلسات من دون استيرادات واسعة لكتابة/صيانة التكوين |
+    | `plugin-sdk/context-visibility-runtime` | حل ظهور السياق وتصفية السياق الإضافي من دون استيرادات واسعة للتكوين/الأمان |
+    | `plugin-sdk/string-coerce-runtime` | مساعدات ضيقة للإجبار والتطبيع للسجلات/السلاسل الأولية من دون استيرادات markdown/logging |
+    | `plugin-sdk/host-runtime` | مساعدات تطبيع اسم المضيف وSCP host |
+    | `plugin-sdk/retry-runtime` | مساعدات تكوين إعادة المحاولة ومشغّل إعادة المحاولة |
+    | `plugin-sdk/agent-runtime` | مساعدات دليل/هوية/مساحة عمل الوكيل |
+    | `plugin-sdk/directory-runtime` | الاستعلام/إزالة التكرار من الدليل المدعوم بالتكوين |
     | `plugin-sdk/keyed-async-queue` | `KeyedAsyncQueue` |
   </Accordion>
 
   <Accordion title="المسارات الفرعية للقدرات والاختبار">
-    | المسار الفرعي | التصديرات الأساسية |
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
-    | `plugin-sdk/media-runtime` | مساعدات مشتركة لجلب/تحويل/تخزين الوسائط بالإضافة إلى بُناة حمولات الوسائط |
-    | `plugin-sdk/media-generation-runtime` | مساعدات مشتركة للفشل الاحتياطي في إنشاء الوسائط، واختيار المرشحين، ورسائل غياب model |
-    | `plugin-sdk/media-understanding` | أنواع مزودات فهم الوسائط بالإضافة إلى تصديرات مساعدات الصور/الصوت الموجّهة للمزود |
-    | `plugin-sdk/text-runtime` | مساعدات مشتركة للنص/Markdown/التسجيل مثل إزالة النص المرئي للمساعد، ومساعدات عرض/تجزئة/جداول Markdown، ومساعدات الإخفاء، ومساعدات وسوم التوجيهات، وأدوات النص الآمن |
+    | `plugin-sdk/media-runtime` | مساعدات مشتركة لجلب/تحويل/تخزين الوسائط بالإضافة إلى بُناة حمولة الوسائط |
+    | `plugin-sdk/media-generation-runtime` | مساعدات مشتركة لـ failover في توليد الوسائط، واختيار المرشحين، ورسائل غياب النموذج |
+    | `plugin-sdk/media-understanding` | أنواع مزوّدات فهم الوسائط بالإضافة إلى تصديرات مساعدات الصور/الصوت المواجهة للمزوّد |
+    | `plugin-sdk/text-runtime` | مساعدات مشتركة للنص/Markdown/التسجيل مثل إزالة النص المرئي للمساعد، ومساعدات عرض/تجزئة/جداول Markdown، ومساعدات التنقيح، ومساعدات وسوم التوجيه، وأدوات النص الآمن |
     | `plugin-sdk/text-chunking` | مساعد تجزئة النص الصادر |
-    | `plugin-sdk/speech` | أنواع مزودات الكلام بالإضافة إلى مساعدات التوجيهات، والسجل، والتحقق الموجّهة للمزود |
-    | `plugin-sdk/speech-core` | مساعدات مشتركة لأنواع مزودات الكلام، والسجل، والتوجيهات، والتطبيع |
-    | `plugin-sdk/realtime-transcription` | أنواع مزودات النسخ الفوري ومساعدات السجل |
-    | `plugin-sdk/realtime-voice` | أنواع مزودات الصوت الفوري ومساعدات السجل |
-    | `plugin-sdk/image-generation` | أنواع مزودات توليد الصور |
-    | `plugin-sdk/image-generation-core` | مساعدات مشتركة لأنواع توليد الصور، والفشل الاحتياطي، والمصادقة، والسجل |
-    | `plugin-sdk/music-generation` | أنواع مزودات/طلبات/نتائج توليد الموسيقى |
-    | `plugin-sdk/music-generation-core` | مساعدات مشتركة لأنواع توليد الموسيقى، ومساعدات الفشل الاحتياطي، والبحث عن المزود، وتحليل مراجع model |
-    | `plugin-sdk/video-generation` | أنواع مزودات/طلبات/نتائج توليد الفيديو |
-    | `plugin-sdk/video-generation-core` | مساعدات مشتركة لأنواع توليد الفيديو، ومساعدات الفشل الاحتياطي، والبحث عن المزود، وتحليل مراجع model |
+    | `plugin-sdk/speech` | أنواع مزوّدات الكلام بالإضافة إلى تصديرات المساعدات المواجهة للمزوّد الخاصة بالتوجيه، والسجل، والتحقق |
+    | `plugin-sdk/speech-core` | مساعدات مشتركة لأنواع مزوّدات الكلام، والسجل، والتوجيه، والتطبيع |
+    | `plugin-sdk/realtime-transcription` | أنواع مزوّدات النسخ الفوري ومساعدات السجل |
+    | `plugin-sdk/realtime-voice` | أنواع مزوّدات الصوت الفوري ومساعدات السجل |
+    | `plugin-sdk/image-generation` | أنواع مزوّدات توليد الصور |
+    | `plugin-sdk/image-generation-core` | مساعدات مشتركة لأنواع توليد الصور، وfailover، والمصادقة، والسجل |
+    | `plugin-sdk/music-generation` | أنواع مزوّد/طلب/نتيجة توليد الموسيقى |
+    | `plugin-sdk/music-generation-core` | مساعدات مشتركة لأنواع توليد الموسيقى، ومساعدات failover، والبحث عن المزوّد، وتحليل model-ref |
+    | `plugin-sdk/video-generation` | أنواع مزوّد/طلب/نتيجة توليد الفيديو |
+    | `plugin-sdk/video-generation-core` | مساعدات مشتركة لأنواع توليد الفيديو، ومساعدات failover، والبحث عن المزوّد، وتحليل model-ref |
     | `plugin-sdk/webhook-targets` | سجل أهداف Webhook ومساعدات تثبيت المسارات |
     | `plugin-sdk/webhook-path` | مساعدات تطبيع مسار Webhook |
     | `plugin-sdk/web-media` | مساعدات مشتركة لتحميل الوسائط البعيدة/المحلية |
@@ -280,102 +280,102 @@ import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
   </Accordion>
 
   <Accordion title="المسارات الفرعية للذاكرة">
-    | المسار الفرعي | التصديرات الأساسية |
+    | المسار الفرعي | أهم التصديرات |
     | --- | --- |
-    | `plugin-sdk/memory-core` | سطح مساعدات memory-core المجمّع لمدير/إعدادات/ملفات/مساعدات CLI |
-    | `plugin-sdk/memory-core-engine-runtime` | واجهة وقت التشغيل لفهرس/بحث الذاكرة |
+    | `plugin-sdk/memory-core` | سطح المساعدات المضمّن memory-core لمساعدات المدير/التكوين/الملف/CLI |
+    | `plugin-sdk/memory-core-engine-runtime` | واجهة وقت تشغيل فهرسة/بحث الذاكرة |
     | `plugin-sdk/memory-core-host-engine-foundation` | تصديرات محرك الأساس لمضيف الذاكرة |
-    | `plugin-sdk/memory-core-host-engine-embeddings` | عقود embedding لمضيف الذاكرة، والوصول إلى السجل، والمزود المحلي، ومساعدات الدُفعات/البعيد العامة |
+    | `plugin-sdk/memory-core-host-engine-embeddings` | عقود embeddings الخاصة بمضيف الذاكرة، والوصول إلى السجل، والمزوّد المحلي، والمساعدات العامة للدفعات/البعيد |
     | `plugin-sdk/memory-core-host-engine-qmd` | تصديرات محرك QMD لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-engine-storage` | تصديرات محرك التخزين لمضيف الذاكرة |
-    | `plugin-sdk/memory-core-host-multimodal` | مساعدات متعددة الوسائط لمضيف الذاكرة |
+    | `plugin-sdk/memory-core-host-multimodal` | مساعدات الوسائط المتعددة لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-query` | مساعدات الاستعلام لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-secret` | مساعدات الأسرار لمضيف الذاكرة |
-    | `plugin-sdk/memory-core-host-events` | مساعدات سجل الأحداث لمضيف الذاكرة |
+    | `plugin-sdk/memory-core-host-events` | مساعدات دفتر يوميات الأحداث لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-status` | مساعدات الحالة لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-runtime-cli` | مساعدات وقت تشغيل CLI لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-runtime-core` | مساعدات وقت التشغيل الأساسية لمضيف الذاكرة |
     | `plugin-sdk/memory-core-host-runtime-files` | مساعدات الملفات/وقت التشغيل لمضيف الذاكرة |
-    | `plugin-sdk/memory-host-core` | اسم بديل محايد للمزوّد لمساعدات وقت التشغيل الأساسية لمضيف الذاكرة |
-    | `plugin-sdk/memory-host-events` | اسم بديل محايد للمزوّد لمساعدات سجل الأحداث لمضيف الذاكرة |
-    | `plugin-sdk/memory-host-files` | اسم بديل محايد للمزوّد لمساعدات الملفات/وقت التشغيل لمضيف الذاكرة |
-    | `plugin-sdk/memory-host-markdown` | مساعدات managed-markdown المشتركة لـ Plugins القريبة من الذاكرة |
+    | `plugin-sdk/memory-host-core` | اسم مستعار محايد للبائع لمساعدات وقت التشغيل الأساسية لمضيف الذاكرة |
+    | `plugin-sdk/memory-host-events` | اسم مستعار محايد للبائع لمساعدات دفتر يوميات الأحداث لمضيف الذاكرة |
+    | `plugin-sdk/memory-host-files` | اسم مستعار محايد للبائع لمساعدات الملفات/وقت التشغيل لمضيف الذاكرة |
+    | `plugin-sdk/memory-host-markdown` | مساعدات managed-markdown المشتركة للplugins المجاورة للذاكرة |
     | `plugin-sdk/memory-host-search` | واجهة وقت تشغيل Active Memory للوصول إلى مدير البحث |
-    | `plugin-sdk/memory-host-status` | اسم بديل محايد للمزوّد لمساعدات الحالة لمضيف الذاكرة |
-    | `plugin-sdk/memory-lancedb` | سطح مساعدات memory-lancedb المجمّع |
+    | `plugin-sdk/memory-host-status` | اسم مستعار محايد للبائع لمساعدات الحالة لمضيف الذاكرة |
+    | `plugin-sdk/memory-lancedb` | سطح المساعدات المضمّن memory-lancedb |
   </Accordion>
 
-  <Accordion title="المسارات الفرعية المحجوزة لمساعدات الحزم المجمعة">
+  <Accordion title="المسارات الفرعية المحجوزة للمساعدات المضمّنة">
     | العائلة | المسارات الفرعية الحالية | الاستخدام المقصود |
     | --- | --- | --- |
-    | Browser | `plugin-sdk/browser-cdp`, `plugin-sdk/browser-config-runtime`, `plugin-sdk/browser-config-support`, `plugin-sdk/browser-control-auth`, `plugin-sdk/browser-node-runtime`, `plugin-sdk/browser-profiles`, `plugin-sdk/browser-security-runtime`, `plugin-sdk/browser-setup-tools`, `plugin-sdk/browser-support` | مساعدات دعم Plugin المتصفح المجمّعة (`browser-support` يبقى حاوية التوافق) |
-    | Matrix | `plugin-sdk/matrix`, `plugin-sdk/matrix-helper`, `plugin-sdk/matrix-runtime-heavy`, `plugin-sdk/matrix-runtime-shared`, `plugin-sdk/matrix-runtime-surface`, `plugin-sdk/matrix-surface`, `plugin-sdk/matrix-thread-bindings` | سطح المساعدات/وقت التشغيل المجمّع لـ Matrix |
-    | Line | `plugin-sdk/line`, `plugin-sdk/line-core`, `plugin-sdk/line-runtime`, `plugin-sdk/line-surface` | سطح المساعدات/وقت التشغيل المجمّع لـ LINE |
-    | IRC | `plugin-sdk/irc`, `plugin-sdk/irc-surface` | سطح المساعدات المجمّع لـ IRC |
-    | مساعدات خاصة بالقنوات | `plugin-sdk/googlechat`, `plugin-sdk/zalouser`, `plugin-sdk/bluebubbles`, `plugin-sdk/bluebubbles-policy`, `plugin-sdk/mattermost`, `plugin-sdk/mattermost-policy`, `plugin-sdk/feishu-conversation`, `plugin-sdk/msteams`, `plugin-sdk/nextcloud-talk`, `plugin-sdk/nostr`, `plugin-sdk/tlon`, `plugin-sdk/twitch` | طبقات التوافق/المساعدات الخاصة بالقنوات المجمعة |
-    | مساعدات خاصة بالمصادقة/Plugin | `plugin-sdk/github-copilot-login`, `plugin-sdk/github-copilot-token`, `plugin-sdk/diagnostics-otel`, `plugin-sdk/diffs`, `plugin-sdk/llm-task`, `plugin-sdk/thread-ownership`, `plugin-sdk/voice-call` | طبقات المساعدات الخاصة بالميزات/Plugins المجمعة؛ ويقوم `plugin-sdk/github-copilot-token` حاليًا بتصدير `DEFAULT_COPILOT_API_BASE_URL` و`deriveCopilotApiBaseUrlFromToken` و`resolveCopilotApiToken` |
+    | Browser | `plugin-sdk/browser-cdp`, `plugin-sdk/browser-config-runtime`, `plugin-sdk/browser-config-support`, `plugin-sdk/browser-control-auth`, `plugin-sdk/browser-node-runtime`, `plugin-sdk/browser-profiles`, `plugin-sdk/browser-security-runtime`, `plugin-sdk/browser-setup-tools`, `plugin-sdk/browser-support` | مساعدات دعم Browser plugin المضمّن (`browser-support` يظل ملف التوافق) |
+    | Matrix | `plugin-sdk/matrix`, `plugin-sdk/matrix-helper`, `plugin-sdk/matrix-runtime-heavy`, `plugin-sdk/matrix-runtime-shared`, `plugin-sdk/matrix-runtime-surface`, `plugin-sdk/matrix-surface`, `plugin-sdk/matrix-thread-bindings` | سطح المساعدات/وقت التشغيل المضمّن لـ Matrix |
+    | Line | `plugin-sdk/line`, `plugin-sdk/line-core`, `plugin-sdk/line-runtime`, `plugin-sdk/line-surface` | سطح المساعدات/وقت التشغيل المضمّن لـ LINE |
+    | IRC | `plugin-sdk/irc`, `plugin-sdk/irc-surface` | سطح المساعدات المضمّن لـ IRC |
+    | مساعدات خاصة بالقنوات | `plugin-sdk/googlechat`, `plugin-sdk/zalouser`, `plugin-sdk/bluebubbles`, `plugin-sdk/bluebubbles-policy`, `plugin-sdk/mattermost`, `plugin-sdk/mattermost-policy`, `plugin-sdk/feishu-conversation`, `plugin-sdk/msteams`, `plugin-sdk/nextcloud-talk`, `plugin-sdk/nostr`, `plugin-sdk/tlon`, `plugin-sdk/twitch` | seams التوافق/المساعدات الخاصة بالقنوات المضمّنة |
+    | مساعدات خاصة بالمصادقة/الplugin | `plugin-sdk/github-copilot-login`, `plugin-sdk/github-copilot-token`, `plugin-sdk/diagnostics-otel`, `plugin-sdk/diffs`, `plugin-sdk/llm-task`, `plugin-sdk/thread-ownership`, `plugin-sdk/voice-call` | seams مساعدات الميزات/الplugins المضمّنة؛ يصدّر `plugin-sdk/github-copilot-token` حاليًا `DEFAULT_COPILOT_API_BASE_URL` و`deriveCopilotApiBaseUrlFromToken` و`resolveCopilotApiToken` |
   </Accordion>
 </AccordionGroup>
 
-## API التسجيل
+## واجهة API للتسجيل
 
-تتلقى دالة الاستدعاء `register(api)` كائن `OpenClawPluginApi` يحتوي على هذه
-الطرائق:
+تتلقى دالة callback ‏`register(api)` كائن `OpenClawPluginApi` بهذه
+الأساليب:
 
 ### تسجيل القدرات
 
-| الطريقة                                           | ما الذي تسجله                     |
+| الأسلوب                                           | ما الذي يسجّله                     |
 | ------------------------------------------------ | ------------------------------------- |
 | `api.registerProvider(...)`                      | الاستدلال النصي (LLM)                  |
 | `api.registerAgentHarness(...)`                  | منفّذ وكيل منخفض المستوى تجريبي |
-| `api.registerCliBackend(...)`                    | واجهة CLI خلفية محلية للاستدلال           |
+| `api.registerCliBackend(...)`                    | خلفية استدلال CLI محلية           |
 | `api.registerChannel(...)`                       | قناة مراسلة                     |
 | `api.registerSpeechProvider(...)`                | تحويل النص إلى كلام / توليف STT        |
-| `api.registerRealtimeTranscriptionProvider(...)` | نسخ فوري مباشر      |
-| `api.registerRealtimeVoiceProvider(...)`         | جلسات صوت فورية ثنائية الاتجاه        |
+| `api.registerRealtimeTranscriptionProvider(...)` | نسخ فوري متدفق      |
+| `api.registerRealtimeVoiceProvider(...)`         | جلسات صوتية فورية ثنائية الاتجاه        |
 | `api.registerMediaUnderstandingProvider(...)`    | تحليل الصور/الصوت/الفيديو            |
 | `api.registerImageGenerationProvider(...)`       | توليد الصور                      |
 | `api.registerMusicGenerationProvider(...)`       | توليد الموسيقى                      |
 | `api.registerVideoGenerationProvider(...)`       | توليد الفيديو                      |
-| `api.registerWebFetchProvider(...)`              | مزود جلب / استخراج الويب           |
+| `api.registerWebFetchProvider(...)`              | مزوّد Web fetch / scrape           |
 | `api.registerWebSearchProvider(...)`             | بحث الويب                            |
 
 ### الأدوات والأوامر
 
-| الطريقة                          | ما الذي تسجله                             |
+| الأسلوب                          | ما الذي يسجّله                             |
 | ------------------------------- | --------------------------------------------- |
 | `api.registerTool(tool, opts?)` | أداة وكيل (مطلوبة أو `{ optional: true }`) |
 | `api.registerCommand(def)`      | أمر مخصص (يتجاوز LLM)             |
 
 ### البنية التحتية
 
-| الطريقة                                         | ما الذي تسجله                       |
+| الأسلوب                                         | ما الذي يسجّله                       |
 | ---------------------------------------------- | --------------------------------------- |
-| `api.registerHook(events, handler, opts?)`     | خطاف حدث                              |
+| `api.registerHook(events, handler, opts?)`     | hook حدث                              |
 | `api.registerHttpRoute(params)`                | نقطة نهاية HTTP في Gateway                   |
-| `api.registerGatewayMethod(name, handler)`     | طريقة RPC في Gateway                      |
+| `api.registerGatewayMethod(name, handler)`     | أسلوب RPC في Gateway                      |
 | `api.registerCli(registrar, opts?)`            | أمر فرعي في CLI                          |
 | `api.registerService(service)`                 | خدمة خلفية                      |
 | `api.registerInteractiveHandler(registration)` | معالج تفاعلي                     |
-| `api.registerMemoryPromptSupplement(builder)`  | قسم إضافي قريب من الذاكرة في prompt |
+| `api.registerMemoryPromptSupplement(builder)`  | قسم prompt إضافي مجاور للذاكرة |
 | `api.registerMemoryCorpusSupplement(adapter)`  | corpus إضافي لبحث/قراءة الذاكرة      |
 
-تظل نطاقات الإدارة الأساسية المحجوزة (`config.*`, `exec.approvals.*`, `wizard.*`,
-`update.*`) دائمًا `operator.admin`، حتى لو حاول Plugin تعيين
-نطاق أضيق لطريقة Gateway. فضّل البوادئ الخاصة بالـ Plugin
-للطرائق المملوكة للـ Plugin.
+تظل مساحات أسماء الإدارة الأساسية المحجوزة (`config.*` و`exec.approvals.*` و`wizard.*`،
+و`update.*`) دائمًا ضمن `operator.admin`، حتى لو حاول plugin تعيين
+نطاق أضيق لأسلوب gateway. وفضّل البوادئ الخاصة بالplugin من أجل
+الأساليب المملوكة لـ plugin.
 
-### بيانات تعريف تسجيل CLI
+### بيانات تسجيل CLI الوصفية
 
-تقبل `api.registerCli(registrar, opts?)` نوعين من بيانات التعريف العليا:
+يقبل `api.registerCli(registrar, opts?)` نوعين من البيانات الوصفية ذات المستوى الأعلى:
 
-- `commands`: جذور أوامر صريحة يملكها المسجّل
-- `descriptors`: واصفات أوامر في وقت التحليل تُستخدم لمساعدة CLI الجذرية،
-  والتوجيه، وتسجيل CLI الكسول للـ Plugin
+- `commands`: جذور أوامر صريحة يملكها المسجل
+- `descriptors`: واصفات أوامر وقت التحليل المستخدمة من أجل مساعدة CLI الجذرية،
+  والتوجيه، وتسجيل CLI الكسول للplugin
 
-إذا كنت تريد أن يبقى أمر Plugin محمّلًا بشكل كسول في مسار CLI الجذري العادي،
-فقدّم `descriptors` تغطي كل جذر أمر من المستوى الأعلى يكشفه ذلك
-المسجّل.
+إذا كنت تريد أن يظل أمر plugin محمّلًا بكسل في مسار CLI الجذري العادي،
+فقدّم `descriptors` تغطي كل جذر أمر من المستوى الأعلى يكشفه هذا
+المسجل.
 
 ```typescript
 api.registerCli(
@@ -387,7 +387,7 @@ api.registerCli(
     descriptors: [
       {
         name: "matrix",
-        description: "إدارة حسابات Matrix، والتحقق، والأجهزة، وحالة profile",
+        description: "إدارة حسابات Matrix، والتحقق، والأجهزة، وحالة الملف الشخصي",
         hasSubcommands: true,
       },
     ],
@@ -395,134 +395,134 @@ api.registerCli(
 );
 ```
 
-استخدم `commands` وحدها فقط عندما لا تحتاج إلى تسجيل CLI كسول في الجذر.
-لا يزال مسار التوافق eager هذا مدعومًا، لكنه لا يثبّت
+استخدم `commands` وحده فقط عندما لا تحتاج إلى تسجيل CLI جذري كسول.
+ما يزال مسار التوافق الفوري هذا مدعومًا، لكنه لا يثبت
 عناصر نائبة مدعومة بـ descriptor من أجل التحميل الكسول وقت التحليل.
 
-### تسجيل الواجهة الخلفية لـ CLI
+### تسجيل خلفية CLI
 
-تتيح `api.registerCliBackend(...)` للـ Plugin امتلاك الإعدادات الافتراضية لواجهة
-CLI خلفية محلية للذكاء الاصطناعي مثل `codex-cli`.
+يتيح `api.registerCliBackend(...)` لـ plugin امتلاك التكوين الافتراضي لخلفية
+CLI محلية للذكاء الاصطناعي مثل `codex-cli`.
 
-- يصبح `id` الخاص بالواجهة الخلفية بادئة المزوّد في مراجع model مثل `codex-cli/gpt-5`.
-- يستخدم `config` الخاص بالواجهة الخلفية الشكل نفسه المستخدم في `agents.defaults.cliBackends.<id>`.
-- تظل إعدادات المستخدم هي الحاكمة. يدمج OpenClaw القيمة `agents.defaults.cliBackends.<id>` فوق
-  القيمة الافتراضية للـ Plugin قبل تشغيل CLI.
-- استخدم `normalizeConfig` عندما تحتاج الواجهة الخلفية إلى إعادة كتابة توافقية بعد الدمج
-  (على سبيل المثال، تطبيع أشكال flags القديمة).
+- يصبح `id` الخاص بالخلفية بادئة المزوّد في مراجع النماذج مثل `codex-cli/gpt-5`.
+- يستخدم `config` الخاص بالخلفية البنية نفسها لـ `agents.defaults.cliBackends.<id>`.
+- يظل تكوين المستخدم هو الفائز. يدمج OpenClaw القيمة `agents.defaults.cliBackends.<id>` فوق
+  القيمة الافتراضية للplugin قبل تشغيل CLI.
+- استخدم `normalizeConfig` عندما تحتاج الخلفية إلى عمليات إعادة كتابة توافقية بعد الدمج
+  (على سبيل المثال، تطبيع أشكال العلامات القديمة).
 
-### الخانات الحصرية
+### المنافذ الحصرية
 
-| الطريقة                                     | ما الذي تسجله                                                                                                                                         |
+| الأسلوب                                     | ما الذي يسجّله                                                                                                                                         |
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api.registerContextEngine(id, factory)`   | محرك السياق (واحد نشط في كل مرة). تتلقى دالة `assemble()` القيمتين `availableTools` و`citationsMode` بحيث يستطيع المحرك تخصيص إضافات prompt. |
-| `api.registerMemoryCapability(capability)` | قدرة الذاكرة الموحدة                                                                                                                                 |
-| `api.registerMemoryPromptSection(builder)` | باني قسم prompt الخاص بالذاكرة                                                                                                                             |
-| `api.registerMemoryFlushPlan(resolver)`    | محلّل خطة تفريغ الذاكرة                                                                                                                                |
+| `api.registerContextEngine(id, factory)`   | محرك السياق (واحد نشط في كل مرة). تتلقى دالة callback ‏`assemble()` القيمتين `availableTools` و`citationsMode` بحيث يمكن للمحرك تخصيص الإضافات إلى prompt. |
+| `api.registerMemoryCapability(capability)` | قدرة ذاكرة موحّدة                                                                                                                                 |
+| `api.registerMemoryPromptSection(builder)` | باني قسم prompt للذاكرة                                                                                                                             |
+| `api.registerMemoryFlushPlan(resolver)`    | محلّل خطة flush للذاكرة                                                                                                                                |
 | `api.registerMemoryRuntime(runtime)`       | مهايئ وقت تشغيل الذاكرة                                                                                                                                    |
 
-### مهايئات embedding للذاكرة
+### مهايئات embedding الخاصة بالذاكرة
 
-| الطريقة                                         | ما الذي تسجله                              |
+| الأسلوب                                         | ما الذي يسجّله                              |
 | ---------------------------------------------- | ---------------------------------------------- |
-| `api.registerMemoryEmbeddingProvider(adapter)` | مهايئ embedding للذاكرة للـ Plugin النشط |
+| `api.registerMemoryEmbeddingProvider(adapter)` | مهايئ embedding للذاكرة من أجل plugin النشط |
 
-- `registerMemoryCapability` هي API المفضلة والحصرية الخاصة بـ Plugin الذاكرة.
-- يمكن لـ `registerMemoryCapability` أيضًا كشف `publicArtifacts.listArtifacts(...)`
-  بحيث تتمكن Plugins المصاحبة من استهلاك عناصر الذاكرة المصدّرة عبر
-  `openclaw/plugin-sdk/memory-host-core` بدلًا من الوصول إلى
-  التخطيط الخاص الداخلي لـ Plugin ذاكرة معيّنة.
-- تمثل `registerMemoryPromptSection` و`registerMemoryFlushPlan` و
-  `registerMemoryRuntime` واجهات API قديمة متوافقة خاصة بـ Plugin الذاكرة.
-- تتيح `registerMemoryEmbeddingProvider` لـ Plugin الذاكرة النشط تسجيل
-  معرّف أو أكثر من مهايئات embedding (مثل `openai` أو `gemini` أو
-  معرّف مخصص يعرّفه Plugin).
-- تُحل إعدادات المستخدم مثل `agents.defaults.memorySearch.provider` و
-  `agents.defaults.memorySearch.fallback` مقابل معرّفات المهايئات المسجّلة هذه.
+- تُعد `registerMemoryCapability` واجهة API الحصرية المفضلة لـ plugin الذاكرة.
+- قد تكشف `registerMemoryCapability` أيضًا عن `publicArtifacts.listArtifacts(...)`
+  بحيث تتمكن plugins المصاحبة من استهلاك عناصر الذاكرة المُصدّرة عبر
+  `openclaw/plugin-sdk/memory-host-core` بدلًا من الوصول إلى التخطيط الخاص
+  الداخلي لـ plugin ذاكرة محدد.
+- تُعد `registerMemoryPromptSection` و`registerMemoryFlushPlan` و
+  `registerMemoryRuntime` واجهات API حصرية متوافقة مع الإصدارات القديمة لـ plugins الذاكرة.
+- تتيح `registerMemoryEmbeddingProvider` لـ plugin الذاكرة النشط تسجيل
+  معرّف embedding واحد أو أكثر (على سبيل المثال `openai` أو `gemini` أو
+  معرّف مخصص يحدده plugin).
+- يتم حل تكوين المستخدم مثل `agents.defaults.memorySearch.provider` و
+  `agents.defaults.memorySearch.fallback` مقابل معرّفات المهايئات المسجلة تلك.
 
 ### الأحداث ودورة الحياة
 
-| الطريقة                                       | ما الذي تفعله                  |
+| الأسلوب                                       | ما الذي يفعله                  |
 | -------------------------------------------- | ----------------------------- |
-| `api.on(hookName, handler, opts?)`           | خطاف دورة حياة typed          |
-| `api.onConversationBindingResolved(handler)` | دالة استدعاء لربط المحادثة |
+| `api.on(hookName, handler, opts?)`           | hook دورة حياة مطبّع          |
+| `api.onConversationBindingResolved(handler)` | callback لحل ارتباط المحادثة |
 
-### دلالات قرار الخطاف
+### دلالات قرارات hook
 
-- `before_tool_call`: يُعد إرجاع `{ block: true }` نهائيًا. بمجرد أن يضبطه أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_tool_call`: يُعامل إرجاع `{ block: false }` على أنه عدم اتخاذ قرار (مثل حذف `block`)، وليس كتجاوز.
-- `before_install`: يُعد إرجاع `{ block: true }` نهائيًا. بمجرد أن يضبطه أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_install`: يُعامل إرجاع `{ block: false }` على أنه عدم اتخاذ قرار (مثل حذف `block`)، وليس كتجاوز.
-- `reply_dispatch`: يُعد إرجاع `{ handled: true, ... }` نهائيًا. بمجرد أن يعلن أي معالج أنه تولّى الإرسال، يتم تخطي المعالجات ذات الأولوية الأدنى ومسار إرسال النموذج الافتراضي.
-- `message_sending`: يُعد إرجاع `{ cancel: true }` نهائيًا. بمجرد أن يضبطه أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `message_sending`: يُعامل إرجاع `{ cancel: false }` على أنه عدم اتخاذ قرار (مثل حذف `cancel`)، وليس كتجاوز.
+- `before_tool_call`: تؤدي إعادة `{ block: true }` إلى قرار نهائي. وبمجرد أن يعيّن أي معالج هذه القيمة، يتم تخطي المعالجات ذات الأولوية الأقل.
+- `before_tool_call`: تُعامل إعادة `{ block: false }` على أنها عدم وجود قرار (مثلها مثل حذف `block`)، وليس كتجاوز.
+- `before_install`: تؤدي إعادة `{ block: true }` إلى قرار نهائي. وبمجرد أن يعيّن أي معالج هذه القيمة، يتم تخطي المعالجات ذات الأولوية الأقل.
+- `before_install`: تُعامل إعادة `{ block: false }` على أنها عدم وجود قرار (مثلها مثل حذف `block`)، وليس كتجاوز.
+- `reply_dispatch`: تؤدي إعادة `{ handled: true, ... }` إلى قرار نهائي. وبمجرد أن يدّعي أي معالج التوزيع، يتم تخطي المعالجات ذات الأولوية الأقل ومسار توزيع النموذج الافتراضي.
+- `message_sending`: تؤدي إعادة `{ cancel: true }` إلى قرار نهائي. وبمجرد أن يعيّن أي معالج هذه القيمة، يتم تخطي المعالجات ذات الأولوية الأقل.
+- `message_sending`: تُعامل إعادة `{ cancel: false }` على أنها عدم وجود قرار (مثلها مثل حذف `cancel`)، وليس كتجاوز.
 
 ### حقول كائن API
 
 | الحقل                    | النوع                      | الوصف                                                                                 |
 | ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | معرّف Plugin                                                                                   |
+| `api.id`                 | `string`                  | معرّف plugin                                                                                   |
 | `api.name`               | `string`                  | اسم العرض                                                                                |
-| `api.version`            | `string?`                 | إصدار Plugin (اختياري)                                                                   |
-| `api.description`        | `string?`                 | وصف Plugin (اختياري)                                                               |
-| `api.source`             | `string`                  | مسار مصدر Plugin                                                                          |
-| `api.rootDir`            | `string?`                 | الدليل الجذري لـ Plugin (اختياري)                                                            |
-| `api.config`             | `OpenClawConfig`          | لقطة الإعدادات الحالية (لقطة وقت تشغيل داخل الذاكرة النشطة عند توفرها)                  |
-| `api.pluginConfig`       | `Record<string, unknown>` | إعدادات خاصة بالـ Plugin من `plugins.entries.<id>.config`                                   |
+| `api.version`            | `string?`                 | إصدار plugin (اختياري)                                                                   |
+| `api.description`        | `string?`                 | وصف plugin (اختياري)                                                               |
+| `api.source`             | `string`                  | مسار مصدر plugin                                                                          |
+| `api.rootDir`            | `string?`                 | الدليل الجذري لـ plugin (اختياري)                                                            |
+| `api.config`             | `OpenClawConfig`          | snapshot التكوين الحالي (snapshot وقت التشغيل النشط في الذاكرة عند توفره)                  |
+| `api.pluginConfig`       | `Record<string, unknown>` | التكوين الخاص بـ plugin من `plugins.entries.<id>.config`                                   |
 | `api.runtime`            | `PluginRuntime`           | [مساعدات وقت التشغيل](/ar/plugins/sdk-runtime)                                                     |
-| `api.logger`             | `PluginLogger`            | logger ذو نطاق محدد (`debug`, `info`, `warn`, `error`)                                            |
-| `api.registrationMode`   | `PluginRegistrationMode`  | وضع التحميل الحالي؛ ويمثل `"setup-runtime"` نافذة بدء/إعداد خفيفة قبل الإدخال الكامل |
-| `api.resolvePath(input)` | `(string) => string`      | حل المسار بالنسبة إلى جذر Plugin                                                        |
+| `api.logger`             | `PluginLogger`            | logger ضمن النطاق (`debug` و`info` و`warn` و`error`)                                            |
+| `api.registrationMode`   | `PluginRegistrationMode`  | وضع التحميل الحالي؛ وتمثل `"setup-runtime"` نافذة بدء التشغيل/الإعداد الخفيفة قبل الإدخال الكامل |
+| `api.resolvePath(input)` | `(string) => string`      | حل المسار نسبةً إلى جذر plugin                                                        |
 
 ## اصطلاح الوحدات الداخلية
 
-داخل Plugin الخاصة بك، استخدم ملفات barrel محلية لعمليات الاستيراد الداخلية:
+داخل plugin الخاص بك، استخدم ملفات barrel محلية للاستيرادات الداخلية:
 
-````
+```
 my-plugin/
-  api.ts            # التصديرات العامة للمستهلكين الخارجيين
+  api.ts            # تصديرات عامة للمستهلكين الخارجيين
   runtime-api.ts    # تصديرات وقت تشغيل داخلية فقط
-  index.ts          # نقطة إدخال Plugin
+  index.ts          # نقطة إدخال plugin
   setup-entry.ts    # إدخال خفيف خاص بالإعداد فقط (اختياري)
-````
+```
 
 <Warning>
-  لا تستورد Plugin الخاصة بك مطلقًا عبر `openclaw/plugin-sdk/<your-plugin>`
-  من شيفرة الإنتاج. وجّه عمليات الاستيراد الداخلية عبر `./api.ts` أو
-  `./runtime-api.ts`. مسار SDK هو العقد الخارجي فقط.
+  لا تستورد plugin الخاص بك أبدًا عبر `openclaw/plugin-sdk/<your-plugin>`
+  من كود الإنتاج. وجّه الاستيرادات الداخلية عبر `./api.ts` أو
+  `./runtime-api.ts`. فمسار SDK هو العقد الخارجي فقط.
 </Warning>
 
-تفضّل الآن الأسطح العامة للـ Plugin المجمعة والمحملة عبر الواجهة (`api.ts` و`runtime-api.ts`،
-و`index.ts` و`setup-entry.ts` وملفات الإدخال العامة المشابهة) لقطة إعدادات
-وقت التشغيل النشطة عندما يكون OpenClaw قيد التشغيل بالفعل. وإذا لم تكن هناك
-لقطة وقت تشغيل بعد، فإنها تعود إلى ملف الإعدادات المحلول على القرص.
+تفضّل الآن الأسطح العامة للplugins المضمّنة المحمّلة عبر الواجهة (`api.ts` و`runtime-api.ts`،
+و`index.ts`، و`setup-entry.ts`، وملفات الإدخال العامة المماثلة)
+snapshot التكوين النشط لوقت التشغيل عندما يكون OpenClaw قيد التشغيل بالفعل. وإذا لم توجد
+snapshot لوقت التشغيل بعد، فإنها تعود إلى ملف التكوين المحلول على القرص.
 
-يمكن لـ Plugins المزودات أيضًا كشف حاوية عقد محلية ضيقة خاصة بالـ Plugin عندما تكون
-إحدى المساعدات خاصة بالمزود عمدًا ولا تنتمي بعد إلى مسار فرعي عام في SDK.
-المثال المجمّع الحالي: يحتفظ مزود Anthropic بمساعدات Claude stream
-داخل طبقة `api.ts` / `contract-api.ts` العامة الخاصة به بدلًا من
-ترقية منطق رأس Anthropic beta و`service_tier` إلى عقد عام في
+يمكن لplugins المزوّدين أيضًا كشف barrel عقد محلي ضيق خاص بالplugin عندما تكون مساعدة ما
+مقصودة بوصفها خاصة بالمزوّد ولا تنتمي بعد إلى مسار فرعي عام في SDK.
+المثال المضمّن الحالي: يحتفظ مزوّد Anthropic بمساعدات Claude stream الخاصة به
+داخل seam عام خاص به في `api.ts` / `contract-api.ts` بدلًا من
+ترقية منطق رؤوس Anthropic beta و`service_tier` إلى عقد عام
 `plugin-sdk/*`.
 
-أمثلة مجمعة حالية أخرى:
+أمثلة مضمّنة حالية أخرى:
 
-- `@openclaw/openai-provider`: يصدّر `api.ts` بُناة المزود،
-  ومساعدات model الافتراضي، وبُناة مزودات الوقت الفعلي
-- `@openclaw/openrouter-provider`: يصدّر `api.ts` باني المزود بالإضافة إلى
-  مساعدات onboarding/config
+- `@openclaw/openai-provider`: يصدّر `api.ts` بُناة المزوّد،
+  ومساعدات النموذج الافتراضي، وبُناة المزوّد الفوري
+- `@openclaw/openrouter-provider`: يصدّر `api.ts` باني المزوّد بالإضافة إلى
+  مساعدات الإعداد الأولي/التكوين
 
 <Warning>
-  يجب على شيفرة الإنتاج الخاصة بالامتدادات أيضًا تجنّب استيرادات
-  `openclaw/plugin-sdk/<other-plugin>`. إذا كانت إحدى المساعدات مشتركة فعلًا، فقم بترقيتها إلى مسار فرعي محايد في SDK
-  مثل `openclaw/plugin-sdk/speech` أو `.../provider-model-shared` أو سطح آخر
-  موجّه بالقدرات بدلًا من ربط Plugins معًا.
+  يجب أن يتجنب كود الإنتاج الخاص بالامتداد أيضًا استيراد
+  `openclaw/plugin-sdk/<other-plugin>`. وإذا كانت المساعدة مشتركة فعلًا، فقم بترقيتها إلى مسار فرعي
+  محايد في SDK مثل `openclaw/plugin-sdk/speech` أو `.../provider-model-shared` أو سطح آخر
+  موجّه بالقدرات بدلًا من ربط pluginين معًا.
 </Warning>
 
 ## ذو صلة
 
-- [نقاط الإدخال](/plugins/sdk-entrypoints) — خيارات `definePluginEntry` و`defineChannelPluginEntry`
-- [مساعدات وقت التشغيل](/plugins/sdk-runtime) — المرجع الكامل لمساحة الأسماء `api.runtime`
-- [الإعدادات والتكوين](/ar/plugins/sdk-setup) — التغليف، وmanifests، ومخططات الإعدادات
+- [نقاط الإدخال](/ar/plugins/sdk-entrypoints) — خيارات `definePluginEntry` و`defineChannelPluginEntry`
+- [مساعدات وقت التشغيل](/ar/plugins/sdk-runtime) — المرجع الكامل لمساحة الأسماء `api.runtime`
+- [الإعداد والتكوين](/ar/plugins/sdk-setup) — التغليف، وmanifests، ومخططات التكوين
 - [الاختبار](/ar/plugins/sdk-testing) — أدوات الاختبار وقواعد lint
 - [ترحيل SDK](/ar/plugins/sdk-migration) — الترحيل من الأسطح المهجورة
-- [الداخلية الخاصة بالـ Plugin](/ar/plugins/architecture) — المعمارية العميقة ونموذج القدرات
+- [الأجزاء الداخلية لـ Plugin](/ar/plugins/architecture) — البنية العميقة ونموذج القدرات

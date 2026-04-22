@@ -1,74 +1,74 @@
 ---
 read_when:
     - العمل على ميزات قناة Discord
-summary: حالة دعم bot في Discord، والإمكانات، والإعدادات
+summary: حالة دعم Discord bot والقدرات والإعدادات
 title: Discord
 x-i18n:
-    generated_at: "2026-04-21T17:45:47Z"
+    generated_at: "2026-04-22T04:20:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1681315a6c246c4b68347f5e22319e132f30ea4e29a19e7d1da9e83dce7b68d0
+    source_hash: 613ae39bc4b8c5661cbaab4f70a57af584f296581c3ce54ddaef0feab44e7e42
     source_path: channels/discord.md
     workflow: 15
 ---
 
 # Discord (Bot API)
 
-الحالة: جاهز للرسائل الخاصة والقنوات داخل الخادم عبر بوابة Discord الرسمية.
+الحالة: جاهز للرسائل الخاصة والقنوات داخل الخوادم عبر بوابة Discord الرسمية.
 
 <CardGroup cols={3}>
   <Card title="الاقتران" icon="link" href="/ar/channels/pairing">
-    تكون الرسائل الخاصة في Discord في وضع الاقتران افتراضيًا.
+    تستخدم الرسائل الخاصة في Discord وضع الاقتران افتراضيًا.
   </Card>
   <Card title="أوامر الشرطة المائلة" icon="terminal" href="/ar/tools/slash-commands">
     سلوك الأوامر الأصلي وفهرس الأوامر.
   </Card>
-  <Card title="استكشاف أخطاء القناة وإصلاحها" icon="wrench" href="/ar/channels/troubleshooting">
-    التشخيصات عبر القنوات وتدفق الإصلاح.
+  <Card title="استكشاف أخطاء القنوات وإصلاحها" icon="wrench" href="/ar/channels/troubleshooting">
+    التشخيص عبر القنوات ومسار الإصلاح.
   </Card>
 </CardGroup>
 
-## إعداد سريع
+## الإعداد السريع
 
-ستحتاج إلى إنشاء تطبيق جديد يحتوي على bot، ثم إضافة الـ bot إلى خادمك، ثم إقرانه مع OpenClaw. نوصي بإضافة الـ bot إلى خادمك الخاص. إذا لم يكن لديك خادم بعد، [فأنشئ واحدًا أولًا](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (اختر **Create My Own > For me and my friends**).
+ستحتاج إلى إنشاء تطبيق جديد يتضمن bot، وإضافة bot إلى خادمك، ثم إقرانه مع OpenClaw. نوصي بإضافة bot إلى خادمك الخاص. إذا لم يكن لديك خادم بعد، [فأنشئ واحدًا أولًا](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (اختر **Create My Own > For me and my friends**).
 
 <Steps>
   <Step title="إنشاء تطبيق Discord وbot">
     انتقل إلى [Discord Developer Portal](https://discord.com/developers/applications) وانقر على **New Application**. سمّه باسم مثل "OpenClaw".
 
-    انقر على **Bot** في الشريط الجانبي. اضبط **Username** على الاسم الذي تطلقه على وكيل OpenClaw الخاص بك.
+    انقر على **Bot** في الشريط الجانبي. اضبط **Username** على الاسم الذي تستخدمه لوكيل OpenClaw الخاص بك.
 
   </Step>
 
-  <Step title="تفعيل intents المميزة">
-    وأنت لا تزال في صفحة **Bot**، مرّر إلى أسفل حتى **Privileged Gateway Intents** وفعّل:
+  <Step title="تفعيل intents ذات الامتيازات">
+    وأنت لا تزال في صفحة **Bot**، مرّر لأسفل إلى **Privileged Gateway Intents** وفعّل:
 
     - **Message Content Intent** (مطلوب)
-    - **Server Members Intent** (موصى به؛ مطلوب لقوائم السماح الخاصة بالأدوار ولمطابقة الاسم إلى المعرّف)
+    - **Server Members Intent** (موصى به؛ مطلوب لقوائم السماح الخاصة بالأدوار ولمطابقة الاسم بالمعرّف)
     - **Presence Intent** (اختياري؛ مطلوب فقط لتحديثات الحالة)
 
   </Step>
 
-  <Step title="نسخ bot token الخاص بك">
-    مرّر مرة أخرى إلى أعلى صفحة **Bot** وانقر على **Reset Token**.
+  <Step title="نسخ token الخاص بـ bot">
+    مرّر مجددًا إلى أعلى صفحة **Bot** وانقر على **Reset Token**.
 
     <Note>
-    رغم الاسم، فهذا ينشئ أول token لك — ولا تتم "إعادة تعيين" أي شيء.
+    رغم الاسم، فهذا ينشئ أول token لك — ولا تتم هنا إعادة "تعيين" أي شيء.
     </Note>
 
-    انسخ الـ token واحفظه في مكان ما. هذا هو **Bot Token** الخاص بك وستحتاج إليه بعد قليل.
+    انسخ token واحفظه في مكان ما. هذا هو **Bot Token** الخاص بك وستحتاج إليه بعد قليل.
 
   </Step>
 
-  <Step title="إنشاء رابط دعوة وإضافة الـ bot إلى خادمك">
-    انقر على **OAuth2** في الشريط الجانبي. ستنشئ رابط دعوة بالأذونات الصحيحة لإضافة الـ bot إلى خادمك.
+  <Step title="إنشاء عنوان URL للدعوة وإضافة bot إلى خادمك">
+    انقر على **OAuth2** في الشريط الجانبي. ستنشئ عنوان URL للدعوة مع الأذونات الصحيحة لإضافة bot إلى خادمك.
 
-    مرّر إلى أسفل حتى **OAuth2 URL Generator** وفعّل:
+    مرّر لأسفل إلى **OAuth2 URL Generator** وفعّل:
 
     - `bot`
     - `applications.commands`
 
-    سيظهر قسم **Bot Permissions** في الأسفل. فعّل:
+    سيظهر قسم **Bot Permissions** بالأسفل. فعّل:
 
     - View Channels
     - Send Messages
@@ -77,30 +77,30 @@ x-i18n:
     - Attach Files
     - Add Reactions (اختياري)
 
-    انسخ الرابط المُنشأ في الأسفل، والصقه في متصفحك، وحدد خادمك، ثم انقر **Continue** للاتصال. ينبغي الآن أن ترى الـ bot في خادم Discord.
+    انسخ عنوان URL الذي تم إنشاؤه في الأسفل، والصقه في المتصفح، وحدد خادمك، ثم انقر **Continue** للاتصال. يجب أن ترى الآن bot الخاص بك داخل خادم Discord.
 
   </Step>
 
   <Step title="تفعيل Developer Mode وجمع المعرّفات الخاصة بك">
     بالعودة إلى تطبيق Discord، تحتاج إلى تفعيل Developer Mode حتى تتمكن من نسخ المعرّفات الداخلية.
 
-    1. انقر على **User Settings** (أيقونة الترس بجانب صورتك الرمزية) → **Advanced** → فعّل **Developer Mode**
-    2. انقر بزر الماوس الأيمن على **أيقونة الخادم** في الشريط الجانبي → **Copy Server ID**
-    3. انقر بزر الماوس الأيمن على **صورتك الرمزية** → **Copy User ID**
+    1. انقر على **User Settings** (أيقونة الترس بجوار صورتك الرمزية) ← **Advanced** ← فعّل **Developer Mode**
+    2. انقر بزر الماوس الأيمن على **أيقونة الخادم** في الشريط الجانبي ← **Copy Server ID**
+    3. انقر بزر الماوس الأيمن على **صورتك الرمزية** ← **Copy User ID**
 
-    احفظ **Server ID** و**User ID** إلى جانب Bot Token — سترسل الثلاثة جميعًا إلى OpenClaw في الخطوة التالية.
+    احفظ **Server ID** و**User ID** مع Bot Token — سترسل الثلاثة جميعًا إلى OpenClaw في الخطوة التالية.
 
   </Step>
 
   <Step title="السماح بالرسائل الخاصة من أعضاء الخادم">
-    لكي يعمل الاقتران، يحتاج Discord إلى السماح لـ bot الخاص بك بإرسال رسالة خاصة إليك. انقر بزر الماوس الأيمن على **أيقونة الخادم** → **Privacy Settings** → فعّل **Direct Messages**.
+    لكي يعمل الاقتران، يجب أن يسمح Discord لـ bot الخاص بك بإرسال رسالة خاصة إليك. انقر بزر الماوس الأيمن على **أيقونة الخادم** ← **Privacy Settings** ← فعّل **Direct Messages**.
 
     يتيح هذا لأعضاء الخادم (بما في ذلك bots) إرسال رسائل خاصة إليك. أبقِ هذا مفعّلًا إذا كنت تريد استخدام الرسائل الخاصة في Discord مع OpenClaw. إذا كنت تخطط لاستخدام قنوات الخادم فقط، فيمكنك تعطيل الرسائل الخاصة بعد الاقتران.
 
   </Step>
 
-  <Step title="اضبط bot token الخاص بك بشكل آمن (لا ترسله في الدردشة)">
-    إن Discord bot token الخاص بك سرّي (مثل كلمة المرور). اضبطه على الجهاز الذي يشغّل OpenClaw قبل مراسلة وكيلك.
+  <Step title="تعيين token الخاص بـ bot بشكل آمن (لا ترسله في الدردشة)">
+    token الخاص بـ Discord bot هو سر (مثل كلمة المرور). عيّنه على الجهاز الذي يشغّل OpenClaw قبل مراسلة وكيلك.
 
 ```bash
 export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN"
@@ -110,20 +110,20 @@ openclaw config set channels.discord.enabled true --strict-json
 openclaw gateway
 ```
 
-    إذا كان OpenClaw يعمل بالفعل كخدمة في الخلفية، فأعد تشغيله عبر تطبيق OpenClaw على Mac أو عبر إيقاف عملية `openclaw gateway run` ثم تشغيلها مجددًا.
+    إذا كان OpenClaw يعمل بالفعل كخدمة في الخلفية، فأعد تشغيله عبر تطبيق OpenClaw على Mac أو عبر إيقاف عملية `openclaw gateway run` ثم تشغيلها من جديد.
 
   </Step>
 
-  <Step title="إعداد OpenClaw والاقتران">
+  <Step title="تهيئة OpenClaw والاقتران">
 
     <Tabs>
-      <Tab title="اسأل وكيلك">
-        تحدّث مع وكيل OpenClaw الخاص بك على أي قناة موجودة (مثل Telegram) وأبلغه بذلك. إذا كانت Discord هي قناتك الأولى، فاستخدم تبويب CLI / config بدلًا من ذلك.
+      <Tab title="اطلب من وكيلك">
+        تحدّث مع وكيل OpenClaw الخاص بك على أي قناة موجودة بالفعل (مثل Telegram) وأخبره بذلك. إذا كانت Discord هي قناتك الأولى، فاستخدم تبويب CLI / config بدلًا من ذلك.
 
-        > "لقد قمت بالفعل بضبط Discord bot token في الإعدادات. يُرجى إكمال إعداد Discord باستخدام User ID `<user_id>` وServer ID `<server_id>`."
+        > "لقد قمت بالفعل بتعيين Discord bot token في config. يُرجى إكمال إعداد Discord باستخدام User ID `<user_id>` وServer ID `<server_id>`."
       </Tab>
       <Tab title="CLI / config">
-        إذا كنت تفضل الإعداد المستند إلى الملف، فاضبط:
+        إذا كنت تفضّل config قائمًا على الملفات، فاضبط:
 
 ```json5
 {
@@ -140,13 +140,13 @@ openclaw gateway
 }
 ```
 
-        البديل عبر env للحساب الافتراضي:
+        الاحتياط من env للحساب الافتراضي:
 
 ```bash
 DISCORD_BOT_TOKEN=...
 ```
 
-        قيم `token` النصية الصريحة مدعومة. كما أن قيم SecretRef مدعومة أيضًا لـ `channels.discord.token` عبر موفري env/file/exec. راجع [إدارة الأسرار](/ar/gateway/secrets).
+        قيم `token` النصية الصريحة مدعومة. كما أن قيم SecretRef مدعومة أيضًا لـ `channels.discord.token` عبر مزودي env/file/exec. راجع [Secrets Management](/ar/gateway/secrets).
 
       </Tab>
     </Tabs>
@@ -154,10 +154,10 @@ DISCORD_BOT_TOKEN=...
   </Step>
 
   <Step title="الموافقة على أول اقتران عبر الرسائل الخاصة">
-    انتظر حتى تعمل البوابة، ثم أرسل رسالة خاصة إلى bot في Discord. سيرد عليك برمز اقتران.
+    انتظر حتى تعمل Gateway، ثم أرسل رسالة خاصة إلى bot الخاص بك في Discord. سيرد عليك برمز اقتران.
 
     <Tabs>
-      <Tab title="اسأل وكيلك">
+      <Tab title="اطلب من وكيلك">
         أرسل رمز الاقتران إلى وكيلك على قناتك الحالية:
 
         > "وافق على رمز اقتران Discord هذا: `<CODE>`"
@@ -174,29 +174,29 @@ openclaw pairing approve discord <CODE>
 
     تنتهي صلاحية رموز الاقتران بعد ساعة واحدة.
 
-    ينبغي أن تتمكن الآن من التحدث مع وكيلك في Discord عبر الرسائل الخاصة.
+    يجب أن تتمكن الآن من التحدث مع وكيلك في Discord عبر الرسائل الخاصة.
 
   </Step>
 </Steps>
 
 <Note>
-يتم حل الـ token على أساس الحساب. تمنح قيم token في الإعدادات الأولوية على البديل عبر env. لا يُستخدم `DISCORD_BOT_TOKEN` إلا للحساب الافتراضي.
-بالنسبة للاتصالات الصادرة المتقدمة (أداة الرسائل/إجراءات القناة)، يُستخدم `token` صريح لكل استدعاء لذلك الاستدعاء. ينطبق ذلك على إجراءات الإرسال والقراءة/الفحص (مثل read/search/fetch/thread/pins/permissions). ولا تزال إعدادات سياسة الحساب/إعادة المحاولة تأتي من الحساب المحدد في اللقطة النشطة لوقت التشغيل.
+يتم حلّ token مع مراعاة الحساب. تكون قيم token في config لها الأولوية على الاحتياط من env. لا يُستخدم `DISCORD_BOT_TOKEN` إلا للحساب الافتراضي.
+بالنسبة إلى الاستدعاءات الصادرة المتقدمة (أفعال أداة/قناة الرسائل)، يتم استخدام `token` صريح لكل استدعاء لذلك الاستدعاء. ينطبق هذا على إجراءات الإرسال والقراءة/الفحص (على سبيل المثال read/search/fetch/thread/pins/permissions). تظل إعدادات سياسة الحساب/إعادة المحاولة تأتي من الحساب المحدد في اللقطة النشطة لوقت التشغيل.
 </Note>
 
 ## موصى به: إعداد مساحة عمل على خادم
 
-بمجرد أن تعمل الرسائل الخاصة، يمكنك إعداد خادم Discord الخاص بك كمساحة عمل كاملة حيث تحصل كل قناة على جلسة وكيل خاصة بها وسياقها الخاص. يُوصى بهذا للخوادم الخاصة التي تكون أنت وbot الخاص بك فقط فيها.
+بمجرد أن تعمل الرسائل الخاصة، يمكنك إعداد خادم Discord الخاص بك كمساحة عمل كاملة بحيث تحصل كل قناة على جلسة وكيل خاصة بها وبسياقها الخاص. يوصى بهذا للخوادم الخاصة التي تقتصر عليك وعلى bot الخاص بك.
 
 <Steps>
   <Step title="إضافة خادمك إلى قائمة السماح الخاصة بالخوادم">
-    يتيح هذا لوكيلك الرد في أي قناة على خادمك، وليس فقط في الرسائل الخاصة.
+    يتيح ذلك لوكيلك الرد في أي قناة على خادمك، وليس فقط في الرسائل الخاصة.
 
     <Tabs>
-      <Tab title="اسأل وكيلك">
-        > "أضف Discord Server ID الخاص بي `<server_id>` إلى قائمة السماح الخاصة بالخوادم"
+      <Tab title="اطلب من وكيلك">
+        > "أضف Server ID الخاص بـ Discord لديّ `<server_id>` إلى قائمة السماح الخاصة بالخوادم"
       </Tab>
-      <Tab title="الإعدادات">
+      <Tab title="Config">
 
 ```json5
 {
@@ -219,15 +219,15 @@ openclaw pairing approve discord <CODE>
 
   </Step>
 
-  <Step title="السماح بالردود دون @mention">
-    بشكل افتراضي، لا يرد وكيلك في قنوات الخادم إلا عند عمل @mention له. بالنسبة لخادم خاص، فغالبًا ستريد أن يرد على كل رسالة.
+  <Step title="السماح بالردود بدون @mention">
+    بشكل افتراضي، لا يرد وكيلك في قنوات الخادم إلا عند الإشارة إليه بـ @mention. بالنسبة إلى خادم خاص، غالبًا ستريد منه أن يرد على كل رسالة.
 
     <Tabs>
-      <Tab title="اسأل وكيلك">
-        > "اسمح لوكيلي بالرد على هذا الخادم دون الحاجة إلى عمل @mention له"
+      <Tab title="اطلب من وكيلك">
+        > "اسمح لوكيلي بالرد على هذا الخادم دون الحاجة إلى @mentioned"
       </Tab>
-      <Tab title="الإعدادات">
-        اضبط `requireMention: false` في إعدادات الخادم لديك:
+      <Tab title="Config">
+        اضبط `requireMention: false` في config الخاص بالخادم:
 
 ```json5
 {
@@ -249,53 +249,53 @@ openclaw pairing approve discord <CODE>
   </Step>
 
   <Step title="خطط للذاكرة في قنوات الخادم">
-    بشكل افتراضي، لا يتم تحميل الذاكرة طويلة الأمد (`MEMORY.md`) إلا في جلسات الرسائل الخاصة. لا تقوم قنوات الخادم بتحميل `MEMORY.md` تلقائيًا.
+    بشكل افتراضي، يتم تحميل الذاكرة طويلة الأمد (`MEMORY.md`) فقط في جلسات الرسائل الخاصة. لا يتم تحميل `MEMORY.md` تلقائيًا في قنوات الخادم.
 
     <Tabs>
-      <Tab title="اسأل وكيلك">
-        > "عندما أطرح أسئلة في قنوات Discord، استخدم memory_search أو memory_get إذا كنت بحاجة إلى سياق طويل الأمد من `MEMORY.md`."
+      <Tab title="اطلب من وكيلك">
+        > "عندما أطرح أسئلة في قنوات Discord، استخدم memory_search أو memory_get إذا احتجت إلى سياق طويل الأمد من `MEMORY.md`."
       </Tab>
       <Tab title="يدوي">
-        إذا كنت بحاجة إلى سياق مشترك في كل قناة، فضع التعليمات الثابتة في `AGENTS.md` أو `USER.md` (يتم حقنهما في كل جلسة). واحتفظ بالملاحظات طويلة الأمد في `MEMORY.md` وادخل إليها عند الطلب باستخدام أدوات الذاكرة.
+        إذا كنت بحاجة إلى سياق مشترك في كل قناة، فضع التعليمات الثابتة في `AGENTS.md` أو `USER.md` (إذ يتم حقنهما في كل جلسة). واحتفظ بالملاحظات طويلة الأمد في `MEMORY.md` وادخل إليها عند الطلب باستخدام أدوات الذاكرة.
       </Tab>
     </Tabs>
 
   </Step>
 </Steps>
 
-الآن أنشئ بعض القنوات على خادم Discord الخاص بك وابدأ التحدث. يمكن لوكيلك رؤية اسم القناة، وتحصل كل قناة على جلسة معزولة خاصة بها — لذلك يمكنك إعداد `#coding` أو `#home` أو `#research` أو أي شيء يناسب سير عملك.
+أنشئ الآن بعض القنوات على خادم Discord الخاص بك وابدأ الدردشة. يمكن لوكيلك رؤية اسم القناة، وتحصل كل قناة على جلسة معزولة خاصة بها — لذلك يمكنك إعداد `#coding` أو `#home` أو `#research` أو أي شيء يناسب سير عملك.
 
 ## نموذج وقت التشغيل
 
-- تملك Gateway اتصال Discord.
-- توجيه الردود حتمي: الرسائل الواردة من Discord تُعاد إلى Discord.
-- بشكل افتراضي (`session.dmScope=main`)، تشارك المحادثات المباشرة الجلسة الرئيسية للوكيل (`agent:main:main`).
-- قنوات الخادم مفاتيح جلسات معزولة (`agent:<agentId>:discord:channel:<channelId>`).
+- تتولى Gateway اتصال Discord.
+- توجيه الردود حتمي: الرسائل الواردة من Discord يعود الرد عليها إلى Discord.
+- بشكل افتراضي (`session.dmScope=main`)، تشترك المحادثات المباشرة في الجلسة الرئيسية للوكيل (`agent:main:main`).
+- قنوات الخادم هي مفاتيح جلسات معزولة (`agent:<agentId>:discord:channel:<channelId>`).
 - يتم تجاهل الرسائل الخاصة الجماعية افتراضيًا (`channels.discord.dm.groupEnabled=false`).
 - تعمل أوامر الشرطة المائلة الأصلية في جلسات أوامر معزولة (`agent:<agentId>:discord:slash:<userId>`)، مع الاستمرار في حمل `CommandTargetSessionKey` إلى جلسة المحادثة الموجّهة.
 
 ## قنوات المنتدى
 
-لا تقبل قنوات المنتدى والوسائط في Discord إلا منشورات الخيوط. يدعم OpenClaw طريقتين لإنشائها:
+لا تقبل قنوات المنتدى والوسائط في Discord إلا المنشورات ضمن سلاسل المحادثات. يدعم OpenClaw طريقتين لإنشائها:
 
-- أرسل رسالة إلى أصل المنتدى (`channel:<forumId>`) لإنشاء خيط تلقائيًا. يستخدم عنوان الخيط أول سطر غير فارغ من رسالتك.
-- استخدم `openclaw message thread create` لإنشاء خيط مباشرة. لا تمرر `--message-id` لقنوات المنتدى.
+- أرسل رسالة إلى أصل المنتدى (`channel:<forumId>`) لإنشاء سلسلة محادثة تلقائيًا. يستخدم عنوان السلسلة أول سطر غير فارغ من رسالتك.
+- استخدم `openclaw message thread create` لإنشاء سلسلة محادثة مباشرة. لا تمرر `--message-id` لقنوات المنتدى.
 
-مثال: الإرسال إلى أصل المنتدى لإنشاء خيط
+مثال: الإرسال إلى أصل المنتدى لإنشاء سلسلة محادثة
 
 ```bash
 openclaw message send --channel discord --target channel:<forumId> \
   --message "Topic title\nBody of the post"
 ```
 
-مثال: إنشاء خيط منتدى بشكل صريح
+مثال: إنشاء سلسلة محادثة في المنتدى بشكل صريح
 
 ```bash
 openclaw message thread create --channel discord --target channel:<forumId> \
   --thread-name "Topic title" --message "Body of the post"
 ```
 
-لا تقبل أصول المنتدى مكوّنات Discord. إذا كنت بحاجة إلى مكوّنات، فأرسل إلى الخيط نفسه (`channel:<threadId>`).
+لا تقبل أصول المنتدى مكوّنات Discord. إذا كنت بحاجة إلى مكوّنات، فأرسل إلى سلسلة المحادثة نفسها (`channel:<threadId>`).
 
 ## المكوّنات التفاعلية
 
@@ -303,26 +303,26 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
 الكتل المدعومة:
 
-- `text` و`section` و`separator` و`actions` و`media-gallery` و`file`
+- `text`, `section`, `separator`, `actions`, `media-gallery`, `file`
 - تسمح صفوف الإجراءات بما يصل إلى 5 أزرار أو قائمة تحديد واحدة
-- أنواع التحديد: `string` و`user` و`role` و`mentionable` و`channel`
+- أنواع التحديد: `string`, `user`, `role`, `mentionable`, `channel`
 
 بشكل افتراضي، تكون المكوّنات للاستخدام مرة واحدة. اضبط `components.reusable=true` للسماح باستخدام الأزرار والقوائم والنماذج عدة مرات حتى تنتهي صلاحيتها.
 
-لتقييد من يمكنه النقر على زر، اضبط `allowedUsers` على ذلك الزر (معرّفات مستخدمي Discord أو الوسوم أو `*`). عند الإعداد، يتلقى المستخدمون غير المطابقين رفضًا مؤقتًا مرئيًا لهم فقط.
+لتقييد من يمكنه النقر على زر، اضبط `allowedUsers` لذلك الزر (معرّفات مستخدمي Discord أو الوسوم أو `*`). عند التهيئة، يتلقى المستخدمون غير المطابقين رفضًا مؤقتًا مرئيًا لهم فقط.
 
-يفتح الأمران `/model` و`/models` منتقي نماذج تفاعليًا يحتوي على قوائم منسدلة لموفر الخدمة والنموذج بالإضافة إلى خطوة Submit. يكون رد المنتقي مؤقتًا ومرئيًا فقط للمستخدم الذي استدعاه، ولا يمكن لغيره استخدامه.
+يفتح الأمران `/model` و`/models` منتقي نماذج تفاعليًا يتضمن قائمتَي provider وmodel المنسدلتين بالإضافة إلى خطوة Submit. يكون رد المنتقي مؤقتًا ومرئيًا فقط للمستخدم الذي استدعاه، ولا يمكن استخدامه إلا من قبله.
 
 مرفقات الملفات:
 
 - يجب أن تشير كتل `file` إلى مرجع مرفق (`attachment://<filename>`)
-- وفّر المرفق عبر `media`/`path`/`filePath` (ملف واحد)؛ استخدم `media-gallery` لعدة ملفات
+- وفّر المرفق عبر `media`/`path`/`filePath` (ملف واحد)؛ واستخدم `media-gallery` لعدة ملفات
 - استخدم `filename` لتجاوز اسم الرفع عندما يجب أن يطابق مرجع المرفق
 
 النماذج المنبثقة:
 
 - أضف `components.modal` بما يصل إلى 5 حقول
-- أنواع الحقول: `text` و`checkbox` و`radio` و`select` و`role-select` و`user-select`
+- أنواع الحقول: `text`, `checkbox`, `radio`, `select`, `role-select`, `user-select`
 - يضيف OpenClaw زر تشغيل تلقائيًا
 
 مثال:
@@ -364,7 +364,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
       title: "التفاصيل",
       triggerLabel: "فتح النموذج",
       fields: [
-        { type: "text", label: "مقدّم الطلب" },
+        { type: "text", label: "مقدم الطلب" },
         {
           type: "select",
           label: "الأولوية",
@@ -383,32 +383,32 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
 <Tabs>
   <Tab title="سياسة الرسائل الخاصة">
-    يتحكم `channels.discord.dmPolicy` في الوصول إلى الرسائل الخاصة (قديمًا: `channels.discord.dm.policy`):
+    يتحكم `channels.discord.dmPolicy` في الوصول إلى الرسائل الخاصة (القديم: `channels.discord.dm.policy`):
 
-    - `pairing` (افتراضي)
+    - `pairing` (الافتراضي)
     - `allowlist`
-    - `open` (يتطلب أن يتضمن `channels.discord.allowFrom` القيمة `"*"`؛ قديمًا: `channels.discord.dm.allowFrom`)
+    - `open` (يتطلب أن تتضمن `channels.discord.allowFrom` القيمة `"*"`؛ القديم: `channels.discord.dm.allowFrom`)
     - `disabled`
 
     إذا لم تكن سياسة الرسائل الخاصة مفتوحة، فسيتم حظر المستخدمين غير المعروفين (أو مطالبتهم بالاقتران في وضع `pairing`).
 
-    أولوية الحسابات المتعددة:
+    أولوية تعدد الحسابات:
 
-    - يطبَّق `channels.discord.accounts.default.allowFrom` على حساب `default` فقط.
-    - ترث الحسابات المسمّاة `channels.discord.allowFrom` عندما لا تكون قيمة `allowFrom` الخاصة بها مضبوطة.
-    - لا ترث الحسابات المسمّاة `channels.discord.accounts.default.allowFrom`.
+    - تنطبق `channels.discord.accounts.default.allowFrom` على الحساب `default` فقط.
+    - ترث الحسابات المسماة `channels.discord.allowFrom` عندما لا تكون `allowFrom` الخاصة بها مضبوطة.
+    - لا ترث الحسابات المسماة `channels.discord.accounts.default.allowFrom`.
 
     تنسيق هدف الرسائل الخاصة للتسليم:
 
     - `user:<id>`
-    - إشارة `<@id>`
+    - الإشارة `<@id>`
 
-    تكون المعرّفات الرقمية المجردة ملتبسة ويتم رفضها ما لم يتم توفير نوع هدف مستخدم/قناة صريح.
+    تكون المعرّفات الرقمية المجردة ملتبسة ويتم رفضها ما لم يتم توفير نوع هدف صريح للمستخدم/القناة.
 
   </Tab>
 
   <Tab title="سياسة الخادم">
-    يتم التحكم في التعامل مع الخوادم بواسطة `channels.discord.groupPolicy`:
+    يتم التحكم في التعامل مع الخادم بواسطة `channels.discord.groupPolicy`:
 
     - `open`
     - `allowlist`
@@ -418,12 +418,12 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
     سلوك `allowlist`:
 
-    - يجب أن يطابق الخادم `channels.discord.guilds` (يفضَّل `id`، ويُقبل slug)
-    - قوائم سماح اختيارية للمرسلين: `users` (يوصى باستخدام المعرّفات الثابتة) و`roles` (معرّفات الأدوار فقط)؛ إذا تم إعداد أيٍّ منهما، فيُسمح للمرسلين عند مطابقتهم `users` أو `roles`
-    - تكون المطابقة المباشرة للاسم/الوسم معطلة افتراضيًا؛ فعّل `channels.discord.dangerouslyAllowNameMatching: true` فقط كوضع توافق طارئ
-    - الأسماء/الوسوم مدعومة في `users`، لكن المعرّفات أكثر أمانًا؛ يحذّر `openclaw security audit` عند استخدام إدخالات الاسم/الوسم
-    - إذا كان لدى الخادم `channels` مُعدّة، فسيتم رفض القنوات غير المدرجة
-    - إذا لم يكن لدى الخادم كتلة `channels`، فسيُسمح بجميع القنوات في ذلك الخادم المدرج في قائمة السماح
+    - يجب أن يطابق الخادم `channels.discord.guilds` (يُفضّل `id`، ويُقبل slug)
+    - قوائم سماح اختيارية للمرسلين: `users` (يُنصح باستخدام معرّفات ثابتة) و`roles` (معرّفات الأدوار فقط)؛ إذا تم إعداد أي منهما، فيُسمح للمرسلين عندما يطابقون `users` أو `roles`
+    - تكون مطابقة الاسم/الوسم المباشرة معطلة افتراضيًا؛ فعّل `channels.discord.dangerouslyAllowNameMatching: true` فقط كوضع توافق طارئ
+    - الأسماء/الوسوم مدعومة في `users`، لكن المعرّفات أكثر أمانًا؛ ويحذّر `openclaw security audit` عند استخدام إدخالات الاسم/الوسم
+    - إذا كان لدى خادم ما `channels` مهيأة، فسيتم رفض القنوات غير المدرجة
+    - إذا لم يكن لدى الخادم كتلة `channels`، فستُسمح جميع القنوات في ذلك الخادم المدرج في قائمة السماح
 
     مثال:
 
@@ -449,21 +449,21 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 }
 ```
 
-    إذا قمت فقط بتعيين `DISCORD_BOT_TOKEN` ولم تُنشئ كتلة `channels.discord`، فسيكون بديل وقت التشغيل هو `groupPolicy="allowlist"` (مع تحذير في السجلات)، حتى لو كانت قيمة `channels.defaults.groupPolicy` هي `open`.
+    إذا قمت فقط بتعيين `DISCORD_BOT_TOKEN` ولم تُنشئ كتلة `channels.discord`، فسيكون الاحتياط في وقت التشغيل هو `groupPolicy="allowlist"` (مع تحذير في السجلات)، حتى إذا كانت `channels.defaults.groupPolicy` تساوي `open`.
 
   </Tab>
 
   <Tab title="الإشارات والرسائل الخاصة الجماعية">
-    تكون رسائل الخادم مقيّدة بالإشارات افتراضيًا.
+    تكون رسائل الخادم مقيّدة بالإشارة افتراضيًا.
 
-    يشمل اكتشاف الإشارات:
+    يتضمن اكتشاف الإشارة ما يلي:
 
     - إشارة صريحة إلى bot
-    - أنماط الإشارة المُعدّة (`agents.list[].groupChat.mentionPatterns`، والبديل `messages.groupChat.mentionPatterns`)
+    - أنماط الإشارة المهيأة (`agents.list[].groupChat.mentionPatterns`، مع احتياط `messages.groupChat.mentionPatterns`)
     - سلوك الرد الضمني على bot في الحالات المدعومة
 
     يتم إعداد `requireMention` لكل خادم/قناة (`channels.discord.guilds...`).
-    يقوم `ignoreOtherMentions` اختياريًا بإسقاط الرسائل التي تذكر مستخدمًا/دورًا آخر لكن ليس bot (باستثناء @everyone/@here).
+    يقوم `ignoreOtherMentions` اختياريًا بإسقاط الرسائل التي تشير إلى مستخدم/دور آخر ولكن ليس إلى bot (باستثناء @everyone/@here).
 
     الرسائل الخاصة الجماعية:
 
@@ -473,9 +473,9 @@ openclaw message thread create --channel discord --target channel:<forumId> \
   </Tab>
 </Tabs>
 
-### التوجيه إلى الوكيل بالاعتماد على الدور
+### التوجيه إلى الوكلاء استنادًا إلى الدور
 
-استخدم `bindings[].match.roles` لتوجيه أعضاء خادم Discord إلى وكلاء مختلفين حسب معرّف الدور. تقبل الارتباطات المعتمدة على الدور معرّفات الأدوار فقط ويتم تقييمها بعد ارتباطات النظير أو نظير الأصل وقبل الارتباطات الخاصة بالخادم فقط. إذا كان الارتباط يضبط أيضًا حقول مطابقة أخرى (مثل `peer` + `guildId` + `roles`)، فيجب أن تتطابق كل الحقول المضبوطة.
+استخدم `bindings[].match.roles` لتوجيه أعضاء خادم Discord إلى وكلاء مختلفين حسب معرّف الدور. تقبل عمليات الربط القائمة على الدور معرّفات الأدوار فقط، ويتم تقييمها بعد عمليات الربط النظيرة أو النظير الأصل وقبل عمليات الربط الخاصة بالخادم فقط. إذا كان الربط يعيّن أيضًا حقول مطابقة أخرى (على سبيل المثال `peer` + `guildId` + `roles`) فيجب أن تتطابق جميع الحقول المهيأة.
 
 ```json5
 {
@@ -510,20 +510,20 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
   </Accordion>
 
-  <Accordion title="intents المميزة">
+  <Accordion title="intents ذات الامتيازات">
     في **Bot -> Privileged Gateway Intents**، فعّل:
 
     - Message Content Intent
     - Server Members Intent (موصى به)
 
-    يكون Presence intent اختياريًا ولا يكون مطلوبًا إلا إذا كنت تريد تلقي تحديثات الحالة. لا يتطلب تعيين حالة bot (`setPresence`) تفعيل تحديثات الحالة للأعضاء.
+    Intent الحالة اختياري ومطلوب فقط إذا كنت تريد تلقي تحديثات الحالة. لا يتطلب تعيين حالة bot (`setPresence`) تفعيل تحديثات الحالة للأعضاء.
 
   </Accordion>
 
   <Accordion title="نطاقات OAuth والأذونات الأساسية">
-    مولّد URL الخاص بـ OAuth:
+    مُولّد عنوان URL لـ OAuth:
 
-    - النطاقات: `bot`، `applications.commands`
+    - النطاقات: `bot`, `applications.commands`
 
     الأذونات الأساسية المعتادة:
 
@@ -534,7 +534,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     - Attach Files
     - Add Reactions (اختياري)
 
-    تجنب `Administrator` ما لم يكن مطلوبًا صراحة.
+    تجنب `Administrator` ما لم تكن هناك حاجة صريحة إليه.
 
   </Accordion>
 
@@ -545,20 +545,20 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     - معرّف القناة
     - معرّف المستخدم
 
-    فضّل استخدام المعرّفات الرقمية في إعدادات OpenClaw من أجل تدقيقات وفحوصات أكثر موثوقية.
+    يُفضّل استخدام المعرّفات الرقمية في config الخاص بـ OpenClaw للحصول على تدقيقات وفحوصات أكثر موثوقية.
 
   </Accordion>
 </AccordionGroup>
 
 ## الأوامر الأصلية ومصادقة الأوامر
 
-- القيمة الافتراضية لـ `commands.native` هي `"auto"` وهي مفعّلة في Discord.
-- تجاوز لكل قناة: `channels.discord.commands.native`.
-- يؤدي `commands.native=false` إلى مسح أوامر Discord الأصلية المسجّلة سابقًا صراحةً.
-- تستخدم مصادقة الأوامر الأصلية نفس قوائم السماح/السياسات الخاصة بـ Discord المستخدمة في معالجة الرسائل العادية.
-- قد تظل الأوامر مرئية في واجهة Discord للمستخدمين غير المصرّح لهم؛ لكن التنفيذ يظل يفرض مصادقة OpenClaw ويعيد "غير مخوّل".
+- القيمة الافتراضية لـ `commands.native` هي `"auto"` وهي مفعلة لـ Discord.
+- تجاوز خاص بكل قناة: `channels.discord.commands.native`.
+- يقوم `commands.native=false` بمسح أوامر Discord الأصلية المسجّلة سابقًا بشكل صريح.
+- تستخدم مصادقة الأوامر الأصلية نفس قوائم السماح/السياسات الخاصة بـ Discord مثل معالجة الرسائل العادية.
+- قد تظل الأوامر مرئية في واجهة Discord للمستخدمين غير المصرح لهم؛ لكن التنفيذ يظل يفرض مصادقة OpenClaw ويُرجع "غير مصرح".
 
-راجع [أوامر الشرطة المائلة](/ar/tools/slash-commands) للاطلاع على فهرس الأوامر والسلوك.
+راجع [Slash commands](/ar/tools/slash-commands) للاطلاع على فهرس الأوامر وسلوكها.
 
 إعدادات أوامر الشرطة المائلة الافتراضية:
 
@@ -568,39 +568,40 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
 <AccordionGroup>
   <Accordion title="وسوم الردود والردود الأصلية">
-    يدعم Discord وسوم الرد في مخرجات الوكيل:
+    يدعم Discord وسوم الردود في مخرجات الوكيل:
 
     - `[[reply_to_current]]`
     - `[[reply_to:<id>]]`
 
-    يتم التحكم بها عبر `channels.discord.replyToMode`:
+    يتم التحكم بذلك بواسطة `channels.discord.replyToMode`:
 
-    - `off` (افتراضي)
+    - `off` (الافتراضي)
     - `first`
     - `all`
     - `batched`
 
-    ملاحظة: يؤدي `off` إلى تعطيل ترابط الرد الضمني. ولا تزال وسوم `[[reply_to_*]]` الصريحة محترمة.
-    يقوم `first` دائمًا بإرفاق مرجع الرد الأصلي الضمني بأول رسالة Discord صادرة في الدورة.
-    يقوم `batched` بإرفاق مرجع الرد الأصلي الضمني في Discord فقط عندما
-    تكون الدورة الواردة دفعة مؤجلة من عدة رسائل. وهذا مفيد
-    عندما تريد الردود الأصلية أساسًا للمحادثات السريعة الملتبسة، وليس لكل
-    دورة رسالة مفردة.
+    ملاحظة: يؤدي `off` إلى تعطيل تسلسل الردود الضمني. ومع ذلك، لا تزال وسوم `[[reply_to_*]]` الصريحة مُحترمة.
+    يقوم `first` دائمًا بإرفاق مرجع الرد الأصلي الضمني بأول رسالة Discord صادرة في هذا الدور.
+    يقوم `batched` بإرفاق مرجع الرد الأصلي الضمني الخاص بـ Discord فقط عندما
+    يكون الدور الوارد عبارة عن دفعة مؤجلة من عدة رسائل. وهذا مفيد
+    عندما تريد الردود الأصلية أساسًا للمحادثات السريعة والملتبسة، وليس لكل
+    دور من رسالة واحدة.
 
-    يتم إظهار معرّفات الرسائل في السياق/السجل لكي تتمكن الوكلاء من استهداف رسائل محددة.
+    يتم إظهار معرّفات الرسائل في السياق/السجل حتى يتمكن الوكلاء من استهداف رسائل محددة.
 
   </Accordion>
 
   <Accordion title="معاينة البث المباشر">
-    يمكن لـ OpenClaw بث مسودات الردود عن طريق إرسال رسالة مؤقتة وتعديلها مع وصول النص.
+    يمكن لـ OpenClaw بث الردود الأولية عبر إرسال رسالة مؤقتة وتحريرها مع وصول النص.
 
     - يتحكم `channels.discord.streaming` في بث المعاينة (`off` | `partial` | `block` | `progress`، الافتراضي: `off`).
-    - يبقى الافتراضي `off` لأن تعديلات معاينة Discord قد تصطدم بحدود المعدّل بسرعة، خاصة عندما تشارك عدة bots أو بوابات الحساب نفسه أو حركة خادم واحدة.
-    - القيمة `progress` مقبولة لتحقيق الاتساق عبر القنوات ويتم ربطها إلى `partial` على Discord.
+    - يبقى الافتراضي `off` لأن تعديلات معاينة Discord قد تصطدم بحدود المعدل بسرعة، خصوصًا عندما تتشارك عدة bots أو Gateways الحساب نفسه أو حركة مرور الخادم نفسه.
+    - القيمة `progress` مقبولة للحفاظ على الاتساق عبر القنوات، ويتم ربطها بـ `partial` في Discord.
     - `channels.discord.streamMode` اسم بديل قديم ويتم ترحيله تلقائيًا.
-    - يقوم `partial` بتعديل رسالة معاينة واحدة مع وصول التوكنات.
-    - يصدر `block` كتلًا بحجم المسودة (استخدم `draftChunk` لضبط الحجم ونقاط الفصل).
-    - يتحكم `streaming.preview.toolProgress` فيما إذا كانت تحديثات الأداة/التقدم تعيد استخدام رسالة معاينة المسودة نفسها (الافتراضي: `true`). اضبطها على `false` للاحتفاظ برسائل أداة/تقدم منفصلة.
+    - يقوم `partial` بتحرير رسالة معاينة واحدة مع وصول الرموز.
+    - يقوم `block` بإخراج أجزاء بحجم المسودة (استخدم `draftChunk` لضبط الحجم ونقاط الانقسام).
+    - تؤدي الردود الإعلامية، وردود الأخطاء، والردود النهائية الصريحة إلى إلغاء تعديلات المعاينة المعلقة من دون تفريغ مسودة مؤقتة قبل التسليم العادي.
+    - يتحكم `streaming.preview.toolProgress` فيما إذا كانت تحديثات الأداة/التقدم ستعيد استخدام رسالة معاينة المسودة نفسها (الافتراضي: `true`). اضبطه على `false` للاحتفاظ برسائل أداة/تقدم منفصلة.
 
     مثال:
 
@@ -614,7 +615,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 }
 ```
 
-    إعدادات تقطيع الوضع `block` الافتراضية (مقيّدة بالقيمة `channels.discord.textChunkLimit`):
+    الإعدادات الافتراضية لتجزئة وضع `block` (مقيدة إلى `channels.discord.textChunkLimit`):
 
 ```json5
 {
@@ -631,18 +632,18 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 }
 ```
 
-    بث المعاينة خاص بالنص فقط؛ وتعود الردود التي تحتوي على وسائط إلى التسليم العادي.
+    بث المعاينة نصّي فقط؛ أما ردود الوسائط فتعود إلى التسليم العادي.
 
-    ملاحظة: بث المعاينة منفصل عن البث الكتلي. عند تفعيل
-    البث الكتلي صراحةً لـ Discord، يتخطى OpenClaw بث المعاينة لتجنب البث المزدوج.
+    ملاحظة: بث المعاينة منفصل عن البث على شكل كتل. عند تفعيل
+    البث على شكل كتل صراحةً لـ Discord، يتجاوز OpenClaw بث المعاينة لتجنب البث المزدوج.
 
   </Accordion>
 
-  <Accordion title="السجل والسياق وسلوك الخيوط">
+  <Accordion title="السجل والسياق وسلوك سلاسل المحادثات">
     سياق سجل الخادم:
 
-    - `channels.discord.historyLimit` الافتراضي `20`
-    - البديل: `messages.groupChat.historyLimit`
+    - القيمة الافتراضية لـ `channels.discord.historyLimit` هي `20`
+    - الاحتياط: `messages.groupChat.historyLimit`
     - القيمة `0` تعطل الميزة
 
     عناصر التحكم في سجل الرسائل الخاصة:
@@ -650,30 +651,30 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     - `channels.discord.dmHistoryLimit`
     - `channels.discord.dms["<user_id>"].historyLimit`
 
-    سلوك الخيوط:
+    سلوك سلاسل المحادثات:
 
-    - يتم توجيه خيوط Discord كجلسات قنوات
-    - يمكن استخدام بيانات الخيط الأب الوصفية لربط جلسة الأصل
-    - يرث إعداد الخيط إعداد القناة الأب ما لم يوجد إدخال خاص بالخيط
+    - يتم توجيه سلاسل محادثات Discord كجلسات قنوات
+    - يمكن استخدام بيانات السلسلة الأصلية الوصفية للربط مع الجلسة الأصل
+    - يرث config الخاص بالسلسلة config القناة الأصل ما لم توجد إدخالة خاصة بالسلسلة
 
-    يتم حقن مواضيع القنوات كسياق **غير موثوق** (وليس كـ system prompt).
-    يبقى سياق الرد والرسالة المقتبسة حاليًا كما تم استلامه.
-    تتحكم قوائم السماح في Discord أساسًا في من يمكنه تشغيل الوكيل، وليست حدًا كاملًا لتنقيح السياق الإضافي.
+    يتم حقن موضوعات القنوات كسياق **غير موثوق** (وليس كموجّه نظام).
+    يظل سياق الردود والرسائل المقتبسة حاليًا كما تم استلامه.
+    تعمل قوائم السماح في Discord أساسًا كبوابة تحدد من يمكنه تشغيل الوكيل، وليست حدًا كاملًا لتنقيح السياق الإضافي.
 
   </Accordion>
 
-  <Accordion title="جلسات مرتبطة بالخيوط للوكلاء الفرعيين">
-    يمكن لـ Discord ربط خيط بهدف جلسة بحيث تستمر الرسائل اللاحقة في ذلك الخيط في التوجيه إلى الجلسة نفسها (بما في ذلك جلسات الوكلاء الفرعيين).
+  <Accordion title="جلسات مرتبطة بسلاسل المحادثات للوكلاء الفرعيين">
+    يمكن لـ Discord ربط سلسلة محادثة بهدف جلسة بحيث تستمر الرسائل اللاحقة في تلك السلسلة بالتوجيه إلى الجلسة نفسها (بما في ذلك جلسات الوكلاء الفرعيين).
 
     الأوامر:
 
-    - `/focus <target>` ربط الخيط الحالي/الجديد بهدف وكيل فرعي/جلسة
-    - `/unfocus` إزالة الربط الحالي للخيط
+    - `/focus <target>` ربط السلسلة الحالية/الجديدة بهدف وكيل فرعي/جلسة
+    - `/unfocus` إزالة ربط السلسلة الحالية
     - `/agents` عرض التشغيلات النشطة وحالة الربط
-    - `/session idle <duration|off>` فحص/تحديث إلغاء التركيز التلقائي بسبب عدم النشاط للارتباطات المركزة
-    - `/session max-age <duration|off>` فحص/تحديث الحد الأقصى الصارم للعمر للارتباطات المركزة
+    - `/session idle <duration|off>` فحص/تحديث إلغاء التركيز التلقائي بسبب عدم النشاط لعمليات الربط المركزة
+    - `/session max-age <duration|off>` فحص/تحديث الحد الأقصى الصارم للعمر لعمليات الربط المركزة
 
-    الإعدادات:
+    Config:
 
 ```json5
 {
@@ -699,24 +700,24 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
     ملاحظات:
 
-    - يضبط `session.threadBindings.*` الإعدادات الافتراضية العامة.
+    - يعيّن `session.threadBindings.*` الإعدادات الافتراضية العامة.
     - يتجاوز `channels.discord.threadBindings.*` سلوك Discord.
-    - يجب أن تكون `spawnSubagentSessions` بقيمة true لإنشاء/ربط الخيوط تلقائيًا لـ `sessions_spawn({ thread: true })`.
-    - يجب أن تكون `spawnAcpSessions` بقيمة true لإنشاء/ربط الخيوط تلقائيًا لـ ACP (`/acp spawn ... --thread ...` أو `sessions_spawn({ runtime: "acp", thread: true })`).
-    - إذا كانت ارتباطات الخيوط معطلة لحساب ما، فلن تكون `/focus` وعمليات ربط الخيوط ذات الصلة متاحة.
+    - يجب أن تكون `spawnSubagentSessions` مساوية لـ true لإنشاء/ربط السلاسل تلقائيًا لـ `sessions_spawn({ thread: true })`.
+    - يجب أن تكون `spawnAcpSessions` مساوية لـ true لإنشاء/ربط السلاسل تلقائيًا لـ ACP (`/acp spawn ... --thread ...` أو `sessions_spawn({ runtime: "acp", thread: true })`).
+    - إذا كانت عمليات ربط السلاسل معطلة لحساب ما، فلن تكون `/focus` وعمليات ربط السلاسل ذات الصلة متاحة.
 
-    راجع [الوكلاء الفرعيون](/ar/tools/subagents)، و[وكلاء ACP](/ar/tools/acp-agents)، و[مرجع الإعدادات](/ar/gateway/configuration-reference).
+    راجع [Sub-agents](/ar/tools/subagents) و[ACP Agents](/ar/tools/acp-agents) و[Configuration Reference](/ar/gateway/configuration-reference).
 
   </Accordion>
 
-  <Accordion title="ارتباطات قنوات ACP الدائمة">
-    لمساحات عمل ACP مستقرة "دائمة التشغيل"، قم بإعداد ارتباطات ACP مكتوبة على المستوى الأعلى تستهدف محادثات Discord.
+  <Accordion title="عمليات ربط قنوات ACP الدائمة">
+    لمساحات عمل ACP المستقرة و"الدائمة التشغيل"، قم بتهيئة عمليات ربط ACP مكتوبة من المستوى الأعلى تستهدف محادثات Discord.
 
-    مسار الإعدادات:
+    مسار Config:
 
-- `bindings[]` مع `type: "acp"` و`match.channel: "discord"`
+    - `bindings[]` مع `type: "acp"` و`match.channel: "discord"`
 
-مثال:
+    مثال:
 
 ```json5
 {
@@ -766,15 +767,15 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
     ملاحظات:
 
-    - يقوم `/acp spawn codex --bind here` بربط قناة Discord الحالية أو الخيط الحالي في مكانه، ويُبقي الرسائل المستقبلية موجّهة إلى جلسة ACP نفسها.
-    - قد يعني ذلك أيضًا "بدء جلسة Codex ACP جديدة"، لكنه لا يُنشئ خيط Discord جديدًا بحد ذاته. تظل القناة الحالية هي سطح الدردشة.
-    - قد يستمر Codex في العمل ضمن `cwd` أو مساحة عمل backend الخاصة به على القرص. مساحة العمل هذه هي حالة وقت تشغيل، وليست خيط Discord.
-    - يمكن لرسائل الخيط أن ترث ارتباط ACP الخاص بالقناة الأصل.
-    - في قناة أو خيط مرتبط، يقوم `/new` و`/reset` بإعادة تعيين جلسة ACP نفسها في مكانها.
-    - لا تزال ارتباطات الخيوط المؤقتة تعمل ويمكنها تجاوز حل الهدف أثناء نشاطها.
-    - لا تكون `spawnAcpSessions` مطلوبة إلا عندما يحتاج OpenClaw إلى إنشاء/ربط خيط فرعي عبر `--thread auto|here`. وهي ليست مطلوبة لـ `/acp spawn ... --bind here` في القناة الحالية.
+    - يقوم `/acp spawn codex --bind here` بربط قناة Discord الحالية أو سلسلة المحادثة الحالية في مكانها ويحافظ على توجيه الرسائل المستقبلية إلى جلسة ACP نفسها.
+    - قد يعني ذلك أيضًا "بدء جلسة Codex ACP جديدة"، لكنه لا ينشئ سلسلة محادثة جديدة في Discord بحد ذاته. تبقى القناة الحالية هي واجهة الدردشة.
+    - قد يظل Codex يعمل ضمن `cwd` الخاص به أو ضمن مساحة عمل backend الخاصة به على القرص. مساحة العمل هذه هي حالة وقت تشغيل، وليست سلسلة محادثة في Discord.
+    - يمكن لرسائل سلاسل المحادثات أن ترث ربط ACP الخاص بالقناة الأصل.
+    - في قناة أو سلسلة محادثة مرتبطة، يعيد `/new` و`/reset` تعيين جلسة ACP نفسها في مكانها.
+    - لا تزال عمليات ربط سلاسل المحادثات المؤقتة تعمل ويمكنها تجاوز تحديد الهدف أثناء نشاطها.
+    - تكون `spawnAcpSessions` مطلوبة فقط عندما يحتاج OpenClaw إلى إنشاء/ربط سلسلة محادثة فرعية عبر `--thread auto|here`. وهي غير مطلوبة لأجل `/acp spawn ... --bind here` في القناة الحالية.
 
-    راجع [وكلاء ACP](/ar/tools/acp-agents) للحصول على تفاصيل سلوك الارتباط.
+    راجع [ACP Agents](/ar/tools/acp-agents) للاطلاع على تفاصيل سلوك الربط.
 
   </Accordion>
 
@@ -782,15 +783,15 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     وضع إشعارات التفاعلات لكل خادم:
 
     - `off`
-    - `own` (افتراضي)
+    - `own` (الافتراضي)
     - `all`
     - `allowlist` (يستخدم `guilds.<id>.users`)
 
-    تتحول أحداث التفاعل إلى أحداث نظام وتُرفق بجلسة Discord الموجّهة.
+    يتم تحويل أحداث التفاعل إلى أحداث نظام وإرفاقها بجلسة Discord الموجّهة.
 
   </Accordion>
 
-  <Accordion title="تفاعلات الإقرار">
+  <Accordion title="تفاعلات التأكيد">
     يرسل `ackReaction` رمزًا تعبيريًا للتأكيد بينما يعالج OpenClaw رسالة واردة.
 
     ترتيب الحل:
@@ -798,19 +799,19 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     - `channels.discord.accounts.<accountId>.ackReaction`
     - `channels.discord.ackReaction`
     - `messages.ackReaction`
-    - البديل من الرمز التعبيري لهوية الوكيل (`agents.list[].identity.emoji`، وإلا `"👀"`)
+    - احتياط الرمز التعبيري لهوية الوكيل (`agents.list[].identity.emoji`، وإلا "👀")
 
     ملاحظات:
 
-    - يقبل Discord الرموز التعبيرية unicode أو أسماء الرموز التعبيرية المخصصة.
+    - يقبل Discord الرموز التعبيرية الموحدة unicode أو أسماء الرموز التعبيرية المخصصة.
     - استخدم `""` لتعطيل التفاعل لقناة أو حساب.
 
   </Accordion>
 
-  <Accordion title="كتابات الإعدادات">
-    تكون كتابات الإعدادات التي تبدأ من القناة مفعّلة افتراضيًا.
+  <Accordion title="كتابات Config">
+    تكون كتابات config التي تبدأ من القناة مفعلة افتراضيًا.
 
-    يؤثر هذا في تدفقات `/config set|unset` (عند تفعيل ميزات الأوامر).
+    يؤثر ذلك في تدفقات `/config set|unset` (عند تفعيل ميزات الأوامر).
 
     للتعطيل:
 
@@ -827,7 +828,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
   </Accordion>
 
   <Accordion title="وكيل Gateway">
-    وجّه حركة WebSocket الخاصة ببوابة Discord وعمليات بحث REST عند بدء التشغيل (معرّف التطبيق + حل قائمة السماح) عبر وكيل HTTP(S) باستخدام `channels.discord.proxy`.
+    وجّه حركة مرور WebSocket الخاصة بـ Discord gateway وعمليات بحث REST عند بدء التشغيل (معرّف التطبيق + حل قائمة السماح) عبر وكيل HTTP(S) باستخدام `channels.discord.proxy`.
 
 ```json5
 {
@@ -858,7 +859,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
   </Accordion>
 
   <Accordion title="دعم PluralKit">
-    فعّل حل PluralKit لربط الرسائل الممررة عبر الوكيل بهوية عضو النظام:
+    فعّل حل PluralKit لربط الرسائل الممرّرة عبر الوكيل بهوية عضو النظام:
 
 ```json5
 {
@@ -876,16 +877,16 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     ملاحظات:
 
     - يمكن أن تستخدم قوائم السماح `pk:<memberId>`
-    - تتم مطابقة أسماء عرض الأعضاء بالاسم/slug فقط عندما تكون `channels.discord.dangerouslyAllowNameMatching: true`
-    - تستخدم عمليات البحث معرّف الرسالة الأصلي وتكون مقيّدة بنافذة زمنية
-    - إذا فشل البحث، فسيتم التعامل مع الرسائل الممررة عبر الوكيل كرسائل bot وسيتم إسقاطها ما لم تكن `allowBots=true`
+    - تتم مطابقة أسماء العرض الخاصة بالأعضاء حسب الاسم/slug فقط عندما تكون `channels.discord.dangerouslyAllowNameMatching: true`
+    - تستخدم عمليات البحث معرّف الرسالة الأصلية وتكون مقيّدة بنافذة زمنية
+    - إذا فشل البحث، فسيتم التعامل مع الرسائل الممرّرة عبر الوكيل على أنها رسائل bot وسيتم إسقاطها ما لم تكن `allowBots=true`
 
   </Accordion>
 
-  <Accordion title="إعداد الحالة">
-    يتم تطبيق تحديثات الحالة عند تعيين حقل حالة أو نشاط، أو عند تفعيل الحالة التلقائية.
+  <Accordion title="تهيئة الحالة">
+    يتم تطبيق تحديثات الحالة عندما تقوم بتعيين حقل حالة أو نشاط، أو عند تفعيل الحالة التلقائية.
 
-    مثال للحالة فقط:
+    مثال على الحالة فقط:
 
 ```json5
 {
@@ -897,7 +898,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 }
 ```
 
-    مثال للنشاط (حالة مخصصة هي نوع النشاط الافتراضي):
+    مثال على النشاط (الحالة المخصصة هي نوع النشاط الافتراضي):
 
 ```json5
 {
@@ -910,7 +911,7 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 }
 ```
 
-    مثال للبث:
+    مثال على البث:
 
 ```json5
 {
@@ -930,10 +931,10 @@ openclaw message thread create --channel discord --target channel:<forumId> \
     - 1: Streaming (يتطلب `activityUrl`)
     - 2: Listening
     - 3: Watching
-    - 4: Custom (يستخدم نص النشاط كحالة الحالة؛ والرمز التعبيري اختياري)
+    - 4: Custom (يستخدم نص النشاط كحالة؛ والرمز التعبيري اختياري)
     - 5: Competing
 
-    مثال للحالة التلقائية (إشارة صحة وقت التشغيل):
+    مثال على الحالة التلقائية (إشارة سلامة وقت التشغيل):
 
 ```json5
 {
@@ -943,14 +944,14 @@ openclaw message thread create --channel discord --target channel:<forumId> \
         enabled: true,
         intervalMs: 30000,
         minUpdateIntervalMs: 15000,
-        exhaustedText: "token exhausted",
+        exhaustedText: "تم استهلاك token",
       },
     },
   },
 }
 ```
 
-    تربط الحالة التلقائية توافر وقت التشغيل بحالة Discord على النحو التالي: healthy => online، وdegraded أو unknown => idle، وexhausted أو unavailable => dnd. تجاوزات النص الاختيارية:
+    تربط الحالة التلقائية مدى توفر وقت التشغيل بحالة Discord: healthy => online، وdegraded أو unknown => idle، وexhausted أو unavailable => dnd. تجاوزات النص الاختيارية:
 
     - `autoPresence.healthyText`
     - `autoPresence.degradedText`
@@ -961,63 +962,63 @@ openclaw message thread create --channel discord --target channel:<forumId> \
   <Accordion title="الموافقات في Discord">
     يدعم Discord معالجة الموافقات المستندة إلى الأزرار في الرسائل الخاصة، ويمكنه اختياريًا نشر مطالبات الموافقة في القناة الأصلية.
 
-    مسار الإعدادات:
+    مسار Config:
 
     - `channels.discord.execApprovals.enabled`
-    - `channels.discord.execApprovals.approvers` (اختياري؛ يعود إلى `commands.ownerAllowFrom` عندما يكون ذلك ممكنًا)
+    - `channels.discord.execApprovals.approvers` (اختياري؛ يستخدم الاحتياط `commands.ownerAllowFrom` عندما يكون ذلك ممكنًا)
     - `channels.discord.execApprovals.target` (`dm` | `channel` | `both`، الافتراضي: `dm`)
-    - `agentFilter` و`sessionFilter` و`cleanupAfterResolve`
+    - `agentFilter`، `sessionFilter`، `cleanupAfterResolve`
 
-    يفعّل Discord موافقات exec الأصلية تلقائيًا عندما تكون `enabled` غير مضبوطة أو `"auto"` ويمكن حلّ مُوافِق واحد على الأقل، سواء من `execApprovals.approvers` أو من `commands.ownerAllowFrom`. لا يستنتج Discord مُوافِقي exec من `allowFrom` الخاص بالقناة أو `dm.allowFrom` القديم أو `defaultTo` الخاص بالرسائل المباشرة. اضبط `enabled: false` لتعطيل Discord كعميل موافقة أصلي صراحةً.
+    يقوم Discord بتفعيل موافقات exec الأصلية تلقائيًا عندما تكون `enabled` غير مضبوطة أو `"auto"` ويكون بالإمكان حل مُوافِق واحد على الأقل، إما من `execApprovals.approvers` أو من `commands.ownerAllowFrom`. لا يستنتج Discord الموافقين على exec من `allowFrom` الخاصة بالقناة، أو `dm.allowFrom` القديمة، أو `defaultTo` الخاصة بالرسائل المباشرة. اضبط `enabled: false` لتعطيل Discord كعميل موافقة أصلي بشكل صريح.
 
-    عندما تكون قيمة `target` هي `channel` أو `both`، تكون مطالبة الموافقة مرئية في القناة. لا يمكن استخدام الأزرار إلا من قبل المُوافِقين الذين تم حلّهم؛ ويتلقى المستخدمون الآخرون رفضًا مؤقتًا مرئيًا لهم فقط. تتضمن مطالبات الموافقة نص الأمر، لذلك فعّل التسليم إلى القناة فقط في القنوات الموثوقة. إذا تعذر اشتقاق معرّف القناة من مفتاح الجلسة، يعود OpenClaw إلى التسليم عبر الرسائل الخاصة.
+    عندما تكون `target` مساوية لـ `channel` أو `both`، تكون مطالبة الموافقة مرئية في القناة. لا يمكن إلا للموافقين الذين تم حلهم استخدام الأزرار؛ أما المستخدمون الآخرون فيتلقون رفضًا مؤقتًا مرئيًا لهم فقط. تتضمن مطالبات الموافقة نص الأمر، لذا لا تفعّل التسليم عبر القناة إلا في القنوات الموثوقة. إذا تعذر اشتقاق معرّف القناة من مفتاح الجلسة، يعود OpenClaw إلى التسليم عبر الرسائل الخاصة.
 
-    يعرض Discord أيضًا أزرار الموافقة المشتركة التي تستخدمها قنوات الدردشة الأخرى. يضيف مُكيّف Discord الأصلي أساسًا توجيه الرسائل الخاصة للمُوافِقين والنشر إلى القناة.
-    عندما تكون هذه الأزرار موجودة، فإنها تكون تجربة الاستخدام الأساسية للموافقات؛ ويجب على OpenClaw
-    ألا يضمّن أمر `/approve` يدويًا إلا عندما تشير نتيجة الأداة إلى
-    أن الموافقات عبر الدردشة غير متاحة أو أن الموافقة اليدوية هي المسار الوحيد.
+    يعرض Discord أيضًا أزرار الموافقة المشتركة المستخدمة من قنوات الدردشة الأخرى. يضيف المهايئ الأصلي لـ Discord أساسًا توجيه الرسائل الخاصة للموافقين والتوزيع إلى القنوات.
+    عندما تكون هذه الأزرار موجودة، فإنها تشكل تجربة المستخدم الأساسية للموافقة؛ ويجب على OpenClaw
+    أن يتضمن أمر `/approve` اليدوي فقط عندما تشير نتيجة الأداة إلى
+    أن موافقات الدردشة غير متاحة أو أن الموافقة اليدوية هي المسار الوحيد.
 
-    تستخدم مصادقة Gateway لهذا المعالج عقد حل بيانات الاعتماد المشترك نفسه المستخدم مع عملاء Gateway الآخرين:
+    تستخدم مصادقة Gateway لهذا المعالج نفس عقد حل بيانات الاعتماد المشتركة الذي تستخدمه بقية عملاء Gateway:
 
     - مصادقة محلية تبدأ من env (`OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD` ثم `gateway.auth.*`)
-    - في الوضع المحلي، يمكن استخدام `gateway.remote.*` كبديل فقط عندما لا تكون `gateway.auth.*` مضبوطة؛ وتفشل قيم SecretRef المحلية المُعدّة لكن غير المحلولة بشكل مغلق
-    - دعم الوضع البعيد عبر `gateway.remote.*` عندما ينطبق ذلك
-    - تكون تجاوزات URL آمنة من حيث التجاوز: لا تعيد تجاوزات CLI استخدام بيانات الاعتماد الضمنية، وتستخدم تجاوزات env بيانات اعتماد env فقط
+    - في الوضع المحلي، يمكن استخدام `gateway.remote.*` كاحتياط فقط عندما لا تكون `gateway.auth.*` مضبوطة؛ وتفشل SecretRef المحلية المضبوطة ولكن غير المحلولة بشكل مغلق
+    - دعم الوضع البعيد عبر `gateway.remote.*` عند الاقتضاء
+    - تكون تجاوزات URL آمنة بالنسبة للتجاوز: لا تعيد تجاوزات CLI استخدام بيانات الاعتماد الضمنية، وتستخدم تجاوزات env بيانات اعتماد env فقط
 
-    سلوك حل الموافقات:
+    سلوك حل الموافقة:
 
-    - يتم حل المعرّفات المسبوقة بـ `plugin:` عبر `plugin.approval.resolve`.
+    - يتم حل المعرّفات التي تبدأ بـ `plugin:` عبر `plugin.approval.resolve`.
     - يتم حل المعرّفات الأخرى عبر `exec.approval.resolve`.
-    - لا يقوم Discord هنا بقفزة بديلة إضافية من exec إلى plugin؛ إذ يحدد
-      بادئة المعرّف طريقة Gateway التي يستدعيها.
+    - لا يقوم Discord هنا بقفزة احتياط إضافية من exec إلى plugin؛ فبادئة
+      المعرّف هي التي تحدد طريقة Gateway التي سيستدعيها.
 
-    تنتهي صلاحية موافقات exec بعد 30 دقيقة افتراضيًا. إذا فشلت الموافقات مع
-    معرّفات موافقة غير معروفة، فتحقق من حل المُوافِقين وتفعيل الميزة
-    وأن نوع معرّف الموافقة المُسلَّم يطابق الطلب المعلّق.
+    تنتهي صلاحية موافقات Exec بعد 30 دقيقة افتراضيًا. إذا فشلت الموافقات مع
+    معرّفات موافقة غير معروفة، فتحقق من حل الموافقين، وتفعيل الميزة، و
+    من أن نوع معرّف الموافقة الذي تم تسليمه يطابق الطلب المعلّق.
 
-    المستندات ذات الصلة: [موافقات Exec](/ar/tools/exec-approvals)
+    المستندات ذات الصلة: [Exec approvals](/ar/tools/exec-approvals)
 
   </Accordion>
 </AccordionGroup>
 
 ## الأدوات وبوابات الإجراءات
 
-تتضمن إجراءات رسائل Discord إجراءات المراسلة وإدارة القنوات والإشراف والحالة وإجراءات البيانات الوصفية.
+تتضمن إجراءات رسائل Discord إجراءات المراسلة، وإدارة القنوات، والإشراف، والحالة، وإجراءات البيانات الوصفية.
 
 أمثلة أساسية:
 
-- المراسلة: `sendMessage` و`readMessages` و`editMessage` و`deleteMessage` و`threadReply`
-- التفاعلات: `react` و`reactions` و`emojiList`
-- الإشراف: `timeout` و`kick` و`ban`
+- المراسلة: `sendMessage`, `readMessages`, `editMessage`, `deleteMessage`, `threadReply`
+- التفاعلات: `react`, `reactions`, `emojiList`
+- الإشراف: `timeout`, `kick`, `ban`
 - الحالة: `setPresence`
 
-يقبل الإجراء `event-create` معامل `image` اختياريًا (URL أو مسار ملف محلي) لتعيين صورة غلاف الحدث المجدول.
+يقبل الإجراء `event-create` وسيط `image` اختياريًا (URL أو مسار ملف محلي) لتعيين صورة غلاف الحدث المجدول.
 
-توجد بوابات الإجراءات تحت `channels.discord.actions.*`.
+توجد بوابات الإجراءات ضمن `channels.discord.actions.*`.
 
 سلوك البوابة الافتراضي:
 
-| مجموعة الإجراء                                                                                                                                                           | الافتراضي |
+| مجموعة الإجراءات                                                                                                                                                        | الافتراضي |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
 | reactions, messages, threads, pins, polls, search, memberInfo, roleInfo, channelInfo, channels, voiceStatus, events, stickers, emojiUploads, stickerUploads, permissions | مفعّل     |
 | roles                                                                                                                                                                    | معطّل     |
@@ -1026,10 +1027,10 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
 ## واجهة Components v2
 
-يستخدم OpenClaw Discord components v2 لموافقات exec وعلامات السياق المتقاطع. يمكن أن تقبل إجراءات رسائل Discord أيضًا `components` لواجهة مستخدم مخصصة (متقدم؛ ويتطلب إنشاء حمولة مكوّن عبر أداة discord)، بينما تظل `embeds` القديمة متاحة ولكن لا يُوصى بها.
+يستخدم OpenClaw Discord components v2 لموافقات exec وعلامات السياق المتقاطع. يمكن لإجراءات رسائل Discord أيضًا قبول `components` لواجهة مستخدم مخصصة (متقدم؛ ويتطلب إنشاء حمولة مكوّن عبر أداة discord)، بينما لا تزال `embeds` القديمة متاحة ولكن لا يُنصح بها.
 
 - يضبط `channels.discord.ui.components.accentColor` لون التمييز المستخدم بواسطة حاويات مكوّنات Discord (hex).
-- اضبطه لكل حساب باستخدام `channels.discord.accounts.<id>.ui.components.accentColor`.
+- عيّنه لكل حساب باستخدام `channels.discord.accounts.<id>.ui.components.accentColor`.
 - يتم تجاهل `embeds` عند وجود components v2.
 
 مثال:
@@ -1055,12 +1056,12 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 المتطلبات:
 
 - فعّل الأوامر الأصلية (`commands.native` أو `channels.discord.commands.native`).
-- اضبط `channels.discord.voice`.
-- يحتاج bot إلى أذونات Connect + Speak في القناة الصوتية المستهدفة.
+- قم بتهيئة `channels.discord.voice`.
+- يحتاج bot إلى أذونات Connect وSpeak في القناة الصوتية المستهدفة.
 
-استخدم الأمر الأصلي الخاص بـ Discord فقط `/vc join|leave|status` للتحكم في الجلسات. يستخدم الأمر الوكيل الافتراضي للحساب ويتبع قواعد قائمة السماح وسياسة الخادم نفسها مثل أوامر Discord الأخرى.
+استخدم أمر Discord الأصلي فقط `/vc join|leave|status` للتحكم في الجلسات. يستخدم الأمر الوكيل الافتراضي للحساب ويتبع قواعد قائمة السماح وسياسة المجموعة نفسها مثل أوامر Discord الأخرى.
 
-مثال للانضمام التلقائي:
+مثال على الانضمام التلقائي:
 
 ```json5
 {
@@ -1088,23 +1089,23 @@ openclaw message thread create --channel discord --target channel:<forumId> \
 
 ملاحظات:
 
-- يتجاوز `voice.tts` القيمة `messages.tts` لتشغيل الصوت فقط.
-- تستمد دورات تفريغ الصوت حالة المالك من `allowFrom` في Discord (أو `dm.allowFrom`)؛ ولا يمكن للمتحدثين غير المالكين الوصول إلى الأدوات المخصّصة للمالك فقط (مثل `gateway` و`cron`).
-- تكون الميزة الصوتية مفعّلة افتراضيًا؛ اضبط `channels.discord.voice.enabled=false` لتعطيلها.
-- يتم تمرير `voice.daveEncryption` و`voice.decryptionFailureTolerance` إلى خيارات الانضمام الخاصة بـ `@discordjs/voice`.
-- القيم الافتراضية في `@discordjs/voice` هي `daveEncryption=true` و`decryptionFailureTolerance=24` إذا لم يتم ضبطها.
-- يراقب OpenClaw أيضًا حالات فشل فك التشفير عند الاستقبال ويستعيد تلقائيًا عبر مغادرة القناة الصوتية ثم الانضمام إليها مجددًا بعد تكرار حالات الفشل خلال نافذة قصيرة.
-- إذا كانت سجلات الاستقبال تعرض بشكل متكرر `DecryptionFailed(UnencryptedWhenPassthroughDisabled)`، فقد يكون هذا خطأ الاستقبال من `@discordjs/voice` على مستوى المنبع والمتتبع في [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419).
+- يتجاوز `voice.tts` قيمة `messages.tts` لتشغيل الصوت فقط.
+- تستمد أدوار مالك نوبات النسخ الصوتي من Discord `allowFrom` (أو `dm.allowFrom`)؛ ولا يمكن للمتحدثين غير المالكين الوصول إلى الأدوات المخصصة للمالك فقط (مثل `gateway` و`cron`).
+- يكون الصوت مفعّلًا افتراضيًا؛ اضبط `channels.discord.voice.enabled=false` لتعطيله.
+- يتم تمرير `voice.daveEncryption` و`voice.decryptionFailureTolerance` إلى خيارات الانضمام في `@discordjs/voice`.
+- تكون القيم الافتراضية في `@discordjs/voice` هي `daveEncryption=true` و`decryptionFailureTolerance=24` إذا لم يتم ضبطها.
+- يراقب OpenClaw أيضًا حالات فشل فك التشفير أثناء الاستقبال ويجري استردادًا تلقائيًا عبر مغادرة القناة الصوتية ثم إعادة الانضمام إليها بعد تكرار حالات الفشل خلال نافذة زمنية قصيرة.
+- إذا كانت سجلات الاستقبال تعرض بشكل متكرر `DecryptionFailed(UnencryptedWhenPassthroughDisabled)`، فقد تكون هذه هي مشكلة الاستقبال في `@discordjs/voice` من المنبع والمتعقبة في [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419).
 
 ## الرسائل الصوتية
 
-تعرض الرسائل الصوتية في Discord معاينة للموجة الصوتية وتتطلب صوت OGG/Opus بالإضافة إلى بيانات وصفية. ينشئ OpenClaw الموجة الصوتية تلقائيًا، لكنه يحتاج إلى توفر `ffmpeg` و`ffprobe` على مضيف Gateway لفحص ملفات الصوت وتحويلها.
+تعرض الرسائل الصوتية في Discord معاينة للشكل الموجي وتتطلب صوت OGG/Opus بالإضافة إلى بيانات وصفية. يُنشئ OpenClaw الشكل الموجي تلقائيًا، لكنه يحتاج إلى توفر `ffmpeg` و`ffprobe` على مضيف Gateway لفحص الملفات الصوتية وتحويلها.
 
 المتطلبات والقيود:
 
-- قدّم **مسار ملف محليًا** (يتم رفض عناوين URL).
-- احذف المحتوى النصي (لا يسمح Discord بالنص + رسالة صوتية في الحمولة نفسها).
-- يُقبل أي تنسيق صوتي؛ ويحوّل OpenClaw الملفات إلى OGG/Opus عند الحاجة.
+- وفّر **مسار ملف محلي** (يتم رفض عناوين URL).
+- احذف المحتوى النصي (لا يسمح Discord بالنص + الرسالة الصوتية في الحمولة نفسها).
+- يتم قبول أي تنسيق صوتي؛ ويحوّل OpenClaw الملف إلى OGG/Opus عند الحاجة.
 
 مثال:
 
@@ -1123,11 +1124,11 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
 
   </Accordion>
 
-  <Accordion title="تم حظر رسائل الخادم بشكل غير متوقع">
+  <Accordion title="حظر رسائل الخادم بشكل غير متوقع">
 
     - تحقّق من `groupPolicy`
-    - تحقّق من قائمة السماح الخاصة بالخادم تحت `channels.discord.guilds`
-    - إذا كانت خريطة `channels` الخاصة بالخادم موجودة، فلن يُسمح إلا بالقنوات المدرجة
+    - تحقّق من قائمة السماح الخاصة بالخادم ضمن `channels.discord.guilds`
+    - إذا كانت خريطة `channels` الخاصة بالخادم موجودة، فلا يُسمح إلا بالقنوات المدرجة
     - تحقّق من سلوك `requireMention` وأنماط الإشارة
 
     فحوصات مفيدة:
@@ -1140,35 +1141,35 @@ openclaw logs --follow
 
   </Accordion>
 
-  <Accordion title="القيمة requireMention false لكن لا يزال الحظر قائمًا">
+  <Accordion title="القيمة require mention false ولكن لا يزال هناك حظر">
     الأسباب الشائعة:
 
     - `groupPolicy="allowlist"` بدون قائمة سماح مطابقة للخادم/القناة
-    - تم إعداد `requireMention` في المكان الخطأ (يجب أن يكون تحت `channels.discord.guilds` أو ضمن إدخال القناة)
-    - تم حظر المرسِل بواسطة قائمة السماح `users` الخاصة بالخادم/القناة
+    - تم إعداد `requireMention` في المكان الخطأ (يجب أن يكون ضمن `channels.discord.guilds` أو ضمن إدخال القناة)
+    - تم حظر المرسل بواسطة قائمة السماح `users` الخاصة بالخادم/القناة
 
   </Accordion>
 
   <Accordion title="تنتهي مهلة المعالجات طويلة التشغيل أو تتكرر الردود">
 
-    سجلات نموذجية:
+    السجلات المعتادة:
 
     - `Listener DiscordMessageListener timed out after 30000ms for event MESSAGE_CREATE`
     - `Slow listener detected ...`
     - `discord inbound worker timed out after ...`
 
-    مفتاح ميزانية المستمع:
+    عنصر ضبط ميزانية المستمع:
 
     - حساب واحد: `channels.discord.eventQueue.listenerTimeout`
-    - حسابات متعددة: `channels.discord.accounts.<accountId>.eventQueue.listenerTimeout`
+    - عدة حسابات: `channels.discord.accounts.<accountId>.eventQueue.listenerTimeout`
 
-    مفتاح مهلة تشغيل العامل:
+    عنصر ضبط مهلة تشغيل العامل:
 
     - حساب واحد: `channels.discord.inboundWorker.runTimeoutMs`
-    - حسابات متعددة: `channels.discord.accounts.<accountId>.inboundWorker.runTimeoutMs`
-    - الافتراضي: `1800000` (30 دقيقة)؛ اضبط `0` للتعطيل
+    - عدة حسابات: `channels.discord.accounts.<accountId>.inboundWorker.runTimeoutMs`
+    - الافتراضي: `1800000` (30 دقيقة)؛ اضبطه على `0` لتعطيله
 
-    خط أساس موصى به:
+    الخط الأساسي الموصى به:
 
 ```json5
 {
@@ -1189,8 +1190,8 @@ openclaw logs --follow
 }
 ```
 
-    استخدم `eventQueue.listenerTimeout` لإعداد المستمع البطيء و`inboundWorker.runTimeoutMs`
-    فقط إذا كنت تريد صمام أمان منفصلًا لدورات الوكيل الموضوعة في قائمة الانتظار.
+    استخدم `eventQueue.listenerTimeout` لإعداد المستمع البطيء، واستخدم `inboundWorker.runTimeoutMs`
+    فقط إذا كنت تريد صمام أمان منفصلًا لنوبات الوكيل الموضوعة في قائمة الانتظار.
 
   </Accordion>
 
@@ -1204,24 +1205,24 @@ openclaw logs --follow
   <Accordion title="مشكلات الرسائل الخاصة والاقتران">
 
     - الرسائل الخاصة معطلة: `channels.discord.dm.enabled=false`
-    - سياسة الرسائل الخاصة معطلة: `channels.discord.dmPolicy="disabled"` (قديمًا: `channels.discord.dm.policy`)
+    - سياسة الرسائل الخاصة معطلة: `channels.discord.dmPolicy="disabled"` (القديم: `channels.discord.dm.policy`)
     - انتظار الموافقة على الاقتران في وضع `pairing`
 
   </Accordion>
 
   <Accordion title="حلقات bot إلى bot">
-    يتم تجاهل الرسائل التي أنشأها bot افتراضيًا.
+    يتم تجاهل الرسائل التي يكتبها bot افتراضيًا.
 
-    إذا قمت بتعيين `channels.discord.allowBots=true`، فاستخدم قواعد صارمة للإشارات وقوائم السماح لتجنب سلوك الحلقات.
-    ويفضّل استخدام `channels.discord.allowBots="mentions"` لقبول رسائل bot التي تذكر bot فقط.
+    إذا قمت بتعيين `channels.discord.allowBots=true`، فاستخدم قواعد صارمة للإشارات وقائمة السماح لتجنب سلوك الحلقات.
+    يُفضّل `channels.discord.allowBots="mentions"` لقبول رسائل bot التي تشير إلى bot فقط.
 
   </Accordion>
 
   <Accordion title="انقطاع STT الصوتي مع DecryptionFailed(...)">
 
-    - أبقِ OpenClaw محدّثًا (`openclaw update`) حتى يكون منطق استعادة استقبال Discord الصوتي موجودًا
-    - أكّد أن `channels.discord.voice.daveEncryption=true` (افتراضي)
-    - ابدأ من `channels.discord.voice.decryptionFailureTolerance=24` (القيمة الافتراضية في المنبع) واضبطها فقط عند الحاجة
+    - حافظ على تحديث OpenClaw (`openclaw update`) حتى يكون منطق استرداد استقبال صوت Discord موجودًا
+    - أكّد أن `channels.discord.voice.daveEncryption=true` (الافتراضي)
+    - ابدأ من `channels.discord.voice.decryptionFailureTolerance=24` (الافتراضي من المنبع) واضبطه فقط عند الحاجة
     - راقب السجلات بحثًا عن:
       - `discord voice: DAVE decrypt failures detected`
       - `discord voice: repeated decrypt failures; attempting rejoin`
@@ -1230,41 +1231,41 @@ openclaw logs --follow
   </Accordion>
 </AccordionGroup>
 
-## مؤشرات مرجع الإعدادات
+## مؤشرات مرجعية للإعدادات
 
 المرجع الأساسي:
 
-- [مرجع الإعدادات - Discord](/ar/gateway/configuration-reference#discord)
+- [المرجع الخاص بالإعدادات - Discord](/ar/gateway/configuration-reference#discord)
 
 حقول Discord عالية الأهمية:
 
-- بدء التشغيل/المصادقة: `enabled` و`token` و`accounts.*` و`allowBots`
-- السياسة: `groupPolicy` و`dm.*` و`guilds.*` و`guilds.*.channels.*`
-- الأوامر: `commands.native` و`commands.useAccessGroups` و`configWrites` و`slashCommand.*`
-- قائمة انتظار الأحداث: `eventQueue.listenerTimeout` (ميزانية المستمع) و`eventQueue.maxQueueSize` و`eventQueue.maxConcurrency`
+- بدء التشغيل/المصادقة: `enabled`، `token`، `accounts.*`، `allowBots`
+- السياسة: `groupPolicy`، `dm.*`، `guilds.*`، `guilds.*.channels.*`
+- الأوامر: `commands.native`، `commands.useAccessGroups`، `configWrites`، `slashCommand.*`
+- قائمة انتظار الأحداث: `eventQueue.listenerTimeout` (ميزانية المستمع)، `eventQueue.maxQueueSize`، `eventQueue.maxConcurrency`
 - العامل الوارد: `inboundWorker.runTimeoutMs`
-- الرد/السجل: `replyToMode` و`historyLimit` و`dmHistoryLimit` و`dms.*.historyLimit`
-- التسليم: `textChunkLimit` و`chunkMode` و`maxLinesPerMessage`
-- البث: `streaming` (الاسم البديل القديم: `streamMode`) و`streaming.preview.toolProgress` و`draftChunk` و`blockStreaming` و`blockStreamingCoalesce`
-- الوسائط/إعادة المحاولة: `mediaMaxMb` و`retry`
-  - يحدد `mediaMaxMb` الحد الأقصى لعمليات الرفع الصادرة إلى Discord (الافتراضي: `100MB`)
+- الرد/السجل: `replyToMode`، `historyLimit`، `dmHistoryLimit`، `dms.*.historyLimit`
+- التسليم: `textChunkLimit`، `chunkMode`، `maxLinesPerMessage`
+- البث: `streaming` (الاسم البديل القديم: `streamMode`)، `streaming.preview.toolProgress`، `draftChunk`، `blockStreaming`، `blockStreamingCoalesce`
+- الوسائط/إعادة المحاولة: `mediaMaxMb`، `retry`
+  - يحدد `mediaMaxMb` حدًا أقصى للتحميلات الصادرة إلى Discord (الافتراضي: `100MB`)
 - الإجراءات: `actions.*`
-- الحالة: `activity` و`status` و`activityType` و`activityUrl`
+- الحالة: `activity`، `status`، `activityType`، `activityUrl`
 - واجهة المستخدم: `ui.components.accentColor`
-- الميزات: `threadBindings` و`bindings[]` على المستوى الأعلى (`type: "acp"`) و`pluralkit` و`execApprovals` و`intents` و`agentComponents` و`heartbeat` و`responsePrefix`
+- الميزات: `threadBindings`، `bindings[]` من المستوى الأعلى (`type: "acp"`)، `pluralkit`، `execApprovals`، `intents`، `agentComponents`، `heartbeat`، `responsePrefix`
 
 ## السلامة والعمليات
 
 - تعامل مع bot tokens على أنها أسرار (يُفضّل `DISCORD_BOT_TOKEN` في البيئات الخاضعة للإشراف).
-- امنح أقل قدر ممكن من أذونات Discord.
-- إذا كانت حالة نشر الأوامر/الحالة قديمة، فأعد تشغيل Gateway ثم أعد التحقق باستخدام `openclaw channels status --probe`.
+- امنح أذونات Discord وفق أقل قدر من الامتيازات.
+- إذا كانت حالة/نشر الأوامر قديمة، فأعد تشغيل Gateway وأعد التحقق باستخدام `openclaw channels status --probe`.
 
 ## ذو صلة
 
 - [الاقتران](/ar/channels/pairing)
 - [المجموعات](/ar/channels/groups)
-- [توجيه القناة](/ar/channels/channel-routing)
+- [توجيه القنوات](/ar/channels/channel-routing)
 - [الأمان](/ar/gateway/security)
 - [التوجيه متعدد الوكلاء](/ar/concepts/multi-agent)
 - [استكشاف الأخطاء وإصلاحها](/ar/channels/troubleshooting)
-- [أوامر الشرطة المائلة](/ar/tools/slash-commands)
+- [Slash commands](/ar/tools/slash-commands)

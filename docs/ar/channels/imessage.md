@@ -1,46 +1,46 @@
 ---
 read_when:
     - إعداد دعم iMessage
-    - تصحيح مشكلات الإرسال/الاستقبال في iMessage
+    - تصحيح أخطاء الإرسال/الاستقبال في iMessage
 summary: دعم iMessage القديم عبر imsg ‏(JSON-RPC عبر stdio). يجب أن تستخدم الإعدادات الجديدة BlueBubbles.
 title: iMessage
 x-i18n:
-    generated_at: "2026-04-05T12:35:33Z"
+    generated_at: "2026-04-22T04:20:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 086d85bead49f75d12ae6b14ac917af52375b6afd28f6af1a0dcbbc7fcb628a0
+    source_hash: fb9cc5a0bd4fbc7ff6f792e737bc4302a67f9ab6aa8231ff6f751fe6d732ca5d
     source_path: channels/imessage.md
     workflow: 15
 ---
 
-# iMessage (قديم: imsg)
+# iMessage (القديم: imsg)
 
 <Warning>
-بالنسبة إلى عمليات نشر iMessage الجديدة، استخدم <a href="/channels/bluebubbles">BlueBubbles</a>.
+بالنسبة لعمليات نشر iMessage الجديدة، استخدم <a href="/ar/channels/bluebubbles">BlueBubbles</a>.
 
-تكامل `imsg` قديم وقد تتم إزالته في إصدار مستقبلي.
+يُعد تكامل `imsg` قديمًا وقد تتم إزالته في إصدار مستقبلي.
 </Warning>
 
-الحالة: تكامل CLI خارجي قديم. يقوم Gateway بتشغيل `imsg rpc` والتواصل عبر JSON-RPC على stdio (من دون daemon/port منفصل).
+الحالة: تكامل CLI خارجي قديم. يقوم Gateway بتشغيل `imsg rpc` ويتواصل عبر JSON-RPC على stdio (من دون daemon/منفذ منفصل).
 
 <CardGroup cols={3}>
-  <Card title="BlueBubbles (موصى به)" icon="message-circle" href="/channels/bluebubbles">
+  <Card title="BlueBubbles (موصى به)" icon="message-circle" href="/ar/channels/bluebubbles">
     مسار iMessage المفضل للإعدادات الجديدة.
   </Card>
-  <Card title="الاقتران" icon="link" href="/channels/pairing">
+  <Card title="الاقتران" icon="link" href="/ar/channels/pairing">
     تستخدم الرسائل المباشرة في iMessage وضع الاقتران افتراضيًا.
   </Card>
-  <Card title="مرجع الإعدادات" icon="settings" href="/gateway/configuration-reference#imessage">
-    مرجع كامل لحقول iMessage.
+  <Card title="مرجع الإعدادات" icon="settings" href="/ar/gateway/configuration-reference#imessage">
+    المرجع الكامل لحقول iMessage.
   </Card>
 </CardGroup>
 
-## إعداد سريع
+## الإعداد السريع
 
 <Tabs>
   <Tab title="Mac محلي (المسار السريع)">
     <Steps>
-      <Step title="تثبيت imsg والتحقق منه">
+      <Step title="ثبّت imsg وتحقق منه">
 
 ```bash
 brew install steipete/tap/imsg
@@ -49,7 +49,7 @@ imsg rpc --help
 
       </Step>
 
-      <Step title="إعداد OpenClaw">
+      <Step title="اضبط OpenClaw">
 
 ```json5
 {
@@ -57,7 +57,7 @@ imsg rpc --help
     imessage: {
       enabled: true,
       cliPath: "/usr/local/bin/imsg",
-      dbPath: "/Users/<you>/Library/Messages/chat.db",
+      dbPath: "/Users/user/Library/Messages/chat.db",
     },
   },
 }
@@ -65,7 +65,7 @@ imsg rpc --help
 
       </Step>
 
-      <Step title="بدء gateway">
+      <Step title="ابدأ gateway">
 
 ```bash
 openclaw gateway
@@ -73,7 +73,7 @@ openclaw gateway
 
       </Step>
 
-      <Step title="الموافقة على أول اقتران رسالة مباشرة (سياسة dmPolicy الافتراضية)">
+      <Step title="وافق على أول اقتران للرسائل المباشرة (dmPolicy الافتراضي)">
 
 ```bash
 openclaw pairing list imessage
@@ -87,7 +87,7 @@ openclaw pairing approve imessage <CODE>
   </Tab>
 
   <Tab title="Mac بعيد عبر SSH">
-    يحتاج OpenClaw فقط إلى `cliPath` متوافق مع stdio، لذلك يمكنك توجيه `cliPath` إلى نص wrapper برمجي يستخدم SSH إلى Mac بعيد ويشغّل `imsg`.
+    لا يتطلب OpenClaw سوى `cliPath` متوافق مع stdio، لذلك يمكنك توجيه `cliPath` إلى نص wrapper برمجي يستخدم SSH للاتصال بـ Mac بعيد وتشغيل `imsg`.
 
 ```bash
 #!/usr/bin/env bash
@@ -104,7 +104,7 @@ exec ssh -T gateway-host imsg "$@"
       cliPath: "~/.openclaw/scripts/imsg-ssh",
       remoteHost: "user@gateway-host", // يُستخدم لجلب المرفقات عبر SCP
       includeAttachments: true,
-      // اختياري: تجاوز الجذور المسموح بها للمرفقات.
+      // اختياري: تجاوز جذور المرفقات المسموح بها.
       // تتضمن القيم الافتراضية /Users/*/Library/Messages/Attachments
       attachmentRoots: ["/Users/*/Library/Messages/Attachments"],
       remoteAttachmentRoots: ["/Users/*/Library/Messages/Attachments"],
@@ -113,9 +113,9 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-    إذا لم يتم ضبط `remoteHost`، يحاول OpenClaw اكتشافه تلقائيًا من خلال تحليل نص wrapper البرمجي لـ SSH.
-    يجب أن يكون `remoteHost` بصيغة `host` أو `user@host` (من دون مسافات أو خيارات SSH).
-    يستخدم OpenClaw تحققًا صارمًا من مفتاح المضيف لـ SCP، لذلك يجب أن يكون مفتاح مضيف relay موجودًا مسبقًا في `~/.ssh/known_hosts`.
+    إذا لم يتم تعيين `remoteHost`، يحاول OpenClaw اكتشافه تلقائيًا عبر تحليل نص wrapper البرمجي الخاص بـ SSH.
+    يجب أن تكون قيمة `remoteHost` بصيغة `host` أو `user@host` (من دون مسافات أو خيارات SSH).
+    يستخدم OpenClaw التحقق الصارم من مفتاح المضيف في SCP، لذلك يجب أن يكون مفتاح مضيف relay موجودًا بالفعل في `~/.ssh/known_hosts`.
     يتم التحقق من مسارات المرفقات مقابل الجذور المسموح بها (`attachmentRoots` / `remoteAttachmentRoots`).
 
   </Tab>
@@ -123,16 +123,16 @@ exec ssh -T gateway-host imsg "$@"
 
 ## المتطلبات والأذونات (macOS)
 
-- يجب أن يكون Messages مسجّل الدخول على Mac الذي يشغّل `imsg`.
-- يلزم Full Disk Access لسياق العملية التي تشغّل OpenClaw/`imsg` (للوصول إلى قاعدة بيانات Messages).
+- يجب أن يكون تطبيق Messages قد سُجّل الدخول إليه على Mac الذي يشغّل `imsg`.
+- يتطلب الأمر Full Disk Access لسياق العملية الذي يشغّل OpenClaw/`imsg` (للوصول إلى قاعدة بيانات Messages).
 - يلزم إذن Automation لإرسال الرسائل عبر Messages.app.
 
 <Tip>
-يتم منح الأذونات لكل سياق عملية. إذا كان gateway يعمل بلا واجهة (LaunchAgent/SSH)، فشغّل أمرًا تفاعليًا لمرة واحدة في السياق نفسه لتفعيل مطالبات الأذونات:
+تُمنح الأذونات لكل سياق عملية على حدة. إذا كان gateway يعمل بلا واجهة (LaunchAgent/SSH)، فشغّل أمرًا تفاعليًا لمرة واحدة في السياق نفسه لتحفيز ظهور المطالبات:
 
 ```bash
 imsg chats --limit 1
-# or
+# أو
 imsg send <handle> "test"
 ```
 
@@ -144,36 +144,36 @@ imsg send <handle> "test"
   <Tab title="سياسة الرسائل المباشرة">
     يتحكم `channels.imessage.dmPolicy` في الرسائل المباشرة:
 
-    - `pairing` (الافتراضي)
+    - `pairing` (افتراضي)
     - `allowlist`
-    - `open` (يتطلب أن تتضمن `allowFrom` القيمة `"*"`)
+    - `open` (يتطلب أن يتضمن `allowFrom` القيمة `"*"`)
     - `disabled`
 
     حقل قائمة السماح: `channels.imessage.allowFrom`.
 
-    يمكن أن تكون إدخالات قائمة السماح handles أو أهداف دردشة (`chat_id:*` أو `chat_guid:*` أو `chat_identifier:*`).
+    يمكن أن تكون إدخالات قائمة السماح handles أو أهداف دردشة (`chat_id:*` و`chat_guid:*` و`chat_identifier:*`).
 
   </Tab>
 
   <Tab title="سياسة المجموعات + الإشارات">
     يتحكم `channels.imessage.groupPolicy` في التعامل مع المجموعات:
 
-    - `allowlist` (الافتراضي عند الإعداد)
+    - `allowlist` (افتراضيًا عند الإعداد)
     - `open`
     - `disabled`
 
-    قائمة السماح لمرسلي المجموعات: `channels.imessage.groupAllowFrom`.
+    قائمة سماح مرسلي المجموعات: `channels.imessage.groupAllowFrom`.
 
-    التراجع في وقت التشغيل: إذا لم يتم ضبط `groupAllowFrom`، فإن فحوصات مرسلي مجموعات iMessage تعود إلى `allowFrom` عند توفره.
+    الاحتياط وقت التشغيل: إذا لم يتم تعيين `groupAllowFrom`، فإن فحوصات مرسلي مجموعات iMessage تعود إلى `allowFrom` عند توفره.
     ملاحظة وقت التشغيل: إذا كان `channels.imessage` مفقودًا بالكامل، يعود وقت التشغيل إلى `groupPolicy="allowlist"` ويسجل تحذيرًا (حتى إذا كان `channels.defaults.groupPolicy` مضبوطًا).
 
-    بوابة الإشارات للمجموعات:
+    تقييد الإشارات للمجموعات:
 
-    - لا يحتوي iMessage على بيانات تعريف أصلية للإشارات
-    - يستخدم اكتشاف الإشارات أنماط regex ‏(`agents.list[].groupChat.mentionPatterns`، مع تراجع إلى `messages.groupChat.mentionPatterns`)
-    - من دون أنماط مهيأة، لا يمكن فرض بوابة الإشارات
+    - لا يحتوي iMessage على بيانات وصفية أصلية للإشارات
+    - يَستخدم اكتشاف الإشارات أنماط regex (`agents.list[].groupChat.mentionPatterns`، والاحتياطي `messages.groupChat.mentionPatterns`)
+    - إذا لم تكن هناك أنماط مُعدة، فلا يمكن فرض تقييد الإشارات
 
-    يمكن لأوامر التحكم الواردة من مرسلين مخولين تجاوز بوابة الإشارات في المجموعات.
+    يمكن لأوامر التحكم من المرسلين المصرح لهم تجاوز تقييد الإشارات داخل المجموعات.
 
   </Tab>
 
@@ -181,33 +181,33 @@ imsg send <handle> "test"
     - تستخدم الرسائل المباشرة التوجيه المباشر؛ وتستخدم المجموعات توجيه المجموعات.
     - مع الإعداد الافتراضي `session.dmScope=main`، تندمج الرسائل المباشرة في iMessage ضمن الجلسة الرئيسية للوكيل.
     - تكون جلسات المجموعات معزولة (`agent:<agentId>:imessage:group:<chat_id>`).
-    - تُوجَّه الردود مرة أخرى إلى iMessage باستخدام بيانات تعريف القناة/الهدف الأصلية.
+    - يتم توجيه الردود مرة أخرى إلى iMessage باستخدام البيانات الوصفية للقناة/الهدف الأصلية.
 
     سلوك السلاسل الشبيهة بالمجموعات:
 
     قد تصل بعض سلاسل iMessage متعددة المشاركين مع `is_group=false`.
-    إذا كان هذا `chat_id` مهيأً صراحةً ضمن `channels.imessage.groups`، فإن OpenClaw يعامله كحركة مرور مجموعة (بوابة مجموعات + عزل جلسة المجموعة).
+    إذا كان هذا `chat_id` مُعدًا صراحةً ضمن `channels.imessage.groups`، فسيتعامل OpenClaw معه على أنه حركة مرور مجموعة (تقييد مجموعات + عزل جلسة المجموعة).
 
   </Tab>
 </Tabs>
 
-## ارتباطات محادثات ACP
+## ربط المحادثات بـ ACP
 
 يمكن أيضًا ربط محادثات iMessage القديمة بجلسات ACP.
 
-تدفق المشغل السريع:
+تدفق المشغّل السريع:
 
 - شغّل `/acp spawn codex --bind here` داخل الرسالة المباشرة أو دردشة المجموعة المسموح بها.
 - تُوجَّه الرسائل المستقبلية في محادثة iMessage نفسها إلى جلسة ACP التي تم إنشاؤها.
-- يعيد `/new` و`/reset` تعيين جلسة ACP المرتبطة نفسها في مكانها.
-- يغلق `/acp close` جلسة ACP ويزيل الارتباط.
+- يعيد كل من `/new` و`/reset` تعيين جلسة ACP المربوطة نفسها في مكانها.
+- يغلق `/acp close` جلسة ACP ويزيل الربط.
 
-يتم دعم الارتباطات الدائمة المهيأة عبر إدخالات `bindings[]` من المستوى الأعلى مع `type: "acp"` و`match.channel: "imessage"`.
+تكون عمليات الربط الدائمة المُعدة مدعومة من خلال إدخالات `bindings[]` ذات المستوى الأعلى مع `type: "acp"` و`match.channel: "imessage"`.
 
-يمكن أن يستخدم `match.peer.id`:
+يمكن أن يستخدم `match.peer.id` ما يلي:
 
-- handle رسالة مباشرة مطبّعًا مثل `+15555550123` أو `user@example.com`
-- `chat_id:<id>` (موصى به للارتباطات المستقرة للمجموعات)
+- handle مُطبع للرسائل المباشرة مثل `+15555550123` أو `user@example.com`
+- `chat_id:<id>` (موصى به لعمليات ربط المجموعات المستقرة)
 - `chat_guid:<guid>`
 - `chat_identifier:<identifier>`
 
@@ -241,7 +241,7 @@ imsg send <handle> "test"
 }
 ```
 
-راجع [وكلاء ACP](/tools/acp-agents) لمعرفة سلوك ارتباط ACP المشترك.
+راجع [ACP Agents](/ar/tools/acp-agents) لمعرفة سلوك ربط ACP المشترك.
 
 ## أنماط النشر
 
@@ -251,22 +251,22 @@ imsg send <handle> "test"
 
     التدفق المعتاد:
 
-    1. أنشئ/سجّل الدخول إلى مستخدم macOS مخصص.
-    2. سجّل الدخول إلى Messages باستخدام Apple ID الخاص بالبوت في ذلك المستخدم.
+    1. أنشئ مستخدم macOS مخصصًا وسجّل الدخول إليه.
+    2. سجّل الدخول إلى Messages باستخدام Apple ID الخاص بالبوت ضمن ذلك المستخدم.
     3. ثبّت `imsg` لذلك المستخدم.
-    4. أنشئ wrapper لـ SSH حتى يتمكن OpenClaw من تشغيل `imsg` في سياق ذلك المستخدم.
-    5. وجّه `channels.imessage.accounts.<id>.cliPath` و`.dbPath` إلى ملف ذلك المستخدم.
+    4. أنشئ wrapper عبر SSH حتى يتمكن OpenClaw من تشغيل `imsg` ضمن سياق ذلك المستخدم.
+    5. وجّه `channels.imessage.accounts.<id>.cliPath` و`.dbPath` إلى ملف ذلك المستخدم الشخصي.
 
-    قد يتطلب التشغيل الأول موافقات GUI ‏(Automation + Full Disk Access) في جلسة مستخدم البوت تلك.
+    قد يتطلب التشغيل الأول موافقات GUI (Automation + Full Disk Access) في جلسة مستخدم البوت.
 
   </Accordion>
 
   <Accordion title="Mac بعيد عبر Tailscale (مثال)">
-    بنية شائعة:
+    البنية الشائعة:
 
     - يعمل gateway على Linux/VM
-    - يعمل iMessage و`imsg` على Mac داخل tailnet لديك
-    - يستخدم wrapper الخاص بـ `cliPath` ‏SSH لتشغيل `imsg`
+    - يعمل iMessage و`imsg` على Mac داخل tailnet الخاص بك
+    - يستخدم wrapper الخاص بـ `cliPath` SSH لتشغيل `imsg`
     - يتيح `remoteHost` جلب المرفقات عبر SCP
 
     مثال:
@@ -290,15 +290,15 @@ imsg send <handle> "test"
 exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 ```
 
-    استخدم مفاتيح SSH بحيث يكون كل من SSH وSCP غير تفاعليين.
-    تأكد أولًا من الوثوق بمفتاح المضيف (على سبيل المثال `ssh bot@mac-mini.tailnet-1234.ts.net`) حتى تتم تعبئة `known_hosts`.
+    استخدم مفاتيح SSH بحيث يعمل كل من SSH وSCP بدون تفاعل.
+    تأكد من الوثوق بمفتاح المضيف أولًا (مثلًا `ssh bot@mac-mini.tailnet-1234.ts.net`) بحيث يتم ملء `known_hosts`.
 
   </Accordion>
 
   <Accordion title="نمط الحسابات المتعددة">
-    يدعم iMessage إعدادات لكل حساب ضمن `channels.imessage.accounts`.
+    يدعم iMessage الإعداد لكل حساب على حدة ضمن `channels.imessage.accounts`.
 
-    يمكن لكل حساب تجاوز حقول مثل `cliPath` و`dbPath` و`allowFrom` و`groupPolicy` و`mediaMaxMb` وإعدادات السجل وقوائم السماح لجذور المرفقات.
+    يمكن لكل حساب تجاوز حقول مثل `cliPath` و`dbPath` و`allowFrom` و`groupPolicy` و`mediaMaxMb` وإعدادات السجل وقوائم السماح الخاصة بجذور المرفقات.
 
   </Accordion>
 </AccordionGroup>
@@ -307,31 +307,31 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 
 <AccordionGroup>
   <Accordion title="المرفقات والوسائط">
-    - إدخال المرفقات الواردة اختياري: `channels.imessage.includeAttachments`
-    - يمكن جلب مسارات المرفقات البعيدة عبر SCP عند ضبط `remoteHost`
+    - يكون استيعاب المرفقات الواردة اختياريًا: `channels.imessage.includeAttachments`
+    - يمكن جلب مسارات المرفقات البعيدة عبر SCP عند تعيين `remoteHost`
     - يجب أن تطابق مسارات المرفقات الجذور المسموح بها:
       - `channels.imessage.attachmentRoots` (محلي)
       - `channels.imessage.remoteAttachmentRoots` (وضع SCP البعيد)
       - نمط الجذر الافتراضي: `/Users/*/Library/Messages/Attachments`
-    - يستخدم SCP تحققًا صارمًا من مفتاح المضيف (`StrictHostKeyChecking=yes`)
+    - يستخدم SCP التحقق الصارم من مفتاح المضيف (`StrictHostKeyChecking=yes`)
     - يستخدم حجم الوسائط الصادرة `channels.imessage.mediaMaxMb` (الافتراضي 16 MB)
   </Accordion>
 
   <Accordion title="تقسيم الرسائل الصادرة">
     - حد تقسيم النص: `channels.imessage.textChunkLimit` (الافتراضي 4000)
     - وضع التقسيم: `channels.imessage.chunkMode`
-      - `length` (الافتراضي)
-      - `newline` (التقسيم حسب الفقرة أولًا)
+      - `length` (افتراضي)
+      - `newline` (تقسيم يعتمد على الفقرات أولًا)
   </Accordion>
 
-  <Accordion title="تنسيقات العنونة">
+  <Accordion title="صيغ العنونة">
     الأهداف الصريحة المفضلة:
 
     - `chat_id:123` (موصى به للتوجيه المستقر)
     - `chat_guid:...`
     - `chat_identifier:...`
 
-    أهداف handle مدعومة أيضًا:
+    كما أن أهداف handles مدعومة أيضًا:
 
     - `imessage:+1555...`
     - `sms:+1555...`
@@ -346,7 +346,7 @@ imsg chats --limit 20
 
 ## عمليات كتابة الإعدادات
 
-يسمح iMessage افتراضيًا بعمليات كتابة الإعدادات التي تبدأها القناة (لأوامر `/config set|unset` عندما تكون `commands.config: true`).
+يسمح iMessage افتراضيًا بعمليات كتابة الإعدادات التي تبدأها القناة (لأجل `/config set|unset` عندما تكون `commands.config: true`).
 
 للتعطيل:
 
@@ -363,20 +363,20 @@ imsg chats --limit 20
 ## استكشاف الأخطاء وإصلاحها
 
 <AccordionGroup>
-  <Accordion title="لم يتم العثور على imsg أو أن RPC غير مدعوم">
-    تحقّق من الملف التنفيذي ودعم RPC:
+  <Accordion title="تعذر العثور على imsg أو RPC غير مدعوم">
+    تحقق من الملف التنفيذي ودعم RPC:
 
 ```bash
 imsg rpc --help
 openclaw channels status --probe
 ```
 
-    إذا أبلغ الفحص أن RPC غير مدعوم، فقم بتحديث `imsg`.
+    إذا أفاد probe بأن RPC غير مدعوم، فقم بتحديث `imsg`.
 
   </Accordion>
 
   <Accordion title="يتم تجاهل الرسائل المباشرة">
-    تحقّق من:
+    تحقق من:
 
     - `channels.imessage.dmPolicy`
     - `channels.imessage.allowFrom`
@@ -385,17 +385,17 @@ openclaw channels status --probe
   </Accordion>
 
   <Accordion title="يتم تجاهل رسائل المجموعات">
-    تحقّق من:
+    تحقق من:
 
     - `channels.imessage.groupPolicy`
     - `channels.imessage.groupAllowFrom`
-    - سلوك قائمة السماح لـ `channels.imessage.groups`
-    - إعداد أنماط الإشارة (`agents.list[].groupChat.mentionPatterns`)
+    - سلوك قائمة السماح في `channels.imessage.groups`
+    - إعداد أنماط الإشارات (`agents.list[].groupChat.mentionPatterns`)
 
   </Accordion>
 
-  <Accordion title="فشل المرفقات البعيدة">
-    تحقّق من:
+  <Accordion title="تفشل المرفقات البعيدة">
+    تحقق من:
 
     - `channels.imessage.remoteHost`
     - `channels.imessage.remoteAttachmentRoots`
@@ -413,22 +413,22 @@ imsg chats --limit 1
 imsg send <handle> "test"
 ```
 
-    أكّد منح Full Disk Access وAutomation لسياق العملية الذي يشغّل OpenClaw/`imsg`.
+    تأكد من منح Full Disk Access وAutomation لسياق العملية الذي يشغّل OpenClaw/`imsg`.
 
   </Accordion>
 </AccordionGroup>
 
-## مؤشرات إلى مرجع الإعدادات
+## مؤشرات مرجع الإعدادات
 
-- [مرجع الإعدادات - iMessage](/gateway/configuration-reference#imessage)
-- [إعدادات Gateway](/gateway/configuration)
-- [الاقتران](/channels/pairing)
-- [BlueBubbles](/channels/bluebubbles)
+- [مرجع الإعدادات - iMessage](/ar/gateway/configuration-reference#imessage)
+- [إعدادات Gateway](/ar/gateway/configuration)
+- [الاقتران](/ar/channels/pairing)
+- [BlueBubbles](/ar/channels/bluebubbles)
 
 ## ذو صلة
 
-- [نظرة عامة على القنوات](/channels) — جميع القنوات المدعومة
-- [الاقتران](/channels/pairing) — مصادقة الرسائل المباشرة وتدفق الاقتران
-- [المجموعات](/channels/groups) — سلوك دردشات المجموعات وبوابة الإشارات
-- [توجيه القنوات](/channels/channel-routing) — توجيه الجلسات للرسائل
-- [الأمان](/gateway/security) — نموذج الوصول والتقوية
+- [نظرة عامة على القنوات](/ar/channels) — جميع القنوات المدعومة
+- [الاقتران](/ar/channels/pairing) — المصادقة على الرسائل المباشرة وتدفق الاقتران
+- [المجموعات](/ar/channels/groups) — سلوك دردشات المجموعات وتقييد الإشارات
+- [توجيه القنوات](/ar/channels/channel-routing) — توجيه الجلسات للرسائل
+- [الأمان](/ar/gateway/security) — نموذج الوصول والتحصين

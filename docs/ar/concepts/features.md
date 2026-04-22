@@ -1,39 +1,39 @@
 ---
 read_when:
-    - تريد قائمة كاملة بما يدعمه OpenClaw
-summary: إمكانات OpenClaw عبر القنوات، والتوجيه، والوسائط، وتجربة الاستخدام.
+    - أنت تريد قائمة كاملة بكل ما يدعمه OpenClaw
+summary: إمكانات OpenClaw عبر القنوات، والتوجيه، والوسائط، وتجربة المستخدم.
 title: الميزات
 x-i18n:
-    generated_at: "2026-04-05T12:40:05Z"
+    generated_at: "2026-04-22T04:22:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 43eae89d9af44ea786dd0221d8d602ebcea15da9d5064396ac9920c0345e2ad3
+    source_hash: 3af9955b65030fe02e35d3056d284271fa9700f3ed094c6f8323eb10e4064e22
     source_path: concepts/features.md
     workflow: 15
 ---
 
 # الميزات
 
-## أبرز المزايا
+## أبرز الميزات
 
 <Columns>
-  <Card title="القنوات" icon="message-square">
-    Discord وiMessage وSignal وSlack وTelegram وWhatsApp وWebChat والمزيد عبر Gateway واحد.
+  <Card title="القنوات" icon="message-square" href="/ar/channels">
+    Discord وiMessage وSignal وSlack وTelegram وWhatsApp وWebChat وغير ذلك عبر Gateway واحدة.
   </Card>
-  <Card title="الإضافات" icon="plug">
-    تضيف الإضافات المدمجة Matrix وNextcloud Talk وNostr وTwitch وZalo والمزيد من دون عمليات تثبيت منفصلة في الإصدارات الحالية العادية.
+  <Card title="Plugins" icon="plug" href="/ar/tools/plugin">
+    تضيف Plugins المضمّنة Matrix وNextcloud Talk وNostr وTwitch وZalo وغير ذلك بدون عمليات تثبيت منفصلة في الإصدارات الحالية العادية.
   </Card>
-  <Card title="التوجيه" icon="route">
+  <Card title="التوجيه" icon="route" href="/ar/concepts/multi-agent">
     توجيه متعدد الوكلاء مع جلسات معزولة.
   </Card>
-  <Card title="الوسائط" icon="image">
-    صور وصوت وفيديو ومستندات، بالإضافة إلى إنشاء الصور/الفيديو.
+  <Card title="الوسائط" icon="image" href="/ar/nodes/images">
+    الصور والصوت والفيديو والمستندات وتوليد الصور/الفيديو.
   </Card>
-  <Card title="التطبيقات وواجهة المستخدم" icon="monitor">
-    واجهة تحكم ويب وتطبيق macOS مرافق.
+  <Card title="التطبيقات وواجهة المستخدم" icon="monitor" href="/web/control-ui">
+    Web Control UI وتطبيق مساعد لنظام macOS.
   </Card>
-  <Card title="عقد الهاتف المحمول" icon="smartphone">
-    عقد iOS وAndroid مع الاقتران، والصوت/الدردشة، وأوامر الجهاز الغنية.
+  <Card title="عُقد الأجهزة المحمولة" icon="smartphone" href="/ar/nodes">
+    عُقد iOS وAndroid مع الاقتران والصوت/الدردشة وأوامر الجهاز الغنية.
   </Card>
 </Columns>
 
@@ -41,43 +41,43 @@ x-i18n:
 
 **القنوات:**
 
-- تتضمن القنوات المضمنة Discord وGoogle Chat وiMessage (legacy) وIRC وSignal وSlack وTelegram وWebChat وWhatsApp
-- تتضمن قنوات الإضافات المدمجة BlueBubbles لـ iMessage وFeishu وLINE وMatrix وMattermost وMicrosoft Teams وNextcloud Talk وNostr وQQ Bot وSynology Chat وTlon وTwitch وZalo وZalo Personal
-- تتضمن إضافات القنوات الاختيارية المثبتة بشكل منفصل Voice Call وحزم الجهات الخارجية مثل WeChat
-- يمكن لإضافات القنوات الخارجية توسيع Gateway أكثر، مثل WeChat
-- دعم الدردشة الجماعية مع تفعيل قائم على الإشارات
-- أمان الرسائل المباشرة عبر قوائم السماح والاقتران
+- تشمل القنوات المضمنة Discord وGoogle Chat وiMessage (القديم) وIRC وSignal وSlack وTelegram وWebChat وWhatsApp
+- تشمل قنوات Plugins المضمنة BlueBubbles لـ iMessage وFeishu وLINE وMatrix وMattermost وMicrosoft Teams وNextcloud Talk وNostr وQQ Bot وSynology Chat وTlon وTwitch وZalo وZalo Personal
+- تشمل Plugins القنوات الاختيارية المثبتة بشكل منفصل Voice Call وحِزم الجهات الخارجية مثل WeChat
+- يمكن لـ Plugins القنوات التابعة لجهات خارجية توسيع Gateway بشكل أكبر، مثل WeChat
+- دعم الدردشة الجماعية مع التفعيل القائم على الإشارة
+- أمان الرسائل الخاصة باستخدام قوائم السماح والاقتران
 
 **الوكيل:**
 
-- بيئة تشغيل وكيل مدمجة مع بث الأدوات
+- runtime وكيل مضمّن مع تدفق الأدوات
 - توجيه متعدد الوكلاء مع جلسات معزولة لكل مساحة عمل أو مرسل
-- الجلسات: تُطوى الدردشات المباشرة إلى `main` مشتركة؛ وتبقى المجموعات معزولة
-- البث والتجزئة للردود الطويلة
+- الجلسات: تُدمج الدردشات المباشرة في `main` مشتركة؛ بينما تكون المجموعات معزولة
+- البث والتقسيم للردود الطويلة
 
-**المصادقة والموفّرون:**
+**المصادقة والمزودون:**
 
-- أكثر من 35 موفّر نماذج (Anthropic وOpenAI وGoogle وغير ذلك)
-- مصادقة اشتراك عبر OAuth (مثل OpenAI Codex)
-- دعم الموفّرين المخصصين والمستضافين ذاتيًا (vLLM وSGLang وOllama وأي نقطة نهاية متوافقة مع OpenAI أو Anthropic)
+- أكثر من 35 مزود نماذج (Anthropic وOpenAI وGoogle وغيرهم)
+- مصادقة الاشتراك عبر OAuth (مثل OpenAI Codex)
+- دعم المزودات المخصصة والمستضافة ذاتيًا (vLLM وSGLang وOllama وأي نقطة نهاية متوافقة مع OpenAI أو Anthropic)
 
 **الوسائط:**
 
-- صور وصوت وفيديو ومستندات في الاتجاهين
-- واجهات قدرات مشتركة لإنشاء الصور وإنشاء الفيديو
-- نسخ صوتي للملاحظات الصوتية
-- تحويل النص إلى كلام عبر عدة موفّرين
+- الصور والصوت والفيديو والمستندات إدخالًا وإخراجًا
+- أسطح إمكانات مشتركة لتوليد الصور وتوليد الفيديو
+- نسخ المذكرات الصوتية إلى نص
+- تحويل النص إلى كلام مع عدة مزودين
 
 **التطبيقات والواجهات:**
 
-- WebChat وواجهة تحكم في المتصفح
-- تطبيق مرافق macOS في شريط القوائم
+- WebChat وControl UI في المتصفح
+- تطبيق مساعد في شريط القوائم على macOS
 - عقدة iOS مع الاقتران وCanvas والكاميرا وتسجيل الشاشة والموقع والصوت
 - عقدة Android مع الاقتران والدردشة والصوت وCanvas والكاميرا وأوامر الجهاز
 
 **الأدوات والأتمتة:**
 
 - أتمتة المتصفح وexec وsandboxing
-- بحث الويب (Brave وDuckDuckGo وExa وFirecrawl وGemini وGrok وKimi وMiniMax Search وOllama Web Search وPerplexity وSearXNG وTavily)
-- مهام Cron وجدولة heartbeat
-- Skills والإضافات ومسارات workflow ‏(Lobster)
+- البحث على الويب (Brave وDuckDuckGo وExa وFirecrawl وGemini وGrok وKimi وMiniMax Search وOllama Web Search وPerplexity وSearXNG وTavily)
+- مهام Cron وجدولة Heartbeat
+- Skills وPlugins وخطوط أنابيب سير العمل (Lobster)
