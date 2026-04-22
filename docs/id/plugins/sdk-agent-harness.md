@@ -1,60 +1,59 @@
 ---
 read_when:
     - Anda sedang mengubah runtime agen tertanam atau registry harness
-    - Anda sedang mendaftarkan harness agen dari plugin bawaan atau tepercaya
+    - Anda sedang mendaftarkan agent harness dari plugin bawaan atau tepercaya
     - Anda perlu memahami bagaimana plugin Codex berhubungan dengan penyedia model
 sidebarTitle: Agent Harness
-summary: Permukaan SDK eksperimental untuk plugin yang menggantikan eksekutor agen tertanam tingkat rendah
+summary: Surface SDK eksperimental untuk plugin yang menggantikan eksekutor agen tertanam level rendah
 title: Plugin Agent Harness
 x-i18n:
-    generated_at: "2026-04-12T00:18:57Z"
+    generated_at: "2026-04-22T09:14:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 62b88fd24ce8b600179db27e16e8d764a2cd7a14e5c5df76374c33121aa5e365
+    source_hash: 728fef59ae3cce29a3348842820f1f71a2eac98ae6b276179bce6c85d16613df
     source_path: plugins/sdk-agent-harness.md
     workflow: 15
 ---
 
 # Plugin Agent Harness
 
-**Agent harness** adalah eksekutor tingkat rendah untuk satu giliran agen OpenClaw
-yang sudah disiapkan. Ini bukan penyedia model, bukan channel, dan bukan registry tool.
+**Agent harness** adalah eksekutor level rendah untuk satu giliran agen OpenClaw
+yang sudah disiapkan. Ini bukan penyedia model, bukan saluran, dan bukan registry tool.
 
-Gunakan permukaan ini hanya untuk plugin native bawaan atau tepercaya. Kontrak ini
+Gunakan surface ini hanya untuk plugin native bawaan atau tepercaya. Kontrak ini
 masih eksperimental karena tipe parameternya sengaja mencerminkan runner
 tertanam saat ini.
 
 ## Kapan menggunakan harness
 
-Daftarkan agent harness saat sebuah keluarga model memiliki runtime sesi native
-sendiri dan transport penyedia OpenClaw normal adalah abstraksi yang salah.
+Daftarkan agent harness ketika suatu keluarga model memiliki runtime sesi native
+sendiri dan transport penyedia OpenClaw normal bukan abstraksi yang tepat.
 
 Contoh:
 
-- server agen pengodean native yang memiliki thread dan compaction
-- CLI atau daemon lokal yang harus melakukan streaming event plan/reasoning/tool native
+- server coding-agent native yang memiliki thread dan Compaction
+- CLI atau daemon lokal yang harus melakukan streaming event rencana/penalaran/tool native
 - runtime model yang memerlukan resume id sendiri selain transkrip sesi OpenClaw
 
-Jangan mendaftarkan harness hanya untuk menambahkan API LLM baru. Untuk API model HTTP atau
-WebSocket normal, bangun [plugin provider](/id/plugins/sdk-provider-plugins).
+Jangan mendaftarkan harness hanya untuk menambahkan API LLM baru. Untuk API model
+HTTP atau WebSocket biasa, bangun [plugin provider](/id/plugins/sdk-provider-plugins).
 
-## Yang masih dimiliki core
+## Yang tetap dimiliki core
 
-Sebelum sebuah harness dipilih, OpenClaw sudah menyelesaikan:
+Sebelum harness dipilih, OpenClaw sudah menyelesaikan:
 
 - penyedia dan model
-- status auth runtime
-- tingkat berpikir dan anggaran konteks
+- status autentikasi runtime
+- tingkat thinking dan anggaran konteks
 - file transkrip/sesi OpenClaw
 - workspace, sandbox, dan kebijakan tool
-- callback balasan channel dan callback streaming
+- callback balasan saluran dan callback streaming
 - kebijakan fallback model dan peralihan model live
 
-Pemisahan itu disengaja. Sebuah harness menjalankan upaya yang sudah disiapkan;
-ia tidak memilih penyedia, menggantikan pengiriman channel, atau diam-diam
-mengganti model.
+Pemisahan itu disengaja. Harness menjalankan attempt yang sudah disiapkan; harness
+tidak memilih penyedia, mengganti pengiriman saluran, atau diam-diam mengganti model.
 
-## Daftarkan harness
+## Mendaftarkan harness
 
 **Import:** `openclaw/plugin-sdk/agent-harness`
 
@@ -92,53 +91,53 @@ export default definePluginEntry({
 
 ## Kebijakan pemilihan
 
-OpenClaw memilih harness setelah resolusi provider/model:
+OpenClaw memilih harness setelah resolusi penyedia/model:
 
 1. `OPENCLAW_AGENT_RUNTIME=<id>` memaksa harness terdaftar dengan id tersebut.
 2. `OPENCLAW_AGENT_RUNTIME=pi` memaksa harness PI bawaan.
-3. `OPENCLAW_AGENT_RUNTIME=auto` meminta harness terdaftar apakah mereka mendukung provider/model
-   yang telah diselesaikan.
+3. `OPENCLAW_AGENT_RUNTIME=auto` meminta harness terdaftar apakah mereka mendukung
+   penyedia/model yang telah di-resolve.
 4. Jika tidak ada harness terdaftar yang cocok, OpenClaw menggunakan PI kecuali fallback PI
    dinonaktifkan.
 
-Kegagalan harness plugin yang dipaksakan akan muncul sebagai kegagalan run. Dalam mode `auto`,
-OpenClaw dapat fallback ke PI ketika harness plugin terpilih gagal sebelum sebuah
-giliran menghasilkan efek samping. Tetapkan `OPENCLAW_AGENT_HARNESS_FALLBACK=none` atau
-`embeddedHarness.fallback: "none"` agar fallback itu menjadi kegagalan keras.
+Kegagalan harness plugin ditampilkan sebagai kegagalan run. Dalam mode `auto`,
+fallback PI hanya digunakan ketika tidak ada harness plugin terdaftar yang mendukung
+penyedia/model yang telah di-resolve. Setelah harness plugin telah mengklaim sebuah run,
+OpenClaw tidak memutar ulang giliran yang sama melalui PI karena hal itu dapat mengubah
+semantik autentikasi/runtime atau menduplikasi efek samping.
 
-Plugin Codex bawaan mendaftarkan `codex` sebagai harness id-nya. Core memperlakukan itu
+Plugin Codex bawaan mendaftarkan `codex` sebagai id harness-nya. Core memperlakukan itu
 sebagai id harness plugin biasa; alias khusus Codex harus berada di plugin
 atau konfigurasi operator, bukan di selector runtime bersama.
 
-## Pairing provider plus harness
+## Pemasangan provider plus harness
 
-Sebagian besar harness juga sebaiknya mendaftarkan provider. Provider membuat ref model,
-status auth, metadata model, dan pemilihan `/model` terlihat oleh seluruh
-OpenClaw. Harness kemudian mengklaim provider itu di `supports(...)`.
+Sebagian besar harness juga sebaiknya mendaftarkan provider. Provider membuat referensi model,
+status autentikasi, metadata model, dan pemilihan `/model` terlihat oleh bagian lain
+OpenClaw. Harness kemudian mengklaim provider tersebut di `supports(...)`.
 
 Plugin Codex bawaan mengikuti pola ini:
 
-- provider id: `codex`
-- ref model pengguna: `codex/gpt-5.4`, `codex/gpt-5.2`, atau model lain yang dikembalikan
+- id provider: `codex`
+- referensi model pengguna: `codex/gpt-5.4`, `codex/gpt-5.2`, atau model lain yang dikembalikan
   oleh server aplikasi Codex
-- harness id: `codex`
-- auth: ketersediaan provider sintetis, karena harness Codex memiliki
-  login/sesi Codex native
+- id harness: `codex`
+- autentikasi: ketersediaan provider sintetis, karena harness Codex memiliki login/sesi Codex native
 - permintaan app-server: OpenClaw mengirim bare model id ke Codex dan membiarkan
   harness berbicara dengan protokol app-server native
 
-Plugin Codex bersifat aditif. Ref `openai/gpt-*` biasa tetap menjadi ref provider OpenAI
+Plugin Codex bersifat aditif. Referensi `openai/gpt-*` biasa tetap menjadi referensi provider OpenAI
 dan terus menggunakan jalur provider OpenClaw normal. Pilih `codex/gpt-*`
-saat Anda menginginkan auth yang dikelola Codex, penemuan model Codex, thread native, dan
-eksekusi app-server Codex. `/model` dapat beralih di antara model Codex yang
-dikembalikan oleh app-server Codex tanpa memerlukan kredensial provider OpenAI.
+saat Anda menginginkan autentikasi yang dikelola Codex, penemuan model Codex, thread native, dan
+eksekusi app-server Codex. `/model` dapat beralih di antara model Codex yang dikembalikan
+oleh app-server Codex tanpa memerlukan kredensial provider OpenAI.
 
 Untuk penyiapan operator, contoh prefiks model, dan konfigurasi khusus Codex, lihat
 [Codex Harness](/id/plugins/codex-harness).
 
 OpenClaw memerlukan app-server Codex `0.118.0` atau yang lebih baru. Plugin Codex memeriksa
-initialize handshake app-server dan memblokir server yang lebih lama atau tanpa versi agar
-OpenClaw hanya berjalan terhadap permukaan protokol yang telah diuji.
+initialize handshake app-server dan memblokir server yang lebih lama atau tidak berversi agar
+OpenClaw hanya berjalan terhadap surface protokol yang sudah diuji.
 
 ### Mode harness Codex native
 
@@ -152,23 +151,23 @@ dari `openai-codex/*`:
   app-server.
 
 Saat mode ini berjalan, Codex memiliki thread id native, perilaku resume,
-compaction, dan eksekusi app-server. OpenClaw tetap memiliki channel chat,
+Compaction, dan eksekusi app-server. OpenClaw tetap memiliki saluran chat,
 mirror transkrip yang terlihat, kebijakan tool, persetujuan, pengiriman media, dan
 pemilihan sesi. Gunakan `embeddedHarness.runtime: "codex"` dengan
-`embeddedHarness.fallback: "none"` saat Anda perlu membuktikan bahwa jalur
-app-server Codex digunakan dan fallback PI tidak menyembunyikan harness native yang rusak.
+`embeddedHarness.fallback: "none"` saat Anda perlu membuktikan bahwa hanya jalur Codex
+app-server yang dapat mengklaim run. Konfigurasi itu hanyalah penjaga pemilihan:
+kegagalan app-server Codex sudah langsung gagal alih-alih mencoba lagi melalui PI.
 
-## Nonaktifkan fallback PI
+## Menonaktifkan fallback PI
 
 Secara default, OpenClaw menjalankan agen tertanam dengan `agents.defaults.embeddedHarness`
-diatur ke `{ runtime: "auto", fallback: "pi" }`. Dalam mode `auto`, plugin
-harness yang terdaftar dapat mengklaim pasangan provider/model. Jika tidak ada yang cocok,
-atau jika harness plugin yang dipilih otomatis gagal sebelum menghasilkan output,
-OpenClaw fallback ke PI.
+disetel ke `{ runtime: "auto", fallback: "pi" }`. Dalam mode `auto`, plugin terdaftar
+harness dapat mengklaim pasangan provider/model. Jika tidak ada yang cocok, OpenClaw melakukan fallback
+ke PI.
 
-Tetapkan `fallback: "none"` saat Anda perlu membuktikan bahwa harness plugin adalah satu-satunya
-runtime yang sedang diuji. Ini menonaktifkan fallback PI otomatis; ini tidak memblokir
-`runtime: "pi"` yang eksplisit atau `OPENCLAW_AGENT_RUNTIME=pi`.
+Setel `fallback: "none"` saat Anda perlu agar kegagalan pemilihan harness plugin yang hilang
+langsung gagal alih-alih menggunakan PI. Kegagalan harness plugin yang terpilih sudah gagal keras.
+Ini tidak memblokir `runtime: "pi"` eksplisit atau `OPENCLAW_AGENT_RUNTIME=pi`.
 
 Untuk run tertanam khusus Codex:
 
@@ -187,7 +186,7 @@ Untuk run tertanam khusus Codex:
 ```
 
 Jika Anda ingin harness plugin terdaftar mana pun mengklaim model yang cocok tetapi tidak pernah
-ingin OpenClaw diam-diam fallback ke PI, pertahankan `runtime: "auto"` dan nonaktifkan
+ingin OpenClaw diam-diam melakukan fallback ke PI, pertahankan `runtime: "auto"` dan nonaktifkan
 fallback:
 
 ```json
@@ -238,23 +237,23 @@ OPENCLAW_AGENT_HARNESS_FALLBACK=none \
 openclaw gateway run
 ```
 
-Dengan fallback dinonaktifkan, sebuah sesi gagal lebih awal saat harness yang diminta tidak
-terdaftar, tidak mendukung provider/model yang telah diselesaikan, atau gagal sebelum
+Dengan fallback dinonaktifkan, sebuah sesi gagal lebih awal ketika harness yang diminta tidak
+terdaftar, tidak mendukung provider/model yang telah di-resolve, atau gagal sebelum
 menghasilkan efek samping giliran. Ini disengaja untuk deployment khusus Codex dan
-untuk live test yang harus membuktikan bahwa jalur app-server Codex benar-benar digunakan.
+untuk pengujian live yang harus membuktikan bahwa jalur app-server Codex benar-benar digunakan.
 
-Pengaturan ini hanya mengontrol harness agen tertanam. Ini tidak menonaktifkan
+Setelan ini hanya mengontrol harness agen tertanam. Ini tidak menonaktifkan
 perutean model khusus provider untuk gambar, video, musik, TTS, PDF, atau yang lainnya.
 
 ## Sesi native dan mirror transkrip
 
-Sebuah harness dapat menyimpan session id native, thread id, atau token resume di sisi daemon.
-Pertahankan pengikatan itu secara eksplisit terkait dengan sesi OpenClaw, dan tetap
-mirror output asisten/tool yang terlihat oleh pengguna ke dalam transkrip OpenClaw.
+Harness dapat menyimpan session id native, thread id, atau token resume sisi daemon.
+Pertahankan keterikatan itu secara eksplisit terkait dengan sesi OpenClaw, dan tetap
+mirror output assistant/tool yang terlihat pengguna ke dalam transkrip OpenClaw.
 
 Transkrip OpenClaw tetap menjadi lapisan kompatibilitas untuk:
 
-- riwayat sesi yang terlihat di channel
+- riwayat sesi yang terlihat di saluran
 - pencarian dan pengindeksan transkrip
 - beralih kembali ke harness PI bawaan pada giliran berikutnya
 - perilaku `/new`, `/reset`, dan penghapusan sesi generik
@@ -264,22 +263,22 @@ menghapusnya saat sesi OpenClaw pemilik di-reset.
 
 ## Hasil tool dan media
 
-Core membangun daftar tool OpenClaw dan meneruskannya ke upaya yang sudah disiapkan.
-Saat sebuah harness mengeksekusi pemanggilan tool dinamis, kembalikan hasil tool melalui
-bentuk hasil harness alih-alih mengirim media channel sendiri.
+Core membangun daftar tool OpenClaw dan meneruskannya ke prepared attempt.
+Saat harness mengeksekusi pemanggilan tool dinamis, kembalikan hasil tool melalui
+shape hasil harness alih-alih mengirim media saluran sendiri.
 
-Ini menjaga output teks, gambar, video, musik, TTS, persetujuan, dan tool perpesanan
-tetap berada pada jalur pengiriman yang sama seperti run berbasis PI.
+Ini menjaga output teks, gambar, video, musik, TTS, persetujuan, dan messaging-tool
+berada pada jalur pengiriman yang sama seperti run yang didukung PI.
 
-## Batasan saat ini
+## Keterbatasan saat ini
 
 - Jalur import publik bersifat generik, tetapi beberapa alias tipe attempt/result masih
   membawa nama `Pi` demi kompatibilitas.
-- Pemasangan harness pihak ketiga masih eksperimental. Utamakan plugin provider
+- Instalasi harness pihak ketiga masih eksperimental. Pilih plugin provider
   sampai Anda memerlukan runtime sesi native.
 - Peralihan harness didukung antar giliran. Jangan mengganti harness di tengah
-  giliran setelah tool native, persetujuan, teks asisten, atau pengiriman
-  pesan telah dimulai.
+  giliran setelah tool native, persetujuan, teks assistant, atau pengiriman pesan
+  telah dimulai.
 
 ## Terkait
 
@@ -287,4 +286,4 @@ tetap berada pada jalur pengiriman yang sama seperti run berbasis PI.
 - [Helper Runtime](/id/plugins/sdk-runtime)
 - [Plugin Provider](/id/plugins/sdk-provider-plugins)
 - [Codex Harness](/id/plugins/codex-harness)
-- [Provider Model](/id/concepts/model-providers)
+- [Penyedia Model](/id/concepts/model-providers)
