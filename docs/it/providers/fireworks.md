@@ -1,34 +1,34 @@
 ---
 read_when:
     - Vuoi usare Fireworks con OpenClaw
-    - Hai bisogno della variabile env della chiave API Fireworks o dell'ID del modello predefinito
-summary: Configurazione di Fireworks (autenticazione + selezione del modello)
+    - Ti serve la variabile env della chiave API Fireworks o l'ID del modello predefinito
+summary: Configurazione di Fireworks (auth + selezione del modello)
 title: Fireworks
 x-i18n:
-    generated_at: "2026-04-12T23:30:30Z"
+    generated_at: "2026-04-22T04:26:42Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1a85d9507c19e275fdd846a303d844eda8045d008774d4dde1eae408e8716b6f
+    source_hash: 1b2aae346f1fb7e6d649deefe9117d8d8399c0441829cb49132ff5b86a7051ce
     source_path: providers/fireworks.md
     workflow: 15
 ---
 
 # Fireworks
 
-[Fireworks](https://fireworks.ai) espone modelli open-weight e instradati tramite un'API compatibile con OpenAI. OpenClaw include un Plugin provider Fireworks bundle.
+[Fireworks](https://fireworks.ai) espone modelli open-weight e instradati tramite un'API compatibile con OpenAI. OpenClaw include un plugin provider Fireworks bundled.
 
-| Proprietà     | Valore                                                 |
+| Property      | Value                                                  |
 | ------------- | ------------------------------------------------------ |
 | Provider      | `fireworks`                                            |
 | Auth          | `FIREWORKS_API_KEY`                                    |
-| API           | chat/completions compatibili con OpenAI                |
-| URL di base   | `https://api.fireworks.ai/inference/v1`                |
-| Modello predefinito | `fireworks/accounts/fireworks/routers/kimi-k2p5-turbo` |
+| API           | chat/completions compatibile con OpenAI                |
+| Base URL      | `https://api.fireworks.ai/inference/v1`                |
+| Default model | `fireworks/accounts/fireworks/routers/kimi-k2p5-turbo` |
 
 ## Per iniziare
 
 <Steps>
-  <Step title="Configura l'autenticazione Fireworks tramite onboarding">
+  <Step title="Configura l'auth Fireworks tramite onboarding">
     ```bash
     openclaw onboard --auth-choice fireworks-api-key
     ```
@@ -45,7 +45,7 @@ x-i18n:
 
 ## Esempio non interattivo
 
-Per configurazioni scriptate o CI, passa tutti i valori sulla riga di comando:
+Per configurazioni tramite script o CI, passa tutti i valori sulla riga di comando:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -58,17 +58,18 @@ openclaw onboard --non-interactive \
 
 ## Catalogo integrato
 
-| Riferimento modello                                    | Nome                        | Input      | Contesto | Output massimo | Note                                           |
-| ------------------------------------------------------ | --------------------------- | ---------- | -------- | -------------- | ---------------------------------------------- |
-| `fireworks/accounts/fireworks/routers/kimi-k2p5-turbo` | Kimi K2.5 Turbo (Fire Pass) | text,image | 256,000  | 256,000        | Modello iniziale bundle predefinito su Fireworks |
+| Model ref                                              | Name                        | Input      | Context | Max output | Notes                                                                                                                                               |
+| ------------------------------------------------------ | --------------------------- | ---------- | ------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fireworks/accounts/fireworks/models/kimi-k2p6`        | Kimi K2.6                   | text,image | 262,144 | 262,144    | Ultimo modello Kimi su Fireworks. Il thinking è disabilitato per le richieste Fireworks K2.6; instrada direttamente tramite Moonshot se hai bisogno dell'output thinking di Kimi. |
+| `fireworks/accounts/fireworks/routers/kimi-k2p5-turbo` | Kimi K2.5 Turbo (Fire Pass) | text,image | 256,000 | 256,000    | Modello iniziale bundled predefinito su Fireworks                                                                                                   |
 
 <Tip>
-Se Fireworks pubblica un modello più recente, ad esempio una nuova release di Qwen o Gemma, puoi passare direttamente a quel modello usando il suo ID modello Fireworks senza attendere un aggiornamento del catalogo bundle.
+Se Fireworks pubblica un modello più recente come una nuova release Qwen o Gemma, puoi passare direttamente a quello usando il suo model id Fireworks senza aspettare un aggiornamento del catalogo bundled.
 </Tip>
 
-## ID modello Fireworks personalizzati
+## Model id Fireworks personalizzati
 
-OpenClaw accetta anche ID modello Fireworks dinamici. Usa l'ID esatto del modello o del router mostrato da Fireworks e anteponi `fireworks/`.
+OpenClaw accetta anche model id Fireworks dinamici. Usa l'esatto model o router id mostrato da Fireworks e anteponi `fireworks/`.
 
 ```json5
 {
@@ -83,8 +84,8 @@ OpenClaw accetta anche ID modello Fireworks dinamici. Usa l'ID esatto del modell
 ```
 
 <AccordionGroup>
-  <Accordion title="Come funziona il prefisso dell'ID modello">
-    Ogni riferimento modello Fireworks in OpenClaw inizia con `fireworks/` seguito dall'ID esatto o dal percorso del router della piattaforma Fireworks. Per esempio:
+  <Accordion title="Come funziona il prefisso del model id">
+    Ogni model ref Fireworks in OpenClaw inizia con `fireworks/` seguito dall'id esatto o dal percorso del router della piattaforma Fireworks. Per esempio:
 
     - Modello router: `fireworks/accounts/fireworks/routers/kimi-k2p5-turbo`
     - Modello diretto: `fireworks/accounts/fireworks/models/<model-name>`
@@ -97,7 +98,7 @@ OpenClaw accetta anche ID modello Fireworks dinamici. Usa l'ID esatto del modell
     Se il Gateway viene eseguito fuori dalla tua shell interattiva, assicurati che `FIREWORKS_API_KEY` sia disponibile anche per quel processo.
 
     <Warning>
-    Una chiave presente solo in `~/.profile` non aiuterà un daemon launchd/systemd a meno che quell'ambiente non venga importato anche lì. Imposta la chiave in `~/.openclaw/.env` o tramite `env.shellEnv` per garantire che il processo gateway possa leggerla.
+    Una chiave presente solo in `~/.profile` non aiuterà un daemon launchd/systemd a meno che quell'ambiente non venga importato anche lì. Imposta la chiave in `~/.openclaw/.env` o tramite `env.shellEnv` per assicurarti che il processo gateway possa leggerla.
     </Warning>
 
   </Accordion>
@@ -107,7 +108,7 @@ OpenClaw accetta anche ID modello Fireworks dinamici. Usa l'ID esatto del modell
 
 <CardGroup cols={2}>
   <Card title="Selezione del modello" href="/it/concepts/model-providers" icon="layers">
-    Scegliere provider, riferimenti ai modelli e comportamento di failover.
+    Scelta di provider, model ref e comportamento di failover.
   </Card>
   <Card title="Risoluzione dei problemi" href="/it/help/troubleshooting" icon="wrench">
     Risoluzione generale dei problemi e FAQ.

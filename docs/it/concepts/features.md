@@ -1,13 +1,13 @@
 ---
 read_when:
     - Vuoi un elenco completo di ciò che OpenClaw supporta
-summary: Funzionalità di OpenClaw tra canali, instradamento, media ed esperienza utente.
+summary: Funzionalità di OpenClaw nei vari canali, instradamento, contenuti multimediali e UX.
 title: Funzionalità
 x-i18n:
-    generated_at: "2026-04-05T13:49:31Z"
+    generated_at: "2026-04-22T04:21:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 43eae89d9af44ea786dd0221d8d602ebcea15da9d5064396ac9920c0345e2ad3
+    source_hash: 3af9955b65030fe02e35d3056d284271fa9700f3ed094c6f8323eb10e4064e22
     source_path: concepts/features.md
     workflow: 15
 ---
@@ -17,23 +17,23 @@ x-i18n:
 ## In evidenza
 
 <Columns>
-  <Card title="Canali" icon="message-square">
-    Discord, iMessage, Signal, Slack, Telegram, WhatsApp, WebChat e altro ancora con un unico Gateway.
+  <Card title="Canali" icon="message-square" href="/it/channels">
+    Discord, iMessage, Signal, Slack, Telegram, WhatsApp, WebChat e altro con un unico Gateway.
   </Card>
-  <Card title="Plugin" icon="plug">
-    I plugin inclusi aggiungono Matrix, Nextcloud Talk, Nostr, Twitch, Zalo e altro ancora senza installazioni separate nelle normali release correnti.
+  <Card title="Plugin" icon="plug" href="/it/tools/plugin">
+    I Plugin inclusi aggiungono Matrix, Nextcloud Talk, Nostr, Twitch, Zalo e altro senza installazioni separate nelle normali release correnti.
   </Card>
-  <Card title="Instradamento" icon="route">
+  <Card title="Instradamento" icon="route" href="/it/concepts/multi-agent">
     Instradamento multi-agente con sessioni isolate.
   </Card>
-  <Card title="Media" icon="image">
+  <Card title="Contenuti multimediali" icon="image" href="/it/nodes/images">
     Immagini, audio, video, documenti e generazione di immagini/video.
   </Card>
-  <Card title="App e UI" icon="monitor">
+  <Card title="App e interfaccia utente" icon="monitor" href="/web/control-ui">
     Control UI web e app complementare per macOS.
   </Card>
-  <Card title="Nodi mobili" icon="smartphone">
-    Nodi iOS e Android con pairing, voce/chat e comandi avanzati del dispositivo.
+  <Card title="Node mobili" icon="smartphone" href="/it/nodes">
+    Node iOS e Android con pairing, voce/chat e comandi avanzati del dispositivo.
   </Card>
 </Columns>
 
@@ -42,15 +42,15 @@ x-i18n:
 **Canali:**
 
 - I canali integrati includono Discord, Google Chat, iMessage (legacy), IRC, Signal, Slack, Telegram, WebChat e WhatsApp
-- I canali dei plugin inclusi comprendono BlueBubbles per iMessage, Feishu, LINE, Matrix, Mattermost, Microsoft Teams, Nextcloud Talk, Nostr, QQ Bot, Synology Chat, Tlon, Twitch, Zalo e Zalo Personal
-- I plugin di canale opzionali installati separatamente includono Voice Call e pacchetti di terze parti come WeChat
-- I plugin di canale di terze parti possono estendere ulteriormente il Gateway, ad esempio WeChat
+- I canali Plugin inclusi comprendono BlueBubbles per iMessage, Feishu, LINE, Matrix, Mattermost, Microsoft Teams, Nextcloud Talk, Nostr, QQ Bot, Synology Chat, Tlon, Twitch, Zalo e Zalo Personal
+- I Plugin di canale opzionali installati separatamente includono Voice Call e pacchetti di terze parti come WeChat
+- I Plugin di canale di terze parti possono estendere ulteriormente il Gateway, come WeChat
 - Supporto per chat di gruppo con attivazione basata sulle menzioni
-- Sicurezza dei messaggi diretti con allowlist e pairing
+- Sicurezza DM con allowlist e pairing
 
 **Agente:**
 
-- Runtime dell'agente integrato con streaming degli strumenti
+- Runtime agente incorporato con streaming degli strumenti
 - Instradamento multi-agente con sessioni isolate per workspace o mittente
 - Sessioni: le chat dirette confluiscono nel `main` condiviso; i gruppi sono isolati
 - Streaming e suddivisione in blocchi per risposte lunghe
@@ -58,26 +58,26 @@ x-i18n:
 **Autenticazione e provider:**
 
 - Oltre 35 provider di modelli (Anthropic, OpenAI, Google e altri)
-- Autenticazione tramite abbonamento via OAuth (ad esempio OpenAI Codex)
+- Autenticazione in abbonamento tramite OAuth (ad esempio OpenAI Codex)
 - Supporto per provider personalizzati e self-hosted (vLLM, SGLang, Ollama e qualsiasi endpoint compatibile con OpenAI o Anthropic)
 
-**Media:**
+**Contenuti multimediali:**
 
 - Immagini, audio, video e documenti in ingresso e in uscita
-- Superfici di capacità condivise per generazione di immagini e generazione di video
-- Trascrizione dei messaggi vocali
-- Text-to-speech con più provider
+- Superfici di funzionalità condivise per la generazione di immagini e video
+- Trascrizione di note vocali
+- Sintesi vocale con più provider
 
 **App e interfacce:**
 
 - WebChat e Control UI nel browser
 - App complementare per la barra dei menu di macOS
-- Nodo iOS con pairing, Canvas, fotocamera, registrazione dello schermo, posizione e voce
-- Nodo Android con pairing, chat, voce, Canvas, fotocamera e comandi del dispositivo
+- Node iOS con pairing, Canvas, fotocamera, registrazione dello schermo, posizione e voce
+- Node Android con pairing, chat, voce, Canvas, fotocamera e comandi del dispositivo
 
 **Strumenti e automazione:**
 
 - Automazione del browser, exec, sandboxing
 - Ricerca web (Brave, DuckDuckGo, Exa, Firecrawl, Gemini, Grok, Kimi, MiniMax Search, Ollama Web Search, Perplexity, SearXNG, Tavily)
-- Processi cron e pianificazione heartbeat
-- Skills, plugin e pipeline di workflow (Lobster)
+- Processi Cron e pianificazione Heartbeat
+- Skills, Plugin e pipeline di workflow (Lobster)
