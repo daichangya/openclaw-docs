@@ -1238,6 +1238,7 @@
                   "tools/pdf",
                   "tools/reactions",
                   "tools/thinking",
+                  "tools/tokenjuice",
                   "tools/video-generation"
                 ]
               },
@@ -2622,6 +2623,7 @@
                   "ja-JP/tools/pdf",
                   "ja-JP/tools/reactions",
                   "ja-JP/tools/thinking",
+                  "ja-JP/tools/tokenjuice",
                   "ja-JP/tools/video-generation"
                 ]
               },
@@ -3391,6 +3393,7 @@
                   "es/tools/pdf",
                   "es/tools/reactions",
                   "es/tools/thinking",
+                  "es/tools/tokenjuice",
                   "es/tools/video-generation"
                 ]
               },
@@ -4160,6 +4163,7 @@
                   "pt-BR/tools/pdf",
                   "pt-BR/tools/reactions",
                   "pt-BR/tools/thinking",
+                  "pt-BR/tools/tokenjuice",
                   "pt-BR/tools/video-generation"
                 ]
               },
@@ -4929,6 +4933,7 @@
                   "ko/tools/pdf",
                   "ko/tools/reactions",
                   "ko/tools/thinking",
+                  "ko/tools/tokenjuice",
                   "ko/tools/video-generation"
                 ]
               },
@@ -5698,6 +5703,7 @@
                   "de/tools/pdf",
                   "de/tools/reactions",
                   "de/tools/thinking",
+                  "de/tools/tokenjuice",
                   "de/tools/video-generation"
                 ]
               },
@@ -6467,6 +6473,7 @@
                   "fr/tools/pdf",
                   "fr/tools/reactions",
                   "fr/tools/thinking",
+                  "fr/tools/tokenjuice",
                   "fr/tools/video-generation"
                 ]
               },
@@ -7236,6 +7243,7 @@
                   "ar/tools/pdf",
                   "ar/tools/reactions",
                   "ar/tools/thinking",
+                  "ar/tools/tokenjuice",
                   "ar/tools/video-generation"
                 ]
               },
@@ -8005,6 +8013,7 @@
                   "it/tools/pdf",
                   "it/tools/reactions",
                   "it/tools/thinking",
+                  "it/tools/tokenjuice",
                   "it/tools/video-generation"
                 ]
               },
@@ -8774,6 +8783,7 @@
                   "tr/tools/pdf",
                   "tr/tools/reactions",
                   "tr/tools/thinking",
+                  "tr/tools/tokenjuice",
                   "tr/tools/video-generation"
                 ]
               },
@@ -9543,6 +9553,7 @@
                   "uk/tools/pdf",
                   "uk/tools/reactions",
                   "uk/tools/thinking",
+                  "uk/tools/tokenjuice",
                   "uk/tools/video-generation"
                 ]
               },
@@ -10312,6 +10323,7 @@
                   "id/tools/pdf",
                   "id/tools/reactions",
                   "id/tools/thinking",
+                  "id/tools/tokenjuice",
                   "id/tools/video-generation"
                 ]
               },
@@ -11081,6 +11093,7 @@
                   "pl/tools/pdf",
                   "pl/tools/reactions",
                   "pl/tools/thinking",
+                  "pl/tools/tokenjuice",
                   "pl/tools/video-generation"
                 ]
               },
