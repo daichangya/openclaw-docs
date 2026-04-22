@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Anda ingin pekerjaan latar belakang/paralel melalui agen
-    - Anda sedang mengubah kebijakan alat `sessions_spawn` atau sub-agent
-    - Anda sedang mengimplementasikan atau memecahkan masalah sesi subagent yang terikat ke thread
-summary: 'Sub-agent: menjalankan agen terisolasi yang mengumumkan hasil kembali ke chat peminta'
+    - Anda menginginkan pekerjaan latar belakang/paralel melalui agent
+    - Anda sedang mengubah `sessions_spawn` atau kebijakan tool sub-agent
+    - Anda sedang mengimplementasikan atau memecahkan masalah sesi sub-agent yang terikat thread
+summary: 'Sub-agent: memunculkan run agent terisolasi yang mengumumkan hasil kembali ke chat peminta'
 title: Sub-Agent
 x-i18n:
-    generated_at: "2026-04-21T19:20:52Z"
+    generated_at: "2026-04-22T04:27:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 218913f0db88d40e1b5fdb0201b8d23e7af23df572c86ff4be2637cb62498281
+    source_hash: ef8d8faa296bdc1b56079bd4a24593ba2e1aa02b9929a7a191b0d8498364ce4e
     source_path: tools/subagents.md
     workflow: 15
 ---
 
 # Sub-agent
 
-Sub-agent adalah eksekusi agen latar belakang yang di-spawn dari eksekusi agen yang sudah ada. Mereka berjalan dalam sesi mereka sendiri (`agent:<agentId>:subagent:<uuid>`) dan, ketika selesai, **mengumumkan** hasilnya kembali ke channel chat peminta. Setiap eksekusi sub-agent dilacak sebagai [tugas latar belakang](/id/automation/tasks).
+Sub-agent adalah run agent latar belakang yang dimunculkan dari run agent yang sudah ada. Mereka berjalan di sesi mereka sendiri (`agent:<agentId>:subagent:<uuid>`) dan, ketika selesai, **mengumumkan** hasilnya kembali ke channel chat peminta. Setiap run sub-agent dilacak sebagai [tugas latar belakang](/id/automation/tasks).
 
 ## Perintah slash
 
-Gunakan `/subagents` untuk memeriksa atau mengontrol eksekusi sub-agent untuk **sesi saat ini**:
+Gunakan `/subagents` untuk memeriksa atau mengendalikan run sub-agent untuk **sesi saat ini**:
 
 - `/subagents list`
 - `/subagents kill <id|#|all>`
@@ -30,9 +30,9 @@ Gunakan `/subagents` untuk memeriksa atau mengontrol eksekusi sub-agent untuk **
 - `/subagents steer <id|#> <message>`
 - `/subagents spawn <agentId> <task> [--model <model>] [--thinking <level>]`
 
-Kontrol pengikatan thread:
+Kontrol binding thread:
 
-Perintah ini berfungsi pada channel yang mendukung pengikatan thread persisten. Lihat **Channel yang mendukung thread** di bawah.
+Perintah-perintah ini berfungsi pada channel yang mendukung binding thread persisten. Lihat **Channel yang mendukung thread** di bawah.
 
 - `/focus <subagent-label|session-key|session-id|session-label>`
 - `/unfocus`
@@ -40,129 +40,129 @@ Perintah ini berfungsi pada channel yang mendukung pengikatan thread persisten. 
 - `/session idle <duration|off>`
 - `/session max-age <duration|off>`
 
-`/subagents info` menampilkan metadata eksekusi (status, cap waktu, id sesi, path transkrip, pembersihan).
+`/subagents info` menampilkan metadata run (status, timestamp, session id, path transkrip, cleanup).
 Gunakan `sessions_history` untuk tampilan recall yang dibatasi dan difilter demi keamanan; periksa
 path transkrip di disk saat Anda memerlukan transkrip mentah lengkap.
 
 ### Perilaku spawn
 
-`/subagents spawn` memulai sub-agent latar belakang sebagai perintah pengguna, bukan relay internal, dan mengirim satu pembaruan penyelesaian final kembali ke chat peminta saat eksekusi selesai.
+`/subagents spawn` memulai sub-agent latar belakang sebagai perintah pengguna, bukan relay internal, dan mengirim satu pembaruan penyelesaian final kembali ke chat peminta saat run selesai.
 
-- Perintah spawn bersifat non-blocking; perintah ini langsung mengembalikan id eksekusi.
+- Perintah spawn bersifat non-blocking; perintah ini segera mengembalikan ID run.
 - Saat selesai, sub-agent mengumumkan pesan ringkasan/hasil kembali ke channel chat peminta.
-- Pengiriman penyelesaian berbasis push. Setelah di-spawn, jangan melakukan polling `/subagents list`,
-  `sessions_list`, atau `sessions_history` dalam loop hanya untuk menunggu penyelesaian;
-  periksa status hanya sesuai kebutuhan untuk debugging atau intervensi.
-- Saat selesai, OpenClaw melakukan best-effort untuk menutup tab/proses browser yang dilacak yang dibuka oleh sesi sub-agent tersebut sebelum alur pembersihan pengumuman berlanjut.
+- Pengiriman penyelesaian berbasis push. Setelah dimunculkan, jangan melakukan polling `/subagents list`,
+  `sessions_list`, atau `sessions_history` dalam loop hanya untuk menunggu hingga
+  selesai; periksa status hanya saat diperlukan untuk debugging atau intervensi.
+- Saat selesai, OpenClaw dengan upaya terbaik menutup tab/proses browser yang dilacak yang dibuka oleh sesi sub-agent tersebut sebelum alur cleanup announce berlanjut.
 - Untuk spawn manual, pengiriman bersifat tangguh:
-  - OpenClaw mencoba pengiriman `agent` langsung terlebih dahulu dengan kunci idempoten yang stabil.
-  - Jika pengiriman langsung gagal, OpenClaw beralih ke perutean antrean.
-  - Jika perutean antrean masih tidak tersedia, pengumuman dicoba lagi dengan exponential backoff singkat sebelum akhirnya menyerah.
-- Pengiriman penyelesaian mempertahankan rute peminta yang telah diselesaikan:
-  - rute penyelesaian yang terikat thread atau terikat percakapan diprioritaskan saat tersedia
-  - jika asal penyelesaian hanya menyediakan channel, OpenClaw mengisi target/akun yang hilang dari rute terselesaikan sesi peminta (`lastChannel` / `lastTo` / `lastAccountId`) agar pengiriman langsung tetap berfungsi
-- Handoff penyelesaian ke sesi peminta adalah konteks internal yang dibuat saat runtime (bukan teks buatan pengguna) dan mencakup:
-  - `Result` (teks balasan `assistant` terlihat terbaru, atau jika tidak ada, teks tool/toolResult terbaru yang telah disanitasi; eksekusi gagal terminal tidak menggunakan ulang teks balasan yang tertangkap)
+  - OpenClaw mencoba pengiriman `agent` langsung terlebih dahulu dengan idempotency key yang stabil.
+  - Jika pengiriman langsung gagal, OpenClaw fallback ke routing antrean.
+  - Jika routing antrean masih tidak tersedia, announce akan dicoba ulang dengan backoff eksponensial singkat sebelum akhirnya menyerah.
+- Pengiriman penyelesaian mempertahankan route peminta yang telah diselesaikan:
+  - route penyelesaian yang terikat thread atau percakapan diutamakan saat tersedia
+  - jika origin penyelesaian hanya menyediakan channel, OpenClaw mengisi target/akun yang hilang dari route yang telah diselesaikan milik sesi peminta (`lastChannel` / `lastTo` / `lastAccountId`) sehingga pengiriman langsung tetap berfungsi
+- Handoff penyelesaian ke sesi peminta adalah konteks internal yang dihasilkan saat runtime (bukan teks yang ditulis pengguna) dan mencakup:
+  - `Result` (teks balasan `assistant` terlihat terbaru, atau teks tool/toolResult terbaru yang sudah disanitasi; run gagal terminal tidak menggunakan ulang teks balasan yang ditangkap)
   - `Status` (`completed successfully` / `failed` / `timed out` / `unknown`)
   - statistik runtime/token ringkas
-  - instruksi pengiriman yang memberitahu agen peminta untuk menulis ulang dengan suara assistant normal (bukan meneruskan metadata internal mentah)
-- `--model` dan `--thinking` menimpa default untuk eksekusi spesifik tersebut.
+  - instruksi pengiriman yang memberi tahu agent peminta untuk menulis ulang dengan suara asisten normal (bukan meneruskan metadata internal mentah)
+- `--model` dan `--thinking` menimpa default untuk run tertentu itu.
 - Gunakan `info`/`log` untuk memeriksa detail dan output setelah selesai.
 - `/subagents spawn` adalah mode sekali jalan (`mode: "run"`). Untuk sesi persisten yang terikat thread, gunakan `sessions_spawn` dengan `thread: true` dan `mode: "session"`.
-- Untuk sesi harness ACP (Codex, Claude Code, Gemini CLI), gunakan `sessions_spawn` dengan `runtime: "acp"` dan lihat [ACP Agents](/id/tools/acp-agents).
+- Untuk sesi harness ACP (Codex, Claude Code, Gemini CLI), gunakan `sessions_spawn` dengan `runtime: "acp"` dan lihat [ACP Agents](/id/tools/acp-agents), khususnya [model pengiriman ACP](/id/tools/acp-agents#delivery-model) saat men-debug penyelesaian atau loop agent-ke-agent.
 
 Tujuan utama:
 
-- Memparalelkan pekerjaan "riset / tugas panjang / tool lambat" tanpa memblokir eksekusi utama.
-- Menjaga sub-agent tetap terisolasi secara default (pemisahan sesi + sandboxing opsional).
-- Menjaga permukaan tool tetap sulit disalahgunakan: sub-agent secara default **tidak** mendapatkan tool sesi.
+- Memparalelkan pekerjaan “riset / tugas panjang / tool lambat” tanpa memblokir run utama.
+- Menjaga sub-agent tetap terisolasi secara default (pemisahan sesi + sandbox opsional).
+- Menjaga permukaan tool tetap sulit disalahgunakan: sub-agent **tidak** mendapatkan tool sesi secara default.
 - Mendukung kedalaman nesting yang dapat dikonfigurasi untuk pola orkestrator.
 
-Catatan biaya: setiap sub-agent memiliki konteks dan penggunaan tokennya **sendiri**. Untuk tugas berat atau berulang,
-atur model yang lebih murah untuk sub-agent dan pertahankan agen utama Anda pada model berkualitas lebih tinggi.
-Anda dapat mengonfigurasi ini melalui `agents.defaults.subagents.model` atau override per agen.
+Catatan biaya: setiap sub-agent memiliki konteks dan penggunaan tokennya **sendiri**. Untuk tugas yang berat atau berulang,
+atur model yang lebih murah untuk sub-agent dan pertahankan agent utama Anda pada model berkualitas lebih tinggi.
+Anda dapat mengonfigurasi ini melalui `agents.defaults.subagents.model` atau override per-agent.
 
 ## Tool
 
 Gunakan `sessions_spawn`:
 
-- Memulai eksekusi sub-agent (`deliver: false`, lane global: `subagent`)
-- Lalu menjalankan langkah pengumuman dan memposting balasan pengumuman ke channel chat peminta
-- Model default: mewarisi pemanggil kecuali Anda menetapkan `agents.defaults.subagents.model` (atau `agents.list[].subagents.model` per agen); `sessions_spawn.model` yang eksplisit tetap diprioritaskan.
-- Thinking default: mewarisi pemanggil kecuali Anda menetapkan `agents.defaults.subagents.thinking` (atau `agents.list[].subagents.thinking` per agen); `sessions_spawn.thinking` yang eksplisit tetap diprioritaskan.
-- Timeout eksekusi default: jika `sessions_spawn.runTimeoutSeconds` dihilangkan, OpenClaw menggunakan `agents.defaults.subagents.runTimeoutSeconds` jika ditetapkan; jika tidak, OpenClaw menggunakan `0` (tanpa timeout).
+- Memulai run sub-agent (`deliver: false`, lane global: `subagent`)
+- Lalu menjalankan langkah announce dan memposting balasan announce ke channel chat peminta
+- Model default: mewarisi pemanggil kecuali Anda mengatur `agents.defaults.subagents.model` (atau `agents.list[].subagents.model` per-agent); `sessions_spawn.model` eksplisit tetap menang.
+- Thinking default: mewarisi pemanggil kecuali Anda mengatur `agents.defaults.subagents.thinking` (atau `agents.list[].subagents.thinking` per-agent); `sessions_spawn.thinking` eksplisit tetap menang.
+- Timeout run default: jika `sessions_spawn.runTimeoutSeconds` dihilangkan, OpenClaw menggunakan `agents.defaults.subagents.runTimeoutSeconds` saat diatur; jika tidak, fallback ke `0` (tanpa timeout).
 
-Parameter tool:
+Param tool:
 
 - `task` (wajib)
 - `label?` (opsional)
-- `agentId?` (opsional; spawn di bawah id agen lain jika diizinkan)
+- `agentId?` (opsional; spawn di bawah ID agent lain jika diizinkan)
 - `model?` (opsional; menimpa model sub-agent; nilai tidak valid dilewati dan sub-agent berjalan pada model default dengan peringatan di hasil tool)
-- `thinking?` (opsional; menimpa level thinking untuk eksekusi sub-agent)
-- `runTimeoutSeconds?` (default ke `agents.defaults.subagents.runTimeoutSeconds` jika ditetapkan, jika tidak `0`; bila ditetapkan, eksekusi sub-agent dihentikan setelah N detik)
-- `thread?` (default `false`; saat `true`, meminta pengikatan thread channel untuk sesi sub-agent ini)
+- `thinking?` (opsional; menimpa level thinking untuk run sub-agent)
+- `runTimeoutSeconds?` (default ke `agents.defaults.subagents.runTimeoutSeconds` saat diatur, jika tidak `0`; saat diatur, run sub-agent dibatalkan setelah N detik)
+- `thread?` (default `false`; saat `true`, meminta binding thread channel untuk sesi sub-agent ini)
 - `mode?` (`run|session`)
   - default adalah `run`
   - jika `thread: true` dan `mode` dihilangkan, default menjadi `session`
   - `mode: "session"` memerlukan `thread: true`
 - `cleanup?` (`delete|keep`, default `keep`)
 - `sandbox?` (`inherit|require`, default `inherit`; `require` menolak spawn kecuali runtime child target disandbox)
-- `sessions_spawn` **tidak** menerima parameter pengiriman channel (`target`, `channel`, `to`, `threadId`, `replyTo`, `transport`). Untuk pengiriman, gunakan `message`/`sessions_send` dari eksekusi yang di-spawn.
+- `sessions_spawn` **tidak** menerima param pengiriman channel (`target`, `channel`, `to`, `threadId`, `replyTo`, `transport`). Untuk pengiriman, gunakan `message`/`sessions_send` dari run yang dimunculkan.
 
 ## Sesi terikat thread
 
-Ketika pengikatan thread diaktifkan untuk suatu channel, sub-agent dapat tetap terikat ke thread sehingga pesan pengguna lanjutan di thread tersebut terus dirutekan ke sesi sub-agent yang sama.
+Saat binding thread diaktifkan untuk suatu channel, sub-agent dapat tetap terikat ke thread sehingga pesan pengguna lanjutan di thread tersebut terus dirutekan ke sesi sub-agent yang sama.
 
 ### Channel yang mendukung thread
 
-- Discord (saat ini satu-satunya channel yang didukung): mendukung sesi subagent persisten yang terikat thread (`sessions_spawn` dengan `thread: true`), kontrol thread manual (`/focus`, `/unfocus`, `/agents`, `/session idle`, `/session max-age`), dan kunci adaptor `channels.discord.threadBindings.enabled`, `channels.discord.threadBindings.idleHours`, `channels.discord.threadBindings.maxAgeHours`, dan `channels.discord.threadBindings.spawnSubagentSessions`.
+- Discord (saat ini satu-satunya channel yang didukung): mendukung sesi subagent persisten yang terikat thread (`sessions_spawn` dengan `thread: true`), kontrol thread manual (`/focus`, `/unfocus`, `/agents`, `/session idle`, `/session max-age`), dan key adapter `channels.discord.threadBindings.enabled`, `channels.discord.threadBindings.idleHours`, `channels.discord.threadBindings.maxAgeHours`, dan `channels.discord.threadBindings.spawnSubagentSessions`.
 
-Alur singkat:
+Alur cepat:
 
 1. Spawn dengan `sessions_spawn` menggunakan `thread: true` (dan opsional `mode: "session"`).
-2. OpenClaw membuat atau mengikat thread ke target sesi tersebut di channel aktif.
+2. OpenClaw membuat atau mengikat thread ke target sesi itu di channel aktif.
 3. Balasan dan pesan lanjutan di thread tersebut dirutekan ke sesi yang terikat.
 4. Gunakan `/session idle` untuk memeriksa/memperbarui auto-unfocus karena tidak aktif dan `/session max-age` untuk mengontrol batas keras.
-5. Gunakan `/unfocus` untuk melepas secara manual.
+5. Gunakan `/unfocus` untuk melepaskan secara manual.
 
 Kontrol manual:
 
 - `/focus <target>` mengikat thread saat ini (atau membuat thread) ke target sub-agent/sesi.
-- `/unfocus` menghapus pengikatan untuk thread saat ini yang sedang terikat.
-- `/agents` menampilkan daftar eksekusi aktif dan status pengikatan (`thread:<id>` atau `unbound`).
+- `/unfocus` menghapus binding untuk thread terikat saat ini.
+- `/agents` mencantumkan run aktif dan status binding (`thread:<id>` atau `unbound`).
 - `/session idle` dan `/session max-age` hanya berfungsi untuk thread terikat yang sedang fokus.
 
-Sakelar konfigurasi:
+Sakelar config:
 
 - Default global: `session.threadBindings.enabled`, `session.threadBindings.idleHours`, `session.threadBindings.maxAgeHours`
-- Override channel dan kunci auto-bind spawn bersifat spesifik adaptor. Lihat **Channel yang mendukung thread** di atas.
+- Override channel dan key auto-bind spawn bersifat spesifik adapter. Lihat **Channel yang mendukung thread** di atas.
 
-Lihat [Configuration Reference](/id/gateway/configuration-reference) dan [Slash commands](/id/tools/slash-commands) untuk detail adaptor saat ini.
+Lihat [Referensi Konfigurasi](/id/gateway/configuration-reference) dan [Perintah slash](/id/tools/slash-commands) untuk detail adapter saat ini.
 
-Daftar izin:
+Allowlist:
 
-- `agents.list[].subagents.allowAgents`: daftar id agen yang dapat ditargetkan melalui `agentId` (`["*"]` untuk mengizinkan semua). Default: hanya agen peminta.
-- `agents.defaults.subagents.allowAgents`: daftar izin agen target default yang digunakan saat agen peminta tidak menetapkan `subagents.allowAgents` miliknya sendiri.
-- Guard pewarisan sandbox: jika sesi peminta disandbox, `sessions_spawn` menolak target yang akan berjalan tanpa sandbox.
-- `agents.defaults.subagents.requireAgentId` / `agents.list[].subagents.requireAgentId`: saat true, memblokir pemanggilan `sessions_spawn` yang menghilangkan `agentId` (memaksa pemilihan profil eksplisit). Default: false.
+- `agents.list[].subagents.allowAgents`: daftar ID agent yang dapat ditargetkan melalui `agentId` (`["*"]` untuk mengizinkan apa pun). Default: hanya agent peminta.
+- `agents.defaults.subagents.allowAgents`: allowlist agent target default yang digunakan saat agent peminta tidak mengatur `subagents.allowAgents` sendiri.
+- Pengaman pewarisan sandbox: jika sesi peminta disandbox, `sessions_spawn` menolak target yang akan berjalan tanpa sandbox.
+- `agents.defaults.subagents.requireAgentId` / `agents.list[].subagents.requireAgentId`: saat true, blokir pemanggilan `sessions_spawn` yang menghilangkan `agentId` (memaksa pemilihan profil eksplisit). Default: false.
 
 Discovery:
 
-- Gunakan `agents_list` untuk melihat id agen mana yang saat ini diizinkan untuk `sessions_spawn`.
+- Gunakan `agents_list` untuk melihat ID agent mana yang saat ini diizinkan untuk `sessions_spawn`.
 
 Auto-archive:
 
 - Sesi sub-agent diarsipkan secara otomatis setelah `agents.defaults.subagents.archiveAfterMinutes` (default: 60).
-- Arsip menggunakan `sessions.delete` dan mengganti nama transkrip menjadi `*.deleted.<timestamp>` (folder yang sama).
-- `cleanup: "delete"` langsung mengarsipkan setelah pengumuman (tetap mempertahankan transkrip melalui penggantian nama).
-- Auto-archive bersifat best-effort; timer yang tertunda hilang jika Gateway dimulai ulang.
-- `runTimeoutSeconds` **tidak** melakukan auto-archive; opsi ini hanya menghentikan eksekusi. Sesi tetap ada hingga auto-archive.
+- Pengarsipan menggunakan `sessions.delete` dan mengganti nama transkrip menjadi `*.deleted.<timestamp>` (folder yang sama).
+- `cleanup: "delete"` mengarsipkan segera setelah announce (tetap mempertahankan transkrip melalui penggantian nama).
+- Auto-archive bersifat best-effort; timer yang tertunda hilang jika gateway di-restart.
+- `runTimeoutSeconds` **tidak** melakukan auto-archive; ia hanya menghentikan run. Sesi tetap ada sampai auto-archive.
 - Auto-archive berlaku sama untuk sesi depth-1 dan depth-2.
-- Pembersihan browser terpisah dari pembersihan arsip: tab/proses browser yang dilacak ditutup secara best-effort saat eksekusi selesai, bahkan jika catatan transkrip/sesi tetap disimpan.
+- Cleanup browser terpisah dari cleanup arsip: tab/proses browser yang dilacak ditutup dengan upaya terbaik saat run selesai, bahkan jika record transkrip/sesi dipertahankan.
 
-## Nested Sub-Agent
+## Sub-Agent bersarang
 
-Secara default, sub-agent tidak dapat melakukan spawn sub-agent mereka sendiri (`maxSpawnDepth: 1`). Anda dapat mengaktifkan satu level nesting dengan menetapkan `maxSpawnDepth: 2`, yang mengizinkan **pola orkestrator**: utama → sub-agent orkestrator → sub-sub-agent pekerja.
+Secara default, sub-agent tidak dapat memunculkan sub-agent mereka sendiri (`maxSpawnDepth: 1`). Anda dapat mengaktifkan satu tingkat nesting dengan mengatur `maxSpawnDepth: 2`, yang memungkinkan **pola orkestrator**: main → sub-agent orkestrator → sub-sub-agent pekerja.
 
 ### Cara mengaktifkan
 
@@ -171,8 +171,8 @@ Secara default, sub-agent tidak dapat melakukan spawn sub-agent mereka sendiri (
   agents: {
     defaults: {
       subagents: {
-        maxSpawnDepth: 2, // izinkan sub-agent melakukan spawn child (default: 1)
-        maxChildrenPerAgent: 5, // maksimum child aktif per sesi agen (default: 5)
+        maxSpawnDepth: 2, // izinkan sub-agent memunculkan child (default: 1)
+        maxChildrenPerAgent: 5, // child aktif maksimum per sesi agent (default: 5)
         maxConcurrent: 8, // batas lane konkurensi global (default: 8)
         runTimeoutSeconds: 900, // timeout default untuk sessions_spawn saat dihilangkan (0 = tanpa timeout)
       },
@@ -181,112 +181,112 @@ Secara default, sub-agent tidak dapat melakukan spawn sub-agent mereka sendiri (
 }
 ```
 
-### Level kedalaman
+### Tingkat depth
 
-| Depth | Bentuk kunci sesi                            | Peran                                         | Dapat spawn?                |
-| ----- | -------------------------------------------- | --------------------------------------------- | --------------------------- |
-| 0     | `agent:<id>:main`                            | Agen utama                                    | Selalu                      |
-| 1     | `agent:<id>:subagent:<uuid>`                 | Sub-agent (orkestrator saat depth 2 diizinkan) | Hanya jika `maxSpawnDepth >= 2` |
-| 2     | `agent:<id>:subagent:<uuid>:subagent:<uuid>` | Sub-sub-agent (pekerja leaf)                  | Tidak pernah                |
+| Depth | Bentuk key sesi                             | Peran                                         | Bisa memunculkan?              |
+| ----- | ------------------------------------------- | --------------------------------------------- | ------------------------------ |
+| 0     | `agent:<id>:main`                           | Agent utama                                   | Selalu                         |
+| 1     | `agent:<id>:subagent:<uuid>`                | Sub-agent (orkestrator saat depth 2 diizinkan) | Hanya jika `maxSpawnDepth >= 2` |
+| 2     | `agent:<id>:subagent:<uuid>:subagent:<uuid>` | Sub-sub-agent (pekerja leaf)                  | Tidak pernah                   |
 
-### Rantai pengumuman
+### Rantai announce
 
 Hasil mengalir kembali ke atas rantai:
 
-1. Pekerja depth-2 selesai → mengumumkan ke parent-nya (orkestrator depth-1)
-2. Orkestrator depth-1 menerima pengumuman, menyintesis hasil, selesai → mengumumkan ke utama
-3. Agen utama menerima pengumuman dan mengirimkannya ke pengguna
+1. Pekerja depth-2 selesai → mengumumkan ke induknya (orkestrator depth-1)
+2. Orkestrator depth-1 menerima announce, mensintesis hasil, selesai → mengumumkan ke main
+3. Agent utama menerima announce dan mengirimkannya ke pengguna
 
-Setiap level hanya melihat pengumuman dari child langsungnya.
+Setiap level hanya melihat announce dari child langsungnya.
 
 Panduan operasional:
 
-- Mulai pekerjaan child sekali lalu tunggu peristiwa penyelesaian alih-alih membangun loop
-  polling di sekitar `sessions_list`, `sessions_history`, `/subagents list`, atau
+- Mulai pekerjaan child satu kali dan tunggu event penyelesaian alih-alih membangun loop polling
+  di sekitar `sessions_list`, `sessions_history`, `/subagents list`, atau
   perintah `exec` sleep.
-- Jika peristiwa penyelesaian child tiba setelah Anda sudah mengirim jawaban final,
+- Jika event penyelesaian child tiba setelah Anda sudah mengirim jawaban final,
   tindak lanjut yang benar adalah token senyap persis `NO_REPLY` / `no_reply`.
 
 ### Kebijakan tool berdasarkan depth
 
-- Peran dan cakupan kontrol ditulis ke metadata sesi saat waktu spawn. Ini mencegah kunci sesi datar atau yang dipulihkan secara tidak sengaja mendapatkan kembali hak istimewa orkestrator.
-- **Depth 1 (orkestrator, saat `maxSpawnDepth >= 2`)**: Mendapat `sessions_spawn`, `subagents`, `sessions_list`, `sessions_history` sehingga dapat mengelola child-nya. Tool sesi/sistem lainnya tetap ditolak.
+- Role dan scope kontrol ditulis ke metadata sesi saat spawn. Ini mencegah key sesi yang datar atau dipulihkan secara tidak sengaja mendapatkan kembali hak istimewa orkestrator.
+- **Depth 1 (orkestrator, saat `maxSpawnDepth >= 2`)**: Mendapat `sessions_spawn`, `subagents`, `sessions_list`, `sessions_history` agar dapat mengelola child-nya. Tool sesi/sistem lainnya tetap ditolak.
 - **Depth 1 (leaf, saat `maxSpawnDepth == 1`)**: Tidak ada tool sesi (perilaku default saat ini).
-- **Depth 2 (pekerja leaf)**: Tidak ada tool sesi — `sessions_spawn` selalu ditolak pada depth 2. Tidak dapat melakukan spawn child lebih lanjut.
+- **Depth 2 (pekerja leaf)**: Tidak ada tool sesi — `sessions_spawn` selalu ditolak pada depth 2. Tidak dapat memunculkan child lebih lanjut.
 
-### Batas spawn per agen
+### Batas spawn per-agent
 
-Setiap sesi agen (pada depth apa pun) dapat memiliki paling banyak `maxChildrenPerAgent` (default: 5) child aktif pada saat yang sama. Ini mencegah fan-out tak terkendali dari satu orkestrator.
+Setiap sesi agent (pada kedalaman apa pun) dapat memiliki paling banyak `maxChildrenPerAgent` (default: 5) child aktif pada satu waktu. Ini mencegah fan-out yang lepas kendali dari satu orkestrator.
 
-### Penghentian berantai
+### Hentikan berantai
 
-Menghentikan orkestrator depth-1 secara otomatis juga menghentikan semua child depth-2 miliknya:
+Menghentikan orkestrator depth-1 secara otomatis menghentikan semua child depth-2-nya:
 
-- `/stop` di chat utama menghentikan semua agen depth-1 dan berantai ke child depth-2 mereka.
-- `/subagents kill <id>` menghentikan sub-agent tertentu dan berantai ke child-nya.
-- `/subagents kill all` menghentikan semua sub-agent untuk peminta dan berantai.
+- `/stop` di chat utama menghentikan semua agent depth-1 dan meneruskan penghentian ke child depth-2 mereka.
+- `/subagents kill <id>` menghentikan sub-agent tertentu dan meneruskan ke child-nya.
+- `/subagents kill all` menghentikan semua sub-agent untuk peminta dan meneruskan penghentian.
 
 ## Autentikasi
 
-Autentikasi sub-agent diselesaikan berdasarkan **id agen**, bukan berdasarkan jenis sesi:
+Auth sub-agent diselesaikan berdasarkan **ID agent**, bukan berdasarkan tipe sesi:
 
-- Kunci sesi sub-agent adalah `agent:<agentId>:subagent:<uuid>`.
-- Penyimpanan auth dimuat dari `agentDir` agen tersebut.
-- Profil auth agen utama digabungkan sebagai **fallback**; profil agen menimpa profil utama saat terjadi konflik.
+- Key sesi sub-agent adalah `agent:<agentId>:subagent:<uuid>`.
+- Penyimpanan auth dimuat dari `agentDir` milik agent tersebut.
+- Profil auth agent utama digabungkan sebagai **fallback**; profil agent menimpa profil utama jika terjadi konflik.
 
-Catatan: penggabungan bersifat aditif, jadi profil utama selalu tersedia sebagai fallback. Auth yang sepenuhnya terisolasi per agen belum didukung.
+Catatan: merge ini bersifat aditif, sehingga profil utama selalu tersedia sebagai fallback. Auth yang sepenuhnya terisolasi per agent belum didukung.
 
-## Pengumuman
+## Announce
 
-Sub-agent melaporkan kembali melalui langkah pengumuman:
+Sub-agent melaporkan kembali melalui langkah announce:
 
-- Langkah pengumuman berjalan di dalam sesi sub-agent (bukan sesi peminta).
+- Langkah announce berjalan di dalam sesi sub-agent (bukan sesi peminta).
 - Jika sub-agent membalas tepat `ANNOUNCE_SKIP`, tidak ada yang diposting.
-- Jika teks assistant terbaru adalah token senyap persis `NO_REPLY` / `no_reply`,
-  output pengumuman disembunyikan meskipun sebelumnya ada progres yang terlihat.
+- Jika teks asisten terbaru adalah token senyap persis `NO_REPLY` / `no_reply`,
+  output announce ditekan meskipun sebelumnya ada progres yang terlihat.
 - Jika tidak, pengiriman bergantung pada depth peminta:
-  - sesi peminta level teratas menggunakan panggilan `agent` tindak lanjut dengan pengiriman eksternal (`deliver=true`)
-  - sesi subagent peminta bertingkat menerima injeksi tindak lanjut internal (`deliver=false`) agar orkestrator dapat menyintesis hasil child di dalam sesi
-  - jika sesi subagent peminta bertingkat sudah tidak ada, OpenClaw beralih ke peminta sesi tersebut jika tersedia
-- Untuk sesi peminta level teratas, pengiriman langsung mode penyelesaian pertama-tama menyelesaikan rute percakapan/thread terikat dan hook override, lalu mengisi field target channel yang hilang dari rute tersimpan sesi peminta. Ini menjaga penyelesaian tetap pada chat/topik yang benar bahkan saat asal penyelesaian hanya mengidentifikasi channel.
-- Agregasi penyelesaian child dibatasi ke eksekusi peminta saat ini saat membangun temuan penyelesaian bertingkat, mencegah output child dari eksekusi lama yang sudah usang bocor ke pengumuman saat ini.
-- Balasan pengumuman mempertahankan perutean thread/topik saat tersedia pada adaptor channel.
-- Konteks pengumuman dinormalisasi menjadi blok peristiwa internal yang stabil:
+  - sesi peminta tingkat atas menggunakan panggilan `agent` lanjutan dengan pengiriman eksternal (`deliver=true`)
+  - sesi subagent peminta bersarang menerima injeksi lanjutan internal (`deliver=false`) sehingga orkestrator dapat mensintesis hasil child di dalam sesi
+  - jika sesi subagent peminta bersarang sudah tidak ada, OpenClaw fallback ke peminta sesi tersebut saat tersedia
+- Untuk sesi peminta tingkat atas, pengiriman langsung mode penyelesaian pertama-tama menyelesaikan route percakapan/thread terikat dan hook override, lalu mengisi field target channel yang hilang dari route tersimpan milik sesi peminta. Ini menjaga penyelesaian tetap berada pada chat/topik yang benar bahkan saat origin penyelesaian hanya mengidentifikasi channel.
+- Agregasi penyelesaian child dibatasi ke run peminta saat ini saat membangun temuan penyelesaian bersarang, sehingga output child basi dari run sebelumnya tidak bocor ke announce saat ini.
+- Balasan announce mempertahankan routing thread/topik saat tersedia pada adapter channel.
+- Konteks announce dinormalisasi menjadi blok event internal yang stabil:
   - sumber (`subagent` atau `cron`)
-  - kunci/id sesi child
-  - jenis pengumuman + label tugas
+  - key/ID sesi child
+  - tipe announce + label tugas
   - baris status yang diturunkan dari hasil runtime (`success`, `error`, `timeout`, atau `unknown`)
-  - konten hasil yang dipilih dari teks assistant terlihat terbaru, atau jika tidak ada, teks tool/toolResult terbaru yang telah disanitasi; eksekusi gagal terminal melaporkan status gagal tanpa memutar ulang teks balasan yang tertangkap
-  - instruksi tindak lanjut yang menjelaskan kapan harus membalas vs. tetap diam
-- `Status` tidak disimpulkan dari output model; status berasal dari sinyal hasil runtime.
-- Saat timeout, jika child hanya sempat menyelesaikan panggilan tool, pengumuman dapat meringkas riwayat itu menjadi ringkasan progres parsial singkat alih-alih memutar ulang output tool mentah.
+  - konten hasil yang dipilih dari teks asisten terlihat terbaru, atau teks tool/toolResult terbaru yang telah disanitasi; run gagal terminal melaporkan status kegagalan tanpa memutar ulang teks balasan yang ditangkap
+  - instruksi lanjutan yang menjelaskan kapan harus membalas vs. tetap diam
+- `Status` tidak diinferensikan dari output model; status berasal dari sinyal hasil runtime.
+- Saat timeout, jika child hanya sempat melalui tool call, announce dapat merangkum riwayat itu menjadi ringkasan progres parsial singkat alih-alih memutar ulang output tool mentah.
 
-Payload pengumuman menyertakan baris statistik di akhir (bahkan saat dibungkus):
+Payload announce menyertakan baris statistik di bagian akhir (bahkan saat dibungkus):
 
 - Runtime (misalnya, `runtime 5m12s`)
 - Penggunaan token (input/output/total)
-- Estimasi biaya saat harga model dikonfigurasi (`models.providers.*.models[].cost`)
-- `sessionKey`, `sessionId`, dan path transkrip (agar agen utama dapat mengambil riwayat melalui `sessions_history` atau memeriksa file di disk)
-- Metadata internal dimaksudkan hanya untuk orkestrasi; balasan yang menghadap pengguna harus ditulis ulang dengan suara assistant normal.
+- Perkiraan biaya saat penetapan harga model dikonfigurasi (`models.providers.*.models[].cost`)
+- `sessionKey`, `sessionId`, dan path transkrip (sehingga agent utama dapat mengambil riwayat melalui `sessions_history` atau memeriksa file di disk)
+- Metadata internal ditujukan hanya untuk orkestrasi; balasan yang menghadap pengguna harus ditulis ulang dengan suara asisten normal.
 
 `sessions_history` adalah jalur orkestrasi yang lebih aman:
 
-- recall assistant dinormalisasi terlebih dahulu:
+- recall asisten dinormalkan terlebih dahulu:
   - tag thinking dihapus
   - blok scaffolding `<relevant-memories>` / `<relevant_memories>` dihapus
-  - blok payload XML panggilan tool teks biasa seperti `<tool_call>...</tool_call>`,
+  - blok payload XML tool-call teks biasa seperti `<tool_call>...</tool_call>`,
     `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, dan
     `<function_calls>...</function_calls>` dihapus, termasuk payload terpotong
-    yang tidak pernah tertutup dengan benar
-  - scaffolding tool-call/result yang diturunkan levelnya dan penanda konteks historis dihapus
+    yang tidak pernah tertutup dengan rapi
+  - scaffolding tool-call/result yang diturunkan dan penanda konteks historis dihapus
   - token kontrol model yang bocor seperti `<|assistant|>`, token ASCII
     `<|...|>` lainnya, dan varian full-width `<｜...｜>` dihapus
-  - XML panggilan tool MiniMax yang malformed dihapus
-- teks mirip kredensial/token disunting
+  - XML tool-call MiniMax yang salah bentuk dihapus
+- teks mirip kredensial/token disensor
 - blok panjang dapat dipotong
-- riwayat yang sangat besar dapat menghapus baris lama atau mengganti baris yang terlalu besar dengan
+- riwayat yang sangat besar dapat menjatuhkan baris yang lebih lama atau mengganti baris yang terlalu besar dengan
   `[sessions_history omitted: message too large]`
-- pemeriksaan transkrip mentah di disk adalah fallback saat Anda memerlukan transkrip lengkap byte demi byte
+- pemeriksaan transkrip mentah di disk adalah fallback saat Anda memerlukan transkrip byte-for-byte lengkap
 
 ## Kebijakan Tool (tool sub-agent)
 
@@ -300,9 +300,9 @@ Secara default, sub-agent mendapatkan **semua tool kecuali tool sesi** dan tool 
 `sessions_history` tetap merupakan tampilan recall yang dibatasi dan disanitasi di sini juga; ini bukan
 dump transkrip mentah.
 
-Saat `maxSpawnDepth >= 2`, sub-agent orkestrator depth-1 juga menerima `sessions_spawn`, `subagents`, `sessions_list`, dan `sessions_history` sehingga mereka dapat mengelola child mereka.
+Saat `maxSpawnDepth >= 2`, sub-agent orkestrator depth-1 juga menerima `sessions_spawn`, `subagents`, `sessions_list`, dan `sessions_history` agar mereka dapat mengelola child mereka.
 
-Override melalui konfigurasi:
+Timpa melalui config:
 
 ```json5
 {
@@ -316,9 +316,9 @@ Override melalui konfigurasi:
   tools: {
     subagents: {
       tools: {
-        // deny diprioritaskan
+        // deny menang
         deny: ["gateway", "cron"],
-        // jika allow ditetapkan, menjadi hanya-allow (deny tetap diprioritaskan)
+        // jika allow diatur, ini menjadi allow-only (deny tetap menang)
         // allow: ["read", "exec", "process"]
       },
     },
@@ -333,14 +333,14 @@ Sub-agent menggunakan lane antrean in-process khusus:
 - Nama lane: `subagent`
 - Konkurensi: `agents.defaults.subagents.maxConcurrent` (default `8`)
 
-## Penghentian
+## Menghentikan
 
-- Mengirim `/stop` di chat peminta membatalkan sesi peminta dan menghentikan semua eksekusi sub-agent aktif yang di-spawn darinya, berantai ke child bertingkat.
-- `/subagents kill <id>` menghentikan sub-agent tertentu dan berantai ke child-nya.
+- Mengirim `/stop` di chat peminta membatalkan sesi peminta dan menghentikan run sub-agent aktif yang dimunculkan darinya, meneruskan ke child bersarang.
+- `/subagents kill <id>` menghentikan sub-agent tertentu dan meneruskan ke child-nya.
 
-## Keterbatasan
+## Batasan
 
-- Pengumuman sub-agent bersifat **best-effort**. Jika gateway dimulai ulang, pekerjaan "mengumumkan kembali" yang tertunda akan hilang.
+- Announce sub-agent bersifat **best-effort**. Jika gateway di-restart, pekerjaan “announce back” yang tertunda akan hilang.
 - Sub-agent tetap berbagi sumber daya proses gateway yang sama; perlakukan `maxConcurrent` sebagai katup pengaman.
 - `sessions_spawn` selalu non-blocking: mengembalikan `{ status: "accepted", runId, childSessionKey }` segera.
 - Konteks sub-agent hanya menyuntikkan `AGENTS.md` + `TOOLS.md` (tanpa `SOUL.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`, atau `BOOTSTRAP.md`).

@@ -1,14 +1,14 @@
 ---
 read_when:
     - Anda ingin menggunakan Vercel AI Gateway dengan OpenClaw
-    - Anda memerlukan variabel env API key atau pilihan auth CLI
+    - Anda memerlukan env var API key atau pilihan auth CLI
 summary: Penyiapan Vercel AI Gateway (auth + pemilihan model)
 title: Vercel AI Gateway
 x-i18n:
-    generated_at: "2026-04-12T23:33:02Z"
+    generated_at: "2026-04-22T04:26:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 48c206a645d7a62e201a35ae94232323c8570fdae63129231c38d363ea78a60b
+    source_hash: 11c0f764d4c35633d0fbfc189bae0fc451dc799002fc1a6d0c84fc73842bbe31
     source_path: providers/vercel-ai-gateway.md
     workflow: 15
 ---
@@ -22,19 +22,20 @@ mengakses ratusan model melalui satu endpoint.
 | ------------- | -------------------------------- |
 | Provider      | `vercel-ai-gateway`              |
 | Auth          | `AI_GATEWAY_API_KEY`             |
-| API           | Kompatibel dengan Anthropic Messages |
+| API           | kompatibel dengan Anthropic Messages |
 | Katalog model | Ditemukan otomatis melalui `/v1/models` |
 
 <Tip>
-OpenClaw menemukan otomatis katalog Gateway `/v1/models`, sehingga
+OpenClaw menemukan otomatis katalog Gateway `/v1/models`, jadi
 `/models vercel-ai-gateway` mencakup ref model saat ini seperti
-`vercel-ai-gateway/openai/gpt-5.4`.
+`vercel-ai-gateway/openai/gpt-5.4` dan
+`vercel-ai-gateway/moonshotai/kimi-k2.6`.
 </Tip>
 
 ## Memulai
 
 <Steps>
-  <Step title="Setel API key">
+  <Step title="Tetapkan API key">
     Jalankan onboarding dan pilih opsi auth AI Gateway:
 
     ```bash
@@ -42,7 +43,7 @@ OpenClaw menemukan otomatis katalog Gateway `/v1/models`, sehingga
     ```
 
   </Step>
-  <Step title="Setel model default">
+  <Step title="Tetapkan model default">
     Tambahkan model ke config OpenClaw Anda:
 
     ```json5
@@ -56,7 +57,7 @@ OpenClaw menemukan otomatis katalog Gateway `/v1/models`, sehingga
     ```
 
   </Step>
-  <Step title="Verifikasi bahwa model tersedia">
+  <Step title="Verifikasi model tersedia">
     ```bash
     openclaw models list --provider vercel-ai-gateway
     ```
@@ -65,7 +66,7 @@ OpenClaw menemukan otomatis katalog Gateway `/v1/models`, sehingga
 
 ## Contoh non-interaktif
 
-Untuk penyiapan skrip atau CI, berikan semua nilai di baris perintah:
+Untuk penyiapan skrip atau CI, berikan semua nilai di command line:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -76,29 +77,29 @@ openclaw onboard --non-interactive \
 
 ## Singkatan ID model
 
-OpenClaw menerima ref model singkat Vercel Claude dan menormalkannya saat
+OpenClaw menerima ref model singkat Claude Vercel dan menormalkannya saat
 runtime:
 
-| Input singkat                      | Ref model yang dinormalisasi                 |
-| ---------------------------------- | -------------------------------------------- |
+| Input singkat                        | Ref model ternormalisasi                     |
+| ------------------------------------ | -------------------------------------------- |
 | `vercel-ai-gateway/claude-opus-4.6` | `vercel-ai-gateway/anthropic/claude-opus-4.6` |
 | `vercel-ai-gateway/opus-4.6`        | `vercel-ai-gateway/anthropic/claude-opus-4-6` |
 
 <Tip>
-Anda dapat menggunakan singkatan atau ref model lengkap di
-konfigurasi Anda. OpenClaw menyelesaikan bentuk kanonis secara otomatis.
+Anda dapat menggunakan singkatan atau ref model yang sepenuhnya memenuhi syarat
+dalam konfigurasi Anda. OpenClaw meresolusikan bentuk kanonis secara otomatis.
 </Tip>
 
 ## Catatan lanjutan
 
 <AccordionGroup>
   <Accordion title="Variabel environment untuk proses daemon">
-    Jika Gateway OpenClaw berjalan sebagai daemon (launchd/systemd), pastikan
-    `AI_GATEWAY_API_KEY` tersedia untuk proses tersebut.
+    Jika OpenClaw Gateway berjalan sebagai daemon (launchd/systemd), pastikan
+    `AI_GATEWAY_API_KEY` tersedia bagi proses tersebut.
 
     <Warning>
-    Key yang hanya disetel di `~/.profile` tidak akan terlihat oleh daemon launchd/systemd
-    kecuali environment tersebut diimpor secara eksplisit. Setel key di
+    Key yang hanya ditetapkan di `~/.profile` tidak akan terlihat oleh daemon launchd/systemd
+    kecuali environment tersebut diimpor secara eksplisit. Tetapkan key di
     `~/.openclaw/.env` atau melalui `env.shellEnv` untuk memastikan proses gateway dapat
     membacanya.
     </Warning>
@@ -108,8 +109,9 @@ konfigurasi Anda. OpenClaw menyelesaikan bentuk kanonis secara otomatis.
   <Accordion title="Perutean provider">
     Vercel AI Gateway merutekan permintaan ke provider upstream berdasarkan prefiks
     ref model. Misalnya, `vercel-ai-gateway/anthropic/claude-opus-4.6` dirutekan
-    melalui Anthropic, sementara `vercel-ai-gateway/openai/gpt-5.4` dirutekan melalui
-    OpenAI. Satu `AI_GATEWAY_API_KEY` Anda menangani autentikasi untuk semua
+    melalui Anthropic, sedangkan `vercel-ai-gateway/openai/gpt-5.4` dirutekan melalui
+    OpenAI dan `vercel-ai-gateway/moonshotai/kimi-k2.6` dirutekan melalui
+    MoonshotAI. Satu `AI_GATEWAY_API_KEY` Anda menangani autentikasi untuk semua
     provider upstream.
   </Accordion>
 </AccordionGroup>
@@ -117,10 +119,10 @@ konfigurasi Anda. OpenClaw menyelesaikan bentuk kanonis secara otomatis.
 ## Terkait
 
 <CardGroup cols={2}>
-  <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
+  <Card title="Model selection" href="/id/concepts/model-providers" icon="layers">
     Memilih provider, ref model, dan perilaku failover.
   </Card>
-  <Card title="Pemecahan masalah" href="/id/help/troubleshooting" icon="wrench">
+  <Card title="Troubleshooting" href="/id/help/troubleshooting" icon="wrench">
     Pemecahan masalah umum dan FAQ.
   </Card>
 </CardGroup>

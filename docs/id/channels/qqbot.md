@@ -1,31 +1,31 @@
 ---
 read_when:
     - Anda ingin menghubungkan OpenClaw ke QQ
-    - Anda memerlukan penyiapan kredensial QQ Bot
-    - Anda ingin dukungan grup atau obrolan pribadi QQ Bot
-summary: Penyiapan, konfigurasi, dan penggunaan QQ Bot
-title: QQ Bot
+    - Anda memerlukan penyiapan kredensial Bot QQ
+    - Anda menginginkan dukungan grup atau chat pribadi Bot QQ
+summary: Penyiapan, konfigurasi, dan penggunaan Bot QQ
+title: Bot QQ
 x-i18n:
-    generated_at: "2026-04-05T13:43:54Z"
+    generated_at: "2026-04-22T04:20:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0e58fb7b07c59ecbf80a1276368c4a007b45d84e296ed40cffe9845e0953696c
+    source_hash: 49a5ae5615935a435a69748a3c4465ae8c33d3ab84db5e37fd8beec70506ce36
     source_path: channels/qqbot.md
     workflow: 15
 ---
 
-# QQ Bot
+# Bot QQ
 
-QQ Bot terhubung ke OpenClaw melalui API resmi QQ Bot (gateway WebSocket). Plugin
-ini mendukung obrolan pribadi C2C, @message grup, dan pesan channel guild dengan
+Bot QQ terhubung ke OpenClaw melalui API Bot QQ resmi (gateway WebSocket). Plugin ini
+mendukung chat pribadi C2C, @message grup, dan pesan channel guild dengan
 media kaya (gambar, suara, video, file).
 
-Status: plugin bawaan. Pesan langsung, obrolan grup, channel guild, dan
+Status: plugin bawaan. Pesan langsung, chat grup, channel guild, dan
 media didukung. Reaksi dan thread tidak didukung.
 
 ## Plugin bawaan
 
-Rilis OpenClaw saat ini menyertakan QQ Bot, jadi build paket normal tidak memerlukan
+Rilis OpenClaw saat ini menyertakan Bot QQ, jadi build paket normal tidak memerlukan
 langkah `openclaw plugins install` terpisah.
 
 ## Penyiapan
@@ -33,7 +33,7 @@ langkah `openclaw plugins install` terpisah.
 1. Buka [QQ Open Platform](https://q.qq.com/) dan pindai kode QR dengan
    QQ di ponsel Anda untuk mendaftar / masuk.
 2. Klik **Create Bot** untuk membuat bot QQ baru.
-3. Temukan **AppID** dan **AppSecret** di halaman pengaturan bot dan salin.
+3. Temukan **AppID** dan **AppSecret** di halaman pengaturan bot lalu salin keduanya.
 
 > AppSecret tidak disimpan dalam plaintext — jika Anda meninggalkan halaman tanpa menyimpannya,
 > Anda harus membuat ulang yang baru.
@@ -46,7 +46,7 @@ openclaw channels add --channel qqbot --token "AppID:AppSecret"
 
 5. Mulai ulang Gateway.
 
-Path penyiapan interaktif:
+Jalur penyiapan interaktif:
 
 ```bash
 openclaw channels add
@@ -90,9 +90,9 @@ AppSecret berbasis file:
 
 Catatan:
 
-- Fallback env hanya berlaku untuk akun default QQ Bot.
+- Fallback env hanya berlaku untuk akun default Bot QQ.
 - `openclaw channels add --channel qqbot --token-file ...` hanya menyediakan
-  AppSecret; AppID harus sudah ditetapkan di konfigurasi atau `QQBOT_APP_ID`.
+  AppSecret; AppID harus sudah diatur di konfigurasi atau `QQBOT_APP_ID`.
 - `clientSecret` juga menerima input SecretRef, bukan hanya string plaintext.
 
 ### Penyiapan multi-akun
@@ -118,7 +118,7 @@ Jalankan beberapa bot QQ dalam satu instance OpenClaw:
 }
 ```
 
-Setiap akun meluncurkan koneksi WebSocket-nya sendiri dan mempertahankan cache
+Setiap akun menjalankan koneksi WebSocket-nya sendiri dan mempertahankan cache
 token yang independen (diisolasi berdasarkan `appId`).
 
 Tambahkan bot kedua melalui CLI:
@@ -129,12 +129,12 @@ openclaw channels add --channel qqbot --account bot2 --token "222222222:secret-o
 
 ### Suara (STT / TTS)
 
-Dukungan STT dan TTS menggunakan konfigurasi dua tingkat dengan fallback prioritas:
+Dukungan STT dan TTS memiliki konfigurasi dua tingkat dengan fallback prioritas:
 
-| Pengaturan | Khusus plugin         | Fallback framework            |
-| ---------- | --------------------- | ----------------------------- |
-| STT        | `channels.qqbot.stt`  | `tools.media.audio.models[0]` |
-| TTS        | `channels.qqbot.tts`  | `messages.tts`                |
+| Setting | Khusus plugin        | Fallback framework           |
+| ------- | -------------------- | ---------------------------- |
+| STT     | `channels.qqbot.stt` | `tools.media.audio.models[0]` |
+| TTS     | `channels.qqbot.tts` | `messages.tts`                |
 
 ```json5
 {
@@ -154,9 +154,9 @@ Dukungan STT dan TTS menggunakan konfigurasi dua tingkat dengan fallback priorit
 }
 ```
 
-Tetapkan `enabled: false` pada salah satu untuk menonaktifkannya.
+Atur `enabled: false` pada salah satunya untuk menonaktifkan.
 
-Perilaku upload/transcode audio outbound juga dapat disetel dengan
+Perilaku upload/transcode audio keluar juga dapat disesuaikan dengan
 `channels.qqbot.audioFormatPolicy`:
 
 - `sttDirectFormats`
@@ -165,36 +165,56 @@ Perilaku upload/transcode audio outbound juga dapat disetel dengan
 
 ## Format target
 
-| Format                     | Deskripsi           |
-| -------------------------- | ------------------- |
-| `qqbot:c2c:OPENID`         | Obrolan pribadi (C2C) |
-| `qqbot:group:GROUP_OPENID` | Obrolan grup        |
-| `qqbot:channel:CHANNEL_ID` | Channel guild       |
+| Format                     | Deskripsi          |
+| -------------------------- | ------------------ |
+| `qqbot:c2c:OPENID`         | Chat pribadi (C2C) |
+| `qqbot:group:GROUP_OPENID` | Chat grup          |
+| `qqbot:channel:CHANNEL_ID` | Channel guild      |
 
 > Setiap bot memiliki kumpulan OpenID penggunanya sendiri. OpenID yang diterima oleh Bot A **tidak dapat**
 > digunakan untuk mengirim pesan melalui Bot B.
 
-## Slash command
+## Perintah slash
 
-Perintah bawaan yang dicegat sebelum antrean AI:
+Perintah bawaan yang diintersepsi sebelum antrean AI:
 
-| Perintah       | Deskripsi                              |
-| -------------- | -------------------------------------- |
-| `/bot-ping`    | Uji latensi                            |
-| `/bot-version` | Tampilkan versi framework OpenClaw     |
-| `/bot-help`    | Daftarkan semua perintah               |
-| `/bot-upgrade` | Tampilkan tautan panduan upgrade QQBot |
-| `/bot-logs`    | Ekspor log gateway terbaru sebagai file |
+| Command        | Deskripsi                                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| `/bot-ping`    | Uji latensi                                                                                                    |
+| `/bot-version` | Tampilkan versi framework OpenClaw                                                                              |
+| `/bot-help`    | Daftarkan semua perintah                                                                                        |
+| `/bot-upgrade` | Tampilkan tautan panduan upgrade QQBot                                                                          |
+| `/bot-logs`    | Ekspor log gateway terbaru sebagai file                                                                         |
+| `/bot-approve` | Setujui tindakan Bot QQ yang tertunda (misalnya, mengonfirmasi upload C2C atau grup) melalui alur native. |
 
 Tambahkan `?` ke perintah apa pun untuk bantuan penggunaan (misalnya `/bot-upgrade ?`).
 
+## Arsitektur engine
+
+Bot QQ dikirim sebagai engine mandiri di dalam plugin:
+
+- Setiap akun memiliki stack resource terisolasi (koneksi WebSocket, klien API, cache token, root penyimpanan media) yang dikunci oleh `appId`. Akun tidak pernah berbagi state masuk/keluar.
+- Logger multi-akun menandai baris log dengan akun pemilik agar diagnostik tetap terpisah saat Anda menjalankan beberapa bot di satu gateway.
+- Jalur bridge masuk, keluar, dan gateway berbagi satu root payload media di bawah `~/.openclaw/media`, sehingga upload, unduhan, dan cache transcode ditempatkan di satu direktori yang dilindungi alih-alih pohon per subsistem.
+- Kredensial dapat dicadangkan dan dipulihkan sebagai bagian dari snapshot kredensial OpenClaw standar; engine memasang ulang stack resource setiap akun saat pemulihan tanpa memerlukan pairing kode QR baru.
+
+## Onboarding kode QR
+
+Sebagai alternatif selain menempelkan `AppID:AppSecret` secara manual, engine mendukung alur onboarding kode QR untuk menautkan Bot QQ ke OpenClaw:
+
+1. Jalankan jalur penyiapan Bot QQ (misalnya `openclaw channels add --channel qqbot`) dan pilih alur kode QR saat diminta.
+2. Pindai kode QR yang dihasilkan dengan aplikasi ponsel yang terkait dengan Bot QQ target.
+3. Setujui pairing di ponsel. OpenClaw menyimpan kredensial yang dikembalikan ke `credentials/` dalam cakupan akun yang tepat.
+
+Prompt persetujuan yang dihasilkan oleh bot itu sendiri (misalnya alur "izinkan tindakan ini?" yang diekspos oleh API Bot QQ) muncul sebagai prompt native OpenClaw yang dapat Anda terima dengan `/bot-approve` alih-alih membalas melalui klien QQ mentah.
+
 ## Pemecahan masalah
 
-- **Bot membalas "gone to Mars":** kredensial belum dikonfigurasi atau Gateway belum dijalankan.
+- **Bot menjawab "gone to Mars":** kredensial belum dikonfigurasi atau Gateway belum dijalankan.
 - **Tidak ada pesan masuk:** verifikasi bahwa `appId` dan `clientSecret` benar, dan
   bot diaktifkan di QQ Open Platform.
-- **Penyiapan dengan `--token-file` masih menunjukkan belum dikonfigurasi:** `--token-file` hanya menetapkan
+- **Penyiapan dengan `--token-file` masih menunjukkan belum dikonfigurasi:** `--token-file` hanya mengatur
   AppSecret. Anda tetap memerlukan `appId` di konfigurasi atau `QQBOT_APP_ID`.
-- **Pesan proaktif tidak sampai:** QQ dapat mencegat pesan yang diprakarsai bot jika
+- **Pesan proaktif tidak sampai:** QQ dapat mencegat pesan yang dimulai bot jika
   pengguna belum berinteraksi baru-baru ini.
-- **Suara tidak ditranskripsikan:** pastikan STT sudah dikonfigurasi dan provider dapat dijangkau.
+- **Suara tidak ditranskripsikan:** pastikan STT telah dikonfigurasi dan provider dapat dijangkau.

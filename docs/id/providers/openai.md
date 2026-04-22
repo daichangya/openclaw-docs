@@ -1,31 +1,31 @@
 ---
 read_when:
     - Anda ingin menggunakan model OpenAI di OpenClaw
-    - Anda menginginkan autentikasi langganan Codex alih-alih API key
-    - Anda memerlukan perilaku eksekusi agen GPT-5 yang lebih ketat
+    - Anda ingin auth langganan Codex alih-alih API key
+    - Anda memerlukan perilaku eksekusi agent GPT-5 yang lebih ketat
 summary: Gunakan OpenAI melalui API key atau langganan Codex di OpenClaw
 title: OpenAI
 x-i18n:
-    generated_at: "2026-04-21T09:23:31Z"
+    generated_at: "2026-04-22T04:26:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 172beb28b099e3d71998458408c9a6b32b03790d2b016351f724bc3f0d9d3245
+    source_hash: 692615b77885c0387d339d47c02ff056ba95d3608aa681882893a46d2a0f723f
     source_path: providers/openai.md
     workflow: 15
 ---
 
 # OpenAI
 
-OpenAI menyediakan API developer untuk model GPT. OpenClaw mendukung dua jalur autentikasi:
+OpenAI menyediakan API developer untuk model GPT. OpenClaw mendukung dua jalur auth:
 
-- **API key** — akses langsung OpenAI Platform dengan penagihan berbasis penggunaan (model `openai/*`)
-- **Langganan Codex** — login ChatGPT/Codex dengan akses langganan (model `openai-codex/*`)
+- **API key** — akses OpenAI Platform langsung dengan penagihan berbasis penggunaan (model `openai/*`)
+- **Langganan Codex** — sign-in ChatGPT/Codex dengan akses langganan (model `openai-codex/*`)
 
-OpenAI secara eksplisit mendukung penggunaan OAuth langganan dalam tool dan alur kerja eksternal seperti OpenClaw.
+OpenAI secara eksplisit mendukung penggunaan OAuth langganan dalam tool eksternal dan alur kerja seperti OpenClaw.
 
-## Mulai
+## Memulai
 
-Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
+Pilih metode auth yang Anda inginkan dan ikuti langkah penyiapannya.
 
 <Tabs>
   <Tab title="API key (OpenAI Platform)">
@@ -40,7 +40,7 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
         openclaw onboard --auth-choice openai-api-key
         ```
 
-        Atau berikan key langsung:
+        Atau berikan key secara langsung:
 
         ```bash
         openclaw onboard --openai-api-key "$OPENAI_API_KEY"
@@ -55,13 +55,13 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
 
     ### Ringkasan rute
 
-    | Referensi model | Rute | Auth |
+    | Model ref | Rute | Auth |
     |-----------|-------|------|
-    | `openai/gpt-5.4` | API OpenAI Platform langsung | `OPENAI_API_KEY` |
-    | `openai/gpt-5.4-pro` | API OpenAI Platform langsung | `OPENAI_API_KEY` |
+    | `openai/gpt-5.4` | OpenAI Platform API langsung | `OPENAI_API_KEY` |
+    | `openai/gpt-5.4-pro` | OpenAI Platform API langsung | `OPENAI_API_KEY` |
 
     <Note>
-    Login ChatGPT/Codex dirutekan melalui `openai-codex/*`, bukan `openai/*`.
+    Sign-in ChatGPT/Codex dirutekan melalui `openai-codex/*`, bukan `openai/*`.
     </Note>
 
     ### Contoh konfigurasi
@@ -74,16 +74,16 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
     ```
 
     <Warning>
-    OpenClaw **tidak** mengekspos `openai/gpt-5.3-codex-spark` pada jalur API langsung. Permintaan API OpenAI live menolak model tersebut. Spark hanya untuk Codex.
+    OpenClaw **tidak** mengekspos `openai/gpt-5.3-codex-spark` pada jalur API langsung. Permintaan OpenAI API live menolak model itu. Spark hanya untuk Codex.
     </Warning>
 
   </Tab>
 
   <Tab title="Langganan Codex">
-    **Terbaik untuk:** menggunakan langganan ChatGPT/Codex Anda alih-alih API key terpisah. Cloud Codex memerlukan login ChatGPT.
+    **Terbaik untuk:** menggunakan langganan ChatGPT/Codex Anda alih-alih API key terpisah. Codex cloud memerlukan sign-in ChatGPT.
 
     <Steps>
-      <Step title="Jalankan OAuth Codex">
+      <Step title="Jalankan Codex OAuth">
         ```bash
         openclaw onboard --auth-choice openai-codex
         ```
@@ -94,7 +94,7 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
         openclaw models auth login --provider openai-codex
         ```
       </Step>
-      <Step title="Tetapkan model default">
+      <Step title="Setel model default">
         ```bash
         openclaw config set agents.defaults.model.primary openai-codex/gpt-5.4
         ```
@@ -108,10 +108,10 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
 
     ### Ringkasan rute
 
-    | Referensi model | Rute | Auth |
+    | Model ref | Rute | Auth |
     |-----------|-------|------|
-    | `openai-codex/gpt-5.4` | OAuth ChatGPT/Codex | login Codex |
-    | `openai-codex/gpt-5.3-codex-spark` | OAuth ChatGPT/Codex | login Codex (bergantung entitlement) |
+    | `openai-codex/gpt-5.4` | ChatGPT/Codex OAuth | Sign-in Codex |
+    | `openai-codex/gpt-5.3-codex-spark` | ChatGPT/Codex OAuth | Sign-in Codex (bergantung pada entitlement) |
 
     <Note>
     Rute ini sengaja dipisahkan dari `openai/gpt-5.4`. Gunakan `openai/*` dengan API key untuk akses Platform langsung, dan `openai-codex/*` untuk akses langganan Codex.
@@ -126,19 +126,19 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
     ```
 
     <Tip>
-    Jika onboarding menggunakan kembali login Codex CLI yang sudah ada, kredensial tersebut tetap dikelola oleh Codex CLI. Saat kedaluwarsa, OpenClaw terlebih dahulu membaca ulang sumber Codex eksternal lalu menulis kembali kredensial yang telah diperbarui ke penyimpanan Codex.
+    Jika onboarding menggunakan ulang login Codex CLI yang sudah ada, kredensial tersebut tetap dikelola oleh Codex CLI. Saat kedaluwarsa, OpenClaw akan membaca ulang sumber Codex eksternal terlebih dahulu dan menulis kembali kredensial yang telah diperbarui ke penyimpanan Codex.
     </Tip>
 
     ### Batas jendela konteks
 
-    OpenClaw memperlakukan metadata model dan batas konteks runtime sebagai nilai terpisah.
+    OpenClaw memperlakukan metadata model dan batas konteks runtime sebagai dua nilai yang terpisah.
 
     Untuk `openai-codex/gpt-5.4`:
 
     - `contextWindow` native: `1050000`
     - Batas `contextTokens` runtime default: `272000`
 
-    Batas default yang lebih kecil ini dalam praktiknya memiliki karakteristik latensi dan kualitas yang lebih baik. Override dengan `contextTokens`:
+    Batas default yang lebih kecil memiliki karakteristik latensi dan kualitas yang lebih baik dalam praktik. Override dengan `contextTokens`:
 
     ```json5
     {
@@ -163,19 +163,19 @@ Pilih metode autentikasi yang Anda sukai dan ikuti langkah penyiapannya.
 
 Plugin `openai` bawaan mendaftarkan pembuatan gambar melalui tool `image_generate`.
 
-| Kemampuan                | Nilai                              |
-| ------------------------ | ---------------------------------- |
-| Model default            | `openai/gpt-image-1`               |
-| Maks gambar per permintaan | 4                                |
-| Mode edit                | Aktif (hingga 5 gambar referensi)  |
-| Override ukuran          | Didukung                           |
-| Rasio aspek / resolusi   | Tidak diteruskan ke OpenAI Images API |
+| Kapabilitas               | Nilai                              |
+| ------------------------- | ---------------------------------- |
+| Model default             | `openai/gpt-image-2`               |
+| Maks gambar per permintaan| 4                                  |
+| Mode edit                 | Diaktifkan (hingga 5 gambar referensi) |
+| Override ukuran           | Didukung, termasuk ukuran 2K/4K    |
+| Aspect ratio / resolution | Tidak diteruskan ke OpenAI Images API |
 
 ```json5
 {
   agents: {
     defaults: {
-      imageGenerationModel: { primary: "openai/gpt-image-1" },
+      imageGenerationModel: { primary: "openai/gpt-image-2" },
     },
   },
 }
@@ -185,17 +185,31 @@ Plugin `openai` bawaan mendaftarkan pembuatan gambar melalui tool `image_generat
 Lihat [Image Generation](/id/tools/image-generation) untuk parameter tool bersama, pemilihan provider, dan perilaku failover.
 </Note>
 
+`gpt-image-2` adalah default untuk pembuatan gambar dari teks ke gambar OpenAI dan pengeditan gambar. `gpt-image-1` tetap dapat digunakan sebagai override model eksplisit, tetapi alur kerja gambar OpenAI baru sebaiknya menggunakan `openai/gpt-image-2`.
+
+Hasilkan:
+
+```
+/tool image_generate model=openai/gpt-image-2 prompt="Poster peluncuran yang rapi untuk OpenClaw di macOS" size=3840x2160 count=1
+```
+
+Edit:
+
+```
+/tool image_generate model=openai/gpt-image-2 prompt="Pertahankan bentuk objek, ubah materialnya menjadi kaca transparan" image=/path/to/reference.png size=1024x1536
+```
+
 ## Pembuatan video
 
 Plugin `openai` bawaan mendaftarkan pembuatan video melalui tool `video_generate`.
 
-| Kemampuan       | Nilai                                                                             |
-| ---------------- | --------------------------------------------------------------------------------- |
-| Model default    | `openai/sora-2`                                                                   |
-| Mode             | Teks-ke-video, gambar-ke-video, edit satu video                                   |
-| Input referensi  | 1 gambar atau 1 video                                                             |
-| Override ukuran  | Didukung                                                                          |
-| Override lainnya | `aspectRatio`, `resolution`, `audio`, `watermark` diabaikan dengan peringatan tool |
+| Kapabilitas       | Nilai                                                                             |
+| ----------------- | --------------------------------------------------------------------------------- |
+| Model default     | `openai/sora-2`                                                                   |
+| Mode              | Teks ke video, gambar ke video, edit video tunggal                                |
+| Input referensi   | 1 gambar atau 1 video                                                             |
+| Override ukuran   | Didukung                                                                          |
+| Override lainnya  | `aspectRatio`, `resolution`, `audio`, `watermark` diabaikan dengan peringatan tool |
 
 ```json5
 {
@@ -213,9 +227,9 @@ Lihat [Video Generation](/id/tools/video-generation) untuk parameter tool bersam
 
 ## Kontribusi prompt GPT-5
 
-OpenClaw menambahkan kontribusi prompt GPT-5 khusus OpenAI untuk run keluarga GPT-5 `openai/*` dan `openai-codex/*`. Kontribusi ini berada di plugin OpenAI bawaan, berlaku untuk ID model seperti `gpt-5`, `gpt-5.2`, `gpt-5.4`, dan `gpt-5.4-mini`, dan tidak berlaku untuk model GPT-4.x yang lebih lama.
+OpenClaw menambahkan kontribusi prompt GPT-5 khusus OpenAI untuk run keluarga GPT-5 `openai/*` dan `openai-codex/*`. Ini berada di plugin OpenAI bawaan, berlaku untuk model id seperti `gpt-5`, `gpt-5.2`, `gpt-5.4`, dan `gpt-5.4-mini`, dan tidak berlaku untuk model GPT-4.x yang lebih lama.
 
-Kontribusi GPT-5 menambahkan kontrak perilaku bertag untuk persistensi persona, keamanan eksekusi, disiplin tool, bentuk output, pemeriksaan penyelesaian, dan verifikasi. Perilaku balasan khusus channel dan pesan senyap tetap berada di system prompt OpenClaw bersama dan kebijakan pengiriman keluar. Panduan GPT-5 selalu diaktifkan untuk model yang cocok. Lapisan gaya interaksi yang ramah terpisah dan dapat dikonfigurasi.
+Kontribusi GPT-5 menambahkan kontrak perilaku bertag untuk persistensi persona, keamanan eksekusi, disiplin tool, bentuk output, pemeriksaan penyelesaian, dan verifikasi. Perilaku balasan khusus channel dan perilaku silent-message tetap berada di system prompt OpenClaw bersama dan kebijakan pengiriman outbound. Panduan GPT-5 selalu diaktifkan untuk model yang cocok. Lapisan gaya interaksi yang ramah terpisah dan dapat dikonfigurasi.
 
 | Nilai                  | Efek                                        |
 | ---------------------- | ------------------------------------------- |
@@ -246,23 +260,23 @@ Kontribusi GPT-5 menambahkan kontrak perilaku bertag untuk persistensi persona, 
 Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-sama menonaktifkan lapisan gaya ramah.
 </Tip>
 
-## Voice dan speech
+## Suara dan speech
 
 <AccordionGroup>
-  <Accordion title="Sintesis speech (TTS)">
-    Plugin `openai` bawaan mendaftarkan sintesis speech untuk permukaan `messages.tts`.
+  <Accordion title="Sintesis ucapan (TTS)">
+    Plugin `openai` bawaan mendaftarkan sintesis ucapan untuk surface `messages.tts`.
 
     | Pengaturan | Jalur konfigurasi | Default |
     |---------|------------|---------|
     | Model | `messages.tts.providers.openai.model` | `gpt-4o-mini-tts` |
-    | Voice | `messages.tts.providers.openai.voice` | `coral` |
+    | Suara | `messages.tts.providers.openai.voice` | `coral` |
     | Kecepatan | `messages.tts.providers.openai.speed` | (tidak disetel) |
     | Instruksi | `messages.tts.providers.openai.instructions` | (tidak disetel, hanya `gpt-4o-mini-tts`) |
     | Format | `messages.tts.providers.openai.responseFormat` | `opus` untuk catatan suara, `mp3` untuk file |
     | API key | `messages.tts.providers.openai.apiKey` | Fallback ke `OPENAI_API_KEY` |
-    | Base URL | `messages.tts.providers.openai.baseUrl` | `https://api.openai.com/v1` |
+    | URL dasar | `messages.tts.providers.openai.baseUrl` | `https://api.openai.com/v1` |
 
-    Model yang tersedia: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`. Voice yang tersedia: `alloy`, `ash`, `ballad`, `cedar`, `coral`, `echo`, `fable`, `juniper`, `marin`, `onyx`, `nova`, `sage`, `shimmer`, `verse`.
+    Model yang tersedia: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`. Suara yang tersedia: `alloy`, `ash`, `ballad`, `cedar`, `coral`, `echo`, `fable`, `juniper`, `marin`, `onyx`, `nova`, `sage`, `shimmer`, `verse`.
 
     ```json5
     {
@@ -277,7 +291,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     ```
 
     <Note>
-    Setel `OPENAI_TTS_BASE_URL` untuk meng-override base URL TTS tanpa memengaruhi endpoint API chat.
+    Setel `OPENAI_TTS_BASE_URL` untuk mengoverride URL dasar TTS tanpa memengaruhi endpoint API chat.
     </Note>
 
   </Accordion>
@@ -288,7 +302,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     | Pengaturan | Jalur konfigurasi | Default |
     |---------|------------|---------|
     | Model | `plugins.entries.voice-call.config.streaming.providers.openai.model` | `gpt-4o-transcribe` |
-    | Durasi senyap | `...openai.silenceDurationMs` | `800` |
+    | Durasi hening | `...openai.silenceDurationMs` | `800` |
     | Ambang VAD | `...openai.vadThreshold` | `0.5` |
     | API key | `...openai.apiKey` | Fallback ke `OPENAI_API_KEY` |
 
@@ -298,16 +312,16 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
 
   </Accordion>
 
-  <Accordion title="Voice realtime">
-    Plugin `openai` bawaan mendaftarkan voice realtime untuk plugin Voice Call.
+  <Accordion title="Suara realtime">
+    Plugin `openai` bawaan mendaftarkan suara realtime untuk plugin Voice Call.
 
     | Pengaturan | Jalur konfigurasi | Default |
     |---------|------------|---------|
     | Model | `plugins.entries.voice-call.config.realtime.providers.openai.model` | `gpt-realtime` |
-    | Voice | `...openai.voice` | `alloy` |
+    | Suara | `...openai.voice` | `alloy` |
     | Temperature | `...openai.temperature` | `0.8` |
     | Ambang VAD | `...openai.vadThreshold` | `0.5` |
-    | Durasi senyap | `...openai.silenceDurationMs` | `500` |
+    | Durasi hening | `...openai.silenceDurationMs` | `500` |
     | API key | `...openai.apiKey` | Fallback ke `OPENAI_API_KEY` |
 
     <Note>
@@ -321,19 +335,19 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
 
 <AccordionGroup>
   <Accordion title="Transport (WebSocket vs SSE)">
-    OpenClaw menggunakan WebSocket terlebih dahulu dengan fallback SSE (`"auto"`) untuk `openai/*` dan `openai-codex/*`.
+    OpenClaw menggunakan WebSocket-first dengan fallback SSE (`"auto"`) untuk `openai/*` dan `openai-codex/*`.
 
     Dalam mode `"auto"`, OpenClaw:
-    - Mencoba ulang satu kegagalan WebSocket awal sebelum fallback ke SSE
-    - Setelah kegagalan, menandai WebSocket sebagai terdegradasi selama ~60 detik dan menggunakan SSE selama masa pendinginan
-    - Melampirkan header identitas sesi dan giliran yang stabil untuk retry dan reconnect
-    - Menormalkan penghitung penggunaan (`input_tokens` / `prompt_tokens`) di berbagai varian transport
+    - Mencoba ulang satu kegagalan awal WebSocket sebelum fallback ke SSE
+    - Setelah kegagalan, menandai WebSocket sebagai degraded selama ~60 detik dan menggunakan SSE selama cool-down
+    - Menempelkan header identitas sesi dan giliran yang stabil untuk retry dan reconnect
+    - Menormalkan penghitung penggunaan (`input_tokens` / `prompt_tokens`) di seluruh varian transport
 
     | Nilai | Perilaku |
     |-------|----------|
-    | `"auto"` (default) | WebSocket terlebih dahulu, fallback SSE |
-    | `"sse"` | Paksa hanya SSE |
-    | `"websocket"` | Paksa hanya WebSocket |
+    | `"auto"` (default) | WebSocket lebih dulu, fallback SSE |
+    | `"sse"` | Paksa SSE saja |
+    | `"websocket"` | Paksa WebSocket saja |
 
     ```json5
     {
@@ -349,9 +363,9 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     }
     ```
 
-    Dokumen OpenAI terkait:
-    - [Realtime API with WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
-    - [Streaming API responses (SSE)](https://platform.openai.com/docs/guides/streaming-responses)
+    Docs OpenAI terkait:
+    - [Realtime API dengan WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
+    - [Respons API streaming (SSE)](https://platform.openai.com/docs/guides/streaming-responses)
 
   </Accordion>
 
@@ -381,7 +395,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     - **Chat/UI:** `/fast status|on|off`
     - **Config:** `agents.defaults.models["<provider>/<model>"].params.fastMode`
 
-    Saat diaktifkan, OpenClaw memetakan mode cepat ke pemrosesan prioritas OpenAI (`service_tier = "priority"`). Nilai `service_tier` yang sudah ada dipertahankan, dan mode cepat tidak menulis ulang `reasoning` atau `text.verbosity`.
+    Saat diaktifkan, OpenClaw memetakan mode cepat ke pemrosesan prioritas OpenAI (`service_tier = "priority"`). Nilai `service_tier` yang ada dipertahankan, dan mode cepat tidak menulis ulang `reasoning` atau `text.verbosity`.
 
     ```json5
     {
@@ -397,7 +411,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     ```
 
     <Note>
-    Override sesi lebih diutamakan daripada konfigurasi. Menghapus override sesi di UI Sessions akan mengembalikan sesi ke default yang dikonfigurasi.
+    Override sesi lebih diutamakan daripada config. Menghapus override sesi di UI Sessions mengembalikan sesi ke default yang dikonfigurasi.
     </Note>
 
   </Accordion>
@@ -421,7 +435,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     Nilai yang didukung: `auto`, `default`, `flex`, `priority`.
 
     <Warning>
-    `serviceTier` hanya diteruskan ke endpoint OpenAI native (`api.openai.com`) dan endpoint Codex native (`chatgpt.com/backend-api`). Jika Anda merutekan salah satu provider melalui proxy, OpenClaw membiarkan `service_tier` apa adanya.
+    `serviceTier` hanya diteruskan ke endpoint OpenAI native (`api.openai.com`) dan endpoint Codex native (`chatgpt.com/backend-api`). Jika Anda merutekan salah satu provider melalui proxy, OpenClaw membiarkan `service_tier` tetap apa adanya.
     </Warning>
 
   </Accordion>
@@ -429,9 +443,9 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
   <Accordion title="Compaction sisi server (Responses API)">
     Untuk model Responses OpenAI langsung (`openai/*` di `api.openai.com`), OpenClaw otomatis mengaktifkan Compaction sisi server:
 
-    - Memaksa `store: true` (kecuali kompatibilitas model menetapkan `supportsStore: false`)
+    - Memaksa `store: true` (kecuali kompat model menetapkan `supportsStore: false`)
     - Menyuntikkan `context_management: [{ type: "compaction", compact_threshold: ... }]`
-    - `compact_threshold` default: 70% dari `contextWindow` (atau `80000` jika tidak tersedia)
+    - Default `compact_threshold`: 70% dari `contextWindow` (atau `80000` saat tidak tersedia)
 
     <Tabs>
       <Tab title="Aktifkan secara eksplisit">
@@ -487,13 +501,13 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     </Tabs>
 
     <Note>
-    `responsesServerCompaction` hanya mengontrol injeksi `context_management`. Model Responses OpenAI langsung tetap memaksa `store: true` kecuali kompatibilitas menetapkan `supportsStore: false`.
+    `responsesServerCompaction` hanya mengontrol injeksi `context_management`. Model Responses OpenAI langsung tetap memaksa `store: true` kecuali kompat menetapkan `supportsStore: false`.
     </Note>
 
   </Accordion>
 
-  <Accordion title="Mode GPT agentik ketat">
-    Untuk run keluarga GPT-5 pada `openai/*` dan `openai-codex/*`, OpenClaw dapat menggunakan kontrak eksekusi tertanam yang lebih ketat:
+  <Accordion title="Mode GPT strict-agentic">
+    Untuk run keluarga GPT-5 pada `openai/*` dan `openai-codex/*`, OpenClaw dapat menggunakan kontrak eksekusi tersemat yang lebih ketat:
 
     ```json5
     {
@@ -506,13 +520,13 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     ```
 
     Dengan `strict-agentic`, OpenClaw:
-    - Tidak lagi memperlakukan giliran yang hanya berisi rencana sebagai kemajuan yang berhasil saat tindakan tool tersedia
-    - Mencoba ulang giliran dengan steer act-now
-    - Mengaktifkan otomatis `update_plan` untuk pekerjaan yang substansial
-    - Menampilkan status terblokir yang eksplisit jika model terus merencanakan tanpa bertindak
+    - Tidak lagi menganggap giliran yang hanya berisi rencana sebagai kemajuan yang berhasil saat tindakan tool tersedia
+    - Mencoba ulang giliran dengan arahan act-now
+    - Mengaktifkan `update_plan` secara otomatis untuk pekerjaan yang substansial
+    - Menampilkan state blocked yang eksplisit jika model terus membuat rencana tanpa bertindak
 
     <Note>
-    Hanya berlaku untuk run OpenAI dan Codex keluarga GPT-5. Provider lain dan keluarga model yang lebih lama tetap menggunakan perilaku default.
+    Cakupannya hanya untuk run keluarga GPT-5 OpenAI dan Codex. Provider lain dan keluarga model yang lebih lama tetap menggunakan perilaku default.
     </Note>
 
   </Accordion>
@@ -521,17 +535,17 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
     OpenClaw memperlakukan endpoint OpenAI langsung, Codex, dan Azure OpenAI secara berbeda dari proxy `/v1` generik yang kompatibel dengan OpenAI:
 
     **Rute native** (`openai/*`, `openai-codex/*`, Azure OpenAI):
-    - Mempertahankan `reasoning: { effort: "none" }` hanya untuk model yang mendukung effort OpenAI `none`
-    - Menghilangkan disabled reasoning untuk model atau proxy yang menolak `reasoning.effort: "none"`
-    - Menjadikan mode ketat sebagai default untuk skema tool
-    - Melampirkan header atribusi tersembunyi hanya pada host native yang terverifikasi
-    - Mempertahankan pembentukan permintaan khusus OpenAI (`service_tier`, `store`, kompatibilitas reasoning, petunjuk prompt-cache)
+    - Menyimpan `reasoning: { effort: "none" }` hanya untuk model yang mendukung effort OpenAI `none`
+    - Menghilangkan reasoning nonaktif untuk model atau proxy yang menolak `reasoning.effort: "none"`
+    - Menjadikan skema tool default ke mode strict
+    - Menempelkan header atribusi tersembunyi hanya pada host native yang terverifikasi
+    - Mempertahankan pembentukan permintaan khusus OpenAI (`service_tier`, `store`, reasoning-compat, petunjuk prompt-cache)
 
     **Rute proxy/kompatibel:**
-    - Menggunakan perilaku kompatibilitas yang lebih longgar
-    - Tidak memaksa skema tool ketat atau header khusus native
+    - Menggunakan perilaku compat yang lebih longgar
+    - Tidak memaksa skema tool strict atau header khusus native
 
-    Azure OpenAI menggunakan transport native dan perilaku kompatibilitas native tetapi tidak menerima header atribusi tersembunyi.
+    Azure OpenAI menggunakan transport native dan perilaku compat tetapi tidak menerima header atribusi tersembunyi.
 
   </Accordion>
 </AccordionGroup>
@@ -540,7 +554,7 @@ Nilai tidak peka huruf besar/kecil saat runtime, jadi `"Off"` dan `"off"` sama-s
 
 <CardGroup cols={2}>
   <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
-    Memilih provider, referensi model, dan perilaku failover.
+    Memilih provider, model ref, dan perilaku failover.
   </Card>
   <Card title="Pembuatan gambar" href="/id/tools/image-generation" icon="image">
     Parameter tool gambar bersama dan pemilihan provider.
