@@ -1,34 +1,36 @@
 ---
 read_when:
     - チャットコマンドの使用または設定
-    - コマンドのルーティングまたは権限のデバッグ
-summary: 'スラッシュコマンド: テキストとネイティブ、設定、サポートされているコマンド'
+    - コマンドルーティングまたは権限のデバッグ
+summary: 'スラッシュコマンド: テキスト方式とネイティブ方式、設定、対応コマンド'
 title: スラッシュコマンド
 x-i18n:
-    generated_at: "2026-04-21T17:45:41Z"
+    generated_at: "2026-04-22T04:28:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 26923608329ba2aeece2d4bc8edfa40ae86e03719a9f590f26ff79f57d97521d
+    source_hash: 43cc050149de60ca39083009fd6ce566af3bfa79d455e2e0f44e2d878bf4d2d9
     source_path: tools/slash-commands.md
     workflow: 15
 ---
 
 # スラッシュコマンド
 
-コマンドはGatewayによって処理されます。ほとんどのコマンドは、`/` で始まる**単独の**メッセージとして送信する必要があります。  
-ホスト限定の bash チャットコマンドは `! <cmd>` を使います（`/bash <cmd>` はエイリアスです）。
+コマンドはGatewayによって処理されます。ほとんどのコマンドは、`/`で始まる**単独**メッセージとして送信する必要があります。
+ホスト専用のbashチャットコマンドは`! <cmd>`を使用します（`/bash <cmd>`はそのエイリアスです）。
 
-関連するシステムは2つあります。
+関連する2つのシステムがあります。
 
-- **コマンド**: 単独の `/...` メッセージ。
-- **ディレクティブ**: `/think`, `/fast`, `/verbose`, `/trace`, `/reasoning`, `/elevated`, `/exec`, `/model`, `/queue`。
-  - ディレクティブは、モデルがメッセージを見る前にメッセージから取り除かれます。
-  - 通常のチャットメッセージ内では（ディレクティブだけのメッセージではない場合）、これらは「インラインヒント」として扱われ、セッション設定は**永続化されません**。
-  - ディレクティブだけのメッセージ内では（メッセージがディレクティブのみを含む場合）、これらはセッションに永続化され、確認応答が返されます。
-  - ディレクティブは**認可された送信者**に対してのみ適用されます。`commands.allowFrom` が設定されている場合、それが使用される唯一の許可リストです。そうでない場合、認可はチャンネルの許可リスト/ペアリングと `commands.useAccessGroups` から決まります。認可されていない送信者では、ディレクティブは通常のテキストとして扱われます。
+- **Commands**: 単独の`/...`メッセージ。
+- **Directives**: `/think`, `/fast`, `/verbose`, `/trace`, `/reasoning`, `/elevated`, `/exec`, `/model`, `/queue`。
+  - Directivesは、モデルがメッセージを見る前に取り除かれます。
+  - 通常のチャットメッセージ内（directiveのみではない場合）では、「インラインヒント」として扱われ、セッション設定を永続化しません。
+  - directiveのみのメッセージ（メッセージがdirectiveだけを含む場合）では、セッションに永続化され、確認応答が返されます。
+  - Directivesは**認可された送信者**に対してのみ適用されます。`commands.allowFrom`が設定されている場合、それが使用される唯一のallowlistです。
+    そうでなければ、認可はチャネルallowlist/ペアリングと`commands.useAccessGroups`から来ます。
+    認可されていない送信者では、directiveは通常のテキストとして扱われます。
 
-さらに、いくつかの**インラインショートカット**もあります（許可リストに登録された/認可された送信者のみ）: `/help`, `/commands`, `/status`, `/whoami` (`/id`)。  
-これらは即座に実行され、モデルがメッセージを見る前に取り除かれ、残りのテキストは通常フローで処理され続けます。
+また、いくつかの**インラインショートカット**もあります（allowlist/認可済み送信者のみ）: `/help`, `/commands`, `/status`, `/whoami`（`/id`）。
+これらは即座に実行され、モデルがメッセージを見る前に取り除かれ、残りのテキストは通常フローを継続します。
 
 ## 設定
 
@@ -57,181 +59,182 @@ x-i18n:
 }
 ```
 
-- `commands.text`（デフォルト: `true`）は、チャットメッセージ内での `/...` の解析を有効にします。
-  - ネイティブコマンドのない画面では（WhatsApp/WebChat/Signal/iMessage/Google Chat/Microsoft Teams）、これを `false` に設定していてもテキストコマンドは引き続き動作します。
-- `commands.native`（デフォルト: `"auto"`）は、ネイティブコマンドを登録します。
-  - Auto: Discord/Telegram ではオン、Slack ではオフです（スラッシュコマンドを追加するまで）。ネイティブサポートのないプロバイダーでは無視されます。
-  - プロバイダーごとに上書きするには、`channels.discord.commands.native`、`channels.telegram.commands.native`、または `channels.slack.commands.native` を設定します（bool または `"auto"`）。
-  - `false` は、起動時に Discord/Telegram で以前登録されたコマンドを削除します。Slack コマンドは Slack アプリで管理されるため、自動では削除されません。
-- `commands.nativeSkills`（デフォルト: `"auto"`）は、サポートされている場合に**skill**コマンドをネイティブに登録します。
-  - Auto: Discord/Telegram ではオン、Slack ではオフです（Slack では skill ごとにスラッシュコマンドを作成する必要があります）。
-  - プロバイダーごとに上書きするには、`channels.discord.commands.nativeSkills`、`channels.telegram.commands.nativeSkills`、または `channels.slack.commands.nativeSkills` を設定します（bool または `"auto"`）。
-- `commands.bash`（デフォルト: `false`）は、`! <cmd>` によるホストシェルコマンドの実行を有効にします（`/bash <cmd>` はエイリアスです。`tools.elevated` の許可リストが必要です）。
-- `commands.bashForegroundMs`（デフォルト: `2000`）は、bash がバックグラウンドモードに切り替わるまで待機する時間を制御します（`0` は即座にバックグラウンド化します）。
-- `commands.config`（デフォルト: `false`）は `/config` を有効にします（`openclaw.json` の読み書き）。
-- `commands.mcp`（デフォルト: `false`）は `/mcp` を有効にします（`mcp.servers` 配下の OpenClaw 管理 MCP 設定の読み書き）。
-- `commands.plugins`（デフォルト: `false`）は `/plugins` を有効にします（plugin の検出/ステータス、およびインストール + 有効化/無効化の制御）。
-- `commands.debug`（デフォルト: `false`）は `/debug` を有効にします（ランタイム限定の上書き）。
-- `commands.restart`（デフォルト: `true`）は `/restart` と Gateway 再起動ツールアクションを有効にします。
-- `commands.ownerAllowFrom`（任意）は、owner 専用コマンド/ツール画面用の明示的な owner 許可リストを設定します。これは `commands.allowFrom` とは別です。
-- `commands.ownerDisplay` は、システムプロンプト内で owner id をどのように表示するかを制御します: `raw` または `hash`。
-- `commands.ownerDisplaySecret` は、`commands.ownerDisplay="hash"` の場合に使用する HMAC シークレットを任意で設定します。
-- `commands.allowFrom`（任意）は、コマンド認可用のプロバイダー別許可リストを設定します。設定されている場合、これがコマンドとディレクティブに対する唯一の認可ソースになります（チャンネルの許可リスト/ペアリングと `commands.useAccessGroups` は無視されます）。グローバルデフォルトには `"*"` を使います。プロバイダー固有のキーはそれを上書きします。
-- `commands.useAccessGroups`（デフォルト: `true`）は、`commands.allowFrom` が設定されていない場合に、コマンドに対して許可リスト/ポリシーを適用します。
+- `commands.text`（デフォルト`true`）は、チャットメッセージ内の`/...`解析を有効にします。
+  - ネイティブコマンドのないサーフェス（WhatsApp/WebChat/Signal/iMessage/Google Chat/Microsoft Teams）では、これを`false`に設定してもテキストコマンドは引き続き動作します。
+- `commands.native`（デフォルト`"auto"`）は、ネイティブコマンドを登録します。
+  - Auto: Discord/Telegramではon、Slackではoff（スラッシュコマンドを追加するまで）。ネイティブサポートのないproviderでは無視されます。
+  - providerごとに上書きするには、`channels.discord.commands.native`、`channels.telegram.commands.native`、または`channels.slack.commands.native`を設定します（boolまたは`"auto"`）。
+  - `false`にすると、起動時にDiscord/Telegramで以前登録したコマンドをクリアします。SlackコマンドはSlackアプリで管理され、自動では削除されません。
+- `commands.nativeSkills`（デフォルト`"auto"`）は、サポートされている場合に**skill**コマンドをネイティブ登録します。
+  - Auto: Discord/Telegramではon、Slackではoff（Slackではskillごとにスラッシュコマンド作成が必要）。
+  - providerごとに上書きするには、`channels.discord.commands.nativeSkills`、`channels.telegram.commands.nativeSkills`、または`channels.slack.commands.nativeSkills`を設定します（boolまたは`"auto"`）。
+- `commands.bash`（デフォルト`false`）は、ホストshellコマンドを実行する`! <cmd>`を有効にします（`/bash <cmd>`はエイリアス。`tools.elevated` allowlistが必要）。
+- `commands.bashForegroundMs`（デフォルト`2000`）は、bashがバックグラウンドモードへ切り替わるまで待機する時間を制御します（`0`で即座にバックグラウンド化）。
+- `commands.config`（デフォルト`false`）は`/config`を有効にします（`openclaw.json`の読み書き）。
+- `commands.mcp`（デフォルト`false`）は`/mcp`を有効にします（`mcp.servers`配下のOpenClaw管理MCP設定の読み書き）。
+- `commands.plugins`（デフォルト`false`）は`/plugins`を有効にします（Plugin検出/ステータス、およびinstall + enable/disable制御）。
+- `commands.debug`（デフォルト`false`）は`/debug`を有効にします（ランタイム専用上書き）。
+- `commands.restart`（デフォルト`true`）は`/restart`とgateway restart tool actionを有効にします。
+- `commands.ownerAllowFrom`（任意）は、owner専用コマンド/toolサーフェス向けの明示的なowner allowlistを設定します。これは`commands.allowFrom`とは別です。
+- チャネルごとの`channels.<channel>.commands.enforceOwnerForCommands`（任意、デフォルト`false`）は、そのサーフェスでowner専用コマンドの実行に**owner ID**を要求します。`true`の場合、送信者は解決済みowner candidate（たとえば`commands.ownerAllowFrom`のエントリやproviderネイティブのownerメタデータ）に一致するか、内部メッセージチャネル上で内部`operator.admin`スコープを持っている必要があります。チャネル`allowFrom`内のワイルドカードエントリ、または空/未解決のowner-candidate一覧では**不十分**です。そのチャネルではowner専用コマンドはfail closedします。owner専用コマンドを`ownerAllowFrom`と標準コマンドallowlistだけで制御したい場合は、これをoffのままにしてください。
+- `commands.ownerDisplay`は、system prompt内でowner idをどのように表示するかを制御します: `raw`または`hash`。
+- `commands.ownerDisplaySecret`は、`commands.ownerDisplay="hash"`時に使用するHMAC secretを任意で設定します。
+- `commands.allowFrom`（任意）は、コマンド認可向けのproviderごとのallowlistを設定します。設定されている場合、これはコマンドとdirectiveの唯一の認可元となり、チャネルallowlist/ペアリングおよび`commands.useAccessGroups`は無視されます。グローバルデフォルトには`"*"`を使い、provider固有キーがそれを上書きします。
+- `commands.useAccessGroups`（デフォルト`true`）は、`commands.allowFrom`が未設定のとき、コマンドに対してallowlist/ポリシーを強制します。
 
 ## コマンド一覧
 
-現在の信頼できる情報源:
+現在のsource-of-truth:
 
-- コア組み込みコマンドは `src/auto-reply/commands-registry.shared.ts` から取得されます
-- 生成された dock コマンドは `src/auto-reply/commands-registry.data.ts` から取得されます
-- plugin コマンドは plugin の `registerCommand()` 呼び出しから取得されます
-- 実際にあなたの gateway で利用できるかどうかは、引き続き設定フラグ、チャンネル画面、インストール済み/有効化済み plugin に依存します
+- core組み込みは`src/auto-reply/commands-registry.shared.ts`から来ます
+- 生成されたdockコマンドは`src/auto-reply/commands-registry.data.ts`から来ます
+- PluginコマンドはPluginの`registerCommand()`呼び出しから来ます
+- 実際にあなたのgatewayで利用可能かどうかは、引き続き設定フラグ、チャネルサーフェス、インストール済み/有効化済みPluginに依存します
 
-### コア組み込みコマンド
+### core組み込みコマンド
 
-現在利用できる組み込みコマンド:
+現在利用可能な組み込みコマンド:
 
-- `/new [model]` は新しいセッションを開始します。`/reset` はリセットのエイリアスです。
-- `/reset soft [message]` は現在の transcript を保持し、再利用される CLI バックエンドのセッション id を破棄し、起動/システムプロンプトの読み込みをその場で再実行します。
-- `/compact [instructions]` はセッションコンテキストを Compaction します。[/concepts/compaction](/ja-JP/concepts/compaction) を参照してください。
-- `/stop` は現在の実行を中止します。
-- `/session idle <duration|off>` と `/session max-age <duration|off>` は、スレッドバインディングの有効期限を管理します。
-- `/think <level>` は思考レベルを設定します。選択肢はアクティブモデルのプロバイダープロファイルから取得されます。一般的なレベルは `off`、`minimal`、`low`、`medium`、`high` で、`xhigh`、`adaptive`、`max`、または二値の `on` のようなカスタムレベルはサポートされている場合にのみ利用できます。エイリアス: `/thinking`, `/t`。
-- `/verbose on|off|full` は詳細出力を切り替えます。エイリアス: `/v`。
-- `/trace on|off` は現在のセッションの plugin トレース出力を切り替えます。
-- `/fast [status|on|off]` は高速モードの表示または設定を行います。
-- `/reasoning [on|off|stream]` は reasoning の表示を切り替えます。エイリアス: `/reason`。
-- `/elevated [on|off|ask|full]` は elevated モードを切り替えます。エイリアス: `/elev`。
-- `/exec host=<auto|sandbox|gateway|node> security=<deny|allowlist|full> ask=<off|on-miss|always> node=<id>` は exec のデフォルトを表示または設定します。
-- `/model [name|#|status]` はモデルの表示または設定を行います。
-- `/models [provider] [page] [limit=<n>|size=<n>|all]` は、プロバイダーまたはプロバイダーのモデルを一覧表示します。
-- `/queue <mode>` はキュー動作を管理します（`steer`, `interrupt`, `followup`, `collect`, `steer-backlog`）。`debounce:2s cap:25 drop:summarize` のようなオプションも使えます。
-- `/help` は短いヘルプ概要を表示します。
-- `/commands` は生成されたコマンドカタログを表示します。
-- `/tools [compact|verbose]` は、現在のエージェントが今使えるものを表示します。
-- `/status` は、利用可能な場合はプロバイダーの使用量/クォータを含むランタイムステータスを表示します。
-- `/tasks` は、現在のセッションのアクティブ/最近のバックグラウンドタスクを一覧表示します。
-- `/context [list|detail|json]` は、コンテキストがどのように組み立てられるかを説明します。
-- `/export-session [path]` は、現在のセッションを HTML にエクスポートします。エイリアス: `/export`。
-- `/whoami` はあなたの送信者 id を表示します。エイリアス: `/id`。
-- `/skill <name> [input]` は名前で skill を実行します。
-- `/allowlist [list|add|remove] ...` は、許可リストのエントリーを管理します。テキスト専用です。
-- `/approve <id> <decision>` は、exec 承認プロンプトを解決します。
-- `/btw <question>` は、今後のセッションコンテキストを変更せずに脇道の質問をします。[/tools/btw](/ja-JP/tools/btw) を参照してください。
-- `/subagents list|kill|log|info|send|steer|spawn` は、現在のセッションのサブエージェント実行を管理します。
-- `/acp spawn|cancel|steer|close|sessions|status|set-mode|set|cwd|permissions|timeout|model|reset-options|doctor|install|help` は、ACP セッションとランタイムオプションを管理します。
-- `/focus <target>` は、現在の Discord スレッドまたは Telegram トピック/会話をセッションターゲットにバインドします。
-- `/unfocus` は、現在のバインディングを解除します。
-- `/agents` は、現在のセッションのスレッドにバインドされたエージェントを一覧表示します。
-- `/kill <id|#|all>` は、実行中のサブエージェントを1つまたはすべて中止します。
-- `/steer <id|#> <message>` は、実行中のサブエージェントにステアリングを送信します。エイリアス: `/tell`。
-- `/config show|get|set|unset` は、`openclaw.json` を読み書きします。owner 専用です。`commands.config: true` が必要です。
-- `/mcp show|get|set|unset` は、`mcp.servers` 配下の OpenClaw 管理 MCP サーバー設定を読み書きします。owner 専用です。`commands.mcp: true` が必要です。
-- `/plugins list|inspect|show|get|install|enable|disable` は、plugin の状態を調査または変更します。`/plugin` はエイリアスです。書き込みは owner 専用です。`commands.plugins: true` が必要です。
-- `/debug show|set|unset|reset` は、ランタイム限定の設定上書きを管理します。owner 専用です。`commands.debug: true` が必要です。
-- `/usage off|tokens|full|cost` は、レスポンスごとの使用量フッターを制御するか、ローカルのコスト概要を表示します。
-- `/tts on|off|status|provider|limit|summary|audio|help` は、TTS を制御します。[/tools/tts](/ja-JP/tools/tts) を参照してください。
-- `/restart` は、有効な場合に OpenClaw を再起動します。デフォルト: 有効。無効にするには `commands.restart: false` を設定してください。
-- `/activation mention|always` は、グループアクティベーションモードを設定します。
-- `/send on|off|inherit` は、送信ポリシーを設定します。owner 専用です。
-- `/bash <command>` は、ホストシェルコマンドを実行します。テキスト専用です。エイリアス: `! <command>`。`commands.bash: true` に加えて `tools.elevated` の許可リストが必要です。
-- `!poll [sessionId]` は、バックグラウンド bash ジョブを確認します。
-- `!stop [sessionId]` は、バックグラウンド bash ジョブを停止します。
+- `/new [model]`は新しいセッションを開始します。`/reset`はresetのエイリアスです。
+- `/reset soft [message]`は現在のtranscriptを保持し、再利用されたCLI backend session idを破棄し、その場でstartup/system-prompt読み込みを再実行します。
+- `/compact [instructions]`はセッションコンテキストをCompactionします。[/concepts/compaction](/ja-JP/concepts/compaction)を参照してください。
+- `/stop`は現在の実行を中止します。
+- `/session idle <duration|off>`および`/session max-age <duration|off>`は、thread-binding expiryを管理します。
+- `/think <level>`はthinkingレベルを設定します。選択肢はアクティブモデルのprovider profileから来ます。一般的なレベルは`off`、`minimal`、`low`、`medium`、`high`で、`xhigh`、`adaptive`、`max`、または二値の`on`のようなカスタムレベルはサポートされる場合にのみ利用できます。エイリアス: `/thinking`, `/t`。
+- `/verbose on|off|full`は詳細出力を切り替えます。エイリアス: `/v`。
+- `/trace on|off`は現在のセッションのPlugin trace出力を切り替えます。
+- `/fast [status|on|off]`は高速モードを表示または設定します。
+- `/reasoning [on|off|stream]`はreasoning表示を切り替えます。エイリアス: `/reason`。
+- `/elevated [on|off|ask|full]`はelevatedモードを切り替えます。エイリアス: `/elev`。
+- `/exec host=<auto|sandbox|gateway|node> security=<deny|allowlist|full> ask=<off|on-miss|always> node=<id>`はexecデフォルトを表示または設定します。
+- `/model [name|#|status]`はモデルを表示または設定します。
+- `/models [provider] [page] [limit=<n>|size=<n>|all]`はprovider、またはproviderのモデルを一覧表示します。
+- `/queue <mode>`はキュー動作（`steer`, `interrupt`, `followup`, `collect`, `steer-backlog`）と、`debounce:2s cap:25 drop:summarize`のようなオプションを管理します。
+- `/help`は短いヘルプ概要を表示します。
+- `/commands`は生成されたコマンドカタログを表示します。
+- `/tools [compact|verbose]`は、現在のエージェントが今使えるものを表示します。
+- `/status`は、利用可能な場合はprovider usage/quotaを含むランタイムステータスを表示します。
+- `/tasks`は、現在のセッションのアクティブな/最近のバックグラウンドタスクを一覧表示します。
+- `/context [list|detail|json]`は、コンテキストがどのように組み立てられるかを説明します。
+- `/export-session [path]`は、現在のセッションをHTMLへエクスポートします。エイリアス: `/export`。
+- `/whoami`は送信者idを表示します。エイリアス: `/id`。
+- `/skill <name> [input]`は、名前でskillを実行します。
+- `/allowlist [list|add|remove] ...`はallowlistエントリを管理します。テキスト専用。
+- `/approve <id> <decision>`はexec approval promptを解決します。
+- `/btw <question>`は、今後のセッションコンテキストを変更せずに補足の質問をします。[/tools/btw](/ja-JP/tools/btw)を参照してください。
+- `/subagents list|kill|log|info|send|steer|spawn`は、現在のセッションのsub-agent実行を管理します。
+- `/acp spawn|cancel|steer|close|sessions|status|set-mode|set|cwd|permissions|timeout|model|reset-options|doctor|install|help`は、ACPセッションとランタイムオプションを管理します。
+- `/focus <target>`は、現在のDiscord threadまたはTelegram topic/conversationをセッションターゲットへバインドします。
+- `/unfocus`は現在のバインディングを削除します。
+- `/agents`は現在のセッションにバインドされたthread-boundエージェントを一覧表示します。
+- `/kill <id|#|all>`は、1つまたはすべての実行中sub-agentを中止します。
+- `/steer <id|#> <message>`は、実行中sub-agentへsteeringを送信します。エイリアス: `/tell`。
+- `/config show|get|set|unset`は`openclaw.json`を読み書きします。owner専用。`commands.config: true`が必要。
+- `/mcp show|get|set|unset`は`mcp.servers`配下のOpenClaw管理MCP server設定を読み書きします。owner専用。`commands.mcp: true`が必要。
+- `/plugins list|inspect|show|get|install|enable|disable`はPlugin状態を検査または変更します。`/plugin`はエイリアスです。書き込みはowner専用。`commands.plugins: true`が必要。
+- `/debug show|set|unset|reset`は、ランタイム専用設定上書きを管理します。owner専用。`commands.debug: true`が必要。
+- `/usage off|tokens|full|cost`は、応答ごとのusageフッターを制御するか、ローカルのコスト概要を表示します。
+- `/tts on|off|status|provider|limit|summary|audio|help`はTTSを制御します。[/tools/tts](/ja-JP/tools/tts)を参照してください。
+- `/restart`は、有効な場合にOpenClawを再起動します。デフォルト: 有効。無効にするには`commands.restart: false`を設定してください。
+- `/activation mention|always`は、グループ有効化モードを設定します。
+- `/send on|off|inherit`はsendポリシーを設定します。owner専用。
+- `/bash <command>`はホストshellコマンドを実行します。テキスト専用。エイリアス: `! <command>`。`commands.bash: true`に加え、`tools.elevated` allowlistが必要です。
+- `!poll [sessionId]`はバックグラウンドbashジョブを確認します。
+- `!stop [sessionId]`はバックグラウンドbashジョブを停止します。
 
-### 生成された dock コマンド
+### 生成されたdockコマンド
 
-Dock コマンドは、ネイティブコマンド対応のチャンネル plugin から生成されます。現在バンドルされているセット:
+dockコマンドは、ネイティブコマンドサポートを持つチャネルPluginから生成されます。現在の組み込みセット:
 
 - `/dock-discord`（エイリアス: `/dock_discord`）
 - `/dock-mattermost`（エイリアス: `/dock_mattermost`）
 - `/dock-slack`（エイリアス: `/dock_slack`）
 - `/dock-telegram`（エイリアス: `/dock_telegram`）
 
-### バンドルされた plugin コマンド
+### 組み込みPluginコマンド
 
-バンドルされた plugin は、さらにスラッシュコマンドを追加できます。このリポジトリで現在バンドルされているコマンド:
+組み込みPluginは追加のスラッシュコマンドを追加できます。このrepoにある現在の組み込みコマンド:
 
-- `/dreaming [on|off|status|help]` は、メモリ Dreaming を切り替えます。[Dreaming](/ja-JP/concepts/dreaming) を参照してください。
-- `/pair [qr|status|pending|approve|cleanup|notify]` は、デバイスのペアリング/セットアップフローを管理します。[Pairing](/ja-JP/channels/pairing) を参照してください。
-- `/phone status|arm <camera|screen|writes|all> [duration]|disarm` は、高リスクの phone Node コマンドを一時的に有効化します。
-- `/voice status|list [limit]|set <voiceId|name>` は、Talk 音声設定を管理します。Discord では、ネイティブコマンド名は `/talkvoice` です。
-- `/card ...` は、LINE リッチカードのプリセットを送信します。[LINE](/ja-JP/channels/line) を参照してください。
-- `/codex status|models|threads|resume|compact|review|account|mcp|skills` は、バンドルされた Codex app-server harness を調査および制御します。[Codex Harness](/ja-JP/plugins/codex-harness) を参照してください。
-- QQBot 専用コマンド:
+- `/dreaming [on|off|status|help]`はmemory Dreamingを切り替えます。[Dreaming](/ja-JP/concepts/dreaming)を参照してください。
+- `/pair [qr|status|pending|approve|cleanup|notify]`はdevice pairing/setupフローを管理します。[Pairing](/ja-JP/channels/pairing)を参照してください。
+- `/phone status|arm <camera|screen|writes|all> [duration]|disarm`は、高リスクなphone Nodeコマンドを一時的に有効化します。
+- `/voice status|list [limit]|set <voiceId|name>`はTalk voice設定を管理します。Discordでは、ネイティブコマンド名は`/talkvoice`です。
+- `/card ...`はLINEリッチカードプリセットを送信します。[LINE](/ja-JP/channels/line)を参照してください。
+- `/codex status|models|threads|resume|compact|review|account|mcp|skills`は、組み込みCodex app-server harnessを検査および制御します。[Codex Harness](/ja-JP/plugins/codex-harness)を参照してください。
+- QQBot専用コマンド:
   - `/bot-ping`
   - `/bot-version`
   - `/bot-help`
   - `/bot-upgrade`
   - `/bot-logs`
 
-### 動的 skill コマンド
+### 動的skillコマンド
 
-ユーザーが呼び出せる Skills もスラッシュコマンドとして公開されます。
+ユーザーが呼び出せるskillも、スラッシュコマンドとして公開されます。
 
-- `/skill <name> [input]` は、汎用エントリーポイントとして常に機能します。
-- skill/plugin が登録している場合、Skills は `/prose` のような直接コマンドとして表示されることもあります。
-- ネイティブ skill コマンド登録は、`commands.nativeSkills` と `channels.<provider>.commands.nativeSkills` によって制御されます。
+- `/skill <name> [input]`は、常に汎用のエントリポイントとして動作します。
+- skill/pluginが登録すれば、`/prose`のような直接コマンドとしてskillが現れることもあります。
+- ネイティブskillコマンド登録は`commands.nativeSkills`と`channels.<provider>.commands.nativeSkills`で制御されます。
 
-注意:
+注記:
 
-- コマンドは、コマンドと引数の間に任意で `:` を入れられます（例: `/think: high`, `/send: on`, `/help:`）。
-- `/new <model>` は、モデルエイリアス、`provider/model`、またはプロバイダー名（あいまい一致）を受け付けます。一致しない場合、そのテキストはメッセージ本文として扱われます。
-- プロバイダー使用量の完全な内訳を確認するには、`openclaw status --usage` を使ってください。
-- `/allowlist add|remove` には `commands.config=true` が必要で、チャンネルの `configWrites` に従います。
-- マルチアカウントチャンネルでは、設定対象の `/allowlist --account <id>` と `/config set channels.<provider>.accounts.<id>...` も対象アカウントの `configWrites` に従います。
-- `/usage` はレスポンスごとの使用量フッターを制御します。`/usage cost` は OpenClaw のセッションログからローカルのコスト概要を表示します。
-- `/restart` はデフォルトで有効です。無効にするには `commands.restart: false` を設定してください。
-- `/plugins install <spec>` は `openclaw plugins install` と同じ plugin spec を受け付けます: ローカルパス/アーカイブ、npm パッケージ、または `clawhub:<pkg>`。
-- `/plugins enable|disable` は plugin 設定を更新し、再起動を求めることがあります。
-- Discord 専用ネイティブコマンド: `/vc join|leave|status` はボイスチャンネルを制御します（`channels.discord.voice` とネイティブコマンドが必要で、テキストとしては利用できません）。
-- Discord のスレッドバインディングコマンド（`/focus`, `/unfocus`, `/agents`, `/session idle`, `/session max-age`）は、有効なスレッドバインディングが有効化されている必要があります（`session.threadBindings.enabled` および/または `channels.discord.threadBindings.enabled`）。
-- ACP コマンドリファレンスとランタイム動作: [ACP Agents](/ja-JP/tools/acp-agents)。
-- `/verbose` はデバッグと追加の可視化を目的としています。通常の使用では **off** のままにしてください。
-- `/trace` は `/verbose` より範囲が狭く、plugin が所有する trace/debug 行だけを表示し、通常の verbose なツールのおしゃべりはオフのままにします。
-- `/fast on|off` はセッション上書きを永続化します。これをクリアして設定デフォルトに戻すには、Sessions UI の `inherit` オプションを使ってください。
-- `/fast` はプロバイダー依存です: OpenAI/OpenAI Codex ではネイティブ Responses エンドポイントで `service_tier=priority` に対応し、`api.anthropic.com` に送られる OAuth 認証トラフィックを含む直接の公開 Anthropic リクエストでは `service_tier=auto` または `standard_only` に対応します。[OpenAI](/ja-JP/providers/openai) と [Anthropic](/ja-JP/providers/anthropic) を参照してください。
-- ツール失敗の概要は関連がある場合に引き続き表示されますが、詳細な失敗テキストが含まれるのは `/verbose` が `on` または `full` のときだけです。
-- `/reasoning`、`/verbose`、`/trace` はグループ設定では危険です: 意図せず内部の reasoning、ツール出力、または plugin 診断を公開してしまう可能性があります。特にグループチャットでは、これらをオフのままにしておくことを推奨します。
-- `/model` は新しいセッションモデルを即座に永続化します。
-- エージェントがアイドル状態なら、次の実行ですぐに使われます。
-- すでに実行がアクティブな場合、OpenClaw はライブ切り替えを保留としてマークし、クリーンな再試行ポイントでのみ新しいモデルに再起動します。
-- ツール活動または返信出力がすでに始まっている場合、その保留切り替えは後の再試行機会または次のユーザーターンまでキューに残ることがあります。
-- **高速パス:** 許可リスト登録済み送信者からのコマンドのみのメッセージは即座に処理されます（キューとモデルをバイパスします）。
-- **グループメンションゲーティング:** 許可リスト登録済み送信者からのコマンドのみのメッセージは、メンション要件をバイパスします。
-- **インラインショートカット（許可リスト登録済み送信者のみ）:** 一部のコマンドは通常メッセージに埋め込まれていても動作し、残りのテキストをモデルが見る前に取り除かれます。
-  - 例: `hey /status` はステータス返信をトリガーし、残りのテキストは通常フローで処理され続けます。
-- 現在の対象: `/help`, `/commands`, `/status`, `/whoami` (`/id`)。
-- 認可されていないコマンドのみのメッセージは黙って無視され、インラインの `/...` トークンは通常のテキストとして扱われます。
-- **skill コマンド:** `user-invocable` な Skills はスラッシュコマンドとして公開されます。名前は `a-z0-9_` に正規化され（最大 32 文字）、衝突した場合は数値サフィックスが付きます（例: `_2`）。
-  - `/skill <name> [input]` は名前で skill を実行します（ネイティブコマンドの制限により skill ごとのコマンドを作れない場合に便利です）。
-  - デフォルトでは、skill コマンドは通常のリクエストとしてモデルに転送されます。
-  - Skills は任意で `command-dispatch: tool` を宣言して、コマンドをツールへ直接ルーティングできます（決定的で、モデルは使いません）。
-  - 例: `/prose`（OpenProse plugin）— [OpenProse](/ja-JP/prose) を参照してください。
-- **ネイティブコマンド引数:** Discord は動的オプションに autocomplete を使います（必須引数を省略したときはボタンメニューも使います）。Telegram と Slack は、コマンドが選択肢をサポートしていて引数を省略した場合、ボタンメニューを表示します。
+- コマンドでは、コマンドと引数の間に任意で`:`を入れられます（例: `/think: high`, `/send: on`, `/help:`）。
+- `/new <model>`は、model alias、`provider/model`、またはprovider名（あいまい一致）を受け付けます。一致しない場合、そのテキストはメッセージ本文として扱われます。
+- provider usageの完全な内訳には、`openclaw status --usage`を使用してください。
+- `/allowlist add|remove`には`commands.config=true`が必要で、チャネルの`configWrites`に従います。
+- マルチアカウントチャネルでは、設定対象の`/allowlist --account <id>`および`/config set channels.<provider>.accounts.<id>...`も、対象アカウントの`configWrites`に従います。
+- `/usage`は応答ごとのusageフッターを制御します。`/usage cost`はOpenClawセッションログからローカルコスト概要を表示します。
+- `/restart`はデフォルトで有効です。無効にするには`commands.restart: false`を設定してください。
+- `/plugins install <spec>`は`openclaw plugins install`と同じPlugin specを受け付けます: ローカルpath/archive、npm package、または`clawhub:<pkg>`。
+- `/plugins enable|disable`はPlugin設定を更新し、再起動を求める場合があります。
+- Discord専用ネイティブコマンド: `/vc join|leave|status`はvoice channelを制御します（`channels.discord.voice`とネイティブコマンドが必要。テキストでは利用不可）。
+- Discordのthread-bindingコマンド（`/focus`, `/unfocus`, `/agents`, `/session idle`, `/session max-age`）は、有効なthread bindingsが有効である必要があります（`session.threadBindings.enabled`および/または`channels.discord.threadBindings.enabled`）。
+- ACPコマンドリファレンスとランタイム動作: [ACP Agents](/ja-JP/tools/acp-agents)。
+- `/verbose`はデバッグと追加可視化のためのものです。通常利用では**off**のままにしてください。
+- `/trace`は`/verbose`より狭く、Plugin所有のtrace/debug行だけを表示し、通常のverboseなtool chatterはoffのままに保ちます。
+- `/fast on|off`はセッション上書きを永続化します。これをクリアして設定デフォルトへ戻すには、Sessions UIの`inherit`オプションを使ってください。
+- `/fast`はprovider固有です: OpenAI/OpenAI CodexではネイティブResponses endpoint上で`service_tier=priority`にマップされます。一方、`api.anthropic.com`へ送られるOAuth認証トラフィックを含む直接の公開Anthropicリクエストでは、`service_tier=auto`または`standard_only`にマップされます。[OpenAI](/ja-JP/providers/openai)および[Anthropic](/ja-JP/providers/anthropic)を参照してください。
+- tool失敗サマリーは必要に応じて引き続き表示されますが、詳細な失敗テキストは`/verbose`が`on`または`full`のときのみ含まれます。
+- `/reasoning`、`/verbose`、`/trace`はグループ設定では危険です。意図せず内部reasoning、tool出力、またはPlugin diagnosticsを露出させる可能性があります。特にグループチャットではoffのままにしておくことを推奨します。
+- `/model`は、新しいセッションmodelを即座に永続化します。
+- エージェントがアイドルであれば、次の実行ですぐに使われます。
+- すでに実行がアクティブな場合、OpenClawはライブ切り替えをpendingとしてマークし、クリーンなretryポイントでのみ新しいmodelへ再起動します。
+- すでにtool activityまたはreply出力が始まっている場合、そのpending切り替えは、後のretry機会または次のユーザーターンまで待機し続けることがあります。
+- **Fast path:** allowlist済み送信者からのコマンド専用メッセージは即座に処理されます（queue + modelをバイパス）。
+- **Group mention gating:** allowlist済み送信者からのコマンド専用メッセージはメンション要件をバイパスします。
+- **インラインショートカット（allowlist済み送信者のみ）:** 一部コマンドは通常メッセージに埋め込まれていても動作し、残りのテキストをモデルが見る前に取り除かれます。
+  - 例: `hey /status`はstatus返信を発生させ、残りのテキストは通常フローを継続します。
+- 現在対象: `/help`, `/commands`, `/status`, `/whoami`（`/id`）。
+- 認可されていないコマンド専用メッセージは黙って無視され、インラインの`/...`トークンは通常のテキストとして扱われます。
+- **skillコマンド:** `user-invocable`なskillはスラッシュコマンドとして公開されます。名前は`a-z0-9_`へサニタイズされ（最大32文字）、衝突した場合は数字サフィックスが付きます（例: `_2`）。
+  - `/skill <name> [input]`は、名前でskillを実行します（ネイティブコマンド上限によりskillごとのコマンドが作れない場合に有用）。
+  - デフォルトでは、skillコマンドは通常のリクエストとしてモデルへ転送されます。
+  - skillは任意で`command-dispatch: tool`を宣言でき、その場合コマンドはtoolへ直接ルーティングされます（決定的、モデルなし）。
+  - 例: `/prose`（OpenProse Plugin）— [OpenProse](/ja-JP/prose)を参照。
+- **ネイティブコマンド引数:** Discordは動的オプションにautocompleteを使用します（必須引数を省略した場合はボタンメニューも使用）。TelegramとSlackでは、コマンドが選択肢をサポートしていて引数を省略すると、ボタンメニューが表示されます。
 
 ## `/tools`
 
-`/tools` が答えるのは設定上の問いではなく、ランタイム上の問いです: **この会話でこのエージェントが今すぐ使えるもの**。
+`/tools`が答えるのは設定の質問ではなく、ランタイムの質問です。つまり、**この会話でこのエージェントが今使えるものは何か**です。
 
-- デフォルトの `/tools` は簡潔で、すばやく見渡せるよう最適化されています。
-- `/tools verbose` は短い説明を追加します。
-- 引数をサポートするネイティブコマンド画面では、同じモード切り替え `compact|verbose` が公開されます。
-- 結果はセッションスコープなので、エージェント、チャンネル、スレッド、送信者認可、またはモデルを変えると出力も変わることがあります。
-- `/tools` には、コアツール、接続された plugin ツール、チャンネル所有ツールを含め、ランタイムで実際に到達可能なツールが含まれます。
+- デフォルトの`/tools`は簡潔で、すばやく確認できるよう最適化されています。
+- `/tools verbose`は短い説明を追加します。
+- 引数をサポートするネイティブコマンドサーフェスでは、同じ`compact|verbose`モード切り替えが公開されます。
+- 結果はセッションスコープなので、エージェント、チャネル、thread、送信者認可、またはmodelが変わると、出力も変わることがあります。
+- `/tools`には、core tool、接続されたPlugin tool、チャネル所有toolを含め、ランタイムで実際に到達可能なtoolが含まれます。
 
-プロファイルや上書きの編集には、`/tools` を静的カタログとして扱うのではなく、Control UI の Tools パネルまたは設定/カタログ画面を使ってください。
+プロファイルや上書きの編集には、`/tools`を静的カタログとして扱うのではなく、Control UIのToolsパネルまたは設定/カタログサーフェスを使用してください。
 
-## 使用量の表示箇所（どこに何が表示されるか）
+## usageサーフェス（どこに何が表示されるか）
 
-- **プロバイダー使用量/クォータ**（例: 「Claude 80% left」）は、使用量トラッキングが有効なとき、現在のモデルプロバイダーについて `/status` に表示されます。OpenClaw はプロバイダーのウィンドウを `% left` に正規化します。MiniMax では残量のみの percent フィールドは表示前に反転され、`model_remains` レスポンスではチャットモデルのエントリーが優先され、モデルタグ付きプランラベルが使われます。
-- `/status` 内の **トークン/キャッシュ行** は、ライブセッションスナップショットの情報が少ない場合、最新の transcript 使用量エントリーにフォールバックできます。既存のゼロ以外のライブ値が引き続き優先され、transcript フォールバックは保存済み合計が欠けているか小さすぎる場合に、アクティブなランタイムモデルラベルや、より大きなプロンプト指向の合計値も復元できます。
-- **レスポンスごとのトークン/コスト** は `/usage off|tokens|full` で制御されます（通常の返信に追記されます）。
-- `/model status` は **モデル/認証/エンドポイント** に関するものであり、使用量に関するものではありません。
+- **Provider usage/quota**（例: 「Claude 80% left」）は、usage追跡が有効な場合、現在のmodel providerについて`/status`に表示されます。OpenClawはprovider windowを`% left`へ正規化します。MiniMaxでは、remaining-only percentフィールドは表示前に反転され、`model_remains`レスポンスではchat-modelエントリが優先され、modelタグ付きplan labelが付与されます。
+- `/status`内の**token/cache行**は、ライブセッションスナップショットが乏しい場合、最新のtranscript usageエントリへフォールバックできます。既存の非ゼロのライブ値は引き続き優先され、transcriptフォールバックは、保存済みtotalが存在しないか小さすぎる場合に、アクティブなランタイムmodel labelと、より大きいprompt指向のtotalも復元できます。
+- **応答ごとのtoken/cost**は`/usage off|tokens|full`で制御されます（通常返信に追記されます）。
+- `/model status`は**models/auth/endpoints**に関するものであり、usageではありません。
 
 ## モデル選択（`/model`）
 
-`/model` はディレクティブとして実装されています。
+`/model`はdirectiveとして実装されています。
 
 例:
 
@@ -244,16 +247,16 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /model status
 ```
 
-注意:
+注記:
 
-- `/model` と `/model list` は、コンパクトな番号付きピッカー（モデルファミリー + 利用可能なプロバイダー）を表示します。
-- Discord では、`/model` と `/models` はプロバイダーとモデルのドロップダウン、および Submit ステップを備えたインタラクティブピッカーを開きます。
-- `/model <#>` はそのピッカーから選択し、可能であれば現在のプロバイダーを優先します。
-- `/model status` は詳細ビューを表示し、利用可能な場合は設定済みプロバイダーエンドポイント（`baseUrl`）と API モード（`api`）も含まれます。
+- `/model`および`/model list`は、簡潔な番号付きpicker（model family + 利用可能provider）を表示します。
+- Discordでは、`/model`と`/models`はproviderおよびmodelのdropdownとSubmitステップを持つインタラクティブpickerを開きます。
+- `/model <#>`はそのpickerから選択します（可能な場合は現在のproviderを優先）。
+- `/model status`は、設定済みprovider endpoint（`baseUrl`）とAPI mode（`api`）を含む詳細ビューを表示します。
 
 ## デバッグ上書き
 
-`/debug` を使うと、**ランタイム限定**の設定上書き（メモリ上、ディスクではない）を設定できます。owner 専用です。デフォルトでは無効で、`commands.debug: true` で有効にします。
+`/debug`では**ランタイム専用**の設定上書き（ディスクではなくメモリ）を設定できます。owner専用。デフォルトでは無効で、`commands.debug: true`で有効化します。
 
 例:
 
@@ -265,14 +268,14 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /debug reset
 ```
 
-注意:
+注記:
 
-- 上書きは新しい設定読み取りにすぐ適用されますが、`openclaw.json` には書き込みません。
-- すべての上書きを消去してディスク上の設定に戻るには `/debug reset` を使ってください。
+- 上書きは新しい設定読み取りに即座に適用されますが、`openclaw.json`には書き込みません。
+- すべての上書きをクリアしてディスク上設定へ戻すには`/debug reset`を使用します。
 
-## plugin トレース出力
+## Plugin trace出力
 
-`/trace` を使うと、完全な verbose モードを有効にせずに**セッションスコープの plugin trace/debug 行**を切り替えられます。
+`/trace`では、完全なverboseモードを有効にせずに、**セッションスコープのPlugin trace/debug行**を切り替えられます。
 
 例:
 
@@ -282,18 +285,18 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /trace off
 ```
 
-注意:
+注記:
 
-- 引数なしの `/trace` は、現在のセッショントレース状態を表示します。
-- `/trace on` は、現在のセッションの plugin トレース行を有効にします。
-- `/trace off` は、それらを再び無効にします。
-- plugin トレース行は `/status` に表示されたり、通常のアシスタント返信の後に続く診断メッセージとして表示されたりすることがあります。
-- `/trace` は `/debug` の代わりにはなりません。`/debug` は引き続きランタイム限定の設定上書きを管理します。
-- `/trace` は `/verbose` の代わりにもなりません。通常の verbose なツール/ステータス出力は引き続き `/verbose` の役割です。
+- 引数なしの`/trace`は現在のセッションtrace状態を表示します。
+- `/trace on`は現在のセッションでPlugin trace行を有効にします。
+- `/trace off`はそれを再び無効にします。
+- Plugin trace行は`/status`内や、通常のassistant返信後のフォローアップdiagnosticメッセージとして表示される場合があります。
+- `/trace`は`/debug`の代替ではありません。`/debug`は引き続きランタイム専用設定上書きを管理します。
+- `/trace`は`/verbose`の代替でもありません。通常のverboseなtool/status出力は引き続き`/verbose`の領域です。
 
 ## 設定更新
 
-`/config` はディスク上の設定（`openclaw.json`）に書き込みます。owner 専用です。デフォルトでは無効で、`commands.config: true` で有効にします。
+`/config`はディスク上の設定（`openclaw.json`）へ書き込みます。owner専用。デフォルトでは無効で、`commands.config: true`で有効化します。
 
 例:
 
@@ -305,14 +308,14 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /config unset messages.responsePrefix
 ```
 
-注意:
+注記:
 
-- 設定は書き込み前に検証されます。無効な変更は拒否されます。
-- `/config` の更新は再起動後も保持されます。
+- 設定は書き込み前に検証され、無効な変更は拒否されます。
+- `/config`の更新は再起動後も保持されます。
 
-## MCP 更新
+## MCP更新
 
-`/mcp` は `mcp.servers` 配下の OpenClaw 管理 MCP サーバー定義を書き込みます。owner 専用です。デフォルトでは無効で、`commands.mcp: true` で有効にします。
+`/mcp`は、`mcp.servers`配下のOpenClaw管理MCP server定義を書き込みます。owner専用。デフォルトでは無効で、`commands.mcp: true`で有効化します。
 
 例:
 
@@ -323,14 +326,14 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /mcp unset context7
 ```
 
-注意:
+注記:
 
-- `/mcp` は設定を OpenClaw 設定に保存し、Pi 所有のプロジェクト設定には保存しません。
-- どの transport が実際に実行可能かは、ランタイムアダプターが決定します。
+- `/mcp`は、Pi所有のproject設定ではなく、OpenClaw設定に保存します。
+- どのtransportが実際に実行可能かはruntime adapterが決定します。
 
-## plugin 更新
+## Plugin更新
 
-`/plugins` を使うと、運用者は検出された plugin を調べ、設定内の有効化状態を切り替えられます。読み取り専用フローでは `/plugin` をエイリアスとして使えます。デフォルトでは無効で、`commands.plugins: true` で有効にします。
+`/plugins`では、operatorが検出済みPluginを調べ、設定内で有効/無効を切り替えられます。読み取り専用フローではエイリアスとして`/plugin`を使用できます。デフォルトでは無効で、`commands.plugins: true`で有効化します。
 
 例:
 
@@ -342,36 +345,37 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /plugins disable context7
 ```
 
-注意:
+注記:
 
-- `/plugins list` と `/plugins show` は、現在のワークスペースとディスク上の設定に対して実際の plugin 検出を行います。
-- `/plugins enable|disable` は plugin 設定のみを更新し、plugin のインストールやアンインストールは行いません。
-- 有効化/無効化の変更後は、適用するために gateway を再起動してください。
+- `/plugins list`と`/plugins show`は、現在のworkspaceとディスク上設定に対する実際のPlugin検出を使用します。
+- `/plugins enable|disable`はPlugin設定のみを更新し、Pluginのinstallやuninstallは行いません。
+- enable/disable変更の適用には、gatewayを再起動してください。
 
-## 画面ごとの注意
+## サーフェス注記
 
-- **テキストコマンド** は通常のチャットセッションで実行されます（DM は `main` を共有し、グループは独自のセッションを持ちます）。
-- **ネイティブコマンド** は分離されたセッションを使います:
+- **テキストコマンド**は通常のチャットセッションで実行されます（DMは`main`を共有し、グループは独自セッションを持ちます）。
+- **ネイティブコマンド**は分離セッションを使用します:
   - Discord: `agent:<agentId>:discord:slash:<userId>`
-  - Slack: `agent:<agentId>:slack:slash:<userId>`（プレフィックスは `channels.slack.slashCommand.sessionPrefix` で設定可能）
-  - Telegram: `telegram:slash:<userId>`（`CommandTargetSessionKey` 経由でチャットセッションを対象にします）
-- **`/stop`** はアクティブなチャットセッションを対象にするため、現在の実行を中止できます。
-- **Slack:** `channels.slack.slashCommand` は単一の `/openclaw` 形式コマンド用として引き続きサポートされています。`commands.native` を有効にする場合は、組み込みコマンドごとに1つの Slack スラッシュコマンドを作成する必要があります（名前は `/help` と同じです）。Slack のコマンド引数メニューは、一時的な Block Kit ボタンとして配信されます。
-  - Slack のネイティブ例外: Slack は `/status` を予約しているため、`/status` ではなく `/agentstatus` を登録してください。テキストの `/status` は Slack メッセージでも引き続き動作します。
+  - Slack: `agent:<agentId>:slack:slash:<userId>`（prefixは`channels.slack.slashCommand.sessionPrefix`で設定可能）
+  - Telegram: `telegram:slash:<userId>`（`CommandTargetSessionKey`経由でチャットセッションをターゲットにする）
+- **`/stop`**は、現在の実行を中止できるよう、アクティブなチャットセッションを対象にします。
+- **Slack:** `channels.slack.slashCommand`は、単一の`/openclaw`形式コマンド向けに引き続きサポートされています。`commands.native`を有効にする場合は、組み込みコマンドごとに1つのSlackスラッシュコマンドを作成する必要があります（名前は`/help`と同じ）。Slack向けコマンド引数メニューは、ephemeralなBlock Kitボタンとして配信されます。
+  - Slackネイティブ例外: Slackは`/status`を予約しているため、`/agentstatus`を登録してください（`/status`ではありません）。テキストの`/status`はSlackメッセージ内でも引き続き動作します。
 
-## BTW 脇道の質問
+## BTW補足質問
 
-`/btw` は現在のセッションについての手軽な**脇道の質問**です。
+`/btw`は、現在のセッションに関する素早い**補足質問**です。
 
-通常のチャットとは異なり、次の特徴があります。
+通常チャットと異なり、次の特徴があります。
 
 - 現在のセッションを背景コンテキストとして使う
-- 別個の**ツールなし**ワンショット呼び出しとして実行される
-- 今後のセッションコンテキストを変更しない
-- transcript 履歴に書き込まれない
-- 通常のアシスタントメッセージではなく、ライブのサイド結果として配信される
+- 別個の**toolなし**ワンショット呼び出しとして実行される
+- 将来のセッションコンテキストを変更しない
+- transcript履歴には書き込まれない
+- 通常のassistantメッセージではなく、ライブの補足結果として配信される
 
-そのため、メインタスクを進めたまま一時的な確認をしたいときに `/btw` は便利です。
+そのため、メイン
+タスクを進めたまま一時的な確認をしたいときに`/btw`は便利です。
 
 例:
 
@@ -379,4 +383,5 @@ Dock コマンドは、ネイティブコマンド対応のチャンネル plugi
 /btw what are we doing right now?
 ```
 
-完全な動作とクライアント UX の詳細については、[BTW Side Questions](/ja-JP/tools/btw) を参照してください。
+完全な動作とclient UXの
+詳細については[BTW Side Questions](/ja-JP/tools/btw)を参照してください。
