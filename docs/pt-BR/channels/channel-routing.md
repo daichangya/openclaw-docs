@@ -1,13 +1,13 @@
 ---
 read_when:
-    - Alterando o roteamento de canais ou o comportamento da caixa de entrada
+    - Alterando o roteamento de canal ou o comportamento da caixa de entrada
 summary: Regras de roteamento por canal (WhatsApp, Telegram, Discord, Slack) e contexto compartilhado
-title: Roteamento de Canais
+title: Roteamento de canal
 x-i18n:
-    generated_at: "2026-04-05T12:34:40Z"
+    generated_at: "2026-04-23T05:38:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 63916c4dd0af5fc9bbd12581a9eb15fea14a380c5ade09323ca0c237db61e537
+    source_hash: e7d437d85d5edd3a0157fd683c6ec63d5d7e905e3e6bdce9a3ba11ddab97d3c2
     source_path: channels/channel-routing.md
     workflow: 15
 ---
@@ -18,9 +18,9 @@ O OpenClaw roteia respostas **de volta para o canal de onde uma mensagem veio**.
 modelo não escolhe um canal; o roteamento é determinístico e controlado pela
 configuração do host.
 
-## Termos principais
+## Termos-chave
 
-- **Canal**: `telegram`, `whatsapp`, `discord`, `irc`, `googlechat`, `slack`, `signal`, `imessage`, `line`, além de canais de extensão. `webchat` é o canal interno da UI do WebChat e não é um canal de saída configurável.
+- **Canal**: `telegram`, `whatsapp`, `discord`, `irc`, `googlechat`, `slack`, `signal`, `imessage`, `line`, além de canais de extensão. `webchat` é o canal interno da interface do WebChat e não é um canal de saída configurável.
 - **AccountId**: instância de conta por canal (quando compatível).
 - Conta padrão opcional do canal: `channels.<channel>.defaultAccount` escolhe
   qual conta é usada quando um caminho de saída não especifica `accountId`.
@@ -30,9 +30,13 @@ configuração do host.
 
 ## Formatos de chave de sessão (exemplos)
 
-Mensagens diretas são recolhidas na sessão **principal** do agente:
+Mensagens diretas são recolhidas na sessão **principal** do agente por padrão:
 
 - `agent:<agentId>:<mainKey>` (padrão: `agent:main:main`)
+
+Mesmo quando o histórico da conversa por mensagem direta é compartilhado com a principal, a sandbox e
+a política de ferramentas usam uma chave de runtime derivada por conta para chat direto no caso de DMs externos,
+para que mensagens originadas do canal não sejam tratadas como execuções locais da sessão principal.
 
 Grupos e canais permanecem isolados por canal:
 
@@ -49,39 +53,39 @@ Exemplos:
 - `agent:main:telegram:group:-1001234567890:topic:42`
 - `agent:main:discord:channel:123456:thread:987654`
 
-## Fixação da rota principal de DM
+## Fixação de rota da DM principal
 
-Quando `session.dmScope` é `main`, mensagens diretas podem compartilhar uma sessão principal.
-Para impedir que `lastRoute` da sessão seja sobrescrito por DMs de não proprietários,
-o OpenClaw infere um proprietário fixado a partir de `allowFrom` quando tudo isso é verdadeiro:
+Quando `session.dmScope` é `main`, mensagens diretas podem compartilhar uma única sessão principal.
+Para evitar que o `lastRoute` da sessão seja sobrescrito por DMs de não proprietários,
+o OpenClaw infere um proprietário fixado a partir de `allowFrom` quando todas estas condições são verdadeiras:
 
 - `allowFrom` tem exatamente uma entrada sem wildcard.
-- A entrada pode ser normalizada para um ID de remetente concreto desse canal.
+- A entrada pode ser normalizada para um ID de remetente concreto para aquele canal.
 - O remetente da DM recebida não corresponde a esse proprietário fixado.
 
-Nesse caso de incompatibilidade, o OpenClaw ainda registra os metadados da sessão recebida, mas
+Nesse caso de divergência, o OpenClaw ainda registra os metadados da sessão recebida, mas
 ignora a atualização de `lastRoute` da sessão principal.
 
 ## Regras de roteamento (como um agente é escolhido)
 
 O roteamento escolhe **um agente** para cada mensagem recebida:
 
-1. **Correspondência exata de peer** (`bindings` com `peer.kind` + `peer.id`).
-2. **Correspondência de peer pai** (herança de thread).
+1. **Correspondência exata do peer** (`bindings` com `peer.kind` + `peer.id`).
+2. **Correspondência do peer pai** (herança de thread).
 3. **Correspondência de guild + funções** (Discord) via `guildId` + `roles`.
 4. **Correspondência de guild** (Discord) via `guildId`.
 5. **Correspondência de equipe** (Slack) via `teamId`.
 6. **Correspondência de conta** (`accountId` no canal).
 7. **Correspondência de canal** (qualquer conta nesse canal, `accountId: "*"`).
-8. **Agente padrão** (`agents.list[].default`, caso contrário a primeira entrada da lista, com fallback para `main`).
+8. **Agente padrão** (`agents.list[].default`, senão a primeira entrada da lista, com fallback para `main`).
 
 Quando um binding inclui vários campos de correspondência (`peer`, `guildId`, `teamId`, `roles`), **todos os campos fornecidos devem corresponder** para que esse binding seja aplicado.
 
-O agente correspondente determina qual workspace e qual armazenamento de sessão são usados.
+O agente correspondente determina qual workspace e armazenamento de sessão são usados.
 
 ## Grupos de broadcast (executar vários agentes)
 
-Os grupos de broadcast permitem executar **vários agentes** para o mesmo peer **quando o OpenClaw normalmente responderia** (por exemplo: em grupos do WhatsApp, após o gating de menção/ativação).
+Grupos de broadcast permitem executar **vários agentes** para o mesmo peer **quando o OpenClaw normalmente responderia** (por exemplo: em grupos do WhatsApp, após a lógica de menção/ativação).
 
 Configuração:
 
@@ -95,7 +99,7 @@ Configuração:
 }
 ```
 
-Consulte: [Grupos de broadcast](/channels/broadcast-groups).
+Veja: [Grupos de broadcast](/pt-BR/channels/broadcast-groups).
 
 ## Visão geral da configuração
 
@@ -107,7 +111,7 @@ Exemplo:
 ```json5
 {
   agents: {
-    list: [{ id: "support", name: "Support", workspace: "~/.openclaw/workspace-support" }],
+    list: [{ id: "support", name: "Suporte", workspace: "~/.openclaw/workspace-support" }],
   },
   bindings: [
     { match: { channel: "slack", teamId: "T123" }, agentId: "support" },
@@ -121,26 +125,25 @@ Exemplo:
 Os armazenamentos de sessão ficam no diretório de estado (padrão `~/.openclaw`):
 
 - `~/.openclaw/agents/<agentId>/sessions/sessions.json`
-- As transcrições JSONL ficam ao lado do armazenamento
+- Transcrições JSONL ficam ao lado do armazenamento
 
-Você pode substituir o caminho do armazenamento via `session.store` e templating com `{agentId}`.
+Você pode substituir o caminho do armazenamento via `session.store` e template `{agentId}`.
 
-A descoberta de sessão do Gateway e do ACP também verifica armazenamentos de agentes com suporte em disco sob a
-raiz padrão `agents/` e sob raízes de `session.store` com template. Os armazenamentos
-descobertos devem permanecer dentro dessa raiz de agente resolvida e usar um arquivo
-`sessions.json` regular. Links simbólicos e caminhos fora da raiz são ignorados.
+A descoberta de sessões do Gateway e ACP também verifica armazenamentos de agentes com persistência em disco sob a
+raiz padrão `agents/` e sob raízes com template de `session.store`. Os armazenamentos descobertos
+devem permanecer dentro dessa raiz de agente resolvida e usar um arquivo
+`sessions.json` regular. Symlinks e caminhos fora da raiz são ignorados.
 
 ## Comportamento do WebChat
 
-O WebChat se conecta ao **agente selecionado** e usa por padrão a sessão principal do agente.
-Por isso, o WebChat permite ver o contexto entre canais desse
-agente em um único lugar.
+O WebChat se conecta ao **agente selecionado** e, por padrão, à sessão principal do agente.
+Por causa disso, o WebChat permite ver o contexto entre canais desse agente em um só lugar.
 
 ## Contexto de resposta
 
-As respostas recebidas incluem:
+Respostas recebidas incluem:
 
 - `ReplyToId`, `ReplyToBody` e `ReplyToSender` quando disponíveis.
-- O contexto citado é acrescentado a `Body` como um bloco `[Replying to ...]`.
+- O contexto citado é anexado a `Body` como um bloco `[Replying to ...]`.
 
 Isso é consistente entre os canais.

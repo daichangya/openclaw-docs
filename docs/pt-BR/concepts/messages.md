@@ -6,10 +6,10 @@ read_when:
 summary: Fluxo de mensagens, sessões, enfileiramento e visibilidade do raciocínio
 title: Mensagens
 x-i18n:
-    generated_at: "2026-04-21T13:35:16Z"
+    generated_at: "2026-04-23T05:38:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4f535d01872e7fcf0f3d99a5c5ac01feddbf7fb562ff61d9ccdf18f109f9922f
+    source_hash: d4490d87835f44f703b45b29ad69878fec552caf81f4bd07d29614f71ee15cfb
     source_path: concepts/messages.md
     workflow: 15
 ---
@@ -22,34 +22,34 @@ streaming e visibilidade do raciocínio.
 ## Fluxo de mensagens (visão geral)
 
 ```
-Mensagem recebida
-  -> roteamento/vinculações -> chave da sessão
-  -> fila (se uma execução estiver ativa)
-  -> execução do agente (streaming + ferramentas)
-  -> respostas enviadas (limites do canal + fragmentação)
+Inbound message
+  -> routing/bindings -> session key
+  -> queue (if a run is active)
+  -> agent run (streaming + tools)
+  -> outbound replies (channel limits + chunking)
 ```
 
 Os principais controles ficam na configuração:
 
 - `messages.*` para prefixos, enfileiramento e comportamento em grupos.
 - `agents.defaults.*` para padrões de streaming em blocos e fragmentação.
-- Sobrescritas de canal (`channels.whatsapp.*`, `channels.telegram.*` etc.) para limites e alternâncias de streaming.
+- Substituições por canal (`channels.whatsapp.*`, `channels.telegram.*`, etc.) para limites e alternâncias de streaming.
 
-Consulte [Configuration](/pt-BR/gateway/configuration) para o schema completo.
+Consulte [Configuration](/pt-BR/gateway/configuration) para o esquema completo.
 
-## Desduplicação de entrada
+## Deduplicação de entrada
 
 Os canais podem reenviar a mesma mensagem após reconexões. O OpenClaw mantém um
 cache de curta duração indexado por canal/conta/par/sessão/id da mensagem, para que entregas
-duplicadas não acionem outra execução do agente.
+duplicadas não disparem outra execução do agente.
 
 ## Debounce de entrada
 
 Mensagens rápidas e consecutivas do **mesmo remetente** podem ser agrupadas em um único
-turno do agente via `messages.inbound`. O debounce é aplicado por canal + conversa
-e usa a mensagem mais recente para encadeamento/IDs de resposta.
+turno do agente por meio de `messages.inbound`. O debounce é aplicado por canal + conversa
+e usa a mensagem mais recente para encadeamento de resposta/IDs.
 
-Configuração (padrão global + sobrescritas por canal):
+Configuração (padrão global + substituições por canal):
 
 ```json5
 {
@@ -68,76 +68,76 @@ Configuração (padrão global + sobrescritas por canal):
 
 Observações:
 
-- O debounce se aplica a mensagens **somente de texto**; mídia/anexos são descarregados imediatamente.
-- Comandos de controle ignoram o debounce para permanecerem isolados — **exceto** quando um canal opta explicitamente pela coalescência de DMs do mesmo remetente (por exemplo, [`coalesceSameSenderDms` do BlueBubbles](/pt-BR/channels/bluebubbles#coalescing-split-send-dms-command--url-in-one-composition)), em que comandos em DM aguardam dentro da janela de debounce para que uma carga útil enviada em partes possa entrar no mesmo turno do agente.
+- O debounce se aplica a mensagens **somente de texto**; mídia/anexos são liberados imediatamente.
+- Comandos de controle ignoram o debounce para permanecerem independentes — **exceto** quando um canal opta explicitamente pela coalescência de DMs do mesmo remetente (por exemplo, [`coalesceSameSenderDms` do BlueBubbles](/pt-BR/channels/bluebubbles#coalescing-split-send-dms-command--url-in-one-composition)), em que comandos de DM aguardam dentro da janela de debounce para que uma carga split-send possa entrar no mesmo turno do agente.
 
 ## Sessões e dispositivos
 
 As sessões pertencem ao Gateway, não aos clientes.
 
-- Chats diretos convergem para a chave da sessão principal do agente.
+- Chats diretos convergem para a chave de sessão principal do agente.
 - Grupos/canais recebem suas próprias chaves de sessão.
 - O armazenamento de sessões e as transcrições ficam no host do Gateway.
 
 Vários dispositivos/canais podem mapear para a mesma sessão, mas o histórico não é totalmente
 sincronizado de volta para todos os clientes. Recomendação: use um dispositivo principal para conversas longas
-para evitar contexto divergente. A Control UI e a TUI sempre mostram a transcrição da sessão
-mantida pelo Gateway, portanto são a fonte de verdade.
+para evitar contexto divergente. A Control UI e a TUI sempre mostram a transcrição da sessão mantida
+pelo Gateway, portanto são a fonte da verdade.
 
 Detalhes: [Session management](/pt-BR/concepts/session).
 
-## Corpos de entrada e contexto do histórico
+## Corpos de entrada e contexto de histórico
 
 O OpenClaw separa o **corpo do prompt** do **corpo do comando**:
 
-- `Body`: texto do prompt enviado ao agente. Isso pode incluir envelopes do canal e
-  wrappers de histórico opcionais.
+- `Body`: texto do prompt enviado ao agente. Pode incluir envelopes do canal e
+  wrappers opcionais de histórico.
 - `CommandBody`: texto bruto do usuário para análise de diretivas/comandos.
-- `RawBody`: alias legado de `CommandBody` (mantido por compatibilidade).
+- `RawBody`: alias legado para `CommandBody` (mantido por compatibilidade).
 
 Quando um canal fornece histórico, ele usa um wrapper compartilhado:
 
-- `[Mensagens do chat desde a sua última resposta - para contexto]`
-- `[Mensagem atual - responda a esta]`
+- `[Chat messages since your last reply - for context]`
+- `[Current message - respond to this]`
 
 Para **chats não diretos** (grupos/canais/salas), o **corpo da mensagem atual** recebe o prefixo do
-rótulo do remetente (o mesmo estilo usado nas entradas do histórico). Isso mantém consistentes no prompt do agente
-as mensagens em tempo real e as mensagens enfileiradas/do histórico.
+rótulo do remetente (o mesmo estilo usado nas entradas de histórico). Isso mantém consistência entre
+mensagens em tempo real e mensagens enfileiradas/de histórico no prompt do agente.
 
-Os buffers de histórico são **somente pendentes**: incluem mensagens de grupo que _não_
-acionaram uma execução (por exemplo, mensagens condicionadas por menção) e **excluem** mensagens
+Os buffers de histórico são **somente pendentes**: eles incluem mensagens de grupo que _não_
+dispararam uma execução (por exemplo, mensagens condicionadas por menção) e **excluem** mensagens
 já presentes na transcrição da sessão.
 
 A remoção de diretivas se aplica apenas à seção da **mensagem atual**, para que o histórico
 permaneça intacto. Canais que encapsulam histórico devem definir `CommandBody` (ou
 `RawBody`) como o texto original da mensagem e manter `Body` como o prompt combinado.
-Os buffers de histórico são configuráveis via `messages.groupChat.historyLimit` (padrão
-global) e sobrescritas por canal como `channels.slack.historyLimit` ou
-`channels.telegram.accounts.<id>.historyLimit` (defina `0` para desabilitar).
+Os buffers de histórico são configuráveis por meio de `messages.groupChat.historyLimit` (padrão
+global) e substituições por canal como `channels.slack.historyLimit` ou
+`channels.telegram.accounts.<id>.historyLimit` (defina `0` para desativar).
 
 ## Enfileiramento e followups
 
 Se uma execução já estiver ativa, mensagens recebidas podem ser enfileiradas, direcionadas para a
 execução atual ou coletadas para um turno de followup.
 
-- Configure via `messages.queue` (e `messages.queue.byChannel`).
+- Configure por meio de `messages.queue` (e `messages.queue.byChannel`).
 - Modos: `interrupt`, `steer`, `followup`, `collect`, além de variantes de backlog.
 
 Detalhes: [Queueing](/pt-BR/concepts/queue).
 
-## Streaming, fragmentação e agrupamento
+## Streaming, fragmentação e batching
 
 O streaming em blocos envia respostas parciais à medida que o modelo produz blocos de texto.
 A fragmentação respeita os limites de texto do canal e evita dividir blocos de código delimitados.
 
 Principais configurações:
 
-- `agents.defaults.blockStreamingDefault` (`on|off`, padrão desligado)
+- `agents.defaults.blockStreamingDefault` (`on|off`, padrão desativado)
 - `agents.defaults.blockStreamingBreak` (`text_end|message_end`)
 - `agents.defaults.blockStreamingChunk` (`minChars|maxChars|breakPreference`)
-- `agents.defaults.blockStreamingCoalesce` (agrupamento com base em inatividade)
-- `agents.defaults.humanDelay` (pausa semelhante à humana entre respostas em bloco)
-- Sobrescritas de canal: `*.blockStreaming` e `*.blockStreamingCoalesce` (canais não Telegram exigem `*.blockStreaming: true` explícito)
+- `agents.defaults.blockStreamingCoalesce` (batching com base em ociosidade)
+- `agents.defaults.humanDelay` (pausa com aparência humana entre respostas em bloco)
+- Substituições por canal: `*.blockStreaming` e `*.blockStreamingCoalesce` (canais não Telegram exigem `*.blockStreaming: true` explícito)
 
 Detalhes: [Streaming + chunking](/pt-BR/concepts/streaming).
 
@@ -146,17 +146,17 @@ Detalhes: [Streaming + chunking](/pt-BR/concepts/streaming).
 O OpenClaw pode expor ou ocultar o raciocínio do modelo:
 
 - `/reasoning on|off|stream` controla a visibilidade.
-- O conteúdo do raciocínio ainda conta para o uso de tokens quando é produzido pelo modelo.
-- O Telegram oferece suporte ao streaming do raciocínio na bolha de rascunho.
+- O conteúdo de raciocínio ainda conta para o uso de tokens quando produzido pelo modelo.
+- O Telegram oferece suporte a streaming do raciocínio na bolha de rascunho.
 
 Detalhes: [Thinking + reasoning directives](/pt-BR/tools/thinking) e [Token use](/pt-BR/reference/token-use).
 
 ## Prefixos, encadeamento e respostas
 
-A formatação de mensagens de saída é centralizada em `messages`:
+A formatação das mensagens de saída é centralizada em `messages`:
 
-- `messages.responsePrefix`, `channels.<channel>.responsePrefix` e `channels.<channel>.accounts.<id>.responsePrefix` (cascata de prefixos de saída), além de `channels.whatsapp.messagePrefix` (prefixo de entrada do WhatsApp)
-- Encadeamento de respostas via `replyToMode` e padrões por canal
+- `messages.responsePrefix`, `channels.<channel>.responsePrefix` e `channels.<channel>.accounts.<id>.responsePrefix` (cascata de prefixo de saída), além de `channels.whatsapp.messagePrefix` (prefixo de entrada do WhatsApp)
+- Encadeamento de respostas por meio de `replyToMode` e padrões por canal
 
 Detalhes: [Configuration](/pt-BR/gateway/configuration-reference#messages) e documentação dos canais.
 
@@ -165,14 +165,18 @@ Detalhes: [Configuration](/pt-BR/gateway/configuration-reference#messages) e doc
 O token silencioso exato `NO_REPLY` / `no_reply` significa “não entregar uma resposta visível ao usuário”.
 O OpenClaw resolve esse comportamento por tipo de conversa:
 
-- Conversas diretas não permitem silêncio por padrão e reescrevem uma resposta silenciosa
-  isolada para uma alternativa curta e visível.
+- Conversas diretas não permitem silêncio por padrão e reescrevem uma resposta silenciosa isolada
+  para um fallback curto e visível.
 - Grupos/canais permitem silêncio por padrão.
 - A orquestração interna permite silêncio por padrão.
 
 Os padrões ficam em `agents.defaults.silentReply` e
 `agents.defaults.silentReplyRewrite`; `surfaces.<id>.silentReply` e
-`surfaces.<id>.silentReplyRewrite` podem sobrescrevê-los por superfície.
+`surfaces.<id>.silentReplyRewrite` podem substituí-los por superfície.
+
+Quando a sessão pai tem uma ou mais execuções pendentes de subagentes geradas, respostas
+silenciosas isoladas são descartadas em todas as superfícies em vez de serem reescritas, para que a
+sessão pai permaneça silenciosa até que o evento de conclusão do filho entregue a resposta real.
 
 ## Relacionado
 
