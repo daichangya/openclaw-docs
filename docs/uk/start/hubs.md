@@ -1,81 +1,81 @@
 ---
 read_when:
-    - Ви хочете отримати повну карту документації
-summary: Хаби, що ведуть до всієї документації OpenClaw
-title: Хаби документації
+    - Ви хочете повну мапу документації
+summary: Центри, що посилаються на всю документацію OpenClaw
+title: Центри документації
 x-i18n:
-    generated_at: "2026-04-05T18:17:52Z"
+    generated_at: "2026-04-23T06:47:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4998710e3dc8018a50abc41285caac83df4b3bf8aec2e4a7525a0563649eb06c
+    source_hash: 4bf24887af25cb345834e7f61e33d1ca3595833a42934ae91a87cc0951b3ae10
     source_path: start/hubs.md
     workflow: 15
 ---
 
-# Хаби документації
+# Центри документації
 
 <Note>
-Якщо ви лише знайомитеся з OpenClaw, почніть із [Getting Started](/start/getting-started).
+Якщо ви новачок в OpenClaw, почніть із [Getting Started](/uk/start/getting-started).
 </Note>
 
-Використовуйте ці хаби, щоб знайти кожну сторінку, включно з детальними розборами та довідковою документацією, які не з’являються в лівій навігації.
+Використовуйте ці центри, щоб знаходити всі сторінки, включно з поглибленими матеріалами й довідковою документацією, які не відображаються в лівій навігації.
 
 ## Почніть тут
 
-- [Індекс](/uk)
-- [Getting Started](/start/getting-started)
-- [Онбординг](/start/onboarding)
-- [Онбординг (CLI)](/start/wizard)
-- [Налаштування](/start/setup)
-- [Панель керування (локальний Gateway)](http://127.0.0.1:18789/)
-- [Довідка](/uk/help)
-- [Каталог документації](/start/docs-directory)
-- [Конфігурація](/uk/gateway/configuration)
-- [Приклади конфігурації](/uk/gateway/configuration-examples)
-- [Помічник OpenClaw](/start/openclaw)
-- [Вітрина](/start/showcase)
-- [Лор](/start/lore)
+- [Index](/uk)
+- [Getting Started](/uk/start/getting-started)
+- [Onboarding](/uk/start/onboarding)
+- [Onboarding (CLI)](/uk/start/wizard)
+- [Setup](/uk/start/setup)
+- [Dashboard (local Gateway)](http://127.0.0.1:18789/)
+- [Help](/uk/help)
+- [Docs directory](/uk/start/docs-directory)
+- [Configuration](/uk/gateway/configuration)
+- [Configuration examples](/uk/gateway/configuration-examples)
+- [OpenClaw assistant](/uk/start/openclaw)
+- [Showcase](/uk/start/showcase)
+- [Lore](/uk/start/lore)
 
 ## Встановлення + оновлення
 
 - [Docker](/uk/install/docker)
 - [Nix](/uk/install/nix)
-- [Оновлення / відкат](/uk/install/updating)
-- [Робочий процес Bun (експериментально)](/uk/install/bun)
+- [Updating / rollback](/uk/install/updating)
+- [Bun workflow (experimental)](/uk/install/bun)
 
 ## Основні концепції
 
-- [Архітектура](/uk/concepts/architecture)
-- [Можливості](/uk/concepts/features)
-- [Мережевий хаб](/uk/network)
-- [Середовище виконання агента](/uk/concepts/agent)
-- [Робочий простір агента](/uk/concepts/agent-workspace)
-- [Пам’ять](/uk/concepts/memory)
-- [Цикл агента](/uk/concepts/agent-loop)
-- [Потокова передача + фрагментація](/uk/concepts/streaming)
-- [Маршрутизація з кількома агентами](/uk/concepts/multi-agent)
-- [Ущільнення](/uk/concepts/compaction)
-- [Сесії](/uk/concepts/session)
-- [Обрізання сесій](/uk/concepts/session-pruning)
-- [Інструменти сесій](/uk/concepts/session-tool)
-- [Черга](/uk/concepts/queue)
-- [Косі команди](/tools/slash-commands)
-- [Адаптери RPC](/uk/reference/rpc)
-- [Схеми TypeBox](/uk/concepts/typebox)
-- [Обробка часових поясів](/uk/concepts/timezone)
-- [Присутність](/uk/concepts/presence)
-- [Виявлення + транспорти](/uk/gateway/discovery)
+- [Architecture](/uk/concepts/architecture)
+- [Features](/uk/concepts/features)
+- [Network hub](/uk/network)
+- [Agent runtime](/uk/concepts/agent)
+- [Agent workspace](/uk/concepts/agent-workspace)
+- [Memory](/uk/concepts/memory)
+- [Agent loop](/uk/concepts/agent-loop)
+- [Streaming + chunking](/uk/concepts/streaming)
+- [Multi-agent routing](/uk/concepts/multi-agent)
+- [Compaction](/uk/concepts/compaction)
+- [Sessions](/uk/concepts/session)
+- [Session pruning](/uk/concepts/session-pruning)
+- [Session tools](/uk/concepts/session-tool)
+- [Queue](/uk/concepts/queue)
+- [Slash commands](/uk/tools/slash-commands)
+- [RPC adapters](/uk/reference/rpc)
+- [TypeBox schemas](/uk/concepts/typebox)
+- [Timezone handling](/uk/concepts/timezone)
+- [Presence](/uk/concepts/presence)
+- [Discovery + transports](/uk/gateway/discovery)
 - [Bonjour](/uk/gateway/bonjour)
-- [Маршрутизація каналів](/uk/channels/channel-routing)
-- [Групи](/uk/channels/groups)
-- [Групові повідомлення](/uk/channels/group-messages)
-- [Перемикання моделей при відмові](/uk/concepts/model-failover)
+- [Channel routing](/uk/channels/channel-routing)
+- [Groups](/uk/channels/groups)
+- [Group messages](/uk/channels/group-messages)
+- [Model failover](/uk/concepts/model-failover)
 - [OAuth](/uk/concepts/oauth)
 
-## Провайдери + вхідні канали
+## Провайдери + вхідні потоки
 
-- [Хаб каналів чату](/uk/channels)
-- [Хаб провайдерів моделей](/uk/providers/models)
+- [Центр чат-каналів](/uk/channels)
+- [Центр провайдерів моделей](/uk/providers/models)
 - [WhatsApp](/uk/channels/whatsapp)
 - [Telegram](/uk/channels/telegram)
 - [Slack](/uk/channels/slack)
@@ -85,59 +85,59 @@ x-i18n:
 - [BlueBubbles (iMessage)](/uk/channels/bluebubbles)
 - [QQ Bot](/uk/channels/qqbot)
 - [iMessage (legacy)](/uk/channels/imessage)
-- [Розбір локації](/uk/channels/location)
-- [WebChat](/web/webchat)
+- [Location parsing](/uk/channels/location)
+- [WebChat](/uk/web/webchat)
 - [Webhooks](/uk/automation/cron-jobs#webhooks)
 - [Gmail Pub/Sub](/uk/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gateway + операції
 
 - [Операційний посібник Gateway](/uk/gateway)
-- [Мережева модель](/uk/gateway/network-model)
-- [Сполучення Gateway](/uk/gateway/pairing)
-- [Блокування Gateway](/uk/gateway/gateway-lock)
-- [Фоновий процес](/uk/gateway/background-process)
-- [Стан здоров’я](/uk/gateway/health)
-- [Сигнал heartbeat](/uk/gateway/heartbeat)
+- [Network model](/uk/gateway/network-model)
+- [Gateway pairing](/uk/gateway/pairing)
+- [Gateway lock](/uk/gateway/gateway-lock)
+- [Background process](/uk/gateway/background-process)
+- [Health](/uk/gateway/health)
+- [Heartbeat](/uk/gateway/heartbeat)
 - [Doctor](/uk/gateway/doctor)
-- [Журналювання](/uk/gateway/logging)
-- [Ізоляція](/uk/gateway/sandboxing)
-- [Панель керування](/web/dashboard)
-- [Control UI](/web/control-ui)
-- [Віддалений доступ](/uk/gateway/remote)
-- [README віддаленого gateway](/uk/gateway/remote-gateway-readme)
+- [Logging](/uk/gateway/logging)
+- [Sandboxing](/uk/gateway/sandboxing)
+- [Dashboard](/uk/web/dashboard)
+- [Control UI](/uk/web/control-ui)
+- [Remote access](/uk/gateway/remote)
+- [Remote gateway README](/uk/gateway/remote-gateway-readme)
 - [Tailscale](/uk/gateway/tailscale)
-- [Безпека](/uk/gateway/security)
-- [Усунення несправностей](/uk/gateway/troubleshooting)
+- [Security](/uk/gateway/security)
+- [Troubleshooting](/uk/gateway/troubleshooting)
 
 ## Інструменти + автоматизація
 
-- [Поверхня інструментів](/tools)
+- [Поверхня інструментів](/uk/tools)
 - [OpenProse](/uk/prose)
-- [Довідник CLI](/cli)
-- [Інструмент Exec](/tools/exec)
-- [Інструмент PDF](/tools/pdf)
-- [Підвищений режим](/tools/elevated)
+- [Довідник CLI](/uk/cli)
+- [Інструмент Exec](/uk/tools/exec)
+- [Інструмент PDF](/uk/tools/pdf)
+- [Підвищений режим](/uk/tools/elevated)
 - [Cron jobs](/uk/automation/cron-jobs)
-- [Автоматизація та завдання](/uk/automation)
-- [Мислення + докладність](/tools/thinking)
-- [Моделі](/uk/concepts/models)
-- [Субагенти](/tools/subagents)
-- [CLI надсилання агенту](/tools/agent-send)
-- [Термінальний UI](/web/tui)
-- [Керування браузером](/tools/browser)
-- [Браузер (усунення несправностей у Linux)](/tools/browser-linux-troubleshooting)
-- [Опитування](/cli/message)
+- [Automation & Tasks](/uk/automation)
+- [Thinking + verbose](/uk/tools/thinking)
+- [Models](/uk/concepts/models)
+- [Sub-agents](/uk/tools/subagents)
+- [CLI надсилання агенту](/uk/tools/agent-send)
+- [Terminal UI](/uk/web/tui)
+- [Керування браузером](/uk/tools/browser)
+- [Browser (Linux troubleshooting)](/uk/tools/browser-linux-troubleshooting)
+- [Опитування](/uk/cli/message)
 
-## Вузли, медіа, голос
+## Nodes, медіа, голос
 
-- [Огляд вузлів](/uk/nodes)
-- [Камера](/uk/nodes/camera)
-- [Зображення](/uk/nodes/images)
-- [Аудіо](/uk/nodes/audio)
-- [Команда локації](/uk/nodes/location-command)
-- [Голосове пробудження](/uk/nodes/voicewake)
-- [Режим розмови](/uk/nodes/talk)
+- [Огляд Nodes](/uk/nodes)
+- [Camera](/uk/nodes/camera)
+- [Images](/uk/nodes/images)
+- [Audio](/uk/nodes/audio)
+- [Команда Location](/uk/nodes/location-command)
+- [Voice wake](/uk/nodes/voicewake)
+- [Talk mode](/uk/nodes/talk)
 
 ## Платформи
 
@@ -147,45 +147,45 @@ x-i18n:
 - [Android](/uk/platforms/android)
 - [Windows (WSL2)](/uk/platforms/windows)
 - [Linux](/uk/platforms/linux)
-- [Вебповерхні](/web)
+- [Вебповерхні](/uk/web)
 
-## Супровідний застосунок macOS (додатково)
+## Супутній застосунок macOS (розширене)
 
-- [Налаштування розробки macOS](/uk/platforms/mac/dev-setup)
+- [macOS dev setup](/uk/platforms/mac/dev-setup)
 - [Рядок меню macOS](/uk/platforms/mac/menu-bar)
-- [Голосове пробудження macOS](/uk/platforms/mac/voicewake)
-- [Голосове накладання macOS](/uk/platforms/mac/voice-overlay)
-- [WebChat для macOS](/uk/platforms/mac/webchat)
-- [Canvas для macOS](/uk/platforms/mac/canvas)
+- [Voice wake на macOS](/uk/platforms/mac/voicewake)
+- [Голосовий оверлей macOS](/uk/platforms/mac/voice-overlay)
+- [WebChat на macOS](/uk/platforms/mac/webchat)
+- [Canvas на macOS](/uk/platforms/mac/canvas)
 - [Дочірній процес macOS](/uk/platforms/mac/child-process)
-- [Стан здоров’я macOS](/uk/platforms/mac/health)
-- [Іконка macOS](/uk/platforms/mac/icon)
+- [Health на macOS](/uk/platforms/mac/health)
+- [Значок macOS](/uk/platforms/mac/icon)
 - [Журналювання macOS](/uk/platforms/mac/logging)
 - [Дозволи macOS](/uk/platforms/mac/permissions)
 - [Віддалений доступ macOS](/uk/platforms/mac/remote)
 - [Підписування macOS](/uk/platforms/mac/signing)
 - [Gateway macOS (launchd)](/uk/platforms/mac/bundled-gateway)
-- [XPC для macOS](/uk/platforms/mac/xpc)
-- [Skills macOS](/uk/platforms/mac/skills)
-- [Peekaboo для macOS](/uk/platforms/mac/peekaboo)
+- [XPC на macOS](/uk/platforms/mac/xpc)
+- [Skills на macOS](/uk/platforms/mac/skills)
+- [Peekaboo на macOS](/uk/platforms/mac/peekaboo)
 
-## Розширення + plugins
+## Plugins
 
-- [Огляд plugins](/tools/plugin)
+- [Огляд Plugins](/uk/tools/plugin)
 - [Створення plugins](/uk/plugins/building-plugins)
-- [Маніфест plugin](/uk/plugins/manifest)
+- [Маніфест Plugin](/uk/plugins/manifest)
 - [Інструменти агента](/uk/plugins/building-plugins#registering-agent-tools)
 - [Пакети plugins](/uk/plugins/bundles)
 - [Спільнотні plugins](/uk/plugins/community)
 - [Кулінарна книга можливостей](/uk/plugins/architecture)
-- [Plugin голосових викликів](/uk/plugins/voice-call)
-- [Plugin користувача Zalo](/uk/plugins/zalouser)
+- [Plugin Voice call](/uk/plugins/voice-call)
+- [Plugin Zalo user](/uk/plugins/zalouser)
 
 ## Робочий простір + шаблони
 
-- [Skills](/tools/skills)
-- [ClawHub](/tools/clawhub)
-- [Конфігурація Skills](/tools/skills-config)
+- [Skills](/uk/tools/skills)
+- [ClawHub](/uk/tools/clawhub)
+- [Конфігурація Skills](/uk/tools/skills-config)
 - [Типові AGENTS](/uk/reference/AGENTS.default)
 - [Шаблони: AGENTS](/uk/reference/templates/AGENTS)
 - [Шаблони: BOOTSTRAP](/uk/reference/templates/BOOTSTRAP)
@@ -197,10 +197,10 @@ x-i18n:
 
 ## Проєкт
 
-- [Подяки](/uk/reference/credits)
+- [Credits](/uk/reference/credits)
 
 ## Тестування + реліз
 
-- [Тестування](/reference/test)
-- [Політика релізів](/uk/reference/RELEASING)
+- [Testing](/uk/reference/test)
+- [Release policy](/uk/reference/RELEASING)
 - [Моделі пристроїв](/uk/reference/device-models)

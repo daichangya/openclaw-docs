@@ -1,15 +1,15 @@
 ---
-summary: Перенаправлення на /tools/message
-title: Polls
+summary: Переспрямувати до /cli/message
+title: Опитування
 x-i18n:
-    generated_at: "2026-04-05T17:56:35Z"
+    generated_at: "2026-04-23T06:42:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8d69432ad8ba5fd80b59f8df779a1105ce0a2ff767d7dd5dc9d8e3ac1cb1ff1f
+    source_hash: 0639c4d35678e5cb0d3a262e2db9cd8db1e25e3eb26adc28bf76b5df14e5446f
     source_path: automation/poll.md
     workflow: 15
 ---
 
-# Polls
+# Опитування
 
-Цю сторінку переміщено до [інструмента Message](/cli/message). Див. [інструмент Message](/cli/message) для документації щодо опитувань.
+Цю сторінку перенесено до [інструмента Message](/uk/cli/message). Документацію щодо опитувань див. в [інструменті Message](/uk/cli/message).
