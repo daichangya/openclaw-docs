@@ -1,25 +1,25 @@
 ---
 read_when:
     - 你想选择一个模型提供商
-    - 你想查看 LLM 认证 + 模型选择的快速设置示例
+    - 你想查看 LLM 身份验证 + 模型选择的快速设置示例
 summary: OpenClaw 支持的模型提供商（LLM）
 title: 模型提供商快速开始
 x-i18n:
-    generated_at: "2026-04-07T09:37:22Z"
+    generated_at: "2026-04-23T05:40:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 59ee4c2f993fe0ae05fe34f52bc6f3e0fc9a76b10760f56b20ad251e25ee9f20
+    source_hash: 9b002903bd0a1872e77d871f283ae426c74356936c5776c710711d7328427fca
     source_path: providers/models.md
     workflow: 15
 ---
 
 # 模型提供商
 
-OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成认证，然后将默认模型设置为 `provider/model`。
+OpenClaw 可以使用许多 LLM 提供商。选择一个，完成身份验证，然后将默认模型设置为 `provider/model`。
 
 ## 快速开始（两步）
 
-1. 使用提供商完成认证（通常通过 `openclaw onboard`）。
+1. 使用提供商完成身份验证（通常通过 `openclaw onboard`）。
 2. 设置默认模型：
 
 ```json5
@@ -30,9 +30,9 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成认证
 
 ## 支持的提供商（入门集合）
 
-- [Alibaba Model Studio](/zh-CN/providers/alibaba)
-- [Anthropic（API + Claude CLI）](/zh-CN/providers/anthropic)
+- [阿里云百炼](/zh-CN/providers/alibaba)
 - [Amazon Bedrock](/zh-CN/providers/bedrock)
+- [Anthropic（API + Claude CLI）](/zh-CN/providers/anthropic)
 - [BytePlus（国际版）](/zh-CN/concepts/model-providers#byteplus-international)
 - [Chutes](/zh-CN/providers/chutes)
 - [ComfyUI](/zh-CN/providers/comfy)
@@ -56,10 +56,10 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成认证
 - [xAI](/zh-CN/providers/xai)
 - [Z.AI](/zh-CN/providers/zai)
 
-## 其他内置变体
+## 其他内置提供商变体
 
-- `anthropic-vertex` - 当 Vertex 凭证可用时，隐式支持 Google Vertex 上的 Anthropic；没有单独的新手引导认证选项
+- `anthropic-vertex` - 当 Vertex 凭证可用时，隐式支持 Google Vertex 上的 Anthropic；无需单独选择新手引导身份验证选项
 - `copilot-proxy` - 本地 VS Code Copilot Proxy 桥接；使用 `openclaw onboard --auth-choice copilot-proxy`
 - `google-gemini-cli` - 非官方的 Gemini CLI OAuth 流程；需要本地安装 `gemini`（`brew install gemini-cli` 或 `npm install -g @google/gemini-cli`）；默认模型为 `google-gemini-cli/gemini-3-flash-preview`；使用 `openclaw onboard --auth-choice google-gemini-cli` 或 `openclaw models auth login --provider google-gemini-cli --set-default`
 
-如需查看完整的提供商目录（xAI、Groq、Mistral 等）以及高级配置，请参阅 [模型提供商](/zh-CN/concepts/model-providers)。
+有关完整的提供商目录（xAI、Groq、Mistral 等）和高级配置，参见 [模型提供商](/zh-CN/concepts/model-providers)。

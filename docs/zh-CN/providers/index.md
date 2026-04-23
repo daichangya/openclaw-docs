@@ -5,10 +5,10 @@ read_when:
 summary: OpenClaw 支持的模型提供商（LLM）
 title: 提供商目录
 x-i18n:
-    generated_at: "2026-04-23T02:13:10Z"
+    generated_at: "2026-04-23T05:40:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bcef929e6757f18aad19b810426c49bdb273a9c65781bb3a21cc50d6d17014b5
+    source_hash: 5a62f8af86fa23f248163d1a23929c628f5bcc757366d0fdb12157f995f8024d
     source_path: providers/index.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 
 OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份验证，然后将默认模型设置为 `provider/model`。
 
-在找聊天渠道文档（WhatsApp/Telegram/Discord/Slack/Mattermost（插件）/ 等）？请参见 [渠道](/zh-CN/channels)。
+在找聊天渠道文档（WhatsApp/Telegram/Discord/Slack/Mattermost（plugin）/等）吗？请参阅 [Channels](/zh-CN/channels)。
 
 ## 快速开始
 
@@ -32,8 +32,9 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 
 ## 提供商文档
 
-- [阿里巴巴 Model Studio](/zh-CN/providers/alibaba)
+- [Alibaba Model Studio](/zh-CN/providers/alibaba)
 - [Amazon Bedrock](/zh-CN/providers/bedrock)
+- [Amazon Bedrock Mantle](/zh-CN/providers/bedrock-mantle)
 - [Anthropic（API + Claude CLI）](/zh-CN/providers/anthropic)
 - [Arcee AI（Trinity 模型）](/zh-CN/providers/arcee)
 - [BytePlus（国际版）](/zh-CN/concepts/model-providers#byteplus-international)
@@ -41,13 +42,14 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 - [Cloudflare AI Gateway](/zh-CN/providers/cloudflare-ai-gateway)
 - [ComfyUI](/zh-CN/providers/comfy)
 - [DeepSeek](/zh-CN/providers/deepseek)
+- [ElevenLabs](/zh-CN/providers/elevenlabs)
 - [fal](/zh-CN/providers/fal)
 - [Fireworks](/zh-CN/providers/fireworks)
 - [GitHub Copilot](/zh-CN/providers/github-copilot)
 - [GLM 模型](/zh-CN/providers/glm)
 - [Google（Gemini）](/zh-CN/providers/google)
 - [Groq（LPU 推理）](/zh-CN/providers/groq)
-- [Hugging Face（推理）](/zh-CN/providers/huggingface)
+- [Hugging Face（Inference）](/zh-CN/providers/huggingface)
 - [inferrs（本地模型）](/zh-CN/providers/inferrs)
 - [Kilocode](/zh-CN/providers/kilocode)
 - [LiteLLM（统一 Gateway 网关）](/zh-CN/providers/litellm)
@@ -69,7 +71,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 - [StepFun](/zh-CN/providers/stepfun)
 - [Synthetic](/zh-CN/providers/synthetic)
 - [Together AI](/zh-CN/providers/together)
-- [Venice（Venice AI，以隐私为中心）](/zh-CN/providers/venice)
+- [Venice（Venice AI，注重隐私）](/zh-CN/providers/venice)
 - [Vercel AI Gateway](/zh-CN/providers/vercel-ai-gateway)
 - [vLLM（本地模型）](/zh-CN/providers/vllm)
 - [Volcengine（Doubao）](/zh-CN/providers/volcengine)
@@ -95,7 +97,6 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个提供商，完成身份
 
 ## 社区工具
 
-- [Claude Max API Proxy](/zh-CN/providers/claude-max-api-proxy) - 用于 Claude 订阅凭证的社区代理（使用前请核实 Anthropic 的政策/条款）
+- [Claude Max API Proxy](/zh-CN/providers/claude-max-api-proxy) - 用于 Claude 订阅凭证的社区代理（使用前请确认 Anthropic 的政策/条款）
 
-如需查看完整的提供商目录（xAI、Groq、Mistral 等）和高级配置，
-请参见 [模型提供商](/zh-CN/concepts/model-providers)。
+如需查看完整的提供商目录（xAI、Groq、Mistral 等）和高级配置，请参阅 [模型提供商](/zh-CN/concepts/model-providers)。
