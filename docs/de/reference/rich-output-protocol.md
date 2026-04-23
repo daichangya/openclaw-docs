@@ -1,29 +1,34 @@
 ---
+read_when:
+    - Ändern des Renderings von Assistant-Ausgaben in der Control UI
+    - Debuggen von Direktiven für `[embed ...]`, `MEDIA:`, Antwort oder Audiodarstellung
+summary: Rich-Output-Shortcode-Protokoll für Embeds, Medien, Audio-Hinweise und Antworten
+title: Rich-Output-Protokoll
 x-i18n:
-    generated_at: "2026-04-11T15:15:49Z"
+    generated_at: "2026-04-23T14:07:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2a8884fc2c304bf96d4675f0c1d1ff781d6dc1ae8c49d92ce08040c9c7709035
+    source_hash: 566338ac0571c6ab9062c6bad0bc4f71fe65249a3fcd9d8e575affcd93db11e7
     source_path: reference/rich-output-protocol.md
     workflow: 15
 ---
 
 # Rich-Output-Protokoll
 
-Die Assistentenausgabe kann eine kleine Menge an Übermittlungs-/Render-Anweisungen enthalten:
+Assistant-Ausgaben können einen kleinen Satz von Zustellungs-/Rendering-Direktiven enthalten:
 
 - `MEDIA:` für die Zustellung von Anhängen
-- `[[audio_as_voice]]` für Hinweise zur Audio-Wiedergabe
-- `[[reply_to_current]]` / `[[reply_to:<id>]]` für Antwort-Metadaten
-- `[embed ...]` für umfangreiches Rendering in der Control UI
+- `[[audio_as_voice]]` für Hinweise zur Audiodarstellung
+- `[[reply_to_current]]` / `[[reply_to:<id>]]` für Antwortmetadaten
+- `[embed ...]` für Rich Rendering in der Control UI
 
-Diese Anweisungen sind getrennt. `MEDIA:` sowie Antwort-/Sprach-Tags bleiben Übermittlungsmetadaten; `[embed ...]` ist der reine Rich-Render-Pfad für das Web.
+Diese Direktiven sind voneinander getrennt. `MEDIA:` und Antwort-/Voice-Tags bleiben Zustellungsmetadaten; `[embed ...]` ist der nur fürs Web gedachte Pfad für Rich Rendering.
 
 ## `[embed ...]`
 
-`[embed ...]` ist die einzige agentenseitige Syntax für umfangreiches Rendering in der Control UI.
+`[embed ...]` ist die einzige agentseitige Syntax für Rich Rendering in der Control UI.
 
-Selbstschließendes Beispiel:
+Beispiel zum Selbstschließen:
 
 ```text
 [embed ref="cv_123" title="Status" /]
@@ -32,15 +37,15 @@ Selbstschließendes Beispiel:
 Regeln:
 
 - `[view ...]` ist für neue Ausgaben nicht mehr gültig.
-- Embed-Shortcodes werden nur in der Nachrichtenoberfläche des Assistenten gerendert.
-- Nur URL-basierte Embeds werden gerendert. Verwende `ref="..."` oder `url="..."`.
-- Inline-HTML-Embed-Shortcodes in Blockform werden nicht gerendert.
+- Embed-Shortcodes werden nur in der Nachrichtenoberfläche des Assistant gerendert.
+- Es werden nur URL-gestützte Embeds gerendert. Verwenden Sie `ref="..."` oder `url="..."`.
+- Blockförmige Inline-HTML-Embed-Shortcodes werden nicht gerendert.
 - Die Web-UI entfernt den Shortcode aus dem sichtbaren Text und rendert das Embed inline.
-- `MEDIA:` ist kein Alias für Embeds und sollte nicht für umfangreiches Embed-Rendering verwendet werden.
+- `MEDIA:` ist kein Embed-Alias und sollte nicht für Rich-Embed-Rendering verwendet werden.
 
-## Gespeicherte Rendering-Struktur
+## Gespeicherte Rendering-Form
 
-Der normalisierte/gespeicherte Inhaltsblock des Assistenten ist ein strukturiertes `canvas`-Element:
+Der normalisierte/gespeicherte Inhaltsblock des Assistant ist ein strukturiertes `canvas`-Element:
 
 ```json
 {
@@ -57,4 +62,4 @@ Der normalisierte/gespeicherte Inhaltsblock des Assistenten ist ein strukturiert
 }
 ```
 
-Gespeicherte/gerenderte Rich-Blöcke verwenden direkt diese `canvas`-Struktur. `present_view` wird nicht erkannt.
+Gespeicherte/gerenderte Rich-Blöcke verwenden diese `canvas`-Form direkt. `present_view` wird nicht erkannt.

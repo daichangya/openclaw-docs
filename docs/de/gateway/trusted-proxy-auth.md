@@ -2,65 +2,63 @@
 read_when:
     - OpenClaw hinter einem identitätsbewussten Proxy ausführen
     - Pomerium, Caddy oder nginx mit OAuth vor OpenClaw einrichten
-    - WebSocket-`1008 unauthorized`-Fehler bei Reverse-Proxy-Setups beheben
+    - WebSocket-1008-unauthorized-Fehler bei Reverse-Proxy-Setups beheben
     - Entscheiden, wo HSTS und andere HTTP-Härtungs-Header gesetzt werden sollen
-summary: Gateway-Authentifizierung an einen vertrauenswürdigen Reverse Proxy delegieren (Pomerium, Caddy, nginx + OAuth)
+summary: Gateway-Authentifizierung an einen vertrauenswürdigen Reverse-Proxy delegieren (Pomerium, Caddy, nginx + OAuth)
 title: Trusted Proxy Auth
 x-i18n:
-    generated_at: "2026-04-05T12:44:55Z"
+    generated_at: "2026-04-23T14:02:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ccd39736b43e8744de31566d5597b3fbf40ecb6ba9c8ba9d2343e1ab9bb8cd45
+    source_hash: 649529e9a350d7df3a9ecbbae8871d61e1dff2069dfabf2f86a77a0d96c52778
     source_path: gateway/trusted-proxy-auth.md
     workflow: 15
 ---
 
 # Trusted Proxy Auth
 
-> ⚠️ **Sicherheitskritische Funktion.** In diesem Modus wird die Authentifizierung vollständig an Ihren Reverse Proxy delegiert. Eine Fehlkonfiguration kann Ihr Gateway unbefugtem Zugriff aussetzen. Lesen Sie diese Seite sorgfältig, bevor Sie sie aktivieren.
+> ⚠️ **Sicherheitsrelevante Funktion.** Dieser Modus delegiert die Authentifizierung vollständig an Ihren Reverse-Proxy. Eine Fehlkonfiguration kann Ihr Gateway für unbefugten Zugriff öffnen. Lesen Sie diese Seite sorgfältig, bevor Sie sie aktivieren.
 
 ## Wann verwenden
 
 Verwenden Sie den Auth-Modus `trusted-proxy`, wenn:
 
 - Sie OpenClaw hinter einem **identitätsbewussten Proxy** ausführen (Pomerium, Caddy + OAuth, nginx + oauth2-proxy, Traefik + forward auth)
-- Ihr Proxy die gesamte Authentifizierung übernimmt und die Benutzeridentität über Header weitergibt
+- Ihr Proxy die gesamte Authentifizierung übernimmt und die Benutzeridentität per Header weitergibt
 - Sie sich in einer Kubernetes- oder Container-Umgebung befinden, in der der Proxy der einzige Pfad zum Gateway ist
-- Sie auf WebSocket-Fehler vom Typ `1008 unauthorized` stoßen, weil Browser keine Tokens in WS-Payloads übergeben können
+- Sie auf WebSocket-`1008 unauthorized`-Fehler stoßen, weil Browser keine Tokens in WS-Payloads übergeben können
 
 ## Wann NICHT verwenden
 
 - Wenn Ihr Proxy Benutzer nicht authentifiziert (nur TLS-Terminator oder Load Balancer)
 - Wenn es irgendeinen Pfad zum Gateway gibt, der den Proxy umgeht (Firewall-Lücken, interner Netzwerkzugriff)
 - Wenn Sie nicht sicher sind, ob Ihr Proxy weitergeleitete Header korrekt entfernt/überschreibt
-- Wenn Sie nur persönlichen Einzelbenutzerzugriff benötigen (für ein einfacheres Setup sollten Sie Tailscale Serve + loopback in Betracht ziehen)
+- Wenn Sie nur persönlichen Einzelbenutzerzugriff benötigen (erwägen Sie Tailscale Serve + loopback für eine einfachere Einrichtung)
 
 ## So funktioniert es
 
-1. Ihr Reverse Proxy authentifiziert Benutzer (OAuth, OIDC, SAML usw.)
+1. Ihr Reverse-Proxy authentifiziert Benutzer (OAuth, OIDC, SAML usw.)
 2. Der Proxy fügt einen Header mit der authentifizierten Benutzeridentität hinzu (z. B. `x-forwarded-user: nick@example.com`)
-3. OpenClaw prüft, ob die Anfrage von einer **vertrauenswürdigen Proxy-IP** stammt (konfiguriert in `gateway.trustedProxies`)
+3. OpenClaw prüft, dass die Anfrage von einer **vertrauenswürdigen Proxy-IP** stammt (konfiguriert in `gateway.trustedProxies`)
 4. OpenClaw extrahiert die Benutzeridentität aus dem konfigurierten Header
 5. Wenn alles passt, wird die Anfrage autorisiert
 
 ## Pairing-Verhalten der Control UI
 
-Wenn `gateway.auth.mode = "trusted-proxy"` aktiv ist und die Anfrage die
-Trusted-Proxy-Prüfungen besteht, können WebSocket-Sitzungen der Control UI ohne
-Device-Pairing-Identität verbinden.
+Wenn `gateway.auth.mode = "trusted-proxy"` aktiv ist und die Anfrage die Prüfungen für vertrauenswürdige Proxys besteht, können WebSocket-Sitzungen der Control UI ohne Geräte-Pairing-Identität eine Verbindung herstellen.
 
 Auswirkungen:
 
 - Pairing ist in diesem Modus nicht mehr die primäre Schranke für den Zugriff auf die Control UI.
 - Ihre Reverse-Proxy-Auth-Richtlinie und `allowUsers` werden zur effektiven Zugriffskontrolle.
-- Halten Sie den Gateway-Ingress strikt auf vertrauenswürdige Proxy-IPs beschränkt (`gateway.trustedProxies` + Firewall).
+- Halten Sie den Gateway-Ingress nur für vertrauenswürdige Proxy-IPs offen (`gateway.trustedProxies` + Firewall).
 
 ## Konfiguration
 
 ```json5
 {
   gateway: {
-    // Trusted-Proxy-Auth erwartet Anfragen von einer vertrauenswürdigen Nicht-Loopback-Proxy-Quelle
+    // Trusted-Proxy-Auth erwartet Anfragen von einer nicht-loopback vertrauenswürdigen Proxy-Quelle
     bind: "lan",
 
     // KRITISCH: Fügen Sie hier nur die IP(s) Ihres Proxys hinzu
@@ -72,10 +70,10 @@ Auswirkungen:
         // Header mit der authentifizierten Benutzeridentität (erforderlich)
         userHeader: "x-forwarded-user",
 
-        // Optional: Header, die vorhanden sein MÜSSEN (Proxy-Verifizierung)
+        // Optional: Header, die IMMER vorhanden sein MÜSSEN (Proxy-Verifikation)
         requiredHeaders: ["x-forwarded-proto", "x-forwarded-host"],
 
-        // Optional: auf bestimmte Benutzer beschränken (leer = alle zulassen)
+        // Optional: auf bestimmte Benutzer beschränken (leer = alle erlauben)
         allowUsers: ["nick@example.com", "admin@company.org"],
       },
     },
@@ -86,9 +84,10 @@ Auswirkungen:
 Wichtige Laufzeitregel:
 
 - Trusted-Proxy-Auth lehnt Anfragen von loopback-Quellen (`127.0.0.1`, `::1`, loopback-CIDRs) ab.
-- Reverse Proxys auf demselben Host über loopback erfüllen Trusted-Proxy-Auth **nicht**.
-- Für Proxy-Setups über loopback auf demselben Host verwenden Sie stattdessen Token-/Passwort-Auth oder routen Sie über eine vertrauenswürdige Nicht-Loopback-Proxy-Adresse, die OpenClaw verifizieren kann.
-- Nicht-Loopback-Bereitstellungen der Control UI benötigen weiterhin explizite `gateway.controlUi.allowedOrigins`.
+- Reverse-Proxys auf demselben Host über loopback erfüllen Trusted-Proxy-Auth **nicht**.
+- Für Proxy-Setups auf demselben Host über loopback verwenden Sie stattdessen Token-/Passwort-Auth oder routen Sie über eine nicht-loopback vertrauenswürdige Proxy-Adresse, die OpenClaw verifizieren kann.
+- Nicht-loopback-Control-UI-Bereitstellungen benötigen weiterhin explizite `gateway.controlUi.allowedOrigins`.
+- **Evidence aus Forwarded-Headers übersteuert loopback-Lokalität.** Wenn eine Anfrage über loopback ankommt, aber Header `X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` trägt, die auf einen nicht lokalen Ursprung zeigen, disqualifiziert diese Evidence die Behauptung lokaler loopback-Herkunft. Die Anfrage wird für Pairing, Trusted-Proxy-Auth und das Gate für Geräteidentität der Control UI als remote behandelt. Dadurch wird verhindert, dass ein loopback-Proxy auf demselben Host die Identität aus Forwarded-Headers in Trusted-Proxy-Auth einschleust.
 
 ### Konfigurationsreferenz
 
@@ -96,9 +95,9 @@ Wichtige Laufzeitregel:
 | ------------------------------------------- | ------------ | -------------------------------------------------------------------------- |
 | `gateway.trustedProxies`                    | Ja           | Array vertrauenswürdiger Proxy-IP-Adressen. Anfragen von anderen IPs werden abgelehnt. |
 | `gateway.auth.mode`                         | Ja           | Muss `"trusted-proxy"` sein                                                |
-| `gateway.auth.trustedProxy.userHeader`      | Ja           | Header-Name, der die authentifizierte Benutzeridentität enthält            |
-| `gateway.auth.trustedProxy.requiredHeaders` | Nein         | Zusätzliche Header, die vorhanden sein müssen, damit die Anfrage als vertrauenswürdig gilt |
-| `gateway.auth.trustedProxy.allowUsers`      | Nein         | Allowlist von Benutzeridentitäten. Leer bedeutet, alle authentifizierten Benutzer zuzulassen. |
+| `gateway.auth.trustedProxy.userHeader`      | Ja           | Header-Name mit der authentifizierten Benutzeridentität                    |
+| `gateway.auth.trustedProxy.requiredHeaders` | Nein         | Zusätzliche Header, die vorhanden sein müssen, damit die Anfrage vertrauenswürdig ist |
+| `gateway.auth.trustedProxy.allowUsers`      | Nein         | Allowlist von Benutzeridentitäten. Leer bedeutet, dass alle authentifizierten Benutzer erlaubt sind. |
 
 ## TLS-Terminierung und HSTS
 
@@ -106,11 +105,10 @@ Verwenden Sie einen TLS-Terminierungspunkt und setzen Sie dort HSTS.
 
 ### Empfohlenes Muster: TLS-Terminierung am Proxy
 
-Wenn Ihr Reverse Proxy HTTPS für `https://control.example.com` verarbeitet, setzen Sie
-`Strict-Transport-Security` am Proxy für diese Domain.
+Wenn Ihr Reverse-Proxy HTTPS für `https://control.example.com` verarbeitet, setzen Sie `Strict-Transport-Security` am Proxy für diese Domain.
 
-- Geeignet für internetseitig erreichbare Bereitstellungen.
-- Hält Zertifikate und HTTP-Härtungsrichtlinien an einem Ort zusammen.
+- Gut geeignet für internetseitig erreichbare Bereitstellungen.
+- Hält Zertifikate + HTTP-Härtungsrichtlinie an einem Ort zusammen.
 - OpenClaw kann hinter dem Proxy auf loopback-HTTP bleiben.
 
 Beispielwert für den Header:
@@ -121,7 +119,7 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 ### TLS-Terminierung am Gateway
 
-Wenn OpenClaw HTTPS selbst direkt bereitstellt (kein TLS-terminierender Proxy), setzen Sie:
+Wenn OpenClaw selbst HTTPS direkt bereitstellt (kein TLS-terminierender Proxy), setzen Sie:
 
 ```json5
 {
@@ -136,15 +134,15 @@ Wenn OpenClaw HTTPS selbst direkt bereitstellt (kein TLS-terminierender Proxy), 
 }
 ```
 
-`strictTransportSecurity` akzeptiert einen Header-Wert als Zeichenfolge oder `false`, um ihn explizit zu deaktivieren.
+`strictTransportSecurity` akzeptiert einen String als Header-Wert oder `false`, um ihn explizit zu deaktivieren.
 
 ### Hinweise zum Rollout
 
-- Beginnen Sie zunächst mit einer kurzen Max-Age-Zeit (zum Beispiel `max-age=300`), während Sie den Datenverkehr validieren.
-- Erhöhen Sie auf langlebige Werte (zum Beispiel `max-age=31536000`) erst, wenn Sie hohe Sicherheit haben.
-- Fügen Sie `includeSubDomains` nur hinzu, wenn jede Subdomain für HTTPS bereit ist.
-- Verwenden Sie Preload nur, wenn Sie die Preload-Anforderungen für Ihre gesamte Domainmenge bewusst erfüllen.
-- Rein lokale Entwicklung mit loopback profitiert nicht von HSTS.
+- Beginnen Sie zunächst mit einer kurzen Max-Age (zum Beispiel `max-age=300`), während Sie den Traffic validieren.
+- Erhöhen Sie erst auf langlebige Werte (zum Beispiel `max-age=31536000`), wenn das Vertrauen hoch ist.
+- Fügen Sie `includeSubDomains` nur hinzu, wenn jede Subdomain HTTPS-fähig ist.
+- Verwenden Sie Preload nur, wenn Sie die Preload-Anforderungen bewusst für Ihren gesamten Domain-Satz erfüllen.
+- Lokale Entwicklung nur über loopback profitiert nicht von HSTS.
 
 ## Beispiele für Proxy-Setups
 
@@ -156,7 +154,7 @@ Pomerium übergibt Identität in `x-pomerium-claim-email` (oder anderen Claim-He
 {
   gateway: {
     bind: "lan",
-    trustedProxies: ["10.0.0.1"], // IP von Pomerium
+    trustedProxies: ["10.0.0.1"], // Pomeriums IP
     auth: {
       mode: "trusted-proxy",
       trustedProxy: {
@@ -168,7 +166,7 @@ Pomerium übergibt Identität in `x-pomerium-claim-email` (oder anderen Claim-He
 }
 ```
 
-Ausschnitt aus der Pomerium-Konfiguration:
+Pomerium-Konfigurationsausschnitt:
 
 ```yaml
 routes:
@@ -190,7 +188,7 @@ Caddy mit dem Plugin `caddy-security` kann Benutzer authentifizieren und Identit
 {
   gateway: {
     bind: "lan",
-    trustedProxies: ["10.0.0.1"], // IP von Caddy/Sidecar-Proxy
+    trustedProxies: ["10.0.0.1"], // IP des Caddy-/Sidecar-Proxys
     auth: {
       mode: "trusted-proxy",
       trustedProxy: {
@@ -201,7 +199,7 @@ Caddy mit dem Plugin `caddy-security` kann Benutzer authentifizieren und Identit
 }
 ```
 
-Ausschnitt aus der Caddyfile:
+Caddyfile-Ausschnitt:
 
 ```
 openclaw.example.com {
@@ -216,7 +214,7 @@ openclaw.example.com {
 
 ### nginx + oauth2-proxy
 
-oauth2-proxy authentifiziert Benutzer und übergibt Identität in `x-auth-request-email`.
+oauth2-proxy authentifiziert Benutzer und übergibt die Identität in `x-auth-request-email`.
 
 ```json5
 {
@@ -233,7 +231,7 @@ oauth2-proxy authentifiziert Benutzer und übergibt Identität in `x-auth-reques
 }
 ```
 
-Ausschnitt aus der nginx-Konfiguration:
+nginx-Konfigurationsausschnitt:
 
 ```nginx
 location / {
@@ -267,19 +265,18 @@ location / {
 
 ## Gemischte Token-Konfiguration
 
-OpenClaw lehnt mehrdeutige Konfigurationen ab, bei denen gleichzeitig `gateway.auth.token` (oder `OPENCLAW_GATEWAY_TOKEN`) und der Modus `trusted-proxy` aktiv sind. Gemischte Token-Konfigurationen können dazu führen, dass loopback-Anfragen stillschweigend über den falschen Auth-Pfad authentifiziert werden.
+OpenClaw lehnt mehrdeutige Konfigurationen ab, bei denen gleichzeitig sowohl ein `gateway.auth.token` (oder `OPENCLAW_GATEWAY_TOKEN`) als auch der Modus `trusted-proxy` aktiv sind. Gemischte Token-Konfigurationen können dazu führen, dass loopback-Anfragen stillschweigend über den falschen Auth-Pfad authentifiziert werden.
 
-Wenn beim Start der Fehler `mixed_trusted_proxy_token` angezeigt wird:
+Wenn beim Start ein Fehler `mixed_trusted_proxy_token` erscheint:
 
-- Entfernen Sie das gemeinsame Token, wenn Sie den Modus `trusted-proxy` verwenden, oder
-- wechseln Sie `gateway.auth.mode` zu `"token"`, wenn Sie tokenbasierte Authentifizierung beabsichtigen.
+- Entfernen Sie das gemeinsame Token, wenn Sie den Modus trusted-proxy verwenden, oder
+- wechseln Sie `gateway.auth.mode` zu `"token"`, wenn Sie Token-basierte Auth verwenden möchten.
 
-Trusted-Proxy-Auth über loopback schlägt ebenfalls sicher fehl: Aufrufer auf demselben Host müssen die konfigurierte Identität über einen vertrauenswürdigen Proxy-Header bereitstellen, statt stillschweigend authentifiziert zu werden.
+Trusted-Proxy-Auth über loopback schlägt ebenfalls fail-closed fehl: Aufrufer auf demselben Host müssen die konfigurierten Identitäts-Header über einen vertrauenswürdigen Proxy bereitstellen, statt stillschweigend authentifiziert zu werden.
 
 ## Header für Operator-Scopes
 
-Trusted-Proxy-Auth ist ein **identitätstragender** HTTP-Modus, daher können Aufrufer
-optional Operator-Scopes mit `x-openclaw-scopes` deklarieren.
+Trusted-Proxy-Auth ist ein **identity-bearing** HTTP-Modus, daher können Aufrufer optional Operator-Scopes mit `x-openclaw-scopes` deklarieren.
 
 Beispiele:
 
@@ -289,85 +286,83 @@ Beispiele:
 
 Verhalten:
 
-- Wenn der Header vorhanden ist, berücksichtigt OpenClaw die deklarierte Scope-Menge.
+- Wenn der Header vorhanden ist, berücksichtigt OpenClaw den deklarierten Scope-Satz.
 - Wenn der Header vorhanden, aber leer ist, deklariert die Anfrage **keine** Operator-Scopes.
-- Wenn der Header fehlt, greifen normale identitätstragende HTTP-APIs auf die Standardmenge der Operator-Default-Scopes zurück.
-- Gateway-auth-**Plugin-HTTP-Routen** sind standardmäßig enger: Wenn `x-openclaw-scopes` fehlt, fällt ihr Laufzeit-Scope auf `operator.write` zurück.
-- HTTP-Anfragen aus dem Browser müssen auch nach erfolgreicher Trusted-Proxy-Auth weiterhin `gateway.controlUi.allowedOrigins` bestehen (oder den bewusst aktivierten Host-Header-Fallback-Modus).
+- Wenn der Header fehlt, fallen normale identity-bearing HTTP-APIs auf den Standard-Scope-Satz für Operatoren zurück.
+- Gateway-Auth-**Plugin-HTTP-Routen** sind standardmäßig enger: Wenn `x-openclaw-scopes` fehlt, fällt ihr Laufzeit-Scope auf `operator.write` zurück.
+- HTTP-Anfragen aus dem Browser-Ursprung müssen weiterhin `gateway.controlUi.allowedOrigins` (oder den bewusst aktivierten Fallback-Modus für den Host-Header) bestehen, auch wenn Trusted-Proxy-Auth erfolgreich war.
 
 Praktische Regel:
 
-- Senden Sie `x-openclaw-scopes` explizit, wenn eine Trusted-Proxy-Anfrage
-  enger sein soll als die Standardwerte oder wenn eine Gateway-auth-Plugin-Route
-  etwas Stärkeres als den Write-Scope benötigt.
+- Senden Sie `x-openclaw-scopes` explizit, wenn Sie möchten, dass eine Trusted-Proxy-Anfrage enger ist als die Standards, oder wenn eine Gateway-Auth-Plugin-Route etwas Stärkeres als Write-Scope benötigt.
 
 ## Sicherheits-Checkliste
 
-Bevor Sie Trusted-Proxy-Auth aktivieren, prüfen Sie Folgendes:
+Bevor Sie Trusted-Proxy-Auth aktivieren, prüfen Sie:
 
-- [ ] **Der Proxy ist der einzige Pfad**: Der Gateway-Port ist gegenüber allem außer Ihrem Proxy durch eine Firewall geschützt
-- [ ] **trustedProxies ist minimal**: Nur die tatsächlichen IPs Ihres Proxys, nicht ganze Subnetze
-- [ ] **Keine Proxy-Quelle über loopback**: Trusted-Proxy-Auth schlägt bei Anfragen von loopback-Quellen sicher fehl
+- [ ] **Proxy ist der einzige Pfad**: Der Gateway-Port ist von allem außer Ihrem Proxy per Firewall abgeschirmt
+- [ ] **trustedProxies ist minimal**: Nur die tatsächlichen Proxy-IPs, nicht ganze Subnetze
+- [ ] **Keine loopback-Proxy-Quelle**: Trusted-Proxy-Auth schlägt für Anfragen aus loopback-Quellen fail-closed fehl
 - [ ] **Proxy entfernt Header**: Ihr Proxy überschreibt (statt anzuhängen) `x-forwarded-*`-Header von Clients
-- [ ] **TLS-Terminierung**: Ihr Proxy verarbeitet TLS; Benutzer verbinden sich über HTTPS
-- [ ] **allowedOrigins ist explizit**: Nicht-Loopback-Control-UI verwendet explizite `gateway.controlUi.allowedOrigins`
-- [ ] **allowUsers ist gesetzt** (empfohlen): Auf bekannte Benutzer beschränken, statt jeden authentifizierten Benutzer zuzulassen
+- [ ] **TLS-Terminierung**: Ihr Proxy übernimmt TLS; Benutzer verbinden sich über HTTPS
+- [ ] **allowedOrigins ist explizit**: Nicht-loopback-Control-UI verwendet explizite `gateway.controlUi.allowedOrigins`
+- [ ] **allowUsers ist gesetzt** (empfohlen): Auf bekannte Benutzer beschränken, statt jedem authentifizierten Benutzer Zugriff zu erlauben
 - [ ] **Keine gemischte Token-Konfiguration**: Setzen Sie nicht gleichzeitig `gateway.auth.token` und `gateway.auth.mode: "trusted-proxy"`
 
-## Security Audit
+## Sicherheitsaudit
 
-`openclaw security audit` markiert Trusted-Proxy-Auth mit einem Befund der Schwere **critical**. Das ist beabsichtigt — es erinnert daran, dass Sie die Sicherheit an Ihr Proxy-Setup delegieren.
+`openclaw security audit` markiert Trusted-Proxy-Auth mit einem Befund der Schwere **kritisch**. Das ist beabsichtigt — es erinnert daran, dass Sie Sicherheit an Ihr Proxy-Setup delegieren.
 
 Das Audit prüft auf:
 
-- Basiswarnung/-erinnerung `gateway.trusted_proxy_auth` mit warning/critical
+- Basiswarnung/-kritischen Hinweis `gateway.trusted_proxy_auth`
 - Fehlende Konfiguration von `trustedProxies`
 - Fehlende Konfiguration von `userHeader`
-- Leeres `allowUsers` (erlaubt jeden authentifizierten Benutzer)
-- Wildcard- oder fehlende Browser-Origin-Richtlinie auf exponierten Oberflächen der Control UI
+- Leeres `allowUsers` (erlaubt jedem authentifizierten Benutzer Zugriff)
+- Platzhalter- oder fehlende Richtlinie für Browser-Ursprünge auf exponierten Control-UI-Oberflächen
 
 ## Fehlerbehebung
 
 ### `trusted_proxy_untrusted_source`
 
-Die Anfrage stammt nicht von einer IP in `gateway.trustedProxies`. Prüfen Sie:
+Die Anfrage kam nicht von einer IP in `gateway.trustedProxies`. Prüfen Sie:
 
 - Ist die Proxy-IP korrekt? (Docker-Container-IPs können sich ändern)
-- Befindet sich ein Load Balancer vor Ihrem Proxy?
+- Gibt es einen Load Balancer vor Ihrem Proxy?
 - Verwenden Sie `docker inspect` oder `kubectl get pods -o wide`, um die tatsächlichen IPs zu finden
 
 ### `trusted_proxy_loopback_source`
 
-OpenClaw hat eine Trusted-Proxy-Anfrage von einer loopback-Quelle abgelehnt.
+OpenClaw hat eine Trusted-Proxy-Anfrage aus einer loopback-Quelle abgelehnt.
 
 Prüfen Sie:
 
 - Verbindet sich der Proxy von `127.0.0.1` / `::1`?
-- Versuchen Sie, Trusted-Proxy-Auth mit einem Reverse Proxy über loopback auf demselben Host zu verwenden?
+- Versuchen Sie, Trusted-Proxy-Auth mit einem loopback-Reverse-Proxy auf demselben Host zu verwenden?
 
 Behebung:
 
-- Verwenden Sie Token-/Passwort-Auth für Proxy-Setups über loopback auf demselben Host, oder
-- routen Sie über eine vertrauenswürdige Nicht-Loopback-Proxy-Adresse und behalten Sie diese IP in `gateway.trustedProxies`.
+- Verwenden Sie Token-/Passwort-Auth für Proxy-Setups auf demselben Host über loopback, oder
+- routen Sie über eine nicht-loopback vertrauenswürdige Proxy-Adresse und behalten Sie diese IP in `gateway.trustedProxies`.
 
 ### `trusted_proxy_user_missing`
 
 Der Benutzer-Header war leer oder fehlte. Prüfen Sie:
 
 - Ist Ihr Proxy so konfiguriert, dass er Identitäts-Header weitergibt?
-- Ist der Header-Name korrekt? (Groß-/Kleinschreibung spielt keine Rolle, die Schreibweise aber schon)
+- Ist der Header-Name korrekt? (Groß-/Kleinschreibung ist nicht relevant, aber die Schreibweise schon)
 - Ist der Benutzer am Proxy tatsächlich authentifiziert?
 
-### `trusted*proxy_missing_header*\*`
+### `trusted_proxy_missing_header_*`
 
 Ein erforderlicher Header war nicht vorhanden. Prüfen Sie:
 
 - Ihre Proxy-Konfiguration für diese spezifischen Header
-- Ob Header irgendwo in der Kette entfernt werden
+- ob Header irgendwo in der Kette entfernt werden
 
 ### `trusted_proxy_user_not_allowed`
 
-Der Benutzer ist authentifiziert, aber nicht in `allowUsers`. Fügen Sie ihn hinzu oder entfernen Sie die Allowlist.
+Der Benutzer ist authentifiziert, aber nicht in `allowUsers`. Fügen Sie ihn entweder hinzu oder entfernen Sie die Allowlist.
 
 ### `trusted_proxy_origin_not_allowed`
 
@@ -375,9 +370,9 @@ Trusted-Proxy-Auth war erfolgreich, aber der Browser-Header `Origin` hat die Ori
 
 Prüfen Sie:
 
-- `gateway.controlUi.allowedOrigins` enthält den exakten Browser-Origin
-- Sie verlassen sich nicht auf Wildcard-Origins, außer wenn Sie absichtlich ein Allow-all-Verhalten möchten
-- Wenn Sie bewusst den Host-Header-Fallback-Modus verwenden, ist `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` ausdrücklich gesetzt
+- `gateway.controlUi.allowedOrigins` enthält exakt den Browser-Origin
+- Sie verlassen sich nicht auf Platzhalter-Origins, es sei denn, Sie möchten bewusst ein Allow-all-Verhalten
+- Wenn Sie bewusst den Fallback-Modus für Host-Header verwenden, ist `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` absichtlich gesetzt
 
 ### WebSocket schlägt weiterhin fehl
 
@@ -389,10 +384,10 @@ Stellen Sie sicher, dass Ihr Proxy:
 
 ## Migration von Token-Auth
 
-Wenn Sie von Token-Auth zu Trusted-Proxy wechseln:
+Wenn Sie von Token-Auth auf Trusted-Proxy umsteigen:
 
 1. Konfigurieren Sie Ihren Proxy so, dass er Benutzer authentifiziert und Header weitergibt
-2. Testen Sie das Proxy-Setup unabhängig (curl mit Headern)
+2. Testen Sie das Proxy-Setup unabhängig davon (`curl` mit Headern)
 3. Aktualisieren Sie die OpenClaw-Konfiguration mit Trusted-Proxy-Auth
 4. Starten Sie das Gateway neu
 5. Testen Sie WebSocket-Verbindungen aus der Control UI
@@ -400,7 +395,7 @@ Wenn Sie von Token-Auth zu Trusted-Proxy wechseln:
 
 ## Verwandt
 
-- [Security](/gateway/security) — vollständiger Sicherheitsleitfaden
-- [Configuration](/gateway/configuration) — Konfigurationsreferenz
-- [Remote Access](/gateway/remote) — andere Muster für Remote-Zugriff
-- [Tailscale](/gateway/tailscale) — einfachere Alternative für Tailnet-only-Zugriff
+- [Sicherheit](/de/gateway/security) — vollständiger Sicherheitsleitfaden
+- [Konfiguration](/de/gateway/configuration) — Konfigurationsreferenz
+- [Remote Access](/de/gateway/remote) — weitere Muster für Fernzugriff
+- [Tailscale](/de/gateway/tailscale) — einfachere Alternative für Zugriff nur über Tailscale

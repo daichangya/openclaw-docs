@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Sie möchten Volcano Engine oder Doubao-Modelle mit OpenClaw verwenden
-    - Sie benötigen die Einrichtung des Volcengine-API-Schlüssels
-summary: Einrichtung von Volcano Engine (Doubao-Modelle, allgemeine und Coding-Endpunkte)
+    - Sie möchten Volcano-Engine- oder Doubao-Modelle mit OpenClaw verwenden.
+    - Sie benötigen die Einrichtung des Volcengine-API-Schlüssels.
+summary: Einrichtung von Volcano Engine (Doubao-Modelle, allgemeine + Coding-Endpunkte)
 title: Volcengine (Doubao)
 x-i18n:
-    generated_at: "2026-04-12T23:33:34Z"
+    generated_at: "2026-04-23T14:06:35Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a21f390da719f79c88c6d55a7d952d35c2ce5ff26d910c9f10020132cd7d2f4c
+    source_hash: 4d803e965699bedf06cc7ea4e902ffc92e4a168be012224e845820069fd67acc
     source_path: providers/volcengine.md
     workflow: 15
 ---
@@ -19,26 +19,26 @@ Der Volcengine-Provider bietet Zugriff auf Doubao-Modelle und Drittanbieter-Mode
 die auf Volcano Engine gehostet werden, mit separaten Endpunkten für allgemeine und Coding-
 Workloads.
 
-| Detail      | Wert                                                |
-| ----------- | --------------------------------------------------- |
-| Provider    | `volcengine` (allgemein) + `volcengine-plan` (Coding) |
-| Auth        | `VOLCANO_ENGINE_API_KEY`                            |
-| API         | OpenAI-kompatibel                                   |
+| Detail    | Wert                                                |
+| --------- | --------------------------------------------------- |
+| Provider  | `volcengine` (allgemein) + `volcengine-plan` (Coding) |
+| Auth      | `VOLCANO_ENGINE_API_KEY`                            |
+| API       | OpenAI-kompatibel                                   |
 
 ## Erste Schritte
 
 <Steps>
   <Step title="API-Schlüssel festlegen">
-    Führen Sie das interaktive Onboarding aus:
+    Führen Sie interaktives Onboarding aus:
 
     ```bash
     openclaw onboard --auth-choice volcengine-api-key
     ```
 
-    Dadurch werden sowohl die allgemeinen (`volcengine`) als auch die Coding-Provider (`volcengine-plan`) mit einem einzigen API-Schlüssel registriert.
+    Dadurch werden sowohl die allgemeinen Provider (`volcengine`) als auch die Coding-Provider (`volcengine-plan`) aus einem einzigen API-Schlüssel registriert.
 
   </Step>
-  <Step title="Ein Standardmodell festlegen">
+  <Step title="Standardmodell festlegen">
     ```json5
     {
       agents: {
@@ -71,20 +71,20 @@ openclaw onboard --non-interactive \
 
 ## Provider und Endpunkte
 
-| Provider          | Endpunkt                                  | Anwendungsfall   |
-| ----------------- | ----------------------------------------- | ---------------- |
+| Provider          | Endpunkt                                  | Anwendungsfall     |
+| ----------------- | ----------------------------------------- | ------------------ |
 | `volcengine`      | `ark.cn-beijing.volces.com/api/v3`        | Allgemeine Modelle |
-| `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | Coding-Modelle   |
+| `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | Coding-Modelle     |
 
 <Note>
-Beide Provider werden mit einem einzigen API-Schlüssel konfiguriert. Das Setup registriert beide automatisch.
+Beide Provider werden aus einem einzigen API-Schlüssel konfiguriert. Das Setup registriert beide automatisch.
 </Note>
 
 ## Verfügbare Modelle
 
 <Tabs>
-  <Tab title="Allgemein (`volcengine`)">
-    | Modell-Ref                                   | Name                            | Eingabe     | Kontext |
+  <Tab title="Allgemein (volcengine)">
+    | Modellreferenz                               | Name                            | Eingabe     | Kontext |
     | -------------------------------------------- | ------------------------------- | ----------- | ------- |
     | `volcengine/doubao-seed-1-8-251228`          | Doubao Seed 1.8                 | Text, Bild  | 256,000 |
     | `volcengine/doubao-seed-code-preview-251028` | doubao-seed-code-preview-251028 | Text, Bild  | 256,000 |
@@ -92,8 +92,8 @@ Beide Provider werden mit einem einzigen API-Schlüssel konfiguriert. Das Setup 
     | `volcengine/glm-4-7-251222`                  | GLM 4.7                         | Text, Bild  | 200,000 |
     | `volcengine/deepseek-v3-2-251201`            | DeepSeek V3.2                   | Text, Bild  | 128,000 |
   </Tab>
-  <Tab title="Coding (`volcengine-plan`)">
-    | Modell-Ref                                        | Name                     | Eingabe | Kontext |
+  <Tab title="Coding (volcengine-plan)">
+    | Modellreferenz                                    | Name                     | Eingabe | Kontext |
     | ------------------------------------------------- | ------------------------ | ------- | ------- |
     | `volcengine-plan/ark-code-latest`                 | Ark Coding Plan          | Text    | 256,000 |
     | `volcengine-plan/doubao-seed-code`                | Doubao Seed Code         | Text    | 256,000 |
@@ -113,30 +113,30 @@ Beide Provider werden mit einem einzigen API-Schlüssel konfiguriert. Das Setup 
     den allgemeinen Katalog `volcengine`.
   </Accordion>
 
-  <Accordion title="Fallback-Verhalten der Modellauswahl">
-    Während der Onboarding-/Konfigurationsauswahl des Modells bevorzugt die Volcengine-Auth-Auswahl
-    sowohl Zeilen `volcengine/*` als auch `volcengine-plan/*`. Wenn diese Modelle noch
-    nicht geladen sind, fällt OpenClaw auf den ungefilterten Katalog zurück, statt eine
-    leere providerbezogene Auswahl anzuzeigen.
+  <Accordion title="Fallback-Verhalten des Modellauswahlfelds">
+    Während der Modellauswahl in Onboarding/Konfiguration bevorzugt die Volcengine-Auth-Auswahl
+    sowohl `volcengine/*`- als auch `volcengine-plan/*`-Zeilen. Wenn diese Modelle noch
+    nicht geladen sind, fällt OpenClaw auf den ungefilterten Katalog zurück, statt
+    einen leeren providerbezogenen Picker anzuzeigen.
   </Accordion>
 
   <Accordion title="Umgebungsvariablen für Daemon-Prozesse">
-    Wenn das Gateway als Daemon läuft (`launchd`/`systemd`), stellen Sie sicher, dass
-    `VOLCANO_ENGINE_API_KEY` für diesen Prozess verfügbar ist (zum Beispiel in
+    Wenn das Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher, dass
+    `VOLCANO_ENGINE_API_KEY` diesem Prozess verfügbar ist (zum Beispiel in
     `~/.openclaw/.env` oder über `env.shellEnv`).
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Wenn OpenClaw als Hintergrunddienst läuft, werden in Ihrer
-interaktiven Shell gesetzte Umgebungsvariablen nicht automatisch übernommen. Siehe den obigen Hinweis zu Daemons.
+Wenn OpenClaw als Hintergrunddienst läuft, werden Umgebungsvariablen aus Ihrer
+interaktiven Shell nicht automatisch übernommen. Siehe den Daemon-Hinweis oben.
 </Warning>
 
-## Verwandte Themen
+## Verwandt
 
 <CardGroup cols={2}>
   <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
-    Provider, Modell-Refs und Failover-Verhalten auswählen.
+    Auswahl von Providern, Modellreferenzen und Failover-Verhalten.
   </Card>
   <Card title="Konfiguration" href="/de/gateway/configuration" icon="gear">
     Vollständige Konfigurationsreferenz für Agenten, Modelle und Provider.
@@ -145,6 +145,6 @@ interaktiven Shell gesetzte Umgebungsvariablen nicht automatisch übernommen. Si
     Häufige Probleme und Debugging-Schritte.
   </Card>
   <Card title="FAQ" href="/de/help/faq" icon="circle-question">
-    Häufig gestellte Fragen zum OpenClaw-Setup.
+    Häufig gestellte Fragen zur OpenClaw-Einrichtung.
   </Card>
 </CardGroup>

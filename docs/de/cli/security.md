@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Sie eine schnelle Sicherheitsprüfung für Konfiguration/Status ausführen möchten
-    - Sie sichere „Fix“-Vorschläge anwenden möchten (Berechtigungen, Standards verschärfen)
-summary: CLI-Referenz für `openclaw security` (häufige Sicherheitsfallen prüfen und beheben)
+    - Sie möchten eine schnelle Sicherheitsprüfung für Konfiguration/Status ausführen
+    - Sie möchten sichere „Fix“-Vorschläge anwenden (Berechtigungen, strengere Standardwerte)
+summary: CLI-Referenz für `openclaw security` (häufige Sicherheits-Footguns prüfen und beheben)
 title: security
 x-i18n:
-    generated_at: "2026-04-05T12:39:13Z"
+    generated_at: "2026-04-23T14:01:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e5a3e4ab8e0dfb6c10763097cb4483be2431985f16de877523eb53e2122239ae
+    source_hash: 92b80468403b7d329391c40add9ae9c0e2423f5c6ff162291fa13ab91ace985d
     source_path: cli/security.md
     workflow: 15
 ---
 
 # `openclaw security`
 
-Sicherheitswerkzeuge (Prüfung + optionale Korrekturen).
+Sicherheitstools (Prüfung + optionale Korrekturen).
 
 Verwandt:
 
-- Sicherheitsleitfaden: [Sicherheit](/gateway/security)
+- Sicherheitsleitfaden: [Sicherheit](/de/gateway/security)
 
 ## Prüfung
 
@@ -32,28 +32,28 @@ openclaw security audit --fix
 openclaw security audit --json
 ```
 
-Die Prüfung warnt, wenn mehrere DM-Absender sich die Hauptsitzung teilen, und empfiehlt den **sicheren DM-Modus**: `session.dmScope="per-channel-peer"` (oder `per-account-channel-peer` für Kanäle mit mehreren Konten) für gemeinsam genutzte Posteingänge.
-Dies dient der Härtung kooperativer/gemeinsam genutzter Posteingänge. Ein einzelnes Gateway, das von gegenseitig nicht vertrauenden/gegnerischen Betreibern gemeinsam genutzt wird, ist kein empfohlenes Setup; trennen Sie Vertrauensgrenzen mit separaten Gateways (oder separaten OS-Benutzern/Hosts).
-Außerdem gibt es `security.trust_model.multi_user_heuristic` aus, wenn die Konfiguration auf wahrscheinlich von mehreren Benutzern genutzten Eingang hindeutet (zum Beispiel offene DM-/Gruppenrichtlinien, konfigurierte Gruppenziele oder Wildcard-Absenderregeln), und erinnert daran, dass OpenClaw standardmäßig ein Vertrauensmodell für persönliche Assistenten verwendet.
-Für absichtlich von mehreren Benutzern genutzte Setups lautet die Empfehlung der Prüfung, alle Sitzungen in einer Sandbox auszuführen, den Dateisystemzugriff auf den Workspace zu begrenzen und persönliche/private Identitäten oder Anmeldedaten aus dieser Laufzeitumgebung herauszuhalten.
-Außerdem wird gewarnt, wenn kleine Modelle (`<=300B`) ohne Sandbox und mit aktivierten Web-/Browser-Tools verwendet werden.
-Für Webhook-Eingang wird gewarnt, wenn `hooks.token` das Gateway-Token wiederverwendet, wenn `hooks.token` kurz ist, wenn `hooks.path="/"`, wenn `hooks.defaultSessionKey` nicht gesetzt ist, wenn `hooks.allowedAgentIds` nicht eingeschränkt ist, wenn Überschreibungen von Request-`sessionKey` aktiviert sind und wenn Überschreibungen ohne `hooks.allowedSessionKeyPrefixes` aktiviert sind.
-Außerdem wird gewarnt, wenn Sandbox-Docker-Einstellungen konfiguriert sind, während der Sandbox-Modus deaktiviert ist, wenn `gateway.nodes.denyCommands` unwirksame musterähnliche/unbekannte Einträge verwendet (nur exakter Abgleich des Knotebefehlsnamens, keine Filterung von Shell-Text), wenn `gateway.nodes.allowCommands` gefährliche Knotebefehle explizit aktiviert, wenn das globale `tools.profile="minimal"` durch Agent-Tool-Profile überschrieben wird, wenn offene Gruppen Laufzeit-/Dateisystem-Tools ohne Sandbox-/Workspace-Schutz bereitstellen und wenn installierte Erweiterungs-Plugin-Tools unter einer permissiven Tool-Richtlinie erreichbar sein könnten.
-Außerdem wird `gateway.allowRealIpFallback=true` markiert (Risiko von Header-Spoofing bei falsch konfigurierten Proxys) und `discovery.mdns.mode="full"` (Leck von Metadaten über mDNS-TXT-Records).
-Außerdem wird gewarnt, wenn die Browser-Sandbox das Docker-Netzwerk `bridge` ohne `sandbox.browser.cdpSourceRange` verwendet.
-Außerdem werden gefährliche Docker-Netzwerkmodi der Sandbox markiert (einschließlich `host` und `container:*`-Namespace-Verknüpfungen).
-Außerdem wird gewarnt, wenn vorhandene Docker-Container der Browser-Sandbox fehlende/veraltete Hash-Labels haben (zum Beispiel Container vor einer Migration ohne `openclaw.browserConfigEpoch`) und `openclaw sandbox recreate --browser --all` empfohlen.
-Außerdem wird gewarnt, wenn npm-basierte Installationsdatensätze für Plugins/Hooks nicht angepinnt sind, Integritätsmetadaten fehlen oder von den aktuell installierten Paketversionen abweichen.
-Es wird gewarnt, wenn Kanal-Allowlists auf veränderlichen Namen/E-Mails/Tags statt auf stabilen IDs basieren (Discord, Slack, Google Chat, Microsoft Teams, Mattermost, IRC-Bereiche, wo zutreffend).
-Es wird gewarnt, wenn `gateway.auth.mode="none"` Gateway-HTTP-APIs ohne gemeinsames Geheimnis erreichbar lässt (`/tools/invoke` plus jeder aktivierte `/v1/*`-Endpunkt).
-Einstellungen mit dem Präfix `dangerous`/`dangerously` sind explizite Break-Glass-Operator-Überschreibungen; das Aktivieren einer solchen Einstellung ist für sich genommen kein Sicherheitslückenbericht.
-Eine vollständige Übersicht gefährlicher Parameter finden Sie im Abschnitt „Insecure or dangerous flags summary“ unter [Sicherheit](/gateway/security).
+Die Prüfung warnt, wenn mehrere DM-Absender dieselbe Hauptsitzung teilen, und empfiehlt den **sicheren DM-Modus**: `session.dmScope="per-channel-peer"` (oder `per-account-channel-peer` für Kanäle mit mehreren Konten) für gemeinsame Posteingänge.
+Dies dient der Härtung kooperativer/geteilter Posteingänge. Ein einzelnes Gateway, das von wechselseitig nicht vertrauenswürdigen/gegnerischen Operatoren gemeinsam genutzt wird, ist kein empfohlenes Setup; trennen Sie Vertrauensgrenzen mit separaten Gateways (oder separaten OS-Benutzern/Hosts).
+Es gibt außerdem `security.trust_model.multi_user_heuristic` aus, wenn die Konfiguration auf wahrscheinlich gemeinsam genutzten Benutzereingang hindeutet (zum Beispiel offene DM-/Gruppenrichtlinie, konfigurierte Gruppenziele oder Wildcard-Absenderregeln), und erinnert daran, dass OpenClaw standardmäßig ein Vertrauensmodell für persönliche Assistenten hat.
+Für absichtlich gemeinsam genutzte Benutzersetups lautet die Empfehlung der Prüfung, alle Sitzungen zu sandboxen, den Dateisystemzugriff auf den Workspace zu begrenzen und persönliche/private Identitäten oder Anmeldedaten von dieser Laufzeit fernzuhalten.
+Sie warnt außerdem, wenn kleine models (`<=300B`) ohne Sandbox und mit aktivierten Web-/Browser-Tools verwendet werden.
+Für Webhook-Eingang warnt sie, wenn `hooks.token` das Gateway-Token wiederverwendet, wenn `hooks.token` kurz ist, wenn `hooks.path="/"`, wenn `hooks.defaultSessionKey` nicht gesetzt ist, wenn `hooks.allowedAgentIds` nicht eingeschränkt ist, wenn Request-`sessionKey`-Überschreibungen aktiviert sind und wenn Überschreibungen ohne `hooks.allowedSessionKeyPrefixes` aktiviert sind.
+Sie warnt außerdem, wenn Sandbox-Docker-Einstellungen konfiguriert sind, während der Sandbox-Modus deaktiviert ist, wenn `gateway.nodes.denyCommands` unwirksame musterartige/unbekannte Einträge verwendet (nur exakter Abgleich von Node-Befehlsnamen, keine Filterung von Shell-Text), wenn `gateway.nodes.allowCommands` gefährliche Node-Befehle explizit aktiviert, wenn global `tools.profile="minimal"` durch Tool-Profile von Agents überschrieben wird, wenn offene Gruppen Laufzeit-/Dateisystem-Tools ohne Sandbox-/Workspace-Schutz verfügbar machen und wenn installierte Plugin-Tools unter einer freizügigen Tool-Richtlinie erreichbar sein könnten.
+Sie markiert außerdem `gateway.allowRealIpFallback=true` (Risiko von Header-Spoofing bei falsch konfigurierten Proxys) und `discovery.mdns.mode="full"` (Metadatenleck über mDNS-TXT-Records).
+Sie warnt außerdem, wenn der Sandbox-Browser das Docker-Netzwerk `bridge` ohne `sandbox.browser.cdpSourceRange` verwendet.
+Sie markiert außerdem gefährliche Docker-Netzwerkmodi für die Sandbox (einschließlich `host` und `container:*`-Namespace-Joins).
+Sie warnt außerdem, wenn vorhandene Docker-Container des Sandbox-Browsers fehlende/veraltete Hash-Labels haben (zum Beispiel Container vor einer Migration ohne `openclaw.browserConfigEpoch`), und empfiehlt `openclaw sandbox recreate --browser --all`.
+Sie warnt außerdem, wenn npm-basierte Installationsdatensätze für Plugin-/Hook-Installationen nicht angepinnt sind, Integritätsmetadaten fehlen oder von aktuell installierten Paketversionen abweichen.
+Sie warnt, wenn Kanal-Allowlists auf veränderlichen Namen/E-Mails/Tags statt auf stabilen IDs beruhen (Discord, Slack, Google Chat, Microsoft Teams, Mattermost, IRC-Scopes, wo anwendbar).
+Sie warnt, wenn `gateway.auth.mode="none"` Gateway-HTTP-APIs ohne gemeinsames Secret erreichbar lässt (`/tools/invoke` plus jeder aktivierte `/v1/*`-Endpunkt).
+Einstellungen mit dem Präfix `dangerous`/`dangerously` sind explizite Break-Glass-Überschreibungen für Operatoren; das Aktivieren einer solchen Einstellung ist für sich genommen kein Bericht über eine Sicherheitslücke.
+Für das vollständige Inventar gefährlicher Parameter siehe den Abschnitt „Insecure or dangerous flags summary“ in [Sicherheit](/de/gateway/security).
 
-SecretRef-Verhalten:
+Verhalten von SecretRef:
 
-- `security audit` löst unterstützte SecretRefs auf den gezielten Pfaden im schreibgeschützten Modus auf.
-- Wenn ein SecretRef im aktuellen Befehlspfad nicht verfügbar ist, wird die Prüfung fortgesetzt und `secretDiagnostics` gemeldet (anstatt abzustürzen).
-- `--token` und `--password` überschreiben nur die Deep-Probe-Authentifizierung für diesen Befehlsaufruf; sie schreiben weder die Konfiguration noch SecretRef-Zuordnungen um.
+- `security audit` löst unterstützte SecretRefs für die betroffenen Pfade im schreibgeschützten Modus auf.
+- Wenn ein SecretRef im aktuellen Befehlspfad nicht verfügbar ist, läuft die Prüfung weiter und meldet `secretDiagnostics` (anstatt abzustürzen).
+- `--token` und `--password` überschreiben nur die Authentifizierung für den Deep-Probe in diesem Befehlsaufruf; sie schreiben weder die Konfiguration noch SecretRef-Zuordnungen um.
 
 ## JSON-Ausgabe
 
@@ -64,7 +64,7 @@ openclaw security audit --json | jq '.summary'
 openclaw security audit --deep --json | jq '.findings[] | select(.severity=="critical") | .checkId'
 ```
 
-Wenn `--fix` und `--json` kombiniert werden, enthält die Ausgabe sowohl Korrekturmaßnahmen als auch den abschließenden Bericht:
+Wenn `--fix` und `--json` kombiniert werden, enthält die Ausgabe sowohl die Korrekturaktionen als auch den abschließenden Bericht:
 
 ```bash
 openclaw security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summary}'
@@ -76,18 +76,18 @@ openclaw security audit --fix --json | jq '{fix: .fix.ok, summary: .report.summa
 
 - setzt häufiges `groupPolicy="open"` auf `groupPolicy="allowlist"` zurück (einschließlich Kontovarianten in unterstützten Kanälen)
 - wenn die WhatsApp-Gruppenrichtlinie auf `allowlist` umgestellt wird, wird `groupAllowFrom` aus
-  der gespeicherten `allowFrom`-Datei übernommen, wenn diese Liste vorhanden ist und die Konfiguration nicht bereits
+  der gespeicherten `allowFrom`-Datei übernommen, sofern diese Liste existiert und die Konfiguration nicht bereits
   `allowFrom` definiert
 - setzt `logging.redactSensitive` von `"off"` auf `"tools"`
-- verschärft Berechtigungen für Status-/Konfigurationsdateien und gängige sensible Dateien
+- verschärft Berechtigungen für Status-/Konfigurationsdaten und häufige sensible Dateien
   (`credentials/*.json`, `auth-profiles.json`, `sessions.json`, Sitzung-
   `*.jsonl`)
 - verschärft außerdem eingebundene Konfigurationsdateien, auf die aus `openclaw.json` verwiesen wird
 - verwendet `chmod` auf POSIX-Hosts und `icacls`-Resets unter Windows
 
-`--fix` tut **nicht**:
+`--fix` macht **nicht** Folgendes:
 
-- Tokens/Passwörter/API-Schlüssel rotieren
-- Tools deaktivieren (`gateway`, `cron`, `exec` usw.)
-- Bind/Auth/Netzwerk-Expositionsentscheidungen des Gateways ändern
+- Tokens/Passwörter/API-Keys rotieren
+- Tools deaktivieren (`gateway`, `Cron`, `exec` usw.)
+- Bind-/Authentifizierungs-/Netzwerk-Expositionsentscheidungen des Gateways ändern
 - Plugins/Skills entfernen oder umschreiben
