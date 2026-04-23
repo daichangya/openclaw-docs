@@ -1035,6 +1035,7 @@
                   "channels/irc",
                   "channels/line",
                   "channels/matrix",
+                  "channels/matrix-push-rules",
                   "channels/mattermost",
                   "channels/msteams",
                   "channels/nextcloud-talk",
@@ -2424,6 +2425,7 @@
                   "ja-JP/channels/irc",
                   "ja-JP/channels/line",
                   "ja-JP/channels/matrix",
+                  "ja-JP/channels/matrix-push-rules",
                   "ja-JP/channels/mattermost",
                   "ja-JP/channels/msteams",
                   "ja-JP/channels/nextcloud-talk",
@@ -3198,6 +3200,7 @@
                   "es/channels/irc",
                   "es/channels/line",
                   "es/channels/matrix",
+                  "es/channels/matrix-push-rules",
                   "es/channels/mattermost",
                   "es/channels/msteams",
                   "es/channels/nextcloud-talk",
@@ -3972,6 +3975,7 @@
                   "pt-BR/channels/irc",
                   "pt-BR/channels/line",
                   "pt-BR/channels/matrix",
+                  "pt-BR/channels/matrix-push-rules",
                   "pt-BR/channels/mattermost",
                   "pt-BR/channels/msteams",
                   "pt-BR/channels/nextcloud-talk",
@@ -4746,6 +4750,7 @@
                   "ko/channels/irc",
                   "ko/channels/line",
                   "ko/channels/matrix",
+                  "ko/channels/matrix-push-rules",
                   "ko/channels/mattermost",
                   "ko/channels/msteams",
                   "ko/channels/nextcloud-talk",
@@ -5520,6 +5525,7 @@
                   "de/channels/irc",
                   "de/channels/line",
                   "de/channels/matrix",
+                  "de/channels/matrix-push-rules",
                   "de/channels/mattermost",
                   "de/channels/msteams",
                   "de/channels/nextcloud-talk",
@@ -6294,6 +6300,7 @@
                   "fr/channels/irc",
                   "fr/channels/line",
                   "fr/channels/matrix",
+                  "fr/channels/matrix-push-rules",
                   "fr/channels/mattermost",
                   "fr/channels/msteams",
                   "fr/channels/nextcloud-talk",
@@ -7068,6 +7075,7 @@
                   "ar/channels/irc",
                   "ar/channels/line",
                   "ar/channels/matrix",
+                  "ar/channels/matrix-push-rules",
                   "ar/channels/mattermost",
                   "ar/channels/msteams",
                   "ar/channels/nextcloud-talk",
@@ -7842,6 +7850,7 @@
                   "it/channels/irc",
                   "it/channels/line",
                   "it/channels/matrix",
+                  "it/channels/matrix-push-rules",
                   "it/channels/mattermost",
                   "it/channels/msteams",
                   "it/channels/nextcloud-talk",
@@ -8616,6 +8625,7 @@
                   "tr/channels/irc",
                   "tr/channels/line",
                   "tr/channels/matrix",
+                  "tr/channels/matrix-push-rules",
                   "tr/channels/mattermost",
                   "tr/channels/msteams",
                   "tr/channels/nextcloud-talk",
@@ -9390,6 +9400,7 @@
                   "uk/channels/irc",
                   "uk/channels/line",
                   "uk/channels/matrix",
+                  "uk/channels/matrix-push-rules",
                   "uk/channels/mattermost",
                   "uk/channels/msteams",
                   "uk/channels/nextcloud-talk",
@@ -10164,6 +10175,7 @@
                   "id/channels/irc",
                   "id/channels/line",
                   "id/channels/matrix",
+                  "id/channels/matrix-push-rules",
                   "id/channels/mattermost",
                   "id/channels/msteams",
                   "id/channels/nextcloud-talk",
@@ -10938,6 +10950,7 @@
                   "pl/channels/irc",
                   "pl/channels/line",
                   "pl/channels/matrix",
+                  "pl/channels/matrix-push-rules",
                   "pl/channels/mattermost",
                   "pl/channels/msteams",
                   "pl/channels/nextcloud-talk",
@@ -11598,780 +11611,6 @@
                 "pages": [
                   "pl/start/hubs",
                   "pl/start/docs-directory"
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "language": "th",
-        "tabs": [
-          {
-            "tab": "Get started",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "th/index",
-                  "th/start/showcase",
-                  "th/concepts/features"
-                ]
-              },
-              {
-                "group": "First steps",
-                "pages": [
-                  "th/start/getting-started",
-                  "th/start/onboarding-overview",
-                  "th/start/wizard",
-                  "th/start/onboarding"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "th/start/openclaw",
-                  "th/start/wizard-cli-reference",
-                  "th/start/wizard-cli-automation"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Install",
-            "groups": [
-              {
-                "group": "Install overview",
-                "pages": [
-                  "th/install/index",
-                  "th/install/installer",
-                  "th/install/node"
-                ]
-              },
-              {
-                "group": "Containers",
-                "pages": [
-                  "th/install/ansible",
-                  "th/install/bun",
-                  "th/install/clawdock",
-                  "th/install/docker",
-                  "th/install/nix",
-                  "th/install/podman"
-                ]
-              },
-              {
-                "group": "Hosting",
-                "pages": [
-                  "th/install/azure",
-                  "th/install/digitalocean",
-                  "th/install/docker-vm-runtime",
-                  "th/install/exe-dev",
-                  "th/install/fly",
-                  "th/install/gcp",
-                  "th/install/hetzner",
-                  "th/install/hostinger",
-                  "th/install/kubernetes",
-                  "th/vps",
-                  "th/install/macos-vm",
-                  "th/install/northflank",
-                  "th/install/oracle",
-                  "th/install/railway",
-                  "th/install/raspberry-pi",
-                  "th/install/render"
-                ]
-              },
-              {
-                "group": "Maintenance",
-                "pages": [
-                  "th/install/updating",
-                  "th/install/migrating",
-                  "th/install/migrating-matrix",
-                  "th/install/uninstall",
-                  "th/install/development-channels"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Channels",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "th/channels/index"
-                ]
-              },
-              {
-                "group": "Messaging platforms",
-                "pages": [
-                  "th/channels/bluebubbles",
-                  "th/channels/discord",
-                  "th/channels/feishu",
-                  "th/channels/googlechat",
-                  "th/channels/imessage",
-                  "th/channels/irc",
-                  "th/channels/line",
-                  "th/channels/matrix",
-                  "th/channels/mattermost",
-                  "th/channels/msteams",
-                  "th/channels/nextcloud-talk",
-                  "th/channels/nostr",
-                  "th/channels/qqbot",
-                  "th/channels/signal",
-                  "th/channels/slack",
-                  "th/channels/synology-chat",
-                  "th/channels/telegram",
-                  "th/channels/tlon",
-                  "th/channels/twitch",
-                  "th/channels/wechat",
-                  "th/channels/whatsapp",
-                  "th/channels/zalo",
-                  "th/channels/zalouser"
-                ]
-              },
-              {
-                "group": "Configuration",
-                "pages": [
-                  "th/channels/pairing",
-                  "th/channels/group-messages",
-                  "th/channels/groups",
-                  "th/channels/broadcast-groups",
-                  "th/channels/channel-routing",
-                  "th/channels/location",
-                  "th/channels/troubleshooting"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Agents",
-            "groups": [
-              {
-                "group": "Fundamentals",
-                "pages": [
-                  "th/concepts/architecture",
-                  "th/concepts/agent",
-                  "th/concepts/agent-loop",
-                  "th/concepts/system-prompt",
-                  "th/concepts/context",
-                  "th/concepts/context-engine",
-                  "th/concepts/agent-workspace",
-                  "th/concepts/soul",
-                  "th/concepts/oauth",
-                  "th/start/bootstrapping",
-                  "th/concepts/experimental-features"
-                ]
-              },
-              {
-                "group": "Sessions and memory",
-                "pages": [
-                  "th/concepts/session",
-                  "th/concepts/session-pruning",
-                  "th/concepts/session-tool",
-                  {
-                    "group": "Memory",
-                    "pages": [
-                      "th/concepts/memory",
-                      "th/concepts/memory-builtin",
-                      "th/concepts/memory-qmd",
-                      "th/concepts/memory-honcho",
-                      "th/concepts/memory-search",
-                      "th/concepts/active-memory",
-                      "th/concepts/dreaming"
-                    ]
-                  },
-                  "th/concepts/compaction"
-                ]
-              },
-              {
-                "group": "Multi-agent",
-                "pages": [
-                  "th/concepts/multi-agent",
-                  "th/concepts/presence",
-                  "th/concepts/delegate-architecture"
-                ]
-              },
-              {
-                "group": "Messages and delivery",
-                "pages": [
-                  "th/concepts/messages",
-                  "th/concepts/streaming",
-                  "th/concepts/retry",
-                  "th/concepts/queue"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Tools & Plugins",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "th/tools/index"
-                ]
-              },
-              {
-                "group": "Plugins",
-                "pages": [
-                  "th/tools/plugin",
-                  "th/plugins/community",
-                  "th/plugins/bundles",
-                  "th/plugins/codex-harness",
-                  "th/plugins/webhooks",
-                  "th/plugins/voice-call",
-                  "th/plugins/memory-wiki",
-                  "th/plugins/zalouser",
-                  {
-                    "group": "Building Plugins",
-                    "pages": [
-                      "th/plugins/building-plugins",
-                      "th/plugins/sdk-channel-plugins",
-                      "th/plugins/sdk-provider-plugins",
-                      "th/plugins/sdk-migration"
-                    ]
-                  },
-                  {
-                    "group": "SDK Reference",
-                    "pages": [
-                      "th/plugins/sdk-overview",
-                      "th/plugins/sdk-entrypoints",
-                      "th/plugins/sdk-runtime",
-                      "th/plugins/sdk-agent-harness",
-                      "th/plugins/sdk-setup",
-                      "th/plugins/sdk-testing",
-                      "th/plugins/manifest",
-                      "th/plugins/architecture"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Skills",
-                "pages": [
-                  "th/tools/skills",
-                  "th/tools/creating-skills",
-                  "th/tools/skills-config",
-                  "th/tools/slash-commands",
-                  "th/tools/clawhub",
-                  "th/prose"
-                ]
-              },
-              {
-                "group": "Automation & Tasks",
-                "pages": [
-                  "th/automation/index",
-                  "th/automation/cron-jobs",
-                  "th/automation/tasks",
-                  "th/automation/taskflow",
-                  "th/automation/standing-orders",
-                  "th/automation/hooks"
-                ]
-              },
-              {
-                "group": "Tools",
-                "pages": [
-                  "th/tools/media-overview",
-                  "th/tools/apply-patch",
-                  {
-                    "group": "Web Browser",
-                    "pages": [
-                      "th/tools/browser",
-                      "th/tools/browser-login",
-                      "th/tools/browser-linux-troubleshooting",
-                      "th/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
-                    ]
-                  },
-                  {
-                    "group": "Web Tools",
-                    "pages": [
-                      "th/tools/web-fetch",
-                      "th/tools/web",
-                      "th/tools/brave-search",
-                      "th/tools/duckduckgo-search",
-                      "th/tools/exa-search",
-                      "th/tools/firecrawl",
-                      "th/tools/gemini-search",
-                      "th/tools/grok-search",
-                      "th/tools/kimi-search",
-                      "th/tools/minimax-search",
-                      "th/tools/ollama-search",
-                      "th/tools/perplexity-search",
-                      "th/tools/searxng-search",
-                      "th/tools/tavily"
-                    ]
-                  },
-                  "th/tools/btw",
-                  "th/tools/code-execution",
-                  "th/tools/diffs",
-                  "th/tools/trajectory",
-                  "th/tools/elevated",
-                  "th/tools/exec",
-                  "th/tools/exec-approvals",
-                  "th/tools/image-generation",
-                  "th/tools/music-generation",
-                  "th/tools/llm-task",
-                  "th/tools/lobster",
-                  "th/tools/loop-detection",
-                  "th/tools/pdf",
-                  "th/tools/reactions",
-                  "th/tools/thinking",
-                  "th/tools/tokenjuice",
-                  "th/tools/video-generation"
-                ]
-              },
-              {
-                "group": "Agent coordination",
-                "pages": [
-                  "th/tools/agent-send",
-                  "th/tools/subagents",
-                  "th/tools/acp-agents",
-                  "th/tools/multi-agent-sandbox-tools"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Models",
-            "groups": [
-              {
-                "group": "Overview",
-                "pages": [
-                  "th/providers/index",
-                  "th/providers/models"
-                ]
-              },
-              {
-                "group": "Concepts and configuration",
-                "pages": [
-                  "th/concepts/models",
-                  "th/concepts/model-providers",
-                  "th/concepts/model-failover"
-                ]
-              },
-              {
-                "group": "Providers",
-                "pages": [
-                  "th/providers/alibaba",
-                  "th/providers/bedrock",
-                  "th/providers/bedrock-mantle",
-                  "th/providers/anthropic",
-                  "th/providers/arcee",
-                  "th/providers/chutes",
-                  "th/providers/claude-max-api-proxy",
-                  "th/providers/cloudflare-ai-gateway",
-                  "th/providers/comfy",
-                  "th/providers/deepgram",
-                  "th/providers/deepseek",
-                  "th/providers/elevenlabs",
-                  "th/providers/fal",
-                  "th/providers/fireworks",
-                  "th/providers/github-copilot",
-                  "th/providers/glm",
-                  "th/providers/google",
-                  "th/providers/groq",
-                  "th/providers/huggingface",
-                  "th/providers/inferrs",
-                  "th/providers/kilocode",
-                  "th/providers/litellm",
-                  "th/providers/lmstudio",
-                  "th/providers/minimax",
-                  "th/providers/mistral",
-                  "th/providers/moonshot",
-                  "th/providers/nvidia",
-                  "th/providers/ollama",
-                  "th/providers/openai",
-                  "th/providers/opencode",
-                  "th/providers/opencode-go",
-                  "th/providers/openrouter",
-                  "th/providers/perplexity-provider",
-                  "th/providers/qianfan",
-                  "th/providers/qwen",
-                  "th/providers/runway",
-                  "th/providers/sglang",
-                  "th/providers/stepfun",
-                  "th/providers/synthetic",
-                  "th/providers/tencent",
-                  "th/providers/together",
-                  "th/providers/venice",
-                  "th/providers/vercel-ai-gateway",
-                  "th/providers/vllm",
-                  "th/providers/volcengine",
-                  "th/providers/vydra",
-                  "th/providers/xai",
-                  "th/providers/xiaomi",
-                  "th/providers/zai"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Platforms",
-            "groups": [
-              {
-                "group": "Platforms overview",
-                "pages": [
-                  "th/platforms/index",
-                  "th/platforms/macos",
-                  "th/platforms/linux",
-                  "th/platforms/windows",
-                  "th/platforms/android",
-                  "th/platforms/ios"
-                ]
-              },
-              {
-                "group": "macOS companion app",
-                "pages": [
-                  "th/platforms/mac/dev-setup",
-                  "th/platforms/mac/menu-bar",
-                  "th/platforms/mac/voicewake",
-                  "th/platforms/mac/voice-overlay",
-                  "th/platforms/mac/webchat",
-                  "th/platforms/mac/canvas",
-                  "th/platforms/mac/child-process",
-                  "th/platforms/mac/health",
-                  "th/platforms/mac/icon",
-                  "th/platforms/mac/logging",
-                  "th/platforms/mac/permissions",
-                  "th/platforms/mac/remote",
-                  "th/platforms/mac/signing",
-                  "th/platforms/mac/bundled-gateway",
-                  "th/platforms/mac/xpc",
-                  "th/platforms/mac/skills",
-                  "th/platforms/mac/peekaboo"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Gateway & Ops",
-            "groups": [
-              {
-                "group": "Gateway",
-                "pages": [
-                  "th/gateway/index",
-                  {
-                    "group": "Configuration and operations",
-                    "pages": [
-                      "th/gateway/configuration",
-                      "th/gateway/configuration-reference",
-                      "th/gateway/configuration-examples",
-                      "th/gateway/authentication",
-                      "th/auth-credential-semantics",
-                      "th/gateway/secrets",
-                      "th/gateway/secrets-plan-contract",
-                      "th/gateway/trusted-proxy-auth",
-                      "th/gateway/health",
-                      "th/gateway/heartbeat",
-                      "th/gateway/doctor",
-                      "th/gateway/logging",
-                      "th/logging",
-                      "th/gateway/gateway-lock",
-                      "th/gateway/background-process",
-                      "th/gateway/multiple-gateways",
-                      "th/gateway/troubleshooting"
-                    ]
-                  },
-                  {
-                    "group": "Security and sandboxing",
-                    "pages": [
-                      "th/gateway/security/index",
-                      "th/gateway/security/audit-checks",
-                      "th/gateway/sandboxing",
-                      "th/gateway/openshell",
-                      "th/gateway/sandbox-vs-tool-policy-vs-elevated"
-                    ]
-                  },
-                  {
-                    "group": "Protocols and APIs",
-                    "pages": [
-                      "th/gateway/protocol",
-                      "th/gateway/bridge-protocol",
-                      "th/gateway/openai-http-api",
-                      "th/gateway/openresponses-http-api",
-                      "th/gateway/tools-invoke-http-api",
-                      "th/gateway/cli-backends",
-                      "th/gateway/local-models"
-                    ]
-                  },
-                  {
-                    "group": "Networking and discovery",
-                    "pages": [
-                      "th/network",
-                      "th/gateway/network-model",
-                      "th/gateway/pairing",
-                      "th/gateway/discovery",
-                      "th/gateway/bonjour"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Remote access",
-                "pages": [
-                  "th/gateway/remote",
-                  "th/gateway/remote-gateway-readme",
-                  "th/gateway/tailscale"
-                ]
-              },
-              {
-                "group": "Security",
-                "pages": [
-                  "th/security/formal-verification",
-                  "th/security/THREAT-MODEL-ATLAS",
-                  "th/security/CONTRIBUTING-THREAT-MODEL"
-                ]
-              },
-              {
-                "group": "Nodes and media",
-                "pages": [
-                  "th/nodes/index",
-                  "th/nodes/troubleshooting",
-                  {
-                    "group": "Media capabilities",
-                    "pages": [
-                      "th/nodes/media-understanding",
-                      "th/nodes/images",
-                      "th/nodes/audio",
-                      "th/nodes/camera",
-                      "th/tools/tts"
-                    ]
-                  },
-                  {
-                    "group": "Node features",
-                    "pages": [
-                      "th/nodes/talk",
-                      "th/nodes/voicewake",
-                      "th/nodes/location-command"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Web interfaces",
-                "pages": [
-                  "th/web/index",
-                  "th/web/control-ui",
-                  "th/web/dashboard",
-                  "th/web/webchat",
-                  "th/web/tui"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Reference",
-            "groups": [
-              {
-                "group": "CLI commands",
-                "pages": [
-                  "th/cli/index",
-                  {
-                    "group": "Gateway and service",
-                    "pages": [
-                      "th/cli/backup",
-                      "th/cli/daemon",
-                      "th/cli/doctor",
-                      "th/cli/gateway",
-                      "th/cli/health",
-                      "th/cli/logs",
-                      "th/cli/onboard",
-                      "th/cli/reset",
-                      "th/cli/secrets",
-                      "th/cli/security",
-                      "th/cli/setup",
-                      "th/cli/status",
-                      "th/cli/uninstall",
-                      "th/cli/update"
-                    ]
-                  },
-                  {
-                    "group": "Agents and sessions",
-                    "pages": [
-                      "th/cli/agent",
-                      "th/cli/agents",
-                      "th/cli/hooks",
-                      "th/cli/infer",
-                      "th/cli/memory",
-                      "th/cli/message",
-                      "th/cli/models",
-                      "th/cli/sessions",
-                      "th/cli/system",
-                      "th/cli/tasks"
-                    ]
-                  },
-                  {
-                    "group": "Channels and messaging",
-                    "pages": [
-                      "th/cli/channels",
-                      "th/cli/devices",
-                      "th/cli/directory",
-                      "th/cli/pairing",
-                      "th/cli/qr",
-                      "th/cli/voicecall"
-                    ]
-                  },
-                  {
-                    "group": "Tools and execution",
-                    "pages": [
-                      "th/cli/approvals",
-                      "th/cli/browser",
-                      "th/cli/cron",
-                      "th/cli/flows",
-                      "th/cli/node",
-                      "th/cli/nodes",
-                      "th/cli/sandbox"
-                    ]
-                  },
-                  {
-                    "group": "Configuration",
-                    "pages": [
-                      "th/cli/config",
-                      "th/cli/configure",
-                      "th/cli/webhooks"
-                    ]
-                  },
-                  {
-                    "group": "Plugins and skills",
-                    "pages": [
-                      "th/cli/plugins",
-                      "th/cli/skills"
-                    ]
-                  },
-                  {
-                    "group": "Interfaces",
-                    "pages": [
-                      "th/cli/dashboard",
-                      "th/cli/tui"
-                    ]
-                  },
-                  {
-                    "group": "Utility",
-                    "pages": [
-                      "th/cli/acp",
-                      "th/cli/clawbot",
-                      "th/cli/completion",
-                      "th/cli/dns",
-                      "th/cli/docs",
-                      "th/cli/mcp",
-                      "th/cli/wiki"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "RPC and API",
-                "pages": [
-                  "th/reference/rpc",
-                  "th/reference/device-models"
-                ]
-              },
-              {
-                "group": "Templates",
-                "pages": [
-                  "th/reference/AGENTS.default",
-                  "th/reference/templates/AGENTS",
-                  "th/reference/templates/BOOT",
-                  "th/reference/templates/BOOTSTRAP",
-                  "th/reference/templates/HEARTBEAT",
-                  "th/reference/templates/IDENTITY",
-                  "th/reference/templates/SOUL",
-                  "th/reference/templates/TOOLS",
-                  "th/reference/templates/USER"
-                ]
-              },
-              {
-                "group": "Technical reference",
-                "pages": [
-                  "th/pi",
-                  "th/reference/wizard",
-                  "th/reference/token-use",
-                  "th/reference/secretref-credential-surface",
-                  "th/reference/prompt-caching",
-                  "th/reference/api-usage-costs",
-                  "th/reference/transcript-hygiene",
-                  "th/reference/memory-config",
-                  "th/reference/rich-output-protocol",
-                  "th/date-time"
-                ]
-              },
-              {
-                "group": "Concept internals",
-                "pages": [
-                  "th/concepts/typebox",
-                  "th/concepts/markdown-formatting",
-                  "th/concepts/typing-indicators",
-                  "th/concepts/usage-tracking",
-                  "th/concepts/timezone"
-                ]
-              },
-              {
-                "group": "Project",
-                "pages": [
-                  "th/reference/credits"
-                ]
-              },
-              {
-                "group": "Release policy",
-                "pages": [
-                  "th/reference/RELEASING",
-                  "th/reference/test"
-                ]
-              }
-            ]
-          },
-          {
-            "tab": "Help",
-            "groups": [
-              {
-                "group": "Help",
-                "pages": [
-                  "th/help/index",
-                  "th/help/troubleshooting",
-                  "th/help/faq"
-                ]
-              },
-              {
-                "group": "Community",
-                "pages": [
-                  "th/start/lore"
-                ]
-              },
-              {
-                "group": "Environment and debugging",
-                "pages": [
-                  "th/help/environment",
-                  "th/help/debugging",
-                  "th/help/testing",
-                  "th/help/scripts",
-                  "th/debug/node-issue",
-                  "th/diagnostics/flags"
-                ]
-              },
-              {
-                "group": "Compaction internals",
-                "pages": [
-                  "th/reference/session-management-compaction"
-                ]
-              },
-              {
-                "group": "Developer setup",
-                "pages": [
-                  "th/start/setup",
-                  "th/pi-dev"
-                ]
-              },
-              {
-                "group": "Contributing",
-                "pages": [
-                  "th/ci"
-                ]
-              },
-              {
-                "group": "Docs meta",
-                "pages": [
-                  "th/start/hubs",
-                  "th/start/docs-directory"
                 ]
               }
             ]
