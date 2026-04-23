@@ -1,59 +1,59 @@
 ---
 read_when:
     - Ви хочете використовувати Cloudflare AI Gateway з OpenClaw
-    - Вам потрібні account ID, gateway ID або env-змінна API key
-summary: Налаштування Cloudflare AI Gateway (auth + вибір моделі)
-title: Cloudflare AI Gateway
+    - Вам потрібен ID облікового запису, ID Gateway або змінна середовища API key
+summary: Налаштування Cloudflare AI Gateway (автентифікація + вибір моделі)
+title: Cloudflare AI gateway
 x-i18n:
-    generated_at: "2026-04-23T21:05:36Z"
+    generated_at: "2026-04-23T22:14:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 31e2886c6333ec47ebed3042c0802ad5aedba6f16fbddc2110728dcb1e86b499
+    source_hash: fb10ef4bd92db88b2b3dac1773439ab2ba37916a72d1925995d74ef787fa1c8b
     source_path: providers/cloudflare-ai-gateway.md
     workflow: 15
 ---
 
-Cloudflare AI Gateway стоїть перед API provider-ів і дає змогу додавати аналітику, кешування та елементи керування. Для Anthropic OpenClaw використовує Anthropic Messages API через endpoint вашого Gateway.
+Cloudflare AI Gateway розташовується перед API провайдерів і дає змогу додавати аналітику, кешування та засоби контролю. Для Anthropic OpenClaw використовує Anthropic Messages API через ваш endpoint Gateway.
 
-| Властивість    | Значення                                                                                |
-| -------------- | --------------------------------------------------------------------------------------- |
-| Provider       | `cloudflare-ai-gateway`                                                                 |
-| Base URL       | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`             |
-| Типова модель  | `cloudflare-ai-gateway/claude-sonnet-4-5`                                               |
-| API key        | `CLOUDFLARE_AI_GATEWAY_API_KEY` (ваш API key provider-а для запитів через Gateway)     |
+| Властивість   | Значення                                                                                |
+| ------------- | --------------------------------------------------------------------------------------- |
+| Провайдер     | `cloudflare-ai-gateway`                                                                 |
+| Базовий URL   | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`             |
+| Модель за замовчуванням | `cloudflare-ai-gateway/claude-sonnet-4-6`                                     |
+| API key       | `CLOUDFLARE_AI_GATEWAY_API_KEY` (ваш API key провайдера для запитів через Gateway)     |
 
 <Note>
-Для моделей Anthropic, маршрутизованих через Cloudflare AI Gateway, використовуйте свій **Anthropic API key** як ключ provider-а.
+Для моделей Anthropic, маршрутизованих через Cloudflare AI Gateway, використовуйте свій **Anthropic API key** як ключ провайдера.
 </Note>
 
 ## Початок роботи
 
 <Steps>
-  <Step title="Задайте API key provider-а та дані Gateway">
-    Запустіть onboarding і виберіть варіант автентифікації Cloudflare AI Gateway:
+  <Step title="Укажіть API key провайдера та дані Gateway">
+    Запустіть онбординг і виберіть варіант автентифікації Cloudflare AI Gateway:
 
     ```bash
     openclaw onboard --auth-choice cloudflare-ai-gateway-api-key
     ```
 
-    Це попросить account ID, gateway ID і API key.
+    Буде запропоновано ввести ID вашого облікового запису, ID Gateway і API key.
 
   </Step>
-  <Step title="Задайте типову модель">
-    Додайте модель до config OpenClaw:
+  <Step title="Укажіть модель за замовчуванням">
+    Додайте модель до конфігурації OpenClaw:
 
     ```json5
     {
       agents: {
         defaults: {
-          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-5" },
+          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-6" },
         },
       },
     }
     ```
 
   </Step>
-  <Step title="Перевірте, що модель доступна">
+  <Step title="Переконайтеся, що модель доступна">
     ```bash
     openclaw models list --provider cloudflare-ai-gateway
     ```
@@ -62,7 +62,7 @@ Cloudflare AI Gateway стоїть перед API provider-ів і дає змо
 
 ## Неінтерактивний приклад
 
-Для scripted- або CI-конфігурацій передавайте всі значення в командному рядку:
+Для сценаріїв або налаштувань CI передайте всі значення в командному рядку:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -76,8 +76,8 @@ openclaw onboard --non-interactive \
 ## Розширена конфігурація
 
 <AccordionGroup>
-  <Accordion title="Автентифіковані Gateway-и">
-    Якщо ви ввімкнули автентифікацію Gateway у Cloudflare, додайте заголовок `cf-aig-authorization`. Це **додатково** до API key вашого provider-а.
+  <Accordion title="Автентифіковані Gateway">
+    Якщо ви ввімкнули автентифікацію Gateway у Cloudflare, додайте заголовок `cf-aig-authorization`. Це **додатково до** API key вашого провайдера.
 
     ```json5
     {
@@ -94,16 +94,16 @@ openclaw onboard --non-interactive \
     ```
 
     <Tip>
-    Заголовок `cf-aig-authorization` автентифікує вас перед самим Cloudflare Gateway, тоді як API key provider-а (наприклад, ваш ключ Anthropic) автентифікує вас перед upstream provider-ом.
+    Заголовок `cf-aig-authorization` автентифікує у самому Cloudflare Gateway, тоді як API key провайдера (наприклад, ваш ключ Anthropic) автентифікує у висхідного провайдера.
     </Tip>
 
   </Accordion>
 
-  <Accordion title="Примітка про environment">
-    Якщо Gateway працює як daemon (launchd/systemd), переконайтеся, що `CLOUDFLARE_AI_GATEWAY_API_KEY` доступний цьому процесу.
+  <Accordion title="Примітка щодо середовища">
+    Якщо Gateway працює як демон (launchd/systemd), переконайтеся, що `CLOUDFLARE_AI_GATEWAY_API_KEY` доступний цьому процесу.
 
     <Warning>
-    Ключ, який лежить лише в `~/.profile`, не допоможе daemon-у launchd/systemd, якщо це середовище там також не імпортовано. Задайте ключ у `~/.openclaw/.env` або через `env.shellEnv`, щоб процес gateway міг його прочитати.
+    Ключ, що зберігається лише в `~/.profile`, не допоможе демону launchd/systemd, якщо це середовище не буде також імпортовано туди. Укажіть ключ у `~/.openclaw/.env` або через `env.shellEnv`, щоб процес Gateway міг його прочитати.
     </Warning>
 
   </Accordion>
@@ -113,9 +113,9 @@ openclaw onboard --non-interactive \
 
 <CardGroup cols={2}>
   <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
-    Вибір provider-ів, посилань на моделі та поведінки failover.
+    Вибір провайдерів, посилань на моделі та поведінки failover.
   </Card>
   <Card title="Усунення несправностей" href="/uk/help/troubleshooting" icon="wrench">
-    Загальне усунення несправностей і FAQ.
+    Загальне усунення несправностей і поширені запитання.
   </Card>
 </CardGroup>
