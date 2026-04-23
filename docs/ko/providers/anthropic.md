@@ -30,7 +30,7 @@ Anthropic의 현재 공개 문서:
 - [Claude Agent SDK overview](https://platform.claude.com/docs/en/agent-sdk/overview)
 - [Using Claude Code with your Pro or Max plan](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
 - [Using Claude Code with your Team or Enterprise plan](https://support.anthropic.com/en/articles/11845131-using-claude-code-with-your-team-or-enterprise-plan/)
-  </Warning>
+</Warning>
 
 ## 시작하기
 
@@ -104,7 +104,7 @@ Anthropic의 현재 공개 문서:
 
     <Tip>
     가장 명확한 과금 경로를 원한다면 대신 Anthropic API 키를 사용하세요. OpenClaw는 [OpenAI Codex](/ko/providers/openai), [Qwen Cloud](/ko/providers/qwen), [MiniMax](/ko/providers/minimax), [Z.AI / GLM](/ko/providers/glm)의 구독형 옵션도 지원합니다.
-    </Tip>
+</Tip>
 
   </Tab>
 </Tabs>
@@ -264,7 +264,7 @@ OpenClaw는 API 키 인증에 대해 Anthropic의 프롬프트 캐싱 기능을 
 
     <Warning>
     사용 중인 Anthropic 자격 증명에 장문 컨텍스트 액세스 권한이 필요합니다. 레거시 토큰 인증(`sk-ant-oat-*`)은 1M 컨텍스트 요청에 대해 거부되며, OpenClaw는 경고를 기록하고 표준 컨텍스트 창으로 폴백합니다.
-    </Warning>
+</Warning>
 
   </Accordion>
 </AccordionGroup>

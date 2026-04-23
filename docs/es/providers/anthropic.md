@@ -33,7 +33,7 @@ Documentación pública actual de Anthropic:
 - [Descripción general del Agent SDK de Claude](https://platform.claude.com/docs/en/agent-sdk/overview)
 - [Usar Claude Code con tu plan Pro o Max](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
 - [Usar Claude Code con tu plan Team o Enterprise](https://support.anthropic.com/en/articles/11845131-using-claude-code-with-your-team-or-enterprise-plan/)
-  </Warning>
+</Warning>
 
 ## Primeros pasos
 
@@ -107,7 +107,7 @@ Documentación pública actual de Anthropic:
 
     <Tip>
     Si quieres la ruta de facturación más clara, usa en su lugar una API key de Anthropic. OpenClaw también admite opciones de estilo suscripción de [OpenAI Codex](/es/providers/openai), [Qwen Cloud](/es/providers/qwen), [MiniMax](/es/providers/minimax) y [Z.AI / GLM](/es/providers/glm).
-    </Tip>
+</Tip>
 
   </Tab>
 </Tabs>
@@ -270,7 +270,7 @@ OpenClaw admite la función de caché de prompts de Anthropic para autenticació
 
     <Warning>
     Requiere acceso a contexto largo en tu credencial de Anthropic. La autenticación con token heredado (`sk-ant-oat-*`) se rechaza para solicitudes de contexto 1M: OpenClaw registra una advertencia y vuelve a la ventana de contexto estándar.
-    </Warning>
+</Warning>
 
   </Accordion>
 </AccordionGroup>

@@ -1499,7 +1499,7 @@ per uso/fatturazione e aumenta i limiti se necessario.
 
   </Accordion>
 
-  <Accordion title='Ho impostato gateway.bind: "lan" (o "tailnet") e ora non c'è nulla in ascolto / l'interfaccia dice unauthorized'>
+  <Accordion title="Ho impostato gateway.bind lan o tailnet e ora non c'è nulla in ascolto / l'interfaccia dice unauthorized">
     I bind non loopback **richiedono un percorso di autenticazione gateway valido**. In pratica questo significa:
 
     - autenticazione con segreto condiviso: token o password
@@ -2213,7 +2213,7 @@ per uso/fatturazione e aumenta i limiti se necessario.
 ## Modelli: predefiniti, selezione, alias, cambio
 
 <AccordionGroup>
-  <Accordion title='Cos'è il "modello predefinito"?'>
+  <Accordion title="Cos'è il modello predefinito?">
     Il modello predefinito di OpenClaw è quello che imposti come:
 
     ```

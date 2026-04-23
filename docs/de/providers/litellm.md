@@ -25,7 +25,7 @@ x-i18n:
 - **Virtuelle Schlüssel** — Erstellen Sie Schlüssel mit Ausgabenlimits für OpenClaw
 - **Logging** — Vollständige Anfrage-/Antwort-Logs für das Debugging
 - **Fallbacks** — Automatisches Failover, wenn Ihr primärer Provider nicht verfügbar ist
-  </Tip>
+</Tip>
 
 ## Schnellstart
 

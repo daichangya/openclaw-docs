@@ -25,7 +25,7 @@ O [LiteLLM](https://litellm.ai) é um Gateway de LLM open source que fornece uma
 - **Chaves virtuais** — Crie chaves com limites de gasto para o OpenClaw
 - **Logging** — Logs completos de requisição/resposta para depuração
 - **Fallbacks** — Failover automático se o seu provedor principal estiver indisponível
-  </Tip>
+</Tip>
 
 ## Início rápido
 

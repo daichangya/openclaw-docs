@@ -14,7 +14,7 @@ x-i18n:
     workflow: 15
 ---
 
-<!-- markdownlint-disable MD033 -->
+{/* markdownlint-disable MD033 */}
 
 # Showcase
 

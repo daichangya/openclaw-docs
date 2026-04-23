@@ -25,7 +25,7 @@ x-i18n:
 - **Claves virtuales** — Crea claves con límites de gasto para OpenClaw
 - **Registro** — Registros completos de solicitudes/respuestas para depuración
 - **Fallbacks** — Failover automático si tu proveedor principal no está disponible
-  </Tip>
+</Tip>
 
 ## Inicio rápido
 

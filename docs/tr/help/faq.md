@@ -799,7 +799,7 @@ kontrol edin ve gerekirse limitleri artırın.
     Evet, **çoklu-agent yönlendirme** ile. Her gönderenin WhatsApp **DM**'sini (peer `kind: "direct"`, gönderen E.164 biçiminde örn. `+15551234567`) farklı bir `agentId`'ye bağlayın; böylece her kişi kendi workspace'ini ve oturum deposunu alır. Yanıtlar yine **aynı WhatsApp hesabından** gelir ve DM erişim denetimi (`channels.whatsapp.dmPolicy` / `channels.whatsapp.allowFrom`) WhatsApp hesabı başına küreseldir. Bkz. [Çoklu-Agent Yönlendirme](/tr/concepts/multi-agent) ve [WhatsApp](/tr/channels/whatsapp).
   </Accordion>
 
-  <Accordion title='Bir "hızlı sohbet" agent'i ve bir "kodlama için Opus" agent'i çalıştırabilir miyim?'>
+  <Accordion title="Bir hızlı sohbet agent'i ve bir kodlama için Opus agent'i çalıştırabilir miyim?">
     Evet. Çoklu-agent yönlendirmeyi kullanın: her agente kendi varsayılan modelini verin, sonra gelen rotaları (sağlayıcı hesabı veya belirli peer'ler) her agente bağlayın. Örnek config [Çoklu-Agent Yönlendirme](/tr/concepts/multi-agent) bölümünde bulunur. Ayrıca [Modeller](/tr/concepts/models) ve [Yapılandırma](/tr/gateway/configuration) bölümlerine bakın.
   </Accordion>
 
@@ -1819,7 +1819,8 @@ __OC_I18N_900051__
 
   </Accordion>
 
-  <Accordion title="İlk kurulum için en az mantıklı config">__OC_I18N_900052__
+  <Accordion title="İlk kurulum için en az mantıklı config">
+__OC_I18N_900052__
     Bu, workspace'inizi ayarlar ve botu kimin tetikleyebileceğini sınırlar.
 
   </Accordion>
@@ -2851,7 +2852,7 @@ __OC_I18N_900112__
 
   </Accordion>
 
-  <Accordion title='Telegram'dan nasıl Discord mesajı gönderirim? ("Cross-context messaging denied")'>
+  <Accordion title="Telegram'dan nasıl Discord mesajı gönderirim? (Cross-context messaging denied)">
     OpenClaw varsayılan olarak **sağlayıcılar arası** mesajlaşmayı engeller. Araç çağrısı
     Telegram'a bağlıysa, açıkça izin vermediğiniz sürece Discord'a göndermez.
 
