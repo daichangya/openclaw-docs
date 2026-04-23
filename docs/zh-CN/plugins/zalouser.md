@@ -1,14 +1,14 @@
 ---
 read_when:
-    - 你希望在 OpenClaw 中使用 Zalo Personal（非官方）支持
+    - 你想在 OpenClaw 中使用 Zalo Personal（非官方）支持
     - 你正在配置或开发 zalouser 插件
-summary: Zalo Personal 插件：通过原生 zca-js 实现二维码登录 + 消息传递（插件安装 + 渠道配置 + 工具）
+summary: Zalo Personal 插件：通过原生 zca-js 进行二维码登录 + 消息收发（插件安装 + 渠道配置 + 工具）
 title: Zalo personal 插件
 x-i18n:
-    generated_at: "2026-04-23T20:59:00Z"
+    generated_at: "2026-04-23T23:01:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 806618b43d1285d1e47c9419b2f4f6f77c5784035c9b7073d0c5e97485876993
+    source_hash: d678bd55fd405a9c689d1202870cc03bfb825a9314c433a0ab729d376e3b67a3
     source_path: plugins/zalouser.md
     workflow: 15
 ---
@@ -17,17 +17,17 @@ x-i18n:
 
 通过插件为 OpenClaw 提供 Zalo Personal 支持，使用原生 `zca-js` 自动化普通 Zalo 个人账号。
 
-> **警告：** 非官方自动化可能导致账号被暂停/封禁。使用风险由你自行承担。
+> **警告：** 非官方自动化可能导致账号被暂停或封禁。请自行承担风险。
 
 ## 命名
 
-渠道 id 为 `zalouser`，以明确表示它自动化的是一个**个人 Zalo 用户账号**（非官方）。我们将 `zalo` 保留给未来可能出现的官方 Zalo API 集成。
+渠道 id 为 `zalouser`，以明确表示这是对 **个人 Zalo 用户账号**（非官方）的自动化支持。我们保留 `zalo`，以便未来可能接入官方 Zalo API 集成。
 
 ## 运行位置
 
 该插件运行在 **Gateway 网关进程内部**。
 
-如果你使用远程 Gateway 网关，请在**运行 Gateway 网关的机器**上安装/配置该插件，然后重启 Gateway 网关。
+如果你使用远程 Gateway 网关，请在**运行 Gateway 网关的机器上**安装/配置它，然后重启 Gateway 网关。
 
 不需要外部 `zca`/`openzca` CLI 二进制文件。
 
@@ -80,6 +80,11 @@ openclaw directory peers list --channel zalouser --query "name"
 
 工具名称：`zalouser`
 
-动作：`send`、`image`、`link`、`friends`、`groups`、`me`、`status`
+操作：`send`、`image`、`link`、`friends`、`groups`、`me`、`status`
 
-渠道消息动作还支持用于消息 reaction 的 `react`。
+渠道消息操作还支持 `react`，用于消息回应。
+
+## 相关内容
+
+- [构建插件](/zh-CN/plugins/building-plugins)
+- [社区插件](/zh-CN/plugins/community)

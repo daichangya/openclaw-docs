@@ -1,15 +1,15 @@
 ---
 read_when:
-    - 你正在脚本或 CI 中自动化新手引导
-    - 你需要针对特定提供商的非交互式示例
+    - 你正在脚本或 CI 中自动执行 onboarding
+    - 你需要特定提供商的非交互式示例
 sidebarTitle: CLI automation
-summary: OpenClaw CLI 的脚本化新手引导与智能体设置
+summary: 用于 OpenClaw CLI 的脚本化 onboarding 和智能体设置
 title: CLI 自动化
 x-i18n:
-    generated_at: "2026-04-23T21:05:57Z"
+    generated_at: "2026-04-23T23:03:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e65db62f68542e017f1e4bb9b802fee49ec50fe196cda6a90d0d2122fca9b44d
+    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 使用 `--non-interactive` 可自动化 `openclaw onboard`。
 
 <Note>
-`--json` 并不意味着非交互模式。对于脚本，请使用 `--non-interactive`（以及 `--workspace`）。
+`--json` 不意味着非交互模式。脚本中请使用 `--non-interactive`（以及 `--workspace`）。
 </Note>
 
 ## 基础非交互示例
@@ -37,11 +37,11 @@ openclaw onboard --non-interactive \
 
 添加 `--json` 可获得机器可读摘要。
 
-使用 `--secret-input-mode ref` 可在 auth profile 中存储基于环境变量的 ref，而不是明文值。
-在新手引导流程中，也支持交互式选择环境变量 ref 与已配置提供商 ref（`file` 或 `exec`）之间的方式。
+使用 `--secret-input-mode ref` 可将基于环境变量的引用存储在 auth 配置文件中，而不是明文值。
+在 onboarding 流程中，支持在环境变量引用与已配置的提供商引用（`file` 或 `exec`）之间进行交互式选择。
 
 在非交互 `ref` 模式下，提供商环境变量必须已在进程环境中设置。
-如果传入内联 key 标志，却没有对应环境变量，现在会快速失败。
+现在，如果传入内联 key 标志但缺少匹配的环境变量，会快速失败。
 
 示例：
 
@@ -53,7 +53,7 @@ openclaw onboard --non-interactive \
   --accept-risk
 ```
 
-## 提供商专用示例
+## 提供商特定示例
 
 <AccordionGroup>
   <Accordion title="Anthropic API key 示例">
@@ -147,7 +147,7 @@ openclaw onboard --non-interactive \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
-    若使用 Go 目录，请改为 `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"`。
+    如果要使用 Go 目录，请改为 `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"`。
   </Accordion>
   <Accordion title="Ollama 示例">
     ```bash
@@ -174,7 +174,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` 是可选的。如果省略，新手引导会检查 `CUSTOM_API_KEY`。
+    `--custom-api-key` 为可选项。如果省略，onboarding 会检查 `CUSTOM_API_KEY`。
 
     ref 模式变体：
 
@@ -192,23 +192,23 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    在这种模式下，新手引导会将 `apiKey` 存储为 `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`。
+    在该模式下，onboarding 会将 `apiKey` 存储为 `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`。
 
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token 仍然作为受支持的新手引导 token 路径保留，但 OpenClaw 现在在可用时会优先复用 Claude CLI。
-对于生产环境，优先使用 Anthropic API key。
+Anthropic setup-token 仍然作为受支持的 onboarding token 路径保留，但当可用时，OpenClaw 现在更倾向于复用 Claude CLI。
+在生产环境中，优先使用 Anthropic API key。
 
 ## 添加另一个智能体
 
 使用 `openclaw agents add <name>` 创建一个独立的智能体，它拥有自己的工作区、
-会话和 auth profiles。不带 `--workspace` 运行会启动向导。
+会话和 auth 配置文件。不带 `--workspace` 运行会启动向导。
 
 ```bash
 openclaw agents add work \
   --workspace ~/.openclaw/workspace-work \
-  --model openai/gpt-5.5 \
+  --model openai/gpt-5.4 \
   --bind whatsapp:biz \
   --non-interactive \
   --json
@@ -228,6 +228,6 @@ openclaw agents add work \
 
 ## 相关文档
 
-- 新手引导中心：[Onboarding（CLI）](/zh-CN/start/wizard)
+- onboarding 中心：[设置向导（CLI）](/zh-CN/start/wizard)
 - 完整参考：[CLI 设置参考](/zh-CN/start/wizard-cli-reference)
 - 命令参考：[`openclaw onboard`](/zh-CN/cli/onboard)

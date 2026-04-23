@@ -1,32 +1,28 @@
 ---
 read_when:
-    - 更改语音唤醒词行为或默认设置
+    - 更改语音唤醒词行为或默认值
     - 添加需要唤醒词同步的新节点平台
-summary: 全局语音唤醒词（由 Gateway 网关拥有）及其如何在节点之间同步
-title: |-
-    语音唤醒 pc蛋蛋 to=functions.read  天天中彩票双色球json
-    {"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/","offset":1,"limit":50}
+summary: Gateway 网关持有的全局语音唤醒词，以及它们如何在各节点之间同步
+title: 语音唤醒
 x-i18n:
-    generated_at: "2026-04-23T20:54:17Z"
+    generated_at: "2026-04-23T22:59:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6ec2cf1cd4f57a7f40908830c2288fcaa77104a39528b409cdc30655a6d65636
+    source_hash: 5094c17aaa7f868beb81d04f7dc60565ded1852cc5c835a33de64dbd3da74bb4
     source_path: nodes/voicewake.md
     workflow: 15
 ---
 
-# 语音唤醒（全局唤醒词）
+OpenClaw 将**唤醒词视为由 Gateway 网关持有的单一全局列表**。
 
-OpenClaw 将**唤醒词视为由 Gateway 网关拥有的单一全局列表**。
-
-- **不存在按节点自定义的唤醒词**。
-- **任意节点/应用 UI 都可以编辑**该列表；更改由 Gateway 网关持久化，并广播给所有端。
+- **没有按节点自定义的唤醒词**。
+- **任何节点/应用 UI 都可以编辑**该列表；更改由 Gateway 网关持久化，并广播给所有人。
 - macOS 和 iOS 保留本地的**语音唤醒启用/禁用**开关（本地 UX 和权限不同）。
-- Android 当前保持语音唤醒关闭，并在语音标签页中使用手动麦克风流程。
+- Android 当前保持语音唤醒关闭，并在“语音”标签中使用手动麦克风流程。
 
-## 存储（Gateway 网关宿主机）
+## 存储（Gateway 网关主机）
 
-唤醒词存储在 gateway 机器上的：
+唤醒词存储在 Gateway 网关机器上的以下位置：
 
 - `~/.openclaw/settings/voicewake.json`
 
@@ -45,7 +41,7 @@ OpenClaw 将**唤醒词视为由 Gateway 网关拥有的单一全局列表**。
 
 说明：
 
-- triggers 会被标准化（去除首尾空白，丢弃空项）。空列表会回退到默认值。
+- 触发词会被规范化（去除首尾空白、丢弃空项）。空列表会回退到默认值。
 - 出于安全考虑，会强制执行限制（数量/长度上限）。
 
 ### 事件
@@ -55,21 +51,27 @@ OpenClaw 将**唤醒词视为由 Gateway 网关拥有的单一全局列表**。
 接收方：
 
 - 所有 WebSocket 客户端（macOS 应用、WebChat 等）
-- 所有已连接节点（iOS/Android），并且在节点连接时也会作为初始“当前状态”推送
+- 所有已连接节点（iOS/Android），并且在节点连接时也会作为初始“当前状态”推送发送
 
 ## 客户端行为
 
 ### macOS 应用
 
 - 使用全局列表来控制 `VoiceWakeRuntime` 触发器。
-- 在语音唤醒设置中编辑“触发词”时，会调用 `voicewake.set`，然后依赖广播让其他客户端保持同步。
+- 在语音唤醒设置中编辑“触发词”会调用 `voicewake.set`，然后依赖广播让其他客户端保持同步。
 
 ### iOS 节点
 
 - 使用全局列表进行 `VoiceWakeManager` 触发词检测。
-- 在设置中编辑唤醒词时，会调用 `voicewake.set`（通过 Gateway 网关 WS），同时保持本地唤醒词检测的响应性。
+- 在设置中编辑唤醒词会调用 `voicewake.set`（通过 Gateway 网关 WS），同时也保持本地唤醒词检测的响应性。
 
 ### Android 节点
 
-- Android 运行时/设置中当前禁用了语音唤醒。
-- Android 语音使用语音标签页中的手动麦克风采集，而不是唤醒词触发。
+- 语音唤醒当前在 Android 运行时/设置中被禁用。
+- Android 语音使用“语音”标签中的手动麦克风采集，而不是唤醒词触发。
+
+## 相关
+
+- [Talk 模式](/zh-CN/nodes/talk)
+- [音频和语音消息](/zh-CN/nodes/audio)
+- [媒体理解](/zh-CN/nodes/media-understanding)

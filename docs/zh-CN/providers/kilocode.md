@@ -1,35 +1,34 @@
 ---
 read_when:
-    - 你想用一个 API key 访问多个 LLM】【。analysis to=functions.read commentary  六和彩json 765  content omitted due to length?
+    - 你想用一个 API 密钥访问多种 LLM
     - 你想在 OpenClaw 中通过 Kilo Gateway 运行模型
-summary: 在 OpenClaw 中使用 Kilo Gateway 的统一 API 访问多种模型
+summary: 使用 Kilo Gateway 的统一 API 在 OpenClaw 中访问多种模型
 title: Kilocode
 x-i18n:
-    generated_at: "2026-04-23T21:00:36Z"
+    generated_at: "2026-04-23T23:02:16Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 413366f6d9668beffea4c799f18fa81e3cf2ed44e9ba08e105791417f6a275b4
+    source_hash: aa3c29e7b39b1dfb049444c7ef2759555bb3f94479622d58fa2aa8fd6389d01f
     source_path: providers/kilocode.md
     workflow: 15
 ---
 
 # Kilo Gateway
 
-Kilo Gateway 提供一个**统一 API**，可通过单一
-端点和 API key 将请求路由到多个模型。它与 OpenAI 兼容，因此大多数 OpenAI SDK 只需切换 base URL 即可使用。
+Kilo Gateway 提供一个**统一 API**，可通过单一端点和 API 密钥将请求路由到多种模型。它兼容 OpenAI，因此大多数 OpenAI SDK 只需切换基础 URL 即可使用。
 
-| 属性 | 值 |
-| -------- | ---------------------------------- |
-| 提供商 | `kilocode` |
-| 认证 | `KILOCODE_API_KEY` |
-| API | OpenAI 兼容 |
-| Base URL | `https://api.kilo.ai/api/gateway/` |
+| 属性 | 值                                 |
+| ---- | ---------------------------------- |
+| 提供商 | `kilocode`                       |
+| 认证 | `KILOCODE_API_KEY`                 |
+| API  | 兼容 OpenAI                        |
+| 基础 URL | `https://api.kilo.ai/api/gateway/` |
 
 ## 入门指南
 
 <Steps>
   <Step title="创建账户">
-    前往 [app.kilo.ai](https://app.kilo.ai)，登录或创建账户，然后进入 API Keys 页面生成一个新 key。
+    前往 [app.kilo.ai](https://app.kilo.ai)，登录或创建账户，然后进入 API Keys 页面生成一个新密钥。
   </Step>
   <Step title="运行新手引导">
     ```bash
@@ -43,7 +42,7 @@ Kilo Gateway 提供一个**统一 API**，可通过单一
     ```
 
   </Step>
-  <Step title="验证模型是否可用">
+  <Step title="验证模型可用">
     ```bash
     openclaw models list --provider kilocode
     ```
@@ -52,35 +51,29 @@ Kilo Gateway 提供一个**统一 API**，可通过单一
 
 ## 默认模型
 
-默认模型是 `kilocode/kilo/auto`，这是一个由 Kilo Gateway 管理的
-提供商自有智能路由模型。
+默认模型是 `kilocode/kilo/auto`，这是一个由 Kilo Gateway 管理、由 provider 拥有的智能路由模型。
 
 <Note>
-OpenClaw 将 `kilocode/kilo/auto` 视为稳定的默认引用，但不会
-公布该路由背后从任务到上游模型的源码支持映射。`kilocode/kilo/auto` 背后的精确
-上游路由由 Kilo Gateway 拥有，而不是在 OpenClaw 中硬编码。
+OpenClaw 将 `kilocode/kilo/auto` 视为稳定的默认引用，但不会为该路由发布基于源的任务到上游模型映射。`kilocode/kilo/auto` 背后的确切上游路由由 Kilo Gateway 决定，而不是由 OpenClaw 硬编码。
 </Note>
 
-## 可用模型
+## 内置目录
 
 OpenClaw 会在启动时从 Kilo Gateway 动态发现可用模型。使用
 `/models kilocode` 可查看你的账户可用的完整模型列表。
 
-Gateway 上任何可用模型都可以通过 `kilocode/` 前缀使用：
+Gateway 网关上可用的任何模型都可以通过 `kilocode/` 前缀来使用：
 
-| 模型引用 | 说明 |
-| -------------------------------------- | ---------------------------------- |
-| `kilocode/kilo/auto` | 默认 —— 智能路由 |
-| `kilocode/anthropic/claude-sonnet-4` | 通过 Kilo 使用 Anthropic |
-| `kilocode/openai/gpt-5.5` | 通过 Kilo 使用 OpenAI |
-| `kilocode/google/gemini-3-pro-preview` | 通过 Kilo 使用 Google |
-| ...以及更多 | 使用 `/models kilocode` 列出全部模型 |
+| 模型引用                              | 说明                               |
+| ------------------------------------- | ---------------------------------- |
+| `kilocode/kilo/auto`                  | 默认 — 智能路由                    |
+| `kilocode/anthropic/claude-sonnet-4`  | 通过 Kilo 使用 Anthropic           |
+| `kilocode/openai/gpt-5.5`             | 通过 Kilo 使用 OpenAI              |
+| `kilocode/google/gemini-3-pro-preview`| 通过 Kilo 使用 Google              |
+| ...以及更多                           | 使用 `/models kilocode` 列出全部   |
 
 <Tip>
-启动时，OpenClaw 会查询 `GET https://api.kilo.ai/api/gateway/models`，并将
-发现到的模型优先合并到静态回退目录之前。内置回退始终
-包含 `kilocode/kilo/auto`（`Kilo Auto`），并带有 `input: ["text", "image"]`、
-`reasoning: true`、`contextWindow: 1000000` 和 `maxTokens: 128000`。
+在启动时，OpenClaw 会查询 `GET https://api.kilo.ai/api/gateway/models`，并将已发现模型合并到静态回退目录之前。内置回退始终包含 `kilocode/kilo/auto`（`Kilo Auto`），其配置为 `input: ["text", "image"]`、`reasoning: true`、`contextWindow: 1000000` 和 `maxTokens: 128000`。
 </Tip>
 
 ## 配置示例
@@ -97,33 +90,27 @@ Gateway 上任何可用模型都可以通过 `kilocode/` 前缀使用：
 ```
 
 <AccordionGroup>
-  <Accordion title="传输与兼容性">
-    源码文档中将 Kilo Gateway 视为与 OpenRouter 兼容，因此它会保留在
-    代理风格的 OpenAI 兼容路径上，而不是使用原生 OpenAI 请求整形。
+  <Accordion title="传输和兼容性">
+    Kilo Gateway 在源代码中被记录为兼容 OpenRouter，因此它会保留在代理式 OpenAI 兼容路径上，而不是使用原生 OpenAI 请求整形。
 
-    - 由 Gemini 支持的 Kilo 引用仍保留在代理式 Gemini 路径上，因此 OpenClaw 会在此路径中保留
-      Gemini thought-signature 清理，而不会启用原生 Gemini
-      replay 校验或 bootstrap 重写。
-    - Kilo Gateway 底层使用 Bearer token，并以你的 API key 作为凭证。
+    - 基于 Gemini 的 Kilo 引用会保留在代理 Gemini 路径上，因此 OpenClaw 会继续在该路径中保留 Gemini thought-signature 清理，而不会启用原生 Gemini 重放验证或引导重写。
+    - Kilo Gateway 底层会使用你的 API 密钥作为 Bearer token。
 
   </Accordion>
 
-  <Accordion title="流包装器与 reasoning">
-    Kilo 的共享流包装器会添加提供商应用请求头，并为受支持的具体模型引用规范化
-    代理 reasoning 负载。
+  <Accordion title="流包装器和推理">
+    Kilo 的共享流包装器会添加 provider app header，并为受支持的具体模型引用规范化代理推理负载。
 
     <Warning>
-    `kilocode/kilo/auto` 以及其他不支持代理 reasoning 的提示会跳过 reasoning
-    注入。如果你需要 reasoning 支持，请使用具体模型引用，例如
-    `kilocode/anthropic/claude-sonnet-4`。
+    `kilocode/kilo/auto` 和其他不支持代理推理的提示会跳过推理注入。如果你需要推理支持，请使用具体模型引用，例如 `kilocode/anthropic/claude-sonnet-4`。
     </Warning>
 
   </Accordion>
 
   <Accordion title="故障排除">
-    - 如果启动时模型发现失败，OpenClaw 会回退到内置静态目录，其中包含 `kilocode/kilo/auto`。
-    - 请确认你的 API key 有效，并且你的 Kilo 账户已启用所需模型。
-    - 当 Gateway 网关作为守护进程运行时，请确保 `KILOCODE_API_KEY` 对该进程可见（例如放在 `~/.openclaw/.env` 中，或通过 `env.shellEnv` 提供）。
+    - 如果启动时模型发现失败，OpenClaw 会回退到内置的静态目录，其中包含 `kilocode/kilo/auto`。
+    - 确认你的 API 密钥有效，并且你的 Kilo 账户已启用所需模型。
+    - 当 Gateway 网关以守护进程运行时，请确保 `KILOCODE_API_KEY` 对该进程可用（例如放在 `~/.openclaw/.env` 中，或通过 `env.shellEnv` 提供）。
   </Accordion>
 </AccordionGroup>
 
@@ -131,12 +118,12 @@ Gateway 上任何可用模型都可以通过 `kilocode/` 前缀使用：
 
 <CardGroup cols={2}>
   <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
-    如何选择提供商、模型引用和故障转移行为。
+    选择提供商、模型引用和故障切换行为。
   </Card>
   <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
     完整的 OpenClaw 配置参考。
   </Card>
   <Card title="Kilo Gateway" href="https://app.kilo.ai" icon="arrow-up-right-from-square">
-    Kilo Gateway 仪表板、API key 和账户管理。
+    Kilo Gateway 控制台、API 密钥和账户管理。
   </Card>
 </CardGroup>

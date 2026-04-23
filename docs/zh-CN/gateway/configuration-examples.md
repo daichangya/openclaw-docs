@@ -3,22 +3,22 @@ read_when:
     - 了解如何配置 OpenClaw
     - 查找配置示例
     - 首次设置 OpenClaw
-summary: 常见 OpenClaw 设置的符合 schema 的配置示例
+summary: 适用于常见 OpenClaw 设置的模式精确配置示例
 title: 配置示例
 x-i18n:
-    generated_at: "2026-04-23T20:48:20Z"
+    generated_at: "2026-04-23T22:57:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dd0180447ed73ec9406723cd2dfc9445b54572c21df56b83d074902840aa726e
+    source_hash: 66f59f9846c7e42d4d4ef2424d6fa56b2e51364f88296974aa2550855f89354f
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-下面的示例已与当前配置 schema 对齐。完整参考和按字段说明请参见 [配置](/zh-CN/gateway/configuration)。
+以下示例与当前配置模式保持一致。有关完整参考和逐字段说明，请参阅 [Configuration](/zh-CN/gateway/configuration)。
 
 ## 快速开始
 
-### 最简配置
+### 最小配置
 
 ```json5
 {
@@ -27,7 +27,7 @@ x-i18n:
 }
 ```
 
-将其保存到 `~/.openclaw/openclaw.json`，然后你就可以用该号码向 bot 发送私信。
+将其保存到 `~/.openclaw/openclaw.json`，然后你就可以通过该号码向机器人发送私信。
 
 ### 推荐入门配置
 
@@ -241,7 +241,7 @@ x-i18n:
       userTimezone: "America/Chicago",
       model: {
         primary: "anthropic/claude-sonnet-4-6",
-        fallbacks: ["anthropic/claude-opus-4-6", "openai/gpt-5.5"],
+        fallbacks: ["anthropic/claude-opus-4-6", "openai/gpt-5.4"],
       },
       imageModel: {
         primary: "openrouter/anthropic/claude-sonnet-4-6",
@@ -249,7 +249,7 @@ x-i18n:
       models: {
         "anthropic/claude-opus-4-6": { alias: "opus" },
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
-        "openai/gpt-5.5": { alias: "gpt" },
+        "openai/gpt-5.4": { alias: "gpt" },
       },
       skills: ["github", "weather"], // inherited by agents that omit list[].skills
       thinkingDefault: "low",
@@ -466,7 +466,7 @@ x-i18n:
 
 ## 常见模式
 
-### 共享 Skills 基线 + 单个覆盖
+### 共享 Skills 基线并覆盖其中一个
 
 ```json5
 {
@@ -510,21 +510,21 @@ x-i18n:
 
 ### 安全私信模式（共享收件箱 / 多用户私信）
 
-如果有不止一个人可以向你的 bot 发送私信（`allowFrom` 中有多个条目、对多个人进行了配对批准，或使用了 `dmPolicy: "open"`），请启用**安全私信模式**，这样不同发送者的私信默认不会共享同一个上下文：
+如果有多个人可以向你的机器人发送私信（`allowFrom` 中有多个条目、已为多人批准配对，或使用 `dmPolicy: "open"`），请启用**安全私信模式**，这样不同发送者发来的私信默认不会共享同一个上下文：
 
 ```json5
 {
-  // 安全私信模式（推荐用于多用户或敏感私信智能体）
+  // Secure DM mode (recommended for multi-user or sensitive DM agents)
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // 示例：WhatsApp 多用户收件箱
+    // Example: WhatsApp multi-user inbox
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // 示例：Discord 多用户收件箱
+    // Example: Discord multi-user inbox
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -534,10 +534,10 @@ x-i18n:
 }
 ```
 
-对于 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC，发送者授权默认优先基于 ID。  
-只有当你明确接受该风险时，才通过各渠道的 `dangerouslyAllowNameMatching: true` 启用基于可变名称/邮箱/昵称的直接匹配。
+对于 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC，发送者授权默认优先使用 ID。
+仅当你明确接受这一风险时，才应通过各渠道的 `dangerouslyAllowNameMatching: true` 启用基于可变姓名/邮箱/昵称的直接匹配。
 
-### Anthropic API key + MiniMax 回退
+### Anthropic API 密钥 + MiniMax 后备
 
 ```json5
 {
@@ -571,7 +571,7 @@ x-i18n:
 }
 ```
 
-### 工作 bot（受限访问）
+### 工作机器人（受限访问）
 
 ```json5
 {
@@ -630,7 +630,7 @@ x-i18n:
 
 ## 提示
 
-- 如果你设置了 `dmPolicy: "open"`，对应的 `allowFrom` 列表必须包含 `"*"`。
-- 不同 provider 的 ID 格式不同（电话号码、用户 ID、频道 ID）。请查阅 provider 文档以确认格式。
-- 可稍后再添加的可选部分：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
-- 更深入的设置说明请参见 [Providers](/zh-CN/providers) 和 [故障排除](/zh-CN/gateway/troubleshooting)。
+- 如果你设置 `dmPolicy: "open"`，对应的 `allowFrom` 列表必须包含 `"*"`。
+- 提供商 ID 各不相同（电话号码、用户 ID、渠道 ID）。请查阅提供商文档以确认格式。
+- 后续可添加的可选部分包括：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
+- 更深入的设置说明请参阅 [Providers](/zh-CN/providers) 和 [故障排除](/zh-CN/gateway/troubleshooting)。
