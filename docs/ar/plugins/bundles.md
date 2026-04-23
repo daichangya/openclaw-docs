@@ -1,48 +1,48 @@
 ---
 read_when:
-    - تريد تثبيت حزمة متوافقة مع Codex أو Claude أو Cursor
-    - تحتاج إلى فهم كيفية تعيين OpenClaw لمحتوى الحزمة إلى الميزات الأصلية
-    - أنت تصحح أخطاء اكتشاف الحزمة أو الإمكانات المفقودة
-summary: تثبيت واستخدام حزم Codex وClaude وCursor كـ plugins في OpenClaw
-title: حزم plugins
+    - أنت تريد تثبيت حزمة متوافقة مع Codex أو Claude أو Cursor
+    - أنت تحتاج إلى فهم كيفية قيام OpenClaw بربط محتوى الحزمة بالميزات الأصلية
+    - أنت تستكشف أخطاء اكتشاف الحِزم أو الإمكانات المفقودة وإصلاحها
+summary: تثبيت واستخدام حِزم Codex وClaude وCursor كـ Plugins في OpenClaw
+title: حِزم Plugin
 x-i18n:
-    generated_at: "2026-04-05T12:51:17Z"
+    generated_at: "2026-04-23T07:27:35Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a8b1eb4633bdff75425d8c2e29be352e11a4cdad7f420c0c66ae5ef07bf9bdcc
+    source_hash: 8c9e48738e059c302157dd8733178109cf34840f32a3d7b5b767ac019fbc581b
     source_path: plugins/bundles.md
     workflow: 15
 ---
 
-# حزم plugins
+# حِزم Plugin
 
-يمكن لـ OpenClaw تثبيت plugins من ثلاثة أنظمة خارجية: **Codex** و**Claude**،
-و**Cursor**. وتسمى هذه **حزم** — وهي حزم محتوى وبيانات وصفية
-يقوم OpenClaw بتعيينها إلى ميزات أصلية مثل Skills وhooks وأدوات MCP.
+يمكن لـ OpenClaw تثبيت Plugins من ثلاثة أنظمة خارجية: **Codex** و**Claude**،
+و**Cursor**. تُسمى هذه **حِزم** — وهي حزم محتوى وبيانات وصفية يقوم
+OpenClaw بربطها بميزات أصلية مثل skills وhooks وأدوات MCP.
 
 <Info>
-  الحزم **ليست** هي نفسها plugins الأصلية في OpenClaw. فالـ plugins الأصلية تعمل
-  داخل العملية ويمكنها تسجيل أي إمكانية. أما الحزم فهي حزم محتوى مع
-  تعيين انتقائي للميزات وحد ثقة أضيق.
+  الحِزم **ليست** مثل Plugins الأصلية في OpenClaw. تعمل Plugins الأصلية
+  داخل العملية نفسها ويمكنها تسجيل أي Capability. أما الحِزم فهي حزم محتوى مع
+  ربط انتقائي للميزات وحد ثقة أضيق.
 </Info>
 
-## لماذا توجد الحزم
+## لماذا توجد الحِزم
 
-يتم نشر العديد من plugins المفيدة بصيغة Codex أو Claude أو Cursor. وبدلًا
-من مطالبة المؤلفين بإعادة كتابتها كـ plugins أصلية في OpenClaw، يقوم OpenClaw
-باكتشاف هذه الصيغ وتعيين محتواها المدعوم إلى مجموعة الميزات الأصلية.
-وهذا يعني أنه يمكنك تثبيت حزمة أوامر Claude أو حزمة Skills من Codex
+تُنشر العديد من Plugins المفيدة بصيغة Codex أو Claude أو Cursor. وبدلًا
+من مطالبة المؤلفين بإعادة كتابتها كـ Plugins أصلية في OpenClaw، يقوم OpenClaw
+باكتشاف هذه الصيغ وربط محتواها المدعوم بمجموعة الميزات الأصلية. وهذا يعني
+أنه يمكنك تثبيت حزمة أوامر Claude أو حزمة Skills من Codex
 واستخدامها فورًا.
 
 ## تثبيت حزمة
 
 <Steps>
-  <Step title="التثبيت من دليل، أو أرشيف، أو Marketplace">
+  <Step title="التثبيت من دليل أو أرشيف أو marketplace">
     ```bash
-    # Local directory
+    # دليل محلي
     openclaw plugins install ./my-bundle
 
-    # Archive
+    # أرشيف
     openclaw plugins install ./my-bundle.tgz
 
     # Claude marketplace
@@ -58,67 +58,69 @@ x-i18n:
     openclaw plugins inspect <id>
     ```
 
-    تظهر الحزم بالشكل `Format: bundle` مع نوع فرعي هو `codex` أو `claude` أو `cursor`.
+    تظهر الحِزم كـ `Format: bundle` مع نوع فرعي `codex` أو `claude` أو `cursor`.
 
   </Step>
 
-  <Step title="أعد التشغيل واستخدمها">
+  <Step title="أعد التشغيل واستخدم">
     ```bash
     openclaw gateway restart
     ```
 
-    تصبح الميزات المعيّنة (Skills، وhooks، وأدوات MCP، وإعدادات LSP الافتراضية) متاحة في الجلسة التالية.
+    تصبح الميزات المربوطة (skills وhooks وأدوات MCP وإعدادات LSP الافتراضية) متاحة في الجلسة التالية.
 
   </Step>
 </Steps>
 
-## ما الذي يعيّنه OpenClaw من الحزم
+## ما الذي يربطه OpenClaw من الحِزم
 
-ليست كل ميزات الحزمة تعمل في OpenClaw اليوم. فيما يلي ما يعمل وما
-يُكتشف لكنه لم يُوصل بعد.
+ليست كل ميزة في الحزمة تعمل داخل OpenClaw اليوم. إليك ما يعمل وما
+يُكتشف لكنه غير موصول بعد.
 
 ### المدعوم حاليًا
 
-| الميزة       | كيفية تعيينها                                                                                 | ينطبق على     |
+| الميزة | كيفية الربط | ينطبق على |
 | ------------- | ------------------------------------------------------------------------------------------- | -------------- |
-| محتوى Skills | يتم تحميل جذور Skills الخاصة بالحزمة كجذور Skills عادية في OpenClaw                                           | جميع الصيغ    |
-| الأوامر      | يتم التعامل مع `commands/` و`.cursor/commands/` كجذور Skills                                  | Claude, Cursor |
-| حزم Hook    | تخطيطات `HOOK.md` + `handler.ts` بأسلوب OpenClaw                                             | Codex          |
-| أدوات MCP     | يتم دمج تكوين MCP الخاص بالحزمة في إعدادات Pi المضمنة؛ ويتم تحميل خوادم stdio وHTTP المدعومة | جميع الصيغ    |
-| خوادم LSP   | يتم دمج `Claude .lsp.json` و`lspServers` المعلنة في manifest في إعدادات LSP الافتراضية لـ Pi المضمنة  | Claude         |
-| الإعدادات      | يتم استيراد `Claude settings.json` كإعدادات Pi مضمنة افتراضية                                     | Claude         |
+| محتوى Skills | تُحمّل جذور Skills في الحزمة كجذور Skills عادية في OpenClaw | جميع الصيغ |
+| الأوامر | يُتعامل مع `commands/` و`.cursor/commands/` على أنها جذور Skills | Claude, Cursor |
+| حِزم Hooks | تخطيطات `HOOK.md` + `handler.ts` بأسلوب OpenClaw | Codex |
+| أدوات MCP | يُدمج تكوين MCP الخاص بالحزمة في إعدادات Pi المضمّن؛ وتُحمّل خوادم stdio وHTTP المدعومة | جميع الصيغ |
+| خوادم LSP | يتم دمج `.lsp.json` من Claude و`lspServers` المعلنة في manifest في إعدادات LSP الافتراضية لـ Pi المضمّن | Claude |
+| الإعدادات | يتم استيراد `settings.json` من Claude كإعدادات افتراضية لـ Pi المضمّن | Claude |
 
 #### محتوى Skills
 
-- يتم تحميل جذور Skills الخاصة بالحزمة كجذور Skills عادية في OpenClaw
-- يتم التعامل مع جذور `commands` الخاصة بـ Claude على أنها جذور Skills إضافية
-- يتم التعامل مع جذور `.cursor/commands` الخاصة بـ Cursor على أنها جذور Skills إضافية
+- تُحمّل جذور Skills في الحزمة كجذور Skills عادية في OpenClaw
+- تُعامل جذور `commands` في Claude على أنها جذور Skills إضافية
+- تُعامل جذور `.cursor/commands` في Cursor على أنها جذور Skills إضافية
 
-وهذا يعني أن ملفات أوامر Claude المكتوبة بـ Markdown تعمل عبر محمّل Skills العادي في OpenClaw.
-كما تعمل أوامر Markdown الخاصة بـ Cursor عبر المسار نفسه.
+هذا يعني أن ملفات أوامر Markdown الخاصة بـ Claude تعمل عبر أداة تحميل Skills
+العادية في OpenClaw. وتعمل أوامر Markdown الخاصة بـ Cursor عبر المسار نفسه.
 
-#### حزم Hook
+#### حِزم Hooks
 
-- تعمل جذور hooks الخاصة بالحزمة **فقط** عندما تستخدم تخطيط
-  حزم hooks العادي في OpenClaw. واليوم تكون هذه الحالة أساسًا متوافقة مع Codex:
+- تعمل جذور hooks في الحزمة **فقط** عندما تستخدم تخطيط حزمة hooks العادي
+  في OpenClaw. واليوم هذه هي الحالة المتوافقة أساسًا مع Codex:
   - `HOOK.md`
   - `handler.ts` أو `handler.js`
 
 #### MCP لـ Pi
 
-- يمكن للحزم المفعّلة أن تساهم في تكوين خادم MCP
-- يدمج OpenClaw تكوين MCP الخاص بالحزمة في إعدادات Pi المضمنة الفعلية على شكل
+- يمكن للحِزم المفعلة أن تساهم في تكوين خادم MCP
+- يدمج OpenClaw تكوين MCP الخاص بالحزمة في إعدادات Pi المضمّن الفعالة على شكل
   `mcpServers`
-- يكشف OpenClaw أدوات MCP المدعومة الخاصة بالحزمة أثناء أدوار الوكيل Pi المضمنة عن طريق
+- يكشف OpenClaw أدوات MCP المدعومة من الحزمة أثناء أدوار وكيل Pi المضمّن عبر
   تشغيل خوادم stdio أو الاتصال بخوادم HTTP
-- تظل إعدادات Pi المحلية الخاصة بالمشروع مطبقة بعد الإعدادات الافتراضية للحزمة، لذا
+- تتضمن ملفات تعريف الأدوات `coding` و`messaging` أدوات MCP الخاصة بالحزمة
+  افتراضيًا؛ استخدم `tools.deny: ["bundle-mcp"]` لتعطيلها لوكيل أو Gateway
+- تظل إعدادات Pi المحلية للمشروع مطبقة بعد إعدادات الحزمة الافتراضية، لذا
   يمكن لإعدادات مساحة العمل تجاوز إدخالات MCP الخاصة بالحزمة عند الحاجة
-- تُرتب فهارس أدوات MCP الخاصة بالحزمة ترتيبًا حتميًا قبل التسجيل، بحيث
-  لا تؤدي تغييرات ترتيب `listTools()` في المصدر إلى إرباك كتل أدوات prompt-cache
+- تُرتب فهارس أدوات MCP الخاصة بالحزمة ترتيبًا حتميًا قبل التسجيل، بحيث لا تؤدي
+  تغييرات ترتيب upstream في `listTools()` إلى اضطراب كتل أدوات prompt-cache
 
 ##### وسائل النقل
 
-يمكن لخوادم MCP استخدام stdio أو HTTP:
+يمكن لخوادم MCP استخدام نقل stdio أو HTTP:
 
 **Stdio** يشغّل عملية فرعية:
 
@@ -136,7 +138,7 @@ x-i18n:
 }
 ```
 
-**HTTP** يتصل بخادم MCP عامل عبر `sse` افتراضيًا، أو `streamable-http` عند الطلب:
+**HTTP** يتصل بخادم MCP قيد التشغيل عبر `sse` افتراضيًا، أو `streamable-http` عند الطلب:
 
 ```json
 {
@@ -156,32 +158,35 @@ x-i18n:
 ```
 
 - يمكن ضبط `transport` على `"streamable-http"` أو `"sse"`؛ وعند حذفه يستخدم OpenClaw القيمة `sse`
-- لا يُسمح إلا بمخططي URL ‏`http:` و`https:`
-- تدعم قيم `headers` الإقحام من نوع `${ENV_VAR}`
+- لا يُسمح إلا بمخططات URL من نوع `http:` و`https:`
+- تدعم قيم `headers` الاستيفاء `${ENV_VAR}`
 - يُرفض إدخال الخادم الذي يحتوي على كل من `command` و`url`
-- يتم حجب بيانات اعتماد URL ‏(userinfo ومعلمات الاستعلام) من أوصاف الأدوات
-  والسجلات
-- يتجاوز `connectionTimeoutMs` المهلة الافتراضية للاتصال البالغة 30 ثانية لكل من
-  وسائل نقل stdio وHTTP
+- تُحجب بيانات اعتماد URL ‏(userinfo ومعلمات الاستعلام) من
+  أوصاف الأدوات والسجلات
+- يتجاوز `connectionTimeoutMs` مهلة الاتصال الافتراضية البالغة 30 ثانية
+  لكل من نقلي stdio وHTTP
 
 ##### تسمية الأدوات
 
-يسجل OpenClaw أدوات MCP الخاصة بالحزمة بأسماء آمنة للمزوّدين بالصيغة
-`serverName__toolName`. فعلى سبيل المثال، إذا كان الخادم بالمفتاح `"vigil-harbor"` يكشف
-أداة `memory_search`، فسيتم تسجيلها باسم `vigil-harbor__memory_search`.
+يسجل OpenClaw أدوات MCP الخاصة بالحزمة بأسماء آمنة للمزود بالصيغة
+`serverName__toolName`. على سبيل المثال، إذا كان الخادم ذو المفتاح `"vigil-harbor"` يوفّر
+الأداة `memory_search` فسيتم تسجيلها باسم `vigil-harbor__memory_search`.
 
-- يتم استبدال الأحرف الخارجة عن `A-Za-z0-9_-` بالرمز `-`
-- تُحد بادئات الخوادم عند 30 حرفًا
+- تُستبدل الأحرف خارج `A-Za-z0-9_-` بـ `-`
+- تُحد البادئات الخاصة بالخادم عند 30 حرفًا
 - تُحد أسماء الأدوات الكاملة عند 64 حرفًا
 - تعود أسماء الخوادم الفارغة إلى `mcp`
-- يتم فض الاشتباك في الأسماء الموحّدة المتصادمة باستخدام لواحق رقمية
-- يكون الترتيب النهائي المكشوف للأدوات حتميًا بحسب الاسم الآمن للحفاظ على ثبات cache في
-  أدوار Pi المتكررة
+- يُزال غموض الأسماء المُنقحة المتصادمة باستخدام لواحق رقمية
+- يكون الترتيب النهائي المكشوف للأدوات حتميًا حسب الاسم الآمن لإبقاء
+  التخزين المؤقت مستقرًا عبر أدوار Pi المتكررة
+- يتعامل ترشيح الملفات التعريفية مع جميع الأدوات من خادم MCP واحد في الحزمة على أنها مملوكة لـ Plugin
+  باسم `bundle-mcp`، لذلك يمكن أن تتضمن قوائم السماح والمنع للملفات التعريفية
+  إما أسماء الأدوات المكشوفة الفردية أو مفتاح Plugin باسم `bundle-mcp`
 
-#### إعدادات Pi المضمنة
+#### إعدادات Pi المضمّن
 
-- يتم استيراد `Claude settings.json` كإعدادات Pi مضمنة افتراضية عندما تكون
-  الحزمة مفعّلة
+- يتم استيراد `settings.json` من Claude كإعدادات افتراضية لـ Pi المضمّن عندما
+  تكون الحزمة مفعلة
 - يقوم OpenClaw بتنقية مفاتيح تجاوز shell قبل تطبيقها
 
 المفاتيح المنقاة:
@@ -189,111 +194,123 @@ x-i18n:
 - `shellPath`
 - `shellCommandPrefix`
 
-#### LSP المضمن لـ Pi
+#### ‏LSP لـ Pi المضمّن
 
-- يمكن لحزم Claude المفعّلة أن تساهم في تكوين خادم LSP
-- يحمّل OpenClaw الملف `.lsp.json` بالإضافة إلى أي مسارات `lspServers` معلنة في manifest
-- يتم دمج تكوين LSP الخاص بالحزمة في إعدادات LSP الافتراضية الفعلية لـ Pi المضمنة
-- لا يمكن تشغيل سوى خوادم LSP المدعومة المعتمدة على stdio اليوم؛ أما وسائل النقل
-  غير المدعومة فما زالت تظهر في `openclaw plugins inspect <id>`
+- يمكن لحِزم Claude المفعلة أن تساهم في تكوين خادم LSP
+- يحمّل OpenClaw ملف `.lsp.json` بالإضافة إلى أي مسارات `lspServers` مُعلنة في manifest
+- يُدمج تكوين LSP الخاص بالحزمة في إعدادات LSP الافتراضية الفعالة لـ Pi المضمّن
+- لا يمكن تشغيل اليوم إلا خوادم LSP المدعومة والمعتمدة على stdio؛ أما وسائل النقل
+  غير المدعومة فتظل تظهر في `openclaw plugins inspect <id>`
 
-### ما يتم اكتشافه لكن لا يتم تنفيذه
+### مكتشف ولكن غير منفذ
 
 يتم التعرف على هذه العناصر وإظهارها في التشخيصات، لكن OpenClaw لا يشغّلها:
 
 - `agents` و`hooks.json` automation و`outputStyles` الخاصة بـ Claude
 - `.cursor/agents` و`.cursor/hooks.json` و`.cursor/rules` الخاصة بـ Cursor
-- بيانات metadata الخاصة بـ Codex inline/app خارج تقارير الإمكانات
+- البيانات الوصفية المضمنة/الخاصة بالتطبيق في Codex خارج نطاق تقارير Capability
 
-## صيغ الحزم
+## صيغ الحِزم
 
 <AccordionGroup>
-  <Accordion title="حزم Codex">
+  <Accordion title="حِزم Codex">
     العلامات: `.codex-plugin/plugin.json`
 
-    المحتوى الاختياري: `skills/`، و`hooks/`، و`.mcp.json`، و`.app.json`
+    المحتوى الاختياري: `skills/` و`hooks/` و`.mcp.json` و`.app.json`
 
-    تتوافق حزم Codex مع OpenClaw بشكل أفضل عندما تستخدم جذور Skills و
-    أدلة حزم hooks بأسلوب OpenClaw (`HOOK.md` + `handler.ts`).
+    تتلاءم حِزم Codex مع OpenClaw بصورة أفضل عندما تستخدم جذور Skills و
+    أدلة حِزم hooks بأسلوب OpenClaw (`HOOK.md` + `handler.ts`).
 
   </Accordion>
 
-  <Accordion title="حزم Claude">
+  <Accordion title="حِزم Claude">
     وضعا اكتشاف:
 
-    - **قائم على Manifest:** ‏`.claude-plugin/plugin.json`
-    - **بلا Manifest:** تخطيط Claude الافتراضي (`skills/`، و`commands/`، و`agents/`، و`hooks/`، و`.mcp.json`، و`.lsp.json`، و`settings.json`)
+    - **معتمدة على Manifest:** `.claude-plugin/plugin.json`
+    - **من دون Manifest:** تخطيط Claude الافتراضي (`skills/` و`commands/` و`agents/` و`hooks/` و`.mcp.json` و`.lsp.json` و`settings.json`)
 
     السلوك الخاص بـ Claude:
 
-    - يتم التعامل مع `commands/` كمحتوى Skills
-    - يتم استيراد `settings.json` إلى إعدادات Pi المضمنة (مع تنقية مفاتيح تجاوز shell)
-    - يكشف `.mcp.json` أدوات stdio المدعومة إلى Pi المضمنة
-    - يتم تحميل `.lsp.json` بالإضافة إلى مسارات `lspServers` المعلنة في manifest إلى إعدادات LSP الافتراضية لـ Pi المضمنة
-    - يتم اكتشاف `hooks/hooks.json` لكن لا يتم تنفيذه
+    - يُتعامل مع `commands/` على أنه محتوى Skills
+    - يتم استيراد `settings.json` إلى إعدادات Pi المضمّن (مع تنقية مفاتيح تجاوز shell)
+    - يكشف `.mcp.json` أدوات stdio المدعومة لـ Pi المضمّن
+    - يُحمَّل `.lsp.json` بالإضافة إلى مسارات `lspServers` المعلنة في manifest إلى إعدادات LSP الافتراضية لـ Pi المضمّن
+    - يتم اكتشاف `hooks/hooks.json` لكنه لا يُنفَّذ
     - تكون مسارات المكونات المخصصة في manifest إضافية (فهي توسّع الإعدادات الافتراضية ولا تستبدلها)
 
   </Accordion>
 
-  <Accordion title="حزم Cursor">
+  <Accordion title="حِزم Cursor">
     العلامات: `.cursor-plugin/plugin.json`
 
-    المحتوى الاختياري: `skills/`، و`.cursor/commands/`، و`.cursor/agents/`، و`.cursor/rules/`، و`.cursor/hooks.json`، و`.mcp.json`
+    المحتوى الاختياري: `skills/` و`.cursor/commands/` و`.cursor/agents/` و`.cursor/rules/` و`.cursor/hooks.json` و`.mcp.json`
 
-    - يتم التعامل مع `.cursor/commands/` كمحتوى Skills
-    - تكون `.cursor/rules/` و`.cursor/agents/` و`.cursor/hooks.json` للاكتشاف فقط
+    - يُتعامل مع `.cursor/commands/` على أنه محتوى Skills
+    - `.cursor/rules/` و`.cursor/agents/` و`.cursor/hooks.json` للاكتشاف فقط
 
   </Accordion>
 </AccordionGroup>
 
 ## أولوية الاكتشاف
 
-يتحقق OpenClaw أولًا من صيغة plugin الأصلية:
+يتحقق OpenClaw من صيغة Plugin الأصلية أولًا:
 
-1. `openclaw.plugin.json` أو `package.json` صالح يحتوي على `openclaw.extensions` — ويُعامل كـ **plugin أصلية**
-2. علامات الحزم (`.codex-plugin/`، أو `.claude-plugin/`، أو التخطيط الافتراضي لـ Claude/Cursor) — وتُعامل كـ **حزمة**
+1. `openclaw.plugin.json` أو `package.json` صالح يحتوي على `openclaw.extensions` — يُتعامل معه كـ **Plugin أصلي**
+2. علامات الحزمة (`.codex-plugin/` أو `.claude-plugin/` أو تخطيط Claude/Cursor الافتراضي) — يُتعامل معها كـ **حزمة**
 
-إذا احتوى الدليل على الاثنين معًا، يستخدم OpenClaw المسار الأصلي. وهذا يمنع
-تثبيت الحزم ثنائية الصيغة جزئيًا كحزم.
+إذا كان الدليل يحتوي على الاثنين معًا، يستخدم OpenClaw المسار الأصلي. وهذا يمنع
+تثبيت الحزم ثنائية الصيغة جزئيًا على أنها حِزم.
+
+## تبعيات بيئة التشغيل والتنظيف
+
+- تُشحن تبعيات بيئة التشغيل الخاصة بالـ Plugin المضمّن داخل حزمة OpenClaw تحت
+  `dist/*`. لا يشغّل OpenClaw الأمر `npm install` عند بدء التشغيل من أجل Plugins
+  المضمّنة؛ إذ تقع على مسار الإصدار مسؤولية شحن حمولة تبعيات
+  كاملة للـ Plugin المضمّن (راجع قاعدة التحقق بعد النشر في
+  [Releasing](/ar/reference/RELEASING)).
+- تتخلص تشغيلات الوكلاء الفرعيين التي تشغّل خوادم MCP المضمّنة من عملاء MCP
+  هؤلاء عبر مسار تنظيف بيئة التشغيل المشترك عند خروج الوكيل الفرعي، بحيث
+  لا تؤدي دورات حياة الوكلاء الفرعيين إلى تسرب عمليات stdio الابنة أو اتصالات
+  MCP الطويلة الأمد عبر الأدوار.
 
 ## الأمان
 
-للحزم حد ثقة أضيق من plugins الأصلية:
+تملك الحِزم حد ثقة أضيق من Plugins الأصلية:
 
-- لا يقوم OpenClaw **بتحميل** وحدات runtime العشوائية الخاصة بالحزم داخل العملية
-- يجب أن تبقى مسارات Skills وحزم hooks داخل جذر plugin (مع التحقق من الحدود)
-- تتم قراءة ملفات الإعدادات باستخدام فحوصات الحدود نفسها
-- يمكن تشغيل خوادم MCP المدعومة من نوع stdio كعمليات فرعية
+- لا يحمّل OpenClaw وحدات بيئة تشغيل عشوائية من الحِزم داخل العملية
+- يجب أن تبقى مسارات Skills وحِزم hook داخل جذر Plugin (مع فحص الحدود)
+- تتم قراءة ملفات الإعدادات بفحوصات الحدود نفسها
+- قد يتم تشغيل خوادم MCP المدعومة والمعتمدة على stdio كعمليات فرعية
 
-وهذا يجعل الحزم أكثر أمانًا افتراضيًا، لكن يجب عليك مع ذلك التعامل مع الحزم الخارجية
-على أنها محتوى موثوق بالنسبة إلى الميزات التي تكشفها.
+وهذا يجعل الحِزم أكثر أمانًا افتراضيًا، لكن ينبغي لك مع ذلك معاملة الحِزم الخارجية
+على أنها محتوى موثوق للميزات التي تكشفها.
 
 ## استكشاف الأخطاء وإصلاحها
 
 <AccordionGroup>
   <Accordion title="يتم اكتشاف الحزمة لكن الإمكانات لا تعمل">
-    شغّل `openclaw plugins inspect <id>`. فإذا كانت الإمكانية مدرجة لكن معلمة على أنها
-    غير موصولة، فهذا حد من حدود المنتج — وليس تثبيتًا معطلاً.
+    شغّل `openclaw plugins inspect <id>`. إذا كانت Capability مدرجة لكن مميزة على
+    أنها غير موصولة، فهذا حدّ في المنتج — وليس تثبيتًا معطّلًا.
   </Accordion>
 
   <Accordion title="ملفات أوامر Claude لا تظهر">
-    تأكد من أن الحزمة مفعّلة وأن ملفات Markdown موجودة داخل جذر
-    `commands/` أو `skills/` المكتشف.
+    تأكد من أن الحزمة مفعلة وأن ملفات Markdown موجودة داخل جذر
+    `commands/` أو `skills/` تم اكتشافه.
   </Accordion>
 
-  <Accordion title="إعدادات Claude لا تُطبَّق">
-    لا يتم دعم سوى إعدادات Pi المضمنة من `settings.json`. ولا يتعامل OpenClaw
-    مع إعدادات الحزمة على أنها تصحيحات raw config.
+  <Accordion title="إعدادات Claude لا تُطبّق">
+    لا يُدعم إلا إعدادات Pi المضمّن القادمة من `settings.json`. ولا يتعامل OpenClaw
+    مع إعدادات الحزمة على أنها ترقيعات تكوين خام.
   </Accordion>
 
-  <Accordion title="Hooks الخاصة بـ Claude لا تُنفَّذ">
-    يكون `hooks/hooks.json` للاكتشاف فقط. وإذا كنت تحتاج إلى hooks قابلة للتشغيل، فاستخدم
-    تخطيط حزم hooks في OpenClaw أو اشحن plugin أصلية.
+  <Accordion title="لا يتم تنفيذ hooks الخاصة بـ Claude">
+    `hooks/hooks.json` للاكتشاف فقط. إذا كنت تحتاج إلى hooks قابلة للتشغيل، فاستخدم
+    تخطيط حزمة hooks في OpenClaw أو اشحن Plugin أصليًا.
   </Accordion>
 </AccordionGroup>
 
 ## ذو صلة
 
-- [تثبيت plugins وتكوينها](/tools/plugin)
-- [بناء plugins](/plugins/building-plugins) — أنشئ plugin أصلية
-- [Plugin Manifest](/plugins/manifest) — مخطط manifest الأصلي
+- [تثبيت Plugins وتكوينها](/ar/tools/plugin)
+- [بناء Plugins](/ar/plugins/building-plugins) — إنشاء Plugin أصلي
+- [Plugin Manifest](/ar/plugins/manifest) — مخطط manifest الأصلي

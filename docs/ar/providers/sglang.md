@@ -1,14 +1,14 @@
 ---
 read_when:
-    - تريد تشغيل OpenClaw على خادم SGLang محلي
+    - تريد تشغيل OpenClaw مقابل خادم SGLang محلي
     - تريد نقاط نهاية `/v1` متوافقة مع OpenAI مع نماذجك الخاصة
-summary: شغّل OpenClaw مع SGLang (خادم مستضاف ذاتيًا ومتوافق مع OpenAI)
+summary: تشغيل OpenClaw مع SGLang (خادم مستضاف ذاتيًا ومتوافق مع OpenAI)
 title: SGLang
 x-i18n:
-    generated_at: "2026-04-12T23:32:47Z"
+    generated_at: "2026-04-23T07:31:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e0a2e50a499c3d25dcdc3af425fb023c6e3f19ed88f533ecf0eb8a2cb7ec8b0d
+    source_hash: 96f243c6028d9de104c96c8e921e5bec1a685db06b80465617f33fe29d5c472d
     source_path: providers/sglang.md
     workflow: 15
 ---
@@ -16,23 +16,28 @@ x-i18n:
 # SGLang
 
 يمكن لـ SGLang تقديم نماذج مفتوحة المصدر عبر HTTP API **متوافق مع OpenAI**.
-ويمكن لـ OpenClaw الاتصال بـ SGLang باستخدام API ‏`openai-completions`.
+ويمكن لـ OpenClaw الاتصال بـ SGLang باستخدام واجهة `openai-completions` API.
 
-كما يمكن لـ OpenClaw أيضًا **اكتشاف** النماذج المتاحة تلقائيًا من SGLang عندما
-تفعّل ذلك عبر `SGLANG_API_KEY` (أي قيمة تعمل إذا كان خادمك لا يفرض المصادقة)
+كما يمكن لـ OpenClaw أيضًا **اكتشاف النماذج المتاحة تلقائيًا** من SGLang عندما تختار
+ذلك عبر `SGLANG_API_KEY` (أي قيمة تعمل إذا كان خادمك لا يفرض المصادقة)
 ولا تعرّف إدخالًا صريحًا `models.providers.sglang`.
+
+يتعامل OpenClaw مع `sglang` باعتباره provider محليًا متوافقًا مع OpenAI ويدعم
+محاسبة الاستخدام المتدفق، بحيث يمكن تحديث أعداد tokens الخاصة بالحالة/السياق من
+استجابات `stream_options.include_usage`.
 
 ## البدء
 
 <Steps>
-  <Step title="Start SGLang">
-    شغّل SGLang بخادم متوافق مع OpenAI. يجب أن يعرّض Base URL لديك نقاط نهاية
-    `/v1` (مثل `/v1/models` و`/v1/chat/completions`). يعمل SGLang غالبًا على:
+  <Step title="ابدأ SGLang">
+    شغّل SGLang مع خادم متوافق مع OpenAI. يجب أن يكشف base URL لديك
+    نقاط نهاية `/v1` (مثل `/v1/models` و`/v1/chat/completions`). ويعمل SGLang
+    عادةً على:
 
     - `http://127.0.0.1:30000/v1`
 
   </Step>
-  <Step title="Set an API key">
+  <Step title="اضبط مفتاح API">
     تعمل أي قيمة إذا لم تُضبط مصادقة على خادمك:
 
     ```bash
@@ -40,7 +45,7 @@ x-i18n:
     ```
 
   </Step>
-  <Step title="Run onboarding or set a model directly">
+  <Step title="شغّل الإعداد الأولي أو اضبط نموذجًا مباشرة">
     ```bash
     openclaw onboard
     ```
@@ -60,27 +65,27 @@ x-i18n:
   </Step>
 </Steps>
 
-## اكتشاف النموذج (الموفّر الضمني)
+## اكتشاف النموذج (provider ضمني)
 
-عند تعيين `SGLANG_API_KEY` (أو وجود ملف مصادقة) و**عدم** تعريف
-`models.providers.sglang`، سيستعلم OpenClaw عن:
+عندما يكون `SGLANG_API_KEY` مضبوطًا (أو يوجد ملف تعريف مصادقة) و**لا**
+تعرّف `models.providers.sglang`، سيستعلم OpenClaw عن:
 
 - `GET http://127.0.0.1:30000/v1/models`
 
-ثم يحوّل المعرّفات المُعادة إلى إدخالات نماذج.
+ويحوّل المعرّفات المعادة إلى إدخالات نماذج.
 
 <Note>
-إذا عيّنت `models.providers.sglang` بشكل صريح، فسيتم تخطي الاكتشاف التلقائي
+إذا ضبطت `models.providers.sglang` صراحة، فسيتم تخطي الاكتشاف التلقائي
 ويجب عليك تعريف النماذج يدويًا.
 </Note>
 
-## الإعداد الصريح (النماذج اليدوية)
+## التكوين الصريح (نماذج يدوية)
 
-استخدم الإعداد الصريح عندما:
+استخدم التكوين الصريح عندما:
 
 - يعمل SGLang على مضيف/منفذ مختلف.
 - تريد تثبيت قيم `contextWindow`/`maxTokens`.
-- يتطلب خادمك مفتاح API حقيقيًا (أو تريد التحكم في الترويسات).
+- يتطلب خادمك مفتاح API حقيقيًا (أو تريد التحكم في الرؤوس).
 
 ```json5
 {
@@ -107,26 +112,26 @@ x-i18n:
 }
 ```
 
-## إعداد متقدم
+## التكوين المتقدم
 
 <AccordionGroup>
-  <Accordion title="Proxy-style behavior">
-    يُعامل SGLang على أنه واجهة خلفية `/v1` متوافقة مع OpenAI بأسلوب الوكيل،
-    وليس نقطة نهاية OpenAI أصلية.
+  <Accordion title="سلوك بنمط Proxy">
+    يُعامل SGLang على أنه backend متوافق مع OpenAI `/v1` بنمط proxy، وليس
+    نقطة نهاية OpenAI أصلية.
 
     | السلوك | SGLang |
-    |--------|--------|
-    | تشكيل الطلبات الخاص بـ OpenAI فقط | لا يُطبّق |
-    | `service_tier` و`store` الخاص بـ Responses وتلميحات ذاكرة التخزين المؤقت للمطالبات | لا تُرسل |
-    | تشكيل الحمولة المتوافق مع الاستدلال | لا يُطبّق |
-    | ترويسات الإسناد المخفية (`originator` و`version` و`User-Agent`) | لا تُحقن على عناوين Base URL المخصصة لـ SGLang |
+    |----------|--------|
+    | تشكيل الطلبات الخاص بـ OpenAI فقط | غير مطبق |
+    | `service_tier` و`store` الخاص بـ Responses وتلميحات prompt-cache | لا تُرسل |
+    | تشكيل حمولة reasoning-compat | غير مطبق |
+    | رؤوس الإسناد المخفية (`originator` و`version` و`User-Agent`) | لا تُحقن على عناوين base URL المخصصة لـ SGLang |
 
   </Accordion>
 
-  <Accordion title="Troubleshooting">
-    **الخادم غير قابل للوصول**
+  <Accordion title="استكشاف الأخطاء وإصلاحها">
+    **لا يمكن الوصول إلى الخادم**
 
-    تحقّق من أن الخادم قيد التشغيل ويستجيب:
+    تحقّق من أن الخادم يعمل ويستجيب:
 
     ```bash
     curl http://127.0.0.1:30000/v1/models
@@ -134,12 +139,13 @@ x-i18n:
 
     **أخطاء المصادقة**
 
-    إذا فشلت الطلبات بسبب أخطاء مصادقة، فعيّن `SGLANG_API_KEY` حقيقيًا يطابق
-    إعداد خادمك، أو اضبط الموفّر صراحةً تحت `models.providers.sglang`.
+    إذا فشلت الطلبات بأخطاء مصادقة، فاضبط `SGLANG_API_KEY` حقيقيًا يطابق
+    تكوين خادمك، أو اضبط provider صراحة تحت
+    `models.providers.sglang`.
 
     <Tip>
-    إذا كنت تشغّل SGLang من دون مصادقة، فتكفي أي قيمة غير فارغة لـ
-    `SGLANG_API_KEY` لتفعيل اكتشاف النماذج.
+    إذا كنت تشغّل SGLang من دون مصادقة، فإن أي قيمة غير فارغة لـ
+    `SGLANG_API_KEY` تكفي للاشتراك في اكتشاف النماذج.
     </Tip>
 
   </Accordion>
@@ -148,10 +154,10 @@ x-i18n:
 ## ذو صلة
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/ar/concepts/model-providers" icon="layers">
-    اختيار الموفّرات، ومراجع النماذج، وسلوك التبديل الاحتياطي.
+  <Card title="اختيار النموذج" href="/ar/concepts/model-providers" icon="layers">
+    اختيار موفري الخدمة، ومراجع النماذج، وسلوك تجاوز الفشل.
   </Card>
-  <Card title="Configuration reference" href="/ar/gateway/configuration-reference" icon="gear">
-    مخطط الإعداد الكامل، بما في ذلك إدخالات الموفّرين.
+  <Card title="مرجع التكوين" href="/ar/gateway/configuration-reference" icon="gear">
+    مخطط التكوين الكامل بما في ذلك إدخالات provider.
   </Card>
 </CardGroup>

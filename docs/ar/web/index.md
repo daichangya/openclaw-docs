@@ -1,42 +1,42 @@
 ---
 read_when:
     - تريد الوصول إلى Gateway عبر Tailscale
-    - تريد واجهة Control UI في المتصفح وتحرير التهيئة
-summary: 'واجهات الويب الخاصة بـ Gateway: واجهة Control UI، وأوضاع الربط، والأمان'
+    - تريد Control UI في المتصفح وتحرير الإعدادات
+summary: 'أسطح الويب الخاصة بـ Gateway: ‏Control UI، وأوضاع bind، والأمان'
 title: الويب
 x-i18n:
-    generated_at: "2026-04-05T13:00:50Z"
+    generated_at: "2026-04-23T07:35:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 15f5643283f7d37235d3d8104897f38db27ac5a9fdef6165156fb542d0e7048c
+    source_hash: cf1a173143782557ecd2e79b28694308709dc945700a509148856255d5cef773
     source_path: web/index.md
     workflow: 15
 ---
 
 # الويب (Gateway)
 
-يقدّم Gateway **واجهة Control UI صغيرة في المتصفح** (Vite + Lit) من المنفذ نفسه الذي يستخدمه WebSocket الخاص بـ Gateway:
+تخدم Gateway **Control UI** صغيرة للمتصفح (Vite + Lit) من المنفذ نفسه الذي تستخدمه Gateway WebSocket:
 
 - الافتراضي: `http://<host>:18789/`
-- بادئة اختيارية: عيّن `gateway.controlUi.basePath` (مثل `/openclaw`)
+- بادئة اختيارية: اضبط `gateway.controlUi.basePath` (مثل `/openclaw`)
 
-توجد الإمكانات في [Control UI](/web/control-ui).
-تركّز هذه الصفحة على أوضاع الربط، والأمان، والواجهات المواجهة للويب.
+توجد القدرات في [Control UI](/ar/web/control-ui).
+تركّز هذه الصفحة على أوضاع bind، والأمان، والأسطح المواجهة للويب.
 
 ## Webhooks
 
-عندما تكون `hooks.enabled=true`، يكشف Gateway أيضًا عن نقطة نهاية webhook صغيرة على خادم HTTP نفسه.
-راجع [تهيئة Gateway](/ar/gateway/configuration) ← `hooks` للحصول على تفاصيل المصادقة + الحمولات.
+عندما تكون `hooks.enabled=true`, تعرض Gateway أيضًا نقطة نهاية Webhook صغيرة على خادم HTTP نفسه.
+راجع [تهيئة Gateway](/ar/gateway/configuration) ← `hooks` للمصادقة + الحمولات.
 
-## التهيئة (مفعّلة افتراضيًا)
+## الإعدادات (مفعّلة افتراضيًا)
 
-تكون **Control UI مفعّلة افتراضيًا** عند وجود الأصول (`dist/control-ui`).
-يمكنك التحكم فيها عبر التهيئة:
+تكون Control UI **مفعّلة افتراضيًا** عندما تكون الأصول موجودة (`dist/control-ui`).
+يمكنك التحكم بها عبر الإعدادات:
 
 ```json5
 {
   gateway: {
-    controlUi: { enabled: true, basePath: "/openclaw" }, // basePath optional
+    controlUi: { enabled: true, basePath: "/openclaw" }, // basePath اختيارية
   },
 }
 ```
@@ -45,7 +45,7 @@ x-i18n:
 
 ### Serve المدمج (موصى به)
 
-أبقِ Gateway على local loopback ودع Tailscale Serve يمرّره كوكيل:
+أبقِ Gateway على loopback ودع Tailscale Serve تمررها عبر proxy:
 
 ```json5
 {
@@ -56,7 +56,7 @@ x-i18n:
 }
 ```
 
-ثم ابدأ gateway:
+ثم ابدأ تشغيل gateway:
 
 ```bash
 openclaw gateway
@@ -64,9 +64,9 @@ openclaw gateway
 
 افتح:
 
-- `https://<magicdns>/` (أو قيمة `gateway.controlUi.basePath` التي هيأتها)
+- `https://<magicdns>/` (أو `gateway.controlUi.basePath` المضبوطة لديك)
 
-### الربط مع tailnet + token
+### bind على Tailnet + token
 
 ```json5
 {
@@ -78,8 +78,8 @@ openclaw gateway
 }
 ```
 
-ثم ابدأ gateway (يستخدم هذا المثال غير المعتمد على local loopback
-مصادقة token بالسر المشترك):
+ثم ابدأ تشغيل gateway (هذا المثال غير loopback يستخدم
+مصادقة token بسر مشترك):
 
 ```bash
 openclaw gateway
@@ -87,7 +87,7 @@ openclaw gateway
 
 افتح:
 
-- `http://<tailscale-ip>:18789/` (أو قيمة `gateway.controlUi.basePath` التي هيأتها)
+- `http://<tailscale-ip>:18789/` (أو `gateway.controlUi.basePath` المضبوطة لديك)
 
 ### الإنترنت العام (Funnel)
 
@@ -96,38 +96,38 @@ openclaw gateway
   gateway: {
     bind: "loopback",
     tailscale: { mode: "funnel" },
-    auth: { mode: "password" }, // or OPENCLAW_GATEWAY_PASSWORD
+    auth: { mode: "password" }, // أو OPENCLAW_GATEWAY_PASSWORD
   },
 }
 ```
 
-## ملاحظات الأمان
+## ملاحظات أمنية
 
-- تكون مصادقة Gateway مطلوبة افتراضيًا (token، أو password، أو trusted-proxy، أو رؤوس هوية Tailscale Serve عند تمكينها).
-- لا تزال عمليات الربط غير المعتمدة على local loopback **تتطلب** مصادقة gateway. عمليًا، يعني ذلك مصادقة token/password أو reverse proxy مدركًا للهوية مع `gateway.auth.mode: "trusted-proxy"`.
-- ينشئ المعالج مصادقة بالسر المشترك افتراضيًا، وعادةً ما يولّد
-  token خاصًا بـ gateway (حتى على local loopback).
-- في وضع السر المشترك، ترسل الواجهة `connect.params.auth.token` أو
+- تكون مصادقة Gateway مطلوبة افتراضيًا (token، أو password، أو trusted-proxy، أو رؤوس هوية Tailscale Serve عند تفعيلها).
+- ما تزال عمليات bind غير loopback **تتطلب** مصادقة gateway. وعمليًا، يعني هذا مصادقة token/password أو reverse proxy مدركًا للهوية مع `gateway.auth.mode: "trusted-proxy"`.
+- ينشئ المعالج مصادقة بسر مشترك افتراضيًا ويولّد عادةً
+  token للـ gateway (حتى على loopback).
+- في وضع السر المشترك، ترسل UI القيمة `connect.params.auth.token` أو
   `connect.params.auth.password`.
-- في الأوضاع الحاملة للهوية مثل Tailscale Serve أو `trusted-proxy`، يتم
+- أما في الأوضاع الحاملة للهوية مثل Tailscale Serve أو `trusted-proxy`, فيتم
   استيفاء فحص مصادقة WebSocket من رؤوس الطلب بدلًا من ذلك.
-- بالنسبة إلى عمليات نشر Control UI غير المعتمدة على local loopback، عيّن `gateway.controlUi.allowedOrigins`
-  صراحةً (كأصول كاملة). وبدون ذلك، يُرفض بدء تشغيل gateway افتراضيًا.
+- بالنسبة إلى عمليات نشر Control UI غير loopback، اضبط `gateway.controlUi.allowedOrigins`
+  صراحةً (الأصول الكاملة). ومن دون ذلك، يُرفض بدء تشغيل gateway افتراضيًا.
 - يفعّل `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true`
-  وضع الرجوع إلى أصل Host-header، لكنه يُعد خفضًا خطيرًا في مستوى الأمان.
+  وضع fallback لأصل Host-header، لكنه خفض أمني خطير.
 - مع Serve، يمكن لرؤوس هوية Tailscale استيفاء مصادقة Control UI/WebSocket
-  عندما تكون `gateway.auth.allowTailscale` مساوية لـ `true` (ولا حاجة إلى token/password).
+  عندما تكون `gateway.auth.allowTailscale` بقيمة `true` (من دون الحاجة إلى token/password).
   أما نقاط نهاية HTTP API فلا تستخدم رؤوس هوية Tailscale تلك؛ بل تتبع
-  وضع مصادقة HTTP العادي الخاص بـ gateway بدلًا من ذلك. عيّن
+  وضع مصادقة HTTP العادي في gateway بدلًا من ذلك. اضبط
   `gateway.auth.allowTailscale: false` لفرض بيانات اعتماد صريحة. راجع
-  [Tailscale](/ar/gateway/tailscale) و[الأمان](/ar/gateway/security). يفترض
-  هذا التدفق من دون token أن مضيف gateway موثوق.
+  [Tailscale](/ar/gateway/tailscale) و[الأمان](/ar/gateway/security). ويفترض هذا
+  التدفق بدون token أن مضيف gateway موثوق.
 - تتطلب `gateway.tailscale.mode: "funnel"` القيمة `gateway.auth.mode: "password"` (كلمة مرور مشتركة).
 
-## بناء الواجهة
+## بناء UI
 
-يقدّم Gateway الملفات الثابتة من `dist/control-ui`. ابنِها باستخدام:
+تخدم Gateway ملفات ثابتة من `dist/control-ui`. ابنِها باستخدام:
 
 ```bash
-pnpm ui:build # auto-installs UI deps on first run
+pnpm ui:build
 ```

@@ -1,27 +1,27 @@
 ---
 read_when:
-    - تريد اختيار موفّر نموذج
+    - تريد اختيار مزوّد نماذج
     - تريد أمثلة إعداد سريعة لمصادقة LLM + اختيار النموذج
-summary: موفّرات النماذج (LLMs) التي يدعمها OpenClaw
-title: البدء السريع لموفّر النموذج
+summary: مزوّدو النماذج (LLMs) المدعومون في OpenClaw
+title: دليل البدء السريع لمزوّد النماذج
 x-i18n:
-    generated_at: "2026-04-08T02:18:28Z"
+    generated_at: "2026-04-23T07:31:35Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 59ee4c2f993fe0ae05fe34f52bc6f3e0fc9a76b10760f56b20ad251e25ee9f20
+    source_hash: 9b002903bd0a1872e77d871f283ae426c74356936c5776c710711d7328427fca
     source_path: providers/models.md
     workflow: 15
 ---
 
-# موفّرات النماذج
+# مزوّدو النماذج
 
-يمكن لـ OpenClaw استخدام العديد من موفّرات LLM. اختر واحدًا، وقم بالمصادقة، ثم عيّن
-النموذج الافتراضي بصيغة `provider/model`.
+يمكن لـ OpenClaw استخدام العديد من مزوّدي LLM. اختر واحدًا، ثم نفّذ المصادقة،
+ثم اضبط النموذج الافتراضي بصيغة `provider/model`.
 
 ## البدء السريع (خطوتان)
 
-1. قم بالمصادقة مع الموفّر (عادةً عبر `openclaw onboard`).
-2. عيّن النموذج الافتراضي:
+1. نفّذ المصادقة مع المزوّد (عادةً عبر `openclaw onboard`).
+2. اضبط النموذج الافتراضي:
 
 ```json5
 {
@@ -29,23 +29,23 @@ x-i18n:
 }
 ```
 
-## الموفّرون المدعومون (مجموعة البداية)
+## المزوّدون المدعومون (مجموعة البداية)
 
 - [Alibaba Model Studio](/ar/providers/alibaba)
-- [Anthropic (API + Claude CLI)](/ar/providers/anthropic)
 - [Amazon Bedrock](/ar/providers/bedrock)
-- [BytePlus (International)](/ar/concepts/model-providers#byteplus-international)
+- [Anthropic ‏(API + Claude CLI)](/ar/providers/anthropic)
+- [BytePlus ‏(International)](/ar/concepts/model-providers#byteplus-international)
 - [Chutes](/ar/providers/chutes)
 - [ComfyUI](/ar/providers/comfy)
 - [Cloudflare AI Gateway](/ar/providers/cloudflare-ai-gateway)
 - [fal](/ar/providers/fal)
 - [Fireworks](/ar/providers/fireworks)
-- [GLM models](/ar/providers/glm)
+- [نماذج GLM](/ar/providers/glm)
 - [MiniMax](/ar/providers/minimax)
 - [Mistral](/ar/providers/mistral)
-- [Moonshot AI (Kimi + Kimi Coding)](/ar/providers/moonshot)
-- [OpenAI (API + Codex)](/ar/providers/openai)
-- [OpenCode (Zen + Go)](/ar/providers/opencode)
+- [Moonshot AI ‏(Kimi + Kimi Coding)](/ar/providers/moonshot)
+- [OpenAI ‏(API + Codex)](/ar/providers/openai)
+- [OpenCode ‏(Zen + Go)](/ar/providers/opencode)
 - [OpenRouter](/ar/providers/openrouter)
 - [Qianfan](/ar/providers/qianfan)
 - [Qwen](/ar/providers/qwen)
@@ -53,15 +53,15 @@ x-i18n:
 - [StepFun](/ar/providers/stepfun)
 - [Synthetic](/ar/providers/synthetic)
 - [Vercel AI Gateway](/ar/providers/vercel-ai-gateway)
-- [Venice (Venice AI)](/ar/providers/venice)
+- [Venice ‏(Venice AI)](/ar/providers/venice)
 - [xAI](/ar/providers/xai)
 - [Z.AI](/ar/providers/zai)
 
-## متغيرات موفّرات إضافية مضمّنة
+## متغيرات المزوّدين المضمّنة الإضافية
 
-- `anthropic-vertex` - دعم Anthropic ضمني على Google Vertex عند توفر بيانات اعتماد Vertex؛ لا يوجد خيار مصادقة منفصل أثناء الإعداد الأولي
-- `copilot-proxy` - جسر Copilot Proxy محلي لـ VS Code؛ استخدم `openclaw onboard --auth-choice copilot-proxy`
-- `google-gemini-cli` - تدفق OAuth غير رسمي لـ Gemini CLI؛ يتطلب تثبيت `gemini` محليًا (`brew install gemini-cli` أو `npm install -g @google/gemini-cli`)؛ النموذج الافتراضي هو `google-gemini-cli/gemini-3-flash-preview`؛ استخدم `openclaw onboard --auth-choice google-gemini-cli` أو `openclaw models auth login --provider google-gemini-cli --set-default`
+- `anthropic-vertex` - دعم Anthropic الضمني على Google Vertex عندما تكون بيانات اعتماد Vertex متاحة؛ ولا يوجد خيار مصادقة منفصل في الإعداد الأوّلي
+- `copilot-proxy` - جسر محلي لـ VS Code Copilot Proxy؛ استخدم `openclaw onboard --auth-choice copilot-proxy`
+- `google-gemini-cli` - تدفق OAuth غير رسمي لـ Gemini CLI؛ ويتطلب تثبيت `gemini` محليًا (`brew install gemini-cli` أو `npm install -g @google/gemini-cli`)؛ والنموذج الافتراضي هو `google-gemini-cli/gemini-3-flash-preview`؛ استخدم `openclaw onboard --auth-choice google-gemini-cli` أو `openclaw models auth login --provider google-gemini-cli --set-default`
 
-للاطلاع على كتالوج الموفّرات الكامل (xAI وGroq وMistral وغيرها) والتكوين المتقدم،
-راجع [موفّرات النماذج](/ar/concepts/model-providers).
+للاطلاع على كتالوج المزوّدين الكامل (xAI وGroq وMistral وغيرها) والإعداد المتقدم،
+راجع [مزوّدو النماذج](/ar/concepts/model-providers).

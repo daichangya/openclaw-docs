@@ -1,155 +1,156 @@
 ---
 read_when:
-    - البحث عن خطوة أو علامة إعداد أولي محددة
+    - البحث عن خطوة أو علامة محددة في الإعداد الأولي
     - أتمتة الإعداد الأولي باستخدام الوضع غير التفاعلي
-    - تصحيح سلوك الإعداد الأولي
+    - 'تصحيح سلوك الإعداد الأولي +#+#+#+#+#+analysis to=none code  盈立 monologue  more reasoning: We need translate. Final only translated text. Let''s do concise faithful.'
 sidebarTitle: Onboarding Reference
-summary: 'المرجع الكامل لإعداد CLI: كل خطوة وعلامة وحقل إعدادات'
+summary: 'المرجع الكامل للإعداد الأولي عبر CLI: كل خطوة، وعلامة، وحقل إعدادات'
 title: مرجع الإعداد الأولي
 x-i18n:
-    generated_at: "2026-04-15T14:41:16Z"
+    generated_at: "2026-04-23T07:32:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1db3ff789422617634e6624f9d12c18b6a6c573721226b9c0fa6f6b7956ef33d
+    source_hash: 51405f5d9ba3d9553662fd0a03254a709d5eb4b27339c5edfe1da1111629d0dd
     source_path: reference/wizard.md
     workflow: 15
 ---
 
 # مرجع الإعداد الأولي
 
-هذا هو المرجع الكامل لـ `openclaw onboard`.
-للاطلاع على نظرة عامة عالية المستوى، راجع [الإعداد الأولي (CLI)](/ar/start/wizard).
+هذا هو المرجع الكامل للأمر `openclaw onboard`.
+وللحصول على نظرة عامة عالية المستوى، راجع [الإعداد الأولي (CLI)](/ar/start/wizard).
 
 ## تفاصيل التدفق (الوضع المحلي)
 
 <Steps>
-  <Step title="اكتشاف الإعدادات الحالية">
-    - إذا كان `~/.openclaw/openclaw.json` موجودًا، فاختر **الاحتفاظ / التعديل / إعادة التعيين**.
-    - لا تؤدي إعادة تشغيل الإعداد الأولي إلى مسح أي شيء **إلا** إذا اخترت صراحةً **إعادة التعيين**
-      (أو مرّرت `--reset`).
-    - يضبط CLI الخيار `--reset` افتراضيًا على `config+creds+sessions`؛ استخدم `--reset-scope full`
+  <Step title="اكتشاف الإعدادات الموجودة">
+    - إذا كان `~/.openclaw/openclaw.json` موجودًا، فاختر **Keep / Modify / Reset**.
+    - إن إعادة تشغيل الإعداد الأولي **لا** تمحو أي شيء ما لم تختر صراحةً **Reset**
+      (أو تمرر `--reset`).
+    - تكون القيمة الافتراضية لـ CLI `--reset` هي `config+creds+sessions`; واستخدم `--reset-scope full`
       لإزالة مساحة العمل أيضًا.
     - إذا كانت الإعدادات غير صالحة أو تحتوي على مفاتيح قديمة، يتوقف المعالج ويطلب
       منك تشغيل `openclaw doctor` قبل المتابعة.
-    - تستخدم إعادة التعيين `trash` (وليس `rm` مطلقًا) وتوفّر النطاقات التالية:
+    - يستخدم Reset الأمر `trash` (وليس `rm` أبدًا) ويعرض النطاقات التالية:
       - الإعدادات فقط
       - الإعدادات + بيانات الاعتماد + الجلسات
       - إعادة تعيين كاملة (تزيل مساحة العمل أيضًا)
   </Step>
-  <Step title="النموذج/المصادقة">
-    - **مفتاح Anthropic API**: يستخدم `ANTHROPIC_API_KEY` إذا كان موجودًا أو يطلب مفتاحًا، ثم يحفظه لاستخدامه من قبل الخدمة الخلفية.
-    - **مفتاح Anthropic API**: هو خيار مساعد Anthropic المفضّل في الإعداد الأولي/الضبط.
-    - **رمز إعداد Anthropic**: لا يزال متاحًا في الإعداد الأولي/الضبط، رغم أن OpenClaw يفضّل الآن إعادة استخدام Claude CLI عند توفره.
-    - **اشتراك OpenAI Code (Codex) (Codex CLI)**: إذا كان `~/.codex/auth.json` موجودًا، يمكن للإعداد الأولي إعادة استخدامه. تظل بيانات اعتماد Codex CLI المعاد استخدامها مُدارة بواسطة Codex CLI؛ وعند انتهاء صلاحيتها يعيد OpenClaw قراءة هذا المصدر أولًا، وعندما يكون المزوّد قادرًا على تحديثها، يكتب بيانات الاعتماد المحدّثة مرة أخرى إلى مخزن Codex بدلًا من تولي إدارتها بنفسه.
-    - **اشتراك OpenAI Code (Codex) (OAuth)**: تدفق عبر المتصفح؛ الصق `code#state`.
-      - يضبط `agents.defaults.model` على `openai-codex/gpt-5.4` عندما يكون النموذج غير مضبوط أو `openai/*`.
-    - **مفتاح OpenAI API**: يستخدم `OPENAI_API_KEY` إذا كان موجودًا أو يطلب مفتاحًا، ثم يخزّنه في ملفات تعريف المصادقة.
-      - يضبط `agents.defaults.model` على `openai/gpt-5.4` عندما يكون النموذج غير مضبوط، أو `openai/*`، أو `openai-codex/*`.
-    - **مفتاح xAI (Grok) API**: يطلب `XAI_API_KEY` ويضبط xAI كمزوّد نماذج.
-    - **OpenCode**: يطلب `OPENCODE_API_KEY` (أو `OPENCODE_ZEN_API_KEY`، احصل عليه من https://opencode.ai/auth) ويتيح لك اختيار فهرس Zen أو Go.
-    - **Ollama**: يوفّر أولًا الخيارات **Cloud + Local** أو **Cloud only** أو **Local only**. يطلب `Cloud only` قيمة `OLLAMA_API_KEY` ويستخدم `https://ollama.com`؛ أما الأوضاع المعتمدة على المضيف فتطلب عنوان URL الأساسي لـ Ollama، وتكتشف النماذج المتاحة، وتسحب النموذج المحلي المحدد تلقائيًا عند الحاجة؛ كما يتحقق `Cloud + Local` أيضًا مما إذا كان مضيف Ollama هذا قد سجّل الدخول للوصول السحابي.
+  <Step title="Model/Auth">
+    - **Anthropic API key**: يستخدم `ANTHROPIC_API_KEY` إذا كان موجودًا أو يطلب مفتاحًا، ثم يحفظه لاستخدام daemon.
+    - **Anthropic API key**: الخيار المفضل لمساعد Anthropic في onboarding/configure.
+    - **Anthropic setup-token**: ما يزال متاحًا في onboarding/configure، رغم أن OpenClaw يفضل الآن إعادة استخدام Claude CLI عند توفره.
+    - **OpenAI Code (Codex) subscription (OAuth)**: تدفق متصفح؛ الصق `code#state`.
+      - يضبط `agents.defaults.model` إلى `openai-codex/gpt-5.4` عندما يكون النموذج غير مضبوط أو `openai/*`.
+    - **OpenAI Code (Codex) subscription (device pairing)**: تدفق اقتران عبر المتصفح مع رمز جهاز قصير العمر.
+      - يضبط `agents.defaults.model` إلى `openai-codex/gpt-5.4` عندما يكون النموذج غير مضبوط أو `openai/*`.
+    - **OpenAI API key**: يستخدم `OPENAI_API_KEY` إذا كان موجودًا أو يطلب مفتاحًا، ثم يخزنه في ملفات تعريف المصادقة.
+      - يضبط `agents.defaults.model` إلى `openai/gpt-5.4` عندما يكون النموذج غير مضبوط، أو `openai/*`، أو `openai-codex/*`.
+    - **xAI (Grok) API key**: يطلب `XAI_API_KEY` ويهيئ xAI كمزوّد نماذج.
+    - **OpenCode**: يطلب `OPENCODE_API_KEY` (أو `OPENCODE_ZEN_API_KEY`، احصل عليه من https://opencode.ai/auth) ويتيح لك اختيار كتالوج Zen أو Go.
+    - **Ollama**: يعرض أولًا **Cloud + Local**، أو **Cloud only**، أو **Local only**. يطلب `Cloud only` القيمة `OLLAMA_API_KEY` ويستخدم `https://ollama.com`; أما الأوضاع المعتمدة على المضيف فتطلب عنوان URL الأساسي لـ Ollama، وتكتشف النماذج المتاحة، وتنفذ سحبًا تلقائيًا للنموذج المحلي المحدد عند الحاجة؛ كما يتحقق `Cloud + Local` أيضًا مما إذا كان مضيف Ollama هذا مسجّل الدخول للوصول السحابي.
     - مزيد من التفاصيل: [Ollama](/ar/providers/ollama)
-    - **مفتاح API**: يخزن المفتاح لك.
-    - **Vercel AI Gateway (وكيل متعدد النماذج)**: يطلب `AI_GATEWAY_API_KEY`.
+    - **API key**: يخزّن المفتاح لك.
+    - **Vercel AI Gateway (multi-model proxy)**: يطلب `AI_GATEWAY_API_KEY`.
     - مزيد من التفاصيل: [Vercel AI Gateway](/ar/providers/vercel-ai-gateway)
-    - **Cloudflare AI Gateway**: يطلب معرّف الحساب، ومعرّف Gateway، و`CLOUDFLARE_AI_GATEWAY_API_KEY`.
+    - **Cloudflare AI Gateway**: يطلب Account ID وGateway ID و`CLOUDFLARE_AI_GATEWAY_API_KEY`.
     - مزيد من التفاصيل: [Cloudflare AI Gateway](/ar/providers/cloudflare-ai-gateway)
-    - **MiniMax**: تُكتب الإعدادات تلقائيًا؛ والإعداد المستضاف الافتراضي هو `MiniMax-M2.7`.
-      يستخدم إعداد مفتاح API `minimax/...`، ويستخدم إعداد OAuth
-      `minimax-portal/...`.
+    - **MiniMax**: تُكتب الإعدادات تلقائيًا؛ والافتراضي المستضاف هو `MiniMax-M2.7`.
+      يستخدم إعداد مفتاح API الصيغة `minimax/...`, ويستخدم إعداد OAuth
+      الصيغة `minimax-portal/...`.
     - مزيد من التفاصيل: [MiniMax](/ar/providers/minimax)
-    - **StepFun**: تُكتب الإعدادات تلقائيًا لـ StepFun standard أو Step Plan على نقاط النهاية في الصين أو العالمية.
-    - يتضمن Standard حاليًا `step-3.5-flash`، كما يتضمن Step Plan أيضًا `step-3.5-flash-2603`.
+    - **StepFun**: تُكتب الإعدادات تلقائيًا لـ StepFun standard أو Step Plan على نقاط نهاية الصين أو العالمية.
+    - يتضمن Standard حاليًا `step-3.5-flash`, كما يتضمن Step Plan أيضًا `step-3.5-flash-2603`.
     - مزيد من التفاصيل: [StepFun](/ar/providers/stepfun)
-    - **Synthetic (متوافق مع Anthropic)**: يطلب `SYNTHETIC_API_KEY`.
+    - **Synthetic (Anthropic-compatible)**: يطلب `SYNTHETIC_API_KEY`.
     - مزيد من التفاصيل: [Synthetic](/ar/providers/synthetic)
     - **Moonshot (Kimi K2)**: تُكتب الإعدادات تلقائيًا.
     - **Kimi Coding**: تُكتب الإعدادات تلقائيًا.
     - مزيد من التفاصيل: [Moonshot AI (Kimi + Kimi Coding)](/ar/providers/moonshot)
-    - **تخطي**: لم تُضبط أي مصادقة بعد.
-    - اختر نموذجًا افتراضيًا من الخيارات المكتشفة (أو أدخل provider/model يدويًا). للحصول على أفضل جودة وتقليل خطر حقن المطالبات، اختر أقوى نموذج من الجيل الأحدث المتاح ضمن مجموعة المزوّدين لديك.
-    - يشغّل الإعداد الأولي فحصًا للنموذج ويعرض تحذيرًا إذا كان النموذج المضبوط غير معروف أو تنقصه المصادقة.
-    - يكون وضع تخزين مفاتيح API افتراضيًا على قيم ملفات تعريف المصادقة النصية الصريحة. استخدم `--secret-input-mode ref` لتخزين مراجع مدعومة بمتغيرات البيئة بدلًا من ذلك (على سبيل المثال `keyRef: { source: "env", provider: "default", id: "OPENAI_API_KEY" }`).
-    - توجد ملفات تعريف المصادقة في `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (مفاتيح API + OAuth). ويُعد `~/.openclaw/credentials/oauth.json` مصدر استيراد قديم فقط.
+    - **Skip**: لم تُهيأ المصادقة بعد.
+    - اختر نموذجًا افتراضيًا من الخيارات المكتشفة (أو أدخل provider/model يدويًا). للحصول على أفضل جودة وتقليل خطر حقن المطالبات، اختر أقوى نموذج متاح من الجيل الأحدث ضمن مجموعة المزوّدين لديك.
+    - يشغّل الإعداد الأولي فحصًا للنموذج ويحذّر إذا كان النموذج المضبوط غير معروف أو تنقصه المصادقة.
+    - يكون وضع تخزين مفتاح API افتراضيًا هو قيم auth-profile بنص صريح. استخدم `--secret-input-mode ref` لتخزين مراجع مدعومة بـ env بدلًا من ذلك (مثل `keyRef: { source: "env", provider: "default", id: "OPENAI_API_KEY" }`).
+    - تعيش ملفات تعريف المصادقة في `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (مفاتيح API + OAuth). أما `~/.openclaw/credentials/oauth.json` فهو قديم للاستيراد فقط.
     - مزيد من التفاصيل: [/concepts/oauth](/ar/concepts/oauth)
     <Note>
-    نصيحة للخوادم/البيئات دون واجهة: أكمل OAuth على جهاز يحتوي على متصفح، ثم انسخ
-    ملف `auth-profiles.json` الخاص بذلك الوكيل (على سبيل المثال
-    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`، أو المسار المطابق
-    `$OPENCLAW_STATE_DIR/...`) إلى مضيف Gateway. يُعد `credentials/oauth.json`
-    مصدر استيراد قديمًا فقط.
+    نصيحة للخوادم/الوضع بدون واجهة: أكمل OAuth على جهاز يحتوي على متصفح، ثم انسخ
+    ملف `auth-profiles.json` لذلك الوكيل (مثل
+    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`, أو المسار المطابق
+    `$OPENCLAW_STATE_DIR/...`) إلى مضيف gateway. أما `credentials/oauth.json`
+    فهو مجرد مصدر استيراد قديم.
     </Note>
   </Step>
-  <Step title="مساحة العمل">
-    - الإعداد الافتراضي `~/.openclaw/workspace` (قابل للضبط).
-    - يهيّئ ملفات مساحة العمل اللازمة لطقس تهيئة الوكيل.
-    - التخطيط الكامل لمساحة العمل + دليل النسخ الاحتياطي: [مساحة عمل الوكيل](/ar/concepts/agent-workspace)
+  <Step title="Workspace">
+    - الافتراضي `~/.openclaw/workspace` (قابل للتهيئة).
+    - يزرع ملفات مساحة العمل اللازمة لطقس الإقلاع الأولي للوكيل.
+    - تخطيط مساحة العمل الكامل + دليل النسخ الاحتياطي: [مساحة عمل الوكيل](/ar/concepts/agent-workspace)
   </Step>
   <Step title="Gateway">
-    - المنفذ، والربط، ووضع المصادقة، وتعريض Tailscale.
-    - توصية المصادقة: احتفظ بخيار **Token** حتى مع loopback لكي يتوجب على عملاء WS المحليين المصادقة.
-    - في وضع الرمز المميّز، يوفّر الإعداد التفاعلي:
-      - **توليد/تخزين رمز مميّز نصي صريح** (الافتراضي)
-      - **استخدام SecretRef** (اختياري)
-      - يعيد Quickstart استخدام SecretRefs الموجودة في `gateway.auth.token` عبر مزوّدي `env` و`file` و`exec` من أجل فحص الإعداد الأولي/تمهيد لوحة التحكم.
-      - إذا كان SecretRef مضبوطًا ولكن تعذر حله، يفشل الإعداد الأولي مبكرًا مع رسالة إصلاح واضحة بدلًا من التراجع الصامت في مصادقة وقت التشغيل.
-    - في وضع كلمة المرور، يدعم الإعداد التفاعلي أيضًا التخزين النصي الصريح أو SecretRef.
-    - مسار SecretRef للرمز المميّز في الوضع غير التفاعلي: `--gateway-token-ref-env <ENV_VAR>`.
-      - يتطلب متغير بيئة غير فارغ في بيئة عملية الإعداد الأولي.
-      - لا يمكن دمجه مع `--gateway-token`.
-    - عطّل المصادقة فقط إذا كنت تثق بالكامل بكل عملية محلية.
-    - لا تزال عمليات الربط غير التابعة لـ loopback تتطلب المصادقة.
+    - المنفذ، وbind، ووضع المصادقة، وكشف Tailscale.
+    - توصية المصادقة: احتفظ بخيار **Token** حتى في loopback حتى يضطر عملاء WS المحليون إلى المصادقة.
+    - في وضع token، يعرض الإعداد التفاعلي:
+      - **Generate/store plaintext token** (الافتراضي)
+      - **Use SecretRef** (اختياري)
+      - يعيد Quickstart استخدام SecretRefs الموجودة لـ `gateway.auth.token` عبر موفري `env` و`file` و`exec` لأجل فحص onboarding/التهيئة الأولية للوحة.
+      - إذا كانت SecretRef مضبوطة لكن لا يمكن حلها، يفشل onboarding مبكرًا مع رسالة إصلاح واضحة بدلًا من خفض مصادقة بيئة التشغيل بصمت.
+    - في وضع password، يدعم الإعداد التفاعلي أيضًا التخزين بنص صريح أو عبر SecretRef.
+    - مسار SecretRef غير التفاعلي لـ token: ‏`--gateway-token-ref-env <ENV_VAR>`.
+      - يتطلب متغير env غير فارغ في بيئة عملية onboarding.
+      - لا يمكن جمعه مع `--gateway-token`.
+    - عطّل المصادقة فقط إذا كنت تثق بالكامل في كل عملية محلية.
+    - ما تزال عمليات bind غير loopback تتطلب مصادقة.
   </Step>
-  <Step title="القنوات">
+  <Step title="Channels">
     - [WhatsApp](/ar/channels/whatsapp): تسجيل دخول QR اختياري.
-    - [Telegram](/ar/channels/telegram): رمز البوت المميّز.
-    - [Discord](/ar/channels/discord): رمز البوت المميّز.
+    - [Telegram](/ar/channels/telegram): رمز bot.
+    - [Discord](/ar/channels/discord): رمز bot.
     - [Google Chat](/ar/channels/googlechat): JSON لحساب خدمة + جمهور Webhook.
-    - [Mattermost](/ar/channels/mattermost) (Plugin): رمز البوت المميّز + عنوان URL الأساسي.
-    - [Signal](/ar/channels/signal): تثبيت `signal-cli` اختياري + إعداد الحساب.
-    - [BlueBubbles](/ar/channels/bluebubbles): **موصى به لـ iMessage**؛ عنوان URL للخادم + كلمة المرور + Webhook.
-    - [iMessage](/ar/channels/imessage): مسار `imsg` CLI القديم + وصول إلى قاعدة البيانات.
-    - أمان الرسائل المباشرة: الإعداد الافتراضي هو الاقتران. ترسل أول رسالة مباشرة رمزًا؛ وافق عليه عبر `openclaw pairing approve <channel> <code>` أو استخدم قوائم السماح.
+    - [Mattermost](/ar/channels/mattermost) (Plugin): رمز bot + عنوان URL أساسي.
+    - [Signal](/ar/channels/signal): تثبيت اختياري لـ `signal-cli` + إعداد الحساب.
+    - [BlueBubbles](/ar/channels/bluebubbles): **موصى به لـ iMessage**; عنوان URL للخادم + كلمة مرور + Webhook.
+    - [iMessage](/ar/channels/imessage): مسار `imsg` CLI القديم + وصول DB.
+    - أمان الرسائل الخاصة: الافتراضي هو الاقتران. ترسل أول رسالة خاصة رمزًا؛ وافق عبر `openclaw pairing approve <channel> <code>` أو استخدم قوائم السماح.
   </Step>
-  <Step title="البحث على الويب">
-    - اختر مزودًا مدعومًا مثل Brave أو DuckDuckGo أو Exa أو Firecrawl أو Gemini أو Grok أو Kimi أو MiniMax Search أو Ollama Web Search أو Perplexity أو SearXNG أو Tavily (أو تخطّه).
-    - يمكن لمزوّدي الخدمات المعتمدين على API استخدام متغيرات البيئة أو الإعدادات الموجودة للإعداد السريع؛ أما المزوّدون الذين لا يحتاجون إلى مفتاح فيستخدمون المتطلبات المسبقة الخاصة بكل مزوّد.
+  <Step title="Web search">
+    - اختر مزودًا مدعومًا مثل Brave أو DuckDuckGo أو Exa أو Firecrawl أو Gemini أو Grok أو Kimi أو MiniMax Search أو Ollama Web Search أو Perplexity أو SearXNG أو Tavily (أو تخطَّ ذلك).
+    - يمكن للمزوّدين المدعومين بـ API استخدام متغيرات env أو الإعدادات الموجودة للإعداد السريع؛ أما المزوّدون الذين لا يحتاجون إلى مفتاح فيستخدمون المتطلبات الخاصة بمزوّدهم بدلًا من ذلك.
     - تخطَّ ذلك باستخدام `--skip-search`.
-    - اضبطه لاحقًا: `openclaw configure --section web`.
+    - يمكن التهيئة لاحقًا عبر: `openclaw configure --section web`.
   </Step>
-  <Step title="تثبيت الخدمة الخلفية">
-    - macOS: LaunchAgent
-      - يتطلب جلسة مستخدم مسجّل دخوله؛ أما للبيئات دون واجهة فاستخدم LaunchDaemon مخصصًا (غير مرفق).
-    - Linux (وWindows عبر WSL2): وحدة مستخدم systemd
-      - يحاول الإعداد الأولي تمكين lingering عبر `loginctl enable-linger <user>` حتى يبقى Gateway قيد التشغيل بعد تسجيل الخروج.
-      - قد يطلب sudo (يكتب إلى `/var/lib/systemd/linger`)؛ ويحاول أولًا بدون sudo.
-    - **اختيار وقت التشغيل:** Node (موصى به؛ ومطلوب لـ WhatsApp/Telegram). ‏Bun **غير موصى به**.
-    - إذا كانت مصادقة الرمز المميّز تتطلب رمزًا وكان `gateway.auth.token` مُدارًا عبر SecretRef، فإن تثبيت الخدمة الخلفية يتحقق منه لكنه لا يحفظ قيم الرموز المميّزة النصية الصريحة المحلولة ضمن بيانات بيئة خدمة المشرف.
-    - إذا كانت مصادقة الرمز المميّز تتطلب رمزًا وكان SecretRef المضبوط للرمز غير محلول، فسيتم حظر تثبيت الخدمة الخلفية مع إرشادات عملية.
-    - إذا كان كل من `gateway.auth.token` و`gateway.auth.password` مضبوطين بينما `gateway.auth.mode` غير مضبوط، فسيتم حظر تثبيت الخدمة الخلفية إلى أن يُضبط الوضع صراحةً.
+  <Step title="تثبيت daemon">
+    - macOS: ‏LaunchAgent
+      - يتطلب جلسة مستخدم مسجّل دخوله؛ أما في وضع headless فاستخدم LaunchDaemon مخصصًا (غير مشحون).
+    - Linux (وWindows عبر WSL2): وحدة systemd للمستخدم
+      - يحاول Onboarding تفعيل lingering عبر `loginctl enable-linger <user>` حتى تبقى Gateway مرفوعة بعد تسجيل الخروج.
+      - قد يطلب sudo (يكتب إلى `/var/lib/systemd/linger`); ويجرب أولًا من دون sudo.
+    - **اختيار بيئة التشغيل:** Node (موصى به؛ ومطلوب لـ WhatsApp/Telegram). أما Bun فهو **غير موصى به**.
+    - إذا كانت مصادقة token تتطلب token وكانت `gateway.auth.token` مُدارة عبر SecretRef، فإن تثبيت daemon يتحقق منها لكنه لا يحفظ قيم token النصية الصريحة المحلولة ضمن بيانات بيئة خدمة المشرف.
+    - إذا كانت مصادقة token تتطلب token وكانت SecretRef الخاصة بالـ token المضبوطة غير محلولة، فسيُحظر تثبيت daemon مع إرشادات عملية.
+    - إذا كانت كل من `gateway.auth.token` و`gateway.auth.password` مضبوطة وكان `gateway.auth.mode` غير مضبوط، فسيُحظر تثبيت daemon حتى يتم ضبط الوضع صراحةً.
   </Step>
   <Step title="فحص السلامة">
-    - يبدأ تشغيل Gateway (إذا لزم الأمر) ويشغّل `openclaw health`.
-    - نصيحة: يضيف `openclaw status --deep` فحص سلامة Gateway المباشر إلى مخرجات الحالة، بما في ذلك فحوصات القنوات عند دعمها (ويتطلب Gateway يمكن الوصول إليه).
+    - يبدأ تشغيل Gateway (عند الحاجة) ويشغّل `openclaw health`.
+    - نصيحة: يضيف `openclaw status --deep` فحص سلامة gateway المباشر إلى مخرجات الحالة، بما في ذلك فحوصات القنوات عند الدعم (ويتطلب gateway قابلة للوصول).
   </Step>
   <Step title="Skills (موصى بها)">
-    - يقرأ Skills المتاحة ويفحص المتطلبات.
-    - يتيح لك اختيار مدير Node: **npm / pnpm** (bun غير موصى به).
+    - يقرأ Skills المتاحة ويتحقق من المتطلبات.
+    - يتيح لك اختيار مدير Node: ‏**npm / pnpm** (Bun غير موصى به).
     - يثبّت التبعيات الاختيارية (يستخدم بعضها Homebrew على macOS).
   </Step>
   <Step title="إنهاء">
-    - ملخص + الخطوات التالية، بما في ذلك تطبيقات iOS/Android/macOS للحصول على ميزات إضافية.
+    - ملخص + خطوات لاحقة، بما في ذلك تطبيقات iOS/Android/macOS للحصول على ميزات إضافية.
   </Step>
 </Steps>
 
 <Note>
-إذا لم يتم اكتشاف واجهة رسومية، يطبع الإعداد الأولي تعليمات إعادة توجيه منفذ SSH لـ Control UI بدلًا من فتح متصفح.
-إذا كانت أصول Control UI مفقودة، يحاول الإعداد الأولي بناءها؛ ويكون البديل هو `pnpm ui:build` (مع تثبيت تبعيات UI تلقائيًا).
+إذا لم يتم اكتشاف GUI، يطبع onboarding تعليمات إعادة توجيه منفذ SSH الخاصة بـ Control UI بدلًا من فتح متصفح.
+إذا كانت أصول Control UI مفقودة، يحاول onboarding بناؤها؛ والعودة الاحتياطية هي `pnpm ui:build` (مع تثبيت تبعيات UI تلقائيًا).
 </Note>
 
 ## الوضع غير التفاعلي
 
-استخدم `--non-interactive` لأتمتة الإعداد الأولي أو تشغيله ضمن سكربتات:
+استخدم `--non-interactive` لأتمتة onboarding أو برمجتها نصيًا:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -163,9 +164,9 @@ openclaw onboard --non-interactive \
   --skip-skills
 ```
 
-أضف `--json` للحصول على ملخص يمكن قراءته آليًا.
+أضف `--json` للحصول على ملخص قابل للقراءة آليًا.
 
-SecretRef لرمز Gateway المميّز في الوضع غير التفاعلي:
+SecretRef لرمز Gateway في الوضع غير التفاعلي:
 
 ```bash
 export OPENCLAW_GATEWAY_TOKEN="your-token"
@@ -176,14 +177,14 @@ openclaw onboard --non-interactive \
   --gateway-token-ref-env OPENCLAW_GATEWAY_TOKEN
 ```
 
-الخياران `--gateway-token` و`--gateway-token-ref-env` متنافيان.
+إن `--gateway-token` و`--gateway-token-ref-env` متنافيان.
 
 <Note>
-لا يعني `--json` **تلقائيًا** الوضع غير التفاعلي. استخدم `--non-interactive` (و`--workspace`) في السكربتات.
+إن `--json` **لا** يعني الوضع غير التفاعلي. استخدم `--non-interactive` (و`--workspace`) في النصوص البرمجية.
 </Note>
 
-توجد أمثلة أوامر خاصة بالمزوّدين في [أتمتة CLI](/ar/start/wizard-cli-automation#provider-specific-examples).
-استخدم صفحة المرجع هذه لمعاني العلامات وترتيب الخطوات.
+توجد أمثلة أوامر خاصة بالمزوّد في [أتمتة CLI](/ar/start/wizard-cli-automation#provider-specific-examples).
+استخدم صفحة المرجع هذه لدلالات العلامات وترتيب الخطوات.
 
 ### إضافة وكيل (غير تفاعلي)
 
@@ -196,14 +197,14 @@ openclaw agents add work \
   --json
 ```
 
-## RPC لمعالج Gateway
+## ‏RPC الخاصة بمعالج Gateway
 
-يعرّض Gateway تدفق الإعداد الأولي عبر RPC (`wizard.start`, `wizard.next`, `wizard.cancel`, `wizard.status`).
-يمكن للعملاء (تطبيق macOS وControl UI) عرض الخطوات دون إعادة تنفيذ منطق الإعداد الأولي.
+تعرض Gateway تدفق onboarding عبر RPC ‏(`wizard.start`, ‏`wizard.next`, ‏`wizard.cancel`, ‏`wizard.status`).
+ويمكن للعملاء (تطبيق macOS، وControl UI) عرض الخطوات من دون إعادة تنفيذ منطق onboarding.
 
 ## إعداد Signal ‏(`signal-cli`)
 
-يمكن للإعداد الأولي تثبيت `signal-cli` من إصدارات GitHub:
+يمكن لـ Onboarding تثبيت `signal-cli` من إصدارات GitHub:
 
 - ينزّل أصل الإصدار المناسب.
 - يخزّنه تحت `~/.openclaw/tools/signal-cli/<version>/`.
@@ -211,42 +212,42 @@ openclaw agents add work \
 
 ملاحظات:
 
-- تتطلب إصدارات JVM **Java 21**.
-- تُستخدم الإصدارات الأصلية عندما تكون متاحة.
-- يستخدم Windows ‏WSL2؛ ويتبع تثبيت signal-cli تدفق Linux داخل WSL.
+- تتطلب بنى JVM وجود **Java 21**.
+- تُستخدم البنى الأصلية عندما تكون متاحة.
+- يستخدم Windows بيئة WSL2؛ ويتبع تثبيت signal-cli تدفق Linux داخل WSL.
 
 ## ما الذي يكتبه المعالج
 
 الحقول النموذجية في `~/.openclaw/openclaw.json`:
 
 - `agents.defaults.workspace`
-- `agents.defaults.model` / `models.providers` (إذا تم اختيار Minimax)
-- `tools.profile` (يضبط الإعداد الأولي المحلي القيمة الافتراضية على `"coding"` عندما تكون غير مضبوطة؛ ويتم الاحتفاظ بالقيم الصريحة الموجودة)
-- `gateway.*` (الوضع، والربط، والمصادقة، وTailscale)
+- `agents.defaults.model` / `models.providers` (إذا تم اختيار MiniMax)
+- `tools.profile` (يضبط الإعداد الأولي المحلي القيمة الافتراضية `"coding"` عند عدم الضبط؛ وتُحفظ القيم الصريحة الموجودة)
+- `gateway.*` (الوضع، وbind، والمصادقة، وTailscale)
 - `session.dmScope` (تفاصيل السلوك: [مرجع إعداد CLI](/ar/start/wizard-cli-reference#outputs-and-internals))
-- `channels.telegram.botToken` و`channels.discord.token` و`channels.matrix.*` و`channels.signal.*` و`channels.imessage.*`
-- قوائم السماح للقنوات (Slack/Discord/Matrix/Microsoft Teams) عند اختيارك ذلك أثناء المطالبات (تُحل الأسماء إلى معرّفات عندما يكون ذلك ممكنًا).
+- `channels.telegram.botToken`, `channels.discord.token`, `channels.matrix.*`, `channels.signal.*`, `channels.imessage.*`
+- قوائم سماح القنوات (Slack/Discord/Matrix/Microsoft Teams) عندما تشترك فيها أثناء المطالبات (تُحل الأسماء إلى معرّفات عند الإمكان).
 - `skills.install.nodeManager`
   - يقبل `setup --node-manager` القيم `npm` أو `pnpm` أو `bun`.
-  - لا يزال يمكن للإعدادات اليدوية استخدام `yarn` عن طريق ضبط `skills.install.nodeManager` مباشرةً.
+  - لا تزال الإعدادات اليدوية تستطيع استخدام `yarn` عبر ضبط `skills.install.nodeManager` مباشرة.
 - `wizard.lastRunAt`
 - `wizard.lastRunVersion`
 - `wizard.lastRunCommit`
 - `wizard.lastRunCommand`
 - `wizard.lastRunMode`
 
-يكتب `openclaw agents add` إلى `agents.list[]` و`bindings` الاختيارية.
+يكتب `openclaw agents add` إلى `agents.list[]` وإلى `bindings` الاختيارية.
 
-تنتقل بيانات اعتماد WhatsApp إلى `~/.openclaw/credentials/whatsapp/<accountId>/`.
+توجد بيانات اعتماد WhatsApp تحت `~/.openclaw/credentials/whatsapp/<accountId>/`.
 وتُخزَّن الجلسات تحت `~/.openclaw/agents/<agentId>/sessions/`.
 
-تُقدَّم بعض القنوات على شكل Plugins. عند اختيار إحداها أثناء الإعداد،
-سيطلب منك الإعداد الأولي تثبيتها (عبر npm أو من مسار محلي) قبل أن يمكن ضبطها.
+تُسلَّم بعض القنوات على هيئة Plugins. وعندما تختار واحدة منها أثناء الإعداد، سيطلب منك onboarding
+تثبيتها (npm أو مسار محلي) قبل أن يمكن تهيئتها.
 
-## المستندات ذات الصلة
+## وثائق ذات صلة
 
 - نظرة عامة على الإعداد الأولي: [الإعداد الأولي (CLI)](/ar/start/wizard)
 - الإعداد الأولي لتطبيق macOS: [الإعداد الأولي](/ar/start/onboarding)
-- مرجع الإعدادات: [إعداد Gateway](/ar/gateway/configuration)
+- مرجع الإعدادات: [تهيئة Gateway](/ar/gateway/configuration)
 - المزوّدون: [WhatsApp](/ar/channels/whatsapp)، [Telegram](/ar/channels/telegram)، [Discord](/ar/channels/discord)، [Google Chat](/ar/channels/googlechat)، [Signal](/ar/channels/signal)، [BlueBubbles](/ar/channels/bluebubbles) (iMessage)، [iMessage](/ar/channels/imessage) (قديم)
 - Skills: [Skills](/ar/tools/skills)، [إعدادات Skills](/ar/tools/skills-config)

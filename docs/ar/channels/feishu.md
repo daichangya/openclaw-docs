@@ -1,36 +1,36 @@
 ---
 read_when:
     - تريد توصيل بوت Feishu/Lark
-    - أنت تقوم بتكوين قناة Feishu
-summary: نظرة عامة على بوت Feishu وميزاته وتكوينه
+    - أنت تُعدّ قناة Feishu
+summary: نظرة عامة على بوت Feishu وميزاته وإعداده
 title: Feishu
 x-i18n:
-    generated_at: "2026-04-13T12:36:52Z"
+    generated_at: "2026-04-23T07:18:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 77fcf95a3fab534ed898bc157d76bf8bdfa8bf8a918d6af84c0db19890916c1a
+    source_hash: 11bf136cecb26dc939c5e78e020c0e6aa3312d9f143af0cab7568743c728cf13
     source_path: channels/feishu.md
     workflow: 15
 ---
 
 # Feishu / Lark
 
-Feishu/Lark هي منصة تعاون متكاملة حيث تتبادل الفرق الدردشة، وتشارك المستندات، وتدير التقويمات، وتنجز العمل معًا.
+Feishu/Lark هي منصة تعاون متكاملة حيث تتحدث الفرق، وتشارك المستندات، وتدير التقويمات، وتنجز العمل معًا.
 
-**الحالة:** جاهزة للإنتاج للرسائل المباشرة للبوت + الدردشات الجماعية. WebSocket هو الوضع الافتراضي؛ ووضع Webhook اختياري.
+**الحالة:** جاهزة للإنتاج للرسائل الخاصة مع البوت + الدردشات الجماعية. WebSocket هو الوضع الافتراضي؛ ووضع Webhook اختياري.
 
 ---
 
 ## البدء السريع
 
-> **يتطلب OpenClaw 2026.4.10 أو أحدث.** شغّل `openclaw --version` للتحقق. وقم بالترقية باستخدام `openclaw update`.
+> **يتطلب OpenClaw 2026.4.10 أو أحدث.** شغّل `openclaw --version` للتحقق. قم بالترقية باستخدام `openclaw update`.
 
 <Steps>
   <Step title="تشغيل معالج إعداد القناة">
   ```bash
   openclaw channels login --channel feishu
   ```
-  امسح رمز QR باستخدام تطبيق Feishu/Lark على هاتفك المحمول لإنشاء بوت Feishu/Lark تلقائيًا.
+  امسح رمز QR باستخدام تطبيق Feishu/Lark على الهاتف المحمول لإنشاء بوت Feishu/Lark تلقائيًا.
   </Step>
   
   <Step title="بعد اكتمال الإعداد، أعد تشغيل Gateway لتطبيق التغييرات">
@@ -44,14 +44,14 @@ Feishu/Lark هي منصة تعاون متكاملة حيث تتبادل الفر
 
 ## التحكم في الوصول
 
-### الرسائل المباشرة
+### الرسائل الخاصة
 
-قم بتكوين `dmPolicy` للتحكم في من يمكنه إرسال رسائل مباشرة إلى البوت:
+قم بتكوين `dmPolicy` للتحكم في من يمكنه مراسلة البوت مباشرةً:
 
-- `"pairing"` — يتلقى المستخدمون غير المعروفين رمز اقتران؛ وافق عليه عبر CLI
+- `"pairing"` — يتلقى المستخدمون غير المعروفين رمز اقتران؛ وتتم الموافقة عبر CLI
 - `"allowlist"` — يمكن فقط للمستخدمين المدرجين في `allowFrom` الدردشة (الافتراضي: مالك البوت فقط)
 - `"open"` — السماح لجميع المستخدمين
-- `"disabled"` — تعطيل جميع الرسائل المباشرة
+- `"disabled"` — تعطيل جميع الرسائل الخاصة
 
 **الموافقة على طلب اقتران:**
 
@@ -66,7 +66,7 @@ openclaw pairing approve feishu <CODE>
 
 | القيمة         | السلوك                                      |
 | ------------- | ------------------------------------------- |
-| `"open"`      | الرد على جميع الرسائل في المجموعات          |
+| `"open"`      | الرد على جميع الرسائل في المجموعات           |
 | `"allowlist"` | الرد فقط على المجموعات المدرجة في `groupAllowFrom` |
 | `"disabled"`  | تعطيل جميع رسائل المجموعات                  |
 
@@ -74,7 +74,7 @@ openclaw pairing approve feishu <CODE>
 
 **اشتراط الإشارة** (`channels.feishu.requireMention`):
 
-- `true` — يتطلب @mention (افتراضي)
+- `true` — يتطلب @mention (الافتراضي)
 - `false` — الرد بدون @mention
 - تجاوز لكل مجموعة: `channels.feishu.groups.<chat_id>.requireMention`
 
@@ -82,7 +82,7 @@ openclaw pairing approve feishu <CODE>
 
 ## أمثلة على تكوين المجموعات
 
-### السماح لجميع المجموعات، بدون اشتراط @mention
+### السماح لجميع المجموعات، من دون الحاجة إلى @mention
 
 ```json5
 {
@@ -94,7 +94,7 @@ openclaw pairing approve feishu <CODE>
 }
 ```
 
-### السماح لجميع المجموعات، مع الاستمرار في اشتراط @mention
+### السماح لجميع المجموعات، مع استمرار اشتراط @mention
 
 ```json5
 {
@@ -142,6 +142,8 @@ openclaw pairing approve feishu <CODE>
 
 ---
 
+<a id="get-groupuser-ids"></a>
+
 ## الحصول على معرّفات المجموعة/المستخدم
 
 ### معرّفات المجموعات (`chat_id`، التنسيق: `oc_xxx`)
@@ -152,13 +154,13 @@ openclaw pairing approve feishu <CODE>
 
 ### معرّفات المستخدمين (`open_id`، التنسيق: `ou_xxx`)
 
-ابدأ Gateway، وأرسل رسالة مباشرة إلى البوت، ثم تحقق من السجلات:
+ابدأ Gateway، ثم أرسل رسالة خاصة إلى البوت، وبعد ذلك تحقّق من السجلات:
 
 ```bash
 openclaw logs --follow
 ```
 
-ابحث عن `open_id` في مخرجات السجل. ويمكنك أيضًا التحقق من طلبات الاقتران المعلقة:
+ابحث عن `open_id` في ناتج السجل. يمكنك أيضًا التحقق من طلبات الاقتران المعلقة:
 
 ```bash
 openclaw pairing list feishu
@@ -168,10 +170,10 @@ openclaw pairing list feishu
 
 ## الأوامر الشائعة
 
-| الأمر   | الوصف                       |
-| --------- | --------------------------- |
-| `/status` | عرض حالة البوت             |
-| `/reset`  | إعادة تعيين الجلسة الحالية |
+| الأمر   | الوصف                          |
+| --------- | ------------------------------ |
+| `/status` | عرض حالة البوت                 |
+| `/reset`  | إعادة تعيين الجلسة الحالية     |
 | `/model`  | عرض نموذج الذكاء الاصطناعي أو تبديله |
 
 > لا يدعم Feishu/Lark قوائم أوامر الشرطة المائلة الأصلية، لذا أرسل هذه الأوامر كرسائل نصية عادية.
@@ -180,31 +182,31 @@ openclaw pairing list feishu
 
 ## استكشاف الأخطاء وإصلاحها
 
-### البوت لا يرد في الدردشات الجماعية
+### لا يرد البوت في الدردشات الجماعية
 
 1. تأكد من إضافة البوت إلى المجموعة
-2. تأكد من أنك تذكر البوت باستخدام @mention (مطلوب افتراضيًا)
-3. تحقق من أن `groupPolicy` ليس `"disabled"`
-4. تحقق من السجلات: `openclaw logs --follow`
+2. تأكد من الإشارة إلى البوت باستخدام @mention (مطلوب افتراضيًا)
+3. تحقّق من أن `groupPolicy` ليست `"disabled"`
+4. افحص السجلات: `openclaw logs --follow`
 
 ### البوت لا يستقبل الرسائل
 
-1. تأكد من أن البوت منشور ومعتمد في Feishu Open Platform / Lark Developer
+1. تأكد من نشر البوت واعتماده في Feishu Open Platform / Lark Developer
 2. تأكد من أن اشتراك الأحداث يتضمن `im.message.receive_v1`
-3. تأكد من تحديد **persistent connection** (WebSocket)
+3. تأكد من اختيار **persistent connection** ‏(WebSocket)
 4. تأكد من منح جميع نطاقات الأذونات المطلوبة
-5. تأكد من أن Gateway قيد التشغيل: `openclaw gateway status`
-6. تحقق من السجلات: `openclaw logs --follow`
+5. تأكد من أن Gateway يعمل: `openclaw gateway status`
+6. افحص السجلات: `openclaw logs --follow`
 
-### تسرّب App Secret
+### تم تسريب App Secret
 
 1. أعد تعيين App Secret في Feishu Open Platform / Lark Developer
-2. حدّث القيمة في التكوين الخاص بك
+2. حدّث القيمة في إعداداتك
 3. أعد تشغيل Gateway: `openclaw gateway restart`
 
 ---
 
-## التكوين المتقدم
+## إعداد متقدم
 
 ### حسابات متعددة
 
@@ -240,14 +242,14 @@ openclaw pairing list feishu
 
 ### البث
 
-يدعم Feishu/Lark الردود المتدفقة عبر البطاقات التفاعلية. وعند التفعيل، يحدّث البوت البطاقة في الوقت الفعلي أثناء إنشاء النص.
+يدعم Feishu/Lark الردود المتدفقة عبر البطاقات التفاعلية. عند التمكين، يحدّث البوت البطاقة في الوقت الفعلي أثناء توليد النص.
 
 ```json5
 {
   channels: {
     feishu: {
-      streaming: true, // تفعيل إخراج البطاقات المتدفقة (الافتراضي: true)
-      blockStreaming: true, // تفعيل البث على مستوى الكتل (الافتراضي: true)
+      streaming: true, // تمكين إخراج البطاقة المتدفقة (الافتراضي: true)
+      blockStreaming: true, // تمكين البث على مستوى الكتل (الافتراضي: true)
     },
   },
 }
@@ -257,10 +259,10 @@ openclaw pairing list feishu
 
 ### تحسين الحصة
 
-قلّل عدد استدعاءات API الخاصة بـ Feishu/Lark باستخدام علامتين اختياريتين:
+قلّل عدد استدعاءات Feishu/Lark API باستخدام علمين اختياريين:
 
 - `typingIndicator` (الافتراضي `true`): اضبطه على `false` لتخطي استدعاءات تفاعل الكتابة
-- `resolveSenderNames` (الافتراضي `true`): اضبطه على `false` لتخطي عمليات البحث عن ملف تعريف المرسل
+- `resolveSenderNames` (الافتراضي `true`): اضبطه على `false` لتخطي عمليات البحث عن ملفات تعريف المرسلين
 
 ```json5
 {
@@ -275,7 +277,7 @@ openclaw pairing list feishu
 
 ### جلسات ACP
 
-يدعم Feishu/Lark بروتوكول ACP للرسائل المباشرة ورسائل سلاسل المجموعات. ويعتمد ACP في Feishu/Lark على الأوامر النصية — لا توجد قوائم أوامر شرطة مائلة أصلية، لذا استخدم رسائل `/acp ...` مباشرة داخل المحادثة.
+يدعم Feishu/Lark بروتوكول ACP للرسائل الخاصة ورسائل سلاسل المجموعات. يعتمد ACP في Feishu/Lark على الأوامر النصية — لا توجد قوائم أوامر شرطة مائلة أصلية، لذا استخدم رسائل `/acp ...` مباشرة داخل المحادثة.
 
 #### ربط ACP دائم
 
@@ -323,17 +325,17 @@ openclaw pairing list feishu
 
 #### تشغيل ACP من الدردشة
 
-في رسالة مباشرة أو سلسلة محادثة في Feishu/Lark:
+في رسالة خاصة أو سلسلة في Feishu/Lark:
 
 ```text
 /acp spawn codex --thread here
 ```
 
-يعمل `--thread here` مع الرسائل المباشرة ورسائل السلاسل في Feishu/Lark. ويتم توجيه الرسائل اللاحقة في المحادثة المرتبطة مباشرة إلى جلسة ACP تلك.
+يعمل `--thread here` مع الرسائل الخاصة ورسائل السلاسل في Feishu/Lark. تُوجَّه الرسائل اللاحقة في المحادثة المرتبطة مباشرةً إلى جلسة ACP تلك.
 
 ### توجيه متعدد الوكلاء
 
-استخدم `bindings` لتوجيه الرسائل المباشرة أو المجموعات في Feishu/Lark إلى وكلاء مختلفين.
+استخدم `bindings` لتوجيه الرسائل الخاصة أو المجموعات في Feishu/Lark إلى وكلاء مختلفين.
 
 ```json5
 {
@@ -366,44 +368,44 @@ openclaw pairing list feishu
 حقول التوجيه:
 
 - `match.channel`: `"feishu"`
-- `match.peer.kind`: `"direct"` (رسالة مباشرة) أو `"group"` (دردشة جماعية)
+- `match.peer.kind`: `"direct"` (رسالة خاصة) أو `"group"` (دردشة جماعية)
 - `match.peer.id`: Open ID للمستخدم (`ou_xxx`) أو معرّف المجموعة (`oc_xxx`)
 
-راجع [الحصول على معرّفات المجموعة/المستخدم](#الحصول-على-معرّفات-المجموعةالمستخدم) للحصول على نصائح حول البحث.
+راجع [الحصول على معرّفات المجموعة/المستخدم](#get-groupuser-ids) للحصول على نصائح البحث.
 
 ---
 
-## مرجع التكوين
+## مرجع الإعدادات
 
-التكوين الكامل: [تكوين Gateway](/ar/gateway/configuration)
+الإعداد الكامل: [إعداد Gateway](/ar/gateway/configuration)
 
-| الإعداد                                           | الوصف                                     | الافتراضي       |
-| ------------------------------------------------- | ----------------------------------------- | ---------------- |
-| `channels.feishu.enabled`                         | تفعيل/تعطيل القناة                        | `true`           |
-| `channels.feishu.domain`                          | نطاق API (`feishu` أو `lark`)             | `feishu`         |
-| `channels.feishu.connectionMode`                  | نقل الأحداث (`websocket` أو `webhook`)    | `websocket`      |
-| `channels.feishu.defaultAccount`                  | الحساب الافتراضي للتوجيه الصادر           | `default`        |
-| `channels.feishu.verificationToken`               | مطلوب لوضع webhook                        | —                |
-| `channels.feishu.encryptKey`                      | مطلوب لوضع webhook                        | —                |
-| `channels.feishu.webhookPath`                     | مسار توجيه Webhook                        | `/feishu/events` |
-| `channels.feishu.webhookHost`                     | مضيف ربط Webhook                          | `127.0.0.1`      |
-| `channels.feishu.webhookPort`                     | منفذ ربط Webhook                          | `3000`           |
-| `channels.feishu.accounts.<id>.appId`             | App ID                                    | —                |
-| `channels.feishu.accounts.<id>.appSecret`         | App Secret                                | —                |
-| `channels.feishu.accounts.<id>.domain`            | تجاوز النطاق لكل حساب                     | `feishu`         |
-| `channels.feishu.dmPolicy`                        | سياسة الرسائل المباشرة                    | `allowlist`      |
-| `channels.feishu.allowFrom`                       | قائمة السماح للرسائل المباشرة (`open_id`) | [BotOwnerId]     |
-| `channels.feishu.groupPolicy`                     | سياسة المجموعات                           | `allowlist`      |
-| `channels.feishu.groupAllowFrom`                  | قائمة السماح للمجموعات                    | —                |
-| `channels.feishu.requireMention`                  | اشتراط @mention في المجموعات              | `true`           |
-| `channels.feishu.groups.<chat_id>.requireMention` | تجاوز @mention لكل مجموعة                 | inherited        |
-| `channels.feishu.groups.<chat_id>.enabled`        | تفعيل/تعطيل مجموعة محددة                  | `true`           |
-| `channels.feishu.textChunkLimit`                  | حجم مقطع الرسالة                          | `2000`           |
-| `channels.feishu.mediaMaxMb`                      | حد حجم الوسائط                            | `30`             |
-| `channels.feishu.streaming`                       | إخراج البطاقات المتدفقة                   | `true`           |
-| `channels.feishu.blockStreaming`                  | البث على مستوى الكتل                      | `true`           |
-| `channels.feishu.typingIndicator`                 | إرسال تفاعلات الكتابة                     | `true`           |
-| `channels.feishu.resolveSenderNames`              | تحليل أسماء عرض المرسلين                  | `true`           |
+| الإعداد                                           | الوصف                                      | الافتراضي       |
+| ------------------------------------------------- | ------------------------------------------ | ---------------- |
+| `channels.feishu.enabled`                         | تمكين/تعطيل القناة                         | `true`           |
+| `channels.feishu.domain`                          | نطاق API ‏(`feishu` أو `lark`)             | `feishu`         |
+| `channels.feishu.connectionMode`                  | نقل الأحداث (`websocket` أو `webhook`)     | `websocket`      |
+| `channels.feishu.defaultAccount`                  | الحساب الافتراضي للتوجيه الصادر            | `default`        |
+| `channels.feishu.verificationToken`               | مطلوب لوضع Webhook                         | —                |
+| `channels.feishu.encryptKey`                      | مطلوب لوضع Webhook                         | —                |
+| `channels.feishu.webhookPath`                     | مسار توجيه Webhook                         | `/feishu/events` |
+| `channels.feishu.webhookHost`                     | مضيف ربط Webhook                           | `127.0.0.1`      |
+| `channels.feishu.webhookPort`                     | منفذ ربط Webhook                           | `3000`           |
+| `channels.feishu.accounts.<id>.appId`             | App ID                                     | —                |
+| `channels.feishu.accounts.<id>.appSecret`         | App Secret                                 | —                |
+| `channels.feishu.accounts.<id>.domain`            | تجاوز نطاق لكل حساب                        | `feishu`         |
+| `channels.feishu.dmPolicy`                        | سياسة الرسائل الخاصة                       | `allowlist`      |
+| `channels.feishu.allowFrom`                       | قائمة السماح للرسائل الخاصة (قائمة `open_id`) | [BotOwnerId]     |
+| `channels.feishu.groupPolicy`                     | سياسة المجموعات                            | `allowlist`      |
+| `channels.feishu.groupAllowFrom`                  | قائمة السماح للمجموعات                     | —                |
+| `channels.feishu.requireMention`                  | اشتراط @mention في المجموعات               | `true`           |
+| `channels.feishu.groups.<chat_id>.requireMention` | تجاوز @mention لكل مجموعة                  | موروث            |
+| `channels.feishu.groups.<chat_id>.enabled`        | تمكين/تعطيل مجموعة محددة                   | `true`           |
+| `channels.feishu.textChunkLimit`                  | حجم مقطع الرسالة                           | `2000`           |
+| `channels.feishu.mediaMaxMb`                      | حد حجم الوسائط                             | `30`             |
+| `channels.feishu.streaming`                       | إخراج البطاقة المتدفقة                     | `true`           |
+| `channels.feishu.blockStreaming`                  | البث على مستوى الكتل                       | `true`           |
+| `channels.feishu.typingIndicator`                 | إرسال تفاعلات الكتابة                      | `true`           |
+| `channels.feishu.resolveSenderNames`              | تحليل أسماء عرض المرسلين                   | `true`           |
 
 ---
 
@@ -433,14 +435,14 @@ openclaw pairing list feishu
 
 - ✅ ردود مضمنة
 - ✅ ردود السلاسل
-- ✅ تظل ردود الوسائط مدركة للسلسلة عند الرد على رسالة ضمن سلسلة
+- ✅ تبقى ردود الوسائط واعية بالسلسلة عند الرد على رسالة ضمن سلسلة
 
 ---
 
 ## ذو صلة
 
 - [نظرة عامة على القنوات](/ar/channels) — جميع القنوات المدعومة
-- [الاقتران](/ar/channels/pairing) — مصادقة الرسائل المباشرة وتدفق الاقتران
-- [المجموعات](/ar/channels/groups) — سلوك الدردشة الجماعية والتحكم عبر الإشارة
+- [الاقتران](/ar/channels/pairing) — مصادقة الرسائل الخاصة وتدفق الاقتران
+- [المجموعات](/ar/channels/groups) — سلوك الدردشة الجماعية وتقييد الإشارات
 - [توجيه القنوات](/ar/channels/channel-routing) — توجيه الجلسات للرسائل
-- [الأمان](/ar/gateway/security) — نموذج الوصول والتدعيم الأمني
+- [الأمان](/ar/gateway/security) — نموذج الوصول والتحصين

@@ -1,47 +1,48 @@
 ---
 read_when:
-    - أنت تريد استخدام models من Mistral في OpenClaw
-    - أنت بحاجة إلى تهيئة Mistral API key ومراجع model
-summary: استخدم models من Mistral ونسخ Voxtral مع OpenClaw
+    - تريد استخدام نماذج Mistral في OpenClaw
+    - تريد نسخًا فوريًا عبر Voxtral من أجل Voice Call
+    - تحتاج إلى onboarding بمفتاح Mistral API ومراجع النماذج
+summary: استخدام نماذج Mistral ونسخ Voxtral مع OpenClaw
 title: Mistral
 x-i18n:
-    generated_at: "2026-04-21T07:26:23Z"
+    generated_at: "2026-04-23T07:31:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e87d04e3d45c04280c90821b1addd87dd612191249836747fba27cde48b9890f
+    source_hash: cbf2f8926a1e8c877a12ea395e96622ff3b337ffa1368277c03abbfb881b18cf
     source_path: providers/mistral.md
     workflow: 15
 ---
 
 # Mistral
 
-يدعم OpenClaw مزود Mistral لكل من توجيه models النصية/الصور (`mistral/...`) و
-نسخ الصوت عبر Voxtral ضمن فهم الوسائط.
-كما يمكن استخدام Mistral أيضًا من أجل embeddings الذاكرة (`memorySearch.provider = "mistral"`).
+يدعم OpenClaw Mistral لكل من توجيه نماذج النص/الصور (`mistral/...`) ونسخ
+الصوت عبر Voxtral في فهم الوسائط.
+كما يمكن استخدام Mistral لتضمينات memory (`memorySearch.provider = "mistral"`).
 
 - المزوّد: `mistral`
 - المصادقة: `MISTRAL_API_KEY`
-- API: ‏Mistral Chat Completions (`https://api.mistral.ai/v1`)
+- API: Mistral Chat Completions (`https://api.mistral.ai/v1`)
 
 ## البدء
 
 <Steps>
-  <Step title="احصل على API key الخاص بك">
-    أنشئ API key في [Mistral Console](https://console.mistral.ai/).
+  <Step title="Get your API key">
+    أنشئ مفتاح API في [Mistral Console](https://console.mistral.ai/).
   </Step>
-  <Step title="شغّل التهيئة الأولية">
+  <Step title="Run onboarding">
     ```bash
     openclaw onboard --auth-choice mistral-api-key
     ```
 
-    أو مرّر المفتاح مباشرةً:
+    أو مرّر المفتاح مباشرة:
 
     ```bash
     openclaw onboard --mistral-api-key "$MISTRAL_API_KEY"
     ```
 
   </Step>
-  <Step title="اضبط model افتراضيًا">
+  <Step title="Set a default model">
     ```json5
     {
       env: { MISTRAL_API_KEY: "sk-..." },
@@ -49,30 +50,31 @@ x-i18n:
     }
     ```
   </Step>
-  <Step title="تحقق من أن model متاح">
+  <Step title="Verify the model is available">
     ```bash
     openclaw models list --provider mistral
     ```
   </Step>
 </Steps>
 
-## كتالوج LLM المدمج
+## كتالوج LLM المضمّن
 
-يشحن OpenClaw حاليًا كتالوج Mistral المجمّع التالي:
+يشحن OpenClaw حاليًا كتالوج Mistral المضمّن التالي:
 
-| مرجع model                        | الإدخال       | السياق | الحد الأقصى للإخراج | الملاحظات                                                            |
+| مرجع النموذج                        | الإدخال       | السياق | الحد الأقصى للمخرجات | ملاحظات                                                            |
 | -------------------------------- | ----------- | ------- | ---------- | ---------------------------------------------------------------- |
-| `mistral/mistral-large-latest`   | نص، صورة | 262,144 | 16,384     | model الافتراضي                                                    |
+| `mistral/mistral-large-latest`   | نص، صورة | 262,144 | 16,384     | النموذج الافتراضي                                                    |
 | `mistral/mistral-medium-2508`    | نص، صورة | 262,144 | 8,192      | Mistral Medium 3.1                                               |
-| `mistral/mistral-small-latest`   | نص، صورة | 128,000 | 16,384     | Mistral Small 4؛ استدلال قابل للتعديل عبر `reasoning_effort` في API |
+| `mistral/mistral-small-latest`   | نص، صورة | 128,000 | 16,384     | Mistral Small 4؛ reasoning قابلة للضبط عبر API `reasoning_effort` |
 | `mistral/pixtral-large-latest`   | نص، صورة | 128,000 | 32,768     | Pixtral                                                          |
 | `mistral/codestral-latest`       | نص        | 256,000 | 4,096      | للبرمجة                                                           |
 | `mistral/devstral-medium-latest` | نص        | 262,144 | 32,768     | Devstral 2                                                       |
-| `mistral/magistral-small`        | نص        | 128,000 | 40,000     | مفعّل للاستدلال                                                |
+| `mistral/magistral-small`        | نص        | 128,000 | 40,000     | reasoning مفعّلة                                                |
 
 ## نسخ الصوت (Voxtral)
 
-استخدم Voxtral لنسخ الصوت عبر مسار فهم الوسائط.
+استخدم Voxtral لنسخ الصوت الدفعي عبر
+خط أنابيب فهم الوسائط.
 
 ```json5
 {
@@ -88,16 +90,58 @@ x-i18n:
 ```
 
 <Tip>
-يستخدم مسار نسخ الوسائط `/v1/audio/transcriptions`. وmodel الصوت الافتراضي لـ Mistral هو `voxtral-mini-latest`.
+يستخدم مسار نسخ الوسائط `/v1/audio/transcriptions`. النموذج الصوتي الافتراضي لـ Mistral هو `voxtral-mini-latest`.
 </Tip>
 
-## إعدادات متقدمة
+## البث المباشر لتحويل الكلام إلى نص في Voice Call
+
+يسجل Plugin المضمّن `mistral` خدمة Voxtral Realtime كمزوّد
+STT للبث في Voice Call.
+
+| الإعداد      | مسار التهيئة                                                            | الافتراضي                                 |
+| ------------ | ---------------------------------------------------------------------- | --------------------------------------- |
+| مفتاح API      | `plugins.entries.voice-call.config.streaming.providers.mistral.apiKey` | يعود إلى `MISTRAL_API_KEY`         |
+| النموذج        | `...mistral.model`                                                     | `voxtral-mini-transcribe-realtime-2602` |
+| الترميز     | `...mistral.encoding`                                                  | `pcm_mulaw`                             |
+| معدل العينة  | `...mistral.sampleRate`                                                | `8000`                                  |
+| التأخير المستهدف | `...mistral.targetStreamingDelayMs`                                    | `800`                                   |
+
+```json5
+{
+  plugins: {
+    entries: {
+      "voice-call": {
+        config: {
+          streaming: {
+            enabled: true,
+            provider: "mistral",
+            providers: {
+              mistral: {
+                apiKey: "${MISTRAL_API_KEY}",
+                targetStreamingDelayMs: 800,
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+<Note>
+يضبط OpenClaw افتراضيًا STT الفوري الخاص بـ Mistral على `pcm_mulaw` عند 8 kHz بحيث يستطيع Voice Call
+تمرير إطارات وسائط Twilio مباشرة. استخدم `encoding: "pcm_s16le"` مع
+`sampleRate` مطابق فقط إذا كان التدفق الصاعد لديك PCM خامًا أصلًا.
+</Note>
+
+## التهيئة المتقدمة
 
 <AccordionGroup>
-  <Accordion title="استدلال قابل للتعديل (mistral-small-latest)">
-    يتم ربط `mistral/mistral-small-latest` مع Mistral Small 4 ويدعم [الاستدلال القابل للتعديل](https://docs.mistral.ai/capabilities/reasoning/adjustable) على Chat Completions API عبر `reasoning_effort` (`none` يقلل التفكير الإضافي في الإخراج؛ و`high` يعرض آثار التفكير الكاملة قبل الإجابة النهائية).
+  <Accordion title="Adjustable reasoning (mistral-small-latest)">
+    يطابق `mistral/mistral-small-latest` النموذج Mistral Small 4 ويدعم [reasoning القابلة للضبط](https://docs.mistral.ai/capabilities/reasoning/adjustable) على Chat Completions API عبر `reasoning_effort` (`none` يقلل التفكير الإضافي في المخرجات؛ و`high` يعرض آثار التفكير الكاملة قبل الإجابة النهائية).
 
-    يربط OpenClaw مستوى **thinking** الخاص بالجلسة مع API الخاص بـ Mistral:
+    يطابق OpenClaw مستوى **thinking** الخاص بالجلسة مع Mistral API:
 
     | مستوى thinking في OpenClaw                          | `reasoning_effort` في Mistral |
     | ------------------------------------------------ | -------------------------- |
@@ -105,13 +149,13 @@ x-i18n:
     | **low** / **medium** / **high** / **xhigh** / **adaptive** / **max** | `high`     |
 
     <Note>
-    لا تستخدم models الأخرى في كتالوج Mistral المجمّع هذا المعامل. استمر في استخدام models ‏`magistral-*` عندما تريد السلوك الأصلي في Mistral المبني على الاستدلال أولًا.
+    لا تستخدم نماذج كتالوج Mistral المضمنة الأخرى هذا المعامل. واصل استخدام نماذج `magistral-*` عندما تريد سلوك Mistral الأصلي المعتمد على reasoning أولًا.
     </Note>
 
   </Accordion>
 
-  <Accordion title="Embeddings الذاكرة">
-    يمكن لـ Mistral تقديم embeddings الذاكرة عبر `/v1/embeddings` (model الافتراضي: `mistral-embed`).
+  <Accordion title="Memory embeddings">
+    يمكن لـ Mistral تقديم تضمينات memory عبر `/v1/embeddings` (النموذج الافتراضي: `mistral-embed`).
 
     ```json5
     {
@@ -121,21 +165,21 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="المصادقة وعنوان URL الأساسي">
-    - تستخدم مصادقة Mistral المتغير `MISTRAL_API_KEY`.
+  <Accordion title="Auth and base URL">
+    - تستخدم مصادقة Mistral القيمة `MISTRAL_API_KEY`.
     - يكون عنوان URL الأساسي للمزوّد افتراضيًا `https://api.mistral.ai/v1`.
-    - model الافتراضي أثناء التهيئة الأولية هو `mistral/mistral-large-latest`.
-    - يستخدم Z.A.I مصادقة Bearer مع API key الخاص بك.
+    - النموذج الافتراضي في onboarding هو `mistral/mistral-large-latest`.
+    - تستخدم Z.AI مصادقة Bearer باستخدام مفتاح API الخاص بك.
   </Accordion>
 </AccordionGroup>
 
 ## ذو صلة
 
 <CardGroup cols={2}>
-  <Card title="اختيار model" href="/ar/concepts/model-providers" icon="layers">
-    اختيار المزوّدات، ومراجع model، وسلوك الفشل الاحتياطي.
+  <Card title="Model selection" href="/ar/concepts/model-providers" icon="layers">
+    اختيار المزوّدات، ومراجع النماذج، وسلوك failover.
   </Card>
-  <Card title="فهم الوسائط" href="/tools/media-understanding" icon="microphone">
+  <Card title="Media understanding" href="/ar/nodes/media-understanding" icon="microphone">
     إعداد نسخ الصوت واختيار المزوّد.
   </Card>
 </CardGroup>

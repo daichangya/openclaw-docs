@@ -1,49 +1,51 @@
 ---
 read_when:
     - نشر OpenClaw على Northflank
-    - أنت تريد نشرًا سحابيًا بنقرة واحدة مع Control UI عبر المتصفح
+    - تريد نشرًا سحابيًا بنقرة واحدة مع واجهة Control UI مستندة إلى المتصفح
 summary: نشر OpenClaw على Northflank باستخدام قالب بنقرة واحدة
 title: Northflank
 x-i18n:
-    generated_at: "2026-04-05T12:48:08Z"
+    generated_at: "2026-04-23T07:26:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6b659607621ad2b38e61644f41cf3e5ae1a32761469223c460952a832d3b93fe
+    source_hash: 5610e076b09d50c23186f1f8db16c039c99d287c34ef6fd71d4272bc527b0388
     source_path: install/northflank.mdx
     workflow: 15
 ---
 
-انشر OpenClaw على Northflank باستخدام قالب بنقرة واحدة وادخل إليه عبر الويب باستخدام Control UI.
-هذا هو أسهل مسار "من دون طرفية على الخادم": يقوم Northflank بتشغيل Gateway نيابةً عنك.
+# Northflank
+
+انشر OpenClaw على Northflank باستخدام قالب بنقرة واحدة وادخل إليه عبر واجهة Control UI على الويب.
+هذا هو أسهل مسار "من دون طرفية على الخادم": إذ يقوم Northflank بتشغيل Gateway نيابةً عنك.
 
 ## كيفية البدء
 
-1. انقر على [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw) لفتح القالب.
-2. أنشئ [حسابًا على Northflank](https://app.northflank.com/signup) إذا لم يكن لديك واحد بالفعل.
-3. انقر على **Deploy OpenClaw now**.
-4. اضبط متغير البيئة المطلوب: `OPENCLAW_GATEWAY_TOKEN` ‏(استخدم قيمة عشوائية قوية).
-5. انقر على **Deploy stack** لبناء قالب OpenClaw وتشغيله.
-6. انتظر حتى يكتمل النشر، ثم انقر على **View resources**.
+1. انقر [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw) لفتح القالب.
+2. أنشئ [حسابًا على Northflank](https://app.northflank.com/signup) إذا لم يكن لديك حساب بالفعل.
+3. انقر **Deploy OpenClaw now**.
+4. اضبط متغير البيئة المطلوب: `OPENCLAW_GATEWAY_TOKEN` (استخدم قيمة عشوائية قوية).
+5. انقر **Deploy stack** لبناء قالب OpenClaw وتشغيله.
+6. انتظر حتى يكتمل النشر، ثم انقر **View resources**.
 7. افتح خدمة OpenClaw.
-8. افتح عنوان URL العام لـ OpenClaw عند `/openclaw` واتصل باستخدام السر المشترك المهيأ. يستخدم هذا القالب `OPENCLAW_GATEWAY_TOKEN` افتراضيًا؛ وإذا استبدلته بمصادقة كلمة المرور، فاستخدم كلمة المرور تلك بدلًا منه.
+8. افتح عنوان URL العام الخاص بـ OpenClaw عند المسار `/openclaw` واتصل باستخدام السر المشترك المضبوط. يستخدم هذا القالب القيمة `OPENCLAW_GATEWAY_TOKEN` افتراضيًا؛ وإذا استبدلتها بمصادقة كلمة المرور، فاستخدم كلمة المرور تلك بدلًا منها.
 
-## ما الذي ستحصل عليه
+## ما الذي تحصل عليه
 
-- Gateway + Control UI مستضافان لـ OpenClaw
+- Gateway مستضاف لـ OpenClaw + Control UI
 - تخزين دائم عبر Northflank Volume ‏(`/data`) بحيث تبقى `openclaw.json`،
-  و`auth-profiles.json` لكل وكيل، وحالة القنوات/المزوّدين، والجلسات،
+  و`auth-profiles.json` لكل وكيل، وحالة القنوات/المزوّدات، والجلسات،
   ومساحة العمل محفوظة عبر عمليات إعادة النشر
 
 ## توصيل قناة
 
-استخدم Control UI عند `/openclaw` أو شغّل `openclaw onboard` عبر SSH للحصول على تعليمات إعداد القناة:
+استخدم Control UI عند `/openclaw` أو شغّل `openclaw onboard` عبر SSH للحصول على تعليمات إعداد القنوات:
 
-- [Telegram](/channels/telegram) ‏(الأسرع — فقط رمز bot)
-- [Discord](/channels/discord)
-- [جميع القنوات](/channels)
+- [Telegram](/ar/channels/telegram) (الأسرع — يحتاج فقط إلى رمز روبوت)
+- [Discord](/ar/channels/discord)
+- [جميع القنوات](/ar/channels)
 
 ## الخطوات التالية
 
-- إعداد قنوات المراسلة: [القنوات](/channels)
-- إعداد Gateway: [إعدادات Gateway](/gateway/configuration)
-- حافظ على تحديث OpenClaw: [التحديث](/install/updating)
+- إعداد قنوات المراسلة: [القنوات](/ar/channels)
+- إعداد Gateway: [إعداد Gateway](/ar/gateway/configuration)
+- إبقاء OpenClaw محدّثًا: [التحديث](/ar/install/updating)

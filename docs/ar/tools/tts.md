@@ -1,84 +1,87 @@
 ---
 read_when:
-    - تمكين تحويل النص إلى كلام للردود
-    - تهيئة موفري TTS أو الحدود
+    - تفعيل تحويل النص إلى كلام للردود
+    - ضبط مزوّدي TTS أو الحدود
     - استخدام أوامر `/tts`
 summary: تحويل النص إلى كلام (TTS) للردود الصادرة
 title: تحويل النص إلى كلام
 x-i18n:
-    generated_at: "2026-04-16T07:17:55Z"
+    generated_at: "2026-04-23T07:34:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: de7c1dc8831c1ba307596afd48cb4d36f844724887a13b17e35f41ef5174a86f
+    source_hash: be8f5a8ce90c56bcce58723702d51154fea3f9fd27a69ace144e2b1e5bdd7049
     source_path: tools/tts.md
     workflow: 15
 ---
 
 # تحويل النص إلى كلام (TTS)
 
-يمكن لـ OpenClaw تحويل الردود الصادرة إلى صوت باستخدام ElevenLabs أو Google Gemini أو Microsoft أو MiniMax أو OpenAI.
-ويعمل ذلك في أي مكان يستطيع OpenClaw فيه إرسال صوت.
+يمكن لـ OpenClaw تحويل الردود الصادرة إلى صوت باستخدام ElevenLabs أو Google Gemini أو Microsoft أو MiniMax أو OpenAI أو xAI.
+ويعمل هذا في أي مكان يستطيع فيه OpenClaw إرسال الصوت.
 
 ## الخدمات المدعومة
 
-- **ElevenLabs** (موفر أساسي أو احتياطي)
-- **Google Gemini** (موفر أساسي أو احتياطي؛ يستخدم Gemini API TTS)
-- **Microsoft** (موفر أساسي أو احتياطي؛ يستخدم التنفيذ المضمّن الحالي `node-edge-tts`)
-- **MiniMax** (موفر أساسي أو احتياطي؛ يستخدم واجهة T2A v2 API)
-- **OpenAI** (موفر أساسي أو احتياطي؛ ويُستخدم أيضًا للملخصات)
+- **ElevenLabs** (كمزوّد أساسي أو احتياطي)
+- **Google Gemini** (كمزوّد أساسي أو احتياطي؛ يستخدم Gemini API TTS)
+- **Microsoft** (كمزوّد أساسي أو احتياطي؛ يستخدم التنفيذ المضمّن الحالي `node-edge-tts`)
+- **MiniMax** (كمزوّد أساسي أو احتياطي؛ يستخدم T2A v2 API)
+- **OpenAI** (كمزوّد أساسي أو احتياطي؛ ويُستخدم أيضًا للملخصات)
+- **xAI** (كمزوّد أساسي أو احتياطي؛ يستخدم xAI TTS API)
 
-### ملاحظات حول Microsoft speech
+### ملاحظات حول كلام Microsoft
 
-يستخدم موفر Microsoft speech المضمّن حاليًا خدمة TTS العصبية عبر الإنترنت من Microsoft Edge
-من خلال مكتبة `node-edge-tts`. وهي خدمة مستضافة (وليست
+يستخدم مزوّد الكلام المضمّن من Microsoft حاليًا خدمة TTS العصبية
+المتاحة عبر الإنترنت في Microsoft Edge من خلال مكتبة `node-edge-tts`. وهي خدمة مستضافة (وليست
 محلية)، وتستخدم نقاط نهاية Microsoft، ولا تتطلب مفتاح API.
-يتيح `node-edge-tts` خيارات لتهيئة النطق وتنسيقات الإخراج، لكن
-ليست كل الخيارات مدعومة من الخدمة. ولا يزال الإدخال الخاص
-بالتهيئة القديمة والتوجيهات الذي يستخدم `edge` يعمل، ويجري تطبيعه إلى `microsoft`.
+ويكشف `node-edge-tts` خيارات إعداد الكلام وتنسيقات الإخراج، لكن
+ليست كل الخيارات مدعومة من الخدمة. ولا يزال الإدخال القديم في config والتوجيهات باستخدام
+`edge` يعمل ويُطبَّع إلى `microsoft`.
 
-نظرًا لأن هذا المسار يعتمد على خدمة ويب عامة من دون SLA أو حصة منشورة،
-فتعامل معه على أنه أفضل جهد. إذا كنت بحاجة إلى حدود مضمونة ودعم، فاستخدم OpenAI
+ولأن هذا المسار خدمة ويب عامة من دون SLA أو حصة منشورة،
+فتعامل معه على أساس أفضل جهد. وإذا كنت تحتاج إلى حدود ودعم مضمونين، فاستخدم OpenAI
 أو ElevenLabs.
 
-## المفاتيح الاختيارية
+## مفاتيح اختيارية
 
-إذا كنت تريد OpenAI أو ElevenLabs أو Google Gemini أو MiniMax:
+إذا كنت تريد OpenAI أو ElevenLabs أو Google Gemini أو MiniMax أو xAI:
 
 - `ELEVENLABS_API_KEY` (أو `XI_API_KEY`)
 - `GEMINI_API_KEY` (أو `GOOGLE_API_KEY`)
 - `MINIMAX_API_KEY`
 - `OPENAI_API_KEY`
+- `XAI_API_KEY`
 
-لا تتطلب Microsoft speech **مفتاح API**.
+كلام Microsoft **لا** يتطلب مفتاح API.
 
-إذا جرى إعداد عدة موفرين، فسيُستخدم الموفر المحدد أولًا وستكون الموفرات الأخرى خيارات احتياطية.
-يستخدم التلخيص التلقائي `summaryModel` المُعدّ (أو `agents.defaults.model.primary`)،
-لذلك يجب أيضًا أن يكون هذا الموفر موثّقًا إذا فعّلت الملخصات.
+إذا تم ضبط عدة مزوّدين، يُستخدم المزوّد المحدد أولًا وتكون المزوّدات الأخرى خيارات احتياطية.
+ويستخدم التلخيص التلقائي `summaryModel` المهيأ (أو `agents.defaults.model.primary`)،
+لذلك يجب أيضًا أن يكون هذا المزوّد مصادقًا عليه إذا فعّلت الملخصات.
 
-## روابط الخدمات
+## روابط الخدمة
 
 - [دليل OpenAI لتحويل النص إلى كلام](https://platform.openai.com/docs/guides/text-to-speech)
 - [مرجع OpenAI Audio API](https://platform.openai.com/docs/api-reference/audio)
 - [تحويل النص إلى كلام في ElevenLabs](https://elevenlabs.io/docs/api-reference/text-to-speech)
 - [المصادقة في ElevenLabs](https://elevenlabs.io/docs/api-reference/authentication)
-- [واجهة MiniMax T2A v2 API](https://platform.minimaxi.com/document/T2A%20V2)
+- [MiniMax T2A v2 API](https://platform.minimaxi.com/document/T2A%20V2)
 - [node-edge-tts](https://github.com/SchneeHertz/node-edge-tts)
 - [تنسيقات إخراج Microsoft Speech](https://learn.microsoft.com/azure/ai-services/speech-service/rest-text-to-speech#audio-outputs)
+- [تحويل النص إلى كلام في xAI](https://docs.x.ai/developers/rest-api-reference/inference/voice#text-to-speech-rest)
 
 ## هل هو مفعّل افتراضيًا؟
 
-لا. يكون Auto‑TTS **متوقفًا** افتراضيًا. فعّله في الإعدادات باستخدام
+لا. يكون Auto‑TTS **معطلًا** افتراضيًا. فعّله في config باستخدام
 `messages.tts.auto` أو محليًا باستخدام `/tts on`.
 
-عندما لا تكون `messages.tts.provider` معيّنة، يختار OpenClaw أول
-موفر speech مُعدّ وفق ترتيب الاختيار التلقائي في السجل.
+عندما لا تكون `messages.tts.provider` مضبوطة، يختار OpenClaw أول
+مزوّد كلام مهيأ وفق ترتيب الاختيار التلقائي في السجل.
 
-## التهيئة
+## الإعدادات
 
-توجد تهيئة TTS ضمن `messages.tts` في `openclaw.json`.
-المخطط الكامل موجود في [تهيئة Gateway](/ar/gateway/configuration).
+توجد إعدادات TTS تحت `messages.tts` في `openclaw.json`.
+ويظهر المخطط الكامل في [إعدادات Gateway](/ar/gateway/configuration).
 
-### الحد الأدنى من التهيئة (تمكين + موفر)
+### إعدادات دنيا (تفعيل + مزوّد)
 
 ```json5
 {
@@ -199,13 +202,40 @@ x-i18n:
 }
 ```
 
-يستخدم Google Gemini TTS مسار مفتاح Gemini API. يكون مفتاح API من Google Cloud Console
-المقيّد على Gemini API صالحًا هنا، وهو نفس نمط المفتاح المستخدم
-من قبل موفر إنشاء الصور المضمّن من Google. ترتيب الاستيفاء هو
+يستخدم Google Gemini TTS مسار مفتاح Gemini API. ويكون مفتاح API من Google Cloud Console
+المقيّد إلى Gemini API صالحًا هنا، وهو النمط نفسه من المفاتيح المستخدم
+من قبل مزود توليد الصور المضمّن من Google. ويكون ترتيب التحليل:
 `messages.tts.providers.google.apiKey` -> `models.providers.google.apiKey` ->
 `GEMINI_API_KEY` -> `GOOGLE_API_KEY`.
 
-### تعطيل Microsoft speech
+### xAI كأساسي
+
+```json5
+{
+  messages: {
+    tts: {
+      auto: "always",
+      provider: "xai",
+      providers: {
+        xai: {
+          apiKey: "xai_api_key",
+          voiceId: "eve",
+          language: "en",
+          responseFormat: "mp3",
+          speed: 1.0,
+        },
+      },
+    },
+  },
+}
+```
+
+يستخدم xAI TTS مسار `XAI_API_KEY` نفسه الذي يستخدمه مزود نماذج Grok المضمّن.
+ويكون ترتيب التحليل: `messages.tts.providers.xai.apiKey` -> `XAI_API_KEY`.
+والأصوات الحية الحالية هي `ara` و`eve` و`leo` و`rex` و`sal` و`una`؛ ويُعد `eve`
+الافتراضي. ويقبل `language` وسم BCP-47 أو `auto`.
+
+### تعطيل كلام Microsoft
 
 ```json5
 {
@@ -221,7 +251,7 @@ x-i18n:
 }
 ```
 
-### حدود مخصصة + مسار التفضيلات
+### حدود مخصصة + مسار prefs
 
 ```json5
 {
@@ -268,67 +298,73 @@ x-i18n:
 
 ### ملاحظات حول الحقول
 
-- `auto`: وضع Auto‑TTS (`off` أو `always` أو `inbound` أو `tagged`).
+- `auto`: وضع Auto‑TTS (`off`، `always`، `inbound`، `tagged`).
   - يرسل `inbound` الصوت فقط بعد رسالة صوتية واردة.
   - يرسل `tagged` الصوت فقط عندما يتضمن الرد توجيهات `[[tts:key=value]]` أو كتلة `[[tts:text]]...[[/tts:text]]`.
 - `enabled`: مفتاح تبديل قديم (يقوم doctor بترحيله إلى `auto`).
-- `mode`: `"final"` (الافتراضي) أو `"all"` (يتضمن ردود الأدوات/الكتل).
-- `provider`: معرّف موفر speech مثل `"elevenlabs"` أو `"google"` أو `"microsoft"` أو `"minimax"` أو `"openai"` (يكون الاحتياطي تلقائيًا).
-- إذا لم يتم تعيين `provider`، يستخدم OpenClaw أول موفر speech مُعدّ وفق ترتيب الاختيار التلقائي في السجل.
+- `mode`: ‏`"final"` (افتراضي) أو `"all"` (يتضمن ردود الأدوات/الكتل).
+- `provider`: معرّف مزود الكلام مثل `"elevenlabs"` أو `"google"` أو `"microsoft"` أو `"minimax"` أو `"openai"` (ويكون الرجوع الاحتياطي تلقائيًا).
+- إذا كان `provider` **غير مضبوط**، يستخدم OpenClaw أول مزود كلام مهيأ وفق ترتيب الاختيار التلقائي في السجل.
 - لا يزال `provider: "edge"` القديم يعمل ويُطبَّع إلى `microsoft`.
-- `summaryModel`: نموذج منخفض التكلفة اختياري للتلخيص التلقائي؛ والقيمة الافتراضية هي `agents.defaults.model.primary`.
-  - يقبل `provider/model` أو اسمًا مستعارًا لنموذج مُعدّ.
-- `modelOverrides`: السماح للنموذج بإخراج توجيهات TTS (مفعّل افتراضيًا).
-  - تكون القيمة الافتراضية لـ `allowProvider` هي `false` (التبديل بين الموفرين يتطلب التفعيل صراحةً).
-- `providers.<id>`: إعدادات خاصة بالموفر ومفهرسة بمعرّف موفر speech.
-- كتل الموفر القديمة المباشرة (`messages.tts.openai` و`messages.tts.elevenlabs` و`messages.tts.microsoft` و`messages.tts.edge`) تُرحَّل تلقائيًا إلى `messages.tts.providers.<id>` عند التحميل.
-- `maxTextLength`: حد أقصى صارم لإدخال TTS (أحرف). يفشل `/tts audio` إذا تم تجاوزه.
-- `timeoutMs`: مهلة انتهاء الطلب (مللي ثانية).
-- `prefsPath`: تجاوز مسار JSON المحلي للتفضيلات (الموفر/الحد/الملخص).
-- تعود قيم `apiKey` إلى متغيرات البيئة (`ELEVENLABS_API_KEY`/`XI_API_KEY` و`GEMINI_API_KEY`/`GOOGLE_API_KEY` و`MINIMAX_API_KEY` و`OPENAI_API_KEY`).
-- `providers.elevenlabs.baseUrl`: تجاوز عنوان URL الأساسي لـ ElevenLabs API.
+- `summaryModel`: نموذج منخفض الكلفة اختياري للتلخيص التلقائي؛ والافتراضي هو `agents.defaults.model.primary`.
+  - يقبل `provider/model` أو اسمًا مستعارًا لنموذج مهيأ.
+- `modelOverrides`: السماح للنموذج بإصدار توجيهات TTS (مفعّل افتراضيًا).
+  - تكون القيمة الافتراضية لـ `allowProvider` هي `false` (ويستلزم تبديل المزوّد الاشتراك الصريح).
+- `providers.<id>`: إعدادات مملوكة للمزوّد ومفهرسة بمعرّف مزود الكلام.
+- تُرحَّل كتل المزوّد المباشرة القديمة (`messages.tts.openai`، `messages.tts.elevenlabs`، `messages.tts.microsoft`، `messages.tts.edge`) تلقائيًا إلى `messages.tts.providers.<id>` عند التحميل.
+- `maxTextLength`: حد صارم لإدخال TTS (أحرف). يفشل `/tts audio` إذا تم تجاوزه.
+- `timeoutMs`: مهلة الطلب (ms).
+- `prefsPath`: تجاوز مسار prefs JSON المحلي (المزوّد/الحد/الملخص).
+- تعود قيم `apiKey` إلى متغيرات البيئة (`ELEVENLABS_API_KEY`/`XI_API_KEY`، `GEMINI_API_KEY`/`GOOGLE_API_KEY`، `MINIMAX_API_KEY`، `OPENAI_API_KEY`).
+- `providers.elevenlabs.baseUrl`: تجاوز عنوان API الأساسي لـ ElevenLabs.
 - `providers.openai.baseUrl`: تجاوز نقطة نهاية OpenAI TTS.
-  - ترتيب الاستيفاء: `messages.tts.providers.openai.baseUrl` -> `OPENAI_TTS_BASE_URL` -> `https://api.openai.com/v1`
-  - تُعامل القيم غير الافتراضية على أنها نقاط نهاية TTS متوافقة مع OpenAI، لذلك تُقبل أسماء النماذج والأصوات المخصصة.
+  - ترتيب التحليل: `messages.tts.providers.openai.baseUrl` -> `OPENAI_TTS_BASE_URL` -> `https://api.openai.com/v1`
+  - تُعامل القيم غير الافتراضية على أنها نقاط نهاية TTS متوافقة مع OpenAI، لذا تُقبل أسماء النماذج والأصوات المخصصة.
 - `providers.elevenlabs.voiceSettings`:
-  - `stability` و`similarityBoost` و`style`: `0..1`
-  - `useSpeakerBoost`: `true|false`
-  - `speed`: `0.5..2.0` (1.0 = عادي)
+  - `stability` و`similarityBoost` و`style`: ‏`0..1`
+  - `useSpeakerBoost`: ‏`true|false`
+  - `speed`: ‏`0.5..2.0` (1.0 = عادي)
 - `providers.elevenlabs.applyTextNormalization`: ‏`auto|on|off`
-- `providers.elevenlabs.languageCode`: رمز ISO 639-1 من حرفين (مثل `en` أو `de`)
-- `providers.elevenlabs.seed`: عدد صحيح `0..4294967295` (حتمية بأفضل جهد)
-- `providers.minimax.baseUrl`: تجاوز عنوان URL الأساسي لـ MiniMax API (الافتراضي `https://api.minimax.io`، ومتغير البيئة: `MINIMAX_API_HOST`).
+- `providers.elevenlabs.languageCode`: معيار ISO 639-1 من حرفين (مثل `en`، `de`)
+- `providers.elevenlabs.seed`: عدد صحيح `0..4294967295` (حتمية على أساس أفضل جهد)
+- `providers.minimax.baseUrl`: تجاوز عنوان MiniMax API الأساسي (الافتراضي `https://api.minimax.io`، ومتغير البيئة: `MINIMAX_API_HOST`).
 - `providers.minimax.model`: نموذج TTS (الافتراضي `speech-2.8-hd`، ومتغير البيئة: `MINIMAX_TTS_MODEL`).
 - `providers.minimax.voiceId`: معرّف الصوت (الافتراضي `English_expressive_narrator`، ومتغير البيئة: `MINIMAX_TTS_VOICE_ID`).
 - `providers.minimax.speed`: سرعة التشغيل `0.5..2.0` (الافتراضي 1.0).
 - `providers.minimax.vol`: مستوى الصوت `(0, 10]` (الافتراضي 1.0؛ ويجب أن يكون أكبر من 0).
-- `providers.minimax.pitch`: تغيير النغمة `-12..12` (الافتراضي 0).
+- `providers.minimax.pitch`: تغيير طبقة الصوت `-12..12` (الافتراضي 0).
 - `providers.google.model`: نموذج Gemini TTS (الافتراضي `gemini-3.1-flash-tts-preview`).
-- `providers.google.voiceName`: اسم صوت Gemini المضمّن مسبقًا (الافتراضي `Kore`؛ كما يُقبل `voice` أيضًا).
-- `providers.google.baseUrl`: تجاوز عنوان URL الأساسي لـ Gemini API. لا يُقبل إلا `https://generativelanguage.googleapis.com`.
+- `providers.google.voiceName`: اسم صوت Gemini الجاهز مسبقًا (الافتراضي `Kore`؛ كما يُقبل `voice` أيضًا).
+- `providers.google.baseUrl`: تجاوز عنوان Gemini API الأساسي. ولا يُقبل إلا `https://generativelanguage.googleapis.com`.
   - إذا تم حذف `messages.tts.providers.google.apiKey`، يمكن لـ TTS إعادة استخدام `models.providers.google.apiKey` قبل الرجوع إلى متغيرات البيئة.
-- `providers.microsoft.enabled`: السماح باستخدام Microsoft speech (الافتراضي `true`؛ بدون مفتاح API).
+- `providers.xai.apiKey`: مفتاح xAI TTS API (متغير البيئة: `XAI_API_KEY`).
+- `providers.xai.baseUrl`: تجاوز عنوان xAI TTS الأساسي (الافتراضي `https://api.x.ai/v1`، ومتغير البيئة: `XAI_BASE_URL`).
+- `providers.xai.voiceId`: معرّف صوت xAI (الافتراضي `eve`؛ والأصوات الحية الحالية: `ara` و`eve` و`leo` و`rex` و`sal` و`una`).
+- `providers.xai.language`: رمز لغة BCP-47 أو `auto` (الافتراضي `en`).
+- `providers.xai.responseFormat`: ‏`mp3` أو `wav` أو `pcm` أو `mulaw` أو `alaw` (الافتراضي `mp3`).
+- `providers.xai.speed`: تجاوز سرعة أصلي خاص بالمزوّد.
+- `providers.microsoft.enabled`: السماح باستخدام كلام Microsoft (الافتراضي `true`؛ ومن دون مفتاح API).
 - `providers.microsoft.voice`: اسم الصوت العصبي من Microsoft (مثل `en-US-MichelleNeural`).
 - `providers.microsoft.lang`: رمز اللغة (مثل `en-US`).
 - `providers.microsoft.outputFormat`: تنسيق إخراج Microsoft (مثل `audio-24khz-48kbitrate-mono-mp3`).
-  - راجع تنسيقات إخراج Microsoft Speech لمعرفة القيم الصالحة؛ فليست كل التنسيقات مدعومة من النقل المضمّن المعتمد على Edge.
-- `providers.microsoft.rate` / `providers.microsoft.pitch` / `providers.microsoft.volume`: سلاسل نسب مئوية (مثل `+10%` و`-5%`).
+  - راجع تنسيقات إخراج Microsoft Speech للقيم الصالحة؛ إذ لا تدعم وسيلة النقل المضمّنة المعتمدة على Edge جميع التنسيقات.
+- `providers.microsoft.rate` / `providers.microsoft.pitch` / `providers.microsoft.volume`: سلاسل نسب مئوية (مثل `+10%`، `-5%`).
 - `providers.microsoft.saveSubtitles`: كتابة ترجمات JSON إلى جانب ملف الصوت.
-- `providers.microsoft.proxy`: عنوان URL للوكيل لطلبات Microsoft speech.
-- `providers.microsoft.timeoutMs`: تجاوز مهلة انتهاء الطلب (مللي ثانية).
+- `providers.microsoft.proxy`: عنوان URL للـ proxy لطلبات كلام Microsoft.
+- `providers.microsoft.timeoutMs`: تجاوز مهلة الطلب (ms).
 - `edge.*`: اسم مستعار قديم لإعدادات Microsoft نفسها.
 
-## تجاوزات يقودها النموذج (مفعّلة افتراضيًا)
+## تجاوزات يقودها النموذج (مفعلة افتراضيًا)
 
-افتراضيًا، **يمكن** للنموذج إخراج توجيهات TTS لرد واحد.
-عندما تكون `messages.tts.auto` مضبوطة على `tagged`، تكون هذه التوجيهات مطلوبة لتفعيل الصوت.
+افتراضيًا، **يمكن** للنموذج إصدار توجيهات TTS لرد واحد.
+وعندما تكون `messages.tts.auto` مساوية لـ `tagged`، تصبح هذه التوجيهات مطلوبة لتشغيل الصوت.
 
-عند التفعيل، يمكن للنموذج إخراج توجيهات `[[tts:...]]` لتجاوز إعداد الصوت
-لرد واحد، بالإضافة إلى كتلة اختيارية `[[tts:text]]...[[/tts:text]]`
-لتوفير وسوم تعبيرية (ضحك، إشارات غناء، وما إلى ذلك) يجب أن تظهر فقط في
+عند تفعيل ذلك، يمكن للنموذج إصدار توجيهات `[[tts:...]]` لتجاوز الصوت
+لرد واحد، بالإضافة إلى كتلة اختيارية `[[tts:text]]...[[/tts:text]]` من أجل
+تقديم وسوم تعبيرية (الضحك، وإشارات الغناء، وما إلى ذلك) ينبغي أن تظهر فقط في
 الصوت.
 
-يتم تجاهل توجيهات `provider=...` ما لم تكن `modelOverrides.allowProvider: true`.
+يتم تجاهل توجيهات `provider=...` ما لم تكن قيمة `modelOverrides.allowProvider: true`.
 
 مثال على حمولة رد:
 
@@ -341,17 +377,17 @@ Here you go.
 
 مفاتيح التوجيه المتاحة (عند التفعيل):
 
-- `provider` (معرّف موفر speech مسجّل، مثل `openai` أو `elevenlabs` أو `google` أو `minimax` أو `microsoft`؛ ويتطلب `allowProvider: true`)
-- `voice` (صوت OpenAI)، أو `voiceName` / `voice_name` / `google_voice` (صوت Google)، أو `voiceId` (ElevenLabs / MiniMax)
-- `model` (نموذج OpenAI TTS أو معرّف نموذج ElevenLabs أو نموذج MiniMax) أو `google_model` (نموذج Google TTS)
-- `stability` و`similarityBoost` و`style` و`speed` و`useSpeakerBoost`
+- `provider` (معرّف مزوّد الكلام المسجل، مثل `openai` أو `elevenlabs` أو `google` أو `minimax` أو `microsoft`؛ ويتطلب `allowProvider: true`)
+- `voice` (صوت OpenAI)، أو `voiceName` / `voice_name` / `google_voice` (صوت Google)، أو `voiceId` (ElevenLabs / MiniMax / xAI)
+- `model` (نموذج OpenAI TTS، أو معرّف نموذج ElevenLabs، أو نموذج MiniMax) أو `google_model` (نموذج Google TTS)
+- `stability`، `similarityBoost`، `style`، `speed`، `useSpeakerBoost`
 - `vol` / `volume` (مستوى صوت MiniMax، من 0 إلى 10)
-- `pitch` (نغمة MiniMax، من -12 إلى 12)
+- `pitch` (طبقة صوت MiniMax، من -12 إلى 12)
 - `applyTextNormalization` (`auto|on|off`)
 - `languageCode` (ISO 639-1)
 - `seed`
 
-تعطيل جميع تجاوزات النموذج:
+عطّل كل تجاوزات النموذج:
 
 ```json5
 {
@@ -365,7 +401,7 @@ Here you go.
 }
 ```
 
-قائمة سماح اختيارية (تمكين التبديل بين الموفرين مع الإبقاء على بقية عناصر الضبط قابلة للتهيئة):
+قائمة سماح اختيارية (تفعيل تبديل المزوّد مع إبقاء بقية المفاتيح قابلة للضبط):
 
 ```json5
 {
@@ -381,20 +417,20 @@ Here you go.
 }
 ```
 
-## تفضيلات لكل مستخدم
+## التفضيلات لكل مستخدم
 
-تكتب أوامر الشرطة المائلة تجاوزات محلية إلى `prefsPath` (الافتراضي:
-`~/.openclaw/settings/tts.json`، ويمكن التجاوز باستخدام `OPENCLAW_TTS_PREFS` أو
+تكتب أوامر slash التجاوزات المحلية إلى `prefsPath` (الافتراضي:
+`~/.openclaw/settings/tts.json`، ويمكن تجاوزه عبر `OPENCLAW_TTS_PREFS` أو
 `messages.tts.prefsPath`).
 
 الحقول المخزنة:
 
 - `enabled`
 - `provider`
-- `maxLength` (حد التلخيص؛ الافتراضي 1500 حرفًا)
+- `maxLength` (عتبة التلخيص؛ الافتراضي 1500 حرفًا)
 - `summarize` (الافتراضي `true`)
 
-تتجاوز هذه الحقول `messages.tts.*` على ذلك المضيف.
+تتجاوز هذه القيم `messages.tts.*` لهذا المضيف.
 
 ## تنسيقات الإخراج (ثابتة)
 
@@ -402,29 +438,30 @@ Here you go.
   - يُعد 48kHz / 64kbps توازنًا جيدًا للرسائل الصوتية.
 - **القنوات الأخرى**: MP3 (`mp3_44100_128` من ElevenLabs، و`mp3` من OpenAI).
   - يُعد 44.1kHz / 128kbps التوازن الافتراضي لوضوح الكلام.
-- **MiniMax**: ‏MP3 (نموذج `speech-2.8-hd`، ومعدل عينات 32kHz). لا يدعم تنسيق الملاحظات الصوتية أصلاً؛ استخدم OpenAI أو ElevenLabs إذا كنت بحاجة إلى رسائل صوتية Opus مضمونة.
-- **Google Gemini**: يعيد Gemini API TTS بيانات PCM خام بمعدل 24kHz. يغلّفها OpenClaw بصيغة WAV لمرفقات الصوت، ويعيد PCM مباشرةً لـ Talk/telephony. لا يدعم هذا المسار تنسيق ملاحظات Opus الصوتية الأصلي.
+- **MiniMax**: ‏MP3 (نموذج `speech-2.8-hd`، بمعدل عينة 32kHz). ولا يُدعم تنسيق الملاحظات الصوتية أصلًا؛ استخدم OpenAI أو ElevenLabs للحصول على رسائل صوتية Opus مضمونة.
+- **Google Gemini**: يعيد Gemini API TTS قيمة PCM خام بتردد 24kHz. ويغلفه OpenClaw كملف WAV لمرفقات الصوت، ويعيد PCM مباشرةً لـ Talk/الاتصالات الهاتفية. ولا يدعم هذا المسار تنسيق الملاحظات الصوتية الأصلي Opus.
+- **xAI**: ‏MP3 افتراضيًا؛ ويمكن أن تكون `responseFormat` هي `mp3` أو `wav` أو `pcm` أو `mulaw` أو `alaw`. ويستخدم OpenClaw نقطة نهاية xAI REST TTS الدفعية ويعيد مرفقًا صوتيًا كاملًا؛ ولا يُستخدم WebSocket الخاص بـ TTS المتدفق في xAI في مسار هذا المزوّد. ولا يدعم هذا المسار تنسيق الملاحظات الصوتية الأصلي Opus.
 - **Microsoft**: يستخدم `microsoft.outputFormat` (الافتراضي `audio-24khz-48kbitrate-mono-mp3`).
-  - يقبل النقل المضمّن قيمة `outputFormat`، لكن ليست كل التنسيقات متاحة من الخدمة.
+  - تقبل وسيلة النقل المضمّنة `outputFormat`، لكن ليست كل التنسيقات متاحة من الخدمة.
   - تتبع قيم تنسيق الإخراج تنسيقات إخراج Microsoft Speech (بما في ذلك Ogg/WebM Opus).
-  - يقبل Telegram `sendVoice` تنسيقات OGG/MP3/M4A؛ استخدم OpenAI/ElevenLabs إذا كنت بحاجة
+  - يقبل `sendVoice` في Telegram التنسيقات OGG/MP3/M4A؛ استخدم OpenAI/ElevenLabs إذا كنت تحتاج
     إلى رسائل صوتية Opus مضمونة.
-  - إذا فشل تنسيق إخراج Microsoft المُعدّ، يعيد OpenClaw المحاولة باستخدام MP3.
+  - إذا فشل تنسيق الإخراج المهيأ من Microsoft، يعيد OpenClaw المحاولة باستخدام MP3.
 
-تكون تنسيقات إخراج OpenAI/ElevenLabs ثابتة بحسب القناة (انظر أعلاه).
+تكون تنسيقات الإخراج في OpenAI/ElevenLabs ثابتة لكل قناة (انظر أعلاه).
 
 ## سلوك Auto-TTS
 
 عند التفعيل، يقوم OpenClaw بما يلي:
 
-- يتخطى TTS إذا كان الرد يحتوي بالفعل على وسائط أو توجيه `MEDIA:`.
-- يتخطى الردود القصيرة جدًا (أقل من 10 أحرف).
-- يلخّص الردود الطويلة عند التفعيل باستخدام `agents.defaults.model.primary` (أو `summaryModel`).
-- يرفق الصوت المُنشأ بالرد.
+- يتخطى TTS إذا كان الرد يحتوي أصلًا على وسائط أو توجيه `MEDIA:`.
+- يتخطى الردود القصيرة جدًا (< 10 أحرف).
+- يلخص الردود الطويلة عند التفعيل باستخدام `agents.defaults.model.primary` (أو `summaryModel`).
+- يرفق الصوت المولّد بالرد.
 
-إذا تجاوز الرد `maxLength` وكان التلخيص متوقفًا (أو لم يوجد مفتاح API لـ
+إذا تجاوز الرد `maxLength` وكان التلخيص معطلًا (أو لم يوجد مفتاح API لـ
 نموذج التلخيص)،
-فسيتم تخطي الصوت وسيُرسل الرد النصي العادي.
+فسيتم تخطي الصوت وإرسال الرد النصي العادي.
 
 ## مخطط التدفق
 
@@ -441,13 +478,13 @@ Reply -> TTS enabled?
                                       -> TTS -> attach audio
 ```
 
-## استخدام أوامر الشرطة المائلة
+## استخدام أمر slash
 
 يوجد أمر واحد فقط: `/tts`.
-راجع [أوامر الشرطة المائلة](/ar/tools/slash-commands) لمعرفة تفاصيل التفعيل.
+راجع [أوامر slash](/ar/tools/slash-commands) لمعرفة تفاصيل التفعيل.
 
-ملاحظة Discord: الأمر `/tts` هو أمر مضمّن في Discord، لذلك يسجّل OpenClaw
-`/voice` باعتباره الأمر الأصلي هناك. وما يزال النص `/tts ...` يعمل.
+ملاحظة Discord: إن `/tts` أمر مدمج في Discord، لذلك يسجل OpenClaw
+الأمر `/voice` كأمر أصلي هناك. ولا يزال النص `/tts ...` يعمل.
 
 ```
 /tts off
@@ -461,28 +498,28 @@ Reply -> TTS enabled?
 
 ملاحظات:
 
-- تتطلب الأوامر مُرسِلًا مخوّلًا (وما تزال قواعد allowlist/owner سارية).
-- يجب تفعيل `commands.text` أو تسجيل الأوامر الأصلية.
-- تقبل تهيئة `messages.tts.auto` القيم `off|always|inbound|tagged`.
+- تتطلب الأوامر مرسلًا مخولًا (ولا تزال قواعد allowlist/المالك مطبقة).
+- يجب أن تكون `commands.text` أو تسجيل الأوامر الأصلية مفعّلة.
+- يقبل config في `messages.tts.auto` القيم `off|always|inbound|tagged`.
 - يكتب `/tts on` تفضيل TTS المحلي إلى `always`؛ ويكتب `/tts off` إلى `off`.
-- استخدم التهيئة عندما تريد القيم الافتراضية `inbound` أو `tagged`.
-- يتم تخزين `limit` و`summary` في التفضيلات المحلية، وليس في التهيئة الرئيسية.
-- ينشئ `/tts audio` ردًا صوتيًا لمرة واحدة (ولا يفعّل TTS).
-- يتضمن `/tts status` إظهارًا للاحتياطي في آخر محاولة:
-  - نجاح مع احتياطي: `Fallback: <primary> -> <used>` بالإضافة إلى `Attempts: ...`
+- استخدم config عندما تريد القيم الافتراضية `inbound` أو `tagged`.
+- يتم تخزين `limit` و`summary` في prefs المحلية، وليس في config الرئيسي.
+- يولّد `/tts audio` ردًا صوتيًا لمرة واحدة (ولا يؤدي إلى تفعيل TTS).
+- يتضمن `/tts status` إظهار الرجوع الاحتياطي لأحدث محاولة:
+  - رجوع احتياطي ناجح: `Fallback: <primary> -> <used>` بالإضافة إلى `Attempts: ...`
   - فشل: `Error: ...` بالإضافة إلى `Attempts: ...`
   - تشخيصات مفصلة: `Attempt details: provider:outcome(reasonCode) latency`
-- تتضمن حالات فشل OpenAI وElevenLabs API الآن تفاصيل خطأ الموفر المُحللة ومعرّف الطلب (عند إرجاعه من الموفر)، ويظهر ذلك في أخطاء/سجلات TTS.
+- تتضمن إخفاقات OpenAI وElevenLabs API الآن تفاصيل أخطاء المزوّد المحللة ومعرّف الطلب (عند إرجاعه من المزوّد)، ويظهر ذلك في أخطاء/سجلات TTS.
 
 ## أداة الوكيل
 
-تقوم أداة `tts` بتحويل النص إلى كلام وتُرجع مرفقًا صوتيًا من أجل
-تسليم الرد. عندما تكون القناة Feishu أو Matrix أو Telegram أو WhatsApp،
+تحول أداة `tts` النص إلى كلام وتعيد مرفقًا صوتيًا من أجل
+تسليم الرد. وعندما تكون القناة Feishu أو Matrix أو Telegram أو WhatsApp،
 يُسلَّم الصوت كرسالة صوتية بدلًا من مرفق ملف.
 
 ## Gateway RPC
 
-طرائق Gateway:
+أساليب Gateway:
 
 - `tts.status`
 - `tts.enable`

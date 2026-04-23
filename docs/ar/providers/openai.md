@@ -2,34 +2,49 @@
 read_when:
     - أنت تريد استخدام نماذج OpenAI في OpenClaw
     - أنت تريد مصادقة اشتراك Codex بدلًا من مفاتيح API
-    - أنت بحاجة إلى سلوك تنفيذ أكثر صرامة لوكيل GPT-5
+    - أنت تحتاج إلى سلوك تنفيذ أكثر صرامة لوكلاء GPT-5
 summary: استخدم OpenAI عبر مفاتيح API أو اشتراك Codex في OpenClaw
 title: OpenAI
 x-i18n:
-    generated_at: "2026-04-22T04:28:08Z"
+    generated_at: "2026-04-23T07:31:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 692615b77885c0387d339d47c02ff056ba95d3608aa681882893a46d2a0f723f
+    source_hash: c3d847e53c2faee5363071dfdcb1f4150b64577674161e000844f579482198d1
     source_path: providers/openai.md
     workflow: 15
 ---
 
-# OpenAI
+  # OpenAI
 
-توفّر OpenAI واجهات API للمطورين لنماذج GPT. يدعم OpenClaw مساري مصادقة:
+  توفر OpenAI واجهات API للمطورين لنماذج GPT. يدعم OpenClaw مساري مصادقة:
 
-- **مفتاح API** — وصول مباشر إلى OpenAI Platform مع فوترة حسب الاستخدام (نماذج `openai/*`)
-- **اشتراك Codex** — تسجيل دخول ChatGPT/Codex مع وصول عبر الاشتراك (نماذج `openai-codex/*`)
+  - **مفتاح API** — وصول مباشر إلى OpenAI Platform مع فوترة حسب الاستخدام (نماذج `openai/*`)
+  - **اشتراك Codex** — تسجيل دخول ChatGPT/Codex مع وصول عبر الاشتراك (نماذج `openai-codex/*`)
 
-تدعم OpenAI صراحةً استخدام OAuth الخاص بالاشتراك في الأدوات الخارجية وسير العمل مثل OpenClaw.
+  تدعم OpenAI صراحةً استخدام OAuth الخاص بالاشتراك في الأدوات وسير العمل الخارجية مثل OpenClaw.
 
-## البدء
+  ## تغطية ميزات OpenClaw
 
-اختر طريقة المصادقة المفضلة لديك واتبع خطوات الإعداد.
+  | قدرة OpenAI | سطح OpenClaw | الحالة |
+  | ------------------------- | ----------------------------------------- | ------------------------------------------------------ |
+  | الدردشة / Responses | موفر النماذج `openai/<model>` | نعم |
+  | نماذج اشتراك Codex | موفر النماذج `openai-codex/<model>` | نعم |
+  | البحث على الويب من جانب الخادم | أداة OpenAI Responses الأصلية | نعم، عند تفعيل البحث على الويب وعدم تثبيت موفر محدد |
+  | الصور | `image_generate` | نعم |
+  | الفيديو | `video_generate` | نعم |
+  | تحويل النص إلى كلام | `messages.tts.provider: "openai"` / `tts` | نعم |
+  | تحويل الكلام إلى نص على دفعات | `tools.media.audio` / فهم الوسائط | نعم |
+  | تحويل الكلام إلى نص بشكل متدفق | Voice Call `streaming.provider: "openai"` | نعم |
+  | الصوت الفوري | Voice Call `realtime.provider: "openai"` | نعم |
+  | التضمينات | موفر تضمينات الذاكرة | نعم |
 
-<Tabs>
+  ## البدء
+
+  اختر طريقة المصادقة المفضلة لديك واتبع خطوات الإعداد.
+
+  <Tabs>
   <Tab title="مفتاح API (OpenAI Platform)">
-    **الأفضل لـ:** الوصول المباشر إلى API والفوترة حسب الاستخدام.
+    **الأفضل من أجل:** وصول API مباشر وفوترة حسب الاستخدام.
 
     <Steps>
       <Step title="احصل على مفتاح API الخاص بك">
@@ -55,16 +70,16 @@ x-i18n:
 
     ### ملخص المسار
 
-    | Model ref | المسار | المصادقة |
+    | مرجع النموذج | المسار | المصادقة |
     |-----------|-------|------|
-    | `openai/gpt-5.4` | OpenAI Platform API المباشر | `OPENAI_API_KEY` |
-    | `openai/gpt-5.4-pro` | OpenAI Platform API المباشر | `OPENAI_API_KEY` |
+    | `openai/gpt-5.4` | OpenAI Platform API مباشرة | `OPENAI_API_KEY` |
+    | `openai/gpt-5.4-pro` | OpenAI Platform API مباشرة | `OPENAI_API_KEY` |
 
     <Note>
-    يتم توجيه تسجيل دخول ChatGPT/Codex عبر `openai-codex/*` وليس `openai/*`.
+    يتم توجيه تسجيل دخول ChatGPT/Codex عبر `openai-codex/*`، وليس `openai/*`.
     </Note>
 
-    ### مثال على config
+    ### مثال على التكوين
 
     ```json5
     {
@@ -74,16 +89,16 @@ x-i18n:
     ```
 
     <Warning>
-    لا يعرّض OpenClaw النموذج `openai/gpt-5.3-codex-spark` على مسار API المباشر. ترفض طلبات OpenAI API الحية هذا النموذج. Spark خاص بـ Codex فقط.
+    لا يكشف OpenClaw **عن** `openai/gpt-5.3-codex-spark` على مسار API المباشر. إذ ترفض طلبات OpenAI API الحية هذا النموذج. إن Spark خاص بـ Codex فقط.
     </Warning>
 
   </Tab>
 
   <Tab title="اشتراك Codex">
-    **الأفضل لـ:** استخدام اشتراك ChatGPT/Codex الخاص بك بدلًا من مفتاح API منفصل. يتطلب Codex cloud تسجيل الدخول إلى ChatGPT.
+    **الأفضل من أجل:** استخدام اشتراك ChatGPT/Codex الخاص بك بدلًا من مفتاح API منفصل. يتطلب Codex السحابي تسجيل الدخول إلى ChatGPT.
 
     <Steps>
-      <Step title="شغّل Codex OAuth">
+      <Step title="شغّل OAuth الخاص بـ Codex">
         ```bash
         openclaw onboard --auth-choice openai-codex
         ```
@@ -92,6 +107,12 @@ x-i18n:
 
         ```bash
         openclaw models auth login --provider openai-codex
+        ```
+
+        بالنسبة إلى الإعدادات الرأسية أو غير الملائمة لرد الاتصال، أضف `--device-code` لتسجيل الدخول باستخدام تدفق رمز الجهاز في ChatGPT بدلًا من رد الاتصال عبر المتصفح المحلي:
+
+        ```bash
+        openclaw models auth login --provider openai-codex --device-code
         ```
       </Step>
       <Step title="اضبط النموذج الافتراضي">
@@ -108,7 +129,7 @@ x-i18n:
 
     ### ملخص المسار
 
-    | Model ref | المسار | المصادقة |
+    | مرجع النموذج | المسار | المصادقة |
     |-----------|-------|------|
     | `openai-codex/gpt-5.4` | ChatGPT/Codex OAuth | تسجيل دخول Codex |
     | `openai-codex/gpt-5.3-codex-spark` | ChatGPT/Codex OAuth | تسجيل دخول Codex (يعتمد على الاستحقاق) |
@@ -117,7 +138,7 @@ x-i18n:
     هذا المسار منفصل عمدًا عن `openai/gpt-5.4`. استخدم `openai/*` مع مفتاح API للوصول المباشر إلى Platform، واستخدم `openai-codex/*` للوصول عبر اشتراك Codex.
     </Note>
 
-    ### مثال على config
+    ### مثال على التكوين
 
     ```json5
     {
@@ -125,20 +146,20 @@ x-i18n:
     }
     ```
 
-    <Tip>
-    إذا أعاد onboarding استخدام تسجيل دخول موجود لـ Codex CLI، فستبقى بيانات الاعتماد هذه مُدارة بواسطة Codex CLI. وعند انتهاء صلاحيتها، يعيد OpenClaw قراءة مصدر Codex الخارجي أولًا ثم يكتب بيانات الاعتماد المحدّثة مرة أخرى إلى تخزين Codex.
-    </Tip>
+    <Note>
+    لم يعد onboarding يستورد مواد OAuth من `~/.codex`. سجّل الدخول باستخدام OAuth عبر المتصفح (الافتراضي) أو تدفق رمز الجهاز أعلاه — ويتولى OpenClaw إدارة بيانات الاعتماد الناتجة داخل مخزن مصادقة الوكيل الخاص به.
+    </Note>
 
-    ### الحد الأقصى لنافذة السياق
+    ### حد نافذة السياق
 
-    يتعامل OpenClaw مع بيانات وصف النموذج وحدّ سياق وقت التشغيل كقيمتين منفصلتين.
+    يتعامل OpenClaw مع بيانات وصفية النموذج وحد بيئة التشغيل للسياق كقيمتين منفصلتين.
 
     بالنسبة إلى `openai-codex/gpt-5.4`:
 
-    - `contextWindow` الأصلي: `1050000`
-    - الحد الافتراضي لـ `contextTokens` في وقت التشغيل: `272000`
+    - `contextWindow` الأصلية: `1050000`
+    - الحد الافتراضي لـ `contextTokens` في بيئة التشغيل: `272000`
 
-    يملك الحد الافتراضي الأصغر خصائص أفضل عمليًا من حيث زمن الاستجابة والجودة. يمكنك تجاوزه باستخدام `contextTokens`:
+    يتمتع الحد الافتراضي الأصغر بزمن استجابة أفضل وخصائص جودة أفضل عمليًا. يمكنك تجاوزه باستخدام `contextTokens`:
 
     ```json5
     {
@@ -153,7 +174,7 @@ x-i18n:
     ```
 
     <Note>
-    استخدم `contextWindow` للتصريح ببيانات وصف النموذج الأصلية. واستخدم `contextTokens` لتقييد ميزانية سياق وقت التشغيل.
+    استخدم `contextWindow` للتصريح ببيانات النموذج الأصلية الوصفية. واستخدم `contextTokens` لتقييد ميزانية سياق بيئة التشغيل.
     </Note>
 
   </Tab>
@@ -161,14 +182,14 @@ x-i18n:
 
 ## توليد الصور
 
-يسجّل Plugin ‏`openai` المضمّن توليد الصور عبر أداة `image_generate`.
+يسجل Plugin `openai` المضمّن توليد الصور عبر الأداة `image_generate`.
 
-| Capability                | القيمة |
+| القدرة | القيمة |
 | ------------------------- | ---------------------------------- |
-| النموذج الافتراضي             | `openai/gpt-image-2`               |
-| الحد الأقصى للصور لكل طلب    | 4                                  |
-| وضع التعديل                 | مفعّل (حتى 5 صور مرجعية) |
-| تجاوزات الحجم            | مدعومة، بما في ذلك أحجام 2K/4K   |
+| النموذج الافتراضي | `openai/gpt-image-2` |
+| الحد الأقصى للصور في كل طلب | 4 |
+| وضع التعديل | مفعّل (حتى 5 صور مرجعية) |
+| تجاوزات الحجم | مدعومة، بما في ذلك أحجام 2K/4K |
 | نسبة الأبعاد / الدقة | لا يتم تمريرها إلى OpenAI Images API |
 
 ```json5
@@ -182,12 +203,12 @@ x-i18n:
 ```
 
 <Note>
-راجع [توليد الصور](/ar/tools/image-generation) للاطلاع على معاملات الأداة المشتركة، واختيار المزوّد، وسلوك failover.
+راجع [Image Generation](/ar/tools/image-generation) للاطلاع على معلمات الأداة المشتركة، واختيار الموفّر، وسلوك failover.
 </Note>
 
-يُعد `gpt-image-2` الافتراضي لكل من توليد الصور من النص في OpenAI وتحرير الصور.
-ولا يزال `gpt-image-1` قابلًا للاستخدام كتجاوز صريح للنموذج، لكن يجب أن تستخدم
-تدفقات عمل الصور الجديدة في OpenAI النموذج `openai/gpt-image-2`.
+إن `gpt-image-2` هو الافتراضي لكل من توليد الصور من النص في OpenAI وتحرير الصور.
+ولا يزال `gpt-image-1` قابلًا للاستخدام كتجاوز صريح للنموذج، لكن
+مسارات عمل الصور الجديدة في OpenAI ينبغي أن تستخدم `openai/gpt-image-2`.
 
 توليد:
 
@@ -195,7 +216,7 @@ x-i18n:
 /tool image_generate model=openai/gpt-image-2 prompt="A polished launch poster for OpenClaw on macOS" size=3840x2160 count=1
 ```
 
-تحرير:
+تعديل:
 
 ```
 /tool image_generate model=openai/gpt-image-2 prompt="Preserve the object shape, change the material to translucent glass" image=/path/to/reference.png size=1024x1536
@@ -203,15 +224,15 @@ x-i18n:
 
 ## توليد الفيديو
 
-يسجّل Plugin ‏`openai` المضمّن توليد الفيديو عبر أداة `video_generate`.
+يسجل Plugin `openai` المضمّن توليد الفيديو عبر الأداة `video_generate`.
 
-| Capability       | القيمة |
+| القدرة | القيمة |
 | ---------------- | --------------------------------------------------------------------------------- |
-| النموذج الافتراضي    | `openai/sora-2`                                                                   |
-| الأوضاع            | نص إلى فيديو، صورة إلى فيديو، تحرير فيديو واحد                                  |
-| المدخلات المرجعية | صورة واحدة أو فيديو واحد                                                                |
-| تجاوزات الحجم   | مدعومة                                                                         |
-| تجاوزات أخرى  | يتم تجاهل `aspectRatio` و`resolution` و`audio` و`watermark` مع تحذير من الأداة |
+| النموذج الافتراضي | `openai/sora-2` |
+| الأوضاع | نص إلى فيديو، صورة إلى فيديو، تحرير فيديو واحد |
+| المدخلات المرجعية | صورة واحدة أو فيديو واحد |
+| تجاوزات الحجم | مدعومة |
+| تجاوزات أخرى | يتم تجاهل `aspectRatio` و`resolution` و`audio` و`watermark` مع تحذير من الأداة |
 
 ```json5
 {
@@ -224,28 +245,32 @@ x-i18n:
 ```
 
 <Note>
-راجع [توليد الفيديو](/ar/tools/video-generation) للاطلاع على معاملات الأداة المشتركة، واختيار المزوّد، وسلوك failover.
+راجع [Video Generation](/ar/tools/video-generation) للاطلاع على معلمات الأداة المشتركة، واختيار الموفّر، وسلوك failover.
 </Note>
 
-## مساهمة GPT-5 في prompt
+## مساهمة prompt الخاصة بـ GPT-5
 
-يضيف OpenClaw مساهمة prompt خاصة بـ OpenAI GPT-5 لتشغيلات عائلة GPT-5 ضمن `openai/*` و`openai-codex/*`. وهي موجودة داخل Plugin ‏OpenAI المضمّن، وتنطبق على معرّفات النماذج مثل `gpt-5` و`gpt-5.2` و`gpt-5.4` و`gpt-5.4-mini`، ولا تنطبق على نماذج GPT-4.x الأقدم.
+يضيف OpenClaw مساهمة prompt مشتركة خاصة بـ GPT-5 لتشغيلات عائلة GPT-5 عبر الموفّرين. وهي تُطبّق حسب معرّف النموذج، لذا تتلقى `openai/gpt-5.4` و`openai-codex/gpt-5.4` و`openrouter/openai/gpt-5.4` و`opencode/gpt-5.4` وغيرها من مراجع GPT-5 المتوافقة التراكب نفسه. أما النماذج الأقدم GPT-4.x فلا تتلقى ذلك.
 
-تضيف مساهمة GPT-5 عقد سلوك موسومًا لاستمرارية الشخصية، وأمان التنفيذ، وانضباط الأدوات، وشكل المخرجات، وفحوصات الإكمال، والتحقق. ويبقى سلوك الردود الخاص بكل قناة وسلوك الرسائل الصامتة ضمن system prompt المشترك في OpenClaw وسياسة التسليم الصادرة. ويكون توجيه GPT-5 مفعّلًا دائمًا للنماذج المطابقة. أما طبقة أسلوب التفاعل الودود فهي منفصلة وقابلة للضبط.
+يستخدم موفّر Codex harness الأصلي المضمّن (`codex/*`) سلوك GPT-5 نفسه وتراكب Heartbeat عبر تعليمات المطور في Codex app-server، لذلك تحافظ جلسات `codex/gpt-5.x` على المتابعة نفسها وإرشادات Heartbeat الاستباقية نفسها رغم أن Codex يملك بقية prompt الخاصة بالـ harness.
 
-| القيمة                  | التأثير                                      |
+تضيف مساهمة GPT-5 عقد سلوك موسومًا يتعلق باستمرارية الشخصية، وسلامة التنفيذ، وانضباط الأدوات، وشكل المخرجات، وفحوصات الإكمال، والتحقق. أما سلوك الرد الخاص بالقناة وسلوك الرسائل الصامتة فيبقيان في system prompt المشترك لـ OpenClaw وسياسة التسليم الصادرة. تكون إرشادات GPT-5 مفعّلة دائمًا للنماذج المطابقة. أما طبقة أسلوب التفاعل الودّي فهي منفصلة وقابلة للتكوين.
+
+| القيمة | التأثير |
 | ---------------------- | ------------------------------------------- |
-| `"friendly"` (الافتراضي) | تفعيل طبقة أسلوب التفاعل الودود |
-| `"on"`                 | اسم بديل لـ `"friendly"`                      |
-| `"off"`                | تعطيل طبقة الأسلوب الودود فقط       |
+| `"friendly"` (الافتراضي) | تفعيل طبقة أسلوب التفاعل الودّي |
+| `"on"` | اسم مستعار لـ `"friendly"` |
+| `"off"` | تعطيل طبقة الأسلوب الودّي فقط |
 
 <Tabs>
-  <Tab title="Config">
+  <Tab title="التكوين">
     ```json5
     {
-      plugins: {
-        entries: {
-          openai: { config: { personality: "friendly" } },
+      agents: {
+        defaults: {
+          promptOverlays: {
+            gpt5: { personality: "friendly" },
+          },
         },
       },
     }
@@ -253,32 +278,36 @@ x-i18n:
   </Tab>
   <Tab title="CLI">
     ```bash
-    openclaw config set plugins.entries.openai.config.personality off
+    openclaw config set agents.defaults.promptOverlays.gpt5.personality off
     ```
   </Tab>
 </Tabs>
 
 <Tip>
-تكون القيم غير حساسة لحالة الأحرف وقت التشغيل، لذا فإن `"Off"` و`"off"` كلتاهما تعطلان طبقة الأسلوب الودود.
+تكون القيم غير حساسة لحالة الأحرف وقت التشغيل، لذا فإن `"Off"` و`"off"` كلتاهما تعطلان طبقة الأسلوب الودّي.
 </Tip>
+
+<Note>
+لا يزال `plugins.entries.openai.config.personality` القديم مقروءًا كرجوع احتياطي للتوافق عندما لا يكون الإعداد المشترك `agents.defaults.promptOverlays.gpt5.personality` مضبوطًا.
+</Note>
 
 ## الصوت والكلام
 
 <AccordionGroup>
-  <Accordion title="تركيب الكلام (TTS)">
-    يسجّل Plugin ‏`openai` المضمّن تركيب الكلام لواجهة `messages.tts`.
+  <Accordion title="توليف الكلام (TTS)">
+    يسجل Plugin `openai` المضمّن توليف الكلام لسطح `messages.tts`.
 
-    | الإعداد | مسار config | الافتراضي |
+    | الإعداد | مسار التكوين | الافتراضي |
     |---------|------------|---------|
     | النموذج | `messages.tts.providers.openai.model` | `gpt-4o-mini-tts` |
     | الصوت | `messages.tts.providers.openai.voice` | `coral` |
     | السرعة | `messages.tts.providers.openai.speed` | (غير مضبوط) |
-    | التعليمات | `messages.tts.providers.openai.instructions` | (غير مضبوط، `gpt-4o-mini-tts` فقط) |
+    | التعليمات | `messages.tts.providers.openai.instructions` | (غير مضبوط، لـ `gpt-4o-mini-tts` فقط) |
     | التنسيق | `messages.tts.providers.openai.responseFormat` | `opus` للملاحظات الصوتية، و`mp3` للملفات |
-    | مفتاح API | `messages.tts.providers.openai.apiKey` | يعود إلى `OPENAI_API_KEY` |
+    | مفتاح API | `messages.tts.providers.openai.apiKey` | يرجع إلى `OPENAI_API_KEY` |
     | Base URL | `messages.tts.providers.openai.baseUrl` | `https://api.openai.com/v1` |
 
-    النماذج المتاحة: `gpt-4o-mini-tts` و`tts-1` و`tts-1-hd`. والأصوات المتاحة: `alloy` و`ash` و`ballad` و`cedar` و`coral` و`echo` و`fable` و`juniper` و`marin` و`onyx` و`nova` و`sage` و`shimmer` و`verse`.
+    النماذج المتاحة: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`. الأصوات المتاحة: `alloy`, `ash`, `ballad`, `cedar`, `coral`, `echo`, `fable`, `juniper`, `marin`, `onyx`, `nova`, `sage`, `shimmer`, `verse`.
 
     ```json5
     {
@@ -293,61 +322,99 @@ x-i18n:
     ```
 
     <Note>
-    اضبط `OPENAI_TTS_BASE_URL` لتجاوز TTS base URL من دون التأثير على نقطة نهاية chat API.
+    اضبط `OPENAI_TTS_BASE_URL` لتجاوز عنوان TTS الأساسي من دون التأثير في نقطة نهاية Chat API.
     </Note>
 
   </Accordion>
 
-  <Accordion title="النسخ اللحظي">
-    يسجّل Plugin ‏`openai` المضمّن النسخ اللحظي لـ Plugin المكالمات الصوتية.
+  <Accordion title="تحويل الكلام إلى نص">
+    يسجل Plugin `openai` المضمّن تحويل الكلام إلى نص على دفعات عبر
+    سطح التحويل إلى نص لفهم الوسائط في OpenClaw.
 
-    | الإعداد | مسار config | الافتراضي |
+    - النموذج الافتراضي: `gpt-4o-transcribe`
+    - نقطة النهاية: OpenAI REST ‏`/v1/audio/transcriptions`
+    - مسار الإدخال: رفع ملف صوتي بنموذج multipart
+    - مدعوم في OpenClaw أينما كان تحويل الصوت الوارد إلى نص يستخدم
+      `tools.media.audio`، بما في ذلك مقاطع قنوات Discord الصوتية ومرفقات
+      الصوت في القنوات
+
+    لفرض استخدام OpenAI لتحويل الصوت الوارد إلى نص:
+
+    ```json5
+    {
+      tools: {
+        media: {
+          audio: {
+            models: [
+              {
+                type: "provider",
+                provider: "openai",
+                model: "gpt-4o-transcribe",
+              },
+            ],
+          },
+        },
+      },
+    }
+    ```
+
+    تُمرر تلميحات اللغة وprompt إلى OpenAI عندما يوفّرها
+    تكوين وسائط الصوت المشترك أو طلب التحويل إلى نص لكل استدعاء.
+
+  </Accordion>
+
+  <Accordion title="التحويل الفوري إلى نص">
+    يسجل Plugin `openai` المضمّن التحويل الفوري إلى نص من أجل Plugin الخاص بـ Voice Call.
+
+    | الإعداد | مسار التكوين | الافتراضي |
     |---------|------------|---------|
     | النموذج | `plugins.entries.voice-call.config.streaming.providers.openai.model` | `gpt-4o-transcribe` |
+    | اللغة | `...openai.language` | (غير مضبوط) |
+    | Prompt | `...openai.prompt` | (غير مضبوط) |
     | مدة الصمت | `...openai.silenceDurationMs` | `800` |
     | عتبة VAD | `...openai.vadThreshold` | `0.5` |
-    | مفتاح API | `...openai.apiKey` | يعود إلى `OPENAI_API_KEY` |
+    | مفتاح API | `...openai.apiKey` | يرجع إلى `OPENAI_API_KEY` |
 
     <Note>
-    يستخدم اتصال WebSocket إلى `wss://api.openai.com/v1/realtime` مع صوت G.711 u-law.
+    يستخدم اتصال WebSocket إلى `wss://api.openai.com/v1/realtime` مع صوت G.711 u-law ‏(`g711_ulaw` / `audio/pcmu`). موفر البث هذا مخصص لمسار التحويل الفوري إلى نص في Voice Call؛ أما صوت Discord فيسجل حاليًا مقاطع قصيرة ويستخدم بدلًا من ذلك مسار التحويل على دفعات `tools.media.audio`.
     </Note>
 
   </Accordion>
 
-  <Accordion title="الصوت اللحظي">
-    يسجّل Plugin ‏`openai` المضمّن الصوت اللحظي لـ Plugin المكالمات الصوتية.
+  <Accordion title="الصوت الفوري">
+    يسجل Plugin `openai` المضمّن الصوت الفوري من أجل Plugin الخاص بـ Voice Call.
 
-    | الإعداد | مسار config | الافتراضي |
+    | الإعداد | مسار التكوين | الافتراضي |
     |---------|------------|---------|
     | النموذج | `plugins.entries.voice-call.config.realtime.providers.openai.model` | `gpt-realtime` |
     | الصوت | `...openai.voice` | `alloy` |
-    | الحرارة | `...openai.temperature` | `0.8` |
+    | درجة الحرارة | `...openai.temperature` | `0.8` |
     | عتبة VAD | `...openai.vadThreshold` | `0.5` |
     | مدة الصمت | `...openai.silenceDurationMs` | `500` |
-    | مفتاح API | `...openai.apiKey` | يعود إلى `OPENAI_API_KEY` |
+    | مفتاح API | `...openai.apiKey` | يرجع إلى `OPENAI_API_KEY` |
 
     <Note>
-    يدعم Azure OpenAI عبر مفاتيح config ‏`azureEndpoint` و`azureDeployment`. ويدعم استدعاء الأدوات ثنائي الاتجاه. ويستخدم تنسيق الصوت G.711 u-law.
+    يدعم Azure OpenAI عبر مفاتيح التكوين `azureEndpoint` و`azureDeployment`. ويدعم الاستدعاء ثنائي الاتجاه للأدوات. ويستخدم تنسيق الصوت G.711 u-law.
     </Note>
 
   </Accordion>
 </AccordionGroup>
 
-## الإعدادات المتقدمة
+## التكوين المتقدم
 
 <AccordionGroup>
   <Accordion title="النقل (WebSocket مقابل SSE)">
-    يستخدم OpenClaw أسلوب WebSocket أولًا مع fallback إلى SSE ‏(`"auto"`) لكل من `openai/*` و`openai-codex/*`.
+    يستخدم OpenClaw أسلوب WebSocket أولًا مع رجوع SSE الاحتياطي (`"auto"`) لكل من `openai/*` و`openai-codex/*`.
 
     في وضع `"auto"`، يقوم OpenClaw بما يلي:
-    - يعيد محاولة فشل WebSocket مبكر واحد قبل الرجوع إلى SSE
-    - بعد الفشل، يعلّم WebSocket على أنه متدهور لمدة تقارب 60 ثانية ويستخدم SSE أثناء فترة التهدئة
-    - يرفق رؤوسًا مستقرة لهوية الجلسة والدور من أجل إعادة المحاولة وإعادة الاتصال
-    - يطبّع عدادات الاستخدام (`input_tokens` / `prompt_tokens`) عبر متغيرات النقل
+    - يعيد محاولة فشل مبكر واحد في WebSocket قبل الرجوع إلى SSE
+    - بعد أي فشل، يعلّم WebSocket على أنه متدهور لمدة ~60 ثانية ويستخدم SSE أثناء فترة التهدئة
+    - يرفق رؤوس هوية جلسة ودور ثابتة لإعادة المحاولات وإعادة الاتصال
+    - يطبّع عدادات الاستخدام (`input_tokens` / `prompt_tokens`) عبر أشكال النقل المختلفة
 
     | القيمة | السلوك |
     |-------|----------|
-    | `"auto"` (الافتراضي) | WebSocket أولًا، ثم fallback إلى SSE |
+    | `"auto"` (الافتراضي) | WebSocket أولًا، مع رجوع SSE الاحتياطي |
     | `"sse"` | فرض SSE فقط |
     | `"websocket"` | فرض WebSocket فقط |
 
@@ -365,17 +432,17 @@ x-i18n:
     }
     ```
 
-    وثائق OpenAI ذات الصلة:
+    مستندات OpenAI ذات الصلة:
     - [Realtime API with WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
     - [Streaming API responses (SSE)](https://platform.openai.com/docs/guides/streaming-responses)
 
   </Accordion>
 
   <Accordion title="إحماء WebSocket">
-    يفعّل OpenClaw إحماء WebSocket افتراضيًا لـ `openai/*` لتقليل زمن استجابة الدور الأول.
+    يفعّل OpenClaw إحماء WebSocket افتراضيًا لـ `openai/*` لتقليل زمن الاستجابة في الدور الأول.
 
     ```json5
-    // Disable warm-up
+    // تعطيل الإحماء
     {
       agents: {
         defaults: {
@@ -391,13 +458,15 @@ x-i18n:
 
   </Accordion>
 
+<a id="openai-fast-mode"></a>
+
   <Accordion title="الوضع السريع">
-    يوفّر OpenClaw مفتاح تبديل مشتركًا للوضع السريع لكل من `openai/*` و`openai-codex/*`:
+    يكشف OpenClaw عن مفتاح وضع سريع مشترك لكل من `openai/*` و`openai-codex/*`:
 
     - **الدردشة/واجهة المستخدم:** `/fast status|on|off`
-    - **Config:** `agents.defaults.models["<provider>/<model>"].params.fastMode`
+    - **التكوين:** `agents.defaults.models["<provider>/<model>"].params.fastMode`
 
-    عند التمكين، يربط OpenClaw الوضع السريع بمعالجة OpenAI ذات الأولوية (`service_tier = "priority"`). ويتم الاحتفاظ بقيم `service_tier` الموجودة، ولا يعيد الوضع السريع كتابة `reasoning` أو `text.verbosity`.
+    عند التفعيل، يربط OpenClaw الوضع السريع بالمعالجة ذات الأولوية في OpenAI ‏(`service_tier = "priority"`). وتُحفَظ قيم `service_tier` الحالية، ولا يعيد الوضع السريع كتابة `reasoning` أو `text.verbosity`.
 
     ```json5
     {
@@ -413,13 +482,13 @@ x-i18n:
     ```
 
     <Note>
-    تتغلب تجاوزات الجلسة على config. وتؤدي إزالة تجاوز الجلسة في واجهة Sessions إلى إعادة الجلسة إلى الإعداد الافتراضي المكوَّن.
+    تتغلب تجاوزات الجلسة على التكوين. ويؤدي مسح تجاوز الجلسة في واجهة Sessions إلى إعادة الجلسة إلى القيمة الافتراضية المضبوطة.
     </Note>
 
   </Accordion>
 
   <Accordion title="المعالجة ذات الأولوية (service_tier)">
-    تكشف API الخاصة بـ OpenAI المعالجة ذات الأولوية عبر `service_tier`. اضبطها لكل نموذج في OpenClaw:
+    تكشف API الخاصة بـ OpenAI عن المعالجة ذات الأولوية عبر `service_tier`. اضبطها لكل نموذج في OpenClaw:
 
     ```json5
     {
@@ -434,10 +503,10 @@ x-i18n:
     }
     ```
 
-    القيم المدعومة: `auto` و`default` و`flex` و`priority`.
+    القيم المدعومة: `auto`, `default`, `flex`, `priority`.
 
     <Warning>
-    يتم تمرير `serviceTier` فقط إلى نقاط نهاية OpenAI الأصلية (`api.openai.com`) ونقاط نهاية Codex الأصلية (`chatgpt.com/backend-api`). إذا وجّهت أيًا من المزوّدين عبر proxy، فسيترك OpenClaw القيمة `service_tier` دون تعديل.
+    لا يُمرَّر `serviceTier` إلا إلى نقاط نهاية OpenAI الأصلية (`api.openai.com`) ونقاط نهاية Codex الأصلية (`chatgpt.com/backend-api`). وإذا قمت بتوجيه أي موفر منهما عبر proxy، فإن OpenClaw يترك `service_tier` من دون تعديل.
     </Warning>
 
   </Accordion>
@@ -445,13 +514,13 @@ x-i18n:
   <Accordion title="Compaction على جانب الخادم (Responses API)">
     بالنسبة إلى نماذج OpenAI Responses المباشرة (`openai/*` على `api.openai.com`)، يفعّل OpenClaw تلقائيًا Compaction على جانب الخادم:
 
-    - يفرض `store: true` (ما لم يضبط compat للنموذج القيمة `supportsStore: false`)
+    - يفرض `store: true` (ما لم يضبط توافق النموذج `supportsStore: false`)
     - يحقن `context_management: [{ type: "compaction", compact_threshold: ... }]`
     - القيمة الافتراضية لـ `compact_threshold`: ‏70% من `contextWindow` (أو `80000` عند عدم توفرها)
 
     <Tabs>
-      <Tab title="التمكين صراحةً">
-        مفيد لنقاط النهاية المتوافقة مثل Azure OpenAI Responses:
+      <Tab title="تفعيل صريح">
+        يكون هذا مفيدًا لنقاط النهاية المتوافقة مثل Azure OpenAI Responses:
 
         ```json5
         {
@@ -503,12 +572,12 @@ x-i18n:
     </Tabs>
 
     <Note>
-    يتحكم `responsesServerCompaction` فقط في حقن `context_management`. ولا تزال نماذج OpenAI Responses المباشرة تفرض `store: true` ما لم يضبط compat القيمة `supportsStore: false`.
+    يتحكم `responsesServerCompaction` فقط في حقن `context_management`. أما نماذج OpenAI Responses المباشرة فلا تزال تفرض `store: true` ما لم يضبط التوافق `supportsStore: false`.
     </Note>
 
   </Accordion>
 
-  <Accordion title="وضع GPT الوكيلي الصارم">
+  <Accordion title="وضع GPT الصارم الخاص بالوكلاء">
     بالنسبة إلى تشغيلات عائلة GPT-5 على `openai/*` و`openai-codex/*`، يمكن لـ OpenClaw استخدام عقد تنفيذ مضمّن أكثر صرامة:
 
     ```json5
@@ -522,32 +591,32 @@ x-i18n:
     ```
 
     مع `strict-agentic`، يقوم OpenClaw بما يلي:
-    - لا يعود يعتبر دورًا قائمًا على الخطة فقط تقدمًا ناجحًا عندما يكون إجراء أداة متاحًا
-    - يعيد محاولة الدور مع توجيه steer للتصرف الآن
-    - يفعّل `update_plan` تلقائيًا للأعمال الكبيرة
+    - لم يعد يعامل الدور الذي يحتوي على خطة فقط على أنه تقدم ناجح عندما يكون إجراء أداة متاحًا
+    - يعيد محاولة الدور مع توجيه "نفّذ الآن"
+    - يفعّل تلقائيًا `update_plan` للأعمال الكبيرة
     - يعرض حالة حظر صريحة إذا استمر النموذج في التخطيط من دون تنفيذ
 
     <Note>
-    هذا النطاق محصور في تشغيلات OpenAI وCodex لعائلة GPT-5 فقط. أما المزوّدون الآخرون وعائلات النماذج الأقدم فيحتفظون بالسلوك الافتراضي.
+    هذا النطاق يقتصر على تشغيلات عائلة GPT-5 الخاصة بـ OpenAI وCodex فقط. أما الموفّرون الآخرون والعائلات الأقدم من النماذج فيحتفظون بالسلوك الافتراضي.
     </Note>
 
   </Accordion>
 
   <Accordion title="المسارات الأصلية مقابل المسارات المتوافقة مع OpenAI">
-    يتعامل OpenClaw مع نقاط نهاية OpenAI وCodex وAzure OpenAI المباشرة بشكل مختلف عن proxies العامة المتوافقة مع OpenAI لمسار `/v1`:
+    يتعامل OpenClaw مع نقاط النهاية المباشرة لـ OpenAI وCodex وAzure OpenAI بصورة مختلفة عن proxies العامة المتوافقة مع OpenAI على `/v1`:
 
     **المسارات الأصلية** (`openai/*` و`openai-codex/*` وAzure OpenAI):
-    - تُبقي `reasoning: { effort: "none" }` فقط للنماذج التي تدعم قيمة OpenAI ‏`none`
-    - تُسقط تعطيل reasoning للنماذج أو proxies التي ترفض `reasoning.effort: "none"`
+    - تحتفظ بـ `reasoning: { effort: "none" }` فقط للنماذج التي تدعم قيمة OpenAI `none`
+    - تحذف reasoning المعطل للنماذج أو proxies التي ترفض `reasoning.effort: "none"`
     - تجعل مخططات الأدوات في الوضع الصارم افتراضيًا
-    - تُرفق رؤوس attribution مخفية على المضيفات الأصلية المتحقق منها فقط
-    - تُبقي تشكيل الطلبات الخاص بـ OpenAI فقط (`service_tier` و`store` وreasoning-compat وتلميحات prompt-cache)
+    - ترفق رؤوس attribution مخفية على المضيفين الأصليين المتحقق منهم فقط
+    - تحتفظ بشكل الطلبات الخاص بـ OpenAI فقط (`service_tier`, `store`, وتوافق reasoning، وتلميحات prompt-cache)
 
     **المسارات المتوافقة/عبر proxy:**
-    - تستخدم سلوك compat أكثر مرونة
+    - تستخدم سلوك توافق أكثر تساهلًا
     - لا تفرض مخططات أدوات صارمة أو رؤوسًا أصلية فقط
 
-    يستخدم Azure OpenAI النقل الأصلي وسلوك compat الأصلي لكنه لا يتلقى رؤوس attribution المخفية.
+    يستخدم Azure OpenAI النقل الأصلي وسلوك التوافق الأصلي، لكنه لا يتلقى رؤوس attribution المخفية.
 
   </Accordion>
 </AccordionGroup>
@@ -556,13 +625,13 @@ x-i18n:
 
 <CardGroup cols={2}>
   <Card title="اختيار النموذج" href="/ar/concepts/model-providers" icon="layers">
-    اختيار المزوّدين، وModel refs، وسلوك failover.
+    اختيار الموفّرين، ومراجع النماذج، وسلوك failover.
   </Card>
   <Card title="توليد الصور" href="/ar/tools/image-generation" icon="image">
-    معاملات أداة الصور المشتركة واختيار المزوّد.
+    معلمات أداة الصور المشتركة واختيار الموفّر.
   </Card>
   <Card title="توليد الفيديو" href="/ar/tools/video-generation" icon="video">
-    معاملات أداة الفيديو المشتركة واختيار المزوّد.
+    معلمات أداة الفيديو المشتركة واختيار الموفّر.
   </Card>
   <Card title="OAuth والمصادقة" href="/ar/gateway/authentication" icon="key">
     تفاصيل المصادقة وقواعد إعادة استخدام بيانات الاعتماد.

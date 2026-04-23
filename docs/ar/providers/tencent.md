@@ -5,20 +5,19 @@ read_when:
 summary: إعداد Tencent Cloud TokenHub
 title: Tencent Cloud (TokenHub)
 x-i18n:
-    generated_at: "2026-04-22T07:18:55Z"
+    generated_at: "2026-04-23T07:31:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04da073973792c55dc0c2d287bfc51187bb2128bbbd5c4a483f850adeea50ab5
+    source_hash: 90fce0d5957b261439cacd2b4df2362ed69511cb047af6a76ccaf54004806041
     source_path: providers/tencent.md
     workflow: 15
 ---
 
 # Tencent Cloud (TokenHub)
 
-يتيح مزود Tencent Cloud الوصول إلى نماذج Tencent Hy عبر نقطة نهاية TokenHub
-(`tencent-tokenhub`).
+يأتي Tencent Cloud كـ **Plugin مزوّد مضمّنة** في OpenClaw. وهي تتيح الوصول إلى نماذج Tencent Hy عبر نقطة نهاية TokenHub ‏(`tencent-tokenhub`).
 
-يستخدم المزود واجهة API متوافقة مع OpenAI.
+يستخدم المزوّد API متوافقة مع OpenAI.
 
 ## البدء السريع
 
@@ -37,31 +36,32 @@ openclaw onboard --non-interactive \
   --accept-risk
 ```
 
-## المزودون ونقاط النهاية
+## المزوّدون ونقاط النهاية
 
-| المزود             | نقطة النهاية                  | حالة الاستخدام           |
-| ------------------ | ----------------------------- | ------------------------ |
-| `tencent-tokenhub` | `tokenhub.tencentmaas.com/v1` | Hy عبر Tencent TokenHub |
+| المزوّد            | نقطة النهاية                  | حالة الاستخدام             |
+| ------------------ | ----------------------------- | -------------------------- |
+| `tencent-tokenhub` | `tokenhub.tencentmaas.com/v1` | Hy عبر Tencent TokenHub    |
 
 ## النماذج المتاحة
 
 ### tencent-tokenhub
 
-- **hy3-preview** — معاينة Hy3 ‏(سياق 256K، reasoning، افتراضي)
+- **hy3-preview** — معاينة Hy3 ‏(سياق 256K، واستدلال، والافتراضي)
 
 ## ملاحظات
 
 - تستخدم مراجع نماذج TokenHub الصيغة `tencent-tokenhub/<modelId>`.
-- تجاوز بيانات التسعير وبيانات السياق الوصفية في `models.providers` عند الحاجة.
+- تُشحن Plugin مع بيانات وصفية مضمّنة لتسعير Hy3 المتدرج، لذلك تُملأ تقديرات التكلفة من دون تجاوزات تسعير يدوية.
+- تجاوز بيانات التسعير والسياق الوصفية في `models.providers` إذا لزم الأمر.
 
-## ملاحظة حول البيئة
+## ملاحظة بيئية
 
-إذا كانت Gateway تعمل كخدمة daemon ‏(`launchd/systemd`)، فتأكد من أن `TOKENHUB_API_KEY`
-متاح لتلك العملية (على سبيل المثال، في `~/.openclaw/.env` أو عبر
+إذا كانت Gateway تعمل كـ daemon ‏(launchd/systemd)، فتأكد من أن `TOKENHUB_API_KEY`
+متاح لتلك العملية (مثلًا في `~/.openclaw/.env` أو عبر
 `env.shellEnv`).
 
-## الوثائق ذات الصلة
+## وثائق ذات صلة
 
-- [إعدادات OpenClaw](/ar/gateway/configuration)
-- [مزودو النماذج](/ar/concepts/model-providers)
+- [إعداد OpenClaw](/ar/gateway/configuration)
+- [مزوّدو النماذج](/ar/concepts/model-providers)
 - [Tencent TokenHub](https://cloud.tencent.com/document/product/1823/130050)
