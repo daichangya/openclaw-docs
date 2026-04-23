@@ -1,54 +1,54 @@
 ---
 read_when:
     - 手动初始化工作区
-summary: 用于 TOOLS.md 的工作区模板
+summary: TOOLS.md 的工作区模板
 title: TOOLS.md 模板
 x-i18n:
-    generated_at: "2026-04-05T10:08:33Z"
+    generated_at: "2026-04-23T21:04:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: eed204d57e7221ae0455a87272da2b0730d6aee6ddd2446a851703276e4a96b7
+    source_hash: 55ea69da82ed3c32671d7faf8b75d7000399eb10a8697243810d2aebc7a99129
     source_path: reference/templates/TOOLS.md
     workflow: 15
 ---
 
-# TOOLS.md - 本地说明
+# TOOLS.md - 本地笔记
 
-Skills 定义工具_如何_工作。这个文件用于记录_你自己的_具体信息——也就是你的设置中独有的内容。
+Skills 定义的是工具_如何_工作。这个文件记录的是_你自己的_具体信息 —— 也就是只属于你的环境配置。
 
-## 这里放什么
+## 这里应该放什么
 
-例如：
+比如：
 
 - 摄像头名称和位置
 - SSH 主机和别名
-- TTS 的首选语音
-- 扬声器/房间名称
+- 偏好的 TTS 语音
+- 扬声器 / 房间名称
 - 设备昵称
-- 任何环境特定的信息
+- 任何环境特定信息
 
 ## 示例
 
 ```markdown
-### Cameras
+### 摄像头
 
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
+- living-room → 主区域，180° 广角
+- front-door → 入口，移动触发
 
 ### SSH
 
-- home-server → 192.168.1.100, user: admin
+- home-server → 192.168.1.100，用户：admin
 
 ### TTS
 
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
+- 偏好语音："Nova"（温暖、略带英式口音）
+- 默认扬声器：Kitchen HomePod
 ```
 
 ## 为什么要分开？
 
-Skills 是共享的。你的设置是你自己的。将它们分开意味着你可以在不丢失自己笔记的情况下更新 Skills，也可以在不泄露自己基础设施信息的情况下共享 Skills。
+Skills 是共享的。你的配置是你自己的。把它们分开，意味着你可以在不丢失笔记的情况下更新 Skills，也可以在不泄露你的基础设施细节的情况下共享 Skills。
 
 ---
 
-添加任何能帮助你完成工作的内容。这是你的速查表。
+把任何能帮助你完成工作的内容都加进来。这是你的速查表。

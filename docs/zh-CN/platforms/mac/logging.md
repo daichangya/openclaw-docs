@@ -1,41 +1,41 @@
 ---
 read_when:
-    - 捕获 macOS 日志或调查私有数据日志记录
-    - 调试语音唤醒/会话生命周期问题
-summary: OpenClaw 日志：滚动诊断文件日志 + 统一日志隐私标志
-title: macOS 日志
+    - 捕获 macOS 日志或排查私有数据记录问题
+    - 调试 Voice Wake / 会话生命周期问题
+summary: OpenClaw 日志：滚动 diagnostics 文件日志 + 统一日志隐私标志
+title: macOS 日志记录
 x-i18n:
-    generated_at: "2026-04-05T08:37:49Z"
+    generated_at: "2026-04-23T20:55:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c08d6bc012f8e8bb53353fe654713dede676b4e6127e49fd76e00c2510b9ab0b
+    source_hash: 18e82cc564f7e33eed7add08d6c7fc70a4bb5309cf2bbedbb09ce0b798fe8155
     source_path: platforms/mac/logging.md
     workflow: 15
 ---
 
-# 日志（macOS）
+# 日志记录（macOS）
 
-## 滚动诊断文件日志（调试面板）
+## 滚动 diagnostics 文件日志（调试面板）
 
-OpenClaw 通过 swift-log 路由 macOS 应用日志（默认使用统一日志），并且在你需要持久化捕获时，可以将本地滚动文件日志写入磁盘。
+OpenClaw 会通过 swift-log 路由 macOS 应用日志（默认使用 unified logging），并且当你需要持久化捕获时，也可以将本地滚动文件日志写入磁盘。
 
-- 详细级别：**调试面板 → 日志 → 应用日志 → 详细级别**
-- 启用：**调试面板 → 日志 → 应用日志 → “写入滚动诊断日志（JSONL）”**
-- 位置：`~/Library/Logs/OpenClaw/diagnostics.jsonl`（自动轮转；旧文件会追加 `.1`、`.2`、… 后缀）
+- 详细程度：**调试面板 → 日志 → 应用日志 → 详细程度**
+- 启用：**调试面板 → 日志 → 应用日志 → “写入滚动 diagnostics 日志（JSONL）”**
+- 位置：`~/Library/Logs/OpenClaw/diagnostics.jsonl`（会自动轮转；旧文件会依次加上 `.1`、`.2` 等后缀）
 - 清除：**调试面板 → 日志 → 应用日志 → “清除”**
 
 说明：
 
-- 此功能**默认关闭**。仅在主动调试时启用。
-- 请将该文件视为敏感内容；未经审查不要分享。
+- 此功能**默认关闭**。仅在你主动调试时启用。
+- 请将该文件视为敏感信息；在未审查前不要分享。
 
-## macOS 上统一日志中的私有数据
+## macOS 上 unified logging 的私有数据
 
-统一日志会对大多数负载进行脱敏，除非某个子系统显式启用 `privacy -off`。根据 Peter 在 macOS [logging privacy shenanigans](https://steipete.me/posts/2025/logging-privacy-shenanigans)（2025）中的说明，这由 `/Library/Preferences/Logging/Subsystems/` 中一个以子系统名称为键的 plist 控制。只有新的日志条目会应用该标志，因此请在复现问题之前启用它。
+除非某个子系统显式启用了 `privacy -off`，否则 unified logging 会对大多数载荷进行脱敏。根据 Peter 关于 macOS [logging privacy shenanigans](https://steipete.me/posts/2025/logging-privacy-shenanigans)（2025）的文章，这由 `/Library/Preferences/Logging/Subsystems/` 下一个以子系统名为键的 plist 控制。只有新的日志条目会应用该标志，因此你应在复现问题之前启用它。
 
-## 为 OpenClaw 启用（`ai.openclaw`）
+## 为 OpenClaw（`ai.openclaw`）启用
 
-- 先将 plist 写入临时文件，然后以 root 身份原子方式安装：
+- 先将 plist 写到一个临时文件，再以 root 身份原子性安装：
 
 ```bash
 cat <<'EOF' >/tmp/ai.openclaw.plist
@@ -54,11 +54,11 @@ EOF
 sudo install -m 644 -o root -g wheel /tmp/ai.openclaw.plist /Library/Preferences/Logging/Subsystems/ai.openclaw.plist
 ```
 
-- 无需重启；`logd` 会很快注意到该文件，但只有新的日志行才会包含私有负载。
-- 使用现有辅助脚本查看更丰富的输出，例如 `./scripts/clawlog.sh --category WebChat --last 5m`。
+- 无需重启；`logd` 很快就会注意到该文件，但只有新的日志行才会包含私有载荷。
+- 使用现有辅助脚本查看更丰富的输出，例如：`./scripts/clawlog.sh --category WebChat --last 5m`。
 
 ## 调试后禁用
 
 - 删除该覆盖项：`sudo rm /Library/Preferences/Logging/Subsystems/ai.openclaw.plist`。
-- 可选运行 `sudo log config --reload`，强制 `logd` 立即丢弃该覆盖项。
-- 请记住，此处可能包含电话号码和消息正文；仅在你主动需要这些额外细节时才保留该 plist。
+- 可选执行 `sudo log config --reload`，以强制 `logd` 立即移除该覆盖。
+- 请记住，这个界面可能包含电话号码和消息正文；只有在你确实主动需要额外细节时，才应保留该 plist。

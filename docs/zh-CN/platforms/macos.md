@@ -1,53 +1,57 @@
 ---
 read_when:
     - 实现 macOS 应用功能
-    - 更改 macOS 上的 Gateway 网关生命周期或节点桥接
+    - 更改 macOS 上的 Gateway 网关生命周期或节点桥接 аиҳабы to=final code omitted
 summary: OpenClaw macOS 配套应用（菜单栏 + Gateway 网关代理）
 title: macOS 应用
 x-i18n:
-    generated_at: "2026-04-17T08:00:01Z"
+    generated_at: "2026-04-23T20:56:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d637df2f73ced110223c48ea3c934045d782e150a46495f434cf924a6a00baf0
+    source_hash: 6c7911d0a2e7be7fa437c5ef01a98c0f7da5e44388152ba182581cd2e381ba8b
     source_path: platforms/macos.md
     workflow: 15
 ---
 
-# OpenClaw macOS 配套应用（菜单栏 + Gateway 网关代理）
+macOS 应用是 OpenClaw 的**菜单栏配套应用**。它负责权限管理，
+在本地管理/附加到 Gateway 网关（launchd 或手动），并将 macOS
+能力作为节点暴露给智能体。
 
-macOS 应用是 OpenClaw 的**菜单栏配套应用**。它负责权限管理，在本地管理/连接 Gateway 网关（通过 `launchd` 或手动方式），并将 macOS 能力作为节点暴露给智能体。
-
-## 它的作用
+## 它能做什么
 
 - 在菜单栏中显示原生通知和状态。
-- 管理 TCC 提示（通知、辅助功能、屏幕录制、麦克风、语音识别、自动化 / AppleScript）。
+- 持有 TCC 提示（通知、辅助功能、屏幕录制、麦克风、
+  语音识别、自动化/AppleScript）。
 - 运行或连接到 Gateway 网关（本地或远程）。
 - 暴露仅限 macOS 的工具（Canvas、Camera、Screen Recording、`system.run`）。
-- 在**远程**模式下启动本地节点宿主服务（`launchd`），并在**本地**模式下将其停止。
-- 可选托管 **PeekabooBridge** 用于 UI 自动化。
-- 可按需通过 npm、pnpm 或 bun 安装全局 CLI（`openclaw`）（应用优先使用 npm，其次是 pnpm，最后是 bun；Node 仍然是推荐的 Gateway 网关运行时）。
+- 在**远程**模式下启动本地节点主机服务（launchd），并在**本地**模式下停止它。
+- 可选托管 **PeekabooBridge**，用于 UI 自动化。
+- 按需通过 npm、pnpm 或 bun 安装全局 CLI（`openclaw`）（应用优先使用 npm，然后 pnpm，再然后 bun；Node 仍然是推荐的 Gateway 网关运行时）。
 
 ## 本地模式与远程模式
 
-- **本地**（默认）：如果存在正在运行的本地 Gateway 网关，应用会连接到它；否则会通过 `openclaw gateway install` 启用 `launchd` 服务。
-- **远程**：应用通过 SSH/Tailscale 连接到 Gateway 网关，并且绝不会启动本地进程。  
-  应用会启动本地**节点宿主服务**，以便远程 Gateway 网关可以访问这台 Mac。  
-  应用不会将 Gateway 网关作为子进程启动。  
-  Gateway 网关发现现在会优先使用 Tailscale MagicDNS 名称，而不是原始 tailnet IP，因此当 tailnet IP 发生变化时，Mac 应用能更可靠地恢复连接。
+- **本地**（默认）：如果存在正在运行的本地 Gateway 网关，应用会附加到它；
+  否则会通过 `openclaw gateway install` 启用 launchd 服务。
+- **远程**：应用通过 SSH/Tailscale 连接到 Gateway 网关，且绝不会启动
+  本地进程。
+  应用会启动本地的**节点主机服务**，这样远程 Gateway 网关就可以访问这台 Mac。
+  应用不会把 Gateway 网关作为子进程拉起。
+  Gateway 网关发现现在会优先使用 Tailscale MagicDNS 名称，而不是原始 tailnet IP，
+  因此当 tailnet IP 发生变化时，Mac 应用恢复得更可靠。
 
 ## Launchd 控制
 
-应用会管理一个每用户的 LaunchAgent，标签为 `ai.openclaw.gateway`
-（使用 `--profile` / `OPENCLAW_PROFILE` 时则为 `ai.openclaw.<profile>`；旧版 `com.openclaw.*` 仍可卸载）。
+应用会管理一个按用户划分的 LaunchAgent，标签为 `ai.openclaw.gateway`
+（当使用 `--profile`/`OPENCLAW_PROFILE` 时为 `ai.openclaw.<profile>`；旧版 `com.openclaw.*` 仍可卸载）。
 
 ```bash
 launchctl kickstart -k gui/$UID/ai.openclaw.gateway
 launchctl bootout gui/$UID/ai.openclaw.gateway
 ```
 
-运行命名配置时，请将标签替换为 `ai.openclaw.<profile>`。
+如果使用的是具名 profile，请将标签替换为 `ai.openclaw.<profile>`。
 
-如果尚未安装 LaunchAgent，请在应用中启用，或运行
+如果 LaunchAgent 尚未安装，请从应用中启用它，或运行
 `openclaw gateway install`。
 
 ## 节点能力（mac）
@@ -59,14 +63,14 @@ macOS 应用会将自己呈现为一个节点。常见命令：
 - Screen：`screen.snapshot`、`screen.record`
 - System：`system.run`、`system.notify`
 
-节点会报告一个 `permissions` 映射，以便智能体判断哪些操作被允许。
+该节点会上报一个 `permissions` 映射，以便智能体判断哪些操作被允许。
 
 节点服务 + 应用 IPC：
 
-- 当无头节点宿主服务运行时（远程模式），它会作为节点连接到 Gateway 网关 WS。
-- `system.run` 通过本地 Unix 套接字在 macOS 应用中执行（UI/TCC 上下文）；提示和输出都会保留在应用内。
+- 当无头节点主机服务正在运行（远程模式）时，它会作为节点连接到 Gateway 网关 WS。
+- `system.run` 会在 macOS 应用中执行（UI/TCC 上下文），通过本地 Unix 套接字；提示和输出都保留在应用内。
 
-示意图（SCI）：
+图示（SCI）：
 
 ```
 Gateway -> Node Service (WS)
@@ -75,10 +79,10 @@ Gateway -> Node Service (WS)
              Mac App (UI + TCC + system.run)
 ```
 
-## Exec approvals（system.run）
+## Exec 审批（`system.run`）
 
-`system.run` 由 macOS 应用中的**Exec approvals** 控制（设置 → Exec approvals）。
-安全级别、询问策略和允许列表会作为本地数据存储在这台 Mac 上：
+`system.run` 由 macOS 应用中的**Exec 审批**控制（Settings → Exec approvals）。
+安全性 + 询问策略 + 允许列表会本地存储在 Mac 上：
 
 ```
 ~/.openclaw/exec-approvals.json
@@ -106,19 +110,19 @@ Gateway -> Node Service (WS)
 说明：
 
 - `allowlist` 条目是针对已解析二进制路径的 glob 模式。
-- 包含 shell 控制或展开语法（`&&`、`||`、`;`、`|`、`` ` ``、`$`、`<`、`>`、`(`、`)`）的原始 shell 命令文本会被视为允许列表未命中，因此需要显式批准（或者将 shell 二进制加入允许列表）。
-- 在提示中选择“始终允许”会将该命令加入允许列表。
-- `system.run` 的环境变量覆盖会先经过过滤（移除 `PATH`、`DYLD_*`、`LD_*`、`NODE_OPTIONS`、`PYTHON*`、`PERL*`、`RUBYOPT`、`SHELLOPTS`、`PS4`），然后再与应用环境合并。
-- 对于 shell 包装器（`bash|sh|zsh ... -c/-lc`），请求范围内的环境变量覆盖会被缩减为一个较小的显式允许列表（`TERM`、`LANG`、`LC_*`、`COLORTERM`、`NO_COLOR`、`FORCE_COLOR`）。
-- 对于允许列表模式下的“始终允许”决策，已知的分发包装器（`env`、`nice`、`nohup`、`stdbuf`、`timeout`）会持久化内部可执行文件路径，而不是包装器路径。如果无法安全解包，则不会自动持久化任何允许列表条目。
+- 含有 shell 控制或展开语法（`&&`、`||`、`;`、`|`、`` ` ``、`$`、`<`、`>`、`(`、`)`）的原始 shell 命令文本会被视为允许列表未命中，因此需要显式批准（或将 shell 二进制加入允许列表）。
+- 在提示中选择 “Always Allow” 会将该命令添加到允许列表。
+- `system.run` 的环境变量覆盖项会被过滤（会丢弃 `PATH`、`DYLD_*`、`LD_*`、`NODE_OPTIONS`、`PYTHON*`、`PERL*`、`RUBYOPT`、`SHELLOPTS`、`PS4`），然后与应用环境合并。
+- 对于 shell 包装器（`bash|sh|zsh ... -c/-lc`），请求作用域内的环境变量覆盖项会被缩减为一个较小的显式允许列表（`TERM`、`LANG`、`LC_*`、`COLORTERM`、`NO_COLOR`、`FORCE_COLOR`）。
+- 对于允许列表模式中的“始终允许”决策，已知调度包装器（`env`、`nice`、`nohup`、`stdbuf`、`timeout`）会持久化其内部可执行路径，而不是包装器路径。如果无法安全解包，则不会自动持久化允许列表条目。
 
-## 深度链接
+## Deep links
 
-应用为本地操作注册了 `openclaw://` URL scheme。
+应用注册了 `openclaw://` URL scheme，用于本地操作。
 
 ### `openclaw://agent`
 
-触发一个 Gateway 网关 `agent` 请求。
+会触发一次 Gateway 网关 `agent` 请求。
 __OC_I18N_900004__
 查询参数：
 
@@ -131,71 +135,82 @@ __OC_I18N_900004__
 
 安全性：
 
-- 没有 `key` 时，应用会提示你确认。
-- 没有 `key` 时，应用会对确认提示中的消息长度施加较短限制，并忽略 `deliver` / `to` / `channel`。
-- 使用有效的 `key` 时，运行将以无人值守方式执行（适用于个人自动化）。
+- 如果没有 `key`，应用会提示确认。
+- 如果没有 `key`，应用会对确认提示中的消息长度施加较短限制，并忽略 `deliver` / `to` / `channel`。
+- 如果提供有效的 `key`，则该运行是无人值守的（适用于个人自动化）。
 
 ## 新手引导流程（典型）
 
 1. 安装并启动 **OpenClaw.app**。
 2. 完成权限检查清单（TCC 提示）。
-3. 确保**本地**模式处于激活状态，且 Gateway 网关正在运行。
-4. 如果你需要终端访问，请安装 CLI。
+3. 确保启用了**本地**模式，并且 Gateway 网关正在运行。
+4. 如果你希望使用终端访问，请安装 CLI。
 
-## 状态目录放置位置（macOS）
+## 状态目录放置（macOS）
 
-避免将你的 OpenClaw 状态目录放在 iCloud 或其他云同步文件夹中。
-由同步支持的路径可能会增加延迟，并且偶尔会导致会话和凭证的文件锁 / 同步竞争。
+请避免将 OpenClaw 状态目录放在 iCloud 或其他云同步文件夹中。
+基于同步的路径会增加延迟，并且偶尔会对
+会话和凭证造成文件锁/同步竞争。
 
-建议使用本地、不同步的状态路径，例如：
+优先使用本地的非同步状态路径，例如：
 __OC_I18N_900005__
-如果 `openclaw doctor` 检测到状态目录位于以下路径之下：
+如果 `openclaw doctor` 检测到状态目录位于以下路径下：
 
 - `~/Library/Mobile Documents/com~apple~CloudDocs/...`
 - `~/Library/CloudStorage/...`
 
-它会发出警告并建议迁移回本地路径。
+它会发出警告，并建议迁移回本地路径。
 
 ## 构建与开发工作流（原生）
 
 - `cd apps/macos && swift build`
-- `swift run OpenClaw`（或 Xcode）
+- `swift run OpenClaw`（或使用 Xcode）
 - 打包应用：`scripts/package-mac-app.sh`
 
-## 调试 Gateway 网关连通性（macOS CLI）
+## 调试 Gateway 网关连接性（macOS CLI）
 
-使用调试 CLI 来演练与 macOS 应用相同的 Gateway 网关 WebSocket 握手和发现逻辑，而无需启动应用。
+使用调试 CLI 可以在不启动应用的情况下，验证与 macOS 应用相同的 Gateway 网关 WebSocket 握手和发现
+逻辑。
 __OC_I18N_900006__
 连接选项：
 
 - `--url <ws://host:port>`：覆盖配置
 - `--mode <local|remote>`：从配置解析（默认：配置值或 local）
-- `--probe`：强制执行一次新的健康探测
+- `--probe`：强制执行新的健康探测
 - `--timeout <ms>`：请求超时（默认：`15000`）
-- `--json`：用于 diff 对比的结构化输出
+- `--json`：用于 diff 的结构化输出
 
 发现选项：
 
-- `--include-local`：包含本应被过滤为“local”的 Gateway 网关
+- `--include-local`：包括那些原本会被过滤为“local”的 Gateway 网关
 - `--timeout <ms>`：整体发现窗口（默认：`2000`）
-- `--json`：用于 diff 对比的结构化输出
+- `--json`：用于 diff 的结构化输出
 
-提示：可与 `openclaw gateway discover --json` 对比，查看 macOS 应用的发现管线（`local.` 加上已配置的广域域名，并带有广域和 Tailscale Serve 回退）是否与 Node CLI 基于 `dns-sd` 的发现行为不同。
+提示：可与 `openclaw gateway discover --json` 对比，查看
+macOS 应用的发现流水线（`local.` 加上已配置的广域域名，并带有
+广域和 Tailscale Serve 回退）是否与
+Node CLI 基于 `dns-sd` 的发现不同。
 
-## 远程连接管线（SSH 隧道）
+## 远程连接底层机制（SSH 隧道）
 
-当 macOS 应用在**远程**模式下运行时，它会打开一个 SSH 隧道，使本地 UI 组件能够像连接 localhost 一样与远程 Gateway 网关通信。
+当 macOS 应用运行在**远程**模式时，它会打开一个 SSH 隧道，以便本地 UI
+组件能够像访问 localhost 一样访问远程 Gateway 网关。
 
-### 控制隧道（Gateway WebSocket 端口）
+### 控制隧道（Gateway 网关 WebSocket 端口）
 
-- **用途：** 健康检查、状态、Web Chat、配置以及其他控制平面调用。
-- **本地端口：** Gateway 网关端口（默认 `18789`），始终保持稳定。
-- **远程端口：** 远程主机上的相同 Gateway 网关端口。
-- **行为：** 不使用随机本地端口；应用会复用现有的健康隧道，或在需要时重新启动它。
-- **SSH 形式：** `ssh -N -L <local>:127.0.0.1:<remote>`，并带有 BatchMode + ExitOnForwardFailure + keepalive 选项。
-- **IP 报告：** SSH 隧道使用 loopback，因此 Gateway 网关会看到节点 IP 为 `127.0.0.1`。如果你希望显示真实客户端 IP，请使用**Direct（ws/wss）**传输方式（参见 [macOS 远程访问](/zh-CN/platforms/mac/remote)）。
+- **目的：** 健康检查、状态、Web Chat、配置以及其他控制平面调用。
+- **本地端口：** Gateway 网关端口（默认 `18789`），始终稳定。
+- **远程端口：** 远程主机上的同一个 Gateway 网关端口。
+- **行为：** 不使用随机本地端口；应用会复用已有的健康隧道，
+  或在需要时重新启动它。
+- **SSH 形式：** `ssh -N -L <local>:127.0.0.1:<remote>`，附带 BatchMode +
+  ExitOnForwardFailure + keepalive 选项。
+- **IP 报告：** SSH 隧道使用 loopback，因此 Gateway 网关会看到节点
+  IP 为 `127.0.0.1`。如果你希望显示真实客户端
+  IP，请使用 **Direct (ws/wss)** 传输（参见 [macOS 远程访问](/zh-CN/platforms/mac/remote)）。
 
-设置步骤请参见 [macOS 远程访问](/zh-CN/platforms/mac/remote)。协议细节请参见 [Gateway 协议](/zh-CN/gateway/protocol)。
+设置步骤请参见 [macOS 远程访问](/zh-CN/platforms/mac/remote)。协议
+细节请参见 [Gateway 网关协议](/zh-CN/gateway/protocol)。
 
 ## 相关文档
 

@@ -2,41 +2,39 @@
 read_when:
     - 你想要一份完整的文档地图
 summary: 链接到所有 OpenClaw 文档的导航中心
-title: 文档导航中心
+title: 文档中心
 x-i18n:
-    generated_at: "2026-04-23T06:43:24Z"
+    generated_at: "2026-04-23T21:05:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4bf24887af25cb345834e7f61e33d1ca3595833a42934ae91a87cc0951b3ae10
+    source_hash: 1c71f4fbadddeab19308b9d3d1144e8979e51b63228019ff8ea64d99a4513c1a
     source_path: start/hubs.md
     workflow: 15
 ---
 
-# 文档导航中心
-
 <Note>
-如果你刚开始接触 OpenClaw，请先阅读 [入门指南](/zh-CN/start/getting-started)。
+如果你是 OpenClaw 新手，请先阅读[入门指南](/zh-CN/start/getting-started)。
 </Note>
 
-使用这些导航中心来发现每一页文档，包括左侧导航中未显示的深度解析和参考文档。
+使用这些中心页来发现所有页面，包括那些不会出现在左侧导航中的深度解析和参考文档。
 
 ## 从这里开始
 
-- [Index](/zh-CN)
+- [索引](/zh-CN)
 - [入门指南](/zh-CN/start/getting-started)
 - [新手引导](/zh-CN/start/onboarding)
-- [设置向导（CLI）](/zh-CN/start/wizard)
+- [新手引导（CLI）](/zh-CN/start/wizard)
 - [设置](/zh-CN/start/setup)
-- [Dashboard（本地 Gateway 网关）](http://127.0.0.1:18789/)
-- [Help](/zh-CN/help)
+- [仪表板（本地 Gateway 网关）](http://127.0.0.1:18789/)
+- [帮助](/zh-CN/help)
 - [文档目录](/zh-CN/start/docs-directory)
 - [配置](/zh-CN/gateway/configuration)
 - [配置示例](/zh-CN/gateway/configuration-examples)
-- [OpenClaw assistant](/zh-CN/start/openclaw)
-- [Showcase](/zh-CN/start/showcase)
-- [Lore](/zh-CN/start/lore)
+- [OpenClaw 助手](/zh-CN/start/openclaw)
+- [展示](/zh-CN/start/showcase)
+- [世界观](/zh-CN/start/lore)
 
-## 安装 + 更新
+## 安装与更新
 
 - [Docker](/zh-CN/install/docker)
 - [Nix](/zh-CN/install/nix)
@@ -45,7 +43,7 @@ x-i18n:
 
 ## 核心概念
 
-- [Architecture](/zh-CN/concepts/architecture)
+- [架构](/zh-CN/concepts/architecture)
 - [功能](/zh-CN/concepts/features)
 - [网络中心](/zh-CN/network)
 - [智能体运行时](/zh-CN/concepts/agent)
@@ -56,12 +54,12 @@ x-i18n:
 - [多智能体路由](/zh-CN/concepts/multi-agent)
 - [压缩](/zh-CN/concepts/compaction)
 - [会话](/zh-CN/concepts/session)
-- [会话裁剪](/zh-CN/concepts/session-pruning)
+- [会话修剪](/zh-CN/concepts/session-pruning)
 - [会话工具](/zh-CN/concepts/session-tool)
 - [队列](/zh-CN/concepts/queue)
-- [斜杠命令](/zh-CN/tools/slash-commands)
+- [Slash commands](/zh-CN/tools/slash-commands)
 - [RPC 适配器](/zh-CN/reference/rpc)
-- [TypeBox 模式](/zh-CN/concepts/typebox)
+- [TypeBox schemas](/zh-CN/concepts/typebox)
 - [时区处理](/zh-CN/concepts/timezone)
 - [在线状态](/zh-CN/concepts/presence)
 - [设备发现 + 传输协议](/zh-CN/gateway/discovery)
@@ -69,13 +67,13 @@ x-i18n:
 - [渠道路由](/zh-CN/channels/channel-routing)
 - [群组](/zh-CN/channels/groups)
 - [群组消息](/zh-CN/channels/group-messages)
-- [模型故障切换](/zh-CN/concepts/model-failover)
+- [模型故障转移](/zh-CN/concepts/model-failover)
 - [OAuth](/zh-CN/concepts/oauth)
 
-## 提供商 + 接入
+## Providers 与入口
 
 - [聊天渠道中心](/zh-CN/channels)
-- [模型提供商中心](/zh-CN/providers/models)
+- [模型 providers 中心](/zh-CN/providers/models)
 - [WhatsApp](/zh-CN/channels/whatsapp)
 - [Telegram](/zh-CN/channels/telegram)
 - [Slack](/zh-CN/channels/slack)
@@ -90,19 +88,19 @@ x-i18n:
 - [Webhooks](/zh-CN/automation/cron-jobs#webhooks)
 - [Gmail Pub/Sub](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)
 
-## Gateway 网关 + 运维
+## Gateway 与运维
 
 - [Gateway 网关运行手册](/zh-CN/gateway)
 - [网络模型](/zh-CN/gateway/network-model)
 - [Gateway 网关配对](/zh-CN/gateway/pairing)
 - [Gateway 网关锁](/zh-CN/gateway/gateway-lock)
 - [后台进程](/zh-CN/gateway/background-process)
-- [健康状态](/zh-CN/gateway/health)
+- [健康检查](/zh-CN/gateway/health)
 - [Heartbeat](/zh-CN/gateway/heartbeat)
 - [Doctor](/zh-CN/gateway/doctor)
 - [日志](/zh-CN/gateway/logging)
 - [沙箱隔离](/zh-CN/gateway/sandboxing)
-- [Dashboard](/zh-CN/web/dashboard)
+- [仪表板](/zh-CN/web/dashboard)
 - [Control UI](/zh-CN/web/control-ui)
 - [远程访问](/zh-CN/gateway/remote)
 - [远程 Gateway 网关 README](/zh-CN/gateway/remote-gateway-readme)
@@ -110,34 +108,34 @@ x-i18n:
 - [安全](/zh-CN/gateway/security)
 - [故障排除](/zh-CN/gateway/troubleshooting)
 
-## 工具 + 自动化
+## 工具与自动化
 
 - [工具总览](/zh-CN/tools)
 - [OpenProse](/zh-CN/prose)
 - [CLI 参考](/zh-CN/cli)
 - [Exec 工具](/zh-CN/tools/exec)
 - [PDF 工具](/zh-CN/tools/pdf)
-- [提升模式](/zh-CN/tools/elevated)
-- [Cron 作业](/zh-CN/automation/cron-jobs)
+- [提权模式](/zh-CN/tools/elevated)
+- [Cron Jobs](/zh-CN/automation/cron-jobs)
 - [自动化与任务](/zh-CN/automation)
 - [Thinking + verbose](/zh-CN/tools/thinking)
 - [模型](/zh-CN/concepts/models)
 - [子智能体](/zh-CN/tools/subagents)
-- [Agent send CLI](/zh-CN/tools/agent-send)
-- [Terminal UI](/zh-CN/web/tui)
+- [智能体发送 CLI](/zh-CN/tools/agent-send)
+- [终端 UI](/zh-CN/web/tui)
 - [浏览器控制](/zh-CN/tools/browser)
 - [Browser（Linux 故障排除）](/zh-CN/tools/browser-linux-troubleshooting)
 - [投票](/zh-CN/cli/message)
 
-## 节点、媒体、语音
+## Nodes、媒体、语音
 
-- [节点概览](/zh-CN/nodes)
-- [相机](/zh-CN/nodes/camera)
+- [Nodes 概览](/zh-CN/nodes)
+- [摄像头](/zh-CN/nodes/camera)
 - [图像](/zh-CN/nodes/images)
 - [音频](/zh-CN/nodes/audio)
 - [位置命令](/zh-CN/nodes/location-command)
 - [语音唤醒](/zh-CN/nodes/voicewake)
-- [通话模式](/zh-CN/nodes/talk)
+- [对话模式](/zh-CN/nodes/talk)
 
 ## 平台
 
@@ -154,15 +152,15 @@ x-i18n:
 - [macOS 开发设置](/zh-CN/platforms/mac/dev-setup)
 - [macOS 菜单栏](/zh-CN/platforms/mac/menu-bar)
 - [macOS 语音唤醒](/zh-CN/platforms/mac/voicewake)
-- [macOS 语音浮层](/zh-CN/platforms/mac/voice-overlay)
+- [macOS 语音覆盖层](/zh-CN/platforms/mac/voice-overlay)
 - [macOS WebChat](/zh-CN/platforms/mac/webchat)
 - [macOS Canvas](/zh-CN/platforms/mac/canvas)
 - [macOS 子进程](/zh-CN/platforms/mac/child-process)
-- [macOS 健康状态](/zh-CN/platforms/mac/health)
+- [macOS 健康检查](/zh-CN/platforms/mac/health)
 - [macOS 图标](/zh-CN/platforms/mac/icon)
 - [macOS 日志](/zh-CN/platforms/mac/logging)
 - [macOS 权限](/zh-CN/platforms/mac/permissions)
-- [macOS 远程访问](/zh-CN/platforms/mac/remote)
+- [macOS 远程](/zh-CN/platforms/mac/remote)
 - [macOS 签名](/zh-CN/platforms/mac/signing)
 - [macOS Gateway 网关（launchd）](/zh-CN/platforms/mac/bundled-gateway)
 - [macOS XPC](/zh-CN/platforms/mac/xpc)
@@ -171,17 +169,17 @@ x-i18n:
 
 ## 插件
 
-- [Plugins 概览](/zh-CN/tools/plugin)
+- [插件概览](/zh-CN/tools/plugin)
 - [构建插件](/zh-CN/plugins/building-plugins)
 - [插件清单](/zh-CN/plugins/manifest)
 - [智能体工具](/zh-CN/plugins/building-plugins#registering-agent-tools)
-- [插件包](/zh-CN/plugins/bundles)
+- [插件 bundle](/zh-CN/plugins/bundles)
 - [社区插件](/zh-CN/plugins/community)
 - [能力扩展手册](/zh-CN/plugins/architecture)
-- [Voice call 插件](/zh-CN/plugins/voice-call)
+- [语音通话插件](/zh-CN/plugins/voice-call)
 - [Zalo user 插件](/zh-CN/plugins/zalouser)
 
-## 工作区 + 模板
+## 工作区与模板
 
 - [Skills](/zh-CN/tools/skills)
 - [ClawHub](/zh-CN/tools/clawhub)
@@ -199,7 +197,7 @@ x-i18n:
 
 - [致谢](/zh-CN/reference/credits)
 
-## 测试 + 发布
+## 测试与发布
 
 - [测试](/zh-CN/reference/test)
 - [发布策略](/zh-CN/reference/RELEASING)

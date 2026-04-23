@@ -1,28 +1,26 @@
 ---
 read_when:
-    - 你想在 OpenClaw 中使用 fal 图像生成
-    - 你需要 `FAL_KEY` 认证流程
-    - 你想为 `image_generate` 或 `video_generate` 使用 fal 默认设置
-summary: 在 OpenClaw 中设置 fal 图像和视频生成
-title: fal
+    - 你希望在 OpenClaw 中使用 fal 图像生成
+    - 你需要 FAL_KEY 认证流程
+    - 你想为 image_generate 或 video_generate 使用 fal 默认值
+summary: OpenClaw 中的 fal 图像与视频生成设置
+title: Fal
 x-i18n:
-    generated_at: "2026-04-12T10:22:34Z"
+    generated_at: "2026-04-23T21:00:09Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ff275233179b4808d625383efe04189ad9e92af09944ba39f1e953e77378e347
+    source_hash: 08863a147cfe9ea2af492b7898471037d9072730b4b7e4089be0afc35e3fd752
     source_path: providers/fal.md
     workflow: 15
 ---
 
-# fal
+OpenClaw 内置了一个 `fal` provider，用于托管式图像和视频生成。
 
-OpenClaw 内置了一个 `fal` 提供商，用于托管图像和视频生成。
-
-| 属性 | 值 |
+| 属性     | 值                                                            |
 | -------- | ------------------------------------------------------------- |
-| 提供商 | `fal` |
-| 认证 | `FAL_KEY`（规范方式；`FAL_API_KEY` 也可作为回退方式使用） |
-| API | fal 模型端点 |
+| Provider | `fal`                                                         |
+| 认证     | `FAL_KEY`（标准方式；`FAL_API_KEY` 也可作为回退使用）         |
+| API      | fal 模型端点                                                  |
 
 ## 入门指南
 
@@ -49,22 +47,22 @@ OpenClaw 内置了一个 `fal` 提供商，用于托管图像和视频生成。
 
 ## 图像生成
 
-内置的 `fal` 图像生成提供商默认使用
+内置的 `fal` 图像生成 provider 默认使用
 `fal/fal-ai/flux/dev`。
 
-| 能力 | 值 |
-| -------------- | -------------------------- |
-| 最大图像数 | 每次请求 4 张 |
-| 编辑模式 | 已启用，1 张参考图像 |
-| 尺寸覆盖 | 支持 |
-| 宽高比 | 支持 |
-| 分辨率 | 支持 |
+| 能力             | 值                         |
+| ---------------- | -------------------------- |
+| 最大图像数       | 每次请求 4 张              |
+| 编辑模式         | 已启用，支持 1 张参考图像  |
+| 尺寸覆盖         | 支持                       |
+| 宽高比           | 支持                       |
+| 分辨率           | 支持                       |
 
 <Warning>
 fal 图像编辑端点**不**支持 `aspectRatio` 覆盖。
 </Warning>
 
-要将 fal 用作默认图像提供商：
+若要将 fal 用作默认图像 provider：
 
 ```json5
 {
@@ -80,17 +78,17 @@ fal 图像编辑端点**不**支持 `aspectRatio` 覆盖。
 
 ## 视频生成
 
-内置的 `fal` 视频生成提供商默认使用
+内置的 `fal` 视频生成 provider 默认使用
 `fal/fal-ai/minimax/video-01-live`。
 
-| 能力 | 值 |
-| ---------- | ------------------------------------------------------------ |
-| 模式 | 文本生成视频、单图参考 |
-| 运行方式 | 由队列支持的提交 / 状态 / 结果流程，用于长时间运行的任务 |
+| 能力      | 值                                                           |
+| --------- | ------------------------------------------------------------ |
+| 模式      | 文本生成视频、单图参考视频                                   |
+| 运行时    | 基于队列的 submit/status/result 流程，适用于长时间运行任务   |
 
 <AccordionGroup>
   <Accordion title="可用视频模型">
-    **HeyGen 视频智能体：**
+    **HeyGen video-agent：**
 
     - `fal/fal-ai/heygen/v2/video-agent`
 
@@ -133,19 +131,20 @@ fal 图像编辑端点**不**支持 `aspectRatio` 覆盖。
 </AccordionGroup>
 
 <Tip>
-使用 `openclaw models list --provider fal` 查看完整的可用 fal 模型列表，包括最近新增的条目。
+使用 `openclaw models list --provider fal` 可查看完整的可用 fal
+模型列表，包括最近新增的条目。
 </Tip>
 
 ## 相关内容
 
 <CardGroup cols={2}>
   <Card title="图像生成" href="/zh-CN/tools/image-generation" icon="image">
-    共享的图像工具参数和提供商选择。
+    共享图像工具参数和 provider 选择。
   </Card>
   <Card title="视频生成" href="/zh-CN/tools/video-generation" icon="video">
-    共享的视频工具参数和提供商选择。
+    共享视频工具参数和 provider 选择。
   </Card>
   <Card title="配置参考" href="/zh-CN/gateway/configuration-reference#agent-defaults" icon="gear">
-    智能体默认设置，包括图像和视频模型选择。
+    智能体默认值，包括图像和视频模型选择。
   </Card>
 </CardGroup>

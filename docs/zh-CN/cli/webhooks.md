@@ -1,26 +1,26 @@
 ---
 read_when:
     - 你想将 Gmail Pub/Sub 事件接入 OpenClaw
-    - 你需要 webhook 辅助命令
-summary: '`openclaw webhooks` 的 CLI 参考（webhook 辅助命令 + Gmail Pub/Sub）'
+    - 你想要 webhook 辅助命令
+summary: '`openclaw webhooks` 的 CLI 参考（webhook 辅助工具 + Gmail Pub/Sub）'
 title: webhooks
 x-i18n:
-    generated_at: "2026-04-05T08:20:34Z"
+    generated_at: "2026-04-23T20:45:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2b22ce879c3a94557be57919b4d2b3e92ff4d41fbae7bc88d2ab07cd4bbeac83
+    source_hash: 7e42359194d3682e824757b301d83d22042c68f6d24b5b1b0550b65a7e5e460d
     source_path: cli/webhooks.md
     workflow: 15
 ---
 
 # `openclaw webhooks`
 
-webhook 辅助命令与集成（Gmail Pub/Sub、webhook 辅助命令）。
+Webhook 辅助工具与集成（Gmail Pub/Sub、webhook 辅助工具）。
 
 相关内容：
 
-- Webhooks：[Webhooks](/automation/cron-jobs#webhooks)
-- Gmail Pub/Sub：[Gmail Pub/Sub](/automation/cron-jobs#gmail-pubsub-integration)
+- Webhooks：[Webhooks](/zh-CN/automation/cron-jobs#webhooks)
+- Gmail Pub/Sub：[Gmail Pub/Sub](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gmail
 
@@ -31,9 +31,9 @@ openclaw webhooks gmail run
 
 ### `webhooks gmail setup`
 
-配置 Gmail watch、Pub/Sub 和 OpenClaw webhook 投递。
+配置 Gmail watch、Pub/Sub 和 OpenClaw webhook 传递。
 
-必需参数：
+必需项：
 
 - `--account <email>`
 
@@ -95,4 +95,4 @@ openclaw webhooks gmail setup --account you@example.com --hook-url https://gatew
 openclaw webhooks gmail run --account you@example.com
 ```
 
-有关端到端设置流程和运行细节，请参阅 [Gmail Pub/Sub 文档](/automation/cron-jobs#gmail-pubsub-integration)。
+端到端设置流程和运维细节请参见 [Gmail Pub/Sub 文档](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)。

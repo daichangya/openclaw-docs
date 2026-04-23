@@ -1,26 +1,24 @@
 ---
 read_when:
-    - 学习如何配置 OpenClaw
+    - 了解如何配置 OpenClaw
     - 查找配置示例
     - 首次设置 OpenClaw
-summary: 适用于常见 OpenClaw 设置的符合 schema 的准确配置示例
+summary: 常见 OpenClaw 设置的符合 schema 的配置示例
 title: 配置示例
 x-i18n:
-    generated_at: "2026-04-23T19:24:17Z"
+    generated_at: "2026-04-23T20:48:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9b5f280003776000a24ab6f9174fcd85f3b159e58c9f22923c6c6ab9143682fb
+    source_hash: dd0180447ed73ec9406723cd2dfc9445b54572c21df56b83d074902840aa726e
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-# 配置示例
-
-以下示例与当前配置 schema 保持一致。若需完整参考和逐字段说明，请参见 [Configuration](/zh-CN/gateway/configuration)。
+下面的示例已与当前配置 schema 对齐。完整参考和按字段说明请参见 [配置](/zh-CN/gateway/configuration)。
 
 ## 快速开始
 
-### 最小配置
+### 最简配置
 
 ```json5
 {
@@ -29,9 +27,9 @@ x-i18n:
 }
 ```
 
-保存到 `~/.openclaw/openclaw.json`，然后你就可以从该号码向机器人发送私信。
+将其保存到 `~/.openclaw/openclaw.json`，然后你就可以用该号码向 bot 发送私信。
 
-### 推荐起步配置
+### 推荐入门配置
 
 ```json5
 {
@@ -55,11 +53,11 @@ x-i18n:
 
 ## 扩展示例（主要选项）
 
-> JSON5 允许使用注释和尾随逗号。普通 JSON 也可以。
+> JSON5 允许你使用注释和尾随逗号。普通 JSON 也可以。
 
 ```json5
 {
-  // 环境 + shell
+  // Environment + shell
   env: {
     OPENROUTER_API_KEY: "sk-or-...",
     vars: {
@@ -71,7 +69,7 @@ x-i18n:
     },
   },
 
-  // 认证配置档元数据（密钥存放在 auth-profiles.json 中）
+  // Auth profile metadata (secrets live in auth-profiles.json)
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -86,14 +84,14 @@ x-i18n:
     },
   },
 
-  // 身份
+  // Identity
   identity: {
     name: "Samantha",
     theme: "helpful sloth",
     emoji: "🦥",
   },
 
-  // 日志
+  // Logging
   logging: {
     level: "info",
     file: "/tmp/openclaw/openclaw.log",
@@ -102,7 +100,7 @@ x-i18n:
     redactSensitive: "tools",
   },
 
-  // 消息格式
+  // Message formatting
   messages: {
     messagePrefix: "[openclaw]",
     responsePrefix: ">",
@@ -110,7 +108,7 @@ x-i18n:
     ackReactionScope: "group-mentions",
   },
 
-  // 路由 + 队列
+  // Routing + queue
   routing: {
     groupChat: {
       mentionPatterns: ["@openclaw", "openclaw"],
@@ -133,7 +131,7 @@ x-i18n:
     },
   },
 
-  // 工具
+  // Tooling
   tools: {
     media: {
       audio: {
@@ -141,7 +139,7 @@ x-i18n:
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // 可选的 CLI 回退（Whisper 二进制）：
+          // Optional CLI fallback (Whisper binary):
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -154,10 +152,10 @@ x-i18n:
     },
   },
 
-  // 会话行为
+  // Session behavior
   session: {
     scope: "per-sender",
-    dmScope: "per-channel-peer", // 推荐用于多用户收件箱
+    dmScope: "per-channel-peer", // recommended for multi-user inboxes
     reset: {
       mode: "daily",
       atHour: 4,
@@ -173,9 +171,9 @@ x-i18n:
       pruneAfter: "30d",
       maxEntries: 500,
       rotateBytes: "10mb",
-      resetArchiveRetention: "30d", // 时长或 false
-      maxDiskBytes: "500mb", // 可选
-      highWaterBytes: "400mb", // 可选（默认是 maxDiskBytes 的 80%）
+      resetArchiveRetention: "30d", // duration or false
+      maxDiskBytes: "500mb", // optional
+      highWaterBytes: "400mb", // optional (defaults to 80% of maxDiskBytes)
     },
     typingIntervalSeconds: 5,
     sendPolicy: {
@@ -184,7 +182,7 @@ x-i18n:
     },
   },
 
-  // 渠道
+  // Channels
   channels: {
     whatsapp: {
       dmPolicy: "pairing",
@@ -236,7 +234,7 @@ x-i18n:
     },
   },
 
-  // 智能体运行时
+  // Agent runtime
   agents: {
     defaults: {
       workspace: "~/.openclaw/workspace",
@@ -253,7 +251,7 @@ x-i18n:
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
         "openai/gpt-5.5": { alias: "gpt" },
       },
-      skills: ["github", "weather"], // 被未设置 list[].skills 的智能体继承
+      skills: ["github", "weather"], // inherited by agents that omit list[].skills
       thinkingDefault: "low",
       verboseDefault: "off",
       elevatedDefault: "on",
@@ -278,7 +276,7 @@ x-i18n:
         every: "30m",
         model: "anthropic/claude-sonnet-4-6",
         target: "last",
-        directPolicy: "allow", // allow（默认）| block
+        directPolicy: "allow", // allow (default) | block
         to: "+15555550123",
         prompt: "HEARTBEAT",
         ackMaxChars: 300,
@@ -293,7 +291,7 @@ x-i18n:
       },
       sandbox: {
         mode: "non-main",
-        scope: "session", // 优先于旧版 perSession: true
+        scope: "session", // preferred over legacy perSession: true
         workspaceRoot: "~/.openclaw/sandboxes",
         docker: {
           image: "openclaw-sandbox:bookworm-slim",
@@ -312,15 +310,15 @@ x-i18n:
       {
         id: "main",
         default: true,
-        // 继承 defaults.skills -> github, weather
-        thinkingDefault: "high", // 每个智能体的 thinking 覆盖
-        reasoningDefault: "on", // 每个智能体的推理可见性
-        fastModeDefault: false, // 每个智能体的快速模式
+        // inherits defaults.skills -> github, weather
+        thinkingDefault: "high", // per-agent thinking override
+        reasoningDefault: "on", // per-agent reasoning visibility
+        fastModeDefault: false, // per-agent fast mode
       },
       {
         id: "quick",
-        skills: [], // 这个智能体不使用任何 Skills
-        fastModeDefault: true, // 这个智能体始终以快速模式运行
+        skills: [], // no skills for this agent
+        fastModeDefault: true, // this agent always runs fast
         thinkingDefault: "off",
       },
     ],
@@ -348,7 +346,7 @@ x-i18n:
     },
   },
 
-  // 自定义模型提供商
+  // Custom model providers
   models: {
     mode: "merge",
     providers: {
@@ -374,7 +372,7 @@ x-i18n:
     },
   },
 
-  // Cron 作业
+  // Cron jobs
   cron: {
     enabled: true,
     store: "~/.openclaw/cron/cron.json",
@@ -429,7 +427,7 @@ x-i18n:
     },
   },
 
-  // Gateway 网关 + 网络
+  // Gateway + networking
   gateway: {
     mode: "local",
     port: 18789,
@@ -468,7 +466,7 @@ x-i18n:
 
 ## 常见模式
 
-### 共享 Skills 基线并覆盖一个智能体
+### 共享 Skills 基线 + 单个覆盖
 
 ```json5
 {
@@ -486,7 +484,7 @@ x-i18n:
 ```
 
 - `agents.defaults.skills` 是共享基线。
-- `agents.list[].skills` 会替换某个智能体的这份基线。
+- `agents.list[].skills` 会为某个智能体替换该基线。
 - 当某个智能体不应看到任何 Skills 时，请使用 `skills: []`。
 
 ### 多平台设置
@@ -512,7 +510,7 @@ x-i18n:
 
 ### 安全私信模式（共享收件箱 / 多用户私信）
 
-如果有多个人可以向你的机器人发送私信（`allowFrom` 中有多个条目、为多个人批准了配对，或使用 `dmPolicy: "open"`），请启用 **安全私信模式**，这样不同发送者发来的私信默认不会共享同一个上下文：
+如果有不止一个人可以向你的 bot 发送私信（`allowFrom` 中有多个条目、对多个人进行了配对批准，或使用了 `dmPolicy: "open"`），请启用**安全私信模式**，这样不同发送者的私信默认不会共享同一个上下文：
 
 ```json5
 {
@@ -536,10 +534,10 @@ x-i18n:
 }
 ```
 
-对于 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC，发送者授权默认优先基于 ID。
-只有在你明确接受该风险时，才通过各渠道的 `dangerouslyAllowNameMatching: true` 启用基于可变名称/邮箱/昵称的直接匹配。
+对于 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC，发送者授权默认优先基于 ID。  
+只有当你明确接受该风险时，才通过各渠道的 `dangerouslyAllowNameMatching: true` 启用基于可变名称/邮箱/昵称的直接匹配。
 
-### Anthropic API 密钥 + MiniMax 回退
+### Anthropic API key + MiniMax 回退
 
 ```json5
 {
@@ -573,7 +571,7 @@ x-i18n:
 }
 ```
 
-### 工作机器人（受限访问）
+### 工作 bot（受限访问）
 
 ```json5
 {
@@ -633,6 +631,6 @@ x-i18n:
 ## 提示
 
 - 如果你设置了 `dmPolicy: "open"`，对应的 `allowFrom` 列表必须包含 `"*"`。
-- 提供商 ID 各不相同（电话号码、用户 ID、渠道 ID）。请查阅提供商文档以确认格式。
-- 之后可以添加的可选部分包括：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
+- 不同 provider 的 ID 格式不同（电话号码、用户 ID、频道 ID）。请查阅 provider 文档以确认格式。
+- 可稍后再添加的可选部分：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
 - 更深入的设置说明请参见 [Providers](/zh-CN/providers) 和 [故障排除](/zh-CN/gateway/troubleshooting)。

@@ -1,26 +1,25 @@
 ---
 read_when:
-    - 你正在为一个插件编写测试
-    - 你需要来自插件 SDK 的测试工具
+    - 你正在为插件编写测试
+    - 你需要来自插件 SDK 的测试工具。此外, improved?
     - 你想了解内置插件的契约测试
 sidebarTitle: Testing
-summary: OpenClaw 插件的测试工具和模式
+summary: OpenClaw 插件的测试工具与模式
 title: 插件测试
 x-i18n:
-    generated_at: "2026-04-15T16:36:51Z"
+    generated_at: "2026-04-23T20:58:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2f75bd3f3b5ba34b05786e0dd96d493c36db73a1d258998bf589e27e45c0bd09
+    source_hash: d1b8f24cdb846190ee973b01fcd466b6fb59367afbaf6abc2c370fae17ccecab
     source_path: plugins/sdk-testing.md
     workflow: 15
 ---
 
-# 插件测试
-
-OpenClaw 插件的测试工具、模式和 lint 强制规则参考。
+OpenClaw
+插件的测试工具、模式和 lint 强制规则参考。
 
 <Tip>
-  **在找测试示例吗？** 操作指南中包含了完整的测试示例：
+  **在找测试示例吗？** 操作指南中包含了完整测试示例：
   [渠道插件测试](/zh-CN/plugins/sdk-channel-plugins#step-6-test) 和
   [提供商插件测试](/zh-CN/plugins/sdk-provider-plugins#step-6-test)。
 </Tip>
@@ -29,7 +28,7 @@ OpenClaw 插件的测试工具、模式和 lint 强制规则参考。
 
 **导入：** `openclaw/plugin-sdk/testing`
 
-`testing` 子路径为插件作者导出了一组精简的辅助工具：
+testing 子路径为插件作者导出了一组精简的辅助工具：
 
 ```typescript
 import {
@@ -41,15 +40,15 @@ import {
 
 ### 可用导出
 
-| 导出                                   | 用途                           |
-| -------------------------------------- | ------------------------------ |
-| `installCommonResolveTargetErrorCases` | 目标解析错误处理的共享测试用例 |
-| `shouldAckReaction`                    | 检查渠道是否应添加确认反应     |
-| `removeAckReactionAfterReply`          | 在回复发送后移除确认反应       |
+| 导出 | 用途 |
+| -------------------------------------- | ------------------------------------------------------ |
+| `installCommonResolveTargetErrorCases` | 用于目标解析错误处理的共享测试用例 |
+| `shouldAckReaction` | 检查某个渠道是否应添加 ack reaction |
+| `removeAckReactionAfterReply` | 在回复投递后移除 ack reaction |
 
 ### 类型
 
-`testing` 子路径还会重新导出一些对测试文件有用的类型：
+testing 子路径还会重新导出在测试文件中有用的类型：
 
 ```typescript
 import type {
@@ -64,13 +63,14 @@ import type {
 
 ## 测试目标解析
 
-使用 `installCommonResolveTargetErrorCases` 为渠道目标解析添加标准错误用例：
+使用 `installCommonResolveTargetErrorCases` 为
+渠道目标解析添加标准错误用例：
 
 ```typescript
 import { describe } from "vitest";
 import { installCommonResolveTargetErrorCases } from "openclaw/plugin-sdk/testing";
 
-describe("my-channel 目标解析", () => {
+describe("my-channel target resolution", () => {
   installCommonResolveTargetErrorCases({
     resolveTarget: ({ to, mode, allowFrom }) => {
       // 你的渠道目标解析逻辑
@@ -79,8 +79,8 @@ describe("my-channel 目标解析", () => {
     implicitAllowFrom: ["user1", "user2"],
   });
 
-  // 添加渠道特定的测试用例
-  it("应该解析 @username 目标", () => {
+  // 添加渠道专用测试用例
+  it("should resolve @username targets", () => {
     // ...
   });
 });
@@ -93,8 +93,8 @@ describe("my-channel 目标解析", () => {
 ```typescript
 import { describe, it, expect, vi } from "vitest";
 
-describe("my-channel 插件", () => {
-  it("应该从配置中解析账户", () => {
+describe("my-channel plugin", () => {
+  it("should resolve account from config", () => {
     const cfg = {
       channels: {
         "my-channel": {
@@ -108,7 +108,7 @@ describe("my-channel 插件", () => {
     expect(account.token).toBe("test-token");
   });
 
-  it("应该在不实体化密钥的情况下检查账户", () => {
+  it("should inspect account without materializing secrets", () => {
     const cfg = {
       channels: {
         "my-channel": { token: "test-token" },
@@ -129,8 +129,8 @@ describe("my-channel 插件", () => {
 ```typescript
 import { describe, it, expect } from "vitest";
 
-describe("my-provider 插件", () => {
-  it("应该解析动态模型", () => {
+describe("my-provider plugin", () => {
+  it("should resolve dynamic models", () => {
     const model = myProvider.resolveDynamicModel({
       modelId: "custom-model-v2",
       // ... context
@@ -141,7 +141,7 @@ describe("my-provider 插件", () => {
     expect(model.api).toBe("openai-completions");
   });
 
-  it("当 API 密钥可用时应该返回目录", async () => {
+  it("should return catalog when API key is available", async () => {
     const result = await myProvider.catalog.run({
       resolveProviderApiKey: () => ({ apiKey: "test-key" }),
       // ... context
@@ -152,9 +152,9 @@ describe("my-provider 插件", () => {
 });
 ```
 
-### Mock 插件运行时
+### 模拟插件运行时
 
-对于使用 `createPluginRuntimeStore` 的代码，请在测试中 mock 运行时：
+对于使用 `createPluginRuntimeStore` 的代码，请在测试中模拟运行时：
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -209,10 +209,10 @@ pnpm test -- src/plugins/contracts/
 
 - 哪些插件注册了哪些提供商
 - 哪些插件注册了哪些语音提供商
-- 注册形状是否正确
+- 注册形态是否正确
 - 运行时契约是否合规
 
-### 运行范围化测试
+### 运行局部测试
 
 针对某个特定插件：
 
@@ -230,17 +230,18 @@ pnpm test -- src/plugins/contracts/runtime.contract.test.ts
 
 ## Lint 强制规则（仓库内插件）
 
-`pnpm check` 会对仓库内插件强制执行三条规则：
+对于仓库内插件，`pnpm check` 会强制执行三条规则：
 
-1. **禁止使用单体根导入** —— 不允许使用 `openclaw/plugin-sdk` 根 barrel
-2. **禁止直接导入 `src/`** —— 插件不能直接导入 `../../src/`
-3. **禁止自导入** —— 插件不能导入它们自己的 `plugin-sdk/<name>` 子路径
+1. **禁止单体根导入** —— 会拒绝 `openclaw/plugin-sdk` 根 barrel
+2. **禁止直接 `src/` 导入** —— 插件不能直接导入 `../../src/`
+3. **禁止自导入** —— 插件不能导入自己的 `plugin-sdk/<name>` 子路径
 
-外部插件不受这些 lint 规则约束，但仍建议遵循相同模式。
+外部插件不受这些 lint 规则约束，但仍建议遵循相同
+模式。
 
 ## 测试配置
 
-OpenClaw 使用带有 V8 覆盖率阈值的 Vitest。对于插件测试：
+OpenClaw 使用 Vitest，并带有 V8 覆盖率阈值。对于插件测试：
 
 ```bash
 # 运行所有测试
@@ -249,10 +250,10 @@ pnpm test
 # 运行特定插件测试
 pnpm test -- <bundled-plugin-root>/my-channel/src/channel.test.ts
 
-# 使用特定测试名称过滤运行
+# 使用指定测试名称过滤运行
 pnpm test -- <bundled-plugin-root>/my-channel/ -t "resolves account"
 
-# 运行并生成覆盖率
+# 带覆盖率运行
 pnpm test:coverage
 ```
 
@@ -265,6 +266,6 @@ OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
 ## 相关内容
 
 - [SDK 概览](/zh-CN/plugins/sdk-overview) -- 导入约定
-- [渠道插件 SDK](/zh-CN/plugins/sdk-channel-plugins) -- 渠道插件接口
-- [提供商插件 SDK](/zh-CN/plugins/sdk-provider-plugins) -- 提供商插件钩子
-- [构建插件](/zh-CN/plugins/building-plugins) -- 入门指南
+- [SDK 渠道插件](/zh-CN/plugins/sdk-channel-plugins) -- 渠道插件接口
+- [SDK 提供商插件](/zh-CN/plugins/sdk-provider-plugins) -- 提供商插件 hooks
+- [构建插件](/zh-CN/plugins/building-plugins) -- 快速开始指南

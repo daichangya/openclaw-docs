@@ -1,36 +1,34 @@
 ---
 read_when:
-    - 从仓库运行脚本时
-    - 在 ./scripts 下添加或修改脚本时
-summary: 仓库脚本：用途、范围和安全注意事项
+    - 运行仓库中的脚本
+    - 在 `./scripts` 下添加或修改脚本
+summary: 仓库脚本：用途、范围和安全说明
 title: 脚本
 x-i18n:
-    generated_at: "2026-04-07T23:10:39Z"
+    generated_at: "2026-04-23T20:51:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3ecf1e9327929948fb75f80e306963af49b353c0aa8d3b6fa532ca964ff8b975
+    source_hash: 839a6d9832988fcdb4b617935ebcfbc55c18b062b42a9480181963d07a952605
     source_path: help/scripts.md
     workflow: 15
 ---
 
-# 脚本
-
 `scripts/` 目录包含用于本地工作流和运维任务的辅助脚本。
-当某项任务明确与某个脚本相关时，请使用这些脚本；否则优先使用 CLI。
+当某项任务显然与某个脚本绑定时，请使用这些脚本；否则优先使用 CLI。
 
 ## 约定
 
-- 除非文档或发布检查清单中引用了脚本，否则脚本都是**可选**的。
-- 如果存在 CLI 界面，优先使用 CLI（例如：凭证监控使用 `openclaw models status --check`）。
-- 假定脚本与主机相关；在新机器上运行前先阅读脚本内容。
+- 除非文档或发布检查清单中有引用，否则脚本都是**可选的**。
+- 当已有 CLI 界面时，优先使用 CLI（例如：认证监控应使用 `openclaw models status --check`）。
+- 假定脚本具有主机特定性；在新机器上运行前请先阅读它们。
 
-## 凭证监控脚本
+## 认证监控脚本
 
-凭证监控已在[身份验证](/zh-CN/gateway/authentication)中说明。`scripts/` 下的脚本是 systemd/Termux 手机工作流的可选附加项。
+认证监控已在[身份验证](/zh-CN/gateway/authentication)中说明。`scripts/` 下的这些脚本是 systemd / Termux 手机工作流的可选补充。
 
-## GitHub 读取辅助工具
+## GitHub 只读辅助脚本
 
-当你希望 `gh` 在保持普通 `gh` 使用你的个人登录进行写入操作的同时，对仓库范围的读取调用使用 GitHub App 安装令牌时，请使用 `scripts/gh-read`。
+当你希望 `gh` 在仓库范围内的只读调用中使用 GitHub App 安装令牌，同时又让普通 `gh` 在写操作中继续使用你的个人登录时，请使用 `scripts/gh-read`。
 
 必需环境变量：
 
@@ -40,7 +38,7 @@ x-i18n:
 可选环境变量：
 
 - `OPENCLAW_GH_READ_INSTALLATION_ID`，当你想跳过基于仓库的安装查找时使用
-- `OPENCLAW_GH_READ_PERMISSIONS`，用于指定要请求的读取权限子集的逗号分隔覆盖值
+- `OPENCLAW_GH_READ_PERMISSIONS`，用于以逗号分隔方式覆盖要请求的只读权限子集
 
 仓库解析顺序：
 
@@ -56,5 +54,5 @@ x-i18n:
 
 ## 添加脚本时
 
-- 保持脚本聚焦且有文档说明。
+- 让脚本保持聚焦并有文档说明。
 - 在相关文档中添加简短条目（如果缺失则创建）。

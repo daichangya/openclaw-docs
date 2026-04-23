@@ -1,15 +1,15 @@
 ---
 read_when:
-    - 你想查看哪些 Skills 可用并已准备好运行
+    - 你想查看哪些 Skills 可用并且已准备好运行
     - 你想从 ClawHub 搜索、安装或更新 Skills
-    - 你想调试 Skills 缺失的二进制文件/环境变量/配置
-summary: '`openclaw skills` 的 CLI 参考（search/install/update/list/info/check）'
-title: skills
+    - 你想调试 Skills 缺失的二进制文件/环境变量/配置问题
+summary: '`openclaw skills` 的 CLI 参考（搜索/安装/更新/列出/信息/检查）'
+title: Skills
 x-i18n:
-    generated_at: "2026-04-05T08:20:20Z"
+    generated_at: "2026-04-23T20:45:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 11af59b1b6bff19cc043acd8d67bdd4303201d3f75f23c948b83bf14882c7bb1
+    source_hash: e8490cd16bfb2120162af9503acb873d434ae4010b4c0270a4aa76991a4316ae
     source_path: cli/skills.md
     workflow: 15
 ---
@@ -20,9 +20,9 @@ x-i18n:
 
 相关内容：
 
-- Skills 系统：[Skills](/tools/skills)
-- Skills 配置：[Skills 配置](/tools/skills-config)
-- ClawHub 安装：[ClawHub](/tools/clawhub)
+- Skills 系统：[Skills](/zh-CN/tools/skills)
+- Skills 配置：[Skills 配置](/zh-CN/tools/skills-config)
+- ClawHub 安装：[ClawHub](/zh-CN/tools/clawhub)
 
 ## 命令
 
@@ -44,23 +44,16 @@ openclaw skills check
 openclaw skills check --json
 ```
 
-`search`/`install`/`update` 直接使用 ClawHub，并安装到当前活动
-工作区的 `skills/` 目录中。`list`/`info`/`check` 仍然检查当前工作区和配置可见的本地
-Skills。
+`search`/`install`/`update` 会直接使用 ClawHub，并安装到当前活动工作区的 `skills/` 目录中。`list`/`info`/`check` 仍然只检查当前工作区和配置可见的本地 Skills。
 
-这个 CLI `install` 命令会从 ClawHub 下载 skill 文件夹。由 Gateway 网关支持、
-通过新手引导或 Skills 设置触发的 skill 依赖安装，则使用独立的
-`skills.install` 请求路径。
+此 CLI `install` 命令会从 ClawHub 下载技能文件夹。由新手引导或 Skills 设置触发的、由 Gateway 网关支持的技能依赖安装，则使用单独的 `skills.install` 请求路径。
 
 说明：
 
-- `search [query...]` 接受可选查询；省略时将浏览默认的
-  ClawHub 搜索流。
-- `search --limit <n>` 会限制返回结果数量。
-- `install --force` 会覆盖工作区中相同
-  slug 的现有 skill 文件夹。
-- `update --all` 只会更新当前活动工作区中受跟踪的 ClawHub 安装项。
-- 如果未提供子命令，`list` 是默认操作。
-- `list`、`info` 和 `check` 会将渲染后的输出写入 stdout。使用
-  `--json` 时，这意味着机器可读负载会保留在 stdout 中，以便用于管道
-  和脚本。
+- `search [query...]` 接受可选查询；省略时会浏览默认的 ClawHub 搜索源。
+- `search --limit <n>` 用于限制返回结果数量。
+- `install --force` 会覆盖工作区中同一 slug 的现有技能文件夹。
+- `update --all` 只会更新当前活动工作区中被跟踪的 ClawHub 安装项。
+- 未提供子命令时，`list` 是默认操作。
+- `list`、`info` 和 `check` 会将渲染后的输出写到 stdout。使用
+  `--json` 时，这意味着机器可读 payload 会保留在 stdout 中，便于管道和脚本使用。

@@ -1,31 +1,30 @@
 ---
 read_when:
-    - 你想抓取一个 URL 并提取可读内容
-    - 你需要配置 `web_fetch` 或它的 Firecrawl 回退
-    - 你想了解 `web_fetch` 的限制和缓存
+    - 你想抓取一个 URL 并提取可读内容♀♀♀♀♀♀analysis to=final code  omitted
+    - 你需要配置 `web_fetch` 或它的 Firecrawl 回退AV无码 to=final code  omitted
+    - 你想了解 `web_fetch` 的限制和缓存机制еҙ to=final code  omitted
 sidebarTitle: Web Fetch
-summary: '`web_fetch` 工具——带可读内容提取的 HTTP 抓取'
+summary: '`web_fetch` 工具 —— 带可读内容提取的 HTTP 抓取'
 title: Web 抓取
 x-i18n:
-    generated_at: "2026-04-05T10:12:44Z"
+    generated_at: "2026-04-23T21:10:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 60c933a25d0f4511dc1683985988e115b836244c5eac4c6667b67c8eb15401e0
+    source_hash: 7acdaf47c46400c2e08a17a0bfd18182499250b085dc97fab9161bfebf9451ec
     source_path: tools/web-fetch.md
     workflow: 15
 ---
 
-# Web 抓取
-
-`web_fetch` 工具会执行普通的 HTTP GET，并提取可读内容
+`web_fetch` 工具会执行普通 HTTP GET，并提取可读内容
 （将 HTML 转为 markdown 或 text）。它**不会**执行 JavaScript。
 
-对于重度 JS 网站或受登录保护的页面，请改用
+对于重度依赖 JS 的网站或需要登录保护的页面，请改用
 [Web Browser](/zh-CN/tools/browser)。
 
 ## 快速开始
 
-`web_fetch` **默认启用**——无需任何配置。Agent 可以立即调用它：
+`web_fetch` **默认启用** —— 无需任何配置。智能体
+可以立即调用它：
 
 ```javascript
 await web_fetch({ url: "https://example.com/article" });
@@ -43,18 +42,18 @@ await web_fetch({ url: "https://example.com/article" });
 
 <Steps>
   <Step title="抓取">
-    发送带有类似 Chrome 的 User-Agent 和 `Accept-Language`
-    header 的 HTTP GET。会阻止私有/内部主机名，并在重定向后重新检查。
+    发送 HTTP GET，请求头中带有类似 Chrome 的 User-Agent 和 `Accept-Language`
+    标头。会阻止私有/内部主机名，并在重定向后重新检查。
   </Step>
   <Step title="提取">
-    对 HTML 响应运行 Readability（正文提取）。
+    对 HTML 响应运行 Readability（主内容提取）。
   </Step>
   <Step title="回退（可选）">
-    如果 Readability 失败且已配置 Firecrawl，则会通过
-    Firecrawl API 以绕过机器人模式重试。
+    如果 Readability 失败，并且已配置 Firecrawl，则会通过
+    Firecrawl API 以 bot-circumvention 模式重试。
   </Step>
   <Step title="缓存">
-    结果默认缓存 15 分钟（可配置），以减少对相同 URL 的重复
+    结果会缓存 15 分钟（可配置），以减少对同一 URL 的重复
     抓取。
   </Step>
 </Steps>
@@ -85,7 +84,7 @@ await web_fetch({ url: "https://example.com/article" });
 ## Firecrawl 回退
 
 如果 Readability 提取失败，`web_fetch` 可以回退到
-[Firecrawl](/zh-CN/tools/firecrawl)，以实现绕过机器人检测和更好的提取效果：
+[Firecrawl](/zh-CN/tools/firecrawl)，以获得 bot-circumvention 和更好的提取效果：
 
 ```json5
 {
@@ -116,35 +115,38 @@ await web_fetch({ url: "https://example.com/article" });
 ```
 
 `plugins.entries.firecrawl.config.webFetch.apiKey` 支持 SecretRef 对象。
-Legacy `tools.web.fetch.firecrawl.*` 配置会由 `openclaw doctor --fix` 自动迁移。
+旧版 `tools.web.fetch.firecrawl.*` 配置会由 `openclaw doctor --fix` 自动迁移。
 
 <Note>
-  如果启用了 Firecrawl，并且其 SecretRef 无法解析，同时也没有
+  如果启用了 Firecrawl，且其 SecretRef 无法解析，同时也没有
   `FIRECRAWL_API_KEY` 环境变量回退，则 gateway 启动会快速失败。
 </Note>
 
 <Note>
-  Firecrawl 的 `baseUrl` 覆盖受严格限制：它们必须使用 `https://`，并且
+  Firecrawl `baseUrl` 覆盖受到严格限制：必须使用 `https://`，并且
   必须是官方 Firecrawl 主机（`api.firecrawl.dev`）。
 </Note>
 
 当前运行时行为：
 
-- `tools.web.fetch.provider` 用于显式选择抓取回退提供商。
-- 如果省略 `provider`，OpenClaw 会从可用凭证中自动检测第一个可用的 Web 抓取提供商。当前内置提供商是 Firecrawl。
-- 如果禁用了 Readability，`web_fetch` 会直接跳到所选提供商的回退路径。如果没有可用提供商，它会以封闭方式失败。
+- `tools.web.fetch.provider` 显式选择抓取回退提供商。
+- 如果省略 `provider`，OpenClaw 会从可用凭证中自动检测第一个就绪的 web-fetch
+  提供商。当前内置提供商是 Firecrawl。
+- 如果禁用了 Readability，`web_fetch` 会直接跳到所选
+  提供商回退。如果没有可用提供商，则会以关闭失败方式终止。
 
 ## 限制与安全
 
 - `maxChars` 会被限制在 `tools.web.fetch.maxCharsCap` 之内
-- 响应体在解析前会被限制为 `maxResponseBytes`；过大的响应会被截断并附带警告
+- 响应体会在解析前被限制为 `maxResponseBytes`；超大
+  响应会被截断并附带警告
 - 私有/内部主机名会被阻止
 - 重定向会被检查，并受 `maxRedirects` 限制
-- `web_fetch` 是尽力而为的——某些网站需要使用 [Web Browser](/zh-CN/tools/browser)
+- `web_fetch` 是尽力而为的 —— 有些网站仍需要使用 [Web Browser](/zh-CN/tools/browser)
 
 ## 工具配置文件
 
-如果你使用工具配置文件或 allowlists，请添加 `web_fetch` 或 `group:web`：
+如果你使用工具配置文件或 allowlist，请添加 `web_fetch` 或 `group:web`：
 
 ```json5
 {
@@ -157,6 +159,6 @@ Legacy `tools.web.fetch.firecrawl.*` 配置会由 `openclaw doctor --fix` 自动
 
 ## 相关内容
 
-- [Web 搜索](/zh-CN/tools/web) -- 使用多个提供商搜索 Web
-- [Web Browser](/zh-CN/tools/browser) -- 面向重度 JS 网站的完整浏览器自动化
-- [Firecrawl](/zh-CN/tools/firecrawl) -- Firecrawl 搜索与抓取工具
+- [Web Search](/zh-CN/tools/web) —— 使用多个提供商搜索网页
+- [Web Browser](/zh-CN/tools/browser) —— 用于重度 JS 网站的完整浏览器自动化
+- [Firecrawl](/zh-CN/tools/firecrawl) —— Firecrawl 搜索与抓取工具

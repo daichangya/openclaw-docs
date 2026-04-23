@@ -1,25 +1,26 @@
 ---
 read_when:
     - 你想选择一个模型提供商
-    - 你想查看 LLM 身份验证 + 模型选择的快速设置示例
+    - 你想要 LLM 认证与模型选择的快速设置示例
 summary: OpenClaw 支持的模型提供商（LLM）
 title: 模型提供商快速开始
 x-i18n:
-    generated_at: "2026-04-23T05:40:53Z"
+    generated_at: "2026-04-23T21:01:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9b002903bd0a1872e77d871f283ae426c74356936c5776c710711d7328427fca
+    source_hash: d38d0eb6af7c3bf415b476c3ea752c29a8a24f8e93e5d52bf86ee685faf79f1a
     source_path: providers/models.md
     workflow: 15
 ---
 
 # 模型提供商
 
-OpenClaw 可以使用许多 LLM 提供商。选择一个，完成身份验证，然后将默认模型设置为 `provider/model`。
+OpenClaw 可以使用许多 LLM 提供商。选择一个、完成认证，然后将默认
+模型设置为 `provider/model`。
 
 ## 快速开始（两步）
 
-1. 使用提供商完成身份验证（通常通过 `openclaw onboard`）。
+1. 使用该提供商完成认证（通常通过 `openclaw onboard`）。
 2. 设置默认模型：
 
 ```json5
@@ -30,7 +31,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个，完成身份验证，
 
 ## 支持的提供商（入门集合）
 
-- [阿里云百炼](/zh-CN/providers/alibaba)
+- [Alibaba Model Studio](/zh-CN/providers/alibaba)
 - [Amazon Bedrock](/zh-CN/providers/bedrock)
 - [Anthropic（API + Claude CLI）](/zh-CN/providers/anthropic)
 - [BytePlus（国际版）](/zh-CN/concepts/model-providers#byteplus-international)
@@ -39,7 +40,7 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个，完成身份验证，
 - [Cloudflare AI Gateway](/zh-CN/providers/cloudflare-ai-gateway)
 - [fal](/zh-CN/providers/fal)
 - [Fireworks](/zh-CN/providers/fireworks)
-- [GLM 模型](/zh-CN/providers/glm)
+- [GLM models](/zh-CN/providers/glm)
 - [MiniMax](/zh-CN/providers/minimax)
 - [Mistral](/zh-CN/providers/mistral)
 - [Moonshot AI（Kimi + Kimi Coding）](/zh-CN/providers/moonshot)
@@ -58,8 +59,9 @@ OpenClaw 可以使用许多 LLM 提供商。选择一个，完成身份验证，
 
 ## 其他内置提供商变体
 
-- `anthropic-vertex` - 当 Vertex 凭证可用时，隐式支持 Google Vertex 上的 Anthropic；无需单独选择新手引导身份验证选项
+- `anthropic-vertex` - 当 Vertex 凭证可用时，隐式支持 Google Vertex 上的 Anthropic；无需单独的新手引导认证选项
 - `copilot-proxy` - 本地 VS Code Copilot Proxy 桥接；使用 `openclaw onboard --auth-choice copilot-proxy`
-- `google-gemini-cli` - 非官方的 Gemini CLI OAuth 流程；需要本地安装 `gemini`（`brew install gemini-cli` 或 `npm install -g @google/gemini-cli`）；默认模型为 `google-gemini-cli/gemini-3-flash-preview`；使用 `openclaw onboard --auth-choice google-gemini-cli` 或 `openclaw models auth login --provider google-gemini-cli --set-default`
+- `google-gemini-cli` - 非官方 Gemini CLI OAuth 流程；需要本地安装 `gemini`（`brew install gemini-cli` 或 `npm install -g @google/gemini-cli`）；默认模型为 `google-gemini-cli/gemini-3-flash-preview`；使用 `openclaw onboard --auth-choice google-gemini-cli` 或 `openclaw models auth login --provider google-gemini-cli --set-default`
 
-有关完整的提供商目录（xAI、Groq、Mistral 等）和高级配置，参见 [模型提供商](/zh-CN/concepts/model-providers)。
+完整提供商目录（xAI、Groq、Mistral 等）和高级配置，
+请参见 [Model Providers](/zh-CN/concepts/model-providers)。
