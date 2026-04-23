@@ -1,9 +1,14 @@
 ---
+read_when:
+    - 重构 QA 场景定义或 qa-lab 测试框架代码
+    - 在 Markdown 场景与 TypeScript 测试框架逻辑之间迁移 QA 行为
+summary: QA 重构：场景目录与测试框架整合计划
+title: QA 重构
 x-i18n:
-    generated_at: "2026-04-17T15:05:20Z"
+    generated_at: "2026-04-23T06:43:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dbb2c70c82da7f6f12d90e25666635ff4147c52e8a94135e902d1de4f5cbccca
+    source_hash: 16867d5be372ab414aa516144193144414c326ea53a52627f3ff91f85b8fdf9d
     source_path: refactor/qa.md
     workflow: 15
 ---
@@ -14,20 +19,21 @@ x-i18n:
 
 ## 目标
 
-将 OpenClaw QA 从拆分定义模型迁移为单一事实来源：
+将 OpenClaw QA 从分裂定义模型迁移为单一事实来源：
 
 - 场景元数据
 - 发送给模型的提示词
 - 设置与清理
-- harness 逻辑
+- 测试框架逻辑
 - 断言与成功标准
 - 产物与报告提示
 
-期望的最终状态是：一个通用 QA harness 加载功能强大的场景定义文件，而不是将大部分行为硬编码在 TypeScript 中。
+期望的最终状态是：一个通用 QA 测试框架加载功能强大的场景定义文件，而不是在 TypeScript 中硬编码大部分行为。
 
 ## 当前状态
 
-当前的主要事实来源现在位于 `qa/scenarios/index.md`，以及每个场景对应的单独文件 `qa/scenarios/<theme>/*.md`。
+当前的主要事实来源已位于 `qa/scenarios/index.md`，以及
+`qa/scenarios/<theme>/*.md` 下每个场景对应的单独文件中。
 
 已实现：
 
@@ -39,28 +45,28 @@ x-i18n:
   - 每个场景一个 Markdown 文件
   - 场景元数据
   - handler 绑定
-  - 场景专用执行配置
+  - 场景特定执行配置
 - `extensions/qa-lab/src/scenario-catalog.ts`
   - Markdown 包解析器 + zod 校验
 - `extensions/qa-lab/src/qa-agent-bootstrap.ts`
-  - 从 Markdown 包渲染执行计划
+  - 从 Markdown 包渲染计划
 - `extensions/qa-lab/src/qa-agent-workspace.ts`
-  - 生成兼容性文件种子，以及 `QA_SCENARIOS.md`
+  - 生成兼容性种子文件以及 `QA_SCENARIOS.md`
 - `extensions/qa-lab/src/suite.ts`
   - 通过 Markdown 定义的 handler 绑定选择可执行场景
-- QA 总线协议 + UI
-  - 用于图片 / 视频 / 音频 / 文件渲染的通用内联附件
+- QA bus 协议 + UI
+  - 用于图像/视频/音频/文件渲染的通用内联附件
 
-仍然拆分的部分：
+仍然分裂的表面：
 
 - `extensions/qa-lab/src/suite.ts`
-  - 仍然承载大多数可执行自定义 handler 逻辑
+  - 仍然承载大部分可执行的自定义 handler 逻辑
 - `extensions/qa-lab/src/report.ts`
-  - 仍然根据运行时输出推导报告结构
+  - 仍然从运行时输出中推导报告结构
 
-因此，事实来源拆分问题已经修复，但执行层仍然主要依赖 handler，而不是完全声明式。
+因此，事实来源分裂的问题已修复，但执行层面目前仍主要依赖 handler，而非完全声明式。
 
-## 实际场景面是什么样的
+## 实际的场景表面是什么样的
 
 阅读当前 suite 可以看到几类不同的场景。
 
@@ -68,49 +74,49 @@ x-i18n:
 
 - 渠道基线
 - 私信基线
-- 线程后续跟进
+- 线程跟进
 - 模型切换
-- 审批后续执行
-- reaction / edit / delete
+- 审批继续执行
+- 反应/编辑/删除
 
 ### 配置与运行时变更
 
-- config patch skill disable
-- config apply restart wake-up
-- config restart capability flip
-- runtime inventory drift check
+- 配置补丁禁用 Skills
+- 配置应用后重启唤醒
+- 配置重启能力切换
+- 运行时清单漂移检查
 
 ### 文件系统与仓库断言
 
-- source / docs discovery report
-- build Lobster Invaders
-- generated image artifact lookup
+- source/docs 发现报告
+- 构建 Lobster Invaders
+- 生成图像产物查找
 
 ### Memory 编排
 
-- memory recall
-- 渠道上下文中的 memory 工具
-- memory failure fallback
-- session memory ranking
-- 线程 memory 隔离
-- memory dreaming sweep
+- 记忆召回
+- 渠道上下文中的记忆工具
+- 记忆失败回退
+- 会话记忆排序
+- 线程记忆隔离
+- 记忆 Dreaming 扫描
 
 ### 工具与插件集成
 
-- MCP plugin-tools call
-- Skills 可见性
-- Skills 热安装
+- MCP plugin-tools 调用
+- skill 可见性
+- skill 热安装
 - 原生图像生成
 - 图像往返
 - 从附件理解图像
 
 ### 多轮与多参与者
 
-- subagent handoff
-- subagent fanout synthesis
-- restart recovery 风格流程
+- 子智能体移交
+- 子智能体扇出综合
+- 重启恢复类流程
 
-这些分类很重要，因为它们决定 DSL 的需求。仅靠“提示词 + 预期文本”的平面列表是不够的。
+这些分类之所以重要，是因为它们决定了 DSL 的需求。仅有“提示词 + 期望文本”的扁平列表是不够的。
 
 ## 方向
 
@@ -120,18 +126,18 @@ x-i18n:
 
 这个包应保持：
 
-- 便于人工在评审中阅读
-- 可被机器解析
-- 足够丰富，可驱动：
+- 在评审中人类可读
+- 机器可解析
+- 足够丰富，能够驱动：
   - suite 执行
-  - QA 工作区 bootstrap
+  - QA 工作区引导
   - QA Lab UI 元数据
-  - docs / discovery 提示词
+  - 文档/发现提示词
   - 报告生成
 
 ### 首选编写格式
 
-使用 Markdown 作为顶层格式，并在其中使用结构化 YAML。
+使用 Markdown 作为顶层格式，并在其中嵌入结构化 YAML。
 
 推荐结构：
 
@@ -142,7 +148,7 @@ x-i18n:
   - tags
   - docs refs
   - code refs
-  - model / provider overrides
+  - model/provider overrides
   - prerequisites
 - prose sections
   - objective
@@ -156,13 +162,13 @@ x-i18n:
 
 这样可以获得：
 
-- 比庞大的 JSON 更好的 PR 可读性
+- 比大型 JSON 更好的 PR 可读性
 - 比纯 YAML 更丰富的上下文
-- 严格解析与 zod 校验
+- 严格解析和 zod 校验
 
-原始 JSON 仅应作为中间生成形式接受。
+原始 JSON 只应作为中间生成形式被接受。
 
-## 提议的场景文件结构
+## 建议的场景文件结构
 
 示例：
 
@@ -187,7 +193,7 @@ codeRefs:
 
 # Objective
 
-Verify generated media is reattached on the follow-up turn.
+验证生成的媒体会在后续轮次中重新附加。
 
 # Setup
 
@@ -208,7 +214,7 @@ Verify generated media is reattached on the follow-up turn.
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Image generation check: generate a QA lighthouse image and summarize it in one short sentence.
+    图像生成检查：生成一张 QA 灯塔图像，并用一句简短的话总结它。
 - action: artifact.capture
   kind: generated-image
   promptSnippet: Image generation check
@@ -216,7 +222,7 @@ Verify generated media is reattached on the follow-up turn.
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Roundtrip image inspection check: describe the generated lighthouse attachment in one short sentence.
+    图像往返检查：用一句简短的话描述生成的灯塔附件。
   attachments:
     - fromArtifact: lighthouseImage
 ```
@@ -235,11 +241,11 @@ Verify generated media is reattached on the follow-up turn.
 ```
 ````
 
-## DSL 必须覆盖的运行器能力
+## DSL 必须覆盖的 Runner 能力
 
-根据当前 suite，通用运行器需要的不只是提示词执行。
+根据当前 suite，通用 runner 需要的不仅仅是执行提示词。
 
-### 环境与设置动作
+### 环境与设置操作
 
 - `bus.reset`
 - `gateway.waitHealthy`
@@ -248,14 +254,14 @@ Verify generated media is reattached on the follow-up turn.
 - `thread.create`
 - `workspace.writeSkill`
 
-### 智能体轮次动作
+### 智能体轮次操作
 
 - `agent.send`
 - `agent.wait`
 - `bus.injectInbound`
 - `bus.injectOutbound`
 
-### 配置与运行时动作
+### 配置与运行时操作
 
 - `config.get`
 - `config.patch`
@@ -264,7 +270,7 @@ Verify generated media is reattached on the follow-up turn.
 - `tools.effective`
 - `skills.status`
 
-### 文件与产物动作
+### 文件与产物操作
 
 - `file.write`
 - `file.read`
@@ -273,7 +279,7 @@ Verify generated media is reattached on the follow-up turn.
 - `artifact.captureGeneratedImage`
 - `artifact.capturePath`
 
-### Memory 与 cron 动作
+### Memory 与 cron 操作
 
 - `memory.indexForce`
 - `memory.searchCli`
@@ -283,7 +289,7 @@ Verify generated media is reattached on the follow-up turn.
 - `cron.waitCompletion`
 - `sessionTranscript.write`
 
-### MCP 动作
+### MCP 操作
 
 - `mcp.callTool`
 
@@ -307,62 +313,62 @@ Verify generated media is reattached on the follow-up turn.
 
 DSL 必须支持保存输出并在后续引用。
 
-当前 suite 中的示例：
+来自当前 suite 的示例：
 
-- 创建一个线程，然后复用 `threadId`
-- 创建一个 session，然后复用 `sessionKey`
-- 生成一张图片，然后在下一轮中附加该文件
-- 生成一个 wake marker 字符串，然后断言它稍后出现
+- 创建线程，然后复用 `threadId`
+- 创建会话，然后复用 `sessionKey`
+- 生成图像，然后在下一轮附加该文件
+- 生成一个唤醒标记字符串，然后断言它稍后出现
 
 所需能力：
 
 - `saveAs`
 - `${vars.name}`
 - `${artifacts.name}`
-- 针对路径、session key、线程 id、marker、工具输出的类型化引用
+- 路径、会话键、线程 ID、标记、工具输出的类型化引用
 
-如果没有变量支持，harness 逻辑就会继续泄漏回 TypeScript 中。
+如果没有变量支持，测试框架逻辑仍会不断从 DSL 泄漏回 TypeScript。
 
 ## 哪些内容应保留为逃生口
 
-在第 1 阶段，完全纯声明式的运行器并不现实。
+在第一阶段，实现一个完全纯声明式的 runner 并不现实。
 
-有些场景天然就是重编排型的：
+有些场景天生就更偏编排：
 
-- memory dreaming sweep
-- config apply restart wake-up
-- config restart capability flip
-- 按时间戳 / 路径解析生成图像产物
-- discovery-report evaluation
+- 记忆 Dreaming 扫描
+- 配置应用后重启唤醒
+- 配置重启能力切换
+- 基于时间戳/路径解析生成图像产物
+- discovery-report 评估
 
-这些目前应继续使用显式自定义 handler。
+目前这些应继续使用显式自定义 handler。
 
 推荐规则：
 
-- 85-90% 声明式
-- 对剩余困难部分使用显式 `customHandler` steps
-- 仅允许具名且有文档说明的自定义 handler
-- 不允许在场景文件中写匿名内联代码
+- 85–90% 声明式
+- 对于剩余复杂部分，使用显式 `customHandler` 步骤
+- 仅允许已命名并有文档的自定义 handler
+- 场景文件中不允许匿名内联代码
 
-这样可以让通用引擎保持整洁，同时仍然推进迁移。
+这样既能保持通用引擎整洁，又能继续推进。
 
 ## 架构变更
 
 ### 当前
 
-场景 Markdown 现在已经是以下内容的事实来源：
+场景 Markdown 现在已是以下内容的事实来源：
 
 - suite 执行
-- 工作区 bootstrap 文件
+- 工作区引导文件
 - QA Lab UI 场景目录
 - 报告元数据
-- discovery 提示词
+- 发现提示词
 
-生成的兼容性内容：
+已生成的兼容性内容：
 
-- seed 工作区仍然包含 `QA_KICKOFF_TASK.md`
-- seed 工作区仍然包含 `QA_SCENARIO_PLAN.md`
-- seed 工作区现在还包含 `QA_SCENARIOS.md`
+- 种子工作区仍包含 `QA_KICKOFF_TASK.md`
+- 种子工作区仍包含 `QA_SCENARIO_PLAN.md`
+- 种子工作区现在还包含 `QA_SCENARIOS.md`
 
 ## 重构计划
 
@@ -372,10 +378,10 @@ DSL 必须支持保存输出并在后续引用。
 
 - 添加了 `qa/scenarios/index.md`
 - 将场景拆分到 `qa/scenarios/<theme>/*.md`
-- 为具名 Markdown YAML 包内容添加了解析器
+- 添加了命名 Markdown YAML 包内容解析器
 - 使用 zod 进行校验
-- 将消费者切换到已解析的包
-- 删除了仓库级 `qa/seed-scenarios.json` 和 `qa/QA_KICKOFF_TASK.md`
+- 将消费者切换到解析后的包
+- 移除了仓库级的 `qa/seed-scenarios.json` 和 `qa/QA_KICKOFF_TASK.md`
 
 ### 第 2 阶段：通用引擎
 
@@ -385,55 +391,55 @@ DSL 必须支持保存输出并在后续引用。
   - action registry
   - assertion registry
   - custom handlers
-- 保留现有 helper functions 作为引擎操作
+- 保留现有辅助函数作为引擎操作
 
 交付物：
 
-- 引擎执行简单的声明式场景
+- 引擎可执行简单的声明式场景
 
-先从主要是 prompt + wait + assert 的场景开始：
+从主要是“提示词 + 等待 + 断言”的场景开始：
 
-- threaded follow-up
+- 线程跟进
 - 从附件理解图像
-- Skills 可见性与调用
-- channel baseline
+- skill 可见性与调用
+- 渠道基线
 
 交付物：
 
-- 第一批真正由 Markdown 定义并通过通用引擎交付的场景
+- 第一批真正由 Markdown 定义并通过通用引擎运行的场景上线
 
 ### 第 4 阶段：迁移中等复杂度场景
 
-- image generation roundtrip
-- 渠道上下文中的 memory 工具
-- session memory ranking
-- subagent handoff
-- subagent fanout synthesis
+- 图像生成往返
+- 渠道上下文中的记忆工具
+- 会话记忆排序
+- 子智能体移交
+- 子智能体扇出综合
 
 交付物：
 
-- 变量、产物、工具断言、request-log 断言都得到验证
+- 变量、产物、工具断言、request-log 断言得到验证
 
-### 第 5 阶段：将困难场景保留在自定义 handler 中
+### 第 5 阶段：将复杂场景保留在自定义 handler 中
 
-- memory dreaming sweep
-- config apply restart wake-up
-- config restart capability flip
-- runtime inventory drift
+- 记忆 Dreaming 扫描
+- 配置应用后重启唤醒
+- 配置重启能力切换
+- 运行时清单漂移
 
 交付物：
 
-- 保持相同的编写格式，但在需要时使用显式 custom-step blocks
+- 保持相同的编写格式，但在需要时使用显式自定义步骤块
 
 ### 第 6 阶段：删除硬编码场景映射
 
 当包覆盖率足够高后：
 
-- 删除 `extensions/qa-lab/src/suite.ts` 中大多数按场景分支的 TypeScript 逻辑
+- 删除 `extensions/qa-lab/src/suite.ts` 中大部分特定场景的 TypeScript 分支逻辑
 
 ## Fake Slack / 富媒体支持
 
-当前 QA 总线仍然是 text-first。
+当前的 QA bus 以文本为主。
 
 相关文件：
 
@@ -443,17 +449,17 @@ DSL 必须支持保存输出并在后续引用。
 - `extensions/qa-lab/src/bus-server.ts`
 - `extensions/qa-lab/web/src/ui-render.ts`
 
-目前 QA 总线支持：
+当前 QA bus 支持：
 
 - 文本
-- reactions
-- threads
+- 反应
+- 线程
 
-它还不能建模内联媒体附件。
+它尚未对内联媒体附件建模。
 
-### 所需的传输契约
+### 所需传输契约
 
-添加通用 QA 总线附件模型：
+添加一个通用 QA bus 附件模型：
 
 ```ts
 type QaBusAttachment = {
@@ -478,34 +484,34 @@ type QaBusAttachment = {
 - `QaBusInboundMessageInput`
 - `QaBusOutboundMessageInput`
 
-### 为什么要先做通用层
+### 为什么先做通用模型
 
 不要构建仅限 Slack 的媒体模型。
 
-而应该：
+而应采用：
 
-- 先有一个通用 QA 传输模型
-- 再在其上构建多个渲染器
-  - 当前 QA Lab chat
+- 一个通用 QA 传输模型
+- 其上支持多个渲染器
+  - 当前的 QA Lab 聊天
   - 未来的 fake Slack web
-  - 其他任何 fake transport views
+  - 其他任何 fake transport 视图
 
-这样可以避免重复逻辑，并让媒体场景保持与传输层无关。
+这样可以避免重复逻辑，并让媒体场景保持与传输方式无关。
 
-### 所需的 UI 工作
+### 所需 UI 工作
 
-更新 QA UI 以渲染：
+更新 QA UI，以渲染：
 
 - 内联图片预览
 - 内联音频播放器
 - 内联视频播放器
 - 文件附件 chip
 
-当前 UI 已经可以渲染线程和 reactions，因此附件渲染应可以叠加到同一消息卡片模型上。
+当前 UI 已能渲染线程和反应，因此附件渲染应能叠加到相同的消息卡片模型上。
 
-### 媒体传输启用后的场景工作
+### 媒体传输将启用的场景工作
 
-一旦附件可以通过 QA 总线流转，我们就可以添加更丰富的 fake-chat 场景：
+一旦附件可以通过 QA bus 流动，我们就能添加更丰富的 fake-chat 场景：
 
 - fake Slack 中的内联图片回复
 - 音频附件理解
@@ -515,24 +521,24 @@ type QaBusAttachment = {
 
 ## 建议
 
-下一块实现工作应是：
+下一块实现应当是：
 
 1. 添加 Markdown 场景加载器 + zod schema
 2. 从 Markdown 生成当前目录
 3. 先迁移几个简单场景
-4. 添加通用 QA 总线附件支持
+4. 添加通用 QA bus 附件支持
 5. 在 QA UI 中渲染内联图片
-6. 然后再扩展到音频和视频
+6. 然后扩展到音频和视频
 
 这是能同时验证两个目标的最小路径：
 
-- 通用的 Markdown 定义 QA
-- 更丰富的 fake messaging surfaces
+- 通用、由 Markdown 定义的 QA
+- 更丰富的 fake messaging 表面
 
-## 开放问题
+## 未决问题
 
 - 场景文件是否应允许嵌入带变量插值的 Markdown 提示词模板
-- setup / cleanup 应该是具名 section，还是仅作为有序动作列表
-- 产物引用在 schema 中应采用强类型，还是基于字符串
-- 自定义 handler 应放在一个统一 registry 中，还是按 surface 分 registry
-- 在迁移期间，生成的 JSON 兼容性文件是否应继续保留为已检入状态
+- 设置/清理应作为命名区段存在，还是仅作为有序操作列表
+- 产物引用在 schema 中应为强类型，还是基于字符串
+- 自定义 handler 应放在一个统一注册表中，还是按 surface 分注册表
+- 在迁移期间，生成的 JSON 兼容文件是否应继续保留为已检入状态
