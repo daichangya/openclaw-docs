@@ -1,0 +1,166 @@
+---
+read_when:
+    - กำลังตั้งค่า OpenClaw บน Raspberry Pi
+    - กำลังรัน OpenClaw บนอุปกรณ์ ARM
+    - กำลังสร้าง AI ส่วนตัวแบบเปิดตลอดเวลาราคาประหยัด
+summary: โฮสต์ OpenClaw บน Raspberry Pi สำหรับการ self-host แบบเปิดใช้งานตลอดเวลา
+title: Raspberry Pi
+x-i18n:
+    generated_at: "2026-04-23T05:42:17Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 222ccbfb18a8dcec483adac6f5647dcb455c84edbad057e0ba2589a6da570b4c
+    source_path: install/raspberry-pi.md
+    workflow: 15
+---
+
+# Raspberry Pi
+
+รัน OpenClaw Gateway แบบคงอยู่และเปิดใช้งานตลอดเวลาบน Raspberry Pi เนื่องจาก Pi ทำหน้าที่เป็นเพียง gateway (โมเดลรันอยู่บนคลาวด์ผ่าน API) แม้แต่ Pi รุ่นพื้นฐานก็สามารถรองรับภาระงานนี้ได้ดี
+
+## ข้อกำหนดเบื้องต้น
+
+- Raspberry Pi 4 หรือ 5 พร้อม RAM 2 GB ขึ้นไป (แนะนำ 4 GB)
+- การ์ด MicroSD (16 GB ขึ้นไป) หรือ USB SSD (ประสิทธิภาพดีกว่า)
+- อะแดปเตอร์ไฟอย่างเป็นทางการของ Pi
+- การเชื่อมต่อเครือข่าย (Ethernet หรือ WiFi)
+- Raspberry Pi OS แบบ 64-bit (จำเป็น -- ห้ามใช้ 32-bit)
+- เวลาประมาณ 30 นาที
+
+## การตั้งค่า
+
+<Steps>
+  <Step title="แฟลชระบบปฏิบัติการ">
+    ใช้ **Raspberry Pi OS Lite (64-bit)** -- ไม่ต้องใช้เดสก์ท็อปสำหรับเซิร์ฟเวอร์แบบ headless
+
+    1. ดาวน์โหลด [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+    2. เลือก OS: **Raspberry Pi OS Lite (64-bit)**
+    3. ในกล่องการตั้งค่า ให้กำหนดค่าล่วงหน้า:
+       - Hostname: `gateway-host`
+       - เปิดใช้งาน SSH
+       - ตั้งชื่อผู้ใช้และรหัสผ่าน
+       - ตั้งค่า WiFi (หากไม่ได้ใช้ Ethernet)
+    4. แฟลชลงในการ์ด SD หรือ USB drive จากนั้นใส่เข้าไปและบูต Pi
+
+  </Step>
+
+  <Step title="เชื่อมต่อผ่าน SSH">
+    ```bash
+    ssh user@gateway-host
+    ```
+  </Step>
+
+  <Step title="อัปเดตระบบ">
+    ```bash
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install -y git curl build-essential
+
+    # ตั้งค่า timezone (สำคัญสำหรับ Cron และการเตือนความจำ)
+    sudo timedatectl set-timezone America/Chicago
+    ```
+
+  </Step>
+
+  <Step title="ติดตั้ง Node.js 24">
+    ```bash
+    curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
+    sudo apt install -y nodejs
+    node --version
+    ```
+  </Step>
+
+  <Step title="เพิ่ม swap (สำคัญสำหรับ 2 GB หรือน้อยกว่า)">
+    ```bash
+    sudo fallocate -l 2G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+    # ลดค่า swappiness สำหรับอุปกรณ์ RAM ต่ำ
+    echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
+    ```
+
+  </Step>
+
+  <Step title="ติดตั้ง OpenClaw">
+    ```bash
+    curl -fsSL https://openclaw.ai/install.sh | bash
+    ```
+  </Step>
+
+  <Step title="รัน onboarding">
+    ```bash
+    openclaw onboard --install-daemon
+    ```
+
+    ทำตามตัวช่วยสร้าง API keys แนะนำมากกว่า OAuth สำหรับอุปกรณ์แบบ headless Telegram คือช่องทางที่เริ่มต้นได้ง่ายที่สุด
+
+  </Step>
+
+  <Step title="ตรวจสอบ">
+    ```bash
+    openclaw status
+    systemctl --user status openclaw-gateway.service
+    journalctl --user -u openclaw-gateway.service -f
+    ```
+  </Step>
+
+  <Step title="เข้าถึง Control UI">
+    บนคอมพิวเตอร์ของคุณ ดึง dashboard URL จาก Pi:
+
+    ```bash
+    ssh user@gateway-host 'openclaw dashboard --no-open'
+    ```
+
+    จากนั้นสร้าง SSH tunnel ในอีกเทอร์มินัลหนึ่ง:
+
+    ```bash
+    ssh -N -L 18789:127.0.0.1:18789 user@gateway-host
+    ```
+
+    เปิด URL ที่พิมพ์ออกมาในเบราว์เซอร์ของเครื่องคุณ สำหรับการเข้าถึงระยะไกลแบบเปิดใช้งานตลอดเวลา ดู [การผสาน Tailscale](/th/gateway/tailscale)
+
+  </Step>
+</Steps>
+
+## เคล็ดลับด้านประสิทธิภาพ
+
+**ใช้ USB SSD** -- การ์ด SD ช้าและเสื่อมเร็ว USB SSD ช่วยเพิ่มประสิทธิภาพอย่างมาก ดู [คู่มือ USB boot ของ Pi](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot)
+
+**เปิดใช้ module compile cache** -- ช่วยให้การเรียกใช้ CLI ซ้ำๆ เร็วขึ้นบนโฮสต์ Pi ที่มีกำลังน้อย:
+
+```bash
+grep -q 'NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF' # pragma: allowlist secret
+export NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+mkdir -p /var/tmp/openclaw-compile-cache
+export OPENCLAW_NO_RESPAWN=1
+EOF
+source ~/.bashrc
+```
+
+**ลดการใช้หน่วยความจำ** -- สำหรับการตั้งค่าแบบ headless ให้คืนหน่วยความจำ GPU และปิดบริการที่ไม่ได้ใช้:
+
+```bash
+echo 'gpu_mem=16' | sudo tee -a /boot/config.txt
+sudo systemctl disable bluetooth
+```
+
+## การแก้ไขปัญหา
+
+**หน่วยความจำไม่พอ** -- ตรวจสอบว่า swap ทำงานอยู่ด้วย `free -h` ปิดบริการที่ไม่ได้ใช้ (`sudo systemctl disable cups bluetooth avahi-daemon`) ใช้เฉพาะโมเดลแบบอิง API
+
+**ประสิทธิภาพช้า** -- ใช้ USB SSD แทน SD card ตรวจสอบ CPU throttling ด้วย `vcgencmd get_throttled` (ควรคืนค่า `0x0`)
+
+**บริการไม่ยอมเริ่ม** -- ตรวจสอบ logs ด้วย `journalctl --user -u openclaw-gateway.service --no-pager -n 100` และรัน `openclaw doctor --non-interactive` หากนี่คือ Pi แบบ headless ให้ตรวจสอบด้วยว่าเปิด lingering แล้ว: `sudo loginctl enable-linger "$(whoami)"`
+
+**ปัญหาไบนารี ARM** -- หาก Skill ล้มเหลวด้วย "exec format error" ให้ตรวจสอบว่าไบนารีนั้นมี build สำหรับ ARM64 หรือไม่ ตรวจสอบสถาปัตยกรรมด้วย `uname -m` (ควรแสดง `aarch64`)
+
+**WiFi หลุด** -- ปิดการจัดการพลังงานของ WiFi: `sudo iwconfig wlan0 power off`
+
+## ขั้นตอนถัดไป
+
+- [Channels](/th/channels) -- เชื่อมต่อ Telegram, WhatsApp, Discord และอื่นๆ
+- [Gateway configuration](/th/gateway/configuration) -- ตัวเลือกคอนฟิกทั้งหมด
+- [Updating](/th/install/updating) -- ทำให้ OpenClaw ทันสมัยอยู่เสมอ
