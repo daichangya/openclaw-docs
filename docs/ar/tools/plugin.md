@@ -1,32 +1,32 @@
 ---
 read_when:
     - تثبيت Plugins أو تهيئتها
-    - فهم قواعد اكتشاف Plugin وتحميلها
-    - العمل مع حزم Plugin المتوافقة مع Codex/Claude
+    - فهم قواعد اكتشاف Plugin وتحميله
+    - العمل مع حِزم Plugin المتوافقة مع Codex/Claude
 sidebarTitle: Install and Configure
-summary: ثبّت Plugins الخاصة بـ OpenClaw وهيئها وأدرها
+summary: ثبّت Plugins في OpenClaw وهيئها وأدرها
 title: Plugins
 x-i18n:
-    generated_at: "2026-04-23T07:33:52Z"
+    generated_at: "2026-04-23T14:03:01Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dc944b53654552ca5cf6132c6ef16c71745a7bffc249daccaee40c513e04209c
+    source_hash: 63aa1b5ed9e3aaa2117b78137a457582b00ea47d94af7da3780ddae38e8e3665
     source_path: tools/plugin.md
     workflow: 15
 ---
 
 # Plugins
 
-توسّع Plugins قدرات OpenClaw بإضافة إمكانات جديدة: القنوات، ومزوّدي النماذج،
-والأدوات، وSkills، والكلام، والنسخ الفوري، والصوت الفوري،
+توسّع Plugins قدرات OpenClaw بإمكانات جديدة: القنوات، ومزوّدو النماذج،
+والأدوات، وSkills، والصوت، والنسخ الفوري، والصوت الفوري،
 وفهم الوسائط، وتوليد الصور، وتوليد الفيديو، وجلب الويب، وبحث الويب،
-وغير ذلك. بعض Plugins تكون **أساسية** (تأتي مع OpenClaw)، وأخرى
-**خارجية** (تنشرها المجتمع على npm).
+وغير ذلك. بعض Plugins تكون **أساسية** (تُشحن مع OpenClaw)، وأخرى
+**خارجية** (تنشرها community على npm).
 
 ## البدء السريع
 
 <Steps>
-  <Step title="اعرف ما الذي تم تحميله">
+  <Step title="اطلع على ما تم تحميله">
     ```bash
     openclaw plugins list
     ```
@@ -37,7 +37,7 @@ x-i18n:
     # من npm
     openclaw plugins install @openclaw/voice-call
 
-    # من دليل أو أرشيف محلي
+    # من دليل محلي أو أرشيف
     openclaw plugins install ./my-plugin
     openclaw plugins install ./my-plugin.tgz
     ```
@@ -49,12 +49,12 @@ x-i18n:
     openclaw gateway restart
     ```
 
-    ثم قم بالتهيئة تحت `plugins.entries.\<id\>.config` في ملف الإعدادات لديك.
+    ثم اضبط الإعدادات تحت `plugins.entries.\<id\>.config` في ملف config الخاص بك.
 
   </Step>
 </Steps>
 
-إذا كنت تفضّل التحكم الأصلي عبر الدردشة، فعطّل `commands.plugins: true` واستخدم:
+إذا كنت تفضل التحكم الأصلي عبر الدردشة، فعّل `commands.plugins: true` واستخدم:
 
 ```text
 /plugin install clawhub:@openclaw/voice-call
@@ -62,33 +62,33 @@ x-i18n:
 /plugin enable voice-call
 ```
 
-يستخدم مسار التثبيت المحلل نفسه الموجود في CLI: مسار/أرشيف محلي، أو
-`clawhub:<pkg>` صريح، أو مواصفة حزمة مجردة (ClawHub أولًا، ثم العودة إلى npm).
+يستخدم مسار التثبيت نفس أداة الحل مثل CLI: مسار/أرشيف محلي، أو
+`clawhub:<pkg>` صريح، أو مواصفة حزمة مجردة (ClawHub أولًا، ثم الرجوع إلى npm).
 
-إذا كانت الإعدادات غير صالحة، فإن التثبيت يفشل عادةً بشكل مغلق ويوجهك إلى
-`openclaw doctor --fix`. والاستثناء الوحيد للاستعادة هو مسار ضيق لإعادة تثبيت Plugin
-مضمّنة تختار الاشتراك في
+إذا كان config غير صالح، فعادةً ما يفشل التثبيت بشكل مغلق ويشير بك إلى
+`openclaw doctor --fix`. والاستثناء الوحيد للاسترداد هو مسار ضيق لإعادة تثبيت
+Plugin مضمّن لـ Plugins التي تشترك في
 `openclaw.install.allowInvalidConfigRecovery`.
 
-لا تقوم عمليات تثبيت OpenClaw المجمّعة بتثبيت شجرة تبعيات وقت التشغيل لكل Plugin مضمّنة
-بشكل مسبق. وعندما تكون Plugin مضمّنة مملوكة لـ OpenClaw نشطة من
-إعدادات Plugin، أو من إعدادات قنوات قديمة، أو من manifest مفعّل افتراضيًا، فإن
-إصلاحات بدء التشغيل تصلح فقط تبعيات وقت التشغيل المعلنة لذلك Plugin قبل استيرادها.
-أما Plugins الخارجية ومسارات التحميل المخصصة فلا تزال بحاجة إلى التثبيت عبر
+لا تقوم تثبيتات OpenClaw المعبأة بتثبيت شجرة تبعيات وقت التشغيل لكل Plugin مضمّن
+بشكل استباقي. وعندما يكون Plugin مضمّن ومملوك لـ OpenClaw نشطًا من خلال
+config الخاص بالـ Plugin، أو config القناة القديم، أو manifest مفعّل افتراضيًا،
+فإن إصلاحات بدء التشغيل تصلح فقط تبعيات وقت التشغيل المعلنة لذلك Plugin قبل استيراده.
+أما Plugins الخارجية ومسارات التحميل المخصصة فما زالت تحتاج إلى التثبيت عبر
 `openclaw plugins install`.
 
-## أنواع Plugin
+## أنواع Plugins
 
-يتعرف OpenClaw على نوعين من صيغ Plugin:
+يتعرف OpenClaw على تنسيقي Plugin:
 
-| الصيغة     | كيف تعمل                                                       | أمثلة                                               |
+| التنسيق     | طريقة العمل                                                       | أمثلة                                               |
 | ---------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| **أصلية** | `openclaw.plugin.json` + وحدة runtime؛ تُنفَّذ داخل العملية       | Plugins رسمية، وحزم npm من المجتمع               |
-| **Bundle** | تخطيط متوافق مع Codex/Claude/Cursor؛ ويُربط بميزات OpenClaw | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
+| **Native** | `openclaw.plugin.json` + وحدة runtime؛ يُنفّذ داخل العملية       | Plugins الرسمية، وحزم npm من community               |
+| **Bundle** | تخطيط متوافق مع Codex/Claude/Cursor؛ يُربط بميزات OpenClaw | `.codex-plugin/`، `.claude-plugin/`، `.cursor-plugin/` |
 
-يظهر كلاهما تحت `openclaw plugins list`. راجع [حزم Plugin](/ar/plugins/bundles) للحصول على تفاصيل الحزم.
+يظهر كلاهما ضمن `openclaw plugins list`. راجع [Plugin Bundles](/ar/plugins/bundles) لتفاصيل الحِزم.
 
-إذا كنت تكتب Plugin أصلية، فابدأ من [بناء Plugins](/ar/plugins/building-plugins)
+إذا كنت تكتب Plugin Native، فابدأ من [بناء Plugins](/ar/plugins/building-plugins)
 و[نظرة عامة على Plugin SDK](/ar/plugins/sdk-overview).
 
 ## Plugins الرسمية
@@ -104,33 +104,33 @@ x-i18n:
 | Zalo            | `@openclaw/zalo`       | [Zalo](/ar/channels/zalo)               |
 | Zalo Personal   | `@openclaw/zalouser`   | [Zalo Personal](/ar/plugins/zalouser)   |
 
-### أساسية (تأتي مع OpenClaw)
+### أساسية (تُشحن مع OpenClaw)
 
 <AccordionGroup>
-  <Accordion title="موفرو النماذج (مفعّلون افتراضيًا)">
-    `anthropic`, `byteplus`, `cloudflare-ai-gateway`, `github-copilot`, `google`,
-    `huggingface`, `kilocode`, `kimi-coding`, `minimax`, `mistral`, `qwen`,
-    `moonshot`, `nvidia`, `openai`, `opencode`, `opencode-go`, `openrouter`,
-    `qianfan`, `synthetic`, `together`, `venice`,
-    `vercel-ai-gateway`, `volcengine`, `xiaomi`, `zai`
+  <Accordion title="مزودو النماذج (مفعّلون افتراضيًا)">
+    `anthropic`، `byteplus`، `cloudflare-ai-gateway`، `github-copilot`، `google`،
+    `huggingface`، `kilocode`، `kimi-coding`، `minimax`، `mistral`، `qwen`،
+    `moonshot`، `nvidia`، `openai`، `opencode`، `opencode-go`، `openrouter`،
+    `qianfan`، `synthetic`، `together`، `venice`،
+    `vercel-ai-gateway`، `volcengine`، `xiaomi`، `zai`
   </Accordion>
 
   <Accordion title="Plugins الذاكرة">
-    - `memory-core` — بحث ذاكرة مضمّن (الافتراضي عبر `plugins.slots.memory`)
-    - `memory-lancedb` — ذاكرة طويلة الأمد بتثبيت عند الطلب مع الاستدعاء/الالتقاط التلقائيين (اضبط `plugins.slots.memory = "memory-lancedb"`)
+    - `memory-core` — بحث الذاكرة المضمّن (الافتراضي عبر `plugins.slots.memory`)
+    - `memory-lancedb` — ذاكرة طويلة الأمد تُثبّت عند الطلب مع auto-recall/capture (اضبط `plugins.slots.memory = "memory-lancedb"`)
   </Accordion>
 
-  <Accordion title="موفرو الكلام (مفعّلون افتراضيًا)">
-    `elevenlabs`, `microsoft`
+  <Accordion title="مزودو الصوت (مفعّلون افتراضيًا)">
+    `elevenlabs`، `microsoft`
   </Accordion>
 
   <Accordion title="أخرى">
-    - `browser` — Plugin متصفح مضمّنة لأداة المتصفح، وCLI ‏`openclaw browser`, وطريقة gateway ‏`browser.request`, وبيئة تشغيل المتصفح، وخدمة التحكم في المتصفح الافتراضية (مفعلة افتراضيًا؛ عطّلها قبل استبدالها)
-    - `copilot-proxy` — جسر VS Code Copilot Proxy (معطل افتراضيًا)
+    - `browser` — Plugin browser مضمّن لأداة browser، وCLI ‏`openclaw browser`، وطريقة Gateway ‏`browser.request`، وruntime الخاصة بالـ browser، وخدمة التحكم الافتراضية للـ browser (مفعّل افتراضيًا؛ عطّله قبل استبداله)
+    - `copilot-proxy` — جسر VS Code Copilot Proxy ‏(معطّل افتراضيًا)
   </Accordion>
 </AccordionGroup>
 
-هل تبحث عن Plugins خارجية؟ راجع [Plugins المجتمع](/ar/plugins/community).
+هل تبحث عن Plugins خارجية؟ راجع [Community Plugins](/ar/plugins/community).
 
 ## الإعدادات
 
@@ -150,58 +150,58 @@ x-i18n:
 
 | الحقل            | الوصف                                               |
 | ---------------- | --------------------------------------------------------- |
-| `enabled`        | المفتاح الرئيسي (الافتراضي: `true`)                           |
-| `allow`          | قائمة سماح Plugin (اختياري)                               |
-| `deny`           | قائمة حظر Plugin (اختيارية؛ الحظر يتغلب)                     |
+| `enabled`        | مفتاح التبديل الرئيسي (الافتراضي: `true`)                           |
+| `allow`          | قائمة سماح Plugins (اختياري)                               |
+| `deny`           | قائمة حظر Plugins (اختياري؛ والحظر يتقدم)                     |
 | `load.paths`     | ملفات/أدلة Plugin إضافية                            |
-| `slots`          | محددات الخانات الحصرية (مثل `memory`, `contextEngine`) |
-| `entries.\<id\>` | مفاتيح تفعيل + إعدادات لكل Plugin                               |
+| `slots`          | محددات slots حصرية (مثل `memory` و`contextEngine`) |
+| `entries.\<id\>` | مفاتيح تبديل + config لكل Plugin                               |
 
-تتطلب تغييرات الإعدادات **إعادة تشغيل gateway**. وإذا كانت Gateway تعمل مع
-مراقبة الإعدادات + إعادة التشغيل داخل العملية مفعّلتين (وهو المسار الافتراضي `openclaw gateway`)،
-فعادةً ما تُنفذ إعادة التشغيل هذه تلقائيًا بعد لحظة من وصول كتابة الإعدادات.
+تتطلب تغييرات config **إعادة تشغيل gateway**. وإذا كانت Gateway تعمل مع
+مراقبة config + إعادة تشغيل داخل العملية مفعّلتين (وهذا هو المسار الافتراضي `openclaw gateway`)،
+فعادةً ما يتم تنفيذ إعادة التشغيل تلك تلقائيًا بعد لحظات من وصول كتابة config.
 
-<Accordion title="حالات Plugin: معطلة مقابل مفقودة مقابل غير صالحة">
-  - **معطلة**: الـ Plugin موجودة لكن قواعد التفعيل عطلتها. وتظل الإعدادات محفوظة.
-  - **مفقودة**: تشير الإعدادات إلى معرّف Plugin لم يعثر عليه الاكتشاف.
-  - **غير صالحة**: الـ Plugin موجودة لكن إعداداتها لا تطابق المخطط المعلن.
+<Accordion title="حالات Plugin: معطّل مقابل مفقود مقابل غير صالح">
+  - **معطّل**: Plugin موجود لكن قواعد التمكين عطّلته. ويتم الاحتفاظ بـ config.
+  - **مفقود**: يشير config إلى معرّف Plugin لم يعثر عليه الاكتشاف.
+  - **غير صالح**: Plugin موجود لكن config الخاص به لا يطابق schema المعلنة.
 </Accordion>
 
-## الاكتشاف والأولوية
+## الاكتشاف والأسبقية
 
-يفحص OpenClaw Plugins بهذا الترتيب (أول تطابق هو الفائز):
+يفحص OpenClaw Plugins بهذا الترتيب (أول تطابق يفوز):
 
 <Steps>
-  <Step title="مسارات الإعدادات">
+  <Step title="مسارات config">
     `plugins.load.paths` — مسارات ملفات أو أدلة صريحة.
   </Step>
 
   <Step title="Plugins مساحة العمل">
-    `\<workspace\>/.openclaw/<plugin-root>/*.ts` و`\<_workspace\>/.openclaw/<plugin-root>/*/index.ts`.
+    `\<workspace\>/.openclaw/<plugin-root>/*.ts` و `\<workspace\>/.openclaw/<plugin-root>/*/index.ts`.
   </Step>
 
   <Step title="Plugins العامة">
-    `~/.openclaw/<plugin-root>/*.ts` و`~/.openclaw/<plugin-root>/*/index.ts`.
+    `~/.openclaw/<plugin-root>/*.ts` و `~/.openclaw/<plugin-root>/*/index.ts`.
   </Step>
 
   <Step title="Plugins المضمّنة">
-    تأتي مع OpenClaw. كثير منها مفعّل افتراضيًا (موفرو النماذج، والكلام).
-    ويتطلب بعضها الآخر تفعيلًا صريحًا.
+    تُشحن مع OpenClaw. كثير منها مفعّل افتراضيًا (مزودو النماذج، الصوت).
+    وأخرى تتطلب تمكينًا صريحًا.
   </Step>
 </Steps>
 
-### قواعد التفعيل
+### قواعد التمكين
 
-- `plugins.enabled: false` يعطل جميع Plugins
-- تتغلب `plugins.deny` دائمًا على allow
-- `plugins.entries.\<id\>.enabled: false` يعطل تلك الـ Plugin
-- Plugins ذات أصل مساحة العمل تكون **معطلة افتراضيًا** (ويجب تفعيلها صراحةً)
+- يؤدي `plugins.enabled: false` إلى تعطيل كل Plugins
+- يتقدم `plugins.deny` دائمًا على allow
+- يؤدي `plugins.entries.\<id\>.enabled: false` إلى تعطيل ذلك Plugin
+- تكون Plugins ذات أصل مساحة العمل **معطّلة افتراضيًا** (ويجب تمكينها صراحةً)
 - تتبع Plugins المضمّنة مجموعة التفعيل الافتراضية المدمجة ما لم يتم تجاوزها
-- يمكن للخانات الحصرية فرض تفعيل Plugin المحددة لتلك الخانة
+- يمكن أن تفرض slots الحصرية تمكين Plugin المحدد لذلك slot
 
-## خانات Plugin (فئات حصرية)
+## Plugin slots (فئات حصرية)
 
-بعض الفئات حصرية (يمكن أن تكون واحدة فقط نشطة في كل مرة):
+بعض الفئات حصرية (واحد نشط فقط في كل مرة):
 
 ```json5
 {
@@ -214,37 +214,37 @@ x-i18n:
 }
 ```
 
-| الخانة            | ما الذي تتحكم به      | الافتراضي             |
+| الـ Slot            | ما الذي يتحكم فيه      | الافتراضي             |
 | --------------- | --------------------- | ------------------- |
-| `memory`        | Plugin الذاكرة النشطة  | `memory-core`       |
-| `contextEngine` | محرك السياق النشط | `legacy` (مدمج) |
+| `memory`        | Plugin الذاكرة النشط  | `memory-core`       |
+| `contextEngine` | محرك السياق النشط | `legacy` (مضمّن) |
 
 ## مرجع CLI
 
 ```bash
-openclaw plugins list                       # جرد مضغوط
+openclaw plugins list                       # فهرس مضغوط
 openclaw plugins list --enabled            # Plugins المحمّلة فقط
 openclaw plugins list --verbose            # أسطر تفاصيل لكل Plugin
-openclaw plugins list --json               # جرد قابل للقراءة الآلية
+openclaw plugins list --json               # فهرس قابل للقراءة آليًا
 openclaw plugins inspect <id>              # تفاصيل عميقة
-openclaw plugins inspect <id> --json       # قابل للقراءة الآلية
+openclaw plugins inspect <id> --json       # قابل للقراءة آليًا
 openclaw plugins inspect --all             # جدول على مستوى الأسطول
-openclaw plugins info <id>                 # اسم مستعار لـ inspect
-openclaw plugins doctor                    # diagnostics
+openclaw plugins info <id>                 # اسم بديل لـ inspect
+openclaw plugins doctor                    # تشخيصات
 
 openclaw plugins install <package>         # تثبيت (ClawHub أولًا، ثم npm)
 openclaw plugins install clawhub:<pkg>     # تثبيت من ClawHub فقط
-openclaw plugins install <spec> --force    # الكتابة فوق تثبيت موجود
+openclaw plugins install <spec> --force    # الكتابة فوق التثبيت الموجود
 openclaw plugins install <path>            # تثبيت من مسار محلي
 openclaw plugins install -l <path>         # ربط (من دون نسخ) للتطوير
 openclaw plugins install <plugin> --marketplace <source>
 openclaw plugins install <plugin> --marketplace https://github.com/<owner>/<repo>
 openclaw plugins install <spec> --pin      # تسجيل مواصفة npm المحلولة الدقيقة
 openclaw plugins install <spec> --dangerously-force-unsafe-install
-openclaw plugins update <id-or-npm-spec> # تحديث Plugin واحدة
+openclaw plugins update <id-or-npm-spec> # تحديث Plugin واحد
 openclaw plugins update <id-or-npm-spec> --dangerously-force-unsafe-install
 openclaw plugins update --all            # تحديث الكل
-openclaw plugins uninstall <id>          # إزالة سجلات الإعداد/التثبيت
+openclaw plugins uninstall <id>          # إزالة سجلات config/التثبيت
 openclaw plugins uninstall <id> --keep-files
 openclaw plugins marketplace list <source>
 openclaw plugins marketplace list <source> --json
@@ -253,57 +253,63 @@ openclaw plugins enable <id>
 openclaw plugins disable <id>
 ```
 
-تأتي Plugins المضمّنة مع OpenClaw. وكثير منها مفعّل افتراضيًا (مثل
-موفري النماذج المضمّنين، وموفري الكلام المضمّنين، وPlugin المتصفح
-المضمّنة). أما Plugins المضمّنة الأخرى فما تزال بحاجة إلى `openclaw plugins enable <id>`.
+تُشحن Plugins المضمّنة مع OpenClaw. كثير منها مفعّل افتراضيًا (على سبيل المثال
+مزودو النماذج المضمّنون، ومزودو الصوت المضمّنون، وPlugin
+browser المضمّن). وما تزال Plugins مضمّنة أخرى تحتاج إلى `openclaw plugins enable <id>`.
 
-يقوم `--force` بالكتابة فوق Plugin أو حزمة hook مثبّتة موجودة بالفعل في مكانها. استخدم
-`openclaw plugins update <id-or-npm-spec>` للترقيات المعتادة لـ Plugins npm
-المتتبعة. ولا يُدعم هذا الخيار مع `--link`, الذي يعيد استخدام مسار المصدر بدلًا
+يقوم `--force` بالكتابة فوق Plugin أو hook pack مثبت موجود في مكانه. استخدم
+`openclaw plugins update <id-or-npm-spec>` للترقيات الروتينية لـ Plugins npm
+المتتبعة. وهو غير مدعوم مع `--link`، الذي يعيد استخدام مسار المصدر بدلًا
 من النسخ فوق هدف تثبيت مُدار.
+
+عندما تكون `plugins.allow` مضبوطة بالفعل، يضيف `openclaw plugins install`
+معرّف Plugin المثبّت إلى قائمة السماح تلك قبل تمكينه، بحيث تصبح عمليات التثبيت
+قابلة للتحميل فورًا بعد إعادة التشغيل.
 
 ينطبق `openclaw plugins update <id-or-npm-spec>` على التثبيتات المتتبعة. ويؤدي تمرير
 مواصفة حزمة npm مع dist-tag أو إصدار دقيق إلى حل اسم الحزمة
-إلى سجل Plugin المتتبَّع وتسجيل المواصفة الجديدة لأجل التحديثات المستقبلية.
-أما تمرير اسم الحزمة من دون إصدار فيعيد تثبيتًا دقيقًا مثبتًا إلى
-خط الإصدار الافتراضي في السجل. وإذا كانت Plugin npm المثبتة تطابق بالفعل
-الإصدار المحلول وهوية العنصر المسجلة، فإن OpenClaw يتجاوز التحديث
-من دون تنزيل أو إعادة تثبيت أو إعادة كتابة الإعدادات.
+مجدّدًا إلى سجل Plugin المتتبع وتسجيل المواصفة الجديدة للتحديثات المستقبلية.
+ويؤدي تمرير اسم الحزمة من دون إصدار إلى إعادة تثبيت دقيق ومثبت إلى
+خط الإصدار الافتراضي للسجل. وإذا كان Plugin npm المثبّت يطابق بالفعل
+الإصدار المحلول وهوية artifact المسجلة، فإن OpenClaw يتخطى التحديث
+من دون تنزيل أو إعادة تثبيت أو إعادة كتابة config.
 
-إن `--pin` خاص بـ npm فقط. وهو غير مدعوم مع `--marketplace`, لأن
-تثبيتات marketplace تحفظ بيانات وصفية لمصدر marketplace بدلًا من مواصفة npm.
+`--pin` خاص بـ npm فقط. وهو غير مدعوم مع `--marketplace`، لأن
+تثبيتات marketplace تحفظ بيانات مصدر marketplace الوصفية بدلًا من مواصفة npm.
 
-إن `--dangerously-force-unsafe-install` هو تجاوز كسر زجاج للحالات الإيجابية
-الخاطئة من ماسح الشيفرة الخطرة المدمج. فهو يسمح لتثبيتات Plugin
-وتحديثاتها بالاستمرار رغم وجود نتائج `critical` من الفحص المدمج، لكنه
-ما يزال لا يتجاوز كتل سياسة `before_install` الخاصة بـ Plugin أو منع فشل الفحص.
+`--dangerously-force-unsafe-install` هو تجاوز break-glass للحالات
+الإيجابية الكاذبة من dangerous-code scanner المضمّن. وهو يسمح باستمرار
+عمليات تثبيت Plugin وتحديثاته بعد نتائج `critical` المضمنة، لكنه
+لا يتجاوز حظر السياسة `before_install` الخاصة بالـ Plugin أو الحظر الناتج عن فشل الفحص.
 
-ينطبق هذا الخيار في CLI على تدفقات تثبيت/تحديث Plugin فقط. أما تثبيتات تبعيات Skill
-المدعومة بـ Gateway فتستخدم بدلًا من ذلك تجاوز الطلب المطابق `dangerouslyForceUnsafeInstall`,
-بينما يبقى `openclaw skills install` تدفق تنزيل/تثبيت Skills منفصلًا من ClawHub.
+ينطبق هذا العلم في CLI على تدفقات تثبيت/تحديث Plugin فقط. أما عمليات تثبيت
+تبعيات Skills المدعومة من Gateway فتستخدم التجاوز المطابق للطلب
+`dangerouslyForceUnsafeInstall` بدلًا من ذلك، بينما يظل `openclaw skills install`
+هو تدفق التنزيل/التثبيت المنفصل لـ Skills من ClawHub.
 
-تشارك الحزم المتوافقة في التدفق نفسه لـ list/inspect/enable/disable الخاص بالـ Plugin.
-ويشمل دعم بيئة التشغيل الحالي Skills الحزمة، وClaude command-skills,
-وقيم Claude الافتراضية في `settings.json`, وClaude `.lsp.json` و
-القيم الافتراضية `lspServers` المعلنة في manifest, وCursor command-skills،
-وأدلة hook المتوافقة مع Codex.
+تشارك الحِزم المتوافقة في نفس تدفق list/inspect/enable/disable الخاص بالـ Plugin.
+ويتضمن دعم runtime الحالي Skills الخاصة بالحِزم، وClaude command-skills،
+وقيم Claude ‏`settings.json` الافتراضية، وقيم Claude ‏`.lsp.json` و
+القيم الافتراضية `lspServers` المعلنة في manifest، وCursor command-skills،
+وأدلة hooks المتوافقة مع Codex.
 
-ويُبلغ `openclaw plugins inspect <id>` أيضًا عن قدرات الحزمة المكتشفة إضافةً إلى
-إدخالات MCP وLSP server المدعومة أو غير المدعومة الخاصة بالـ Plugins المدعومة بالحزم.
+يبلغ `openclaw plugins inspect <id>` أيضًا عن إمكانات الحِزمة المكتشفة بالإضافة
+إلى إدخالات خوادم MCP وLSP المدعومة أو غير المدعومة لـ Plugins
+المدعومة بالحِزم.
 
-يمكن أن تكون مصادر Marketplace اسم marketplace معروفًا لـ Claude من
-`~/.claude/plugins/known_marketplaces.json`, أو جذر marketplace محليًا، أو
-مسار `marketplace.json`, أو صيغة GitHub مختصرة مثل `owner/repo`, أو عنوان URL لمستودع GitHub،
-أو عنوان URL لـ git. وبالنسبة إلى marketpaces البعيدة، يجب أن تبقى إدخالات Plugin داخل
-مستودع marketplace المستنسخ وأن تستخدم مصادر مسارات نسبية فقط.
+يمكن أن تكون مصادر Marketplace اسم known-marketplace خاصًا بـ Claude من
+`~/.claude/plugins/known_marketplaces.json`، أو جذر Marketplace محلي أو
+مسار `marketplace.json`، أو اختصار GitHub مثل `owner/repo`، أو عنوان URL لمستودع GitHub،
+أو عنوان URL لـ git. وبالنسبة إلى Marketplaces البعيدة، يجب أن تبقى إدخالات Plugin داخل
+مستودع Marketplace المستنسخ وأن تستخدم مصادر مسارات نسبية فقط.
 
-راجع [مرجع CLI للأمر `openclaw plugins`](/ar/cli/plugins) للحصول على التفاصيل الكاملة.
+راجع [مرجع CLI ‏`openclaw plugins`](/ar/cli/plugins) للاطلاع على التفاصيل الكاملة.
 
 ## نظرة عامة على Plugin API
 
-تُصدّر Plugins الأصلية كائن إدخال يعرض `register(api)`. وقد
-تستخدم Plugins الأقدم ما يزال `activate(api)` كاسم مستعار قديم، لكن Plugins الجديدة ينبغي أن
-تستخدم `register`.
+تُصدّر Plugins Native كائن إدخال يعرّض `register(api)`. وما زالت
+Plugins الأقدم قد تستخدم `activate(api)` كاسم بديل قديم، لكن Plugins الجديدة يجب
+أن تستخدم `register`.
 
 ```typescript
 export default definePluginEntry({
@@ -324,14 +330,15 @@ export default definePluginEntry({
 ```
 
 يحمّل OpenClaw كائن الإدخال ويستدعي `register(api)` أثناء تفعيل Plugin.
-وما يزال المحمّل يعود إلى `activate(api)` بالنسبة إلى Plugins الأقدم،
-لكن يجب أن تتعامل Plugins المضمّنة وPlugins الخارجية الجديدة مع `register` على أنها العقد العام.
+وما يزال loader يعود إلى `activate(api)` بالنسبة إلى Plugins الأقدم،
+لكن يجب على Plugins المضمّنة وPlugins الخارجية الجديدة اعتبار `register`
+العقد العام.
 
-أساليب التسجيل الشائعة:
+طرق التسجيل الشائعة:
 
 | الطريقة                                  | ما الذي تسجله           |
 | --------------------------------------- | --------------------------- |
-| `registerProvider`                      | مزوّد نموذج (LLM)        |
+| `registerProvider`                      | مزود نماذج (LLM)        |
 | `registerChannel`                       | قناة دردشة                |
 | `registerTool`                          | أداة وكيل                  |
 | `registerHook` / `on(...)`              | hooks دورة الحياة             |
@@ -342,29 +349,29 @@ export default definePluginEntry({
 | `registerImageGenerationProvider`       | توليد الصور            |
 | `registerMusicGenerationProvider`       | توليد الموسيقى            |
 | `registerVideoGenerationProvider`       | توليد الفيديو            |
-| `registerWebFetchProvider`              | مزوّد جلب / كشط الويب |
+| `registerWebFetchProvider`              | مزود جلب / كشط ويب |
 | `registerWebSearchProvider`             | بحث الويب                  |
 | `registerHttpRoute`                     | نقطة نهاية HTTP               |
 | `registerCommand` / `registerCli`       | أوامر CLI                |
-| `registerContextEngine`                 | محرك سياق              |
+| `registerContextEngine`                 | محرك السياق              |
 | `registerService`                       | خدمة في الخلفية          |
 
-سلوك حواجز hook الخاصة بـ hooks دورة الحياة المtyped:
+سلوك hook guard بالنسبة إلى hooks دورة الحياة المكتوبة:
 
 - `before_tool_call`: تكون `{ block: true }` نهائية؛ ويتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_tool_call`: تكون `{ block: false }` بلا تأثير ولا تمسح block سابقة.
+- `before_tool_call`: تكون `{ block: false }` بلا تأثير ولا تزيل block سابقًا.
 - `before_install`: تكون `{ block: true }` نهائية؛ ويتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_install`: تكون `{ block: false }` بلا تأثير ولا تمسح block سابقة.
+- `before_install`: تكون `{ block: false }` بلا تأثير ولا تزيل block سابقًا.
 - `message_sending`: تكون `{ cancel: true }` نهائية؛ ويتم تخطي المعالجات ذات الأولوية الأدنى.
-- `message_sending`: تكون `{ cancel: false }` بلا تأثير ولا تمسح cancel سابقة.
+- `message_sending`: تكون `{ cancel: false }` بلا تأثير ولا تزيل cancel سابقًا.
 
-للاطلاع على السلوك الكامل للـ hooks المtyped، راجع [نظرة عامة على SDK](/ar/plugins/sdk-overview#hook-decision-semantics).
+للاطلاع على السلوك الكامل للـ hooks المكتوبة، راجع [نظرة عامة على SDK](/ar/plugins/sdk-overview#hook-decision-semantics).
 
 ## ذو صلة
 
-- [بناء Plugins](/ar/plugins/building-plugins) — أنشئ Plugin الخاصة بك
-- [حزم Plugin](/ar/plugins/bundles) — توافق حزم Codex/Claude/Cursor
-- [بيان Plugin](/ar/plugins/manifest) — مخطط manifest
-- [تسجيل الأدوات](/ar/plugins/building-plugins#registering-agent-tools) — أضف أدوات الوكيل في Plugin
-- [الداخليات الخاصة بـ Plugin](/ar/plugins/architecture) — نموذج القدرات ومسار التحميل
-- [Plugins المجتمع](/ar/plugins/community) — قوائم الطرف الثالث
+- [بناء Plugins](/ar/plugins/building-plugins) — أنشئ Plugin خاصًا بك
+- [Plugin Bundles](/ar/plugins/bundles) — توافق حِزم Codex/Claude/Cursor
+- [Plugin Manifest](/ar/plugins/manifest) — مخطط manifest
+- [تسجيل الأدوات](/ar/plugins/building-plugins#registering-agent-tools) — أضف أدوات الوكيل داخل Plugin
+- [Plugin Internals](/ar/plugins/architecture) — نموذج الإمكانات ومسار التحميل
+- [Community Plugins](/ar/plugins/community) — قوائم الجهات الخارجية

@@ -1,32 +1,32 @@
 ---
 read_when:
     - تريد استخدام app-server harness المضمّن الخاص بـ Codex
-    - تحتاج إلى مراجع نماذج Codex وأمثلة إعدادات
-    - تريد تعطيل الرجوع الاحتياطي إلى Pi في عمليات النشر الخاصة بـ Codex فقط
-summary: تشغيل دورات الوكيل المضمّن في OpenClaw عبر app-server harness المضمّن الخاص بـ Codex
+    - تحتاج إلى مراجع نماذج Codex وأمثلة على الإعدادات
+    - تريد تعطيل الرجوع إلى Pi لعمليات النشر الخاصة بـ Codex فقط
+summary: شغّل أدوار الوكيل المضمّن في OpenClaw عبر app-server harness المضمّن الخاص بـ Codex
 title: Codex Harness
 x-i18n:
-    generated_at: "2026-04-23T07:27:36Z"
+    generated_at: "2026-04-23T14:00:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f5eff5a2af66033d575bc05c9f31a23ed0367bedc518dc25364e60a3012bfdff
+    source_hash: 8172af40edb7d1f7388a606df1c8f776622ffd82b46245fb9fbd184fbf829356
     source_path: plugins/codex-harness.md
     workflow: 15
 ---
 
 # Codex Harness
 
-يتيح Plugin المضمّن `codex` لـ OpenClaw تشغيل دورات الوكيل المضمّن عبر
-Codex app-server بدلًا من PI harness المدمج.
+يتيح Plugin ‏`codex` المضمّن لـ OpenClaw تشغيل أدوار الوكيل المضمّن عبر
+Codex app-server بدلًا من PI harness المضمّن.
 
 استخدم هذا عندما تريد أن يتولى Codex جلسة الوكيل منخفضة المستوى: اكتشاف
-النماذج، واستئناف الخيوط الأصلية، وCompaction الأصلي، وتنفيذ app-server.
-ولا يزال OpenClaw يملك قنوات الدردشة، وملفات الجلسات، واختيار النماذج، والأدوات،
-والموافقات، وتسليم الوسائط، ونسخة transcript المرئية.
+النماذج، واستئناف الخيط الأصلي، وCompaction الأصلي، وتنفيذ app-server.
+وما زال OpenClaw يملك قنوات الدردشة، وملفات الجلسات، واختيار النماذج، والأدوات،
+والموافقات، وتسليم الوسائط، ونسخة السجل المرئية.
 
-كما تحترم دورات Codex الأصلية أيضًا hooks المشتركة الخاصة بـ Plugin بحيث تبقى
-شيفرات prompt الوسيطة، والأتمتة الواعية بـ Compaction، وmiddleware الأدوات،
-ومراقبو دورة الحياة متوافقة مع PI harness:
+تحترم أدوار Codex الأصلية أيضًا hooks المشتركة لـ Plugin بحيث تظل
+prompt shims، والأتمتة الواعية بـ Compaction، وtool middleware، ومراقبو دورة الحياة
+متوافقة مع PI harness:
 
 - `before_prompt_build`
 - `before_compaction`, `after_compaction`
@@ -35,48 +35,46 @@ Codex app-server بدلًا من PI harness المدمج.
 - `before_message_write`
 - `agent_end`
 
-يمكن أيضًا لـ Plugins المضمّنة تسجيل factory لامتداد Codex app-server لإضافة
-middleware غير متزامن لـ `tool_result`، كما تُوجَّه كتابات transcript
-المعكوسة الخاصة بـ Codex عبر `before_message_write`.
+يمكن أيضًا لـ Plugins المضمّنة تسجيل Codex app-server extension factory لإضافة
+`tool_result` middleware غير المتزامن.
 
-تكون الـ harness معطلة افتراضيًا. ولا يتم اختيارها إلا عندما يكون Plugin
-`codex` مفعّلًا ويكون النموذج المحلول من نوع `codex/*`، أو عندما تفرض صراحة
+يكون harness معطلًا افتراضيًا. ولا يتم اختياره إلا عندما يكون Plugin ‏`codex`
+مفعّلًا ويكون النموذج الذي تم حله نموذج `codex/*`، أو عندما تفرض صراحةً
 `embeddedHarness.runtime: "codex"` أو `OPENCLAW_AGENT_RUNTIME=codex`.
-وإذا لم تُهيئ `codex/*` مطلقًا، فإن تشغيلات PI وOpenAI وAnthropic وGemini وlocal
-والمزوّدات المخصصة الحالية تبقى على سلوكها الحالي.
+إذا لم تضبط `codex/*` مطلقًا، فستحتفظ تشغيلات PI وOpenAI وAnthropic وGemini وlocal
+وcustom-provider الحالية بسلوكها الحالي.
 
 ## اختر بادئة النموذج الصحيحة
 
-يمتلك OpenClaw مسارات منفصلة للوصول على هيئة OpenAI والوصول على هيئة Codex:
+لدى OpenClaw مسارات منفصلة للوصول بشكل OpenAI وبشكل Codex:
 
-| مرجع النموذج          | مسار وقت التشغيل                            | استخدمه عندما |
-| --------------------- | ------------------------------------------- | ------------- |
-| `openai/gpt-5.4`      | مزوّد OpenAI عبر بنية OpenClaw/PI           | تريد وصولًا مباشرًا إلى OpenAI Platform API باستخدام `OPENAI_API_KEY`. |
-| `openai-codex/gpt-5.4`| مزوّد OpenAI Codex OAuth عبر PI             | تريد ChatGPT/Codex OAuth من دون Codex app-server harness. |
-| `codex/gpt-5.4`       | مزوّد Codex المضمّن بالإضافة إلى Codex harness | تريد تنفيذ Codex app-server الأصلي لدورة الوكيل المضمّن. |
+| مرجع النموذج              | مسار وقت التشغيل                                 | يُستخدم عندما                                                                |
+| ---------------------- | -------------------------------------------- | ----------------------------------------------------------------------- |
+| `openai/gpt-5.4`       | مزوّد OpenAI عبر OpenClaw/PI plumbing | تريد وصولًا مباشرًا إلى OpenAI Platform API باستخدام `OPENAI_API_KEY`.       |
+| `openai-codex/gpt-5.4` | مزوّد OpenAI Codex OAuth عبر PI       | تريد ChatGPT/Codex OAuth من دون Codex app-server harness.      |
+| `codex/gpt-5.4`        | مزوّد Codex المضمّن بالإضافة إلى Codex harness    | تريد تنفيذ Codex app-server الأصلي لدور الوكيل المضمّن. |
 
-لا تطالب Codex harness إلا بمراجع النماذج `codex/*`. أما المراجع الحالية `openai/*`،
-و`openai-codex/*`، وAnthropic، وGemini، وxAI، وlocal، والمزوّدات المخصصة، فتبقى
+لا يطالب Codex harness إلا بمراجع النماذج `codex/*`. أما مراجع `openai/*`
+و`openai-codex/*` وAnthropic وGemini وxAI وlocal وcustom provider الحالية فتبقى
 على مساراتها العادية.
 
 ## المتطلبات
 
-- OpenClaw مع توافر Plugin `codex` المضمّن.
+- OpenClaw مع توفر Plugin ‏`codex` المضمّن.
 - Codex app-server بالإصدار `0.118.0` أو أحدث.
-- توافر مصادقة Codex لعملية app-server.
+- توفر مصادقة Codex لعملية app-server.
 
-يمنع Plugin المصافحات القديمة أو غير المرقمة للإصدار الخاصة بـ app-server. وهذا يبقي
-OpenClaw على سطح البروتوكول الذي تم اختباره عليه.
+يحظر Plugin عمليات handshake الأقدم أو غير المرقمة لإصدار app-server. وهذا يُبقي
+OpenClaw على سطح البروتوكول الذي اختُبر عليه.
 
-بالنسبة إلى الاختبارات الحية واختبارات Docker الدخانية، تأتي المصادقة عادة من `OPENAI_API_KEY`، بالإضافة إلى
-ملفات Codex CLI الاختيارية مثل `~/.codex/auth.json` و
-`~/.codex/config.toml`. استخدم مواد المصادقة نفسها التي يستخدمها
-Codex app-server المحلي لديك.
+بالنسبة لاختبارات smoke الحية وDocker، تأتي المصادقة عادةً من `OPENAI_API_KEY`، بالإضافة
+إلى ملفات Codex CLI الاختيارية مثل `~/.codex/auth.json` و
+`~/.codex/config.toml`. استخدم نفس مواد المصادقة التي يستخدمها Codex app-server
+المحلي لديك.
 
-## الحد الأدنى من الإعداد
+## الحد الأدنى من الإعدادات
 
-استخدم `codex/gpt-5.4`، وفعّل Plugin المضمّن، وافرِض
-Codex harness:
+استخدم `codex/gpt-5.4`، ومكّن Plugin المضمّن، وافرِض harness ‏`codex`:
 
 ```json5
 {
@@ -99,7 +97,7 @@ Codex harness:
 }
 ```
 
-إذا كان config لديك يستخدم `plugins.allow`، فأدرج `codex` هناك أيضًا:
+إذا كان config لديك يستخدم `plugins.allow`، فضمّن `codex` هناك أيضًا:
 
 ```json5
 {
@@ -114,14 +112,14 @@ Codex harness:
 }
 ```
 
-يؤدي ضبط `agents.defaults.model` أو نموذج وكيل إلى `codex/<model>` أيضًا إلى
-تفعيل Plugin `codex` المضمّن تلقائيًا. ولا يزال إدخال Plugin الصريح
+يؤدي أيضًا ضبط `agents.defaults.model` أو نموذج وكيل إلى `codex/<model>` إلى
+تفعيل Plugin ‏`codex` المضمّن تلقائيًا. وما زال إدخال Plugin الصريح
 مفيدًا في الإعدادات المشتركة لأنه يجعل نية النشر واضحة.
 
 ## أضف Codex من دون استبدال النماذج الأخرى
 
-أبقِ `runtime: "auto"` عندما تريد Codex لنماذج `codex/*` وPI لكل
-شيء آخر:
+أبقِ `runtime: "auto"` عندما تريد استخدام Codex لنماذج `codex/*` وPI
+لكل شيء آخر:
 
 ```json5
 {
@@ -153,7 +151,7 @@ Codex harness:
 }
 ```
 
-بهذا الشكل:
+مع هذا الشكل:
 
 - يستخدم `/model codex` أو `/model codex/gpt-5.4` ‏Codex app-server harness.
 - يستخدم `/model gpt` أو `/model openai/gpt-5.4` مسار مزوّد OpenAI.
@@ -162,7 +160,7 @@ Codex harness:
 
 ## عمليات النشر الخاصة بـ Codex فقط
 
-عطّل الرجوع الاحتياطي إلى PI عندما تحتاج إلى إثبات أن كل دورة وكيل مضمّن تستخدم
+عطّل الرجوع إلى PI عندما تحتاج إلى إثبات أن كل دور وكيل مضمّن يستخدم
 Codex harness:
 
 ```json5
@@ -187,14 +185,14 @@ OPENCLAW_AGENT_HARNESS_FALLBACK=none \
 openclaw gateway run
 ```
 
-عند تعطيل الرجوع الاحتياطي، يفشل OpenClaw مبكرًا إذا كان Plugin الخاص بـ Codex معطلًا،
-أو إذا لم يكن النموذج المطلوب من نوع `codex/*`، أو إذا كان app-server قديمًا جدًا، أو إذا
+مع تعطيل fallback، يفشل OpenClaw مبكرًا إذا كان Plugin ‏Codex معطلًا،
+أو إذا لم يكن النموذج المطلوب مرجع `codex/*`، أو إذا كان app-server قديمًا جدًا، أو إذا
 تعذر بدء app-server.
 
 ## Codex لكل وكيل
 
-يمكنك جعل وكيل واحد خاصًا بـ Codex بينما يحتفظ الوكيل الافتراضي باختيار
-تلقائي عادي:
+يمكنك جعل وكيل واحد خاصًا بـ Codex فقط بينما يحتفظ الوكيل الافتراضي
+بالاختيار التلقائي العادي:
 
 ```json5
 {
@@ -225,14 +223,14 @@ openclaw gateway run
 }
 ```
 
-استخدم أوامر الجلسة العادية لتبديل الوكلاء والنماذج. ينشئ `/new` جلسة
-OpenClaw جديدة، وتقوم Codex harness بإنشاء أو استئناف خيط app-server
-الجانبي حسب الحاجة. ويزيل `/reset` ربط جلسة OpenClaw لذلك الخيط.
+استخدم أوامر الجلسة العادية للتبديل بين الوكلاء والنماذج. ينشئ `/new`
+جلسة OpenClaw جديدة، وينشئ Codex harness أو يستأنف خيط app-server الجانبي
+عند الحاجة. ويمسح `/reset` ربط جلسة OpenClaw لذلك الخيط.
 
-## اكتشاف النماذج
+## اكتشاف النموذج
 
-افتراضيًا، يطلب Plugin الخاص بـ Codex النماذج المتاحة من app-server. وإذا
-فشل الاكتشاف أو انتهت مهلته، يستخدم الفهرس الاحتياطي المضمّن:
+افتراضيًا، يطلب Plugin ‏Codex من app-server النماذج المتاحة. إذا
+فشل الاكتشاف أو انتهت مهلته، فإنه يستخدم كتالوج fallback المضمّن:
 
 - `codex/gpt-5.4`
 - `codex/gpt-5.4-mini`
@@ -259,7 +257,7 @@ OpenClaw جديدة، وتقوم Codex harness بإنشاء أو استئناف 
 ```
 
 عطّل الاكتشاف عندما تريد أن يتجنب بدء التشغيل فحص Codex والالتزام
-بالفهرس الاحتياطي:
+بكتالوج fallback:
 
 ```json5
 {
@@ -280,7 +278,7 @@ OpenClaw جديدة، وتقوم Codex harness بإنشاء أو استئناف 
 
 ## اتصال app-server والسياسة
 
-افتراضيًا، يبدأ Plugin تشغيل Codex محليًا باستخدام:
+افتراضيًا، يبدأ Plugin ‏Codex محليًا باستخدام:
 
 ```bash
 codex app-server --listen stdio://
@@ -289,10 +287,10 @@ codex app-server --listen stdio://
 افتراضيًا، يبدأ OpenClaw جلسات Codex harness المحلية في وضع YOLO:
 `approvalPolicy: "never"` و`approvalsReviewer: "user"` و
 `sandbox: "danger-full-access"`. وهذه هي وضعية المشغّل المحلي الموثوق المستخدمة
-لـ Heartbeat المستقلة: حيث يمكن لـ Codex استخدام أدوات shell والشبكة
-من دون التوقف عند مطالبات الموافقة الأصلية التي لا يوجد أحد حاضر للإجابة عنها.
+لـ Heartbeat المستقلة: إذ يمكن لـ Codex استخدام shell وأدوات الشبكة من دون
+التوقف عند مطالبات الموافقة الأصلية عندما لا يكون هناك أحد للإجابة.
 
-للاشتراك في الموافقات التي يراجعها Guardian في Codex، اضبط `appServer.mode:
+للاشتراك في موافقات Codex التي يراجعها Guardian، اضبط `appServer.mode:
 "guardian"`:
 
 ```json5
@@ -313,7 +311,7 @@ codex app-server --listen stdio://
 }
 ```
 
-يوسّع وضع Guardian إلى:
+يتوسع وضع Guardian إلى:
 
 ```json5
 {
@@ -335,24 +333,24 @@ codex app-server --listen stdio://
 }
 ```
 
-Guardian هو مراجع موافقات أصلي في Codex. وعندما يطلب Codex الخروج من
-صندوق الحماية، أو الكتابة خارج مساحة العمل، أو إضافة أذونات مثل الوصول إلى الشبكة،
-فإن Codex يوجّه طلب الموافقة ذلك إلى وكيل فرعي مراجع بدلًا من مطالبة بشرية.
-ويجمع المراجع السياق ويطبق إطار المخاطر الخاص بـ Codex، ثم
-يوافق أو يرفض الطلب المحدد. ويكون Guardian مفيدًا عندما تريد حواجز حماية
-أكثر من وضع YOLO لكنك لا تزال تحتاج إلى وكلاء وHeartbeats غير مراقَبة
-لمواصلة التقدم.
+Guardian هو مراجع موافقات أصلي في Codex. عندما يطلب Codex الخروج من
+sandbox، أو الكتابة خارج مساحة العمل، أو إضافة أذونات مثل الوصول إلى الشبكة،
+فإن Codex يوجّه طلب الموافقة هذا إلى reviewer subagent بدلًا من مطالبة بشرية.
+يجمع reviewer السياق ويطبق إطار المخاطر الخاص بـ Codex، ثم
+يوافق على الطلب المحدد أو يرفضه. يكون Guardian مفيدًا عندما تريد مزيدًا من
+القيود الوقائية مقارنةً بوضع YOLO لكنك ما زلت تحتاج إلى وكلاء وHeartbeat غير
+مراقبة لتُحرز تقدمًا.
 
-يتضمن Docker live harness مجسًا لـ Guardian عندما تكون
-`OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE=1`. فهو يبدأ Codex harness في
-وضع Guardian، ويتحقق من الموافقة على أمر shell مُصعّد وغير ضار، ويتحقق
-من رفض رفع سر مزيف إلى وجهة خارجية غير موثوقة بحيث
-يطلب الوكيل موافقة صريحة من جديد.
+يتضمن Docker live harness فحص Guardian عندما تكون
+`OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE=1`. إذ يبدأ Codex harness في
+وضع Guardian، ويتحقق من الموافقة على أمر shell مصعّد وغير ضار، ويتحقق
+من رفض رفع secret مزيفة إلى وجهة خارجية غير موثوقة بحيث يعود الوكيل
+ليطلب موافقة صريحة.
 
-لا تزال حقول السياسة الفردية تتغلب على `mode`، لذا يمكن لعمليات النشر المتقدمة
+ما زالت حقول السياسة الفردية تتقدم على `mode`، لذا يمكن لعمليات النشر المتقدمة
 مزج الإعداد المسبق مع اختيارات صريحة.
 
-وبالنسبة إلى app-server يعمل بالفعل، استخدم نقل WebSocket:
+بالنسبة إلى app-server يعمل بالفعل، استخدم نقل WebSocket:
 
 ```json5
 {
@@ -376,23 +374,23 @@ Guardian هو مراجع موافقات أصلي في Codex. وعندما يطل
 
 حقول `appServer` المدعومة:
 
-| الحقل              | الافتراضي                                | المعنى |
-| ------------------ | ---------------------------------------- | ------ |
-| `transport`        | `"stdio"`                                | يقوم `"stdio"` بتشغيل Codex؛ ويتصل `"websocket"` بـ `url`. |
-| `command`          | `"codex"`                                | الملف التنفيذي لنقل stdio. |
-| `args`             | `["app-server", "--listen", "stdio://"]` | الوسائط لنقل stdio. |
-| `url`              | غير مضبوط                                | عنوان URL لـ WebSocket app-server. |
-| `authToken`        | غير مضبوط                                | رمز Bearer لنقل WebSocket. |
-| `headers`          | `{}`                                     | ترويسات WebSocket إضافية. |
-| `requestTimeoutMs` | `60000`                                  | المهلة الزمنية لاستدعاءات control-plane الخاصة بـ app-server. |
-| `mode`             | `"yolo"`                                 | إعداد مسبق لتنفيذ YOLO أو التنفيذ الذي يراجعه guardian. |
-| `approvalPolicy`   | `"never"`                                | سياسة الموافقة الأصلية في Codex المُرسلة عند بدء/استئناف/دورة الخيط. |
-| `sandbox`          | `"danger-full-access"`                   | وضع صندوق الحماية الأصلي في Codex المُرسل عند بدء/استئناف الخيط. |
-| `approvalsReviewer`| `"user"`                                 | استخدم `"guardian_subagent"` للسماح لـ Codex Guardian بمراجعة المطالبات. |
-| `serviceTier`      | غير مضبوط                                | طبقة خدمة اختيارية لـ Codex app-server: `"fast"` أو `"flex"` أو `null`. ويتم تجاهل القيم القديمة غير الصالحة. |
+| الحقل               | الافتراضي                                  | المعنى                                                                                                   |
+| ------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `transport`         | `"stdio"`                                | تقوم `"stdio"` بتشغيل Codex؛ وتتصل `"websocket"` بـ `url`.                                                  |
+| `command`           | `"codex"`                                | الملف التنفيذي لنقل stdio.                                                                           |
+| `args`              | `["app-server", "--listen", "stdio://"]` | الوسيطات لنقل stdio.                                                                            |
+| `url`               | غير مضبوط                                    | عنوان URL لـ WebSocket app-server.                                                                                 |
+| `authToken`         | غير مضبوط                                    | Bearer token لنقل WebSocket.                                                                     |
+| `headers`           | `{}`                                     | ترويسات WebSocket إضافية.                                                                                  |
+| `requestTimeoutMs`  | `60000`                                  | المهلة الزمنية لاستدعاءات control-plane الخاصة بـ app-server.                                                               |
+| `mode`              | `"yolo"`                                 | إعداد مسبق لتنفيذ YOLO أو التنفيذ بمراجعة Guardian.                                                           |
+| `approvalPolicy`    | `"never"`                                | سياسة الموافقة الأصلية في Codex المرسلة إلى بدء/استئناف/دور الخيط.                                            |
+| `sandbox`           | `"danger-full-access"`                   | وضع sandbox الأصلي في Codex المرسل إلى بدء/استئناف الخيط.                                                    |
+| `approvalsReviewer` | `"user"`                                 | استخدم `"guardian_subagent"` للسماح لـ Codex Guardian بمراجعة المطالبات.                                           |
+| `serviceTier`       | غير مضبوط                                    | مستوى خدمة Codex app-server اختياري: `"fast"` أو `"flex"` أو `null`. يتم تجاهل القيم القديمة غير الصالحة. |
 
-لا تزال متغيرات البيئة الأقدم تعمل كقيم احتياطية للاختبار المحلي عندما
-يكون حقل الإعداد المطابق غير مضبوط:
+ما زالت متغيرات البيئة الأقدم تعمل كبدائل احتياطية للاختبار المحلي عندما
+يكون حقل config المطابق غير مضبوط:
 
 - `OPENCLAW_CODEX_APP_SERVER_BIN`
 - `OPENCLAW_CODEX_APP_SERVER_ARGS`
@@ -402,9 +400,9 @@ Guardian هو مراجع موافقات أصلي في Codex. وعندما يطل
 
 تمت إزالة `OPENCLAW_CODEX_APP_SERVER_GUARDIAN=1`. استخدم
 `plugins.entries.codex.config.appServer.mode: "guardian"` بدلًا من ذلك، أو
-`OPENCLAW_CODEX_APP_SERVER_MODE=guardian` لاختبار محلي لمرة واحدة. ويُفضَّل config
-لعمليات النشر القابلة لإعادة التكرار لأنه يُبقي سلوك Plugin في
-الملف المُراجَع نفسه مع بقية إعداد Codex harness.
+`OPENCLAW_CODEX_APP_SERVER_MODE=guardian` لاختبار محلي لمرة واحدة. يُفضَّل config
+لعمليات النشر القابلة للتكرار لأنه يبقي سلوك Plugin في
+نفس الملف المُراجع مع بقية إعداد Codex harness.
 
 ## وصفات شائعة
 
@@ -422,7 +420,7 @@ Codex محلي مع نقل stdio الافتراضي:
 }
 ```
 
-التحقق من Codex-only harness، مع تعطيل الرجوع الاحتياطي إلى PI:
+التحقق من Codex-only harness، مع تعطيل الرجوع إلى PI:
 
 ```json5
 {
@@ -439,7 +437,7 @@ Codex محلي مع نقل stdio الافتراضي:
 }
 ```
 
-موافقات Codex التي يراجعها Guardian:
+موافقات Codex بمراجعة Guardian:
 
 ```json5
 {
@@ -484,91 +482,90 @@ app-server بعيد مع ترويسات صريحة:
 }
 ```
 
-يبقى تبديل النماذج تحت تحكم OpenClaw. وعندما تُرفق جلسة OpenClaw
-بخيط Codex موجود، ترسل الدورة التالية
-النموذج الحالي المحدد من نوع `codex/*`، والمزوّد، وسياسة الموافقة، وصندوق الحماية، وطبقة الخدمة إلى
-app-server مرة أخرى. ويُبقي التبديل من `codex/gpt-5.4` إلى `codex/gpt-5.2`
-ربط الخيط، لكنه يطلب من Codex المتابعة باستخدام النموذج المحدد حديثًا.
+يظل تبديل النماذج خاضعًا لتحكم OpenClaw. عندما تكون جلسة OpenClaw مرفقة
+بخيط Codex موجود، يرسل الدور التالي
+النموذج `codex/*` المحدد حاليًا، والمزوّد، وسياسة الموافقة، وsandbox، ومستوى الخدمة إلى
+app-server مرة أخرى. يحافظ التبديل من `codex/gpt-5.4` إلى `codex/gpt-5.2`
+على ربط الخيط لكنه يطلب من Codex المتابعة باستخدام النموذج المحدد حديثًا.
 
 ## أمر Codex
 
 يسجل Plugin المضمّن الأمر `/codex` كأمر slash مخوّل. وهو
 عام ويعمل على أي قناة تدعم أوامر OpenClaw النصية.
 
-الأشكال الشائعة:
+الصيغ الشائعة:
 
-- يعرض `/codex status` اتصال app-server المباشر، والنماذج، والحساب، وحدود المعدل، وخوادم MCP، وSkills.
-- يسرد `/codex models` نماذج Codex app-server المباشرة.
-- يسرد `/codex threads [filter]` خيوط Codex الحديثة.
+- يعرض `/codex status` حالة اتصال app-server الحية، والنماذج، والحساب، وحدود المعدل، وخوادم MCP، وSkills.
+- يعرض `/codex models` نماذج Codex app-server الحية.
+- يعرض `/codex threads [filter]` خيوط Codex الحديثة.
 - يربط `/codex resume <thread-id>` جلسة OpenClaw الحالية بخيط Codex موجود.
-- يطلب `/codex compact` من Codex app-server تنفيذ Compaction للخيط المرتبط.
-- يبدأ `/codex review` مراجعة Codex الأصلية للخيط المرتبط.
+- يطلب `/codex compact` من Codex app-server تنفيذ Compaction للخيط المرفق.
+- يبدأ `/codex review` مراجعة Codex الأصلية للخيط المرفق.
 - يعرض `/codex account` حالة الحساب وحدود المعدل.
-- يسرد `/codex mcp` حالة خادم MCP في Codex app-server.
-- يسرد `/codex skills` Skills في Codex app-server.
+- يعرض `/codex mcp` حالة خادم MCP في Codex app-server.
+- يعرض `/codex skills` Skills الخاصة بـ Codex app-server.
 
-يكتب `/codex resume` ملف الربط الجانبي نفسه الذي تستخدمه harness في
-الدورات العادية. وفي الرسالة التالية، يستأنف OpenClaw خيط Codex ذلك، ويمرر
-نموذج OpenClaw الحالي المحدد من نوع `codex/*` إلى app-server، ويحافظ على
-تفعيل السجل الموسع.
+يكتب `/codex resume` ملف الربط الجانبي نفسه الذي يستخدمه harness في
+الأدوار العادية. وفي الرسالة التالية، يستأنف OpenClaw خيط Codex هذا، ويمرر
+نموذج OpenClaw ‏`codex/*` المحدد حاليًا إلى app-server، ويبقي
+السجل الموسّع مفعّلًا.
 
-يتطلب سطح الأوامر Codex app-server بالإصدار `0.118.0` أو أحدث. وتُبلَّغ الطرق
-التحكمية الفردية على أنها `unsupported by this Codex app-server` إذا كان
-app-server مستقبليًا أو مخصصًا لا يوفّر طريقة JSON-RPC تلك.
+يتطلب سطح الأوامر Codex app-server بالإصدار `0.118.0` أو أحدث. وتُبلَّغ
+طرق التحكم الفردية على أنها `unsupported by this Codex app-server` إذا كان
+app-server مستقبليًا أو مخصصًا لا يعرّض طريقة JSON-RPC تلك.
 
 ## الأدوات والوسائط وCompaction
 
-تغيّر Codex harness منفّذ الوكيل المضمّن منخفض المستوى فقط.
+لا يغيّر Codex harness سوى منفذ الوكيل المضمّن منخفض المستوى.
 
-ولا يزال OpenClaw يبني قائمة الأدوات ويتلقى نتائج الأدوات الديناميكية من
-harness. ويستمر النص والصور والفيديو والموسيقى وTTS والموافقات ومخرجات
-أدوات المراسلة عبر مسار التسليم العادي في OpenClaw.
+وما زال OpenClaw يبني قائمة الأدوات ويتلقى نتائج الأدوات الديناميكية من
+harness. ويستمر النص، والصور، والفيديو، والموسيقى، وTTS، والموافقات، ومخرجات
+أداة المراسلة عبر مسار التسليم العادي في OpenClaw.
 
-تُوجَّه طلبات موافقة أدوات Codex MCP عبر تدفق موافقة Plugin في OpenClaw
-عندما يضع Codex العلامة `_meta.codex_approval_kind` على
-`"mcp_tool_call"`؛ أما طلبات الاستحضار الأخرى وطلبات الإدخال الحر فلا تزال
+تُوجَّه طلبات موافقة أداة Codex MCP عبر تدفق موافقة Plugin في OpenClaw
+عندما يضع Codex القيمة `_meta.codex_approval_kind` على
+`"mcp_tool_call"`؛ أما طلبات elicitation الأخرى وطلبات الإدخال الحر فما زالت
 تفشل بشكل مغلق.
 
-عندما يستخدم النموذج المحدد Codex harness، يُفوَّض Compaction الأصلي للخيط إلى
-Codex app-server. ويحتفظ OpenClaw بنسخة transcript معكوسة من أجل سجل القناة،
+عندما يستخدم النموذج المحدد Codex harness، يتم تفويض Compaction الأصلي للخيط إلى
+Codex app-server. يحتفظ OpenClaw بنسخة مرآة من السجل من أجل سجل القناة،
 والبحث، و`/new`، و`/reset`، والتبديل المستقبلي للنموذج أو harness. وتتضمن
-النسخة المعكوسة مطالبة المستخدم، والنص النهائي للمساعد، وسجلات استدلال أو خطة
-خفيفة من Codex عندما يصدرها app-server. وحتى الآن، يسجل OpenClaw فقط
-إشارات بدء Compaction الأصلي واكتماله. وهو لا يعرّض بعد ملخصًا مقروءًا للبشر
-عن Compaction أو قائمة قابلة للتدقيق بالعناصر التي احتفظ بها Codex بعد Compaction.
+النسخة المرآة مطالبة المستخدم، والنص النهائي للمساعد، وسجلات reasoning أو الخطة الخفيفة من Codex
+عندما يصدرها app-server. وحتى اليوم، لا يسجل OpenClaw إلا إشارات
+بدء Compaction الأصلي واكتماله. وهو لا يعرّض بعد ملخصًا مقروءًا بشريًا لـ
+Compaction أو قائمة قابلة للتدقيق بالعناصر التي احتفظ بها Codex بعد Compaction.
 
-لا يتطلب توليد الوسائط وجود PI. إذ تستمر الصور والفيديو والموسيقى وPDF وTTS و
-فهم الوسائط في استخدام إعدادات المزوّد/النموذج المطابقة مثل
+لا يتطلب إنشاء الوسائط PI. إذ تستمر عمليات الصور، والفيديو، والموسيقى، وPDF، وTTS، وفهم الوسائط
+في استخدام إعدادات المزوّد/النموذج المطابقة مثل
 `agents.defaults.imageGenerationModel` و`videoGenerationModel` و`pdfModel` و
 `messages.tts`.
 
 ## استكشاف الأخطاء وإصلاحها
 
 **لا يظهر Codex في `/model`:** فعّل `plugins.entries.codex.enabled`،
-واضبط مرجع نموذج `codex/*`، أو تحقّق مما إذا كان `plugins.allow` يستبعد `codex`.
+واضبط مرجع نموذج `codex/*`، أو تحقّق مما إذا كانت `plugins.allow` تستبعد `codex`.
 
-**يستخدم OpenClaw PI بدلًا من Codex:** إذا لم تطالب أي Codex harness بالتشغيل،
-فقد يستخدم OpenClaw PI كخلفية توافقية. اضبط
+**يستخدم OpenClaw ‏PI بدلًا من Codex:** إذا لم يطالب أي Codex harness بالتشغيل،
+فقد يستخدم OpenClaw ‏PI كواجهة توافق. اضبط
 `embeddedHarness.runtime: "codex"` لفرض اختيار Codex أثناء الاختبار، أو
-`embeddedHarness.fallback: "none"` للفشل عندما لا تطابق أي Plugin harness. وبمجرد
-اختيار Codex app-server، تظهر إخفاقاته مباشرة من دون إعدادات
-رجوع احتياطي إضافية.
+`embeddedHarness.fallback: "none"` للفشل عند عدم تطابق أي Plugin harness. وبمجرد
+اختيار Codex app-server، تظهر إخفاقاته مباشرةً من دون إعداد fallback إضافي.
 
-**تم رفض app-server:** قم بترقية Codex بحيث تُبلّغ مصافحة app-server
+**تم رفض app-server:** رقِّ Codex لكي تبلغ عملية handshake الخاصة بـ app-server
 عن الإصدار `0.118.0` أو أحدث.
 
 **اكتشاف النموذج بطيء:** خفّض `plugins.entries.codex.config.discovery.timeoutMs`
 أو عطّل الاكتشاف.
 
-**يفشل نقل WebSocket فورًا:** تحقّق من `appServer.url` و`authToken`
-ومن أن app-server البعيد يتحدث الإصدار نفسه من بروتوكول Codex app-server.
+**يفشل نقل WebSocket فورًا:** تحقّق من `appServer.url` و`authToken`،
+ومن أن app-server البعيد يتحدث بنفس إصدار بروتوكول Codex app-server.
 
-**يستخدم نموذج غير Codex PI:** هذا متوقع. إذ لا تطالب Codex harness إلا
+**يستخدم نموذج غير Codex ‏PI:** هذا متوقع. لا يطالب Codex harness إلا
 بمراجع النماذج `codex/*`.
 
 ## ذو صلة
 
-- [Plugins الخاصة بـ Agent Harness](/ar/plugins/sdk-agent-harness)
-- [مزوّدو النماذج](/ar/concepts/model-providers)
+- [Plugins Agent Harness](/ar/plugins/sdk-agent-harness)
+- [مزودو النماذج](/ar/concepts/model-providers)
 - [مرجع الإعدادات](/ar/gateway/configuration-reference)
 - [الاختبار](/ar/help/testing#live-codex-app-server-harness-smoke)
