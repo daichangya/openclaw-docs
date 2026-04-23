@@ -3,27 +3,27 @@ read_when:
     - คุณต้องการเลือกผู้ให้บริการโมเดล
     - คุณต้องการภาพรวมอย่างรวดเร็วของแบ็กเอนด์ LLM ที่รองรับ
 summary: ผู้ให้บริการโมเดล (LLM) ที่ OpenClaw รองรับ
-title: สารบัญผู้ให้บริการ
+title: ไดเรกทอรีผู้ให้บริการ
 x-i18n:
-    generated_at: "2026-04-23T05:51:33Z"
+    generated_at: "2026-04-23T06:08:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bcef929e6757f18aad19b810426c49bdb273a9c65781bb3a21cc50d6d17014b5
+    source_hash: 5a62f8af86fa23f248163d1a23929c628f5bcc757366d0fdb12157f995f8024d
     source_path: providers/index.md
     workflow: 15
 ---
 
 # ผู้ให้บริการโมเดล
 
-OpenClaw สามารถใช้ผู้ให้บริการ LLM ได้หลายราย เลือกผู้ให้บริการ ยืนยันตัวตน แล้วตั้ง
+OpenClaw สามารถใช้ผู้ให้บริการ LLM ได้หลากหลายราย เลือกผู้ให้บริการ ยืนยันตัวตน แล้วตั้งค่า
 โมเดลเริ่มต้นเป็น `provider/model`
 
-กำลังมองหาเอกสารของช่องแชต (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/อื่น ๆ) อยู่หรือไม่? ดู [Channels](/th/channels)
+กำลังมองหาเอกสารช่องทางแชต (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/ฯลฯ) อยู่หรือไม่? ดูที่ [Channels](/th/channels)
 
 ## เริ่มต้นอย่างรวดเร็ว
 
-1. ยืนยันตัวตนกับผู้ให้บริการ (โดยทั่วไปผ่าน `openclaw onboard`)
-2. ตั้งโมเดลเริ่มต้น:
+1. ยืนยันตัวตนกับผู้ให้บริการ (โดยปกติผ่าน `openclaw onboard`)
+2. ตั้งค่าโมเดลเริ่มต้น:
 
 ```json5
 {
@@ -31,33 +31,35 @@ OpenClaw สามารถใช้ผู้ให้บริการ LLM ไ
 }
 ```
 
-## เอกสารของผู้ให้บริการ
+## เอกสารผู้ให้บริการ
 
 - [Alibaba Model Studio](/th/providers/alibaba)
 - [Amazon Bedrock](/th/providers/bedrock)
+- [Amazon Bedrock Mantle](/th/providers/bedrock-mantle)
 - [Anthropic (API + Claude CLI)](/th/providers/anthropic)
 - [Arcee AI (โมเดล Trinity)](/th/providers/arcee)
-- [BytePlus (International)](/th/concepts/model-providers#byteplus-international)
+- [BytePlus (นานาชาติ)](/th/concepts/model-providers#byteplus-international)
 - [Chutes](/th/providers/chutes)
 - [Cloudflare AI Gateway](/th/providers/cloudflare-ai-gateway)
 - [ComfyUI](/th/providers/comfy)
 - [DeepSeek](/th/providers/deepseek)
+- [ElevenLabs](/th/providers/elevenlabs)
 - [fal](/th/providers/fal)
 - [Fireworks](/th/providers/fireworks)
 - [GitHub Copilot](/th/providers/github-copilot)
 - [โมเดล GLM](/th/providers/glm)
 - [Google (Gemini)](/th/providers/google)
-- [Groq (LPU inference)](/th/providers/groq)
+- [Groq (การอนุมานด้วย LPU)](/th/providers/groq)
 - [Hugging Face (Inference)](/th/providers/huggingface)
 - [inferrs (โมเดลภายในเครื่อง)](/th/providers/inferrs)
 - [Kilocode](/th/providers/kilocode)
-- [LiteLLM (unified gateway)](/th/providers/litellm)
+- [LiteLLM (Gateway แบบรวมศูนย์)](/th/providers/litellm)
 - [LM Studio (โมเดลภายในเครื่อง)](/th/providers/lmstudio)
 - [MiniMax](/th/providers/minimax)
 - [Mistral](/th/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/th/providers/moonshot)
 - [NVIDIA](/th/providers/nvidia)
-- [Ollama (โมเดลคลาวด์ + ภายในเครื่อง)](/th/providers/ollama)
+- [Ollama (คลาวด์ + โมเดลภายในเครื่อง)](/th/providers/ollama)
 - [OpenAI (API + Codex)](/th/providers/openai)
 - [OpenCode](/th/providers/opencode)
 - [OpenCode Go](/th/providers/opencode-go)
@@ -79,14 +81,14 @@ OpenClaw สามารถใช้ผู้ให้บริการ LLM ไ
 - [Xiaomi](/th/providers/xiaomi)
 - [Z.AI](/th/providers/zai)
 
-## หน้าภาพรวมแบบใช้ร่วมกัน
+## หน้าภาพรวมที่ใช้ร่วมกัน
 
-- [ตัวแปร bundled เพิ่มเติม](/th/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy และ Gemini CLI OAuth
-- [การสร้างภาพ](/th/tools/image-generation) - เครื่องมือ `image_generate` ที่ใช้ร่วมกัน, การเลือก provider และ failover
-- [การสร้างเพลง](/th/tools/music-generation) - เครื่องมือ `music_generate` ที่ใช้ร่วมกัน, การเลือก provider และ failover
-- [การสร้างวิดีโอ](/th/tools/video-generation) - เครื่องมือ `video_generate` ที่ใช้ร่วมกัน, การเลือก provider และ failover
+- [ตัวแปรแบบ bundled เพิ่มเติม](/th/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy และ Gemini CLI OAuth
+- [การสร้างภาพ](/th/tools/image-generation) - เครื่องมือ `image_generate` แบบใช้ร่วมกัน การเลือกผู้ให้บริการ และการสลับสำรอง
+- [การสร้างเพลง](/th/tools/music-generation) - เครื่องมือ `music_generate` แบบใช้ร่วมกัน การเลือกผู้ให้บริการ และการสลับสำรอง
+- [การสร้างวิดีโอ](/th/tools/video-generation) - เครื่องมือ `video_generate` แบบใช้ร่วมกัน การเลือกผู้ให้บริการ และการสลับสำรอง
 
-## ผู้ให้บริการถอดเสียง
+## ผู้ให้บริการการถอดเสียง
 
 - [Deepgram (การถอดเสียงจากเสียง)](/th/providers/deepgram)
 - [ElevenLabs](/th/providers/elevenlabs#speech-to-text)
@@ -96,7 +98,7 @@ OpenClaw สามารถใช้ผู้ให้บริการ LLM ไ
 
 ## เครื่องมือจากชุมชน
 
-- [Claude Max API Proxy](/th/providers/claude-max-api-proxy) - พร็อกซีจากชุมชนสำหรับข้อมูลรับรอง Claude subscription (โปรดตรวจสอบนโยบาย/ข้อกำหนดของ Anthropic ก่อนใช้งาน)
+- [Claude Max API Proxy](/th/providers/claude-max-api-proxy) - พร็อกซีจากชุมชนสำหรับข้อมูลรับรองการสมัครใช้งาน Claude (โปรดยืนยันนโยบาย/ข้อกำหนดของ Anthropic ก่อนใช้งาน)
 
-สำหรับ catalog ของ provider แบบเต็ม (xAI, Groq, Mistral ฯลฯ) และการกำหนดค่าขั้นสูง
-ดู [ผู้ให้บริการโมเดล](/th/concepts/model-providers)
+สำหรับแค็ตตาล็อกผู้ให้บริการฉบับเต็ม (xAI, Groq, Mistral ฯลฯ) และการกำหนดค่าขั้นสูง
+ดูที่ [ผู้ให้บริการโมเดล](/th/concepts/model-providers)
