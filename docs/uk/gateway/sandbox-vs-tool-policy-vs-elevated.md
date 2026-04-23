@@ -1,28 +1,28 @@
 ---
 read_when: You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change.
 status: active
-summary: 'Чому інструмент заблоковано: середовище виконання sandbox, політика дозволу/заборони інструментів і шлюзи підвищеного виконання'
-title: Sandbox проти політики інструментів проти підвищеного виконання
+summary: 'Чому інструмент заблоковано: середовище виконання sandbox, політика дозволу/заборони інструментів і шлюзи elevated exec'
+title: Sandbox проти політики інструментів проти elevated
 x-i18n:
-    generated_at: "2026-04-20T18:29:31Z"
+    generated_at: "2026-04-23T19:24:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a85378343df0594be451212cb4c95b349a0cc7cd1f242b9306be89903a450db1
+    source_hash: cfc54cdb1adbe37a2cfa837560d3d3862c1aa2732dcb8a73377114d4b873e569
     source_path: gateway/sandbox-vs-tool-policy-vs-elevated.md
     workflow: 15
 ---
 
-# Sandbox проти політики інструментів проти підвищеного виконання
+# Sandbox проти політики інструментів проти elevated
 
-OpenClaw має три пов’язані (але різні) механізми керування:
+В OpenClaw є три пов’язані (але різні) механізми керування:
 
-1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) визначає, **де запускаються інструменти** (бекенд sandbox чи хост).
+1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) визначає, **де виконуються інструменти** (бекенд sandbox чи хост).
 2. **Політика інструментів** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) визначає, **які інструменти доступні/дозволені**.
-3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) — це **лише для exec аварійний обхід** для запуску поза sandbox, коли ви працюєте в sandbox (`gateway` за замовчуванням або `node`, якщо ціль exec налаштована на `node`).
+3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) — це **escape hatch лише для exec**, щоб запускати поза sandbox, коли ви працюєте в sandbox (`gateway` типово або `node`, якщо ціль exec налаштована як `node`).
 
-## Швидка діагностика
+## Швидке налагодження
 
-Використовуйте інспектор, щоб побачити, що OpenClaw _насправді_ робить:
+Використовуйте inspector, щоб побачити, що OpenClaw _насправді_ робить:
 
 ```bash
 openclaw sandbox explain
@@ -31,50 +31,50 @@ openclaw sandbox explain --agent work
 openclaw sandbox explain --json
 ```
 
-Він показує:
+Він виводить:
 
-- ефективний режим/область sandbox/доступ до робочого простору
-- чи сесія зараз працює в sandbox (main проти non-main)
-- ефективні правила allow/deny для інструментів у sandbox (і чи вони надійшли від агента/глобально/за замовчуванням)
+- ефективний режим/область sandbox/доступ до workspace
+- чи перебуває сесія зараз у sandbox (main чи non-main)
+- ефективний allow/deny інструментів у sandbox (і чи це походить від agent/global/default)
 - шлюзи elevated і шляхи ключів для виправлення
 
-## Sandbox: де запускаються інструменти
+## Sandbox: де виконуються інструменти
 
-Робота sandbox керується через `agents.defaults.sandbox.mode`:
+Sandboxing керується через `agents.defaults.sandbox.mode`:
 
-- `"off"`: усе запускається на хості.
-- `"non-main"`: у sandbox запускаються лише non-main сесії (типовий «сюрприз» для груп/каналів).
-- `"all"`: у sandbox запускається все.
+- `"off"`: усе виконується на хості.
+- `"non-main"`: у sandbox працюють лише non-main сесії (типовий «сюрприз» для груп/каналів).
+- `"all"`: усе працює в sandbox.
 
-Повну матрицю дивіться в [Sandboxing](/uk/gateway/sandboxing) (область, монтування робочого простору, образи).
+Див. [Sandboxing](/uk/gateway/sandboxing) для повної матриці (область, монтування workspace, зображення).
 
 ### Bind mounts (швидка перевірка безпеки)
 
-- `docker.binds` _прориває_ файлову систему sandbox: усе, що ви змонтуєте, буде видиме всередині контейнера з указаним режимом (`:ro` або `:rw`).
-- За замовчуванням використовується читання-запис, якщо режим не вказано; для вихідного коду/секретів краще використовувати `:ro`.
-- `scope: "shared"` ігнорує bind-монтування для окремих агентів (застосовуються лише глобальні bind-монтування).
-- OpenClaw двічі перевіряє джерела bind-монтувань: спочатку на нормалізованому шляху джерела, а потім повторно після розв’язання через найглибший наявний батьківський каталог. Обхід через батьківські symlink не дозволяє обійти перевірки заблокованих шляхів або дозволених коренів.
-- Навіть неіснуючі кінцеві шляхи все одно безпечно перевіряються. Якщо `/workspace/alias-out/new-file` розв’язується через symlink-батьківський каталог у заблокований шлях або за межі налаштованих дозволених коренів, bind-монтування буде відхилено.
-- Монтування `/var/run/docker.sock` фактично передає керування хостом sandbox; робіть це лише свідомо.
-- Доступ до робочого простору (`workspaceAccess: "ro"`/`"rw"`) не залежить від режимів bind-монтування.
+- `docker.binds` _прорізає_ файлову систему sandbox: усе, що ви монтуєте, видно всередині контейнера з указаним режимом (`:ro` або `:rw`).
+- Типове значення — read-write, якщо ви не вказали режим; для source/secrets краще `:ro`.
+- `scope: "shared"` ігнорує bind-и для окремих агентів (застосовуються лише глобальні bind-и).
+- OpenClaw двічі перевіряє джерела bind: спочатку за нормалізованим шляхом джерела, а потім ще раз після розв’язання через найглибшого наявного предка. Виходи через symlink-parent не обходять перевірки blocked-path або allowed-root.
+- Неіснуючі leaf-шляхи також усе одно безпечно перевіряються. Якщо `/workspace/alias-out/new-file` розв’язується через symlinked parent до заблокованого шляху або за межі налаштованих allowed roots, bind буде відхилено.
+- Монтування `/var/run/docker.sock` фактично передає sandbox керування хостом; робіть це лише навмисно.
+- Доступ до workspace (`workspaceAccess: "ro"`/`"rw"`) не залежить від режимів bind.
 
-## Політика інструментів: які інструменти існують/можуть викликатися
+## Політика інструментів: які інструменти існують/можна викликати
 
 Важливі два рівні:
 
-- **Профіль інструментів**: `tools.profile` і `agents.list[].tools.profile` (базовий список дозволених)
+- **Профіль інструментів**: `tools.profile` і `agents.list[].tools.profile` (базовий allowlist)
 - **Профіль інструментів провайдера**: `tools.byProvider[provider].profile` і `agents.list[].tools.byProvider[provider].profile`
-- **Глобальна/персональна політика інструментів агента**: `tools.allow`/`tools.deny` і `agents.list[].tools.allow`/`agents.list[].tools.deny`
+- **Глобальна/поагентна політика інструментів**: `tools.allow`/`tools.deny` і `agents.list[].tools.allow`/`agents.list[].tools.deny`
 - **Політика інструментів провайдера**: `tools.byProvider[provider].allow/deny` і `agents.list[].tools.byProvider[provider].allow/deny`
 - **Політика інструментів sandbox** (застосовується лише в sandbox): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` і `agents.list[].tools.sandbox.tools.*`
 
-Базові правила:
+Основні правила:
 
 - `deny` завжди має пріоритет.
-- Якщо `allow` не порожній, усе інше вважається заблокованим.
-- Політика інструментів — це жорстке обмеження: `/exec` не може перевизначити заборонений інструмент `exec`.
-- `/exec` лише змінює налаштування сесії за замовчуванням для авторизованих відправників; він не надає доступ до інструментів.
-  Ключі інструментів провайдера можуть приймати або `provider` (наприклад, `google-antigravity`), або `provider/model` (наприклад, `openai/gpt-5.4`).
+- Якщо `allow` непорожній, усе інше вважається заблокованим.
+- Політика інструментів — це жорстка межа: `/exec` не може перевизначити заборонений інструмент `exec`.
+- `/exec` лише змінює типові параметри сесії для авторизованих відправників; він не надає доступ до інструментів.
+  Ключі інструментів провайдера можуть приймати або `provider` (наприклад, `google-antigravity`), або `provider/model` (наприклад, `openai/gpt-5.5`).
 
 ### Групи інструментів (скорочення)
 
@@ -94,7 +94,7 @@ openclaw sandbox explain --json
 
 Доступні групи:
 
-- `group:runtime`: `exec`, `process`, `code_execution` (`bash` також приймається як
+- `group:runtime`: `exec`, `process`, `code_execution` (`bash` приймається як
   псевдонім для `exec`)
 - `group:fs`: `read`, `write`, `edit`, `apply_patch`
 - `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `sessions_yield`, `subagents`, `session_status`
@@ -106,23 +106,23 @@ openclaw sandbox explain --json
 - `group:nodes`: `nodes`
 - `group:agents`: `agents_list`
 - `group:media`: `image`, `image_generate`, `video_generate`, `tts`
-- `group:openclaw`: усі вбудовані інструменти OpenClaw (не включає Plugin провайдерів)
+- `group:openclaw`: усі вбудовані інструменти OpenClaw (без provider plugins)
 
 ## Elevated: exec-only «запуск на хості»
 
 Elevated **не** надає додаткових інструментів; він впливає лише на `exec`.
 
-- Якщо ви в sandbox, `/elevated on` (або `exec` з `elevated: true`) запускає виконання поза sandbox (схвалення все одно можуть застосовуватися).
+- Якщо ви в sandbox, `/elevated on` (або `exec` з `elevated: true`) запускає поза sandbox (схвалення все одно можуть застосовуватися).
 - Використовуйте `/elevated full`, щоб пропустити схвалення exec для сесії.
 - Якщо ви вже працюєте напряму, elevated фактично нічого не змінює (але все одно проходить через шлюзи).
-- Elevated **не** має області дії Skills і **не** перевизначає правила allow/deny для інструментів.
-- Elevated не надає довільних міжхостових перевизначень із `host=auto`; він дотримується звичайних правил цілі exec і лише зберігає `node`, якщо налаштована/сесійна ціль уже встановлена як `node`.
-- `/exec` — це окремий механізм від elevated. Він лише коригує стандартні параметри exec для сесії для авторизованих відправників.
+- Elevated **не** обмежується Skills і **не** перевизначає allow/deny інструментів.
+- Elevated не надає довільних міжхостових перевизначень із `host=auto`; він дотримується звичайних правил цілі exec і лише зберігає `node`, коли налаштована/сесійна ціль уже є `node`.
+- `/exec` окремий від elevated. Він лише коригує параметри exec для конкретної сесії для авторизованих відправників.
 
 Шлюзи:
 
-- Увімкнення: `tools.elevated.enabled` (і, за потреби, `agents.list[].tools.elevated.enabled`)
-- Списки дозволених відправників: `tools.elevated.allowFrom.<provider>` (і, за потреби, `agents.list[].tools.elevated.allowFrom.<provider>`)
+- Увімкнення: `tools.elevated.enabled` (і за потреби `agents.list[].tools.elevated.enabled`)
+- Allowlist-и відправників: `tools.elevated.allowFrom.<provider>` (і за потреби `agents.list[].tools.elevated.allowFrom.<provider>`)
 
 Див. [Elevated Mode](/uk/tools/elevated).
 
@@ -134,15 +134,15 @@ Elevated **не** надає додаткових інструментів; ві
 
 - Вимкнути sandbox: `agents.defaults.sandbox.mode=off` (або для окремого агента `agents.list[].sandbox.mode=off`)
 - Дозволити інструмент усередині sandbox:
-  - видалити його з `tools.sandbox.tools.deny` (або для окремого агента `agents.list[].tools.sandbox.tools.deny`)
-  - або додати його до `tools.sandbox.tools.allow` (або до allow для окремого агента)
+  - видалити його з `tools.sandbox.tools.deny` (або з `agents.list[].tools.sandbox.tools.deny` для агента)
+  - або додати його до `tools.sandbox.tools.allow` (або до allow для агента)
 
 ### «Я думав, що це main, чому воно в sandbox?»
 
-У режимі `"non-main"` ключі груп/каналів _не_ є main. Використовуйте ключ main-сесії (показується через `sandbox explain`) або перемкніть режим на `"off"`.
+У режимі `"non-main"` ключі group/channel _не_ є main. Використовуйте ключ main-сесії (показується в `sandbox explain`) або перемкніть режим на `"off"`.
 
 ## Див. також
 
-- [Sandboxing](/uk/gateway/sandboxing) -- повний довідник із sandbox (режими, області, бекенди, образи)
-- [Multi-Agent Sandbox & Tools](/uk/tools/multi-agent-sandbox-tools) -- перевизначення для окремих агентів і пріоритетність
+- [Sandboxing](/uk/gateway/sandboxing) -- повний довідник по sandbox (режими, області, бекенди, зображення)
+- [Sandbox і інструменти для кількох агентів](/uk/tools/multi-agent-sandbox-tools) -- перевизначення для окремих агентів і пріоритетність
 - [Elevated Mode](/uk/tools/elevated)

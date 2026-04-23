@@ -1,14 +1,14 @@
 ---
 read_when:
     - Ви хочете використовувати Vercel AI Gateway з OpenClaw
-    - Вам потрібна змінна середовища ключа API або варіант автентифікації через CLI
-summary: Налаштування Vercel AI Gateway (автентифікація + вибір моделі)
+    - Вам потрібна змінна середовища API key або варіант auth для CLI
+summary: Налаштування Vercel AI Gateway (auth + вибір моделі)
 title: Vercel AI Gateway
 x-i18n:
-    generated_at: "2026-04-22T03:53:21Z"
+    generated_at: "2026-04-23T19:26:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 11c0f764d4c35633d0fbfc189bae0fc451dc799002fc1a6d0c84fc73842bbe31
+    source_hash: 410dfb7c0f44337653906b661612d946ccf48716ae700a718a4f004b03bc1261
     source_path: providers/vercel-ai-gateway.md
     workflow: 15
 ---
@@ -16,35 +16,35 @@ x-i18n:
 # Vercel AI Gateway
 
 [Vercel AI Gateway](https://vercel.com/ai-gateway) надає уніфікований API для
-доступу до сотень моделей через єдину кінцеву точку.
+доступу до сотень моделей через єдиний endpoint.
 
-| Властивість   | Значення                        |
-| ------------- | ------------------------------- |
-| Постачальник  | `vercel-ai-gateway`             |
-| Автентифікація | `AI_GATEWAY_API_KEY`            |
-| API           | сумісний з Anthropic Messages   |
+| Властивість   | Значення                         |
+| ------------- | -------------------------------- |
+| Провайдер     | `vercel-ai-gateway`              |
+| Auth          | `AI_GATEWAY_API_KEY`             |
+| API           | сумісний з Anthropic Messages    |
 | Каталог моделей | автоматично виявляється через `/v1/models` |
 
 <Tip>
 OpenClaw автоматично виявляє каталог Gateway `/v1/models`, тому
-`/models vercel-ai-gateway` містить актуальні посилання на моделі, такі як
-`vercel-ai-gateway/openai/gpt-5.4` і
+`/models vercel-ai-gateway` включає актуальні посилання на моделі, зокрема
+`vercel-ai-gateway/openai/gpt-5.5` і
 `vercel-ai-gateway/moonshotai/kimi-k2.6`.
 </Tip>
 
 ## Початок роботи
 
 <Steps>
-  <Step title="Установіть ключ API">
-    Запустіть онбординг і виберіть варіант автентифікації AI Gateway:
+  <Step title="Задайте API key">
+    Запустіть онбординг і виберіть варіант auth AI Gateway:
 
     ```bash
     openclaw onboard --auth-choice ai-gateway-api-key
     ```
 
   </Step>
-  <Step title="Установіть модель за замовчуванням">
-    Додайте модель до своєї конфігурації OpenClaw:
+  <Step title="Задайте модель за замовчуванням">
+    Додайте модель до конфігурації OpenClaw:
 
     ```json5
     {
@@ -57,7 +57,7 @@ OpenClaw автоматично виявляє каталог Gateway `/v1/model
     ```
 
   </Step>
-  <Step title="Переконайтеся, що модель доступна">
+  <Step title="Перевірте, що модель доступна">
     ```bash
     openclaw models list --provider vercel-ai-gateway
     ```
@@ -75,44 +75,44 @@ openclaw onboard --non-interactive \
   --ai-gateway-api-key "$AI_GATEWAY_API_KEY"
 ```
 
-## Скорочений запис ID моделі
+## Скорочений запис id моделі
 
 OpenClaw приймає скорочені посилання на моделі Vercel Claude і нормалізує їх під
 час виконання:
 
-| Скорочений вхід                    | Нормалізоване посилання на модель            |
-| ---------------------------------- | -------------------------------------------- |
+| Скорочений ввід                     | Нормалізоване посилання на модель             |
+| ----------------------------------- | --------------------------------------------- |
 | `vercel-ai-gateway/claude-opus-4.6` | `vercel-ai-gateway/anthropic/claude-opus-4.6` |
-| `vercel-ai-gateway/opus-4.6`       | `vercel-ai-gateway/anthropic/claude-opus-4-6` |
+| `vercel-ai-gateway/opus-4.6`        | `vercel-ai-gateway/anthropic/claude-opus-4-6` |
 
 <Tip>
-Ви можете використовувати або скорочений запис, або повне посилання на модель у
-своїй конфігурації. OpenClaw автоматично визначає канонічну форму.
+У конфігурації можна використовувати як скорочений запис, так і повне посилання
+на модель. OpenClaw автоматично визначає канонічну форму.
 </Tip>
 
-## Розширені примітки
+## Додаткові примітки
 
 <AccordionGroup>
-  <Accordion title="Змінна середовища для процесів демона">
-    Якщо Gateway OpenClaw працює як демон (launchd/systemd), переконайтеся, що
-    `AI_GATEWAY_API_KEY` доступна цьому процесу.
+  <Accordion title="Змінна середовища для daemon-процесів">
+    Якщо Gateway OpenClaw працює як daemon (launchd/systemd), переконайтеся, що
+    `AI_GATEWAY_API_KEY` доступна для цього процесу.
 
     <Warning>
-    Ключ, установлений лише в `~/.profile`, не буде видимий демону launchd/systemd,
-    якщо це середовище не імпортовано явно. Установіть ключ у
+    Ключ, заданий лише в `~/.profile`, не буде видимий для daemon
+    launchd/systemd, якщо це середовище не було явно імпортоване. Задайте ключ у
     `~/.openclaw/.env` або через `env.shellEnv`, щоб процес gateway міг
     його прочитати.
     </Warning>
 
   </Accordion>
 
-  <Accordion title="Маршрутизація постачальника">
-    Vercel AI Gateway маршрутизує запити до висхідного постачальника на основі
-    префікса посилання на модель. Наприклад, `vercel-ai-gateway/anthropic/claude-opus-4.6` маршрутизується
-    через Anthropic, тоді як `vercel-ai-gateway/openai/gpt-5.4` маршрутизується через
-    OpenAI, а `vercel-ai-gateway/moonshotai/kimi-k2.6` маршрутизується через
-    MoonshotAI. Ваш єдиний `AI_GATEWAY_API_KEY` забезпечує автентифікацію для всіх
-    висхідних постачальників.
+  <Accordion title="Маршрутизація провайдера">
+    Vercel AI Gateway маршрутизує запити до провайдера upstream на основі префікса
+    посилання на модель. Наприклад, `vercel-ai-gateway/anthropic/claude-opus-4.6` маршрутизується
+    через Anthropic, тоді як `vercel-ai-gateway/openai/gpt-5.5` маршрутизується через
+    OpenAI, а `vercel-ai-gateway/moonshotai/kimi-k2.6` — через
+    MoonshotAI. Єдиний `AI_GATEWAY_API_KEY` обробляє автентифікацію для всіх
+    провайдерів upstream.
   </Accordion>
 </AccordionGroup>
 
@@ -120,7 +120,7 @@ OpenClaw приймає скорочені посилання на моделі 
 
 <CardGroup cols={2}>
   <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
-    Вибір постачальників, посилань на моделі та поведінки перемикання при збоях.
+    Вибір провайдерів, посилань на моделі та поведінки failover.
   </Card>
   <Card title="Усунення несправностей" href="/uk/help/troubleshooting" icon="wrench">
     Загальне усунення несправностей і FAQ.

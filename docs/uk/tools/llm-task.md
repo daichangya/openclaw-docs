@@ -1,29 +1,29 @@
 ---
 read_when:
-    - Потрібен крок LLM лише з JSON усередині робочих процесів
-    - Потрібен валідований за схемою вивід LLM для автоматизації
-summary: Завдання LLM лише з JSON для робочих процесів (необов’язковий plugin-інструмент)
+    - Вам потрібен крок LLM лише з JSON усередині workflow
+    - Вам потрібен вивід LLM, валідований за schema, для автоматизації
+summary: Завдання LLM лише з JSON для workflow (необов’язковий інструмент plugin)
 title: Завдання LLM
 x-i18n:
-    generated_at: "2026-04-05T18:20:09Z"
+    generated_at: "2026-04-23T19:28:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: cbe9b286a8e958494de06a59b6e7b750a82d492158df344c7afe30fce24f0584
+    source_hash: 4234b2fd9247c06fcc481be6e3339726ebdb84891f4b8324f17e2d387dac4d8a
     source_path: tools/llm-task.md
     workflow: 15
 ---
 
 # Завдання LLM
 
-`llm-task` — це **необов’язковий plugin-інструмент**, який виконує завдання LLM лише з JSON і
-повертає структурований вивід (за бажанням валідований за JSON Schema).
+`llm-task` — це **необов’язковий інструмент Plugin**, який виконує завдання LLM лише з JSON і
+повертає структурований вивід (за потреби валідований за JSON Schema).
 
-Це ідеально підходить для рушіїв робочих процесів на кшталт Lobster: ви можете додати один крок LLM
-без написання власного коду OpenClaw для кожного робочого процесу.
+Це ідеально підходить для рушіїв workflow, таких як Lobster: ви можете додати один крок LLM
+без написання власного коду OpenClaw для кожного workflow.
 
-## Увімкнення plugin
+## Увімкніть Plugin
 
-1. Увімкніть plugin:
+1. Увімкніть Plugin:
 
 ```json
 {
@@ -60,9 +60,9 @@ x-i18n:
         "enabled": true,
         "config": {
           "defaultProvider": "openai-codex",
-          "defaultModel": "gpt-5.4",
+          "defaultModel": "gpt-5.5",
           "defaultAuthProfileId": "main",
-          "allowedModels": ["openai-codex/gpt-5.4"],
+          "allowedModels": ["openai-codex/gpt-5.5"],
           "maxTokens": 800,
           "timeoutMs": 30000
         }
@@ -73,29 +73,29 @@ x-i18n:
 ```
 
 `allowedModels` — це allowlist рядків `provider/model`. Якщо його задано, будь-який запит
-поза цим списком відхиляється.
+поза цим списком буде відхилено.
 
 ## Параметри інструмента
 
-- `prompt` (string, обов’язково)
-- `input` (any, необов’язково)
+- `prompt` (string, обов’язковий)
+- `input` (any, необов’язковий)
 - `schema` (object, необов’язкова JSON Schema)
-- `provider` (string, необов’язково)
-- `model` (string, необов’язково)
-- `thinking` (string, необов’язково)
-- `authProfileId` (string, необов’язково)
-- `temperature` (number, необов’язково)
-- `maxTokens` (number, необов’язково)
-- `timeoutMs` (number, необов’язково)
+- `provider` (string, необов’язковий)
+- `model` (string, необов’язковий)
+- `thinking` (string, необов’язковий)
+- `authProfileId` (string, необов’язковий)
+- `temperature` (number, необов’язковий)
+- `maxTokens` (number, необов’язковий)
+- `timeoutMs` (number, необов’язковий)
 
 `thinking` приймає стандартні пресети міркування OpenClaw, наприклад `low` або `medium`.
 
 ## Вивід
 
-Повертає `details.json`, який містить розібраний JSON (і виконує валідацію за
+Повертає `details.json`, що містить розібраний JSON (і проходить валідацію за
 `schema`, якщо її надано).
 
-## Приклад: крок робочого процесу Lobster
+## Приклад: крок workflow Lobster
 
 ```lobster
 openclaw.invoke --tool llm-task --action json --args-json '{
@@ -117,10 +117,10 @@ openclaw.invoke --tool llm-task --action json --args-json '{
 }'
 ```
 
-## Зауваження щодо безпеки
+## Примітки щодо безпеки
 
-- Інструмент працює **лише з JSON** і наказує моделі повертати лише JSON (без
-  code fences, без коментарів).
+- Інструмент працює **лише з JSON** і наказує моделі виводити тільки JSON (без
+  code fences і без коментарів).
 - Для цього запуску моделі не надаються жодні інструменти.
-- Вважайте вивід недовіреним, якщо не виконуєте валідацію через `schema`.
-- Розміщуйте approvals перед будь-яким кроком із побічними ефектами (send, post, exec).
+- Вважайте вивід недовіреним, якщо не виконаєте валідацію за `schema`.
+- Ставте approvals перед будь-яким кроком із побічними ефектами (send, post, exec).
