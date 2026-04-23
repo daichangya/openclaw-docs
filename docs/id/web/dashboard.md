@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Mengubah autentikasi dashboard atau mode eksposur
-summary: Akses dan autentikasi dashboard Gateway (UI Kontrol)
+    - Mengubah mode autentikasi atau eksposur dashboard
+summary: Akses dan auth dashboard Gateway (Control UI)
 title: Dashboard
 x-i18n:
-    generated_at: "2026-04-05T14:10:06Z"
+    generated_at: "2026-04-23T09:30:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 316e082ae4759f710b457487351e30c53b34c7c2b4bf84ad7b091a50538af5cc
+    source_hash: d5b50d711711f70c51d65f3908b7a8c1e0e978ed46a853f0ab48c13dfe0348ff
     source_path: web/dashboard.md
     workflow: 15
 ---
 
-# Dashboard (UI Kontrol)
+# Dashboard (Control UI)
 
-Dashboard Gateway adalah UI Kontrol berbasis browser yang disajikan di `/` secara default
-(override dengan `gateway.controlUi.basePath`).
+Dashboard Gateway adalah Control UI berbasis browser yang disajikan di `/` secara default
+(timpa dengan `gateway.controlUi.basePath`).
 
 Buka cepat (Gateway lokal):
 
@@ -23,12 +23,11 @@ Buka cepat (Gateway lokal):
 
 Referensi utama:
 
-- [UI Kontrol](/web/control-ui) untuk penggunaan dan kemampuan UI.
+- [Control UI](/id/web/control-ui) untuk penggunaan dan kapabilitas UI.
 - [Tailscale](/id/gateway/tailscale) untuk otomatisasi Serve/Funnel.
-- [Permukaan web](/web) untuk mode bind dan catatan keamanan.
+- [Permukaan web](/id/web) untuk mode bind dan catatan keamanan.
 
-Autentikasi diberlakukan pada handshake WebSocket melalui jalur autentikasi gateway
-yang dikonfigurasi:
+Autentikasi ditegakkan pada handshake WebSocket melalui jalur auth gateway yang dikonfigurasi:
 
 - `connect.params.auth.token`
 - `connect.params.auth.password`
@@ -37,63 +36,65 @@ yang dikonfigurasi:
 
 Lihat `gateway.auth` di [Konfigurasi Gateway](/id/gateway/configuration).
 
-Catatan keamanan: UI Kontrol adalah **permukaan admin** (chat, config, persetujuan exec).
+Catatan keamanan: Control UI adalah **permukaan admin** (obrolan, config, persetujuan exec).
 Jangan mengeksposnya secara publik. UI menyimpan token URL dashboard di sessionStorage
 untuk sesi tab browser saat ini dan URL gateway yang dipilih, lalu menghapusnya dari URL setelah dimuat.
-Pilih localhost, Tailscale Serve, atau tunnel SSH.
+Utamakan localhost, Tailscale Serve, atau tunnel SSH.
 
 ## Jalur cepat (direkomendasikan)
 
 - Setelah onboarding, CLI otomatis membuka dashboard dan mencetak tautan bersih (tanpa token).
 - Buka kembali kapan saja: `openclaw dashboard` (menyalin tautan, membuka browser jika memungkinkan, menampilkan petunjuk SSH jika headless).
-- Jika UI meminta autentikasi shared-secret, tempel token atau
-  password yang dikonfigurasi ke pengaturan UI Kontrol.
+- Jika UI meminta auth shared-secret, tempel token atau
+  password yang dikonfigurasi ke pengaturan Control UI.
 
-## Dasar autentikasi (lokal vs jarak jauh)
+## Dasar auth (lokal vs remote)
 
 - **Localhost**: buka `http://127.0.0.1:18789/`.
 - **Sumber token shared-secret**: `gateway.auth.token` (atau
-  `OPENCLAW_GATEWAY_TOKEN`); `openclaw dashboard` dapat meneruskannya melalui URL fragment
-  untuk bootstrap satu kali, dan UI Kontrol menyimpannya di sessionStorage untuk
-  sesi tab browser saat ini dan URL gateway yang dipilih alih-alih localStorage.
+  `OPENCLAW_GATEWAY_TOKEN`); `openclaw dashboard` dapat meneruskannya melalui fragmen URL
+  untuk bootstrap sekali pakai, dan Control UI menyimpannya di sessionStorage untuk
+  sesi tab browser saat ini dan URL gateway yang dipilih, bukan di localStorage.
 - Jika `gateway.auth.token` dikelola SecretRef, `openclaw dashboard`
-  mencetak/menyalin/membuka URL tanpa token secara desain. Ini menghindari
-  mengekspos token yang dikelola secara eksternal di log shell, riwayat clipboard, atau argumen peluncuran browser.
-- Jika `gateway.auth.token` dikonfigurasi sebagai SecretRef dan tidak dapat diresolusikan di
-  shell Anda saat ini, `openclaw dashboard` tetap mencetak URL tanpa token beserta
-  panduan penyiapan autentikasi yang dapat ditindaklanjuti.
+  mencetak/menyalin/membuka URL tanpa token secara sengaja. Ini menghindari
+  tereksposnya token yang dikelola secara eksternal di log shell, riwayat clipboard, atau
+  argumen peluncuran browser.
+- Jika `gateway.auth.token` dikonfigurasi sebagai SecretRef dan tidak dapat di-resolve di
+  shell Anda saat ini, `openclaw dashboard` tetap mencetak URL tanpa token plus
+  panduan penyiapan auth yang dapat ditindaklanjuti.
 - **Password shared-secret**: gunakan `gateway.auth.password` yang dikonfigurasi (atau
-  `OPENCLAW_GATEWAY_PASSWORD`). Dashboard tidak menyimpan password antar
+  `OPENCLAW_GATEWAY_PASSWORD`). Dashboard tidak mempertahankan password setelah
   reload.
-- **Mode pembawa identitas**: Tailscale Serve dapat memenuhi autentikasi UI Kontrol/WebSocket
-  melalui header identitas saat `gateway.auth.allowTailscale: true`, dan
-  reverse proxy non-loopback yang sadar identitas dapat memenuhi
+- **Mode pembawa identitas**: Tailscale Serve dapat memenuhi auth
+  Control UI/WebSocket melalui header identitas saat `gateway.auth.allowTailscale: true`, dan
+  reverse proxy sadar identitas non-loopback dapat memenuhi
   `gateway.auth.mode: "trusted-proxy"`. Dalam mode tersebut dashboard tidak
   memerlukan shared secret yang ditempel untuk WebSocket.
-- **Bukan localhost**: gunakan Tailscale Serve, bind shared-secret non-loopback, sebuah
-  reverse proxy non-loopback yang sadar identitas dengan
+- **Bukan localhost**: gunakan Tailscale Serve, bind shared-secret non-loopback,
+  reverse proxy sadar identitas non-loopback dengan
   `gateway.auth.mode: "trusted-proxy"`, atau tunnel SSH. API HTTP tetap menggunakan
-  autentikasi shared-secret kecuali Anda sengaja menjalankan private-ingress
-  `gateway.auth.mode: "none"` atau autentikasi HTTP trusted-proxy. Lihat
-  [Permukaan web](/web).
+  auth shared-secret kecuali Anda memang sengaja menjalankan ingress privat
+  `gateway.auth.mode: "none"` atau auth HTTP trusted-proxy. Lihat
+  [Permukaan web](/id/web).
 
 <a id="if-you-see-unauthorized-1008"></a>
 
 ## Jika Anda melihat "unauthorized" / 1008
 
-- Pastikan gateway dapat dijangkau (lokal: `openclaw status`; jarak jauh: tunnel SSH `ssh -N -L 18789:127.0.0.1:18789 user@host` lalu buka `http://127.0.0.1:18789/`).
-- Untuk `AUTH_TOKEN_MISMATCH`, klien dapat melakukan satu percobaan ulang tepercaya dengan token perangkat tersimpan saat gateway mengembalikan petunjuk retry. Percobaan ulang token tersimpan itu menggunakan kembali scope yang telah disetujui dan tersimpan pada token; pemanggil `deviceToken` eksplisit / `scopes` eksplisit tetap mempertahankan set scope yang diminta. Jika autentikasi masih gagal setelah retry itu, selesaikan token drift secara manual.
-- Di luar jalur retry itu, prioritas autentikasi koneksi adalah shared token/password eksplisit terlebih dahulu, lalu `deviceToken` eksplisit, lalu token perangkat tersimpan, lalu token bootstrap.
-- Pada jalur UI Kontrol Tailscale Serve async, percobaan gagal untuk
-  `{scope, ip}` yang sama diserialkan sebelum limiter failed-auth mencatatnya, sehingga
-  percobaan buruk kedua yang berjalan bersamaan sudah bisa menampilkan `retry later`.
-- Untuk langkah perbaikan token drift, ikuti [Checklist pemulihan token drift](/cli/devices#token-drift-recovery-checklist).
+- Pastikan gateway dapat dijangkau (lokal: `openclaw status`; remote: tunnel SSH `ssh -N -L 18789:127.0.0.1:18789 user@host` lalu buka `http://127.0.0.1:18789/`).
+- Untuk `AUTH_TOKEN_MISMATCH`, klien dapat melakukan satu retry tepercaya dengan token perangkat cache ketika gateway mengembalikan petunjuk retry. Retry token cache tersebut menggunakan kembali cakupan yang disetujui dan disimpan untuk token itu; pemanggil `deviceToken` eksplisit / `scopes` eksplisit mempertahankan kumpulan cakupan yang diminta. Jika auth masih gagal setelah retry itu, selesaikan drift token secara manual.
+- Di luar jalur retry tersebut, prioritas auth connect bersifat eksplisit: shared token/password eksplisit terlebih dahulu, lalu `deviceToken` eksplisit, lalu token perangkat tersimpan, lalu token bootstrap.
+- Pada jalur async Tailscale Serve Control UI, percobaan gagal untuk
+  `{scope, ip}` yang sama diserialkan sebelum limiter failed-auth mencatatnya, sehingga retry buruk kedua yang bersamaan sudah dapat menampilkan `retry later`.
+- Untuk langkah perbaikan drift token, ikuti [Checklist pemulihan drift token](/id/cli/devices#token-drift-recovery-checklist).
 - Ambil atau sediakan shared secret dari host gateway:
   - Token: `openclaw config get gateway.auth.token`
-  - Password: resolusikan `gateway.auth.password` atau
-    `OPENCLAW_GATEWAY_PASSWORD` yang dikonfigurasi
-  - Token yang dikelola SecretRef: resolusikan penyedia secret eksternal atau ekspor
+  - Password: resolve `gateway.auth.password` yang dikonfigurasi atau
+    `OPENCLAW_GATEWAY_PASSWORD`
+  - Token yang dikelola SecretRef: resolve provider secret eksternal atau ekspor
     `OPENCLAW_GATEWAY_TOKEN` di shell ini, lalu jalankan ulang `openclaw dashboard`
   - Tidak ada shared secret yang dikonfigurasi: `openclaw doctor --generate-gateway-token`
-- Di pengaturan dashboard, tempel token atau password ke field autentikasi,
+- Di pengaturan dashboard, tempel token atau password ke field auth,
   lalu sambungkan.
+- Picker bahasa UI ada di **Overview -> Gateway Access -> Language**.
+  Itu adalah bagian dari kartu akses, bukan bagian Appearance.

@@ -1,34 +1,41 @@
 ---
 read_when:
-    - Mengimplementasikan atau memperbarui klien WS Gateway
+    - Mengimplementasikan atau memperbarui client WS gateway
     - Men-debug ketidakcocokan protokol atau kegagalan koneksi
-    - Membuat ulang skema/model protokol
-summary: 'Protokol Gateway WebSocket: handshake, frame, pembuatan versi'
+    - Meregenerasi skema/model protokol
+summary: 'Protokol WebSocket Gateway: handshake, frame, versioning'
 title: Protokol Gateway
 x-i18n:
-    generated_at: "2026-04-22T04:22:10Z"
+    generated_at: "2026-04-23T09:21:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6efa76f5f0faa6c10a8515b0cf457233e48551e3484a605dffaf6459ddff9231
+    source_hash: 9d4ea65fbe31962ed8ece04a645cfe5aaff9fee8b5f89bc896b461cd45567634
     source_path: gateway/protocol.md
     workflow: 15
 ---
 
 # Protokol Gateway (WebSocket)
 
-Protokol WS Gateway adalah **control plane tunggal + transport node** untuk
-OpenClaw. Semua klien (CLI, UI web, aplikasi macOS, node iOS/Android, node
+Protokol WS Gateway adalah **control plane tunggal + transport Node** untuk
+OpenClaw. Semua client (CLI, UI web, aplikasi macOS, Node iOS/Android, Node
 headless) terhubung melalui WebSocket dan mendeklarasikan **role** + **scope**
-mereka saat handshake.
+mereka pada saat handshake.
 
 ## Transport
 
 - WebSocket, frame teks dengan payload JSON.
 - Frame pertama **harus** berupa permintaan `connect`.
+- Frame pra-koneksi dibatasi hingga 64 KiB. Setelah handshake berhasil, client
+  harus mengikuti batas `hello-ok.policy.maxPayload` dan
+  `hello-ok.policy.maxBufferedBytes`. Dengan diagnostics yang diaktifkan,
+  frame masuk yang terlalu besar dan buffer keluar yang lambat akan memunculkan event `payload.large`
+  sebelum gateway menutup atau menjatuhkan frame yang terpengaruh. Event ini menyimpan
+  ukuran, batas, permukaan, dan kode alasan yang aman. Event ini tidak menyimpan body pesan,
+  isi lampiran, body frame mentah, token, cookie, atau nilai secret.
 
 ## Handshake (connect)
 
-Gateway → Klien (tantangan pra-koneksi):
+Gateway → Client (challenge pra-koneksi):
 
 ```json
 {
@@ -38,7 +45,7 @@ Gateway → Klien (tantangan pra-koneksi):
 }
 ```
 
-Klien → Gateway:
+Client → Gateway:
 
 ```json
 {
@@ -73,7 +80,7 @@ Klien → Gateway:
 }
 ```
 
-Gateway → Klien:
+Gateway → Client:
 
 ```json
 {
@@ -100,7 +107,7 @@ Gateway → Klien:
 melaporkan role/scope yang dinegosiasikan saat tersedia, dan menyertakan `deviceToken`
 saat gateway menerbitkannya.
 
-Saat tidak ada device token yang diterbitkan, `hello-ok.auth` masih dapat melaporkan
+Saat tidak ada device token yang diterbitkan, `hello-ok.auth` tetap dapat melaporkan
 izin yang dinegosiasikan:
 
 ```json
@@ -112,7 +119,7 @@ izin yang dinegosiasikan:
 }
 ```
 
-Saat device token diterbitkan, `hello-ok` juga menyertakan:
+Saat device token diterbitkan, `hello-ok` juga mencakup:
 
 ```json
 {
@@ -124,8 +131,8 @@ Saat device token diterbitkan, `hello-ok` juga menyertakan:
 }
 ```
 
-Selama trusted bootstrap handoff, `hello-ok.auth` juga dapat menyertakan entri role
-terbatas tambahan dalam `deviceTokens`:
+Selama trusted bootstrap handoff, `hello-ok.auth` juga dapat mencakup entri role
+tambahan yang dibatasi dalam `deviceTokens`:
 
 ```json
 {
@@ -144,14 +151,13 @@ terbatas tambahan dalam `deviceTokens`:
 }
 ```
 
-Untuk alur bootstrap node/operator bawaan, token node utama tetap
-`scopes: []` dan token operator yang diserahkan tetap dibatasi ke allowlist
-operator bootstrap (`operator.approvals`, `operator.read`,
+Untuk alur bootstrap Node/operator bawaan, token Node primary tetap
+`scopes: []` dan token operator yang diserahkan tetap dibatasi pada allowlist operator bootstrap (`operator.approvals`, `operator.read`,
 `operator.talk.secrets`, `operator.write`). Pemeriksaan scope bootstrap tetap
-berawalan role: entri operator hanya memenuhi permintaan operator, dan role
-non-operator tetap memerlukan scope di bawah awalan role mereka sendiri.
+berawalan role: entri operator hanya memenuhi permintaan operator, dan role non-operator
+tetap memerlukan scope di bawah prefiks role mereka sendiri.
 
-### Contoh node
+### Contoh Node
 
 ```json
 {
@@ -188,17 +194,17 @@ non-operator tetap memerlukan scope di bawah awalan role mereka sendiri.
 
 ## Framing
 
-- **Request**: `{type:"req", id, method, params}`
-- **Response**: `{type:"res", id, ok, payload|error}`
+- **Permintaan**: `{type:"req", id, method, params}`
+- **Respons**: `{type:"res", id, ok, payload|error}`
 - **Event**: `{type:"event", event, payload, seq?, stateVersion?}`
 
-Method yang memiliki efek samping memerlukan **idempotency key** (lihat skema).
+Metode yang memiliki efek samping memerlukan **idempotency key** (lihat skema).
 
 ## Role + scope
 
 ### Role
 
-- `operator` = klien control plane (CLI/UI/otomasi).
+- `operator` = client control plane (CLI/UI/automasi).
 - `node` = host kapabilitas (camera/screen/canvas/system.run).
 
 ### Scope (operator)
@@ -215,464 +221,466 @@ Scope umum:
 `talk.config` dengan `includeSecrets: true` memerlukan `operator.talk.secrets`
 (atau `operator.admin`).
 
-Method RPC Gateway yang didaftarkan plugin dapat meminta scope operatornya sendiri, tetapi
-awalan admin inti yang dicadangkan (`config.*`, `exec.approvals.*`, `wizard.*`,
-`update.*`) selalu diselesaikan ke `operator.admin`.
+Metode RPC gateway yang didaftarkan Plugin dapat meminta scope operator mereka sendiri, tetapi
+prefiks admin inti yang dicadangkan (`config.*`, `exec.approvals.*`, `wizard.*`,
+`update.*`) selalu di-resolve ke `operator.admin`.
 
-Scope method hanyalah gerbang pertama. Beberapa perintah slash yang dicapai melalui
-`chat.send` menerapkan pemeriksaan tingkat perintah yang lebih ketat di atasnya. Contohnya,
-penulisan persisten `/config set` dan `/config unset` memerlukan `operator.admin`.
+Scope metode hanyalah gerbang pertama. Beberapa slash command yang dicapai melalui
+`chat.send` menerapkan pemeriksaan tingkat perintah yang lebih ketat di atasnya. Misalnya, write persisten
+`/config set` dan `/config unset` memerlukan `operator.admin`.
 
-`node.pair.approve` juga memiliki pemeriksaan scope tambahan pada saat persetujuan di atas
-scope method dasarnya:
+`node.pair.approve` juga memiliki pemeriksaan scope pada saat persetujuan di atas
+scope metode dasar:
 
-- permintaan tanpa perintah: `operator.pairing`
-- permintaan dengan perintah node non-exec: `operator.pairing` + `operator.write`
-- permintaan yang menyertakan `system.run`, `system.run.prepare`, atau `system.which`:
+- permintaan tanpa command: `operator.pairing`
+- permintaan dengan command Node non-exec: `operator.pairing` + `operator.write`
+- permintaan yang mencakup `system.run`, `system.run.prepare`, atau `system.which`:
   `operator.pairing` + `operator.admin`
 
-### Caps/commands/permissions (node)
+### Caps/commands/permissions (Node)
 
-Node mendeklarasikan klaim kapabilitas saat connect:
+Node mendeklarasikan klaim kapabilitas pada saat koneksi:
 
 - `caps`: kategori kapabilitas tingkat tinggi.
-- `commands`: allowlist perintah untuk invoke.
-- `permissions`: toggle granular (misalnya `screen.record`, `camera.capture`).
+- `commands`: allowlist command untuk invoke.
+- `permissions`: toggle granular (mis. `screen.record`, `camera.capture`).
 
-Gateway memperlakukan ini sebagai **klaim** dan menerapkan allowlist di sisi server.
+Gateway memperlakukan ini sebagai **klaim** dan menegakkan allowlist di sisi server.
 
-## Kehadiran
+## Presence
 
 - `system-presence` mengembalikan entri yang dikunci oleh identitas perangkat.
-- Entri kehadiran menyertakan `deviceId`, `roles`, dan `scopes` sehingga UI dapat menampilkan satu baris per perangkat
-  bahkan saat perangkat terhubung sebagai **operator** dan **node** sekaligus.
+- Entri presence mencakup `deviceId`, `roles`, dan `scopes` sehingga UI dapat menampilkan satu baris per perangkat
+  bahkan saat perangkat tersebut terhubung sebagai **operator** dan **Node** sekaligus.
 
 ## Scoping event broadcast
 
-Event broadcast WebSocket yang didorong server dibatasi oleh scope sehingga sesi dengan scope pairing atau sesi khusus node tidak menerima konten sesi secara pasif.
+Event broadcast WebSocket yang didorong server digate dengan scope sehingga sesi dengan scope pairing atau sesi khusus-Node tidak menerima konten sesi secara pasif.
 
-- **Frame chat, agent, dan hasil alat** (termasuk event `agent` yang di-streaming dan hasil pemanggilan alat) memerlukan setidaknya `operator.read`. Sesi tanpa `operator.read` sepenuhnya melewati frame ini.
-- **Broadcast `plugin.*` yang didefinisikan plugin** dibatasi ke `operator.write` atau `operator.admin`, bergantung pada cara plugin mendaftarkannya.
-- **Event status dan transport** (`heartbeat`, `presence`, `tick`, siklus hidup connect/disconnect, dan sebagainya) tetap tidak dibatasi agar kesehatan transport tetap dapat diamati oleh setiap sesi yang diautentikasi.
-- **Keluarga event broadcast yang tidak dikenal** dibatasi oleh scope secara default (fail-closed) kecuali handler terdaftar secara eksplisit melonggarkannya.
+- **Frame chat, agent, dan hasil tool** (termasuk event `agent` yang di-stream dan hasil panggilan tool) memerlukan setidaknya `operator.read`. Sesi tanpa `operator.read` sepenuhnya melewati frame ini.
+- **Broadcast `plugin.*` yang didefinisikan Plugin** digate ke `operator.write` atau `operator.admin`, bergantung pada cara Plugin mendaftarkannya.
+- **Event status dan transport** (`heartbeat`, `presence`, `tick`, lifecycle connect/disconnect, dll.) tetap tidak dibatasi sehingga kesehatan transport tetap dapat diamati oleh setiap sesi yang terautentikasi.
+- **Keluarga event broadcast yang tidak dikenal** digate dengan scope secara default (fail-closed) kecuali handler terdaftar secara eksplisit melonggarkannya.
 
-Setiap koneksi klien menyimpan nomor urut per-kliennya sendiri sehingga broadcast mempertahankan urutan monoton pada socket tersebut bahkan saat klien yang berbeda melihat subset aliran event yang telah difilter oleh scope yang berbeda.
+Setiap koneksi client menyimpan nomor urut per-client-nya sendiri sehingga broadcast mempertahankan urutan monoton pada socket tersebut bahkan ketika client yang berbeda melihat subset stream event yang berbeda karena filtering scope.
 
-## Keluarga method RPC umum
+## Keluarga metode RPC umum
 
-Halaman ini bukan dump lengkap hasil generate, tetapi permukaan WS publik lebih luas
-daripada contoh handshake/autentikasi di atas. Ini adalah keluarga method utama yang
-diekspos Gateway saat ini.
+Halaman ini bukan dump penuh yang dihasilkan, tetapi permukaan WS publik lebih luas
+daripada contoh handshake/auth di atas. Berikut adalah keluarga metode utama yang
+diekspose Gateway saat ini.
 
-`hello-ok.features.methods` adalah daftar penemuan konservatif yang dibangun dari
-`src/gateway/server-methods-list.ts` plus ekspor method plugin/channel yang dimuat.
-Perlakukan ini sebagai penemuan fitur, bukan sebagai dump hasil generate dari setiap helper yang dapat dipanggil
+`hello-ok.features.methods` adalah daftar discovery konservatif yang dibangun dari
+`src/gateway/server-methods-list.ts` ditambah ekspor metode plugin/channel yang dimuat.
+Perlakukan ini sebagai discovery fitur, bukan sebagai dump yang dihasilkan dari setiap helper callable
 yang diimplementasikan di `src/gateway/server-methods/*.ts`.
 
-### System dan identitas
+### Sistem dan identitas
 
-- `health` mengembalikan snapshot kesehatan gateway yang dicache atau baru diprobe.
+- `health` mengembalikan snapshot health gateway yang di-cache atau baru diprobe.
+- `diagnostics.stability` mengembalikan perekam stabilitas diagnostik terbatas
+  terbaru. Perekam ini menyimpan metadata operasional seperti nama event, jumlah, ukuran byte,
+  pembacaan memori, state antrean/sesi, nama channel/plugin, dan id sesi. Perekam
+  ini tidak menyimpan teks obrolan, body webhook, output tool, body permintaan atau
+  respons mentah, token, cookie, atau nilai secret. Scope operator read
+  diperlukan.
 - `status` mengembalikan ringkasan gateway bergaya `/status`; field sensitif hanya
-  disertakan untuk klien operator dengan scope admin.
+  disertakan untuk client operator dengan scope admin.
 - `gateway.identity.get` mengembalikan identitas perangkat gateway yang digunakan oleh alur relay dan
   pairing.
-- `system-presence` mengembalikan snapshot kehadiran saat ini untuk perangkat
-  operator/node yang terhubung.
-- `system-event` menambahkan event sistem dan dapat memperbarui/menyiarkan
-  konteks kehadiran.
+- `system-presence` mengembalikan snapshot presence saat ini untuk perangkat
+  operator/Node yang terhubung.
+- `system-event` menambahkan event sistem dan dapat memperbarui/menyiarkan konteks
+  presence.
 - `last-heartbeat` mengembalikan event Heartbeat persisten terbaru.
-- `set-heartbeats` mengaktifkan atau menonaktifkan pemrosesan Heartbeat di gateway.
+- `set-heartbeats` mengaktifkan/menonaktifkan pemrosesan Heartbeat di gateway.
 
-### Model dan penggunaan
+### Model dan usage
 
-- `models.list` mengembalikan katalog model yang diizinkan saat runtime.
-- `usage.status` mengembalikan ringkasan jendela penggunaan provider/kuota tersisa.
-- `usage.cost` mengembalikan ringkasan penggunaan biaya agregat untuk rentang tanggal.
+- `models.list` mengembalikan katalog model yang diizinkan pada runtime.
+- `usage.status` mengembalikan ringkasan jendela usage/kuota tersisa provider.
+- `usage.cost` mengembalikan ringkasan usage biaya teragregasi untuk suatu rentang tanggal.
 - `doctor.memory.status` mengembalikan kesiapan vector-memory / embedding untuk
   workspace agent default aktif.
-- `sessions.usage` mengembalikan ringkasan penggunaan per sesi.
+- `sessions.usage` mengembalikan ringkasan usage per sesi.
 - `sessions.usage.timeseries` mengembalikan usage timeseries untuk satu sesi.
-- `sessions.usage.logs` mengembalikan entri log penggunaan untuk satu sesi.
+- `sessions.usage.logs` mengembalikan entri log usage untuk satu sesi.
 
 ### Channel dan helper login
 
-- `channels.status` mengembalikan ringkasan status channel/plugin bawaan + bundel.
-- `channels.logout` melakukan logout untuk channel/akun tertentu saat channel
+- `channels.status` mengembalikan ringkasan status channel/Plugin bawaan + bundled.
+- `channels.logout` logout dari channel/akun tertentu saat channel tersebut
   mendukung logout.
-- `web.login.start` memulai alur login QR/web untuk provider channel web
-  berkemampuan QR saat ini.
-- `web.login.wait` menunggu hingga alur login QR/web tersebut selesai dan memulai
-  channel saat berhasil.
-- `push.test` mengirim push APNs uji ke node iOS yang terdaftar.
-- `voicewake.get` mengembalikan pemicu wake-word yang tersimpan.
-- `voicewake.set` memperbarui pemicu wake-word dan menyiarkan perubahannya.
+- `web.login.start` memulai alur login QR/web untuk provider channel web yang mendukung QR saat ini.
+- `web.login.wait` menunggu alur login QR/web tersebut selesai dan memulai
+  channel jika berhasil.
+- `push.test` mengirim APNs push uji ke Node iOS yang terdaftar.
+- `voicewake.get` mengembalikan trigger wake-word yang tersimpan.
+- `voicewake.set` memperbarui trigger wake-word dan menyiarkan perubahan.
 
-### Messaging dan log
+### Pesan dan log
 
-- `send` adalah RPC pengiriman keluar langsung untuk
-  pengiriman yang ditargetkan ke channel/akun/thread di luar runner chat.
-- `logs.tail` mengembalikan tail log file gateway yang dikonfigurasi dengan kontrol kursor/limit dan
-  batas byte maksimum.
+- `send` adalah RPC pengiriman outbound langsung untuk
+  pengiriman yang ditargetkan channel/akun/thread di luar chat runner.
+- `logs.tail` mengembalikan tail log file gateway yang dikonfigurasi dengan kontrol cursor/limit dan
+  byte maksimum.
 
 ### Talk dan TTS
 
-- `talk.config` mengembalikan payload config Talk efektif; `includeSecrets`
+- `talk.config` mengembalikan payload konfigurasi Talk yang efektif; `includeSecrets`
   memerlukan `operator.talk.secrets` (atau `operator.admin`).
-- `talk.mode` menetapkan/menyiarkan status mode Talk saat ini untuk klien WebChat/Control UI.
-- `talk.speak` mensintesis ucapan melalui provider ucapan Talk aktif.
-- `tts.status` mengembalikan status TTS aktif, provider aktif, provider fallback,
-  dan status config provider.
+- `talk.mode` menetapkan/menyiarkan state mode Talk saat ini untuk client WebChat/Control UI.
+- `talk.speak` mensintesis ucapan melalui provider speech Talk yang aktif.
+- `tts.status` mengembalikan state TTS aktif/nonaktif, provider aktif, provider fallback,
+  dan state konfigurasi provider.
 - `tts.providers` mengembalikan inventaris provider TTS yang terlihat.
-- `tts.enable` dan `tts.disable` mengaktifkan atau menonaktifkan status preferensi TTS.
-- `tts.setProvider` memperbarui provider TTS pilihan.
+- `tts.enable` dan `tts.disable` mengaktifkan/menonaktifkan state preferensi TTS.
+- `tts.setProvider` memperbarui provider TTS yang dipilih.
 - `tts.convert` menjalankan konversi text-to-speech sekali jalan.
 
-### Secrets, config, update, dan wizard
+### Secret, konfigurasi, pembaruan, dan wizard
 
-- `secrets.reload` menyelesaikan ulang SecretRef aktif dan menukar status rahasia runtime
-  hanya saat seluruh proses berhasil.
-- `secrets.resolve` menyelesaikan penetapan secret target perintah untuk himpunan
+- `secrets.reload` me-resolve ulang SecretRef aktif dan menukar state secret runtime
+  hanya jika sepenuhnya berhasil.
+- `secrets.resolve` me-resolve penugasan secret target perintah untuk sekumpulan
   perintah/target tertentu.
-- `config.get` mengembalikan snapshot config saat ini dan hash-nya.
-- `config.set` menulis payload config yang tervalidasi.
-- `config.patch` menggabungkan pembaruan config parsial.
-- `config.apply` memvalidasi + mengganti seluruh payload config.
-- `config.schema` mengembalikan payload skema config live yang digunakan oleh Control UI dan
-  tooling CLI: schema, `uiHints`, versi, dan metadata generasi, termasuk
-  metadata skema plugin + channel saat runtime dapat memuatnya. Skema
+- `config.get` mengembalikan snapshot konfigurasi saat ini beserta hash-nya.
+- `config.set` menulis payload konfigurasi yang tervalidasi.
+- `config.patch` menggabungkan pembaruan konfigurasi parsial.
+- `config.apply` memvalidasi + mengganti payload konfigurasi penuh.
+- `config.schema` mengembalikan payload skema konfigurasi live yang digunakan oleh Control UI dan
+  tooling CLI: skema, `uiHints`, versi, dan metadata generasi, termasuk
+  metadata skema plugin + channel saat runtime dapat memuatnya. Skema tersebut
   mencakup metadata field `title` / `description` yang diturunkan dari label yang sama
-  dan teks bantuan yang digunakan oleh UI, termasuk object bersarang, wildcard, item array,
+  dan teks bantuan yang digunakan UI, termasuk object bersarang, wildcard, item array,
   dan cabang komposisi `anyOf` / `oneOf` / `allOf` saat dokumentasi field yang cocok
   tersedia.
-- `config.schema.lookup` mengembalikan payload pencarian dengan cakupan path untuk satu path config:
+- `config.schema.lookup` mengembalikan payload lookup dengan cakupan path untuk satu path konfigurasi:
   path yang dinormalisasi, node skema dangkal, hint yang cocok + `hintPath`, dan
-  ringkasan child langsung untuk penelusuran UI/CLI.
-  - Node skema hasil pencarian mempertahankan dokumentasi yang menghadap pengguna dan field validasi umum:
+  ringkasan child langsung untuk drill-down UI/CLI.
+  - Node skema lookup mempertahankan dokumentasi yang terlihat pengguna dan field validasi umum:
     `title`, `description`, `type`, `enum`, `const`, `format`, `pattern`,
     batas numerik/string/array/object, dan flag boolean seperti
     `additionalProperties`, `deprecated`, `readOnly`, `writeOnly`.
-  - Ringkasan child mengekspos `key`, `path` yang dinormalisasi, `type`, `required`,
-    `hasChildren`, plus `hint` / `hintPath` yang cocok.
-- `update.run` menjalankan alur update gateway dan menjadwalkan restart hanya saat
-  update itu sendiri berhasil.
+  - Ringkasan child menampilkan `key`, `path` yang dinormalisasi, `type`, `required`,
+    `hasChildren`, beserta `hint` / `hintPath` yang cocok.
+- `update.run` menjalankan alur pembaruan gateway dan menjadwalkan restart hanya saat
+  pembaruan itu sendiri berhasil.
 - `wizard.start`, `wizard.next`, `wizard.status`, dan `wizard.cancel` mengekspos
   wizard onboarding melalui WS RPC.
 
 ### Keluarga utama yang sudah ada
 
-#### Agent dan helper workspace
+#### Helper agent dan workspace
 
 - `agents.list` mengembalikan entri agent yang dikonfigurasi.
 - `agents.create`, `agents.update`, dan `agents.delete` mengelola record agent dan
   wiring workspace.
 - `agents.files.list`, `agents.files.get`, dan `agents.files.set` mengelola
   file workspace bootstrap yang diekspos untuk sebuah agent.
-- `agent.identity.get` mengembalikan identitas asisten efektif untuk agent atau
+- `agent.identity.get` mengembalikan identitas assistant efektif untuk agent atau
   sesi.
-- `agent.wait` menunggu hingga suatu run selesai dan mengembalikan snapshot terminal saat
+- `agent.wait` menunggu run selesai dan mengembalikan snapshot terminal saat
   tersedia.
 
 #### Kontrol sesi
 
 - `sessions.list` mengembalikan indeks sesi saat ini.
-- `sessions.subscribe` dan `sessions.unsubscribe` mengaktifkan atau menonaktifkan subscription event perubahan sesi
-  untuk klien WS saat ini.
-- `sessions.messages.subscribe` dan `sessions.messages.unsubscribe` mengaktifkan atau menonaktifkan
-  subscription event transkrip/pesan untuk satu sesi.
-- `sessions.preview` mengembalikan pratinjau transkrip berbatas untuk kunci sesi
+- `sessions.subscribe` dan `sessions.unsubscribe` mengaktifkan/menonaktifkan
+  langganan event perubahan sesi untuk client WS saat ini.
+- `sessions.messages.subscribe` dan `sessions.messages.unsubscribe` mengaktifkan/menonaktifkan
+  langganan event transkrip/pesan untuk satu sesi.
+- `sessions.preview` mengembalikan pratinjau transkrip terbatas untuk key sesi
   tertentu.
-- `sessions.resolve` menyelesaikan atau mengkanonisasi target sesi.
+- `sessions.resolve` me-resolve atau mengkanonisasi target sesi.
 - `sessions.create` membuat entri sesi baru.
 - `sessions.send` mengirim pesan ke sesi yang sudah ada.
-- `sessions.steer` adalah varian interrupt-and-steer untuk sesi yang aktif.
-- `sessions.abort` membatalkan pekerjaan aktif untuk suatu sesi.
+- `sessions.steer` adalah varian interrupt-and-steer untuk sesi aktif.
+- `sessions.abort` membatalkan pekerjaan aktif untuk sebuah sesi.
 - `sessions.patch` memperbarui metadata/override sesi.
 - `sessions.reset`, `sessions.delete`, dan `sessions.compact` melakukan
   pemeliharaan sesi.
-- `sessions.get` mengembalikan baris sesi tersimpan lengkap.
-- eksekusi chat tetap menggunakan `chat.history`, `chat.send`, `chat.abort`, dan
+- `sessions.get` mengembalikan seluruh baris sesi yang tersimpan.
+- Eksekusi chat tetap menggunakan `chat.history`, `chat.send`, `chat.abort`, dan
   `chat.inject`.
-- `chat.history` dinormalisasi untuk tampilan klien UI: tag directive inline dihapus
+- `chat.history` dinormalisasi untuk tampilan client UI: tag directive inline dihapus
   dari teks yang terlihat, payload XML tool-call teks biasa (termasuk
   `<tool_call>...</tool_call>`, `<function_call>...</function_call>`,
   `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>`, dan
-  blok tool-call terpotong) serta token kontrol model ASCII/full-width yang bocor
-  dihapus, baris asisten token-senyap murni seperti `NO_REPLY` /
-  `no_reply` yang persis dihilangkan, dan baris yang terlalu besar dapat diganti dengan placeholder.
+  blok tool-call yang terpotong) serta token kontrol model ASCII/full-width yang bocor
+  dihapus, baris assistant yang hanya berisi silent-token murni seperti `NO_REPLY` /
+  `no_reply` persis dihilangkan, dan baris yang terlalu besar dapat diganti dengan placeholder.
 
-#### Pairing perangkat dan device token
+#### Pairing perangkat dan token perangkat
 
-- `device.pair.list` mengembalikan perangkat yang di-pairing tertunda dan yang disetujui.
+- `device.pair.list` mengembalikan perangkat yang dipasangkan yang tertunda dan disetujui.
 - `device.pair.approve`, `device.pair.reject`, dan `device.pair.remove` mengelola
   record pairing perangkat.
-- `device.token.rotate` merotasi token perangkat yang di-pairing dalam batas role
-  dan scope yang disetujui.
-- `device.token.revoke` mencabut token perangkat yang di-pairing.
+- `device.token.rotate` merotasi token perangkat yang dipasangkan dalam batas role
+  dan scope yang telah disetujui.
+- `device.token.revoke` mencabut token perangkat yang dipasangkan.
 
-#### Pairing node, invoke, dan pekerjaan tertunda
+#### Pairing Node, invoke, dan pekerjaan tertunda
 
 - `node.pair.request`, `node.pair.list`, `node.pair.approve`,
-  `node.pair.reject`, dan `node.pair.verify` mencakup pairing node dan
-  verifikasi bootstrap.
-- `node.list` dan `node.describe` mengembalikan status node yang dikenal/terhubung.
-- `node.rename` memperbarui label node yang di-pairing.
-- `node.invoke` meneruskan perintah ke node yang terhubung.
+  `node.pair.reject`, dan `node.pair.verify` mencakup pairing Node dan verifikasi
+  bootstrap.
+- `node.list` dan `node.describe` mengembalikan state Node yang diketahui/terhubung.
+- `node.rename` memperbarui label Node yang dipasangkan.
+- `node.invoke` meneruskan command ke Node yang terhubung.
 - `node.invoke.result` mengembalikan hasil untuk permintaan invoke.
-- `node.event` membawa event yang berasal dari node kembali ke gateway.
-- `node.canvas.capability.refresh` menyegarkan token kapabilitas canvas yang dibatasi scope.
-- `node.pending.pull` dan `node.pending.ack` adalah API antrean node-terhubung.
-- `node.pending.enqueue` dan `node.pending.drain` mengelola pekerjaan tertunda tahan lama
-  untuk node offline/terputus.
+- `node.event` membawa event yang berasal dari Node kembali ke gateway.
+- `node.canvas.capability.refresh` me-refresh token kapabilitas canvas yang dibatasi scope.
+- `node.pending.pull` dan `node.pending.ack` adalah API antrean Node terhubung.
+- `node.pending.enqueue` dan `node.pending.drain` mengelola pekerjaan tertunda yang persisten
+  untuk Node offline/terputus.
 
 #### Keluarga persetujuan
 
 - `exec.approval.request`, `exec.approval.get`, `exec.approval.list`, dan
-  `exec.approval.resolve` mencakup permintaan persetujuan exec sekali pakai plus
-  pencarian/pemutaran ulang persetujuan tertunda.
+  `exec.approval.resolve` mencakup permintaan persetujuan exec sekali jalan beserta lookup/replay
+  persetujuan tertunda.
 - `exec.approval.waitDecision` menunggu satu persetujuan exec tertunda dan mengembalikan
-  keputusan akhir (atau `null` saat timeout).
-- `exec.approvals.get` dan `exec.approvals.set` mengelola snapshot kebijakan
-  persetujuan exec gateway.
-- `exec.approvals.node.get` dan `exec.approvals.node.set` mengelola kebijakan persetujuan exec
-  lokal node melalui perintah relay node.
+  keputusan final (atau `null` saat timeout).
+- `exec.approvals.get` dan `exec.approvals.set` mengelola snapshot kebijakan persetujuan exec gateway.
+- `exec.approvals.node.get` dan `exec.approvals.node.set` mengelola kebijakan persetujuan exec lokal-Node
+  melalui command relay Node.
 - `plugin.approval.request`, `plugin.approval.list`,
   `plugin.approval.waitDecision`, dan `plugin.approval.resolve` mencakup
   alur persetujuan yang didefinisikan Plugin.
 
 #### Keluarga utama lainnya
 
-- otomasi:
+- automasi:
   - `wake` menjadwalkan injeksi teks bangun segera atau pada Heartbeat berikutnya
   - `cron.list`, `cron.status`, `cron.add`, `cron.update`, `cron.remove`,
     `cron.run`, `cron.runs`
-- skills/tools: `commands.list`, `skills.*`, `tools.catalog`, `tools.effective`
+- Skills/tools: `commands.list`, `skills.*`, `tools.catalog`, `tools.effective`
 
 ### Keluarga event umum
 
-- `chat`: pembaruan chat UI seperti `chat.inject` dan event chat khusus transkrip
+- `chat`: pembaruan chat UI seperti `chat.inject` dan event chat khusus-transkrip
   lainnya.
-- `session.message` dan `session.tool`: pembaruan transkrip/aliran event untuk sesi yang di-subscribe.
+- `session.message` dan `session.tool`: pembaruan transkrip/stream event untuk sesi
+  yang dilanggani.
 - `sessions.changed`: indeks sesi atau metadata berubah.
-- `presence`: pembaruan snapshot kehadiran sistem.
-- `tick`: event keepalive / liveness periodik.
-- `health`: pembaruan snapshot kesehatan gateway.
-- `heartbeat`: pembaruan aliran event Heartbeat.
+- `presence`: pembaruan snapshot presence sistem.
+- `tick`: event keepalive / liveness berkala.
+- `health`: pembaruan snapshot health gateway.
+- `heartbeat`: pembaruan stream event Heartbeat.
 - `cron`: event perubahan run/job Cron.
 - `shutdown`: notifikasi shutdown gateway.
-- `node.pair.requested` / `node.pair.resolved`: siklus hidup pairing node.
-- `node.invoke.request`: broadcast permintaan invoke node.
-- `device.pair.requested` / `device.pair.resolved`: siklus hidup perangkat yang di-pairing.
-- `voicewake.changed`: config pemicu wake-word berubah.
-- `exec.approval.requested` / `exec.approval.resolved`: siklus hidup
+- `node.pair.requested` / `node.pair.resolved`: lifecycle pairing Node.
+- `node.invoke.request`: broadcast permintaan invoke Node.
+- `device.pair.requested` / `device.pair.resolved`: lifecycle perangkat yang dipasangkan.
+- `voicewake.changed`: konfigurasi trigger wake-word berubah.
+- `exec.approval.requested` / `exec.approval.resolved`: lifecycle
   persetujuan exec.
-- `plugin.approval.requested` / `plugin.approval.resolved`: siklus hidup persetujuan Plugin.
+- `plugin.approval.requested` / `plugin.approval.resolved`: lifecycle persetujuan plugin.
 
-### Method helper node
+### Metode helper Node
 
 - Node dapat memanggil `skills.bins` untuk mengambil daftar executable skill saat ini
   untuk pemeriksaan auto-allow.
 
-### Method helper operator
+### Metode helper operator
 
-- Operator dapat memanggil `commands.list` (`operator.read`) untuk mengambil inventaris
-  perintah runtime untuk sebuah agent.
+- Operator dapat memanggil `commands.list` (`operator.read`) untuk mengambil inventaris command runtime bagi sebuah agent.
   - `agentId` bersifat opsional; hilangkan untuk membaca workspace agent default.
-  - `scope` mengontrol permukaan mana yang ditargetkan `name` utama:
-    - `text` mengembalikan token perintah teks utama tanpa awalan `/`
-    - `native` dan jalur default `both` mengembalikan nama native yang sadar-provider
+  - `scope` mengontrol permukaan mana yang dituju oleh `name` utama:
+    - `text` mengembalikan token command teks utama tanpa awalan `/`
+    - `native` dan path default `both` mengembalikan nama native yang sadar-provider
       saat tersedia
-  - `textAliases` membawa alias slash persis seperti `/model` dan `/m`.
-  - `nativeName` membawa nama perintah native yang sadar-provider saat tersedia.
-  - `provider` bersifat opsional dan hanya memengaruhi penamaan native plus ketersediaan
-    perintah Plugin native.
-  - `includeArgs=false` menghilangkan metadata argumen terserialisasi dari respons.
-- Operator dapat memanggil `tools.catalog` (`operator.read`) untuk mengambil katalog tool runtime untuk sebuah
+  - `textAliases` memuat alias slash persis seperti `/model` dan `/m`.
+  - `nativeName` memuat nama command native yang sadar-provider saat tersedia.
+  - `provider` bersifat opsional dan hanya memengaruhi penamaan native plus ketersediaan command plugin native.
+  - `includeArgs=false` menghilangkan metadata argumen yang diserialisasi dari respons.
+- Operator dapat memanggil `tools.catalog` (`operator.read`) untuk mengambil katalog tool runtime bagi sebuah
   agent. Respons mencakup tool yang dikelompokkan dan metadata provenance:
   - `source`: `core` atau `plugin`
   - `pluginId`: pemilik plugin saat `source="plugin"`
   - `optional`: apakah tool plugin bersifat opsional
-- Operator dapat memanggil `tools.effective` (`operator.read`) untuk mengambil inventaris tool efektif runtime
+- Operator dapat memanggil `tools.effective` (`operator.read`) untuk mengambil inventaris tool efektif-runtime
   untuk sebuah sesi.
   - `sessionKey` wajib.
   - Gateway menurunkan konteks runtime tepercaya dari sesi di sisi server alih-alih menerima
-    auth atau konteks pengiriman yang disediakan pemanggil.
-  - Respons dibatasi ke sesi dan mencerminkan apa yang dapat digunakan percakapan aktif saat ini,
+    auth atau konteks pengiriman yang disuplai pemanggil.
+  - Respons memiliki cakupan sesi dan mencerminkan apa yang dapat digunakan percakapan aktif saat ini,
     termasuk tool core, plugin, dan channel.
 - Operator dapat memanggil `skills.status` (`operator.read`) untuk mengambil inventaris
-  skill yang terlihat untuk sebuah agent.
+  Skills yang terlihat bagi sebuah agent.
   - `agentId` bersifat opsional; hilangkan untuk membaca workspace agent default.
-  - Respons mencakup kelayakan, persyaratan yang hilang, pemeriksaan config, dan
-    opsi instalasi yang disanitasi tanpa mengekspos nilai secret mentah.
+  - Respons mencakup kelayakan, persyaratan yang hilang, pemeriksaan konfigurasi, dan
+    opsi instalasi yang telah disanitasi tanpa mengekspos nilai secret mentah.
 - Operator dapat memanggil `skills.search` dan `skills.detail` (`operator.read`) untuk
-  metadata penemuan ClawHub.
+  metadata discovery ClawHub.
 - Operator dapat memanggil `skills.install` (`operator.admin`) dalam dua mode:
-  - mode ClawHub: `{ source: "clawhub", slug, version?, force? }` menginstal folder
+  - Mode ClawHub: `{ source: "clawhub", slug, version?, force? }` menginstal folder
     skill ke direktori `skills/` workspace agent default.
-  - mode installer Gateway: `{ name, installId, dangerouslyForceUnsafeInstall?, timeoutMs? }`
+  - Mode installer gateway: `{ name, installId, dangerouslyForceUnsafeInstall?, timeoutMs? }`
     menjalankan aksi `metadata.openclaw.install` yang dideklarasikan pada host gateway.
 - Operator dapat memanggil `skills.update` (`operator.admin`) dalam dua mode:
-  - mode ClawHub memperbarui satu slug yang dilacak atau semua instalasi ClawHub yang dilacak di
+  - Mode ClawHub memperbarui satu slug yang dilacak atau semua instalasi ClawHub yang dilacak di
     workspace agent default.
-  - mode config mem-patch nilai `skills.entries.<skillKey>` seperti `enabled`,
+  - Mode config mem-patch nilai `skills.entries.<skillKey>` seperti `enabled`,
     `apiKey`, dan `env`.
 
 ## Persetujuan exec
 
-- Saat suatu permintaan exec memerlukan persetujuan, gateway menyiarkan `exec.approval.requested`.
-- Klien operator menyelesaikannya dengan memanggil `exec.approval.resolve` (memerlukan scope `operator.approvals`).
-- Untuk `host=node`, `exec.approval.request` harus menyertakan `systemRunPlan` (`argv`/`cwd`/`rawCommand`/metadata sesi kanonis). Permintaan yang tidak memiliki `systemRunPlan` ditolak.
-- Setelah disetujui, panggilan `node.invoke system.run` yang diteruskan menggunakan ulang
-  `systemRunPlan` kanonis tersebut sebagai konteks perintah/cwd/sesi yang otoritatif.
-- Jika pemanggil memutasi `command`, `rawCommand`, `cwd`, `agentId`, atau
-  `sessionKey` antara prepare dan penerusan `system.run` akhir yang disetujui,
-  gateway menolak run tersebut alih-alih mempercayai payload yang telah dimutasi.
+- Saat permintaan exec memerlukan persetujuan, gateway menyiarkan `exec.approval.requested`.
+- Client operator me-resolve dengan memanggil `exec.approval.resolve` (memerlukan scope `operator.approvals`).
+- Untuk `host=node`, `exec.approval.request` harus mencakup `systemRunPlan` (metadata kanonis `argv`/`cwd`/`rawCommand`/sesi). Permintaan yang tidak memiliki `systemRunPlan` akan ditolak.
+- Setelah disetujui, panggilan `node.invoke system.run` yang diteruskan menggunakan kembali
+  `systemRunPlan` kanonis tersebut sebagai konteks command/cwd/sesi yang otoritatif.
+- Jika pemanggil mengubah `command`, `rawCommand`, `cwd`, `agentId`, atau
+  `sessionKey` antara persiapan dan penerusan `system.run` final yang disetujui, gateway
+  menolak run tersebut alih-alih memercayai payload yang telah diubah.
 
 ## Fallback pengiriman agent
 
-- Permintaan `agent` dapat menyertakan `deliver=true` untuk meminta pengiriman keluar.
-- `bestEffortDeliver=false` mempertahankan perilaku ketat: target pengiriman yang tidak terselesaikan atau khusus internal mengembalikan `INVALID_REQUEST`.
-- `bestEffortDeliver=true` mengizinkan fallback ke eksekusi khusus sesi saat tidak ada rute pengiriman eksternal yang dapat diselesaikan (misalnya sesi internal/webchat atau config multi-channel yang ambigu).
+- Permintaan `agent` dapat menyertakan `deliver=true` untuk meminta pengiriman outbound.
+- `bestEffortDeliver=false` mempertahankan perilaku ketat: target pengiriman yang tidak ter-resolve atau hanya-internal mengembalikan `INVALID_REQUEST`.
+- `bestEffortDeliver=true` memungkinkan fallback ke eksekusi hanya-sesi saat tidak ada rute eksternal yang dapat dikirim yang dapat di-resolve (misalnya sesi internal/webchat atau konfigurasi multi-channel yang ambigu).
 
-## Pembuatan versi
+## Versioning
 
 - `PROTOCOL_VERSION` berada di `src/gateway/protocol/schema/protocol-schemas.ts`.
-- Klien mengirim `minProtocol` + `maxProtocol`; server menolak ketidakcocokan.
-- Skema + model dihasilkan dari definisi TypeBox:
+- Client mengirim `minProtocol` + `maxProtocol`; server menolak ketidakcocokan.
+- Skema + model digenerasikan dari definisi TypeBox:
   - `pnpm protocol:gen`
   - `pnpm protocol:gen:swift`
   - `pnpm protocol:check`
 
-### Konstanta klien
+### Konstanta client
 
-Klien referensi di `src/gateway/client.ts` menggunakan default berikut. Nilai-nilai ini
-stabil di seluruh protokol v3 dan merupakan baseline yang diharapkan untuk klien pihak ketiga.
+Client referensi di `src/gateway/client.ts` menggunakan default berikut. Nilai-nilai ini
+stabil di seluruh protokol v3 dan merupakan baseline yang diharapkan untuk client pihak ketiga.
 
-| Konstanta                                 | Default                                               | Sumber                                                     |
+| Constant                                  | Default                                               | Source                                                     |
 | ----------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
 | `PROTOCOL_VERSION`                        | `3`                                                   | `src/gateway/protocol/schema/protocol-schemas.ts`          |
 | Timeout permintaan (per RPC)              | `30_000` md                                           | `src/gateway/client.ts` (`requestTimeoutMs`)               |
 | Timeout preauth / connect-challenge       | `10_000` md                                           | `src/gateway/handshake-timeouts.ts` (clamp `250`–`10_000`) |
 | Backoff reconnect awal                    | `1_000` md                                            | `src/gateway/client.ts` (`backoffMs`)                      |
 | Backoff reconnect maksimum                | `30_000` md                                           | `src/gateway/client.ts` (`scheduleReconnect`)              |
-| Clamp percobaan cepat ulang setelah device-token close | `250` md                                   | `src/gateway/client.ts`                                    |
+| Clamp retry-cepat setelah device-token close | `250` md                                           | `src/gateway/client.ts`                                    |
 | Grace force-stop sebelum `terminate()`    | `250` md                                              | `FORCE_STOP_TERMINATE_GRACE_MS`                            |
 | Timeout default `stopAndWait()`           | `1_000` md                                            | `STOP_AND_WAIT_TIMEOUT_MS`                                 |
 | Interval tick default (pra `hello-ok`)    | `30_000` md                                           | `src/gateway/client.ts`                                    |
-| Penutupan karena tick-timeout             | kode `4000` saat senyap melebihi `tickIntervalMs * 2` | `src/gateway/client.ts`                                    |
+| Penutupan karena timeout tick             | kode `4000` saat senyap melebihi `tickIntervalMs * 2` | `src/gateway/client.ts`                                    |
 | `MAX_PAYLOAD_BYTES`                       | `25 * 1024 * 1024` (25 MB)                            | `src/gateway/server-constants.ts`                          |
 
 Server mengiklankan `policy.tickIntervalMs`, `policy.maxPayload`,
-dan `policy.maxBufferedBytes` efektif di `hello-ok`; klien harus mematuhi nilai-nilai tersebut
+dan `policy.maxBufferedBytes` efektif di `hello-ok`; client harus menghormati nilai-nilai tersebut
 alih-alih default pra-handshake.
 
 ## Auth
 
-- Autentikasi gateway shared-secret menggunakan `connect.params.auth.token` atau
+- Auth gateway shared-secret menggunakan `connect.params.auth.token` atau
   `connect.params.auth.password`, bergantung pada mode auth yang dikonfigurasi.
 - Mode yang membawa identitas seperti Tailscale Serve
-  (`gateway.auth.allowTailscale: true`) atau
-  `gateway.auth.mode: "trusted-proxy"` non-loopback memenuhi pemeriksaan auth connect dari
+  (`gateway.auth.allowTailscale: true`) atau non-loopback
+  `gateway.auth.mode: "trusted-proxy"` memenuhi pemeriksaan auth connect dari
   header permintaan alih-alih `connect.params.auth.*`.
-- Ingress privat dengan `gateway.auth.mode: "none"` sepenuhnya melewati auth connect shared-secret;
-  jangan mengekspos mode itu pada ingress publik/tidak tepercaya.
-- Setelah pairing, Gateway menerbitkan **device token** yang dibatasi ke
-  role + scope koneksi. Token ini dikembalikan dalam `hello-ok.auth.deviceToken` dan harus
-  dipersistenkan oleh klien untuk koneksi berikutnya.
-- Klien harus memersistenkan `hello-ok.auth.deviceToken` utama setelah setiap
+- Ingress privat `gateway.auth.mode: "none"` melewati auth connect shared-secret
+  sepenuhnya; jangan ekspos mode tersebut pada ingress publik/tidak tepercaya.
+- Setelah pairing, Gateway menerbitkan **device token** dengan scope ke role + scope koneksi.
+  Token ini dikembalikan di `hello-ok.auth.deviceToken` dan harus
+  dipersist oleh client untuk koneksi berikutnya.
+- Client harus mem-persist `hello-ok.auth.deviceToken` primary setelah setiap
   koneksi berhasil.
-- Melakukan reconnect dengan device token **tersimpan** tersebut juga harus menggunakan ulang
-  himpunan scope yang disetujui dan tersimpan untuk token itu. Ini mempertahankan akses
-  baca/probe/status yang sudah diberikan dan menghindari reconnect yang diam-diam
-  menyusut ke scope implicit admin-only yang lebih sempit.
-- Penyusunan auth connect sisi klien (`selectConnectAuth` di
+- Menyambung ulang dengan device token **tersimpan** tersebut juga harus menggunakan kembali
+  kumpulan scope yang telah disetujui dan tersimpan untuk token tersebut. Ini mempertahankan
+  akses baca/probe/status yang sudah diberikan dan menghindari reconnect diam-diam menyusut ke
+  scope implicit admin-only yang lebih sempit.
+- Perakitan auth connect sisi client (`selectConnectAuth` di
   `src/gateway/client.ts`):
-  - `auth.password` bersifat ortogonal dan selalu diteruskan saat diatur.
+  - `auth.password` bersifat ortogonal dan selalu diteruskan saat disetel.
   - `auth.token` diisi dalam urutan prioritas: shared token eksplisit terlebih dahulu,
-    lalu `deviceToken` eksplisit, lalu token per-perangkat tersimpan (dikunci oleh
+    lalu `deviceToken` eksplisit, lalu token per-device yang tersimpan (dikunci oleh
     `deviceId` + `role`).
-  - `auth.bootstrapToken` hanya dikirim saat tidak satu pun dari hal di atas menghasilkan
-    `auth.token`. Shared token atau device token apa pun yang berhasil diselesaikan akan menekannya.
+  - `auth.bootstrapToken` dikirim hanya saat tidak ada yang di atas yang menghasilkan
+    `auth.token`. Shared token atau device token yang berhasil di-resolve akan menekannya.
   - Auto-promotion device token tersimpan pada retry satu kali
-    `AUTH_TOKEN_MISMATCH` dibatasi hanya untuk **endpoint tepercaya** —
+    `AUTH_TOKEN_MISMATCH` digate hanya untuk **endpoint tepercaya** —
     loopback, atau `wss://` dengan `tlsFingerprint` yang dipin. `wss://` publik
     tanpa pinning tidak memenuhi syarat.
 - Entri tambahan `hello-ok.auth.deviceTokens` adalah token handoff bootstrap.
-  Persistenkan hanya saat koneksi menggunakan auth bootstrap pada transport tepercaya
-  seperti `wss://` atau loopback/pairing lokal.
-- Jika klien memberikan `deviceToken` **eksplisit** atau `scopes` eksplisit, himpunan scope
-  yang diminta pemanggil tersebut tetap otoritatif; scope cache hanya digunakan ulang
-  saat klien menggunakan ulang token per-perangkat yang tersimpan.
+  Persist hanya saat koneksi menggunakan auth bootstrap pada transport tepercaya
+  seperti `wss://` atau loopback/local pairing.
+- Jika sebuah client menyuplai `deviceToken` **eksplisit** atau `scopes` eksplisit, kumpulan scope yang diminta pemanggil tersebut tetap otoritatif; scope cache hanya
+  digunakan ulang saat client menggunakan kembali token per-device yang tersimpan.
 - Device token dapat dirotasi/dicabut melalui `device.token.rotate` dan
   `device.token.revoke` (memerlukan scope `operator.pairing`).
-- Penerbitan/rotasi token tetap dibatasi ke himpunan role yang disetujui yang tercatat di
+- Penerbitan/rotasi token tetap dibatasi pada kumpulan role yang telah disetujui dan dicatat dalam
   entri pairing perangkat tersebut; merotasi token tidak dapat memperluas perangkat ke
   role yang tidak pernah diberikan oleh persetujuan pairing.
-- Untuk sesi token paired-device, manajemen perangkat dibatasi ke diri sendiri kecuali
+- Untuk sesi token perangkat yang dipasangkan, manajemen perangkat memiliki scope ke diri sendiri kecuali
   pemanggil juga memiliki `operator.admin`: pemanggil non-admin hanya dapat menghapus/mencabut/merotasi
   entri perangkat **milik mereka sendiri**.
-- `device.token.rotate` juga memeriksa himpunan scope operator yang diminta terhadap
-  scope sesi saat ini milik pemanggil. Pemanggil non-admin tidak dapat merotasi token ke
-  himpunan scope operator yang lebih luas daripada yang sudah mereka miliki.
-- Kegagalan auth menyertakan `error.details.code` plus petunjuk pemulihan:
+- `device.token.rotate` juga memeriksa kumpulan scope operator yang diminta terhadap
+  scope sesi pemanggil saat ini. Pemanggil non-admin tidak dapat merotasi token ke
+  kumpulan scope operator yang lebih luas daripada yang sudah mereka miliki.
+- Kegagalan auth mencakup `error.details.code` beserta petunjuk pemulihan:
   - `error.details.canRetryWithDeviceToken` (boolean)
   - `error.details.recommendedNextStep` (`retry_with_device_token`, `update_auth_configuration`, `update_auth_credentials`, `wait_then_retry`, `review_auth_configuration`)
-- Perilaku klien untuk `AUTH_TOKEN_MISMATCH`:
-  - Klien tepercaya dapat mencoba satu retry terbatas dengan token per-perangkat cache.
-  - Jika retry itu gagal, klien harus menghentikan loop reconnect otomatis dan menampilkan panduan tindakan operator.
+- Perilaku client untuk `AUTH_TOKEN_MISMATCH`:
+  - Client tepercaya dapat mencoba satu retry terbatas dengan token per-device yang di-cache.
+  - Jika retry itu gagal, client harus menghentikan loop reconnect otomatis dan menampilkan panduan tindakan operator.
 
 ## Identitas perangkat + pairing
 
 - Node harus menyertakan identitas perangkat yang stabil (`device.id`) yang diturunkan dari
   fingerprint keypair.
 - Gateway menerbitkan token per perangkat + role.
-- Persetujuan pairing diperlukan untuk `device.id` baru kecuali auto-approval lokal
+- Persetujuan pairing diperlukan untuk ID perangkat baru kecuali auto-approval lokal
   diaktifkan.
-- Pairing auto-approval berpusat pada koneksi local loopback langsung.
+- Auto-approval pairing berpusat pada koneksi loopback lokal langsung.
 - OpenClaw juga memiliki jalur self-connect backend/container-local yang sempit untuk
   alur helper shared-secret tepercaya.
 - Koneksi tailnet atau LAN pada host yang sama tetap diperlakukan sebagai remote untuk pairing dan
   memerlukan persetujuan.
-- Semua klien WS harus menyertakan identitas `device` selama `connect` (operator + node).
-  Control UI hanya dapat menghilangkannya dalam mode berikut:
+- Semua client WS harus menyertakan identitas `device` selama `connect` (operator + node).
+  Control UI dapat menghilangkannya hanya dalam mode berikut:
   - `gateway.controlUi.allowInsecureAuth=true` untuk kompatibilitas HTTP tidak aman khusus localhost.
   - auth operator Control UI `gateway.auth.mode: "trusted-proxy"` yang berhasil.
-  - `gateway.controlUi.dangerouslyDisableDeviceAuth=true` (break-glass, penurunan keamanan yang parah).
+  - `gateway.controlUi.dangerouslyDisableDeviceAuth=true` (break-glass, penurunan keamanan yang berat).
 - Semua koneksi harus menandatangani nonce `connect.challenge` yang diberikan server.
 
 ### Diagnostik migrasi auth perangkat
 
-Untuk klien lama yang masih menggunakan perilaku penandatanganan pra-challenge, `connect` sekarang mengembalikan
+Untuk client legacy yang masih menggunakan perilaku penandatanganan pra-challenge, `connect` kini mengembalikan
 kode detail `DEVICE_AUTH_*` di bawah `error.details.code` dengan `error.details.reason` yang stabil.
 
 Kegagalan migrasi umum:
 
-| Pesan                       | details.code                     | details.reason           | Arti                                                |
-| --------------------------- | -------------------------------- | ------------------------ | --------------------------------------------------- |
-| `device nonce required`     | `DEVICE_AUTH_NONCE_REQUIRED`     | `device-nonce-missing`   | Klien menghilangkan `device.nonce` (atau mengirim kosong). |
-| `device nonce mismatch`     | `DEVICE_AUTH_NONCE_MISMATCH`     | `device-nonce-mismatch`  | Klien menandatangani dengan nonce basi/salah.       |
-| `device signature invalid`  | `DEVICE_AUTH_SIGNATURE_INVALID`  | `device-signature`       | Payload signature tidak cocok dengan payload v2.    |
+| Message                     | details.code                     | details.reason           | Meaning                                            |
+| --------------------------- | -------------------------------- | ------------------------ | -------------------------------------------------- |
+| `device nonce required`     | `DEVICE_AUTH_NONCE_REQUIRED`     | `device-nonce-missing`   | Client tidak menyertakan `device.nonce` (atau mengirim kosong). |
+| `device nonce mismatch`     | `DEVICE_AUTH_NONCE_MISMATCH`     | `device-nonce-mismatch`  | Client menandatangani dengan nonce yang stale/salah. |
+| `device signature invalid`  | `DEVICE_AUTH_SIGNATURE_INVALID`  | `device-signature`       | Payload tanda tangan tidak cocok dengan payload v2. |
 | `device signature expired`  | `DEVICE_AUTH_SIGNATURE_EXPIRED`  | `device-signature-stale` | Timestamp yang ditandatangani berada di luar skew yang diizinkan. |
 | `device identity mismatch`  | `DEVICE_AUTH_DEVICE_ID_MISMATCH` | `device-id-mismatch`     | `device.id` tidak cocok dengan fingerprint public key. |
-| `device public key invalid` | `DEVICE_AUTH_PUBLIC_KEY_INVALID` | `device-public-key`      | Format/kanonisasi public key gagal.                 |
+| `device public key invalid` | `DEVICE_AUTH_PUBLIC_KEY_INVALID` | `device-public-key`      | Format/kanonisasi public key gagal.         |
 
 Target migrasi:
 
 - Selalu tunggu `connect.challenge`.
 - Tandatangani payload v2 yang menyertakan nonce server.
 - Kirim nonce yang sama di `connect.params.device.nonce`.
-- Payload signature yang disukai adalah `v3`, yang mengikat `platform` dan `deviceFamily`
+- Payload tanda tangan yang disarankan adalah `v3`, yang mengikat `platform` dan `deviceFamily`
   selain field device/client/role/scopes/token/nonce.
-- Signature `v2` lama tetap diterima untuk kompatibilitas, tetapi pinning metadata
-  paired-device tetap mengendalikan kebijakan perintah saat reconnect.
+- Tanda tangan `v2` legacy tetap diterima untuk kompatibilitas, tetapi pinning metadata
+  perangkat yang dipasangkan tetap mengontrol kebijakan command saat reconnect.
 
 ## TLS + pinning
 
 - TLS didukung untuk koneksi WS.
-- Klien dapat secara opsional mem-pin fingerprint sertifikat gateway (lihat config `gateway.tls`
-  plus `gateway.remote.tlsFingerprint` atau CLI `--tls-fingerprint`).
+- Client dapat secara opsional mem-pin fingerprint sertifikat gateway (lihat konfigurasi `gateway.tls`
+  ditambah `gateway.remote.tlsFingerprint` atau CLI `--tls-fingerprint`).
 
 ## Cakupan
 
-Protokol ini mengekspos **API gateway lengkap** (status, channel, model, chat,
-agent, sesi, node, persetujuan, dan sebagainya). Permukaan pastinya ditentukan oleh
+Protokol ini mengekspos **API gateway penuh** (status, channel, model, chat,
+agent, sesi, Node, persetujuan, dll.). Permukaan yang tepat ditentukan oleh
 skema TypeBox di `src/gateway/protocol/schema.ts`.

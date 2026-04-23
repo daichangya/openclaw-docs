@@ -1,27 +1,32 @@
 ---
+read_when:
+    - Mengubah rendering output asisten di UI Control
+    - Men-debug directive presentasi `[embed ...]`, `MEDIA:`, reply, atau audio
+summary: Protokol shortcode rich output untuk embed, media, hint audio, dan balasan
+title: Protokol Rich Output
 x-i18n:
-    generated_at: "2026-04-11T15:15:49Z"
+    generated_at: "2026-04-23T09:27:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2a8884fc2c304bf96d4675f0c1d1ff781d6dc1ae8c49d92ce08040c9c7709035
+    source_hash: 566338ac0571c6ab9062c6bad0bc4f71fe65249a3fcd9d8e575affcd93db11e7
     source_path: reference/rich-output-protocol.md
     workflow: 15
 ---
 
-# Protokol Output Kaya
+# Protokol Rich Output
 
-Output asisten dapat membawa sekumpulan kecil arahan pengiriman/perenderan:
+Output asisten dapat membawa sekumpulan kecil directive pengiriman/rendering:
 
 - `MEDIA:` untuk pengiriman lampiran
-- `[[audio_as_voice]]` untuk petunjuk penyajian audio
+- `[[audio_as_voice]]` untuk hint presentasi audio
 - `[[reply_to_current]]` / `[[reply_to:<id>]]` untuk metadata balasan
-- `[embed ...]` untuk perenderan kaya UI Kontrol
+- `[embed ...]` untuk rendering kaya UI Control
 
-Arahan ini terpisah. `MEDIA:` dan tag balasan/suara tetap merupakan metadata pengiriman; `[embed ...]` adalah jalur render kaya khusus web.
+Directive ini terpisah. `MEDIA:` dan tag balasan/suara tetap merupakan metadata pengiriman; `[embed ...]` adalah jalur render kaya khusus web.
 
 ## `[embed ...]`
 
-`[embed ...]` adalah satu-satunya sintaks render kaya yang ditujukan untuk agen bagi UI Kontrol.
+`[embed ...]` adalah satu-satunya sintaks render kaya yang ditujukan ke agen untuk UI Control.
 
 Contoh self-closing:
 
@@ -32,13 +37,13 @@ Contoh self-closing:
 Aturan:
 
 - `[view ...]` tidak lagi valid untuk output baru.
-- Kode pendek embed dirender hanya di permukaan pesan asisten.
+- Shortcode embed dirender hanya di surface pesan asisten.
 - Hanya embed berbasis URL yang dirender. Gunakan `ref="..."` atau `url="..."`.
-- Kode pendek embed HTML inline berbentuk blok tidak dirender.
-- UI web menghapus kode pendek dari teks yang terlihat dan merender embed secara inline.
-- `MEDIA:` bukan alias embed dan tidak boleh digunakan untuk perenderan embed kaya.
+- Shortcode embed HTML inline berbentuk blok tidak dirender.
+- UI web menghapus shortcode dari teks yang terlihat dan merender embed secara inline.
+- `MEDIA:` bukan alias embed dan tidak boleh digunakan untuk rendering rich embed.
 
-## Bentuk Perenderan yang Disimpan
+## Bentuk Rendering yang Tersimpan
 
 Blok konten asisten yang dinormalisasi/disimpan adalah item `canvas` terstruktur:
 

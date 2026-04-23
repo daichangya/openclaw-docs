@@ -1,22 +1,21 @@
 ---
 read_when:
     - Anda ingin menggunakan model Tencent Hy dengan OpenClaw
-    - Anda memerlukan penyiapan kunci API TokenHub
+    - Anda memerlukan penyiapan API key TokenHub
 summary: Penyiapan Tencent Cloud TokenHub
 title: Tencent Cloud (TokenHub)
 x-i18n:
-    generated_at: "2026-04-22T09:15:26Z"
+    generated_at: "2026-04-23T09:27:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04da073973792c55dc0c2d287bfc51187bb2128bbbd5c4a483f850adeea50ab5
+    source_hash: 90fce0d5957b261439cacd2b4df2362ed69511cb047af6a76ccaf54004806041
     source_path: providers/tencent.md
     workflow: 15
 ---
 
 # Tencent Cloud (TokenHub)
 
-Provider Tencent Cloud memberikan akses ke model Tencent Hy melalui endpoint TokenHub
-(`tencent-tokenhub`).
+Tencent Cloud dikirim sebagai **Plugin provider bawaan** di OpenClaw. Ini memberikan akses ke model Tencent Hy melalui endpoint TokenHub (`tencent-tokenhub`).
 
 Provider ini menggunakan API yang kompatibel dengan OpenAI.
 
@@ -39,7 +38,7 @@ openclaw onboard --non-interactive \
 
 ## Provider dan endpoint
 
-| Provider           | Endpoint                      | Kasus penggunaan        |
+| Provider           | Endpoint                      | Use case                |
 | ------------------ | ----------------------------- | ----------------------- |
 | `tencent-tokenhub` | `tokenhub.tencentmaas.com/v1` | Hy melalui Tencent TokenHub |
 
@@ -47,14 +46,15 @@ openclaw onboard --non-interactive \
 
 ### tencent-tokenhub
 
-- **hy3-preview** — Pratinjau Hy3 (konteks 256K, penalaran, default)
+- **hy3-preview** — pratinjau Hy3 (konteks 256K, reasoning, default)
 
 ## Catatan
 
-- Referensi model TokenHub menggunakan `tencent-tokenhub/<modelId>`.
-- Ganti metadata harga dan konteks di `models.providers` jika diperlukan.
+- Model ref TokenHub menggunakan `tencent-tokenhub/<modelId>`.
+- Plugin ini dikirim dengan metadata harga Hy3 bertingkat yang sudah bawaan, sehingga estimasi biaya terisi tanpa override harga manual.
+- Override metadata harga dan konteks di `models.providers` jika diperlukan.
 
-## Catatan lingkungan
+## Catatan environment
 
 Jika Gateway berjalan sebagai daemon (launchd/systemd), pastikan `TOKENHUB_API_KEY`
 tersedia untuk proses tersebut (misalnya, di `~/.openclaw/.env` atau melalui

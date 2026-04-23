@@ -1,44 +1,43 @@
 ---
 read_when:
     - Anda ingin menggunakan model Volcano Engine atau Doubao dengan OpenClaw
-    - Anda memerlukan penyiapan kunci API Volcengine
+    - Anda memerlukan penyiapan API key Volcengine
 summary: Penyiapan Volcano Engine (model Doubao, endpoint umum + coding)
 title: Volcengine (Doubao)
 x-i18n:
-    generated_at: "2026-04-12T23:33:13Z"
+    generated_at: "2026-04-23T09:27:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a21f390da719f79c88c6d55a7d952d35c2ce5ff26d910c9f10020132cd7d2f4c
+    source_hash: 4d803e965699bedf06cc7ea4e902ffc92e4a168be012224e845820069fd67acc
     source_path: providers/volcengine.md
     workflow: 15
 ---
 
 # Volcengine (Doubao)
 
-Provider Volcengine memberikan akses ke model Doubao dan model pihak ketiga
-yang dihosting di Volcano Engine, dengan endpoint terpisah untuk beban kerja
-umum dan coding.
+Provider Volcengine memberi akses ke model Doubao dan model pihak ketiga
+yang di-host di Volcano Engine, dengan endpoint terpisah untuk workload umum dan coding.
 
-| Detail    | Value                                               |
-| --------- | --------------------------------------------------- |
-| Provider  | `volcengine` (umum) + `volcengine-plan` (coding)    |
-| Autentikasi | `VOLCANO_ENGINE_API_KEY`                          |
-| API       | Kompatibel OpenAI                                   |
+| Detail    | Nilai                                              |
+| --------- | -------------------------------------------------- |
+| Providers | `volcengine` (umum) + `volcengine-plan` (coding)   |
+| Auth      | `VOLCANO_ENGINE_API_KEY`                           |
+| API       | Kompatibel OpenAI                                  |
 
 ## Memulai
 
 <Steps>
-  <Step title="Tetapkan kunci API">
+  <Step title="Atur API key">
     Jalankan onboarding interaktif:
 
     ```bash
     openclaw onboard --auth-choice volcengine-api-key
     ```
 
-    Ini mendaftarkan provider umum (`volcengine`) dan coding (`volcengine-plan`) dari satu kunci API.
+    Ini mendaftarkan provider umum (`volcengine`) dan coding (`volcengine-plan`) dari satu API key.
 
   </Step>
-  <Step title="Tetapkan model default">
+  <Step title="Atur model default">
     ```json5
     {
       agents: {
@@ -49,7 +48,7 @@ umum dan coding.
     }
     ```
   </Step>
-  <Step title="Verifikasi bahwa model tersedia">
+  <Step title="Verifikasi model tersedia">
     ```bash
     openclaw models list --provider volcengine
     openclaw models list --provider volcengine-plan
@@ -58,7 +57,7 @@ umum dan coding.
 </Steps>
 
 <Tip>
-Untuk penyiapan non-interaktif (CI, scripting), berikan key secara langsung:
+Untuk penyiapan non-interaktif (CI, skrip), berikan key secara langsung:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -77,7 +76,7 @@ openclaw onboard --non-interactive \
 | `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | Model coding     |
 
 <Note>
-Kedua provider dikonfigurasi dari satu kunci API. Penyiapan mendaftarkan keduanya secara otomatis.
+Kedua provider dikonfigurasi dari satu API key. Penyiapan mendaftarkan keduanya secara otomatis.
 </Note>
 
 ## Model yang tersedia
@@ -110,26 +109,26 @@ Kedua provider dikonfigurasi dari satu kunci API. Penyiapan mendaftarkan keduany
   <Accordion title="Model default setelah onboarding">
     `openclaw onboard --auth-choice volcengine-api-key` saat ini menetapkan
     `volcengine-plan/ark-code-latest` sebagai model default sambil juga mendaftarkan
-    katalog `volcengine` umum.
+    katalog umum `volcengine`.
   </Accordion>
 
   <Accordion title="Perilaku fallback pemilih model">
-    Selama pemilihan model onboarding/configure, opsi autentikasi Volcengine memprioritaskan
+    Selama pemilihan model onboarding/configure, pilihan auth Volcengine lebih memilih
     baris `volcengine/*` dan `volcengine-plan/*`. Jika model tersebut belum
-    dimuat, OpenClaw akan kembali ke katalog tanpa filter alih-alih menampilkan
-    pemilih yang scoped ke provider namun kosong.
+    dimuat, OpenClaw akan fallback ke katalog tanpa filter alih-alih menampilkan
+    pemilih kosong yang dicakup ke provider.
   </Accordion>
 
-  <Accordion title="Variabel lingkungan untuk proses daemon">
+  <Accordion title="Variabel environment untuk proses daemon">
     Jika Gateway berjalan sebagai daemon (launchd/systemd), pastikan
-    `VOLCANO_ENGINE_API_KEY` tersedia untuk proses tersebut (misalnya, di
+    `VOLCANO_ENGINE_API_KEY` tersedia untuk proses tersebut (misalnya di
     `~/.openclaw/.env` atau melalui `env.shellEnv`).
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Saat menjalankan OpenClaw sebagai layanan latar belakang, variabel lingkungan yang ditetapkan di shell
-interaktif Anda tidak diwariskan secara otomatis. Lihat catatan daemon di atas.
+Saat menjalankan OpenClaw sebagai layanan latar belakang, variabel environment yang diatur di
+shell interaktif Anda tidak otomatis diwariskan. Lihat catatan daemon di atas.
 </Warning>
 
 ## Terkait
@@ -138,8 +137,8 @@ interaktif Anda tidak diwariskan secara otomatis. Lihat catatan daemon di atas.
   <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
     Memilih provider, ref model, dan perilaku failover.
   </Card>
-  <Card title="Konfigurasi" href="/id/gateway/configuration" icon="gear">
-    Referensi config lengkap untuk agent, model, dan provider.
+  <Card title="Configuration" href="/id/gateway/configuration" icon="gear">
+    Referensi config lengkap untuk agen, model, dan provider.
   </Card>
   <Card title="Pemecahan masalah" href="/id/help/troubleshooting" icon="wrench">
     Masalah umum dan langkah debugging.

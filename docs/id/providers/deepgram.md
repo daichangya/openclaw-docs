@@ -1,35 +1,39 @@
 ---
 read_when:
     - Anda menginginkan speech-to-text Deepgram untuk lampiran audio
-    - Anda memerlukan contoh config Deepgram singkat
-summary: Transkripsi Deepgram untuk catatan suara masuk
+    - Anda menginginkan transkripsi streaming Deepgram untuk Voice Call
+    - Anda memerlukan contoh konfigurasi Deepgram singkat
+summary: Transkripsi Deepgram untuk voice note masuk
 title: Deepgram
 x-i18n:
-    generated_at: "2026-04-12T23:30:25Z"
+    generated_at: "2026-04-23T09:26:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 091523d6669e3d258f07c035ec756bd587299b6c7025520659232b1b2c1e21a5
+    source_hash: 0b05f0f436a723c6e7697612afa0f8cb7e2b84a722d4ec12fae9c0bece945407
     source_path: providers/deepgram.md
     workflow: 15
 ---
 
 # Deepgram (Transkripsi Audio)
 
-Deepgram adalah API speech-to-text. Di OpenClaw, ini digunakan untuk **transkripsi audio/catatan suara masuk**
-melalui `tools.media.audio`.
+Deepgram adalah API speech-to-text. Di OpenClaw, Deepgram digunakan untuk
+transkripsi audio/voice note masuk melalui `tools.media.audio` dan untuk STT
+streaming Voice Call melalui `plugins.entries.voice-call.config.streaming`.
 
-Saat diaktifkan, OpenClaw mengunggah file audio ke Deepgram dan menyisipkan transkrip
-ke pipeline balasan (`{{Transcript}}` + blok `[Audio]`). Ini **bukan streaming**;
-ini menggunakan endpoint transkripsi rekaman siap pakai.
+Untuk transkripsi batch, OpenClaw mengunggah file audio lengkap ke Deepgram
+dan menyuntikkan transkrip ke pipeline balasan (`{{Transcript}}` +
+blok `[Audio]`). Untuk streaming Voice Call, OpenClaw meneruskan frame G.711
+u-law langsung melalui endpoint WebSocket `listen` Deepgram dan memancarkan
+transkrip parsial atau final saat Deepgram mengembalikannya.
 
 | Detail        | Nilai                                                      |
 | ------------- | ---------------------------------------------------------- |
 | Situs web     | [deepgram.com](https://deepgram.com)                       |
-| Dokumen       | [developers.deepgram.com](https://developers.deepgram.com) |
+| Docs          | [developers.deepgram.com](https://developers.deepgram.com) |
 | Auth          | `DEEPGRAM_API_KEY`                                         |
 | Model default | `nova-3`                                                   |
 
-## Memulai
+## Mulai
 
 <Steps>
   <Step title="Setel API key Anda">
@@ -54,21 +58,21 @@ ini menggunakan endpoint transkripsi rekaman siap pakai.
     }
     ```
   </Step>
-  <Step title="Kirim catatan suara">
-    Kirim pesan audio melalui channel terhubung apa pun. OpenClaw akan mentranskripsikannya
-    melalui Deepgram dan menyisipkan transkrip ke pipeline balasan.
+  <Step title="Kirim voice note">
+    Kirim pesan audio melalui channel yang terhubung. OpenClaw akan mentranskripsikannya
+    melalui Deepgram dan menyuntikkan transkrip ke pipeline balasan.
   </Step>
 </Steps>
 
 ## Opsi konfigurasi
 
-| Opsi              | Path                                                         | Deskripsi                               |
-| ----------------- | ------------------------------------------------------------ | --------------------------------------- |
-| `model`           | `tools.media.audio.models[].model`                           | ID model Deepgram (default: `nova-3`)   |
-| `language`        | `tools.media.audio.models[].language`                        | Petunjuk bahasa (opsional)              |
-| `detect_language` | `tools.media.audio.providerOptions.deepgram.detect_language` | Aktifkan deteksi bahasa (opsional)      |
-| `punctuate`       | `tools.media.audio.providerOptions.deepgram.punctuate`       | Aktifkan tanda baca (opsional)          |
-| `smart_format`    | `tools.media.audio.providerOptions.deepgram.smart_format`    | Aktifkan pemformatan cerdas (opsional)  |
+| Opsi              | Path                                                         | Deskripsi                            |
+| ----------------- | ------------------------------------------------------------ | ------------------------------------ |
+| `model`           | `tools.media.audio.models[].model`                           | ID model Deepgram (default: `nova-3`) |
+| `language`        | `tools.media.audio.models[].language`                        | Petunjuk bahasa (opsional)           |
+| `detect_language` | `tools.media.audio.providerOptions.deepgram.detect_language` | Aktifkan deteksi bahasa (opsional)   |
+| `punctuate`       | `tools.media.audio.providerOptions.deepgram.punctuate`       | Aktifkan tanda baca (opsional)       |
+| `smart_format`    | `tools.media.audio.providerOptions.deepgram.smart_format`    | Aktifkan pemformatan pintar (opsional) |
 
 <Tabs>
   <Tab title="Dengan petunjuk bahasa">
@@ -108,42 +112,82 @@ ini menggunakan endpoint transkripsi rekaman siap pakai.
   </Tab>
 </Tabs>
 
+## STT streaming Voice Call
+
+Plugin bawaan `deepgram` juga mendaftarkan provider transkripsi realtime
+untuk plugin Voice Call.
+
+| Pengaturan      | Path konfigurasi                                                       | Default                          |
+| --------------- | ---------------------------------------------------------------------- | -------------------------------- |
+| API key         | `plugins.entries.voice-call.config.streaming.providers.deepgram.apiKey` | Fallback ke `DEEPGRAM_API_KEY`   |
+| Model           | `...deepgram.model`                                                    | `nova-3`                         |
+| Language        | `...deepgram.language`                                                 | (tidak disetel)                  |
+| Encoding        | `...deepgram.encoding`                                                 | `mulaw`                          |
+| Sample rate     | `...deepgram.sampleRate`                                               | `8000`                           |
+| Endpointing     | `...deepgram.endpointingMs`                                            | `800`                            |
+| Interim results | `...deepgram.interimResults`                                           | `true`                           |
+
+```json5
+{
+  plugins: {
+    entries: {
+      "voice-call": {
+        config: {
+          streaming: {
+            enabled: true,
+            provider: "deepgram",
+            providers: {
+              deepgram: {
+                apiKey: "${DEEPGRAM_API_KEY}",
+                model: "nova-3",
+                endpointingMs: 800,
+                language: "en-US",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+<Note>
+Voice Call menerima audio telepon sebagai G.711 u-law 8 kHz. Provider
+streaming Deepgram default ke `encoding: "mulaw"` dan `sampleRate: 8000`, sehingga
+frame media Twilio dapat diteruskan secara langsung.
+</Note>
+
 ## Catatan
 
 <AccordionGroup>
   <Accordion title="Autentikasi">
     Autentikasi mengikuti urutan auth provider standar. `DEEPGRAM_API_KEY` adalah
-    jalur yang paling sederhana.
+    jalur paling sederhana.
   </Accordion>
   <Accordion title="Proxy dan endpoint kustom">
-    Override endpoint atau header dengan `tools.media.audio.baseUrl` dan
+    Timpa endpoint atau header dengan `tools.media.audio.baseUrl` dan
     `tools.media.audio.headers` saat menggunakan proxy.
   </Accordion>
   <Accordion title="Perilaku output">
     Output mengikuti aturan audio yang sama seperti provider lain (batas ukuran, timeout,
-    penyisipan transkrip).
+    penyuntikan transkrip).
   </Accordion>
 </AccordionGroup>
-
-<Note>
-Transkripsi Deepgram bersifat **khusus rekaman siap pakai** (bukan streaming real-time). OpenClaw
-mengunggah file audio lengkap dan menunggu transkrip penuh sebelum menyisipkannya
-ke dalam percakapan.
-</Note>
 
 ## Terkait
 
 <CardGroup cols={2}>
-  <Card title="Tool media" href="/tools/media" icon="photo-film">
+  <Card title="Media tools" href="/id/tools/media-overview" icon="photo-film">
     Ikhtisar pipeline pemrosesan audio, gambar, dan video.
   </Card>
-  <Card title="Konfigurasi" href="/id/gateway/configuration" icon="gear">
-    Referensi config lengkap termasuk pengaturan tool media.
+  <Card title="Configuration" href="/id/gateway/configuration" icon="gear">
+    Referensi konfigurasi lengkap termasuk pengaturan tool media.
   </Card>
-  <Card title="Pemecahan masalah" href="/id/help/troubleshooting" icon="wrench">
+  <Card title="Troubleshooting" href="/id/help/troubleshooting" icon="wrench">
     Masalah umum dan langkah debugging.
   </Card>
   <Card title="FAQ" href="/id/help/faq" icon="circle-question">
-    Pertanyaan yang sering diajukan tentang penyiapan OpenClaw.
+    Pertanyaan umum tentang penyiapan OpenClaw.
   </Card>
 </CardGroup>

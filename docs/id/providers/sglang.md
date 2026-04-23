@@ -5,22 +5,26 @@ read_when:
 summary: Jalankan OpenClaw dengan SGLang (server self-hosted yang kompatibel dengan OpenAI)
 title: SGLang
 x-i18n:
-    generated_at: "2026-04-12T23:32:43Z"
+    generated_at: "2026-04-23T09:27:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e0a2e50a499c3d25dcdc3af425fb023c6e3f19ed88f533ecf0eb8a2cb7ec8b0d
+    source_hash: 96f243c6028d9de104c96c8e921e5bec1a685db06b80465617f33fe29d5c472d
     source_path: providers/sglang.md
     workflow: 15
 ---
 
 # SGLang
 
-SGLang dapat menyajikan model open-source melalui API HTTP **yang kompatibel dengan OpenAI**.
+SGLang dapat melayani model open-source melalui API HTTP **yang kompatibel dengan OpenAI**.
 OpenClaw dapat terhubung ke SGLang menggunakan API `openai-completions`.
 
-OpenClaw juga dapat **menemukan otomatis** model yang tersedia dari SGLang saat Anda melakukan opt-in
-dengan `SGLANG_API_KEY` (nilai apa pun berfungsi jika server Anda tidak menerapkan auth)
-dan Anda tidak mendefinisikan entri `models.providers.sglang` secara eksplisit.
+OpenClaw juga dapat **menemukan model yang tersedia secara otomatis** dari SGLang saat Anda ikut
+serta dengan `SGLANG_API_KEY` (nilai apa pun berfungsi jika server Anda tidak menegakkan auth)
+dan Anda tidak mendefinisikan entri `models.providers.sglang` yang eksplisit.
+
+OpenClaw memperlakukan `sglang` sebagai provider lokal yang kompatibel dengan OpenAI yang mendukung
+pencatatan penggunaan berbasis streaming, sehingga jumlah token status/konteks dapat diperbarui dari
+respons `stream_options.include_usage`.
 
 ## Memulai
 
@@ -33,15 +37,15 @@ dan Anda tidak mendefinisikan entri `models.providers.sglang` secara eksplisit.
     - `http://127.0.0.1:30000/v1`
 
   </Step>
-  <Step title="Setel API key">
-    Nilai apa pun berfungsi jika tidak ada auth yang dikonfigurasi pada server Anda:
+  <Step title="Atur API key">
+    Nilai apa pun berfungsi jika tidak ada auth yang dikonfigurasi di server Anda:
 
     ```bash
     export SGLANG_API_KEY="sglang-local"
     ```
 
   </Step>
-  <Step title="Jalankan onboarding atau setel model secara langsung">
+  <Step title="Jalankan onboarding atau atur model secara langsung">
     ```bash
     openclaw onboard
     ```
@@ -63,25 +67,25 @@ dan Anda tidak mendefinisikan entri `models.providers.sglang` secara eksplisit.
 
 ## Penemuan model (provider implisit)
 
-Saat `SGLANG_API_KEY` disetel (atau profil auth ada) dan Anda **tidak**
-mendefinisikan `models.providers.sglang`, OpenClaw akan mengueri:
+Saat `SGLANG_API_KEY` diatur (atau auth profile ada) dan Anda **tidak**
+mendefinisikan `models.providers.sglang`, OpenClaw akan mengkueri:
 
 - `GET http://127.0.0.1:30000/v1/models`
 
-dan mengubah ID yang dikembalikan menjadi entri model.
+dan mengonversi ID yang dikembalikan menjadi entri model.
 
 <Note>
-Jika Anda menyetel `models.providers.sglang` secara eksplisit, penemuan otomatis dilewati dan
+Jika Anda mengatur `models.providers.sglang` secara eksplisit, penemuan otomatis dilewati dan
 Anda harus mendefinisikan model secara manual.
 </Note>
 
 ## Konfigurasi eksplisit (model manual)
 
-Gunakan konfigurasi eksplisit ketika:
+Gunakan config eksplisit saat:
 
-- SGLang berjalan di host/port yang berbeda.
+- SGLang berjalan pada host/port yang berbeda.
 - Anda ingin mem-pin nilai `contextWindow`/`maxTokens`.
-- Server Anda memerlukan API key sungguhan (atau Anda ingin mengontrol header).
+- Server Anda memerlukan API key nyata (atau Anda ingin mengontrol header).
 
 ```json5
 {
@@ -112,12 +116,12 @@ Gunakan konfigurasi eksplisit ketika:
 
 <AccordionGroup>
   <Accordion title="Perilaku bergaya proxy">
-    SGLang diperlakukan sebagai backend `/v1` bergaya proxy yang kompatibel dengan OpenAI, bukan
+    SGLang diperlakukan sebagai backend `/v1` yang kompatibel dengan OpenAI bergaya proxy, bukan
     endpoint OpenAI native.
 
     | Behavior | SGLang |
     |----------|--------|
-    | Pembentukan permintaan khusus OpenAI | Tidak diterapkan |
+    | Pembentukan request khusus OpenAI | Tidak diterapkan |
     | `service_tier`, Responses `store`, petunjuk prompt-cache | Tidak dikirim |
     | Pembentukan payload kompatibilitas reasoning | Tidak diterapkan |
     | Header atribusi tersembunyi (`originator`, `version`, `User-Agent`) | Tidak disuntikkan pada base URL SGLang kustom |
@@ -127,7 +131,7 @@ Gunakan konfigurasi eksplisit ketika:
   <Accordion title="Pemecahan masalah">
     **Server tidak dapat dijangkau**
 
-    Verifikasi bahwa server berjalan dan merespons:
+    Verifikasi server berjalan dan merespons:
 
     ```bash
     curl http://127.0.0.1:30000/v1/models
@@ -135,13 +139,13 @@ Gunakan konfigurasi eksplisit ketika:
 
     **Error auth**
 
-    Jika permintaan gagal dengan error auth, setel `SGLANG_API_KEY` sungguhan yang sesuai
+    Jika request gagal dengan error auth, atur `SGLANG_API_KEY` nyata yang cocok
     dengan konfigurasi server Anda, atau konfigurasikan provider secara eksplisit di bawah
     `models.providers.sglang`.
 
     <Tip>
-    Jika Anda menjalankan SGLang tanpa autentikasi, nilai apa pun yang tidak kosong untuk
-    `SGLANG_API_KEY` sudah cukup untuk melakukan opt-in ke penemuan model.
+    Jika Anda menjalankan SGLang tanpa autentikasi, nilai non-kosong apa pun untuk
+    `SGLANG_API_KEY` sudah cukup untuk ikut serta dalam penemuan model.
     </Tip>
 
   </Accordion>
@@ -154,6 +158,6 @@ Gunakan konfigurasi eksplisit ketika:
     Memilih provider, ref model, dan perilaku failover.
   </Card>
   <Card title="Referensi konfigurasi" href="/id/gateway/configuration-reference" icon="gear">
-    Skema konfigurasi lengkap termasuk entri provider.
+    Skema config lengkap termasuk entri provider.
   </Card>
 </CardGroup>

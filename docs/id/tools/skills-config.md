@@ -1,22 +1,22 @@
 ---
 read_when:
-    - Menambahkan atau memodifikasi konfigurasi Skills
+    - Menambahkan atau mengubah konfigurasi Skills
     - Menyesuaikan allowlist bawaan atau perilaku instalasi
-summary: Schema konfigurasi Skills dan contohnya
+summary: Skema konfigurasi Skills dan contoh-contohnya
 title: Konfigurasi Skills
 x-i18n:
-    generated_at: "2026-04-21T09:24:47Z"
+    generated_at: "2026-04-23T09:29:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8af3a51af5d6d6af355c529bb8ec0a045046c635d8fff0dec20cd875ec12e88b
+    source_hash: 7f3b0a5946242bb5c07fd88678c88e3ee62cda514a5afcc9328f67853e05ad3f
     source_path: tools/skills-config.md
     workflow: 15
 ---
 
 # Konfigurasi Skills
 
-Sebagian besar konfigurasi loader/instalasi Skills berada di bawah `skills` dalam
-`~/.openclaw/openclaw.json`. Visibilitas skill khusus agen berada di bawah
+Sebagian besar konfigurasi loader/instalasi skill berada di bawah `skills` di
+`~/.openclaw/openclaw.json`. Visibilitas skill khusus agent berada di bawah
 `agents.defaults.skills` dan `agents.list[].skills`.
 
 ```json5
@@ -30,7 +30,7 @@ Sebagian besar konfigurasi loader/instalasi Skills berada di bawah `skills` dala
     },
     install: {
       preferBrew: true,
-      nodeManager: "npm", // npm | pnpm | yarn | bun (runtime Gateway tetap Node; bun tidak direkomendasikan)
+      nodeManager: "npm", // npm | pnpm | yarn | bun (runtime Gateway tetap Node; bun tidak disarankan)
     },
     entries: {
       "image-lab": {
@@ -47,9 +47,9 @@ Sebagian besar konfigurasi loader/instalasi Skills berada di bawah `skills` dala
 }
 ```
 
-Untuk pembuatan/pengeditan gambar bawaan, utamakan `agents.defaults.imageGenerationModel`
-ditambah tool inti `image_generate`. `skills.entries.*` hanya untuk alur kerja skill kustom atau
-pihak ketiga.
+Untuk generasi/editing gambar bawaan, pilih `agents.defaults.imageGenerationModel`
+plus tool core `image_generate`. `skills.entries.*` hanya untuk alur kerja skill
+kustom atau pihak ketiga.
 
 Jika Anda memilih provider/model gambar tertentu, konfigurasikan juga
 auth/API key provider tersebut. Contoh umum: `GEMINI_API_KEY` atau `GOOGLE_API_KEY` untuk
@@ -57,13 +57,13 @@ auth/API key provider tersebut. Contoh umum: `GEMINI_API_KEY` atau `GOOGLE_API_K
 
 Contoh:
 
-- Konfigurasi gaya Nano Banana native: `agents.defaults.imageGenerationModel.primary: "google/gemini-3.1-flash-image-preview"`
-- Konfigurasi fal native: `agents.defaults.imageGenerationModel.primary: "fal/fal-ai/flux/dev"`
+- Penyiapan native bergaya Nano Banana Pro: `agents.defaults.imageGenerationModel.primary: "google/gemini-3-pro-image-preview"`
+- Penyiapan fal native: `agents.defaults.imageGenerationModel.primary: "fal/fal-ai/flux/dev"`
 
-## Allowlist skill agen
+## Allowlist skill agent
 
-Gunakan konfigurasi agen ketika Anda menginginkan root skill mesin/workspace yang sama, tetapi
-dengan himpunan skill yang terlihat berbeda per agen.
+Gunakan konfigurasi agent saat Anda menginginkan root skill mesin/workspace yang sama, tetapi
+set skill terlihat yang berbeda per agent.
 
 ```json5
 {
@@ -74,7 +74,7 @@ dengan himpunan skill yang terlihat berbeda per agen.
     list: [
       { id: "writer" }, // mewarisi default -> github, weather
       { id: "docs", skills: ["docs-search"] }, // menggantikan default
-      { id: "locked-down", skills: [] }, // tanpa skill
+      { id: "locked-down", skills: [] }, // tanpa Skills
     ],
   },
 }
@@ -82,59 +82,59 @@ dengan himpunan skill yang terlihat berbeda per agen.
 
 Aturan:
 
-- `agents.defaults.skills`: baseline allowlist bersama untuk agen yang menghilangkan
+- `agents.defaults.skills`: baseline allowlist bersama untuk agent yang menghilangkan
   `agents.list[].skills`.
-- Hilangkan `agents.defaults.skills` agar skill tidak dibatasi secara default.
-- `agents.list[].skills`: himpunan skill final eksplisit untuk agen tersebut; tidak
+- Hilangkan `agents.defaults.skills` untuk membiarkan skill tidak dibatasi secara default.
+- `agents.list[].skills`: set skill akhir eksplisit untuk agent tersebut; tidak
   digabungkan dengan default.
-- `agents.list[].skills: []`: jangan tampilkan skill apa pun untuk agen tersebut.
+- `agents.list[].skills: []`: jangan tampilkan skill apa pun untuk agent tersebut.
 
 ## Field
 
 - Root skill bawaan selalu mencakup `~/.openclaw/skills`, `~/.agents/skills`,
   `<workspace>/.agents/skills`, dan `<workspace>/skills`.
-- `allowBundled`: allowlist opsional hanya untuk Skills **bawaan**. Saat diatur, hanya
-  Skills bawaan dalam daftar yang memenuhi syarat (skill terkelola, agen, dan workspace tidak terpengaruh).
+- `allowBundled`: allowlist opsional hanya untuk skill **bawaan**. Saat disetel, hanya
+  skill bawaan dalam daftar yang memenuhi syarat (skill terkelola, agent, dan workspace tidak terpengaruh).
 - `load.extraDirs`: direktori skill tambahan untuk dipindai (prioritas terendah).
 - `load.watch`: pantau folder skill dan segarkan snapshot Skills (default: true).
 - `load.watchDebounceMs`: debounce untuk peristiwa watcher skill dalam milidetik (default: 250).
-- `install.preferBrew`: utamakan installer brew saat tersedia (default: true).
+- `install.preferBrew`: pilih installer brew jika tersedia (default: true).
 - `install.nodeManager`: preferensi installer node (`npm` | `pnpm` | `yarn` | `bun`, default: npm).
   Ini hanya memengaruhi **instalasi skill**; runtime Gateway tetap harus Node
-  (Bun tidak direkomendasikan untuk WhatsApp/Telegram).
+  (Bun tidak disarankan untuk WhatsApp/Telegram).
   - `openclaw setup --node-manager` lebih sempit dan saat ini menerima `npm`,
-    `pnpm`, atau `bun`. Setel `skills.install.nodeManager: "yarn"` secara manual jika Anda
-    menginginkan instalasi skill berbasis Yarn.
+    `pnpm`, atau `bun`. Tetapkan `skills.install.nodeManager: "yarn"` secara manual jika Anda
+    ingin instalasi skill berbasis Yarn.
 - `entries.<skillKey>`: override per skill.
-- `agents.defaults.skills`: allowlist skill default opsional yang diwarisi oleh agen
+- `agents.defaults.skills`: allowlist skill default opsional yang diwarisi oleh agent
   yang menghilangkan `agents.list[].skills`.
-- `agents.list[].skills`: allowlist skill final per agen yang opsional; daftar eksplisit
-  menggantikan default turunan alih-alih menggabungkannya.
+- `agents.list[].skills`: allowlist skill akhir per agent yang opsional; daftar
+  eksplisit menggantikan default yang diwarisi alih-alih menggabungkannya.
 
 Field per skill:
 
-- `enabled`: setel `false` untuk menonaktifkan skill meskipun skill itu bawaan/terinstal.
-- `env`: variabel lingkungan yang disuntikkan untuk proses agen (hanya jika belum diatur).
-- `apiKey`: kemudahan opsional untuk skill yang mendeklarasikan variabel env utama.
+- `enabled`: tetapkan `false` untuk menonaktifkan skill meskipun skill tersebut bawaan/terinstal.
+- `env`: variabel lingkungan yang disuntikkan untuk run agent (hanya jika belum disetel).
+- `apiKey`: kemudahan opsional untuk skill yang mendeklarasikan env var utama.
   Mendukung string plaintext atau objek SecretRef (`{ source, provider, id }`).
 
 ## Catatan
 
-- Key di bawah `entries` dipetakan ke nama skill secara default. Jika suatu skill mendefinisikan
-  `metadata.openclaw.skillKey`, gunakan key itu sebagai gantinya.
+- Kunci di bawah `entries` dipetakan ke nama skill secara default. Jika suatu skill mendefinisikan
+  `metadata.openclaw.skillKey`, gunakan kunci itu sebagai gantinya.
 - Prioritas pemuatan adalah `<workspace>/skills` → `<workspace>/.agents/skills` →
-  `~/.agents/skills` → `~/.openclaw/skills` → Skills bawaan →
+  `~/.agents/skills` → `~/.openclaw/skills` → skill bawaan →
   `skills.load.extraDirs`.
-- Perubahan pada skill diambil pada giliran agen berikutnya saat watcher diaktifkan.
+- Perubahan pada skill diambil pada giliran agent berikutnya saat watcher diaktifkan.
 
-### Skills tersandbox + variabel env
+### Skill tersandbox + env var
 
-Saat sebuah sesi **tersandbox**, proses skill berjalan di dalam
-backend sandbox yang dikonfigurasi. Sandbox **tidak** mewarisi `process.env` host.
+Saat sesi **disandbox**, proses skill berjalan di dalam backend
+sandbox yang dikonfigurasi. Sandbox **tidak** mewarisi `process.env` host.
 
 Gunakan salah satu dari:
 
-- `agents.defaults.sandbox.docker.env` untuk backend Docker (atau `agents.list[].sandbox.docker.env` per agen)
-- bake env ke image sandbox kustom Anda atau lingkungan sandbox jarak jauh
+- `agents.defaults.sandbox.docker.env` untuk backend Docker (atau `agents.list[].sandbox.docker.env` per-agent)
+- bake env ke image sandbox kustom atau environment sandbox jarak jauh Anda
 
-`env` global dan `skills.entries.<skill>.env/apiKey` hanya berlaku untuk proses **host**.
+`env` global dan `skills.entries.<skill>.env/apiKey` hanya berlaku untuk run **host**.

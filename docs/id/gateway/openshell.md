@@ -1,15 +1,15 @@
 ---
 read_when:
     - Anda ingin sandbox yang dikelola di cloud alih-alih Docker lokal
-    - Anda sedang menyiapkan plugin OpenShell
+    - Anda sedang menyiapkan Plugin OpenShell
     - Anda perlu memilih antara mode workspace mirror dan remote
 summary: Gunakan OpenShell sebagai backend sandbox terkelola untuk agen OpenClaw
 title: OpenShell
 x-i18n:
-    generated_at: "2026-04-05T13:54:23Z"
+    generated_at: "2026-04-23T09:21:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: aaf9027d0632a70fb86455f8bc46dc908ff766db0eb0cdf2f7df39c715241ead
+    source_hash: 2534127b293364659a14df3e36583a9b7120f5d55cdbd8b4b611efe44adc7ff8
     source_path: gateway/openshell.md
     workflow: 15
 ---
@@ -18,23 +18,22 @@ x-i18n:
 
 OpenShell adalah backend sandbox terkelola untuk OpenClaw. Alih-alih menjalankan container Docker
 secara lokal, OpenClaw mendelegasikan siklus hidup sandbox ke CLI `openshell`,
-yang menyediakan environment jarak jauh dengan eksekusi perintah berbasis SSH.
+yang memprovisikan environment remote dengan eksekusi perintah berbasis SSH.
 
-Plugin OpenShell menggunakan kembali transport SSH inti yang sama dan bridge
-filesystem jarak jauh yang sama seperti [backend SSH](/gateway/sandboxing#ssh-backend) generik. Plugin ini menambahkan
-siklus hidup khusus OpenShell (`sandbox create/get/delete`, `sandbox ssh-config`)
+Plugin OpenShell menggunakan ulang transport SSH inti yang sama dan bridge sistem file remote
+seperti [backend SSH](/id/gateway/sandboxing#ssh-backend) generik. Plugin ini menambahkan siklus hidup khusus OpenShell (`sandbox create/get/delete`, `sandbox ssh-config`)
 dan mode workspace `mirror` opsional.
 
 ## Prasyarat
 
-- CLI `openshell` terinstal dan ada di `PATH` (atau setel path kustom melalui
+- CLI `openshell` terinstal dan ada di `PATH` (atau atur path kustom melalui
   `plugins.entries.openshell.config.command`)
 - Akun OpenShell dengan akses sandbox
-- OpenClaw Gateway berjalan di host
+- Gateway OpenClaw berjalan di host
 
-## Mulai cepat
+## Memulai cepat
 
-1. Aktifkan plugin dan setel backend sandbox:
+1. Aktifkan Plugin dan atur backend sandbox:
 
 ```json5
 {
@@ -62,7 +61,7 @@ dan mode workspace `mirror` opsional.
 }
 ```
 
-2. Mulai ulang Gateway. Pada giliran agen berikutnya, OpenClaw membuat sandbox OpenShell
+2. Restart Gateway. Pada giliran agen berikutnya, OpenClaw membuat sandbox OpenShell
    dan merutekan eksekusi tool melaluinya.
 
 3. Verifikasi:
@@ -74,19 +73,19 @@ openclaw sandbox explain
 
 ## Mode workspace
 
-Ini adalah keputusan paling penting saat menggunakan OpenShell.
+Ini adalah keputusan terpenting saat menggunakan OpenShell.
 
 ### `mirror`
 
-Gunakan `plugins.entries.openshell.config.mode: "mirror"` saat Anda ingin **workspace lokal
-tetap menjadi yang kanonis**.
+Gunakan `plugins.entries.openshell.config.mode: "mirror"` saat Anda ingin **workspace
+lokal tetap menjadi kanonis**.
 
 Perilaku:
 
 - Sebelum `exec`, OpenClaw menyinkronkan workspace lokal ke sandbox OpenShell.
-- Setelah `exec`, OpenClaw menyinkronkan workspace jarak jauh kembali ke workspace lokal.
+- Setelah `exec`, OpenClaw menyinkronkan workspace remote kembali ke workspace lokal.
 - Tool file tetap beroperasi melalui bridge sandbox, tetapi workspace lokal
-  tetap menjadi source of truth di antara giliran.
+  tetap menjadi sumber kebenaran antar-giliran.
 
 Paling cocok untuk:
 
@@ -95,44 +94,44 @@ Paling cocok untuk:
 - Anda ingin sandbox OpenShell berperilaku semirip mungkin dengan backend Docker.
 - Anda ingin workspace host mencerminkan penulisan sandbox setelah setiap giliran exec.
 
-Tradeoff: biaya sinkronisasi tambahan sebelum dan setelah setiap exec.
+Tradeoff: biaya sinkronisasi tambahan sebelum dan sesudah setiap exec.
 
 ### `remote`
 
-Gunakan `plugins.entries.openshell.config.mode: "remote"` saat Anda ingin
-**workspace OpenShell menjadi yang kanonis**.
+Gunakan `plugins.entries.openshell.config.mode: "remote"` saat Anda ingin **workspace
+OpenShell menjadi kanonis**.
 
 Perilaku:
 
-- Saat sandbox pertama kali dibuat, OpenClaw melakukan seed workspace jarak jauh dari
+- Saat sandbox pertama kali dibuat, OpenClaw melakukan seed workspace remote dari
   workspace lokal satu kali.
 - Setelah itu, `exec`, `read`, `write`, `edit`, dan `apply_patch` beroperasi
-  langsung terhadap workspace OpenShell jarak jauh.
-- OpenClaw **tidak** menyinkronkan perubahan jarak jauh kembali ke workspace lokal.
-- Pembacaan media pada waktu prompt tetap berfungsi karena tool file dan media membaca melalui
+  langsung pada workspace OpenShell remote.
+- OpenClaw **tidak** menyinkronkan perubahan remote kembali ke workspace lokal.
+- Pembacaan media saat prompt tetap berfungsi karena tool file dan media membaca melalui
   bridge sandbox.
 
 Paling cocok untuk:
 
-- Sandbox seharusnya hidup terutama di sisi jarak jauh.
-- Anda ingin overhead sinkronisasi per giliran lebih rendah.
-- Anda tidak ingin edit lokal host diam-diam menimpa status sandbox jarak jauh.
+- Sandbox seharusnya hidup terutama di sisi remote.
+- Anda menginginkan overhead sinkronisasi per giliran yang lebih rendah.
+- Anda tidak ingin edit lokal di host diam-diam menimpa status sandbox remote.
 
 Penting: jika Anda mengedit file di host di luar OpenClaw setelah seed awal,
-sandbox jarak jauh **tidak** melihat perubahan tersebut. Gunakan
+sandbox remote **tidak** melihat perubahan tersebut. Gunakan
 `openclaw sandbox recreate` untuk melakukan seed ulang.
 
 ### Memilih mode
 
-|                          | `mirror`                    | `remote`                  |
-| ------------------------ | --------------------------- | ------------------------- |
-| **Workspace kanonis**    | Host lokal                  | OpenShell jarak jauh      |
-| **Arah sinkronisasi**    | Dua arah (setiap exec)      | Seed satu kali            |
-| **Overhead per giliran** | Lebih tinggi (unggah + unduh) | Lebih rendah (operasi jarak jauh langsung) |
-| **Edit lokal terlihat?** | Ya, pada exec berikutnya    | Tidak, sampai recreate    |
-| **Paling cocok untuk**   | Alur kerja pengembangan     | Agen jangka panjang, CI   |
+|                          | `mirror`                     | `remote`                  |
+| ------------------------ | ---------------------------- | ------------------------- |
+| **Workspace kanonis**    | Host lokal                   | OpenShell remote          |
+| **Arah sinkronisasi**    | Dua arah (setiap exec)       | Seed satu kali            |
+| **Overhead per giliran** | Lebih tinggi (unggah + unduh) | Lebih rendah (operasi remote langsung) |
+| **Edit lokal terlihat?** | Ya, pada exec berikutnya     | Tidak, sampai recreate    |
+| **Paling cocok untuk**   | Alur kerja pengembangan      | Agen jangka panjang, CI   |
 
-## Referensi konfigurasi
+## Referensi config
 
 Semua config OpenShell berada di bawah `plugins.entries.openshell.config`:
 
@@ -145,15 +144,15 @@ Semua config OpenShell berada di bawah `plugins.entries.openshell.config`:
 | `gatewayEndpoint`         | `string`                 | —             | URL endpoint gateway OpenShell (`--gateway-endpoint`) |
 | `policy`                  | `string`                 | —             | ID kebijakan OpenShell untuk pembuatan sandbox        |
 | `providers`               | `string[]`               | `[]`          | Nama provider yang dilampirkan saat sandbox dibuat    |
-| `gpu`                     | `boolean`                | `false`       | Meminta resource GPU                                  |
-| `autoProviders`           | `boolean`                | `true`        | Meneruskan `--auto-providers` saat pembuatan sandbox  |
-| `remoteWorkspaceDir`      | `string`                 | `"/sandbox"`  | Workspace tulis utama di dalam sandbox                |
+| `gpu`                     | `boolean`                | `false`       | Minta resource GPU                                    |
+| `autoProviders`           | `boolean`                | `true`        | Teruskan `--auto-providers` saat membuat sandbox      |
+| `remoteWorkspaceDir`      | `string`                 | `"/sandbox"`  | Workspace writable utama di dalam sandbox             |
 | `remoteAgentWorkspaceDir` | `string`                 | `"/agent"`    | Path mount workspace agen (untuk akses read-only)     |
-| `timeoutSeconds`          | `number`                 | `120`         | Timeout untuk operasi CLI `openshell`                 |
+| `timeoutSeconds`          | `number`                 | `120`         | Batas waktu untuk operasi CLI `openshell`             |
 
 Pengaturan tingkat sandbox (`mode`, `scope`, `workspaceAccess`) dikonfigurasi di bawah
 `agents.defaults.sandbox` seperti backend lainnya. Lihat
-[Sandboxing](/gateway/sandboxing) untuk matriks lengkap.
+[Sandboxing](/id/gateway/sandboxing) untuk matriks lengkap.
 
 ## Contoh
 
@@ -262,18 +261,18 @@ openclaw sandbox list
 # Periksa kebijakan efektif
 openclaw sandbox explain
 
-# Recreate (menghapus workspace jarak jauh, seed ulang pada penggunaan berikutnya)
+# Recreate (menghapus workspace remote, melakukan seed ulang pada penggunaan berikutnya)
 openclaw sandbox recreate --all
 ```
 
-Untuk mode `remote`, **recreate sangat penting**: ini menghapus workspace jarak jauh
-kanonis untuk cakupan tersebut. Penggunaan berikutnya melakukan seed workspace jarak jauh baru dari
+Untuk mode `remote`, **recreate sangat penting**: perintah ini menghapus workspace remote
+kanonis untuk cakupan tersebut. Penggunaan berikutnya melakukan seed workspace remote baru dari
 workspace lokal.
 
-Untuk mode `mirror`, recreate terutama mereset environment eksekusi jarak jauh karena
-workspace lokal tetap menjadi yang kanonis.
+Untuk mode `mirror`, recreate terutama mereset environment eksekusi remote karena
+workspace lokal tetap kanonis.
 
-### Kapan harus recreate
+### Kapan melakukan recreate
 
 Lakukan recreate setelah mengubah salah satu dari ini:
 
@@ -286,27 +285,34 @@ Lakukan recreate setelah mengubah salah satu dari ini:
 openclaw sandbox recreate --all
 ```
 
+## Penguatan keamanan
+
+OpenShell mem-pin fd root workspace dan memeriksa ulang identitas sandbox sebelum setiap
+pembacaan, sehingga pertukaran symlink atau workspace yang di-remount tidak dapat mengalihkan pembacaan keluar dari
+workspace remote yang dimaksud.
+
 ## Keterbatasan saat ini
 
 - Browser sandbox tidak didukung pada backend OpenShell.
 - `sandbox.docker.binds` tidak berlaku untuk OpenShell.
-- Pengaturan runtime khusus Docker di bawah `sandbox.docker.*` hanya berlaku untuk backend Docker.
+- Knop runtime khusus Docker di bawah `sandbox.docker.*` hanya berlaku untuk backend
+  Docker.
 
 ## Cara kerjanya
 
 1. OpenClaw memanggil `openshell sandbox create` (dengan flag `--from`, `--gateway`,
    `--policy`, `--providers`, `--gpu` sesuai konfigurasi).
 2. OpenClaw memanggil `openshell sandbox ssh-config <name>` untuk mendapatkan detail
-   koneksi SSH untuk sandbox.
-3. Core menulis config SSH ke file sementara dan membuka sesi SSH menggunakan
-   bridge filesystem jarak jauh yang sama seperti backend SSH generik.
-4. Dalam mode `mirror`: sinkronkan lokal ke jarak jauh sebelum exec, jalankan, sinkronkan kembali setelah exec.
-5. Dalam mode `remote`: seed satu kali saat create, lalu beroperasi langsung pada
-   workspace jarak jauh.
+   koneksi SSH bagi sandbox.
+3. Inti menulis config SSH ke file sementara dan membuka sesi SSH menggunakan
+   bridge sistem file remote yang sama seperti backend SSH generik.
+4. Dalam mode `mirror`: sinkronkan lokal ke remote sebelum exec, jalankan, sinkronkan kembali setelah exec.
+5. Dalam mode `remote`: lakukan seed sekali saat create, lalu beroperasi langsung pada workspace
+   remote.
 
 ## Lihat juga
 
-- [Sandboxing](/gateway/sandboxing) -- mode, cakupan, dan perbandingan backend
-- [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated) -- debugging tool yang diblokir
-- [Multi-Agent Sandbox and Tools](/tools/multi-agent-sandbox-tools) -- override per agen
-- [Sandbox CLI](/cli/sandbox) -- perintah `openclaw sandbox`
+- [Sandboxing](/id/gateway/sandboxing) -- mode, cakupan, dan perbandingan backend
+- [Sandbox vs Kebijakan Tool vs Elevated](/id/gateway/sandbox-vs-tool-policy-vs-elevated) -- debugging tool yang diblokir
+- [Sandbox dan Tool Multi-Agen](/id/tools/multi-agent-sandbox-tools) -- override per agen
+- [CLI Sandbox](/id/cli/sandbox) -- perintah `openclaw sandbox`

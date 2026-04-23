@@ -1,32 +1,32 @@
 ---
 read_when:
-    - Anda sedang menambahkan wizard setup ke sebuah plugin
+    - Anda sedang menambahkan wizard penyiapan ke sebuah plugin
     - Anda perlu memahami `setup-entry.ts` vs `index.ts`
-    - Anda sedang mendefinisikan skema config plugin atau metadata openclaw di `package.json`
+    - Anda sedang mendefinisikan schema konfigurasi plugin atau metadata `openclaw` di `package.json`
 sidebarTitle: Setup and Config
-summary: Wizard setup, `setup-entry.ts`, skema config, dan metadata `package.json`
-title: Setup dan Config Plugin
+summary: Wizard penyiapan, `setup-entry.ts`, schema konfigurasi, dan metadata `package.json`
+title: Penyiapan dan Konfigurasi Plugin
 x-i18n:
-    generated_at: "2026-04-21T09:22:39Z"
+    generated_at: "2026-04-23T09:25:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 5de51b55c04b4f05947bc2d4de9c34e24a26e4ca8b3ff9b1711288a8e5b63273
+    source_hash: 110cf9aa1bfaeb286d38963cfba2006502e853dd603a126d1c179cbc9b60aea1
     source_path: plugins/sdk-setup.md
     workflow: 15
 ---
 
-# Setup dan Config Plugin
+# Penyiapan dan Konfigurasi Plugin
 
-Referensi untuk packaging plugin (metadata `package.json`), manifes
-(`openclaw.plugin.json`), entri setup, dan skema config.
+Referensi untuk packaging plugin (metadata `package.json`), manifest
+(`openclaw.plugin.json`), setup entry, dan schema konfigurasi.
 
 <Tip>
   **Mencari panduan langkah demi langkah?** Panduan how-to membahas packaging dalam konteks:
-  [Plugin Channel](/id/plugins/sdk-channel-plugins#step-1-package-and-manifest) dan
-  [Plugin Provider](/id/plugins/sdk-provider-plugins#step-1-package-and-manifest).
+  [Channel Plugins](/id/plugins/sdk-channel-plugins#step-1-package-and-manifest) dan
+  [Provider Plugins](/id/plugins/sdk-provider-plugins#step-1-package-and-manifest).
 </Tip>
 
-## Metadata paket
+## Metadata package
 
 `package.json` Anda memerlukan field `openclaw` yang memberi tahu sistem plugin apa
 yang disediakan plugin Anda:
@@ -72,46 +72,46 @@ yang disediakan plugin Anda:
 ```
 
 Jika Anda memublikasikan plugin secara eksternal di ClawHub, field `compat` dan `build`
-tersebut wajib. Cuplikan publish kanonis ada di
+tersebut wajib. Snippet publish kanonis berada di
 `docs/snippets/plugin-publish/`.
 
 ### Field `openclaw`
 
-| Field        | Type       | Description                                                                                            |
-| ------------ | ---------- | ------------------------------------------------------------------------------------------------------ |
-| `extensions` | `string[]` | File entry point (relatif ke root paket)                                                               |
-| `setupEntry` | `string`   | Entri ringan khusus setup (opsional)                                                                   |
-| `channel`    | `object`   | Metadata katalog channel untuk permukaan setup, picker, quickstart, dan status                         |
-| `providers`  | `string[]` | ID provider yang didaftarkan oleh plugin ini                                                           |
-| `install`    | `object`   | Petunjuk instalasi: `npmSpec`, `localPath`, `defaultChoice`, `minHostVersion`, `allowInvalidConfigRecovery` |
-| `startup`    | `object`   | Flag perilaku startup                                                                                  |
+| Field        | Tipe       | Deskripsi                                                                                                                 |
+| ------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `extensions` | `string[]` | File entry point (relatif terhadap root package)                                                                          |
+| `setupEntry` | `string`   | Entry ringan khusus penyiapan (opsional)                                                                                  |
+| `channel`    | `object`   | Metadata katalog channel untuk surface penyiapan, picker, quickstart, dan status                                          |
+| `providers`  | `string[]` | ID provider yang didaftarkan oleh plugin ini                                                                              |
+| `install`    | `object`   | Petunjuk instalasi: `npmSpec`, `localPath`, `defaultChoice`, `minHostVersion`, `expectedIntegrity`, `allowInvalidConfigRecovery` |
+| `startup`    | `object`   | Flag perilaku startup                                                                                                     |
 
 ### `openclaw.channel`
 
-`openclaw.channel` adalah metadata paket ringan untuk penemuan channel dan permukaan
-setup sebelum runtime dimuat.
+`openclaw.channel` adalah metadata package ringan untuk penemuan channel dan surface
+penyiapan sebelum runtime dimuat.
 
-| Field                                  | Type       | What it means                                                                 |
+| Field                                  | Tipe       | Artinya                                                                       |
 | -------------------------------------- | ---------- | ----------------------------------------------------------------------------- |
 | `id`                                   | `string`   | ID channel kanonis.                                                           |
 | `label`                                | `string`   | Label channel utama.                                                          |
-| `selectionLabel`                       | `string`   | Label picker/setup saat perlu berbeda dari `label`.                           |
-| `detailLabel`                          | `string`   | Label detail sekunder untuk katalog channel dan permukaan status yang lebih kaya. |
-| `docsPath`                             | `string`   | Path docs untuk setup dan tautan pemilihan.                                   |
-| `docsLabel`                            | `string`   | Timpa label yang digunakan untuk tautan docs saat perlu berbeda dari ID channel. |
-| `blurb`                                | `string`   | Deskripsi onboarding/katalog singkat.                                         |
-| `order`                                | `number`   | Urutan sortir di katalog channel.                                             |
+| `selectionLabel`                       | `string`   | Label picker/penyiapan bila harus berbeda dari `label`.                       |
+| `detailLabel`                          | `string`   | Label detail sekunder untuk katalog channel dan surface status yang lebih kaya. |
+| `docsPath`                             | `string`   | Path docs untuk tautan penyiapan dan pemilihan.                               |
+| `docsLabel`                            | `string`   | Override label yang digunakan untuk tautan docs saat harus berbeda dari ID channel. |
+| `blurb`                                | `string`   | Deskripsi singkat onboarding/katalog.                                         |
+| `order`                                | `number`   | Urutan sortir dalam katalog channel.                                          |
 | `aliases`                              | `string[]` | Alias lookup tambahan untuk pemilihan channel.                                |
-| `preferOver`                           | `string[]` | ID plugin/channel prioritas lebih rendah yang harus dikalahkan oleh channel ini. |
-| `systemImage`                          | `string`   | Nama icon/system-image opsional untuk katalog UI channel.                     |
-| `selectionDocsPrefix`                  | `string`   | Teks awalan sebelum tautan docs di permukaan pemilihan.                       |
-| `selectionDocsOmitLabel`               | `boolean`  | Tampilkan path docs secara langsung alih-alih tautan docs berlabel dalam salinan pemilihan. |
-| `selectionExtras`                      | `string[]` | String pendek tambahan yang ditambahkan dalam salinan pemilihan.              |
-| `markdownCapable`                      | `boolean`  | Menandai channel sebagai mampu Markdown untuk keputusan pemformatan outbound.  |
-| `exposure`                             | `object`   | Kontrol visibilitas channel untuk setup, daftar terkonfigurasi, dan permukaan docs. |
-| `quickstartAllowFrom`                  | `boolean`  | Mengikutsertakan channel ini ke alur setup quickstart `allowFrom` standar.    |
-| `forceAccountBinding`                  | `boolean`  | Wajibkan binding akun eksplisit bahkan ketika hanya ada satu akun.            |
-| `preferSessionLookupForAnnounceTarget` | `boolean`  | Prioritaskan lookup sesi saat me-resolve target announce untuk channel ini.    |
+| `preferOver`                           | `string[]` | ID plugin/channel prioritas lebih rendah yang harus dikalahkan channel ini.   |
+| `systemImage`                          | `string`   | Nama ikon/system-image opsional untuk katalog UI channel.                     |
+| `selectionDocsPrefix`                  | `string`   | Teks prefiks sebelum tautan docs dalam surface pemilihan.                     |
+| `selectionDocsOmitLabel`               | `boolean`  | Tampilkan path docs secara langsung alih-alih tautan docs berlabel dalam copy pemilihan. |
+| `selectionExtras`                      | `string[]` | String pendek tambahan yang ditambahkan dalam copy pemilihan.                 |
+| `markdownCapable`                      | `boolean`  | Menandai channel sebagai mampu markdown untuk keputusan pemformatan keluar.    |
+| `exposure`                             | `object`   | Kontrol visibilitas channel untuk surface penyiapan, daftar terkonfigurasi, dan docs. |
+| `quickstartAllowFrom`                  | `boolean`  | Memilih channel ini ke alur penyiapan quickstart `allowFrom` standar.         |
+| `forceAccountBinding`                  | `boolean`  | Mewajibkan binding akun eksplisit bahkan saat hanya ada satu akun.            |
+| `preferSessionLookupForAnnounceTarget` | `boolean`  | Lebih mengutamakan lookup sesi saat menyelesaikan target announce untuk channel ini. |
 
 Contoh:
 
@@ -125,7 +125,7 @@ Contoh:
       "detailLabel": "My Channel Bot",
       "docsPath": "/channels/my-channel",
       "docsLabel": "my-channel",
-      "blurb": "Integrasi obrolan self-hosted berbasis webhook.",
+      "blurb": "Integrasi chat self-hosted berbasis Webhook.",
       "order": 80,
       "aliases": ["mc"],
       "preferOver": ["my-channel-legacy"],
@@ -145,36 +145,59 @@ Contoh:
 
 `exposure` mendukung:
 
-- `configured`: sertakan channel di permukaan daftar bergaya configured/status
-- `setup`: sertakan channel di picker setup/configure interaktif
-- `docs`: tandai channel sebagai berhadapan publik di permukaan docs/navigasi
+- `configured`: sertakan channel dalam surface daftar bergaya configured/status
+- `setup`: sertakan channel dalam picker penyiapan/konfigurasi interaktif
+- `docs`: tandai channel sebagai menghadap publik dalam surface docs/navigasi
 
-`showConfigured` dan `showInSetup` tetap didukung sebagai alias lama. Sebaiknya gunakan
+`showConfigured` dan `showInSetup` tetap didukung sebagai alias legacy. Sebaiknya gunakan
 `exposure`.
 
 ### `openclaw.install`
 
-`openclaw.install` adalah metadata paket, bukan metadata manifes.
+`openclaw.install` adalah metadata package, bukan metadata manifest.
 
-| Field                        | Type                 | What it means                                                                    |
+| Field                        | Tipe                 | Artinya                                                                          |
 | ---------------------------- | -------------------- | -------------------------------------------------------------------------------- |
 | `npmSpec`                    | `string`             | Spec npm kanonis untuk alur install/update.                                      |
-| `localPath`                  | `string`             | Path instalasi lokal pengembangan atau bawaan.                                   |
-| `defaultChoice`              | `"npm"` \| `"local"` | Sumber instalasi yang dipilih saat keduanya tersedia.                            |
+| `localPath`                  | `string`             | Path instalasi development lokal atau bawaan.                                    |
+| `defaultChoice`              | `"npm"` \| `"local"` | Sumber instalasi yang diutamakan saat keduanya tersedia.                         |
 | `minHostVersion`             | `string`             | Versi OpenClaw minimum yang didukung dalam bentuk `>=x.y.z`.                     |
-| `allowInvalidConfigRecovery` | `boolean`            | Memungkinkan alur instal ulang plugin bawaan memulihkan kegagalan config usang tertentu. |
+| `expectedIntegrity`          | `string`             | String integritas dist npm yang diharapkan, biasanya `sha512-...`, untuk instalasi yang di-pin. |
+| `allowInvalidConfigRecovery` | `boolean`            | Memungkinkan alur instal ulang plugin bawaan pulih dari kegagalan konfigurasi stale tertentu. |
 
-Jika `minHostVersion` disetel, instalasi dan pemuatan registri manifes sama-sama menegakkannya.
-Host yang lebih lama melewati plugin; string versi yang tidak valid ditolak.
+Onboarding interaktif juga menggunakan `openclaw.install` untuk surface
+install-on-demand. Jika plugin Anda mengekspos pilihan auth provider atau metadata
+penyiapan/katalog channel sebelum runtime dimuat, onboarding dapat menampilkan pilihan itu, meminta pilihan instalasi npm vs lokal, menginstal atau mengaktifkan plugin, lalu melanjutkan alur yang dipilih. Pilihan onboarding npm memerlukan metadata katalog tepercaya dengan
+`npmSpec` registry; versi exact dan `expectedIntegrity` adalah pin opsional. Jika
+`expectedIntegrity` ada, alur install/update menegakkannya. Pertahankan metadata "apa yang ditampilkan" di `openclaw.plugin.json` dan metadata "cara menginstalnya"
+di `package.json`.
 
-`allowInvalidConfigRecovery` bukan bypass umum untuk config rusak. Ini
-hanya untuk pemulihan sempit plugin bawaan, sehingga instal ulang/setup dapat memperbaiki sisa upgrade yang diketahui seperti path plugin bawaan yang hilang atau entri `channels.<id>`
-yang usang untuk plugin yang sama. Jika config rusak karena alasan yang tidak terkait, instalasi
-tetap gagal tertutup dan memberi tahu operator untuk menjalankan `openclaw doctor --fix`.
+Jika `minHostVersion` disetel, instalasi dan pemuatan manifest-registry sama-sama menegakkannya. Host yang lebih lama melewati plugin; string versi yang tidak valid ditolak.
 
-### Muat penuh tertunda
+Untuk instalasi npm yang di-pin, pertahankan versi exact dalam `npmSpec` dan tambahkan
+integritas artefak yang diharapkan:
 
-Plugin channel dapat ikut serta dalam pemuatan tertunda dengan:
+```json
+{
+  "openclaw": {
+    "install": {
+      "npmSpec": "@wecom/wecom-openclaw-plugin@1.2.3",
+      "expectedIntegrity": "sha512-REPLACE_WITH_NPM_DIST_INTEGRITY",
+      "defaultChoice": "npm"
+    }
+  }
+}
+```
+
+`allowInvalidConfigRecovery` bukan bypass umum untuk konfigurasi yang rusak. Ini
+hanya untuk pemulihan plugin bawaan yang sempit, sehingga instal ulang/penyiapan dapat memperbaiki sisa upgrade yang diketahui
+seperti path plugin bawaan yang hilang atau entri `channels.<id>`
+yang stale untuk plugin yang sama. Jika konfigurasi rusak karena alasan yang tidak terkait, instalasi
+tetap gagal secara fail-closed dan memberi tahu operator untuk menjalankan `openclaw doctor --fix`.
+
+### Penundaan pemuatan penuh
+
+Plugin channel dapat memilih pemuatan tertunda dengan:
 
 ```json
 {
@@ -188,39 +211,39 @@ Plugin channel dapat ikut serta dalam pemuatan tertunda dengan:
 }
 ```
 
-Saat diaktifkan, OpenClaw hanya memuat `setupEntry` selama fase startup
-pra-listen, bahkan untuk channel yang sudah terkonfigurasi. Entri penuh dimuat setelah
-gateway mulai listen.
+Saat diaktifkan, OpenClaw hanya memuat `setupEntry` selama fase startup pra-listen,
+bahkan untuk channel yang sudah dikonfigurasi. Entry penuh dimuat setelah
+Gateway mulai mendengarkan.
 
 <Warning>
-  Aktifkan pemuatan tertunda hanya ketika `setupEntry` Anda mendaftarkan semua yang
-  dibutuhkan gateway sebelum mulai listen (registrasi channel, rute HTTP,
-  metode gateway). Jika entri penuh memiliki capability startup yang diperlukan, pertahankan
+  Aktifkan pemuatan tertunda hanya jika `setupEntry` Anda mendaftarkan semua yang
+  dibutuhkan Gateway sebelum mulai mendengarkan (registrasi channel, rute HTTP,
+  metode Gateway). Jika entry penuh memiliki kapabilitas startup yang wajib, pertahankan
   perilaku default.
 </Warning>
 
-Jika entri setup/penuh Anda mendaftarkan metode gateway RPC, simpan pada
-prefix khusus plugin. Namespace admin inti yang dicadangkan (`config.*`,
-`exec.approvals.*`, `wizard.*`, `update.*`) tetap dimiliki inti dan selalu di-resolve
+Jika setup/full entry Anda mendaftarkan metode Gateway RPC, pertahankan metode itu pada
+prefiks khusus plugin. Namespace admin inti yang dicadangkan (`config.*`,
+`exec.approvals.*`, `wizard.*`, `update.*`) tetap dimiliki core dan selalu diselesaikan
 ke `operator.admin`.
 
-## Manifes plugin
+## Manifest plugin
 
-Setiap plugin native harus mengirim `openclaw.plugin.json` di root paket.
-OpenClaw menggunakan ini untuk memvalidasi config tanpa mengeksekusi kode plugin.
+Setiap plugin native harus mengirim `openclaw.plugin.json` di root package.
+OpenClaw menggunakan ini untuk memvalidasi konfigurasi tanpa mengeksekusi kode plugin.
 
 ```json
 {
   "id": "my-plugin",
   "name": "My Plugin",
-  "description": "Menambahkan capability My Plugin ke OpenClaw",
+  "description": "Menambahkan kapabilitas My Plugin ke OpenClaw",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "webhookSecret": {
         "type": "string",
-        "description": "Secret verifikasi webhook"
+        "description": "Rahasia verifikasi Webhook"
       }
     }
   }
@@ -242,7 +265,7 @@ Untuk plugin channel, tambahkan `kind` dan `channels`:
 }
 ```
 
-Bahkan plugin tanpa config pun harus mengirim skema. Skema kosong valid:
+Bahkan plugin tanpa konfigurasi pun harus mengirim schema. Schema kosong itu valid:
 
 ```json
 {
@@ -254,24 +277,24 @@ Bahkan plugin tanpa config pun harus mengirim skema. Skema kosong valid:
 }
 ```
 
-Lihat [Manifes Plugin](/id/plugins/manifest) untuk referensi skema lengkap.
+Lihat [Plugin Manifest](/id/plugins/manifest) untuk referensi schema lengkap.
 
-## Publishing ClawHub
+## Publikasi ClawHub
 
-Untuk paket plugin, gunakan perintah ClawHub khusus paket:
+Untuk package plugin, gunakan perintah ClawHub khusus package:
 
 ```bash
 clawhub package publish your-org/your-plugin --dry-run
 clawhub package publish your-org/your-plugin
 ```
 
-Alias publish lama khusus skill diperuntukkan bagi Skills. Paket plugin harus
+Alias publish legacy khusus skill adalah untuk Skills. Package plugin harus
 selalu menggunakan `clawhub package publish`.
 
-## Entri setup
+## Setup entry
 
 File `setup-entry.ts` adalah alternatif ringan untuk `index.ts` yang
-dimuat OpenClaw ketika hanya memerlukan permukaan setup (onboarding, perbaikan config,
+dimuat OpenClaw saat hanya memerlukan surface penyiapan (onboarding, perbaikan konfigurasi,
 pemeriksaan channel yang dinonaktifkan).
 
 ```typescript
@@ -282,81 +305,75 @@ import { myChannelPlugin } from "./src/channel.js";
 export default defineSetupPluginEntry(myChannelPlugin);
 ```
 
-Ini menghindari memuat kode runtime yang berat (library kripto, registrasi CLI,
-layanan latar belakang) selama alur setup.
+Ini menghindari pemuatan kode runtime berat (library kripto, registrasi CLI,
+layanan latar belakang) selama alur penyiapan.
 
-Channel workspace bawaan yang menyimpan ekspor aman-setup di modul sidecar dapat
+Channel workspace bawaan yang menyimpan ekspor aman-untuk-penyiapan di modul sidecar dapat
 menggunakan `defineBundledChannelSetupEntry(...)` dari
 `openclaw/plugin-sdk/channel-entry-contract` alih-alih
-`defineSetupPluginEntry(...)`. Kontrak bawaan itu juga mendukung ekspor `runtime`
-opsional sehingga wiring runtime saat setup tetap ringan dan eksplisit.
+`defineSetupPluginEntry(...)`. Kontrak bawaan itu juga mendukung ekspor
+`runtime` opsional sehingga wiring runtime saat penyiapan dapat tetap ringan dan eksplisit.
 
-**Kapan OpenClaw menggunakan `setupEntry` alih-alih entri penuh:**
+**Saat OpenClaw menggunakan `setupEntry` alih-alih entry penuh:**
 
-- Channel dinonaktifkan tetapi memerlukan permukaan setup/onboarding
+- Channel dinonaktifkan tetapi memerlukan surface penyiapan/onboarding
 - Channel diaktifkan tetapi belum dikonfigurasi
 - Pemuatan tertunda diaktifkan (`deferConfiguredChannelFullLoadUntilAfterListen`)
 
-**Apa yang harus didaftarkan `setupEntry`:**
+**Yang harus didaftarkan oleh `setupEntry`:**
 
 - Objek plugin channel (melalui `defineSetupPluginEntry`)
-- Rute HTTP apa pun yang diperlukan sebelum gateway listen
-- Metode gateway apa pun yang dibutuhkan selama startup
+- Rute HTTP apa pun yang diperlukan sebelum Gateway listen
+- Metode Gateway apa pun yang dibutuhkan selama startup
 
-Metode gateway startup tersebut tetap harus menghindari namespace admin inti
-yang dicadangkan seperti `config.*` atau `update.*`.
+Metode Gateway startup tersebut tetap harus menghindari namespace admin inti yang dicadangkan
+seperti `config.*` atau `update.*`.
 
-**Apa yang TIDAK boleh disertakan `setupEntry`:**
+**Yang TIDAK boleh disertakan dalam `setupEntry`:**
 
 - Registrasi CLI
 - Layanan latar belakang
 - Impor runtime berat (kripto, SDK)
-- Metode gateway yang hanya dibutuhkan setelah startup
+- Metode Gateway yang hanya dibutuhkan setelah startup
 
-### Impor helper setup sempit
+### Impor helper penyiapan yang sempit
 
-Untuk jalur khusus setup yang panas, sebaiknya gunakan seam helper setup yang sempit alih-alih umbrella
-`plugin-sdk/setup` yang lebih luas ketika Anda hanya memerlukan sebagian dari permukaan setup:
+Untuk jalur khusus penyiapan yang panas, sebaiknya gunakan seam helper penyiapan sempit alih-alih umbrella
+`plugin-sdk/setup` yang lebih luas saat Anda hanya membutuhkan sebagian surface penyiapan:
 
-| Import path                        | Use it for                                                                                | Key exports                                                                                                                                                                                                                                                                                  |
-| ---------------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plugin-sdk/setup-runtime`         | helper runtime saat setup yang tetap tersedia di `setupEntry` / startup channel tertunda | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
-| `plugin-sdk/setup-adapter-runtime` | adaptor setup akun yang sadar environment                                                 | `createEnvPatchedAccountSetupAdapter`                                                                                                                                                                                                                                                        |
-| `plugin-sdk/setup-tools`           | helper CLI/arsip/docs untuk setup/install                                                 | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR`                                                                                                                                                                                |
+| Path impor                         | Gunakan untuk                                                                              | Ekspor kunci                                                                                                                                                                                                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `plugin-sdk/setup-runtime`         | helper runtime saat penyiapan yang tetap tersedia di `setupEntry` / startup channel tertunda | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
+| `plugin-sdk/setup-adapter-runtime` | adapter penyiapan akun yang sadar lingkungan                                               | `createEnvPatchedAccountSetupAdapter`                                                                                                                                                                                                                                                     |
+| `plugin-sdk/setup-tools`           | helper CLI/archive/docs untuk penyiapan/instalasi                                          | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR`                                                                                                                                                                           |
 
-Gunakan seam `plugin-sdk/setup` yang lebih luas ketika Anda menginginkan toolbox
-setup bersama lengkap, termasuk helper patch config seperti
+Gunakan seam `plugin-sdk/setup` yang lebih luas saat Anda menginginkan toolbox
+penyiapan bersama penuh, termasuk helper patch konfigurasi seperti
 `moveSingleAccountChannelSectionToDefaultAccount(...)`.
 
-Adaptor patch setup tetap aman untuk hot-path saat diimpor. Lookup permukaan kontrak
-promosi akun tunggal bawaannya bersifat lazy, sehingga mengimpor
-`plugin-sdk/setup-runtime` tidak secara eager memuat discovery permukaan kontrak bawaan
-sebelum adaptor benar-benar digunakan.
+Adapter patch penyiapan tetap aman untuk import pada jalur panas. Lookup surface kontrak promosi satu-akun bawaan mereka bersifat lazy, sehingga mengimpor
+`plugin-sdk/setup-runtime` tidak memuat discovery surface kontrak bawaan secara eager sebelum adapter benar-benar digunakan.
 
-### Promosi akun tunggal milik channel
+### Promosi satu-akun milik channel
 
-Saat sebuah channel meningkatkan config tingkat atas akun tunggal menjadi
+Saat sebuah channel di-upgrade dari konfigurasi tingkat atas satu-akun ke
 `channels.<id>.accounts.*`, perilaku bersama default adalah memindahkan nilai bercakupan akun yang dipromosikan ke `accounts.default`.
 
-Channel bawaan dapat mempersempit atau menimpa promosi itu melalui permukaan kontrak
-setup mereka:
+Channel bawaan dapat mempersempit atau menimpa promosi itu melalui surface
+kontrak penyiapan mereka:
 
-- `singleAccountKeysToMove`: kunci tingkat atas tambahan yang harus dipindahkan ke
-  akun yang dipromosikan
-- `namedAccountPromotionKeys`: ketika akun bernama sudah ada, hanya kunci ini yang
-  dipindahkan ke akun yang dipromosikan; kunci kebijakan/pengiriman bersama tetap di
-  root channel
-- `resolveSingleAccountPromotionTarget(...)`: pilih akun yang ada mana yang
-  menerima nilai yang dipromosikan
+- `singleAccountKeysToMove`: key tingkat atas tambahan yang harus dipindahkan ke akun yang dipromosikan
+- `namedAccountPromotionKeys`: saat named account sudah ada, hanya key ini yang dipindahkan ke akun yang dipromosikan; key kebijakan/pengiriman bersama tetap berada di root channel
+- `resolveSingleAccountPromotionTarget(...)`: memilih akun yang sudah ada mana yang menerima nilai yang dipromosikan
 
-Matrix adalah contoh bawaan saat ini. Jika tepat satu akun Matrix bernama sudah
-ada, atau jika `defaultAccount` menunjuk ke kunci non-kanonis yang ada seperti
-`Ops`, promosi mempertahankan akun itu alih-alih membuat entri baru
-`accounts.default`.
+Matrix adalah contoh bawaan saat ini. Jika tepat satu akun Matrix bernama sudah ada,
+atau jika `defaultAccount` menunjuk ke key non-kanonis yang sudah ada
+seperti `Ops`, promosi mempertahankan akun itu alih-alih membuat entri
+`accounts.default` baru.
 
-## Skema config
+## Schema konfigurasi
 
-Config plugin divalidasi terhadap JSON Schema di manifes Anda. Pengguna
+Konfigurasi plugin divalidasi terhadap JSON Schema dalam manifest Anda. Pengguna
 mengonfigurasi plugin melalui:
 
 ```json5
@@ -373,9 +390,9 @@ mengonfigurasi plugin melalui:
 }
 ```
 
-Plugin Anda menerima config ini sebagai `api.pluginConfig` selama registrasi.
+Plugin Anda menerima konfigurasi ini sebagai `api.pluginConfig` selama registrasi.
 
-Untuk config khusus channel, gunakan bagian config channel sebagai gantinya:
+Untuk konfigurasi khusus channel, gunakan bagian konfigurasi channel sebagai gantinya:
 
 ```json5
 {
@@ -388,10 +405,10 @@ Untuk config khusus channel, gunakan bagian config channel sebagai gantinya:
 }
 ```
 
-### Membangun skema config channel
+### Membangun schema konfigurasi channel
 
-Gunakan `buildChannelConfigSchema` dari `openclaw/plugin-sdk/core` untuk mengubah
-skema Zod menjadi wrapper `ChannelConfigSchema` yang divalidasi OpenClaw:
+Gunakan `buildChannelConfigSchema` dari `openclaw/plugin-sdk/core` untuk mengonversi
+schema Zod menjadi wrapper `ChannelConfigSchema` yang divalidasi OpenClaw:
 
 ```typescript
 import { z } from "zod";
@@ -407,10 +424,10 @@ const accountSchema = z.object({
 const configSchema = buildChannelConfigSchema(accountSchema);
 ```
 
-## Wizard setup
+## Wizard penyiapan
 
-Plugin channel dapat menyediakan wizard setup interaktif untuk `openclaw onboard`.
-Wizard adalah objek `ChannelSetupWizard` pada `ChannelPlugin`:
+Plugin channel dapat menyediakan wizard penyiapan interaktif untuk `openclaw onboard`.
+Wizard ini adalah objek `ChannelSetupWizard` pada `ChannelPlugin`:
 
 ```typescript
 import type { ChannelSetupWizard } from "openclaw/plugin-sdk/channel-setup";
@@ -445,21 +462,20 @@ const setupWizard: ChannelSetupWizard = {
 
 Tipe `ChannelSetupWizard` mendukung `credentials`, `textInputs`,
 `dmPolicy`, `allowFrom`, `groupAccess`, `prepare`, `finalize`, dan lainnya.
-Lihat paket plugin bawaan (misalnya plugin Discord `src/channel.setup.ts`) untuk
+Lihat package plugin bawaan (misalnya plugin Discord `src/channel.setup.ts`) untuk
 contoh lengkap.
 
 Untuk prompt allowlist DM yang hanya memerlukan alur standar
-`note -> prompt -> parse -> merge -> patch`, sebaiknya gunakan helper setup
-bersama dari `openclaw/plugin-sdk/setup`: `createPromptParsedAllowFromForAccount(...)`,
+`note -> prompt -> parse -> merge -> patch`, sebaiknya gunakan helper penyiapan bersama
+dari `openclaw/plugin-sdk/setup`: `createPromptParsedAllowFromForAccount(...)`,
 `createTopLevelChannelParsedAllowFromPrompt(...)`, dan
 `createNestedChannelParsedAllowFromPrompt(...)`.
 
-Untuk blok status setup channel yang hanya bervariasi menurut label, skor, dan
-baris tambahan opsional, sebaiknya gunakan `createStandardChannelSetupStatus(...)` dari
-`openclaw/plugin-sdk/setup` alih-alih membuat objek `status` yang sama secara manual di
+Untuk blok status penyiapan channel yang hanya bervariasi pada label, skor, dan baris tambahan opsional, sebaiknya gunakan `createStandardChannelSetupStatus(...)` dari
+`openclaw/plugin-sdk/setup` alih-alih merakit objek `status` yang sama secara manual di
 setiap plugin.
 
-Untuk permukaan setup opsional yang hanya harus muncul dalam konteks tertentu, gunakan
+Untuk surface penyiapan opsional yang hanya boleh muncul dalam konteks tertentu, gunakan
 `createOptionalChannelSetupSurface` dari `openclaw/plugin-sdk/channel-setup`:
 
 ```typescript
@@ -476,28 +492,27 @@ const setupSurface = createOptionalChannelSetupSurface({
 
 `plugin-sdk/channel-setup` juga mengekspos builder tingkat lebih rendah
 `createOptionalChannelSetupAdapter(...)` dan
-`createOptionalChannelSetupWizard(...)` ketika Anda hanya memerlukan separuh dari
-permukaan install opsional itu.
+`createOptionalChannelSetupWizard(...)` saat Anda hanya memerlukan salah satu bagian dari
+surface instalasi opsional tersebut.
 
-Adapter/wizard opsional yang dihasilkan gagal tertutup pada penulisan config nyata. Mereka
-menggunakan ulang satu pesan install-required di seluruh `validateInput`,
-`applyAccountConfig`, dan `finalize`, serta menambahkan tautan docs ketika `docsPath`
+Adapter/wizard opsional yang dihasilkan gagal secara fail-closed pada penulisan konfigurasi nyata. Adapter/wizard ini menggunakan kembali satu pesan wajib-instal di seluruh `validateInput`,
+`applyAccountConfig`, dan `finalize`, serta menambahkan tautan docs saat `docsPath`
 disetel.
 
-Untuk UI setup berbasis binary, sebaiknya gunakan helper delegasi bersama alih-alih
-menyalin glue binary/status yang sama ke setiap channel:
+Untuk UI penyiapan yang didukung biner, sebaiknya gunakan helper delegasi bersama alih-alih
+menyalin glue biner/status yang sama ke setiap channel:
 
-- `createDetectedBinaryStatus(...)` untuk blok status yang hanya bervariasi menurut label,
-  petunjuk, skor, dan deteksi binary
-- `createCliPathTextInput(...)` untuk input teks berbasis path
+- `createDetectedBinaryStatus(...)` untuk blok status yang hanya bervariasi pada label,
+  petunjuk, skor, dan deteksi biner
+- `createCliPathTextInput(...)` untuk input teks yang didukung path
 - `createDelegatedSetupWizardStatusResolvers(...)`,
   `createDelegatedPrepare(...)`, `createDelegatedFinalize(...)`, dan
-  `createDelegatedResolveConfigured(...)` ketika `setupEntry` perlu meneruskan ke
-  wizard penuh yang lebih berat secara lazy
-- `createDelegatedTextInputShouldPrompt(...)` ketika `setupEntry` hanya perlu
+  `createDelegatedResolveConfigured(...)` saat `setupEntry` perlu meneruskan secara lazy ke
+  wizard penuh yang lebih berat
+- `createDelegatedTextInputShouldPrompt(...)` saat `setupEntry` hanya perlu
   mendelegasikan keputusan `textInputs[*].shouldPrompt`
 
-## Publishing dan instalasi
+## Publikasi dan instalasi
 
 **Plugin eksternal:** publikasikan ke [ClawHub](/id/tools/clawhub) atau npm, lalu instal:
 
@@ -505,22 +520,22 @@ menyalin glue binary/status yang sama ke setiap channel:
 openclaw plugins install @myorg/openclaw-my-plugin
 ```
 
-OpenClaw mencoba ClawHub terlebih dahulu dan secara otomatis fallback ke npm. Anda juga dapat
+OpenClaw mencoba ClawHub terlebih dahulu dan otomatis fallback ke npm. Anda juga dapat
 memaksa ClawHub secara eksplisit:
 
 ```bash
 openclaw plugins install clawhub:@myorg/openclaw-my-plugin   # hanya ClawHub
 ```
 
-Tidak ada override `npm:` yang cocok. Gunakan spec paket npm normal ketika Anda
+Tidak ada override `npm:` yang cocok. Gunakan spec package npm normal saat Anda
 menginginkan jalur npm setelah fallback ClawHub:
 
 ```bash
 openclaw plugins install @myorg/openclaw-my-plugin
 ```
 
-**Plugin dalam repo:** tempatkan di bawah pohon workspace plugin bawaan dan plugin akan otomatis
-ditemukan selama build.
+**Plugin dalam repo:** tempatkan di bawah tree workspace plugin bawaan dan plugin tersebut akan
+ditemukan secara otomatis saat build.
 
 **Pengguna dapat menginstal:**
 
@@ -530,14 +545,15 @@ openclaw plugins install <package-name>
 
 <Info>
   Untuk instalasi yang bersumber dari npm, `openclaw plugins install` menjalankan
-  `npm install --ignore-scripts` (tanpa lifecycle scripts). Jaga pohon dependensi plugin
-  tetap JS/TS murni dan hindari paket yang memerlukan build `postinstall`.
+  `npm install --ignore-scripts` (tanpa lifecycle script). Pertahankan tree dependensi plugin
+  murni JS/TS dan hindari package yang memerlukan build `postinstall`.
 </Info>
 
-Plugin bawaan milik OpenClaw adalah satu-satunya pengecualian perbaikan startup: ketika instalasi terpaket melihat salah satunya diaktifkan oleh config plugin, config channel lama, atau manifes default-enabled bawaannya, startup akan menginstal dependensi runtime plugin yang hilang sebelum impor. Plugin pihak ketiga tidak boleh bergantung pada instalasi saat startup; tetap gunakan installer plugin eksplisit.
+Plugin bawaan milik OpenClaw adalah satu-satunya pengecualian perbaikan startup: saat
+instalasi paket melihat salah satu plugin tersebut diaktifkan oleh konfigurasi plugin, konfigurasi channel legacy, atau manifest bawaan default-enabled-nya, startup akan menginstal dependensi runtime plugin yang hilang sebelum import. Plugin pihak ketiga tidak boleh bergantung pada instalasi startup; tetap gunakan installer plugin yang eksplisit.
 
 ## Terkait
 
 - [SDK Entry Points](/id/plugins/sdk-entrypoints) -- `definePluginEntry` dan `defineChannelPluginEntry`
-- [Manifes Plugin](/id/plugins/manifest) -- referensi skema manifes lengkap
-- [Membangun Plugin](/id/plugins/building-plugins) -- panduan memulai langkah demi langkah
+- [Plugin Manifest](/id/plugins/manifest) -- referensi schema manifest lengkap
+- [Building Plugins](/id/plugins/building-plugins) -- panduan memulai langkah demi langkah

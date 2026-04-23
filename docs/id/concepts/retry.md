@@ -1,51 +1,63 @@
 ---
 read_when:
-    - Memperbarui perilaku atau default retry penyedia
-    - Men-debug kesalahan pengiriman penyedia atau rate limit
-summary: Kebijakan retry untuk panggilan penyedia keluar
+    - Memperbarui perilaku atau default retry provider
+    - Men-debug error pengiriman provider atau rate limit
+summary: Kebijakan retry untuk panggilan provider keluar
 title: Kebijakan Retry
 x-i18n:
-    generated_at: "2026-04-05T13:52:10Z"
+    generated_at: "2026-04-23T09:20:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 55bb261ff567f46ce447be9c0ee0c5b5e6d2776287d7662762656c14108dd607
+    source_hash: aa16219d197492be15925dfd49359cfbed20e53ecdaa5309bbe122d4fe611e75
     source_path: concepts/retry.md
     workflow: 15
 ---
 
-# Kebijakan retry
+# Kebijakan Retry
 
 ## Tujuan
 
 - Retry per permintaan HTTP, bukan per alur multi-langkah.
-- Pertahankan urutan dengan me-retry hanya langkah saat ini.
-- Hindari duplikasi operasi yang non-idempoten.
+- Mempertahankan urutan dengan me-retry hanya langkah saat ini.
+- Menghindari duplikasi operasi non-idempoten.
 
 ## Default
 
-- Upaya: 3
-- Batas maksimum penundaan: 30000 ms
+- Percobaan: 3
+- Batas maksimum delay: 30000 ms
 - Jitter: 0.1 (10 persen)
-- Default penyedia:
-  - Penundaan minimum Telegram: 400 ms
-  - Penundaan minimum Discord: 500 ms
+- Default provider:
+  - Delay minimum Telegram: 400 ms
+  - Delay minimum Discord: 500 ms
 
 ## Perilaku
 
+### Provider model
+
+- OpenClaw membiarkan SDK provider menangani retry singkat normal.
+- Untuk SDK berbasis Stainless seperti Anthropic dan OpenAI, respons yang dapat di-retry
+  (`408`, `409`, `429`, dan `5xx`) dapat menyertakan `retry-after-ms` atau
+  `retry-after`. Saat waktu tunggu itu lebih lama dari 60 detik, OpenClaw menyuntikkan
+  `x-should-retry: false` sehingga SDK langsung menampilkan error dan failover model
+  dapat beralih ke profil auth lain atau model fallback.
+- Timpa batasnya dengan `OPENCLAW_SDK_RETRY_MAX_WAIT_SECONDS=<seconds>`.
+  Setel ke `0`, `false`, `off`, `none`, atau `disabled` untuk membiarkan SDK menghormati jeda `Retry-After`
+  yang panjang secara internal.
+
 ### Discord
 
-- Retry hanya pada kesalahan rate limit (HTTP 429).
+- Retry hanya pada error rate limit (HTTP 429).
 - Menggunakan Discord `retry_after` jika tersedia, jika tidak menggunakan exponential backoff.
 
 ### Telegram
 
-- Retry pada kesalahan sementara (429, timeout, connect/reset/closed, temporarily unavailable).
+- Retry pada error sementara (429, timeout, connect/reset/closed, sementara tidak tersedia).
 - Menggunakan `retry_after` jika tersedia, jika tidak menggunakan exponential backoff.
-- Kesalahan parse Markdown tidak di-retry; sebagai gantinya fallback ke plain text.
+- Error parse Markdown tidak di-retry; error tersebut fallback ke teks biasa.
 
 ## Konfigurasi
 
-Setel kebijakan retry per penyedia di `~/.openclaw/openclaw.json`:
+Setel kebijakan retry per provider di `~/.openclaw/openclaw.json`:
 
 ```json5
 {
@@ -72,5 +84,5 @@ Setel kebijakan retry per penyedia di `~/.openclaw/openclaw.json`:
 
 ## Catatan
 
-- Retry berlaku per permintaan (pengiriman pesan, upload media, reaksi, poll, stiker).
+- Retry berlaku per permintaan (pengiriman pesan, upload media, reaksi, poll, sticker).
 - Alur komposit tidak me-retry langkah yang sudah selesai.

@@ -1,36 +1,37 @@
 ---
 read_when:
     - Anda ingin merutekan OpenClaw melalui proxy LiteLLM
-    - Anda memerlukan pelacakan biaya, logging, atau perutean model melalui LiteLLM
+    - Anda memerlukan pelacakan biaya, logging, atau routing model melalui LiteLLM
 summary: Jalankan OpenClaw melalui LiteLLM Proxy untuk akses model terpadu dan pelacakan biaya
 title: LiteLLM
 x-i18n:
-    generated_at: "2026-04-12T23:31:28Z"
+    generated_at: "2026-04-23T09:26:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 766692eb83a1be83811d8e09a970697530ffdd4f3392247cfb2927fd590364a0
+    source_hash: 6f9665b204126861a7dbbd426b26a624e60fd219a44756cec6a023df73848cef
     source_path: providers/litellm.md
     workflow: 15
 ---
 
 # LiteLLM
 
-[LiteLLM](https://litellm.ai) adalah gateway LLM open-source yang menyediakan API terpadu untuk 100+ provider model. Rutekan OpenClaw melalui LiteLLM untuk mendapatkan pelacakan biaya terpusat, logging, dan fleksibilitas untuk mengganti backend tanpa mengubah konfigurasi OpenClaw Anda.
+[LiteLLM](https://litellm.ai) adalah gateway LLM open-source yang menyediakan API terpadu untuk 100+ provider model. Rutekan OpenClaw melalui LiteLLM untuk mendapatkan pelacakan biaya terpusat, logging, dan fleksibilitas untuk mengganti backend tanpa mengubah config OpenClaw Anda.
 
 <Tip>
 **Mengapa menggunakan LiteLLM dengan OpenClaw?**
 
 - **Pelacakan biaya** — Lihat dengan tepat berapa biaya yang dikeluarkan OpenClaw di semua model
-- **Perutean model** — Beralih antara Claude, GPT-4, Gemini, Bedrock tanpa perubahan konfigurasi
+- **Routing model** — Berpindah antara Claude, GPT-4, Gemini, Bedrock tanpa perubahan config
 - **Virtual key** — Buat key dengan batas pengeluaran untuk OpenClaw
-- **Logging** — Log permintaan/balasan lengkap untuk debugging
+- **Logging** — Log request/response lengkap untuk debugging
 - **Fallback** — Failover otomatis jika provider utama Anda sedang down
-  </Tip>
 
-## Mulai cepat
+</Tip>
+
+## Memulai cepat
 
 <Tabs>
-  <Tab title="Onboarding (direkomendasikan)">
+  <Tab title="Onboarding (disarankan)">
     **Terbaik untuk:** jalur tercepat menuju penyiapan LiteLLM yang berfungsi.
 
     <Steps>
@@ -44,7 +45,7 @@ x-i18n:
   </Tab>
 
   <Tab title="Penyiapan manual">
-    **Terbaik untuk:** kontrol penuh atas instalasi dan konfigurasi.
+    **Terbaik untuk:** kontrol penuh atas instalasi dan config.
 
     <Steps>
       <Step title="Mulai LiteLLM Proxy">
@@ -60,7 +61,7 @@ x-i18n:
         openclaw
         ```
 
-        Selesai. OpenClaw sekarang dirutekan melalui LiteLLM.
+        Selesai. OpenClaw sekarang merutekan melalui LiteLLM.
       </Step>
     </Steps>
 
@@ -69,13 +70,13 @@ x-i18n:
 
 ## Konfigurasi
 
-### Variabel environment
+### Variabel lingkungan
 
 ```bash
 export LITELLM_API_KEY="sk-litellm-key"
 ```
 
-### File konfigurasi
+### File config
 
 ```json5
 {
@@ -135,7 +136,7 @@ export LITELLM_API_KEY="sk-litellm-key"
 
   </Accordion>
 
-  <Accordion title="Perutean model">
+  <Accordion title="Routing model">
     LiteLLM dapat merutekan permintaan model ke backend yang berbeda. Konfigurasikan di `config.yaml` LiteLLM Anda:
 
     ```yaml
@@ -151,7 +152,7 @@ export LITELLM_API_KEY="sk-litellm-key"
           api_key: os.environ/OPENAI_API_KEY
     ```
 
-    OpenClaw tetap meminta `claude-opus-4-6` — LiteLLM menangani peruteannya.
+    OpenClaw tetap meminta `claude-opus-4-6` — LiteLLM menangani routing-nya.
 
   </Accordion>
 
@@ -159,7 +160,7 @@ export LITELLM_API_KEY="sk-litellm-key"
     Periksa dashboard atau API LiteLLM:
 
     ```bash
-    # Informasi key
+    # Info key
     curl "http://localhost:4000/key/info" \
       -H "Authorization: Bearer sk-litellm-key"
 
@@ -172,11 +173,11 @@ export LITELLM_API_KEY="sk-litellm-key"
 
   <Accordion title="Catatan perilaku proxy">
     - LiteLLM berjalan di `http://localhost:4000` secara default
-    - OpenClaw terhubung melalui endpoint `/v1` LiteLLM yang bergaya proxy dan kompatibel dengan OpenAI
-    - Pembentukan permintaan khusus OpenAI native tidak berlaku melalui LiteLLM:
-      tidak ada `service_tier`, tidak ada Responses `store`, tidak ada petunjuk prompt-cache, dan tidak ada pembentukan payload kompatibilitas reasoning OpenAI
+    - OpenClaw terhubung melalui endpoint `/v1` kompatibel OpenAI bergaya proxy milik LiteLLM
+    - Pembentukan request native khusus OpenAI tidak berlaku melalui LiteLLM:
+      tidak ada `service_tier`, tidak ada Responses `store`, tidak ada hint prompt-cache, dan tidak ada pembentukan payload kompatibilitas reasoning OpenAI
     - Header atribusi OpenClaw tersembunyi (`originator`, `version`, `User-Agent`)
-      tidak disuntikkan pada base URL LiteLLM kustom
+      tidak diinjeksi pada base URL LiteLLM kustom
   </Accordion>
 </AccordionGroup>
 
@@ -188,13 +189,13 @@ Untuk konfigurasi provider umum dan perilaku failover, lihat [Model Providers](/
 
 <CardGroup cols={2}>
   <Card title="Dokumentasi LiteLLM" href="https://docs.litellm.ai" icon="book">
-    Dokumentasi resmi LiteLLM dan referensi API.
+    Dokumentasi LiteLLM resmi dan referensi API.
   </Card>
   <Card title="Provider model" href="/id/concepts/model-providers" icon="layers">
     Ringkasan semua provider, ref model, dan perilaku failover.
   </Card>
   <Card title="Konfigurasi" href="/id/gateway/configuration" icon="gear">
-    Referensi konfigurasi lengkap.
+    Referensi config lengkap.
   </Card>
   <Card title="Pemilihan model" href="/id/concepts/models" icon="brain">
     Cara memilih dan mengonfigurasi model.

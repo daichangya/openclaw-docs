@@ -1,42 +1,42 @@
 ---
 read_when:
     - Menyiapkan channel BlueBubbles
-    - Pemecahan masalah pairing Webhook
+    - Memecahkan masalah pairing Webhook
     - Mengonfigurasi iMessage di macOS
-summary: iMessage melalui server macOS BlueBubbles (REST kirim/terima, mengetik, reaksi, pairing, tindakan lanjutan).
+summary: iMessage melalui server BlueBubbles macOS (REST kirim/terima, mengetik, reaksi, pairing, tindakan lanjutan).
 title: BlueBubbles
 x-i18n:
-    generated_at: "2026-04-22T04:19:51Z"
+    generated_at: "2026-04-23T09:16:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: db2e193db3fbcea22748187c21d0493037f59d4f1af163725530d5572b06e8b4
+    source_hash: a1c1670bb453a1f78bb8e35e4b7065ceeba46ce93180e1288745621f8c4179c9
     source_path: channels/bluebubbles.md
     workflow: 15
 ---
 
 # BlueBubbles (REST macOS)
 
-Status: plugin bawaan yang berkomunikasi dengan server macOS BlueBubbles melalui HTTP. **Direkomendasikan untuk integrasi iMessage** karena API-nya lebih kaya dan penyiapannya lebih mudah dibandingkan channel imsg lama.
+Status: plugin bawaan yang berkomunikasi dengan server BlueBubbles macOS melalui HTTP. **Direkomendasikan untuk integrasi iMessage** karena API-nya lebih kaya dan penyiapannya lebih mudah dibandingkan channel imsg lama.
 
 ## Plugin bawaan
 
 Rilis OpenClaw saat ini menyertakan BlueBubbles, jadi build paket normal tidak
 memerlukan langkah `openclaw plugins install` terpisah.
 
-## Gambaran umum
+## Ringkasan
 
 - Berjalan di macOS melalui aplikasi helper BlueBubbles ([bluebubbles.app](https://bluebubbles.app)).
 - Direkomendasikan/diuji: macOS Sequoia (15). macOS Tahoe (26) berfungsi; edit saat ini rusak di Tahoe, dan pembaruan ikon grup mungkin melaporkan berhasil tetapi tidak tersinkron.
 - OpenClaw berkomunikasi dengannya melalui REST API (`GET /api/v1/ping`, `POST /message/text`, `POST /chat/:id/*`).
-- Pesan masuk datang melalui Webhook; balasan keluar, indikator mengetik, tanda baca, dan tapback adalah panggilan REST.
-- Lampiran dan stiker diserap sebagai media masuk (dan ditampilkan ke agent bila memungkinkan).
-- Pairing/allowlist bekerja sama seperti channel lain (`/channels/pairing` dan seterusnya) dengan `channels.bluebubbles.allowFrom` + kode pairing.
-- Reaksi ditampilkan sebagai event sistem seperti Slack/Telegram sehingga agent dapat "menyebut"nya sebelum membalas.
-- Fitur lanjutan: edit, batalkan kirim, thread balasan, efek pesan, manajemen grup.
+- Pesan masuk diterima melalui webhook; balasan keluar, indikator mengetik, tanda baca, dan tapback adalah panggilan REST.
+- Lampiran dan stiker dimasukkan sebagai media masuk (dan ditampilkan ke agent jika memungkinkan).
+- Pairing/allowlist bekerja dengan cara yang sama seperti channel lain (`/channels/pairing` dll.) dengan `channels.bluebubbles.allowFrom` + kode pairing.
+- Reaksi ditampilkan sebagai peristiwa sistem seperti Slack/Telegram sehingga agent dapat "menyebutnya" sebelum membalas.
+- Fitur lanjutan: edit, batalkan kirim, threading balasan, efek pesan, manajemen grup.
 
 ## Mulai cepat
 
-1. Instal server BlueBubbles di Mac Anda (ikuti instruksi di [bluebubbles.app/install](https://bluebubbles.app/install)).
+1. Instal server BlueBubbles di Mac Anda (ikuti petunjuk di [bluebubbles.app/install](https://bluebubbles.app/install)).
 2. Di konfigurasi BlueBubbles, aktifkan web API dan tetapkan kata sandi.
 3. Jalankan `openclaw onboard` dan pilih BlueBubbles, atau konfigurasi secara manual:
 
@@ -53,18 +53,18 @@ memerlukan langkah `openclaw plugins install` terpisah.
    }
    ```
 
-4. Arahkan Webhook BlueBubbles ke gateway Anda (contoh: `https://your-gateway-host:3000/bluebubbles-webhook?password=<password>`).
-5. Mulai gateway; gateway akan mendaftarkan handler Webhook dan memulai pairing.
+4. Arahkan webhook BlueBubbles ke Gateway Anda (contoh: `https://your-gateway-host:3000/bluebubbles-webhook?password=<password>`).
+5. Mulai Gateway; Gateway akan mendaftarkan handler webhook dan memulai pairing.
 
 Catatan keamanan:
 
-- Selalu tetapkan kata sandi Webhook.
-- Autentikasi Webhook selalu wajib. OpenClaw menolak permintaan Webhook BlueBubbles kecuali permintaan tersebut menyertakan password/guid yang cocok dengan `channels.bluebubbles.password` (misalnya `?password=<password>` atau `x-password`), terlepas dari topologi loopback/proxy.
-- Autentikasi kata sandi diperiksa sebelum membaca/mengurai seluruh body Webhook.
+- Selalu tetapkan kata sandi webhook.
+- Autentikasi webhook selalu diperlukan. OpenClaw menolak permintaan webhook BlueBubbles kecuali permintaan tersebut menyertakan password/guid yang cocok dengan `channels.bluebubbles.password` (misalnya `?password=<password>` atau `x-password`), terlepas dari topologi loopback/proxy.
+- Autentikasi kata sandi diperiksa sebelum membaca/mengurai seluruh isi webhook.
 
 ## Menjaga Messages.app tetap aktif (VM / penyiapan headless)
 
-Beberapa penyiapan macOS VM / selalu aktif dapat membuat Messages.app menjadi “idle” (event masuk berhenti sampai aplikasi dibuka/dibawa ke foreground). Solusi sederhana adalah **menyentuh Messages setiap 5 menit** menggunakan AppleScript + LaunchAgent.
+Beberapa penyiapan VM macOS / always-on dapat berakhir dengan Messages.app menjadi “idle” (peristiwa masuk berhenti sampai aplikasi dibuka/dibawa ke depan). Solusi sederhananya adalah **menyenggol Messages setiap 5 menit** menggunakan AppleScript + LaunchAgent.
 
 ### 1) Simpan AppleScript
 
@@ -72,7 +72,7 @@ Simpan ini sebagai:
 
 - `~/Scripts/poke-messages.scpt`
 
-Contoh skrip (non-interaktif; tidak mencuri fokus):
+Contoh skrip (non-interaktif; tidak mengambil fokus):
 
 ```applescript
 try
@@ -127,7 +127,7 @@ Simpan ini sebagai:
 Catatan:
 
 - Ini berjalan **setiap 300 detik** dan **saat login**.
-- Eksekusi pertama dapat memicu prompt **Automation** macOS (`osascript` → Messages). Setujui prompt tersebut dalam sesi pengguna yang sama yang menjalankan LaunchAgent.
+- Proses pertama kali mungkin memicu prompt **Automation** macOS (`osascript` → Messages). Setujui prompt tersebut di sesi pengguna yang sama yang menjalankan LaunchAgent.
 
 Muat:
 
@@ -138,7 +138,7 @@ launchctl load ~/Library/LaunchAgents/com.user.poke-messages.plist
 
 ## Onboarding
 
-BlueBubbles tersedia dalam onboarding interaktif:
+BlueBubbles tersedia di onboarding interaktif:
 
 ```
 openclaw onboard
@@ -146,9 +146,9 @@ openclaw onboard
 
 Wizard akan meminta:
 
-- **URL Server** (wajib): alamat server BlueBubbles (mis., `http://192.168.1.100:1234`)
+- **Server URL** (wajib): alamat server BlueBubbles (misalnya, `http://192.168.1.100:1234`)
 - **Password** (wajib): kata sandi API dari pengaturan BlueBubbles Server
-- **Jalur Webhook** (opsional): default ke `/bluebubbles-webhook`
+- **Webhook path** (opsional): default ke `/bluebubbles-webhook`
 - **Kebijakan DM**: pairing, allowlist, open, atau disabled
 - **Daftar izin**: nomor telepon, email, atau target chat
 
@@ -179,9 +179,9 @@ Grup:
 Webhook grup BlueBubbles sering kali hanya menyertakan alamat peserta mentah. Jika Anda ingin konteks `GroupMembers` menampilkan nama kontak lokal sebagai gantinya, Anda dapat mengaktifkan pengayaan Contacts lokal di macOS:
 
 - `channels.bluebubbles.enrichGroupParticipantsFromContacts = true` mengaktifkan pencarian. Default: `false`.
-- Pencarian hanya berjalan setelah akses grup, otorisasi perintah, dan gating mention mengizinkan pesan tersebut lewat.
+- Pencarian hanya berjalan setelah akses grup, otorisasi perintah, dan pembatasan mention telah mengizinkan pesan untuk lolos.
 - Hanya peserta telepon tanpa nama yang diperkaya.
-- Nomor telepon mentah tetap menjadi fallback bila tidak ditemukan kecocokan lokal.
+- Nomor telepon mentah tetap digunakan sebagai fallback saat tidak ada kecocokan lokal yang ditemukan.
 
 ```json5
 {
@@ -193,13 +193,13 @@ Webhook grup BlueBubbles sering kali hanya menyertakan alamat peserta mentah. Ji
 }
 ```
 
-### Gating mention (grup)
+### Pembatasan mention (grup)
 
-BlueBubbles mendukung gating mention untuk chat grup, mengikuti perilaku iMessage/WhatsApp:
+BlueBubbles mendukung pembatasan mention untuk chat grup, selaras dengan perilaku iMessage/WhatsApp:
 
 - Menggunakan `agents.list[].groupChat.mentionPatterns` (atau `messages.groupChat.mentionPatterns`) untuk mendeteksi mention.
 - Saat `requireMention` diaktifkan untuk sebuah grup, agent hanya merespons saat disebut.
-- Perintah kontrol dari pengirim yang berwenang melewati gating mention.
+- Perintah kontrol dari pengirim yang berwenang melewati pembatasan mention.
 
 Konfigurasi per grup:
 
@@ -218,15 +218,15 @@ Konfigurasi per grup:
 }
 ```
 
-### Gating perintah
+### Pembatasan perintah
 
-- Perintah kontrol (mis., `/config`, `/model`) memerlukan otorisasi.
+- Perintah kontrol (misalnya, `/config`, `/model`) memerlukan otorisasi.
 - Menggunakan `allowFrom` dan `groupAllowFrom` untuk menentukan otorisasi perintah.
 - Pengirim yang berwenang dapat menjalankan perintah kontrol bahkan tanpa mention di grup.
 
 ### System prompt per grup
 
-Setiap entri di bawah `channels.bluebubbles.groups.*` menerima string `systemPrompt` opsional. Nilainya disuntikkan ke system prompt agent pada setiap giliran yang menangani pesan di grup tersebut, sehingga Anda dapat menetapkan persona atau aturan perilaku per grup tanpa mengedit prompt agent:
+Setiap entri di bawah `channels.bluebubbles.groups.*` menerima string `systemPrompt` opsional. Nilai ini disuntikkan ke system prompt agent pada setiap giliran yang menangani pesan di grup tersebut, sehingga Anda dapat menetapkan persona atau aturan perilaku per grup tanpa mengedit prompt agent:
 
 ```json5
 {
@@ -234,7 +234,7 @@ Setiap entri di bawah `channels.bluebubbles.groups.*` menerima string `systemPro
     bluebubbles: {
       groups: {
         "iMessage;-;chat123": {
-          systemPrompt: "Buat respons maksimal 3 kalimat. Samakan nada santai grup ini.",
+          systemPrompt: "Jaga respons di bawah 3 kalimat. Cerminkan nada santai grup.",
         },
       },
     },
@@ -242,11 +242,11 @@ Setiap entri di bawah `channels.bluebubbles.groups.*` menerima string `systemPro
 }
 ```
 
-Kuncinya cocok dengan apa pun yang dilaporkan BlueBubbles sebagai `chatGuid` / `chatIdentifier` / `chatId` numerik untuk grup tersebut, dan entri wildcard `"*"` menyediakan default untuk setiap grup tanpa kecocokan persis (pola yang sama digunakan oleh `requireMention` dan kebijakan tool per grup). Kecocokan persis selalu menang atas wildcard. DM mengabaikan field ini; gunakan penyesuaian prompt tingkat agent atau tingkat akun sebagai gantinya.
+Kuncinya cocok dengan apa pun yang BlueBubbles laporkan sebagai `chatGuid` / `chatIdentifier` / `chatId` numerik untuk grup tersebut, dan entri wildcard `"*"` menyediakan default untuk setiap grup tanpa kecocokan tepat (pola yang sama digunakan oleh `requireMention` dan kebijakan tool per grup). Kecocokan tepat selalu menang atas wildcard. DM mengabaikan bidang ini; gunakan kustomisasi prompt tingkat agent atau tingkat akun sebagai gantinya.
 
-#### Contoh praktik: balasan berulir dan reaksi tapback (Private API)
+#### Contoh praktis: balasan berutas dan reaksi tapback (Private API)
 
-Dengan BlueBubbles Private API diaktifkan, pesan masuk tiba dengan ID pesan pendek (misalnya `[[reply_to:5]]`) dan agent dapat memanggil `action=reply` untuk membuat thread ke pesan tertentu atau `action=react` untuk menambahkan tapback. `systemPrompt` per grup adalah cara andal untuk membuat agent memilih tool yang tepat:
+Dengan BlueBubbles Private API diaktifkan, pesan masuk datang dengan ID pesan pendek (misalnya `[[reply_to:5]]`) dan agent dapat memanggil `action=reply` untuk membuat utas ke pesan tertentu atau `action=react` untuk menambahkan tapback. `systemPrompt` per grup adalah cara yang andal untuk menjaga agent memilih tool yang tepat:
 
 ```json5
 {
@@ -256,10 +256,10 @@ Dengan BlueBubbles Private API diaktifkan, pesan masuk tiba dengan ID pesan pend
         "iMessage;+;chat-family": {
           systemPrompt: [
             "Saat membalas di grup ini, selalu panggil action=reply dengan",
-            "messageId [[reply_to:N]] dari konteks agar respons Anda berulir",
-            "di bawah pesan yang memicu. Jangan pernah kirim pesan baru yang tidak tertaut.",
+            "messageId [[reply_to:N]] dari konteks agar respons Anda berutas",
+            "di bawah pesan pemicu. Jangan pernah mengirim pesan baru yang tidak terhubung.",
             "",
-            "Untuk pengakuan singkat ('ok', 'paham', 'siap'), gunakan",
+            "Untuk pengakuan singkat ('ok', 'mengerti', 'siap'), gunakan",
             "action=react dengan emoji tapback yang sesuai (❤️, 👍, 😂, ‼️, ❓)",
             "alih-alih mengirim balasan teks.",
           ].join(" "),
@@ -270,20 +270,20 @@ Dengan BlueBubbles Private API diaktifkan, pesan masuk tiba dengan ID pesan pend
 }
 ```
 
-Reaksi tapback dan balasan berulir sama-sama memerlukan BlueBubbles Private API; lihat [Tindakan lanjutan](#advanced-actions) dan [ID pesan](#message-ids-short-vs-full) untuk mekanisme dasarnya.
+Reaksi tapback dan balasan berutas sama-sama memerlukan BlueBubbles Private API; lihat [Tindakan lanjutan](#advanced-actions) dan [ID Pesan](#message-ids-short-vs-full) untuk mekanisme dasarnya.
 
 ## Binding percakapan ACP
 
-Chat BlueBubbles dapat diubah menjadi workspace ACP yang persisten tanpa mengubah lapisan transport.
+Chat BlueBubbles dapat diubah menjadi workspace ACP yang tahan lama tanpa mengubah lapisan transport.
 
 Alur operator cepat:
 
 - Jalankan `/acp spawn codex --bind here` di dalam DM atau chat grup yang diizinkan.
-- Pesan berikutnya dalam percakapan BlueBubbles yang sama diarahkan ke sesi ACP yang di-spawn.
+- Pesan berikutnya dalam percakapan BlueBubbles yang sama dirutekan ke sesi ACP yang dibuat.
 - `/new` dan `/reset` mereset sesi ACP yang sama di tempat.
 - `/acp close` menutup sesi ACP dan menghapus binding.
 
-Binding persisten yang dikonfigurasi juga didukung melalui entri `bindings[]` tingkat atas dengan `type: "acp"` dan `match.channel: "bluebubbles"`.
+Binding persisten yang dikonfigurasi juga didukung melalui entri tingkat atas `bindings[]` dengan `type: "acp"` dan `match.channel: "bluebubbles"`.
 
 `match.peer.id` dapat menggunakan bentuk target BlueBubbles apa pun yang didukung:
 
@@ -292,7 +292,7 @@ Binding persisten yang dikonfigurasi juga didukung melalui entri `bindings[]` ti
 - `chat_guid:<guid>`
 - `chat_identifier:<identifier>`
 
-Untuk binding grup yang stabil, gunakan `chat_id:*` atau `chat_identifier:*`.
+Untuk binding grup yang stabil, pilih `chat_id:*` atau `chat_identifier:*`.
 
 Contoh:
 
@@ -330,7 +330,7 @@ Lihat [ACP Agents](/id/tools/acp-agents) untuk perilaku binding ACP bersama.
 
 - **Indikator mengetik**: Dikirim secara otomatis sebelum dan selama pembuatan respons.
 - **Tanda baca**: Dikontrol oleh `channels.bluebubbles.sendReadReceipts` (default: `true`).
-- **Indikator mengetik**: OpenClaw mengirim event mulai mengetik; BlueBubbles membersihkan status mengetik secara otomatis saat pengiriman atau timeout (stop manual melalui DELETE tidak andal).
+- **Indikator mengetik**: OpenClaw mengirim peristiwa mulai mengetik; BlueBubbles membersihkan status mengetik secara otomatis saat mengirim atau saat timeout (penghentian manual melalui DELETE tidak andal).
 
 ```json5
 {
@@ -357,7 +357,7 @@ BlueBubbles mendukung tindakan pesan lanjutan saat diaktifkan dalam konfigurasi:
         reply: true, // threading balasan berdasarkan GUID pesan
         sendWithEffect: true, // efek pesan (slam, loud, dll.)
         renameGroup: true, // ganti nama chat grup
-        setGroupIcon: true, // atur ikon/foto chat grup (tidak stabil di macOS 26 Tahoe)
+        setGroupIcon: true, // atur ikon/foto chat grup (kurang andal di macOS 26 Tahoe)
         addParticipant: true, // tambahkan peserta ke grup
         removeParticipant: true, // hapus peserta dari grup
         leaveGroup: true, // keluar dari chat grup
@@ -370,59 +370,61 @@ BlueBubbles mendukung tindakan pesan lanjutan saat diaktifkan dalam konfigurasi:
 
 Tindakan yang tersedia:
 
-- **react**: Tambah/hapus reaksi tapback (`messageId`, `emoji`, `remove`). Kumpulan tapback bawaan iMessage adalah `love`, `like`, `dislike`, `laugh`, `emphasize`, dan `question`. Saat agent memilih emoji di luar kumpulan tersebut (misalnya `👀`), tool reaction akan fallback ke `love` agar tapback tetap dirender alih-alih membuat seluruh permintaan gagal. Reaksi ack yang dikonfigurasi tetap divalidasi secara ketat dan akan error pada nilai yang tidak dikenal.
+- **react**: Tambahkan/hapus reaksi tapback (`messageId`, `emoji`, `remove`). Set tapback asli iMessage adalah `love`, `like`, `dislike`, `laugh`, `emphasize`, dan `question`. Saat agent memilih emoji di luar set tersebut (misalnya `👀`), tool reaksi akan fallback ke `love` sehingga tapback tetap dirender alih-alih seluruh permintaan gagal. Reaksi ack yang dikonfigurasi tetap divalidasi secara ketat dan menghasilkan error pada nilai yang tidak dikenal.
 - **edit**: Edit pesan terkirim (`messageId`, `text`)
 - **unsend**: Batalkan kirim pesan (`messageId`)
 - **reply**: Balas pesan tertentu (`messageId`, `text`, `to`)
 - **sendWithEffect**: Kirim dengan efek iMessage (`text`, `to`, `effectId`)
 - **renameGroup**: Ganti nama chat grup (`chatGuid`, `displayName`)
-- **setGroupIcon**: Atur ikon/foto chat grup (`chatGuid`, `media`) — tidak stabil di macOS 26 Tahoe (API dapat mengembalikan sukses tetapi ikon tidak tersinkron).
+- **setGroupIcon**: Atur ikon/foto chat grup (`chatGuid`, `media`) — kurang andal di macOS 26 Tahoe (API mungkin mengembalikan sukses tetapi ikon tidak tersinkron).
 - **addParticipant**: Tambahkan seseorang ke grup (`chatGuid`, `address`)
 - **removeParticipant**: Hapus seseorang dari grup (`chatGuid`, `address`)
 - **leaveGroup**: Keluar dari chat grup (`chatGuid`)
 - **upload-file**: Kirim media/file (`to`, `buffer`, `filename`, `asVoice`)
-  - Memo suara: setel `asVoice: true` dengan audio **MP3** atau **CAF** untuk mengirim sebagai pesan suara iMessage. BlueBubbles mengonversi MP3 → CAF saat mengirim memo suara.
+  - Memo suara: tetapkan `asVoice: true` dengan audio **MP3** atau **CAF** untuk mengirim sebagai pesan suara iMessage. BlueBubbles mengonversi MP3 → CAF saat mengirim memo suara.
 - Alias lama: `sendAttachment` masih berfungsi, tetapi `upload-file` adalah nama tindakan kanonis.
 
-### ID pesan (pendek vs penuh)
+### ID Pesan (pendek vs penuh)
 
-OpenClaw dapat menampilkan ID pesan _pendek_ (mis., `1`, `2`) untuk menghemat token.
+OpenClaw dapat menampilkan ID pesan _pendek_ (misalnya, `1`, `2`) untuk menghemat token.
 
 - `MessageSid` / `ReplyToId` dapat berupa ID pendek.
 - `MessageSidFull` / `ReplyToIdFull` berisi ID penuh provider.
-- ID pendek disimpan di memori; ID ini dapat kedaluwarsa saat restart atau cache eviction.
-- Tindakan menerima `messageId` pendek atau penuh, tetapi ID pendek akan error jika sudah tidak tersedia.
+- ID pendek berada di memori; ID tersebut dapat kedaluwarsa saat restart atau pengosongan cache.
+- Tindakan menerima `messageId` pendek atau penuh, tetapi ID pendek akan menghasilkan error jika tidak lagi tersedia.
 
-Gunakan ID penuh untuk otomatisasi dan penyimpanan yang tahan lama:
+Gunakan ID penuh untuk otomasi dan penyimpanan yang tahan lama:
 
 - Template: `{{MessageSidFull}}`, `{{ReplyToIdFull}}`
 - Konteks: `MessageSidFull` / `ReplyToIdFull` dalam payload masuk
 
 Lihat [Configuration](/id/gateway/configuration) untuk variabel template.
 
-## Coalescing DM split-send (perintah + URL dalam satu komposisi)
+<a id="coalescing-split-send-dms-command--url-in-one-composition"></a>
 
-Saat pengguna mengetik perintah dan URL bersama di iMessage — misalnya `Dump https://example.com/article` — Apple membagi pengiriman menjadi **dua pengiriman Webhook terpisah**:
+## Menggabungkan split-send DM (perintah + URL dalam satu komposisi)
+
+Saat pengguna mengetik perintah dan URL bersama di iMessage — misalnya `Dump https://example.com/article` — Apple membagi pengiriman menjadi **dua pengiriman webhook terpisah**:
 
 1. Pesan teks (`"Dump"`).
 2. Balon pratinjau URL (`"https://..."`) dengan gambar pratinjau OG sebagai lampiran.
 
-Kedua Webhook tiba di OpenClaw dengan jeda sekitar ~0.8-2.0 dtk pada sebagian besar penyiapan. Tanpa coalescing, agent menerima perintah saja pada giliran 1, membalas (sering kali "kirim URL-nya"), dan baru melihat URL pada giliran 2 — pada titik itu konteks perintah sudah hilang.
+Kedua webhook tiba di OpenClaw dengan selang ~0,8-2,0 dtk pada sebagian besar penyiapan. Tanpa penggabungan, agent menerima perintah saja pada giliran 1, membalas (sering kali "kirim URL-nya"), dan baru melihat URL pada giliran 2 — ketika konteks perintah sudah hilang.
 
-`channels.bluebubbles.coalesceSameSenderDms` mengikutsertakan DM ke dalam penggabungan Webhook berurutan dari pengirim yang sama menjadi satu giliran agent. Chat grup tetap menggunakan kunci per pesan sehingga struktur giliran multi-pengguna tetap terjaga.
+`channels.bluebubbles.coalesceSameSenderDms` mengikutsertakan DM agar webhook berurutan dari pengirim yang sama digabungkan menjadi satu giliran agent. Chat grup tetap menggunakan kunci per pesan sehingga struktur giliran multi-pengguna tetap terjaga.
 
-### Kapan harus diaktifkan
+### Kapan diaktifkan
 
-Aktifkan jika:
+Aktifkan ketika:
 
-- Anda menyediakan Skills yang mengharapkan `command + payload` dalam satu pesan (dump, paste, save, queue, dll.).
+- Anda menyediakan Skills yang mengharapkan `perintah + payload` dalam satu pesan (dump, paste, save, queue, dll.).
 - Pengguna Anda menempelkan URL, gambar, atau konten panjang bersama perintah.
-- Anda dapat menerima tambahan latensi giliran DM (lihat di bawah).
+- Anda dapat menerima latensi giliran DM tambahan (lihat di bawah).
 
-Biarkan nonaktif jika:
+Biarkan nonaktif ketika:
 
 - Anda memerlukan latensi perintah minimum untuk pemicu DM satu kata.
-- Semua alur Anda berupa perintah one-shot tanpa payload lanjutan.
+- Semua alur Anda adalah perintah sekali jalan tanpa payload lanjutan.
 
 ### Mengaktifkan
 
@@ -430,13 +432,13 @@ Biarkan nonaktif jika:
 {
   channels: {
     bluebubbles: {
-      coalesceSameSenderDms: true, // opt in (default: false)
+      coalesceSameSenderDms: true, // ikut serta (default: false)
     },
   },
 }
 ```
 
-Dengan flag ini aktif dan tanpa `messages.inbound.byChannel.bluebubbles` eksplisit, jendela debounce melebar menjadi **2500 md** (default untuk non-coalescing adalah 500 md). Jendela yang lebih lebar ini diperlukan — ritme split-send Apple sebesar 0.8-2.0 dtk tidak muat dalam default yang lebih ketat.
+Dengan flag aktif dan tanpa `messages.inbound.byChannel.bluebubbles` yang eksplisit, jendela debounce melebar menjadi **2500 md** (default untuk non-penggabungan adalah 500 md). Jendela yang lebih lebar ini diperlukan — ritme split-send Apple sebesar 0,8-2,0 dtk tidak muat dalam default yang lebih sempit.
 
 Untuk menyesuaikan jendela sendiri:
 
@@ -445,8 +447,8 @@ Untuk menyesuaikan jendela sendiri:
   messages: {
     inbound: {
       byChannel: {
-        // 2500 md berfungsi untuk sebagian besar penyiapan; naikkan ke 4000 md jika Mac Anda lambat
-        // atau sedang di bawah tekanan memori (jeda yang diamati dapat melewati 2 dtk saat itu).
+        // 2500 md bekerja untuk sebagian besar penyiapan; naikkan ke 4000 md jika Mac Anda lambat
+        // atau berada di bawah tekanan memori (selang yang diamati bisa melewati 2 dtk saat itu).
         bluebubbles: 2500,
       },
     },
@@ -456,22 +458,22 @@ Untuk menyesuaikan jendela sendiri:
 
 ### Trade-off
 
-- **Latensi tambahan untuk perintah kontrol DM.** Saat flag ini aktif, pesan perintah kontrol DM (seperti `Dump`, `Save`, dll.) sekarang menunggu hingga jendela debounce sebelum dikirim, kalau-kalau Webhook payload akan datang. Perintah chat grup tetap dikirim seketika.
-- **Output gabungan dibatasi** — teks gabungan dibatasi hingga 4000 karakter dengan penanda `…[truncated]` yang eksplisit; lampiran dibatasi hingga 20; entri sumber dibatasi hingga 10 (yang pertama-plus-terbaru dipertahankan setelah itu). Setiap `messageId` sumber tetap mencapai inbound-dedupe sehingga replay MessagePoller berikutnya dari event individual mana pun dikenali sebagai duplikat.
+- **Latensi tambahan untuk perintah kontrol DM.** Dengan flag aktif, pesan perintah kontrol DM (seperti `Dump`, `Save`, dll.) sekarang menunggu hingga jendela debounce sebelum dikirim, untuk berjaga-jaga jika webhook payload akan datang. Perintah chat grup tetap dikirim seketika.
+- **Output gabungan memiliki batas** — teks gabungan dibatasi hingga 4000 karakter dengan penanda `…[truncated]` yang eksplisit; lampiran dibatasi hingga 20; entri sumber dibatasi hingga 10 (entri pertama-plus-terbaru dipertahankan setelah itu). Setiap `messageId` sumber tetap masuk ke inbound-dedupe sehingga replay MessagePoller berikutnya dari peristiwa individual apa pun dikenali sebagai duplikat.
 - **Opt-in, per channel.** Channel lain (Telegram, WhatsApp, Slack, …) tidak terpengaruh.
 
 ### Skenario dan apa yang dilihat agent
 
-| Pengguna menulis                                                      | Apple mengirim            | Flag off (default)                      | Flag on + jendela 2500 md                                               |
-| --------------------------------------------------------------------- | ------------------------- | --------------------------------------- | ----------------------------------------------------------------------- |
-| `Dump https://example.com` (satu kali kirim)                          | 2 Webhook selisih ~1 dtk  | Dua giliran agent: "Dump" saja, lalu URL | Satu giliran: teks gabungan `Dump https://example.com`                  |
-| `Save this 📎image.jpg caption` (lampiran + teks)                     | 2 Webhook                 | Dua giliran                             | Satu giliran: teks + gambar                                             |
-| `/status` (perintah mandiri)                                          | 1 Webhook                 | Dikirim seketika                        | **Tunggu hingga jendela, lalu kirim**                                   |
-| URL ditempel sendiri                                                  | 1 Webhook                 | Dikirim seketika                        | Dikirim seketika (hanya satu entri dalam bucket)                        |
-| Teks + URL dikirim sebagai dua pesan terpisah yang disengaja, menit terpisah | 2 Webhook di luar jendela | Dua giliran                             | Dua giliran (jendela kedaluwarsa di antaranya)                          |
-| Banjir cepat (>10 DM kecil dalam jendela)                             | N Webhook                 | N giliran                               | Satu giliran, output dibatasi (yang pertama + terbaru, batas teks/lampiran diterapkan) |
+| Yang disusun pengguna                                             | Yang dikirim Apple         | Flag mati (default)                     | Flag aktif + jendela 2500 md                                            |
+| ----------------------------------------------------------------- | -------------------------- | --------------------------------------- | ------------------------------------------------------------------------ |
+| `Dump https://example.com` (satu kali kirim)                      | 2 webhook selang ~1 dtk    | Dua giliran agent: "Dump" saja, lalu URL | Satu giliran: teks gabungan `Dump https://example.com`                   |
+| `Save this 📎image.jpg caption` (lampiran + teks)                 | 2 webhook                  | Dua giliran                             | Satu giliran: teks + gambar                                              |
+| `/status` (perintah mandiri)                                      | 1 webhook                  | Langsung dikirim                        | **Menunggu hingga jendela, lalu dikirim**                                |
+| URL ditempelkan sendiri                                           | 1 webhook                  | Langsung dikirim                        | Langsung dikirim (hanya satu entri di bucket)                            |
+| Teks + URL dikirim sebagai dua pesan terpisah yang disengaja, selang beberapa menit | 2 webhook di luar jendela  | Dua giliran                             | Dua giliran (jendela kedaluwarsa di antaranya)                           |
+| Banjir cepat (>10 DM kecil dalam jendela)                         | N webhook                  | N giliran                               | Satu giliran, output dibatasi (pertama + terbaru, batas teks/lampiran diterapkan) |
 
-### Pemecahan masalah coalescing split-send
+### Pemecahan masalah penggabungan split-send
 
 Jika flag aktif dan split-send masih tiba sebagai dua giliran, periksa setiap lapisan:
 
@@ -481,7 +483,7 @@ Jika flag aktif dan split-send masih tiba sebagai dua giliran, periksa setiap la
    grep coalesceSameSenderDms ~/.openclaw/openclaw.json
    ```
 
-   Lalu `openclaw gateway restart` — flag dibaca saat pembuatan debouncer-registry.
+   Lalu `openclaw gateway restart` — flag dibaca saat pembuatan registri debouncer.
 
 2. **Jendela debounce cukup lebar untuk penyiapan Anda.** Lihat log server BlueBubbles di `~/Library/Logs/bluebubbles-server/main.log`:
 
@@ -489,13 +491,13 @@ Jika flag aktif dan split-send masih tiba sebagai dua giliran, periksa setiap la
    grep -E "Dispatching event to webhook" main.log | tail -20
    ```
 
-   Ukur jeda antara pengiriman teks bergaya `"Dump"` dan pengiriman `"https://..."; Attachments:` yang mengikutinya. Naikkan `messages.inbound.byChannel.bluebubbles` agar nyaman mencakup jeda tersebut.
+   Ukur selang antara pengiriman teks bergaya `"Dump"` dan pengiriman `"https://..."; Attachments:` yang mengikutinya. Naikkan `messages.inbound.byChannel.bluebubbles` agar cukup menutupi selang tersebut.
 
-3. **Stempel waktu JSONL sesi ≠ kedatangan Webhook.** Stempel waktu event sesi (`~/.openclaw/agents/<id>/sessions/*.jsonl`) mencerminkan kapan gateway menyerahkan pesan ke agent, **bukan** kapan Webhook tiba. Pesan kedua yang diantrikan dan ditandai `[Queued messages while agent was busy]` berarti giliran pertama masih berjalan saat Webhook kedua tiba — bucket coalesce sudah ter-flush. Sesuaikan jendela berdasarkan log server BB, bukan log sesi.
+3. **Stempel waktu JSONL sesi ≠ kedatangan webhook.** Stempel waktu peristiwa sesi (`~/.openclaw/agents/<id>/sessions/*.jsonl`) mencerminkan kapan Gateway menyerahkan pesan ke agent, **bukan** kapan webhook tiba. Pesan kedua yang antre dengan tag `[Queued messages while agent was busy]` berarti giliran pertama masih berjalan saat webhook kedua tiba — bucket penggabungan sudah lebih dulu flush. Sesuaikan jendela berdasarkan log server BB, bukan log sesi.
 
-4. **Tekanan memori memperlambat pengiriman balasan.** Pada mesin yang lebih kecil (8 GB), giliran agent dapat berlangsung cukup lama sehingga bucket coalesce ter-flush sebelum balasan selesai, dan URL masuk sebagai giliran kedua yang diantrikan. Periksa `memory_pressure` dan `ps -o rss -p $(pgrep openclaw-gateway)`; jika gateway berada di atas ~500 MB RSS dan compressor aktif, tutup proses berat lain atau pindah ke host yang lebih besar.
+4. **Tekanan memori memperlambat pengiriman balasan.** Pada mesin yang lebih kecil (8 GB), giliran agent dapat memakan waktu cukup lama sehingga bucket penggabungan flush sebelum balasan selesai, dan URL masuk sebagai giliran kedua yang antre. Periksa `memory_pressure` dan `ps -o rss -p $(pgrep openclaw-gateway)`; jika Gateway berada di atas ~500 MB RSS dan compressor aktif, tutup proses berat lainnya atau pindah ke host yang lebih besar.
 
-5. **Pengiriman reply-quote adalah jalur yang berbeda.** Jika pengguna mengetuk `Dump` sebagai **balasan** terhadap URL-balloon yang sudah ada (iMessage menampilkan lencana "1 Reply" pada bubble Dump), URL berada di `replyToBody`, bukan di Webhook kedua. Coalescing tidak berlaku — ini masalah skill/prompt, bukan masalah debouncer.
+5. **Pengiriman kutipan balasan adalah jalur yang berbeda.** Jika pengguna mengetuk `Dump` sebagai **balasan** ke balon URL yang ada (iMessage menampilkan badge "1 Reply" pada gelembung Dump), URL berada di `replyToBody`, bukan di webhook kedua. Penggabungan tidak berlaku — itu adalah urusan skill/prompt, bukan urusan debouncer.
 
 ## Streaming blok
 
@@ -505,7 +507,7 @@ Kontrol apakah respons dikirim sebagai satu pesan atau di-stream dalam blok:
 {
   channels: {
     bluebubbles: {
-      blockStreaming: true, // aktifkan streaming blok (default nonaktif)
+      blockStreaming: true, // aktifkan streaming blok (mati secara default)
     },
   },
 }
@@ -515,7 +517,7 @@ Kontrol apakah respons dikirim sebagai satu pesan atau di-stream dalam blok:
 
 - Lampiran masuk diunduh dan disimpan di cache media.
 - Batas media melalui `channels.bluebubbles.mediaMaxMb` untuk media masuk dan keluar (default: 8 MB).
-- Teks keluar dipecah ke `channels.bluebubbles.textChunkLimit` (default: 4000 karakter).
+- Teks keluar dipotong menjadi `channels.bluebubbles.textChunkLimit` (default: 4000 karakter).
 
 ## Referensi konfigurasi
 
@@ -528,20 +530,20 @@ Opsi provider:
 - `channels.bluebubbles.password`: Kata sandi API.
 - `channels.bluebubbles.webhookPath`: Jalur endpoint Webhook (default: `/bluebubbles-webhook`).
 - `channels.bluebubbles.dmPolicy`: `pairing | allowlist | open | disabled` (default: `pairing`).
-- `channels.bluebubbles.allowFrom`: Allowlist DM (handle, email, nomor E.164, `chat_id:*`, `chat_guid:*`).
+- `channels.bluebubbles.allowFrom`: allowlist DM (handle, email, nomor E.164, `chat_id:*`, `chat_guid:*`).
 - `channels.bluebubbles.groupPolicy`: `open | allowlist | disabled` (default: `allowlist`).
-- `channels.bluebubbles.groupAllowFrom`: Allowlist pengirim grup.
-- `channels.bluebubbles.enrichGroupParticipantsFromContacts`: Di macOS, secara opsional memperkaya peserta grup tanpa nama dari Contacts lokal setelah gating lolos. Default: `false`.
+- `channels.bluebubbles.groupAllowFrom`: allowlist pengirim grup.
+- `channels.bluebubbles.enrichGroupParticipantsFromContacts`: Di macOS, secara opsional perkaya peserta grup tanpa nama dari Contacts lokal setelah gating lolos. Default: `false`.
 - `channels.bluebubbles.groups`: Konfigurasi per grup (`requireMention`, dll.).
 - `channels.bluebubbles.sendReadReceipts`: Kirim tanda baca (default: `true`).
-- `channels.bluebubbles.blockStreaming`: Aktifkan streaming blok (default: `false`; wajib untuk balasan streaming).
+- `channels.bluebubbles.blockStreaming`: Aktifkan streaming blok (default: `false`; diperlukan untuk balasan streaming).
 - `channels.bluebubbles.textChunkLimit`: Ukuran chunk keluar dalam karakter (default: 4000).
-- `channels.bluebubbles.sendTimeoutMs`: Timeout per permintaan dalam md untuk pengiriman teks keluar melalui `/api/v1/message/text` (default: 30000). Naikkan pada penyiapan macOS 26 di mana pengiriman iMessage Private API dapat macet selama 60+ detik di dalam framework iMessage; misalnya `45000` atau `60000`. Probe, pencarian chat, reaksi, edit, dan pemeriksaan kesehatan saat ini tetap memakai default 10 dtk yang lebih pendek; perluasan cakupan ke reaksi dan edit direncanakan sebagai tindak lanjut. Override per akun: `channels.bluebubbles.accounts.<accountId>.sendTimeoutMs`.
-- `channels.bluebubbles.chunkMode`: `length` (default) membagi hanya saat melebihi `textChunkLimit`; `newline` membagi pada baris kosong (batas paragraf) sebelum chunking berdasarkan panjang.
+- `channels.bluebubbles.sendTimeoutMs`: Timeout per permintaan dalam md untuk pengiriman teks keluar melalui `/api/v1/message/text` (default: 30000). Naikkan pada penyiapan macOS 26 tempat pengiriman iMessage Private API dapat macet selama 60+ detik di dalam framework iMessage; misalnya `45000` atau `60000`. Probe, pencarian chat, reaksi, edit, dan pemeriksaan kesehatan saat ini tetap menggunakan default 10 dtk yang lebih pendek; perluasan cakupan ke reaksi dan edit direncanakan sebagai tindak lanjut. Override per akun: `channels.bluebubbles.accounts.<accountId>.sendTimeoutMs`.
+- `channels.bluebubbles.chunkMode`: `length` (default) hanya membagi saat melebihi `textChunkLimit`; `newline` membagi pada baris kosong (batas paragraf) sebelum chunking berdasarkan panjang.
 - `channels.bluebubbles.mediaMaxMb`: Batas media masuk/keluar dalam MB (default: 8).
-- `channels.bluebubbles.mediaLocalRoots`: Allowlist eksplisit direktori lokal absolut yang diizinkan untuk jalur media lokal keluar. Pengiriman jalur lokal ditolak secara default kecuali ini dikonfigurasi. Override per akun: `channels.bluebubbles.accounts.<accountId>.mediaLocalRoots`.
-- `channels.bluebubbles.coalesceSameSenderDms`: Gabungkan Webhook DM berurutan dari pengirim yang sama menjadi satu giliran agent sehingga split-send teks+URL dari Apple tiba sebagai satu pesan (default: `false`). Lihat [Coalescing DM split-send](#coalescing-split-send-dms-command--url-in-one-composition) untuk skenario, penyesuaian jendela, dan trade-off. Memperlebar jendela debounce masuk default dari 500 md menjadi 2500 md saat diaktifkan tanpa `messages.inbound.byChannel.bluebubbles` eksplisit.
-- `channels.bluebubbles.historyLimit`: Maks pesan grup untuk konteks (0 menonaktifkan).
+- `channels.bluebubbles.mediaLocalRoots`: allowlist eksplisit direktori lokal absolut yang diizinkan untuk jalur media lokal keluar. Pengiriman jalur lokal ditolak secara default kecuali ini dikonfigurasi. Override per akun: `channels.bluebubbles.accounts.<accountId>.mediaLocalRoots`.
+- `channels.bluebubbles.coalesceSameSenderDms`: Gabungkan webhook DM berurutan dari pengirim yang sama menjadi satu giliran agent sehingga split-send teks+URL Apple tiba sebagai satu pesan (default: `false`). Lihat [Menggabungkan split-send DM](#coalescing-split-send-dms-command--url-in-one-composition) untuk skenario, penyesuaian jendela, dan trade-off. Memperlebar jendela debounce masuk default dari 500 md menjadi 2500 md saat diaktifkan tanpa `messages.inbound.byChannel.bluebubbles` yang eksplisit.
+- `channels.bluebubbles.historyLimit`: Maksimum pesan grup untuk konteks (0 menonaktifkan).
 - `channels.bluebubbles.dmHistoryLimit`: Batas riwayat DM.
 - `channels.bluebubbles.actions`: Aktifkan/nonaktifkan tindakan tertentu.
 - `channels.bluebubbles.accounts`: Konfigurasi multi-akun.
@@ -553,7 +555,7 @@ Opsi global terkait:
 
 ## Pengalamatan / target pengiriman
 
-Utamakan `chat_guid` untuk routing yang stabil:
+Pilih `chat_guid` untuk perutean yang stabil:
 
 - `chat_guid:iMessage;-;+15555550123` (disarankan untuk grup)
 - `chat_id:123`
@@ -561,34 +563,34 @@ Utamakan `chat_guid` untuk routing yang stabil:
 - Handle langsung: `+15555550123`, `user@example.com`
   - Jika handle langsung tidak memiliki chat DM yang sudah ada, OpenClaw akan membuatnya melalui `POST /api/v1/chat/new`. Ini memerlukan BlueBubbles Private API diaktifkan.
 
-### Routing iMessage vs SMS
+### Perutean iMessage vs SMS
 
-Saat handle yang sama memiliki chat iMessage dan SMS di Mac (misalnya nomor telepon yang terdaftar di iMessage tetapi juga telah menerima fallback bubble hijau), OpenClaw mengutamakan chat iMessage dan tidak pernah diam-diam menurunkan ke SMS. Untuk memaksa chat SMS, gunakan prefiks target `sms:` yang eksplisit (misalnya `sms:+15555550123`). Handle tanpa chat iMessage yang cocok tetap dikirim melalui chat apa pun yang dilaporkan BlueBubbles.
+Saat handle yang sama memiliki chat iMessage dan chat SMS di Mac (misalnya nomor telepon yang terdaftar di iMessage tetapi juga menerima fallback gelembung hijau), OpenClaw memilih chat iMessage dan tidak pernah diam-diam menurunkan ke SMS. Untuk memaksa chat SMS, gunakan prefiks target `sms:` yang eksplisit (misalnya `sms:+15555550123`). Handle tanpa chat iMessage yang cocok tetap mengirim melalui chat apa pun yang dilaporkan BlueBubbles.
 
 ## Keamanan
 
-- Permintaan Webhook diautentikasi dengan membandingkan parameter query atau header `guid`/`password` terhadap `channels.bluebubbles.password`.
-- Jaga kerahasiaan kata sandi API dan endpoint Webhook (perlakukan seperti kredensial).
-- Tidak ada bypass localhost untuk autentikasi Webhook BlueBubbles. Jika Anda mem-proxy lalu lintas Webhook, pertahankan kata sandi BlueBubbles pada permintaan secara end-to-end. `gateway.trustedProxies` tidak menggantikan `channels.bluebubbles.password` di sini. Lihat [Keamanan Gateway](/id/gateway/security#reverse-proxy-configuration).
-- Aktifkan HTTPS + aturan firewall pada server BlueBubbles jika diekspos di luar LAN Anda.
+- Permintaan Webhook diautentikasi dengan membandingkan parameter kueri atau header `guid`/`password` terhadap `channels.bluebubbles.password`.
+- Jaga kerahasiaan kata sandi API dan endpoint webhook (perlakukan seperti kredensial).
+- Tidak ada bypass localhost untuk autentikasi webhook BlueBubbles. Jika Anda mem-proxy trafik webhook, pertahankan kata sandi BlueBubbles pada permintaan secara end-to-end. `gateway.trustedProxies` tidak menggantikan `channels.bluebubbles.password` di sini. Lihat [Keamanan Gateway](/id/gateway/security#reverse-proxy-configuration).
+- Aktifkan HTTPS + aturan firewall pada server BlueBubbles jika mengeksposnya di luar LAN Anda.
 
 ## Pemecahan masalah
 
-- Jika event mengetik/baca berhenti berfungsi, periksa log Webhook BlueBubbles dan verifikasi jalur gateway cocok dengan `channels.bluebubbles.webhookPath`.
+- Jika peristiwa mengetik/baca berhenti berfungsi, periksa log webhook BlueBubbles dan verifikasi jalur Gateway cocok dengan `channels.bluebubbles.webhookPath`.
 - Kode pairing kedaluwarsa setelah satu jam; gunakan `openclaw pairing list bluebubbles` dan `openclaw pairing approve bluebubbles <code>`.
 - Reaksi memerlukan BlueBubbles private API (`POST /api/v1/message/react`); pastikan versi server mengeksposnya.
-- Edit/unsend memerlukan macOS 13+ dan versi server BlueBubbles yang kompatibel. Pada macOS 26 (Tahoe), edit saat ini rusak karena perubahan private API.
-- Pembaruan ikon grup dapat tidak stabil di macOS 26 (Tahoe): API dapat mengembalikan sukses tetapi ikon baru tidak tersinkron.
-- OpenClaw secara otomatis menyembunyikan tindakan yang diketahui rusak berdasarkan versi macOS server BlueBubbles. Jika edit masih muncul di macOS 26 (Tahoe), nonaktifkan secara manual dengan `channels.bluebubbles.actions.edit=false`.
-- `coalesceSameSenderDms` diaktifkan tetapi split-send (misalnya `Dump` + URL) masih tiba sebagai dua giliran: lihat checklist [pemecahan masalah coalescing split-send](#split-send-coalescing-troubleshooting) — penyebab umum adalah jendela debounce yang terlalu sempit, stempel waktu log sesi yang keliru dibaca sebagai kedatangan Webhook, atau pengiriman reply-quote (yang memakai `replyToBody`, bukan Webhook kedua).
+- Edit/batalkan kirim memerlukan macOS 13+ dan versi server BlueBubbles yang kompatibel. Di macOS 26 (Tahoe), edit saat ini rusak karena perubahan private API.
+- Pembaruan ikon grup dapat kurang andal di macOS 26 (Tahoe): API mungkin mengembalikan sukses tetapi ikon baru tidak tersinkron.
+- OpenClaw otomatis menyembunyikan tindakan yang diketahui rusak berdasarkan versi macOS server BlueBubbles. Jika edit masih muncul di macOS 26 (Tahoe), nonaktifkan secara manual dengan `channels.bluebubbles.actions.edit=false`.
+- `coalesceSameSenderDms` diaktifkan tetapi split-send (misalnya `Dump` + URL) masih tiba sebagai dua giliran: lihat checklist [pemecahan masalah penggabungan split-send](#split-send-coalescing-troubleshooting) — penyebab umumnya adalah jendela debounce yang terlalu sempit, stempel waktu log sesi yang salah dibaca sebagai kedatangan webhook, atau pengiriman reply-quote (yang menggunakan `replyToBody`, bukan webhook kedua).
 - Untuk info status/kesehatan: `openclaw status --all` atau `openclaw status --deep`.
 
-Untuk referensi alur kerja channel umum, lihat [Channels](/id/channels) dan panduan [Plugins](/id/tools/plugin).
+Untuk referensi alur kerja channel umum, lihat panduan [Channels](/id/channels) dan [Plugins](/id/tools/plugin).
 
 ## Terkait
 
-- [Ikhtisar Channels](/id/channels) — semua channel yang didukung
+- [Ringkasan Channels](/id/channels) — semua channel yang didukung
 - [Pairing](/id/channels/pairing) — autentikasi DM dan alur pairing
-- [Groups](/id/channels/groups) — perilaku chat grup dan gating mention
-- [Channel Routing](/id/channels/channel-routing) — routing sesi untuk pesan
-- [Security](/id/gateway/security) — model akses dan hardening
+- [Groups](/id/channels/groups) — perilaku chat grup dan pembatasan mention
+- [Perutean Channel](/id/channels/channel-routing) — perutean sesi untuk pesan
+- [Keamanan](/id/gateway/security) — model akses dan hardening

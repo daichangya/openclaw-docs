@@ -1,44 +1,48 @@
 ---
 read_when:
     - Anda ingin menjalankan OpenClaw terhadap server vLLM lokal
-    - Anda ingin endpoint `/v1` yang kompatibel dengan OpenAI dengan model Anda sendiri
+    - Anda menginginkan endpoint `/v1` yang kompatibel dengan OpenAI dengan model Anda sendiri
 summary: Jalankan OpenClaw dengan vLLM (server lokal yang kompatibel dengan OpenAI)
 title: vLLM
 x-i18n:
-    generated_at: "2026-04-12T23:33:04Z"
+    generated_at: "2026-04-23T09:27:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a43be9ae879158fcd69d50fb3a47616fd560e3c6fe4ecb3a109bdda6a63a6a80
+    source_hash: c6c4ceeb59cc10079630e45263485747eadfc66a66267d27579f466d0c0a91a1
     source_path: providers/vllm.md
     workflow: 15
 ---
 
 # vLLM
 
-vLLM dapat menyajikan model open-source (dan beberapa model kustom) melalui API HTTP **yang kompatibel dengan OpenAI**. OpenClaw terhubung ke vLLM menggunakan API `openai-completions`.
+vLLM dapat menyajikan model open-source (dan beberapa model kustom) melalui HTTP API **yang kompatibel dengan OpenAI**. OpenClaw terhubung ke vLLM menggunakan API `openai-completions`.
 
-OpenClaw juga dapat **menemukan otomatis** model yang tersedia dari vLLM saat Anda melakukan opt-in dengan `VLLM_API_KEY` (nilai apa pun berfungsi jika server Anda tidak menerapkan auth) dan Anda tidak mendefinisikan entri `models.providers.vllm` secara eksplisit.
+OpenClaw juga dapat **menemukan otomatis** model yang tersedia dari vLLM saat Anda ikut serta dengan `VLLM_API_KEY` (nilai apa pun berfungsi jika server Anda tidak menegakkan auth) dan Anda tidak mendefinisikan entri `models.providers.vllm` secara eksplisit.
 
-| Property         | Value                                    |
+OpenClaw memperlakukan `vllm` sebagai provider lokal yang kompatibel dengan OpenAI dan mendukung
+streamed usage accounting, sehingga jumlah token status/konteks dapat diperbarui dari
+respons `stream_options.include_usage`.
+
+| Properti         | Nilai                                    |
 | ---------------- | ---------------------------------------- |
 | ID Provider      | `vllm`                                   |
 | API              | `openai-completions` (kompatibel dengan OpenAI) |
-| Auth             | Variabel environment `VLLM_API_KEY`      |
+| Auth             | variabel lingkungan `VLLM_API_KEY`       |
 | Base URL default | `http://127.0.0.1:8000/v1`               |
 
-## Memulai
+## Mulai menggunakan
 
 <Steps>
   <Step title="Mulai vLLM dengan server yang kompatibel dengan OpenAI">
-    Base URL Anda harus mengekspos endpoint `/v1` (mis. `/v1/models`, `/v1/chat/completions`). vLLM umumnya berjalan di:
+    Base URL Anda harus mengekspos endpoint `/v1` (misalnya `/v1/models`, `/v1/chat/completions`). vLLM umumnya berjalan di:
 
     ```
     http://127.0.0.1:8000/v1
     ```
 
   </Step>
-  <Step title="Setel variabel environment API key">
-    Nilai apa pun berfungsi jika server Anda tidak menerapkan auth:
+  <Step title="Tetapkan variabel lingkungan API key">
+    Nilai apa pun berfungsi jika server Anda tidak menegakkan auth:
 
     ```bash
     export VLLM_API_KEY="vllm-local"
@@ -46,7 +50,7 @@ OpenClaw juga dapat **menemukan otomatis** model yang tersedia dari vLLM saat An
 
   </Step>
   <Step title="Pilih model">
-    Ganti dengan salah satu ID model vLLM Anda:
+    Ganti dengan salah satu model ID vLLM Anda:
 
     ```json5
     {
@@ -66,26 +70,26 @@ OpenClaw juga dapat **menemukan otomatis** model yang tersedia dari vLLM saat An
   </Step>
 </Steps>
 
-## Penemuan model (provider implisit)
+## Discovery model (provider implisit)
 
-Saat `VLLM_API_KEY` disetel (atau profil auth ada) dan Anda **tidak** mendefinisikan `models.providers.vllm`, OpenClaw mengueri:
+Saat `VLLM_API_KEY` ditetapkan (atau ada auth profile) dan Anda **tidak** mendefinisikan `models.providers.vllm`, OpenClaw mengueri:
 
 ```
 GET http://127.0.0.1:8000/v1/models
 ```
 
-dan mengubah ID yang dikembalikan menjadi entri model.
+dan mengonversi ID yang dikembalikan menjadi entri model.
 
 <Note>
-Jika Anda menyetel `models.providers.vllm` secara eksplisit, penemuan otomatis dilewati dan Anda harus mendefinisikan model secara manual.
+Jika Anda menetapkan `models.providers.vllm` secara eksplisit, discovery otomatis dilewati dan Anda harus mendefinisikan model secara manual.
 </Note>
 
 ## Konfigurasi eksplisit (model manual)
 
-Gunakan konfigurasi eksplisit ketika:
+Gunakan konfigurasi eksplisit saat:
 
 - vLLM berjalan di host atau port yang berbeda
-- Anda ingin mem-pin nilai `contextWindow` atau `maxTokens`
+- Anda ingin menetapkan nilai `contextWindow` atau `maxTokens`
 - Server Anda memerlukan API key sungguhan (atau Anda ingin mengontrol header)
 
 ```json5
@@ -117,21 +121,22 @@ Gunakan konfigurasi eksplisit ketika:
 
 <AccordionGroup>
   <Accordion title="Perilaku bergaya proxy">
-    vLLM diperlakukan sebagai backend `/v1` bergaya proxy yang kompatibel dengan OpenAI, bukan endpoint OpenAI native. Ini berarti:
+    vLLM diperlakukan sebagai backend `/v1` bergaya proxy yang kompatibel dengan OpenAI, bukan endpoint
+    OpenAI native. Artinya:
 
-    | Behavior | Applied? |
-    |----------|----------|
+    | Perilaku | Diterapkan? |
+    |----------|-------------|
     | Pembentukan permintaan OpenAI native | Tidak |
     | `service_tier` | Tidak dikirim |
     | Responses `store` | Tidak dikirim |
     | Petunjuk prompt-cache | Tidak dikirim |
-    | Pembentukan payload kompatibilitas reasoning OpenAI | Tidak diterapkan |
-    | Header atribusi OpenClaw tersembunyi | Tidak disuntikkan pada base URL kustom |
+    | Pembentukan payload compat reasoning OpenAI | Tidak diterapkan |
+    | Header attribution OpenClaw tersembunyi | Tidak disuntikkan pada base URL kustom |
 
   </Accordion>
 
   <Accordion title="Base URL kustom">
-    Jika server vLLM Anda berjalan di host atau port non-default, setel `baseUrl` dalam konfigurasi provider eksplisit:
+    Jika server vLLM Anda berjalan di host atau port non-default, tetapkan `baseUrl` di konfigurasi provider eksplisit:
 
     ```json5
     {
@@ -144,7 +149,7 @@ Gunakan konfigurasi eksplisit ketika:
             models: [
               {
                 id: "my-custom-model",
-                name: "Model vLLM Remote",
+                name: "Model vLLM Jarak Jauh",
                 reasoning: false,
                 input: ["text"],
                 contextWindow: 64000,
@@ -164,7 +169,7 @@ Gunakan konfigurasi eksplisit ketika:
 
 <AccordionGroup>
   <Accordion title="Server tidak dapat dijangkau">
-    Periksa bahwa server vLLM berjalan dan dapat diakses:
+    Periksa bahwa server vLLM sedang berjalan dan dapat diakses:
 
     ```bash
     curl http://127.0.0.1:8000/v1/models
@@ -175,28 +180,28 @@ Gunakan konfigurasi eksplisit ketika:
   </Accordion>
 
   <Accordion title="Error auth pada permintaan">
-    Jika permintaan gagal dengan error auth, setel `VLLM_API_KEY` sungguhan yang sesuai dengan konfigurasi server Anda, atau konfigurasikan provider secara eksplisit di bawah `models.providers.vllm`.
+    Jika permintaan gagal dengan error auth, tetapkan `VLLM_API_KEY` sungguhan yang cocok dengan konfigurasi server Anda, atau konfigurasi provider secara eksplisit di bawah `models.providers.vllm`.
 
     <Tip>
-    Jika server vLLM Anda tidak menerapkan auth, nilai apa pun yang tidak kosong untuk `VLLM_API_KEY` berfungsi sebagai sinyal opt-in untuk OpenClaw.
+    Jika server vLLM Anda tidak menegakkan auth, nilai `VLLM_API_KEY` apa pun yang tidak kosong berfungsi sebagai sinyal opt-in untuk OpenClaw.
     </Tip>
 
   </Accordion>
 
   <Accordion title="Tidak ada model yang ditemukan">
-    Penemuan otomatis memerlukan `VLLM_API_KEY` disetel **dan** tidak ada entri konfigurasi `models.providers.vllm` yang eksplisit. Jika Anda telah mendefinisikan provider secara manual, OpenClaw melewati penemuan dan hanya menggunakan model yang Anda deklarasikan.
+    Discovery otomatis memerlukan `VLLM_API_KEY` ditetapkan **dan** tidak ada entri konfigurasi `models.providers.vllm` yang eksplisit. Jika Anda telah mendefinisikan provider secara manual, OpenClaw melewati discovery dan hanya menggunakan model yang Anda deklarasikan.
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Bantuan lebih lanjut: [Pemecahan masalah](/id/help/troubleshooting) dan [FAQ](/id/help/faq).
+Bantuan lebih lanjut: [Troubleshooting](/id/help/troubleshooting) dan [FAQ](/id/help/faq).
 </Warning>
 
 ## Terkait
 
 <CardGroup cols={2}>
   <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
-    Memilih provider, ref model, dan perilaku failover.
+    Memilih provider, referensi model, dan perilaku failover.
   </Card>
   <Card title="OpenAI" href="/id/providers/openai" icon="bolt">
     Provider OpenAI native dan perilaku rute yang kompatibel dengan OpenAI.
@@ -204,7 +209,7 @@ Bantuan lebih lanjut: [Pemecahan masalah](/id/help/troubleshooting) dan [FAQ](/i
   <Card title="OAuth dan auth" href="/id/gateway/authentication" icon="key">
     Detail auth dan aturan penggunaan ulang kredensial.
   </Card>
-  <Card title="Pemecahan masalah" href="/id/help/troubleshooting" icon="wrench">
+  <Card title="Troubleshooting" href="/id/help/troubleshooting" icon="wrench">
     Masalah umum dan cara mengatasinya.
   </Card>
 </CardGroup>

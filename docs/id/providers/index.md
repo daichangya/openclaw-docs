@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Anda ingin memilih provider model
-    - Anda memerlukan ikhtisar cepat tentang backend LLM yang didukung
+    - Anda ingin memilih provider model մը
+    - Anda memerlukan gambaran cepat tentang backend LLM yang didukung
 summary: Provider model (LLM) yang didukung oleh OpenClaw
 title: Direktori Provider
 x-i18n:
-    generated_at: "2026-04-22T04:25:50Z"
+    generated_at: "2026-04-23T09:26:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7d77e5da93d71c48ea97460c6be56fbbe8279d9240a8101e1b35fdafb657737e
+    source_hash: 2b038f095480fc2cd4f7eb75500d9d8eb7b03fa90614e122744939e0ddc6996d
     source_path: providers/index.md
     workflow: 15
 ---
@@ -18,7 +18,7 @@ x-i18n:
 OpenClaw dapat menggunakan banyak provider LLM. Pilih provider, lakukan autentikasi, lalu setel
 model default sebagai `provider/model`.
 
-Mencari docs channel chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/dll.)? Lihat [Channels](/id/channels).
+Mencari dokumentasi chat channel (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/dll.)? Lihat [Channels](/id/channels).
 
 ## Mulai cepat
 
@@ -31,10 +31,11 @@ Mencari docs channel chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/d
 }
 ```
 
-## Docs provider
+## Dokumentasi provider
 
 - [Alibaba Model Studio](/id/providers/alibaba)
 - [Amazon Bedrock](/id/providers/bedrock)
+- [Amazon Bedrock Mantle](/id/providers/bedrock-mantle)
 - [Anthropic (API + Claude CLI)](/id/providers/anthropic)
 - [Arcee AI (model Trinity)](/id/providers/arcee)
 - [BytePlus (Internasional)](/id/concepts/model-providers#byteplus-international)
@@ -42,6 +43,7 @@ Mencari docs channel chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/d
 - [Cloudflare AI Gateway](/id/providers/cloudflare-ai-gateway)
 - [ComfyUI](/id/providers/comfy)
 - [DeepSeek](/id/providers/deepseek)
+- [ElevenLabs](/id/providers/elevenlabs)
 - [fal](/id/providers/fal)
 - [Fireworks](/id/providers/fireworks)
 - [GitHub Copilot](/id/providers/github-copilot)
@@ -69,6 +71,7 @@ Mencari docs channel chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/d
 - [SGLang (model lokal)](/id/providers/sglang)
 - [StepFun](/id/providers/stepfun)
 - [Synthetic](/id/providers/synthetic)
+- [Tencent Cloud (TokenHub)](/id/providers/tencent)
 - [Together AI](/id/providers/together)
 - [Venice (Venice AI, berfokus pada privasi)](/id/providers/venice)
 - [Vercel AI Gateway](/id/providers/vercel-ai-gateway)
@@ -79,16 +82,20 @@ Mencari docs channel chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/d
 - [Xiaomi](/id/providers/xiaomi)
 - [Z.AI](/id/providers/zai)
 
-## Halaman ikhtisar bersama
+## Halaman gambaran umum bersama
 
 - [Varian bawaan tambahan](/id/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy, dan Gemini CLI OAuth
-- [Image Generation](/id/tools/image-generation) - Tool `image_generate` bersama, pemilihan provider, dan failover
-- [Music Generation](/id/tools/music-generation) - Tool `music_generate` bersama, pemilihan provider, dan failover
-- [Video Generation](/id/tools/video-generation) - Tool `video_generate` bersama, pemilihan provider, dan failover
+- [Generasi Gambar](/id/tools/image-generation) - tool `image_generate` bersama, pemilihan provider, dan failover
+- [Generasi Musik](/id/tools/music-generation) - tool `music_generate` bersama, pemilihan provider, dan failover
+- [Generasi Video](/id/tools/video-generation) - tool `video_generate` bersama, pemilihan provider, dan failover
 
 ## Provider transkripsi
 
 - [Deepgram (transkripsi audio)](/id/providers/deepgram)
+- [ElevenLabs](/id/providers/elevenlabs#speech-to-text)
+- [Mistral](/id/providers/mistral#audio-transcription-voxtral)
+- [OpenAI](/id/providers/openai#speech-to-text)
+- [xAI](/id/providers/xai#speech-to-text)
 
 ## Tool komunitas
 

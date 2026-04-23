@@ -4,44 +4,44 @@ read_when:
 summary: Status dukungan, kemampuan, dan konfigurasi bot Discord
 title: Discord
 x-i18n:
-    generated_at: "2026-04-22T04:19:49Z"
+    generated_at: "2026-04-23T09:16:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 613ae39bc4b8c5661cbaab4f70a57af584f296581c3ce54ddaef0feab44e7e42
+    source_hash: 1160a0b221bc3251722a81c00c65ee7c2001efce345248727f1f3c8580a0e953
     source_path: channels/discord.md
     workflow: 15
 ---
 
-# Discord (API Bot)
+# Discord (Bot API)
 
 Status: siap untuk DM dan channel guild melalui gateway Discord resmi.
 
 <CardGroup cols={3}>
-  <Card title="Pairing" icon="link" href="/id/channels/pairing">
-    DM Discord secara default menggunakan mode pairing.
+  <Card title="Pemasangan" icon="link" href="/id/channels/pairing">
+    DM Discord secara default menggunakan mode pemasangan.
   </Card>
-  <Card title="Slash commands" icon="terminal" href="/id/tools/slash-commands">
+  <Card title="Perintah slash" icon="terminal" href="/id/tools/slash-commands">
     Perilaku perintah native dan katalog perintah.
   </Card>
-  <Card title="Channel troubleshooting" icon="wrench" href="/id/channels/troubleshooting">
-    Diagnostik lintas channel dan alur perbaikan.
+  <Card title="Pemecahan masalah channel" icon="wrench" href="/id/channels/troubleshooting">
+    Diagnostik lintas-channel dan alur perbaikan.
   </Card>
 </CardGroup>
 
 ## Penyiapan cepat
 
-Anda perlu membuat aplikasi baru dengan bot, menambahkan bot ke server Anda, lalu memasangkannya ke OpenClaw. Kami menyarankan menambahkan bot ke server privat Anda sendiri. Jika Anda belum memilikinya, [buat terlebih dahulu](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (pilih **Create My Own > For me and my friends**).
+Anda perlu membuat aplikasi baru dengan bot, menambahkan bot ke server Anda, dan memasangkannya ke OpenClaw. Kami menyarankan untuk menambahkan bot Anda ke server pribadi Anda sendiri. Jika Anda belum punya, [buat terlebih dahulu](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (pilih **Create My Own > For me and my friends**).
 
 <Steps>
-  <Step title="Create a Discord application and bot">
-    Buka [Discord Developer Portal](https://discord.com/developers/applications) lalu klik **New Application**. Beri nama seperti "OpenClaw".
+  <Step title="Buat aplikasi dan bot Discord">
+    Buka [Discord Developer Portal](https://discord.com/developers/applications) dan klik **New Application**. Beri nama seperti "OpenClaw".
 
-    Klik **Bot** di sidebar. Atur **Username** ke nama yang Anda gunakan untuk agen OpenClaw Anda.
+    Klik **Bot** di sidebar. Atur **Username** ke apa pun yang Anda gunakan untuk menyebut agen OpenClaw Anda.
 
   </Step>
 
-  <Step title="Enable privileged intents">
-    Masih di halaman **Bot**, gulir ke bawah ke **Privileged Gateway Intents** lalu aktifkan:
+  <Step title="Aktifkan intent berhak istimewa">
+    Masih di halaman **Bot**, gulir ke bawah ke **Privileged Gateway Intents** dan aktifkan:
 
     - **Message Content Intent** (wajib)
     - **Server Members Intent** (disarankan; wajib untuk allowlist peran dan pencocokan nama ke ID)
@@ -49,42 +49,45 @@ Anda perlu membuat aplikasi baru dengan bot, menambahkan bot ke server Anda, lal
 
   </Step>
 
-  <Step title="Copy your bot token">
-    Gulir kembali ke atas pada halaman **Bot** lalu klik **Reset Token**.
+  <Step title="Salin token bot Anda">
+    Gulir kembali ke atas pada halaman **Bot** dan klik **Reset Token**.
 
     <Note>
-    Meskipun namanya demikian, ini menghasilkan token pertama Anda — tidak ada yang sedang "di-reset."
+    Meski namanya begitu, ini menghasilkan token pertama Anda — tidak ada yang sedang "direset."
     </Note>
 
-    Salin token tersebut dan simpan di suatu tempat. Ini adalah **Bot Token** Anda dan Anda akan segera memerlukannya.
+    Salin token tersebut dan simpan di suatu tempat. Ini adalah **Bot Token** Anda dan Anda akan segera membutuhkannya.
 
   </Step>
 
-  <Step title="Generate an invite URL and add the bot to your server">
+  <Step title="Buat URL undangan dan tambahkan bot ke server Anda">
     Klik **OAuth2** di sidebar. Anda akan membuat URL undangan dengan izin yang tepat untuk menambahkan bot ke server Anda.
 
-    Gulir ke bawah ke **OAuth2 URL Generator** lalu aktifkan:
+    Gulir ke bawah ke **OAuth2 URL Generator** dan aktifkan:
 
     - `bot`
     - `applications.commands`
 
-    Bagian **Bot Permissions** akan muncul di bawahnya. Aktifkan:
+    Bagian **Bot Permissions** akan muncul di bawahnya. Aktifkan setidaknya:
 
-    - View Channels
-    - Send Messages
-    - Read Message History
-    - Embed Links
-    - Attach Files
-    - Add Reactions (opsional)
+    **General Permissions**
+      - View Channels
+    **Text Permissions**
+      - Send Messages
+      - Read Message History
+      - Embed Links
+      - Attach Files
+      - Add Reactions (opsional)
 
-    Salin URL yang dihasilkan di bagian bawah, tempelkan ke browser Anda, pilih server Anda, lalu klik **Continue** untuk menghubungkan. Sekarang Anda seharusnya melihat bot Anda di server Discord.
+    Ini adalah set dasar untuk channel teks normal. Jika Anda berencana memposting di thread Discord, termasuk alur channel forum atau media yang membuat atau melanjutkan thread, aktifkan juga **Send Messages in Threads**.
+    Salin URL yang dihasilkan di bagian bawah, tempelkan ke browser Anda, pilih server Anda, lalu klik **Continue** untuk menghubungkan. Sekarang Anda seharusnya dapat melihat bot Anda di server Discord.
 
   </Step>
 
-  <Step title="Enable Developer Mode and collect your IDs">
-    Kembali ke aplikasi Discord, Anda perlu mengaktifkan Developer Mode agar dapat menyalin ID internal.
+  <Step title="Aktifkan Developer Mode dan kumpulkan ID Anda">
+    Kembali ke aplikasi Discord, Anda perlu mengaktifkan Developer Mode agar bisa menyalin ID internal.
 
-    1. Klik **User Settings** (ikon roda gigi di samping avatar Anda) → **Advanced** → aktifkan **Developer Mode**
+    1. Klik **User Settings** (ikon roda gigi di sebelah avatar Anda) → **Advanced** → aktifkan **Developer Mode**
     2. Klik kanan **ikon server** Anda di sidebar → **Copy Server ID**
     3. Klik kanan **avatar Anda sendiri** → **Copy User ID**
 
@@ -92,15 +95,15 @@ Anda perlu membuat aplikasi baru dengan bot, menambahkan bot ke server Anda, lal
 
   </Step>
 
-  <Step title="Allow DMs from server members">
-    Agar pairing berfungsi, Discord harus mengizinkan bot Anda mengirim DM kepada Anda. Klik kanan **ikon server** Anda → **Privacy Settings** → aktifkan **Direct Messages**.
+  <Step title="Izinkan DM dari anggota server">
+    Agar pemasangan berfungsi, Discord perlu mengizinkan bot Anda mengirim DM kepada Anda. Klik kanan **ikon server** Anda → **Privacy Settings** → aktifkan **Direct Messages**.
 
-    Ini memungkinkan anggota server (termasuk bot) mengirim DM kepada Anda. Biarkan ini tetap aktif jika Anda ingin menggunakan DM Discord dengan OpenClaw. Jika Anda hanya berencana menggunakan channel guild, Anda dapat menonaktifkan DM setelah pairing.
+    Ini memungkinkan anggota server (termasuk bot) mengirim DM kepada Anda. Biarkan ini tetap aktif jika Anda ingin menggunakan DM Discord dengan OpenClaw. Jika Anda hanya berencana menggunakan channel guild, Anda dapat menonaktifkan DM setelah pemasangan.
 
   </Step>
 
-  <Step title="Set your bot token securely (do not send it in chat)">
-    Token bot Discord Anda adalah rahasia (seperti kata sandi). Atur token ini pada mesin yang menjalankan OpenClaw sebelum mengirim pesan ke agen Anda.
+  <Step title="Atur token bot Anda dengan aman (jangan kirimkan di chat)">
+    Token bot Discord Anda adalah rahasia (seperti kata sandi). Atur token itu di mesin yang menjalankan OpenClaw sebelum mengirim pesan ke agen Anda.
 
 ```bash
 export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN"
@@ -110,17 +113,17 @@ openclaw config set channels.discord.enabled true --strict-json
 openclaw gateway
 ```
 
-    Jika OpenClaw sudah berjalan sebagai layanan latar belakang, mulai ulang melalui aplikasi OpenClaw Mac atau dengan menghentikan lalu menjalankan kembali proses `openclaw gateway run`.
+    Jika OpenClaw sudah berjalan sebagai layanan latar belakang, mulai ulang melalui aplikasi OpenClaw Mac atau dengan menghentikan lalu memulai ulang proses `openclaw gateway run`.
 
   </Step>
 
-  <Step title="Configure OpenClaw and pair">
+  <Step title="Konfigurasikan OpenClaw dan lakukan pemasangan">
 
     <Tabs>
-      <Tab title="Ask your agent">
+      <Tab title="Tanya agen Anda">
         Chat dengan agen OpenClaw Anda di channel lain yang sudah ada (misalnya Telegram) dan beri tahu agen tersebut. Jika Discord adalah channel pertama Anda, gunakan tab CLI / config sebagai gantinya.
 
-        > "Saya sudah menetapkan token bot Discord saya di config. Tolong selesaikan penyiapan Discord dengan User ID `<user_id>` dan Server ID `<server_id>`."
+        > "Saya sudah mengatur token bot Discord saya di config. Tolong selesaikan penyiapan Discord dengan User ID `<user_id>` dan Server ID `<server_id>`."
       </Tab>
       <Tab title="CLI / config">
         Jika Anda lebih suka config berbasis file, atur:
@@ -153,14 +156,14 @@ DISCORD_BOT_TOKEN=...
 
   </Step>
 
-  <Step title="Approve first DM pairing">
-    Tunggu hingga gateway berjalan, lalu kirim DM ke bot Anda di Discord. Bot akan merespons dengan kode pairing.
+  <Step title="Setujui pemasangan DM pertama">
+    Tunggu sampai gateway berjalan, lalu kirim DM ke bot Anda di Discord. Bot akan merespons dengan kode pemasangan.
 
     <Tabs>
-      <Tab title="Ask your agent">
-        Kirim kode pairing ke agen Anda di channel yang sudah ada:
+      <Tab title="Tanya agen Anda">
+        Kirim kode pemasangan ke agen Anda di channel yang sudah ada:
 
-        > "Setujui kode pairing Discord ini: `<CODE>`"
+        > "Setujui kode pemasangan Discord ini: `<CODE>`"
       </Tab>
       <Tab title="CLI">
 
@@ -172,7 +175,7 @@ openclaw pairing approve discord <CODE>
       </Tab>
     </Tabs>
 
-    Kode pairing kedaluwarsa setelah 1 jam.
+    Kode pemasangan kedaluwarsa setelah 1 jam.
 
     Sekarang Anda seharusnya dapat chat dengan agen Anda di Discord melalui DM.
 
@@ -180,21 +183,21 @@ openclaw pairing approve discord <CODE>
 </Steps>
 
 <Note>
-Resolusi token bersifat account-aware. Nilai token di config mengungguli fallback env. `DISCORD_BOT_TOKEN` hanya digunakan untuk akun default.
-Untuk panggilan outbound lanjutan (aksi message tool/channel), `token` eksplisit per panggilan digunakan untuk panggilan tersebut. Ini berlaku untuk aksi gaya kirim dan baca/probe (misalnya read/search/fetch/thread/pins/permissions). Pengaturan kebijakan akun/retry tetap berasal dari akun yang dipilih dalam snapshot runtime aktif.
+Resolusi token bersifat sadar-akun. Nilai token config lebih diutamakan daripada fallback env. `DISCORD_BOT_TOKEN` hanya digunakan untuk akun default.
+Untuk panggilan outbound lanjutan (alat pesan/aksi channel), `token` eksplisit per panggilan digunakan untuk panggilan tersebut. Ini berlaku untuk aksi kirim dan baca/probe (misalnya read/search/fetch/thread/pins/permissions). Pengaturan kebijakan akun/retry tetap berasal dari akun yang dipilih dalam snapshot runtime aktif.
 </Note>
 
-## Rekomendasi: Siapkan workspace guild
+## Disarankan: Siapkan workspace guild
 
-Setelah DM berfungsi, Anda dapat menyiapkan server Discord sebagai workspace penuh, di mana setiap channel mendapatkan sesi agen sendiri dengan konteksnya masing-masing. Ini direkomendasikan untuk server privat yang hanya berisi Anda dan bot Anda.
+Setelah DM berfungsi, Anda dapat menyiapkan server Discord Anda sebagai workspace penuh tempat setiap channel mendapatkan sesi agen sendiri dengan konteksnya sendiri. Ini direkomendasikan untuk server pribadi yang hanya berisi Anda dan bot Anda.
 
 <Steps>
-  <Step title="Add your server to the guild allowlist">
-    Ini memungkinkan agen Anda merespons di channel mana pun pada server Anda, bukan hanya DM.
+  <Step title="Tambahkan server Anda ke allowlist guild">
+    Ini memungkinkan agen Anda merespons di channel apa pun di server Anda, bukan hanya DM.
 
     <Tabs>
-      <Tab title="Ask your agent">
-        > "Tambahkan Discord Server ID saya `<server_id>` ke guild allowlist"
+      <Tab title="Tanya agen Anda">
+        > "Tambahkan Server ID Discord saya `<server_id>` ke allowlist guild"
       </Tab>
       <Tab title="Config">
 
@@ -219,15 +222,15 @@ Setelah DM berfungsi, Anda dapat menyiapkan server Discord sebagai workspace pen
 
   </Step>
 
-  <Step title="Allow responses without @mention">
-    Secara default, agen Anda hanya merespons di channel guild saat di-@mention. Untuk server privat, Anda kemungkinan ingin agen tersebut merespons setiap pesan.
+  <Step title="Izinkan respons tanpa @mention">
+    Secara default, agen Anda hanya merespons di channel guild saat di-@mention. Untuk server pribadi, Anda kemungkinan ingin agen merespons setiap pesan.
 
     <Tabs>
-      <Tab title="Ask your agent">
+      <Tab title="Tanya agen Anda">
         > "Izinkan agen saya merespons di server ini tanpa harus di-@mention"
       </Tab>
       <Tab title="Config">
-        Atur `requireMention: false` dalam config guild Anda:
+        Atur `requireMention: false` di config guild Anda:
 
 ```json5
 {
@@ -248,31 +251,31 @@ Setelah DM berfungsi, Anda dapat menyiapkan server Discord sebagai workspace pen
 
   </Step>
 
-  <Step title="Plan for memory in guild channels">
+  <Step title="Rencanakan penggunaan memori di channel guild">
     Secara default, memori jangka panjang (`MEMORY.md`) hanya dimuat dalam sesi DM. Channel guild tidak memuat `MEMORY.md` secara otomatis.
 
     <Tabs>
-      <Tab title="Ask your agent">
-        > "Saat saya mengajukan pertanyaan di channel Discord, gunakan memory_search atau memory_get jika Anda memerlukan konteks jangka panjang dari `MEMORY.md`."
+      <Tab title="Tanya agen Anda">
+        > "Saat saya mengajukan pertanyaan di channel Discord, gunakan memory_search atau memory_get jika Anda memerlukan konteks jangka panjang dari MEMORY.md."
       </Tab>
       <Tab title="Manual">
-        Jika Anda memerlukan konteks bersama di setiap channel, letakkan instruksi yang stabil di `AGENTS.md` atau `USER.md` (keduanya diinjeksi untuk setiap sesi). Simpan catatan jangka panjang di `MEMORY.md` dan akses sesuai kebutuhan dengan tool memori.
+        Jika Anda memerlukan konteks bersama di setiap channel, letakkan instruksi stabil di `AGENTS.md` atau `USER.md` (keduanya disuntikkan ke setiap sesi). Simpan catatan jangka panjang di `MEMORY.md` dan akses sesuai kebutuhan dengan alat memori.
       </Tab>
     </Tabs>
 
   </Step>
 </Steps>
 
-Sekarang buat beberapa channel di server Discord Anda dan mulailah chat. Agen Anda dapat melihat nama channel, dan setiap channel mendapatkan sesi terisolasi sendiri — jadi Anda dapat menyiapkan `#coding`, `#home`, `#research`, atau apa pun yang sesuai dengan alur kerja Anda.
+Sekarang buat beberapa channel di server Discord Anda dan mulai chat. Agen Anda dapat melihat nama channel, dan setiap channel mendapatkan sesi terisolasi sendiri — jadi Anda dapat menyiapkan `#coding`, `#home`, `#research`, atau apa pun yang sesuai dengan alur kerja Anda.
 
 ## Model runtime
 
 - Gateway memiliki koneksi Discord.
-- Perutean balasan bersifat deterministik: balasan masuk dari Discord kembali ke Discord.
+- Perutean balasan bersifat deterministik: pesan masuk dari Discord dibalas kembali ke Discord.
 - Secara default (`session.dmScope=main`), chat langsung berbagi sesi utama agen (`agent:main:main`).
-- Channel guild menggunakan key sesi terisolasi (`agent:<agentId>:discord:channel:<channelId>`).
-- Group DM diabaikan secara default (`channels.discord.dm.groupEnabled=false`).
-- Slash command native berjalan dalam sesi perintah terisolasi (`agent:<agentId>:discord:slash:<userId>`), sambil tetap membawa `CommandTargetSessionKey` ke sesi percakapan yang dirutekan.
+- Channel guild adalah kunci sesi terisolasi (`agent:<agentId>:discord:channel:<channelId>`).
+- DM grup diabaikan secara default (`channels.discord.dm.groupEnabled=false`).
+- Perintah slash native berjalan dalam sesi perintah terisolasi (`agent:<agentId>:discord:slash:<userId>`), sambil tetap membawa `CommandTargetSessionKey` ke sesi percakapan yang dirutekan.
 
 ## Channel forum
 
@@ -285,45 +288,45 @@ Contoh: kirim ke induk forum untuk membuat thread
 
 ```bash
 openclaw message send --channel discord --target channel:<forumId> \
-  --message "Judul topik\nIsi posting"
+  --message "Topic title\nBody of the post"
 ```
 
 Contoh: buat thread forum secara eksplisit
 
 ```bash
 openclaw message thread create --channel discord --target channel:<forumId> \
-  --thread-name "Judul topik" --message "Isi posting"
+  --thread-name "Topic title" --message "Body of the post"
 ```
 
 Induk forum tidak menerima komponen Discord. Jika Anda memerlukan komponen, kirim ke thread itu sendiri (`channel:<threadId>`).
 
 ## Komponen interaktif
 
-OpenClaw mendukung container komponen Discord v2 untuk pesan agen. Gunakan message tool dengan payload `components`. Hasil interaksi dirutekan kembali ke agen sebagai pesan masuk normal dan mengikuti pengaturan Discord `replyToMode` yang ada.
+OpenClaw mendukung container komponen Discord v2 untuk pesan agen. Gunakan alat pesan dengan payload `components`. Hasil interaksi dirutekan kembali ke agen sebagai pesan masuk normal dan mengikuti pengaturan Discord `replyToMode` yang ada.
 
 Blok yang didukung:
 
 - `text`, `section`, `separator`, `actions`, `media-gallery`, `file`
 - Baris aksi mendukung hingga 5 tombol atau satu menu pilih
-- Tipe select: `string`, `user`, `role`, `mentionable`, `channel`
+- Jenis select: `string`, `user`, `role`, `mentionable`, `channel`
 
-Secara default, komponen hanya dapat digunakan satu kali. Atur `components.reusable=true` agar tombol, select, dan form dapat digunakan beberapa kali sampai kedaluwarsa.
+Secara default, komponen hanya dapat digunakan satu kali. Atur `components.reusable=true` untuk mengizinkan tombol, select, dan form digunakan beberapa kali sampai kedaluwarsa.
 
-Untuk membatasi siapa yang dapat mengklik tombol, atur `allowedUsers` pada tombol tersebut (Discord user ID, tag, atau `*`). Jika dikonfigurasi, pengguna yang tidak cocok akan menerima penolakan ephemeral.
+Untuk membatasi siapa yang dapat mengklik tombol, atur `allowedUsers` pada tombol tersebut (ID pengguna Discord, tag, atau `*`). Saat dikonfigurasi, pengguna yang tidak cocok akan menerima penolakan ephemeral.
 
-Slash command `/model` dan `/models` membuka pemilih model interaktif dengan dropdown provider dan model serta langkah Submit. Balasan pemilih bersifat ephemeral dan hanya dapat digunakan oleh pengguna yang memanggilnya.
+Perintah slash `/model` dan `/models` membuka pemilih model interaktif dengan dropdown provider dan model plus langkah Submit. Kecuali `commands.modelsWrite=false`, `/models add` juga mendukung penambahan entri provider/model baru dari chat, dan model yang baru ditambahkan akan muncul tanpa me-restart gateway. Balasan pemilih bersifat ephemeral dan hanya pengguna yang memanggilnya yang dapat menggunakannya.
 
 Lampiran file:
 
 - Blok `file` harus mengarah ke referensi lampiran (`attachment://<filename>`)
-- Sediakan lampiran melalui `media`/`path`/`filePath` (satu file); gunakan `media-gallery` untuk beberapa file
-- Gunakan `filename` untuk mengganti nama unggahan saat harus cocok dengan referensi lampiran
+- Sediakan lampiran melalui `media`/`path`/`filePath` (file tunggal); gunakan `media-gallery` untuk beberapa file
+- Gunakan `filename` untuk mengganti nama upload ketika harus cocok dengan referensi lampiran
 
 Form modal:
 
 - Tambahkan `components.modal` dengan hingga 5 field
-- Tipe field: `text`, `checkbox`, `radio`, `select`, `role-select`, `user-select`
-- OpenClaw akan menambahkan tombol pemicu secara otomatis
+- Jenis field: `text`, `checkbox`, `radio`, `select`, `role-select`, `user-select`
+- OpenClaw menambahkan tombol pemicu secara otomatis
 
 Contoh:
 
@@ -332,45 +335,45 @@ Contoh:
   channel: "discord",
   action: "send",
   to: "channel:123456789012345678",
-  message: "Teks fallback opsional",
+  message: "Optional fallback text",
   components: {
     reusable: true,
-    text: "Pilih jalur",
+    text: "Choose a path",
     blocks: [
       {
         type: "actions",
         buttons: [
           {
-            label: "Setujui",
+            label: "Approve",
             style: "success",
             allowedUsers: ["123456789012345678"],
           },
-          { label: "Tolak", style: "danger" },
+          { label: "Decline", style: "danger" },
         ],
       },
       {
         type: "actions",
         select: {
           type: "string",
-          placeholder: "Pilih opsi",
+          placeholder: "Pick an option",
           options: [
-            { label: "Opsi A", value: "a" },
-            { label: "Opsi B", value: "b" },
+            { label: "Option A", value: "a" },
+            { label: "Option B", value: "b" },
           ],
         },
       },
     ],
     modal: {
-      title: "Detail",
-      triggerLabel: "Buka formulir",
+      title: "Details",
+      triggerLabel: "Open form",
       fields: [
-        { type: "text", label: "Peminta" },
+        { type: "text", label: "Requester" },
         {
           type: "select",
-          label: "Prioritas",
+          label: "Priority",
           options: [
-            { label: "Rendah", value: "low" },
-            { label: "Tinggi", value: "high" },
+            { label: "Low", value: "low" },
+            { label: "High", value: "high" },
           ],
         },
       ],
@@ -383,19 +386,19 @@ Contoh:
 
 <Tabs>
   <Tab title="Kebijakan DM">
-    `channels.discord.dmPolicy` mengontrol akses DM (legacy: `channels.discord.dm.policy`):
+    `channels.discord.dmPolicy` mengontrol akses DM (lama: `channels.discord.dm.policy`):
 
     - `pairing` (default)
     - `allowlist`
-    - `open` (memerlukan `channels.discord.allowFrom` menyertakan `"*"`; legacy: `channels.discord.dm.allowFrom`)
+    - `open` (memerlukan `channels.discord.allowFrom` untuk menyertakan `"*"`; lama: `channels.discord.dm.allowFrom`)
     - `disabled`
 
-    Jika kebijakan DM tidak terbuka, pengguna yang tidak dikenal diblokir (atau diminta melakukan pairing dalam mode `pairing`).
+    Jika kebijakan DM tidak terbuka, pengguna yang tidak dikenal akan diblokir (atau diminta melakukan pairing dalam mode `pairing`).
 
     Prioritas multi-akun:
 
     - `channels.discord.accounts.default.allowFrom` hanya berlaku untuk akun `default`.
-    - Akun bernama mewarisi `channels.discord.allowFrom` ketika `allowFrom` milik akun tersebut tidak diatur.
+    - Akun bernama mewarisi `channels.discord.allowFrom` saat `allowFrom` miliknya sendiri tidak diatur.
     - Akun bernama tidak mewarisi `channels.discord.accounts.default.allowFrom`.
 
     Format target DM untuk pengiriman:
@@ -403,7 +406,7 @@ Contoh:
     - `user:<id>`
     - mention `<@id>`
 
-    ID numerik polos bersifat ambigu dan ditolak kecuali jenis target user/channel eksplisit diberikan.
+    ID numerik polos ambigu dan ditolak kecuali jenis target pengguna/channel eksplisit diberikan.
 
   </Tab>
 
@@ -418,12 +421,12 @@ Contoh:
 
     Perilaku `allowlist`:
 
-    - guild harus cocok dengan `channels.discord.guilds` (`id` lebih disarankan, slug diterima)
-    - allowlist pengirim opsional: `users` (ID stabil disarankan) dan `roles` (hanya ID role); jika salah satunya dikonfigurasi, pengirim diizinkan saat cocok dengan `users` ATAU `roles`
+    - guild harus cocok dengan `channels.discord.guilds` (`id` lebih disukai, slug diterima)
+    - allowlist pengirim opsional: `users` (ID stabil disarankan) dan `roles` (hanya ID peran); jika salah satu dikonfigurasi, pengirim diizinkan saat cocok dengan `users` ATAU `roles`
     - pencocokan nama/tag langsung dinonaktifkan secara default; aktifkan `channels.discord.dangerouslyAllowNameMatching: true` hanya sebagai mode kompatibilitas darurat
     - nama/tag didukung untuk `users`, tetapi ID lebih aman; `openclaw security audit` memperingatkan saat entri nama/tag digunakan
-    - jika sebuah guild memiliki `channels` yang dikonfigurasi, channel yang tidak tercantum akan ditolak
-    - jika sebuah guild tidak memiliki blok `channels`, semua channel dalam guild yang ada di allowlist akan diizinkan
+    - jika guild memiliki `channels` yang dikonfigurasi, channel yang tidak tercantum akan ditolak
+    - jika guild tidak memiliki blok `channels`, semua channel dalam guild yang di-allowlist diizinkan
 
     Contoh:
 
@@ -449,23 +452,23 @@ Contoh:
 }
 ```
 
-    Jika Anda hanya menetapkan `DISCORD_BOT_TOKEN` dan tidak membuat blok `channels.discord`, fallback runtime adalah `groupPolicy="allowlist"` (dengan peringatan di log), bahkan jika `channels.defaults.groupPolicy` adalah `open`.
+    Jika Anda hanya mengatur `DISCORD_BOT_TOKEN` dan tidak membuat blok `channels.discord`, fallback runtime adalah `groupPolicy="allowlist"` (dengan peringatan di log), meskipun `channels.defaults.groupPolicy` adalah `open`.
 
   </Tab>
 
-  <Tab title="Mention dan group DM">
-    Pesan guild secara default dibatasi oleh mention.
+  <Tab title="Mention dan DM grup">
+    Pesan guild dibatasi mention secara default.
 
     Deteksi mention mencakup:
 
     - mention bot eksplisit
     - pola mention yang dikonfigurasi (`agents.list[].groupChat.mentionPatterns`, fallback `messages.groupChat.mentionPatterns`)
-    - perilaku balas-ke-bot implisit dalam kasus yang didukung
+    - perilaku reply-to-bot implisit dalam kasus yang didukung
 
     `requireMention` dikonfigurasi per guild/channel (`channels.discord.guilds...`).
-    `ignoreOtherMentions` secara opsional mengabaikan pesan yang menyebut pengguna/role lain tetapi bukan bot (tidak termasuk @everyone/@here).
+    `ignoreOtherMentions` secara opsional mengabaikan pesan yang me-mention pengguna/peran lain tetapi bukan bot (tidak termasuk @everyone/@here).
 
-    Group DM:
+    DM grup:
 
     - default: diabaikan (`dm.groupEnabled=false`)
     - allowlist opsional melalui `dm.groupChannels` (ID channel atau slug)
@@ -473,9 +476,9 @@ Contoh:
   </Tab>
 </Tabs>
 
-### Perutean agen berbasis role
+### Perutean agen berbasis peran
 
-Gunakan `bindings[].match.roles` untuk merutekan anggota guild Discord ke agen yang berbeda berdasarkan ID role. Binding berbasis role hanya menerima ID role dan dievaluasi setelah binding peer atau parent-peer dan sebelum binding khusus guild. Jika sebuah binding juga menetapkan field pencocokan lain (misalnya `peer` + `guildId` + `roles`), semua field yang dikonfigurasi harus cocok.
+Gunakan `bindings[].match.roles` untuk merutekan anggota guild Discord ke agen yang berbeda berdasarkan ID peran. Binding berbasis peran hanya menerima ID peran dan dievaluasi setelah binding peer atau parent-peer dan sebelum binding khusus guild. Jika sebuah binding juga menetapkan field pencocokan lain (misalnya `peer` + `guildId` + `roles`), semua field yang dikonfigurasi harus cocok.
 
 ```json5
 {
@@ -510,31 +513,34 @@ Gunakan `bindings[].match.roles` untuk merutekan anggota guild Discord ke agen y
 
   </Accordion>
 
-  <Accordion title="Privileged intents">
+  <Accordion title="Intent berhak istimewa">
     Di **Bot -> Privileged Gateway Intents**, aktifkan:
 
     - Message Content Intent
     - Server Members Intent (disarankan)
 
-    Presence intent bersifat opsional dan hanya diperlukan jika Anda ingin menerima pembaruan presence. Menetapkan presence bot (`setPresence`) tidak memerlukan pengaktifan pembaruan presence untuk anggota.
+    Presence intent bersifat opsional dan hanya diperlukan jika Anda ingin menerima pembaruan presence. Mengatur presence bot (`setPresence`) tidak memerlukan pengaktifan pembaruan presence untuk anggota.
 
   </Accordion>
 
-  <Accordion title="OAuth scopes dan izin baseline">
+  <Accordion title="Cakupan OAuth dan izin dasar">
     Generator URL OAuth:
 
-    - scope: `bot`, `applications.commands`
+    - cakupan: `bot`, `applications.commands`
 
-    Izin baseline yang umum:
+    Izin dasar yang umum:
 
-    - View Channels
-    - Send Messages
-    - Read Message History
-    - Embed Links
-    - Attach Files
-    - Add Reactions (opsional)
+    **General Permissions**
+      - View Channels
+    **Text Permissions**
+      - Send Messages
+      - Read Message History
+      - Embed Links
+      - Attach Files
+      - Add Reactions (opsional)
 
-    Hindari `Administrator` kecuali memang diperlukan secara eksplisit.
+    Ini adalah set dasar untuk channel teks normal. Jika Anda berencana memposting di thread Discord, termasuk alur channel forum atau media yang membuat atau melanjutkan thread, aktifkan juga **Send Messages in Threads**.
+    Hindari `Administrator` kecuali benar-benar diperlukan.
 
   </Accordion>
 
@@ -545,22 +551,22 @@ Gunakan `bindings[].match.roles` untuk merutekan anggota guild Discord ke agen y
     - ID channel
     - ID pengguna
 
-    Gunakan ID numerik di config OpenClaw untuk audit dan probe yang andal.
+    Lebih pilih ID numerik dalam config OpenClaw untuk audit dan probe yang andal.
 
   </Accordion>
 </AccordionGroup>
 
 ## Perintah native dan autentikasi perintah
 
-- `commands.native` default-nya `"auto"` dan diaktifkan untuk Discord.
-- Override per channel: `channels.discord.commands.native`.
-- `commands.native=false` secara eksplisit menghapus Discord native command yang sebelumnya terdaftar.
-- Autentikasi native command menggunakan allowlist/kebijakan Discord yang sama seperti penanganan pesan biasa.
-- Perintah mungkin tetap terlihat di UI Discord bagi pengguna yang tidak berwenang; eksekusi tetap menerapkan autentikasi OpenClaw dan mengembalikan "tidak diizinkan".
+- `commands.native` secara default adalah `"auto"` dan diaktifkan untuk Discord.
+- Override per-channel: `channels.discord.commands.native`.
+- `commands.native=false` secara eksplisit menghapus perintah native Discord yang sebelumnya terdaftar.
+- Autentikasi perintah native menggunakan allowlist/kebijakan Discord yang sama seperti penanganan pesan normal.
+- Perintah mungkin tetap terlihat di UI Discord untuk pengguna yang tidak berwenang; eksekusi tetap menegakkan autentikasi OpenClaw dan mengembalikan "not authorized".
 
 Lihat [Slash commands](/id/tools/slash-commands) untuk katalog dan perilaku perintah.
 
-Pengaturan slash command default:
+Pengaturan default perintah slash:
 
 - `ephemeral: true`
 
@@ -582,40 +588,19 @@ Pengaturan slash command default:
 
     Catatan: `off` menonaktifkan threading balasan implisit. Tag `[[reply_to_*]]` eksplisit tetap dihormati.
     `first` selalu melampirkan referensi balasan native implisit ke pesan Discord outbound pertama untuk giliran tersebut.
-    `batched` hanya melampirkan referensi balasan native implisit Discord saat
+    `batched` hanya melampirkan referensi balasan native implisit Discord ketika
     giliran masuk adalah batch debounce dari beberapa pesan. Ini berguna
-    ketika Anda menginginkan balasan native terutama untuk chat cepat yang ambigu, bukan setiap
+    ketika Anda menginginkan balasan native terutama untuk chat yang ambigu dan ramai, bukan setiap
     giliran satu pesan.
 
-    ID pesan ditampilkan dalam konteks/riwayat sehingga agen dapat menargetkan pesan tertentu.
+    ID pesan ditampilkan dalam context/history sehingga agen dapat menargetkan pesan tertentu.
 
   </Accordion>
 
-  <Accordion title="Pratinjau stream langsung">
-    OpenClaw dapat melakukan streaming draf balasan dengan mengirim pesan sementara lalu mengeditnya saat teks masuk.
+  <Accordion title="Pratinjau streaming langsung">
+    OpenClaw dapat melakukan streaming draf balasan dengan mengirim pesan sementara dan mengeditnya saat teks masuk. `channels.discord.streaming` menerima `off` (default) | `partial` | `block` | `progress`. `progress` dipetakan ke `partial` di Discord; `streamMode` adalah alias lama dan dimigrasikan secara otomatis.
 
-    - `channels.discord.streaming` mengontrol streaming pratinjau (`off` | `partial` | `block` | `progress`, default: `off`).
-    - Default tetap `off` karena edit pratinjau Discord dapat cepat terkena rate limit, terutama ketika beberapa bot atau gateway berbagi akun atau trafik guild yang sama.
-    - `progress` diterima untuk konsistensi lintas channel dan dipetakan ke `partial` di Discord.
-    - `channels.discord.streamMode` adalah alias legacy dan dimigrasikan secara otomatis.
-    - `partial` mengedit satu pesan pratinjau saat token masuk.
-    - `block` mengirim potongan seukuran draf (gunakan `draftChunk` untuk menyesuaikan ukuran dan titik pemisah).
-    - Final media, error, dan balasan eksplisit membatalkan edit pratinjau yang tertunda tanpa mem-flush draf sementara sebelum pengiriman normal.
-    - `streaming.preview.toolProgress` mengontrol apakah pembaruan tool/progress menggunakan kembali pesan pratinjau draf yang sama (default: `true`). Atur `false` untuk mempertahankan pesan tool/progress terpisah.
-
-    Contoh:
-
-```json5
-{
-  channels: {
-    discord: {
-      streaming: "partial",
-    },
-  },
-}
-```
-
-    Default chunking mode `block` (dibatasi ke `channels.discord.textChunkLimit`):
+    Default tetap `off` karena edit pratinjau Discord cepat mencapai batas rate limit saat beberapa bot atau gateway berbagi akun.
 
 ```json5
 {
@@ -632,10 +617,12 @@ Pengaturan slash command default:
 }
 ```
 
-    Streaming pratinjau hanya untuk teks; balasan media kembali ke pengiriman normal.
+    - `partial` mengedit satu pesan pratinjau saat token masuk.
+    - `block` mengeluarkan potongan seukuran draf (gunakan `draftChunk` untuk menyesuaikan ukuran dan titik pemisahan, dibatasi ke `textChunkLimit`).
+    - Final media, error, dan explicit-reply membatalkan edit pratinjau yang tertunda.
+    - `streaming.preview.toolProgress` (default `true`) mengontrol apakah pembaruan tool/progress menggunakan kembali pesan pratinjau.
 
-    Catatan: streaming pratinjau terpisah dari block streaming. Saat block streaming secara eksplisit
-    diaktifkan untuk Discord, OpenClaw melewati stream pratinjau untuk menghindari streaming ganda.
+    Streaming pratinjau hanya untuk teks; balasan media kembali ke pengiriman normal. Saat streaming `block` diaktifkan secara eksplisit, OpenClaw melewati streaming pratinjau untuk menghindari streaming ganda.
 
   </Accordion>
 
@@ -653,26 +640,25 @@ Pengaturan slash command default:
 
     Perilaku thread:
 
-    - Thread Discord dirutekan sebagai sesi channel
-    - metadata thread induk dapat digunakan untuk keterkaitan sesi induk
-    - config thread mewarisi config channel induk kecuali ada entri khusus thread
+    - Thread Discord dirutekan sebagai sesi channel dan mewarisi config channel induk kecuali dioverride.
+    - `channels.discord.thread.inheritParent` (default `false`) menjadikan thread otomatis baru ikut melakukan seeding dari transkrip induk. Override per akun berada di bawah `channels.discord.accounts.<id>.thread.inheritParent`.
+    - Reaksi message-tool dapat me-resolve target DM `user:<id>`.
+    - `guilds.<guild>.channels.<channel>.requireMention: false` dipertahankan selama fallback aktivasi tahap balasan.
 
-    Topik channel diinjeksi sebagai konteks **tidak tepercaya** (bukan sebagai system prompt).
-    Konteks balasan dan pesan kutipan saat ini tetap seperti yang diterima.
-    Allowlist Discord terutama membatasi siapa yang dapat memicu agen, bukan batas redaksi konteks tambahan yang sepenuhnya lengkap.
+    Topik channel disuntikkan sebagai konteks **tidak tepercaya**. Allowlists membatasi siapa yang dapat memicu agen, bukan batas penyuntingan konteks tambahan secara penuh.
 
   </Accordion>
 
   <Accordion title="Sesi terikat thread untuk subagen">
-    Discord dapat mengikat thread ke target sesi sehingga pesan lanjutan dalam thread tersebut tetap dirutekan ke sesi yang sama (termasuk sesi subagen).
+    Discord dapat mengikat thread ke target sesi sehingga pesan lanjutan di thread tersebut tetap dirutekan ke sesi yang sama (termasuk sesi subagen).
 
     Perintah:
 
-    - `/focus <target>` mengikat thread saat ini/baru ke target subagen/sesi
-    - `/unfocus` menghapus binding thread saat ini
-    - `/agents` menampilkan run aktif dan status binding
-    - `/session idle <duration|off>` memeriksa/memperbarui auto-unfocus karena tidak aktif untuk binding yang difokuskan
-    - `/session max-age <duration|off>` memeriksa/memperbarui usia maksimum keras untuk binding yang difokuskan
+    - `/focus <target>` ikat thread saat ini/baru ke target subagen/sesi
+    - `/unfocus` hapus binding thread saat ini
+    - `/agents` tampilkan run aktif dan status binding
+    - `/session idle <duration|off>` periksa/perbarui auto-unfocus karena tidak aktif untuk binding terfokus
+    - `/session max-age <duration|off>` periksa/perbarui usia maksimum keras untuk binding terfokus
 
     Config:
 
@@ -701,19 +687,19 @@ Pengaturan slash command default:
     Catatan:
 
     - `session.threadBindings.*` menetapkan default global.
-    - `channels.discord.threadBindings.*` meng-override perilaku Discord.
-    - `spawnSubagentSessions` harus bernilai true untuk membuat/mengikat thread secara otomatis untuk `sessions_spawn({ thread: true })`.
-    - `spawnAcpSessions` harus bernilai true untuk membuat/mengikat thread secara otomatis untuk ACP (`/acp spawn ... --thread ...` atau `sessions_spawn({ runtime: "acp", thread: true })`).
+    - `channels.discord.threadBindings.*` mengoverride perilaku Discord.
+    - `spawnSubagentSessions` harus bernilai true untuk membuat/mengikat thread secara otomatis bagi `sessions_spawn({ thread: true })`.
+    - `spawnAcpSessions` harus bernilai true untuk membuat/mengikat thread secara otomatis bagi ACP (`/acp spawn ... --thread ...` atau `sessions_spawn({ runtime: "acp", thread: true })`).
     - Jika thread binding dinonaktifkan untuk sebuah akun, `/focus` dan operasi thread binding terkait tidak tersedia.
 
-    Lihat [Sub-agents](/id/tools/subagents), [ACP Agents](/id/tools/acp-agents), dan [Configuration Reference](/id/gateway/configuration-reference).
+    Lihat [Subagen](/id/tools/subagents), [Agen ACP](/id/tools/acp-agents), dan [Referensi Config](/id/gateway/configuration-reference).
 
   </Accordion>
 
   <Accordion title="Binding channel ACP persisten">
-    Untuk workspace ACP "always-on" yang stabil, konfigurasi binding ACP bertipe tingkat atas yang menargetkan percakapan Discord.
+    Untuk workspace ACP stabil yang "selalu aktif", konfigurasikan binding ACP bertipe tingkat atas yang menargetkan percakapan Discord.
 
-    Path config:
+    Jalur config:
 
     - `bindings[]` dengan `type: "acp"` dan `match.channel: "discord"`
 
@@ -767,15 +753,11 @@ Pengaturan slash command default:
 
     Catatan:
 
-    - `/acp spawn codex --bind here` mengikat channel atau thread Discord saat ini secara langsung dan mempertahankan perutean pesan berikutnya ke sesi ACP yang sama.
-    - Ini masih dapat berarti "mulai sesi ACP Codex yang baru", tetapi tidak membuat thread Discord baru dengan sendirinya. Channel yang ada tetap menjadi permukaan chat.
-    - Codex tetap dapat berjalan dalam `cwd` atau workspace backend-nya sendiri di disk. Workspace tersebut adalah status runtime, bukan thread Discord.
-    - Pesan thread dapat mewarisi binding ACP channel induk.
-    - Dalam channel atau thread yang terikat, `/new` dan `/reset` mereset sesi ACP yang sama secara langsung.
-    - Binding thread sementara tetap berfungsi dan dapat meng-override resolusi target saat aktif.
-    - `spawnAcpSessions` hanya diperlukan ketika OpenClaw perlu membuat/mengikat thread anak melalui `--thread auto|here`. Ini tidak diperlukan untuk `/acp spawn ... --bind here` di channel saat ini.
+    - `/acp spawn codex --bind here` mengikat channel atau thread saat ini langsung di tempat dan membuat pesan berikutnya tetap berada pada sesi ACP yang sama. Pesan thread mewarisi binding channel induk.
+    - Di channel atau thread yang terikat, `/new` dan `/reset` mereset sesi ACP yang sama langsung di tempat. Binding thread sementara dapat mengoverride resolusi target saat aktif.
+    - `spawnAcpSessions` hanya diperlukan saat OpenClaw perlu membuat/mengikat thread anak melalui `--thread auto|here`.
 
-    Lihat [ACP Agents](/id/tools/acp-agents) untuk detail perilaku binding.
+    Lihat [Agen ACP](/id/tools/acp-agents) untuk detail perilaku binding.
 
   </Accordion>
 
@@ -787,7 +769,7 @@ Pengaturan slash command default:
     - `all`
     - `allowlist` (menggunakan `guilds.<id>.users`)
 
-    Event reaksi diubah menjadi event sistem dan dilampirkan ke sesi Discord yang dirutekan.
+    Peristiwa reaksi diubah menjadi peristiwa sistem dan dilampirkan ke sesi Discord yang dirutekan.
 
   </Accordion>
 
@@ -804,7 +786,7 @@ Pengaturan slash command default:
     Catatan:
 
     - Discord menerima emoji unicode atau nama emoji kustom.
-    - Gunakan `""` untuk menonaktifkan reaksi pada channel atau akun.
+    - Gunakan `""` untuk menonaktifkan reaksi bagi channel atau akun.
 
   </Accordion>
 
@@ -827,7 +809,7 @@ Pengaturan slash command default:
 
   </Accordion>
 
-  <Accordion title="Proxy gateway">
+  <Accordion title="Proxy Gateway">
     Rutekan trafik WebSocket gateway Discord dan lookup REST saat startup (ID aplikasi + resolusi allowlist) melalui proxy HTTP(S) dengan `channels.discord.proxy`.
 
 ```json5
@@ -886,7 +868,7 @@ Pengaturan slash command default:
   <Accordion title="Konfigurasi presence">
     Pembaruan presence diterapkan saat Anda menetapkan field status atau activity, atau saat Anda mengaktifkan auto presence.
 
-    Contoh hanya status:
+    Contoh status saja:
 
 ```json5
 {
@@ -898,13 +880,13 @@ Pengaturan slash command default:
 }
 ```
 
-    Contoh activity (custom status adalah tipe activity default):
+    Contoh activity (custom status adalah jenis activity default):
 
 ```json5
 {
   channels: {
     discord: {
-      activity: "Waktu fokus",
+      activity: "Focus time",
       activityType: 4,
     },
   },
@@ -925,7 +907,7 @@ Pengaturan slash command default:
 }
 ```
 
-    Peta tipe activity:
+    Peta jenis activity:
 
     - 0: Playing
     - 1: Streaming (memerlukan `activityUrl`)
@@ -944,7 +926,7 @@ Pengaturan slash command default:
         enabled: true,
         intervalMs: 30000,
         minUpdateIntervalMs: 15000,
-        exhaustedText: "token habis",
+        exhaustedText: "token exhausted",
       },
     },
   },
@@ -962,76 +944,60 @@ Pengaturan slash command default:
   <Accordion title="Persetujuan di Discord">
     Discord mendukung penanganan persetujuan berbasis tombol di DM dan secara opsional dapat memposting prompt persetujuan di channel asal.
 
-    Path config:
+    Jalur config:
 
     - `channels.discord.execApprovals.enabled`
     - `channels.discord.execApprovals.approvers` (opsional; fallback ke `commands.ownerAllowFrom` jika memungkinkan)
     - `channels.discord.execApprovals.target` (`dm` | `channel` | `both`, default: `dm`)
     - `agentFilter`, `sessionFilter`, `cleanupAfterResolve`
 
-    Discord otomatis mengaktifkan persetujuan exec native saat `enabled` tidak diatur atau `"auto"` dan setidaknya satu approver dapat diresolusikan, baik dari `execApprovals.approvers` maupun dari `commands.ownerAllowFrom`. Discord tidak menyimpulkan approver exec dari `allowFrom` channel, `dm.allowFrom` legacy, atau `defaultTo` pesan langsung. Atur `enabled: false` untuk menonaktifkan Discord secara eksplisit sebagai klien persetujuan native.
+    Discord otomatis mengaktifkan persetujuan exec native saat `enabled` tidak diatur atau `"auto"` dan setidaknya satu approver dapat di-resolve, baik dari `execApprovals.approvers` maupun dari `commands.ownerAllowFrom`. Discord tidak menyimpulkan approver exec dari channel `allowFrom`, `dm.allowFrom` lama, atau `defaultTo` direct-message. Atur `enabled: false` untuk menonaktifkan Discord sebagai klien persetujuan native secara eksplisit.
 
-    Saat `target` adalah `channel` atau `both`, prompt persetujuan terlihat di channel. Hanya approver yang teresolusikan yang dapat menggunakan tombol; pengguna lain menerima penolakan ephemeral. Prompt persetujuan menyertakan teks perintah, jadi aktifkan pengiriman channel hanya pada channel tepercaya. Jika ID channel tidak dapat diturunkan dari key sesi, OpenClaw akan fallback ke pengiriman DM.
+    Saat `target` adalah `channel` atau `both`, prompt persetujuan terlihat di channel. Hanya approver yang berhasil di-resolve yang dapat menggunakan tombol; pengguna lain menerima penolakan ephemeral. Prompt persetujuan menyertakan teks perintah, jadi aktifkan pengiriman ke channel hanya pada channel tepercaya. Jika ID channel tidak dapat diturunkan dari kunci sesi, OpenClaw akan fallback ke pengiriman DM.
 
     Discord juga merender tombol persetujuan bersama yang digunakan oleh channel chat lain. Adapter Discord native terutama menambahkan perutean DM approver dan fanout channel.
-    Saat tombol tersebut ada, tombol itu menjadi UX persetujuan utama; OpenClaw
-    hanya boleh menyertakan perintah `/approve` manual ketika hasil tool menyatakan
+    Saat tombol tersebut ada, itu menjadi UX persetujuan utama; OpenClaw
+    hanya boleh menyertakan perintah `/approve` manual saat hasil tool menyatakan
     persetujuan chat tidak tersedia atau persetujuan manual adalah satu-satunya jalur.
 
-    Autentikasi gateway untuk handler ini menggunakan kontrak resolusi kredensial bersama yang sama seperti klien Gateway lainnya:
+    Autentikasi Gateway dan resolusi persetujuan mengikuti kontrak klien Gateway bersama (`plugin:` ID di-resolve melalui `plugin.approval.resolve`; ID lain melalui `exec.approval.resolve`). Persetujuan kedaluwarsa setelah 30 menit secara default.
 
-    - autentikasi lokal berbasis env terlebih dahulu (`OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD` lalu `gateway.auth.*`)
-    - dalam mode lokal, `gateway.remote.*` dapat digunakan sebagai fallback hanya saat `gateway.auth.*` tidak diatur; SecretRef lokal yang dikonfigurasi tetapi tidak teresolusikan gagal tertutup
-    - dukungan mode remote melalui `gateway.remote.*` bila berlaku
-    - override URL aman terhadap override: override CLI tidak menggunakan kembali kredensial implisit, dan override env hanya menggunakan kredensial env
-
-    Perilaku resolusi persetujuan:
-
-    - ID yang diawali `plugin:` diresolusikan melalui `plugin.approval.resolve`.
-    - ID lainnya diresolusikan melalui `exec.approval.resolve`.
-    - Discord tidak melakukan hop fallback exec-ke-plugin tambahan di sini; prefiks
-      id menentukan metode gateway mana yang dipanggil.
-
-    Persetujuan exec kedaluwarsa setelah 30 menit secara default. Jika persetujuan gagal dengan
-    ID persetujuan tidak dikenal, verifikasi resolusi approver, pengaktifan fitur, dan
-    bahwa jenis ID persetujuan yang dikirim cocok dengan permintaan yang tertunda.
-
-    Dokumen terkait: [Exec approvals](/id/tools/exec-approvals)
+    Lihat [Persetujuan exec](/id/tools/exec-approvals).
 
   </Accordion>
 </AccordionGroup>
 
 ## Tool dan gerbang aksi
 
-Aksi message Discord mencakup messaging, admin channel, moderasi, presence, dan aksi metadata.
+Aksi pesan Discord mencakup perpesanan, admin channel, moderasi, presence, dan aksi metadata.
 
 Contoh inti:
 
-- messaging: `sendMessage`, `readMessages`, `editMessage`, `deleteMessage`, `threadReply`
+- perpesanan: `sendMessage`, `readMessages`, `editMessage`, `deleteMessage`, `threadReply`
 - reaksi: `react`, `reactions`, `emojiList`
 - moderasi: `timeout`, `kick`, `ban`
 - presence: `setPresence`
 
-Aksi `event-create` menerima parameter `image` opsional (URL atau path file lokal) untuk menetapkan gambar sampul scheduled event.
+Aksi `event-create` menerima parameter `image` opsional (URL atau jalur file lokal) untuk menetapkan gambar sampul acara terjadwal.
 
 Gerbang aksi berada di bawah `channels.discord.actions.*`.
 
 Perilaku gerbang default:
 
-| Grup aksi                                                                                                                                                                 | Default   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| reactions, messages, threads, pins, polls, search, memberInfo, roleInfo, channelInfo, channels, voiceStatus, events, stickers, emojiUploads, stickerUploads, permissions | diaktifkan |
-| roles                                                                                                                                                                     | dinonaktifkan |
-| moderation                                                                                                                                                                | dinonaktifkan |
-| presence                                                                                                                                                                  | dinonaktifkan |
+| Kelompok aksi                                                                                                                                                            | Default   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
+| reactions, messages, threads, pins, polls, search, memberInfo, roleInfo, channelInfo, channels, voiceStatus, events, stickers, emojiUploads, stickerUploads, permissions | enabled   |
+| roles                                                                                                                                                                    | disabled  |
+| moderation                                                                                                                                                               | disabled  |
+| presence                                                                                                                                                                 | disabled  |
 
 ## UI Components v2
 
-OpenClaw menggunakan Discord components v2 untuk persetujuan exec dan penanda lintas konteks. Aksi message Discord juga dapat menerima `components` untuk UI kustom (lanjutan; memerlukan pembuatan payload komponen melalui discord tool), sementara `embeds` legacy tetap tersedia tetapi tidak direkomendasikan.
+OpenClaw menggunakan komponen Discord v2 untuk persetujuan exec dan penanda lintas-konteks. Aksi pesan Discord juga dapat menerima `components` untuk UI kustom (lanjutan; memerlukan konstruksi payload komponen melalui tool discord), sementara `embeds` lama tetap tersedia tetapi tidak direkomendasikan.
 
 - `channels.discord.ui.components.accentColor` menetapkan warna aksen yang digunakan oleh container komponen Discord (hex).
-- Tetapkan per akun dengan `channels.discord.accounts.<id>.ui.components.accentColor`.
-- `embeds` diabaikan saat components v2 ada.
+- Atur per akun dengan `channels.discord.accounts.<id>.ui.components.accentColor`.
+- `embeds` diabaikan saat komponen v2 ada.
 
 Contoh:
 
@@ -1049,17 +1015,19 @@ Contoh:
 }
 ```
 
-## Channel voice
+## Voice
 
-OpenClaw dapat bergabung ke channel voice Discord untuk percakapan realtime yang berkelanjutan. Ini terpisah dari lampiran pesan voice.
+Discord memiliki dua permukaan voice yang berbeda: **voice channels** realtime (percakapan berkelanjutan) dan **lampiran voice message** (format pratinjau waveform). Gateway mendukung keduanya.
+
+### Voice channels
 
 Persyaratan:
 
 - Aktifkan perintah native (`commands.native` atau `channels.discord.commands.native`).
-- Konfigurasi `channels.discord.voice`.
-- Bot memerlukan izin Connect + Speak di channel voice target.
+- Konfigurasikan `channels.discord.voice`.
+- Bot memerlukan izin Connect + Speak di voice channel target.
 
-Gunakan perintah native khusus Discord `/vc join|leave|status` untuk mengontrol sesi. Perintah ini menggunakan agen default akun dan mengikuti aturan allowlist dan kebijakan grup yang sama seperti perintah Discord lainnya.
+Gunakan `/vc join|leave|status` untuk mengontrol sesi. Perintah ini menggunakan agen default akun dan mengikuti aturan allowlist serta kebijakan grup yang sama seperti perintah Discord lainnya.
 
 Contoh auto-join:
 
@@ -1089,25 +1057,21 @@ Contoh auto-join:
 
 Catatan:
 
-- `voice.tts` meng-override `messages.tts` hanya untuk pemutaran voice.
+- `voice.tts` mengoverride `messages.tts` hanya untuk pemutaran voice.
 - Giliran transkrip voice menurunkan status owner dari Discord `allowFrom` (atau `dm.allowFrom`); pembicara non-owner tidak dapat mengakses tool khusus owner (misalnya `gateway` dan `cron`).
 - Voice diaktifkan secara default; atur `channels.discord.voice.enabled=false` untuk menonaktifkannya.
 - `voice.daveEncryption` dan `voice.decryptionFailureTolerance` diteruskan ke opsi join `@discordjs/voice`.
 - Default `@discordjs/voice` adalah `daveEncryption=true` dan `decryptionFailureTolerance=24` jika tidak diatur.
-- OpenClaw juga memantau kegagalan dekripsi saat menerima dan melakukan pemulihan otomatis dengan keluar/bergabung kembali ke channel voice setelah kegagalan berulang dalam jangka waktu singkat.
+- OpenClaw juga memantau kegagalan dekripsi penerimaan dan memulihkan secara otomatis dengan keluar/bergabung ulang ke voice channel setelah kegagalan berulang dalam jendela waktu singkat.
 - Jika log penerimaan berulang kali menampilkan `DecryptionFailed(UnencryptedWhenPassthroughDisabled)`, ini mungkin bug receive upstream `@discordjs/voice` yang dilacak di [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419).
 
-## Pesan voice
+### Voice messages
 
-Pesan voice Discord menampilkan pratinjau waveform dan memerlukan audio OGG/Opus beserta metadata. OpenClaw membuat waveform secara otomatis, tetapi membutuhkan `ffmpeg` dan `ffprobe` yang tersedia pada host gateway untuk memeriksa dan mengonversi file audio.
+Voice message Discord menampilkan pratinjau waveform dan memerlukan audio OGG/Opus. OpenClaw menghasilkan waveform secara otomatis, tetapi memerlukan `ffmpeg` dan `ffprobe` di host gateway untuk memeriksa dan mengonversi.
 
-Persyaratan dan batasan:
-
-- Berikan **path file lokal** (URL ditolak).
-- Hilangkan konten teks (Discord tidak mengizinkan teks + pesan voice dalam payload yang sama).
-- Format audio apa pun diterima; OpenClaw mengonversinya ke OGG/Opus bila diperlukan.
-
-Contoh:
+- Berikan **jalur file lokal** (URL ditolak).
+- Hilangkan konten teks (Discord menolak teks + voice message dalam payload yang sama).
+- Format audio apa pun diterima; OpenClaw mengonversinya ke OGG/Opus jika diperlukan.
 
 ```bash
 message(action="send", channel="discord", target="channel:123", path="/path/to/audio.mp3", asVoice=true)
@@ -1119,15 +1083,15 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
   <Accordion title="Menggunakan intent yang tidak diizinkan atau bot tidak melihat pesan guild">
 
     - aktifkan Message Content Intent
-    - aktifkan Server Members Intent saat Anda bergantung pada resolusi user/member
-    - mulai ulang gateway setelah mengubah intent
+    - aktifkan Server Members Intent saat Anda bergantung pada resolusi pengguna/anggota
+    - restart gateway setelah mengubah intent
 
   </Accordion>
 
   <Accordion title="Pesan guild diblokir secara tidak terduga">
 
     - verifikasi `groupPolicy`
-    - verifikasi guild allowlist di bawah `channels.discord.guilds`
+    - verifikasi allowlist guild di bawah `channels.discord.guilds`
     - jika peta `channels` guild ada, hanya channel yang tercantum yang diizinkan
     - verifikasi perilaku `requireMention` dan pola mention
 
@@ -1141,10 +1105,10 @@ openclaw logs --follow
 
   </Accordion>
 
-  <Accordion title="Require mention false tetapi tetap diblokir">
+  <Accordion title="Require mention false tetapi masih diblokir">
     Penyebab umum:
 
-    - `groupPolicy="allowlist"` tanpa guild/channel allowlist yang cocok
+    - `groupPolicy="allowlist"` tanpa allowlist guild/channel yang cocok
     - `requireMention` dikonfigurasi di tempat yang salah (harus di bawah `channels.discord.guilds` atau entri channel)
     - pengirim diblokir oleh allowlist `users` guild/channel
 
@@ -1158,12 +1122,12 @@ openclaw logs --follow
     - `Slow listener detected ...`
     - `discord inbound worker timed out after ...`
 
-    Knob anggaran listener:
+    Knop anggaran listener:
 
     - akun tunggal: `channels.discord.eventQueue.listenerTimeout`
     - multi-akun: `channels.discord.accounts.<accountId>.eventQueue.listenerTimeout`
 
-    Knob timeout run worker:
+    Knop batas waktu eksekusi worker:
 
     - akun tunggal: `channels.discord.inboundWorker.runTimeoutMs`
     - multi-akun: `channels.discord.accounts.<accountId>.inboundWorker.runTimeoutMs`
@@ -1191,64 +1155,64 @@ openclaw logs --follow
 ```
 
     Gunakan `eventQueue.listenerTimeout` untuk penyiapan listener yang lambat dan `inboundWorker.runTimeoutMs`
-    hanya jika Anda menginginkan katup pengaman terpisah untuk giliran agen yang antre.
+    hanya jika Anda menginginkan katup pengaman terpisah untuk giliran agen yang masuk antrean.
 
   </Accordion>
 
   <Accordion title="Ketidakcocokan audit izin">
     Pemeriksaan izin `channels status --probe` hanya berfungsi untuk ID channel numerik.
 
-    Jika Anda menggunakan key slug, pencocokan runtime tetap dapat berfungsi, tetapi probe tidak dapat memverifikasi izin sepenuhnya.
+    Jika Anda menggunakan kunci slug, pencocokan runtime mungkin tetap berfungsi, tetapi probe tidak dapat memverifikasi izin sepenuhnya.
 
   </Accordion>
 
   <Accordion title="Masalah DM dan pairing">
 
     - DM dinonaktifkan: `channels.discord.dm.enabled=false`
-    - kebijakan DM dinonaktifkan: `channels.discord.dmPolicy="disabled"` (legacy: `channels.discord.dm.policy`)
+    - kebijakan DM dinonaktifkan: `channels.discord.dmPolicy="disabled"` (lama: `channels.discord.dm.policy`)
     - menunggu persetujuan pairing dalam mode `pairing`
 
   </Accordion>
 
   <Accordion title="Loop bot ke bot">
-    Secara default pesan yang dibuat bot diabaikan.
+    Secara default, pesan yang dibuat bot diabaikan.
 
-    Jika Anda menetapkan `channels.discord.allowBots=true`, gunakan aturan mention dan allowlist yang ketat untuk menghindari perilaku loop.
-    Lebih baik gunakan `channels.discord.allowBots="mentions"` untuk hanya menerima pesan bot yang me-mention bot.
+    Jika Anda mengatur `channels.discord.allowBots=true`, gunakan aturan mention dan allowlist yang ketat untuk menghindari perilaku loop.
+    Lebih pilih `channels.discord.allowBots="mentions"` agar hanya menerima pesan bot yang me-mention bot.
 
   </Accordion>
 
   <Accordion title="Voice STT terputus dengan DecryptionFailed(...)">
 
-    - pastikan OpenClaw tetap terbaru (`openclaw update`) agar logika pemulihan receive voice Discord tersedia
-    - konfirmasikan `channels.discord.voice.daveEncryption=true` (default)
+    - jaga OpenClaw tetap terbaru (`openclaw update`) agar logika pemulihan receive voice Discord tersedia
+    - pastikan `channels.discord.voice.daveEncryption=true` (default)
     - mulai dari `channels.discord.voice.decryptionFailureTolerance=24` (default upstream) dan sesuaikan hanya jika diperlukan
     - pantau log untuk:
       - `discord voice: DAVE decrypt failures detected`
       - `discord voice: repeated decrypt failures; attempting rejoin`
-    - jika kegagalan berlanjut setelah rejoin otomatis, kumpulkan log dan bandingkan dengan [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419)
+    - jika kegagalan berlanjut setelah join ulang otomatis, kumpulkan log dan bandingkan dengan [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419)
 
   </Accordion>
 </AccordionGroup>
 
-## Penunjuk referensi konfigurasi
+## Penunjuk referensi config
 
 Referensi utama:
 
-- [Configuration reference - Discord](/id/gateway/configuration-reference#discord)
+- [Referensi config - Discord](/id/gateway/configuration-reference#discord)
 
 Field Discord dengan sinyal tinggi:
 
 - startup/auth: `enabled`, `token`, `accounts.*`, `allowBots`
 - kebijakan: `groupPolicy`, `dm.*`, `guilds.*`, `guilds.*.channels.*`
 - perintah: `commands.native`, `commands.useAccessGroups`, `configWrites`, `slashCommand.*`
-- antrean event: `eventQueue.listenerTimeout` (anggaran listener), `eventQueue.maxQueueSize`, `eventQueue.maxConcurrency`
-- inbound worker: `inboundWorker.runTimeoutMs`
+- antrean peristiwa: `eventQueue.listenerTimeout` (anggaran listener), `eventQueue.maxQueueSize`, `eventQueue.maxConcurrency`
+- worker masuk: `inboundWorker.runTimeoutMs`
 - balasan/riwayat: `replyToMode`, `historyLimit`, `dmHistoryLimit`, `dms.*.historyLimit`
 - pengiriman: `textChunkLimit`, `chunkMode`, `maxLinesPerMessage`
-- streaming: `streaming` (alias legacy: `streamMode`), `streaming.preview.toolProgress`, `draftChunk`, `blockStreaming`, `blockStreamingCoalesce`
+- streaming: `streaming` (alias lama: `streamMode`), `streaming.preview.toolProgress`, `draftChunk`, `blockStreaming`, `blockStreamingCoalesce`
 - media/retry: `mediaMaxMb`, `retry`
-  - `mediaMaxMb` membatasi unggahan Discord outbound (default: `100MB`)
+  - `mediaMaxMb` membatasi upload Discord outbound (default: `100MB`)
 - aksi: `actions.*`
 - presence: `activity`, `status`, `activityType`, `activityUrl`
 - UI: `ui.components.accentColor`
@@ -1256,16 +1220,16 @@ Field Discord dengan sinyal tinggi:
 
 ## Keamanan dan operasi
 
-- Perlakukan token bot sebagai rahasia (`DISCORD_BOT_TOKEN` lebih disarankan di lingkungan tersupervisi).
-- Berikan izin Discord dengan prinsip hak istimewa minimum.
-- Jika deployment/status perintah sudah usang, mulai ulang gateway dan periksa kembali dengan `openclaw channels status --probe`.
+- Perlakukan token bot sebagai rahasia (`DISCORD_BOT_TOKEN` lebih disukai di lingkungan tersupervisi).
+- Berikan izin Discord dengan hak minimum.
+- Jika deployment/status perintah usang, restart gateway dan periksa ulang dengan `openclaw channels status --probe`.
 
 ## Terkait
 
 - [Pairing](/id/channels/pairing)
-- [Groups](/id/channels/groups)
-- [Channel routing](/id/channels/channel-routing)
-- [Security](/id/gateway/security)
-- [Multi-agent routing](/id/concepts/multi-agent)
-- [Troubleshooting](/id/channels/troubleshooting)
-- [Slash commands](/id/tools/slash-commands)
+- [Grup](/id/channels/groups)
+- [Perutean channel](/id/channels/channel-routing)
+- [Keamanan](/id/gateway/security)
+- [Perutean multi-agen](/id/concepts/multi-agent)
+- [Pemecahan masalah](/id/channels/troubleshooting)
+- [Perintah slash](/id/tools/slash-commands)

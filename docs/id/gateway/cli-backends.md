@@ -1,38 +1,38 @@
 ---
 read_when:
-    - Anda menginginkan fallback yang andal saat penyedia API gagal
-    - Anda menjalankan Codex CLI atau CLI AI lokal lainnya dan ingin menggunakannya kembali
-    - Anda ingin memahami jembatan loopback MCP untuk akses alat backend CLI
-summary: 'Backend CLI: fallback CLI AI lokal dengan jembatan alat MCP opsional'
+    - Anda ingin fallback yang andal saat provider API gagal
+    - Anda sedang menjalankan Codex CLI atau CLI AI lokal lainnya dan ingin menggunakannya kembali
+    - Anda ingin memahami bridge loopback MCP untuk akses alat backend CLI
+summary: 'Backend CLI: fallback CLI AI lokal dengan bridge alat MCP opsional'
 title: Backend CLI
 x-i18n:
-    generated_at: "2026-04-22T09:14:37Z"
+    generated_at: "2026-04-23T09:20:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3566d4f2b7a841473a4ed6379c1abd8dbd06c392dbff15ca37c4f8ea1e1ead51
+    source_hash: 475923b36e4580d3e4e57014ff2e6b89e9eb52c11b0a0ab1fc8241655b07836e
     source_path: gateway/cli-backends.md
     workflow: 15
 ---
 
 # Backend CLI (runtime fallback)
 
-OpenClaw dapat menjalankan **CLI AI lokal** sebagai **fallback hanya-teks** ketika penyedia API sedang down,
-terkena pembatasan laju, atau sementara bermasalah. Ini sengaja dibuat konservatif:
+OpenClaw dapat menjalankan **CLI AI lokal** sebagai **fallback hanya-teks** saat provider API sedang down,
+terkena rate limit, atau sementara bermasalah. Pendekatan ini sengaja konservatif:
 
-- **Alat OpenClaw tidak disuntikkan secara langsung**, tetapi backend dengan `bundleMcp: true`
-  dapat menerima alat gateway melalui jembatan MCP loopback.
+- **Alat OpenClaw tidak diinjeksi secara langsung**, tetapi backend dengan `bundleMcp: true`
+  dapat menerima alat gateway melalui bridge loopback MCP.
 - **Streaming JSONL** untuk CLI yang mendukungnya.
-- **Sesi didukung** (sehingga giliran lanjutan tetap koheren).
+- **Sesi didukung** (jadi giliran tindak lanjut tetap koheren).
 - **Gambar dapat diteruskan** jika CLI menerima path gambar.
 
 Ini dirancang sebagai **jaring pengaman** alih-alih jalur utama. Gunakan ini saat Anda
 menginginkan respons teks “selalu berfungsi” tanpa bergantung pada API eksternal.
 
 Jika Anda menginginkan runtime harness penuh dengan kontrol sesi ACP, tugas latar belakang,
-pengikatan thread/percakapan, dan sesi coding eksternal persisten, gunakan
+binding thread/percakapan, dan sesi coding eksternal persisten, gunakan
 [ACP Agents](/id/tools/acp-agents). Backend CLI bukan ACP.
 
-## Mulai cepat yang ramah pemula
+## Memulai cepat yang ramah pemula
 
 Anda dapat menggunakan Codex CLI **tanpa konfigurasi apa pun** (plugin OpenAI bawaan
 mendaftarkan backend default):
@@ -41,7 +41,7 @@ mendaftarkan backend default):
 openclaw agent --message "hi" --model codex-cli/gpt-5.4
 ```
 
-Jika Gateway Anda berjalan di bawah launchd/systemd dan PATH minimal, tambahkan hanya
+Jika gateway Anda berjalan di bawah launchd/systemd dan PATH minimal, tambahkan hanya
 path perintahnya:
 
 ```json5
@@ -58,10 +58,10 @@ path perintahnya:
 }
 ```
 
-Selesai. Tidak perlu kunci, tidak perlu konfigurasi autentikasi tambahan selain yang dibutuhkan oleh CLI itu sendiri.
+Itu saja. Tidak perlu key, tidak perlu konfigurasi auth tambahan selain yang dimiliki CLI itu sendiri.
 
-Jika Anda menggunakan backend CLI bawaan sebagai **penyedia pesan utama** pada host
-Gateway, OpenClaw sekarang otomatis memuat plugin bawaan pemiliknya ketika konfigurasi Anda
+Jika Anda menggunakan backend CLI bawaan sebagai **provider pesan utama** pada
+host gateway, OpenClaw sekarang otomatis memuat plugin bawaan pemiliknya saat config Anda
 secara eksplisit merujuk backend tersebut dalam ref model atau di bawah
 `agents.defaults.cliBackends`.
 
@@ -89,7 +89,7 @@ Tambahkan backend CLI ke daftar fallback Anda agar hanya berjalan saat model uta
 Catatan:
 
 - Jika Anda menggunakan `agents.defaults.models` (allowlist), Anda juga harus menyertakan model backend CLI di sana.
-- Jika penyedia utama gagal (autentikasi, pembatasan laju, timeout), OpenClaw akan
+- Jika provider utama gagal (auth, rate limit, timeout), OpenClaw akan
   mencoba backend CLI berikutnya.
 
 ## Ringkasan konfigurasi
@@ -100,8 +100,8 @@ Semua backend CLI berada di bawah:
 agents.defaults.cliBackends
 ```
 
-Setiap entri diberi kunci berupa **id penyedia** (misalnya `codex-cli`, `my-cli`).
-Id penyedia menjadi sisi kiri dari ref model Anda:
+Setiap entri dikunci oleh **id provider** (misalnya `codex-cli`, `my-cli`).
+Id provider menjadi sisi kiri ref model Anda:
 
 ```
 <provider>/<model>
@@ -131,7 +131,7 @@ Id penyedia menjadi sisi kiri dari ref model Anda:
           sessionMode: "existing",
           sessionIdFields: ["session_id", "conversation_id"],
           systemPromptArg: "--system",
-          // CLI bergaya Codex dapat menunjuk ke file prompt sebagai gantinya:
+          // CLI gaya Codex dapat menunjuk ke file prompt sebagai gantinya:
           // systemPromptFileConfigArg: "-c",
           // systemPromptFileConfigKey: "model_instructions_file",
           systemPromptWhen: "first",
@@ -147,56 +147,66 @@ Id penyedia menjadi sisi kiri dari ref model Anda:
 
 ## Cara kerjanya
 
-1. **Memilih backend** berdasarkan prefiks penyedia (`codex-cli/...`).
-2. **Membangun prompt sistem** menggunakan prompt OpenClaw + konteks workspace yang sama.
+1. **Memilih backend** berdasarkan prefiks provider (`codex-cli/...`).
+2. **Membangun system prompt** menggunakan prompt + konteks workspace OpenClaw yang sama.
 3. **Menjalankan CLI** dengan id sesi (jika didukung) agar riwayat tetap konsisten.
-   Backend `claude-cli` bawaan mempertahankan proses stdio Claude tetap hidup per
-   sesi OpenClaw dan mengirim giliran lanjutan melalui stdin stream-json.
+   Backend `claude-cli` bawaan menjaga proses stdio Claude tetap hidup per
+   sesi OpenClaw dan mengirim giliran tindak lanjut melalui stdin stream-json.
 4. **Mengurai output** (JSON atau teks biasa) dan mengembalikan teks akhir.
-5. **Menyimpan id sesi** per backend, sehingga giliran lanjutan menggunakan kembali sesi CLI yang sama.
+5. **Mempertahankan id sesi** per backend, sehingga tindak lanjut menggunakan kembali sesi CLI yang sama.
 
 <Note>
-Backend `claude-cli` Anthropic bawaan kini didukung lagi. Staf Anthropic
-memberi tahu kami bahwa penggunaan Claude CLI bergaya OpenClaw diizinkan lagi, sehingga OpenClaw memperlakukan
-penggunaan `claude -p` sebagai sesuatu yang disetujui untuk integrasi ini kecuali Anthropic menerbitkan
+Backend `claude-cli` Anthropic bawaan kembali didukung. Staf Anthropic
+memberi tahu kami bahwa penggunaan Claude CLI gaya OpenClaw diizinkan lagi, sehingga OpenClaw memperlakukan
+penggunaan `claude -p` sebagai yang disahkan untuk integrasi ini kecuali Anthropic menerbitkan
 kebijakan baru.
 </Note>
 
-Backend `codex-cli` OpenAI bawaan meneruskan prompt sistem OpenClaw melalui
-override konfigurasi `model_instructions_file` Codex (`-c
-model_instructions_file="..."`). Codex tidak menyediakan flag bergaya Claude
-`--append-system-prompt`, jadi OpenClaw menulis prompt yang telah dirakit ke
+Backend `codex-cli` OpenAI bawaan meneruskan system prompt OpenClaw melalui
+override config `model_instructions_file` milik Codex (`-c
+model_instructions_file="..."`). Codex tidak mengekspos flag
+`--append-system-prompt` gaya Claude, jadi OpenClaw menulis prompt rakitan ke
 file sementara untuk setiap sesi Codex CLI baru.
 
 Backend `claude-cli` Anthropic bawaan menerima snapshot Skills OpenClaw
-dengan dua cara: katalog Skills OpenClaw ringkas dalam prompt sistem yang ditambahkan, dan
-Plugin Claude Code sementara yang diberikan dengan `--plugin-dir`. Plugin tersebut hanya berisi
-Skills yang memenuhi syarat untuk agen/sesi itu, sehingga resolver skill native Claude Code
-melihat set terfilter yang sama yang seharusnya diiklankan OpenClaw dalam
-prompt. Override env/kunci API Skill tetap diterapkan oleh OpenClaw ke lingkungan proses turunan untuk proses tersebut.
+dengan dua cara: katalog Skills OpenClaw ringkas di appended system prompt, dan
+Plugin Claude Code sementara yang diteruskan dengan `--plugin-dir`. Plugin tersebut hanya berisi
+Skills yang memenuhi syarat untuk agen/sesi itu, sehingga resolver skill native Claude Code melihat himpunan terfilter yang sama yang sebaliknya akan diiklankan OpenClaw di
+prompt. Override env/API key skill tetap diterapkan oleh OpenClaw ke
+lingkungan proses anak untuk run tersebut.
 
 ## Sesi
 
 - Jika CLI mendukung sesi, setel `sessionArg` (misalnya `--session-id`) atau
-  `sessionArgs` (placeholder `{sessionId}`) ketika ID perlu disisipkan
+  `sessionArgs` (placeholder `{sessionId}`) saat ID perlu disisipkan
   ke beberapa flag.
 - Jika CLI menggunakan **subperintah resume** dengan flag yang berbeda, setel
-  `resumeArgs` (menggantikan `args` saat melanjutkan) dan opsional `resumeOutput`
-  (untuk resume non-JSON).
+  `resumeArgs` (menggantikan `args` saat melanjutkan) dan opsional
+  `resumeOutput` (untuk resume non-JSON).
 - `sessionMode`:
   - `always`: selalu kirim id sesi (UUID baru jika belum ada yang tersimpan).
   - `existing`: hanya kirim id sesi jika sebelumnya sudah tersimpan.
   - `none`: jangan pernah kirim id sesi.
-- Backend `claude-cli` bawaan menggunakan `liveSession: "claude-stdio"` sehingga
-  giliran lanjutan menggunakan kembali proses Claude aktif selama masih aktif. Jika
-  Gateway dimulai ulang atau proses idle berhenti, OpenClaw melanjutkan dari
-  id sesi Claude yang tersimpan.
+- `claude-cli` default ke `liveSession: "claude-stdio"`, `output: "jsonl"`,
+  dan `input: "stdin"` sehingga giliran tindak lanjut menggunakan kembali proses Claude live saat
+  proses tersebut aktif. Warm stdio sekarang menjadi default, termasuk untuk config kustom
+  yang menghilangkan field transport. Jika Gateway direstart atau proses idle
+  keluar, OpenClaw melanjutkan dari id sesi Claude yang tersimpan. Id sesi yang tersimpan diverifikasi terhadap transkrip proyek yang ada dan dapat dibaca sebelum
+  resume, sehingga binding fantom dihapus dengan `reason=transcript-missing`
+  alih-alih diam-diam memulai sesi Claude CLI baru di bawah `--resume`.
+- Sesi CLI yang tersimpan adalah kontinuitas milik provider. Reset sesi harian implisit
+  tidak memutusnya; `/reset` dan kebijakan `session.reset` eksplisit tetap
+  memutuskannya.
 
 Catatan serialisasi:
 
-- `serialize: true` menjaga urutan eksekusi pada lane yang sama.
-- Sebagian besar CLI melakukan serialisasi pada satu lane penyedia.
-- OpenClaw menghentikan penggunaan ulang sesi CLI yang tersimpan ketika status autentikasi backend berubah, termasuk login ulang, rotasi token, atau perubahan kredensial profil autentikasi.
+- `serialize: true` menjaga run pada jalur yang sama tetap terurut.
+- Sebagian besar CLI melakukan serialisasi pada satu jalur provider.
+- OpenClaw membuang penggunaan ulang sesi CLI yang tersimpan saat identitas auth terpilih berubah,
+  termasuk perubahan id profil auth, API key statis, token statis, atau identitas akun OAuth
+  saat CLI mengekspos salah satunya. Rotasi token akses dan refresh OAuth tidak
+  memutus sesi CLI yang tersimpan. Jika CLI tidak mengekspos id akun OAuth yang stabil,
+  OpenClaw membiarkan CLI tersebut menegakkan izin resume.
 
 ## Gambar (pass-through)
 
@@ -209,23 +219,22 @@ imageMode: "repeat"
 
 OpenClaw akan menulis gambar base64 ke file sementara. Jika `imageArg` disetel, path tersebut
 diteruskan sebagai argumen CLI. Jika `imageArg` tidak ada, OpenClaw menambahkan
-path file ke prompt (path injection), yang cukup untuk CLI yang otomatis
-memuat file lokal dari path biasa.
+path file ke prompt (injeksi path), yang cukup untuk CLI yang memuat
+file lokal secara otomatis dari path biasa.
 
 ## Input / output
 
 - `output: "json"` (default) mencoba mengurai JSON dan mengekstrak teks + id sesi.
 - Untuk output JSON Gemini CLI, OpenClaw membaca teks balasan dari `response` dan
-  penggunaan dari `stats` ketika `usage` tidak ada atau kosong.
-- `output: "jsonl"` mengurai stream JSONL (misalnya Codex CLI `--json`) dan mengekstrak pesan agen akhir beserta pengenal sesi
-  jika ada.
+  penggunaan dari `stats` saat `usage` tidak ada atau kosong.
+- `output: "jsonl"` mengurai stream JSONL (misalnya Codex CLI `--json`) dan mengekstrak pesan agen akhir plus pengenal sesi jika ada.
 - `output: "text"` memperlakukan stdout sebagai respons akhir.
 
 Mode input:
 
 - `input: "arg"` (default) meneruskan prompt sebagai argumen CLI terakhir.
 - `input: "stdin"` mengirim prompt melalui stdin.
-- Jika prompt sangat panjang dan `maxPromptArgChars` disetel, stdin akan digunakan.
+- Jika prompt sangat panjang dan `maxPromptArgChars` disetel, stdin digunakan.
 
 ## Default (dimiliki plugin)
 
@@ -251,32 +260,32 @@ Plugin Google bawaan juga mendaftarkan default untuk `google-gemini-cli`:
 - `sessionMode: "existing"`
 - `sessionIdFields: ["session_id", "sessionId"]`
 
-Prasyarat: Gemini CLI lokal harus terpasang dan tersedia sebagai
+Prasyarat: Gemini CLI lokal harus terinstal dan tersedia sebagai
 `gemini` di `PATH` (`brew install gemini-cli` atau
 `npm install -g @google/gemini-cli`).
 
 Catatan JSON Gemini CLI:
 
 - Teks balasan dibaca dari field JSON `response`.
-- Penggunaan akan fallback ke `stats` saat `usage` tidak ada atau kosong.
+- Penggunaan fallback ke `stats` saat `usage` tidak ada atau kosong.
 - `stats.cached` dinormalisasi menjadi OpenClaw `cacheRead`.
 - Jika `stats.input` tidak ada, OpenClaw menurunkan token input dari
   `stats.input_tokens - stats.cached`.
 
-Override hanya jika diperlukan (umumnya: path `command` absolut).
+Lakukan override hanya jika diperlukan (umumnya: path `command` absolut).
 
-## Default milik Plugin
+## Default yang dimiliki plugin
 
-Default backend CLI sekarang menjadi bagian dari permukaan Plugin:
+Default backend CLI sekarang menjadi bagian dari surface plugin:
 
 - Plugin mendaftarkannya dengan `api.registerCliBackend(...)`.
-- `id` backend menjadi prefiks penyedia dalam ref model.
-- Konfigurasi pengguna di `agents.defaults.cliBackends.<id>` tetap meng-override default plugin.
-- Pembersihan konfigurasi khusus-backend tetap dimiliki plugin melalui hook
-  opsional `normalizeConfig`.
+- Backend `id` menjadi prefiks provider dalam ref model.
+- Config pengguna di `agents.defaults.cliBackends.<id>` tetap menimpa default plugin.
+- Pembersihan config khusus backend tetap dimiliki plugin melalui hook
+  `normalizeConfig` opsional.
 
 Plugin yang memerlukan shim kompatibilitas prompt/pesan kecil dapat mendeklarasikan
-transformasi teks dua arah tanpa mengganti penyedia atau backend CLI:
+transformasi teks dua arah tanpa mengganti provider atau backend CLI:
 
 ```typescript
 api.registerTextTransforms({
@@ -293,52 +302,52 @@ api.registerTextTransforms({
 });
 ```
 
-`input` menulis ulang prompt sistem dan prompt pengguna yang diteruskan ke CLI. `output`
-menulis ulang delta asisten yang di-stream dan teks akhir yang diurai sebelum OpenClaw menangani
-marker kontrolnya sendiri dan pengiriman channel.
+`input` menulis ulang system prompt dan prompt pengguna yang diteruskan ke CLI. `output`
+menulis ulang delta asisten yang di-stream dan teks akhir yang telah diurai sebelum OpenClaw menangani
+penanda kontrolnya sendiri dan pengiriman channel.
 
-Untuk CLI yang mengeluarkan JSONL yang kompatibel dengan Claude Code stream-json, setel
-`jsonlDialect: "claude-stream-json"` pada konfigurasi backend tersebut.
+Untuk CLI yang memancarkan JSONL yang kompatibel dengan stream-json Claude Code, setel
+`jsonlDialect: "claude-stream-json"` pada config backend tersebut.
 
 ## Overlay bundle MCP
 
-Backend CLI **tidak** menerima panggilan alat OpenClaw secara langsung, tetapi sebuah backend dapat
-ikut serta pada overlay konfigurasi MCP yang dihasilkan dengan `bundleMcp: true`.
+Backend CLI **tidak** menerima pemanggilan alat OpenClaw secara langsung, tetapi sebuah backend dapat
+ikut serta dalam overlay config MCP yang dihasilkan dengan `bundleMcp: true`.
 
 Perilaku bawaan saat ini:
 
-- `claude-cli`: file konfigurasi MCP strict yang dihasilkan
-- `codex-cli`: override konfigurasi inline untuk `mcp_servers`
+- `claude-cli`: file config MCP ketat yang dihasilkan
+- `codex-cli`: override config inline untuk `mcp_servers`
 - `google-gemini-cli`: file pengaturan sistem Gemini yang dihasilkan
 
 Saat bundle MCP diaktifkan, OpenClaw:
 
-- menjalankan server MCP HTTP loopback yang mengekspos alat gateway ke proses CLI
-- mengautentikasi jembatan dengan token per-sesi (`OPENCLAW_MCP_TOKEN`)
-- membatasi akses alat ke sesi, akun, dan konteks channel saat ini
+- meluncurkan server MCP HTTP loopback yang mengekspos alat gateway ke proses CLI
+- mengautentikasi bridge dengan token per-sesi (`OPENCLAW_MCP_TOKEN`)
+- membatasi akses alat ke konteks sesi, akun, dan channel saat ini
 - memuat server bundle-MCP yang diaktifkan untuk workspace saat ini
-- menggabungkannya dengan bentuk konfigurasi/pengaturan MCP backend yang sudah ada
-- menulis ulang konfigurasi peluncuran menggunakan mode integrasi milik backend dari extension pemiliknya
+- menggabungkannya dengan bentuk config/pengaturan MCP backend yang sudah ada
+- menulis ulang config peluncuran menggunakan mode integrasi milik backend dari extension pemilik
 
-Jika tidak ada server MCP yang diaktifkan, OpenClaw tetap menyuntikkan konfigurasi strict ketika sebuah
-backend ikut serta dalam bundle MCP agar proses latar belakang tetap terisolasi.
+Jika tidak ada server MCP yang diaktifkan, OpenClaw tetap menginjeksi config ketat saat sebuah
+backend ikut serta dalam bundle MCP agar run latar belakang tetap terisolasi.
 
 ## Batasan
 
-- **Tidak ada panggilan alat OpenClaw langsung.** OpenClaw tidak menyuntikkan panggilan alat ke
+- **Tidak ada pemanggilan alat OpenClaw langsung.** OpenClaw tidak menginjeksi pemanggilan alat ke
   protokol backend CLI. Backend hanya melihat alat gateway saat mereka ikut serta dalam
   `bundleMcp: true`.
-- **Streaming bersifat khusus-backend.** Beberapa backend melakukan stream JSONL; yang lain melakukan buffer
-  hingga proses keluar.
+- **Streaming bersifat khusus backend.** Beberapa backend men-stream JSONL; yang lain membuffer
+  sampai keluar.
 - **Output terstruktur** bergantung pada format JSON CLI.
-- **Sesi Codex CLI** dilanjutkan melalui output teks (bukan JSONL), yang kurang
-  terstruktur dibandingkan eksekusi awal `--json`. Sesi OpenClaw tetap bekerja
-  secara normal.
+- **Sesi Codex CLI** melanjutkan melalui output teks (tanpa JSONL), yang kurang
+  terstruktur dibanding run awal `--json`. Sesi OpenClaw tetap berfungsi
+  normal.
 
 ## Pemecahan masalah
 
 - **CLI tidak ditemukan**: setel `command` ke path lengkap.
 - **Nama model salah**: gunakan `modelAliases` untuk memetakan `provider/model` → model CLI.
-- **Tidak ada kelanjutan sesi**: pastikan `sessionArg` disetel dan `sessionMode` bukan
+- **Tidak ada kontinuitas sesi**: pastikan `sessionArg` disetel dan `sessionMode` bukan
   `none` (Codex CLI saat ini tidak dapat melanjutkan dengan output JSON).
-- **Gambar diabaikan**: setel `imageArg` (dan verifikasi CLI mendukung path file).
+- **Gambar diabaikan**: setel `imageArg` (dan verifikasi bahwa CLI mendukung path file).
