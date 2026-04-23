@@ -1,46 +1,49 @@
 ---
 read_when:
     - Chcesz interaktywnie dostosować poświadczenia, urządzenia lub domyślne ustawienia agenta
-summary: Dokumentacja CLI dla `openclaw configure` (interaktywne podpowiedzi konfiguracji)
+summary: Dokumentacja CLI dla `openclaw configure` (interaktywne prompty konfiguracji)
 title: configure
 x-i18n:
-    generated_at: "2026-04-05T13:48:03Z"
+    generated_at: "2026-04-23T09:58:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 989569fdb8e1b31ce3438756b3ed9bf18e0c8baf611c5981643ba5925459c98f
+    source_hash: 7fedaf1bc5e5c793ed354ff01294808f9b4a266219f8e07799a2545fe5652cf2
     source_path: cli/configure.md
     workflow: 15
 ---
 
 # `openclaw configure`
 
-Interaktywny kreator do konfigurowania poświadczeń, urządzeń i domyślnych ustawień agenta.
+Interaktywny prompt do konfiguracji poświadczeń, urządzeń i domyślnych ustawień agenta.
 
-Uwaga: Sekcja **Model** zawiera teraz wybór wielokrotny dla allowlisty
-`agents.defaults.models` (co jest widoczne w `/model` i w selektorze modeli).
+Uwaga: sekcja **Model** zawiera teraz wielokrotny wybór dla listy dozwolonych
+`agents.defaults.models` (co pojawia się w `/model` i selektorze modeli).
+Wybory konfiguracji ograniczone do providera scalają wybrane modele z istniejącą
+listą dozwolonych zamiast zastępować niezwiązanych providerów już obecnych
+w konfiguracji.
 
-Gdy konfiguracja zaczyna się od wyboru uwierzytelniania dostawcy, selektory modelu domyślnego i
-allowlisty automatycznie preferują tego dostawcę. W przypadku sparowanych dostawców, takich
-jak Volcengine/BytePlus, ta sama preferencja dopasowuje także ich warianty
-planu kodowania (`volcengine-plan/*`, `byteplus-plan/*`). Jeśli filtr preferowanego dostawcy
-dałby pustą listę, konfiguracja wraca do niefiltrowanego katalogu zamiast pokazywać pusty selektor.
+Gdy configure uruchamia się z wyboru uwierzytelniania providera, selektory
+domyślnego modelu i listy dozwolonych automatycznie preferują tego providera. W przypadku sparowanych providerów, takich
+jak Volcengine/BytePlus, ta sama preferencja pasuje także do ich wariantów
+planu kodowania (`volcengine-plan/*`, `byteplus-plan/*`). Jeśli filtr
+preferowanego providera dałby pustą listę, configure wraca do nieprzefiltrowanego
+katalogu zamiast pokazywać pusty selektor.
 
 Wskazówka: `openclaw config` bez podpolecenia otwiera ten sam kreator. Użyj
-`openclaw config get|set|unset` do nieinteraktywnych edycji.
+`openclaw config get|set|unset` do zmian nieinteraktywnych.
 
-W przypadku wyszukiwania w sieci `openclaw configure --section web` pozwala wybrać dostawcę
-i skonfigurować jego poświadczenia. Niektórzy dostawcy pokazują także dodatkowe
-podpowiedzi specyficzne dla dostawcy:
+W przypadku wyszukiwania w sieci `openclaw configure --section web` pozwala wybrać providera
+i skonfigurować jego poświadczenia. Niektórzy providerzy pokazują też dalsze prompty specyficzne dla providera:
 
-- **Grok** może zaoferować opcjonalną konfigurację `x_search` z użyciem tego samego `XAI_API_KEY` i
+- **Grok** może oferować opcjonalną konfigurację `x_search` z tym samym `XAI_API_KEY` i
   pozwolić wybrać model `x_search`.
-- **Kimi** może zapytać o region API Moonshot (`api.moonshot.ai` vs
+- **Kimi** może zapytać o region Moonshot API (`api.moonshot.ai` vs
   `api.moonshot.cn`) oraz domyślny model wyszukiwania w sieci Kimi.
 
 Powiązane:
 
-- Referencja konfiguracji Gateway: [Konfiguracja](/gateway/configuration)
-- CLI config: [Config](/cli/config)
+- Dokumentacja konfiguracji Gateway: [Configuration](/pl/gateway/configuration)
+- CLI Config: [Config](/pl/cli/config)
 
 ## Opcje
 
@@ -60,11 +63,11 @@ Dostępne sekcje:
 
 Uwagi:
 
-- Wybór miejsca uruchomienia Gateway zawsze aktualizuje `gateway.mode`. Możesz wybrać „Kontynuuj” bez innych sekcji, jeśli to wszystko, czego potrzebujesz.
-- Usługi zorientowane na kanały (Slack/Discord/Matrix/Microsoft Teams) podczas konfiguracji proszą o allowlisty kanałów/pokoi. Możesz wprowadzać nazwy lub identyfikatory; kreator rozwiązuje nazwy do identyfikatorów, gdy to możliwe.
-- Jeśli uruchamiasz krok instalacji daemona, uwierzytelnianie tokenem wymaga tokena, a `gateway.auth.token` jest zarządzane przez SecretRef, konfiguracja waliduje SecretRef, ale nie zapisuje rozwiązanych jawnych wartości tokena w metadanych środowiska usługi supervisora.
-- Jeśli uwierzytelnianie tokenem wymaga tokena, a skonfigurowany SecretRef tokena jest nierozwiązany, konfiguracja blokuje instalację daemona i pokazuje konkretne wskazówki naprawcze.
-- Jeśli skonfigurowane są zarówno `gateway.auth.token`, jak i `gateway.auth.password`, a `gateway.auth.mode` nie jest ustawione, konfiguracja blokuje instalację daemona, dopóki tryb nie zostanie ustawiony jawnie.
+- Wybór miejsca uruchamiania Gateway zawsze aktualizuje `gateway.mode`. Możesz wybrać „Continue” bez innych sekcji, jeśli to wszystko, czego potrzebujesz.
+- Usługi zorientowane na kanały (Slack/Discord/Matrix/Microsoft Teams) podczas konfiguracji pytają o listy dozwolonych kanałów/pokoi. Możesz wprowadzać nazwy lub ID; kreator rozwiązuje nazwy do ID, gdy to możliwe.
+- Jeśli uruchamiasz krok instalacji daemona, uwierzytelnianie tokenem wymaga tokena, a `gateway.auth.token` jest zarządzane przez SecretRef, configure weryfikuje SecretRef, ale nie zapisuje rozwiązanych jawnych wartości tokena w metadanych środowiska usługi nadzorcy.
+- Jeśli uwierzytelnianie tokenem wymaga tokena, a skonfigurowany SecretRef tokena jest nierozwiązany, configure blokuje instalację daemona i pokazuje konkretne wskazówki naprawcze.
+- Jeśli skonfigurowano jednocześnie `gateway.auth.token` i `gateway.auth.password`, a `gateway.auth.mode` nie jest ustawione, configure blokuje instalację daemona, dopóki tryb nie zostanie jawnie ustawiony.
 
 ## Przykłady
 

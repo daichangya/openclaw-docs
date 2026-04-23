@@ -1,26 +1,27 @@
 ---
 read_when:
     - Potrzebujesz dokładnego omówienia pętli agenta lub zdarzeń cyklu życia
+    - Zmieniasz kolejkowanie sesji, zapisy transkryptu lub zachowanie blokady zapisu sesji
 summary: Cykl życia pętli agenta, strumienie i semantyka oczekiwania
 title: Pętla agenta
 x-i18n:
-    generated_at: "2026-04-12T23:28:03Z"
+    generated_at: "2026-04-23T09:59:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3c2986708b444055340e0c91b8fce7d32225fcccf3d197b797665fd36b1991a5
+    source_hash: 439b68446cc75db3ded7a7d20df8e074734e6759ecf989a41299d1b84f1ce79c
     source_path: concepts/agent-loop.md
     workflow: 15
 ---
 
 # Pętla agenta (OpenClaw)
 
-Pętla agentowa to pełny, „rzeczywisty” przebieg działania agenta: przyjęcie danych wejściowych → zbudowanie kontekstu → wnioskowanie modelu →
-wykonanie narzędzi → strumieniowanie odpowiedzi → trwały zapis. To autorytatywna ścieżka, która przekształca wiadomość
-w działania i końcową odpowiedź, zachowując przy tym spójność stanu sesji.
+Pętla agentowa to pełne „prawdziwe” uruchomienie agenta: przyjęcie → złożenie kontekstu → inferencja modelu →
+wykonanie narzędzi → strumieniowanie odpowiedzi → utrwalenie. To autorytatywna ścieżka, która zamienia wiadomość
+w działania i końcową odpowiedź, utrzymując spójny stan sesji.
 
-W OpenClaw pętla to pojedynczy, serializowany przebieg na sesję, który emituje zdarzenia cyklu życia i strumienia,
-gdy model myśli, wywołuje narzędzia i strumieniuje dane wyjściowe. Ten dokument wyjaśnia, jak ta autentyczna pętla
-jest połączona od początku do końca.
+W OpenClaw pętla to pojedyncze, serializowane uruchomienie na sesję, które emituje zdarzenia cyklu życia i strumienia,
+gdy model myśli, wywołuje narzędzia i strumieniuje wynik. Ten dokument wyjaśnia, jak ta rzeczywista pętla
+jest połączona od końca do końca.
 
 ## Punkty wejścia
 
@@ -29,18 +30,18 @@ jest połączona od początku do końca.
 
 ## Jak to działa (wysoki poziom)
 
-1. RPC `agent` weryfikuje parametry, rozwiązuje sesję (`sessionKey`/`sessionId`), zapisuje metadane sesji i natychmiast zwraca `{ runId, acceptedAt }`.
+1. RPC `agent` waliduje parametry, rozstrzyga sesję (sessionKey/sessionId), utrwala metadane sesji i natychmiast zwraca `{ runId, acceptedAt }`.
 2. `agentCommand` uruchamia agenta:
-   - rozwiązuje domyślne wartości modelu + thinking/verbose/trace
-   - wczytuje snapshot Skills
-   - wywołuje `runEmbeddedPiAgent` (środowisko uruchomieniowe pi-agent-core)
-   - emituje **lifecycle end/error**, jeśli osadzona pętla tego nie zrobi
+   - rozstrzyga domyślne wartości modelu + thinking/verbose/trace
+   - ładuje migawkę Skills
+   - wywołuje `runEmbeddedPiAgent` (runtime pi-agent-core)
+   - emituje **lifecycle end/error**, jeśli osadzona pętla ich nie wyemituje
 3. `runEmbeddedPiAgent`:
-   - serializuje przebiegi przez kolejki per sesja i globalne
-   - rozwiązuje profil modelu + auth i buduje sesję pi
+   - serializuje uruchomienia przez kolejki per sesja + globalne
+   - rozstrzyga model + profil uwierzytelniania i buduje sesję pi
    - subskrybuje zdarzenia pi i strumieniuje delty asystenta/narzędzi
-   - wymusza limit czasu -> przerywa przebieg po jego przekroczeniu
-   - zwraca payloady + metadane użycia
+   - wymusza limit czasu -> przerywa uruchomienie po jego przekroczeniu
+   - zwraca ładunki + metadane użycia
 4. `subscribeEmbeddedPiSession` mostkuje zdarzenia pi-agent-core do strumienia OpenClaw `agent`:
    - zdarzenia narzędzi => `stream: "tool"`
    - delty asystenta => `stream: "assistant"`
@@ -51,22 +52,30 @@ jest połączona od początku do końca.
 
 ## Kolejkowanie + współbieżność
 
-- Przebiegi są serializowane per klucz sesji (pas sesji), a opcjonalnie także przez pas globalny.
-- Zapobiega to wyścigom narzędzi/sesji i utrzymuje spójność historii sesji.
-- Kanały wiadomości mogą wybierać tryby kolejki (collect/steer/followup), które zasilają ten system pasów.
+- Uruchomienia są serializowane per klucz sesji (pas sesji) i opcjonalnie przez pas globalny.
+- To zapobiega wyścigom narzędzi/sesji i utrzymuje spójność historii sesji.
+- Kanały wiadomości mogą wybierać tryby kolejkowania (collect/steer/followup), które zasilają ten system pasów.
   Zobacz [Kolejka poleceń](/pl/concepts/queue).
+- Zapisy transkryptu są również chronione blokadą zapisu sesji na pliku sesji. Blokada jest
+  świadoma procesu i oparta na pliku, więc wychwytuje zapisujących, którzy omijają kolejkę w procesie lub pochodzą
+  z innego procesu.
+- Blokady zapisu sesji są domyślnie nierekurencyjne. Jeśli pomocnik celowo zagnieżdża przejęcie
+  tej samej blokady przy zachowaniu jednego logicznego zapisującego, musi jawnie włączyć tę możliwość przez
+  `allowReentrant: true`.
 
 ## Przygotowanie sesji + obszaru roboczego
 
-- Obszar roboczy jest rozwiązywany i tworzony; przebiegi w sandbox mogą zostać przekierowane do katalogu głównego obszaru roboczego sandbox.
-- Skills są wczytywane (lub ponownie używane ze snapshotu) i wstrzykiwane do środowiska oraz promptu.
-- Pliki bootstrap/kontekstu są rozwiązywane i wstrzykiwane do raportu promptu systemowego.
-- Uzyskiwana jest blokada zapisu sesji; przed rozpoczęciem strumieniowania `SessionManager` jest otwierany i przygotowywany.
+- Obszar roboczy jest rozstrzygany i tworzony; uruchomienia sandboxowane mogą przekierowywać do korzenia obszaru roboczego sandbox.
+- Skills są ładowane (lub ponownie używane z migawki) i wstrzykiwane do env oraz promptu.
+- Pliki bootstrap/kontekstu są rozstrzygane i wstrzykiwane do raportu promptu systemowego.
+- Przejmowana jest blokada zapisu sesji; `SessionManager` jest otwierany i przygotowywany przed strumieniowaniem. Każda
+  późniejsza ścieżka przepisywania transkryptu, Compaction lub obcinania musi przejąć tę samą blokadę przed otwarciem lub
+  mutacją pliku transkryptu.
 
 ## Składanie promptu + prompt systemowy
 
-- Prompt systemowy jest budowany z bazowego promptu OpenClaw, promptu Skills, kontekstu bootstrap i nadpisań dla danego przebiegu.
-- Wymuszane są limity specyficzne dla modelu oraz tokeny zarezerwowane dla Compaction.
+- Prompt systemowy jest budowany z bazowego promptu OpenClaw, promptu Skills, kontekstu bootstrap i nadpisań per uruchomienie.
+- Wymuszane są limity specyficzne dla modelu oraz tokeny rezerwy Compaction.
 - Zobacz [Prompt systemowy](/pl/concepts/system-prompt), aby sprawdzić, co widzi model.
 
 ## Punkty hooków (gdzie można przechwycić)
@@ -74,73 +83,73 @@ jest połączona od początku do końca.
 OpenClaw ma dwa systemy hooków:
 
 - **Hooki wewnętrzne** (hooki Gateway): skrypty sterowane zdarzeniami dla poleceń i zdarzeń cyklu życia.
-- **Hooki Pluginów**: punkty rozszerzeń wewnątrz cyklu życia agenta/narzędzi i potoku Gateway.
+- **Hooki Plugin**: punkty rozszerzeń wewnątrz cyklu życia agenta/narzędzi i potoku gateway.
 
 ### Hooki wewnętrzne (hooki Gateway)
 
-- **`agent:bootstrap`**: uruchamia się podczas budowania plików bootstrap, zanim prompt systemowy zostanie ostatecznie sfinalizowany.
-  Użyj tego, aby dodawać/usuwać pliki kontekstu bootstrap.
-- Hooki poleceń: `/new`, `/reset`, `/stop` i inne zdarzenia poleceń (zobacz dokumentację Hooków).
+- **`agent:bootstrap`**: uruchamiany podczas budowania plików bootstrap przed finalizacją promptu systemowego.
+  Użyj go, aby dodawać/usuwać pliki kontekstu bootstrap.
+- **Hooki poleceń**: zdarzenia `/new`, `/reset`, `/stop` i innych poleceń (zobacz dokument Hooks).
 
-Zobacz [Hooki](/pl/automation/hooks), aby znaleźć konfigurację i przykłady.
+Zobacz [Hooki](/pl/automation/hooks), aby poznać konfigurację i przykłady.
 
-### Hooki Pluginów (cykl życia agenta + Gateway)
+### Hooki Plugin (cykl życia agenta + gateway)
 
-Są one uruchamiane wewnątrz pętli agenta lub potoku Gateway:
+Są uruchamiane wewnątrz pętli agenta lub potoku gateway:
 
-- **`before_model_resolve`**: uruchamiany przed sesją (bez `messages`), aby deterministycznie nadpisać dostawcę/model przed rozstrzygnięciem modelu.
-- **`before_prompt_build`**: uruchamiany po wczytaniu sesji (z `messages`), aby wstrzyknąć `prependContext`, `systemPrompt`, `prependSystemContext` lub `appendSystemContext` przed wysłaniem promptu. Używaj `prependContext` dla dynamicznego tekstu per tura, a pól kontekstu systemowego dla stabilnych wskazówek, które powinny znajdować się w przestrzeni promptu systemowego.
-- **`before_agent_start`**: hook zgodności wstecznej; może działać w dowolnej z obu faz — preferuj powyższe hooki jawne.
-- **`before_agent_reply`**: uruchamiany po działaniach inline i przed wywołaniem LLM, pozwalając Pluginowi przejąć turę i zwrócić odpowiedź syntetyczną lub całkowicie wyciszyć turę.
-- **`agent_end`**: umożliwia inspekcję końcowej listy wiadomości i metadanych przebiegu po zakończeniu.
+- **`before_model_resolve`**: uruchamiany przed sesją (bez `messages`), aby deterministycznie nadpisać provider/model przed rozstrzygnięciem modelu.
+- **`before_prompt_build`**: uruchamiany po załadowaniu sesji (z `messages`), aby wstrzyknąć `prependContext`, `systemPrompt`, `prependSystemContext` lub `appendSystemContext` przed wysłaniem promptu. Użyj `prependContext` dla dynamicznego tekstu per tura, a pól kontekstu systemowego dla stabilnych wskazówek, które powinny znaleźć się w przestrzeni promptu systemowego.
+- **`before_agent_start`**: starszy hook zgodności, który może działać w obu fazach; preferuj powyższe hooki jawne.
+- **`before_agent_reply`**: uruchamiany po akcjach inline i przed wywołaniem LLM, pozwalając Pluginowi przejąć turę i zwrócić syntetyczną odpowiedź albo całkowicie wyciszyć turę.
+- **`agent_end`**: sprawdza końcową listę wiadomości i metadane uruchomienia po zakończeniu.
 - **`before_compaction` / `after_compaction`**: obserwują lub adnotują cykle Compaction.
 - **`before_tool_call` / `after_tool_call`**: przechwytują parametry/wyniki narzędzi.
-- **`before_install`**: umożliwia inspekcję wyników wbudowanego skanowania i opcjonalne zablokowanie instalacji Skills lub Pluginów.
-- **`tool_result_persist`**: synchronicznie przekształca wyniki narzędzi, zanim zostaną zapisane w transkrypcie sesji.
-- **`message_received` / `message_sending` / `message_sent`**: hooki wiadomości przychodzących i wychodzących.
+- **`before_install`**: sprawdza wbudowane wyniki skanowania i może opcjonalnie blokować instalacje Skills lub Plugin.
+- **`tool_result_persist`**: synchronicznie przekształca wyniki narzędzi przed zapisaniem ich do transkryptu sesji.
+- **`message_received` / `message_sending` / `message_sent`**: hooki wiadomości przychodzących + wychodzących.
 - **`session_start` / `session_end`**: granice cyklu życia sesji.
-- **`gateway_start` / `gateway_stop`**: zdarzenia cyklu życia Gateway.
+- **`gateway_start` / `gateway_stop`**: zdarzenia cyklu życia gateway.
 
-Zasady decyzyjne hooków dla zabezpieczeń wyjścia/narzędzi:
+Zasady decyzji hooków dla zabezpieczeń narzędzi/wyjścia:
 
-- `before_tool_call`: `{ block: true }` jest rozstrzygające i zatrzymuje handlery o niższym priorytecie.
-- `before_tool_call`: `{ block: false }` nic nie robi i nie usuwa wcześniejszej blokady.
-- `before_install`: `{ block: true }` jest rozstrzygające i zatrzymuje handlery o niższym priorytecie.
-- `before_install`: `{ block: false }` nic nie robi i nie usuwa wcześniejszej blokady.
-- `message_sending`: `{ cancel: true }` jest rozstrzygające i zatrzymuje handlery o niższym priorytecie.
-- `message_sending`: `{ cancel: false }` nic nie robi i nie usuwa wcześniejszego anulowania.
+- `before_tool_call`: `{ block: true }` jest końcowe i zatrzymuje handlery o niższym priorytecie.
+- `before_tool_call`: `{ block: false }` nic nie robi i nie czyści wcześniejszej blokady.
+- `before_install`: `{ block: true }` jest końcowe i zatrzymuje handlery o niższym priorytecie.
+- `before_install`: `{ block: false }` nic nie robi i nie czyści wcześniejszej blokady.
+- `message_sending`: `{ cancel: true }` jest końcowe i zatrzymuje handlery o niższym priorytecie.
+- `message_sending`: `{ cancel: false }` nic nie robi i nie czyści wcześniejszego anulowania.
 
-Zobacz [Hooki Pluginów](/pl/plugins/architecture#provider-runtime-hooks), aby znaleźć API hooków i szczegóły rejestracji.
+Zobacz [Hooki Plugin](/pl/plugins/architecture#provider-runtime-hooks), aby poznać API hooków i szczegóły rejestracji.
 
 ## Strumieniowanie + częściowe odpowiedzi
 
 - Delty asystenta są strumieniowane z pi-agent-core i emitowane jako zdarzenia `assistant`.
-- Strumieniowanie blokowe może emitować częściowe odpowiedzi na `text_end` albo `message_end`.
-- Strumieniowanie rozumowania może być emitowane jako osobny strumień albo jako odpowiedzi blokowe.
-- Zobacz [Strumieniowanie](/pl/concepts/streaming), aby poznać zachowanie fragmentacji i odpowiedzi blokowych.
+- Strumieniowanie blokowe może emitować częściowe odpowiedzi na `text_end` lub `message_end`.
+- Strumieniowanie rozumowania może być emitowane jako osobny strumień lub jako odpowiedzi blokowe.
+- Zobacz [Strumieniowanie](/pl/concepts/streaming), aby poznać zachowanie chunkingu i odpowiedzi blokowych.
 
-## Wykonywanie narzędzi + narzędzia wiadomości
+## Wykonanie narzędzi + narzędzia wiadomości
 
-- Zdarzenia rozpoczęcia/aktualizacji/zakończenia narzędzia są emitowane w strumieniu `tool`.
-- Wyniki narzędzi są oczyszczane pod względem rozmiaru i payloadów obrazów przed logowaniem/emisją.
+- Zdarzenia start/update/end narzędzi są emitowane w strumieniu `tool`.
+- Wyniki narzędzi są sanityzowane pod kątem rozmiaru i ładunków obrazów przed logowaniem/emisją.
 - Wysłania przez narzędzia wiadomości są śledzone, aby tłumić zduplikowane potwierdzenia asystenta.
 
 ## Kształtowanie odpowiedzi + tłumienie
 
-- Końcowe payloady są składane z:
+- Końcowe ładunki są składane z:
   - tekstu asystenta (i opcjonalnie rozumowania)
-  - podsumowań narzędzi inline (gdy `verbose` jest włączone i dozwolone)
-  - tekstu błędu asystenta, gdy model zwróci błąd
-- Dokładny token wyciszający `NO_REPLY` / `no_reply` jest filtrowany z wychodzących
-  payloadów.
-- Duplikaty z narzędzi wiadomości są usuwane z końcowej listy payloadów.
-- Jeśli nie pozostaną żadne renderowalne payloady, a narzędzie zwróciło błąd, emitowana jest awaryjna odpowiedź o błędzie narzędzia
-  (chyba że narzędzie wiadomości już wysłało odpowiedź widoczną dla użytkownika).
+  - podsumowań narzędzi inline (gdy verbose + dozwolone)
+  - tekstu błędu asystenta, gdy model zwraca błąd
+- Dokładny cichy token `NO_REPLY` / `no_reply` jest filtrowany z wychodzących
+  ładunków.
+- Duplikaty narzędzi wiadomości są usuwane z końcowej listy ładunków.
+- Jeśli nie pozostaną żadne renderowalne ładunki, a narzędzie zwróciło błąd, emitowana jest awaryjna odpowiedź błędu narzędzia
+  (chyba że narzędzie wiadomości wysłało już widoczną dla użytkownika odpowiedź).
 
-## Compaction + ponowienia
+## Compaction + ponowne próby
 
-- Auto-Compaction emituje zdarzenia strumienia `compaction` i może uruchomić ponowienie.
-- Przy ponowieniu bufory w pamięci i podsumowania narzędzi są resetowane, aby uniknąć zduplikowanego wyjścia.
+- Automatyczny Compaction emituje zdarzenia strumienia `compaction` i może wywołać ponowną próbę.
+- Przy ponownej próbie bufory w pamięci i podsumowania narzędzi są resetowane, aby uniknąć duplikacji wyniku.
 - Zobacz [Compaction](/pl/concepts/compaction), aby poznać potok Compaction.
 
 ## Strumienie zdarzeń (obecnie)
@@ -152,25 +161,25 @@ Zobacz [Hooki Pluginów](/pl/plugins/architecture#provider-runtime-hooks), aby z
 ## Obsługa kanału czatu
 
 - Delty asystenta są buforowane do wiadomości czatu `delta`.
-- Końcowe `final` czatu jest emitowane przy **lifecycle end/error**.
+- Końcowy czat `final` jest emitowany przy **lifecycle end/error**.
 
 ## Limity czasu
 
-- Domyślny `agent.wait`: 30 s (tylko oczekiwanie). Parametr `timeoutMs` go nadpisuje.
-- Czas działania agenta: domyślne `agents.defaults.timeoutSeconds` to 172800 s (48 godzin); wymuszane przez timer przerwania w `runEmbeddedPiAgent`.
-- Limit bezczynności LLM: `agents.defaults.llm.idleTimeoutSeconds` przerywa żądanie modelu, gdy w oknie bezczynności nie nadejdą żadne fragmenty odpowiedzi. Ustaw tę wartość jawnie dla wolnych modeli lokalnych albo dostawców rozumowania/wywołań narzędzi; ustaw na 0, aby wyłączyć. Jeśli nie jest ustawiona, OpenClaw używa `agents.defaults.timeoutSeconds`, jeśli jest skonfigurowane, w przeciwnym razie 120 s. Przebiegi wyzwalane przez Cron bez jawnego limitu czasu LLM lub agenta wyłączają watchdog bezczynności i polegają na zewnętrznym limicie czasu Cron.
+- Domyślnie `agent.wait`: 30 s (tylko oczekiwanie). Parametr `timeoutMs` nadpisuje.
+- Runtime agenta: domyślnie `agents.defaults.timeoutSeconds` to 172800 s (48 godzin); wymuszane w liczniku przerwania `runEmbeddedPiAgent`.
+- Limit bezczynności LLM: `agents.defaults.llm.idleTimeoutSeconds` przerywa żądanie modelu, gdy przed upływem okna bezczynności nie nadejdą żadne chunki odpowiedzi. Ustaw to jawnie dla wolnych modeli lokalnych albo providerów rozumowania/wywołań narzędzi; ustaw `0`, aby wyłączyć. Jeśli nie jest ustawione, OpenClaw używa `agents.defaults.timeoutSeconds`, gdy jest skonfigurowane, w przeciwnym razie 120 s. Uruchomienia wyzwalane przez cron bez jawnego limitu czasu LLM lub agenta wyłączają watchdog bezczynności i polegają na zewnętrznym limicie czasu cron.
 
-## Gdzie wszystko może zakończyć się wcześniej
+## Gdzie rzeczy mogą zakończyć się wcześniej
 
 - Limit czasu agenta (przerwanie)
 - AbortSignal (anulowanie)
 - Rozłączenie Gateway lub limit czasu RPC
-- Limit czasu `agent.wait` (dotyczy tylko oczekiwania, nie zatrzymuje agenta)
+- Limit czasu `agent.wait` (tylko oczekiwanie, nie zatrzymuje agenta)
 
 ## Powiązane
 
 - [Narzędzia](/pl/tools) — dostępne narzędzia agenta
-- [Hooki](/pl/automation/hooks) — skrypty sterowane zdarzeniami, wyzwalane przez zdarzenia cyklu życia agenta
+- [Hooki](/pl/automation/hooks) — skrypty sterowane zdarzeniami wyzwalane przez zdarzenia cyklu życia agenta
 - [Compaction](/pl/concepts/compaction) — jak długie rozmowy są podsumowywane
-- [Zgody na Exec](/pl/tools/exec-approvals) — bramki zatwierdzania poleceń powłoki
-- [Thinking](/pl/tools/thinking) — konfiguracja poziomu thinking/rozumowania
+- [Zatwierdzenia exec](/pl/tools/exec-approvals) — bramki zatwierdzeń dla poleceń powłoki
+- [Thinking](/pl/tools/thinking) — konfiguracja poziomu thinking

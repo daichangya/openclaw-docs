@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Chcesz zrozumieć routing i izolację sesji
-    - Chcesz skonfigurować zakres DM dla środowisk wieloużytkownikowych
+    - Chcesz zrozumieć trasowanie i izolację sesji
+    - Chcesz skonfigurować zakres DM dla konfiguracji wieloużytkownikowych
 summary: Jak OpenClaw zarządza sesjami rozmów
 title: Zarządzanie sesjami
 x-i18n:
-    generated_at: "2026-04-05T13:51:32Z"
+    generated_at: "2026-04-23T10:00:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ab985781e54b22a034489dafa4b52cc204b1a5da22ee9b62edc7f6697512cea1
+    source_hash: d099ef7f3b484cf0fa45ddbf5648a7497d6509209e4de08c8484102eca073a2b
     source_path: concepts/session.md
     workflow: 15
 ---
@@ -16,26 +16,27 @@ x-i18n:
 # Zarządzanie sesjami
 
 OpenClaw organizuje rozmowy w **sesje**. Każda wiadomość jest kierowana do
-sesji na podstawie tego, skąd pochodzi — DM, czaty grupowe, zadania cron itd.
+sesji na podstawie miejsca pochodzenia — DM, czaty grupowe, zadania cron itp.
 
-## Jak kierowane są wiadomości
+## Jak trasowane są wiadomości
 
-| Źródło          | Zachowanie                |
-| --------------- | ------------------------- |
-| Wiadomości bezpośrednie | Domyślnie współdzielona sesja |
-| Czaty grupowe   | Izolowane per grupa       |
-| Pokoje/kanały   | Izolowane per pokój       |
-| Zadania cron    | Nowa sesja dla każdego uruchomienia |
-| Webhooki        | Izolowane per hook        |
+| Źródło           | Zachowanie                |
+| ---------------- | ------------------------- |
+| Wiadomości bezpośrednie | Współdzielona sesja domyślnie |
+| Czaty grupowe    | Izolowane per grupa       |
+| Pokoje/kanały    | Izolowane per pokój       |
+| Zadania cron     | Świeża sesja dla każdego uruchomienia |
+| Webhooki         | Izolowane per hook        |
 
 ## Izolacja DM
 
-Domyślnie wszystkie DM współdzielą jedną sesję dla zachowania ciągłości. To jest w porządku w
-środowiskach dla jednego użytkownika.
+Domyślnie wszystkie DM współdzielą jedną sesję dla ciągłości. To sprawdza się
+w konfiguracjach jednoosobowych.
 
 <Warning>
-Jeśli wiele osób może wysyłać wiadomości do Twojego agenta, włącz izolację DM. Bez niej wszyscy
-użytkownicy współdzielą ten sam kontekst rozmowy — prywatne wiadomości Alicji byłyby widoczne dla Boba.
+Jeśli wiele osób może wysyłać wiadomości do Twojego agenta, włącz izolację DM. Bez tego wszyscy
+użytkownicy współdzielą ten sam kontekst rozmowy — prywatne wiadomości Alicji byłyby
+widoczne dla Boba.
 </Warning>
 
 **Rozwiązanie:**
@@ -43,7 +44,7 @@ użytkownicy współdzielą ten sam kontekst rozmowy — prywatne wiadomości Al
 ```json5
 {
   session: {
-    dmScope: "per-channel-peer", // izolacja według kanału + nadawcy
+    dmScope: "per-channel-peer", // isolate by channel + sender
   },
 }
 ```
@@ -56,15 +57,15 @@ Inne opcje:
 - `per-account-channel-peer` — izolacja według konta + kanału + nadawcy.
 
 <Tip>
-Jeśli ta sama osoba kontaktuje się z Tobą z wielu kanałów, użyj
-`session.identityLinks`, aby połączyć jej tożsamości, tak aby współdzieliła jedną sesję.
+Jeśli ta sama osoba kontaktuje się z Tobą przez wiele kanałów, użyj
+`session.identityLinks`, aby powiązać jej tożsamości, tak aby współdzieliły jedną sesję.
 </Tip>
 
 Zweryfikuj konfigurację za pomocą `openclaw security audit`.
 
 ## Cykl życia sesji
 
-Sesje są ponownie używane, dopóki nie wygasną:
+Sesje są ponownie używane do momentu wygaśnięcia:
 
 - **Codzienny reset** (domyślnie) — nowa sesja o 4:00 czasu lokalnego na hoście
   gateway.
@@ -73,20 +74,25 @@ Sesje są ponownie używane, dopóki nie wygasną:
 - **Reset ręczny** — wpisz `/new` lub `/reset` na czacie. `/new <model>` także
   przełącza model.
 
-Gdy skonfigurowane są jednocześnie codzienne i bezczynnościowe resety, wygrywa ten, który wygaśnie wcześniej.
+Gdy skonfigurowano jednocześnie codzienne i bezczynnościowe resety, wygrywa to,
+które wygaśnie wcześniej.
 
-## Gdzie przechowywany jest stan
+Sesje z aktywną sesją CLI należącą do providera nie są odcinane przez niejawną
+domyślną zmianę dzienną. Użyj `/reset` albo jawnie skonfiguruj `session.reset`, gdy takie
+sesje powinny wygasać według timera.
 
-Cały stan sesji należy do **gateway**. Klienci UI wysyłają zapytania do gateway o
-dane sesji.
+## Gdzie znajduje się stan
+
+Cały stan sesji należy do **gateway**. Klienci UI odpytyją gateway o dane
+sesji.
 
 - **Magazyn:** `~/.openclaw/agents/<agentId>/sessions/sessions.json`
-- **Transkrypcje:** `~/.openclaw/agents/<agentId>/sessions/<sessionId>.jsonl`
+- **Transkrypty:** `~/.openclaw/agents/<agentId>/sessions/<sessionId>.jsonl`
 
-## Utrzymanie sesji
+## Konserwacja sesji
 
-OpenClaw automatycznie ogranicza rozmiar przechowywanych danych sesji w czasie. Domyślnie działa
-w trybie `warn` (zgłasza, co zostałoby wyczyszczone). Ustaw `session.maintenance.mode`
+OpenClaw automatycznie z czasem ogranicza rozmiar magazynu sesji. Domyślnie działa
+w trybie `warn` (raportuje, co zostałoby wyczyszczone). Ustaw `session.maintenance.mode`
 na `"enforce"`, aby włączyć automatyczne czyszczenie:
 
 ```json5
@@ -101,22 +107,22 @@ na `"enforce"`, aby włączyć automatyczne czyszczenie:
 }
 ```
 
-Podgląd za pomocą `openclaw sessions cleanup --dry-run`.
+Podejrzyj działanie przez `openclaw sessions cleanup --dry-run`.
 
 ## Inspekcja sesji
 
 - `openclaw status` — ścieżka magazynu sesji i ostatnia aktywność.
-- `openclaw sessions --json` — wszystkie sesje (filtruj za pomocą `--active <minutes>`).
+- `openclaw sessions --json` — wszystkie sesje (filtruj przez `--active <minutes>`).
 - `/status` na czacie — użycie kontekstu, model i przełączniki.
 - `/context list` — co znajduje się w prompcie systemowym.
 
 ## Dalsza lektura
 
-- [Przycinanie sesji](/concepts/session-pruning) — skracanie wyników narzędzi
-- [Kompaktowanie](/concepts/compaction) — podsumowywanie długich rozmów
-- [Narzędzia sesji](/concepts/session-tool) — narzędzia agenta do pracy między sesjami
-- [Dogłębne omówienie zarządzania sesjami](/reference/session-management-compaction) —
-  schemat magazynu, transkrypcje, polityka wysyłania, metadane pochodzenia i zaawansowana konfiguracja
-- [Multi-Agent](/concepts/multi-agent) — routing i izolacja sesji między agentami
-- [Zadania w tle](/pl/automation/tasks) — jak praca odłączona tworzy rekordy zadań z odniesieniami do sesji
+- [Przycinanie sesji](/pl/concepts/session-pruning) — przycinanie wyników narzędzi
+- [Compaction](/pl/concepts/compaction) — podsumowywanie długich rozmów
+- [Narzędzia sesji](/pl/concepts/session-tool) — narzędzia agenta do pracy między sesjami
+- [Szczegółowe omówienie zarządzania sesjami](/pl/reference/session-management-compaction) —
+  schemat magazynu, transkrypty, polityka wysyłania, metadane pochodzenia i konfiguracja zaawansowana
+- [Multi-Agent](/pl/concepts/multi-agent) — trasowanie i izolacja sesji między agentami
+- [Zadania w tle](/pl/automation/tasks) — jak praca odłączona tworzy rekordy zadań z odwołaniami do sesji
 - [Routing kanałów](/pl/channels/channel-routing) — jak wiadomości przychodzące są kierowane do sesji

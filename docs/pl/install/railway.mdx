@@ -1,28 +1,30 @@
 ---
 read_when:
-    - Wdrażasz OpenClaw na Railway
-    - Chcesz wdrożenia w chmurze jednym kliknięciem z przeglądarkowym Control UI
-summary: Wdrażanie OpenClaw na Railway przy użyciu szablonu one-click
+    - Wdrażanie OpenClaw na Railway
+    - Chcesz wdrożenia w chmurze jednym kliknięciem z opartym na przeglądarce Control UI
+summary: Wdróż OpenClaw na Railway za pomocą szablonu one-click
 title: Railway
 x-i18n:
-    generated_at: "2026-04-05T13:57:59Z"
+    generated_at: "2026-04-23T10:03:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f59699aa4e9d27d50018acc2e89ed1bbb1b1a5c85e3fd52f2afe5b2c97b21720
+    source_hash: 989c8467ead04b8aa7c94101abd99c936ecd3e451fe728afe8c2f2bd5a78df48
     source_path: install/railway.mdx
     workflow: 15
 ---
 
-Wdróż OpenClaw na Railway przy użyciu szablonu one-click i uzyskaj dostęp przez webowe Control UI.
-To najprostsza ścieżka typu „bez terminala na serwerze”: Railway uruchamia Gateway za ciebie.
+# Railway
 
-## Szybka checklista (dla nowych użytkowników)
+Wdróż OpenClaw na Railway za pomocą szablonu one-click i uzyskaj dostęp przez webowe Control UI.
+To najprostsza ścieżka „bez terminala na serwerze”: Railway uruchamia Gateway za Ciebie.
+
+## Szybka lista kontrolna (nowi użytkownicy)
 
 1. Kliknij **Deploy on Railway** (poniżej).
 2. Dodaj **Volume** zamontowany pod `/data`.
 3. Ustaw wymagane **Variables** (co najmniej `OPENCLAW_GATEWAY_PORT` i `OPENCLAW_GATEWAY_TOKEN`).
 4. Włącz **HTTP Proxy** na porcie `8080`.
-5. Otwórz `https://<your-railway-domain>/openclaw` i połącz się przy użyciu skonfigurowanego współdzielonego sekretu. Ten szablon domyślnie używa `OPENCLAW_GATEWAY_TOKEN`; jeśli zastąpisz go uwierzytelnianiem hasłem, użyj tego hasła.
+5. Otwórz `https://<your-railway-domain>/openclaw` i połącz się przy użyciu skonfigurowanego współdzielonego sekretu. Ten szablon domyślnie używa `OPENCLAW_GATEWAY_TOKEN`; jeśli zastąpisz go uwierzytelnianiem hasłem, użyj zamiast tego tego hasła.
 
 ## Wdrożenie one-click
 
@@ -30,12 +32,12 @@ To najprostsza ścieżka typu „bez terminala na serwerze”: Railway uruchamia
   Deploy on Railway
 </a>
 
-Po wdrożeniu znajdź publiczny URL w **Railway → your service → Settings → Domains**.
+Po wdrożeniu znajdź swój publiczny adres URL w **Railway → your service → Settings → Domains**.
 
-Railway może:
+Railway:
 
-- przydzielić ci wygenerowaną domenę (często `https://<something>.up.railway.app`), lub
-- użyć twojej własnej domeny, jeśli ją podłączysz.
+- przydzieli Ci wygenerowaną domenę (często `https://<something>.up.railway.app`), albo
+- użyje Twojej własnej domeny, jeśli została podłączona.
 
 Następnie otwórz:
 
@@ -43,9 +45,9 @@ Następnie otwórz:
 
 ## Co otrzymujesz
 
-- Hostowany OpenClaw Gateway + Control UI
-- Trwałe przechowywanie przez Railway Volume (`/data`), dzięki czemu `openclaw.json`,
-  per-agent `auth-profiles.json`, stan kanałów/dostawców, sesje oraz
+- Hostowany Gateway OpenClaw + Control UI
+- Trwałą pamięć przez Railway Volume (`/data`), dzięki czemu `openclaw.json`,
+  `auth-profiles.json` dla poszczególnych agentów, stan kanałów/dostawców, sesje i
   workspace przetrwają ponowne wdrożenia
 
 ## Wymagane ustawienia Railway
@@ -58,16 +60,16 @@ Włącz **HTTP Proxy** dla usługi.
 
 ### Volume (wymagane)
 
-Podłącz wolumen zamontowany pod:
+Podłącz volume zamontowany pod:
 
 - `/data`
 
 ### Variables
 
-Ustaw te zmienne dla usługi:
+Ustaw te zmienne w usłudze:
 
 - `OPENCLAW_GATEWAY_PORT=8080` (wymagane — musi odpowiadać portowi w Public Networking)
-- `OPENCLAW_GATEWAY_TOKEN` (wymagane; traktuj jako sekret administracyjny)
+- `OPENCLAW_GATEWAY_TOKEN` (wymagane; traktuj jako sekret administratora)
 - `OPENCLAW_STATE_DIR=/data/.openclaw` (zalecane)
 - `OPENCLAW_WORKSPACE_DIR=/data/workspace` (zalecane)
 
@@ -75,23 +77,23 @@ Ustaw te zmienne dla usługi:
 
 Użyj Control UI pod `/openclaw` albo uruchom `openclaw onboard` przez powłokę Railway, aby uzyskać instrukcje konfiguracji kanałów:
 
-- [Telegram](/channels/telegram) (najszybciej — wystarczy token bota)
-- [Discord](/channels/discord)
+- [Telegram](/pl/channels/telegram) (najszybciej — wystarczy token bota)
+- [Discord](/pl/channels/discord)
 - [Wszystkie kanały](/pl/channels)
 
 ## Kopie zapasowe i migracja
 
-Wyeksportuj swój stan, config, profile uwierzytelniania i workspace:
+Wyeksportuj swój stan, konfigurację, profile uwierzytelniania i workspace:
 
 ```bash
 openclaw backup create
 ```
 
-To tworzy przenośne archiwum kopii zapasowej ze stanem OpenClaw oraz ewentualnie skonfigurowanym
-workspace. Szczegóły znajdziesz w [Backup](/cli/backup).
+To tworzy przenośne archiwum kopii zapasowej ze stanem OpenClaw oraz każdym skonfigurowanym
+workspace. Szczegóły znajdziesz w [Kopia zapasowa](/pl/cli/backup).
 
 ## Następne kroki
 
 - Skonfiguruj kanały wiadomości: [Kanały](/pl/channels)
-- Skonfiguruj Gateway: [Konfiguracja Gateway](/gateway/configuration)
-- Utrzymuj OpenClaw na bieżąco: [Aktualizowanie](/install/updating)
+- Skonfiguruj Gateway: [Konfiguracja Gateway](/pl/gateway/configuration)
+- Aktualizuj OpenClaw na bieżąco: [Aktualizowanie](/pl/install/updating)

@@ -1,29 +1,34 @@
 ---
+read_when:
+    - Zmiana renderowania danych wyjściowych asystenta w Control UI
+    - Debugowanie dyrektyw prezentacji `[embed ...]`, `MEDIA:`, odpowiedzi lub audio
+summary: Protokół shortcode dla danych wyjściowych rich output dla osadzeń, multimediów, wskazówek audio i odpowiedzi
+title: Protokół Rich Output
 x-i18n:
-    generated_at: "2026-04-11T15:15:56Z"
+    generated_at: "2026-04-23T10:08:46Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2a8884fc2c304bf96d4675f0c1d1ff781d6dc1ae8c49d92ce08040c9c7709035
+    source_hash: 566338ac0571c6ab9062c6bad0bc4f71fe65249a3fcd9d8e575affcd93db11e7
     source_path: reference/rich-output-protocol.md
     workflow: 15
 ---
 
-# Protokół rozbudowanego wyjścia
+# Protokół Rich Output
 
-Wynik asystenta może zawierać niewielki zestaw dyrektyw dostarczania/renderowania:
+Dane wyjściowe asystenta mogą przenosić mały zestaw dyrektyw dostarczania/renderowania:
 
 - `MEDIA:` do dostarczania załączników
-- `[[audio_as_voice]]` do wskazówek dotyczących prezentacji audio
+- `[[audio_as_voice]]` do wskazówek prezentacji audio
 - `[[reply_to_current]]` / `[[reply_to:<id>]]` do metadanych odpowiedzi
-- `[embed ...]` do rozbudowanego renderowania w interfejsie użytkownika Control UI
+- `[embed ...]` do rich renderingu w Control UI
 
-Te dyrektywy są odrębne. `MEDIA:` oraz tagi reply/voice pozostają metadanymi dostarczania; `[embed ...]` to ścieżka rozbudowanego renderowania tylko dla sieci.
+Te dyrektywy są odrębne. `MEDIA:` oraz tagi odpowiedzi/głosu pozostają metadanymi dostarczania; `[embed ...]` to ścieżka rich renderingu tylko dla WWW.
 
 ## `[embed ...]`
 
-`[embed ...]` to jedyna składnia rozbudowanego renderowania skierowana do agentów dla interfejsu użytkownika Control UI.
+`[embed ...]` to jedyna skierowana do agenta składnia rich renderingu dla Control UI.
 
-Przykład samodomykający:
+Przykład samozamykający:
 
 ```text
 [embed ref="cv_123" title="Status" /]
@@ -31,16 +36,16 @@ Przykład samodomykający:
 
 Zasady:
 
-- `[view ...]` nie jest już prawidłowe dla nowych wyników.
-- Krótkie kody embed są renderowane tylko na powierzchni wiadomości asystenta.
+- `[view ...]` nie jest już prawidłowe dla nowych danych wyjściowych.
+- Shortcode `embed` renderują się tylko na powierzchni wiadomości asystenta.
 - Renderowane są tylko osadzenia oparte na URL. Użyj `ref="..."` lub `url="..."`.
-- Krótkie kody osadzania w postaci blokowej, zapisane jako wbudowany HTML, nie są renderowane.
-- Interfejs webowy usuwa shortcode z widocznego tekstu i renderuje osadzenie w linii.
-- `MEDIA:` nie jest aliasem embed i nie należy go używać do renderowania rozbudowanych osadzeń.
+- Shortcode osadzeń HTML inline w formie blokowej nie są renderowane.
+- Interfejs WWW usuwa shortcode z widocznego tekstu i renderuje osadzenie inline.
+- `MEDIA:` nie jest aliasem `embed` i nie należy go używać do rich renderingu osadzeń.
 
-## Zapisany kształt renderowania
+## Przechowywany kształt renderowania
 
-Znormalizowany/zapisany blok treści asystenta ma postać uporządkowanego elementu `canvas`:
+Znormalizowany/przechowywany blok treści asystenta to ustrukturyzowany element `canvas`:
 
 ```json
 {
@@ -57,4 +62,4 @@ Znormalizowany/zapisany blok treści asystenta ma postać uporządkowanego eleme
 }
 ```
 
-Zapisane/renderowane bloki rozbudowane używają bezpośrednio tego kształtu `canvas`. `present_view` nie jest rozpoznawane.
+Przechowywane/renderowane rich bloki używają bezpośrednio tego kształtu `canvas`. `present_view` nie jest rozpoznawane.

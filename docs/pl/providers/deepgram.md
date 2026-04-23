@@ -1,32 +1,37 @@
 ---
 read_when:
-    - Chcesz używać Deepgram speech-to-text do załączników audio
+    - Chcesz używać Deepgram speech-to-text dla załączników audio
+    - Chcesz używać transkrypcji strumieniowej Deepgram dla Voice Call
     - Potrzebujesz szybkiego przykładu konfiguracji Deepgram
 summary: Transkrypcja Deepgram dla przychodzących notatek głosowych
 title: Deepgram
 x-i18n:
-    generated_at: "2026-04-12T23:30:28Z"
+    generated_at: "2026-04-23T10:07:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 091523d6669e3d258f07c035ec756bd587299b6c7025520659232b1b2c1e21a5
+    source_hash: 0b05f0f436a723c6e7697612afa0f8cb7e2b84a722d4ec12fae9c0bece945407
     source_path: providers/deepgram.md
     workflow: 15
 ---
 
-# Deepgram (Transkrypcja audio)
+# Deepgram (transkrypcja audio)
 
-Deepgram to API speech-to-text. W OpenClaw jest używane do **transkrypcji przychodzącego audio/notatek głosowych** przez `tools.media.audio`.
+Deepgram to API speech-to-text. W OpenClaw jest używane do transkrypcji
+przychodzących plików audio/notatek głosowych przez `tools.media.audio` oraz do
+strumieniowego STT w Voice Call przez `plugins.entries.voice-call.config.streaming`.
 
-Po włączeniu OpenClaw przesyła plik audio do Deepgram i wstrzykuje transkrypcję
-do pipeline odpowiedzi (`{{Transcript}}` + blok `[Audio]`). To **nie jest streaming**;
-używany jest endpoint transkrypcji nagrań wstępnie zarejestrowanych.
+W przypadku transkrypcji wsadowej OpenClaw przesyła cały plik audio do Deepgram
+i wstrzykuje transkrypcję do potoku odpowiedzi (`{{Transcript}}` +
+blok `[Audio]`). W przypadku strumieniowania Voice Call OpenClaw przekazuje na żywo ramki G.711
+u-law przez endpoint WebSocket `listen` Deepgram i emituje częściowe lub
+końcowe transkrypcje w miarę zwracania ich przez Deepgram.
 
-| Szczegół      | Wartość                                                    |
-| ------------- | ---------------------------------------------------------- |
-| Strona        | [deepgram.com](https://deepgram.com)                       |
-| Dokumentacja  | [developers.deepgram.com](https://developers.deepgram.com) |
-| Uwierzytelnianie | `DEEPGRAM_API_KEY`                                      |
-| Model domyślny | `nova-3`                                                  |
+| Szczegół       | Wartość                                                    |
+| -------------- | ---------------------------------------------------------- |
+| Strona         | [deepgram.com](https://deepgram.com)                       |
+| Dokumentacja   | [developers.deepgram.com](https://developers.deepgram.com) |
+| Uwierzytelnianie | `DEEPGRAM_API_KEY`                                       |
+| Model domyślny | `nova-3`                                                   |
 
 ## Pierwsze kroki
 
@@ -54,23 +59,23 @@ używany jest endpoint transkrypcji nagrań wstępnie zarejestrowanych.
     ```
   </Step>
   <Step title="Wyślij notatkę głosową">
-    Wyślij wiadomość audio przez dowolny podłączony kanał. OpenClaw transkrybuje ją
-    przez Deepgram i wstrzykuje transkrypcję do pipeline odpowiedzi.
+    Wyślij wiadomość audio przez dowolny podłączony kanał. OpenClaw przetranskrybuje ją
+    przez Deepgram i wstrzyknie transkrypcję do potoku odpowiedzi.
   </Step>
 </Steps>
 
 ## Opcje konfiguracji
 
-| Opcja            | Ścieżka                                                      | Opis                                      |
-| ---------------- | ------------------------------------------------------------ | ----------------------------------------- |
-| `model`          | `tools.media.audio.models[].model`                           | ID modelu Deepgram (domyślnie: `nova-3`)  |
-| `language`       | `tools.media.audio.models[].language`                        | Wskazówka języka (opcjonalnie)            |
-| `detect_language` | `tools.media.audio.providerOptions.deepgram.detect_language` | Włącza wykrywanie języka (opcjonalnie)    |
-| `punctuate`      | `tools.media.audio.providerOptions.deepgram.punctuate`       | Włącza interpunkcję (opcjonalnie)         |
-| `smart_format`   | `tools.media.audio.providerOptions.deepgram.smart_format`    | Włącza inteligentne formatowanie (opcjonalnie) |
+| Opcja             | Ścieżka                                                     | Opis                                  |
+| ----------------- | ----------------------------------------------------------- | ------------------------------------- |
+| `model`           | `tools.media.audio.models[].model`                          | Identyfikator modelu Deepgram (domyślnie: `nova-3`) |
+| `language`        | `tools.media.audio.models[].language`                       | Wskazówka językowa (opcjonalna)       |
+| `detect_language` | `tools.media.audio.providerOptions.deepgram.detect_language` | Włącza wykrywanie języka (opcjonalne) |
+| `punctuate`       | `tools.media.audio.providerOptions.deepgram.punctuate`      | Włącza interpunkcję (opcjonalne)      |
+| `smart_format`    | `tools.media.audio.providerOptions.deepgram.smart_format`   | Włącza inteligentne formatowanie (opcjonalne) |
 
 <Tabs>
-  <Tab title="Ze wskazówką języka">
+  <Tab title="Ze wskazówką językową">
     ```json5
     {
       tools: {
@@ -107,11 +112,57 @@ używany jest endpoint transkrypcji nagrań wstępnie zarejestrowanych.
   </Tab>
 </Tabs>
 
+## Strumieniowe STT dla Voice Call
+
+Bundled Plugin `deepgram` rejestruje również dostawcę transkrypcji realtime
+dla Pluginu Voice Call.
+
+| Ustawienie       | Ścieżka konfiguracji                                                   | Domyślnie                        |
+| ---------------- | ---------------------------------------------------------------------- | -------------------------------- |
+| Klucz API        | `plugins.entries.voice-call.config.streaming.providers.deepgram.apiKey` | Wraca do `DEEPGRAM_API_KEY`      |
+| Model            | `...deepgram.model`                                                    | `nova-3`                         |
+| Język            | `...deepgram.language`                                                 | (nieustawione)                   |
+| Kodowanie        | `...deepgram.encoding`                                                 | `mulaw`                          |
+| Częstotliwość próbkowania | `...deepgram.sampleRate`                                      | `8000`                           |
+| Endpointing      | `...deepgram.endpointingMs`                                            | `800`                            |
+| Wyniki pośrednie | `...deepgram.interimResults`                                           | `true`                           |
+
+```json5
+{
+  plugins: {
+    entries: {
+      "voice-call": {
+        config: {
+          streaming: {
+            enabled: true,
+            provider: "deepgram",
+            providers: {
+              deepgram: {
+                apiKey: "${DEEPGRAM_API_KEY}",
+                model: "nova-3",
+                endpointingMs: 800,
+                language: "en-US",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+<Note>
+Voice Call odbiera dźwięk telefoniczny jako 8 kHz G.711 u-law. Dostawca
+strumieniowania Deepgram domyślnie używa `encoding: "mulaw"` i `sampleRate: 8000`, więc
+ramki multimedialne Twilio mogą być przekazywane bezpośrednio.
+</Note>
+
 ## Uwagi
 
 <AccordionGroup>
   <Accordion title="Uwierzytelnianie">
-    Uwierzytelnianie przebiega według standardowej kolejności dostawców. `DEEPGRAM_API_KEY` to
+    Uwierzytelnianie przebiega zgodnie ze standardową kolejnością uwierzytelniania dostawców. `DEEPGRAM_API_KEY` to
     najprostsza ścieżka.
   </Accordion>
   <Accordion title="Proxy i niestandardowe endpointy">
@@ -119,30 +170,24 @@ używany jest endpoint transkrypcji nagrań wstępnie zarejestrowanych.
     `tools.media.audio.headers`, gdy używasz proxy.
   </Accordion>
   <Accordion title="Zachowanie wyjścia">
-    Wyjście podlega tym samym zasadom audio co u innych dostawców (limity rozmiaru, timeouty,
+    Wyjście podlega tym samym regułom audio co u innych dostawców (limity rozmiaru, timeouty,
     wstrzykiwanie transkrypcji).
   </Accordion>
 </AccordionGroup>
 
-<Note>
-Transkrypcja Deepgram działa **tylko dla nagrań wstępnie zarejestrowanych** (nie dla streamingu w czasie rzeczywistym). OpenClaw
-przesyła cały plik audio i czeka na pełną transkrypcję, zanim wstrzyknie
-ją do rozmowy.
-</Note>
-
 ## Powiązane
 
 <CardGroup cols={2}>
-  <Card title="Narzędzia mediów" href="/tools/media" icon="photo-film">
-    Przegląd pipeline przetwarzania audio, obrazów i wideo.
+  <Card title="Narzędzia multimedialne" href="/pl/tools/media-overview" icon="photo-film">
+    Przegląd potoku przetwarzania audio, obrazów i wideo.
   </Card>
   <Card title="Konfiguracja" href="/pl/gateway/configuration" icon="gear">
-    Pełna referencja konfiguracji, w tym ustawienia narzędzi mediów.
+    Pełna dokumentacja konfiguracji, w tym ustawień narzędzi multimedialnych.
   </Card>
   <Card title="Rozwiązywanie problemów" href="/pl/help/troubleshooting" icon="wrench">
     Typowe problemy i kroki debugowania.
   </Card>
   <Card title="FAQ" href="/pl/help/faq" icon="circle-question">
-    Najczęściej zadawane pytania dotyczące konfiguracji OpenClaw.
+    Często zadawane pytania dotyczące konfiguracji OpenClaw.
   </Card>
 </CardGroup>
