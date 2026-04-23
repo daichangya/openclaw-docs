@@ -1,15 +1,15 @@
 ---
 read_when:
-    - 你需要 `openclaw onboard` 的详细行为说明
-    - 你正在调试新手引导结果或集成新手引导客户端
+    - 你需要了解 `openclaw onboard` 的详细行为
+    - 你正在调试新手引导结果，或集成新手引导客户端
 sidebarTitle: CLI reference
-summary: CLI 设置流程、凭证/模型设置、输出和内部机制的完整参考
+summary: CLI 设置流程、凭证 / 模型设置、输出和内部机制的完整参考
 title: CLI 设置参考
 x-i18n:
-    generated_at: "2026-04-15T13:39:08Z"
+    generated_at: "2026-04-23T02:36:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 61ca679caca3b43fa02388294007f89db22d343e49e10b61d8d118cd8fbb7369
+    source_hash: 60b47a3cd7eaa6e10b5e7108ba4eb331afddffa55a321eac98243611fd7e721b
     source_path: start/wizard-cli-reference.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 # CLI 设置参考
 
 本页是 `openclaw onboard` 的完整参考。
-如需简短指南，请参阅 [新手引导（CLI）](/zh-CN/start/wizard)。
+简短指南见 [设置向导（CLI）](/zh-CN/start/wizard)。
 
 ## 向导的作用
 
@@ -25,48 +25,48 @@ x-i18n:
 
 - 模型和凭证设置（OpenAI Code 订阅 OAuth、Anthropic Claude CLI 或 API 密钥，以及 MiniMax、GLM、Ollama、Moonshot、StepFun 和 AI Gateway 选项）
 - 工作区位置和引导文件
-- Gateway 网关设置（端口、绑定、认证、Tailscale）
+- Gateway 网关设置（端口、绑定、凭证、Tailscale）
 - 渠道和提供商（Telegram、WhatsApp、Discord、Google Chat、Mattermost、Signal、BlueBubbles，以及其他内置渠道插件）
 - 守护进程安装（LaunchAgent、systemd 用户单元，或原生 Windows Scheduled Task，并在失败时回退到 Startup 文件夹）
 - 健康检查
 - Skills 设置
 
-远程模式会将此机器配置为连接到其他地方的 Gateway 网关。
+远程模式会将这台机器配置为连接到其他位置的 Gateway 网关。
 它不会在远程主机上安装或修改任何内容。
 
 ## 本地流程详情
 
 <Steps>
   <Step title="现有配置检测">
-    - 如果 `~/.openclaw/openclaw.json` 已存在，可选择保留、修改或重置。
-    - 重新运行向导不会清除任何内容，除非你明确选择“重置”（或传入 `--reset`）。
-    - CLI `--reset` 默认是 `config+creds+sessions`；使用 `--reset-scope full` 还会移除工作区。
-    - 如果配置无效或包含旧版键名，向导会停止并要求你先运行 `openclaw doctor` 再继续。
+    - 如果存在 `~/.openclaw/openclaw.json`，可选择保留、修改或重置。
+    - 重新运行向导不会清除任何内容，除非你明确选择重置（或传入 `--reset`）。
+    - CLI `--reset` 默认作用于 `config+creds+sessions`；使用 `--reset-scope full` 还会移除工作区。
+    - 如果配置无效或包含旧版键名，向导会停止，并要求你先运行 `openclaw doctor` 后再继续。
     - 重置使用 `trash`，并提供以下范围：
       - 仅配置
       - 配置 + 凭证 + 会话
-      - 完全重置（还会移除工作区）
+      - 完整重置（同时移除工作区）
   </Step>
   <Step title="模型和凭证">
     - 完整选项矩阵见 [凭证和模型选项](#auth-and-model-options)。
   </Step>
   <Step title="工作区">
-    - 默认 `~/.openclaw/workspace`（可配置）。
-    - 生成首次运行引导流程所需的工作区文件。
-    - 工作区布局： [智能体工作区](/zh-CN/concepts/agent-workspace)。
+    - 默认值为 `~/.openclaw/workspace`（可配置）。
+    - 会写入首次运行引导仪式所需的工作区文件。
+    - 工作区布局见：[智能体工作区](/zh-CN/concepts/agent-workspace)。
   </Step>
   <Step title="Gateway 网关">
-    - 提示设置端口、绑定、认证模式和 Tailscale 暴露方式。
-    - 推荐：即使只绑定到 loopback，也保持启用令牌认证，这样本地 WS 客户端仍必须进行认证。
+    - 会提示你设置端口、绑定、凭证模式和 Tailscale 暴露方式。
+    - 推荐：即使仅用于 loopback，也保持启用令牌凭证，这样本地 WS 客户端也必须进行认证。
     - 在令牌模式下，交互式设置提供：
-      - **生成/存储明文令牌**（默认）
-      - **使用 SecretRef**（可选）
+      - **生成 / 存储明文令牌**（默认）
+      - **使用 SecretRef**（可选启用）
     - 在密码模式下，交互式设置也支持明文或 SecretRef 存储。
     - 非交互式令牌 SecretRef 路径：`--gateway-token-ref-env <ENV_VAR>`。
-      - 要求新手引导进程环境中存在一个非空环境变量。
+      - 要求新手引导进程环境中存在非空环境变量。
       - 不能与 `--gateway-token` 同时使用。
-    - 仅当你完全信任每个本地进程时才禁用认证。
-    - 非 loopback 绑定仍然需要认证。
+    - 仅当你完全信任每个本地进程时，才禁用凭证。
+    - 非 loopback 绑定仍然需要凭证。
   </Step>
   <Step title="渠道">
     - [WhatsApp](/zh-CN/channels/whatsapp)：可选 QR 登录
@@ -77,19 +77,19 @@ x-i18n:
     - [Signal](/zh-CN/channels/signal)：可选 `signal-cli` 安装 + 账号配置
     - [BlueBubbles](/zh-CN/channels/bluebubbles)：推荐用于 iMessage；服务器 URL + 密码 + webhook
     - [iMessage](/zh-CN/channels/imessage)：旧版 `imsg` CLI 路径 + DB 访问
-    - 私信安全：默认使用配对。首次私信会发送一个代码；通过
+    - 私信安全：默认为配对。首次私信会发送一个代码；可通过
       `openclaw pairing approve <channel> <code>` 批准，或使用 allowlist。
   </Step>
   <Step title="守护进程安装">
     - macOS：LaunchAgent
-      - 需要已登录的用户会话；对于无头环境，请使用自定义 LaunchDaemon（未随附）。
+      - 需要已登录的用户会话；对于无头环境，请使用自定义 LaunchDaemon（未随产品提供）。
     - Linux 和通过 WSL2 的 Windows：systemd 用户单元
-      - 向导会尝试执行 `loginctl enable-linger <user>`，使 Gateway 网关在注销后仍保持运行。
-      - 可能会提示 sudo（写入 `/var/lib/systemd/linger`）；它会先尝试不使用 sudo。
+      - 向导会尝试执行 `loginctl enable-linger <user>`，以便 Gateway 网关在注销后继续运行。
+      - 可能会提示 sudo（写入 `/var/lib/systemd/linger`）；它会先尝试无 sudo 方式。
     - 原生 Windows：优先使用 Scheduled Task
-      - 如果任务创建被拒绝，OpenClaw 会回退到按用户设置的 Startup 文件夹登录项，并立即启动 Gateway 网关。
-      - 仍然优先推荐 Scheduled Task，因为它们提供更好的监督状态。
-    - 运行时选择：Node（推荐；WhatsApp 和 Telegram 必需）。不推荐 Bun。
+      - 如果任务创建被拒绝，OpenClaw 会回退到每用户 Startup 文件夹登录项，并立即启动 Gateway 网关。
+      - 仍优先推荐 Scheduled Task，因为它们提供更好的主管理器状态信息。
+    - 运行时选择：Node（推荐；WhatsApp 和 Telegram 需要）。不推荐使用 Bun。
   </Step>
   <Step title="健康检查">
     - 启动 Gateway 网关（如有需要）并运行 `openclaw health`。
@@ -107,12 +107,12 @@ x-i18n:
 
 <Note>
 如果未检测到 GUI，向导会打印用于 Control UI 的 SSH 端口转发说明，而不是打开浏览器。
-如果缺少 Control UI 资源，向导会尝试构建它们；回退命令是 `pnpm ui:build`（会自动安装 UI 依赖）。
+如果缺少 Control UI 资源，向导会尝试构建它们；回退命令为 `pnpm ui:build`（会自动安装 UI 依赖）。
 </Note>
 
 ## 远程模式详情
 
-远程模式会将此机器配置为连接到其他地方的 Gateway 网关。
+远程模式会将这台机器配置为连接到其他位置的 Gateway 网关。
 
 <Info>
 远程模式不会在远程主机上安装或修改任何内容。
@@ -121,11 +121,11 @@ x-i18n:
 你需要设置：
 
 - 远程 Gateway 网关 URL（`ws://...`）
-- 如果远程 Gateway 网关需要认证，则设置令牌（推荐）
+- 如果远程 Gateway 网关需要凭证，则设置令牌（推荐）
 
 <Note>
-- 如果 Gateway 网关仅限 loopback，请使用 SSH 隧道或 tailnet。
-- 设备发现提示：
+- 如果 Gateway 网关仅绑定到 loopback，请使用 SSH 隧道或 tailnet。
+- 发现提示：
   - macOS：Bonjour（`dns-sd`）
   - Linux：Avahi（`avahi-browse`）
 </Note>
@@ -134,13 +134,7 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Anthropic API 密钥">
-    如果存在 `ANTHROPIC_API_KEY` 则使用它，否则提示你输入密钥，然后将其保存供守护进程使用。
-  </Accordion>
-  <Accordion title="OpenAI Code 订阅（复用 Codex CLI）">
-    如果 `~/.codex/auth.json` 存在，向导可以复用它。
-    复用的 Codex CLI 凭证仍由 Codex CLI 管理；过期时，OpenClaw
-    会先重新读取该来源，并且在提供商支持刷新的情况下，将
-    刷新后的凭证写回 Codex 存储，而不是自行接管其管理。
+    如果存在 `ANTHROPIC_API_KEY` 则使用它，否则提示输入密钥，然后保存供守护进程使用。
   </Accordion>
   <Accordion title="OpenAI Code 订阅（OAuth）">
     浏览器流程；粘贴 `code#state`。
@@ -148,14 +142,20 @@ x-i18n:
     当模型未设置或为 `openai/*` 时，将 `agents.defaults.model` 设置为 `openai-codex/gpt-5.4`。
 
   </Accordion>
+  <Accordion title="OpenAI Code 订阅（设备配对）">
+    浏览器配对流程，使用短时有效的设备代码。
+
+    当模型未设置或为 `openai/*` 时，将 `agents.defaults.model` 设置为 `openai-codex/gpt-5.4`。
+
+  </Accordion>
   <Accordion title="OpenAI API 密钥">
-    如果存在 `OPENAI_API_KEY` 则使用它，否则提示你输入密钥，然后将凭证存储到凭证配置文件中。
+    如果存在 `OPENAI_API_KEY` 则使用它，否则提示输入密钥，然后将该凭证存储到凭证配置文件中。
 
     当模型未设置、为 `openai/*` 或 `openai-codex/*` 时，将 `agents.defaults.model` 设置为 `openai/gpt-5.4`。
 
   </Accordion>
   <Accordion title="xAI（Grok）API 密钥">
-    提示输入 `XAI_API_KEY` 并将 xAI 配置为模型提供商。
+    提示输入 `XAI_API_KEY`，并将 xAI 配置为模型提供商。
   </Accordion>
   <Accordion title="OpenCode">
     提示输入 `OPENCODE_API_KEY`（或 `OPENCODE_ZEN_API_KEY`），并让你选择 Zen 或 Go 目录。
@@ -166,45 +166,45 @@ x-i18n:
   </Accordion>
   <Accordion title="Vercel AI Gateway">
     提示输入 `AI_GATEWAY_API_KEY`。
-    更多细节： [Vercel AI Gateway](/zh-CN/providers/vercel-ai-gateway)。
+    更多详情见：[Vercel AI Gateway](/zh-CN/providers/vercel-ai-gateway)。
   </Accordion>
   <Accordion title="Cloudflare AI Gateway">
     提示输入账号 ID、Gateway 网关 ID 和 `CLOUDFLARE_AI_GATEWAY_API_KEY`。
-    更多细节： [Cloudflare AI Gateway](/zh-CN/providers/cloudflare-ai-gateway)。
+    更多详情见：[Cloudflare AI Gateway](/zh-CN/providers/cloudflare-ai-gateway)。
   </Accordion>
   <Accordion title="MiniMax">
-    配置会自动写入。托管默认值是 `MiniMax-M2.7`；API 密钥设置使用
+    配置会自动写入。托管默认值为 `MiniMax-M2.7`；API 密钥设置使用
     `minimax/...`，OAuth 设置使用 `minimax-portal/...`。
-    更多细节： [MiniMax](/zh-CN/providers/minimax)。
+    更多详情见：[MiniMax](/zh-CN/providers/minimax)。
   </Accordion>
   <Accordion title="StepFun">
-    会为中国区或全球端点上的 StepFun standard 或 Step Plan 自动写入配置。
-    Standard 当前包含 `step-3.5-flash`，Step Plan 还包含 `step-3.5-flash-2603`。
-    更多细节： [StepFun](/zh-CN/providers/stepfun)。
+    配置会针对中国或全球端点的 StepFun standard 或 Step Plan 自动写入。
+    Standard 当前包括 `step-3.5-flash`，Step Plan 还包括 `step-3.5-flash-2603`。
+    更多详情见：[StepFun](/zh-CN/providers/stepfun)。
   </Accordion>
   <Accordion title="Synthetic（兼容 Anthropic）">
     提示输入 `SYNTHETIC_API_KEY`。
-    更多细节： [Synthetic](/zh-CN/providers/synthetic)。
+    更多详情见：[Synthetic](/zh-CN/providers/synthetic)。
   </Accordion>
   <Accordion title="Ollama（云端和本地开放模型）">
-    首先提示你选择 `Cloud + Local`、`Cloud only` 或 `Local only`。
+    会先提示选择 `Cloud + Local`、`Cloud only` 或 `Local only`。
     `Cloud only` 使用 `OLLAMA_API_KEY` 和 `https://ollama.com`。
-    基于主机的模式会提示输入基础 URL（默认 `http://127.0.0.1:11434`）、发现可用模型并建议默认值。
+    基于主机的模式会提示输入基础 URL（默认 `http://127.0.0.1:11434`），发现可用模型，并建议默认值。
     `Cloud + Local` 还会检查该 Ollama 主机是否已登录以访问云端。
-    更多细节： [Ollama](/zh-CN/providers/ollama)。
+    更多详情见：[Ollama](/zh-CN/providers/ollama)。
   </Accordion>
   <Accordion title="Moonshot 和 Kimi Coding">
     Moonshot（Kimi K2）和 Kimi Coding 配置会自动写入。
-    更多细节： [Moonshot AI（Kimi + Kimi Coding）](/zh-CN/providers/moonshot)。
+    更多详情见：[Moonshot AI（Kimi + Kimi Coding）](/zh-CN/providers/moonshot)。
   </Accordion>
   <Accordion title="自定义提供商">
     适用于兼容 OpenAI 和兼容 Anthropic 的端点。
 
     交互式新手引导支持与其他提供商 API 密钥流程相同的 API 密钥存储选项：
     - **立即粘贴 API 密钥**（明文）
-    - **使用 secret reference**（环境变量引用或已配置的提供商引用，并带有预检校验）
+    - **使用 secret reference**（环境变量引用或已配置的提供商引用，带预检校验）
 
-    非交互式参数：
+    非交互式标志：
     - `--auth-choice custom-api-key`
     - `--custom-base-url`
     - `--custom-model-id`
@@ -214,20 +214,20 @@ x-i18n:
 
   </Accordion>
   <Accordion title="跳过">
-    保持凭证未配置状态。
+    保持凭证未配置。
   </Accordion>
 </AccordionGroup>
 
 模型行为：
 
 - 从检测到的选项中选择默认模型，或手动输入提供商和模型。
-- 当新手引导从某个提供商凭证选项开始时，模型选择器会自动优先显示
-  该提供商。对于 Volcengine 和 BytePlus，这种优先级
+- 当新手引导从某个提供商凭证选项开始时，模型选择器会自动优先
+  该提供商。对于 Volcengine 和 BytePlus，此优先级
   也会匹配它们的 coding-plan 变体（`volcengine-plan/*`、
   `byteplus-plan/*`）。
-- 如果该首选提供商筛选结果为空，选择器会回退到
+- 如果该优先提供商过滤后为空，选择器会回退到
   完整目录，而不是显示没有模型。
-- 向导会执行模型检查，并在配置的模型未知或缺少凭证时发出警告。
+- 向导会运行模型检查，并在配置的模型未知或缺少凭证时发出警告。
 
 凭证和配置文件路径：
 
@@ -236,28 +236,28 @@ x-i18n:
 
 凭证存储模式：
 
-- 默认的新手引导行为会将 API 密钥作为明文值持久化到凭证配置文件中。
+- 默认新手引导行为会将 API 密钥作为明文值持久化到凭证配置文件中。
 - `--secret-input-mode ref` 会启用引用模式，而不是明文密钥存储。
   在交互式设置中，你可以选择以下任一方式：
   - 环境变量引用（例如 `keyRef: { source: "env", provider: "default", id: "OPENAI_API_KEY" }`）
   - 已配置的提供商引用（`file` 或 `exec`），包含提供商别名 + id
-- 交互式引用模式会在保存前执行快速预检校验。
-  - 环境变量引用：校验变量名以及当前新手引导环境中的非空值。
+- 交互式引用模式在保存前会执行快速预检校验。
+  - 环境变量引用：校验变量名，以及当前新手引导环境中的非空值。
   - 提供商引用：校验提供商配置并解析请求的 id。
   - 如果预检失败，新手引导会显示错误并允许你重试。
 - 在非交互式模式下，`--secret-input-mode ref` 仅支持基于环境变量。
   - 在新手引导进程环境中设置提供商环境变量。
-  - 内联密钥参数（例如 `--openai-api-key`）要求必须设置该环境变量；否则新手引导会快速失败。
+  - 内联密钥标志（例如 `--openai-api-key`）要求该环境变量已设置；否则新手引导会快速失败。
   - 对于自定义提供商，非交互式 `ref` 模式会将 `models.providers.<id>.apiKey` 存储为 `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`。
   - 在该自定义提供商场景中，`--custom-api-key` 要求必须设置 `CUSTOM_API_KEY`；否则新手引导会快速失败。
-- Gateway 网关认证凭证在交互式设置中支持明文和 SecretRef 选项：
-  - 令牌模式：**生成/存储明文令牌**（默认）或 **使用 SecretRef**。
+- Gateway 网关凭证凭据在交互式设置中支持明文和 SecretRef 选项：
+  - 令牌模式：**生成 / 存储明文令牌**（默认）或 **使用 SecretRef**。
   - 密码模式：明文或 SecretRef。
 - 非交互式令牌 SecretRef 路径：`--gateway-token-ref-env <ENV_VAR>`。
-- 现有的明文设置将继续保持不变并正常工作。
+- 现有的明文设置会继续保持不变并正常工作。
 
 <Note>
-无头环境和服务器提示：在有浏览器的机器上完成 OAuth，然后复制
+无头环境和服务器提示：先在有浏览器的机器上完成 OAuth，然后复制
 该智能体的 `auth-profiles.json`（例如
 `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`，或对应的
 `$OPENCLAW_STATE_DIR/...` 路径）到 Gateway 网关主机。`credentials/oauth.json`
@@ -270,14 +270,14 @@ x-i18n:
 
 - `agents.defaults.workspace`
 - `agents.defaults.model` / `models.providers`（如果选择了 MiniMax）
-- `tools.profile`（本地新手引导在未设置时默认使用 `"coding"`；现有的显式值会被保留）
-- `gateway.*`（模式、绑定、认证、Tailscale）
-- `session.dmScope`（本地新手引导在未设置时默认将其设为 `per-channel-peer`；现有的显式值会被保留）
+- `tools.profile`（本地新手引导在未设置时默认使用 `"coding"`；现有显式值会被保留）
+- `gateway.*`（模式、绑定、凭证、Tailscale）
+- `session.dmScope`（本地新手引导在未设置时默认将其设为 `per-channel-peer`；现有显式值会被保留）
 - `channels.telegram.botToken`、`channels.discord.token`、`channels.matrix.*`、`channels.signal.*`、`channels.imessage.*`
-- 当你在提示中选择启用时的渠道 allowlist（Slack、Discord、Matrix、Microsoft Teams）（名称会在可能时解析为 ID）
+- 当你在提示中选择启用时的渠道 allowlist（Slack、Discord、Matrix、Microsoft Teams）（如果可能，名称会解析为 ID）
 - `skills.install.nodeManager`
-  - `setup --node-manager` 参数接受 `npm`、`pnpm` 或 `bun`。
-  - 后续手动配置仍可将 `skills.install.nodeManager: "yarn"` 设为 `"yarn"`。
+  - `setup --node-manager` 标志接受 `npm`、`pnpm` 或 `bun`。
+  - 稍后手动配置仍可将 `skills.install.nodeManager: "yarn"`` 设置为该值。
 - `wizard.lastRunAt`
 - `wizard.lastRunVersion`
 - `wizard.lastRunCommit`
@@ -286,11 +286,11 @@ x-i18n:
 
 `openclaw agents add` 会写入 `agents.list[]` 和可选的 `bindings`。
 
-WhatsApp 凭证位于 `~/.openclaw/credentials/whatsapp/<accountId>/`。
+WhatsApp 凭证位于 `~/.openclaw/credentials/whatsapp/<accountId>/` 下。
 会话存储在 `~/.openclaw/agents/<agentId>/sessions/` 下。
 
 <Note>
-某些渠道以插件形式提供。在设置期间选择这些渠道时，向导会先提示你安装该插件（npm 或本地路径），然后再进行渠道配置。
+某些渠道以插件形式提供。在设置期间选择它们时，向导会先提示你安装插件（npm 或本地路径），然后再进行渠道配置。
 </Note>
 
 Gateway 网关向导 RPC：
@@ -300,19 +300,19 @@ Gateway 网关向导 RPC：
 - `wizard.cancel`
 - `wizard.status`
 
-客户端（macOS 应用和 Control UI）可以渲染这些步骤，而无需重新实现新手引导逻辑。
+客户端（macOS 应用和 Control UI）可以渲染步骤，而无需重新实现新手引导逻辑。
 
 Signal 设置行为：
 
-- 下载对应的发布资源
-- 将其存储到 `~/.openclaw/tools/signal-cli/<version>/`
+- 下载合适的发布资源
+- 将其存储在 `~/.openclaw/tools/signal-cli/<version>/` 下
 - 在配置中写入 `channels.signal.cliPath`
 - JVM 构建需要 Java 21
-- 可用时使用原生构建
+- 可用时会使用原生构建
 - Windows 使用 WSL2，并在 WSL 内遵循 Linux 的 `signal-cli` 流程
 
 ## 相关文档
 
-- 新手引导中心：[新手引导（CLI）](/zh-CN/start/wizard)
-- 自动化和脚本：[CLI 自动化](/zh-CN/start/wizard-cli-automation)
+- 新手引导中心：[设置向导（CLI）](/start/wizard)
+- 自动化和脚本：[CLI 自动化](/start/wizard-cli-automation)
 - 命令参考：[`openclaw onboard`](/cli/onboard)
