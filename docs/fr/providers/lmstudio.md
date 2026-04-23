@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Vous souhaitez exécuter OpenClaw avec des modèles open source via LM Studio
-    - Vous souhaitez configurer et paramétrer LM Studio
+    - Vous voulez exécuter OpenClaw avec des modèles open source via LM Studio
+    - Vous voulez configurer et paramétrer LM Studio
 summary: Exécuter OpenClaw avec LM Studio
 title: LM Studio
 x-i18n:
-    generated_at: "2026-04-23T07:09:40Z"
+    generated_at: "2026-04-23T14:01:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 733527e95041da04562c0ee5d9486750d8355a255624a6d5735954de34429a5c
+    source_hash: 062b26cf10631e74f4e1917ea9011133eb4433f5fb7ee85748d00080a6ca212d
     source_path: providers/lmstudio.md
     workflow: 15
 ---
 
 # LM Studio
 
-LM Studio est une application conviviale mais puissante pour exécuter des modèles open-weight sur votre propre matériel. Elle permet d’exécuter des modèles llama.cpp (GGUF) ou MLX (Apple Silicon). Elle existe en package GUI ou en daemon sans interface (`llmster`). Pour la documentation produit et de configuration, voir [lmstudio.ai](https://lmstudio.ai/).
+LM Studio est une application conviviale mais puissante pour exécuter des modèles open-weight sur votre propre matériel. Elle permet d’exécuter des modèles llama.cpp (GGUF) ou MLX (Apple Silicon). Disponible sous forme de package GUI ou de daemon headless (`llmster`). Pour la documentation produit et de configuration, voir [lmstudio.ai](https://lmstudio.ai/).
 
 ## Démarrage rapide
 
-1. Installez LM Studio (desktop) ou `llmster` (sans interface), puis démarrez le serveur local :
+1. Installez LM Studio (desktop) ou `llmster` (headless), puis démarrez le serveur local :
 
 ```bash
 curl -fsSL https://lmstudio.ai/install.sh | bash
@@ -27,7 +27,7 @@ curl -fsSL https://lmstudio.ai/install.sh | bash
 
 2. Démarrez le serveur
 
-Assurez-vous de démarrer soit l’application desktop, soit le daemon avec la commande suivante :
+Assurez-vous soit de démarrer l’application desktop, soit d’exécuter le daemon avec la commande suivante :
 
 ```bash
 lms daemon up
@@ -37,9 +37,9 @@ lms daemon up
 lms server start --port 1234
 ```
 
-Si vous utilisez l’application, assurez-vous d’avoir activé le JIT pour une expérience fluide. En savoir plus dans le [guide LM Studio JIT and TTL](https://lmstudio.ai/docs/developer/core/ttl-and-auto-evict).
+Si vous utilisez l’application, assurez-vous que JIT est activé pour une expérience fluide. Pour en savoir plus, consultez le [guide LM Studio JIT and TTL](https://lmstudio.ai/docs/developer/core/ttl-and-auto-evict).
 
-3. OpenClaw requiert une valeur de jeton LM Studio. Définissez `LM_API_TOKEN` :
+3. OpenClaw exige une valeur de jeton LM Studio. Définissez `LM_API_TOKEN` :
 
 ```bash
 export LM_API_TOKEN="your-lm-studio-api-token"
@@ -59,7 +59,7 @@ Pour les détails de configuration de l’authentification LM Studio, voir [LM S
 openclaw onboard
 ```
 
-5. Dans l’onboarding, utilisez l’invite `Default model` pour choisir votre modèle LM Studio.
+5. Pendant l’onboarding, utilisez l’invite `Default model` pour choisir votre modèle LM Studio.
 
 Vous pouvez aussi le définir ou le modifier plus tard :
 
@@ -67,13 +67,11 @@ Vous pouvez aussi le définir ou le modifier plus tard :
 openclaw models set lmstudio/qwen/qwen3.5-9b
 ```
 
-Les clés de modèle LM Studio suivent un format `author/model-name` (par ex. `qwen/qwen3.5-9b`). Les références de modèle OpenClaw
-préfixent le nom du fournisseur : `lmstudio/qwen/qwen3.5-9b`. Vous pouvez trouver la clé exacte d’un
-modèle en exécutant `curl http://localhost:1234/api/v1/models` et en regardant le champ `key`.
+Les clés de modèle LM Studio suivent un format `author/model-name` (par ex. `qwen/qwen3.5-9b`). Les références de modèle OpenClaw ajoutent le nom du fournisseur en préfixe : `lmstudio/qwen/qwen3.5-9b`. Vous pouvez trouver la clé exacte d’un modèle en exécutant `curl http://localhost:1234/api/v1/models` et en consultant le champ `key`.
 
 ## Onboarding non interactif
 
-Utilisez l’onboarding non interactif lorsque vous souhaitez automatiser la configuration (CI, provisioning, amorçage à distance) :
+Utilisez l’onboarding non interactif si vous voulez automatiser la configuration (CI, provisioning, bootstrap distant) :
 
 ```bash
 openclaw onboard \
@@ -82,7 +80,7 @@ openclaw onboard \
   --auth-choice lmstudio
 ```
 
-Ou spécifiez l’URL de base ou le modèle avec une clé API :
+Ou indiquez l’URL de base ou le modèle avec clé API :
 
 ```bash
 openclaw onboard \
@@ -94,26 +92,27 @@ openclaw onboard \
   --custom-model-id qwen/qwen3.5-9b
 ```
 
-`--custom-model-id` prend la clé de modèle telle que renvoyée par LM Studio (par ex. `qwen/qwen3.5-9b`), sans
-le préfixe de fournisseur `lmstudio/`.
+`--custom-model-id` prend la clé de modèle telle que renvoyée par LM Studio (par ex. `qwen/qwen3.5-9b`), sans le préfixe de fournisseur `lmstudio/`.
 
-L’onboarding non interactif requiert `--lmstudio-api-key` (ou `LM_API_TOKEN` dans l’environnement).
-Pour les serveurs LM Studio non authentifiés, n’importe quelle valeur de jeton non vide fonctionne.
+L’onboarding non interactif exige `--lmstudio-api-key` (ou `LM_API_TOKEN` dans l’environnement).
+Pour les serveurs LM Studio sans authentification, toute valeur de jeton non vide fonctionne.
 
 `--custom-api-key` reste pris en charge pour compatibilité, mais `--lmstudio-api-key` est préféré pour LM Studio.
 
 Cela écrit `models.providers.lmstudio`, définit le modèle par défaut sur
-`lmstudio/<custom-model-id>`, et écrit le profil d’authentification `lmstudio:default`.
+`lmstudio/<custom-model-id>` et écrit le profil d’authentification `lmstudio:default`.
 
-La configuration interactive peut demander une longueur de contexte de chargement préférée facultative et l’appliquer aux modèles LM Studio découverts qu’elle enregistre dans la configuration.
+La configuration interactive peut demander une longueur de contexte de chargement préférée facultative et l’applique à tous les modèles LM Studio découverts qu’elle enregistre dans la configuration.
 
 ## Configuration
 
-### Compatibilité d’usage en streaming
+### Compatibilité avec l’usage en streaming
 
-OpenClaw marque LM Studio comme compatible avec l’usage en streaming, de sorte que la comptabilité des jetons ne se dégrade plus vers des totaux inconnus ou obsolètes sur les complétions diffusées en streaming. OpenClaw récupère aussi les comptes de jetons à partir des métadonnées de style llama.cpp `timings.prompt_n` / `timings.predicted_n` lorsque LM Studio n’émet pas d’objet `usage` au format OpenAI.
+LM Studio est compatible avec l’usage en streaming. Lorsqu’il n’émet pas d’objet
+`usage` au format OpenAI, OpenClaw récupère à la place les comptes de jetons à partir des métadonnées
+`timings.prompt_n` / `timings.predicted_n` au format llama.cpp.
 
-Autres backends locaux compatibles OpenAI couverts par le même comportement :
+Le même comportement s’applique à ces backends locaux compatibles OpenAI :
 
 - vLLM
 - SGLang
@@ -154,10 +153,10 @@ Autres backends locaux compatibles OpenAI couverts par le même comportement :
 
 ### LM Studio non détecté
 
-Assurez-vous que LM Studio est en cours d’exécution et que vous avez défini `LM_API_TOKEN` (pour les serveurs non authentifiés, n’importe quelle valeur de jeton non vide fonctionne) :
+Assurez-vous que LM Studio est en cours d’exécution et que vous avez défini `LM_API_TOKEN` (pour les serveurs sans authentification, toute valeur de jeton non vide fonctionne) :
 
 ```bash
-# Démarrer via l’application desktop, ou en mode sans interface :
+# Démarrage via l’application desktop, ou en headless :
 lms server start --port 1234
 ```
 
@@ -169,12 +168,12 @@ curl http://localhost:1234/api/v1/models
 
 ### Erreurs d’authentification (HTTP 401)
 
-Si la configuration signale HTTP 401, vérifiez votre clé API :
+Si la configuration signale une erreur HTTP 401, vérifiez votre clé API :
 
 - Vérifiez que `LM_API_TOKEN` correspond à la clé configurée dans LM Studio.
 - Pour les détails de configuration de l’authentification LM Studio, voir [LM Studio Authentication](https://lmstudio.ai/docs/developer/core/authentication).
 - Si votre serveur n’exige pas d’authentification, utilisez n’importe quelle valeur de jeton non vide pour `LM_API_TOKEN`.
 
-### Chargement de modèle juste-à-temps
+### Chargement de modèle juste à temps
 
-LM Studio prend en charge le chargement de modèle juste-à-temps (JIT), où les modèles sont chargés à la première requête. Assurez-vous que cette option est activée pour éviter les erreurs « Model not loaded ».
+LM Studio prend en charge le chargement de modèle juste à temps (JIT), où les modèles sont chargés à la première requête. Assurez-vous que cette option est activée pour éviter les erreurs « Model not loaded ».

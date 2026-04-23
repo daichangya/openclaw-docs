@@ -1,15 +1,15 @@
 ---
 read_when:
-    - Vous souhaitez configurer Moonshot K2 (Moonshot Open Platform) vs Kimi Coding
-    - Vous devez comprendre les points de terminaison, clés et références de modèle séparés
-    - Vous voulez une configuration prête à copier-coller pour l’un ou l’autre fournisseur
+    - Vous souhaitez configurer Moonshot K2 (Moonshot Open Platform) par rapport à Kimi Coding
+    - Vous devez comprendre les points de terminaison, les clés et les références de modèle séparés
+    - Vous souhaitez une configuration prête à copier-coller pour l’un ou l’autre fournisseur
 summary: Configurer Moonshot K2 vs Kimi Coding (fournisseurs + clés séparés)
 title: Moonshot AI
 x-i18n:
-    generated_at: "2026-04-23T07:09:48Z"
+    generated_at: "2026-04-23T14:02:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d9a726df279bfc0351b8ab224e682b5c1e6e360440659e33e8568a94c351df51
+    source_hash: e143632de7aff050f32917e379e21ace5f4a5f9857618ef720f885f2f298ca72
     source_path: providers/moonshot.md
     workflow: 15
 ---
@@ -21,45 +21,45 @@ fournisseur et définissez le modèle par défaut sur `moonshot/kimi-k2.6`, ou u
 Kimi Coding avec `kimi/kimi-code`.
 
 <Warning>
-Moonshot et Kimi Coding sont **des fournisseurs distincts**. Les clés ne sont pas interchangeables, les points de terminaison diffèrent, et les références de modèle diffèrent (`moonshot/...` vs `kimi/...`).
+Moonshot et Kimi Coding sont des **fournisseurs distincts**. Les clés ne sont pas interchangeables, les points de terminaison diffèrent, et les références de modèle diffèrent (`moonshot/...` vs `kimi/...`).
 </Warning>
 
 ## Catalogue de modèles intégré
 
 [//]: # "moonshot-kimi-k2-ids:start"
 
-| Référence de modèle              | Nom                    | Reasoning | Entrée      | Contexte | Sortie max |
-| -------------------------------- | ---------------------- | --------- | ----------- | -------- | ---------- |
-| `moonshot/kimi-k2.6`             | Kimi K2.6              | Non       | texte, image | 262,144 | 262,144    |
-| `moonshot/kimi-k2.5`             | Kimi K2.5              | Non       | texte, image | 262,144 | 262,144    |
-| `moonshot/kimi-k2-thinking`      | Kimi K2 Thinking       | Oui       | texte       | 262,144 | 262,144    |
-| `moonshot/kimi-k2-thinking-turbo`| Kimi K2 Thinking Turbo | Oui       | texte       | 262,144 | 262,144    |
-| `moonshot/kimi-k2-turbo`         | Kimi K2 Turbo          | Non       | texte       | 256,000 | 16,384     |
+| Model ref                         | Name                   | Reasoning | Input       | Context | Max output |
+| --------------------------------- | ---------------------- | --------- | ----------- | ------- | ---------- |
+| `moonshot/kimi-k2.6`              | Kimi K2.6              | No        | text, image | 262,144 | 262,144    |
+| `moonshot/kimi-k2.5`              | Kimi K2.5              | No        | text, image | 262,144 | 262,144    |
+| `moonshot/kimi-k2-thinking`       | Kimi K2 Thinking       | Yes       | text        | 262,144 | 262,144    |
+| `moonshot/kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo | Yes       | text        | 262,144 | 262,144    |
+| `moonshot/kimi-k2-turbo`          | Kimi K2 Turbo          | No        | text        | 256,000 | 16,384     |
 
 [//]: # "moonshot-kimi-k2-ids:end"
 
 Les estimations de coût intégrées pour les modèles K2 actuellement hébergés par Moonshot utilisent les
-tarifs pay-as-you-go publiés par Moonshot : Kimi K2.6 coûte 0,16 $/MTok en cache hit,
-0,95 $/MTok en entrée, et 4,00 $/MTok en sortie ; Kimi K2.5 coûte 0,10 $/MTok en cache hit,
-0,60 $/MTok en entrée, et 3,00 $/MTok en sortie. Les autres anciennes entrées du catalogue conservent
-des espaces réservés à coût nul sauf si vous les remplacez dans la configuration.
+tarifs à l’usage publiés par Moonshot : Kimi K2.6 coûte 0,16 $/MTok en lecture de cache,
+0,95 $/MTok en entrée et 4,00 $/MTok en sortie ; Kimi K2.5 coûte 0,10 $/MTok en lecture de cache,
+0,60 $/MTok en entrée et 3,00 $/MTok en sortie. Les autres entrées héritées du catalogue conservent
+des valeurs de coût nulles tant que vous ne les remplacez pas dans la configuration.
 
-## Premiers pas
+## Prise en main
 
 Choisissez votre fournisseur et suivez les étapes de configuration.
 
 <Tabs>
   <Tab title="API Moonshot">
-    **Idéal pour :** les modèles Kimi K2 via Moonshot Open Platform.
+    **Idéal pour :** les modèles Kimi K2 via la Moonshot Open Platform.
 
     <Steps>
       <Step title="Choisir votre région de point de terminaison">
-        | Choix d’authentification | Point de terminaison          | Région         |
-        | ------------------------ | ----------------------------- | -------------- |
-        | `moonshot-api-key`       | `https://api.moonshot.ai/v1`  | Internationale |
-        | `moonshot-api-key-cn`    | `https://api.moonshot.cn/v1`  | Chine          |
+        | Auth choice            | Endpoint                       | Region        |
+        | ---------------------- | ------------------------------ | ------------- |
+        | `moonshot-api-key`     | `https://api.moonshot.ai/v1`   | International |
+        | `moonshot-api-key-cn`  | `https://api.moonshot.cn/v1`   | China         |
       </Step>
-      <Step title="Exécuter l’onboarding">
+      <Step title="Lancer l’onboarding">
         ```bash
         openclaw onboard --auth-choice moonshot-api-key
         ```
@@ -86,8 +86,8 @@ Choisissez votre fournisseur et suivez les étapes de configuration.
         openclaw models list --provider moonshot
         ```
       </Step>
-      <Step title="Exécuter un test de fumée live">
-        Utilisez un répertoire d’état isolé lorsque vous voulez vérifier l’accès au modèle et le suivi
+      <Step title="Exécuter un test smoke en direct">
+        Utilisez un répertoire d’état isolé lorsque vous souhaitez vérifier l’accès au modèle et le suivi
         des coûts sans toucher à vos sessions normales :
 
         ```bash
@@ -194,11 +194,11 @@ Choisissez votre fournisseur et suivez les étapes de configuration.
     **Idéal pour :** les tâches orientées code via le point de terminaison Kimi Coding.
 
     <Note>
-    Kimi Coding utilise une clé API différente et un préfixe de fournisseur différent (`kimi/...`) de Moonshot (`moonshot/...`). L’ancienne référence de modèle `kimi/k2p5` reste acceptée comme ID de compatibilité.
+    Kimi Coding utilise une clé API différente et un préfixe de fournisseur différent (`kimi/...`) de Moonshot (`moonshot/...`). La référence de modèle héritée `kimi/k2p5` reste acceptée comme identifiant de compatibilité.
     </Note>
 
     <Steps>
-      <Step title="Exécuter l’onboarding">
+      <Step title="Lancer l’onboarding">
         ```bash
         openclaw onboard --auth-choice kimi-code-api-key
         ```
@@ -242,10 +242,10 @@ Choisissez votre fournisseur et suivez les étapes de configuration.
 
 ## Recherche web Kimi
 
-OpenClaw embarque aussi **Kimi** comme fournisseur `web_search`, adossé à la recherche web Moonshot.
+OpenClaw fournit également **Kimi** comme fournisseur `web_search`, adossé à la recherche web Moonshot.
 
 <Steps>
-  <Step title="Exécuter la configuration interactive de recherche web">
+  <Step title="Exécuter la configuration interactive de la recherche web">
     ```bash
     openclaw configure --section web
     ```
@@ -254,13 +254,13 @@ OpenClaw embarque aussi **Kimi** comme fournisseur `web_search`, adossé à la r
     `plugins.entries.moonshot.config.webSearch.*`.
 
   </Step>
-  <Step title="Configurer la région et le modèle de recherche web">
+  <Step title="Configurer la région de recherche web et le modèle">
     La configuration interactive demande :
 
-    | Paramètre            | Options                                                              |
-    | -------------------- | -------------------------------------------------------------------- |
-    | Région API           | `https://api.moonshot.ai/v1` (internationale) ou `https://api.moonshot.cn/v1` (Chine) |
-    | Modèle de recherche web | Par défaut `kimi-k2.6`                                           |
+    | Setting             | Options                                                              |
+    | ------------------- | -------------------------------------------------------------------- |
+    | API region          | `https://api.moonshot.ai/v1` (international) ou `https://api.moonshot.cn/v1` (Chine) |
+    | Web search model    | Par défaut `kimi-k2.6`                                             |
 
   </Step>
 </Steps>
@@ -274,7 +274,7 @@ La configuration se trouve sous `plugins.entries.moonshot.config.webSearch` :
       moonshot: {
         config: {
           webSearch: {
-            apiKey: "sk-...", // ou utiliser KIMI_API_KEY / MOONSHOT_API_KEY
+            apiKey: "sk-...", // ou utilisez KIMI_API_KEY / MOONSHOT_API_KEY
             baseUrl: "https://api.moonshot.ai/v1",
             model: "kimi-k2.6",
           },
@@ -296,12 +296,12 @@ La configuration se trouve sous `plugins.entries.moonshot.config.webSearch` :
 
 <AccordionGroup>
   <Accordion title="Mode de réflexion natif">
-    Moonshot Kimi prend en charge un mode de réflexion natif binaire :
+    Moonshot Kimi prend en charge une réflexion native binaire :
 
     - `thinking: { type: "enabled" }`
     - `thinking: { type: "disabled" }`
 
-    Configurez-le par modèle via `agents.defaults.models.<provider/model>.params` :
+    Configurez-la par modèle via `agents.defaults.models.<provider/model>.params` :
 
     ```json5
     {
@@ -319,20 +319,20 @@ La configuration se trouve sous `plugins.entries.moonshot.config.webSearch` :
     }
     ```
 
-    OpenClaw mappe aussi les niveaux d’exécution `/think` pour Moonshot :
+    OpenClaw mappe également les niveaux d’exécution `/think` pour Moonshot :
 
-    | Niveau `/think`      | Comportement Moonshot        |
-    | -------------------- | ---------------------------- |
-    | `/think off`         | `thinking.type=disabled`     |
-    | Tout niveau non-off  | `thinking.type=enabled`      |
+    | `/think` level       | Moonshot behavior          |
+    | -------------------- | -------------------------- |
+    | `/think off`         | `thinking.type=disabled`   |
+    | Tout niveau autre que off    | `thinking.type=enabled`    |
 
     <Warning>
-    Lorsque la réflexion Moonshot est activée, `tool_choice` doit être `auto` ou `none`. OpenClaw normalise les valeurs `tool_choice` incompatibles en `auto` pour compatibilité.
+    Lorsque la réflexion Moonshot est activée, `tool_choice` doit être `auto` ou `none`. OpenClaw normalise les valeurs `tool_choice` incompatibles en `auto` pour la compatibilité.
     </Warning>
 
-    Kimi K2.6 accepte aussi un champ facultatif `thinking.keep` qui contrôle
-    la conservation multi-tours de `reasoning_content`. Définissez-le sur `"all"` pour conserver l’intégralité
-    du raisonnement entre les tours ; omettez-le (ou laissez-le à `null`) pour utiliser la
+    Kimi K2.6 accepte également un champ facultatif `thinking.keep` qui contrôle
+    la conservation multi-tour de `reasoning_content`. Définissez-le sur `"all"` pour conserver le
+    raisonnement complet d’un tour à l’autre ; omettez-le (ou laissez-le à `null`) pour utiliser la
     stratégie par défaut du serveur. OpenClaw ne transmet `thinking.keep` que pour
     `moonshot/kimi-k2.6` et le supprime des autres modèles.
 
@@ -355,9 +355,9 @@ La configuration se trouve sous `plugins.entries.moonshot.config.webSearch` :
   </Accordion>
 
   <Accordion title="Assainissement des identifiants d’appel d’outil">
-    Moonshot Kimi sert des identifiants `tool_call` natifs de forme `functions.<name>:<index>` sur le transport compatible OpenAI. OpenClaw n’assainit plus strictement ces identifiants pour Moonshot, de sorte que les flux agentiques multi-tours via Kimi K2.6 continuent de fonctionner au-delà de 2-3 tours de tool-calling lorsque la couche de service fait correspondre les identifiants modifiés aux définitions d’outil d’origine.
+    Moonshot Kimi fournit des identifiants `tool_call` de la forme `functions.<name>:<index>`. OpenClaw les conserve inchangés afin que les appels d’outil multi-tours continuent de fonctionner.
 
-    Si un fournisseur personnalisé compatible OpenAI a besoin du comportement précédent, définissez `sanitizeToolCallIds: true` sur l’entrée du fournisseur. L’indicateur se trouve dans la famille de relecture partagée `openai-compatible` ; Moonshot est relié au mode opt-out par défaut.
+    Pour forcer un assainissement strict sur un fournisseur personnalisé compatible OpenAI, définissez `sanitizeToolCallIds: true` :
 
     ```json5
     {
@@ -376,39 +376,38 @@ La configuration se trouve sous `plugins.entries.moonshot.config.webSearch` :
 
   <Accordion title="Compatibilité de l’usage en streaming">
     Les points de terminaison Moonshot natifs (`https://api.moonshot.ai/v1` et
-    `https://api.moonshot.cn/v1`) annoncent la compatibilité de l’usage en streaming sur le
-    transport partagé `openai-completions`. OpenClaw s’appuie sur les capacités du point de terminaison, de sorte que les ID de fournisseurs personnalisés compatibles ciblant les mêmes hôtes Moonshot natifs héritent du même comportement d’usage en streaming.
+    `https://api.moonshot.cn/v1`) annoncent une compatibilité d’usage en streaming sur le
+    transport partagé `openai-completions`. OpenClaw se base sur les capacités du point de terminaison, de sorte que les identifiants de fournisseurs personnalisés compatibles ciblant les mêmes hôtes Moonshot natifs héritent du même comportement d’usage en streaming.
 
-    Avec la tarification K2.6 intégrée, l’usage en streaming qui inclut les jetons d’entrée, de sortie,
-    et de lecture de cache est aussi converti en coût USD local estimé pour
-    `/status`, `/usage full`, `/usage cost`, et la comptabilité de session adossée à la
-    transcription.
+    Avec la tarification K2.6 intégrée, l’usage en streaming qui inclut les jetons d’entrée, de sortie
+    et de lecture de cache est également converti en coût local estimé en USD pour
+    `/status`, `/usage full`, `/usage cost`, et la comptabilité de session adossée aux transcriptions.
 
   </Accordion>
 
   <Accordion title="Référence des points de terminaison et des références de modèle">
-    | Fournisseur | Préfixe de référence de modèle | Point de terminaison          | Variable d’environnement d’authentification |
-    | ------------ | ------------------------------ | ----------------------------- | ------------------------------------------- |
-    | Moonshot     | `moonshot/`                    | `https://api.moonshot.ai/v1`  | `MOONSHOT_API_KEY`                          |
-    | Moonshot CN  | `moonshot/`                    | `https://api.moonshot.cn/v1`  | `MOONSHOT_API_KEY`                          |
-    | Kimi Coding  | `kimi/`                        | Point de terminaison Kimi Coding | `KIMI_API_KEY`                           |
-    | Recherche web | N/A                           | Identique à la région d’API Moonshot | `KIMI_API_KEY` ou `MOONSHOT_API_KEY` |
+    | Provider   | Model ref prefix | Endpoint                      | Auth env var        |
+    | ---------- | ---------------- | ----------------------------- | ------------------- |
+    | Moonshot   | `moonshot/`      | `https://api.moonshot.ai/v1`  | `MOONSHOT_API_KEY`  |
+    | Moonshot CN| `moonshot/`      | `https://api.moonshot.cn/v1`  | `MOONSHOT_API_KEY`  |
+    | Kimi Coding| `kimi/`          | Point de terminaison Kimi Coding          | `KIMI_API_KEY`      |
+    | Recherche web | N/A              | Identique à la région de l’API Moonshot   | `KIMI_API_KEY` ou `MOONSHOT_API_KEY` |
 
     - La recherche web Kimi utilise `KIMI_API_KEY` ou `MOONSHOT_API_KEY`, et utilise par défaut `https://api.moonshot.ai/v1` avec le modèle `kimi-k2.6`.
-    - Remplacez si nécessaire les métadonnées de tarification et de contexte dans `models.providers`.
+    - Remplacez les métadonnées de tarification et de contexte dans `models.providers` si nécessaire.
     - Si Moonshot publie des limites de contexte différentes pour un modèle, ajustez `contextWindow` en conséquence.
 
   </Accordion>
 </AccordionGroup>
 
-## Lié
+## Liens associés
 
 <CardGroup cols={2}>
-  <Card title="Sélection de modèle" href="/fr/concepts/model-providers" icon="layers">
-    Choisir les fournisseurs, les références de modèle et le comportement de basculement.
+  <Card title="Sélection du modèle" href="/fr/concepts/model-providers" icon="layers">
+    Choisir les fournisseurs, références de modèle et comportement de bascule.
   </Card>
   <Card title="Recherche web" href="/fr/tools/web" icon="magnifying-glass">
-    Configuration des fournisseurs de recherche web, y compris Kimi.
+    Configurer les fournisseurs de recherche web, y compris Kimi.
   </Card>
   <Card title="Référence de configuration" href="/fr/gateway/configuration-reference" icon="gear">
     Schéma de configuration complet pour les fournisseurs, modèles et plugins.
