@@ -1,72 +1,72 @@
 ---
 read_when:
-    - Ви хочете використовувати моделі StepFun в OpenClaw
+    - Ви хочете моделі StepFun в OpenClaw
     - Вам потрібні вказівки з налаштування StepFun
 summary: Використовуйте моделі StepFun з OpenClaw
 title: StepFun
 x-i18n:
-    generated_at: "2026-04-23T21:08:09Z"
+    generated_at: "2026-04-23T23:05:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3267379303e5cf1539c1945ec8d777f1bfc6189c9f9e7f8802b3393c60e7693d
+    source_hash: a5bc7904a07bed9f8c9bbbaabb9a7ab56e8f19924df9ec493a126a2685079486
     source_path: providers/stepfun.md
     workflow: 15
 ---
 
-OpenClaw містить bundled provider Plugin StepFun з двома provider id:
+OpenClaw містить комплектний plugin provider StepFun з двома ідентифікаторами provider:
 
-- `stepfun` для стандартного endpoint
-- `stepfun-plan` для endpoint Step Plan
+- `stepfun` для стандартного ендпоїнта
+- `stepfun-plan` для ендпоїнта Step Plan
 
 <Warning>
-Standard і Step Plan — це **окремі провайдери** з різними endpoint і префіксами model ref (`stepfun/...` проти `stepfun-plan/...`). Використовуйте China key з endpoint `.com`, а global key — з endpoint `.ai`.
+Standard і Step Plan — це **окремі provider** з різними ендпоїнтами та префіксами посилань на моделі (`stepfun/...` проти `stepfun-plan/...`). Використовуйте China-ключ з ендпоїнтами `.com`, а global-ключ — з ендпоїнтами `.ai`.
 </Warning>
 
-## Огляд регіонів і endpoint
+## Огляд регіонів і ендпоїнтів
 
-| Endpoint  | China (`.com`)                         | Global (`.ai`)                        |
-| --------- | -------------------------------------- | ------------------------------------- |
-| Standard  | `https://api.stepfun.com/v1`           | `https://api.stepfun.ai/v1`           |
-| Step Plan | `https://api.stepfun.com/step_plan/v1` | `https://api.stepfun.ai/step_plan/v1` |
+| Ендпоїнт   | China (`.com`)                         | Global (`.ai`)                        |
+| ---------- | -------------------------------------- | ------------------------------------- |
+| Standard   | `https://api.stepfun.com/v1`           | `https://api.stepfun.ai/v1`           |
+| Step Plan  | `https://api.stepfun.com/step_plan/v1` | `https://api.stepfun.ai/step_plan/v1` |
 
-Auth env var: `STEPFUN_API_KEY`
+Env-змінна автентифікації: `STEPFUN_API_KEY`
 
-## Вбудовані каталоги
+## Вбудований каталог
 
 Standard (`stepfun`):
 
-| Model ref                | Context | Max output | Notes                     |
-| ------------------------ | ------- | ---------- | ------------------------- |
-| `stepfun/step-3.5-flash` | 262,144 | 65,536     | Типова стандартна модель  |
+| Посилання на модель       | Контекст | Макс. вивід | Примітки                 |
+| ------------------------- | -------- | ----------- | ------------------------ |
+| `stepfun/step-3.5-flash`  | 262,144  | 65,536      | Типова стандартна модель |
 
 Step Plan (`stepfun-plan`):
 
-| Model ref                          | Context | Max output | Notes                         |
-| ---------------------------------- | ------- | ---------- | ----------------------------- |
-| `stepfun-plan/step-3.5-flash`      | 262,144 | 65,536     | Типова модель Step Plan       |
-| `stepfun-plan/step-3.5-flash-2603` | 262,144 | 65,536     | Додаткова модель Step Plan    |
+| Посилання на модель                 | Контекст | Макс. вивід | Примітки                    |
+| ----------------------------------- | -------- | ----------- | --------------------------- |
+| `stepfun-plan/step-3.5-flash`       | 262,144  | 65,536      | Типова модель Step Plan     |
+| `stepfun-plan/step-3.5-flash-2603`  | 262,144  | 65,536      | Додаткова модель Step Plan  |
 
 ## Початок роботи
 
-Виберіть поверхню провайдера і виконайте кроки налаштування.
+Виберіть потрібну поверхню provider і виконайте кроки налаштування.
 
 <Tabs>
   <Tab title="Standard">
-    **Найкраще для:** використання загального призначення через стандартний endpoint StepFun.
+    **Найкраще для:** загального використання через стандартний ендпоїнт StepFun.
 
     <Steps>
-      <Step title="Виберіть регіон endpoint">
-        | Auth choice                      | Endpoint                        | Region        |
-        | -------------------------------- | ------------------------------- | ------------- |
-        | `stepfun-standard-api-key-intl`  | `https://api.stepfun.ai/v1`     | International |
-        | `stepfun-standard-api-key-cn`    | `https://api.stepfun.com/v1`    | China         |
+      <Step title="Виберіть регіон ендпоїнта">
+        | Варіант автентифікації           | Ендпоїнт                        | Регіон         |
+        | -------------------------------- | ------------------------------- | -------------- |
+        | `stepfun-standard-api-key-intl`  | `https://api.stepfun.ai/v1`     | Міжнародний    |
+        | `stepfun-standard-api-key-cn`    | `https://api.stepfun.com/v1`    | China          |
       </Step>
-      <Step title="Запустіть onboarding">
+      <Step title="Запустіть початкове налаштування">
         ```bash
         openclaw onboard --auth-choice stepfun-standard-api-key-intl
         ```
 
-        Або для endpoint China:
+        Або для ендпоїнта China:
 
         ```bash
         openclaw onboard --auth-choice stepfun-standard-api-key-cn
@@ -92,21 +92,21 @@ Step Plan (`stepfun-plan`):
   </Tab>
 
   <Tab title="Step Plan">
-    **Найкраще для:** reasoning endpoint Step Plan.
+    **Найкраще для:** ендпоїнта міркування Step Plan.
 
     <Steps>
-      <Step title="Виберіть регіон endpoint">
-        | Auth choice                  | Endpoint                               | Region        |
-        | ---------------------------- | -------------------------------------- | ------------- |
-        | `stepfun-plan-api-key-intl`  | `https://api.stepfun.ai/step_plan/v1`  | International |
-        | `stepfun-plan-api-key-cn`    | `https://api.stepfun.com/step_plan/v1` | China         |
+      <Step title="Виберіть регіон ендпоїнта">
+        | Варіант автентифікації        | Ендпоїнт                               | Регіон         |
+        | ----------------------------- | -------------------------------------- | -------------- |
+        | `stepfun-plan-api-key-intl`   | `https://api.stepfun.ai/step_plan/v1`  | Міжнародний    |
+        | `stepfun-plan-api-key-cn`     | `https://api.stepfun.com/step_plan/v1` | China          |
       </Step>
-      <Step title="Запустіть onboarding">
+      <Step title="Запустіть початкове налаштування">
         ```bash
         openclaw onboard --auth-choice stepfun-plan-api-key-intl
         ```
 
-        Або для endpoint China:
+        Або для ендпоїнта China:
 
         ```bash
         openclaw onboard --auth-choice stepfun-plan-api-key-cn
@@ -133,10 +133,10 @@ Step Plan (`stepfun-plan`):
   </Tab>
 </Tabs>
 
-## Розширене налаштування
+## Розширена конфігурація
 
 <AccordionGroup>
-  <Accordion title="Повна config: Standard provider">
+  <Accordion title="Повна конфігурація: provider Standard">
     ```json5
     {
       env: { STEPFUN_API_KEY: "your-key" },
@@ -166,7 +166,7 @@ Step Plan (`stepfun-plan`):
     ```
   </Accordion>
 
-  <Accordion title="Повна config: provider Step Plan">
+  <Accordion title="Повна конфігурація: provider Step Plan">
     ```json5
     {
       env: { STEPFUN_API_KEY: "your-key" },
@@ -206,30 +206,30 @@ Step Plan (`stepfun-plan`):
   </Accordion>
 
   <Accordion title="Примітки">
-    - Провайдер bundled входить до OpenClaw, тому окремий крок встановлення Plugin не потрібен.
+    - Provider постачається разом з OpenClaw, тому окремий крок встановлення plugin не потрібен.
     - `step-3.5-flash-2603` наразі доступна лише в `stepfun-plan`.
-    - Один потік auth записує профілі з регіоном, що збігається, і для `stepfun`, і для `stepfun-plan`, тож обидві поверхні можна виявляти разом.
+    - Один потік автентифікації записує профілі з відповідним регіоном як для `stepfun`, так і для `stepfun-plan`, тож обидві поверхні можна виявляти разом.
     - Використовуйте `openclaw models list` і `openclaw models set <provider/model>`, щоб переглядати або перемикати моделі.
   </Accordion>
 </AccordionGroup>
 
 <Note>
-Для ширшого огляду провайдерів див. [Model providers](/uk/concepts/model-providers).
+Для ширшого огляду provider див. [Provider моделей](/uk/concepts/model-providers).
 </Note>
 
-## Пов’язане
+## Пов’язано
 
 <CardGroup cols={2}>
   <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
-    Огляд усіх провайдерів, model refs і поведінки failover.
+    Огляд усіх provider, посилань на моделі та поведінки failover.
   </Card>
-  <Card title="Довідник із конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
-    Повна schema config для провайдерів, моделей і Plugin.
+  <Card title="Довідка з конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
+    Повна схема конфігурації для provider, моделей і plugin.
   </Card>
   <Card title="Вибір моделі" href="/uk/concepts/models" icon="brain">
-    Як вибирати та налаштовувати моделі.
+    Як вибирати й налаштовувати моделі.
   </Card>
   <Card title="Платформа StepFun" href="https://platform.stepfun.com" icon="globe">
-    Керування API key StepFun і документація.
+    Керування API-ключами StepFun і документація.
   </Card>
 </CardGroup>

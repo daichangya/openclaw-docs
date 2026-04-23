@@ -1,13 +1,19 @@
 ---
-summary: Перенаправити до /automation/cron-jobs
+summary: Переспрямувати до /automation/cron-jobs
 title: Усунення несправностей автоматизації
 x-i18n:
-    generated_at: "2026-04-23T20:43:15Z"
+    generated_at: "2026-04-23T22:57:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4cf6025d6c2e12bfc52ba847de002aaea3bf59efaebbb659c4c685559d359cb6
+    source_hash: e7784858f6d2594a1d6019435b2a5a1647e12f5de6329198db9539e325f73737
     source_path: automation/troubleshooting.md
     workflow: 15
 ---
 
-Цю сторінку перенесено до [Заплановані завдання](/uk/automation/cron-jobs#troubleshooting). Див. [Заплановані завдання](/uk/automation/cron-jobs#troubleshooting) для документації з усунення несправностей.
+Цю сторінку переміщено до [Заплановані завдання](/uk/automation/cron-jobs#troubleshooting). Документацію з усунення несправностей дивіться в [Заплановані завдання](/uk/automation/cron-jobs#troubleshooting).
+
+## Пов’язане
+
+- [Гачки](/uk/automation/hooks)
+- [Фонові завдання](/uk/automation/tasks)
+- [Усунення несправностей Gateway](/uk/gateway/troubleshooting)

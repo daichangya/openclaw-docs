@@ -1,32 +1,32 @@
 ---
 read_when:
     - Рефакторинг визначень QA-сценаріїв або коду harness qa-lab
-    - Перенесення поведінки QA між markdown-сценаріями та логікою harness на TypeScript
-summary: План рефакторингу QA для каталогу сценаріїв і консолідації harness
+    - Переміщення поведінки QA між Markdown-сценаріями та логікою harness у TypeScript
+summary: План рефакторингу QA для каталогу сценаріїв і консолідації harness-ів
 title: Рефакторинг QA
 x-i18n:
-    generated_at: "2026-04-23T21:09:09Z"
+    generated_at: "2026-04-23T23:06:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0ca2257d24ad4face71897d986fd85bea901dcf805894e7b0cfe02f96e2eb95a
+    source_hash: 3d193f449764f9a5fde6c3655c9e16ac5f1d76624de43cd5fbf79a6b0ca7d986
     source_path: refactor/qa.md
     workflow: 15
 ---
 
-Статус: закладну міграцію вже виконано.
+Статус: базову міграцію завершено.
 
 ## Мета
 
-Перевести QA OpenClaw з моделі розділених визначень до єдиного джерела істини для:
+Перевести QA OpenClaw з моделі розділених визначень на єдине джерело істини:
 
-- metadata сценаріїв
-- prompt-ів, які надсилаються моделі
-- setup і teardown
-- логіки harness
-- перевірок і критеріїв успіху
-- artifacts і підказок для звітів
+- метадані сценаріїв
+- prompt-и, що надсилаються моделі
+- налаштування і завершення
+- логіка harness
+- перевірки та критерії успіху
+- артефакти й підказки для звітів
 
-Бажаний кінцевий стан — це універсальний QA harness, який завантажує потужні файли визначень сценаріїв замість того, щоб жорстко кодувати більшість поведінки на TypeScript.
+Бажаний кінцевий стан — це універсальний QA harness, який завантажує потужні файли визначення сценаріїв замість жорсткого кодування більшості поведінки в TypeScript.
 
 ## Поточний стан
 
@@ -36,87 +36,87 @@ x-i18n:
 Реалізовано:
 
 - `qa/scenarios/index.md`
-  - canonical metadata QA pack
-  - identity оператора
-  - kickoff mission
+  - канонічні метадані QA pack
+  - ідентичність оператора
+  - стартова місія
 - `qa/scenarios/<theme>/*.md`
   - один markdown-файл на сценарій
-  - metadata сценарію
+  - метадані сценарію
   - прив’язки handler-ів
-  - execution config, специфічний для сценарію
+  - конфігурація виконання, специфічна для сценарію
 - `extensions/qa-lab/src/scenario-catalog.ts`
-  - parser markdown pack + валідація zod
+  - markdown-парсер pack + валідація через zod
 - `extensions/qa-lab/src/qa-agent-bootstrap.ts`
-  - рендеринг plan з markdown pack
+  - рендеринг плану з markdown-pack
 - `extensions/qa-lab/src/qa-agent-workspace.ts`
-  - seed для згенерованих compatibility-файлів плюс `QA_SCENARIOS.md`
+  - підготовка згенерованих файлів сумісності плюс `QA_SCENARIOS.md`
 - `extensions/qa-lab/src/suite.ts`
-  - вибір виконуваних сценаріїв через прив’язки handler-ів, визначені в markdown
-- QA bus protocol + UI
+  - вибір виконуваних сценаріїв через визначені в markdown прив’язки handler-ів
+- протокол QA bus + UI
   - універсальні inline-вкладення для рендерингу image/video/audio/file
 
-Поверхні, що все ще залишаються розділеними:
+Поверхні, які ще лишаються розділеними:
 
 - `extensions/qa-lab/src/suite.ts`
-  - усе ще володіє більшістю виконуваної custom-логіки handler-ів
+  - все ще містить більшість виконуваної користувацької логіки handler-ів
 - `extensions/qa-lab/src/report.ts`
-  - усе ще виводить структуру звіту з runtime-виводу
+  - все ще виводить структуру звіту з runtime-виводів
 
-Отже, проблему розділення джерела істини вже виправлено, але виконання все ще здебільшого спирається на handler-и, а не є повністю декларативним.
+Отже, розділення джерела істини вже усунуто, але виконання все ще здебільшого спирається на handler-и, а не є повністю декларативним.
 
-## Як виглядає реальна поверхня сценаріїв
+## Як насправді виглядає поверхня сценаріїв
 
 Читання поточного suite показує кілька окремих класів сценаріїв.
 
 ### Проста взаємодія
 
-- channel baseline
-- DM baseline
-- threaded follow-up
-- model switch
-- approval followthrough
-- reaction/edit/delete
+- базова перевірка каналу
+- базова перевірка DM
+- подальша дія в потоці
+- перемикання моделі
+- доведення підтвердження до завершення
+- реакція/редагування/видалення
 
-### Мутація конфігурації та runtime
+### Зміна config і runtime
 
-- config patch skill disable
-- config apply restart wake-up
-- config restart capability flip
-- runtime inventory drift check
+- вимкнення skill через patch config
+- пробудження після перезапуску через config apply
+- перемикання можливостей після перезапуску config
+- перевірка дрейфу inventory runtime
 
 ### Перевірки файлової системи та репозиторію
 
-- source/docs discovery report
-- build Lobster Invaders
-- generated image artifact lookup
+- звіт про виявлення source/docs
+- зібрати Lobster Invaders
+- пошук артефакту згенерованого зображення
 
 ### Оркестрація пам’яті
 
-- memory recall
-- memory tools in channel context
-- memory failure fallback
-- session memory ranking
-- thread memory isolation
-- memory dreaming sweep
+- відновлення пам’яті
+- інструменти пам’яті в контексті каналу
+- fallback при збоях пам’яті
+- ранжування пам’яті сесії
+- ізоляція пам’яті потоку
+- прохід Dreaming для пам’яті
 
-### Інтеграція інструментів і Plugin
+### Інтеграція інструментів і Plugin-ів
 
-- MCP plugin-tools call
-- skill visibility
-- skill hot install
-- native image generation
+- виклик MCP plugin-tools
+- видимість skill
+- гаряче встановлення skill
+- native-генерація зображень
 - image roundtrip
-- image understanding from attachment
+- розуміння зображення з вкладення
 
-### Багатоходові сценарії та кілька учасників
+### Багатоциклові та багатокористувацькі
 
-- subagent handoff
-- subagent fanout synthesis
-- restart recovery style flows
+- передача керування субагенту
+- fanout synthesis субагента
+- потоки відновлення після перезапуску
 
-Ці категорії важливі, тому що вони визначають вимоги до DSL. Плаского списку з prompt + очікуваним текстом недостатньо.
+Ці категорії важливі, оскільки вони визначають вимоги до DSL. Плоского списку prompt + очікуваний текст недостатньо.
 
-## Напрям
+## Напрямок
 
 ### Єдине джерело істини
 
@@ -126,17 +126,17 @@ x-i18n:
 Pack має залишатися:
 
 - читабельним для людини під час review
-- придатним для машинного парсингу
+- придатним до машинного парсингу
 - достатньо багатим, щоб керувати:
   - виконанням suite
-  - bootstrap QA workspace
-  - metadata QA Lab UI
-  - docs/discovery prompt-ами
+  - bootstrap робочого простору QA
+  - метаданими UI QA Lab
+  - prompt-ами для docs/discovery
   - генерацією звітів
 
-### Бажаний формат авторства
+### Бажаний формат авторинга
 
-Використовувати markdown як top-level-формат, із структурованим YAML усередині.
+Використовувати markdown як формат верхнього рівня зі структурованим YAML усередині нього.
 
 Рекомендована форма:
 
@@ -147,13 +147,13 @@ Pack має залишатися:
   - tags
   - docs refs
   - code refs
-  - override-и model/provider
+  - перевизначення model/provider
   - prerequisites
-- prose-секції
+- прозові секції
   - objective
   - notes
   - debugging hints
-- fenced YAML blocks
+- fenced YAML-блоки
   - setup
   - steps
   - assertions
@@ -161,24 +161,24 @@ Pack має залишатися:
 
 Це дає:
 
-- кращу читабельність PR, ніж величезний JSON
+- кращу читабельність PR, ніж гігантський JSON
 - багатший контекст, ніж чистий YAML
-- суворий парсинг і валідацію zod
+- строгий парсинг і валідацію через zod
 
-Сирий JSON припустимий лише як проміжна згенерована форма.
+Сирий JSON прийнятний лише як проміжна згенерована форма.
 
-## Пропонована форма файлу сценарію
+## Запропонована форма файла сценарію
 
 Приклад:
 
 ````md
 ---
 id: image-generation-roundtrip
-title: Image generation roundtrip
+title: Roundtrip генерації зображення
 surface: image
 tags: [media, image, roundtrip]
 models:
-  primary: openai/gpt-5.5
+  primary: openai/gpt-5.4
 requires:
   tools: [image_generate]
   plugins: [openai, qa-channel]
@@ -190,11 +190,11 @@ codeRefs:
   - src/gateway/chat-attachments.ts
 ---
 
-# Objective
+# Мета
 
-Verify generated media is reattached on the follow-up turn.
+Перевірити, що згенероване медіа повторно приєднується в наступному циклі.
 
-# Setup
+# Налаштування
 
 ```yaml scenario.setup
 - action: config.patch
@@ -207,26 +207,26 @@ Verify generated media is reattached on the follow-up turn.
   key: agent:qa:image-roundtrip
 ```
 
-# Steps
+# Кроки
 
 ```yaml scenario.steps
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Image generation check: generate a QA lighthouse image and summarize it in one short sentence.
+    Перевірка генерації зображення: згенеруй QA-зображення маяка й коротко підсумуй його одним реченням.
 - action: artifact.capture
   kind: generated-image
-  promptSnippet: Image generation check
+  promptSnippet: Перевірка генерації зображення
   saveAs: lighthouseImage
 - action: agent.send
   session: agent:qa:image-roundtrip
   message: |
-    Roundtrip image inspection check: describe the generated lighthouse attachment in one short sentence.
+    Перевірка огляду roundtrip-зображення: опиши згенероване вкладення з маяком одним коротким реченням.
   attachments:
     - fromArtifact: lighthouseImage
 ```
 
-# Expect
+# Очікування
 
 ```yaml scenario.expect
 - assert: outbound.textIncludes
@@ -242,9 +242,9 @@ Verify generated media is reattached on the follow-up turn.
 
 ## Можливості runner-а, які має покривати DSL
 
-На основі поточного suite універсальному runner-у потрібно більше, ніж просто виконання prompt-ів.
+На основі поточного suite універсальний runner має підтримувати більше, ніж просто виконання prompt-ів.
 
-### Дії середовища та setup
+### Дії середовища і налаштування
 
 - `bus.reset`
 - `gateway.waitHealthy`
@@ -253,14 +253,14 @@ Verify generated media is reattached on the follow-up turn.
 - `thread.create`
 - `workspace.writeSkill`
 
-### Дії ходу агента
+### Дії циклу агента
 
 - `agent.send`
 - `agent.wait`
 - `bus.injectInbound`
 - `bus.injectOutbound`
 
-### Дії конфігурації та runtime
+### Дії config і runtime
 
 - `config.get`
 - `config.patch`
@@ -269,7 +269,7 @@ Verify generated media is reattached on the follow-up turn.
 - `tools.effective`
 - `skills.status`
 
-### Дії з файлами та artifacts
+### Дії з файлами й артефактами
 
 - `file.write`
 - `file.read`
@@ -278,7 +278,7 @@ Verify generated media is reattached on the follow-up turn.
 - `artifact.captureGeneratedImage`
 - `artifact.capturePath`
 
-### Дії з пам’яттю та Cron
+### Дії з пам’яттю і cron
 
 - `memory.indexForce`
 - `memory.searchCli`
@@ -308,89 +308,89 @@ Verify generated media is reattached on the follow-up turn.
 - `cron.managedPresent`
 - `artifact.exists`
 
-## Змінні та посилання на artifacts
+## Змінні та посилання на артефакти
 
-DSL має підтримувати збережені виходи та подальші посилання на них.
+DSL має підтримувати збережені результати й подальші посилання на них.
 
 Приклади з поточного suite:
 
-- створити thread, а потім повторно використати `threadId`
-- створити session, а потім повторно використати `sessionKey`
-- згенерувати image, а потім прикріпити файл на наступному ході
-- згенерувати рядок-маркер wake, а потім перевірити, що він з’являється пізніше
+- створити потік, а потім повторно використати `threadId`
+- створити сесію, а потім повторно використати `sessionKey`
+- згенерувати зображення, а потім прикріпити файл у наступному циклі
+- згенерувати рядок-маркер пробудження, а потім перевірити, що він з’являється пізніше
 
 Потрібні можливості:
 
 - `saveAs`
 - `${vars.name}`
 - `${artifacts.name}`
-- типізовані посилання для paths, session keys, thread id, marker-ів, output інструментів
+- типізовані посилання для шляхів, ключів сесій, id потоків, маркерів, виводів інструментів
 
-Без підтримки змінних harness і далі буде “витікати” логіку сценаріїв назад у TypeScript.
+Без підтримки змінних harness і далі витікатиме логікою сценаріїв назад у TypeScript.
 
-## Що має залишитися аварійними винятками
+## Що має залишитися як escape hatch
 
-Повністю чистий декларативний runner нереалістичний на фазі 1.
+Повністю чистий декларативний runner нереалістичний у фазі 1.
 
-Деякі сценарії за своєю природою важкі з погляду оркестрації:
+Деякі сценарії за своєю природою потребують важкої оркестрації:
 
-- memory dreaming sweep
-- config apply restart wake-up
-- config restart capability flip
-- generated image artifact resolution by timestamp/path
-- discovery-report evaluation
+- прохід Dreaming для пам’яті
+- пробудження після перезапуску через config apply
+- перемикання можливостей після перезапуску config
+- визначення артефакту згенерованого зображення за timestamp/path
+- оцінювання discovery-report
 
-Поки що для них слід використовувати явні custom handler-и.
+Поки що для них слід використовувати явні користувацькі handler-и.
 
 Рекомендоване правило:
 
 - 85-90% декларативно
 - явні кроки `customHandler` для складного залишку
-- лише іменовані й задокументовані custom handler-и
+- лише іменовані та задокументовані користувацькі handler-и
 - жодного анонімного inline-коду у файлі сценарію
 
-Це збереже чистоту універсального engine, але все одно дасть змогу рухатися вперед.
+Це дозволяє зберігати універсальний engine чистим і водночас рухатися вперед.
 
 ## Зміна архітектури
 
 ### Поточний стан
 
-Markdown сценаріїв уже є джерелом істини для:
+Markdown-сценарії вже є джерелом істини для:
 
 - виконання suite
-- bootstrap-файлів workspace
-- каталогу сценаріїв QA Lab UI
-- metadata звітів
-- discovery prompt-ів
+- файлів bootstrap робочого простору
+- каталогу сценаріїв UI QA Lab
+- метаданих звітів
+- prompt-ів discovery
 
 Згенерована сумісність:
 
-- seeded workspace і далі включає `QA_KICKOFF_TASK.md`
-- seeded workspace і далі включає `QA_SCENARIO_PLAN.md`
-- seeded workspace тепер також включає `QA_SCENARIOS.md`
+- підготовлений робочий простір усе ще містить `QA_KICKOFF_TASK.md`
+- підготовлений робочий простір усе ще містить `QA_SCENARIO_PLAN.md`
+- підготовлений робочий простір тепер також містить `QA_SCENARIOS.md`
 
 ## План рефакторингу
 
 ### Фаза 1: loader і schema
 
-Завершено.
+Виконано.
 
 - додано `qa/scenarios/index.md`
 - сценарії розділено на `qa/scenarios/<theme>/*.md`
-- додано parser для вмісту іменованого markdown YAML pack
+- додано парсер для іменованого markdown-вмісту pack у YAML
 - додано валідацію через zod
-- споживачів переключено на parsed pack
+- споживачів переведено на парсений pack
 - видалено `qa/seed-scenarios.json` і `qa/QA_KICKOFF_TASK.md` на рівні репозиторію
 
 ### Фаза 2: універсальний engine
 
-- розділити `extensions/qa-lab/src/suite.ts` на:
+- розбити `extensions/qa-lab/src/suite.ts` на:
   - loader
   - engine
-  - registry дій
-  - registry перевірок
-  - custom handlers
-- залишити наявні helper-функції як операції engine
+  - реєстр дій
+  - реєстр перевірок
+  - користувацькі handler-и
+- зберегти наявні helper-функції як операції engine
 
 Результат:
 
@@ -398,49 +398,49 @@ Markdown сценаріїв уже є джерелом істини для:
 
 Почати зі сценаріїв, які здебільшого складаються з prompt + wait + assert:
 
-- threaded follow-up
-- image understanding from attachment
-- skill visibility and invocation
-- channel baseline
+- подальша дія в потоці
+- розуміння зображення з вкладення
+- видимість і виклик skill
+- базова перевірка каналу
 
 Результат:
 
-- перші реальні markdown-визначені сценарії, що постачаються через універсальний engine
+- перші реальні сценарії, визначені в markdown, постачаються через універсальний engine
 
 ### Фаза 4: міграція сценаріїв середньої складності
 
 - image generation roundtrip
-- memory tools in channel context
-- session memory ranking
-- subagent handoff
-- subagent fanout synthesis
+- інструменти пам’яті в контексті каналу
+- ранжування пам’яті сесії
+- передача керування субагенту
+- fanout synthesis субагента
 
 Результат:
 
-- доведена підтримка variables, artifacts, tool assertions, request-log assertions
+- підтверджено роботу змінних, артефактів, перевірок інструментів і перевірок request-log
 
-### Фаза 5: складні сценарії залишаються на custom handlers
+### Фаза 5: залишити складні сценарії на користувацьких handler-ах
 
-- memory dreaming sweep
-- config apply restart wake-up
-- config restart capability flip
-- runtime inventory drift
+- прохід Dreaming для пам’яті
+- пробудження після перезапуску через config apply
+- перемикання можливостей після перезапуску config
+- дрейф inventory runtime
 
 Результат:
 
-- той самий формат авторства, але з явними блоками custom-step там, де це потрібно
+- той самий формат авторинга, але з явними блоками custom-step там, де це потрібно
 
-### Фаза 6: видалення hardcoded scenario map
+### Фаза 6: видалити map сценаріїв із жорстким кодуванням
 
-Щойно покриття pack стане достатньо хорошим:
+Щойно покриття pack стане достатньо добрим:
 
-- прибрати більшість TypeScript-розгалужень, специфічних для сценаріїв, з `extensions/qa-lab/src/suite.ts`
+- видалити більшість специфічних для сценаріїв розгалужень TypeScript із `extensions/qa-lab/src/suite.ts`
 
-## Fake Slack / підтримка rich media
+## Підтримка fake Slack / rich media
 
 Поточний QA bus орієнтований насамперед на текст.
 
-Відповідні файли:
+Релевантні файли:
 
 - `extensions/qa-channel/src/protocol.ts`
 - `extensions/qa-lab/src/bus-state.ts`
@@ -450,11 +450,11 @@ Markdown сценаріїв уже є джерелом істини для:
 
 Сьогодні QA bus підтримує:
 
-- text
-- reactions
-- threads
+- текст
+- реакції
+- потоки
 
-Він ще не моделює inline media attachments.
+Він ще не моделює inline-медіавкладення.
 
 ### Потрібний транспортний контракт
 
@@ -483,9 +483,9 @@ type QaBusAttachment = {
 - `QaBusInboundMessageInput`
 - `QaBusOutboundMessageInput`
 
-### Чому спочатку універсально
+### Чому спершу універсально
 
-Не будуйте модель media лише для Slack.
+Не створювати модель медіа лише для Slack.
 
 Натомість:
 
@@ -493,51 +493,51 @@ type QaBusAttachment = {
 - кілька renderer-ів поверх неї
   - поточний чат QA Lab
   - майбутній fake Slack web
-  - будь-які інші перегляди fake transport
+  - будь-які інші подання fake transport
 
-Це запобігає дублюванню логіки й дозволяє media-сценаріям залишатися незалежними від транспорту.
+Це запобігає дублюванню логіки й дозволяє медіасценаріям залишатися незалежними від транспорту.
 
-### Яка робота потрібна в UI
+### Потрібна робота в UI
 
-Оновити UI QA, щоб він рендерив:
+Оновити UI QA для рендерингу:
 
-- inline preview зображення
-- inline audio player
-- inline video player
-- chip файлового вкладення
+- inline-preview зображення
+- inline-аудіоплеєра
+- inline-відеоплеєра
+- chip вкладеного файла
 
-Поточний UI вже вміє рендерити threads і reactions, тож рендеринг вкладень має нашаровуватися на ту саму модель картки повідомлення.
+Поточний UI уже вміє рендерити потоки й реакції, тож рендеринг вкладень має накластися на ту саму модель картки повідомлення.
 
-### Які сценарії відкриває media transport
+### Які сценарії відкриє медіатранспорт
 
-Коли вкладення потечуть через QA bus, ми зможемо додати багатші fake-chat-сценарії:
+Щойно вкладення почнуть проходити через QA bus, можна буде додати багатші fake-chat сценарії:
 
-- inline image reply у fake Slack
-- розуміння audio attachment
-- розуміння video attachment
+- inline-відповідь із зображенням у fake Slack
+- розуміння аудіовкладення
+- розуміння відеовкладення
 - змішаний порядок вкладень
-- thread reply зі збереженням media
+- відповідь у потоці зі збереженням медіа
 
 ## Рекомендація
 
-Наступний шматок реалізації має бути таким:
+Наступний етап реалізації має бути таким:
 
-1. додати markdown scenario loader + zod schema
+1. додати markdown-loader сценаріїв + zod-schema
 2. згенерувати поточний каталог із markdown
-3. спочатку мігрувати кілька простих сценаріїв
+3. спершу мігрувати кілька простих сценаріїв
 4. додати універсальну підтримку вкладень у QA bus
-5. відрендерити inline image у QA UI
-6. а потім розширити це на audio і video
+5. реалізувати рендеринг inline-зображення в UI QA
+6. потім розширити на аудіо та відео
 
 Це найменший шлях, який доводить обидві цілі:
 
 - універсальний QA, визначений через markdown
-- багатші fake messaging surfaces
+- багатші fake-поверхні обміну повідомленнями
 
 ## Відкриті питання
 
-- чи мають файли сценаріїв дозволяти вбудовані markdown-шаблони prompt-ів із інтерполяцією змінних
-- чи мають setup/cleanup бути іменованими секціями чи просто впорядкованими списками дій
-- чи мають посилання на artifacts бути строго типізованими в схемі чи базуватися на рядках
-- чи мають custom handler-и жити в одному registry чи в registry для кожної поверхні окремо
+- чи мають файли сценаріїв дозволяти вбудовані markdown-шаблони prompt-ів з інтерполяцією змінних
+- чи мають setup/cleanup бути іменованими секціями, чи просто впорядкованими списками дій
+- чи мають посилання на артефакти бути строго типізованими в schema, чи базуватися на рядках
+- чи мають користувацькі handler-и жити в одному реєстрі чи в реєстрах за поверхнями
 - чи має згенерований JSON-файл сумісності залишатися закоміченим під час міграції

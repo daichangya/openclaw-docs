@@ -1,33 +1,33 @@
 ---
 read_when:
-    - Ви хочете моделі Xiaomi MiMo в OpenClaw
-    - Вам потрібно налаштувати XIAOMI_API_KEY
-summary: Використовувати моделі Xiaomi MiMo з OpenClaw
+    - Ви хочете використовувати моделі Xiaomi MiMo в OpenClaw
+    - Вам потрібно налаштувати `XIAOMI_API_KEY`
+summary: Використання моделей Xiaomi MiMo з OpenClaw
 title: Xiaomi MiMo
 x-i18n:
-    generated_at: "2026-04-23T21:08:58Z"
+    generated_at: "2026-04-23T23:06:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4d0c7b8f62536a60de4b5ef24c065c1cb96aa2f81501bd7579f94f3a86f465fe
+    source_hash: ae61547fa5864f0cd3e19465a8a7d6ff843f9534ab9c2dd39a86a3593cafaa8d
     source_path: providers/xiaomi.md
     workflow: 15
 ---
 
-Xiaomi MiMo — це API-платформа для моделей **MiMo**. OpenClaw використовує сумісний з OpenAI ендпоінт Xiaomi
-з автентифікацією через API-ключ.
+Xiaomi MiMo — це API-платформа для моделей **MiMo**. OpenClaw використовує endpoint Xiaomi,
+сумісний з OpenAI, з автентифікацією через API key.
 
 | Властивість | Значення                        |
 | ----------- | ------------------------------- |
-| Provider    | `xiaomi`                        |
+| Провайдер   | `xiaomi`                        |
 | Auth        | `XIAOMI_API_KEY`                |
-| API         | OpenAI-compatible               |
+| API         | Сумісний з OpenAI               |
 | Base URL    | `https://api.xiaomimimo.com/v1` |
 
 ## Початок роботи
 
 <Steps>
-  <Step title="Отримайте API-ключ">
-    Створіть API-ключ у [консолі Xiaomi MiMo](https://platform.xiaomimimo.com/#/console/api-keys).
+  <Step title="Отримайте API key">
+    Створіть API key у [консолі Xiaomi MiMo](https://platform.xiaomimimo.com/#/console/api-keys).
   </Step>
   <Step title="Запустіть onboarding">
     ```bash
@@ -48,16 +48,16 @@ Xiaomi MiMo — це API-платформа для моделей **MiMo**. Open
   </Step>
 </Steps>
 
-## Доступні моделі
+## Вбудований catalog
 
-| Посилання на модель     | Вхід        | Контекст  | Макс. вивід | Reasoning | Примітки        |
-| ----------------------- | ----------- | --------- | ----------- | --------- | ---------------- |
-| `xiaomi/mimo-v2-flash`  | text        | 262,144   | 8,192       | Ні        | Типова модель    |
-| `xiaomi/mimo-v2-pro`    | text        | 1,048,576 | 32,000      | Так       | Великий контекст |
-| `xiaomi/mimo-v2-omni`   | text, image | 262,144   | 32,000      | Так       | Мультимодальна   |
+| Посилання на модель    | Вхід        | Контекст  | Макс. вивід | Reasoning | Примітки       |
+| ---------------------- | ----------- | --------- | ----------- | --------- | -------------- |
+| `xiaomi/mimo-v2-flash` | text        | 262,144   | 8,192       | Ні        | Типова модель  |
+| `xiaomi/mimo-v2-pro`   | text        | 1,048,576 | 32,000      | Так       | Великий контекст |
+| `xiaomi/mimo-v2-omni`  | text, image | 262,144   | 32,000      | Так       | Мультимодальна |
 
 <Tip>
-Типове посилання на модель — `xiaomi/mimo-v2-flash`. Provider ін’єктується автоматично, коли задано `XIAOMI_API_KEY` або існує auth profile.
+Типове посилання на модель — `xiaomi/mimo-v2-flash`. Провайдер автоматично додається, коли задано `XIAOMI_API_KEY` або існує auth profile.
 </Tip>
 
 ## Приклад config
@@ -110,26 +110,26 @@ Xiaomi MiMo — це API-платформа для моделей **MiMo**. Open
 
 <AccordionGroup>
   <Accordion title="Поведінка автоін’єкції">
-    Provider `xiaomi` ін’єктується автоматично, коли `XIAOMI_API_KEY` задано у вашому середовищі або існує auth profile. Вам не потрібно вручну налаштовувати provider, якщо тільки ви не хочете перевизначити metadata моделей або base URL.
+    Провайдер `xiaomi` автоматично додається, коли `XIAOMI_API_KEY` задано у вашому середовищі або існує auth profile. Вам не потрібно вручну налаштовувати провайдера, якщо тільки ви не хочете перевизначити метадані моделі або base URL.
   </Accordion>
 
-  <Accordion title="Деталі моделей">
-    - **mimo-v2-flash** — легка й швидка, ідеально підходить для загальних текстових завдань. Без підтримки reasoning.
-    - **mimo-v2-pro** — підтримує reasoning із context window на 1M токенів для навантажень із довгими документами.
+  <Accordion title="Докладніше про моделі">
+    - **mimo-v2-flash** — легка й швидка, ідеальна для загальних текстових завдань. Підтримка reasoning відсутня.
+    - **mimo-v2-pro** — підтримує reasoning з контекстним вікном на 1M токенів для роботи з довгими документами.
     - **mimo-v2-omni** — мультимодальна модель із підтримкою reasoning, яка приймає і текст, і зображення.
 
     <Note>
-    Усі моделі використовують префікс `xiaomi/` (наприклад, `xiaomi/mimo-v2-pro`).
+    Усі моделі використовують префікс `xiaomi/` (наприклад `xiaomi/mimo-v2-pro`).
     </Note>
 
   </Accordion>
 
-  <Accordion title="Усунення несправностей">
-    - Якщо моделі не з’являються, переконайтеся, що `XIAOMI_API_KEY` задано і він валідний.
-    - Якщо Gateway працює як демон, переконайтеся, що ключ доступний для цього процесу (наприклад, у `~/.openclaw/.env` або через `env.shellEnv`).
+  <Accordion title="Усунення проблем">
+    - Якщо моделі не з’являються, переконайтеся, що `XIAOMI_API_KEY` задано й він валідний.
+    - Коли Gateway працює як daemon, переконайтеся, що ключ доступний цьому процесу (наприклад у `~/.openclaw/.env` або через `env.shellEnv`).
 
     <Warning>
-    Ключі, задані лише у вашій інтерактивній оболонці, не видимі для процесів gateway, керованих демоном. Для постійної доступності використовуйте `~/.openclaw/.env` або config `env.shellEnv`.
+    Ключі, задані лише в інтерактивному shell, не видимі процесам gateway, якими керує daemon. Для постійної доступності використовуйте `~/.openclaw/.env` або config `env.shellEnv`.
     </Warning>
 
   </Accordion>
@@ -139,12 +139,12 @@ Xiaomi MiMo — це API-платформа для моделей **MiMo**. Open
 
 <CardGroup cols={2}>
   <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
-    Вибір provider, посилань на моделі та поведінки failover.
+    Вибір провайдерів, посилань на моделі та поведінки failover.
   </Card>
-  <Card title="Довідник із конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
-    Повний довідник із конфігурації OpenClaw.
+  <Card title="Довідник конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
+    Повний довідник конфігурації OpenClaw.
   </Card>
   <Card title="Консоль Xiaomi MiMo" href="https://platform.xiaomimimo.com" icon="arrow-up-right-from-square">
-    Панель керування Xiaomi MiMo та керування API-ключами.
+    Панель Xiaomi MiMo і керування API key.
   </Card>
 </CardGroup>

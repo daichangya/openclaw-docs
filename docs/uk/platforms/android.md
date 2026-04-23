@@ -1,55 +1,53 @@
 ---
 read_when:
-    - Pairing або повторне підключення Android Node
-    - Налагодження виявлення gateway або auth на Android
+    - Сполучення або повторне підключення Node Android
+    - Налагодження виявлення gateway або автентифікації на Android
     - Перевірка паритету історії чату між клієнтами
 summary: 'Android app (Node): runbook підключення + поверхня команд Connect/Chat/Voice/Canvas'
-title: Android app
+title: Застосунок Android
 x-i18n:
-    generated_at: "2026-04-23T21:00:09Z"
+    generated_at: "2026-04-23T23:01:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 5753da56938c05cf8b63d22bd73dd4a1cd729c8a1b0599904b634ebeac841104
+    source_hash: 386aafd0d23a5c1c1a9e67236b222527e7860cd855474d187354567c6c80f50e
     source_path: platforms/android.md
     workflow: 15
 ---
 
-# Android app (Node)
+> **Примітка:** Застосунок Android ще не було публічно випущено. Вихідний код доступний у [репозиторії OpenClaw](https://github.com/openclaw/openclaw) у `apps/android`. Ви можете зібрати його самостійно за допомогою Java 17 і Android SDK (`./gradlew :app:assemblePlayDebug`). Інструкції зі збирання див. у [apps/android/README.md](https://github.com/openclaw/openclaw/blob/main/apps/android/README.md).
 
-> **Примітка:** Android app ще не було публічно випущено. Вихідний код доступний у [репозиторії OpenClaw](https://github.com/openclaw/openclaw) у `apps/android`. Ви можете зібрати його самостійно за допомогою Java 17 і Android SDK (`./gradlew :app:assemblePlayDebug`). Інструкції зі збірки див. у [apps/android/README.md](https://github.com/openclaw/openclaw/blob/main/apps/android/README.md).
+## Знімок підтримки
 
-## Короткий огляд підтримки
-
-- Роль: companion Node app (Android не хостить Gateway).
-- Gateway потрібен: так (запускайте його на macOS, Linux або Windows через WSL2).
-- Установлення: [Getting Started](/uk/start/getting-started) + [Pairing](/uk/channels/pairing).
-- Gateway: [Runbook](/uk/gateway) + [Configuration](/uk/gateway/configuration).
-  - Протоколи: [Gateway protocol](/uk/gateway/protocol) (Node + control plane).
+- Роль: супутній застосунок Node (Android не розміщує Gateway).
+- Gateway потрібен: так (запускається на macOS, Linux або Windows через WSL2).
+- Встановлення: [Початок роботи](/uk/start/getting-started) + [Сполучення](/uk/channels/pairing).
+- Gateway: [Runbook](/uk/gateway) + [Конфігурація](/uk/gateway/configuration).
+  - Протоколи: [Протокол Gateway](/uk/gateway/protocol) (Node + control plane).
 
 ## Керування системою
 
-Керування системою (launchd/systemd) живе на хості Gateway. Див. [Gateway](/uk/gateway).
+Керування системою (launchd/systemd) розміщується на хості Gateway. Див. [Gateway](/uk/gateway).
 
 ## Runbook підключення
 
-Android Node app ⇄ (mDNS/NSD + WebSocket) ⇄ **Gateway**
+Застосунок Node Android ⇄ (mDNS/NSD + WebSocket) ⇄ **Gateway**
 
-Android підключається напряму до WebSocket Gateway і використовує device pairing (`role: node`).
+Android підключається безпосередньо до Gateway WebSocket і використовує сполучення пристроїв (`role: node`).
 
-Для Tailscale або публічних хостів Android вимагає безпечний endpoint:
+Для Tailscale або публічних хостів Android потребує захищеного endpoint-а:
 
-- Бажано: Tailscale Serve / Funnel з `https://<magicdns>` / `wss://<magicdns>`
-- Також підтримується: будь-яка інша URL Gateway `wss://` зі справжнім TLS endpoint
-- Відкритий `ws://` усе ще підтримується для приватних LAN-адрес / `.local` host-ів, а також `localhost`, `127.0.0.1` і bridge Android emulator (`10.0.2.2`)
+- Рекомендовано: Tailscale Serve / Funnel з `https://<magicdns>` / `wss://<magicdns>`
+- Також підтримується: будь-який інший URL Gateway `wss://` зі справжнім TLS-endpoint-ом
+- Незашифрований `ws://` і далі підтримується для приватних LAN-адрес / хостів `.local`, а також `localhost`, `127.0.0.1` і мосту Android emulator (`10.0.2.2`)
 
 ### Передумови
 
-- Ви можете запустити Gateway на “master”-машині.
-- Пристрій/emulator Android може дістатися до WebSocket gateway:
-  - Та сама LAN з mDNS/NSD, **або**
-  - Той самий Tailscale tailnet з Wide-Area Bonjour / unicast DNS-SD (див. нижче), **або**
-  - Ручний host/port gateway (fallback)
-- Pairing Android через tailnet/public **не** використовує сирі `ws://` endpoints на tailnet IP. Натомість використовуйте Tailscale Serve або іншу URL `wss://`.
+- Ви можете запустити Gateway на “головній” машині.
+- Пристрій/emulator Android може досягати Gateway WebSocket:
+  - у тій самій LAN з mDNS/NSD, **або**
+  - у тій самій tailnet Tailscale з Wide-Area Bonjour / unicast DNS-SD (див. нижче), **або**
+  - через ручне задання хоста/порту gateway (резервний варіант)
+- Сполучення Android через tailnet/публічну мережу **не** використовує сирі endpoint-и tailnet IP `ws://`. Замість цього використовуйте Tailscale Serve або інший URL `wss://`.
 - Ви можете запускати CLI (`openclaw`) на машині gateway (або через SSH).
 
 ### 1) Запустіть Gateway
@@ -58,19 +56,19 @@ Android підключається напряму до WebSocket Gateway і ви
 openclaw gateway --port 18789 --verbose
 ```
 
-Підтвердьте в логах, що бачите щось на кшталт:
+Підтвердьте в журналах, що ви бачите щось на кшталт:
 
 - `listening on ws://0.0.0.0:18789`
 
-Для віддаленого доступу Android через Tailscale віддавайте перевагу Serve/Funnel замість сирого bind tailnet:
+Для віддаленого доступу Android через Tailscale надавайте перевагу Serve/Funnel замість сирого bind tailnet:
 
 ```bash
 openclaw gateway --tailscale serve
 ```
 
-Це дає Android безпечний endpoint `wss://` / `https://`. Простого налаштування `gateway.bind: "tailnet"` недостатньо для першого віддаленого pairing Android, якщо ви також окремо не завершуєте TLS.
+Це надає Android захищений endpoint `wss://` / `https://`. Звичайного налаштування `gateway.bind: "tailnet"` недостатньо для першого віддаленого сполучення Android, якщо ви також окремо не завершуєте TLS.
 
-### 2) Перевірте виявлення (необов’язково)
+### 2) Перевірте discovery (необов’язково)
 
 На машині gateway:
 
@@ -78,7 +76,7 @@ openclaw gateway --tailscale serve
 dns-sd -B _openclaw-gw._tcp local.
 ```
 
-Додаткові примітки щодо налагодження: [Bonjour](/uk/gateway/bonjour).
+Додаткові примітки з налагодження: [Bonjour](/uk/gateway/bonjour).
 
 Якщо ви також налаштували wide-area discovery domain, порівняйте з:
 
@@ -86,35 +84,35 @@ dns-sd -B _openclaw-gw._tcp local.
 openclaw gateway discover --json
 ```
 
-Це показує `local.` і налаштований wide-area domain за один прохід та використовує розв’язаний
+Це показує `local.` плюс налаштований wide-area domain за один прохід і використовує визначений
 service endpoint замість підказок лише з TXT.
 
-#### Виявлення через tailnet (Vienna ⇄ London) за допомогою unicast DNS-SD
+#### Discovery через tailnet (Відень ⇄ Лондон) за допомогою unicast DNS-SD
 
-Виявлення Android через NSD/mDNS не проходить між мережами. Якщо ваш Android Node і gateway знаходяться в різних мережах, але з’єднані через Tailscale, використовуйте Wide-Area Bonjour / unicast DNS-SD.
+Discovery Android через NSD/mDNS не проходить між мережами. Якщо ваш Android Node і gateway перебувають у різних мережах, але підключені через Tailscale, використовуйте Wide-Area Bonjour / unicast DNS-SD.
 
-Самого лише виявлення недостатньо для pairing Android через tailnet/public. Виявлений маршрут усе одно потребує безпечний endpoint (`wss://` або Tailscale Serve):
+Самого discovery недостатньо для сполучення Android через tailnet/публічну мережу. Виявлений маршрут усе одно потребує захищеного endpoint-а (`wss://` або Tailscale Serve):
 
-1. Налаштуйте DNS-SD zone (наприклад, `openclaw.internal.`) на хості gateway і опублікуйте записи `_openclaw-gw._tcp`.
-2. Налаштуйте split DNS Tailscale для вибраного домену, вказавши цей DNS server.
+1. Налаштуйте зону DNS-SD (наприклад, `openclaw.internal.`) на хості gateway і опублікуйте записи `_openclaw-gw._tcp`.
+2. Налаштуйте split DNS у Tailscale для вибраного домену з вказівкою на цей DNS-сервер.
 
-Подробиці та приклад конфігурації CoreDNS: [Bonjour](/uk/gateway/bonjour).
+Докладніше та приклад конфігурації CoreDNS: [Bonjour](/uk/gateway/bonjour).
 
 ### 3) Підключіться з Android
 
-В Android app:
+У застосунку Android:
 
-- App підтримує з’єднання з gateway через **foreground service** (постійне сповіщення).
+- Застосунок підтримує з’єднання з gateway активним за допомогою **foreground service** (постійне сповіщення).
 - Відкрийте вкладку **Connect**.
 - Використовуйте режим **Setup Code** або **Manual**.
-- Якщо виявлення заблоковано, використовуйте ручний host/port у **Advanced controls**. Для приватних LAN host-ів `ws://` і далі працює. Для Tailscale/public host-ів увімкніть TLS і використовуйте endpoint `wss://` / Tailscale Serve.
+- Якщо discovery заблоковано, використовуйте ручне задання хоста/порту в **Advanced controls**. Для приватних LAN-хостів `ws://` і далі працює. Для Tailscale/публічних хостів увімкніть TLS і використовуйте endpoint `wss://` / Tailscale Serve.
 
-Після першого успішного pairing Android автоматично перепідключається під час запуску:
+Після першого успішного сполучення Android автоматично перепідключається під час запуску:
 
-- до Manual endpoint (якщо ввімкнено), інакше
+- до manual endpoint-а (якщо ввімкнено), інакше
 - до останнього виявленого gateway (best-effort).
 
-### 4) Схваліть pairing (CLI)
+### 4) Підтвердьте сполучення (CLI)
 
 На машині gateway:
 
@@ -124,11 +122,11 @@ openclaw devices approve <requestId>
 openclaw devices reject <requestId>
 ```
 
-Подробиці pairing: [Pairing](/uk/channels/pairing).
+Подробиці сполучення: [Сполучення](/uk/channels/pairing).
 
-### 5) Переконайтеся, що Node підключено
+### 5) Перевірте, що Node підключено
 
-- Через статус Node:
+- Через стан Node:
 
   ```bash
   openclaw nodes status
@@ -140,60 +138,60 @@ openclaw devices reject <requestId>
   openclaw gateway call node.list --params "{}"
   ```
 
-### 6) Чат + історія
+### 6) Chat + history
 
-Вкладка Chat в Android підтримує вибір сесії (типово `main`, плюс інші наявні сесії):
+Вкладка Chat на Android підтримує вибір сесії (типово `main`, а також інші наявні сесії):
 
-- Історія: `chat.history` (нормалізована для відображення; inline directive tags
-  видаляються з видимого тексту, XML payload-і tool call у plain text (включно з
+- History: `chat.history` (нормалізована для відображення; inline directive tags
+  прибираються з видимого тексту, XML payload-и викликів інструментів у plain-text (включно з
   `<tool_call>...</tool_call>`, `<function_call>...</function_call>`,
-  `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` та
-  обрізаними блоками tool-call) і витіклі ASCII/full-width control tokens моделі
-  видаляються, чисті assistant rows лише з silent-token, як-от точний `NO_REPLY` /
-  `no_reply`, пропускаються, а надто великі rows можуть замінюватися placeholders)
+  `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` і
+  обрізаними блоками викликів інструментів) і витіклі ASCII/full-width токени керування моделлю
+  прибираються, рядки помічника, що містять лише silent-token, як-от точний `NO_REPLY` /
+  `no_reply`, пропускаються, а надто великі рядки можуть бути замінені placeholder-ами)
 - Надсилання: `chat.send`
 - Push-оновлення (best-effort): `chat.subscribe` → `event:"chat"`
 
 ### 7) Canvas + camera
 
-#### Gateway Canvas Host (рекомендовано для web content)
+#### Хост Canvas Gateway (рекомендовано для вебвмісту)
 
-Якщо ви хочете, щоб Node показував справжні HTML/CSS/JS, які агент може редагувати на диску, націльте Node на Gateway canvas host.
+Якщо ви хочете, щоб Node показував справжній HTML/CSS/JS, який агент може редагувати на диску, вкажіть для Node хост canvas Gateway.
 
 Примітка: Node завантажують canvas з HTTP-сервера Gateway (той самий порт, що й `gateway.port`, типово `18789`).
 
 1. Створіть `~/.openclaw/workspace/canvas/index.html` на хості gateway.
 
-2. Перейдіть до нього на Node (LAN):
+2. Перейдіть Node на нього (LAN):
 
 ```bash
 openclaw nodes invoke --node "<Android Node>" --command canvas.navigate --params '{"url":"http://<gateway-hostname>.local:18789/__openclaw__/canvas/"}'
 ```
 
-Tailnet (необов’язково): якщо обидва пристрої в Tailscale, використовуйте ім’я MagicDNS або IP tailnet замість `.local`, наприклад `http://<gateway-magicdns>:18789/__openclaw__/canvas/`.
+Tailnet (необов’язково): якщо обидва пристрої в Tailscale, використовуйте ім’я MagicDNS або tailnet IP замість `.local`, наприклад `http://<gateway-magicdns>:18789/__openclaw__/canvas/`.
 
-Цей сервер додає клієнт live-reload в HTML і перезавантажує його після змін у файлах.
-A2UI host доступний за адресою `http://<gateway-host>:18789/__openclaw__/a2ui/`.
+Цей сервер інжектує клієнт live-reload у HTML і перезавантажує сторінку при зміні файлів.
+Хост A2UI розміщено за адресою `http://<gateway-host>:18789/__openclaw__/a2ui/`.
 
-Команди Canvas (лише на передньому плані):
+Команди Canvas (лише в foreground):
 
 - `canvas.eval`, `canvas.snapshot`, `canvas.navigate` (використовуйте `{"url":""}` або `{"url":"/"}`, щоб повернутися до типового scaffold). `canvas.snapshot` повертає `{ format, base64 }` (типово `format="jpeg"`).
-- A2UI: `canvas.a2ui.push`, `canvas.a2ui.reset` (`canvas.a2ui.pushJSONL` — застарілий псевдонім)
+- A2UI: `canvas.a2ui.push`, `canvas.a2ui.reset` (`canvas.a2ui.pushJSONL` — legacy-псевдонім)
 
-Команди камери (лише на передньому плані; захищені дозволами):
+Команди camera (лише в foreground; залежать від дозволів):
 
 - `camera.snap` (jpg)
 - `camera.clip` (mp4)
 
-Параметри та helper-и CLI див. у [Camera node](/uk/nodes/camera).
+Параметри та helper-команди CLI див. у [Camera node](/uk/nodes/camera).
 
 ### 8) Voice + розширена поверхня команд Android
 
-- Voice: Android використовує єдиний потік увімкнення/вимкнення мікрофона у вкладці Voice із захопленням transcript і відтворенням `talk.speak`. Локальний system TTS використовується лише тоді, коли `talk.speak` недоступний. Voice зупиняється, коли app покидає передній план.
-- Перемикачі wake/talk-mode для voice наразі прибрано з UX/runtime Android.
-- Додаткові сімейства команд Android (доступність залежить від пристрою + дозволів):
+- Voice: Android використовує єдиний потік увімкнення/вимкнення мікрофона у вкладці Voice із захопленням транскрипту та відтворенням `talk.speak`. Локальний системний TTS використовується лише тоді, коли `talk.speak` недоступний. Voice зупиняється, коли застосунок виходить із foreground.
+- Перемикачі voice wake/talk-mode наразі прибрано з UX/runtime Android.
+- Додаткові сімейства команд Android (доступність залежить від пристрою та дозволів):
   - `device.status`, `device.info`, `device.permissions`, `device.health`
-  - `notifications.list`, `notifications.actions` (див. [Notification forwarding](#notification-forwarding) нижче)
+  - `notifications.list`, `notifications.actions` (див. [Переадресація сповіщень](#notification-forwarding) нижче)
   - `photos.latest`
   - `contacts.search`, `contacts.add`
   - `calendar.events`, `calendar.add`
@@ -201,34 +199,34 @@ A2UI host доступний за адресою `http://<gateway-host>:18789/__
   - `sms.search`
   - `motion.activity`, `motion.pedometer`
 
-## Entrypoint-и assistant
+## Точки входу помічника
 
-Android підтримує запуск OpenClaw через системний тригер assistant (Google
-Assistant). Якщо все налаштовано, утримання кнопки home або фраза "Hey Google, ask
-OpenClaw..." відкриває app і передає prompt у composer чату.
+Android підтримує запуск OpenClaw із системного тригера помічника (Google
+Assistant). Якщо це налаштовано, утримання кнопки home або фраза "Hey Google, ask
+OpenClaw..." відкриває застосунок і передає prompt у composer чату.
 
-Це використовує метадані Android **App Actions**, оголошені в маніфесті app. Додаткове
-налаштування на боці gateway не потрібне — intent assistant повністю
-обробляється Android app і пересилається як звичайне повідомлення чату.
+Для цього використовується метадані Android **App Actions**, оголошені в маніфесті застосунку. Жодної
+додаткової конфігурації на боці gateway не потрібно — intent помічника
+повністю обробляється застосунком Android і передається як звичайне повідомлення чату.
 
 <Note>
 Доступність App Actions залежить від пристрою, версії Google Play Services
-і того, чи вибрав користувач OpenClaw як типову assistant app.
+і від того, чи вибрав користувач OpenClaw як типовий застосунок помічника.
 </Note>
 
-## Пересилання сповіщень
+## Переадресація сповіщень
 
-Android може пересилати сповіщення пристрою в gateway як події. Кілька елементів керування дозволяють обмежити, які саме сповіщення пересилаються і коли.
+Android може пересилати сповіщення пристрою до gateway як події. Кілька елементів керування дають змогу обмежувати, які сповіщення пересилаються і коли.
 
 | Ключ                             | Тип            | Опис                                                                                                  |
 | -------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------- |
-| `notifications.allowPackages`    | string[]       | Пересилати сповіщення лише від цих package name. Якщо задано, усі інші packages ігноруються.         |
-| `notifications.denyPackages`     | string[]       | Ніколи не пересилати сповіщення від цих package name. Застосовується після `allowPackages`.          |
-| `notifications.quietHours.start` | string (HH:mm) | Початок вікна quiet hours (локальний час пристрою). У цей період сповіщення придушуються.            |
-| `notifications.quietHours.end`   | string (HH:mm) | Кінець вікна quiet hours.                                                                             |
-| `notifications.rateLimit`        | number         | Максимум пересланих сповіщень від одного package за хвилину. Надлишкові сповіщення відкидаються.     |
+| `notifications.allowPackages`    | string[]       | Пересилати лише сповіщення з цих назв пакетів. Якщо задано, усі інші пакети ігноруються.             |
+| `notifications.denyPackages`     | string[]       | Ніколи не пересилати сповіщення з цих назв пакетів. Застосовується після `allowPackages`.            |
+| `notifications.quietHours.start` | string (HH:mm) | Початок вікна тихих годин (локальний час пристрою). Під час цього вікна сповіщення пригнічуються.    |
+| `notifications.quietHours.end`   | string (HH:mm) | Кінець вікна тихих годин.                                                                              |
+| `notifications.rateLimit`        | number         | Максимальна кількість пересланих сповіщень на пакет за хвилину. Надлишкові сповіщення відкидаються. |
 
-Picker сповіщень також використовує безпечнішу поведінку для подій пересланих сповіщень, запобігаючи випадковому пересиланню чутливих системних сповіщень.
+Вибірник сповіщень також використовує безпечнішу поведінку для подій пересланих сповіщень, запобігаючи випадковому пересиланню чутливих системних сповіщень.
 
 Приклад конфігурації:
 
@@ -247,5 +245,5 @@ Picker сповіщень також використовує безпечніш
 ```
 
 <Note>
-Пересилання сповіщень вимагає дозволу Android Notification Listener. App запитує його під час налаштування.
+Для переадресації сповіщень потрібен дозвіл Android Notification Listener. Під час налаштування застосунок запропонує його надати.
 </Note>

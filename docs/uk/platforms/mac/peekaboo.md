@@ -1,50 +1,48 @@
 ---
 read_when:
-    - Хостинг PeekabooBridge в OpenClaw.app
+    - Розміщення PeekabooBridge в OpenClaw.app
     - Інтеграція Peekaboo через Swift Package Manager
     - Зміна протоколу/шляхів PeekabooBridge
 summary: Інтеграція PeekabooBridge для автоматизації UI на macOS
-title: Peekaboo bridge
+title: Міст Peekaboo
 x-i18n:
-    generated_at: "2026-04-23T21:01:16Z"
+    generated_at: "2026-04-23T23:01:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ebd4efbf2a1c45e59795fca8b746b859a8bfd7370ec24aa94da84a94e1f6544c
+    source_hash: 638f7a0e8d85d0cfcade259a934108e9ec7a1ccc894c9db0d1bd3cf1de99441d
     source_path: platforms/mac/peekaboo.md
     workflow: 15
 ---
 
-# Peekaboo Bridge (автоматизація UI на macOS)
-
-OpenClaw може хостити **PeekabooBridge** як локальний брокер автоматизації UI, що враховує дозволи.
-Це дозволяє CLI `peekaboo` керувати автоматизацією UI, повторно використовуючи
-дозволи TCC macOS app.
+OpenClaw може розміщувати **PeekabooBridge** як локальний брокер автоматизації UI з урахуванням дозволів.
+Це дає змогу CLI `peekaboo` керувати автоматизацією UI, повторно використовуючи
+дозволи TCC застосунку macOS.
 
 ## Що це таке (і чим не є)
 
-- **Host**: OpenClaw.app може виступати як host PeekabooBridge.
-- **Client**: використовуйте CLI `peekaboo` (окремої поверхні `openclaw ui ...` немає).
-- **UI**: візуальні overlay лишаються в Peekaboo.app; OpenClaw — це тонкий broker host.
+- **Хост**: OpenClaw.app може діяти як хост PeekabooBridge.
+- **Клієнт**: використовуйте CLI `peekaboo` (окремої поверхні `openclaw ui ...` немає).
+- **UI**: візуальні накладки залишаються в Peekaboo.app; OpenClaw — це тонкий хост-брокер.
 
-## Увімкнення bridge
+## Увімкнення моста
 
-У macOS app:
+У застосунку macOS:
 
 - Settings → **Enable Peekaboo Bridge**
 
-Коли bridge увімкнено, OpenClaw запускає локальний UNIX socket server. Якщо його вимкнено, host
-зупиняється, і `peekaboo` повертається до інших доступних host-ів.
+Коли ввімкнено, OpenClaw запускає локальний сервер UNIX socket. Якщо вимкнено, хост
+зупиняється, а `peekaboo` повертається до інших доступних хостів.
 
-## Порядок виявлення client-ом
+## Порядок виявлення клієнтом
 
-Клієнти Peekaboo зазвичай пробують host-и в такому порядку:
+Клієнти Peekaboo зазвичай намагаються знайти хости в такому порядку:
 
 1. Peekaboo.app (повний UX)
 2. Claude.app (якщо встановлено)
-3. OpenClaw.app (тонкий broker)
+3. OpenClaw.app (тонкий брокер)
 
-Використовуйте `peekaboo bridge status --verbose`, щоб побачити, який host активний і який
-шлях socket використовується. Ви можете перевизначити це так:
+Використовуйте `peekaboo bridge status --verbose`, щоб побачити, який хост активний і який
+шлях socket використовується. Ви можете перевизначити його так:
 
 ```bash
 export PEEKABOO_BRIDGE_SOCKET=/path/to/bridge.sock
@@ -52,21 +50,21 @@ export PEEKABOO_BRIDGE_SOCKET=/path/to/bridge.sock
 
 ## Безпека й дозволи
 
-- Bridge перевіряє **підписи коду викликача**; застосовується allowlist TeamID
-  (TeamID host-а Peekaboo + TeamID app OpenClaw).
-- Запити мають timeout приблизно через 10 секунд.
-- Якщо бракує потрібних дозволів, bridge повертає зрозуміле повідомлення про помилку
-  замість запуску System Settings.
+- Міст перевіряє **підписи коду викликача**; застосовується allowlist TeamID
+  (TeamID хоста Peekaboo + TeamID застосунку OpenClaw).
+- Час очікування запитів спливає приблизно через 10 секунд.
+- Якщо потрібні дозволи відсутні, міст повертає чітке повідомлення про помилку,
+  а не запускає System Settings.
 
 ## Поведінка snapshot (автоматизація)
 
-Snapshots зберігаються в пам’яті й автоматично спливають через короткий час.
-Якщо вам потрібне довше зберігання, повторно захопіть їх із client-а.
+Snapshot зберігаються в пам’яті й автоматично зникають після короткого проміжку часу.
+Якщо вам потрібне довше зберігання, повторно захопіть їх із клієнта.
 
-## Усунення несправностей
+## Усунення проблем
 
-- Якщо `peekaboo` повідомляє “bridge client is not authorized”, переконайтеся, що client
-  підписано належним чином, або запускайте host із `PEEKABOO_ALLOW_UNSIGNED_SOCKET_CLIENTS=1`
-  **лише** в режимі debug.
-- Якщо host-и не знаходяться, відкрийте один із host app-ів (Peekaboo.app або OpenClaw.app)
-  і переконайтеся, що надано дозволи.
+- Якщо `peekaboo` повідомляє “bridge client is not authorized”, переконайтеся, що клієнт
+  належним чином підписаний, або запускайте хост із `PEEKABOO_ALLOW_UNSIGNED_SOCKET_CLIENTS=1`
+  лише в режимі **debug**.
+- Якщо хости не знайдено, відкрийте один із застосунків-хостів (Peekaboo.app або OpenClaw.app)
+  і переконайтеся, що дозволи надано.

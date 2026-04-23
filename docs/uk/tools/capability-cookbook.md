@@ -1,81 +1,84 @@
 ---
 read_when:
-    - Додавання нової core-можливості та поверхні реєстрації Plugin иҭanalysis to=functions.read ៏ញ្ញា ҭарнакjson  content={"path":"docs/plugins/adding-capabilities.md","offset":1,"limit":400}
-    - Вирішення, чи має код належати core, vendor Plugin чи feature Plugin
-    - Підключення нового runtime helper-а для каналів або tools
+    - Додавання нової основної можливості та поверхні реєстрації Plugin
+    - Визначення, чи має код належати ядру, vendor Plugin чи feature Plugin
+    - Підключення нового допоміжного засобу runtime для каналів або інструментів
 sidebarTitle: Adding Capabilities
-summary: Посібник для контриб’юторів щодо додавання нової спільної можливості до системи Plugin OpenClaw
+summary: Посібник для контриб’юторів із додавання нової спільної можливості до системи Plugin OpenClaw
 title: Додавання можливостей (посібник для контриб’юторів)
 x-i18n:
-    generated_at: "2026-04-23T21:13:55Z"
+    generated_at: "2026-04-23T23:07:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b5939c129d25ffe58bca97e77da99f12344c3ec3c1657bac3c9b756f89acb1de
+    source_hash: f1e3251b9150c9744d967e91f531dfce01435b13aea3a17088ccd54f2145d14f
     source_path: tools/capability-cookbook.md
     workflow: 15
 ---
 
 <Info>
-  Це **посібник для контриб’юторів** для core-розробників OpenClaw. Якщо ви
-  створюєте зовнішній Plugin, див. натомість [Building Plugins](/uk/plugins/building-plugins).
+  Це **посібник для контриб’юторів** для розробників ядра OpenClaw. Якщо ви
+  створюєте зовнішній Plugin, див. [Створення Plugins](/uk/plugins/building-plugins)
+  натомість.
 </Info>
 
-Використовуйте це, коли OpenClaw потрібна нова доменна область, наприклад генерування зображень, генерування відео або якась майбутня функціональна область, керована vendor-ом.
+Використовуйте це, коли OpenClaw потребує нового домену, такого як image generation, video
+generation або якоїсь майбутньої функціональної області з підтримкою vendor.
 
 Правило:
 
 - plugin = межа володіння
-- capability = спільний контракт core
+- capability = спільний контракт ядра
 
-Це означає, що не слід починати з прямого підключення vendor-а до каналу чи
-tool. Починайте з визначення capability.
+Це означає, що не слід починати з прямого підключення vendor до каналу або
+інструмента. Починайте з визначення capability.
 
 ## Коли створювати capability
 
 Створюйте нову capability, коли всі ці умови істинні:
 
 1. її потенційно може реалізувати більше ніж один vendor
-2. channels, tools або feature plugins повинні споживати її, не зважаючи на
-   vendor-а
-3. core має володіти fallback, policy, config або поведінкою доставки
+2. канали, інструменти або feature Plugin мають споживати її, не зважаючи на
+   vendor
+3. ядро має володіти поведінкою fallback, policy, config або delivery
 
-Якщо робота стосується лише vendor-а і спільного контракту ще не існує, зупиніться й спочатку визначте контракт.
+Якщо робота стосується лише vendor і спільного контракту ще не існує, зупиніться й спочатку визначте
+контракт.
 
 ## Стандартна послідовність
 
-1. Визначте типізований контракт core.
+1. Визначте типізований контракт ядра.
 2. Додайте реєстрацію Plugin для цього контракту.
-3. Додайте спільний runtime helper.
-4. Підключіть один реальний Plugin vendor-а як доказ.
-5. Переведіть споживачів feature/channel на runtime helper.
-6. Додайте contract tests.
-7. Задокументуйте операторську конфігурацію та модель володіння.
+3. Додайте спільний допоміжний засіб runtime.
+4. Підключіть один реальний vendor Plugin як доказ.
+5. Переведіть feature/channel-споживачів на допоміжний засіб runtime.
+6. Додайте contract-тести.
+7. Задокументуйте операторський config і модель володіння.
 
 ## Що куди належить
 
-Core:
+Ядро:
 
 - типи request/response
-- реєстр provider-ів + resolution
+- registry провайдерів + resolution
 - поведінка fallback
-- схема конфігурації плюс поширені метадані docs `title` / `description` на вкладені object, wildcard, array-item і composition nodes
-- поверхня runtime helper-а
+- schema config плюс поширені метадані docs `title` / `description` у вузлах вкладених об’єктів, wildcard, елементів масивів і composition
+- поверхня допоміжного засобу runtime
 
 Vendor Plugin:
 
-- виклики API vendor-а
-- обробка auth vendor-а
-- нормалізація запитів, специфічна для vendor-а
+- виклики API vendor
+- обробка auth vendor
+- vendor-специфічна нормалізація request
 - реєстрація реалізації capability
 
 Feature/channel Plugin:
 
-- викликає `api.runtime.*` або відповідний helper `plugin-sdk/*-runtime`
-- ніколи не викликає реалізацію vendor-а напряму
+- викликає `api.runtime.*` або відповідний допоміжний засіб `plugin-sdk/*-runtime`
+- ніколи не викликає реалізацію vendor напряму
 
 ## Контрольний список файлів
 
-Для нової capability очікуйте зміни в цих областях:
+Для нової capability очікуйте, що доведеться змінити такі області:
 
 - `src/<capability>/types.ts`
 - `src/<capability>/...registry/runtime.ts`
@@ -87,35 +90,41 @@ Feature/channel Plugin:
 - `src/plugins/runtime/index.ts`
 - `src/plugin-sdk/<capability>.ts`
 - `src/plugin-sdk/<capability>-runtime.ts`
-- один або кілька пакетів вбудованих plugins
+- один або кілька пакетів вбудованих Plugin
 - config/docs/tests
 
-## Приклад: генерування зображень
+## Приклад: image generation
 
-Генерування зображень відповідає стандартній схемі:
+Image generation дотримується стандартної форми:
 
-1. core визначає `ImageGenerationProvider`
-2. core відкриває `registerImageGenerationProvider(...)`
-3. core відкриває `runtime.imageGeneration.generate(...)`
-4. plugins `openai`, `google`, `fal` і `minimax` реєструють реалізації, керовані vendor-ами
-5. майбутні vendors можуть реєструвати той самий контракт без змін у channels/tools
+1. ядро визначає `ImageGenerationProvider`
+2. ядро відкриває `registerImageGenerationProvider(...)`
+3. ядро відкриває `runtime.imageGeneration.generate(...)`
+4. Plugin `openai`, `google`, `fal` і `minimax` реєструють реалізації з підтримкою vendor
+5. майбутні vendor можуть реєструвати той самий контракт без зміни каналів/інструментів
 
-Ключ конфігурації відокремлений від маршрутизації аналізу vision:
+Ключ config відокремлений від маршрутизації vision-analysis:
 
-- `agents.defaults.imageModel` = аналізувати зображення
-- `agents.defaults.imageGenerationModel` = генерувати зображення
+- `agents.defaults.imageModel` = аналіз зображень
+- `agents.defaults.imageGenerationModel` = генерація зображень
 
 Тримайте їх окремо, щоб fallback і policy залишалися явними.
 
-## Контрольний список перед рев’ю
+## Контрольний список перевірки
 
 Перед випуском нової capability перевірте:
 
-- жоден channel/tool не імпортує код vendor-а напряму
-- runtime helper є спільним шляхом
-- принаймні один contract test перевіряє вбудоване володіння
-- docs конфігурації називають новий ключ model/config
+- жоден канал/інструмент не імпортує код vendor напряму
+- допоміжний засіб runtime є спільним шляхом
+- принаймні один contract-тест перевіряє вбудоване володіння
+- docs config називають новий ключ model/config
 - docs Plugin пояснюють межу володіння
 
-Якщо PR пропускає шар capability і зашиває поведінку vendor-а прямо в
-channel/tool, заверніть його назад і спочатку визначте контракт.
+Якщо PR пропускає шар capability і жорстко вбудовує поведінку vendor у
+канал/інструмент, повертайте його назад і спочатку визначайте контракт.
+
+## Пов’язане
+
+- [Plugin](/uk/tools/plugin)
+- [Створення Skills](/uk/tools/creating-skills)
+- [Інструменти та Plugins](/uk/tools)

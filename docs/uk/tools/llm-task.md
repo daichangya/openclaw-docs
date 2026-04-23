@@ -1,27 +1,27 @@
 ---
 read_when:
-    - Ви хочете мати JSON-only LLM-крок усередині workflow
-    - Вам потрібен schema-validated вивід LLM для автоматизації
-summary: JSON-only LLM tasks для workflow (необов’язковий Plugin tool)
-title: LLM task
+    - Ви хочете JSON-only крок LLM всередині workflows
+    - Вам потрібен вивід LLM, валідований схемою, для автоматизації
+summary: Завдання LLM лише з JSON для workflows (необов’язковий інструмент plugin)
+title: Завдання LLM
 x-i18n:
-    generated_at: "2026-04-23T21:15:38Z"
+    generated_at: "2026-04-23T23:07:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 03844e1e0cd18a1537320cd1401fa50704327f0ab3ffaf5e60c069235d7069d7
+    source_hash: 613aefd1bac5b9675821a118c11130c8bfaefb1673d0266f14ff4e91b47fed8b
     source_path: tools/llm-task.md
     workflow: 15
 ---
 
-`llm-task` — це **необов’язковий Plugin tool**, який запускає JSON-only LLM-задачу і
-повертає структурований вивід (за бажанням перевірений на відповідність JSON Schema).
+`llm-task` — це **необов’язковий інструмент plugin**, який запускає JSON-only завдання LLM і
+повертає структурований вивід (за бажанням валідований за JSON Schema).
 
-Це ідеально підходить для workflow engine, таких як Lobster: ви можете додати один LLM-крок
-без написання custom-коду OpenClaw для кожного workflow.
+Це ідеально підходить для рушіїв workflow, таких як Lobster: ви можете додати один крок LLM
+без написання користувацького коду OpenClaw для кожного workflow.
 
-## Увімкнення Plugin
+## Увімкнення plugin
 
-1. Увімкніть Plugin:
+1. Увімкніть plugin:
 
 ```json
 {
@@ -33,7 +33,7 @@ x-i18n:
 }
 ```
 
-2. Додайте tool до allowlist (він реєструється з `optional: true`):
+2. Додайте інструмент до allowlist (він реєструється з `optional: true`):
 
 ```json
 {
@@ -60,7 +60,7 @@ x-i18n:
           "defaultProvider": "openai-codex",
           "defaultModel": "gpt-5.5",
           "defaultAuthProfileId": "main",
-          "allowedModels": ["openai/gpt-5.5"],
+          "allowedModels": ["openai/gpt-5.4"],
           "maxTokens": 800,
           "timeoutMs": 30000
         }
@@ -71,7 +71,7 @@ x-i18n:
 ```
 
 `allowedModels` — це allowlist рядків формату `provider/model`. Якщо його задано, будь-який запит
-поза цим списком буде відхилено.
+поза списком відхиляється.
 
 ## Параметри інструмента
 
@@ -86,11 +86,11 @@ x-i18n:
 - `maxTokens` (number, необов’язково)
 - `timeoutMs` (number, необов’язково)
 
-`thinking` приймає стандартні reasoning-presets OpenClaw, такі як `low` або `medium`.
+`thinking` приймає стандартні пресети міркування OpenClaw, наприклад `low` або `medium`.
 
 ## Вивід
 
-Повертає `details.json`, що містить розпарсений JSON (і виконує валідацію відносно
+Повертає `details.json`, що містить розібраний JSON (і виконує валідацію за
 `schema`, якщо її надано).
 
 ## Приклад: крок workflow Lobster
@@ -119,6 +119,12 @@ openclaw.invoke --tool llm-task --action json --args-json '{
 
 - Інструмент є **JSON-only** і наказує моделі виводити лише JSON (без
   code fence, без коментарів).
-- Для цього запуску моделі не відкриваються інструменти.
-- Ставтеся до виводу як до недовіреного, якщо не виконуєте валідацію через `schema`.
-- Розміщуйте approvals перед будь-яким кроком із побічними ефектами (send, post, exec).
+- Для моделі під час цього запуску не відкриваються жодні інструменти.
+- Вважайте вивід недовіреним, якщо ви не виконуєте валідацію через `schema`.
+- Додавайте погодження перед будь-яким кроком із побічними ефектами (send, post, exec).
+
+## Пов’язано
+
+- [Рівні Thinking](/uk/tools/thinking)
+- [Sub-agents](/uk/tools/subagents)
+- [Slash-команди](/uk/tools/slash-commands)

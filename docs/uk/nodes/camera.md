@@ -1,55 +1,53 @@
 ---
 read_when:
-    - Додавання або зміна захоплення з камери на iOS/Android Node або macOS
+    - Додавання або зміна захоплення з камери на вузлах iOS/Android або в macOS
     - Розширення робочих процесів тимчасових файлів MEDIA, доступних агенту
-summary: 'Захоплення з камери (iOS/Android Node + застосунок macOS) для використання агентом: фото (jpg) і короткі відеокліпи (mp4)'
+summary: 'Захоплення з камери (вузли iOS/Android + застосунок macOS) для використання агентом: фотографії (jpg) і короткі відеокліпи (mp4)'
 title: Захоплення з камери
 x-i18n:
-    generated_at: "2026-04-23T20:58:36Z"
+    generated_at: "2026-04-23T23:00:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 089d2628381c7ca8c65bc9ef19b036b5e32cb3202dfd57cb158e4cacb3b069c6
+    source_hash: 33e23a382cdcea57e20ab1466bf32e54dd17e3b7918841dbd6d3ebf59547ad93
     source_path: nodes/camera.md
     workflow: 15
 ---
 
-# Захоплення з камери (агент)
-
 OpenClaw підтримує **захоплення з камери** для робочих процесів агента:
 
-- **iOS Node** (спарений через Gateway): захоплення **фото** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
-- **Android Node** (спарений через Gateway): захоплення **фото** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
-- **Застосунок macOS** (Node через Gateway): захоплення **фото** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
+- **Вузол iOS** (сполучений через Gateway): захоплення **фотографії** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
+- **Вузол Android** (сполучений через Gateway): захоплення **фотографії** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
+- **Застосунок macOS** (вузол через Gateway): захоплення **фотографії** (`jpg`) або **короткого відеокліпу** (`mp4`, з необов’язковим аудіо) через `node.invoke`.
 
-Увесь доступ до камери захищений **налаштуваннями, якими керує користувач**.
+Увесь доступ до камери захищений **налаштуваннями під контролем користувача**.
 
-## iOS Node
+## Вузол iOS
 
 ### Налаштування користувача (типово ввімкнено)
 
-- Вкладка налаштувань iOS → **Camera** → **Allow Camera** (`camera.enabled`)
+- Вкладка налаштувань iOS → **Камера** → **Дозволити камеру** (`camera.enabled`)
   - Типово: **увімкнено** (відсутній ключ вважається ввімкненим).
   - Якщо вимкнено: команди `camera.*` повертають `CAMERA_DISABLED`.
 
 ### Команди (через Gateway `node.invoke`)
 
 - `camera.list`
-  - Response payload:
-    - `devices`: масив `{ id, name, position, deviceType }`
+  - Корисне навантаження відповіді:
+    - `devices`: масив із `{ id, name, position, deviceType }`
 
 - `camera.snap`
   - Параметри:
     - `facing`: `front|back` (типово: `front`)
-    - `maxWidth`: число (необов’язково; типово `1600` на iOS Node)
+    - `maxWidth`: число (необов’язково; типово `1600` на вузлі iOS)
     - `quality`: `0..1` (необов’язково; типово `0.9`)
     - `format`: наразі `jpg`
     - `delayMs`: число (необов’язково; типово `0`)
     - `deviceId`: рядок (необов’язково; із `camera.list`)
-  - Response payload:
+  - Корисне навантаження відповіді:
     - `format: "jpg"`
     - `base64: "<...>"`
     - `width`, `height`
-  - Захист payload: фото повторно стискаються, щоб утримувати payload base64 меншим за 5 МБ.
+  - Запобіжник корисного навантаження: фотографії повторно стискаються, щоб зберегти корисне навантаження base64 меншим за 5 MB.
 
 - `camera.clip`
   - Параметри:
@@ -58,7 +56,7 @@ OpenClaw підтримує **захоплення з камери** для ро
     - `includeAudio`: boolean (типово `true`)
     - `format`: наразі `mp4`
     - `deviceId`: рядок (необов’язково; із `camera.list`)
-  - Response payload:
+  - Корисне навантаження відповіді:
     - `format: "mp4"`
     - `base64: "<...>"`
     - `durationMs`
@@ -66,16 +64,16 @@ OpenClaw підтримує **захоплення з камери** для ро
 
 ### Вимога переднього плану
 
-Як і `canvas.*`, iOS Node дозволяє команди `camera.*` лише в **передньому плані**. Виклики у фоновому режимі повертають `NODE_BACKGROUND_UNAVAILABLE`.
+Як і `canvas.*`, вузол iOS дозволяє команди `camera.*` лише у **передньому плані**. Виклики у фоновому режимі повертають `NODE_BACKGROUND_UNAVAILABLE`.
 
 ### Допоміжний засіб CLI (тимчасові файли + MEDIA)
 
-Найпростіший спосіб отримати вкладення — через допоміжний засіб CLI, який записує декодовані медіа у тимчасовий файл і виводить `MEDIA:<path>`.
+Найпростіший спосіб отримати вкладення — скористатися допоміжним засобом CLI, який записує декодовані медіадані до тимчасового файла та виводить `MEDIA:<path>`.
 
 Приклади:
 
 ```bash
-openclaw nodes camera snap --node <id>               # типово: і front, і back (2 рядки MEDIA)
+openclaw nodes camera snap --node <id>               # default: both front + back (2 MEDIA lines)
 openclaw nodes camera snap --node <id> --facing front
 openclaw nodes camera clip --node <id> --duration 3000
 openclaw nodes camera clip --node <id> --no-audio
@@ -83,64 +81,64 @@ openclaw nodes camera clip --node <id> --no-audio
 
 Примітки:
 
-- `nodes camera snap` типово використовує **обидва** напрями, щоб агент отримав обидва ракурси.
+- `nodes camera snap` типово використовує **обидва** напрями, щоб надати агенту обидва ракурси.
 - Вихідні файли є тимчасовими (у тимчасовому каталозі ОС), якщо ви не створите власну обгортку.
 
-## Android Node
+## Вузол Android
 
 ### Налаштування користувача Android (типово ввімкнено)
 
-- Аркуш налаштувань Android → **Camera** → **Allow Camera** (`camera.enabled`)
+- Панель налаштувань Android → **Камера** → **Дозволити камеру** (`camera.enabled`)
   - Типово: **увімкнено** (відсутній ключ вважається ввімкненим).
   - Якщо вимкнено: команди `camera.*` повертають `CAMERA_DISABLED`.
 
 ### Дозволи
 
-- Android потребує runtime-дозволів:
+- Android вимагає дозволів під час виконання:
   - `CAMERA` для `camera.snap` і `camera.clip`.
   - `RECORD_AUDIO` для `camera.clip`, коли `includeAudio=true`.
 
-Якщо дозволів бракує, застосунок по можливості покаже запит; якщо доступ заборонено, запити `camera.*` завершуються помилкою
+Якщо дозволів бракує, застосунок покаже запит, коли це можливо; якщо відмовлено, запити `camera.*` завершаться помилкою
 `*_PERMISSION_REQUIRED`.
 
 ### Вимога переднього плану Android
 
-Як і `canvas.*`, Android Node дозволяє команди `camera.*` лише в **передньому плані**. Виклики у фоновому режимі повертають `NODE_BACKGROUND_UNAVAILABLE`.
+Як і `canvas.*`, вузол Android дозволяє команди `camera.*` лише у **передньому плані**. Виклики у фоновому режимі повертають `NODE_BACKGROUND_UNAVAILABLE`.
 
 ### Команди Android (через Gateway `node.invoke`)
 
 - `camera.list`
-  - Response payload:
-    - `devices`: масив `{ id, name, position, deviceType }`
+  - Корисне навантаження відповіді:
+    - `devices`: масив із `{ id, name, position, deviceType }`
 
-### Захист payload
+### Запобіжник корисного навантаження
 
-Фото повторно стискаються, щоб утримувати payload base64 меншим за 5 МБ.
+Фотографії повторно стискаються, щоб зберегти корисне навантаження base64 меншим за 5 MB.
 
 ## Застосунок macOS
 
 ### Налаштування користувача (типово вимкнено)
 
-Супутній застосунок macOS надає прапорець:
+Супутній застосунок macOS має прапорець:
 
 - **Settings → General → Allow Camera** (`openclaw.cameraEnabled`)
   - Типово: **вимкнено**
-  - Якщо вимкнено: запити до камери повертають “Camera disabled by user”.
+  - Якщо вимкнено: запити до камери повертають “Камеру вимкнено користувачем”.
 
 ### Допоміжний засіб CLI (node invoke)
 
-Використовуйте основний CLI `openclaw`, щоб викликати команди камери на Node macOS.
+Використовуйте основний CLI `openclaw`, щоб викликати команди камери на вузлі macOS.
 
 Приклади:
 
 ```bash
-openclaw nodes camera list --node <id>            # перелік id камер
-openclaw nodes camera snap --node <id>            # виводить MEDIA:<path>
+openclaw nodes camera list --node <id>            # list camera ids
+openclaw nodes camera snap --node <id>            # prints MEDIA:<path>
 openclaw nodes camera snap --node <id> --max-width 1280
 openclaw nodes camera snap --node <id> --delay-ms 2000
 openclaw nodes camera snap --node <id> --device-id <id>
-openclaw nodes camera clip --node <id> --duration 10s          # виводить MEDIA:<path>
-openclaw nodes camera clip --node <id> --duration-ms 3000      # виводить MEDIA:<path> (застарілий прапорець)
+openclaw nodes camera clip --node <id> --duration 10s          # prints MEDIA:<path>
+openclaw nodes camera clip --node <id> --duration-ms 3000      # prints MEDIA:<path> (legacy flag)
 openclaw nodes camera clip --node <id> --device-id <id>
 openclaw nodes camera clip --node <id> --no-audio
 ```
@@ -149,21 +147,27 @@ openclaw nodes camera clip --node <id> --no-audio
 
 - `openclaw nodes camera snap` типово використовує `maxWidth=1600`, якщо не перевизначено.
 - На macOS `camera.snap` очікує `delayMs` (типово 2000 мс) після прогріву/стабілізації експозиції перед захопленням.
-- Payload фотографій повторно стискаються, щоб утримувати base64 меншим за 5 МБ.
+- Корисні навантаження фотографій повторно стискаються, щоб зберегти base64 меншим за 5 MB.
 
 ## Безпека + практичні обмеження
 
-- Доступ до камери та мікрофона викликає звичайні системні запити дозволів (і потребує рядків використання в Info.plist).
-- Відеокліпи обмежені за тривалістю (зараз `<= 60s`), щоб уникнути надто великих payload Node (накладні витрати base64 + ліміти повідомлень).
+- Доступ до камери та мікрофона викликає звичайні системні запити на дозволи (і вимагає рядків usage в Info.plist).
+- Відеокліпи обмежені за тривалістю (наразі `<= 60s`), щоб уникнути завеликих корисних навантажень вузла (накладні витрати base64 + обмеження повідомлень).
 
-## Відео екрана macOS (на рівні ОС)
+## Відеозапис екрана macOS (на рівні ОС)
 
 Для _відео екрана_ (не камери) використовуйте супутній застосунок macOS:
 
 ```bash
-openclaw nodes screen record --node <id> --duration 10s --fps 15   # виводить MEDIA:<path>
+openclaw nodes screen record --node <id> --duration 10s --fps 15   # prints MEDIA:<path>
 ```
 
 Примітки:
 
-- Потребує дозволу macOS **Screen Recording** (TCC).
+- Потрібен дозвіл macOS **Screen Recording** (TCC).
+
+## Пов’язане
+
+- [Підтримка зображень і медіа](/uk/nodes/images)
+- [Розуміння медіа](/uk/nodes/media-understanding)
+- [Команда location](/uk/nodes/location-command)

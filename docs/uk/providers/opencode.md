@@ -5,30 +5,30 @@ read_when:
 summary: Використання каталогів OpenCode Zen і Go з OpenClaw
 title: OpenCode
 x-i18n:
-    generated_at: "2026-04-23T21:07:30Z"
+    generated_at: "2026-04-23T23:05:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d017d3a3c9ffa1cefe66823e822080fde8c69429ba945c4e5883723e8bfe9c22
+    source_hash: d59c82a46988ef7dbbc98895af34441a5b378e5110ea636104df5f9c3672e3f0
     source_path: providers/opencode.md
     workflow: 15
 ---
 
-OpenCode відкриває в OpenClaw два розміщені каталоги:
+OpenCode надає в OpenClaw два розміщені catalog:
 
-| Catalog | Prefix            | Runtime provider |
-| ------- | ----------------- | ---------------- |
-| **Zen** | `opencode/...`    | `opencode`       |
-| **Go**  | `opencode-go/...` | `opencode-go`    |
+| Catalog | Префікс          | Runtime-провайдер |
+| ------- | ---------------- | ----------------- |
+| **Zen** | `opencode/...`   | `opencode`        |
+| **Go**  | `opencode-go/...`| `opencode-go`     |
 
-Обидва каталоги використовують той самий API key OpenCode. OpenClaw зберігає runtime provider id окремими,
-щоб маршрутизація per-model на боці upstream залишалася правильною, але onboarding і документація трактують їх
-як одне налаштування OpenCode.
+Обидва catalog використовують той самий API key OpenCode. OpenClaw зберігає id runtime-провайдерів
+розділеними, щоб маршрутизація по моделях вище за потоком залишалася коректною, але onboarding і docs
+розглядають це як єдине налаштування OpenCode.
 
 ## Початок роботи
 
 <Tabs>
-  <Tab title="Каталог Zen">
-    **Найкраще для:** curated multi-model proxy OpenCode (Claude, GPT, Gemini).
+  <Tab title="Catalog Zen">
+    **Найкраще підходить для:** куруваного багатомодельного proxy OpenCode (Claude, GPT, Gemini).
 
     <Steps>
       <Step title="Запустіть onboarding">
@@ -42,7 +42,7 @@ OpenCode відкриває в OpenClaw два розміщені каталог
         openclaw onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Задайте модель Zen як типову">
+      <Step title="Зробіть модель Zen типовою">
         ```bash
         openclaw config set agents.defaults.model.primary "opencode/claude-opus-4-6"
         ```
@@ -56,8 +56,8 @@ OpenCode відкриває в OpenClaw два розміщені каталог
 
   </Tab>
 
-  <Tab title="Каталог Go">
-    **Найкраще для:** лінійки Kimi, GLM і MiniMax, розміщених в OpenCode.
+  <Tab title="Catalog Go">
+    **Найкраще підходить для:** лінійки Kimi, GLM і MiniMax, розміщеної в OpenCode.
 
     <Steps>
       <Step title="Запустіть onboarding">
@@ -71,7 +71,7 @@ OpenCode відкриває в OpenClaw два розміщені каталог
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Задайте модель Go як типову">
+      <Step title="Зробіть модель Go типовою">
         ```bash
         openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
         ```
@@ -86,7 +86,7 @@ OpenCode відкриває в OpenClaw два розміщені каталог
   </Tab>
 </Tabs>
 
-## Приклад конфігурації
+## Приклад config
 
 ```json5
 {
@@ -95,62 +95,62 @@ OpenCode відкриває в OpenClaw два розміщені каталог
 }
 ```
 
-## Каталоги
+## Вбудовані catalog
 
 ### Zen
 
-| Property         | Value                                                                   |
+| Властивість      | Значення                                                                |
 | ---------------- | ----------------------------------------------------------------------- |
-| Runtime provider | `opencode`                                                              |
-| Example models   | `opencode/claude-opus-4-6`, `opencode/gpt-5.5`, `opencode/gemini-3-pro` |
+| Runtime-провайдер | `opencode`                                                             |
+| Приклади моделей | `opencode/claude-opus-4-6`, `opencode/gpt-5.5`, `opencode/gemini-3-pro` |
 
 ### Go
 
-| Property         | Value                                                                    |
+| Властивість      | Значення                                                                 |
 | ---------------- | ------------------------------------------------------------------------ |
-| Runtime provider | `opencode-go`                                                            |
-| Example models   | `opencode-go/kimi-k2.5`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
+| Runtime-провайдер | `opencode-go`                                                           |
+| Приклади моделей | `opencode-go/kimi-k2.5`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
 
-## Розширене налаштування
+## Розширена конфігурація
 
 <AccordionGroup>
-  <Accordion title="Alias-и API key">
+  <Accordion title="Alias API key">
     `OPENCODE_ZEN_API_KEY` також підтримується як alias для `OPENCODE_API_KEY`.
   </Accordion>
 
   <Accordion title="Спільні облікові дані">
-    Введення одного ключа OpenCode під час setup зберігає облікові дані для обох runtime
-    provider-ів. Вам не потрібно окремо проходити onboarding для кожного каталогу.
+    Введення одного ключа OpenCode під час setup зберігає облікові дані для обох runtime-
+    провайдерів. Вам не потрібно окремо проходити onboarding для кожного catalog.
   </Accordion>
 
-  <Accordion title="Billing і dashboard">
-    Ви входите в OpenCode, додаєте billing details і копіюєте свій API key. Billing
-    і доступність каталогів керуються з dashboard OpenCode.
+  <Accordion title="Білінг і dashboard">
+    Ви входите в OpenCode, додаєте платіжні дані й копіюєте свій API key. Білінг
+    і доступність catalog керуються з dashboard OpenCode.
   </Accordion>
 
-  <Accordion title="Поведінка Gemini replay">
+  <Accordion title="Поведінка replay для Gemini">
     Посилання OpenCode на базі Gemini залишаються на шляху proxy-Gemini, тому OpenClaw зберігає
-    там очищення thought-signature Gemini без увімкнення native
-    replay validation Gemini або bootstrap-переписувань.
+    там санітизацію thought-signature Gemini, не вмикаючи власну
+    валідацію replay Gemini або bootstrap-перезапис.
   </Accordion>
 
-  <Accordion title="Поведінка non-Gemini replay">
-    Посилання OpenCode, які не є Gemini, зберігають мінімальну OpenAI-compatible політику replay.
+  <Accordion title="Поведінка replay не для Gemini">
+    Посилання OpenCode не на базі Gemini зберігають мінімальну політику replay, сумісну з OpenAI.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Введення одного ключа OpenCode під час setup зберігає облікові дані і для Zen, і
-для runtime provider-ів Go, тож onboarding потрібно пройти лише один раз.
+Введення одного ключа OpenCode під час setup зберігає облікові дані для обох runtime-провайдерів Zen і
+Go, тож onboarding потрібно пройти лише один раз.
 </Tip>
 
 ## Пов’язане
 
 <CardGroup cols={2}>
   <Card title="Вибір моделі" href="/uk/concepts/model-providers" icon="layers">
-    Вибір провайдерів, model ref і поведінки failover.
+    Вибір провайдерів, посилань на моделі та поведінки failover.
   </Card>
   <Card title="Довідник конфігурації" href="/uk/gateway/configuration-reference" icon="gear">
-    Повний довідник конфігурації для агентів, моделей і провайдерів.
+    Повний довідник config для агентів, моделей і провайдерів.
   </Card>
 </CardGroup>
