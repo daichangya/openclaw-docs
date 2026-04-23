@@ -370,7 +370,7 @@ so file operands cannot be smuggled as ambiguous positionals.
     automatically.
 
   </Accordion>
-</AccordionGroup>
+  </AccordionGroup>
 
 ### Safe bins versus allowlist
 
