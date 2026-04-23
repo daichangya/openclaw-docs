@@ -292,7 +292,7 @@ EOF
 
     Safe bins 还会强制在执行时将 argv token 视为**字面文本**（不进行 glob 展开，也不进行 `$VARS` 扩展），适用于仅 stdin 的片段，因此像 `*` 或 `$HOME/...` 这样的模式不能被用来伪装文件读取。
 
-    </Accordion>
+  </Accordion>
 
     <Accordion title="受信任的二进制目录">
       Safe bins 必须从受信任的二进制目录中解析（系统默认值
