@@ -1,48 +1,41 @@
 ---
 read_when:
-    - API provider'ları başarısız olduğunda güvenilir bir geri dönüş istiyorsunuz.
-    - Codex CLI veya diğer yerel AI CLI'ları çalıştırıyorsunuz ve bunları yeniden kullanmak istiyorsunuz.
-    - CLI arka ucu araç erişimi için MCP loopback köprüsünü anlamak istiyorsunuz.
-summary: 'CLI arka uçları: isteğe bağlı MCP araç köprüsüne sahip yerel AI CLI geri dönüşü'
+    - API sağlayıcıları başarısız olduğunda güvenilir bir yedek istersiniz
+    - Codex CLI veya diğer yerel AI CLI'leri çalıştırıyorsunuz ve bunları yeniden kullanmak istiyorsunuz
+    - CLI arka ucu araç erişimi için MCP local loopback köprüsünü anlamak istiyorsunuz
+summary: 'CLI arka uçları: isteğe bağlı MCP araç köprüsü ile yerel AI CLI yedeği'
 title: CLI Arka Uçları
 x-i18n:
-    generated_at: "2026-04-23T09:02:24Z"
+    generated_at: "2026-04-23T14:56:41Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 475923b36e4580d3e4e57014ff2e6b89e9eb52c11b0a0ab1fc8241655b07836e
+    source_hash: ff7458d18b8a5b716930579241177917fd3edffcf7f6e211c7d570cf76519316
     source_path: gateway/cli-backends.md
     workflow: 15
 ---
 
-# CLI arka uçları (geri dönüş çalışma zamanı)
+# CLI arka uçları (yedek çalışma zamanı)
 
-OpenClaw, API provider'lar kapalıyken,
-hız sınırına takıldığında veya geçici olarak hatalı davrandığında **metin odaklı geri dönüş** olarak **yerel AI CLI'larını** çalıştırabilir. Bu özellikle temkinli şekilde tasarlanmıştır:
+OpenClaw, API sağlayıcıları kapalıyken, hız sınırına takıldığında veya geçici olarak hatalı davrandığında **metinle sınırlı bir yedek** olarak **yerel AI CLI'leri** çalıştırabilir. Bu kasıtlı olarak temkinli tasarlanmıştır:
 
-- **OpenClaw araçları doğrudan enjekte edilmez**, ancak `bundleMcp: true` olan arka uçlar
-  Gateway araçlarını bir loopback MCP köprüsü üzerinden alabilir.
-- Bunu destekleyen CLI'lar için **JSONL akışı**.
-- **Oturumlar desteklenir** (böylece takip eden dönüşler tutarlı kalır).
-- CLI görüntü yollarını kabul ediyorsa **görüntüler iletilebilir**.
+- **OpenClaw araçları doğrudan eklenmez**, ancak `bundleMcp: true` olan arka uçlar döngüsel bir MCP köprüsü üzerinden gateway araçlarını alabilir.
+- Bunu destekleyen CLI'ler için **JSONL akışı**.
+- **Oturumlar desteklenir** (böylece takip eden turlar tutarlı kalır).
+- CLI görüntü yollarını kabul ediyorsa **görüntüler aktarılabilir**.
 
-Bu, birincil yol olmaktan çok bir **güvenlik ağı** olarak tasarlanmıştır. Harici API'lere güvenmeden
-“her zaman çalışan” metin yanıtları istediğinizde kullanın.
+Bu, birincil yol olmaktan çok bir **güvenlik ağı** olarak tasarlanmıştır. Harici API'lere bağlı kalmadan “her zaman çalışır” metin yanıtları istediğinizde kullanın.
 
-Tam bir harness çalışma zamanı; ACP oturum denetimleri, arka plan görevleri,
-thread/konuşma bağlama ve kalıcı harici coding oturumları istiyorsanız
-bunun yerine [ACP Agents](/tr/tools/acp-agents) kullanın. CLI arka uçları ACP değildir.
+ACP oturum denetimleri, arka plan görevleri, iş parçacığı/konuşma bağlama ve kalıcı harici kodlama oturumları içeren tam bir harness çalışma zamanı istiyorsanız, bunun yerine [ACP Ajanları](/tr/tools/acp-agents) kullanın. CLI arka uçları ACP değildir.
 
-## Yeni başlayanlar için hızlı başlangıç
+## Başlangıç için hızlı kurulum
 
-Codex CLI'ı **hiç yapılandırma olmadan** kullanabilirsiniz (paketli OpenAI Plugin'i
-varsayılan bir arka uç kaydeder):
+Codex CLI'yi **hiç yapılandırma olmadan** kullanabilirsiniz (paketlenmiş OpenAI plugin'i varsayılan bir arka uç kaydeder):
 
 ```bash
 openclaw agent --message "hi" --model codex-cli/gpt-5.4
 ```
 
-Gateway'iniz launchd/systemd altında çalışıyorsa ve PATH sınırlıysa, yalnızca
-komut yolunu ekleyin:
+Gateway'niz launchd/systemd altında çalışıyorsa ve PATH sınırlıysa, yalnızca komut yolunu ekleyin:
 
 ```json5
 {
@@ -58,15 +51,13 @@ komut yolunu ekleyin:
 }
 ```
 
-Hepsi bu. CLI'ın kendisinin gerektirdiği şeylerin ötesinde anahtar, ek kimlik doğrulama yapılandırması gerekmez.
+Hepsi bu kadar. CLI'nin kendisinin ötesinde anahtar gerekmez, ek kimlik doğrulama yapılandırması gerekmez.
 
-Paketli bir CLI arka ucunu Gateway host'unda **birincil mesaj provider'ı** olarak kullanırsanız,
-yapılandırmanız bu arka uca açıkça bir model ref içinde veya
-`agents.defaults.cliBackends` altında başvuruyorsa OpenClaw artık ilgili paketli Plugin'i otomatik yükler.
+Paketlenmiş bir CLI arka ucunu bir gateway ana makinesinde **birincil mesaj sağlayıcısı** olarak kullanıyorsanız, OpenClaw artık yapılandırmanız bu arka uca bir model başvurusunda veya `agents.defaults.cliBackends` altında açıkça başvuruyorsa ilgili paketlenmiş plugin'i otomatik olarak yükler.
 
-## Geri dönüş olarak kullanma
+## Yedek olarak kullanma
 
-Bir CLI arka ucunu geri dönüş listenize ekleyin; böylece yalnızca birincil modeller başarısız olduğunda çalışır:
+Bir CLI arka ucunu yedek listenize ekleyin; böylece yalnızca birincil modeller başarısız olduğunda çalışır:
 
 ```json5
 {
@@ -87,26 +78,25 @@ Bir CLI arka ucunu geri dönüş listenize ekleyin; böylece yalnızca birincil 
 
 Notlar:
 
-- `agents.defaults.models` (allowlist) kullanıyorsanız CLI arka ucu modellerinizi de oraya eklemelisiniz.
-- Birincil provider başarısız olursa (kimlik doğrulama, hız sınırları, zaman aşımları), OpenClaw
-  sırada CLI arka ucunu dener.
+- `agents.defaults.models` (izin verilenler listesi) kullanıyorsanız, CLI arka ucu modellerinizi de oraya eklemeniz gerekir.
+- Birincil sağlayıcı başarısız olursa (kimlik doğrulama, hız sınırları, zaman aşımları), OpenClaw sırada CLI arka ucunu dener.
 
 ## Yapılandırmaya genel bakış
 
-Tüm CLI arka uçları şunun altında bulunur:
+Tüm CLI arka uçları şurada bulunur:
 
 ```
 agents.defaults.cliBackends
 ```
 
-Her giriş bir **provider id** ile anahtarlanır (ör. `codex-cli`, `my-cli`).
-Provider id, model ref'inizin sol tarafı olur:
+Her giriş bir **sağlayıcı kimliği** ile anahtarlanır (ör. `codex-cli`, `my-cli`).
+Sağlayıcı kimliği model başvurunuzun sol tarafı olur:
 
 ```
 <provider>/<model>
 ```
 
-### Örnek yapılandırma
+### Yapılandırma örneği
 
 ```json5
 {
@@ -130,7 +120,7 @@ Provider id, model ref'inizin sol tarafı olur:
           sessionMode: "existing",
           sessionIdFields: ["session_id", "conversation_id"],
           systemPromptArg: "--system",
-          // Codex tarzı CLI'lar bunun yerine bir istem dosyasına işaret edebilir:
+          // Codex tarzı CLI'ler bunun yerine bir prompt dosyasına işaret edebilir:
           // systemPromptFileConfigArg: "-c",
           // systemPromptFileConfigKey: "model_instructions_file",
           systemPromptWhen: "first",
@@ -146,65 +136,55 @@ Provider id, model ref'inizin sol tarafı olur:
 
 ## Nasıl çalışır
 
-1. Provider önekine göre (`codex-cli/...`) **bir arka uç seçer**.
-2. Aynı OpenClaw istemi + çalışma alanı bağlamını kullanarak **bir sistem istemi oluşturur**.
-3. Geçmiş tutarlı kalsın diye CLI'ı bir oturum kimliğiyle çalıştırır (destekleniyorsa).
-   Paketli `claude-cli` arka ucu, her
-   OpenClaw oturumu için bir Claude stdio sürecini canlı tutar ve takip eden dönüşleri stream-json stdin üzerinden gönderir.
+1. Sağlayıcı önekine göre (`codex-cli/...`) **bir arka uç seçer**.
+2. Aynı OpenClaw prompt + çalışma alanı bağlamını kullanarak **bir sistem prompt'u oluşturur**.
+3. Geçmiş tutarlı kalsın diye, destekleniyorsa, bir oturum kimliği ile **CLI'yi çalıştırır**.
+   Paketlenmiş `claude-cli` arka ucu OpenClaw oturumu başına bir Claude stdio sürecini canlı tutar ve takip eden turları stream-json stdin üzerinden gönderir.
 4. **Çıktıyı ayrıştırır** (JSON veya düz metin) ve son metni döndürür.
-5. **Oturum kimliklerini** arka uç başına kalıcılaştırır; böylece takip eden dönüşler aynı CLI oturumunu yeniden kullanır.
+5. Takip eden istekler aynı CLI oturumunu yeniden kullansın diye arka uç başına **oturum kimliklerini kalıcılaştırır**.
 
 <Note>
-Paketli Anthropic `claude-cli` arka ucu yeniden desteklenmektedir. Anthropic çalışanları
-bize OpenClaw tarzı Claude CLI kullanımına yeniden izin verildiğini
-söyledi; bu nedenle Anthropic yeni bir ilke yayımlamadığı sürece OpenClaw,
-`claude -p` kullanımını bu entegrasyon için onaylanmış kabul eder.
+Paketlenmiş Anthropic `claude-cli` arka ucu yeniden desteklenmektedir. Anthropic çalışanları bize OpenClaw tarzı Claude CLI kullanımına yeniden izin verildiğini söyledi; bu nedenle Anthropic yeni bir politika yayımlamadıkça OpenClaw bu entegrasyon için `claude -p` kullanımını onaylı kabul eder.
 </Note>
 
-Paketli OpenAI `codex-cli` arka ucu, OpenClaw'un sistem istemini
-Codex'in `model_instructions_file` yapılandırma geçersiz kılması (`-c
-model_instructions_file="..."`) üzerinden geçirir. Codex, Claude tarzı
-bir `--append-system-prompt` bayrağı sunmadığından OpenClaw, her yeni Codex CLI oturumu için birleştirilmiş istemi geçici bir dosyaya yazar.
+Paketlenmiş OpenAI `codex-cli` arka ucu OpenClaw'ın sistem prompt'unu Codex'in `model_instructions_file` yapılandırma geçersiz kılması üzerinden geçirir (`-c
+model_instructions_file="..."`). Codex, Claude tarzı bir
+`--append-system-prompt` bayrağı sunmadığından, OpenClaw her yeni Codex CLI oturumu için derlenen prompt'u geçici bir dosyaya yazar.
 
-Paketli Anthropic `claude-cli` arka ucu, OpenClaw Skills anlık görüntüsünü
-iki yolla alır: eklenmiş sistem istemindeki kompakt OpenClaw Skills kataloğu ve
-`--plugin-dir` ile geçirilen geçici bir Claude Code Plugin'i. Plugin yalnızca o agent/oturum için uygun Skills öğelerini içerir; böylece Claude Code'un yerel skill çözücüsü, OpenClaw'un istemde başka türlü duyuracağı aynı filtrelenmiş kümeyi görür. Skill env/API anahtarı geçersiz kılmaları yine de çalışma için alt süreç ortamına OpenClaw tarafından uygulanır.
+Paketlenmiş Anthropic `claude-cli` arka ucu OpenClaw Skills anlık görüntüsünü iki şekilde alır: eklenen sistem prompt'undaki derli toplu OpenClaw Skills kataloğu ve `--plugin-dir` ile geçirilen geçici bir Claude Code plugin'i. Plugin yalnızca o ajan/oturum için uygun Skills öğelerini içerir; böylece Claude Code'un yerel beceri çözücüsü, OpenClaw'ın aksi halde prompt'ta duyuracağı aynı filtrelenmiş kümeyi görür. Skill env/API anahtarı geçersiz kılmaları çalıştırma için alt süreç ortamına yine OpenClaw tarafından uygulanır.
+
+OpenClaw paketlenmiş `claude-cli` arka ucunu kullanmadan önce, Claude Code'un kendisi aynı ana makinede zaten oturum açmış olmalıdır:
+
+```bash
+claude auth login
+claude auth status --text
+openclaw models auth login --provider anthropic --method cli --set-default
+```
+
+`claude` ikili dosyası zaten `PATH` üzerinde değilse yalnızca `agents.defaults.cliBackends.claude-cli.command` kullanın.
 
 ## Oturumlar
 
-- CLI oturumları destekliyorsa, oturum kimliğini birden çok bayrağa
-  yerleştirmek gerektiğinde `sessionArg` (ör. `--session-id`) veya
-  `sessionArgs` (`{sessionId}` yer tutucusu) ayarlayın.
-- CLI, farklı bayraklarla **resume alt komutu** kullanıyorsa,
-  `resumeArgs` (`resume` sırasında `args` yerine geçer) ve isteğe bağlı olarak
-  `resumeOutput` (JSON olmayan resume durumları için) ayarlayın.
+- CLI oturumları destekliyorsa, `sessionArg` (ör. `--session-id`) veya kimliğin birden fazla bayrağa eklenmesi gerektiğinde `sessionArgs` (`{sessionId}` yer tutucusu) ayarlayın.
+- CLI farklı bayraklarla bir **resume alt komutu** kullanıyorsa, `resumeArgs` ayarlayın (`args` yerine geçer) ve isteğe bağlı olarak `resumeOutput` ayarlayın (JSON olmayan resume işlemleri için).
 - `sessionMode`:
-  - `always`: her zaman bir oturum kimliği gönderir (saklanmış yoksa yeni UUID).
-  - `existing`: yalnızca daha önce bir oturum kimliği saklandıysa gönderir.
+  - `always`: her zaman bir oturum kimliği gönderir (depolanmış yoksa yeni UUID).
+  - `existing`: yalnızca daha önce depolanmışsa bir oturum kimliği gönderir.
   - `none`: asla oturum kimliği göndermez.
-- `claude-cli` varsayılan olarak `liveSession: "claude-stdio"`, `output: "jsonl"`
-  ve `input: "stdin"` kullanır; böylece takip eden dönüşler etkin olduğu sürece
-  canlı Claude sürecini yeniden kullanır. Sıcak stdio artık varsayılandır; taşıma alanlarını atlayan özel yapılandırmalarda da böyledir. Gateway yeniden başlarsa veya boşta duran süreç
-  çıkarsa OpenClaw saklanan Claude oturum kimliğinden resume yapar. Saklanan oturum kimlikleri,
-  resume öncesinde mevcut okunabilir bir proje transcript'ine karşı doğrulanır; böylece hayalet bağlar
-  `--resume` altında sessizce yeni bir Claude CLI oturumu başlatmak yerine `reason=transcript-missing`
-  ile temizlenir.
-- Saklanan CLI oturumları provider'a ait sürekliliktir. Örtük günlük oturum
-  sıfırlaması bunları kesmez; `/reset` ve açık `session.reset` ilkeleri yine keser.
+- `claude-cli` varsayılan olarak `liveSession: "claude-stdio"`, `output: "jsonl"` ve `input: "stdin"` kullanır; böylece takip eden turlar etkin olduğu sürece canlı Claude sürecini yeniden kullanır.
+  Özel yapılandırmalar aktarım alanlarını atladığında da sıcak stdio artık varsayılandır. Gateway yeniden başlarsa veya boşta bekleyen süreç çıkarsa, OpenClaw depolanan Claude oturum kimliğinden devam eder. Depolanan oturum kimlikleri, devam etmeden önce mevcut ve okunabilir bir proje dökümüne karşı doğrulanır; böylece hayali bağlamalar `--resume` altında sessizce yeni bir Claude CLI oturumu başlatmak yerine `reason=transcript-missing` ile temizlenir.
+- Depolanan CLI oturumları sağlayıcıya ait sürekliliktir. Örtük günlük oturum sıfırlaması bunları kesmez; `/reset` ve açık `session.reset` ilkeleri keser.
 
 Serileştirme notları:
 
-- `serialize: true`, aynı şeritli çalıştırmaları sıralı tutar.
-- Çoğu CLI tek bir provider şeridinde serileştirilir.
-- Seçilen kimlik doğrulama kimliği değiştiğinde OpenClaw saklanan CLI oturumu yeniden kullanımını bırakır;
-  buna değişen auth profile id, statik API anahtarı, statik token veya CLI bunu sunuyorsa OAuth
-  hesap kimliği dahildir. OAuth erişim ve yenileme token'ı
-  dönüşümü saklanan CLI oturumunu kesmez. Bir CLI kararlı bir OAuth hesap kimliği sunmuyorsa,
-  OpenClaw resume izinlerini o CLI'ın uygulamasına bırakır.
+- `serialize: true`, aynı lane'deki çalıştırmaların sıralı kalmasını sağlar.
+- Çoğu CLI tek bir sağlayıcı lane'i üzerinde serileştirilir.
+- OpenClaw, seçilen kimlik doğrulama kimliği değiştiğinde depolanan CLI oturumu yeniden kullanımını bırakır; buna değişmiş auth profil kimliği, statik API anahtarı, statik token veya CLI bunlardan birini açığa çıkarıyorsa OAuth hesap kimliği dahildir.
+  OAuth erişim ve yenileme token'ı rotasyonu depolanan CLI oturumunu kesmez. Bir CLI kararlı bir OAuth hesap kimliği açığa çıkarmıyorsa, OpenClaw o CLI'nin resume izinlerini uygulamasına izin verir.
 
-## Görüntüler (iletim)
+## Görüntüler (aktarım)
 
-CLI'ınız görüntü yollarını kabul ediyorsa `imageArg` ayarlayın:
+CLI'niz görüntü yollarını kabul ediyorsa, `imageArg` ayarlayın:
 
 ```json5
 imageArg: "--image",
@@ -212,28 +192,26 @@ imageMode: "repeat"
 ```
 
 OpenClaw base64 görüntüleri geçici dosyalara yazar. `imageArg` ayarlanmışsa bu
-yollar CLI bağımsız değişkenleri olarak geçirilir. `imageArg` eksikse OpenClaw
-dosya yollarını isteme ekler (yol enjeksiyonu); bu, düz yollardan yerel dosyaları otomatik
-yükleyen CLI'lar için yeterlidir.
+yollar CLI argümanları olarak geçirilir. `imageArg` eksikse, OpenClaw dosya
+yollarını prompt'a ekler (yol enjeksiyonu); bu, düz yollardan yerel dosyaları
+otomatik yükleyen CLI'ler için yeterlidir.
 
 ## Girdiler / çıktılar
 
-- `output: "json"` (varsayılan), JSON ayrıştırmayı ve metin + oturum kimliği çıkarmayı dener.
-- Gemini CLI JSON çıktısı için OpenClaw, `usage` eksik veya boş olduğunda
-  yanıt metnini `response` içinden ve kullanımı `stats` içinden okur.
-- `output: "jsonl"`, JSONL akışlarını ayrıştırır (örneğin Codex CLI `--json`) ve son agent mesajını, varsa oturum
-  tanımlayıcılarıyla birlikte çıkarır.
-- `output: "text"`, stdout'u son yanıt olarak kabul eder.
+- `output: "json"` (varsayılan) JSON ayrıştırmayı dener ve metin + oturum kimliğini çıkarır.
+- Gemini CLI JSON çıktısı için OpenClaw, `usage` eksik veya boş olduğunda yanıt metnini `response` içinden ve kullanımı `stats` içinden okur.
+- `output: "jsonl"` JSONL akışlarını ayrıştırır (örneğin Codex CLI `--json`) ve mevcut olduğunda son ajan mesajını ve oturum tanımlayıcılarını çıkarır.
+- `output: "text"` stdout'u son yanıt olarak ele alır.
 
 Girdi modları:
 
-- `input: "arg"` (varsayılan), istemi son CLI bağımsız değişkeni olarak geçirir.
-- `input: "stdin"`, istemi stdin üzerinden gönderir.
-- İstem çok uzunsa ve `maxPromptArgChars` ayarlanmışsa stdin kullanılır.
+- `input: "arg"` (varsayılan) prompt'u son CLI argümanı olarak geçirir.
+- `input: "stdin"` prompt'u stdin üzerinden gönderir.
+- Prompt çok uzunsa ve `maxPromptArgChars` ayarlanmışsa stdin kullanılır.
 
-## Varsayılanlar (Plugin'e ait)
+## Varsayılanlar (plugin'e ait)
 
-Paketli OpenAI Plugin'i ayrıca `codex-cli` için bir varsayılan kaydeder:
+Paketlenmiş OpenAI plugin'i ayrıca `codex-cli` için bir varsayılan kaydeder:
 
 - `command: "codex"`
 - `args: ["exec","--json","--color","never","--sandbox","workspace-write","--skip-git-repo-check"]`
@@ -244,7 +222,7 @@ Paketli OpenAI Plugin'i ayrıca `codex-cli` için bir varsayılan kaydeder:
 - `imageArg: "--image"`
 - `sessionMode: "existing"`
 
-Paketli Google Plugin'i ayrıca `google-gemini-cli` için bir varsayılan kaydeder:
+Paketlenmiş Google plugin'i ayrıca `google-gemini-cli` için bir varsayılan kaydeder:
 
 - `command: "gemini"`
 - `args: ["--output-format", "json", "--prompt", "{prompt}"]`
@@ -255,32 +233,27 @@ Paketli Google Plugin'i ayrıca `google-gemini-cli` için bir varsayılan kayded
 - `sessionMode: "existing"`
 - `sessionIdFields: ["session_id", "sessionId"]`
 
-Ön koşul: yerel Gemini CLI kurulu olmalı ve `PATH` üzerinde
-`gemini` olarak erişilebilir olmalıdır (`brew install gemini-cli` veya
-`npm install -g @google/gemini-cli`).
+Önkoşul: yerel Gemini CLI kurulmuş olmalı ve `PATH` üzerinde `gemini` olarak kullanılabilir olmalıdır (`brew install gemini-cli` veya `npm install -g @google/gemini-cli`).
 
 Gemini CLI JSON notları:
 
 - Yanıt metni JSON `response` alanından okunur.
-- `usage` yoksa veya boşsa kullanım için `stats` geri dönüş olarak kullanılır.
-- `stats.cached`, OpenClaw `cacheRead` içine normalize edilir.
-- `stats.input` eksikse OpenClaw giriş token'larını
-  `stats.input_tokens - stats.cached` üzerinden türetir.
+- `usage` yoksa veya boşsa, kullanım için `stats` yedek olarak kullanılır.
+- `stats.cached`, OpenClaw `cacheRead` biçimine normalize edilir.
+- `stats.input` eksikse, OpenClaw girdi token'larını `stats.input_tokens - stats.cached` üzerinden türetir.
 
-Yalnızca gerektiğinde geçersiz kılın (yaygın durum: mutlak `command` yolu).
+Yalnızca gerekirse geçersiz kılın (yaygın durum: mutlak `command` yolu).
 
 ## Plugin'e ait varsayılanlar
 
-CLI arka ucu varsayılanları artık Plugin yüzeyinin parçasıdır:
+CLI arka ucu varsayılanları artık plugin yüzeyinin bir parçasıdır:
 
 - Plugin'ler bunları `api.registerCliBackend(...)` ile kaydeder.
-- Arka uç `id` değeri, model ref'lerde provider öneki olur.
-- `agents.defaults.cliBackends.<id>` içindeki kullanıcı yapılandırması yine de Plugin varsayılanını geçersiz kılar.
-- Arka uca özgü yapılandırma temizliği, isteğe bağlı
-  `normalizeConfig` kancası üzerinden Plugin'e ait kalır.
+- Arka uç `id` değeri model başvurularında sağlayıcı öneki olur.
+- `agents.defaults.cliBackends.<id>` altındaki kullanıcı yapılandırması plugin varsayılanını yine geçersiz kılar.
+- Arka uca özgü yapılandırma temizliği, isteğe bağlı `normalizeConfig` hook'u üzerinden plugin'e ait kalır.
 
-Küçük istem/mesaj uyumluluk uyarlamalarına ihtiyaç duyan Plugin'ler,
-bir provider veya CLI arka ucunu değiştirmeden çift yönlü metin dönüşümleri bildirebilir:
+Küçük prompt/mesaj uyumluluk uyarlamalarına ihtiyaç duyan plugin'ler, bir sağlayıcıyı veya CLI arka ucunu değiştirmeden çift yönlü metin dönüşümleri tanımlayabilir:
 
 ```typescript
 api.registerTextTransforms({
@@ -297,51 +270,41 @@ api.registerTextTransforms({
 });
 ```
 
-`input`, CLI'a geçirilen sistem istemini ve kullanıcı istemini yeniden yazar. `output`,
-OpenClaw kendi denetim işaretleyicilerini ve kanal teslimatını ele almadan önce
-akışlı assistant deltalarını ve ayrıştırılmış son metni yeniden yazar.
+`input`, CLI'ye geçirilen sistem prompt'unu ve kullanıcı prompt'unu yeniden yazar. `output`, OpenClaw kendi kontrol işaretçilerini ve kanal teslimini işlemeden önce akış halindeki asistan deltalarını ve ayrıştırılmış son metni yeniden yazar.
 
-Claude Code stream-json uyumlu JSONL üreten CLI'lar için,
-o arka ucun yapılandırmasında `jsonlDialect: "claude-stream-json"` ayarlayın.
+Claude Code stream-json ile uyumlu JSONL üreten CLI'ler için, o arka ucun yapılandırmasında `jsonlDialect: "claude-stream-json"` ayarlayın.
 
-## MCP paket bindirmeleri
+## Bundle MCP katmanları
 
-CLI arka uçları OpenClaw araç çağrılarını **doğrudan** almaz, ancak bir arka uç
-`bundleMcp: true` ile üretilmiş bir MCP yapılandırma bindirmesine katılabilir.
+CLI arka uçları OpenClaw araç çağrılarını **doğrudan** almaz, ancak bir arka uç `bundleMcp: true` ile oluşturulmuş bir MCP yapılandırma katmanını kullanmayı seçebilir.
 
-Geçerli paketli davranış:
+Mevcut paketlenmiş davranış:
 
-- `claude-cli`: üretilmiş katı MCP yapılandırma dosyası
+- `claude-cli`: oluşturulmuş katı MCP yapılandırma dosyası
 - `codex-cli`: `mcp_servers` için satır içi yapılandırma geçersiz kılmaları
-- `google-gemini-cli`: üretilmiş Gemini sistem ayarları dosyası
+- `google-gemini-cli`: oluşturulmuş Gemini sistem ayarları dosyası
 
-MCP paketi etkinleştirildiğinde OpenClaw:
+Bundle MCP etkinleştirildiğinde OpenClaw:
 
-- CLI sürecine Gateway araçlarını sunan bir loopback HTTP MCP sunucusu başlatır
-- köprüyü oturum başına token ile kimlik doğrular (`OPENCLAW_MCP_TOKEN`)
+- CLI sürecine gateway araçlarını sunan döngüsel bir HTTP MCP sunucusu başlatır
+- köprüyü oturum başına bir token ile doğrular (`OPENCLAW_MCP_TOKEN`)
 - araç erişimini geçerli oturum, hesap ve kanal bağlamıyla sınırlar
 - geçerli çalışma alanı için etkin bundle-MCP sunucularını yükler
-- bunları mevcut arka uç MCP yapılandırması/ayar biçimiyle birleştirir
-- başlatma yapılandırmasını, ilgili extension'dan gelen arka uca ait entegrasyon modunu kullanarak yeniden yazar
+- bunları mevcut arka uç MCP yapılandırması/ayar şekli ile birleştirir
+- başlatma yapılandırmasını sahibi olan eklentinin sahip olduğu entegrasyon modunu kullanarak yeniden yazar
 
-Hiçbir MCP sunucusu etkin değilse bile, bir arka uç
-bundle MCP'ye katıldığında OpenClaw yine de katı bir yapılandırma enjekte eder; böylece arka plan çalıştırmaları yalıtılmış kalır.
+Hiçbir MCP sunucusu etkin değilse, OpenClaw bir arka uç bundle MCP'yi seçtiğinde arka plan çalıştırmaları yalıtılmış kalsın diye yine de katı bir yapılandırma ekler.
 
 ## Sınırlamalar
 
-- **Doğrudan OpenClaw araç çağrıları yoktur.** OpenClaw, CLI arka ucu protokolüne
-  araç çağrıları enjekte etmez. Arka uçlar Gateway araçlarını yalnızca
-  `bundleMcp: true` seçeneğine katıldıklarında görür.
-- **Akış arka uca özeldir.** Bazı arka uçlar JSONL akışı yapar; diğerleri
-  çıkışa kadar tamponlar.
-- **Yapılandırılmış çıktılar**, CLI'ın JSON biçimine bağlıdır.
-- **Codex CLI oturumları**, metin çıktısı üzerinden resume eder (JSONL yoktur); bu,
-  ilk `--json` çalıştırmasına göre daha az yapılandırılmıştır. OpenClaw oturumları yine de normal çalışır.
+- **Doğrudan OpenClaw araç çağrıları yoktur.** OpenClaw, CLI arka ucu protokolüne araç çağrıları eklemez. Arka uçlar gateway araçlarını yalnızca `bundleMcp: true` seçtiklerinde görür.
+- **Akış arka uca özeldir.** Bazı arka uçlar JSONL akışı yapar; diğerleri çıkışa kadar tamponlar.
+- **Yapılandırılmış çıktılar** CLI'nin JSON biçimine bağlıdır.
+- **Codex CLI oturumları** metin çıktısı üzerinden sürdürülür (JSONL yoktur); bu, ilk `--json` çalıştırmasına göre daha az yapılandırılmıştır. OpenClaw oturumları yine de normal çalışır.
 
 ## Sorun giderme
 
 - **CLI bulunamadı**: `command` değerini tam yol olarak ayarlayın.
-- **Yanlış model adı**: `provider/model` → CLI model eşlemesi yapmak için `modelAliases` kullanın.
-- **Oturum sürekliliği yok**: `sessionArg` ayarlandığından ve `sessionMode` değerinin
-  `none` olmadığından emin olun (Codex CLI şu anda JSON çıktısıyla resume edemez).
-- **Görüntüler yok sayılıyor**: `imageArg` ayarlayın (ve CLI'ın dosya yollarını desteklediğini doğrulayın).
+- **Yanlış model adı**: `provider/model` → CLI modeli eşlemesi için `modelAliases` kullanın.
+- **Oturum sürekliliği yok**: `sessionArg` ayarlandığından ve `sessionMode` değerinin `none` olmadığından emin olun (Codex CLI şu anda JSON çıktısı ile sürdüremez).
+- **Görüntüler yok sayılıyor**: `imageArg` ayarlayın (ve CLI'nin dosya yollarını desteklediğini doğrulayın).
