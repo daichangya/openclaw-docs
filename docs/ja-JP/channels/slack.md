@@ -1,48 +1,48 @@
 ---
 read_when:
-    - SlackのセットアップまたはSlackのソケット/HTTPモードのデバッグ
-summary: Slackのセットアップとランタイム動作（Socket Mode + HTTPリクエストURL）
+    - Slack のセットアップ、または Slack のソケット/HTTP モードのデバッグ
+summary: Slack のセットアップと実行時の動作（ソケットモード + HTTP リクエスト URL）
 title: Slack
 x-i18n:
-    generated_at: "2026-04-22T04:20:31Z"
+    generated_at: "2026-04-23T04:44:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e80b1ff7dfe3124916f9a4334badc9a742a0d0843b37c77838ede9f830920ff7
+    source_hash: a1609ab5570daac455005cb00cee578c8954e05b25c25bf5759ae032d2a12c2c
     source_path: channels/slack.md
     workflow: 15
 ---
 
 # Slack
 
-ステータス: Slackアプリ連携によるDM + チャネル向けの本番対応済み。デフォルトモードはSocket Modeで、HTTPリクエストURLもサポートされています。
+ステータス: Slack アプリ連携による DM とチャンネルに対応した本番運用対応。デフォルトモードは Socket Mode で、HTTP リクエスト URL もサポートされています。
 
 <CardGroup cols={3}>
   <Card title="ペアリング" icon="link" href="/ja-JP/channels/pairing">
-    SlackのDMはデフォルトでペアリングモードです。
+    Slack DM はデフォルトでペアリングモードになります。
   </Card>
   <Card title="スラッシュコマンド" icon="terminal" href="/ja-JP/tools/slash-commands">
     ネイティブコマンドの動作とコマンドカタログ。
   </Card>
-  <Card title="チャネルのトラブルシューティング" icon="wrench" href="/ja-JP/channels/troubleshooting">
-    チャネル横断の診断と修復プレイブック。
+  <Card title="チャンネルのトラブルシューティング" icon="wrench" href="/ja-JP/channels/troubleshooting">
+    チャンネル横断の診断と修復プレイブック。
   </Card>
 </CardGroup>
 
-## クイックセットアップ
+## クイックスタート
 
 <Tabs>
-  <Tab title="Socket Mode（デフォルト）">
+  <Tab title="Socket Mode (デフォルト)">
     <Steps>
-      <Step title="新しいSlackアプリを作成する">
-        Slackアプリ設定で**[Create New App](https://api.slack.com/apps/new)**ボタンを押します。
+      <Step title="新しい Slack アプリを作成する">
+        Slack アプリ設定で **[Create New App](https://api.slack.com/apps/new)** ボタンを押します。
 
-        - **from a manifest**を選び、アプリ用のワークスペースを選択します
-        - 下記の[マニフェストとスコープのチェックリスト](#manifest-and-scope-checklist)にあるサンプルマニフェストを貼り付け、そのまま作成を続けます
-        - `connections:write`付きの**App-Level Token**（`xapp-...`）を生成します
-        - アプリをインストールし、表示される**Bot Token**（`xoxb-...`）をコピーします
+        - **from a manifest** を選択し、アプリ用のワークスペースを選びます
+        - 以下の [manifest の例](#manifest-and-scope-checklist) を貼り付けて、そのまま作成を続けます
+        - `connections:write` を付与した **App-Level Token** (`xapp-...`) を生成します
+        - アプリをインストールし、表示される **Bot Token** (`xoxb-...`) をコピーします
       </Step>
 
-      <Step title="OpenClawを設定する">
+      <Step title="OpenClaw を設定する">
 
 ```json5
 {
@@ -66,7 +66,7 @@ SLACK_BOT_TOKEN=xoxb-...
 
       </Step>
 
-      <Step title="Gatewayを起動する">
+      <Step title="Gateway を起動する">
 
 ```bash
 openclaw gateway
@@ -77,19 +77,19 @@ openclaw gateway
 
   </Tab>
 
-  <Tab title="HTTPリクエストURL">
+  <Tab title="HTTP リクエスト URL">
     <Steps>
-      <Step title="新しいSlackアプリを作成する">
-        Slackアプリ設定で**[Create New App](https://api.slack.com/apps/new)**ボタンを押します。
+      <Step title="新しい Slack アプリを作成する">
+        Slack アプリ設定で **[Create New App](https://api.slack.com/apps/new)** ボタンを押します。
 
-        - **from a manifest**を選び、アプリ用のワークスペースを選択します
-        - [サンプルマニフェスト](#manifest-and-scope-checklist)を貼り付け、作成前にURLを更新します
-        - リクエスト検証用に**Signing Secret**を保存します
-        - アプリをインストールし、表示される**Bot Token**（`xoxb-...`）をコピーします
+        - **from a manifest** を選択し、アプリ用のワークスペースを選びます
+        - [manifest の例](#manifest-and-scope-checklist) を貼り付け、作成前に URL を更新します
+        - リクエスト検証用の **Signing Secret** を保存します
+        - アプリをインストールし、表示される **Bot Token** (`xoxb-...`) をコピーします
 
       </Step>
 
-      <Step title="OpenClawを設定する">
+      <Step title="OpenClaw を設定する">
 
 ```json5
 {
@@ -106,14 +106,14 @@ openclaw gateway
 ```
 
         <Note>
-        マルチアカウントHTTPでは一意のwebhookパスを使用してください
+        マルチアカウント HTTP では一意の webhook パスを使用してください
 
-        登録が衝突しないよう、各アカウントに異なる`webhookPath`（デフォルトは`/slack/events`）を設定してください。
+        登録が衝突しないように、各アカウントに個別の `webhookPath`（デフォルトは `/slack/events`）を設定してください。
         </Note>
 
       </Step>
 
-      <Step title="Gatewayを起動する">
+      <Step title="Gateway を起動する">
 
 ```bash
 openclaw gateway
@@ -125,16 +125,16 @@ openclaw gateway
   </Tab>
 </Tabs>
 
-## マニフェストとスコープのチェックリスト
+## manifest とスコープのチェックリスト
 
 <Tabs>
-  <Tab title="Socket Mode（デフォルト）">
+  <Tab title="Socket Mode (デフォルト)">
 
 ```json
 {
   "display_information": {
     "name": "OpenClaw",
-    "description": "OpenClaw向けSlackコネクタ"
+    "description": "Slack connector for OpenClaw"
   },
   "features": {
     "bot_user": {
@@ -148,7 +148,7 @@ openclaw gateway
     "slash_commands": [
       {
         "command": "/openclaw",
-        "description": "OpenClawにメッセージを送信",
+        "description": "Send a message to OpenClaw",
         "should_escape": false
       }
     ]
@@ -205,13 +205,13 @@ openclaw gateway
 
   </Tab>
 
-  <Tab title="HTTPリクエストURL">
+  <Tab title="HTTP リクエスト URL">
 
 ```json
 {
   "display_information": {
     "name": "OpenClaw",
-    "description": "OpenClaw向けSlackコネクタ"
+    "description": "Slack connector for OpenClaw"
   },
   "features": {
     "bot_user": {
@@ -225,7 +225,7 @@ openclaw gateway
     "slash_commands": [
       {
         "command": "/openclaw",
-        "description": "OpenClawにメッセージを送信",
+        "description": "Send a message to OpenClaw",
         "should_escape": false,
         "url": "https://gateway-host.example.com/slack/events"
       }
@@ -289,138 +289,138 @@ openclaw gateway
   </Tab>
 </Tabs>
 
-### 追加のマニフェスト設定
+### 追加の manifest 設定
 
-上記のデフォルトを拡張するさまざまな機能を表面化します。
+上記のデフォルトを拡張する、異なる機能の表示方法です。
 
 <AccordionGroup>
-  <Accordion title="任意のネイティブスラッシュコマンド">
+  <Accordion title="オプションのネイティブスラッシュコマンド">
 
-    単一の設定済みコマンドの代わりに、複数の[ネイティブスラッシュコマンド](#commands-and-slash-behavior)をニュアンス付きで使用できます。
+    単一の設定済みコマンドの代わりに、複数の[ネイティブスラッシュコマンド](#commands-and-slash-behavior)を使うこともでき、その際にはいくつか注意点があります。
 
-    - `/status`コマンドは予約されているため、`/status`の代わりに`/agentstatus`を使用します。
-    - 同時に利用可能にできるスラッシュコマンドは25個までです。
+    - `/status` コマンドは予約されているため、`/status` の代わりに `/agentstatus` を使用します。
+    - 同時に利用可能にできるスラッシュコマンドは 25 個までです。
 
-    既存の`features.slash_commands`セクションを、[利用可能なコマンド](/ja-JP/tools/slash-commands#command-list)の一部で置き換えてください。
+    既存の `features.slash_commands` セクションを、[利用可能なコマンド](/ja-JP/tools/slash-commands#command-list) の一部で置き換えてください。
 
     <Tabs>
-      <Tab title="Socket Mode（デフォルト）">
+      <Tab title="Socket Mode (デフォルト)">
 
 ```json
     "slash_commands": [
       {
         "command": "/new",
-        "description": "新しいセッションを開始する",
+        "description": "Start a new session",
         "usage_hint": "[model]"
       },
       {
         "command": "/reset",
-        "description": "現在のセッションをリセットする"
+        "description": "Reset the current session"
       },
       {
         "command": "/compact",
-        "description": "セッションコンテキストを圧縮する",
+        "description": "Compact the session context",
         "usage_hint": "[instructions]"
       },
       {
         "command": "/stop",
-        "description": "現在の実行を停止する"
+        "description": "Stop the current run"
       },
       {
         "command": "/session",
-        "description": "スレッドバインディングの有効期限を管理する",
+        "description": "Manage thread-binding expiry",
         "usage_hint": "idle <duration|off> or max-age <duration|off>"
       },
       {
         "command": "/think",
-        "description": "思考レベルを設定する",
+        "description": "Set the thinking level",
         "usage_hint": "<level>"
       },
       {
         "command": "/verbose",
-        "description": "詳細出力を切り替える",
+        "description": "Toggle verbose output",
         "usage_hint": "on|off|full"
       },
       {
         "command": "/fast",
-        "description": "高速モードを表示または設定する",
+        "description": "Show or set fast mode",
         "usage_hint": "[status|on|off]"
       },
       {
         "command": "/reasoning",
-        "description": "reasoningの表示を切り替える",
+        "description": "Toggle reasoning visibility",
         "usage_hint": "[on|off|stream]"
       },
       {
         "command": "/elevated",
-        "description": "elevatedモードを切り替える",
+        "description": "Toggle elevated mode",
         "usage_hint": "[on|off|ask|full]"
       },
       {
         "command": "/exec",
-        "description": "execのデフォルトを表示または設定する",
+        "description": "Show or set exec defaults",
         "usage_hint": "host=<auto|sandbox|gateway|node> security=<deny|allowlist|full> ask=<off|on-miss|always> node=<id>"
       },
       {
         "command": "/model",
-        "description": "モデルを表示または設定する",
+        "description": "Show or set the model",
         "usage_hint": "[name|#|status]"
       },
       {
         "command": "/models",
-        "description": "プロバイダー、またはプロバイダーのモデルを一覧表示する",
-        "usage_hint": "[provider] [page] [limit=<n>|size=<n>|all]"
+        "description": "List providers/models or add a model",
+        "usage_hint": "[provider] [page] [limit=<n>|size=<n>|all] | add <provider> <modelId>"
       },
       {
         "command": "/help",
-        "description": "短いヘルプ概要を表示する"
+        "description": "Show the short help summary"
       },
       {
         "command": "/commands",
-        "description": "生成されたコマンドカタログを表示する"
+        "description": "Show the generated command catalog"
       },
       {
         "command": "/tools",
-        "description": "現在のエージェントが今使えるものを表示する",
+        "description": "Show what the current agent can use right now",
         "usage_hint": "[compact|verbose]"
       },
       {
         "command": "/agentstatus",
-        "description": "利用可能な場合はプロバイダー使用量/クォータを含むランタイムステータスを表示する"
+        "description": "Show runtime status, including provider usage/quota when available"
       },
       {
         "command": "/tasks",
-        "description": "現在のセッションのアクティブな/最近のバックグラウンドタスクを一覧表示する"
+        "description": "List active/recent background tasks for the current session"
       },
       {
         "command": "/context",
-        "description": "コンテキストがどのように組み立てられるかを説明する",
+        "description": "Explain how context is assembled",
         "usage_hint": "[list|detail|json]"
       },
       {
         "command": "/whoami",
-        "description": "自分の送信者IDを表示する"
+        "description": "Show your sender identity"
       },
       {
         "command": "/skill",
-        "description": "名前でskillを実行する",
+        "description": "Run a skill by name",
         "usage_hint": "<name> [input]"
       },
       {
         "command": "/btw",
-        "description": "セッションコンテキストを変更せずに補足の質問をする",
+        "description": "Ask a side question without changing session context",
         "usage_hint": "<question>"
       },
       {
         "command": "/usage",
-        "description": "使用量フッターを制御するか、コスト概要を表示する",
+        "description": "Control the usage footer or show cost summary",
         "usage_hint": "off|tokens|full|cost"
       }
     ]
 ```
 
       </Tab>
-      <Tab title="HTTPリクエストURL">
+      <Tab title="HTTP リクエスト URL">
 
 ```json
     "slash_commands": [
@@ -437,7 +437,7 @@ openclaw gateway
       },
       {
         "command": "/compact",
-        "description": "セッションコンテキストを圧縮する",
+        "description": "セッションコンテキストをコンパクト化する",
         "usage_hint": "[instructions]",
         "url": "https://gateway-host.example.com/slack/events"
       },
@@ -449,7 +449,7 @@ openclaw gateway
       {
         "command": "/session",
         "description": "スレッドバインディングの有効期限を管理する",
-        "usage_hint": "idle <duration|off> or max-age <duration|off>",
+        "usage_hint": "idle <duration|off> または max-age <duration|off>",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
@@ -466,25 +466,25 @@ openclaw gateway
       },
       {
         "command": "/fast",
-        "description": "高速モードを表示または設定する",
+        "description": "fast モードを表示または設定する",
         "usage_hint": "[status|on|off]",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/reasoning",
-        "description": "reasoningの表示を切り替える",
+        "description": "reasoning の表示を切り替える",
         "usage_hint": "[on|off|stream]",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/elevated",
-        "description": "elevatedモードを切り替える",
+        "description": "elevated モードを切り替える",
         "usage_hint": "[on|off|ask|full]",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/exec",
-        "description": "execのデフォルトを表示または設定する",
+        "description": "exec のデフォルト設定を表示または設定する",
         "usage_hint": "host=<auto|sandbox|gateway|node> security=<deny|allowlist|full> ask=<off|on-miss|always> node=<id>",
         "url": "https://gateway-host.example.com/slack/events"
       },
@@ -496,13 +496,13 @@ openclaw gateway
       },
       {
         "command": "/models",
-        "description": "プロバイダー、またはプロバイダーのモデルを一覧表示する",
+        "description": "プロバイダーを一覧表示する、またはプロバイダーのモデルを一覧表示する",
         "usage_hint": "[provider] [page] [limit=<n>|size=<n>|all]",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/help",
-        "description": "短いヘルプ概要を表示する",
+        "description": "簡潔なヘルプ概要を表示する",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
@@ -518,12 +518,12 @@ openclaw gateway
       },
       {
         "command": "/agentstatus",
-        "description": "利用可能な場合はプロバイダー使用量/クォータを含むランタイムステータスを表示する",
+        "description": "利用可能な場合はプロバイダーの使用状況やクォータを含む実行時ステータスを表示する",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/tasks",
-        "description": "現在のセッションのアクティブな/最近のバックグラウンドタスクを一覧表示する",
+        "description": "現在のセッションのアクティブまたは最近のバックグラウンドタスクを一覧表示する",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
@@ -534,24 +534,24 @@ openclaw gateway
       },
       {
         "command": "/whoami",
-        "description": "自分の送信者IDを表示する",
+        "description": "自分の送信者 ID を表示する",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/skill",
-        "description": "名前でSkillsを実行する",
+        "description": "名前で skill を実行する",
         "usage_hint": "<name> [input]",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/btw",
-        "description": "セッションコンテキストを変更せずに補足の質問をする",
+        "description": "セッションコンテキストを変更せずに横道の質問をする",
         "usage_hint": "<question>",
         "url": "https://gateway-host.example.com/slack/events"
       },
       {
         "command": "/usage",
-        "description": "使用量フッターを制御するか、コスト概要を表示する",
+        "description": "usage フッターを制御する、またはコスト概要を表示する",
         "usage_hint": "off|tokens|full|cost",
         "url": "https://gateway-host.example.com/slack/events"
       }
@@ -562,51 +562,55 @@ openclaw gateway
     </Tabs>
 
   </Accordion>
-  <Accordion title="任意の著者表示スコープ（書き込み操作）">
-    送信メッセージで、デフォルトのSlackアプリIDではなくアクティブなエージェントID（カスタムユーザー名とアイコン）を使用したい場合は、`chat:write.customize`ボットスコープを追加してください。
+  <Accordion title="オプションの作成者表示スコープ（書き込み操作）">
+    送信メッセージでデフォルトの Slack アプリ ID ではなく、アクティブなエージェント ID（カスタムユーザー名とアイコン）を使いたい場合は、`chat:write.customize` bot スコープを追加してください。
 
-    絵文字アイコンを使用する場合、Slackでは`:emoji_name:`構文が必要です。
+    絵文字アイコンを使う場合、Slack では `:emoji_name:` 構文が必要です。
 
   </Accordion>
-  <Accordion title="任意のユーザートークンスコープ（読み取り操作）">
-    `channels.slack.userToken`を設定する場合、一般的な読み取りスコープは次のとおりです。
+  <Accordion title="オプションのユーザートークンスコープ（読み取り操作）">
+    `channels.slack.userToken` を設定する場合、一般的な読み取りスコープは次のとおりです。
 
-    - `channels:history`、`groups:history`、`im:history`、`mpim:history`
-    - `channels:read`、`groups:read`、`im:read`、`mpim:read`
+    - `channels:history`, `groups:history`, `im:history`, `mpim:history`
+    - `channels:read`, `groups:read`, `im:read`, `mpim:read`
     - `users:read`
     - `reactions:read`
     - `pins:read`
     - `emoji:read`
-    - `search:read`（Slack検索の読み取りに依存する場合）
+    - `search:read`（Slack 検索の読み取りに依存する場合）
 
   </Accordion>
 </AccordionGroup>
 
 ## トークンモデル
 
-- Socket Modeでは`botToken` + `appToken`が必要です。
-- HTTPモードでは`botToken` + `signingSecret`が必要です。
-- `botToken`、`appToken`、`signingSecret`、`userToken`は、平文の文字列またはSecretRefオブジェクトを受け入れます。
-- 設定内のトークンは環境変数フォールバックより優先されます。
-- `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN`の環境変数フォールバックはデフォルトアカウントにのみ適用されます。
-- `userToken`（`xoxp-...`）は設定内のみ対応です（環境変数フォールバックなし）。デフォルトでは読み取り専用動作（`userTokenReadOnly: true`）です。
+- Socket Mode には `botToken` + `appToken` が必要です。
+- HTTP モードには `botToken` + `signingSecret` が必要です。
+- `botToken`、`appToken`、`signingSecret`、`userToken` は平文の
+  文字列または SecretRef オブジェクトを受け付けます。
+- config のトークンは env フォールバックより優先されます。
+- `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN` の env フォールバックはデフォルトアカウントにのみ適用されます。
+- `userToken`（`xoxp-...`）は config 専用です（env フォールバックなし）。デフォルトでは読み取り専用動作（`userTokenReadOnly: true`）になります。
 
 ステータススナップショットの動作:
 
-- Slackアカウント検査では、資格情報ごとの`*Source`および`*Status`フィールド（`botToken`、`appToken`、`signingSecret`、`userToken`）を追跡します。
-- ステータスは`available`、`configured_unavailable`、`missing`です。
-- `configured_unavailable`は、そのアカウントがSecretRefまたは別の非インラインなシークレットソースで設定されているものの、現在のコマンド/ランタイム経路では実際の値を解決できなかったことを意味します。
-- HTTPモードでは`signingSecretStatus`が含まれます。Socket Modeでは必要な組み合わせは`botTokenStatus` + `appTokenStatus`です。
+- Slack アカウント検査では、認証情報ごとの `*Source` と `*Status`
+  フィールド（`botToken`、`appToken`、`signingSecret`、`userToken`）を追跡します。
+- ステータスは `available`、`configured_unavailable`、または `missing` です。
+- `configured_unavailable` は、そのアカウントが SecretRef
+  や別の非インラインなシークレットソースで設定されているものの、現在のコマンド/実行時パスでは
+  実際の値を解決できなかったことを意味します。
+- HTTP モードでは `signingSecretStatus` が含まれます。Socket Mode では、必要な組み合わせは `botTokenStatus` + `appTokenStatus` です。
 
 <Tip>
-アクション/ディレクトリ読み取りでは、設定されている場合はユーザートークンを優先できます。書き込みでは引き続きボットトークンが優先されます。ユーザートークンでの書き込みは、`userTokenReadOnly: false`かつボットトークンが利用できない場合にのみ許可されます。
+アクションやディレクトリ読み取りでは、設定されていれば user token が優先されることがあります。書き込みでは引き続き bot token が優先されます。user-token による書き込みが許可されるのは、`userTokenReadOnly: false` で、かつ bot token が利用できない場合だけです。
 </Tip>
 
-## アクションと制御
+## アクションとゲート
 
-Slackアクションは`channels.slack.actions.*`で制御されます。
+Slack アクションは `channels.slack.actions.*` によって制御されます。
 
-現在のSlackツールで利用可能なアクショングループ:
+現在の Slack ツールで利用可能なアクショングループ:
 
 | Group      | Default |
 | ---------- | ------- |
@@ -616,138 +620,138 @@ Slackアクションは`channels.slack.actions.*`で制御されます。
 | memberInfo | enabled |
 | emojiList  | enabled |
 
-現在のSlackメッセージアクションには、`send`、`upload-file`、`download-file`、`read`、`edit`、`delete`、`pin`、`unpin`、`list-pins`、`member-info`、`emoji-list`が含まれます。
+現在の Slack メッセージアクションには、`send`、`upload-file`、`download-file`、`read`、`edit`、`delete`、`pin`、`unpin`、`list-pins`、`member-info`、`emoji-list` が含まれます。
 
 ## アクセス制御とルーティング
 
 <Tabs>
-  <Tab title="DMポリシー">
-    `channels.slack.dmPolicy`はDMアクセスを制御します（旧形式: `channels.slack.dm.policy`）。
+  <Tab title="DM ポリシー">
+    `channels.slack.dmPolicy` は DM アクセスを制御します（レガシー: `channels.slack.dm.policy`）:
 
     - `pairing`（デフォルト）
     - `allowlist`
-    - `open`（`channels.slack.allowFrom`に`"*"`を含める必要があります。旧形式: `channels.slack.dm.allowFrom`）
+    - `open`（`channels.slack.allowFrom` に `"*"` を含める必要があります。レガシー: `channels.slack.dm.allowFrom`）
     - `disabled`
 
-    DMフラグ:
+    DM フラグ:
 
-    - `dm.enabled`（デフォルトtrue）
+    - `dm.enabled`（デフォルト true）
     - `channels.slack.allowFrom`（推奨）
-    - `dm.allowFrom`（旧形式）
-    - `dm.groupEnabled`（グループDMはデフォルトでfalse）
-    - `dm.groupChannels`（任意のMPIM allowlist）
+    - `dm.allowFrom`（レガシー）
+    - `dm.groupEnabled`（グループ DM のデフォルトは false）
+    - `dm.groupChannels`（オプションの MPIM 許可リスト）
 
     マルチアカウントの優先順位:
 
-    - `channels.slack.accounts.default.allowFrom`は`default`アカウントにのみ適用されます。
-    - 名前付きアカウントは、自身の`allowFrom`が未設定の場合に`channels.slack.allowFrom`を継承します。
-    - 名前付きアカウントは`channels.slack.accounts.default.allowFrom`を継承しません。
+    - `channels.slack.accounts.default.allowFrom` は `default` アカウントにのみ適用されます。
+    - 名前付きアカウントは、自分自身の `allowFrom` が未設定の場合に `channels.slack.allowFrom` を継承します。
+    - 名前付きアカウントは `channels.slack.accounts.default.allowFrom` を継承しません。
 
-    DMでのペアリングには`openclaw pairing approve slack <code>`を使用します。
+    DM でのペアリングには `openclaw pairing approve slack <code>` を使います。
 
   </Tab>
 
-  <Tab title="チャネルポリシー">
-    `channels.slack.groupPolicy`はチャネル処理を制御します。
+  <Tab title="チャンネルポリシー">
+    `channels.slack.groupPolicy` はチャンネル処理を制御します:
 
     - `open`
     - `allowlist`
     - `disabled`
 
-    チャネルallowlistは`channels.slack.channels`配下にあり、安定したチャネルIDを使用する必要があります。
+    チャンネルの許可リストは `channels.slack.channels` 配下にあり、安定したチャンネル ID を使うべきです。
 
-    ランタイム注記: `channels.slack`自体が完全に存在しない場合（環境変数のみのセットアップ）、ランタイムは`groupPolicy="allowlist"`にフォールバックし、警告を記録します（`channels.defaults.groupPolicy`が設定されていても同様です）。
+    実行時メモ: `channels.slack` が完全に欠けている場合（env のみのセットアップ）、実行時は `groupPolicy="allowlist"` にフォールバックし、警告をログに出します（`channels.defaults.groupPolicy` が設定されていても同様です）。
 
-    名前/ID解決:
+    名前/ID 解決:
 
-    - チャネルallowlistエントリとDM allowlistエントリは、トークンアクセスが可能であれば起動時に解決されます
-    - 解決されないチャネル名エントリは設定どおり保持されますが、デフォルトではルーティング時に無視されます
-    - 受信認可とチャネルルーティングはデフォルトでID優先です。直接のユーザー名/スラッグ一致には`channels.slack.dangerouslyAllowNameMatching: true`が必要です
+    - チャンネル許可リスト項目と DM 許可リスト項目は、トークンアクセスが許可されていれば起動時に解決されます
+    - 解決できなかったチャンネル名の項目は設定どおり保持されますが、デフォルトではルーティングで無視されます
+    - 受信認可とチャンネルルーティングはデフォルトで ID 優先です。username/slug の直接一致には `channels.slack.dangerouslyAllowNameMatching: true` が必要です
 
   </Tab>
 
-  <Tab title="メンションとチャネルユーザー">
-    チャネルメッセージはデフォルトでメンション制御されます。
+  <Tab title="メンションとチャンネルユーザー">
+    チャンネルメッセージはデフォルトでメンションゲートされます。
 
     メンションソース:
 
     - 明示的なアプリメンション（`<@botId>`）
-    - メンション正規表現パターン（`agents.list[].groupChat.mentionPatterns`、フォールバックは`messages.groupChat.mentionPatterns`）
-    - 暗黙のbot宛てスレッド返信動作（`thread.requireExplicitMention`が`true`の場合は無効）
+    - メンション regex パターン（`agents.list[].groupChat.mentionPatterns`、フォールバックは `messages.groupChat.mentionPatterns`）
+    - 暗黙の bot 宛てスレッド返信動作（`thread.requireExplicitMention` が `true` の場合は無効）
 
-    チャネルごとの制御（`channels.slack.channels.<id>`。名前は起動時解決または`dangerouslyAllowNameMatching`経由のみ）:
+    チャンネルごとの制御（`channels.slack.channels.<id>`。名前は起動時解決または `dangerouslyAllowNameMatching` 経由のみ）:
 
     - `requireMention`
-    - `users`（allowlist）
+    - `users`（許可リスト）
     - `allowBots`
     - `skills`
     - `systemPrompt`
-    - `tools`、`toolsBySender`
-    - `toolsBySender`のキー形式: `id:`、`e164:`、`username:`、`name:`、または`"*"`ワイルドカード
-      （旧来の接頭辞なしキーは引き続き`id:`のみにマップされます）
+    - `tools`, `toolsBySender`
+    - `toolsBySender` のキー形式: `id:`、`e164:`、`username:`、`name:`、または `"*"` ワイルドカード
+      （レガシーの接頭辞なしキーも引き続き `id:` のみにマップされます）
 
   </Tab>
 </Tabs>
 
 ## スレッド、セッション、返信タグ
 
-- DMは`direct`として、チャネルは`channel`として、MPIMは`group`としてルーティングされます。
-- デフォルトの`session.dmScope=main`では、Slack DMはエージェントのメインセッションに集約されます。
-- チャネルセッション: `agent:<agentId>:slack:channel:<channelId>`。
-- スレッド返信は、該当する場合にスレッドセッション接尾辞（`:thread:<threadTs>`）を作成できます。
-- `channels.slack.thread.historyScope`のデフォルトは`thread`、`thread.inheritParent`のデフォルトは`false`です。
-- `channels.slack.thread.initialHistoryLimit`は、新しいスレッドセッション開始時に取得する既存スレッドメッセージ数を制御します（デフォルトは`20`。無効化するには`0`に設定）。
-- `channels.slack.thread.requireExplicitMention`（デフォルト`false`）: `true`の場合、暗黙のスレッドメンションを抑制し、botがすでにそのスレッドに参加していても、スレッド内の明示的な`@bot`メンションにのみ応答します。これがない場合、bot参加済みスレッド内の返信は`requireMention`制御をバイパスします。
+- DM は `direct` としてルーティングされ、チャンネルは `channel`、MPIM は `group` としてルーティングされます。
+- デフォルトの `session.dmScope=main` では、Slack DM はエージェントのメインセッションに集約されます。
+- チャンネルセッション: `agent:<agentId>:slack:channel:<channelId>`。
+- スレッド返信では、適用可能な場合にスレッドセッション接尾辞（`:thread:<threadTs>`）を作成できます。
+- `channels.slack.thread.historyScope` のデフォルトは `thread`、`thread.inheritParent` のデフォルトは `false` です。
+- `channels.slack.thread.initialHistoryLimit` は、新しいスレッドセッション開始時に取得する既存スレッドメッセージ数を制御します（デフォルト `20`。無効化するには `0` を設定）。
+- `channels.slack.thread.requireExplicitMention`（デフォルト `false`）: `true` の場合、暗黙のスレッドメンションを抑制し、bot がすでにそのスレッドに参加していても、スレッド内では明示的な `@bot` メンションにのみ応答します。これがない場合、bot が参加しているスレッド内の返信は `requireMention` ゲートをバイパスします。
 
 返信スレッド制御:
 
-- `channels.slack.replyToMode`: `off|first|all|batched`（デフォルト`off`）
-- `channels.slack.replyToModeByChatType`: `direct|group|channel`ごと
-- ダイレクトチャット向けの旧来のフォールバック: `channels.slack.dm.replyToMode`
+- `channels.slack.replyToMode`: `off|first|all|batched`（デフォルト `off`）
+- `channels.slack.replyToModeByChatType`: `direct|group|channel` ごと
+- direct チャット用のレガシーフォールバック: `channels.slack.dm.replyToMode`
 
-手動返信タグがサポートされています。
+手動返信タグがサポートされています:
 
 - `[[reply_to_current]]`
 - `[[reply_to:<id>]]`
 
-注: `replyToMode="off"`は、明示的な`[[reply_to_*]]`タグを含め、Slackにおける**すべての**返信スレッド化を無効にします。これはTelegramと異なり、Telegramでは`"off"`モードでも明示的タグは引き続き尊重されます。この違いはプラットフォームのスレッドモデルを反映したものです。Slackスレッドではメッセージがチャネルから隠れますが、Telegramの返信はメインチャットフロー内で可視のままです。
+注: `replyToMode="off"` は、明示的な `[[reply_to_*]]` タグを含め、Slack での**すべて**の返信スレッド化を無効にします。これは Telegram と異なり、Telegram では `"off"` モードでも明示タグが引き続き尊重されます。この違いはプラットフォームのスレッドモデルを反映しています。Slack のスレッドはメッセージをチャンネルから隠しますが、Telegram の返信はメインチャットの流れの中で表示されたままです。
 
-## ackリアクション
+## 確認用リアクション
 
-`ackReaction`は、OpenClawが受信メッセージを処理中であることを示す確認用絵文字を送信します。
+`ackReaction` は、OpenClaw が受信メッセージを処理中に確認用の絵文字を送信します。
 
 解決順序:
 
 - `channels.slack.accounts.<accountId>.ackReaction`
 - `channels.slack.ackReaction`
 - `messages.ackReaction`
-- エージェントIDの絵文字フォールバック（`agents.list[].identity.emoji`、なければ`"👀"`）
+- エージェント ID の絵文字フォールバック（`agents.list[].identity.emoji`、なければ `"👀"`）
 
-注記:
+注意:
 
-- Slackはショートコードを期待します（例: `"eyes"`）。
-- Slackアカウント単位またはグローバルでリアクションを無効にするには`""`を使用します。
+- Slack では shortcode が必要です（例: `"eyes"`）。
+- Slack アカウント単位またはグローバルにリアクションを無効にするには `""` を使用します。
 
 ## テキストストリーミング
 
-`channels.slack.streaming`はライブプレビュー動作を制御します:
+`channels.slack.streaming` はライブプレビューの動作を制御します:
 
-- `off`: ライブプレビューストリーミングを無効にします。
-- `partial`（デフォルト）: プレビューテキストを最新の部分出力で置き換えます。
-- `block`: チャンク化されたプレビュー更新を追記します。
-- `progress`: 生成中は進捗ステータステキストを表示し、その後に最終テキストを送信します。
-- `streaming.preview.toolProgress`: 下書きプレビューが有効なとき、ツール/進捗更新を同じ編集済みプレビューメッセージに流します（デフォルト: `true`）。分離したツール/進捗メッセージのままにするには`false`に設定します。
+- `off`: ライブプレビューのストリーミングを無効にします。
+- `partial`（デフォルト）: プレビューのテキストを最新の部分出力で置き換えます。
+- `block`: 分割されたプレビュー更新を追記します。
+- `progress`: 生成中は進行状況テキストを表示し、その後で最終テキストを送信します。
+- `streaming.preview.toolProgress`: ドラフトプレビューが有効なとき、ツール/進行状況の更新を同じ編集対象のプレビューメッセージに流します（デフォルト: `true`）。別々のツール/進行状況メッセージを維持するには `false` に設定します。
 
-`channels.slack.streaming.nativeTransport`は、`channels.slack.streaming.mode`が`partial`のときのSlackネイティブテキストストリーミングを制御します（デフォルト: `true`）。
+`channels.slack.streaming.nativeTransport` は、`channels.slack.streaming.mode` が `partial` のときの Slack ネイティブテキストストリーミングを制御します（デフォルト: `true`）。
 
-- SlackネイティブテキストストリーミングとSlack assistantスレッドステータスを表示するには、返信スレッドが利用可能である必要があります。スレッド選択は引き続き`replyToMode`に従います。
-- チャネルおよびグループチャットのルートでは、ネイティブストリーミングが利用できない場合でも通常の下書きプレビューを使用できます。
-- 最上位のSlack DMはデフォルトでスレッド外のままなので、スレッド形式のプレビューは表示されません。そこで進捗を見えるようにしたい場合は、スレッド返信または`typingReaction`を使用してください。
-- メディアおよび非テキストペイロードは通常の配信にフォールバックします。
-- メディア/エラーの最終出力では、一時的な下書きをフラッシュせずに保留中のプレビュー編集をキャンセルします。対象となるテキスト/ブロックの最終出力は、その場でプレビューを編集できる場合にのみフラッシュされます。
-- 返信の途中でストリーミングに失敗した場合、OpenClawは残りのペイロードについて通常の配信にフォールバックします。
+- Slack ネイティブテキストストリーミングと Slack assistant のスレッドステータスを表示するには、返信スレッドが利用可能である必要があります。スレッド選択は引き続き `replyToMode` に従います。
+- ネイティブストリーミングが利用できない場合でも、チャンネルおよびグループチャットのルートでは通常のドラフトプレビューを使用できます。
+- 最上位の Slack DM はデフォルトでスレッド外のままなので、スレッド形式のプレビューは表示されません。そこでも進行状況を見せたい場合は、スレッド返信または `typingReaction` を使用してください。
+- メディアと非テキストのペイロードは通常の配信にフォールバックします。
+- メディア/エラーの最終出力では、一時的なドラフトを反映せずに保留中のプレビュー編集をキャンセルします。対象となるテキスト/ブロックの最終出力は、プレビューをその場で編集できる場合にのみ反映されます。
+- 返信の途中でストリーミングに失敗した場合、OpenClaw は残りのペイロードを通常配信にフォールバックします。
 
-Slackネイティブテキストストリーミングの代わりに下書きプレビューを使用するには:
+Slack ネイティブテキストストリーミングの代わりにドラフトプレビューを使用する:
 
 ```json5
 {
@@ -762,57 +766,57 @@ Slackネイティブテキストストリーミングの代わりに下書きプ
 }
 ```
 
-旧キー:
+レガシーキー:
 
-- `channels.slack.streamMode`（`replace | status_final | append`）は自動的に`channels.slack.streaming.mode`へ移行されます。
-- 真偽値の`channels.slack.streaming`は自動的に`channels.slack.streaming.mode`および`channels.slack.streaming.nativeTransport`へ移行されます。
-- 旧来の`channels.slack.nativeStreaming`は自動的に`channels.slack.streaming.nativeTransport`へ移行されます。
+- `channels.slack.streamMode`（`replace | status_final | append`）は `channels.slack.streaming.mode` に自動移行されます。
+- boolean の `channels.slack.streaming` は `channels.slack.streaming.mode` と `channels.slack.streaming.nativeTransport` に自動移行されます。
+- レガシーの `channels.slack.nativeStreaming` は `channels.slack.streaming.nativeTransport` に自動移行されます。
 
-## typingリアクションのフォールバック
+## typing リアクションのフォールバック
 
-`typingReaction`は、OpenClawが返信を処理している間、受信したSlackメッセージに一時的なリアクションを追加し、実行完了時にそれを削除します。これは、デフォルトの「入力中...」ステータスインジケーターを使用するスレッド返信の外側で特に有用です。
+`typingReaction` は、OpenClaw が返信を処理している間、受信した Slack メッセージに一時的なリアクションを追加し、実行完了時にそれを削除します。これは、デフォルトの「入力中...」ステータス表示を使うスレッド返信の外側で特に有用です。
 
 解決順序:
 
 - `channels.slack.accounts.<accountId>.typingReaction`
 - `channels.slack.typingReaction`
 
-注記:
+注意:
 
-- Slackはショートコードを期待します（例: `"hourglass_flowing_sand"`）。
-- このリアクションはベストエフォートであり、返信または失敗経路の完了後に自動的にクリーンアップが試行されます。
+- Slack では shortcode が必要です（例: `"hourglass_flowing_sand"`）。
+- このリアクションはベストエフォートであり、返信または失敗処理の完了後に自動でクリーンアップが試みられます。
 
-## メディア、チャンク分割、配信
+## メディア、分割、配信
 
 <AccordionGroup>
   <Accordion title="受信添付ファイル">
-    Slackのファイル添付は、SlackホストのプライベートURLからダウンロードされ（トークン認証リクエストフロー）、取得成功かつサイズ制限内であればメディアストアに書き込まれます。
+    Slack のファイル添付は、Slack がホストする非公開 URL から（トークン認証付きリクエストフローで）ダウンロードされ、取得に成功しサイズ制限内であればメディアストアに書き込まれます。
 
-    ランタイムの受信サイズ上限は、`channels.slack.mediaMaxMb`で上書きされない限り、デフォルトで`20MB`です。
+    実行時の受信サイズ上限は、`channels.slack.mediaMaxMb` で上書きしない限りデフォルトで `20MB` です。
 
   </Accordion>
 
   <Accordion title="送信テキストとファイル">
-    - テキストチャンクは`channels.slack.textChunkLimit`を使用します（デフォルト4000）
-    - `channels.slack.chunkMode="newline"`で段落優先の分割を有効にします
-    - ファイル送信はSlackアップロードAPIを使用し、スレッド返信（`thread_ts`）を含めることができます
-    - 送信メディア上限は、設定されていれば`channels.slack.mediaMaxMb`に従います。それ以外の場合、チャネル送信はメディアパイプラインのMIME種別デフォルトに従います
+    - テキスト分割には `channels.slack.textChunkLimit` を使用します（デフォルト 4000）
+    - `channels.slack.chunkMode="newline"` で段落優先の分割が有効になります
+    - ファイル送信には Slack のアップロード API を使用し、スレッド返信（`thread_ts`）を含めることもできます
+    - 送信メディア上限は、設定されていれば `channels.slack.mediaMaxMb` に従います。それ以外の場合、チャンネル送信はメディアパイプラインの MIME 種別デフォルトに従います
   </Accordion>
 
-  <Accordion title="配信ターゲット">
-    推奨される明示的ターゲット:
+  <Accordion title="配信先">
+    推奨される明示的な送信先:
 
-    - DM向けの`user:<id>`
-    - チャネル向けの`channel:<id>`
+    - DM には `user:<id>`
+    - チャンネルには `channel:<id>`
 
-    Slack DMは、ユーザーターゲットへの送信時にSlack conversation API経由で開かれます。
+    Slack DM は、user ターゲットへの送信時に Slack の conversation API 経由で開かれます。
 
   </Accordion>
 </AccordionGroup>
 
 ## コマンドとスラッシュ動作
 
-スラッシュコマンドは、Slackでは単一の設定済みコマンドまたは複数のネイティブコマンドとして表示されます。コマンドデフォルトを変更するには`channels.slack.slashCommand`を設定します:
+Slack では、スラッシュコマンドは単一の設定済みコマンドとして、または複数のネイティブコマンドとして表示されます。コマンドのデフォルトを変更するには `channels.slack.slashCommand` を設定します。
 
 - `enabled: false`
 - `name: "openclaw"`
@@ -823,32 +827,32 @@ Slackネイティブテキストストリーミングの代わりに下書きプ
 /openclaw /help
 ```
 
-ネイティブコマンドには、Slackアプリで[追加のマニフェスト設定](#additional-manifest-settings)が必要で、代わりに`channels.slack.commands.native: true`またはグローバル設定の`commands.native: true`で有効にします。
+ネイティブコマンドには、Slack アプリで[追加の manifest 設定](#additional-manifest-settings)が必要であり、代わりに `channels.slack.commands.native: true` またはグローバル設定の `commands.native: true` で有効にします。
 
-- Slackではネイティブコマンド自動モードは**off**なので、`commands.native: "auto"`ではSlackネイティブコマンドは有効になりません。
+- Slack ではネイティブコマンドの自動モードは **off** なので、`commands.native: "auto"` では Slack ネイティブコマンドは有効になりません。
 
 ```txt
 /help
 ```
 
-ネイティブ引数メニューは、選択したオプション値を送信する前に確認モーダルを表示する適応型レンダリング戦略を使用します:
+ネイティブ引数メニューは、選択したオプション値を送信する前に確認モーダルを表示する適応型レンダリング戦略を使用します。
 
-- 最大5個のオプション: ボタンブロック
-- 6〜100個のオプション: 静的選択メニュー
-- 100個超のオプション: インタラクティビティのオプションハンドラーが利用可能な場合、非同期オプションフィルタリング付きの外部選択
-- Slack制限超過時: エンコード済みオプション値はボタンにフォールバック
+- 最大 5 オプション: ボタンブロック
+- 6〜100 オプション: 静的セレクトメニュー
+- 100 を超えるオプション: interactivity のオプションハンドラーが利用可能な場合、非同期オプションフィルタリング付きの外部セレクト
+- Slack の上限超過時: エンコード済みオプション値はボタンにフォールバック
 
 ```txt
 /think
 ```
 
-スラッシュセッションは`agent:<agentId>:slack:slash:<userId>`のような分離キーを使用しつつ、コマンド実行は引き続き`CommandTargetSessionKey`を使って対象会話セッションにルーティングされます。
+スラッシュセッションでは `agent:<agentId>:slack:slash:<userId>` のような分離キーを使用しつつ、コマンド実行は引き続き `CommandTargetSessionKey` を使って対象の会話セッションへルーティングされます。
 
 ## インタラクティブ返信
 
-Slackはエージェント作成のインタラクティブ返信コントロールをレンダリングできますが、この機能はデフォルトでは無効です。
+Slack はエージェント作成のインタラクティブ返信コントロールをレンダリングできますが、この機能はデフォルトでは無効です。
 
-グローバルで有効にするには:
+グローバルに有効化する:
 
 ```json5
 {
@@ -862,7 +866,7 @@ Slackはエージェント作成のインタラクティブ返信コントロー
 }
 ```
 
-または、1つのSlackアカウントでのみ有効にするには:
+または、1 つの Slack アカウントだけで有効化する:
 
 ```json5
 {
@@ -880,41 +884,43 @@ Slackはエージェント作成のインタラクティブ返信コントロー
 }
 ```
 
-有効時、エージェントはSlack専用の返信ディレクティブを出力できます:
+有効にすると、エージェントは Slack 専用の返信ディレクティブを出力できます。
 
 - `[[slack_buttons: Approve:approve, Reject:reject]]`
 - `[[slack_select: Choose a target | Canary:canary, Production:production]]`
 
-これらのディレクティブはSlack Block Kitにコンパイルされ、クリックまたは選択は既存のSlackインタラクションイベント経路を通じて戻されます。
+これらのディレクティブは Slack Block Kit にコンパイルされ、クリックや選択は既存の Slack interaction イベント経路を通って返送されます。
 
-注記:
+注意:
 
-- これはSlack専用UIです。他のチャネルはSlack Block Kitディレクティブを独自のボタンシステムへ変換しません。
-- インタラクティブコールバック値は、エージェントが生で書いた値ではなく、OpenClaw生成の不透明トークンです。
-- 生成されたインタラクティブブロックがSlack Block Kitの制限を超える場合、OpenClawは無効なblocksペイロードを送る代わりに元のテキスト返信へフォールバックします。
+- これは Slack 固有の UI です。他のチャンネルは Slack Block Kit ディレクティブを独自のボタンシステムに変換しません。
+- インタラクティブコールバック値は OpenClaw が生成した不透明トークンであり、生のエージェント作成値ではありません。
+- 生成されたインタラクティブブロックが Slack Block Kit の上限を超える場合、OpenClaw は無効な blocks ペイロードを送る代わりに、元のテキスト返信へフォールバックします。
 
-## Slackでのexec承認
+## Slack での exec 承認
 
-Slackは、Web UIやターミナルにフォールバックする代わりに、インタラクティブボタンとインタラクションを備えたネイティブ承認クライアントとして動作できます。
+Slack は、Web UI やターミナルへフォールバックする代わりに、インタラクティブボタンと interaction を備えたネイティブ承認クライアントとして動作できます。
 
-- Exec承認は、ネイティブDM/チャネルルーティング向けに`channels.slack.execApprovals.*`を使用します。
-- Plugin承認も、リクエストがすでにSlackに届いていて承認ID種別が`plugin:`である場合、同じSlackネイティブボタンUIを通じて解決できます。
-- 承認者の認可は引き続き強制されます。承認者として識別されたユーザーのみがSlack経由でリクエストを承認または拒否できます。
+- exec 承認では、ネイティブ DM/チャンネルルーティングに `channels.slack.execApprovals.*` を使用します。
+- Plugin 承認は、リクエストがすでに Slack に届いていて承認 ID 種別が `plugin:` の場合、同じ Slack ネイティブボタン表示を通して解決できます。
+- 承認者の認可は引き続き適用されます。Slack 経由でリクエストを承認または拒否できるのは、承認者として識別されたユーザーだけです。
 
-これは他のチャネルと同じ共有承認ボタンUIを使用します。Slackアプリ設定で`interactivity`が有効な場合、承認プロンプトは会話内に直接Block Kitボタンとしてレンダリングされます。
-これらのボタンが存在する場合、それが主要な承認UXです。OpenClawは、ツール結果がチャット承認不可を示す場合、または手動承認が唯一の経路である場合にのみ、手動の`/approve`コマンドを含めるべきです。
+これは他のチャンネルと同じ共有承認ボタン表示を使います。Slack アプリ設定で `interactivity` が有効になっていると、承認プロンプトは会話内に直接 Block Kit ボタンとして表示されます。
+これらのボタンが存在する場合、それが主要な承認 UX です。OpenClaw
+は、ツール結果がチャット承認を利用不可と示している場合、または手動承認が唯一の手段である場合にのみ、手動の `/approve` コマンドを含めるべきです。
 
 設定パス:
 
 - `channels.slack.execApprovals.enabled`
-- `channels.slack.execApprovals.approvers`（任意。可能な場合は`commands.ownerAllowFrom`にフォールバック）
+- `channels.slack.execApprovals.approvers`（省略可。可能な場合は `commands.ownerAllowFrom` にフォールバック）
 - `channels.slack.execApprovals.target`（`dm` | `channel` | `both`、デフォルト: `dm`）
-- `agentFilter`、`sessionFilter`
+- `agentFilter`, `sessionFilter`
 
-Slackは、`enabled`が未設定または`"auto"`で、かつ少なくとも1人の承認者が解決された場合、ネイティブexec承認を自動有効化します。Slackをネイティブ承認クライアントとして明示的に無効にするには`enabled: false`を設定してください。
-承認者が解決されるときにネイティブ承認を強制的に有効化するには`enabled: true`を設定してください。
+Slack は、`enabled` が未設定または `"auto"` で、かつ少なくとも 1 人の
+承認者が解決されると、ネイティブ exec 承認を自動有効化します。Slack をネイティブ承認クライアントとして明示的に無効にするには `enabled: false` を設定してください。
+承認者が解決されるときにネイティブ承認を強制有効化するには `enabled: true` を設定してください。
 
-明示的なSlack exec承認設定がない場合のデフォルト動作:
+明示的な Slack exec 承認設定がない場合のデフォルト動作:
 
 ```json5
 {
@@ -924,7 +930,7 @@ Slackは、`enabled`が未設定または`"auto"`で、かつ少なくとも1人
 }
 ```
 
-明示的なSlackネイティブ設定が必要なのは、承認者を上書きしたい、フィルターを追加したい、または発信元チャット配信を選びたい場合だけです:
+承認者を上書きしたい、フィルターを追加したい、または送信元チャットへの配信を有効にしたい場合にのみ、明示的な Slack ネイティブ設定が必要です。
 
 ```json5
 {
@@ -940,49 +946,50 @@ Slackは、`enabled`が未設定または`"auto"`で、かつ少なくとも1人
 }
 ```
 
-共有の`approvals.exec`転送は別です。exec承認プロンプトを他のチャットや明示的な帯域外ターゲットにもルーティングする必要がある場合にのみ使用してください。共有の`approvals.plugin`転送も別です。Slackネイティブボタンは、それらのリクエストがすでにSlackに届いている場合、引き続きPlugin承認を解決できます。
+共有の `approvals.exec` 転送は別機能です。exec 承認プロンプトを他のチャットや明示的な帯域外ターゲットにもルーティングする必要がある場合にのみ使用してください。共有の `approvals.plugin` 転送も別です。Slack ネイティブボタンは、それらのリクエストがすでに
+Slack に届いている場合、引き続き plugin 承認を解決できます。
 
-同一チャットでの`/approve`も、すでにコマンドをサポートしているSlackチャネルとDMで動作します。完全な承認転送モデルについては[Exec approvals](/ja-JP/tools/exec-approvals)を参照してください。
+同じチャット内での `/approve` も、すでにコマンドをサポートしている Slack チャンネルと DM で機能します。完全な承認転送モデルについては [Exec approvals](/ja-JP/tools/exec-approvals) を参照してください。
 
 ## イベントと運用時の動作
 
-- メッセージ編集/削除/スレッドブロードキャストはシステムイベントにマップされます。
-- リアクション追加/削除イベントはシステムイベントにマップされます。
-- メンバー参加/退出、チャネル作成/名前変更、ピン追加/削除イベントはシステムイベントにマップされます。
-- `channel_id_changed`は、`configWrites`が有効な場合にチャネル設定キーを移行できます。
-- チャネルtopic/purposeメタデータは信頼されないコンテキストとして扱われ、ルーティングコンテキストに注入されることがあります。
-- スレッド開始メッセージと初期スレッド履歴コンテキストのシーディングは、該当する場合は設定済み送信者allowlistでフィルタリングされます。
-- ブロックアクションとモーダルインタラクションは、豊富なペイロードフィールドを含む構造化された`Slack interaction: ...`システムイベントを出力します:
-  - ブロックアクション: 選択値、ラベル、picker値、`workflow_*`メタデータ
-  - モーダルの`view_submission`および`view_closed`イベント: ルーティングされたチャネルメタデータとフォーム入力付き
+- メッセージ編集/削除/スレッドブロードキャストはシステムイベントにマッピングされます。
+- リアクションの追加/削除イベントはシステムイベントにマッピングされます。
+- メンバーの参加/離脱、チャンネル作成/名前変更、ピン追加/削除イベントはシステムイベントにマッピングされます。
+- `channel_id_changed` は、`configWrites` が有効な場合にチャンネル設定キーを移行できます。
+- チャンネルトピック/目的メタデータは信頼されないコンテキストとして扱われ、ルーティングコンテキストに注入されることがあります。
+- スレッド開始メッセージと初期スレッド履歴のコンテキスト投入は、適用可能な場合、設定済み送信者許可リストによってフィルタリングされます。
+- ブロックアクションとモーダル interaction は、リッチなペイロードフィールドを持つ構造化された `Slack interaction: ...` システムイベントを出力します。
+  - block actions: 選択値、ラベル、picker 値、`workflow_*` メタデータ
+  - モーダル `view_submission` および `view_closed` イベント: ルーティングされたチャンネルメタデータとフォーム入力付き
 
 ## 設定リファレンスへのポインタ
 
-主要リファレンス:
+主なリファレンス:
 
-- [設定リファレンス - Slack](/ja-JP/gateway/configuration-reference#slack)
+- [Configuration reference - Slack](/ja-JP/gateway/configuration-reference#slack)
 
-  重要なSlackフィールド:
-  - mode/auth: `mode`、`botToken`、`appToken`、`signingSecret`、`webhookPath`、`accounts.*`
-  - DMアクセス: `dm.enabled`、`dmPolicy`、`allowFrom`（旧形式: `dm.policy`、`dm.allowFrom`）、`dm.groupEnabled`、`dm.groupChannels`
-  - 互換性トグル: `dangerouslyAllowNameMatching`（緊急用。必要な場合以外はoffのままにしてください）
-  - チャネルアクセス: `groupPolicy`、`channels.*`、`channels.*.users`、`channels.*.requireMention`
-  - スレッド/履歴: `replyToMode`、`replyToModeByChatType`、`thread.*`、`historyLimit`、`dmHistoryLimit`、`dms.*.historyLimit`
-  - 配信: `textChunkLimit`、`chunkMode`、`mediaMaxMb`、`streaming`、`streaming.nativeTransport`、`streaming.preview.toolProgress`
-  - 運用/機能: `configWrites`、`commands.native`、`slashCommand.*`、`actions.*`、`userToken`、`userTokenReadOnly`
+  重要な Slack フィールド:
+  - mode/auth: `mode`, `botToken`, `appToken`, `signingSecret`, `webhookPath`, `accounts.*`
+  - DM アクセス: `dm.enabled`, `dmPolicy`, `allowFrom`（レガシー: `dm.policy`, `dm.allowFrom`）, `dm.groupEnabled`, `dm.groupChannels`
+  - 互換性トグル: `dangerouslyAllowNameMatching`（最終手段。必要になるまでオフのままにしてください）
+  - チャンネルアクセス: `groupPolicy`, `channels.*`, `channels.*.users`, `channels.*.requireMention`
+  - スレッド/履歴: `replyToMode`, `replyToModeByChatType`, `thread.*`, `historyLimit`, `dmHistoryLimit`, `dms.*.historyLimit`
+  - 配信: `textChunkLimit`, `chunkMode`, `mediaMaxMb`, `streaming`, `streaming.nativeTransport`, `streaming.preview.toolProgress`
+  - 運用/機能: `configWrites`, `commands.native`, `slashCommand.*`, `actions.*`, `userToken`, `userTokenReadOnly`
 
 ## トラブルシューティング
 
 <AccordionGroup>
-  <Accordion title="チャネルで返信がない">
-    次の順に確認してください:
+  <Accordion title="チャンネルで返信がない">
+    次の順に確認してください。
 
     - `groupPolicy`
-    - チャネルallowlist（`channels.slack.channels`）
+    - チャンネル許可リスト（`channels.slack.channels`）
     - `requireMention`
-    - チャネルごとの`users` allowlist
+    - チャンネルごとの `users` 許可リスト
 
-    役立つコマンド:
+    便利なコマンド:
 
 ```bash
 openclaw channels status --probe
@@ -992,12 +999,12 @@ openclaw doctor
 
   </Accordion>
 
-  <Accordion title="DMメッセージが無視される">
-    次を確認してください:
+  <Accordion title="DM メッセージが無視される">
+    確認項目:
 
     - `channels.slack.dm.enabled`
-    - `channels.slack.dmPolicy`（または旧形式の`channels.slack.dm.policy`）
-    - ペアリング承認 / allowlistエントリ
+    - `channels.slack.dmPolicy`（またはレガシーの `channels.slack.dm.policy`）
+    - ペアリング承認 / 許可リスト項目
 
 ```bash
 openclaw pairing list slack
@@ -1005,37 +1012,35 @@ openclaw pairing list slack
 
   </Accordion>
 
-  <Accordion title="Socket modeが接続しない">
-    ボットトークンとアプリトークン、およびSlackアプリ設定でのSocket Mode有効化を確認してください。
+  <Accordion title="Socket mode が接続しない">
+    bot + app トークンと、Slack アプリ設定での Socket Mode 有効化を確認してください。
 
-    `openclaw channels status --probe --json`で`botTokenStatus`または
-    `appTokenStatus: "configured_unavailable"`が表示される場合、そのSlackアカウントは
-    設定済みですが、現在のランタイムではSecretRefで管理された
+    `openclaw channels status --probe --json` に `botTokenStatus` または
+    `appTokenStatus: "configured_unavailable"` が表示される場合、その Slack アカウントは
+    設定済みですが、現在の実行時に SecretRef を使った
     値を解決できませんでした。
 
   </Accordion>
 
-  <Accordion title="HTTP modeでイベントを受信しない">
-    次を確認してください:
+  <Accordion title="HTTP モードでイベントを受信しない">
+    次を確認してください。
 
     - signing secret
-    - webhook path
-    - Slack Request URLs（Events + Interactivity + Slash Commands）
-    - HTTPアカウントごとの一意な`webhookPath`
+    - webhook パス
+    - Slack Request URL（Events + Interactivity + Slash Commands）
+    - HTTP アカウントごとの一意な `webhookPath`
 
-    アカウントスナップショットに`signingSecretStatus: "configured_unavailable"`が
-    表示される場合、そのHTTPアカウントは設定済みですが、現在のランタイムでは
-    SecretRefで管理されたsigning secretを解決できませんでした。
+    アカウントスナップショットに `signingSecretStatus: "configured_unavailable"` が表示される場合、その HTTP アカウントは設定済みですが、現在の実行時に SecretRef を使った signing secret を解決できませんでした。
 
   </Accordion>
 
-  <Accordion title="ネイティブ/スラッシュコマンドが発火しない">
-    意図していたものを確認してください:
+  <Accordion title="ネイティブ/スラッシュコマンドが反応しない">
+    次のどちらを意図していたか確認してください。
 
-    - Slackに登録された対応するスラッシュコマンドを伴うネイティブコマンドモード（`channels.slack.commands.native: true`）
+    - ネイティブコマンドモード（`channels.slack.commands.native: true`）で、Slack に対応するスラッシュコマンドが登録されている
     - または単一スラッシュコマンドモード（`channels.slack.slashCommand.enabled: true`）
 
-    あわせて`commands.useAccessGroups`とチャネル/ユーザーallowlistも確認してください。
+    あわせて、`commands.useAccessGroups` とチャンネル/ユーザー許可リストも確認してください。
 
   </Accordion>
 </AccordionGroup>
@@ -1045,7 +1050,7 @@ openclaw pairing list slack
 - [ペアリング](/ja-JP/channels/pairing)
 - [グループ](/ja-JP/channels/groups)
 - [セキュリティ](/ja-JP/gateway/security)
-- [チャネルルーティング](/ja-JP/channels/channel-routing)
+- [チャンネルルーティング](/ja-JP/channels/channel-routing)
 - [トラブルシューティング](/ja-JP/channels/troubleshooting)
 - [設定](/ja-JP/gateway/configuration)
 - [スラッシュコマンド](/ja-JP/tools/slash-commands)
