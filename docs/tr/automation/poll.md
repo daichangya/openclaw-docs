@@ -1,15 +1,15 @@
 ---
-summary: /tools/message adresine yönlendir
+summary: /cli/message konumuna yönlendir
 title: Anketler
 x-i18n:
-    generated_at: "2026-04-05T13:42:00Z"
+    generated_at: "2026-04-23T08:56:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8d69432ad8ba5fd80b59f8df779a1105ce0a2ff767d7dd5dc9d8e3ac1cb1ff1f
+    source_hash: 0639c4d35678e5cb0d3a262e2db9cd8db1e25e3eb26adc28bf76b5df14e5446f
     source_path: automation/poll.md
     workflow: 15
 ---
 
 # Anketler
 
-Bu sayfa [Message tool](/cli/message) sayfasına taşındı. Anket belgeleri için [Message tool](/cli/message) sayfasına bakın.
+Bu sayfa [Message tool](/tr/cli/message) konumuna taşındı. Anket belgeleri için [Message tool](/tr/cli/message) sayfasına bakın.

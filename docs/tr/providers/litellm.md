@@ -1,40 +1,41 @@
 ---
 read_when:
-    - OpenClaw’u bir LiteLLM proxy üzerinden yönlendirmek istiyorsunuz
-    - LiteLLM üzerinden maliyet takibi, günlükleme veya model yönlendirmesine ihtiyacınız var
-summary: Birleşik model erişimi ve maliyet takibi için OpenClaw’u LiteLLM Proxy üzerinden çalıştırın
+    - OpenClaw'ı bir LiteLLM proxy üzerinden yönlendirmek istiyorsunuz
+    - LiteLLM üzerinden maliyet takibi, günlükleme veya model yönlendirme istiyorsunuz
+summary: Birleşik model erişimi ve maliyet takibi için OpenClaw'ı LiteLLM Proxy üzerinden çalıştırın
 title: LiteLLM
 x-i18n:
-    generated_at: "2026-04-12T23:31:25Z"
+    generated_at: "2026-04-23T09:09:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 766692eb83a1be83811d8e09a970697530ffdd4f3392247cfb2927fd590364a0
+    source_hash: 6f9665b204126861a7dbbd426b26a624e60fd219a44756cec6a023df73848cef
     source_path: providers/litellm.md
     workflow: 15
 ---
 
 # LiteLLM
 
-[LiteLLM](https://litellm.ai), 100’den fazla model sağlayıcısına birleşik bir API sunan açık kaynaklı bir LLM gateway’idir. Merkezi maliyet takibi, günlükleme ve OpenClaw yapılandırmanızı değiştirmeden arka uçlar arasında geçiş yapma esnekliği elde etmek için OpenClaw’u LiteLLM üzerinden yönlendirin.
+[LiteLLM](https://litellm.ai), 100'den fazla model sağlayıcısı için birleşik API sunan açık kaynaklı bir LLM gateway'idir. Merkezi maliyet takibi, günlükleme ve OpenClaw yapılandırmanızı değiştirmeden arka uçlar arasında geçiş yapma esnekliği elde etmek için OpenClaw'ı LiteLLM üzerinden yönlendirin.
 
 <Tip>
-**OpenClaw ile neden LiteLLM kullanmalısınız?**
+**OpenClaw ile neden LiteLLM kullanılmalı?**
 
-- **Maliyet takibi** — OpenClaw’un tüm modeller genelinde tam olarak ne harcadığını görün
-- **Model yönlendirme** — Yapılandırma değişikliği olmadan Claude, GPT-4, Gemini, Bedrock arasında geçiş yapın
-- **Sanal anahtarlar** — OpenClaw için harcama limitli anahtarlar oluşturun
+- **Maliyet takibi** — OpenClaw'ın tüm modellerde tam olarak ne harcadığını görün
+- **Model yönlendirme** — Yapılandırma değiştirmeden Claude, GPT-4, Gemini, Bedrock arasında geçiş yapın
+- **Sanal anahtarlar** — OpenClaw için harcama sınırlarına sahip anahtarlar oluşturun
 - **Günlükleme** — Hata ayıklama için tam istek/yanıt günlükleri
-- **Geri dönüşler** — Birincil sağlayıcınız kapalıysa otomatik yük devretme
-  </Tip>
+- **Geri dönüşler** — Birincil sağlayıcınız kapalıysa otomatik devralma
+
+</Tip>
 
 ## Hızlı başlangıç
 
 <Tabs>
-  <Tab title="Başlangıç kurulumu (önerilen)">
-    **En iyisi:** çalışan bir LiteLLM kurulumu için en hızlı yol.
+  <Tab title="İlk kurulum (önerilen)">
+    **Şunun için en iyisi:** çalışan bir LiteLLM kurulumu için en hızlı yol.
 
     <Steps>
-      <Step title="Başlangıç kurulumunu çalıştırın">
+      <Step title="İlk kurulumu çalıştırın">
         ```bash
         openclaw onboard --auth-choice litellm-api-key
         ```
@@ -43,8 +44,8 @@ x-i18n:
 
   </Tab>
 
-  <Tab title="Manuel kurulum">
-    **En iyisi:** kurulum ve yapılandırma üzerinde tam denetim.
+  <Tab title="Elle kurulum">
+    **Şunun için en iyisi:** kurulum ve yapılandırma üzerinde tam denetim.
 
     <Steps>
       <Step title="LiteLLM Proxy'yi başlatın">
@@ -53,7 +54,7 @@ x-i18n:
         litellm --model claude-opus-4-6
         ```
       </Step>
-      <Step title="OpenClaw’u LiteLLM’ye yönlendirin">
+      <Step title="OpenClaw'ı LiteLLM'ye yönlendirin">
         ```bash
         export LITELLM_API_KEY="your-litellm-key"
 
@@ -118,7 +119,7 @@ export LITELLM_API_KEY="sk-litellm-key"
 
 <AccordionGroup>
   <Accordion title="Sanal anahtarlar">
-    Harcama limitleriyle OpenClaw için özel bir anahtar oluşturun:
+    Harcama sınırlarıyla OpenClaw için özel bir anahtar oluşturun:
 
     ```bash
     curl -X POST "http://localhost:4000/key/generate" \
@@ -131,7 +132,7 @@ export LITELLM_API_KEY="sk-litellm-key"
       }'
     ```
 
-    Oluşturulan anahtarı `LITELLM_API_KEY` olarak kullanın.
+    Üretilen anahtarı `LITELLM_API_KEY` olarak kullanın.
 
   </Accordion>
 
@@ -156,10 +157,10 @@ export LITELLM_API_KEY="sk-litellm-key"
   </Accordion>
 
   <Accordion title="Kullanımı görüntüleme">
-    LiteLLM’nin panosunu veya API’sini kontrol edin:
+    LiteLLM panosunu veya API'sini kontrol edin:
 
     ```bash
-    # Anahtar bilgileri
+    # Anahtar bilgisi
     curl "http://localhost:4000/key/info" \
       -H "Authorization: Bearer sk-litellm-key"
 
@@ -172,18 +173,18 @@ export LITELLM_API_KEY="sk-litellm-key"
 
   <Accordion title="Proxy davranışı notları">
     - LiteLLM varsayılan olarak `http://localhost:4000` üzerinde çalışır
-    - OpenClaw, LiteLLM’nin proxy tarzı OpenAI uyumlu `/v1`
+    - OpenClaw, LiteLLM'nin proxy tarzı OpenAI uyumlu `/v1`
       uç noktası üzerinden bağlanır
-    - Yerel yalnızca OpenAI istek şekillendirmesi LiteLLM üzerinden uygulanmaz:
+    - Yerel yalnızca-OpenAI istek şekillendirmesi LiteLLM üzerinden uygulanmaz:
       `service_tier` yok, Responses `store` yok, prompt-cache ipuçları yok ve
-      OpenAI reasoning-compat payload shaping yok
-    - Gizli OpenClaw atıf üst bilgileri (`originator`, `version`, `User-Agent`)
-      özel LiteLLM temel URL’lerine eklenmez
+      OpenAI reasoning uyumluluk payload şekillendirmesi yok
+    - Gizli OpenClaw ilişkilendirme başlıkları (`originator`, `version`, `User-Agent`)
+      özel LiteLLM temel URL'lerine eklenmez
   </Accordion>
 </AccordionGroup>
 
 <Note>
-Genel sağlayıcı yapılandırması ve yük devretme davranışı için [Model Providers](/tr/concepts/model-providers) bölümüne bakın.
+Genel sağlayıcı yapılandırması ve devralma davranışı için bkz. [Model Providers](/tr/concepts/model-providers).
 </Note>
 
 ## İlgili
@@ -193,7 +194,7 @@ Genel sağlayıcı yapılandırması ve yük devretme davranışı için [Model 
     Resmî LiteLLM belgeleri ve API başvurusu.
   </Card>
   <Card title="Model sağlayıcıları" href="/tr/concepts/model-providers" icon="layers">
-    Tüm sağlayıcıların, model referanslarının ve yük devretme davranışının genel görünümü.
+    Tüm sağlayıcılar, model başvuruları ve devralma davranışı hakkında genel bakış.
   </Card>
   <Card title="Yapılandırma" href="/tr/gateway/configuration" icon="gear">
     Tam yapılandırma başvurusu.

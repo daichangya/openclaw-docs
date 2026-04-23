@@ -1,42 +1,42 @@
 ---
 read_when:
-    - Codex, Claude veya Cursor ile uyumlu bir paket yüklemek istediğinizde
-    - OpenClaw'un paket içeriğini yerel özelliklere nasıl eşlediğini anlamanız gerektiğinde
-    - paket algılama veya eksik yeteneklerde hata ayıklarken
-summary: Codex, Claude ve Cursor paketlerini OpenClaw plugin'leri olarak yükleyin ve kullanın
+    - Codex, Claude veya Cursor uyumlu bir paket kurmak istiyorsunuz
+    - OpenClaw'ın paket içeriğini yerel özelliklere nasıl eşlediğini anlamanız gerekiyor
+    - Paket algılaması veya eksik yeteneklerde hata ayıklıyorsunuz
+summary: Codex, Claude ve Cursor paketlerini OpenClaw Plugin'leri olarak kurun ve kullanın
 title: Plugin Paketleri
 x-i18n:
-    generated_at: "2026-04-05T14:01:32Z"
+    generated_at: "2026-04-23T09:05:35Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a8b1eb4633bdff75425d8c2e29be352e11a4cdad7f420c0c66ae5ef07bf9bdcc
+    source_hash: dd5ac067546429412f8f4fd2c0da22005686c2d4377944ecd078f56054223f9b
     source_path: plugins/bundles.md
     workflow: 15
 ---
 
 # Plugin Paketleri
 
-OpenClaw, üç harici ekosistemden plugin yükleyebilir: **Codex**, **Claude**,
-ve **Cursor**. Bunlara **paketler** denir — OpenClaw'un Skills, hook'lar ve MCP araçları gibi yerel özelliklere eşlediği içerik ve meta veri paketleri.
+OpenClaw, üç harici ekosistemden Plugin kurabilir: **Codex**, **Claude**
+ve **Cursor**. Bunlara **paketler** denir — OpenClaw'ın bunları Skills, kancalar ve MCP araçları gibi yerel özelliklere eşlediği içerik ve meta veri paketleri.
 
 <Info>
-  Paketler, yerel OpenClaw plugin'leriyle **aynı şey değildir**. Yerel plugin'ler
-  işlem içinde çalışır ve herhangi bir yeteneği kaydedebilir. Paketler ise
-  seçmeli özellik eşlemesi ve daha dar bir güven sınırı olan içerik paketleridir.
+  Paketler, yerel OpenClaw Plugin'leri ile **aynı şey değildir**. Yerel Plugin'ler
+  süreç içinde çalışır ve herhangi bir yeteneği kaydedebilir. Paketler ise
+  seçici özellik eşleme ve daha dar bir güven sınırı olan içerik paketleridir.
 </Info>
 
-## Paketler neden vardır
+## Paketlerin neden var olduğu
 
-Birçok yararlı plugin, Codex, Claude veya Cursor biçiminde yayımlanır. OpenClaw,
-yazarların bunları yerel OpenClaw plugin'leri olarak yeniden yazmasını istemek
-yerine bu biçimleri algılar ve desteklenen içeriklerini yerel özellik kümesine
-eşler. Bu, bir Claude komut paketini veya bir Codex Skills paketini yükleyip
-hemen kullanabileceğiniz anlamına gelir.
+Birçok yararlı Plugin, Codex, Claude veya Cursor biçiminde yayımlanır. OpenClaw,
+yazarların bunları yerel OpenClaw Plugin'leri olarak yeniden yazmasını gerektirmek yerine,
+bu biçimleri algılar ve desteklenen içeriklerini yerel özellik
+kümesine eşler. Bu, bir Claude komut paketini veya bir Codex Skills paketini
+kurup hemen kullanabileceğiniz anlamına gelir.
 
-## Bir paket yükleyin
+## Paket kurma
 
 <Steps>
-  <Step title="Bir dizinden, arşivden veya marketplace'ten yükleyin">
+  <Step title="Bir dizinden, arşivden veya pazar yerinden kurun">
     ```bash
     # Yerel dizin
     openclaw plugins install ./my-bundle
@@ -44,7 +44,7 @@ hemen kullanabileceğiniz anlamına gelir.
     # Arşiv
     openclaw plugins install ./my-bundle.tgz
 
-    # Claude marketplace
+    # Claude pazar yeri
     openclaw plugins marketplace list <marketplace-name>
     openclaw plugins install <plugin-name>@<marketplace-name>
     ```
@@ -57,7 +57,7 @@ hemen kullanabileceğiniz anlamına gelir.
     openclaw plugins inspect <id>
     ```
 
-    Paketler, `codex`, `claude` veya `cursor` alt türüne sahip `Format: bundle` olarak görünür.
+    Paketler `Format: bundle` olarak görünür ve `codex`, `claude` veya `cursor` alt türüne sahiptir.
 
   </Step>
 
@@ -66,59 +66,57 @@ hemen kullanabileceğiniz anlamına gelir.
     openclaw gateway restart
     ```
 
-    Eşlenen özellikler (Skills, hook'lar, MCP araçları, LSP varsayılanları) sonraki oturumda kullanılabilir olur.
+    Eşlenen özellikler (Skills, kancalar, MCP araçları, LSP varsayılanları) sonraki oturumda kullanılabilir olur.
 
   </Step>
 </Steps>
 
-## OpenClaw'un paketlerden eşledikleri
+## OpenClaw'ın paketlerden eşlediği özellikler
 
-Bugün her paket özelliği OpenClaw'da çalışmaz. Burada neyin çalıştığı ve neyin
-algılandığı ancak henüz bağlanmadığı açıklanmıştır.
+Bugün OpenClaw'da her paket özelliği çalışmaz. Burada nelerin çalıştığı ve
+nelerin algılanıp henüz bağlanmadığı açıklanmıştır.
 
 ### Şu anda desteklenenler
 
-| Özellik         | Nasıl eşlenir                                                                              | Şunlar için geçerlidir |
-| --------------- | ------------------------------------------------------------------------------------------ | ---------------------- |
-| Skill içeriği   | Paket skill kökleri normal OpenClaw Skills olarak yüklenir                                 | Tüm biçimler           |
-| Komutlar        | `commands/` ve `.cursor/commands/` skill kökleri olarak değerlendirilir                    | Claude, Cursor         |
-| Hook paketleri  | OpenClaw tarzı `HOOK.md` + `handler.ts` düzenleri                                          | Codex                  |
-| MCP araçları    | Paket MCP yapılandırması gömülü Pi ayarlarına birleştirilir; desteklenen stdio ve HTTP sunucuları yüklenir | Tüm biçimler |
-| LSP sunucuları  | Claude `.lsp.json` ve manifest içinde bildirilen `lspServers`, gömülü Pi LSP varsayılanlarına birleştirilir | Claude |
-| Ayarlar         | Claude `settings.json`, gömülü Pi varsayılanları olarak içe aktarılır                      | Claude                 |
+| Özellik      | Nasıl eşlenir                                                                                | Uygulandığı biçimler |
+| ------------ | -------------------------------------------------------------------------------------------- | -------------------- |
+| Skills içeriği | Paket Skills kökleri normal OpenClaw Skills olarak yüklenir                                 | Tüm biçimler         |
+| Komutlar     | `commands/` ve `.cursor/commands/`, Skills kökleri olarak değerlendirilir                    | Claude, Cursor       |
+| Kanca paketleri | OpenClaw tarzı `HOOK.md` + `handler.ts` düzenleri                                         | Codex                |
+| MCP araçları | Paket MCP yapılandırması gömülü Pi ayarlarına birleştirilir; desteklenen stdio ve HTTP sunucuları yüklenir | Tüm biçimler         |
+| LSP sunucuları | Claude `.lsp.json` ve manifest içinde bildirilen `lspServers`, gömülü Pi LSP varsayılanlarına birleştirilir | Claude               |
+| Ayarlar      | Claude `settings.json`, gömülü Pi varsayılanları olarak içe aktarılır                        | Claude               |
 
-#### Skill içeriği
+#### Skills içeriği
 
-- paket skill kökleri normal OpenClaw Skills kökleri olarak yüklenir
-- Claude `commands` kökleri ek skill kökleri olarak değerlendirilir
-- Cursor `.cursor/commands` kökleri ek skill kökleri olarak değerlendirilir
+- paket Skills kökleri normal OpenClaw Skills kökleri olarak yüklenir
+- Claude `commands` kökleri ek Skills kökleri olarak değerlendirilir
+- Cursor `.cursor/commands` kökleri ek Skills kökleri olarak değerlendirilir
 
-Bu, Claude markdown komut dosyalarının normal OpenClaw Skills yükleyicisi
-üzerinden çalıştığı anlamına gelir. Cursor komut markdown'u da aynı yol
-üzerinden çalışır.
+Bu, Claude Markdown komut dosyalarının normal OpenClaw Skills
+yükleyicisi üzerinden çalıştığı anlamına gelir. Cursor komut Markdown'u da aynı yol üzerinden çalışır.
 
-#### Hook paketleri
+#### Kanca paketleri
 
-- paket hook kökleri, yalnızca normal OpenClaw hook-paketi düzenini
-  kullandıklarında çalışır. Bugün bu öncelikle Codex ile uyumlu durumdur:
+- paket kanca kökleri **yalnızca** normal OpenClaw kanca paketi
+  düzenini kullanıyorsa çalışır. Bugün bu öncelikle Codex uyumlu durumdur:
   - `HOOK.md`
   - `handler.ts` veya `handler.js`
 
 #### Pi için MCP
 
 - etkin paketler MCP sunucu yapılandırmasına katkıda bulunabilir
-- OpenClaw, paket MCP yapılandırmasını etkin gömülü Pi ayarlarına
+- OpenClaw paket MCP yapılandırmasını etkili gömülü Pi ayarlarına
   `mcpServers` olarak birleştirir
-- OpenClaw, stdio sunucuları başlatarak veya HTTP sunucularına bağlanarak
-  gömülü Pi aracı turları sırasında desteklenen paket MCP araçlarını sunar
-- proje yerelindeki Pi ayarları, paket varsayılanlarından sonra yine uygulanır;
-  bu nedenle gerektiğinde çalışma alanı ayarları paket MCP girdilerini geçersiz kılabilir
-- paket MCP araç katalogları, kaydetmeden önce deterministik olarak sıralanır;
-  böylece yukarı akış `listTools()` sırası değişiklikleri prompt-cache araç bloklarını bozmaz
+- OpenClaw, desteklenen paket MCP araçlarını gömülü Pi aracı turları sırasında
+  stdio sunucuları başlatarak veya HTTP sunucularına bağlanarak açığa çıkarır
+- `coding` ve `messaging` araç profilleri varsayılan olarak paket MCP araçlarını içerir; bir aracı veya Gateway için devre dışı kalmak için `tools.deny: ["bundle-mcp"]` kullanın
+- proje yerel Pi ayarları, paket varsayılanlarından sonra yine uygulanır; böylece gerektiğinde çalışma alanı ayarları paket MCP girdilerini geçersiz kılabilir
+- paket MCP araç katalogları kayıttan önce belirlenimci olarak sıralanır; böylece upstream `listTools()` sırası değişiklikleri prompt-cache araç bloklarını oynatmaz
 
-##### Taşımalar
+##### Taşıma türleri
 
-MCP sunucuları stdio veya HTTP taşıması kullanabilir:
+MCP sunucuları stdio veya HTTP taşımasını kullanabilir:
 
 **Stdio**, bir alt süreç başlatır:
 
@@ -136,7 +134,7 @@ MCP sunucuları stdio veya HTTP taşıması kullanabilir:
 }
 ```
 
-**HTTP**, varsayılan olarak `sse` üzerinden çalışan bir MCP sunucusuna veya istenirse `streamable-http` üzerinden bağlanır:
+**HTTP**, varsayılan olarak `sse`, istenirse `streamable-http` üzerinden çalışan bir MCP sunucusuna bağlanır:
 
 ```json
 {
@@ -166,22 +164,24 @@ MCP sunucuları stdio veya HTTP taşıması kullanabilir:
 
 ##### Araç adlandırma
 
-OpenClaw, paket MCP araçlarını sağlayıcı açısından güvenli adlarla
-`serverName__toolName` biçiminde kaydeder. Örneğin, `"vigil-harbor"` anahtarlı ve
-`memory_search` aracını sunan bir sunucu, `vigil-harbor__memory_search` olarak kaydedilir.
+OpenClaw, paket MCP araçlarını sağlayıcı için güvenli adlarla
+`serverName__toolName` biçiminde kaydeder. Örneğin, `"vigil-harbor"` anahtarına sahip ve
+`memory_search` aracını açığa çıkaran bir sunucu, `vigil-harbor__memory_search` olarak kaydedilir.
 
 - `A-Za-z0-9_-` dışındaki karakterler `-` ile değiştirilir
-- sunucu önekleri en fazla 30 karakterle sınırlandırılır
-- tam araç adları en fazla 64 karakterle sınırlandırılır
+- sunucu önekleri 30 karakterle sınırlıdır
+- tam araç adları 64 karakterle sınırlıdır
 - boş sunucu adları `mcp` değerine geri döner
 - çakışan temizlenmiş adlar sayısal son eklerle ayrıştırılır
-- son görünen araç sırası, tekrarlanan Pi
-  turlarını önbellek açısından kararlı tutmak için güvenli ada göre deterministiktir
+- son açığa çıkarılan araç sırası, yinelenen Pi
+  turlarını önbellek açısından kararlı tutmak için güvenli ada göre belirlenimcidir
+- profil filtreleme, tek bir paket MCP sunucusundaki tüm araçları
+  `bundle-mcp` sahibi Plugin'ler olarak değerlendirir; bu nedenle profil izin listeleri ve engelleme listeleri
+  tek tek açığa çıkarılmış araç adlarını veya `bundle-mcp` Plugin anahtarını içerebilir
 
 #### Gömülü Pi ayarları
 
-- Claude `settings.json`, paket etkin olduğunda varsayılan gömülü Pi ayarları olarak
-  içe aktarılır
+- Claude `settings.json`, paket etkin olduğunda varsayılan gömülü Pi ayarları olarak içe aktarılır
 - OpenClaw, uygulamadan önce shell geçersiz kılma anahtarlarını temizler
 
 Temizlenen anahtarlar:
@@ -192,18 +192,18 @@ Temizlenen anahtarlar:
 #### Gömülü Pi LSP
 
 - etkin Claude paketleri LSP sunucu yapılandırmasına katkıda bulunabilir
-- OpenClaw, `.lsp.json` ile birlikte manifest içinde bildirilen tüm `lspServers` yollarını yükler
-- paket LSP yapılandırması etkin gömülü Pi LSP varsayılanlarına birleştirilir
-- bugün yalnızca desteklenen stdio tabanlı LSP sunucuları çalıştırılabilir; desteklenmeyen
-  taşımalar yine de `openclaw plugins inspect <id>` içinde görünür
+- OpenClaw `.lsp.json` ile manifest içinde bildirilen tüm `lspServers` yollarını yükler
+- paket LSP yapılandırması etkili gömülü Pi LSP varsayılanlarına birleştirilir
+- bugün yalnızca desteklenen stdio destekli LSP sunucuları çalıştırılabilir; desteklenmeyen
+  taşıma türleri yine de `openclaw plugins inspect <id>` içinde görünür
 
-### Algılanan ancak çalıştırılmayanlar
+### Algılanır ancak yürütülmez
 
-Bunlar tanınır ve tanılamada gösterilir, ancak OpenClaw bunları çalıştırmaz:
+Bunlar tanınır ve tanılarda gösterilir, ancak OpenClaw bunları çalıştırmaz:
 
 - Claude `agents`, `hooks.json` otomasyonu, `outputStyles`
 - Cursor `.cursor/agents`, `.cursor/hooks.json`, `.cursor/rules`
-- Yetenek raporlamasının ötesindeki Codex satır içi/uygulama meta verileri
+- Codex satır içi/uygulama meta verileri, yetenek raporlaması dışında
 
 ## Paket biçimleri
 
@@ -213,8 +213,8 @@ Bunlar tanınır ve tanılamada gösterilir, ancak OpenClaw bunları çalıştı
 
     İsteğe bağlı içerik: `skills/`, `hooks/`, `.mcp.json`, `.app.json`
 
-    Codex paketleri, skill kökleri ve OpenClaw tarzı
-    hook-paketi dizinleri (`HOOK.md` + `handler.ts`) kullandıklarında OpenClaw'a en iyi şekilde uyar.
+    Codex paketleri, Skills kökleri ve OpenClaw tarzı
+    kanca paketi dizinleri (`HOOK.md` + `handler.ts`) kullandıklarında OpenClaw'a en iyi şekilde uyar.
 
   </Accordion>
 
@@ -226,12 +226,12 @@ Bunlar tanınır ve tanılamada gösterilir, ancak OpenClaw bunları çalıştı
 
     Claude'a özgü davranış:
 
-    - `commands/` skill içeriği olarak değerlendirilir
+    - `commands/`, Skills içeriği olarak değerlendirilir
     - `settings.json`, gömülü Pi ayarlarına içe aktarılır (shell geçersiz kılma anahtarları temizlenir)
-    - `.mcp.json`, desteklenen stdio araçlarını gömülü Pi'ye sunar
+    - `.mcp.json`, desteklenen stdio araçlarını gömülü Pi'ye açığa çıkarır
     - `.lsp.json` ile manifest içinde bildirilen `lspServers` yolları, gömülü Pi LSP varsayılanlarına yüklenir
-    - `hooks/hooks.json` algılanır ancak çalıştırılmaz
-    - Manifest içindeki özel bileşen yolları ekleyicidir (varsayılanları değiştirmez, genişletir)
+    - `hooks/hooks.json` algılanır ancak yürütülmez
+    - Manifest içindeki özel bileşen yolları eklemelidir (varsayılanları değiştirmez, genişletir)
 
   </Accordion>
 
@@ -240,59 +240,68 @@ Bunlar tanınır ve tanılamada gösterilir, ancak OpenClaw bunları çalıştı
 
     İsteğe bağlı içerik: `skills/`, `.cursor/commands/`, `.cursor/agents/`, `.cursor/rules/`, `.cursor/hooks.json`, `.mcp.json`
 
-    - `.cursor/commands/` skill içeriği olarak değerlendirilir
-    - `.cursor/rules/`, `.cursor/agents/` ve `.cursor/hooks.json` yalnızca algılama içindir
+    - `.cursor/commands/`, Skills içeriği olarak değerlendirilir
+    - `.cursor/rules/`, `.cursor/agents/` ve `.cursor/hooks.json` yalnızca algılama amaçlıdır
 
   </Accordion>
 </AccordionGroup>
 
 ## Algılama önceliği
 
-OpenClaw önce yerel plugin biçimini denetler:
+OpenClaw önce yerel Plugin biçimini denetler:
 
-1. `openclaw.plugin.json` veya `openclaw.extensions` içeren geçerli `package.json` — **yerel plugin** olarak değerlendirilir
+1. `openclaw.plugin.json` veya `openclaw.extensions` içeren geçerli `package.json` — **yerel Plugin** olarak değerlendirilir
 2. Paket işaretleyicileri (`.codex-plugin/`, `.claude-plugin/` veya varsayılan Claude/Cursor düzeni) — **paket** olarak değerlendirilir
 
-Bir dizin her ikisini de içeriyorsa OpenClaw yerel yolu kullanır. Bu, çift biçimli paketlerin kısmen paket olarak yüklenmesini önler.
+Bir dizin her ikisini de içeriyorsa, OpenClaw yerel yolu kullanır. Bu, çift biçimli paketlerin
+kısmen paket olarak kurulmasını önler.
+
+## Çalışma zamanı bağımlılıkları ve temizlik
+
+- Paketlenmiş Plugin çalışma zamanı bağımlılıkları, OpenClaw paketi içinde
+  `dist/*` altında gelir. OpenClaw, paketlenmiş
+  Plugin'ler için başlangıçta `npm install` çalıştırmaz; tam bir paketlenmiş
+  bağımlılık yükünün gönderilmesinden sürüm hattı sorumludur (bkz.
+  [Releasing](/tr/reference/RELEASING) içindeki yayımlama sonrası doğrulama kuralı).
 
 ## Güvenlik
 
-Paketlerin güven sınırı, yerel plugin'lere göre daha dardır:
+Paketlerin güven sınırı yerel Plugin'lere göre daha dardır:
 
-- OpenClaw, rastgele paket çalışma zamanı modüllerini işlem içinde yüklemez
-- Skills ve hook-paketi yolları plugin kökü içinde kalmalıdır (sınır denetimli)
+- OpenClaw süreç içinde rastgele paket çalışma zamanı modülleri yüklemez
+- Skills ve kanca paketi yolları Plugin kökü içinde kalmalıdır (sınır denetimli)
 - Ayar dosyaları aynı sınır denetimleriyle okunur
 - Desteklenen stdio MCP sunucuları alt süreç olarak başlatılabilir
 
-Bu, paketleri varsayılan olarak daha güvenli hâle getirir; ancak yine de üçüncü taraf
-paketleri, açığa çıkardıkları özellikler için güvenilir içerik olarak değerlendirmelisiniz.
+Bu, paketleri varsayılan olarak daha güvenli kılar; ancak yine de üçüncü taraf
+paketleri, açığa çıkardıkları özellikler açısından güvenilir içerik olarak değerlendirmelisiniz.
 
 ## Sorun giderme
 
 <AccordionGroup>
   <Accordion title="Paket algılanıyor ama yetenekler çalışmıyor">
-    `openclaw plugins inspect <id>` komutunu çalıştırın. Bir yetenek listelenmiş ancak
-    bağlanmamış olarak işaretlenmişse bu bir bozuk yükleme değil, ürün sınırıdır.
+    `openclaw plugins inspect <id>` çalıştırın. Bir yetenek listeleniyor ancak
+    bağlanmamış olarak işaretleniyorsa, bu bir ürün sınırıdır — bozuk kurulum değildir.
   </Accordion>
 
   <Accordion title="Claude komut dosyaları görünmüyor">
-    Paketin etkin olduğundan ve markdown dosyalarının algılanan bir
+    Paketin etkin olduğundan ve Markdown dosyalarının algılanan
     `commands/` veya `skills/` kökü içinde bulunduğundan emin olun.
   </Accordion>
 
   <Accordion title="Claude ayarları uygulanmıyor">
     Yalnızca `settings.json` içindeki gömülü Pi ayarları desteklenir. OpenClaw,
-    paket ayarlarını ham yapılandırma yamaları olarak değerlendirmez.
+    paket ayarlarını ham yapılandırma yaması olarak değerlendirmez.
   </Accordion>
 
-  <Accordion title="Claude hook'ları çalışmıyor">
-    `hooks/hooks.json` yalnızca algılama içindir. Çalıştırılabilir hook'lara ihtiyacınız varsa
-    OpenClaw hook-paketi düzenini kullanın veya yerel bir plugin gönderin.
+  <Accordion title="Claude kancaları yürütülmüyor">
+    `hooks/hooks.json` yalnızca algılama amaçlıdır. Çalıştırılabilir kancalara ihtiyacınız varsa,
+    OpenClaw kanca paketi düzenini kullanın veya yerel bir Plugin gönderin.
   </Accordion>
 </AccordionGroup>
 
 ## İlgili
 
-- [Plugin'leri Yükleme ve Yapılandırma](/tools/plugin)
-- [Plugin Geliştirme](/plugins/building-plugins) — yerel bir plugin oluşturun
-- [Plugin Manifesti](/plugins/manifest) — yerel manifest şeması
+- [Plugin'leri Kurun ve Yapılandırın](/tr/tools/plugin)
+- [Plugin Oluşturma](/tr/plugins/building-plugins) — yerel bir Plugin oluşturun
+- [Plugin Manifesti](/tr/plugins/manifest) — yerel manifest şeması

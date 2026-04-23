@@ -1,39 +1,41 @@
 ---
 read_when:
-    - OpenClaw ile Bedrock Mantle tarafından barındırılan OSS modellerini kullanmak istiyorsunuz
+    - Bedrock Mantle üzerinde barındırılan OSS modellerini OpenClaw ile kullanmak istiyorsunuz
     - GPT-OSS, Qwen, Kimi veya GLM için Mantle OpenAI uyumlu uç noktasına ihtiyacınız var
 summary: OpenClaw ile Amazon Bedrock Mantle (OpenAI uyumlu) modellerini kullanın
 title: Amazon Bedrock Mantle
 x-i18n:
-    generated_at: "2026-04-12T23:29:32Z"
+    generated_at: "2026-04-23T09:08:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 27e602b6f6a3ae92427de135cb9df6356e0daaea6b6fe54723a7542dd0d5d21e
+    source_hash: a20e0abcd140b3c7115a9b0bbdf924e15962e0452ded676df252c753610e03ed
     source_path: providers/bedrock-mantle.md
     workflow: 15
 ---
 
 # Amazon Bedrock Mantle
 
-OpenClaw, Mantle OpenAI uyumlu uç noktasına bağlanan paketlenmiş bir **Amazon Bedrock Mantle** sağlayıcısı içerir. Mantle, Bedrock altyapısıyla desteklenen standart bir `/v1/chat/completions` yüzeyi üzerinden açık kaynaklı ve üçüncü taraf modelleri (GPT-OSS, Qwen, Kimi, GLM ve benzerleri) barındırır.
+OpenClaw, Mantle OpenAI uyumlu uç noktaya bağlanan paketlenmiş bir **Amazon Bedrock Mantle** sağlayıcısı içerir. Mantle, açık kaynaklı ve
+üçüncü taraf modelleri (GPT-OSS, Qwen, Kimi, GLM ve benzerleri) Bedrock altyapısı tarafından desteklenen standart bir
+`/v1/chat/completions` yüzeyi üzerinden barındırır.
 
-| Property       | Value                                                                               |
-| -------------- | ----------------------------------------------------------------------------------- |
-| Sağlayıcı kimliği | `amazon-bedrock-mantle`                                                          |
-| API            | `openai-completions` (OpenAI uyumlu)                                                |
-| Kimlik doğrulama | Açık `AWS_BEARER_TOKEN_BEDROCK` veya IAM kimlik bilgisi zinciriyle bearer token üretimi |
-| Varsayılan bölge | `us-east-1` (`AWS_REGION` veya `AWS_DEFAULT_REGION` ile geçersiz kılınabilir)    |
+| Özellik       | Değer                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| Sağlayıcı Kimliği    | `amazon-bedrock-mantle`                                                                     |
+| API            | `openai-completions` (OpenAI uyumlu) veya `anthropic-messages` (Anthropic Messages yolu) |
+| Auth           | Açık `AWS_BEARER_TOKEN_BEDROCK` veya IAM kimlik bilgisi zinciri bearer-token üretimi         |
+| Varsayılan bölge | `us-east-1` (`AWS_REGION` veya `AWS_DEFAULT_REGION` ile geçersiz kılın)                            |
 
-## Başlangıç
+## Başlarken
 
-Tercih ettiğiniz kimlik doğrulama yöntemini seçin ve kurulum adımlarını izleyin.
+Tercih ettiğiniz auth yöntemini seçin ve kurulum adımlarını izleyin.
 
 <Tabs>
   <Tab title="Açık bearer token">
-    **Şunun için en iyisi:** zaten bir Mantle bearer token'ınız olan ortamlar.
+    **En iyisi:** elinizde zaten bir Mantle bearer token bulunan ortamlar için.
 
     <Steps>
-      <Step title="Gateway ana bilgisayarında bearer token'ı ayarlayın">
+      <Step title="Gateway ana makinesinde bearer token'ı ayarlayın">
         ```bash
         export AWS_BEARER_TOKEN_BEDROCK="..."
         ```
@@ -44,30 +46,31 @@ Tercih ettiğiniz kimlik doğrulama yöntemini seçin ve kurulum adımlarını i
         export AWS_REGION="us-west-2"
         ```
       </Step>
-      <Step title="Modellerin bulunduğunu doğrulayın">
+      <Step title="Modellerin keşfedildiğini doğrulayın">
         ```bash
         openclaw models list
         ```
 
-        Bulunan modeller `amazon-bedrock-mantle` sağlayıcısı altında görünür. Varsayılanları geçersiz kılmak istemiyorsanız ek yapılandırma gerekmez.
+        Keşfedilen modeller `amazon-bedrock-mantle` sağlayıcısı altında görünür. Varsayılanları geçersiz kılmak istemediğiniz sürece
+        ek config gerekmez.
       </Step>
     </Steps>
 
   </Tab>
 
   <Tab title="IAM kimlik bilgileri">
-    **Şunun için en iyisi:** AWS SDK uyumlu kimlik bilgilerini kullanmak (paylaşılan yapılandırma, SSO, web identity, instance veya task rolleri).
+    **En iyisi:** AWS SDK uyumlu kimlik bilgilerini kullanmak için (paylaşılan config, SSO, web kimliği, örnek veya görev rolleri).
 
     <Steps>
-      <Step title="Gateway ana bilgisayarında AWS kimlik bilgilerini yapılandırın">
-        Herhangi bir AWS SDK uyumlu kimlik doğrulama kaynağı çalışır:
+      <Step title="Gateway ana makinesinde AWS kimlik bilgilerini yapılandırın">
+        AWS SDK uyumlu herhangi bir auth kaynağı çalışır:
 
         ```bash
         export AWS_PROFILE="default"
         export AWS_REGION="us-west-2"
         ```
       </Step>
-      <Step title="Modellerin bulunduğunu doğrulayın">
+      <Step title="Modellerin keşfedildiğini doğrulayın">
         ```bash
         openclaw models list
         ```
@@ -77,23 +80,26 @@ Tercih ettiğiniz kimlik doğrulama yöntemini seçin ve kurulum adımlarını i
     </Steps>
 
     <Tip>
-    `AWS_BEARER_TOKEN_BEDROCK` ayarlanmamışsa OpenClaw, paylaşılan kimlik bilgileri/yapılandırma profilleri, SSO, web identity ve instance veya task rolleri dahil olmak üzere AWS varsayılan kimlik bilgisi zincirinden sizin için bearer token üretir.
+    `AWS_BEARER_TOKEN_BEDROCK` ayarlı değilse OpenClaw bearer token'ı sizin için AWS varsayılan kimlik bilgisi zincirinden üretir; buna paylaşılan kimlik bilgileri/config profilleri, SSO, web kimliği ve örnek veya görev rolleri dahildir.
     </Tip>
 
   </Tab>
 </Tabs>
 
-## Otomatik model bulma
+## Otomatik model keşfi
 
-`AWS_BEARER_TOKEN_BEDROCK` ayarlandığında OpenClaw bunu doğrudan kullanır. Aksi halde OpenClaw, AWS varsayılan kimlik bilgisi zincirinden bir Mantle bearer token üretmeye çalışır. Ardından bölgenin `/v1/models` uç noktasını sorgulayarak kullanılabilir Mantle modellerini bulur.
+`AWS_BEARER_TOKEN_BEDROCK` ayarlıysa OpenClaw bunu doğrudan kullanır. Aksi halde,
+OpenClaw AWS varsayılan
+kimlik bilgisi zincirinden bir Mantle bearer token üretmeyi dener. Ardından
+bölgenin `/v1/models` uç noktasını sorgulayarak kullanılabilir Mantle modellerini keşfeder.
 
-| Davranış         | Ayrıntı                  |
-| ---------------- | ------------------------ |
-| Bulma önbelleği  | Sonuçlar 1 saat önbelleğe alınır |
-| IAM token yenileme | Saatlik                |
+| Davranış          | Ayrıntı                    |
+| ----------------- | ------------------------- |
+| Keşif önbelleği   | Sonuçlar 1 saat önbelleğe alınır |
+| IAM token yenileme | Saatlik                    |
 
 <Note>
-Bearer token, standart [Amazon Bedrock](/tr/providers/bedrock) sağlayıcısı tarafından kullanılan aynı `AWS_BEARER_TOKEN_BEDROCK` değeridir.
+Bearer token, standart [Amazon Bedrock](/tr/providers/bedrock) sağlayıcısı tarafından kullanılan `AWS_BEARER_TOKEN_BEDROCK` ile aynıdır.
 </Note>
 
 ### Desteklenen bölgeler
@@ -102,9 +108,9 @@ Bearer token, standart [Amazon Bedrock](/tr/providers/bedrock) sağlayıcısı t
 `ap-south-1`, `ap-southeast-3`, `eu-central-1`, `eu-west-1`, `eu-west-2`,
 `eu-south-1`, `eu-north-1`, `sa-east-1`.
 
-## El ile yapılandırma
+## Elle yapılandırma
 
-Otomatik bulma yerine açık yapılandırmayı tercih ediyorsanız:
+Otomatik keşif yerine açık config tercih ediyorsanız:
 
 ```json5
 {
@@ -135,16 +141,52 @@ Otomatik bulma yerine açık yapılandırmayı tercih ediyorsanız:
 ## Gelişmiş notlar
 
 <AccordionGroup>
-  <Accordion title="Akıl yürütme desteği">
-    Akıl yürütme desteği, `thinking`, `reasoner` veya `gpt-oss-120b` gibi desenler içeren model kimliklerinden çıkarılır. OpenClaw, bulma sırasında eşleşen modeller için otomatik olarak `reasoning: true` ayarlar.
+  <Accordion title="Reasoning desteği">
+    Reasoning desteği, `thinking`, `reasoner` veya `gpt-oss-120b` gibi
+    kalıplar içeren model kimliklerinden çıkarılır. OpenClaw, keşif sırasında eşleşen modeller için otomatik olarak
+    `reasoning: true` ayarlar.
   </Accordion>
 
   <Accordion title="Uç nokta kullanılamıyor">
-    Mantle uç noktası kullanılamıyorsa veya hiç model döndürmüyorsa sağlayıcı sessizce atlanır. OpenClaw hata vermez; yapılandırılmış diğer sağlayıcılar normal şekilde çalışmaya devam eder.
+    Mantle uç noktası kullanılamıyorsa veya hiç model döndürmüyorsa sağlayıcı
+    sessizce atlanır. OpenClaw hata vermez; yapılandırılmış diğer sağlayıcılar
+    normal şekilde çalışmaya devam eder.
+  </Accordion>
+
+  <Accordion title="Anthropic Messages yolu üzerinden Claude Opus 4.7">
+    Mantle ayrıca Claude modellerini aynı bearer-authenticated streaming yolu üzerinden taşıyan bir Anthropic Messages yolu da sunar. Claude Opus 4.7 (`amazon-bedrock-mantle/claude-opus-4.7`) bu yol üzerinden sağlayıcıya ait streaming ile çağrılabilir; bu yüzden AWS bearer token'ları Anthropic API anahtarları gibi ele alınmaz.
+
+    Mantle sağlayıcısında bir Anthropic Messages modeli sabitlediğinizde OpenClaw, bu model için `openai-completions` yerine `anthropic-messages` API yüzeyini kullanır. Auth yine `AWS_BEARER_TOKEN_BEDROCK` içinden (veya üretilmiş IAM bearer token'ından) gelir.
+
+    ```json5
+    {
+      models: {
+        providers: {
+          "amazon-bedrock-mantle": {
+            models: [
+              {
+                id: "claude-opus-4.7",
+                name: "Claude Opus 4.7",
+                api: "anthropic-messages",
+                reasoning: true,
+                input: ["text", "image"],
+                contextWindow: 1000000,
+                maxTokens: 32000,
+              },
+            ],
+          },
+        },
+      },
+    }
+    ```
+
   </Accordion>
 
   <Accordion title="Amazon Bedrock sağlayıcısıyla ilişkisi">
-    Bedrock Mantle, standart [Amazon Bedrock](/tr/providers/bedrock) sağlayıcısından ayrı bir sağlayıcıdır. Mantle, OpenAI uyumlu bir `/v1` yüzeyi kullanırken standart Bedrock sağlayıcısı yerel Bedrock API'sini kullanır.
+    Bedrock Mantle, standart
+    [Amazon Bedrock](/tr/providers/bedrock) sağlayıcısından ayrı bir sağlayıcıdır. Mantle
+    OpenAI uyumlu bir `/v1` yüzeyi kullanırken standart Bedrock sağlayıcısı
+    yerel Bedrock API'sini kullanır.
 
     Her iki sağlayıcı da mevcut olduğunda aynı `AWS_BEARER_TOKEN_BEDROCK` kimlik bilgisini paylaşır.
 
@@ -158,10 +200,10 @@ Otomatik bulma yerine açık yapılandırmayı tercih ediyorsanız:
     Anthropic Claude, Titan ve diğer modeller için yerel Bedrock sağlayıcısı.
   </Card>
   <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model başvurularını ve devralma davranışını seçme.
+    Sağlayıcıları, model başvurularını ve failover davranışını seçme.
   </Card>
-  <Card title="OAuth ve kimlik doğrulama" href="/tr/gateway/authentication" icon="key">
-    Kimlik doğrulama ayrıntıları ve kimlik bilgisi yeniden kullanma kuralları.
+  <Card title="OAuth ve auth" href="/tr/gateway/authentication" icon="key">
+    Auth ayrıntıları ve kimlik bilgisi yeniden kullanım kuralları.
   </Card>
   <Card title="Sorun giderme" href="/tr/help/troubleshooting" icon="wrench">
     Yaygın sorunlar ve bunların nasıl çözüleceği.

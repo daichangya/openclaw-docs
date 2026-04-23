@@ -1,131 +1,132 @@
 ---
 read_when:
-    - Düşünme, hızlı mod veya ayrıntılı yönerge ayrıştırmasını ya da varsayılanlarını ayarlama
-summary: '`/think`, `/fast`, `/verbose`, `/trace` ve muhakeme görünürlüğü için yönerge söz dizimi'
-title: Düşünme Düzeyleri
+    - Thinking, fast-mode veya verbose yönerge ayrıştırmasını ya da varsayılanlarını ayarlama
+summary: '`/think`, `/fast`, `/verbose`, `/trace` ve akıl yürütme görünürlüğü için yönerge söz dizimi'
+title: Thinking Düzeyleri
 x-i18n:
-    generated_at: "2026-04-21T19:21:02Z"
+    generated_at: "2026-04-23T09:12:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c77f6f1318c428bbd21725ea5f32f8088506a10cbbf5b5cbca5973c72a5a81f9
+    source_hash: 66033bb9272c9b9ea8fc85dc91e33e95ce4c469c56a8cd10c19632a5aa8a2338
     source_path: tools/thinking.md
     workflow: 15
 ---
 
-# Düşünme Düzeyleri (`/think` yönergeleri)
+# Thinking Düzeyleri (/think yönergeleri)
 
 ## Ne yapar
 
-- Herhangi bir gelen gövdedeki satır içi yönerge: `/t <level>`, `/think:<level>` veya `/thinking <level>`.
+- Herhangi bir gelen gövdede satır içi yönerge: `/t <level>`, `/think:<level>` veya `/thinking <level>`.
 - Düzeyler (takma adlar): `off | minimal | low | medium | high | xhigh | adaptive | max`
   - minimal → “think”
   - low → “think hard”
   - medium → “think harder”
-  - high → “ultrathink” (en yüksek bütçe)
-  - xhigh → “ultrathink+” (GPT-5.2 + Codex modelleri ve Anthropic Claude Opus 4.7 çabası)
-  - adaptive → sağlayıcı tarafından yönetilen uyarlanabilir düşünme (Anthropic/Bedrock üzerindeki Claude 4.6 ve Anthropic Claude Opus 4.7 için desteklenir)
-  - max → sağlayıcının en yüksek muhakemesi (şu anda Anthropic Claude Opus 4.7)
-  - `x-high`, `x_high`, `extra-high`, `extra high` ve `extra_high`, `xhigh` olarak eşlenir.
-  - `highest`, `high` olarak eşlenir.
+  - high → “ultrathink” (azami bütçe)
+  - xhigh → “ultrathink+” (GPT-5.2 + Codex modelleri ve Anthropic Claude Opus 4.7 effort)
+  - adaptive → sağlayıcı tarafından yönetilen uyarlanabilir thinking (Anthropic/Bedrock üzerindeki Claude 4.6 ve Anthropic Claude Opus 4.7 için desteklenir)
+  - max → sağlayıcı azami akıl yürütme (şu anda Anthropic Claude Opus 4.7)
+  - `x-high`, `x_high`, `extra-high`, `extra high` ve `extra_high`, `xhigh` değerine eşlenir.
+  - `highest`, `high` değerine eşlenir.
 - Sağlayıcı notları:
-  - Düşünme menüleri ve seçicileri sağlayıcı profil odaklıdır. Sağlayıcı Plugin'leri, `on` gibi ikili etiketler de dahil olmak üzere seçili model için tam düzey kümesini bildirir.
-  - `adaptive`, `xhigh` ve `max`, yalnızca bunları destekleyen sağlayıcı/model profilleri için gösterilir. Desteklenmeyen düzeyler için yazılmış yönergeler, o modelin geçerli seçenekleriyle birlikte reddedilir.
-  - Mevcut kayıtlı ancak desteklenmeyen düzeyler, sağlayıcı profil sıralamasına göre yeniden eşlenir. `adaptive`, uyarlanabilir olmayan modellerde `medium` düzeyine geri düşer; `xhigh` ve `max` ise seçili model için desteklenen `off` dışındaki en yüksek düzeye geri düşer.
-  - Anthropic Claude 4.6 modelleri, açık bir düşünme düzeyi ayarlanmadığında varsayılan olarak `adaptive` kullanır.
-  - Anthropic Claude Opus 4.7 varsayılan olarak uyarlanabilir düşünme kullanmaz. Açıkça bir düşünme düzeyi ayarlamadığınız sürece API effort varsayılanı sağlayıcıya aittir.
-  - Anthropic Claude Opus 4.7, `/think xhigh` ifadesini uyarlanabilir düşünme artı `output_config.effort: "xhigh"` olarak eşler; çünkü `/think` bir düşünme yönergesidir ve `xhigh`, Opus 4.7 effort ayarıdır.
-  - Anthropic Claude Opus 4.7 ayrıca `/think max` sunar; bu da aynı sağlayıcıya ait en yüksek effort yoluna eşlenir.
-  - OpenAI GPT modelleri, `/think` ifadesini modele özgü Responses API effort desteği üzerinden eşler. `/think off`, yalnızca hedef model bunu destekliyorsa `reasoning.effort: "none"` gönderir; aksi halde OpenClaw desteklenmeyen bir değer göndermek yerine devre dışı reasoning payload'unu atlar.
-  - Anthropic uyumlu akış yolundaki MiniMax (`minimax/*`), model parametrelerinde veya istek parametrelerinde açıkça düşünme ayarlamadığınız sürece varsayılan olarak `thinking: { type: "disabled" }` kullanır. Bu, MiniMax'ın yerel olmayan Anthropic akış biçiminden sızan `reasoning_content` delta'larını önler.
-  - Z.AI (`zai/*`) yalnızca ikili düşünmeyi destekler (`on`/`off`). `off` dışındaki herhangi bir düzey `on` olarak ele alınır (`low` olarak eşlenir).
-  - Moonshot (`moonshot/*`), `/think off` ifadesini `thinking: { type: "disabled" }`, `off` dışındaki herhangi bir düzeyi ise `thinking: { type: "enabled" }` olarak eşler. Düşünme etkin olduğunda Moonshot yalnızca `tool_choice` `auto|none` kabul eder; OpenClaw uyumsuz değerleri `auto` olarak normalize eder.
+  - Thinking menüleri ve seçicileri sağlayıcı profiline göre belirlenir. Sağlayıcı Plugin'leri seçilen model için tam düzey kümesini, `on` gibi ikili etiketler dahil, bildirir.
+  - `adaptive`, `xhigh` ve `max` yalnızca bunları destekleyen sağlayıcı/model profilleri için duyurulur. Desteklenmeyen düzeyler için yazılmış yönergeler, o modelin geçerli seçenekleriyle reddedilir.
+  - Saklanmış mevcut desteklenmeyen düzeyler sağlayıcı profil sırasına göre yeniden eşlenir. `adaptive`, uyarlanabilir olmayan modellerde `medium` değerine geri düşer; `xhigh` ve `max` ise seçilen model için desteklenen en büyük off-olmayan düzeye geri düşer.
+  - Anthropic Claude 4.6 modelleri, açık bir thinking düzeyi ayarlı değilse varsayılan olarak `adaptive` kullanır.
+  - Anthropic Claude Opus 4.7 varsayılan olarak adaptive thinking kullanmaz. API effort varsayılanı, siz açıkça bir thinking düzeyi ayarlamadıkça sağlayıcıya ait kalır.
+  - Anthropic Claude Opus 4.7, `/think xhigh` komutunu adaptive thinking artı `output_config.effort: "xhigh"` olarak eşler; çünkü `/think` bir thinking yönergesidir ve `xhigh` Opus 4.7 effort ayarıdır.
+  - Anthropic Claude Opus 4.7 ayrıca `/think max` değerini de açığa çıkarır; bu aynı sağlayıcıya ait azami effort yoluna eşlenir.
+  - OpenAI GPT modelleri, `/think` komutunu modele özgü Responses API effort desteği üzerinden eşler. `/think off`, yalnızca hedef model bunu desteklediğinde `reasoning.effort: "none"` gönderir; aksi halde OpenClaw desteklenmeyen bir değer göndermek yerine devre dışı reasoning yükünü atlar.
+  - Anthropic uyumlu akış yolundaki MiniMax (`minimax/*`), model params veya istek params içinde açıkça thinking ayarlamadığınız sürece varsayılan olarak `thinking: { type: "disabled" }` kullanır. Bu, MiniMax'ın yerel olmayan Anthropic akış biçiminden `reasoning_content` delta'larının sızmasını önler.
+  - Z.AI (`zai/*`) yalnızca ikili thinking destekler (`on`/`off`). `off` olmayan her düzey `on` olarak değerlendirilir (`low` değerine eşlenir).
+  - Moonshot (`moonshot/*`), `/think off` değerini `thinking: { type: "disabled" }`, `off` olmayan her düzeyi ise `thinking: { type: "enabled" }` olarak eşler. Thinking etkin olduğunda Moonshot yalnızca `tool_choice` olarak `auto|none` kabul eder; OpenClaw uyumsuz değerleri `auto` olarak normalleştirir.
 
 ## Çözümleme sırası
 
-1. İleti üzerindeki satır içi yönerge (yalnızca o iletiye uygulanır).
-2. Oturum geçersiz kılması (yalnızca yönerge içeren bir ileti gönderilerek ayarlanır).
-3. Agent başına varsayılan (`config` içindeki `agents.list[].thinkingDefault`).
-4. Genel varsayılan (`config` içindeki `agents.defaults.thinkingDefault`).
-5. Geri dönüş: varsa sağlayıcının bildirdiği varsayılan; reasoning özellikli olarak işaretlenen diğer katalog modelleri için `low`; aksi halde `off`.
+1. Mesaj üzerindeki satır içi yönerge (yalnızca o mesaja uygulanır).
+2. Oturum geçersiz kılması (yalnızca yönergeden oluşan bir mesaj gönderilerek ayarlanır).
+3. Ajan başına varsayılan (`config` içinde `agents.list[].thinkingDefault`).
+4. Genel varsayılan (`config` içinde `agents.defaults.thinkingDefault`).
+5. Geri dönüş: mevcut olduğunda sağlayıcının bildirdiği varsayılan, reasoning yetenekli olarak işaretlenmiş diğer katalog modelleri için `low`, aksi halde `off`.
 
-## Oturum varsayılanı ayarlama
+## Bir oturum varsayılanı ayarlama
 
-- **Yalnızca** yönergeden oluşan bir ileti gönderin (boşluklara izin verilir), örneğin `/think:medium` veya `/t high`.
-- Bu, geçerli oturum için kalıcı olur (varsayılan olarak gönderici başına); `/think:off` veya oturum boşta kalma sıfırlaması ile temizlenir.
-- Onay yanıtı gönderilir (`Thinking level set to high.` / `Thinking disabled.`). Düzey geçersizse (ör. `/thinking big`), komut bir ipucuyla reddedilir ve oturum durumu değiştirilmeden kalır.
-- Geçerli düşünme düzeyini görmek için argümansız `/think` (veya `/think:`) gönderin.
+- **Yalnızca** yönergeden oluşan bir mesaj gönderin (boşluk kabul edilir), örneğin `/think:medium` veya `/t high`.
+- Bu, geçerli oturum için kalıcı olur (varsayılan olarak gönderici başına); `/think:off` veya oturum boşta sıfırlaması ile temizlenir.
+- Onay yanıtı gönderilir (`Thinking level set to high.` / `Thinking disabled.`). Düzey geçersizse (ör. `/thinking big`) komut bir ipucuyla reddedilir ve oturum durumu değiştirilmeden kalır.
+- Geçerli thinking düzeyini görmek için argümansız `/think` (veya `/think:`) gönderin.
 
-## Agent tarafından uygulanması
+## Ajan tarafından uygulama
 
-- **Gömülü Pi**: çözümlenen düzey, süreç içi Pi agent çalışma zamanına iletilir.
+- **Embedded Pi**: çözümlenen düzey, süreç içi Pi ajan çalışma zamanına geçirilir.
 
-## Hızlı mod (`/fast`)
+## Fast mode (/fast)
 
 - Düzeyler: `on|off`.
-- Yalnızca yönerge içeren ileti, oturum hızlı mod geçersiz kılmasını açıp kapatır ve `Fast mode enabled.` / `Fast mode disabled.` yanıtını verir.
-- Geçerli etkin hızlı mod durumunu görmek için modsuz `/fast` (veya `/fast status`) gönderin.
-- OpenClaw hızlı modu şu sırayla çözümler:
+- Yalnızca yönergeden oluşan mesaj, oturum fast-mode geçersiz kılmasını değiştirir ve `Fast mode enabled.` / `Fast mode disabled.` yanıtını verir.
+- Geçerli etkin fast-mode durumunu görmek için kip vermeden `/fast` (veya `/fast status`) gönderin.
+- OpenClaw fast mode'u şu sırayla çözümler:
   1. Satır içi/yalnızca yönerge `/fast on|off`
   2. Oturum geçersiz kılması
-  3. Agent başına varsayılan (`agents.list[].fastModeDefault`)
+  3. Ajan başına varsayılan (`agents.list[].fastModeDefault`)
   4. Model başına yapılandırma: `agents.defaults.models["<provider>/<model>"].params.fastMode`
   5. Geri dönüş: `off`
-- `openai/*` için hızlı mod, desteklenen Responses isteklerinde `service_tier=priority` göndererek OpenAI öncelikli işlemeye eşlenir.
-- `openai-codex/*` için hızlı mod, Codex Responses üzerinde aynı `service_tier=priority` bayrağını gönderir. OpenClaw, her iki kimlik doğrulama yolu için de tek bir paylaşılan `/fast` anahtarı tutar.
-- `api.anthropic.com` adresine gönderilen OAuth kimlik doğrulamalı trafik dahil, doğrudan genel `anthropic/*` istekleri için hızlı mod Anthropic hizmet katmanlarına eşlenir: `/fast on`, `service_tier=auto`; `/fast off`, `service_tier=standard_only` ayarlar.
-- Anthropic uyumlu yoldaki `minimax/*` için `/fast on` (veya `params.fastMode: true`), `MiniMax-M2.7` değerini `MiniMax-M2.7-highspeed` olarak yeniden yazar.
-- Her ikisi de ayarlıysa, açık Anthropic `serviceTier` / `service_tier` model parametreleri hızlı mod varsayılanını geçersiz kılar. OpenClaw, Anthropic olmayan proxy temel URL'leri için Anthropic hizmet katmanı eklemesini yine de atlar.
+- `openai/*` için fast mode, desteklenen Responses isteklerinde `service_tier=priority` göndererek OpenAI öncelikli işlemeye eşlenir.
+- `openai-codex/*` için fast mode, Codex Responses üzerinde aynı `service_tier=priority` bayrağını gönderir. OpenClaw her iki auth yolu için de tek bir paylaşılan `/fast` geçişi tutar.
+- `api.anthropic.com` adresine gönderilen OAuth ile kimliği doğrulanmış trafik dahil doğrudan herkese açık `anthropic/*` istekleri için fast mode, Anthropic hizmet katmanlarına eşlenir: `/fast on`, `service_tier=auto`; `/fast off`, `service_tier=standard_only` ayarlar.
+- Anthropic uyumlu yoldaki `minimax/*` için `/fast on` (veya `params.fastMode: true`) `MiniMax-M2.7` değerini `MiniMax-M2.7-highspeed` olarak yeniden yazar.
+- Açık Anthropic `serviceTier` / `service_tier` model params, ikisi birden ayarlandığında fast-mode varsayılanını geçersiz kılar. OpenClaw, Anthropic hizmet katmanı enjeksiyonunu Anthropic olmayan proxy temel URL'leri için yine de atlar.
+- `/status`, yalnızca fast mode etkin olduğunda `Fast` gösterir.
 
-## Ayrıntılı yönergeler (`/verbose` veya `/v`)
+## Verbose yönergeleri (/verbose veya /v)
 
 - Düzeyler: `on` (minimal) | `full` | `off` (varsayılan).
-- Yalnızca yönerge içeren ileti, oturum ayrıntı düzeyini açıp kapatır ve `Verbose logging enabled.` / `Verbose logging disabled.` yanıtını verir; geçersiz düzeyler durumu değiştirmeden bir ipucu döndürür.
-- `/verbose off`, açık bir oturum geçersiz kılması saklar; bunu Sessions UI içinden `inherit` seçerek temizleyin.
-- Satır içi yönerge yalnızca o iletiyi etkiler; diğer durumlarda oturum/genel varsayılanlar uygulanır.
-- Geçerli ayrıntı düzeyini görmek için argümansız `/verbose` (veya `/verbose:`) gönderin.
-- Ayrıntılı mod açık olduğunda, yapılandırılmış araç sonuçları üreten agent'lar (Pi, diğer JSON agent'ları), her araç çağrısını kendi başına yalnızca meta veri içeren bir ileti olarak geri gönderir; varsa `<emoji> <tool-name>: <arg>` ile öneklenir (yol/komut). Bu araç özetleri, her araç başladığında gönderilir (ayrı baloncuklar olarak), akış delta'ları olarak değil.
-- Araç hata özeti normal modda görünür kalır, ancak ham hata ayrıntısı sonekleri `verbose` `on` veya `full` olmadıkça gizlenir.
-- `verbose` `full` olduğunda, araç çıktıları da tamamlandıktan sonra iletilir (ayrı baloncuk olarak, güvenli bir uzunluğa kısaltılmış biçimde). Bir çalışma sürerken `/verbose on|full|off` arasında geçiş yaparsanız, sonraki araç baloncukları yeni ayara uyar.
+- Yalnızca yönergeden oluşan mesaj, oturum verbose durumunu değiştirir ve `Verbose logging enabled.` / `Verbose logging disabled.` yanıtını verir; geçersiz düzeyler durumu değiştirmeden ipucu döndürür.
+- `/verbose off`, açık bir oturum geçersiz kılması depolar; bunu Sessions UI üzerinden `inherit` seçerek temizleyin.
+- Satır içi yönerge yalnızca o mesaja uygulanır; aksi durumda oturum/genel varsayılanlar geçerlidir.
+- Geçerli verbose düzeyini görmek için argümansız `/verbose` (veya `/verbose:`) gönderin.
+- Verbose açık olduğunda, yapılandırılmış tool result'lar yayan ajanlar (Pi, diğer JSON ajanları) her tool call'ı, mevcut olduğunda `<emoji> <tool-name>: <arg>` önekiyle (yol/komut) kendi yalnızca üst veri mesajı olarak geri gönderir. Bu tool özetleri, her araç başlar başlamaz (ayrı baloncuklar halinde) gönderilir; akış delta'ları olarak değil.
+- Tool failure özetleri normal kipte görünür kalır, ancak ham hata ayrıntısı sonekleri verbose `on` veya `full` olmadıkça gizlenir.
+- Verbose `full` olduğunda, tool çıktıları tamamlandıktan sonra da iletilir (ayrı baloncuk, güvenli bir uzunluğa kısaltılmış). Bir çalıştırma sürerken `/verbose on|full|off` değiştirirseniz, sonraki tool baloncukları yeni ayara uyar.
 
-## Plugin izleme yönergeleri (`/trace`)
+## Plugin izleme yönergeleri (/trace)
 
 - Düzeyler: `on` | `off` (varsayılan).
-- Yalnızca yönerge içeren ileti, oturum Plugin izleme çıktısını açıp kapatır ve `Plugin trace enabled.` / `Plugin trace disabled.` yanıtını verir.
-- Satır içi yönerge yalnızca o iletiyi etkiler; diğer durumlarda oturum/genel varsayılanlar uygulanır.
-- Geçerli izleme düzeyini görmek için argümansız `/trace` (veya `/trace:`) gönderin.
-- `/trace`, `/verbose` seçeneğinden daha dardır: yalnızca Plugin'e ait izleme/hata ayıklama satırlarını, örneğin Active Memory hata ayıklama özetlerini gösterir.
-- İzleme satırları `/status` içinde ve normal assistant yanıtından sonra gelen takip tanılama iletisi olarak görünebilir.
+- Yalnızca yönergeden oluşan mesaj, oturum Plugin izleme çıktısını değiştirir ve `Plugin trace enabled.` / `Plugin trace disabled.` yanıtını verir.
+- Satır içi yönerge yalnızca o mesaja uygulanır; aksi durumda oturum/genel varsayılanlar geçerlidir.
+- Geçerli trace düzeyini görmek için argümansız `/trace` (veya `/trace:`) gönderin.
+- `/trace`, `/verbose` komutundan daha dardır: yalnızca Active Memory hata ayıklama özetleri gibi Plugin'e ait trace/debug satırlarını açığa çıkarır.
+- Trace satırları `/status` içinde ve normal assistant yanıtından sonra takip tanılama mesajı olarak görünebilir.
 
-## Muhakeme görünürlüğü (`/reasoning`)
+## Akıl yürütme görünürlüğü (/reasoning)
 
 - Düzeyler: `on|off|stream`.
-- Yalnızca yönerge içeren ileti, yanıtlarda düşünme bloklarının gösterilip gösterilmeyeceğini açıp kapatır.
-- Etkinleştirildiğinde, muhakeme `Reasoning:` önekiyle **ayrı bir ileti** olarak gönderilir.
-- `stream` (yalnızca Telegram): reasoning'i yanıt üretilirken Telegram taslak baloncuğuna akıtır, ardından reasoning olmadan son yanıtı gönderir.
+- Yalnızca yönergeden oluşan mesaj, yanıtlar içinde thinking bloklarının gösterilip gösterilmeyeceğini değiştirir.
+- Etkin olduğunda akıl yürütme, `Reasoning:` önekiyle **ayrı bir mesaj** olarak gönderilir.
+- `stream` (yalnızca Telegram): akıl yürütmeyi yanıt üretilirken Telegram taslak baloncuğuna akıtır, ardından nihai yanıtı akıl yürütme olmadan gönderir.
 - Takma ad: `/reason`.
-- Geçerli reasoning düzeyini görmek için argümansız `/reasoning` (veya `/reasoning:`) gönderin.
-- Çözümleme sırası: satır içi yönerge, ardından oturum geçersiz kılması, ardından agent başına varsayılan (`agents.list[].reasoningDefault`), ardından geri dönüş (`off`).
+- Geçerli akıl yürütme düzeyini görmek için argümansız `/reasoning` (veya `/reasoning:`) gönderin.
+- Çözümleme sırası: satır içi yönerge, sonra oturum geçersiz kılması, sonra ajan başına varsayılan (`agents.list[].reasoningDefault`), sonra geri dönüş (`off`).
 
 ## İlgili
 
-- Elevated mode belgeleri [Elevated mode](/tr/tools/elevated) içinde yer alır.
+- Elevated mode belgeleri [Elevated mode](/tr/tools/elevated) sayfasında bulunur.
 
 ## Heartbeat'ler
 
-- Heartbeat probe gövdesi, yapılandırılmış heartbeat istemidir (varsayılan: `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`). Bir heartbeat iletisindeki satır içi yönergeler her zamanki gibi uygulanır (ancak heartbeat'lerden oturum varsayılanlarını değiştirmekten kaçının).
-- Heartbeat teslimi varsayılan olarak yalnızca son payload'u gönderir. Ayrı `Reasoning:` iletisini de göndermek için (varsa), `agents.defaults.heartbeat.includeReasoning: true` veya agent başına `agents.list[].heartbeat.includeReasoning: true` ayarlayın.
+- Heartbeat yoklama gövdesi, yapılandırılmış Heartbeat istemidir (varsayılan: `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`). Heartbeat mesajındaki satır içi yönergeler her zamanki gibi uygulanır (ancak Heartbeat'lerden oturum varsayılanlarını değiştirmekten kaçının).
+- Heartbeat teslimi varsayılan olarak yalnızca nihai yükü gönderir. Ayrı `Reasoning:` mesajını da göndermek için (mevcutsa), `agents.defaults.heartbeat.includeReasoning: true` veya ajan başına `agents.list[].heartbeat.includeReasoning: true` ayarlayın.
 
 ## Web sohbet UI
 
-- Web sohbet düşünme seçicisi, sayfa yüklendiğinde gelen oturum deposu/yapılandırmasından oturumun kayıtlı düzeyini yansıtır.
-- Başka bir düzey seçmek, oturum geçersiz kılmasını hemen `sessions.patch` ile yazar; bir sonraki gönderimi beklemez ve tek seferlik bir `thinkingOnce` geçersiz kılması değildir.
-- İlk seçenek her zaman `Default (<resolved level>)` olur; burada çözümlenen varsayılan, etkin oturum modelinin sağlayıcı düşünme profilinden gelir.
-- Seçici, gateway oturum satırı tarafından döndürülen `thinkingOptions` değerini kullanır. Tarayıcı UI kendi sağlayıcı regex listesini tutmaz; modele özgü düzey kümeleri Plugin'lere aittir.
-- `/think:<level>` hâlâ çalışır ve aynı kayıtlı oturum düzeyini günceller; böylece sohbet yönergeleri ve seçici senkronize kalır.
+- Web sohbeti thinking seçicisi, sayfa yüklenirken gelen oturum deposundan/yapılandırmadan oturumun saklanan düzeyini yansıtır.
+- Başka bir düzey seçmek, oturum geçersiz kılmasını hemen `sessions.patch` üzerinden yazar; sonraki gönderimi beklemez ve tek seferlik bir `thinkingOnce` geçersiz kılması değildir.
+- İlk seçenek her zaman `Default (<resolved level>)` olur; burada çözümlenen varsayılan, etkin oturum modelinin sağlayıcı thinking profilinden gelir.
+- Seçici, Gateway oturum satırı tarafından döndürülen `thinkingOptions` değerini kullanır. Tarayıcı UI kendi sağlayıcı regex listesini tutmaz; modele özgü düzey kümelerinin sahibi Plugin'lerdir.
+- `/think:<level>` yine çalışır ve aynı saklanan oturum düzeyini günceller; böylece sohbet yönergeleri ve seçici eşzamanlı kalır.
 
 ## Sağlayıcı profilleri
 
-- Sağlayıcı Plugin'leri, modelin desteklenen düzeylerini ve varsayılanını tanımlamak için `resolveThinkingProfile(ctx)` sunabilir.
-- Her profil düzeyinin kayıtlı kanonik bir `id` değeri vardır (`off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `adaptive` veya `max`) ve bir görüntüleme `label` değeri içerebilir. İkili sağlayıcılar `{ id: "low", label: "on" }` kullanır.
-- Yayımlanmış eski hook'lar (`supportsXHighThinking`, `isBinaryThinking` ve `resolveDefaultThinkingLevel`) uyumluluk bağdaştırıcıları olarak kalır, ancak yeni özel düzey kümeleri `resolveThinkingProfile` kullanmalıdır.
-- Gateway satırları `thinkingOptions` ve `thinkingDefault` değerlerini gösterir; böylece ACP/sohbet istemcileri çalışma zamanı doğrulamasının kullandığı aynı profili işler.
+- Sağlayıcı Plugin'leri, modelin desteklenen düzeylerini ve varsayılanını tanımlamak için `resolveThinkingProfile(ctx)` açığa çıkarabilir.
+- Her profil düzeyinin saklanan kanonik bir `id` değeri vardır (`off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `adaptive` veya `max`) ve bir görüntüleme `label` değeri içerebilir. İkili sağlayıcılar `{ id: "low", label: "on" }` kullanır.
+- Yayınlanmış eski Hook'lar (`supportsXHighThinking`, `isBinaryThinking` ve `resolveDefaultThinkingLevel`) uyumluluk bağdaştırıcıları olarak kalır, ancak yeni özel düzey kümeleri `resolveThinkingProfile` kullanmalıdır.
+- Gateway satırları `thinkingOptions` ve `thinkingDefault` açığa çıkarır; böylece ACP/sohbet istemcileri çalışma zamanı doğrulamasının kullandığı aynı profili işler.

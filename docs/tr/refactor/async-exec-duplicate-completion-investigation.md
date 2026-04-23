@@ -1,132 +1,137 @@
 ---
+read_when:
+    - Tekrarlanan node exec tamamlama olaylarında hata ayıklama yapıyorsunuz
+    - Heartbeat/sistem olayı tekrar kaldırma üzerinde çalışıyorsunuz
+summary: Yinelenen eşzamansız exec tamamlama eklemesi için inceleme notları
+title: Eşzamansız Exec Yinelenen Tamamlama İncelemesi
 x-i18n:
-    generated_at: "2026-04-16T08:53:31Z"
+    generated_at: "2026-04-23T09:10:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 95e56c5411204363676f002059c942201503e2359515d1a4b409882cc2e04920
+    source_hash: 8b0a3287b78bbc4c41e4354e9062daba7ae790fa207eee9a5f77515b958b510b
     source_path: refactor/async-exec-duplicate-completion-investigation.md
     workflow: 15
 ---
 
-# Async Exec Çift Tamamlanma İncelemesi
+# Eşzamansız Exec Yinelenen Tamamlama İncelemesi
 
 ## Kapsam
 
 - Oturum: `agent:main:telegram:group:-1003774691294:topic:1`
-- Belirti: aynı async exec completion, `keen-nexus` oturum/çalıştırması için LCM'de iki kez kullanıcı turu olarak kaydedildi.
-- Amaç: bunun büyük olasılıkla yinelenen oturum enjeksiyonu mu yoksa basit bir giden teslimat yeniden denemesi mi olduğunu belirlemek.
+- Belirti: aynı eşzamansız exec tamamlaması, `keen-nexus` oturum/çalıştırma kimliği için LCM içinde kullanıcı dönüşleri olarak iki kez kaydedildi.
+- Hedef: bunun büyük olasılıkla yinelenen oturum eklemesi mi yoksa düz giden teslimat yeniden denemesi mi olduğunu belirlemek.
 
 ## Sonuç
 
-Bu büyük olasılıkla saf bir giden teslimat yeniden denemesi değil, **yinelenen oturum enjeksiyonu**.
+Bunun büyük olasılıkla saf bir giden teslimat yeniden denemesi değil, **yinelenen oturum eklemesi** olduğu görülüyor.
 
-Gateway tarafındaki en güçlü boşluk, **node exec completion yolunda**:
+Gateway tarafındaki en güçlü boşluk **node exec tamamlama yolunda**:
 
-1. Node tarafındaki bir exec bitişi, tam `runId` ile `exec.finished` yayar.
+1. Node tarafındaki bir exec bitişi, tam `runId` ile `exec.finished` üretir.
 2. Gateway `server-node-events`, bunu bir sistem olayına dönüştürür ve bir Heartbeat ister.
-3. Heartbeat çalıştırması, boşaltılmış sistem olayı bloğunu agent prompt'una enjekte eder.
-4. Gömülü runner, bu prompt'u oturum transkriptine yeni bir kullanıcı turu olarak kalıcılaştırır.
+3. Heartbeat çalıştırması, boşaltılmış sistem olayı bloğunu agent prompt'una ekler.
+4. Gömülü runner, bu prompt'u oturum transkriptinde yeni bir kullanıcı dönüşü olarak kalıcılaştırır.
 
-Aynı `exec.finished`, herhangi bir nedenle aynı `runId` için gateway'e iki kez ulaşırsa (yeniden oynatma, yeniden bağlanma kopyası, upstream yeniden gönderim, yinelenmiş üretici), OpenClaw şu anda bu yol üzerinde `runId`/`contextKey` ile anahtarlanan **bir idempotency kontrolüne sahip değil**. İkinci kopya da aynı içerikle ikinci bir kullanıcı mesajına dönüşür.
+Aynı `exec.finished`, aynı `runId` için Gateway'e herhangi bir nedenle iki kez ulaşırsa (replay, yeniden bağlanma yinelenmesi, upstream yeniden gönderim, yinelenmiş üretici), OpenClaw şu anda bu yol üzerinde `runId`/`contextKey` ile anahtarlanmış bir **idempotency denetimine sahip değil**. İkinci kopya aynı içeriğe sahip ikinci bir kullanıcı mesajına dönüşür.
 
-## Kesin Kod Yolu
+## Tam Kod Yolu
 
-### 1. Üretici: node exec completion olayı
+### 1. Üretici: node exec tamamlama olayı
 
 - `src/node-host/invoke.ts:340-360`
-  - `sendExecFinishedEvent(...)`, olay `exec.finished` olacak şekilde `node.event` yayar.
-  - Payload, `sessionKey` ve tam `runId` içerir.
+  - `sendExecFinishedEvent(...)`, `exec.finished` olayıyla `node.event` üretir.
+  - Payload `sessionKey` ve tam `runId` içerir.
 
 ### 2. Gateway olay alımı
 
 - `src/gateway/server-node-events.ts:574-640`
   - `exec.finished` olayını işler.
-  - Metni oluşturur:
+  - Şu metni oluşturur:
     - `Exec finished (node=..., id=<runId>, code ...)`
   - Bunu şu şekilde kuyruğa alır:
     - `enqueueSystemEvent(text, { sessionKey, contextKey: runId ? \`exec:${runId}\` : "exec", trusted: false })`
-  - Hemen ardından bir wake ister:
+  - Hemen bir uyandırma ister:
     - `requestHeartbeatNow(scopedHeartbeatWakeOptions(sessionKey, { reason: "exec-event" }))`
 
-### 3. Sistem olayı dedupe zayıflığı
+### 3. Sistem olayı tekrar kaldırma zayıflığı
 
 - `src/infra/system-events.ts:90-115`
-  - `enqueueSystemEvent(...)` yalnızca **ardışık yinelenen metni** bastırır:
+  - `enqueueSystemEvent(...)`, yalnızca **ardışık yinelenen metni** bastırır:
     - `if (entry.lastText === cleaned) return false`
-  - `contextKey` saklar, ancak `contextKey`'i idempotency için **kullanmaz**.
-  - Drain sonrasında yinelenen bastırma sıfırlanır.
+  - `contextKey` saklar, ancak idempotency için `contextKey` kullanmaz.
+  - Drain sonrası yinelenen bastırma sıfırlanır.
 
-Bu şu anlama gelir: aynı `runId` ile yeniden oynatılmış bir `exec.finished`, kod zaten kararlı bir idempotency adayı (`exec:<runId>`) içermesine rağmen daha sonra tekrar kabul edilebilir.
+Bu, aynı `runId` ile yeniden oynatılan bir `exec.finished` olayının, kod zaten kararlı bir idempotency adayı olan (`exec:<runId>`) değere sahip olsa bile daha sonra tekrar kabul edilebileceği anlamına gelir.
 
-### 4. Wake işleme birincil çoğaltıcı değil
+### 4. Uyandırma işleme birincil çoğaltıcı değil
 
 - `src/infra/heartbeat-wake.ts:79-117`
-  - Wake'ler `(agentId, sessionKey)` ile birleştirilir.
-  - Aynı hedef için yinelenen wake istekleri tek bir bekleyen wake girdisine çöker.
+  - Uyandırmalar `(agentId, sessionKey)` ile birleştirilir.
+  - Aynı hedefe yönelik yinelenen uyandırma istekleri tek bir bekleyen uyandırma girdisinde birleşir.
 
-Bu da **tek başına yinelenen wake işlemenin**, yinelenen olay alımına kıyasla daha zayıf bir açıklama olmasını sağlar.
+Bu, **tek başına yinelenen uyandırma işlemenin** yinelenen olay alımına göre daha zayıf bir açıklama olduğu anlamına gelir.
 
 ### 5. Heartbeat olayı tüketir ve prompt girdisine dönüştürür
 
 - `src/infra/heartbeat-runner.ts:535-574`
   - Preflight, bekleyen sistem olaylarına bakar ve exec-event çalıştırmalarını sınıflandırır.
 - `src/auto-reply/reply/session-system-events.ts:86-90`
-  - `drainFormattedSystemEvents(...)`, oturum için kuyruğu boşaltır.
+  - `drainFormattedSystemEvents(...)`, oturum kuyruğunu boşaltır.
 - `src/auto-reply/reply/get-reply-run.ts:400-427`
-  - Boşaltılmış sistem olayı bloğu, agent prompt gövdesinin başına eklenir.
+  - Boşaltılmış sistem olayı bloğu agent prompt gövdesinin başına eklenir.
 
-### 6. Transkript enjeksiyon noktası
+### 6. Transkript ekleme noktası
 
 - `src/agents/pi-embedded-runner/run/attempt.ts:2000-2017`
   - `activeSession.prompt(effectivePrompt)`, tam prompt'u gömülü PI oturumuna gönderir.
-  - Completion'dan türetilen prompt'un kalıcı bir kullanıcı turuna dönüştüğü nokta burasıdır.
+  - Tamamlama türetilmiş prompt'un kalıcı kullanıcı dönüşüne dönüştüğü nokta burasıdır.
 
-Dolayısıyla aynı sistem olayı iki kez prompt içine yeniden kurulursa, LCM'de yinelenen kullanıcı mesajları beklenen bir sonuçtur.
+Dolayısıyla aynı sistem olayı prompt içine iki kez yeniden kurulursa, yinelenen LCM kullanıcı mesajları beklenen bir sonuçtur.
 
-## Neden basit giden teslimat yeniden denemesi daha az olası
+## Neden düz giden teslimat yeniden denemesi daha az olası
 
-Heartbeat runner içinde gerçek bir giden hata yolu var:
+Heartbeat runner içinde gerçek bir giden hata yolu vardır:
 
 - `src/infra/heartbeat-runner.ts:1194-1242`
-  - Yanıt önce üretilir.
+  - Önce yanıt üretilir.
   - Giden teslimat daha sonra `deliverOutboundPayloads(...)` aracılığıyla gerçekleşir.
-  - Buradaki hata `{ status: "failed" }` döndürür.
+  - Buradaki başarısızlık `{ status: "failed" }` döndürür.
 
-Ancak aynı sistem olayı kuyruğu girdisi için, bu tek başına yinelenen kullanıcı turlarını açıklamak için **yeterli değildir**:
+Ancak aynı sistem olayı kuyruğu girdisi için bu tek başına **yinelenen kullanıcı dönüşlerini** açıklamak için yeterli değildir:
 
 - `src/auto-reply/reply/session-system-events.ts:86-90`
   - Sistem olayı kuyruğu, giden teslimattan önce zaten boşaltılmıştır.
 
-Yani bir kanal gönderim yeniden denemesi tek başına aynı kuyruklanmış olayı yeniden oluşturmaz. Harici teslimatın eksik/başarısız olmasını açıklayabilir, ancak tek başına ikinci özdeş oturum kullanıcı mesajını açıklamaz.
+Dolayısıyla bir kanal gönderim yeniden denemesi tek başına aynı kuyruğa alınmış olayı yeniden oluşturmaz. Bu, eksik/başarısız harici teslimatı açıklayabilir, ancak tek başına ikinci özdeş oturum kullanıcı mesajını açıklamaz.
 
 ## İkincil, daha düşük güvenli olasılık
 
 Agent runner içinde tam çalıştırma yeniden deneme döngüsü vardır:
 
 - `src/auto-reply/reply/agent-runner-execution.ts:741-1473`
-  - Bazı geçici hatalar, tüm çalıştırmayı yeniden deneyebilir ve aynı `commandBody`'yi yeniden gönderebilir.
+  - Belirli geçici hatalar tüm çalıştırmayı yeniden deneyebilir ve aynı `commandBody` değerini yeniden gönderebilir.
 
-Bu, prompt zaten eklenmişken yeniden deneme koşulu tetiklenirse, **aynı yanıt yürütmesi içinde** kalıcılaştırılmış bir kullanıcı prompt'unu çoğaltabilir.
+Bu, yeniden deneme koşulu tetiklenmeden önce prompt zaten eklenmişse **aynı yanıt yürütmesi içinde** kalıcı kullanıcı prompt'unu çoğaltabilir.
 
-Bunu, yinelenen `exec.finished` alımına göre daha düşük sıraya koyuyorum çünkü:
+Bunu yinelenen `exec.finished` alımından daha düşük olasılıklı görüyorum çünkü:
 
-- gözlemlenen boşluk yaklaşık 51 saniyeydi; bu da süreç içi bir yeniden denemeden çok ikinci bir wake/tur gibi görünüyor;
-- rapor zaten tekrarlanan mesaj gönderim hatalarından bahsediyor; bu da anlık model/runtime yeniden denemesinden çok daha sonraki ayrı bir tura işaret ediyor.
+- gözlenen boşluk yaklaşık 51 saniyeydi; bu, süreç içi yeniden denemeden çok ikinci bir uyandırma/dönüşe benziyor;
+- rapor zaten tekrarlanan mesaj gönderim hatalarından söz ediyor; bu da anlık model/çalışma zamanı yeniden denemesinden çok ayrı bir daha sonraki dönüşe işaret ediyor.
 
 ## Kök Neden Hipotezi
 
 En yüksek güvenli hipotez:
 
-- `keen-nexus` completion, **node exec olay yolu** üzerinden geldi.
-- Aynı `exec.finished`, `server-node-events`'e iki kez teslim edildi.
-- Gateway ikisini de kabul etti çünkü `enqueueSystemEvent(...)`, `contextKey` / `runId` ile dedupe yapmıyor.
-- Kabul edilen her olay bir Heartbeat tetikledi ve PI transkriptine kullanıcı turu olarak enjekte edildi.
+- `keen-nexus` tamamlaması **node exec olay yolu** üzerinden geldi.
+- Aynı `exec.finished`, `server-node-events` adresine iki kez teslim edildi.
+- Gateway ikisini de kabul etti çünkü `enqueueSystemEvent(...)`, `contextKey` / `runId` ile tekrar kaldırma yapmıyor.
+- Kabul edilen her olay bir Heartbeat tetikledi ve PI transkriptine kullanıcı dönüşü olarak eklendi.
 
-## Önerilen Küçük ve Cerrahi Düzeltme
+## Önerilen küçük cerrahi düzeltme
 
-Bir düzeltme isteniyorsa, en küçük ve en yüksek değerli değişiklik şu olur:
+Bir düzeltme isteniyorsa, en küçük yüksek değerli değişiklik şudur:
 
-- exec/sistem olayı idempotency'sinin, en azından tam `(sessionKey, contextKey, text)` tekrarları için, `contextKey`'i kısa bir ufuk boyunca dikkate almasını sağlamak;
-- veya `server-node-events` içinde `(sessionKey, runId, event kind)` ile anahtarlanan `exec.finished` için özel bir dedupe eklemek.
+- exec/sistem-olayı idempotency'sinin, en azından tam `(sessionKey, contextKey, text)` tekrarları için kısa bir ufuk boyunca `contextKey` değerini dikkate almasını sağlamak;
+- veya `server-node-events` içinde `(sessionKey, runId, event kind)` ile anahtarlanmış `exec.finished` için özel bir tekrar kaldırma eklemek.
 
-Bu, yeniden oynatılmış `exec.finished` kopyalarını oturum turlarına dönüşmeden önce doğrudan engeller.
+Bu, yeniden oynatılan `exec.finished` yinelenmelerini oturum dönüşlerine dönüşmeden önce doğrudan engeller.

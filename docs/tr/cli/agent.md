@@ -1,13 +1,13 @@
 ---
 read_when:
-    - Betiklerden tek bir agent turu çalıştırmak istediğinizde (isteğe bağlı olarak yanıtı iletme)
-summary: '`openclaw agent` için CLI başvurusu (Gateway üzerinden tek bir agent turu gönderin)'
+    - Betiklerden bir agent turu çalıştırmak istiyorsunuz (isteğe bağlı olarak yanıtı teslim edin)
+summary: Gateway üzerinden `openclaw agent` için CLI başvurusu (bir agent turu gönder)
 title: agent
 x-i18n:
-    generated_at: "2026-04-05T13:47:36Z"
+    generated_at: "2026-04-23T08:59:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0627f943bc7f3556318008f76dc6150788cf06927dccdc7d2681acb98f257d56
+    source_hash: 4ba3181d74e9a8d6d607ee62b18e1e6fd693e64e7789e6b29b7f7b1ccb7b69d0
     source_path: cli/agent.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 Gateway üzerinden bir agent turu çalıştırın (gömülü kullanım için `--local` kullanın).
 Yapılandırılmış bir agent'ı doğrudan hedeflemek için `--agent <id>` kullanın.
 
-En az bir oturum seçici belirtin:
+En az bir oturum seçici verin:
 
 - `--to <dest>`
 - `--session-id <id>`
@@ -25,23 +25,23 @@ En az bir oturum seçici belirtin:
 
 İlgili:
 
-- Agent gönderme aracı: [Agent send](/tools/agent-send)
+- Agent gönderme tool'u: [Agent send](/tr/tools/agent-send)
 
 ## Seçenekler
 
-- `-m, --message <text>`: gerekli ileti gövdesi
+- `-m, --message <text>`: zorunlu mesaj gövdesi
 - `-t, --to <dest>`: oturum anahtarını türetmek için kullanılan alıcı
 - `--session-id <id>`: açık oturum kimliği
-- `--agent <id>`: agent kimliği; yönlendirme bağlarını geçersiz kılar
-- `--thinking <off|minimal|low|medium|high|xhigh>`: agent düşünme seviyesi
-- `--verbose <on|off>`: ayrıntı düzeyini oturum için kalıcı hale getir
+- `--agent <id>`: agent kimliği; yönlendirme bağlamalarını geçersiz kılar
+- `--thinking <level>`: agent düşünme düzeyi (`off`, `minimal`, `low`, `medium`, `high` ve `xhigh`, `adaptive` veya `max` gibi sağlayıcının desteklediği özel düzeyler)
+- `--verbose <on|off>`: ayrıntılı düzeyi oturum için kalıcılaştırır
 - `--channel <channel>`: teslimat kanalı; ana oturum kanalını kullanmak için boş bırakın
 - `--reply-to <target>`: teslimat hedefi geçersiz kılması
 - `--reply-channel <channel>`: teslimat kanalı geçersiz kılması
 - `--reply-account <id>`: teslimat hesabı geçersiz kılması
-- `--local`: gömülü agent'ı doğrudan çalıştır (eklenti kayıt defteri ön yüklemesinden sonra)
-- `--deliver`: yanıtı seçilen kanal/hedefe geri gönder
-- `--timeout <seconds>`: agent zaman aşımını geçersiz kıl (varsayılan 600 veya yapılandırma değeri)
+- `--local`: gömülü agent'ı doğrudan çalıştırın (Plugin kayıt defteri ön yüklemesinden sonra)
+- `--deliver`: yanıtı seçilen kanala/hedefe geri gönder
+- `--timeout <seconds>`: agent zaman aşımını geçersiz kılar (varsayılan 600 veya config değeri)
 - `--json`: JSON çıktısı ver
 
 ## Örnekler
@@ -57,8 +57,8 @@ openclaw agent --agent ops --message "Run locally" --local
 
 ## Notlar
 
-- Gateway modu, Gateway isteği başarısız olduğunda gömülü agent'a geri döner. Baştan itibaren gömülü yürütmeyi zorlamak için `--local` kullanın.
-- `--local` yine de önce eklenti kayıt defterini önceden yükler; böylece eklenti tarafından sağlanan sağlayıcılar, araçlar ve kanallar gömülü çalıştırmalar sırasında kullanılabilir kalır.
-- `--channel`, `--reply-channel` ve `--reply-account`, oturum yönlendirmesini değil, yanıt teslimini etkiler.
-- Bu komut `models.json` yeniden oluşturmayı tetiklediğinde, SecretRef tarafından yönetilen sağlayıcı kimlik bilgileri çözülmüş düz gizli metin olarak değil, gizli olmayan işaretleyiciler olarak kalıcı hale getirilir (örneğin ortam değişkeni adları, `secretref-env:ENV_VAR_NAME` veya `secretref-managed`).
-- İşaretleyici yazımları kaynak açısından yetkilidir: OpenClaw, çözülmüş çalışma zamanı gizli değerlerinden değil, etkin kaynak yapılandırma anlık görüntüsündeki işaretleyicileri kalıcı hale getirir.
+- Gateway modu, Gateway isteği başarısız olduğunda gömülü agent'a fallback yapar. Baştan gömülü yürütmeyi zorlamak için `--local` kullanın.
+- `--local`, gömülü çalıştırmalar sırasında Plugin tarafından sağlanan sağlayıcıların, tools'ların ve kanalların kullanılabilir kalması için önce Plugin kayıt defterini yine de ön yükler.
+- `--channel`, `--reply-channel` ve `--reply-account`, oturum yönlendirmesini değil yanıt teslimini etkiler.
+- Bu komut `models.json` yeniden oluşturmayı tetiklediğinde, SecretRef tarafından yönetilen sağlayıcı kimlik bilgileri çözülmüş düz gizli metin olarak değil, gizli olmayan işaretleyiciler olarak kalıcılaştırılır (örneğin env değişken adları, `secretref-env:ENV_VAR_NAME` veya `secretref-managed`).
+- İşaretleyici yazımları kaynak yetkilidir: OpenClaw, işaretleyicileri çözülmüş çalışma zamanı gizli değerlerinden değil, etkin kaynak config snapshot'undan kalıcılaştırır.

@@ -1,22 +1,21 @@
 ---
 read_when:
-    - OpenClaw ile Tencent Hy modellerini kullanmak istiyorsunuz
+    - Tencent Hy modellerini OpenClaw ile kullanmak istiyorsunuz
     - TokenHub API anahtarı kurulumuna ihtiyacınız var
 summary: Tencent Cloud TokenHub kurulumu
 title: Tencent Cloud (TokenHub)
 x-i18n:
-    generated_at: "2026-04-22T08:55:45Z"
+    generated_at: "2026-04-23T09:09:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04da073973792c55dc0c2d287bfc51187bb2128bbbd5c4a483f850adeea50ab5
+    source_hash: 90fce0d5957b261439cacd2b4df2362ed69511cb047af6a76ccaf54004806041
     source_path: providers/tencent.md
     workflow: 15
 ---
 
 # Tencent Cloud (TokenHub)
 
-Tencent Cloud sağlayıcısı, TokenHub uç noktası (`tencent-tokenhub`) üzerinden
-Tencent Hy modellerine erişim sağlar.
+Tencent Cloud, OpenClaw içinde **paketle birlikte gelen bir sağlayıcı plugin'i** olarak sunulur. TokenHub uç noktası (`tencent-tokenhub`) üzerinden Tencent Hy modellerine erişim sağlar.
 
 Sağlayıcı, OpenAI uyumlu bir API kullanır.
 
@@ -39,29 +38,30 @@ openclaw onboard --non-interactive \
 
 ## Sağlayıcılar ve uç noktalar
 
-| Sağlayıcı          | Uç nokta                      | Kullanım durumu         |
-| ------------------ | ----------------------------- | ----------------------- |
-| `tencent-tokenhub` | `tokenhub.tencentmaas.com/v1` | Tencent TokenHub ile Hy |
+| Sağlayıcı           | Uç nokta                      | Kullanım durumu         |
+| ------------------- | ----------------------------- | ----------------------- |
+| `tencent-tokenhub`  | `tokenhub.tencentmaas.com/v1` | Tencent TokenHub üzerinden Hy |
 
 ## Kullanılabilir modeller
 
 ### tencent-tokenhub
 
-- **hy3-preview** — Hy3 önizlemesi (256K bağlam, akıl yürütme, varsayılan)
+- **hy3-preview** — Hy3 önizleme (256K bağlam, reasoning, varsayılan)
 
 ## Notlar
 
-- TokenHub model başvuruları `tencent-tokenhub/<modelId>` kullanır.
-- Gerekirse fiyatlandırma ve bağlam meta verilerini `models.providers` içinde geçersiz kılın.
+- TokenHub model başvuruları `tencent-tokenhub/<modelId>` biçimini kullanır.
+- Plugin, katmanlı Hy3 fiyatlandırma meta verisini yerleşik olarak sunar; bu nedenle manuel fiyatlandırma geçersiz kılmaları olmadan maliyet tahminleri doldurulur.
+- Gerekirse fiyatlandırma ve bağlam meta verisini `models.providers` içinde geçersiz kılın.
 
 ## Ortam notu
 
 Gateway bir daemon olarak çalışıyorsa (launchd/systemd), `TOKENHUB_API_KEY`
-değerinin o süreç için kullanılabilir olduğundan emin olun (örneğin,
-`~/.openclaw/.env` içinde veya `env.shellEnv` aracılığıyla).
+değerinin o süreç için erişilebilir olduğundan emin olun (örneğin `~/.openclaw/.env` içinde veya
+`env.shellEnv` üzerinden).
 
 ## İlgili belgeler
 
 - [OpenClaw Yapılandırması](/tr/gateway/configuration)
-- [Model Sağlayıcıları](/tr/concepts/model-providers)
+- [Model Providers](/tr/concepts/model-providers)
 - [Tencent TokenHub](https://cloud.tencent.com/document/product/1823/130050)

@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Sağlayıcı yeniden deneme davranışını veya varsayılanlarını güncelliyorsunuz
-    - Sağlayıcı gönderim hatalarını veya hız sınırlarını hata ayıklıyorsunuz
+    - Sağlayıcı yeniden deneme davranışını veya varsayılanlarını güncelleme
+    - Sağlayıcı gönderim hatalarını veya hız sınırlarını ayıklama
 summary: Giden sağlayıcı çağrıları için yeniden deneme ilkesi
 title: Yeniden Deneme İlkesi
 x-i18n:
-    generated_at: "2026-04-05T13:51:13Z"
+    generated_at: "2026-04-23T09:01:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 55bb261ff567f46ce447be9c0ee0c5b5e6d2776287d7662762656c14108dd607
+    source_hash: aa16219d197492be15925dfd49359cfbed20e53ecdaa5309bbe122d4fe611e75
     source_path: concepts/retry.md
     workflow: 15
 ---
@@ -17,31 +17,43 @@ x-i18n:
 
 ## Hedefler
 
-- Çok adımlı akış başına değil, HTTP isteği başına yeniden dene.
-- Yalnızca geçerli adımı yeniden deneyerek sıralamayı koru.
-- İdempotent olmayan işlemlerin yinelenmesini önle.
+- Yeniden denemeyi çok adımlı akış başına değil, HTTP isteği başına yapmak.
+- Yalnızca geçerli adımı yeniden deneyerek sıralamayı korumak.
+- İdempotent olmayan işlemleri yinelemekten kaçınmak.
 
 ## Varsayılanlar
 
 - Deneme sayısı: 3
-- En yüksek gecikme sınırı: 30000 ms
+- Azami gecikme sınırı: 30000 ms
 - Jitter: 0.1 (yüzde 10)
 - Sağlayıcı varsayılanları:
-  - Telegram en düşük gecikme: 400 ms
-  - Discord en düşük gecikme: 500 ms
+  - Telegram asgari gecikme: 400 ms
+  - Discord asgari gecikme: 500 ms
 
 ## Davranış
 
+### Model sağlayıcıları
+
+- OpenClaw, normal kısa yeniden denemeleri sağlayıcı SDK'larının işlemesine izin verir.
+- Anthropic ve OpenAI gibi Stainless tabanlı SDK'larda yeniden denenebilir yanıtlar
+  (`408`, `409`, `429` ve `5xx`) `retry-after-ms` veya
+  `retry-after` içerebilir. Bu bekleme 60 saniyeden uzunsa OpenClaw
+  `x-should-retry: false` enjekte eder; böylece SDK hatayı hemen gösterir ve model
+  failover başka bir auth profiline veya fallback modele dönebilir.
+- Sınırı `OPENCLAW_SDK_RETRY_MAX_WAIT_SECONDS=<seconds>` ile geçersiz kılın.
+  SDK'ların uzun `Retry-After`
+  uyku sürelerine dahili olarak uymasına izin vermek için bunu `0`, `false`, `off`, `none` veya `disabled` olarak ayarlayın.
+
 ### Discord
 
-- Yalnızca hız sınırı hatalarında yeniden dener (HTTP 429).
-- Kullanılabiliyorsa Discord `retry_after` değerini, aksi takdirde üstel geri çekilmeyi kullanır.
+- Yalnızca hız sınırı hatalarında (HTTP 429) yeniden dener.
+- Varsa Discord `retry_after` değerini, yoksa üstel backoff kullanır.
 
 ### Telegram
 
-- Geçici hatalarda yeniden dener (429, zaman aşımı, bağlanma/sıfırlama/kapanma, geçici olarak kullanılamıyor).
-- Kullanılabiliyorsa `retry_after` değerini, aksi takdirde üstel geri çekilmeyi kullanır.
-- Markdown ayrıştırma hataları yeniden denenmez; düz metne geri düşerler.
+- Geçici hatalarda yeniden dener (429, zaman aşımı, connect/reset/closed, geçici olarak kullanılamıyor).
+- Varsa `retry_after` değerini, yoksa üstel backoff kullanır.
+- Markdown ayrıştırma hataları yeniden denenmez; düz metne fallback yapar.
 
 ## Yapılandırma
 
@@ -72,5 +84,5 @@ Yeniden deneme ilkesini `~/.openclaw/openclaw.json` içinde sağlayıcı başın
 
 ## Notlar
 
-- Yeniden denemeler istek başına uygulanır (mesaj gönderimi, medya yükleme, tepki, anket, çıkartma).
+- Yeniden denemeler istek başına uygulanır (mesaj gönderme, medya yükleme, tepki, anket, çıkartma).
 - Bileşik akışlar tamamlanmış adımları yeniden denemez.

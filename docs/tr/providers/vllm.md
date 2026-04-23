@@ -1,36 +1,39 @@
 ---
 read_when:
     - OpenClaw'ı yerel bir vLLM sunucusuna karşı çalıştırmak istiyorsunuz
-    - Kendi modellerinizle OpenAI uyumlu `/v1` uç noktalarını istiyorsunuz
-summary: OpenClaw'ı vLLM ile çalıştırma (OpenAI uyumlu yerel sunucu)
+    - Kendi modellerinizle OpenAI uyumlu `/v1` uç noktaları istiyorsunuz
+summary: OpenClaw'ı vLLM ile çalıştırın (OpenAI uyumlu yerel sunucu)
 title: vLLM
 x-i18n:
-    generated_at: "2026-04-12T23:33:30Z"
+    generated_at: "2026-04-23T09:09:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a43be9ae879158fcd69d50fb3a47616fd560e3c6fe4ecb3a109bdda6a63a6a80
+    source_hash: c6c4ceeb59cc10079630e45263485747eadfc66a66267d27579f466d0c0a91a1
     source_path: providers/vllm.md
     workflow: 15
 ---
 
 # vLLM
 
-vLLM, **OpenAI uyumlu** bir HTTP API üzerinden açık kaynaklı (ve bazı özel) modelleri sunabilir. OpenClaw, vLLM'e `openai-completions` API'sini kullanarak bağlanır.
+vLLM, **OpenAI uyumlu** HTTP API üzerinden açık kaynaklı (ve bazı özel) modeller sunabilir. OpenClaw, vLLM'ye `openai-completions` API'sini kullanarak bağlanır.
 
-OpenClaw ayrıca, `VLLM_API_KEY` ile açıkça etkinleştirdiğinizde (sunucunuz kimlik doğrulamayı zorlamıyorsa herhangi bir değer çalışır) ve açık bir `models.providers.vllm` girdisi tanımlamadığınızda, vLLM'den kullanılabilir modelleri **otomatik keşfedebilir**.
+OpenClaw, `VLLM_API_KEY` ile katılım yaptığınızda (sunucunuz auth zorlamıyorsa herhangi bir değer çalışır) ve açık bir `models.providers.vllm` girdisi tanımlamadığınızda, vLLM'deki kullanılabilir modelleri **otomatik keşfedebilir**.
 
-| Özellik         | Değer                                    |
+OpenClaw, `vllm` sağlayıcısını akışlı kullanım hesaplamasını destekleyen yerel bir OpenAI uyumlu sağlayıcı olarak değerlendirir; bu nedenle durum/bağlam token sayıları
+`stream_options.include_usage` yanıtlarından güncellenebilir.
+
+| Özellik          | Değer                                    |
 | ---------------- | ---------------------------------------- |
-| Sağlayıcı ID'si | `vllm`                                   |
+| Sağlayıcı kimliği | `vllm`                                  |
 | API              | `openai-completions` (OpenAI uyumlu)     |
-| Kimlik doğrulama | `VLLM_API_KEY` ortam değişkeni           |
-| Varsayılan taban URL | `http://127.0.0.1:8000/v1`           |
+| Auth             | `VLLM_API_KEY` ortam değişkeni           |
+| Varsayılan base URL | `http://127.0.0.1:8000/v1`            |
 
-## Başlangıç
+## Başlarken
 
 <Steps>
-  <Step title="OpenAI uyumlu bir sunucuyla vLLM'i başlatın">
-    Taban URL'niz `/v1` uç noktalarını sunmalıdır (ör. `/v1/models`, `/v1/chat/completions`). vLLM yaygın olarak şu adreste çalışır:
+  <Step title="vLLM'yi OpenAI uyumlu bir sunucuyla başlatın">
+    Base URL'niz `/v1` uç noktalarını açığa çıkarmalıdır (ör. `/v1/models`, `/v1/chat/completions`). vLLM yaygın olarak şu adreste çalışır:
 
     ```
     http://127.0.0.1:8000/v1
@@ -38,7 +41,7 @@ OpenClaw ayrıca, `VLLM_API_KEY` ile açıkça etkinleştirdiğinizde (sunucunuz
 
   </Step>
   <Step title="API anahtarı ortam değişkenini ayarlayın">
-    Sunucunuz kimlik doğrulamayı zorlamıyorsa herhangi bir değer çalışır:
+    Sunucunuz auth zorlamıyorsa herhangi bir değer çalışır:
 
     ```bash
     export VLLM_API_KEY="vllm-local"
@@ -68,25 +71,25 @@ OpenClaw ayrıca, `VLLM_API_KEY` ile açıkça etkinleştirdiğinizde (sunucunuz
 
 ## Model keşfi (örtük sağlayıcı)
 
-`VLLM_API_KEY` ayarlandığında (veya bir kimlik doğrulama profili mevcut olduğunda) ve `models.providers.vllm` tanımlamadığınızda, OpenClaw şu isteği sorgular:
+`VLLM_API_KEY` ayarlandığında (veya bir auth profili mevcut olduğunda) ve siz **`models.providers.vllm` tanımlamadığınızda**, OpenClaw şu sorguyu yapar:
 
 ```
 GET http://127.0.0.1:8000/v1/models
 ```
 
-ve dönen kimlikleri model girdilerine dönüştürür.
+ve döndürülen kimlikleri model girdilerine dönüştürür.
 
 <Note>
-`models.providers.vllm` değerini açıkça ayarlarsanız otomatik keşif atlanır ve modelleri elle tanımlamanız gerekir.
+`models.providers.vllm` değerini açıkça ayarlarsanız, otomatik keşif atlanır ve modelleri elle tanımlamanız gerekir.
 </Note>
 
-## Açık yapılandırma (manuel modeller)
+## Açık yapılandırma (elle modeller)
 
 Şu durumlarda açık yapılandırma kullanın:
 
-- vLLM farklı bir ana makinede veya bağlantı noktasında çalışıyorsa
+- vLLM farklı bir ana makinede veya portta çalışıyorsa
 - `contextWindow` veya `maxTokens` değerlerini sabitlemek istiyorsanız
-- Sunucunuz gerçek bir API anahtarı gerektiriyorsa (veya üst bilgileri kontrol etmek istiyorsanız)
+- Sunucunuz gerçek bir API anahtarı gerektiriyorsa (veya üst bilgileri denetlemek istiyorsanız)
 
 ```json5
 {
@@ -118,21 +121,21 @@ ve dönen kimlikleri model girdilerine dönüştürür.
 <AccordionGroup>
   <Accordion title="Proxy tarzı davranış">
     vLLM, yerel bir
-    OpenAI uç noktası olarak değil, proxy tarzı OpenAI uyumlu bir `/v1` backend'i olarak ele alınır. Bu şu anlama gelir:
+    OpenAI uç noktası olarak değil, proxy tarzı OpenAI uyumlu `/v1` arka ucu olarak değerlendirilir. Bunun anlamı şudur:
 
     | Davranış | Uygulanır mı? |
     |----------|---------------|
-    | Yerel OpenAI istek şekillendirmesi | Hayır |
+    | Yerel OpenAI istek şekillendirme | Hayır |
     | `service_tier` | Gönderilmez |
     | Responses `store` | Gönderilmez |
-    | İstem önbelleği ipuçları | Gönderilmez |
-    | OpenAI reasoning-compat yük şekillendirmesi | Uygulanmaz |
-    | Gizli OpenClaw ilişkilendirme üst bilgileri | Özel taban URL'lerde eklenmez |
+    | Prompt-cache ipuçları | Gönderilmez |
+    | OpenAI reasoning-compat yük şekillendirme | Uygulanmaz |
+    | Gizli OpenClaw atıf üst bilgileri | Özel base URL'lerde enjekte edilmez |
 
   </Accordion>
 
-  <Accordion title="Özel taban URL">
-    vLLM sunucunuz varsayılan olmayan bir ana makinede veya bağlantı noktasında çalışıyorsa, açık sağlayıcı yapılandırmasında `baseUrl` ayarlayın:
+  <Accordion title="Özel base URL">
+    vLLM sunucunuz varsayılan olmayan bir ana makine veya portta çalışıyorsa, açık sağlayıcı yapılandırmasında `baseUrl` ayarlayın:
 
     ```json5
     {
@@ -165,27 +168,27 @@ ve dönen kimlikleri model girdilerine dönüştürür.
 
 <AccordionGroup>
   <Accordion title="Sunucuya ulaşılamıyor">
-    vLLM sunucusunun çalıştığını ve erişilebilir olduğunu denetleyin:
+    vLLM sunucusunun çalıştığını ve erişilebilir olduğunu kontrol edin:
 
     ```bash
     curl http://127.0.0.1:8000/v1/models
     ```
 
-    Bağlantı hatası görürseniz ana makineyi, bağlantı noktasını ve vLLM'in OpenAI uyumlu sunucu kipinde başlatıldığını doğrulayın.
+    Bağlantı hatası görüyorsanız ana makineyi, portu ve vLLM'nin OpenAI uyumlu sunucu moduyla başlatıldığını doğrulayın.
 
   </Accordion>
 
-  <Accordion title="İsteklerde kimlik doğrulama hataları">
-    İstekler kimlik doğrulama hatalarıyla başarısız oluyorsa, sunucu yapılandırmanızla eşleşen gerçek bir `VLLM_API_KEY` ayarlayın veya sağlayıcıyı `models.providers.vllm` altında açıkça yapılandırın.
+  <Accordion title="İsteklerde auth hataları">
+    İstekler auth hatalarıyla başarısız oluyorsa, sunucu yapılandırmanızla eşleşen gerçek bir `VLLM_API_KEY` ayarlayın veya sağlayıcıyı `models.providers.vllm` altında açıkça yapılandırın.
 
     <Tip>
-    vLLM sunucunuz kimlik doğrulamayı zorlamıyorsa, `VLLM_API_KEY` için boş olmayan herhangi bir değer OpenClaw için açık etkinleştirme sinyali olarak çalışır.
+    vLLM sunucunuz auth zorlamıyorsa, `VLLM_API_KEY` için boş olmayan herhangi bir değer OpenClaw için katılım sinyali olarak çalışır.
     </Tip>
 
   </Accordion>
 
   <Accordion title="Hiç model keşfedilmedi">
-    Otomatik keşif için `VLLM_API_KEY` ayarlanmış **olmalı** ve açık bir `models.providers.vllm` yapılandırma girdisi bulunmamalıdır. Sağlayıcıyı elle tanımladıysanız OpenClaw keşfi atlar ve yalnızca bildirdiğiniz modelleri kullanır.
+    Otomatik keşif için `VLLM_API_KEY` ayarlanmış olmalı **ve** açık bir `models.providers.vllm` yapılandırma girdisi olmamalıdır. Sağlayıcıyı elle tanımladıysanız, OpenClaw keşfi atlar ve yalnızca bildirdiğiniz modelleri kullanır.
   </Accordion>
 </AccordionGroup>
 
@@ -197,13 +200,13 @@ Daha fazla yardım: [Sorun giderme](/tr/help/troubleshooting) ve [SSS](/tr/help/
 
 <CardGroup cols={2}>
   <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model başvurularını ve yük devretme davranışını seçme.
+    Sağlayıcıları, model başvurularını ve failover davranışını seçme.
   </Card>
   <Card title="OpenAI" href="/tr/providers/openai" icon="bolt">
-    Yerel OpenAI sağlayıcısı ve OpenAI uyumlu yol davranışı.
+    Yerel OpenAI sağlayıcısı ve OpenAI uyumlu rota davranışı.
   </Card>
-  <Card title="OAuth ve kimlik doğrulama" href="/tr/gateway/authentication" icon="key">
-    Kimlik doğrulama ayrıntıları ve kimlik bilgisi yeniden kullanım kuralları.
+  <Card title="OAuth ve auth" href="/tr/gateway/authentication" icon="key">
+    Auth ayrıntıları ve kimlik bilgisi yeniden kullanım kuralları.
   </Card>
   <Card title="Sorun giderme" href="/tr/help/troubleshooting" icon="wrench">
     Yaygın sorunlar ve bunların nasıl çözüleceği.

@@ -1,26 +1,26 @@
 ---
 read_when:
     - Gateway'i bir tarayıcıdan yönetmek istiyorsunuz
-    - SSH tünelleri olmadan Tailnet erişimi istiyorsunuz
-summary: Gateway için tarayıcı tabanlı kontrol arayüzü (sohbet, düğümler, config)
-title: Kontrol Arayüzü
+    - SSH tünelleri olmadan tailnet erişimi istiyorsunuz
+summary: Gateway için tarayıcı tabanlı Control UI (sohbet, Node'lar, yapılandırma)
+title: Control UI
 x-i18n:
-    generated_at: "2026-04-05T14:15:08Z"
+    generated_at: "2026-04-23T09:13:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1568680a07907343352dbb3a2e6a1b896826404a7d8baba62512f03eac28e3d7
+    source_hash: ce0ed08db83a04d47122c5ada0507d6a9e4c725f8ad4fa8f62cb5d4f0412bfc6
     source_path: web/control-ui.md
     workflow: 15
 ---
 
-# Kontrol Arayüzü (tarayıcı)
+# Control UI (tarayıcı)
 
-Kontrol Arayüzü, Gateway tarafından sunulan küçük bir **Vite + Lit** tek sayfalı uygulamadır:
+Control UI, Gateway tarafından sunulan küçük bir **Vite + Lit** tek sayfa uygulamasıdır:
 
 - varsayılan: `http://<host>:18789/`
 - isteğe bağlı önek: `gateway.controlUi.basePath` ayarlayın (ör. `/openclaw`)
 
-Aynı bağlantı noktası üzerindeki **Gateway WebSocket** ile **doğrudan** konuşur.
+Aynı port üzerindeki **Gateway WebSocket** ile **doğrudan** konuşur.
 
 ## Hızlı açılış (yerel)
 
@@ -28,126 +28,183 @@ Gateway aynı bilgisayarda çalışıyorsa şunu açın:
 
 - [http://127.0.0.1:18789/](http://127.0.0.1:18789/) (veya [http://localhost:18789/](http://localhost:18789/))
 
-Sayfa yüklenemezse önce Gateway'i başlatın: `openclaw gateway`.
+Sayfa yüklenmezse önce Gateway'i başlatın: `openclaw gateway`.
 
 Kimlik doğrulama, WebSocket el sıkışması sırasında şu yollarla sağlanır:
 
 - `connect.params.auth.token`
 - `connect.params.auth.password`
 - `gateway.auth.allowTailscale: true` olduğunda Tailscale Serve kimlik başlıkları
-- `gateway.auth.mode: "trusted-proxy"` olduğunda güvenilir proxy kimlik başlıkları
+- `gateway.auth.mode: "trusted-proxy"` olduğunda trusted-proxy kimlik başlıkları
 
-Gösterge paneli ayarlar paneli, geçerli tarayıcı sekmesi oturumu için bir token'ı
-ve seçilen gateway URL'sini saklar; parolalar kalıcı olarak saklanmaz. İlk bağlantıda
-paylaşılan gizli anahtar kimlik doğrulaması için onboarding genellikle bir gateway
-token'ı üretir, ancak `gateway.auth.mode` `"password"` olduğunda parola tabanlı
-kimlik doğrulama da çalışır.
+Gösterge paneli ayarlar paneli, geçerli tarayıcı sekmesi oturumu
+ve seçilen Gateway URL'si için bir token tutar; parolalar kalıcı olarak saklanmaz. Onboarding genellikle
+ilk bağlantıda paylaşılan gizli anahtar kimlik doğrulaması için bir Gateway token'ı üretir, ancak
+`gateway.auth.mode` `"password"` olduğunda parola kimlik doğrulaması da çalışır.
 
 ## Cihaz eşleştirme (ilk bağlantı)
 
-Kontrol Arayüzü'ne yeni bir tarayıcıdan veya cihazdan bağlandığınızda, Gateway
-aynı Tailnet üzerinde `gateway.auth.allowTailscale: true` olsa bile
-**tek seferlik bir eşleştirme onayı** gerektirir. Bu, yetkisiz erişimi önlemek için
-bir güvenlik önlemidir.
+Control UI'ye yeni bir tarayıcı veya cihazdan bağlandığınızda Gateway,
+**tek seferlik bir eşleştirme onayı** ister — `gateway.auth.allowTailscale: true`
+ile aynı Tailnet üzerinde olsanız bile. Bu, yetkisiz erişimi önlemek için bir güvenlik önlemidir.
 
 **Göreceğiniz şey:** "disconnected (1008): pairing required"
 
 **Cihazı onaylamak için:**
 
 ```bash
-# Bekleyen istekleri listeleyin
+# Bekleyen istekleri listele
 openclaw devices list
 
-# İstek kimliğine göre onaylayın
+# İstek kimliğiyle onayla
 openclaw devices approve <requestId>
 ```
 
 Tarayıcı eşleştirmeyi değişmiş kimlik doğrulama ayrıntılarıyla (rol/kapsamlar/public
-key) yeniden denerse, önceki bekleyen istek geçersiz kılınır ve yeni bir `requestId`
-oluşturulur. Onaylamadan önce `openclaw devices list` komutunu yeniden çalıştırın.
+anahtar) yeniden denerse, önceki bekleyen istek geçersiz kılınır ve yeni bir `requestId`
+oluşturulur. Onaydan önce `openclaw devices list` komutunu yeniden çalıştırın.
+
+Tarayıcı zaten eşleştirilmişse ve onu salt okunur erişimden
+yazma/yönetici erişimine geçirirseniz, bu sessiz bir yeniden bağlanma değil,
+bir onay yükseltmesi olarak değerlendirilir. OpenClaw eski onayı etkin tutar, daha geniş kapsamlı yeniden bağlanmayı engeller
+ve yeni kapsam kümesini açıkça onaylamanızı ister.
 
 Onaylandıktan sonra cihaz hatırlanır ve
-`openclaw devices revoke --device <id> --role <role>` ile iptal etmediğiniz sürece yeniden onay gerektirmez. Token döndürme ve iptal etme için
-[Devices CLI](/cli/devices) bölümüne bakın.
+`openclaw devices revoke --device <id> --role <role>` ile iptal etmediğiniz sürece yeniden onay gerektirmez. Token döndürme ve iptal için
+bkz. [Devices CLI](/tr/cli/devices).
 
 **Notlar:**
 
-- Doğrudan yerel local loopback tarayıcı bağlantıları (`127.0.0.1` / `localhost`)
-  otomatik olarak onaylanır.
+- Doğrudan yerel loopback tarayıcı bağlantıları (`127.0.0.1` / `localhost`)
+  otomatik onaylanır.
 - Tailnet ve LAN tarayıcı bağlantıları, aynı makineden gelseler bile
-  yine açık onay gerektirir.
+  yine de açık onay gerektirir.
 - Her tarayıcı profili benzersiz bir cihaz kimliği üretir; bu nedenle tarayıcı değiştirmek veya
   tarayıcı verilerini temizlemek yeniden eşleştirme gerektirir.
 
+## Kişisel kimlik (tarayıcı-yerel)
+
+Control UI, paylaşılan oturumlarda atıf için giden mesajlara eklenen
+tarayıcı başına kişisel kimliği (görünen ad ve avatar) destekler. Bu kimlik
+tarayıcı depolamasında yaşar, geçerli tarayıcı profiline kapsamludur ve
+diğer cihazlarla eşzamanlanmaz veya gerçekten gönderdiğiniz mesajlardaki normal transkript
+yazarlık üst verisinin ötesinde sunucu tarafında kalıcı olarak saklanmaz. Site verilerini temizlemek veya
+tarayıcı değiştirmek bunu boş duruma sıfırlar.
+
+## Çalışma zamanı yapılandırma uç noktası
+
+Control UI çalışma zamanı ayarlarını
+`/__openclaw/control-ui-config.json` üzerinden alır. Bu uç nokta, HTTP yüzeyinin geri kalanıyla aynı
+Gateway kimlik doğrulamasıyla korunur: kimliği doğrulanmamış tarayıcılar
+bunu alamaz ve başarılı bir alma işlemi için ya zaten geçerli bir Gateway
+token/parola, Tailscale Serve kimliği veya trusted-proxy kimliği gerekir.
+
 ## Dil desteği
 
-Kontrol Arayüzü ilk yüklemede tarayıcı yerel ayarınıza göre kendini yerelleştirebilir ve bunu daha sonra Erişim kartındaki dil seçicisinden geçersiz kılabilirsiniz.
+Control UI ilk yüklemede tarayıcı yerel ayarınıza göre kendini yerelleştirebilir.
+Bunu daha sonra geçersiz kılmak için **Overview -> Gateway Access -> Language** bölümünü açın.
+Yerel ayar seçicisi Appearance altında değil, Gateway Access kartında bulunur.
 
-- Desteklenen yerel ayarlar: `en`, `zh-CN`, `zh-TW`, `pt-BR`, `de`, `es`
-- İngilizce dışındaki çeviriler tarayıcıda tembel yüklenir.
-- Seçilen yerel ayar tarayıcı depolamasına kaydedilir ve sonraki ziyaretlerde yeniden kullanılır.
+- Desteklenen yerel ayarlar: `en`, `zh-CN`, `zh-TW`, `pt-BR`, `de`, `es`, `ja-JP`, `ko`, `fr`, `tr`, `uk`, `id`, `pl`, `th`
+- İngilizce dışındaki çeviriler tarayıcıda lazy-load edilir.
+- Seçilen yerel ayar tarayıcı depolamasına kaydedilir ve gelecekteki ziyaretlerde yeniden kullanılır.
 - Eksik çeviri anahtarları İngilizceye geri döner.
 
 ## Neler yapabilir (bugün)
 
 - Gateway WS üzerinden modelle sohbet (`chat.history`, `chat.send`, `chat.abort`, `chat.inject`)
-- Sohbet içinde araç çağrılarını ve canlı araç çıktı kartlarını akış olarak gösterme (aracı olayları)
-- Kanallar: yerleşik ve paketlenmiş/harici plugin kanalları için durum, QR girişi ve kanal başına config (`channels.status`, `web.login.*`, `config.patch`)
-- Örnekler: durum listesi + yenileme (`system-presence`)
-- Oturumlar: liste + oturum başına model/düşünme/hızlı/ayrıntılı/akıl yürütme geçersiz kılmaları (`sessions.list`, `sessions.patch`)
-- Cron işleri: listeleme/ekleme/düzenleme/çalıştırma/etkinleştirme/devre dışı bırakma + çalıştırma geçmişi (`cron.*`)
-- Skills: durum, etkinleştirme/devre dışı bırakma, kurulum, API anahtarı güncellemeleri (`skills.*`)
-- Düğümler: liste + sınırlar (`node.list`)
-- `exec host=gateway/node` için yürütme onayları: gateway veya düğüm izin listelerini düzenleme + ilke sorma (`exec.approvals.*`)
-- Config: `~/.openclaw/openclaw.json` görüntüleme/düzenleme (`config.get`, `config.set`)
-- Config: doğrulamayla birlikte uygulama + yeniden başlatma (`config.apply`) ve son etkin oturumu uyandırma
-- Config yazımları, eşzamanlı düzenlemelerin üzerine yazmayı önlemek için bir temel hash koruması içerir
-- Config yazımları (`config.set`/`config.apply`/`config.patch`), gönderilen config yükündeki başvurular için etkin SecretRef çözümlemesini de ön kontrol olarak yapar; çözümlenmemiş etkin gönderilmiş başvurular yazmadan önce reddedilir
-- Config şeması + form oluşturma (`config.schema` / `config.schema.lookup`,
-  alan `title` / `description`, eşleşen arayüz ipuçları, doğrudan alt öğe
-  özetleri, iç içe nesne/joker karakter/dizi/bileşim düğümlerinde doküman meta verileri
-  ve mevcut olduğunda plugin + kanal şemaları dahil); Ham JSON düzenleyicisi
-  yalnızca güvenli bir ham gidiş-dönüş mümkün olduğunda kullanılabilir
-- Bir anlık görüntü ham metni güvenli şekilde gidiş-dönüş yapamıyorsa, Kontrol Arayüzü Form modunu zorunlu kılar ve o anlık görüntü için Ham modu devre dışı bırakır
-- Yapılandırılmış SecretRef nesne değerleri, nesneden dizeye yanlışlıkla bozulmayı önlemek için form metin girişlerinde salt okunur olarak işlenir
+- Sohbet içinde araç çağrılarını + canlı araç çıktı kartlarını akıtma (ajan olayları)
+- Kanallar: yerleşik artı bundled/harici Plugin kanal durumu, QR girişi ve kanal başına yapılandırma (`channels.status`, `web.login.*`, `config.patch`)
+- Örnekler: varlık listesi + yenileme (`system-presence`)
+- Oturumlar: liste + oturum başına model/thinking/fast/verbose/trace/reasoning geçersiz kılmaları (`sessions.list`, `sessions.patch`)
+- Dreams: Dreaming durumu, etkinleştir/devre dışı bırak geçişi ve Dream Diary okuyucusu (`doctor.memory.status`, `doctor.memory.dreamDiary`, `config.patch`)
+- Cron işleri: listele/ekle/düzenle/çalıştır/etkinleştir/devre dışı bırak + çalıştırma geçmişi (`cron.*`)
+- Skills: durum, etkinleştir/devre dışı bırak, kurulum, API anahtarı güncellemeleri (`skills.*`)
+- Node'lar: liste + sınırlar (`node.list`)
+- Exec onayları: `exec host=gateway/node` için Gateway veya Node izin listelerini düzenleme + ilke isteme (`exec.approvals.*`)
+- Yapılandırma: `~/.openclaw/openclaw.json` görüntüleme/düzenleme (`config.get`, `config.set`)
+- Yapılandırma: doğrulama ile uygula + yeniden başlat (`config.apply`) ve son etkin oturumu uyandır
+- Yapılandırma yazımları, eşzamanlı düzenlemelerin üzerine yazmayı önlemek için temel hash koruması içerir
+- Yapılandırma yazımları (`config.set`/`config.apply`/`config.patch`), gönderilen yapılandırma yükündeki ref'ler için etkin SecretRef çözümlemesini de önceden yoklar; çözümlenmemiş etkin gönderilmiş ref'ler yazmadan önce reddedilir
+- Yapılandırma şeması + form işleme (`config.schema` / `config.schema.lookup`,
+  alan `title` / `description`, eşleşen UI ipuçları, doğrudan alt özetler,
+  iç içe nesne/joker/dizi/bileşim düğümlerindeki belge üst verileri,
+  ayrıca mevcut olduğunda Plugin + kanal şemaları dahil); ham JSON editörü
+  yalnızca anlık görüntünün güvenli ham gidiş-dönüşü varsa kullanılabilir
+- Bir anlık görüntü ham metinle güvenli şekilde gidiş-dönüş yapamıyorsa, Control UI Form kipini zorlar ve o anlık görüntü için Raw kipini devre dışı bırakır
+- Ham JSON editörü "Reset to saved", düzleştirilmiş bir anlık görüntüyü yeniden oluşturmak yerine ham yazılmış şekli (biçimlendirme, yorumlar, `$include` düzeni) korur; böylece anlık görüntü güvenli biçimde gidiş-dönüş yapabiliyorsa harici düzenlemeler sıfırlamada korunur
+- Yapılandırılmış SecretRef nesne değerleri, yanlışlıkla nesneden dizeye bozulmayı önlemek için form metin girdilerinde salt okunur işlenir
 - Hata ayıklama: durum/sağlık/model anlık görüntüleri + olay günlüğü + manuel RPC çağrıları (`status`, `health`, `models.list`)
-- Günlükler: filtreleme/dışa aktarma ile gateway dosya günlüklerinin canlı takibi (`logs.tail`)
-- Güncelleme: paket/git güncellemesi + yeniden başlatma çalıştırma (`update.run`) ve yeniden başlatma raporu
+- Günlükler: filtreleme/dışa aktarma ile Gateway dosya günlüklerinin canlı kuyruğu (`logs.tail`)
+- Güncelleme: paket/git güncellemesi çalıştır + yeniden başlat (`update.run`) ve yeniden başlatma raporu
 
 Cron işleri paneli notları:
 
-- Yalıtılmış işler için teslim varsayılan olarak duyuru özetidir. Yalnızca dahili çalıştırmalar istiyorsanız bunu hiçbiri olarak değiştirebilirsiniz.
+- Yalıtılmış işler için teslim varsayılanı duyuru özetidir. Yalnızca dahili çalıştırmalar istiyorsanız bunu none olarak değiştirebilirsiniz.
 - Duyuru seçildiğinde kanal/hedef alanları görünür.
-- Webhook modu `delivery.mode = "webhook"` kullanır ve `delivery.to` geçerli bir HTTP(S) webhook URL'si olarak ayarlanır.
-- Ana oturum işleri için webhook ve none teslim modları kullanılabilir.
-- Gelişmiş düzenleme denetimleri arasında çalıştırma sonrası silme, aracı geçersiz kılmasını temizleme, cron exact/stagger seçenekleri,
-  aracı model/düşünme geçersiz kılmaları ve imkanlar dahilinde teslim anahtarları bulunur.
-- Form doğrulaması alan düzeyi hatalarla satır içidir; geçersiz değerler düzeltilene kadar kaydet düğmesi devre dışı kalır.
-- Ayrı bir bearer token göndermek için `cron.webhookToken` ayarlayın; atlanırsa webhook kimlik doğrulama başlığı olmadan gönderilir.
-- Kullanımdan kaldırılmış yedek: `notify: true` içeren saklanan eski işler, taşınana kadar yine de `cron.webhook` kullanabilir.
+- Webhook kipi `delivery.mode = "webhook"` kullanır ve `delivery.to` geçerli bir HTTP(S) Webhook URL'si olarak ayarlanır.
+- Ana oturum işleri için Webhook ve none teslim kipleri kullanılabilir.
+- Gelişmiş düzenleme denetimleri, çalıştırma sonrası silme, ajan geçersiz kılmasını temizleme, Cron exact/stagger seçenekleri,
+  ajan model/thinking geçersiz kılmaları ve best-effort teslim geçişlerini içerir.
+- Form doğrulaması alan düzeyinde hatalarla satır içidir; geçersiz değerler düzeltilene kadar kaydet düğmesini devre dışı bırakır.
+- Ayrı bir bearer token göndermek için `cron.webhookToken` ayarlayın; boş bırakılırsa Webhook kimlik doğrulama başlığı olmadan gönderilir.
+- Kullanımdan kaldırılmış geri dönüş: `notify: true` içeren depolanmış eski işler, geçirilene kadar yine de `cron.webhook` kullanabilir.
 
 ## Sohbet davranışı
 
-- `chat.send` **bloklamaz**: hemen `{ runId, status: "started" }` ile onay verir ve yanıt `chat` olayları üzerinden akış halinde gelir.
-- Aynı `idempotencyKey` ile yeniden göndermek, çalışma sırasında `{ status: "in_flight" }`, tamamlandıktan sonra ise `{ status: "ok" }` döndürür.
-- `chat.history` yanıtları, arayüz güvenliği için boyutla sınırlıdır. Döküm girdileri çok büyük olduğunda Gateway uzun metin alanlarını kısaltabilir, ağır meta veri bloklarını atlayabilir ve aşırı büyük mesajları bir yer tutucuyla değiştirebilir (`[chat.history omitted: message too large]`).
-- `chat.history`, görünür assistant metninden yalnızca görüntüleme amaçlı satır içi yönerge etiketlerini de kaldırır (örneğin `[[reply_to_*]]` ve `[[audio_as_voice]]`), düz metin tool-call XML yüklerini (`<tool_call>...</tool_call>`, `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` ve kesilmiş tool-call blokları dahil) ve sızmış ASCII/tam genişlikli model kontrol belirteçlerini de kaldırır; ayrıca görünür metninin tamamı yalnızca tam sessiz belirteç `NO_REPLY` / `no_reply` olan assistant girdilerini atlar.
-- `chat.inject`, oturum dökümüne bir assistant notu ekler ve yalnızca arayüz güncellemeleri için bir `chat` olayı yayınlar (aracı çalıştırması yok, kanal teslimi yok).
-- Sohbet üstbilgisindeki model ve düşünme seçicileri etkin oturumu `sessions.patch` ile hemen yamar; bunlar tek dönüşlük gönderim seçenekleri değil, kalıcı oturum geçersiz kılmalarıdır.
-- Durdurma:
-  - **Durdur** düğmesine tıklayın (`chat.abort` çağırır)
-  - Bant dışı iptal için `/stop` yazın (veya `stop`, `stop action`, `stop run`, `stop openclaw`, `please stop` gibi bağımsız iptal ifadeleri kullanın)
-  - `chat.abort`, o oturum için tüm etkin çalıştırmaları iptal etmek üzere `{ sessionKey }` desteği sunar (`runId` yok)
-- İptal edilen kısmi içeriğin korunması:
-  - Bir çalıştırma iptal edildiğinde, kısmi assistant metni yine de arayüzde gösterilebilir
-  - Gateway, arabelleğe alınmış çıktı varsa iptal edilen kısmi assistant metnini döküm geçmişine kalıcı olarak yazar
-  - Kalıcı girdiler, döküm tüketicilerinin iptal edilmiş kısmi içerikleri normal tamamlanma çıktısından ayırabilmesi için iptal meta verileri içerir
+- `chat.send` **engellemesizdir**: hemen `{ runId, status: "started" }` ile onaylar ve yanıt `chat` olayları üzerinden akıtılır.
+- Aynı `idempotencyKey` ile yeniden gönderim, çalışırken `{ status: "in_flight" }`, tamamlandıktan sonra `{ status: "ok" }` döndürür.
+- `chat.history` yanıtları, UI güvenliği için boyutla sınırlandırılmıştır. Transkript girdileri çok büyük olduğunda Gateway uzun metin alanlarını kesebilir, ağır üst veri bloklarını atlayabilir ve aşırı büyük mesajları bir yer tutucuyla değiştirebilir (`[chat.history omitted: message too large]`).
+- `chat.history`, görünür assistant metninden görüntülemeye özel satır içi yönerge etiketlerini de temizler (örneğin `[[reply_to_*]]` ve `[[audio_as_voice]]`), düz metin tool-call XML yüklerini (şunlar dahil: `<tool_call>...</tool_call>`, `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` ve kesilmiş tool-call blokları), sızmış ASCII/tam genişlik model denetim token'larını kaldırır ve tüm görünür metni yalnızca tam sessiz token `NO_REPLY` / `no_reply` olan assistant girdilerini atlar.
+- `chat.inject`, oturum transkriptine bir assistant notu ekler ve yalnızca UI güncellemeleri için bir `chat` olayı yayınlar (ajan çalıştırması yok, kanal teslimi yok).
+- Sohbet başlığı model ve thinking seçicileri etkin oturumu hemen `sessions.patch` üzerinden yamalar; bunlar tek dönüşlük gönderim seçenekleri değil, kalıcı oturum geçersiz kılmalarıdır.
+- Durdur:
+  - **Stop** düğmesine tıklayın (`chat.abort` çağırır)
+  - Bant dışı durdurmak için `/stop` yazın (veya `stop`, `stop action`, `stop run`, `stop openclaw`, `please stop` gibi bağımsız abort ifadeleri)
+  - `chat.abort`, bir oturum için tüm etkin çalıştırmaları abort etmek üzere `{ sessionKey }` desteği sunar (`runId` olmadan)
+- Abort sonrası kısmi çıktı saklama:
+  - Bir çalıştırma abort edildiğinde, kısmi assistant metni UI'de yine de gösterilebilir
+  - Gateway, tamponlanmış çıktı varsa abort edilmiş kısmi assistant metnini transkript geçmişine kalıcılaştırır
+  - Kalıcılaştırılan girdiler abort üst verisi içerir; böylece transkript kullanıcıları abort kısımlarını normal tamamlanma çıktısından ayırt edebilir
+
+## Barındırılan gömmeler
+
+Assistant mesajları, `[embed ...]`
+kısa koduyla barındırılan web içeriğini satır içinde işleyebilir. iframe sandbox ilkesi
+`gateway.controlUi.embedSandbox` tarafından denetlenir:
+
+- `strict`: barındırılan embed'ler içinde script yürütmeyi devre dışı bırakır
+- `scripts`: köken yalıtımını korurken etkileşimli embed'lere izin verir; bu
+  varsayılandır ve genellikle kendi kendine yeterli tarayıcı oyunları/widget'lar
+  için yeterlidir
+- `trusted`: kasıtlı olarak daha güçlü ayrıcalıklar gerektiren aynı site belgeleri
+  için `allow-scripts` üzerine `allow-same-origin` ekler
+
+Örnek:
+
+```json5
+{
+  gateway: {
+    controlUi: {
+      embedSandbox: "scripts",
+    },
+  },
+}
+```
+
+`trusted` değerini yalnızca gömülü belge gerçekten aynı köken
+davranışına ihtiyaç duyuyorsa kullanın. Çoğu ajan tarafından üretilmiş oyun ve etkileşimli canvas için `scripts`
+daha güvenli seçimdir.
+
+Mutlak harici `http(s)` embed URL'leri varsayılan olarak engelli kalır. Kasıtlı olarak
+`[embed url="https://..."]` ile üçüncü taraf sayfaların yüklenmesini istiyorsanız
+`gateway.controlUi.allowExternalEmbedUrls: true` ayarlayın.
 
 ## Tailnet erişimi (önerilir)
 
 ### Tümleşik Tailscale Serve (tercih edilir)
 
-Gateway'i loopback üzerinde tutun ve Tailscale Serve'ın bunu HTTPS ile proxy etmesini sağlayın:
+Gateway'i loopback üzerinde tutun ve Tailscale Serve'in bunu HTTPS ile proxy'lemesine izin verin:
 
 ```bash
 openclaw gateway --tailscale serve
@@ -157,18 +214,22 @@ openclaw gateway --tailscale serve
 
 - `https://<magicdns>/` (veya yapılandırılmış `gateway.controlUi.basePath`)
 
-Varsayılan olarak, Kontrol Arayüzü/WebSocket Serve istekleri
-`gateway.auth.allowTailscale` `true` olduğunda Tailscale kimlik başlıkları (`tailscale-user-login`) ile kimlik doğrulaması yapabilir. OpenClaw,
-`x-forwarded-for` adresini `tailscale whois` ile çözümleyip başlıkla eşleştirerek kimliği doğrular ve bunları yalnızca istek
-Tailscale'in `x-forwarded-*` başlıklarıyla birlikte loopback'e ulaştığında kabul eder. Açık paylaşılan gizli anahtar
-kimlik bilgilerini zorunlu kılmak istiyorsanız `gateway.auth.allowTailscale: false` ayarlayın. Sonra `gateway.auth.mode: "token"` veya
+Varsayılan olarak, `gateway.auth.allowTailscale` `true` olduğunda Control UI/WebSocket Serve istekleri
+Tailscale kimlik başlıkları (`tailscale-user-login`) üzerinden kimlik doğrulaması yapabilir. OpenClaw,
+`x-forwarded-for` adresini
+`tailscale whois` ile çözüp başlıkla eşleştirerek kimliği doğrular ve bunları yalnızca
+istek Tailscale'in `x-forwarded-*` başlıklarıyla loopback'e ulaştığında kabul eder. Açık paylaşılan gizli anahtar
+kimlik bilgilerini Serve trafiği için bile zorunlu kılmak istiyorsanız
+`gateway.auth.allowTailscale: false` ayarlayın. Ardından `gateway.auth.mode: "token"` veya
 `"password"` kullanın.
-Bu eşzamansız Serve kimlik yolunda, aynı istemci IP'si
-ve kimlik doğrulama kapsamı için başarısız kimlik doğrulama denemeleri, hız sınırı yazımlarından önce serileştirilir. Bu nedenle aynı tarayıcıdan gelen eşzamanlı hatalı yeniden denemeler,
-paralel yarışan iki düz uyuşmazlık yerine ikinci istekte `retry later` gösterebilir.
-Tokensız Serve kimlik doğrulaması, gateway ana bilgisayarının güvenilir olduğunu varsayar. O ana bilgisayarda güvenilmeyen yerel kod çalışabiliyorsa, token/parola kimlik doğrulamasını zorunlu kılın.
+Bu eşzamansız Serve kimlik yolu için aynı istemci IP'si
+ve kimlik doğrulama kapsamı için başarısız kimlik doğrulama denemeleri, hız sınırı yazımlarından önce
+sıralanır. Bu nedenle aynı tarayıcıdan gelen eşzamanlı kötü yeniden denemelerde
+paralel iki düz uyuşmazlık yerine ikinci istekte `retry later` görünebilir.
+Tokensız Serve kimlik doğrulaması, Gateway ana makinesinin güvenilir olduğunu varsayar. O ana makinede güvenilmeyen yerel kod
+çalışabiliyorsa token/parola kimlik doğrulaması gerektirin.
 
-### Tailnet'e bağlan + token
+### Tailnet'e bind + token
 
 ```bash
 openclaw gateway --bind tailnet --token "$(openssl rand -hex 32)"
@@ -178,27 +239,27 @@ Ardından şunu açın:
 
 - `http://<tailscale-ip>:18789/` (veya yapılandırılmış `gateway.controlUi.basePath`)
 
-Eşleşen paylaşılan gizli anahtarı arayüz ayarlarına yapıştırın (`connect.params.auth.token` veya `connect.params.auth.password`
-olarak gönderilir).
+Eşleşen paylaşılan gizli anahtarı UI ayarlarına yapıştırın (şu şekilde gönderilir:
+`connect.params.auth.token` veya `connect.params.auth.password`).
 
 ## Güvensiz HTTP
 
 Gösterge panelini düz HTTP üzerinden açarsanız (`http://<lan-ip>` veya `http://<tailscale-ip>`),
 tarayıcı **güvenli olmayan bir bağlamda** çalışır ve WebCrypto'yu engeller. Varsayılan olarak,
-OpenClaw cihaz kimliği olmadan Kontrol Arayüzü bağlantılarını **engeller**.
+OpenClaw cihaz kimliği olmadan Control UI bağlantılarını **engeller**.
 
 Belgelenmiş istisnalar:
 
-- `gateway.controlUi.allowInsecureAuth=true` ile yalnızca localhost için güvensiz HTTP uyumluluğu
-- `gateway.auth.mode: "trusted-proxy"` üzerinden başarılı operatör Kontrol Arayüzü kimlik doğrulaması
+- `gateway.controlUi.allowInsecureAuth=true` ile yalnızca localhost güvensiz HTTP uyumluluğu
+- `gateway.auth.mode: "trusted-proxy"` üzerinden başarılı operatör Control UI kimlik doğrulaması
 - acil durum için `gateway.controlUi.dangerouslyDisableDeviceAuth=true`
 
-**Önerilen düzeltme:** HTTPS kullanın (Tailscale Serve) veya arayüzü yerel olarak açın:
+**Önerilen düzeltme:** HTTPS kullanın (Tailscale Serve) veya UI'yi yerel olarak açın:
 
 - `https://<magicdns>/` (Serve)
-- `http://127.0.0.1:18789/` (gateway ana bilgisayarında)
+- `http://127.0.0.1:18789/` (Gateway ana makinesinde)
 
-**Güvensiz kimlik doğrulama anahtarı davranışı:**
+**Güvensiz auth geçişi davranışı:**
 
 ```json5
 {
@@ -210,11 +271,12 @@ Belgelenmiş istisnalar:
 }
 ```
 
-`allowInsecureAuth` yalnızca yerel bir uyumluluk anahtarıdır:
+`allowInsecureAuth` yalnızca yerel bir uyumluluk geçişidir:
 
-- Güvenli olmayan HTTP bağlamlarında localhost Kontrol Arayüzü oturumlarının cihaz kimliği olmadan ilerlemesine izin verir.
+- Güvenli olmayan HTTP bağlamlarında localhost Control UI oturumlarının
+  cihaz kimliği olmadan devam etmesine izin verir.
 - Eşleştirme denetimlerini atlamaz.
-- Uzak (localhost dışı) cihaz kimliği gereksinimlerini gevşetmez.
+- Uzak (localhost olmayan) cihaz kimliği gereksinimlerini gevşetmez.
 
 **Yalnızca acil durum için:**
 
@@ -228,24 +290,47 @@ Belgelenmiş istisnalar:
 }
 ```
 
-`dangerouslyDisableDeviceAuth`, Kontrol Arayüzü cihaz kimliği denetimlerini devre dışı bırakır ve
-ciddi bir güvenlik düşüşüdür. Acil kullanım sonrası bunu hızla geri alın.
+`dangerouslyDisableDeviceAuth`, Control UI cihaz kimliği denetimlerini devre dışı bırakır ve
+ciddi bir güvenlik düşüşüdür. Acil kullanım sonrasında hızla geri alın.
 
-Güvenilir proxy notu:
+Trusted-proxy notu:
 
-- başarılı güvenilir proxy kimlik doğrulaması, cihaz kimliği olmadan **operatör** Kontrol Arayüzü oturumlarını kabul edebilir
-- bu durum düğüm rolündeki Kontrol Arayüzü oturumlarına **uzanmaz**
-- aynı ana bilgisayardaki loopback ters proxy'leri yine de güvenilir proxy kimlik doğrulamasını karşılamaz; bkz.
-  [Trusted Proxy Auth](/tr/gateway/trusted-proxy-auth)
+- başarılı trusted-proxy kimlik doğrulaması, **operatör** Control UI oturumlarını
+  cihaz kimliği olmadan kabul edebilir
+- bu durum node-rollü Control UI oturumlarına **uzanmaz**
+- aynı ana makinedeki loopback reverse proxy'ler hâlâ trusted-proxy kimlik doğrulamasını karşılamaz; bkz.
+  [Güvenilen Proxy Kimlik Doğrulaması](/tr/gateway/trusted-proxy-auth)
 
-HTTPS kurulum rehberliği için [Tailscale](/tr/gateway/tailscale) bölümüne bakın.
+HTTPS kurulum rehberi için bkz. [Tailscale](/tr/gateway/tailscale).
 
-## Arayüzü derleme
+## Content Security Policy
 
-Gateway, `dist/control-ui` dizininden statik dosyalar sunar. Bunları şu komutla derleyin:
+Control UI sıkı bir `img-src` ilkesiyle gelir: yalnızca **aynı kökenli** varlıklara ve `data:` URL'lerine izin verilir. Uzak `http(s)` ve protokol göreli görsel URL'leri tarayıcı tarafından reddedilir ve ağ fetch'i başlatmaz.
+
+Bunun pratikte anlamı:
+
+- Göreli yollar altında sunulan avatarlar ve görseller (örneğin `/avatars/<id>`) yine de işlenir.
+- Satır içi `data:image/...` URL'leri yine de işlenir (protokol içi yükler için kullanışlıdır).
+- Kanal üst verisinin ürettiği uzak avatar URL'leri, Control UI'nin avatar yardımcılarında ayıklanır ve yerleşik logo/rozet ile değiştirilir; böylece ele geçirilmiş veya kötü niyetli bir kanal bir operatör tarayıcısından keyfi uzak görsel fetch'lerini zorlayamaz.
+
+Bu davranışı elde etmek için bir şey değiştirmeniz gerekmez — her zaman açıktır ve yapılandırılamaz.
+
+## Avatar rotası kimlik doğrulaması
+
+Gateway kimlik doğrulaması yapılandırıldığında, Control UI avatar uç noktası API'nin geri kalanıyla aynı Gateway token'ını gerektirir:
+
+- `GET /avatar/<agentId>` avatar görselini yalnızca kimliği doğrulanmış çağıranlara döndürür. `GET /avatar/<agentId>?meta=1` aynı kuralla avatar üst verisini döndürür.
+- Her iki rotaya yapılan kimliği doğrulanmamış istekler reddedilir (kardeş assistant-media rotasıyla eşleşecek şekilde). Bu, başka şekilde korunan ana makinelerde avatar rotasının ajan kimliğini sızdırmasını önler.
+- Control UI'nin kendisi, avatarları getirirken Gateway token'ını bearer başlığı olarak iletir ve görselin gösterge panellerinde yine de işlenmesi için kimliği doğrulanmış blob URL'leri kullanır.
+
+Gateway kimlik doğrulamasını devre dışı bırakırsanız (paylaşılan ana makinelerde önerilmez), avatar rotası da Gateway'in geri kalanıyla uyumlu şekilde kimlik doğrulamasız hâle gelir.
+
+## UI'yi derleme
+
+Gateway, statik dosyaları `dist/control-ui` üzerinden sunar. Şu komutla derleyin:
 
 ```bash
-pnpm ui:build # ilk çalıştırmada arayüz bağımlılıklarını otomatik kurar
+pnpm ui:build
 ```
 
 İsteğe bağlı mutlak taban (sabit varlık URL'leri istediğinizde):
@@ -257,19 +342,19 @@ OPENCLAW_CONTROL_UI_BASE_PATH=/openclaw/ pnpm ui:build
 Yerel geliştirme için (ayrı geliştirme sunucusu):
 
 ```bash
-pnpm ui:dev # ilk çalıştırmada arayüz bağımlılıklarını otomatik kurar
+pnpm ui:dev
 ```
 
-Ardından arayüzü Gateway WS URL'nize yönlendirin (ör. `ws://127.0.0.1:18789`).
+Ardından UI'yi Gateway WS URL'nize yönlendirin (ör. `ws://127.0.0.1:18789`).
 
-## Hata ayıklama/test etme: geliştirme sunucusu + uzak Gateway
+## Hata ayıklama/test: geliştirme sunucusu + uzak Gateway
 
-Kontrol Arayüzü statik dosyalardır; WebSocket hedefi yapılandırılabilir ve
-HTTP kaynağından farklı olabilir. Bu, Vite geliştirme sunucusunu yerelde kullanmak
-ama Gateway'i başka bir yerde çalıştırmak istediğinizde kullanışlıdır.
+Control UI statik dosyalardır; WebSocket hedefi yapılandırılabilir ve
+HTTP kaynağından farklı olabilir. Bu, Vite geliştirme sunucusunu yerel olarak
+çalıştırmak ama Gateway'i başka yerde tutmak istediğinizde kullanışlıdır.
 
-1. Arayüz geliştirme sunucusunu başlatın: `pnpm ui:dev`
-2. Şunun gibi bir URL açın:
+1. UI geliştirme sunucusunu başlatın: `pnpm ui:dev`
+2. Şöyle bir URL açın:
 
 ```text
 http://localhost:5173/?gatewayUrl=ws://<gateway-host>:18789
@@ -283,18 +368,19 @@ http://localhost:5173/?gatewayUrl=wss://<gateway-host>:18789#token=<gateway-toke
 
 Notlar:
 
-- `gatewayUrl` yüklendikten sonra localStorage'da saklanır ve URL'den kaldırılır.
-- `token` mümkün olduğunda URL parçası (`#token=...`) ile geçirilmelidir. Parçalar sunucuya gönderilmez; bu da istek günlüğü ve Referer sızıntısını önler. Eski `?token=` sorgu parametreleri uyumluluk için yine bir kez içe aktarılır, ancak yalnızca yedek olarak ve önyüklemeden hemen sonra kaldırılır.
+- `gatewayUrl`, yüklemeden sonra localStorage içinde saklanır ve URL'den kaldırılır.
+- `token`, mümkün olduğunda URL sorgusu yerine parça (`#token=...`) üzerinden geçirilmelidir. Parçalar sunucuya gönderilmez; bu da istek günlüğü ve Referer sızıntısını önler. Eski `?token=` sorgu parametreleri uyumluluk için hâlâ bir kez içe aktarılır, ancak yalnızca geri dönüş olarak kullanılır ve bootstrap'ten hemen sonra temizlenir.
 - `password` yalnızca bellekte tutulur.
-- `gatewayUrl` ayarlandığında, arayüz config veya ortam kimlik bilgilerine geri dönmez.
-  `token` (veya `password`) açıkça sağlanmalıdır. Açık kimlik bilgilerinin eksik olması bir hatadır.
+- `gatewayUrl` ayarlandığında UI, yapılandırma veya ortam kimlik bilgilerine geri dönmez.
+  `token` (veya `password`) değerini açıkça verin. Açık kimlik bilgisi eksikliği bir hatadır.
 - Gateway TLS arkasındaysa `wss://` kullanın (Tailscale Serve, HTTPS proxy vb.).
-- Tıklama sahtekarlığını önlemek için `gatewayUrl` yalnızca üst düzey pencerede kabul edilir (gömülü olarak değil).
-- Loopback olmayan Kontrol Arayüzü dağıtımları `gateway.controlUi.allowedOrigins`
-  değerini açıkça ayarlamalıdır (tam origin'ler). Buna uzak geliştirme kurulumları da dahildir.
-- Sıkı denetimli yerel testler dışında `gateway.controlUi.allowedOrigins: ["*"]` kullanmayın.
-  Bu, “kullandığım ana bilgisayarla eşleştir” değil, herhangi bir tarayıcı origin'ine izin ver anlamına gelir.
-- `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true`, Host başlığı origin geri dönüş modunu etkinleştirir, ancak bu tehlikeli bir güvenlik modudur.
+- `gatewayUrl`, clickjacking'i önlemek için yalnızca üst düzey pencerede kabul edilir (gömülü değil).
+- Loopback olmayan Control UI dağıtımları, `gateway.controlUi.allowedOrigins`
+  değerini açıkça ayarlamalıdır (tam kökenler). Buna uzak geliştirme kurulumları da dahildir.
+- Sıkı denetimli yerel test dışında `gateway.controlUi.allowedOrigins: ["*"]` kullanmayın.
+  Bu, “hangi ana makineyi kullanıyorsam onunla eşleş” değil, herhangi bir tarayıcı kökenine izin ver anlamına gelir.
+- `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true`,
+  Host-header köken geri dönüş kipini etkinleştirir, ancak bu tehlikeli bir güvenlik kipidir.
 
 Örnek:
 
@@ -308,11 +394,11 @@ Notlar:
 }
 ```
 
-Uzak erişim kurulum ayrıntıları: [Remote access](/tr/gateway/remote).
+Uzak erişim kurulum ayrıntıları: [Uzak erişim](/tr/gateway/remote).
 
 ## İlgili
 
-- [Dashboard](/web/dashboard) — gateway gösterge paneli
-- [WebChat](/web/webchat) — tarayıcı tabanlı sohbet arayüzü
-- [TUI](/web/tui) — terminal kullanıcı arayüzü
-- [Health Checks](/tr/gateway/health) — gateway sağlık izleme
+- [Dashboard](/tr/web/dashboard) — Gateway gösterge paneli
+- [WebChat](/tr/web/webchat) — tarayıcı tabanlı sohbet arayüzü
+- [TUI](/tr/web/tui) — terminal kullanıcı arayüzü
+- [Health Checks](/tr/gateway/health) — Gateway sağlık izleme
