@@ -1,39 +1,39 @@
 ---
 read_when:
     - OpenClaw ile DeepSeek kullanmak istiyorsunuz
-    - API anahtarı ortam değişkenine veya CLI auth seçeneğine ihtiyacınız var
-summary: DeepSeek kurulumu (auth + model seçimi)
+    - API anahtarı ortam değişkenine veya CLI kimlik doğrulama seçimine ihtiyacınız var
+summary: DeepSeek kurulumu (kimlik doğrulama + model seçimi)
 title: DeepSeek
 x-i18n:
-    generated_at: "2026-04-24T09:25:35Z"
+    generated_at: "2026-04-24T15:21:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ead407c67c05bd8700db1cba36defdd9d47bdc9a071c76a07c4b4fb82f6b80e2
+    source_hash: 5b0d2345c72328e14351d71c5784204dc6ed9dc922f919b6adfac394001c3261
     source_path: providers/deepseek.md
     workflow: 15
 ---
 
-[DeepSeek](https://www.deepseek.com), OpenAI uyumlu bir API ile güçlü AI modelleri sunar.
+[DeepSeek](https://www.deepseek.com), OpenAI uyumlu bir API ile güçlü yapay zeka modelleri sunar.
 
-| Özellik   | Değer                      |
-| --------- | -------------------------- |
-| Sağlayıcı | `deepseek`                 |
-| Auth      | `DEEPSEEK_API_KEY`         |
-| API       | OpenAI-compatible          |
-| Base URL  | `https://api.deepseek.com` |
+| Özellik | Değer                     |
+| -------- | ------------------------- |
+| Sağlayıcı | `deepseek`                |
+| Kimlik Doğrulama | `DEEPSEEK_API_KEY`        |
+| API      | OpenAI uyumlu             |
+| Temel URL | `https://api.deepseek.com` |
 
-## Başlarken
+## Başlangıç
 
 <Steps>
   <Step title="API anahtarınızı alın">
-    [platform.deepseek.com](https://platform.deepseek.com/api_keys) üzerinden bir API anahtarı oluşturun.
+    [platform.deepseek.com](https://platform.deepseek.com/api_keys) adresinde bir API anahtarı oluşturun.
   </Step>
-  <Step title="Onboarding çalıştırın">
+  <Step title="Kurulumu çalıştırın">
     ```bash
     openclaw onboard --auth-choice deepseek-api-key
     ```
 
-    Bu komut API anahtarınızı ister ve varsayılan model olarak `deepseek/deepseek-chat` ayarlar.
+    Bu işlem API anahtarınızı isteme istemi gösterir ve varsayılan model olarak `deepseek/deepseek-v4-flash` ayarlar.
 
   </Step>
   <Step title="Modellerin kullanılabilir olduğunu doğrulayın">
@@ -45,7 +45,7 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Etkileşimsiz kurulum">
-    Betik tabanlı veya başsız kurulumlar için tüm bayrakları doğrudan verin:
+    Betikli veya başsız kurulumlar için tüm bayrakları doğrudan geçin:
 
     ```bash
     openclaw onboard --non-interactive \
@@ -60,20 +60,24 @@ x-i18n:
 </AccordionGroup>
 
 <Warning>
-Gateway bir daemon olarak çalışıyorsa (launchd/systemd), `DEEPSEEK_API_KEY`
-değerinin o süreç için erişilebilir olduğundan emin olun (örneğin `~/.openclaw/.env` içinde veya
-`env.shellEnv` üzerinden).
+Gateway bir daemon (launchd/systemd) olarak çalışıyorsa, `DEEPSEEK_API_KEY`
+değişkeninin bu süreç için kullanılabilir olduğundan emin olun (örneğin, `~/.openclaw/.env` içinde veya
+`env.shellEnv` aracılığıyla).
 </Warning>
 
 ## Yerleşik katalog
 
-| Model ref                    | Ad                | Girdi | Bağlam  | Maks çıktı | Notlar                                            |
-| ---------------------------- | ----------------- | ----- | ------- | ---------- | ------------------------------------------------- |
-| `deepseek/deepseek-chat`     | DeepSeek Chat     | text  | 131,072 | 8,192      | Varsayılan model; düşünmesiz DeepSeek V3.2 yüzeyi |
-| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text  | 131,072 | 65,536     | Düşünme etkin V3.2 yüzeyi                         |
+| Model ref                    | Ad              | Girdi | Bağlam    | Maksimum çıktı | Notlar                                     |
+| ---------------------------- | --------------- | ----- | --------- | -------------- | ------------------------------------------ |
+| `deepseek/deepseek-v4-flash` | DeepSeek V4 Flash | text  | 1,000,000 | 384,000        | Varsayılan model; V4 düşünme destekli yüzey |
+| `deepseek/deepseek-v4-pro`   | DeepSeek V4 Pro   | text  | 1,000,000 | 384,000        | V4 düşünme destekli yüzey                  |
+| `deepseek/deepseek-chat`     | DeepSeek Chat     | text  | 131,072   | 8,192          | DeepSeek V3.2 düşünmesiz yüzey             |
+| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text  | 131,072   | 65,536         | Akıl yürütme etkin V3.2 yüzeyi             |
 
 <Tip>
-Paketli iki model de şu anda kaynakta akış kullanımı uyumluluğu bildiriyor.
+V4 modelleri, DeepSeek'in `thinking` denetimini destekler. OpenClaw ayrıca
+takip eden dönüşlerde DeepSeek `reasoning_content` içeriğini yeniden oynatır; böylece araç
+çağrılarına sahip düşünme oturumları devam edebilir.
 </Tip>
 
 ## Yapılandırma örneği
@@ -83,7 +87,7 @@ Paketli iki model de şu anda kaynakta akış kullanımı uyumluluğu bildiriyor
   env: { DEEPSEEK_API_KEY: "sk-..." },
   agents: {
     defaults: {
-      model: { primary: "deepseek/deepseek-chat" },
+      model: { primary: "deepseek/deepseek-v4-flash" },
     },
   },
 }
@@ -92,10 +96,10 @@ Paketli iki model de şu anda kaynakta akış kullanımı uyumluluğu bildiriyor
 ## İlgili
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model ref'lerini ve failover davranışını seçme.
+  <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
+    Sağlayıcıları, model ref'lerini ve yük devretme davranışını seçme.
   </Card>
-  <Card title="Configuration reference" href="/tr/gateway/configuration-reference" icon="gear">
-    Agent'ler, modeller ve sağlayıcılar için tam yapılandırma başvurusu.
+  <Card title="Yapılandırma başvurusu" href="/tr/gateway/configuration-reference" icon="gear">
+    Aracılar, modeller ve sağlayıcılar için tam yapılandırma başvurusu.
   </Card>
 </CardGroup>
