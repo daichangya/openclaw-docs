@@ -18,7 +18,7 @@ jobs:
     name: Translate ${{ inputs.locale }}
     runs-on: ubuntu-latest
     concurrency:
-      group: translate-${{ inputs.locale_slug }}
+      group: docs-i18n-publish-main
       cancel-in-progress: false
     steps:
       - name: Checkout publish repo
@@ -261,10 +261,31 @@ jobs:
       - name: Commit locale refresh
         env:
           LOCALE: ${{ inputs.locale }}
+          SOURCE_SHA: ${{ steps.meta.outputs.sha }}
         run: |
+          set -euo pipefail
+
+          remote_source_sha() {
+            git show refs/remotes/origin/main:.openclaw-sync/source.json 2>/dev/null \
+              | node -e 'const fs = require("node:fs"); try { const data = JSON.parse(fs.readFileSync(0, "utf8")); if (data.sha) process.stdout.write(data.sha); } catch {}' \
+              || true
+          }
+
+          skip_stale_source() {
+            current_source_sha="$(remote_source_sha)"
+            if [ -n "$current_source_sha" ] && [ "$current_source_sha" != "$SOURCE_SHA" ]; then
+              echo "Skipping ${LOCALE} translation for stale source ${SOURCE_SHA}; origin/main has ${current_source_sha}."
+              exit 0
+            fi
+          }
+
           if [ -z "$(git status --porcelain --untracked-files=all -- "docs/${LOCALE}" "docs/.i18n/${LOCALE}.tm.jsonl")" ]; then
             echo "No ${LOCALE} translation changes."
             exit 0
+          fi
+
+          if git fetch origin main:refs/remotes/origin/main; then
+            skip_stale_source
           fi
 
           git config user.name "openclaw-docs-i18n[bot]"
@@ -272,10 +293,15 @@ jobs:
           git add "docs/${LOCALE}" "docs/.i18n/${LOCALE}.tm.jsonl"
           git commit -m "chore(i18n): refresh ${LOCALE} translations"
           for attempt in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin HEAD:main; then
-              exit 0
+            if git fetch origin main:refs/remotes/origin/main; then
+              skip_stale_source
+              if git rebase origin/main && git push origin HEAD:main; then
+                exit 0
+              fi
+              git rebase --abort >/dev/null 2>&1 || true
             fi
-            sleep 5
+            echo "Locale refresh attempt ${attempt} failed; retrying."
+            sleep $((attempt * 2))
           done
           echo "Failed to push ${LOCALE} translations after retries."
           exit 1
