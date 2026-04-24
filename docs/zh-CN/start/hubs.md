@@ -1,22 +1,22 @@
 ---
 read_when:
-    - 你想查看完整的文档地图
-summary: 链接到所有 OpenClaw 文档的枢纽页
-title: 文档枢纽
+    - 你想要一份完整的文档地图
+summary: 链接到所有 OpenClaw 文档的中心页
+title: 文档中心页
 x-i18n:
-    generated_at: "2026-04-24T04:07:51Z"
+    generated_at: "2026-04-24T17:31:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 711d23631ca29b122054b1a048058ec5bd787043e7ffc8c3108b17cf275c2c8e
+    source_hash: db591029047b57e65141c5992760a81b838580602b1073e94d1bc2690415c0aa
     source_path: start/hubs.md
     workflow: 15
 ---
 
 <Note>
-如果你是 OpenClaw 新手，请先阅读[入门指南](/zh-CN/start/getting-started)。
+如果你刚开始使用 OpenClaw，请先从 [入门指南](/zh-CN/start/getting-started) 开始。
 </Note>
 
-使用这些枢纽页来发现每一个页面，包括左侧导航中未出现的深度解析和参考文档。
+使用这些中心页来发现每一页文档，包括左侧导航中未显示的深度解析和参考文档。
 
 ## 从这里开始
 
@@ -25,14 +25,14 @@ x-i18n:
 - [新手引导](/zh-CN/start/onboarding)
 - [新手引导（CLI）](/zh-CN/start/wizard)
 - [设置](/zh-CN/start/setup)
-- [控制台（本地 Gateway 网关）](http://127.0.0.1:18789/)
+- [Dashboard（本地 Gateway 网关）](http://127.0.0.1:18789/)
 - [帮助](/zh-CN/help)
 - [文档目录](/zh-CN/start/docs-directory)
 - [配置](/zh-CN/gateway/configuration)
 - [配置示例](/zh-CN/gateway/configuration-examples)
 - [OpenClaw 助手](/zh-CN/start/openclaw)
 - [展示](/zh-CN/start/showcase)
-- [Lore](/zh-CN/start/lore)
+- [设定](/zh-CN/start/lore)
 
 ## 安装 + 更新
 
@@ -45,7 +45,7 @@ x-i18n:
 
 - [架构](/zh-CN/concepts/architecture)
 - [功能](/zh-CN/concepts/features)
-- [网络枢纽](/zh-CN/network)
+- [网络中心](/zh-CN/network)
 - [智能体运行时](/zh-CN/concepts/agent)
 - [智能体工作区](/zh-CN/concepts/agent-workspace)
 - [记忆](/zh-CN/concepts/memory)
@@ -59,7 +59,7 @@ x-i18n:
 - [队列](/zh-CN/concepts/queue)
 - [斜杠命令](/zh-CN/tools/slash-commands)
 - [RPC 适配器](/zh-CN/reference/rpc)
-- [TypeBox schemas](/zh-CN/concepts/typebox)
+- [TypeBox 模式](/zh-CN/concepts/typebox)
 - [时区处理](/zh-CN/concepts/timezone)
 - [在线状态](/zh-CN/concepts/presence)
 - [设备发现 + 传输协议](/zh-CN/gateway/discovery)
@@ -67,13 +67,13 @@ x-i18n:
 - [渠道路由](/zh-CN/channels/channel-routing)
 - [群组](/zh-CN/channels/groups)
 - [群组消息](/zh-CN/channels/group-messages)
-- [模型故障转移](/zh-CN/concepts/model-failover)
+- [模型故障切换](/zh-CN/concepts/model-failover)
 - [OAuth](/zh-CN/concepts/oauth)
 
-## 提供商 + 入口
+## 提供商 + 接入
 
-- [聊天渠道枢纽](/zh-CN/channels)
-- [模型提供商枢纽](/zh-CN/providers/models)
+- [聊天渠道中心](/zh-CN/channels)
+- [模型提供商中心](/zh-CN/providers/models)
 - [WhatsApp](/zh-CN/channels/whatsapp)
 - [Telegram](/zh-CN/channels/telegram)
 - [Slack](/zh-CN/channels/slack)
@@ -100,8 +100,8 @@ x-i18n:
 - [Doctor](/zh-CN/gateway/doctor)
 - [日志](/zh-CN/gateway/logging)
 - [沙箱隔离](/zh-CN/gateway/sandboxing)
-- [控制台](/zh-CN/web/dashboard)
-- [Control UI](/zh-CN/web/control-ui)
+- [Dashboard](/zh-CN/web/dashboard)
+- [控制 UI](/zh-CN/web/control-ui)
 - [远程访问](/zh-CN/gateway/remote)
 - [远程 Gateway 网关 README](/zh-CN/gateway/remote-gateway-readme)
 - [Tailscale](/zh-CN/gateway/tailscale)
@@ -110,15 +110,15 @@ x-i18n:
 
 ## 工具 + 自动化
 
-- [工具界面](/zh-CN/tools)
+- [工具总览](/zh-CN/tools)
 - [OpenProse](/zh-CN/prose)
 - [CLI 参考](/zh-CN/cli)
 - [Exec 工具](/zh-CN/tools/exec)
 - [PDF 工具](/zh-CN/tools/pdf)
-- [提升权限模式](/zh-CN/tools/elevated)
+- [提升模式](/zh-CN/tools/elevated)
 - [Cron 作业](/zh-CN/automation/cron-jobs)
 - [自动化与任务](/zh-CN/automation)
-- [Thinking + verbose](/zh-CN/tools/thinking)
+- [思考 + 详细输出](/zh-CN/tools/thinking)
 - [模型](/zh-CN/concepts/models)
 - [子智能体](/zh-CN/tools/subagents)
 - [智能体发送 CLI](/zh-CN/tools/agent-send)
@@ -135,7 +135,7 @@ x-i18n:
 - [音频](/zh-CN/nodes/audio)
 - [位置命令](/zh-CN/nodes/location-command)
 - [语音唤醒](/zh-CN/nodes/voicewake)
-- [Talk 模式](/zh-CN/nodes/talk)
+- [对话模式](/zh-CN/nodes/talk)
 
 ## 平台
 
@@ -152,7 +152,7 @@ x-i18n:
 - [macOS 开发设置](/zh-CN/platforms/mac/dev-setup)
 - [macOS 菜单栏](/zh-CN/platforms/mac/menu-bar)
 - [macOS 语音唤醒](/zh-CN/platforms/mac/voicewake)
-- [macOS 语音覆盖层](/zh-CN/platforms/mac/voice-overlay)
+- [macOS 语音浮层](/zh-CN/platforms/mac/voice-overlay)
 - [macOS WebChat](/zh-CN/platforms/mac/webchat)
 - [macOS Canvas](/zh-CN/platforms/mac/canvas)
 - [macOS 子进程](/zh-CN/platforms/mac/child-process)
@@ -171,6 +171,7 @@ x-i18n:
 
 - [插件概览](/zh-CN/tools/plugin)
 - [构建插件](/zh-CN/plugins/building-plugins)
+- [插件钩子](/zh-CN/plugins/hooks)
 - [插件清单](/zh-CN/plugins/manifest)
 - [智能体工具](/zh-CN/plugins/building-plugins#registering-agent-tools)
 - [插件包](/zh-CN/plugins/bundles)
