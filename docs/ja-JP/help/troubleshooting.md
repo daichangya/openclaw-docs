@@ -1,25 +1,23 @@
 ---
 read_when:
-    - OpenClawが動作しておらず、最短で解決したい
-    - 詳細な手順書に入る前に、トリアージフローを使いたい
+    - OpenClawが動作しておらず、最短で修正する方法が必要だ
+    - 詳細なランブックに入る前に、トリアージの流れが欲しい
 summary: OpenClawの症状別トラブルシューティングハブ
 title: 一般的なトラブルシューティング
 x-i18n:
-    generated_at: "2026-04-24T05:02:15Z"
+    generated_at: "2026-04-24T08:58:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ce06ddce9de9e5824b4c5e8c182df07b29ce3ff113eb8e29c62aef9a4682e8e9
+    source_hash: c832c3f7609c56a5461515ed0f693d2255310bf2d3958f69f57c482bcbef97f0
     source_path: help/troubleshooting.md
     workflow: 15
 ---
 
-# トラブルシューティング
-
-2分しかないなら、このページをトリアージの入口として使ってください。
+2分しかない場合は、このページをトリアージの入口として使ってください。
 
 ## 最初の60秒
 
-次のラダーをこの順番でそのまま実行してください:
+この順番で、次のコマンドをそのまま実行してください:
 
 ```bash
 openclaw status
@@ -31,47 +29,44 @@ openclaw channels status --probe
 openclaw logs --follow
 ```
 
-正常な出力を1行で言うと:
+1行での良い出力の目安:
 
-- `openclaw status` → 設定済みチャネルが表示され、明らかなauthエラーがない。
+- `openclaw status` → 設定済みのchannelが表示され、明らかなauthエラーがない。
 - `openclaw status --all` → 完全なレポートが表示され、共有可能である。
-- `openclaw gateway probe` → 想定したgatewayターゲットに到達できる（`Reachable: yes`）。`Capability: ...` はprobeが証明できたauthレベルを示し、`Read probe: limited - missing scope: operator.read` は診断の劣化であって接続失敗ではない。
-- `openclaw gateway status` → `Runtime: running`、`Connectivity probe: ok`、そしてもっともらしい `Capability: ...` 行。read-scope RPCの証明も必要なら `--require-rpc` を使ってください。
-- `openclaw doctor` → 設定/サービスに関するブロッキングなエラーがない。
-- `openclaw channels status --probe` → gatewayに到達できる場合、アカウントごとのライブトランスポート状態と、対応していれば `works` や `audit ok` のようなprobe/audit結果を返す。gatewayに到達できない場合、このコマンドは設定のみのサマリーへフォールバックする。
-- `openclaw logs --follow` → 安定したアクティビティがあり、繰り返される致命的エラーがない。
+- `openclaw gateway probe` → 期待するgateway targetに到達できる（`Reachable: yes`）。`Capability: ...`は、probeで証明できたauthレベルを示します。`Read probe: limited - missing scope: operator.read`は診断機能の劣化であり、接続失敗ではありません。
+- `openclaw gateway status` → `Runtime: running`、`Connectivity probe: ok`、そして妥当な`Capability: ...`行がある。read-scope RPCの確認も必要なら`--require-rpc`を使ってください。
+- `openclaw doctor` → 設定やサービスにブロッキングなエラーがない。
+- `openclaw channels status --probe` → 到達可能なgatewayは、アカウントごとのライブtransport stateと、`works`や`audit ok`のようなprobe/audit結果を返す。gatewayに到達できない場合、このコマンドはconfig-only summaryにフォールバックする。
+- `openclaw logs --follow` → 安定したアクティビティがあり、繰り返す致命的エラーがない。
 
 ## Anthropic long context 429
 
+次のメッセージが表示された場合:
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`
-が表示されたら、
-[/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/ja-JP/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context)
-へ進んでください。
+[/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/ja-JP/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context)に進んでください。
 
-## ローカルのOpenAI互換バックエンドは直接では動くが、OpenClaw内では失敗する
+## ローカルのOpenAI互換バックエンドは直接では動くがOpenClawでは失敗する
 
-ローカルまたはセルフホストの `/v1` バックエンドが、小さな直接
-`/v1/chat/completions` probeには応答するのに、`openclaw infer model run` や通常の
-agentターンでは失敗する場合:
+ローカルまたはself-hostedの`/v1`バックエンドが、小さな直接の
+`/v1/chat/completions` probeには応答するのに、`openclaw infer model run`や通常の
+agent turnでは失敗する場合:
 
-1. エラーに `messages[].content` が文字列を期待しているとあるなら、
-   `models.providers.<provider>.models[].compat.requiresStringContent: true` を設定してください。
-2. バックエンドが依然としてOpenClawのagentターンでのみ失敗するなら、
-   `models.providers.<provider>.models[].compat.supportsTools: false` を設定して再試行してください。
-3. 小さな直接呼び出しが引き続き動作するのに、より大きなOpenClawプロンプトで
-   バックエンドがクラッシュするなら、残る問題はupstreamのモデル/サーバー制限として扱い、
-   詳細手順書に進んでください:
+1. エラーに`messages[].content`が文字列を期待しているとある場合は、
+   `models.providers.<provider>.models[].compat.requiresStringContent: true`を設定します。
+2. バックエンドがそれでもOpenClaw agent turnでのみ失敗する場合は、
+   `models.providers.<provider>.models[].compat.supportsTools: false`を設定して再試行します。
+3. ごく小さな直接呼び出しはまだ動作するが、より大きいOpenClaw promptでバックエンドがクラッシュする場合、残っている問題はupstreamのmodel/serverの制限として扱い、詳細ランブックに進んでください:
    [/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail](/ja-JP/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail)
 
-## Pluginのインストールが openclaw extensions 不足で失敗する
+## Pluginインストールがopenclaw extensions不足で失敗する
 
-`package.json missing openclaw.extensions` でインストールが失敗する場合、そのplugin packageは、OpenClawがもはや受け付けない古い形式を使っています。
+インストールが`package.json missing openclaw.extensions`で失敗する場合、そのplugin packageはOpenClawが現在受け付けない古い形式を使っています。
 
-plugin package側での修正:
+plugin packageでの修正:
 
-1. `package.json` に `openclaw.extensions` を追加する。
-2. エントリをビルド済みランタイムファイル（通常は `./dist/index.js`）に向ける。
-3. pluginを再公開し、`openclaw plugins install <package>` を再実行する。
+1. `package.json`に`openclaw.extensions`を追加します。
+2. エントリをビルド済みランタイムファイル（通常は`./dist/index.js`）に向けます。
+3. pluginを再公開し、`openclaw plugins install <package>`を再度実行します。
 
 例:
 
@@ -85,28 +80,28 @@ plugin package側での修正:
 }
 ```
 
-参考: [Pluginアーキテクチャ](/ja-JP/plugins/architecture)
+参考: [Plugin architecture](/ja-JP/plugins/architecture)
 
-## 決定木
+## 判断ツリー
 
 ```mermaid
 flowchart TD
-  A[OpenClawが動作していない] --> B{最初に何が壊れるか}
-  B --> C[返信がない]
-  B --> D[DashboardまたはControl UIが接続しない]
-  B --> E[Gatewayが起動しない、またはサービスが動作していない]
-  B --> F[チャネルは接続するがメッセージが流れない]
-  B --> G[CronまたはHeartbeatが発火しなかった、または配信されなかった]
-  B --> H[Nodeはペアリング済みだがcamera canvas screen execが失敗する]
-  B --> I[Browserツールが失敗する]
+  A[OpenClaw is not working] --> B{What breaks first}
+  B --> C[No replies]
+  B --> D[Dashboard or Control UI will not connect]
+  B --> E[Gateway will not start or service not running]
+  B --> F[Channel connects but messages do not flow]
+  B --> G[Cron or heartbeat did not fire or did not deliver]
+  B --> H[Node is paired but camera canvas screen exec fails]
+  B --> I[Browser tool fails]
 
-  C --> C1[/返信がないセクション/]
-  D --> D1[/Control UIセクション/]
-  E --> E1[/Gatewayセクション/]
-  F --> F1[/チャネルフローセクション/]
-  G --> G1[/自動化セクション/]
-  H --> H1[/Nodeツールセクション/]
-  I --> I1[/Browserセクション/]
+  C --> C1[/No replies section/]
+  D --> D1[/Control UI section/]
+  E --> E1[/Gateway section/]
+  F --> F1[/Channel flow section/]
+  G --> G1[/Automation section/]
+  H --> H1[/Node tools section/]
+  I --> I1[/Browser section/]
 ```
 
 <AccordionGroup>
@@ -119,19 +114,19 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
     - `Runtime: running`
     - `Connectivity probe: ok`
-    - `Capability: read-only`、`write-capable`、または `admin-capable`
-    - あなたのチャネルでトランスポートが接続済みと表示され、対応していれば `channels status --probe` に `works` または `audit ok` が出る
-    - 送信者が承認済みである（またはDMポリシーがopen/allowlistである）
+    - `Capability: read-only`、`write-capable`、または`admin-capable`
+    - あなたのchannelでtransport connectedが表示され、対応している場合は`channels status --probe`で`works`または`audit ok`が出る
+    - 送信者が承認済みである（またはDM policyがopen/allowlistである）
 
     よくあるログシグネチャ:
 
-    - `drop guild message (mention required` → Discordでメンションゲーティングによりメッセージがブロックされた。
-    - `pairing request` → 送信者は未承認で、DMペアリング承認待ち。
-    - チャネルログ内の `blocked` / `allowlist` → 送信者、ルーム、またはグループがフィルタされている。
+    - `drop guild message (mention required` → Discordでmention gatingによりメッセージがブロックされた。
+    - `pairing request` → 送信者が未承認で、DM pairing approval待ち。
+    - channelログの`blocked` / `allowlist` → 送信者、room、またはgroupがフィルタされている。
 
     詳細ページ:
 
@@ -141,7 +136,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="DashboardまたはControl UIが接続しない">
+  <Accordion title="DashboardまたはControl UIが接続できない">
     ```bash
     openclaw status
     openclaw gateway status
@@ -150,23 +145,23 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
-    - `openclaw gateway status` に `Dashboard: http://...` が表示される
+    - `openclaw gateway status`に`Dashboard: http://...`が表示される
     - `Connectivity probe: ok`
-    - `Capability: read-only`、`write-capable`、または `admin-capable`
-    - ログにauthループがない
+    - `Capability: read-only`、`write-capable`、または`admin-capable`
+    - ログにauth loopがない
 
     よくあるログシグネチャ:
 
-    - `device identity required` → HTTP/非secure contextではdevice authを完了できない。
-    - `origin not allowed` → ブラウザの `Origin` がそのControl UI gatewayターゲットで許可されていない。
-    - `AUTH_TOKEN_MISMATCH` と再試行ヒント（`canRetryWithDeviceToken=true`） → 1回だけ信頼されたdevice-token再試行が自動で起こる場合がある。
-    - そのキャッシュ済みtoken再試行では、ペアリング済みdevice tokenとともに保存されたキャッシュ済みscopeセットを再利用する。明示的な `deviceToken` / 明示的な `scopes` の呼び出し元は、代わりに要求したscopeセットを維持する。
-    - 非同期のTailscale Serve Control UI経路では、同じ `{scope, ip}` に対する失敗試行は、limiterが失敗を記録する前に直列化されるため、2回目の不正な同時再試行ではすでに `retry later` が表示されることがある。
-    - localhostブラウザoriginからの `too many failed authentication attempts (retry later)` → 同じ `Origin` からの繰り返し失敗は一時的にロックアウトされる。別のlocalhost originは別のバケットを使う。
-    - その再試行後も `unauthorized` が繰り返される → token/passwordが間違っている、auth mode不一致、または古いペアリング済みdevice token。
-    - `gateway connect failed:` → UIが間違ったURL/ポートまたは到達不能なgatewayを対象にしている。
+    - `device identity required` → HTTP/non-secure contextではdevice authを完了できない。
+    - `origin not allowed` → browserの`Origin`がControl UIのgateway targetで許可されていない。
+    - `AUTH_TOKEN_MISMATCH`とretryヒント（`canRetryWithDeviceToken=true`）→ 信頼済みdevice-tokenによる1回のretryが自動で行われることがある。
+    - そのcached-token retryでは、paired device tokenと一緒に保存されたcached scope setが再利用される。明示的な`deviceToken` / 明示的な`scopes`呼び出し元は、要求したscope setをそのまま保持する。
+    - 非同期のTailscale Serve Control UI pathでは、同じ`{scope, ip}`に対する失敗した試行は、limiterが失敗を記録する前に直列化されるため、2回目の同時並行のbad retryではすでに`retry later`が表示されることがある。
+    - localhost browser originからの`too many failed authentication attempts (retry later)` → 同じ`Origin`からの繰り返し失敗は一時的にロックアウトされる。別のlocalhost originは別bucketを使う。
+    - そのretry後も`unauthorized`が繰り返される → token/passwordの誤り、auth modeの不一致、またはpaired device tokenの期限切れ。
+    - `gateway connect failed:` → UIが間違ったURL/portを向いているか、gatewayに到達できない。
 
     詳細ページ:
 
@@ -176,7 +171,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Gatewayが起動しない、またはサービスはインストール済みだが動作していない">
+  <Accordion title="Gatewayが起動しない、またはサービスがインストール済みだが実行されていない">
     ```bash
     openclaw status
     openclaw gateway status
@@ -185,18 +180,18 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
     - `Service: ... (loaded)`
     - `Runtime: running`
     - `Connectivity probe: ok`
-    - `Capability: read-only`、`write-capable`、または `admin-capable`
+    - `Capability: read-only`、`write-capable`、または`admin-capable`
 
     よくあるログシグネチャ:
 
-    - `Gateway start blocked: set gateway.mode=local` または `existing config is missing gateway.mode` → gateway modeがremoteになっている、または設定ファイルにlocal-modeの印がなく、修復が必要。
-    - `refusing to bind gateway ... without auth` → 有効なgateway auth経路（token/password、または設定済みtrusted-proxy）がないままloopback以外へbindしている。
-    - `another gateway instance is already listening` または `EADDRINUSE` → ポートがすでに使われている。
+    - `Gateway start blocked: set gateway.mode=local`または`existing config is missing gateway.mode` → gateway modeがremoteであるか、config fileにlocal-mode stampがなく、修復が必要。
+    - `refusing to bind gateway ... without auth` → 有効なgateway auth path（token/password、または設定されているtrusted-proxy）なしでnon-loopback bindしようとしている。
+    - `another gateway instance is already listening`または`EADDRINUSE` → portがすでに使用されている。
 
     詳細ページ:
 
@@ -206,7 +201,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="チャネルは接続するがメッセージが流れない">
+  <Accordion title="Channelは接続されるがメッセージが流れない">
     ```bash
     openclaw status
     openclaw gateway status
@@ -215,17 +210,17 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
-    - チャネルトランスポートが接続済み。
-    - pairing/allowlistチェックに通る。
-    - 必要な場合にメンションが検出される。
+    - Channel transportが接続済みである。
+    - Pairing/allowlistチェックに通る。
+    - 必要な場合、mentionが検出されている。
 
     よくあるログシグネチャ:
 
-    - `mention required` → グループのメンションゲーティングにより処理がブロックされた。
+    - `mention required` → group mention gatingにより処理がブロックされた。
     - `pairing` / `pending` → DM送信者がまだ承認されていない。
-    - `not_in_channel`、`missing_scope`、`Forbidden`、`401/403` → チャネル権限tokenの問題。
+    - `not_in_channel`、`missing_scope`、`Forbidden`、`401/403` → channel permission tokenの問題。
 
     詳細ページ:
 
@@ -234,7 +229,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="CronまたはHeartbeatが発火しなかった、または配信されなかった">
+  <Accordion title="CronまたはHeartbeatが起動しなかった、または配信されなかった">
     ```bash
     openclaw status
     openclaw gateway status
@@ -244,21 +239,21 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
-    - `cron.status` にenabledと次回wakeが表示される。
-    - `cron runs` に最近の `ok` エントリが表示される。
-    - Heartbeatが有効で、active hoursの時間外ではない。
+    - `cron.status`でenabledかつ次回起動時刻が表示される。
+    - `cron runs`に最近の`ok`エントリがある。
+    - Heartbeatが有効で、active hoursの外ではない。
 
     よくあるログシグネチャ:
 
-    - `cron: scheduler disabled; jobs will not run automatically` → cronが無効。
-    - `heartbeat skipped` with `reason=quiet-hours` → 設定されたactive hoursの外。
-    - `heartbeat skipped` with `reason=empty-heartbeat-file` → `HEARTBEAT.md` は存在するが、空行/ヘッダーのみの足場しか含んでいない。
-    - `heartbeat skipped` with `reason=no-tasks-due` → `HEARTBEAT.md` のタスクモードは有効だが、タスク間隔がまだどれも期限到来していない。
-    - `heartbeat skipped` with `reason=alerts-disabled` → Heartbeat可視性がすべて無効（`showOk`、`showAlerts`、`useIndicator` がすべてオフ）。
-    - `requests-in-flight` → main laneがビジーで、Heartbeat wakeが遅延された。
-    - `unknown accountId` → Heartbeat配信ターゲットのアカウントが存在しない。
+    - `cron: scheduler disabled; jobs will not run automatically` → Cronが無効。
+    - `heartbeat skipped`と`reason=quiet-hours` → 設定されたactive hoursの外。
+    - `heartbeat skipped`と`reason=empty-heartbeat-file` → `HEARTBEAT.md`は存在するが、空またはheaderだけの雛形しか含まれていない。
+    - `heartbeat skipped`と`reason=no-tasks-due` → `HEARTBEAT.md`のtask modeが有効だが、task intervalがまだどれも期限に達していない。
+    - `heartbeat skipped`と`reason=alerts-disabled` → Heartbeat visibilityがすべて無効（`showOk`、`showAlerts`、`useIndicator`がすべてオフ）。
+    - `requests-in-flight` → メインレーンがビジーで、Heartbeat wakeが延期された。
+    - `unknown accountId` → Heartbeatの配信先accountが存在しない。
 
     詳細ページ:
 
@@ -268,7 +263,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Nodeはペアリング済みだがcamera canvas screen execツールが失敗する">
+  <Accordion title="Nodeはpairedされているが、toolでcamera canvas screen execが失敗する">
     ```bash
     openclaw status
     openclaw gateway status
@@ -277,17 +272,17 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
-    - Nodeが接続済みかつrole `node` でペアリング済みとして表示される。
-    - 呼び出そうとしているコマンドに対するcapabilityが存在する。
-    - ツールに対する権限状態が付与済みである。
+    - Nodeがconnectedかつrole `node`でpaired済みとして表示される。
+    - 呼び出しているコマンドに対するCapabilityが存在する。
+    - そのtoolに必要なpermission stateがgrantedである。
 
     よくあるログシグネチャ:
 
-    - `NODE_BACKGROUND_UNAVAILABLE` → nodeアプリをforegroundに持ってくる。
-    - `*_PERMISSION_REQUIRED` → OS権限が拒否されている/欠落している。
-    - `SYSTEM_RUN_DENIED: approval required` → exec承認が保留中。
+    - `NODE_BACKGROUND_UNAVAILABLE` → Node appをforegroundに戻す。
+    - `*_PERMISSION_REQUIRED` → OS permissionが拒否されているか存在しない。
+    - `SYSTEM_RUN_DENIED: approval required` → exec approval待ち。
     - `SYSTEM_RUN_DENIED: allowlist miss` → コマンドがexec allowlistにない。
 
     詳細ページ:
@@ -298,7 +293,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Execが突然承認を求めるようになった">
+  <Accordion title="Execが急に承認を求めるようになった">
     ```bash
     openclaw config get tools.exec.host
     openclaw config get tools.exec.security
@@ -308,14 +303,14 @@ flowchart TD
 
     何が変わったか:
 
-    - `tools.exec.host` が未設定の場合、デフォルトは `auto` です。
-    - `host=auto` は、sandbox runtimeがアクティブなら `sandbox` に、そうでなければ `gateway` に解決されます。
-    - `host=auto` はルーティングのみです。プロンプトなしの「YOLO」動作は、gateway/node上の `security=full` と `ask=off` から来ます。
-    - `gateway` と `node` では、未設定の `tools.exec.security` のデフォルトは `full` です。
-    - 未設定の `tools.exec.ask` のデフォルトは `off` です。
-    - 結果として、承認が表示されているなら、何らかのホストローカルまたはセッションごとのポリシーが、現在のデフォルトより厳しくexecを制限しています。
+    - `tools.exec.host`が未設定の場合、デフォルトは`auto`です。
+    - `host=auto`は、sandbox runtimeがアクティブな場合は`sandbox`に、そうでない場合は`gateway`に解決されます。
+    - `host=auto`はルーティングのみです。プロンプトなしの「YOLO」動作は、gateway/node上の`security=full`と`ask=off`によって決まります。
+    - `gateway`と`node`では、未設定の`tools.exec.security`のデフォルトは`full`です。
+    - 未設定の`tools.exec.ask`のデフォルトは`off`です。
+    - 結果として、承認が表示されている場合は、何らかのhost-localまたはper-session policyによって、現在のデフォルトより厳しくexecが制限されています。
 
-    現在のデフォルトである「承認なし」動作を復元するには:
+    現在のデフォルトの承認不要動作に戻すには:
 
     ```bash
     openclaw config set tools.exec.host gateway
@@ -326,15 +321,15 @@ flowchart TD
 
     より安全な代替案:
 
-    - 安定したホストルーティングだけが欲しいなら、`tools.exec.host=gateway` だけを設定する。
-    - ホストexecは維持しつつallowlist miss時にレビューしたいなら、`security=allowlist` と `ask=on-miss` を使う。
-    - `host=auto` を再び `sandbox` に解決させたいなら、sandbox modeを有効にする。
+    - 安定したhost routingだけが必要なら、`tools.exec.host=gateway`だけを設定する。
+    - host execを使いたいが、allowlist miss時にはレビューもしたい場合は、`security=allowlist`と`ask=on-miss`を使う。
+    - `host=auto`を再び`sandbox`に解決させたい場合は、sandbox modeを有効にする。
 
     よくあるログシグネチャ:
 
-    - `Approval required.` → コマンドは `/approve ...` を待っている。
-    - `SYSTEM_RUN_DENIED: approval required` → node-host exec承認が保留中。
-    - `exec host=sandbox requires a sandbox runtime for this session` → 暗黙または明示のsandbox選択だが、sandbox modeがオフ。
+    - `Approval required.` → コマンドは`/approve ...`待ち。
+    - `SYSTEM_RUN_DENIED: approval required` → node-host exec approval待ち。
+    - `exec host=sandbox requires a sandbox runtime for this session` → 暗黙的または明示的にsandboxが選択されているが、sandbox modeがオフ。
 
     詳細ページ:
 
@@ -344,7 +339,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Browserツールが失敗する">
+  <Accordion title="Browser toolが失敗する">
     ```bash
     openclaw status
     openclaw gateway status
@@ -353,22 +348,22 @@ flowchart TD
     openclaw doctor
     ```
 
-    正常な出力は次のようになります:
+    良い出力の目安:
 
-    - Browser status に `running: true` と選択されたbrowser/profileが表示される。
-    - `openclaw` が起動する、または `user` がローカルChromeタブを確認できる。
+    - Browser statusに`running: true`と、選択されたbrowser/profileが表示される。
+    - `openclaw`が起動する、または`user`がローカルのChromeタブを参照できる。
 
     よくあるログシグネチャ:
 
-    - `unknown command "browser"` または `unknown command 'browser'` → `plugins.allow` が設定されており、`browser` を含んでいない。
-    - `Failed to start Chrome CDP on port` → ローカルbrowser起動に失敗した。
-    - `browser.executablePath not found` → 設定されたバイナリパスが間違っている。
-    - `browser.cdpUrl must be http(s) or ws(s)` → 設定されたCDP URLが未対応スキームを使っている。
-    - `browser.cdpUrl has invalid port` → 設定されたCDP URLのポートが不正または範囲外。
-    - `No Chrome tabs found for profile="user"` → Chrome MCP attach profileに開いているローカルChromeタブがない。
-    - `Remote CDP for profile "<name>" is not reachable` → 設定されたremote CDP endpointにこのホストから到達できない。
-    - `Browser attachOnly is enabled ... not reachable` または `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profileに生きているCDPターゲットがない。
-    - attach-onlyまたはremote CDP profileで古いviewport / dark-mode / locale / offline上書きが残っている → `openclaw browser stop --browser-profile <name>` を実行し、gatewayを再起動せずにアクティブなcontrol sessionを閉じてエミュレーション状態を解放する。
+    - `unknown command "browser"`または`unknown command 'browser'` → `plugins.allow`が設定されており、`browser`が含まれていない。
+    - `Failed to start Chrome CDP on port` → ローカルbrowserの起動に失敗した。
+    - `browser.executablePath not found` → 設定されたバイナリパスが誤っている。
+    - `browser.cdpUrl must be http(s) or ws(s)` → 設定されたCDP URLが未対応のschemeを使っている。
+    - `browser.cdpUrl has invalid port` → 設定されたCDP URLのportが不正または範囲外。
+    - `No Chrome tabs found for profile="user"` → Chrome MCP attach profileに、開いているローカルChromeタブがない。
+    - `Remote CDP for profile "<name>" is not reachable` → 設定されたリモートCDP endpointにこのホストから到達できない。
+    - `Browser attachOnly is enabled ... not reachable`または`Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profileに有効なCDP targetがない。
+    - attach-onlyまたはremote CDP profileでviewport / dark-mode / locale / offline overrideが古いまま残っている → `openclaw browser stop --browser-profile <name>`を実行して、gatewayを再起動せずにアクティブなcontrol sessionを閉じ、emulation stateを解放する。
 
     詳細ページ:
 
@@ -384,7 +379,7 @@ flowchart TD
 ## 関連
 
 - [FAQ](/ja-JP/help/faq) — よくある質問
-- [Gatewayトラブルシューティング](/ja-JP/gateway/troubleshooting) — Gateway固有の問題
+- [Gatewayのトラブルシューティング](/ja-JP/gateway/troubleshooting) — Gateway固有の問題
 - [Doctor](/ja-JP/gateway/doctor) — 自動ヘルスチェックと修復
-- [チャネルトラブルシューティング](/ja-JP/channels/troubleshooting) — チャネル接続の問題
-- [自動化トラブルシューティング](/ja-JP/automation/cron-jobs#troubleshooting) — CronとHeartbeatの問題
+- [Channelのトラブルシューティング](/ja-JP/channels/troubleshooting) — channel接続の問題
+- [Automationのトラブルシューティング](/ja-JP/automation/cron-jobs#troubleshooting) — CronとHeartbeatの問題

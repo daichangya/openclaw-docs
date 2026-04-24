@@ -1,32 +1,32 @@
 ---
 read_when:
     - Pluginのインストールまたは設定
-    - Pluginの検出と読み込みルールを理解する
-    - Codex/Claude互換のPluginバンドルを扱う
+    - Pluginの検出と読み込みルールの理解
+    - Codex/Claude互換Pluginバンドルの操作
 sidebarTitle: Install and Configure
-summary: OpenClaw Pluginをインストール、設定、管理する
+summary: OpenClaw Pluginのインストール、設定、および管理
 title: Plugin
 x-i18n:
-    generated_at: "2026-04-24T05:26:11Z"
+    generated_at: "2026-04-24T09:03:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a2cf5cb6146ae5e52a32201ee08c03211dbea2313b884c696307abc56d3f9cbf
+    source_hash: 83ab1218d6677ad518a4991ca546d55eed9648e1fa92b76b7433ecd5df569e28
     source_path: tools/plugin.md
     workflow: 15
 ---
 
-Pluginは新しい機能でOpenClawを拡張します。たとえば、チャネル、モデルプロバイダー、ツール、Skills、音声、リアルタイム文字起こし、リアルタイム音声、メディア理解、画像生成、動画生成、Webフェッチ、Web検索などです。Pluginの一部は**core**（OpenClawに同梱）で、その他は**external**（コミュニティがnpmで公開）です。
+Pluginは、OpenClawに新しい機能を追加します: チャンネル、モデルプロバイダー、エージェントハーネス、ツール、Skills、音声、realtime文字起こし、realtime音声、メディア理解、画像生成、動画生成、Web取得、Web検索などです。Pluginには、**core**（OpenClawに同梱）なものと、**external**（コミュニティがnpmで公開）なものがあります。
 
 ## クイックスタート
 
 <Steps>
-  <Step title="読み込まれているものを確認する">
+  <Step title="読み込まれているものを確認">
     ```bash
     openclaw plugins list
     ```
   </Step>
 
-  <Step title="Pluginをインストールする">
+  <Step title="Pluginをインストール">
     ```bash
     # npmから
     openclaw plugins install @openclaw/voice-call
@@ -38,17 +38,17 @@ Pluginは新しい機能でOpenClawを拡張します。たとえば、チャネ
 
   </Step>
 
-  <Step title="Gatewayを再起動する">
+  <Step title="Gatewayを再起動">
     ```bash
     openclaw gateway restart
     ```
 
-    その後、設定ファイルの`plugins.entries.\<id\>.config`で設定します。
+    その後、設定ファイルの `plugins.entries.\<id\>.config` 配下で設定します。
 
   </Step>
 </Steps>
 
-チャットネイティブな操作を使いたい場合は、`commands.plugins: true`を有効にして、次を使用します。
+チャットネイティブな操作を好む場合は、`commands.plugins: true` を有効にして次を使います:
 
 ```text
 /plugin install clawhub:@openclaw/voice-call
@@ -56,48 +56,40 @@ Pluginは新しい機能でOpenClawを拡張します。たとえば、チャネ
 /plugin enable voice-call
 ```
 
-インストールパスはCLIと同じリゾルバーを使用します。ローカルパス/アーカイブ、明示的な
-`clawhub:<pkg>`、または素のパッケージ指定（最初にClawHub、その後npmへフォールバック）です。
+インストールパスはCLIと同じリゾルバーを使用します: ローカルパス/アーカイブ、明示的な `clawhub:<pkg>`、または裸のパッケージ指定（最初にClawHub、次にnpmへフォールバック）。
 
-設定が無効な場合、通常、インストールはフェイルクローズで失敗し、
-`openclaw doctor --fix`へ誘導されます。唯一の回復例外は、`openclaw.install.allowInvalidConfigRecovery`に
-オプトインしたPlugin向けの、限定的な同梱Plugin再インストールパスです。
+設定が無効な場合、通常はインストールは安全側で失敗し、`openclaw doctor --fix` を案内します。唯一の回復例外は、`openclaw.install.allowInvalidConfigRecovery` にオプトインしたPlugin向けの、狭いバンドル済みPlugin再インストールパスです。
 
-パッケージ化されたOpenClawのインストールでは、同梱されているすべてのPluginの
-ランタイム依存ツリーが即座にインストールされるわけではありません。同梱のOpenClaw所有Pluginが、
-Plugin設定、従来のチャネル設定、またはデフォルト有効のマニフェストからアクティブになると、
-起動時の修復では、そのPluginをimportする前に、そのPluginが宣言したランタイム依存のみを修復します。
-external Pluginおよびカスタム読み込みパスは、引き続き
-`openclaw plugins install`でインストールする必要があります。
+パッケージ化されたOpenClawインストールでは、すべてのバンドル済みPluginのランタイム依存ツリーを事前に積極インストールしません。バンドル済みのOpenClaw所有Pluginが、Plugin設定、従来のチャンネル設定、またはデフォルト有効マニフェストから有効になっている場合、起動時の修復では、そのPluginが宣言したランタイム依存関係のみをimport前に修復します。外部Pluginとカスタム読み込みパスは、引き続き `openclaw plugins install` でインストールする必要があります。
 
 ## Pluginの種類
 
-OpenClawは2つのPlugin形式を認識します。
+OpenClawは2つのPlugin形式を認識します:
 
-| 形式       | 動作方法                                                           | 例                                                     |
+| Format     | 仕組み                                                       | 例                                               |
 | ---------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
-| **Native** | `openclaw.plugin.json` + ランタイムモジュール。プロセス内で実行されます | 公式Plugin、コミュニティのnpmパッケージ               |
-| **Bundle** | Codex/Claude/Cursor互換レイアウト。OpenClaw機能にマッピングされます | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
+| **Native** | `openclaw.plugin.json` + ランタイムモジュール。インプロセスで実行される       | 公式Plugin、コミュニティnpmパッケージ               |
+| **Bundle** | Codex/Claude/Cursor互換レイアウト。OpenClaw機能へマップされる | `.codex-plugin/`, `.claude-plugin/`, `.cursor-plugin/` |
 
-どちらも`openclaw plugins list`に表示されます。Bundleの詳細は[Plugin Bundles](/ja-JP/plugins/bundles)を参照してください。
+どちらも `openclaw plugins list` に表示されます。Bundleの詳細は [Plugin Bundles](/ja-JP/plugins/bundles) を参照してください。
 
-native Pluginを作成する場合は、[Building Plugins](/ja-JP/plugins/building-plugins)
-と[Plugin SDK Overview](/ja-JP/plugins/sdk-overview)から始めてください。
+ネイティブPluginを書いている場合は、[Building Plugins](/ja-JP/plugins/building-plugins)
+と [Plugin SDK Overview](/ja-JP/plugins/sdk-overview) から始めてください。
 
 ## 公式Plugin
 
 ### インストール可能（npm）
 
-| Plugin          | パッケージ             | ドキュメント                           |
-| --------------- | ---------------------- | -------------------------------------- |
-| Matrix          | `@openclaw/matrix`     | [Matrix](/ja-JP/channels/matrix)             |
-| Microsoft Teams | `@openclaw/msteams`    | [Microsoft Teams](/ja-JP/channels/msteams)   |
-| Nostr           | `@openclaw/nostr`      | [Nostr](/ja-JP/channels/nostr)               |
-| Voice Call      | `@openclaw/voice-call` | [Voice Call](/ja-JP/plugins/voice-call)      |
-| Zalo            | `@openclaw/zalo`       | [Zalo](/ja-JP/channels/zalo)                 |
-| Zalo Personal   | `@openclaw/zalouser`   | [Zalo Personal](/ja-JP/plugins/zalouser)     |
+| Plugin          | Package                | Docs                                 |
+| --------------- | ---------------------- | ------------------------------------ |
+| Matrix          | `@openclaw/matrix`     | [Matrix](/ja-JP/channels/matrix)           |
+| Microsoft Teams | `@openclaw/msteams`    | [Microsoft Teams](/ja-JP/channels/msteams) |
+| Nostr           | `@openclaw/nostr`      | [Nostr](/ja-JP/channels/nostr)             |
+| Voice Call      | `@openclaw/voice-call` | [Voice Call](/ja-JP/plugins/voice-call)    |
+| Zalo            | `@openclaw/zalo`       | [Zalo](/ja-JP/channels/zalo)               |
+| Zalo Personal   | `@openclaw/zalouser`   | [Zalo Personal](/ja-JP/plugins/zalouser)   |
 
-### Core（OpenClawに同梱）
+### core（OpenClawに同梱）
 
 <AccordionGroup>
   <Accordion title="モデルプロバイダー（デフォルトで有効）">
@@ -109,8 +101,8 @@ native Pluginを作成する場合は、[Building Plugins](/ja-JP/plugins/buildi
   </Accordion>
 
   <Accordion title="メモリPlugin">
-    - `memory-core` — 同梱のメモリ検索（`plugins.slots.memory`によるデフォルト）
-    - `memory-lancedb` — 必要時インストールの長期メモリ。自動想起/自動取得に対応（`plugins.slots.memory = "memory-lancedb"`を設定）
+    - `memory-core` — バンドル済みメモリ検索（デフォルトは `plugins.slots.memory` 経由）
+    - `memory-lancedb` — 必要時インストールの長期メモリ。自動recall/capture付き（`plugins.slots.memory = "memory-lancedb"` を設定）
   </Accordion>
 
   <Accordion title="音声プロバイダー（デフォルトで有効）">
@@ -118,12 +110,12 @@ native Pluginを作成する場合は、[Building Plugins](/ja-JP/plugins/buildi
   </Accordion>
 
   <Accordion title="その他">
-    - `browser` — ブラウザツール、`openclaw browser` CLI、`browser.request` Gatewayメソッド、ブラウザランタイム、デフォルトのブラウザ制御サービス向けの同梱ブラウザPlugin（デフォルトで有効。置き換える前に無効化してください）
+    - `browser` — browserツール、`openclaw browser` CLI、`browser.request` Gatewayメソッド、browserランタイム、およびデフォルトbrowser controlサービス向けのバンドル済みbrowser Plugin（デフォルトで有効。置き換える前に無効化してください）
     - `copilot-proxy` — VS Code Copilot Proxyブリッジ（デフォルトでは無効）
   </Accordion>
 </AccordionGroup>
 
-サードパーティのPluginを探していますか？ [Community Plugins](/ja-JP/plugins/community)を参照してください。
+サードパーティPluginを探していますか？ [Community Plugins](/ja-JP/plugins/community) を参照してください。
 
 ## 設定
 
@@ -141,28 +133,26 @@ native Pluginを作成する場合は、[Building Plugins](/ja-JP/plugins/buildi
 }
 ```
 
-| フィールド       | 説明                                                      |
+| Field            | 説明                                               |
 | ---------------- | --------------------------------------------------------- |
-| `enabled`        | マスタートグル（デフォルト: `true`）                      |
-| `allow`          | Plugin許可リスト（任意）                                  |
-| `deny`           | Plugin拒否リスト（任意。拒否が優先）                      |
-| `load.paths`     | 追加のPluginファイル/ディレクトリ                         |
-| `slots`          | 排他的スロットセレクター（例: `memory`, `contextEngine`） |
-| `entries.\<id\>` | Pluginごとのトグル + 設定                                 |
+| `enabled`        | マスタートグル（デフォルト: `true`）                           |
+| `allow`          | Plugin allowlist（任意）                               |
+| `deny`           | Plugin denylist（任意。denyが優先）                     |
+| `load.paths`     | 追加のPluginファイル/ディレクトリ                            |
+| `slots`          | 排他的スロット選択子（例: `memory`, `contextEngine`） |
+| `entries.\<id\>` | Pluginごとのトグル + 設定                               |
 
-設定変更には**Gatewayの再起動が必要**です。Gatewayが設定監視 + プロセス内再起動を有効にして
-実行されている場合（デフォルトの`openclaw gateway`パス）、通常、この再起動は
-設定の書き込み後しばらくして自動的に実行されます。
+設定変更には**Gatewayの再起動が必要**です。Gatewayが設定監視 + インプロセス再起動有効状態（デフォルトの `openclaw gateway` パス）で動作している場合、その再起動は通常、設定書き込みの少し後に自動実行されます。
 
-<Accordion title="Pluginの状態: disabled と missing と invalid">
-  - **Disabled**: Pluginは存在しますが、有効化ルールによって無効化されています。設定は保持されます。
-  - **Missing**: 設定がPlugin IDを参照していますが、検出では見つかりませんでした。
-  - **Invalid**: Pluginは存在しますが、その設定が宣言されたスキーマに一致しません。
+<Accordion title="Plugin状態: disabled vs missing vs invalid">
+  - **Disabled**: Pluginは存在するが、有効化ルールによって無効化されています。設定は保持されます。
+  - **Missing**: 設定がPlugin IDを参照しているが、検出で見つかりませんでした。
+  - **Invalid**: Pluginは存在するが、その設定が宣言されたスキーマに一致しません。
 </Accordion>
 
 ## 検出と優先順位
 
-OpenClawは次の順序でPluginをスキャンします（最初に一致したものが優先されます）。
+OpenClawは、次の順序でPluginをスキャンします（最初に一致したものが優先）:
 
 <Steps>
   <Step title="設定パス">
@@ -177,55 +167,60 @@ OpenClawは次の順序でPluginをスキャンします（最初に一致した
     `~/.openclaw/<plugin-root>/*.ts` および `~/.openclaw/<plugin-root>/*/index.ts`。
   </Step>
 
-  <Step title="同梱Plugin">
+  <Step title="バンドル済みPlugin">
     OpenClawに同梱されています。多くはデフォルトで有効です（モデルプロバイダー、音声など）。
-    それ以外は明示的な有効化が必要です。
+    その他は明示的な有効化が必要です。
   </Step>
 </Steps>
 
 ### 有効化ルール
 
-- `plugins.enabled: false` はすべてのPluginを無効にします
+- `plugins.enabled: false` はすべてのPluginを無効化します
 - `plugins.deny` は常にallowより優先されます
-- `plugins.entries.\<id\>.enabled: false` はそのPluginを無効にします
+- `plugins.entries.\<id\>.enabled: false` はそのPluginを無効化します
 - ワークスペース由来のPluginは**デフォルトで無効**です（明示的に有効化する必要があります）
-- 同梱Pluginは、上書きされない限り、組み込みのデフォルト有効セットに従います
-- 排他的スロットは、そのスロット用に選択されたPluginを強制的に有効化できます
+- バンドル済みPluginは、上書きされない限り組み込みのデフォルト有効セットに従います
+- 排他的スロットは、そのスロットに選ばれたPluginを強制的に有効化することがあります
+- 一部のバンドル済みオプトインPluginは、設定でプロバイダーのmodel ref、チャンネル設定、ハーネスランタイムなどのPlugin所有サーフェスが指定されると自動的に有効化されます
+- OpenAI系のCodexルートは独立したPlugin境界を保ちます:
+  `openai-codex/*` はOpenAI Pluginに属し、一方でバンドル済みCodex
+  app-server Pluginは `embeddedHarness.runtime: "codex"` または従来の
+  `codex/*` model refs によって選択されます
 
 ## Pluginスロット（排他的カテゴリ）
 
-一部のカテゴリは排他的です（一度に1つだけ有効）。
+一部のカテゴリは排他的です（一度に1つだけ有効）:
 
 ```json5
 {
   plugins: {
     slots: {
       memory: "memory-core", // または "none" で無効化
-      contextEngine: "legacy", // または Plugin ID
+      contextEngine: "legacy", // またはPlugin id
     },
   },
 }
 ```
 
-| スロット        | 制御対象                 | デフォルト          |
-| --------------- | ------------------------ | ------------------- |
-| `memory`        | Active Memory Plugin     | `memory-core`       |
-| `contextEngine` | アクティブなコンテキストエンジン | `legacy` (組み込み) |
+| Slot            | 制御対象      | デフォルト             |
+| --------------- | --------------------- | ------------------- |
+| `memory`        | Active Memory Plugin  | `memory-core`       |
+| `contextEngine` | アクティブなコンテキストエンジン | `legacy`（組み込み） |
 
 ## CLIリファレンス
 
 ```bash
-openclaw plugins list                       # 簡潔な一覧
-openclaw plugins list --enabled            # 読み込まれているPluginのみ
+openclaw plugins list                       # コンパクトな一覧
+openclaw plugins list --enabled            # 読み込まれたPluginのみ
 openclaw plugins list --verbose            # Pluginごとの詳細行
 openclaw plugins list --json               # 機械可読な一覧
 openclaw plugins inspect <id>              # 詳細情報
 openclaw plugins inspect <id> --json       # 機械可読
-openclaw plugins inspect --all             # 全体テーブル
-openclaw plugins info <id>                 # inspectのエイリアス
+openclaw plugins inspect --all             # 全体表
+openclaw plugins info <id>                 # inspectの別名
 openclaw plugins doctor                    # 診断
 
-openclaw plugins install <package>         # インストール（最初にClawHub、その後npm）
+openclaw plugins install <package>         # インストール（最初にClawHub、次にnpm）
 openclaw plugins install clawhub:<pkg>     # ClawHubのみからインストール
 openclaw plugins install <spec> --force    # 既存インストールを上書き
 openclaw plugins install <path>            # ローカルパスからインストール
@@ -246,57 +241,35 @@ openclaw plugins enable <id>
 openclaw plugins disable <id>
 ```
 
-同梱PluginはOpenClawに同梱されています。多くはデフォルトで有効です（たとえば、
-同梱のモデルプロバイダー、同梱の音声プロバイダー、同梱のbrowser
-Plugin）。その他の同梱Pluginは、引き続き`openclaw plugins enable <id>`が必要です。
+バンドル済みPluginはOpenClawに同梱されています。多くはデフォルトで有効です（たとえば
+バンドル済みモデルプロバイダー、バンドル済み音声プロバイダー、バンドル済みbrowser
+Plugin）。その他のバンドル済みPluginは、引き続き `openclaw plugins enable <id>` が必要です。
 
-`--force`は、既存のインストール済みPluginまたはhook packをその場で上書きします。追跡されているnpm
-Pluginの通常のアップグレードには、`openclaw plugins update <id-or-npm-spec>`を使用してください。
-これは`--link`とは併用できません。`--link`は、管理されたインストール先にコピーする代わりに、
-ソースパスを再利用します。
+`--force` は、既存のインストール済みPluginまたはフックパックをその場で上書きします。追跡中のnpm
+Pluginの通常アップグレードには `openclaw plugins update <id-or-npm-spec>` を使用してください。これは `--link` ではサポートされません。`--link` は管理対象のインストール先へコピーせず、元のパスを再利用するためです。
 
-`plugins.allow`がすでに設定されている場合、`openclaw plugins install`は、
-インストールしたPlugin IDをそのallowlistに追加してから有効化するため、再起動後すぐに
-読み込み可能になります。
+`plugins.allow` がすでに設定されている場合、`openclaw plugins install` は、インストールした
+Plugin IDをそのallowlistへ追加してから有効化するため、再起動後すぐに読み込み可能になります。
 
-`openclaw plugins update <id-or-npm-spec>`は追跡されているインストールに適用されます。
-dist-tagまたは正確なバージョン付きのnpmパッケージspecを渡すと、パッケージ名が
-追跡中のPluginレコードへ解決し直され、今後の更新用に新しいspecが記録されます。
-バージョンなしのパッケージ名を渡すと、正確にpinされたインストールがレジストリの
-デフォルトのリリース系列へ戻されます。インストール済みのnpm Pluginが、解決されたバージョンおよび
-記録されたアーティファクト識別子にすでに一致している場合、OpenClawはダウンロード、再インストール、
-設定の書き換えを行わずに更新をスキップします。
+`openclaw plugins update <id-or-npm-spec>` は追跡中のインストールに適用されます。dist-tagまたは正確なバージョン付きのnpmパッケージspecを渡すと、パッケージ名を追跡中Pluginレコードへ解決し直し、将来の更新用に新しいspecを記録します。バージョンなしのパッケージ名を渡すと、正確にpinされたインストールはレジストリのデフォルトリリースラインへ戻されます。インストール済みnpm Pluginが、解決されたバージョンと記録済みアーティファクトIDにすでに一致している場合、OpenClawはダウンロード、再インストール、設定書き換えを行わずに更新をスキップします。
 
-`--pin`はnpm専用です。`--marketplace`とは併用できません。
-marketplaceインストールでは、npm specの代わりにmarketplaceソースメタデータが永続化されるためです。
+`--pin` はnpm専用です。`--marketplace` ではサポートされません。marketplaceインストールはnpm specではなく、marketplaceソースメタデータを永続化するためです。
 
-`--dangerously-force-unsafe-install`は、組み込みの危険コードスキャナーによる誤検知に対する
-緊急回避用のオーバーライドです。これにより、組み込みの`critical`検出結果があっても
-Pluginのインストールと更新を続行できますが、それでもPluginの`before_install`ポリシーブロックや
-スキャン失敗によるブロックは回避されません。
+`--dangerously-force-unsafe-install` は、組み込みの危険コードスキャナーによる誤検知に対する緊急用オーバーライドです。これにより、組み込みの `critical` 所見を超えてPluginインストールとPlugin更新を継続できますが、それでもPluginの `before_install` ポリシーブロックやスキャン失敗によるブロックは回避しません。
 
-このCLIフラグは、Pluginのインストール/更新フローにのみ適用されます。Gateway経由のSkill
-依存関係インストールでは、代わりに対応する`dangerouslyForceUnsafeInstall`リクエストオーバーライドを使用し、
-`openclaw skills install`は引き続き別個のClawHub Skillダウンロード/インストールフローです。
+このCLIフラグは、Pluginのインストール/更新フローにのみ適用されます。GatewayバックのSkill依存関係インストールでは、代わりに対応する `dangerouslyForceUnsafeInstall` リクエストオーバーライドを使用します。一方、`openclaw skills install` は別個のClawHub Skillsダウンロード/インストールフローのままです。
 
-互換Bundleは、同じPlugin list/inspect/enable/disableフローに参加します。
-現在のランタイムサポートには、Bundle Skills、Claude command-skills、
-Claude `settings.json`のデフォルト、Claude `.lsp.json`とマニフェスト宣言の
-`lspServers`デフォルト、Cursor command-skills、互換Codex hook
-ディレクトリが含まれます。
+互換Bundleは、同じPluginの一覧表示/inspect/enable/disableフローに参加します。現在のランタイムサポートには、bundle Skills、Claude command-skills、Claude `settings.json` デフォルト、Claude `.lsp.json` とマニフェスト宣言の `lspServers` デフォルト、Cursor command-skills、および互換Codexフックディレクトリが含まれます。
 
-`openclaw plugins inspect <id>`は、Bundle対応Plugin向けに、検出されたBundle機能に加え、
-サポートされる、またはサポートされないMCPおよびLSPサーバーエントリも報告します。
+`openclaw plugins inspect <id>` は、bundleバックPlugin向けに、検出されたbundle機能に加えて、サポートされる/サポートされないMCPおよびLSPサーバーエントリも報告します。
 
-Marketplaceソースには、`~/.claude/plugins/known_marketplaces.json`にあるClaudeの既知marketplace名、ローカルのmarketplaceルートまたは`marketplace.json`パス、`owner/repo`のようなGitHub短縮表記、GitHubリポジトリURL、またはgit URLを指定できます。リモートmarketplaceでは、Pluginエントリはクローンされたmarketplaceリポジトリ内にとどまり、ソースには相対パスのみを使用する必要があります。
+Marketplaceソースには、`~/.claude/plugins/known_marketplaces.json` にあるClaudeの既知marketplace名、ローカルmarketplaceルートまたは `marketplace.json` パス、`owner/repo` のようなGitHub省略記法、GitHubリポジトリURL、またはgit URLを使用できます。リモートmarketplaceでは、Pluginエントリはクローンしたmarketplaceリポジトリ内にとどまり、相対パスソースのみを使用する必要があります。
 
-完全な詳細については、[`openclaw plugins` CLIリファレンス](/ja-JP/cli/plugins)を参照してください。
+完全な詳細は [`openclaw plugins` CLIリファレンス](/ja-JP/cli/plugins) を参照してください。
 
 ## Plugin API概要
 
-native Pluginは、`register(api)`を公開するエントリオブジェクトをexportします。古い
-Pluginはレガシーなエイリアスとして`activate(api)`をまだ使用している場合がありますが、新しいPluginでは
-`register`を使用してください。
+ネイティブPluginは、`register(api)` を公開するエントリオブジェクトをexportします。古いPluginはまだ従来の別名として `activate(api)` を使うことがありますが、新しいPluginは `register` を使うべきです。
 
 ```typescript
 export default definePluginEntry({
@@ -316,48 +289,46 @@ export default definePluginEntry({
 });
 ```
 
-OpenClawはエントリオブジェクトを読み込み、Pluginの有効化時に`register(api)`を呼び出します。ローダーは古い
-Plugin向けに引き続き`activate(api)`へフォールバックしますが、同梱Pluginと新しいexternal Pluginでは、
-`register`を公開コントラクトとして扱う必要があります。
+OpenClawはエントリオブジェクトを読み込み、Plugin有効化時に `register(api)` を呼び出します。ローダーは古いPlugin向けに引き続き `activate(api)` へフォールバックしますが、バンドル済みPluginと新しい外部Pluginでは、`register` を公開契約として扱うべきです。
 
 一般的な登録メソッド:
 
-| メソッド                                | 登録されるもの              |
+| Method                                  | 登録するもの           |
 | --------------------------------------- | --------------------------- |
-| `registerProvider`                      | モデルプロバイダー（LLM）   |
-| `registerChannel`                       | チャットチャネル            |
-| `registerTool`                          | エージェントツール          |
-| `registerHook` / `on(...)`              | ライフサイクルフック        |
-| `registerSpeechProvider`                | テキスト読み上げ / STT      |
-| `registerRealtimeTranscriptionProvider` | ストリーミングSTT           |
-| `registerRealtimeVoiceProvider`         | 双方向リアルタイム音声      |
-| `registerMediaUnderstandingProvider`    | 画像/音声解析               |
-| `registerImageGenerationProvider`       | 画像生成                    |
-| `registerMusicGenerationProvider`       | 音楽生成                    |
-| `registerVideoGenerationProvider`       | 動画生成                    |
-| `registerWebFetchProvider`              | Webフェッチ / スクレイププロバイダー |
-| `registerWebSearchProvider`             | Web検索                     |
-| `registerHttpRoute`                     | HTTPエンドポイント          |
-| `registerCommand` / `registerCli`       | CLIコマンド                 |
-| `registerContextEngine`                 | コンテキストエンジン        |
-| `registerService`                       | バックグラウンドサービス    |
+| `registerProvider`                      | モデルプロバイダー（LLM）        |
+| `registerChannel`                       | チャットチャンネル                |
+| `registerTool`                          | エージェントツール                  |
+| `registerHook` / `on(...)`              | ライフサイクルフック             |
+| `registerSpeechProvider`                | テキスト読み上げ / STT        |
+| `registerRealtimeTranscriptionProvider` | ストリーミングSTT               |
+| `registerRealtimeVoiceProvider`         | 双方向realtime音声       |
+| `registerMediaUnderstandingProvider`    | 画像/音声解析        |
+| `registerImageGenerationProvider`       | 画像生成            |
+| `registerMusicGenerationProvider`       | 音楽生成            |
+| `registerVideoGenerationProvider`       | 動画生成            |
+| `registerWebFetchProvider`              | Web取得 / スクレイププロバイダー |
+| `registerWebSearchProvider`             | Web検索                  |
+| `registerHttpRoute`                     | HTTPエンドポイント               |
+| `registerCommand` / `registerCli`       | CLIコマンド                |
+| `registerContextEngine`                 | コンテキストエンジン              |
+| `registerService`                       | バックグラウンドサービス          |
 
-型付きライフサイクルフックにおけるフックガードの動作:
+型付きライフサイクルフックのフックガード動作:
 
-- `before_tool_call`: `{ block: true }`は終端です。より低い優先度のハンドラーはスキップされます。
-- `before_tool_call`: `{ block: false }`は何もしない動作で、以前のblockを解除しません。
-- `before_install`: `{ block: true }`は終端です。より低い優先度のハンドラーはスキップされます。
-- `before_install`: `{ block: false }`は何もしない動作で、以前のblockを解除しません。
-- `message_sending`: `{ cancel: true }`は終端です。より低い優先度のハンドラーはスキップされます。
-- `message_sending`: `{ cancel: false }`は何もしない動作で、以前のcancelを解除しません。
+- `before_tool_call`: `{ block: true }` は終端です。より低優先度のハンドラーはスキップされます。
+- `before_tool_call`: `{ block: false }` はno-opであり、以前のblockを解除しません。
+- `before_install`: `{ block: true }` は終端です。より低優先度のハンドラーはスキップされます。
+- `before_install`: `{ block: false }` はno-opであり、以前のblockを解除しません。
+- `message_sending`: `{ cancel: true }` は終端です。より低優先度のハンドラーはスキップされます。
+- `message_sending`: `{ cancel: false }` はno-opであり、以前のcancelを解除しません。
 
-完全な型付きフックの動作については、[SDK Overview](/ja-JP/plugins/sdk-overview#hook-decision-semantics)を参照してください。
+型付きフックの完全な動作については、[SDK Overview](/ja-JP/plugins/sdk-overview#hook-decision-semantics) を参照してください。
 
 ## 関連
 
-- [Building Plugins](/ja-JP/plugins/building-plugins) — 独自のPluginを作成する
-- [Plugin Bundles](/ja-JP/plugins/bundles) — Codex/Claude/Cursor Bundle互換性
+- [Building Plugins](/ja-JP/plugins/building-plugins) — 独自Pluginを作成
+- [Plugin Bundles](/ja-JP/plugins/bundles) — Codex/Claude/Cursor Bundle互換
 - [Plugin Manifest](/ja-JP/plugins/manifest) — マニフェストスキーマ
-- [Registering Tools](/ja-JP/plugins/building-plugins#registering-agent-tools) — Pluginにエージェントツールを追加する
+- [Registering Tools](/ja-JP/plugins/building-plugins#registering-agent-tools) — Pluginにエージェントツールを追加
 - [Plugin Internals](/ja-JP/plugins/architecture) — 機能モデルと読み込みパイプライン
 - [Community Plugins](/ja-JP/plugins/community) — サードパーティ一覧

@@ -1,79 +1,91 @@
 ---
 read_when:
-    - 新しいコア capability と Plugin 登録 surface を追加する場合
-    - コードを core、vendor Plugin、または feature Plugin のどこに置くべきか判断する場合
-    - チャネルまたはツール向けの新しい runtime helper を配線する場合
+    - 新しいcore capabilityとPlugin登録面の追加
+    - コードをcore、vendor Plugin、またはfeature Pluginのどこに置くべきかを判断すること
+    - チャネルまたはツール向けの新しいランタイムhelperの配線
 sidebarTitle: Adding Capabilities
-summary: OpenClaw Plugin システムに新しい共有 capability を追加するためのコントリビューターガイド
-title: capability の追加（コントリビューターガイド）
+summary: OpenClaw Pluginシステムに新しい共有capabilityを追加するためのコントリビューターガイド
+title: capabilityの追加（コントリビューターガイド）
 x-i18n:
-    generated_at: "2026-04-24T05:24:11Z"
+    generated_at: "2026-04-24T09:02:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f1e3251b9150c9744d967e91f531dfce01435b13aea3a17088ccd54f2145d14f
+    source_hash: 864506dd3f61aa64e7c997c9d9e05ce0ad70c80a26a734d4f83b2e80331be4ab
     source_path: tools/capability-cookbook.md
     workflow: 15
 ---
 
 <Info>
-  これは OpenClaw コア開発者向けの**コントリビューターガイド**です。外部 Plugin を構築している場合は、代わりに [Building Plugins](/ja-JP/plugins/building-plugins)
-  を参照してください。
+  これはOpenClaw core開発者向けの**コントリビューターガイド**です。外部Pluginを作成している場合は、代わりに[Building Plugins](/ja-JP/plugins/building-plugins)を参照してください。
 </Info>
 
-image generation、video generation、あるいは将来の vendor 提供機能領域のような新しいドメインが OpenClaw に必要なときにこれを使います。
+これは、OpenClawが画像生成、動画生成、または将来のvendor支援機能領域のような新しいドメインを必要とするときに使います。
 
-ルールは次のとおりです:
+ルールは次のとおりです。
 
-- plugin = ownership boundary
-- capability = shared core contract
+- plugin = 所有境界
+- capability = 共有core契約
 
-つまり、vendor をチャネルやツールに直接配線するところから始めてはいけません。まず capability を定義してください。
+つまり、vendorを直接チャネルやツールへ配線することから始めてはいけません。まずcapabilityを定義することから始めてください。
 
-## capability を作成するタイミング
+## capabilityを作るべきタイミング
 
-次のすべてに当てはまる場合は、新しい capability を作成します:
+次のすべてに当てはまる場合、新しいcapabilityを作成してください。
 
-1. 複数の vendor が実装できる可能性がある
-2. チャネル、ツール、または feature Plugin が vendor を意識せずにそれを利用すべきである
-3. fallback、policy、config、または配信動作を core が所有する必要がある
+1. 複数のvendorが実装する可能性がもっともらしくある
+2. チャネル、ツール、またはfeature Pluginが、vendorを意識せずにそれを利用すべきである
+3. coreがfallback、ポリシー、設定、または配信挙動を所有する必要がある
 
-作業が vendor 専用で、まだ共有 contract が存在しないなら、いったん止まって先に contract を定義してください。
+その作業がvendor専用で、共有契約がまだ存在しないなら、いったん止めて先に契約を定義してください。
 
 ## 標準的な手順
 
-1. 型付き core contract を定義する。
-2. その contract 用の Plugin 登録を追加する。
-3. 共有 runtime helper を追加する。
-4. 実証として実在の vendor Plugin を 1 つ配線する。
-5. feature / channel consumer を runtime helper に移行する。
-6. contract テストを追加する。
-7. operator 向け config と ownership model を文書化する。
+1. 型付きのcore契約を定義する。
+2. その契約のPlugin登録を追加する。
+3. 共有ランタイムhelperを追加する。
+4. 証明として、実際のvendor Pluginを1つ配線する。
+5. feature/チャネル利用側をランタイムhelperへ移行する。
+6. 契約テストを追加する。
+7. オペレーター向け設定と所有モデルをドキュメント化する。
 
-## 何をどこに置くか
+## どこに何を置くか
 
 Core:
 
-- request / response 型
-- provider registry + resolution
-- fallback 動作
-- config schema と、ネストした object、wildcard、array-item、composition node に伝播される `title` / `description` ドキュメント metadata
-- runtime helper surface
+- リクエスト/レスポンス型
+- プロバイダーregistry + 解決
+- fallback挙動
+- 設定スキーマと、ネストしたobject、wildcard、配列項目、composition nodeへ伝播される`title` / `description`ドキュメントメタデータ
+- ランタイムhelper面
 
-Vendor plugin:
+Vendor Plugin:
 
-- vendor API 呼び出し
-- vendor 認証処理
-- vendor 固有のリクエスト正規化
-- capability 実装の登録
+- vendor API呼び出し
+- vendor認証処理
+- vendor固有のリクエスト正規化
+- capability実装の登録
 
-Feature / channel plugin:
+Feature/チャネルPlugin:
 
-- `api.runtime.*` または対応する `plugin-sdk/*-runtime` helper を呼ぶ
-- vendor 実装を直接呼んではならない
+- `api.runtime.*`または対応する`plugin-sdk/*-runtime` helperを呼び出す
+- vendor実装を直接呼び出してはならない
+
+## ProviderとHarnessのシーム
+
+その挙動が汎用エージェントループではなくモデルプロバイダー契約に属する場合は、providerフックを使ってください。例としては、トランスポート選択後のプロバイダー固有リクエストパラメータ、auth-profile優先、プロンプトoverlay、モデル/profile failover後のフォローアップfallback routingなどがあります。
+
+その挙動がターンを実行しているランタイムに属する場合は、agent harnessフックを使ってください。ハーネスは、空の応答、reasoningのみ、planningのみの応答など、成功はしているが使えないattempt結果を分類できるため、外側のモデルfallbackポリシーが再試行を判断できます。
+
+どちらのシームも狭く保ってください。
+
+- coreはretry/fallbackポリシーを所有する
+- provider Pluginはプロバイダー固有のリクエスト/auth/routing hintを所有する
+- harness Pluginはランタイム固有のattempt分類を所有する
+- サードパーティPluginは、core stateの直接変更ではなくhintを返す
 
 ## ファイルチェックリスト
 
-新しい capability では、次の領域に触れることを想定してください:
+新しいcapabilityでは、次の領域に触れることを想定してください。
 
 - `src/<capability>/types.ts`
 - `src/<capability>/...registry/runtime.ts`
@@ -85,37 +97,37 @@ Feature / channel plugin:
 - `src/plugins/runtime/index.ts`
 - `src/plugin-sdk/<capability>.ts`
 - `src/plugin-sdk/<capability>-runtime.ts`
-- 1 つ以上のバンドル済み Plugin パッケージ
-- config / docs / tests
+- 1つ以上の同梱Pluginパッケージ
+- config/docs/tests
 
-## 例: image generation
+## 例: 画像生成
 
-image generation は標準的な形に従います:
+画像生成は標準的な形に従います。
 
-1. core が `ImageGenerationProvider` を定義する
-2. core が `registerImageGenerationProvider(...)` を公開する
-3. core が `runtime.imageGeneration.generate(...)` を公開する
-4. `openai`、`google`、`fal`、`minimax` Plugin が vendor 提供の実装を登録する
-5. 将来の vendor も、チャネル / ツールを変更せずに同じ contract を登録できる
+1. coreが`ImageGenerationProvider`を定義する
+2. coreが`registerImageGenerationProvider(...)`を公開する
+3. coreが`runtime.imageGeneration.generate(...)`を公開する
+4. `openai`、`google`、`fal`、`minimax` Pluginがvendor支援実装を登録する
+5. 将来のvendorも、チャネル/ツールを変更せずに同じ契約を登録できる
 
-config key は vision-analysis routing とは分かれています:
+設定キーはvision-analysis routingとは分かれています。
 
 - `agents.defaults.imageModel` = 画像を解析する
 - `agents.defaults.imageGenerationModel` = 画像を生成する
 
-fallback と policy が明示的に保たれるよう、これらは分けたままにしてください。
+fallbackとポリシーを明示的に保つため、これらは分けたままにしてください。
 
 ## レビューチェックリスト
 
-新しい capability を出荷する前に、次を確認してください:
+新しいcapabilityを出荷する前に、次を確認してください。
 
-- チャネル / ツールが vendor コードを直接 import していない
-- runtime helper が共有パスになっている
-- 少なくとも 1 つの contract テストが bundled ownership を検証している
-- config docs に新しい model / config key が記載されている
-- Plugin docs が ownership boundary を説明している
+- どのチャネル/ツールもvendorコードを直接importしていない
+- ランタイムhelperが共有経路になっている
+- 少なくとも1つの契約テストが同梱所有を検証している
+- 設定ドキュメントに新しいモデル/設定キーが記載されている
+- Pluginドキュメントが所有境界を説明している
 
-PR が capability レイヤーを飛ばして vendor の動作をチャネル / ツールにハードコードしている場合は、差し戻して先に contract を定義してください。
+PRがcapabilityレイヤーを飛ばしてチャネル/ツールにvendor挙動をハードコードしている場合は、差し戻して先に契約を定義してください。
 
 ## 関連
 
