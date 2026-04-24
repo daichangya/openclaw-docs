@@ -1,15 +1,15 @@
 ---
 read_when:
     - Налаштування OpenClaw на Oracle Cloud
-    - Пошук безкоштовного VPS-хостингу для OpenClaw
-    - Потрібен OpenClaw 24/7 на невеликому сервері
-summary: Розгорнути OpenClaw на Always Free ARM tier від Oracle Cloud
+    - Шукаєте безкоштовний VPS-хостинг для OpenClaw
+    - Хочете мати OpenClaw 24/7 на невеликому сервері
+summary: Розміщення OpenClaw на Always Free ARM tier від Oracle Cloud
 title: Oracle Cloud
 x-i18n:
-    generated_at: "2026-04-23T20:57:43Z"
+    generated_at: "2026-04-24T03:19:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0d3272cac5549e98f1e19031dd9af9399a60488a5e3b20d026cd28aa48dc04d0
+    source_hash: dce0d2a33556c8e48a48df744f8d1341fcfa78c93ff5a5e02a5013d207f3e6ed
     source_path: install/oracle.md
     workflow: 15
 ---
@@ -18,16 +18,16 @@ x-i18n:
 
 ## Передумови
 
-- Обліковий запис Oracle Cloud ([реєстрація](https://www.oracle.com/cloud/free/)) — див. [посібник зі створення облікового запису від спільноти](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd), якщо виникнуть проблеми
+- Обліковий запис Oracle Cloud ([реєстрація](https://www.oracle.com/cloud/free/)) -- див. [посібник із реєстрації від спільноти](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd), якщо виникнуть проблеми
 - Обліковий запис Tailscale (безкоштовно на [tailscale.com](https://tailscale.com))
 - Пара SSH-ключів
-- Приблизно 30 хвилин
+- Близько 30 хвилин
 
 ## Налаштування
 
 <Steps>
-  <Step title="Створіть екземпляр OCI">
-    1. Увійдіть у [Oracle Cloud Console](https://cloud.oracle.com/).
+  <Step title="Створення екземпляра OCI">
+    1. Увійдіть до [Oracle Cloud Console](https://cloud.oracle.com/).
     2. Перейдіть до **Compute > Instances > Create Instance**.
     3. Налаштуйте:
        - **Name:** `openclaw`
@@ -36,16 +36,16 @@ x-i18n:
        - **OCPUs:** 2 (або до 4)
        - **Memory:** 12 ГБ (або до 24 ГБ)
        - **Boot volume:** 50 ГБ (до 200 ГБ безкоштовно)
-       - **SSH key:** додайте свій публічний ключ
+       - **SSH key:** Додайте свій публічний ключ
     4. Натисніть **Create** і запишіть публічну IP-адресу.
 
     <Tip>
-    Якщо створення екземпляра завершується помилкою "Out of capacity", спробуйте інший availability domain або повторіть пізніше. Ємність free tier обмежена.
+    Якщо створення екземпляра завершується помилкою "Out of capacity", спробуйте інший availability domain або повторіть спробу пізніше. Ресурси free tier обмежені.
     </Tip>
 
   </Step>
 
-  <Step title="Підключіться й оновіть систему">
+  <Step title="Підключення та оновлення системи">
     ```bash
     ssh ubuntu@YOUR_PUBLIC_IP
 
@@ -57,18 +57,18 @@ x-i18n:
 
   </Step>
 
-  <Step title="Налаштуйте користувача та ім’я хоста">
+  <Step title="Налаштування користувача та hostname">
     ```bash
     sudo hostnamectl set-hostname openclaw
     sudo passwd ubuntu
     sudo loginctl enable-linger ubuntu
     ```
 
-    Увімкнення linger дає змогу службам користувача працювати після виходу із системи.
+    Увімкнення linger дозволяє користувацьким службам працювати після виходу із системи.
 
   </Step>
 
-  <Step title="Установіть Tailscale">
+  <Step title="Встановлення Tailscale">
     ```bash
     curl -fsSL https://tailscale.com/install.sh | sh
     sudo tailscale up --ssh --hostname=openclaw
@@ -78,17 +78,17 @@ x-i18n:
 
   </Step>
 
-  <Step title="Установіть OpenClaw">
+  <Step title="Встановлення OpenClaw">
     ```bash
     curl -fsSL https://openclaw.ai/install.sh | bash
     source ~/.bashrc
     ```
 
-    Коли з’явиться запитання "How do you want to hatch your bot?", виберіть **Do this later**.
+    Коли з’явиться запит "How do you want to hatch your bot?", виберіть **Do this later**.
 
   </Step>
 
-  <Step title="Налаштуйте gateway">
+  <Step title="Налаштування gateway">
     Використовуйте автентифікацію токеном із Tailscale Serve для безпечного віддаленого доступу.
 
     ```bash
@@ -101,23 +101,23 @@ x-i18n:
     systemctl --user restart openclaw-gateway.service
     ```
 
-    `gateway.trustedProxies=["127.0.0.1"]` тут потрібне лише для обробки forwarded-IP/local-client локальним проксі Tailscale Serve. Це **не** `gateway.auth.mode: "trusted-proxy"`. Маршрути diff viewer у цій конфігурації зберігають поведінку fail-closed: необроблені запити viewer до `127.0.0.1` без forwarded proxy headers можуть повертати `Diff not found`. Використовуйте `mode=file` / `mode=both` для вкладень або навмисно ввімкніть віддалені viewer і задайте `plugins.entries.diffs.config.viewerBaseUrl` (або передайте proxy `baseUrl`), якщо вам потрібні спільні посилання на viewer.
+    `gateway.trustedProxies=["127.0.0.1"]` тут використовується лише для обробки forwarded-IP/local-client локального проксі Tailscale Serve. Це **не** `gateway.auth.mode: "trusted-proxy"`. Маршрути переглядача diff у цій конфігурації зберігають fail-closed-поведінку: сирі запити переглядача `127.0.0.1` без forwarded proxy headers можуть повертати `Diff not found`. Для вкладень використовуйте `mode=file` / `mode=both`, або навмисно ввімкніть віддалені переглядачі й задайте `plugins.entries.diffs.config.viewerBaseUrl` (або передайте proxy `baseUrl`), якщо вам потрібні придатні для поширення посилання на переглядач.
 
   </Step>
 
-  <Step title="Посильте безпеку VCN">
-    Блокуйте весь трафік, окрім Tailscale, на мережевому рівні:
+  <Step title="Посилення безпеки VCN">
+    Заблокуйте весь трафік, крім Tailscale, на рівні мережі:
 
-    1. У OCI Console перейдіть до **Networking > Virtual Cloud Networks**.
-    2. Виберіть свій VCN, потім **Security Lists > Default Security List**.
-    3. **Видаліть** усі ingress-правила, крім `0.0.0.0/0 UDP 41641` (Tailscale).
-    4. Залиште типові egress-правила (дозволити весь вихідний трафік).
+    1. Перейдіть до **Networking > Virtual Cloud Networks** в OCI Console.
+    2. Натисніть свій VCN, потім **Security Lists > Default Security List**.
+    3. **Видаліть** усі правила ingress, крім `0.0.0.0/0 UDP 41641` (Tailscale).
+    4. Залиште типові правила egress (дозволити весь вихідний трафік).
 
-    Це блокує SSH на порту 22, HTTP, HTTPS та все інше на мережевому рівні. З цього моменту підключення можливе лише через Tailscale.
+    Це блокує SSH на порту 22, HTTP, HTTPS та все інше на рівні мережі. Відтепер ви можете підключатися лише через Tailscale.
 
   </Step>
 
-  <Step title="Перевірте">
+  <Step title="Перевірка">
     ```bash
     openclaw --version
     systemctl --user status openclaw-gateway.service
@@ -125,20 +125,20 @@ x-i18n:
     curl http://localhost:18789
     ```
 
-    Відкрийте Control UI з будь-якого пристрою у вашому tailnet:
+    Отримайте доступ до Control UI з будь-якого пристрою у вашій tailnet:
 
     ```
     https://openclaw.<tailnet-name>.ts.net/
     ```
 
-    Замініть `<tailnet-name>` на назву вашого tailnet (її видно в `tailscale status`).
+    Замініть `<tailnet-name>` на назву вашої tailnet (видно в `tailscale status`).
 
   </Step>
 </Steps>
 
-## Резервний варіант: SSH tunnel
+## Резервний варіант: SSH-тунель
 
-Якщо Tailscale Serve не працює, використайте SSH tunnel зі своєї локальної машини:
+Якщо Tailscale Serve не працює, використовуйте SSH-тунель із локальної машини:
 
 ```bash
 ssh -L 18789:127.0.0.1:18789 ubuntu@openclaw
@@ -148,16 +148,22 @@ ssh -L 18789:127.0.0.1:18789 ubuntu@openclaw
 
 ## Усунення несправностей
 
-**Не вдається створити екземпляр ("Out of capacity")** — ARM-екземпляри free tier популярні. Спробуйте інший availability domain або повторіть у непікові години.
+**Не вдається створити екземпляр ("Out of capacity")** -- ARM-екземпляри free tier популярні. Спробуйте інший availability domain або повторіть спробу в непікові години.
 
-**Tailscale не підключається** — запустіть `sudo tailscale up --ssh --hostname=openclaw --reset`, щоб повторно пройти автентифікацію.
+**Tailscale не підключається** -- Виконайте `sudo tailscale up --ssh --hostname=openclaw --reset`, щоб повторно пройти автентифікацію.
 
-**Gateway не запускається** — запустіть `openclaw doctor --non-interactive` і перевірте журнали через `journalctl --user -u openclaw-gateway.service -n 50`.
+**Gateway не запускається** -- Виконайте `openclaw doctor --non-interactive` і перевірте журнали через `journalctl --user -u openclaw-gateway.service -n 50`.
 
-**Проблеми з ARM-бінарниками** — більшість npm-пакетів працює на ARM64. Для нативних бінарників шукайте випуски `linux-arm64` або `aarch64`. Перевірте архітектуру через `uname -m`.
+**Проблеми з ARM-бінарниками** -- Більшість npm-пакетів працюють на ARM64. Для нативних бінарних файлів шукайте випуски `linux-arm64` або `aarch64`. Перевірте архітектуру через `uname -m`.
 
 ## Наступні кроки
 
-- [Канали](/uk/channels) — підключіть Telegram, WhatsApp, Discord та інші
-- [Конфігурація Gateway](/uk/gateway/configuration) — усі параметри конфігурації
-- [Оновлення](/uk/install/updating) — підтримуйте OpenClaw в актуальному стані
+- [Channels](/uk/channels) -- підключіть Telegram, WhatsApp, Discord та інші
+- [Конфігурація Gateway](/uk/gateway/configuration) -- усі параметри конфігурації
+- [Оновлення](/uk/install/updating) -- підтримуйте OpenClaw в актуальному стані
+
+## Пов’язане
+
+- [Огляд встановлення](/uk/install)
+- [GCP](/uk/install/gcp)
+- [VPS hosting](/uk/vps)

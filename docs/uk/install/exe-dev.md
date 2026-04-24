@@ -1,36 +1,36 @@
 ---
 read_when:
-    - Вам потрібен недорогий постійно увімкнений Linux-хост для Gateway
-    - Ви хочете мати віддалений доступ до Control UI без власного VPS
-summary: Запуск OpenClaw Gateway на exe.dev (VM + HTTPS proxy) для віддаленого доступу
+    - Ви хочете недорогий Linux-хост, який завжди працює, для Gateway
+    - Ви хочете віддалений доступ до Control UI без власного VPS
+summary: Запустіть Gateway OpenClaw на exe.dev (VM + HTTPS-proxy) для віддаленого доступу
 title: exe.dev
 x-i18n:
-    generated_at: "2026-04-23T20:56:47Z"
+    generated_at: "2026-04-24T03:18:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3ac8d51c939f10ed32a035fa13d0a41bd5dbfba7bcc8489b19c20954bda81259
+    source_hash: 0ec992a734dc55c190d5ef3bdd020aa12e9613958a87d8998727264f6f3d3c1f
     source_path: install/exe-dev.md
     workflow: 15
 ---
 
 Мета: Gateway OpenClaw, запущений на VM exe.dev, доступний з вашого ноутбука за адресою: `https://<vm-name>.exe.xyz`
 
-Ця сторінка припускає стандартний образ **exeuntu** від exe.dev. Якщо ви вибрали інший дистрибутив, відповідно підберіть пакети.
+Ця сторінка передбачає стандартний образ **exeuntu** від exe.dev. Якщо ви вибрали інший дистрибутив, відповідно зіставте пакунки.
 
 ## Швидкий шлях для початківців
 
 1. [https://exe.new/openclaw](https://exe.new/openclaw)
-2. Заповніть свій auth key/token за потреби
-3. Натисніть "Agent" поруч зі своєю VM і дочекайтеся, поки Shelley завершить розгортання
-4. Відкрийте `https://<vm-name>.exe.xyz/` і пройдіть автентифікацію за допомогою налаштованого shared secret (у цьому посібнику типово використовується token auth, але password auth теж працює, якщо ви переключите `gateway.auth.mode`)
-5. Схваліть усі pending device pairing requests через `openclaw devices approve <requestId>`
+2. Заповніть свій ключ/токен автентифікації за потреби
+3. Натисніть "Agent" поруч із вашою VM і дочекайтеся, поки Shelley завершить підготовку
+4. Відкрийте `https://<vm-name>.exe.xyz/` і пройдіть автентифікацію за допомогою налаштованого спільного секрету (у цьому посібнику типово використовується автентифікація token, але автентифікація password також працює, якщо ви перемкнете `gateway.auth.mode`)
+5. Схваліть усі очікувані запити на спарювання пристроїв за допомогою `openclaw devices approve <requestId>`
 
 ## Що вам потрібно
 
 - обліковий запис exe.dev
 - доступ `ssh exe.dev` до віртуальних машин [exe.dev](https://exe.dev) (необов’язково)
 
-## Автоматичне встановлення за допомогою Shelley
+## Автоматизоване встановлення за допомогою Shelley
 
 Shelley, агент [exe.dev](https://exe.dev), може миттєво встановити OpenClaw за нашим
 prompt. Використаний prompt наведено нижче:
@@ -43,7 +43,7 @@ Set up OpenClaw (https://docs.openclaw.ai/install) on this VM. Use the non-inter
 
 ## 1) Створіть VM
 
-Зі свого пристрою:
+З вашого пристрою:
 
 ```bash
 ssh exe.dev new
@@ -55,18 +55,18 @@ ssh exe.dev new
 ssh <vm-name>.exe.xyz
 ```
 
-Порада: тримайте цю VM **stateful**. OpenClaw зберігає `openclaw.json`, `auth-profiles.json`
-для кожного агента, сесії та стан каналів/provider-ів у
-`~/.openclaw/`, а також робочий простір у `~/.openclaw/workspace/`.
+Порада: залишайте цю VM **stateful**. OpenClaw зберігає `openclaw.json`, `auth-profiles.json`
+для кожного агента, сесії та стан каналу/провайдера в
+`~/.openclaw/`, а також робочу область у `~/.openclaw/workspace/`.
 
-## 2) Установіть залежності (на VM)
+## 2) Встановіть передумови (на VM)
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y git curl jq ca-certificates openssl
 ```
 
-## 3) Установіть OpenClaw
+## 3) Встановіть OpenClaw
 
 Запустіть скрипт встановлення OpenClaw:
 
@@ -74,9 +74,9 @@ sudo apt-get install -y git curl jq ca-certificates openssl
 curl -fsSL https://openclaw.ai/install.sh | bash
 ```
 
-## 4) Налаштуйте nginx для проксування OpenClaw на порт 8000
+## 4) Налаштуйте nginx для proxy OpenClaw на порт 8000
 
-Відредагуйте `/etc/nginx/sites-enabled/default`, вставивши:
+Відредагуйте `/etc/nginx/sites-enabled/default`, додавши
 
 ```
 server {
@@ -108,23 +108,23 @@ server {
 }
 ```
 
-Перезаписуйте forwarding headers замість збереження ланцюжків, наданих клієнтом.
-OpenClaw довіряє метаданим forwarded IP лише від явно налаштованих proxy,
-а ланцюжки `X-Forwarded-For` у стилі append розглядаються як ризик для посилення безпеки.
+Перезаписуйте заголовки переспрямування замість збереження ланцюжків, переданих клієнтом.
+OpenClaw довіряє метаданим переспрямованих IP лише від явно налаштованих proxy,
+а ланцюжки `X-Forwarded-For` у стилі append вважаються ризиком для посилення захисту.
 
-## 5) Отримайте доступ до OpenClaw і надайте дозволи
+## 5) Отримайте доступ до OpenClaw і надайте привілеї
 
-Перейдіть на `https://<vm-name>.exe.xyz/` (див. вивід onboarding Control UI). Якщо з’являється запит на auth, вставте
-налаштований shared secret із VM. У цьому посібнику використовується token auth, тож отримайте `gateway.auth.token`
-через `openclaw config get gateway.auth.token` (або згенеруйте його через `openclaw doctor --generate-gateway-token`).
-Якщо ви переключили gateway на password auth, використовуйте `gateway.auth.password` / `OPENCLAW_GATEWAY_PASSWORD`.
-Схвалюйте пристрої через `openclaw devices list` і `openclaw devices approve <requestId>`. Якщо сумніваєтеся, використовуйте Shelley у браузері!
+Відкрийте `https://<vm-name>.exe.xyz/` (див. вивід Control UI під час onboarding). Якщо з’явиться запит на автентифікацію, вставте
+налаштований спільний секрет із VM. У цьому посібнику використовується автентифікація token, тому отримайте `gateway.auth.token`
+за допомогою `openclaw config get gateway.auth.token` (або згенеруйте його командою `openclaw doctor --generate-gateway-token`).
+Якщо ви змінили gateway на автентифікацію password, використовуйте натомість `gateway.auth.password` / `OPENCLAW_GATEWAY_PASSWORD`.
+Схвалюйте пристрої за допомогою `openclaw devices list` і `openclaw devices approve <requestId>`. Якщо сумніваєтеся, використовуйте Shelley у браузері!
 
 ## Віддалений доступ
 
-Віддалений доступ забезпечується автентифікацією [exe.dev](https://exe.dev). Типово
-HTTP-трафік із порту 8000 пересилається на `https://<vm-name>.exe.xyz`
-з email auth.
+Віддалений доступ забезпечується автентифікацією [exe.dev](https://exe.dev). За
+замовчуванням HTTP-трафік з порту 8000 переспрямовується на `https://<vm-name>.exe.xyz`
+з автентифікацією за email.
 
 ## Оновлення
 
@@ -135,4 +135,9 @@ openclaw gateway restart
 openclaw health
 ```
 
-Посібник: [Updating](/uk/install/updating)
+Посібник: [Оновлення](/uk/install/updating)
+
+## Пов’язане
+
+- [Віддалений gateway](/uk/gateway/remote)
+- [Огляд встановлення](/uk/install)

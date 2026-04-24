@@ -2,13 +2,13 @@
 read_when:
     - Ви хочете видалити OpenClaw з машини
     - Сервіс gateway усе ще працює після видалення
-summary: Повністю видалити OpenClaw (CLI, сервіс, state, workspace)
-title: Видалення
+summary: Повністю видалити OpenClaw (CLI, service, стан, робочий простір)
+title: Видалення OpenClaw
 x-i18n:
-    generated_at: "2026-04-23T20:58:14Z"
+    generated_at: "2026-04-24T03:19:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 37f96121335e8e29140a2b9e1de9190ce379fc687448fd317b982af52899d2f7
+    source_hash: 6d73bc46f4878510706132e5c6cfec3c27cdb55578ed059dc12a785712616d75
     source_path: install/uninstall.md
     workflow: 15
 ---
@@ -20,7 +20,7 @@ x-i18n:
 
 ## Простий шлях (CLI усе ще встановлено)
 
-Рекомендовано: використовуйте вбудований деінсталятор:
+Рекомендовано: скористайтеся вбудованим деінсталятором:
 
 ```bash
 openclaw uninstall
@@ -47,21 +47,21 @@ openclaw gateway stop
 openclaw gateway uninstall
 ```
 
-3. Видаліть state + config:
+3. Видаліть стан і конфігурацію:
 
 ```bash
 rm -rf "${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
 ```
 
-Якщо ви встановили `OPENCLAW_CONFIG_PATH` на користувацьке розташування поза каталогом state, видаліть і цей файл.
+Якщо ви встановили `OPENCLAW_CONFIG_PATH` на власне розташування поза каталогом стану, видаліть і цей файл.
 
-4. Видаліть свій workspace (необов’язково, видаляє файли агента):
+4. Видаліть робочий простір (необов’язково, видаляє файли агента):
 
 ```bash
 rm -rf ~/.openclaw/workspace
 ```
 
-5. Видаліть встановлений CLI (оберіть той варіант, який ви використовували):
+5. Видаліть встановлений CLI (виберіть той спосіб, який ви використовували):
 
 ```bash
 npm rm -g openclaw
@@ -77,25 +77,25 @@ rm -rf /Applications/OpenClaw.app
 
 Примітки:
 
-- Якщо ви використовували профілі (`--profile` / `OPENCLAW_PROFILE`), повторіть крок 3 для кожного каталогу state (типові значення — `~/.openclaw-<profile>`).
-- У віддаленому режимі каталог state розташований на **хості gateway**, тож виконайте кроки 1-4 також там.
+- Якщо ви використовували профілі (`--profile` / `OPENCLAW_PROFILE`), повторіть крок 3 для кожного каталогу стану (типові значення — `~/.openclaw-<profile>`).
+- У віддаленому режимі каталог стану розташований на **хості gateway**, тож виконайте кроки 1–4 і там також.
 
 ## Ручне видалення сервісу (CLI не встановлено)
 
-Використовуйте це, якщо сервіс gateway продовжує працювати, але `openclaw` відсутній.
+Використовуйте цей шлях, якщо сервіс gateway продовжує працювати, але `openclaw` відсутній.
 
 ### macOS (launchd)
 
-Типова мітка — `ai.openclaw.gateway` (або `ai.openclaw.<profile>`; застарілі `com.openclaw.*` також можуть усе ще існувати):
+Типова мітка — `ai.openclaw.gateway` (або `ai.openclaw.<profile>`; застарілі `com.openclaw.*` усе ще можуть існувати):
 
 ```bash
 launchctl bootout gui/$UID/ai.openclaw.gateway
 rm -f ~/Library/LaunchAgents/ai.openclaw.gateway.plist
 ```
 
-Якщо ви використовували профіль, замініть мітку й ім’я plist на `ai.openclaw.<profile>`. Також видаліть усі наявні застарілі plist `com.openclaw.*`.
+Якщо ви використовували профіль, замініть мітку та ім’я plist на `ai.openclaw.<profile>`. Якщо є, видаліть усі застарілі plist `com.openclaw.*`.
 
-### Linux (user unit systemd)
+### Linux (користувацький unit systemd)
 
 Типова назва unit — `openclaw-gateway.service` (або `openclaw-gateway-<profile>.service`):
 
@@ -108,26 +108,31 @@ systemctl --user daemon-reload
 ### Windows (Scheduled Task)
 
 Типова назва завдання — `OpenClaw Gateway` (або `OpenClaw Gateway (<profile>)`).
-Скрипт завдання розташований у вашому каталозі state.
+Скрипт завдання розташований у вашому каталозі стану.
 
 ```powershell
 schtasks /Delete /F /TN "OpenClaw Gateway"
 Remove-Item -Force "$env:USERPROFILE\.openclaw\gateway.cmd"
 ```
 
-Якщо ви використовували профіль, видаліть відповідну назву завдання і `~\.openclaw-<profile>\gateway.cmd`.
+Якщо ви використовували профіль, видаліть відповідну назву завдання та `~\.openclaw-<profile>\gateway.cmd`.
 
-## Звичайне встановлення vs checkout вихідного коду
+## Звичайне встановлення vs checkout з джерела
 
-### Звичайне встановлення (`install.sh` / npm / pnpm / bun)
+### Звичайне встановлення (install.sh / npm / pnpm / bun)
 
 Якщо ви використовували `https://openclaw.ai/install.sh` або `install.ps1`, CLI було встановлено через `npm install -g openclaw@latest`.
-Видаліть його через `npm rm -g openclaw` (або `pnpm remove -g` / `bun remove -g`, якщо ви встановлювали саме так).
+Видаліть його за допомогою `npm rm -g openclaw` (або `pnpm remove -g` / `bun remove -g`, якщо встановлювали саме так).
 
-### Checkout вихідного коду (git clone)
+### Checkout з джерела (git clone)
 
 Якщо ви запускаєте з checkout репозиторію (`git clone` + `openclaw ...` / `bun run openclaw ...`):
 
-1. Видаліть сервіс gateway **до** видалення репозиторію (використайте простий шлях вище або ручне видалення сервісу).
+1. Видаліть сервіс gateway **перед** видаленням репозиторію (скористайтеся простим шляхом вище або ручним видаленням сервісу).
 2. Видаліть каталог репозиторію.
-3. Видаліть state + workspace, як показано вище.
+3. Видаліть стан і робочий простір, як показано вище.
+
+## Пов’язано
+
+- [Огляд встановлення](/uk/install)
+- [Посібник з міграції](/uk/install/migrating)

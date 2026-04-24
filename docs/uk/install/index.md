@@ -1,22 +1,28 @@
 ---
 read_when:
-    - Вам потрібен спосіб встановлення, відмінний від короткого сценарію в Getting Started
+    - Вам потрібен спосіб встановлення, відмінний від швидкого старту Getting Started
     - Ви хочете розгорнути на хмарній платформі
-    - Вам потрібно оновити, перенести або видалити систему
-summary: Встановлення OpenClaw — скрипт інсталятора, npm/pnpm/bun, зі source, Docker тощо
+    - Потрібно оновити, мігрувати або видалити
+summary: Встановлення OpenClaw — скрипт інсталятора, npm/pnpm/bun, із source, Docker тощо
 title: Встановлення
 x-i18n:
-    generated_at: "2026-04-23T20:57:09Z"
+    generated_at: "2026-04-24T03:18:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a30a8c5caa4ae917b09b2362be86800a5ed034c515dd1072fc7001014c10c654
+    source_hash: 48cb531ff09cd9ba076e5a995753c6acd5273f58d9d0f1e51010bf77a18bf85e
     source_path: install/index.md
     workflow: 15
 ---
 
+## Системні вимоги
+
+- **Node 24** (рекомендовано) або Node 22.14+ — скрипт інсталятора обробляє це автоматично
+- **macOS, Linux або Windows** — підтримуються і нативний Windows, і WSL2; WSL2 стабільніший. Див. [Windows](/uk/platforms/windows).
+- `pnpm` потрібен лише якщо ви збираєте із source
+
 ## Рекомендовано: скрипт інсталятора
 
-Найшвидший спосіб встановлення. Він визначає вашу ОС, встановлює Node за потреби, встановлює OpenClaw і запускає onboarding.
+Найшвидший спосіб встановлення. Він визначає вашу ОС, за потреби встановлює Node, встановлює OpenClaw і запускає onboarding.
 
 <Tabs>
   <Tab title="macOS / Linux / WSL2">
@@ -46,27 +52,21 @@ x-i18n:
   </Tab>
 </Tabs>
 
-Усі прапорці та параметри для CI/автоматизації див. в [Внутрішні механізми інсталятора](/uk/install/installer).
-
-## Системні вимоги
-
-- **Node 24** (рекомендовано) або Node 22.14+ — скрипт інсталятора обробляє це автоматично
-- **macOS, Linux або Windows** — підтримуються як нативний Windows, так і WSL2; WSL2 стабільніший. Див. [Windows](/uk/platforms/windows).
-- `pnpm` потрібен лише якщо ви збираєте зі source
+Усі прапорці та параметри для CI/автоматизації див. в [Внутрішня будова інсталятора](/uk/install/installer).
 
 ## Альтернативні способи встановлення
 
-### Інсталятор у локальний prefix (`install-cli.sh`)
+### Інсталятор локального префікса (`install-cli.sh`)
 
-Використовуйте це, якщо хочете, щоб OpenClaw і Node зберігалися під локальним prefix, наприклад
+Використовуйте цей варіант, якщо ви хочете, щоб OpenClaw і Node зберігалися під локальним префіксом, наприклад
 `~/.openclaw`, без залежності від системного встановлення Node:
 
 ```bash
 curl -fsSL https://openclaw.ai/install-cli.sh | bash
 ```
 
-Він типово підтримує npm-встановлення, а також встановлення з git-checkout у тому ж
-потоці prefix. Повний довідник: [Внутрішні механізми інсталятора](/uk/install/installer#install-clish).
+Він типово підтримує встановлення через npm, а також встановлення з git checkout у межах того самого
+потоку з префіксом. Повний довідник: [Внутрішня будова інсталятора](/uk/install/installer#install-clish).
 
 ### npm, pnpm або bun
 
@@ -87,7 +87,7 @@ curl -fsSL https://openclaw.ai/install-cli.sh | bash
     ```
 
     <Note>
-    pnpm вимагає явного схвалення для пакетів зі build-скриптами. Після першого встановлення виконайте `pnpm approve-builds -g`.
+    pnpm потребує явного підтвердження для пакетів зі скриптами збірки. Після першого встановлення виконайте `pnpm approve-builds -g`.
     </Note>
 
   </Tab>
@@ -98,14 +98,14 @@ curl -fsSL https://openclaw.ai/install-cli.sh | bash
     ```
 
     <Note>
-    Bun підтримується для шляху глобального встановлення CLI. Для runtime Gateway рекомендованим daemon runtime залишається Node.
+    Bun підтримується для шляху глобального встановлення CLI. Для середовища виконання Gateway рекомендованим середовищем виконання daemon залишається Node.
     </Note>
 
   </Tab>
 </Tabs>
 
 <Accordion title="Усунення несправностей: помилки збірки sharp (npm)">
-  Якщо `sharp` не працює через глобально встановлений libvips:
+  Якщо `sharp` завершується помилкою через глобально встановлений libvips:
 
 ```bash
 SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install -g openclaw@latest
@@ -113,9 +113,9 @@ SHARP_IGNORE_GLOBAL_LIBVIPS=1 npm install -g openclaw@latest
 
 </Accordion>
 
-### Зі source
+### Із source
 
-Для контриб’юторів або всіх, хто хоче запускати з локального checkout:
+Для контриб’юторів або тих, хто хоче запускати з локального checkout:
 
 ```bash
 git clone https://github.com/openclaw/openclaw.git
@@ -125,7 +125,7 @@ pnpm link --global
 openclaw onboard --install-daemon
 ```
 
-Або пропустіть link і використовуйте `pnpm openclaw ...` зсередини repo. Повні робочі процеси розробки див. в [Налаштування](/uk/start/setup).
+Або пропустіть link і використовуйте `pnpm openclaw ...` всередині репозиторію. Повні робочі процеси розробки див. у [Setup](/uk/start/setup).
 
 ### Встановлення з GitHub main
 
@@ -133,23 +133,23 @@ openclaw onboard --install-daemon
 npm install -g github:openclaw/openclaw#main
 ```
 
-### Контейнери та пакетні менеджери
+### Контейнери та менеджери пакетів
 
 <CardGroup cols={2}>
   <Card title="Docker" href="/uk/install/docker" icon="container">
-    Контейнеризовані або безголові розгортання.
+    Контейнеризовані або headless-розгортання.
   </Card>
   <Card title="Podman" href="/uk/install/podman" icon="container">
-    Rootless контейнерна альтернатива Docker.
+    Rootless-альтернатива Docker для контейнерів.
   </Card>
   <Card title="Nix" href="/uk/install/nix" icon="snowflake">
-    Декларативне встановлення через Nix flake.
+    Декларативне встановлення через flake Nix.
   </Card>
   <Card title="Ansible" href="/uk/install/ansible" icon="server">
-    Автоматизоване розгортання у флоті машин.
+    Автоматизоване розгортання парку систем.
   </Card>
   <Card title="Bun" href="/uk/install/bun" icon="zap">
-    Використання лише CLI через runtime Bun.
+    Використання лише CLI через середовище виконання Bun.
   </Card>
 </CardGroup>
 
@@ -161,11 +161,11 @@ openclaw doctor         # перевірити проблеми конфігур
 openclaw gateway status # перевірити, що Gateway запущений
 ```
 
-Якщо після встановлення ви хочете керований запуск:
+Якщо після встановлення вам потрібен керований автозапуск:
 
 - macOS: LaunchAgent через `openclaw onboard --install-daemon` або `openclaw gateway install`
-- Linux/WSL2: user service systemd через ті самі команди
-- Нативний Windows: спочатку Scheduled Task, із запасним per-user login item у папці Startup, якщо створення завдання заборонене
+- Linux/WSL2: користувацька служба systemd через ті самі команди
+- Нативний Windows: насамперед Scheduled Task, із резервним елементом входу в папці Startup для кожного користувача, якщо створення завдання заборонено
 
 ## Хостинг і розгортання
 
@@ -187,31 +187,31 @@ openclaw gateway status # перевірити, що Gateway запущений
 ## Оновлення, міграція або видалення
 
 <CardGroup cols={3}>
-  <Card title="Оновлення" href="/uk/install/updating" icon="refresh-cw">
+  <Card title="Updating" href="/uk/install/updating" icon="refresh-cw">
     Підтримуйте OpenClaw в актуальному стані.
   </Card>
-  <Card title="Міграція" href="/uk/install/migrating" icon="arrow-right">
-    Перенесіть систему на нову машину.
+  <Card title="Migrating" href="/uk/install/migrating" icon="arrow-right">
+    Перенесення на нову машину.
   </Card>
-  <Card title="Видалення" href="/uk/install/uninstall" icon="trash-2">
-    Повністю видаліть OpenClaw.
+  <Card title="Uninstall" href="/uk/install/uninstall" icon="trash-2">
+    Повністю видалити OpenClaw.
   </Card>
 </CardGroup>
 
 ## Усунення несправностей: `openclaw` не знайдено
 
-Якщо встановлення пройшло успішно, але `openclaw` не знаходиться у вашому терміналі:
+Якщо встановлення виконалося успішно, але `openclaw` не знаходиться у вашому терміналі:
 
 ```bash
 node -v           # Node встановлено?
-npm prefix -g     # Де глобальні пакети?
+npm prefix -g     # Де розташовані глобальні пакети?
 echo "$PATH"      # Чи є глобальний каталог bin у PATH?
 ```
 
-Якщо `$(npm prefix -g)/bin` немає у вашому `$PATH`, додайте його у файл запуску shell (`~/.zshrc` або `~/.bashrc`):
+Якщо `$(npm prefix -g)/bin` немає у вашому `$PATH`, додайте його до файла запуску вашої оболонки (`~/.zshrc` або `~/.bashrc`):
 
 ```bash
 export PATH="$(npm prefix -g)/bin:$PATH"
 ```
 
-Потім відкрийте новий термінал. Докладніше див. в [Налаштування Node](/uk/install/node).
+Потім відкрийте новий термінал. Докладніше див. у [Налаштування Node](/uk/install/node).

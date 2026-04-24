@@ -1,13 +1,13 @@
 ---
 read_when:
-    - Ви хочете кілька ізольованих агентів (робочі простори + маршрутизація + автентифікація)
-summary: Довідник CLI для `openclaw agents` (`list`/`add`/`delete`/`bindings`/`bind`/`unbind`/`set identity`)
+    - Ви хочете мати кілька ізольованих агентів (робочі простори + маршрутизація + автентифікація)
+summary: Довідник CLI для `openclaw agents` (list/add/delete/bindings/bind/unbind/set identity)
 title: Агенти
 x-i18n:
-    generated_at: "2026-04-23T20:45:57Z"
+    generated_at: "2026-04-24T03:15:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 55fb9a79fade299556a785780619e0422ba3e4a24c0e6e287510948c15df83ec
+    source_hash: d39cacdec57971dc6a62afb8102e6802178b7cc6ac645e60733a55c2144a1edc
     source_path: cli/agents.md
     workflow: 15
 ---
@@ -16,11 +16,11 @@ x-i18n:
 
 Керуйте ізольованими агентами (робочі простори + автентифікація + маршрутизація).
 
-Пов’язане:
+Пов’язано:
 
-- Маршрутизація з кількома агентами: [Multi-Agent Routing](/uk/concepts/multi-agent)
-- Робочий простір агента: [Agent workspace](/uk/concepts/agent-workspace)
-- Конфігурація видимості Skills: [Skills config](/uk/tools/skills-config)
+- Маршрутизація кількох агентів: [Маршрутизація кількох агентів](/uk/concepts/multi-agent)
+- Робочий простір агента: [Робочий простір агента](/uk/concepts/agent-workspace)
+- Конфігурація видимості Skills: [Конфігурація Skills](/uk/tools/skills-config)
 
 ## Приклади
 
@@ -41,12 +41,12 @@ openclaw agents delete work
 
 Використовуйте прив’язки маршрутизації, щоб закріпити вхідний трафік каналу за конкретним агентом.
 
-Якщо ви також хочете різний видимий набір Skills для кожного агента, налаштуйте
+Якщо ви також хочете мати різні видимі Skills для кожного агента, налаштуйте
 `agents.defaults.skills` і `agents.list[].skills` у `openclaw.json`. Див.
-[Skills config](/uk/tools/skills-config) і
-[Configuration Reference](/uk/gateway/configuration-reference#agents-defaults-skills).
+[Конфігурація Skills](/uk/tools/skills-config) і
+[Довідник з конфігурації](/uk/gateway/configuration-reference#agents-defaults-skills).
 
-Список прив’язок:
+Перелічити прив’язки:
 
 ```bash
 openclaw agents bindings
@@ -54,21 +54,21 @@ openclaw agents bindings --agent work
 openclaw agents bindings --json
 ```
 
-Додавання прив’язок:
+Додати прив’язки:
 
 ```bash
 openclaw agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-Якщо ви пропускаєте `accountId` (`--bind <channel>`), OpenClaw визначає його з типових значень каналу та хуків налаштування Plugin, коли вони доступні.
+Якщо ви пропустите `accountId` (`--bind <channel>`), OpenClaw визначить його з типових значень каналу та хуків налаштування Plugin, коли вони доступні.
 
-Якщо ви пропускаєте `--agent` для `bind` або `unbind`, OpenClaw використовує поточний типовий агент.
+Якщо ви пропустите `--agent` для `bind` або `unbind`, OpenClaw використовуватиме поточного типового агента.
 
 ### Поведінка області дії прив’язки
 
 - Прив’язка без `accountId` відповідає лише типовому обліковому запису каналу.
-- `accountId: "*"` — це резервний варіант для всього каналу (усі облікові записи) і він менш специфічний, ніж явна прив’язка облікового запису.
-- Якщо той самий агент уже має відповідну прив’язку каналу без `accountId`, а пізніше ви виконуєте прив’язку з явним або визначеним `accountId`, OpenClaw оновлює цю наявну прив’язку на місці замість додавання дубліката.
+- `accountId: "*"` є резервним варіантом для всього каналу (усі облікові записи) і є менш специфічним, ніж явна прив’язка облікового запису.
+- Якщо той самий агент уже має відповідну прив’язку каналу без `accountId`, а ви пізніше додаєте прив’язку з явним або визначеним `accountId`, OpenClaw оновлює цю наявну прив’язку на місці замість додавання дубліката.
 
 Приклад:
 
@@ -80,16 +80,16 @@ openclaw agents bind --agent work --bind telegram
 openclaw agents bind --agent work --bind telegram:ops
 ```
 
-Після оновлення маршрутизація для цієї прив’язки обмежується `telegram:ops`. Якщо вам також потрібна маршрутизація для типового облікового запису, додайте її явно (наприклад, `--bind telegram:default`).
+Після оновлення маршрутизація для цієї прив’язки матиме область дії `telegram:ops`. Якщо ви також хочете маршрутизацію для типового облікового запису, додайте її явно (наприклад, `--bind telegram:default`).
 
-Видалення прив’язок:
+Видалити прив’язки:
 
 ```bash
 openclaw agents unbind --agent work --bind telegram:ops
 openclaw agents unbind --agent work --all
 ```
 
-`unbind` приймає або `--all`, або одне чи кілька значень `--bind`, але не обидва варіанти одночасно.
+`unbind` приймає або `--all`, або одне чи більше значень `--bind`, але не обидва варіанти одночасно.
 
 ## Поверхня команд
 
@@ -102,7 +102,7 @@ openclaw agents unbind --agent work --all
 Параметри:
 
 - `--json`
-- `--bindings`: включити повні правила маршрутизації, а не лише кількість/зведення для кожного агента
+- `--bindings`: включити повні правила маршрутизації, а не лише кількість/підсумки для кожного агента
 
 ### `agents add [name]`
 
@@ -117,9 +117,9 @@ openclaw agents unbind --agent work --all
 
 Примітки:
 
-- Передавання будь-яких явних прапорців add переводить команду в неінтерактивний режим.
+- Передавання будь-яких явних прапорців додавання переводить команду в неінтерактивний режим.
 - Неінтерактивний режим вимагає імені агента та `--workspace`.
-- `main` зарезервовано й не може використовуватися як ідентифікатор нового агента.
+- `main` зарезервовано, і його не можна використовувати як ідентифікатор нового агента.
 
 ### `agents bindings`
 
@@ -156,20 +156,20 @@ openclaw agents unbind --agent work --all
 
 - `main` не можна видалити.
 - Без `--force` потрібне інтерактивне підтвердження.
-- Каталоги робочого простору, стану агента та транскриптів сесій переміщуються в Trash, а не видаляються безповоротно.
+- Каталоги робочого простору, стану агента та транскриптів сесій переміщуються до Кошика, а не видаляються остаточно.
 
-## Файли identity
+## Файли ідентичності
 
 Кожен робочий простір агента може містити `IDENTITY.md` у корені робочого простору:
 
 - Приклад шляху: `~/.openclaw/workspace/IDENTITY.md`
-- `set-identity --from-identity` читає з кореня робочого простору (або з явно вказаного `--identity-file`)
+- `set-identity --from-identity` читає з кореня робочого простору (або з явного `--identity-file`)
 
 Шляхи до аватарів визначаються відносно кореня робочого простору.
 
-## Налаштування identity
+## Установлення ідентичності
 
-`set-identity` записує поля в `agents.list[].identity`:
+`set-identity` записує поля до `agents.list[].identity`:
 
 - `name`
 - `theme`
@@ -191,16 +191,16 @@ openclaw agents unbind --agent work --all
 Примітки:
 
 - Для вибору цільового агента можна використовувати `--agent` або `--workspace`.
-- Якщо ви покладаєтеся на `--workspace`, а кілька агентів використовують той самий робочий простір, команда завершується помилкою та просить передати `--agent`.
-- Якщо явні поля identity не надано, команда читає дані identity з `IDENTITY.md`.
+- Якщо ви покладаєтеся на `--workspace`, а кілька агентів використовують цей робочий простір, команда завершиться з помилкою й попросить вас передати `--agent`.
+- Коли явні поля ідентичності не вказані, команда читає дані ідентичності з `IDENTITY.md`.
 
-Завантаження з `IDENTITY.md`:
+Завантажити з `IDENTITY.md`:
 
 ```bash
 openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
 ```
 
-Явне перевизначення полів:
+Явно перевизначити поля:
 
 ```bash
 openclaw agents set-identity --agent main --name "OpenClaw" --emoji "🦞" --avatar avatars/openclaw.png
@@ -225,3 +225,9 @@ openclaw agents set-identity --agent main --name "OpenClaw" --emoji "🦞" --ava
   },
 }
 ```
+
+## Пов’язано
+
+- [Довідник CLI](/uk/cli)
+- [Маршрутизація кількох агентів](/uk/concepts/multi-agent)
+- [Робочий простір агента](/uk/concepts/agent-workspace)
