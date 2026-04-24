@@ -1,67 +1,73 @@
 ---
 read_when:
     - Налаштування поведінки голосового оверлею
-summary: Життєвий цикл голосового оверлею, коли wake-word і push-to-talk перекриваються
+summary: Життєвий цикл голосового оверлею, коли перетинаються wake-word і push-to-talk
 title: Голосовий оверлей
 x-i18n:
-    generated_at: "2026-04-23T21:01:19Z"
+    generated_at: "2026-04-24T04:17:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ca195d981b5b4c63fca84edcaf8a15fde0c1c04972ef0f331d34837d82a75074
+    source_hash: 3ae98afad57dffe73e2c878eef4f3253e4464d68cadf531e9239b017cc160f28
     source_path: platforms/mac/voice-overlay.md
     workflow: 15
 ---
 
 # Життєвий цикл голосового оверлею (macOS)
 
-Аудиторія: учасники розробки macOS-застосунку. Мета: зробити голосовий оверлей передбачуваним, коли wake-word і push-to-talk перекриваються.
+Аудиторія: учасники розробки застосунку macOS. Мета: забезпечити передбачувану поведінку голосового оверлею, коли wake-word і push-to-talk перетинаються.
 
 ## Поточний намір
 
-- Якщо оверлей уже видимий через wake-word і користувач натискає гарячу клавішу, сесія гарячої клавіші _усиновлює_ наявний текст замість скидання. Оверлей залишається відкритим, доки гарячу клавішу утримують. Коли користувач відпускає: надсилати, якщо є обрізаний текст, інакше закривати.
-- Wake-word сам по собі, як і раніше, автоматично надсилає після тиші; push-to-talk надсилає одразу після відпускання.
+- Якщо оверлей уже видимий через wake-word і користувач натискає гарячу клавішу, сесія гарячої клавіші _підхоплює_ наявний текст замість його скидання. Оверлей залишається відкритим, поки гаряча клавіша утримується. Коли користувач відпускає клавішу: надіслати, якщо є обрізаний текст, інакше закрити.
+- Wake-word сам по собі, як і раніше, автоматично надсилає на тиші; push-to-talk надсилає одразу після відпускання.
 
 ## Реалізовано (9 грудня 2025)
 
-- Сесії оверлею тепер несуть token для кожного capture (wake-word або push-to-talk). Оновлення partial/final/send/dismiss/level відкидаються, якщо token не збігається, що запобігає застарілим callback-ам.
-- Push-to-talk усиновлює будь-який текст видимого оверлею як префікс (тобто натискання гарячої клавіші, коли wake-оверлей уже відкрито, зберігає текст і додає нову мову). Він очікує до 1.5 с на фінальний транскрипт, перш ніж використовувати fallback до поточного тексту.
-- Логування chime/overlay тепер відбувається на рівні `info` в категоріях `voicewake.overlay`, `voicewake.ptt` і `voicewake.chime` (старт сесії, partial, final, send, dismiss, причина chime).
+- Сесії оверлею тепер мають token для кожного захоплення (wake-word або push-to-talk). Оновлення partial/final/send/dismiss/level відкидаються, якщо token не збігається, що запобігає застарілим callback.
+- Push-to-talk підхоплює будь-який текст видимого оверлею як префікс (тобто натискання гарячої клавіші, поки відкритий wake-оверлей, зберігає текст і додає нове мовлення). Він чекає до 1.5 с на фінальний transcript, а потім повертається до поточного тексту.
+- Логування chime/overlay виводиться на рівні `info` у категоріях `voicewake.overlay`, `voicewake.ptt` і `voicewake.chime` (початок сесії, partial, final, send, dismiss, причина chime).
 
 ## Наступні кроки
 
 1. **VoiceSessionCoordinator (actor)**
-   - Володіє рівно однією `VoiceSession` за раз.
-   - API (на основі token-ів): `beginWakeCapture`, `beginPushToTalk`, `updatePartial`, `endCapture`, `cancel`, `applyCooldown`.
-   - Відкидає callback-и, які несуть застарілі token-и (це запобігає повторному відкриттю оверлею старими recognizer-ами).
+   - Керує рівно однією `VoiceSession` одночасно.
+   - API (на основі token): `beginWakeCapture`, `beginPushToTalk`, `updatePartial`, `endCapture`, `cancel`, `applyCooldown`.
+   - Відкидає callback, що містять застарілі token (це не дає старим recognizer знову відкрити оверлей).
 2. **VoiceSession (model)**
    - Поля: `token`, `source` (wakeWord|pushToTalk), committed/volatile text, прапорці chime, таймери (auto-send, idle), `overlayMode` (display|editing|sending), дедлайн cooldown.
 3. **Прив’язка оверлею**
-   - `VoiceSessionPublisher` (`ObservableObject`) дзеркалить активну сесію у SwiftUI.
-   - `VoiceWakeOverlayView` рендериться лише через publisher; він ніколи не мутує напряму глобальні singleton-и.
-   - Дії користувача в оверлеї (`sendNow`, `dismiss`, `edit`) викликають callback у coordinator із token-ом сесії.
+   - `VoiceSessionPublisher` (`ObservableObject`) віддзеркалює активну сесію у SwiftUI.
+   - `VoiceWakeOverlayView` рендериться лише через publisher; він ніколи не змінює глобальні singleton напряму.
+   - Дії користувача в оверлеї (`sendNow`, `dismiss`, `edit`) викликають coordinator назад із token сесії.
 4. **Уніфікований шлях надсилання**
-   - Під час `endCapture`: якщо обрізаний текст порожній → закрити; інакше `performSend(session:)` (один раз відтворює send chime, пересилає, закриває).
+   - На `endCapture`: якщо обрізаний текст порожній → закрити; інакше `performSend(session:)` (один раз відтворює chime надсилання, пересилає, закриває).
    - Push-to-talk: без затримки; wake-word: необов’язкова затримка для auto-send.
-   - Після завершення push-to-talk застосовується короткий cooldown до runtime wake, щоб wake-word не тригерився знову одразу.
+   - Застосовує короткий cooldown до середовища виконання wake після завершення push-to-talk, щоб wake-word не спрацьовував знову одразу.
 5. **Логування**
-   - Coordinator надсилає логи `.info` у subsystem `ai.openclaw`, категорії `voicewake.overlay` і `voicewake.chime`.
+   - Coordinator виводить логи `.info` у subsystem `ai.openclaw`, категоріях `voicewake.overlay` і `voicewake.chime`.
    - Ключові події: `session_started`, `adopted_by_push_to_talk`, `partial`, `finalized`, `send`, `dismiss`, `cancel`, `cooldown`.
 
-## Checklist налагодження
+## Список перевірки для налагодження
 
-- Потоково переглядайте логи під час відтворення “липкого” оверлею:
+- Потоково виводьте логи під час відтворення завислого оверлею:
 
   ```bash
   sudo log stream --predicate 'subsystem == "ai.openclaw" AND category CONTAINS "voicewake"' --level info --style compact
   ```
 
-- Переконайтеся, що активний лише один token сесії; застарілі callback-и coordinator має відкидати.
-- Переконайтеся, що відпускання push-to-talk завжди викликає `endCapture` з активним token-ом; якщо текст порожній, очікуйте `dismiss` без chime або send.
+- Переконайтеся, що активний лише один token сесії; застарілі callback мають відкидатися coordinator.
+- Переконайтеся, що відпускання push-to-talk завжди викликає `endCapture` з активним token; якщо текст порожній, очікуйте `dismiss` без chime і без надсилання.
 
 ## Кроки міграції (рекомендовано)
 
 1. Додайте `VoiceSessionCoordinator`, `VoiceSession` і `VoiceSessionPublisher`.
-2. Переробіть `VoiceWakeRuntime`, щоб він створював/оновлював/завершував сесії замість прямої роботи з `VoiceWakeOverlayController`.
-3. Переробіть `VoicePushToTalk`, щоб він усиновлював наявні сесії й викликав `endCapture` після відпускання; застосовуйте cooldown runtime.
-4. Під’єднайте `VoiceWakeOverlayController` до publisher; приберіть прямі виклики з runtime/PTT.
-5. Додайте integration-тести для усиновлення сесії, cooldown і закриття за порожнього тексту.
+2. Переробіть `VoiceWakeRuntime`, щоб він створював/оновлював/завершував сесії замість прямої взаємодії з `VoiceWakeOverlayController`.
+3. Переробіть `VoicePushToTalk`, щоб він підхоплював наявні сесії та викликав `endCapture` при відпусканні; застосуйте cooldown середовища виконання.
+4. Підключіть `VoiceWakeOverlayController` до publisher; приберіть прямі виклики з runtime/PTT.
+5. Додайте інтеграційні тести для підхоплення сесій, cooldown і закриття при порожньому тексті.
+
+## Пов’язане
+
+- [Застосунок macOS](/uk/platforms/macos)
+- [Голосове пробудження (macOS)](/uk/platforms/mac/voicewake)
+- [Режим Talk](/uk/nodes/talk)

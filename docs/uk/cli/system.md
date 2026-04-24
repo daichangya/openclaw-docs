@@ -1,23 +1,23 @@
 ---
 read_when:
     - Ви хочете поставити системну подію в чергу без створення завдання Cron
-    - Вам потрібно ввімкнути або вимкнути Heartbeat-и
-    - Ви хочете перевірити записи системної presence
-summary: Довідник CLI для `openclaw system` (системні події, Heartbeat, presence)
+    - Вам потрібно ввімкнути або вимкнути Heartbeat
+    - Ви хочете переглянути записи присутності системи
+summary: Довідка CLI для `openclaw system` (системні події, Heartbeat, присутність)
 title: Система
 x-i18n:
-    generated_at: "2026-04-23T20:48:47Z"
+    generated_at: "2026-04-24T04:13:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 890e188c4026ccac426cb71df78b6b4a6b7ac35d654b6b2e33eede502af8bd9c
+    source_hash: 0f4be30b0b2d18ee5653071d6375cebeb9fc94733e30bdb7b89a19c286df880b
     source_path: cli/system.md
     workflow: 15
 ---
 
 # `openclaw system`
 
-Допоміжні системні команди для Gateway: постановка системних подій у чергу, керування Heartbeat-ами
-та перегляд presence.
+Допоміжні засоби рівня системи для Gateway: постановка системних подій у чергу, керування Heartbeat
+і перегляд присутності.
 
 Усі підкоманди `system` використовують Gateway RPC і приймають спільні прапорці клієнта:
 
@@ -26,7 +26,7 @@ x-i18n:
 - `--timeout <ms>`
 - `--expect-final`
 
-## Типові команди
+## Поширені команди
 
 ```bash
 openclaw system event --text "Check for urgent follow-ups" --mode now
@@ -38,9 +38,9 @@ openclaw system presence
 
 ## `system event`
 
-Поставити системну подію в чергу в **main** session. Наступний Heartbeat впровадить
+Поставити системну подію в чергу в **головній** сесії. Наступний Heartbeat вставить
 її як рядок `System:` у prompt. Використовуйте `--mode now`, щоб запустити Heartbeat
-негайно; `next-heartbeat` чекає на наступний запланований tick.
+негайно; `next-heartbeat` чекає наступного запланованого такту.
 
 Прапорці:
 
@@ -54,8 +54,8 @@ openclaw system presence
 Керування Heartbeat:
 
 - `last`: показати останню подію Heartbeat.
-- `enable`: знову ввімкнути Heartbeat-и (використовуйте це, якщо їх було вимкнено).
-- `disable`: призупинити Heartbeat-и.
+- `enable`: знову ввімкнути Heartbeat (використовуйте це, якщо їх було вимкнено).
+- `disable`: призупинити Heartbeat.
 
 Прапорці:
 
@@ -64,8 +64,8 @@ openclaw system presence
 
 ## `system presence`
 
-Перелічити поточні записи системної presence, відомі Gateway (вузли,
-інстанси та подібні рядки стану).
+Показати поточні записи присутності системи, про які знає Gateway (nodes,
+екземпляри та подібні рядки стану).
 
 Прапорці:
 
@@ -75,4 +75,8 @@ openclaw system presence
 ## Примітки
 
 - Потрібен запущений Gateway, доступний через вашу поточну конфігурацію (локальну або віддалену).
-- Системні події є ефемерними й не зберігаються після перезапусків.
+- Системні події є тимчасовими й не зберігаються після перезапусків.
+
+## Пов’язане
+
+- [Довідка CLI](/uk/cli)

@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Ви хочете використовувати Perplexity Search для веб-пошуку
+    - Вам потрібно використовувати пошук Perplexity для вебпошуку
     - Вам потрібно налаштувати `PERPLEXITY_API_KEY` або `OPENROUTER_API_KEY`
-summary: API пошуку Perplexity і сумісність Sonar/OpenRouter для `web_search`
-title: Пошук Perplexity (legacy-шлях)
+summary: API пошуку Perplexity та сумісність Sonar/OpenRouter для `web_search`
+title: Пошук Perplexity (застарілий шлях)
 x-i18n:
-    generated_at: "2026-04-23T20:59:43Z"
+    generated_at: "2026-04-24T04:15:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c1196ff5bb8e319c7148207b6c394097aeb80a722e3dc7243314896465bd4248
+    source_hash: 87a7b6e14f636cfe6b7c5833af1b0aecb334a39babbb779c32f29bbbb5c9e14a
     source_path: perplexity.md
     workflow: 15
 ---
@@ -18,25 +18,25 @@ x-i18n:
 OpenClaw підтримує API пошуку Perplexity як provider для `web_search`.
 Він повертає структуровані результати з полями `title`, `url` і `snippet`.
 
-Для сумісності OpenClaw також підтримує застарілі конфігурації Perplexity Sonar/OpenRouter.
+Для сумісності OpenClaw також підтримує застарілі налаштування Perplexity Sonar/OpenRouter.
 Якщо ви використовуєте `OPENROUTER_API_KEY`, ключ `sk-or-...` у `plugins.entries.perplexity.config.webSearch.apiKey` або задаєте `plugins.entries.perplexity.config.webSearch.baseUrl` / `model`, provider перемикається на шлях chat-completions і повертає згенеровані ШІ відповіді з цитуваннями замість структурованих результатів API пошуку.
 
-## Отримання API key Perplexity
+## Отримання API-ключа Perplexity
 
-1. Створіть акаунт Perplexity на [perplexity.ai/settings/api](https://www.perplexity.ai/settings/api)
-2. Згенеруйте API key у dashboard
-3. Збережіть ключ у config або задайте `PERPLEXITY_API_KEY` у середовищі Gateway.
+1. Створіть обліковий запис Perplexity на [perplexity.ai/settings/api](https://www.perplexity.ai/settings/api)
+2. Згенеруйте API-ключ у панелі керування
+3. Збережіть ключ у конфігурації або задайте `PERPLEXITY_API_KEY` у середовищі Gateway.
 
 ## Сумісність з OpenRouter
 
-Якщо ви вже використовували OpenRouter для Perplexity Sonar, залишайте `provider: "perplexity"` і задайте `OPENROUTER_API_KEY` у середовищі Gateway або збережіть ключ `sk-or-...` у `plugins.entries.perplexity.config.webSearch.apiKey`.
+Якщо ви вже використовували OpenRouter для Perplexity Sonar, залиште `provider: "perplexity"` і задайте `OPENROUTER_API_KEY` у середовищі Gateway або збережіть ключ `sk-or-...` у `plugins.entries.perplexity.config.webSearch.apiKey`.
 
-Необов’язкові елементи керування сумісністю:
+Необов’язкові параметри сумісності:
 
 - `plugins.entries.perplexity.config.webSearch.baseUrl`
 - `plugins.entries.perplexity.config.webSearch.model`
 
-## Приклади config
+## Приклади конфігурації
 
 ### Нативний API пошуку Perplexity
 
@@ -63,7 +63,7 @@ OpenClaw підтримує API пошуку Perplexity як provider для `we
 }
 ```
 
-### Сумісність OpenRouter / Sonar
+### Сумісність з OpenRouter / Sonar
 
 ```json5
 {
@@ -90,55 +90,55 @@ OpenClaw підтримує API пошуку Perplexity як provider для `we
 }
 ```
 
-## Де задавати ключ
+## Де задати ключ
 
-**Через config:** виконайте `openclaw configure --section web`. Це збереже ключ у
-`~/.openclaw/openclaw.json` під `plugins.entries.perplexity.config.webSearch.apiKey`.
+**Через конфігурацію:** запустіть `openclaw configure --section web`. Це зберігає ключ у
+`~/.openclaw/openclaw.json` у полі `plugins.entries.perplexity.config.webSearch.apiKey`.
 Це поле також приймає об’єкти SecretRef.
 
 **Через середовище:** задайте `PERPLEXITY_API_KEY` або `OPENROUTER_API_KEY`
-у середовищі процесу Gateway. Для встановлення gateway розмістіть це в
-`~/.openclaw/.env` (або у вашому середовищі сервісу). Див. [Env vars](/uk/help/faq#env-vars-and-env-loading).
+у середовищі процесу Gateway. Для встановленого gateway додайте його в
+`~/.openclaw/.env` (або у середовище вашого сервісу). Див. [Змінні середовища](/uk/help/faq#env-vars-and-env-loading).
 
-Якщо налаштовано `provider: "perplexity"` і SecretRef для ключа Perplexity не вдається визначити без env fallback, startup/reload завершується помилкою одразу.
+Якщо налаштовано `provider: "perplexity"` і SecretRef ключа Perplexity не вдається розв’язати без резервного варіанта з env, запуск/перезавантаження аварійно завершуються одразу.
 
 ## Параметри інструмента
 
-Ці параметри застосовуються до шляху нативного API пошуку Perplexity.
+Ці параметри застосовуються до нативного шляху API пошуку Perplexity.
 
-| Параметр             | Опис                                                 |
-| -------------------- | ---------------------------------------------------- |
-| `query`              | Пошуковий запит (обов’язково)                        |
-| `count`              | Кількість результатів для повернення (1-10, типово: 5) |
-| `country`            | 2-літерний код країни ISO (наприклад, "US", "DE")    |
-| `language`           | Код мови ISO 639-1 (наприклад, "en", "de", "fr")     |
-| `freshness`          | Часовий фільтр: `day` (24h), `week`, `month` або `year` |
-| `date_after`         | Лише результати, опубліковані після цієї дати (YYYY-MM-DD) |
-| `date_before`        | Лише результати, опубліковані до цієї дати (YYYY-MM-DD) |
-| `domain_filter`      | Масив allowlist/denylist доменів (максимум 20)       |
-| `max_tokens`         | Загальний бюджет контенту (типово: 25000, максимум: 1000000) |
-| `max_tokens_per_page`| Ліміт токенів на сторінку (типово: 2048)             |
+| Параметр              | Опис                                                   |
+| --------------------- | ------------------------------------------------------ |
+| `query`               | Пошуковий запит (обов’язково)                          |
+| `count`               | Кількість результатів для повернення (1–10, типово: 5) |
+| `country`             | 2-літерний код країни ISO (наприклад, `"US"`, `"DE"`)  |
+| `language`            | Код мови ISO 639-1 (наприклад, `"en"`, `"de"`, `"fr"`) |
+| `freshness`           | Фільтр часу: `day` (24 год), `week`, `month` або `year` |
+| `date_after`          | Лише результати, опубліковані після цієї дати (YYYY-MM-DD) |
+| `date_before`         | Лише результати, опубліковані до цієї дати (YYYY-MM-DD) |
+| `domain_filter`       | Масив allowlist/denylist доменів (макс. 20)            |
+| `max_tokens`          | Загальний бюджет вмісту (типово: 25000, макс.: 1000000) |
+| `max_tokens_per_page` | Ліміт токенів на сторінку (типово: 2048)               |
 
 Для застарілого шляху сумісності Sonar/OpenRouter:
 
 - приймаються `query`, `count` і `freshness`
-- `count` там лише для сумісності; відповідь усе одно залишається однією синтезованою
-  відповіддю з цитуваннями, а не списком із N результатів
-- фільтри, доступні лише в API пошуку, як-от `country`, `language`, `date_after`,
+- `count` там потрібен лише для сумісності; відповідь усе одно буде одним синтезованим
+  результатом із цитуваннями, а не списком із N результатів
+- фільтри лише для Search API, такі як `country`, `language`, `date_after`,
   `date_before`, `domain_filter`, `max_tokens` і `max_tokens_per_page`,
   повертають явні помилки
 
 **Приклади:**
 
 ```javascript
-// Пошук для конкретної країни та мови
+// Пошук для конкретної країни й мови
 await web_search({
   query: "renewable energy",
   country: "DE",
   language: "de",
 });
 
-// Нещодавні результати (за останній тиждень)
+// Нещодавні результати (за минулий тиждень)
 await web_search({
   query: "AI news",
   freshness: "week",
@@ -151,19 +151,19 @@ await web_search({
   date_before: "2024-06-30",
 });
 
-// Фільтрація за доменами (allowlist)
+// Фільтрація доменів (allowlist)
 await web_search({
   query: "climate research",
   domain_filter: ["nature.com", "science.org", ".edu"],
 });
 
-// Фільтрація за доменами (denylist - префікс -)
+// Фільтрація доменів (denylist — префікс -)
 await web_search({
   query: "product reviews",
   domain_filter: ["-reddit.com", "-pinterest.com"],
 });
 
-// Розширене витягування контенту
+// Більше витягування вмісту
 await web_search({
   query: "detailed AI research",
   max_tokens: 50000,
@@ -171,18 +171,23 @@ await web_search({
 });
 ```
 
-### Правила `domain_filter`
+### Правила фільтра доменів
 
-- Максимум 20 доменів у фільтрі
+- Максимум 20 доменів на фільтр
 - Не можна змішувати allowlist і denylist в одному запиті
-- Для записів denylist використовуйте префікс `-` (наприклад, `["-reddit.com"]`)
+- Для елементів denylist використовуйте префікс `-` (наприклад, `["-reddit.com"]`)
 
 ## Примітки
 
-- API пошуку Perplexity повертає структуровані результати веб-пошуку (`title`, `url`, `snippet`)
-- OpenRouter або явне задання `plugins.entries.perplexity.config.webSearch.baseUrl` / `model` перемикає Perplexity назад на Sonar chat completions для сумісності
+- API пошуку Perplexity повертає структуровані результати вебпошуку (`title`, `url`, `snippet`)
+- OpenRouter або явне задання `plugins.entries.perplexity.config.webSearch.baseUrl` / `model` перемикає Perplexity назад на chat completions Sonar для сумісності
 - Сумісність Sonar/OpenRouter повертає одну синтезовану відповідь із цитуваннями, а не структуровані рядки результатів
 - Результати типово кешуються на 15 хвилин (налаштовується через `cacheTtlMinutes`)
 
-Повну конфігурацію `web_search` див. в [Web tools](/uk/tools/web).
-Докладніше див. у [документації API пошуку Perplexity](https://docs.perplexity.ai/docs/search/quickstart).
+Повну конфігурацію `web_search` дивіться в [Веб-інструменти](/uk/tools/web).
+Докладніше див. [документацію API пошуку Perplexity](https://docs.perplexity.ai/docs/search/quickstart).
+
+## Пов’язане
+
+- [Пошук Perplexity](/uk/tools/perplexity-search)
+- [Вебпошук](/uk/tools/web)

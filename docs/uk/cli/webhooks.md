@@ -1,25 +1,25 @@
 ---
 read_when:
     - Ви хочете підключити події Gmail Pub/Sub до OpenClaw
-    - Вам потрібні допоміжні команди для Webhook-ів
-summary: Довідник CLI для `openclaw webhooks` (допоміжні засоби Webhook + Gmail Pub/Sub)
-title: Webhook-и
+    - Вам потрібні допоміжні команди Webhook
+summary: Довідка CLI для `openclaw webhooks` (допоміжні засоби Webhook + Gmail Pub/Sub)
+title: Webhooks
 x-i18n:
-    generated_at: "2026-04-23T20:49:06Z"
+    generated_at: "2026-04-24T04:13:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7e42359194d3682e824757b301d83d22042c68f6d24b5b1b0550b65a7e5e460d
+    source_hash: ce9b085904918f1fea4daa7728470d492ab3e7d92ad43a6b1e7efe8d9f70868f
     source_path: cli/webhooks.md
     workflow: 15
 ---
 
 # `openclaw webhooks`
 
-Допоміжні засоби та інтеграції Webhook (Gmail Pub/Sub, допоміжні засоби Webhook).
+Допоміжні засоби Webhook та інтеграції (Gmail Pub/Sub, допоміжні засоби webhook).
 
 Пов’язане:
 
-- Webhook-и: [Webhook-и](/uk/automation/cron-jobs#webhooks)
+- Webhooks: [Webhooks](/uk/automation/cron-jobs#webhooks)
 - Gmail Pub/Sub: [Gmail Pub/Sub](/uk/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gmail
@@ -95,4 +95,9 @@ openclaw webhooks gmail setup --account you@example.com --hook-url https://gatew
 openclaw webhooks gmail run --account you@example.com
 ```
 
-Див. [документацію Gmail Pub/Sub](/uk/automation/cron-jobs#gmail-pubsub-integration) для повного процесу налаштування та експлуатаційних деталей.
+Див. [документацію Gmail Pub/Sub](/uk/automation/cron-jobs#gmail-pubsub-integration) для наскрізного процесу налаштування та операційних деталей.
+
+## Пов’язане
+
+- [Довідка CLI](/uk/cli)
+- [Автоматизація Webhook](/uk/automation/cron-jobs)

@@ -1,105 +1,107 @@
 ---
 read_when:
     - Вибір або перемикання моделей, налаштування псевдонімів
-    - Налагодження failover моделі / «Усі моделі завершилися помилкою»
-    - Розуміння профілів auth і способів керування ними
-summary: 'FAQ: типові значення моделей, вибір, псевдоніми, перемикання, failover та профілі auth'
-title: FAQ — моделі та профілі auth
+    - Налагодження failover моделі / «Усі моделі зазнали невдачі»
+    - Розуміння профілів автентифікації та способів керування ними
+sidebarTitle: Models FAQ
+summary: 'FAQ: типові параметри моделі, вибір, псевдоніми, перемикання, failover і профілі автентифікації'
+title: 'FAQ: моделі та автентифікація'
 x-i18n:
-    generated_at: "2026-04-24T03:46:10Z"
+    generated_at: "2026-04-24T04:14:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8dc7cc346046d17e6044e6a43a8c707b0a842eddd87abb0a9a2b8364ed1b0f23
+    source_hash: 8acc0bc1ea7096ba4743defb2a1766a62ccf6c44202df82ee9c1c04e5ab62222
     source_path: help/faq-models.md
     workflow: 15
 ---
 
-  Запитання й відповіді про моделі та профілі auth. Про налаштування, сесії, gateway, канали та
-  усунення неполадок див. основний [FAQ](/uk/help/faq).
+  Запитання й відповіді щодо моделей і профілів автентифікації. Для налаштування, сесій, gateway, каналів і
+  усунення несправностей див. основне [FAQ](/uk/help/faq).
 
-  ## Моделі: типові значення, вибір, псевдоніми, перемикання
+  ## Моделі: типові параметри, вибір, псевдоніми, перемикання
 
   <AccordionGroup>
   <Accordion title='Що таке "типова модель"?'>
-    Типова модель OpenClaw — це те, що ви задаєте як:
+    Типова модель OpenClaw — це те, що ви встановили як:
 
     ```
     agents.defaults.model.primary
     ```
 
-    На моделі посилаються у форматі `provider/model` (наприклад: `openai/gpt-5.4` або `openai-codex/gpt-5.5`). Якщо ви пропускаєте provider, OpenClaw спочатку пробує псевдонім, потім унікальний збіг налаштованого provider для точного id моделі, і лише після цього повертається до налаштованого типового provider як до застарілого шляху сумісності. Якщо цей provider більше не надає налаштовану типову модель, OpenClaw повертається до першого налаштованого provider/model замість того, щоб показувати застаріле типове значення видаленого provider. Вам усе одно слід **явно** задавати `provider/model`.
+    На моделі посилаються у форматі `provider/model` (наприклад: `openai/gpt-5.4` або `openai-codex/gpt-5.5`). Якщо не вказати provider, OpenClaw спочатку намагається знайти псевдонім, потім — унікальний збіг серед налаштованих provider для цього точного id моделі, і лише після цього повертається до налаштованого типового provider як до застарілого шляху сумісності. Якщо цей provider більше не надає налаштовану типову модель, OpenClaw переходить до першого налаштованого provider/model замість того, щоб показувати застарілий типовий provider, який більше не існує. Вам усе одно слід **явно** вказувати `provider/model`.
 
   </Accordion>
 
   <Accordion title="Яку модель ви рекомендуєте?">
-    **Рекомендоване типове значення:** використовуйте найсильнішу доступну модель останнього покоління у вашому стеку provider.
-    **Для агентів з увімкненими інструментами або недовіреним вводом:** надавайте перевагу силі моделі над вартістю.
+    **Рекомендована типова:** використовуйте найсильнішу модель останнього покоління, доступну у вашому стеку provider.
+    **Для агентів з інструментами або недовіреним вхідним вмістом:** надавайте перевагу силі моделі над вартістю.
     **Для звичайного/низькоризикового чату:** використовуйте дешевші резервні моделі й маршрутизуйте за роллю агента.
 
     Для MiniMax є окрема документація: [MiniMax](/uk/providers/minimax) і
     [Локальні моделі](/uk/gateway/local-models).
 
-    Практичне правило: використовуйте **найкращу модель, яку можете собі дозволити** для високоризикових завдань, і дешевшу
-    модель для звичайного чату або підсумків. Ви можете маршрутизувати моделі для кожного агента й використовувати підагентів для
-    паралелізації довгих завдань (кожен підагент споживає токени). Див. [Моделі](/uk/concepts/models) і
-    [Підагенти](/uk/tools/subagents).
+    Практичне правило: використовуйте **найкращу модель, яку можете собі дозволити** для високоризикової роботи, і дешевшу
+    модель для звичайного чату або підсумків. Ви можете маршрутизувати моделі для кожного агента та використовувати субагентів для
+    паралелізації довгих завдань (кожен субагент витрачає токени). Див. [Моделі](/uk/concepts/models) і
+    [Субагенти](/uk/tools/subagents).
 
-    Сильне попередження: слабші/надмірно квантизовані моделі більш уразливі до prompt
+    Важливе попередження: слабші/надмірно квантизовані моделі вразливіші до prompt
     injection і небезпечної поведінки. Див. [Безпека](/uk/gateway/security).
 
     Більше контексту: [Моделі](/uk/concepts/models).
 
   </Accordion>
 
-  <Accordion title="Як переключити моделі без очищення конфігурації?">
-    Використовуйте **команди моделі** або редагуйте лише поля **model**. Уникайте повної заміни config.
+  <Accordion title="Як перемикати моделі без стирання конфігурації?">
+    Використовуйте **команди моделі** або редагуйте лише поля **model**. Уникайте повної заміни конфігурації.
 
     Безпечні варіанти:
 
     - `/model` у чаті (швидко, для поточної сесії)
     - `openclaw models set ...` (оновлює лише конфігурацію моделі)
     - `openclaw configure --section model` (інтерактивно)
-    - відредагуйте `agents.defaults.model` у `~/.openclaw/openclaw.json`
+    - редагуйте `agents.defaults.model` у `~/.openclaw/openclaw.json`
 
-    Уникайте `config.apply` із частковим об’єктом, якщо тільки ви справді не хочете замінити всю config.
-    Для редагувань через RPC спочатку перегляньте через `config.schema.lookup` і надавайте перевагу `config.patch`. Payload lookup дає вам нормалізований шлях, документацію/обмеження поверхневої schema та підсумки безпосередніх дочірніх елементів.
+    Уникайте `config.apply` з частковим об’єктом, якщо ви справді не хочете замінити всю конфігурацію.
+    Для редагування через RPC спочатку перевірте через `config.schema.lookup` і надавайте перевагу `config.patch`.
+    Payload lookup дає вам нормалізований шлях, стислі описи/обмеження схеми та підсумки безпосередніх дочірніх елементів.
     для часткових оновлень.
-    Якщо ви все ж перезаписали config, відновіть її з резервної копії або повторно запустіть `openclaw doctor`, щоб виконати відновлення.
+    Якщо ви все ж перезаписали конфігурацію, відновіть її з резервної копії або повторно запустіть `openclaw doctor` для виправлення.
 
     Документація: [Моделі](/uk/concepts/models), [Configure](/uk/cli/configure), [Config](/uk/cli/config), [Doctor](/uk/gateway/doctor).
 
   </Accordion>
 
-  <Accordion title="Чи можу я використовувати self-hosted моделі (llama.cpp, vLLM, Ollama)?">
-    Так. Ollama — найпростіший шлях до локальних моделей.
+  <Accordion title="Чи можна використовувати self-hosted моделі (llama.cpp, vLLM, Ollama)?">
+    Так. Ollama — найпростіший шлях для локальних моделей.
 
     Найшвидше налаштування:
 
-    1. Установіть Ollama з `https://ollama.com/download`
+    1. Встановіть Ollama з `https://ollama.com/download`
     2. Завантажте локальну модель, наприклад `ollama pull gemma4`
-    3. Якщо ви також хочете хмарні моделі, виконайте `ollama signin`
+    3. Якщо вам також потрібні хмарні моделі, виконайте `ollama signin`
     4. Запустіть `openclaw onboard` і виберіть `Ollama`
     5. Виберіть `Local` або `Cloud + Local`
 
     Примітки:
 
-    - `Cloud + Local` дає вам хмарні моделі плюс ваші локальні моделі Ollama
-    - хмарні моделі, як-от `kimi-k2.5:cloud`, не потребують локального завантаження
+    - `Cloud + Local` надає вам хмарні моделі разом із локальними моделями Ollama
+    - хмарні моделі, наприклад `kimi-k2.5:cloud`, не потребують локального завантаження
     - для ручного перемикання використовуйте `openclaw models list` і `openclaw models set ollama/<model>`
 
-    Примітка щодо безпеки: менші або сильно квантизовані моделі більш уразливі до prompt
+    Примітка щодо безпеки: менші або сильно квантизовані моделі вразливіші до prompt
     injection. Ми наполегливо рекомендуємо **великі моделі** для будь-якого бота, який може використовувати інструменти.
-    Якщо ви все ж хочете малі моделі, увімкніть sandboxing і строгі allowlist інструментів.
+    Якщо ви все ж хочете маленькі моделі, увімкніть sandboxing і суворі allowlist для інструментів.
 
     Документація: [Ollama](/uk/providers/ollama), [Локальні моделі](/uk/gateway/local-models),
-    [Провайдери моделей](/uk/concepts/model-providers), [Безпека](/uk/gateway/security),
+    [Providers моделей](/uk/concepts/model-providers), [Безпека](/uk/gateway/security),
     [Sandboxing](/uk/gateway/sandboxing).
 
   </Accordion>
 
   <Accordion title="Які моделі використовують OpenClaw, Flawd і Krill?">
     - Ці розгортання можуть відрізнятися й змінюватися з часом; фіксованої рекомендації щодо provider немає.
-    - Перевіряйте поточне налаштування runtime на кожному gateway через `openclaw models status`.
+    - Перевіряйте поточне налаштування середовища виконання на кожному gateway за допомогою `openclaw models status`.
     - Для агентів, чутливих до безпеки/з інструментами, використовуйте найсильнішу доступну модель останнього покоління.
   </Accordion>
 
@@ -116,58 +118,58 @@ x-i18n:
     /model gemini-flash-lite
     ```
 
-    Це вбудовані псевдоніми. Користувацькі псевдоніми можна додати через `agents.defaults.models`.
+    Це вбудовані псевдоніми. Власні псевдоніми можна додати через `agents.defaults.models`.
 
     Ви можете переглянути доступні моделі за допомогою `/model`, `/model list` або `/model status`.
 
-    `/model` (і `/model list`) показує компактний нумерований вибір. Вибір за номером:
+    `/model` (і `/model list`) показує компактний нумерований список вибору. Вибір за номером:
 
     ```
     /model 3
     ```
 
-    Ви також можете примусово задати конкретний профіль auth для provider (для поточної сесії):
+    Ви також можете примусово вибрати конкретний профіль автентифікації для provider (для сесії):
 
     ```
     /model opus@anthropic:default
     /model opus@anthropic:work
     ```
 
-    Порада: `/model status` показує, який агент активний, який файл `auth-profiles.json` використовується та який профіль auth буде спробовано наступним.
-    Він також показує налаштовану кінцеву точку provider (`baseUrl`) і режим API (`api`), якщо вони доступні.
+    Порада: `/model status` показує, який агент активний, який файл `auth-profiles.json` використовується та який профіль автентифікації буде спробовано наступним.
+    Також він показує налаштований endpoint provider (`baseUrl`) і режим API (`api`), якщо вони доступні.
 
-    **Як скасувати закріплення профілю, який я задав через @profile?**
+    **Як скасувати закріплення профілю, заданого через @profile?**
 
-    Повторно виконайте `/model` **без** суфікса `@profile`:
+    Повторно запустіть `/model` **без** суфікса `@profile`:
 
     ```
     /model anthropic/claude-opus-4-6
     ```
 
-    Якщо ви хочете повернутися до типового значення, виберіть його через `/model` (або надішліть `/model <default provider/model>`).
-    Використовуйте `/model status`, щоб підтвердити, який профіль auth активний.
+    Якщо ви хочете повернутися до типового значення, виберіть його з `/model` (або надішліть `/model <default provider/model>`).
+    Скористайтеся `/model status`, щоб підтвердити, який профіль автентифікації активний.
 
   </Accordion>
 
-  <Accordion title="Чи можу я використовувати GPT 5.5 для щоденних завдань, а Codex 5.5 — для кодування?">
-    Так. Задайте одну модель як типову й перемикайтеся за потреби:
+  <Accordion title="Чи можна використовувати GPT 5.5 для щоденних завдань, а Codex 5.5 — для кодування?">
+    Так. Встановіть одну модель як типову й перемикайтеся за потреби:
 
-    - **Швидке перемикання (для сесії):** `/model openai/gpt-5.4` для поточних завдань через прямий API key OpenAI або `/model openai-codex/gpt-5.5` для OAuth-завдань GPT-5.5 Codex.
-    - **Типове значення:** задайте `agents.defaults.model.primary` як `openai/gpt-5.4` для використання API key або `openai-codex/gpt-5.5` для використання GPT-5.5 Codex OAuth.
-    - **Підагенти:** маршрутизуйте завдання кодування до підагентів з іншою типовою моделлю.
+    - **Швидке перемикання (для сесії):** `/model openai/gpt-5.4` для поточних завдань із прямим ключем API OpenAI або `/model openai-codex/gpt-5.5` для завдань GPT-5.5 Codex OAuth.
+    - **Типове значення:** встановіть `agents.defaults.model.primary` у `openai/gpt-5.4` для використання з ключем API або `openai-codex/gpt-5.5` для використання GPT-5.5 Codex OAuth.
+    - **Субагенти:** маршрутизуйте завдання кодування до субагентів з іншою типовою моделлю.
 
-    Прямий доступ через API key до `openai/gpt-5.5` підтримується, щойно OpenAI увімкне
-    GPT-5.5 у публічному API. До того часу GPT-5.5 доступний лише через subscription/OAuth.
+    Прямий доступ через ключ API для `openai/gpt-5.5` підтримується, щойно OpenAI увімкне
+    GPT-5.5 у публічному API. До того часу GPT-5.5 доступний лише через підписку/OAuth.
 
-    Див. [Моделі](/uk/concepts/models) і [Слеш-команди](/uk/tools/slash-commands).
+    Див. [Моделі](/uk/concepts/models) і [Slash-команди](/uk/tools/slash-commands).
 
   </Accordion>
 
   <Accordion title="Як налаштувати fast mode для GPT 5.5?">
-    Використовуйте або перемикач на рівні сесії, або типове значення в config:
+    Використовуйте або перемикач сесії, або типове значення в конфігурації:
 
     - **Для сесії:** надішліть `/fast on`, поки сесія використовує `openai/gpt-5.4` або `openai-codex/gpt-5.5`.
-    - **Типове значення для моделі:** задайте `agents.defaults.models["openai/gpt-5.4"].params.fastMode` або `agents.defaults.models["openai-codex/gpt-5.5"].params.fastMode` як `true`.
+    - **Типове значення для моделі:** встановіть `agents.defaults.models["openai/gpt-5.4"].params.fastMode` або `agents.defaults.models["openai-codex/gpt-5.5"].params.fastMode` у `true`.
 
     Приклад:
 
@@ -187,40 +189,40 @@ x-i18n:
     }
     ```
 
-    Для OpenAI fast mode мапиться на `service_tier = "priority"` у підтримуваних нативних запитах Responses. Сесійні перевизначення `/fast` мають вищий пріоритет за типові значення config.
+    Для OpenAI fast mode відповідає `service_tier = "priority"` у підтримуваних власних запитах Responses. Перевизначення сесії через `/fast` мають пріоритет над типовими значеннями конфігурації.
 
     Див. [Thinking and fast mode](/uk/tools/thinking) і [OpenAI fast mode](/uk/providers/openai#fast-mode).
 
   </Accordion>
 
   <Accordion title='Чому я бачу "Model ... is not allowed", а потім немає відповіді?'>
-    Якщо задано `agents.defaults.models`, це стає **allowlist** для `/model` і будь-яких
-    перевизначень на рівні сесії. Вибір моделі, якої немає в цьому списку, повертає:
+    Якщо встановлено `agents.defaults.models`, це стає **allowlist** для `/model` і будь-яких
+    перевизначень сесії. Вибір моделі, якої немає в цьому списку, повертає:
 
     ```
     Model "provider/model" is not allowed. Use /model to list available models.
     ```
 
     Ця помилка повертається **замість** звичайної відповіді. Виправлення: додайте модель до
-    `agents.defaults.models`, приберіть allowlist або виберіть модель із `/model list`.
+    `agents.defaults.models`, видаліть allowlist або виберіть модель із `/model list`.
 
   </Accordion>
 
   <Accordion title='Чому я бачу "Unknown model: minimax/MiniMax-M2.7"?'>
-    Це означає, що **provider не налаштовано** (не знайдено конфігурації provider MiniMax або
-    профілю auth), тому модель не може бути визначена.
+    Це означає, що **provider не налаштований** (не знайдено конфігурації provider MiniMax або профілю
+    автентифікації), тому модель не може бути розв’язана.
 
-    Контрольний список виправлення:
+    Список перевірки для виправлення:
 
-    1. Оновіться до актуального релізу OpenClaw (або запускайте з вихідного `main`), а потім перезапустіть gateway.
-    2. Переконайтеся, що MiniMax налаштовано (через майстер або JSON), або що auth MiniMax
-       існує в env/auth profiles, щоб можна було ін’єктувати відповідний provider
+    1. Оновіться до актуального релізу OpenClaw (або запускайте з вихідного коду `main`), а потім перезапустіть gateway.
+    2. Переконайтеся, що MiniMax налаштований (майстер або JSON), або що автентифікація MiniMax
+       є в env/auth profiles, щоб можна було інжектувати відповідний provider
        (`MINIMAX_API_KEY` для `minimax`, `MINIMAX_OAUTH_TOKEN` або збережений MiniMax
        OAuth для `minimax-portal`).
-    3. Використовуйте точний id моделі (з урахуванням регістру) для вашого шляху auth:
-       `minimax/MiniMax-M2.7` або `minimax/MiniMax-M2.7-highspeed` для налаштування через API key,
-       або `minimax-portal/MiniMax-M2.7` /
-       `minimax-portal/MiniMax-M2.7-highspeed` для налаштування через OAuth.
+    3. Використовуйте точний id моделі (з урахуванням регістру) для вашого шляху автентифікації:
+       `minimax/MiniMax-M2.7` або `minimax/MiniMax-M2.7-highspeed` для налаштування
+       з ключем API, або `minimax-portal/MiniMax-M2.7` /
+       `minimax-portal/MiniMax-M2.7-highspeed` для налаштування OAuth.
     4. Виконайте:
 
        ```bash
@@ -233,9 +235,9 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="Чи можу я використовувати MiniMax як типову модель, а OpenAI — для складних завдань?">
-    Так. Використовуйте **MiniMax як типову** і перемикайте моделі **для окремої сесії** за потреби.
-    Fallback призначений для **помилок**, а не для «складних завдань», тому використовуйте `/model` або окремого агента.
+  <Accordion title="Чи можна використовувати MiniMax як типову модель, а OpenAI — для складних завдань?">
+    Так. Використовуйте **MiniMax як типову** і перемикайте моделі **для кожної сесії** за потреби.
+    Резервні моделі призначені для **помилок**, а не для «складних завдань», тому використовуйте `/model` або окремого агента.
 
     **Варіант A: перемикання для сесії**
 
@@ -262,31 +264,31 @@ x-i18n:
 
     **Варіант B: окремі агенти**
 
-    - Типове значення агента A: MiniMax
-    - Типове значення агента B: OpenAI
+    - Агент A типово: MiniMax
+    - Агент B типово: OpenAI
     - Маршрутизуйте за агентом або використовуйте `/agent` для перемикання
 
-    Документація: [Моделі](/uk/concepts/models), [Маршрутизація кількох агентів](/uk/concepts/multi-agent), [MiniMax](/uk/providers/minimax), [OpenAI](/uk/providers/openai).
+    Документація: [Моделі](/uk/concepts/models), [Маршрутизація з кількома агентами](/uk/concepts/multi-agent), [MiniMax](/uk/providers/minimax), [OpenAI](/uk/providers/openai).
 
   </Accordion>
 
   <Accordion title="Чи є opus / sonnet / gpt вбудованими скороченнями?">
-    Так. OpenClaw постачається з кількома типовими скороченнями (вони застосовуються лише коли модель існує в `agents.defaults.models`):
+    Так. OpenClaw постачається з кількома типовими скороченнями (застосовуються лише тоді, коли модель існує в `agents.defaults.models`):
 
     - `opus` → `anthropic/claude-opus-4-6`
     - `sonnet` → `anthropic/claude-sonnet-4-6`
-    - `gpt` → `openai/gpt-5.4` для налаштувань через API key або `openai-codex/gpt-5.5`, якщо налаштовано Codex OAuth
+    - `gpt` → `openai/gpt-5.4` для налаштувань з ключем API або `openai-codex/gpt-5.5`, якщо налаштовано Codex OAuth
     - `gpt-mini` → `openai/gpt-5.4-mini`
     - `gpt-nano` → `openai/gpt-5.4-nano`
     - `gemini` → `google/gemini-3.1-pro-preview`
     - `gemini-flash` → `google/gemini-3-flash-preview`
     - `gemini-flash-lite` → `google/gemini-3.1-flash-lite-preview`
 
-    Якщо ви задасте власний псевдонім з такою самою назвою, пріоритет матиме ваше значення.
+    Якщо ви задасте власний псевдонім з такою самою назвою, ваше значення матиме пріоритет.
 
   </Accordion>
 
-  <Accordion title="Як визначати/перевизначати скорочення моделей (псевдоніми)?">
+  <Accordion title="Як визначити/перевизначити скорочення моделей (псевдоніми)?">
     Псевдоніми задаються через `agents.defaults.models.<modelId>.alias`. Приклад:
 
     ```json5
@@ -304,12 +306,12 @@ x-i18n:
     }
     ```
 
-    Тоді `/model sonnet` (або `/<alias>`, коли це підтримується) визначається як цей id моделі.
+    Тоді `/model sonnet` (або `/<alias>`, де це підтримується) буде розв’язуватися в цей id моделі.
 
   </Accordion>
 
-  <Accordion title="Як додати моделі від інших provider, як-от OpenRouter або Z.AI?">
-    OpenRouter (оплата за токени; багато моделей):
+  <Accordion title="Як додати моделі від інших provider, наприклад OpenRouter або Z.AI?">
+    OpenRouter (оплата за токен; багато моделей):
 
     ```json5
     {
@@ -337,12 +339,12 @@ x-i18n:
     }
     ```
 
-    Якщо ви посилаєтеся на `provider/model`, але потрібний ключ provider відсутній, ви отримаєте помилку auth під час runtime (наприклад, `No API key found for provider "zai"`).
+    Якщо ви посилаєтеся на provider/model, але потрібний ключ provider відсутній, ви отримаєте помилку автентифікації під час виконання (наприклад, `No API key found for provider "zai"`).
 
-    **Не знайдено API key для provider після додавання нового агента**
+    **Після додавання нового агента не знайдено API key для provider**
 
-    Зазвичай це означає, що **новий агент** має порожнє сховище auth. Auth є окремим для кожного агента і
-    зберігається тут:
+    Зазвичай це означає, що **новий агент** має порожнє сховище автентифікації. Автентифікація є окремою для кожного агента й
+    зберігається в:
 
     ```
     ~/.openclaw/agents/<agentId>/agent/auth-profiles.json
@@ -350,119 +352,120 @@ x-i18n:
 
     Варіанти виправлення:
 
-    - Виконайте `openclaw agents add <id>` і налаштуйте auth під час роботи майстра.
-    - Або скопіюйте `auth-profiles.json` з `agentDir` головного агента в `agentDir` нового агента.
+    - Запустіть `openclaw agents add <id>` і налаштуйте автентифікацію під час майстра.
+    - Або скопіюйте `auth-profiles.json` з `agentDir` основного агента в `agentDir` нового агента.
 
-    Не використовуйте один і той самий `agentDir` для кількох агентів; це спричиняє колізії auth/сесій.
+    **Не** використовуйте спільний `agentDir` для кількох агентів; це спричиняє конфлікти автентифікації/сесій.
 
   </Accordion>
 </AccordionGroup>
 
-## Failover моделі та «Усі моделі завершилися помилкою»
+## Failover моделі та "Усі моделі зазнали невдачі"
 
 <AccordionGroup>
   <Accordion title="Як працює failover?">
     Failover відбувається у два етапи:
 
-    1. **Ротація профілів auth** у межах одного provider.
-    2. **Fallback моделі** до наступної моделі в `agents.defaults.model.fallbacks`.
+    1. **Ротація профілів автентифікації** в межах того самого provider.
+    2. **Резервне перемикання моделі** на наступну модель у `agents.defaults.model.fallbacks`.
 
-    До профілів, що завершуються помилками, застосовуються cooldown (експоненційний backoff), тому OpenClaw може продовжувати відповідати, навіть коли provider обмежений rate limit або тимчасово не працює.
+    До профілів, що дають збій, застосовуються cooldown (експоненційний backoff), тому OpenClaw може продовжувати відповідати навіть тоді, коли provider обмежує швидкість або тимчасово не працює.
 
-    Кошик rate limit включає не лише звичайні відповіді `429`. OpenClaw
-    також вважає такими, що заслуговують на failover, повідомлення на кшталт
-    `Too many concurrent requests`,
+    Кошик rate-limit охоплює не лише звичайні відповіді `429`. OpenClaw
+    також розглядає такі повідомлення, як `Too many concurrent requests`,
     `ThrottlingException`, `concurrency limit reached`,
     `workers_ai ... quota limit exceeded`, `resource exhausted` і періодичні
-    ліміти вікна використання (`weekly/monthly limit reached`).
+    обмеження вікна використання (`weekly/monthly limit reached`), як
+    rate limit, що заслуговують на failover.
 
-    Деякі відповіді, схожі на billing, не є `402`, а деякі відповіді HTTP `402`
-    теж залишаються в цьому кошику тимчасових помилок. Якщо provider повертає
-    явний текст про billing на `401` або `403`, OpenClaw усе одно може залишити це
-    в категорії billing, але provider-specific text matcher залишаються обмеженими
-    тим provider, якому вони належать (наприклад, OpenRouter `Key limit exceeded`). Якщо повідомлення `402`
-    натомість схоже на повторюваний ліміт вікна використання або
-    ліміт витрат organization/workspace (`daily limit reached, resets tomorrow`,
+    Деякі відповіді, схожі на billing, не є `402`, а деякі HTTP-відповіді `402`
+    також залишаються в цьому тимчасовому кошику. Якщо provider повертає
+    явний текст про billing у `401` або `403`, OpenClaw усе одно може залишити це
+    в лінії billing, але provider-специфічні текстові зіставлення залишаються в межах
+    provider, якому вони належать (наприклад, OpenRouter `Key limit exceeded`). Якщо ж повідомлення `402`
+    виглядає як придатне до повторної спроби обмеження вікна використання або
+    ліміт витрат організації/робочого простору (`daily limit reached, resets tomorrow`,
     `organization spending limit exceeded`), OpenClaw трактує це як
-    `rate_limit`, а не як тривале вимкнення через billing.
+    `rate_limit`, а не як довге вимкнення через billing.
 
     Помилки переповнення контексту відрізняються: сигнатури на кшталт
     `request_too_large`, `input exceeds the maximum number of tokens`,
     `input token count exceeds the maximum number of input tokens`,
     `input is too long for the model` або `ollama error: context length
-    exceeded` залишаються на шляху compaction/retry замість переходу до
-    fallback моделі.
+    exceeded` залишаються на шляху Compaction/повторної спроби замість переходу до
+    резервної моделі.
 
-    Загальний текст server-error навмисно вужчий, ніж «усе, де є
-    unknown/error». OpenClaw справді вважає гідними failover transient-форми,
-    прив’язані до provider, як-от Anthropic bare `An unknown error occurred`, OpenRouter bare
-    `Provider returned error`, помилки reason stop на кшталт `Unhandled stop reason:
-    error`, JSON `api_error` payload з transient server text
+    Загальний текст server-error навмисно вужчий, ніж «будь-що з
+    unknown/error усередині». OpenClaw справді вважає provider-специфічні тимчасові форми,
+    такі як Anthropic bare `An unknown error occurred`, OpenRouter bare
+    `Provider returned error`, помилки stop-reason на кшталт `Unhandled stop reason:
+    error`, JSON-payload `api_error` із тимчасовим текстом сервера
     (`internal server error`, `unknown error, 520`, `upstream error`, `backend
-    error`) і помилки зайнятості provider, як-от `ModelNotReadyException`, як
-    сигнали timeout/overloaded, що заслуговують на failover, коли контекст provider збігається.
-    Загальний внутрішній текст fallback на кшталт `LLM request failed with an unknown
-    error.` залишається консервативним і сам по собі не запускає fallback моделі.
+    error`) і помилки зайнятості provider, такі як `ModelNotReadyException`,
+    сигналами timeout/overloaded, що варті failover, коли контекст provider
+    збігається.
+    Загальний внутрішній резервний текст на кшталт `LLM request failed with an unknown
+    error.` залишається консервативним і сам по собі не запускає резервне перемикання моделі.
 
   </Accordion>
 
   <Accordion title='Що означає "No credentials found for profile anthropic:default"?'>
-    Це означає, що система спробувала використати ID профілю auth `anthropic:default`, але не змогла знайти для нього облікові дані в очікуваному сховищі auth.
+    Це означає, що система намагалася використати id профілю автентифікації `anthropic:default`, але не змогла знайти облікові дані для нього в очікуваному сховищі автентифікації.
 
-    **Контрольний список виправлення:**
+    **Список перевірки для виправлення:**
 
-    - **Підтвердьте, де зберігаються профілі auth** (нові та застарілі шляхи)
-      - Поточний шлях: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
-      - Застарілий шлях: `~/.openclaw/agent/*` (мігрується через `openclaw doctor`)
-    - **Підтвердьте, що ваша змінна env завантажується Gateway**
-      - Якщо ви задали `ANTHROPIC_API_KEY` у своїй оболонці, але запускаєте Gateway через systemd/launchd, він може її не успадкувати. Додайте її в `~/.openclaw/.env` або ввімкніть `env.shellEnv`.
+    - **Підтвердьте, де зберігаються auth profiles** (нові й застарілі шляхи)
+      - Поточний: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+      - Застарілий: `~/.openclaw/agent/*` (мігрується через `openclaw doctor`)
+    - **Підтвердьте, що ваша env var завантажується Gateway**
+      - Якщо ви задали `ANTHROPIC_API_KEY` у shell, але запускаєте Gateway через systemd/launchd, він може не успадкувати її. Додайте її в `~/.openclaw/.env` або увімкніть `env.shellEnv`.
     - **Переконайтеся, що редагуєте правильного агента**
       - У конфігураціях із кількома агентами може бути кілька файлів `auth-profiles.json`.
-    - **Перевірте статус моделі/auth**
-      - Використовуйте `openclaw models status`, щоб переглянути налаштовані моделі та те, чи пройшли provider автентифікацію.
+    - **Швидка перевірка стану model/auth**
+      - Використовуйте `openclaw models status`, щоб переглянути налаштовані моделі й те, чи автентифіковано providers.
 
-    **Контрольний список виправлення для "No credentials found for profile anthropic"**
+    **Список перевірки для виправлення "No credentials found for profile anthropic"**
 
-    Це означає, що виконання закріплене за профілем auth Anthropic, але Gateway
-    не може знайти його у своєму сховищі auth.
+    Це означає, що запуск прив’язаний до профілю автентифікації Anthropic, але Gateway
+    не може знайти його у своєму сховищі автентифікації.
 
     - **Використовуйте Claude CLI**
-      - Виконайте `openclaw models auth login --provider anthropic --method cli --set-default` на хості gateway.
-    - **Якщо ви хочете використовувати API key**
+      - Запустіть `openclaw models auth login --provider anthropic --method cli --set-default` на хості gateway.
+    - **Якщо ви хочете використовувати натомість ключ API**
       - Додайте `ANTHROPIC_API_KEY` у `~/.openclaw/.env` на **хості gateway**.
-      - Очистьте будь-який закріплений порядок, який примусово вимагає відсутній профіль:
+      - Очистьте будь-який закріплений порядок, що примушує використовувати відсутній профіль:
 
         ```bash
         openclaw models auth order clear --provider anthropic
         ```
 
     - **Підтвердьте, що ви запускаєте команди на хості gateway**
-      - У віддаленому режимі профілі auth зберігаються на машині gateway, а не на вашому ноутбуці.
+      - У віддаленому режимі auth profiles зберігаються на машині gateway, а не на вашому ноутбуці.
 
   </Accordion>
 
-  <Accordion title="Чому також була спроба Google Gemini, і вона завершилася помилкою?">
-    Якщо конфігурація вашої моделі включає Google Gemini як fallback (або ви перемкнулися на скорочення Gemini), OpenClaw спробує її під час fallback моделі. Якщо ви не налаштували облікові дані Google, ви побачите `No API key found for provider "google"`.
+  <Accordion title="Чому він також спробував Google Gemini і зазнав невдачі?">
+    Якщо конфігурація вашої моделі містить Google Gemini як резервну модель (або ви переключилися на скорочення Gemini), OpenClaw спробує її під час резервного перемикання моделі. Якщо ви не налаштували облікові дані Google, ви побачите `No API key found for provider "google"`.
 
-    Виправлення: або надайте auth Google, або приберіть/не використовуйте моделі Google в `agents.defaults.model.fallbacks` / псевдонімах, щоб fallback не маршрутизувався туди.
+    Виправлення: або надайте автентифікацію Google, або видаліть/не використовуйте моделі Google в `agents.defaults.model.fallbacks` / псевдонімах, щоб резервне перемикання не маршрутизувалося туди.
 
     **LLM request rejected: thinking signature required (Google Antigravity)**
 
-    Причина: історія сесії містить **thinking blocks без signature** (часто через
-    перерваний/частковий потік). Google Antigravity вимагає signature для thinking blocks.
+    Причина: історія сесії містить **блоки thinking без signatures** (часто через
+    перерваний/частковий потік). Google Antigravity вимагає signatures для блоків thinking.
 
-    Виправлення: OpenClaw тепер видаляє thinking blocks без signature для Google Antigravity Claude. Якщо це все ще трапляється, почніть **нову сесію** або задайте `/thinking off` для цього агента.
+    Виправлення: тепер OpenClaw видаляє блоки thinking без підпису для Google Antigravity Claude. Якщо це все ще трапляється, почніть **нову сесію** або встановіть `/thinking off` для цього агента.
 
   </Accordion>
 </AccordionGroup>
 
-## Профілі auth: що це таке і як ними керувати
+## Auth profiles: що це таке й як ними керувати
 
-Пов’язане: [/concepts/oauth](/uk/concepts/oauth) (потоки OAuth, зберігання token, шаблони для кількох облікових записів)
+Пов’язане: [/concepts/oauth](/uk/concepts/oauth) (потоки OAuth, зберігання токенів, шаблони для кількох облікових записів)
 
 <AccordionGroup>
-  <Accordion title="Що таке профіль auth?">
-    Профіль auth — це іменований запис облікових даних (OAuth або API key), прив’язаний до provider. Профілі зберігаються тут:
+  <Accordion title="Що таке auth profile?">
+    Auth profile — це іменований запис облікових даних (OAuth або ключ API), прив’язаний до provider. Профілі зберігаються в:
 
     ```
     ~/.openclaw/agents/<agentId>/agent/auth-profiles.json
@@ -470,71 +473,71 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="Які типові ID профілів?">
-    OpenClaw використовує ID з префіксом provider, наприклад:
+  <Accordion title="Які типові id профілів?">
+    OpenClaw використовує id з префіксом provider, наприклад:
 
-    - `anthropic:default` (типово, коли не існує ідентичності email)
+    - `anthropic:default` (поширений варіант, коли немає email-ідентичності)
     - `anthropic:<email>` для OAuth-ідентичностей
-    - користувацькі ID, які ви обираєте (наприклад, `anthropic:work`)
+    - власні id, які ви обираєте (наприклад, `anthropic:work`)
 
   </Accordion>
 
-  <Accordion title="Чи можу я керувати тим, який профіль auth буде спробовано першим?">
-    Так. Config підтримує необов’язкові метадані для профілів і порядок для кожного provider (`auth.order.<provider>`). Це **не** зберігає secrets; це зіставляє ID з provider/mode і задає порядок ротації.
+  <Accordion title="Чи можу я керувати тим, який auth profile буде випробувано першим?">
+    Так. Конфігурація підтримує необов’язкові метадані для профілів і порядок для кожного provider (`auth.order.<provider>`). Це **не** зберігає секрети; це зіставляє id із provider/mode і задає порядок ротації.
 
-    OpenClaw може тимчасово пропускати профіль, якщо він перебуває в короткому **cooldown** (rate limit/timeout/auth failures) або в довшому стані **disabled** (billing/insufficient credits). Щоб це перевірити, виконайте `openclaw models status --json` і перегляньте `auth.unusableProfiles`. Налаштування: `auth.cooldowns.billingBackoffHours*`.
+    OpenClaw може тимчасово пропустити профіль, якщо він перебуває в короткому **cooldown** (rate limit/timeouts/auth failures) або в довшому стані **disabled** (billing/insufficient credits). Щоб перевірити це, запустіть `openclaw models status --json` і перегляньте `auth.unusableProfiles`. Налаштування: `auth.cooldowns.billingBackoffHours*`.
 
-    Cooldown для rate limit можуть бути прив’язані до моделі. Профіль, який перебуває в cooldown
+    Cooldown rate limit можуть бути прив’язані до моделі. Профіль, який перебуває в cooldown
     для однієї моделі, усе ще може бути придатним для спорідненої моделі того самого provider,
-    тоді як billing/disabled вікна все одно блокують увесь профіль.
+    тоді як вікна billing/disabled, як і раніше, блокують увесь профіль.
 
-    Ви також можете задати **перевизначення порядку для окремого агента** (зберігається в `auth-state.json` цього агента) через CLI:
+    Ви також можете задати перевизначення порядку **для конкретного агента** (зберігається в `auth-state.json` цього агента) через CLI:
 
     ```bash
-    # Типово використовує налаштованого типового агента (не вказуйте --agent)
+    # Типово використовується налаштований типовий агент (пропустіть --agent)
     openclaw models auth order get --provider anthropic
 
     # Зафіксувати ротацію на одному профілі (пробувати лише його)
     openclaw models auth order set --provider anthropic anthropic:default
 
-    # Або задати явний порядок (fallback у межах provider)
+    # Або задати явний порядок (резервне перемикання в межах provider)
     openclaw models auth order set --provider anthropic anthropic:work anthropic:default
 
     # Очистити перевизначення (повернутися до config auth.order / round-robin)
     openclaw models auth order clear --provider anthropic
     ```
 
-    Щоб націлитися на конкретного агента:
+    Щоб націлити на конкретного агента:
 
     ```bash
     openclaw models auth order set --provider anthropic --agent main anthropic:default
     ```
 
-    Щоб перевірити, що саме буде реально спробовано, використовуйте:
+    Щоб перевірити, що саме буде спробовано, використовуйте:
 
     ```bash
     openclaw models status --probe
     ```
 
     Якщо збережений профіль пропущено в явному порядку, probe повідомить
-    `excluded_by_auth_order` для цього профілю замість того, щоб тихо його пробувати.
+    `excluded_by_auth_order` для цього профілю замість того, щоб мовчки його пробувати.
 
   </Accordion>
 
-  <Accordion title="OAuth чи API key — у чому різниця?">
+  <Accordion title="OAuth vs API key — у чому різниця?">
     OpenClaw підтримує обидва варіанти:
 
-    - **OAuth** часто використовує доступ за підпискою (де це застосовується).
-    - **API key** використовують модель оплати за токени.
+    - **OAuth** часто використовує доступ за підпискою (де це застосовно).
+    - **API keys** використовують оплату за токени.
 
-    Майстер явно підтримує Anthropic Claude CLI, OpenAI Codex OAuth і API key.
+    Майстер явним чином підтримує Anthropic Claude CLI, OpenAI Codex OAuth і ключі API.
 
   </Accordion>
 </AccordionGroup>
 
 ## Пов’язане
 
-- [FAQ](/uk/help/faq) — основний FAQ
+- [FAQ](/uk/help/faq) — основне FAQ
 - [FAQ — швидкий старт і початкове налаштування](/uk/help/faq-first-run)
 - [Вибір моделі](/uk/concepts/model-providers)
 - [Failover моделі](/uk/concepts/model-failover)

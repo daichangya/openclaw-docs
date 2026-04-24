@@ -1,84 +1,84 @@
 ---
 read_when:
-    - Налаштування або налагодження віддаленого керування mac
-summary: Потік застосунку macOS для керування віддаленим Gateway OpenClaw через SSH
+    - Налаштування або налагодження віддаленого керування на mac
+summary: Потік застосунку macOS для керування віддаленим gateway OpenClaw через SSH
 title: Віддалене керування
 x-i18n:
-    generated_at: "2026-04-24T03:46:39Z"
+    generated_at: "2026-04-24T04:17:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 17992eeb20fc6a463e12222547a8c90a34e6bbd94907e02d5033c18a31f776d8
+    source_hash: c1b436fe35db300f719cf3e72530e74914df6023509907d485670746c29656d8
     source_path: platforms/mac/remote.md
     workflow: 15
 ---
 
-# Віддалений OpenClaw (macOS ⇄ віддалений host)
+# Віддалений OpenClaw (macOS ⇄ віддалений хост)
 
-Цей потік дозволяє застосунку macOS діяти як повноцінне віддалене керування для Gateway OpenClaw, що працює на іншому host (desktop/server). Це функція застосунку **Remote over SSH** (віддалений запуск). Усі функції — перевірки стану, переспрямування Voice Wake і Web Chat — повторно використовують ту саму віддалену SSH-конфігурацію з _Settings → General_.
+Цей потік дає змогу застосунку macOS діяти як повноцінний засіб віддаленого керування для gateway OpenClaw, що працює на іншому хості (настільному комп’ютері/сервері). Це функція застосунку **Remote over SSH** (віддалений запуск). Усі можливості — перевірки стану здоров’я, переспрямування Voice Wake і Web Chat — повторно використовують ту саму віддалену SSH-конфігурацію з _Settings → General_.
 
 ## Режими
 
-- **Local (цей Mac)**: Усе працює на ноутбуці. SSH не використовується.
-- **Remote over SSH (типово)**: Команди OpenClaw виконуються на віддаленому host. Застосунок mac відкриває SSH-з’єднання з `-o BatchMode`, а також використовує вибрану вами identity/key і локальне переспрямування порту.
-- **Remote direct (ws/wss)**: Без SSH-тунелю. Застосунок mac напряму підключається до URL Gateway (наприклад, через Tailscale Serve або публічний HTTPS reverse proxy).
+- **Local (this Mac)**: усе працює на ноутбуці. SSH не використовується.
+- **Remote over SSH (default)**: команди OpenClaw виконуються на віддаленому хості. Застосунок mac відкриває SSH-з’єднання з `-o BatchMode` плюс вибраний вами identity/key і локальне переспрямування порту.
+- **Remote direct (ws/wss)**: без SSH-тунелю. Застосунок mac підключається до URL gateway напряму (наприклад, через Tailscale Serve або публічний HTTPS reverse proxy).
 
-## Віддалені transport
+## Віддалені транспорти
 
-Віддалений режим підтримує два transport:
+Віддалений режим підтримує два транспорти:
 
-- **SSH tunnel** (типово): Використовує `ssh -N -L ...` для переспрямування порту Gateway на localhost. Gateway бачитиме IP Node як `127.0.0.1`, оскільки тунель працює через loopback.
-- **Direct (ws/wss)**: Підключається безпосередньо до URL Gateway. Gateway бачить реальний IP клієнта.
+- **SSH tunnel** (типово): використовує `ssh -N -L ...` для переспрямування порту gateway на localhost. Gateway бачитиме IP node як `127.0.0.1`, оскільки тунель є loopback.
+- **Direct (ws/wss)**: підключається безпосередньо до URL gateway. Gateway бачить справжню IP-адресу клієнта.
 
-## Передумови на віддаленому host
+## Передумови на віддаленому хості
 
-1. Встановіть Node + pnpm і зберіть/встановіть CLI OpenClaw (`pnpm install && pnpm build && pnpm link --global`).
+1. Установіть Node + pnpm і зберіть/установіть CLI OpenClaw (`pnpm install && pnpm build && pnpm link --global`).
 2. Переконайтеся, що `openclaw` є в PATH для неінтерактивних shell (за потреби створіть symlink у `/usr/local/bin` або `/opt/homebrew/bin`).
-3. Відкрийте SSH з автентифікацією ключем. Для стабільної доступності поза LAN рекомендуємо IP-адреси **Tailscale**.
+3. Відкрийте SSH з автентифікацією за ключем. Ми рекомендуємо IP-адреси **Tailscale** для стабільної доступності поза LAN.
 
 ## Налаштування застосунку macOS
 
 1. Відкрийте _Settings → General_.
-2. У розділі **OpenClaw runs** виберіть **Remote over SSH** і задайте:
+2. У розділі **OpenClaw runs** виберіть **Remote over SSH** і встановіть:
    - **Transport**: **SSH tunnel** або **Direct (ws/wss)**.
    - **SSH target**: `user@host` (необов’язково `:port`).
-     - Якщо Gateway знаходиться в тій самій LAN і анонсує себе через Bonjour, виберіть його зі списку знайдених, щоб автоматично заповнити це поле.
+     - Якщо gateway знаходиться в тій самій LAN і оголошує себе через Bonjour, виберіть його зі списку виявлених, щоб автоматично заповнити це поле.
    - **Gateway URL** (лише Direct): `wss://gateway.example.ts.net` (або `ws://...` для local/LAN).
    - **Identity file** (додатково): шлях до вашого ключа.
-   - **Project root** (додатково): шлях до віддаленого checkout, який використовується для команд.
-   - **CLI path** (додатково): необов’язковий шлях до придатного для запуску entrypoint/binary `openclaw` (автоматично заповнюється, якщо його анонсовано).
-3. Натисніть **Test remote**. Успіх означає, що віддалена команда `openclaw status --json` виконується коректно. Збої зазвичай означають проблеми з PATH/CLI; код виходу 127 означає, що CLI не знайдено на віддаленому боці.
-4. Перевірки стану та Web Chat тепер автоматично працюватимуть через цей SSH-тунель.
+   - **Project root** (додатково): шлях до checkout на віддаленому хості, який використовується для команд.
+   - **CLI path** (додатково): необов’язковий шлях до виконуваного entrypoint/binary `openclaw` (автоматично заповнюється, якщо оголошено).
+3. Натисніть **Test remote**. Успіх означає, що віддалений `openclaw status --json` виконується правильно. Збої зазвичай означають проблеми PATH/CLI; код виходу 127 означає, що CLI не знайдено на віддаленому хості.
+4. Перевірки стану здоров’я та Web Chat тепер автоматично працюватимуть через цей SSH-тунель.
 
 ## Web Chat
 
-- **SSH tunnel**: Web Chat підключається до Gateway через переспрямований порт керування WebSocket (типово 18789).
-- **Direct (ws/wss)**: Web Chat підключається безпосередньо до налаштованого URL Gateway.
+- **SSH tunnel**: Web Chat підключається до gateway через переспрямований порт керування WebSocket (типово 18789).
+- **Direct (ws/wss)**: Web Chat підключається безпосередньо до налаштованого URL gateway.
 - Окремого HTTP-сервера WebChat більше немає.
 
 ## Дозволи
 
-- Віддалений host потребує тих самих дозволів TCC, що й локальна машина (Automation, Accessibility, Screen Recording, Microphone, Speech Recognition, Notifications). Запустіть onboarding на цій машині один раз, щоб надати їх.
-- Node анонсують свій стан дозволів через `node.list` / `node.describe`, щоб агенти знали, що доступно.
+- Віддалений хост потребує тих самих дозволів TCC, що й локальний (Automation, Accessibility, Screen Recording, Microphone, Speech Recognition, Notifications). Один раз виконайте onboarding на цій машині, щоб надати їх.
+- Nodes оголошують свій стан дозволів через `node.list` / `node.describe`, щоб агенти знали, що доступно.
 
 ## Примітки щодо безпеки
 
-- Віддавайте перевагу bind на loopback на віддаленому host і підключайтеся через SSH або Tailscale.
-- SSH-тунелювання використовує сувору перевірку host key; спочатку довіртеся host key, щоб він з’явився в `~/.ssh/known_hosts`.
-- Якщо ви прив’язуєте Gateway до інтерфейсу, відмінного від loopback, вимагайте чинну автентифікацію Gateway: token, password або identity-aware reverse proxy з `gateway.auth.mode: "trusted-proxy"`.
-- Див. [Security](/uk/gateway/security) і [Tailscale](/uk/gateway/tailscale).
+- Надавайте перевагу прив’язкам loopback на віддаленому хості та підключайтеся через SSH або Tailscale.
+- SSH-тунелювання використовує сувору перевірку host key; спочатку довірте host key, щоб він з’явився в `~/.ssh/known_hosts`.
+- Якщо ви прив’язуєте Gateway до інтерфейсу не-loopback, вимагайте дійсну автентифікацію Gateway: токен, пароль або identity-aware reverse proxy з `gateway.auth.mode: "trusted-proxy"`.
+- Див. [Безпека](/uk/gateway/security) і [Tailscale](/uk/gateway/tailscale).
 
 ## Потік входу WhatsApp (віддалено)
 
-- Запустіть `openclaw channels login --verbose` **на віддаленому host**. Відскануйте QR у WhatsApp на своєму телефоні.
-- Повторно виконайте вхід на цьому host, якщо автентифікація спливе. Перевірка стану покаже проблеми зі з’єднанням.
+- Запустіть `openclaw channels login --verbose` **на віддаленому хості**. Відскануйте QR за допомогою WhatsApp на телефоні.
+- Повторно запустіть вхід на тому хості, якщо автентифікація завершиться. Перевірка стану здоров’я покаже проблеми зі зв’язуванням.
 
-## Усунення проблем
+## Усунення несправностей
 
-- **exit 127 / not found**: `openclaw` відсутній у PATH для non-login shell. Додайте його до `/etc/paths`, rc-файлу вашого shell або створіть symlink у `/usr/local/bin`/`/opt/homebrew/bin`.
+- **exit 127 / not found**: `openclaw` відсутній у PATH для shell без входу в систему. Додайте його до `/etc/paths`, rc-файлу вашого shell або створіть symlink у `/usr/local/bin`/`/opt/homebrew/bin`.
 - **Health probe failed**: перевірте доступність SSH, PATH і те, що Baileys увійшов у систему (`openclaw status --json`).
-- **Web Chat stuck**: переконайтеся, що Gateway працює на віддаленому host і що переспрямований порт відповідає WS-порту Gateway; UI потребує справного WS-з’єднання.
-- **Node IP shows 127.0.0.1**: це очікувано при використанні SSH tunnel. Перемкніть **Transport** на **Direct (ws/wss)**, якщо хочете, щоб Gateway бачив реальний IP клієнта.
-- **Voice Wake**: trigger phrases автоматично переспрямовуються у віддаленому режимі; окремий forwarder не потрібен.
+- **Web Chat stuck**: переконайтеся, що gateway працює на віддаленому хості й переспрямований порт збігається з портом WS gateway; UI потребує справного WS-з’єднання.
+- **Node IP shows 127.0.0.1**: це очікувано при використанні SSH tunnel. Перемкніть **Transport** на **Direct (ws/wss)**, якщо хочете, щоб gateway бачив справжню IP-адресу клієнта.
+- **Voice Wake**: фрази активації автоматично переспрямовуються у віддаленому режимі; окремий переспрямовувач не потрібен.
 
 ## Звуки сповіщень
 
@@ -88,4 +88,9 @@ x-i18n:
 openclaw nodes notify --node <id> --title "Ping" --body "Remote gateway ready" --sound Glass
 ```
 
-Глобального перемикача “default sound” у застосунку більше немає; виклики вибирають звук (або його відсутність) окремо для кожного запиту.
+Глобального перемикача “типовий звук” у застосунку більше немає; виклики вибирають звук (або його відсутність) для кожного запиту окремо.
+
+## Пов’язане
+
+- [Застосунок macOS](/uk/platforms/macos)
+- [Віддалений доступ](/uk/gateway/remote)

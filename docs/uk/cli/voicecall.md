@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Ви використовуєте Plugin voice-call і хочете точки входу CLI
+    - Ви використовуєте Plugin для голосових дзвінків і хочете мати точки входу CLI
     - Вам потрібні швидкі приклади для `voicecall call|continue|dtmf|status|tail|expose`
-summary: Довідка CLI для `openclaw voicecall` (поверхня команд Plugin для voice-call)
-title: Voicecall
+summary: Довідка CLI для `openclaw voicecall` (поверхня команд Plugin для голосових дзвінків)
+title: Голосовий дзвінок
 x-i18n:
-    generated_at: "2026-04-24T00:54:19Z"
+    generated_at: "2026-04-24T04:13:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2f7588e5ee8bcf2316b74498f0aaff954d0970450d4251fd83e188e8326f6de8
+    source_hash: 03773f46d1c9ab407a9734cb2bbe13d2a36bf0da8e6c9c68c18c05e285912c88
     source_path: cli/voicecall.md
     workflow: 15
 ---
 
 # `openclaw voicecall`
 
-`voicecall` — це команда, яку надає Plugin. Вона з’являється лише якщо Plugin voice-call встановлено та ввімкнено.
+`voicecall` — це команда, яку надає Plugin. Вона з’являється лише тоді, коли Plugin голосових дзвінків установлено та ввімкнено.
 
-Основний документ:
+Основна документація:
 
-- Plugin voice-call: [Голосовий дзвінок](/uk/plugins/voice-call)
+- Plugin голосових дзвінків: [Voice Call](/uk/plugins/voice-call)
 
 ## Поширені команди
 
@@ -31,7 +31,7 @@ openclaw voicecall dtmf --call-id <id> --digits "ww123456#"
 openclaw voicecall end --call-id <id>
 ```
 
-## Відкриття Webhook назовні (Tailscale)
+## Відкриття Webhook (Tailscale)
 
 ```bash
 openclaw voicecall expose --mode serve
@@ -39,4 +39,9 @@ openclaw voicecall expose --mode funnel
 openclaw voicecall expose --mode off
 ```
 
-Примітка щодо безпеки: відкривайте кінцеву точку Webhook назовні лише в мережі, яким ви довіряєте. За можливості віддавайте перевагу Tailscale Serve замість Funnel.
+Примітка щодо безпеки: відкривайте endpoint Webhook лише для мереж, яким ви довіряєте. За можливості надавайте перевагу Tailscale Serve замість Funnel.
+
+## Пов’язане
+
+- [Довідка CLI](/uk/cli)
+- [Plugin голосових дзвінків](/uk/plugins/voice-call)

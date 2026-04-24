@@ -1,30 +1,30 @@
 ---
 read_when:
-    - Реалізація панелі Canvas для macOS
-    - Додавання елементів керування агента для візуального workspace
-    - Налагодження завантажень Canvas у WKWebView
-summary: Панель Canvas під керуванням агента, вбудована через WKWebView + custom URL scheme
+    - Реалізація панелі Canvas на macOS
+    - Додавання елементів керування агента для візуального робочого простору
+    - Налагодження завантаження canvas у WKWebView
+summary: Панель Canvas під керуванням агента, вбудована через WKWebView і власну схему URL
 title: Canvas
 x-i18n:
-    generated_at: "2026-04-23T23:01:51Z"
+    generated_at: "2026-04-24T04:16:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: aac3c051c7acd69939d5de34028eea6bbdf11ca13fd84c4b05cf053b8ba539b4
+    source_hash: 1a791f7841193a55b7f9cc5cc26168258d72d972279bba4c68fd1b15ef16f1c4
     source_path: platforms/mac/canvas.md
     workflow: 15
 ---
 
 Застосунок macOS вбудовує **панель Canvas** під керуванням агента за допомогою `WKWebView`. Це
-легкий візуальний workspace для HTML/CSS/JS, A2UI та невеликих інтерактивних
-UI-поверхонь.
+легкий візуальний робочий простір для HTML/CSS/JS, A2UI та невеликих
+інтерактивних UI-поверхонь.
 
-## Де живе Canvas
+## Де розміщується Canvas
 
 Стан Canvas зберігається в Application Support:
 
 - `~/Library/Application Support/OpenClaw/canvas/<session>/...`
 
-Панель Canvas обслуговує ці файли через **custom URL scheme**:
+Панель Canvas обслуговує ці файли через **власну схему URL**:
 
 - `openclaw-canvas://<session>/<path>`
 
@@ -38,22 +38,22 @@ UI-поверхонь.
 
 ## Поведінка панелі
 
-- Панель без рамки, зі змінним розміром, закріплена біля рядка меню (або курсора миші).
+- Панель без рамки зі змінним розміром, прив’язана біля рядка меню (або курсора миші).
 - Запам’ятовує розмір/позицію для кожної сесії.
 - Автоматично перезавантажується, коли змінюються локальні файли canvas.
-- Одночасно видимою може бути лише одна панель Canvas (за потреби сесія перемикається).
+- Одночасно видима лише одна панель Canvas (за потреби сесія перемикається).
 
 Canvas можна вимкнути в Settings → **Allow Canvas**. Якщо Canvas вимкнено, команди
-вузла canvas повертають `CANVAS_DISABLED`.
+node для canvas повертають `CANVAS_DISABLED`.
 
 ## Поверхня API агента
 
-Canvas доступний через **Gateway WebSocket**, тому агент може:
+Canvas доступний через **Gateway WebSocket**, тож агент може:
 
-- показувати/ховати панель
-- переходити за шляхом або URL
+- показувати/приховувати панель
+- переходити до шляху або URL
 - виконувати JavaScript
-- захоплювати зображення snapshot
+- робити знімок зображення
 
 Приклади CLI:
 
@@ -67,13 +67,13 @@ openclaw nodes canvas snapshot --node <id>
 Примітки:
 
 - `canvas.navigate` приймає **локальні шляхи canvas**, URL `http(s)` і URL `file://`.
-- Якщо передати `"/"`, Canvas покаже локальний scaffold або `index.html`.
+- Якщо передати `"/"`, Canvas покаже локальну scaffold-сторінку або `index.html`.
 
 ## A2UI у Canvas
 
-A2UI розміщується в canvas host Gateway і рендериться всередині панелі Canvas.
-Коли Gateway оголошує Canvas host, застосунок macOS автоматично переходить на
-сторінку хоста A2UI під час першого відкриття.
+A2UI розміщується хостом canvas Gateway і рендериться всередині панелі Canvas.
+Коли Gateway оголошує хост Canvas, застосунок macOS автоматично переходить до
+сторінки хоста A2UI під час першого відкриття.
 
 Типовий URL хоста A2UI:
 
@@ -83,7 +83,7 @@ http://<gateway-host>:18789/__openclaw__/a2ui/
 
 ### Команди A2UI (v0.8)
 
-Наразі Canvas приймає повідомлення сервер→клієнт **A2UI v0.8**:
+Наразі Canvas приймає повідомлення server→client **A2UI v0.8**:
 
 - `beginRendering`
 - `surfaceUpdate`
@@ -103,15 +103,15 @@ EOFA2
 openclaw nodes canvas a2ui push --jsonl /tmp/a2ui-v0.8.jsonl --node <id>
 ```
 
-Швидка перевірка:
+Швидка smoke-перевірка:
 
 ```bash
 openclaw nodes canvas a2ui push --node <id> --text "Hello from A2UI"
 ```
 
-## Запуск агентських прогонів із Canvas
+## Запуск агентських виконань із Canvas
 
-Canvas може запускати нові прогони агента через deep links:
+Canvas може запускати нові виконання агента через deep links:
 
 - `openclaw://agent?...`
 
@@ -125,6 +125,11 @@ window.location.href = "openclaw://agent?message=Review%20this%20design";
 
 ## Примітки щодо безпеки
 
-- Схема Canvas блокує обхід каталогів; файли мають розміщуватися в межах кореня сесії.
-- Локальний вміст Canvas використовує custom scheme (сервер local loopback не потрібен).
-- Зовнішні URL `http(s)` дозволені лише за умови явного переходу до них.
+- Схема Canvas блокує directory traversal; файли мають розміщуватися в корені сесії.
+- Локальний вміст Canvas використовує власну схему (сервер local loopback не потрібен).
+- Зовнішні URL `http(s)` дозволені лише за явного переходу до них.
+
+## Пов’язане
+
+- [Застосунок macOS](/uk/platforms/macos)
+- [WebChat](/uk/web/webchat)

@@ -1,19 +1,23 @@
 ---
 read_when:
-    - Ручне bootstrapping робочого простору
+    - Ручне початкове налаштування робочого простору
 summary: Шаблон робочого простору для HEARTBEAT.md
 title: Шаблон HEARTBEAT.md
 x-i18n:
-    generated_at: "2026-04-23T21:10:32Z"
+    generated_at: "2026-04-24T04:18:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f5a6af215181cf4b17848e41b91883b729d150bcfa05eb7663d36db0983e18bd
+    source_hash: f234f7f5fd016a29a56bae11fc9114649e9c48acd0ece69a9accf90302ed728c
     source_path: reference/templates/HEARTBEAT.md
     workflow: 15
 ---
 
 ```markdown
-# Залиште цей файл порожнім (або лише з коментарями), щоб пропустити виклики Heartbeat API.
+# Залиште цей файл порожнім (або лише з коментарями), щоб пропустити API-виклики Heartbeat.
 
-# Додайте завдання нижче, коли захочете, щоб агент періодично щось перевіряв.
+# Додавайте завдання нижче, коли хочете, щоб агент періодично щось перевіряв.
 ```
+
+## Пов’язане
+
+- [Конфігурація Heartbeat](/uk/gateway/config-agents)

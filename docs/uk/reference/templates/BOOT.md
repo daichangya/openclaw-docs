@@ -1,19 +1,23 @@
 ---
 read_when:
-    - Додавання контрольного списку до BOOT.md
-summary: Шаблон workspace для BOOT.md
+    - Додавання контрольного списку BOOT.md
+summary: Шаблон робочого простору для BOOT.md
 title: Шаблон BOOT.md
 x-i18n:
-    generated_at: "2026-04-23T21:10:13Z"
+    generated_at: "2026-04-24T04:18:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 259bbe6a13f083671648db92ed42a886121056279a33f53d09560fef2b36ac00
+    source_hash: 78c31ef770af20fee60c5d9998c7b2eefb0e2139076f26707ee4cf84502b59f8
     source_path: reference/templates/BOOT.md
     workflow: 15
 ---
 
 # BOOT.md
 
-Додайте короткі, явні інструкції про те, що OpenClaw має робити під час запуску (увімкніть `hooks.internal.enabled`).
-Якщо завдання надсилає повідомлення, використовуйте tool message, а потім дайте відповідь точним
-тихим token-ом `NO_REPLY` / `no_reply`.
+Додайте короткі, явні інструкції щодо того, що OpenClaw має робити під час запуску (увімкніть `hooks.internal.enabled`).
+Якщо завдання надсилає повідомлення, використовуйте інструмент повідомлень, а потім дайте відповідь точним
+тихим токеном `NO_REPLY` / `no_reply`.
+
+## Пов’язане
+
+- [Робочий простір агента](/uk/concepts/agent-workspace)

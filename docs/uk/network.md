@@ -1,75 +1,81 @@
 ---
 read_when:
-    - Вам потрібен огляд мережевої архітектури й безпеки
-    - Ви налагоджуєте доступ через local чи tailnet або pairing
-    - Вам потрібен канонічний список мережевої документації
-summary: 'Мережевий хаб: поверхні gateway, прив’язка, виявлення та безпека'
+    - Вам потрібен огляд мережевої архітектури та безпеки
+    - Ви налагоджуєте локальний доступ чи доступ через tailnet або сполучення
+    - Ви хочете отримати канонічний список мережевої документації
+summary: 'Мережевий хаб: поверхні gateway, сполучення, виявлення та безпека'
 title: Мережа
 x-i18n:
-    generated_at: "2026-04-05T18:08:48Z"
+    generated_at: "2026-04-24T04:15:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4a5f39d4f40ad19646d372000c85b663770eae412af91e1c175eb27b22208118
+    source_hash: 663f372555f044146a5d381566371e9a38185e7f295243bfd61314f12e3a4f06
     source_path: network.md
     workflow: 15
 ---
 
 # Мережевий хаб
 
-Цей хаб посилається на основні документи про те, як OpenClaw підключає, прив’язує та захищає
+Цей хаб містить посилання на основну документацію про те, як OpenClaw підключає, сполучає та захищає
 пристрої через localhost, LAN і tailnet.
 
-## Базова модель
+## Основна модель
 
-Більшість операцій проходить через Gateway (`openclaw gateway`) — один довготривалий процес, який керує підключеннями каналів і площиною керування WebSocket.
+Більшість операцій проходить через Gateway (`openclaw gateway`) — єдиний довготривалий процес, який керує підключеннями каналів і площиною керування WebSocket.
 
-- **Спочатку loopback**: Gateway WS типово використовує `ws://127.0.0.1:18789`.
-  Прив’язки не до loopback вимагають валідного шляху автентифікації gateway: спільного секрету
-  через token/password або правильно налаштованого розгортання `trusted-proxy`
-  не на loopback.
-- **Один Gateway на хост** — рекомендований варіант. Для ізоляції запускайте кілька gateway з ізольованими profile і портами ([Кілька Gateway](/gateway/multiple-gateways)).
-- **Canvas host** обслуговується на тому самому порту, що й Gateway (`/__openclaw__/canvas/`, `/__openclaw__/a2ui/`), і захищений автентифікацією Gateway, якщо bind не на loopback.
-- **Віддалений доступ** зазвичай здійснюється через SSH-тунель або Tailscale VPN ([Віддалений доступ](/gateway/remote)).
+- **Спочатку loopback**: WS Gateway типово використовує `ws://127.0.0.1:18789`.
+  Прив’язки не до loopback вимагають дійсного шляху автентифікації gateway: автентифікація
+  токеном/паролем зі спільним секретом або правильно налаштоване розгортання
+  `trusted-proxy` не на loopback.
+- **Один Gateway на хост** — рекомендований варіант. Для ізоляції запускайте кілька gateway з ізольованими профілями та портами ([Кілька Gateway](/uk/gateway/multiple-gateways)).
+- **Canvas host** обслуговується на тому самому порту, що й Gateway (`/__openclaw__/canvas/`, `/__openclaw__/a2ui/`), і захищений автентифікацією Gateway, коли прив’язаний не лише до loopback.
+- **Віддалений доступ** зазвичай здійснюється через SSH tunnel або VPN Tailscale ([Віддалений доступ](/uk/gateway/remote)).
 
 Ключові посилання:
 
-- [Архітектура Gateway](/concepts/architecture)
-- [Протокол Gateway](/gateway/protocol)
-- [Runbook Gateway](/gateway)
-- [Веб-поверхні + режими bind](/web)
+- [Архітектура Gateway](/uk/concepts/architecture)
+- [Протокол Gateway](/uk/gateway/protocol)
+- [Runbook Gateway](/uk/gateway)
+- [Вебповерхні та режими прив’язки](/uk/web)
 
-## Pairing + ідентичність
+## Сполучення та ідентичність
 
-- [Огляд pairing (DM + вузли)](/channels/pairing)
-- [Прив’язка вузлів, якою володіє Gateway](/gateway/pairing)
-- [CLI Devices (pairing + ротація токенів)](/cli/devices)
-- [CLI Pairing (підтвердження DM)](/cli/pairing)
+- [Огляд сполучення (DM + nodes)](/uk/channels/pairing)
+- [Сполучення node під керуванням Gateway](/uk/gateway/pairing)
+- [CLI Devices (сполучення + ротація токенів)](/uk/cli/devices)
+- [CLI Pairing (схвалення DM)](/uk/cli/pairing)
 
 Локальна довіра:
 
-- Прямі локальні loopback-підключення можуть автоматично підтверджуватися для pairing, щоб UX на одному хості залишався плавним.
-- OpenClaw також має вузький шлях backend/container-local self-connect для
-  довірених сценаріїв helper зі спільним секретом.
-- Клієнти tailnet і LAN, включно з bind tailnet на тому самому хості, і далі потребують
-  явного підтвердження pairing.
+- Прямі локальні підключення loopback можуть автоматично схвалюватися для сполучення, щоб
+  забезпечити зручний UX на тому самому хості.
+- OpenClaw також має вузький шлях самопідключення backend/container-local для
+  довірених допоміжних потоків зі спільним секретом.
+- Клієнти tailnet і LAN, включно з прив’язками tailnet на тому самому хості, все одно потребують
+  явного схвалення сполучення.
 
-## Виявлення + транспорти
+## Виявлення та транспорти
 
-- [Виявлення й транспорти](/gateway/discovery)
-- [Bonjour / mDNS](/gateway/bonjour)
-- [Віддалений доступ (SSH)](/gateway/remote)
-- [Tailscale](/gateway/tailscale)
+- [Виявлення та транспорти](/uk/gateway/discovery)
+- [Bonjour / mDNS](/uk/gateway/bonjour)
+- [Віддалений доступ (SSH)](/uk/gateway/remote)
+- [Tailscale](/uk/gateway/tailscale)
 
-## Вузли + транспорти
+## Nodes і транспорти
 
-- [Огляд вузлів](/nodes)
-- [Протокол bridge (застарілі вузли, історично)](/gateway/bridge-protocol)
-- [Runbook вузла: iOS](/platforms/ios)
-- [Runbook вузла: Android](/platforms/android)
+- [Огляд Nodes](/uk/nodes)
+- [Протокол Bridge (застарілі nodes, історично)](/uk/gateway/bridge-protocol)
+- [Runbook node: iOS](/uk/platforms/ios)
+- [Runbook node: Android](/uk/platforms/android)
 
 ## Безпека
 
-- [Огляд безпеки](/gateway/security)
-- [Довідник із конфігурації Gateway](/gateway/configuration)
-- [Усунення несправностей](/gateway/troubleshooting)
-- [Doctor](/gateway/doctor)
+- [Огляд безпеки](/uk/gateway/security)
+- [Довідка з конфігурації Gateway](/uk/gateway/configuration)
+- [Усунення несправностей](/uk/gateway/troubleshooting)
+- [Doctor](/uk/gateway/doctor)
+
+## Пов’язане
+
+- [Мережева модель Gateway](/uk/gateway/network-model)
+- [Віддалений доступ](/uk/gateway/remote)

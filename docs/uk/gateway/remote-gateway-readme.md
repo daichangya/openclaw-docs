@@ -3,15 +3,15 @@ read_when: Connecting the macOS app to a remote gateway over SSH
 summary: Налаштування SSH-тунелю для підключення OpenClaw.app до віддаленого Gateway
 title: Налаштування віддаленого Gateway
 x-i18n:
-    generated_at: "2026-04-23T20:54:07Z"
+    generated_at: "2026-04-24T04:13:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 01377df9da684a12ef2df8af83d42b9a54a455ec8cc1326a4f7c3784ffebb9bc
+    source_hash: cc5df551839db87a36be7c1b29023c687c418d13337075490436335a8bb1635d
     source_path: gateway/remote-gateway-readme.md
     workflow: 15
 ---
 
-> Цей вміст було об’єднано в [Віддалений доступ](/uk/gateway/remote#macos-persistent-ssh-tunnel-via-launchagent). Дивіться цю сторінку для актуального посібника.
+> Цей вміст було об’єднано в [Remote Access](/uk/gateway/remote#macos-persistent-ssh-tunnel-via-launchagent). Актуальний посібник дивіться на цій сторінці.
 
 # Запуск OpenClaw.app із віддаленим Gateway
 
@@ -21,16 +21,16 @@ OpenClaw.app використовує SSH-тунелювання для підк
 
 ```mermaid
 flowchart TB
-    subgraph Client["Client Machine"]
+    subgraph Client["Клієнтська машина"]
         direction TB
         A["OpenClaw.app"]
-        B["ws://127.0.0.1:18789\n(local port)"]
+        B["ws://127.0.0.1:18789\n(локальний порт)"]
         T["SSH Tunnel"]
 
         A --> B
         B --> T
     end
-    subgraph Remote["Remote Machine"]
+    subgraph Remote["Віддалена машина"]
         direction TB
         C["Gateway WebSocket"]
         D["ws://127.0.0.1:18789"]
@@ -42,19 +42,19 @@ flowchart TB
 
 ## Швидке налаштування
 
-### Крок 1: Додайте SSH-конфігурацію
+### Крок 1: Додайте конфігурацію SSH
 
 Відредагуйте `~/.ssh/config` і додайте:
 
 ```ssh
 Host remote-gateway
-    HostName <REMOTE_IP>          # e.g., 172.27.187.184
-    User <REMOTE_USER>            # e.g., jefferson
+    HostName <REMOTE_IP>          # наприклад, 172.27.187.184
+    User <REMOTE_USER>            # наприклад, jefferson
     LocalForward 18789 127.0.0.1:18789
     IdentityFile ~/.ssh/id_rsa
 ```
 
-Замініть `<REMOTE_IP>` і `<REMOTE_USER>` на свої значення.
+Замініть `<REMOTE_IP>` і `<REMOTE_USER>` на ваші значення.
 
 ### Крок 2: Скопіюйте SSH-ключ
 
@@ -70,9 +70,9 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 openclaw config set gateway.remote.token "<your-token>"
 ```
 
-Використовуйте `gateway.remote.password` замість цього, якщо ваш віддалений Gateway використовує автентифікацію паролем.
-`OPENCLAW_GATEWAY_TOKEN` усе ще валідний як перевизначення на рівні оболонки, але сталий
-клієнтський сценарій для віддаленого доступу — це `gateway.remote.token` / `gateway.remote.password`.
+Використовуйте `gateway.remote.password` натомість, якщо ваш віддалений Gateway використовує автентифікацію за паролем.
+`OPENCLAW_GATEWAY_TOKEN` і далі лишається валідним як перевизначення на рівні оболонки, але надійне
+налаштування віддаленого клієнта — це `gateway.remote.token` / `gateway.remote.password`.
 
 ### Крок 4: Запустіть SSH-тунель
 
@@ -83,7 +83,7 @@ ssh -N remote-gateway &
 ### Крок 5: Перезапустіть OpenClaw.app
 
 ```bash
-# Quit OpenClaw.app (⌘Q), then reopen:
+# Вийдіть з OpenClaw.app (⌘Q), потім відкрийте знову:
 open /path/to/OpenClaw.app
 ```
 
@@ -132,26 +132,26 @@ launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist
 - перезапускатися в разі збою
 - працювати у фоновому режимі
 
-Примітка щодо застарілого: видаліть будь-який залишковий LaunchAgent `com.openclaw.ssh-tunnel`, якщо він є.
+Примітка щодо застарілих налаштувань: видаліть будь-який залишковий LaunchAgent `com.openclaw.ssh-tunnel`, якщо він існує.
 
 ---
 
-## Усунення несправностей
+## Усунення проблем
 
-**Перевірити, чи працює тунель:**
+**Перевірте, чи запущений тунель:**
 
 ```bash
 ps aux | grep "ssh -N remote-gateway" | grep -v grep
 lsof -i :18789
 ```
 
-**Перезапустити тунель:**
+**Перезапустіть тунель:**
 
 ```bash
 launchctl kickstart -k gui/$UID/ai.openclaw.ssh-tunnel
 ```
 
-**Зупинити тунель:**
+**Зупиніть тунель:**
 
 ```bash
 launchctl bootout gui/$UID/ai.openclaw.ssh-tunnel
@@ -161,11 +161,16 @@ launchctl bootout gui/$UID/ai.openclaw.ssh-tunnel
 
 ## Як це працює
 
-| Component                            | What It Does                                                 |
-| ------------------------------------ | ------------------------------------------------------------ |
-| `LocalForward 18789 127.0.0.1:18789` | Перенаправляє локальний порт 18789 на віддалений порт 18789  |
-| `ssh -N`                             | SSH без виконання віддалених команд (лише перенаправлення порту) |
-| `KeepAlive`                          | Автоматично перезапускає тунель у разі збою                  |
-| `RunAtLoad`                          | Запускає тунель під час завантаження агента                  |
+| Компонент                            | Що він робить                                               |
+| ------------------------------------ | ----------------------------------------------------------- |
+| `LocalForward 18789 127.0.0.1:18789` | Перенаправляє локальний порт 18789 на віддалений порт 18789 |
+| `ssh -N`                             | SSH без виконання віддалених команд (лише перенаправлення портів) |
+| `KeepAlive`                          | Автоматично перезапускає тунель у разі збою                 |
+| `RunAtLoad`                          | Запускає тунель під час завантаження агента                 |
 
-OpenClaw.app підключається до `ws://127.0.0.1:18789` на вашій клієнтській машині. SSH-тунель перенаправляє це з’єднання на порт 18789 віддаленої машини, де запущено Gateway.
+OpenClaw.app підключається до `ws://127.0.0.1:18789` на вашій клієнтській машині. SSH-тунель перенаправляє це підключення на порт 18789 віддаленої машини, де запущено Gateway.
+
+## Пов’язане
+
+- [Remote access](/uk/gateway/remote)
+- [Tailscale](/uk/gateway/tailscale)
