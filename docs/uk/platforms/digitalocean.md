@@ -1,14 +1,14 @@
 ---
 read_when:
     - Налаштування OpenClaw на DigitalOcean
-    - Пошук недорогого VPS-хостингу для OpenClaw
+    - Шукаєте недорогий VPS-хостинг для OpenClaw
 summary: OpenClaw на DigitalOcean (простий платний варіант VPS)
 title: DigitalOcean (платформа)
 x-i18n:
-    generated_at: "2026-04-23T21:00:05Z"
+    generated_at: "2026-04-24T03:47:10Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3783fd8036e1a6c5239fe50e61e369f1abc410a8bf027c241c053c3e4082a19c
+    source_hash: c9d286f243f38ed910a3229f195be724f9f96481036380d8c8194ff298d39c87
     source_path: platforms/digitalocean.md
     workflow: 15
 ---
@@ -17,25 +17,25 @@ x-i18n:
 
 ## Мета
 
-Запустити постійний Gateway OpenClaw на DigitalOcean за **$6/місяць** (або $4/місяць за резервним тарифом).
+Запустити постійний Gateway OpenClaw на DigitalOcean за **$6/місяць** (або $4/міс. за резервованою ціною).
 
-Якщо вам потрібен варіант за $0/місяць і вас не лякають ARM + специфічне для провайдера налаштування, див. [посібник для Oracle Cloud](/uk/install/oracle).
+Якщо вам потрібен варіант за $0/місяць і ви не проти ARM + специфічного для провайдера налаштування, див. [посібник з Oracle Cloud](/uk/install/oracle).
 
 ## Порівняння вартості (2026)
 
-| Провайдер    | План            | Характеристики          | Ціна/міс     | Примітки                              |
-| ------------ | --------------- | ----------------------- | ------------ | ------------------------------------- |
-| Oracle Cloud | Always Free ARM | до 4 OCPU, 24GB RAM     | $0           | ARM, обмежена ємність / нюанси реєстрації |
-| Hetzner      | CX22            | 2 vCPU, 4GB RAM         | €3.79 (~$4)  | Найдешевший платний варіант           |
-| DigitalOcean | Basic           | 1 vCPU, 1GB RAM         | $6           | Простий UI, хороша документація       |
-| Vultr        | Cloud Compute   | 1 vCPU, 1GB RAM         | $6           | Багато локацій                        |
-| Linode       | Nanode          | 1 vCPU, 1GB RAM         | $5           | Тепер частина Akamai                  |
+| Провайдер    | План            | Характеристики          | Ціна/міс.   | Примітки                              |
+| ------------ | --------------- | ----------------------- | ----------- | ------------------------------------- |
+| Oracle Cloud | Always Free ARM | до 4 OCPU, 24GB RAM     | $0          | ARM, обмежена місткість / нюанси реєстрації |
+| Hetzner      | CX22            | 2 vCPU, 4GB RAM         | €3.79 (~$4) | Найдешевший платний варіант           |
+| DigitalOcean | Basic           | 1 vCPU, 1GB RAM         | $6          | Простий UI, хороша документація       |
+| Vultr        | Cloud Compute   | 1 vCPU, 1GB RAM         | $6          | Багато локацій                        |
+| Linode       | Nanode          | 1 vCPU, 1GB RAM         | $5          | Тепер частина Akamai                  |
 
 **Вибір провайдера:**
 
 - DigitalOcean: найпростіший UX + передбачуване налаштування (цей посібник)
-- Hetzner: хороше співвідношення ціни/продуктивності (див. [посібник для Hetzner](/uk/install/hetzner))
-- Oracle Cloud: може коштувати $0/місяць, але більш вибагливий і лише ARM (див. [посібник для Oracle](/uk/install/oracle))
+- Hetzner: хороше співвідношення ціни та продуктивності (див. [посібник з Hetzner](/uk/install/hetzner))
+- Oracle Cloud: може коштувати $0/місяць, але вибагливіший і лише на ARM (див. [посібник з Oracle](/uk/install/oracle))
 
 ---
 
@@ -48,7 +48,7 @@ x-i18n:
 ## 1) Створіть Droplet
 
 <Warning>
-Використовуйте чистий базовий образ (Ubuntu 24.04 LTS). Уникайте сторонніх Marketplace 1-click образів, якщо ви не перевірили їхні стартові скрипти та типові налаштування фаєрвола.
+Використовуйте чистий базовий образ (Ubuntu 24.04 LTS). Уникайте сторонніх Marketplace-образів із встановленням в 1 клік, якщо ви не перевірили їхні startup scripts і стандартні параметри firewall.
 </Warning>
 
 1. Увійдіть у [DigitalOcean](https://cloud.digitalocean.com/)
@@ -56,7 +56,7 @@ x-i18n:
 3. Виберіть:
    - **Region:** найближчий до вас (або ваших користувачів)
    - **Image:** Ubuntu 24.04 LTS
-   - **Size:** Basic → Regular → **$6/mo** (1 vCPU, 1GB RAM, 25GB SSD)
+   - **Size:** Basic → Regular → **$6/міс.** (1 vCPU, 1GB RAM, 25GB SSD)
    - **Authentication:** SSH key (рекомендовано) або пароль
 4. Натисніть **Create Droplet**
 5. Запишіть IP-адресу
@@ -84,7 +84,7 @@ curl -fsSL https://openclaw.ai/install.sh | bash
 openclaw --version
 ```
 
-## 4) Запустіть Onboarding
+## 4) Запустіть початкове налаштування
 
 ```bash
 openclaw onboard --install-daemon
@@ -92,10 +92,10 @@ openclaw onboard --install-daemon
 
 Майстер проведе вас через:
 
-- auth моделі (API-ключі або OAuth)
-- налаштування каналів (Telegram, WhatsApp, Discord тощо)
-- токен Gateway (генерується автоматично)
-- установлення демона (systemd)
+- Автентифікацію моделі (API-ключі або OAuth)
+- Налаштування channel (Telegram, WhatsApp, Discord тощо)
+- Gateway token (генерується автоматично)
+- Установлення демона (systemd)
 
 ## 5) Перевірте Gateway
 
@@ -110,11 +110,11 @@ systemctl --user status openclaw-gateway.service
 journalctl --user -u openclaw-gateway.service -f
 ```
 
-## 6) Отримайте доступ до панелі керування
+## 6) Отримайте доступ до Dashboard
 
-За замовчуванням gateway прив’язується до loopback. Щоб отримати доступ до Control UI:
+Gateway за замовчуванням прив’язується до loopback. Щоб отримати доступ до Control UI:
 
-**Варіант A: SSH Tunnel (рекомендовано)**
+**Варіант A: SSH-тунель (рекомендовано)**
 
 ```bash
 # From your local machine
@@ -139,10 +139,10 @@ openclaw gateway restart
 
 Примітки:
 
-- Serve зберігає Gateway доступним лише через loopback і автентифікує трафік Control UI/WebSocket через заголовки ідентичності Tailscale (автентифікація без токена передбачає довірений хост gateway; HTTP API не використовують ці заголовки Tailscale, а натомість дотримуються звичайного HTTP-режиму автентифікації gateway).
-- Щоб натомість вимагати явні credentials через спільний секрет, задайте `gateway.auth.allowTailscale: false` і використовуйте `gateway.auth.mode: "token"` або `"password"`.
+- Serve зберігає Gateway доступним лише через loopback і автентифікує трафік Control UI/WebSocket через заголовки identity Tailscale (автентифікація без токена передбачає довірений хост gateway; HTTP API не використовують ці заголовки Tailscale, а натомість дотримуються звичайного режиму HTTP-автентифікації gateway).
+- Щоб натомість вимагати явні облікові дані зі спільним секретом, установіть `gateway.auth.allowTailscale: false` і використовуйте `gateway.auth.mode: "token"` або `"password"`.
 
-**Варіант C: прив’язка tailnet (без Serve)**
+**Варіант C: Tailnet bind (без Serve)**
 
 ```bash
 openclaw config set gateway.bind tailnet
@@ -151,7 +151,7 @@ openclaw gateway restart
 
 Відкрийте: `http://<tailscale-ip>:18789` (потрібен токен).
 
-## 7) Підключіть свої канали
+## 7) Підключіть свої channels
 
 ### Telegram
 
@@ -167,7 +167,7 @@ openclaw channels login whatsapp
 # Scan QR code
 ```
 
-Інші провайдери див. у [Каналах](/uk/channels).
+Див. [Channels](/uk/channels) для інших провайдерів.
 
 ---
 
@@ -187,12 +187,12 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
 ### Використовуйте легшу модель
 
-Якщо виникають OOM, варто:
+Якщо ви стикаєтеся з OOM, розгляньте такі варіанти:
 
-- використовувати моделі через API (Claude, GPT) замість локальних моделей
-- задати меншу модель у `agents.defaults.model.primary`
+- Використовуйте моделі на основі API (Claude, GPT) замість локальних моделей
+- Установіть `agents.defaults.model.primary` на меншу модель
 
-### Слідкуйте за пам’яттю
+### Моніторинг пам’яті
 
 ```bash
 free -h
@@ -203,12 +203,12 @@ htop
 
 ## Збереження стану
 
-Увесь state зберігається в:
+Увесь стан зберігається в:
 
-- `~/.openclaw/` — `openclaw.json`, `auth-profiles.json` для кожного агента, стан каналів/провайдерів і дані сесій
+- `~/.openclaw/` — `openclaw.json`, `auth-profiles.json` для кожного агента, стан channel/provider і дані сесій
 - `~/.openclaw/workspace/` — workspace (SOUL.md, memory тощо)
 
-Ці дані переживають перезавантаження. Періодично робіть резервні копії:
+Ці дані переживають перезавантаження. Регулярно створюйте резервні копії:
 
 ```bash
 openclaw backup create
@@ -216,23 +216,23 @@ openclaw backup create
 
 ---
 
-## Безкоштовна альтернатива Oracle Cloud
+## Безкоштовна альтернатива: Oracle Cloud
 
-Oracle Cloud пропонує **Always Free** ARM-екземпляри, які значно потужніші за будь-який платний варіант тут — за $0/місяць.
+Oracle Cloud пропонує інстанси **Always Free** на ARM, які значно потужніші за будь-який платний варіант тут — за $0/місяць.
 
-| Що ви отримуєте   | Характеристики        |
-| ----------------- | --------------------- |
-| **4 OCPUs**       | ARM Ampere A1         |
-| **24GB RAM**      | Більш ніж достатньо   |
-| **200GB storage** | Block volume          |
-| **Назавжди безкоштовно** | Без списань з картки |
+| Що ви отримуєте   | Характеристики         |
+| ----------------- | ---------------------- |
+| **4 OCPU**        | ARM Ampere A1          |
+| **24GB RAM**      | Більш ніж достатньо    |
+| **200GB storage** | Block volume           |
+| **Безкоштовно назавжди** | Без списань із банківської картки |
 
 **Застереження:**
 
-- Реєстрація може бути вибагливою (повторіть, якщо не вдається)
-- ARM-архітектура — більшість речей працює, але деяким бінарникам потрібні ARM-збірки
+- Реєстрація може бути вибагливою (спробуйте ще раз, якщо не вийде)
+- Архітектура ARM — більшість речей працює, але для деяких бінарних файлів потрібні ARM-збірки
 
-Повний посібник із налаштування див. у [Oracle Cloud](/uk/install/oracle). Поради щодо реєстрації та усунення проблем із процесом підключення див. в цьому [посібнику від спільноти](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd).
+Повний посібник з налаштування див. в [Oracle Cloud](/uk/install/oracle). Поради щодо реєстрації та усунення проблем із процесом підключення див. в цьому [посібнику спільноти](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd).
 
 ---
 
@@ -246,7 +246,7 @@ openclaw doctor --non-interactive
 journalctl --user -u openclaw-gateway.service --no-pager -n 50
 ```
 
-### Порт уже зайнятий
+### Порт уже використовується
 
 ```bash
 lsof -i :18789
@@ -265,9 +265,9 @@ free -h
 
 ---
 
-## Див. також
+## Пов’язане
 
-- [Посібник для Hetzner](/uk/install/hetzner) — дешевше, потужніше
-- [Встановлення через Docker](/uk/install/docker) — контейнеризоване налаштування
+- [Посібник з Hetzner](/uk/install/hetzner) — дешевше, потужніше
+- [Установлення через Docker](/uk/install/docker) — контейнеризоване налаштування
 - [Tailscale](/uk/gateway/tailscale) — безпечний віддалений доступ
 - [Конфігурація](/uk/gateway/configuration) — повний довідник із конфігурації

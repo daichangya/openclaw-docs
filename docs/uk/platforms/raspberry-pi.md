@@ -2,14 +2,14 @@
 read_when:
     - Налаштування OpenClaw на Raspberry Pi
     - Запуск OpenClaw на ARM-пристроях
-    - Створення недорогого персонального AI, який завжди працює
-summary: OpenClaw на Raspberry Pi (бюджетне self-hosted налаштування)
+    - Побудова недорогої персональної AI-системи, що працює постійно
+summary: OpenClaw на Raspberry Pi (бюджетне самостійне розгортання)
 title: Raspberry Pi (платформа)
 x-i18n:
-    generated_at: "2026-04-23T21:01:50Z"
+    generated_at: "2026-04-24T03:47:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 976de01203f982511f8f4b66331e9263d7848cbe656b0cdb5932eb890c72a178
+    source_hash: 79a2e8edf3c2853deddece8d52dc87b9a5800643b4d866acd80db3a83ca9b270
     source_path: platforms/raspberry-pi.md
     workflow: 15
 ---
@@ -18,43 +18,43 @@ x-i18n:
 
 ## Мета
 
-Запустити постійний, завжди ввімкнений Gateway OpenClaw на Raspberry Pi за **~$35-80** одноразових витрат (без щомісячних платежів).
+Запустити постійний, завжди увімкнений Gateway OpenClaw на Raspberry Pi за **~$35-80** одноразових витрат (без щомісячних платежів).
 
 Ідеально для:
 
 - персонального AI-асистента 24/7
 - хаба домашньої автоматизації
-- енергоефективного бота Telegram/WhatsApp, який завжди доступний
+- енергоефективного, завжди доступного бота для Telegram/WhatsApp
 
 ## Вимоги до обладнання
 
-| Модель Pi        | RAM     | Працює?   | Примітки                           |
-| ---------------- | ------- | --------- | ---------------------------------- |
-| **Pi 5**         | 4GB/8GB | ✅ Найкраще | Найшвидший, рекомендовано         |
-| **Pi 4**         | 4GB     | ✅ Добре   | Оптимальний варіант для більшості користувачів |
-| **Pi 4**         | 2GB     | ✅ Нормально | Працює, додайте swap             |
-| **Pi 4**         | 1GB     | ⚠️ Тісно   | Можливо зі swap, мінімальна конфігурація |
+| Модель Pi        | RAM     | Працює?  | Примітки                           |
+| ---------------- | ------- | -------- | ---------------------------------- |
+| **Pi 5**         | 4GB/8GB | ✅ Найкраще | Найшвидший, рекомендовано          |
+| **Pi 4**         | 4GB     | ✅ Добре | Оптимальний варіант для більшості користувачів |
+| **Pi 4**         | 2GB     | ✅ OK    | Працює, додайте swap               |
+| **Pi 4**         | 1GB     | ⚠️ Тісно | Можливо зі swap, мінімальна конфігурація |
 | **Pi 3B+**       | 1GB     | ⚠️ Повільно | Працює, але повільно              |
-| **Pi Zero 2 W**  | 512MB   | ❌         | Не рекомендовано                   |
+| **Pi Zero 2 W**  | 512MB   | ❌       | Не рекомендовано                   |
 
 **Мінімальні характеристики:** 1GB RAM, 1 ядро, 500MB диска  
-**Рекомендовано:** 2GB+ RAM, 64-bit ОС, SD-карта 16GB+ (або USB SSD)
+**Рекомендовано:** 2GB+ RAM, 64-bit OS, SD-карта 16GB+ (або USB SSD)
 
 ## Що вам потрібно
 
 - Raspberry Pi 4 або 5 (рекомендовано 2GB+)
 - MicroSD-карта (16GB+) або USB SSD (краща продуктивність)
 - Блок живлення (рекомендовано офіційний PSU для Pi)
-- Підключення до мережі (Ethernet або WiFi)
+- Мережеве підключення (Ethernet або WiFi)
 - ~30 хвилин
 
 ## 1) Запишіть ОС
 
-Використовуйте **Raspberry Pi OS Lite (64-bit)** — робочий стіл для headless-сервера не потрібен.
+Використовуйте **Raspberry Pi OS Lite (64-bit)** — для безголового сервера робочий стіл не потрібен.
 
 1. Завантажте [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
-2. Виберіть ОС: **Raspberry Pi OS Lite (64-bit)**
-3. Натисніть іконку шестерні (⚙️), щоб попередньо налаштувати:
+2. Оберіть ОС: **Raspberry Pi OS Lite (64-bit)**
+3. Натисніть значок шестерні (⚙️), щоб попередньо налаштувати:
    - Установіть hostname: `gateway-host`
    - Увімкніть SSH
    - Установіть ім’я користувача/пароль
@@ -66,63 +66,63 @@ x-i18n:
 
 ```bash
 ssh user@gateway-host
-# or use the IP address
+# або використайте IP-адресу
 ssh user@192.168.x.x
 ```
 
 ## 3) Налаштування системи
 
 ```bash
-# Update system
+# Оновити систему
 sudo apt update && sudo apt upgrade -y
 
-# Install essential packages
+# Установити необхідні пакунки
 sudo apt install -y git curl build-essential
 
-# Set timezone (important for cron/reminders)
-sudo timedatectl set-timezone America/Chicago  # Change to your timezone
+# Установити часовий пояс (важливо для cron/нагадувань)
+sudo timedatectl set-timezone America/Chicago  # Змініть на свій часовий пояс
 ```
 
 ## 4) Установіть Node.js 24 (ARM64)
 
 ```bash
-# Install Node.js via NodeSource
+# Установити Node.js через NodeSource
 curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt install -y nodejs
 
-# Verify
-node --version  # Should show v24.x.x
+# Перевірити
+node --version  # Має показати v24.x.x
 npm --version
 ```
 
 ## 5) Додайте swap (важливо для 2GB або менше)
 
-Swap запобігає аваріям через нестачу пам’яті:
+Swap запобігає збоям через нестачу пам’яті:
 
 ```bash
-# Create 2GB swap file
+# Створити swap-файл на 2GB
 sudo fallocate -l 2G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
 
-# Make permanent
+# Зробити постійним
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
-# Optimize for low RAM (reduce swappiness)
+# Оптимізувати для малої RAM (зменшити swappiness)
 echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 ```
 
 ## 6) Установіть OpenClaw
 
-### Варіант A: Стандартне встановлення (рекомендовано)
+### Варіант A: стандартне встановлення (рекомендовано)
 
 ```bash
 curl -fsSL https://openclaw.ai/install.sh | bash
 ```
 
-### Варіант B: Встановлення для зручного експериментування (For tinkering)
+### Варіант B: зручне для змін встановлення (для експериментів)
 
 ```bash
 git clone https://github.com/openclaw/openclaw.git
@@ -132,7 +132,7 @@ npm run build
 npm link
 ```
 
-Встановлення для експериментування дає прямий доступ до логів і коду — це корисно для налагодження проблем, специфічних для ARM.
+Встановлення для змін дає прямий доступ до логів і коду — це корисно для налагодження ARM-специфічних проблем.
 
 ## 7) Запустіть онбординг
 
@@ -140,39 +140,39 @@ npm link
 openclaw onboard --install-daemon
 ```
 
-Дотримуйтеся майстра:
+Дотримуйтесь майстра:
 
 1. **Режим Gateway:** Local
-2. **Auth:** рекомендовано API-ключі (OAuth може бути примхливим на headless Pi)
-3. **Канали:** найпростіше почати з Telegram
-4. **Daemon:** Yes (systemd)
+2. **Auth:** рекомендовано API keys (OAuth на безголовому Pi може бути нестабільним)
+3. **Channels:** найпростіше почати з Telegram
+4. **Daemon:** Так (systemd)
 
 ## 8) Перевірте встановлення
 
 ```bash
-# Check status
+# Перевірити стан
 openclaw status
 
-# Check service (standard install = systemd user unit)
+# Перевірити сервіс (стандартне встановлення = user unit systemd)
 systemctl --user status openclaw-gateway.service
 
-# View logs
+# Переглянути логи
 journalctl --user -u openclaw-gateway.service -f
 ```
 
-## 9) Отримайте доступ до панелі OpenClaw
+## 9) Отримайте доступ до Dashboard OpenClaw
 
-Замініть `user@gateway-host` на ваше ім’я користувача Pi і hostname або IP-адресу.
+Замініть `user@gateway-host` на ім’я користувача й hostname або IP-адресу вашого Pi.
 
-На вашому комп’ютері попросіть Pi вивести новий URL панелі:
+На своєму комп’ютері попросіть Pi вивести новий URL Dashboard:
 
 ```bash
 ssh user@gateway-host 'openclaw dashboard --no-open'
 ```
 
-Команда виводить `Dashboard URL:`. Залежно від того, як налаштовано `gateway.auth.token`,
-це може бути звичайне посилання `http://127.0.0.1:18789/` або таке,
-що містить `#token=...`.
+Команда виведе `Dashboard URL:`. Залежно від того, як налаштовано `gateway.auth.token`,
+URL може бути звичайним посиланням `http://127.0.0.1:18789/` або
+містити `#token=...`.
 
 В іншому терміналі на вашому комп’ютері створіть SSH-тунель:
 
@@ -180,10 +180,10 @@ ssh user@gateway-host 'openclaw dashboard --no-open'
 ssh -N -L 18789:127.0.0.1:18789 user@gateway-host
 ```
 
-Потім відкрийте надрукований Dashboard URL у локальному браузері.
+Потім відкрийте надрукований URL Dashboard у локальному браузері.
 
-Якщо UI просить shared-secret auth, вставте налаштований токен або пароль
-у налаштуваннях Control UI. Для token auth використовуйте `gateway.auth.token` (або
+Якщо UI запитує shared-secret auth, вставте налаштований token або password
+в налаштуваннях Control UI. Для token auth використовуйте `gateway.auth.token` (або
 `OPENCLAW_GATEWAY_TOKEN`).
 
 Для постійного віддаленого доступу див. [Tailscale](/uk/gateway/tailscale).
@@ -194,16 +194,16 @@ ssh -N -L 18789:127.0.0.1:18789 user@gateway-host
 
 ### Використовуйте USB SSD (велике покращення)
 
-SD-карти повільні та зношуються. USB SSD значно покращує продуктивність:
+SD-карти повільні й зношуються. USB SSD суттєво покращує продуктивність:
 
 ```bash
-# Check if booting from USB
+# Перевірити, чи завантаження йде з USB
 lsblk
 ```
 
-Налаштування див. у [Pi USB boot guide](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot).
+Інструкції з налаштування див. у [посібнику з USB boot для Pi](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot).
 
-### Прискорте запуск CLI (module compile cache)
+### Прискорте запуск CLI (кеш компіляції модулів)
 
 На менш потужних хостах Pi увімкніть кеш компіляції модулів Node, щоб повторні запуски CLI були швидшими:
 
@@ -218,15 +218,15 @@ source ~/.bashrc
 
 Примітки:
 
-- `NODE_COMPILE_CACHE` прискорює наступні запуски (`status`, `health`, `--help`).
+- `NODE_COMPILE_CACHE` пришвидшує наступні запуски (`status`, `health`, `--help`).
 - `/var/tmp` переживає перезавантаження краще, ніж `/tmp`.
 - `OPENCLAW_NO_RESPAWN=1` уникає додаткових витрат на запуск через самоперезапуск CLI.
-- Перший запуск прогріває кеш; наступні отримують найбільшу користь.
+- Перший запуск прогріває кеш; найбільшу користь дають наступні запуски.
 
 ### Налаштування запуску systemd (необов’язково)
 
-Якщо цей Pi в основному використовується для OpenClaw, додайте drop-in для служби, щоб зменшити
-jitter під час перезапуску та зберегти стабільне середовище запуску:
+Якщо цей Pi переважно виконує OpenClaw, додайте drop-in для сервісу, щоб зменшити
+нестабільність перезапусків і зберегти стабільне середовище запуску:
 
 ```bash
 systemctl --user edit openclaw-gateway.service
@@ -248,51 +248,51 @@ systemctl --user daemon-reload
 systemctl --user restart openclaw-gateway.service
 ```
 
-За можливості зберігайте стан/кеш OpenClaw на SSD-backed сховищі, щоб уникнути
+Якщо можливо, тримайте стан/кеш OpenClaw на сховищі з SSD, щоб уникнути
 вузьких місць випадкового I/O SD-карти під час холодних запусків.
 
-Якщо це headless Pi, один раз увімкніть lingering, щоб користувацька служба переживала
+Якщо це безголовий Pi, один раз увімкніть lingering, щоб user service переживав
 вихід із системи:
 
 ```bash
 sudo loginctl enable-linger "$(whoami)"
 ```
 
-Як політики `Restart=` допомагають автоматизованому відновленню:
+Як політики `Restart=` допомагають автоматичному відновленню:
 [systemd can automate service recovery](https://www.redhat.com/en/blog/systemd-automate-recovery).
 
 ### Зменште використання пам’яті
 
 ```bash
-# Disable GPU memory allocation (headless)
+# Вимкнути виділення пам’яті під GPU (безголовий режим)
 echo 'gpu_mem=16' | sudo tee -a /boot/config.txt
 
-# Disable Bluetooth if not needed
+# Вимкнути Bluetooth, якщо він не потрібен
 sudo systemctl disable bluetooth
 ```
 
-### Моніторте ресурси
+### Моніторинг ресурсів
 
 ```bash
-# Check memory
+# Перевірити пам’ять
 free -h
 
-# Check CPU temperature
+# Перевірити температуру CPU
 vcgencmd measure_temp
 
-# Live monitoring
+# Моніторинг у реальному часі
 htop
 ```
 
 ---
 
-## Примітки, специфічні для ARM
+## Примітки щодо ARM
 
 ### Сумісність бінарних файлів
 
 Більшість можливостей OpenClaw працює на ARM64, але деяким зовнішнім бінарним файлам можуть знадобитися ARM-збірки:
 
-| Tool               | Статус ARM64 | Примітки                            |
+| Інструмент         | Статус ARM64 | Примітки                            |
 | ------------------ | ------------ | ----------------------------------- |
 | Node.js            | ✅           | Працює чудово                       |
 | WhatsApp (Baileys) | ✅           | Чистий JS, без проблем              |
@@ -300,22 +300,22 @@ htop
 | gog (Gmail CLI)    | ⚠️           | Перевірте наявність ARM-релізу      |
 | Chromium (browser) | ✅           | `sudo apt install chromium-browser` |
 
-Якщо Skill не працює, перевірте, чи є в його бінарного файла ARM-збірка. У багатьох Go/Rust tools вона є; у деяких — ні.
+Якщо Skill не працює, перевірте, чи має його бінарний файл ARM-збірку. Багато інструментів на Go/Rust мають, але не всі.
 
-### 32-bit проти 64-bit
+### 32-bit vs 64-bit
 
-**Завжди використовуйте 64-bit ОС.** Node.js і багато сучасних tools цього потребують. Перевірка:
+**Завжди використовуйте 64-bit OS.** Node.js і багато сучасних інструментів цього потребують. Перевірте так:
 
 ```bash
 uname -m
-# Should show: aarch64 (64-bit) not armv7l (32-bit)
+# Має показати: aarch64 (64-bit), а не armv7l (32-bit)
 ```
 
 ---
 
-## Рекомендоване налаштування моделі
+## Рекомендоване налаштування моделей
 
-Оскільки Pi тут лише виконує роль Gateway (моделі працюють у хмарі), використовуйте моделі на основі API:
+Оскільки Pi тут лише Gateway (моделі працюють у хмарі), використовуйте моделі на базі API:
 
 ```json
 {
@@ -330,74 +330,74 @@ uname -m
 }
 ```
 
-**Не намагайтеся запускати локальні LLM на Pi** — навіть малі моделі будуть надто повільними. Нехай Claude/GPT виконують важку роботу.
+**Не намагайтеся запускати локальні LLM на Pi** — навіть малі моделі працюватимуть надто повільно. Нехай Claude/GPT виконують основне навантаження.
 
 ---
 
-## Автозапуск при завантаженні
+## Автозапуск під час завантаження
 
 Онбординг це налаштовує, але для перевірки:
 
 ```bash
-# Check service is enabled
+# Перевірити, що сервіс увімкнено
 systemctl --user is-enabled openclaw-gateway.service
 
-# Enable if not
+# Увімкнути, якщо ні
 systemctl --user enable openclaw-gateway.service
 
-# Start on boot
+# Запускати під час завантаження
 systemctl --user start openclaw-gateway.service
 ```
 
 ---
 
-## Усунення проблем
+## Усунення несправностей
 
 ### Нестача пам’яті (OOM)
 
 ```bash
-# Check memory
+# Перевірити пам’ять
 free -h
 
-# Add more swap (see Step 5)
-# Or reduce services running on the Pi
+# Додати більше swap (див. крок 5)
+# Або зменшити кількість сервісів, що працюють на Pi
 ```
 
-### Повільна робота
+### Повільна продуктивність
 
 - Використовуйте USB SSD замість SD-карти
-- Вимкніть невикористовувані служби: `sudo systemctl disable cups bluetooth avahi-daemon`
+- Вимкніть непотрібні сервіси: `sudo systemctl disable cups bluetooth avahi-daemon`
 - Перевірте тротлінг CPU: `vcgencmd get_throttled` (має повертати `0x0`)
 
-### Служба не запускається
+### Сервіс не запускається
 
 ```bash
-# Check logs
+# Перевірити логи
 journalctl --user -u openclaw-gateway.service --no-pager -n 100
 
-# Common fix: rebuild
-cd ~/openclaw  # if using hackable install
+# Поширене виправлення: перебудова
+cd ~/openclaw  # якщо використовуєте встановлення для змін
 npm run build
 systemctl --user restart openclaw-gateway.service
 ```
 
-### Проблеми з ARM-бінарними файлами
+### Проблеми з ARM-бінарниками
 
-Якщо Skill завершується з "exec format error":
+Якщо Skill падає з помилкою "exec format error":
 
-1. Перевірте, чи є ARM64-збірка бінарного файла
-2. Спробуйте зібрати з source
-3. Або використайте контейнер Docker з підтримкою ARM
+1. Перевірте, чи має бінарний файл збірку для ARM64
+2. Спробуйте зібрати з джерела
+3. Або використайте Docker-контейнер із підтримкою ARM
 
-### Відпадає WiFi
+### Обриви WiFi
 
-Для headless Pi, що працює через WiFi:
+Для безголових Pi на WiFi:
 
 ```bash
-# Disable WiFi power management
+# Вимкнути керування живленням WiFi
 sudo iwconfig wlan0 power off
 
-# Make permanent
+# Зробити постійним
 echo 'wireless-power off' | sudo tee -a /etc/network/interfaces
 ```
 
@@ -405,23 +405,23 @@ echo 'wireless-power off' | sudo tee -a /etc/network/interfaces
 
 ## Порівняння вартості
 
-| Налаштування   | Одноразова вартість | Щомісячна вартість | Примітки                    |
-| -------------- | ------------------- | ------------------ | --------------------------- |
-| **Pi 4 (2GB)** | ~$45                | $0                 | + електроенергія (~$5/рік)  |
-| **Pi 4 (4GB)** | ~$55                | $0                 | Рекомендовано               |
-| **Pi 5 (4GB)** | ~$60                | $0                 | Найкраща продуктивність     |
-| **Pi 5 (8GB)** | ~$80                | $0                 | Надлишково, але із запасом на майбутнє |
-| DigitalOcean   | $0                  | $6/міс             | $72/рік                     |
-| Hetzner        | $0                  | €3.79/міс          | ~$50/рік                    |
+| Варіант         | Одноразова вартість | Щомісячна вартість | Примітки                  |
+| --------------- | ------------------- | ------------------ | ------------------------- |
+| **Pi 4 (2GB)**  | ~$45                | $0                 | + електроенергія (~$5/рік) |
+| **Pi 4 (4GB)**  | ~$55                | $0                 | Рекомендовано             |
+| **Pi 5 (4GB)**  | ~$60                | $0                 | Найкраща продуктивність   |
+| **Pi 5 (8GB)**  | ~$80                | $0                 | Надлишково, але із запасом на майбутнє |
+| DigitalOcean    | $0                  | $6/mo              | $72/рік                   |
+| Hetzner         | $0                  | €3.79/mo           | ~$50/рік                  |
 
-**Точка беззбитковості:** Pi окупає себе приблизно за 6–12 місяців порівняно з хмарним VPS.
+**Точка окупності:** Pi окупається приблизно за 6-12 місяців порівняно з хмарним VPS.
 
 ---
 
-## Див. також
+## Пов’язане
 
 - [Linux guide](/uk/platforms/linux) — загальне налаштування Linux
 - [DigitalOcean guide](/uk/install/digitalocean) — хмарна альтернатива
 - [Hetzner guide](/uk/install/hetzner) — налаштування Docker
 - [Tailscale](/uk/gateway/tailscale) — віддалений доступ
-- [Nodes](/uk/nodes) — спарте ваш ноутбук/телефон із gateway на Pi
+- [Nodes](/uk/nodes) — під’єднайте свій ноутбук/телефон до Gateway на Pi

@@ -1,27 +1,27 @@
 ---
 read_when:
     - Ви хочете вибрати провайдера моделі
-    - Ви хочете швидкі приклади налаштування для автентифікації LLM + вибору моделі
+    - Ви хочете швидкі приклади налаштування для автентифікації LLM і вибору моделі
 summary: Провайдери моделей (LLM), які підтримує OpenClaw
 title: Швидкий старт для провайдерів моделей
 x-i18n:
-    generated_at: "2026-04-23T21:07:09Z"
+    generated_at: "2026-04-24T03:48:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d38d0eb6af7c3bf415b476c3ea752c29a8a24f8e93e5d52bf86ee685faf79f1a
+    source_hash: b824a664e0e7a7a5b0ea640ea7329ea3d1e3d12b85d9310231c76014b2ae01cc
     source_path: providers/models.md
     workflow: 15
 ---
 
 # Провайдери моделей
 
-OpenClaw може використовувати багато провайдерів LLM. Виберіть одного, пройдіть автентифікацію, а потім задайте типову
-модель у форматі `provider/model`.
+OpenClaw може використовувати багато провайдерів LLM. Виберіть одного, пройдіть автентифікацію, а потім задайте модель за замовчуванням
+у форматі `provider/model`.
 
 ## Швидкий старт (два кроки)
 
 1. Пройдіть автентифікацію у провайдера (зазвичай через `openclaw onboard`).
-2. Установіть типову модель:
+2. Задайте модель за замовчуванням:
 
 ```json5
 {
@@ -29,7 +29,7 @@ OpenClaw може використовувати багато провайдер
 }
 ```
 
-## Підтримувані провайдери (базовий набір)
+## Підтримувані провайдери (стартовий набір)
 
 - [Alibaba Model Studio](/uk/providers/alibaba)
 - [Amazon Bedrock](/uk/providers/bedrock)
@@ -40,7 +40,7 @@ OpenClaw може використовувати багато провайдер
 - [Cloudflare AI Gateway](/uk/providers/cloudflare-ai-gateway)
 - [fal](/uk/providers/fal)
 - [Fireworks](/uk/providers/fireworks)
-- [GLM models](/uk/providers/glm)
+- [Моделі GLM](/uk/providers/glm)
 - [MiniMax](/uk/providers/minimax)
 - [Mistral](/uk/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/uk/providers/moonshot)
@@ -59,8 +59,15 @@ OpenClaw може використовувати багато провайдер
 
 ## Додаткові варіанти вбудованих провайдерів
 
-- `anthropic-vertex` - неявна підтримка Anthropic у Google Vertex, коли доступні облікові дані Vertex; окремого варіанта автентифікації в онбордингу немає
+- `anthropic-vertex` - неявна підтримка Anthropic у Google Vertex, коли доступні облікові дані Vertex; окремий варіант автентифікації під час onboarding не потрібен
 - `copilot-proxy` - локальний міст VS Code Copilot Proxy; використовуйте `openclaw onboard --auth-choice copilot-proxy`
-- `google-gemini-cli` - неофіційний OAuth-потік Gemini CLI; вимагає локального встановлення `gemini` (`brew install gemini-cli` або `npm install -g @google/gemini-cli`); типова модель `google-gemini-cli/gemini-3-flash-preview`; використовуйте `openclaw onboard --auth-choice google-gemini-cli` або `openclaw models auth login --provider google-gemini-cli --set-default`
+- `google-gemini-cli` - неофіційний OAuth-процес Gemini CLI; потребує локального встановлення `gemini` (`brew install gemini-cli` або `npm install -g @google/gemini-cli`); модель за замовчуванням — `google-gemini-cli/gemini-3-flash-preview`; використовуйте `openclaw onboard --auth-choice google-gemini-cli` або `openclaw models auth login --provider google-gemini-cli --set-default`
 
-Повний каталог провайдерів (xAI, Groq, Mistral тощо) і розширену конфігурацію див. у [Model providers](/uk/concepts/model-providers).
+Повний каталог провайдерів (xAI, Groq, Mistral тощо) і розширену конфігурацію
+див. у [Провайдери моделей](/uk/concepts/model-providers).
+
+## Пов’язане
+
+- [Вибір моделі](/uk/concepts/model-providers)
+- [Model failover](/uk/concepts/model-failover)
+- [Models CLI](/uk/cli/models)

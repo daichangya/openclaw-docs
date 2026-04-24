@@ -6,31 +6,31 @@ read_when:
 summary: Налаштування генерації відео Runway в OpenClaw
 title: Runway
 x-i18n:
-    generated_at: "2026-04-23T21:08:01Z"
+    generated_at: "2026-04-24T03:48:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: fe0caa1c286a4e7ce25a2876f51d09ea462978746fb7a6f428395f67b78d56b2
+    source_hash: 9648ca4403283cd23bf899d697f35a6b63986e8860227628c0d5789fceee3ce8
     source_path: providers/runway.md
     workflow: 15
 ---
 
-OpenClaw постачається з вбудованим провайдером `runway` для хостованої генерації відео.
+OpenClaw постачається з вбудованим провайдером `runway` для hosted-генерації відео.
 
-| Властивість | Значення                                                           |
-| ----------- | ------------------------------------------------------------------ |
-| ID провайдера | `runway`                                                         |
-| Автентифікація | `RUNWAYML_API_SECRET` (канонічно) або `RUNWAY_API_KEY`          |
-| API         | Генерація відео Runway на основі задач (`GET /v1/tasks/{id}` polling) |
+| Property    | Value                                                             |
+| ----------- | ----------------------------------------------------------------- |
+| Provider id | `runway`                                                          |
+| Auth        | `RUNWAYML_API_SECRET` (канонічний) або `RUNWAY_API_KEY`           |
+| API         | Генерація відео Runway на основі завдань (`GET /v1/tasks/{id}` polling) |
 
-## Початок роботи
+## Швидкий старт
 
 <Steps>
-  <Step title="Установіть API key">
+  <Step title="Задайте API key">
     ```bash
     openclaw onboard --auth-choice runway-api-key
     ```
   </Step>
-  <Step title="Установіть Runway як типовий провайдер відео">
+  <Step title="Зробіть Runway типовим провайдером відео">
     ```bash
     openclaw config set agents.defaults.videoGenerationModel.primary "runway/gen4.5"
     ```
@@ -42,19 +42,19 @@ OpenClaw постачається з вбудованим провайдером
 
 ## Підтримувані режими
 
-| Режим          | Модель             | Вхідне референсне джерело |
-| -------------- | ------------------ | ------------------------- |
-| Text-to-video  | `gen4.5` (типово)  | Немає                     |
+| Mode           | Model              | Reference input              |
+| -------------- | ------------------ | ---------------------------- |
+| Text-to-video  | `gen4.5` (типово)  | Немає                        |
 | Image-to-video | `gen4.5`           | 1 локальне або віддалене зображення |
 | Video-to-video | `gen4_aleph`       | 1 локальне або віддалене відео |
 
 <Note>
-Локальні посилання на зображення та відео підтримуються через data URI. Для запусків лише з текстом
+Підтримуються локальні reference image і video через data URI. Для запусків лише з текстом
 наразі доступні співвідношення сторін `16:9` і `9:16`.
 </Note>
 
 <Warning>
-Для video-to-video наразі обов’язково потрібна саме `runway/gen4_aleph`.
+Video-to-video наразі вимагає саме `runway/gen4_aleph`.
 </Warning>
 
 ## Конфігурація
@@ -75,14 +75,14 @@ OpenClaw постачається з вбудованим провайдером
 
 <AccordionGroup>
   <Accordion title="Псевдоніми змінних середовища">
-    OpenClaw розпізнає і `RUNWAYML_API_SECRET` (канонічно), і `RUNWAY_API_KEY`.
+    OpenClaw розпізнає і `RUNWAYML_API_SECRET` (канонічний), і `RUNWAY_API_KEY`.
     Будь-яка з цих змінних автентифікує провайдера Runway.
   </Accordion>
 
-  <Accordion title="Опитування задач">
-    Runway використовує API на основі задач. Після надсилання запиту на генерацію OpenClaw
-    опитує `GET /v1/tasks/{id}`, доки відео не буде готове. Додаткової
-    конфігурації для поведінки опитування не потрібно.
+  <Accordion title="Опитування завдань">
+    Runway використовує API на основі завдань. Після надсилання запиту на генерацію OpenClaw
+    опитує `GET /v1/tasks/{id}` доти, доки відео не буде готове. Додаткове
+    налаштування для цієї поведінки polling не потрібне.
   </Accordion>
 </AccordionGroup>
 
@@ -92,7 +92,7 @@ OpenClaw постачається з вбудованим провайдером
   <Card title="Генерація відео" href="/uk/tools/video-generation" icon="video">
     Спільні параметри інструмента, вибір провайдера та асинхронна поведінка.
   </Card>
-  <Card title="Довідник із конфігурації" href="/uk/gateway/configuration-reference#agent-defaults" icon="gear">
-    Типові налаштування агента, включно з моделлю генерації відео.
+  <Card title="Configuration reference" href="/uk/gateway/config-agents#agent-defaults" icon="gear">
+    Типові налаштування агентів, включно з моделлю генерації відео.
   </Card>
 </CardGroup>
