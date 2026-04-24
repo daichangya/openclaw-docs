@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Vous voulez utiliser DeepSeek avec OpenClaw
-    - Vous avez besoin de la variable d’environnement de clé API ou du choix d’authentification CLI
-summary: configuration de DeepSeek (authentification + sélection de modèle)
+    - Vous souhaitez utiliser DeepSeek avec OpenClaw
+    - Vous avez besoin de la variable d’environnement de clé API ou du choix d’authentification du CLI
+summary: Configuration de DeepSeek (authentification + sélection du modèle)
 title: DeepSeek
 x-i18n:
-    generated_at: "2026-04-24T07:26:27Z"
+    generated_at: "2026-04-24T15:25:47Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ead407c67c05bd8700db1cba36defdd9d47bdc9a071c76a07c4b4fb82f6b80e2
+    source_hash: 5b0d2345c72328e14351d71c5784204dc6ed9dc922f919b6adfac394001c3261
     source_path: providers/deepseek.md
     workflow: 15
 ---
@@ -25,18 +25,18 @@ x-i18n:
 ## Premiers pas
 
 <Steps>
-  <Step title="Obtenir votre clé API">
+  <Step title="Obtenez votre clé API">
     Créez une clé API sur [platform.deepseek.com](https://platform.deepseek.com/api_keys).
   </Step>
-  <Step title="Lancer l’intégration">
+  <Step title="Exécutez l’onboarding">
     ```bash
     openclaw onboard --auth-choice deepseek-api-key
     ```
 
-    Cela vous demandera votre clé API et définira `deepseek/deepseek-chat` comme modèle par défaut.
+    Cela vous demandera votre clé API et définira `deepseek/deepseek-v4-flash` comme modèle par défaut.
 
   </Step>
-  <Step title="Vérifier que les modèles sont disponibles">
+  <Step title="Vérifiez que les modèles sont disponibles">
     ```bash
     openclaw models list --provider deepseek
     ```
@@ -45,7 +45,7 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Configuration non interactive">
-    Pour les installations scriptées ou headless, passez directement tous les indicateurs :
+    Pour les installations scriptées ou sans interface, transmettez tous les indicateurs directement :
 
     ```bash
     openclaw onboard --non-interactive \
@@ -60,20 +60,24 @@ x-i18n:
 </AccordionGroup>
 
 <Warning>
-Si la Gateway s’exécute comme démon (launchd/systemd), assurez-vous que `DEEPSEEK_API_KEY`
-est disponible pour ce processus (par exemple dans `~/.openclaw/.env` ou via
+Si le Gateway s’exécute en tant que démon (launchd/systemd), assurez-vous que `DEEPSEEK_API_KEY`
+est disponible pour ce processus (par exemple, dans `~/.openclaw/.env` ou via
 `env.shellEnv`).
 </Warning>
 
 ## Catalogue intégré
 
-| Référence de modèle          | Nom               | Entrée | Contexte | Sortie max | Remarques                                         |
-| ---------------------------- | ----------------- | ------ | -------- | ---------- | ------------------------------------------------ |
-| `deepseek/deepseek-chat`     | DeepSeek Chat     | texte  | 131,072  | 8,192      | Modèle par défaut ; surface non réfléchie DeepSeek V3.2 |
-| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | texte  | 131,072  | 65,536     | Surface V3.2 avec raisonnement activé            |
+| Référence du modèle          | Nom               | Entrée | Contexte  | Sortie max | Notes                                      |
+| ---------------------------- | ----------------- | ------ | --------- | ---------- | ------------------------------------------ |
+| `deepseek/deepseek-v4-flash` | DeepSeek V4 Flash | text   | 1,000,000 | 384,000    | Modèle par défaut ; interface V4 compatible avec le thinking |
+| `deepseek/deepseek-v4-pro`   | DeepSeek V4 Pro   | text   | 1,000,000 | 384,000    | Interface V4 compatible avec le thinking   |
+| `deepseek/deepseek-chat`     | DeepSeek Chat     | text   | 131,072   | 8,192      | Interface sans thinking DeepSeek V3.2      |
+| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text   | 131,072   | 65,536     | Interface V3.2 avec raisonnement activé    |
 
 <Tip>
-Les deux modèles intégrés annoncent actuellement une compatibilité d’usage du streaming dans le code source.
+Les modèles V4 prennent en charge le contrôle `thinking` de DeepSeek. OpenClaw rejoue également
+`reasoning_content` de DeepSeek lors des tours de suivi afin que les sessions de thinking avec des appels
+d’outils puissent se poursuivre.
 </Tip>
 
 ## Exemple de configuration
@@ -83,7 +87,7 @@ Les deux modèles intégrés annoncent actuellement une compatibilité d’usage
   env: { DEEPSEEK_API_KEY: "sk-..." },
   agents: {
     defaults: {
-      model: { primary: "deepseek/deepseek-chat" },
+      model: { primary: "deepseek/deepseek-v4-flash" },
     },
   },
 }
@@ -92,10 +96,10 @@ Les deux modèles intégrés annoncent actuellement une compatibilité d’usage
 ## Liens associés
 
 <CardGroup cols={2}>
-  <Card title="Sélection de modèle" href="/fr/concepts/model-providers" icon="layers">
-    Choisir les fournisseurs, les références de modèle et le comportement de repli.
+  <Card title="Sélection du modèle" href="/fr/concepts/model-providers" icon="layers">
+    Choisir les fournisseurs, les références de modèle et le comportement de basculement.
   </Card>
   <Card title="Référence de configuration" href="/fr/gateway/configuration-reference" icon="gear">
-    Référence complète de configuration pour les agents, modèles et fournisseurs.
+    Référence complète de configuration pour les agents, les modèles et les fournisseurs.
   </Card>
 </CardGroup>
