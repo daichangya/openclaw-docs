@@ -1,37 +1,37 @@
 ---
 read_when:
-    - 你希望 OpenClaw 在 Azure 上 24/7 运行，并配合 Network Security Group 加固
-    - 你希望在自己的 Azure Linux VM 上部署一个生产级、始终在线的 OpenClaw Gateway 网关
-    - 你希望通过 Azure Bastion SSH 进行安全管理
-summary: 在 Azure Linux VM 上 24/7 运行 OpenClaw Gateway 网关，并保持持久状态
+    - 你想要让 OpenClaw 在 Azure 上 24/7 运行，并对网络安全组进行加固
+    - 你想要在你自己的 Azure Linux VM 上部署一个生产级、始终在线的 OpenClaw Gateway 网关
+    - 你想要使用 Azure Bastion SSH 进行安全管理
+summary: 在 Azure Linux VM 上 24/7 运行 OpenClaw Gateway 网关并保留持久状态
 title: Azure
 x-i18n:
-    generated_at: "2026-04-05T08:26:23Z"
+    generated_at: "2026-04-24T03:16:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dcdcf6dcf5096cd21e1b64f455656f7d77b477d03e9a088db74c6e988c3031db
+    source_hash: e42e1a35e0340b959b73c548bc1efd6366bee38cf4c8cd23d986c5f14e5da0e0
     source_path: install/azure.md
     workflow: 15
 ---
 
 # 在 Azure Linux VM 上运行 OpenClaw
 
-本指南将使用 Azure CLI 设置 Azure Linux VM，应用 Network Security Group（NSG）加固，配置 Azure Bastion 以提供 SSH 访问，并安装 OpenClaw。
+本指南将使用 Azure CLI 设置 Azure Linux VM，应用网络安全组（NSG）加固，配置 Azure Bastion 以提供 SSH 访问，并安装 OpenClaw。
 
-## 你将要完成的事项
+## 你将执行的操作
 
 - 使用 Azure CLI 创建 Azure 网络（VNet、子网、NSG）和计算资源
-- 应用 Network Security Group 规则，使 VM SSH 仅允许来自 Azure Bastion 的访问
-- 使用 Azure Bastion 进行 SSH 访问（VM 不分配公网 IP）
+- 应用网络安全组规则，使 VM SSH 仅允许来自 Azure Bastion
+- 使用 Azure Bastion 进行 SSH 访问（VM 不暴露公网 IP）
 - 使用安装脚本安装 OpenClaw
 - 验证 Gateway 网关
 
-## 你需要准备的内容
+## 你需要准备
 
-- 一个具有创建计算和网络资源权限的 Azure 订阅
-- 已安装 Azure CLI（如有需要，请参见 [Azure CLI 安装步骤](https://learn.microsoft.com/cli/azure/install-azure-cli)）
-- 一对 SSH 密钥（如果还没有，本指南也会说明如何生成）
-- 约 20-30 分钟
+- 一个有权限创建计算和网络资源的 Azure 订阅
+- 已安装 Azure CLI（如有需要，请参见 [Azure CLI install steps](https://learn.microsoft.com/cli/azure/install-azure-cli)）
+- 一对 SSH 密钥（本指南也会介绍如何在需要时生成）
+- 约 20–30 分钟
 
 ## 配置部署
 
@@ -46,13 +46,13 @@ x-i18n:
 
   </Step>
 
-  <Step title="注册所需的资源 provider（一次性）">
+  <Step title="注册所需的资源提供程序（一次性）">
     ```bash
     az provider register --namespace Microsoft.Compute
     az provider register --namespace Microsoft.Network
     ```
 
-    验证注册状态。等待二者都显示 `Registered`。
+    验证注册状态。等待两者都显示为 `Registered`。
 
     ```bash
     az provider show --namespace Microsoft.Compute --query registrationState -o tsv
@@ -77,18 +77,18 @@ x-i18n:
     BASTION_PIP_NAME="pip-openclaw-bastion"
     ```
 
-    请根据你的环境调整名称和 CIDR 范围。Bastion 子网必须至少为 `/26`。
+    根据你的环境调整名称和 CIDR 范围。Bastion 子网必须至少为 `/26`。
 
   </Step>
 
   <Step title="选择 SSH 密钥">
-    如果你已有公钥，请直接使用：
+    如果你已有现成的公钥，可以直接使用：
 
     ```bash
     SSH_PUB_KEY="$(cat ~/.ssh/id_ed25519.pub)"
     ```
 
-    如果你还没有 SSH 密钥，请先生成一个：
+    如果你还没有 SSH 密钥，可以生成一个：
 
     ```bash
     ssh-keygen -t ed25519 -a 100 -f ~/.ssh/id_ed25519 -C "you@example.com"
@@ -103,11 +103,11 @@ x-i18n:
     OS_DISK_SIZE_GB=64
     ```
 
-    请选择你的订阅和区域中可用的 VM 规格与 OS 磁盘大小：
+    请选择在你的订阅和区域中可用的 VM 规格与 OS 磁盘大小：
 
-    - 轻量使用场景可先选较小规格，之后再扩容
-    - 如果需要更重的自动化、更多渠道，或更大的模型/工具负载，请选择更多 vCPU/RAM/磁盘
-    - 如果某个 VM 规格在你的区域或订阅配额中不可用，请选择最接近的可用 SKU
+    - 轻量使用可先从较小规格开始，之后再扩容
+    - 对于更重的自动化、更多渠道，或更大的模型 / 工具工作负载，请使用更多 vCPU / RAM / 磁盘
+    - 如果某个 VM 规格在你的区域中不可用，或超出订阅配额，请选择最接近的可用 SKU
 
     列出目标区域中可用的 VM 规格：
 
@@ -115,7 +115,7 @@ x-i18n:
     az vm list-skus --location "${LOCATION}" --resource-type virtualMachines -o table
     ```
 
-    检查你当前的 vCPU 和磁盘使用量/配额：
+    检查你当前的 vCPU 和磁盘使用量 / 配额：
 
     ```bash
     az vm list-usage --location "${LOCATION}" -o table
@@ -134,7 +134,7 @@ x-i18n:
   </Step>
 
   <Step title="创建网络安全组">
-    创建 NSG，并添加规则，使只有 Bastion 子网可以通过 SSH 连接到 VM。
+    创建 NSG 并添加规则，使只有 Bastion 子网可以通过 SSH 访问 VM。
 
     ```bash
     az network nsg create \
@@ -148,7 +148,7 @@ x-i18n:
       --source-address-prefixes "${BASTION_SUBNET_PREFIX}" \
       --destination-port-ranges 22
 
-    # 拒绝来自公网的 SSH
+    # 拒绝来自公共互联网的 SSH
     az network nsg rule create \
       -g "${RG}" --nsg-name "${NSG_NAME}" \
       -n DenyInternetSsh --priority 110 \
@@ -165,12 +165,12 @@ x-i18n:
       --destination-port-ranges 22
     ```
 
-    这些规则按优先级顺序评估（数字越小优先级越高）：优先级 100 允许 Bastion 流量，然后在 110 和 120 阻止所有其他 SSH。
+    这些规则会按优先级求值（数字越小越先执行）：Bastion 流量在 100 被允许，其余所有 SSH 则在 110 和 120 被阻止。
 
   </Step>
 
   <Step title="创建虚拟网络和子网">
-    创建 VNet 和 VM 子网（附加 NSG），然后添加 Bastion 子网。
+    创建包含 VM 子网（已附加 NSG）的 VNet，然后再添加 Bastion 子网。
 
     ```bash
     az network vnet create \
@@ -194,7 +194,7 @@ x-i18n:
   </Step>
 
   <Step title="创建 VM">
-    该 VM 不分配公网 IP。SSH 访问完全通过 Azure Bastion 进行。
+    该 VM 没有公网 IP。SSH 访问仅通过 Azure Bastion 提供。
 
     ```bash
     az vm create \
@@ -211,9 +211,9 @@ x-i18n:
       --nsg ""
     ```
 
-    `--public-ip-address ""` 可防止分配公网 IP。`--nsg ""` 会跳过为每个 NIC 创建单独 NSG（子网级 NSG 已负责安全控制）。
+    `--public-ip-address ""` 可防止分配公网 IP。`--nsg ""` 会跳过为每个 NIC 创建单独的 NSG（子网级 NSG 已负责安全控制）。
 
-    **可复现性：** 上面的命令对 Ubuntu 镜像使用了 `latest`。如果你想固定到某个具体版本，请先列出可用版本，然后替换 `latest`：
+    **可复现性：** 上面的命令对 Ubuntu 镜像使用了 `latest`。若要固定具体版本，请列出可用版本并将 `latest` 替换掉：
 
     ```bash
     az vm image list \
@@ -224,7 +224,7 @@ x-i18n:
   </Step>
 
   <Step title="创建 Azure Bastion">
-    Azure Bastion 可在不暴露公网 IP 的情况下，为 VM 提供托管 SSH 访问。若要使用基于 CLI 的 `az network bastion ssh`，需要支持隧道的 Standard SKU。
+    Azure Bastion 可在不暴露公网 IP 的情况下，为 VM 提供托管 SSH 访问。基于 CLI 的 `az network bastion ssh` 需要支持隧道功能的 Standard SKU。
 
     ```bash
     az network public-ip create \
@@ -238,7 +238,7 @@ x-i18n:
       --sku Standard --enable-tunneling true
     ```
 
-    Bastion 通常需要 5-10 分钟完成配置，但在某些区域中可能需要长达 15-30 分钟。
+    Bastion 的预配通常需要 5–10 分钟，但在某些区域中可能需要 15–30 分钟。
 
   </Step>
 </Steps>
@@ -246,7 +246,7 @@ x-i18n:
 ## 安装 OpenClaw
 
 <Steps>
-  <Step title="通过 Azure Bastion SSH 进入 VM">
+  <Step title="通过 Azure Bastion SSH 登录 VM">
     ```bash
     VM_ID="$(az vm show -g "${RG}" -n "${VM_NAME}" --query id -o tsv)"
 
@@ -268,51 +268,57 @@ x-i18n:
     rm -f /tmp/install.sh
     ```
 
-    安装程序会在尚未安装时安装 Node LTS 和依赖项，安装 OpenClaw，并启动新手引导向导。详见[安装](/install)。
+    如果系统中尚未安装，安装程序会安装 Node LTS 和依赖项、安装 OpenClaw，并启动新手引导向导。详情请参见[安装](/zh-CN/install)。
 
   </Step>
 
   <Step title="验证 Gateway 网关">
-    新手引导完成后，运行：
+    完成新手引导后：
 
     ```bash
     openclaw gateway status
     ```
 
-    大多数企业 Azure 团队已经拥有 GitHub Copilot 许可证。如果你的情况也是如此，我们建议你在 OpenClaw 新手引导向导中选择 GitHub Copilot provider。参见 [GitHub Copilot provider](/providers/github-copilot)。
+    大多数企业 Azure 团队已经拥有 GitHub Copilot 许可证。如果你的情况也是如此，我们建议你在 OpenClaw 新手引导向导中选择 GitHub Copilot 提供商。参见 [GitHub Copilot provider](/zh-CN/providers/github-copilot)。
 
   </Step>
 </Steps>
 
-## 成本考虑
+## 成本考量
 
-Azure Bastion Standard SKU 的运行成本大约为**140 美元/月**，VM（Standard_B2as_v2）的运行成本大约为**55 美元/月**。
+Azure Bastion Standard SKU 的运行成本约为**\$140/月**，VM（Standard_B2as_v2）的运行成本约为**\$55/月**。
 
 为了降低成本：
 
-- **在不使用时释放 VM**（停止计算计费；磁盘费用仍然保留）。当 VM 被释放时，OpenClaw Gateway 网关将不可访问——当你再次需要它在线时请重新启动：
+- **在不使用时解除分配 VM**（停止计算计费；磁盘费用仍会保留）。VM 解除分配期间，OpenClaw Gateway 网关将无法访问——需要再次在线时再重启它：
 
   ```bash
   az vm deallocate -g "${RG}" -n "${VM_NAME}"
-  az vm start -g "${RG}" -n "${VM_NAME}"   # 之后重新启动
+  az vm start -g "${RG}" -n "${VM_NAME}"   # 之后重启
   ```
 
-- **在不需要时删除 Bastion**，等需要 SSH 访问时再重新创建。Bastion 是最大的成本项，而且通常只需几分钟即可重新配置完成。
-- 如果你只需要基于 Portal 的 SSH，而不需要 CLI 隧道（`az network bastion ssh`），请使用 **Basic Bastion SKU**（约 **38 美元/月**）。
+- **在不需要时删除 Bastion**，需要 SSH 访问时再重新创建。Bastion 是最大的成本项，而它只需要几分钟即可完成预配。
+- 如果你只需要基于 Portal 的 SSH，不需要 CLI 隧道（`az network bastion ssh`），可以使用 **Basic Bastion SKU**（约 \$38/月）。
 
 ## 清理
 
-如需删除本指南创建的所有资源：
+要删除本指南创建的所有资源：
 
 ```bash
 az group delete -n "${RG}" --yes --no-wait
 ```
 
-这将删除资源组及其内部的所有内容（VM、VNet、NSG、Bastion、公网 IP）。
+这会删除资源组及其中的所有内容（VM、VNet、NSG、Bastion、公网 IP）。
 
 ## 后续步骤
 
-- 设置消息渠道：[Channels](/channels)
-- 将本地设备配对为节点：[Nodes](/nodes)
-- 配置 Gateway 网关：[Gateway 配置](/gateway/configuration)
-- 若要了解使用 GitHub Copilot 模型 provider 在 Azure 上部署 OpenClaw 的更多细节，请参见：[OpenClaw on Azure with GitHub Copilot](https://github.com/johnsonshi/openclaw-azure-github-copilot)
+- 设置消息渠道：[Channels](/zh-CN/channels)
+- 将本地设备配对为节点：[Nodes](/zh-CN/nodes)
+- 配置 Gateway 网关：[Gateway configuration](/zh-CN/gateway/configuration)
+- 有关使用 GitHub Copilot 模型提供商在 Azure 上部署 OpenClaw 的更多详情，请参见：[OpenClaw on Azure with GitHub Copilot](https://github.com/johnsonshi/openclaw-azure-github-copilot)
+
+## 相关
+
+- [Install overview](/zh-CN/install)
+- [GCP](/zh-CN/install/gcp)
+- [DigitalOcean](/zh-CN/install/digitalocean)

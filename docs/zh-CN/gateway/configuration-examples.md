@@ -3,18 +3,18 @@ read_when:
     - 了解如何配置 OpenClaw
     - 查找配置示例
     - 首次设置 OpenClaw
-summary: 适用于常见 OpenClaw 设置的模式精确配置示例
+summary: 常见 OpenClaw 设置的符合 schema 的配置示例
 title: 配置示例
 x-i18n:
-    generated_at: "2026-04-23T22:57:44Z"
+    generated_at: "2026-04-24T03:15:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 66f59f9846c7e42d4d4ef2424d6fa56b2e51364f88296974aa2550855f89354f
+    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-以下示例与当前配置模式保持一致。有关完整参考和逐字段说明，请参阅 [Configuration](/zh-CN/gateway/configuration)。
+以下示例与当前配置 schema 保持一致。要查看完整参考和逐字段说明，请参见[配置](/zh-CN/gateway/configuration)。
 
 ## 快速开始
 
@@ -27,9 +27,9 @@ x-i18n:
 }
 ```
 
-将其保存到 `~/.openclaw/openclaw.json`，然后你就可以通过该号码向机器人发送私信。
+保存到 `~/.openclaw/openclaw.json`，然后你就可以通过该号码向机器人发送私信。
 
-### 推荐入门配置
+### 推荐的入门配置
 
 ```json5
 {
@@ -57,7 +57,7 @@ x-i18n:
 
 ```json5
 {
-  // Environment + shell
+  // 环境 + shell
   env: {
     OPENROUTER_API_KEY: "sk-or-...",
     vars: {
@@ -69,7 +69,7 @@ x-i18n:
     },
   },
 
-  // Auth profile metadata (secrets live in auth-profiles.json)
+  // 凭证配置元数据（密钥存储在 auth-profiles.json 中）
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -84,14 +84,14 @@ x-i18n:
     },
   },
 
-  // Identity
+  // 身份
   identity: {
     name: "Samantha",
     theme: "helpful sloth",
     emoji: "🦥",
   },
 
-  // Logging
+  // 日志
   logging: {
     level: "info",
     file: "/tmp/openclaw/openclaw.log",
@@ -100,7 +100,7 @@ x-i18n:
     redactSensitive: "tools",
   },
 
-  // Message formatting
+  // 消息格式
   messages: {
     messagePrefix: "[openclaw]",
     responsePrefix: ">",
@@ -108,7 +108,7 @@ x-i18n:
     ackReactionScope: "group-mentions",
   },
 
-  // Routing + queue
+  // 路由 + 队列
   routing: {
     groupChat: {
       mentionPatterns: ["@openclaw", "openclaw"],
@@ -131,7 +131,7 @@ x-i18n:
     },
   },
 
-  // Tooling
+  // 工具
   tools: {
     media: {
       audio: {
@@ -139,7 +139,7 @@ x-i18n:
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // Optional CLI fallback (Whisper binary):
+          // 可选 CLI 回退（Whisper 二进制文件）：
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -152,10 +152,10 @@ x-i18n:
     },
   },
 
-  // Session behavior
+  // 会话行为
   session: {
     scope: "per-sender",
-    dmScope: "per-channel-peer", // recommended for multi-user inboxes
+    dmScope: "per-channel-peer", // 推荐用于多用户收件箱
     reset: {
       mode: "daily",
       atHour: 4,
@@ -171,9 +171,9 @@ x-i18n:
       pruneAfter: "30d",
       maxEntries: 500,
       rotateBytes: "10mb",
-      resetArchiveRetention: "30d", // duration or false
-      maxDiskBytes: "500mb", // optional
-      highWaterBytes: "400mb", // optional (defaults to 80% of maxDiskBytes)
+      resetArchiveRetention: "30d", // 时长或 false
+      maxDiskBytes: "500mb", // 可选
+      highWaterBytes: "400mb", // 可选（默认是 maxDiskBytes 的 80%）
     },
     typingIntervalSeconds: 5,
     sendPolicy: {
@@ -182,7 +182,7 @@ x-i18n:
     },
   },
 
-  // Channels
+  // 渠道
   channels: {
     whatsapp: {
       dmPolicy: "pairing",
@@ -234,7 +234,7 @@ x-i18n:
     },
   },
 
-  // Agent runtime
+  // 智能体运行时
   agents: {
     defaults: {
       workspace: "~/.openclaw/workspace",
@@ -251,7 +251,7 @@ x-i18n:
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
         "openai/gpt-5.4": { alias: "gpt" },
       },
-      skills: ["github", "weather"], // inherited by agents that omit list[].skills
+      skills: ["github", "weather"], // 会被未设置 list[].skills 的智能体继承
       thinkingDefault: "low",
       verboseDefault: "off",
       elevatedDefault: "on",
@@ -276,7 +276,7 @@ x-i18n:
         every: "30m",
         model: "anthropic/claude-sonnet-4-6",
         target: "last",
-        directPolicy: "allow", // allow (default) | block
+        directPolicy: "allow", // allow（默认）| block
         to: "+15555550123",
         prompt: "HEARTBEAT",
         ackMaxChars: 300,
@@ -291,7 +291,7 @@ x-i18n:
       },
       sandbox: {
         mode: "non-main",
-        scope: "session", // preferred over legacy perSession: true
+        scope: "session", // 相比旧版 perSession: true，更推荐使用此项
         workspaceRoot: "~/.openclaw/sandboxes",
         docker: {
           image: "openclaw-sandbox:bookworm-slim",
@@ -310,15 +310,15 @@ x-i18n:
       {
         id: "main",
         default: true,
-        // inherits defaults.skills -> github, weather
-        thinkingDefault: "high", // per-agent thinking override
-        reasoningDefault: "on", // per-agent reasoning visibility
-        fastModeDefault: false, // per-agent fast mode
+        // 继承 defaults.skills -> github, weather
+        thinkingDefault: "high", // 每个智能体的 thinking 覆盖
+        reasoningDefault: "on", // 每个智能体的推理可见性
+        fastModeDefault: false, // 每个智能体的快速模式
       },
       {
         id: "quick",
-        skills: [], // no skills for this agent
-        fastModeDefault: true, // this agent always runs fast
+        skills: [], // 此智能体不使用任何 Skills
+        fastModeDefault: true, // 此智能体始终以快速模式运行
         thinkingDefault: "off",
       },
     ],
@@ -346,7 +346,7 @@ x-i18n:
     },
   },
 
-  // Custom model providers
+  // 自定义模型提供商
   models: {
     mode: "merge",
     providers: {
@@ -372,7 +372,7 @@ x-i18n:
     },
   },
 
-  // Cron jobs
+  // Cron 作业
   cron: {
     enabled: true,
     store: "~/.openclaw/cron/cron.json",
@@ -384,7 +384,7 @@ x-i18n:
     },
   },
 
-  // Webhooks
+  // Webhook
   hooks: {
     enabled: true,
     path: "/hooks",
@@ -427,7 +427,7 @@ x-i18n:
     },
   },
 
-  // Gateway + networking
+  // Gateway 网关 + 网络
   gateway: {
     mode: "local",
     port: 18789,
@@ -466,7 +466,7 @@ x-i18n:
 
 ## 常见模式
 
-### 共享 Skills 基线并覆盖其中一个
+### 共享的 Skills 基线 + 单个覆盖
 
 ```json5
 {
@@ -484,8 +484,8 @@ x-i18n:
 ```
 
 - `agents.defaults.skills` 是共享基线。
-- `agents.list[].skills` 会为某个智能体替换该基线。
-- 当某个智能体不应看到任何 Skills 时，请使用 `skills: []`。
+- `agents.list[].skills` 会替换某个智能体的该基线。
+- 当某个智能体不应看到任何 Skills 时，使用 `skills: []`。
 
 ### 多平台设置
 
@@ -510,21 +510,21 @@ x-i18n:
 
 ### 安全私信模式（共享收件箱 / 多用户私信）
 
-如果有多个人可以向你的机器人发送私信（`allowFrom` 中有多个条目、已为多人批准配对，或使用 `dmPolicy: "open"`），请启用**安全私信模式**，这样不同发送者发来的私信默认不会共享同一个上下文：
+如果不止一个人可以向你的机器人发送私信（`allowFrom` 中有多个条目、为多个人批准配对，或者 `dmPolicy: "open"`），请启用**安全私信模式**，这样默认情况下，不同发送者的私信就不会共享同一个上下文：
 
 ```json5
 {
-  // Secure DM mode (recommended for multi-user or sensitive DM agents)
+  // 安全私信模式（推荐用于多用户或敏感私信智能体）
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // Example: WhatsApp multi-user inbox
+    // 示例：WhatsApp 多用户收件箱
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // Example: Discord multi-user inbox
+    // 示例：Discord 多用户收件箱
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -534,10 +534,10 @@ x-i18n:
 }
 ```
 
-对于 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC，发送者授权默认优先使用 ID。
-仅当你明确接受这一风险时，才应通过各渠道的 `dangerouslyAllowNameMatching: true` 启用基于可变姓名/邮箱/昵称的直接匹配。
+对于 Discord / Slack / Google Chat / Microsoft Teams / Mattermost / IRC，发送者授权默认优先基于 ID。
+只有在你明确接受该风险时，才启用各渠道的 `dangerouslyAllowNameMatching: true`，以允许直接使用可变的名称 / 邮箱 / 昵称进行匹配。
 
-### Anthropic API 密钥 + MiniMax 后备
+### Anthropic API 密钥 + MiniMax 回退
 
 ```json5
 {
@@ -630,7 +630,12 @@ x-i18n:
 
 ## 提示
 
-- 如果你设置 `dmPolicy: "open"`，对应的 `allowFrom` 列表必须包含 `"*"`。
-- 提供商 ID 各不相同（电话号码、用户 ID、渠道 ID）。请查阅提供商文档以确认格式。
-- 后续可添加的可选部分包括：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
-- 更深入的设置说明请参阅 [Providers](/zh-CN/providers) 和 [故障排除](/zh-CN/gateway/troubleshooting)。
+- 如果你设置了 `dmPolicy: "open"`，对应的 `allowFrom` 列表必须包含 `"*"`。
+- 提供商 ID 各不相同（电话号码、用户 ID、渠道 ID）。请参阅提供商文档以确认格式。
+- 可稍后添加的可选部分：`web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
+- 更深入的设置说明，请参见[提供商](/zh-CN/providers)和[故障排除](/zh-CN/gateway/troubleshooting)。
+
+## 相关
+
+- [Configuration reference](/zh-CN/gateway/configuration-reference)
+- [Configuration](/zh-CN/gateway/configuration)

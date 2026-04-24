@@ -5,35 +5,35 @@ read_when:
 summary: 面向由提供商支持的模型、图像、音频、TTS、视频、网页和嵌入工作流的 infer-first CLI
 title: 推理 CLI
 x-i18n:
-    generated_at: "2026-04-24T00:54:21Z"
+    generated_at: "2026-04-24T03:14:46Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4d4a9ac8ebb2bb36f48acfe25ca9dfeb4d28015cbd0006563587fab1bbbe18e0
+    source_hash: 5a5a2ca9da4b5c26fbd61c271801d50a3d533bd4cc8430aa71f65e2cdc4fdee6
     source_path: cli/infer.md
     workflow: 15
 ---
 
-`openclaw infer` 是由提供商支持的推理工作流的规范无头入口。
+`openclaw infer` 是面向由提供商支持的推理工作流的规范无头入口。
 
-它有意公开的是能力家族，而不是原始 Gateway 网关 RPC 名称，也不是原始智能体工具 id。
+它有意暴露的是能力家族，而不是原始的 Gateway 网关 RPC 名称，也不是原始的智能体工具 id。
 
-## 将 infer 变成一个 Skills
+## 将 infer 变成一个 skill
 
-把这段内容复制并粘贴给一个智能体：
+将下面内容复制并粘贴给一个智能体：
 
 ```text
 Read https://docs.openclaw.ai/cli/infer, then create a skill that routes my common workflows to `openclaw infer`.
 Focus on model runs, image generation, video generation, audio transcription, TTS, web search, and embeddings.
 ```
 
-一个好的基于 infer 的 Skills 应该：
+一个良好的、基于 infer 的 skill 应该：
 
-- 将常见的用户意图映射到正确的 infer 子命令
-- 为其覆盖的工作流包含几个规范的 infer 示例
+- 将常见用户意图映射到正确的 infer 子命令
+- 为其覆盖的工作流包含一些规范的 infer 示例
 - 在示例和建议中优先使用 `openclaw infer ...`
-- 避免在 Skills 正文中重新编写整个 infer 入口的文档
+- 避免在 skill 正文中重新记录整个 infer 的完整功能面
 
-典型的 infer 导向 Skills 覆盖范围：
+典型的面向 infer 的 skill 覆盖范围：
 
 - `openclaw infer model run`
 - `openclaw infer image generate`
@@ -44,15 +44,15 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 
 ## 为什么使用 infer
 
-`openclaw infer` 为 OpenClaw 中由提供商支持的推理任务提供了一个统一的 CLI。
+`openclaw infer` 为 OpenClaw 中由提供商支持的推理任务提供了统一的 CLI。
 
 优势：
 
-- 使用 OpenClaw 中已经配置好的提供商和模型，而不是为每个后端单独接入一次性封装。
-- 将模型、图像、音频转录、TTS、视频、网页和嵌入工作流统一到一棵命令树下。
-- 为脚本、自动化和智能体驱动的工作流使用稳定的 `--json` 输出结构。
+- 使用 OpenClaw 中已经配置好的提供商和模型，而不是为每个后端单独接线一次性包装器。
+- 将模型、图像、音频转录、TTS、视频、网页和嵌入工作流统一到同一个命令树下。
+- 为脚本、自动化和由智能体驱动的工作流使用稳定的 `--json` 输出结构。
 - 当任务本质上是“运行推理”时，优先使用 OpenClaw 的第一方入口。
-- 对于大多数 infer 命令，使用常规本地路径而无需依赖 Gateway 网关。
+- 对于大多数 infer 命令，使用常规本地路径，无需 Gateway 网关。
 
 ## 命令树
 
@@ -107,7 +107,7 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 
 ## 常见任务
 
-下表将常见推理任务映射到对应的 infer 命令。
+下表将常见推理任务映射到相应的 infer 命令。
 
 | 任务 | 命令 | 说明 |
 | ----------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------- |
@@ -125,13 +125,13 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 ## 行为
 
 - `openclaw infer ...` 是这些工作流的主要 CLI 入口。
-- 当输出将被其他命令或脚本消费时，使用 `--json`。
+- 当输出将被另一个命令或脚本消费时，使用 `--json`。
 - 当需要特定后端时，使用 `--provider` 或 `--model provider/model`。
 - 对于 `image describe`、`audio transcribe` 和 `video describe`，`--model` 必须使用 `<provider/model>` 形式。
-- 对于 `image describe`，显式指定 `--model` 会直接运行该提供商/模型。该模型必须在模型目录或提供商配置中具备图像能力。`codex/<model>` 会运行一个受限的 Codex app-server 图像理解轮次；`openai-codex/<model>` 使用 OpenAI Codex OAuth 提供商路径。
-- 无状态执行命令默认走本地。
-- 由 Gateway 网关管理状态的命令默认走 Gateway 网关。
-- 常规本地路径不要求 Gateway 网关正在运行。
+- 对于 `image describe`，显式指定 `--model` 会直接运行该 provider/model。该模型必须在模型目录或提供商配置中具备图像能力。`codex/<model>` 会运行一个有边界的 Codex app-server 图像理解轮次；`openai-codex/<model>` 使用 OpenAI Codex OAuth 提供商路径。
+- 无状态执行命令默认使用本地传输。
+- 由 Gateway 网关管理状态的命令默认使用网关传输。
+- 常规本地路径不要求 Gateway 网关处于运行状态。
 
 ## 模型
 
@@ -146,7 +146,7 @@ openclaw infer model inspect --name gpt-5.5 --json
 
 说明：
 
-- `model run` 会复用智能体运行时，因此提供商/模型覆盖的行为与常规智能体执行一致。
+- `model run` 会复用智能体运行时，因此 provider/model 覆盖行为与常规智能体执行一致。
 - `model auth login`、`model auth logout` 和 `model auth status` 用于管理已保存的提供商认证状态。
 
 ## 图像
@@ -163,7 +163,7 @@ openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --j
 
 说明：
 
-- 当从现有输入文件开始时，使用 `image edit`。
+- 从现有输入文件开始时，使用 `image edit`。
 - 对于 `image describe`，`--model` 必须是支持图像的 `<provider/model>`。
 - 对于本地 Ollama 视觉模型，先拉取模型，并将 `OLLAMA_API_KEY` 设置为任意占位值，例如 `ollama-local`。参见 [Ollama](/zh-CN/providers/ollama#vision-and-image-description)。
 
@@ -179,7 +179,7 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 
 说明：
 
-- `audio transcribe` 用于文件转录，不用于实时会话管理。
+- `audio transcribe` 用于文件转录，而不是实时会话管理。
 - `--model` 必须是 `<provider/model>`。
 
 ## TTS
@@ -195,7 +195,7 @@ openclaw infer tts status --json
 
 说明：
 
-- `tts status` 默认走 Gateway 网关，因为它反映的是由 Gateway 网关管理的 TTS 状态。
+- `tts status` 默认使用 gateway，因为它反映的是由 Gateway 网关管理的 TTS 状态。
 - 使用 `tts providers`、`tts voices` 和 `tts set-provider` 来检查和配置 TTS 行为。
 
 ## 视频
@@ -226,7 +226,7 @@ openclaw infer web providers --json
 
 说明：
 
-- 使用 `web providers` 检查可用、已配置和已选定的提供商。
+- 使用 `web providers` 检查可用、已配置和当前选定的提供商。
 
 ## 嵌入
 
@@ -240,7 +240,7 @@ openclaw infer embedding providers --json
 
 ## JSON 输出
 
-infer 命令会在一个共享封装结构下规范化 JSON 输出：
+Infer 命令会在共享封装结构下规范化 JSON 输出：
 
 ```json
 {
@@ -286,3 +286,8 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 ## 说明
 
 - `openclaw capability ...` 是 `openclaw infer ...` 的别名。
+
+## 相关内容
+
+- [CLI 参考](/zh-CN/cli)
+- [模型](/zh-CN/concepts/models)
