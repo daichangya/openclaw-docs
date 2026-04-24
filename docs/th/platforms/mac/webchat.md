@@ -1,30 +1,28 @@
 ---
 read_when:
-    - กำลังดีบักมุมมอง WebChat บน mac หรือพอร์ต loopback
-summary: วิธีที่แอป mac ฝัง Gateway WebChat และวิธีดีบักมัน
+    - การดีบักมุมมอง WebChat บน Mac หรือพอร์ต loopback【อ่านข้อความเต็มanalysis to=none  大发快三大小单双ಿಲ್ಲ
+summary: วิธีที่แอป Mac ฝัง Gateway WebChat และวิธีดีบักมัน
 title: WebChat (macOS)
 x-i18n:
-    generated_at: "2026-04-23T05:45:28Z"
+    generated_at: "2026-04-24T09:22:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4f2c45fa5512cc9c5d3b3aa188d94e2e5a90e4bcce607d959d40bea8b17c90c5
+    source_hash: c3e291a4b2a28e1016a9187f952b18ca4ea70660aa081564eeb27637cd8e8ae2
     source_path: platforms/mac/webchat.md
     workflow: 15
 ---
 
-# WebChat (แอป macOS)
+แอป macOS บนแถบเมนูจะฝัง UI ของ WebChat เป็นมุมมอง SwiftUI แบบเนทีฟ มัน
+เชื่อมต่อกับ Gateway และใช้ **main session** สำหรับเอเจนต์ที่เลือกเป็นค่าเริ่มต้น
+(พร้อมตัวสลับเซสชันสำหรับเซสชันอื่น)
 
-แอปในแถบเมนูของ macOS ฝัง UI ของ WebChat เป็นมุมมอง SwiftUI แบบเนทีฟ มัน
-เชื่อมต่อกับ Gateway และใช้ค่าเริ่มต้นเป็น **main session** สำหรับเอเจนต์ที่เลือก
-(พร้อมตัวสลับ session สำหรับ sessions อื่น)
-
-- **โหมด Local**: เชื่อมต่อโดยตรงกับ Gateway WebSocket ในเครื่อง
-- **โหมด Remote**: ส่งต่อ control port ของ Gateway ผ่าน SSH และใช้
+- **โหมด local**: เชื่อมต่อโดยตรงกับ local Gateway WebSocket
+- **โหมด remote**: ส่งต่อพอร์ตควบคุมของ Gateway ผ่าน SSH และใช้
   tunnel นั้นเป็น data plane
 
-## การเปิดใช้งานและการดีบัก
+## การเปิดและการดีบัก
 
-- แบบ manual: เมนู Lobster → “Open Chat”
+- แบบแมนนวล: เมนู Lobster → “Open Chat”
 - เปิดอัตโนมัติสำหรับการทดสอบ:
 
   ```bash
@@ -33,26 +31,31 @@ x-i18n:
 
 - Logs: `./scripts/clawlog.sh` (subsystem `ai.openclaw`, category `WebChatSwiftUI`)
 
-## วิธีการเชื่อมต่อ
+## วิธีการเชื่อมต่อภายใน
 
-- Data plane: ใช้ methods ของ Gateway WS ได้แก่ `chat.history`, `chat.send`, `chat.abort`,
-  `chat.inject` และ events ได้แก่ `chat`, `agent`, `presence`, `tick`, `health`
+- Data plane: Gateway WS methods `chat.history`, `chat.send`, `chat.abort`,
+  `chat.inject` และ events `chat`, `agent`, `presence`, `tick`, `health`
 - `chat.history` จะส่งคืน transcript rows ที่ normalize แล้วสำหรับการแสดงผล: inline directive
-  tags จะถูกลบออกจากข้อความที่มองเห็นได้, payload XML ของการเรียกใช้เครื่องมือในข้อความล้วน
+  tags จะถูกลบออกจากข้อความที่มองเห็นได้, payload XML ของ plain-text tool-call
   (รวมถึง `<tool_call>...</tool_call>`,
   `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`,
-  `<function_calls>...</function_calls>` และบล็อกการเรียกใช้เครื่องมือแบบถูกตัดทอน) และ
-  leaked ASCII/full-width model control tokens จะถูกลบออก, assistant rows ที่มีแต่
-  silent-token ล้วนๆ เช่น `NO_REPLY` / `no_reply` แบบตรงตัวจะถูกละเว้น
-  และ rows ที่มีขนาดใหญ่เกินไปอาจถูกแทนที่ด้วย placeholders
-- Session: ใช้ session หลักเป็นค่าเริ่มต้น (`main` หรือ `global` เมื่อ scope เป็น
-  global) UI สามารถสลับไปมาระหว่าง sessions ได้
-- Onboarding ใช้ session เฉพาะเพื่อแยกการตั้งค่าครั้งแรกออกจากกัน
+  `<function_calls>...</function_calls>` และ truncated tool-call blocks) รวมถึง
+  model control tokens แบบ ASCII/full-width ที่รั่วออกมาจะถูกลบออก, assistant rows ที่เป็น
+  silent-token ล้วน เช่น `NO_REPLY` / `no_reply` แบบตรงตัวจะถูกละออก และ
+  rows ที่มีขนาดใหญ่เกินไปอาจถูกแทนที่ด้วย placeholders
+- Session: ใช้ primary session เป็นค่าเริ่มต้น (`main` หรือ `global` เมื่อ scope เป็น
+  global) UI สามารถสลับระหว่างเซสชันได้
+- Onboarding ใช้เซสชันเฉพาะเพื่อแยกการตั้งค่าครั้งแรกออกไป
 
 ## พื้นผิวด้านความปลอดภัย
 
-- โหมด Remote จะส่งต่อเฉพาะ Gateway WebSocket control port ผ่าน SSH เท่านั้น
+- โหมด remote ส่งต่อเฉพาะพอร์ต Gateway WebSocket control ผ่าน SSH เท่านั้น
 
 ## ข้อจำกัดที่ทราบ
 
-- UI ถูกปรับให้เหมาะกับ chat sessions (ไม่ใช่ browser sandbox แบบเต็ม)
+- UI นี้ปรับให้เหมาะกับแชตเซสชัน (ไม่ใช่ browser sandbox แบบเต็ม)
+
+## ที่เกี่ยวข้อง
+
+- [WebChat](/th/web/webchat)
+- [macOS app](/th/platforms/macos)

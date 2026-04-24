@@ -1,24 +1,24 @@
 ---
 read_when:
     - คุณต้องการแก้ไขการอนุมัติ exec จาก CLI
-    - คุณต้องจัดการ allowlists บนโฮสต์ Gateway หรือ Node
+    - คุณต้องจัดการ allowlists บนโฮสต์ gateway หรือ Node
 summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw approvals` และ `openclaw exec-policy`
 title: การอนุมัติ
 x-i18n:
-    generated_at: "2026-04-23T06:17:03Z"
+    generated_at: "2026-04-24T09:01:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4e4e031df737e3bdde97ece81fe50eafbb4384557b40c6d52cf2395cf30721a3
+    source_hash: 7403f0e35616db5baf3d1564c8c405b3883fc3e5032da9c6a19a32dba8c5fb7d
     source_path: cli/approvals.md
     workflow: 15
 ---
 
 # `openclaw approvals`
 
-จัดการการอนุมัติ exec สำหรับ **โฮสต์ local**, **โฮสต์ Gateway** หรือ **โฮสต์ Node**
-โดยค่าเริ่มต้น คำสั่งจะกำหนดเป้าหมายไปที่ไฟล์การอนุมัติ local บนดิสก์ ใช้ `--gateway` เพื่อกำหนดเป้าหมายไปที่ gateway หรือใช้ `--node` เพื่อกำหนดเป้าหมายไปที่ node ที่ระบุ
+จัดการการอนุมัติ exec สำหรับ **โฮสต์โลคัล**, **โฮสต์ gateway** หรือ **โฮสต์ Node**
+ตามค่าเริ่มต้น คำสั่งจะกำหนดเป้าหมายไปที่ไฟล์การอนุมัติแบบโลคัลบนดิสก์ ใช้ `--gateway` เพื่อกำหนดเป้าหมายไปที่ gateway หรือใช้ `--node` เพื่อกำหนดเป้าหมายไปที่ Node ที่ระบุ
 
-ชื่อเรียกแทน: `openclaw exec-approvals`
+Alias: `openclaw exec-approvals`
 
 ที่เกี่ยวข้อง:
 
@@ -27,13 +27,13 @@ x-i18n:
 
 ## `openclaw exec-policy`
 
-`openclaw exec-policy` คือคำสั่งอำนวยความสะดวกแบบ local สำหรับทำให้การตั้งค่า `tools.exec.*` ที่ร้องขอและไฟล์การอนุมัติของโฮสต์ local สอดคล้องกันในขั้นตอนเดียว
+`openclaw exec-policy` คือคำสั่งอำนวยความสะดวกแบบโลคัลสำหรับทำให้ config `tools.exec.*` ที่ร้องขอและไฟล์การอนุมัติของโฮสต์โลคัลสอดคล้องกันในขั้นตอนเดียว
 
-ใช้คำสั่งนี้เมื่อคุณต้องการ:
+ใช้เมื่อคุณต้องการ:
 
-- ตรวจสอบนโยบาย local ที่ร้องขอ ไฟล์การอนุมัติของโฮสต์ และผลลัพธ์ที่มีผลจริงหลังการรวม
-- ใช้ preset แบบ local เช่น YOLO หรือ deny-all
-- ซิงโครไนซ์ `tools.exec.*` แบบ local และ `~/.openclaw/exec-approvals.json` แบบ local
+- ตรวจสอบนโยบาย `tools.exec` แบบโลคัลที่ร้องขอ ไฟล์การอนุมัติของโฮสต์ และผลลัพธ์ที่มีผลจริงหลังการรวม
+- ใช้ preset แบบโลคัล เช่น YOLO หรือ deny-all
+- ซิงโครไนซ์ `tools.exec.*` แบบโลคัลและ `~/.openclaw/exec-approvals.json` แบบโลคัล
 
 ตัวอย่าง:
 
@@ -54,16 +54,16 @@ openclaw exec-policy set --host gateway --security full --ask off --ask-fallback
 
 ขอบเขตปัจจุบัน:
 
-- `exec-policy` เป็น **local-only**
-- คำสั่งนี้อัปเดตไฟล์ config local และไฟล์การอนุมัติ local พร้อมกัน
-- คำสั่งนี้จะ **ไม่** push นโยบายไปยังโฮสต์ Gateway หรือโฮสต์ Node
-- `--host node` จะถูกปฏิเสธในคำสั่งนี้ เพราะการอนุมัติ exec ของ node จะถูกดึงจาก node ระหว่างรันไทม์ และต้องจัดการผ่านคำสั่ง approvals ที่กำหนดเป้าหมายไปยัง node แทน
-- `openclaw exec-policy show` จะทำเครื่องหมายขอบเขต `host=node` ว่าถูกจัดการโดย node ระหว่างรันไทม์ แทนการอนุมานนโยบายที่มีผลจริงจากไฟล์การอนุมัติ local
+- `exec-policy` เป็นแบบ **local-only**
+- คำสั่งนี้อัปเดตไฟล์ config แบบโลคัลและไฟล์การอนุมัติแบบโลคัลพร้อมกัน
+- คำสั่งนี้ **ไม่** push policy ไปยังโฮสต์ gateway หรือโฮสต์ Node
+- `--host node` จะถูกปฏิเสธในคำสั่งนี้ เพราะการอนุมัติ exec ของ Node จะถูกดึงจาก Node ระหว่างรันไทม์ และต้องจัดการผ่านคำสั่ง approvals ที่กำหนดเป้าหมายไปยัง Node แทน
+- `openclaw exec-policy show` จะทำเครื่องหมายขอบเขต `host=node` ว่าถูกจัดการโดย Node ในรันไทม์ แทนการอนุมานนโยบายที่มีผลจริงจากไฟล์การอนุมัติแบบโลคัล
 
 หากคุณต้องการแก้ไขการอนุมัติของโฮสต์ระยะไกลโดยตรง ให้ใช้ `openclaw approvals set --gateway`
 หรือ `openclaw approvals set --node <id|name|ip>` ต่อไป
 
-## คำสั่งทั่วไป
+## คำสั่งที่ใช้บ่อย
 
 ```bash
 openclaw approvals get
@@ -71,18 +71,18 @@ openclaw approvals get --node <id|name|ip>
 openclaw approvals get --gateway
 ```
 
-ขณะนี้ `openclaw approvals get` จะแสดงนโยบาย exec ที่มีผลจริงสำหรับเป้าหมาย local, gateway และ node:
+ขณะนี้ `openclaw approvals get` จะแสดงนโยบาย exec ที่มีผลจริงสำหรับเป้าหมายแบบโลคัล, gateway และ Node:
 
-- นโยบาย `tools.exec` ที่ร้องขอ
-- นโยบายจากไฟล์การอนุมัติของโฮสต์
+- policy `tools.exec` ที่ร้องขอ
+- policy ของไฟล์การอนุมัติของโฮสต์
 - ผลลัพธ์ที่มีผลจริงหลังใช้กฎลำดับความสำคัญ
 
-ลำดับความสำคัญนี้ตั้งใจออกแบบไว้เช่นนั้น:
+ลำดับความสำคัญนี้เป็นไปโดยตั้งใจ:
 
-- ไฟล์การอนุมัติของโฮสต์คือแหล่งข้อมูลจริงที่ใช้บังคับ
-- นโยบาย `tools.exec` ที่ร้องขอสามารถทำให้เจตนาแคบลงหรือกว้างขึ้นได้ แต่ผลลัพธ์ที่มีผลจริงยังคงได้มาจากกฎของโฮสต์
-- `--node` จะรวมไฟล์การอนุมัติของโฮสต์ node เข้ากับนโยบาย `tools.exec` ของ gateway เพราะทั้งสองอย่างยังคงมีผลในระหว่างรันไทม์
-- หาก config ของ gateway ไม่พร้อมใช้งาน CLI จะย้อนกลับไปใช้ snapshot การอนุมัติของ node และระบุว่าไม่สามารถคำนวณนโยบายสุดท้ายระหว่างรันไทม์ได้
+- ไฟล์การอนุมัติของโฮสต์คือแหล่งความจริงที่บังคับใช้ได้จริง
+- policy `tools.exec` ที่ร้องขออาจทำให้เจตนาแคบลงหรือกว้างขึ้น แต่ผลลัพธ์ที่มีผลจริงยังคงได้มาจากกฎของโฮสต์
+- `--node` จะรวมไฟล์การอนุมัติของโฮสต์ Node เข้ากับ policy `tools.exec` ของ gateway เพราะทั้งสองส่วนยังคงมีผลระหว่างรันไทม์
+- หาก config ของ gateway ไม่พร้อมใช้งาน CLI จะย้อนกลับไปใช้ snapshot การอนุมัติของ Node และระบุว่าไม่สามารถคำนวณ policy สุดท้ายระหว่างรันไทม์ได้
 
 ## แทนที่การอนุมัติจากไฟล์
 
@@ -95,9 +95,9 @@ openclaw approvals set --node <id|name|ip> --file ./exec-approvals.json
 openclaw approvals set --gateway --file ./exec-approvals.json
 ```
 
-`set` รองรับ JSON5 ไม่ใช่เฉพาะ JSON แบบ strict เท่านั้น ใช้ `--file` หรือ `--stdin` อย่างใดอย่างหนึ่ง ห้ามใช้ทั้งสองพร้อมกัน
+`set` รองรับ JSON5 ไม่ใช่แค่ JSON แบบเข้มงวดเท่านั้น ใช้ `--file` หรือ `--stdin` อย่างใดอย่างหนึ่ง ไม่ใช่ทั้งสองอย่าง
 
-## ตัวอย่าง "Never prompt" / YOLO
+## ตัวอย่าง "never prompt" / YOLO
 
 สำหรับโฮสต์ที่ไม่ควรหยุดเพื่อขอการอนุมัติ exec เลย ให้ตั้งค่า defaults ของการอนุมัติของโฮสต์เป็น `full` + `off`:
 
@@ -114,7 +114,7 @@ openclaw approvals set --stdin <<'EOF'
 EOF
 ```
 
-ตัวแปรสำหรับ node:
+ตัวแปรสำหรับ Node:
 
 ```bash
 openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
@@ -129,7 +129,7 @@ openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-การดำเนินการนี้จะเปลี่ยนเฉพาะ **ไฟล์การอนุมัติของโฮสต์** เท่านั้น เพื่อให้สอดคล้องกับนโยบาย OpenClaw ที่ร้องขอ ให้ตั้งค่าดังนี้ด้วย:
+การทำเช่นนี้จะเปลี่ยนเฉพาะ **ไฟล์การอนุมัติของโฮสต์** เท่านั้น เพื่อให้ policy ของ OpenClaw ที่ร้องขอสอดคล้องกันด้วย ให้ตั้งค่า:
 
 ```bash
 openclaw config set tools.exec.host gateway
@@ -139,20 +139,20 @@ openclaw config set tools.exec.ask off
 
 เหตุผลที่ใช้ `tools.exec.host=gateway` ในตัวอย่างนี้:
 
-- `host=auto` ยังคงหมายถึง "ใช้ sandbox หากมี มิฉะนั้นใช้ gateway"
-- YOLO เกี่ยวข้องกับการอนุมัติ ไม่ใช่การกำหนดเส้นทาง
-- หากคุณต้องการให้ใช้ host exec แม้มีการตั้งค่า sandbox ไว้ ให้ระบุการเลือกโฮสต์อย่างชัดเจนด้วย `gateway` หรือ `/exec host=gateway`
+- `host=auto` ยังคงหมายถึง "ใช้ sandbox เมื่อพร้อมใช้งาน มิฉะนั้นใช้ gateway"
+- YOLO เป็นเรื่องของการอนุมัติ ไม่ใช่การกำหนดเส้นทาง
+- หากคุณต้องการใช้ host exec แม้จะมีการกำหนดค่า sandbox ไว้ ให้ระบุตัวเลือกโฮสต์อย่างชัดเจนด้วย `gateway` หรือ `/exec host=gateway`
 
-สิ่งนี้สอดคล้องกับพฤติกรรม YOLO แบบค่าเริ่มต้นของโฮสต์ในปัจจุบัน หากคุณต้องการให้เข้มงวดขึ้น ให้ปรับการอนุมัติให้รัดกุมขึ้น
+ซึ่งสอดคล้องกับลักษณะการทำงาน YOLO แบบค่าเริ่มต้นของโฮสต์ในปัจจุบัน หากต้องการการอนุมัติ ให้ทำให้เข้มงวดขึ้น
 
-ทางลัดแบบ local:
+ทางลัดแบบโลคัล:
 
 ```bash
 openclaw exec-policy preset yolo
 ```
 
-ทางลัดแบบ local นี้จะอัปเดตทั้ง config `tools.exec.*` local ที่ร้องขอและ
-defaults ของการอนุมัติ local พร้อมกัน โดยมีเจตนาเทียบเท่ากับการตั้งค่าด้วยตนเองสองขั้นตอนข้างต้น แต่ใช้ได้เฉพาะกับเครื่อง local เท่านั้น
+ทางลัดแบบโลคัลนี้จะอัปเดตทั้ง config `tools.exec.*` แบบโลคัลที่ร้องขอและค่าเริ่มต้นของการอนุมัติแบบโลคัลพร้อมกัน
+โดยมีเจตนาเทียบเท่ากับการตั้งค่าแบบสองขั้นตอนด้วยตนเองด้านบน แต่ใช้ได้เฉพาะกับเครื่องโลคัลเท่านั้น
 
 ## ตัวช่วย allowlist
 
@@ -164,19 +164,19 @@ openclaw approvals allowlist add --agent "*" "/usr/bin/uname"
 openclaw approvals allowlist remove "~/Projects/**/bin/rg"
 ```
 
-## ตัวเลือกทั่วไป
+## ตัวเลือกที่ใช้บ่อย
 
-`get`, `set` และ `allowlist add|remove` ทั้งหมดรองรับ:
+`get`, `set` และ `allowlist add|remove` ต่างก็รองรับ:
 
 - `--node <id|name|ip>`
 - `--gateway`
-- ตัวเลือก node RPC ที่ใช้ร่วมกัน: `--url`, `--token`, `--timeout`, `--json`
+- ตัวเลือก Node RPC ที่ใช้ร่วมกัน: `--url`, `--token`, `--timeout`, `--json`
 
 หมายเหตุเกี่ยวกับการกำหนดเป้าหมาย:
 
-- หากไม่มี target flags จะหมายถึงไฟล์การอนุมัติ local บนดิสก์
-- `--gateway` กำหนดเป้าหมายไปที่ไฟล์การอนุมัติของโฮสต์ Gateway
-- `--node` กำหนดเป้าหมายไปที่โฮสต์ node หนึ่งตัว หลังจาก resolve id, name, IP หรือคำนำหน้า id แล้ว
+- หากไม่มีแฟลกกำหนดเป้าหมาย หมายถึงไฟล์การอนุมัติแบบโลคัลบนดิสก์
+- `--gateway` กำหนดเป้าหมายไปที่ไฟล์การอนุมัติของโฮสต์ gateway
+- `--node` กำหนดเป้าหมายไปที่โฮสต์ Node หนึ่งตัวหลังจาก resolve id, name, IP หรือคำนำหน้า id
 
 `allowlist add|remove` ยังรองรับ:
 
@@ -185,6 +185,11 @@ openclaw approvals allowlist remove "~/Projects/**/bin/rg"
 ## หมายเหตุ
 
 - `--node` ใช้ตัว resolve เดียวกับ `openclaw nodes` (id, name, ip หรือคำนำหน้า id)
-- `--agent` มีค่าเริ่มต้นเป็น `"*"` ซึ่งใช้กับ agents ทั้งหมด
-- โฮสต์ node ต้องประกาศรองรับ `system.execApprovals.get/set` (แอป macOS หรือโฮสต์ node แบบ headless)
-- ไฟล์การอนุมัติจะถูกจัดเก็บแยกตามโฮสต์ที่ `~/.openclaw/exec-approvals.json`
+- `--agent` มีค่าเริ่มต้นเป็น `"*"` ซึ่งใช้กับเอเจนต์ทั้งหมด
+- โฮสต์ Node ต้องประกาศ `system.execApprovals.get/set` (แอป macOS หรือโฮสต์ Node แบบ headless)
+- ไฟล์การอนุมัติจะถูกเก็บแยกตามโฮสต์ที่ `~/.openclaw/exec-approvals.json`
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)
+- [การอนุมัติ exec](/th/tools/exec-approvals)

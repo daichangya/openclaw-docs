@@ -1,35 +1,33 @@
 ---
 read_when: “You want per-agent sandboxing or per-agent tool allow/deny policies in a multi-agent gateway.”
 status: active
-summary: “Sandbox และข้อจำกัดของเครื่องมือแบบรายเอเจนต์, ลำดับความสำคัญ และตัวอย่าง”
+summary: “Sandbox และข้อจำกัดของเครื่องมือแบบแยกตามเอเจนต์, ลำดับความสำคัญ และตัวอย่าง”
 title: Sandbox และเครื่องมือแบบหลายเอเจนต์
 x-i18n:
-    generated_at: "2026-04-23T06:02:39Z"
+    generated_at: "2026-04-24T09:37:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 07985f7c8fae860a7b9bf685904903a4a8f90249e95e4179cf0775a1208c0597
+    source_hash: 7239e28825759efb060b821f87f5ebd9a7f3b720b30ff16dc076b186e47fcde9
     source_path: tools/multi-agent-sandbox-tools.md
     workflow: 15
 ---
 
-# การตั้งค่า Sandbox และเครื่องมือแบบหลายเอเจนต์
+# การกำหนดค่า Sandbox และเครื่องมือแบบหลายเอเจนต์
 
-เอเจนต์แต่ละตัวในระบบหลายเอเจนต์สามารถ override นโยบาย sandbox และ
-tool ระดับ global ได้ หน้านี้ครอบคลุมการตั้งค่าแบบรายเอเจนต์ กฎลำดับความสำคัญ และ
-ตัวอย่าง
+เอเจนต์แต่ละตัวในการตั้งค่าแบบหลายเอเจนต์สามารถ override นโยบาย sandbox และเครื่องมือระดับ global ได้ หน้านี้ครอบคลุมการกำหนดค่าแยกตามเอเจนต์ กฎลำดับความสำคัญ และตัวอย่าง
 
-- **Sandbox backends และ modes**: ดู [Sandboxing](/th/gateway/sandboxing)
-- **การดีบัก tools ที่ถูกบล็อก**: ดู [Sandbox vs Tool Policy vs Elevated](/th/gateway/sandbox-vs-tool-policy-vs-elevated) และ `openclaw sandbox explain`
+- **Sandbox backends และโหมด**: ดู [Sandboxing](/th/gateway/sandboxing)
+- **การดีบักเครื่องมือที่ถูกบล็อก**: ดู [Sandbox vs Tool Policy vs Elevated](/th/gateway/sandbox-vs-tool-policy-vs-elevated) และ `openclaw sandbox explain`
 - **Elevated exec**: ดู [Elevated Mode](/th/tools/elevated)
 
-Auth เป็นแบบรายเอเจนต์: แต่ละเอเจนต์จะอ่านจาก auth store ใน `agentDir` ของตัวเองที่
+Auth เป็นแบบแยกต่อเอเจนต์: แต่ละเอเจนต์จะอ่านจากที่เก็บ auth ของ `agentDir` ของตัวเองที่
 `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
-Credentials **จะไม่** ถูกแชร์ระหว่างเอเจนต์ ห้ามใช้ `agentDir` ซ้ำข้ามเอเจนต์โดยเด็ดขาด
-หากคุณต้องการแชร์ creds ให้คัดลอก `auth-profiles.json` ไปยัง `agentDir` ของเอเจนต์อีกตัว
+ข้อมูลรับรองจะ **ไม่** ถูกใช้ร่วมกันระหว่างเอเจนต์ ห้ามใช้ `agentDir` ซ้ำข้ามเอเจนต์เด็ดขาด
+หากคุณต้องการแชร์ข้อมูลรับรอง ให้คัดลอก `auth-profiles.json` ไปยัง `agentDir` ของเอเจนต์อีกตัว
 
 ---
 
-## ตัวอย่างการตั้งค่า
+## ตัวอย่างการกำหนดค่า
 
 ### ตัวอย่าง 1: เอเจนต์ส่วนตัว + เอเจนต์ครอบครัวแบบจำกัดสิทธิ์
 
@@ -77,12 +75,12 @@ Credentials **จะไม่** ถูกแชร์ระหว่างเอ
 
 **ผลลัพธ์:**
 
-- เอเจนต์ `main`: ทำงานบนโฮสต์ เข้าถึงเครื่องมือได้เต็มรูปแบบ
-- เอเจนต์ `family`: ทำงานใน Docker (หนึ่งคอนเทนเนอร์ต่อเอเจนต์) ใช้ได้เฉพาะเครื่องมือ `read`
+- เอเจนต์ `main`: รันบน host, เข้าถึงเครื่องมือได้เต็มรูปแบบ
+- เอเจนต์ `family`: รันใน Docker (หนึ่งคอนเทนเนอร์ต่อเอเจนต์), ใช้ได้เฉพาะเครื่องมือ `read`
 
 ---
 
-### ตัวอย่าง 2: เอเจนต์งานพร้อม Shared Sandbox
+### ตัวอย่าง 2: เอเจนต์งานพร้อม Sandbox แบบแชร์ร่วมกัน
 
 ```json
 {
@@ -113,7 +111,7 @@ Credentials **จะไม่** ถูกแชร์ระหว่างเอ
 
 ---
 
-### ตัวอย่าง 2b: โปรไฟล์ coding แบบ global + เอเจนต์แบบ messaging-only
+### ตัวอย่าง 2b: โปรไฟล์ coding ระดับ global + เอเจนต์เฉพาะการส่งข้อความ
 
 ```json
 {
@@ -131,19 +129,19 @@ Credentials **จะไม่** ถูกแชร์ระหว่างเอ
 
 **ผลลัพธ์:**
 
-- เอเจนต์ค่าเริ่มต้นจะได้เครื่องมือสาย coding
+- เอเจนต์เริ่มต้นจะได้เครื่องมือสำหรับ coding
 - เอเจนต์ `support` เป็นแบบ messaging-only (+ เครื่องมือ Slack)
 
 ---
 
-### ตัวอย่าง 3: Sandbox Modes ต่างกันในแต่ละเอเจนต์
+### ตัวอย่าง 3: โหมด Sandbox ต่างกันในแต่ละเอเจนต์
 
 ```json
 {
   "agents": {
     "defaults": {
       "sandbox": {
-        "mode": "non-main", // ค่าเริ่มต้นระดับ global
+        "mode": "non-main", // Global default
         "scope": "session"
       }
     },
@@ -152,14 +150,14 @@ Credentials **จะไม่** ถูกแชร์ระหว่างเอ
         "id": "main",
         "workspace": "~/.openclaw/workspace",
         "sandbox": {
-          "mode": "off" // Override: main จะไม่ถูก sandbox
+          "mode": "off" // Override: main ไม่ใช้ sandbox เลย
         }
       },
       {
         "id": "public",
         "workspace": "~/.openclaw/workspace-public",
         "sandbox": {
-          "mode": "all", // Override: public จะถูก sandbox เสมอ
+          "mode": "all", // Override: public ใช้ sandbox เสมอ
           "scope": "agent"
         },
         "tools": {
@@ -174,13 +172,13 @@ Credentials **จะไม่** ถูกแชร์ระหว่างเอ
 
 ---
 
-## ลำดับความสำคัญของการตั้งค่า
+## ลำดับความสำคัญของการกำหนดค่า
 
 เมื่อมีทั้ง config ระดับ global (`agents.defaults.*`) และ config เฉพาะเอเจนต์ (`agents.list[].*`):
 
-### Sandbox Config
+### Config ของ Sandbox
 
-ค่าที่กำหนดเฉพาะเอเจนต์จะ override ค่าระดับ global:
+การตั้งค่าเฉพาะเอเจนต์จะ override การตั้งค่าระดับ global:
 
 ```
 agents.list[].sandbox.mode > agents.defaults.sandbox.mode
@@ -194,35 +192,35 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 
 **หมายเหตุ:**
 
-- `agents.list[].sandbox.{docker,browser,prune}.*` จะ override `agents.defaults.sandbox.{docker,browser,prune}.*` สำหรับเอเจนต์นั้น (จะถูกละเลยเมื่อ sandbox scope resolve เป็น `"shared"`)
+- `agents.list[].sandbox.{docker,browser,prune}.*` จะ override `agents.defaults.sandbox.{docker,browser,prune}.*` สำหรับเอเจนต์นั้น (จะถูกละเว้นเมื่อ sandbox scope ถูก resolve เป็น `"shared"`)
 
 ### ข้อจำกัดของเครื่องมือ
 
-ลำดับการกรองมีดังนี้:
+ลำดับการกรองคือ:
 
-1. **Tool profile** (`tools.profile` หรือ `agents.list[].tools.profile`)
-2. **Provider tool profile** (`tools.byProvider[provider].profile` หรือ `agents.list[].tools.byProvider[provider].profile`)
-3. **Global tool policy** (`tools.allow` / `tools.deny`)
-4. **Provider tool policy** (`tools.byProvider[provider].allow/deny`)
-5. **Agent-specific tool policy** (`agents.list[].tools.allow/deny`)
-6. **Agent provider policy** (`agents.list[].tools.byProvider[provider].allow/deny`)
-7. **Sandbox tool policy** (`tools.sandbox.tools` หรือ `agents.list[].tools.sandbox.tools`)
-8. **Subagent tool policy** (`tools.subagents.tools`, หากเกี่ยวข้อง)
+1. **โปรไฟล์เครื่องมือ** (`tools.profile` หรือ `agents.list[].tools.profile`)
+2. **โปรไฟล์เครื่องมือของ provider** (`tools.byProvider[provider].profile` หรือ `agents.list[].tools.byProvider[provider].profile`)
+3. **นโยบายเครื่องมือระดับ global** (`tools.allow` / `tools.deny`)
+4. **นโยบายเครื่องมือของ provider** (`tools.byProvider[provider].allow/deny`)
+5. **นโยบายเครื่องมือเฉพาะเอเจนต์** (`agents.list[].tools.allow/deny`)
+6. **นโยบาย provider ของเอเจนต์** (`agents.list[].tools.byProvider[provider].allow/deny`)
+7. **นโยบายเครื่องมือของ sandbox** (`tools.sandbox.tools` หรือ `agents.list[].tools.sandbox.tools`)
+8. **นโยบายเครื่องมือของ subagent** (`tools.subagents.tools` หากเกี่ยวข้อง)
 
 แต่ละระดับสามารถจำกัดเครื่องมือเพิ่มเติมได้ แต่ไม่สามารถคืนสิทธิ์ให้เครื่องมือที่ถูกปฏิเสธจากระดับก่อนหน้าได้
-หากตั้ง `agents.list[].tools.sandbox.tools` ไว้ มันจะใช้แทน `tools.sandbox.tools` สำหรับเอเจนต์นั้น
-หากตั้ง `agents.list[].tools.profile` ไว้ มันจะ override `tools.profile` สำหรับเอเจนต์นั้น
-คีย์ provider tool รองรับทั้ง `provider` (เช่น `google-antigravity`) หรือ `provider/model` (เช่น `openai/gpt-5.4`)
+หากตั้งค่า `agents.list[].tools.sandbox.tools` ไว้ ค่านั้นจะมาแทน `tools.sandbox.tools` สำหรับเอเจนต์นั้น
+หากตั้งค่า `agents.list[].tools.profile` ไว้ ค่านั้นจะ override `tools.profile` สำหรับเอเจนต์นั้น
+คีย์เครื่องมือของ provider ยอมรับได้ทั้ง `provider` (เช่น `google-antigravity`) หรือ `provider/model` (เช่น `openai/gpt-5.4`)
 
-นโยบายเครื่องมือรองรับ shorthand แบบ `group:*` ที่จะขยายเป็นหลายเครื่องมือ ดู [Tool groups](/th/gateway/sandbox-vs-tool-policy-vs-elevated#tool-groups-shorthands) สำหรับรายการแบบเต็ม
+นโยบายเครื่องมือรองรับ shorthand แบบ `group:*` ที่จะขยายเป็นหลายเครื่องมือ ดู [Tool groups](/th/gateway/sandbox-vs-tool-policy-vs-elevated#tool-groups-shorthands) สำหรับรายการทั้งหมด
 
-การ override elevated แบบรายเอเจนต์ (`agents.list[].tools.elevated`) ยังสามารถจำกัด elevated exec เพิ่มเติมสำหรับเอเจนต์บางตัวได้ ดู [Elevated Mode](/th/tools/elevated) สำหรับรายละเอียด
+การ override Elevated แบบแยกต่อเอเจนต์ (`agents.list[].tools.elevated`) สามารถจำกัด elevated exec เพิ่มเติมสำหรับเอเจนต์เฉพาะได้ ดู [Elevated Mode](/th/tools/elevated) สำหรับรายละเอียด
 
 ---
 
-## การย้ายมาจากเอเจนต์เดี่ยว
+## การย้ายจากเอเจนต์เดี่ยว
 
-**ก่อน (เอเจนต์เดี่ยว):**
+**ก่อนหน้า (เอเจนต์เดี่ยว):**
 
 ```json
 {
@@ -245,7 +243,7 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-**หลัง (หลายเอเจนต์พร้อมโปรไฟล์ต่างกัน):**
+**หลังจากนั้น (หลายเอเจนต์พร้อมโปรไฟล์ต่างกัน):**
 
 ```json
 {
@@ -262,7 +260,7 @@ agents.list[].sandbox.prune.* > agents.defaults.sandbox.prune.*
 }
 ```
 
-config แบบเดิม `agent.*` จะถูก migrate โดย `openclaw doctor`; จากนี้ไปควรใช้ `agents.defaults` + `agents.list`
+config แบบ legacy `agent.*` จะถูกย้ายโดย `openclaw doctor`; จากนี้ไปควรใช้ `agents.defaults` + `agents.list`
 
 ---
 
@@ -279,7 +277,7 @@ config แบบเดิม `agent.*` จะถูก migrate โดย `opencl
 }
 ```
 
-### เอเจนต์สำหรับรันอย่างปลอดภัย (ไม่แก้ไขไฟล์)
+### เอเจนต์สำหรับการรันอย่างปลอดภัย (ไม่แก้ไขไฟล์)
 
 ```json
 {
@@ -302,28 +300,29 @@ config แบบเดิม `agent.*` จะถูก migrate โดย `opencl
 }
 ```
 
-`sessions_history` ในโปรไฟล์นี้ยังคงคืนมุมมอง recall ที่ถูกจำกัดและ sanitize แล้ว
-แทนการ dump transcript แบบดิบ การ recall ของ assistant จะลบ thinking tags,
-โครงสร้าง `<relevant-memories>`, payload XML ของ tool-call แบบ plain-text
+`sessions_history` ในโปรไฟล์นี้ยังคงส่งคืนมุมมองการเรียกคืนแบบจำกัดและผ่านการทำความสะอาดแล้ว
+แทนการ dump ทรานสคริปต์ดิบทั้งหมด การเรียกคืนฝั่ง assistant จะลบแท็ก thinking,
+โครง `<relevant-memories>`, payload XML ของการเรียกใช้เครื่องมือในข้อความล้วน
 (รวมถึง `<tool_call>...</tool_call>`,
 `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`,
-`<function_calls>...</function_calls>` และบล็อก tool-call ที่ถูกตัดทอน),
-โครงสร้าง tool-call แบบ downgraded, model control
-tokens แบบ ASCII/full-width ที่รั่วออกมา และ MiniMax tool-call XML ที่ผิดรูปแบบ ก่อนทำ redaction/truncation
+`<function_calls>...</function_calls>` และบล็อกการเรียกใช้เครื่องมือที่ถูกตัดทอน),
+โครงสร้างการเรียกใช้เครื่องมือที่ถูกลดระดับ, โทเค็นควบคุมโมเดลแบบ ASCII/full-width ที่รั่วออกมา,
+และ XML การเรียกใช้เครื่องมือ MiniMax ที่ผิดรูปแบบก่อนการปกปิด/ตัดทอน
 
 ---
 
-## ข้อควรระวังที่พบบ่อย: `"non-main"`
+## ข้อผิดพลาดที่พบบ่อย: `"non-main"`
 
 `agents.defaults.sandbox.mode: "non-main"` อิงจาก `session.mainKey` (ค่าเริ่มต้น `"main"`)
-ไม่ใช่ agent id เซสชันแบบกลุ่ม/ช่องทางจะมีคีย์ของตัวเองเสมอ ดังนั้น
-จึงถูกมองว่าเป็น non-main และจะถูก sandbox หากคุณต้องการให้เอเจนต์ตัวใดไม่มี sandbox เลย ให้ตั้ง `agents.list[].sandbox.mode: "off"`
+ไม่ใช่ agent id เซสชันกลุ่ม/ช่องทางจะมีคีย์ของตัวเองเสมอ ดังนั้น
+จึงถูกมองว่าไม่ใช่ main และจะถูก sandbox หากคุณต้องการให้เอเจนต์ไม่ใช้
+sandbox เลย ให้ตั้ง `agents.list[].sandbox.mode: "off"`
 
 ---
 
 ## การทดสอบ
 
-หลังจากตั้งค่า sandbox และ tools แบบหลายเอเจนต์แล้ว:
+หลังจากกำหนดค่า sandbox และเครื่องมือแบบหลายเอเจนต์แล้ว:
 
 1. **ตรวจสอบการ resolve เอเจนต์:**
 
@@ -331,7 +330,7 @@ tokens แบบ ASCII/full-width ที่รั่วออกมา และ
    openclaw agents list --bindings
    ```
 
-2. **ตรวจสอบ sandbox containers:**
+2. **ยืนยันคอนเทนเนอร์ Sandbox:**
 
    ```exec
    docker ps --filter "name=openclaw-sbx-"
@@ -339,7 +338,7 @@ tokens แบบ ASCII/full-width ที่รั่วออกมา และ
 
 3. **ทดสอบข้อจำกัดของเครื่องมือ:**
    - ส่งข้อความที่ต้องใช้เครื่องมือที่ถูกจำกัด
-   - ตรวจสอบว่าเอเจนต์ไม่สามารถใช้เครื่องมือที่ถูกปฏิเสธได้
+   - ยืนยันว่าเอเจนต์ไม่สามารถใช้เครื่องมือที่ถูกปฏิเสธได้
 
 4. **ติดตาม logs:**
 
@@ -349,31 +348,31 @@ tokens แบบ ASCII/full-width ที่รั่วออกมา และ
 
 ---
 
-## การแก้ไขปัญหา
+## การแก้ปัญหา
 
 ### เอเจนต์ไม่ถูก sandbox แม้ตั้ง `mode: "all"`
 
-- ตรวจสอบว่ามี `agents.defaults.sandbox.mode` ระดับ global ที่ไป override หรือไม่
+- ตรวจสอบว่ามี `agents.defaults.sandbox.mode` ระดับ global ที่ override อยู่หรือไม่
 - config เฉพาะเอเจนต์มีลำดับความสำคัญสูงกว่า ดังนั้นให้ตั้ง `agents.list[].sandbox.mode: "all"`
 
-### เครื่องมือยังคงใช้ได้แม้อยู่ใน deny list
+### เครื่องมือยังใช้งานได้แม้อยู่ใน deny list
 
 - ตรวจสอบลำดับการกรองเครื่องมือ: global → agent → sandbox → subagent
-- แต่ละระดับทำได้เพียงจำกัดเพิ่ม ไม่สามารถคืนสิทธิ์กลับมาได้
+- แต่ละระดับทำได้เพียงจำกัดเพิ่ม ไม่สามารถคืนสิทธิ์ได้
 - ตรวจสอบผ่าน logs: `[tools] filtering tools for agent:${agentId}`
 
 ### คอนเทนเนอร์ไม่ถูกแยกต่อเอเจนต์
 
-- ตั้ง `scope: "agent"` ใน sandbox config เฉพาะเอเจนต์
-- ค่าเริ่มต้นคือ `"session"` ซึ่งจะสร้างหนึ่งคอนเทนเนอร์ต่อเซสชัน
+- ตั้ง `scope: "agent"` ใน config sandbox เฉพาะเอเจนต์
+- ค่าเริ่มต้นคือ `"session"` ซึ่งสร้างหนึ่งคอนเทนเนอร์ต่อเซสชัน
 
 ---
 
-## ดูเพิ่มเติม
+## ที่เกี่ยวข้อง
 
-- [Sandboxing](/th/gateway/sandboxing) -- เอกสารอ้างอิง sandbox แบบเต็ม (modes, scopes, backends, images)
+- [Sandboxing](/th/gateway/sandboxing) -- เอกสารอ้างอิง Sandbox แบบเต็ม (โหมด, scope, backend, image)
 - [Sandbox vs Tool Policy vs Elevated](/th/gateway/sandbox-vs-tool-policy-vs-elevated) -- ดีบักว่า "ทำไมสิ่งนี้ถึงถูกบล็อก?"
 - [Elevated Mode](/th/tools/elevated)
 - [Multi-Agent Routing](/th/concepts/multi-agent)
-- [Sandbox Configuration](/th/gateway/configuration-reference#agentsdefaultssandbox)
+- [Sandbox Configuration](/th/gateway/config-agents#agentsdefaultssandbox)
 - [Session Management](/th/concepts/session)

@@ -1,31 +1,29 @@
 ---
 read_when:
-    - กำลังตรวจสอบความครอบคลุมของข้อมูลรับรอง SecretRef
-    - กำลังตรวจสอบว่าข้อมูลรับรองมีสิทธิ์สำหรับ `secrets configure` หรือ `secrets apply` หรือไม่
-    - กำลังตรวจสอบว่าทำไมข้อมูลรับรองจึงอยู่นอกพื้นผิวที่รองรับ
-summary: พื้นผิวข้อมูลรับรอง SecretRef แบบ canonical ที่รองรับเทียบกับไม่รองรับ
+    - การตรวจสอบความครอบคลุมของข้อมูลรับรอง SecretRef
+    - การตรวจสอบว่าข้อมูลรับรองมีสิทธิ์สำหรับ `secrets configure` หรือ `secrets apply` หรือไม่
+    - การตรวจสอบว่าเหตุใดข้อมูลรับรองจึงอยู่นอกพื้นผิวที่รองรับ
+summary: พื้นผิวข้อมูลรับรอง SecretRef ที่รองรับและไม่รองรับแบบ canonical
 title: พื้นผิวข้อมูลรับรอง SecretRef
 x-i18n:
-    generated_at: "2026-04-23T05:55:18Z"
+    generated_at: "2026-04-24T09:31:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dd0b9c379236b17a72f552d6360b8b5a2269009e019c138c6bb50f4f7328ddaf
+    source_hash: ddb8d7660f2757e3d2a078c891f52325bf9ec9291ec7d5f5e06daef4041e2006
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
-
-# พื้นผิวข้อมูลรับรอง SecretRef
 
 หน้านี้กำหนดพื้นผิวข้อมูลรับรอง SecretRef แบบ canonical
 
 เจตนาของขอบเขต:
 
-- อยู่ในขอบเขต: ข้อมูลรับรองที่ผู้ใช้จัดหาให้โดยตรงอย่างเคร่งครัด ซึ่ง OpenClaw ไม่ได้สร้างหรือหมุนให้
-- นอกขอบเขต: ข้อมูลรับรองที่สร้างหรือหมุนขณะรันไทม์, วัสดุสำหรับรีเฟรช OAuth และอาร์ติแฟกต์ที่มีลักษณะคล้ายเซสชัน
+- อยู่ในขอบเขต: ข้อมูลรับรองที่ผู้ใช้จัดหาให้โดยตรงอย่างเคร่งครัด ซึ่ง OpenClaw ไม่ได้ออกให้หรือหมุนเวียนให้
+- อยู่นอกขอบเขต: ข้อมูลรับรองที่สร้างขึ้นตอนรันไทม์หรือมีการหมุนเวียน, ข้อมูลสำหรับ OAuth refresh และ artifact ลักษณะคล้ายเซสชัน
 
 ## ข้อมูลรับรองที่รองรับ
 
-### เป้าหมายใน `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### เป้าหมาย `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 [//]: # "secretref-supported-list-start"
 
@@ -108,10 +106,10 @@ x-i18n:
 - `channels.zalo.webhookSecret`
 - `channels.zalo.accounts.*.botToken`
 - `channels.zalo.accounts.*.webhookSecret`
-- `channels.googlechat.serviceAccount` ผ่าน `serviceAccountRef` ที่เป็น sibling (ข้อยกเว้นเพื่อความเข้ากันได้)
-- `channels.googlechat.accounts.*.serviceAccount` ผ่าน `serviceAccountRef` ที่เป็น sibling (ข้อยกเว้นเพื่อความเข้ากันได้)
+- `channels.googlechat.serviceAccount` ผ่าน `serviceAccountRef` ที่อยู่ข้างเคียง (ข้อยกเว้นด้านความเข้ากันได้)
+- `channels.googlechat.accounts.*.serviceAccount` ผ่าน `serviceAccountRef` ที่อยู่ข้างเคียง (ข้อยกเว้นด้านความเข้ากันได้)
 
-### เป้าหมายใน `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
+### เป้าหมาย `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 - `profiles.*.keyRef` (`type: "api_key"`; ไม่รองรับเมื่อ `auth.profiles.<id>.mode = "oauth"`)
 - `profiles.*.tokenRef` (`type: "token"`; ไม่รองรับเมื่อ `auth.profiles.<id>.mode = "oauth"`)
@@ -120,17 +118,17 @@ x-i18n:
 
 หมายเหตุ:
 
-- เป้าหมายแผนของ auth-profile ต้องใช้ `agentId`
-- รายการแผนจะชี้ไปที่ `profiles.*.key` / `profiles.*.token` และเขียน ref แบบ sibling (`keyRef` / `tokenRef`)
-- ref ของ auth-profile ถูกรวมอยู่ในการ resolve ขณะรันไทม์และความครอบคลุมของการ audit
-- ตัวป้องกันนโยบาย OAuth: `auth.profiles.<id>.mode = "oauth"` ไม่สามารถใช้ร่วมกับอินพุต SecretRef สำหรับโปรไฟล์นั้นได้ การเริ่มต้น/รีโหลดและการ resolve auth-profile จะ fail fast เมื่อมีการละเมิดนโยบายนี้
-- สำหรับ model provider ที่จัดการด้วย SecretRef, รายการ `agents/*/agent/models.json` ที่ถูกสร้างขึ้นจะคง marker ที่ไม่ใช่ secret (ไม่ใช่ค่า secret ที่ resolve แล้ว) สำหรับพื้นผิว `apiKey`/header
-- การคง marker ใช้ source-authoritative: OpenClaw เขียน marker จาก snapshot ของ config ต้นทางที่กำลังใช้งานอยู่ (ก่อน resolve) ไม่ใช่จากค่าความลับของรันไทม์ที่ resolve แล้ว
-- สำหรับ web search:
-  - ในโหมด explicit provider (ตั้ง `tools.web.search.provider` ไว้) จะมีเพียงคีย์ของ provider ที่เลือกเท่านั้นที่ active
-  - ในโหมด auto (ยังไม่ได้ตั้ง `tools.web.search.provider`) จะมีเพียงคีย์ provider ตัวแรกที่ resolve ได้ตามลำดับความสำคัญเท่านั้นที่ active
-  - ในโหมด auto, ref ของ provider ที่ไม่ได้ถูกเลือกจะถือว่า inactive จนกว่าจะถูกเลือก
-  - พาธ provider แบบเดิมใน `tools.web.search.*` ยังคง resolve ได้ในช่วงหน้าต่างความเข้ากันได้ แต่พื้นผิว SecretRef แบบ canonical คือ `plugins.entries.<plugin>.config.webSearch.*`
+- เป้าหมายแผนของ auth profile ต้องใช้ `agentId`
+- รายการแผนกำหนดเป้าหมายไปที่ `profiles.*.key` / `profiles.*.token` และเขียน ref ที่เป็น sibling (`keyRef` / `tokenRef`)
+- ref ของ auth profile ถูกรวมอยู่ในการ resolve ตอนรันไทม์และความครอบคลุมของการ audit
+- การป้องกันตามนโยบาย OAuth: `auth.profiles.<id>.mode = "oauth"` ไม่สามารถใช้ร่วมกับอินพุต SecretRef สำหรับ profile นั้นได้ การเริ่มต้น/รีโหลดและการ resolve auth profile จะล้มเหลวทันทีเมื่อมีการละเมิดนโยบายนี้
+- สำหรับผู้ให้บริการโมเดลที่จัดการด้วย SecretRef รายการ `agents/*/agent/models.json` ที่สร้างขึ้นจะเก็บ marker ที่ไม่เป็นความลับ (ไม่ใช่ค่าความลับที่ resolve แล้ว) สำหรับพื้นผิว `apiKey`/header
+- การเก็บ marker ยึดตามแหล่งข้อมูลเป็นหลัก: OpenClaw เขียน marker จาก snapshot คอนฟิกต้นทางที่กำลังใช้งานอยู่ (ก่อนการ resolve) ไม่ใช่จากค่าความลับที่ resolve แล้วในรันไทม์
+- สำหรับการค้นหาเว็บ:
+  - ในโหมดผู้ให้บริการแบบระบุชัดเจน (ตั้งค่า `tools.web.search.provider`) จะมีเพียงคีย์ของผู้ให้บริการที่เลือกเท่านั้นที่ทำงานอยู่
+  - ในโหมดอัตโนมัติ (ไม่ได้ตั้งค่า `tools.web.search.provider`) จะมีเพียงคีย์ของผู้ให้บริการตัวแรกที่ resolve ได้ตามลำดับความสำคัญเท่านั้นที่ทำงานอยู่
+  - ในโหมดอัตโนมัติ ref ของผู้ให้บริการที่ไม่ได้ถูกเลือกจะถือว่าไม่ทำงานจนกว่าจะถูกเลือก
+  - พาธผู้ให้บริการแบบเก่า `tools.web.search.*` ยังคง resolve ได้ในช่วงหน้าต่างความเข้ากันได้ แต่พื้นผิว SecretRef แบบ canonical คือ `plugins.entries.<plugin>.config.webSearch.*`
 
 ## ข้อมูลรับรองที่ไม่รองรับ
 
@@ -152,4 +150,9 @@ x-i18n:
 
 เหตุผล:
 
-- ข้อมูลรับรองเหล่านี้เป็นคลาสที่ถูกสร้างขึ้น หมุนเวียน มีสถานะของเซสชัน หรือคงอยู่แบบ OAuth ซึ่งไม่สอดคล้องกับการ resolve SecretRef ภายนอกแบบอ่านอย่างเดียว
+- ข้อมูลรับรองเหล่านี้เป็นคลาสที่ถูกออกให้ หมุนเวียน มีสถานะของเซสชัน หรือคงอยู่แบบ OAuth ซึ่งไม่เหมาะกับการ resolve SecretRef ภายนอกแบบอ่านอย่างเดียว
+
+## ที่เกี่ยวข้อง
+
+- [Secrets management](/th/gateway/secrets)
+- [Auth credential semantics](/th/auth-credential-semantics)

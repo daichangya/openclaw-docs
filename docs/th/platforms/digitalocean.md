@@ -1,14 +1,14 @@
 ---
 read_when:
     - การตั้งค่า OpenClaw บน DigitalOcean
-    - กำลังมองหาโฮสติ้ง VPS ราคาถูกสำหรับ OpenClaw
+    - กำลังมองหา VPS ราคาประหยัดสำหรับ OpenClaw
 summary: OpenClaw บน DigitalOcean (ตัวเลือก VPS แบบเสียเงินที่เรียบง่าย)
 title: DigitalOcean (แพลตฟอร์ม)
 x-i18n:
-    generated_at: "2026-04-23T05:43:57Z"
+    generated_at: "2026-04-24T09:21:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6ee4ad84c421f87064534a4fb433df1f70304502921841ec618318ed862d4092
+    source_hash: c9d286f243f38ed910a3229f195be724f9f96481036380d8c8194ff298d39c87
     source_path: platforms/digitalocean.md
     workflow: 15
 ---
@@ -17,47 +17,47 @@ x-i18n:
 
 ## เป้าหมาย
 
-รัน OpenClaw Gateway แบบถาวรบน DigitalOcean ด้วยราคา **$6/เดือน** (หรือ $4/เดือน หากใช้การจองล่วงหน้า)
+รัน OpenClaw Gateway แบบคงอยู่บน DigitalOcean ในราคา **$6/เดือน** (หรือ $4/เดือนหากใช้ reserved pricing)
 
-หากคุณต้องการตัวเลือก $0/เดือนและไม่ติดเรื่อง ARM + การตั้งค่าเฉพาะของผู้ให้บริการ ให้ดู [คู่มือ Oracle Cloud](/th/install/oracle)
+หากคุณต้องการตัวเลือก $0/เดือนและไม่ติดเรื่อง ARM + การตั้งค่าเฉพาะผู้ให้บริการ ดู [คู่มือ Oracle Cloud](/th/install/oracle)
 
 ## เปรียบเทียบค่าใช้จ่าย (2026)
 
-| ผู้ให้บริการ | แผน            | สเปก                  | ราคา/เดือน   | หมายเหตุ                                 |
-| ------------ | -------------- | --------------------- | ------------ | ---------------------------------------- |
-| Oracle Cloud | Always Free ARM | สูงสุด 4 OCPU, RAM 24GB | $0         | ARM, ความจุจำกัด / ขั้นตอนสมัครมีจุกจิก |
-| Hetzner      | CX22           | 2 vCPU, RAM 4GB       | €3.79 (~$4) | ตัวเลือกแบบเสียเงินที่ถูกที่สุด          |
-| DigitalOcean | Basic          | 1 vCPU, RAM 1GB       | $6          | UI ใช้ง่าย เอกสารดี                      |
-| Vultr        | Cloud Compute  | 1 vCPU, RAM 1GB       | $6          | มีหลายตำแหน่ง                            |
-| Linode       | Nanode         | 1 vCPU, RAM 1GB       | $5          | ตอนนี้เป็นส่วนหนึ่งของ Akamai          |
+| ผู้ให้บริการ   | แผน               | สเปก                   | ราคา/เดือน   | หมายเหตุ                                  |
+| -------------- | ----------------- | ---------------------- | ------------ | ----------------------------------------- |
+| Oracle Cloud   | Always Free ARM   | สูงสุด 4 OCPU, RAM 24GB | $0           | ARM, ความจุจำกัด / สมัครค่อนข้างจุกจิก    |
+| Hetzner        | CX22              | 2 vCPU, RAM 4GB        | €3.79 (~$4)  | ตัวเลือกแบบเสียเงินที่ถูกที่สุด            |
+| DigitalOcean   | Basic             | 1 vCPU, RAM 1GB        | $6           | UI ใช้ง่าย เอกสารดี                       |
+| Vultr          | Cloud Compute     | 1 vCPU, RAM 1GB        | $6           | มีหลาย location                           |
+| Linode         | Nanode            | 1 vCPU, RAM 1GB        | $5           | ปัจจุบันเป็นส่วนหนึ่งของ Akamai          |
 
 **การเลือกผู้ให้บริการ:**
 
 - DigitalOcean: UX ง่ายที่สุด + การตั้งค่าคาดเดาได้ (คู่มือนี้)
 - Hetzner: ราคาต่อประสิทธิภาพดี (ดู [คู่มือ Hetzner](/th/install/hetzner))
-- Oracle Cloud: อาจเป็น $0/เดือน แต่จุกจิกกว่าและเป็น ARM เท่านั้น (ดู [คู่มือ Oracle](/th/install/oracle))
+- Oracle Cloud: อาจเป็น $0/เดือน แต่จุกจิกกว่าและเป็น ARM-only (ดู [คู่มือ Oracle](/th/install/oracle))
 
 ---
 
 ## ข้อกำหนดเบื้องต้น
 
 - บัญชี DigitalOcean ([สมัครพร้อมเครดิตฟรี $200](https://m.do.co/c/signup))
-- คู่คีย์ SSH (หรือพร้อมจะใช้การยืนยันตัวตนด้วยรหัสผ่าน)
+- คู่กุญแจ SSH (หรือยินดีใช้ password auth)
 - เวลาประมาณ 20 นาที
 
 ## 1) สร้าง Droplet
 
 <Warning>
-ใช้ base image ที่สะอาด (Ubuntu 24.04 LTS) หลีกเลี่ยง Marketplace 1-click image จากบุคคลที่สาม เว้นแต่คุณได้ตรวจสอบ startup script และค่าเริ่มต้นของไฟร์วอลล์แล้ว
+ใช้ base image ที่สะอาด (Ubuntu 24.04 LTS) หลีกเลี่ยง Marketplace 1-click images จากบุคคลที่สาม เว้นแต่คุณได้ตรวจสอบ startup scripts และค่าเริ่มต้นของ firewall แล้ว
 </Warning>
 
-1. ล็อกอินเข้า [DigitalOcean](https://cloud.digitalocean.com/)
+1. ล็อกอินไปที่ [DigitalOcean](https://cloud.digitalocean.com/)
 2. คลิก **Create → Droplets**
 3. เลือก:
-   - **Region:** ใกล้คุณ (หรือผู้ใช้ของคุณ) ที่สุด
+   - **Region:** ใกล้คุณที่สุด (หรือใกล้ผู้ใช้ของคุณ)
    - **Image:** Ubuntu 24.04 LTS
-   - **Size:** Basic → Regular → **$6/เดือน** (1 vCPU, RAM 1GB, SSD 25GB)
-   - **Authentication:** SSH key (แนะนำ) หรือรหัสผ่าน
+   - **Size:** Basic → Regular → **$6/mo** (1 vCPU, RAM 1GB, SSD 25GB)
+   - **Authentication:** SSH key (แนะนำ) หรือ password
 4. คลิก **Create Droplet**
 5. จด IP address ไว้
 
@@ -90,9 +90,9 @@ openclaw --version
 openclaw onboard --install-daemon
 ```
 
-วิซาร์ดจะพาคุณผ่านขั้นตอน:
+wizard จะพาคุณผ่านขั้นตอนต่อไปนี้:
 
-- การยืนยันตัวตนของโมเดล (API keys หรือ OAuth)
+- model auth (API keys หรือ OAuth)
 - การตั้งค่าช่องทาง (Telegram, WhatsApp, Discord ฯลฯ)
 - Gateway token (สร้างให้อัตโนมัติ)
 - การติดตั้ง daemon (systemd)
@@ -106,13 +106,13 @@ openclaw status
 # ตรวจสอบ service
 systemctl --user status openclaw-gateway.service
 
-# ดูล็อก
+# ดู logs
 journalctl --user -u openclaw-gateway.service -f
 ```
 
-## 6) เข้าถึงแดชบอร์ด
+## 6) เข้าถึง Dashboard
 
-โดยค่าเริ่มต้น gateway จะ bind กับ loopback หากต้องการเข้าถึง Control UI:
+gateway จะ bind กับ loopback เป็นค่าเริ่มต้น หากต้องการเข้าถึง Control UI:
 
 **ตัวเลือก A: SSH Tunnel (แนะนำ)**
 
@@ -139,8 +139,8 @@ openclaw gateway restart
 
 หมายเหตุ:
 
-- Serve จะทำให้ Gateway ยังคงเป็น loopback-only และยืนยันตัวตนทราฟฟิกของ Control UI/WebSocket ผ่าน Tailscale identity headers (auth แบบไม่ใช้ token นี้ตั้งอยู่บนสมมติฐานว่าโฮสต์ของ gateway เชื่อถือได้; HTTP API จะไม่ใช้ Tailscale headers เหล่านั้น แต่จะยึดตามโหมด HTTP auth ปกติของ gateway แทน)
-- หากต้องการบังคับใช้ข้อมูลรับรอง shared-secret แบบชัดเจนแทน ให้ตั้ง `gateway.auth.allowTailscale: false` และใช้ `gateway.auth.mode: "token"` หรือ `"password"`
+- Serve จะคง Gateway ไว้แบบ loopback-only และยืนยันตัวตนทราฟฟิกของ Control UI/WebSocket ผ่าน Tailscale identity headers (tokenless auth ถือว่าโฮสต์ gateway เชื่อถือได้; HTTP APIs จะไม่ใช้ Tailscale headers เหล่านั้น และจะใช้โหมด HTTP auth ปกติของ gateway แทน)
+- หากต้องการให้ใช้ shared-secret credentials แบบ explicit แทน ให้ตั้งค่า `gateway.auth.allowTailscale: false` และใช้ `gateway.auth.mode: "token"` หรือ `"password"`
 
 **ตัวเลือก C: Tailnet bind (ไม่ใช้ Serve)**
 
@@ -167,13 +167,13 @@ openclaw channels login whatsapp
 # สแกน QR code
 ```
 
-ดู [Channels](/th/channels) สำหรับผู้ให้บริการอื่น
+ดู [Channels](/th/channels) สำหรับผู้ให้บริการรายอื่น
 
 ---
 
 ## การปรับแต่งสำหรับ RAM 1GB
 
-droplet ราคา $6 มี RAM เพียง 1GB เพื่อให้ระบบทำงานลื่นไหล:
+droplet ราคา $6 มี RAM เพียง 1GB เพื่อให้ทำงานได้ลื่นขึ้น:
 
 ### เพิ่ม swap (แนะนำ)
 
@@ -187,12 +187,12 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
 ### ใช้โมเดลที่เบากว่า
 
-หากคุณเจอ OOM ให้พิจารณา:
+หากคุณเจอ OOMs ให้พิจารณา:
 
-- ใช้โมเดลที่อิง API (Claude, GPT) แทนโมเดล local
-- ตั้งค่า `agents.defaults.model.primary` ไปยังโมเดลที่เล็กกว่า
+- ใช้โมเดลแบบ API-based (Claude, GPT) แทนโมเดลในเครื่อง
+- ตั้งค่า `agents.defaults.model.primary` เป็นโมเดลที่เล็กกว่า
 
-### ตรวจสอบหน่วยความจำ
+### เฝ้าดูหน่วยความจำ
 
 ```bash
 free -h
@@ -201,14 +201,14 @@ htop
 
 ---
 
-## การเก็บสถานะถาวร
+## การคงอยู่ของข้อมูล
 
 สถานะทั้งหมดอยู่ใน:
 
-- `~/.openclaw/` — `openclaw.json`, `auth-profiles.json` ต่อเอเจนต์, สถานะของช่องทาง/ผู้ให้บริการ และข้อมูลเซสชัน
-- `~/.openclaw/workspace/` — workspace (SOUL.md, หน่วยความจำ ฯลฯ)
+- `~/.openclaw/` — `openclaw.json`, `auth-profiles.json` รายเอเจนต์, สถานะของ channel/provider และข้อมูลเซสชัน
+- `~/.openclaw/workspace/` — workspace (SOUL.md, memory ฯลฯ)
 
-สิ่งเหล่านี้จะคงอยู่หลังการรีบูต ควรสำรองเป็นระยะ:
+สิ่งเหล่านี้อยู่รอดข้ามการรีบูต สำรองข้อมูลเป็นระยะ:
 
 ```bash
 openclaw backup create
@@ -216,29 +216,29 @@ openclaw backup create
 
 ---
 
-## ทางเลือกฟรีจาก Oracle Cloud
+## ทางเลือกฟรีบน Oracle Cloud
 
-Oracle Cloud มี instance ARM แบบ **Always Free** ที่ทรงพลังกว่าตัวเลือกแบบเสียเงินใด ๆ ที่กล่าวถึงที่นี่มาก — ในราคา $0/เดือน
+Oracle Cloud มีอินสแตนซ์ ARM แบบ **Always Free** ที่มีประสิทธิภาพสูงกว่าตัวเลือกแบบเสียเงินทั้งหมดที่นี่อย่างมาก — ในราคา $0/เดือน
 
-| สิ่งที่คุณได้รับ   | สเปก                  |
-| ------------------ | --------------------- |
-| **4 OCPUs**        | ARM Ampere A1         |
-| **RAM 24GB**       | มากเกินพอ             |
-| **ที่เก็บข้อมูล 200GB** | Block volume     |
-| **ฟรีตลอดไป**      | ไม่มีค่าใช้จ่ายจากบัตรเครดิต |
+| สิ่งที่คุณได้รับ | สเปก                    |
+| ---------------- | ----------------------- |
+| **4 OCPUs**      | ARM Ampere A1           |
+| **RAM 24GB**     | มากเกินพอ               |
+| **พื้นที่เก็บ 200GB** | Block volume        |
+| **ฟรีตลอดไป**   | ไม่มีการเรียกเก็บบัตรเครดิต |
 
 **ข้อควรระวัง:**
 
-- การสมัครอาจจุกจิก (หากล้มเหลวให้ลองใหม่)
-- เป็นสถาปัตยกรรม ARM — ส่วนใหญ่ใช้งานได้ แต่บางไบนารีต้องมีบิลด์ ARM
+- การสมัครอาจจุกจิก (ลองใหม่หากล้มเหลว)
+- สถาปัตยกรรม ARM — ส่วนใหญ่ใช้งานได้ แต่บาง binary ต้องใช้ ARM builds
 
-สำหรับคู่มือการตั้งค่าแบบเต็ม ดู [Oracle Cloud](/th/install/oracle) สำหรับเคล็ดลับการสมัครและการแก้ไขปัญหาระหว่างขั้นตอนสมัคร ดู [คู่มือจากชุมชน](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd) นี้
+สำหรับคู่มือการตั้งค่าแบบเต็ม ดู [Oracle Cloud](/th/install/oracle) สำหรับเคล็ดลับการสมัครและการแก้ปัญหาในกระบวนการสมัคร ดู [คู่มือจากชุมชน](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd)
 
 ---
 
 ## การแก้ไขปัญหา
 
-### Gateway ไม่ยอมเริ่มทำงาน
+### Gateway ไม่ยอมเริ่ม
 
 ```bash
 openclaw gateway status
@@ -265,9 +265,9 @@ free -h
 
 ---
 
-## ดูเพิ่มเติม
+## ที่เกี่ยวข้อง
 
-- [คู่มือ Hetzner](/th/install/hetzner) — ถูกกว่า ทรงพลังกว่า
-- [การติดตั้งด้วย Docker](/th/install/docker) — การตั้งค่าแบบ containerized
+- [คู่มือ Hetzner](/th/install/hetzner) — ถูกกว่า แรงกว่า
+- [ติดตั้งด้วย Docker](/th/install/docker) — การตั้งค่าแบบคอนเทนเนอร์
 - [Tailscale](/th/gateway/tailscale) — การเข้าถึงระยะไกลอย่างปลอดภัย
-- [การกำหนดค่า](/th/gateway/configuration) — เอกสารอ้างอิง config แบบเต็ม
+- [Configuration](/th/gateway/configuration) — เอกสารอ้างอิงคอนฟิกแบบเต็ม

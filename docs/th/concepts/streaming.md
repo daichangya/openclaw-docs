@@ -1,193 +1,193 @@
 ---
 read_when:
-    - การอธิบายว่าการสตรีมหรือการแบ่งชังก์ทำงานอย่างไรบนแชนเนลต่าง ๆ
-    - การเปลี่ยนพฤติกรรมการสตรีมแบบบล็อกหรือการแบ่งชังก์ของแชนเนล
-    - การดีบักการตอบกลับแบบบล็อกหรือการสตรีมพรีวิวของแชนเนลที่ซ้ำ/มาเร็วเกินไป
-summary: พฤติกรรมการสตรีม + การแบ่งชังก์ (การตอบกลับแบบบล็อก การสตรีมพรีวิวของแชนเนล การแมปโหมด)
-title: การสตรีมและการแบ่งชังก์
+    - การอธิบายว่าการสตรีมหรือการแบ่งชิ้นทำงานอย่างไรบนช่องทางต่าง ๆ
+    - การเปลี่ยนลักษณะการทำงานของ block streaming หรือ channel chunking
+    - การดีบักการตอบกลับแบบบล็อกที่ซ้ำกัน/เร็วเกินไป หรือการสตรีมตัวอย่างของช่องทาง
+summary: ลักษณะการทำงานของการสตรีม + การแบ่งชิ้น (การตอบกลับแบบบล็อก, การสตรีมตัวอย่างในช่องทาง, การแมปโหมด)
+title: การสตรีมและการแบ่งชิ้น
 x-i18n:
-    generated_at: "2026-04-23T05:32:04Z"
+    generated_at: "2026-04-24T09:08:01Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c6b246025ea1b1be57705bde60c0cdb485ffda727392cf00ea5a165571e37fce
+    source_hash: 48d0391644e410d08f81cc2fb2d02a4aeb836ab04f37ea34a6c94bec9bc16b07
     source_path: concepts/streaming.md
     workflow: 15
 ---
 
-# การสตรีม + การแบ่งชังก์
+# การสตรีม + การแบ่งชิ้น
 
-OpenClaw มีเลเยอร์การสตรีมแยกกันสองชั้น:
+OpenClaw มีชั้นการสตรีมแยกกัน 2 ชั้น:
 
-- **การสตรีมแบบบล็อก (แชนเนล):** ส่ง **บล็อก** ที่เสร็จสมบูรณ์แล้วออกไปขณะที่ผู้ช่วยกำลังเขียน สิ่งเหล่านี้คือข้อความแชนเนลปกติ (ไม่ใช่ token delta)
-- **การสตรีมแบบพรีวิว (Telegram/Discord/Slack):** อัปเดต **ข้อความพรีวิวชั่วคราว** ระหว่างการสร้างข้อความ
+- **Block streaming (ช่องทาง):** ส่ง **บล็อก** ที่เสร็จสมบูรณ์แล้วออกไปขณะที่ assistant กำลังเขียน สิ่งเหล่านี้เป็นข้อความช่องทางปกติ (ไม่ใช่ token deltas)
+- **Preview streaming (Telegram/Discord/Slack):** อัปเดต **ข้อความตัวอย่าง** ชั่วคราวระหว่างการสร้าง
 
-ปัจจุบันยัง **ไม่มีการสตรีม token delta จริง** ไปยังข้อความของแชนเนล การสตรีมแบบพรีวิวเป็นแบบอิงข้อความ (ส่ง + แก้ไข/ต่อท้าย)
+ปัจจุบันยัง **ไม่มีการสตรีมแบบ token-delta จริง** ไปยังข้อความของช่องทาง Preview streaming เป็นแบบอิงข้อความ (ส่ง + แก้ไข/ต่อท้าย)
 
-## การสตรีมแบบบล็อก (ข้อความของแชนเนล)
+## Block streaming (ข้อความของช่องทาง)
 
-การสตรีมแบบบล็อกจะส่งเอาต์พุตของผู้ช่วยออกเป็นชังก์หยาบ ๆ เมื่อพร้อมใช้งาน
+Block streaming จะส่งเอาต์พุตของ assistant ออกเป็นชิ้นแบบหยาบเมื่อพร้อมใช้งาน
 
-```
+```text
 Model output
   └─ text_delta/events
        ├─ (blockStreamingBreak=text_end)
-       │    └─ chunker ส่งบล็อกออกมาเมื่อบัฟเฟอร์เติบโตขึ้น
+       │    └─ chunker emits blocks as buffer grows
        └─ (blockStreamingBreak=message_end)
-            └─ chunker flush ที่ message_end
-                   └─ การส่งของแชนเนล (block replies)
+            └─ chunker flushes at message_end
+                   └─ channel send (block replies)
 ```
 
 คำอธิบาย:
 
-- `text_delta/events`: event การสตรีมของโมเดล (อาจมีน้อยสำหรับโมเดลที่ไม่สตรีม)
-- `chunker`: `EmbeddedBlockChunker` ที่ใช้ขอบเขตต่ำสุด/สูงสุด + ความชอบจุดแบ่ง
+- `text_delta/events`: model stream events (อาจมีไม่ถี่สำหรับโมเดลที่ไม่สตรีม)
+- `chunker`: `EmbeddedBlockChunker` ที่ใช้ min/max bounds + break preference
 - `channel send`: ข้อความขาออกจริง (block replies)
 
 **ตัวควบคุม:**
 
 - `agents.defaults.blockStreamingDefault`: `"on"`/`"off"` (ค่าเริ่มต้นปิด)
-- การแทนที่รายแชนเนล: `*.blockStreaming` (และตัวแปรรายบัญชี) เพื่อบังคับ `"on"`/`"off"` ต่อแชนเนล
+- Channel overrides: `*.blockStreaming` (และตัวแปรรายบัญชี) เพื่อบังคับ `"on"`/`"off"` รายช่องทาง
 - `agents.defaults.blockStreamingBreak`: `"text_end"` หรือ `"message_end"`
 - `agents.defaults.blockStreamingChunk`: `{ minChars, maxChars, breakPreference? }`
 - `agents.defaults.blockStreamingCoalesce`: `{ minChars?, maxChars?, idleMs? }` (รวมบล็อกที่สตรีมก่อนส่ง)
-- เพดานตายตัวของแชนเนล: `*.textChunkLimit` (เช่น `channels.whatsapp.textChunkLimit`)
-- โหมดการแบ่งชังก์ของแชนเนล: `*.chunkMode` (`length` เป็นค่าเริ่มต้น, `newline` แบ่งที่บรรทัดว่าง (ขอบเขตย่อหน้า) ก่อนการแบ่งตามความยาว)
-- เพดานแบบนุ่มของ Discord: `channels.discord.maxLinesPerMessage` (ค่าเริ่มต้น 17) ใช้แบ่งคำตอบที่ยาวในแนวตั้งเพื่อหลีกเลี่ยงการถูกตัดใน UI
+- เพดานตายตัวของช่องทาง: `*.textChunkLimit` (เช่น `channels.whatsapp.textChunkLimit`)
+- โหมดการแบ่งชิ้นของช่องทาง: `*.chunkMode` (`length` เป็นค่าเริ่มต้น, `newline` จะแบ่งตามบรรทัดว่าง (ขอบเขตย่อหน้า) ก่อนแบ่งตามความยาว)
+- เพดานแบบนุ่มของ Discord: `channels.discord.maxLinesPerMessage` (ค่าเริ่มต้น 17) จะแบ่งคำตอบที่ยาวเป็นแนวตั้งเพื่อหลีกเลี่ยงการถูกตัดใน UI
 
 **ความหมายของขอบเขต:**
 
-- `text_end`: สตรีมบล็อกทันทีที่ chunker ส่งออก; flush ทุก `text_end`
-- `message_end`: รอจนข้อความของผู้ช่วยเสร็จสิ้น แล้วจึง flush เอาต์พุตที่บัฟเฟอร์ไว้
+- `text_end`: สตรีมบล็อกทันทีที่ chunker สร้างออกมา; flush ทุกครั้งที่ `text_end`
+- `message_end`: รอจนข้อความของ assistant จบก่อน แล้วจึง flush เอาต์พุตที่บัฟเฟอร์ไว้
 
-`message_end` ยังคงใช้ chunker หากข้อความในบัฟเฟอร์ยาวเกิน `maxChars` ดังนั้นจึงอาจส่งหลายชังก์ออกมาตอนท้ายได้
+`message_end` ยังคงใช้ chunker หากข้อความในบัฟเฟอร์เกิน `maxChars` ดังนั้นอาจส่งออกหลายชิ้นตอนจบได้
 
-## อัลกอริทึมการแบ่งชังก์ (ขอบเขตต่ำ/สูง)
+## อัลกอริทึมการแบ่งชิ้น (ขอบล่าง/ขอบบน)
 
-การแบ่งชังก์แบบบล็อกถูก implement โดย `EmbeddedBlockChunker`:
+การแบ่งชิ้นของ block ถูกทำโดย `EmbeddedBlockChunker`:
 
-- **ขอบเขตต่ำ:** จะไม่ส่งออกจนกว่าบัฟเฟอร์ >= `minChars` (เว้นแต่ถูกบังคับ)
-- **ขอบเขตสูง:** พยายามแบ่งก่อน `maxChars`; หากถูกบังคับ ให้แบ่งที่ `maxChars`
-- **ความชอบจุดแบ่ง:** `paragraph` → `newline` → `sentence` → `whitespace` → จุดแบ่งแบบบังคับ
-- **Code fence:** จะไม่แบ่งภายใน fence; เมื่อถูกบังคับที่ `maxChars` จะปิดแล้วเปิด fence ใหม่เพื่อให้ Markdown ยังคงถูกต้อง
+- **ขอบล่าง:** จะยังไม่ส่งออกจนกว่าบัฟเฟอร์จะมีขนาด >= `minChars` (เว้นแต่จะถูกบังคับ)
+- **ขอบบน:** พยายามแบ่งก่อนถึง `maxChars`; หากถูกบังคับ จะแบ่งที่ `maxChars`
+- **ลำดับความสำคัญของจุดแบ่ง:** `paragraph` → `newline` → `sentence` → `whitespace` → hard break
+- **Code fences:** จะไม่แบ่งภายใน fences; หากจำเป็นต้องแบ่งที่ `maxChars`, ระบบจะปิดแล้วเปิด fence ใหม่เพื่อให้ Markdown ยังถูกต้อง
 
-`maxChars` จะถูกบีบไม่ให้เกิน `textChunkLimit` ของแชนเนล ดังนั้นคุณจึงไม่สามารถเกินเพดานต่อแชนเนลได้
+`maxChars` จะถูก clamp ให้ไม่เกิน `textChunkLimit` ของช่องทาง ดังนั้นคุณจะไม่สามารถเกินเพดานรายช่องทางได้
 
-## การรวมชังก์ (รวมบล็อกที่สตรีม)
+## Coalescing (รวมบล็อกที่สตรีม)
 
-เมื่อเปิดใช้การสตรีมแบบบล็อก OpenClaw สามารถ **รวม block chunk ที่ต่อเนื่องกัน**
-ก่อนส่งออกได้ ซึ่งช่วยลด “สแปมข้อความบรรทัดเดียว” ขณะยังคงให้
+เมื่อเปิดใช้ block streaming, OpenClaw สามารถ **รวม block chunks ที่ต่อเนื่องกัน**
+ก่อนส่งออกได้ ซึ่งช่วยลด “สแปมบรรทัดเดียว” ขณะยังคงให้
 เอาต์พุตแบบค่อยเป็นค่อยไป
 
-- การรวมชังก์จะรอ **ช่วงว่าง** (`idleMs`) ก่อน flush
-- บัฟเฟอร์มีเพดานที่ `maxChars` และจะ flush หากเกิน
-- `minChars` ป้องกันไม่ให้ส่งชิ้นส่วนเล็กเกินไปจนกว่าจะมีข้อความสะสมเพียงพอ
-  (การ flush สุดท้ายจะส่งข้อความที่เหลือเสมอ)
-- ตัวเชื่อมมาจาก `blockStreamingChunk.breakPreference`
+- Coalescing จะรอ **ช่วงว่าง** (`idleMs`) ก่อน flush
+- บัฟเฟอร์จะถูกจำกัดด้วย `maxChars` และจะ flush หากเกินค่านั้น
+- `minChars` ป้องกันไม่ให้ส่งชิ้นเล็กมากจนกว่าจะมีข้อความสะสมมากพอ
+  (final flush จะส่งข้อความที่เหลือเสมอ)
+- ตัวเชื่อมจะได้มาจาก `blockStreamingChunk.breakPreference`
   (`paragraph` → `\n\n`, `newline` → `\n`, `sentence` → เว้นวรรค)
-- มีการแทนที่รายแชนเนลผ่าน `*.blockStreamingCoalesce` (รวมถึง config รายบัญชี)
-- ค่าเริ่มต้น `minChars` ของ coalesce จะถูกเพิ่มเป็น 1500 สำหรับ Signal/Slack/Discord เว้นแต่มีการแทนที่ไว้
+- มี channel overrides ผ่าน `*.blockStreamingCoalesce` (รวมถึง config รายบัญชี)
+- ค่าเริ่มต้นของ coalesce `minChars` จะถูกเพิ่มเป็น 1500 สำหรับ Signal/Slack/Discord เว้นแต่จะมีการ override
 
-## จังหวะแบบมนุษย์ระหว่างบล็อก
+## การเว้นจังหวะแบบมนุษย์ระหว่างบล็อก
 
-เมื่อเปิดใช้การสตรีมแบบบล็อก คุณสามารถเพิ่ม **การหน่วงแบบสุ่ม** ระหว่าง
-block reply แต่ละก้อน (หลังบล็อกแรก) ได้ ซึ่งทำให้การตอบหลายบับเบิลดู
+เมื่อเปิดใช้ block streaming คุณสามารถเพิ่ม **ช่วงหยุดแบบสุ่ม**
+ระหว่าง block replies (หลังบล็อกแรก) ได้ ซึ่งช่วยให้การตอบหลายบับเบิลดู
 เป็นธรรมชาติมากขึ้น
 
-- Config: `agents.defaults.humanDelay` (แทนที่รายเอเจนต์ด้วย `agents.list[].humanDelay`)
+- Config: `agents.defaults.humanDelay` (override รายเอเจนต์ได้ผ่าน `agents.list[].humanDelay`)
 - โหมด: `off` (ค่าเริ่มต้น), `natural` (800–2500ms), `custom` (`minMs`/`maxMs`)
-- ใช้กับ **block reply** เท่านั้น ไม่ใช้กับคำตอบสุดท้ายหรือสรุปจาก tool
+- ใช้กับ **block replies** เท่านั้น ไม่ใช้กับ final replies หรือ tool summaries
 
-## "สตรีมเป็นชังก์หรือส่งทั้งหมด"
+## "Stream chunks or everything"
 
 สิ่งนี้แมปได้ดังนี้:
 
-- **สตรีมเป็นชังก์:** `blockStreamingDefault: "on"` + `blockStreamingBreak: "text_end"` (ส่งออกระหว่างทาง) แชนเนลที่ไม่ใช่ Telegram ยังต้องตั้ง `*.blockStreaming: true` ด้วย
-- **สตรีมทั้งหมดตอนท้าย:** `blockStreamingBreak: "message_end"` (flush ครั้งเดียว แต่อาจได้หลายชังก์ถ้ายาวมาก)
-- **ไม่มีการสตรีมแบบบล็อก:** `blockStreamingDefault: "off"` (มีเพียงคำตอบสุดท้าย)
+- **Stream chunks:** `blockStreamingDefault: "on"` + `blockStreamingBreak: "text_end"` (ส่งออกระหว่างทาง) ช่องทางที่ไม่ใช่ Telegram ต้องมี `*.blockStreaming: true` ด้วย
+- **Stream everything at end:** `blockStreamingBreak: "message_end"` (flush ครั้งเดียว แต่อาจหลายชิ้นหากยาวมาก)
+- **No block streaming:** `blockStreamingDefault: "off"` (มีเฉพาะ final reply)
 
-**หมายเหตุสำหรับแชนเนล:** การสตรีมแบบบล็อกจะ **ปิดอยู่ เว้นแต่**
-`*.blockStreaming` จะถูกตั้งเป็น `true` อย่างชัดเจน แชนเนลสามารถสตรีมพรีวิวสด
-(`channels.<channel>.streaming`) ได้โดยไม่มี block reply
+**หมายเหตุเกี่ยวกับช่องทาง:** Block streaming จะ **ปิดอยู่ เว้นแต่**
+จะตั้ง `*.blockStreaming` เป็น `true` อย่างชัดเจน ช่องทางสามารถสตรีม live preview
+(`channels.<channel>.streaming`) ได้โดยไม่มี block replies
 
-ย้ำตำแหน่ง config: ค่าเริ่มต้น `blockStreaming*` อยู่ภายใต้
+ย้ำตำแหน่ง config: ค่าเริ่มต้น `blockStreaming*` อยู่ใต้
 `agents.defaults` ไม่ใช่ที่ root config
 
-## โหมดการสตรีมแบบพรีวิว
+## โหมดของ Preview streaming
 
 คีย์มาตรฐาน: `channels.<channel>.streaming`
 
 โหมด:
 
-- `off`: ปิดการสตรีมแบบพรีวิว
-- `partial`: พรีวิวเดี่ยวที่ถูกแทนที่ด้วยข้อความล่าสุด
-- `block`: พรีวิวอัปเดตเป็นขั้น ๆ แบบแบ่งชังก์/ต่อท้าย
-- `progress`: พรีวิวความคืบหน้า/สถานะระหว่างการสร้าง และคำตอบสุดท้ายเมื่อเสร็จสิ้น
+- `off`: ปิด preview streaming
+- `partial`: ตัวอย่างเดียวที่ถูกแทนที่ด้วยข้อความล่าสุด
+- `block`: อัปเดตตัวอย่างแบบแบ่งชิ้น/ต่อท้าย
+- `progress`: แสดงตัวอย่างสถานะ/ความคืบหน้าระหว่างสร้าง แล้วส่งคำตอบสุดท้ายเมื่อเสร็จ
 
-### การแมปตามแชนเนล
+### การแมปของช่องทาง
 
-| แชนเนล    | `off` | `partial` | `block` | `progress`         |
-| ---------- | ----- | --------- | ------- | ------------------ |
-| Telegram   | ✅    | ✅        | ✅      | แมปเป็น `partial` |
-| Discord    | ✅    | ✅        | ✅      | แมปเป็น `partial` |
-| Slack      | ✅    | ✅        | ✅      | ✅                 |
-| Mattermost | ✅    | ✅        | ✅      | ✅                 |
+| Channel | `off` | `partial` | `block` | `progress` |
+| ---------- | ----- | --------- | ------- | ----------------- |
+| Telegram | ✅ | ✅ | ✅ | แมปเป็น `partial` |
+| Discord | ✅ | ✅ | ✅ | แมปเป็น `partial` |
+| Slack | ✅ | ✅ | ✅ | ✅ |
+| Mattermost | ✅ | ✅ | ✅ | ✅ |
 
 เฉพาะ Slack:
 
-- `channels.slack.streaming.nativeTransport` ใช้สลับการเรียก Slack native streaming API เมื่อ `channels.slack.streaming.mode="partial"` (ค่าเริ่มต้น: `true`)
-- Slack native streaming และสถานะ assistant thread ของ Slack ต้องมีเป้าหมาย reply thread; DM ระดับบนสุดจะไม่แสดงพรีวิวแบบเธรดลักษณะนั้น
+- `channels.slack.streaming.nativeTransport` ใช้สลับการเรียกใช้ API สตรีมแบบเนทีฟของ Slack เมื่อ `channels.slack.streaming.mode="partial"` (ค่าเริ่มต้น: `true`)
+- การสตรีมแบบเนทีฟของ Slack และสถานะเธรด assistant ของ Slack ต้องมีเป้าหมายเป็น reply thread; DM ระดับบนสุดจะไม่แสดงตัวอย่างแบบเธรด
 
-การย้ายจากคีย์แบบเดิม:
+การย้ายคีย์แบบเดิม:
 
-- Telegram: `streamMode` + boolean `streaming` จะย้ายอัตโนมัติไปเป็น enum `streaming`
-- Discord: `streamMode` + boolean `streaming` จะย้ายอัตโนมัติไปเป็น enum `streaming`
-- Slack: `streamMode` จะย้ายอัตโนมัติไปเป็น `streaming.mode`; boolean `streaming` จะย้ายอัตโนมัติไปเป็น `streaming.mode` พร้อม `streaming.nativeTransport`; `nativeStreaming` แบบเดิมจะย้ายอัตโนมัติไปเป็น `streaming.nativeTransport`
+- Telegram: `streamMode` + boolean `streaming` จะถูกย้ายอัตโนมัติเป็น enum `streaming`
+- Discord: `streamMode` + boolean `streaming` จะถูกย้ายอัตโนมัติเป็น enum `streaming`
+- Slack: `streamMode` จะถูกย้ายอัตโนมัติไปยัง `streaming.mode`; boolean `streaming` จะถูกย้ายอัตโนมัติไปยัง `streaming.mode` พร้อม `streaming.nativeTransport`; `nativeStreaming` แบบเดิมจะถูกย้ายอัตโนมัติไปยัง `streaming.nativeTransport`
 
-### พฤติกรรมขณะรัน
+### ลักษณะการทำงานขณะรันไทม์
 
 Telegram:
 
-- ใช้ `sendMessage` + `editMessageText` สำหรับอัปเดตพรีวิวทั้งใน DM และกลุ่ม/หัวข้อ
-- การสตรีมแบบพรีวิวจะถูกข้ามเมื่อมีการเปิดใช้การสตรีมแบบบล็อกของ Telegram อย่างชัดเจน (เพื่อหลีกเลี่ยงการสตรีมซ้ำ)
-- `/reasoning stream` สามารถเขียน reasoning ลงในพรีวิวได้
+- ใช้ `sendMessage` + `editMessageText` สำหรับอัปเดต preview ทั้งใน DMs และกลุ่ม/topics
+- Preview streaming จะถูกข้ามเมื่อเปิดใช้ Telegram block streaming อย่างชัดเจน (เพื่อหลีกเลี่ยง double-streaming)
+- `/reasoning stream` สามารถเขียน reasoning ลงใน preview ได้
 
 Discord:
 
-- ใช้ข้อความพรีวิวแบบส่ง + แก้ไข
-- โหมด `block` ใช้การแบ่งชังก์แบบร่าง (`draftChunk`)
-- การสตรีมแบบพรีวิวจะถูกข้ามเมื่อมีการเปิดใช้การสตรีมแบบบล็อกของ Discord อย่างชัดเจน
-- payload สุดท้ายที่เป็นสื่อ, ข้อผิดพลาด และ explicit-reply จะยกเลิกพรีวิวที่รออยู่โดยไม่ flush ร่างใหม่ แล้วจึงใช้การส่งปกติ
+- ใช้ข้อความ preview แบบส่ง + แก้ไข
+- โหมด `block` ใช้ draft chunking (`draftChunk`)
+- Preview streaming จะถูกข้ามเมื่อเปิดใช้ Discord block streaming อย่างชัดเจน
+- payload สุดท้ายแบบสื่อ, ข้อผิดพลาด และ explicit-reply จะยกเลิก previews ที่ค้างอยู่โดยไม่ flush draft ใหม่ แล้วจึงใช้การส่งแบบปกติ
 
 Slack:
 
-- `partial` สามารถใช้ Slack native streaming (`chat.startStream`/`append`/`stop`) ได้เมื่อมีให้ใช้
-- `block` ใช้พรีวิวแบบร่างที่ต่อท้ายได้
-- `progress` ใช้ข้อความพรีวิวสถานะ แล้วตามด้วยคำตอบสุดท้าย
-- payload สุดท้ายที่เป็นสื่อ/ข้อผิดพลาด และ progress finals จะไม่สร้างข้อความร่างชั่วคราวที่ต้องทิ้ง; มีเพียงข้อความสุดท้ายแบบ text/block ที่สามารถแก้ไขพรีวิวได้เท่านั้นที่จะ flush ข้อความร่างที่รออยู่
+- `partial` สามารถใช้การสตรีมแบบเนทีฟของ Slack (`chat.startStream`/`append`/`stop`) ได้เมื่อพร้อมใช้งาน
+- `block` ใช้ draft previews แบบต่อท้าย
+- `progress` ใช้ข้อความตัวอย่างสถานะ แล้วจึงส่งคำตอบสุดท้าย
+- payload สุดท้ายแบบสื่อ/ข้อผิดพลาด และ progress finals จะไม่สร้าง draft messages ที่ทิ้งไปเปล่า ๆ; เฉพาะ finals แบบข้อความ/บล็อกที่สามารถแก้ไข preview ได้เท่านั้นที่จะ flush ข้อความ draft ที่ค้างอยู่
 
 Mattermost:
 
-- สตรีมความคิด กิจกรรมของ tool และข้อความตอบกลับบางส่วนลงในโพสต์พรีวิวแบบร่างเดียว ซึ่งจะปิดท้ายในตำแหน่งเดิมเมื่อสามารถส่งคำตอบสุดท้ายได้อย่างปลอดภัย
-- หากโพสต์พรีวิวถูกลบหรือไม่สามารถใช้งานได้ในเวลาปิดท้าย จะ fallback ไปส่งโพสต์สุดท้ายใหม่
-- payload สุดท้ายที่เป็นสื่อ/ข้อผิดพลาดจะยกเลิกการอัปเดตพรีวิวที่รออยู่ก่อนการส่งปกติ แทนที่จะ flush โพสต์พรีวิวชั่วคราว
+- สตรีม thinking, กิจกรรมของเครื่องมือ และข้อความตอบกลับบางส่วนลงใน draft preview post เดียว ซึ่งจะ finalize ในตำแหน่งเดิมเมื่อสามารถส่งคำตอบสุดท้ายได้อย่างปลอดภัย
+- จะย้อนกลับไปส่ง final post ใหม่หาก preview post ถูกลบหรือไม่พร้อมใช้งานตอน finalize
+- payload สุดท้ายแบบสื่อ/ข้อผิดพลาดจะยกเลิกการอัปเดต preview ที่ค้างอยู่ก่อนส่งแบบปกติ แทนที่จะ flush preview post ชั่วคราว
 
 Matrix:
 
-- พรีวิวแบบร่างจะปิดท้ายในตำแหน่งเดิมเมื่อข้อความสุดท้ายสามารถใช้ event พรีวิวเดิมซ้ำได้
-- final ที่เป็นสื่ออย่างเดียว, ข้อผิดพลาด และ reply-target-mismatch จะยกเลิกการอัปเดตพรีวิวที่รออยู่ก่อนการส่งปกติ; พรีวิวเก่าที่แสดงอยู่แล้วจะถูก redacted
+- Draft previews จะ finalize ในตำแหน่งเดิมเมื่อข้อความสุดท้ายสามารถใช้ event ของ preview ซ้ำได้
+- finals แบบสื่ออย่างเดียว, ข้อผิดพลาด และ reply-target-mismatch จะยกเลิกการอัปเดต preview ที่ค้างอยู่ก่อนการส่งแบบปกติ; preview เก่าที่มองเห็นอยู่แล้วจะถูก redacted
 
-### การอัปเดตพรีวิวความคืบหน้าของ tool
+### การอัปเดตตัวอย่างแบบ Tool-progress
 
-การสตรีมแบบพรีวิวยังสามารถรวมการอัปเดต **tool-progress** ได้ด้วย — เป็นบรรทัดสถานะสั้น ๆ เช่น "กำลังค้นหาเว็บ", "กำลังอ่านไฟล์" หรือ "กำลังเรียก tool" ซึ่งจะปรากฏในข้อความพรีวิวเดียวกันขณะ tool กำลังทำงาน ก่อนคำตอบสุดท้ายจะมาถึง สิ่งนี้ช่วยให้ turn ที่มีหลายขั้นตอนของ tool ดูมีความเคลื่อนไหวแทนที่จะเงียบระหว่างพรีวิวความคิดแรกกับคำตอบสุดท้าย
+Preview streaming ยังสามารถรวมการอัปเดต **tool-progress** ได้ด้วย — เป็นบรรทัดสถานะสั้น ๆ เช่น "searching the web", "reading file" หรือ "calling tool" ซึ่งจะแสดงในข้อความ preview เดียวกันขณะเครื่องมือกำลังทำงาน ก่อนถึงคำตอบสุดท้าย สิ่งนี้ช่วยให้เทิร์นเครื่องมือหลายขั้นตอนดูมีชีวิต แทนที่จะเงียบระหว่างตัวอย่างการคิดครั้งแรกกับคำตอบสุดท้าย
 
 พื้นผิวที่รองรับ:
 
-- **Discord**, **Slack** และ **Telegram** สตรีม tool-progress ลงในการแก้ไขพรีวิวสด
-- **Mattermost** รวมกิจกรรมของ tool เข้ากับโพสต์พรีวิวแบบร่างเดียวอยู่แล้ว (ดูด้านบน)
-- การแก้ไข tool-progress จะเป็นไปตามโหมดการสตรีมแบบพรีวิวที่กำลังใช้งาน; จะถูกข้ามเมื่อการสตรีมแบบพรีวิวเป็น `off` หรือเมื่อการสตรีมแบบบล็อกเข้ามารับช่วงข้อความนั้นแล้ว
+- **Discord**, **Slack** และ **Telegram** จะสตรีม tool-progress ลงในการแก้ไข live preview
+- **Mattermost** รวมกิจกรรมของเครื่องมือไว้ใน draft preview post เดียวอยู่แล้ว (ดูด้านบน)
+- การแก้ไข tool-progress จะเป็นไปตามโหมด preview streaming ที่ใช้งานอยู่; ระบบจะข้ามเมื่อ preview streaming เป็น `off` หรือเมื่อ block streaming เข้ามาควบคุมข้อความแล้ว
 
 ## ที่เกี่ยวข้อง
 
-- [Messages](/th/concepts/messages) — วงจรชีวิตและการส่งของข้อความ
-- [Retry](/th/concepts/retry) — พฤติกรรมการลองใหม่เมื่อการส่งล้มเหลว
-- [แชนเนล](/th/channels) — การรองรับการสตรีมรายแชนเนล
+- [Messages](/th/concepts/messages) — วงจรชีวิตของข้อความและการส่ง
+- [Retry](/th/concepts/retry) — ลักษณะการ retry เมื่อการส่งล้มเหลว
+- [Channels](/th/channels) — การรองรับการสตรีมรายช่องทาง

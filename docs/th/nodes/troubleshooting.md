@@ -1,21 +1,19 @@
 ---
 read_when:
-    - Node เชื่อมต่ออยู่ แต่เครื่องมือ camera/canvas/screen/exec ล้มเหลว
-    - คุณต้องการโมเดลความเข้าใจเรื่อง node pairing เทียบกับ approvals
-summary: แก้ไขปัญหาการจับคู่ Node ข้อกำหนดเรื่อง foreground สิทธิ์ และความล้มเหลวของเครื่องมือ
-title: การแก้ไขปัญหา Node
+    - Node เชื่อมต่อแล้ว แต่เครื่องมือ camera/canvas/screen/exec ล้มเหลว
+    - คุณต้องการโมเดลความเข้าใจเรื่องการจับคู่ Node เทียบกับ approvals
+summary: การแก้ปัญหาการจับคู่ Node, ข้อกำหนดการทำงานเบื้องหน้า, สิทธิ์ และความล้มเหลวของเครื่องมือ
+title: การแก้ปัญหา Node
 x-i18n:
-    generated_at: "2026-04-23T05:43:24Z"
+    generated_at: "2026-04-24T09:20:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c2e431e6a35c482a655e01460bef9fab5d5a5ae7dc46f8f992ee51100f5c937e
+    source_hash: 59c7367d02945e972094b47832164d95573a2aab1122e8ccf6feb80bcfcd95be
     source_path: nodes/troubleshooting.md
     workflow: 15
 ---
 
-# การแก้ไขปัญหา Node
-
-ใช้หน้านี้เมื่อมองเห็น node ใน status แต่เครื่องมือของ node ล้มเหลว
+ใช้หน้านี้เมื่อมองเห็น Node ในสถานะแล้ว แต่เครื่องมือของ Node ล้มเหลว
 
 ## ลำดับคำสั่ง
 
@@ -27,7 +25,7 @@ openclaw doctor
 openclaw channels status --probe
 ```
 
-จากนั้นรันการตรวจสอบเฉพาะสำหรับ node:
+จากนั้นรันการตรวจสอบเฉพาะของ Node:
 
 ```bash
 openclaw nodes status
@@ -35,17 +33,17 @@ openclaw nodes describe --node <idOrNameOrIp>
 openclaw approvals get --node <idOrNameOrIp>
 ```
 
-สัญญาณที่ถือว่าปกติ:
+สัญญาณที่ดี:
 
-- Node เชื่อมต่อและจับคู่แล้วสำหรับ role `node`
+- Node เชื่อมต่ออยู่และจับคู่แล้วสำหรับ role `node`
 - `nodes describe` มี capability ที่คุณกำลังเรียกใช้
-- Exec approvals แสดง mode/allowlist ตามที่คาดไว้
+- Exec approval แสดงโหมด/allowlist ตามที่คาดไว้
 
-## ข้อกำหนดเรื่อง foreground
+## ข้อกำหนดการทำงานเบื้องหน้า
 
-`canvas.*`, `camera.*` และ `screen.*` ใช้ได้เฉพาะ foreground บน node ของ iOS/Android
+`canvas.*`, `camera.*` และ `screen.*` ใช้งานได้เฉพาะเมื่ออยู่เบื้องหน้าบน Node ของ iOS/Android
 
-ตรวจสอบและแก้ไขแบบเร็ว:
+ตรวจแบบเร็วและแก้ไข:
 
 ```bash
 openclaw nodes describe --node <idOrNameOrIp>
@@ -53,26 +51,26 @@ openclaw nodes canvas snapshot --node <idOrNameOrIp>
 openclaw logs --follow
 ```
 
-หากคุณเห็น `NODE_BACKGROUND_UNAVAILABLE` ให้นำแอป node ขึ้นมาด้านหน้าแล้วลองใหม่
+หากคุณเห็น `NODE_BACKGROUND_UNAVAILABLE` ให้นำแอป Node ขึ้นมาไว้เบื้องหน้าแล้วลองใหม่
 
 ## เมทริกซ์สิทธิ์
 
-| Capability                   | iOS                                     | Android                                      | แอป node บน macOS                | รหัสข้อผิดพลาดที่พบบ่อย           |
+| Capability                   | iOS                                     | Android                                      | แอป Node บน macOS             | โค้ดข้อผิดพลาดที่พบบ่อย        |
 | ---------------------------- | --------------------------------------- | -------------------------------------------- | ----------------------------- | ------------------------------ |
-| `camera.snap`, `camera.clip` | กล้อง (+ ไมค์สำหรับเสียงในคลิป)           | กล้อง (+ ไมค์สำหรับเสียงในคลิป)                | กล้อง (+ ไมค์สำหรับเสียงในคลิป) | `*_PERMISSION_REQUIRED`        |
-| `screen.record`              | Screen Recording (+ ไมค์แบบไม่บังคับ)       | prompt สำหรับการจับหน้าจอ (+ ไมค์แบบไม่บังคับ)       | Screen Recording              | `*_PERMISSION_REQUIRED`        |
-| `location.get`               | While Using หรือ Always (ขึ้นอยู่กับโหมด) | ตำแหน่งแบบ Foreground/Background ตามโหมด | สิทธิ์ตำแหน่ง           | `LOCATION_PERMISSION_REQUIRED` |
-| `system.run`                 | n/a (เส้นทางโฮสต์ของ node)                    | n/a (เส้นทางโฮสต์ของ node)                         | ต้องใช้ exec approvals       | `SYSTEM_RUN_DENIED`            |
+| `camera.snap`, `camera.clip` | กล้อง (+ ไมค์สำหรับเสียงใน clip)        | กล้อง (+ ไมค์สำหรับเสียงใน clip)             | กล้อง (+ ไมค์สำหรับเสียงใน clip) | `*_PERMISSION_REQUIRED`        |
+| `screen.record`              | การบันทึกหน้าจอ (+ ไมค์แบบไม่บังคับ)    | พรอมป์จับภาพหน้าจอ (+ ไมค์แบบไม่บังคับ)     | การบันทึกหน้าจอ                | `*_PERMISSION_REQUIRED`        |
+| `location.get`               | ขณะใช้งานหรือตลอดเวลา (ขึ้นกับโหมด)     | ตำแหน่งแบบ Foreground/Background ตามโหมด     | สิทธิ์ตำแหน่ง                  | `LOCATION_PERMISSION_REQUIRED` |
+| `system.run`                 | n/a (เส้นทาง node host)                 | n/a (เส้นทาง node host)                      | ต้องใช้ exec approval         | `SYSTEM_RUN_DENIED`            |
 
-## Pairing เทียบกับ approvals
+## การจับคู่เทียบกับ approvals
 
-สิ่งเหล่านี้เป็นด่านคนละชั้นกัน:
+สิ่งเหล่านี้เป็นเกตคนละชั้นกัน:
 
-1. **Device pairing**: node นี้สามารถเชื่อมต่อกับ gateway ได้หรือไม่?
-2. **นโยบายคำสั่ง node ของ Gateway**: RPC command ID นี้ได้รับอนุญาตโดย `gateway.nodes.allowCommands` / `denyCommands` และค่าเริ่มต้นของแพลตฟอร์มหรือไม่?
-3. **Exec approvals**: node นี้สามารถรัน shell command ใดคำสั่งหนึ่งในเครื่องได้หรือไม่?
+1. **การจับคู่อุปกรณ์**: Node นี้เชื่อมต่อกับ gateway ได้หรือไม่?
+2. **นโยบายคำสั่ง Node ของ Gateway**: อนุญาต command ID ของ RPC หรือไม่ตาม `gateway.nodes.allowCommands` / `denyCommands` และค่าเริ่มต้นของแพลตฟอร์ม?
+3. **Exec approvals**: Node นี้สามารถรันคำสั่ง shell เฉพาะรายการหนึ่งในเครื่องได้หรือไม่?
 
-การตรวจสอบแบบเร็ว:
+ตรวจแบบเร็ว:
 
 ```bash
 openclaw devices list
@@ -81,31 +79,31 @@ openclaw approvals get --node <idOrNameOrIp>
 openclaw approvals allowlist add --node <idOrNameOrIp> "/usr/bin/uname"
 ```
 
-หากไม่มี pairing ให้อนุมัติอุปกรณ์ของ node ก่อน
-หาก `nodes describe` ไม่มีคำสั่งที่ควรมี ให้ตรวจสอบนโยบายคำสั่ง node ของ gateway และตรวจสอบว่า node ได้ประกาศคำสั่งนั้นตอนเชื่อมต่อจริงหรือไม่
-หาก pairing ปกติแต่ `system.run` ล้มเหลว ให้แก้ exec approvals/allowlist บน node นั้น
+หากยังไม่ได้จับคู่ ให้อนุมัติอุปกรณ์ Node ก่อน
+หาก `nodes describe` ไม่มีคำสั่งนั้น ให้ตรวจนโยบายคำสั่ง Node ของ gateway และตรวจว่า Node ประกาศคำสั่งนั้นตอนเชื่อมต่อจริงหรือไม่
+หากการจับคู่ปกติแต่ `system.run` ล้มเหลว ให้แก้ exec approval/allowlist บน Node นั้น
 
-Node pairing เป็นด่านด้านตัวตน/ความเชื่อถือ ไม่ใช่พื้นผิวสำหรับอนุมัติรายคำสั่ง สำหรับ `system.run`, นโยบายแบบราย node อยู่ในไฟล์ exec approvals ของ node นั้น (`openclaw approvals get --node ...`) ไม่ได้อยู่ใน pairing record ของ gateway
+การจับคู่ Node เป็นเกตด้านตัวตน/ความเชื่อถือ ไม่ใช่พื้นผิวการอนุมัติรายคำสั่ง สำหรับ `system.run` นโยบายราย Node จะอยู่ในไฟล์ exec approval ของ Node นั้น (`openclaw approvals get --node ...`) ไม่ได้อยู่ในระเบียนการจับคู่ของ gateway
 
-สำหรับการรัน `host=node` ที่อิง approval, gateway จะผูกการรันเข้ากับ
-`systemRunPlan` แบบ canonical ที่เตรียมไว้ด้วย หากผู้เรียกภายหลังแก้ไข
-command/cwd หรือ metadata ของ session ก่อนที่การรันที่อนุมัติแล้วจะถูกส่งต่อ gateway จะปฏิเสธ
-การรันนั้นว่าเป็น approval mismatch แทนที่จะเชื่อถือ payload ที่ถูกแก้ไข
+สำหรับการรัน `host=node` ที่อาศัย approval, gateway ยังผูกการรันเข้ากับ
+`systemRunPlan` แบบ canonical ที่เตรียมไว้ด้วย หากผู้เรียกในภายหลังแก้ command/cwd หรือ
+metadata ของเซสชันก่อนส่งต่อการรันที่ได้รับอนุมัติ gateway จะปฏิเสธ
+การรันนั้นในฐานะ approval mismatch แทนที่จะเชื่อใจ payload ที่ถูกแก้ไขแล้ว
 
-## รหัสข้อผิดพลาดของ node ที่พบบ่อย
+## โค้ดข้อผิดพลาดของ Node ที่พบบ่อย
 
-- `NODE_BACKGROUND_UNAVAILABLE` → แอปอยู่เบื้องหลัง; นำขึ้นมาด้านหน้า
-- `CAMERA_DISABLED` → ปิดสวิตช์กล้องใน settings ของ node
-- `*_PERMISSION_REQUIRED` → ไม่มีสิทธิ์ของระบบปฏิบัติการหรือถูกปฏิเสธ
+- `NODE_BACKGROUND_UNAVAILABLE` → แอปอยู่เบื้องหลัง; ให้นำขึ้นมาไว้เบื้องหน้า
+- `CAMERA_DISABLED` → ปิด toggle ของกล้องใน settings ของ Node
+- `*_PERMISSION_REQUIRED` → ไม่มี/ถูกปฏิเสธสิทธิ์ของ OS
 - `LOCATION_DISABLED` → ปิดโหมดตำแหน่งอยู่
-- `LOCATION_PERMISSION_REQUIRED` → โหมดตำแหน่งที่ร้องขอไม่ได้รับอนุญาต
-- `LOCATION_BACKGROUND_UNAVAILABLE` → แอปอยู่เบื้องหลัง แต่มีเพียงสิทธิ์ While Using
-- `SYSTEM_RUN_DENIED: approval required` → คำขอ exec ต้องได้รับการอนุมัติแบบ explicit
+- `LOCATION_PERMISSION_REQUIRED` → ยังไม่ได้สิทธิ์สำหรับโหมดตำแหน่งที่ร้องขอ
+- `LOCATION_BACKGROUND_UNAVAILABLE` → แอปอยู่เบื้องหลัง แต่มีเพียงสิทธิ์แบบ While Using
+- `SYSTEM_RUN_DENIED: approval required` → คำขอ exec ต้องได้รับการอนุมัติอย่างชัดเจน
 - `SYSTEM_RUN_DENIED: allowlist miss` → คำสั่งถูกบล็อกโดยโหมด allowlist
-  บนโฮสต์ node ของ Windows รูปแบบ shell-wrapper เช่น `cmd.exe /c ...` จะถูกนับเป็น allowlist miss ใน
-  โหมด allowlist เว้นแต่จะได้รับอนุมัติผ่าน flow การถาม
+  บน Windows node host รูปแบบ shell-wrapper เช่น `cmd.exe /c ...` จะถูกมองเป็น allowlist miss ใน
+  โหมด allowlist เว้นแต่จะได้รับการอนุมัติผ่าน ask flow
 
-## วงจรกู้คืนแบบเร็ว
+## ลูปกู้คืนแบบเร็ว
 
 ```bash
 openclaw nodes status
@@ -114,12 +112,12 @@ openclaw approvals get --node <idOrNameOrIp>
 openclaw logs --follow
 ```
 
-หากยังติดปัญหาอยู่:
+หากยังติดอยู่:
 
-- อนุมัติ device pairing ใหม่
-- เปิดแอป node ใหม่ (ให้อยู่ foreground)
-- ให้สิทธิ์ของระบบปฏิบัติการใหม่
-- สร้างใหม่/ปรับนโยบาย exec approval
+- อนุมัติการจับคู่อุปกรณ์ใหม่อีกครั้ง
+- เปิดแอป Node ใหม่ (ให้อยู่เบื้องหน้า)
+- ให้สิทธิ์ของ OS ใหม่
+- สร้าง/ปรับนโยบาย exec approval ใหม่
 
 ที่เกี่ยวข้อง:
 
@@ -128,3 +126,9 @@ openclaw logs --follow
 - [/nodes/location-command](/th/nodes/location-command)
 - [/tools/exec-approvals](/th/tools/exec-approvals)
 - [/gateway/pairing](/th/gateway/pairing)
+
+## ที่เกี่ยวข้อง
+
+- [ภาพรวมของ Node](/th/nodes)
+- [การแก้ปัญหา Gateway](/th/gateway/troubleshooting)
+- [การแก้ปัญหาช่องทาง](/th/channels/troubleshooting)

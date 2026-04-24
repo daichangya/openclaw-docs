@@ -2,25 +2,23 @@
 read_when:
     - การตั้งค่า OpenClaw บน Oracle Cloud
     - กำลังมองหาโฮสติ้ง VPS ฟรีสำหรับ OpenClaw
-    - ต้องการ OpenClaw แบบ 24/7 บนเซิร์ฟเวอร์ขนาดเล็ก
-summary: โฮสต์ OpenClaw บน ARM tier แบบ Always Free ของ Oracle Cloud
+    - ต้องการให้ OpenClaw ทำงานตลอด 24/7 บนเซิร์ฟเวอร์ขนาดเล็ก
+summary: โฮสต์ OpenClaw บน Oracle Cloud Always Free ARM tier
 title: Oracle Cloud
 x-i18n:
-    generated_at: "2026-04-23T05:42:01Z"
+    generated_at: "2026-04-24T09:18:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6915f8c428cfcbc215ba6547273df6e7b93212af6590827a3853f15617ba245e
+    source_hash: dce0d2a33556c8e48a48df744f8d1341fcfa78c93ff5a5e02a5013d207f3e6ed
     source_path: install/oracle.md
     workflow: 15
 ---
 
-# Oracle Cloud
-
-รัน OpenClaw Gateway แบบถาวรบน ARM tier แบบ **Always Free** ของ Oracle Cloud (สูงสุด 4 OCPU, RAM 24 GB, ที่เก็บข้อมูล 200 GB) โดยไม่มีค่าใช้จ่าย
+รัน OpenClaw Gateway แบบคงอยู่ถาวรบน **Always Free** ARM tier ของ Oracle Cloud (สูงสุด 4 OCPU, RAM 24 GB, พื้นที่จัดเก็บ 200 GB) ได้โดยไม่มีค่าใช้จ่าย
 
 ## ข้อกำหนดเบื้องต้น
 
-- บัญชี Oracle Cloud ([สมัคร](https://www.oracle.com/cloud/free/)) -- ดู [คู่มือสมัครจากชุมชน](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd) หากคุณพบปัญหา
+- บัญชี Oracle Cloud ([สมัคร](https://www.oracle.com/cloud/free/)) -- ดู [คู่มือสมัครโดยชุมชน](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd) หากคุณพบปัญหา
 - บัญชี Tailscale (ฟรีที่ [tailscale.com](https://tailscale.com))
 - คู่คีย์ SSH
 - เวลาประมาณ 30 นาที
@@ -28,8 +26,8 @@ x-i18n:
 ## การตั้งค่า
 
 <Steps>
-  <Step title="สร้าง OCI instance">
-    1. ล็อกอินเข้า [Oracle Cloud Console](https://cloud.oracle.com/)
+  <Step title="สร้างอินสแตนซ์ OCI">
+    1. ลงชื่อเข้าใช้ [Oracle Cloud Console](https://cloud.oracle.com/)
     2. ไปที่ **Compute > Instances > Create Instance**
     3. กำหนดค่า:
        - **Name:** `openclaw`
@@ -37,12 +35,12 @@ x-i18n:
        - **Shape:** `VM.Standard.A1.Flex` (Ampere ARM)
        - **OCPUs:** 2 (หรือสูงสุด 4)
        - **Memory:** 12 GB (หรือสูงสุด 24 GB)
-       - **Boot volume:** 50 GB (ฟรีได้สูงสุด 200 GB)
+       - **Boot volume:** 50 GB (ฟรีสูงสุด 200 GB)
        - **SSH key:** เพิ่ม public key ของคุณ
     4. คลิก **Create** และจด public IP address ไว้
 
     <Tip>
-    หากการสร้าง instance ล้มเหลวพร้อมข้อความ "Out of capacity" ให้ลอง availability domain อื่น หรือลองใหม่ภายหลัง ความจุของ free tier มีจำกัด
+    หากการสร้างอินสแตนซ์ล้มเหลวด้วย "Out of capacity" ให้ลอง availability domain อื่นหรือลองใหม่ภายหลัง ความจุของ free tier มีจำกัด
     </Tip>
 
   </Step>
@@ -55,7 +53,7 @@ x-i18n:
     sudo apt install -y build-essential
     ```
 
-    ต้องใช้ `build-essential` สำหรับการคอมไพล์ dependency บางตัวบน ARM
+    `build-essential` จำเป็นสำหรับการคอมไพล์ dependency บางตัวบน ARM
 
   </Step>
 
@@ -66,7 +64,7 @@ x-i18n:
     sudo loginctl enable-linger ubuntu
     ```
 
-    การเปิดใช้ linger จะทำให้บริการของผู้ใช้ยังทำงานต่อหลังจาก logout
+    การเปิดใช้ linger จะทำให้บริการของผู้ใช้ยังคงทำงานต่อหลัง logout
 
   </Step>
 
@@ -76,7 +74,7 @@ x-i18n:
     sudo tailscale up --ssh --hostname=openclaw
     ```
 
-    จากนี้ไป ให้เชื่อมต่อผ่าน Tailscale: `ssh ubuntu@openclaw`
+    จากนี้ไปให้เชื่อมต่อผ่าน Tailscale: `ssh ubuntu@openclaw`
 
   </Step>
 
@@ -86,7 +84,7 @@ x-i18n:
     source ~/.bashrc
     ```
 
-    เมื่อมีพรอมป์ถามว่า "How do you want to hatch your bot?" ให้เลือก **Do this later**
+    เมื่อระบบถามว่า "How do you want to hatch your bot?" ให้เลือก **Do this later**
 
   </Step>
 
@@ -103,19 +101,19 @@ x-i18n:
     systemctl --user restart openclaw-gateway.service
     ```
 
-    `gateway.trustedProxies=["127.0.0.1"]` ตรงนี้มีไว้เฉพาะสำหรับการจัดการ forwarded-IP/local-client ของ local Tailscale Serve proxy เท่านั้น มัน **ไม่ใช่** `gateway.auth.mode: "trusted-proxy"` เส้นทางของ diff viewer จะยังคงมีพฤติกรรม fail-closed ในการตั้งค่านี้: คำขอ viewer แบบดิบจาก `127.0.0.1` ที่ไม่มี forwarded proxy headers อาจตอบกลับ `Diff not found` ใช้ `mode=file` / `mode=both` สำหรับไฟล์แนบ หรือเปิดใช้ remote viewer โดยตั้งใจและกำหนด `plugins.entries.diffs.config.viewerBaseUrl` (หรือส่ง `baseUrl` ของ proxy) หากคุณต้องการลิงก์ viewer ที่แชร์ได้
+    `gateway.trustedProxies=["127.0.0.1"]` ในที่นี้มีไว้เฉพาะสำหรับการจัดการ forwarded-IP/local-client ของ local Tailscale Serve proxy เท่านั้น มัน **ไม่ใช่** `gateway.auth.mode: "trusted-proxy"` เส้นทาง diff viewer ยังคงมีพฤติกรรม fail-closed ในการตั้งค่านี้: คำขอ viewer แบบดิบจาก `127.0.0.1` ที่ไม่มี forwarded proxy headers อาจส่งกลับ `Diff not found` ใช้ `mode=file` / `mode=both` สำหรับไฟล์แนบ หรือเปิดใช้ remote viewers โดยเจตนาและตั้ง `plugins.entries.diffs.config.viewerBaseUrl` (หรือส่ง `baseUrl` ของ proxy) หากคุณต้องการลิงก์ viewer ที่แชร์ได้
 
   </Step>
 
   <Step title="ล็อก down ความปลอดภัยของ VCN">
-    บล็อกทราฟฟิกทั้งหมด ยกเว้น Tailscale ที่ network edge:
+    บล็อกทราฟฟิกทั้งหมด ยกเว้น Tailscale ที่ขอบเครือข่าย:
 
     1. ไปที่ **Networking > Virtual Cloud Networks** ใน OCI Console
-    2. คลิก VCN ของคุณ จากนั้นไปที่ **Security Lists > Default Security List**
+    2. คลิก VCN ของคุณ จากนั้น **Security Lists > Default Security List**
     3. **ลบ** ingress rules ทั้งหมด ยกเว้น `0.0.0.0/0 UDP 41641` (Tailscale)
     4. คง egress rules เริ่มต้นไว้ (อนุญาต outbound ทั้งหมด)
 
-    วิธีนี้จะบล็อก SSH บนพอร์ต 22, HTTP, HTTPS และทุกอย่างอื่นที่ network edge จากจุดนี้ไป คุณจะเชื่อมต่อได้เฉพาะผ่าน Tailscale เท่านั้น
+    สิ่งนี้จะบล็อก SSH ที่พอร์ต 22, HTTP, HTTPS และทุกอย่างอื่นที่ขอบเครือข่าย จากจุดนี้คุณจะเชื่อมต่อได้ผ่าน Tailscale เท่านั้น
 
   </Step>
 
@@ -150,16 +148,22 @@ ssh -L 18789:127.0.0.1:18789 ubuntu@openclaw
 
 ## การแก้ไขปัญหา
 
-**การสร้าง instance ล้มเหลว ("Out of capacity")** -- instance ARM แบบ free tier ได้รับความนิยมมาก ให้ลอง availability domain อื่น หรือพยายามใหม่ในช่วงนอกเวลาใช้งานหนาแน่น
+**การสร้างอินสแตนซ์ล้มเหลว ("Out of capacity")** -- อินสแตนซ์ ARM แบบ free tier ได้รับความนิยมมาก ให้ลอง availability domain อื่นหรือลองใหม่ในช่วงเวลาที่มีการใช้งานน้อย
 
-**Tailscale เชื่อมต่อไม่ได้** -- รัน `sudo tailscale up --ssh --hostname=openclaw --reset` เพื่อตรวจสอบสิทธิ์ใหม่
+**Tailscale เชื่อมต่อไม่ได้** -- รัน `sudo tailscale up --ssh --hostname=openclaw --reset` เพื่อยืนยันตัวตนใหม่
 
-**Gateway ไม่ยอมเริ่มทำงาน** -- รัน `openclaw doctor --non-interactive` และตรวจสอบล็อกด้วย `journalctl --user -u openclaw-gateway.service -n 50`
+**Gateway ไม่ยอมเริ่มทำงาน** -- รัน `openclaw doctor --non-interactive` และตรวจสอบ log ด้วย `journalctl --user -u openclaw-gateway.service -n 50`
 
-**ปัญหาไบนารีบน ARM** -- แพ็กเกจ npm ส่วนใหญ่ทำงานบน ARM64 ได้ สำหรับไบนารีเนทีฟ ให้มองหารุ่น `linux-arm64` หรือ `aarch64` ตรวจสอบสถาปัตยกรรมด้วย `uname -m`
+**ปัญหาไบนารีบน ARM** -- แพ็กเกจ npm ส่วนใหญ่ทำงานบน ARM64 ได้ สำหรับไบนารีแบบเนทีฟ ให้มองหารีลีส `linux-arm64` หรือ `aarch64` ตรวจสอบสถาปัตยกรรมด้วย `uname -m`
 
 ## ขั้นตอนถัดไป
 
 - [Channels](/th/channels) -- เชื่อมต่อ Telegram, WhatsApp, Discord และอื่น ๆ
 - [การกำหนดค่า Gateway](/th/gateway/configuration) -- ตัวเลือก config ทั้งหมด
-- [Updating](/th/install/updating) -- ทำให้ OpenClaw ทันสมัยอยู่เสมอ
+- [การอัปเดต](/th/install/updating) -- ทำให้ OpenClaw ทันสมัยอยู่เสมอ
+
+## ที่เกี่ยวข้อง
+
+- [ภาพรวมการติดตั้ง](/th/install)
+- [GCP](/th/install/gcp)
+- [VPS hosting](/th/vps)

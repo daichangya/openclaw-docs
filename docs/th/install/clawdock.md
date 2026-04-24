@@ -1,84 +1,82 @@
 ---
 read_when:
     - คุณรัน OpenClaw ด้วย Docker บ่อย ๆ และต้องการคำสั่งประจำวันให้สั้นลง
-    - คุณต้องการชั้นตัวช่วยสำหรับแดชบอร์ด ล็อก การตั้งค่า token และโฟลว์การจับคู่
-summary: ตัวช่วย shell ของ ClawDock สำหรับการติดตั้ง OpenClaw แบบ Docker
+    - คุณต้องการชั้นตัวช่วยสำหรับแดชบอร์ด บันทึก การตั้งค่าโทเค็น และโฟลว์ pairing
+summary: ตัวช่วยเชลล์ ClawDock สำหรับการติดตั้ง OpenClaw แบบ Docker
 title: ClawDock
 x-i18n:
-    generated_at: "2026-04-23T05:38:45Z"
+    generated_at: "2026-04-24T09:16:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 93d67d1d979450d8c9c11854d2f40977c958f1c300e75a5c42ce4c31de86735a
+    source_hash: 308ac338cb8a94d7996489ef9d751a9359b22ddd3c44d64774c6a2275b29aa22
     source_path: install/clawdock.md
     workflow: 15
 ---
 
-# ClawDock
-
-ClawDock คือชั้นตัวช่วย shell ขนาดเล็กสำหรับการติดตั้ง OpenClaw แบบ Docker
+ClawDock คือชั้นตัวช่วยเชลล์ขนาดเล็กสำหรับการติดตั้ง OpenClaw แบบ Docker
 
 มันให้คำสั่งสั้น ๆ เช่น `clawdock-start`, `clawdock-dashboard` และ `clawdock-fix-token` แทนการใช้คำสั่ง `docker compose ...` ที่ยาวกว่า
 
-หากคุณยังไม่ได้ตั้งค่า Docker ให้เริ่มจาก [Docker](/th/install/docker)
+หากคุณยังไม่ได้ตั้งค่า Docker ให้เริ่มที่ [Docker](/th/install/docker)
 
-## ติดตั้ง
+## การติดตั้ง
 
-ใช้พาธตัวช่วยที่เป็นมาตรฐาน:
+ใช้พาธตัวช่วยมาตรฐาน:
 
 ```bash
 mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/openclaw/openclaw/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
 echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
-หากคุณเคยติดตั้ง ClawDock มาก่อนจาก `scripts/shell-helpers/clawdock-helpers.sh` ให้ติดตั้งใหม่จากพาธใหม่ `scripts/clawdock/clawdock-helpers.sh` พาธ raw GitHub แบบเก่าถูกนำออกแล้ว
+หากก่อนหน้านี้คุณติดตั้ง ClawDock จาก `scripts/shell-helpers/clawdock-helpers.sh` ให้ติดตั้งใหม่จากพาธใหม่ `scripts/clawdock/clawdock-helpers.sh` พาธ raw GitHub แบบเก่าถูกลบออกแล้ว
 
 ## สิ่งที่คุณจะได้รับ
 
-### การทำงานพื้นฐาน
+### การดำเนินการพื้นฐาน
 
-| คำสั่ง            | คำอธิบาย               |
-| ----------------- | ---------------------- |
-| `clawdock-start`   | เริ่ม gateway          |
-| `clawdock-stop`    | หยุด gateway           |
-| `clawdock-restart` | รีสตาร์ต gateway       |
-| `clawdock-status`  | ตรวจสอบสถานะ container |
-| `clawdock-logs`    | ติดตามล็อกของ gateway  |
+| คำสั่ง | คำอธิบาย |
+| ------------------ | ---------------------- |
+| `clawdock-start`   | เริ่ม Gateway |
+| `clawdock-stop`    | หยุด Gateway |
+| `clawdock-restart` | รีสตาร์ต Gateway |
+| `clawdock-status`  | ตรวจสอบสถานะคอนเทนเนอร์ |
+| `clawdock-logs`    | ติดตามบันทึกของ Gateway |
 
-### การเข้าถึง container
+### การเข้าถึงคอนเทนเนอร์
 
-| คำสั่ง                   | คำอธิบาย                                   |
-| ------------------------ | ------------------------------------------ |
-| `clawdock-shell`          | เปิด shell ภายใน gateway container         |
-| `clawdock-cli <command>`  | รันคำสั่ง OpenClaw CLI ใน Docker           |
-| `clawdock-exec <command>` | สั่งรันคำสั่งใด ๆ ภายใน container          |
+| คำสั่ง | คำอธิบาย |
+| ------------------------- | --------------------------------------------- |
+| `clawdock-shell`          | เปิดเชลล์ภายในคอนเทนเนอร์ Gateway |
+| `clawdock-cli <command>`  | รันคำสั่ง OpenClaw CLI ใน Docker |
+| `clawdock-exec <command>` | รันคำสั่งใด ๆ ภายในคอนเทนเนอร์ |
 
-### Web UI และการจับคู่
+### เว็บ UI และการจับคู่
 
-| คำสั่ง                 | คำอธิบาย                    |
-| ---------------------- | --------------------------- |
-| `clawdock-dashboard`    | เปิด URL ของ Control UI     |
-| `clawdock-devices`      | แสดงรายการการจับคู่อุปกรณ์ที่รออยู่ |
-| `clawdock-approve <id>` | อนุมัติคำขอจับคู่            |
+| คำสั่ง | คำอธิบาย |
+| ----------------------- | ---------------------------- |
+| `clawdock-dashboard`    | เปิด URL ของ Control UI |
+| `clawdock-devices`      | แสดงรายการการจับคู่อุปกรณ์ที่กำลังรอ |
+| `clawdock-approve <id>` | อนุมัติคำขอการจับคู่ |
 
 ### การตั้งค่าและการบำรุงรักษา
 
-| คำสั่ง              | คำอธิบาย                                          |
-| ------------------- | ------------------------------------------------- |
-| `clawdock-fix-token` | กำหนดค่า gateway token ภายใน container           |
-| `clawdock-update`    | ดึง อัปเดต build ใหม่ และรีสตาร์ต                |
-| `clawdock-rebuild`   | build Docker image ใหม่เท่านั้น                   |
-| `clawdock-clean`     | ลบ containers และ volumes                         |
+| คำสั่ง | คำอธิบาย |
+| -------------------- | ------------------------------------------------ |
+| `clawdock-fix-token` | กำหนดค่า Gateway token ภายในคอนเทนเนอร์ |
+| `clawdock-update`    | pull, rebuild และ restart |
+| `clawdock-rebuild`   | rebuild เฉพาะ Docker image |
+| `clawdock-clean`     | ลบคอนเทนเนอร์และโวลุ่ม |
 
 ### เครื่องมืออรรถประโยชน์
 
-| คำสั่ง                | คำอธิบาย                               |
-| --------------------- | -------------------------------------- |
-| `clawdock-health`      | รันการตรวจสุขภาพของ gateway           |
-| `clawdock-token`       | พิมพ์ gateway token                    |
+| คำสั่ง | คำอธิบาย |
+| ---------------------- | --------------------------------------- |
+| `clawdock-health`      | รันการตรวจสอบสุขภาพของ Gateway |
+| `clawdock-token`       | แสดง Gateway token |
 | `clawdock-cd`          | กระโดดไปยังไดเรกทอรีโปรเจกต์ OpenClaw |
-| `clawdock-config`      | เปิด `~/.openclaw`                     |
-| `clawdock-show-config` | พิมพ์ไฟล์ config พร้อมค่าที่ถูกปกปิด  |
-| `clawdock-workspace`   | เปิดไดเรกทอรี workspace                |
+| `clawdock-config`      | เปิด `~/.openclaw` |
+| `clawdock-show-config` | พิมพ์ไฟล์ config พร้อมปิดทับค่า |
+| `clawdock-workspace`   | เปิดไดเรกทอรีพื้นที่ทำงาน |
 
 ## โฟลว์ครั้งแรก
 
@@ -95,19 +93,19 @@ clawdock-devices
 clawdock-approve <request-id>
 ```
 
-## Config และความลับ
+## Config และ secrets
 
 ClawDock ใช้งานร่วมกับการแยก config แบบ Docker เดียวกับที่อธิบายไว้ใน [Docker](/th/install/docker):
 
-- `<project>/.env` สำหรับค่าเฉพาะ Docker เช่น ชื่อ image, พอร์ต และ gateway token
-- `~/.openclaw/.env` สำหรับ provider key และ bot token ที่อิงกับ env
-- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` สำหรับ auth ของ provider แบบ OAuth/API-key ที่เก็บไว้
-- `~/.openclaw/openclaw.json` สำหรับ config ด้านพฤติกรรม
+- `<project>/.env` สำหรับค่าที่เฉพาะกับ Docker เช่นชื่อ image, พอร์ต และ Gateway token
+- `~/.openclaw/.env` สำหรับคีย์ของผู้ให้บริการและ bot token ที่อิงกับ env
+- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` สำหรับ auth ของผู้ให้บริการแบบ OAuth/API-key ที่เก็บไว้
+- `~/.openclaw/openclaw.json` สำหรับ config พฤติกรรม
 
-ใช้ `clawdock-show-config` เมื่อต้องการตรวจสอบไฟล์ `.env` และ `openclaw.json` อย่างรวดเร็ว มันจะปกปิดค่าใน `.env` ในเอาต์พุตที่พิมพ์ออกมา
+ใช้ `clawdock-show-config` เมื่อคุณต้องการตรวจสอบไฟล์ `.env` และ `openclaw.json` อย่างรวดเร็ว มันจะปิดทับค่าใน `.env` ในเอาต์พุตที่พิมพ์ออกมา
 
 ## หน้าที่เกี่ยวข้อง
 
 - [Docker](/th/install/docker)
 - [Docker VM Runtime](/th/install/docker-vm-runtime)
-- [Updating](/th/install/updating)
+- [การอัปเดต](/th/install/updating)

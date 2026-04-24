@@ -1,71 +1,73 @@
 ---
 read_when:
     - การโฮสต์ PeekabooBridge ใน OpenClaw.app
-    - การผสานรวม Peekaboo ผ่าน Swift Package Manager
+    - การเชื่อมต่อ Peekaboo ผ่าน Swift Package Manager
     - การเปลี่ยนโปรโตคอล/พาธของ PeekabooBridge
-summary: การผสานรวม PeekabooBridge สำหรับระบบอัตโนมัติของ UI บน macOS
-title: Peekaboo Bridge
+summary: การเชื่อมต่อ PeekabooBridge สำหรับระบบอัตโนมัติของ UI บน macOS
+title: Peekaboo bridge
 x-i18n:
-    generated_at: "2026-04-23T05:45:09Z"
+    generated_at: "2026-04-24T09:22:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 30961eb502eecd23c017b58b834bd8cb00cab8b17302617d541afdace3ad8dba
+    source_hash: 3646f66551645733292fb183e0ff2c56697e7b24248ff7c32a0dc925431f6ba7
     source_path: platforms/mac/peekaboo.md
     workflow: 15
 ---
 
-# Peekaboo Bridge (ระบบอัตโนมัติของ UI บน macOS)
-
-OpenClaw สามารถโฮสต์ **PeekabooBridge** เป็นโบรกเกอร์ระบบอัตโนมัติของ UI ภายในเครื่องที่รับรู้เรื่องสิทธิ์ได้
-วิธีนี้ทำให้ CLI `peekaboo` สามารถขับระบบอัตโนมัติของ UI ได้ โดยใช้สิทธิ์ TCC ของแอป macOS ซ้ำได้
+OpenClaw สามารถโฮสต์ **PeekabooBridge** ในฐานะ broker สำหรับระบบอัตโนมัติของ UI ภายในเครื่องที่รับรู้สิทธิ์อนุญาตได้ ซึ่งช่วยให้ CLI `peekaboo` สามารถขับเคลื่อนระบบอัตโนมัติของ UI ได้โดยใช้สิทธิ์ TCC ของแอป macOS ร่วมกัน
 
 ## สิ่งนี้คืออะไร (และไม่ใช่อะไร)
 
 - **โฮสต์**: OpenClaw.app สามารถทำหน้าที่เป็นโฮสต์ของ PeekabooBridge ได้
 - **ไคลเอนต์**: ให้ใช้ CLI `peekaboo` (ไม่มีพื้นผิว `openclaw ui ...` แยกต่างหาก)
-- **UI**: overlay แบบภาพยังคงอยู่ใน Peekaboo.app; OpenClaw เป็นเพียงโฮสต์โบรกเกอร์แบบบาง
+- **UI**: visual overlays ยังคงอยู่ใน Peekaboo.app; OpenClaw เป็นเพียงโฮสต์ broker แบบบาง
 
-## เปิดใช้งาน bridge
+## เปิดใช้ bridge
 
 ในแอป macOS:
 
 - Settings → **Enable Peekaboo Bridge**
 
-เมื่อเปิดใช้ OpenClaw จะเริ่มเซิร์ฟเวอร์ local UNIX socket หากปิดใช้งาน โฮสต์
-จะหยุดทำงาน และ `peekaboo` จะ fallback ไปยังโฮสต์อื่นที่มีอยู่
+เมื่อเปิดใช้ OpenClaw จะเริ่มเซิร์ฟเวอร์ UNIX socket ภายในเครื่อง เมื่อปิดใช้งาน โฮสต์
+จะถูกหยุด และ `peekaboo` จะ fallback ไปยังโฮสต์อื่นที่ใช้งานได้
 
 ## ลำดับการค้นพบของไคลเอนต์
 
-โดยทั่วไปไคลเอนต์ Peekaboo จะลองโฮสต์ตามลำดับนี้:
+โดยทั่วไปไคลเอนต์ของ Peekaboo จะลองโฮสต์ตามลำดับนี้:
 
-1. Peekaboo.app (UX แบบเต็ม)
+1. Peekaboo.app (UX เต็มรูปแบบ)
 2. Claude.app (หากติดตั้งไว้)
-3. OpenClaw.app (โบรกเกอร์แบบบาง)
+3. OpenClaw.app (thin broker)
 
-ใช้ `peekaboo bridge status --verbose` เพื่อดูว่าโฮสต์ใดกำลัง active และใช้
-พาธ socket ใดอยู่ คุณสามารถ override ได้ด้วย:
+ใช้ `peekaboo bridge status --verbose` เพื่อดูว่าโฮสต์ใด active อยู่ และใช้
+socket path ใดอยู่ คุณสามารถ override ได้ด้วย:
 
 ```bash
 export PEEKABOO_BRIDGE_SOCKET=/path/to/bridge.sock
 ```
 
-## ความปลอดภัยและสิทธิ์
+## ความปลอดภัยและสิทธิ์อนุญาต
 
 - bridge จะตรวจสอบ **ลายเซ็นโค้ดของผู้เรียก**; มีการบังคับใช้ allowlist ของ TeamID
   (TeamID ของโฮสต์ Peekaboo + TeamID ของแอป OpenClaw)
-- คำขอจะหมดเวลาภายในประมาณ 10 วินาที
+- คำขอจะหมดเวลาหลังจากประมาณ 10 วินาที
 - หากไม่มีสิทธิ์ที่จำเป็น bridge จะส่งข้อความข้อผิดพลาดที่ชัดเจนกลับมา
   แทนการเปิด System Settings
 
-## พฤติกรรมของ snapshot (automation)
+## พฤติกรรมของ snapshot (ระบบอัตโนมัติ)
 
-snapshot จะถูกเก็บไว้ใน memory และหมดอายุอัตโนมัติหลังช่วงเวลาสั้น ๆ
-หากคุณต้องการเก็บไว้นานขึ้น ให้จับใหม่จากฝั่งไคลเอนต์
+snapshot จะถูกเก็บไว้ในหน่วยความจำและหมดอายุอัตโนมัติหลังจากช่วงเวลาสั้น ๆ
+หากคุณต้องการการเก็บไว้นานขึ้น ให้จับใหม่จากไคลเอนต์
 
 ## การแก้ไขปัญหา
 
 - หาก `peekaboo` รายงานว่า “bridge client is not authorized” ให้ตรวจสอบว่าไคลเอนต์
-  ถูกเซ็นอย่างถูกต้อง หรือรันโฮสต์ด้วย `PEEKABOO_ALLOW_UNSIGNED_SOCKET_CLIENTS=1`
-  ในโหมด **debug** เท่านั้น
+  ถูกลงลายเซ็นอย่างถูกต้อง หรือรันโฮสต์ด้วย `PEEKABOO_ALLOW_UNSIGNED_SOCKET_CLIENTS=1`
+  เฉพาะในโหมด **debug** เท่านั้น
 - หากไม่พบโฮสต์ใดเลย ให้เปิดแอปโฮสต์ตัวใดตัวหนึ่ง (Peekaboo.app หรือ OpenClaw.app)
-  และยืนยันว่าได้ให้สิทธิ์เรียบร้อยแล้ว
+  และยืนยันว่าได้ให้สิทธิ์อนุญาตแล้ว
+
+## ที่เกี่ยวข้อง
+
+- [แอป macOS](/th/platforms/macos)
+- [สิทธิ์อนุญาตบน macOS](/th/platforms/mac/permissions)

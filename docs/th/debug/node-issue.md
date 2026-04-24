@@ -1,14 +1,14 @@
 ---
 read_when:
-    - การดีบักสคริปต์พัฒนาเฉพาะ Node หรือความล้มเหลวของโหมด watch
-    - การสืบสวนการแครชของตัวโหลด tsx/esbuild ใน OpenClaw
-summary: บันทึกและวิธีแก้ปัญหาชั่วคราวสำหรับการแครชของ Node + tsx แบบ "__name is not a function"
+    - การดีบักสคริปต์พัฒนาแบบเฉพาะ Node หรือความล้มเหลวของโหมด watch
+    - การตรวจสอบการแครชของตัวโหลด tsx/esbuild ใน OpenClaw
+summary: บันทึกปัญหาการแครชของ Node + tsx แบบ `"__name is not a function"` และวิธีหลีกเลี่ยง
 title: การแครชของ Node + tsx
 x-i18n:
-    generated_at: "2026-04-23T05:32:28Z"
+    generated_at: "2026-04-24T09:08:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ca45c795c356ada8f81e75b394ec82743d3d1bf1bbe83a24ec6699946b920f01
+    source_hash: 7d043466f71eae223fa568a3db82e424580ce3269ca11d0e84368beefc25bd25
     source_path: debug/node-issue.md
     workflow: 15
 ---
@@ -25,24 +25,24 @@ x-i18n:
     at .../src/agents/auth-profiles/constants.ts:25:20
 ```
 
-ปัญหานี้เริ่มขึ้นหลังจากเปลี่ยนสคริปต์พัฒนาจาก Bun มาเป็น `tsx` (commit `2871657e`, 2026-01-06) โดยเส้นทางรันไทม์เดียวกันนี้เคยทำงานได้กับ Bun
+ปัญหานี้เริ่มขึ้นหลังจากเปลี่ยน dev scripts จาก Bun ไปเป็น `tsx` (commit `2871657e`, 2026-01-06) โดยเส้นทาง runtime เดียวกันนี้เคยทำงานได้กับ Bun
 
 ## สภาพแวดล้อม
 
 - Node: v25.x (พบปัญหาบน v25.3.0)
 - tsx: 4.21.0
-- OS: macOS (มีแนวโน้มว่าจะเกิดซ้ำบนแพลตฟอร์มอื่นที่รัน Node 25 ได้เช่นกัน)
+- OS: macOS (มีแนวโน้มว่าจะเกิดซ้ำได้บนแพลตฟอร์มอื่นที่รัน Node 25)
 
-## การทำซ้ำปัญหา (เฉพาะ Node)
+## วิธีทำให้เกิดซ้ำ (Node เท่านั้น)
 
 ```bash
-# ในรากของ repo
+# ในรูทของ repo
 node --version
 pnpm install
 node --import tsx src/entry.ts status
 ```
 
-## การทำซ้ำขั้นต่ำใน repo
+## ตัวอย่างทำซ้ำขั้นต่ำใน repo
 
 ```bash
 node --import tsx scripts/repro/tsx-name-repro.ts
@@ -56,28 +56,28 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 
 ## หมายเหตุ / สมมติฐาน
 
-- `tsx` ใช้ esbuild เพื่อแปลง TS/ESM โดย `keepNames` ของ esbuild จะสร้าง helper ชื่อ `__name` และห่อการประกาศฟังก์ชันด้วย `__name(...)`
-- การแครชนี้บ่งชี้ว่า `__name` มีอยู่ แต่ไม่ใช่ฟังก์ชันในรันไทม์ ซึ่งหมายความว่า helper อาจหายไปหรือถูกเขียนทับสำหรับโมดูลนี้ในเส้นทาง loader ของ Node 25
-- มีรายงานปัญหาลักษณะคล้ายกันเกี่ยวกับ helper `__name` ในผู้ใช้ esbuild รายอื่นเมื่อ helper หายไปหรือถูกเขียนใหม่
+- `tsx` ใช้ esbuild เพื่อแปลง TS/ESM โดย `keepNames` ของ esbuild จะสร้าง helper ชื่อ `__name` และห่อการกำหนดฟังก์ชันด้วย `__name(...)`
+- การแครชนี้บ่งชี้ว่า `__name` มีอยู่ แต่ไม่ใช่ฟังก์ชันในขณะรันไทม์ ซึ่งหมายความว่า helper หายไปหรือถูกเขียนทับสำหรับโมดูลนี้ในเส้นทาง loader ของ Node 25
+- มีรายงานปัญหาที่คล้ายกันเกี่ยวกับ helper `__name` ในผู้ใช้ esbuild รายอื่นเมื่อ helper หายไปหรือถูกเขียนใหม่
 
 ## ประวัติการถดถอย
 
-- `2871657e` (2026-01-06): สคริปต์ถูกเปลี่ยนจาก Bun มาเป็น tsx เพื่อให้ Bun เป็นเพียงตัวเลือก
-- ก่อนหน้านั้น (เส้นทาง Bun) `openclaw status` และ `gateway:watch` ทำงานได้
+- `2871657e` (2026-01-06): scripts ถูกเปลี่ยนจาก Bun ไปเป็น tsx เพื่อให้ Bun เป็นทางเลือก
+- ก่อนหน้านั้น (เส้นทาง Bun), `openclaw status` และ `gateway:watch` ทำงานได้
 
-## วิธีแก้ปัญหาชั่วคราว
+## วิธีหลีกเลี่ยง
 
-- ใช้ Bun สำหรับสคริปต์พัฒนา (เป็นการย้อนกลับชั่วคราวในปัจจุบัน)
-- ใช้ `tsgo` สำหรับตรวจชนิดของ repo แล้วรันเอาต์พุตที่ build แล้ว:
+- ใช้ Bun สำหรับ dev scripts (เป็นการย้อนกลับชั่วคราวในปัจจุบัน)
+- ใช้ `tsgo` สำหรับ type checking ของ repo จากนั้นรันผลลัพธ์ที่ build แล้ว:
 
   ```bash
   pnpm tsgo
   node openclaw.mjs status
   ```
 
-- หมายเหตุทางประวัติ: เคยใช้ `tsc` ที่นี่ระหว่างดีบักปัญหา Node/tsx นี้ แต่ตอนนี้ lane การตรวจชนิดของ repo ใช้ `tsgo`
-- ปิดการใช้ esbuild keepNames ใน TS loader หากทำได้ (จะป้องกันการแทรก helper `__name`); ปัจจุบัน tsx ยังไม่เปิดให้ตั้งค่านี้
-- ทดสอบ Node LTS (22/24) กับ `tsx` เพื่อดูว่าปัญหานี้เกิดเฉพาะกับ Node 25 หรือไม่
+- หมายเหตุทางประวัติ: เคยใช้ `tsc` ขณะดีบักปัญหา Node/tsx นี้ แต่ปัจจุบัน lanes สำหรับ type-check ของ repo ใช้ `tsgo`
+- ปิด esbuild keepNames ใน TS loader หากทำได้ (จะป้องกันการแทรก helper `__name`); ปัจจุบัน tsx ยังไม่เปิดให้กำหนดค่านี้
+- ทดสอบ Node LTS (22/24) กับ `tsx` เพื่อดูว่าปัญหานี้เฉพาะกับ Node 25 หรือไม่
 
 ## แหล่งอ้างอิง
 
@@ -87,6 +87,11 @@ node --import tsx scripts/repro/tsx-name-repro.ts
 
 ## ขั้นตอนถัดไป
 
-- ทำซ้ำปัญหาบน Node 22/24 เพื่อยืนยันว่าเป็นการถดถอยของ Node 25
-- ทดสอบ `tsx` รุ่น nightly หรือ pin ไปยังเวอร์ชันก่อนหน้า หากมีการถดถอยที่ทราบอยู่แล้ว
-- หากปัญหาเกิดซ้ำบน Node LTS ให้ยื่น minimal repro ไปยัง upstream พร้อม stack trace ของ `__name`
+- ทำให้เกิดซ้ำบน Node 22/24 เพื่อยืนยันว่าเป็นการถดถอยของ Node 25
+- ทดสอบ `tsx` รุ่น nightly หรือปักหมุดไปยังเวอร์ชันก่อนหน้า หากมีการถดถอยที่ทราบอยู่แล้ว
+- หากเกิดซ้ำบน Node LTS ให้ส่งตัวอย่างทำซ้ำขั้นต่ำไปยัง upstream พร้อม stack trace ของ `__name`
+
+## ที่เกี่ยวข้อง
+
+- [การติดตั้ง Node.js](/th/install/node)
+- [การแก้ไขปัญหา Gateway](/th/gateway/troubleshooting)

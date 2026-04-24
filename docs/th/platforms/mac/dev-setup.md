@@ -1,56 +1,56 @@
 ---
 read_when:
     - การตั้งค่าสภาพแวดล้อมการพัฒนาบน macOS
-summary: คู่มือการตั้งค่าสำหรับนักพัฒนาที่ทำงานกับแอป OpenClaw บน macOS
-title: การตั้งค่านักพัฒนาบน macOS
+summary: คู่มือการตั้งค่าสำหรับนักพัฒนาที่ทำงานกับแอป macOS ของ OpenClaw
+title: การตั้งค่านักพัฒนาสำหรับ macOS
 x-i18n:
-    generated_at: "2026-04-23T05:44:42Z"
+    generated_at: "2026-04-24T09:21:47Z"
     model: gpt-5.4
     provider: openai
-    source_hash: fd13f17391bdd87ef59e4c575e5da3312c4066de00905731263bff655a5db357
+    source_hash: 30f98b3249096fa1e125a7beb77562b7bd36e2c17f524f30a1c58de61bd04da0
     source_path: platforms/mac/dev-setup.md
     workflow: 15
 ---
 
-# การตั้งค่านักพัฒนาบน macOS
+# การตั้งค่านักพัฒนาสำหรับ macOS
 
-คู่มือนี้ครอบคลุมขั้นตอนที่จำเป็นสำหรับการ build และรันแอป OpenClaw บน macOS จากซอร์ส
+คู่มือนี้ครอบคลุมขั้นตอนที่จำเป็นสำหรับการ build และรันแอป macOS ของ OpenClaw จากซอร์ส
 
 ## ข้อกำหนดเบื้องต้น
 
-ก่อน build แอป โปรดตรวจสอบว่าคุณได้ติดตั้งสิ่งต่อไปนี้แล้ว:
+ก่อน build แอป โปรดตรวจสอบว่าคุณติดตั้งสิ่งต่อไปนี้แล้ว:
 
 1. **Xcode 26.2+**: จำเป็นสำหรับการพัฒนา Swift
-2. **Node.js 24 & pnpm**: แนะนำสำหรับ gateway, CLI และสคริปต์แพ็กเกจ ส่วน Node 22 LTS ซึ่งปัจจุบันคือ `22.14+` ยังคงรองรับเพื่อความเข้ากันได้
+2. **Node.js 24 & pnpm**: แนะนำสำหรับ gateway, CLI และสคริปต์การแพ็กเกจ Node 22 LTS ซึ่งปัจจุบันคือ `22.14+` ยังคงรองรับเพื่อความเข้ากันได้
 
-## 1. ติดตั้ง Dependencies
+## 1. ติดตั้ง dependency
 
-ติดตั้ง dependencies ทั้งโครงการ:
+ติดตั้ง dependency ทั้งโปรเจกต์:
 
 ```bash
 pnpm install
 ```
 
-## 2. Build และแพ็กแอป
+## 2. Build และแพ็กเกจแอป
 
-หากต้องการ build แอป macOS และแพ็กเป็น `dist/OpenClaw.app` ให้รัน:
+หากต้องการ build แอป macOS และแพ็กเกจเป็น `dist/OpenClaw.app` ให้รัน:
 
 ```bash
 ./scripts/package-mac-app.sh
 ```
 
-หากคุณไม่มี Apple Developer ID certificate สคริปต์จะใช้ **ad-hoc signing** (`-`) โดยอัตโนมัติ
+หากคุณไม่มีใบรับรอง Apple Developer ID สคริปต์จะใช้ **ad-hoc signing** (`-`) โดยอัตโนมัติ
 
-สำหรับโหมด dev run, แฟล็กการ signing และการแก้ปัญหา Team ID ดู README ของแอป macOS:
+สำหรับโหมดการรันแบบ dev, แฟล็กสำหรับ signing และการแก้ปัญหา Team ID โปรดดู README ของแอป macOS:
 [https://github.com/openclaw/openclaw/blob/main/apps/macos/README.md](https://github.com/openclaw/openclaw/blob/main/apps/macos/README.md)
 
-> **หมายเหตุ**: แอปที่เซ็นแบบ ad-hoc อาจทำให้เกิด security prompts หากแอปแครชทันทีพร้อม "Abort trap 6" ให้ดูส่วน [การแก้ปัญหา](#troubleshooting)
+> **หมายเหตุ**: แอปที่ signed แบบ ad-hoc อาจกระตุ้น security prompt หากแอป crash ทันทีพร้อมข้อความ "Abort trap 6" ให้ดูส่วน [การแก้ปัญหา](#การแก้ปัญหา)
 
 ## 3. ติดตั้ง CLI
 
-แอป macOS คาดหวังให้มีการติดตั้ง `openclaw` CLI แบบ global เพื่อจัดการงานเบื้องหลัง
+แอป macOS คาดว่าจะมีการติดตั้ง CLI `openclaw` แบบ global เพื่อจัดการงานเบื้องหลัง
 
-**วิธีติดตั้ง (แนะนำ):**
+**หากต้องการติดตั้ง (แนะนำ):**
 
 1. เปิดแอป OpenClaw
 2. ไปที่แท็บการตั้งค่า **General**
@@ -62,8 +62,8 @@ pnpm install
 npm install -g openclaw@<version>
 ```
 
-`pnpm add -g openclaw@<version>` และ `bun add -g openclaw@<version>` ก็ใช้ได้เช่นกัน
-สำหรับรันไทม์ของ Gateway ยังคงแนะนำให้ใช้ Node
+`pnpm add -g openclaw@<version>` และ `bun add -g openclaw@<version>` ก็ใช้งานได้เช่นกัน
+สำหรับรันไทม์ของ Gateway, Node ยังคงเป็นเส้นทางที่แนะนำ
 
 ## การแก้ปัญหา
 
@@ -71,23 +71,23 @@ npm install -g openclaw@<version>
 
 การ build แอป macOS คาดหวัง macOS SDK รุ่นล่าสุดและ Swift 6.2 toolchain
 
-**System dependencies (จำเป็น):**
+**dependency ของระบบ (จำเป็น):**
 
-- **macOS เวอร์ชันล่าสุดที่มีใน Software Update** (จำเป็นสำหรับ Xcode 26.2 SDKs)
+- **macOS เวอร์ชันล่าสุดที่มีใน Software Update** (จำเป็นสำหรับ SDK ของ Xcode 26.2)
 - **Xcode 26.2** (Swift 6.2 toolchain)
 
-**การตรวจสอบ:**
+**ตรวจสอบ:**
 
 ```bash
 xcodebuild -version
 xcrun swift --version
 ```
 
-หากเวอร์ชันไม่ตรงกัน ให้อัปเดต macOS/Xcode แล้วรัน build ใหม่
+หากเวอร์ชันไม่ตรงกัน ให้อัปเดต macOS/Xcode แล้วรันการ build ใหม่
 
-### แอปแครชตอนอนุญาตสิทธิ์
+### แอป crash ตอนให้สิทธิ์
 
-หากแอปแครชเมื่อคุณพยายามอนุญาตการเข้าถึง **Speech Recognition** หรือ **Microphone** สาเหตุอาจมาจาก TCC cache ที่เสียหายหรือ signature ไม่ตรงกัน
+หากแอป crash เมื่อคุณพยายามอนุญาตการเข้าถึง **Speech Recognition** หรือ **Microphone** อาจเกิดจาก TCC cache เสียหาย หรือ signature ไม่ตรงกัน
 
 **วิธีแก้:**
 
@@ -99,16 +99,21 @@ xcrun swift --version
 
 2. หากยังไม่สำเร็จ ให้เปลี่ยน `BUNDLE_ID` ชั่วคราวใน [`scripts/package-mac-app.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/package-mac-app.sh) เพื่อบังคับให้ macOS มองเป็น "clean slate"
 
-### Gateway ค้างที่ "Starting..." ไม่สิ้นสุด
+### Gateway แสดง "Starting..." ไม่สิ้นสุด
 
-หากสถานะ gateway ค้างอยู่ที่ "Starting..." ให้ตรวจสอบว่ามี zombie process ยึดพอร์ตอยู่หรือไม่:
+หากสถานะของ gateway ค้างอยู่ที่ "Starting..." ให้ตรวจสอบว่ามี zombie process จับพอร์ตอยู่หรือไม่:
 
 ```bash
 openclaw gateway status
 openclaw gateway stop
 
-# หากคุณไม่ได้ใช้ LaunchAgent (dev mode / manual runs) ให้หา listener:
+# If you're not using a LaunchAgent (dev mode / manual runs), find the listener:
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 ```
 
-หากมีการรันแบบ manual ยึดพอร์ตอยู่ ให้หยุด process นั้น (Ctrl+C) หากจำเป็นจริงๆ ค่อย kill PID ที่คุณพบด้านบน
+หากมี manual run จับพอร์ตอยู่ ให้หยุดโพรเซสนั้น (Ctrl+C) หากจำเป็นจริง ๆ ให้ kill PID ที่คุณพบจากด้านบน
+
+## ที่เกี่ยวข้อง
+
+- [แอป macOS](/th/platforms/macos)
+- [ภาพรวมการติดตั้ง](/th/install)

@@ -1,28 +1,26 @@
 ---
 read_when: You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change.
 status: active
-summary: 'เหตุใด tool จึงถูกบล็อก: รันไทม์ sandbox, นโยบายอนุญาต/ปฏิเสธ tool และจุดควบคุม exec แบบยกระดับ'
-title: Sandbox เทียบกับนโยบาย Tool เทียบกับ Elevated
+summary: 'เหตุใดเครื่องมือจึงถูกบล็อก: runtime ของ sandbox, นโยบาย allow/deny ของเครื่องมือ และเกตของ elevated exec'
+title: Sandbox เทียบกับนโยบายเครื่องมือ เทียบกับ elevated
 x-i18n:
-    generated_at: "2026-04-23T05:35:25Z"
+    generated_at: "2026-04-24T09:12:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a85378343df0594be451212cb4c95b349a0cc7cd1f242b9306be89903a450db1
+    source_hash: 74bb73023a3f7a85a0c020b2e8df69610ab8f8e60f8ab6142f8da7810dc08429
     source_path: gateway/sandbox-vs-tool-policy-vs-elevated.md
     workflow: 15
 ---
 
-# Sandbox เทียบกับนโยบาย Tool เทียบกับ Elevated
-
 OpenClaw มีตัวควบคุมที่เกี่ยวข้องกันสามอย่าง (แต่แตกต่างกัน):
 
-1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) เป็นตัวตัดสินว่า **tools รันที่ไหน** (backend ของ sandbox หรือ host)
-2. **นโยบาย Tool** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) เป็นตัวตัดสินว่า **tools ใดพร้อมใช้งาน/ได้รับอนุญาต**
-3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) คือ **ช่องทางหลีกเลี่ยงเฉพาะ exec** เพื่อรันนอก sandbox เมื่อคุณอยู่ในสภาพ sandbox (`gateway` เป็นค่าเริ่มต้น หรือ `node` เมื่อกำหนด exec target ไว้เป็น `node`)
+1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) ตัดสินใจว่า **เครื่องมือจะรันที่ไหน** (backend ของ sandbox เทียบกับโฮสต์)
+2. **นโยบายเครื่องมือ** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) ตัดสินใจว่า **เครื่องมือใดพร้อมใช้งาน/ได้รับอนุญาต**
+3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) คือ **ช่องทางหลุดเฉพาะ exec** สำหรับรันนอก sandbox เมื่อคุณอยู่ใน sandbox (`gateway` เป็นค่าเริ่มต้น หรือ `node` เมื่อมีการกำหนด exec target เป็น `node`)
 
-## การดีบักแบบรวดเร็ว
+## การแก้ไขปัญหาอย่างรวดเร็ว
 
-ใช้ตัวตรวจสอบเพื่อดูว่า OpenClaw _กำลังทำอะไรอยู่จริง ๆ_:
+ใช้ inspector เพื่อดูว่า OpenClaw _กำลังทำอะไรจริง ๆ_:
 
 ```bash
 openclaw sandbox explain
@@ -33,52 +31,52 @@ openclaw sandbox explain --json
 
 มันจะแสดง:
 
-- โหมด sandbox/scope/workspace access ที่มีผลจริง
-- เซสชันนั้นกำลังอยู่ใน sandbox หรือไม่ (main เทียบกับ non-main)
-- นโยบาย allow/deny ของ sandbox tool ที่มีผลจริง (และมาจาก agent/global/default หรือไม่)
-- gate ของ elevated และพาธคีย์สำหรับแก้ไข
+- โหมด/scope/การเข้าถึงพื้นที่ทำงานของ sandbox ที่มีผลจริง
+- เซสชันปัจจุบันอยู่ใน sandbox หรือไม่ (main เทียบกับ non-main)
+- allow/deny ของเครื่องมือใน sandbox ที่มีผลจริง (และมาจาก agent/global/default หรือไม่)
+- เกตของ elevated และพาธคีย์สำหรับการแก้ไข
 
-## Sandbox: tools รันที่ไหน
+## Sandbox: เครื่องมือรันที่ไหน
 
 Sandboxing ถูกควบคุมโดย `agents.defaults.sandbox.mode`:
 
-- `"off"`: ทุกอย่างรันบน host
-- `"non-main"`: เฉพาะเซสชันที่ไม่ใช่ main เท่านั้นที่อยู่ใน sandbox (เป็น “จุดที่มักทำให้แปลกใจ” สำหรับ groups/channels)
+- `"off"`: ทุกอย่างรันบนโฮสต์
+- `"non-main"`: เฉพาะเซสชันที่ไม่ใช่ main เท่านั้นที่อยู่ใน sandbox (เป็น “เรื่องน่าประหลาดใจ” ที่พบบ่อยสำหรับกลุ่ม/ช่องทาง)
 - `"all"`: ทุกอย่างอยู่ใน sandbox
 
-ดู [Sandboxing](/th/gateway/sandboxing) สำหรับเมทริกซ์ทั้งหมด (scope, workspace mounts, images)
+ดู [Sandboxing](/th/gateway/sandboxing) สำหรับเมทริกซ์แบบเต็ม (scope, การ mount พื้นที่ทำงาน, image)
 
-### Bind mount (ตรวจสอบความปลอดภัยแบบรวดเร็ว)
+### Bind mount (การตรวจสอบความปลอดภัยแบบรวดเร็ว)
 
-- `docker.binds` _เจาะทะลุ_ ระบบไฟล์ของ sandbox: สิ่งที่คุณ mount จะมองเห็นได้ภายใน container ตามโหมดที่คุณตั้ง (`:ro` หรือ `:rw`)
-- ค่าเริ่มต้นคือ read-write หากคุณไม่ระบุโหมด; ควรใช้ `:ro` สำหรับ source/secrets
-- `scope: "shared"` จะไม่สนใจ bind ต่อเอเจนต์ (ใช้ได้เฉพาะ global bind)
-- OpenClaw จะตรวจสอบแหล่งที่มาของ bind สองครั้ง: ครั้งแรกบนพาธต้นทางที่ normalized และอีกครั้งหลัง resolve ผ่าน ancestor ที่ลึกที่สุดที่มีอยู่แล้ว การหลบหนีผ่าน symlink-parent ไม่สามารถข้ามการตรวจ blocked-path หรือ allowed-root ได้
-- พาธปลายทางที่ยังไม่มีอยู่ก็ยังถูกตรวจสอบอย่างปลอดภัย หาก `/workspace/alias-out/new-file` resolve ผ่าน parent ที่เป็น symlink ไปยังพาธที่ถูกบล็อกหรืออยู่นอก allowed roots ที่กำหนดไว้ bind จะถูกปฏิเสธ
-- การ bind `/var/run/docker.sock` เทียบเท่ากับมอบสิทธิ์ควบคุม host ให้ sandbox; ทำเช่นนี้เฉพาะเมื่อเจตนาชัดเจน
-- การเข้าถึง workspace (`workspaceAccess: "ro"`/`"rw"`) เป็นอิสระจากโหมดของ bind
+- `docker.binds` _เจาะผ่าน_ ระบบไฟล์ของ sandbox: สิ่งใดก็ตามที่คุณ mount จะมองเห็นได้ภายใน container ตามโหมดที่คุณตั้ง (`:ro` หรือ `:rw`)
+- ค่าเริ่มต้นคือ read-write หากคุณละโหมดไว้; ควรใช้ `:ro` สำหรับ source/secrets
+- `scope: "shared"` จะไม่สนใจ bind แบบต่อเอเจนต์ (จะใช้เฉพาะ bind แบบส่วนกลาง)
+- OpenClaw ตรวจสอบแหล่งที่มาของ bind สองครั้ง: ครั้งแรกบนพาธต้นทางที่ normalize แล้ว จากนั้นตรวจสอบอีกครั้งหลัง resolve ผ่าน ancestor ที่มีอยู่จริงที่ลึกที่สุด การหลบหนีผ่าน symlink-parent ไม่สามารถหลบการตรวจ blocked-path หรือ allowed-root ได้
+- leaf path ที่ยังไม่มีอยู่ก็ยังถูกตรวจสอบอย่างปลอดภัย หาก `/workspace/alias-out/new-file` resolve ผ่าน parent ที่เป็น symlink ไปยังพาธที่ถูกบล็อกหรืออยู่นอก allowed root ที่กำหนดไว้ bind จะถูกปฏิเสธ
+- การ bind `/var/run/docker.sock` เทียบเท่ากับการยกอำนาจควบคุมโฮสต์ให้ sandbox; ทำสิ่งนี้เฉพาะเมื่อเจตนาเท่านั้น
+- การเข้าถึงพื้นที่ทำงาน (`workspaceAccess: "ro"`/`"rw"`) แยกจากโหมดของ bind
 
-## นโยบาย Tool: tools ใดมีอยู่/เรียกใช้ได้
+## นโยบายเครื่องมือ: เครื่องมือใดมีอยู่/เรียกใช้ได้
 
 มีสองชั้นที่สำคัญ:
 
-- **โปรไฟล์ Tool**: `tools.profile` และ `agents.list[].tools.profile` (allowlist พื้นฐาน)
-- **โปรไฟล์ Tool ต่อ provider**: `tools.byProvider[provider].profile` และ `agents.list[].tools.byProvider[provider].profile`
-- **นโยบาย Tool ระดับ global/ต่อเอเจนต์**: `tools.allow`/`tools.deny` และ `agents.list[].tools.allow`/`agents.list[].tools.deny`
-- **นโยบาย Tool ต่อ provider**: `tools.byProvider[provider].allow/deny` และ `agents.list[].tools.byProvider[provider].allow/deny`
-- **นโยบาย Sandbox tool** (มีผลเฉพาะเมื่ออยู่ใน sandbox): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` และ `agents.list[].tools.sandbox.tools.*`
+- **โปรไฟล์เครื่องมือ**: `tools.profile` และ `agents.list[].tools.profile` (allowlist พื้นฐาน)
+- **โปรไฟล์เครื่องมือของผู้ให้บริการ**: `tools.byProvider[provider].profile` และ `agents.list[].tools.byProvider[provider].profile`
+- **นโยบายเครื่องมือแบบส่วนกลาง/ต่อเอเจนต์**: `tools.allow`/`tools.deny` และ `agents.list[].tools.allow`/`agents.list[].tools.deny`
+- **นโยบายเครื่องมือของผู้ให้บริการ**: `tools.byProvider[provider].allow/deny` และ `agents.list[].tools.byProvider[provider].allow/deny`
+- **นโยบายเครื่องมือของ sandbox** (ใช้เฉพาะเมื่ออยู่ใน sandbox): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` และ `agents.list[].tools.sandbox.tools.*`
 
-หลักจำง่าย ๆ:
+หลักทั่วไป:
 
 - `deny` ชนะเสมอ
-- ถ้า `allow` ไม่ว่าง ทุกอย่างที่เหลือจะถูกมองว่า blocked
-- นโยบาย Tool คือจุดหยุดแบบเด็ดขาด: `/exec` ไม่สามารถ override `exec` tool ที่ถูกปฏิเสธได้
-- `/exec` เปลี่ยนเฉพาะค่าเริ่มต้นของเซสชันสำหรับผู้ส่งที่ได้รับอนุญาต; มันไม่ได้มอบสิทธิ์เข้าถึง tool
-  คีย์ tool ต่อ provider ยอมรับได้ทั้ง `provider` (เช่น `google-antigravity`) หรือ `provider/model` (เช่น `openai/gpt-5.4`)
+- หาก `allow` ไม่ว่าง ทุกอย่างที่เหลือจะถือว่าถูกบล็อก
+- นโยบายเครื่องมือคือจุดหยุดแบบ hard stop: `/exec` ไม่สามารถ override เครื่องมือ `exec` ที่ถูก deny ได้
+- `/exec` เปลี่ยนเฉพาะค่าเริ่มต้นของเซสชันสำหรับผู้ส่งที่ได้รับอนุญาต; มันไม่ได้มอบสิทธิ์เข้าถึงเครื่องมือ
+  คีย์เครื่องมือของผู้ให้บริการรับได้ทั้ง `provider` (เช่น `google-antigravity`) หรือ `provider/model` (เช่น `openai/gpt-5.4`)
 
-### กลุ่ม Tool (ชอร์ตแฮนด์)
+### กลุ่มเครื่องมือ (shorthand)
 
-นโยบาย Tool (global, agent, sandbox) รองรับรายการ `group:*` ที่ขยายเป็นหลาย tools:
+นโยบายเครื่องมือ (global, agent, sandbox) รองรับรายการ `group:*` ที่ขยายเป็นหลายเครื่องมือ:
 
 ```json5
 {
@@ -92,7 +90,7 @@ Sandboxing ถูกควบคุมโดย `agents.defaults.sandbox.mode`:
 }
 ```
 
-กลุ่มที่ใช้ได้:
+กลุ่มที่มีให้ใช้:
 
 - `group:runtime`: `exec`, `process`, `code_execution` (`bash` ยอมรับเป็น
   alias ของ `exec`)
@@ -106,43 +104,43 @@ Sandboxing ถูกควบคุมโดย `agents.defaults.sandbox.mode`:
 - `group:nodes`: `nodes`
 - `group:agents`: `agents_list`
 - `group:media`: `image`, `image_generate`, `video_generate`, `tts`
-- `group:openclaw`: tools แบบ built-in ทั้งหมดของ OpenClaw (ไม่รวม provider plugins)
+- `group:openclaw`: เครื่องมือ OpenClaw ในตัวทั้งหมด (ไม่รวม provider Plugin)
 
-## Elevated: “รันบน host” แบบ exec-only
+## Elevated: "รันบนโฮสต์" แบบเฉพาะ exec
 
-Elevated **ไม่ได้** มอบ tools เพิ่มเติม; มันมีผลเฉพาะกับ `exec`
+Elevated **ไม่ได้** มอบเครื่องมือเพิ่ม; มันมีผลเฉพาะกับ `exec`
 
-- หากคุณอยู่ใน sandbox, `/elevated on` (หรือ `exec` ที่มี `elevated: true`) จะรันนอก sandbox (อาจยังต้องมี approvals)
-- ใช้ `/elevated full` เพื่อข้าม exec approvals สำหรับเซสชันนั้น
-- หากคุณกำลังรันแบบ direct อยู่แล้ว elevated แทบจะไม่มีผลอะไร (แต่ยังคงมีกลไก gate)
-- Elevated **ไม่ได้** ผูกกับ Skills และ **ไม่ได้** override allow/deny ของ tool
-- Elevated ไม่ได้มอบการ override ข้าม host แบบอิสระจาก `host=auto`; มันทำตามกฎ exec target ปกติ และจะคง `node` ไว้เฉพาะเมื่อ target ที่กำหนด/ของเซสชันเป็น `node` อยู่แล้วเท่านั้น
-- `/exec` แยกจาก elevated มันแค่ปรับค่าเริ่มต้นของ exec ต่อเซสชันสำหรับผู้ส่งที่ได้รับอนุญาต
+- หากคุณอยู่ใน sandbox, `/elevated on` (หรือ `exec` ที่มี `elevated: true`) จะรันนอก sandbox (อาจยังต้องมีการอนุมัติอยู่)
+- ใช้ `/elevated full` เพื่อข้ามการอนุมัติ exec สำหรับเซสชันนั้น
+- หากคุณกำลังรันแบบ direct อยู่แล้ว elevated แทบไม่มีผล (แต่ยังอยู่ภายใต้เกต)
+- Elevated **ไม่** ถูกกำหนดขอบเขตตาม Skill และ **ไม่** override allow/deny ของเครื่องมือ
+- Elevated ไม่ได้มอบการ override ข้ามโฮสต์ตามอำเภอใจจาก `host=auto`; มันเป็นไปตามกฎ exec target ปกติ และจะคง `node` ไว้เฉพาะเมื่อ target ที่กำหนดไว้/ของเซสชันเป็น `node` อยู่แล้ว
+- `/exec` แยกจาก elevated มันเพียงปรับค่าเริ่มต้นของ exec ต่อเซสชันสำหรับผู้ส่งที่ได้รับอนุญาต
 
-Gates:
+เกต:
 
-- การเปิดใช้งาน: `tools.elevated.enabled` (และอาจใช้ `agents.list[].tools.elevated.enabled`)
-- allowlist ของผู้ส่ง: `tools.elevated.allowFrom.<provider>` (และอาจใช้ `agents.list[].tools.elevated.allowFrom.<provider>`)
+- การเปิดใช้งาน: `tools.elevated.enabled` (และแบบเลือกได้ `agents.list[].tools.elevated.enabled`)
+- allowlist ของผู้ส่ง: `tools.elevated.allowFrom.<provider>` (และแบบเลือกได้ `agents.list[].tools.elevated.allowFrom.<provider>`)
 
 ดู [Elevated Mode](/th/tools/elevated)
 
-## วิธีแก้ปัญหา “ถูกขังใน sandbox” ที่พบบ่อย
+## วิธีแก้ "คุก sandbox" ที่พบบ่อย
 
 ### "Tool X blocked by sandbox tool policy"
 
 คีย์สำหรับแก้ไข (เลือกอย่างใดอย่างหนึ่ง):
 
-- ปิด sandbox: `agents.defaults.sandbox.mode=off` (หรือแบบต่อเอเจนต์ `agents.list[].sandbox.mode=off`)
-- อนุญาต tool นั้นภายใน sandbox:
-  - เอามันออกจาก `tools.sandbox.tools.deny` (หรือแบบต่อเอเจนต์ `agents.list[].tools.sandbox.tools.deny`)
-  - หรือเพิ่มมันเข้าไปใน `tools.sandbox.tools.allow` (หรือ allow แบบต่อเอเจนต์)
+- ปิดใช้งาน sandbox: `agents.defaults.sandbox.mode=off` (หรือ `agents.list[].sandbox.mode=off` ต่อเอเจนต์)
+- อนุญาตเครื่องมือนั้นภายใน sandbox:
+  - เอาออกจาก `tools.sandbox.tools.deny` (หรือ `agents.list[].tools.sandbox.tools.deny` ต่อเอเจนต์)
+  - หรือเพิ่มเข้า `tools.sandbox.tools.allow` (หรือ allow ต่อเอเจนต์)
 
 ### "ฉันคิดว่านี่คือ main ทำไมมันถึงอยู่ใน sandbox?"
 
-ในโหมด `"non-main"` คีย์ของ group/channel _ไม่ใช่_ main ใช้ session key ของ main (แสดงโดย `sandbox explain`) หรือสลับโหมดเป็น `"off"`
+ในโหมด `"non-main"` คีย์ของกลุ่ม/ช่องทาง _ไม่ใช่_ main ใช้ main session key (แสดงโดย `sandbox explain`) หรือสลับโหมดเป็น `"off"`
 
-## ดูเพิ่มเติม
+## ที่เกี่ยวข้อง
 
-- [Sandboxing](/th/gateway/sandboxing) -- เอกสารอ้างอิง sandbox แบบเต็ม (โหมด, scope, backend, images)
-- [Multi-Agent Sandbox & Tools](/th/tools/multi-agent-sandbox-tools) -- การ override ต่อเอเจนต์และลำดับความสำคัญ
+- [Sandboxing](/th/gateway/sandboxing) -- เอกสารอ้างอิง sandbox แบบเต็ม (โหมด, scope, backend, image)
+- [Multi-Agent Sandbox & Tools](/th/tools/multi-agent-sandbox-tools) -- override ต่อเอเจนต์และลำดับความสำคัญ
 - [Elevated Mode](/th/tools/elevated)

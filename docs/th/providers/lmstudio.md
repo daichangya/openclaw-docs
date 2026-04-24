@@ -1,25 +1,23 @@
 ---
 read_when:
-    - คุณต้องการเรียกใช้ OpenClaw กับโมเดลโอเพนซอร์สผ่าน LM Studio
+    - คุณต้องการรัน OpenClaw กับโมเดลโอเพนซอร์สผ่าน LM Studio
     - คุณต้องการตั้งค่าและกำหนดค่า LM Studio
-summary: เรียกใช้ OpenClaw กับ LM Studio
+summary: รัน OpenClaw กับ LM Studio
 title: LM Studio
 x-i18n:
-    generated_at: "2026-04-23T10:22:10Z"
+    generated_at: "2026-04-24T09:28:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 062b26cf10631e74f4e1917ea9011133eb4433f5fb7ee85748d00080a6ca212d
+    source_hash: 2077790173a8cb660409b64e199d2027dda7b5b55226a00eadb0cdc45061e3ce
     source_path: providers/lmstudio.md
     workflow: 15
 ---
 
-# LM Studio
-
-LM Studio เป็นแอปที่ใช้งานง่ายแต่ทรงพลังสำหรับรันโมเดลแบบ open-weight บนฮาร์ดแวร์ของคุณเอง รองรับการรันโมเดล llama.cpp (GGUF) หรือ MLX (Apple Silicon) มีทั้งแบบแพ็กเกจ GUI และ daemon แบบ headless (`llmster`) สำหรับเอกสารผลิตภัณฑ์และการตั้งค่า ดูได้ที่ [lmstudio.ai](https://lmstudio.ai/)
+LM Studio เป็นแอปที่ใช้งานง่ายแต่ทรงพลังสำหรับรันโมเดลแบบ open-weight บนฮาร์ดแวร์ของคุณเอง มันให้คุณรัน llama.cpp (GGUF) หรือโมเดล MLX (Apple Silicon) ได้ มีทั้งแพ็กเกจแบบ GUI และ daemon แบบ headless (`llmster`) สำหรับเอกสารเกี่ยวกับผลิตภัณฑ์และการตั้งค่า โปรดดู [lmstudio.ai](https://lmstudio.ai/)
 
 ## เริ่มต้นอย่างรวดเร็ว
 
-1. ติดตั้ง LM Studio (เดสก์ท็อป) หรือ `llmster` (headless) แล้วเริ่มเซิร์ฟเวอร์ภายในเครื่อง:
+1. ติดตั้ง LM Studio (เดสก์ท็อป) หรือ `llmster` (headless) จากนั้นเริ่ม local server:
 
 ```bash
 curl -fsSL https://lmstudio.ai/install.sh | bash
@@ -27,7 +25,7 @@ curl -fsSL https://lmstudio.ai/install.sh | bash
 
 2. เริ่มเซิร์ฟเวอร์
 
-ตรวจสอบให้แน่ใจว่าคุณเปิดแอปเดสก์ท็อปไว้ หรือรัน daemon ด้วยคำสั่งต่อไปนี้:
+ตรวจสอบให้แน่ใจว่าคุณเปิดแอปเดสก์ท็อป หรือรัน daemon ด้วยคำสั่งต่อไปนี้:
 
 ```bash
 lms daemon up
@@ -37,21 +35,21 @@ lms daemon up
 lms server start --port 1234
 ```
 
-หากคุณใช้แอป ให้ตรวจสอบว่าเปิด JIT แล้วเพื่อให้ใช้งานได้ลื่นไหล ดูข้อมูลเพิ่มเติมได้ใน [คู่มือ JIT และ TTL ของ LM Studio](https://lmstudio.ai/docs/developer/core/ttl-and-auto-evict)
+หากคุณใช้แอป ให้ตรวจสอบว่าเปิด JIT ไว้เพื่อให้ได้ประสบการณ์ที่ลื่นไหล อ่านเพิ่มเติมใน [คู่มือ LM Studio JIT และ TTL](https://lmstudio.ai/docs/developer/core/ttl-and-auto-evict)
 
-3. OpenClaw ต้องใช้ค่า token ของ LM Studio ให้ตั้งค่า `LM_API_TOKEN`:
+3. OpenClaw ต้องใช้ค่าโทเค็นของ LM Studio ตั้งค่า `LM_API_TOKEN`:
 
 ```bash
 export LM_API_TOKEN="your-lm-studio-api-token"
 ```
 
-หากปิดการยืนยันตัวตนของ LM Studio อยู่ ให้ใช้ค่า token ที่ไม่ว่างค่าใดก็ได้:
+หากปิดการยืนยันตัวตนของ LM Studio ไว้ ให้ใช้ค่าโทเค็นใดก็ได้ที่ไม่ว่าง:
 
 ```bash
 export LM_API_TOKEN="placeholder-key"
 ```
 
-สำหรับรายละเอียดการตั้งค่าการยืนยันตัวตนของ LM Studio ดู [LM Studio Authentication](https://lmstudio.ai/docs/developer/core/authentication)
+สำหรับรายละเอียดการตั้งค่า auth ของ LM Studio โปรดดู [LM Studio Authentication](https://lmstudio.ai/docs/developer/core/authentication)
 
 4. รัน onboarding แล้วเลือก `LM Studio`:
 
@@ -59,21 +57,21 @@ export LM_API_TOKEN="placeholder-key"
 openclaw onboard
 ```
 
-5. ระหว่าง onboarding ให้ใช้พรอมต์ `Default model` เพื่อเลือกโมเดล LM Studio ของคุณ
+5. ระหว่าง onboarding ให้ใช้พรอมป์ `Default model` เพื่อเลือกโมเดล LM Studio ของคุณ
 
-คุณสามารถตั้งค่าหรือเปลี่ยนภายหลังได้เช่นกัน:
+คุณยังสามารถตั้งค่าหรือเปลี่ยนภายหลังได้:
 
 ```bash
 openclaw models set lmstudio/qwen/qwen3.5-9b
 ```
 
-คีย์โมเดลของ LM Studio ใช้รูปแบบ `author/model-name` (เช่น `qwen/qwen3.5-9b`) ส่วน ref
-ของโมเดลใน OpenClaw จะเติมชื่อ provider นำหน้าเป็น `lmstudio/qwen/qwen3.5-9b` คุณสามารถดูคีย์ที่แน่นอนของ
+คีย์โมเดลของ LM Studio ใช้รูปแบบ `author/model-name` (เช่น `qwen/qwen3.5-9b`) ส่วน
+model ref ของ OpenClaw จะเติมชื่อ provider ไว้ด้านหน้า: `lmstudio/qwen/qwen3.5-9b` คุณสามารถดูคีย์ที่ตรงตัวของ
 โมเดลได้โดยรัน `curl http://localhost:1234/api/v1/models` แล้วดูฟิลด์ `key`
 
-## onboarding แบบไม่โต้ตอบ
+## Onboarding แบบไม่โต้ตอบ
 
-ใช้ onboarding แบบไม่โต้ตอบเมื่อคุณต้องการสคริปต์การตั้งค่า (CI, provisioning, remote bootstrap):
+ใช้ onboarding แบบไม่โต้ตอบเมื่อคุณต้องการทำสคริปต์สำหรับการตั้งค่า (CI, provisioning, remote bootstrap):
 
 ```bash
 openclaw onboard \
@@ -94,28 +92,28 @@ openclaw onboard \
   --custom-model-id qwen/qwen3.5-9b
 ```
 
-`--custom-model-id` รับคีย์โมเดลตามที่ LM Studio ส่งกลับมา (เช่น `qwen/qwen3.5-9b`) โดยไม่ต้องมี
-prefix `lmstudio/` ของ provider
+`--custom-model-id` รับค่าเป็น model key ตามที่ LM Studio ส่งกลับมา (เช่น `qwen/qwen3.5-9b`) โดยไม่ต้องมี
+prefix `lmstudio/` ด้านหน้า
 
 onboarding แบบไม่โต้ตอบต้องใช้ `--lmstudio-api-key` (หรือ `LM_API_TOKEN` ใน env)
-สำหรับเซิร์ฟเวอร์ LM Studio ที่ไม่ต้องยืนยันตัวตน ค่า token ที่ไม่ว่างค่าใดก็ได้สามารถใช้ได้
+สำหรับเซิร์ฟเวอร์ LM Studio ที่ไม่ใช้การยืนยันตัวตน ค่าโทเค็นใด ๆ ที่ไม่ว่างก็ใช้ได้
 
-`--custom-api-key` ยังรองรับอยู่เพื่อความเข้ากันได้ แต่สำหรับ LM Studio แนะนำให้ใช้ `--lmstudio-api-key`
+`--custom-api-key` ยังคงรองรับเพื่อความเข้ากันได้ แต่ `--lmstudio-api-key` เป็นตัวเลือกที่ควรใช้สำหรับ LM Studio
 
-การดำเนินการนี้จะเขียน `models.providers.lmstudio` ตั้งค่าโมเดลเริ่มต้นเป็น
-`lmstudio/<custom-model-id>` และเขียนโปรไฟล์ยืนยันตัวตน `lmstudio:default`
+สิ่งนี้จะเขียน `models.providers.lmstudio`, ตั้งค่าโมเดลเริ่มต้นเป็น
+`lmstudio/<custom-model-id>` และเขียน auth profile `lmstudio:default`
 
-การตั้งค่าแบบโต้ตอบสามารถถามค่าความยาวบริบทการโหลดที่ต้องการแบบเลือกได้ และจะนำไปใช้กับโมเดล LM Studio ที่ตรวจพบซึ่งถูกบันทึกลงคอนฟิก
+การตั้งค่าแบบโต้ตอบสามารถพรอมป์ถาม preferred load context length แบบไม่บังคับ และจะนำค่าไปใช้กับโมเดล LM Studio ที่ค้นพบซึ่งบันทึกลงในคอนฟิก
 
 ## การกำหนดค่า
 
-### ความเข้ากันได้ของการรายงาน usage ระหว่างสตรีม
+### ความเข้ากันได้ของ streaming usage
 
-LM Studio เข้ากันได้กับการรายงาน usage ระหว่างสตรีม เมื่อไม่ส่งออบเจ็กต์ `usage` ที่มีรูปแบบแบบ OpenAI
-OpenClaw จะกู้คืนจำนวนโทเค็นจาก metadata แบบ llama.cpp
+LM Studio เข้ากันได้กับ streaming-usage เมื่อมันไม่ส่ง
+ออบเจ็กต์ `usage` ในรูปแบบ OpenAI OpenClaw จะกู้คืนจำนวนโทเค็นจาก metadata แบบ llama.cpp
 `timings.prompt_n` / `timings.predicted_n` แทน
 
-พฤติกรรมเดียวกันนี้ใช้กับแบ็กเอนด์ภายในเครื่องแบบเข้ากันได้กับ OpenAI ต่อไปนี้:
+พฤติกรรมเดียวกันนี้ใช้กับแบ็กเอนด์ local ที่เข้ากันได้กับ OpenAI ต่อไปนี้ด้วย:
 
 - vLLM
 - SGLang
@@ -125,7 +123,7 @@ OpenClaw จะกู้คืนจำนวนโทเค็นจาก meta
 - TabbyAPI
 - text-generation-webui
 
-### การกำหนดค่าแบบชัดเจน
+### การกำหนดค่าแบบ explicit
 
 ```json5
 {
@@ -152,14 +150,14 @@ OpenClaw จะกู้คืนจำนวนโทเค็นจาก meta
 }
 ```
 
-## การแก้ไขปัญหา
+## การแก้ปัญหา
 
 ### ตรวจไม่พบ LM Studio
 
-ตรวจสอบให้แน่ใจว่า LM Studio กำลังทำงานอยู่ และคุณได้ตั้งค่า `LM_API_TOKEN` แล้ว (สำหรับเซิร์ฟเวอร์ที่ไม่ต้องยืนยันตัวตน ค่า token ที่ไม่ว่างค่าใดก็ได้ใช้ได้):
+ตรวจสอบว่า LM Studio กำลังทำงานอยู่ และคุณได้ตั้งค่า `LM_API_TOKEN` แล้ว (สำหรับเซิร์ฟเวอร์ที่ไม่ใช้การยืนยันตัวตน ค่าโทเค็นใด ๆ ที่ไม่ว่างก็ใช้ได้):
 
 ```bash
-# เริ่มผ่านแอปเดสก์ท็อป หรือแบบ headless:
+# Start via desktop app, or headless:
 lms server start --port 1234
 ```
 
@@ -169,14 +167,20 @@ lms server start --port 1234
 curl http://localhost:1234/api/v1/models
 ```
 
-### ข้อผิดพลาดการยืนยันตัวตน (HTTP 401)
+### ข้อผิดพลาดด้านการยืนยันตัวตน (HTTP 401)
 
 หากการตั้งค่ารายงาน HTTP 401 ให้ตรวจสอบ API key ของคุณ:
 
-- ตรวจสอบว่า `LM_API_TOKEN` ตรงกับคีย์ที่ตั้งค่าไว้ใน LM Studio
-- สำหรับรายละเอียดการตั้งค่าการยืนยันตัวตนของ LM Studio ดู [LM Studio Authentication](https://lmstudio.ai/docs/developer/core/authentication)
-- หากเซิร์ฟเวอร์ของคุณไม่ต้องใช้การยืนยันตัวตน ให้ใช้ค่า token ที่ไม่ว่างค่าใดก็ได้สำหรับ `LM_API_TOKEN`
+- ตรวจสอบว่า `LM_API_TOKEN` ตรงกับคีย์ที่กำหนดไว้ใน LM Studio
+- สำหรับรายละเอียดการตั้งค่า auth ของ LM Studio โปรดดู [LM Studio Authentication](https://lmstudio.ai/docs/developer/core/authentication)
+- หากเซิร์ฟเวอร์ของคุณไม่ต้องใช้การยืนยันตัวตน ให้ใช้ค่าโทเค็นใดก็ได้ที่ไม่ว่างสำหรับ `LM_API_TOKEN`
 
-### การโหลดโมเดลแบบทันเวลาพอดี
+### การโหลดโมเดลแบบ just-in-time
 
-LM Studio รองรับการโหลดโมเดลแบบทันเวลาพอดี (JIT) ซึ่งโมเดลจะถูกโหลดเมื่อมีคำขอครั้งแรก ตรวจสอบให้แน่ใจว่าคุณเปิดใช้งานสิ่งนี้เพื่อหลีกเลี่ยงข้อผิดพลาด 'Model not loaded'
+LM Studio รองรับการโหลดโมเดลแบบ just-in-time (JIT) ซึ่งโมเดลจะถูกโหลดเมื่อมีคำขอครั้งแรก ตรวจสอบให้แน่ใจว่าคุณเปิดใช้งานสิ่งนี้ไว้เพื่อหลีกเลี่ยงข้อผิดพลาด 'Model not loaded'
+
+## ที่เกี่ยวข้อง
+
+- [การเลือกโมเดล](/th/concepts/model-providers)
+- [Ollama](/th/providers/ollama)
+- [โมเดลในเครื่อง](/th/gateway/local-models)

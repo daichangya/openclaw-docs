@@ -1,22 +1,20 @@
 ---
 read_when:
-    - กำลังทำงานกับ reactions ในทุกช่องทาง to=functions.read commentary ￣第四色json  泰皇平台{"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-pr-maintainer/SKILL.md","offset":1,"limit":20} 天天中彩票被analysis to=functions.read 软件合法吗 კომენტary to=functions.read 】【。】【”】【json 毛片高清免费视频{"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-pr-maintainer/SKILL.md","offset":1,"limit":20}"}
-    - กำลังทำความเข้าใจว่า emoji reactions แตกต่างกันอย่างไรในแต่ละแพลตฟอร์ม
-summary: ความหมายของเครื่องมือ Reaction ในทุกช่องทางที่รองรับ
-title: Reactions
+    - 'การทำงานกับรีแอ็กชันในทุกช่องทางดลองใช้ฟรีanalysis to=final  content: Need translate. Keep English mandated terms maybe none. Output only translated text.'
+    - การทำความเข้าใจว่าการรีแอ็กด้วยอีโมจิแตกต่างกันอย่างไรในแต่ละแพลตฟอร์ม
+summary: semantics ของเครื่องมือรีแอ็กชันข้ามทุกช่องทางที่รองรับ
+title: รีแอ็กชัน
 x-i18n:
-    generated_at: "2026-04-23T06:03:02Z"
+    generated_at: "2026-04-24T09:38:16Z"
     model: gpt-5.4
     provider: openai
-    source_hash: cfac31b7f0effc89cc696e3cf34cd89503ccdbb28996723945025e4b6e159986
+    source_hash: 58d9a85114e715fd1813a4d662b02a6b8b9cad9a8eea9c63d024a933ba573a65
     source_path: tools/reactions.md
     workflow: 15
 ---
 
-# Reactions
-
-เอเจนต์สามารถเพิ่มและลบ emoji reactions บนข้อความได้โดยใช้เครื่องมือ `message`
-ร่วมกับ action `react` พฤติกรรมของ reaction จะแตกต่างกันไปตามแต่ละช่องทาง
+เอเจนต์สามารถเพิ่มและลบรีแอ็กชันอีโมจิบนข้อความได้โดยใช้เครื่องมือ `message`
+ร่วมกับ action `react` พฤติกรรมของรีแอ็กชันจะแตกต่างกันไปตามแต่ละช่องทาง
 
 ## วิธีการทำงาน
 
@@ -28,58 +26,58 @@ x-i18n:
 }
 ```
 
-- `emoji` จำเป็นเมื่อเพิ่ม reaction
-- ตั้ง `emoji` เป็นสตริงว่าง (`""`) เพื่อลบ reaction ของบอต
-- ตั้ง `remove: true` เพื่อลบ emoji ที่ระบุแบบเฉพาะเจาะจง (ต้องใช้ `emoji` ที่ไม่ว่าง)
+- `emoji` จำเป็นเมื่อเพิ่มรีแอ็กชัน
+- ตั้ง `emoji` เป็นสตริงว่าง (`""`) เพื่อลบรีแอ็กชันของบอต
+- ตั้ง `remove: true` เพื่อลบอีโมจิที่ระบุ (ต้องใช้ `emoji` ที่ไม่ว่าง)
 
-## พฤติกรรมของแต่ละช่องทาง
+## พฤติกรรมตามช่องทาง
 
 <AccordionGroup>
   <Accordion title="Discord และ Slack">
-    - `emoji` ที่ว่างจะลบ reactions ทั้งหมดของบอตบนข้อความนั้น
-    - `remove: true` จะลบเฉพาะ emoji ที่ระบุ
+    - `emoji` ว่างจะลบรีแอ็กชันทั้งหมดของบอตบนข้อความนั้น
+    - `remove: true` จะลบเฉพาะอีโมจิที่ระบุ
   </Accordion>
 
   <Accordion title="Google Chat">
-    - `emoji` ที่ว่างจะลบ reactions ของแอปบนข้อความนั้น
-    - `remove: true` จะลบเฉพาะ emoji ที่ระบุ
+    - `emoji` ว่างจะลบรีแอ็กชันของแอปบนข้อความนั้น
+    - `remove: true` จะลบเฉพาะอีโมจิที่ระบุ
   </Accordion>
 
   <Accordion title="Telegram">
-    - `emoji` ที่ว่างจะลบ reactions ของบอต
-    - `remove: true` ก็ใช้ลบ reactions เช่นกัน แต่ยังคงต้องใช้ `emoji` ที่ไม่ว่างเพื่อให้ผ่านการตรวจสอบของเครื่องมือ
+    - `emoji` ว่างจะลบรีแอ็กชันของบอต
+    - `remove: true` ก็ใช้ลบรีแอ็กชันเช่นกัน แต่ยังต้องใช้ `emoji` ที่ไม่ว่างสำหรับการตรวจสอบของเครื่องมือ
   </Accordion>
 
   <Accordion title="WhatsApp">
-    - `emoji` ที่ว่างจะลบ reaction ของบอต
-    - `remove: true` จะถูกแมปเป็น emoji ว่างภายใน (แต่ยังต้องใช้ `emoji` ในการเรียกใช้เครื่องมือ)
+    - `emoji` ว่างจะลบรีแอ็กชันของบอต
+    - `remove: true` จะถูกแมปภายในให้เป็นอีโมจิว่าง (แต่ยังต้องมี `emoji` ในการเรียกเครื่องมือ)
   </Accordion>
 
   <Accordion title="Zalo Personal (zalouser)">
     - ต้องใช้ `emoji` ที่ไม่ว่าง
-    - `remove: true` จะลบ reaction ของ emoji นั้นแบบเฉพาะเจาะจง
+    - `remove: true` จะลบรีแอ็กชันของอีโมจินั้นโดยเฉพาะ
   </Accordion>
 
   <Accordion title="Feishu/Lark">
-    - ใช้เครื่องมือ `feishu_reaction` พร้อม actions `add`, `remove` และ `list`
-    - การเพิ่ม/ลบต้องใช้ `emoji_type`; ส่วนการลบต้องใช้ `reaction_id` เพิ่มเติมด้วย
+    - ใช้เครื่องมือ `feishu_reaction` พร้อม action `add`, `remove` และ `list`
+    - การเพิ่ม/ลบต้องใช้ `emoji_type`; ส่วนการลบยังต้องใช้ `reaction_id` ด้วย
   </Accordion>
 
   <Accordion title="Signal">
-    - การแจ้งเตือน reaction ขาเข้าถูกควบคุมด้วย `channels.signal.reactionNotifications`: `"off"` จะปิดการแจ้งเตือน, `"own"` (ค่าเริ่มต้น) จะปล่อย events เมื่อผู้ใช้แสดง reaction ต่อข้อความของบอต และ `"all"` จะปล่อย events สำหรับ reactions ทั้งหมด
+    - การแจ้งเตือนรีแอ็กชันขาเข้าถูกควบคุมโดย `channels.signal.reactionNotifications`: `"off"` จะปิด, `"own"` (ค่าปริยาย) จะปล่อย event เมื่อผู้ใช้รีแอ็กกับข้อความของบอต และ `"all"` จะปล่อย event สำหรับรีแอ็กชันทั้งหมด
   </Accordion>
 </AccordionGroup>
 
-## ระดับของ Reaction
+## ระดับรีแอ็กชัน
 
-คอนฟิก `reactionLevel` แบบรายช่องทางควบคุมว่าเอเจนต์จะใช้ reactions กว้างแค่ไหน โดยค่าที่ใช้กันทั่วไปคือ `off`, `ack`, `minimal` หรือ `extensive`
+คอนฟิก `reactionLevel` รายช่องทางจะควบคุมว่าเอเจนต์ใช้รีแอ็กชันในวงกว้างแค่ไหน โดยค่าทั่วไปคือ `off`, `ack`, `minimal` หรือ `extensive`
 
 - [Telegram reactionLevel](/th/channels/telegram#reaction-notifications) — `channels.telegram.reactionLevel`
 - [WhatsApp reactionLevel](/th/channels/whatsapp#reaction-level) — `channels.whatsapp.reactionLevel`
 
-ตั้งค่า `reactionLevel` บนแต่ละช่องทางเพื่อปรับว่าเอเจนต์จะตอบสนองต่อข้อความบนแต่ละแพลตฟอร์มมากน้อยเพียงใด
+ตั้ง `reactionLevel` บนแต่ละช่องทางเพื่อปรับว่าเอเจนต์จะรีแอ็กกับข้อความบนแต่ละแพลตฟอร์มอย่างกระตือรือร้นเพียงใด
 
 ## ที่เกี่ยวข้อง
 
-- [Agent Send](/th/tools/agent-send) — เครื่องมือ `message` ที่มี `react`
-- [Channels](/th/channels) — การกำหนดค่าเฉพาะของช่องทาง
+- [Agent Send](/th/tools/agent-send) — เครื่องมือ `message` ที่รวม `react` ไว้
+- [Channels](/th/channels) — การกำหนดค่าเฉพาะของแต่ละช่องทาง

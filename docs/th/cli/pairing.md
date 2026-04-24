@@ -1,20 +1,20 @@
 ---
 read_when:
-    - คุณกำลังใช้ข้อความส่วนตัวใน pairing-mode และต้องอนุมัติผู้ส่ง
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw pairing` (อนุมัติ/แสดงรายการคำขอจับคู่)
-title: pairing
+    - คุณกำลังใช้ DM ในโหมดการจับคู่และต้องการอนุมัติผู้ส่ง
+summary: เอกสารอ้างอิง CLI สำหรับ `openclaw pairing` (อนุมัติ/แสดงรายการคำขอจับคู่)
+title: การจับคู่
 x-i18n:
-    generated_at: "2026-04-23T06:19:08Z"
+    generated_at: "2026-04-24T09:03:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 122a608ef83ec2b1011fdfd1b59b94950a4dcc8b598335b0956e2eedece4958f
+    source_hash: 9e81dc407138e958e41d565b0addb600ad1ba5187627bb219f0b85b92bd112d1
     source_path: cli/pairing.md
     workflow: 15
 ---
 
 # `openclaw pairing`
 
-อนุมัติหรือตรวจสอบคำขอจับคู่ DM (สำหรับ channel ที่รองรับการจับคู่)
+อนุมัติหรือตรวจสอบคำขอจับคู่ DM (สำหรับแชนแนลที่รองรับการจับคู่)
 
 ที่เกี่ยวข้อง:
 
@@ -34,39 +34,44 @@ openclaw pairing approve --channel telegram --account work <code> --notify
 
 ## `pairing list`
 
-แสดงรายการคำขอจับคู่ที่รอดำเนินการสำหรับหนึ่ง channel
+แสดงรายการคำขอจับคู่ที่รอดำเนินการสำหรับหนึ่งแชนแนล
 
 ตัวเลือก:
 
-- `[channel]`: ID ของ channel แบบ positional
-- `--channel <channel>`: ID ของ channel แบบระบุชัดเจน
-- `--account <accountId>`: ID ของบัญชีสำหรับ channel แบบหลายบัญชี
-- `--json`: เอาต์พุตที่เครื่องอ่านได้
+- `[channel]`: channel id แบบระบุตำแหน่ง
+- `--channel <channel>`: channel id แบบระบุชัดเจน
+- `--account <accountId>`: account id สำหรับแชนแนลแบบหลายบัญชี
+- `--json`: เอาต์พุตแบบ machine-readable
 
 หมายเหตุ:
 
-- หากมีการตั้งค่า channel ที่รองรับการจับคู่หลายรายการ คุณต้องระบุ channel ไม่ว่าจะในรูปแบบ positional หรือด้วย `--channel`
-- อนุญาตให้ใช้ channel ของ extension ได้ ตราบใดที่ ID ของ channel ถูกต้อง
+- หากมีหลายแชนแนลที่รองรับการจับคู่ถูกกำหนดค่าไว้ คุณต้องระบุแชนแนล ไม่ว่าจะเป็นแบบระบุตำแหน่งหรือด้วย `--channel`
+- อนุญาตให้ใช้ extension channels ได้ ตราบใดที่ channel id ถูกต้อง
 
 ## `pairing approve`
 
-อนุมัติรหัสจับคู่ที่รอดำเนินการและอนุญาตผู้ส่งนั้น
+อนุมัติรหัสการจับคู่ที่รอดำเนินการและอนุญาตผู้ส่งนั้น
 
 การใช้งาน:
 
 - `openclaw pairing approve <channel> <code>`
 - `openclaw pairing approve --channel <channel> <code>`
-- `openclaw pairing approve <code>` เมื่อมีการตั้งค่า channel ที่รองรับการจับคู่ไว้เพียงหนึ่งรายการเท่านั้น
+- `openclaw pairing approve <code>` เมื่อมีการกำหนดค่าแชนแนลที่รองรับการจับคู่ไว้เพียงหนึ่งแชนแนล
 
 ตัวเลือก:
 
-- `--channel <channel>`: ID ของ channel แบบระบุชัดเจน
-- `--account <accountId>`: ID ของบัญชีสำหรับ channel แบบหลายบัญชี
-- `--notify`: ส่งการยืนยันกลับไปยังผู้ร้องขอบน channel เดียวกัน
+- `--channel <channel>`: channel id แบบระบุชัดเจน
+- `--account <accountId>`: account id สำหรับแชนแนลแบบหลายบัญชี
+- `--notify`: ส่งการยืนยันกลับไปยังผู้ร้องขอบนแชนแนลเดียวกัน
 
 ## หมายเหตุ
 
-- อินพุต channel: ส่งแบบ positional (`pairing list telegram`) หรือด้วย `--channel <channel>`
-- `pairing list` รองรับ `--account <accountId>` สำหรับ channel แบบหลายบัญชี
+- อินพุตแชนแนล: ส่งแบบระบุตำแหน่ง (`pairing list telegram`) หรือด้วย `--channel <channel>`
+- `pairing list` รองรับ `--account <accountId>` สำหรับแชนแนลแบบหลายบัญชี
 - `pairing approve` รองรับ `--account <accountId>` และ `--notify`
-- หากมีการตั้งค่า channel ที่รองรับการจับคู่เพียงหนึ่งรายการ อนุญาตให้ใช้ `pairing approve <code>` ได้
+- หากมีการกำหนดค่าแชนแนลที่รองรับการจับคู่ไว้เพียงหนึ่งแชนแนล อนุญาตให้ใช้ `pairing approve <code>` ได้
+
+## ที่เกี่ยวข้อง
+
+- [CLI reference](/th/cli)
+- [Channel pairing](/th/channels/pairing)

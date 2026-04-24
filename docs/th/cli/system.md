@@ -1,32 +1,32 @@
 ---
 read_when:
-    - คุณต้องการเพิ่มเหตุการณ์ของระบบเข้าคิวโดยไม่ต้องสร้างงาน Cron【อ่านข้อความเต็มanalysis to=final code  sorry
-    - คุณต้องเปิดหรือปิด Heartbeat
-    - คุณต้องการตรวจสอบรายการการแสดงสถานะของระบบ
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw system` (เหตุการณ์ของระบบ, Heartbeat, การแสดงสถานะ)
-title: system
+    - คุณต้องการใส่ system event เข้าแถวโดยไม่สร้างงาน Cron
+    - คุณต้องการเปิดหรือปิด Heartbeat
+    - คุณต้องการตรวจสอบรายการ presence ของระบบ
+summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw system` (system events, Heartbeat, presence)
+title: ระบบ
 x-i18n:
-    generated_at: "2026-04-23T06:19:56Z"
+    generated_at: "2026-04-24T09:04:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a7d19afde9d9cde8a79b0bb8cec6e5673466f4cb9b575fb40111fc32f4eee5d7
+    source_hash: 0f4be30b0b2d18ee5653071d6375cebeb9fc94733e30bdb7b89a19c286df880b
     source_path: cli/system.md
     workflow: 15
 ---
 
 # `openclaw system`
 
-ตัวช่วยระดับระบบสำหรับ Gateway: เพิ่มเหตุการณ์ของระบบเข้าคิว ควบคุม Heartbeat
-และดูการแสดงสถานะ
+ตัวช่วยระดับระบบสำหรับ Gateway: ใส่ system events เข้าแถว ควบคุม Heartbeat
+และดู presence
 
-คำสั่งย่อย `system` ทั้งหมดใช้ Gateway RPC และรองรับแฟล็กไคลเอนต์ที่ใช้ร่วมกันดังนี้:
+subcommands ทั้งหมดของ `system` ใช้ Gateway RPC และรองรับแฟลกไคลเอนต์ที่ใช้ร่วมกัน:
 
 - `--url <url>`
 - `--token <token>`
 - `--timeout <ms>`
 - `--expect-final`
 
-## คำสั่งทั่วไป
+## คำสั่งที่ใช้บ่อย
 
 ```bash
 openclaw system event --text "Check for urgent follow-ups" --mode now
@@ -38,41 +38,45 @@ openclaw system presence
 
 ## `system event`
 
-เพิ่มเหตุการณ์ของระบบเข้าคิวในเซสชัน **main** Heartbeat ครั้งถัดไปจะฉีด
-เหตุการณ์นั้นเข้าไปเป็นบรรทัด `System:` ในพรอมป์ต์ ใช้ `--mode now` เพื่อทริกเกอร์ Heartbeat
-ทันที; `next-heartbeat` จะรอรอบ tick ที่กำหนดไว้ถัดไป
+ใส่ system event เข้าแถวใน session **หลัก** Heartbeat ครั้งถัดไปจะฉีด
+เหตุการณ์นี้เป็นบรรทัด `System:` ในพรอมป์ต์ ใช้ `--mode now` เพื่อทริกเกอร์ Heartbeat
+ทันที; `next-heartbeat` จะรอ tick ตามกำหนดครั้งถัดไป
 
-แฟล็ก:
+แฟลก:
 
-- `--text <text>`: ข้อความเหตุการณ์ของระบบที่จำเป็นต้องระบุ
+- `--text <text>`: ข้อความ system event ที่จำเป็น
 - `--mode <mode>`: `now` หรือ `next-heartbeat` (ค่าเริ่มต้น)
-- `--json`: เอาต์พุตที่เครื่องอ่านได้
-- `--url`, `--token`, `--timeout`, `--expect-final`: แฟล็ก Gateway RPC ที่ใช้ร่วมกัน
+- `--json`: เอาต์พุตแบบเครื่องอ่านได้
+- `--url`, `--token`, `--timeout`, `--expect-final`: แฟลก Gateway RPC ที่ใช้ร่วมกัน
 
 ## `system heartbeat last|enable|disable`
 
-การควบคุม Heartbeat:
+ตัวควบคุม Heartbeat:
 
 - `last`: แสดงเหตุการณ์ Heartbeat ล่าสุด
-- `enable`: เปิด Heartbeat กลับมาอีกครั้ง (ใช้เมื่อตอนก่อนหน้านี้ถูกปิดไว้)
+- `enable`: เปิด Heartbeat กลับมาอีกครั้ง (ใช้เมื่อถูกปิดไว้)
 - `disable`: หยุด Heartbeat ชั่วคราว
 
-แฟล็ก:
+แฟลก:
 
-- `--json`: เอาต์พุตที่เครื่องอ่านได้
-- `--url`, `--token`, `--timeout`, `--expect-final`: แฟล็ก Gateway RPC ที่ใช้ร่วมกัน
+- `--json`: เอาต์พุตแบบเครื่องอ่านได้
+- `--url`, `--token`, `--timeout`, `--expect-final`: แฟลก Gateway RPC ที่ใช้ร่วมกัน
 
 ## `system presence`
 
-แสดงรายการการแสดงสถานะของระบบปัจจุบันที่ Gateway รับรู้ (nodes,
-instances และบรรทัดสถานะที่คล้ายกัน)
+แสดงรายการ presence ของระบบปัจจุบันที่ Gateway รู้จัก (Nodes,
+instances และบรรทัดสถานะในลักษณะเดียวกัน)
 
-แฟล็ก:
+แฟลก:
 
-- `--json`: เอาต์พุตที่เครื่องอ่านได้
-- `--url`, `--token`, `--timeout`, `--expect-final`: แฟล็ก Gateway RPC ที่ใช้ร่วมกัน
+- `--json`: เอาต์พุตแบบเครื่องอ่านได้
+- `--url`, `--token`, `--timeout`, `--expect-final`: แฟลก Gateway RPC ที่ใช้ร่วมกัน
 
 ## หมายเหตุ
 
-- ต้องมี Gateway ที่กำลังทำงานและเข้าถึงได้ผ่าน config ปัจจุบันของคุณ (local หรือ remote)
-- เหตุการณ์ของระบบเป็นข้อมูลชั่วคราวและจะไม่ถูกเก็บคงไว้ข้ามการรีสตาร์ต
+- ต้องมี Gateway ที่กำลังรันและเข้าถึงได้ตาม config ปัจจุบันของคุณ (โลคัลหรือระยะไกล)
+- system events เป็นแบบชั่วคราวและจะไม่ถูกเก็บไว้ข้ามการรีสตาร์ต
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)

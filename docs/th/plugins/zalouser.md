@@ -1,14 +1,14 @@
 ---
 read_when:
     - คุณต้องการการรองรับ Zalo Personal (ไม่เป็นทางการ) ใน OpenClaw
-    - คุณกำลังกำหนดค่าหรือพัฒนา Plugin zalouser
-summary: 'Plugin Zalo Personal: การล็อกอินด้วย QR + การส่งข้อความผ่าน zca-js แบบเนทีฟ (การติดตั้ง Plugin + การกำหนดค่าช่องทาง + เครื่องมือ)'
+    - คุณกำลังกำหนดค่าหรือพัฒนา Plugin `zalouser`
+summary: 'Plugin Zalo Personal: การเข้าสู่ระบบด้วย QR + การรับส่งข้อความผ่าน zca-js แบบเนทีฟ (การติดตั้ง Plugin + การตั้งค่า channel + เครื่องมือ)'
 title: Plugin Zalo Personal
 x-i18n:
-    generated_at: "2026-04-23T05:49:42Z"
+    generated_at: "2026-04-24T09:26:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3218c3ee34f36466d952aec1b479d451a6235c7c46918beb28698234a7fd0968
+    source_hash: d678bd55fd405a9c689d1202870cc03bfb825a9314c433a0ab729d376e3b67a3
     source_path: plugins/zalouser.md
     workflow: 15
 ---
@@ -17,21 +17,21 @@ x-i18n:
 
 การรองรับ Zalo Personal สำหรับ OpenClaw ผ่าน Plugin โดยใช้ `zca-js` แบบเนทีฟเพื่อทำงานอัตโนมัติกับบัญชีผู้ใช้ Zalo ปกติ
 
-> **คำเตือน:** ระบบอัตโนมัติที่ไม่เป็นทางการอาจทำให้บัญชีถูกระงับ/แบน ใช้งานด้วยความเสี่ยงของคุณเอง
+> **คำเตือน:** การทำงานอัตโนมัติแบบไม่เป็นทางการอาจทำให้บัญชีถูกระงับ/แบน ใช้งานด้วยความเสี่ยงของคุณเอง
 
 ## การตั้งชื่อ
 
-id ของช่องทางคือ `zalouser` เพื่อให้ชัดเจนว่านี่คือการทำงานอัตโนมัติกับ **บัญชีผู้ใช้ Zalo ส่วนตัว** (ไม่เป็นทางการ) เราเก็บ `zalo` ไว้สำหรับการเชื่อมต่อ Zalo API แบบทางการที่อาจมีในอนาคต
+id ของ Channel คือ `zalouser` เพื่อให้ชัดเจนว่านี่คือการทำงานอัตโนมัติกับ **บัญชีผู้ใช้ Zalo ส่วนตัว** (ไม่เป็นทางการ) เราสงวน `zalo` ไว้สำหรับความเป็นไปได้ของการผสานรวมกับ API ทางการของ Zalo ในอนาคต
 
-## ตำแหน่งที่มันทำงาน
+## ทำงานที่ไหน
 
-Plugin นี้รัน **ภายในโปรเซส Gateway**
+Plugin นี้ทำงาน **ภายในโปรเซส Gateway**
 
-หากคุณใช้ Gateway แบบ remote ให้ติดตั้ง/กำหนดค่ามันบน **เครื่องที่รัน Gateway** จากนั้นรีสตาร์ต Gateway
+หากคุณใช้ Gateway ระยะไกล ให้ติดตั้ง/กำหนดค่าบน **เครื่องที่รัน Gateway** แล้วจึงรีสตาร์ต Gateway
 
-ไม่ต้องใช้ไบนารี CLI ภายนอกอย่าง `zca`/`openzca`
+ไม่จำเป็นต้องใช้ไบนารี CLI ภายนอก `zca`/`openzca`
 
-## การติดตั้ง
+## ติดตั้ง
 
 ### ตัวเลือก A: ติดตั้งจาก npm
 
@@ -53,7 +53,7 @@ cd "$PLUGIN_SRC" && pnpm install
 
 ## คอนฟิก
 
-คอนฟิกของช่องทางอยู่ภายใต้ `channels.zalouser` (ไม่ใช่ `plugins.entries.*`):
+คอนฟิก Channel อยู่ใต้ `channels.zalouser` (ไม่ใช่ `plugins.entries.*`):
 
 ```json5
 {
@@ -76,10 +76,15 @@ openclaw message send --channel zalouser --target <threadId> --message "Hello fr
 openclaw directory peers list --channel zalouser --query "name"
 ```
 
-## เครื่องมือของเอเจนต์
+## เครื่องมือเอเจนต์
 
 ชื่อเครื่องมือ: `zalouser`
 
-Actions: `send`, `image`, `link`, `friends`, `groups`, `me`, `status`
+แอ็กชัน: `send`, `image`, `link`, `friends`, `groups`, `me`, `status`
 
-การดำเนินการข้อความของช่องทางยังรองรับ `react` สำหรับการแสดงปฏิกิริยาต่อข้อความด้วย
+แอ็กชันข้อความของ Channel ยังรองรับ `react` สำหรับ reaction ของข้อความด้วย
+
+## ที่เกี่ยวข้อง
+
+- [Building plugins](/th/plugins/building-plugins)
+- [Community plugins](/th/plugins/community)

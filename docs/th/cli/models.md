@@ -1,27 +1,27 @@
 ---
 read_when:
-    - คุณต้องการเปลี่ยนโมเดลเริ่มต้นหรือดูสถานะ auth ของผู้ให้บริการ
-    - คุณต้องการสแกนโมเดล/ผู้ให้บริการที่ใช้งานได้และแก้ไขข้อบกพร่องของโปรไฟล์ auth
-summary: เอกสารอ้างอิง CLI สำหรับ `openclaw models` (status/list/set/scan, ชื่อแทน, fallback, auth)
-title: models
+    - คุณต้องการเปลี่ยนโมเดลเริ่มต้นหรือดูสถานะการยืนยันตัวตนของ provider
+    - คุณต้องการสแกนโมเดล/ provider ที่ใช้งานได้และแก้ปัญหาโปรไฟล์การยืนยันตัวตน
+summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw models` (status/list/set/scan, alias, fallback, auth)
+title: โมเดล
 x-i18n:
-    generated_at: "2026-04-23T10:16:35Z"
+    generated_at: "2026-04-24T09:03:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d4ba72ca8acb7cc31796c119fce3816e6a919eb28a4ed4b03664d3b222498f5a
+    source_hash: 08e04342ef240bf7a1f60c4d4e2667d17c9a97e985c1b170db8538c890dc8119
     source_path: cli/models.md
     workflow: 15
 ---
 
 # `openclaw models`
 
-การค้นหาโมเดล การสแกน และการกำหนดค่า (โมเดลเริ่มต้น, fallback, โปรไฟล์ auth)
+การค้นหา การสแกน และการกำหนดค่าโมเดล (โมเดลเริ่มต้น, fallback, โปรไฟล์การยืนยันตัวตน)
 
 ที่เกี่ยวข้อง:
 
-- ผู้ให้บริการ + โมเดล: [Models](/th/providers/models)
-- แนวคิดการเลือกโมเดล + slash command `/models`: [แนวคิดเรื่อง Models](/th/concepts/models)
-- การตั้งค่า auth ของผู้ให้บริการ: [เริ่มต้นใช้งาน](/th/start/getting-started)
+- Provider + โมเดล: [Models](/th/providers/models)
+- แนวคิดการเลือกโมเดล + คำสั่ง slash `/models`: [แนวคิดเกี่ยวกับโมเดล](/th/concepts/models)
+- การตั้งค่าการยืนยันตัวตนของ provider: [เริ่มต้นใช้งาน](/th/start/getting-started)
 
 ## คำสั่งที่ใช้บ่อย
 
@@ -32,38 +32,40 @@ openclaw models set <model-or-alias>
 openclaw models scan
 ```
 
-`openclaw models status` จะแสดงค่าเริ่มต้น/fallback ที่ resolve แล้ว พร้อมภาพรวม auth
-เมื่อมีสแนปช็อตการใช้งานของผู้ให้บริการ ส่วนสถานะ OAuth/API key จะรวม
-หน้าต่างการใช้งานของผู้ให้บริการและสแนปช็อตโควตาไว้ด้วย
-ผู้ให้บริการที่รองรับหน้าต่างการใช้งานในปัจจุบันคือ: Anthropic, GitHub Copilot, Gemini CLI, OpenAI
-Codex, MiniMax, Xiaomi และ z.ai โดยข้อมูล auth สำหรับการใช้งานมาจาก hook
-เฉพาะของผู้ให้บริการเมื่อมี; มิฉะนั้น OpenClaw จะ fallback ไปจับคู่ข้อมูลรับรอง OAuth/API key
-จากโปรไฟล์ auth, env หรือคอนฟิก
-ในเอาต์พุต `--json`, `auth.providers` คือภาพรวมของผู้ให้บริการที่รับรู้ env/config/store
-ส่วน `auth.oauth` คือสถานะสุขภาพของโปรไฟล์ใน auth store เท่านั้น
-เพิ่ม `--probe` เพื่อรันการ probe auth แบบสดกับแต่ละโปรไฟล์ผู้ให้บริการที่กำหนดค่าไว้
-การ probe เป็นคำขอจริง (อาจใช้โทเค็นและทำให้ติด rate limit)
+`openclaw models status` จะแสดงค่า default/fallback ที่ resolve แล้ว พร้อมภาพรวมของการยืนยันตัวตน
+เมื่อมี snapshot การใช้งานของ provider พร้อมใช้งาน ส่วนสถานะ OAuth/API-key จะรวม
+ช่วงเวลาการใช้งานและ snapshot โควตาของ provider ด้วย
+ปัจจุบัน provider ที่มี usage window ได้แก่: Anthropic, GitHub Copilot, Gemini CLI, OpenAI
+Codex, MiniMax, Xiaomi และ z.ai ข้อมูลยืนยันตัวตนสำหรับ usage มาจาก hook เฉพาะของ provider
+เมื่อมี; หากไม่มี OpenClaw จะ fallback ไปจับคู่ข้อมูลรับรอง OAuth/API-key
+จาก auth profile, env หรือ config
+ในผลลัพธ์ `--json`, `auth.providers` คือภาพรวมของ provider ที่รับรู้ env/config/store
+ขณะที่ `auth.oauth` เป็นเฉพาะสุขภาพของโปรไฟล์ใน auth store เท่านั้น
+เพิ่ม `--probe` เพื่อรัน auth probe แบบ live กับแต่ละ provider profile ที่กำหนดค่าไว้
+probe เป็นคำขอจริง (อาจใช้โทเค็นและกระตุ้น rate limit)
 ใช้ `--agent <id>` เพื่อตรวจสอบสถานะ model/auth ของเอเจนต์ที่กำหนดค่าไว้ เมื่อไม่ระบุ
 คำสั่งจะใช้ `OPENCLAW_AGENT_DIR`/`PI_CODING_AGENT_DIR` หากมีการตั้งค่าไว้ มิฉะนั้นจะใช้
 เอเจนต์เริ่มต้นที่กำหนดค่าไว้
-แถวของ probe อาจมาจากโปรไฟล์ auth, ข้อมูลรับรองจาก env หรือ `models.json`
+แถวของ probe อาจมาจาก auth profile, ข้อมูลรับรองใน env หรือ `models.json`
 
 หมายเหตุ:
 
-- `models set <model-or-alias>` รองรับ `provider/model` หรือ alias
-- `models list --all` จะรวมแถวแค็ตตาล็อกคงที่ที่มากับผู้ให้บริการ แม้ว่า
-  คุณจะยังไม่ได้ยืนยันตัวตนกับผู้ให้บริการนั้นก็ตาม แถวเหล่านั้นยังคงแสดง
-  เป็น unavailable จนกว่าจะมีการกำหนดค่า auth ที่ตรงกัน
-- `models list --provider <id>` กรองตามรหัสผู้ให้บริการ เช่น `moonshot` หรือ
-  `openai-codex` โดยไม่รองรับป้ายชื่อที่ใช้แสดงจากตัวเลือกผู้ให้บริการแบบโต้ตอบ
+- `models set <model-or-alias>` รับค่าเป็น `provider/model` หรือ alias
+- `models list` เป็นแบบอ่านอย่างเดียว: มันอ่าน config, auth profile, สถานะแค็ตตาล็อก
+  ที่มีอยู่ และแถวแค็ตตาล็อกที่ provider เป็นเจ้าของ แต่จะไม่เขียนทับ
+  `models.json`
+- `models list --all` จะรวมแถว static catalog ที่ provider เป็นเจ้าของซึ่งมาพร้อมระบบด้วย
+  แม้ว่าคุณจะยังไม่ได้ยืนยันตัวตนกับ provider นั้นก็ตาม แถวเหล่านั้นยังคงแสดง
+  ว่าใช้งานไม่ได้จนกว่าจะมีการกำหนดค่าการยืนยันตัวตนที่ตรงกัน
+- `models list --provider <id>` ใช้กรองตาม provider id เช่น `moonshot` หรือ
+  `openai-codex` โดยไม่รับ label ที่ใช้แสดงผลจากตัวเลือก provider แบบโต้ตอบ
   เช่น `Moonshot AI`
-- การแยกวิเคราะห์ model ref จะตัดที่ `/` **ตัวแรก** หาก model ID มี `/` อยู่ด้วย (แบบ OpenRouter) ให้ใส่คำนำหน้าผู้ให้บริการด้วย (ตัวอย่าง: `openrouter/moonshotai/kimi-k2`)
-- หากไม่ระบุผู้ให้บริการ OpenClaw จะ resolve อินพุตเป็น alias ก่อน จากนั้น
-  เป็นรายการที่ตรงกันแบบไม่ซ้ำในผู้ให้บริการที่กำหนดค่าสำหรับ model id นั้นพอดี และหลังจากนั้นจึงค่อย fallback ไปยังผู้ให้บริการเริ่มต้นที่กำหนดค่าไว้พร้อมคำเตือนการเลิกใช้
-  หากผู้ให้บริการนั้นไม่ได้เปิดเผยโมเดลเริ่มต้นที่กำหนดค่าไว้อีกต่อไป OpenClaw
-  จะ fallback ไปยังผู้ให้บริการ/โมเดลรายการแรกที่กำหนดค่าไว้ แทนที่จะแสดง
-  ค่าเริ่มต้นเก่าของผู้ให้บริการที่ถูกลบออกไปแล้ว
-- `models status` อาจแสดง `marker(<value>)` ในเอาต์พุต auth สำหรับ placeholder ที่ไม่ใช่ความลับ (ตัวอย่างเช่น `OPENAI_API_KEY`, `secretref-managed`, `minimax-oauth`, `oauth:chutes`, `ollama-local`) แทนการปกปิดเป็นความลับ
+- การ parse model ref จะทำโดยแยกที่ `/` **ตัวแรก** หาก model ID มี `/` อยู่ด้วย (แบบ OpenRouter) ให้ใส่ provider prefix ด้วย (ตัวอย่าง: `openrouter/moonshotai/kimi-k2`)
+- หากคุณไม่ระบุ provider OpenClaw จะ resolve ข้อมูลนำเข้าดังกล่าวเป็น alias ก่อน จากนั้น
+  เป็นการจับคู่แบบไม่กำกวมกับ provider ที่กำหนดค่าไว้สำหรับ model id นั้นแบบตรงตัว และหลังจากนั้นเท่านั้นจึง fallback ไปยัง provider เริ่มต้นที่กำหนดค่าไว้พร้อมคำเตือนว่าเลิกใช้แล้ว
+  หาก provider นั้นไม่ได้เปิดเผยโมเดลเริ่มต้นที่กำหนดค่าไว้อีกต่อไป OpenClaw
+  จะ fallback ไปยัง provider/model รายการแรกที่กำหนดค่าไว้ แทนการแสดงค่าเริ่มต้นของ provider เก่าที่ถูกลบไปแล้ว
+- `models status` อาจแสดง `marker(<value>)` ในผลลัพธ์ auth สำหรับ placeholder ที่ไม่ใช่ความลับ (เช่น `OPENAI_API_KEY`, `secretref-managed`, `minimax-oauth`, `oauth:chutes`, `ollama-local`) แทนการ mask เป็นความลับ
 
 ### `models status`
 
@@ -72,13 +74,13 @@ Codex, MiniMax, Xiaomi และ z.ai โดยข้อมูล auth สำห
 - `--json`
 - `--plain`
 - `--check` (exit 1=หมดอายุ/ไม่มี, 2=ใกล้หมดอายุ)
-- `--probe` (probe แบบสดของโปรไฟล์ auth ที่กำหนดค่าไว้)
-- `--probe-provider <name>` (probe ผู้ให้บริการหนึ่งราย)
-- `--probe-profile <id>` (ระบุซ้ำหรือคั่นด้วยจุลภาคหลาย profile id)
+- `--probe` (probe แบบ live ของ auth profile ที่กำหนดค่าไว้)
+- `--probe-provider <name>` (probe provider เดียว)
+- `--probe-profile <id>` (ใช้ซ้ำได้หรือคั่นด้วย comma สำหรับหลาย profile id)
 - `--probe-timeout <ms>`
 - `--probe-concurrency <n>`
 - `--probe-max-tokens <n>`
-- `--agent <id>` (รหัสเอเจนต์ที่กำหนดค่าไว้; ใช้แทน `OPENCLAW_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
+- `--agent <id>` (id ของเอเจนต์ที่กำหนดค่าไว้; override `OPENCLAW_AGENT_DIR`/`PI_CODING_AGENT_DIR`)
 
 กลุ่มสถานะของ probe:
 
@@ -91,15 +93,15 @@ Codex, MiniMax, Xiaomi และ z.ai โดยข้อมูล auth สำห
 - `unknown`
 - `no_model`
 
-กรณีรายละเอียด/รหัสเหตุผลของ probe ที่ควรพบได้:
+กรณี detail/reason-code ของ probe ที่ควรคาดว่าจะพบ:
 
-- `excluded_by_auth_order`: มีโปรไฟล์ที่จัดเก็บไว้ แต่
-  `auth.order.<provider>` แบบระบุชัดเจนไม่ได้รวมโปรไฟล์นั้นไว้ ดังนั้น probe จะแสดงการยกเว้นแทน
+- `excluded_by_auth_order`: มี stored profile อยู่ แต่ `auth.order.<provider>` แบบ explicit
+  ไม่ได้รวมมันไว้ ดังนั้น probe จะรายงานการยกเว้นนี้แทน
   การลองใช้
 - `missing_credential`, `invalid_expires`, `expired`, `unresolved_ref`:
-  มีโปรไฟล์อยู่ แต่ยังไม่เข้าเกณฑ์/ไม่สามารถ resolve ได้
-- `no_model`: มี auth ของผู้ให้บริการ แต่ OpenClaw ไม่สามารถ resolve
-  โมเดลตัวเลือกที่ probe ได้สำหรับผู้ให้บริการนั้น
+  มี profile อยู่ แต่ยังไม่มีคุณสมบัติใช้งานหรือ resolve ไม่ได้
+- `no_model`: มีการยืนยันตัวตนของ provider อยู่ แต่ OpenClaw ไม่สามารถ resolve
+  candidate โมเดลที่ probe ได้สำหรับ provider นั้น
 
 ## Alias + fallback
 
@@ -108,7 +110,7 @@ openclaw models aliases list
 openclaw models fallbacks list
 ```
 
-## โปรไฟล์ auth
+## Auth profile
 
 ```bash
 openclaw models auth add
@@ -117,12 +119,12 @@ openclaw models auth setup-token --provider <id>
 openclaw models auth paste-token
 ```
 
-`models auth add` คือตัวช่วย auth แบบโต้ตอบ สามารถเปิดโฟลว์ auth ของผู้ให้บริการ
-(OAuth/API key) หรือนำทางคุณไปยังการวางโทเค็นด้วยตนเอง ขึ้นอยู่กับ
-ผู้ให้บริการที่คุณเลือก
+`models auth add` คือตัวช่วยการยืนยันตัวตนแบบโต้ตอบ มันสามารถเริ่มโฟลว์การยืนยันตัวตนของ provider
+(OAuth/API key) หรือแนะนำคุณไปยังการวางโทเค็นด้วยตนเอง ขึ้นอยู่กับ provider
+ที่คุณเลือก
 
-`models auth login` จะรันโฟลว์ auth ของ Plugin ผู้ให้บริการ (OAuth/API key) ใช้
-`openclaw plugins list` เพื่อดูว่ามีผู้ให้บริการใดติดตั้งอยู่บ้าง
+`models auth login` จะรันโฟลว์การยืนยันตัวตนของ provider plugin (OAuth/API key) ใช้
+`openclaw plugins list` เพื่อดูว่า provider ใดติดตั้งอยู่บ้าง
 
 ตัวอย่าง:
 
@@ -132,15 +134,21 @@ openclaw models auth login --provider openai-codex --set-default
 
 หมายเหตุ:
 
-- `setup-token` และ `paste-token` ยังคงเป็นคำสั่งโทเค็นทั่วไปสำหรับผู้ให้บริการ
-  ที่เปิดเผยวิธี auth แบบโทเค็น
-- `setup-token` ต้องใช้ TTY แบบโต้ตอบ และจะรันวิธี token-auth ของผู้ให้บริการ
-  (โดยค่าเริ่มต้นจะใช้วิธี `setup-token` ของผู้ให้บริการนั้นเมื่อมีการเปิดเผยไว้)
-- `paste-token` รองรับสตริงโทเค็นที่สร้างจากที่อื่นหรือจากระบบอัตโนมัติ
-- `paste-token` ต้องระบุ `--provider`, จะถามค่าโทเค็น และเขียน
-  ลงใน profile id เริ่มต้น `<provider>:manual` เว้นแต่คุณจะส่ง
+- `setup-token` และ `paste-token` ยังคงเป็นคำสั่งโทเค็นแบบทั่วไปสำหรับ provider
+  ที่เปิดเผยวิธีการยืนยันตัวตนด้วยโทเค็น
+- `setup-token` ต้องใช้ TTY แบบโต้ตอบ และจะรันวิธี token-auth ของ provider
+  (โดยใช้วิธี `setup-token` ของ provider นั้นเป็นค่าปริยาย เมื่อ provider เปิดเผยวิธีนี้ไว้)
+- `paste-token` รับสตริงโทเค็นที่สร้างจากที่อื่นหรือจากระบบอัตโนมัติ
+- `paste-token` ต้องใช้ `--provider`, จะพรอมป์ให้ใส่ค่าโทเค็น และเขียน
+  ไปยัง profile id ค่าปริยาย `<provider>:manual` เว้นแต่คุณจะส่ง
   `--profile-id`
-- `paste-token --expires-in <duration>` จะจัดเก็บเวลาหมดอายุแบบ absolute ของโทเค็นจาก
-  duration แบบสัมพัทธ์ เช่น `365d` หรือ `12h`
-- หมายเหตุสำหรับ Anthropic: ทีมงาน Anthropic แจ้งเราว่าการใช้งาน Claude CLI แบบ OpenClaw ได้รับอนุญาตอีกครั้ง ดังนั้น OpenClaw จึงถือว่าการใช้ Claude CLI ซ้ำและการใช้ `claude -p` เป็นวิธีที่ได้รับอนุญาตสำหรับการผสานรวมนี้ เว้นแต่ Anthropic จะเผยแพร่นโยบายใหม่
-- `setup-token` / `paste-token` ของ Anthropic ยังคงพร้อมใช้งานในฐานะเส้นทางโทเค็นที่รองรับของ OpenClaw แต่ตอนนี้ OpenClaw จะให้ความสำคัญกับการใช้ Claude CLI ซ้ำและ `claude -p` ก่อนเมื่อพร้อมใช้งาน
+- `paste-token --expires-in <duration>` จะจัดเก็บเวลาหมดอายุของโทเค็นแบบสัมบูรณ์จาก
+  ระยะเวลาแบบสัมพัทธ์ เช่น `365d` หรือ `12h`
+- หมายเหตุเกี่ยวกับ Anthropic: พนักงานของ Anthropic แจ้งเราว่าการใช้งาน Claude CLI แบบ OpenClaw ได้รับอนุญาตอีกครั้ง ดังนั้น OpenClaw จึงถือว่าการใช้ Claude CLI ซ้ำและการใช้ `claude -p` ได้รับอนุญาตสำหรับการเชื่อมต่อนี้ เว้นแต่ Anthropic จะเผยแพร่นโยบายใหม่
+- `setup-token` / `paste-token` ของ Anthropic ยังคงใช้งานได้เป็นเส้นทางโทเค็นที่ OpenClaw รองรับ แต่ตอนนี้ OpenClaw จะให้ความสำคัญกับการใช้ Claude CLI ซ้ำและ `claude -p` เมื่อมี
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)
+- [การเลือกโมเดล](/th/concepts/model-providers)
+- [Model failover](/th/concepts/model-failover)

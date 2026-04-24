@@ -1,21 +1,19 @@
 ---
 read_when:
-    - คุณต้องการตรวจสอบ ตรวจประเมิน หรือยกเลิกรายการงานเบื้องหลัง
-    - คุณกำลังจัดทำเอกสารคำสั่ง TaskFlow ภายใต้ `openclaw tasks flow`
-summary: เอกสารอ้างอิง CLI สำหรับ `openclaw tasks` (บัญชีงานเบื้องหลังและสถานะ TaskFlow)
+    - คุณต้องการตรวจสอบ ตรวจสอบย้อนหลัง หรือยกเลิกระเบียนงานเบื้องหลัง
+    - คุณกำลังจัดทำเอกสารคำสั่ง Task Flow ภายใต้ `openclaw tasks flow`
+summary: เอกสารอ้างอิง CLI สำหรับ `openclaw tasks` (บัญชีรายการงานเบื้องหลังและสถานะ Task Flow)
 title: '`openclaw tasks`'
 x-i18n:
-    generated_at: "2026-04-23T06:19:53Z"
+    generated_at: "2026-04-24T09:04:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 549e07c8a576cb4c5bd48874f16b0daa4a34facb53b102e12d358bdad2191628
+    source_hash: 55aab29821578bf8c09e1b6cd5bbeb5e3dae4438e453b418fa7e8420412c8152
     source_path: cli/tasks.md
     workflow: 15
 ---
 
-# `openclaw tasks`
-
-ตรวจสอบงานเบื้องหลังแบบคงทนและสถานะ TaskFlow เมื่อไม่มีคำสั่งย่อย
+ตรวจสอบงานเบื้องหลังแบบคงทนและสถานะ Task Flow โดยเมื่อไม่มี subcommand
 `openclaw tasks` จะเทียบเท่ากับ `openclaw tasks list`
 
 ดู [งานเบื้องหลัง](/th/automation/tasks) สำหรับวงจรชีวิตและโมเดลการส่งมอบ
@@ -52,7 +50,7 @@ openclaw tasks flow cancel <lookup>
 openclaw tasks list [--runtime <name>] [--status <name>] [--json]
 ```
 
-แสดงรายการงานเบื้องหลังที่ติดตามไว้ โดยเรียงจากใหม่สุดก่อน
+แสดงรายการงานเบื้องหลังที่ติดตามไว้ โดยเรียงจากใหม่ไปเก่า
 
 ### `show`
 
@@ -60,7 +58,7 @@ openclaw tasks list [--runtime <name>] [--status <name>] [--json]
 openclaw tasks show <lookup> [--json]
 ```
 
-แสดงงานหนึ่งรายการตาม task ID, run ID หรือ session key
+แสดง task หนึ่งรายการตาม task ID, run ID หรือ session key
 
 ### `notify`
 
@@ -68,7 +66,7 @@ openclaw tasks show <lookup> [--json]
 openclaw tasks notify <lookup> <done_only|state_changes|silent>
 ```
 
-เปลี่ยนนโยบายการแจ้งเตือนสำหรับงานที่กำลังทำงานอยู่
+เปลี่ยนนโยบายการแจ้งเตือนสำหรับ task ที่กำลังทำงานอยู่
 
 ### `cancel`
 
@@ -84,7 +82,7 @@ openclaw tasks cancel <lookup>
 openclaw tasks audit [--severity <warn|error>] [--code <name>] [--limit <n>] [--json]
 ```
 
-แสดงรายการงานและระเบียน TaskFlow ที่เก่า สูญหาย ส่งมอบล้มเหลว หรือไม่สอดคล้องกันในลักษณะอื่น
+แสดงระเบียน task และ Task Flow ที่ค้าง สูญหาย ส่งมอบล้มเหลว หรือไม่สอดคล้องกันในลักษณะอื่น
 
 ### `maintenance`
 
@@ -92,7 +90,7 @@ openclaw tasks audit [--severity <warn|error>] [--code <name>] [--limit <n>] [--
 openclaw tasks maintenance [--apply] [--json]
 ```
 
-แสดงตัวอย่างหรือปรับใช้การกระทบยอด การประทับตราการล้างข้อมูล และการตัดทอนของงานและ TaskFlow
+แสดงตัวอย่างหรือปรับใช้การกระทบยอด Task และ Task Flow การประทับตราการล้างข้อมูล และการตัดทิ้ง
 
 ### `flow`
 
@@ -102,4 +100,9 @@ openclaw tasks flow show <lookup> [--json]
 openclaw tasks flow cancel <lookup>
 ```
 
-ตรวจสอบหรือยกเลิกสถานะ TaskFlow แบบคงทนภายใต้บัญชีงาน
+ตรวจสอบหรือยกเลิกสถานะ Task Flow แบบคงทนภายใต้บัญชีรายการ task
+
+## ที่เกี่ยวข้อง
+
+- [เอกสารอ้างอิง CLI](/th/cli)
+- [งานเบื้องหลัง](/th/automation/tasks)

@@ -1,29 +1,27 @@
 ---
 read_when:
-    - คุณต้องเรียกใช้ตัวช่วยของแกนหลักจาก Plugin (TTS, STT, การสร้างภาพ, การค้นหาเว็บ, subagent)
-    - คุณต้องการเข้าใจว่า `api.runtime` เปิดเผยอะไรบ้าง
+    - คุณต้องเรียกใช้ตัวช่วยของ core จาก Plugin (TTS, STT, การสร้างภาพ, การค้นหาเว็บ, subagent, Node)
+    - คุณต้องการทำความเข้าใจว่า `api.runtime` เปิดเผยอะไรบ้าง
     - คุณกำลังเข้าถึงตัวช่วยด้านคอนฟิก เอเจนต์ หรือสื่อจากโค้ด Plugin
 sidebarTitle: Runtime Helpers
-summary: api.runtime -- ตัวช่วย runtime ที่ถูก inject และพร้อมใช้งานสำหรับ Plugins
-title: ตัวช่วย Plugin Runtime
+summary: api.runtime -- ตัวช่วยรันไทม์ที่ถูกฉีดเข้ามาและพร้อมให้ Plugin ใช้งาน
+title: ตัวช่วยรันไทม์ของ Plugin
 x-i18n:
-    generated_at: "2026-04-23T05:48:16Z"
+    generated_at: "2026-04-24T09:25:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c77a6e9cd48c84affa17dce684bbd0e072c8b63485e4a5d569f3793a4ea4f9c8
+    source_hash: 2327bdabc0dc1e05000ff83e507007fadff2698cceaae0d4a3e7bc4885440c55
     source_path: plugins/sdk-runtime.md
     workflow: 15
 ---
 
-# ตัวช่วย Plugin Runtime
-
-เอกสารอ้างอิงสำหรับออบเจ็กต์ `api.runtime` ที่ถูก inject เข้าไปในทุก Plugin ระหว่างการ
-ลงทะเบียน ใช้ตัวช่วยเหล่านี้แทนการ import internals ของโฮสต์โดยตรง
+ข้อมูลอ้างอิงสำหรับออบเจ็กต์ `api.runtime` ที่ถูกฉีดเข้าไปในทุก Plugin ระหว่างการลงทะเบียน
+ให้ใช้ตัวช่วยเหล่านี้แทนการ import ส่วนภายในของโฮสต์โดยตรง
 
 <Tip>
-  **กำลังมองหาคำอธิบายแบบ walkthrough อยู่หรือไม่?** ดู [Channel Plugins](/th/plugins/sdk-channel-plugins)
+  **กำลังมองหาคำแนะนำแบบเป็นขั้นตอนอยู่หรือไม่?** ดู [Channel Plugins](/th/plugins/sdk-channel-plugins)
   หรือ [Provider Plugins](/th/plugins/sdk-provider-plugins) สำหรับคู่มือแบบทีละขั้นตอน
-  ที่แสดงตัวช่วยเหล่านี้ในบริบทการใช้งานจริง
+  ที่แสดงการใช้ตัวช่วยเหล่านี้ในบริบทจริง
 </Tip>
 
 ```typescript
@@ -32,32 +30,32 @@ register(api) {
 }
 ```
 
-## namespaces ของ Runtime
+## namespace ของรันไทม์
 
 ### `api.runtime.agent`
 
-ตัวตนของเอเจนต์ ไดเรกทอรี และการจัดการ session
+อัตลักษณ์เอเจนต์, ไดเรกทอรี และการจัดการเซสชัน
 
 ```typescript
-// Resolve ไดเรกทอรีทำงานของเอเจนต์
+// Resolve the agent's working directory
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 
-// Resolve workspace ของเอเจนต์
+// Resolve agent workspace
 const workspaceDir = api.runtime.agent.resolveAgentWorkspaceDir(cfg);
 
-// ดึงตัวตนของเอเจนต์
+// Get agent identity
 const identity = api.runtime.agent.resolveAgentIdentity(cfg);
 
-// ดึงระดับการคิดค่าเริ่มต้น
+// Get default thinking level
 const thinking = api.runtime.agent.resolveThinkingDefault(cfg, provider, model);
 
-// ดึง timeout ของเอเจนต์
+// Get agent timeout
 const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 
-// ตรวจให้แน่ใจว่า workspace มีอยู่
+// Ensure workspace exists
 await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-// รัน embedded agent turn
+// Run an embedded agent turn
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 const result = await api.runtime.agent.runEmbeddedAgent({
   sessionId: "my-plugin:task-1",
@@ -69,13 +67,13 @@ const result = await api.runtime.agent.runEmbeddedAgent({
 });
 ```
 
-`runEmbeddedAgent(...)` เป็นตัวช่วยแบบเป็นกลางสำหรับการเริ่ม OpenClaw
-agent turn ปกติจากโค้ด Plugin มันใช้การ resolve provider/model และ
-agent-harness แบบเดียวกับที่การตอบกลับซึ่งถูกทริกเกอร์จากช่องทางใช้งาน
+`runEmbeddedAgent(...)` คือตัวช่วยแบบเป็นกลางสำหรับเริ่มเทิร์นเอเจนต์ OpenClaw
+ปกติจากโค้ด Plugin โดยจะใช้การ resolve ผู้ให้บริการ/โมเดลและ
+การเลือก agent harness แบบเดียวกับการตอบกลับที่ถูกกระตุ้นจาก channel
 
-`runEmbeddedPiAgent(...)` ยังคงอยู่เป็น compatibility alias
+`runEmbeddedPiAgent(...)` ยังคงมีอยู่ในฐานะ alias เพื่อความเข้ากันได้
 
-**ตัวช่วยสำหรับ session store** อยู่ภายใต้ `api.runtime.agent.session`:
+**ตัวช่วย session store** อยู่ภายใต้ `api.runtime.agent.session`:
 
 ```typescript
 const storePath = api.runtime.agent.session.resolveStorePath(cfg);
@@ -95,28 +93,28 @@ const provider = api.runtime.agent.defaults.provider; // เช่น "anthropic
 
 ### `api.runtime.subagent`
 
-เปิดและจัดการการรัน subagent แบบเบื้องหลัง
+เปิดใช้งานและจัดการการรัน subagent แบบเบื้องหลัง
 
 ```typescript
-// เริ่มการรัน subagent
+// Start a subagent run
 const { runId } = await api.runtime.subagent.run({
   sessionKey: "agent:main:subagent:search-helper",
   message: "Expand this query into focused follow-up searches.",
-  provider: "openai", // override แบบไม่บังคับ
-  model: "gpt-4.1-mini", // override แบบไม่บังคับ
+  provider: "openai", // optional override
+  model: "gpt-4.1-mini", // optional override
   deliver: false,
 });
 
-// รอจนเสร็จ
+// Wait for completion
 const result = await api.runtime.subagent.waitForRun({ runId, timeoutMs: 30000 });
 
-// อ่านข้อความใน session
+// Read session messages
 const { messages } = await api.runtime.subagent.getSessionMessages({
   sessionKey: "agent:main:subagent:search-helper",
   limit: 10,
 });
 
-// ลบ session
+// Delete a session
 await api.runtime.subagent.deleteSession({
   sessionKey: "agent:main:subagent:search-helper",
 });
@@ -125,13 +123,34 @@ await api.runtime.subagent.deleteSession({
 <Warning>
   การ override โมเดล (`provider`/`model`) ต้องได้รับการ opt-in จาก operator ผ่าน
   `plugins.entries.<id>.subagent.allowModelOverride: true` ในคอนฟิก
-  Plugins ที่ไม่น่าเชื่อถือยังสามารถรัน subagents ได้ แต่คำขอ override จะถูกปฏิเสธ
+  Plugin ที่ไม่น่าเชื่อถือยังคงรัน subagent ได้ แต่คำขอ override จะถูกปฏิเสธ
 </Warning>
+
+### `api.runtime.nodes`
+
+แสดงรายการ Node ที่เชื่อมต่ออยู่และเรียกใช้คำสั่งของโฮสต์ Node จากโค้ด Plugin
+ที่โหลดโดย Gateway ใช้สิ่งนี้เมื่อ Plugin เป็นเจ้าของงานภายในเครื่องบนอุปกรณ์ที่จับคู่ไว้
+เช่น browser หรือ audio bridge บน Mac อีกเครื่อง
+
+```typescript
+const { nodes } = await api.runtime.nodes.list({ connected: true });
+
+const result = await api.runtime.nodes.invoke({
+  nodeId: "mac-studio",
+  command: "my-plugin.command",
+  params: { action: "start" },
+  timeoutMs: 30000,
+});
+```
+
+รันไทม์นี้พร้อมใช้งานเฉพาะภายใน Gateway เท่านั้น
+คำสั่งของ Node ยังคงผ่านการจับคู่ Node ของ Gateway ตามปกติ, allowlist ของคำสั่ง
+และการจัดการคำสั่งภายในเครื่องของ Node
 
 ### `api.runtime.taskFlow`
 
-ผูก TaskFlow runtime เข้ากับ OpenClaw session key ที่มีอยู่แล้ว หรือ trusted tool
-context จากนั้นสร้างและจัดการ TaskFlow โดยไม่ต้องส่ง owner ในทุกการเรียก
+ผูกรันไทม์ TaskFlow เข้ากับ session key ของ OpenClaw ที่มีอยู่
+หรือบริบทเครื่องมือที่เชื่อถือได้ แล้วจึงสร้างและจัดการ TaskFlow โดยไม่ต้องส่ง owner ทุกครั้งที่เรียก
 
 ```typescript
 const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
@@ -158,74 +177,74 @@ const waiting = taskFlow.setWaiting({
 });
 ```
 
-ใช้ `bindSession({ sessionKey, requesterOrigin })` เมื่อคุณมี
-OpenClaw session key ที่เชื่อถือได้อยู่แล้วจาก binding layer ของคุณเอง อย่าผูกจาก raw
-user input
+ใช้ `bindSession({ sessionKey, requesterOrigin })` เมื่อคุณมี session key
+ของ OpenClaw ที่เชื่อถือได้จากเลเยอร์การผูกของคุณเองอยู่แล้ว
+อย่าผูกจากอินพุตดิบของผู้ใช้
 
 ### `api.runtime.tts`
 
-การสังเคราะห์เสียงจากข้อความ
+การสังเคราะห์ข้อความเป็นเสียงพูด
 
 ```typescript
-// TTS แบบมาตรฐาน
+// Standard TTS
 const clip = await api.runtime.tts.textToSpeech({
   text: "Hello from OpenClaw",
   cfg: api.config,
 });
 
-// TTS ที่ปรับให้เหมาะกับระบบโทรศัพท์
+// Telephony-optimized TTS
 const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
   text: "Hello from OpenClaw",
   cfg: api.config,
 });
 
-// แสดงรายการเสียงที่ใช้ได้
+// List available voices
 const voices = await api.runtime.tts.listVoices({
   provider: "elevenlabs",
   cfg: api.config,
 });
 ```
 
-ใช้การกำหนดค่า `messages.tts` และการเลือกผู้ให้บริการจากแกนหลัก คืนค่า PCM audio
-buffer + sample rate
+ใช้คอนฟิก `messages.tts` และการเลือกผู้ให้บริการจาก core
+ส่งกลับบัฟเฟอร์เสียง PCM + sample rate
 
 ### `api.runtime.mediaUnderstanding`
 
-การวิเคราะห์รูปภาพ เสียง และวิดีโอ
+การวิเคราะห์ภาพ เสียง และวิดีโอ
 
 ```typescript
-// อธิบายรูปภาพ
+// Describe an image
 const image = await api.runtime.mediaUnderstanding.describeImageFile({
   filePath: "/tmp/inbound-photo.jpg",
   cfg: api.config,
   agentDir: "/tmp/agent",
 });
 
-// ถอดเสียงจากไฟล์เสียง
+// Transcribe audio
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  mime: "audio/ogg", // ไม่บังคับ ใช้เมื่อไม่สามารถอนุมาน MIME ได้
+  mime: "audio/ogg", // optional, for when MIME cannot be inferred
 });
 
-// อธิบายวิดีโอ
+// Describe a video
 const video = await api.runtime.mediaUnderstanding.describeVideoFile({
   filePath: "/tmp/inbound-video.mp4",
   cfg: api.config,
 });
 
-// วิเคราะห์ไฟล์แบบทั่วไป
+// Generic file analysis
 const result = await api.runtime.mediaUnderstanding.runFile({
   filePath: "/tmp/inbound-file.pdf",
   cfg: api.config,
 });
 ```
 
-จะคืนค่า `{ text: undefined }` เมื่อไม่มีเอาต์พุตเกิดขึ้น (เช่น อินพุตถูกข้ามไป)
+ส่งกลับ `{ text: undefined }` เมื่อไม่มีการสร้างผลลัพธ์ (เช่น อินพุตถูกข้าม)
 
 <Info>
-  `api.runtime.stt.transcribeAudioFile(...)` ยังคงอยู่เป็น compatibility alias
-  ของ `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`
+  `api.runtime.stt.transcribeAudioFile(...)` ยังคงมีอยู่ในฐานะ alias เพื่อความเข้ากันได้
+  สำหรับ `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`
 </Info>
 
 ### `api.runtime.imageGeneration`
@@ -256,7 +275,7 @@ const result = await api.runtime.webSearch.search({
 
 ### `api.runtime.media`
 
-ยูทิลิตีระดับต่ำสำหรับ media
+ยูทิลิตีสื่อระดับต่ำ
 
 ```typescript
 const webMedia = await api.runtime.media.loadWebMedia(url);
@@ -265,6 +284,18 @@ const kind = api.runtime.media.mediaKindFromMime("image/jpeg"); // "image"
 const isVoice = api.runtime.media.isVoiceCompatibleAudio(filePath);
 const metadata = await api.runtime.media.getImageMetadata(filePath);
 const resized = await api.runtime.media.resizeToJpeg(buffer, { maxWidth: 800 });
+const terminalQr = await api.runtime.media.renderQrTerminal("https://openclaw.ai");
+const pngQr = await api.runtime.media.renderQrPngBase64("https://openclaw.ai", {
+  scale: 6, // 1-12
+  marginModules: 4, // 0-16
+});
+const pngQrDataUrl = await api.runtime.media.renderQrPngDataUrl("https://openclaw.ai");
+const tmpRoot = resolvePreferredOpenClawTmpDir();
+const pngQrFile = await api.runtime.media.writeQrPngTempFile("https://openclaw.ai", {
+  tmpRoot,
+  dirPrefix: "my-plugin-qr-",
+  fileName: "qr.png",
+});
 ```
 
 ### `api.runtime.config`
@@ -289,7 +320,7 @@ const hint = api.runtime.system.formatNativeDependencyHint(pkg);
 
 ### `api.runtime.events`
 
-การ subscribe กับ events
+การสมัครรับ event
 
 ```typescript
 api.runtime.events.onAgentEvent((event) => {
@@ -302,7 +333,7 @@ api.runtime.events.onSessionTranscriptUpdate((update) => {
 
 ### `api.runtime.logging`
 
-Logging
+การบันทึกล็อก
 
 ```typescript
 const verbose = api.runtime.logging.shouldLogVerbose();
@@ -311,7 +342,7 @@ const childLogger = api.runtime.logging.getChildLogger({ plugin: "my-plugin" }, 
 
 ### `api.runtime.modelAuth`
 
-การ resolve auth ของโมเดลและผู้ให้บริการ
+การ resolve การยืนยันตัวตนของโมเดลและผู้ให้บริการ
 
 ```typescript
 const auth = await api.runtime.modelAuth.getApiKeyForModel({ model, cfg });
@@ -323,7 +354,7 @@ const providerAuth = await api.runtime.modelAuth.resolveApiKeyForProvider({
 
 ### `api.runtime.state`
 
-การ resolve state directory
+การ resolve ไดเรกทอรี state
 
 ```typescript
 const stateDir = api.runtime.state.resolveStateDir();
@@ -331,7 +362,7 @@ const stateDir = api.runtime.state.resolveStateDir();
 
 ### `api.runtime.tools`
 
-โรงงานสร้าง memory tools และ CLI
+factory ของเครื่องมือหน่วยความจำและ CLI
 
 ```typescript
 const getTool = api.runtime.tools.createMemoryGetTool(/* ... */);
@@ -341,10 +372,10 @@ api.runtime.tools.registerMemoryCli(/* ... */);
 
 ### `api.runtime.channel`
 
-ตัวช่วย runtime เฉพาะของช่องทาง (ใช้ได้เมื่อโหลด Plugin ของช่องทางอยู่)
+ตัวช่วยรันไทม์เฉพาะของ channel (พร้อมใช้งานเมื่อมีการโหลด Channel plugin)
 
-`api.runtime.channel.mentions` คือพื้นผิวนโยบาย inbound mention แบบใช้ร่วมกันสำหรับ
-Plugins ช่องทางที่บันเดิลมาซึ่งใช้ runtime injection:
+`api.runtime.channel.mentions` คือ surface นโยบายการกล่าวถึงขาเข้าที่ใช้ร่วมกันสำหรับ
+Channel plugin แบบ bundled ที่ใช้การฉีดรันไทม์:
 
 ```typescript
 const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
@@ -371,7 +402,7 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 });
 ```
 
-ตัวช่วย mentions ที่มีให้:
+ตัวช่วยการกล่าวถึงที่พร้อมใช้งาน:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -379,14 +410,14 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 - `implicitMentionKindWhen`
 - `resolveInboundMentionDecision`
 
-`api.runtime.channel.mentions` ตั้งใจไม่เปิดเผยตัวช่วย compatibility แบบเก่า
-`resolveMentionGating*` ให้เลือกใช้เส้นทางที่ normalize แล้วแบบ
+`api.runtime.channel.mentions` จงใจไม่เปิดเผยตัวช่วยความเข้ากันได้
+`resolveMentionGating*` แบบเก่า ควรใช้เส้นทางแบบทำให้เป็นมาตรฐาน
 `{ facts, policy }`
 
-## การเก็บอ้างอิงของ runtime
+## การเก็บ reference ของรันไทม์
 
-ใช้ `createPluginRuntimeStore` เพื่อเก็บอ้างอิง runtime สำหรับใช้นอก
-callback ของ `register`
+ใช้ `createPluginRuntimeStore` เพื่อเก็บ reference ของรันไทม์ไว้ใช้ภายนอก
+callback `register`:
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -397,7 +428,7 @@ const store = createPluginRuntimeStore<PluginRuntime>({
   errorMessage: "my-plugin runtime not initialized",
 });
 
-// ใน entry point ของคุณ
+// In your entry point
 export default defineChannelPluginEntry({
   id: "my-plugin",
   name: "My Plugin",
@@ -406,35 +437,35 @@ export default defineChannelPluginEntry({
   setRuntime: store.setRuntime,
 });
 
-// ในไฟล์อื่น
+// In other files
 export function getRuntime() {
-  return store.getRuntime(); // โยนข้อผิดพลาดหากยังไม่ถูก initialize
+  return store.getRuntime(); // throws if not initialized
 }
 
 export function tryGetRuntime() {
-  return store.tryGetRuntime(); // คืนค่า null หากยังไม่ถูก initialize
+  return store.tryGetRuntime(); // returns null if not initialized
 }
 ```
 
-ควรใช้ `pluginId` สำหรับตัวตนของ runtime-store รูปแบบ `key` ระดับต่ำกว่า
-มีไว้สำหรับกรณีที่พบไม่บ่อยซึ่ง Plugin หนึ่งตัวตั้งใจต้องการ runtime slot มากกว่าหนึ่งชุด
+ควรใช้ `pluginId` สำหรับอัตลักษณ์ของ runtime-store รูปแบบ `key`
+ระดับต่ำกว่านั้นมีไว้สำหรับกรณีที่พบไม่บ่อยซึ่ง Plugin หนึ่งตั้งใจต้องใช้สล็อตรันไทม์มากกว่าหนึ่งสล็อต
 
-## ฟิลด์ `api` ระดับบนสุดอื่นๆ
+## ฟิลด์ `api` ระดับบนสุดอื่น ๆ
 
-นอกเหนือจาก `api.runtime` แล้ว ออบเจ็กต์ API ยังมี:
+นอกเหนือจาก `api.runtime` แล้ว ออบเจ็กต์ API ยังมีให้ด้วย:
 
-| ฟิลด์                    | ชนิด                      | คำอธิบาย                                                                                 |
+| ฟิลด์                    | ชนิดข้อมูล                | คำอธิบาย                                                                                   |
 | ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | id ของ Plugin                                                                                   |
-| `api.name`               | `string`                  | ชื่อที่ใช้แสดงของ Plugin                                                                         |
-| `api.config`             | `OpenClawConfig`          | snapshot คอนฟิกปัจจุบัน (active in-memory runtime snapshot เมื่อมีให้ใช้งาน)                  |
-| `api.pluginConfig`       | `Record<string, unknown>` | คอนฟิกเฉพาะของ Plugin จาก `plugins.entries.<id>.config`                                   |
-| `api.logger`             | `PluginLogger`            | logger แบบมีขอบเขต (`debug`, `info`, `warn`, `error`)                                            |
-| `api.registrationMode`   | `PluginRegistrationMode`  | โหมดโหลดปัจจุบัน; `"setup-runtime"` คือหน้าต่าง startup/setup แบบเบาก่อน full-entry จริง |
-| `api.resolvePath(input)` | `(string) => string`      | resolve พาธโดยอิงจาก root ของ Plugin                                                  |
+| `api.id`                 | `string`                  | id ของ Plugin                                                                               |
+| `api.name`               | `string`                  | ชื่อที่ใช้แสดงของ Plugin                                                                    |
+| `api.config`             | `OpenClawConfig`          | snapshot คอนฟิกปัจจุบัน (snapshot ของรันไทม์ในหน่วยความจำที่กำลังใช้งานเมื่อมี)            |
+| `api.pluginConfig`       | `Record<string, unknown>` | คอนฟิกเฉพาะของ Plugin จาก `plugins.entries.<id>.config`                                    |
+| `api.logger`             | `PluginLogger`            | logger แบบมีขอบเขต (`debug`, `info`, `warn`, `error`)                                      |
+| `api.registrationMode`   | `PluginRegistrationMode`  | โหมดการโหลดปัจจุบัน; `"setup-runtime"` คือช่วงเริ่มต้น/ตั้งค่าแบบเบาก่อนเข้า entry แบบเต็ม |
+| `api.resolvePath(input)` | `(string) => string`      | resolve พาธโดยอิงกับรากของ Plugin                                                          |
 
 ## ที่เกี่ยวข้อง
 
-- [ภาพรวม SDK](/th/plugins/sdk-overview) -- เอกสารอ้างอิง subpath
+- [SDK Overview](/th/plugins/sdk-overview) -- ข้อมูลอ้างอิง subpath
 - [SDK Entry Points](/th/plugins/sdk-entrypoints) -- ตัวเลือกของ `definePluginEntry`
-- [Plugin Internals](/th/plugins/architecture) -- โมเดลความสามารถและ registry
+- [Plugin Internals](/th/plugins/architecture) -- โมเดลความสามารถและรีจิสทรี

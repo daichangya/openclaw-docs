@@ -1,15 +1,15 @@
 ---
 read_when:
-    - คุณต้องการดูว่า Skills ใดพร้อมใช้งานและพร้อมรันบ้าง
+    - คุณต้องการดูว่า Skills ใดพร้อมใช้งานและพร้อมรันแล้ว
     - คุณต้องการค้นหา ติดตั้ง หรืออัปเดต Skills จาก ClawHub
-    - คุณต้องการดีบักไบนารี/env/config ที่ขาดหายไปสำหรับ Skills
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw skills` (search/install/update/list/info/check)
-title: skills
+    - คุณต้องการแก้ปัญหาไบนารี/ตัวแปรแวดล้อม/คอนฟิกที่ขาดหายสำหรับ Skills
+summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw skills` (ค้นหา/ติดตั้ง/อัปเดต/แสดงรายการ/ข้อมูล/ตรวจสอบ)
+title: Skills
 x-i18n:
-    generated_at: "2026-04-23T06:19:47Z"
+    generated_at: "2026-04-24T09:04:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 11af59b1b6bff19cc043acd8d67bdd4303201d3f75f23c948b83bf14882c7bb1
+    source_hash: 31cd7647a15cd5df6cf5a2311e63bb11cc3aabfe8beefda7be57dc76adc509ea
     source_path: cli/skills.md
     workflow: 15
 ---
@@ -21,8 +21,8 @@ x-i18n:
 ที่เกี่ยวข้อง:
 
 - ระบบ Skills: [Skills](/th/tools/skills)
-- config ของ Skills: [Skills config](/th/tools/skills-config)
-- การติดตั้ง ClawHub: [ClawHub](/th/tools/clawhub)
+- คอนฟิก Skills: [คอนฟิก Skills](/th/tools/skills-config)
+- การติดตั้งจาก ClawHub: [ClawHub](/th/tools/clawhub)
 
 ## คำสั่ง
 
@@ -45,21 +45,27 @@ openclaw skills check --json
 ```
 
 `search`/`install`/`update` ใช้ ClawHub โดยตรงและติดตั้งลงในไดเรกทอรี `skills/`
-ของ workspace ที่กำลังใช้งานอยู่ ขณะที่ `list`/`info`/`check` ยังคงตรวจสอบ
-Skills ในเครื่องที่มองเห็นได้จาก workspace และ config ปัจจุบัน
+ของ workspace ที่ใช้งานอยู่ ส่วน `list`/`info`/`check` ยังคงตรวจสอบ
+Skills ในเครื่องที่มองเห็นได้จาก workspace และคอนฟิกปัจจุบัน
 
-คำสั่ง CLI `install` นี้จะดาวน์โหลดโฟลเดอร์ skill จาก ClawHub ส่วนการติดตั้ง dependency
-ของ skill ที่ถูกทริกเกอร์จาก onboarding หรือการตั้งค่า Skills ซึ่งทำงานผ่าน Gateway จะใช้
-เส้นทางคำขอ `skills.install` แยกต่างหากแทน
+คำสั่ง `install` ของ CLI นี้จะดาวน์โหลดโฟลเดอร์ skill จาก ClawHub การติดตั้ง dependency
+ของ skill ที่ถูกทริกเกอร์จาก onboarding หรือการตั้งค่า Skills ซึ่งอาศัย Gateway
+จะใช้เส้นทางคำขอ `skills.install` แยกต่างหากแทน
 
 หมายเหตุ:
 
-- `search [query...]` รองรับ query แบบไม่บังคับ; หากไม่ระบุ จะเป็นการเรียกดูฟีดค้นหา ClawHub เริ่มต้น
-- `search --limit <n>` จำกัดจำนวนผลลัพธ์ที่ส่งคืน
-- `install --force` เขียนทับโฟลเดอร์ skill ใน workspace ที่มีอยู่แล้วสำหรับ
+- `search [query...]` รับคำค้นหาแบบไม่บังคับ; หากไม่ระบุ จะเป็นการเรียกดู feed ค้นหาเริ่มต้นของ
+  ClawHub
+- `search --limit <n>` จำกัดจำนวนผลลัพธ์ที่ส่งกลับ
+- `install --force` จะเขียนทับโฟลเดอร์ skill ของ workspace ที่มีอยู่แล้วสำหรับ
   slug เดียวกัน
-- `update --all` จะอัปเดตเฉพาะการติดตั้ง ClawHub ที่ติดตามอยู่ใน workspace ที่กำลังใช้งาน
-- `list` เป็นการทำงานเริ่มต้นเมื่อไม่ได้ระบุคำสั่งย่อย
-- `list`, `info` และ `check` จะเขียนเอาต์พุตที่เรนเดอร์แล้วไปยัง stdout เมื่อใช้
-  `--json` หมายความว่าเพย์โหลดที่เครื่องอ่านได้จะยังคงอยู่บน stdout สำหรับ pipe
+- `update --all` จะอัปเดตเฉพาะการติดตั้งจาก ClawHub ที่ติดตามไว้ใน workspace ที่ใช้งานอยู่
+- `list` คือการกระทำค่าปริยายเมื่อไม่ได้ระบุ subcommand
+- `list`, `info` และ `check` จะเขียนผลลัพธ์ที่ render แล้วไปยัง stdout เมื่อใช้
+  `--json` หมายความว่า payload แบบ machine-readable จะยังคงอยู่บน stdout สำหรับ pipe
   และสคริปต์
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)
+- [Skills](/th/tools/skills)

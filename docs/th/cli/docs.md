@@ -1,24 +1,24 @@
 ---
 read_when:
-    - คุณต้องการค้นหาเอกสาร OpenClaw แบบสดจากเทอร์มินัล
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw docs` (ค้นหาในดัชนีเอกสารสด)
+    - คุณต้องการค้นหาเอกสาร OpenClaw แบบ live จากเทอร์มินัล
+summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw docs` (ค้นหาดัชนีเอกสารแบบ live)
 title: เอกสาร
 x-i18n:
-    generated_at: "2026-04-23T06:17:45Z"
+    generated_at: "2026-04-24T09:02:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: cfcceed872d7509b9843af3fae733a136bc5e26ded55c2ac47a16489a1636989
+    source_hash: 0d208f5b9a3576ce0597abca600df109db054d20068359a9f2070ac30b1a8f69
     source_path: cli/docs.md
     workflow: 15
 ---
 
 # `openclaw docs`
 
-ค้นหาในดัชนีเอกสารสด
+ค้นหาดัชนีเอกสารแบบ live
 
 อาร์กิวเมนต์:
 
-- `[query...]`: คำค้นหาที่จะส่งไปยังดัชนีเอกสารสด
+- `[query...]`: คำค้นหาที่จะส่งไปยังดัชนีเอกสารแบบ live
 
 ตัวอย่าง:
 
@@ -31,5 +31,9 @@ openclaw docs gateway token secretref
 
 หมายเหตุ:
 
-- หากไม่มีคำค้นหา `openclaw docs` จะเปิดจุดเริ่มต้นการค้นหาเอกสารสด
-- คำค้นหาหลายคำจะถูกส่งต่อเป็นคำขอค้นหาเดียว
+- หากไม่มีคำค้นหา `openclaw docs` จะเปิดจุดเริ่มต้นการค้นหาเอกสารแบบ live
+- คำค้นหาหลายคำจะถูกส่งผ่านเป็นคำขอค้นหาเดียว
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)

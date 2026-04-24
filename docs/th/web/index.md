@@ -2,50 +2,48 @@
 read_when:
     - คุณต้องการเข้าถึง Gateway ผ่าน Tailscale
     - คุณต้องการ Control UI บนเบราว์เซอร์และการแก้ไข config
-summary: 'พื้นผิวเว็บของ Gateway: Control UI, โหมด bind และความปลอดภัย'
+summary: 'พื้นผิวเว็บของ Gateway: Control UI, โหมดการ bind และความปลอดภัย'
 title: เว็บ
 x-i18n:
-    generated_at: "2026-04-23T06:20:16Z"
+    generated_at: "2026-04-24T09:40:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: cf1a173143782557ecd2e79b28694308709dc945700a509148856255d5cef773
+    source_hash: 0336a6597cebf4a8a83d348abd3d59ff4b9bd7349a32c8a0a0093da0f656e97d
     source_path: web/index.md
     workflow: 15
 ---
 
-# เว็บ (Gateway)
-
-Gateway ให้บริการ **Control UI บนเบราว์เซอร์** ขนาดเล็ก (Vite + Lit) จากพอร์ตเดียวกันกับ Gateway WebSocket:
+Gateway ให้บริการ **Control UI บนเบราว์เซอร์** ขนาดเล็ก (Vite + Lit) จากพอร์ตเดียวกับ Gateway WebSocket:
 
 - ค่าเริ่มต้น: `http://<host>:18789/`
-- คำนำหน้าแบบไม่บังคับ: ตั้งค่า `gateway.controlUi.basePath` (เช่น `/openclaw`)
+- พาธนำหน้าแบบทางเลือก: ตั้งค่า `gateway.controlUi.basePath` (เช่น `/openclaw`)
 
-ความสามารถต่าง ๆ อยู่ใน [Control UI](/th/web/control-ui)
-หน้านี้เน้นที่โหมด bind, ความปลอดภัย และพื้นผิวที่เปิดออกสู่เว็บ
+ความสามารถต่าง ๆ อยู่ที่ [Control UI](/th/web/control-ui)
+หน้านี้เน้นที่โหมดการ bind, ความปลอดภัย และพื้นผิวที่เข้าถึงผ่านเว็บ
 
 ## Webhooks
 
-เมื่อ `hooks.enabled=true` Gateway จะเปิดเผย endpoint ของ Webhook ขนาดเล็กบนเซิร์ฟเวอร์ HTTP เดียวกันด้วย
+เมื่อ `hooks.enabled=true`, Gateway จะเปิดเผย endpoint สำหรับ Webhook ขนาดเล็กบน HTTP server เดียวกันด้วย
 ดู [การกำหนดค่า Gateway](/th/gateway/configuration) → `hooks` สำหรับ auth + payloads
 
-## Config (เปิดใช้โดยค่าเริ่มต้น)
+## การกำหนดค่า (เปิดโดยค่าเริ่มต้น)
 
-Control UI จะ **เปิดใช้โดยค่าเริ่มต้น** เมื่อมี assets อยู่ (`dist/control-ui`)
+Control UI จะ **เปิดใช้งานโดยค่าเริ่มต้น** เมื่อมี assets อยู่ (`dist/control-ui`)
 คุณสามารถควบคุมได้ผ่าน config:
 
 ```json5
 {
   gateway: {
-    controlUi: { enabled: true, basePath: "/openclaw" }, // basePath เป็นตัวเลือก
+    controlUi: { enabled: true, basePath: "/openclaw" }, // basePath เป็นทางเลือก
   },
 }
 ```
 
 ## การเข้าถึงผ่าน Tailscale
 
-### Serve แบบผสานรวม (แนะนำ)
+### Integrated Serve (แนะนำ)
 
-ให้ Gateway อยู่บน loopback และให้ Tailscale Serve ทำหน้าที่ proxy:
+ให้ Gateway อยู่บน loopback และให้ Tailscale Serve ทำหน้าที่ proxy ให้:
 
 ```json5
 {
@@ -62,11 +60,11 @@ Control UI จะ **เปิดใช้โดยค่าเริ่มต้
 openclaw gateway
 ```
 
-เปิด:
+เปิดที่:
 
 - `https://<magicdns>/` (หรือ `gateway.controlUi.basePath` ที่คุณตั้งค่าไว้)
 
-### bind กับ tailnet + token
+### Bind กับ tailnet + token
 
 ```json5
 {
@@ -78,14 +76,14 @@ openclaw gateway
 }
 ```
 
-จากนั้นเริ่ม gateway (ตัวอย่างแบบ non-loopback นี้ใช้ token auth
+จากนั้นเริ่ม gateway (ตัวอย่างที่ไม่ใช่ loopback นี้ใช้ token auth
 แบบ shared-secret):
 
 ```bash
 openclaw gateway
 ```
 
-เปิด:
+เปิดที่:
 
 - `http://<tailscale-ip>:18789/` (หรือ `gateway.controlUi.basePath` ที่คุณตั้งค่าไว้)
 
@@ -103,30 +101,30 @@ openclaw gateway
 
 ## หมายเหตุด้านความปลอดภัย
 
-- โดยค่าเริ่มต้น จำเป็นต้องมี gateway auth (token, password, trusted-proxy หรือ headers ระบุตัวตนจาก Tailscale Serve เมื่อเปิดใช้งาน)
-- bind แบบ non-loopback ยังคง **ต้องใช้** gateway auth ในทางปฏิบัติหมายถึง token/password auth หรือ reverse proxy ที่รับรู้ตัวตนพร้อม `gateway.auth.mode: "trusted-proxy"`
-- wizard จะสร้าง auth แบบ shared-secret โดยค่าเริ่มต้น และมักจะสร้าง
-  gateway token ให้ด้วย (แม้จะเป็น loopback)
+- การยืนยันตัวตนของ Gateway จำเป็นโดยค่าเริ่มต้น (token, password, trusted-proxy หรือ Tailscale Serve identity headers เมื่อเปิดใช้งาน)
+- การ bind แบบ non-loopback ยังคง **ต้อง** ใช้การยืนยันตัวตนของ gateway ในทางปฏิบัติหมายถึง token/password auth หรือ reverse proxy ที่รับรู้ตัวตนพร้อม `gateway.auth.mode: "trusted-proxy"`
+- wizard จะสร้าง shared-secret auth โดยค่าเริ่มต้น และโดยปกติจะสร้าง
+  gateway token ให้ด้วย (แม้บน loopback)
 - ในโหมด shared-secret UI จะส่ง `connect.params.auth.token` หรือ
   `connect.params.auth.password`
-- ในโหมดที่มีข้อมูลระบุตัวตน เช่น Tailscale Serve หรือ `trusted-proxy` การตรวจสอบ auth
-  ของ WebSocket จะผ่านจาก request headers แทน
-- สำหรับการปรับใช้ Control UI แบบ non-loopback ให้ตั้งค่า `gateway.controlUi.allowedOrigins`
-  อย่างชัดเจน (origin แบบเต็ม) หากไม่ตั้งค่า การเริ่มต้น gateway จะถูกปฏิเสธโดยค่าเริ่มต้น
-- `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` จะเปิดใช้
-  โหมด Host-header origin fallback แต่เป็นการลดระดับความปลอดภัยที่อันตราย
-- เมื่อใช้ Serve, headers ระบุตัวตนของ Tailscale สามารถทำให้ Control UI/WebSocket
-  ผ่าน auth ได้เมื่อ `gateway.auth.allowTailscale` เป็น `true` (ไม่ต้องใช้ token/password)
-  ส่วน endpoints ของ HTTP API จะไม่ใช้ headers ระบุตัวตนของ Tailscale เหล่านั้น แต่จะทำตาม
+- ในโหมดที่มีข้อมูลระบุตัวตน เช่น Tailscale Serve หรือ `trusted-proxy`
+  การตรวจสอบ WebSocket auth จะผ่านจาก request headers แทน
+- สำหรับการปรับใช้ Control UI แบบ non-loopback ให้ตั้ง `gateway.controlUi.allowedOrigins`
+  อย่างชัดเจน (origin แบบเต็ม) หากไม่ตั้งค่าไว้ การเริ่มต้น gateway จะถูกปฏิเสธโดยค่าเริ่มต้น
+- `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` เปิดใช้
+  โหมด fallback ของ origin จาก Host header แต่เป็นการลดระดับความปลอดภัยที่มีความเสี่ยง
+- เมื่อใช้ Serve, Tailscale identity headers สามารถทำให้ Control UI/WebSocket auth
+  ผ่านได้เมื่อ `gateway.auth.allowTailscale` เป็น `true` (ไม่ต้องใช้ token/password)
+  ส่วน HTTP API endpoints จะไม่ใช้ Tailscale identity headers เหล่านั้น; แต่จะทำตาม
   โหมด HTTP auth ปกติของ gateway แทน ตั้งค่า
-  `gateway.auth.allowTailscale: false` หากต้องการบังคับใช้ credentials แบบชัดเจน ดู
-  [Tailscale](/th/gateway/tailscale) และ [ความปลอดภัย](/th/gateway/security)
-  โฟลว์แบบไม่ใช้ token นี้ตั้งอยู่บนสมมติฐานว่าโฮสต์ gateway เป็นโฮสต์ที่เชื่อถือได้
-- `gateway.tailscale.mode: "funnel"` ต้องใช้ `gateway.auth.mode: "password"` (shared password)
+  `gateway.auth.allowTailscale: false` หากต้องการให้ต้องใช้ credentials อย่างชัดเจน ดู
+  [Tailscale](/th/gateway/tailscale) และ [ความปลอดภัย](/th/gateway/security) โฟลว์
+  แบบไม่ใช้โทเค็นนี้ถือว่าโฮสต์ของ gateway เป็นโฮสต์ที่เชื่อถือได้
+- `gateway.tailscale.mode: "funnel"` ต้องใช้ `gateway.auth.mode: "password"` (รหัสผ่านที่ใช้ร่วมกัน)
 
 ## การ build UI
 
-Gateway ให้บริการไฟล์สแตติกจาก `dist/control-ui` ให้ build ได้ด้วย:
+Gateway ให้บริการไฟล์สแตติกจาก `dist/control-ui` build ได้ด้วย:
 
 ```bash
 pnpm ui:build

@@ -1,81 +1,79 @@
 ---
 read_when:
-    - คุณต้องการแผนที่เอกสารแบบครบถ้วน【อ่านข้อความเต็มanalysis to=final code  omitted because final only should be translated text.
+    - คุณต้องการแผนผังเอกสารทั้งหมดแบบครบถ้วน
 summary: ฮับที่ลิงก์ไปยังเอกสารทุกหน้าของ OpenClaw
 title: ฮับเอกสาร
 x-i18n:
-    generated_at: "2026-04-23T10:23:44Z"
+    generated_at: "2026-04-24T09:33:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4bf24887af25cb345834e7f61e33d1ca3595833a42934ae91a87cc0951b3ae10
+    source_hash: 711d23631ca29b122054b1a048058ec5bd787043e7ffc8c3108b17cf275c2c8e
     source_path: start/hubs.md
     workflow: 15
 ---
-
-# ฮับเอกสาร
 
 <Note>
 หากคุณเพิ่งเริ่มใช้ OpenClaw ให้เริ่มที่ [Getting Started](/th/start/getting-started)
 </Note>
 
-ใช้ฮับเหล่านี้เพื่อค้นพบทุกหน้า รวมถึงบทเจาะลึกและเอกสารอ้างอิงที่ไม่ปรากฏในแถบนำทางด้านซ้าย
+ใช้ฮับเหล่านี้เพื่อค้นหาทุกหน้า รวมถึงเอกสารเจาะลึกและเอกสารอ้างอิงที่ไม่ปรากฏในแถบนำทางด้านซ้าย
 
 ## เริ่มที่นี่
 
-- [Index](/th)
+- [ดัชนี](/th)
 - [Getting Started](/th/start/getting-started)
 - [Onboarding](/th/start/onboarding)
 - [Onboarding (CLI)](/th/start/wizard)
-- [Setup](/th/start/setup)
-- [Dashboard (local Gateway)](http://127.0.0.1:18789/)
-- [Help](/th/help)
-- [Docs directory](/th/start/docs-directory)
-- [Configuration](/th/gateway/configuration)
-- [Configuration examples](/th/gateway/configuration-examples)
-- [OpenClaw assistant](/th/start/openclaw)
-- [Showcase](/th/start/showcase)
+- [การตั้งค่า](/th/start/setup)
+- [แดชบอร์ด (Gateway ในเครื่อง)](http://127.0.0.1:18789/)
+- [ความช่วยเหลือ](/th/help)
+- [ไดเรกทอรีเอกสาร](/th/start/docs-directory)
+- [การกำหนดค่า](/th/gateway/configuration)
+- [ตัวอย่างการกำหนดค่า](/th/gateway/configuration-examples)
+- [ผู้ช่วย OpenClaw](/th/start/openclaw)
+- [ตัวอย่างการใช้งาน](/th/start/showcase)
 - [Lore](/th/start/lore)
 
 ## การติดตั้ง + การอัปเดต
 
 - [Docker](/th/install/docker)
 - [Nix](/th/install/nix)
-- [Updating / rollback](/th/install/updating)
-- [Bun workflow (experimental)](/th/install/bun)
+- [การอัปเดต / ย้อนกลับ](/th/install/updating)
+- [เวิร์กโฟลว์ Bun (ทดลอง)](/th/install/bun)
 
 ## แนวคิดหลัก
 
-- [Architecture](/th/concepts/architecture)
-- [Features](/th/concepts/features)
-- [Network hub](/th/network)
-- [Agent runtime](/th/concepts/agent)
-- [Agent workspace](/th/concepts/agent-workspace)
+- [สถาปัตยกรรม](/th/concepts/architecture)
+- [ฟีเจอร์](/th/concepts/features)
+- [ฮับเครือข่าย](/th/network)
+- [runtime ของเอเจนต์](/th/concepts/agent)
+- [workspace ของเอเจนต์](/th/concepts/agent-workspace)
 - [Memory](/th/concepts/memory)
-- [Agent loop](/th/concepts/agent-loop)
-- [Streaming + chunking](/th/concepts/streaming)
-- [Multi-agent routing](/th/concepts/multi-agent)
+- [ลูปของเอเจนต์](/th/concepts/agent-loop)
+- [การสตรีม + chunking](/th/concepts/streaming)
+- [การกำหนดเส้นทางหลายเอเจนต์](/th/concepts/multi-agent)
 - [Compaction](/th/concepts/compaction)
-- [Sessions](/th/concepts/session)
+- [เซสชัน](/th/concepts/session)
 - [Session pruning](/th/concepts/session-pruning)
-- [Session tools](/th/concepts/session-tool)
-- [Queue](/th/concepts/queue)
-- [Slash commands](/th/tools/slash-commands)
+- [เครื่องมือเซสชัน](/th/concepts/session-tool)
+- [คิว](/th/concepts/queue)
+- [คำสั่ง slash](/th/tools/slash-commands)
 - [RPC adapters](/th/reference/rpc)
-- [TypeBox schemas](/th/concepts/typebox)
-- [Timezone handling](/th/concepts/timezone)
-- [Presence](/th/concepts/presence)
-- [Discovery + transports](/th/gateway/discovery)
+- [สคีมา TypeBox](/th/concepts/typebox)
+- [การจัดการเขตเวลา](/th/concepts/timezone)
+- [สถานะออนไลน์](/th/concepts/presence)
+- [การค้นพบ + ทรานสปอร์ต](/th/gateway/discovery)
 - [Bonjour](/th/gateway/bonjour)
-- [Channel routing](/th/channels/channel-routing)
-- [Groups](/th/channels/groups)
-- [Group messages](/th/channels/group-messages)
-- [Model failover](/th/concepts/model-failover)
+- [การกำหนดเส้นทางช่องทางส่งข้อความ](/th/channels/channel-routing)
+- [กลุ่ม](/th/channels/groups)
+- [ข้อความกลุ่ม](/th/channels/group-messages)
+- [failover ของโมเดล](/th/concepts/model-failover)
 - [OAuth](/th/concepts/oauth)
 
-## Providers + การรับข้อมูลเข้า
+## ผู้ให้บริการ + ingress
 
-- [Chat channels hub](/th/channels)
-- [Model providers hub](/th/providers/models)
+- [ฮับช่องทางแชต](/th/channels)
+- [ฮับผู้ให้บริการโมเดล](/th/providers/models)
 - [WhatsApp](/th/channels/whatsapp)
 - [Telegram](/th/channels/telegram)
 - [Slack](/th/channels/slack)
@@ -84,60 +82,60 @@ x-i18n:
 - [Signal](/th/channels/signal)
 - [BlueBubbles (iMessage)](/th/channels/bluebubbles)
 - [QQ Bot](/th/channels/qqbot)
-- [iMessage (legacy)](/th/channels/imessage)
-- [Location parsing](/th/channels/location)
+- [iMessage (รุ่นเก่า)](/th/channels/imessage)
+- [การแยกวิเคราะห์ตำแหน่ง](/th/channels/location)
 - [WebChat](/th/web/webchat)
 - [Webhooks](/th/automation/cron-jobs#webhooks)
 - [Gmail Pub/Sub](/th/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gateway + การปฏิบัติการ
 
-- [Gateway runbook](/th/gateway)
-- [Network model](/th/gateway/network-model)
-- [Gateway pairing](/th/gateway/pairing)
-- [Gateway lock](/th/gateway/gateway-lock)
-- [Background process](/th/gateway/background-process)
-- [Health](/th/gateway/health)
+- [คู่มือปฏิบัติงาน Gateway](/th/gateway)
+- [โมเดลเครือข่าย](/th/gateway/network-model)
+- [การจับคู่ Gateway](/th/gateway/pairing)
+- [ล็อก Gateway](/th/gateway/gateway-lock)
+- [โปรเซสเบื้องหลัง](/th/gateway/background-process)
+- [สุขภาพระบบ](/th/gateway/health)
 - [Heartbeat](/th/gateway/heartbeat)
 - [Doctor](/th/gateway/doctor)
-- [Logging](/th/gateway/logging)
+- [การบันทึก log](/th/gateway/logging)
 - [Sandboxing](/th/gateway/sandboxing)
-- [Dashboard](/th/web/dashboard)
+- [แดชบอร์ด](/th/web/dashboard)
 - [Control UI](/th/web/control-ui)
-- [Remote access](/th/gateway/remote)
-- [Remote gateway README](/th/gateway/remote-gateway-readme)
+- [การเข้าถึงระยะไกล](/th/gateway/remote)
+- [README ของ remote gateway](/th/gateway/remote-gateway-readme)
 - [Tailscale](/th/gateway/tailscale)
-- [Security](/th/gateway/security)
-- [Troubleshooting](/th/gateway/troubleshooting)
+- [ความปลอดภัย](/th/gateway/security)
+- [การแก้ปัญหา](/th/gateway/troubleshooting)
 
-## Tools + ระบบอัตโนมัติ
+## เครื่องมือ + ระบบอัตโนมัติ
 
-- [Tools surface](/th/tools)
+- [พื้นผิวเครื่องมือ](/th/tools)
 - [OpenProse](/th/prose)
-- [CLI reference](/th/cli)
+- [เอกสารอ้างอิง CLI](/th/cli)
 - [Exec tool](/th/tools/exec)
 - [PDF tool](/th/tools/pdf)
-- [Elevated mode](/th/tools/elevated)
+- [โหมดยกระดับสิทธิ์](/th/tools/elevated)
 - [Cron jobs](/th/automation/cron-jobs)
-- [Automation & Tasks](/th/automation)
-- [Thinking + verbose](/th/tools/thinking)
-- [Models](/th/concepts/models)
-- [Sub-agents](/th/tools/subagents)
-- [Agent send CLI](/th/tools/agent-send)
+- [ระบบอัตโนมัติและงาน](/th/automation)
+- [การคิด + verbose](/th/tools/thinking)
+- [โมเดล](/th/concepts/models)
+- [เอเจนต์ย่อย](/th/tools/subagents)
+- [CLI สำหรับส่งถึงเอเจนต์](/th/tools/agent-send)
 - [Terminal UI](/th/web/tui)
-- [Browser control](/th/tools/browser)
-- [Browser (การแก้ปัญหาบน Linux)](/th/tools/browser-linux-troubleshooting)
-- [Polls](/th/cli/message)
+- [การควบคุมเบราว์เซอร์](/th/tools/browser)
+- [เบราว์เซอร์ (การแก้ปัญหาบน Linux)](/th/tools/browser-linux-troubleshooting)
+- [โพลล์](/th/cli/message)
 
-## Nodes, media, voice
+## Nodes, สื่อ, เสียง
 
 - [ภาพรวม Nodes](/th/nodes)
-- [Camera](/th/nodes/camera)
-- [Images](/th/nodes/images)
-- [Audio](/th/nodes/audio)
-- [คำสั่ง location](/th/nodes/location-command)
-- [Voice wake](/th/nodes/voicewake)
-- [Talk mode](/th/nodes/talk)
+- [กล้อง](/th/nodes/camera)
+- [รูปภาพ](/th/nodes/images)
+- [เสียง](/th/nodes/audio)
+- [คำสั่งตำแหน่ง](/th/nodes/location-command)
+- [ปลุกด้วยเสียง](/th/nodes/voicewake)
+- [โหมด Talk](/th/nodes/talk)
 
 ## แพลตฟอร์ม
 
@@ -147,60 +145,64 @@ x-i18n:
 - [Android](/th/platforms/android)
 - [Windows (WSL2)](/th/platforms/windows)
 - [Linux](/th/platforms/linux)
-- [Web surfaces](/th/web)
+- [พื้นผิวเว็บ](/th/web)
 
-## แอปคู่หู macOS (ขั้นสูง)
+## แอป macOS companion (ขั้นสูง)
 
-- [การตั้งค่า dev สำหรับ macOS](/th/platforms/mac/dev-setup)
+- [การตั้งค่าสำหรับพัฒนาบน macOS](/th/platforms/mac/dev-setup)
 - [แถบเมนู macOS](/th/platforms/mac/menu-bar)
-- [macOS voice wake](/th/platforms/mac/voicewake)
+- [การปลุกด้วยเสียงบน macOS](/th/platforms/mac/voicewake)
 - [โอเวอร์เลย์เสียงบน macOS](/th/platforms/mac/voice-overlay)
 - [WebChat บน macOS](/th/platforms/mac/webchat)
 - [Canvas บน macOS](/th/platforms/mac/canvas)
 - [child process บน macOS](/th/platforms/mac/child-process)
-- [Health บน macOS](/th/platforms/mac/health)
+- [สุขภาพระบบบน macOS](/th/platforms/mac/health)
 - [ไอคอน macOS](/th/platforms/mac/icon)
-- [Logging บน macOS](/th/platforms/mac/logging)
+- [การบันทึก log บน macOS](/th/platforms/mac/logging)
 - [สิทธิ์บน macOS](/th/platforms/mac/permissions)
-- [Remote บน macOS](/th/platforms/mac/remote)
-- [การลงนามบน macOS](/th/platforms/mac/signing)
+- [การเชื่อมต่อระยะไกลบน macOS](/th/platforms/mac/remote)
+- [การเซ็นบน macOS](/th/platforms/mac/signing)
 - [Gateway บน macOS (launchd)](/th/platforms/mac/bundled-gateway)
-- [macOS XPC](/th/platforms/mac/xpc)
+- [XPC บน macOS](/th/platforms/mac/xpc)
 - [Skills บน macOS](/th/platforms/mac/skills)
-- [macOS Peekaboo](/th/platforms/mac/peekaboo)
+- [Peekaboo บน macOS](/th/platforms/mac/peekaboo)
 
-## Plugins
+## ปลั๊กอิน
 
-- [ภาพรวม Plugins](/th/tools/plugin)
-- [การสร้าง plugins](/th/plugins/building-plugins)
-- [Plugin manifest](/th/plugins/manifest)
-- [Agent tools](/th/plugins/building-plugins#registering-agent-tools)
-- [Plugin bundles](/th/plugins/bundles)
-- [Community plugins](/th/plugins/community)
-- [Capability cookbook](/th/plugins/architecture)
-- [Voice call plugin](/th/plugins/voice-call)
-- [Zalo user plugin](/th/plugins/zalouser)
+- [ภาพรวมปลั๊กอิน](/th/tools/plugin)
+- [การสร้างปลั๊กอิน](/th/plugins/building-plugins)
+- [manifest ของปลั๊กอิน](/th/plugins/manifest)
+- [เครื่องมือเอเจนต์](/th/plugins/building-plugins#registering-agent-tools)
+- [ปลั๊กอิน bundles](/th/plugins/bundles)
+- [ปลั๊กอินชุมชน](/th/plugins/community)
+- [คู่มือสูตรความสามารถ](/th/plugins/architecture)
+- [ปลั๊กอิน voice call](/th/plugins/voice-call)
+- [ปลั๊กอินผู้ใช้ Zalo](/th/plugins/zalouser)
 
-## Workspace + เทมเพลต
+## Workspace + แม่แบบ
 
 - [Skills](/th/tools/skills)
 - [ClawHub](/th/tools/clawhub)
-- [การตั้งค่า Skills](/th/tools/skills-config)
-- [AGENTS ค่าเริ่มต้น](/th/reference/AGENTS.default)
-- [เทมเพลต: AGENTS](/th/reference/templates/AGENTS)
-- [เทมเพลต: BOOTSTRAP](/th/reference/templates/BOOTSTRAP)
-- [เทมเพลต: HEARTBEAT](/th/reference/templates/HEARTBEAT)
-- [เทมเพลต: IDENTITY](/th/reference/templates/IDENTITY)
-- [เทมเพลต: SOUL](/th/reference/templates/SOUL)
-- [เทมเพลต: TOOLS](/th/reference/templates/TOOLS)
-- [เทมเพลต: USER](/th/reference/templates/USER)
+- [config ของ Skills](/th/tools/skills-config)
+- [AGENTS เริ่มต้น](/th/reference/AGENTS.default)
+- [แม่แบบ: AGENTS](/th/reference/templates/AGENTS)
+- [แม่แบบ: BOOTSTRAP](/th/reference/templates/BOOTSTRAP)
+- [แม่แบบ: HEARTBEAT](/th/reference/templates/HEARTBEAT)
+- [แม่แบบ: IDENTITY](/th/reference/templates/IDENTITY)
+- [แม่แบบ: SOUL](/th/reference/templates/SOUL)
+- [แม่แบบ: TOOLS](/th/reference/templates/TOOLS)
+- [แม่แบบ: USER](/th/reference/templates/USER)
 
-## โครงการ
+## โปรเจกต์
 
-- [Credits](/th/reference/credits)
+- [เครดิต](/th/reference/credits)
 
-## การทดสอบ + การออกรีลีส
+## การทดสอบ + รีลีส
 
-- [Testing](/th/reference/test)
-- [นโยบายการออกรีลีส](/th/reference/RELEASING)
-- [Device models](/th/reference/device-models)
+- [การทดสอบ](/th/reference/test)
+- [นโยบายการรีลีส](/th/reference/RELEASING)
+- [รุ่นอุปกรณ์](/th/reference/device-models)
+
+## ที่เกี่ยวข้อง
+
+- [Getting started](/th/start/getting-started)

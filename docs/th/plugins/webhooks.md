@@ -1,36 +1,33 @@
 ---
 read_when:
-    - คุณต้องการทริกเกอร์หรือขับเคลื่อน TaskFlow จากระบบภายนอก ag真人 to=functions.read commentary  银航json ￣奇米path":"docs/AGENTS.md","offset":1,"limit":200} code
-    - คุณกำลังกำหนดค่า Plugin Webhook ที่มากับระบบ
-summary: 'Plugin Webhook: ingress ของ TaskFlow ที่ยืนยันตัวตนแล้วสำหรับระบบอัตโนมัติภายนอกที่เชื่อถือได้'
-title: Plugin Webhook
+    - คุณต้องการทริกเกอร์หรือขับเคลื่อน TaskFlow จากระบบภายนอก
+    - คุณกำลังกำหนดค่า Plugin webhooks ที่มาพร้อมกัน
+summary: 'Plugin Webhooks: ingress ของ TaskFlow ที่ยืนยันตัวตนแล้วสำหรับระบบอัตโนมัติภายนอกที่เชื่อถือได้'
+title: Plugin Webhooks
 x-i18n:
-    generated_at: "2026-04-23T05:49:18Z"
+    generated_at: "2026-04-24T09:26:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a5da12a887752ec6ee853cfdb912db0ae28512a0ffed06fe3828ef2eee15bc9d
+    source_hash: a35074f256e0664ee73111bcb93ce1a2311dbd4db2231200a1a385e15ed5e6c4
     source_path: plugins/webhooks.md
     workflow: 15
 ---
 
-# Webhook (Plugin)
+# Webhooks (Plugin)
 
-Plugin Webhook เพิ่ม route HTTP ที่ยืนยันตัวตนแล้ว ซึ่ง bind ระบบอัตโนมัติภายนอกเข้ากับ TaskFlow ของ OpenClaw
+Plugin Webhooks จะเพิ่ม route HTTP ที่ยืนยันตัวตนแล้ว ซึ่งผูกระบบอัตโนมัติภายนอกเข้ากับ TaskFlow ของ OpenClaw
 
-ใช้เมื่อคุณต้องการให้ระบบที่เชื่อถือได้ เช่น Zapier, n8n, งาน CI หรือ
-บริการภายใน สร้างและขับเคลื่อน TaskFlow ที่มีการจัดการโดยไม่ต้องเขียน
-Plugin แบบกำหนดเองก่อน
+ใช้เมื่อคุณต้องการให้ระบบที่เชื่อถือได้ เช่น Zapier, n8n, งาน CI หรือบริการภายใน สร้างและขับเคลื่อน TaskFlow ที่มีการจัดการ โดยไม่ต้องเขียน Plugin แบบกำหนดเองก่อน
 
-## ทำงานที่ไหน
+## ตำแหน่งที่รัน
 
-Plugin Webhook ทำงานภายในโปรเซส Gateway
+Plugin Webhooks จะรันอยู่ภายใน process ของ Gateway
 
-หาก Gateway ของคุณรันอยู่บนอีกเครื่องหนึ่ง ให้ติดตั้งและกำหนดค่า Plugin บน
-โฮสต์ Gateway นั้น แล้วรีสตาร์ต Gateway
+หาก Gateway ของคุณรันอยู่บนอีกเครื่องหนึ่ง ให้ติดตั้งและกำหนดค่า Plugin บนโฮสต์ Gateway นั้น แล้วรีสตาร์ต Gateway
 
 ## กำหนดค่า route
 
-ตั้งค่า config ภายใต้ `plugins.entries.webhooks.config`:
+ตั้งค่า config ใต้ `plugins.entries.webhooks.config`:
 
 ```json5
 {
@@ -49,7 +46,7 @@ Plugin Webhook ทำงานภายในโปรเซส Gateway
                 id: "OPENCLAW_WEBHOOK_SECRET",
               },
               controllerId: "webhooks/zapier",
-              description: "สะพาน TaskFlow ของ Zapier",
+              description: "Zapier TaskFlow bridge",
             },
           },
         },
@@ -63,39 +60,36 @@ Plugin Webhook ทำงานภายในโปรเซส Gateway
 
 - `enabled`: ไม่บังคับ ค่าเริ่มต้นคือ `true`
 - `path`: ไม่บังคับ ค่าเริ่มต้นคือ `/plugins/webhooks/<routeId>`
-- `sessionKey`: เซสชันที่จำเป็นซึ่งเป็นเจ้าของ TaskFlow ที่ bind อยู่
+- `sessionKey`: session ที่จำเป็นซึ่งเป็นเจ้าของ TaskFlow ที่ถูกผูกไว้
 - `secret`: shared secret หรือ SecretRef ที่จำเป็น
-- `controllerId`: รหัส controller แบบไม่บังคับสำหรับ flow ที่มีการจัดการซึ่งถูกสร้างขึ้น
-- `description`: หมายเหตุสำหรับผู้ปฏิบัติงานแบบไม่บังคับ
+- `controllerId`: ไม่บังคับ controller id สำหรับ managed flow ที่ถูกสร้าง
+- `description`: ไม่บังคับ หมายเหตุสำหรับผู้ดูแลระบบ
 
 อินพุต `secret` ที่รองรับ:
 
 - สตริงธรรมดา
 - SecretRef ที่มี `source: "env" | "file" | "exec"`
 
-หาก route ที่ใช้ secret ไม่สามารถ resolve secret ได้ตอนเริ่มต้น Plugin จะข้าม
-route นั้นและบันทึกคำเตือนไว้ แทนที่จะเปิดเผย endpoint ที่เสีย
+หาก route ที่อิง secret ไม่สามารถ resolve secret ได้ตอนเริ่มต้น Plugin จะข้าม route นั้นและบันทึกคำเตือนไว้ แทนที่จะเปิดเผย endpoint ที่ใช้งานไม่ได้
 
 ## โมเดลความปลอดภัย
 
-แต่ละ route ได้รับความเชื่อถือให้ดำเนินการด้วยสิทธิ์ของ TaskFlow ตาม `sessionKey`
-ที่กำหนดค่าไว้
+แต่ละ route ได้รับความเชื่อถือให้ทำงานด้วยสิทธิ์ TaskFlow ของ `sessionKey` ที่กำหนดไว้
 
-นั่นหมายความว่า route สามารถตรวจสอบและแก้ไข TaskFlow ที่เป็นของเซสชันนั้นได้ ดังนั้น
-คุณควร:
+นั่นหมายความว่า route สามารถตรวจสอบและเปลี่ยนแปลง TaskFlow ที่เป็นของ session นั้นได้ ดังนั้นคุณควร:
 
-- ใช้ secret ที่แข็งแรงและไม่ซ้ำกันต่อ route
-- ควรใช้ secret reference แทน secret plaintext แบบอินไลน์
-- bind route กับเซสชันที่แคบที่สุดเท่าที่เหมาะกับเวิร์กโฟลว์
+- ใช้ secret ที่คาดเดายากและไม่ซ้ำกันสำหรับแต่ละ route
+- ควรใช้ secret reference แทน secret แบบ plaintext ที่ใส่ตรง ๆ
+- ผูก route กับ session ที่แคบที่สุดเท่าที่เหมาะกับเวิร์กโฟลว์
 - เปิดเผยเฉพาะพาธ Webhook ที่คุณต้องการจริง ๆ
 
-Plugin ใช้สิ่งต่อไปนี้:
+Plugin นี้ใช้:
 
 - การยืนยันตัวตนด้วย shared secret
 - ตัวป้องกันขนาด request body และ timeout
-- rate limiting แบบ fixed-window
-- การจำกัดจำนวนคำขอที่กำลังดำเนินการ
-- การเข้าถึง TaskFlow แบบ owner-bound ผ่าน `api.runtime.taskFlow.bindSession(...)`
+- การจำกัดอัตราแบบ fixed-window
+- การจำกัดจำนวน request ที่กำลังประมวลผล
+- การเข้าถึง TaskFlow ที่ผูกกับเจ้าของผ่าน `api.runtime.taskFlow.bindSession(...)`
 
 ## รูปแบบคำขอ
 
@@ -113,9 +107,9 @@ curl -X POST https://gateway.example.com/plugins/webhooks/zapier \
   -d '{"action":"create_flow","goal":"Review inbound queue"}'
 ```
 
-## การดำเนินการที่รองรับ
+## action ที่รองรับ
 
-ปัจจุบัน Plugin ยอมรับค่า `action` แบบ JSON เหล่านี้:
+ปัจจุบัน Plugin รองรับค่า `action` ใน JSON ดังนี้:
 
 - `create_flow`
 - `get_flow`
@@ -133,7 +127,7 @@ curl -X POST https://gateway.example.com/plugins/webhooks/zapier \
 
 ### `create_flow`
 
-สร้าง TaskFlow ที่มีการจัดการสำหรับเซสชันที่ route bind ไว้
+สร้าง TaskFlow ที่มีการจัดการสำหรับ session ที่ route ผูกไว้
 
 ตัวอย่าง:
 
@@ -191,10 +185,10 @@ runtime ที่อนุญาตคือ:
 }
 ```
 
-Plugin ตั้งใจล้าง metadata ของ owner/session ออกจากการตอบกลับของ Webhook
+Plugin นี้จงใจล้างเมทาดาทาของ owner/session ออกจากการตอบกลับของ Webhook
 
 ## เอกสารที่เกี่ยวข้อง
 
 - [Plugin runtime SDK](/th/plugins/sdk-runtime)
-- [ภาพรวมของ Hooks และ Webhook](/th/automation/hooks)
-- [CLI webhooks](/cli/webhooks)
+- [ภาพรวม hooks และ Webhook](/th/automation/hooks)
+- [CLI webhooks](/th/cli/webhooks)

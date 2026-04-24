@@ -1,31 +1,29 @@
 ---
 read_when:
     - การแนะนำ ClawHub ให้ผู้ใช้ใหม่
-    - การติดตั้ง ค้นหา หรือเผยแพร่ Skills หรือ Plugins
-    - การอธิบายแฟล็กของ ClawHub CLI และพฤติกรรมการซิงก์
-summary: 'คู่มือ ClawHub: registry สาธารณะ โฟลว์ติดตั้งแบบ native ของ OpenClaw และเวิร์กโฟลว์ของ ClawHub CLI'
+    - การติดตั้ง ค้นหา หรือเผยแพร่ Skills หรือ Plugin
+    - การอธิบายแฟล็กของ ClawHub CLI และพฤติกรรมการซิงค์
+summary: 'คู่มือ ClawHub: รีจิสทรีสาธารณะ, โฟลว์การติดตั้ง OpenClaw แบบเนทีฟ และเวิร์กโฟลว์ ClawHub CLI'
 title: ClawHub
 x-i18n:
-    generated_at: "2026-04-23T05:59:40Z"
+    generated_at: "2026-04-24T09:35:31Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 88980eb2f48c5298aec5b697e8e50762c3df5a4114f567e69424a1cb36e5102e
+    source_hash: 887bbf942238e3aee84389aa1c85b31b263144021301de37452522e215a0b1e5
     source_path: tools/clawhub.md
     workflow: 15
 ---
 
-# ClawHub
+ClawHub คือรีจิสทรีสาธารณะสำหรับ **Skills และ Plugin ของ OpenClaw**
 
-ClawHub คือ registry สาธารณะสำหรับ **Skills และ Plugins ของ OpenClaw**
-
-- ใช้คำสั่ง `openclaw` แบบ native เพื่อค้นหา/ติดตั้ง/อัปเดต Skills และติดตั้ง
-  Plugins จาก ClawHub
-- ใช้ CLI แยกชื่อ `clawhub` เมื่อต้องการ workflow ด้านการยืนยันตัวตนกับ registry, การเผยแพร่, ลบ,
-  กู้คืน หรือซิงก์
+- ใช้คำสั่ง `openclaw` แบบเนทีฟเพื่อค้นหา/ติดตั้ง/อัปเดต Skills และติดตั้ง
+  Plugin จาก ClawHub
+- ใช้ CLI `clawhub` แยกต่างหากเมื่อคุณต้องการการยืนยันตัวตนกับรีจิสทรี, การเผยแพร่, การลบ,
+  การกู้คืน, หรือเวิร์กโฟลว์การซิงค์
 
 เว็บไซต์: [clawhub.ai](https://clawhub.ai)
 
-## โฟลว์แบบ native ของ OpenClaw
+## โฟลว์ OpenClaw แบบเนทีฟ
 
 Skills:
 
@@ -42,52 +40,52 @@ openclaw plugins install clawhub:<package>
 openclaw plugins update --all
 ```
 
-package spec ของ Plugin ที่ปลอดภัยตามรูปแบบ npm แบบไม่ระบุคำนำหน้าก็จะถูกลองกับ ClawHub ก่อน npm ด้วย:
+สเปก Plugin แบบ bare npm-safe จะถูกลองค้นหากับ ClawHub ก่อน npm ด้วย:
 
 ```bash
 openclaw plugins install openclaw-codex-app-server
 ```
 
-คำสั่ง `openclaw` แบบ native จะติดตั้งลงใน workspace ที่ active อยู่ และเก็บเมทาดาทาแหล่งที่มาไว้
-เพื่อให้การเรียก `update` ภายหลังยังคงอยู่บน ClawHub ได้
+คำสั่ง `openclaw` แบบเนทีฟจะติดตั้งลงใน workspace ที่ใช้งานอยู่ และบันทึก metadata
+ของแหล่งที่มาไว้ เพื่อให้การเรียก `update` ภายหลังยังคงอยู่บน ClawHub ได้
 
 การติดตั้ง Plugin จะตรวจสอบความเข้ากันได้ของ `pluginApi` และ `minGatewayVersion`
-ที่ประกาศไว้ก่อนเริ่มการติดตั้ง archive ดังนั้นโฮสต์ที่ไม่เข้ากันจะ fail closed ตั้งแต่เนิ่น ๆ
-แทนที่จะติดตั้งได้เพียงบางส่วน
+ที่ประกาศไว้ก่อนรันการติดตั้ง archive ดังนั้น host ที่ไม่เข้ากันจะถูกปิดกั้นตั้งแต่ต้น
+แทนที่จะติดตั้งแพ็กเกจเพียงบางส่วน
 
 `openclaw plugins install clawhub:...` ยอมรับเฉพาะตระกูล Plugin ที่ติดตั้งได้เท่านั้น
-หาก package ใน ClawHub เป็น Skill จริง OpenClaw จะหยุดและชี้คุณไปที่
+หากแพ็กเกจ ClawHub เป็น Skill จริง OpenClaw จะหยุดและแนะนำให้คุณใช้
 `openclaw skills install <slug>` แทน
 
 ## ClawHub คืออะไร
 
-- registry สาธารณะสำหรับ Skills และ Plugins ของ OpenClaw
-- ที่เก็บแบบมีเวอร์ชันของชุด Skill และเมทาดาทา
-- พื้นผิวสำหรับการค้นพบผ่านการค้นหา tag และสัญญาณการใช้งาน
+- รีจิสทรีสาธารณะสำหรับ Skills และ Plugin ของ OpenClaw
+- ที่เก็บ bundle ของ Skill และ metadata แบบมีเวอร์ชัน
+- พื้นที่สำหรับการค้นพบผ่านการค้นหา แท็ก และสัญญาณการใช้งาน
 
 ## วิธีการทำงาน
 
-1. ผู้ใช้เผยแพร่ชุด Skill (ไฟล์ + เมทาดาทา)
-2. ClawHub เก็บชุดนั้นไว้ parse เมทาดาทา และกำหนดเวอร์ชัน
-3. registry ทำดัชนี Skill เพื่อการค้นหาและการค้นพบ
-4. ผู้ใช้ browse ดาวน์โหลด และติดตั้ง Skills ใน OpenClaw
+1. ผู้ใช้เผยแพร่ bundle ของ Skill (ไฟล์ + metadata)
+2. ClawHub จัดเก็บ bundle แยกวิเคราะห์ metadata และกำหนดเวอร์ชัน
+3. รีจิสทรีทำดัชนี Skill สำหรับการค้นหาและการค้นพบ
+4. ผู้ใช้เรียกดู ดาวน์โหลด และติดตั้ง Skills ใน OpenClaw
 
 ## สิ่งที่คุณทำได้
 
 - เผยแพร่ Skills ใหม่และเวอร์ชันใหม่ของ Skills ที่มีอยู่
-- ค้นพบ Skills ตามชื่อ tag หรือการค้นหา
-- ดาวน์โหลดชุด Skill และตรวจสอบไฟล์ภายใน
+- ค้นพบ Skills ตามชื่อ แท็ก หรือการค้นหา
+- ดาวน์โหลด bundle ของ Skill และตรวจสอบไฟล์ภายใน
 - รายงาน Skills ที่ไม่เหมาะสมหรือไม่ปลอดภัย
-- หากคุณเป็นผู้ดูแล สามารถซ่อน เลิกซ่อน ลบ หรือแบนได้
+- หากคุณเป็นผู้ดูแล คุณสามารถซ่อน เลิกซ่อน ลบ หรือแบนได้
 
-## เหมาะกับใคร (เป็นมิตรกับผู้เริ่มต้น)
+## เหมาะสำหรับใคร (เป็นมิตรกับผู้เริ่มต้น)
 
-หากคุณต้องการเพิ่มความสามารถใหม่ให้กับเอเจนต์ OpenClaw ของคุณ ClawHub คือวิธีที่ง่ายที่สุดในการค้นหาและติดตั้ง Skills คุณไม่จำเป็นต้องรู้ว่าแบ็กเอนด์ทำงานอย่างไร คุณสามารถ:
+หากคุณต้องการเพิ่มความสามารถใหม่ให้กับเอเจนต์ OpenClaw ของคุณ ClawHub คือวิธีที่ง่ายที่สุดในการค้นหาและติดตั้ง Skills คุณไม่จำเป็นต้องรู้ว่า backend ทำงานอย่างไร คุณสามารถ:
 
-- ค้นหา Skills ด้วยภาษาทั่วไป
+- ค้นหา Skills ด้วยภาษาปกติ
 - ติดตั้ง Skill ลงใน workspace ของคุณ
-- อัปเดต Skills ภายหลังด้วยคำสั่งเดียว
-- สำรอง Skills ของคุณเองโดยการเผยแพร่
+- อัปเดต Skills ภายหลังได้ด้วยคำสั่งเดียว
+- สำรอง Skills ของคุณเองด้วยการเผยแพร่
 
 ## เริ่มต้นอย่างรวดเร็ว (ไม่เชิงเทคนิค)
 
@@ -95,13 +93,13 @@ openclaw plugins install openclaw-codex-app-server
    - `openclaw skills search "calendar"`
 2. ติดตั้ง Skill:
    - `openclaw skills install <skill-slug>`
-3. เริ่มเซสชัน OpenClaw ใหม่เพื่อให้มันเห็น Skill ใหม่
-4. หากคุณต้องการเผยแพร่หรือจัดการ auth ของ registry ให้ติดตั้ง
+3. เริ่มเซสชัน OpenClaw ใหม่เพื่อให้ระบบรับ Skill ใหม่
+4. หากคุณต้องการเผยแพร่หรือจัดการการยืนยันตัวตนกับรีจิสทรี ให้ติดตั้ง
    CLI `clawhub` แยกต่างหากด้วย
 
 ## ติดตั้ง ClawHub CLI
 
-คุณต้องใช้สิ่งนี้เฉพาะสำหรับ workflow ที่ยืนยันตัวตนกับ registry เช่น publish/sync:
+คุณต้องใช้สิ่งนี้เฉพาะสำหรับเวิร์กโฟลว์ที่ต้องยืนยันตัวตนกับรีจิสทรี เช่น publish/sync:
 
 ```bash
 npm i -g clawhub
@@ -111,87 +109,91 @@ npm i -g clawhub
 pnpm add -g clawhub
 ```
 
-## มันเข้ากับ OpenClaw อย่างไร
+## วิธีที่มันเชื่อมเข้ากับ OpenClaw
 
-`openclaw skills install` แบบ native จะติดตั้งลงในไดเรกทอรี `skills/` ของ workspace ที่ active อยู่ ส่วน `openclaw plugins install clawhub:...` จะบันทึกการติดตั้ง Plugin แบบจัดการตามปกติ พร้อมเมทาดาทาแหล่งที่มาของ ClawHub สำหรับการอัปเดต
+`openclaw skills install` แบบเนทีฟจะติดตั้งลงในไดเรกทอรี `skills/`
+ของ workspace ที่ใช้งานอยู่ `openclaw plugins install clawhub:...` จะบันทึก
+การติดตั้ง Plugin แบบ managed ปกติพร้อม metadata แหล่งที่มาของ ClawHub สำหรับการอัปเดต
 
-การติดตั้ง Plugin จาก ClawHub แบบไม่ระบุตัวตนก็จะ fail closed สำหรับ package ส่วนตัวด้วย
-ส่วน community channel หรือช่องทางที่ไม่เป็นทางการอื่นยังติดตั้งได้ แต่ OpenClaw จะเตือน
-เพื่อให้ผู้ปฏิบัติงานตรวจสอบแหล่งที่มาและการยืนยันก่อนเปิดใช้งาน
+การติดตั้ง Plugin จาก ClawHub แบบไม่ระบุตัวตนจะปิดกั้นสำหรับแพ็กเกจ private ด้วย
+ช่องทางชุมชนหรือช่องทางที่ไม่ใช่ทางการอื่นยังคงติดตั้งได้ แต่ OpenClaw จะเตือน
+เพื่อให้ผู้ดูแลตรวจสอบแหล่งที่มาและการยืนยันก่อนเปิดใช้งาน
 
-CLI `clawhub` แบบแยกยังติดตั้ง Skills ลงใน `./skills` ภายใต้ไดเรกทอรีทำงานปัจจุบันของคุณ หากมีการตั้งค่า OpenClaw workspace ไว้ `clawhub`
+CLI `clawhub` แยกต่างหากจะติดตั้ง Skills ลงใน `./skills` ภายใต้
+ไดเรกทอรีทำงานปัจจุบันของคุณด้วย หากมีการกำหนดค่า workspace ของ OpenClaw ไว้ `clawhub`
 จะ fallback ไปยัง workspace นั้น เว้นแต่คุณจะ override ด้วย `--workdir` (หรือ
-`CLAWHUB_WORKDIR`) OpenClaw จะโหลด workspace skills จาก `<workspace>/skills`
-และจะเห็นมันในเซสชัน**ถัดไป** หากคุณใช้งาน
-`~/.openclaw/skills` หรือ bundled skills อยู่แล้ว workspace skills จะมีลำดับความสำคัญก่อน
+`CLAWHUB_WORKDIR`) OpenClaw โหลด workspace skills จาก `<workspace>/skills`
+และจะรับมาใช้ในเซสชัน**ถัดไป** หากคุณใช้งาน
+`~/.openclaw/skills` หรือ bundled skills อยู่แล้ว workspace skills จะมีลำดับความสำคัญสูงกว่า
 
-สำหรับรายละเอียดเพิ่มเติมเกี่ยวกับวิธีโหลด แชร์ และควบคุมการใช้งาน Skills ดู
+สำหรับรายละเอียดเพิ่มเติมเกี่ยวกับวิธีที่ Skills ถูกโหลด ใช้ร่วมกัน และกำกับไว้ โปรดดู
 [Skills](/th/tools/skills)
 
-## ภาพรวมของระบบ Skill
+## ภาพรวมระบบ Skill
 
-Skill คือชุดไฟล์แบบมีเวอร์ชันที่สอน OpenClaw วิธีทำงานเฉพาะอย่าง
-แต่ละครั้งที่เผยแพร่จะสร้างเวอร์ชันใหม่ และ registry จะเก็บประวัติเวอร์ชันไว้
-เพื่อให้ผู้ใช้ตรวจสอบการเปลี่ยนแปลงได้
+Skill คือ bundle ของไฟล์แบบมีเวอร์ชันที่สอน OpenClaw ให้ทำงาน
+เฉพาะอย่างหนึ่ง แต่ละครั้งที่เผยแพร่จะสร้างเวอร์ชันใหม่ และรีจิสทรีจะเก็บ
+ประวัติเวอร์ชันไว้เพื่อให้ผู้ใช้ตรวจสอบการเปลี่ยนแปลงได้
 
-Skill ทั่วไปมักประกอบด้วย:
+Skill โดยทั่วไปประกอบด้วย:
 
-- ไฟล์ `SKILL.md` พร้อมคำอธิบายหลักและวิธีใช้
-- คอนฟิก สคริปต์ หรือไฟล์สนับสนุนแบบไม่บังคับที่ Skill ใช้
-- เมทาดาทา เช่น tag สรุป และข้อกำหนดในการติดตั้ง
+- ไฟล์ `SKILL.md` พร้อมคำอธิบายหลักและวิธีใช้งาน
+- config, script หรือไฟล์สนับสนุนเพิ่มเติมที่ Skill ใช้
+- metadata เช่น แท็ก สรุป และข้อกำหนดการติดตั้ง
 
-ClawHub ใช้เมทาดาทาเพื่อขับเคลื่อนการค้นพบและเปิดเผยความสามารถของ Skill อย่างปลอดภัย
-registry ยังติดตามสัญญาณการใช้งาน (เช่น ดาวและจำนวนดาวน์โหลด) เพื่อปรับปรุง
+ClawHub ใช้ metadata เพื่อขับเคลื่อนการค้นพบและเปิดเผยความสามารถของ Skill อย่างปลอดภัย
+รีจิสทรียังติดตามสัญญาณการใช้งาน (เช่น ดาวและจำนวนดาวน์โหลด) เพื่อปรับปรุง
 การจัดอันดับและการมองเห็น
 
-## สิ่งที่บริการนี้มีให้ (ฟีเจอร์)
+## บริการนี้มีอะไรให้บ้าง (ฟีเจอร์)
 
-- **การ browse สาธารณะ** ของ Skills และเนื้อหา `SKILL.md`
-- **การค้นหา** ที่ขับเคลื่อนด้วย embeddings (vector search) ไม่ใช่แค่คีย์เวิร์ด
-- **การทำเวอร์ชัน** ด้วย semver, changelog และ tag (รวมถึง `latest`)
-- **การดาวน์โหลด** เป็น zip ต่อเวอร์ชัน
-- **ดาวและคอมเมนต์** สำหรับความคิดเห็นจากชุมชน
-- **hook สำหรับ moderation** สำหรับ approvals และ audits
-- **API ที่เป็นมิตรกับ CLI** สำหรับระบบอัตโนมัติและการเขียนสคริปต์
+- **การเรียกดูสาธารณะ** ของ Skills และเนื้อหา `SKILL.md`
+- **การค้นหา** ที่ขับเคลื่อนด้วย embeddings (การค้นหาแบบเวกเตอร์) ไม่ใช่แค่คีย์เวิร์ด
+- **การกำหนดเวอร์ชัน** ด้วย semver, changelog และแท็ก (รวมถึง `latest`)
+- **การดาวน์โหลด** เป็น zip แยกตามแต่ละเวอร์ชัน
+- **ดาวและความคิดเห็น** สำหรับข้อเสนอแนะจากชุมชน
+- **Hooks สำหรับการกลั่นกรอง** เพื่อการอนุมัติและ audit
+- **API ที่เป็นมิตรกับ CLI** สำหรับระบบอัตโนมัติและสคริปต์
 
-## ความปลอดภัยและ moderation
+## ความปลอดภัยและการกลั่นกรอง
 
-ClawHub เปิดกว้างเป็นค่าเริ่มต้น ทุกคนสามารถอัปโหลด Skills ได้ แต่บัญชี GitHub ต้อง
-มีอายุอย่างน้อยหนึ่งสัปดาห์จึงจะเผยแพร่ได้ วิธีนี้ช่วยชะลอการใช้งานในทางที่ผิดโดยไม่ปิดกั้น
-ผู้มีส่วนร่วมที่ชอบด้วยกฎหมาย
+ClawHub เปิดใช้งานโดยค่าเริ่มต้น ทุกคนสามารถอัปโหลด Skills ได้ แต่บัญชี GitHub ต้อง
+มีอายุอย่างน้อยหนึ่งสัปดาห์จึงจะเผยแพร่ได้ ซึ่งช่วยชะลอการใช้งานในทางที่ผิดโดยไม่ขัดขวาง
+ผู้มีส่วนร่วมที่ถูกต้องตามปกติ
 
-การรายงานและ moderation:
+การรายงานและการกลั่นกรอง:
 
-- ผู้ใช้ที่ลงชื่อเข้าใช้ทุกคนสามารถรายงาน Skill ได้
+- ผู้ใช้ที่ลงชื่อเข้าใช้แล้วทุกคนสามารถรายงาน Skill ได้
 - ต้องระบุเหตุผลของการรายงานและมีการบันทึกไว้
-- ผู้ใช้แต่ละคนสามารถมีรายงานที่ active ได้พร้อมกันสูงสุด 20 รายการ
-- Skills ที่มีรายงานจากผู้ใช้ไม่ซ้ำกันมากกว่า 3 ราย จะถูกซ่อนอัตโนมัติตามค่าเริ่มต้น
+- ผู้ใช้แต่ละคนสามารถมีรายงานที่ยังใช้งานอยู่ได้สูงสุด 20 รายการในเวลาเดียวกัน
+- Skills ที่มีรายงานไม่ซ้ำกันมากกว่า 3 รายการจะถูกซ่อนโดยอัตโนมัติตามค่าเริ่มต้น
 - ผู้ดูแลสามารถดู Skills ที่ถูกซ่อน เลิกซ่อน ลบ หรือแบนผู้ใช้ได้
-- การใช้ฟีเจอร์รายงานในทางที่ผิดอาจนำไปสู่การถูกแบนบัญชี
+- การใช้ฟีเจอร์รายงานในทางที่ผิดอาจส่งผลให้บัญชีถูกแบน
 
-สนใจเป็นผู้ดูแลหรือไม่? ถามใน Discord ของ OpenClaw และติดต่อผู้ดูแลหรือผู้ดูแลโครงการ
+สนใจเป็นผู้ดูแลหรือไม่? ถามได้ใน OpenClaw Discord และติดต่อ
+ผู้ดูแลหรือผู้ดูแลระบบหลัก
 
 ## คำสั่ง CLI และพารามิเตอร์
 
-ตัวเลือก global (ใช้ได้กับทุกคำสั่ง):
+ตัวเลือกส่วนกลาง (ใช้กับทุกคำสั่ง):
 
-- `--workdir <dir>`: ไดเรกทอรีทำงาน (ค่าเริ่มต้น: ไดเรกทอรีปัจจุบัน; fallback ไปยัง OpenClaw workspace)
-- `--dir <dir>`: ไดเรกทอรี Skills แบบสัมพัทธ์จาก workdir (ค่าเริ่มต้น: `skills`)
-- `--site <url>`: base URL ของไซต์ (สำหรับ browser login)
-- `--registry <url>`: base URL ของ registry API
-- `--no-input`: ปิด prompt (non-interactive)
-- `-V, --cli-version`: พิมพ์เวอร์ชันของ CLI
+- `--workdir <dir>`: ไดเรกทอรีทำงาน (ค่าเริ่มต้น: dir ปัจจุบัน; fallback ไปยัง OpenClaw workspace)
+- `--dir <dir>`: ไดเรกทอรี Skills โดยอิงจาก workdir (ค่าเริ่มต้น: `skills`)
+- `--site <url>`: URL ฐานของเว็บไซต์ (เข้าสู่ระบบผ่านเบราว์เซอร์)
+- `--registry <url>`: URL ฐานของ API รีจิสทรี
+- `--no-input`: ปิด prompts (ไม่โต้ตอบ)
+- `-V, --cli-version`: พิมพ์เวอร์ชัน CLI
 
 Auth:
 
-- `clawhub login` (โฟลว์ผ่านเบราว์เซอร์) หรือ `clawhub login --token <token>`
+- `clawhub login` (โฟลว์เบราว์เซอร์) หรือ `clawhub login --token <token>`
 - `clawhub logout`
 - `clawhub whoami`
 
 ตัวเลือก:
 
 - `--token <token>`: วาง API token
-- `--label <label>`: label ที่เก็บไว้สำหรับ token จาก browser login (ค่าเริ่มต้น: `CLI token`)
+- `--label <label>`: ป้ายกำกับที่จัดเก็บสำหรับ token การล็อกอินผ่านเบราว์เซอร์ (ค่าเริ่มต้น: `CLI token`)
 - `--no-browser`: ไม่เปิดเบราว์เซอร์ (ต้องใช้ร่วมกับ `--token`)
 
 ค้นหา:
@@ -202,19 +204,19 @@ Auth:
 ติดตั้ง:
 
 - `clawhub install <slug>`
-- `--version <version>`: ติดตั้งเวอร์ชันที่เฉพาะเจาะจง
-- `--force`: เขียนทับหากมีโฟลเดอร์อยู่แล้ว
+- `--version <version>`: ติดตั้งเวอร์ชันที่ระบุ
+- `--force`: เขียนทับหากโฟลเดอร์มีอยู่แล้ว
 
 อัปเดต:
 
 - `clawhub update <slug>`
 - `clawhub update --all`
-- `--version <version>`: อัปเดตเป็นเวอร์ชันที่เฉพาะเจาะจง (ใช้ได้กับ slug เดียวเท่านั้น)
-- `--force`: เขียนทับเมื่อไฟล์ในเครื่องไม่ตรงกับเวอร์ชันที่เผยแพร่ใด ๆ
+- `--version <version>`: อัปเดตเป็นเวอร์ชันที่ระบุ (ใช้ได้กับ slug เดียวเท่านั้น)
+- `--force`: เขียนทับเมื่อไฟล์ในเครื่องไม่ตรงกับเวอร์ชันที่เผยแพร่ใดๆ
 
 รายการ:
 
-- `clawhub list` (อ่านจาก `.clawhub/lock.json`)
+- `clawhub list` (อ่าน `.clawhub/lock.json`)
 
 เผยแพร่ Skills:
 
@@ -222,32 +224,32 @@ Auth:
 - `--slug <slug>`: slug ของ Skill
 - `--name <name>`: ชื่อที่แสดง
 - `--version <version>`: เวอร์ชัน semver
-- `--changelog <text>`: ข้อความ changelog (เว้นว่างได้)
-- `--tags <tags>`: tag คั่นด้วยจุลภาค (ค่าเริ่มต้น: `latest`)
+- `--changelog <text>`: ข้อความ changelog (สามารถเว้นว่างได้)
+- `--tags <tags>`: แท็กคั่นด้วยจุลภาค (ค่าเริ่มต้น: `latest`)
 
 เผยแพร่ Plugins:
 
 - `clawhub package publish <source>`
-- `<source>` อาจเป็นโฟลเดอร์ในเครื่อง, `owner/repo`, `owner/repo@ref` หรือ GitHub URL
-- `--dry-run`: build แผนการเผยแพร่แบบตรงตัวโดยไม่อัปโหลดอะไร
-- `--json`: ส่งออกแบบ machine-readable สำหรับ CI
-- `--source-repo`, `--source-commit`, `--source-ref`: override แบบไม่บังคับเมื่อการตรวจจับอัตโนมัติยังไม่เพียงพอ
+- `<source>` สามารถเป็นโฟลเดอร์ในเครื่อง, `owner/repo`, `owner/repo@ref`, หรือ GitHub URL
+- `--dry-run`: สร้างแผนการเผยแพร่จริงโดยไม่อัปโหลดอะไร
+- `--json`: แสดงผลลัพธ์แบบ machine-readable สำหรับ CI
+- `--source-repo`, `--source-commit`, `--source-ref`: ใช้ override แบบเลือกได้เมื่อการตรวจจับอัตโนมัติยังไม่เพียงพอ
 
 ลบ/กู้คืน (เฉพาะ owner/admin):
 
 - `clawhub delete <slug> --yes`
 - `clawhub undelete <slug> --yes`
 
-ซิงก์ (สแกน Skills ในเครื่อง + เผยแพร่ตัวใหม่/ตัวที่อัปเดต):
+ซิงค์ (สแกน Skills ในเครื่อง + เผยแพร่รายการใหม่/ที่อัปเดต):
 
 - `clawhub sync`
-- `--root <dir...>`: root สำหรับการสแกนเพิ่มเติม
-- `--all`: อัปโหลดทุกอย่างโดยไม่ถาม
-- `--dry-run`: แสดงว่าจะอัปโหลดอะไรบ้าง
+- `--root <dir...>`: root เพิ่มเติมสำหรับสแกน
+- `--all`: อัปโหลดทุกอย่างโดยไม่มี prompt
+- `--dry-run`: แสดงสิ่งที่จะถูกอัปโหลด
 - `--bump <type>`: `patch|minor|major` สำหรับการอัปเดต (ค่าเริ่มต้น: `patch`)
-- `--changelog <text>`: changelog สำหรับการอัปเดตแบบ non-interactive
-- `--tags <tags>`: tag คั่นด้วยจุลภาค (ค่าเริ่มต้น: `latest`)
-- `--concurrency <n>`: จำนวนการตรวจสอบ registry พร้อมกัน (ค่าเริ่มต้น: 4)
+- `--changelog <text>`: changelog สำหรับการอัปเดตแบบไม่โต้ตอบ
+- `--tags <tags>`: แท็กคั่นด้วยจุลภาค (ค่าเริ่มต้น: `latest`)
+- `--concurrency <n>`: การตรวจสอบรีจิสทรี (ค่าเริ่มต้น: 4)
 
 ## เวิร์กโฟลว์ทั่วไปสำหรับเอเจนต์
 
@@ -263,13 +265,13 @@ clawhub search "postgres backups"
 clawhub install my-skill-pack
 ```
 
-### อัปเดต Skills ที่ติดตั้งแล้ว
+### อัปเดต Skills ที่ติดตั้งไว้
 
 ```bash
 clawhub update --all
 ```
 
-### สำรอง Skills ของคุณ (publish หรือ sync)
+### สำรอง Skills ของคุณ (เผยแพร่หรือซิงค์)
 
 สำหรับโฟลเดอร์ Skill เดียว:
 
@@ -277,7 +279,7 @@ clawhub update --all
 clawhub skill publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
 ```
 
-เพื่อสแกนและสำรอง Skills หลายตัวพร้อมกัน:
+เพื่อสแกนและสำรอง Skills จำนวนมากพร้อมกัน:
 
 ```bash
 clawhub sync --all
@@ -292,7 +294,7 @@ clawhub package publish your-org/your-plugin@v1.0.0
 clawhub package publish https://github.com/your-org/your-plugin
 ```
 
-Plugin แบบโค้ดต้องมีเมทาดาทา OpenClaw ที่จำเป็นใน `package.json`:
+Code Plugin ต้องมี metadata ของ OpenClaw ที่จำเป็นใน `package.json`:
 
 ```json
 {
@@ -314,34 +316,35 @@ Plugin แบบโค้ดต้องมีเมทาดาทา OpenClaw 
 }
 ```
 
-package ที่เผยแพร่ควรส่งมาพร้อม JavaScript ที่ build แล้ว และชี้ `runtimeExtensions`
-ไปยังเอาต์พุตนั้น การติดตั้งแบบ git checkout ยัง fallback ไปยัง source TypeScript ได้
-เมื่อไม่มีไฟล์ที่ build แล้ว แต่ runtime entry แบบ build แล้วช่วยหลีกเลี่ยงการคอมไพล์ TypeScript ตอน runtime ในเส้นทาง startup, doctor และการโหลด Plugin
+แพ็กเกจที่เผยแพร่ควรส่งมอบ JavaScript ที่ build แล้วและชี้ `runtimeExtensions`
+ไปยังผลลัพธ์นั้น การติดตั้งจาก Git checkout ยังสามารถ fallback ไปยังซอร์ส TypeScript
+ได้เมื่อไม่มีไฟล์ที่ build แล้ว แต่ entry ของ runtime ที่ build แล้วจะช่วยหลีกเลี่ยง
+การคอมไพล์ TypeScript ระหว่างรันในขั้นตอนการเริ่มต้น doctor และการโหลด Plugin
 
 ## รายละเอียดขั้นสูง (เชิงเทคนิค)
 
-### การทำเวอร์ชันและ tag
+### การกำหนดเวอร์ชันและแท็ก
 
-- แต่ละครั้งที่เผยแพร่จะสร้าง `SkillVersion` แบบ **semver** ใหม่
-- tag (เช่น `latest`) จะชี้ไปยังเวอร์ชันหนึ่ง; การย้าย tag ช่วยให้คุณ rollback ได้
-- changelog ถูกแนบแยกตามเวอร์ชัน และสามารถเว้นว่างได้เมื่อ sync หรือเผยแพร่การอัปเดต
+- การเผยแพร่แต่ละครั้งจะสร้าง `SkillVersion` แบบ **semver** ใหม่
+- แท็ก (เช่น `latest`) ชี้ไปยังเวอร์ชันหนึ่ง การย้ายแท็กช่วยให้คุณ rollback ได้
+- changelog จะแนบตามแต่ละเวอร์ชัน และสามารถเว้นว่างได้เมื่อซิงค์หรือเผยแพร่การอัปเดต
 
-### การเปลี่ยนแปลงในเครื่องเทียบกับเวอร์ชันใน registry
+### การเปลี่ยนแปลงในเครื่องเทียบกับเวอร์ชันในรีจิสทรี
 
-การอัปเดตจะเปรียบเทียบเนื้อหา Skill ในเครื่องกับเวอร์ชันใน registry โดยใช้ content hash หากไฟล์ในเครื่องไม่ตรงกับเวอร์ชันที่เผยแพร่ใด ๆ CLI จะถามก่อนเขียนทับ (หรือบังคับให้ใช้ `--force` ในโหมด non-interactive)
+การอัปเดตจะเปรียบเทียบเนื้อหา Skill ในเครื่องกับเวอร์ชันในรีจิสทรีโดยใช้ content hash หากไฟล์ในเครื่องไม่ตรงกับเวอร์ชันที่เผยแพร่ใดๆ CLI จะถามก่อนเขียนทับ (หรือกำหนดให้ใช้ `--force` ในการรันแบบไม่โต้ตอบ)
 
-### การสแกน sync และ fallback root
+### การสแกนซิงค์และ root สำรอง
 
-`clawhub sync` จะสแกน workdir ปัจจุบันของคุณก่อน หากไม่พบ Skills จะ fallback ไปยังตำแหน่งแบบ legacy ที่รู้จัก (เช่น `~/openclaw/skills` และ `~/.openclaw/skills`) สิ่งนี้ออกแบบมาเพื่อค้นหา Skill ที่ติดตั้งไว้แบบเก่าโดยไม่ต้องใส่แฟล็กเพิ่มเติม
+`clawhub sync` จะสแกน workdir ปัจจุบันของคุณก่อน หากไม่พบ Skills ระบบจะ fallback ไปยังตำแหน่ง legacy ที่รู้จัก (เช่น `~/openclaw/skills` และ `~/.openclaw/skills`) ซึ่งออกแบบมาเพื่อค้นหาการติดตั้ง Skill รุ่นเก่าโดยไม่ต้องใช้แฟล็กเพิ่มเติม
 
-### การจัดเก็บและ lockfile
+### ที่เก็บข้อมูลและ lockfile
 
 - Skills ที่ติดตั้งแล้วจะถูกบันทึกไว้ใน `.clawhub/lock.json` ภายใต้ workdir ของคุณ
-- auth token จะถูกเก็บไว้ในไฟล์คอนฟิกของ ClawHub CLI (override ได้ผ่าน `CLAWHUB_CONFIG_PATH`)
+- Auth token จะถูกเก็บไว้ในไฟล์ config ของ ClawHub CLI (override ได้ผ่าน `CLAWHUB_CONFIG_PATH`)
 
 ### Telemetry (จำนวนการติดตั้ง)
 
-เมื่อคุณรัน `clawhub sync` ขณะล็อกอินอยู่ CLI จะส่งสแนปชอตแบบน้อยที่สุดเพื่อคำนวณจำนวนการติดตั้ง คุณสามารถปิดสิ่งนี้ได้ทั้งหมด:
+เมื่อคุณรัน `clawhub sync` ขณะล็อกอินอยู่ CLI จะส่ง snapshot ขั้นต่ำเพื่อคำนวณจำนวนการติดตั้ง คุณสามารถปิดใช้งานสิ่งนี้ทั้งหมดได้:
 
 ```bash
 export CLAWHUB_DISABLE_TELEMETRY=1
@@ -349,8 +352,14 @@ export CLAWHUB_DISABLE_TELEMETRY=1
 
 ## ตัวแปรสภาพแวดล้อม
 
-- `CLAWHUB_SITE`: override URL ของไซต์
-- `CLAWHUB_REGISTRY`: override URL ของ registry API
+- `CLAWHUB_SITE`: override URL ของเว็บไซต์
+- `CLAWHUB_REGISTRY`: override URL ของ API รีจิสทรี
 - `CLAWHUB_CONFIG_PATH`: override ตำแหน่งที่ CLI เก็บ token/config
-- `CLAWHUB_WORKDIR`: override workdir ค่าเริ่มต้น
+- `CLAWHUB_WORKDIR`: override workdir เริ่มต้น
 - `CLAWHUB_DISABLE_TELEMETRY=1`: ปิด telemetry บน `sync`
+
+## ที่เกี่ยวข้อง
+
+- [Plugin](/th/tools/plugin)
+- [Skills](/th/tools/skills)
+- [Community plugins](/th/plugins/community)

@@ -1,28 +1,26 @@
 ---
 read_when:
-    - คุณกำลังทำ onboarding แบบอัตโนมัติในสคริปต์หรือ CI
-    - คุณต้องการตัวอย่างแบบ non-interactive สำหรับผู้ให้บริการเฉพาะ【final
+    - คุณกำลังทำให้การเริ่มต้นใช้งานเป็นแบบอัตโนมัติในสคริปต์หรือ CI
+    - คุณต้องการตัวอย่างแบบไม่โต้ตอบสำหรับ provider ที่เฉพาะเจาะจง
 sidebarTitle: CLI automation
 summary: การเริ่มต้นใช้งานแบบสคริปต์และการตั้งค่าเอเจนต์สำหรับ OpenClaw CLI
-title: การทำงานอัตโนมัติผ่าน CLI
+title: การทำงานอัตโนมัติของ CLI
 x-i18n:
-    generated_at: "2026-04-23T05:58:00Z"
+    generated_at: "2026-04-24T09:34:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bca2dd6e482a16b27284fc76319e936e8df0ff5558134827c19f6875436cc652
+    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
 
-# การทำงานอัตโนมัติผ่าน CLI
-
-ใช้ `--non-interactive` เพื่อทำ `openclaw onboard` แบบอัตโนมัติ
+ใช้ `--non-interactive` เพื่อทำ `openclaw onboard` ให้เป็นอัตโนมัติ
 
 <Note>
-`--json` ไม่ได้หมายถึงโหมด non-interactive โดยอัตโนมัติ สำหรับสคริปต์ ให้ใช้ `--non-interactive` (และ `--workspace`)
+`--json` ไม่ได้หมายความว่าจะเป็นโหมดไม่โต้ตอบโดยอัตโนมัติ สำหรับสคริปต์ให้ใช้ `--non-interactive` (และ `--workspace`)
 </Note>
 
-## ตัวอย่าง non-interactive พื้นฐาน
+## ตัวอย่างพื้นฐานแบบไม่โต้ตอบ
 
 ```bash
 openclaw onboard --non-interactive \
@@ -37,13 +35,13 @@ openclaw onboard --non-interactive \
   --skip-skills
 ```
 
-เพิ่ม `--json` หากต้องการสรุปแบบ machine-readable
+เพิ่ม `--json` เพื่อให้ได้สรุปที่เครื่องอ่านได้
 
-ใช้ `--secret-input-mode ref` เพื่อเก็บ refs ที่อิง env ลงใน auth profiles แทนค่าข้อความล้วน
-การเลือกแบบ interactive ระหว่าง env refs และ configured provider refs (`file` หรือ `exec`) มีให้ใช้ใน onboarding flow
+ใช้ `--secret-input-mode ref` เพื่อเก็บ ref ที่อิง env ไว้ใน auth profile แทนการเก็บค่าแบบ plaintext
+ในการเริ่มต้นใช้งานมีการเลือกแบบโต้ตอบระหว่าง env refs และ provider refs ที่กำหนดค่าไว้ (`file` หรือ `exec`)
 
-ในโหมด non-interactive แบบ `ref`, provider env vars ต้องถูกตั้งไว้ใน process environment
-หากส่ง inline key flags โดยไม่มี env var ที่ตรงกัน ระบบจะล้มเหลวทันที
+ในโหมด `ref` แบบไม่โต้ตอบ ตัวแปร env ของ provider ต้องถูกตั้งค่าไว้ใน environment ของโปรเซส
+หากส่งแฟล็กคีย์แบบ inline โดยไม่มี env var ที่ตรงกัน ระบบจะล้มเหลวทันที
 
 ตัวอย่าง:
 
@@ -55,7 +53,7 @@ openclaw onboard --non-interactive \
   --accept-risk
 ```
 
-## ตัวอย่างเฉพาะผู้ให้บริการ
+## ตัวอย่างเฉพาะ provider
 
 <AccordionGroup>
   <Accordion title="ตัวอย่าง Anthropic API key">
@@ -162,7 +160,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="ตัวอย่าง Custom provider">
+  <Accordion title="ตัวอย่าง provider แบบกำหนดเอง">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -176,7 +174,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` เป็นตัวเลือก หากละไว้ onboarding จะตรวจสอบ `CUSTOM_API_KEY`
+    `--custom-api-key` เป็นทางเลือก หากไม่ระบุ การเริ่มต้นใช้งานจะตรวจสอบ `CUSTOM_API_KEY`
 
     ตัวแปรแบบ ref-mode:
 
@@ -194,18 +192,18 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    ในโหมดนี้ onboarding จะเก็บ `apiKey` เป็น `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`
+    ในโหมดนี้ การเริ่มต้นใช้งานจะเก็บ `apiKey` เป็น `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`
 
   </Accordion>
 </AccordionGroup>
 
-setup-token ของ Anthropic ยังคงใช้ได้ในฐานะเส้นทาง token สำหรับ onboarding ที่รองรับ แต่ตอนนี้ OpenClaw จะให้ความสำคัญกับการนำ Claude CLI มาใช้ซ้ำเมื่อมีให้ใช้
-สำหรับ production ควรใช้ Anthropic API key
+Anthropic setup-token ยังคงใช้งานได้ในฐานะเส้นทางโทเค็นที่รองรับสำหรับการเริ่มต้นใช้งาน แต่ตอนนี้ OpenClaw จะเลือกใช้ Claude CLI ซ้ำก่อนเมื่อพร้อมใช้งาน
+สำหรับการใช้งานจริง แนะนำให้ใช้ Anthropic API key
 
 ## เพิ่มเอเจนต์อีกตัว
 
-ใช้ `openclaw agents add <name>` เพื่อสร้างเอเจนต์แยกที่มี workspace,
-sessions และ auth profiles ของตัวเอง การรันโดยไม่มี `--workspace` จะเปิดวิซาร์ด
+ใช้ `openclaw agents add <name>` เพื่อสร้างเอเจนต์แยกต่างหากที่มี workspace,
+เซสชัน และ auth profiles ของตัวเอง หากรันโดยไม่ใช้ `--workspace` ระบบจะเปิดวิซาร์ด
 
 ```bash
 openclaw agents add work \
@@ -216,7 +214,7 @@ openclaw agents add work \
   --json
 ```
 
-สิ่งที่มันตั้งค่า:
+สิ่งที่จะถูกตั้งค่า:
 
 - `agents.list[].name`
 - `agents.list[].workspace`
@@ -224,12 +222,12 @@ openclaw agents add work \
 
 หมายเหตุ:
 
-- workspace เริ่มต้นใช้รูปแบบ `~/.openclaw/workspace-<agentId>`
-- เพิ่ม `bindings` เพื่อจัดเส้นทางข้อความขาเข้า (วิซาร์ดสามารถทำสิ่งนี้ได้)
-- แฟล็กสำหรับ non-interactive: `--model`, `--agent-dir`, `--bind`, `--non-interactive`
+- workspace เริ่มต้นจะเป็นรูปแบบ `~/.openclaw/workspace-<agentId>`
+- เพิ่ม `bindings` เพื่อกำหนดเส้นทางข้อความขาเข้า (วิซาร์ดสามารถทำได้)
+- แฟล็กสำหรับโหมดไม่โต้ตอบ: `--model`, `--agent-dir`, `--bind`, `--non-interactive`
 
 ## เอกสารที่เกี่ยวข้อง
 
-- ศูนย์กลาง onboarding: [Onboarding (CLI)](/th/start/wizard)
+- ศูนย์กลางการเริ่มต้นใช้งาน: [Onboarding (CLI)](/th/start/wizard)
 - เอกสารอ้างอิงแบบเต็ม: [CLI Setup Reference](/th/start/wizard-cli-reference)
-- เอกสารอ้างอิงคำสั่ง: [`openclaw onboard`](/cli/onboard)
+- เอกสารอ้างอิงคำสั่ง: [`openclaw onboard`](/th/cli/onboard)

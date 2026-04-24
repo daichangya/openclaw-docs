@@ -1,26 +1,24 @@
 ---
 read_when:
-    - คุณต้องการล็อกดีบักแบบเจาะจงโดยไม่เพิ่มระดับการบันทึกล็อกแบบทั่วระบบ
-    - คุณต้องการเก็บล็อกเฉพาะระบบย่อยสำหรับการสนับสนุน მომხმარողի to=functions.read เติมเงินไทยฟรี  东臣json  全民彩票天天送"path":"docs/AGENTS.md","offset":1,"limit":200} code
-summary: แฟล็กการวินิจฉัยสำหรับล็อกดีบักแบบเจาะจง
-title: แฟล็กการวินิจฉัย
+    - คุณต้องการ log ดีบักแบบเจาะจงโดยไม่เพิ่มระดับ logging แบบโกลบอล
+    - คุณต้องการเก็บ log เฉพาะระบบย่อยสำหรับการซัพพอร์ต
+summary: แฟล็ก diagnostics สำหรับ log ดีบักแบบเจาะจง
+title: แฟล็ก diagnostics
 x-i18n:
-    generated_at: "2026-04-23T05:32:27Z"
+    generated_at: "2026-04-24T09:08:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: daf0eca0e6bd1cbc2c400b2e94e1698709a96b9cdba1a8cf00bd580a61829124
+    source_hash: b7e5ec9c5e28ef51f1e617baf62412897df8096f227a74d86a0824e269aafd9d
     source_path: diagnostics/flags.md
     workflow: 15
 ---
 
-# แฟล็กการวินิจฉัย
-
-แฟล็กการวินิจฉัยช่วยให้คุณเปิดใช้ล็อกดีบักแบบเจาะจงได้โดยไม่ต้องเปิดการบันทึกแบบละเอียดทุกที่ แฟล็กเป็นแบบเลือกเปิดใช้และจะไม่มีผล เว้นแต่ระบบย่อยจะตรวจสอบแฟล็กเหล่านั้น
+แฟล็ก diagnostics ช่วยให้คุณเปิด log ดีบักแบบเจาะจงได้โดยไม่ต้องเปิด verbose logging ทุกที่ แฟล็กเหล่านี้เป็นแบบเลือกใช้เองและจะไม่มีผลเว้นแต่ระบบย่อยจะตรวจสอบมัน
 
 ## วิธีการทำงาน
 
-- แฟล็กเป็นสตริง (ไม่สนตัวพิมพ์เล็ก/ใหญ่)
-- คุณสามารถเปิดใช้แฟล็กใน config หรือผ่าน env override
+- แฟล็กเป็นสตริง (ไม่สนตัวพิมพ์เล็กใหญ่)
+- คุณสามารถเปิดใช้แฟล็กได้ในการกำหนดค่าหรือผ่าน env override
 - รองรับ wildcard:
   - `telegram.*` ตรงกับ `telegram.http`
   - `*` เปิดใช้ทุกแฟล็ก
@@ -45,7 +43,7 @@ x-i18n:
 }
 ```
 
-รีสตาร์ต gateway หลังจากเปลี่ยนแฟล็ก
+รีสตาร์ท gateway หลังจากเปลี่ยนแฟล็ก
 
 ## Env override (ใช้ครั้งเดียว)
 
@@ -59,25 +57,25 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
 OPENCLAW_DIAGNOSTICS=0
 ```
 
-## ล็อกจะไปอยู่ที่ไหน
+## log จะไปที่ใด
 
-แฟล็กจะส่งล็อกไปยังไฟล์ล็อกการวินิจฉัยมาตรฐาน โดยค่าเริ่มต้น:
+แฟล็กจะส่ง log ไปยังไฟล์ diagnostics log มาตรฐาน โดยค่าเริ่มต้น:
 
 ```
 /tmp/openclaw/openclaw-YYYY-MM-DD.log
 ```
 
-หากคุณตั้งค่า `logging.file` ให้ใช้พาธนั้นแทน ล็อกจะอยู่ในรูปแบบ JSONL (หนึ่งอ็อบเจ็กต์ JSON ต่อหนึ่งบรรทัด) การปกปิดข้อมูลยังคงมีผลตาม `logging.redactSensitive`
+หากคุณตั้งค่า `logging.file` ให้ใช้พาธนั้นแทน log เป็น JSONL (หนึ่งออบเจ็กต์ JSON ต่อหนึ่งบรรทัด) การปกปิดข้อมูลยังคงใช้ตาม `logging.redactSensitive`
 
-## ดึงล็อกออกมา
+## ดึง log
 
-เลือกไฟล์ล็อกล่าสุด:
+เลือกไฟล์ log ล่าสุด:
 
 ```bash
 ls -t /tmp/openclaw/openclaw-*.log | head -n 1
 ```
 
-กรองเฉพาะการวินิจฉัย HTTP ของ Telegram:
+กรองหา diagnostics ของ Telegram HTTP:
 
 ```bash
 rg "telegram http error" /tmp/openclaw/openclaw-*.log
@@ -89,10 +87,15 @@ rg "telegram http error" /tmp/openclaw/openclaw-*.log
 tail -f /tmp/openclaw/openclaw-$(date +%F).log | rg "telegram http error"
 ```
 
-สำหรับ gateway ระยะไกล คุณยังสามารถใช้ `openclaw logs --follow` ได้ด้วย (ดู [/cli/logs](/cli/logs))
+สำหรับ gateway ระยะไกล คุณยังสามารถใช้ `openclaw logs --follow` ได้ (ดู [/cli/logs](/th/cli/logs))
 
 ## หมายเหตุ
 
-- หากตั้งค่า `logging.level` สูงกว่า `warn` ล็อกเหล่านี้อาจถูกระงับ ค่าเริ่มต้น `info` ใช้ได้
-- สามารถเปิดใช้แฟล็กค้างไว้ได้อย่างปลอดภัย; แฟล็กจะมีผลเฉพาะกับปริมาณล็อกของระบบย่อยที่ระบุ
-- ใช้ [/logging](/th/logging) เพื่อเปลี่ยนปลายทางล็อก ระดับ และการปกปิดข้อมูล
+- หากตั้งค่า `logging.level` สูงกว่า `warn` log เหล่านี้อาจถูกระงับ ค่าเริ่มต้น `info` ใช้งานได้
+- แฟล็กสามารถเปิดทิ้งไว้ได้อย่างปลอดภัย; มันมีผลเฉพาะกับปริมาณ log ของระบบย่อยที่ระบุ
+- ใช้ [/logging](/th/logging) เพื่อเปลี่ยนปลายทาง log ระดับ และการปกปิดข้อมูล
+
+## ที่เกี่ยวข้อง
+
+- [Gateway diagnostics](/th/gateway/diagnostics)
+- [การแก้ไขปัญหา Gateway](/th/gateway/troubleshooting)

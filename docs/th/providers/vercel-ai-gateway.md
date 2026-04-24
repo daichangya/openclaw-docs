@@ -1,42 +1,40 @@
 ---
 read_when:
     - คุณต้องการใช้ Vercel AI Gateway กับ OpenClaw
-    - คุณต้องการ env var ของ API key หรือตัวเลือกการยืนยันตัวตนผ่าน CLI
+    - คุณต้องการตัวแปรสภาพแวดล้อมของคีย์ API หรือตัวเลือกการยืนยันตัวตนใน CLI
 summary: การตั้งค่า Vercel AI Gateway (การยืนยันตัวตน + การเลือกโมเดล)
 title: Vercel AI Gateway
 x-i18n:
-    generated_at: "2026-04-23T05:53:44Z"
+    generated_at: "2026-04-24T09:30:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 11c0f764d4c35633d0fbfc189bae0fc451dc799002fc1a6d0c84fc73842bbe31
+    source_hash: e1fa1c3c6e44e40d7a1fc89d93ee268c19124b746d4644d58014157be7cceeb9
     source_path: providers/vercel-ai-gateway.md
     workflow: 15
 ---
 
-# Vercel AI Gateway
+[Vercel AI Gateway](https://vercel.com/ai-gateway) ให้ API แบบรวมศูนย์สำหรับ
+เข้าถึงโมเดลหลายร้อยรายการผ่าน endpoint เดียว
 
-[Vercel AI Gateway](https://vercel.com/ai-gateway) ให้ API แบบรวมศูนย์เพื่อ
-เข้าถึงโมเดลหลายร้อยตัวผ่าน endpoint เดียว
-
-| คุณสมบัติ       | ค่า                               |
-| --------------- | --------------------------------- |
-| ผู้ให้บริการ     | `vercel-ai-gateway`              |
-| การยืนยันตัวตน | `AI_GATEWAY_API_KEY`             |
-| API             | เข้ากันได้กับ Anthropic Messages |
-| แค็ตตาล็อกโมเดล | ค้นพบอัตโนมัติผ่าน `/v1/models` |
+| คุณสมบัติ      | ค่า                               |
+| -------------- | --------------------------------- |
+| Provider       | `vercel-ai-gateway`               |
+| Auth           | `AI_GATEWAY_API_KEY`              |
+| API            | เข้ากันได้กับ Anthropic Messages  |
+| แค็ตตาล็อกโมเดล | ค้นพบอัตโนมัติผ่าน `/v1/models`   |
 
 <Tip>
 OpenClaw จะค้นพบแค็ตตาล็อก `/v1/models` ของ Gateway โดยอัตโนมัติ ดังนั้น
-`/models vercel-ai-gateway` จึงมี model ref ปัจจุบัน เช่น
-`vercel-ai-gateway/openai/gpt-5.4` และ
+`/models vercel-ai-gateway` จึงรวม model refs ปัจจุบัน เช่น
+`vercel-ai-gateway/openai/gpt-5.5` และ
 `vercel-ai-gateway/moonshotai/kimi-k2.6`
 </Tip>
 
 ## เริ่มต้นใช้งาน
 
 <Steps>
-  <Step title="ตั้งค่า API key">
-    รัน onboarding แล้วเลือกตัวเลือก auth ของ AI Gateway:
+  <Step title="ตั้งค่าคีย์ API">
+    เรียกใช้ onboarding แล้วเลือกตัวเลือก auth ของ AI Gateway:
 
     ```bash
     openclaw onboard --auth-choice ai-gateway-api-key
@@ -44,7 +42,7 @@ OpenClaw จะค้นพบแค็ตตาล็อก `/v1/models` ขอ
 
   </Step>
   <Step title="ตั้งค่าโมเดลเริ่มต้น">
-    เพิ่มโมเดลลงในคอนฟิก OpenClaw ของคุณ:
+    เพิ่มโมเดลลงใน config ของ OpenClaw:
 
     ```json5
     {
@@ -66,7 +64,7 @@ OpenClaw จะค้นพบแค็ตตาล็อก `/v1/models` ขอ
 
 ## ตัวอย่างแบบไม่โต้ตอบ
 
-สำหรับชุดติดตั้งแบบสคริปต์หรือ CI ให้ส่งค่าทั้งหมดผ่าน command line:
+สำหรับการตั้งค่าแบบสคริปต์หรือ CI ให้ส่งค่าทั้งหมดผ่านบรรทัดคำสั่ง:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -75,42 +73,42 @@ openclaw onboard --non-interactive \
   --ai-gateway-api-key "$AI_GATEWAY_API_KEY"
 ```
 
-## รูปแบบย่อของ model ID
+## รูปแบบย่อของ Model ID
 
-OpenClaw รองรับ model ref แบบย่อของ Vercel Claude และจะ normalize ตอน runtime:
+OpenClaw รองรับ model refs แบบย่อของ Vercel Claude และจะทำให้เป็นรูปแบบมาตรฐานขณะรันไทม์:
 
-| อินพุตแบบย่อ                        | model ref ที่ normalize แล้ว                    |
-| ----------------------------------- | ---------------------------------------------- |
-| `vercel-ai-gateway/claude-opus-4.6` | `vercel-ai-gateway/anthropic/claude-opus-4.6` |
-| `vercel-ai-gateway/opus-4.6`        | `vercel-ai-gateway/anthropic/claude-opus-4-6` |
+| อินพุตแบบย่อ                        | model ref ที่ถูกทำให้เป็นมาตรฐาน                 |
+| ----------------------------------- | ------------------------------------------------ |
+| `vercel-ai-gateway/claude-opus-4.6` | `vercel-ai-gateway/anthropic/claude-opus-4.6`    |
+| `vercel-ai-gateway/opus-4.6`        | `vercel-ai-gateway/anthropic/claude-opus-4-6`    |
 
 <Tip>
-คุณสามารถใช้ทั้งรูปแบบย่อหรือ model ref แบบระบุเต็มในคอนฟิกของคุณได้
-OpenClaw จะ resolve ไปเป็นรูปแบบ canonical โดยอัตโนมัติ
+คุณสามารถใช้ได้ทั้งรูปแบบย่อหรือ model ref แบบระบุเต็มใน config ของคุณ
+OpenClaw จะ resolve ไปยังรูปแบบ canonical โดยอัตโนมัติ
 </Tip>
 
-## หมายเหตุขั้นสูง
+## การตั้งค่าขั้นสูง
 
 <AccordionGroup>
   <Accordion title="ตัวแปรสภาพแวดล้อมสำหรับโปรเซสแบบ daemon">
-    หาก OpenClaw Gateway รันเป็น daemon (launchd/systemd) ให้ตรวจสอบว่า
-    `AI_GATEWAY_API_KEY` พร้อมใช้งานกับโปรเซสนั้น
+    หาก OpenClaw Gateway ทำงานเป็น daemon (launchd/systemd) โปรดตรวจสอบให้แน่ใจว่า
+    `AI_GATEWAY_API_KEY` พร้อมใช้งานสำหรับโปรเซสนั้น
 
     <Warning>
-    key ที่ตั้งไว้เฉพาะใน `~/.profile` จะไม่มองเห็นโดย daemon ของ launchd/systemd
-    เว้นแต่ environment นั้นจะถูก import อย่างชัดเจน ให้ตั้งค่า key ใน
-    `~/.openclaw/.env` หรือผ่าน `env.shellEnv` เพื่อให้แน่ใจว่าโปรเซส Gateway
-    สามารถอ่านได้
+    คีย์ที่ตั้งค่าไว้เฉพาะใน `~/.profile` จะไม่มองเห็นโดย daemon ของ launchd/systemd
+    เว้นแต่จะมีการนำเข้าสภาพแวดล้อมนั้นอย่างชัดเจน ให้ตั้งค่าคีย์ไว้ใน
+    `~/.openclaw/.env` หรือผ่าน `env.shellEnv` เพื่อให้แน่ใจว่าโปรเซส gateway สามารถ
+    อ่านได้
     </Warning>
 
   </Accordion>
 
-  <Accordion title="การกำหนดเส้นทางผู้ให้บริการ">
-    Vercel AI Gateway จะกำหนดเส้นทางคำขอไปยังผู้ให้บริการต้นทางตาม
-    คำนำหน้าของ model ref ตัวอย่างเช่น `vercel-ai-gateway/anthropic/claude-opus-4.6` จะกำหนดเส้นทาง
-    ผ่าน Anthropic ขณะที่ `vercel-ai-gateway/openai/gpt-5.4` จะกำหนดเส้นทางผ่าน
+  <Accordion title="การกำหนดเส้นทางของ provider">
+    Vercel AI Gateway จะกำหนดเส้นทางคำขอไปยังผู้ให้บริการต้นทางตามคำนำหน้าของ model
+    ref ตัวอย่างเช่น `vercel-ai-gateway/anthropic/claude-opus-4.6` จะกำหนดเส้นทาง
+    ผ่าน Anthropic ขณะที่ `vercel-ai-gateway/openai/gpt-5.5` จะกำหนดเส้นทางผ่าน
     OpenAI และ `vercel-ai-gateway/moonshotai/kimi-k2.6` จะกำหนดเส้นทางผ่าน
-    MoonshotAI `AI_GATEWAY_API_KEY` เดียวของคุณจัดการการยืนยันตัวตนสำหรับ
+    MoonshotAI โดย `AI_GATEWAY_API_KEY` เพียงค่าเดียวของคุณจะจัดการการยืนยันตัวตนสำหรับ
     ผู้ให้บริการต้นทางทั้งหมด
   </Accordion>
 </AccordionGroup>
@@ -119,9 +117,9 @@ OpenClaw จะ resolve ไปเป็นรูปแบบ canonical โดย
 
 <CardGroup cols={2}>
   <Card title="การเลือกโมเดล" href="/th/concepts/model-providers" icon="layers">
-    การเลือกผู้ให้บริการ model ref และพฤติกรรม failover
+    การเลือก providers, model refs และพฤติกรรม failover
   </Card>
   <Card title="การแก้ไขปัญหา" href="/th/help/troubleshooting" icon="wrench">
-    การแก้ไขปัญหาทั่วไปและ FAQ
+    การแก้ไขปัญหาทั่วไปและคำถามที่พบบ่อย
   </Card>
 </CardGroup>

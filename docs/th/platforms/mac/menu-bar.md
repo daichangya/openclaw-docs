@@ -1,13 +1,13 @@
 ---
 read_when:
-    - การปรับ UI ของเมนูบน Mac หรือตรรกะของสถานะ
+    - การปรับ UI ของเมนูบน mac หรือการเปลี่ยนตรรกะสถานะ
 summary: ตรรกะสถานะของ menu bar และสิ่งที่แสดงให้ผู้ใช้เห็น
-title: Menu Bar
+title: Menu bar
 x-i18n:
-    generated_at: "2026-04-23T05:45:00Z"
+    generated_at: "2026-04-24T09:21:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8eb73c0e671a76aae4ebb653c65147610bf3e6d3c9c0943d150e292e7761d16d
+    source_hash: 89b03f3b0f9e56057d4cbf10bd1252372c65a2b2ae5e0405a844e9a59b51405d
     source_path: platforms/mac/menu-bar.md
     workflow: 15
 ---
@@ -16,15 +16,15 @@ x-i18n:
 
 ## สิ่งที่แสดง
 
-- เราแสดงสถานะงานปัจจุบันของเอเจนต์ในไอคอนบน menu bar และในแถวสถานะแรกของเมนู
-- สถานะสุขภาพจะถูกซ่อนขณะมีงานกำลังทำอยู่; มันจะกลับมาเมื่อทุก sessions อยู่ในสถานะ idle
+- เราแสดงสถานะงานปัจจุบันของเอเจนต์ในไอคอน menu bar และในแถวสถานะแรกของเมนู
+- สถานะสุขภาพจะถูกซ่อนไว้ขณะมีงาน active; และจะกลับมาเมื่อทุกเซสชัน idle
 - บล็อก “Nodes” ในเมนูจะแสดงเฉพาะ **อุปกรณ์** เท่านั้น (paired nodes ผ่าน `node.list`) ไม่ใช่รายการ client/presence
-- ส่วน “Usage” จะปรากฏใต้ Context เมื่อมี provider usage snapshots พร้อมใช้งาน
+- ส่วน “Usage” จะปรากฏใต้ Context เมื่อมี provider usage snapshots ให้ใช้
 
-## โมเดลสถานะ
+## แบบจำลองสถานะ
 
-- Sessions: events จะมาพร้อม `runId` (ต่อการรัน) และ `sessionKey` ใน payload โดย session “main” คือคีย์ `main`; หากไม่มี เราจะ fallback ไปยัง session ที่ถูกอัปเดตล่าสุด
-- ลำดับความสำคัญ: main ชนะเสมอ หาก main กำลังทำงาน สถานะของมันจะถูกแสดงทันที หาก main ว่างอยู่ เราจะแสดงสถานะของ non-main session ที่เพิ่งทำงานล่าสุด เราจะไม่สลับไปมาระหว่างกิจกรรมกลางคัน; เราจะสลับเฉพาะเมื่อ session ปัจจุบันเข้าสู่ idle หรือเมื่อ main กลับมาทำงาน
+- Sessions: เหตุการณ์จะมาพร้อม `runId` (ต่อการรัน) บวกกับ `sessionKey` ใน payload เซสชัน “main” คือคีย์ `main`; หากไม่มี เราจะ fallback ไปยังเซสชันที่อัปเดตล่าสุด
+- ลำดับความสำคัญ: main ชนะเสมอ หาก main active สถานะของมันจะแสดงทันที หาก main idle จะแสดงสถานะของเซสชัน non-main ที่ active ล่าสุด เราจะไม่สลับไปมาระหว่างกิจกรรม; จะสลับก็ต่อเมื่อเซสชันปัจจุบัน idle หรือ main กลายเป็น active
 - ประเภทของกิจกรรม:
   - `job`: การรันคำสั่งระดับสูง (`state: started|streaming|done|error`)
   - `tool`: `phase: start|result` พร้อม `toolName` และ `meta/args`
@@ -45,44 +45,49 @@ x-i18n:
 - `attach` → 📎
 - ค่าเริ่มต้น → 🛠️
 
-### การแมปด้านภาพ
+### การแมปเชิงภาพ
 
-- `idle`: critter แบบปกติ
-- `workingMain`: มี badge พร้อม glyph, tint เต็ม และแอนิเมชันขาแบบ “working”
-- `workingOther`: มี badge พร้อม glyph, tint แบบ muted, ไม่มีการ scurry
-- `overridden`: ใช้ glyph/tint ที่เลือกไว้โดยไม่ขึ้นกับกิจกรรมจริง
+- `idle`: critter ปกติ
+- `workingMain`: badge พร้อม glyph, tint เต็ม, แอนิเมชันขาแบบ “working”
+- `workingOther`: badge พร้อม glyph, tint แบบ muted, ไม่มีการ scurry
+- `overridden`: ใช้ glyph/tint ที่เลือกไว้โดยไม่ขึ้นกับกิจกรรม
 
-## ข้อความแถวสถานะ (เมนู)
+## ข้อความในแถวสถานะ (เมนู)
 
-- ขณะมีงานกำลังทำอยู่: `<Session role> · <activity label>`
+- ขณะมีงาน active: `<Session role> · <activity label>`
   - ตัวอย่าง: `Main · exec: pnpm test`, `Other · read: apps/macos/Sources/OpenClaw/AppState.swift`
-- เมื่อ idle: จะ fallback ไปยังสรุปสถานะสุขภาพ
+- เมื่อ idle: จะ fallback ไปยังสรุปสุขภาพ
 
-## การรับ events
+## การรับเหตุการณ์เข้า
 
-- แหล่งที่มา: events `agent` จาก control-channel (`ControlChannel.handleAgentEvent`)
-- ฟิลด์ที่แยกวิเคราะห์:
-  - `stream: "job"` พร้อม `data.state` สำหรับ start/stop
+- แหล่งที่มา: เหตุการณ์ `agent` ของ control-channel (`ControlChannel.handleAgentEvent`)
+- ฟิลด์ที่ parse:
+  - `stream: "job"` พร้อม `data.state` สำหรับการเริ่ม/หยุด
   - `stream: "tool"` พร้อม `data.phase`, `name`, และ `meta`/`args` แบบไม่บังคับ
 - Labels:
   - `exec`: บรรทัดแรกของ `args.command`
-  - `read`/`write`: พาธแบบย่อ
-  - `edit`: พาธพร้อมชนิดการเปลี่ยนแปลงที่อนุมานจาก `meta`/จำนวน diff
+  - `read`/`write`: path แบบย่อ
+  - `edit`: path พร้อมประเภทการเปลี่ยนแปลงที่อนุมานจาก `meta`/จำนวน diff
   - fallback: ชื่อเครื่องมือ
 
 ## Debug override
 
 - Settings ▸ Debug ▸ ตัวเลือก “Icon override”:
   - `System (auto)` (ค่าเริ่มต้น)
-  - `Working: main` (แยกตามชนิดของ tool)
-  - `Working: other` (แยกตามชนิดของ tool)
+  - `Working: main` (แยกตามประเภทเครื่องมือ)
+  - `Working: other` (แยกตามประเภทเครื่องมือ)
   - `Idle`
 - เก็บผ่าน `@AppStorage("iconOverride")`; แมปไปยัง `IconState.overridden`
 
 ## เช็กลิสต์การทดสอบ
 
-- กระตุ้นงานใน main session: ตรวจสอบว่าไอคอนสลับทันทีและแถวสถานะแสดงป้าย main
-- กระตุ้นงานใน non-main session ขณะ main idle: ไอคอน/สถานะแสดง non-main; และคงอยู่แบบเสถียรจนงานนั้นเสร็จ
-- เริ่ม main ขณะ other กำลังทำงาน: ไอคอนต้องสลับเป็น main ทันที
-- tool bursts ที่เกิดถี่ๆ: ตรวจสอบว่า badge ไม่กะพริบ (มี TTL grace บนผลลัพธ์ของ tool)
-- แถวสถานะสุขภาพต้องกลับมาเมื่อทุก sessions idle
+- ทริกเกอร์งานของ main session: ตรวจสอบว่าไอคอนสลับทันทีและแถวสถานะแสดงป้ายของ main
+- ทริกเกอร์งานของ non-main session ขณะที่ main idle: ไอคอน/สถานะแสดง non-main; คงที่จนกว่าจะเสร็จ
+- เริ่ม main ขณะที่ other active: ไอคอนสลับไปที่ main ทันที
+- tool bursts แบบรวดเร็ว: ตรวจสอบว่า badge ไม่กะพริบ (มี TTL grace บนผลลัพธ์ของ tool)
+- แถวสุขภาพกลับมาอีกครั้งเมื่อทุกเซสชัน idle
+
+## ที่เกี่ยวข้อง
+
+- [แอป macOS](/th/platforms/macos)
+- [ไอคอน menu bar](/th/platforms/mac/icon)

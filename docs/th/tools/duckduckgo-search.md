@@ -1,39 +1,36 @@
 ---
 read_when:
-    - คุณต้องการผู้ให้บริการ web search ที่ไม่ต้องใช้ API key
+    - คุณต้องการผู้ให้บริการค้นหาเว็บที่ไม่ต้องใช้คีย์ API
     - คุณต้องการใช้ DuckDuckGo สำหรับ `web_search`
-    - คุณต้องการ search fallback แบบไม่ต้องกำหนดค่าเลย
-summary: DuckDuckGo web search -- ผู้ให้บริการ fallback แบบไม่ใช้คีย์ (ทดลอง, อิง HTML)
-title: การค้นหา DuckDuckGo
+    - คุณต้องการตัวสำรองการค้นหาแบบไม่ต้องตั้งค่าเลย
+summary: การค้นหาเว็บด้วย DuckDuckGo -- ผู้ให้บริการสำรองที่ไม่ต้องใช้คีย์ (experimental, อิง HTML)
+title: การค้นหาด้วย DuckDuckGo
 x-i18n:
-    generated_at: "2026-04-23T06:00:06Z"
+    generated_at: "2026-04-24T09:35:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 31f8e3883584534396c247c3d8069ea4c5b6399e0ff13a9dd0c8ee0c3da02096
+    source_hash: 6828830079b0bee1321f0971ec120ae98bc72ab040ad3a0fe30fe89217ed0722
     source_path: tools/duckduckgo-search.md
     workflow: 15
 ---
 
-# การค้นหา DuckDuckGo
-
-OpenClaw รองรับ DuckDuckGo เป็นผู้ให้บริการ `web_search` แบบ **ไม่ใช้คีย์** ไม่ต้องใช้ API
-key หรือบัญชี
+OpenClaw รองรับ DuckDuckGo เป็นผู้ให้บริการ `web_search` แบบ **ไม่ต้องใช้คีย์** ไม่ต้องมีคีย์ API หรือบัญชีผู้ใช้
 
 <Warning>
-  DuckDuckGo เป็นการเชื่อมต่อแบบ **ทดลองและไม่เป็นทางการ** ที่ดึงผลลัพธ์
-  จากหน้าค้นหาแบบ non-JavaScript ของ DuckDuckGo — ไม่ใช่ API อย่างเป็นทางการ ควรคาดหมาย
-  ว่าจะมีการใช้งานเสียหายเป็นครั้งคราวจากหน้าท้าทายบอทหรือการเปลี่ยนแปลงของ HTML
+  DuckDuckGo เป็นการเชื่อมต่อแบบ **experimental และไม่เป็นทางการ** ที่ดึงผลลัพธ์
+  จากหน้าค้นหาแบบไม่ใช้ JavaScript ของ DuckDuckGo — ไม่ใช่ API อย่างเป็นทางการ โปรดคาดไว้ว่า
+  อาจใช้งานไม่ได้เป็นครั้งคราวจากหน้าท้าทายบอตหรือการเปลี่ยนแปลง HTML
 </Warning>
 
 ## การตั้งค่า
 
-ไม่ต้องใช้ API key — เพียงตั้ง DuckDuckGo เป็นผู้ให้บริการของคุณ:
+ไม่ต้องใช้คีย์ API — เพียงแค่ตั้งค่า DuckDuckGo เป็นผู้ให้บริการของคุณ:
 
 <Steps>
   <Step title="กำหนดค่า">
     ```bash
     openclaw configure --section web
-    # เลือก "duckduckgo" เป็นผู้ให้บริการ
+    # Select "duckduckgo" as the provider
     ```
   </Step>
 </Steps>
@@ -52,7 +49,7 @@ key หรือบัญชี
 }
 ```
 
-การตั้งค่าระดับ Plugin แบบเลือกได้สำหรับ region และ SafeSearch:
+การตั้งค่าระดับ Plugin แบบทางเลือกสำหรับภูมิภาคและ SafeSearch:
 
 ```json5
 {
@@ -61,8 +58,8 @@ key หรือบัญชี
       duckduckgo: {
         config: {
           webSearch: {
-            region: "us-en", // รหัส region ของ DuckDuckGo
-            safeSearch: "moderate", // "strict", "moderate" หรือ "off"
+            region: "us-en", // DuckDuckGo region code
+            safeSearch: "moderate", // "strict", "moderate", or "off"
           },
         },
       },
@@ -73,37 +70,46 @@ key หรือบัญชี
 
 ## พารามิเตอร์ของเครื่องมือ
 
-| พารามิเตอร์  | คำอธิบาย                                                      |
-| ------------ | ------------------------------------------------------------- |
-| `query`      | คำค้นหา (จำเป็น)                                               |
-| `count`      | จำนวนผลลัพธ์ที่จะส่งกลับ (1-10, ค่าเริ่มต้น: 5)               |
-| `region`     | รหัส region ของ DuckDuckGo (เช่น `us-en`, `uk-en`, `de-de`)   |
-| `safeSearch` | ระดับ SafeSearch: `strict`, `moderate` (ค่าเริ่มต้น) หรือ `off` |
+<ParamField path="query" type="string" required>
+คำค้นหา
+</ParamField>
 
-สามารถตั้งค่า region และ SafeSearch ใน config ของ Plugin ได้เช่นกัน (ดูด้านบน) —
-พารามิเตอร์ของเครื่องมือจะ override ค่าใน config เป็นรายคำค้น
+<ParamField path="count" type="number" default="5">
+จำนวนผลลัพธ์ที่จะส่งกลับ (1–10)
+</ParamField>
+
+<ParamField path="region" type="string">
+รหัสภูมิภาคของ DuckDuckGo (เช่น `us-en`, `uk-en`, `de-de`)
+</ParamField>
+
+<ParamField path="safeSearch" type="'strict' | 'moderate' | 'off'" default="moderate">
+ระดับ SafeSearch
+</ParamField>
+
+ภูมิภาคและ SafeSearch สามารถตั้งค่าได้ใน config ของ Plugin เช่นกัน (ดูด้านบน) —
+พารามิเตอร์ของเครื่องมือจะมีลำดับความสำคัญเหนือค่าคอนฟิกในแต่ละคำค้น
 
 ## หมายเหตุ
 
-- **ไม่ต้องใช้ API key** — ใช้งานได้ทันที ไม่ต้องกำหนดค่า
-- **ทดลอง** — รวบรวมผลลัพธ์จากหน้าค้นหา HTML แบบ non-JavaScript ของ DuckDuckGo
-  ไม่ใช่ API หรือ SDK อย่างเป็นทางการ
-- **มีความเสี่ยงเรื่อง bot-challenge** — DuckDuckGo อาจแสดง CAPTCHA หรือบล็อกคำขอ
-  เมื่อมีการใช้งานหนักหรือแบบอัตโนมัติ
-- **การ parse HTML** — ผลลัพธ์ขึ้นอยู่กับโครงสร้างหน้า ซึ่งอาจเปลี่ยนได้โดย
-  ไม่แจ้งล่วงหน้า
-- **ลำดับการตรวจจับอัตโนมัติ** — DuckDuckGo เป็น key-free fallback ตัวแรก
-  (ลำดับ 100) ในการตรวจจับอัตโนมัติ ผู้ให้บริการที่อิง API และมีคีย์กำหนดค่าไว้จะรัน
-  ก่อน จากนั้นจึงเป็น Ollama Web Search (ลำดับ 110) แล้วค่อย SearXNG (ลำดับ 200)
-- **SafeSearch มีค่าเริ่มต้นเป็น moderate** เมื่อไม่ได้กำหนดค่า
+- **ไม่ต้องใช้คีย์ API** — ใช้งานได้ทันทีโดยไม่ต้องตั้งค่า
+- **experimental** — รวบรวมผลลัพธ์จากหน้าค้นหา HTML แบบไม่ใช้ JavaScript
+  ของ DuckDuckGo ไม่ใช่ API หรือ SDK อย่างเป็นทางการ
+- **ความเสี่ยงจาก bot-challenge** — DuckDuckGo อาจแสดง CAPTCHA หรือบล็อกคำขอ
+  เมื่อมีการใช้งานหนักหรือใช้งานแบบอัตโนมัติ
+- **การแยกวิเคราะห์ HTML** — ผลลัพธ์ขึ้นอยู่กับโครงสร้างของหน้าเว็บ ซึ่งอาจเปลี่ยนแปลงได้โดย
+  ไม่มีการแจ้งล่วงหน้า
+- **ลำดับการตรวจจับอัตโนมัติ** — DuckDuckGo เป็นตัวสำรองแบบไม่ต้องใช้คีย์ตัวแรก
+  (ลำดับ 100) ในการตรวจจับอัตโนมัติ ผู้ให้บริการที่ใช้ API และมีการตั้งค่าคีย์ไว้จะทำงาน
+  ก่อน จากนั้นเป็น Ollama Web Search (ลำดับ 110) แล้วจึงเป็น SearXNG (ลำดับ 200)
+- **SafeSearch มีค่าเริ่มต้นเป็น moderate** หากไม่ได้กำหนดค่าไว้
 
 <Tip>
-  สำหรับการใช้งานใน production ควรพิจารณา [Brave Search](/th/tools/brave-search) (มี free tier
-  ให้ใช้) หรือผู้ให้บริการที่อิง API รายอื่น
+  สำหรับการใช้งานจริงใน production โปรดพิจารณา [Brave Search](/th/tools/brave-search) (มี
+  free tier) หรือผู้ให้บริการที่รองรับ API รายอื่น
 </Tip>
 
 ## ที่เกี่ยวข้อง
 
-- [Web Search overview](/th/tools/web) -- ผู้ให้บริการทั้งหมดและการตรวจจับอัตโนมัติ
+- [ภาพรวม Web Search](/th/tools/web) -- ผู้ให้บริการทั้งหมดและการตรวจจับอัตโนมัติ
 - [Brave Search](/th/tools/brave-search) -- ผลลัพธ์แบบมีโครงสร้างพร้อม free tier
-- [Exa Search](/th/tools/exa-search) -- neural search พร้อม content extraction
+- [Exa Search](/th/tools/exa-search) -- การค้นหาแบบ neural พร้อมการดึงเนื้อหา

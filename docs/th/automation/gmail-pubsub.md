@@ -1,15 +1,18 @@
 ---
-summary: เปลี่ยนเส้นทางไปที่ /automation/cron-jobs
+summary: เปลี่ยนเส้นทางไปยัง /automation/cron-jobs
 title: Gmail PubSub
 x-i18n:
-    generated_at: "2026-04-23T05:24:30Z"
+    generated_at: "2026-04-24T08:57:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c2e17fdc8c09d52b6dc9fb6c44053446f07d02c65a0ab725d4ea038bd035d889
+    source_hash: 4462fb58fa73ac3eb3d8d2994760b96424dcad3f1543e8ff10222936f6c54caf
     source_path: automation/gmail-pubsub.md
     workflow: 15
 ---
 
-# Gmail PubSub
+หน้านี้ถูกย้ายไปที่ [Scheduled Tasks](/th/automation/cron-jobs#gmail-pubsub-integration) โปรดดูเอกสาร Gmail PubSub ได้ที่ [Scheduled Tasks](/th/automation/cron-jobs#gmail-pubsub-integration)
 
-หน้านี้ย้ายไปที่ [งานที่ตั้งเวลาไว้](/th/automation/cron-jobs#gmail-pubsub-integration) ดู [งานที่ตั้งเวลาไว้](/th/automation/cron-jobs#gmail-pubsub-integration) สำหรับเอกสาร Gmail PubSub
+## ที่เกี่ยวข้อง
+
+- [Webhook](/th/automation/cron-jobs)
+- [การแก้ไขปัญหา Automation](/th/automation/cron-jobs)

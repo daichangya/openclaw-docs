@@ -1,41 +1,39 @@
 ---
 read_when:
-    - คุณต้องการเปิดใช้งานหรือกำหนดค่า `code_execution`
-    - คุณต้องการการวิเคราะห์ระยะไกลโดยไม่ต้องเข้าถึง shell ในเครื่อง
-    - คุณต้องการใช้ `x_search` หรือ `web_search` ร่วมกับการวิเคราะห์ Python ระยะไกล
+    - คุณต้องการเปิดใช้หรือกำหนดค่า code_execution
+    - คุณต้องการการวิเคราะห์จากระยะไกลโดยไม่ให้เข้าถึง shell ในเครื่องన్నారు to=assistant final code  სწორിയായി translated text only.
+    - คุณต้องการใช้ x_search หรือ web_search ร่วมกับการวิเคราะห์ Python ระยะไกล
 summary: code_execution -- รันการวิเคราะห์ Python ระยะไกลแบบ sandboxed ด้วย xAI
-title: Code Execution
+title: การรันโค้ด
 x-i18n:
-    generated_at: "2026-04-23T05:59:35Z"
+    generated_at: "2026-04-24T09:35:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 48ca1ddd026cb14837df90ee74859eb98ba6d1a3fbc78da8a72390d0ecee5e40
+    source_hash: 332afbbef15eaa832d87f263eb095eff680e8f941b9e123add9b37f9b4fa5e00
     source_path: tools/code-execution.md
     workflow: 15
 ---
 
-# Code Execution
+`code_execution` รันการวิเคราะห์ Python ระยะไกลแบบ sandboxed บน Responses API ของ xAI
+สิ่งนี้แตกต่างจาก [`exec`](/th/tools/exec) ในเครื่อง:
 
-`code_execution` ใช้รันการวิเคราะห์ Python ระยะไกลแบบ sandboxed บน Responses API ของ xAI
-สิ่งนี้ต่างจาก [`exec`](/th/tools/exec) แบบ local:
-
-- `exec` รัน shell commands บนเครื่องของคุณหรือบน node
+- `exec` รันคำสั่ง shell บนเครื่องของคุณหรือบน Node
 - `code_execution` รัน Python ใน sandbox ระยะไกลของ xAI
 
 ใช้ `code_execution` สำหรับ:
 
 - การคำนวณ
-- การทำตาราง
+- การจัดตาราง
 - สถิติแบบรวดเร็ว
-- การวิเคราะห์สไตล์กราฟ
-- การวิเคราะห์ข้อมูลที่ได้จาก `x_search` หรือ `web_search`
+- การวิเคราะห์ลักษณะคล้ายกราฟ
+- การวิเคราะห์ข้อมูลที่ส่งกลับมาจาก `x_search` หรือ `web_search`
 
-อย่าใช้มันเมื่อคุณต้องการไฟล์ในเครื่อง shell ของคุณ repo ของคุณ หรือ paired
-devices ในกรณีนั้นให้ใช้ [`exec`](/th/tools/exec)
+**อย่า** ใช้มันเมื่อคุณต้องการไฟล์ในเครื่อง shell ของคุณ repo ของคุณ หรืออุปกรณ์ที่จับคู่ไว้
+ในกรณีนั้นให้ใช้ [`exec`](/th/tools/exec)
 
 ## การตั้งค่า
 
-คุณต้องมี xAI API key โดยคีย์ต่อไปนี้ใช้ได้ทั้งหมด:
+คุณต้องมี xAI API key โดยใช้วิธีใดวิธีหนึ่งต่อไปนี้ได้:
 
 - `XAI_API_KEY`
 - `plugins.entries.xai.config.webSearch.apiKey`
@@ -66,7 +64,7 @@ devices ในกรณีนั้นให้ใช้ [`exec`](/th/tools/exec
 
 ## วิธีใช้งาน
 
-ถามแบบธรรมชาติและระบุเจตนาในการวิเคราะห์ให้ชัดเจน:
+ถามแบบเป็นธรรมชาติและระบุเจตนาว่าต้องการวิเคราะห์อย่างชัดเจน:
 
 ```text
 Use code_execution to calculate the 7-day moving average for these numbers: ...
@@ -80,18 +78,20 @@ Use x_search to find posts mentioning OpenClaw this week, then use code_executio
 Use web_search to gather the latest AI benchmark numbers, then use code_execution to compare percent changes.
 ```
 
-ภายในเครื่องมือนี้รับพารามิเตอร์ `task` เพียงตัวเดียว ดังนั้นเอเจนต์ควรส่ง
-คำขอวิเคราะห์ทั้งหมดและข้อมูลแบบ inline ที่เกี่ยวข้องในพรอมป์ต์เดียว
+ภายในเครื่องมือนี้จะรับพารามิเตอร์ `task` เพียงตัวเดียว ดังนั้นเอเจนต์ควรส่ง
+คำขอวิเคราะห์ทั้งหมดพร้อมข้อมูลแบบ inline ในพรอมป์เดียว
 
 ## ข้อจำกัด
 
-- นี่คือการรันระยะไกลของ xAI ไม่ใช่การรันโปรเซสในเครื่อง
-- ควรมองว่าเป็นการวิเคราะห์ชั่วคราว ไม่ใช่ notebook แบบคงอยู่
+- นี่คือการรันของ xAI แบบระยะไกล ไม่ใช่การรันโพรเซสในเครื่อง
+- ควรถูกมองว่าเป็นการวิเคราะห์แบบชั่วคราว ไม่ใช่สมุดโน้ตแบบถาวร
 - อย่าคาดหวังการเข้าถึงไฟล์ในเครื่องหรือ workspace ของคุณ
 - หากต้องการข้อมูล X ล่าสุด ให้ใช้ [`x_search`](/th/tools/web#x_search) ก่อน
 
-## ดูเพิ่มเติม
+## ที่เกี่ยวข้อง
 
-- [Web tools](/th/tools/web)
-- [Exec](/th/tools/exec)
+- [เครื่องมือ Exec](/th/tools/exec)
+- [Exec approvals](/th/tools/exec-approvals)
+- [เครื่องมือ apply_patch](/th/tools/apply-patch)
+- [เครื่องมือเว็บ](/th/tools/web)
 - [xAI](/th/providers/xai)

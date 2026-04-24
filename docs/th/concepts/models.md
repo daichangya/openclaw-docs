@@ -1,115 +1,113 @@
 ---
 read_when:
-    - การเพิ่มหรือแก้ไข CLI ของโมเดล (models list/set/scan/aliases/fallbacks)
-    - การเปลี่ยนพฤติกรรม fallback ของโมเดลหรือ UX การเลือกโมเดล
-    - การอัปเดตการ probe ของ model scan (tools/images)
-summary: 'CLI ของโมเดล: list, set, aliases, fallbacks, scan, status'
-title: CLI ของโมเดล
+    - การเพิ่มหรือแก้ไข CLI ของ Models (`models list/set/scan/aliases/fallbacks`)
+    - การเปลี่ยนพฤติกรรม fallback ของโมเดลหรือ UX การเลือก
+    - การอัปเดต probes ของการสแกนโมเดล (tools/images)
+summary: 'CLI ของ Models: แสดงรายการ ตั้งค่า aliases fallbacks สแกน สถานะ'
+title: CLI ของ Models
 x-i18n:
-    generated_at: "2026-04-23T10:17:28Z"
+    generated_at: "2026-04-24T09:06:42Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 46916d9600a4e4aebdb026aa42df39149d8b6d438a8a7e85a61053dfc8f76dcc
+    source_hash: 12f784984c87b33e645ec296f7f93ec3acc2a91efa3b63d3a912a6b09b90e048
     source_path: concepts/models.md
     workflow: 15
 ---
 
-# CLI ของโมเดล
-
 ดู [/concepts/model-failover](/th/concepts/model-failover) สำหรับการหมุนเวียน
-auth profile, cooldown และวิธีที่สิ่งเหล่านั้นทำงานร่วมกับ fallback
-ภาพรวม provider แบบรวดเร็ว + ตัวอย่าง: [/concepts/model-providers](/th/concepts/model-providers)
+auth profile, cooldowns และวิธีที่สิ่งเหล่านั้นโต้ตอบกับ fallbacks
+ภาพรวมผู้ให้บริการแบบรวดเร็ว + ตัวอย่าง: [/concepts/model-providers](/th/concepts/model-providers)
 
 ## การเลือกโมเดลทำงานอย่างไร
 
 OpenClaw เลือกโมเดลตามลำดับนี้:
 
-1. โมเดล **Primary** (`agents.defaults.model.primary` หรือ `agents.defaults.model`)
+1. โมเดล **หลัก** (`agents.defaults.model.primary` หรือ `agents.defaults.model`)
 2. **Fallbacks** ใน `agents.defaults.model.fallbacks` (ตามลำดับ)
-3. **Provider auth failover** จะเกิดขึ้นภายใน provider ก่อนจะย้ายไปยัง
+3. **Provider auth failover** จะเกิดขึ้นภายในผู้ให้บริการก่อนจะย้ายไปยัง
    โมเดลถัดไป
 
 ที่เกี่ยวข้อง:
 
-- `agents.defaults.models` คือ allowlist/catalog ของโมเดลที่ OpenClaw ใช้งานได้ (รวมทั้ง alias)
-- `agents.defaults.imageModel` จะถูกใช้ **เฉพาะเมื่อ** โมเดล primary ไม่รองรับรูปภาพ
-- `agents.defaults.pdfModel` ถูกใช้โดยเครื่องมือ `pdf` หากไม่ได้กำหนดไว้ เครื่องมือ
-  จะ fallback ไปที่ `agents.defaults.imageModel` จากนั้นจึงเป็นโมเดล session/default
-  ที่ resolve แล้ว
-- `agents.defaults.imageGenerationModel` ถูกใช้โดยความสามารถสร้างภาพแบบใช้ร่วมกัน หากไม่ได้กำหนดไว้ `image_generate` ยังสามารถอนุมานค่าเริ่มต้นของ provider ที่มี auth รองรับได้ โดยจะลอง provider ค่าเริ่มต้นปัจจุบันก่อน จากนั้นจึงลอง provider สำหรับการสร้างภาพที่ลงทะเบียนไว้อื่น ๆ ตามลำดับ provider-id หากคุณกำหนด provider/model แบบเฉพาะเจาะจง ให้กำหนด auth/API key ของ provider นั้นด้วย
-- `agents.defaults.musicGenerationModel` ถูกใช้โดยความสามารถสร้างเพลงแบบใช้ร่วมกัน หากไม่ได้กำหนดไว้ `music_generate` ยังสามารถอนุมานค่าเริ่มต้นของ provider ที่มี auth รองรับได้ โดยจะลอง provider ค่าเริ่มต้นปัจจุบันก่อน จากนั้นจึงลอง provider สำหรับการสร้างเพลงที่ลงทะเบียนไว้อื่น ๆ ตามลำดับ provider-id หากคุณกำหนด provider/model แบบเฉพาะเจาะจง ให้กำหนด auth/API key ของ provider นั้นด้วย
-- `agents.defaults.videoGenerationModel` ถูกใช้โดยความสามารถสร้างวิดีโอแบบใช้ร่วมกัน หากไม่ได้กำหนดไว้ `video_generate` ยังสามารถอนุมานค่าเริ่มต้นของ provider ที่มี auth รองรับได้ โดยจะลอง provider ค่าเริ่มต้นปัจจุบันก่อน จากนั้นจึงลอง provider สำหรับการสร้างวิดีโอที่ลงทะเบียนไว้อื่น ๆ ตามลำดับ provider-id หากคุณกำหนด provider/model แบบเฉพาะเจาะจง ให้กำหนด auth/API key ของ provider นั้นด้วย
-- ค่าเริ่มต้นราย agent สามารถ override `agents.defaults.model` ได้ผ่าน `agents.list[].model` พร้อม bindings (ดู [/concepts/multi-agent](/th/concepts/multi-agent))
+- `agents.defaults.models` คือ allowlist/catalog ของโมเดลที่ OpenClaw ใช้ได้ (รวม aliases)
+- `agents.defaults.imageModel` จะใช้ **เฉพาะเมื่อ** โมเดลหลักรับภาพไม่ได้
+- `agents.defaults.pdfModel` ใช้โดยเครื่องมือ `pdf` หากไม่ระบุ เครื่องมือ
+  จะ fallback ไปยัง `agents.defaults.imageModel` จากนั้นจึงไปยัง
+  โมเดลของเซสชัน/ค่าเริ่มต้นที่ resolve แล้ว
+- `agents.defaults.imageGenerationModel` ใช้โดยความสามารถในการสร้างภาพแบบใช้ร่วมกัน หากไม่ระบุ `image_generate` ยังคงอนุมานค่าเริ่มต้นของผู้ให้บริการที่มี auth รองรับได้ โดยจะลองผู้ให้บริการเริ่มต้นปัจจุบันก่อน จากนั้นจึงลองผู้ให้บริการสร้างภาพที่ลงทะเบียนไว้ที่เหลือตามลำดับ provider-id หากคุณตั้ง provider/model แบบเจาะจง ให้กำหนด auth/API key ของผู้ให้บริการนั้นด้วย
+- `agents.defaults.musicGenerationModel` ใช้โดยความสามารถในการสร้างเพลงแบบใช้ร่วมกัน หากไม่ระบุ `music_generate` ยังคงอนุมานค่าเริ่มต้นของผู้ให้บริการที่มี auth รองรับได้ โดยจะลองผู้ให้บริการเริ่มต้นปัจจุบันก่อน จากนั้นจึงลองผู้ให้บริการสร้างเพลงที่ลงทะเบียนไว้ที่เหลือตามลำดับ provider-id หากคุณตั้ง provider/model แบบเจาะจง ให้กำหนด auth/API key ของผู้ให้บริการนั้นด้วย
+- `agents.defaults.videoGenerationModel` ใช้โดยความสามารถในการสร้างวิดีโอแบบใช้ร่วมกัน หากไม่ระบุ `video_generate` ยังคงอนุมานค่าเริ่มต้นของผู้ให้บริการที่มี auth รองรับได้ โดยจะลองผู้ให้บริการเริ่มต้นปัจจุบันก่อน จากนั้นจึงลองผู้ให้บริการสร้างวิดีโอที่ลงทะเบียนไว้ที่เหลือตามลำดับ provider-id หากคุณตั้ง provider/model แบบเจาะจง ให้กำหนด auth/API key ของผู้ให้บริการนั้นด้วย
+- ค่าเริ่มต้นรายเอเจนต์สามารถ override `agents.defaults.model` ผ่าน `agents.list[].model` ร่วมกับ bindings ได้ (ดู [/concepts/multi-agent](/th/concepts/multi-agent))
 
 ## นโยบายโมเดลแบบรวดเร็ว
 
-- ตั้งค่า primary ของคุณเป็นโมเดลรุ่นล่าสุดที่มีความสามารถสูงที่สุดที่คุณใช้งานได้
-- ใช้ fallback สำหรับงานที่ไวต่อค่าใช้จ่าย/latency และการแชตที่ความเสี่ยงต่ำกว่า
-- สำหรับ agent ที่เปิดใช้เครื่องมือหรือมีอินพุตที่ไม่น่าเชื่อถือ ให้หลีกเลี่ยงโมเดลรุ่นเก่า/ชั้นที่อ่อนกว่า
+- ตั้งค่าโมเดลหลักของคุณเป็นโมเดลรุ่นล่าสุดที่แข็งแกร่งที่สุดเท่าที่คุณเข้าถึงได้
+- ใช้ fallbacks สำหรับงานที่ไวต่อค่าใช้จ่าย/latency และแชตที่มีความเสี่ยงต่ำกว่า
+- สำหรับเอเจนต์ที่เปิดใช้เครื่องมือหรืออินพุตที่ไม่น่าเชื่อถือ ให้หลีกเลี่ยงโมเดลรุ่นเก่าหรือระดับที่อ่อนกว่า
 
-## Onboarding (แนะนำ)
+## การเริ่มต้นใช้งาน (แนะนำ)
 
-หากคุณไม่ต้องการแก้ไข config ด้วยตนเอง ให้รัน onboarding:
+หากคุณไม่ต้องการแก้ไขคอนฟิกด้วยมือ ให้รัน onboarding:
 
 ```bash
 openclaw onboard
 ```
 
-ระบบสามารถตั้งค่าโมเดล + auth สำหรับ provider ทั่วไปได้ รวมถึง **OpenAI Code (Codex)
+คำสั่งนี้สามารถตั้งค่า model + auth สำหรับผู้ให้บริการทั่วไป รวมถึง **OpenAI Code (Codex)
 subscription** (OAuth) และ **Anthropic** (API key หรือ Claude CLI)
 
-## คีย์ config (ภาพรวม)
+## คีย์คอนฟิก (ภาพรวม)
 
 - `agents.defaults.model.primary` และ `agents.defaults.model.fallbacks`
 - `agents.defaults.imageModel.primary` และ `agents.defaults.imageModel.fallbacks`
 - `agents.defaults.pdfModel.primary` และ `agents.defaults.pdfModel.fallbacks`
 - `agents.defaults.imageGenerationModel.primary` และ `agents.defaults.imageGenerationModel.fallbacks`
 - `agents.defaults.videoGenerationModel.primary` และ `agents.defaults.videoGenerationModel.fallbacks`
-- `agents.defaults.models` (allowlist + alias + พารามิเตอร์ provider)
-- `models.providers` (provider แบบกำหนดเองที่เขียนลงใน `models.json`)
+- `agents.defaults.models` (allowlist + aliases + provider params)
+- `models.providers` (custom providers ที่เขียนลงใน `models.json`)
 
-model ref จะถูก normalize เป็นตัวพิมพ์เล็ก alias ของ provider เช่น `z.ai/*` จะถูก normalize
+Model refs จะถูก normalize เป็นตัวพิมพ์เล็ก aliases ของผู้ให้บริการ เช่น `z.ai/*` จะถูก normalize
 เป็น `zai/*`
 
-ตัวอย่างการกำหนดค่า provider (รวมถึง OpenCode) อยู่ใน
+ตัวอย่างการกำหนดค่าผู้ให้บริการ (รวมถึง OpenCode) อยู่ใน
 [/providers/opencode](/th/providers/opencode)
 
 ### การแก้ไข allowlist อย่างปลอดภัย
 
-ใช้การเขียนแบบเพิ่มรายการเมื่ออัปเดต `agents.defaults.models` ด้วยตนเอง:
+ใช้การเขียนแบบเพิ่มเมื่ออัปเดต `agents.defaults.models` ด้วยมือ:
 
 ```bash
-openclaw config set agents.defaults.models '{"openai-codex/gpt-5.4":{}}' --strict-json --merge
+openclaw config set agents.defaults.models '{"openai/gpt-5.4":{}}' --strict-json --merge
 ```
 
-`openclaw config set` ป้องกัน model/provider map จากการถูกเขียนทับโดยไม่ได้ตั้งใจ การกำหนดค่า
-plain object ให้กับ `agents.defaults.models`, `models.providers` หรือ
-`models.providers.<id>.models` โดยตรงจะถูกปฏิเสธเมื่ออาจทำให้รายการเดิม
-หายไป ใช้ `--merge` สำหรับการเปลี่ยนแปลงแบบเพิ่มรายการ; ใช้ `--replace` เฉพาะเมื่อ
-ค่าที่ให้มาควรกลายเป็นค่าเป้าหมายทั้งหมด
+`openclaw config set` ปกป้อง maps ของ model/provider จากการถูกเขียนทับโดยไม่ตั้งใจ การ
+กำหนด object แบบตรง ๆ ให้กับ `agents.defaults.models`, `models.providers` หรือ
+`models.providers.<id>.models` จะถูกปฏิเสธหากจะลบรายการเดิมที่มีอยู่
+ใช้ `--merge` สำหรับการเปลี่ยนแปลงแบบเพิ่มรายการ; ใช้ `--replace` เฉพาะเมื่อ
+ค่าที่ระบุมาควรกลายเป็นค่าเป้าหมายทั้งหมดจริง ๆ
 
-การตั้งค่า provider แบบโต้ตอบและ `openclaw configure --section model` ก็จะ merge
-ค่าที่เลือกในขอบเขต provider เข้ากับ allowlist ที่มีอยู่เช่นกัน ดังนั้นการเพิ่ม Codex,
-Ollama หรือ provider อื่นจะไม่ทำให้รายการโมเดลที่ไม่เกี่ยวข้องหายไป
+การตั้งค่าผู้ให้บริการแบบ interactive และ `openclaw configure --section model` ก็จะ merge
+ค่าที่เลือกในขอบเขตผู้ให้บริการเข้ากับ allowlist เดิมด้วย ดังนั้นการเพิ่ม Codex,
+Ollama หรือผู้ให้บริการอื่นจะไม่ทำให้รายการโมเดลที่ไม่เกี่ยวข้องหายไป
 
-## "Model is not allowed" (และเหตุใดการตอบกลับจึงหยุด)
+## "Model is not allowed" (และทำไมคำตอบจึงหยุด)
 
-หากมีการตั้งค่า `agents.defaults.models` ไว้ มันจะกลายเป็น **allowlist** สำหรับ `/model` และสำหรับ
-session override เมื่อผู้ใช้เลือกโมเดลที่ไม่อยู่ใน allowlist นั้น
-OpenClaw จะส่งกลับ:
+หากมีการตั้งค่า `agents.defaults.models` ค่านี้จะกลายเป็น **allowlist** สำหรับ `/model` และสำหรับ
+session overrides เมื่อผู้ใช้เลือกโมเดลที่ไม่ได้อยู่ใน allowlist นั้น
+OpenClaw จะตอบกลับว่า:
 
 ```
 Model "provider/model" is not allowed. Use /model to list available models.
 ```
 
-สิ่งนี้เกิดขึ้น **ก่อน** ที่จะสร้างการตอบกลับตามปกติ ดังนั้นข้อความอาจให้ความรู้สึกเหมือน
-“ไม่ได้ตอบกลับ” วิธีแก้คือ:
+สิ่งนี้เกิดขึ้น **ก่อน** ที่จะมีการสร้างคำตอบตามปกติ ดังนั้นข้อความอาจให้ความรู้สึก
+เหมือน “ไม่ตอบกลับ” วิธีแก้คือ:
 
-- เพิ่มโมเดลเข้าไปใน `agents.defaults.models`, หรือ
+- เพิ่มโมเดลนั้นลงใน `agents.defaults.models`, หรือ
 - ล้าง allowlist (ลบ `agents.defaults.models`), หรือ
 - เลือกโมเดลจาก `/model list`
 
-ตัวอย่าง config ของ allowlist:
+ตัวอย่างคอนฟิก allowlist:
 
 ```json5
 {
@@ -137,28 +135,28 @@ Model "provider/model" is not allowed. Use /model to list available models.
 
 หมายเหตุ:
 
-- `/model` (และ `/model list`) เป็นตัวเลือกแบบกระชับที่มีหมายเลขกำกับ (ตระกูลโมเดล + provider ที่พร้อมใช้งาน)
-- บน Discord, `/model` และ `/models` จะเปิดตัวเลือกแบบโต้ตอบพร้อม dropdown ของ provider และโมเดล รวมถึงขั้นตอน Submit
-- `/models add` เปิดใช้งานโดยค่าเริ่มต้น และสามารถปิดได้ด้วย `commands.modelsWrite=false`
-- เมื่อเปิดใช้งาน `/models add <provider> <modelId>` คือเส้นทางที่เร็วที่สุด; การใช้ `/models add` แบบไม่มีอาร์กิวเมนต์จะเริ่ม flow แบบมีคำแนะนำที่เลือก provider ก่อนในระบบที่รองรับ
-- หลังจากใช้ `/models add` โมเดลใหม่จะพร้อมใช้งานใน `/models` และ `/model` โดยไม่ต้องรีสตาร์ต gateway
+- `/model` (และ `/model list`) เป็นตัวเลือกแบบกะทัดรัดที่มีหมายเลขกำกับ (ตระกูลโมเดล + ผู้ให้บริการที่ใช้ได้)
+- บน Discord, `/model` และ `/models` จะเปิดตัวเลือกแบบโต้ตอบพร้อมดรอปดาวน์ผู้ให้บริการและโมเดล รวมทั้งขั้นตอน Submit
+- `/models add` เปิดใช้งานตามค่าเริ่มต้น และสามารถปิดได้ด้วย `commands.modelsWrite=false`
+- เมื่อเปิดใช้งานแล้ว `/models add <provider> <modelId>` คือเส้นทางที่เร็วที่สุด; `/models add` แบบเปล่าจะเริ่มโฟลว์แนะนำแบบเลือกผู้ให้บริการก่อนในกรณีที่รองรับ
+- หลังจาก `/models add` โมเดลใหม่จะพร้อมใช้งานใน `/models` และ `/model` โดยไม่ต้องรีสตาร์ต gateway
 - `/model <#>` ใช้เลือกจากตัวเลือกนั้น
 - `/model` จะบันทึกการเลือกเซสชันใหม่ทันที
-- หาก agent ว่างอยู่ การรันครั้งถัดไปจะใช้โมเดลใหม่ทันที
-- หากมีการรันที่กำลังทำงานอยู่ OpenClaw จะทำเครื่องหมายการสลับสดไว้เป็น pending และจะรีสตาร์ตไปใช้โมเดลใหม่เฉพาะเมื่อถึงจุด retry ที่สะอาด
-- หากกิจกรรมของเครื่องมือหรือเอาต์พุตการตอบกลับเริ่มขึ้นแล้ว การสลับที่ pending อาจยังคงอยู่ในคิวจนกว่าจะมีโอกาส retry ในภายหลังหรือถึงเทิร์นถัดไปของผู้ใช้
-- `/model status` คือมุมมองแบบละเอียด (auth candidate และเมื่อมีการกำหนดค่าไว้ จะรวม `baseUrl` + โหมด `api` ของปลายทาง provider)
-- model ref จะถูกแยกโดยแบ่งที่ `/` **ตัวแรก** ใช้รูปแบบ `provider/model` เมื่อพิมพ์ `/model <ref>`
-- หาก model ID เองมี `/` อยู่ด้วย (แบบ OpenRouter) คุณต้องใส่คำนำหน้า provider ด้วย (ตัวอย่าง: `/model openrouter/moonshotai/kimi-k2`)
+- หากเอเจนต์ว่างอยู่ การรันครั้งถัดไปจะใช้โมเดลใหม่ทันที
+- หากมีการรันที่ active อยู่แล้ว OpenClaw จะทำเครื่องหมายว่าการสลับแบบสดกำลังรอดำเนินการ และจะรีสตาร์ตไปยังโมเดลใหม่เฉพาะที่จุด retry ที่สะอาดเท่านั้น
+- หากกิจกรรมของเครื่องมือหรือเอาต์พุตคำตอบเริ่มไปแล้ว การสลับที่รอดำเนินการอาจยังค้างอยู่จนกว่าจะมีโอกาส retry ครั้งถัดไปหรือ user turn ถัดไป
+- `/model status` คือมุมมองแบบละเอียด (auth candidates และเมื่อมีการกำหนดค่าไว้ จะรวม provider endpoint `baseUrl` + โหมด `api`)
+- Model refs จะถูก parse โดยแยกที่ `/` **ตัวแรก** ใช้ `provider/model` เมื่อพิมพ์ `/model <ref>`
+- หาก model ID เองมี `/` (แบบ OpenRouter) คุณต้องใส่ provider prefix ด้วย (ตัวอย่าง: `/model openrouter/moonshotai/kimi-k2`)
 - หากคุณละ provider ไว้ OpenClaw จะ resolve อินพุตตามลำดับนี้:
   1. ตรงกับ alias
-  2. ตรงกับ configured-provider แบบไม่ซ้ำสำหรับ model id แบบไม่ใส่คำนำหน้าเดียวกัน
-  3. fallback แบบเดิมไปยัง provider ค่าเริ่มต้นที่กำหนดไว้
-     หาก provider นั้นไม่เปิดให้ใช้โมเดลค่าเริ่มต้นที่กำหนดไว้อีกต่อไป OpenClaw
-     จะ fallback ไปยัง provider/model รายการแรกที่กำหนดไว้แทน เพื่อหลีกเลี่ยง
-     การแสดงค่าเริ่มต้นของ provider ที่ถูกลบไปแล้วและล้าสมัย
+  2. ตรงกับ configured-provider แบบไม่ซ้ำสำหรับ unprefixed model id ที่ตรงกันนั้น
+  3. fallback แบบเลิกใช้แล้วไปยังผู้ให้บริการเริ่มต้นที่กำหนดไว้
+     หากผู้ให้บริการนั้นไม่เปิดเผยโมเดลเริ่มต้นที่กำหนดไว้อีกต่อไป OpenClaw
+     จะ fallback ไปยัง provider/model รายการแรกที่กำหนดค่าไว้แทน เพื่อหลีกเลี่ยง
+     การแสดงค่าเริ่มต้นของผู้ให้บริการที่ถูกลบและล้าสมัย
 
-พฤติกรรม/การกำหนดค่าของคำสั่งแบบเต็ม: [Slash commands](/th/tools/slash-commands)
+พฤติกรรม/คอนฟิกของคำสั่งแบบเต็ม: [Slash commands](/th/tools/slash-commands)
 
 ตัวอย่าง:
 
@@ -195,38 +193,39 @@ openclaw models image-fallbacks clear
 
 ### `models list`
 
-จะแสดงโมเดลที่กำหนดค่าไว้โดยค่าเริ่มต้น แฟลกที่มีประโยชน์:
+จะแสดงโมเดลที่กำหนดค่าไว้เป็นค่าเริ่มต้น แฟล็กที่มีประโยชน์:
 
-- `--all`: catalog ทั้งหมด
-- `--local`: เฉพาะ provider ในเครื่อง
-- `--provider <id>`: กรองตาม provider id เช่น `moonshot`; ไม่รองรับ display
-  label จากตัวเลือกแบบโต้ตอบ
+- `--all`: catalog แบบเต็ม
+- `--local`: เฉพาะผู้ให้บริการในเครื่อง
+- `--provider <id>`: กรองตาม provider id เช่น `moonshot`; ไม่รองรับ
+  ป้ายชื่อที่แสดงจาก interactive pickers
 - `--plain`: หนึ่งโมเดลต่อหนึ่งบรรทัด
-- `--json`: เอาต์พุตที่เครื่องอ่านได้
+- `--json`: เอาต์พุตแบบอ่านได้ด้วยเครื่อง
 
-`--all` จะรวมแถว catalog แบบคงที่ที่เป็นของ provider และมาพร้อมระบบก่อนที่จะมีการกำหนด auth
-ดังนั้นมุมมองที่ใช้เพื่อการค้นหาอย่างเดียวจึงสามารถแสดงโมเดลที่ยังไม่พร้อมใช้งานได้จนกว่าคุณจะเพิ่มข้อมูลรับรองของ provider ที่ตรงกัน
+`--all` จะรวมแถว catalog แบบ static ที่ผู้ให้บริการเป็นเจ้าของและรวมมากับระบบก่อน
+มีการกำหนดค่า auth ดังนั้นมุมมองแบบ discovery-only อาจแสดงโมเดลที่ยังใช้ไม่ได้จนกว่า
+คุณจะเพิ่ม credentials ของผู้ให้บริการที่ตรงกัน
 
 ### `models status`
 
-แสดงโมเดล primary ที่ resolve แล้ว, fallback, image model และภาพรวม auth
-ของ provider ที่กำหนดค่าไว้ นอกจากนี้ยังแสดงสถานะการหมดอายุของ OAuth สำหรับ profile ที่พบ
-ใน auth store (เตือนภายใน 24 ชม. โดยค่าเริ่มต้น) `--plain` จะพิมพ์เฉพาะ
-โมเดล primary ที่ resolve แล้ว
-สถานะ OAuth จะแสดงเสมอ (และรวมอยู่ในเอาต์พุต `--json`) หาก provider
-ที่กำหนดค่าไว้ไม่มีข้อมูลรับรอง `models status` จะแสดงส่วน **Missing auth**
-JSON จะรวม `auth.oauth` (หน้าต่างการเตือน + profile) และ `auth.providers`
-(auth ที่มีผลจริงต่อ provider รวมถึงข้อมูลรับรองจาก env) `auth.oauth`
-เป็นเพียงสถานะสุขภาพของ profile ใน auth-store เท่านั้น; provider ที่ใช้ env-only จะไม่ปรากฏในส่วนนั้น
-ใช้ `--check` สำหรับระบบอัตโนมัติ (ออกด้วยรหัส `1` เมื่อไม่มี/หมดอายุ, `2` เมื่อกำลังจะหมดอายุ)
-ใช้ `--probe` สำหรับการตรวจสอบ auth แบบสด; แถวของ probe อาจมาจาก auth profile, ข้อมูลรับรองใน env
-หรือ `models.json`
-หาก `auth.order.<provider>` ที่กำหนดไว้อย่างชัดเจนละ profile ที่จัดเก็บไว้บางรายการออกไป probe จะรายงาน
-`excluded_by_auth_order` แทนที่จะลองใช้งาน หากมี auth แต่ไม่สามารถ resolve โมเดลที่ probe ได้
-สำหรับ provider นั้น probe จะรายงาน `status: no_model`
+แสดงโมเดลหลักที่ resolve แล้ว fallbacks, image model และภาพรวม auth
+ของผู้ให้บริการที่กำหนดค่าไว้ นอกจากนี้ยังแสดงสถานะการหมดอายุของ OAuth สำหรับ profiles ที่พบ
+ใน auth store (เตือนภายใน 24 ชม. เป็นค่าเริ่มต้น) `--plain` จะพิมพ์เฉพาะ
+โมเดลหลักที่ resolve แล้ว
+สถานะ OAuth จะแสดงเสมอ (และรวมอยู่ในเอาต์พุต `--json`) หากผู้ให้บริการที่กำหนดค่าไว้
+ไม่มี credentials, `models status` จะพิมพ์ส่วน **Missing auth**
+JSON จะรวม `auth.oauth` (ช่วงเวลาเตือน + profiles) และ `auth.providers`
+(auth ที่มีผลจริงต่อผู้ให้บริการ รวมถึง credentials ที่มาจาก env) `auth.oauth`
+เป็นข้อมูลสุขภาพของ profile ใน auth store เท่านั้น; ผู้ให้บริการที่ใช้เฉพาะ env จะไม่ปรากฏที่นั่น
+ใช้ `--check` สำหรับงานอัตโนมัติ (exit `1` เมื่อขาดหาย/หมดอายุ, `2` เมื่อใกล้หมดอายุ)
+ใช้ `--probe` สำหรับการตรวจสอบ auth แบบสด; แถว probe อาจมาจาก auth profiles, env
+credentials หรือ `models.json`
+หาก `auth.order.<provider>` แบบชัดเจนละเว้น stored profile ไว้
+probe จะรายงาน `excluded_by_auth_order` แทนที่จะลองใช้งาน หากมี auth อยู่แต่ไม่สามารถ resolve โมเดลที่ probe ได้สำหรับผู้ให้บริการนั้น probe จะรายงาน `status: no_model`
 
-การเลือก auth ขึ้นอยู่กับ provider/บัญชี สำหรับโฮสต์ gateway ที่ทำงานตลอดเวลา API
-key มักคาดการณ์ได้ง่ายที่สุด; ยังรองรับการใช้ Claude CLI ซ้ำและ profile OAuth/token ของ Anthropic ที่มีอยู่เดิมด้วย
+การเลือก auth ขึ้นอยู่กับผู้ให้บริการ/บัญชี สำหรับโฮสต์ gateway ที่เปิดตลอดเวลา API
+keys มักคาดการณ์ได้มากที่สุด; รองรับการใช้ Claude CLI ซ้ำและ Anthropic
+OAuth/token profiles ที่มีอยู่แล้วเช่นกัน
 
 ตัวอย่าง (Claude CLI):
 
@@ -238,61 +237,61 @@ openclaw models status
 ## การสแกน (โมเดลฟรีของ OpenRouter)
 
 `openclaw models scan` จะตรวจสอบ **catalog โมเดลฟรี** ของ OpenRouter และสามารถ
-probe โมเดลเพิ่มเติมได้เพื่อทดสอบการรองรับเครื่องมือและรูปภาพ
+probe โมเดลเพิ่มเติมสำหรับการรองรับ tools และ images ได้ตามต้องการ
 
-แฟลกสำคัญ:
+แฟล็กสำคัญ:
 
-- `--no-probe`: ข้ามการ probe แบบสด (เฉพาะ metadata)
+- `--no-probe`: ข้ามการ probe แบบสด (metadata เท่านั้น)
 - `--min-params <b>`: ขนาดพารามิเตอร์ขั้นต่ำ (พันล้าน)
 - `--max-age-days <days>`: ข้ามโมเดลที่เก่ากว่า
-- `--provider <name>`: ตัวกรองคำนำหน้า provider
+- `--provider <name>`: ตัวกรอง provider prefix
 - `--max-candidates <n>`: ขนาดรายการ fallback
-- `--set-default`: ตั้งค่า `agents.defaults.model.primary` เป็นตัวเลือกแรก
-- `--set-image`: ตั้งค่า `agents.defaults.imageModel.primary` เป็นตัวเลือกภาพตัวแรก
+- `--set-default`: ตั้ง `agents.defaults.model.primary` เป็นตัวเลือกแรก
+- `--set-image`: ตั้ง `agents.defaults.imageModel.primary` เป็นตัวเลือกภาพตัวแรก
 
-การ probe ต้องใช้ OpenRouter API key (จาก auth profile หรือ
-`OPENROUTER_API_KEY`) หากไม่มีคีย์ ให้ใช้ `--no-probe` เพื่อแสดงเฉพาะ candidate
+การ probe ต้องใช้ OpenRouter API key (จาก auth profiles หรือ
+`OPENROUTER_API_KEY`) หากไม่มีคีย์ ให้ใช้ `--no-probe` เพื่อแสดงเฉพาะ candidates
 
-ผลลัพธ์การสแกนจะถูกจัดอันดับตาม:
+ผลการสแกนจะถูกจัดอันดับตาม:
 
-1. การรองรับรูปภาพ
+1. การรองรับภาพ
 2. latency ของเครื่องมือ
 3. ขนาด context
 4. จำนวนพารามิเตอร์
 
 อินพุต
 
-- รายการ `/models` ของ OpenRouter (กรอง `:free`)
-- ต้องใช้ OpenRouter API key จาก auth profile หรือ `OPENROUTER_API_KEY` (ดู [/environment](/th/help/environment))
-- ตัวกรองเพิ่มเติม: `--max-age-days`, `--min-params`, `--provider`, `--max-candidates`
-- ตัวควบคุมการ probe: `--timeout`, `--concurrency`
+- รายการ OpenRouter `/models` (กรอง `:free`)
+- ต้องใช้ OpenRouter API key จาก auth profiles หรือ `OPENROUTER_API_KEY` (ดู [/environment](/th/help/environment))
+- ตัวกรองเพิ่มเติมที่เป็นทางเลือก: `--max-age-days`, `--min-params`, `--provider`, `--max-candidates`
+- การควบคุม probe: `--timeout`, `--concurrency`
 
-เมื่อรันใน TTY คุณสามารถเลือก fallback แบบโต้ตอบได้ ในโหมดไม่โต้ตอบ
+เมื่อรันใน TTY คุณสามารถเลือก fallbacks แบบโต้ตอบได้ ในโหมดไม่โต้ตอบ
 ให้ส่ง `--yes` เพื่อยอมรับค่าเริ่มต้น
 
-## รีจิสทรีโมเดล (`models.json`)
+## รีจิสทรี Models (`models.json`)
 
-provider แบบกำหนดเองใน `models.providers` จะถูกเขียนลงใน `models.json` ภายใต้
+custom providers ใน `models.providers` จะถูกเขียนลงใน `models.json` ภายใต้
 ไดเรกทอรี agent (ค่าเริ่มต้น `~/.openclaw/agents/<agentId>/agent/models.json`) ไฟล์นี้
-จะถูก merge โดยค่าเริ่มต้น เว้นแต่จะตั้ง `models.mode` เป็น `replace`
+จะถูก merge เป็นค่าเริ่มต้น เว้นแต่ `models.mode` จะถูกตั้งเป็น `replace`
 
-ลำดับความสำคัญของโหมด merge สำหรับ provider ID ที่ตรงกัน:
+ลำดับความสำคัญของโหมด merge สำหรับ provider IDs ที่ตรงกัน:
 
-- `baseUrl` ที่ไม่ว่างและมีอยู่แล้วใน `models.json` ของ agent จะมีลำดับความสำคัญกว่า
-- `apiKey` ที่ไม่ว่างใน `models.json` ของ agent จะมีลำดับความสำคัญกว่าเฉพาะเมื่อ provider นั้นไม่ได้ถูกจัดการด้วย SecretRef ในบริบท config/auth-profile ปัจจุบัน
-- ค่า `apiKey` ของ provider ที่จัดการด้วย SecretRef จะถูกรีเฟรชจาก marker ของแหล่งที่มา (`ENV_VAR_NAME` สำหรับ env ref, `secretref-managed` สำหรับ file/exec ref) แทนการเก็บ secret ที่ resolve แล้ว
-- ค่า header ของ provider ที่จัดการด้วย SecretRef จะถูกรีเฟรชจาก marker ของแหล่งที่มา (`secretref-env:ENV_VAR_NAME` สำหรับ env ref, `secretref-managed` สำหรับ file/exec ref)
-- `apiKey`/`baseUrl` ของ agent ที่ว่างหรือไม่มีอยู่จะ fallback ไปใช้ `models.providers` จาก config
-- ฟิลด์ provider อื่น ๆ จะถูกรีเฟรชจาก config และข้อมูล catalog ที่ถูก normalize แล้ว
+- `baseUrl` ที่ไม่ว่างและมีอยู่แล้วใน `models.json` ของเอเจนต์จะมีสิทธิ์เหนือกว่า
+- `apiKey` ที่ไม่ว่างใน `models.json` ของเอเจนต์จะมีสิทธิ์เหนือกว่าเฉพาะเมื่อผู้ให้บริการนั้นไม่ได้ถูกจัดการด้วย SecretRef ในบริบทคอนฟิก/auth-profile ปัจจุบัน
+- ค่า `apiKey` ของผู้ให้บริการที่จัดการด้วย SecretRef จะถูกรีเฟรชจาก source markers (`ENV_VAR_NAME` สำหรับ env refs, `secretref-managed` สำหรับ file/exec refs) แทนการบันทึก secrets ที่ resolve แล้ว
+- ค่า header ของผู้ให้บริการที่จัดการด้วย SecretRef จะถูกรีเฟรชจาก source markers (`secretref-env:ENV_VAR_NAME` สำหรับ env refs, `secretref-managed` สำหรับ file/exec refs)
+- `apiKey`/`baseUrl` ของเอเจนต์ที่ว่างหรือไม่มีอยู่จะ fallback ไปยังคอนฟิก `models.providers`
+- ฟิลด์อื่น ๆ ของผู้ให้บริการจะถูกรีเฟรชจากคอนฟิกและข้อมูล catalog ที่ normalize แล้ว
 
-การคงอยู่ของ marker ยึดแหล่งที่มาเป็นหลัก: OpenClaw จะเขียน marker จาก snapshot config ของแหล่งที่มาที่ใช้งานอยู่ (ก่อน resolve) ไม่ใช่จากค่า secret ของรันไทม์ที่ resolve แล้ว
+การบันทึก marker อ้างอิงแหล่งที่มาเป็นหลัก: OpenClaw จะเขียน markers จาก snapshot คอนฟิกของแหล่งข้อมูลที่กำลังใช้งาน (ก่อนการ resolve) ไม่ใช่จากค่าความลับ runtime ที่ resolve แล้ว
 สิ่งนี้มีผลทุกครั้งที่ OpenClaw สร้าง `models.json` ใหม่ รวมถึงเส้นทางที่ขับเคลื่อนด้วยคำสั่ง เช่น `openclaw agent`
 
 ## ที่เกี่ยวข้อง
 
-- [Model Providers](/th/concepts/model-providers) — การกำหนดเส้นทาง provider และ auth
+- [ผู้ให้บริการโมเดล](/th/concepts/model-providers) — การกำหนดเส้นทางผู้ให้บริการและ auth
 - [Model Failover](/th/concepts/model-failover) — สายโซ่ fallback
-- [Image Generation](/th/tools/image-generation) — การกำหนดค่าโมเดลภาพ
-- [Music Generation](/th/tools/music-generation) — การกำหนดค่าโมเดลเพลง
-- [Video Generation](/th/tools/video-generation) — การกำหนดค่าโมเดลวิดีโอ
-- [Configuration Reference](/th/gateway/configuration-reference#agent-defaults) — คีย์ config ของ agent ค่าเริ่มต้น
+- [การสร้างภาพ](/th/tools/image-generation) — การกำหนดค่า image model
+- [การสร้างเพลง](/th/tools/music-generation) — การกำหนดค่า music model
+- [การสร้างวิดีโอ](/th/tools/video-generation) — การกำหนดค่า video model
+- [เอกสารอ้างอิงการกำหนดค่า](/th/gateway/config-agents#agent-defaults) — คีย์คอนฟิกของ model

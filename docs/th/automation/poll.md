@@ -2,14 +2,18 @@
 summary: เปลี่ยนเส้นทางไปยัง /cli/message
 title: โพลล์
 x-i18n:
-    generated_at: "2026-04-23T10:13:41Z"
+    generated_at: "2026-04-24T08:57:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0639c4d35678e5cb0d3a262e2db9cd8db1e25e3eb26adc28bf76b5df14e5446f
+    source_hash: a277212ed680b7aeb9153d003bc084d2d0c918dc53f2f469c72f7fe5a881cfae
     source_path: automation/poll.md
     workflow: 15
 ---
 
-# โพลล์
+หน้านี้ย้ายไปที่ [Message tool](/th/cli/message) แล้ว ดู [Message tool](/th/cli/message) สำหรับเอกสารประกอบเกี่ยวกับโพลล์
 
-หน้านี้ย้ายไปที่ [เครื่องมือ Message](/th/cli/message) ดู [เครื่องมือ Message](/th/cli/message) สำหรับเอกสารเกี่ยวกับโพลล์
+## ที่เกี่ยวข้อง
+
+- [Webhook](/th/automation/cron-jobs)
+- [งานตามกำหนดเวลา](/th/automation/cron-jobs)
+- [งานเบื้องหลัง](/th/automation/tasks)

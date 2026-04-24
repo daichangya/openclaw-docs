@@ -1,32 +1,30 @@
 ---
 read_when:
-    - การเปลี่ยนการเรนเดอร์เอาต์พุตของ assistant ใน Control UI
-    - การดีบักคำสั่งกำหนดการแสดงผล `[embed ...]`, `MEDIA:`, reply หรือ audio
-summary: โปรโตคอล shortcode สำหรับ rich output สำหรับ embeds, media, audio hints และการตอบกลับ
-title: โปรโตคอล Rich Output
+    - การเปลี่ยนการเรนเดอร์เอาต์พุตของผู้ช่วยใน Control UI
+    - การดีบักคำสั่งกำกับการแสดงผล `[embed ...]`, `MEDIA:`, reply หรือ audio
+summary: โปรโตคอล shortcode สำหรับเอาต์พุตแบบริชสำหรับ embeds, สื่อ, คำใบ้เสียง และการตอบกลับ
+title: โปรโตคอลเอาต์พุตแบบริช
 x-i18n:
-    generated_at: "2026-04-23T10:23:30Z"
+    generated_at: "2026-04-24T09:31:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 566338ac0571c6ab9062c6bad0bc4f71fe65249a3fcd9d8e575affcd93db11e7
+    source_hash: 688d60c97180b4ba250e731d765e8469a01c68588c149b760c32eab77955f69b
     source_path: reference/rich-output-protocol.md
     workflow: 15
 ---
 
-# โปรโตคอล Rich Output
+เอาต์พุตของผู้ช่วยสามารถมีคำสั่งกำกับการส่ง/การเรนเดอร์ชุดเล็กๆ ได้:
 
-เอาต์พุตของ assistant สามารถมีคำสั่งกำหนดการส่งมอบ/การเรนเดอร์ได้ชุดเล็ก ๆ ดังนี้:
-
-- `MEDIA:` สำหรับการส่ง attachments
+- `MEDIA:` สำหรับการส่งไฟล์แนบ
 - `[[audio_as_voice]]` สำหรับคำใบ้การแสดงผลเสียง
-- `[[reply_to_current]]` / `[[reply_to:<id>]]` สำหรับ metadata ของการตอบกลับ
-- `[embed ...]` สำหรับการเรนเดอร์แบบ rich ใน Control UI
+- `[[reply_to_current]]` / `[[reply_to:<id>]]` สำหรับข้อมูลเมตาการตอบกลับ
+- `[embed ...]` สำหรับการเรนเดอร์แบบริชใน Control UI
 
-คำสั่งเหล่านี้แยกจากกัน `MEDIA:` และแท็ก reply/voice ยังคงเป็น metadata ของการส่งมอบ; `[embed ...]` คือเส้นทางการเรนเดอร์แบบ rich ที่ใช้บนเว็บเท่านั้น
+คำสั่งกำกับเหล่านี้แยกจากกัน `MEDIA:` และแท็ก reply/voice ยังคงเป็นข้อมูลเมตาการส่ง; ส่วน `[embed ...]` เป็นเส้นทางการเรนเดอร์แบบริชสำหรับเว็บเท่านั้น
 
 ## `[embed ...]`
 
-`[embed ...]` คือไวยากรณ์การเรนเดอร์แบบ rich ฝั่ง agent เพียงแบบเดียวสำหรับ Control UI
+`[embed ...]` เป็น syntax สำหรับการเรนเดอร์แบบริชที่หันหน้าให้เอเจนต์เพียงแบบเดียวสำหรับ Control UI
 
 ตัวอย่างแบบ self-closing:
 
@@ -37,15 +35,15 @@ x-i18n:
 กฎ:
 
 - `[view ...]` ใช้ไม่ได้อีกต่อไปสำหรับเอาต์พุตใหม่
-- embed shortcodes จะแสดงผลเฉพาะในพื้นผิวข้อความของ assistant
-- ระบบเรนเดอร์เฉพาะ embeds ที่อิง URL ใช้ `ref="..."` หรือ `url="..."`
-- block-form inline HTML embed shortcodes จะไม่ถูกเรนเดอร์
-- เว็บ UI จะลบ shortcode ออกจากข้อความที่มองเห็นได้ และเรนเดอร์ embed แบบ inline
-- `MEDIA:` ไม่ใช่ชื่ออื่นของ embed และไม่ควรใช้สำหรับการเรนเดอร์ rich embed
+- embed shortcodes จะเรนเดอร์เฉพาะในพื้นผิวข้อความของผู้ช่วยเท่านั้น
+- จะเรนเดอร์เฉพาะ embeds ที่อิงกับ URL เท่านั้น ใช้ `ref="..."` หรือ `url="..."`
+- จะไม่เรนเดอร์ embed shortcodes แบบ HTML inline ในรูป block-form
+- เว็บ UI จะตัด shortcode ออกจากข้อความที่มองเห็นได้ และเรนเดอร์ embed แบบ inline
+- `MEDIA:` ไม่ใช่นามแฝงของ embed และไม่ควรใช้สำหรับการเรนเดอร์ embed แบบริช
 
-## รูปร่างการเรนเดอร์ที่จัดเก็บไว้
+## โครงสร้างการเรนเดอร์ที่จัดเก็บไว้
 
-บล็อกเนื้อหา assistant แบบ normalized/ที่จัดเก็บไว้คือรายการ `canvas` ที่มีโครงสร้าง:
+บล็อกเนื้อหาผู้ช่วยที่ผ่านการ normalize/จัดเก็บแล้วจะเป็นรายการ `canvas` แบบมีโครงสร้าง:
 
 ```json
 {
@@ -62,4 +60,9 @@ x-i18n:
 }
 ```
 
-บล็อกแบบ rich ที่ถูกจัดเก็บ/เรนเดอร์จะใช้โครงสร้าง `canvas` นี้โดยตรง ระบบไม่รู้จัก `present_view`
+บล็อกแบบริชที่ถูกจัดเก็บ/เรนเดอร์จะใช้โครงสร้าง `canvas` นี้โดยตรง `present_view` ไม่ถูกรู้จัก
+
+## ที่เกี่ยวข้อง
+
+- [RPC adapters](/th/reference/rpc)
+- [Typebox](/th/concepts/typebox)

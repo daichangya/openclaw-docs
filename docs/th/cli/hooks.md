@@ -1,45 +1,45 @@
 ---
 read_when:
-    - คุณต้องการจัดการ hooks ของเอเจนต์
-    - คุณต้องการตรวจสอบความพร้อมใช้งานของ hook หรือเปิดใช้งาน workspace hooks
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw hooks` (hooks ของเอเจนต์)
-title: Hooks
+    - คุณต้องการจัดการ hook ของเอเจนต์
+    - คุณต้องการตรวจสอบความพร้อมใช้งานของ hook หรือเปิดใช้ hook ของ workspace
+summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw hooks` (hook ของเอเจนต์)
+title: Hook
 x-i18n:
-    generated_at: "2026-04-23T06:18:09Z"
+    generated_at: "2026-04-24T09:02:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a09978267783734aaf9bd8bf36aa365ca680a3652afb904db2e5b55dfa64dcd1
+    source_hash: 84f209e90a5679b889112fc03e22ea94f486ded9db25b5238c0366283695a5b9
     source_path: cli/hooks.md
     workflow: 15
 ---
 
 # `openclaw hooks`
 
-จัดการ hooks ของเอเจนต์ (ระบบอัตโนมัติแบบขับเคลื่อนด้วยเหตุการณ์สำหรับคำสั่งอย่าง `/new`, `/reset` และการเริ่มต้น Gateway)
+จัดการ hook ของเอเจนต์ (ระบบอัตโนมัติแบบขับเคลื่อนด้วยเหตุการณ์สำหรับคำสั่งอย่าง `/new`, `/reset` และการเริ่มต้น gateway)
 
-การรัน `openclaw hooks` โดยไม่ระบุคำสั่งย่อยจะเทียบเท่ากับ `openclaw hooks list`
+การรัน `openclaw hooks` โดยไม่ระบุ subcommand จะเทียบเท่ากับ `openclaw hooks list`
 
 ที่เกี่ยวข้อง:
 
-- Hooks: [Hooks](/th/automation/hooks)
-- Plugin hooks: [Plugin hooks](/th/plugins/architecture#provider-runtime-hooks)
+- Hook: [Hooks](/th/automation/hooks)
+- Plugin hook: [Plugin hooks](/th/plugins/architecture-internals#provider-runtime-hooks)
 
-## แสดง Hooks ทั้งหมด
+## แสดงรายการ Hook ทั้งหมด
 
 ```bash
 openclaw hooks list
 ```
 
-แสดง hooks ที่ค้นพบทั้งหมดจากไดเรกทอรี workspace, managed, extra และ bundled
-การเริ่มต้น Gateway จะไม่โหลดตัวจัดการ hook ภายในจนกว่าจะมีการกำหนดค่า internal hook อย่างน้อยหนึ่งรายการ
+แสดง hook ที่ค้นพบทั้งหมดจากไดเรกทอรี workspace, managed, extra และ bundled
+การเริ่มต้น gateway จะไม่โหลด internal hook handler จนกว่าจะมีการกำหนดค่า internal hook อย่างน้อยหนึ่งรายการ
 
 **ตัวเลือก:**
 
-- `--eligible`: แสดงเฉพาะ hooks ที่พร้อมใช้งาน (ตรงตามข้อกำหนด)
+- `--eligible`: แสดงเฉพาะ hook ที่เข้าเกณฑ์ (ตรงตามข้อกำหนด)
 - `--json`: แสดงผลเป็น JSON
-- `-v, --verbose`: แสดงข้อมูลโดยละเอียดรวมถึงข้อกำหนดที่ขาดหายไป
+- `-v, --verbose`: แสดงข้อมูลโดยละเอียด รวมถึงข้อกำหนดที่ยังขาดหาย
 
-**ตัวอย่างเอาต์พุต:**
+**ตัวอย่างผลลัพธ์:**
 
 ```
 Hooks (4/4 ready)
@@ -57,7 +57,7 @@ Ready:
 openclaw hooks list --verbose
 ```
 
-แสดงข้อกำหนดที่ขาดหายไปสำหรับ hooks ที่ยังไม่พร้อมใช้งาน
+แสดงข้อกำหนดที่ยังขาดสำหรับ hook ที่ยังไม่เข้าเกณฑ์
 
 **ตัวอย่าง (JSON):**
 
@@ -65,7 +65,7 @@ openclaw hooks list --verbose
 openclaw hooks list --json
 ```
 
-ส่งคืน JSON แบบมีโครงสร้างสำหรับการใช้งานเชิงโปรแกรม
+ส่งคืน JSON แบบมีโครงสร้างสำหรับการใช้งานแบบเป็นโปรแกรม
 
 ## ดูข้อมูล Hook
 
@@ -77,7 +77,7 @@ openclaw hooks info <name>
 
 **อาร์กิวเมนต์:**
 
-- `<name>`: ชื่อ hook หรือคีย์ของ hook (เช่น `session-memory`)
+- `<name>`: ชื่อ hook หรือ hook key (เช่น `session-memory`)
 
 **ตัวเลือก:**
 
@@ -89,7 +89,7 @@ openclaw hooks info <name>
 openclaw hooks info session-memory
 ```
 
-**เอาต์พุต:**
+**ผลลัพธ์:**
 
 ```
 💾 session-memory ✓ Ready
@@ -107,19 +107,19 @@ Requirements:
   Config: ✓ workspace.dir
 ```
 
-## ตรวจสอบความพร้อมของ Hooks
+## ตรวจสอบคุณสมบัติการใช้งานของ Hook
 
 ```bash
 openclaw hooks check
 ```
 
-แสดงสรุปสถานะความพร้อมของ hook (พร้อมใช้งานกี่รายการ เทียบกับยังไม่พร้อมกี่รายการ)
+แสดงสรุปสถานะคุณสมบัติการใช้งานของ hook (มีกี่รายการที่พร้อมใช้เทียบกับยังไม่พร้อม)
 
 **ตัวเลือก:**
 
 - `--json`: แสดงผลเป็น JSON
 
-**ตัวอย่างเอาต์พุต:**
+**ตัวอย่างผลลัพธ์:**
 
 ```
 Hooks Status
@@ -129,15 +129,15 @@ Ready: 4
 Not ready: 0
 ```
 
-## เปิดใช้งาน Hook
+## เปิดใช้ Hook
 
 ```bash
 openclaw hooks enable <name>
 ```
 
-เปิดใช้งาน hook ที่ระบุโดยเพิ่มเข้าไปใน config ของคุณ (ค่าเริ่มต้นคือ `~/.openclaw/openclaw.json`)
+เปิดใช้ hook ที่ระบุโดยเพิ่มลงในคอนฟิกของคุณ (ค่าปริยายคือ `~/.openclaw/openclaw.json`)
 
-**หมายเหตุ:** workspace hooks จะถูกปิดใช้งานเป็นค่าเริ่มต้นจนกว่าจะเปิดใช้งานที่นี่หรือใน config hooks ที่จัดการโดย Plugin จะแสดง `plugin:<id>` ใน `openclaw hooks list` และไม่สามารถเปิด/ปิดใช้งานได้จากที่นี่ ให้เปิด/ปิดใช้งาน Plugin นั้นแทน
+**หมายเหตุ:** hook ของ workspace จะถูกปิดไว้เป็นค่าปริยายจนกว่าจะเปิดใช้ที่นี่หรือในคอนฟิก Hook ที่จัดการโดย Plugin จะแสดงเป็น `plugin:<id>` ใน `openclaw hooks list` และไม่สามารถเปิด/ปิดได้จากที่นี่ ให้เปิด/ปิด Plugin แทน
 
 **อาร์กิวเมนต์:**
 
@@ -149,32 +149,32 @@ openclaw hooks enable <name>
 openclaw hooks enable session-memory
 ```
 
-**เอาต์พุต:**
+**ผลลัพธ์:**
 
 ```
 ✓ Enabled hook: 💾 session-memory
 ```
 
-**สิ่งที่ทำ:**
+**สิ่งที่จะเกิดขึ้น:**
 
-- ตรวจสอบว่า hook มีอยู่และพร้อมใช้งาน
-- อัปเดต `hooks.internal.entries.<name>.enabled = true` ใน config ของคุณ
-- บันทึก config ลงดิสก์
+- ตรวจสอบว่า hook มีอยู่และเข้าเกณฑ์ใช้งาน
+- อัปเดต `hooks.internal.entries.<name>.enabled = true` ในคอนฟิกของคุณ
+- บันทึกคอนฟิกลงดิสก์
 
-หาก hook มาจาก `<workspace>/hooks/` ต้องมีขั้นตอน opt-in นี้ก่อน
-Gateway จึงจะโหลดมันได้
+หาก hook มาจาก `<workspace>/hooks/` ขั้นตอน opt-in นี้จำเป็นก่อน
+ที่ Gateway จะโหลดมัน
 
-**หลังจากเปิดใช้งาน:**
+**หลังจากเปิดใช้:**
 
-- รีสตาร์ท gateway เพื่อให้ hooks โหลดใหม่ (รีสตาร์ทแอปเมนูบาร์บน macOS หรือรีสตาร์ทโปรเซส gateway ของคุณในโหมด dev)
+- รีสตาร์ต gateway เพื่อ reload hook (รีสตาร์ตแอปเมนูบาร์บน macOS หรือรีสตาร์ตโพรเซส gateway ของคุณในโหมด dev)
 
-## ปิดใช้งาน Hook
+## ปิดใช้ Hook
 
 ```bash
 openclaw hooks disable <name>
 ```
 
-ปิดใช้งาน hook ที่ระบุโดยอัปเดต config ของคุณ
+ปิดใช้ hook ที่ระบุโดยอัปเดตคอนฟิกของคุณ
 
 **อาร์กิวเมนต์:**
 
@@ -186,54 +186,54 @@ openclaw hooks disable <name>
 openclaw hooks disable command-logger
 ```
 
-**เอาต์พุต:**
+**ผลลัพธ์:**
 
 ```
 ⏸ Disabled hook: 📝 command-logger
 ```
 
-**หลังจากปิดใช้งาน:**
+**หลังจากปิดใช้:**
 
-- รีสตาร์ท gateway เพื่อให้ hooks โหลดใหม่
+- รีสตาร์ต gateway เพื่อ reload hook
 
 ## หมายเหตุ
 
 - `openclaw hooks list --json`, `info --json` และ `check --json` จะเขียน JSON แบบมีโครงสร้างลง stdout โดยตรง
-- hooks ที่จัดการโดย Plugin ไม่สามารถเปิดหรือปิดใช้งานได้จากที่นี่; ให้เปิดหรือปิดใช้งาน Plugin เจ้าของแทน
+- hook ที่จัดการโดย Plugin ไม่สามารถเปิดหรือปิดได้ที่นี่; ให้เปิดหรือปิด Plugin เจ้าของแทน
 
-## ติดตั้ง Hook Packs
+## ติดตั้ง Hook Pack
 
 ```bash
-openclaw plugins install <package>        # ClawHub ก่อน แล้วจึง npm
-openclaw plugins install <package> --pin  # ตรึงเวอร์ชัน
+openclaw plugins install <package>        # ClawHub ก่อน แล้วค่อย npm
+openclaw plugins install <package> --pin  # ปักหมุดเวอร์ชัน
 openclaw plugins install <path>           # พาธในเครื่อง
 ```
 
-ติดตั้ง hook packs ผ่านตัวติดตั้ง plugins แบบรวมศูนย์
+ติดตั้ง hook pack ผ่านตัวติดตั้ง Plugin แบบรวมศูนย์
 
-`openclaw hooks install` ยังใช้ได้ในฐานะนามแฝงเพื่อความเข้ากันได้ แต่จะพิมพ์
-คำเตือนการเลิกใช้งานและส่งต่อไปยัง `openclaw plugins install`
+`openclaw hooks install` ยังใช้งานได้ในฐานะ alias เพื่อความเข้ากันได้ แต่จะแสดง
+คำเตือนว่าเลิกใช้แล้ว และส่งต่อไปยัง `openclaw plugins install`
 
-สเปก npm เป็นแบบ **registry-only** (ชื่อแพ็กเกจ + **เวอร์ชันแบบตรงตัว** หรือ
+สเปก npm เป็นแบบ **registry-only** (ชื่อแพ็กเกจ + **เวอร์ชันแบบ exact** หรือ
 **dist-tag** แบบไม่บังคับ) ระบบจะปฏิเสธสเปกแบบ Git/URL/file และช่วง semver
-การติดตั้ง dependency จะรันพร้อม `--ignore-scripts` เพื่อความปลอดภัย
+การติดตั้ง dependency จะรันด้วย `--ignore-scripts` เพื่อความปลอดภัย
 
-สเปกเปล่าและ `@latest` จะอยู่ในสายเสถียร หาก npm resolve อย่างใดอย่างหนึ่ง
-เหล่านั้นไปเป็นรุ่น prerelease, OpenClaw จะหยุดและขอให้คุณ opt in อย่างชัดเจนด้วย
-แท็ก prerelease เช่น `@beta`/`@rc` หรือเวอร์ชัน prerelease แบบตรงตัว
+สเปกแบบเปล่าและ `@latest` จะคงอยู่บนเส้นทาง stable หาก npm resolve สองแบบนี้
+ไปเป็น prerelease OpenClaw จะหยุดและขอให้คุณ opt in อย่างชัดเจนด้วย
+แท็ก prerelease เช่น `@beta`/`@rc` หรือเวอร์ชัน prerelease แบบ exact
 
-**สิ่งที่ทำ:**
+**สิ่งที่จะเกิดขึ้น:**
 
-- คัดลอก hook pack ไปยัง `~/.openclaw/hooks/<id>`
-- เปิดใช้งาน hooks ที่ติดตั้งใน `hooks.internal.entries.*`
-- บันทึกการติดตั้งไว้ภายใต้ `hooks.internal.installs`
+- คัดลอก hook pack ไปที่ `~/.openclaw/hooks/<id>`
+- เปิดใช้ hook ที่ติดตั้งแล้วใน `hooks.internal.entries.*`
+- บันทึกการติดตั้งไว้ใน `hooks.internal.installs`
 
 **ตัวเลือก:**
 
-- `-l, --link`: ลิงก์ไดเรกทอรีในเครื่องแทนการคัดลอก (เพิ่มเข้าไปใน `hooks.internal.load.extraDirs`)
-- `--pin`: บันทึกการติดตั้ง npm เป็น `name@version` ที่ resolve แล้วแบบตรงตัวใน `hooks.internal.installs`
+- `-l, --link`: ลิงก์ไดเรกทอรีในเครื่องแทนการคัดลอก (เพิ่มลงใน `hooks.internal.load.extraDirs`)
+- `--pin`: บันทึกการติดตั้งจาก npm เป็น `name@version` แบบ exact ที่ resolve แล้วใน `hooks.internal.installs`
 
-**ไฟล์บีบอัดที่รองรับ:** `.zip`, `.tgz`, `.tar.gz`, `.tar`
+**ไฟล์เก็บถาวรที่รองรับ:** `.zip`, `.tgz`, `.tar.gz`, `.tar`
 
 **ตัวอย่าง:**
 
@@ -241,7 +241,7 @@ openclaw plugins install <path>           # พาธในเครื่อง
 # ไดเรกทอรีในเครื่อง
 openclaw plugins install ./my-hook-pack
 
-# ไฟล์บีบอัดในเครื่อง
+# ไฟล์เก็บถาวรในเครื่อง
 openclaw plugins install ./my-hook-pack.zip
 
 # แพ็กเกจ NPM
@@ -251,51 +251,51 @@ openclaw plugins install @openclaw/my-hook-pack
 openclaw plugins install -l ./my-hook-pack
 ```
 
-hook packs ที่ลิงก์ไว้จะถือเป็น managed hooks จากไดเรกทอรี
-ที่ผู้ดูแลระบบกำหนดค่าไว้ ไม่ใช่ workspace hooks
+hook pack ที่ลิงก์ไว้จะถูกมองว่าเป็น hook แบบ managed จากไดเรกทอรี
+ที่ผู้ดูแลกำหนดค่าไว้ ไม่ใช่ hook ของ workspace
 
-## อัปเดต Hook Packs
+## อัปเดต Hook Pack
 
 ```bash
 openclaw plugins update <id>
 openclaw plugins update --all
 ```
 
-อัปเดต hook packs แบบ npm ที่ติดตามไว้ผ่านตัวอัปเดต plugins แบบรวมศูนย์
+อัปเดต hook pack ที่ติดตามจาก npm ผ่านตัวอัปเดต Plugin แบบรวมศูนย์
 
-`openclaw hooks update` ยังใช้ได้ในฐานะนามแฝงเพื่อความเข้ากันได้ แต่จะพิมพ์
-คำเตือนการเลิกใช้งานและส่งต่อไปยัง `openclaw plugins update`
+`openclaw hooks update` ยังใช้งานได้ในฐานะ alias เพื่อความเข้ากันได้ แต่จะแสดง
+คำเตือนว่าเลิกใช้แล้ว และส่งต่อไปยัง `openclaw plugins update`
 
 **ตัวเลือก:**
 
-- `--all`: อัปเดต hook packs ที่ติดตามไว้ทั้งหมด
+- `--all`: อัปเดต hook pack ที่ติดตามทั้งหมด
 - `--dry-run`: แสดงสิ่งที่จะเปลี่ยนโดยไม่เขียนข้อมูล
 
-เมื่อมีแฮชความถูกต้องที่บันทึกไว้และแฮชของอาร์ติแฟกต์ที่ดึงมาเปลี่ยนไป
-OpenClaw จะพิมพ์คำเตือนและขอการยืนยันก่อนดำเนินการต่อ ใช้
-`--yes` แบบ global เพื่อข้ามพร้อมท์ใน CI/การรันแบบไม่โต้ตอบ
+เมื่อมี stored integrity hash อยู่แล้ว และ hash ของ artifact ที่ดึงมาเปลี่ยนไป
+OpenClaw จะแสดงคำเตือนและขอการยืนยันก่อนดำเนินการต่อ ใช้ `--yes`
+แบบ global เพื่อข้ามพรอมป์ในการรัน CI/แบบไม่โต้ตอบ
 
-## Bundled Hooks
+## Hook ที่มาพร้อมระบบ
 
 ### session-memory
 
-บันทึกบริบทของเซสชันลงหน่วยความจำเมื่อคุณใช้ `/new` หรือ `/reset`
+บันทึกบริบทของเซสชันลงใน memory เมื่อคุณใช้ `/new` หรือ `/reset`
 
-**เปิดใช้งาน:**
+**เปิดใช้:**
 
 ```bash
 openclaw hooks enable session-memory
 ```
 
-**เอาต์พุต:** `~/.openclaw/workspace/memory/YYYY-MM-DD-slug.md`
+**ผลลัพธ์:** `~/.openclaw/workspace/memory/YYYY-MM-DD-slug.md`
 
 **ดูเพิ่มเติม:** [เอกสาร session-memory](/th/automation/hooks#session-memory)
 
 ### bootstrap-extra-files
 
-แทรกไฟล์ bootstrap เพิ่มเติม (เช่น `AGENTS.md` / `TOOLS.md` ภายใน monorepo) ระหว่าง `agent:bootstrap`
+แทรกไฟล์ bootstrap เพิ่มเติม (เช่น `AGENTS.md` / `TOOLS.md` เฉพาะ monorepo) ระหว่าง `agent:bootstrap`
 
-**เปิดใช้งาน:**
+**เปิดใช้:**
 
 ```bash
 openclaw hooks enable bootstrap-extra-files
@@ -305,15 +305,15 @@ openclaw hooks enable bootstrap-extra-files
 
 ### command-logger
 
-บันทึกเหตุการณ์คำสั่งทั้งหมดลงในไฟล์ audit ส่วนกลาง
+บันทึกเหตุการณ์คำสั่งทั้งหมดไปยังไฟล์ audit ส่วนกลาง
 
-**เปิดใช้งาน:**
+**เปิดใช้:**
 
 ```bash
 openclaw hooks enable command-logger
 ```
 
-**เอาต์พุต:** `~/.openclaw/logs/commands.log`
+**ผลลัพธ์:** `~/.openclaw/logs/commands.log`
 
 **ดูบันทึก:**
 
@@ -321,7 +321,7 @@ openclaw hooks enable command-logger
 # คำสั่งล่าสุด
 tail -n 20 ~/.openclaw/logs/commands.log
 
-# แสดงผลให้อ่านง่าย
+# แสดงผลแบบอ่านง่าย
 cat ~/.openclaw/logs/commands.log | jq .
 
 # กรองตาม action
@@ -332,14 +332,19 @@ grep '"action":"new"' ~/.openclaw/logs/commands.log | jq .
 
 ### boot-md
 
-รัน `BOOT.md` เมื่อ gateway เริ่มต้น (หลังจาก channels เริ่มทำงานแล้ว)
+รัน `BOOT.md` เมื่อ gateway เริ่มทำงาน (หลังจากช่องทางเริ่มแล้ว)
 
 **เหตุการณ์**: `gateway:startup`
 
-**เปิดใช้งาน**:
+**เปิดใช้**:
 
 ```bash
 openclaw hooks enable boot-md
 ```
 
 **ดูเพิ่มเติม:** [เอกสาร boot-md](/th/automation/hooks#boot-md)
+
+## ที่เกี่ยวข้อง
+
+- [ข้อมูลอ้างอิง CLI](/th/cli)
+- [Automation hooks](/th/automation/hooks)

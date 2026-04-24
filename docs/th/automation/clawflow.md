@@ -1,15 +1,19 @@
 ---
-summary: เปลี่ยนเส้นทางไปยัง TaskFlow
+summary: เปลี่ยนเส้นทางไปยัง Task Flow
 title: ClawFlow
 x-i18n:
-    generated_at: "2026-04-23T05:24:27Z"
+    generated_at: "2026-04-24T08:57:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e644237e0812f25b46a06ff125c8858dbc69a499aa43cfd73cf7cb37572e78e6
+    source_hash: 1de967044fe5b9996d5aa6d46d63e645d887a98f31bb6dae9ba66dd0eddd1d0e
     source_path: automation/clawflow.md
     workflow: 15
 ---
 
-# ClawFlow
+ClawFlow ถูกเปลี่ยนชื่อเป็น [Task Flow](/th/automation/taskflow) โปรดดูเอกสารปัจจุบันที่ [Task Flow](/th/automation/taskflow)
 
-ClawFlow ถูกเปลี่ยนชื่อเป็น [TaskFlow](/th/automation/taskflow) โปรดดู [TaskFlow](/th/automation/taskflow) สำหรับเอกสารปัจจุบัน
+## ที่เกี่ยวข้อง
+
+- [Task Flow](/th/automation/taskflow)
+- [คำสั่งถาวร](/th/automation/standing-orders)
+- [Hooks](/th/automation/hooks)

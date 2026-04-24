@@ -1,44 +1,42 @@
 ---
 read_when:
     - คุณต้องการใช้ Cloudflare AI Gateway กับ OpenClaw
-    - คุณต้องการ account ID, gateway ID หรือ env var ของ API key
-summary: การตั้งค่า Cloudflare AI Gateway (auth + การเลือกโมเดล)
+    - คุณต้องการ account ID, gateway ID หรือตัวแปรสภาพแวดล้อมของคีย์ API
+summary: การตั้งค่า Cloudflare AI Gateway (การยืนยันตัวตน + การเลือกโมเดล)
 title: Cloudflare AI Gateway
 x-i18n:
-    generated_at: "2026-04-23T05:50:36Z"
+    generated_at: "2026-04-24T09:27:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 12e9589fe74e6a6335370b9cf2361a464876a392a33f8317d7fd30c3f163b2e5
+    source_hash: fb10ef4bd92db88b2b3dac1773439ab2ba37916a72d1925995d74ef787fa1c8b
     source_path: providers/cloudflare-ai-gateway.md
     workflow: 15
 ---
 
-# Cloudflare AI Gateway
-
-Cloudflare AI Gateway วางอยู่หน้าชั้นของ provider APIs และช่วยให้คุณเพิ่ม analytics, caching และ controls ได้ สำหรับ Anthropic นั้น OpenClaw จะใช้ Anthropic Messages API ผ่าน Gateway endpoint ของคุณ
+Cloudflare AI Gateway อยู่หน้าชั้น API ของผู้ให้บริการ และช่วยให้คุณเพิ่มการวิเคราะห์ การแคช และการควบคุมต่าง ๆ ได้ สำหรับ Anthropic นั้น OpenClaw จะใช้ Anthropic Messages API ผ่าน endpoint ของ Gateway ของคุณ
 
 | คุณสมบัติ      | ค่า                                                                                      |
-| ------------- | ---------------------------------------------------------------------------------------- |
-| Provider      | `cloudflare-ai-gateway`                                                                  |
-| Base URL      | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`              |
-| โมเดลเริ่มต้น | `cloudflare-ai-gateway/claude-sonnet-4-5`                                                |
-| API key       | `CLOUDFLARE_AI_GATEWAY_API_KEY` (provider API key ของคุณสำหรับคำขอที่ผ่าน Gateway)       |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Provider       | `cloudflare-ai-gateway`                                                                  |
+| Base URL       | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`              |
+| โมเดลเริ่มต้น | `cloudflare-ai-gateway/claude-sonnet-4-6`                                                |
+| คีย์ API       | `CLOUDFLARE_AI_GATEWAY_API_KEY` (คีย์ API ของผู้ให้บริการของคุณสำหรับคำขอที่ผ่าน Gateway) |
 
 <Note>
-สำหรับโมเดล Anthropic ที่กำหนดเส้นทางผ่าน Cloudflare AI Gateway ให้ใช้ **Anthropic API key** ของคุณเป็น provider key
+สำหรับโมเดล Anthropic ที่กำหนดเส้นทางผ่าน Cloudflare AI Gateway ให้ใช้ **คีย์ API ของ Anthropic** เป็นคีย์ของผู้ให้บริการ
 </Note>
 
 ## เริ่มต้นใช้งาน
 
 <Steps>
-  <Step title="ตั้งค่า provider API key และรายละเอียดของ Gateway">
-    รัน onboarding และเลือกตัวเลือก auth ของ Cloudflare AI Gateway:
+  <Step title="ตั้งค่าคีย์ API ของผู้ให้บริการและรายละเอียดของ Gateway">
+    เรียกใช้ onboarding แล้วเลือกตัวเลือก auth ของ Cloudflare AI Gateway:
 
     ```bash
     openclaw onboard --auth-choice cloudflare-ai-gateway-api-key
     ```
 
-    ขั้นตอนนี้จะถาม account ID, gateway ID และ API key ของคุณ
+    ระบบจะถามหา account ID, gateway ID และคีย์ API ของคุณ
 
   </Step>
   <Step title="ตั้งค่าโมเดลเริ่มต้น">
@@ -48,7 +46,7 @@ Cloudflare AI Gateway วางอยู่หน้าชั้นของ pro
     {
       agents: {
         defaults: {
-          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-5" },
+          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-6" },
         },
       },
     }
@@ -64,7 +62,7 @@ Cloudflare AI Gateway วางอยู่หน้าชั้นของ pro
 
 ## ตัวอย่างแบบไม่โต้ตอบ
 
-สำหรับการตั้งค่าแบบสคริปต์หรือ CI ให้ส่งค่าทั้งหมดผ่าน command line:
+สำหรับการตั้งค่าแบบสคริปต์หรือ CI ให้ส่งค่าทั้งหมดผ่านบรรทัดคำสั่ง:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -78,8 +76,8 @@ openclaw onboard --non-interactive \
 ## การตั้งค่าขั้นสูง
 
 <AccordionGroup>
-  <Accordion title="Gateways ที่ยืนยันตัวตนแล้ว">
-    หากคุณเปิดใช้การยืนยันตัวตนของ Gateway ใน Cloudflare ให้เพิ่ม header `cf-aig-authorization` สิ่งนี้เป็น **เพิ่มเติมจาก** provider API key ของคุณ
+  <Accordion title="Gateway ที่มีการยืนยันตัวตน">
+    หากคุณเปิดใช้การยืนยันตัวตนของ Gateway ใน Cloudflare ให้เพิ่ม header `cf-aig-authorization` ซึ่งเป็นสิ่งที่ต้องมี **เพิ่มเติมจาก** คีย์ API ของผู้ให้บริการของคุณ
 
     ```json5
     {
@@ -96,16 +94,16 @@ openclaw onboard --non-interactive \
     ```
 
     <Tip>
-    header `cf-aig-authorization` ใช้ยืนยันตัวตนกับ Cloudflare Gateway เอง ส่วน provider API key (ตัวอย่างเช่น Anthropic key ของคุณ) ใช้ยืนยันตัวตนกับ upstream provider
+    header `cf-aig-authorization` ใช้สำหรับยืนยันตัวตนกับ Cloudflare Gateway เอง ขณะที่คีย์ API ของผู้ให้บริการ (เช่น คีย์ Anthropic ของคุณ) ใช้สำหรับยืนยันตัวตนกับผู้ให้บริการต้นทาง
     </Tip>
 
   </Accordion>
 
-  <Accordion title="หมายเหตุเรื่อง Environment">
-    หาก Gateway รันเป็น daemon (launchd/systemd) ให้แน่ใจว่า `CLOUDFLARE_AI_GATEWAY_API_KEY` พร้อมใช้งานสำหรับโปรเซสนั้น
+  <Accordion title="หมายเหตุเกี่ยวกับสภาพแวดล้อม">
+    หาก Gateway ทำงานเป็น daemon (launchd/systemd) โปรดตรวจสอบให้แน่ใจว่า `CLOUDFLARE_AI_GATEWAY_API_KEY` พร้อมใช้งานสำหรับโปรเซสนั้น
 
     <Warning>
-    คีย์ที่อยู่เพียงใน `~/.profile` จะไม่ช่วยกับ launchd/systemd daemon เว้นแต่ environment นั้นจะถูกนำเข้าไปที่นั่นด้วย ตั้งค่าคีย์ไว้ใน `~/.openclaw/.env` หรือผ่าน `env.shellEnv` เพื่อให้แน่ใจว่าโปรเซส gateway อ่านค่านี้ได้
+    คีย์ที่อยู่เพียงใน `~/.profile` จะไม่ช่วย daemon ของ launchd/systemd เว้นแต่จะมีการนำสภาพแวดล้อมนั้นเข้าไปด้วยเช่นกัน ให้ตั้งค่าคีย์ไว้ใน `~/.openclaw/.env` หรือผ่าน `env.shellEnv` เพื่อให้แน่ใจว่าโปรเซส gateway สามารถอ่านได้
     </Warning>
 
   </Accordion>

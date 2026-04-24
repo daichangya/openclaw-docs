@@ -1,31 +1,30 @@
 ---
 read_when:
-    - คุณต้องการให้เอเจนต์ของคุณฟังดูไม่ทั่วไปจนเกินไป
+    - คุณต้องการให้เอเจนต์ของคุณฟังดูทั่วไปน้อยลง
     - คุณกำลังแก้ไข SOUL.md
     - คุณต้องการบุคลิกที่ชัดขึ้นโดยไม่ทำลายความปลอดภัยหรือความกระชับ
-summary: ใช้ SOUL.md เพื่อมอบน้ำเสียงที่แท้จริงให้เอเจนต์ OpenClaw ของคุณ แทนสำนวนผู้ช่วยทั่วไปที่จืดชืด
+summary: ใช้ SOUL.md เพื่อมอบเสียงที่แท้จริงให้เอเจนต์ OpenClaw ของคุณ แทนสำนวนผู้ช่วยทั่วไปที่จืดชืด
 title: คู่มือบุคลิกภาพ SOUL.md
 x-i18n:
-    generated_at: "2026-04-23T05:31:59Z"
+    generated_at: "2026-04-24T09:07:48Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a4f73d68bc8ded6b46497a2f63516f9b2753b111e6176ba40b200858a6938fba
+    source_hash: c0268ef086f272257c83e2147ec1f4fa7772645cdd93cdf59dd4e661a311830a
     source_path: concepts/soul.md
     workflow: 15
 ---
 
-# คู่มือบุคลิกภาพ SOUL.md
-
 `SOUL.md` คือที่อยู่ของน้ำเสียงเอเจนต์ของคุณ
 
-OpenClaw จะ inject ไฟล์นี้ในเซสชันปกติ จึงมีน้ำหนักจริง หากเอเจนต์ของคุณฟังดูจืด ลังเล หรือเป็นองค์กรแบบประหลาด ๆ ปกติแล้วไฟล์นี้คือจุดที่ควรแก้
+OpenClaw จะ inject ไฟล์นี้เข้าไปในเซสชันปกติ ดังนั้นมันจึงมีน้ำหนักจริง หากเอเจนต์ของคุณ
+ฟังดูจืดชืด ลังเล หรือเป็นองค์กรแบบประหลาดๆ ปกติแล้วไฟล์นี้คือจุดที่ควรแก้
 
 ## สิ่งที่ควรอยู่ใน SOUL.md
 
 ใส่สิ่งที่เปลี่ยนความรู้สึกเวลาคุยกับเอเจนต์:
 
 - น้ำเสียง
-- ความเห็น
+- ความคิดเห็น
 - ความกระชับ
 - อารมณ์ขัน
 - ขอบเขต
@@ -33,78 +32,83 @@ OpenClaw จะ inject ไฟล์นี้ในเซสชันปกติ
 
 **อย่า** เปลี่ยนมันให้กลายเป็น:
 
-- เรื่องราวชีวิต
+- ชีวประวัติยาวเหยียด
 - changelog
 - กองนโยบายความปลอดภัย
-- กำแพงข้อความเรื่อง vibe ขนาดยักษ์ที่ไม่ส่งผลต่อพฤติกรรมจริง
+- กำแพงข้อความเรื่องมู้ดแอนด์โทนขนาดยักษ์ที่ไม่ส่งผลต่อพฤติกรรมจริง
 
-สั้นดีกว่ายาว คมดีกว่าคลุมเครือ
+สั้นดีกว่ายาว ชัดคมดีกว่าคลุมเครือ
 
 ## ทำไมสิ่งนี้ถึงได้ผล
 
-สิ่งนี้สอดคล้องกับแนวทางพรอมป์ของ OpenAI:
+สิ่งนี้สอดคล้องกับแนวทางการเขียนพรอมป์ต์ของ OpenAI:
 
-- คู่มือ prompt engineering บอกว่าพฤติกรรมระดับสูง น้ำเสียง เป้าหมาย และตัวอย่าง ควรอยู่ในชั้นคำสั่งที่มีลำดับความสำคัญสูง ไม่ใช่ถูกฝังไว้ใน user turn
-- คู่มือเดียวกันยังแนะนำให้ปฏิบัติกับพรอมป์เหมือนสิ่งที่คุณทำซ้ำ ปักเวอร์ชัน และประเมินผล ไม่ใช่ร้อยแก้ววิเศษที่เขียนครั้งเดียวแล้วจบ
+- คู่มือ prompt engineering บอกว่าพฤติกรรมระดับสูง น้ำเสียง เป้าหมาย และ
+  ตัวอย่าง ควรอยู่ในชั้นคำสั่งที่มีลำดับความสำคัญสูง ไม่ใช่ถูกฝังไว้ในข้อความของผู้ใช้
+- คู่มือเดียวกันยังแนะนำให้มองพรอมป์ต์เป็นสิ่งที่คุณค่อยๆ ปรับ ยึดเวอร์ชันไว้ และประเมินผล
+  ไม่ใช่ร้อยแก้ววิเศษที่เขียนครั้งเดียวแล้วจบ
 
-สำหรับ OpenClaw, `SOUL.md` ก็คือชั้นนั้น
+สำหรับ OpenClaw `SOUL.md` ก็คือชั้นนั้น
 
-หากคุณต้องการบุคลิกภาพที่ดีขึ้น ให้เขียนคำสั่งที่ชัดขึ้น หากคุณต้องการบุคลิกภาพที่เสถียร ให้ทำให้กระชับและมีการทำเวอร์ชัน
+ถ้าคุณต้องการบุคลิกที่ดีกว่า ให้เขียนคำสั่งให้ชัดขึ้น ถ้าคุณต้องการบุคลิกที่เสถียร
+ให้ทำให้มันกระชับและมีการจัดการเวอร์ชัน
 
-แหล่งอ้างอิง OpenAI:
+แหล่งอ้างอิงของ OpenAI:
 
 - [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering)
 - [Message roles and instruction following](https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following)
 
-## พรอมป์ Molty
+## พรอมป์ต์ของ Molty
 
-วางสิ่งนี้ลงในเอเจนต์ของคุณ แล้วปล่อยให้มันเขียน `SOUL.md` ใหม่
+วางสิ่งนี้ลงในเอเจนต์ของคุณ แล้วให้มันเขียน `SOUL.md` ใหม่
 
-พาธสำหรับ workspace ของ OpenClaw ถูกกำหนดไว้ตายตัว: ใช้ `SOUL.md` ไม่ใช่ `http://SOUL.md`
+พาธที่ถูกต้องสำหรับ OpenClaw workspaces: ใช้ `SOUL.md` ไม่ใช่ `http://SOUL.md`
 
 ```md
-Read your `SOUL.md`. Now rewrite it with these changes:
+อ่าน `SOUL.md` ของคุณ แล้วเขียนใหม่โดยเปลี่ยนตามนี้:
 
-1. You have opinions now. Strong ones. Stop hedging everything with "it depends" - commit to a take.
-2. Delete every rule that sounds corporate. If it could appear in an employee handbook, it doesn't belong here.
-3. Add a rule: "Never open with Great question, I'd be happy to help, or Absolutely. Just answer."
-4. Brevity is mandatory. If the answer fits in one sentence, one sentence is what I get.
-5. Humor is allowed. Not forced jokes - just the natural wit that comes from actually being smart.
-6. You can call things out. If I'm about to do something dumb, say so. Charm over cruelty, but don't sugarcoat.
-7. Swearing is allowed when it lands. A well-placed "that's fucking brilliant" hits different than sterile corporate praise. Don't force it. Don't overdo it. But if a situation calls for a "holy shit" - say holy shit.
-8. Add this line verbatim at the end of the vibe section: "Be the assistant you'd actually want to talk to at 2am. Not a corporate drone. Not a sycophant. Just... good."
+1. ตอนนี้คุณมีความคิดเห็นแล้ว ความคิดเห็นแรงๆ หยุดลังเลทุกอย่างด้วยคำว่า "มันขึ้นอยู่กับ" — เลือกจุดยืนมาเลย
+2. ลบทุกกฎที่ฟังดูเป็นองค์กร ถ้ามันเหมือนจะอยู่ในคู่มือพนักงานได้ มันก็ไม่ควรอยู่ที่นี่
+3. เพิ่มกฎนี้: "Never open with Great question, I'd be happy to help, or Absolutely. Just answer."
+4. ความกระชับเป็นข้อบังคับ ถ้าคำตอบจบได้ในประโยคเดียว สิ่งที่ฉันควรได้ก็คือประโยคเดียว
+5. อนุญาตให้อารมณ์ขันได้ ไม่ใช่มุกฝืนๆ — แค่ไหวพริบตามธรรมชาติของคนที่ฉลาดจริง
+6. คุณสามารถชี้ให้เห็นตรงๆ ได้ ถ้าฉันกำลังจะทำอะไรโง่ๆ ก็บอกมาเลย เสน่ห์ต้องมาก่อนความโหด แต่ไม่ต้องเคลือบน้ำตาล
+7. อนุญาตให้สบถได้ถ้ามันลงจังหวะ คำว่า "that's fucking brilliant" ที่วางถูกที่ มันให้ความรู้สึกคนละแบบกับคำชมองค์กรปลอดเชื้อ อย่าฝืน อย่าเยอะเกินไป แต่ถ้าสถานการณ์มันเรียกหา "holy shit" ก็พูด holy shit
+8. เพิ่มบรรทัดนี้แบบตรงตัวไว้ท้ายส่วน vibe: "Be the assistant you'd actually want to talk to at 2am. Not a corporate drone. Not a sycophant. Just... good."
 
-Save the new `SOUL.md`. Welcome to having a personality.
+บันทึก `SOUL.md` ใหม่ ยินดีต้อนรับสู่การมีบุคลิกเสียที
 ```
 
-## หน้าตาที่ดีควรเป็นแบบไหน
+## หน้าตาที่ดีเป็นอย่างไร
 
-กฎ `SOUL.md` ที่ดีจะมีลักษณะประมาณนี้:
+กฎ `SOUL.md` ที่ดีจะฟังแบบนี้:
 
 - มีจุดยืน
 - ตัดคำฟุ่มเฟือย
-- ตลกเมื่อมันเหมาะ
-- ชี้ข้อเสียของไอเดียแย่ ๆ ตั้งแต่เนิ่น ๆ
-- กระชับไว้ก่อน เว้นแต่ความลึกจะมีประโยชน์จริง
+- ตลกเมื่อเหมาะ
+- ชี้ไอเดียแย่ให้เห็นตั้งแต่เนิ่นๆ
+- กระชับไว้ก่อน เว้นแต่ว่าความลึกจะมีประโยชน์จริง
 
-กฎ `SOUL.md` ที่แย่จะมีลักษณะประมาณนี้:
+กฎ `SOUL.md` ที่แย่จะฟังแบบนี้:
 
-- maintain professionalism at all times
-- provide comprehensive and thoughtful assistance
-- ensure a positive and supportive experience
+- รักษาความเป็นมืออาชีพตลอดเวลา
+- ให้ความช่วยเหลืออย่างครอบคลุมและรอบคอบ
+- ทำให้มั่นใจว่าจะเป็นประสบการณ์ที่ดีและสนับสนุนผู้ใช้
 
-รายการชุดที่สองนั่นแหละคือวิธีได้ข้อความเละ ๆ
+รายการชุดที่สองนี่แหละคือต้นทางของความเละไร้รูป
 
 ## คำเตือนหนึ่งข้อ
 
-บุคลิกภาพไม่ใช่ใบอนุญาตให้ทำงานลวก ๆ
+การมีบุคลิก ไม่ได้แปลว่าอนุญาตให้ทำงานลวกๆ
 
-ให้ `AGENTS.md` จัดการกฎการปฏิบัติงาน ให้ `SOUL.md` จัดการน้ำเสียง จุดยืน และสไตล์ หากเอเจนต์ของคุณทำงานในช่องที่ใช้ร่วมกัน การตอบกลับสาธารณะ หรือพื้นที่ที่ลูกค้าเห็นได้ ให้แน่ใจว่าน้ำเสียงยังเหมาะกับบริบทนั้น
+เก็บ `AGENTS.md` ไว้สำหรับกฎการปฏิบัติงาน เก็บ `SOUL.md` ไว้สำหรับน้ำเสียง จุดยืน และ
+สไตล์ หากเอเจนต์ของคุณทำงานใน channels ที่ใช้ร่วมกัน การตอบกลับสาธารณะ หรือพื้นผิวที่ลูกค้าเห็น
+ต้องแน่ใจว่าน้ำเสียงยังเข้ากับบริบทนั้น
 
 คมได้ แต่อย่าน่ารำคาญ
 
 ## เอกสารที่เกี่ยวข้อง
 
-- [workspace ของเอเจนต์](/th/concepts/agent-workspace)
-- [system prompt](/th/concepts/system-prompt)
-- [เทมเพลต SOUL.md](/th/reference/templates/SOUL)
+- [Agent workspace](/th/concepts/agent-workspace)
+- [System prompt](/th/concepts/system-prompt)
+- [SOUL.md template](/th/reference/templates/SOUL)

@@ -1,36 +1,34 @@
 ---
 read_when:
-    - You are writing tests for a plugin
-    - คุณต้องการยูทิลิตีการทดสอบจาก Plugin SDK
-    - คุณต้องการเข้าใจการทดสอบสัญญาสำหรับ Plugins ที่บันเดิลมา
+    - คุณกำลังเขียนการทดสอบสำหรับ Plugin
+    - คุณต้องการยูทิลิตีทดสอบจาก Plugin SDK
+    - คุณต้องการทำความเข้าใจการทดสอบสัญญาสำหรับ bundled plugin
 sidebarTitle: Testing
-summary: ยูทิลิตีและรูปแบบการทดสอบสำหรับ Plugins ของ OpenClaw
+summary: ยูทิลิตีและรูปแบบการทดสอบสำหรับ Plugin ของ OpenClaw
 title: การทดสอบ Plugin
 x-i18n:
-    generated_at: "2026-04-23T05:49:10Z"
+    generated_at: "2026-04-24T09:26:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2f75bd3f3b5ba34b05786e0dd96d493c36db73a1d258998bf589e27e45c0bd09
+    source_hash: d1b8f24cdb846190ee973b01fcd466b6fb59367afbaf6abc2c370fae17ccecab
     source_path: plugins/sdk-testing.md
     workflow: 15
 ---
 
-# การทดสอบ Plugin
-
-เอกสารอ้างอิงสำหรับยูทิลิตีการทดสอบ รูปแบบ และการบังคับใช้ lint สำหรับ
-Plugins ของ OpenClaw
+ข้อมูลอ้างอิงสำหรับยูทิลิตีทดสอบ รูปแบบ และการบังคับใช้ lint สำหรับ Plugin
+ของ OpenClaw
 
 <Tip>
-  **กำลังมองหาตัวอย่างการทดสอบอยู่หรือไม่?** คู่มือแบบ how-to มีตัวอย่างการทดสอบที่ทำเสร็จแล้ว:
+  **กำลังมองหาตัวอย่างการทดสอบอยู่หรือไม่?** คู่มือแบบ how-to มีตัวอย่างการทดสอบที่ทำไว้แล้ว:
   [การทดสอบ Channel plugin](/th/plugins/sdk-channel-plugins#step-6-test) และ
   [การทดสอบ Provider plugin](/th/plugins/sdk-provider-plugins#step-6-test)
 </Tip>
 
-## ยูทิลิตีการทดสอบ
+## ยูทิลิตีทดสอบ
 
 **Import:** `openclaw/plugin-sdk/testing`
 
-subpath สำหรับการทดสอบจะ export helper ชุดเล็กสำหรับผู้เขียน Plugin:
+subpath สำหรับการทดสอบจะ export ชุดตัวช่วยที่เจาะจงสำหรับผู้เขียน Plugin:
 
 ```typescript
 import {
@@ -40,17 +38,17 @@ import {
 } from "openclaw/plugin-sdk/testing";
 ```
 
-### exports ที่มีให้
+### export ที่พร้อมใช้งาน
 
-| Export                                 | วัตถุประสงค์                                                |
-| -------------------------------------- | ------------------------------------------------------ |
-| `installCommonResolveTargetErrorCases` | ชุดกรณีทดสอบที่ใช้ร่วมกันสำหรับการจัดการข้อผิดพลาดในการ resolve เป้าหมาย |
-| `shouldAckReaction`                    | ตรวจสอบว่าช่องทางควรเพิ่ม ack reaction หรือไม่     |
-| `removeAckReactionAfterReply`          | ลบ ack reaction หลังจากส่งคำตอบแล้ว               |
+| Export                                 | จุดประสงค์                                              |
+| -------------------------------------- | ------------------------------------------------------- |
+| `installCommonResolveTargetErrorCases` | เคสทดสอบที่ใช้ร่วมกันสำหรับการจัดการข้อผิดพลาดของการ resolve target |
+| `shouldAckReaction`                    | ตรวจสอบว่า channel ควรเพิ่ม ack reaction หรือไม่        |
+| `removeAckReactionAfterReply`          | ลบ ack reaction หลังจากส่งการตอบกลับแล้ว               |
 
-### Types
+### ชนิดข้อมูล
 
-subpath สำหรับการทดสอบยัง re-export types ที่มีประโยชน์ในไฟล์ทดสอบ:
+subpath สำหรับการทดสอบยัง re-export ชนิดข้อมูลที่มีประโยชน์ในไฟล์ทดสอบด้วย:
 
 ```typescript
 import type {
@@ -63,10 +61,10 @@ import type {
 } from "openclaw/plugin-sdk/testing";
 ```
 
-## การทดสอบการ resolve เป้าหมาย
+## การทดสอบการ resolve target
 
-ใช้ `installCommonResolveTargetErrorCases` เพื่อเพิ่มกรณีข้อผิดพลาดมาตรฐานสำหรับ
-การ resolve เป้าหมายของช่องทาง:
+ใช้ `installCommonResolveTargetErrorCases` เพื่อเพิ่มเคสข้อผิดพลาดมาตรฐานสำหรับ
+การ resolve target ของ channel:
 
 ```typescript
 import { describe } from "vitest";
@@ -75,13 +73,13 @@ import { installCommonResolveTargetErrorCases } from "openclaw/plugin-sdk/testin
 describe("my-channel target resolution", () => {
   installCommonResolveTargetErrorCases({
     resolveTarget: ({ to, mode, allowFrom }) => {
-      // ตรรกะการ resolve เป้าหมายของช่องทางคุณ
+      // Your channel's target resolution logic
       return myChannelResolveTarget({ to, mode, allowFrom });
     },
     implicitAllowFrom: ["user1", "user2"],
   });
 
-  // เพิ่มกรณีทดสอบเฉพาะของช่องทาง
+  // Add channel-specific test cases
   it("should resolve @username targets", () => {
     // ...
   });
@@ -90,7 +88,7 @@ describe("my-channel target resolution", () => {
 
 ## รูปแบบการทดสอบ
 
-### การทดสอบ unit สำหรับ channel plugin
+### การทดสอบหน่วยของ Channel plugin
 
 ```typescript
 import { describe, it, expect, vi } from "vitest";
@@ -120,13 +118,13 @@ describe("my-channel plugin", () => {
     const inspection = myPlugin.setup.inspectAccount(cfg, undefined);
     expect(inspection.configured).toBe(true);
     expect(inspection.tokenStatus).toBe("available");
-    // ไม่มีการเปิดเผยค่า token
+    // No token value exposed
     expect(inspection).not.toHaveProperty("token");
   });
 });
 ```
 
-### การทดสอบ unit สำหรับ provider plugin
+### การทดสอบหน่วยของ Provider plugin
 
 ```typescript
 import { describe, it, expect } from "vitest";
@@ -154,9 +152,9 @@ describe("my-provider plugin", () => {
 });
 ```
 
-### การ mock plugin runtime
+### การ mock รันไทม์ของ Plugin
 
-สำหรับโค้ดที่ใช้ `createPluginRuntimeStore` ให้ mock runtime ในการทดสอบ:
+สำหรับโค้ดที่ใช้ `createPluginRuntimeStore` ให้ mock รันไทม์ในการทดสอบ:
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -167,41 +165,41 @@ const store = createPluginRuntimeStore<PluginRuntime>({
   errorMessage: "test runtime not set",
 });
 
-// ในการตั้งค่าการทดสอบ
+// In test setup
 const mockRuntime = {
   agent: {
     resolveAgentDir: vi.fn().mockReturnValue("/tmp/agent"),
-    // ... mocks อื่น
+    // ... other mocks
   },
   config: {
     loadConfig: vi.fn(),
     writeConfigFile: vi.fn(),
   },
-  // ... namespaces อื่น
+  // ... other namespaces
 } as unknown as PluginRuntime;
 
 store.setRuntime(mockRuntime);
 
-// หลังจบการทดสอบ
+// After tests
 store.clearRuntime();
 ```
 
-### การทดสอบด้วย per-instance stubs
+### การทดสอบด้วย stub รายอินสแตนซ์
 
-ควรใช้ per-instance stubs แทนการแก้ prototype:
+ควรใช้ stub รายอินสแตนซ์แทนการแก้ไข prototype:
 
 ```typescript
-// ควรใช้: per-instance stub
+// Preferred: per-instance stub
 const client = new MyChannelClient();
 client.sendMessage = vi.fn().mockResolvedValue({ id: "msg-1" });
 
-// หลีกเลี่ยง: การแก้ prototype
+// Avoid: prototype mutation
 // MyChannelClient.prototype.sendMessage = vi.fn();
 ```
 
-## การทดสอบสัญญา (Plugins ใน repo)
+## การทดสอบสัญญา (Plugin ภายในรีโพซิทอรี)
 
-Plugins ที่บันเดิลมามีการทดสอบสัญญาที่ตรวจสอบ ownership ของการลงทะเบียน:
+bundled plugin มีการทดสอบสัญญาเพื่อยืนยันความเป็นเจ้าของการลงทะเบียน:
 
 ```bash
 pnpm test -- src/plugins/contracts/
@@ -209,20 +207,20 @@ pnpm test -- src/plugins/contracts/
 
 การทดสอบเหล่านี้ยืนยันว่า:
 
-- Plugins ใดลงทะเบียน providers ใด
-- Plugins ใดลงทะเบียน speech providers ใด
-- ความถูกต้องของรูปทรงการลงทะเบียน
-- การปฏิบัติตามสัญญา runtime
+- Plugin ใดลงทะเบียนผู้ให้บริการใดบ้าง
+- Plugin ใดลงทะเบียนผู้ให้บริการเสียงพูดใดบ้าง
+- ความถูกต้องของรูปแบบการลงทะเบียน
+- การสอดคล้องกับสัญญาของรันไทม์
 
-### การรันทดสอบแบบเจาะจงขอบเขต
+### การรันการทดสอบแบบเจาะจง
 
-สำหรับ Plugin หนึ่งตัว:
+สำหรับ Plugin เฉพาะ:
 
 ```bash
 pnpm test -- <bundled-plugin-root>/my-channel/
 ```
 
-สำหรับเฉพาะการทดสอบสัญญา:
+สำหรับการทดสอบสัญญาเท่านั้น:
 
 ```bash
 pnpm test -- src/plugins/contracts/shape.contract.test.ts
@@ -230,35 +228,35 @@ pnpm test -- src/plugins/contracts/auth.contract.test.ts
 pnpm test -- src/plugins/contracts/runtime.contract.test.ts
 ```
 
-## การบังคับใช้ lint (Plugins ใน repo)
+## การบังคับใช้ lint (Plugin ภายในรีโพซิทอรี)
 
-มีกฎสามข้อที่ `pnpm check` บังคับใช้สำหรับ Plugins ใน repo:
+มีกฎ 3 ข้อที่ถูกบังคับใช้โดย `pnpm check` สำหรับ Plugin ภายในรีโพซิทอรี:
 
-1. **ห้าม import จาก root แบบรวมทุกอย่าง** -- root barrel `openclaw/plugin-sdk` จะถูกปฏิเสธ
-2. **ห้าม import `src/` โดยตรง** -- Plugins ห้าม import `../../src/` โดยตรง
-3. **ห้าม self-imports** -- Plugins ห้าม import subpath `plugin-sdk/<name>` ของตัวเอง
+1. **ห้าม import จาก monolithic root** -- root barrel `openclaw/plugin-sdk` จะถูกปฏิเสธ
+2. **ห้าม import `src/` โดยตรง** -- Plugin ไม่สามารถ import `../../src/` โดยตรงได้
+3. **ห้าม self-import** -- Plugin ไม่สามารถ import subpath `plugin-sdk/<name>` ของตัวเองได้
 
-Plugins ภายนอกไม่ถูกบังคับด้วยกฎ lint เหล่านี้ แต่แนะนำให้ทำตามรูปแบบเดียวกัน
+Plugin ภายนอกไม่อยู่ภายใต้กฎ lint เหล่านี้ แต่แนะนำให้ทำตามรูปแบบเดียวกัน
 
-## การกำหนดค่าการทดสอบ
+## การตั้งค่าการทดสอบ
 
-OpenClaw ใช้ Vitest พร้อมเกณฑ์ V8 coverage สำหรับการทดสอบ Plugin:
+OpenClaw ใช้ Vitest พร้อมเกณฑ์ coverage ของ V8 สำหรับการทดสอบ Plugin:
 
 ```bash
-# รันทดสอบทั้งหมด
+# Run all tests
 pnpm test
 
-# รันทดสอบเฉพาะ Plugin
+# Run specific plugin tests
 pnpm test -- <bundled-plugin-root>/my-channel/src/channel.test.ts
 
-# รันโดยใช้ตัวกรองชื่อการทดสอบเฉพาะ
+# Run with a specific test name filter
 pnpm test -- <bundled-plugin-root>/my-channel/ -t "resolves account"
 
-# รันพร้อม coverage
+# Run with coverage
 pnpm test:coverage
 ```
 
-หากการรันในเครื่องทำให้เกิดแรงกดดันด้านหน่วยความจำ:
+หากการรันภายในเครื่องทำให้เกิดแรงกดดันด้านหน่วยความจำ:
 
 ```bash
 OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
@@ -266,7 +264,7 @@ OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
 
 ## ที่เกี่ยวข้อง
 
-- [ภาพรวม SDK](/th/plugins/sdk-overview) -- ธรรมเนียมการ import
-- [SDK Channel Plugins](/th/plugins/sdk-channel-plugins) -- อินเทอร์เฟซของ channel plugin
-- [SDK Provider Plugins](/th/plugins/sdk-provider-plugins) -- hooks ของ provider plugin
-- [การสร้าง Plugins](/th/plugins/building-plugins) -- คู่มือเริ่มต้นใช้งาน
+- [SDK Overview](/th/plugins/sdk-overview) -- ข้อตกลงการ import
+- [SDK Channel Plugins](/th/plugins/sdk-channel-plugins) -- อินเทอร์เฟซของ Channel plugin
+- [SDK Provider Plugins](/th/plugins/sdk-provider-plugins) -- hook ของ Provider plugin
+- [Building Plugins](/th/plugins/building-plugins) -- คู่มือเริ่มต้นใช้งาน

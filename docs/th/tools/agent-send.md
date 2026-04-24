@@ -1,55 +1,51 @@
 ---
 read_when:
-    - คุณต้องการทริกเกอร์การรันของเอเจนต์จากสคริปต์หรือบรรทัดคำสั่ง
-    - คุณต้องการส่งคำตอบของเอเจนต์ไปยังช่องทางแชตแบบเป็นโปรแกรม
-summary: |-
-    รันเทิร์นของเอเจนต์จาก CLI และเลือกส่งคำตอบไปยัง channels ได้＠＼(^analysis to=functions.read  ฝ่ายขายละครիքjson
-    {"path":"docs/cli/agent.md"}
-title: การส่งโดยเอเจนต์
+    - คุณต้องการทริกเกอร์การรันเอเจนต์จากสคริปต์หรือบรรทัดคำสั่ง
+    - คุณต้องการส่งคำตอบของเอเจนต์ไปยังช่องแชตแบบเป็นโปรแกรมបាន
+summary: รัน agent turn จาก CLI และเลือกส่งคำตอบกลับไปยังช่องทางต่าง ๆ ได้ตามต้องการ
+title: การส่งของเอเจนต์
 x-i18n:
-    generated_at: "2026-04-23T05:58:40Z"
+    generated_at: "2026-04-24T09:34:37Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0550ad38efb2711f267a62b905fd150987a98801247de780ed3df97f27245704
+    source_hash: 8f29ab906ed8179b265138ee27312c8f4b318d09b73ad61843fca6809c32bd31
     source_path: tools/agent-send.md
     workflow: 15
 ---
 
-# การส่งโดยเอเจนต์
-
-`openclaw agent` จะรันเทิร์นของเอเจนต์หนึ่งครั้งจากบรรทัดคำสั่งโดยไม่ต้องมี
+`openclaw agent` รัน agent turn เดียวจากบรรทัดคำสั่งโดยไม่ต้องมี
 ข้อความแชตขาเข้า ใช้สำหรับเวิร์กโฟลว์แบบสคริปต์ การทดสอบ และ
 การส่งแบบเป็นโปรแกรม
 
 ## เริ่มต้นอย่างรวดเร็ว
 
 <Steps>
-  <Step title="รันเทิร์นของเอเจนต์แบบง่าย">
+  <Step title="รัน agent turn แบบง่าย">
     ```bash
     openclaw agent --message "What is the weather today?"
     ```
 
-    คำสั่งนี้จะส่งข้อความผ่าน Gateway และพิมพ์คำตอบออกมา
+    คำสั่งนี้จะส่งข้อความผ่าน Gateway และพิมพ์คำตอบ
 
   </Step>
 
-  <Step title="กำหนดเป้าหมายเอเจนต์หรือเซสชันเฉพาะ">
+  <Step title="ระบุ agent หรือ session เฉพาะ">
     ```bash
-    # กำหนดเป้าหมายเอเจนต์เฉพาะ
+    # ระบุ agent เฉพาะ
     openclaw agent --agent ops --message "Summarize logs"
 
-    # กำหนดเป้าหมายไปยังหมายเลขโทรศัพท์ (derive session key)
+    # ระบุหมายเลขโทรศัพท์ (อนุมานคีย์เซสชัน)
     openclaw agent --to +15555550123 --message "Status update"
 
-    # ใช้เซสชันเดิมต่อ
+    # ใช้ session ที่มีอยู่แล้วต่อ
     openclaw agent --session-id abc123 --message "Continue the task"
     ```
 
   </Step>
 
-  <Step title="ส่งคำตอบไปยัง channel">
+  <Step title="ส่งคำตอบไปยังช่องทาง">
     ```bash
-    # ส่งไปยัง WhatsApp (channel ค่าเริ่มต้น)
+    # ส่งไปยัง WhatsApp (ช่องทางปริยาย)
     openclaw agent --to +15555550123 --message "Report ready" --deliver
 
     # ส่งไปยัง Slack
@@ -62,48 +58,48 @@ x-i18n:
 
 ## แฟล็ก
 
-| แฟล็ก                         | คำอธิบาย                                                     |
-| ---------------------------- | ------------------------------------------------------------ |
-| `--message \<text\>`         | ข้อความที่จะส่ง (จำเป็น)                                     |
-| `--to \<dest\>`              | derive session key จากเป้าหมาย (โทรศัพท์, chat id)           |
-| `--agent \<id\>`             | กำหนดเป้าหมายไปยังเอเจนต์ที่กำหนดค่าไว้ (ใช้เซสชัน `main` ของมัน) |
-| `--session-id \<id\>`        | ใช้เซสชันเดิมต่อโดยอ้างอิงจาก id                             |
-| `--local`                    | บังคับใช้รันไทม์แบบฝังตัวในเครื่อง (ข้าม Gateway)           |
-| `--deliver`                  | ส่งคำตอบไปยัง chat channel                                   |
-| `--channel \<name\>`         | channel สำหรับการส่ง (whatsapp, telegram, discord, slack ฯลฯ) |
-| `--reply-to \<target\>`      | override เป้าหมายการส่ง                                      |
-| `--reply-channel \<name\>`   | override channel การส่ง                                       |
-| `--reply-account \<id\>`     | override delivery account id                                  |
-| `--thinking \<level\>`       | ตั้งค่าระดับ thinking สำหรับ model profile ที่เลือก           |
-| `--verbose \<on\|full\|off\>` | ตั้งค่าระดับ verbose                                         |
-| `--timeout \<seconds\>`      | override agent timeout                                        |
-| `--json`                     | แสดงผลเป็น JSON แบบมีโครงสร้าง                              |
+| Flag                          | คำอธิบาย                                                    |
+| ----------------------------- | ----------------------------------------------------------- |
+| `--message \<text\>`          | ข้อความที่จะส่ง (จำเป็น)                                    |
+| `--to \<dest\>`               | อนุมานคีย์เซสชันจากเป้าหมาย (โทรศัพท์, chat id)            |
+| `--agent \<id\>`              | ระบุ agent ที่ตั้งค่าไว้ (ใช้ session `main` ของมัน)         |
+| `--session-id \<id\>`         | ใช้ session ที่มีอยู่แล้วต่อโดยอิงตาม id                    |
+| `--local`                     | บังคับใช้ runtime แบบฝังในเครื่อง (ข้าม Gateway)           |
+| `--deliver`                   | ส่งคำตอบไปยังช่องแชต                                        |
+| `--channel \<name\>`          | ช่องทางสำหรับการส่ง (whatsapp, telegram, discord, slack ฯลฯ) |
+| `--reply-to \<target\>`       | แทนที่เป้าหมายการส่ง                                        |
+| `--reply-channel \<name\>`    | แทนที่ช่องทางการส่ง                                         |
+| `--reply-account \<id\>`      | แทนที่ id บัญชีสำหรับการส่ง                                 |
+| `--thinking \<level\>`        | ตั้งค่าระดับการคิดสำหรับโปรไฟล์โมเดลที่เลือก                 |
+| `--verbose \<on\|full\|off\>` | ตั้งค่าระดับ verbose                                        |
+| `--timeout \<seconds\>`       | แทนที่ค่า timeout ของเอเจนต์                                |
+| `--json`                      | แสดงผลเป็น JSON แบบมีโครงสร้าง                             |
 
 ## พฤติกรรม
 
-- ตามค่าเริ่มต้น CLI จะวิ่ง **ผ่าน Gateway** เพิ่ม `--local` หากต้องการบังคับให้ใช้
-  embedded runtime บนเครื่องปัจจุบัน
-- หากเข้าถึง Gateway ไม่ได้ CLI จะ **fallback** ไปยัง local embedded run
-- การเลือกเซสชัน: `--to` จะ derive session key (เป้าหมายแบบกลุ่ม/channel
-  จะคงการแยกไว้; direct chats จะถูกรวมเข้า `main`)
-- แฟล็ก thinking และ verbose จะถูกเก็บไว้ใน session store
-- เอาต์พุต: ข้อความธรรมดาเป็นค่าเริ่มต้น หรือใช้ `--json` เพื่อผลลัพธ์แบบมีโครงสร้างพร้อม metadata
+- โดยค่าเริ่มต้น CLI จะทำงาน **ผ่าน Gateway** เพิ่ม `--local` เพื่อบังคับใช้
+  runtime แบบฝังในเครื่องปัจจุบัน
+- หากไม่สามารถเข้าถึง Gateway ได้ CLI จะ **fallback** ไปใช้การรันแบบฝังในเครื่อง
+- การเลือกเซสชัน: `--to` จะอนุมานคีย์เซสชัน (เป้าหมายแบบกลุ่ม/ช่องทาง
+  จะคงการแยกไว้; แชตโดยตรงจะถูกรวมเป็น `main`)
+- แฟล็ก thinking และ verbose จะถูกเก็บไว้ในที่เก็บเซสชัน
+- เอาต์พุต: เป็นข้อความธรรมดาโดยค่าเริ่มต้น หรือใช้ `--json` สำหรับ payload + metadata แบบมีโครงสร้าง
 
 ## ตัวอย่าง
 
 ```bash
-# เทิร์นแบบง่ายพร้อมเอาต์พุต JSON
+# turn แบบง่ายพร้อมเอาต์พุต JSON
 openclaw agent --to +15555550123 --message "Trace logs" --verbose on --json
 
-# เทิร์นพร้อมระดับ thinking
+# turn พร้อมระดับการคิด
 openclaw agent --session-id 1234 --message "Summarize inbox" --thinking medium
 
-# ส่งไปยัง channel ที่ต่างจากเซสชัน
+# ส่งไปยังคนละช่องทางกับ session
 openclaw agent --agent ops --message "Alert" --deliver --reply-channel telegram --reply-to "@admin"
 ```
 
 ## ที่เกี่ยวข้อง
 
-- [Agent CLI reference](/cli/agent)
-- [Sub-agents](/th/tools/subagents) — การ spawn sub-agent แบบเบื้องหลัง
-- [Sessions](/th/concepts/session) — วิธีการทำงานของ session keys
+- [ข้อมูลอ้างอิง CLI ของ Agent](/th/cli/agent)
+- [Sub-agents](/th/tools/subagents) — การสร้าง Sub-agent เบื้องหลัง
+- [เซสชัน](/th/concepts/session) — วิธีการทำงานของคีย์เซสชัน

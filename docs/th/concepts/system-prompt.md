@@ -1,112 +1,109 @@
 ---
 read_when:
-    - การแก้ไขข้อความของ system prompt, รายการเครื่องมือ หรือส่วนเวลา/Heartbeat
-    - การเปลี่ยนพฤติกรรมของ workspace bootstrap หรือการ inject Skills
-summary: system prompt ของ OpenClaw มีอะไรบ้างและถูกรวบรวมขึ้นมาอย่างไร
+    - การแก้ไขข้อความ System prompt รายการ tools หรือส่วนเวลา/Heartbeat
+    - การเปลี่ยนพฤติกรรมการบูตสแตรป workspace หรือการแทรก Skills
+summary: สิ่งที่อยู่ใน system prompt ของ OpenClaw และวิธีประกอบมันขึ้นมา
 title: System prompt
 x-i18n:
-    generated_at: "2026-04-23T05:32:03Z"
+    generated_at: "2026-04-24T09:07:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bc7b887865830e29bcbfb7f88a12fe04f490eec64cb745fc4534051b63a862dc
+    source_hash: ff0498b99974f1a75fc9b93ca46cc0bf008ebf234b429c05ee689a4a150d29f1
     source_path: concepts/system-prompt.md
     workflow: 15
 ---
 
-# System Prompt
+OpenClaw จะสร้าง system prompt แบบกำหนดเองสำหรับทุกการรันของเอเจนต์ โดย prompt นี้เป็น **ของ OpenClaw เอง** และไม่ได้ใช้ prompt ค่าเริ่มต้นของ pi-coding-agent
 
-OpenClaw สร้าง system prompt แบบกำหนดเองสำหรับการรันเอเจนต์ทุกครั้ง พรอมป์ต์นี้ **เป็นของ OpenClaw เอง** และไม่ได้ใช้พรอมป์ต์เริ่มต้นของ pi-coding-agent
+prompt นี้จะถูกประกอบโดย OpenClaw และแทรกเข้าไปในการรันของเอเจนต์แต่ละครั้ง
 
-พรอมป์ต์จะถูกรวบรวมโดย OpenClaw และ inject เข้าไปในการรันเอเจนต์แต่ละครั้ง
+Provider Plugins สามารถเพิ่มแนวทางการใช้ prompt ที่รับรู้ cache ได้ โดยไม่ต้องแทนที่
+prompt ทั้งหมดที่ OpenClaw เป็นเจ้าของ runtime ของ provider สามารถ:
 
-Provider plugins สามารถเพิ่มคำแนะนำพรอมป์ต์แบบรับรู้ cache ได้ โดยไม่ต้องแทนที่
-พรอมป์ต์ทั้งหมดที่ OpenClaw เป็นเจ้าของ รันไทม์ของ provider สามารถ:
-
-- แทนที่ core sections แบบมีชื่อชุดเล็กๆ (`interaction_style`,
+- แทนที่ core sections แบบมีชื่อจำนวนเล็กน้อย (`interaction_style`,
   `tool_call_style`, `execution_bias`)
-- inject **stable prefix** เหนือขอบเขต prompt cache
-- inject **dynamic suffix** ใต้ขอบเขต prompt cache
+- แทรก **stable prefix** ไว้เหนือ prompt cache boundary
+- แทรก **dynamic suffix** ไว้ใต้ prompt cache boundary
 
-ใช้ส่วนที่ provider เป็นเจ้าของสำหรับการปรับแต่งเฉพาะตระกูลโมเดล เก็บการเปลี่ยนพรอมป์ต์แบบเดิมผ่าน
-`before_prompt_build` ไว้เพื่อ compatibility หรือการเปลี่ยนพรอมป์ต์ระดับโกลบอลจริงๆ
-ไม่ใช่พฤติกรรมของ provider ตามปกติ
+ใช้ส่วนเพิ่มที่เป็นของ provider สำหรับการปรับแต่งตามตระกูลโมเดลโดยเฉพาะ เก็บการแก้ไข prompt แบบเดิมผ่าน
+`before_prompt_build` ไว้เพื่อความเข้ากันได้หรือสำหรับการเปลี่ยน prompt แบบโกลบอลจริง ๆ ไม่ใช่สำหรับพฤติกรรมปกติของ provider
 
-overlay ของตระกูล OpenAI GPT-5 ทำให้กฎการทำงานหลักมีขนาดเล็ก และเพิ่ม
-คำแนะนำเฉพาะโมเดลสำหรับ persona latching, ผลลัพธ์ที่กระชับ, วินัยในการใช้เครื่องมือ,
-การค้นหาแบบขนาน, ความครอบคลุมของ deliverable, การตรวจสอบความถูกต้อง, บริบทที่ขาดหายไป
-และสุขอนามัยของ terminal-tool
+overlay สำหรับตระกูล OpenAI GPT-5 จะคงกฎการทำงานหลักไว้ให้เล็ก และเพิ่ม
+คำแนะนำเฉพาะโมเดลสำหรับ persona latching, เอาต์พุตที่กระชับ, วินัยในการใช้ tool,
+parallel lookup, ความครอบคลุมของ deliverable, การตรวจสอบยืนยัน, บริบทที่ขาดหาย และ
+สุขอนามัยของ terminal-tool
 
 ## โครงสร้าง
 
-พรอมป์ต์ถูกออกแบบให้กะทัดรัดโดยตั้งใจ และใช้ sections แบบตายตัว:
+prompt นี้มีขนาดกะทัดรัดโดยตั้งใจ และใช้ sections แบบคงที่:
 
-- **Tooling**: การเตือนว่าแหล่งข้อมูลจริงของเครื่องมือแบบมีโครงสร้างคืออะไร พร้อมคำแนะนำการใช้เครื่องมือในรันไทม์
-- **Execution Bias**: คำแนะนำแบบย่อให้ทำงานต่อเนื่อง: ลงมือในเทิร์นนั้นกับ
-  คำขอที่ทำได้ทันที, ทำต่อจนเสร็จหรือจนติดขัด, ฟื้นตัวจากผลลัพธ์เครื่องมือที่อ่อน,
-  ตรวจสอบสถานะที่เปลี่ยนแปลงได้จากของจริง และยืนยันก่อนสรุปคำตอบ
-- **Safety**: การเตือน guardrail แบบสั้นเพื่อหลีกเลี่ยงพฤติกรรมแสวงหาอำนาจหรือเลี่ยงการกำกับดูแล
-- **Skills** (เมื่อมี): บอกโมเดลว่าควรโหลดคำแนะนำของ skill ตามต้องการอย่างไร
+- **Tooling**: การเตือนว่า structured-tool เป็นแหล่งข้อมูลจริงหลัก พร้อมแนวทางการใช้ tool ใน runtime
+- **Execution Bias**: แนวทางแบบกระชับเพื่อทำงานต่อให้จบ: ลงมือทำภายในเทิร์นกับ
+  คำขอที่ลงมือได้ ดำเนินต่อจนเสร็จหรือถูกบล็อก ฟื้นตัวจากผลลัพธ์ tool ที่อ่อน
+  ตรวจสอบ mutable state แบบสด และยืนยันก่อนสรุปผล
+- **Safety**: การเตือน guardrail แบบสั้นเพื่อหลีกเลี่ยงพฤติกรรมแสวงหาอำนาจหรือหลบเลี่ยงการกำกับดูแล
+- **Skills** (เมื่อมี): บอกโมเดลว่าจะโหลดคำสั่งของ skill ตามต้องการอย่างไร
 - **OpenClaw Self-Update**: วิธีตรวจสอบ config อย่างปลอดภัยด้วย
-  `config.schema.lookup`, แพตช์ config ด้วย `config.patch`, แทนที่
-  config ทั้งหมดด้วย `config.apply` และรัน `update.run` เฉพาะเมื่อมีคำขอจากผู้ใช้อย่างชัดเจนเท่านั้น เครื่องมือ `gateway` ที่ใช้ได้เฉพาะเจ้าของยังปฏิเสธการเขียนทับ
-  `tools.exec.ask` / `tools.exec.security` รวมถึง aliases แบบเดิม `tools.bash.*`
-  ที่ถูก normalize ไปยัง exec paths ที่ได้รับการป้องกันเหล่านั้น
+  `config.schema.lookup`, patch config ด้วย `config.patch`, แทนที่ config ทั้งหมด
+  ด้วย `config.apply` และรัน `update.run` ได้เฉพาะเมื่อผู้ใช้ร้องขออย่างชัดเจน
+  tool `gateway` ที่จำกัดเฉพาะ owner ยังปฏิเสธการเขียนทับ
+  `tools.exec.ask` / `tools.exec.security` รวมถึง alias แบบเดิม `tools.bash.*`
+  ที่ถูก normalize ไปยัง protected exec paths เหล่านั้น
 - **Workspace**: ไดเรกทอรีทำงาน (`agents.defaults.workspace`)
-- **Documentation**: พาธในเครื่องไปยังเอกสารของ OpenClaw (repo หรือ npm package) และควรอ่านเมื่อใด
-- **Workspace Files (injected)**: ระบุว่าไฟล์ bootstrap ถูกรวมไว้ด้านล่าง
-- **Sandbox** (เมื่อเปิดใช้): ระบุรันไทม์แบบ sandboxed, พาธของ sandbox และมี elevated exec หรือไม่
-- **Current Date & Time**: เวลาท้องถิ่นของผู้ใช้, timezone และรูปแบบเวลา
-- **Reply Tags**: ไวยากรณ์ของ reply tag แบบไม่บังคับสำหรับ provider ที่รองรับ
-- **Heartbeats**: พรอมป์ต์ heartbeat และพฤติกรรมการตอบรับ เมื่อเปิดใช้ heartbeats สำหรับเอเจนต์ค่าเริ่มต้น
-- **Runtime**: host, OS, node, โมเดล, repo root (เมื่อตรวจพบ), ระดับการคิด (หนึ่งบรรทัด)
-- **Reasoning**: ระดับการแสดงผลปัจจุบัน + คำใบ้สำหรับสลับ `/reasoning`
+- **Documentation**: พาธภายในเครื่องไปยังเอกสาร OpenClaw (repo หรือ npm package) และควรอ่านเมื่อใด
+- **Workspace Files (injected)**: ระบุว่า bootstrap files ถูกรวมไว้ด้านล่าง
+- **Sandbox** (เมื่อเปิดใช้งาน): ระบุ runtime แบบ sandboxed, พาธของ sandbox และมี elevated exec หรือไม่
+- **Current Date & Time**: เวลาท้องถิ่นของผู้ใช้ เขตเวลา และรูปแบบเวลา
+- **Reply Tags**: ไวยากรณ์ของ reply tag แบบไม่บังคับสำหรับ providers ที่รองรับ
+- **Heartbeats**: prompt ของ heartbeat และพฤติกรรม ack เมื่อเปิดใช้ heartbeat สำหรับเอเจนต์เริ่มต้น
+- **Runtime**: โฮสต์, OS, node, โมเดล, repo root (เมื่อตรวจพบ), ระดับความคิด (หนึ่งบรรทัด)
+- **Reasoning**: ระดับการมองเห็นปัจจุบัน + คำใบ้สำหรับสลับด้วย `/reasoning`
 
-ส่วน Tooling ยังรวมคำแนะนำของรันไทม์สำหรับงานที่ใช้เวลานาน:
+ส่วน Tooling ยังรวมแนวทางใน runtime สำหรับงานที่ใช้เวลานานด้วย:
 
-- ใช้ Cron สำหรับการติดตามผลในอนาคต (`check back later`, การเตือน, งานที่เกิดซ้ำ)
-  แทน `exec` sleep loops, กลเม็ดหน่วงเวลา `yieldMs` หรือการ polling `process`
-  ซ้ำๆ
-- ใช้ `exec` / `process` เฉพาะกับคำสั่งที่เริ่มตอนนี้และทำงานต่อไป
+- ใช้ cron สำหรับการติดตามในอนาคต (`check back later`, การเตือน, งานที่เกิดซ้ำ)
+  แทน `exec` sleep loops, ลูกเล่นหน่วงเวลา `yieldMs` หรือการ polling `process`
+  ซ้ำ ๆ
+- ใช้ `exec` / `process` เฉพาะกับคำสั่งที่เริ่มตอนนี้และทำงานต่อ
   ในเบื้องหลัง
-- เมื่อเปิดใช้ automatic completion wake ให้เริ่มคำสั่งครั้งเดียว และพึ่งพา
-  เส้นทางปลุกแบบ push-based เมื่อมีผลลัพธ์ออกมาหรือเกิดความล้มเหลว
-- ใช้ `process` สำหรับ logs, status, input หรือการแทรกแซงเมื่อคุณต้องการ
-  ตรวจสอบคำสั่งที่กำลังรันอยู่
-- หากงานมีขนาดใหญ่กว่า ให้เลือก `sessions_spawn`; การเสร็จสิ้นของ sub-agent เป็นแบบ
-  push-based และประกาศกลับไปยังผู้ร้องขอโดยอัตโนมัติ
-- อย่า polling `subagents list` / `sessions_list` เป็นลูปเพียงเพื่อรอ
-  ให้เสร็จ
+- เมื่อเปิดใช้งาน automatic completion wake ให้เริ่มคำสั่งเพียงครั้งเดียว และพึ่ง
+  push-based wake path เมื่อคำสั่งนั้นส่งเอาต์พุตออกมาหรือล้มเหลว
+- ใช้ `process` สำหรับ logs, status, input หรือการแทรกแซง เมื่อคุณต้องการ
+  ตรวจสอบคำสั่งที่กำลังทำงานอยู่
+- หากงานใหญ่กว่า ให้เลือกใช้ `sessions_spawn`; การเสร็จสิ้นของ sub-agent เป็น
+  แบบ push-based และประกาศกลับไปยังผู้ร้องขอโดยอัตโนมัติ
+- อย่า poll `subagents list` / `sessions_list` เป็นลูปเพียงเพื่อรอ
+  การเสร็จสิ้น
 
-เมื่อเปิดใช้เครื่องมือ experimental `update_plan` ส่วน Tooling จะบอกโมเดลด้วยว่า
-ให้ใช้เฉพาะกับงานหลายขั้นตอนที่ไม่ใช่งานง่ายๆ, คงไว้เพียงหนึ่งขั้นตอนที่เป็น
-`in_progress` และหลีกเลี่ยงการทำซ้ำแผนทั้งหมดหลังการอัปเดตแต่ละครั้ง
+เมื่อเปิดใช้ tool ทดลอง `update_plan` ส่วน Tooling จะบอกโมเดลด้วยว่า
+ให้ใช้เฉพาะกับงานหลายขั้นตอนที่ไม่ใช่งานเล็กน้อย คงไว้เพียงหนึ่งขั้นที่มีสถานะ
+`in_progress` และหลีกเลี่ยงการทวนทั้งแผนซ้ำหลังจากอัปเดตทุกครั้ง
 
-Safety guardrails ใน system prompt เป็นเพียงคำแนะนำ มันชี้นำพฤติกรรมของโมเดลแต่ไม่ใช่การบังคับใช้นโยบาย ใช้นโยบายเครื่องมือ, การอนุมัติ exec, sandboxing และ channel allowlists สำหรับการบังคับใช้จริง; ผู้ปฏิบัติงานสามารถปิดสิ่งเหล่านี้ได้โดยเจตนา
+Safety guardrails ใน system prompt เป็นเพียงคำแนะนำ พวกมันช่วยชี้นำพฤติกรรมของโมเดลแต่ไม่ได้บังคับใช้นโยบาย ใช้นโยบายของ tool, exec approvals, sandboxing และ channel allowlists สำหรับการบังคับใช้แบบจริงจัง; ผู้ปฏิบัติงานสามารถปิดสิ่งเหล่านี้ได้ตามการออกแบบ
 
-บนช่องทางที่มี approval cards/buttons แบบ native ตอนนี้พรอมป์ต์ของรันไทม์จะบอก
-เอเจนต์ให้พึ่งพา UI สำหรับการอนุมัติแบบ native นั้นก่อน มันควรใส่คำสั่ง
-`/approve` แบบ manual เฉพาะเมื่อผลลัพธ์ของเครื่องมือบอกว่า chat approvals ใช้ไม่ได้ หรือ
-การอนุมัติด้วยตนเองเป็นเส้นทางเดียวเท่านั้น
+บนแชนแนลที่มีการ์ด/ปุ่มอนุมัติแบบเนทีฟ runtime prompt ตอนนี้จะบอกเอเจนต์ให้
+พึ่ง native approval UI นั้นก่อน โดยควรใส่คำสั่ง `/approve` แบบแมนนวลเฉพาะเมื่อ
+ผลลัพธ์ของ tool ระบุว่าการอนุมัติผ่านแชตไม่พร้อมใช้งาน หรือการอนุมัติแบบแมนนวลเป็นทางเดียวเท่านั้น
 
-## โหมดของพรอมป์ต์
+## โหมดของ prompt
 
-OpenClaw สามารถเรนเดอร์ system prompts ที่เล็กลงสำหรับ sub-agents ได้ รันไทม์จะตั้ง
-`promptMode` สำหรับการรันแต่ละครั้ง (ไม่ใช่ config ที่ผู้ใช้มองเห็น):
+OpenClaw สามารถเรนเดอร์ system prompts ที่เล็กลงสำหรับ sub-agents ได้ runtime จะตั้งค่า
+`promptMode` สำหรับแต่ละการรัน (ไม่ใช่ config ที่ผู้ใช้มองเห็นได้):
 
-- `full` (ค่าเริ่มต้น): รวมทุก sections ด้านบน
+- `full` (ค่าเริ่มต้น): รวมทุก section ข้างต้น
 - `minimal`: ใช้สำหรับ sub-agents; ตัด **Skills**, **Memory Recall**, **OpenClaw
   Self-Update**, **Model Aliases**, **User Identity**, **Reply Tags**,
   **Messaging**, **Silent Replies** และ **Heartbeats** ออก ส่วน Tooling, **Safety**,
-  Workspace, Sandbox, Current Date & Time (เมื่อทราบ), Runtime และบริบท
-  ที่ inject ไว้จะยังคงมีอยู่
-- `none`: คืนเฉพาะบรรทัดบอกอัตลักษณ์พื้นฐาน
+  Workspace, Sandbox, Current Date & Time (เมื่อทราบ), Runtime และ injected
+  context ยังคงมีอยู่
+- `none`: ส่งคืนเพียงบรรทัด identity พื้นฐานเท่านั้น
 
-เมื่อ `promptMode=minimal` พรอมป์ต์ที่ถูก inject เพิ่มเติมจะถูกติดป้ายเป็น **Subagent
+เมื่อ `promptMode=minimal`, prompts เพิ่มเติมที่ถูกแทรกจะถูกติดป้ายเป็น **Subagent
 Context** แทน **Group Chat Context**
 
-## การ inject bootstrap ของ workspace
+## การแทรก bootstrap ของ workspace
 
-ไฟล์ bootstrap จะถูกตัดแต่งและต่อท้ายภายใต้ **Project Context** เพื่อให้โมเดลเห็นอัตลักษณ์และบริบทของโปรไฟล์โดยไม่ต้องอ่านอย่างชัดเจน:
+bootstrap files จะถูกตัดให้สั้นลงและต่อท้ายภายใต้ **Project Context** เพื่อให้โมเดลเห็นบริบทของ identity และ profile โดยไม่ต้องอ่านแบบ explicit:
 
 - `AGENTS.md`
 - `SOUL.md`
@@ -114,53 +111,53 @@ Context** แทน **Group Chat Context**
 - `IDENTITY.md`
 - `USER.md`
 - `HEARTBEAT.md`
-- `BOOTSTRAP.md` (เฉพาะใน workspaces ที่เพิ่งสร้างใหม่)
-- `MEMORY.md` เมื่อมีอยู่ มิฉะนั้นใช้ `memory.md` เป็น fallback แบบตัวพิมพ์เล็ก
+- `BOOTSTRAP.md` (เฉพาะ workspaces ที่สร้างใหม่เท่านั้น)
+- `MEMORY.md` เมื่อมีอยู่
 
-ไฟล์ทั้งหมดเหล่านี้จะถูก **inject เข้าไปใน context window** ทุกเทิร์น เว้นแต่
-จะมี gate เฉพาะไฟล์ `HEARTBEAT.md` จะถูกละไว้ในการรันปกติเมื่อ
-ปิดใช้งาน heartbeats สำหรับเอเจนต์ค่าเริ่มต้น หรือ
-`agents.defaults.heartbeat.includeSystemPromptSection` เป็น false ให้ไฟล์ที่ถูก inject
-มีความกระชับ — โดยเฉพาะ `MEMORY.md` ซึ่งอาจเติบโตขึ้นตามเวลาและนำไปสู่
-การใช้ context สูงโดยไม่คาดคิดและการ Compaction ที่ถี่ขึ้น
+ไฟล์ทั้งหมดนี้จะถูก **แทรกเข้าไปในหน้าต่างบริบท** ทุกเทิร์น เว้นแต่
+จะมี gate เฉพาะไฟล์ `HEARTBEAT.md` จะถูกละออกในการรันปกติเมื่อ
+heartbeats ถูกปิดสำหรับเอเจนต์เริ่มต้น หรือเมื่อ
+`agents.defaults.heartbeat.includeSystemPromptSection` เป็น false ให้ทำไฟล์ที่ถูกแทรก
+ให้กระชับ — โดยเฉพาะ `MEMORY.md` ซึ่งอาจเติบโตขึ้นตามเวลาและนำไปสู่
+การใช้บริบทสูงอย่างไม่คาดคิดและ Compaction ที่ถี่ขึ้น
 
-> **หมายเหตุ:** ไฟล์รายวัน `memory/*.md` **ไม่ใช่** ส่วนหนึ่งของ bootstrap
-> Project Context ปกติ ในเทิร์นทั่วไป ไฟล์เหล่านี้จะถูกเข้าถึงตามต้องการผ่าน
-> เครื่องมือ `memory_search` และ `memory_get` ดังนั้นจึงไม่กิน
-> context window เว้นแต่โมเดลจะอ่านอย่างชัดเจน เทิร์น `/new` และ
-> `/reset` แบบเปล่าเป็นข้อยกเว้น: รันไทม์สามารถ prepend daily memory ล่าสุด
-> เป็นบล็อก startup-context แบบครั้งเดียวสำหรับเทิร์นแรกนั้นได้
+> **หมายเหตุ:** ไฟล์รายวัน `memory/*.md` **ไม่** เป็นส่วนหนึ่งของ bootstrap
+> Project Context ปกติ ในเทิร์นทั่วไปไฟล์เหล่านี้จะถูกเข้าถึงตามต้องการผ่าน
+> tools `memory_search` และ `memory_get` ดังนั้นจึงไม่กินพื้นที่ใน
+> context window เว้นแต่โมเดลจะอ่านมันอย่างชัดเจน เทิร์น `/new` และ
+> `/reset` เปล่า ๆ เป็นข้อยกเว้น: runtime สามารถเติม memory รายวันล่าสุดไว้ข้างหน้า
+> เป็นบล็อก startup-context แบบครั้งเดียวสำหรับเทิร์นแรกนั้น
 
-ไฟล์ขนาดใหญ่จะถูกตัดทอนพร้อมตัวทำเครื่องหมาย ขนาดสูงสุดต่อไฟล์ถูกควบคุมโดย
-`agents.defaults.bootstrapMaxChars` (ค่าเริ่มต้น: 12000) เนื้อหา bootstrap ที่ inject
-รวมกันทุกไฟล์ถูกจำกัดโดย `agents.defaults.bootstrapTotalMaxChars`
-(ค่าเริ่มต้น: 60000) ไฟล์ที่หายไปจะ inject ตัวทำเครื่องหมายสั้นๆ ว่าไฟล์หายไป เมื่อเกิดการตัดทอน
-OpenClaw สามารถ inject บล็อกคำเตือนไว้ใน Project Context ได้; ควบคุมสิ่งนี้ด้วย
+ไฟล์ขนาดใหญ่จะถูกตัดพร้อม marker ขนาดสูงสุดต่อไฟล์ควบคุมด้วย
+`agents.defaults.bootstrapMaxChars` (ค่าเริ่มต้น: 12000) ปริมาณ bootstrap
+ที่ถูกแทรกทั้งหมดข้ามหลายไฟล์ถูกจำกัดด้วย `agents.defaults.bootstrapTotalMaxChars`
+(ค่าเริ่มต้น: 60000) ไฟล์ที่หายไปจะฉีดเครื่องหมายไฟล์หายแบบสั้น เมื่อเกิดการตัดทอน
+OpenClaw สามารถฉีดบล็อกเตือนใน Project Context ได้; ควบคุมสิ่งนี้ด้วย
 `agents.defaults.bootstrapPromptTruncationWarning` (`off`, `once`, `always`;
 ค่าเริ่มต้น: `once`)
 
-sessions ของ sub-agent จะ inject เฉพาะ `AGENTS.md` และ `TOOLS.md` (ไฟล์ bootstrap อื่นๆ
+เซสชันของ sub-agent จะแทรกเฉพาะ `AGENTS.md` และ `TOOLS.md` เท่านั้น (bootstrap files อื่น
 จะถูกกรองออกเพื่อให้บริบทของ sub-agent มีขนาดเล็ก)
 
-hooks ภายในสามารถดักขั้นตอนนี้ผ่าน `agent:bootstrap` เพื่อกลายพันธุ์หรือแทนที่
-ไฟล์ bootstrap ที่ inject เข้าไป (เช่น สลับ `SOUL.md` เป็น persona ทางเลือก)
+hooks ภายในสามารถสกัดกั้นขั้นตอนนี้ผ่าน `agent:bootstrap` เพื่อแก้ไขหรือแทนที่
+bootstrap files ที่ถูกแทรก (เช่น สลับ `SOUL.md` เป็น persona แบบอื่น)
 
 หากคุณต้องการทำให้เอเจนต์ฟังดูทั่วไปน้อยลง ให้เริ่มจาก
-[คู่มือบุคลิกภาพ SOUL.md](/th/concepts/soul)
+[SOUL.md Personality Guide](/th/concepts/soul)
 
-หากต้องการตรวจสอบว่าแต่ละไฟล์ที่ถูก inject มีส่วนเท่าใด (ดิบเทียบกับที่ inject, การตัดทอน รวมถึง overhead ของ schema เครื่องมือ) ให้ใช้ `/context list` หรือ `/context detail` ดู [Context](/th/concepts/context)
+หากต้องการตรวจสอบว่าแต่ละไฟล์ที่ถูกแทรกส่งผลมากแค่ไหน (raw เทียบกับ injected, การตัดทอน รวมถึง overhead ของ schema ของ tool) ให้ใช้ `/context list` หรือ `/context detail` ดู [Context](/th/concepts/context)
 
 ## การจัดการเวลา
 
-system prompt จะมี section **Current Date & Time** โดยเฉพาะเมื่อ
-ทราบ timezone ของผู้ใช้ เพื่อให้ prompt cache คงที่ ตอนนี้มันจะรวมเฉพาะ
-**time zone** (ไม่มีนาฬิกาแบบไดนามิกหรือรูปแบบเวลา)
+system prompt จะมี section **Current Date & Time** โดยเฉพาะเมื่อทราบ
+เขตเวลาของผู้ใช้ เพื่อให้ prompt มีความเสถียรต่อ cache ตอนนี้มันจะรวมเพียง
+**เขตเวลา** เท่านั้น (ไม่มีนาฬิกาแบบไดนามิกหรือรูปแบบเวลา)
 
-ใช้ `session_status` เมื่อเอเจนต์ต้องการเวลาปัจจุบัน; การ์ดสถานะ
-จะมีบรรทัด timestamp เครื่องมือเดียวกันนี้ยังสามารถตั้งค่า model
-override ต่อ session ได้แบบไม่บังคับ (`model=default` ใช้เพื่อล้างค่า)
+ใช้ `session_status` เมื่อเอเจนต์ต้องการเวลาปัจจุบัน; การ์ดสถานะจะมี
+บรรทัดประทับเวลา tool เดียวกันนี้ยังสามารถตั้งค่า per-session model
+override ได้ตามตัวเลือก (`model=default` จะล้างมัน)
 
-ตั้งค่าด้วย:
+กำหนดค่าด้วย:
 
 - `agents.defaults.userTimezone`
 - `agents.defaults.timeFormat` (`auto` | `12` | `24`)
@@ -169,15 +166,15 @@ override ต่อ session ได้แบบไม่บังคับ (`model
 
 ## Skills
 
-เมื่อมี Skills ที่เข้าเกณฑ์ OpenClaw จะ inject **รายการ Skills ที่พร้อมใช้** แบบกะทัดรัด
-(`formatSkillsForPrompt`) ซึ่งรวม **พาธไฟล์** ของแต่ละ skill พรอมป์ต์
-จะสั่งให้โมเดลใช้ `read` เพื่อโหลด SKILL.md จากตำแหน่งที่ระบุไว้
-(ใน workspace, managed หรือ bundled) หากไม่มี Skills ที่เข้าเกณฑ์ section
-Skills จะถูกละไว้
+เมื่อมี Skills ที่เข้าเกณฑ์ OpenClaw จะฉีด **available skills list** แบบกะทัดรัด
+(`formatSkillsForPrompt`) ที่รวม **พาธไฟล์** ของแต่ละ skill ด้วย prompt
+จะสั่งให้โมเดลใช้ `read` เพื่อโหลด SKILL.md ที่ตำแหน่งที่ระบุไว้
+(ใน workspace, แบบ managed หรือแบบ bundled) หากไม่มี skill ที่เข้าเกณฑ์
+ส่วน Skills จะถูกละออก
 
-เกณฑ์ความพร้อมใช้รวมถึง metadata gates ของ skill, การตรวจสอบสภาพแวดล้อม/การตั้งค่าของรันไทม์
-และ allowlist ของ skill ที่มีผลบังคับใช้จริงของเอเจนต์ เมื่อมีการตั้งค่า `agents.defaults.skills` หรือ
-`agents.list[].skills`
+เกณฑ์การมีสิทธิ์รวมถึง metadata gates ของ skill, การตรวจสอบ runtime environment/config
+และ allowlist ของ Skills ที่มีผลกับเอเจนต์เมื่อมีการกำหนด
+`agents.defaults.skills` หรือ `agents.list[].skills`
 
 ```
 <available_skills>
@@ -189,26 +186,32 @@ Skills จะถูกละไว้
 </available_skills>
 ```
 
-สิ่งนี้ทำให้ base prompt มีขนาดเล็ก ขณะเดียวกันก็ยังเปิดให้ใช้ skill แบบเจาะจงได้
+สิ่งนี้ช่วยให้ prompt พื้นฐานมีขนาดเล็ก ขณะเดียวกันก็ยังเปิดให้ใช้ skill แบบเจาะจงได้
 
-งบประมาณของรายการ skills เป็นของ subsystem ของ skills:
+งบประมาณของรายการ Skills เป็นของ subsystem ด้าน skills:
 
-- ค่าเริ่มต้นระดับโกลบอล: `skills.limits.maxSkillsPromptChars`
-- การ override รายเอเจนต์: `agents.list[].skillsLimits.maxSkillsPromptChars`
+- ค่าเริ่มต้นแบบโกลบอล: `skills.limits.maxSkillsPromptChars`
+- การแทนที่ต่อเอเจนต์: `agents.list[].skillsLimits.maxSkillsPromptChars`
 
-excerpts ของรันไทม์แบบมีขอบเขตทั่วไปใช้พื้นผิวอีกแบบหนึ่ง:
+excerpts ของ runtime แบบมีขอบเขตทั่วไปใช้พื้นผิวคนละส่วน:
 
 - `agents.defaults.contextLimits.*`
 - `agents.list[].contextLimits.*`
 
-การแยกนี้ทำให้การกำหนดขนาดของ Skills แยกออกจากการกำหนดขนาดของการอ่าน/การ inject ในรันไทม์ เช่น
-`memory_get`, ผลลัพธ์ของเครื่องมือแบบสด และการรีเฟรช AGENTS.md หลัง Compaction
+การแยกนี้ช่วยให้ขนาดของ skills แยกจากขนาดการอ่าน/การฉีดใน runtime เช่น
+`memory_get`, ผลลัพธ์สดของ tool และการรีเฟรช `AGENTS.md` หลัง Compaction
 
 ## Documentation
 
-เมื่อมีพร้อมใช้งาน system prompt จะมี section **Documentation** ที่ชี้ไปยัง
-ไดเรกทอรีเอกสาร OpenClaw ในเครื่อง (ทั้ง `docs/` ใน repo workspace หรือเอกสารจาก npm
-package ที่ bundled มา) และยังระบุมิเรอร์สาธารณะ, source repo, community Discord และ
-ClawHub ([https://clawhub.ai](https://clawhub.ai)) สำหรับการค้นหา Skills พรอมป์ต์จะสั่งให้โมเดลปรึกษาเอกสารในเครื่องก่อน
-สำหรับพฤติกรรม คำสั่ง การตั้งค่า หรือสถาปัตยกรรมของ OpenClaw และให้รัน
-`openclaw status` เองเมื่อเป็นไปได้ (ให้ถามผู้ใช้เฉพาะเมื่อมันไม่มีสิทธิ์เข้าถึง)
+เมื่อพร้อมใช้งาน system prompt จะมีส่วน **Documentation** ที่ชี้ไปยัง
+ไดเรกทอรีเอกสาร OpenClaw ภายในเครื่อง (ทั้ง `docs/` ใน repo workspace หรือใน npm
+package ที่รวมมา) และยังระบุกระจกสาธารณะ source repo ชุมชน Discord และ
+ClawHub ([https://clawhub.ai](https://clawhub.ai)) สำหรับการค้นหา Skills prompt จะสั่งให้โมเดลอ้างอิงเอกสารภายในเครื่องก่อน
+สำหรับพฤติกรรม คำสั่ง config หรือสถาปัตยกรรมของ OpenClaw และให้รัน
+`openclaw status` เองเมื่อทำได้ (ถามผู้ใช้เฉพาะเมื่อไม่มีสิทธิ์เข้าถึง)
+
+## ที่เกี่ยวข้อง
+
+- [Agent runtime](/th/concepts/agent)
+- [Agent workspace](/th/concepts/agent-workspace)
+- [Context engine](/th/concepts/context-engine)

@@ -1,38 +1,36 @@
 ---
 read_when:
-    - การ pairing หรือเชื่อมต่อ Node บน iOS ใหม่
+    - Pairing or reconnecting the iOS node
     - การรันแอป iOS จากซอร์ส
-    - การดีบักการค้นพบ gateway หรือคำสั่ง canvas
-summary: 'แอป Node บน iOS: เชื่อมต่อกับ Gateway, การ pairing, canvas และการแก้ไขปัญหา'
+    - การแก้ไขปัญหาการค้นหา Gateway หรือคำสั่ง canvas
+summary: 'แอป Node บน iOS: เชื่อมต่อกับ Gateway การจับคู่ canvas และการแก้ไขปัญหา'
 title: แอป iOS
 x-i18n:
-    generated_at: "2026-04-23T05:44:14Z"
+    generated_at: "2026-04-24T09:21:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f3e0a6e33e72d4c9f1f17ef70a1b67bae9ebe4a2dca16677ea6b28d0ddac1b4e
+    source_hash: 87eaa706993bec9434bf22e18022af711b8398efff11c7fba4887aba46041ed3
     source_path: platforms/ios.md
     workflow: 15
 ---
 
-# แอป iOS (Node)
+สถานะพร้อมใช้งาน: พรีวิวภายใน แอป iOS ยังไม่ได้เผยแพร่สู่สาธารณะ
 
-ความพร้อมใช้งาน: พรีวิวภายใน แอป iOS ยังไม่ได้เผยแพร่สู่สาธารณะ
-
-## มันทำอะไรได้บ้าง
+## สิ่งที่มันทำได้
 
 - เชื่อมต่อกับ Gateway ผ่าน WebSocket (LAN หรือ tailnet)
-- เปิดเผยความสามารถของ Node: Canvas, Screen snapshot, Camera capture, Location, Talk mode, Voice wake
-- รับคำสั่ง `node.invoke` และรายงาน event สถานะของ node
+- เปิดเผยความสามารถของ Node: Canvas, ภาพหน้าจอ, การจับภาพจากกล้อง, ตำแหน่ง, โหมด Talk, การปลุกด้วยเสียง
+- รับคำสั่ง `node.invoke` และรายงานเหตุการณ์สถานะของ Node
 
 ## ข้อกำหนด
 
-- Gateway ที่กำลังทำงานบนอุปกรณ์อีกเครื่องหนึ่ง (macOS, Linux หรือ Windows ผ่าน WSL2)
+- Gateway ที่กำลังรันอยู่บนอุปกรณ์อื่น (macOS, Linux หรือ Windows ผ่าน WSL2)
 - เส้นทางเครือข่าย:
-  - อยู่ใน LAN เดียวกันผ่าน Bonjour **หรือ**
-  - ผ่าน tailnet ด้วย unicast DNS-SD (ตัวอย่างโดเมน: `openclaw.internal.`) **หรือ**
-  - host/port แบบกำหนดเองด้วยตนเอง (fallback)
+  - อยู่บน LAN เดียวกันผ่าน Bonjour **หรือ**
+  - อยู่บน tailnet ผ่าน unicast DNS-SD (ตัวอย่างโดเมน: `openclaw.internal.`) **หรือ**
+  - ระบุ host/port ด้วยตนเอง (ทางเลือกสำรอง)
 
-## เริ่มต้นอย่างรวดเร็ว (pair + connect)
+## เริ่มต้นอย่างรวดเร็ว (จับคู่ + เชื่อมต่อ)
 
 1. เริ่ม Gateway:
 
@@ -40,17 +38,17 @@ x-i18n:
 openclaw gateway --port 18789
 ```
 
-2. ในแอป iOS เปิด Settings แล้วเลือก gateway ที่ค้นพบ (หรือเปิด Manual Host แล้วกรอก host/port)
+2. ในแอป iOS ให้เปิด Settings แล้วเลือก gateway ที่ค้นพบได้ (หรือเปิด Manual Host แล้วใส่ host/port)
 
-3. อนุมัติคำขอ pairing บนโฮสต์ของ gateway:
+3. อนุมัติคำขอจับคู่บนโฮสต์ gateway:
 
 ```bash
 openclaw devices list
 openclaw devices approve <requestId>
 ```
 
-หากแอปลองจับคู่ใหม่โดยมีรายละเอียด auth เปลี่ยนไป (role/scopes/public key)
-คำขอที่รอดำเนินการก่อนหน้าจะถูกแทนที่ และจะสร้าง `requestId` ใหม่
+หากแอปลองจับคู่อีกครั้งด้วยรายละเอียด auth ที่เปลี่ยนไป (role/scopes/public key),
+คำขอที่รอก่อนหน้าจะถูกแทนที่ และจะมีการสร้าง `requestId` ใหม่
 ให้รัน `openclaw devices list` อีกครั้งก่อนอนุมัติ
 
 4. ตรวจสอบการเชื่อมต่อ:
@@ -60,10 +58,9 @@ openclaw nodes status
 openclaw gateway call node.list --params "{}"
 ```
 
-## push แบบมี relay สำหรับ build ทางการ
+## Relay-backed push สำหรับบิลด์ทางการ
 
-build iOS ทางการที่แจกจ่ายจะใช้ push relay ภายนอกแทนการเผยแพร่ APNs token ดิบ
-ไปยัง gateway
+บิลด์ iOS ทางการที่แจกจ่ายจริงจะใช้ external push relay แทนการเผยแพร่ APNs token ดิบไปยัง gateway
 
 ข้อกำหนดฝั่ง Gateway:
 
@@ -84,82 +81,82 @@ build iOS ทางการที่แจกจ่ายจะใช้ push r
 โฟลว์ทำงานอย่างไร:
 
 - แอป iOS ลงทะเบียนกับ relay โดยใช้ App Attest และ app receipt
-- relay ส่งคืน relay handle แบบ opaque พร้อม send grant ที่กำหนดขอบเขตตามการลงทะเบียน
-- แอป iOS ดึงข้อมูลตัวตนของ gateway ที่จับคู่ไว้และรวมเข้าไปในการลงทะเบียน relay ด้วย ดังนั้น registration แบบ relay-backed จะถูกมอบสิทธิ์ไปยัง gateway นั้นโดยเฉพาะ
-- แอปส่งต่อ relay-backed registration นั้นไปยัง gateway ที่จับคู่ผ่าน `push.apns.register`
-- gateway ใช้ relay handle ที่เก็บไว้นั้นสำหรับ `push.test`, background wake และ wake nudge
-- relay base URL ของ gateway ต้องตรงกับ relay URL ที่ฝังอยู่ใน build iOS ทางการ/TestFlight
-- หากภายหลังแอปเชื่อมต่อกับ gateway อื่น หรือ build ที่มี relay base URL ต่างออกไป แอปจะรีเฟรช relay registration แทนการใช้ binding เดิมซ้ำ
+- relay จะคืน relay handle แบบทึบพร้อม send grant ที่มีขอบเขตตามการลงทะเบียน
+- แอป iOS จะดึงตัวตนของ gateway ที่จับคู่ไว้และรวมมันไว้ในการลงทะเบียนกับ relay เพื่อให้การลงทะเบียนแบบ relay-backed ถูกมอบหมายให้กับ gateway ตัวนั้นโดยเฉพาะ
+- แอปจะส่งต่อการลงทะเบียนแบบ relay-backed นั้นไปยัง gateway ที่จับคู่ด้วย `push.apns.register`
+- gateway จะใช้ relay handle ที่จัดเก็บไว้นั้นสำหรับ `push.test`, background wake และ wake nudge
+- relay base URL ของ gateway ต้องตรงกับ relay URL ที่ฝังมาในบิลด์ iOS ทางการ/TestFlight
+- หากภายหลังแอปเชื่อมต่อกับ gateway ตัวอื่น หรือกับบิลด์ที่มี relay base URL ต่างกัน มันจะรีเฟรช relay registration แทนการใช้ binding เดิมซ้ำ
 
 สิ่งที่ gateway **ไม่** ต้องใช้สำหรับเส้นทางนี้:
 
-- ไม่ต้องใช้ relay token ระดับ deployment
-- ไม่ต้องใช้ APNs key โดยตรงสำหรับการส่งแบบ relay-backed ของ build ทางการ/TestFlight
+- ไม่ต้องมี relay token ระดับ deployment
+- ไม่ต้องมี APNs key โดยตรงสำหรับการส่งแบบ relay-backed ของ official/TestFlight
 
-โฟลว์ที่ผู้ปฏิบัติการคาดว่าจะทำ:
+โฟลว์ที่ผู้ปฏิบัติการคาดหวัง:
 
-1. ติดตั้ง build iOS ทางการ/TestFlight
-2. ตั้งค่า `gateway.push.apns.relay.baseUrl` บน gateway
-3. pair แอปเข้ากับ gateway และปล่อยให้เชื่อมต่อจนเสร็จ
-4. แอปจะเผยแพร่ `push.apns.register` โดยอัตโนมัติหลังจากมี APNs token แล้ว เซสชันของผู้ปฏิบัติการเชื่อมต่ออยู่ และการลงทะเบียนกับ relay สำเร็จ
-5. หลังจากนั้น `push.test`, reconnect wake และ wake nudge จะใช้ relay-backed registration ที่เก็บไว้ได้
+1. ติดตั้งบิลด์ iOS ทางการ/TestFlight
+2. ตั้ง `gateway.push.apns.relay.baseUrl` บน gateway
+3. จับคู่แอปกับ gateway และปล่อยให้มันเชื่อมต่อจนเสร็จ
+4. แอปจะเผยแพร่ `push.apns.register` โดยอัตโนมัติหลังจากมี APNs token แล้ว เซสชัน operator เชื่อมต่ออยู่ และการลงทะเบียนกับ relay สำเร็จ
+5. หลังจากนั้น `push.test`, reconnect wake และ wake nudge จะสามารถใช้ relay-backed registration ที่จัดเก็บไว้ได้
 
-หมายเหตุด้านความเข้ากันได้:
+หมายเหตุเรื่องความเข้ากันได้:
 
-- `OPENCLAW_APNS_RELAY_BASE_URL` ยังใช้เป็น env override ชั่วคราวสำหรับ gateway ได้
+- `OPENCLAW_APNS_RELAY_BASE_URL` ยังคงใช้เป็น env override ชั่วคราวสำหรับ gateway ได้
 
 ## โฟลว์การยืนยันตัวตนและความเชื่อถือ
 
-relay มีไว้เพื่อบังคับใช้ข้อจำกัดสองข้อที่ APNs-on-gateway แบบตรงไม่สามารถให้ได้
-สำหรับ build iOS ทางการ:
+relay มีไว้เพื่อบังคับใช้ข้อจำกัดสองอย่างที่ direct APNs-on-gateway ไม่สามารถให้ได้สำหรับ
+บิลด์ iOS ทางการ:
 
-- ใช้ relay แบบโฮสต์ได้เฉพาะ build iOS ของ OpenClaw ที่แท้จริงซึ่งแจกจ่ายผ่าน Apple เท่านั้น
-- gateway สามารถส่ง push แบบ relay-backed ได้เฉพาะสำหรับอุปกรณ์ iOS ที่จับคู่กับ gateway นั้นโดยเฉพาะ
+- มีเพียงบิลด์ iOS ของ OpenClaw แท้ที่แจกจ่ายผ่าน Apple เท่านั้นที่สามารถใช้ hosted relay ได้
+- gateway สามารถส่ง push แบบ relay-backed ได้เฉพาะให้กับอุปกรณ์ iOS ที่จับคู่กับ gateway ตัวนั้นโดยเฉพาะ
 
-ทีละช่วงการเดินทาง:
+ทีละช่วง:
 
-1. `แอป iOS -> gateway`
-   - แอปจะ pair กับ gateway ก่อนผ่านโฟลว์ Gateway auth ปกติ
-   - สิ่งนี้ทำให้แอปมีทั้ง authenticated node session และ authenticated operator session
-   - operator session ใช้เรียก `gateway.identity.get`
+1. `iOS app -> gateway`
+   - แอปจะจับคู่กับ gateway ก่อนผ่านโฟลว์ auth ปกติของ Gateway
+   - สิ่งนี้ทำให้แอปมีทั้งเซสชัน node ที่ยืนยันตัวตนแล้วและเซสชัน operator ที่ยืนยันตัวตนแล้ว
+   - เซสชัน operator ใช้เรียก `gateway.identity.get`
 
-2. `แอป iOS -> relay`
-   - แอปเรียก endpoint สำหรับการลงทะเบียนของ relay ผ่าน HTTPS
-   - การลงทะเบียนรวม App Attest proof พร้อม app receipt
-   - relay ตรวจสอบ bundle ID, App Attest proof และ Apple receipt และต้องเป็น
+2. `iOS app -> relay`
+   - แอปเรียก endpoint การลงทะเบียนของ relay ผ่าน HTTPS
+   - การลงทะเบียนมี App Attest proof พร้อม app receipt
+   - relay จะตรวจสอบ bundle ID, App Attest proof และ Apple receipt และกำหนดให้ต้องเป็น
      เส้นทางการแจกจ่ายแบบทางการ/production
-   - นี่คือสิ่งที่กันไม่ให้ local Xcode/dev build ใช้ hosted relay ได้ local build อาจ
-     ถูกเซ็นจริง แต่ไม่ผ่านหลักฐานการแจกจ่ายแบบทางการของ Apple ที่ relay คาดหวัง
+   - นี่คือสิ่งที่บล็อกไม่ให้บิลด์ local Xcode/dev ใช้ hosted relay บิลด์ local อาจ
+     ถูกเซ็นแล้ว แต่ไม่ได้ผ่านหลักฐานการแจกจ่ายทางการของ Apple ที่ relay คาดหวัง
 
-3. `การมอบสิทธิ์ตัวตนของ gateway`
-   - ก่อนลงทะเบียนกับ relay แอปจะดึงตัวตนของ gateway ที่จับคู่ไว้จาก
+3. `gateway identity delegation`
+   - ก่อนการลงทะเบียนกับ relay แอปจะดึงตัวตนของ gateway ที่จับคู่ไว้จาก
      `gateway.identity.get`
-   - แอปรวมตัวตนของ gateway นั้นไว้ใน payload ของการลงทะเบียน relay
-   - relay ส่งคืน relay handle และ registration-scoped send grant ที่ถูกมอบให้กับ
+   - แอปจะรวมตัวตนของ gateway นั้นไว้ใน payload การลงทะเบียนกับ relay
+   - relay จะคืน relay handle และ send grant ที่มีขอบเขตตามการลงทะเบียน ซึ่งถูกมอบหมายให้
      ตัวตนของ gateway นั้น
 
 4. `gateway -> relay`
-   - gateway เก็บ relay handle และ send grant จาก `push.apns.register`
-   - ใน `push.test`, reconnect wake และ wake nudge gateway จะเซ็นคำขอส่งด้วย
-     device identity ของตัวเอง
-   - relay ตรวจสอบทั้ง send grant ที่เก็บไว้และลายเซ็นของ gateway เทียบกับ
-     delegated gateway identity จากการลงทะเบียน
-   - gateway อื่นไม่สามารถใช้ registration ที่เก็บไว้นี้ซ้ำได้ แม้ว่าจะ somehow ได้ handle ไปก็ตาม
+   - gateway จะเก็บ relay handle และ send grant จาก `push.apns.register`
+   - ใน `push.test`, reconnect wake และ wake nudge, gateway จะเซ็นคำขอส่งด้วย
+     ตัวตนอุปกรณ์ของมันเอง
+   - relay จะตรวจสอบทั้ง send grant ที่เก็บไว้และลายเซ็นของ gateway เทียบกับ delegated
+     gateway identity จากการลงทะเบียน
+   - gateway อื่นไม่สามารถใช้ registration ที่จัดเก็บไว้นี้ซ้ำได้ แม้ว่ามันจะ somehow ได้ handle ไปก็ตาม
 
 5. `relay -> APNs`
-   - relay เป็นเจ้าของ production APNs credentials และ raw APNs token สำหรับ build ทางการ
-   - gateway จะไม่เก็บ raw APNs token สำหรับ build ทางการแบบ relay-backed
-   - relay ส่ง push สุดท้ายไปยัง APNs ในนามของ gateway ที่จับคู่ไว้
+   - relay เป็นเจ้าของข้อมูลรับรอง APNs สำหรับ production และ APNs token ดิบสำหรับบิลด์ทางการ
+   - gateway จะไม่เก็บ APNs token ดิบสำหรับบิลด์ทางการแบบ relay-backed
+   - relay จะส่ง push สุดท้ายไปยัง APNs ในนามของ gateway ที่จับคู่ไว้
 
 เหตุผลที่ออกแบบเช่นนี้:
 
-- เพื่อเก็บ production APNs credentials ให้อยู่นอก gateway ของผู้ใช้
-- เพื่อหลีกเลี่ยงการเก็บ raw APNs token ของ build ทางการบน gateway
-- เพื่อให้ใช้งาน hosted relay ได้เฉพาะกับ build OpenClaw ทางการ/TestFlight
-- เพื่อป้องกันไม่ให้ gateway หนึ่งส่ง wake push ไปยังอุปกรณ์ iOS ที่เป็นของ gateway อื่น
+- เพื่อเก็บข้อมูลรับรอง APNs สำหรับ production ไว้ไม่ให้อยู่ใน gateway ของผู้ใช้
+- เพื่อหลีกเลี่ยงการเก็บ APNs token ดิบของบิลด์ทางการไว้บน gateway
+- เพื่อให้การใช้ hosted relay จำกัดอยู่เฉพาะบิลด์ OpenClaw ทางการ/TestFlight
+- เพื่อป้องกันไม่ให้ gateway หนึ่งส่ง wake push ไปยังอุปกรณ์ iOS ที่เป็นของอีก gateway หนึ่ง
 
-local/manual build ยังคงใช้ APNs แบบตรง หากคุณกำลังทดสอบ build เหล่านั้นโดยไม่มี relay
-gateway ยังคงต้องใช้ direct APNs credentials:
+บิลด์ local/manual ยังคงใช้ direct APNs หากคุณกำลังทดสอบบิลด์เหล่านั้นโดยไม่ใช้ relay
+gateway ยังต้องใช้ข้อมูลรับรอง APNs โดยตรง:
 
 ```bash
 export OPENCLAW_APNS_TEAM_ID="TEAMID"
@@ -167,11 +164,9 @@ export OPENCLAW_APNS_KEY_ID="KEYID"
 export OPENCLAW_APNS_PRIVATE_KEY_P8="$(cat /path/to/AuthKey_KEYID.p8)"
 ```
 
-สิ่งเหล่านี้คือ runtime env var ของโฮสต์ gateway ไม่ใช่การตั้งค่า Fastlane `apps/ios/fastlane/.env` เก็บเฉพาะ
-auth ของ App Store Connect / TestFlight เช่น `ASC_KEY_ID` และ `ASC_ISSUER_ID`; มันไม่ได้กำหนดค่า
-การส่ง direct APNs สำหรับ local iOS build
+สิ่งเหล่านี้เป็น env var ของ runtime บนโฮสต์ gateway ไม่ใช่การตั้งค่า Fastlane `apps/ios/fastlane/.env` เก็บเฉพาะ auth ของ App Store Connect / TestFlight เช่น `ASC_KEY_ID` และ `ASC_ISSUER_ID`; มันไม่ได้กำหนดค่า direct APNs delivery สำหรับบิลด์ iOS แบบ local
 
-ที่เก็บบนโฮสต์ gateway ที่แนะนำ:
+การจัดเก็บบนโฮสต์ gateway ที่แนะนำ:
 
 ```bash
 mkdir -p ~/.openclaw/credentials/apns
@@ -181,15 +176,13 @@ chmod 600 ~/.openclaw/credentials/apns/AuthKey_KEYID.p8
 export OPENCLAW_APNS_PRIVATE_KEY_PATH="$HOME/.openclaw/credentials/apns/AuthKey_KEYID.p8"
 ```
 
-ห้ามคอมมิตไฟล์ `.p8` หรือวางไว้ใต้ checkout ของ repo
+อย่า commit ไฟล์ `.p8` หรือวางไว้ใต้ repo checkout
 
-## เส้นทางการค้นพบ
+## เส้นทางการค้นหา
 
 ### Bonjour (LAN)
 
-แอป iOS จะ browse `_openclaw-gw._tcp` บน `local.` และเมื่อมีการกำหนดค่าไว้ ก็จะ browse
-โดเมน discovery แบบ wide-area DNS-SD เดียวกันด้วย Gateway ใน LAN เดียวกันจะปรากฏโดยอัตโนมัติจาก `local.`;
-การค้นพบข้ามเครือข่ายสามารถใช้โดเมน wide-area ที่กำหนดค่าไว้ได้โดยไม่ต้องเปลี่ยนประเภทของ beacon
+แอป iOS จะ browse `_openclaw-gw._tcp` บน `local.` และเมื่อมีการกำหนดค่า จะ browse บนโดเมน wide-area DNS-SD เดียวกันด้วย Gateway ที่อยู่บน LAN เดียวกันจะปรากฏขึ้นโดยอัตโนมัติจาก `local.`; การค้นหาข้ามเครือข่ายสามารถใช้โดเมน wide-area ที่กำหนดค่าไว้โดยไม่ต้องเปลี่ยนชนิด beacon
 
 ### Tailnet (ข้ามเครือข่าย)
 
@@ -197,13 +190,13 @@ export OPENCLAW_APNS_PRIVATE_KEY_PATH="$HOME/.openclaw/credentials/apns/AuthKey_
 `openclaw.internal.`) และ Tailscale split DNS
 ดู [Bonjour](/th/gateway/bonjour) สำหรับตัวอย่าง CoreDNS
 
-### host/port แบบกำหนดด้วยตนเอง
+### ระบุ host/port ด้วยตนเอง
 
 ใน Settings ให้เปิด **Manual Host** แล้วกรอก host + port ของ gateway (ค่าเริ่มต้น `18789`)
 
 ## Canvas + A2UI
 
-iOS node เรนเดอร์ canvas ด้วย WKWebView ใช้ `node.invoke` เพื่อควบคุมมัน:
+Node บน iOS จะเรนเดอร์ canvas แบบ WKWebView ใช้ `node.invoke` เพื่อควบคุมมัน:
 
 ```bash
 openclaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__openclaw__/canvas/"}'
@@ -211,10 +204,10 @@ openclaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"ur
 
 หมายเหตุ:
 
-- canvas host ของ Gateway ให้บริการที่ `/__openclaw__/canvas/` และ `/__openclaw__/a2ui/`
-- มันถูกเสิร์ฟจากเซิร์ฟเวอร์ HTTP ของ Gateway (พอร์ตเดียวกับ `gateway.port`, ค่าเริ่มต้น `18789`)
-- iOS node จะนำทางไปยัง A2UI โดยอัตโนมัติเมื่อเชื่อมต่อ หากมีการประกาศ canvas host URL
-- กลับไปยัง scaffold ที่มีอยู่ภายในด้วย `canvas.navigate` และ `{"url":""}`
+- canvas host ของ Gateway ให้บริการ `/__openclaw__/canvas/` และ `/__openclaw__/a2ui/`
+- มันให้บริการจากเซิร์ฟเวอร์ HTTP ของ Gateway (พอร์ตเดียวกับ `gateway.port`, ค่าเริ่มต้น `18789`)
+- Node บน iOS จะนำทางไปยัง A2UI โดยอัตโนมัติเมื่อเชื่อมต่อ หากมีการประกาศ canvas host URL
+- กลับไปยัง scaffold ที่มีมาในตัวด้วย `canvas.navigate` และ `{"url":""}`
 
 ### Canvas eval / snapshot
 
@@ -226,17 +219,17 @@ openclaw nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaSc
 openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
 ```
 
-## Voice wake + talk mode
+## Voice wake + โหมด Talk
 
-- Voice wake และ talk mode มีอยู่ใน Settings
-- iOS อาจระงับเสียงที่ทำงานเบื้องหลัง; ให้ถือว่าฟีเจอร์เสียงเป็นแบบ best-effort เมื่อแอปไม่ได้ active อยู่
+- Voice wake และโหมด Talk ใช้งานได้ใน Settings
+- iOS อาจระงับเสียงเบื้องหลัง; ให้ถือว่าฟีเจอร์เสียงเป็นแบบ best-effort เมื่อแอปไม่ได้ active
 
 ## ข้อผิดพลาดที่พบบ่อย
 
-- `NODE_BACKGROUND_UNAVAILABLE`: ให้นำแอป iOS ขึ้นมาไว้ใน foreground (คำสั่ง canvas/camera/screen ต้องใช้)
+- `NODE_BACKGROUND_UNAVAILABLE`: นำแอป iOS กลับมาไว้ที่ foreground (คำสั่ง canvas/camera/screen ต้องใช้ foreground)
 - `A2UI_HOST_NOT_CONFIGURED`: Gateway ไม่ได้ประกาศ canvas host URL; ตรวจสอบ `canvasHost` ใน [การกำหนดค่า Gateway](/th/gateway/configuration)
-- ไม่เคยมี pairing prompt ปรากฏ: รัน `openclaw devices list` แล้วอนุมัติด้วยตนเอง
-- reconnect ไม่ได้หลังติดตั้งใหม่: โทเค็น pairing ใน Keychain ถูกล้างแล้ว; ให้ pair node ใหม่
+- พรอมป์จับคู่ไม่เคยปรากฏ: รัน `openclaw devices list` แล้วอนุมัติด้วยตนเอง
+- การเชื่อมต่อใหม่ล้มเหลวหลังติดตั้งใหม่: pairing token ใน Keychain ถูกล้าง; ให้จับคู่ Node ใหม่
 
 ## เอกสารที่เกี่ยวข้อง
 

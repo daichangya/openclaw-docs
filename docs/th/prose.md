@@ -2,49 +2,47 @@
 read_when:
     - คุณต้องการรันหรือเขียนเวิร์กโฟลว์ `.prose`
     - คุณต้องการเปิดใช้ Plugin OpenProse
-    - คุณต้องเข้าใจการจัดเก็บ state
-summary: 'OpenProse: เวิร์กโฟลว์ `.prose`, คำสั่ง slash และ state ใน OpenClaw'
+    - คุณต้องการทำความเข้าใจการจัดเก็บสถานะ
+summary: 'OpenProse: เวิร์กโฟลว์ `.prose`, คำสั่งสแลช และสถานะใน OpenClaw'
 title: OpenProse
 x-i18n:
-    generated_at: "2026-04-23T05:49:50Z"
+    generated_at: "2026-04-24T09:26:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 95f86ed3029c5599b6a6bed1f75b2e10c8808cf7ffa5e33dbfb1801a7f65f405
+    source_hash: e1d6f3aa64c403daedaeaa2d7934b8474c0756fe09eed09efd1efeef62413e9e
     source_path: prose.md
     workflow: 15
 ---
 
-# OpenProse
-
-OpenProse คือรูปแบบเวิร์กโฟลว์แบบพกพาและเน้น Markdown สำหรับประสานงานเซสชัน AI ใน OpenClaw มันมาพร้อมเป็น Plugin ที่ติดตั้ง skill pack ของ OpenProse พร้อมคำสั่ง slash `/prose` โปรแกรมจะอยู่ในไฟล์ `.prose` และสามารถ spawn sub-agent หลายตัวพร้อมโฟลว์ควบคุมแบบชัดเจนได้
+OpenProse เป็นรูปแบบเวิร์กโฟลว์แบบพกพาและยึด Markdown เป็นหลัก สำหรับ orchestration ของเซสชัน AI ใน OpenClaw มันมาในรูปแบบ Plugin ที่ติดตั้งชุด Skills ของ OpenProse พร้อมคำสั่งสแลช `/prose` โปรแกรมจะอยู่ในไฟล์ `.prose` และสามารถ spawn sub-agent หลายตัวด้วย control flow ที่ชัดเจน
 
 เว็บไซต์ทางการ: [https://www.prose.md](https://www.prose.md)
 
-## สิ่งที่มันทำได้
+## สิ่งที่ทำได้
 
-- งานวิจัย + การสังเคราะห์แบบ multi-agent พร้อม parallelism แบบชัดเจน
-- เวิร์กโฟลว์ที่ทำซ้ำได้และปลอดภัยต่อการอนุมัติ (code review, incident triage, content pipeline)
-- โปรแกรม `.prose` ที่นำกลับมาใช้ซ้ำได้และรันได้ข้ามรันไทม์ของเอเจนต์ที่รองรับ
+- งานวิจัย + การสังเคราะห์แบบหลาย agent พร้อม parallelism ที่ชัดเจน
+- เวิร์กโฟลว์ที่ทำซ้ำได้และปลอดภัยต่อ approval (code review, incident triage, content pipelines)
+- โปรแกรม `.prose` ที่ใช้ซ้ำได้และรันข้าม agent runtime ที่รองรับได้
 
 ## ติดตั้ง + เปิดใช้
 
-Plugin ที่มากับระบบจะถูกปิดไว้โดยค่าเริ่มต้น เปิดใช้ OpenProse:
+Plugin ที่มาพร้อมกันจะถูกปิดไว้ตามค่าเริ่มต้น เปิดใช้ OpenProse ได้ดังนี้:
 
 ```bash
 openclaw plugins enable open-prose
 ```
 
-รีสตาร์ต Gateway หลังเปิดใช้ Plugin
+รีสตาร์ต Gateway หลังจากเปิดใช้ Plugin แล้ว
 
-checkout แบบ dev/local: `openclaw plugins install ./path/to/local/open-prose-plugin`
+สำหรับ dev/local checkout: `openclaw plugins install ./path/to/local/open-prose-plugin`
 
-เอกสารที่เกี่ยวข้อง: [Plugins](/th/tools/plugin), [Plugin manifest](/th/plugins/manifest), [Skills](/th/tools/skills)
+เอกสารที่เกี่ยวข้อง: [Plugins](/th/tools/plugin), [Plugin manifest](/th/plugins/manifest), [Skills](/th/tools/skills).
 
-## คำสั่ง slash
+## คำสั่งสแลช
 
-OpenProse ลงทะเบียน `/prose` เป็นคำสั่ง skill ที่ผู้ใช้เรียกได้ มันกำหนดเส้นทางไปยังคำสั่ง VM ของ OpenProse และใช้เครื่องมือของ OpenClaw ภายใต้พื้นผิว
+OpenProse ลงทะเบียน `/prose` เป็นคำสั่ง Skills ที่ผู้ใช้เรียกใช้ได้ โดยจะส่งต่อไปยังคำสั่งของ OpenProse VM และใช้เครื่องมือของ OpenClaw อยู่เบื้องหลัง
 
-คำสั่งทั่วไป:
+คำสั่งที่ใช้บ่อย:
 
 ```
 /prose help
@@ -83,7 +81,7 @@ context: { findings, draft }
 
 ## ตำแหน่งไฟล์
 
-OpenProse จะเก็บ state ไว้ใต้ `.prose/` ใน workspace ของคุณ:
+OpenProse เก็บสถานะไว้ใต้ `.prose/` ใน workspace ของคุณ:
 
 ```
 .prose/
@@ -97,45 +95,50 @@ OpenProse จะเก็บ state ไว้ใต้ `.prose/` ใน workspace
 └── agents/
 ```
 
-เอเจนต์ถาวรระดับผู้ใช้จะอยู่ที่:
+agent แบบคงอยู่ในระดับผู้ใช้จะอยู่ที่:
 
 ```
 ~/.prose/agents/
 ```
 
-## โหมด state
+## โหมดสถานะ
 
-OpenProse รองรับ backend ของ state หลายแบบ:
+OpenProse รองรับแบ็กเอนด์สถานะหลายแบบ:
 
 - **filesystem** (ค่าเริ่มต้น): `.prose/runs/...`
 - **in-context**: ชั่วคราว สำหรับโปรแกรมขนาดเล็ก
-- **sqlite** (experimental): ต้องใช้ไบนารี `sqlite3`
-- **postgres** (experimental): ต้องใช้ `psql` และ connection string
+- **sqlite** (ทดลอง): ต้องใช้ไบนารี `sqlite3`
+- **postgres** (ทดลอง): ต้องใช้ `psql` และ connection string
 
 หมายเหตุ:
 
-- sqlite/postgres เป็นแบบเลือกเปิดใช้และยัง experimental
-- ข้อมูลรับรอง postgres จะไหลเข้าไปใน log ของ subagent; ใช้ฐานข้อมูลเฉพาะที่ให้สิทธิ์เท่าที่จำเป็น
+- sqlite/postgres เป็นแบบ opt-in และยังอยู่ในสถานะทดลอง
+- credential ของ postgres จะไหลเข้าไปใน log ของ subagent; ให้ใช้ฐานข้อมูลเฉพาะที่มีสิทธิ์ต่ำที่สุดเท่าที่จำเป็น
 
 ## โปรแกรมระยะไกล
 
-`/prose run <handle/slug>` จะ resolve ไปยัง `https://p.prose.md/<handle>/<slug>`
-ส่วน URL โดยตรงจะถูกดึงมาตามที่ระบุ การดำเนินการนี้ใช้เครื่องมือ `web_fetch` (หรือ `exec` สำหรับ POST)
+`/prose run <handle/slug>` จะ resolve ไปที่ `https://p.prose.md/<handle>/<slug>`
+ส่วน URL ตรงจะถูกดึงตามที่ระบุไว้ การทำงานนี้ใช้เครื่องมือ `web_fetch` (หรือ `exec` สำหรับ POST)
 
-## การแมปกับรันไทม์ของ OpenClaw
+## การแมป runtime ของ OpenClaw
 
-โปรแกรม OpenProse แมปกับ primitive ของ OpenClaw ดังนี้:
+โปรแกรม OpenProse จะถูกแมปเข้ากับ primitive ของ OpenClaw ดังนี้:
 
-| แนวคิดของ OpenProse          | เครื่องมือของ OpenClaw |
-| ---------------------------- | ---------------------- |
-| Spawn session / Task tool    | `sessions_spawn`       |
-| การอ่าน/เขียนไฟล์            | `read` / `write`       |
-| Web fetch                    | `web_fetch`            |
+| แนวคิดของ OpenProse       | tool ของ OpenClaw |
+| ------------------------- | ----------------- |
+| Spawn session / Task tool | `sessions_spawn`  |
+| อ่าน/เขียนไฟล์           | `read` / `write`  |
+| ดึงข้อมูลเว็บ             | `web_fetch`       |
 
-หาก allowlist ของเครื่องมือบล็อกเครื่องมือเหล่านี้ โปรแกรม OpenProse จะล้มเหลว ดู [Skills config](/th/tools/skills-config)
+หาก allowlist ของ tool ของคุณบล็อกเครื่องมือเหล่านี้ โปรแกรม OpenProse จะล้มเหลว ดู [การกำหนดค่า Skills](/th/tools/skills-config)
 
-## ความปลอดภัย + การอนุมัติ
+## ความปลอดภัย + approval
 
-ให้ถือว่าไฟล์ `.prose` เป็นโค้ด ตรวจทานก่อนรัน ใช้ allowlist ของเครื่องมือ OpenClaw และ approval gate เพื่อควบคุม side effect
+ให้ปฏิบัติต่อไฟล์ `.prose` เสมือนโค้ด ตรวจสอบก่อนรัน ใช้ tool allowlist และ approval gate ของ OpenClaw เพื่อควบคุมผลข้างเคียง
 
-สำหรับเวิร์กโฟลว์ที่กำหนดผลลัพธ์ได้แน่นอนและมีกลไกอนุมัติ เปรียบเทียบได้กับ [Lobster](/th/tools/lobster)
+หากต้องการเวิร์กโฟลว์ที่กำหนดแน่นอนและมี approval gate ให้เปรียบเทียบกับ [Lobster](/th/tools/lobster)
+
+## ที่เกี่ยวข้อง
+
+- [Text-to-speech](/th/tools/tts)
+- [การจัดรูปแบบ Markdown](/th/concepts/markdown-formatting)

@@ -1,28 +1,28 @@
 ---
 read_when:
-    - คุณต้องการล้างสถานะในเครื่องโดยยังคงติดตั้ง CLI ไว้ต่อไป
-    - คุณต้องการดูตัวอย่างล่วงหน้าว่าอะไรจะถูกลบออกบ้าง
-summary: ข้อมูลอ้างอิง CLI สำหรับ `openclaw reset` (รีเซ็ตสถานะ/การกำหนดค่าในเครื่อง)
+    - คุณต้องการล้างสถานะภายในเครื่องโดยยังคงติดตั้ง CLI ไว้ต่อไป
+    - คุณต้องการ dry-run เพื่อดูว่าจะลบอะไรบ้าง
+summary: เอกสารอ้างอิง CLI สำหรับ `openclaw reset` (รีเซ็ตสถานะ/config ภายในเครื่อง)
 title: รีเซ็ต
 x-i18n:
-    generated_at: "2026-04-23T06:19:19Z"
+    generated_at: "2026-04-24T09:04:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad464700f948bebe741ec309f25150714f0b280834084d4f531327418a42c79b
+    source_hash: e4a4aba32fb44905d079bf2a22e582a3affbe9809eac9af237ce3e48da72b42c
     source_path: cli/reset.md
     workflow: 15
 ---
 
 # `openclaw reset`
 
-รีเซ็ต config/สถานะในเครื่อง (ยังคงติดตั้ง CLI ไว้)
+รีเซ็ต config/สถานะภายในเครื่อง (ยังคงติดตั้ง CLI ไว้)
 
 ตัวเลือก:
 
 - `--scope <scope>`: `config`, `config+creds+sessions` หรือ `full`
 - `--yes`: ข้ามข้อความยืนยัน
-- `--non-interactive`: ปิดใช้งานข้อความถาม; ต้องใช้ร่วมกับ `--scope` และ `--yes`
-- `--dry-run`: พิมพ์การดำเนินการโดยไม่ลบไฟล์
+- `--non-interactive`: ปิดการถามตอบ; ต้องใช้ร่วมกับ `--scope` และ `--yes`
+- `--dry-run`: แสดงการกระทำโดยไม่ลบไฟล์
 
 ตัวอย่าง:
 
@@ -37,6 +37,10 @@ openclaw reset --scope full --yes --non-interactive
 
 หมายเหตุ:
 
-- รัน `openclaw backup create` ก่อน หากคุณต้องการสแนปชอตที่กู้คืนได้ก่อนลบสถานะในเครื่อง
-- หากคุณไม่ระบุ `--scope`, `openclaw reset` จะใช้ข้อความถามแบบโต้ตอบเพื่อเลือกสิ่งที่จะลบ
-- `--non-interactive` ใช้ได้ก็ต่อเมื่อตั้งค่าทั้ง `--scope` และ `--yes` แล้ว
+- รัน `openclaw backup create` ก่อน หากคุณต้องการ snapshot ที่กู้คืนได้ก่อนลบสถานะภายในเครื่อง
+- หากคุณไม่ระบุ `--scope`, `openclaw reset` จะใช้ prompt แบบโต้ตอบเพื่อเลือกว่าจะลบอะไร
+- `--non-interactive` ใช้ได้ก็ต่อเมื่อตั้งค่าทั้ง `--scope` และ `--yes`
+
+## ที่เกี่ยวข้อง
+
+- [CLI reference](/th/cli)

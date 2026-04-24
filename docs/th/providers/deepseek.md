@@ -1,44 +1,42 @@
 ---
 read_when:
     - คุณต้องการใช้ DeepSeek กับ OpenClaw
-    - คุณต้องการตัวแปรสภาพแวดล้อมของ API key หรือทางเลือกการยืนยันตัวตนผ่าน CLI to=final
-summary: การตั้งค่า DeepSeek (auth + การเลือกโมเดล)
+    - คุณต้องการตัวแปรสภาพแวดล้อมสำหรับ API key หรือตัวเลือกการยืนยันตัวตนใน CLI
+summary: การตั้งค่า DeepSeek (การยืนยันตัวตน + การเลือก model)
 title: DeepSeek
 x-i18n:
-    generated_at: "2026-04-23T05:50:46Z"
+    generated_at: "2026-04-24T09:27:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad06880bd1ab89f72f9e31f4927e2c099dcf6b4e0ff2b3fcc91a24468fbc089d
+    source_hash: ead407c67c05bd8700db1cba36defdd9d47bdc9a071c76a07c4b4fb82f6b80e2
     source_path: providers/deepseek.md
     workflow: 15
 ---
 
-# DeepSeek
+[DeepSeek](https://www.deepseek.com) ให้บริการ AI model ประสิทธิภาพสูงผ่าน API ที่เข้ากันได้กับ OpenAI
 
-[DeepSeek](https://www.deepseek.com) ให้บริการโมเดล AI ที่ทรงพลังผ่าน API ที่เข้ากันได้กับ OpenAI
-
-| Property | Value                      |
-| -------- | -------------------------- |
-| Provider | `deepseek`                 |
-| Auth     | `DEEPSEEK_API_KEY`         |
-| API      | เข้ากันได้กับ OpenAI      |
-| Base URL | `https://api.deepseek.com` |
+| คุณสมบัติ | ค่า                         |
+| -------- | --------------------------- |
+| Provider | `deepseek`                  |
+| Auth     | `DEEPSEEK_API_KEY`          |
+| API      | เข้ากันได้กับ OpenAI        |
+| Base URL | `https://api.deepseek.com`  |
 
 ## เริ่มต้นใช้งาน
 
 <Steps>
   <Step title="รับ API key ของคุณ">
-    สร้าง API key ที่ [platform.deepseek.com](https://platform.deepseek.com/api_keys)
+    สร้าง API key ได้ที่ [platform.deepseek.com](https://platform.deepseek.com/api_keys).
   </Step>
-  <Step title="รัน onboarding">
+  <Step title="รันการ onboarding">
     ```bash
     openclaw onboard --auth-choice deepseek-api-key
     ```
 
-    สิ่งนี้จะพรอมป์ขอ API key ของคุณ และตั้ง `deepseek/deepseek-chat` เป็นโมเดลเริ่มต้น
+    ระบบจะขอ API key ของคุณ และตั้ง `deepseek/deepseek-chat` เป็น model เริ่มต้น
 
   </Step>
-  <Step title="ตรวจสอบว่าโมเดลพร้อมใช้งาน">
+  <Step title="ตรวจสอบว่า model พร้อมใช้งาน">
     ```bash
     openclaw models list --provider deepseek
     ```
@@ -46,8 +44,8 @@ x-i18n:
 </Steps>
 
 <AccordionGroup>
-  <Accordion title="การตั้งค่าแบบไม่โต้ตอบ">
-    สำหรับการติดตั้งแบบสคริปต์หรือแบบ headless ให้ส่งแฟล็กทั้งหมดโดยตรง:
+  <Accordion title="การตั้งค่าแบบ non-interactive">
+    สำหรับการติดตั้งแบบสคริปต์หรือแบบไม่มีหน้าจอ ให้ส่งทุก flag โดยตรง:
 
     ```bash
     openclaw onboard --non-interactive \
@@ -62,20 +60,20 @@ x-i18n:
 </AccordionGroup>
 
 <Warning>
-หาก Gateway รันเป็น daemon (launchd/systemd) ให้ตรวจสอบว่า `DEEPSEEK_API_KEY`
-พร้อมใช้งานสำหรับโปรเซสนั้น (เช่น ใน `~/.openclaw/.env` หรือผ่าน
+หาก Gateway ทำงานเป็น daemon (launchd/systemd) โปรดตรวจสอบว่า process นั้น
+สามารถเข้าถึง `DEEPSEEK_API_KEY` ได้ (เช่น ใน `~/.openclaw/.env` หรือผ่าน
 `env.shellEnv`)
 </Warning>
 
-## แค็ตตาล็อกที่มาพร้อมกัน
+## แคตตาล็อกในตัว
 
-| Model ref                    | Name              | Input | Context | Max output | Notes                                              |
-| ---------------------------- | ----------------- | ----- | ------- | ---------- | -------------------------------------------------- |
-| `deepseek/deepseek-chat`     | DeepSeek Chat     | text  | 131,072 | 8,192      | โมเดลเริ่มต้น; พื้นผิวแบบ non-thinking ของ DeepSeek V3.2 |
-| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text  | 131,072 | 65,536     | พื้นผิว V3.2 ที่เปิดใช้ reasoning                  |
+| Model ref                    | ชื่อ               | อินพุต | คอนเท็กซ์ | เอาต์พุตสูงสุด | หมายเหตุ                                            |
+| ---------------------------- | ------------------ | ------ | --------- | -------------- | --------------------------------------------------- |
+| `deepseek/deepseek-chat`     | DeepSeek Chat      | text   | 131,072   | 8,192          | model เริ่มต้น; พื้นผิว DeepSeek V3.2 แบบไม่ใช้การคิด |
+| `deepseek/deepseek-reasoner` | DeepSeek Reasoner  | text   | 131,072   | 65,536         | พื้นผิว V3.2 ที่เปิดใช้ reasoning                    |
 
 <Tip>
-ปัจจุบันโมเดล bundled ทั้งสองตัวประกาศความเข้ากันได้กับ streaming usage ไว้ใน source
+ปัจจุบันทั้งสอง model ที่มาพร้อมกันประกาศความเข้ากันได้กับ streaming usage ในซอร์ส
 </Tip>
 
 ## ตัวอย่าง config
@@ -94,10 +92,10 @@ x-i18n:
 ## ที่เกี่ยวข้อง
 
 <CardGroup cols={2}>
-  <Card title="การเลือกโมเดล" href="/th/concepts/model-providers" icon="layers">
-    การเลือกผู้ให้บริการ, model ref และพฤติกรรม failover
+  <Card title="การเลือก model" href="/th/concepts/model-providers" icon="layers">
+    การเลือก provider, ref ของ model และพฤติกรรม failover
   </Card>
-  <Card title="เอกสารอ้างอิงการกำหนดค่า" href="/th/gateway/configuration-reference" icon="gear">
-    เอกสารอ้างอิง config แบบเต็มสำหรับเอเจนต์ โมเดล และผู้ให้บริการ
+  <Card title="ข้อมูลอ้างอิงการกำหนดค่า" href="/th/gateway/configuration-reference" icon="gear">
+    ข้อมูลอ้างอิง config แบบเต็มสำหรับ agent, model และ provider
   </Card>
 </CardGroup>

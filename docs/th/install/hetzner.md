@@ -1,81 +1,81 @@
 ---
 read_when:
-    - คุณต้องการให้ OpenClaw ทำงานตลอด 24/7 บน cloud VPS (ไม่ใช่แล็ปท็อปของคุณ)
-    - คุณต้องการ Gateway ที่พร้อมใช้งานระดับ production และทำงานตลอดเวลาบน VPS ของคุณเอง
-    - คุณต้องการควบคุม persistence, ไบนารี และพฤติกรรมการรีสตาร์ตได้เต็มรูปแบบ
-    - คุณกำลังรัน OpenClaw ใน Docker บน Hetzner หรือผู้ให้บริการลักษณะเดียวกัน
-summary: รัน OpenClaw Gateway ตลอด 24/7 บน VPS ราคาประหยัดของ Hetzner (Docker) พร้อมสถานะถาวรและไบนารีที่รวมมาในอิมเมจแล้ว
+    - คุณต้องการให้ OpenClaw ทำงานตลอด 24/7 บน Cloud VPS (ไม่ใช่บนแล็ปท็อปของคุณ)
+    - คุณต้องการ Gateway แบบ production-grade ที่ทำงานตลอดเวลาบน VPS ของคุณเอง
+    - คุณต้องการควบคุมการเก็บข้อมูลแบบถาวร ไบนารี และพฤติกรรมการรีสตาร์ตได้อย่างเต็มที่
+    - คุณกำลังรัน OpenClaw ใน Docker บน Hetzner หรือผู้ให้บริการลักษณะใกล้เคียงกัน
+summary: รัน OpenClaw Gateway ตลอด 24/7 บน Hetzner VPS ราคาประหยัด (Docker) พร้อมสถานะแบบคงทนและไบนารีที่รวมมาในอิมเมจแล้ว
 title: Hetzner
 x-i18n:
-    generated_at: "2026-04-23T05:39:53Z"
+    generated_at: "2026-04-24T09:17:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 32f5e552ea87970b89c762059bc27f22e0aa3abf001307cae8829b9f1c713a42
+    source_hash: f9d5917add7afea31426ef587577af21ed18f09302cbf8e542f547a6530ff38b
     source_path: install/hetzner.md
     workflow: 15
 ---
 
-# OpenClaw บน Hetzner (Docker, คู่มือ VPS ระดับ Production)
+# OpenClaw บน Hetzner (Docker, คู่มือ VPS สำหรับ Production)
 
 ## เป้าหมาย
 
-รัน OpenClaw Gateway แบบคงอยู่ถาวรบน Hetzner VPS โดยใช้ Docker พร้อมสถานะถาวร, ไบนารีที่รวมมาในอิมเมจแล้ว และพฤติกรรมการรีสตาร์ตที่ปลอดภัย
+รัน OpenClaw Gateway แบบคงอยู่ถาวรบน Hetzner VPS โดยใช้ Docker พร้อมสถานะที่คงทน ไบนารีที่ฝังมาในอิมเมจ และพฤติกรรมการรีสตาร์ตที่ปลอดภัย
 
-หากคุณต้องการ “OpenClaw 24/7 ในราคาประมาณ ~$5” นี่คือการตั้งค่าที่เรียบง่ายและเชื่อถือได้ที่สุด
-ราคา Hetzner เปลี่ยนแปลงได้; ให้เลือก Debian/Ubuntu VPS ขนาดเล็กที่สุด แล้วค่อยขยายหากเจอ OOM
+หากคุณต้องการ “OpenClaw 24/7 ในราคาประมาณ $5” นี่คือการตั้งค่าที่เชื่อถือได้และเรียบง่ายที่สุด
+ราคา Hetzner เปลี่ยนแปลงได้; ให้เลือก VPS Debian/Ubuntu ที่เล็กที่สุดก่อน แล้วค่อยขยายหากเจอ OOM
 
-หมายเหตุด้านโมเดลความปลอดภัย:
+หมายเหตุเกี่ยวกับโมเดลความปลอดภัย:
 
-- เอเจนต์ที่ใช้ร่วมกันในบริษัทใช้ได้เมื่อทุกคนอยู่ในขอบเขตความเชื่อถือเดียวกันและรันไทม์ใช้เพื่อธุรกิจเท่านั้น
-- ควรแยกอย่างเข้มงวด: VPS/รันไทม์ เฉพาะ + บัญชีเฉพาะ; ไม่มีโปรไฟล์ Apple/Google/เบราว์เซอร์/password-manager ส่วนตัวบนโฮสต์นั้น
-- หากผู้ใช้เป็นปฏิปักษ์ต่อกัน ให้แยกตาม gateway/host/ผู้ใช้ระบบปฏิบัติการ
+- เอเจนต์ที่ใช้ร่วมกันในบริษัทใช้งานได้เมื่อทุกคนอยู่ในขอบเขตความเชื่อถือเดียวกัน และรันไทม์นั้นใช้เพื่อธุรกิจเท่านั้น
+- ควรรักษาการแยกอย่างเข้มงวด: VPS/รันไทม์เฉพาะ + บัญชีเฉพาะ; อย่าใช้โปรไฟล์ Apple/Google/เบราว์เซอร์/ตัวจัดการรหัสผ่านส่วนตัวบนโฮสต์นั้น
+- หากผู้ใช้เป็นปฏิปักษ์ต่อกัน ให้แยกตาม gateway/host/OS user
 
 ดู [Security](/th/gateway/security) และ [VPS hosting](/th/vps)
 
-## เรากำลังทำอะไรอยู่ (แบบง่ายๆ)?
+## เรากำลังทำอะไรอยู่ (แบบง่าย ๆ)?
 
 - เช่า Linux server ขนาดเล็ก (Hetzner VPS)
-- ติดตั้ง Docker (รันไทม์แอปแบบแยก)
+- ติดตั้ง Docker (รันไทม์ของแอปแบบแยกส่วน)
 - เริ่ม OpenClaw Gateway ใน Docker
-- เก็บ `~/.openclaw` + `~/.openclaw/workspace` แบบถาวรบนโฮสต์ (อยู่รอดผ่านการรีสตาร์ต/รีบิลด์)
+- เก็บ `~/.openclaw` + `~/.openclaw/workspace` ไว้บนโฮสต์แบบถาวร (อยู่รอดหลังรีสตาร์ต/สร้างใหม่)
 - เข้าถึง Control UI จากแล็ปท็อปของคุณผ่าน SSH tunnel
 
-สถานะ `~/.openclaw` ที่ถูก mount นั้นรวมถึง `openclaw.json`, ไฟล์
-`agents/<agentId>/agent/auth-profiles.json` ต่อเอเจนต์ และ `.env`
+สถานะ `~/.openclaw` ที่ถูก mount นี้รวมถึง `openclaw.json`, ไฟล์
+`agents/<agentId>/agent/auth-profiles.json` รายเอเจนต์ และ `.env`
 
 สามารถเข้าถึง Gateway ได้ผ่าน:
 
-- การส่งต่อพอร์ต SSH จากแล็ปท็อปของคุณ
-- การเปิดเผยพอร์ตโดยตรง หากคุณจัดการ firewall และ tokens เอง
+- การ forward พอร์ตด้วย SSH จากแล็ปท็อปของคุณ
+- การเปิดเผยพอร์ตโดยตรง หากคุณจัดการ firewall และ token ด้วยตัวเอง
 
-คู่มือนี้สมมติว่าคุณใช้ Ubuntu หรือ Debian บน Hetzner  
-หากคุณใช้ Linux VPS อื่น ให้จับคู่แพ็กเกจตามนั้น
-สำหรับโฟลว์ Docker แบบทั่วไป ดู [Docker](/th/install/docker)
+คู่มือนี้สมมติว่าใช้ Ubuntu หรือ Debian บน Hetzner  
+หากคุณใช้ Linux VPS ตัวอื่น ให้ปรับแพ็กเกจให้เหมาะสม
+สำหรับ flow Docker ทั่วไป ดู [Docker](/th/install/docker)
 
 ---
 
-## เส้นทางด่วน (สำหรับผู้ปฏิบัติการที่มีประสบการณ์)
+## เส้นทางแบบเร็ว (สำหรับผู้ดูแลที่มีประสบการณ์)
 
-1. จัดเตรียม Hetzner VPS
+1. Provision Hetzner VPS
 2. ติดตั้ง Docker
 3. clone OpenClaw repository
-4. สร้างไดเรกทอรีบนโฮสต์สำหรับ persistence
+4. สร้างไดเรกทอรีโฮสต์สำหรับการเก็บข้อมูลถาวร
 5. กำหนดค่า `.env` และ `docker-compose.yml`
-6. รวมไบนารีที่จำเป็นไว้ในอิมเมจ
+6. ฝังไบนารีที่ต้องใช้ลงในอิมเมจ
 7. `docker compose up -d`
-8. ตรวจสอบ persistence และการเข้าถึง Gateway
+8. ตรวจสอบการคงอยู่ของข้อมูลและการเข้าถึง Gateway
 
 ---
 
 ## สิ่งที่คุณต้องมี
 
 - Hetzner VPS พร้อมสิทธิ์ root
-- การเข้าถึง SSH จากแล็ปท็อปของคุณ
+- การเข้าถึงผ่าน SSH จากแล็ปท็อปของคุณ
 - ความคุ้นเคยพื้นฐานกับ SSH + การคัดลอก/วาง
 - เวลาประมาณ 20 นาที
 - Docker และ Docker Compose
-- ข้อมูลรับรอง auth ของโมเดล
-- ข้อมูลรับรองของผู้ให้บริการเพิ่มเติม (ไม่บังคับ)
+- ข้อมูลรับรองสำหรับ model auth
+- ข้อมูลรับรอง provider แบบไม่บังคับ
   - WhatsApp QR
   - Telegram bot token
   - Gmail OAuth
@@ -83,7 +83,7 @@ x-i18n:
 ---
 
 <Steps>
-  <Step title="จัดเตรียม VPS">
+  <Step title="Provision VPS">
     สร้าง Ubuntu หรือ Debian VPS ใน Hetzner
 
     เชื่อมต่อในฐานะ root:
@@ -92,8 +92,8 @@ x-i18n:
     ssh root@YOUR_VPS_IP
     ```
 
-    คู่มือนี้สมมติว่า VPS เป็นแบบ stateful
-    อย่าปฏิบัติต่อมันเหมือนโครงสร้างพื้นฐานแบบทิ้งได้
+    คู่มือนี้สมมติว่า VPS มีสถานะแบบคงอยู่
+    อย่าถือว่ามันเป็น infrastructure แบบใช้แล้วทิ้ง
 
   </Step>
 
@@ -119,25 +119,25 @@ x-i18n:
     cd openclaw
     ```
 
-    คู่มือนี้สมมติว่าคุณจะ build อิมเมจแบบกำหนดเองเพื่อรับประกันว่าไบนารีจะคงอยู่ถาวร
+    คู่มือนี้สมมติว่าคุณจะ build image แบบกำหนดเองเพื่อรับประกันการคงอยู่ของไบนารี
 
   </Step>
 
-  <Step title="สร้างไดเรกทอรีบนโฮสต์สำหรับ persistence">
-    Docker containers เป็นแบบ ephemeral
-    สถานะที่อยู่ยาวทั้งหมดต้องอยู่บนโฮสต์
+  <Step title="สร้างไดเรกทอรีโฮสต์สำหรับการเก็บข้อมูลถาวร">
+    Docker container เป็นแบบ ephemeral
+    สถานะที่มีอายุยาวทั้งหมดต้องอยู่บนโฮสต์
 
     ```bash
     mkdir -p /root/.openclaw/workspace
 
-    # ตั้ง ownership ให้เป็นผู้ใช้ใน container (uid 1000):
+    # Set ownership to the container user (uid 1000):
     chown -R 1000:1000 /root/.openclaw
     ```
 
   </Step>
 
-  <Step title="กำหนดค่าตัวแปรสภาพแวดล้อม">
-    สร้าง `.env` ในรากของ repository
+  <Step title="กำหนดค่าตัวแปรแวดล้อม">
+    สร้าง `.env` ที่รากของ repository
 
     ```bash
     OPENCLAW_IMAGE=openclaw:latest
@@ -152,9 +152,9 @@ x-i18n:
     XDG_CONFIG_HOME=/home/node/.openclaw
     ```
 
-    ปล่อย `OPENCLAW_GATEWAY_TOKEN` ว่างไว้ เว้นแต่คุณจะตั้งใจ
-    จัดการมันผ่าน `.env` อย่างชัดเจน; OpenClaw จะเขียน gateway token แบบสุ่มลงใน
-    config ตอนเริ่มครั้งแรก สร้างรหัสผ่าน keyring แล้ววางลงใน
+    ปล่อย `OPENCLAW_GATEWAY_TOKEN` ว่างไว้ เว้นแต่คุณต้องการ
+    จัดการมันผ่าน `.env` อย่างชัดเจน; OpenClaw จะเขียน token ของ gateway แบบสุ่มลงใน
+    คอนฟิกเมื่อเริ่มทำงานครั้งแรก สร้างรหัสผ่านสำหรับ keyring แล้ววางลงใน
     `GOG_KEYRING_PASSWORD`:
 
     ```bash
@@ -163,13 +163,13 @@ x-i18n:
 
     **อย่า commit ไฟล์นี้**
 
-    ไฟล์ `.env` นี้มีไว้สำหรับ env ของ container/runtime เช่น `OPENCLAW_GATEWAY_TOKEN`
-    ส่วน auth ที่เป็น OAuth/API-key ของผู้ให้บริการจะถูกเก็บใน
-    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` ที่ถูก mount
+    ไฟล์ `.env` นี้ใช้สำหรับ env ของ container/runtime เช่น `OPENCLAW_GATEWAY_TOKEN`
+    ส่วน auth แบบ OAuth/API-key ของ provider ที่จัดเก็บไว้จะอยู่ใน
+    `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` ที่ถูก mount มา
 
   </Step>
 
-  <Step title="การกำหนดค่า Docker Compose">
+  <Step title="คอนฟิก Docker Compose">
     สร้างหรืออัปเดต `docker-compose.yml`
 
     ```yaml
@@ -194,8 +194,8 @@ x-i18n:
           - ${OPENCLAW_CONFIG_DIR}:/home/node/.openclaw
           - ${OPENCLAW_WORKSPACE_DIR}:/home/node/.openclaw/workspace
         ports:
-          # คำแนะนำ: ให้ Gateway เป็น loopback-only บน VPS; เข้าถึงผ่าน SSH tunnel
-          # หากต้องการเปิดเผยสู่สาธารณะ ให้เอา prefix `127.0.0.1:` ออก และจัดการ firewall ตามนั้น
+          # Recommended: keep the Gateway loopback-only on the VPS; access via SSH tunnel.
+          # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
           - "127.0.0.1:${OPENCLAW_GATEWAY_PORT}:18789"
         command:
           [
@@ -210,21 +210,21 @@ x-i18n:
           ]
     ```
 
-    `--allow-unconfigured` มีไว้เพื่อความสะดวกในช่วง bootstrap เท่านั้น ไม่ใช่ตัวแทนของการกำหนดค่า gateway ที่เหมาะสม คุณยังควรตั้งค่า auth (`gateway.auth.token` หรือ password) และใช้การตั้งค่า bind ที่ปลอดภัยสำหรับการปรับใช้ของคุณ
+    `--allow-unconfigured` มีไว้เพื่อความสะดวกในการ bootstrap เท่านั้น ไม่ใช่สิ่งทดแทนการกำหนดค่า gateway ที่เหมาะสม คุณยังคงต้องตั้งค่า auth (`gateway.auth.token` หรือรหัสผ่าน) และใช้ bind setting ที่ปลอดภัยสำหรับ deployment ของคุณ
 
   </Step>
 
   <Step title="ขั้นตอนรันไทม์ Docker VM แบบใช้ร่วมกัน">
-    ใช้คู่มือรันไทม์แบบใช้ร่วมกันสำหรับโฟลว์ Docker host ทั่วไป:
+    ใช้คู่มือรันไทม์ที่ใช้ร่วมกันสำหรับ flow ทั่วไปของโฮสต์ Docker:
 
-    - [รวมไบนารีที่จำเป็นไว้ในอิมเมจ](/th/install/docker-vm-runtime#bake-required-binaries-into-the-image)
-    - [Build และเปิดใช้งาน](/th/install/docker-vm-runtime#build-and-launch)
-    - [อะไรอยู่ถาวรที่ไหน](/th/install/docker-vm-runtime#what-persists-where)
+    - [ฝังไบนารีที่ต้องใช้ลงในอิมเมจ](/th/install/docker-vm-runtime#bake-required-binaries-into-the-image)
+    - [Build และ launch](/th/install/docker-vm-runtime#build-and-launch)
+    - [อะไรถูกเก็บไว้ที่ไหน](/th/install/docker-vm-runtime#what-persists-where)
     - [การอัปเดต](/th/install/docker-vm-runtime#updates)
 
   </Step>
 
-  <Step title="การเข้าถึงเฉพาะของ Hetzner">
+  <Step title="การเข้าถึงเฉพาะสำหรับ Hetzner">
     หลังจากขั้นตอน build และ launch แบบใช้ร่วมกันแล้ว ให้ทำ tunnel จากแล็ปท็อปของคุณ:
 
     ```bash
@@ -235,35 +235,42 @@ x-i18n:
 
     `http://127.0.0.1:18789/`
 
-    วาง shared secret ที่กำหนดไว้ คู่มือนี้ใช้ gateway token เป็นค่าเริ่มต้น
-    หากคุณสลับไปใช้ password auth ให้ใช้รหัสผ่านนั้นแทน
+    วาง shared secret ที่กำหนดค่าไว้ คู่มือนี้ใช้ gateway token เป็น
+    ค่าปริยาย; หากคุณเปลี่ยนไปใช้ password auth ให้ใช้รหัสผ่านนั้นแทน
 
   </Step>
 </Steps>
 
-แผนผัง persistence แบบใช้ร่วมกันอยู่ที่ [Docker VM Runtime](/th/install/docker-vm-runtime#what-persists-where)
+แผนผังการคงอยู่ของข้อมูลแบบใช้ร่วมกันอยู่ที่ [Docker VM Runtime](/th/install/docker-vm-runtime#what-persists-where)
 
 ## Infrastructure as Code (Terraform)
 
-สำหรับทีมที่ชอบเวิร์กโฟลว์ infrastructure-as-code มีชุด Terraform ที่ดูแลโดยชุมชนซึ่งให้:
+สำหรับทีมที่ต้องการเวิร์กโฟลว์ infrastructure-as-code การตั้งค่า Terraform ที่ดูแลโดยชุมชนมีสิ่งต่อไปนี้ให้:
 
-- การกำหนดค่า Terraform แบบโมดูลพร้อมการจัดการ remote state
-- การจัดเตรียมอัตโนมัติผ่าน cloud-init
-- สคริปต์การปรับใช้ (bootstrap, deploy, backup/restore)
-- การเสริมความปลอดภัย (firewall, UFW, การเข้าถึงผ่าน SSH เท่านั้น)
+- คอนฟิก Terraform แบบโมดูล พร้อม remote state management
+- การ provision อัตโนมัติผ่าน cloud-init
+- สคริปต์ deployment (bootstrap, deploy, backup/restore)
+- การ harden ด้านความปลอดภัย (firewall, UFW, การเข้าถึงแบบ SSH-only)
 - การกำหนดค่า SSH tunnel สำหรับการเข้าถึง gateway
 
-**Repositories:**
+**Repository:**
 
 - Infrastructure: [openclaw-terraform-hetzner](https://github.com/andreesg/openclaw-terraform-hetzner)
 - Docker config: [openclaw-docker-config](https://github.com/andreesg/openclaw-docker-config)
 
-แนวทางนี้ช่วยเสริมการตั้งค่า Docker ด้านบนด้วยการปรับใช้ที่ทำซ้ำได้ โครงสร้างพื้นฐานที่ควบคุมเวอร์ชันได้ และการกู้คืนจากภัยพิบัติแบบอัตโนมัติ
+แนวทางนี้ช่วยเสริมการตั้งค่า Docker ด้านบนด้วย deployment ที่ทำซ้ำได้, infrastructure ที่ควบคุมเวอร์ชัน และ disaster recovery แบบอัตโนมัติ
 
-> **หมายเหตุ:** ดูแลโดยชุมชน สำหรับปัญหาหรือการมีส่วนร่วม ดูที่ลิงก์ repository ด้านบน
+> **หมายเหตุ:** ดูแลโดยชุมชน สำหรับปัญหาหรือการร่วมพัฒนา โปรดดูจากลิงก์ repository ด้านบน
 
 ## ขั้นตอนถัดไป
 
-- ตั้งค่า messaging channels: [Channels](/th/channels)
-- กำหนดค่า Gateway: [Gateway configuration](/th/gateway/configuration)
-- อัปเดต OpenClaw ให้ทันสมัย: [Updating](/th/install/updating)
+- ตั้งค่าช่องทางการส่งข้อความ: [Channels](/th/channels)
+- กำหนดค่า Gateway: [การกำหนดค่า Gateway](/th/gateway/configuration)
+- อัปเดต OpenClaw ให้ทันสมัยอยู่เสมอ: [Updating](/th/install/updating)
+
+## ที่เกี่ยวข้อง
+
+- [ภาพรวมการติดตั้ง](/th/install)
+- [Fly.io](/th/install/fly)
+- [Docker](/th/install/docker)
+- [VPS hosting](/th/vps)

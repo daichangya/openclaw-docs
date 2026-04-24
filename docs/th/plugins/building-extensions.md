@@ -1,17 +1,20 @@
 ---
 read_when:
-    - ลิงก์แบบเดิมไปยัง building-extensions
-summary: การเปลี่ยนเส้นทางไปยังคู่มือ Building Plugins ปัจจุบัน
-title: Building Plugins (เปลี่ยนเส้นทาง)
+    - ลิงก์เดิมไปยัง building-extensions
+summary: เปลี่ยนเส้นทางไปยังคู่มือการสร้าง Plugin ปัจจุบัน
+title: การสร้าง Plugin (เปลี่ยนเส้นทาง)
 x-i18n:
-    generated_at: "2026-04-23T05:45:57Z"
+    generated_at: "2026-04-24T09:22:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9e3a8aaaf749b692b7659b91dc826b6e6806851c6ac97a1ad970ce77a400f162
+    source_hash: d687ccddfe7dcadf8bdd0fc903bf8a5da112902a8d23086b04da25df752facaf
     source_path: plugins/building-extensions.md
     workflow: 15
 ---
 
-# Building Plugins
+หน้านี้ได้ย้ายไปที่ [Building Plugins](/th/plugins/building-plugins)
 
-หน้านี้ย้ายไปที่ [Building Plugins](/th/plugins/building-plugins) แล้ว
+## ที่เกี่ยวข้อง
+
+- [Building plugins](/th/plugins/building-plugins)
+- [สถาปัตยกรรม Plugin](/th/plugins/architecture)
