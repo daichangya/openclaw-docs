@@ -1661,7 +1661,8 @@
                 "pages": [
                   "help/index",
                   "help/troubleshooting",
-                  "help/faq"
+                  "help/faq",
+                  "help/faq-first-run"
                 ]
               },
               {
@@ -3061,7 +3062,8 @@
                 "pages": [
                   "ja-JP/help/index",
                   "ja-JP/help/troubleshooting",
-                  "ja-JP/help/faq"
+                  "ja-JP/help/faq",
+                  "ja-JP/help/faq-first-run"
                 ]
               },
               {
@@ -3846,7 +3848,8 @@
                 "pages": [
                   "es/help/index",
                   "es/help/troubleshooting",
-                  "es/help/faq"
+                  "es/help/faq",
+                  "es/help/faq-first-run"
                 ]
               },
               {
@@ -4631,7 +4634,8 @@
                 "pages": [
                   "pt-BR/help/index",
                   "pt-BR/help/troubleshooting",
-                  "pt-BR/help/faq"
+                  "pt-BR/help/faq",
+                  "pt-BR/help/faq-first-run"
                 ]
               },
               {
@@ -5416,7 +5420,8 @@
                 "pages": [
                   "ko/help/index",
                   "ko/help/troubleshooting",
-                  "ko/help/faq"
+                  "ko/help/faq",
+                  "ko/help/faq-first-run"
                 ]
               },
               {
@@ -6201,7 +6206,8 @@
                 "pages": [
                   "de/help/index",
                   "de/help/troubleshooting",
-                  "de/help/faq"
+                  "de/help/faq",
+                  "de/help/faq-first-run"
                 ]
               },
               {
@@ -6986,7 +6992,8 @@
                 "pages": [
                   "fr/help/index",
                   "fr/help/troubleshooting",
-                  "fr/help/faq"
+                  "fr/help/faq",
+                  "fr/help/faq-first-run"
                 ]
               },
               {
@@ -7771,7 +7778,8 @@
                 "pages": [
                   "ar/help/index",
                   "ar/help/troubleshooting",
-                  "ar/help/faq"
+                  "ar/help/faq",
+                  "ar/help/faq-first-run"
                 ]
               },
               {
@@ -8556,7 +8564,8 @@
                 "pages": [
                   "it/help/index",
                   "it/help/troubleshooting",
-                  "it/help/faq"
+                  "it/help/faq",
+                  "it/help/faq-first-run"
                 ]
               },
               {
@@ -9341,7 +9350,8 @@
                 "pages": [
                   "tr/help/index",
                   "tr/help/troubleshooting",
-                  "tr/help/faq"
+                  "tr/help/faq",
+                  "tr/help/faq-first-run"
                 ]
               },
               {
@@ -10126,7 +10136,8 @@
                 "pages": [
                   "uk/help/index",
                   "uk/help/troubleshooting",
-                  "uk/help/faq"
+                  "uk/help/faq",
+                  "uk/help/faq-first-run"
                 ]
               },
               {
@@ -10911,7 +10922,8 @@
                 "pages": [
                   "id/help/index",
                   "id/help/troubleshooting",
-                  "id/help/faq"
+                  "id/help/faq",
+                  "id/help/faq-first-run"
                 ]
               },
               {
@@ -11696,7 +11708,8 @@
                 "pages": [
                   "pl/help/index",
                   "pl/help/troubleshooting",
-                  "pl/help/faq"
+                  "pl/help/faq",
+                  "pl/help/faq-first-run"
                 ]
               },
               {
