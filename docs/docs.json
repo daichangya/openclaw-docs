@@ -1167,7 +1167,8 @@
                       "plugins/sdk-setup",
                       "plugins/sdk-testing",
                       "plugins/manifest",
-                      "plugins/architecture"
+                      "plugins/architecture",
+                      "plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -2564,7 +2565,8 @@
                       "ja-JP/plugins/sdk-setup",
                       "ja-JP/plugins/sdk-testing",
                       "ja-JP/plugins/manifest",
-                      "ja-JP/plugins/architecture"
+                      "ja-JP/plugins/architecture",
+                      "ja-JP/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -3346,7 +3348,8 @@
                       "es/plugins/sdk-setup",
                       "es/plugins/sdk-testing",
                       "es/plugins/manifest",
-                      "es/plugins/architecture"
+                      "es/plugins/architecture",
+                      "es/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -4128,7 +4131,8 @@
                       "pt-BR/plugins/sdk-setup",
                       "pt-BR/plugins/sdk-testing",
                       "pt-BR/plugins/manifest",
-                      "pt-BR/plugins/architecture"
+                      "pt-BR/plugins/architecture",
+                      "pt-BR/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -4910,7 +4914,8 @@
                       "ko/plugins/sdk-setup",
                       "ko/plugins/sdk-testing",
                       "ko/plugins/manifest",
-                      "ko/plugins/architecture"
+                      "ko/plugins/architecture",
+                      "ko/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -5692,7 +5697,8 @@
                       "de/plugins/sdk-setup",
                       "de/plugins/sdk-testing",
                       "de/plugins/manifest",
-                      "de/plugins/architecture"
+                      "de/plugins/architecture",
+                      "de/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -6474,7 +6480,8 @@
                       "fr/plugins/sdk-setup",
                       "fr/plugins/sdk-testing",
                       "fr/plugins/manifest",
-                      "fr/plugins/architecture"
+                      "fr/plugins/architecture",
+                      "fr/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -7256,7 +7263,8 @@
                       "ar/plugins/sdk-setup",
                       "ar/plugins/sdk-testing",
                       "ar/plugins/manifest",
-                      "ar/plugins/architecture"
+                      "ar/plugins/architecture",
+                      "ar/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -8038,7 +8046,8 @@
                       "it/plugins/sdk-setup",
                       "it/plugins/sdk-testing",
                       "it/plugins/manifest",
-                      "it/plugins/architecture"
+                      "it/plugins/architecture",
+                      "it/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -8820,7 +8829,8 @@
                       "tr/plugins/sdk-setup",
                       "tr/plugins/sdk-testing",
                       "tr/plugins/manifest",
-                      "tr/plugins/architecture"
+                      "tr/plugins/architecture",
+                      "tr/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -9602,7 +9612,8 @@
                       "uk/plugins/sdk-setup",
                       "uk/plugins/sdk-testing",
                       "uk/plugins/manifest",
-                      "uk/plugins/architecture"
+                      "uk/plugins/architecture",
+                      "uk/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -10384,7 +10395,8 @@
                       "id/plugins/sdk-setup",
                       "id/plugins/sdk-testing",
                       "id/plugins/manifest",
-                      "id/plugins/architecture"
+                      "id/plugins/architecture",
+                      "id/plugins/architecture-internals"
                     ]
                   }
                 ]
@@ -11166,7 +11178,8 @@
                       "pl/plugins/sdk-setup",
                       "pl/plugins/sdk-testing",
                       "pl/plugins/manifest",
-                      "pl/plugins/architecture"
+                      "pl/plugins/architecture",
+                      "pl/plugins/architecture-internals"
                     ]
                   }
                 ]
