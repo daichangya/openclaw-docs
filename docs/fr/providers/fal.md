@@ -1,30 +1,28 @@
 ---
 read_when:
     - Vous souhaitez utiliser la génération d’images fal dans OpenClaw
-    - Vous avez besoin du flux d’auth `FAL_KEY`
-    - Vous souhaitez les valeurs par défaut fal pour `image_generate` ou `video_generate`
+    - Vous avez besoin du flux d’authentification `FAL_KEY`
+    - Vous souhaitez des valeurs par défaut fal pour `image_generate` ou `video_generate`
 summary: Configuration de la génération d’images et de vidéos fal dans OpenClaw
-title: fal
+title: Fal
 x-i18n:
-    generated_at: "2026-04-12T23:30:32Z"
+    generated_at: "2026-04-24T07:26:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ff275233179b4808d625383efe04189ad9e92af09944ba39f1e953e77378e347
+    source_hash: d23d2d0d27e5f60f9dacb4a6a7e4c07248cf45ccd80bfabaf6bb99f5f78946b2
     source_path: providers/fal.md
     workflow: 15
 ---
 
-# fal
+OpenClaw fournit un fournisseur `fal` intégré pour la génération hébergée d’images et de vidéos.
 
-OpenClaw inclut un fournisseur `fal` intégré pour la génération hébergée d’images et de vidéos.
+| Property | Value                                                         |
+| -------- | ------------------------------------------------------------- |
+| Fournisseur | `fal`                                                         |
+| Auth     | `FAL_KEY` (canonique ; `FAL_API_KEY` fonctionne aussi en repli) |
+| API      | Points de terminaison des modèles fal                         |
 
-| Propriété | Valeur                                                        |
-| --------- | ------------------------------------------------------------- |
-| Fournisseur | `fal`                                                       |
-| Auth      | `FAL_KEY` (canonique ; `FAL_API_KEY` fonctionne aussi en repli) |
-| API       | points de terminaison de modèles fal                          |
-
-## Prise en main
+## Démarrage
 
 <Steps>
   <Step title="Définir la clé API">
@@ -52,19 +50,19 @@ OpenClaw inclut un fournisseur `fal` intégré pour la génération hébergée d
 Le fournisseur intégré de génération d’images `fal` utilise par défaut
 `fal/fal-ai/flux/dev`.
 
-| Capacité         | Valeur                     |
-| ---------------- | -------------------------- |
-| Nombre max d’images | 4 par requête           |
-| Mode édition     | Activé, 1 image de référence |
-| Remplacements de taille | Pris en charge       |
-| Ratio d’aspect   | Pris en charge             |
-| Résolution       | Prise en charge            |
+| Capability     | Value                      |
+| -------------- | -------------------------- |
+| Nombre max d’images     | 4 par requête              |
+| Mode édition      | Activé, 1 image de référence |
+| Remplacements de taille | Pris en charge                  |
+| Ratio d’aspect   | Pris en charge                  |
+| Résolution     | Pris en charge                  |
 
 <Warning>
 Le point de terminaison d’édition d’image fal ne prend **pas** en charge les remplacements `aspectRatio`.
 </Warning>
 
-Pour utiliser fal comme fournisseur d’images par défaut :
+Pour utiliser fal comme fournisseur d’images par défaut :
 
 ```json5
 {
@@ -80,21 +78,21 @@ Pour utiliser fal comme fournisseur d’images par défaut :
 
 ## Génération de vidéos
 
-Le fournisseur intégré de génération de vidéos `fal` utilise par défaut
+Le fournisseur intégré de génération vidéo `fal` utilise par défaut
 `fal/fal-ai/minimax/video-01-live`.
 
-| Capacité | Valeur                                                        |
-| -------- | ------------------------------------------------------------- |
-| Modes    | Texte vers vidéo, image de référence unique                   |
-| Runtime  | Flux submit/status/result adossé à une file d’attente pour les tâches longues |
+| Capability | Value                                                        |
+| ---------- | ------------------------------------------------------------ |
+| Modes      | Texte vers vidéo, image de référence unique                  |
+| Runtime    | Flux submit/status/result adossé à une file pour les tâches longues |
 
 <AccordionGroup>
   <Accordion title="Modèles vidéo disponibles">
-    **HeyGen video-agent :**
+    **Agent vidéo HeyGen :**
 
     - `fal/fal-ai/heygen/v2/video-agent`
 
-    **Seedance 2.0 :**
+    **Seedance 2.0 :**
 
     - `fal/bytedance/seedance-2.0/fast/text-to-video`
     - `fal/bytedance/seedance-2.0/fast/image-to-video`
@@ -133,20 +131,20 @@ Le fournisseur intégré de génération de vidéos `fal` utilise par défaut
 </AccordionGroup>
 
 <Tip>
-Utilisez `openclaw models list --provider fal` pour voir la liste complète des modèles fal
-disponibles, y compris les entrées ajoutées récemment.
+Utilisez `openclaw models list --provider fal` pour voir la liste complète des modèles fal disponibles,
+y compris les entrées ajoutées récemment.
 </Tip>
 
-## Liens associés
+## Lié
 
 <CardGroup cols={2}>
-  <Card title="Image generation" href="/fr/tools/image-generation" icon="image">
-    Paramètres partagés de l’outil d’image et sélection du fournisseur.
+  <Card title="Génération d’images" href="/fr/tools/image-generation" icon="image">
+    Paramètres partagés de l’outil image et sélection du fournisseur.
   </Card>
-  <Card title="Video generation" href="/fr/tools/video-generation" icon="video">
+  <Card title="Génération vidéo" href="/fr/tools/video-generation" icon="video">
     Paramètres partagés de l’outil vidéo et sélection du fournisseur.
   </Card>
-  <Card title="Configuration reference" href="/fr/gateway/configuration-reference#agent-defaults" icon="gear">
+  <Card title="Référence de configuration" href="/fr/gateway/config-agents#agent-defaults" icon="gear">
     Valeurs par défaut de l’agent, y compris la sélection des modèles d’image et de vidéo.
   </Card>
 </CardGroup>

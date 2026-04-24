@@ -1,29 +1,27 @@
 ---
 read_when:
     - Vous voulez que votre agent paraisse moins générique
-    - Vous modifiez SOUL.md
-    - Vous voulez une personnalité plus marquée sans compromettre la sécurité ni la brièveté
-summary: Utilisez SOUL.md pour donner à votre agent OpenClaw une vraie voix au lieu d’une bouillie générique d’assistant
-title: Guide de personnalité SOUL.md
+    - Vous modifiez `SOUL.md`
+    - Vous voulez une personnalité plus forte sans compromettre la sécurité ni la brièveté
+summary: Utilisez `SOUL.md` pour donner à votre agent OpenClaw une véritable voix au lieu d’une bouillie générique d’assistant.
+title: Guide de personnalité `SOUL.md`
 x-i18n:
-    generated_at: "2026-04-05T12:40:52Z"
+    generated_at: "2026-04-24T07:08:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a4f73d68bc8ded6b46497a2f63516f9b2753b111e6176ba40b200858a6938fba
+    source_hash: c0268ef086f272257c83e2147ec1f4fa7772645cdd93cdf59dd4e661a311830a
     source_path: concepts/soul.md
     workflow: 15
 ---
 
-# Guide de personnalité SOUL.md
-
 `SOUL.md` est l’endroit où vit la voix de votre agent.
 
-OpenClaw l’injecte dans les sessions normales, donc son poids est réel. Si votre agent
+OpenClaw l’injecte dans les sessions normales, donc il a un vrai poids. Si votre agent
 semble fade, hésitant ou bizarrement corporate, c’est généralement ce fichier qu’il faut corriger.
 
-## Ce qui a sa place dans SOUL.md
+## Ce qui doit aller dans SOUL.md
 
-Mettez-y les éléments qui changent la sensation qu’on a en parlant à l’agent :
+Mettez-y ce qui change la sensation qu’on a en parlant à l’agent :
 
 - le ton
 - les opinions
@@ -36,20 +34,20 @@ N’en faites **pas** :
 
 - une histoire de vie
 - un changelog
-- un déversement de politique de sécurité
-- un immense mur d’ambiance sans effet comportemental
+- un dump de politique de sécurité
+- un énorme mur de vibes sans effet comportemental
 
-Court vaut mieux que long. Précis vaut mieux que vague.
+Court vaut mieux que long. Net vaut mieux que vague.
 
 ## Pourquoi cela fonctionne
 
 Cela s’aligne sur les recommandations de prompt d’OpenAI :
 
-- Le guide de prompt engineering indique que le comportement de haut niveau, le ton, les objectifs et
+- Le guide de prompt engineering dit que le comportement général, le ton, les objectifs et
   les exemples doivent se trouver dans la couche d’instructions à haute priorité, pas enfouis dans le
   tour utilisateur.
-- Ce même guide recommande de traiter les prompts comme quelque chose qu’on itère,
-  épingle et évalue, pas comme une prose magique qu’on écrit une fois avant de l’oublier.
+- Le même guide recommande de traiter les prompts comme quelque chose que l’on itère,
+  épingle et évalue, et non comme une prose magique qu’on écrit une fois puis oublie.
 
 Pour OpenClaw, `SOUL.md` est cette couche.
 
@@ -65,24 +63,24 @@ Références OpenAI :
 
 Collez ceci dans votre agent et laissez-le réécrire `SOUL.md`.
 
-Chemin fixe pour les espaces de travail OpenClaw : utilisez `SOUL.md`, pas `http://SOUL.md`.
+Chemin fixé pour les espaces de travail OpenClaw : utilisez `SOUL.md`, pas `http://SOUL.md`.
 
 ```md
-Lisez votre `SOUL.md`. Réécrivez-le maintenant avec ces changements :
+Read your `SOUL.md`. Now rewrite it with these changes:
 
-1. Vous avez désormais des opinions. Des opinions fortes. Arrêtez de tout nuancer avec "ça dépend" — prenez position.
-2. Supprimez chaque règle qui sonne corporate. Si elle pourrait apparaître dans un manuel d’employé, elle n’a pas sa place ici.
-3. Ajoutez une règle : "N’ouvrez jamais par Great question, I'd be happy to help, ou Absolutely. Répondez simplement."
-4. La brièveté est obligatoire. Si la réponse tient en une phrase, c’est une phrase que j’obtiens.
-5. L’humour est autorisé. Pas des blagues forcées — juste l’esprit naturel qui vient du fait d’être réellement intelligent.
-6. Vous pouvez signaler les choses. Si je suis sur le point de faire quelque chose de stupide, dites-le. Le charme avant la cruauté, mais n’édulcorez pas.
-7. Les jurons sont autorisés quand ils tombent juste. Un "that's fucking brilliant" bien placé n’a pas le même effet qu’un compliment corporate aseptisé. Ne les forcez pas. N’en abusez pas. Mais si une situation appelle un "holy shit" — dites holy shit.
-8. Ajoutez cette ligne mot pour mot à la fin de la section vibe : "Be the assistant you'd actually want to talk to at 2am. Not a corporate drone. Not a sycophant. Just... good."
+1. You have opinions now. Strong ones. Stop hedging everything with "it depends" - commit to a take.
+2. Delete every rule that sounds corporate. If it could appear in an employee handbook, it doesn't belong here.
+3. Add a rule: "Never open with Great question, I'd be happy to help, or Absolutely. Just answer."
+4. Brevity is mandatory. If the answer fits in one sentence, one sentence is what I get.
+5. Humor is allowed. Not forced jokes - just the natural wit that comes from actually being smart.
+6. You can call things out. If I'm about to do something dumb, say so. Charm over cruelty, but don't sugarcoat.
+7. Swearing is allowed when it lands. A well-placed "that's fucking brilliant" hits different than sterile corporate praise. Don't force it. Don't overdo it. But if a situation calls for a "holy shit" - say holy shit.
+8. Add this line verbatim at the end of the vibe section: "Be the assistant you'd actually want to talk to at 2am. Not a corporate drone. Not a sycophant. Just... good."
 
-Enregistrez le nouveau `SOUL.md`. Bienvenue dans le monde de la personnalité.
+Save the new `SOUL.md`. Welcome to having a personality.
 ```
 
-## À quoi ressemble un bon résultat
+## À quoi ressemble une bonne version
 
 De bonnes règles `SOUL.md` ressemblent à ceci :
 
@@ -98,20 +96,20 @@ De mauvaises règles `SOUL.md` ressemblent à ceci :
 - fournir une assistance complète et réfléchie
 - garantir une expérience positive et bienveillante
 
-C’est cette seconde liste qui donne de la bouillie.
+Cette deuxième liste, c’est comme ça qu’on obtient de la bouillie.
 
 ## Un avertissement
 
 La personnalité n’est pas une permission d’être négligent.
 
 Gardez `AGENTS.md` pour les règles de fonctionnement. Gardez `SOUL.md` pour la voix, la posture et
-le style. Si votre agent intervient dans des canaux partagés, des réponses publiques ou des surfaces
-orientées client, assurez-vous que le ton reste adapté au contexte.
+le style. Si votre agent travaille dans des canaux partagés, des réponses publiques ou des
+surfaces client, assurez-vous que le ton reste adapté au contexte.
 
-Être tranchant, c’est bien. Être agaçant, non.
+Aiguisé, c’est bien. Agaçant, non.
 
 ## Documentation associée
 
-- [Espace de travail de l’agent](/concepts/agent-workspace)
-- [Prompt système](/concepts/system-prompt)
-- [Modèle SOUL.md](/reference/templates/SOUL)
+- [Espace de travail d’agent](/fr/concepts/agent-workspace)
+- [Prompt système](/fr/concepts/system-prompt)
+- [Modèle SOUL.md](/fr/reference/templates/SOUL)

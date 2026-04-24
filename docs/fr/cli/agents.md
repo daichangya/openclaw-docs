@@ -1,26 +1,26 @@
 ---
 read_when:
     - Vous voulez plusieurs agents isolés (espaces de travail + routage + authentification)
-summary: Référence CLI pour `openclaw agents` (lister/ajouter/supprimer/liaisons/lier/délier/définir l’identité)
-title: agents
+summary: Référence CLI pour `openclaw agents` (list/add/delete/bindings/bind/unbind/set identity)
+title: Agents
 x-i18n:
-    generated_at: "2026-04-23T07:00:24Z"
+    generated_at: "2026-04-24T07:03:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f328d9f4ce636ce27defdcbcc48b1ca041bc25d0888c3e4df0dd79840f44ca8f
+    source_hash: 04d0ce4f3fb3d0c0ba8ffb3676674cda7d9a60441a012bc94ff24a17105632f1
     source_path: cli/agents.md
     workflow: 15
 ---
 
 # `openclaw agents`
 
-Gérez des agents isolés (espaces de travail + authentification + routage).
+Gérer des agents isolés (espaces de travail + authentification + routage).
 
-Voir aussi :
+Associé :
 
 - Routage multi-agent : [Routage multi-agent](/fr/concepts/multi-agent)
-- Espace de travail agent : [Espace de travail agent](/fr/concepts/agent-workspace)
-- Configuration de la visibilité des Skills : [Configuration des Skills](/fr/tools/skills-config)
+- Espace de travail d’agent : [Espace de travail d’agent](/fr/concepts/agent-workspace)
+- Configuration de visibilité des Skills : [Configuration des Skills](/fr/tools/skills-config)
 
 ## Exemples
 
@@ -39,12 +39,12 @@ openclaw agents delete work
 
 ## Liaisons de routage
 
-Utilisez les liaisons de routage pour épingler le trafic entrant d’un canal à un agent spécifique.
+Utilisez des liaisons de routage pour épingler le trafic entrant d’un canal à un agent spécifique.
 
-Si vous voulez aussi des Skills visibles différents selon l’agent, configurez
+Si vous souhaitez aussi différentes Skills visibles par agent, configurez
 `agents.defaults.skills` et `agents.list[].skills` dans `openclaw.json`. Voir
 [Configuration des Skills](/fr/tools/skills-config) et
-[Référence de configuration](/fr/gateway/configuration-reference#agents-defaults-skills).
+[Référence de configuration](/fr/gateway/config-agents#agents-defaults-skills).
 
 Lister les liaisons :
 
@@ -60,27 +60,27 @@ Ajouter des liaisons :
 openclaw agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-Si vous omettez `accountId` (`--bind <channel>`), OpenClaw le résout à partir des valeurs par défaut du canal et des hooks de configuration du plugin lorsqu’ils sont disponibles.
+Si vous omettez `accountId` (`--bind <channel>`), OpenClaw le résout à partir des valeurs par défaut du canal et des hooks de configuration de Plugin lorsqu’ils sont disponibles.
 
 Si vous omettez `--agent` pour `bind` ou `unbind`, OpenClaw cible l’agent par défaut actuel.
 
-### Comportement de portée des liaisons
+### Comportement du périmètre de liaison
 
 - Une liaison sans `accountId` correspond uniquement au compte par défaut du canal.
-- `accountId: "*"` est le repli à l’échelle du canal (tous les comptes) et est moins spécifique qu’une liaison de compte explicite.
-- Si le même agent possède déjà une liaison de canal correspondante sans `accountId`, puis que vous ajoutez ensuite une liaison avec un `accountId` explicite ou résolu, OpenClaw met à niveau cette liaison existante sur place au lieu d’ajouter un doublon.
+- `accountId: "*"` est le repli à l’échelle du canal (tous les comptes) et est moins spécifique qu’une liaison explicite de compte.
+- Si le même agent possède déjà une liaison de canal correspondante sans `accountId`, et que vous effectuez ensuite une liaison avec un `accountId` explicite ou résolu, OpenClaw met à niveau cette liaison existante sur place au lieu d’ajouter un doublon.
 
 Exemple :
 
 ```bash
-# liaison initiale au niveau du canal uniquement
+# liaison initiale canal uniquement
 openclaw agents bind --agent work --bind telegram
 
-# puis mise à niveau vers une liaison à portée de compte
+# mise à niveau ultérieure vers une liaison limitée à un compte
 openclaw agents bind --agent work --bind telegram:ops
 ```
 
-Après la mise à niveau, le routage de cette liaison est limité à `telegram:ops`. Si vous voulez aussi le routage du compte par défaut, ajoutez-le explicitement (par exemple `--bind telegram:default`).
+Après la mise à niveau, le routage pour cette liaison est limité à `telegram:ops`. Si vous voulez aussi le routage du compte par défaut, ajoutez-le explicitement (par exemple `--bind telegram:default`).
 
 Supprimer des liaisons :
 
@@ -95,14 +95,14 @@ openclaw agents unbind --agent work --all
 
 ### `agents`
 
-Exécuter `openclaw agents` sans sous-commande équivaut à `openclaw agents list`.
+L’exécution de `openclaw agents` sans sous-commande équivaut à `openclaw agents list`.
 
 ### `agents list`
 
 Options :
 
 - `--json`
-- `--bindings` : inclure les règles de routage complètes, et pas seulement les comptes/résumés par agent
+- `--bindings` : inclure les règles de routage complètes, pas seulement les comptes/résumés par agent
 
 ### `agents add [name]`
 
@@ -117,9 +117,9 @@ Options :
 
 Remarques :
 
-- Le passage d’un indicateur `add` explicite fait basculer la commande vers le mode non interactif.
-- Le mode non interactif requiert à la fois un nom d’agent et `--workspace`.
-- `main` est réservé et ne peut pas être utilisé comme nouvel identifiant d’agent.
+- Le passage de tout indicateur explicite d’ajout fait basculer la commande vers le chemin non interactif.
+- Le mode non interactif nécessite à la fois un nom d’agent et `--workspace`.
+- `main` est réservé et ne peut pas être utilisé comme nouvel ID d’agent.
 
 ### `agents bindings`
 
@@ -156,14 +156,14 @@ Remarques :
 
 - `main` ne peut pas être supprimé.
 - Sans `--force`, une confirmation interactive est requise.
-- Les répertoires d’espace de travail, d’état de l’agent et de transcription de session sont déplacés vers la corbeille, et non supprimés définitivement.
+- L’espace de travail, l’état de l’agent et les répertoires de transcriptions de session sont déplacés vers la corbeille, et non supprimés définitivement.
 
 ## Fichiers d’identité
 
-Chaque espace de travail agent peut inclure un `IDENTITY.md` à la racine de l’espace de travail :
+Chaque espace de travail d’agent peut inclure un `IDENTITY.md` à la racine de l’espace de travail :
 
 - Exemple de chemin : `~/.openclaw/workspace/IDENTITY.md`
-- `set-identity --from-identity` lit depuis la racine de l’espace de travail (ou depuis un `--identity-file` explicite)
+- `set-identity --from-identity` lit depuis la racine de l’espace de travail (ou un `--identity-file` explicite)
 
 Les chemins d’avatar sont résolus par rapport à la racine de l’espace de travail.
 
@@ -174,7 +174,7 @@ Les chemins d’avatar sont résolus par rapport à la racine de l’espace de t
 - `name`
 - `theme`
 - `emoji`
-- `avatar` (chemin relatif à l’espace de travail, URL http(s), ou URI de données)
+- `avatar` (chemin relatif à l’espace de travail, URL http(s) ou URI de données)
 
 Options :
 
@@ -190,8 +190,8 @@ Options :
 
 Remarques :
 
-- `--agent` ou `--workspace` peut être utilisé pour sélectionner l’agent cible.
-- Si vous utilisez `--workspace` et que plusieurs agents partagent cet espace de travail, la commande échoue et vous demande de passer `--agent`.
+- `--agent` ou `--workspace` peuvent être utilisés pour sélectionner l’agent cible.
+- Si vous vous appuyez sur `--workspace` et que plusieurs agents partagent cet espace de travail, la commande échoue et vous demande de passer `--agent`.
 - Lorsqu’aucun champ d’identité explicite n’est fourni, la commande lit les données d’identité depuis `IDENTITY.md`.
 
 Charger depuis `IDENTITY.md` :
@@ -200,7 +200,7 @@ Charger depuis `IDENTITY.md` :
 openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
 ```
 
-Remplacer explicitement des champs :
+Remplacer explicitement les champs :
 
 ```bash
 openclaw agents set-identity --agent main --name "OpenClaw" --emoji "🦞" --avatar avatars/openclaw.png
@@ -216,7 +216,7 @@ Exemple de configuration :
         id: "main",
         identity: {
           name: "OpenClaw",
-          theme: "homard spatial",
+          theme: "space lobster",
           emoji: "🦞",
           avatar: "avatars/openclaw.png",
         },
@@ -225,3 +225,9 @@ Exemple de configuration :
   },
 }
 ```
+
+## Associé
+
+- [Référence CLI](/fr/cli)
+- [Routage multi-agent](/fr/concepts/multi-agent)
+- [Espace de travail d’agent](/fr/concepts/agent-workspace)

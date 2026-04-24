@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Vous voulez un fournisseur de recherche web ne nécessitant aucune clé API
+    - Vous voulez un fournisseur de recherche Web qui ne nécessite aucune clé API
     - Vous voulez utiliser DuckDuckGo pour `web_search`
-    - Vous avez besoin d'un secours de recherche sans configuration
-summary: Recherche web DuckDuckGo -- fournisseur de secours sans clé (expérimental, basé sur HTML)
+    - Vous avez besoin d’un repli de recherche sans configuration
+summary: Recherche Web DuckDuckGo -- fournisseur de repli sans clé (expérimental, basé sur HTML)
 title: Recherche DuckDuckGo
 x-i18n:
-    generated_at: "2026-04-05T12:56:06Z"
+    generated_at: "2026-04-24T07:35:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 31f8e3883584534396c247c3d8069ea4c5b6399e0ff13a9dd0c8ee0c3da02096
+    source_hash: 6828830079b0bee1321f0971ec120ae98bc72ab040ad3a0fe30fe89217ed0722
     source_path: tools/duckduckgo-search.md
     workflow: 15
 ---
 
-# Recherche DuckDuckGo
-
-OpenClaw prend en charge DuckDuckGo comme fournisseur `web_search` **sans clé**. Aucune clé API ni aucun compte n'est requis.
+OpenClaw prend en charge DuckDuckGo comme fournisseur `web_search` **sans clé**. Aucune clé API ni aucun compte ne sont requis.
 
 <Warning>
-  DuckDuckGo est une intégration **expérimentale et non officielle** qui extrait les résultats des pages de recherche non JavaScript de DuckDuckGo — et non d'une API officielle. Attendez-vous à des dysfonctionnements occasionnels dus aux pages de défi anti-bot ou aux changements de HTML.
+  DuckDuckGo est une intégration **expérimentale et non officielle** qui récupère les résultats
+  à partir des pages de recherche non JavaScript de DuckDuckGo — pas d’une API officielle. Attendez-vous à
+  des cassures occasionnelles dues aux pages de défi anti-bot ou aux changements HTML.
 </Warning>
 
 ## Configuration
@@ -30,12 +30,12 @@ Aucune clé API nécessaire — définissez simplement DuckDuckGo comme fourniss
   <Step title="Configurer">
     ```bash
     openclaw configure --section web
-    # Select "duckduckgo" as the provider
+    # Sélectionnez "duckduckgo" comme fournisseur
     ```
   </Step>
 </Steps>
 
-## Config
+## Configuration
 
 ```json5
 {
@@ -49,7 +49,7 @@ Aucune clé API nécessaire — définissez simplement DuckDuckGo comme fourniss
 }
 ```
 
-Paramètres facultatifs au niveau du plugin pour la région et SafeSearch :
+Paramètres facultatifs au niveau Plugin pour la région et SafeSearch :
 
 ```json5
 {
@@ -58,8 +58,8 @@ Paramètres facultatifs au niveau du plugin pour la région et SafeSearch :
       duckduckgo: {
         config: {
           webSearch: {
-            region: "us-en", // DuckDuckGo region code
-            safeSearch: "moderate", // "strict", "moderate", or "off"
+            region: "us-en", // code de région DuckDuckGo
+            safeSearch: "moderate", // "strict", "moderate", ou "off"
           },
         },
       },
@@ -68,32 +68,48 @@ Paramètres facultatifs au niveau du plugin pour la région et SafeSearch :
 }
 ```
 
-## Paramètres de l'outil
+## Paramètres de l’outil
 
-| Parameter    | Description                                                |
-| ------------ | ---------------------------------------------------------- |
-| `query`      | Requête de recherche (obligatoire)                         |
-| `count`      | Résultats à renvoyer (1-10, par défaut : 5)                |
-| `region`     | Code région DuckDuckGo (par ex. `us-en`, `uk-en`, `de-de`) |
-| `safeSearch` | Niveau SafeSearch : `strict`, `moderate` (par défaut) ou `off` |
+<ParamField path="query" type="string" required>
+Requête de recherche.
+</ParamField>
 
-La région et SafeSearch peuvent également être définis dans la config du plugin (voir ci-dessus) — les paramètres de l'outil remplacent les valeurs de config pour chaque requête.
+<ParamField path="count" type="number" default="5">
+Nombre de résultats à renvoyer (1–10).
+</ParamField>
+
+<ParamField path="region" type="string">
+Code de région DuckDuckGo (par ex. `us-en`, `uk-en`, `de-de`).
+</ParamField>
+
+<ParamField path="safeSearch" type="'strict' | 'moderate' | 'off'" default="moderate">
+Niveau de SafeSearch.
+</ParamField>
+
+La région et SafeSearch peuvent aussi être définis dans la configuration du Plugin (voir ci-dessus) — les
+paramètres de l’outil remplacent les valeurs de configuration pour chaque requête.
 
 ## Remarques
 
 - **Aucune clé API** — fonctionne immédiatement, sans configuration
-- **Expérimental** — collecte les résultats à partir des pages de recherche HTML non JavaScript de DuckDuckGo, et non d'une API ou d'un SDK officiel
-- **Risque de défi anti-bot** — DuckDuckGo peut afficher des CAPTCHAs ou bloquer les requêtes en cas d'usage intensif ou automatisé
-- **Analyse HTML** — les résultats dépendent de la structure de la page, qui peut changer sans préavis
-- **Ordre d'auto-détection** — DuckDuckGo est le premier secours sans clé (ordre 100) dans l'auto-détection. Les fournisseurs avec API configurée s'exécutent d'abord, puis Ollama Web Search (ordre 110), puis SearXNG (ordre 200)
-- **SafeSearch utilise `moderate` par défaut** lorsqu'il n'est pas configuré
+- **Expérimental** — rassemble les résultats depuis les pages de recherche HTML non JavaScript
+  de DuckDuckGo, pas depuis une API ou un SDK officiel
+- **Risque de défi anti-bot** — DuckDuckGo peut servir des CAPTCHA ou bloquer les requêtes
+  en cas d’usage intensif ou automatisé
+- **Analyse HTML** — les résultats dépendent de la structure des pages, qui peut changer sans
+  préavis
+- **Ordre d’auto-détection** — DuckDuckGo est le premier repli sans clé
+  (ordre 100) dans l’auto-détection. Les fournisseurs adossés à une API avec des clés configurées s’exécutent
+  d’abord, puis Ollama Web Search (ordre 110), puis SearXNG (ordre 200)
+- **SafeSearch vaut par défaut moderate** lorsqu’il n’est pas configuré
 
 <Tip>
-  Pour un usage en production, envisagez [Brave Search](/tools/brave-search) (niveau gratuit disponible) ou un autre fournisseur reposant sur une API.
+  Pour un usage de production, envisagez [Brave Search](/fr/tools/brave-search) (niveau gratuit
+  disponible) ou un autre fournisseur adossé à une API.
 </Tip>
 
-## Liens connexes
+## Lié
 
-- [Vue d'ensemble de Web Search](/tools/web) -- tous les fournisseurs et l'auto-détection
-- [Brave Search](/tools/brave-search) -- résultats structurés avec niveau gratuit
-- [Exa Search](/tools/exa-search) -- recherche neuronale avec extraction de contenu
+- [Vue d’ensemble de Web Search](/fr/tools/web) -- tous les fournisseurs et l’auto-détection
+- [Brave Search](/fr/tools/brave-search) -- résultats structurés avec niveau gratuit
+- [Exa Search](/fr/tools/exa-search) -- recherche neuronale avec extraction de contenu

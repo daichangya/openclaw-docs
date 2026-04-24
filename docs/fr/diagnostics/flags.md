@@ -2,30 +2,28 @@
 read_when:
     - Vous avez besoin de journaux de débogage ciblés sans augmenter les niveaux de journalisation globaux
     - Vous devez capturer des journaux spécifiques à un sous-système pour le support
-summary: Indicateurs de diagnostic pour des journaux de débogage ciblés
-title: Indicateurs de diagnostic
+summary: Options de diagnostic pour des journaux de débogage ciblés
+title: Options de diagnostic
 x-i18n:
-    generated_at: "2026-04-05T12:41:10Z"
+    generated_at: "2026-04-24T07:08:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: daf0eca0e6bd1cbc2c400b2e94e1698709a96b9cdba1a8cf00bd580a61829124
+    source_hash: b7e5ec9c5e28ef51f1e617baf62412897df8096f227a74d86a0824e269aafd9d
     source_path: diagnostics/flags.md
     workflow: 15
 ---
 
-# Indicateurs de diagnostic
-
-Les indicateurs de diagnostic vous permettent d’activer des journaux de débogage ciblés sans activer la journalisation verbeuse partout. Les indicateurs sont facultatifs et n’ont aucun effet tant qu’un sous-système ne les vérifie pas.
+Les options de diagnostic vous permettent d’activer des journaux de débogage ciblés sans activer la journalisation verbeuse partout. Les options sont opt-in et n’ont aucun effet tant qu’un sous-système ne les vérifie pas.
 
 ## Fonctionnement
 
-- Les indicateurs sont des chaînes (insensibles à la casse).
-- Vous pouvez activer des indicateurs dans la configuration ou via un remplacement env.
-- Les jokers sont pris en charge :
+- Les options sont des chaînes (insensibles à la casse).
+- Vous pouvez activer les options dans la configuration ou via un remplacement par variable d’environnement.
+- Les jokers sont pris en charge :
   - `telegram.*` correspond à `telegram.http`
-  - `*` active tous les indicateurs
+  - `*` active toutes les options
 
-## Activation via la configuration
+## Activer via la configuration
 
 ```json
 {
@@ -35,7 +33,7 @@ Les indicateurs de diagnostic vous permettent d’activer des journaux de débog
 }
 ```
 
-Plusieurs indicateurs :
+Options multiples :
 
 ```json
 {
@@ -45,25 +43,25 @@ Plusieurs indicateurs :
 }
 ```
 
-Redémarrez la passerelle après avoir modifié les indicateurs.
+Redémarrez le gateway après avoir modifié les options.
 
-## Remplacement env (ponctuel)
+## Remplacement via variable d’environnement (ponctuel)
 
 ```bash
 OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload
 ```
 
-Désactiver tous les indicateurs :
+Désactiver toutes les options :
 
 ```bash
 OPENCLAW_DIAGNOSTICS=0
 ```
 
-## Emplacement des journaux
+## Où vont les journaux
 
-Les indicateurs émettent des journaux dans le fichier standard de diagnostic. Par défaut :
+Les options émettent les journaux dans le fichier de diagnostics standard. Par défaut :
 
-```
+```text
 /tmp/openclaw/openclaw-YYYY-MM-DD.log
 ```
 
@@ -71,28 +69,33 @@ Si vous définissez `logging.file`, utilisez ce chemin à la place. Les journaux
 
 ## Extraire les journaux
 
-Choisir le fichier journal le plus récent :
+Choisissez le fichier journal le plus récent :
 
 ```bash
 ls -t /tmp/openclaw/openclaw-*.log | head -n 1
 ```
 
-Filtrer les diagnostics HTTP Telegram :
+Filtrer pour les diagnostics HTTP Telegram :
 
 ```bash
 rg "telegram http error" /tmp/openclaw/openclaw-*.log
 ```
 
-Ou suivre pendant la reproduction :
+Ou suivre en direct pendant la reproduction :
 
 ```bash
 tail -f /tmp/openclaw/openclaw-$(date +%F).log | rg "telegram http error"
 ```
 
-Pour les passerelles distantes, vous pouvez aussi utiliser `openclaw logs --follow` (voir [/cli/logs](/cli/logs)).
+Pour les gateways distants, vous pouvez aussi utiliser `openclaw logs --follow` (voir [/cli/logs](/fr/cli/logs)).
 
 ## Remarques
 
-- Si `logging.level` est défini au-dessus de `warn`, ces journaux peuvent être supprimés. La valeur par défaut `info` convient.
-- Ces indicateurs peuvent rester activés sans risque ; ils n’affectent que le volume de journalisation du sous-système spécifique.
-- Utilisez [/logging](/logging) pour modifier les destinations de journaux, les niveaux et l’expurgation.
+- Si `logging.level` est défini à une valeur supérieure à `warn`, ces journaux peuvent être supprimés. La valeur par défaut `info` convient.
+- Ces options peuvent rester activées sans risque ; elles n’affectent que le volume de journaux du sous-système spécifique.
+- Utilisez [/logging](/fr/logging) pour modifier les destinations, niveaux et règles d’expurgation des journaux.
+
+## Lié
+
+- [Diagnostics du Gateway](/fr/gateway/diagnostics)
+- [Dépannage du Gateway](/fr/gateway/troubleshooting)

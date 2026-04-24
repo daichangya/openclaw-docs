@@ -1,46 +1,44 @@
 ---
 read_when:
-    - Configurer OpenClaw sur un Raspberry Pi
-    - Exécuter OpenClaw sur des appareils ARM
+    - Configuration d’OpenClaw sur un Pi Raspberry
+    - Exécution d’OpenClaw sur des appareils ARM
     - Construire une IA personnelle peu coûteuse et toujours active
-summary: Héberger OpenClaw sur un Raspberry Pi pour un auto-hébergement toujours actif
-title: Raspberry Pi
+summary: héberger OpenClaw sur un Pi pour un auto-hébergement toujours actif
+title: Pi Raspberry
 x-i18n:
-    generated_at: "2026-04-05T12:46:58Z"
+    generated_at: "2026-04-24T07:18:09Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 222ccbfb18a8dcec483adac6f5647dcb455c84edbad057e0ba2589a6da570b4c
+    source_hash: 5fa11bf65f6db50b0864dabcf417f08c06e82a5ce067304f1cbfc189a4991a40
     source_path: install/raspberry-pi.md
     workflow: 15
 ---
 
-# Raspberry Pi
-
-Exécutez une OpenClaw Gateway persistante et toujours active sur un Raspberry Pi. Comme le Pi n’est que la passerelle (les modèles s’exécutent dans le cloud via API), même un Pi modeste gère bien la charge.
+Exécutez une Gateway OpenClaw persistante et toujours active sur un Pi Raspberry. Comme le Pi n’est que la gateway (les modèles s’exécutent dans le cloud via API), même un Pi modeste gère bien la charge.
 
 ## Prérequis
 
-- Raspberry Pi 4 ou 5 avec 2 Go+ de RAM (4 Go recommandés)
-- Carte MicroSD (16 Go+) ou SSD USB (meilleures performances)
+- Pi Raspberry 4 ou 5 avec 2 Go+ de RAM (4 Go recommandés)
+- Carte microSD (16 Go+) ou SSD USB (meilleures performances)
 - Alimentation officielle Pi
 - Connexion réseau (Ethernet ou WiFi)
-- Raspberry Pi OS 64 bits (requis -- n’utilisez pas la version 32 bits)
+- Raspberry Pi OS 64 bits (obligatoire -- n’utilisez pas 32 bits)
 - Environ 30 minutes
 
 ## Configuration
 
 <Steps>
   <Step title="Flasher l’OS">
-    Utilisez **Raspberry Pi OS Lite (64-bit)** -- aucun bureau n’est nécessaire pour un serveur headless.
+    Utilisez **Raspberry Pi OS Lite (64-bit)** -- pas d’environnement de bureau nécessaire pour un serveur headless.
 
     1. Téléchargez [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
     2. Choisissez l’OS : **Raspberry Pi OS Lite (64-bit)**.
     3. Dans la boîte de dialogue des paramètres, préconfigurez :
        - Nom d’hôte : `gateway-host`
        - Activer SSH
-       - Définir nom d’utilisateur et mot de passe
+       - Définir le nom d’utilisateur et le mot de passe
        - Configurer le WiFi (si vous n’utilisez pas Ethernet)
-    4. Flashez sur votre carte SD ou votre disque USB, insérez-le, puis démarrez le Pi.
+    4. Flashez sur votre carte SD ou votre lecteur USB, insérez-le, puis démarrez le Pi.
 
   </Step>
 
@@ -50,7 +48,7 @@ Exécutez une OpenClaw Gateway persistante et toujours active sur un Raspberry P
     ```
   </Step>
 
-  <Step title="Mettre à jour le système">
+  <Step title="Mettre le système à jour">
     ```bash
     sudo apt update && sudo apt upgrade -y
     sudo apt install -y git curl build-essential
@@ -90,12 +88,12 @@ Exécutez une OpenClaw Gateway persistante et toujours active sur un Raspberry P
     ```
   </Step>
 
-  <Step title="Exécuter l’onboarding">
+  <Step title="Lancer l’intégration">
     ```bash
     openclaw onboard --install-daemon
     ```
 
-    Suivez l’assistant. Les clés API sont recommandées à la place d’OAuth pour les appareils headless. Telegram est le canal le plus simple pour commencer.
+    Suivez l’assistant. Les clés API sont recommandées plutôt qu’OAuth pour les appareils headless. Telegram est le canal le plus simple pour commencer.
 
   </Step>
 
@@ -107,7 +105,7 @@ Exécutez une OpenClaw Gateway persistante et toujours active sur un Raspberry P
     ```
   </Step>
 
-  <Step title="Accéder à l’interface Control">
+  <Step title="Accéder au Control UI">
     Sur votre ordinateur, obtenez une URL de tableau de bord depuis le Pi :
 
     ```bash
@@ -120,16 +118,16 @@ Exécutez une OpenClaw Gateway persistante et toujours active sur un Raspberry P
     ssh -N -L 18789:127.0.0.1:18789 user@gateway-host
     ```
 
-    Ouvrez l’URL affichée dans votre navigateur local. Pour un accès distant toujours actif, voir [Intégration Tailscale](/gateway/tailscale).
+    Ouvrez l’URL affichée dans votre navigateur local. Pour un accès distant permanent, voir [Intégration Tailscale](/fr/gateway/tailscale).
 
   </Step>
 </Steps>
 
 ## Conseils de performance
 
-**Utilisez un SSD USB** -- Les cartes SD sont lentes et s’usent. Un SSD USB améliore nettement les performances. Voir le [guide de démarrage USB du Pi](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot).
+**Utilisez un SSD USB** -- les cartes SD sont lentes et s’usent. Un SSD USB améliore considérablement les performances. Voir le [guide de démarrage USB du Pi](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#usb-mass-storage-boot).
 
-**Activez le cache de compilation des modules** -- Accélère les invocations CLI répétées sur les hôtes Pi moins puissants :
+**Activez le cache de compilation des modules** -- accélère les invocations répétées de la CLI sur les hôtes Pi moins puissants :
 
 ```bash
 grep -q 'NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF' # pragma: allowlist secret
@@ -140,27 +138,33 @@ EOF
 source ~/.bashrc
 ```
 
-**Réduisez l’utilisation mémoire** -- Pour les configurations headless, libérez la mémoire GPU et désactivez les services inutilisés :
+**Réduisez l’usage mémoire** -- pour les configurations headless, libérez la mémoire GPU et désactivez les services inutilisés :
 
 ```bash
 echo 'gpu_mem=16' | sudo tee -a /boot/config.txt
 sudo systemctl disable bluetooth
 ```
 
-## Résolution des problèmes
+## Dépannage
 
-**Mémoire insuffisante** -- Vérifiez que le swap est actif avec `free -h`. Désactivez les services inutilisés (`sudo systemctl disable cups bluetooth avahi-daemon`). Utilisez uniquement des modèles basés sur API.
+**Mémoire insuffisante** -- vérifiez que le swap est actif avec `free -h`. Désactivez les services inutilisés (`sudo systemctl disable cups bluetooth avahi-daemon`). Utilisez uniquement des modèles basés sur API.
 
-**Performances lentes** -- Utilisez un SSD USB au lieu d’une carte SD. Vérifiez le throttling CPU avec `vcgencmd get_throttled` (doit renvoyer `0x0`).
+**Performances lentes** -- utilisez un SSD USB au lieu d’une carte SD. Vérifiez le throttling CPU avec `vcgencmd get_throttled` (devrait renvoyer `0x0`).
 
-**Le service ne démarre pas** -- Vérifiez les journaux avec `journalctl --user -u openclaw-gateway.service --no-pager -n 100` et exécutez `openclaw doctor --non-interactive`. Si c’est un Pi headless, vérifiez aussi que le lingering est activé : `sudo loginctl enable-linger "$(whoami)"`.
+**Le service ne démarre pas** -- vérifiez les journaux avec `journalctl --user -u openclaw-gateway.service --no-pager -n 100` et exécutez `openclaw doctor --non-interactive`. Si c’est un Pi headless, vérifiez aussi que le lingering est activé : `sudo loginctl enable-linger "$(whoami)"`.
 
-**Problèmes de binaire ARM** -- Si une Skill échoue avec « exec format error », vérifiez si le binaire dispose d’une build ARM64. Vérifiez l’architecture avec `uname -m` (doit afficher `aarch64`).
+**Problèmes de binaire ARM** -- si un skill échoue avec « exec format error », vérifiez si le binaire possède un build ARM64. Vérifiez l’architecture avec `uname -m` (doit afficher `aarch64`).
 
-**Coupures WiFi** -- Désactivez la gestion d’alimentation WiFi : `sudo iwconfig wlan0 power off`.
+**Coupures WiFi** -- désactivez la gestion d’alimentation WiFi : `sudo iwconfig wlan0 power off`.
 
 ## Étapes suivantes
 
-- [Canaux](/channels) -- connecter Telegram, WhatsApp, Discord, et plus encore
-- [Configuration Gateway](/gateway/configuration) -- toutes les options de configuration
-- [Mise à jour](/install/updating) -- maintenir OpenClaw à jour
+- [Canaux](/fr/channels) -- connecter Telegram, WhatsApp, Discord, etc.
+- [Configuration Gateway](/fr/gateway/configuration) -- toutes les options de configuration
+- [Mise à jour](/fr/install/updating) -- maintenir OpenClaw à jour
+
+## Liens associés
+
+- [Vue d’ensemble de l’installation](/fr/install)
+- [Serveur Linux](/fr/vps)
+- [Plateformes](/fr/platforms)

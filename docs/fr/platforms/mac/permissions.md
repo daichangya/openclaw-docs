@@ -1,41 +1,39 @@
 ---
 read_when:
-    - Débogage des invites de permission macOS absentes ou bloquées
-    - Packaging ou signature de l’application macOS
-    - Modification des identifiants de bundle ou des chemins d’installation de l’application
+    - Déboguer les invites de permissions macOS manquantes ou bloquées
+    - Packaging ou signature de l’app macOS
+    - Modifier les identifiants de bundle ou les chemins d’installation de l’app macOS
 summary: Persistance des permissions macOS (TCC) et exigences de signature
 title: Permissions macOS
 x-i18n:
-    generated_at: "2026-04-05T12:48:41Z"
+    generated_at: "2026-04-24T07:21:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 250065b964c98c307a075ab9e23bf798f9d247f27befe2e5f271ffef1f497def
+    source_hash: c9ee8ee6409577094a0ba1bc4a50c73560741c12cbb1b3c811cb684ac150e05e
     source_path: platforms/mac/permissions.md
     workflow: 15
 ---
 
-# Permissions macOS (TCC)
-
 Les autorisations macOS sont fragiles. TCC associe une autorisation à la
-signature du code de l’application, à son identifiant de bundle et à son chemin sur le disque. Si l’un de ces éléments change,
-macOS traite l’application comme nouvelle et peut supprimer ou masquer les invites.
+signature du code de l’app, à l’identifiant de bundle et à son chemin sur le disque. Si l’un de ces éléments change,
+macOS considère l’app comme nouvelle et peut supprimer ou masquer les invites.
 
 ## Exigences pour des permissions stables
 
-- Même chemin : exécutez l’application depuis un emplacement fixe (pour OpenClaw, `dist/OpenClaw.app`).
+- Même chemin : exécutez l’app depuis un emplacement fixe (pour OpenClaw, `dist/OpenClaw.app`).
 - Même identifiant de bundle : changer l’identifiant de bundle crée une nouvelle identité de permission.
-- Application signée : les builds non signées ou signées ad hoc ne conservent pas les permissions.
+- App signée : les builds non signés ou signés ad hoc ne conservent pas les permissions.
 - Signature cohérente : utilisez un vrai certificat Apple Development ou Developer ID
-  afin que la signature reste stable d’une reconstruction à l’autre.
+  afin que la signature reste stable entre les reconstructions.
 
 Les signatures ad hoc génèrent une nouvelle identité à chaque build. macOS oubliera les autorisations précédentes,
-et les invites peuvent même disparaître complètement jusqu’à ce que les anciennes entrées soient supprimées.
+et les invites peuvent même disparaître complètement jusqu’à ce que les anciennes entrées soient effacées.
 
 ## Checklist de récupération lorsque les invites disparaissent
 
-1. Quittez l’application.
-2. Supprimez l’entrée de l’application dans Réglages système -> Confidentialité et sécurité.
-3. Relancez l’application depuis le même chemin et réaccordez les permissions.
+1. Quittez l’app.
+2. Supprimez l’entrée de l’app dans Réglages Système -> Confidentialité et sécurité.
+3. Relancez l’app depuis le même chemin et réaccordez les permissions.
 4. Si l’invite n’apparaît toujours pas, réinitialisez les entrées TCC avec `tccutil` et réessayez.
 5. Certaines permissions ne réapparaissent qu’après un redémarrage complet de macOS.
 
@@ -49,9 +47,14 @@ sudo tccutil reset AppleEvents
 
 ## Permissions fichiers et dossiers (Desktop/Documents/Downloads)
 
-macOS peut aussi protéger Desktop, Documents et Downloads pour les processus terminal/arrière-plan. Si les lectures de fichiers ou les listes de répertoires se bloquent, accordez l’accès au même contexte de processus qui effectue les opérations sur fichiers (par exemple Terminal/iTerm, application lancée par LaunchAgent ou processus SSH).
+macOS peut aussi restreindre Desktop, Documents et Downloads pour les processus terminal/arrière-plan. Si des lectures de fichiers ou des listages de répertoires se bloquent, accordez l’accès au même contexte de processus que celui qui exécute les opérations sur les fichiers (par exemple Terminal/iTerm, app lancée par LaunchAgent, ou processus SSH).
 
 Solution de contournement : déplacez les fichiers dans l’espace de travail OpenClaw (`~/.openclaw/workspace`) si vous voulez éviter des autorisations par dossier.
 
 Si vous testez les permissions, signez toujours avec un vrai certificat. Les builds ad hoc
 ne sont acceptables que pour des exécutions locales rapides où les permissions n’ont pas d’importance.
+
+## Articles connexes
+
+- [App macOS](/fr/platforms/macos)
+- [Signature macOS](/fr/platforms/mac/signing)

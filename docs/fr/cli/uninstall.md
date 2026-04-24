@@ -1,32 +1,32 @@
 ---
 read_when:
-    - Vous voulez supprimer le service Gateway et/ou l’état local
-    - Vous voulez d’abord une exécution à blanc
-summary: Référence CLI pour `openclaw uninstall` (supprimer le service Gateway + les données locales)
-title: uninstall
+    - Vous souhaitez supprimer le service Gateway et/ou l’état local
+    - Vous souhaitez d’abord un essai à blanc
+summary: Référence CLI pour `openclaw uninstall` (supprimer le service Gateway et les données locales)
+title: Désinstaller
 x-i18n:
-    generated_at: "2026-04-05T12:39:05Z"
+    generated_at: "2026-04-24T07:05:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2123a4f9c7a070ef7e13c60dafc189053ef61ce189fa4f29449dd50987c1894c
+    source_hash: b774fc006e989068b9126aff2a72888fd808a2e0e3d5ea8b57e6ab9d9f1b63ee
     source_path: cli/uninstall.md
     workflow: 15
 ---
 
 # `openclaw uninstall`
 
-Désinstalle le service Gateway + les données locales (la CLI reste en place).
+Désinstaller le service Gateway + les données locales (la CLI reste).
 
 Options :
 
 - `--service` : supprimer le service Gateway
 - `--state` : supprimer l’état et la configuration
 - `--workspace` : supprimer les répertoires d’espace de travail
-- `--app` : supprimer l’application macOS
-- `--all` : supprimer le service, l’état, l’espace de travail et l’application
+- `--app` : supprimer l’app macOS
+- `--all` : supprimer le service, l’état, l’espace de travail et l’app
 - `--yes` : ignorer les invites de confirmation
 - `--non-interactive` : désactiver les invites ; nécessite `--yes`
-- `--dry-run` : afficher les actions sans supprimer les fichiers
+- `--dry-run` : afficher les actions sans supprimer de fichiers
 
 Exemples :
 
@@ -41,6 +41,11 @@ openclaw uninstall --dry-run
 
 Remarques :
 
-- Exécutez d’abord `openclaw backup create` si vous voulez un instantané restaurable avant de supprimer l’état ou les espaces de travail.
-- `--all` est un raccourci pour supprimer ensemble le service, l’état, l’espace de travail et l’application.
+- Exécutez d’abord `openclaw backup create` si vous souhaitez un instantané restaurable avant de supprimer l’état ou les espaces de travail.
+- `--all` est un raccourci pour supprimer ensemble le service, l’état, l’espace de travail et l’app.
 - `--non-interactive` nécessite `--yes`.
+
+## Articles connexes
+
+- [Référence CLI](/fr/cli)
+- [Désinstallation](/fr/install/uninstall)

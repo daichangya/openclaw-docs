@@ -2,13 +2,13 @@
 read_when:
     - Vous devez capturer localement le trafic de transport OpenClaw pour le débogage
     - Vous souhaitez inspecter les sessions du proxy de débogage, les blobs ou les préréglages de requête intégrés
-summary: Référence CLI pour `openclaw proxy`, le proxy de débogage local et l’inspecteur de capture
-title: proxy
+summary: Référence CLI pour `openclaw proxy`, le proxy de débogage local et l’inspecteur de captures
+title: Proxy
 x-i18n:
-    generated_at: "2026-04-23T13:59:01Z"
+    generated_at: "2026-04-24T07:05:12Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 274de676a558153be85e345917c67647eb7e755b01869bc29e1effba66a7e828
+    source_hash: 7af5c596fb36f67e3fcffaff14dcbb4eabbcff0b95174ac6058a097ec9fd715f
     source_path: cli/proxy.md
     workflow: 15
 ---
@@ -19,7 +19,7 @@ Exécutez le proxy de débogage explicite local et inspectez le trafic capturé.
 
 Il s’agit d’une commande de débogage pour l’investigation au niveau du transport. Elle peut démarrer un
 proxy local, exécuter une commande enfant avec la capture activée, lister les sessions de capture,
-interroger des motifs de trafic courants, lire des blobs capturés et purger les données
+interroger les modèles de trafic courants, lire les blobs capturés et purger les données
 de capture locales.
 
 ## Commandes
@@ -36,7 +36,7 @@ openclaw proxy purge
 
 ## Préréglages de requête
 
-`openclaw proxy query --preset <name>` accepte :
+`openclaw proxy query --preset <name>` accepte :
 
 - `double-sends`
 - `retry-storms`
@@ -47,6 +47,11 @@ openclaw proxy purge
 
 ## Remarques
 
-- `start` utilise `127.0.0.1` par défaut sauf si `--host` est défini.
+- `start` utilise par défaut `127.0.0.1` sauf si `--host` est défini.
 - `run` démarre un proxy de débogage local puis exécute la commande après `--`.
-- Les captures sont des données de débogage locales ; utilisez `openclaw proxy purge` une fois terminé.
+- Les captures sont des données de débogage locales ; utilisez `openclaw proxy purge` lorsque vous avez terminé.
+
+## Voir aussi
+
+- [Référence CLI](/fr/cli)
+- [Authentification de proxy approuvé](/fr/gateway/trusted-proxy-auth)

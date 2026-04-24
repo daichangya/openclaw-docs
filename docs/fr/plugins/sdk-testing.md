@@ -1,36 +1,36 @@
 ---
 read_when:
-    - Vous écrivez des tests pour un plugin
-    - Vous avez besoin d’utilitaires de test du SDK du Plugin
-    - Vous souhaitez comprendre les tests de contrat pour les plugins intégrés
+    - |-
+      Vous écrivez des tests pour un plugin不中返ుంజassistant to=functions.read వ్యాఖ్యary  玩彩神争霸  天天中彩票双色球json
+      {"path":"/home/runner/work/docs/docs/source/AGENTS.md","offset":1,"limit":40}
+    - Vous avez besoin des utilitaires de test du SDK Plugin
+    - Vous voulez comprendre les tests de contrat pour les plugins intégrés
 sidebarTitle: Testing
-summary: Utilitaires et modèles de test pour les plugins OpenClaw
-title: Tests du Plugin
+summary: Utilitaires et schémas de test pour les plugins OpenClaw
+title: Tests de plugin
 x-i18n:
-    generated_at: "2026-04-15T19:41:46Z"
+    generated_at: "2026-04-24T07:24:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2f75bd3f3b5ba34b05786e0dd96d493c36db73a1d258998bf589e27e45c0bd09
+    source_hash: d1b8f24cdb846190ee973b01fcd466b6fb59367afbaf6abc2c370fae17ccecab
     source_path: plugins/sdk-testing.md
     workflow: 15
 ---
 
-# Tests du Plugin
-
-Référence pour les utilitaires de test, les modèles et l’application des règles de lint pour les
+Référence des utilitaires de test, des schémas et de l’application des règles de lint pour les
 plugins OpenClaw.
 
 <Tip>
-  **Vous cherchez des exemples de test ?** Les guides pratiques incluent des exemples de test complets :
-  [Tests de plugins de canal](/fr/plugins/sdk-channel-plugins#step-6-test) et
-  [Tests de plugins de fournisseur](/fr/plugins/sdk-provider-plugins#step-6-test).
+  **Vous cherchez des exemples de test ?** Les guides pratiques incluent des exemples de test détaillés :
+  [Tests de plugin de canal](/fr/plugins/sdk-channel-plugins#step-6-test) et
+  [Tests de plugin de fournisseur](/fr/plugins/sdk-provider-plugins#step-6-test).
 </Tip>
 
 ## Utilitaires de test
 
-**Importation :** `openclaw/plugin-sdk/testing`
+**Import :** `openclaw/plugin-sdk/testing`
 
-Le sous-chemin de test exporte un ensemble restreint d’assistants pour les auteurs de plugins :
+Le sous-chemin de test exporte un ensemble restreint de helpers pour les auteurs de plugins :
 
 ```typescript
 import {
@@ -42,11 +42,11 @@ import {
 
 ### Exports disponibles
 
-| Export                                 | But                                                    |
-| -------------------------------------- | ------------------------------------------------------ |
+| Export                                 | Objectif                                              |
+| -------------------------------------- | ----------------------------------------------------- |
 | `installCommonResolveTargetErrorCases` | Cas de test partagés pour la gestion des erreurs de résolution de cible |
 | `shouldAckReaction`                    | Vérifier si un canal doit ajouter une réaction d’accusé de réception |
-| `removeAckReactionAfterReply`          | Supprimer la réaction d’accusé de réception après l’envoi de la réponse |
+| `removeAckReactionAfterReply`          | Supprimer la réaction d’accusé de réception après la remise de la réponse |
 
 ### Types
 
@@ -65,8 +65,8 @@ import type {
 
 ## Tester la résolution de cible
 
-Utilisez `installCommonResolveTargetErrorCases` pour ajouter des cas d’erreur standard pour la
-résolution de cible de canal :
+Utilisez `installCommonResolveTargetErrorCases` pour ajouter des cas d’erreur standards pour
+la résolution de cible de canal :
 
 ```typescript
 import { describe } from "vitest";
@@ -88,9 +88,9 @@ describe("my-channel target resolution", () => {
 });
 ```
 
-## Modèles de test
+## Schémas de test
 
-### Test unitaire d’un Plugin de canal
+### Tester unitairement un plugin de canal
 
 ```typescript
 import { describe, it, expect, vi } from "vitest";
@@ -126,7 +126,7 @@ describe("my-channel plugin", () => {
 });
 ```
 
-### Test unitaire d’un Plugin de fournisseur
+### Tester unitairement un plugin de fournisseur
 
 ```typescript
 import { describe, it, expect } from "vitest";
@@ -154,7 +154,7 @@ describe("my-provider plugin", () => {
 });
 ```
 
-### Simuler le runtime du Plugin
+### Mock du runtime de plugin
 
 Pour le code qui utilise `createPluginRuntimeStore`, simulez le runtime dans les tests :
 
@@ -188,7 +188,7 @@ store.clearRuntime();
 
 ### Tester avec des stubs par instance
 
-Préférez les stubs par instance à la mutation du prototype :
+Préférez des stubs par instance à la mutation de prototype :
 
 ```typescript
 // Preferred: per-instance stub
@@ -199,9 +199,9 @@ client.sendMessage = vi.fn().mockResolvedValue({ id: "msg-1" });
 // MyChannelClient.prototype.sendMessage = vi.fn();
 ```
 
-## Tests de contrat (plugins du dépôt)
+## Tests de contrat (plugins dans le dépôt)
 
-Les plugins intégrés disposent de tests de contrat qui vérifient la propriété de l’enregistrement :
+Les plugins intégrés ont des tests de contrat qui vérifient la propriété de l’enregistrement :
 
 ```bash
 pnpm test -- src/plugins/contracts/
@@ -210,8 +210,8 @@ pnpm test -- src/plugins/contracts/
 Ces tests vérifient :
 
 - Quels plugins enregistrent quels fournisseurs
-- Quels plugins enregistrent quels fournisseurs vocaux
-- La justesse de la forme d’enregistrement
+- Quels plugins enregistrent quels fournisseurs de parole
+- La correction de la forme d’enregistrement
 - La conformité au contrat d’exécution
 
 ### Exécuter des tests ciblés
@@ -230,20 +230,20 @@ pnpm test -- src/plugins/contracts/auth.contract.test.ts
 pnpm test -- src/plugins/contracts/runtime.contract.test.ts
 ```
 
-## Application des règles de lint (plugins du dépôt)
+## Application des règles de lint (plugins dans le dépôt)
 
-Trois règles sont appliquées par `pnpm check` pour les plugins du dépôt :
+Trois règles sont appliquées par `pnpm check` pour les plugins dans le dépôt :
 
-1. **Pas d’imports racine monolithiques** -- le barrel racine `openclaw/plugin-sdk` est rejeté
-2. **Pas d’imports directs depuis `src/`** -- les plugins ne peuvent pas importer `../../src/` directement
-3. **Pas d’auto-imports** -- les plugins ne peuvent pas importer leur propre sous-chemin `plugin-sdk/<name>`
+1. **Pas d’imports racine monolithiques** — le barrel racine `openclaw/plugin-sdk` est rejeté
+2. **Pas d’imports directs de `src/`** — les plugins ne peuvent pas importer directement `../../src/`
+3. **Pas d’auto-imports** — les plugins ne peuvent pas importer leur propre sous-chemin `plugin-sdk/<name>`
 
-Les plugins externes ne sont pas soumis à ces règles de lint, mais il est recommandé de suivre les mêmes
-modèles.
+Les plugins externes ne sont pas soumis à ces règles de lint, mais il est recommandé
+de suivre les mêmes schémas.
 
 ## Configuration des tests
 
-OpenClaw utilise Vitest avec des seuils de couverture V8. Pour les tests de plugins :
+OpenClaw utilise Vitest avec des seuils de couverture V8. Pour les tests de plugin :
 
 ```bash
 # Run all tests
@@ -265,9 +265,9 @@ Si les exécutions locales provoquent une pression mémoire :
 OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
 ```
 
-## Voir aussi
+## Associé
 
-- [Vue d’ensemble du SDK](/fr/plugins/sdk-overview) -- conventions d’importation
-- [SDK Channel Plugins](/fr/plugins/sdk-channel-plugins) -- interface de Plugin de canal
-- [SDK Provider Plugins](/fr/plugins/sdk-provider-plugins) -- hooks de Plugin de fournisseur
-- [Création de plugins](/fr/plugins/building-plugins) -- guide de démarrage
+- [Vue d’ensemble du SDK](/fr/plugins/sdk-overview) -- conventions d’import
+- [Plugins de canal du SDK](/fr/plugins/sdk-channel-plugins) -- interface de plugin de canal
+- [Plugins de fournisseur du SDK](/fr/plugins/sdk-provider-plugins) -- hooks de plugin de fournisseur
+- [Créer des plugins](/fr/plugins/building-plugins) -- guide de démarrage

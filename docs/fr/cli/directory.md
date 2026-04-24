@@ -1,33 +1,33 @@
 ---
 read_when:
-    - Vous voulez rechercher les identifiants de contacts/groupes/de soi-même pour un canal
-    - Vous développez un adaptateur de répertoire de canal
-summary: Référence CLI pour `openclaw directory` (soi-même, pairs, groupes)
-title: directory
+    - Vous voulez rechercher des contacts/groupes/ID de soi pour un canal
+    - Vous développez un adaptateur d’annuaire de canal
+summary: Référence CLI pour `openclaw directory` (soi, pairs, groupes)
+title: Annuaire
 x-i18n:
-    generated_at: "2026-04-05T12:37:50Z"
+    generated_at: "2026-04-24T07:04:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6a81a037e0a33f77c24b1adabbc4be16ed4d03c419873f3cbdd63f2ce84a1064
+    source_hash: f63ed92469738501ae1f8f08aec3edf01d1f0f46008571ed38ccd9c77e5ba15e
     source_path: cli/directory.md
     workflow: 15
 ---
 
 # `openclaw directory`
 
-Recherches dans le répertoire pour les canaux qui le prennent en charge (contacts/pairs, groupes et « moi »).
+Recherches d’annuaire pour les canaux qui les prennent en charge (contacts/pairs, groupes et « moi »).
 
-## Drapeaux courants
+## Indicateurs courants
 
 - `--channel <name>` : ID/alias du canal (requis lorsque plusieurs canaux sont configurés ; automatique lorsqu’un seul canal est configuré)
-- `--account <id>` : ID du compte (par défaut : valeur par défaut du canal)
+- `--account <id>` : ID de compte (par défaut : compte par défaut du canal)
 - `--json` : sortie JSON
 
 ## Remarques
 
 - `directory` est destiné à vous aider à trouver des ID que vous pouvez coller dans d’autres commandes (en particulier `openclaw message send --target ...`).
-- Pour de nombreux canaux, les résultats s’appuient sur la configuration (listes d’autorisation / groupes configurés) plutôt que sur un répertoire actif du fournisseur.
-- La sortie par défaut est `id` (et parfois `name`) séparée par une tabulation ; utilisez `--json` pour les scripts.
+- Pour de nombreux canaux, les résultats sont adossés à la configuration (listes blanches / groupes configurés) plutôt qu’à un annuaire de fournisseur en direct.
+- La sortie par défaut est `id` (et parfois `name`) séparés par une tabulation ; utilisez `--json` pour les scripts.
 
 ## Utiliser les résultats avec `message send`
 
@@ -42,10 +42,10 @@ openclaw message send --channel slack --target user:U012ABCDEF --message "hello"
 - Telegram : `@username` ou ID de chat numérique ; les groupes sont des ID numériques
 - Slack : `user:U…` et `channel:C…`
 - Discord : `user:<id>` et `channel:<id>`
-- Matrix (plugin) : `user:@user:server`, `room:!roomId:server` ou `#alias:server`
-- Microsoft Teams (plugin) : `user:<id>` et `conversation:<id>`
-- Zalo (plugin) : ID utilisateur (Bot API)
-- Zalo Personal / `zalouser` (plugin) : ID de fil (DM/groupe) depuis `zca` (`me`, `friend list`, `group list`)
+- Matrix (Plugin) : `user:@user:server`, `room:!roomId:server` ou `#alias:server`
+- Microsoft Teams (Plugin) : `user:<id>` et `conversation:<id>`
+- Zalo (Plugin) : ID utilisateur (Bot API)
+- Zalo Personal / `zalouser` (Plugin) : ID de fil (DM/groupe) depuis `zca` (`me`, `friend list`, `group list`)
 
 ## Soi-même ("me")
 
@@ -68,3 +68,7 @@ openclaw directory groups list --channel zalouser
 openclaw directory groups list --channel zalouser --query "work"
 openclaw directory groups members --channel zalouser --group-id <id>
 ```
+
+## Lié
+
+- [Référence CLI](/fr/cli)

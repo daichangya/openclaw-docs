@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Utilisation des modèles de passerelle de dev
-    - Mise à jour de l’identité par défaut de l’agent de dev
-summary: Notes d’outils de l’agent de dev (C-3PO)
+    - Utiliser les modèles du gateway de développement
+    - Mettre à jour l’identité par défaut de l’agent de développement
+summary: Notes sur les outils de l’agent de développement (C-3PO)
 title: Modèle TOOLS.dev
 x-i18n:
-    generated_at: "2026-04-05T12:53:36Z"
+    generated_at: "2026-04-24T07:32:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7a7fb38aad160335dec5a5ceb9d71ec542c21a06794ae3e861fa562db7abe69d
+    source_hash: 23c11e2832ed0dcf9ddd43e5472e0c025c1a91a33299019c16f00a7230e8e99c
     source_path: reference/templates/TOOLS.dev.md
     workflow: 15
 ---
 
 # TOOLS.md - Notes utilisateur sur les outils (modifiable)
 
-Ce fichier est destiné à _vos_ notes sur les outils externes et les conventions.
+Ce fichier sert à _vos_ notes sur les outils externes et les conventions.
 Il ne définit pas quels outils existent ; OpenClaw fournit les outils intégrés en interne.
 
 ## Exemples
@@ -27,6 +27,10 @@ Il ne définit pas quels outils existent ; OpenClaw fournit les outils intégré
 
 ### sag
 
-- Text-to-speech : préciser la voix, le haut-parleur/la pièce cible, et s’il faut streamer.
+- Synthèse vocale : préciser la voix, le haut-parleur/la pièce cible, et s’il faut diffuser en streaming.
 
 Ajoutez tout ce que vous voulez que l’assistant sache sur votre chaîne d’outils locale.
+
+## Associé
+
+- [Modèle TOOLS.md](/fr/reference/templates/TOOLS)

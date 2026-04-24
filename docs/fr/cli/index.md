@@ -2,29 +2,27 @@
 read_when:
     - Trouver la bonne sous-commande `openclaw`
     - Rechercher les indicateurs globaux ou les règles de style de sortie
-summary: 'Index de la CLI OpenClaw : liste des commandes, indicateurs globaux et liens vers les pages de chaque commande'
-title: Référence de la CLI
+summary: 'Index du CLI OpenClaw : liste des commandes, indicateurs globaux et liens vers les pages par commande'
+title: Référence CLI
 x-i18n:
-    generated_at: "2026-04-23T13:58:26Z"
+    generated_at: "2026-04-24T07:04:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9ccf909596d6d4936fadecfa3a98d7bc24fd18d6ec828ec91bd524019565c54b
+    source_hash: 9fec51767cf6c2a0abeb684f00877371dae3ac05ed864eff03a581976e90c1ce
     source_path: cli/index.md
     workflow: 15
 ---
 
-# Référence de la CLI
-
-`openclaw` est le point d’entrée principal de la CLI. Chaque commande principale a soit une
-page de référence dédiée, soit est documentée avec la commande dont elle est un alias ; cet
-index liste les commandes, les indicateurs globaux et les règles de style de sortie qui
-s’appliquent à l’ensemble de la CLI.
+`openclaw` est le point d’entrée principal du CLI. Chaque commande centrale dispose soit d’une
+page de référence dédiée, soit est documentée avec la commande dont elle est l’alias ; cet
+index répertorie les commandes, les indicateurs globaux et les règles de style de sortie qui
+s’appliquent dans l’ensemble du CLI.
 
 ## Pages de commande
 
 | Domaine              | Commandes                                                                                                                                                                                                                 |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Configuration et onboarding | [`setup`](/fr/cli/setup) · [`onboard`](/fr/cli/onboard) · [`configure`](/fr/cli/configure) · [`config`](/fr/cli/config) · [`completion`](/fr/cli/completion) · [`doctor`](/fr/cli/doctor) · [`dashboard`](/fr/cli/dashboard)                   |
+| Configuration et prise en main | [`setup`](/fr/cli/setup) · [`onboard`](/fr/cli/onboard) · [`configure`](/fr/cli/configure) · [`config`](/fr/cli/config) · [`completion`](/fr/cli/completion) · [`doctor`](/fr/cli/doctor) · [`dashboard`](/fr/cli/dashboard)                   |
 | Réinitialisation et désinstallation | [`backup`](/fr/cli/backup) · [`reset`](/fr/cli/reset) · [`uninstall`](/fr/cli/uninstall) · [`update`](/fr/cli/update)                                                                                                                 |
 | Messagerie et agents | [`message`](/fr/cli/message) · [`agent`](/fr/cli/agent) · [`agents`](/fr/cli/agents) · [`acp`](/fr/cli/acp) · [`mcp`](/fr/cli/mcp)                                                                                                       |
 | Santé et sessions    | [`status`](/fr/cli/status) · [`health`](/fr/cli/health) · [`sessions`](/fr/cli/sessions)                                                                                                                                           |
@@ -33,30 +31,30 @@ s’appliquent à l’ensemble de la CLI.
 | Réseau et nœuds      | [`directory`](/fr/cli/directory) · [`nodes`](/fr/cli/nodes) · [`devices`](/fr/cli/devices) · [`node`](/fr/cli/node)                                                                                                                   |
 | Exécution et sandbox | [`approvals`](/fr/cli/approvals) · `exec-policy` (voir [`approvals`](/fr/cli/approvals)) · [`sandbox`](/fr/cli/sandbox) · [`tui`](/fr/cli/tui) · `chat`/`terminal` (alias de [`tui --local`](/fr/cli/tui)) · [`browser`](/fr/cli/browser) |
 | Automatisation       | [`cron`](/fr/cli/cron) · [`tasks`](/fr/cli/tasks) · [`hooks`](/fr/cli/hooks) · [`webhooks`](/fr/cli/webhooks)                                                                                                                         |
-| Découverte et documentation | [`dns`](/fr/cli/dns) · [`docs`](/fr/cli/docs)                                                                                                                                                                                   |
-| Appairage et canaux  | [`pairing`](/fr/cli/pairing) · [`qr`](/fr/cli/qr) · [`channels`](/fr/cli/channels)                                                                                                                                                 |
+| Découverte et docs   | [`dns`](/fr/cli/dns) · [`docs`](/fr/cli/docs)                                                                                                                                                                                   |
+| Association et canaux | [`pairing`](/fr/cli/pairing) · [`qr`](/fr/cli/qr) · [`channels`](/fr/cli/channels)                                                                                                                                                 |
 | Sécurité et plugins  | [`security`](/fr/cli/security) · [`secrets`](/fr/cli/secrets) · [`skills`](/fr/cli/skills) · [`plugins`](/fr/cli/plugins) · [`proxy`](/fr/cli/proxy)                                                                                     |
-| Alias hérités        | [`daemon`](/fr/cli/daemon) (service Gateway) · [`clawbot`](/fr/cli/clawbot) (espace de noms)                                                                                                                                         |
+| Alias hérités        | [`daemon`](/fr/cli/daemon) (service gateway) · [`clawbot`](/fr/cli/clawbot) (espace de noms)                                                                                                                                         |
 | Plugins (facultatif) | [`voicecall`](/fr/cli/voicecall) (si installé)                                                                                                                                                                              |
 
 ## Indicateurs globaux
 
-| Indicateur               | Utilité                                                              |
-| ------------------------ | -------------------------------------------------------------------- |
-| `--dev`                  | Isole l’état sous `~/.openclaw-dev` et décale les ports par défaut   |
-| `--profile <name>`       | Isole l’état sous `~/.openclaw-<name>`                               |
-| `--container <name>`     | Cible un conteneur nommé pour l’exécution                            |
-| `--no-color`             | Désactive les couleurs ANSI (`NO_COLOR=1` est également pris en charge) |
-| `--update`               | Raccourci pour [`openclaw update`](/fr/cli/update) (installations source uniquement) |
-| `-V`, `--version`, `-v`  | Affiche la version et quitte                                         |
+| Indicateur              | Utilité                                                                |
+| ----------------------- | ---------------------------------------------------------------------- |
+| `--dev`                 | Isole l’état sous `~/.openclaw-dev` et décale les ports par défaut     |
+| `--profile <name>`      | Isole l’état sous `~/.openclaw-<name>`                                 |
+| `--container <name>`    | Cible un conteneur nommé pour l’exécution                              |
+| `--no-color`            | Désactive les couleurs ANSI (`NO_COLOR=1` est aussi respecté)          |
+| `--update`              | Raccourci pour [`openclaw update`](/fr/cli/update) (installations source uniquement) |
+| `-V`, `--version`, `-v` | Affiche la version puis quitte                                         |
 
 ## Modes de sortie
 
-- Les couleurs ANSI et les indicateurs de progression s’affichent uniquement dans les sessions TTY.
-- Les hyperliens OSC-8 s’affichent comme liens cliquables lorsqu’ils sont pris en charge ; sinon, la
-  CLI revient à des URL en clair.
+- Les couleurs ANSI et les indicateurs de progression ne sont rendus que dans les sessions TTY.
+- Les hyperliens OSC-8 sont rendus sous forme de liens cliquables lorsqu’ils sont pris en charge ; sinon, le
+  CLI revient à des URL en texte brut.
 - `--json` (et `--plain` lorsqu’il est pris en charge) désactive le style pour une sortie propre.
-- Les commandes de longue durée affichent un indicateur de progression (OSC 9;4 lorsqu’il est pris en charge).
+- Les commandes longues affichent un indicateur de progression (OSC 9;4 lorsqu’il est pris en charge).
 
 Source de vérité de la palette : `src/terminal/palette.ts`.
 
@@ -355,32 +353,32 @@ openclaw [--dev] [--profile <name>] <command>
   terminal (alias: tui --local)
 ```
 
-Les plugins peuvent ajouter des commandes de niveau supérieur supplémentaires (par exemple `openclaw voicecall`).
+Les Plugins peuvent ajouter des commandes supplémentaires au niveau supérieur (par exemple `openclaw voicecall`).
 
 </Accordion>
 
-## Commandes slash du chat
+## Commandes slash de chat
 
 Les messages de chat prennent en charge les commandes `/...`. Voir [commandes slash](/fr/tools/slash-commands).
 
-Points clés :
+Points forts :
 
 - `/status` — diagnostics rapides.
-- `/trace` — lignes de trace/débogage de plugin limitées à la session.
+- `/trace` — lignes de trace/débogage de Plugin limitées à la session.
 - `/config` — modifications de configuration persistées.
-- `/debug` — remplacements de configuration uniquement à l’exécution (en mémoire, pas sur disque ; nécessite `commands.debug: true`).
+- `/debug` — remplacements de configuration à l’exécution uniquement (mémoire, pas disque ; nécessite `commands.debug: true`).
 
-## Suivi de l’utilisation
+## Suivi d’utilisation
 
-`openclaw status --usage` et la surface de l’interface de contrôle affichent l’utilisation/le quota des fournisseurs lorsque
-les identifiants OAuth/API sont disponibles. Les données proviennent directement des points de terminaison d’utilisation des fournisseurs
-et sont normalisées en `X% left`. Les fournisseurs avec fenêtres d’utilisation
-actuelles : Anthropic, GitHub Copilot, Gemini CLI, OpenAI Codex, MiniMax,
+`openclaw status --usage` et l’interface de contrôle affichent l’utilisation/le quota du provider lorsque
+des identifiants OAuth/API sont disponibles. Les données proviennent directement des points de terminaison
+d’utilisation des providers et sont normalisées en `X% restants`. Providers avec fenêtres
+d’utilisation actuelles : Anthropic, GitHub Copilot, Gemini CLI, OpenAI Codex, MiniMax,
 Xiaomi et z.ai.
 
-Voir [Suivi de l’utilisation](/fr/concepts/usage-tracking) pour plus de détails.
+Voir [Suivi d’utilisation](/fr/concepts/usage-tracking) pour plus de détails.
 
-## Associé
+## Lié
 
 - [Commandes slash](/fr/tools/slash-commands)
 - [Configuration](/fr/gateway/configuration)

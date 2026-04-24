@@ -1,53 +1,54 @@
 ---
 read_when:
-    - Modifier le runtime d’agent, le bootstrap du workspace ou le comportement des sessions
-summary: Runtime d’agent, contrat de workspace et bootstrap de session
-title: Runtime d’agent
+    - Modification du runtime de l’agent, de l’initialisation de l’espace de travail ou du comportement de session
+summary: Runtime de l’agent, contrat d’espace de travail et initialisation de session
+title: Runtime de l’agent
 x-i18n:
-    generated_at: "2026-04-05T12:39:29Z"
+    generated_at: "2026-04-24T07:06:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e2ff39f4114f009e5b1f86894ea4bb29b1c9512563b70d063f09ca7cde5e8948
+    source_hash: 07fe0ca3c6bc306f95ac024b97b4e6e188c2d30786b936b8bd66a5f3ec012d4e
     source_path: concepts/agent.md
     workflow: 15
 ---
 
-# Runtime d’agent
+OpenClaw exécute un **unique runtime d’agent embarqué** — un processus d’agent par
+Gateway, avec son propre espace de travail, ses fichiers d’initialisation et son stockage de sessions. Cette page
+couvre ce contrat de runtime : ce que l’espace de travail doit contenir, quels fichiers sont injectés
+et comment les sessions s’initialisent à partir de celui-ci.
 
-OpenClaw exécute un unique runtime d’agent embarqué.
+## Espace de travail (requis)
 
-## Workspace (requis)
+OpenClaw utilise un unique répertoire d’espace de travail d’agent (`agents.defaults.workspace`) comme **seul** répertoire de travail (`cwd`) de l’agent pour les outils et le contexte.
 
-OpenClaw utilise un unique répertoire de workspace d’agent (`agents.defaults.workspace`) comme **seul** répertoire de travail (`cwd`) de l’agent pour les outils et le contexte.
+Recommandation : utilisez `openclaw setup` pour créer `~/.openclaw/openclaw.json` s’il est manquant et initialiser les fichiers de l’espace de travail.
 
-Recommandé : utilisez `openclaw setup` pour créer `~/.openclaw/openclaw.json` s’il manque et initialiser les fichiers du workspace.
+Guide complet de la structure de l’espace de travail + sauvegarde : [Espace de travail de l’agent](/fr/concepts/agent-workspace)
 
-Guide complet de disposition du workspace + sauvegarde : [Agent workspace](/concepts/agent-workspace)
+Si `agents.defaults.sandbox` est activé, les sessions non principales peuvent remplacer cela avec
+des espaces de travail par session sous `agents.defaults.sandbox.workspaceRoot` (voir
+[Configuration du Gateway](/fr/gateway/configuration)).
 
-Si `agents.defaults.sandbox` est activé, les sessions non principales peuvent surcharger cela avec
-des workspaces par session sous `agents.defaults.sandbox.workspaceRoot` (voir
-[Gateway configuration](/gateway/configuration)).
+## Fichiers d’initialisation (injectés)
 
-## Fichiers bootstrap (injectés)
-
-À l’intérieur de `agents.defaults.workspace`, OpenClaw attend ces fichiers modifiables par l’utilisateur :
+Dans `agents.defaults.workspace`, OpenClaw attend ces fichiers modifiables par l’utilisateur :
 
 - `AGENTS.md` — instructions de fonctionnement + « mémoire »
 - `SOUL.md` — persona, limites, ton
-- `TOOLS.md` — notes sur les outils maintenues par l’utilisateur (par ex. `imsg`, `sag`, conventions)
-- `BOOTSTRAP.md` — rituel unique de première exécution (supprimé une fois terminé)
-- `IDENTITY.md` — nom/ambiance/emoji de l’agent
-- `USER.md` — profil utilisateur + forme d’adresse préférée
+- `TOOLS.md` — notes d’outils maintenues par l’utilisateur (par ex. `imsg`, `sag`, conventions)
+- `BOOTSTRAP.md` — rituel unique de première exécution (supprimé après exécution)
+- `IDENTITY.md` — nom/style/emoji de l’agent
+- `USER.md` — profil utilisateur + mode d’adresse préféré
 
 Au premier tour d’une nouvelle session, OpenClaw injecte directement le contenu de ces fichiers dans le contexte de l’agent.
 
-Les fichiers vides sont ignorés. Les gros fichiers sont rognés et tronqués avec un marqueur afin que les prompts restent légers (lisez le fichier pour obtenir le contenu complet).
+Les fichiers vides sont ignorés. Les gros fichiers sont rognés et tronqués avec un marqueur afin que les prompts restent légers (lisez le fichier pour le contenu complet).
 
-Si un fichier est manquant, OpenClaw injecte une seule ligne de marqueur « fichier manquant » (et `openclaw setup` créera un modèle par défaut sûr).
+Si un fichier est manquant, OpenClaw injecte une seule ligne marqueur « fichier manquant » (et `openclaw setup` créera un modèle par défaut sûr).
 
-`BOOTSTRAP.md` n’est créé que pour un **workspace tout neuf** (aucun autre fichier bootstrap présent). Si vous le supprimez après avoir terminé le rituel, il ne doit pas être recréé lors des redémarrages ultérieurs.
+`BOOTSTRAP.md` n’est créé que pour un **tout nouvel espace de travail** (aucun autre fichier d’initialisation présent). Si vous le supprimez après avoir terminé le rituel, il ne doit pas être recréé lors des redémarrages ultérieurs.
 
-Pour désactiver complètement la création des fichiers bootstrap (pour les workspaces préremplis), définissez :
+Pour désactiver complètement la création des fichiers d’initialisation (pour les espaces de travail préremplis), définissez :
 
 ```json5
 { agent: { skipBootstrap: true } }
@@ -55,33 +56,33 @@ Pour désactiver complètement la création des fichiers bootstrap (pour les wor
 
 ## Outils intégrés
 
-Les outils cœur (read/exec/edit/write et outils système associés) sont toujours disponibles,
-sous réserve de la politique des outils. `apply_patch` est facultatif et contrôlé par
-`tools.exec.applyPatch`. `TOOLS.md` ne contrôle **pas** quels outils existent ; c’est
-un guide sur la façon dont _vous_ voulez qu’ils soient utilisés.
+Les outils de base (read/exec/edit/write et outils système associés) sont toujours disponibles,
+sous réserve de la politique d’outils. `apply_patch` est facultatif et contrôlé par
+`tools.exec.applyPatch`. `TOOLS.md` ne contrôle **pas** les outils qui existent ; il sert
+de guide sur la manière dont _vous_ souhaitez qu’ils soient utilisés.
 
 ## Skills
 
-OpenClaw charge les Skills depuis ces emplacements (priorité la plus élevée d’abord) :
+OpenClaw charge les Skills à partir de ces emplacements (priorité la plus élevée en premier) :
 
-- Workspace : `<workspace>/skills`
+- Espace de travail : `<workspace>/skills`
 - Skills d’agent du projet : `<workspace>/.agents/skills`
 - Skills d’agent personnels : `~/.agents/skills`
-- Gérés/locaux : `~/.openclaw/skills`
-- Intégrés (fournis avec l’installation)
+- Géré/local : `~/.openclaw/skills`
+- Intégré (livré avec l’installation)
 - Dossiers de Skills supplémentaires : `skills.load.extraDirs`
 
-Les Skills peuvent être contrôlées par config/env (voir `skills` dans [Gateway configuration](/gateway/configuration)).
+Les Skills peuvent être contrôlés par configuration/env (voir `skills` dans [Configuration du Gateway](/fr/gateway/configuration)).
 
-## Limites du runtime
+## Frontières du runtime
 
-Le runtime d’agent embarqué est construit sur le cœur d’agent Pi (modèles, outils et
-pipeline de prompt). La gestion des sessions, la découverte, le câblage des outils et la
-remise par canal sont des couches gérées par OpenClaw au-dessus de ce cœur.
+Le runtime d’agent embarqué repose sur le cœur d’agent Pi (modèles, outils et
+pipeline de prompts). La gestion de session, la découverte, le câblage des outils et la
+livraison par canal sont des couches appartenant à OpenClaw au-dessus de ce cœur.
 
 ## Sessions
 
-Les transcriptions de session sont stockées en JSONL à l’emplacement suivant :
+Les transcripts de session sont stockés en JSONL à l’emplacement suivant :
 
 - `~/.openclaw/agents/<agentId>/sessions/<SessionId>.jsonl`
 
@@ -91,35 +92,37 @@ Les anciens dossiers de session provenant d’autres outils ne sont pas lus.
 ## Pilotage pendant le streaming
 
 Lorsque le mode de file d’attente est `steer`, les messages entrants sont injectés dans l’exécution en cours.
-Le pilotage mis en file d’attente est remis **après la fin de l’exécution
-des appels d’outils du tour assistant en cours**, avant le prochain appel LLM. Le pilotage ne saute plus
-les appels d’outils restants du message assistant en cours ; il injecte le message mis en file d’attente à la prochaine frontière du modèle à la place.
+Le pilotage mis en file d’attente est livré **après que le tour actuel de l’assistant a terminé
+d’exécuter ses appels d’outils**, avant le prochain appel au LLM. Le pilotage ne saute plus les
+appels d’outils restants du message actuel de l’assistant ; il injecte le message mis en file d’attente à la prochaine frontière de modèle.
 
 Lorsque le mode de file d’attente est `followup` ou `collect`, les messages entrants sont conservés jusqu’à la
-fin du tour en cours, puis un nouveau tour d’agent démarre avec les charges utiles mises en file d’attente. Voir
-[Queue](/concepts/queue) pour le comportement des modes + debounce/cap.
+fin du tour actuel, puis un nouveau tour d’agent démarre avec les charges utiles mises en file d’attente. Voir
+[Queue](/fr/concepts/queue) pour le comportement des modes + debounce/limite.
 
-Le streaming par blocs envoie les blocs assistant terminés dès qu’ils sont finis ; il est
+Le streaming par blocs envoie les blocs d’assistant terminés dès qu’ils sont prêts ; il est
 **désactivé par défaut** (`agents.defaults.blockStreamingDefault: "off"`).
-Ajustez la frontière via `agents.defaults.blockStreamingBreak` (`text_end` vs `message_end` ; par défaut `text_end`).
+Ajustez la frontière via `agents.defaults.blockStreamingBreak` (`text_end` vs `message_end` ; valeur par défaut : text_end).
 Contrôlez le découpage souple des blocs avec `agents.defaults.blockStreamingChunk` (par défaut
-800–1200 caractères ; privilégie les sauts de paragraphe, puis les nouvelles lignes ; les phrases en dernier).
-Fusionnez les segments streamés avec `agents.defaults.blockStreamingCoalesce` pour réduire le
-spam de lignes uniques (fusion basée sur l’inactivité avant l’envoi). Les canaux hors Telegram exigent
+800–1200 caractères ; privilégie les sauts de paragraphe, puis les retours à la ligne ; les phrases en dernier).
+Fusionnez les morceaux diffusés avec `agents.defaults.blockStreamingCoalesce` pour réduire le
+spam sur une seule ligne (fusion basée sur l’inactivité avant envoi). Les canaux autres que Telegram nécessitent
 `*.blockStreaming: true` explicite pour activer les réponses par blocs.
-Les résumés détaillés des outils sont émis au démarrage des outils (sans debounce) ; l’interface Control
-streame la sortie des outils via les événements d’agent lorsque disponible.
-Plus de détails : [Streaming + chunking](/concepts/streaming).
+Les résumés détaillés d’outils sont émis au démarrage des outils (sans debounce) ; l’interface de contrôle
+diffuse la sortie des outils via les événements de l’agent lorsqu’ils sont disponibles.
+Plus de détails : [Streaming + découpage](/fr/concepts/streaming).
 
-## Références de modèle
+## Références de modèles
 
-Les références de modèle dans la configuration (par exemple `agents.defaults.model` et `agents.defaults.models`) sont analysées en les divisant sur le **premier** `/`.
+Les références de modèles dans la configuration (par exemple `agents.defaults.model` et `agents.defaults.models`) sont analysées en les divisant sur le **premier** `/`.
 
 - Utilisez `provider/model` lors de la configuration des modèles.
 - Si l’ID du modèle lui-même contient `/` (style OpenRouter), incluez le préfixe du fournisseur (exemple : `openrouter/moonshotai/kimi-k2`).
 - Si vous omettez le fournisseur, OpenClaw essaie d’abord un alias, puis une
-  correspondance unique de fournisseur configuré pour cet ID de modèle exact, et ce n’est qu’ensuite qu’il se replie sur le fournisseur par défaut configuré. Si ce fournisseur n’expose plus le
-  modèle par défaut configuré, OpenClaw se replie sur le premier couple fournisseur/modèle configuré au lieu de signaler un ancien défaut de fournisseur supprimé.
+  correspondance unique de fournisseur configuré pour cet ID de modèle exact, et ensuite seulement revient
+  au fournisseur par défaut configuré. Si ce fournisseur n’expose plus le
+  modèle par défaut configuré, OpenClaw revient au premier couple
+  fournisseur/modèle configuré au lieu d’afficher une ancienne valeur par défaut de fournisseur supprimé.
 
 ## Configuration (minimale)
 
@@ -130,4 +133,10 @@ Au minimum, définissez :
 
 ---
 
-_Suivant : [Group Chats](/channels/group-messages)_ 🦞
+_Suivant : [Discussions de groupe](/fr/channels/group-messages)_ 🦞
+
+## Associé
+
+- [Espace de travail de l’agent](/fr/concepts/agent-workspace)
+- [Routage multi-agent](/fr/concepts/multi-agent)
+- [Gestion de session](/fr/concepts/session)

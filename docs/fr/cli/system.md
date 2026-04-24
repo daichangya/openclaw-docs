@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Vous voulez mettre en file d’attente un événement système sans créer de tâche cron
-    - Vous devez activer ou désactiver les heartbeats
-    - Vous voulez inspecter les entrées de présence système
-summary: Référence CLI pour `openclaw system` (événements système, heartbeat, présence)
-title: system
+    - Vous souhaitez mettre en file d’attente un événement système sans créer de tâche Cron
+    - Vous devez activer ou désactiver les Heartbeats
+    - Vous souhaitez inspecter les entrées de présence système
+summary: Référence CLI pour `openclaw system` (événements système, Heartbeat, présence)
+title: Système
 x-i18n:
-    generated_at: "2026-04-05T12:39:05Z"
+    generated_at: "2026-04-24T07:05:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a7d19afde9d9cde8a79b0bb8cec6e5673466f4cb9b575fb40111fc32f4eee5d7
+    source_hash: 0f4be30b0b2d18ee5653071d6375cebeb9fc94733e30bdb7b89a19c286df880b
     source_path: cli/system.md
     workflow: 15
 ---
 
 # `openclaw system`
 
-Assistants de niveau système pour la Gateway : mettre en file d’attente des événements système, contrôler les heartbeats
-et afficher la présence.
+Assistants au niveau système pour le Gateway : mise en file d’attente d’événements système, contrôle des Heartbeats,
+et affichage de la présence.
 
-Toutes les sous-commandes `system` utilisent la RPC Gateway et acceptent les drapeaux client partagés :
+Toutes les sous-commandes `system` utilisent le RPC Gateway et acceptent les options client partagées :
 
 - `--url <url>`
 - `--token <token>`
@@ -38,41 +38,45 @@ openclaw system presence
 
 ## `system event`
 
-Met en file d’attente un événement système sur la session **main**. Le prochain heartbeat l’injectera
-comme ligne `System:` dans le prompt. Utilisez `--mode now` pour déclencher le heartbeat
-immédiatement ; `next-heartbeat` attend le prochain tick planifié.
+Mettre en file d’attente un événement système sur la session **principale**. Le prochain Heartbeat l’injectera
+comme ligne `System:` dans le prompt. Utilisez `--mode now` pour déclencher le Heartbeat
+immédiatement ; `next-heartbeat` attend le prochain tick planifié.
 
-Drapeaux :
+Options :
 
-- `--text <text>` : texte d’événement système requis.
-- `--mode <mode>` : `now` ou `next-heartbeat` (par défaut).
-- `--json` : sortie lisible par machine.
-- `--url`, `--token`, `--timeout`, `--expect-final` : drapeaux RPC Gateway partagés.
+- `--text <text>` : texte de l’événement système requis.
+- `--mode <mode>` : `now` ou `next-heartbeat` (par défaut).
+- `--json` : sortie lisible par machine.
+- `--url`, `--token`, `--timeout`, `--expect-final` : options RPC Gateway partagées.
 
 ## `system heartbeat last|enable|disable`
 
-Contrôles du heartbeat :
+Contrôles du Heartbeat :
 
-- `last` : afficher le dernier événement de heartbeat.
-- `enable` : réactiver les heartbeats (utilisez ceci s’ils ont été désactivés).
-- `disable` : suspendre les heartbeats.
+- `last` : afficher le dernier événement Heartbeat.
+- `enable` : réactiver les Heartbeats (utilisez ceci s’ils ont été désactivés).
+- `disable` : mettre les Heartbeats en pause.
 
-Drapeaux :
+Options :
 
-- `--json` : sortie lisible par machine.
-- `--url`, `--token`, `--timeout`, `--expect-final` : drapeaux RPC Gateway partagés.
+- `--json` : sortie lisible par machine.
+- `--url`, `--token`, `--timeout`, `--expect-final` : options RPC Gateway partagées.
 
 ## `system presence`
 
-Lister les entrées de présence système actuelles que la Gateway connaît (nodes,
+Lister les entrées de présence système actuelles connues du Gateway (Node,
 instances et lignes d’état similaires).
 
-Drapeaux :
+Options :
 
-- `--json` : sortie lisible par machine.
-- `--url`, `--token`, `--timeout`, `--expect-final` : drapeaux RPC Gateway partagés.
+- `--json` : sortie lisible par machine.
+- `--url`, `--token`, `--timeout`, `--expect-final` : options RPC Gateway partagées.
 
 ## Remarques
 
-- Nécessite une Gateway en cours d’exécution, joignable via votre configuration actuelle (locale ou distante).
-- Les événements système sont éphémères et ne sont pas conservés après un redémarrage.
+- Nécessite un Gateway en cours d’exécution, accessible via votre configuration actuelle (locale ou distante).
+- Les événements système sont éphémères et ne sont pas conservés après redémarrage.
+
+## Lié
+
+- [Référence CLI](/fr/cli)

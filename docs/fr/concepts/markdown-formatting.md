@@ -1,45 +1,43 @@
 ---
 read_when:
     - Vous modifiez le formatage Markdown ou le découpage pour les canaux sortants
-    - Vous ajoutez un nouveau formateur de canal ou un nouveau mappage de style
-    - Vous déboguez des régressions de formatage entre les canaux
+    - Vous ajoutez un nouveau formateur de canal ou un nouveau mapping de style
+    - Vous déboguez des régressions de formatage entre canaux
 summary: Pipeline de formatage Markdown pour les canaux sortants
 title: Formatage Markdown
 x-i18n:
-    generated_at: "2026-04-05T12:39:51Z"
+    generated_at: "2026-04-24T07:06:47Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f3794674e30e265208d14a986ba9bdc4ba52e0cb69c446094f95ca6c674e4566
+    source_hash: cf052e11fe9fd075a4337ffa555391c7003a346240b57bb65054c3f08401dfd9
     source_path: concepts/markdown-formatting.md
     workflow: 15
 ---
 
-# Formatage Markdown
-
-OpenClaw formate le Markdown sortant en le convertissant vers une représentation intermédiaire partagée
-(IR) avant de produire la sortie spécifique au canal. L’IR conserve le
-texte source intact tout en transportant les plages de style/lien, afin que le
-découpage et le rendu restent cohérents entre les canaux.
+OpenClaw formate le Markdown sortant en le convertissant dans une représentation
+intermédiaire (IR) partagée avant de générer une sortie spécifique au canal. L’IR conserve le
+texte source intact tout en transportant les plages de style/liens, afin que le découpage et le rendu restent
+cohérents entre les canaux.
 
 ## Objectifs
 
 - **Cohérence :** une étape d’analyse, plusieurs moteurs de rendu.
-- **Découpage sûr :** découper le texte avant le rendu afin que le formatage inline ne
-  se rompe jamais entre les fragments.
-- **Adaptation au canal :** mapper le même IR vers Slack mrkdwn, Telegram HTML et les
+- **Découpage sûr :** diviser le texte avant le rendu pour que le formatage en ligne ne
+  soit jamais cassé entre les segments.
+- **Adaptation au canal :** mapper la même IR vers le mrkdwn Slack, le HTML Telegram et les
   plages de style Signal sans réanalyser le Markdown.
 
 ## Pipeline
 
 1. **Analyser le Markdown -> IR**
-   - L’IR est constitué de texte brut plus des plages de style (gras/italique/barré/code/spoiler) et des plages de lien.
-   - Les offsets sont en unités de code UTF-16 afin que les plages de style Signal s’alignent avec son API.
-   - Les tableaux ne sont analysés que lorsqu’un canal active explicitement la conversion de tableaux.
+   - L’IR est du texte brut plus des plages de style (gras/italique/barré/code/spoiler) et des plages de liens.
+   - Les offsets sont en unités de code UTF-16 afin que les plages de style Signal soient alignées avec son API.
+   - Les tableaux ne sont analysés que lorsqu’un canal active la conversion des tableaux.
 2. **Découper l’IR (format d’abord)**
-   - Le découpage s’effectue sur le texte IR avant le rendu.
-   - Le formatage inline ne se coupe pas entre les fragments ; les plages sont découpées par fragment.
-3. **Rendu par canal**
-   - **Slack :** jetons mrkdwn (gras/italique/barré/code), liens au format `<url|label>`.
+   - Le découpage s’effectue sur le texte de l’IR avant le rendu.
+   - Le formatage en ligne ne se divise pas entre segments ; les plages sont découpées par segment.
+3. **Rendre par canal**
+   - **Slack :** jetons mrkdwn (gras/italique/barré/code), liens sous la forme `<url|label>`.
    - **Telegram :** balises HTML (`<b>`, `<i>`, `<s>`, `<code>`, `<pre><code>`, `<a href>`).
    - **Signal :** texte brut + plages `text-style` ; les liens deviennent `label (url)` lorsque le libellé diffère.
 
@@ -61,21 +59,21 @@ IR (schématique) :
 }
 ```
 
-## Où il est utilisé
+## Où c’est utilisé
 
-- Les adaptateurs sortants Slack, Telegram et Signal produisent le rendu à partir de l’IR.
-- Les autres canaux (WhatsApp, iMessage, Microsoft Teams, Discord) utilisent encore du texte brut ou
-  leurs propres règles de formatage, avec la conversion des tableaux Markdown appliquée avant
+- Les adaptateurs sortants Slack, Telegram et Signal effectuent le rendu à partir de l’IR.
+- Les autres canaux (WhatsApp, iMessage, Microsoft Teams, Discord) utilisent toujours du texte brut ou
+  leurs propres règles de formatage, avec conversion des tableaux Markdown appliquée avant
   le découpage lorsqu’elle est activée.
 
 ## Gestion des tableaux
 
-Les tableaux Markdown ne sont pas pris en charge de manière cohérente selon les clients de chat. Utilisez
+Les tableaux Markdown ne sont pas pris en charge de manière cohérente selon les clients de discussion. Utilisez
 `markdown.tables` pour contrôler la conversion par canal (et par compte).
 
-- `code` : rend les tableaux sous forme de blocs de code (par défaut pour la plupart des canaux).
-- `bullets` : convertit chaque ligne en puces (par défaut pour Signal + WhatsApp).
-- `off` : désactive l’analyse et la conversion des tableaux ; le texte brut du tableau est transmis tel quel.
+- `code` : rendre les tableaux sous forme de blocs de code (par défaut pour la plupart des canaux).
+- `bullets` : convertir chaque ligne en puces (par défaut pour Signal + WhatsApp).
+- `off` : désactiver l’analyse et la conversion des tableaux ; le texte brut du tableau est transmis tel quel.
 
 Clés de configuration :
 
@@ -92,46 +90,51 @@ channels:
 
 ## Règles de découpage
 
-- Les limites de découpage proviennent des adaptateurs/configurations de canal et sont appliquées au texte IR.
-- Les blocs de code délimités sont conservés comme un seul bloc avec un saut de ligne final afin que les canaux
+- Les limites de découpage proviennent des adaptateurs/configurations de canal et sont appliquées au texte de l’IR.
+- Les blocs de code délimités sont conservés comme un bloc unique avec un saut de ligne final afin que les canaux
   les rendent correctement.
-- Les préfixes de liste et de citation font partie du texte IR, donc le découpage
+- Les préfixes de liste et de citation font partie du texte de l’IR, de sorte que le découpage
   ne coupe pas au milieu d’un préfixe.
-- Les styles inline (gras/italique/barré/code inline/spoiler) ne sont jamais coupés entre
-  les fragments ; le moteur de rendu rouvre les styles à l’intérieur de chaque fragment.
+- Les styles en ligne (gras/italique/barré/code en ligne/spoiler) ne sont jamais divisés entre
+  les segments ; le moteur de rendu rouvre les styles dans chaque segment.
 
-Si vous avez besoin de plus d’informations sur le comportement de découpage entre les canaux, consultez
-[Streaming + chunking](/concepts/streaming).
+Si vous avez besoin de plus d’informations sur le comportement du découpage entre canaux, voir
+[Diffusion + découpage](/fr/concepts/streaming).
 
-## Politique des liens
+## Politique de liens
 
-- **Slack :** `[label](url)` -> `<url|label>` ; les URL nues restent nues. L’autolink
+- **Slack :** `[label](url)` -> `<url|label>` ; les URL brutes restent brutes. L’autolink
   est désactivé pendant l’analyse pour éviter les doubles liens.
 - **Telegram :** `[label](url)` -> `<a href="url">label</a>` (mode d’analyse HTML).
 - **Signal :** `[label](url)` -> `label (url)` sauf si le libellé correspond à l’URL.
 
 ## Spoilers
 
-Les marqueurs spoiler (`||spoiler||`) ne sont analysés que pour Signal, où ils sont mappés vers
+Les marqueurs de spoiler (`||spoiler||`) ne sont analysés que pour Signal, où ils sont mappés vers
 des plages de style SPOILER. Les autres canaux les traitent comme du texte brut.
 
 ## Comment ajouter ou mettre à jour un formateur de canal
 
-1. **Analyser une seule fois :** utilisez l’assistant partagé `markdownToIR(...)` avec des
-   options adaptées au canal (autolink, style de titre, préfixe de citation).
+1. **Analyser une seule fois :** utilisez le helper partagé `markdownToIR(...)` avec les options
+   appropriées au canal (autolink, style des titres, préfixe de citation).
 2. **Rendre :** implémentez un moteur de rendu avec `renderMarkdownWithMarkers(...)` et une
-   table de mappage des marqueurs de style (ou les plages de style Signal).
-3. **Découper :** appelez `chunkMarkdownIR(...)` avant le rendu ; rendez chaque fragment.
-4. **Raccorder l’adaptateur :** mettez à jour l’adaptateur sortant du canal pour utiliser le nouveau découpeur
+   table de correspondance des marqueurs de style (ou des plages de style Signal).
+3. **Découper :** appelez `chunkMarkdownIR(...)` avant le rendu ; effectuez le rendu de chaque segment.
+4. **Brancher l’adaptateur :** mettez à jour l’adaptateur sortant du canal pour utiliser le nouveau découpeur
    et le nouveau moteur de rendu.
 5. **Tester :** ajoutez ou mettez à jour les tests de formatage et un test de livraison sortante si le
    canal utilise le découpage.
 
-## Pièges fréquents
+## Pièges courants
 
 - Les jetons Slack entre chevrons (`<@U123>`, `<#C123>`, `<https://...>`) doivent être
   préservés ; échappez le HTML brut en toute sécurité.
-- Le HTML Telegram nécessite d’échapper le texte en dehors des balises pour éviter un balisage cassé.
-- Les plages de style Signal dépendent des offsets UTF-16 ; n’utilisez pas d’offsets par point de code.
-- Conservez les sauts de ligne finaux pour les blocs de code délimités afin que les marqueurs de fermeture tombent
+- Le HTML Telegram exige d’échapper le texte hors balises afin d’éviter un balisage cassé.
+- Les plages de style Signal dépendent d’offsets UTF-16 ; n’utilisez pas d’offsets en points de code.
+- Préservez les sauts de ligne finaux pour les blocs de code délimités afin que les marqueurs de fermeture tombent
   sur leur propre ligne.
+
+## Articles connexes
+
+- [Diffusion et découpage](/fr/concepts/streaming)
+- [Prompt système](/fr/concepts/system-prompt)

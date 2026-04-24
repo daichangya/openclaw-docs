@@ -1,22 +1,20 @@
 ---
 read_when:
     - Apprendre à configurer OpenClaw
-    - Rechercher des exemples de configuration
+    - À la recherche d’exemples de configuration
     - Configurer OpenClaw pour la première fois
 summary: Exemples de configuration conformes au schéma pour les configurations OpenClaw courantes
 title: Exemples de configuration
 x-i18n:
-    generated_at: "2026-04-05T12:41:56Z"
+    generated_at: "2026-04-24T07:09:36Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1c85643b02285cefa2aaa9dd7c1e3abebb505bc8b415b5153b5899efc3ade0f7
+    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-# Exemples de configuration
-
-Les exemples ci-dessous sont alignés sur le schéma de configuration actuel. Pour la référence exhaustive et les notes champ par champ, voir [Configuration](/gateway/configuration).
+Les exemples ci-dessous sont alignés sur le schéma de configuration actuel. Pour la référence exhaustive et les notes champ par champ, voir [Configuration](/fr/gateway/configuration).
 
 ## Démarrage rapide
 
@@ -29,7 +27,7 @@ Les exemples ci-dessous sont alignés sur le schéma de configuration actuel. Po
 }
 ```
 
-Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bot depuis ce numéro.
+Enregistrez ceci dans `~/.openclaw/openclaw.json` et vous pourrez envoyer des DM au bot depuis ce numéro.
 
 ### Configuration de départ recommandée
 
@@ -37,7 +35,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
 {
   identity: {
     name: "Clawd",
-    theme: "helpful assistant",
+    theme: "assistant utile",
     emoji: "🦞",
   },
   agent: {
@@ -71,7 +69,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
     },
   },
 
-  // Métadonnées de profil d’authentification (les secrets se trouvent dans auth-profiles.json)
+  // Métadonnées des profils d’authentification (les secrets se trouvent dans auth-profiles.json)
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -89,7 +87,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
   // Identité
   identity: {
     name: "Samantha",
-    theme: "helpful sloth",
+    theme: "paresseux serviable",
     emoji: "🦥",
   },
 
@@ -133,7 +131,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
     },
   },
 
-  // Outils
+  // Outillage
   tools: {
     media: {
       audio: {
@@ -141,7 +139,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // Solution de repli CLI facultative (binaire Whisper) :
+          // Repli CLI facultatif (binaire Whisper) :
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -312,8 +310,8 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
       {
         id: "main",
         default: true,
-        // hérite defaults.skills -> github, weather
-        thinkingDefault: "high", // remplacement du niveau de réflexion par agent
+        // hérite de defaults.skills -> github, weather
+        thinkingDefault: "high", // surcharge de thinking par agent
         reasoningDefault: "on", // visibilité du raisonnement par agent
         fastModeDefault: false, // mode rapide par agent
       },
@@ -374,7 +372,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
     },
   },
 
-  // Tâches cron
+  // Jobs Cron
   cron: {
     enabled: true,
     store: "~/.openclaw/cron/cron.json",
@@ -468,7 +466,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
 
 ## Modèles courants
 
-### Base partagée de Skills avec une exception
+### Base commune de Skills avec une surcharge
 
 ```json5
 {
@@ -485,7 +483,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
 }
 ```
 
-- `agents.defaults.skills` est la base partagée.
+- `agents.defaults.skills` est la base commune.
 - `agents.list[].skills` remplace cette base pour un agent.
 - Utilisez `skills: []` lorsqu’un agent ne doit voir aucune Skill.
 
@@ -512,7 +510,7 @@ Enregistrez dans `~/.openclaw/openclaw.json` et vous pourrez envoyer un DM au bo
 
 ### Mode DM sécurisé (boîte de réception partagée / DM multi-utilisateurs)
 
-Si plus d’une personne peut envoyer un DM à votre bot (plusieurs entrées dans `allowFrom`, approbations d’appairage pour plusieurs personnes, ou `dmPolicy: "open"`), activez le **mode DM sécurisé** afin que les DM provenant de différents expéditeurs ne partagent pas un même contexte par défaut :
+Si plus d’une personne peut envoyer un DM à votre bot (plusieurs entrées dans `allowFrom`, approbations de pairing pour plusieurs personnes, ou `dmPolicy: "open"`), activez le **mode DM sécurisé** afin que les DM de différents expéditeurs ne partagent pas le même contexte par défaut :
 
 ```json5
 {
@@ -536,10 +534,10 @@ Si plus d’une personne peut envoyer un DM à votre bot (plusieurs entrées dan
 }
 ```
 
-Pour Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC, l’autorisation de l’expéditeur est d’abord basée sur l’ID par défaut.
-N’activez la correspondance directe sur des noms/e-mails/pseudos modifiables avec `dangerouslyAllowNameMatching: true` propre à chaque canal que si vous acceptez explicitement ce risque.
+Pour Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC, l’autorisation des expéditeurs repose d’abord sur l’identifiant par défaut.
+N’activez la correspondance directe sur des noms/adresses e-mail/pseudos modifiables avec `dangerouslyAllowNameMatching: true` propre à chaque canal que si vous acceptez explicitement ce risque.
 
-### Clé API Anthropic + solution de repli MiniMax
+### Clé API Anthropic + repli MiniMax
 
 ```json5
 {
@@ -573,13 +571,13 @@ N’activez la correspondance directe sur des noms/e-mails/pseudos modifiables a
 }
 ```
 
-### Bot professionnel (accès restreint)
+### Bot de travail (accès restreint)
 
 ```json5
 {
   identity: {
     name: "WorkBot",
-    theme: "professional assistant",
+    theme: "assistant professionnel",
   },
   agent: {
     workspace: "~/work-openclaw",
@@ -633,6 +631,11 @@ N’activez la correspondance directe sur des noms/e-mails/pseudos modifiables a
 ## Conseils
 
 - Si vous définissez `dmPolicy: "open"`, la liste `allowFrom` correspondante doit inclure `"*"`.
-- Les ID de fournisseur diffèrent (numéros de téléphone, ID utilisateur, ID de canal). Utilisez la documentation du fournisseur pour confirmer le format.
+- Les identifiants des fournisseurs diffèrent (numéros de téléphone, identifiants utilisateur, identifiants de canal). Utilisez la documentation du fournisseur pour confirmer le format.
 - Sections facultatives à ajouter plus tard : `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
-- Voir [Providers](/providers) et [Dépannage](/gateway/troubleshooting) pour des notes de configuration plus approfondies.
+- Voir [Fournisseurs](/fr/providers) et [Dépannage](/fr/gateway/troubleshooting) pour des notes de configuration plus détaillées.
+
+## Articles connexes
+
+- [Référence de configuration](/fr/gateway/configuration-reference)
+- [Configuration](/fr/gateway/configuration)

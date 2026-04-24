@@ -1,50 +1,48 @@
 ---
 read_when:
-    - Choix d’un parcours d’onboarding
-    - Configuration d’un nouvel environnement
+    - choisir un parcours d’intégration
+    - configuration d’un nouvel environnement
 sidebarTitle: Onboarding Overview
-summary: Vue d’ensemble des options et des flux d’onboarding OpenClaw
-title: Vue d’ensemble de l’onboarding
+summary: vue d’ensemble des options et flux d’intégration OpenClaw
+title: vue d’ensemble de l’intégration
 x-i18n:
-    generated_at: "2026-04-05T12:54:18Z"
+    generated_at: "2026-04-24T07:33:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 374697c1dbe0c3871c43164076fbed7119ef032f4a40d0f6e421051f914806e5
+    source_hash: 3a161e504f94c633873a497dd97c971ebfed6f31ef23a3fe9e85eec5a06d1d97
     source_path: start/onboarding-overview.md
     workflow: 15
 ---
 
-# Vue d’ensemble de l’onboarding
-
-OpenClaw propose deux parcours d’onboarding. Les deux configurent l’authentification, la passerelle et
-des canaux de discussion facultatifs — ils diffèrent simplement par la manière dont vous interagissez avec la configuration.
+OpenClaw a deux parcours d’intégration. Les deux configurent l’authentification, la Gateway et
+des canaux de chat facultatifs — ils diffèrent seulement par la manière dont vous interagissez avec la configuration.
 
 ## Quel parcours dois-je utiliser ?
 
-|                | Onboarding CLI                         | Onboarding application macOS |
-| -------------- | -------------------------------------- | ---------------------------- |
-| **Plateformes** | macOS, Linux, Windows (natif ou WSL2) | macOS uniquement             |
-| **Interface**  | Assistant dans le terminal             | Interface guidée dans l’application |
-| **Idéal pour** | Serveurs, headless, contrôle total     | Mac de bureau, configuration visuelle |
-| **Automatisation** | `--non-interactive` pour les scripts | Manuel uniquement         |
-| **Commande**   | `openclaw onboard`                     | Lancer l’application         |
+|                | Intégration CLI                        | Intégration de l’app macOS |
+| -------------- | -------------------------------------- | -------------------------- |
+| **Plateformes** | macOS, Linux, Windows (natif ou WSL2) | macOS uniquement           |
+| **Interface**  | Assistant terminal                     | Interface guidée dans l’app |
+| **Idéal pour** | Serveurs, headless, contrôle complet   | Mac de bureau, configuration visuelle |
+| **Automatisation** | `--non-interactive` pour les scripts | Manuel uniquement        |
+| **Commande**   | `openclaw onboard`                     | Lancer l’app               |
 
-La plupart des utilisateurs devraient commencer par **l’onboarding CLI** — il fonctionne partout et vous donne
+La plupart des utilisateurs devraient commencer par l’**intégration CLI** — elle fonctionne partout et vous donne
 le plus de contrôle.
 
-## Ce que l’onboarding configure
+## Ce que l’intégration configure
 
-Quel que soit le parcours choisi, l’onboarding configure :
+Quel que soit le parcours choisi, l’intégration configure :
 
-1. **Fournisseur de modèles et authentification** — clé API, OAuth ou jeton de configuration pour le fournisseur choisi
-2. **Espace de travail** — répertoire pour les fichiers d’agent, modèles bootstrap et mémoire
-3. **Passerelle** — port, adresse de liaison, mode d’authentification
-4. **Canaux** (facultatif) — canaux de discussion intégrés et groupés tels que
+1. **Fournisseur de modèle et authentification** — clé API, OAuth ou jeton de configuration pour le fournisseur choisi
+2. **Espace de travail** — répertoire pour les fichiers d’agent, les modèles bootstrap et la mémoire
+3. **Gateway** — port, adresse de liaison, mode d’authentification
+4. **Canaux** (facultatif) — canaux de chat intégrés et regroupés tels que
    BlueBubbles, Discord, Feishu, Google Chat, Mattermost, Microsoft Teams,
-   Telegram, WhatsApp, et plus encore
-5. **Daemon** (facultatif) — service en arrière-plan pour que la passerelle démarre automatiquement
+   Telegram, WhatsApp, etc.
+5. **Démon** (facultatif) — service d’arrière-plan afin que la Gateway démarre automatiquement
 
-## Onboarding CLI
+## Intégration CLI
 
 Exécutez dans n’importe quel terminal :
 
@@ -52,25 +50,30 @@ Exécutez dans n’importe quel terminal :
 openclaw onboard
 ```
 
-Ajoutez `--install-daemon` pour également installer le service en arrière-plan en une seule étape.
+Ajoutez `--install-daemon` pour aussi installer le service d’arrière-plan en une seule étape.
 
-Référence complète : [Onboarding (CLI)](/fr/start/wizard)
-Documentation de la commande CLI : [`openclaw onboard`](/cli/onboard)
+Référence complète : [Intégration (CLI)](/fr/start/wizard)
+Documentation de la commande CLI : [`openclaw onboard`](/fr/cli/onboard)
 
-## Onboarding de l’application macOS
+## Intégration de l’app macOS
 
-Ouvrez l’application OpenClaw. L’assistant de premier lancement vous guide à travers les mêmes étapes
+Ouvrez l’app OpenClaw. L’assistant de premier lancement vous guide à travers les mêmes étapes
 avec une interface visuelle.
 
-Référence complète : [Onboarding (application macOS)](/start/onboarding)
+Référence complète : [Intégration (app macOS)](/fr/start/onboarding)
 
 ## Fournisseurs personnalisés ou non listés
 
-Si votre fournisseur n’est pas listé dans l’onboarding, choisissez **Custom Provider** puis
-renseignez :
+Si votre fournisseur n’est pas listé dans l’intégration, choisissez **Custom Provider** et
+saisissez :
 
-- le mode de compatibilité API (compatible OpenAI, compatible Anthropic ou auto-detect)
-- la base URL et la clé API
-- l’ID du modèle et un alias facultatif
+- Mode de compatibilité API (compatible OpenAI, compatible Anthropic ou détection automatique)
+- URL de base et clé API
+- ID de modèle et alias facultatif
 
-Plusieurs points de terminaison personnalisés peuvent coexister — chacun obtient son propre ID de point de terminaison.
+Plusieurs points de terminaison personnalisés peuvent coexister — chacun reçoit son propre ID de point de terminaison.
+
+## Liens associés
+
+- [Premiers pas](/fr/start/getting-started)
+- [Référence de configuration CLI](/fr/start/wizard-cli-reference)

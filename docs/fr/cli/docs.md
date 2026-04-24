@@ -1,24 +1,24 @@
 ---
 read_when:
     - Vous souhaitez rechercher dans la documentation OpenClaw en direct depuis le terminal
-summary: Référence CLI pour `openclaw docs` (rechercher dans l’index en direct de la documentation)
-title: docs
+summary: Référence CLI pour `openclaw docs` (rechercher dans l’index de documentation en direct)
+title: Docs
 x-i18n:
-    generated_at: "2026-04-05T12:37:49Z"
+    generated_at: "2026-04-24T07:04:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: cfcceed872d7509b9843af3fae733a136bc5e26ded55c2ac47a16489a1636989
+    source_hash: 0d208f5b9a3576ce0597abca600df109db054d20068359a9f2070ac30b1a8f69
     source_path: cli/docs.md
     workflow: 15
 ---
 
 # `openclaw docs`
 
-Recherchez dans l’index en direct de la documentation.
+Rechercher dans l’index de documentation en direct.
 
 Arguments :
 
-- `[query...]` : termes de recherche à envoyer à l’index en direct de la documentation
+- `[query...]` : termes de recherche à envoyer à l’index de documentation en direct
 
 Exemples :
 
@@ -32,4 +32,8 @@ openclaw docs gateway token secretref
 Remarques :
 
 - Sans requête, `openclaw docs` ouvre le point d’entrée de recherche de la documentation en direct.
-- Les requêtes composées de plusieurs mots sont transmises comme une seule requête de recherche.
+- Les requêtes de plusieurs mots sont transmises comme une seule requête de recherche.
+
+## Associé
+
+- [Référence CLI](/fr/cli)

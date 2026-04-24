@@ -1,31 +1,28 @@
 ---
 read_when:
-    - Vous souhaitez utiliser Volcengine ou des modèles Doubao avec OpenClaw
-    - Vous avez besoin de la configuration de la clé API Volcengine
-summary: Configuration de Volcengine (modèles Doubao, points de terminaison généraux + coding)
-title: Volcengine (Doubao)
+    - Vous souhaitez utiliser Volcano Engine ou les modèles Doubao avec OpenClaw
+    - Vous devez configurer la clé API Volcano Engine
+summary: Configuration de Volcano Engine (modèles Doubao, endpoints généraux + code)
+title: Volcano Engine (Doubao)
 x-i18n:
-    generated_at: "2026-04-23T07:10:23Z"
+    generated_at: "2026-04-24T07:29:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4d803e965699bedf06cc7ea4e902ffc92e4a168be012224e845820069fd67acc
+    source_hash: 6091da50fbab3a01cdc4337a496f361987f1991a2e2b7764e7a9c8c464e9757a
     source_path: providers/volcengine.md
     workflow: 15
 ---
 
-# Volcengine (Doubao)
-
-Le fournisseur Volcengine donne accès aux modèles Doubao et aux modèles tiers
-hébergés sur Volcengine, avec des points de terminaison distincts pour les charges générales et
-de code.
+Le fournisseur Volcano Engine donne accès aux modèles Doubao et à des modèles tiers
+hébergés sur Volcano Engine, avec des endpoints séparés pour les charges de travail générales et de code.
 
 | Détail    | Valeur                                              |
 | --------- | --------------------------------------------------- |
-| Fournisseurs | `volcengine` (général) + `volcengine-plan` (coding) |
-| Auth      | `VOLCANO_ENGINE_API_KEY`                            |
+| Fournisseurs | `volcengine` (général) + `volcengine-plan` (code) |
+| Authentification | `VOLCANO_ENGINE_API_KEY`                   |
 | API       | Compatible OpenAI                                   |
 
-## Bien démarrer
+## Premiers pas
 
 <Steps>
   <Step title="Définir la clé API">
@@ -35,7 +32,7 @@ de code.
     openclaw onboard --auth-choice volcengine-api-key
     ```
 
-    Cela enregistre à la fois les fournisseurs général (`volcengine`) et coding (`volcengine-plan`) à partir d’une seule clé API.
+    Cela enregistre les fournisseurs général (`volcengine`) et code (`volcengine-plan`) à partir d’une seule clé API.
 
   </Step>
   <Step title="Définir un modèle par défaut">
@@ -58,7 +55,7 @@ de code.
 </Steps>
 
 <Tip>
-Pour une configuration non interactive (CI, scripting), passez directement la clé :
+Pour une configuration non interactive (CI, scripts), passez directement la clé :
 
 ```bash
 openclaw onboard --non-interactive \
@@ -69,77 +66,77 @@ openclaw onboard --non-interactive \
 
 </Tip>
 
-## Fournisseurs et points de terminaison
+## Fournisseurs et endpoints
 
-| Fournisseur       | Point de terminaison                       | Cas d’usage      |
+| Fournisseur       | Endpoint                                  | Cas d’usage      |
 | ----------------- | ----------------------------------------- | ---------------- |
 | `volcengine`      | `ark.cn-beijing.volces.com/api/v3`        | Modèles généraux |
 | `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | Modèles de code  |
 
 <Note>
-Les deux fournisseurs sont configurés à partir d’une seule clé API. La configuration enregistre automatiquement les deux.
+Les deux fournisseurs sont configurés à partir d’une seule clé API. Le setup enregistre les deux automatiquement.
 </Note>
 
-## Modèles disponibles
+## Catalogue intégré
 
 <Tabs>
   <Tab title="Général (volcengine)">
-    | Référence de modèle                           | Nom                             | Entrée      | Contexte |
-    | --------------------------------------------- | ------------------------------- | ----------- | -------- |
-    | `volcengine/doubao-seed-1-8-251228`          | Doubao Seed 1.8                 | text, image | 256,000 |
-    | `volcengine/doubao-seed-code-preview-251028` | doubao-seed-code-preview-251028 | text, image | 256,000 |
-    | `volcengine/kimi-k2-5-260127`                | Kimi K2.5                       | text, image | 256,000 |
-    | `volcengine/glm-4-7-251222`                  | GLM 4.7                         | text, image | 200,000 |
-    | `volcengine/deepseek-v3-2-251201`            | DeepSeek V3.2                   | text, image | 128,000 |
+    | Référence de modèle                         | Nom                             | Entrée      | Contexte |
+    | ------------------------------------------- | ------------------------------- | ----------- | -------- |
+    | `volcengine/doubao-seed-1-8-251228`         | Doubao Seed 1.8                 | texte, image | 256 000 |
+    | `volcengine/doubao-seed-code-preview-251028`| doubao-seed-code-preview-251028 | texte, image | 256 000 |
+    | `volcengine/kimi-k2-5-260127`               | Kimi K2.5                       | texte, image | 256 000 |
+    | `volcengine/glm-4-7-251222`                 | GLM 4.7                         | texte, image | 200 000 |
+    | `volcengine/deepseek-v3-2-251201`           | DeepSeek V3.2                   | texte, image | 128 000 |
   </Tab>
-  <Tab title="Coding (volcengine-plan)">
-    | Référence de modèle                                | Nom                      | Entrée | Contexte |
-    | -------------------------------------------------- | ------------------------ | ------ | -------- |
-    | `volcengine-plan/ark-code-latest`                 | Ark Coding Plan          | text   | 256,000 |
-    | `volcengine-plan/doubao-seed-code`                | Doubao Seed Code         | text   | 256,000 |
-    | `volcengine-plan/glm-4.7`                         | GLM 4.7 Coding           | text   | 200,000 |
-    | `volcengine-plan/kimi-k2-thinking`                | Kimi K2 Thinking         | text   | 256,000 |
-    | `volcengine-plan/kimi-k2.5`                       | Kimi K2.5 Coding         | text   | 256,000 |
-    | `volcengine-plan/doubao-seed-code-preview-251028` | Doubao Seed Code Preview | text   | 256,000 |
+  <Tab title="Code (volcengine-plan)">
+    | Référence de modèle                              | Nom                      | Entrée | Contexte |
+    | ------------------------------------------------ | ------------------------ | ------ | -------- |
+    | `volcengine-plan/ark-code-latest`                | Ark Coding Plan          | texte  | 256 000 |
+    | `volcengine-plan/doubao-seed-code`               | Doubao Seed Code         | texte  | 256 000 |
+    | `volcengine-plan/glm-4.7`                        | GLM 4.7 Coding           | texte  | 200 000 |
+    | `volcengine-plan/kimi-k2-thinking`               | Kimi K2 Thinking         | texte  | 256 000 |
+    | `volcengine-plan/kimi-k2.5`                      | Kimi K2.5 Coding         | texte  | 256 000 |
+    | `volcengine-plan/doubao-seed-code-preview-251028`| Doubao Seed Code Preview | texte  | 256 000 |
   </Tab>
 </Tabs>
 
-## Remarques avancées
+## Configuration avancée
 
 <AccordionGroup>
   <Accordion title="Modèle par défaut après l’onboarding">
     `openclaw onboard --auth-choice volcengine-api-key` définit actuellement
-    `volcengine-plan/ark-code-latest` comme modèle par défaut tout en enregistrant aussi
+    `volcengine-plan/ark-code-latest` comme modèle par défaut tout en enregistrant également
     le catalogue général `volcengine`.
   </Accordion>
 
   <Accordion title="Comportement de repli du sélecteur de modèle">
-    Pendant la sélection du modèle dans onboarding/configure, le choix d’authentification Volcengine privilégie
-    à la fois les lignes `volcengine/*` et `volcengine-plan/*`. Si ces modèles ne sont pas
-    encore chargés, OpenClaw revient au catalogue non filtré au lieu d’afficher un
-    sélecteur vide limité au fournisseur.
+    Pendant l’onboarding/la sélection de modèle dans configure, le choix d’authentification Volcengine préfère
+    les lignes `volcengine/*` et `volcengine-plan/*`. Si ces modèles ne sont
+    pas encore chargés, OpenClaw revient au catalogue non filtré au lieu d’afficher
+    un sélecteur limité au fournisseur vide.
   </Accordion>
 
   <Accordion title="Variables d’environnement pour les processus daemon">
     Si le Gateway s’exécute comme daemon (launchd/systemd), assurez-vous que
-    `VOLCANO_ENGINE_API_KEY` est disponible pour ce processus (par exemple dans
+    `VOLCANO_ENGINE_API_KEY` est disponible pour ce processus (par exemple, dans
     `~/.openclaw/.env` ou via `env.shellEnv`).
   </Accordion>
 </AccordionGroup>
 
 <Warning>
 Lorsque vous exécutez OpenClaw comme service en arrière-plan, les variables d’environnement définies dans votre
-shell interactif ne sont pas automatiquement héritées. Voir la remarque ci-dessus sur les daemons.
+shell interactif ne sont pas héritées automatiquement. Voir la remarque ci-dessus sur le daemon.
 </Warning>
 
-## Liens associés
+## Articles connexes
 
 <CardGroup cols={2}>
-  <Card title="Sélection de modèle" href="/fr/concepts/model-providers" icon="layers">
-    Choisir des fournisseurs, des références de modèles et le comportement de repli.
+  <Card title="Sélection des modèles" href="/fr/concepts/model-providers" icon="layers">
+    Choisir les fournisseurs, références de modèles et comportement de bascule.
   </Card>
   <Card title="Configuration" href="/fr/gateway/configuration" icon="gear">
-    Référence complète de configuration pour les agents, les modèles et les fournisseurs.
+    Référence complète de configuration pour les agents, modèles et fournisseurs.
   </Card>
   <Card title="Dépannage" href="/fr/help/troubleshooting" icon="wrench">
     Problèmes courants et étapes de débogage.

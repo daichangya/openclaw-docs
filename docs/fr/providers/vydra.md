@@ -1,32 +1,30 @@
 ---
 read_when:
-    - Vous souhaitez la génération de médias Vydra dans OpenClaw
-    - Vous avez besoin d’instructions pour la configuration de la clé API Vydra
-summary: Utiliser l’image, la vidéo et la voix Vydra dans OpenClaw
+    - Vous voulez la génération média Vydra dans OpenClaw
+    - Vous avez besoin d’un guide de configuration de clé API Vydra
+summary: Utiliser l’image, la vidéo et la parole Vydra dans OpenClaw
 title: Vydra
 x-i18n:
-    generated_at: "2026-04-12T23:33:02Z"
+    generated_at: "2026-04-24T07:29:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ab623d14b656ce0b68d648a6393fcee3bb880077d6583e0d5c1012e91757f20e
+    source_hash: 85420c3f337c13313bf571d5ee92c1f1988ff8119d401e7ec0ea0db1e74d9b69
     source_path: providers/vydra.md
     workflow: 15
 ---
 
-# Vydra
-
-Le Plugin Vydra bundled ajoute :
+Le plugin Vydra intégré ajoute :
 
 - La génération d’images via `vydra/grok-imagine`
 - La génération de vidéos via `vydra/veo3` et `vydra/kling`
-- La synthèse vocale via la route TTS de Vydra adossée à ElevenLabs
+- La synthèse vocale via la route TTS Vydra adossée à ElevenLabs
 
-OpenClaw utilise la même `VYDRA_API_KEY` pour ces trois capacités.
+OpenClaw utilise la même `VYDRA_API_KEY` pour les trois capacités.
 
 <Warning>
-Utilisez `https://www.vydra.ai/api/v1` comme base URL.
+Utilisez `https://www.vydra.ai/api/v1` comme URL de base.
 
-L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `www`. Certains clients HTTP suppriment `Authorization` lors de cette redirection entre hôtes, ce qui transforme une clé API valide en un échec d’authentification trompeur. Le plugin bundled utilise directement la base URL `www` pour éviter cela.
+L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `www`. Certains clients HTTP abandonnent `Authorization` lors de cette redirection inter-hôte, ce qui transforme une clé API valide en un échec d’authentification trompeur. Le plugin intégré utilise directement l’URL de base `www` pour éviter cela.
 </Warning>
 
 ## Configuration
@@ -45,7 +43,7 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
 
   </Step>
   <Step title="Choisir une capacité par défaut">
-    Choisissez une ou plusieurs des capacités ci-dessous (image, vidéo ou voix) et appliquez la configuration correspondante.
+    Choisissez une ou plusieurs des capacités ci-dessous (image, vidéo ou parole) et appliquez la configuration correspondante.
   </Step>
 </Steps>
 
@@ -57,7 +55,7 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
 
     - `vydra/grok-imagine`
 
-    Définissez-le comme fournisseur d’images par défaut :
+    Définissez-le comme fournisseur d’image par défaut :
 
     ```json5
     {
@@ -71,10 +69,10 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
     }
     ```
 
-    La prise en charge bundled actuelle couvre uniquement le texte vers image. Les routes d’édition hébergées de Vydra attendent des URL d’image distantes, et OpenClaw n’ajoute pas encore de pont de téléversement spécifique à Vydra dans le plugin bundled.
+    La prise en charge intégrée actuelle se limite au texte-vers-image. Les routes d’édition hébergées de Vydra attendent des URL d’image distantes, et OpenClaw n’ajoute pas encore de pont de téléversement spécifique à Vydra dans le plugin intégré.
 
     <Note>
-    Voir [Génération d’images](/fr/tools/image-generation) pour les paramètres d’outil partagés, la sélection du fournisseur et le comportement de failover.
+    Voir [Génération d’images](/fr/tools/image-generation) pour les paramètres d’outil partagés, la sélection de fournisseur et le comportement de repli.
     </Note>
 
   </Accordion>
@@ -82,8 +80,8 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
   <Accordion title="Génération de vidéos">
     Modèles vidéo enregistrés :
 
-    - `vydra/veo3` pour le texte vers vidéo
-    - `vydra/kling` pour l’image vers vidéo
+    - `vydra/veo3` pour le texte-vers-vidéo
+    - `vydra/kling` pour l’image-vers-vidéo
 
     Définissez Vydra comme fournisseur vidéo par défaut :
 
@@ -101,13 +99,13 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
 
     Remarques :
 
-    - `vydra/veo3` est bundled uniquement en texte vers vidéo.
-    - `vydra/kling` nécessite actuellement une référence d’URL d’image distante. Les téléversements de fichiers locaux sont rejetés d’emblée.
-    - La route HTTP `kling` actuelle de Vydra n’est pas cohérente quant à savoir si elle exige `image_url` ou `video_url` ; le fournisseur bundled mappe la même URL d’image distante dans les deux champs.
-    - Le plugin bundled reste prudent et ne transmet pas les réglages de style non documentés tels que le ratio d’aspect, la résolution, le filigrane ou l’audio généré.
+    - `vydra/veo3` est intégré uniquement en texte-vers-vidéo.
+    - `vydra/kling` exige actuellement une référence d’URL d’image distante. Les téléversements de fichiers locaux sont rejetés d’emblée.
+    - La route HTTP `kling` actuelle de Vydra a été incohérente quant à l’exigence de `image_url` ou `video_url` ; le fournisseur intégré mappe la même URL d’image distante sur les deux champs.
+    - Le plugin intégré reste conservateur et ne transmet pas de paramètres de style non documentés tels que le ratio d’aspect, la résolution, le watermark ou l’audio généré.
 
     <Note>
-    Voir [Génération vidéo](/fr/tools/video-generation) pour les paramètres d’outil partagés, la sélection du fournisseur et le comportement de failover.
+    Voir [Génération de vidéos](/fr/tools/video-generation) pour les paramètres d’outil partagés, la sélection de fournisseur et le comportement de repli.
     </Note>
 
   </Accordion>
@@ -121,12 +119,12 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
     pnpm test:live -- extensions/vydra/vydra.live.test.ts
     ```
 
-    Le fichier live Vydra bundled couvre désormais :
+    Le fichier live Vydra intégré couvre maintenant :
 
-    - `vydra/veo3` texte vers vidéo
-    - `vydra/kling` image vers vidéo à l’aide d’une URL d’image distante
+    - `vydra/veo3` texte-vers-vidéo
+    - `vydra/kling` image-vers-vidéo à l’aide d’une URL d’image distante
 
-    Remplacez le fixture d’image distante si nécessaire :
+    Redéfinissez la fixture d’image distante si nécessaire :
 
     ```bash
     export OPENCLAW_LIVE_VYDRA_KLING_IMAGE_URL="https://example.com/reference.png"
@@ -135,7 +133,7 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
   </Accordion>
 
   <Accordion title="Synthèse vocale">
-    Définissez Vydra comme fournisseur de voix :
+    Définissez Vydra comme fournisseur de parole :
 
     ```json5
     {
@@ -156,26 +154,26 @@ L’hôte apex de Vydra (`https://vydra.ai/api/v1`) redirige actuellement vers `
     Valeurs par défaut :
 
     - Modèle : `elevenlabs/tts`
-    - Id de voix : `21m00Tcm4TlvDq8ikWAM`
+    - ID de voix : `21m00Tcm4TlvDq8ikWAM`
 
-    Le plugin bundled expose actuellement une voix par défaut connue pour bien fonctionner et renvoie des fichiers audio MP3.
+    Le plugin intégré expose actuellement une voix par défaut connue comme fiable et renvoie des fichiers audio MP3.
 
   </Accordion>
 </AccordionGroup>
 
-## Lié à ce sujet
+## Liens associés
 
 <CardGroup cols={2}>
-  <Card title="Répertoire des fournisseurs" href="/fr/providers/index" icon="list">
+  <Card title="Annuaire des fournisseurs" href="/fr/providers/index" icon="list">
     Parcourir tous les fournisseurs disponibles.
   </Card>
   <Card title="Génération d’images" href="/fr/tools/image-generation" icon="image">
-    Paramètres d’outil d’image partagés et sélection du fournisseur.
+    Paramètres partagés de l’outil image et sélection du fournisseur.
   </Card>
-  <Card title="Génération vidéo" href="/fr/tools/video-generation" icon="video">
-    Paramètres d’outil vidéo partagés et sélection du fournisseur.
+  <Card title="Génération de vidéos" href="/fr/tools/video-generation" icon="video">
+    Paramètres partagés de l’outil vidéo et sélection du fournisseur.
   </Card>
-  <Card title="Référence de configuration" href="/fr/gateway/configuration-reference#agent-defaults" icon="gear">
-    Valeurs par défaut de l’agent et configuration des modèles.
+  <Card title="Référence de configuration" href="/fr/gateway/config-agents#agent-defaults" icon="gear">
+    Valeurs par défaut des agents et configuration des modèles.
   </Card>
 </CardGroup>

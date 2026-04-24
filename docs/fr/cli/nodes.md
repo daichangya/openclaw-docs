@@ -1,27 +1,27 @@
 ---
 read_when:
-    - Vous gérez des nœuds appairés (caméras, écran, canvas)
-    - Vous devez approuver des requêtes ou invoquer des commandes de nœud
-summary: Référence CLI pour `openclaw nodes` (statut, pairage, invocation, caméra/canvas/écran)
-title: nodes
+    - Vous gérez des Nodes associés (caméras, écran, canvas)
+    - Vous devez approuver des demandes ou invoquer des commandes de Node
+summary: Référence CLI pour `openclaw nodes` (statut, association, invocation, caméra/canvas/écran)
+title: Nodes
 x-i18n:
-    generated_at: "2026-04-05T12:38:32Z"
+    generated_at: "2026-04-24T07:04:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1ce3095591c4623ad18e3eca8d8083e5c10266fbf94afea2d025f0ba8093a175
+    source_hash: a1f1b440b3113b71338ae9cab5e1ded607dba79b9429f5c0b1b5f9e758b9f73e
     source_path: cli/nodes.md
     workflow: 15
 ---
 
 # `openclaw nodes`
 
-Gérez les nœuds appairés (appareils) et invoquez les capacités des nœuds.
+Gérez les Nodes associés (appareils) et invoquez les capacités des Nodes.
 
 Lié :
 
-- Vue d’ensemble des nœuds : [Nodes](/nodes)
-- Caméra : [Nœuds caméra](/nodes/camera)
-- Images : [Nœuds d’image](/nodes/images)
+- Vue d’ensemble des Nodes : [Nodes](/fr/nodes)
+- Caméra : [Nodes caméra](/fr/nodes/camera)
+- Images : [Nodes d’image](/fr/nodes/images)
 
 Options courantes :
 
@@ -42,18 +42,18 @@ openclaw nodes status --connected
 openclaw nodes status --last-connected 24h
 ```
 
-`nodes list` affiche les tableaux des nœuds en attente/appairés. Les lignes appairées incluent l’ancienneté de la connexion la plus récente (`Last Connect`).
-Utilisez `--connected` pour n’afficher que les nœuds actuellement connectés. Utilisez `--last-connected <duration>` pour
-filtrer les nœuds qui se sont connectés dans une durée donnée (par exemple `24h`, `7d`).
+`nodes list` affiche des tableaux des éléments en attente/associés. Les lignes associées incluent l’ancienneté de connexion la plus récente (Last Connect).
+Utilisez `--connected` pour n’afficher que les Nodes actuellement connectés. Utilisez `--last-connected <duration>` pour
+filtrer sur les Nodes qui se sont connectés dans une durée donnée (par ex. `24h`, `7d`).
 
 Remarque sur l’approbation :
 
-- `openclaw nodes pending` ne nécessite que la portée de pairage.
-- `openclaw nodes approve <requestId>` hérite des exigences de portée supplémentaires de la
-  requête en attente :
-  - requête sans commande : pairage uniquement
-  - commandes de nœud sans `exec` : pairage + écriture
-  - `system.run` / `system.run.prepare` / `system.which` : pairage + admin
+- `openclaw nodes pending` nécessite uniquement le scope d’association.
+- `openclaw nodes approve <requestId>` hérite des exigences de scope supplémentaires de la
+  demande en attente :
+  - demande sans commande : association uniquement
+  - commandes de Node non `exec` : association + écriture
+  - `system.run` / `system.run.prepare` / `system.which` : association + admin
 
 ## Invocation
 
@@ -61,13 +61,18 @@ Remarque sur l’approbation :
 openclaw nodes invoke --node <id|name|ip> --command <command> --params <json>
 ```
 
-Options d’invocation :
+Indicateurs d’invocation :
 
 - `--params <json>` : chaîne d’objet JSON (par défaut `{}`).
-- `--invoke-timeout <ms>` : délai d’expiration d’invocation du nœud (par défaut `15000`).
+- `--invoke-timeout <ms>` : délai d’attente d’invocation du Node (par défaut `15000`).
 - `--idempotency-key <key>` : clé d’idempotence facultative.
 - `system.run` et `system.run.prepare` sont bloqués ici ; utilisez l’outil `exec` avec `host=node` pour l’exécution shell.
 
-Pour exécuter des commandes shell sur un nœud, utilisez l’outil `exec` avec `host=node` au lieu de `openclaw nodes run`.
-La CLI `nodes` est désormais centrée sur les capacités : RPC direct via `nodes invoke`, plus pairage, caméra,
-écran, localisation, canvas et notifications.
+Pour l’exécution shell sur un Node, utilisez l’outil `exec` avec `host=node` au lieu de `openclaw nodes run`.
+Le CLI `nodes` est désormais centré sur les capacités : RPC direct via `nodes invoke`, plus l’association, la caméra,
+l’écran, la localisation, le canvas et les notifications.
+
+## Lié
+
+- [Référence CLI](/fr/cli)
+- [Nodes](/fr/nodes)

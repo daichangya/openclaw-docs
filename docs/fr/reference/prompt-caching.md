@@ -1,43 +1,39 @@
 ---
 read_when:
-    - Vous voulez réduire les coûts en jetons des prompts avec la rétention du cache
+    - Vous voulez réduire les coûts en tokens d’invite grâce à la conservation du cache
     - Vous avez besoin d’un comportement de cache par agent dans des configurations multi-agents
-    - Vous ajustez heartbeat et l’élagage cache-ttl ensemble
-summary: Paramètres de cache de prompt, ordre de fusion, comportement des fournisseurs et modèles de réglage
-title: Cache de prompt
+    - Vous ajustez ensemble Heartbeat et l’élagage cache-ttl
+summary: Réglages de mise en cache des prompts, ordre de fusion, comportement des fournisseurs et schémas d’ajustement
+title: Mise en cache des prompts
 x-i18n:
-    generated_at: "2026-04-05T12:53:49Z"
+    generated_at: "2026-04-24T07:31:00Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 13d5f3153b6593ae22cd04a6c2540e074cf15df9f1990fc5b7184fe803f4a1bd
+    source_hash: 2534a5648db39dae0979bd8b84263f83332fbaa2dc2c0675409c307fa991c7c8
     source_path: reference/prompt-caching.md
     workflow: 15
 ---
 
-# Cache de prompt
+La mise en cache des prompts signifie que le fournisseur de modèle peut réutiliser des préfixes d’invite inchangés (généralement les instructions système/développeur et d’autres contextes stables) d’un tour à l’autre au lieu de les retraiter à chaque fois. OpenClaw normalise l’usage du fournisseur en `cacheRead` et `cacheWrite` lorsque l’API amont expose directement ces compteurs.
 
-Le cache de prompt signifie que le fournisseur de modèle peut réutiliser des préfixes de prompt inchangés (généralement les instructions system/developer et d’autres contextes stables) entre les tours, au lieu de les retraiter à chaque fois. OpenClaw normalise l’usage fournisseur en `cacheRead` et `cacheWrite` lorsque l’API amont expose directement ces compteurs.
+Les surfaces d’état peuvent aussi récupérer les compteurs de cache depuis le journal d’utilisation de transcription le plus récent lorsque le snapshot de session en direct ne les contient pas, de sorte que `/status` peut continuer d’afficher une ligne de cache après une perte partielle des métadonnées de session. Les valeurs de cache en direct non nulles existantes restent prioritaires sur les valeurs de repli issues de la transcription.
 
-Les surfaces de statut peuvent aussi récupérer les compteurs de cache à partir du dernier journal
-d’usage de transcription lorsque l’instantané live de session ne les contient pas, de sorte que `/status` puisse
-continuer d’afficher une ligne de cache après une perte partielle des métadonnées de session. Les valeurs live existantes non nulles de cache restent prioritaires par rapport aux valeurs de repli issues de la transcription.
+Pourquoi cela compte : coût en tokens plus faible, réponses plus rapides et performance plus prévisible pour les sessions de longue durée. Sans mise en cache, les invites répétées paient le coût complet de l’invite à chaque tour, même lorsque la majeure partie de l’entrée n’a pas changé.
 
-Pourquoi c’est important : coût en jetons plus faible, réponses plus rapides, et performances plus prévisibles pour les sessions de longue durée. Sans cache, les prompts répétés paient le coût total du prompt à chaque tour même lorsque la majeure partie de l’entrée ne change pas.
+Cette page couvre tous les réglages liés au cache qui affectent la réutilisation des invites et le coût en tokens.
 
-Cette page couvre tous les paramètres liés au cache qui affectent la réutilisation des prompts et le coût en jetons.
+Références fournisseurs :
 
-Références des fournisseurs :
-
-- Cache de prompt Anthropic : [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
-- Cache de prompt OpenAI : [https://developers.openai.com/api/docs/guides/prompt-caching](https://developers.openai.com/api/docs/guides/prompt-caching)
+- Mise en cache des prompts Anthropic : [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+- Mise en cache des prompts OpenAI : [https://developers.openai.com/api/docs/guides/prompt-caching](https://developers.openai.com/api/docs/guides/prompt-caching)
 - En-têtes API OpenAI et IDs de requête : [https://developers.openai.com/api/reference/overview](https://developers.openai.com/api/reference/overview)
 - IDs de requête et erreurs Anthropic : [https://platform.claude.com/docs/en/api/errors](https://platform.claude.com/docs/en/api/errors)
 
-## Paramètres principaux
+## Réglages principaux
 
 ### `cacheRetention` (valeur par défaut globale, modèle et par agent)
 
-Définissez la rétention du cache comme valeur par défaut globale pour tous les modèles :
+Définissez la conservation du cache comme valeur globale par défaut pour tous les modèles :
 
 ```yaml
 agents:
@@ -46,7 +42,7 @@ agents:
       cacheRetention: "long" # none | short | long
 ```
 
-Remplacez-la par modèle :
+Remplacement par modèle :
 
 ```yaml
 agents:
@@ -67,15 +63,15 @@ agents:
         cacheRetention: "none"
 ```
 
-Ordre de fusion de la configuration :
+Ordre de fusion de configuration :
 
-1. `agents.defaults.params` (valeur par défaut globale — s’applique à tous les modèles)
+1. `agents.defaults.params` (valeur globale par défaut — s’applique à tous les modèles)
 2. `agents.defaults.models["provider/model"].params` (remplacement par modèle)
-3. `agents.list[].params` (ID d’agent correspondant ; remplace par clé)
+3. `agents.list[].params` (ID d’agent correspondant ; remplace clé par clé)
 
 ### `contextPruning.mode: "cache-ttl"`
 
-Élague l’ancien contexte des résultats d’outils après les fenêtres TTL du cache afin que les requêtes après inactivité ne remettent pas en cache un historique surdimensionné.
+Élague l’ancien contexte de résultat d’outil après les fenêtres TTL du cache afin que les requêtes après inactivité ne remettent pas en cache un historique surdimensionné.
 
 ```yaml
 agents:
@@ -85,9 +81,9 @@ agents:
       ttl: "1h"
 ```
 
-Voir [Élagage de session](/concepts/session-pruning) pour le comportement complet.
+Voir [Élagage de session](/fr/concepts/session-pruning) pour le comportement complet.
 
-### Maintien à chaud via heartbeat
+### Maintien au chaud par Heartbeat
 
 Heartbeat peut garder les fenêtres de cache chaudes et réduire les réécritures répétées du cache après des périodes d’inactivité.
 
@@ -98,44 +94,45 @@ agents:
       every: "55m"
 ```
 
-Heartbeat par agent est pris en charge via `agents.list[].heartbeat`.
+Heartbeat par agent est pris en charge sous `agents.list[].heartbeat`.
 
 ## Comportement des fournisseurs
 
 ### Anthropic (API directe)
 
 - `cacheRetention` est pris en charge.
-- Avec les profils d’authentification à clé API Anthropic, OpenClaw initialise `cacheRetention: "short"` pour les références de modèles Anthropic lorsqu’elle n’est pas définie.
-- Les réponses Messages natives Anthropic exposent à la fois `cache_read_input_tokens` et `cache_creation_input_tokens`, donc OpenClaw peut afficher `cacheRead` et `cacheWrite`.
-- Pour les requêtes Anthropic natives, `cacheRetention: "short"` correspond au cache éphémère par défaut de 5 minutes, et `cacheRetention: "long"` passe à la TTL de 1 heure uniquement sur les hôtes directs `api.anthropic.com`.
+- Avec les profils d’authentification par clé API Anthropic, OpenClaw initialise `cacheRetention: "short"` pour les références de modèle Anthropic lorsqu’il n’est pas défini.
+- Les réponses Anthropic Messages natives exposent à la fois `cache_read_input_tokens` et `cache_creation_input_tokens`, donc OpenClaw peut afficher `cacheRead` et `cacheWrite`.
+- Pour les requêtes Anthropic natives, `cacheRetention: "short"` correspond au cache éphémère par défaut de 5 minutes, et `cacheRetention: "long"` passe à un TTL d’1 heure uniquement sur les hôtes directs `api.anthropic.com`.
 
 ### OpenAI (API directe)
 
-- Le cache de prompt est automatique sur les modèles récents pris en charge. OpenClaw n’a pas besoin d’injecter de marqueurs de cache au niveau des blocs.
-- OpenClaw utilise `prompt_cache_key` pour garder un routage de cache stable d’un tour à l’autre et utilise `prompt_cache_retention: "24h"` uniquement lorsque `cacheRetention: "long"` est sélectionné sur des hôtes directs OpenAI.
-- OpenAI expose les jetons de prompt mis en cache via `usage.prompt_tokens_details.cached_tokens` (ou `input_tokens_details.cached_tokens` sur les événements Responses API). OpenClaw les mappe vers `cacheRead`.
-- OpenAI n’expose pas de compteur distinct de jetons d’écriture de cache, donc `cacheWrite` reste à `0` sur les chemins OpenAI même lorsque le fournisseur réchauffe un cache.
-- OpenAI renvoie des en-têtes utiles de traçage et de limitation de débit comme `x-request-id`, `openai-processing-ms`, et `x-ratelimit-*`, mais la comptabilisation des hits de cache doit venir de la charge utile d’usage, pas des en-têtes.
-- En pratique, OpenAI se comporte souvent comme un cache de préfixe initial plutôt que comme la réutilisation complète d’un historique mobile à la Anthropic. Les tours texte stables avec un long préfixe peuvent atteindre un plateau d’environ `4864` jetons mis en cache dans les sondes live actuelles, tandis que les transcriptions riches en outils ou de type MCP plafonnent souvent près de `4608` jetons mis en cache, même sur des répétitions exactes.
+- La mise en cache des prompts est automatique sur les modèles récents pris en charge. OpenClaw n’a pas besoin d’injecter de marqueurs de cache au niveau des blocs.
+- OpenClaw utilise `prompt_cache_key` pour garder un routage de cache stable entre les tours et n’utilise `prompt_cache_retention: "24h"` que lorsque `cacheRetention: "long"` est sélectionné sur des hôtes OpenAI directs.
+- Les réponses OpenAI exposent les tokens d’invite mis en cache via `usage.prompt_tokens_details.cached_tokens` (ou `input_tokens_details.cached_tokens` sur les événements de l’API Responses). OpenClaw les mappe vers `cacheRead`.
+- OpenAI n’expose pas de compteur distinct de tokens d’écriture de cache, donc `cacheWrite` reste à `0` sur les chemins OpenAI même lorsque le fournisseur réchauffe un cache.
+- OpenAI renvoie des en-têtes utiles de traçage et de limitation de débit comme `x-request-id`, `openai-processing-ms` et `x-ratelimit-*`, mais la comptabilisation des hits de cache doit provenir de la charge utile d’utilisation, pas des en-têtes.
+- En pratique, OpenAI se comporte souvent comme un cache de préfixe initial plutôt qu’une réutilisation de l’historique complet à la manière d’Anthropic. Les tours avec préfixe long et stable peuvent se stabiliser autour d’un plateau de `4864` tokens mis en cache dans les sondes en direct actuelles, tandis que les transcriptions lourdes en outils ou de type MCP se stabilisent souvent autour de `4608` tokens mis en cache même sur des répétitions exactes.
 
 ### Anthropic Vertex
 
-- Les modèles Anthropic sur Vertex AI (`anthropic-vertex/*`) prennent en charge `cacheRetention` de la même façon que l’API Anthropic directe.
-- `cacheRetention: "long"` correspond à la vraie TTL de cache de prompt de 1 heure sur les points de terminaison Vertex AI.
-- La rétention de cache par défaut pour `anthropic-vertex` correspond aux valeurs par défaut directes d’Anthropic.
-- Les requêtes Vertex passent par un façonnage de cache sensible aux frontières afin que la réutilisation du cache reste alignée sur ce que les fournisseurs reçoivent réellement.
+- Les modèles Anthropic sur Vertex AI (`anthropic-vertex/*`) prennent en charge `cacheRetention` de la même manière qu’Anthropic direct.
+- `cacheRetention: "long"` correspond au vrai TTL de 1 heure du cache d’invite sur les endpoints Vertex AI.
+- La conservation de cache par défaut pour `anthropic-vertex` correspond à celle d’Anthropic direct.
+- Les requêtes Vertex sont routées via une mise en forme de cache sensible aux frontières afin que la réutilisation du cache reste alignée sur ce que les fournisseurs reçoivent réellement.
 
 ### Amazon Bedrock
 
 - Les références de modèle Anthropic Claude (`amazon-bedrock/*anthropic.claude*`) prennent en charge le passage explicite de `cacheRetention`.
 - Les modèles Bedrock non Anthropic sont forcés à `cacheRetention: "none"` à l’exécution.
 
-### Modèles Anthropic OpenRouter
+### Modèles Anthropic via OpenRouter
 
 Pour les références de modèle `openrouter/anthropic/*`, OpenClaw injecte
-`cache_control` Anthropic sur les blocs de prompt system/developer afin d’améliorer la
-réutilisation du cache de prompt uniquement lorsque la requête cible toujours une route OpenRouter vérifiée
-(`openrouter` sur son point de terminaison par défaut, ou tout provider/base URL qui se résout vers `openrouter.ai`).
+`cache_control` Anthropic sur les blocs de prompt système/développeur afin d’améliorer la réutilisation
+du cache d’invite uniquement lorsque la requête cible encore une route OpenRouter vérifiée
+(`openrouter` sur son endpoint par défaut, ou tout fournisseur/URL de base qui se résout
+vers `openrouter.ai`).
 
 Si vous redirigez le modèle vers une URL de proxy arbitraire compatible OpenAI, OpenClaw
 cesse d’injecter ces marqueurs de cache Anthropic spécifiques à OpenRouter.
@@ -146,69 +143,69 @@ Si le fournisseur ne prend pas en charge ce mode de cache, `cacheRetention` n’
 
 ### API directe Google Gemini
 
-- Le transport Gemini direct (`api: "google-generative-ai"`) rapporte les hits de cache
-  via `cachedContentTokenCount` amont ; OpenClaw le mappe vers `cacheRead`.
+- Le transport direct Gemini (`api: "google-generative-ai"`) signale les hits de cache
+  via `cachedContentTokenCount` en amont ; OpenClaw le mappe vers `cacheRead`.
 - Lorsque `cacheRetention` est défini sur un modèle Gemini direct, OpenClaw crée,
-  réutilise et rafraîchit automatiquement des ressources `cachedContents` pour les prompts système
-  dans les exécutions Google AI Studio. Cela signifie que vous n’avez plus besoin de précréer manuellement
-  un handle cached-content.
+  réutilise et actualise automatiquement les ressources `cachedContents` pour les prompts système
+  sur les exécutions Google AI Studio. Cela signifie que vous n’avez plus besoin de précréer
+  manuellement un handle de contenu mis en cache.
 - Vous pouvez toujours transmettre un handle Gemini cached-content existant via
-  `params.cachedContent` (ou l’ancien `params.cached_content`) sur le modèle
-  configuré.
-- Ceci est distinct du cache de préfixe de prompt Anthropic/OpenAI. Pour Gemini,
+  `params.cachedContent` (ou l’ancien `params.cached_content`) sur le modèle configuré.
+- C’est distinct de la mise en cache de préfixe d’invite Anthropic/OpenAI. Pour Gemini,
   OpenClaw gère une ressource native fournisseur `cachedContents` au lieu
   d’injecter des marqueurs de cache dans la requête.
 
-### Usage JSON Gemini CLI
+### Utilisation JSON Gemini CLI
 
-- La sortie JSON de Gemini CLI peut aussi exposer des hits de cache via `stats.cached` ;
+- La sortie JSON Gemini CLI peut aussi exposer les hits de cache via `stats.cached` ;
   OpenClaw le mappe vers `cacheRead`.
-- Si la CLI omet une valeur directe `stats.input`, OpenClaw dérive les jetons d’entrée
-  de `stats.input_tokens - stats.cached`.
-- Il ne s’agit que d’une normalisation d’usage. Cela ne signifie pas qu’OpenClaw crée
-  des marqueurs de cache de prompt de style Anthropic/OpenAI pour Gemini CLI.
+- Si la CLI omet une valeur directe `stats.input`, OpenClaw dérive les tokens d’entrée
+  à partir de `stats.input_tokens - stats.cached`.
+- Il s’agit uniquement d’une normalisation d’usage. Cela ne signifie pas qu’OpenClaw crée
+  des marqueurs de cache d’invite de style Anthropic/OpenAI pour Gemini CLI.
 
 ## Frontière de cache du prompt système
 
-OpenClaw divise le prompt système en un **préfixe stable** et un **suffixe volatil**
+OpenClaw découpe le prompt système en un **préfixe stable** et un **suffixe volatil**
 séparés par une frontière interne de préfixe de cache. Le contenu au-dessus de la
-frontière (définitions d’outils, métadonnées de Skills, fichiers d’espace de travail, et autres
-contextes relativement statiques) est ordonné pour rester identique octet pour octet entre les tours.
-Le contenu sous la frontière (par exemple `HEARTBEAT.md`, horodatages runtime, et
-autres métadonnées par tour) peut changer sans invalider le préfixe mis en cache.
+frontière (définitions d’outils, métadonnées de Skills, fichiers d’espace de travail et autre
+contexte relativement statique) est ordonné pour rester octet-identique d’un tour à l’autre.
+Le contenu sous la frontière (par exemple `HEARTBEAT.md`, horodatages d’exécution et autres métadonnées par tour) est autorisé à changer sans invalider le préfixe mis en cache.
 
 Choix de conception clés :
 
-- Les fichiers stables de contexte projet de l’espace de travail sont ordonnés avant `HEARTBEAT.md` afin que
-  les variations de heartbeat n’invalident pas le préfixe stable.
-- La frontière est appliquée dans le façonnage des transports de la famille Anthropic, de la famille OpenAI, Google et CLI afin que tous les fournisseurs pris en charge bénéficient de la même stabilité de préfixe.
-- Les requêtes Codex Responses et Anthropic Vertex passent par un façonnage de cache sensible aux frontières afin que la réutilisation du cache reste alignée sur ce que les fournisseurs reçoivent réellement.
+- Les fichiers stables de contexte de projet de l’espace de travail sont ordonnés avant `HEARTBEAT.md` afin que
+  l’agitation de Heartbeat ne casse pas le préfixe stable.
+- La frontière est appliquée à travers la mise en forme des transports de type Anthropic, de type OpenAI, Google et
+  CLI, de sorte que tous les fournisseurs pris en charge bénéficient de la même stabilité de préfixe.
+- Les requêtes Codex Responses et Anthropic Vertex sont routées via
+  une mise en forme de cache sensible aux frontières afin que la réutilisation du cache reste alignée sur ce que les fournisseurs reçoivent réellement.
 - Les empreintes du prompt système sont normalisées (espaces, fins de ligne,
-  contexte ajouté par hook, ordre des capacités runtime) afin que des prompts inchangés sur le plan sémantique partagent le KV/cache entre les tours.
+  contexte ajouté par hook, ordre des capacités runtime) afin que les invites sémantiquement inchangées
+  partagent le KV/cache entre les tours.
 
 Si vous voyez des pics inattendus de `cacheWrite` après un changement de configuration ou d’espace de travail,
-vérifiez si ce changement se situe au-dessus ou au-dessous de la frontière de cache. Déplacer
-du contenu volatil sous la frontière (ou le stabiliser) résout souvent le
-problème.
+vérifiez si le changement se situe au-dessus ou au-dessous de la frontière de cache. Déplacer le
+contenu volatil sous la frontière (ou le stabiliser) résout souvent le problème.
 
 ## Garde-fous de stabilité du cache OpenClaw
 
-OpenClaw maintient aussi plusieurs formes de charges utiles sensibles au cache déterministes avant
+OpenClaw maintient aussi plusieurs formes de charge utile sensibles au cache déterministes avant
 que la requête n’atteigne le fournisseur :
 
-- Les catalogues d’outils MCP bundle sont triés de manière déterministe avant l’enregistrement
-  des outils, afin que les changements d’ordre `listTools()` ne modifient pas le bloc d’outils
-  et n’invalident pas les préfixes du cache de prompt.
-- Les sessions héritées avec des blocs d’image persistés conservent intacts les **3 tours terminés
-  les plus récents** ; les blocs d’image plus anciens déjà traités peuvent être
-  remplacés par un marqueur afin que les suivis riches en images ne renvoient pas
-  sans cesse de grosses charges utiles obsolètes.
+- Les catalogues d’outils MCP de bundle sont triés de manière déterministe avant l’enregistrement
+  des outils, de sorte que les changements d’ordre `listTools()` n’agitent pas le bloc d’outils et
+  ne cassent pas les préfixes de cache d’invite.
+- Les anciennes sessions avec blocs d’image persistés gardent les **3 tours terminés les plus récents**
+  intacts ; les anciens blocs d’image déjà traités peuvent être remplacés par
+  un marqueur afin que les suivis lourds en images ne continuent pas à renvoyer de grosses
+  charges utiles obsolètes.
 
-## Modèles de réglage
+## Schémas d’ajustement
 
 ### Trafic mixte (valeur par défaut recommandée)
 
-Gardez une base de référence durable sur votre agent principal, désactivez le cache sur les agents notificateurs par rafales :
+Conservez une base de longue durée sur votre agent principal, désactivez la mise en cache sur les agents de notification en rafale :
 
 ```yaml
 agents:
@@ -229,68 +226,68 @@ agents:
         cacheRetention: "none"
 ```
 
-### Référence orientée coût
+### Base orientée coût
 
-- Définissez la base sur `cacheRetention: "short"`.
+- Définissez `cacheRetention: "short"` comme base.
 - Activez `contextPruning.mode: "cache-ttl"`.
-- Gardez heartbeat en dessous de votre TTL uniquement pour les agents qui bénéficient de caches chauds.
+- Gardez Heartbeat sous votre TTL uniquement pour les agents qui bénéficient de caches chauds.
 
-## Diagnostics du cache
+## Diagnostics de cache
 
-OpenClaw expose des diagnostics dédiés de trace de cache pour les exécutions d’agent embarquées.
+OpenClaw expose des diagnostics dédiés de trace de cache pour les exécutions d’agent intégrées.
 
-Pour les diagnostics utilisateur normaux, `/status` et d’autres résumés d’usage peuvent utiliser
-la dernière entrée d’usage de transcription comme source de repli pour `cacheRead` /
-`cacheWrite` lorsque l’entrée live de session ne contient pas ces compteurs.
+Pour les diagnostics orientés utilisateur normaux, `/status` et les autres résumés d’usage peuvent utiliser
+la dernière entrée d’utilisation de transcription comme source de repli pour `cacheRead` /
+`cacheWrite` lorsque l’entrée de session en direct ne contient pas ces compteurs.
 
-## Tests live de régression
+## Tests de régression en direct
 
-OpenClaw conserve une seule barrière combinée de régression live du cache pour les préfixes répétés, les tours d’outil, les tours d’image, les transcriptions d’outils de style MCP, et un témoin sans cache Anthropic.
+OpenClaw conserve une seule porte de régression de cache en direct combinée pour les préfixes répétés, les tours d’outils, les tours d’image, les transcriptions d’outils de type MCP et un témoin Anthropic sans cache.
 
 - `src/agents/live-cache-regression.live.test.ts`
 - `src/agents/live-cache-regression-baseline.ts`
 
-Exécutez cette barrière live ciblée avec :
+Exécutez la porte étroite en direct avec :
 
 ```sh
 OPENCLAW_LIVE_TEST=1 OPENCLAW_LIVE_CACHE_TEST=1 pnpm test:live:cache
 ```
 
-Le fichier de référence stocke les derniers nombres live observés ainsi que les seuils de régression spécifiques au fournisseur utilisés par le test.
-L’exécuteur utilise aussi des ID de session et espaces de noms de prompt frais à chaque exécution afin que l’état de cache précédent ne pollue pas l’échantillon courant de régression.
+Le fichier de base stocke les derniers chiffres observés en direct ainsi que les seuils de régression spécifiques au fournisseur utilisés par le test.
+L’exécuteur utilise aussi des IDs de session frais par exécution et des espaces de noms d’invite afin que l’état de cache précédent ne pollue pas l’échantillon de régression courant.
 
-Ces tests n’utilisent intentionnellement pas des critères de réussite identiques pour tous les fournisseurs.
+Ces tests n’utilisent volontairement pas des critères de réussite identiques pour tous les fournisseurs.
 
-### Attentes live Anthropic
+### Attentes en direct pour Anthropic
 
-- Attendez-vous à des écritures explicites d’échauffement via `cacheWrite`.
-- Attendez-vous à une réutilisation presque complète de l’historique sur les tours répétés car le contrôle de cache Anthropic fait progresser le point de coupure du cache au fil de la conversation.
-- Les assertions live actuelles utilisent encore des seuils élevés de taux de hit pour les chemins stables, outils et images.
+- Attendre des écritures d’échauffement explicites via `cacheWrite`.
+- Attendre une réutilisation quasi complète de l’historique sur les tours répétés parce que le contrôle de cache Anthropic fait progresser le point d’arrêt du cache à travers la conversation.
+- Les assertions en direct actuelles utilisent encore des seuils élevés de taux de hit pour les chemins stables, d’outils et d’image.
 
-### Attentes live OpenAI
+### Attentes en direct pour OpenAI
 
-- Attendez-vous uniquement à `cacheRead`. `cacheWrite` reste à `0`.
-- Traitez la réutilisation du cache sur tours répétés comme un plateau spécifique au fournisseur, et non comme une réutilisation mobile complète de l’historique à la Anthropic.
-- Les assertions live actuelles utilisent des seuils prudents dérivés du comportement live observé sur `gpt-5.4-mini` :
+- Attendre uniquement `cacheRead`. `cacheWrite` reste à `0`.
+- Traiter la réutilisation de cache sur tours répétés comme un plateau spécifique au fournisseur, et non comme une réutilisation mobile de l’historique complet à la manière d’Anthropic.
+- Les assertions en direct actuelles utilisent des contrôles de seuil conservateurs dérivés du comportement observé en direct sur `gpt-5.4-mini` :
   - préfixe stable : `cacheRead >= 4608`, taux de hit `>= 0.90`
   - transcription d’outil : `cacheRead >= 4096`, taux de hit `>= 0.85`
   - transcription d’image : `cacheRead >= 3840`, taux de hit `>= 0.82`
-  - transcription de style MCP : `cacheRead >= 4096`, taux de hit `>= 0.85`
+  - transcription de type MCP : `cacheRead >= 4096`, taux de hit `>= 0.85`
 
-La vérification live combinée fraîche du 2026-04-04 a donné :
+La vérification combinée fraîche en direct du 2026-04-04 a donné :
 
 - préfixe stable : `cacheRead=4864`, taux de hit `0.966`
 - transcription d’outil : `cacheRead=4608`, taux de hit `0.896`
 - transcription d’image : `cacheRead=4864`, taux de hit `0.954`
-- transcription de style MCP : `cacheRead=4608`, taux de hit `0.891`
+- transcription de type MCP : `cacheRead=4608`, taux de hit `0.891`
 
-Le temps horloge local récent pour la barrière combinée était d’environ `88s`.
+Le temps d’exécution local récent pour la porte combinée était d’environ `88s`.
 
 Pourquoi les assertions diffèrent :
 
-- Anthropic expose des points de coupure de cache explicites et une réutilisation mobile de l’historique de conversation.
-- Le cache de prompt OpenAI reste sensible au préfixe exact, mais le préfixe effectivement réutilisable dans le trafic live Responses peut plafonner plus tôt que le prompt complet.
-- À cause de cela, comparer Anthropic et OpenAI avec un unique seuil de pourcentage inter-fournisseur crée de faux cas de régression.
+- Anthropic expose des points d’arrêt explicites du cache et une réutilisation mobile de l’historique de conversation.
+- La mise en cache des prompts OpenAI reste sensible aux préfixes exacts, mais le préfixe réutilisable effectif dans le trafic live Responses peut plafonner plus tôt que l’invite complète.
+- À cause de cela, comparer Anthropic et OpenAI avec un seul seuil de pourcentage inter-fournisseurs crée de fausses régressions.
 
 ### Configuration `diagnostics.cacheTrace`
 
@@ -298,10 +295,10 @@ Pourquoi les assertions diffèrent :
 diagnostics:
   cacheTrace:
     enabled: true
-    filePath: "~/.openclaw/logs/cache-trace.jsonl" # facultatif
-    includeMessages: false # par défaut true
-    includePrompt: false # par défaut true
-    includeSystem: false # par défaut true
+    filePath: "~/.openclaw/logs/cache-trace.jsonl" # optional
+    includeMessages: false # default true
+    includePrompt: false # default true
+    includeSystem: false # default true
 ```
 
 Valeurs par défaut :
@@ -311,33 +308,38 @@ Valeurs par défaut :
 - `includePrompt` : `true`
 - `includeSystem` : `true`
 
-### Basculements env (débogage ponctuel)
+### Bascule env (débogage ponctuel)
 
 - `OPENCLAW_CACHE_TRACE=1` active la trace de cache.
 - `OPENCLAW_CACHE_TRACE_FILE=/path/to/cache-trace.jsonl` remplace le chemin de sortie.
-- `OPENCLAW_CACHE_TRACE_MESSAGES=0|1` active/désactive la capture complète des charges utiles des messages.
-- `OPENCLAW_CACHE_TRACE_PROMPT=0|1` active/désactive la capture du texte du prompt.
-- `OPENCLAW_CACHE_TRACE_SYSTEM=0|1` active/désactive la capture du prompt système.
+- `OPENCLAW_CACHE_TRACE_MESSAGES=0|1` active/désactive la capture complète des charges utiles de message.
+- `OPENCLAW_CACHE_TRACE_PROMPT=0|1` active/désactive la capture du texte de l’invite.
+- `OPENCLAW_CACHE_TRACE_SYSTEM=0|1` active/désactive la capture de l’invite système.
 
 ### Ce qu’il faut inspecter
 
-- Les événements de trace de cache sont au format JSONL et incluent des instantanés par étape comme `session:loaded`, `prompt:before`, `stream:context`, et `session:after`.
-- L’impact des jetons de cache par tour est visible dans les surfaces normales d’usage via `cacheRead` et `cacheWrite` (par exemple `/usage full` et les résumés d’usage de session).
-- Pour Anthropic, attendez-vous à voir `cacheRead` et `cacheWrite` lorsque le cache est actif.
-- Pour OpenAI, attendez-vous à `cacheRead` lors des hits de cache et à `cacheWrite` restant à `0` ; OpenAI ne publie pas de champ distinct pour les jetons d’écriture du cache.
-- Si vous avez besoin de traçage de requête, journalisez les IDs de requête et les en-têtes de limitation de débit séparément des métriques de cache. La sortie actuelle de trace de cache d’OpenClaw est centrée sur la forme du prompt/de la session et l’usage normalisé des jetons plutôt que sur les en-têtes bruts de réponse du fournisseur.
+- Les événements de trace de cache sont en JSONL et incluent des snapshots par étape comme `session:loaded`, `prompt:before`, `stream:context` et `session:after`.
+- L’impact des tokens de cache par tour est visible dans les surfaces normales d’utilisation via `cacheRead` et `cacheWrite` (par exemple `/usage full` et les résumés d’utilisation de session).
+- Pour Anthropic, attendez-vous à voir `cacheRead` et `cacheWrite` lorsque la mise en cache est active.
+- Pour OpenAI, attendez-vous à voir `cacheRead` sur les hits de cache et `cacheWrite` rester à `0` ; OpenAI ne publie pas de champ séparé pour les tokens d’écriture de cache.
+- Si vous avez besoin d’une traçabilité des requêtes, journalisez les IDs de requête et les en-têtes de limitation de débit séparément des métriques de cache. La sortie actuelle de trace de cache d’OpenClaw se concentre sur la forme de l’invite/session et l’usage normalisé des tokens plutôt que sur les en-têtes bruts de réponse du fournisseur.
 
 ## Dépannage rapide
 
 - `cacheWrite` élevé sur la plupart des tours : vérifiez les entrées volatiles du prompt système et confirmez que le modèle/fournisseur prend en charge vos réglages de cache.
-- `cacheWrite` élevé sur Anthropic : cela signifie souvent que le point de coupure du cache tombe sur du contenu qui change à chaque requête.
-- `cacheRead` faible sur OpenAI : vérifiez que le préfixe stable est au début, que le préfixe répété fait au moins 1024 jetons, et que le même `prompt_cache_key` est réutilisé pour les tours censés partager un cache.
-- Aucun effet de `cacheRetention` : confirmez que la clé de modèle correspond à `agents.defaults.models["provider/model"]`.
-- Requêtes Bedrock Nova/Mistral avec réglages de cache : forçage runtime attendu vers `none`.
+- `cacheWrite` élevé sur Anthropic : cela signifie souvent que le point d’arrêt du cache tombe sur un contenu qui change à chaque requête.
+- `cacheRead` OpenAI faible : vérifiez que le préfixe stable est en tête, que le préfixe répété fait au moins 1024 tokens, et que le même `prompt_cache_key` est réutilisé pour les tours qui doivent partager un cache.
+- Aucun effet de `cacheRetention` : confirmez que la clé du modèle correspond à `agents.defaults.models["provider/model"]`.
+- Requêtes Bedrock Nova/Mistral avec paramètres de cache : forçage d’exécution attendu vers `none`.
 
-Documents associés :
+Documentation associée :
 
-- [Anthropic](/providers/anthropic)
-- [Utilisation des jetons et coûts](/reference/token-use)
-- [Élagage de session](/concepts/session-pruning)
-- [Référence de configuration Gateway](/gateway/configuration-reference)
+- [Anthropic](/fr/providers/anthropic)
+- [Utilisation des tokens et coûts](/fr/reference/token-use)
+- [Élagage de session](/fr/concepts/session-pruning)
+- [Référence de configuration du Gateway](/fr/gateway/configuration-reference)
+
+## Associé
+
+- [Utilisation des tokens et coûts](/fr/reference/token-use)
+- [Utilisation et coûts API](/fr/reference/api-usage-costs)

@@ -1,29 +1,27 @@
 ---
 read_when:
-    - Vous devez inspecter la sortie brute du modèle pour détecter des fuites de raisonnement
-    - Vous voulez exécuter la Gateway en mode watch pendant l’itération
-    - Vous avez besoin d’un flux de travail de débogage reproductible
+    - Vous devez inspecter la sortie brute du modèle pour détecter les fuites de raisonnement
+    - Vous souhaitez exécuter le Gateway en mode watch pendant vos itérations
+    - Vous avez besoin d’un flux de débogage reproductible
 summary: 'Outils de débogage : mode watch, flux bruts du modèle et traçage des fuites de raisonnement'
 title: Débogage
 x-i18n:
-    generated_at: "2026-04-23T07:04:22Z"
+    generated_at: "2026-04-24T07:13:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 45f1c55268c02d2d52abf348760d1e00e7536788c3a9aa77854692c4d964fb6e
+    source_hash: 8d52070204e21cd7e5bff565fadab96fdeee0ad906c4c8601572761a096d9025
     source_path: help/debugging.md
     workflow: 15
 ---
 
-# Débogage
+Cette page couvre les helpers de débogage pour la sortie en streaming, en particulier lorsqu’un
+provider mélange le raisonnement au texte normal.
 
-Cette page couvre les assistants de débogage pour la sortie en streaming, en particulier lorsqu’un
-fournisseur mélange le raisonnement au texte normal.
+## Surcharges de débogage à l’exécution
 
-## Remplacements de débogage à l’exécution
-
-Utilisez `/debug` dans le chat pour définir des remplacements de configuration **uniquement à l’exécution** (mémoire, pas disque).
+Utilisez `/debug` dans le chat pour définir des surcharges de configuration **uniquement à l’exécution** (mémoire, pas disque).
 `/debug` est désactivé par défaut ; activez-le avec `commands.debug: true`.
-C’est pratique lorsque vous devez basculer des réglages obscurs sans modifier `openclaw.json`.
+C’est pratique lorsque vous devez basculer des paramètres obscurs sans modifier `openclaw.json`.
 
 Exemples :
 
@@ -34,12 +32,12 @@ Exemples :
 /debug reset
 ```
 
-`/debug reset` efface tous les remplacements et revient à la configuration sur disque.
+`/debug reset` efface toutes les surcharges et revient à la configuration sur disque.
 
 ## Sortie de trace de session
 
-Utilisez `/trace` lorsque vous voulez voir les lignes de trace/débogage appartenant aux plugins dans une session
-sans activer le mode verbeux complet.
+Utilisez `/trace` lorsque vous voulez voir les lignes de trace/débogage détenues par les Plugins dans une session
+sans activer le mode verbose complet.
 
 Exemples :
 
@@ -49,23 +47,23 @@ Exemples :
 /trace off
 ```
 
-Utilisez `/trace` pour les diagnostics de plugins tels que les résumés de débogage Active Memory.
-Continuez à utiliser `/verbose` pour la sortie normale verbeuse de statut/outils, et continuez à utiliser
-`/debug` pour les remplacements de configuration uniquement à l’exécution.
+Utilisez `/trace` pour les diagnostics de Plugin tels que les résumés de débogage Active Memory.
+Continuez à utiliser `/verbose` pour la sortie verbose normale des statuts/outils, et continuez à utiliser
+`/debug` pour les surcharges de configuration uniquement à l’exécution.
 
-## Chronométrage CLI de débogage temporaire
+## Aide temporaire de timing CLI pour le débogage
 
-OpenClaw conserve `src/cli/debug-timing.ts` comme petit assistant pour
-l’investigation locale. Il n’est volontairement pas branché au démarrage de la CLI, au routage des commandes
+OpenClaw conserve `src/cli/debug-timing.ts` comme petit helper pour les
+investigations locales. Il n’est volontairement pas branché au démarrage du CLI, au routage des commandes,
 ni à aucune commande par défaut. Utilisez-le uniquement pendant le débogage d’une commande lente, puis
 supprimez l’import et les spans avant de livrer le changement de comportement.
 
-Utilisez-le lorsqu’une commande est lente et que vous avez besoin d’un découpage rapide par phase avant de
-décider d’utiliser un profileur CPU ou de corriger un sous-système spécifique.
+Utilisez-le lorsqu’une commande est lente et que vous avez besoin d’une ventilation rapide par phase avant
+de décider d’utiliser un profileur CPU ou de corriger un sous-système spécifique.
 
 ### Ajouter des spans temporaires
 
-Ajoutez l’assistant près du code que vous examinez. Par exemple, lors du débogage de
+Ajoutez le helper près du code que vous examinez. Par exemple, pendant le débogage de
 `openclaw models list`, un patch temporaire dans
 `src/commands/models/list.list-command.ts` pourrait ressembler à ceci :
 
@@ -87,16 +85,16 @@ const loaded = await timing.timeAsync(
 );
 ```
 
-Directives :
+Consignes :
 
 - Préfixez les noms de phase temporaires avec `debug:`.
-- N’ajoutez que quelques spans autour des sections suspectées d’être lentes.
-- Préférez des phases larges comme `registry`, `auth_store` ou `rows` plutôt que des noms
-  d’assistants.
+- N’ajoutez que quelques spans autour des sections soupçonnées d’être lentes.
+- Préférez de grandes phases telles que `registry`, `auth_store`, ou `rows` aux
+  noms de helpers.
 - Utilisez `time()` pour le travail synchrone et `timeAsync()` pour les promesses.
-- Gardez stdout propre. L’assistant écrit vers stderr, ainsi la sortie JSON des commandes reste analysable.
+- Gardez stdout propre. Le helper écrit sur stderr, de sorte que la sortie JSON de la commande reste analysable.
 - Supprimez les imports et spans temporaires avant d’ouvrir la PR de correction finale.
-- Incluez la sortie de chronométrage ou un court résumé dans l’issue ou la PR qui explique
+- Incluez la sortie de timing ou un court résumé dans l’issue ou la PR qui explique
   l’optimisation.
 
 ### Exécuter avec une sortie lisible
@@ -107,7 +105,7 @@ Le mode lisible est le meilleur pour le débogage en direct :
 OPENCLAW_DEBUG_TIMING=1 pnpm openclaw models list --all --provider moonshot
 ```
 
-Exemple de sortie d’une investigation temporaire sur `models list` :
+Exemple de sortie à partir d’une investigation temporaire de `models list` :
 
 ```text
 OpenClaw CLI debug timing: models list
@@ -136,23 +134,23 @@ moonshot/kimi-k2.6                         text+image  256k  no    no
   36.9s     +0ms complete rows=5
 ```
 
-Constats issus de cette sortie :
+Constats à partir de cette sortie :
 
-| Phase                                    |      Temps | Ce que cela signifie                                                                                   |
-| ---------------------------------------- | ---------: | ------------------------------------------------------------------------------------------------------ |
-| `debug:models:list:auth_store`           |      20.3s | Le chargement du store de profils d’authentification est le coût principal et doit être investigué en priorité. |
-| `debug:models:list:ensure_models_json`   |       5.0s | La synchronisation de `models.json` est suffisamment coûteuse pour examiner la mise en cache ou les conditions de saut. |
-| `debug:models:list:load_model_registry`  |       5.9s | La construction du registre et le travail de disponibilité des fournisseurs représentent aussi des coûts significatifs. |
-| `debug:models:list:read_registry_models` |       2.4s | Lire tous les modèles du registre n’est pas gratuit et peut compter pour `--all`.                     |
-| phases d’ajout de lignes                 | 3.2s total | Construire cinq lignes affichées prend encore plusieurs secondes, donc le chemin de filtrage mérite un examen plus attentif. |
-| `debug:models:list:print_model_table`    |        0ms | Le rendu n’est pas le goulot d’étranglement.                                                           |
+| Phase                                    |     Temps | Ce que cela signifie                                                                                   |
+| ---------------------------------------- | --------: | ------------------------------------------------------------------------------------------------------ |
+| `debug:models:list:auth_store`           |    20.3s  | Le chargement du magasin de profils d’authentification est le coût principal et doit être étudié en premier. |
+| `debug:models:list:ensure_models_json`   |     5.0s  | La synchronisation de `models.json` est suffisamment coûteuse pour examiner le cache ou les conditions d’omission. |
+| `debug:models:list:load_model_registry`  |     5.9s  | La construction du registre et le travail de disponibilité provider sont aussi des coûts significatifs. |
+| `debug:models:list:read_registry_models` |     2.4s  | Lire tous les modèles du registre n’est pas gratuit et peut compter pour `--all`.                    |
+| phases d’ajout de lignes                 | 3.2s total | Construire cinq lignes affichées prend encore plusieurs secondes, donc le chemin de filtrage mérite un examen plus poussé. |
+| `debug:models:list:print_model_table`    |      0ms  | Le rendu n’est pas le goulot d’étranglement.                                                          |
 
-Ces constats suffisent à guider le patch suivant sans conserver le code de chronométrage
+Ces constats suffisent à guider le patch suivant sans conserver de code de timing
 dans les chemins de production.
 
 ### Exécuter avec une sortie JSON
 
-Utilisez le mode JSON lorsque vous voulez enregistrer ou comparer des données de chronométrage :
+Utilisez le mode JSON lorsque vous voulez enregistrer ou comparer les données de timing :
 
 ```bash
 OPENCLAW_DEBUG_TIMING=json pnpm openclaw models list --all --provider moonshot \
@@ -183,16 +181,16 @@ rg 'createCliDebugTiming|debug:[a-z0-9_-]+:' src/commands src/cli \
   --glob '!*.test.ts'
 ```
 
-La commande ne doit renvoyer aucun site d’appel d’instrumentation temporaire à moins que la PR
-n’ajoute explicitement une surface de diagnostic permanente. Pour les corrections normales de performance,
-ne conservez que le changement de comportement, les tests et une courte note avec les preuves de chronométrage.
+La commande ne doit renvoyer aucun site d’appel d’instrumentation temporaire, sauf si la PR
+ajoute explicitement une surface de diagnostics permanente. Pour les correctifs de performance normaux,
+ne conservez que le changement de comportement, les tests et une courte note avec les preuves de timing.
 
-Pour des points chauds CPU plus profonds, utilisez le profilage Node (`--cpu-prof`) ou un profileur
-externe au lieu d’ajouter davantage d’enveloppes de chronométrage.
+Pour les points chauds CPU plus profonds, utilisez le profiling Node (`--cpu-prof`) ou un
+profileur externe au lieu d’ajouter davantage de wrappers de timing.
 
-## Mode watch de la Gateway
+## Mode watch du Gateway
 
-Pour une itération rapide, exécutez la Gateway sous le watcher de fichiers :
+Pour des itérations rapides, exécutez le gateway sous le watcher de fichiers :
 
 ```bash
 pnpm gateway:watch
@@ -204,25 +202,24 @@ Cela correspond à :
 node scripts/watch-node.mjs gateway --force
 ```
 
-Le watcher redémarre sur les fichiers pertinents pour le build sous `src/`, les fichiers source d’extensions,
-les métadonnées `package.json` et `openclaw.plugin.json` des extensions, `tsconfig.json`,
-`package.json` et `tsdown.config.ts`. Les changements de métadonnées d’extension redémarrent la
-Gateway sans forcer un rebuild `tsdown` ; les changements de source et de configuration
-reconstruisent toujours `dist` d’abord.
+Le watcher redémarre sur les fichiers pertinents pour le build sous `src/`, les fichiers source d’extension,
+`package.json` des extensions et les métadonnées `openclaw.plugin.json`, `tsconfig.json`,
+`package.json`, et `tsdown.config.ts`. Les changements de métadonnées d’extension redémarrent le
+gateway sans forcer une reconstruction `tsdown` ; les changements de source et de configuration reconstruisent toujours `dist` d’abord.
 
-Ajoutez tous les drapeaux CLI de la Gateway après `gateway:watch` et ils seront retransmis à
-chaque redémarrage. Réexécuter la même commande watch pour le même dépôt/jeu de drapeaux
-remplace désormais l’ancien watcher au lieu de laisser des parents de watcher en double.
+Ajoutez tout indicateur CLI gateway après `gateway:watch` et il sera transmis à chaque
+redémarrage. Relancer la même commande watch pour le même dépôt/jeu d’indicateurs remplace maintenant
+l’ancien watcher au lieu de laisser des parents watchers dupliqués.
 
-## Profil dev + Gateway dev (`--dev`)
+## Profil dev + gateway dev (`--dev`)
 
 Utilisez le profil dev pour isoler l’état et lancer une configuration sûre et jetable pour le
-débogage. Il existe **deux** drapeaux `--dev` :
+débogage. Il y a **deux** indicateurs `--dev` :
 
-- **`--dev` global (profil) :** isole l’état sous `~/.openclaw-dev` et
-  définit par défaut le port de la Gateway à `19001` (les ports dérivés se décalent avec lui).
-- **`gateway --dev` :** indique à la Gateway de créer automatiquement une configuration +
-  un espace de travail par défaut s’ils sont absents (et d’ignorer `BOOTSTRAP.md`).
+- **Global `--dev` (profil)** : isole l’état sous `~/.openclaw-dev` et
+  définit par défaut le port gateway sur `19001` (les ports dérivés se décalent avec lui).
+- **`gateway --dev`** : indique au Gateway de créer automatiquement une configuration par défaut +
+  un espace de travail s’ils sont manquants (et d’ignorer `BOOTSTRAP.md`).
 
 Flux recommandé (profil dev + bootstrap dev) :
 
@@ -231,24 +228,24 @@ pnpm gateway:dev
 OPENCLAW_PROFILE=dev openclaw tui
 ```
 
-Si vous n’avez pas encore d’installation globale, exécutez la CLI via `pnpm openclaw ...`.
+Si vous n’avez pas encore d’installation globale, exécutez le CLI via `pnpm openclaw ...`.
 
 Ce que cela fait :
 
-1. **Isolation de profil** (`--dev` global)
+1. **Isolation de profil** (global `--dev`)
    - `OPENCLAW_PROFILE=dev`
    - `OPENCLAW_STATE_DIR=~/.openclaw-dev`
    - `OPENCLAW_CONFIG_PATH=~/.openclaw-dev/openclaw.json`
    - `OPENCLAW_GATEWAY_PORT=19001` (browser/canvas se décalent en conséquence)
 
 2. **Bootstrap dev** (`gateway --dev`)
-   - Écrit une configuration minimale si absente (`gateway.mode=local`, liaison loopback).
+   - Écrit une configuration minimale si elle manque (`gateway.mode=local`, bind loopback).
    - Définit `agent.workspace` sur l’espace de travail dev.
    - Définit `agent.skipBootstrap=true` (pas de `BOOTSTRAP.md`).
-   - Initialise les fichiers de l’espace de travail s’ils sont absents :
+   - Initialise les fichiers d’espace de travail s’ils sont absents :
      `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`.
-   - Identité par défaut : **C3‑PO** (droïde protocolaire).
-   - Ignore les fournisseurs de canaux en mode dev (`OPENCLAW_SKIP_CHANNELS=1`).
+   - Identité par défaut : **C3‑PO** (droïde de protocole).
+   - Ignore les providers de canal en mode dev (`OPENCLAW_SKIP_CHANNELS=1`).
 
 Flux de réinitialisation (nouveau départ) :
 
@@ -256,8 +253,8 @@ Flux de réinitialisation (nouveau départ) :
 pnpm gateway:dev:reset
 ```
 
-Remarque : `--dev` est un drapeau de profil **global** et il est absorbé par certains runners.
-Si vous devez l’écrire explicitement, utilisez la forme variable d’environnement :
+Remarque : `--dev` est un indicateur de profil **global** et il est consommé par certains runners.
+Si vous devez l’écrire explicitement, utilisez la forme par variable d’environnement :
 
 ```bash
 OPENCLAW_PROFILE=dev openclaw gateway --dev --reset
@@ -266,7 +263,7 @@ OPENCLAW_PROFILE=dev openclaw gateway --dev --reset
 `--reset` efface la configuration, les identifiants, les sessions et l’espace de travail dev (en utilisant
 `trash`, pas `rm`), puis recrée la configuration dev par défaut.
 
-Astuce : si une Gateway non dev est déjà en cours d’exécution (launchd/systemd), arrêtez-la d’abord :
+Conseil : si un gateway non-dev est déjà en cours d’exécution (launchd/systemd), arrêtez-le d’abord :
 
 ```bash
 openclaw gateway stop
@@ -275,16 +272,16 @@ openclaw gateway stop
 ## Journalisation des flux bruts (OpenClaw)
 
 OpenClaw peut journaliser le **flux brut de l’assistant** avant tout filtrage/formatage.
-C’est la meilleure façon de voir si le raisonnement arrive sous forme de deltas de texte brut
-(ou de blocs de réflexion séparés).
+C’est le meilleur moyen de voir si le raisonnement arrive sous forme de deltas de texte brut
+(ou sous forme de blocs de réflexion séparés).
 
-Activez-le via la CLI :
+Activez-la via le CLI :
 
 ```bash
 pnpm gateway:watch --raw-stream
 ```
 
-Remplacement facultatif du chemin :
+Surcharge facultative du chemin :
 
 ```bash
 pnpm gateway:watch --raw-stream --raw-stream-path ~/.openclaw/logs/raw-stream.jsonl
@@ -303,8 +300,8 @@ Fichier par défaut :
 
 ## Journalisation des segments bruts (pi-mono)
 
-Pour capturer les **segments bruts compatibles OpenAI** avant qu’ils soient analysés en blocs,
-pi-mono expose un journaliseur distinct :
+Pour capturer les **segments bruts compatibles OpenAI** avant qu’ils ne soient analysés en blocs,
+pi-mono expose un logger séparé :
 
 ```bash
 PI_RAW_STREAM=1
@@ -320,11 +317,16 @@ Fichier par défaut :
 
 `~/.pi-mono/logs/raw-openai-completions.jsonl`
 
-> Remarque : ceci n’est émis que par les processus utilisant le fournisseur
-> `openai-completions` de pi-mono.
+> Remarque : ceci n’est émis que par les processus utilisant le
+> provider `openai-completions` de pi-mono.
 
 ## Remarques de sécurité
 
 - Les journaux de flux bruts peuvent inclure les prompts complets, la sortie des outils et les données utilisateur.
-- Conservez les journaux en local et supprimez-les après le débogage.
-- Si vous partagez des journaux, nettoyez d’abord les secrets et les données personnelles.
+- Gardez les journaux en local et supprimez-les après le débogage.
+- Si vous partagez les journaux, nettoyez d’abord les secrets et les données personnelles.
+
+## Lié
+
+- [Dépannage](/fr/help/troubleshooting)
+- [FAQ](/fr/help/faq)

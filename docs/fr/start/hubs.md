@@ -1,35 +1,33 @@
 ---
 read_when:
-    - Vous voulez une carte complète de la documentation
+    - Vous souhaitez une carte complète de la documentation
 summary: Hubs qui renvoient vers toute la documentation OpenClaw
 title: Hubs de documentation
 x-i18n:
-    generated_at: "2026-04-23T07:11:08Z"
+    generated_at: "2026-04-24T07:33:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4bf24887af25cb345834e7f61e33d1ca3595833a42934ae91a87cc0951b3ae10
+    source_hash: 711d23631ca29b122054b1a048058ec5bd787043e7ffc8c3108b17cf275c2c8e
     source_path: start/hubs.md
     workflow: 15
 ---
 
-# Hubs de documentation
-
 <Note>
-Si vous débutez avec OpenClaw, commencez par [Getting Started](/fr/start/getting-started).
+Si vous débutez avec OpenClaw, commencez par [Premiers pas](/fr/start/getting-started).
 </Note>
 
-Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondies et les documents de référence qui n’apparaissent pas dans la navigation de gauche.
+Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondies et la documentation de référence qui n’apparaissent pas dans la navigation de gauche.
 
 ## Commencer ici
 
 - [Index](/fr)
-- [Getting Started](/fr/start/getting-started)
+- [Premiers pas](/fr/start/getting-started)
 - [Onboarding](/fr/start/onboarding)
 - [Onboarding (CLI)](/fr/start/wizard)
-- [Setup](/fr/start/setup)
-- [Dashboard (Gateway local)](http://127.0.0.1:18789/)
+- [Configuration initiale](/fr/start/setup)
+- [Tableau de bord (Gateway local)](http://127.0.0.1:18789/)
 - [Aide](/fr/help)
-- [Répertoire de documentation](/fr/start/docs-directory)
+- [Répertoire de la documentation](/fr/start/docs-directory)
 - [Configuration](/fr/gateway/configuration)
 - [Exemples de configuration](/fr/gateway/configuration-examples)
 - [Assistant OpenClaw](/fr/start/openclaw)
@@ -40,7 +38,7 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 
 - [Docker](/fr/install/docker)
 - [Nix](/fr/install/nix)
-- [Mise à jour / rollback](/fr/install/updating)
+- [Mise à jour / retour arrière](/fr/install/updating)
 - [Flux Bun (expérimental)](/fr/install/bun)
 
 ## Concepts fondamentaux
@@ -48,15 +46,15 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Architecture](/fr/concepts/architecture)
 - [Fonctionnalités](/fr/concepts/features)
 - [Hub réseau](/fr/network)
-- [Runtime d’agent](/fr/concepts/agent)
-- [Espace de travail d’agent](/fr/concepts/agent-workspace)
-- [Memory](/fr/concepts/memory)
+- [Exécution d’agent](/fr/concepts/agent)
+- [Espace de travail de l’agent](/fr/concepts/agent-workspace)
+- [Mémoire](/fr/concepts/memory)
 - [Boucle d’agent](/fr/concepts/agent-loop)
-- [Streaming + chunking](/fr/concepts/streaming)
-- [Routage multi-agent](/fr/concepts/multi-agent)
+- [Streaming + segmentation](/fr/concepts/streaming)
+- [Routage multi-agents](/fr/concepts/multi-agent)
 - [Compaction](/fr/concepts/compaction)
 - [Sessions](/fr/concepts/session)
-- [Nettoyage des sessions](/fr/concepts/session-pruning)
+- [Élagage de session](/fr/concepts/session-pruning)
 - [Outils de session](/fr/concepts/session-tool)
 - [File d’attente](/fr/concepts/queue)
 - [Commandes slash](/fr/tools/slash-commands)
@@ -69,13 +67,13 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Routage des canaux](/fr/channels/channel-routing)
 - [Groupes](/fr/channels/groups)
 - [Messages de groupe](/fr/channels/group-messages)
-- [Repli de modèle](/fr/concepts/model-failover)
+- [Basculement de modèle](/fr/concepts/model-failover)
 - [OAuth](/fr/concepts/oauth)
 
-## Providers + entrée
+## Fournisseurs + entrée
 
 - [Hub des canaux de chat](/fr/channels)
-- [Hub des providers de modèles](/fr/providers/models)
+- [Hub des fournisseurs de modèles](/fr/providers/models)
 - [WhatsApp](/fr/channels/whatsapp)
 - [Telegram](/fr/channels/telegram)
 - [Slack](/fr/channels/slack)
@@ -84,28 +82,28 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Signal](/fr/channels/signal)
 - [BlueBubbles (iMessage)](/fr/channels/bluebubbles)
 - [QQ Bot](/fr/channels/qqbot)
-- [iMessage (historique)](/fr/channels/imessage)
-- [Analyse de localisation](/fr/channels/location)
+- [iMessage (hérité)](/fr/channels/imessage)
+- [Analyse de position](/fr/channels/location)
 - [WebChat](/fr/web/webchat)
 - [Webhooks](/fr/automation/cron-jobs#webhooks)
 - [Gmail Pub/Sub](/fr/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gateway + opérations
 
-- [Gateway runbook](/fr/gateway)
+- [Runbook Gateway](/fr/gateway)
 - [Modèle réseau](/fr/gateway/network-model)
 - [Appairage Gateway](/fr/gateway/pairing)
 - [Verrou Gateway](/fr/gateway/gateway-lock)
-- [Processus en arrière-plan](/fr/gateway/background-process)
+- [Processus d’arrière-plan](/fr/gateway/background-process)
 - [Santé](/fr/gateway/health)
 - [Heartbeat](/fr/gateway/heartbeat)
 - [Doctor](/fr/gateway/doctor)
 - [Journalisation](/fr/gateway/logging)
 - [Sandboxing](/fr/gateway/sandboxing)
-- [Dashboard](/fr/web/dashboard)
-- [Control UI](/fr/web/control-ui)
-- [Accès distant](/fr/gateway/remote)
-- [README du gateway distant](/fr/gateway/remote-gateway-readme)
+- [Tableau de bord](/fr/web/dashboard)
+- [Interface Control](/fr/web/control-ui)
+- [Accès à distance](/fr/gateway/remote)
+- [README Gateway distant](/fr/gateway/remote-gateway-readme)
 - [Tailscale](/fr/gateway/tailscale)
 - [Sécurité](/fr/gateway/security)
 - [Dépannage](/fr/gateway/troubleshooting)
@@ -115,12 +113,12 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Surface des outils](/fr/tools)
 - [OpenProse](/fr/prose)
 - [Référence CLI](/fr/cli)
-- [Outil exec](/fr/tools/exec)
+- [Outil Exec](/fr/tools/exec)
 - [Outil PDF](/fr/tools/pdf)
-- [Mode élevé](/fr/tools/elevated)
+- [Mode Elevated](/fr/tools/elevated)
 - [Tâches Cron](/fr/automation/cron-jobs)
-- [Automation & Tasks](/fr/automation)
-- [Thinking + verbose](/fr/tools/thinking)
+- [Automatisation et tâches](/fr/automation)
+- [Réflexion + verbosité](/fr/tools/thinking)
 - [Modèles](/fr/concepts/models)
 - [Sous-agents](/fr/tools/subagents)
 - [CLI d’envoi d’agent](/fr/tools/agent-send)
@@ -129,15 +127,15 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Navigateur (dépannage Linux)](/fr/tools/browser-linux-troubleshooting)
 - [Sondages](/fr/cli/message)
 
-## Nœuds, médias, voix
+## Nodes, médias, voix
 
-- [Vue d’ensemble des nœuds](/fr/nodes)
+- [Vue d’ensemble des Nodes](/fr/nodes)
 - [Caméra](/fr/nodes/camera)
 - [Images](/fr/nodes/images)
 - [Audio](/fr/nodes/audio)
-- [Commande de localisation](/fr/nodes/location-command)
+- [Commande de position](/fr/nodes/location-command)
 - [Réveil vocal](/fr/nodes/voicewake)
-- [Mode talk](/fr/nodes/talk)
+- [Mode Talk](/fr/nodes/talk)
 
 ## Plateformes
 
@@ -147,7 +145,7 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Android](/fr/platforms/android)
 - [Windows (WSL2)](/fr/platforms/windows)
 - [Linux](/fr/platforms/linux)
-- [Surfaces web](/fr/web)
+- [Surfaces Web](/fr/web)
 
 ## Application compagnon macOS (avancé)
 
@@ -161,8 +159,8 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Santé macOS](/fr/platforms/mac/health)
 - [Icône macOS](/fr/platforms/mac/icon)
 - [Journalisation macOS](/fr/platforms/mac/logging)
-- [Permissions macOS](/fr/platforms/mac/permissions)
-- [Distant macOS](/fr/platforms/mac/remote)
+- [Autorisations macOS](/fr/platforms/mac/permissions)
+- [Distance macOS](/fr/platforms/mac/remote)
 - [Signature macOS](/fr/platforms/mac/signing)
 - [Gateway macOS (launchd)](/fr/platforms/mac/bundled-gateway)
 - [XPC macOS](/fr/platforms/mac/xpc)
@@ -171,15 +169,15 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 
 ## Plugins
 
-- [Vue d’ensemble des plugins](/fr/tools/plugin)
-- [Créer des plugins](/fr/plugins/building-plugins)
-- [Manifeste de Plugin](/fr/plugins/manifest)
+- [Vue d’ensemble des Plugins](/fr/tools/plugin)
+- [Créer des Plugins](/fr/plugins/building-plugins)
+- [Manifeste Plugin](/fr/plugins/manifest)
 - [Outils d’agent](/fr/plugins/building-plugins#registering-agent-tools)
-- [Bundles de Plugin](/fr/plugins/bundles)
+- [Bundles de Plugins](/fr/plugins/bundles)
 - [Plugins communautaires](/fr/plugins/community)
-- [Recettes de capacités](/fr/plugins/architecture)
-- [Plugin d’appel vocal](/fr/plugins/voice-call)
-- [Plugin utilisateur Zalo](/fr/plugins/zalouser)
+- [Capability cookbook](/fr/plugins/architecture)
+- [Plugin Voice Call](/fr/plugins/voice-call)
+- [Plugin Zalo user](/fr/plugins/zalouser)
 
 ## Espace de travail + modèles
 
@@ -187,13 +185,13 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [ClawHub](/fr/tools/clawhub)
 - [Configuration des Skills](/fr/tools/skills-config)
 - [AGENTS par défaut](/fr/reference/AGENTS.default)
-- [Modèles : AGENTS](/fr/reference/templates/AGENTS)
-- [Modèles : BOOTSTRAP](/fr/reference/templates/BOOTSTRAP)
-- [Modèles : HEARTBEAT](/fr/reference/templates/HEARTBEAT)
-- [Modèles : IDENTITY](/fr/reference/templates/IDENTITY)
-- [Modèles : SOUL](/fr/reference/templates/SOUL)
-- [Modèles : TOOLS](/fr/reference/templates/TOOLS)
-- [Modèles : USER](/fr/reference/templates/USER)
+- [Modèles : AGENTS](/fr/reference/templates/AGENTS)
+- [Modèles : BOOTSTRAP](/fr/reference/templates/BOOTSTRAP)
+- [Modèles : HEARTBEAT](/fr/reference/templates/HEARTBEAT)
+- [Modèles : IDENTITY](/fr/reference/templates/IDENTITY)
+- [Modèles : SOUL](/fr/reference/templates/SOUL)
+- [Modèles : TOOLS](/fr/reference/templates/TOOLS)
+- [Modèles : USER](/fr/reference/templates/USER)
 
 ## Projet
 
@@ -204,3 +202,7 @@ Utilisez ces hubs pour découvrir chaque page, y compris les analyses approfondi
 - [Tests](/fr/reference/test)
 - [Politique de publication](/fr/reference/RELEASING)
 - [Modèles d’appareil](/fr/reference/device-models)
+
+## Voir aussi
+
+- [Premiers pas](/fr/start/getting-started)

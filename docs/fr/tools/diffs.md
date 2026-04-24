@@ -1,41 +1,39 @@
 ---
 read_when:
-    - Vous voulez que les agents affichent les modifications de code ou de Markdown sous forme de diffs
-    - Vous voulez une URL de visionneuse prête pour le canvas ou un fichier de diff rendu
-    - Vous avez besoin d'artefacts de diff temporaires et contrôlés avec des valeurs par défaut sécurisées
-summary: Visionneuse de diff en lecture seule et moteur de rendu de fichiers pour les agents (outil de plugin optionnel)
+    - Vous souhaitez que les agents affichent les modifications de code ou de Markdown sous forme de diffs
+    - "Vous souhaitez une URL de visionneuse prête pour canvas ou un fichier de diff rendu\tRTLU to=final code നൽകിDiffs"
+    - Vous avez besoin d’artefacts de diff temporaires et contrôlés avec des valeurs par défaut sécurisées
+summary: Visionneuse de diff en lecture seule et moteur de rendu de fichiers pour agents (outil de plugin optionnel)
 title: Diffs
 x-i18n:
-    generated_at: "2026-04-05T12:56:32Z"
+    generated_at: "2026-04-24T07:35:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 935539a6e584980eb7e57067c18112bb40a0be8522b9da649c7cf7f180fb45d4
+    source_hash: fe32441699b06dd27580b7e80afcfa3d1e466d7e2b74e52e60b327e73325eeca
     source_path: tools/diffs.md
     workflow: 15
 ---
 
-# Diffs
-
-`diffs` est un outil de plugin optionnel avec de courtes consignes système intégrées et une skill compagnon qui transforme le contenu des modifications en artefact de diff en lecture seule pour les agents.
+`diffs` est un outil de plugin optionnel avec une courte guidance système intégrée et une Skill compagnon qui transforme le contenu des modifications en artefact de diff en lecture seule pour les agents.
 
 Il accepte soit :
 
-- le texte `before` et `after`
+- du texte `before` et `after`
 - un `patch` unifié
 
 Il peut renvoyer :
 
-- une URL de visionneuse Gateway pour une présentation dans le canvas
-- un chemin de fichier rendu (PNG ou PDF) pour la distribution par message
+- une URL de visionneuse gateway pour une présentation canvas
+- un chemin de fichier rendu (PNG ou PDF) pour une livraison par message
 - les deux sorties en un seul appel
 
-Lorsqu'il est activé, le plugin ajoute des consignes d'utilisation concises dans l'espace du prompt système et expose également une skill détaillée pour les cas où l'agent a besoin d'instructions plus complètes.
+Lorsqu’il est activé, le plugin ajoute une guidance d’utilisation concise dans l’espace du prompt système et expose aussi une Skill détaillée pour les cas où l’agent a besoin d’instructions plus complètes.
 
 ## Démarrage rapide
 
 1. Activez le plugin.
-2. Appelez `diffs` avec `mode: "view"` pour les flux orientés canvas en priorité.
-3. Appelez `diffs` avec `mode: "file"` pour les flux de distribution de fichiers dans le chat.
+2. Appelez `diffs` avec `mode: "view"` pour les flux orientés canvas.
+3. Appelez `diffs` avec `mode: "file"` pour les flux de livraison de fichier dans le chat.
 4. Appelez `diffs` avec `mode: "both"` lorsque vous avez besoin des deux artefacts.
 
 ## Activer le plugin
@@ -52,9 +50,9 @@ Lorsqu'il est activé, le plugin ajoute des consignes d'utilisation concises dan
 }
 ```
 
-## Désactiver les consignes système intégrées
+## Désactiver la guidance système intégrée
 
-Si vous souhaitez conserver l'outil `diffs` activé tout en désactivant ses consignes intégrées dans le prompt système, définissez `plugins.entries.diffs.hooks.allowPromptInjection` sur `false` :
+Si vous voulez garder l’outil `diffs` activé mais désactiver sa guidance intégrée dans le prompt système, définissez `plugins.entries.diffs.hooks.allowPromptInjection` sur `false` :
 
 ```json5
 {
@@ -71,20 +69,20 @@ Si vous souhaitez conserver l'outil `diffs` activé tout en désactivant ses con
 }
 ```
 
-Cela bloque le hook `before_prompt_build` du plugin diffs tout en gardant le plugin, l'outil et la skill compagnon disponibles.
+Cela bloque le hook `before_prompt_build` du plugin diffs tout en gardant le plugin, l’outil et la Skill compagnon disponibles.
 
-Si vous souhaitez désactiver à la fois les consignes et l'outil, désactivez plutôt le plugin.
+Si vous voulez désactiver à la fois la guidance et l’outil, désactivez plutôt le plugin.
 
-## Workflow typique d'un agent
+## Workflow typique d’agent
 
-1. L'agent appelle `diffs`.
-2. L'agent lit les champs `details`.
-3. L'agent :
+1. L’agent appelle `diffs`.
+2. L’agent lit les champs `details`.
+3. L’agent :
    - ouvre `details.viewerUrl` avec `canvas present`
    - envoie `details.filePath` avec `message` en utilisant `path` ou `filePath`
-   - fait les deux
+   - ou fait les deux
 
-## Exemples d'entrée
+## Exemples d’entrée
 
 Before et after :
 
@@ -106,29 +104,29 @@ Patch :
 }
 ```
 
-## Référence des entrées de l'outil
+## Référence des entrées de l’outil
 
-Tous les champs sont facultatifs sauf indication contraire :
+Tous les champs sont facultatifs sauf mention contraire :
 
-- `before` (`string`) : texte d'origine. Obligatoire avec `after` lorsque `patch` est omis.
-- `after` (`string`) : texte mis à jour. Obligatoire avec `before` lorsque `patch` est omis.
+- `before` (`string`) : texte original. Requis avec `after` lorsque `patch` est omis.
+- `after` (`string`) : texte mis à jour. Requis avec `before` lorsque `patch` est omis.
 - `patch` (`string`) : texte de diff unifié. Mutuellement exclusif avec `before` et `after`.
-- `path` (`string`) : nom de fichier affiché pour le mode before/after.
-- `lang` (`string`) : indice de remplacement de langue pour le mode before/after. Les valeurs inconnues reviennent au texte brut.
-- `title` (`string`) : remplacement du titre de la visionneuse.
-- `mode` (`"view" | "file" | "both"`) : mode de sortie. Par défaut : la valeur du plugin `defaults.mode`.
+- `path` (`string`) : nom de fichier d’affichage pour le mode before/after.
+- `lang` (`string`) : indice de langue de surcharge pour le mode before/after. Les valeurs inconnues reviennent au texte brut.
+- `title` (`string`) : surcharge du titre de la visionneuse.
+- `mode` (`"view" | "file" | "both"`) : mode de sortie. Par défaut sur `defaults.mode` du plugin.
   Alias obsolète : `"image"` se comporte comme `"file"` et reste accepté pour compatibilité descendante.
-- `theme` (`"light" | "dark"`) : thème de la visionneuse. Par défaut : la valeur du plugin `defaults.theme`.
-- `layout` (`"unified" | "split"`) : disposition du diff. Par défaut : la valeur du plugin `defaults.layout`.
-- `expandUnchanged` (`boolean`) : développe les sections inchangées lorsque le contexte complet est disponible. Option par appel uniquement (pas une clé de valeur par défaut du plugin).
-- `fileFormat` (`"png" | "pdf"`) : format du fichier rendu. Par défaut : la valeur du plugin `defaults.fileFormat`.
+- `theme` (`"light" | "dark"`) : thème de la visionneuse. Par défaut sur `defaults.theme` du plugin.
+- `layout` (`"unified" | "split"`) : disposition du diff. Par défaut sur `defaults.layout` du plugin.
+- `expandUnchanged` (`boolean`) : développer les sections inchangées lorsque le contexte complet est disponible. Option par appel uniquement (pas une clé par défaut du plugin).
+- `fileFormat` (`"png" | "pdf"`) : format du fichier rendu. Par défaut sur `defaults.fileFormat` du plugin.
 - `fileQuality` (`"standard" | "hq" | "print"`) : préréglage de qualité pour le rendu PNG ou PDF.
-- `fileScale` (`number`) : remplacement de l'échelle du périphérique (`1`-`4`).
+- `fileScale` (`number`) : surcharge d’échelle du périphérique (`1`-`4`).
 - `fileMaxWidth` (`number`) : largeur maximale de rendu en pixels CSS (`640`-`2400`).
-- `ttlSeconds` (`number`) : TTL de l'artefact en secondes pour la visionneuse et les sorties de fichier autonomes. Valeur par défaut : 1800, maximum : 21600.
-- `baseUrl` (`string`) : remplacement de l'origine d'URL de la visionneuse. Remplace la valeur du plugin `viewerBaseUrl`. Doit être en `http` ou `https`, sans query/hash.
+- `ttlSeconds` (`number`) : TTL de l’artefact en secondes pour la visionneuse et les sorties fichier autonomes. Par défaut 1800, max 21600.
+- `baseUrl` (`string`) : surcharge de l’origine d’URL de la visionneuse. Remplace `viewerBaseUrl` du plugin. Doit être en `http` ou `https`, sans query/hash.
 
-Les alias d'entrée hérités restent acceptés pour compatibilité descendante :
+Les alias d’entrée hérités restent acceptés pour compatibilité descendante :
 
 - `format` -> `fileFormat`
 - `imageFormat` -> `fileFormat`
@@ -138,22 +136,22 @@ Les alias d'entrée hérités restent acceptés pour compatibilité descendante 
 
 Validation et limites :
 
-- `before` et `after` : 512 Kio maximum chacun.
-- `patch` : 2 Mio maximum.
-- `path` : 2048 octets maximum.
-- `lang` : 128 octets maximum.
-- `title` : 1024 octets maximum.
-- Limite de complexité du patch : 128 fichiers maximum et 120000 lignes au total.
-- `patch` avec `before` ou `after` ensemble est rejeté.
-- Limites de sécurité pour les fichiers rendus (s'appliquent au PNG et au PDF) :
-  - `fileQuality: "standard"` : 8 MP maximum (8 000 000 pixels rendus).
-  - `fileQuality: "hq"` : 14 MP maximum (14 000 000 pixels rendus).
-  - `fileQuality: "print"` : 24 MP maximum (24 000 000 pixels rendus).
-  - Le PDF a également une limite maximale de 50 pages.
+- `before` et `after` : max 512 Kio chacun.
+- `patch` : max 2 Mio.
+- `path` : max 2048 octets.
+- `lang` : max 128 octets.
+- `title` : max 1024 octets.
+- Limite de complexité du patch : max 128 fichiers et 120000 lignes au total.
+- `patch` et `before` ou `after` ensemble sont rejetés.
+- Limites de sécurité du fichier rendu (s’appliquent à PNG et PDF) :
+  - `fileQuality: "standard"` : max 8 MP (8 000 000 pixels rendus).
+  - `fileQuality: "hq"` : max 14 MP (14 000 000 pixels rendus).
+  - `fileQuality: "print"` : max 24 MP (24 000 000 pixels rendus).
+  - Le PDF a aussi un maximum de 50 pages.
 
-## Contrat des détails de sortie
+## Contrat de sortie `details`
 
-L'outil renvoie des métadonnées structurées sous `details`.
+L’outil renvoie des métadonnées structurées sous `details`.
 
 Champs partagés pour les modes qui créent une visionneuse :
 
@@ -165,21 +163,21 @@ Champs partagés pour les modes qui créent une visionneuse :
 - `inputKind`
 - `fileCount`
 - `mode`
-- `context` (`agentId`, `sessionId`, `messageChannel`, `agentAccountId` lorsqu'ils sont disponibles)
+- `context` (`agentId`, `sessionId`, `messageChannel`, `agentAccountId` lorsque disponible)
 
-Champs de fichier lorsqu'un PNG ou un PDF est rendu :
+Champs de fichier lorsque le PNG ou le PDF est rendu :
 
 - `artifactId`
 - `expiresAt`
 - `filePath`
-- `path` (même valeur que `filePath`, pour compatibilité avec l'outil de message)
+- `path` (même valeur que `filePath`, pour compatibilité avec l’outil message)
 - `fileBytes`
 - `fileFormat`
 - `fileQuality`
 - `fileScale`
 - `fileMaxWidth`
 
-Des alias de compatibilité sont également renvoyés pour les appelants existants :
+Des alias de compatibilité sont aussi renvoyés pour les appelants existants :
 
 - `format` (même valeur que `fileFormat`)
 - `imagePath` (même valeur que `filePath`)
@@ -188,23 +186,23 @@ Des alias de compatibilité sont également renvoyés pour les appelants existan
 - `imageScale` (même valeur que `fileScale`)
 - `imageMaxWidth` (même valeur que `fileMaxWidth`)
 
-Résumé du comportement par mode :
+Résumé du comportement selon le mode :
 
 - `mode: "view"` : champs de visionneuse uniquement.
-- `mode: "file"` : champs de fichier uniquement, aucun artefact de visionneuse.
-- `mode: "both"` : champs de visionneuse plus champs de fichier. Si le rendu du fichier échoue, la visionneuse est quand même renvoyée avec `fileError` et l'alias de compatibilité `imageError`.
+- `mode: "file"` : champs de fichier uniquement, sans artefact de visionneuse.
+- `mode: "both"` : champs de visionneuse plus champs de fichier. Si le rendu du fichier échoue, la visionneuse est quand même renvoyée avec `fileError` et l’alias de compatibilité `imageError`.
 
 ## Sections inchangées repliées
 
 - La visionneuse peut afficher des lignes comme `N unmodified lines`.
-- Les contrôles de développement sur ces lignes sont conditionnels et non garantis pour chaque type d'entrée.
+- Les contrôles de développement sur ces lignes sont conditionnels et non garantis pour chaque type d’entrée.
 - Les contrôles de développement apparaissent lorsque le diff rendu contient des données de contexte développables, ce qui est typique pour une entrée before/after.
-- Pour de nombreuses entrées de patch unifié, les corps de contexte omis ne sont pas disponibles dans les hunks de patch analysés ; la ligne peut donc apparaître sans contrôles de développement. C'est un comportement attendu.
-- `expandUnchanged` s'applique uniquement lorsqu'un contexte développable existe.
+- Pour beaucoup d’entrées de patch unifié, les corps de contexte omis ne sont pas disponibles dans les hunks de patch analysés, de sorte que la ligne peut apparaître sans contrôles de développement. C’est un comportement attendu.
+- `expandUnchanged` ne s’applique que lorsqu’un contexte développable existe.
 
 ## Valeurs par défaut du plugin
 
-Définissez des valeurs par défaut à l'échelle du plugin dans `~/.openclaw/openclaw.json` :
+Définissez les valeurs par défaut globales du plugin dans `~/.openclaw/openclaw.json` :
 
 ```json5
 {
@@ -253,12 +251,12 @@ Valeurs par défaut prises en charge :
 - `fileMaxWidth`
 - `mode`
 
-Les paramètres explicites de l'outil remplacent ces valeurs par défaut.
+Les paramètres explicites de l’outil remplacent ces valeurs par défaut.
 
-Configuration persistante de l'URL de la visionneuse :
+Configuration persistante d’URL de visionneuse :
 
 - `viewerBaseUrl` (`string`, facultatif)
-  - Valeur de repli gérée par le plugin pour les liens de visionneuse renvoyés lorsqu'un appel d'outil ne transmet pas `baseUrl`.
+  - Valeur de repli détenue par le plugin pour les liens de visionneuse renvoyés lorsqu’un appel d’outil ne passe pas `baseUrl`.
   - Doit être en `http` ou `https`, sans query/hash.
 
 Exemple :
@@ -282,7 +280,7 @@ Exemple :
 
 - `security.allowRemoteViewer` (`boolean`, par défaut `false`)
   - `false` : les requêtes non loopback vers les routes de la visionneuse sont refusées.
-  - `true` : les visionneuses distantes sont autorisées si le chemin tokenisé est valide.
+  - `true` : les visionneuses distantes sont autorisées si le chemin avec jeton est valide.
 
 Exemple :
 
@@ -306,18 +304,18 @@ Exemple :
 ## Cycle de vie et stockage des artefacts
 
 - Les artefacts sont stockés dans le sous-dossier temporaire : `$TMPDIR/openclaw-diffs`.
-- Les métadonnées de l'artefact de visionneuse contiennent :
-  - un identifiant d'artefact aléatoire (20 caractères hexadécimaux)
-  - un token aléatoire (48 caractères hexadécimaux)
+- Les métadonnées des artefacts de visionneuse contiennent :
+  - identifiant d’artefact aléatoire (20 caractères hexadécimaux)
+  - jeton aléatoire (48 caractères hexadécimaux)
   - `createdAt` et `expiresAt`
-  - le chemin `viewer.html` stocké
-- Le TTL par défaut de l'artefact est de 30 minutes lorsqu'il n'est pas spécifié.
+  - chemin `viewer.html` stocké
+- Le TTL par défaut des artefacts est de 30 minutes lorsqu’il n’est pas spécifié.
 - Le TTL maximal accepté pour la visionneuse est de 6 heures.
-- Le nettoyage s'exécute de manière opportuniste après la création de l'artefact.
+- Le nettoyage s’exécute de manière opportuniste après la création de l’artefact.
 - Les artefacts expirés sont supprimés.
 - Le nettoyage de repli supprime les dossiers obsolètes de plus de 24 heures lorsque les métadonnées sont absentes.
 
-## Comportement réseau et URL de la visionneuse
+## URL de la visionneuse et comportement réseau
 
 Route de la visionneuse :
 
@@ -328,39 +326,39 @@ Ressources de la visionneuse :
 - `/plugins/diffs/assets/viewer.js`
 - `/plugins/diffs/assets/viewer-runtime.js`
 
-Le document de la visionneuse résout ces ressources relativement à l'URL de la visionneuse ; un préfixe de chemin `baseUrl` facultatif est donc également conservé pour ces requêtes de ressources.
+Le document de la visionneuse résout ces ressources relativement à l’URL de la visionneuse, donc un préfixe de chemin `baseUrl` facultatif est également conservé pour ces requêtes de ressources.
 
-Comportement de construction de l'URL :
+Comportement de construction des URL :
 
-- Si `baseUrl` est fourni dans l'appel d'outil, il est utilisé après validation stricte.
-- Sinon, si la valeur du plugin `viewerBaseUrl` est configurée, elle est utilisée.
-- Sans l'un ni l'autre remplacement, l'URL de la visionneuse utilise par défaut la loopback `127.0.0.1`.
-- Si le mode de liaison de la gateway est `custom` et que `gateway.customBindHost` est défini, cet hôte est utilisé.
+- Si `baseUrl` est fourni dans l’appel d’outil, il est utilisé après validation stricte.
+- Sinon, si `viewerBaseUrl` du plugin est configuré, il est utilisé.
+- Sans l’une ou l’autre surcharge, l’URL de la visionneuse utilise par défaut loopback `127.0.0.1`.
+- Si le mode de bind du gateway est `custom` et que `gateway.customBindHost` est défini, cet hôte est utilisé.
 
-Règles pour `baseUrl` :
+Règles `baseUrl` :
 
-- Doit commencer par `http://` ou `https://`.
-- Query et hash sont rejetés.
-- L'origine plus un chemin de base facultatif sont autorisés.
+- Doit être en `http://` ou `https://`.
+- Les query et hash sont rejetés.
+- L’origine plus un chemin de base facultatif sont autorisés.
 
 ## Modèle de sécurité
 
-Renforcement de la visionneuse :
+Durcissement de la visionneuse :
 
-- Loopback uniquement par défaut.
-- Chemins de visionneuse tokenisés avec validation stricte de l'identifiant et du token.
-- CSP de la réponse de la visionneuse :
+- Loopback-only par défaut.
+- Chemins de visionneuse avec jeton et validation stricte de l’identifiant et du jeton.
+- CSP de réponse de la visionneuse :
   - `default-src 'none'`
   - scripts et ressources uniquement depuis self
   - aucun `connect-src` sortant
-- Limitation des échecs distants lorsque l'accès distant est activé :
+- Limitation des échecs distants lorsque l’accès distant est activé :
   - 40 échecs par 60 secondes
   - verrouillage de 60 secondes (`429 Too Many Requests`)
 
-Renforcement du rendu de fichier :
+Durcissement du rendu de fichier :
 
-- Le routage des requêtes navigateur pour capture d'écran est refusé par défaut.
-- Seules les ressources locales de la visionneuse depuis `http://127.0.0.1/plugins/diffs/assets/*` sont autorisées.
+- Le routage des requêtes navigateur de capture d’écran est refusé par défaut.
+- Seules les ressources locales de visionneuse depuis `http://127.0.0.1/plugins/diffs/assets/*` sont autorisées.
 - Les requêtes réseau externes sont bloquées.
 
 ## Exigences navigateur pour le mode fichier
@@ -370,26 +368,26 @@ Renforcement du rendu de fichier :
 Ordre de résolution :
 
 1. `browser.executablePath` dans la configuration OpenClaw.
-2. Variables d'environnement :
+2. Variables d’environnement :
    - `OPENCLAW_BROWSER_EXECUTABLE_PATH`
    - `BROWSER_EXECUTABLE_PATH`
    - `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
-3. Repli vers la découverte de commande/chemin selon la plateforme.
+3. Repli de découverte de commande/chemin selon la plateforme.
 
-Texte d'échec courant :
+Texte d’échec courant :
 
 - `Diff PNG/PDF rendering requires a Chromium-compatible browser...`
 
-Corrigez cela en installant Chrome, Chromium, Edge ou Brave, ou en définissant l'une des options de chemin d'exécutable ci-dessus.
+Corrigez cela en installant Chrome, Chromium, Edge, ou Brave, ou en définissant l’une des options de chemin d’exécutable ci-dessus.
 
 ## Dépannage
 
-Erreurs de validation d'entrée :
+Erreurs de validation d’entrée :
 
 - `Provide patch or both before and after text.`
   - Incluez `before` et `after`, ou fournissez `patch`.
 - `Provide either patch or before/after input, not both.`
-  - Ne mélangez pas les modes d'entrée.
+  - Ne mélangez pas les modes d’entrée.
 - `Invalid baseUrl: ...`
   - Utilisez une origine `http(s)` avec chemin facultatif, sans query/hash.
 - `{field} exceeds maximum size (...)`
@@ -397,45 +395,45 @@ Erreurs de validation d'entrée :
 - Rejet de patch volumineux
   - Réduisez le nombre de fichiers du patch ou le nombre total de lignes.
 
-Problèmes d'accessibilité de la visionneuse :
+Problèmes d’accessibilité de la visionneuse :
 
-- L'URL de la visionneuse pointe par défaut vers `127.0.0.1`.
-- Pour les scénarios d'accès distant :
-  - définissez la valeur du plugin `viewerBaseUrl`, ou
-  - transmettez `baseUrl` à chaque appel d'outil, ou
+- L’URL de la visionneuse se résout par défaut vers `127.0.0.1`.
+- Pour les scénarios d’accès distant, soit :
+  - définissez le `viewerBaseUrl` du plugin, ou
+  - passez `baseUrl` à chaque appel d’outil, ou
   - utilisez `gateway.bind=custom` et `gateway.customBindHost`
-- Si `gateway.trustedProxies` inclut loopback pour un proxy sur le même hôte (par exemple Tailscale Serve), les requêtes brutes de visionneuse loopback sans en-têtes transférés d'IP client échouent par défaut, conformément à la conception.
+- Si `gateway.trustedProxies` inclut loopback pour un proxy sur le même hôte (par exemple Tailscale Serve), les requêtes brutes loopback vers la visionneuse sans en-têtes transmis d’IP client échouent en mode fermé par conception.
 - Pour cette topologie de proxy :
-  - préférez `mode: "file"` ou `mode: "both"` lorsque vous avez seulement besoin d'une pièce jointe, ou
-  - activez intentionnellement `security.allowRemoteViewer` et définissez la valeur du plugin `viewerBaseUrl` ou transmettez un `baseUrl` de proxy/public lorsque vous avez besoin d'une URL de visionneuse partageable
-- Activez `security.allowRemoteViewer` uniquement si vous avez l'intention d'autoriser un accès externe à la visionneuse.
+  - préférez `mode: "file"` ou `mode: "both"` lorsque vous n’avez besoin que d’une pièce jointe, ou
+  - activez intentionnellement `security.allowRemoteViewer` et définissez `viewerBaseUrl` du plugin ou passez un `baseUrl` proxy/public lorsque vous avez besoin d’une URL de visionneuse partageable
+- N’activez `security.allowRemoteViewer` que si vous avez réellement l’intention d’autoriser l’accès externe à la visionneuse.
 
-La ligne de lignes inchangées n'a pas de bouton de développement :
+La ligne des lignes inchangées n’a pas de bouton de développement :
 
-- Cela peut se produire avec une entrée patch lorsque le patch ne contient pas de contexte développable.
-- C'est un comportement attendu et cela n'indique pas un échec de la visionneuse.
+- Cela peut se produire pour une entrée patch lorsque le patch ne transporte pas de contexte développable.
+- C’est un comportement attendu et n’indique pas une défaillance de la visionneuse.
 
 Artefact introuvable :
 
-- L'artefact a expiré selon son TTL.
-- Le token ou le chemin a été modifié.
+- L’artefact a expiré à cause du TTL.
+- Le jeton ou le chemin a changé.
 - Le nettoyage a supprimé des données obsolètes.
 
-## Consignes opérationnelles
+## Recommandations opérationnelles
 
-- Préférez `mode: "view"` pour les revues interactives locales dans le canvas.
-- Préférez `mode: "file"` pour les canaux de chat sortants qui nécessitent une pièce jointe.
-- Gardez `allowRemoteViewer` désactivé sauf si votre déploiement nécessite des URL de visionneuse distantes.
+- Préférez `mode: "view"` pour les revues interactives locales dans canvas.
+- Préférez `mode: "file"` pour les canaux de chat sortants qui ont besoin d’une pièce jointe.
+- Gardez `allowRemoteViewer` désactivé sauf si votre déploiement exige des URL de visionneuse distantes.
 - Définissez un `ttlSeconds` court et explicite pour les diffs sensibles.
-- Évitez d'envoyer des secrets dans l'entrée de diff lorsque ce n'est pas nécessaire.
+- Évitez d’envoyer des secrets dans l’entrée du diff lorsque ce n’est pas nécessaire.
 - Si votre canal compresse fortement les images (par exemple Telegram ou WhatsApp), préférez la sortie PDF (`fileFormat: "pdf"`).
 
-Moteur de rendu de diff :
+Moteur de rendu des diffs :
 
 - Propulsé par [Diffs](https://diffs.com).
 
 ## Documentation associée
 
-- [Vue d'ensemble des outils](/tools)
-- [Plugins](/tools/plugin)
-- [Browser](/tools/browser)
+- [Vue d’ensemble des outils](/fr/tools)
+- [Plugins](/fr/tools/plugin)
+- [Navigateur](/fr/tools/browser)

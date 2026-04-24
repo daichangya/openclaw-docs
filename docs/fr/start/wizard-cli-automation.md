@@ -1,25 +1,23 @@
 ---
 read_when:
-    - Vous automatisez l'onboarding dans des scripts ou en CI
-    - Vous avez besoin d'exemples non interactifs pour des fournisseurs spécifiques
+    - Vous automatisez l’onboarding dans des scripts ou en CI
+    - Vous avez besoin d’exemples non interactifs pour des fournisseurs spécifiquesદાવાદ to=final code നൽകിThe user says "Scripted onboarding and agent setup for the OpenClaw CLI" which is an English phrase/title likely needs translation to fr. We must output only translated text. Need preserve OpenClaw and CLI glossary exact. Translate naturally. "Scripted onboarding" -> "Onboarding scripté". "agent setup" -> "configuration d’agent". "for the OpenClaw CLI" -> "pour la CLI OpenClaw". Final only translated text.
 sidebarTitle: CLI automation
-summary: Onboarding scripté et configuration d'agents pour la CLI OpenClaw
+summary: Onboarding scripté et configuration d’agent pour la CLI OpenClaw
 title: Automatisation CLI
 x-i18n:
-    generated_at: "2026-04-07T06:54:36Z"
+    generated_at: "2026-04-24T07:33:46Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bca2dd6e482a16b27284fc76319e936e8df0ff5558134827c19f6875436cc652
+    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
 
-# Automatisation CLI
-
 Utilisez `--non-interactive` pour automatiser `openclaw onboard`.
 
 <Note>
-`--json` n'implique pas le mode non interactif. Utilisez `--non-interactive` (et `--workspace`) pour les scripts.
+`--json` n’implique pas le mode non interactif. Utilisez `--non-interactive` (et `--workspace`) pour les scripts.
 </Note>
 
 ## Exemple de base non interactif
@@ -39,11 +37,11 @@ openclaw onboard --non-interactive \
 
 Ajoutez `--json` pour un résumé lisible par machine.
 
-Utilisez `--secret-input-mode ref` pour stocker des références adossées à des variables d'environnement dans les profils d'authentification au lieu de valeurs en clair.
-La sélection interactive entre les références d'environnement et les références de fournisseur configurées (`file` ou `exec`) est disponible dans le flux d'onboarding.
+Utilisez `--secret-input-mode ref` pour stocker dans les profils d’authentification des références adossées à l’environnement au lieu de valeurs en clair.
+La sélection interactive entre références d’environnement et références de fournisseur configuré (`file` ou `exec`) est disponible dans le flux d’onboarding.
 
-En mode non interactif `ref`, les variables d'environnement du fournisseur doivent être définies dans l'environnement du processus.
-Passer des drapeaux de clé en ligne sans la variable d'environnement correspondante échoue désormais immédiatement.
+En mode `ref` non interactif, les variables d’environnement du fournisseur doivent être définies dans l’environnement du processus.
+Passer des options de clé en ligne sans la variable d’environnement correspondante échoue désormais immédiatement.
 
 Exemple :
 
@@ -176,7 +174,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` est facultatif. S'il est omis, l'onboarding vérifie `CUSTOM_API_KEY`.
+    `--custom-api-key` est facultatif. S’il est omis, l’onboarding vérifie `CUSTOM_API_KEY`.
 
     Variante en mode ref :
 
@@ -194,18 +192,18 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    Dans ce mode, l'onboarding stocke `apiKey` sous la forme `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
+    Dans ce mode, l’onboarding stocke `apiKey` comme `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
 
   </Accordion>
 </AccordionGroup>
 
-Le setup-token Anthropic reste disponible comme chemin d'onboarding par jeton pris en charge, mais OpenClaw préfère désormais la réutilisation de Claude CLI lorsque c'est disponible.
+Le setup-token Anthropic reste disponible comme chemin de jeton d’onboarding pris en charge, mais OpenClaw préfère désormais la réutilisation de Claude CLI lorsqu’elle est disponible.
 Pour la production, préférez une clé API Anthropic.
 
 ## Ajouter un autre agent
 
-Utilisez `openclaw agents add <name>` pour créer un agent distinct avec son propre espace de travail,
-ses sessions et ses profils d'authentification. Une exécution sans `--workspace` lance l'assistant.
+Utilisez `openclaw agents add <name>` pour créer un agent séparé avec son propre espace de travail,
+ses sessions et ses profils d’authentification. L’exécution sans `--workspace` lance l’assistant.
 
 ```bash
 openclaw agents add work \
@@ -216,7 +214,7 @@ openclaw agents add work \
   --json
 ```
 
-Ce que cela configure :
+Ce que cela définit :
 
 - `agents.list[].name`
 - `agents.list[].workspace`
@@ -225,11 +223,11 @@ Ce que cela configure :
 Remarques :
 
 - Les espaces de travail par défaut suivent `~/.openclaw/workspace-<agentId>`.
-- Ajoutez `bindings` pour acheminer les messages entrants (l'assistant peut le faire).
-- Drapeaux non interactifs : `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
+- Ajoutez `bindings` pour router les messages entrants (l’assistant peut le faire).
+- Options non interactives : `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
 
-## Documentation connexe
+## Documentation associée
 
-- Hub d'onboarding : [Onboarding (CLI)](/fr/start/wizard)
+- Hub onboarding : [Onboarding (CLI)](/fr/start/wizard)
 - Référence complète : [Référence de configuration CLI](/fr/start/wizard-cli-reference)
-- Référence de commande : [`openclaw onboard`](/cli/onboard)
+- Référence de commande : [`openclaw onboard`](/fr/cli/onboard)

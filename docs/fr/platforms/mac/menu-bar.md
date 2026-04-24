@@ -1,13 +1,13 @@
 ---
 read_when:
     - Ajustement de l’interface du menu mac ou de la logique d’état
-summary: Logique d’état de la barre de menus et ce qui est affiché aux utilisateurs
+summary: Logique d’état de la barre de menus et ce qui est présenté aux utilisateurs
 title: Barre de menus
 x-i18n:
-    generated_at: "2026-04-05T12:48:43Z"
+    generated_at: "2026-04-24T07:20:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8eb73c0e671a76aae4ebb653c65147610bf3e6d3c9c0943d150e292e7761d16d
+    source_hash: 89b03f3b0f9e56057d4cbf10bd1252372c65a2b2ae5e0405a844e9a59b51405d
     source_path: platforms/mac/menu-bar.md
     workflow: 15
 ---
@@ -18,13 +18,13 @@ x-i18n:
 
 - Nous affichons l’état de travail actuel de l’agent dans l’icône de la barre de menus et dans la première ligne d’état du menu.
 - L’état de santé est masqué pendant qu’un travail est actif ; il réapparaît lorsque toutes les sessions sont inactives.
-- Le bloc « Nodes » dans le menu liste uniquement les **appareils** (nœuds appairés via `node.list`), pas les entrées client/presence.
-- Une section « Usage » apparaît sous Context lorsque des instantanés d’utilisation du fournisseur sont disponibles.
+- Le bloc « Nodes » du menu liste uniquement les **appareils** (Nodes associés via `node.list`), et non les entrées client/presence.
+- Une section « Usage » apparaît sous Context lorsque des instantanés d’utilisation provider sont disponibles.
 
 ## Modèle d’état
 
-- Sessions : les événements arrivent avec `runId` (par exécution) plus `sessionKey` dans la charge utile. La session « main » correspond à la clé `main` ; si elle est absente, nous revenons à la session la plus récemment mise à jour.
-- Priorité : main l’emporte toujours. Si main est active, son état est affiché immédiatement. Si main est inactive, la session non principale active la plus récente est affichée. Nous n’oscillons pas en cours d’activité ; nous ne basculons que lorsque la session courante devient inactive ou que main devient active.
+- Sessions : les événements arrivent avec `runId` (par exécution) plus `sessionKey` dans la charge utile. La session « main » est la clé `main` ; si elle est absente, nous revenons à la session mise à jour le plus récemment.
+- Priorité : main gagne toujours. Si main est active, son état est affiché immédiatement. Si main est inactive, la session non-main active la plus récente est affichée. Nous n’oscillons pas en cours d’activité ; nous ne basculons que lorsque la session actuelle devient inactive ou que main devient active.
 - Types d’activité :
   - `job` : exécution de commande de haut niveau (`state: started|streaming|done|error`).
   - `tool` : `phase: start|result` avec `toolName` et `meta/args`.
@@ -34,7 +34,7 @@ x-i18n:
 - `idle`
 - `workingMain(ActivityKind)`
 - `workingOther(ActivityKind)`
-- `overridden(ActivityKind)` (remplacement de débogage)
+- `overridden(ActivityKind)` (surcharge de débogage)
 
 ### `ActivityKind` → glyphe
 
@@ -45,16 +45,16 @@ x-i18n:
 - `attach` → 📎
 - par défaut → 🛠️
 
-### Mappage visuel
+### Mapping visuel
 
-- `idle` : créature normale.
-- `workingMain` : badge avec glyphe, teinte complète, animation de pattes « en train de travailler ».
-- `workingOther` : badge avec glyphe, teinte atténuée, pas de déplacement rapide.
-- `overridden` : utilise le glyphe/la teinte choisi quel que soit l’état d’activité.
+- `idle` : critter normal.
+- `workingMain` : badge avec glyphe, teinte complète, animation de jambe « working ».
+- `workingOther` : badge avec glyphe, teinte atténuée, pas de mouvement rapide.
+- `overridden` : utilise le glyphe/la teinte choisis indépendamment de l’activité.
 
 ## Texte de la ligne d’état (menu)
 
-- Tant qu’un travail est actif : `<Rôle de session> · <libellé d’activité>`
+- Pendant qu’un travail est actif : `<Session role> · <activity label>`
   - Exemples : `Main · exec: pnpm test`, `Other · read: apps/macos/Sources/OpenClaw/AppState.swift`.
 - Lorsqu’il est inactif : revient au résumé de santé.
 
@@ -66,11 +66,11 @@ x-i18n:
   - `stream: "tool"` avec `data.phase`, `name`, `meta`/`args` facultatifs.
 - Libellés :
   - `exec` : première ligne de `args.command`.
-  - `read`/`write` : chemin abrégé.
-  - `edit` : chemin plus type de modification inféré à partir de `meta`/du nombre de diffs.
-  - repli : nom de l’outil.
+  - `read`/`write` : chemin raccourci.
+  - `edit` : chemin plus type de changement inféré depuis `meta`/les compteurs de diff.
+  - solution de repli : nom de l’outil.
 
-## Remplacement de débogage
+## Surcharge de débogage
 
 - Réglages ▸ Debug ▸ sélecteur « Icon override » :
   - `System (auto)` (par défaut)
@@ -81,8 +81,13 @@ x-i18n:
 
 ## Checklist de test
 
-- Déclencher une tâche de session principale : vérifier que l’icône bascule immédiatement et que la ligne d’état affiche le libellé principal.
-- Déclencher une tâche de session non principale alors que main est inactive : l’icône/l’état affichent la session non principale ; cela reste stable jusqu’à la fin.
+- Déclencher une tâche de session main : vérifier que l’icône bascule immédiatement et que la ligne d’état affiche le libellé main.
+- Déclencher une tâche de session non-main pendant que main est inactive : l’icône/l’état affiche non-main ; reste stable jusqu’à la fin.
 - Démarrer main alors qu’une autre session est active : l’icône bascule instantanément vers main.
-- Rafales rapides d’outils : s’assurer que le badge ne clignote pas (grâce à une période de grâce TTL sur les résultats d’outil).
-- La ligne de santé réapparaît une fois que toutes les sessions sont inactives.
+- Rafales rapides d’outils : s’assurer que le badge ne scintille pas (grâce TTL sur les résultats d’outils).
+- La ligne de santé réapparaît une fois toutes les sessions inactives.
+
+## Lié
+
+- [App macOS](/fr/platforms/macos)
+- [Icône de la barre de menus](/fr/platforms/mac/icon)

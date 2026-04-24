@@ -1,22 +1,20 @@
 ---
 read_when:
-    - Vous souhaitez utiliser les modèles Google Gemini avec OpenClaw
+    - Vous voulez utiliser les modèles Google Gemini avec OpenClaw
     - Vous avez besoin du flux d’authentification par clé API ou OAuth
-summary: Configuration de Google Gemini (clé API + OAuth, génération d’images, compréhension des médias, TTS, recherche Web)
+summary: Configuration de Google Gemini (clé API + OAuth, génération d’image, compréhension des médias, TTS, recherche Web)
 title: Google (Gemini)
 x-i18n:
-    generated_at: "2026-04-19T01:11:31Z"
+    generated_at: "2026-04-24T07:27:03Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e5e055b02cc51899e11836a882f1f981fedfa5c4dbe42261ac2f2eba5e4d707c
+    source_hash: b43d7171f56ecdfb49a25256783433e64f99a02760b3bc6f0e1055195f556f5d
     source_path: providers/google.md
     workflow: 15
 ---
 
-# Google (Gemini)
-
-Le Plugin Google fournit l’accès aux modèles Gemini via Google AI Studio, ainsi que la
-génération d’images, la compréhension des médias (image/audio/vidéo), la synthèse vocale et la recherche Web via
+Le Plugin Google fournit l’accès aux modèles Gemini via Google AI Studio, ainsi qu’à la
+génération d’image, à la compréhension des médias (image/audio/vidéo), à la synthèse vocale, et à la recherche Web via
 Gemini Grounding.
 
 - Fournisseur : `google`
@@ -29,16 +27,16 @@ Gemini Grounding.
 Choisissez votre méthode d’authentification préférée et suivez les étapes de configuration.
 
 <Tabs>
-  <Tab title="API key">
-    **Idéal pour :** l’accès standard à l’API Gemini via Google AI Studio.
+  <Tab title="Clé API">
+    **Idéal pour :** accès standard à l’API Gemini via Google AI Studio.
 
     <Steps>
-      <Step title="Run onboarding">
+      <Step title="Lancer l’onboarding">
         ```bash
         openclaw onboard --auth-choice gemini-api-key
         ```
 
-        Ou transmettez la clé directement :
+        Ou passez directement la clé :
 
         ```bash
         openclaw onboard --non-interactive \
@@ -47,7 +45,7 @@ Choisissez votre méthode d’authentification préférée et suivez les étapes
           --gemini-api-key "$GEMINI_API_KEY"
         ```
       </Step>
-      <Step title="Set a default model">
+      <Step title="Définir un modèle par défaut">
         ```json5
         {
           agents: {
@@ -58,7 +56,7 @@ Choisissez votre méthode d’authentification préférée et suivez les étapes
         }
         ```
       </Step>
-      <Step title="Verify the model is available">
+      <Step title="Vérifier que le modèle est disponible">
         ```bash
         openclaw models list --provider google
         ```
@@ -72,15 +70,15 @@ Choisissez votre méthode d’authentification préférée et suivez les étapes
   </Tab>
 
   <Tab title="Gemini CLI (OAuth)">
-    **Idéal pour :** réutiliser une connexion Gemini CLI existante via OAuth PKCE plutôt qu’une clé API distincte.
+    **Idéal pour :** réutiliser une connexion Gemini CLI existante via l’OAuth PKCE au lieu d’une clé API séparée.
 
     <Warning>
     Le fournisseur `google-gemini-cli` est une intégration non officielle. Certains utilisateurs
-    signalent des restrictions de compte lors de l’utilisation d’OAuth de cette manière. Utilisez-le à vos propres risques.
+    signalent des restrictions de compte lorsqu’ils utilisent l’OAuth de cette manière. Utilisez-la à vos propres risques.
     </Warning>
 
     <Steps>
-      <Step title="Install the Gemini CLI">
+      <Step title="Installer Gemini CLI">
         La commande locale `gemini` doit être disponible dans le `PATH`.
 
         ```bash
@@ -92,14 +90,14 @@ Choisissez votre méthode d’authentification préférée et suivez les étapes
         ```
 
         OpenClaw prend en charge à la fois les installations Homebrew et les installations npm globales, y compris
-        les dispositions courantes sous Windows/npm.
+        les dispositions Windows/npm courantes.
       </Step>
-      <Step title="Log in via OAuth">
+      <Step title="Se connecter via OAuth">
         ```bash
         openclaw models auth login --provider google-gemini-cli --set-default
         ```
       </Step>
-      <Step title="Verify the model is available">
+      <Step title="Vérifier que le modèle est disponible">
         ```bash
         openclaw models list --provider google-gemini-cli
         ```
@@ -117,60 +115,60 @@ Choisissez votre méthode d’authentification préférée et suivez les étapes
     (Ou les variantes `GEMINI_CLI_*`.)
 
     <Note>
-    Si les requêtes OAuth Gemini CLI échouent après la connexion, définissez `GOOGLE_CLOUD_PROJECT` ou
-    `GOOGLE_CLOUD_PROJECT_ID` sur l’hôte Gateway et réessayez.
+    Si les requêtes Gemini CLI OAuth échouent après la connexion, définissez `GOOGLE_CLOUD_PROJECT` ou
+    `GOOGLE_CLOUD_PROJECT_ID` sur l’hôte gateway et réessayez.
     </Note>
 
     <Note>
-    Si la connexion échoue avant le démarrage du flux du navigateur, assurez-vous que la commande locale `gemini`
-    est installée et disponible dans le `PATH`.
+    Si la connexion échoue avant le démarrage du flux navigateur, assurez-vous que la commande locale `gemini`
+    est installée et présente dans le `PATH`.
     </Note>
 
-    Le fournisseur `google-gemini-cli`, limité à OAuth, est une surface
-    distincte d’inférence de texte. La génération d’images, la compréhension des médias et Gemini Grounding restent sur
-    l’identifiant de fournisseur `google`.
+    Le fournisseur `google-gemini-cli` uniquement OAuth est une surface distincte
+    d’inférence texte. La génération d’image, la compréhension des médias et Gemini Grounding restent sur
+    l’ID fournisseur `google`.
 
   </Tab>
 </Tabs>
 
 ## Capacités
 
-| Capacité                   | Pris en charge                 |
-| -------------------------- | ------------------------------ |
-| Complétions de chat        | Oui                            |
-| Génération d’images        | Oui                            |
-| Génération de musique      | Oui                            |
-| Synthèse vocale            | Oui                            |
-| Compréhension d’images     | Oui                            |
-| Transcription audio        | Oui                            |
-| Compréhension vidéo        | Oui                            |
-| Recherche Web (Grounding)  | Oui                            |
-| Thinking/reasoning         | Oui (Gemini 2.5+ / Gemini 3+)  |
-| Modèles Gemma 4            | Oui                            |
+| Capacité               | Pris en charge                 |
+| ---------------------- | ------------------------------ |
+| Complétions de chat    | Oui                            |
+| Génération d’image     | Oui                            |
+| Génération musicale    | Oui                            |
+| Synthèse vocale        | Oui                            |
+| Compréhension d’image  | Oui                            |
+| Transcription audio    | Oui                            |
+| Compréhension vidéo    | Oui                            |
+| Recherche Web (Grounding) | Oui                         |
+| Réflexion/raisonnement | Oui (Gemini 2.5+ / Gemini 3+) |
+| Modèles Gemma 4        | Oui                            |
 
 <Tip>
 Les modèles Gemini 3 utilisent `thinkingLevel` plutôt que `thinkingBudget`. OpenClaw mappe
-les contrôles de raisonnement de Gemini 3, Gemini 3.1 et de l’alias `gemini-*-latest` vers
-`thinkingLevel` afin que les exécutions par défaut/à faible latence n’envoient pas de valeurs
-`thinkingBudget` désactivées.
+les contrôles de raisonnement de Gemini 3, Gemini 3.1, et des alias `gemini-*-latest` vers
+`thinkingLevel` afin que les exécutions par défaut/à faible latence n’envoient pas
+de valeurs `thinkingBudget` désactivées.
 
-Les modèles Gemma 4 (par exemple `gemma-4-26b-a4b-it`) prennent en charge le mode thinking. OpenClaw
-réécrit `thinkingBudget` en un `thinkingLevel` Google pris en charge pour Gemma 4.
-Définir thinking sur `off` conserve la désactivation de thinking au lieu de le mapper sur
+Les modèles Gemma 4 (par exemple `gemma-4-26b-a4b-it`) prennent en charge le mode réflexion. OpenClaw
+réécrit `thinkingBudget` vers un `thinkingLevel` Google pris en charge pour Gemma 4.
+Définir la réflexion sur `off` conserve la réflexion désactivée au lieu de la mapper vers
 `MINIMAL`.
 </Tip>
 
-## Génération d’images
+## Génération d’image
 
-Le fournisseur de génération d’images `google` intégré utilise par défaut
+Le fournisseur intégré `google` de génération d’image utilise par défaut
 `google/gemini-3.1-flash-image-preview`.
 
 - Prend aussi en charge `google/gemini-3-pro-image-preview`
 - Génération : jusqu’à 4 images par requête
 - Mode édition : activé, jusqu’à 5 images d’entrée
-- Contrôles de géométrie : `size`, `aspectRatio` et `resolution`
+- Contrôles de géométrie : `size`, `aspectRatio`, et `resolution`
 
-Pour utiliser Google comme fournisseur d’images par défaut :
+Pour utiliser Google comme fournisseur d’image par défaut :
 
 ```json5
 {
@@ -185,17 +183,17 @@ Pour utiliser Google comme fournisseur d’images par défaut :
 ```
 
 <Note>
-Voir [Image Generation](/fr/tools/image-generation) pour les paramètres d’outil partagés, la sélection du fournisseur et le comportement de basculement.
+Voir [Génération d’image](/fr/tools/image-generation) pour les paramètres partagés de l’outil, la sélection du fournisseur et le comportement de basculement.
 </Note>
 
 ## Génération vidéo
 
-Le Plugin `google` intégré enregistre également la génération vidéo via l’outil partagé
+Le Plugin intégré `google` enregistre aussi la génération vidéo via l’outil partagé
 `video_generate`.
 
 - Modèle vidéo par défaut : `google/veo-3.1-fast-generate-preview`
-- Modes : texte vers vidéo, image vers vidéo et flux à référence vidéo unique
-- Prend en charge `aspectRatio`, `resolution` et `audio`
+- Modes : texte-vers-vidéo, image-vers-vidéo, et flux à référence vidéo unique
+- Prend en charge `aspectRatio`, `resolution`, et `audio`
 - Limite actuelle de durée : **4 à 8 secondes**
 
 Pour utiliser Google comme fournisseur vidéo par défaut :
@@ -213,12 +211,12 @@ Pour utiliser Google comme fournisseur vidéo par défaut :
 ```
 
 <Note>
-Voir [Video Generation](/fr/tools/video-generation) pour les paramètres d’outil partagés, la sélection du fournisseur et le comportement de basculement.
+Voir [Génération vidéo](/fr/tools/video-generation) pour les paramètres partagés de l’outil, la sélection du fournisseur et le comportement de basculement.
 </Note>
 
-## Génération de musique
+## Génération musicale
 
-Le Plugin `google` intégré enregistre également la génération de musique via l’outil partagé
+Le Plugin intégré `google` enregistre aussi la génération musicale via l’outil partagé
 `music_generate`.
 
 - Modèle musical par défaut : `google/lyria-3-clip-preview`
@@ -243,18 +241,18 @@ Pour utiliser Google comme fournisseur musical par défaut :
 ```
 
 <Note>
-Voir [Music Generation](/fr/tools/music-generation) pour les paramètres d’outil partagés, la sélection du fournisseur et le comportement de basculement.
+Voir [Génération musicale](/fr/tools/music-generation) pour les paramètres partagés de l’outil, la sélection du fournisseur et le comportement de basculement.
 </Note>
 
 ## Synthèse vocale
 
-Le fournisseur vocal `google` intégré utilise le chemin TTS de l’API Gemini avec
+Le fournisseur de parole intégré `google` utilise le chemin TTS de l’API Gemini avec
 `gemini-3.1-flash-tts-preview`.
 
 - Voix par défaut : `Kore`
 - Authentification : `messages.tts.providers.google.apiKey`, `models.providers.google.apiKey`, `GEMINI_API_KEY`, ou `GOOGLE_API_KEY`
-- Sortie : WAV pour les pièces jointes TTS classiques, PCM pour Talk/téléphonie
-- Sortie native en note vocale : non prise en charge sur ce chemin API Gemini, car l’API renvoie du PCM plutôt que de l’Opus
+- Sortie : WAV pour les pièces jointes TTS normales, PCM pour Talk/téléphonie
+- Sortie native en note vocale : non prise en charge sur ce chemin de l’API Gemini car l’API renvoie du PCM plutôt que de l’Opus
 
 Pour utiliser Google comme fournisseur TTS par défaut :
 
@@ -275,34 +273,34 @@ Pour utiliser Google comme fournisseur TTS par défaut :
 }
 ```
 
-Le TTS de l’API Gemini accepte des balises audio expressives entre crochets dans le texte, comme
+Le TTS de l’API Gemini accepte des balises audio expressives entre crochets dans le texte, telles que
 `[whispers]` ou `[laughs]`. Pour garder les balises hors de la réponse de chat visible tout en
 les envoyant au TTS, placez-les dans un bloc `[[tts:text]]...[[/tts:text]]` :
 
 ```text
-Voici le texte propre de la réponse.
+Here is the clean reply text.
 
-[[tts:text]][whispers] Voici la version parlée.[[/tts:text]]
+[[tts:text]][whispers] Here is the spoken version.[[/tts:text]]
 ```
 
 <Note>
-Une clé API Google Cloud Console restreinte à l’API Gemini est valide pour ce
+Une clé API Google Cloud Console limitée à l’API Gemini est valide pour ce
 fournisseur. Il ne s’agit pas du chemin distinct de l’API Cloud Text-to-Speech.
 </Note>
 
 ## Configuration avancée
 
 <AccordionGroup>
-  <Accordion title="Direct Gemini cache reuse">
+  <Accordion title="Réutilisation directe du cache Gemini">
     Pour les exécutions directes de l’API Gemini (`api: "google-generative-ai"`), OpenClaw
     transmet un handle `cachedContent` configuré aux requêtes Gemini.
 
-    - Configurez des paramètres par modèle ou globaux avec
-      `cachedContent` ou l’ancien `cached_content`
+    - Configurez des paramètres par modèle ou globaux avec soit
+      `cachedContent` soit l’ancien `cached_content`
     - Si les deux sont présents, `cachedContent` l’emporte
-    - Valeur d’exemple : `cachedContents/prebuilt-context`
-    - L’utilisation avec succès du cache Gemini est normalisée dans OpenClaw en `cacheRead` à partir de
-      `cachedContentTokenCount` en amont
+    - Exemple de valeur : `cachedContents/prebuilt-context`
+    - L’utilisation de cache-hit Gemini est normalisée en `cacheRead` OpenClaw à partir de
+      `cachedContentTokenCount` amont
 
     ```json5
     {
@@ -322,38 +320,38 @@ fournisseur. Il ne s’agit pas du chemin distinct de l’API Cloud Text-to-Spee
 
   </Accordion>
 
-  <Accordion title="Gemini CLI JSON usage notes">
+  <Accordion title="Remarques sur l’utilisation JSON de Gemini CLI">
     Lors de l’utilisation du fournisseur OAuth `google-gemini-cli`, OpenClaw normalise
-    la sortie JSON du CLI comme suit :
+    la sortie JSON de la CLI comme suit :
 
-    - Le texte de réponse provient du champ JSON `response` du CLI.
-    - L’usage se rabat sur `stats` lorsque le CLI laisse `usage` vide.
-    - `stats.cached` est normalisé en `cacheRead` dans OpenClaw.
-    - Si `stats.input` est absent, OpenClaw dérive les jetons d’entrée à partir de
+    - Le texte de réponse provient du champ JSON `response` de la CLI.
+    - L’utilisation revient à `stats` lorsque la CLI laisse `usage` vide.
+    - `stats.cached` est normalisé en `cacheRead` OpenClaw.
+    - Si `stats.input` est manquant, OpenClaw dérive les tokens d’entrée à partir de
       `stats.input_tokens - stats.cached`.
 
   </Accordion>
 
-  <Accordion title="Environment and daemon setup">
-    Si le Gateway s’exécute comme démon (launchd/systemd), assurez-vous que `GEMINI_API_KEY`
-    est disponible pour ce processus (par exemple, dans `~/.openclaw/.env` ou via
+  <Accordion title="Environnement et configuration du daemon">
+    Si le Gateway s’exécute comme daemon (launchd/systemd), assurez-vous que `GEMINI_API_KEY`
+    est disponible pour ce processus (par exemple dans `~/.openclaw/.env` ou via
     `env.shellEnv`).
   </Accordion>
 </AccordionGroup>
 
-## Connexe
+## Lié
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/fr/concepts/model-providers" icon="layers">
-    Choisir les fournisseurs, les références de modèle et le comportement de basculement.
+  <Card title="Sélection de modèle" href="/fr/concepts/model-providers" icon="layers">
+    Choisir les fournisseurs, références de modèles et comportement de basculement.
   </Card>
-  <Card title="Image generation" href="/fr/tools/image-generation" icon="image">
-    Paramètres d’outil d’image partagés et sélection du fournisseur.
+  <Card title="Génération d’image" href="/fr/tools/image-generation" icon="image">
+    Paramètres partagés d’outil d’image et sélection du fournisseur.
   </Card>
-  <Card title="Video generation" href="/fr/tools/video-generation" icon="video">
-    Paramètres d’outil vidéo partagés et sélection du fournisseur.
+  <Card title="Génération vidéo" href="/fr/tools/video-generation" icon="video">
+    Paramètres partagés d’outil vidéo et sélection du fournisseur.
   </Card>
-  <Card title="Music generation" href="/fr/tools/music-generation" icon="music">
-    Paramètres d’outil musical partagés et sélection du fournisseur.
+  <Card title="Génération musicale" href="/fr/tools/music-generation" icon="music">
+    Paramètres partagés d’outil musical et sélection du fournisseur.
   </Card>
 </CardGroup>

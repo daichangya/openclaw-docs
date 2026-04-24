@@ -1,25 +1,25 @@
 ---
 read_when:
-    - Vous voulez utiliser la CLI memory-wiki
+    - Vous souhaitez utiliser le CLI memory-wiki
     - Vous documentez ou modifiez `openclaw wiki`
-summary: Référence CLI pour `openclaw wiki` (état du coffre memory-wiki, recherche, compilation, lint, application, pont et assistants Obsidian)
-title: wiki
+summary: Référence CLI pour `openclaw wiki` (statut du coffre-fort memory-wiki, recherche, compilation, lint, application, bridge et helpers Obsidian)
+title: Wiki
 x-i18n:
-    generated_at: "2026-04-23T07:02:26Z"
+    generated_at: "2026-04-24T07:05:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e94908532c35da4edf488266ddc6eee06e8f7833eeba5f2b5c0c7d5d45b65eef
+    source_hash: c25f7046ef0c29ed74204a5349edc2aa20ce79a355f49211a0ba0df4a5e4db3a
     source_path: cli/wiki.md
     workflow: 15
 ---
 
 # `openclaw wiki`
 
-Inspectez et maintenez le coffre `memory-wiki`.
+Inspectez et maintenez le coffre-fort `memory-wiki`.
 
-Fourni par le plugin intégré `memory-wiki`.
+Fourni par le Plugin intégré `memory-wiki`.
 
-Liens associés :
+Lié :
 
 - [Plugin Memory Wiki](/fr/plugins/memory-wiki)
 - [Vue d’ensemble de la mémoire](/fr/concepts/memory)
@@ -31,9 +31,9 @@ Utilisez `openclaw wiki` lorsque vous voulez un coffre de connaissances compilé
 
 - recherche native au wiki et lecture de pages
 - synthèses riches en provenance
-- rapports de contradictions et de fraîcheur
-- imports de pont depuis le plugin de mémoire actif
-- assistants CLI Obsidian facultatifs
+- rapports de contradiction et de fraîcheur
+- imports bridge depuis le Plugin mémoire actif
+- helpers CLI Obsidian facultatifs
 
 ## Commandes courantes
 
@@ -70,52 +70,52 @@ openclaw wiki obsidian daily
 
 ### `wiki status`
 
-Inspectez le mode actuel du coffre, son état de santé et la disponibilité de la CLI Obsidian.
+Inspecte le mode actuel du coffre-fort, son état de santé et la disponibilité du CLI Obsidian.
 
-Utilisez cette commande en premier lorsque vous n’êtes pas sûr que le coffre soit initialisé, que le mode pont
-soit sain ou que l’intégration Obsidian soit disponible.
+Utilisez d’abord cette commande lorsque vous ne savez pas si le coffre-fort est initialisé, si le mode bridge
+est sain, ou si l’intégration Obsidian est disponible.
 
 ### `wiki doctor`
 
-Exécutez des vérifications de santé du wiki et faites remonter les problèmes de configuration ou du coffre.
+Exécute les vérifications de santé du wiki et met en évidence les problèmes de configuration ou de coffre-fort.
 
-Les problèmes typiques incluent :
+Problèmes typiques :
 
-- mode pont activé sans artefacts de mémoire publics
-- disposition du coffre invalide ou manquante
-- CLI Obsidian externe manquante lorsque le mode Obsidian est attendu
+- mode bridge activé sans artefacts de mémoire publique
+- disposition de coffre-fort invalide ou manquante
+- CLI Obsidian externe manquant alors que le mode Obsidian est attendu
 
 ### `wiki init`
 
-Créez la structure du coffre wiki et les pages de départ.
+Crée la structure du coffre-fort wiki et les pages de départ.
 
-Cela initialise la structure racine, y compris les index de premier niveau et les répertoires
+Cette commande initialise la structure racine, y compris les index de premier niveau et les répertoires
 de cache.
 
 ### `wiki ingest <path-or-url>`
 
-Importez du contenu dans la couche source du wiki.
+Importe du contenu dans la couche source du wiki.
 
 Remarques :
 
-- l’import d’URL est contrôlé par `ingest.allowUrlIngest`
-- les pages source importées conservent la provenance dans le frontmatter
+- l’import par URL est contrôlé par `ingest.allowUrlIngest`
+- les pages source importées conservent leur provenance dans le frontmatter
 - la compilation automatique peut s’exécuter après l’import lorsqu’elle est activée
 
 ### `wiki compile`
 
-Reconstruisez les index, blocs liés, tableaux de bord et condensés compilés.
+Reconstruit les index, blocs liés, tableaux de bord et condensés compilés.
 
-Cela écrit des artefacts stables destinés aux machines sous :
+Cette commande écrit des artefacts stables orientés machine sous :
 
 - `.openclaw-wiki/cache/agent-digest.json`
 - `.openclaw-wiki/cache/claims.jsonl`
 
-Si `render.createDashboards` est activé, la compilation rafraîchit aussi les pages de rapport.
+Si `render.createDashboards` est activé, la compilation actualise aussi les pages de rapport.
 
 ### `wiki lint`
 
-Analysez le coffre et signalez :
+Vérifie le coffre-fort et signale :
 
 - problèmes structurels
 - lacunes de provenance
@@ -128,7 +128,7 @@ Exécutez cette commande après des mises à jour significatives du wiki.
 
 ### `wiki search <query>`
 
-Recherchez du contenu dans le wiki.
+Recherche dans le contenu du wiki.
 
 Le comportement dépend de la configuration :
 
@@ -136,12 +136,12 @@ Le comportement dépend de la configuration :
 - `search.corpus` : `wiki`, `memory` ou `all`
 
 Utilisez `wiki search` lorsque vous voulez un classement spécifique au wiki ou des détails de provenance.
-Pour un large passage unique de rappel partagé, préférez `openclaw memory search` lorsque le
-plugin de mémoire actif expose une recherche partagée.
+Pour un passage de rappel partagé large, préférez `openclaw memory search` lorsque le
+Plugin mémoire actif expose une recherche partagée.
 
 ### `wiki get <lookup>`
 
-Lisez une page wiki par identifiant ou chemin relatif.
+Lit une page du wiki par identifiant ou chemin relatif.
 
 Exemples :
 
@@ -152,13 +152,13 @@ openclaw wiki get syntheses/alpha-summary.md --from 1 --lines 80
 
 ### `wiki apply`
 
-Appliquez des mutations ciblées sans chirurgie libre sur les pages.
+Applique des mutations ciblées sans chirurgie libre sur les pages.
 
 Les flux pris en charge incluent :
 
 - création/mise à jour d’une page de synthèse
-- mise à jour des métadonnées de page
-- attachement d’identifiants de source
+- mise à jour des métadonnées d’une page
+- attachement d’identifiants source
 - ajout de questions
 - ajout de contradictions
 - mise à jour de la confiance/du statut
@@ -169,20 +169,21 @@ les blocs gérés.
 
 ### `wiki bridge import`
 
-Importez dans des pages source adossées au pont les artefacts de mémoire publics provenant du plugin de mémoire actif.
+Importe des artefacts de mémoire publique depuis le Plugin mémoire actif vers des pages source
+adossées au bridge.
 
-Utilisez cette commande en mode `bridge` lorsque vous voulez que les derniers artefacts de mémoire exportés
-soient importés dans le coffre wiki.
+Utilisez cette commande en mode `bridge` lorsque vous voulez récupérer dans le coffre-fort wiki les derniers artefacts mémoire
+exportés.
 
 ### `wiki unsafe-local import`
 
-Importez depuis des chemins locaux explicitement configurés en mode `unsafe-local`.
+Importe depuis des chemins locaux explicitement configurés en mode `unsafe-local`.
 
-Ceci est intentionnellement expérimental et limité à la même machine.
+Cette fonctionnalité est volontairement expérimentale et limitée à la même machine.
 
 ### `wiki obsidian ...`
 
-Commandes d’assistance Obsidian pour les coffres exécutés en mode compatible Obsidian.
+Helpers Obsidian pour les coffres-forts exécutés en mode compatible Obsidian.
 
 Sous-commandes :
 
@@ -192,18 +193,17 @@ Sous-commandes :
 - `command`
 - `daily`
 
-Elles exigent la CLI officielle `obsidian` dans le `PATH` lorsque
+Celles-ci nécessitent le CLI officiel `obsidian` dans le `PATH` lorsque
 `obsidian.useOfficialCli` est activé.
 
-## Conseils pratiques d’utilisation
+## Guide d’utilisation pratique
 
 - Utilisez `wiki search` + `wiki get` lorsque la provenance et l’identité des pages comptent.
-- Utilisez `wiki apply` au lieu de modifier manuellement des sections générées et gérées.
+- Utilisez `wiki apply` au lieu de modifier à la main les sections générées gérées.
 - Utilisez `wiki lint` avant de faire confiance à un contenu contradictoire ou à faible confiance.
-- Utilisez `wiki compile` après des imports en masse ou des modifications de sources lorsque vous voulez
-  immédiatement des tableaux de bord et des condensés compilés à jour.
-- Utilisez `wiki bridge import` lorsque le mode pont dépend d’artefacts de mémoire
-  nouvellement exportés.
+- Utilisez `wiki compile` après des imports en masse ou des changements de source lorsque vous voulez immédiatement des
+  tableaux de bord et des condensés compilés à jour.
+- Utilisez `wiki bridge import` lorsque le mode bridge dépend d’artefacts mémoire nouvellement exportés.
 
 ## Liens avec la configuration
 
@@ -218,3 +218,8 @@ Le comportement de `openclaw wiki` est façonné par :
 - `plugins.entries.memory-wiki.config.context.includeCompiledDigestPrompt`
 
 Voir [Plugin Memory Wiki](/fr/plugins/memory-wiki) pour le modèle de configuration complet.
+
+## Lié
+
+- [Référence CLI](/fr/cli)
+- [Memory wiki](/fr/plugins/memory-wiki)

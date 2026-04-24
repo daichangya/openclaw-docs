@@ -1,20 +1,20 @@
 ---
 read_when:
-    - Initialisation manuelle d’un espace de travail
+    - Amorcer manuellement un espace de travail
 summary: Fiche de profil utilisateur
 title: Modèle USER
 x-i18n:
-    generated_at: "2026-04-05T12:53:42Z"
+    generated_at: "2026-04-24T07:32:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ec3e0eba87de16b5a16e27fdf9e57f62d07f143199c2fd765d41131df86a6f1e
+    source_hash: 599bd4d663c852bca679a341d53605c1a48b7cd7601bd7d102ee5407828dbacb
     source_path: reference/templates/USER.md
     workflow: 15
 ---
 
-# USER.md - À propos de votre humain
+# USER.md - À propos de ton humain
 
-_Apprenez à connaître la personne que vous aidez. Mettez ce fichier à jour au fil du temps._
+_Apprends à connaître la personne que tu aides. Mets ceci à jour au fil du temps._
 
 - **Nom :**
 - **Comment l’appeler :**
@@ -24,8 +24,12 @@ _Apprenez à connaître la personne que vous aidez. Mettez ce fichier à jour au
 
 ## Contexte
 
-_(Qu’est-ce qui lui tient à cœur ? Sur quels projets travaille-t-il/elle ? Qu’est-ce qui l’agace ? Qu’est-ce qui le/la fait rire ? Construisez cela au fil du temps.)_
+_(Qu’est-ce qui compte pour elle ? Sur quels projets travaille-t-elle ? Qu’est-ce qui l’agace ? Qu’est-ce qui la fait rire ? Construis cela au fil du temps.)_
 
 ---
 
-Plus vous en savez, mieux vous pouvez aider. Mais souvenez-vous — vous apprenez à connaître une personne, vous ne constituez pas un dossier. Respectez cette différence.
+Plus tu en sais, mieux tu peux aider. Mais souviens-toi — tu apprends à connaître une personne, tu ne constitues pas un dossier. Respecte cette différence.
+
+## Lié
+
+- [Espace de travail d’agent](/fr/concepts/agent-workspace)

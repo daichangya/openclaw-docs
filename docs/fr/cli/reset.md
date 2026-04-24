@@ -1,28 +1,28 @@
 ---
 read_when:
-    - Vous voulez effacer l’état local tout en gardant la CLI installée
-    - Vous voulez une exécution à blanc de ce qui serait supprimé
+    - Vous souhaitez effacer l’état local tout en conservant la CLI installée
+    - Vous souhaitez un aperçu à blanc de ce qui serait supprimé
 summary: Référence CLI pour `openclaw reset` (réinitialiser l’état/la configuration locale)
-title: reset
+title: Réinitialiser
 x-i18n:
-    generated_at: "2026-04-05T12:38:45Z"
+    generated_at: "2026-04-24T07:05:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad464700f948bebe741ec309f25150714f0b280834084d4f531327418a42c79b
+    source_hash: e4a4aba32fb44905d079bf2a22e582a3affbe9809eac9af237ce3e48da72b42c
     source_path: cli/reset.md
     workflow: 15
 ---
 
 # `openclaw reset`
 
-Réinitialise la configuration/l’état local (garde la CLI installée).
+Réinitialiser la configuration/l’état local (conserve la CLI installée).
 
 Options :
 
-- `--scope <scope>` : `config`, `config+creds+sessions`, ou `full`
+- `--scope <scope>` : `config`, `config+creds+sessions` ou `full`
 - `--yes` : ignorer les invites de confirmation
 - `--non-interactive` : désactiver les invites ; nécessite `--scope` et `--yes`
-- `--dry-run` : afficher les actions sans supprimer les fichiers
+- `--dry-run` : afficher les actions sans supprimer de fichiers
 
 Exemples :
 
@@ -37,6 +37,10 @@ openclaw reset --scope full --yes --non-interactive
 
 Remarques :
 
-- Exécutez d’abord `openclaw backup create` si vous voulez un instantané restaurable avant de supprimer l’état local.
-- Si vous omettez `--scope`, `openclaw reset` utilise une invite interactive pour choisir ce qui doit être supprimé.
+- Exécutez d’abord `openclaw backup create` si vous souhaitez un snapshot restaurable avant de supprimer l’état local.
+- Si vous omettez `--scope`, `openclaw reset` utilise une invite interactive pour choisir ce qu’il faut supprimer.
 - `--non-interactive` n’est valide que lorsque `--scope` et `--yes` sont tous deux définis.
+
+## Associé
+
+- [Référence CLI](/fr/cli)

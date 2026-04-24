@@ -1,20 +1,20 @@
 ---
 read_when:
-    - Vous voulez lister les sessions stockées et voir l’activité récente
-summary: Référence CLI pour `openclaw sessions` (liste des sessions stockées + utilisation)
-title: sessions
+    - Vous souhaitez lister les sessions stockées et voir l’activité récente
+summary: Référence CLI pour `openclaw sessions` (lister les sessions stockées + l’utilisation)
+title: Sessions
 x-i18n:
-    generated_at: "2026-04-05T12:38:59Z"
+    generated_at: "2026-04-24T07:05:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 47eb55d90bd0681676283310cfa50dcacc95dff7d9a39bf2bb188788c6e5e5ba
+    source_hash: 8d9fdc5d4cc968784e6e937a1000e43650345c27765208d46611e1fe85ee9293
     source_path: cli/sessions.md
     workflow: 15
 ---
 
 # `openclaw sessions`
 
-Liste les sessions de conversation stockées.
+Lister les sessions de conversation stockées.
 
 ```bash
 openclaw sessions
@@ -25,19 +25,19 @@ openclaw sessions --verbose
 openclaw sessions --json
 ```
 
-Sélection de portée :
+Sélection du périmètre :
 
 - par défaut : magasin de l’agent par défaut configuré
 - `--verbose` : journalisation détaillée
-- `--agent <id>` : un magasin d’agent configuré
-- `--all-agents` : agrège tous les magasins d’agents configurés
+- `--agent <id>` : magasin d’un agent configuré
+- `--all-agents` : agréger tous les magasins d’agents configurés
 - `--store <path>` : chemin explicite du magasin (ne peut pas être combiné avec `--agent` ou `--all-agents`)
 
-`openclaw sessions --all-agents` lit les magasins d’agents configurés. La découverte des
-sessions Gateway et ACP est plus large : elle inclut aussi les magasins présents
-uniquement sur disque trouvés sous la racine `agents/` par défaut ou une racine `session.store`
-modélisée. Ces magasins découverts doivent se résoudre en fichiers `sessions.json`
-réguliers à l’intérieur de la racine de l’agent ; les liens symboliques et les chemins hors racine sont ignorés.
+`openclaw sessions --all-agents` lit les magasins d’agents configurés. La découverte des sessions Gateway et ACP
+est plus large : elle inclut aussi les magasins présents uniquement sur disque trouvés sous
+la racine `agents/` par défaut ou une racine `session.store` basée sur un modèle. Ces
+magasins découverts doivent se résoudre en fichiers `sessions.json` ordinaires dans la
+racine de l’agent ; les liens symboliques et les chemins hors racine sont ignorés.
 
 Exemples JSON :
 
@@ -62,7 +62,7 @@ Exemples JSON :
 
 ## Maintenance de nettoyage
 
-Exécutez la maintenance maintenant (au lieu d’attendre le prochain cycle d’écriture) :
+Exécuter la maintenance maintenant (au lieu d’attendre le prochain cycle d’écriture) :
 
 ```bash
 openclaw sessions cleanup --dry-run
@@ -75,17 +75,17 @@ openclaw sessions cleanup --json
 
 `openclaw sessions cleanup` utilise les paramètres `session.maintenance` de la configuration :
 
-- Remarque sur la portée : `openclaw sessions cleanup` maintient uniquement les magasins/transcriptions de session. Il n’élague pas les journaux d’exécution cron (`cron/runs/<jobId>.jsonl`), qui sont gérés par `cron.runLog.maxBytes` et `cron.runLog.keepLines` dans la [Configuration cron](/automation/cron-jobs#configuration) et expliqués dans [Maintenance cron](/automation/cron-jobs#maintenance).
+- Remarque de périmètre : `openclaw sessions cleanup` maintient uniquement les magasins/transcriptions de session. Il n’élague pas les journaux d’exécution Cron (`cron/runs/<jobId>.jsonl`), qui sont gérés par `cron.runLog.maxBytes` et `cron.runLog.keepLines` dans [Configuration Cron](/fr/automation/cron-jobs#configuration) et expliqués dans [Maintenance Cron](/fr/automation/cron-jobs#maintenance).
 
-- `--dry-run` : prévisualise combien d’entrées seraient élaguées/limitées sans écriture.
-  - En mode texte, l’exécution à blanc affiche un tableau d’actions par session (`Action`, `Key`, `Age`, `Model`, `Flags`) afin que vous puissiez voir ce qui serait conservé ou supprimé.
-- `--enforce` : applique la maintenance même lorsque `session.maintenance.mode` vaut `warn`.
-- `--fix-missing` : supprime les entrées dont les fichiers de transcription sont manquants, même si elles ne devraient normalement pas encore sortir par ancienneté ou par nombre.
-- `--active-key <key>` : protège une clé active spécifique contre l’éviction liée au budget disque.
-- `--agent <id>` : exécute le nettoyage pour un magasin d’agent configuré.
-- `--all-agents` : exécute le nettoyage pour tous les magasins d’agents configurés.
-- `--store <path>` : exécute sur un fichier `sessions.json` spécifique.
-- `--json` : affiche un résumé JSON. Avec `--all-agents`, la sortie inclut un résumé par magasin.
+- `--dry-run` : prévisualiser combien d’entrées seraient élaguées/limitées sans écrire.
+  - En mode texte, `dry-run` affiche un tableau d’action par session (`Action`, `Key`, `Age`, `Model`, `Flags`) afin que vous puissiez voir ce qui serait conservé ou supprimé.
+- `--enforce` : appliquer la maintenance même lorsque `session.maintenance.mode` vaut `warn`.
+- `--fix-missing` : supprimer les entrées dont les fichiers de transcription sont manquants, même si elles ne dépasseraient normalement pas encore les seuils d’âge/de nombre.
+- `--active-key <key>` : protéger une clé active spécifique contre l’éviction liée au budget disque.
+- `--agent <id>` : exécuter le nettoyage pour le magasin d’un agent configuré.
+- `--all-agents` : exécuter le nettoyage pour tous les magasins d’agents configurés.
+- `--store <path>` : exécuter sur un fichier `sessions.json` spécifique.
+- `--json` : afficher un résumé JSON. Avec `--all-agents`, la sortie inclut un résumé par magasin.
 
 `openclaw sessions cleanup --all-agents --dry-run --json` :
 
@@ -115,6 +115,11 @@ openclaw sessions cleanup --json
 }
 ```
 
-Lié :
+Associé :
 
-- Configuration des sessions : [Référence de configuration](/gateway/configuration-reference#session)
+- Configuration de session : [Référence de configuration](/fr/gateway/config-agents#session)
+
+## Associé
+
+- [Référence CLI](/fr/cli)
+- [Gestion des sessions](/fr/concepts/session)

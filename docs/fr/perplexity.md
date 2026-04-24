@@ -1,35 +1,35 @@
 ---
 read_when:
     - Vous souhaitez utiliser Perplexity Search pour la recherche web
-    - Vous devez configurer `PERPLEXITY_API_KEY` ou `OPENROUTER_API_KEY`
-summary: API de recherche Perplexity et compatibilité Sonar/OpenRouter pour web_search
-title: Perplexity Search (chemin hérité)
+    - Vous avez besoin de configurer `PERPLEXITY_API_KEY` ou `OPENROUTER_API_KEY`
+summary: API Perplexity Search et compatibilité Sonar/OpenRouter pour `web_search`
+title: Recherche Perplexity (chemin hérité)
 x-i18n:
-    generated_at: "2026-04-05T12:47:58Z"
+    generated_at: "2026-04-24T07:19:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ba91e63e7412f3b6f889ee11f4a66563014932a1dc7be8593fe2262a4877b89b
+    source_hash: 87a7b6e14f636cfe6b7c5833af1b0aecb334a39babbb779c32f29bbbb5c9e14a
     source_path: perplexity.md
     workflow: 15
 ---
 
 # API Perplexity Search
 
-OpenClaw prend en charge l'API Perplexity Search comme fournisseur `web_search`.
+OpenClaw prend en charge l’API Perplexity Search comme fournisseur `web_search`.
 Elle renvoie des résultats structurés avec les champs `title`, `url` et `snippet`.
 
-Pour des raisons de compatibilité, OpenClaw prend également en charge les configurations héritées Perplexity Sonar/OpenRouter.
-Si vous utilisez `OPENROUTER_API_KEY`, une clé `sk-or-...` dans `plugins.entries.perplexity.config.webSearch.apiKey`, ou si vous définissez `plugins.entries.perplexity.config.webSearch.baseUrl` / `model`, le fournisseur bascule vers le chemin chat-completions et renvoie des réponses synthétisées par l'IA avec citations au lieu de résultats structurés de l'API Search.
+Pour la compatibilité, OpenClaw prend également en charge les anciennes configurations Perplexity Sonar/OpenRouter.
+Si vous utilisez `OPENROUTER_API_KEY`, une clé `sk-or-...` dans `plugins.entries.perplexity.config.webSearch.apiKey`, ou définissez `plugins.entries.perplexity.config.webSearch.baseUrl` / `model`, le fournisseur bascule vers le chemin chat-completions et renvoie des réponses synthétisées par IA avec citations au lieu des résultats structurés de l’API Search.
 
 ## Obtenir une clé API Perplexity
 
 1. Créez un compte Perplexity sur [perplexity.ai/settings/api](https://www.perplexity.ai/settings/api)
-2. Générez une clé API dans le dashboard
-3. Stockez la clé dans la configuration ou définissez `PERPLEXITY_API_KEY` dans l'environnement de la gateway.
+2. Générez une clé API dans le tableau de bord
+3. Stockez la clé dans la configuration ou définissez `PERPLEXITY_API_KEY` dans l’environnement du Gateway.
 
 ## Compatibilité OpenRouter
 
-Si vous utilisiez déjà OpenRouter pour Perplexity Sonar, conservez `provider: "perplexity"` et définissez `OPENROUTER_API_KEY` dans l'environnement de la gateway, ou stockez une clé `sk-or-...` dans `plugins.entries.perplexity.config.webSearch.apiKey`.
+Si vous utilisiez déjà OpenRouter pour Perplexity Sonar, conservez `provider: "perplexity"` et définissez `OPENROUTER_API_KEY` dans l’environnement du Gateway, ou stockez une clé `sk-or-...` dans `plugins.entries.perplexity.config.webSearch.apiKey`.
 
 Contrôles de compatibilité facultatifs :
 
@@ -92,46 +92,46 @@ Contrôles de compatibilité facultatifs :
 
 ## Où définir la clé
 
-**Via la configuration :** exécutez `openclaw configure --section web`. La clé est stockée dans
+**Via la configuration :** exécutez `openclaw configure --section web`. Cela stocke la clé dans
 `~/.openclaw/openclaw.json` sous `plugins.entries.perplexity.config.webSearch.apiKey`.
-Ce champ accepte également les objets SecretRef.
+Ce champ accepte aussi des objets SecretRef.
 
-**Via l'environnement :** définissez `PERPLEXITY_API_KEY` ou `OPENROUTER_API_KEY`
-dans l'environnement du processus gateway. Pour une installation gateway, placez-la dans
-`~/.openclaw/.env` (ou dans l'environnement de votre service). Voir [Variables d'environnement](/help/faq#env-vars-and-env-loading).
+**Via l’environnement :** définissez `PERPLEXITY_API_KEY` ou `OPENROUTER_API_KEY`
+dans l’environnement du processus Gateway. Pour une installation gateway, placez-la dans
+`~/.openclaw/.env` (ou dans l’environnement de votre service). Voir [Variables d’environnement](/fr/help/faq#env-vars-and-env-loading).
 
-Si `provider: "perplexity"` est configuré et que le SecretRef de clé Perplexity n'est pas résolu sans repli env, le démarrage/rechargement échoue immédiatement.
+Si `provider: "perplexity"` est configuré et que la SecretRef de clé Perplexity n’est pas résolue sans repli env, le démarrage/rechargement échoue immédiatement.
 
-## Paramètres de l'outil
+## Paramètres de l’outil
 
-Ces paramètres s'appliquent au chemin natif de l'API Perplexity Search.
+Ces paramètres s’appliquent au chemin natif de l’API Perplexity Search.
 
-| Paramètre             | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| `query`               | Requête de recherche (obligatoire)                         |
-| `count`               | Nombre de résultats à renvoyer (1-10, défaut : 5)          |
-| `country`             | Code pays ISO à 2 lettres (par ex. `"US"`, `"DE"`)         |
-| `language`            | Code langue ISO 639-1 (par ex. `"en"`, `"de"`, `"fr"`)     |
-| `freshness`           | Filtre temporel : `day` (24h), `week`, `month` ou `year`   |
-| `date_after`          | Uniquement les résultats publiés après cette date (YYYY-MM-DD) |
-| `date_before`         | Uniquement les résultats publiés avant cette date (YYYY-MM-DD) |
-| `domain_filter`       | Tableau de liste d'autorisation/de refus de domaines (max 20) |
-| `max_tokens`          | Budget total de contenu (défaut : 25000, max : 1000000)    |
-| `max_tokens_per_page` | Limite de jetons par page (défaut : 2048)                  |
+| Paramètre            | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `query`              | Requête de recherche (requis)                        |
+| `count`              | Nombre de résultats à renvoyer (1-10, par défaut : 5) |
+| `country`            | Code pays ISO à 2 lettres (par ex. "US", "DE")      |
+| `language`           | Code langue ISO 639-1 (par ex. "en", "de", "fr")    |
+| `freshness`          | Filtre temporel : `day` (24 h), `week`, `month`, ou `year` |
+| `date_after`         | Résultats publiés uniquement après cette date (YYYY-MM-DD) |
+| `date_before`        | Résultats publiés uniquement avant cette date (YYYY-MM-DD) |
+| `domain_filter`      | Tableau de liste d’autorisation/de refus de domaines (max 20) |
+| `max_tokens`         | Budget total de contenu (par défaut : 25000, max : 1000000) |
+| `max_tokens_per_page`| Limite de jetons par page (par défaut : 2048)        |
 
-Pour le chemin de compatibilité hérité Sonar/OpenRouter :
+Pour le chemin hérité de compatibilité Sonar/OpenRouter :
 
-- `query`, `count` et `freshness` sont acceptés
-- `count` n'est là que pour la compatibilité ; la réponse reste une seule
-  réponse synthétisée avec citations plutôt qu'une liste de N résultats
-- Les filtres réservés à l'API Search comme `country`, `language`, `date_after`,
-  `date_before`, `domain_filter`, `max_tokens` et `max_tokens_per_page`
+- `query`, `count`, et `freshness` sont acceptés
+- `count` n’est là que pour compatibilité ; la réponse reste une seule
+  réponse synthétisée avec citations plutôt qu’une liste de N résultats
+- Les filtres propres à l’API Search tels que `country`, `language`, `date_after`,
+  `date_before`, `domain_filter`, `max_tokens`, et `max_tokens_per_page`
   renvoient des erreurs explicites
 
 **Exemples :**
 
 ```javascript
-// Recherche spécifique à un pays et à une langue
+// Recherche spécifique au pays et à la langue
 await web_search({
   query: "renewable energy",
   country: "DE",
@@ -151,13 +151,13 @@ await web_search({
   date_before: "2024-06-30",
 });
 
-// Filtrage de domaine (liste d'autorisation)
+// Filtrage de domaine (liste d’autorisation)
 await web_search({
   query: "climate research",
   domain_filter: ["nature.com", "science.org", ".edu"],
 });
 
-// Filtrage de domaine (liste de refus - préfixer par -)
+// Filtrage de domaine (liste de refus - préfixe avec -)
 await web_search({
   query: "product reviews",
   domain_filter: ["-reddit.com", "-pinterest.com"],
@@ -174,15 +174,20 @@ await web_search({
 ### Règles de filtre de domaine
 
 - Maximum 20 domaines par filtre
-- Impossible de mélanger liste d'autorisation et liste de refus dans une même requête
+- Impossible de mélanger liste d’autorisation et liste de refus dans une même requête
 - Utilisez le préfixe `-` pour les entrées de liste de refus (par ex. `["-reddit.com"]`)
 
 ## Remarques
 
-- L'API Perplexity Search renvoie des résultats de recherche web structurés (`title`, `url`, `snippet`)
-- OpenRouter ou `plugins.entries.perplexity.config.webSearch.baseUrl` / `model` explicites rebascule Perplexity vers les chat completions Sonar pour des raisons de compatibilité
-- La compatibilité Sonar/OpenRouter renvoie une seule réponse synthétisée avec citations, pas des lignes de résultats structurées
+- L’API Perplexity Search renvoie des résultats de recherche web structurés (`title`, `url`, `snippet`)
+- OpenRouter ou un `plugins.entries.perplexity.config.webSearch.baseUrl` / `model` explicite rebascule Perplexity vers les chat completions Sonar pour compatibilité
+- La compatibilité Sonar/OpenRouter renvoie une réponse synthétisée unique avec citations, et non des lignes de résultats structurées
 - Les résultats sont mis en cache pendant 15 minutes par défaut (configurable via `cacheTtlMinutes`)
 
-Voir [Outils web](/tools/web) pour la configuration complète de `web_search`.
-Voir la [documentation de l'API Perplexity Search](https://docs.perplexity.ai/docs/search/quickstart) pour plus de détails.
+Voir [Outils web](/fr/tools/web) pour la configuration complète de web_search.
+Voir [Documentation API Perplexity Search](https://docs.perplexity.ai/docs/search/quickstart) pour plus de détails.
+
+## Articles connexes
+
+- [Recherche Perplexity](/fr/tools/perplexity-search)
+- [Recherche web](/fr/tools/web)

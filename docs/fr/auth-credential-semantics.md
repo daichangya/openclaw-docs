@@ -1,21 +1,19 @@
 ---
 read_when:
     - Travail sur la résolution des profils d’authentification ou le routage des identifiants
-    - Débogage des échecs d’authentification des modèles ou de l’ordre des profils
-summary: Sémantique canonique d’éligibilité et de résolution des identifiants pour les profils d’authentification
+    - Débogage des échecs d’authentification du modèle ou de l’ordre des profils
+summary: Sémantique canonique d’éligibilité des identifiants et de résolution pour les profils d’authentification
 title: Sémantique des identifiants d’authentification
 x-i18n:
-    generated_at: "2026-04-05T12:34:08Z"
+    generated_at: "2026-04-24T06:59:10Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a4cd3e16cd25eb22c5e707311d06a19df1a59747ee3261c2d32c534a245fd7fb
+    source_hash: b45da872b9ab177acbac08ce353b6ee31b6a068477ace52e5e5eda32a848d8bb
     source_path: auth-credential-semantics.md
     workflow: 15
 ---
 
-# Sémantique des identifiants d’authentification
-
-Ce document définit la sémantique canonique d’éligibilité et de résolution des identifiants utilisée dans l’ensemble de :
+Ce document définit la sémantique canonique d’éligibilité des identifiants et de résolution utilisée dans l’ensemble de :
 
 - `resolveAuthProfileOrder`
 - `resolveApiKeyForProfile`
@@ -24,7 +22,7 @@ Ce document définit la sémantique canonique d’éligibilité et de résolutio
 
 L’objectif est de maintenir l’alignement entre le comportement au moment de la sélection et celui à l’exécution.
 
-## Codes de raison de probe stables
+## Codes de raison stables pour la sonde
 
 - `ok`
 - `excluded_by_auth_order`
@@ -36,44 +34,50 @@ L’objectif est de maintenir l’alignement entre le comportement au moment de 
 
 ## Identifiants de jeton
 
-Les identifiants de jeton (`type: "token"`) prennent en charge `token` en ligne et/ou `tokenRef`.
+Les identifiants de jeton (`type: "token"`) prennent en charge `token` inline et/ou `tokenRef`.
 
 ### Règles d’éligibilité
 
 1. Un profil de jeton n’est pas éligible lorsque `token` et `tokenRef` sont tous deux absents.
 2. `expires` est facultatif.
 3. Si `expires` est présent, il doit s’agir d’un nombre fini supérieur à `0`.
-4. Si `expires` est invalide (`NaN`, `0`, négatif, non fini ou de type incorrect), le profil n’est pas éligible avec `invalid_expires`.
+4. Si `expires` est invalide (`NaN`, `0`, négatif, non fini ou du mauvais type), le profil n’est pas éligible avec `invalid_expires`.
 5. Si `expires` se situe dans le passé, le profil n’est pas éligible avec `expired`.
 6. `tokenRef` ne contourne pas la validation de `expires`.
 
 ### Règles de résolution
 
 1. La sémantique du résolveur correspond à la sémantique d’éligibilité pour `expires`.
-2. Pour les profils éligibles, le matériel de jeton peut être résolu à partir d’une valeur en ligne ou de `tokenRef`.
+2. Pour les profils éligibles, le contenu du jeton peut être résolu à partir d’une valeur inline ou de `tokenRef`.
 3. Les références impossibles à résoudre produisent `unresolved_ref` dans la sortie de `models status --probe`.
 
 ## Filtrage explicite de l’ordre d’authentification
 
-- Lorsque `auth.order.<provider>` ou la surcharge d’ordre du magasin d’authentification est définie pour un fournisseur, `models status --probe` ne probe que les identifiants de profil qui restent dans l’ordre d’authentification résolu pour ce fournisseur.
-- Un profil stocké pour ce fournisseur qui est omis de l’ordre explicite n’est pas essayé silencieusement plus tard. La sortie de probe le signale avec `reasonCode: excluded_by_auth_order` et le détail `Excluded by auth.order for this provider.`
+- Lorsque `auth.order.<provider>` ou la surcharge d’ordre du magasin d’authentification est définie pour un provider, `models status --probe` ne sonde que les identifiants de profil qui restent dans l’ordre d’authentification résolu pour ce provider.
+- Un profil stocké pour ce provider qui est omis de l’ordre explicite n’est pas essayé silencieusement plus tard. La sortie de la sonde le signale avec `reasonCode: excluded_by_auth_order` et le détail
+  `Excluded by auth.order for this provider.`
 
-## Résolution de la cible de probe
+## Résolution des cibles de sonde
 
-- Les cibles de probe peuvent provenir des profils d’authentification, des identifiants d’environnement ou de `models.json`.
-- Si un fournisseur a des identifiants mais qu’OpenClaw ne peut pas résoudre de candidat de modèle probeable pour lui, `models status --probe` signale `status: no_model` avec `reasonCode: no_model`.
+- Les cibles de sonde peuvent provenir des profils d’authentification, des identifiants d’environnement ou de `models.json`.
+- Si un provider dispose d’identifiants mais qu’OpenClaw ne peut pas résoudre de candidat de modèle pouvant être sondé pour celui-ci, `models status --probe` signale `status: no_model` avec `reasonCode: no_model`.
 
 ## Garde de politique SecretRef OAuth
 
 - L’entrée SecretRef est réservée aux identifiants statiques uniquement.
-- Si un identifiant de profil est de `type: "oauth"`, les objets SecretRef ne sont pas pris en charge pour ce matériel d’identifiant de profil.
-- Si `auth.profiles.<id>.mode` vaut `"oauth"`, l’entrée `keyRef`/`tokenRef` adossée à SecretRef pour ce profil est rejetée.
-- Les violations sont des échecs bloquants dans les chemins de résolution d’authentification au démarrage/rechargement.
+- Si un identifiant de profil est de `type: "oauth"`, les objets SecretRef ne sont pas pris en charge pour le contenu de cet identifiant de profil.
+- Si `auth.profiles.<id>.mode` est `"oauth"`, l’entrée `keyRef`/`tokenRef` basée sur SecretRef pour ce profil est rejetée.
+- Les violations constituent des échecs bloquants dans les chemins de résolution d’authentification au démarrage/rechargement.
 
-## Messagerie compatible avec l’historique
+## Messagerie compatible avec l’existant
 
-Pour la compatibilité des scripts, les erreurs de probe conservent cette première ligne inchangée :
+Pour la compatibilité des scripts, les erreurs de sonde conservent cette première ligne inchangée :
 
 `Auth profile credentials are missing or expired.`
 
-Des détails plus conviviaux et des codes de raison stables peuvent être ajoutés sur les lignes suivantes.
+Des détails conviviaux et des codes de raison stables peuvent être ajoutés sur les lignes suivantes.
+
+## Lié
+
+- [Gestion des secrets](/fr/gateway/secrets)
+- [Stockage de l’authentification](/fr/concepts/oauth)

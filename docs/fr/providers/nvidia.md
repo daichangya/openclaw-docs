@@ -1,31 +1,29 @@
 ---
 read_when:
-    - Vous souhaitez utiliser gratuitement des modèles ouverts dans OpenClaw
-    - Vous avez besoin de configurer `NVIDIA_API_KEY`
+    - Vous voulez utiliser gratuitement des modèles ouverts dans OpenClaw
+    - Vous avez besoin de la configuration de `NVIDIA_API_KEY`
 summary: Utiliser l’API compatible OpenAI de NVIDIA dans OpenClaw
 title: NVIDIA
 x-i18n:
-    generated_at: "2026-04-12T23:31:36Z"
+    generated_at: "2026-04-24T07:28:01Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 45048037365138141ee82cefa0c0daaf073a1c2ae3aa7b23815f6ca676fc0d3e
+    source_hash: 2d056be5be012be537ba5c4d5812ea15ec440e5a552b235854e2078064376192
     source_path: providers/nvidia.md
     workflow: 15
 ---
 
-# NVIDIA
-
-NVIDIA fournit une API compatible OpenAI à l’adresse `https://integrate.api.nvidia.com/v1` pour
-des modèles ouverts gratuits. Authentifiez-vous avec une clé d’API obtenue sur
+NVIDIA fournit une API compatible OpenAI sur `https://integrate.api.nvidia.com/v1` pour
+des modèles ouverts gratuits. Authentifiez-vous avec une clé API depuis
 [build.nvidia.com](https://build.nvidia.com/settings/api-keys).
 
-## Prise en main
+## Premiers pas
 
 <Steps>
-  <Step title="Obtenir votre clé d’API">
-    Créez une clé d’API sur [build.nvidia.com](https://build.nvidia.com/settings/api-keys).
+  <Step title="Obtenir votre clé API">
+    Créez une clé API sur [build.nvidia.com](https://build.nvidia.com/settings/api-keys).
   </Step>
-  <Step title="Exporter la clé et lancer l’onboarding">
+  <Step title="Exporter la clé et lancer l’intégration">
     ```bash
     export NVIDIA_API_KEY="nvapi-..."
     openclaw onboard --auth-choice skip
@@ -66,14 +64,14 @@ dans la sortie de `ps`. Préférez la variable d’environnement `NVIDIA_API_KEY
 
 ## Catalogue intégré
 
-| Model ref                                  | Name                         | Context | Max output |
-| ------------------------------------------ | ---------------------------- | ------- | ---------- |
-| `nvidia/nvidia/nemotron-3-super-120b-a12b` | NVIDIA Nemotron 3 Super 120B | 262,144 | 8,192      |
-| `nvidia/moonshotai/kimi-k2.5`              | Kimi K2.5                    | 262,144 | 8,192      |
-| `nvidia/minimaxai/minimax-m2.5`            | Minimax M2.5                 | 196,608 | 8,192      |
-| `nvidia/z-ai/glm5`                         | GLM 5                        | 202,752 | 8,192      |
+| Référence de modèle                         | Nom                          | Contexte | Sortie max |
+| ------------------------------------------- | ---------------------------- | -------- | ---------- |
+| `nvidia/nvidia/nemotron-3-super-120b-a12b`  | NVIDIA Nemotron 3 Super 120B | 262,144  | 8,192      |
+| `nvidia/moonshotai/kimi-k2.5`               | Kimi K2.5                    | 262,144  | 8,192      |
+| `nvidia/minimaxai/minimax-m2.5`             | Minimax M2.5                 | 196,608  | 8,192      |
+| `nvidia/z-ai/glm5`                          | GLM 5                        | 202,752  | 8,192      |
 
-## Remarques avancées
+## Configuration avancée
 
 <AccordionGroup>
   <Accordion title="Comportement d’activation automatique">
@@ -82,29 +80,29 @@ dans la sortie de `ps`. Préférez la variable d’environnement `NVIDIA_API_KEY
   </Accordion>
 
   <Accordion title="Catalogue et tarification">
-    Le catalogue intégré est statique. Les coûts valent par défaut `0` dans la source puisque NVIDIA
-    offre actuellement un accès API gratuit pour les modèles listés.
+    Le catalogue intégré est statique. Les coûts valent par défaut `0` dans le code source, car NVIDIA
+    propose actuellement un accès API gratuit pour les modèles listés.
   </Accordion>
 
   <Accordion title="Point de terminaison compatible OpenAI">
-    NVIDIA utilise le point de terminaison standard `/v1` pour les complétions. Tout outil
+    NVIDIA utilise le point de terminaison standard `/v1` completions. Tout outillage
     compatible OpenAI devrait fonctionner immédiatement avec l’URL de base NVIDIA.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
 Les modèles NVIDIA sont actuellement gratuits. Consultez
-[build.nvidia.com](https://build.nvidia.com/) pour connaître la disponibilité la plus récente et
-les détails des limites de débit.
+[build.nvidia.com](https://build.nvidia.com/) pour les dernières informations de disponibilité et
+de limitation de débit.
 </Tip>
 
-## Connexe
+## Liens associés
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/fr/concepts/model-providers" icon="layers">
-    Choisir les fournisseurs, les références de modèles et le comportement de basculement.
+  <Card title="Sélection de modèle" href="/fr/concepts/model-providers" icon="layers">
+    Choix des fournisseurs, références de modèle et comportement de repli.
   </Card>
-  <Card title="Configuration reference" href="/fr/gateway/configuration-reference" icon="gear">
-    Référence complète de configuration pour les agents, les modèles et les fournisseurs.
+  <Card title="Référence de configuration" href="/fr/gateway/configuration-reference" icon="gear">
+    Référence complète de configuration pour les agents, modèles et fournisseurs.
   </Card>
 </CardGroup>
