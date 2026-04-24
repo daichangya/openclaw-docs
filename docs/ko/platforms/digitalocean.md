@@ -1,65 +1,65 @@
 ---
 read_when:
-    - DigitalOcean에서 OpenClaw를 설정할 때
-    - OpenClaw용 저렴한 VPS 호스팅을 찾고 있을 때
-summary: DigitalOcean에서 OpenClaw 실행(간단한 유료 VPS 옵션)
-title: DigitalOcean (플랫폼)
+    - DigitalOcean에 OpenClaw 설정하기
+    - OpenClaw용 저렴한 VPS 호스팅을 찾고 있습니다
+summary: DigitalOcean에서 OpenClaw 사용하기(간단한 유료 VPS 옵션)
+title: DigitalOcean(플랫폼)
 x-i18n:
-    generated_at: "2026-04-05T12:48:26Z"
+    generated_at: "2026-04-24T06:23:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6ee4ad84c421f87064534a4fb433df1f70304502921841ec618318ed862d4092
+    source_hash: c9d286f243f38ed910a3229f195be724f9f96481036380d8c8194ff298d39c87
     source_path: platforms/digitalocean.md
     workflow: 15
 ---
 
-# DigitalOcean에서 OpenClaw
+# DigitalOcean에서 OpenClaw 사용하기
 
 ## 목표
 
-DigitalOcean에서 **월 $6**(또는 예약 요금제로 월 $4)로 지속 실행되는 OpenClaw 게이트웨이를 운영합니다.
+DigitalOcean에서 **월 $6**(또는 예약 요금 사용 시 월 $4)으로 지속 실행되는 OpenClaw Gateway를 운영합니다.
 
-월 $0 옵션이 필요하고 ARM + provider별 설정을 감수할 수 있다면 [Oracle Cloud 가이드](/platforms/oracle)를 참조하세요.
+월 $0 옵션을 원하고 ARM + 제공업체별 설정을 감수할 수 있다면 [Oracle Cloud 가이드](/ko/install/oracle)를 참조하세요.
 
 ## 비용 비교 (2026)
 
-| Provider     | 플랜            | 사양                  | 월 요금      | 참고                                  |
-| ------------ | --------------- | --------------------- | ----------- | ------------------------------------- |
-| Oracle Cloud | Always Free ARM | 최대 4 OCPU, 24GB RAM | $0          | ARM, 제한된 수용량 / 가입 이슈        |
-| Hetzner      | CX22            | 2 vCPU, 4GB RAM       | €3.79 (~$4) | 가장 저렴한 유료 옵션                 |
-| DigitalOcean | Basic           | 1 vCPU, 1GB RAM       | $6          | 쉬운 UI, 좋은 문서                    |
-| Vultr        | Cloud Compute   | 1 vCPU, 1GB RAM       | $6          | 많은 지역                             |
-| Linode       | Nanode          | 1 vCPU, 1GB RAM       | $5          | 현재 Akamai 소속                      |
+| Provider     | Plan            | Specs                  | Price/mo    | Notes                              |
+| ------------ | --------------- | ---------------------- | ----------- | ---------------------------------- |
+| Oracle Cloud | Always Free ARM | 최대 4 OCPU, 24GB RAM  | $0          | ARM, 제한된 수용량 / 가입 특이사항 |
+| Hetzner      | CX22            | 2 vCPU, 4GB RAM        | €3.79 (~$4) | 가장 저렴한 유료 옵션              |
+| DigitalOcean | Basic           | 1 vCPU, 1GB RAM        | $6          | 쉬운 UI, 좋은 문서                 |
+| Vultr        | Cloud Compute   | 1 vCPU, 1GB RAM        | $6          | 많은 지역                          |
+| Linode       | Nanode          | 1 vCPU, 1GB RAM        | $5          | 현재 Akamai 소속                   |
 
-**Provider 선택 가이드:**
+**제공업체 선택하기:**
 
 - DigitalOcean: 가장 단순한 UX + 예측 가능한 설정(이 가이드)
-- Hetzner: 좋은 가격 대비 성능([Hetzner 가이드](/install/hetzner) 참조)
-- Oracle Cloud: 월 $0이 가능하지만 더 까다롭고 ARM 전용([Oracle 가이드](/platforms/oracle) 참조)
+- Hetzner: 좋은 가격/성능([Hetzner 가이드](/ko/install/hetzner) 참조)
+- Oracle Cloud: 월 $0 가능하지만 더 까다롭고 ARM 전용([Oracle 가이드](/ko/install/oracle) 참조)
 
 ---
 
-## 전제 조건
+## 사전 요구 사항
 
 - DigitalOcean 계정([$200 무료 크레딧으로 가입](https://m.do.co/c/signup))
 - SSH 키 쌍(또는 비밀번호 인증 사용 의향)
 - 약 20분
 
-## 1) Droplet 생성
+## 1) Droplet 만들기
 
 <Warning>
-깨끗한 베이스 이미지(Ubuntu 24.04 LTS)를 사용하세요. 시작 스크립트와 방화벽 기본값을 검토하지 않았다면 서드파티 Marketplace 원클릭 이미지는 피하세요.
+깨끗한 베이스 이미지(Ubuntu 24.04 LTS)를 사용하세요. 시작 스크립트와 방화벽 기본값을 검토하지 않았다면 서드파티 Marketplace 1-click 이미지는 피하세요.
 </Warning>
 
-1. [DigitalOcean](https://cloud.digitalocean.com/)에 로그인합니다
-2. **Create → Droplets**를 클릭합니다
-3. 다음을 선택합니다:
-   - **Region:** 자신(또는 사용자)과 가장 가까운 지역
+1. [DigitalOcean](https://cloud.digitalocean.com/)에 로그인합니다.
+2. **Create → Droplets**를 클릭합니다.
+3. 다음을 선택합니다.
+   - **Region:** 본인(또는 사용자)과 가장 가까운 지역
    - **Image:** Ubuntu 24.04 LTS
-   - **Size:** Basic → Regular → **월 $6** (1 vCPU, 1GB RAM, 25GB SSD)
+   - **Size:** Basic → Regular → **$6/mo** (1 vCPU, 1GB RAM, 25GB SSD)
    - **Authentication:** SSH 키(권장) 또는 비밀번호
-4. **Create Droplet**를 클릭합니다
-5. IP 주소를 기록합니다
+4. **Create Droplet**을 클릭합니다.
+5. IP 주소를 기록해 둡니다.
 
 ## 2) SSH로 연결
 
@@ -90,14 +90,14 @@ openclaw --version
 openclaw onboard --install-daemon
 ```
 
-마법사는 다음 항목을 안내합니다:
+마법사가 다음 과정을 안내합니다.
 
 - 모델 인증(API 키 또는 OAuth)
 - 채널 설정(Telegram, WhatsApp, Discord 등)
-- 게이트웨이 토큰(자동 생성)
-- daemon 설치(systemd)
+- Gateway 토큰(자동 생성)
+- 데몬 설치(systemd)
 
-## 5) 게이트웨이 확인
+## 5) Gateway 확인
 
 ```bash
 # 상태 확인
@@ -112,7 +112,7 @@ journalctl --user -u openclaw-gateway.service -f
 
 ## 6) 대시보드 접근
 
-게이트웨이는 기본적으로 loopback에 바인딩됩니다. 제어 UI에 접근하려면:
+Gateway는 기본적으로 loopback에 바인딩됩니다. Control UI에 접근하려면 다음을 사용하세요.
 
 **옵션 A: SSH 터널(권장)**
 
@@ -123,14 +123,14 @@ ssh -L 18789:localhost:18789 root@YOUR_DROPLET_IP
 # 그런 다음 열기: http://localhost:18789
 ```
 
-**옵션 B: Tailscale Serve (HTTPS, loopback 전용)**
+**옵션 B: Tailscale Serve (HTTPS, loopback-only)**
 
 ```bash
 # droplet에서
 curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
 
-# 게이트웨이가 Tailscale Serve를 사용하도록 구성
+# Gateway가 Tailscale Serve를 사용하도록 설정
 openclaw config set gateway.tailscale.mode serve
 openclaw gateway restart
 ```
@@ -139,17 +139,17 @@ openclaw gateway restart
 
 참고:
 
-- Serve는 게이트웨이를 loopback 전용으로 유지하고 제어 UI/WebSocket 트래픽을 Tailscale ID 헤더를 통해 인증합니다(Tailscale 헤더 없는 토큰 없는 인증은 신뢰된 게이트웨이 호스트를 전제로 하며, HTTP API는 해당 Tailscale 헤더를 사용하지 않고 대신 게이트웨이의 일반 HTTP 인증 모드를 따릅니다).
-- 명시적인 공유 비밀 자격 증명을 요구하려면 `gateway.auth.allowTailscale: false`로 설정하고 `gateway.auth.mode: "token"` 또는 `"password"`를 사용하세요.
+- Serve는 Gateway를 loopback-only로 유지하고 Tailscale identity header를 통해 Control UI/WebSocket 트래픽을 인증합니다(토큰 없는 인증은 신뢰할 수 있는 gateway 호스트를 가정함. HTTP API는 이러한 Tailscale header를 사용하지 않고 대신 gateway의 일반 HTTP 인증 모드를 따릅니다).
+- 대신 명시적인 공유 비밀 자격 증명을 요구하려면 `gateway.auth.allowTailscale: false`를 설정하고 `gateway.auth.mode: "token"` 또는 `"password"`를 사용하세요.
 
-**옵션 C: Tailnet 바인드(Serve 없음)**
+**옵션 C: tailnet 바인딩(Serve 없음)**
 
 ```bash
 openclaw config set gateway.bind tailnet
 openclaw gateway restart
 ```
 
-열기: `http://<tailscale-ip>:18789` (토큰 필요).
+열기: `http://<tailscale-ip>:18789` (토큰 필요)
 
 ## 7) 채널 연결
 
@@ -167,15 +167,15 @@ openclaw channels login whatsapp
 # QR 코드 스캔
 ```
 
-다른 provider는 [Channels](/channels)를 참조하세요.
+다른 제공업체는 [채널](/ko/channels)을 참조하세요.
 
 ---
 
-## 1GB RAM에 대한 최적화
+## 1GB RAM 최적화
 
-$6 droplet은 RAM이 1GB뿐입니다. 원활하게 실행하려면:
+$6 droplet에는 1GB RAM만 있습니다. 원활하게 실행하려면 다음을 고려하세요.
 
-### 스왑 추가(권장)
+### swap 추가(권장)
 
 ```bash
 fallocate -l 2G /swapfile
@@ -187,7 +187,7 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
 ### 더 가벼운 모델 사용
 
-OOM이 발생한다면 다음을 고려하세요:
+OOM이 발생한다면 다음을 고려하세요.
 
 - 로컬 모델 대신 API 기반 모델(Claude, GPT) 사용
 - `agents.defaults.model.primary`를 더 작은 모델로 설정
@@ -201,14 +201,14 @@ htop
 
 ---
 
-## 영속성
+## 지속성
 
-모든 상태는 다음 위치에 저장됩니다:
+모든 상태는 다음 위치에 저장됩니다.
 
-- `~/.openclaw/` — `openclaw.json`, 에이전트별 `auth-profiles.json`, 채널/provider 상태, 세션 데이터
-- `~/.openclaw/workspace/` — 워크스페이스(SOUL.md, memory 등)
+- `~/.openclaw/` — `openclaw.json`, 에이전트별 `auth-profiles.json`, 채널/제공업체 상태, 세션 데이터
+- `~/.openclaw/workspace/` — workspace (`SOUL.md`, memory 등)
 
-이 항목들은 재부팅 후에도 유지됩니다. 주기적으로 백업하세요:
+이 데이터는 재부팅 후에도 유지됩니다. 주기적으로 백업하세요.
 
 ```bash
 openclaw backup create
@@ -220,25 +220,25 @@ openclaw backup create
 
 Oracle Cloud는 여기의 어떤 유료 옵션보다도 훨씬 강력한 **Always Free** ARM 인스턴스를 월 $0에 제공합니다.
 
-| 제공 항목          | 사양                  |
-| ------------------ | --------------------- |
-| **4 OCPU**         | ARM Ampere A1         |
-| **24GB RAM**       | 충분하고도 남음       |
-| **200GB storage**  | 블록 볼륨             |
-| **영구 무료**      | 신용카드 청구 없음    |
+| 제공 항목          | Specs             |
+| ------------------ | ----------------- |
+| **4 OCPU**         | ARM Ampere A1     |
+| **24GB RAM**       | 충분하고도 남음   |
+| **200GB storage**  | Block volume      |
+| **영구 무료**      | 신용카드 청구 없음 |
 
 **주의 사항:**
 
 - 가입이 까다로울 수 있음(실패하면 다시 시도)
-- ARM 아키텍처 — 대부분은 작동하지만 일부 바이너리는 ARM 빌드가 필요함
+- ARM 아키텍처 — 대부분은 동작하지만 일부 바이너리는 ARM 빌드가 필요함
 
-전체 설정 가이드는 [Oracle Cloud](/platforms/oracle)를 참조하세요. 가입 팁과 등록 과정 문제 해결은 이 [커뮤니티 가이드](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd)를 참조하세요.
+전체 설정 가이드는 [Oracle Cloud](/ko/install/oracle)를 참조하세요. 가입 팁과 등록 과정 문제 해결은 이 [커뮤니티 가이드](https://gist.github.com/rssnyder/51e3cfedd730e7dd5f4a816143b25dbd)를 참조하세요.
 
 ---
 
 ## 문제 해결
 
-### 게이트웨이가 시작되지 않음
+### Gateway가 시작되지 않음
 
 ```bash
 openclaw gateway status
@@ -246,7 +246,7 @@ openclaw doctor --non-interactive
 journalctl --user -u openclaw-gateway.service --no-pager -n 50
 ```
 
-### 포트가 이미 사용 중
+### 포트가 이미 사용 중임
 
 ```bash
 lsof -i :18789
@@ -259,15 +259,15 @@ kill <PID>
 # 메모리 확인
 free -h
 
-# 스왑 추가
-# 또는 월 $12 droplet(2GB RAM)로 업그레이드
+# swap을 더 추가
+# 또는 $12/월 droplet(2GB RAM)로 업그레이드
 ```
 
 ---
 
-## 함께 보기
+## 관련 항목
 
-- [Hetzner 가이드](/install/hetzner) — 더 저렴하고 더 강력함
-- [Docker 설치](/install/docker) — 컨테이너화된 설정
-- [Tailscale](/gateway/tailscale) — 안전한 원격 접근
-- [구성](/gateway/configuration) — 전체 config 참조
+- [Hetzner 가이드](/ko/install/hetzner) — 더 저렴하고 더 강력함
+- [Docker 설치](/ko/install/docker) — 컨테이너 기반 설정
+- [Tailscale](/ko/gateway/tailscale) — 안전한 원격 접근
+- [구성](/ko/gateway/configuration) — 전체 config 참조

@@ -1,35 +1,33 @@
 ---
 read_when:
-    - 기본 메모리 백엔드를 이해하려고 함
-    - 임베딩 provider 또는 하이브리드 검색을 구성하려고 함
-summary: 키워드, 벡터 및 하이브리드 검색을 지원하는 기본 SQLite 기반 메모리 백엔드
+    - 기본 메모리 백엔드를 이해하고 싶으신 것입니다
+    - 임베딩 provider 또는 하이브리드 검색을 구성하고 싶으신 것입니다
+summary: 키워드, 벡터, 하이브리드 검색을 지원하는 기본 SQLite 기반 메모리 백엔드
 title: 내장 메모리 엔진
 x-i18n:
-    generated_at: "2026-04-05T12:39:50Z"
+    generated_at: "2026-04-24T06:10:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 181c40a43332315bf915ff6f395d9d5fd766c889e1a8d1aa525f9ba0198d3367
+    source_hash: f82c1f4dc37b4fc6c075a7fcd2ec78bfcbfbebbcba7e48d366a1da3afcaff508
     source_path: concepts/memory-builtin.md
     workflow: 15
 ---
-
-# 내장 메모리 엔진
 
 내장 엔진은 기본 메모리 백엔드입니다. 에이전트별 SQLite 데이터베이스에
 메모리 인덱스를 저장하며, 시작하는 데 추가 의존성이 필요하지 않습니다.
 
 ## 제공 기능
 
-- **키워드 검색**: FTS5 전문 인덱싱(BM25 점수화) 사용.
-- **벡터 검색**: 지원되는 모든 provider의 임베딩 사용.
-- **하이브리드 검색**: 두 방식을 결합해 최상의 결과 제공.
-- **CJK 지원**: 중국어, 일본어, 한국어를 위한 trigram 토큰화.
-- **sqlite-vec 가속**: 데이터베이스 내 벡터 쿼리 지원(선택 사항).
+- FTS5 전문 인덱싱(BM25 점수화)을 통한 **키워드 검색**
+- 지원되는 모든 provider의 임베딩을 통한 **벡터 검색**
+- 최상의 결과를 위해 둘을 결합하는 **하이브리드 검색**
+- 중국어, 일본어, 한국어용 trigram 토큰화를 통한 **CJK 지원**
+- 데이터베이스 내 벡터 쿼리를 위한 **sqlite-vec 가속**(선택 사항)
 
 ## 시작하기
 
-OpenAI, Gemini, Voyage 또는 Mistral용 API 키가 있으면 내장
-엔진이 이를 자동 감지하여 벡터 검색을 활성화합니다. 별도 config가 필요 없습니다.
+OpenAI, Gemini, Voyage, 또는 Mistral용 API 키가 있으면 내장
+엔진이 이를 자동 감지하여 벡터 검색을 활성화합니다. 구성은 필요하지 않습니다.
 
 provider를 명시적으로 설정하려면 다음과 같이 하세요.
 
@@ -47,66 +45,93 @@ provider를 명시적으로 설정하려면 다음과 같이 하세요.
 
 임베딩 provider가 없으면 키워드 검색만 사용할 수 있습니다.
 
+내장 로컬 임베딩 provider를 강제로 사용하려면 `local.modelPath`를
+GGUF 파일로 지정하세요.
+
+```json5
+{
+  agents: {
+    defaults: {
+      memorySearch: {
+        provider: "local",
+        fallback: "none",
+        local: {
+          modelPath: "~/.node-llama-cpp/models/embeddinggemma-300m-qat-Q8_0.gguf",
+        },
+      },
+    },
+  },
+}
+```
+
 ## 지원되는 임베딩 provider
 
-| Provider | ID        | 자동 감지 | 참고                                |
-| -------- | --------- | --------- | ----------------------------------- |
-| OpenAI   | `openai`  | 예        | 기본값: `text-embedding-3-small`    |
-| Gemini   | `gemini`  | 예        | 멀티모달(이미지 + 오디오) 지원      |
-| Voyage   | `voyage`  | 예        |                                     |
-| Mistral  | `mistral` | 예        |                                     |
-| Ollama   | `ollama`  | 아니요    | 로컬, 명시적으로 설정해야 함        |
-| Local    | `local`   | 예(첫 번째) | GGUF 모델, 약 0.6GB 다운로드      |
+| Provider | ID | 자동 감지 | 참고 |
+| -------- | --------- | ------------- | ----------------------------------- |
+| OpenAI | `openai` | 예 | 기본값: `text-embedding-3-small` |
+| Gemini | `gemini` | 예 | 멀티모달 지원(이미지 + 오디오) |
+| Voyage | `voyage` | 예 |  |
+| Mistral | `mistral` | 예 |  |
+| Ollama | `ollama` | 아니요 | 로컬, 명시적으로 설정 |
+| Local | `local` | 예(가장 먼저) | GGUF 모델, 약 0.6 GB 다운로드 |
 
-자동 감지는 API 키를 확인할 수 있는 첫 번째 provider를 위 표의
-순서대로 선택합니다. 재정의하려면 `memorySearch.provider`를 설정하세요.
+자동 감지는 API 키를 확인할 수 있는 첫 번째 provider를 위 표의 순서대로 선택합니다. 재정의하려면 `memorySearch.provider`를 설정하세요.
 
-## 인덱싱 동작 방식
+## 인덱싱 작동 방식
 
-OpenClaw는 `MEMORY.md`와 `memory/*.md`를 청크(~400 토큰, 80토큰
-중첩)로 인덱싱하고 에이전트별 SQLite 데이터베이스에 저장합니다.
+OpenClaw는 `MEMORY.md`와 `memory/*.md`를 청크(약 400토큰, 80토큰 중첩)로 인덱싱하여 에이전트별 SQLite 데이터베이스에 저장합니다.
 
 - **인덱스 위치:** `~/.openclaw/memory/<agentId>.sqlite`
-- **파일 감시:** 메모리 파일 변경 시 디바운스된 재인덱싱(1.5초)이 트리거됩니다.
-- **자동 재인덱싱:** 임베딩 provider, 모델 또는 청킹 config가
-  변경되면 전체 인덱스를 자동으로 다시 빌드합니다.
-- **온디맨드 재인덱싱:** `openclaw memory index --force`
+- **파일 감시:** 메모리 파일 변경은 디바운스된 재인덱싱(1.5초)을 트리거합니다.
+- **자동 재인덱싱:** 임베딩 provider, 모델, 또는 청킹 구성이
+  변경되면 전체 인덱스가 자동으로 다시 빌드됩니다.
+- **요청 시 재인덱싱:** `openclaw memory index --force`
 
 <Info>
-`memorySearch.extraPaths`를 사용하면 workspace 외부의 Markdown 파일도
-인덱싱할 수 있습니다. 자세한 내용은
-[configuration reference](/reference/memory-config#additional-memory-paths)를 참조하세요.
+`memorySearch.extraPaths`를 사용하면 워크스페이스 외부의 Markdown 파일도 인덱싱할 수 있습니다. 자세한 내용은
+[구성 참조](/ko/reference/memory-config#additional-memory-paths)를 참조하세요.
 </Info>
 
 ## 사용 시점
 
 내장 엔진은 대부분의 사용자에게 적합한 선택입니다.
 
-- 추가 의존성 없이 바로 사용할 수 있습니다.
-- 키워드 검색과 벡터 검색을 모두 잘 처리합니다.
-- 모든 임베딩 providers를 지원합니다.
+- 추가 의존성 없이 바로 작동합니다.
+- 키워드 및 벡터 검색을 잘 처리합니다.
+- 모든 임베딩 provider를 지원합니다.
 - 하이브리드 검색은 두 검색 접근 방식의 장점을 결합합니다.
 
-리랭킹, 쿼리 확장, 또는 workspace 외부 디렉터리 인덱싱이 필요하다면
-[QMD](/concepts/memory-qmd)로 전환하는 것을 고려하세요.
+reranking, 쿼리 확장, 또는 워크스페이스 외부 디렉터리 인덱싱이 필요하다면 [QMD](/ko/concepts/memory-qmd)로 전환하는 것을 고려하세요.
 
-자동 사용자 모델링이 포함된 세션 간 메모리가 필요하다면
-[Honcho](/concepts/memory-honcho)를 고려하세요.
+자동 사용자 모델링이 포함된 세션 간 메모리가 필요하다면 [Honcho](/ko/concepts/memory-honcho)를 고려하세요.
 
 ## 문제 해결
 
-**메모리 검색이 비활성화되었나요?** `openclaw memory status`를 확인하세요. 감지된 provider가
-없다면 하나를 명시적으로 설정하거나 API 키를 추가하세요.
+**메모리 검색이 비활성화되었나요?** `openclaw memory status`를 확인하세요. provider가 감지되지 않으면
+명시적으로 설정하거나 API 키를 추가하세요.
 
-**결과가 오래되었나요?** `openclaw memory index --force`를 실행해 다시 빌드하세요. 감시기가
-드물게 일부 변경을 놓칠 수 있습니다.
+**로컬 provider가 감지되지 않나요?** 로컬 경로가 존재하는지 확인하고 다음을 실행하세요.
 
-**sqlite-vec가 로드되지 않나요?** OpenClaw는 자동으로 프로세스 내 코사인 유사도로
-폴백합니다. 구체적인 로드 오류는 로그를 확인하세요.
+```bash
+openclaw memory status --deep --agent main
+openclaw memory index --force --agent main
+```
+
+독립 실행형 CLI 명령과 Gateway는 동일한 `local` provider ID를 사용합니다.
+provider가 `auto`로 설정된 경우, 로컬 임베딩은
+`memorySearch.local.modelPath`가 실제 로컬 파일을 가리킬 때만 가장 먼저 고려됩니다.
+
+**결과가 오래되었나요?** 다시 빌드하려면 `openclaw memory index --force`를 실행하세요. 드문 예외 상황에서는 watcher가 변경을 놓칠 수 있습니다.
+
+**sqlite-vec가 로드되지 않나요?** OpenClaw는 자동으로 프로세스 내 cosine similarity로 대체합니다. 구체적인 로드 오류는 로그를 확인하세요.
 
 ## 구성
 
-임베딩 provider 설정, 하이브리드 검색 튜닝(가중치, MMR, 시간적
-감쇠), 배치 인덱싱, 멀티모달 메모리, sqlite-vec, 추가 경로 및 기타
-모든 config 옵션은
-[Memory configuration reference](/reference/memory-config)를 참조하세요.
+임베딩 provider 설정, 하이브리드 검색 튜닝(가중치, MMR, 시간 감쇠), 배치 인덱싱, 멀티모달 메모리, sqlite-vec, 추가 경로, 기타 모든 구성 옵션은
+[메모리 구성 참조](/ko/reference/memory-config)를 참조하세요.
+
+## 관련
+
+- [메모리 개요](/ko/concepts/memory)
+- [메모리 검색](/ko/concepts/memory-search)
+- [Active Memory](/ko/concepts/active-memory)

@@ -1,385 +1,135 @@
 ---
 read_when:
-    - 어느 SDK 하위 경로에서 import해야 하는지 알아야 합니다
+    - 어느 SDK 서브패스에서 import해야 하는지 알아야 합니다
     - OpenClawPluginApi의 모든 등록 메서드에 대한 참조가 필요합니다
-    - 특정 SDK export를 찾는 중입니다
-sidebarTitle: SDK Overview
-summary: import 맵, 등록 API 참조 및 SDK 아키텍처
+    - 특정 SDK export를 찾고 있습니다
+sidebarTitle: SDK overview
+summary: import 맵, 등록 API 참조, SDK 아키텍처
 title: Plugin SDK 개요
 x-i18n:
-    generated_at: "2026-04-23T06:05:37Z"
+    generated_at: "2026-04-24T06:27:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 5f9608fa3194b1b1609d16d7e2077ea58de097e9e8d4cedef4cb975adfb92938
+    source_hash: 7090e13508382a68988f3d345bf12d6f3822c499e01a3affb1fa7a277b22f276
     source_path: plugins/sdk-overview.md
     workflow: 15
 ---
 
-# Plugin SDK 개요
-
-Plugin SDK는 Plugin과 코어 사이의 타입 지정 계약입니다. 이 페이지는 **무엇을 import할지**와 **무엇을 등록할 수 있는지**에 대한 참조입니다.
+Plugin SDK는 Plugin과 코어 사이의 타입 지정된 계약입니다. 이 페이지는 **무엇을 import해야 하는지**와 **무엇을 등록할 수 있는지**에 대한 참조입니다.
 
 <Tip>
-  **사용 방법 가이드를 찾고 있나요?**
-  - 첫 Plugin이라면 [시작하기](/ko/plugins/building-plugins)부터 시작하세요
-  - 채널 Plugin이라면 [채널 Plugin](/ko/plugins/sdk-channel-plugins)을 참조하세요
-  - Provider Plugin이라면 [Provider Plugins](/ko/plugins/sdk-provider-plugins)을 참조하세요
-</Tip>
+  how-to 가이드를 찾고 있나요?
+
+- 첫 Plugin이라면? [Plugins 빌드하기](/ko/plugins/building-plugins)부터 시작하세요.
+- 채널 Plugin이라면? [채널 Plugins](/ko/plugins/sdk-channel-plugins)를 참조하세요.
+- Provider Plugin이라면? [Provider Plugins](/ko/plugins/sdk-provider-plugins)를 참조하세요.
+  </Tip>
 
 ## import 규칙
 
-항상 특정 하위 경로에서 import하세요.
+항상 특정 서브패스에서 import하세요:
 
 ```typescript
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
 ```
 
-각 하위 경로는 작고 독립적인 모듈입니다. 이렇게 하면 시작 속도가 빨라지고
-순환 의존성 문제를 방지할 수 있습니다. 채널별 진입점/빌드 helper에는
-`openclaw/plugin-sdk/channel-core`를 우선 사용하고, 더 넓은 umbrella 표면과
-`buildChannelConfigSchema` 같은 공용 helper에는
-`openclaw/plugin-sdk/core`를 사용하세요.
+각 서브패스는 작고 독립적인 모듈입니다. 이렇게 하면 시작 속도가 빨라지고
+순환 의존성 문제를 방지할 수 있습니다. 채널 전용 진입/빌드 헬퍼에는
+`openclaw/plugin-sdk/channel-core`를 선호하고, 더 넓은 umbrella 표면과
+`buildChannelConfigSchema` 같은 공유 헬퍼에는 `openclaw/plugin-sdk/core`를 유지하세요.
 
-`openclaw/plugin-sdk/slack`, `openclaw/plugin-sdk/discord`,
-`openclaw/plugin-sdk/signal`, `openclaw/plugin-sdk/whatsapp` 같은
-provider 이름 기반 편의 경계나 채널 브랜드 helper 경계는 추가하거나 의존하지 마세요.
-번들 Plugin은 자체 `api.ts` 또는 `runtime-api.ts` barrel 안에서
-일반적인 SDK 하위 경로를 조합해야 하며, 코어는 해당 Plugin 로컬 barrel을 사용하거나
-그 필요가 진정으로 교차 채널일 때만 좁은 일반 SDK 계약을 추가해야 합니다.
+<Warning>
+  provider 또는 channel 브랜드가 붙은 편의 seam(예:
+  `openclaw/plugin-sdk/slack`, `.../discord`, `.../signal`, `.../whatsapp`)은
+  import하지 마세요. 번들 Plugins는 자신의 `api.ts` /
+  `runtime-api.ts` barrel 안에서 일반 SDK 서브패스를 조합합니다. 코어 소비자는
+  해당 Plugin 로컬 barrel을 사용하거나, 필요가 진정으로
+  cross-channel인 경우에만 좁은 일반 SDK 계약을 추가해야 합니다.
 
-생성된 export 맵에는 여전히 `plugin-sdk/feishu`, `plugin-sdk/feishu-setup`,
-`plugin-sdk/zalo`, `plugin-sdk/zalo-setup`, `plugin-sdk/matrix*` 같은
-소수의 번들 Plugin helper 경계가 포함되어 있습니다. 이런 하위 경로는
-번들 Plugin 유지보수 및 호환성 전용이며, 아래의 일반 표에서는 의도적으로 제외되어 있고
-새 서드파티 Plugin에 권장되는 import 경로가 아닙니다.
+번들 Plugin 헬퍼 seam의 작은 집합(`plugin-sdk/feishu`,
+`plugin-sdk/zalo`, `plugin-sdk/matrix*` 등)은 여전히
+생성된 export 맵에 나타납니다. 이들은 번들 Plugin 유지보수 전용이며,
+새 서드파티 Plugin의 권장 import 경로는 아닙니다.
+</Warning>
 
-## 하위 경로 참조
+## 서브패스 참조
 
-가장 자주 사용하는 하위 경로를 목적별로 묶었습니다. 200개가 넘는 전체 생성 목록은
-`scripts/lib/plugin-sdk-entrypoints.json`에 있습니다.
+Plugin SDK는 영역별로 그룹화된 좁은 서브패스 집합으로 노출됩니다(Plugin
+entry, channel, provider, auth, runtime, capability, memory, 예약된
+번들 Plugin 헬퍼). 전체 카탈로그는 그룹화 및 링크와 함께
+[Plugin SDK 서브패스](/ko/plugins/sdk-subpaths)를 참조하세요.
 
-예약된 번들 Plugin helper 하위 경로도 이 생성 목록에 계속 나타납니다.
-문서 페이지에서 명시적으로 공개 표면으로 안내하지 않는 한,
-이들을 구현 세부 사항/호환성 표면으로 취급하세요.
-
-### Plugin 진입점
-
-| Subpath | 주요 export |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `plugin-sdk/plugin-entry`   | `definePluginEntry`                                                                                                                    |
-| `plugin-sdk/core`           | `defineChannelPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase`, `defineSetupPluginEntry`, `buildChannelConfigSchema` |
-| `plugin-sdk/config-schema`  | `OpenClawSchema`                                                                                                                       |
-| `plugin-sdk/provider-entry` | `defineSingleProviderPluginEntry`                                                                                                      |
-
-<AccordionGroup>
-  <Accordion title="채널 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/channel-core` | `defineChannelPluginEntry`, `defineSetupPluginEntry`, `createChatChannelPlugin`, `createChannelPluginBase` |
-    | `plugin-sdk/config-schema` | 루트 `openclaw.json` Zod 스키마 export (`OpenClawSchema`) |
-    | `plugin-sdk/channel-setup` | `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`, `createOptionalChannelSetupWizard`, 그리고 `DEFAULT_ACCOUNT_ID`, `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled`, `splitSetupEntries` |
-    | `plugin-sdk/setup` | 공용 setup wizard helper, allowlist 프롬프트, setup 상태 빌더 |
-    | `plugin-sdk/setup-runtime` | `createPatchedAccountSetupAdapter`, `createEnvPatchedAccountSetupAdapter`, `createSetupInputPresenceValidator`, `noteChannelLookupFailure`, `noteChannelLookupSummary`, `promptResolvedAllowFrom`, `splitSetupEntries`, `createAllowlistSetupWizardProxy`, `createDelegatedSetupWizardProxy` |
-    | `plugin-sdk/setup-adapter-runtime` | `createEnvPatchedAccountSetupAdapter` |
-    | `plugin-sdk/setup-tools` | `formatCliCommand`, `detectBinary`, `extractArchive`, `resolveBrewExecutable`, `formatDocsLink`, `CONFIG_DIR` |
-    | `plugin-sdk/account-core` | 다중 계정 config/작업 게이트 helper, 기본 계정 fallback helper |
-    | `plugin-sdk/account-id` | `DEFAULT_ACCOUNT_ID`, account-id 정규화 helper |
-    | `plugin-sdk/account-resolution` | 계정 조회 + 기본 fallback helper |
-    | `plugin-sdk/account-helpers` | 좁은 범위의 계정 목록/계정 작업 helper |
-    | `plugin-sdk/channel-pairing` | `createChannelPairingController` |
-    | `plugin-sdk/channel-reply-pipeline` | `createChannelReplyPipeline` |
-    | `plugin-sdk/channel-config-helpers` | `createHybridChannelConfigAdapter` |
-    | `plugin-sdk/channel-config-schema` | 채널 config 스키마 타입 |
-    | `plugin-sdk/telegram-command-config` | 번들 계약 fallback이 있는 Telegram 사용자 지정 명령어 정규화/검증 helper |
-    | `plugin-sdk/command-gating` | 좁은 범위의 명령어 인증 게이트 helper |
-    | `plugin-sdk/channel-policy` | `resolveChannelGroupRequireMention` |
-    | `plugin-sdk/channel-lifecycle` | `createAccountStatusSink`, 초안 스트림 수명 주기/최종화 helper |
-    | `plugin-sdk/inbound-envelope` | 공용 인바운드 라우트 + envelope 빌더 helper |
-    | `plugin-sdk/inbound-reply-dispatch` | 공용 인바운드 기록 및 디스패치 helper |
-    | `plugin-sdk/messaging-targets` | 대상 파싱/매칭 helper |
-    | `plugin-sdk/outbound-media` | 공용 아웃바운드 미디어 로드 helper |
-    | `plugin-sdk/outbound-runtime` | 아웃바운드 identity, 전송 delegate, 페이로드 계획 helper |
-    | `plugin-sdk/poll-runtime` | 좁은 범위의 poll 정규화 helper |
-    | `plugin-sdk/thread-bindings-runtime` | 스레드 바인딩 수명 주기 및 어댑터 helper |
-    | `plugin-sdk/agent-media-payload` | 레거시 에이전트 미디어 페이로드 빌더 |
-    | `plugin-sdk/conversation-runtime` | 대화/스레드 바인딩, 페어링 및 구성된 바인딩 helper |
-    | `plugin-sdk/runtime-config-snapshot` | 런타임 config 스냅샷 helper |
-    | `plugin-sdk/runtime-group-policy` | 런타임 그룹 정책 해석 helper |
-    | `plugin-sdk/channel-status` | 공용 채널 상태 스냅샷/요약 helper |
-    | `plugin-sdk/channel-config-primitives` | 좁은 범위의 채널 config 스키마 primitive |
-    | `plugin-sdk/channel-config-writes` | 채널 config 쓰기 인증 helper |
-    | `plugin-sdk/channel-plugin-common` | 공용 채널 Plugin prelude export |
-    | `plugin-sdk/allowlist-config-edit` | allowlist config 편집/읽기 helper |
-    | `plugin-sdk/group-access` | 공용 그룹 액세스 결정 helper |
-    | `plugin-sdk/direct-dm` | 공용 direct-DM 인증/가드 helper |
-    | `plugin-sdk/interactive-runtime` | 의미 기반 메시지 표현, 전달, 레거시 인터랙티브 답글 helper. [메시지 표현](/ko/plugins/message-presentation) 참조 |
-    | `plugin-sdk/channel-inbound` | 인바운드 debounce, 멘션 매칭, 멘션 정책 helper, envelope helper를 위한 호환성 barrel |
-    | `plugin-sdk/channel-mention-gating` | 더 넓은 인바운드 런타임 표면 없이 좁은 범위의 멘션 정책 helper |
-    | `plugin-sdk/channel-location` | 채널 위치 컨텍스트 및 형식화 helper |
-    | `plugin-sdk/channel-logging` | 인바운드 드롭 및 typing/ack 실패를 위한 채널 로깅 helper |
-    | `plugin-sdk/channel-send-result` | 답글 결과 타입 |
-    | `plugin-sdk/channel-actions` | 채널 메시지 작업 helper 및 Plugin 호환성을 위해 유지되는 지원 중단된 기본 스키마 helper |
-    | `plugin-sdk/channel-targets` | 대상 파싱/매칭 helper |
-    | `plugin-sdk/channel-contract` | 채널 계약 타입 |
-    | `plugin-sdk/channel-feedback` | 피드백/반응 연결 |
-    | `plugin-sdk/channel-secret-runtime` | `collectSimpleChannelFieldAssignments`, `getChannelSurface`, `pushAssignment` 및 비밀 대상 타입과 같은 좁은 범위의 비밀 계약 helper |
-  </Accordion>
-
-  <Accordion title="Provider 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/provider-entry` | `defineSingleProviderPluginEntry` |
-    | `plugin-sdk/provider-setup` | 선별된 로컬/셀프 호스팅 provider setup helper |
-    | `plugin-sdk/self-hosted-provider-setup` | OpenAI 호환 셀프 호스팅 provider setup용 집중 helper |
-    | `plugin-sdk/cli-backend` | CLI backend 기본값 + watchdog 상수 |
-    | `plugin-sdk/provider-auth-runtime` | provider Plugin용 런타임 API 키 해석 helper |
-    | `plugin-sdk/provider-auth-api-key` | `upsertApiKeyProfile` 같은 API 키 온보딩/profile 쓰기 helper |
-    | `plugin-sdk/provider-auth-result` | 표준 OAuth auth-result 빌더 |
-    | `plugin-sdk/provider-auth-login` | provider Plugin용 공용 인터랙티브 로그인 helper |
-    | `plugin-sdk/provider-env-vars` | provider 인증 env var 조회 helper |
-    | `plugin-sdk/provider-auth` | `createProviderApiKeyAuthMethod`, `ensureApiKeyFromOptionEnvOrPrompt`, `upsertAuthProfile`, `upsertApiKeyProfile`, `writeOAuthCredentials` |
-    | `plugin-sdk/provider-model-shared` | `ProviderReplayFamily`, `buildProviderReplayFamilyHooks`, `normalizeModelCompat`, 공용 replay-policy 빌더, provider 엔드포인트 helper, `normalizeNativeXaiModelId` 같은 model-id 정규화 helper |
-    | `plugin-sdk/provider-catalog-shared` | `findCatalogTemplate`, `buildSingleProviderApiKeyCatalog`, `supportsNativeStreamingUsageCompat`, `applyProviderNativeStreamingUsageCompat` |
-    | `plugin-sdk/provider-http` | 오디오 전사 multipart form helper를 포함한 일반 provider HTTP/엔드포인트 기능 helper |
-    | `plugin-sdk/provider-web-fetch-contract` | `enablePluginInConfig`와 `WebFetchProviderPlugin` 같은 좁은 범위의 웹 가져오기 config/선택 계약 helper |
-    | `plugin-sdk/provider-web-fetch` | 웹 가져오기 provider 등록/캐시 helper |
-    | `plugin-sdk/provider-web-search-config-contract` | Plugin 활성화 wiring이 필요 없는 provider를 위한 좁은 범위의 웹 검색 config/자격 증명 helper |
-    | `plugin-sdk/provider-web-search-contract` | `createWebSearchProviderContractFields`, `enablePluginInConfig`, `resolveProviderWebSearchPluginConfig`, 범위 지정 자격 증명 setter/getter 같은 좁은 범위의 웹 검색 config/자격 증명 계약 helper |
-    | `plugin-sdk/provider-web-search` | 웹 검색 provider 등록/캐시/런타임 helper |
-    | `plugin-sdk/provider-tools` | `ProviderToolCompatFamily`, `buildProviderToolCompatFamilyHooks`, Gemini 스키마 정리 + 진단, 그리고 `resolveXaiModelCompatPatch` / `applyXaiModelCompat` 같은 xAI 호환 helper |
-    | `plugin-sdk/provider-usage` | `fetchClaudeUsage` 등 |
-    | `plugin-sdk/provider-stream` | `ProviderStreamFamily`, `buildProviderStreamFamilyHooks`, `composeProviderStreamWrappers`, 스트림 래퍼 타입, 그리고 공용 Anthropic/Bedrock/Google/Kilocode/Moonshot/OpenAI/OpenRouter/Z.A.I/MiniMax/Copilot 래퍼 helper |
-    | `plugin-sdk/provider-transport-runtime` | guarded fetch, transport 메시지 변환, 쓰기 가능한 transport 이벤트 스트림 같은 기본 provider transport helper |
-    | `plugin-sdk/provider-onboard` | 온보딩 config patch helper |
-    | `plugin-sdk/global-singleton` | 프로세스 로컬 singleton/map/cache helper |
-  </Accordion>
-
-  <Accordion title="인증 및 보안 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/command-auth` | `resolveControlCommandGate`, 명령어 레지스트리 helper, 발신자 인증 helper |
-    | `plugin-sdk/command-status` | `buildCommandsMessagePaginated`, `buildHelpMessage` 같은 명령어/help 메시지 빌더 |
-    | `plugin-sdk/approval-auth-runtime` | 승인자 해석 및 동일 채팅 작업 인증 helper |
-    | `plugin-sdk/approval-client-runtime` | 기본 exec 승인 프로필/필터 helper |
-    | `plugin-sdk/approval-delivery-runtime` | 기본 승인 기능/전달 어댑터 |
-    | `plugin-sdk/approval-gateway-runtime` | 공용 approval gateway 해석 helper |
-    | `plugin-sdk/approval-handler-adapter-runtime` | 빠른 채널 진입점을 위한 경량 기본 승인 어댑터 로드 helper |
-    | `plugin-sdk/approval-handler-runtime` | 더 넓은 승인 핸들러 런타임 helper. 좁은 adapter/gateway 경계로 충분하다면 그것을 우선 사용하세요 |
-    | `plugin-sdk/approval-native-runtime` | 기본 승인 대상 + 계정 바인딩 helper |
-    | `plugin-sdk/approval-reply-runtime` | exec/Plugin 승인 답글 페이로드 helper |
-    | `plugin-sdk/command-auth-native` | 기본 명령어 인증 + 기본 세션 대상 helper |
-    | `plugin-sdk/command-detection` | 공용 명령어 감지 helper |
-    | `plugin-sdk/command-surface` | 명령어 본문 정규화 및 명령어 표면 helper |
-    | `plugin-sdk/allow-from` | `formatAllowFromLowercase` |
-    | `plugin-sdk/channel-secret-runtime` | 채널/Plugin 비밀 표면을 위한 좁은 범위의 비밀 계약 수집 helper |
-    | `plugin-sdk/secret-ref-runtime` | 비밀 계약/config 파싱을 위한 좁은 범위의 `coerceSecretRef` 및 SecretRef 타입 helper |
-    | `plugin-sdk/security-runtime` | 공용 신뢰, DM 게이팅, 외부 콘텐츠, 비밀 수집 helper |
-    | `plugin-sdk/ssrf-policy` | 호스트 allowlist 및 사설 네트워크 SSRF 정책 helper |
-    | `plugin-sdk/ssrf-dispatcher` | 넓은 인프라 런타임 표면 없이 좁은 범위의 pinned-dispatcher helper |
-    | `plugin-sdk/ssrf-runtime` | pinned-dispatcher, SSRF 보호 fetch, SSRF 정책 helper |
-    | `plugin-sdk/secret-input` | 비밀 입력 파싱 helper |
-    | `plugin-sdk/webhook-ingress` | Webhook 요청/대상 helper |
-    | `plugin-sdk/webhook-request-guards` | 요청 본문 크기/시간 초과 helper |
-  </Accordion>
-
-  <Accordion title="런타임 및 저장소 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/runtime` | 넓은 범위의 런타임/로깅/백업/Plugin 설치 helper |
-    | `plugin-sdk/runtime-env` | 좁은 범위의 런타임 env, 로거, 시간 초과, 재시도, backoff helper |
-    | `plugin-sdk/channel-runtime-context` | 일반 채널 런타임 컨텍스트 등록 및 조회 helper |
-    | `plugin-sdk/runtime-store` | `createPluginRuntimeStore` |
-    | `plugin-sdk/plugin-runtime` | 공용 Plugin 명령어/hook/http/인터랙티브 helper |
-    | `plugin-sdk/hook-runtime` | 공용 Webhook/내부 hook 파이프라인 helper |
-    | `plugin-sdk/lazy-runtime` | `createLazyRuntimeModule`, `createLazyRuntimeMethod`, `createLazyRuntimeSurface` 같은 지연 런타임 import/바인딩 helper |
-    | `plugin-sdk/process-runtime` | 프로세스 exec helper |
-    | `plugin-sdk/cli-runtime` | CLI 형식화, 대기, 버전 helper |
-    | `plugin-sdk/gateway-runtime` | Gateway 클라이언트 및 채널 상태 patch helper |
-    | `plugin-sdk/config-runtime` | config 로드/쓰기 helper 및 Plugin config 조회 helper |
-    | `plugin-sdk/telegram-command-config` | 번들 Telegram 계약 표면을 사용할 수 없는 경우에도 Telegram 명령어 이름/설명 정규화 및 중복/충돌 검사 |
-    | `plugin-sdk/text-autolink-runtime` | 넓은 text-runtime barrel 없이 파일 참조 autolink 감지 |
-    | `plugin-sdk/approval-runtime` | exec/Plugin 승인 helper, 승인 기능 빌더, 인증/프로필 helper, 기본 라우팅/런타임 helper |
-    | `plugin-sdk/reply-runtime` | 공용 인바운드/답글 런타임 helper, 청크 분할, 디스패치, Heartbeat, 답글 플래너 |
-    | `plugin-sdk/reply-dispatch-runtime` | 좁은 범위의 답글 디스패치/최종화 helper |
-    | `plugin-sdk/reply-history` | `buildHistoryContext`, `recordPendingHistoryEntry`, `clearHistoryEntriesIfEnabled` 같은 공용 짧은 기간 reply-history helper |
-    | `plugin-sdk/reply-reference` | `createReplyReferencePlanner` |
-    | `plugin-sdk/reply-chunking` | 좁은 범위의 텍스트/Markdown 청크 분할 helper |
-    | `plugin-sdk/session-store-runtime` | 세션 저장소 경로 + updated-at helper |
-    | `plugin-sdk/state-paths` | 상태/OAuth 디렉터리 경로 helper |
-    | `plugin-sdk/routing` | `resolveAgentRoute`, `buildAgentSessionKey`, `resolveDefaultAgentBoundAccountId` 같은 라우트/세션 키/계정 바인딩 helper |
-    | `plugin-sdk/status-helpers` | 공용 채널/계정 상태 요약 helper, 런타임 상태 기본값, 이슈 메타데이터 helper |
-    | `plugin-sdk/target-resolver-runtime` | 공용 대상 해석 helper |
-    | `plugin-sdk/string-normalization-runtime` | slug/문자열 정규화 helper |
-    | `plugin-sdk/request-url` | fetch/request 유사 입력에서 문자열 URL 추출 |
-    | `plugin-sdk/run-command` | 정규화된 stdout/stderr 결과를 가진 시간 제한 명령어 실행기 |
-    | `plugin-sdk/param-readers` | 공용 도구/CLI 파라미터 리더 |
-    | `plugin-sdk/tool-payload` | 도구 결과 객체에서 정규화된 페이로드 추출 |
-    | `plugin-sdk/tool-send` | 도구 인수에서 정식 전송 대상 필드 추출 |
-    | `plugin-sdk/temp-path` | 공용 임시 다운로드 경로 helper |
-    | `plugin-sdk/logging-core` | 하위 시스템 로거 및 redaction helper |
-    | `plugin-sdk/markdown-table-runtime` | Markdown 표 모드 helper |
-    | `plugin-sdk/json-store` | 작은 JSON 상태 읽기/쓰기 helper |
-    | `plugin-sdk/file-lock` | 재진입 가능한 파일 잠금 helper |
-    | `plugin-sdk/persistent-dedupe` | 디스크 기반 dedupe 캐시 helper |
-    | `plugin-sdk/acp-runtime` | ACP 런타임/세션 및 reply-dispatch helper |
-    | `plugin-sdk/acp-binding-resolve-runtime` | 수명 주기 시작 import 없이 읽기 전용 ACP 바인딩 해석 |
-    | `plugin-sdk/agent-config-primitives` | 좁은 범위의 에이전트 런타임 config 스키마 primitive |
-    | `plugin-sdk/boolean-param` | 느슨한 불리언 파라미터 리더 |
-    | `plugin-sdk/dangerous-name-runtime` | 위험한 이름 매칭 해석 helper |
-    | `plugin-sdk/device-bootstrap` | 디바이스 bootstrap 및 페어링 토큰 helper |
-    | `plugin-sdk/extension-shared` | 공용 passive-channel, 상태, ambient 프록시 helper primitive |
-    | `plugin-sdk/models-provider-runtime` | `/models` 명령어/provider 답글 helper |
-    | `plugin-sdk/skill-commands-runtime` | Skills 명령어 목록 helper |
-    | `plugin-sdk/native-command-registry` | 기본 명령어 레지스트리/빌드/직렬화 helper |
-    | `plugin-sdk/agent-harness` | 저수준 에이전트 harness를 위한 실험적 trusted-Plugin 표면: harness 타입, 활성 실행 steer/abort helper, OpenClaw 도구 브리지 helper, 시도 결과 유틸리티 |
-    | `plugin-sdk/provider-zai-endpoint` | Z.A.I 엔드포인트 감지 helper |
-    | `plugin-sdk/infra-runtime` | 시스템 이벤트/Heartbeat helper |
-    | `plugin-sdk/collection-runtime` | 작은 bounded 캐시 helper |
-    | `plugin-sdk/diagnostic-runtime` | 진단 플래그 및 이벤트 helper |
-    | `plugin-sdk/error-runtime` | 오류 그래프, 형식화, 공용 오류 분류 helper, `isApprovalNotFoundError` |
-    | `plugin-sdk/fetch-runtime` | 래핑된 fetch, 프록시, pinned 조회 helper |
-    | `plugin-sdk/runtime-fetch` | 프록시/guarded-fetch import 없이 dispatcher 인식 런타임 fetch |
-    | `plugin-sdk/response-limit-runtime` | 넓은 미디어 런타임 표면 없이 bounded 응답 본문 리더 |
-    | `plugin-sdk/session-binding-runtime` | 구성된 바인딩 라우팅 또는 페어링 저장소 없이 현재 대화 바인딩 상태 |
-    | `plugin-sdk/session-store-runtime` | 넓은 config 쓰기/유지보수 import 없이 세션 저장소 읽기 helper |
-    | `plugin-sdk/context-visibility-runtime` | 넓은 config/보안 import 없이 컨텍스트 가시성 해석 및 보조 컨텍스트 필터링 |
-    | `plugin-sdk/string-coerce-runtime` | Markdown/로깅 import 없이 좁은 범위의 primitive record/string 강제 변환 및 정규화 helper |
-    | `plugin-sdk/host-runtime` | 호스트명 및 SCP 호스트 정규화 helper |
-    | `plugin-sdk/retry-runtime` | 재시도 config 및 재시도 실행기 helper |
-    | `plugin-sdk/agent-runtime` | 에이전트 디렉터리/identity/작업공간 helper |
-    | `plugin-sdk/directory-runtime` | config 기반 디렉터리 조회/dedup |
-    | `plugin-sdk/keyed-async-queue` | `KeyedAsyncQueue` |
-  </Accordion>
-
-  <Accordion title="기능 및 테스트 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/media-runtime` | 공용 미디어 fetch/변환/저장 helper와 미디어 페이로드 빌더 |
-    | `plugin-sdk/media-generation-runtime` | 공용 미디어 생성 failover helper, 후보 선택, 누락된 모델 메시지 처리 |
-    | `plugin-sdk/media-understanding` | 미디어 이해 provider 타입과 provider용 이미지/오디오 helper export |
-    | `plugin-sdk/text-runtime` | assistant-visible-text 제거, Markdown 렌더/청크 분할/표 helper, redaction helper, directive 태그 helper, 안전한 텍스트 유틸리티 같은 공용 텍스트/Markdown/로깅 helper |
-    | `plugin-sdk/text-chunking` | 아웃바운드 텍스트 청크 분할 helper |
-    | `plugin-sdk/speech` | 음성 provider 타입과 provider용 directive, 레지스트리, 검증 helper |
-    | `plugin-sdk/speech-core` | 공용 음성 provider 타입, 레지스트리, directive, 정규화 helper |
-    | `plugin-sdk/realtime-transcription` | 실시간 전사 provider 타입, 레지스트리 helper, 공용 WebSocket 세션 helper |
-    | `plugin-sdk/realtime-voice` | 실시간 음성 provider 타입 및 레지스트리 helper |
-    | `plugin-sdk/image-generation` | 이미지 생성 provider 타입 |
-    | `plugin-sdk/image-generation-core` | 공용 이미지 생성 타입, failover, 인증, 레지스트리 helper |
-    | `plugin-sdk/music-generation` | 음악 생성 provider/요청/결과 타입 |
-    | `plugin-sdk/music-generation-core` | 공용 음악 생성 타입, failover helper, provider 조회, model-ref 파싱 |
-    | `plugin-sdk/video-generation` | 비디오 생성 provider/요청/결과 타입 |
-    | `plugin-sdk/video-generation-core` | 공용 비디오 생성 타입, failover helper, provider 조회, model-ref 파싱 |
-    | `plugin-sdk/webhook-targets` | Webhook 대상 레지스트리 및 라우트 설치 helper |
-    | `plugin-sdk/webhook-path` | Webhook 경로 정규화 helper |
-    | `plugin-sdk/web-media` | 공용 원격/로컬 미디어 로드 helper |
-    | `plugin-sdk/zod` | Plugin SDK 소비자를 위한 재export된 `zod` |
-    | `plugin-sdk/testing` | `installCommonResolveTargetErrorCases`, `shouldAckReaction` |
-  </Accordion>
-
-  <Accordion title="메모리 하위 경로">
-    | Subpath | 주요 export |
-    | --- | --- |
-    | `plugin-sdk/memory-core` | manager/config/file/CLI helper를 위한 번들 memory-core helper 표면 |
-    | `plugin-sdk/memory-core-engine-runtime` | 메모리 인덱스/검색 런타임 파사드 |
-    | `plugin-sdk/memory-core-host-engine-foundation` | 메모리 호스트 foundation 엔진 export |
-    | `plugin-sdk/memory-core-host-engine-embeddings` | 메모리 호스트 임베딩 계약, 레지스트리 접근, 로컬 provider, 일반 batch/원격 helper |
-    | `plugin-sdk/memory-core-host-engine-qmd` | 메모리 호스트 QMD 엔진 export |
-    | `plugin-sdk/memory-core-host-engine-storage` | 메모리 호스트 저장소 엔진 export |
-    | `plugin-sdk/memory-core-host-multimodal` | 메모리 호스트 멀티모달 helper |
-    | `plugin-sdk/memory-core-host-query` | 메모리 호스트 쿼리 helper |
-    | `plugin-sdk/memory-core-host-secret` | 메모리 호스트 비밀 helper |
-    | `plugin-sdk/memory-core-host-events` | 메모리 호스트 이벤트 저널 helper |
-    | `plugin-sdk/memory-core-host-status` | 메모리 호스트 상태 helper |
-    | `plugin-sdk/memory-core-host-runtime-cli` | 메모리 호스트 CLI 런타임 helper |
-    | `plugin-sdk/memory-core-host-runtime-core` | 메모리 호스트 코어 런타임 helper |
-    | `plugin-sdk/memory-core-host-runtime-files` | 메모리 호스트 파일/런타임 helper |
-    | `plugin-sdk/memory-host-core` | 메모리 호스트 코어 런타임 helper에 대한 vendor-neutral 별칭 |
-    | `plugin-sdk/memory-host-events` | 메모리 호스트 이벤트 저널 helper에 대한 vendor-neutral 별칭 |
-    | `plugin-sdk/memory-host-files` | 메모리 호스트 파일/런타임 helper에 대한 vendor-neutral 별칭 |
-    | `plugin-sdk/memory-host-markdown` | 메모리 인접 Plugin을 위한 공용 관리형 Markdown helper |
-    | `plugin-sdk/memory-host-search` | 검색 관리자 접근을 위한 Active Memory 런타임 파사드 |
-    | `plugin-sdk/memory-host-status` | 메모리 호스트 상태 helper에 대한 vendor-neutral 별칭 |
-    | `plugin-sdk/memory-lancedb` | 번들 memory-lancedb helper 표면 |
-  </Accordion>
-
-  <Accordion title="예약된 번들 helper 하위 경로">
-    | Family | 현재 하위 경로 | 의도된 용도 |
-    | --- | --- | --- |
-    | Browser | `plugin-sdk/browser-cdp`, `plugin-sdk/browser-config-runtime`, `plugin-sdk/browser-config-support`, `plugin-sdk/browser-control-auth`, `plugin-sdk/browser-node-runtime`, `plugin-sdk/browser-profiles`, `plugin-sdk/browser-security-runtime`, `plugin-sdk/browser-setup-tools`, `plugin-sdk/browser-support` | 번들 브라우저 Plugin 지원 helper (`browser-support`는 호환성 barrel로 유지) |
-    | Matrix | `plugin-sdk/matrix`, `plugin-sdk/matrix-helper`, `plugin-sdk/matrix-runtime-heavy`, `plugin-sdk/matrix-runtime-shared`, `plugin-sdk/matrix-runtime-surface`, `plugin-sdk/matrix-surface`, `plugin-sdk/matrix-thread-bindings` | 번들 Matrix helper/런타임 표면 |
-    | Line | `plugin-sdk/line`, `plugin-sdk/line-core`, `plugin-sdk/line-runtime`, `plugin-sdk/line-surface` | 번들 LINE helper/런타임 표면 |
-    | IRC | `plugin-sdk/irc`, `plugin-sdk/irc-surface` | 번들 IRC helper 표면 |
-    | 채널별 helper | `plugin-sdk/googlechat`, `plugin-sdk/zalouser`, `plugin-sdk/bluebubbles`, `plugin-sdk/bluebubbles-policy`, `plugin-sdk/mattermost`, `plugin-sdk/mattermost-policy`, `plugin-sdk/feishu-conversation`, `plugin-sdk/msteams`, `plugin-sdk/nextcloud-talk`, `plugin-sdk/nostr`, `plugin-sdk/tlon`, `plugin-sdk/twitch` | 번들 채널 호환성/helper 경계 |
-    | 인증/Plugin별 helper | `plugin-sdk/github-copilot-login`, `plugin-sdk/github-copilot-token`, `plugin-sdk/diagnostics-otel`, `plugin-sdk/diffs`, `plugin-sdk/llm-task`, `plugin-sdk/thread-ownership`, `plugin-sdk/voice-call` | 번들 기능/Plugin helper 경계. `plugin-sdk/github-copilot-token`은 현재 `DEFAULT_COPILOT_API_BASE_URL`, `deriveCopilotApiBaseUrlFromToken`, `resolveCopilotApiToken`을 export |
-  </Accordion>
-</AccordionGroup>
+200개 이상의 서브패스로 생성된 목록은 `scripts/lib/plugin-sdk-entrypoints.json`에 있습니다.
 
 ## 등록 API
 
-`register(api)` 콜백은 다음 메서드를 가진 `OpenClawPluginApi` 객체를 받습니다.
+`register(api)` 콜백은 다음 메서드를 가진 `OpenClawPluginApi` 객체를 받습니다:
 
-### 기능 등록
+### Capability 등록
 
-| 메서드 | 등록하는 항목 |
-| ------------------------------------------------ | ------------------------------------- |
-| `api.registerProvider(...)`                      | 텍스트 추론(LLM) |
-| `api.registerAgentHarness(...)`                  | 실험적 저수준 에이전트 실행기 |
-| `api.registerCliBackend(...)`                    | 로컬 CLI 추론 backend |
-| `api.registerChannel(...)`                       | 메시징 채널 |
-| `api.registerSpeechProvider(...)`                | 텍스트 음성 변환 / STT 합성 |
-| `api.registerRealtimeTranscriptionProvider(...)` | 스트리밍 실시간 전사 |
-| `api.registerRealtimeVoiceProvider(...)`         | 양방향 실시간 음성 세션 |
-| `api.registerMediaUnderstandingProvider(...)`    | 이미지/오디오/비디오 분석 |
-| `api.registerImageGenerationProvider(...)`       | 이미지 생성 |
-| `api.registerMusicGenerationProvider(...)`       | 음악 생성 |
-| `api.registerVideoGenerationProvider(...)`       | 비디오 생성 |
-| `api.registerWebFetchProvider(...)`              | 웹 가져오기 / 스크레이프 provider |
-| `api.registerWebSearchProvider(...)`             | 웹 검색 |
+| 메서드                                           | 등록 대상                              |
+| ------------------------------------------------ | -------------------------------------- |
+| `api.registerProvider(...)`                      | 텍스트 추론 (LLM)                      |
+| `api.registerAgentHarness(...)`                  | 실험적 저수준 에이전트 실행기          |
+| `api.registerCliBackend(...)`                    | 로컬 CLI 추론 백엔드                   |
+| `api.registerChannel(...)`                       | 메시징 채널                            |
+| `api.registerSpeechProvider(...)`                | 텍스트 음성 변환 / STT 합성            |
+| `api.registerRealtimeTranscriptionProvider(...)` | 스트리밍 실시간 전사                   |
+| `api.registerRealtimeVoiceProvider(...)`         | 양방향 실시간 음성 세션                |
+| `api.registerMediaUnderstandingProvider(...)`    | 이미지/오디오/비디오 분석              |
+| `api.registerImageGenerationProvider(...)`       | 이미지 생성                            |
+| `api.registerMusicGenerationProvider(...)`       | 음악 생성                              |
+| `api.registerVideoGenerationProvider(...)`       | 비디오 생성                            |
+| `api.registerWebFetchProvider(...)`              | 웹 가져오기 / 스크래핑 provider        |
+| `api.registerWebSearchProvider(...)`             | 웹 검색                                |
 
-### 도구 및 명령어
+### 도구 및 명령
 
-| 메서드 | 등록하는 항목 |
-| ------------------------------- | --------------------------------------------- |
-| `api.registerTool(tool, opts?)` | 에이전트 도구(필수 또는 `{ optional: true }`) |
-| `api.registerCommand(def)`      | 사용자 지정 명령어(LLM 우회) |
+| 메서드                          | 등록 대상                                            |
+| ------------------------------- | ---------------------------------------------------- |
+| `api.registerTool(tool, opts?)` | 에이전트 도구(필수 또는 `{ optional: true }`)        |
+| `api.registerCommand(def)`      | 커스텀 명령(LLM 우회)                                |
 
 ### 인프라
 
-| 메서드 | 등록하는 항목 |
-| ----------------------------------------------- | --------------------------------------- |
-| `api.registerHook(events, handler, opts?)`      | 이벤트 hook |
-| `api.registerHttpRoute(params)`                 | Gateway HTTP 엔드포인트 |
-| `api.registerGatewayMethod(name, handler)`      | Gateway RPC 메서드 |
-| `api.registerCli(registrar, opts?)`             | CLI 하위 명령어 |
-| `api.registerService(service)`                  | 백그라운드 서비스 |
-| `api.registerInteractiveHandler(registration)`  | 인터랙티브 핸들러 |
-| `api.registerEmbeddedExtensionFactory(factory)` | Pi embedded-runner extension 팩터리 |
-| `api.registerMemoryPromptSupplement(builder)`   | 추가형 메모리 인접 프롬프트 섹션 |
-| `api.registerMemoryCorpusSupplement(adapter)`   | 추가형 메모리 검색/읽기 코퍼스 |
+| 메서드                                          | 등록 대상                              |
+| ----------------------------------------------- | -------------------------------------- |
+| `api.registerHook(events, handler, opts?)`      | 이벤트 hook                            |
+| `api.registerHttpRoute(params)`                 | Gateway HTTP 엔드포인트                |
+| `api.registerGatewayMethod(name, handler)`      | Gateway RPC 메서드                     |
+| `api.registerCli(registrar, opts?)`             | CLI 하위 명령                          |
+| `api.registerService(service)`                  | 백그라운드 서비스                      |
+| `api.registerInteractiveHandler(registration)`  | 대화형 핸들러                          |
+| `api.registerEmbeddedExtensionFactory(factory)` | Pi embedded-runner 확장 팩토리         |
+| `api.registerMemoryPromptSupplement(builder)`   | 추가형 메모리 인접 프롬프트 섹션       |
+| `api.registerMemoryCorpusSupplement(adapter)`   | 추가형 메모리 검색/읽기 코퍼스         |
 
-예약된 코어 관리 네임스페이스(`config.*`, `exec.approvals.*`, `wizard.*`,
-`update.*`)는 Plugin이 더 좁은 gateway 메서드 범위를 할당하려고 해도 항상
-`operator.admin`으로 유지됩니다. Plugin 소유 메서드에는 Plugin 전용 prefix를
-우선 사용하세요.
+<Note>
+  예약된 코어 관리자 네임스페이스(`config.*`, `exec.approvals.*`, `wizard.*`,
+  `update.*`)는 Plugin이 더 좁은 범위를 지정하려 해도 항상 `operator.admin`으로 유지됩니다.
+  Plugin 소유 메서드에는 Plugin 전용 접두사를 선호하세요.
+</Note>
 
-Plugin에 OpenClaw 내장 실행 중 Pi 네이티브 이벤트 타이밍이 필요할 때
-`api.registerEmbeddedExtensionFactory(...)`를 사용하세요. 예를 들어, 최종 도구 결과
-메시지가 출력되기 전에 수행되어야 하는 비동기 `tool_result` 재작성 같은 경우입니다.
-이것은 현재 번들 Plugin 전용 경계입니다. 번들 Plugin만 이를 등록할 수 있으며,
+<Accordion title="registerEmbeddedExtensionFactory를 언제 사용할까">
+  Plugin이 OpenClaw 내장 실행 중 Pi 네이티브
+  이벤트 타이밍이 필요할 때 `api.registerEmbeddedExtensionFactory(...)`를 사용하세요. 예를 들어
+  최종 tool-result 메시지가 방출되기 전에 일어나야 하는 비동기 `tool_result`
+  재작성 같은 경우입니다.
+
+현재 이것은 번들 Plugin seam입니다. 번들 Plugins만 등록할 수 있으며,
 `openclaw.plugin.json`에 `contracts.embeddedExtensionFactories: ["pi"]`를
-선언해야 합니다. 더 낮은 수준의 경계가 필요하지 않은 작업에는 일반 OpenClaw
-Plugin hook을 유지하세요.
+선언해야 합니다. 더 낮은 수준 seam이 필요하지 않은 작업에는 일반 OpenClaw Plugin 훅을 유지하세요.
+</Accordion>
 
 ### CLI 등록 메타데이터
 
-`api.registerCli(registrar, opts?)`는 두 종류의 최상위 메타데이터를 받습니다.
+`api.registerCli(registrar, opts?)`는 두 종류의 최상위 메타데이터를 받습니다:
 
-- `commands`: registrar가 소유하는 명시적 명령어 루트
-- `descriptors`: 루트 CLI help, 라우팅, 지연 Plugin CLI 등록에 사용되는 파싱 시점 명령어 descriptor
+- `commands`: registrar가 소유하는 명시적 명령 루트
+- `descriptors`: 루트 CLI 도움말, 라우팅, lazy Plugin CLI 등록에 사용되는 파싱 시점 명령 descriptor
 
-Plugin 명령어를 일반 루트 CLI 경로에서 지연 로드 상태로 유지하려면,
-해당 registrar가 노출하는 모든 최상위 명령어 루트를 포괄하는 `descriptors`를 제공하세요.
+Plugin 명령이 일반 루트 CLI 경로에서 lazy-loaded 상태를 유지하길 원한다면, 해당 registrar가 노출하는 모든 최상위 명령 루트를 포괄하는 `descriptors`를 제공하세요.
 
 ```typescript
 api.registerCli(
@@ -399,137 +149,147 @@ api.registerCli(
 );
 ```
 
-지연 루트 CLI 등록이 필요하지 않을 때만 `commands`만 단독으로 사용하세요.
-그 eager 호환성 경로도 계속 지원되지만, 파싱 시점 지연 로딩을 위한
-descriptor 기반 placeholder는 설치하지 않습니다.
+lazy 루트 CLI 등록이 필요하지 않을 때만 `commands` 단독 사용을 고려하세요.
+그 eager 호환 경로는 여전히 지원되지만, 파싱 시점 lazy loading을 위한 descriptor 기반 placeholder는 설치하지 않습니다.
 
-### CLI backend 등록
+### CLI 백엔드 등록
 
-`api.registerCliBackend(...)`를 사용하면 Plugin이 `codex-cli` 같은 로컬
-AI CLI backend의 기본 config를 소유할 수 있습니다.
+`api.registerCliBackend(...)`는 Plugin이 `codex-cli` 같은 로컬
+AI CLI 백엔드의 기본 구성을 소유하게 합니다.
 
-- backend `id`는 `codex-cli/gpt-5` 같은 model ref의 provider prefix가 됩니다.
-- backend `config`는 `agents.defaults.cliBackends.<id>`와 동일한 형태를 사용합니다.
-- 사용자 config가 여전히 우선합니다. OpenClaw는 CLI 실행 전에
-  Plugin 기본값 위에 `agents.defaults.cliBackends.<id>`를 병합합니다.
-- 병합 후 backend에 호환성 재작성이 필요하면(예: 예전 flag 형태 정규화)
+- 백엔드 `id`는 `codex-cli/gpt-5` 같은 모델 참조에서 provider 접두사가 됩니다.
+- 백엔드 `config`는 `agents.defaults.cliBackends.<id>`와 같은 형태를 사용합니다.
+- 사용자 구성은 여전히 우선합니다. OpenClaw는 CLI를 실행하기 전에
+  plugin 기본값 위에 `agents.defaults.cliBackends.<id>`를 병합합니다.
+- 백엔드가 병합 후 호환성 재작성(예: 오래된 플래그 형태 정규화)이 필요하면
   `normalizeConfig`를 사용하세요.
 
-### 단일 슬롯
+### 배타적 슬롯
 
-| 메서드 | 등록하는 항목 |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api.registerContextEngine(id, factory)`   | 컨텍스트 엔진(한 번에 하나만 활성). `assemble()` 콜백은 엔진이 프롬프트 추가를 조정할 수 있도록 `availableTools`와 `citationsMode`를 받습니다. |
-| `api.registerMemoryCapability(capability)` | 통합 메모리 기능 |
-| `api.registerMemoryPromptSection(builder)` | 메모리 프롬프트 섹션 빌더 |
-| `api.registerMemoryFlushPlan(resolver)`    | 메모리 flush 계획 해석기 |
-| `api.registerMemoryRuntime(runtime)`       | 메모리 런타임 어댑터 |
+| 메서드                                     | 등록 대상                                                                                                                                                |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api.registerContextEngine(id, factory)`   | Context engine(한 번에 하나만 활성). `assemble()` 콜백은 `availableTools`와 `citationsMode`를 받아 엔진이 프롬프트 추가를 조정할 수 있게 합니다.      |
+| `api.registerMemoryCapability(capability)` | 통합 메모리 capability                                                                                                                                   |
+| `api.registerMemoryPromptSection(builder)` | 메모리 프롬프트 섹션 빌더                                                                                                                                 |
+| `api.registerMemoryFlushPlan(resolver)`    | 메모리 flush 계획 확인기                                                                                                                                  |
+| `api.registerMemoryRuntime(runtime)`       | 메모리 런타임 어댑터                                                                                                                                      |
 
 ### 메모리 임베딩 어댑터
 
-| 메서드 | 등록하는 항목 |
+| 메서드                                         | 등록 대상                                      |
 | ---------------------------------------------- | ---------------------------------------------- |
-| `api.registerMemoryEmbeddingProvider(adapter)` | 활성 Plugin용 메모리 임베딩 어댑터 |
+| `api.registerMemoryEmbeddingProvider(adapter)` | 활성 Plugin용 메모리 임베딩 어댑터             |
 
-- `registerMemoryCapability`가 권장되는 단일 메모리 Plugin API입니다.
-- `registerMemoryCapability`는 companion Plugin이 특정 메모리 Plugin의 비공개 레이아웃에 접근하지 않고
-  `openclaw/plugin-sdk/memory-host-core`를 통해 내보낸 메모리 아티팩트를 사용할 수 있도록
+- `registerMemoryCapability`는 선호되는 배타적 메모리 Plugin API입니다.
+- `registerMemoryCapability`는 동반 Plugins가 특정
+  메모리 Plugin의 비공개 레이아웃에 접근하는 대신
+  `openclaw/plugin-sdk/memory-host-core`를 통해 내보낸 메모리 아티팩트를 소비할 수 있도록
   `publicArtifacts.listArtifacts(...)`를 노출할 수도 있습니다.
 - `registerMemoryPromptSection`, `registerMemoryFlushPlan`,
-  `registerMemoryRuntime`은 레거시 호환용 단일 메모리 Plugin API입니다.
-- `registerMemoryEmbeddingProvider`를 사용하면 활성 메모리 Plugin이
-  하나 이상의 임베딩 어댑터 ID(예: `openai`, `gemini` 또는 Plugin 정의 사용자 지정 ID)를
-  등록할 수 있습니다.
+  `registerMemoryRuntime`는 레거시 호환 배타적 메모리 Plugin API입니다.
+- `registerMemoryEmbeddingProvider`는 활성 메모리 Plugin이 하나 이상의
+  임베딩 어댑터 ID(예: `openai`, `gemini`, 또는 Plugin이 정의한 커스텀 ID)를 등록하게 합니다.
 - `agents.defaults.memorySearch.provider` 및
-  `agents.defaults.memorySearch.fallback` 같은 사용자 config는
-  이렇게 등록된 어댑터 ID를 기준으로 해석됩니다.
+  `agents.defaults.memorySearch.fallback` 같은 사용자 구성은 이러한 등록된
+  어댑터 ID에 대해 확인됩니다.
 
-### 이벤트 및 수명 주기
+### 이벤트와 수명 주기
 
-| 메서드 | 수행하는 작업 |
-| -------------------------------------------- | ----------------------------- |
-| `api.on(hookName, handler, opts?)`           | 타입 지정 수명 주기 hook |
-| `api.onConversationBindingResolved(handler)` | 대화 바인딩 콜백 |
+| 메서드                                       | 기능                         |
+| -------------------------------------------- | ---------------------------- |
+| `api.on(hookName, handler, opts?)`           | 타입 지정된 수명 주기 훅     |
+| `api.onConversationBindingResolved(handler)` | 대화 바인딩 콜백             |
 
-### Hook 결정 의미
+### 훅 결정 의미
 
-- `before_tool_call`: `{ block: true }`를 반환하면 종료 결정입니다. 어느 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
-- `before_tool_call`: `{ block: false }`를 반환하면 재정의가 아니라 결정 없음(`block` 생략과 동일)으로 처리됩니다.
-- `before_install`: `{ block: true }`를 반환하면 종료 결정입니다. 어느 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
-- `before_install`: `{ block: false }`를 반환하면 재정의가 아니라 결정 없음(`block` 생략과 동일)으로 처리됩니다.
-- `reply_dispatch`: `{ handled: true, ... }`를 반환하면 종료 결정입니다. 어느 핸들러든 디스패치를 처리했다고 주장하면 더 낮은 우선순위 핸들러와 기본 모델 디스패치 경로는 건너뜁니다.
-- `message_sending`: `{ cancel: true }`를 반환하면 종료 결정입니다. 어느 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
-- `message_sending`: `{ cancel: false }`를 반환하면 재정의가 아니라 결정 없음(`cancel` 생략과 동일)으로 처리됩니다.
-- `message_received`: 인바운드 스레드/토픽 라우팅이 필요하면 타입 지정된 `threadId` 필드를 사용하세요. `metadata`는 채널별 추가 정보용으로 유지하세요.
-- `message_sending`: 채널별 `metadata`로 fallback하기 전에 타입 지정된 `replyToId` / `threadId` 라우팅 필드를 사용하세요.
-- `gateway_start`: 내부 `gateway:startup` hook에 의존하는 대신 gateway가 소유하는 시작 상태에는 `ctx.config`, `ctx.workspaceDir`, `ctx.getCron?.()`을 사용하세요.
+- `before_tool_call`: `{ block: true }`를 반환하면 최종 결정입니다. 어떤 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
+- `before_tool_call`: `{ block: false }`를 반환하면 재정의가 아니라 결정 없음으로 처리됩니다(`block` 생략과 동일).
+- `before_install`: `{ block: true }`를 반환하면 최종 결정입니다. 어떤 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
+- `before_install`: `{ block: false }`를 반환하면 재정의가 아니라 결정 없음으로 처리됩니다(`block` 생략과 동일).
+- `reply_dispatch`: `{ handled: true, ... }`를 반환하면 최종 결정입니다. 어떤 핸들러든 dispatch를 가져가면 더 낮은 우선순위 핸들러와 기본 모델 dispatch 경로는 건너뜁니다.
+- `message_sending`: `{ cancel: true }`를 반환하면 최종 결정입니다. 어떤 핸들러든 이를 설정하면 더 낮은 우선순위 핸들러는 건너뜁니다.
+- `message_sending`: `{ cancel: false }`를 반환하면 재정의가 아니라 결정 없음으로 처리됩니다(`cancel` 생략과 동일).
+- `message_received`: 수신 스레드/토픽 라우팅이 필요할 때는 typed `threadId` 필드를 사용하세요. `metadata`는 채널별 추가 정보를 위해 유지하세요.
+- `message_sending`: 채널별 `metadata`로 폴백하기 전에 typed `replyToId` / `threadId` 라우팅 필드를 사용하세요.
+- `gateway_start`: 내부 `gateway:startup` 훅에 의존하는 대신 Gateway 소유 시작 상태에는 `ctx.config`, `ctx.workspaceDir`, `ctx.getCron?.()`를 사용하세요.
 
 ### API 객체 필드
 
-| 필드 | 타입 | 설명 |
-| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | Plugin ID |
-| `api.name`               | `string`                  | 표시 이름 |
-| `api.version`            | `string?`                 | Plugin 버전(선택 사항) |
-| `api.description`        | `string?`                 | Plugin 설명(선택 사항) |
-| `api.source`             | `string`                  | Plugin 소스 경로 |
-| `api.rootDir`            | `string?`                 | Plugin 루트 디렉터리(선택 사항) |
-| `api.config`             | `OpenClawConfig`          | 현재 config 스냅샷(가능한 경우 활성 인메모리 런타임 스냅샷) |
-| `api.pluginConfig`       | `Record<string, unknown>` | `plugins.entries.<id>.config`의 Plugin별 config |
-| `api.runtime`            | `PluginRuntime`           | [런타임 helper](/ko/plugins/sdk-runtime) |
-| `api.logger`             | `PluginLogger`            | 범위 지정 로거(`debug`, `info`, `warn`, `error`) |
-| `api.registrationMode`   | `PluginRegistrationMode`  | 현재 로드 모드. `"setup-runtime"`은 전체 진입점 시작/설정 전의 경량 창입니다 |
-| `api.resolvePath(input)` | `(string) => string`      | Plugin 루트를 기준으로 경로 해석 |
+| 필드                    | 타입                      | 설명                                                                                         |
+| ----------------------- | ------------------------- | -------------------------------------------------------------------------------------------- |
+| `api.id`                | `string`                  | Plugin ID                                                                                    |
+| `api.name`              | `string`                  | 표시 이름                                                                                    |
+| `api.version`           | `string?`                 | Plugin 버전(선택 사항)                                                                       |
+| `api.description`       | `string?`                 | Plugin 설명(선택 사항)                                                                       |
+| `api.source`            | `string`                  | Plugin 소스 경로                                                                             |
+| `api.rootDir`           | `string?`                 | Plugin 루트 디렉터리(선택 사항)                                                              |
+| `api.config`            | `OpenClawConfig`          | 현재 구성 스냅샷(가능한 경우 활성 메모리 내 런타임 스냅샷)                                   |
+| `api.pluginConfig`      | `Record<string, unknown>` | `plugins.entries.<id>.config`의 Plugin 전용 구성                                             |
+| `api.runtime`           | `PluginRuntime`           | [런타임 헬퍼](/ko/plugins/sdk-runtime)                                                          |
+| `api.logger`            | `PluginLogger`            | 범위가 지정된 로거 (`debug`, `info`, `warn`, `error`)                                        |
+| `api.registrationMode`  | `PluginRegistrationMode`  | 현재 로드 모드. `"setup-runtime"`은 전체 entry 이전의 경량 시작/설정 창입니다               |
+| `api.resolvePath(input)`| `(string) => string`      | Plugin 루트를 기준으로 경로 확인                                                             |
 
 ## 내부 모듈 규칙
 
-Plugin 내부에서는 내부 import에 로컬 barrel 파일을 사용하세요.
+Plugin 내부에서는 내부 import에 로컬 barrel 파일을 사용하세요:
 
 ```
 my-plugin/
   api.ts            # 외부 소비자를 위한 공개 export
   runtime-api.ts    # 내부 전용 런타임 export
   index.ts          # Plugin 진입점
-  setup-entry.ts    # 경량 setup 전용 진입점(선택 사항)
+  setup-entry.ts    # 경량 설정 전용 entry (선택 사항)
 ```
 
 <Warning>
-  프로덕션 코드에서 `openclaw/plugin-sdk/<your-plugin>`을 통해 자신의 Plugin을 import하지 마세요.
-  내부 import는 `./api.ts` 또는 `./runtime-api.ts`를 통해 연결하세요.
-  SDK 경로는 외부 계약 전용입니다.
+  프로덕션 코드에서 `openclaw/plugin-sdk/<your-plugin>`을 통해 자신의 Plugin을
+  import하지 마세요. 내부 import는 `./api.ts` 또는
+  `./runtime-api.ts`를 통하도록 하세요. SDK 경로는 외부 계약 전용입니다.
 </Warning>
 
-파사드 로드 방식의 번들 Plugin 공개 표면(`api.ts`, `runtime-api.ts`,
-`index.ts`, `setup-entry.ts` 및 유사한 공개 진입 파일)은 이제 OpenClaw가 이미
-실행 중이면 활성 런타임 config 스냅샷을 우선 사용합니다.
-아직 런타임 스냅샷이 없으면 디스크에서 해석된 config 파일로 fallback합니다.
+파사드로 로드되는 번들 Plugin 공개 표면(`api.ts`, `runtime-api.ts`,
+`index.ts`, `setup-entry.ts` 및 유사한 공개 entry 파일)은
+OpenClaw가 이미 실행 중이면 활성 런타임 구성 스냅샷을 우선합니다. 아직 런타임
+스냅샷이 없으면 디스크에 있는 확인된 구성 파일로 폴백합니다.
 
-provider Plugin은 helper가 의도적으로 provider 전용이고 아직 일반 SDK 하위 경로에
-속하지 않을 때, 좁은 Plugin 로컬 계약 barrel을 노출할 수도 있습니다.
-현재 번들 예시: Anthropic provider는 Anthropic beta-header와 `service_tier`
-로직을 일반 `plugin-sdk/*` 계약으로 승격하는 대신,
-자체 공개 `api.ts` / `contract-api.ts` 경계에 Claude 스트림 helper를 유지합니다.
+provider Plugins는 헬퍼가 의도적으로 provider 전용이며 아직 일반 SDK
+서브패스에 속하지 않을 때 좁은 Plugin 로컬 계약 barrel을 노출할 수 있습니다.
+번들 예시:
 
-다른 현재 번들 예시:
-
-- `@openclaw/openai-provider`: `api.ts`는 provider builder,
-  기본 모델 helper, 실시간 provider builder를 export합니다
-- `@openclaw/openrouter-provider`: `api.ts`는 provider builder와
-  온보딩/config helper를 export합니다
+- **Anthropic**: Claude
+  beta-header 및 `service_tier` 스트림 헬퍼를 위한 공개 `api.ts` / `contract-api.ts` seam
+- **`@openclaw/openai-provider`**: `api.ts`가 provider 빌더,
+  기본 모델 헬퍼, 실시간 provider 빌더를 export
+- **`@openclaw/openrouter-provider`**: `api.ts`가 provider 빌더와
+  온보딩/구성 헬퍼를 export
 
 <Warning>
-  extension 프로덕션 코드는 `openclaw/plugin-sdk/<other-plugin>`
-  import도 피해야 합니다. helper가 정말 공용이어야 한다면
-  두 Plugin을 결합하는 대신 `openclaw/plugin-sdk/speech`,
-  `.../provider-model-shared` 또는 다른 기능 중심 표면 같은
-  중립적인 SDK 하위 경로로 승격하세요.
+  확장 프로덕션 코드 역시 `openclaw/plugin-sdk/<other-plugin>`
+  import를 피해야 합니다. 헬퍼가 정말로 공유되어야 한다면, 두 Plugin을 서로 결합하는 대신
+  `openclaw/plugin-sdk/speech`, `.../provider-model-shared` 또는 다른
+  capability 지향 표면 같은 중립 SDK 서브패스로 승격하세요.
 </Warning>
 
-## 관련 항목
+## 관련
 
-- [진입점](/ko/plugins/sdk-entrypoints) — `definePluginEntry` 및 `defineChannelPluginEntry` 옵션
-- [런타임 helper](/ko/plugins/sdk-runtime) — 전체 `api.runtime` 네임스페이스 참조
-- [설정 및 Config](/ko/plugins/sdk-setup) — 패키징, manifest, config 스키마
-- [테스트](/ko/plugins/sdk-testing) — 테스트 유틸리티 및 lint 규칙
-- [SDK 마이그레이션](/ko/plugins/sdk-migration) — 지원 중단된 표면에서 마이그레이션
-- [Plugin Internals](/ko/plugins/architecture) — 심층 아키텍처 및 기능 모델
+<CardGroup cols={2}>
+  <Card title="진입점" icon="door-open" href="/ko/plugins/sdk-entrypoints">
+    `definePluginEntry` 및 `defineChannelPluginEntry` 옵션.
+  </Card>
+  <Card title="런타임 헬퍼" icon="gears" href="/ko/plugins/sdk-runtime">
+    전체 `api.runtime` 네임스페이스 참조.
+  </Card>
+  <Card title="설정 및 구성" icon="sliders" href="/ko/plugins/sdk-setup">
+    패키징, 매니페스트, 구성 스키마.
+  </Card>
+  <Card title="테스트" icon="vial" href="/ko/plugins/sdk-testing">
+    테스트 유틸리티와 lint 규칙.
+  </Card>
+  <Card title="SDK 마이그레이션" icon="arrows-turn-right" href="/ko/plugins/sdk-migration">
+    더 이상 권장되지 않는 표면에서 마이그레이션하기.
+  </Card>
+  <Card title="Plugin 내부 구조" icon="diagram-project" href="/ko/plugins/architecture">
+    심층 아키텍처와 capability 모델.
+  </Card>
+</CardGroup>

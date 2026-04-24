@@ -1,22 +1,20 @@
 ---
 read_when:
-    - OpenClaw 구성 방법을 배우는 경우
-    - 구성 예시를 찾는 경우
-    - 처음으로 OpenClaw를 설정하는 경우
-summary: 일반적인 OpenClaw 설정을 위한 스키마에 정확히 맞는 구성 예시
-title: 구성 예시
+    - OpenClaw 구성 방법 배우기
+    - 구성 예제 찾기
+    - 처음으로 OpenClaw 설정하기
+summary: 일반적인 OpenClaw 설정을 위한 스키마에 정확히 맞는 구성 예제
+title: 구성 예제
 x-i18n:
-    generated_at: "2026-04-05T12:42:26Z"
+    generated_at: "2026-04-24T06:13:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1c85643b02285cefa2aaa9dd7c1e3abebb505bc8b415b5153b5899efc3ade0f7
+    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-# 구성 예시
-
-아래 예시는 현재 config 스키마에 맞춰져 있습니다. 전체 참조와 필드별 설명은 [Configuration](/gateway/configuration)을 참조하세요.
+아래 예제는 현재 구성 스키마에 맞춰 정렬되어 있습니다. 전체 참조와 필드별 설명은 [구성](/ko/gateway/configuration)을 참조하세요.
 
 ## 빠른 시작
 
@@ -37,7 +35,7 @@ x-i18n:
 {
   identity: {
     name: "Clawd",
-    theme: "helpful assistant",
+    theme: "도움이 되는 어시스턴트",
     emoji: "🦞",
   },
   agent: {
@@ -53,13 +51,13 @@ x-i18n:
 }
 ```
 
-## 확장 예시(주요 옵션)
+## 확장 예제(주요 옵션)
 
-> JSON5에서는 주석과 후행 쉼표를 사용할 수 있습니다. 일반 JSON도 작동합니다.
+> JSON5를 사용하면 주석과 후행 쉼표를 사용할 수 있습니다. 일반 JSON도 동작합니다.
 
 ```json5
 {
-  // Environment + shell
+  // 환경 + 셸
   env: {
     OPENROUTER_API_KEY: "sk-or-...",
     vars: {
@@ -71,7 +69,7 @@ x-i18n:
     },
   },
 
-  // Auth profile metadata (secrets live in auth-profiles.json)
+  // 인증 프로필 메타데이터(비밀 정보는 auth-profiles.json에 저장)
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -86,14 +84,14 @@ x-i18n:
     },
   },
 
-  // Identity
+  // ID
   identity: {
     name: "Samantha",
-    theme: "helpful sloth",
+    theme: "도움이 되는 나무늘보",
     emoji: "🦥",
   },
 
-  // Logging
+  // 로깅
   logging: {
     level: "info",
     file: "/tmp/openclaw/openclaw.log",
@@ -102,7 +100,7 @@ x-i18n:
     redactSensitive: "tools",
   },
 
-  // Message formatting
+  // 메시지 형식
   messages: {
     messagePrefix: "[openclaw]",
     responsePrefix: ">",
@@ -110,7 +108,7 @@ x-i18n:
     ackReactionScope: "group-mentions",
   },
 
-  // Routing + queue
+  // 라우팅 + 큐
   routing: {
     groupChat: {
       mentionPatterns: ["@openclaw", "openclaw"],
@@ -133,7 +131,7 @@ x-i18n:
     },
   },
 
-  // Tooling
+  // 도구
   tools: {
     media: {
       audio: {
@@ -141,7 +139,7 @@ x-i18n:
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // Optional CLI fallback (Whisper binary):
+          // 선택적 CLI 폴백(Whisper 바이너리):
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -154,10 +152,10 @@ x-i18n:
     },
   },
 
-  // Session behavior
+  // 세션 동작
   session: {
     scope: "per-sender",
-    dmScope: "per-channel-peer", // recommended for multi-user inboxes
+    dmScope: "per-channel-peer", // 다중 사용자 받은편지함에 권장
     reset: {
       mode: "daily",
       atHour: 4,
@@ -173,9 +171,9 @@ x-i18n:
       pruneAfter: "30d",
       maxEntries: 500,
       rotateBytes: "10mb",
-      resetArchiveRetention: "30d", // duration or false
-      maxDiskBytes: "500mb", // optional
-      highWaterBytes: "400mb", // optional (defaults to 80% of maxDiskBytes)
+      resetArchiveRetention: "30d", // 기간 또는 false
+      maxDiskBytes: "500mb", // 선택 사항
+      highWaterBytes: "400mb", // 선택 사항(기본값은 maxDiskBytes의 80%)
     },
     typingIntervalSeconds: 5,
     sendPolicy: {
@@ -184,7 +182,7 @@ x-i18n:
     },
   },
 
-  // Channels
+  // 채널
   channels: {
     whatsapp: {
       dmPolicy: "pairing",
@@ -236,7 +234,7 @@ x-i18n:
     },
   },
 
-  // Agent runtime
+  // 에이전트 런타임
   agents: {
     defaults: {
       workspace: "~/.openclaw/workspace",
@@ -253,7 +251,7 @@ x-i18n:
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
         "openai/gpt-5.4": { alias: "gpt" },
       },
-      skills: ["github", "weather"], // inherited by agents that omit list[].skills
+      skills: ["github", "weather"], // list[].skills를 생략한 에이전트가 상속
       thinkingDefault: "low",
       verboseDefault: "off",
       elevatedDefault: "on",
@@ -278,7 +276,7 @@ x-i18n:
         every: "30m",
         model: "anthropic/claude-sonnet-4-6",
         target: "last",
-        directPolicy: "allow", // allow (default) | block
+        directPolicy: "allow", // allow (기본값) | block
         to: "+15555550123",
         prompt: "HEARTBEAT",
         ackMaxChars: 300,
@@ -293,7 +291,7 @@ x-i18n:
       },
       sandbox: {
         mode: "non-main",
-        scope: "session", // preferred over legacy perSession: true
+        scope: "session", // 레거시 perSession: true보다 권장
         workspaceRoot: "~/.openclaw/sandboxes",
         docker: {
           image: "openclaw-sandbox:bookworm-slim",
@@ -312,15 +310,15 @@ x-i18n:
       {
         id: "main",
         default: true,
-        // inherits defaults.skills -> github, weather
-        thinkingDefault: "high", // per-agent thinking override
-        reasoningDefault: "on", // per-agent reasoning visibility
-        fastModeDefault: false, // per-agent fast mode
+        // defaults.skills -> github, weather 상속
+        thinkingDefault: "high", // 에이전트별 thinking 재정의
+        reasoningDefault: "on", // 에이전트별 reasoning 가시성
+        fastModeDefault: false, // 에이전트별 fast mode
       },
       {
         id: "quick",
-        skills: [], // no skills for this agent
-        fastModeDefault: true, // this agent always runs fast
+        skills: [], // 이 에이전트는 Skills 없음
+        fastModeDefault: true, // 이 에이전트는 항상 빠르게 실행
         thinkingDefault: "off",
       },
     ],
@@ -348,7 +346,7 @@ x-i18n:
     },
   },
 
-  // Custom model providers
+  // 커스텀 모델 provider
   models: {
     mode: "merge",
     providers: {
@@ -374,7 +372,7 @@ x-i18n:
     },
   },
 
-  // Cron jobs
+  // Cron 작업
   cron: {
     enabled: true,
     store: "~/.openclaw/cron/cron.json",
@@ -386,7 +384,7 @@ x-i18n:
     },
   },
 
-  // Webhooks
+  // Webhook
   hooks: {
     enabled: true,
     path: "/hooks",
@@ -401,7 +399,7 @@ x-i18n:
         wakeMode: "now",
         name: "Gmail",
         sessionKey: "hook:gmail:{{messages[0].id}}",
-        messageTemplate: "From: {{messages[0].from}}\nSubject: {{messages[0].subject}}",
+        messageTemplate: "보낸 사람: {{messages[0].from}}\n제목: {{messages[0].subject}}",
         textTemplate: "{{messages[0].snippet}}",
         deliver: true,
         channel: "last",
@@ -429,7 +427,7 @@ x-i18n:
     },
   },
 
-  // Gateway + networking
+  // Gateway + 네트워킹
   gateway: {
     mode: "local",
     port: 18789,
@@ -468,7 +466,7 @@ x-i18n:
 
 ## 일반적인 패턴
 
-### 하나의 재정의가 있는 공유 Skills 기준선
+### 하나의 재정의가 있는 공유 Skill 기준선
 
 ```json5
 {
@@ -486,10 +484,10 @@ x-i18n:
 ```
 
 - `agents.defaults.skills`는 공유 기준선입니다.
-- `agents.list[].skills`는 특정 agent 하나에 대해 그 기준선을 대체합니다.
-- agent가 어떤 Skills도 보지 않아야 하면 `skills: []`를 사용하세요.
+- `agents.list[].skills`는 하나의 에이전트에 대해 그 기준선을 대체합니다.
+- 에이전트가 어떤 Skills도 보지 않게 하려면 `skills: []`를 사용하세요.
 
-### 멀티 플랫폼 설정
+### 다중 플랫폼 설정
 
 ```json5
 {
@@ -512,21 +510,21 @@ x-i18n:
 
 ### 보안 DM 모드(공유 받은편지함 / 다중 사용자 DM)
 
-한 명보다 많은 사람이 봇에 DM을 보낼 수 있다면(`allowFrom`에 여러 항목이 있는 경우, 여러 사람에 대한 페어링 승인, 또는 `dmPolicy: "open"`), 기본적으로 서로 다른 발신자의 DM이 하나의 컨텍스트를 공유하지 않도록 **보안 DM 모드**를 활성화하세요:
+둘 이상의 사람이 봇에 DM을 보낼 수 있다면(`allowFrom`에 여러 항목, 여러 사람에 대한 페어링 승인, 또는 `dmPolicy: "open"`), 서로 다른 발신자의 DM이 기본적으로 하나의 컨텍스트를 공유하지 않도록 **보안 DM 모드**를 활성화하세요:
 
 ```json5
 {
-  // Secure DM mode (recommended for multi-user or sensitive DM agents)
+  // 보안 DM 모드(다중 사용자 또는 민감한 DM 에이전트에 권장)
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // Example: WhatsApp multi-user inbox
+    // 예시: WhatsApp 다중 사용자 받은편지함
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // Example: Discord multi-user inbox
+    // 예시: Discord 다중 사용자 받은편지함
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -536,10 +534,10 @@ x-i18n:
 }
 ```
 
-Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC의 경우 발신자 인증은 기본적으로 ID 우선입니다.
-그 위험을 명시적으로 감수하는 경우에만 각 채널의 `dangerouslyAllowNameMatching: true`로 직접 변경 가능한 이름/이메일/닉네임 매칭을 활성화하세요.
+Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC에서는 발신자 인증이 기본적으로 ID 우선입니다.
+그 위험을 명시적으로 받아들일 경우에만 각 채널의 `dangerouslyAllowNameMatching: true`로 직접적인 변경 가능한 이름/이메일/닉네임 매칭을 활성화하세요.
 
-### Anthropic API 키 + MiniMax 대체
+### Anthropic API 키 + MiniMax 폴백
 
 ```json5
 {
@@ -573,13 +571,13 @@ Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC의 경우 발신자 인
 }
 ```
 
-### 업무용 봇(제한된 액세스)
+### 업무용 봇(제한된 접근)
 
 ```json5
 {
   identity: {
     name: "WorkBot",
-    theme: "professional assistant",
+    theme: "전문적인 어시스턴트",
   },
   agent: {
     workspace: "~/work-openclaw",
@@ -616,7 +614,7 @@ Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC의 경우 발신자 인
         models: [
           {
             id: "my-local-model",
-            name: "Local Model",
+            name: "로컬 모델",
             reasoning: false,
             input: ["text"],
             cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
@@ -632,7 +630,12 @@ Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC의 경우 발신자 인
 
 ## 팁
 
-- `dmPolicy: "open"`을 설정하는 경우, 해당 `allowFrom` 목록에는 반드시 `"*"`가 포함되어야 합니다.
-- 공급자 ID 형식은 서로 다릅니다(전화번호, 사용자 ID, 채널 ID). 형식 확인은 각 공급자 문서를 참조하세요.
+- `dmPolicy: "open"`을 설정하면 해당 `allowFrom` 목록에는 반드시 `"*"`가 포함되어야 합니다.
+- provider ID는 서로 다릅니다(전화번호, 사용자 ID, 채널 ID). 형식을 확인하려면 provider 문서를 참조하세요.
 - 나중에 추가할 수 있는 선택 섹션: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
-- 더 자세한 설정 참고 사항은 [Providers](/providers) 및 [Troubleshooting](/gateway/troubleshooting)을 참조하세요.
+- 더 자세한 설정 내용은 [Providers](/ko/providers) 및 [문제 해결](/ko/gateway/troubleshooting)을 참조하세요.
+
+## 관련
+
+- [구성 참조](/ko/gateway/configuration-reference)
+- [구성](/ko/gateway/configuration)

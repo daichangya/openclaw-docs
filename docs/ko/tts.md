@@ -3,12 +3,16 @@ redirect: /tools/tts
 summary: '`/tools/tts`로 리디렉션'
 title: 텍스트 음성 변환
 x-i18n:
-    generated_at: "2026-04-23T14:09:55Z"
+    generated_at: "2026-04-24T06:44:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 87d5df4216805bde41fb099e4fc7ec97a82658cdbd80cc1224dd9fee81c49abf
+    source_hash: 7a2383813c9a16e4c10e0e26b4de2e519f64425196c7cf4bb4d1bd144002662a
     source_path: tts.md
     workflow: 15
 ---
 
-이 페이지는 [텍스트 음성 변환](/ko/tools/tts)(으)로 이동했습니다.
+이 페이지는 [Text-to-Speech](/ko/tools/tts)로 이동되었습니다.
+
+## 관련 문서
+
+- [텍스트 음성 변환](/ko/tools/tts)

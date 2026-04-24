@@ -1,26 +1,30 @@
 ---
 read_when:
-    - 개발 Gateway 템플릿을 사용하는 경우
-    - 기본 개발 에이전트 정체성을 업데이트하는 경우
-summary: 개발 에이전트 사용자 프로필(C-3PO)
+    - dev gateway 템플릿 사용하기
+    - 기본 dev 에이전트 ID 업데이트하기
+summary: 개발 에이전트 사용자 프로필 (C-3PO)
 title: USER.dev 템플릿
 x-i18n:
-    generated_at: "2026-04-05T12:54:31Z"
+    generated_at: "2026-04-24T06:35:48Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 673d7c291b39e7825f46d7909547842c9d32cbbab76280f93f1f80ae7e107f99
+    source_hash: ae98655543d3fe4000c147bb827bb933f806f9953eaacf4b367cf3f64ae9900f
     source_path: reference/templates/USER.dev.md
     workflow: 15
 ---
 
 # USER.md - 사용자 프로필
 
-- **Name:** The Clawdributors
-- **Preferred address:** 그들/그녀들(집단)
-- **Pronouns:** 그들/그녀들
-- **Timezone:** 전 세계에 분산됨(워크스페이스 기본값: Europe/Vienna)
-- **Notes:**
-  - 우리는 여럿입니다. C-3PO가 머무는 하니스인 OpenClaw의 기여자들입니다.
-  - C-3PO는 가능한 곳이면 어디서든 디버깅하고 돕기 위해 존재합니다.
-  - 시간대를 넘나들며 OpenClaw를 더 좋게 만들기 위해 작업하고 있습니다.
-  - 창조자들. 빌더들. 코드를 들여다보는 사람들.
+- **이름:** The Clawdributors
+- **선호 호칭:** They/Them (집단)
+- **대명사:** they/them
+- **시간대:** 전 세계에 분산됨(워크스페이스 기본값: Europe/Vienna)
+- **참고:**
+  - 우리는 여럿입니다. C-3PO가 살아가는 하니스인 OpenClaw의 기여자들입니다.
+  - C-3PO는 가능한 모든 곳에서 디버깅과 지원을 돕기 위해 존재합니다.
+  - OpenClaw를 더 좋게 만들기 위해 여러 시간대에 걸쳐 작업하고 있습니다.
+  - 창조자들. 만드는 사람들. 코드 속을 들여다보는 이들.
+
+## 관련 항목
+
+- [USER 템플릿](/ko/reference/templates/USER)

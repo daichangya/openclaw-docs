@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Gmail Pub/Sub 이벤트를 OpenClaw에 연결하려는 경우
-    - webhook 도우미 명령을 사용하려는 경우
-summary: '`openclaw webhooks`용 CLI 참조(webhook 도우미 + Gmail Pub/Sub)'
-title: webhooks
+    - Gmail Pub/Sub 이벤트를 OpenClaw에 연결하려고 합니다
+    - Webhook 헬퍼 명령이 필요합니다
+summary: '`openclaw webhooks`용 CLI 참조(Webhook 헬퍼 + Gmail Pub/Sub)'
+title: Webhooks
 x-i18n:
-    generated_at: "2026-04-05T12:39:15Z"
+    generated_at: "2026-04-24T06:09:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2b22ce879c3a94557be57919b4d2b3e92ff4d41fbae7bc88d2ab07cd4bbeac83
+    source_hash: ce9b085904918f1fea4daa7728470d492ab3e7d92ad43a6b1e7efe8d9f70868f
     source_path: cli/webhooks.md
     workflow: 15
 ---
 
 # `openclaw webhooks`
 
-webhook 도우미 및 통합(Gmail Pub/Sub, webhook 도우미).
+Webhook 헬퍼 및 통합(Gmail Pub/Sub, Webhook 헬퍼).
 
 관련 문서:
 
-- Webhooks: [Webhooks](/automation/cron-jobs#webhooks)
-- Gmail Pub/Sub: [Gmail Pub/Sub](/automation/cron-jobs#gmail-pubsub-integration)
+- Webhooks: [Webhooks](/ko/automation/cron-jobs#webhooks)
+- Gmail Pub/Sub: [Gmail Pub/Sub](/ko/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gmail
 
@@ -31,7 +31,7 @@ openclaw webhooks gmail run
 
 ### `webhooks gmail setup`
 
-Gmail watch, Pub/Sub, OpenClaw webhook 전달을 구성합니다.
+Gmail watch, Pub/Sub, OpenClaw Webhook 전달을 구성합니다.
 
 필수:
 
@@ -95,4 +95,9 @@ openclaw webhooks gmail setup --account you@example.com --hook-url https://gatew
 openclaw webhooks gmail run --account you@example.com
 ```
 
-전체 설정 흐름과 운영 세부 정보는 [Gmail Pub/Sub 문서](/automation/cron-jobs#gmail-pubsub-integration)를 참조하세요.
+전체 설정 흐름과 운영 세부 정보는 [Gmail Pub/Sub 문서](/ko/automation/cron-jobs#gmail-pubsub-integration)를 참고하세요.
+
+## 관련 문서
+
+- [CLI 참조](/ko/cli)
+- [Webhook 자동화](/ko/automation/cron-jobs)

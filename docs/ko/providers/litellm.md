@@ -1,30 +1,28 @@
 ---
 read_when:
-    - LiteLLM 프록시를 통해 OpenClaw를 라우팅하려고 합니다
+    - OpenClaw를 LiteLLM 프록시를 통해 라우팅하고 싶습니다
     - LiteLLM을 통한 비용 추적, 로깅 또는 모델 라우팅이 필요합니다
-summary: LiteLLM Proxy를 통해 OpenClaw를 실행하여 통합 모델 액세스 및 비용 추적 사용
+summary: LiteLLM Proxy를 통해 OpenClaw를 실행하여 통합 모델 접근 및 비용 추적 사용하기
 title: LiteLLM
 x-i18n:
-    generated_at: "2026-04-23T14:06:48Z"
+    generated_at: "2026-04-24T06:31:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6f9665b204126861a7dbbd426b26a624e60fd219a44756cec6a023df73848cef
+    source_hash: 9da14e6ded4c9e0b54989898a982987c0a60f6f6170d10b6cd2eddcd5106630f
     source_path: providers/litellm.md
     workflow: 15
 ---
 
-# LiteLLM
-
-[LiteLLM](https://litellm.ai)은 100개 이상의 모델 provider에 대한 통합 API를 제공하는 오픈 소스 LLM Gateway입니다. OpenClaw를 LiteLLM을 통해 라우팅하면 중앙 집중식 비용 추적, 로깅, 그리고 OpenClaw config를 변경하지 않고도 백엔드를 전환할 수 있는 유연성을 얻을 수 있습니다.
+[LiteLLM](https://litellm.ai)은 100개 이상의 모델 provider에 대한 통합 API를 제공하는 오픈소스 LLM Gateway입니다. OpenClaw를 LiteLLM을 통해 라우팅하면 비용 추적과 로깅을 중앙화하고, OpenClaw config를 바꾸지 않고도 백엔드를 유연하게 전환할 수 있습니다.
 
 <Tip>
-**OpenClaw에서 LiteLLM을 사용하는 이유는 무엇인가요?**
+**OpenClaw와 함께 LiteLLM을 사용하는 이유는?**
 
-- **비용 추적** — 모든 모델에서 OpenClaw가 정확히 얼마나 사용했는지 확인
+- **비용 추적** — 모든 모델에서 OpenClaw가 정확히 얼마를 쓰는지 확인
 - **모델 라우팅** — config 변경 없이 Claude, GPT-4, Gemini, Bedrock 간 전환
 - **가상 키** — OpenClaw용 지출 한도가 있는 키 생성
 - **로깅** — 디버깅을 위한 전체 요청/응답 로그
-- **fallback** — 기본 provider가 다운된 경우 자동 failover
+- **폴백** — 기본 provider가 다운되었을 때 자동 페일오버
 
 </Tip>
 
@@ -32,7 +30,7 @@ x-i18n:
 
 <Tabs>
   <Tab title="온보딩(권장)">
-    **가장 적합한 경우:** 작동하는 LiteLLM 설정으로 가는 가장 빠른 경로.
+    **적합한 경우:** LiteLLM을 가장 빠르게 작동시키고 싶을 때
 
     <Steps>
       <Step title="온보딩 실행">
@@ -45,7 +43,7 @@ x-i18n:
   </Tab>
 
   <Tab title="수동 설정">
-    **가장 적합한 경우:** 설치 및 config를 완전히 제어하려는 경우.
+    **적합한 경우:** 설치와 config를 완전히 직접 제어하고 싶을 때
 
     <Steps>
       <Step title="LiteLLM Proxy 시작">
@@ -54,14 +52,14 @@ x-i18n:
         litellm --model claude-opus-4-6
         ```
       </Step>
-      <Step title="OpenClaw를 LiteLLM으로 지정">
+      <Step title="OpenClaw를 LiteLLM에 연결">
         ```bash
         export LITELLM_API_KEY="your-litellm-key"
 
         openclaw
         ```
 
-        이제 완료되었습니다. OpenClaw는 이제 LiteLLM을 통해 라우팅됩니다.
+        이것으로 끝입니다. 이제 OpenClaw는 LiteLLM을 통해 라우팅됩니다.
       </Step>
     </Steps>
 
@@ -115,11 +113,11 @@ export LITELLM_API_KEY="sk-litellm-key"
 }
 ```
 
-## 고급 주제
+## 고급 구성
 
 <AccordionGroup>
   <Accordion title="가상 키">
-    지출 한도가 있는 OpenClaw 전용 키를 생성합니다:
+    지출 한도가 있는 OpenClaw 전용 키를 생성하세요.
 
     ```bash
     curl -X POST "http://localhost:4000/key/generate" \
@@ -137,7 +135,7 @@ export LITELLM_API_KEY="sk-litellm-key"
   </Accordion>
 
   <Accordion title="모델 라우팅">
-    LiteLLM은 모델 요청을 서로 다른 백엔드로 라우팅할 수 있습니다. LiteLLM `config.yaml`에서 구성하세요:
+    LiteLLM은 모델 요청을 다른 백엔드로 라우팅할 수 있습니다. LiteLLM의 `config.yaml`에서 구성하세요.
 
     ```yaml
     model_list:
@@ -157,7 +155,7 @@ export LITELLM_API_KEY="sk-litellm-key"
   </Accordion>
 
   <Accordion title="사용량 보기">
-    LiteLLM 대시보드 또는 API를 확인하세요:
+    LiteLLM의 대시보드나 API를 확인하세요.
 
     ```bash
     # 키 정보
@@ -171,34 +169,35 @@ export LITELLM_API_KEY="sk-litellm-key"
 
   </Accordion>
 
-  <Accordion title="프록시 동작 참고 사항">
+  <Accordion title="프록시 동작 참고">
     - LiteLLM은 기본적으로 `http://localhost:4000`에서 실행됩니다
     - OpenClaw는 LiteLLM의 프록시 스타일 OpenAI 호환 `/v1`
-      endpoint를 통해 연결합니다
-    - 네이티브 OpenAI 전용 요청 shaping은 LiteLLM을 통해서는 적용되지 않습니다:
-      `service_tier` 없음, Responses `store` 없음, prompt-cache 힌트 없음, OpenAI reasoning 호환 payload shaping 없음
+      엔드포인트를 통해 연결합니다
+    - 네이티브 OpenAI 전용 요청 형식 조정은 LiteLLM 경유 시 적용되지 않습니다:
+      `service_tier` 없음, Responses `store` 없음, prompt-cache 힌트 없음,
+      OpenAI reasoning 호환 페이로드 형식 조정 없음
     - 숨겨진 OpenClaw attribution 헤더(`originator`, `version`, `User-Agent`)는
       사용자 지정 LiteLLM base URL에는 주입되지 않습니다
   </Accordion>
 </AccordionGroup>
 
 <Note>
-일반적인 provider 구성 및 failover 동작은 [Model Providers](/ko/concepts/model-providers)를 참조하세요.
+일반적인 provider 구성과 페일오버 동작은 [Model Providers](/ko/concepts/model-providers)를 참조하세요.
 </Note>
 
-## 관련 문서
+## 관련 항목
 
 <CardGroup cols={2}>
   <Card title="LiteLLM 문서" href="https://docs.litellm.ai" icon="book">
-    공식 LiteLLM 문서 및 API 참조.
+    공식 LiteLLM 문서 및 API 참조
   </Card>
-  <Card title="모델 provider" href="/ko/concepts/model-providers" icon="layers">
-    모든 provider, 모델 ref, failover 동작 개요.
+  <Card title="모델 선택" href="/ko/concepts/model-providers" icon="layers">
+    모든 provider, 모델 ref, 페일오버 동작 개요
   </Card>
   <Card title="구성" href="/ko/gateway/configuration" icon="gear">
-    전체 config 참조.
+    전체 config 참조
   </Card>
   <Card title="모델 선택" href="/ko/concepts/models" icon="brain">
-    모델을 선택하고 구성하는 방법.
+    모델을 선택하고 구성하는 방법
   </Card>
 </CardGroup>

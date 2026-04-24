@@ -1,13 +1,13 @@
 ---
 read_when:
-    - pairing 모드 DM을 사용 중이고 발신자를 승인해야 하는 경우
-summary: '`openclaw pairing`용 CLI 참조(페어링 요청 승인/목록)'
-title: pairing
+    - 페어링 모드 DM을 사용 중이며 발신자를 승인해야 합니다
+summary: '`openclaw pairing`에 대한 CLI 참조(페어링 요청 승인/목록 표시)'
+title: 페어링
 x-i18n:
-    generated_at: "2026-04-05T12:38:43Z"
+    generated_at: "2026-04-24T06:08:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 122a608ef83ec2b1011fdfd1b59b94950a4dcc8b598335b0956e2eedece4958f
+    source_hash: 9e81dc407138e958e41d565b0addb600ad1ba5187627bb219f0b85b92bd112d1
     source_path: cli/pairing.md
     workflow: 15
 ---
@@ -16,9 +16,9 @@ x-i18n:
 
 DM 페어링 요청을 승인하거나 검사합니다(페어링을 지원하는 채널용).
 
-관련 문서:
+관련:
 
-- 페어링 흐름: [페어링](/channels/pairing)
+- 페어링 흐름: [페어링](/ko/channels/pairing)
 
 ## 명령
 
@@ -34,18 +34,18 @@ openclaw pairing approve --channel telegram --account work <code> --notify
 
 ## `pairing list`
 
-하나의 채널에 대한 대기 중인 페어링 요청을 나열합니다.
+하나의 채널에 대해 대기 중인 페어링 요청을 나열합니다.
 
 옵션:
 
-- `[channel]`: 위치 기반 채널 ID
+- `[channel]`: 위치 채널 ID
 - `--channel <channel>`: 명시적 채널 ID
 - `--account <accountId>`: 다중 계정 채널용 계정 ID
-- `--json`: 기계 판독 가능 출력
+- `--json`: 기계 판독 가능한 출력
 
 참고:
 
-- 여러 페어링 지원 채널이 구성된 경우, 위치 인수 또는 `--channel`을 사용해 채널을 제공해야 합니다.
+- 페어링 가능한 채널이 여러 개 구성되어 있으면 위치 인수 또는 `--channel`로 채널을 제공해야 합니다.
 - 채널 ID가 유효한 한 extension 채널도 허용됩니다.
 
 ## `pairing approve`
@@ -56,17 +56,22 @@ openclaw pairing approve --channel telegram --account work <code> --notify
 
 - `openclaw pairing approve <channel> <code>`
 - `openclaw pairing approve --channel <channel> <code>`
-- 정확히 하나의 페어링 지원 채널만 구성된 경우 `openclaw pairing approve <code>`
+- 정확히 하나의 페어링 가능한 채널만 구성된 경우 `openclaw pairing approve <code>`
 
 옵션:
 
 - `--channel <channel>`: 명시적 채널 ID
 - `--account <accountId>`: 다중 계정 채널용 계정 ID
-- `--notify`: 동일한 채널에서 요청자에게 확인 메시지 전송
+- `--notify`: 동일한 채널에서 요청자에게 확인 메시지를 다시 보냄
 
 ## 참고
 
-- 채널 입력: 위치 인수로 전달하거나(`pairing list telegram`) `--channel <channel>`을 사용하세요.
-- `pairing list`는 다중 계정 채널에 대해 `--account <accountId>`를 지원합니다.
-- `pairing approve`는 `--account <accountId>` 및 `--notify`를 지원합니다.
-- 하나의 페어링 지원 채널만 구성된 경우 `pairing approve <code>`를 사용할 수 있습니다.
+- 채널 입력: 위치 인수로 전달(`pairing list telegram`)하거나 `--channel <channel>`을 사용하세요.
+- `pairing list`는 다중 계정 채널용 `--account <accountId>`를 지원합니다.
+- `pairing approve`는 `--account <accountId>`와 `--notify`를 지원합니다.
+- 정확히 하나의 페어링 가능한 채널만 구성된 경우 `pairing approve <code>`를 사용할 수 있습니다.
+
+## 관련
+
+- [CLI 참조](/ko/cli)
+- [채널 페어링](/ko/channels/pairing)

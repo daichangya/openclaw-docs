@@ -2,14 +2,18 @@
 summary: /cli/message로 리디렉션
 title: 투표
 x-i18n:
-    generated_at: "2026-04-23T13:58:03Z"
+    generated_at: "2026-04-24T06:02:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0639c4d35678e5cb0d3a262e2db9cd8db1e25e3eb26adc28bf76b5df14e5446f
+    source_hash: a277212ed680b7aeb9153d003bc084d2d0c918dc53f2f469c72f7fe5a881cfae
     source_path: automation/poll.md
     workflow: 15
 ---
 
-# 투표
+이 페이지는 [Message tool](/ko/cli/message)(으)로 이동했습니다. 투표 문서는 [Message tool](/ko/cli/message)에서 확인하세요.
 
-이 페이지는 [Message tool](/ko/cli/message)(으)로 이동했습니다. 투표 문서는 [Message tool](/ko/cli/message)을(를) 참조하세요.
+## 관련
+
+- [Webhook](/ko/automation/cron-jobs)
+- [예약된 작업](/ko/automation/cron-jobs)
+- [백그라운드 작업](/ko/automation/tasks)
