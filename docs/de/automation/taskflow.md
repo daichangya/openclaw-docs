@@ -1,89 +1,87 @@
 ---
 read_when:
-    - Sie möchten verstehen, wie TaskFlow mit Hintergrundaufgaben zusammenhängt.
-    - Sie stoßen in Versionshinweisen oder der Dokumentation auf Task Flow oder den Aufgabenablauf von OpenClaw.
-    - Sie möchten den dauerhaften Ablaufstatus prüfen oder verwalten.
-summary: Task-Flow-Orchestrierungsschicht oberhalb von Hintergrundaufgaben
-title: Task-Flow
+    - Sie möchten verstehen, wie Task Flow mit Hintergrundaufgaben zusammenhängt.
+    - Sie stoßen in Release Notes oder der Dokumentation auf Task Flow oder openclaw tasks flow.
+    - Sie möchten den dauerhaften Flow-Status prüfen oder verwalten.
+summary: TaskFlow-Orchestrierungsschicht oberhalb von Hintergrundaufgaben
+title: Aufgabenfluss
 x-i18n:
-    generated_at: "2026-04-23T06:25:35Z"
+    generated_at: "2026-04-24T06:26:43Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f94a3cda89db5bfcc6c396358bc3fcee40f9313e102dc697d985f40707381468
+    source_hash: 90286fb783db5417ab5e781377a85be76cd3f9e9b32da57558c2d8f02b813dba
     source_path: automation/taskflow.md
     workflow: 15
 ---
 
-# Task Flow
+TaskFlow ist die Flow-Orchestrierungsschicht, die oberhalb von [Hintergrundaufgaben](/de/automation/tasks) sitzt. Sie verwaltet dauerhafte mehrstufige Flows mit eigenem Status, Revisionsverfolgung und Synchronisationssemantik, während einzelne Aufgaben die Einheit entkoppelter Arbeit bleiben.
 
-Task Flow ist das Orchestrierungssubstrat für Abläufe, das oberhalb von [Hintergrundaufgaben](/de/automation/tasks) liegt. Es verwaltet dauerhafte mehrstufige Abläufe mit eigenem Status, Revisionsverfolgung und Synchronisierungssemantik, während einzelne Aufgaben die Einheit entkoppelter Arbeit bleiben.
+## Wann Sie TaskFlow verwenden sollten
 
-## Wann Task Flow verwendet werden sollte
+Verwenden Sie TaskFlow, wenn sich Arbeit über mehrere aufeinanderfolgende oder verzweigte Schritte erstreckt und Sie eine dauerhafte Fortschrittsverfolgung über Gateway-Neustarts hinweg benötigen. Für einzelne Hintergrundvorgänge reicht eine einfache [Aufgabe](/de/automation/tasks) aus.
 
-Verwenden Sie Task Flow, wenn sich Arbeit über mehrere aufeinanderfolgende oder verzweigte Schritte erstreckt und Sie eine dauerhafte Fortschrittsverfolgung über Gateway-Neustarts hinweg benötigen. Für einzelne Hintergrundoperationen ist eine einfache [Aufgabe](/de/automation/tasks) ausreichend.
-
-| Szenario                             | Verwenden             |
+| Szenario                             | Verwenden Sie         |
 | ------------------------------------ | --------------------- |
 | Einzelner Hintergrundjob             | Einfache Aufgabe      |
-| Mehrstufige Pipeline (A, dann B, dann C) | Task Flow (verwaltet) |
-| Extern erstellte Aufgaben beobachten | Task Flow (gespiegelt) |
+| Mehrstufige Pipeline (A dann B dann C) | TaskFlow (verwaltet)  |
+| Extern erstellte Aufgaben beobachten | TaskFlow (gespiegelt) |
 | Einmalige Erinnerung                 | Cron-Job              |
 
-## Synchronisierungsmodi
+## Synchronisationsmodi
 
 ### Verwalteter Modus
 
-Task Flow besitzt den gesamten Lebenszyklus von Anfang bis Ende. Es erstellt Aufgaben als Ablaufschritte, führt sie bis zum Abschluss und setzt den Ablaufstatus automatisch fort.
+TaskFlow besitzt den Lebenszyklus vollständig von Anfang bis Ende. Es erstellt Aufgaben als Flow-Schritte, führt sie bis zum Abschluss und setzt den Flow-Status automatisch fort.
 
-Beispiel: ein wöchentlicher Berichtsablauf, der (1) Daten sammelt, (2) den Bericht erstellt und (3) ihn zustellt. Task Flow erstellt jeden Schritt als Hintergrundaufgabe, wartet auf den Abschluss und wechselt dann zum nächsten Schritt.
+Beispiel: ein wöchentlicher Berichts-Flow, der (1) Daten sammelt, (2) den Bericht erstellt und (3) ihn zustellt. TaskFlow erstellt jeden Schritt als Hintergrundaufgabe, wartet auf den Abschluss und wechselt dann zum nächsten Schritt.
 
 ```text
 Flow: weekly-report
-  Step 1: gather-data     → task created → succeeded
-  Step 2: generate-report → task created → succeeded
-  Step 3: deliver         → task created → running
+  Schritt 1: gather-data     → Aufgabe erstellt → erfolgreich
+  Schritt 2: generate-report → Aufgabe erstellt → erfolgreich
+  Schritt 3: deliver         → Aufgabe erstellt → wird ausgeführt
 ```
 
 ### Gespiegelter Modus
 
-Task Flow beobachtet extern erstellte Aufgaben und hält den Ablaufstatus synchron, ohne die Verantwortung für die Aufgabenerstellung zu übernehmen. Das ist nützlich, wenn Aufgaben aus Cron-Jobs, CLI-Befehlen oder anderen Quellen stammen und Sie eine einheitliche Ansicht ihres Fortschritts als Ablauf möchten.
+TaskFlow beobachtet extern erstellte Aufgaben und hält den Flow-Status synchron, ohne die Erstellung der Aufgaben zu übernehmen. Dies ist nützlich, wenn Aufgaben aus Cron-Jobs, CLI-Befehlen oder anderen Quellen stammen und Sie eine einheitliche Sicht auf ihren Fortschritt als Flow möchten.
 
-Beispiel: drei unabhängige Cron-Jobs, die zusammen eine „Morgenroutine für den Betrieb“ bilden. Ein gespiegelter Ablauf verfolgt ihren gemeinsamen Fortschritt, ohne zu steuern, wann oder wie sie ausgeführt werden.
+Beispiel: drei unabhängige Cron-Jobs, die zusammen eine „Morning Ops“-Routine bilden. Ein gespiegelter Flow verfolgt ihren gemeinsamen Fortschritt, ohne zu steuern, wann oder wie sie ausgeführt werden.
 
 ## Dauerhafter Status und Revisionsverfolgung
 
-Jeder Ablauf speichert seinen eigenen Status dauerhaft und verfolgt Revisionen, damit der Fortschritt Gateway-Neustarts übersteht. Die Revisionsverfolgung ermöglicht Konflikterkennung, wenn mehrere Quellen versuchen, denselben Ablauf gleichzeitig fortzusetzen.
+Jeder Flow speichert seinen eigenen Status dauerhaft und verfolgt Revisionen, sodass der Fortschritt Gateway-Neustarts übersteht. Die Revisionsverfolgung ermöglicht die Erkennung von Konflikten, wenn mehrere Quellen versuchen, denselben Flow gleichzeitig fortzusetzen.
 
-## Abbruchverhalten
+## Verhalten bei Abbruch
 
-`openclaw tasks flow cancel` setzt eine dauerhafte Abbruchabsicht für den Ablauf. Aktive Aufgaben innerhalb des Ablaufs werden abgebrochen, und es werden keine neuen Schritte gestartet. Die Abbruchabsicht bleibt über Neustarts hinweg bestehen, sodass ein abgebrochener Ablauf abgebrochen bleibt, auch wenn das Gateway neu startet, bevor alle untergeordneten Aufgaben beendet wurden.
+`openclaw tasks flow cancel` setzt eine dauerhafte Abbruchabsicht auf dem Flow. Aktive Aufgaben innerhalb des Flows werden abgebrochen, und es werden keine neuen Schritte gestartet. Die Abbruchabsicht bleibt über Neustarts hinweg bestehen, sodass ein abgebrochener Flow abgebrochen bleibt, selbst wenn das Gateway neu startet, bevor alle untergeordneten Aufgaben beendet wurden.
 
 ## CLI-Befehle
 
 ```bash
-# List active and recent flows
+# Aktive und kürzliche Flows auflisten
 openclaw tasks flow list
 
-# Show details for a specific flow
+# Details für einen bestimmten Flow anzeigen
 openclaw tasks flow show <lookup>
 
-# Cancel a running flow and its active tasks
+# Einen laufenden Flow und seine aktiven Aufgaben abbrechen
 openclaw tasks flow cancel <lookup>
 ```
 
-| Befehl                            | Beschreibung                                     |
-| --------------------------------- | ------------------------------------------------ |
-| `openclaw tasks flow list`        | Zeigt verfolgte Abläufe mit Status und Synchronisierungsmodus |
-| `openclaw tasks flow show <id>`   | Prüft einen Ablauf anhand der Ablauf-ID oder des Lookup-Schlüssels |
-| `openclaw tasks flow cancel <id>` | Bricht einen laufenden Ablauf und seine aktiven Aufgaben ab |
+| Befehl                            | Beschreibung                                      |
+| --------------------------------- | ------------------------------------------------- |
+| `openclaw tasks flow list`        | Zeigt verfolgte Flows mit Status und Synchronisationsmodus |
+| `openclaw tasks flow show <id>`   | Einen Flow nach Flow-ID oder Lookup-Schlüssel prüfen |
+| `openclaw tasks flow cancel <id>` | Einen laufenden Flow und seine aktiven Aufgaben abbrechen |
 
-## Wie Abläufe mit Aufgaben zusammenhängen
+## Wie Flows mit Aufgaben zusammenhängen
 
-Abläufe koordinieren Aufgaben, ersetzen sie aber nicht. Ein einzelner Ablauf kann im Lauf seiner Lebensdauer mehrere Hintergrundaufgaben steuern. Verwenden Sie `openclaw tasks`, um einzelne Aufgabeneinträge zu prüfen, und `openclaw tasks flow`, um den orchestrierenden Ablauf zu prüfen.
+Flows koordinieren Aufgaben, ersetzen sie aber nicht. Ein einzelner Flow kann im Laufe seiner Lebensdauer mehrere Hintergrundaufgaben steuern. Verwenden Sie `openclaw tasks`, um einzelne Aufgaben-Einträge zu prüfen, und `openclaw tasks flow`, um den orchestrierenden Flow zu prüfen.
 
 ## Verwandt
 
-- [Hintergrundaufgaben](/de/automation/tasks) — das Verzeichnis entkoppelter Arbeit, das von Abläufen koordiniert wird
-- [CLI: Aufgaben](/de/cli/tasks) — CLI-Befehlsreferenz für `openclaw tasks flow`
+- [Hintergrundaufgaben](/de/automation/tasks) — das Verzeichnis entkoppelter Arbeit, das von Flows koordiniert wird
+- [CLI: tasks](/de/cli/tasks) — CLI-Befehlsreferenz für `openclaw tasks flow`
 - [Automatisierungsübersicht](/de/automation) — alle Automatisierungsmechanismen auf einen Blick
-- [Cron-Jobs](/de/automation/cron-jobs) — geplante Jobs, die in Abläufe einfließen können
+- [Cron-Jobs](/de/automation/cron-jobs) — geplante Jobs, die in Flows einfließen können

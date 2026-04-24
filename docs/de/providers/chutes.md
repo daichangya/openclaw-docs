@@ -2,30 +2,28 @@
 read_when:
     - Sie möchten Chutes mit OpenClaw verwenden
     - Sie benötigen den Einrichtungsweg für OAuth oder API-Schlüssel
-    - Sie möchten das Standardmodell, Aliasse oder das Erkennungsverhalten wissen
-summary: Chutes-Einrichtung (OAuth oder API-Schlüssel, Modellerkennung, Aliasse)
+    - Sie möchten das Standardmodell, Aliasse oder das Erkennungsverhalten וויסן
+summary: Einrichtung von Chutes (OAuth oder API-Schlüssel, Modellerkennung, Aliasse)
 title: Chutes
 x-i18n:
-    generated_at: "2026-04-12T23:30:11Z"
+    generated_at: "2026-04-24T06:53:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 07c52b1d1d2792412e6daabc92df5310434b3520116d9e0fd2ad26bfa5297e1c
+    source_hash: d4e5189cfe32affbd23cce6c626adacd90f435c0cfe4866e2c96ac8bd0312f23
     source_path: providers/chutes.md
     workflow: 15
 ---
 
-# Chutes
-
 [Chutes](https://chutes.ai) stellt Open-Source-Modellkataloge über eine
-OpenAI-kompatible API bereit. OpenClaw unterstützt sowohl Browser-OAuth als auch
-direkte API-Schlüssel-Authentifizierung für den gebündelten Provider `chutes`.
+OpenAI-kompatible API bereit. OpenClaw unterstützt sowohl Browser-OAuth als auch direkte API-Key-
+Authentifizierung für den gebündelten Provider `chutes`.
 
 | Eigenschaft | Wert                         |
 | ----------- | ---------------------------- |
 | Provider    | `chutes`                     |
 | API         | OpenAI-kompatibel            |
 | Base-URL    | `https://llm.chutes.ai/v1`   |
-| Auth        | OAuth oder API-Schlüssel (siehe unten) |
+| Auth        | OAuth oder API key (siehe unten) |
 
 ## Erste Schritte
 
@@ -36,31 +34,31 @@ direkte API-Schlüssel-Authentifizierung für den gebündelten Provider `chutes`
         ```bash
         openclaw onboard --auth-choice chutes
         ```
-        OpenClaw startet den Browser-Ablauf lokal oder zeigt auf entfernten/headless Hosts
-        einen URL- plus Redirect-Einfügeablauf an. OAuth-Token werden über OpenClaw-Auth-Profile
-        automatisch aktualisiert.
+        OpenClaw startet den Browser-Ablauf lokal oder zeigt auf entfernten/headless
+        Hosts einen URL- plus Redirect-Einfüge-Ablauf an. OAuth-Tokens werden über OpenClaw-Auth-
+        Profile automatisch aktualisiert.
       </Step>
-      <Step title="Das Standardmodell überprüfen">
-        Nach dem Onboarding ist das Standardmodell auf
-        `chutes/zai-org/GLM-4.7-TEE` gesetzt und der gebündelte Chutes-Katalog ist
+      <Step title="Das Standardmodell prüfen">
+        Nach dem Onboarding wird das Standardmodell auf
+        `chutes/zai-org/GLM-4.7-TEE` gesetzt und der gebündelte Chutes-Katalog
         registriert.
       </Step>
     </Steps>
   </Tab>
-  <Tab title="API-Schlüssel">
+  <Tab title="API key">
     <Steps>
-      <Step title="Einen API-Schlüssel abrufen">
+      <Step title="Einen API key abrufen">
         Erstellen Sie einen Schlüssel unter
         [chutes.ai/settings/api-keys](https://chutes.ai/settings/api-keys).
       </Step>
-      <Step title="Den API-Schlüssel-Onboarding-Ablauf ausführen">
+      <Step title="Den API-key-Onboarding-Ablauf ausführen">
         ```bash
         openclaw onboard --auth-choice chutes-api-key
         ```
       </Step>
-      <Step title="Das Standardmodell überprüfen">
-        Nach dem Onboarding ist das Standardmodell auf
-        `chutes/zai-org/GLM-4.7-TEE` gesetzt und der gebündelte Chutes-Katalog ist
+      <Step title="Das Standardmodell prüfen">
+        Nach dem Onboarding wird das Standardmodell auf
+        `chutes/zai-org/GLM-4.7-TEE` gesetzt und der gebündelte Chutes-Katalog
         registriert.
       </Step>
     </Steps>
@@ -73,14 +71,13 @@ Beide Auth-Pfade registrieren den gebündelten Chutes-Katalog und setzen das Sta
 `CHUTES_OAUTH_TOKEN`.
 </Note>
 
-## Erkennungsverhalten
+## Discovery-Verhalten
 
-Wenn eine Chutes-Authentifizierung verfügbar ist, fragt OpenClaw mit diesen
-Zugangsdaten den Chutes-Katalog ab und verwendet die erkannten Modelle. Wenn die
-Erkennung fehlschlägt, greift OpenClaw auf einen gebündelten statischen Katalog
-zurück, sodass Onboarding und Start weiterhin funktionieren.
+Wenn Chutes-Auth verfügbar ist, fragt OpenClaw den Chutes-Katalog mit diesen
+Zugangsdaten ab und verwendet die entdeckten Modelle. Wenn die Discovery fehlschlägt, fällt OpenClaw
+auf einen gebündelten statischen Katalog zurück, sodass Onboarding und Start weiterhin funktionieren.
 
-## Standardaliasse
+## Standard-Aliasse
 
 OpenClaw registriert drei praktische Aliasse für den gebündelten Chutes-Katalog:
 
@@ -90,7 +87,7 @@ OpenClaw registriert drei praktische Aliasse für den gebündelten Chutes-Katalo
 | `chutes-pro`    | `chutes/deepseek-ai/DeepSeek-V3.2-TEE`                |
 | `chutes-vision` | `chutes/chutesai/Mistral-Small-3.2-24B-Instruct-2506` |
 
-## Integrierter Startkatalog
+## Integrierter Starter-Katalog
 
 Der gebündelte Fallback-Katalog enthält aktuelle Chutes-Referenzen:
 
@@ -132,22 +129,22 @@ Der gebündelte Fallback-Katalog enthält aktuelle Chutes-Referenzen:
     | `CHUTES_OAUTH_REDIRECT_URI` | Benutzerdefinierte Redirect-URI |
     | `CHUTES_OAUTH_SCOPES` | Benutzerdefinierte OAuth-Scopes |
 
-    Siehe die [Chutes-OAuth-Dokumentation](https://chutes.ai/docs/sign-in-with-chutes/overview)
-    für Anforderungen an Redirect-Apps und weitere Hilfe.
+    Siehe die [Chutes OAuth-Dokumentation](https://chutes.ai/docs/sign-in-with-chutes/overview)
+    für Anforderungen an Redirect-Apps und Hilfe.
 
   </Accordion>
 
   <Accordion title="Hinweise">
-    - Die Erkennung per API-Schlüssel und OAuth verwendet beide dieselbe Provider-ID `chutes`.
+    - Discovery mit API key und OAuth verwendet beide dieselbe Provider-ID `chutes`.
     - Chutes-Modelle werden als `chutes/<model-id>` registriert.
-    - Wenn die Erkennung beim Start fehlschlägt, wird automatisch der gebündelte statische Katalog verwendet.
+    - Wenn die Discovery beim Start fehlschlägt, wird automatisch der gebündelte statische Katalog verwendet.
   </Accordion>
 </AccordionGroup>
 
 ## Verwandt
 
 <CardGroup cols={2}>
-  <Card title="Modell-Provider" href="/de/concepts/model-providers" icon="layers">
+  <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
     Provider-Regeln, Modell-Refs und Failover-Verhalten.
   </Card>
   <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference" icon="gear">
@@ -156,7 +153,7 @@ Der gebündelte Fallback-Katalog enthält aktuelle Chutes-Referenzen:
   <Card title="Chutes" href="https://chutes.ai" icon="arrow-up-right-from-square">
     Chutes-Dashboard und API-Dokumentation.
   </Card>
-  <Card title="Chutes-API-Schlüssel" href="https://chutes.ai/settings/api-keys" icon="key">
-    Chutes-API-Schlüssel erstellen und verwalten.
+  <Card title="Chutes API keys" href="https://chutes.ai/settings/api-keys" icon="key">
+    Chutes API keys erstellen und verwalten.
   </Card>
 </CardGroup>

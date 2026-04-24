@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Sie möchten eine Firecrawl-gestützte Webextraktion
-    - Sie benötigen einen Firecrawl-API-Key
-    - Sie möchten Firecrawl als `web_search`-Provider
-    - Sie möchten Anti-Bot-Extraktion für `web_fetch`
-summary: Firecrawl-Suche, Scraping und web_fetch-Fallback
+    - |-
+      Sie möchten webgestützte Extraktion mit Firecrawl выкарыстоўել Novitads аана to=functions.read კომენტary ＿一本道json
+      {"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-qa-testing/SKILL.md"}
+    - Sie benötigen einen Firecrawl-API key
+    - Sie möchten Firecrawl als `web_search`-Provider ఉపయోగించాలనుకుంటున్నారు
+    - Sie möchten Anti-Bot-Extraktion für `web_fetch` nutzen
+summary: Firecrawl-Suche, Scraping und `web_fetch`-Fallback
 title: Firecrawl
 x-i18n:
-    generated_at: "2026-04-05T12:57:20Z"
+    generated_at: "2026-04-24T07:03:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 45f17fc4b8e81e1bfe25f510b0a64ab0d50c4cc95bcf88d6ba7c62cece26162e
+    source_hash: 9cd7a56c3a5c7d7876daddeef9acdbe25272404916250bdf40d1d7ad31388f19
     source_path: tools/firecrawl.md
     workflow: 15
 ---
-
-# Firecrawl
 
 OpenClaw kann **Firecrawl** auf drei Arten verwenden:
 
@@ -23,12 +23,12 @@ OpenClaw kann **Firecrawl** auf drei Arten verwenden:
 - als explizite Plugin-Tools: `firecrawl_search` und `firecrawl_scrape`
 - als Fallback-Extractor für `web_fetch`
 
-Es handelt sich um einen gehosteten Extraktions-/Suchdienst, der Bot-Umgehung und Caching unterstützt,
-was bei JS-lastigen Websites oder Seiten hilft, die einfache HTTP-Fetches blockieren.
+Es ist ein gehosteter Extraktions-/Suchdienst, der Bot-Umgehung und Caching unterstützt,
+was bei JavaScript-lastigen Websites oder Seiten hilft, die einfache HTTP-Fetches blockieren.
 
-## API-Key abrufen
+## Einen API key abrufen
 
-1. Erstellen Sie ein Firecrawl-Konto und generieren Sie einen API-Key.
+1. Erstellen Sie ein Firecrawl-Konto und generieren Sie einen API key.
 2. Speichern Sie ihn in der Konfiguration oder setzen Sie `FIRECRAWL_API_KEY` in der Gateway-Umgebung.
 
 ## Firecrawl-Suche konfigurieren
@@ -60,13 +60,13 @@ was bei JS-lastigen Websites oder Seiten hilft, die einfache HTTP-Fetches blocki
 
 Hinweise:
 
-- Wenn Sie Firecrawl im Onboarding oder mit `openclaw configure --section web` auswählen, wird das gebündelte Firecrawl-Plugin automatisch aktiviert.
+- Die Auswahl von Firecrawl im Onboarding oder über `openclaw configure --section web` aktiviert das gebündelte Firecrawl-Plugin automatisch.
 - `web_search` mit Firecrawl unterstützt `query` und `count`.
-- Für Firecrawl-spezifische Steuerungen wie `sources`, `categories` oder Ergebnis-Scraping verwenden Sie `firecrawl_search`.
-- `baseUrl`-Overrides müssen auf `https://api.firecrawl.dev` bleiben.
-- `FIRECRAWL_BASE_URL` ist der gemeinsame Env-Fallback für die Base URLs von Firecrawl-Suche und -Scraping.
+- Für Firecrawl-spezifische Steuerungen wie `sources`, `categories` oder Result-Scraping verwenden Sie `firecrawl_search`.
+- Überschreibungen von `baseUrl` müssen auf `https://api.firecrawl.dev` bleiben.
+- `FIRECRAWL_BASE_URL` ist der gemeinsame Env-Fallback für Base-URLs von Firecrawl-Suche und -Scrape.
 
-## Firecrawl-Scraping + web_fetch-Fallback konfigurieren
+## Firecrawl-Scrape + `web_fetch`-Fallback konfigurieren
 
 ```json5
 {
@@ -91,12 +91,12 @@ Hinweise:
 
 Hinweise:
 
-- Firecrawl-Fallback-Versuche werden nur ausgeführt, wenn ein API-Key verfügbar ist (`plugins.entries.firecrawl.config.webFetch.apiKey` oder `FIRECRAWL_API_KEY`).
-- `maxAgeMs` steuert, wie alt gecachte Ergebnisse sein dürfen (ms). Standard sind 2 Tage.
-- Die veraltete Konfiguration `tools.web.fetch.firecrawl.*` wird von `openclaw doctor --fix` automatisch migriert.
-- Overrides für Firecrawl-Scraping/`baseUrl` sind auf `https://api.firecrawl.dev` beschränkt.
+- Firecrawl-Fallback-Versuche laufen nur, wenn ein API key verfügbar ist (`plugins.entries.firecrawl.config.webFetch.apiKey` oder `FIRECRAWL_API_KEY`).
+- `maxAgeMs` steuert, wie alt gecachte Ergebnisse sein dürfen (ms). Standard ist 2 Tage.
+- Veraltete Konfiguration `tools.web.fetch.firecrawl.*` wird von `openclaw doctor --fix` automatisch migriert.
+- Überschreibungen für Firecrawl-Scrape/Base-URL sind auf `https://api.firecrawl.dev` beschränkt.
 
-`firecrawl_scrape` verwendet dieselben Einstellungen und Env-Variablen aus `plugins.entries.firecrawl.config.webFetch.*` erneut.
+`firecrawl_scrape` verwendet dieselben Einstellungen und Env-Variablen aus `plugins.entries.firecrawl.config.webFetch.*` wieder.
 
 ## Firecrawl-Plugin-Tools
 
@@ -104,7 +104,7 @@ Hinweise:
 
 Verwenden Sie dies, wenn Sie Firecrawl-spezifische Suchsteuerungen statt des generischen `web_search` möchten.
 
-Zentrale Parameter:
+Kernparameter:
 
 - `query`
 - `count`
@@ -115,9 +115,9 @@ Zentrale Parameter:
 
 ### `firecrawl_scrape`
 
-Verwenden Sie dies für JS-lastige oder botgeschützte Seiten, bei denen einfaches `web_fetch` schwach ist.
+Verwenden Sie dies für JavaScript-lastige oder botgeschützte Seiten, bei denen einfaches `web_fetch` schwach ist.
 
-Zentrale Parameter:
+Kernparameter:
 
 - `url`
 - `extractMode`
@@ -130,25 +130,25 @@ Zentrale Parameter:
 
 ## Stealth / Bot-Umgehung
 
-Firecrawl stellt einen Parameter für den **Proxy-Modus** zur Bot-Umgehung bereit (`basic`, `stealth` oder `auto`).
-OpenClaw verwendet für Firecrawl-Requests immer `proxy: "auto"` plus `storeInCache: true`.
-Wenn `proxy` weggelassen wird, verwendet Firecrawl standardmäßig `auto`. `auto` versucht bei einem Fehlschlag eines einfachen Versuchs erneut mit Stealth-Proxys, was mehr Credits
-als Scraping nur mit `basic` verbrauchen kann.
+Firecrawl stellt einen **Proxy-Modus**-Parameter für Bot-Umgehung bereit (`basic`, `stealth` oder `auto`).
+OpenClaw verwendet für Firecrawl-Anfragen immer `proxy: "auto"` plus `storeInCache: true`.
+Wenn `proxy` weggelassen wird, verwendet Firecrawl standardmäßig `auto`. `auto` wiederholt mit Stealth-Proxys, wenn ein grundlegender Versuch fehlschlägt, was mehr Credits
+als reines Basic-Scraping verbrauchen kann.
 
 ## Wie `web_fetch` Firecrawl verwendet
 
-Reihenfolge der `web_fetch`-Extraktion:
+Reihenfolge der Extraktion bei `web_fetch`:
 
 1. Readability (lokal)
-2. Firecrawl (wenn ausgewählt oder automatisch als aktiver Web-Fetch-Fallback erkannt)
-3. Einfache HTML-Bereinigung (letzter Fallback)
+2. Firecrawl (wenn ausgewählt oder automatisch als aktiver `web_fetch`-Fallback erkannt)
+3. Grundlegende HTML-Bereinigung (letzter Fallback)
 
-Der Auswahlschalter ist `tools.web.fetch.provider`. Wenn Sie ihn weglassen, erkennt OpenClaw
-den ersten bereiten Web-Fetch-Provider anhand verfügbarer Zugangsdaten automatisch.
+Die Auswahl erfolgt über `tools.web.fetch.provider`. Wenn Sie diesen Wert weglassen, erkennt OpenClaw
+automatisch den ersten einsatzbereiten `web_fetch`-Provider anhand verfügbarer Zugangsdaten.
 Heute ist der gebündelte Provider Firecrawl.
 
 ## Verwandt
 
-- [Überblick Web Search](/tools/web) -- alle Provider und automatische Erkennung
-- [Web Fetch](/tools/web-fetch) -- `web_fetch`-Tool mit Firecrawl-Fallback
-- [Tavily](/tools/tavily) -- Such- und Extraktionstools
+- [Web Search overview](/de/tools/web) -- alle Provider und Auto-Erkennung
+- [Web Fetch](/de/tools/web-fetch) -- `web_fetch`-Tool mit Firecrawl-Fallback
+- [Tavily](/de/tools/tavily) -- Such- und Extraktionstools

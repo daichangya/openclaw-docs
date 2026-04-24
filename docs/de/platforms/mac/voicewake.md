@@ -1,74 +1,80 @@
 ---
 read_when:
-    - Arbeiten an Pfaden für Sprachaktivierung oder PTT
-summary: Sprachaktivierung und Push-to-Talk-Modi plus Routing-Details in der Mac-App
-title: Sprachaktivierung (macOS)
+    - Arbeiten an Voice-Wake- oder PTT-Pfaden
+summary: Voice-Wake- und Push-to-Talk-Modi sowie Routing-Details in der mac-App
+title: Voice-Wake (macOS)
 x-i18n:
-    generated_at: "2026-04-05T12:50:01Z"
+    generated_at: "2026-04-24T06:48:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: fed6524a2e1fad5373d34821c920b955a2b5a3fcd9c51cdb97cf4050536602a7
+    source_hash: 0273c24764f0baf440a19f31435d6ee62ab040c1ec5a97d7733d3ec8b81b0641
     source_path: platforms/mac/voicewake.md
     workflow: 15
 ---
 
-# Sprachaktivierung & Push-to-Talk
+# Voice-Wake & Push-to-Talk
 
 ## Modi
 
-- **Wake-Word-Modus** (Standard): Der ständig aktive Speech-Recognizer wartet auf Auslösetoken (`swabbleTriggerWords`). Bei einer Übereinstimmung startet er die Erfassung, zeigt das Overlay mit Teiltext an und sendet nach Stille automatisch.
-- **Push-to-Talk (rechte Wahltaste halten)**: Halte die rechte Wahltaste gedrückt, um die Erfassung sofort zu starten – kein Auslöser erforderlich. Das Overlay erscheint, solange die Taste gehalten wird; beim Loslassen wird finalisiert und nach einer kurzen Verzögerung weitergeleitet, damit du den Text noch anpassen kannst.
+- **Wake-Word-Modus** (Standard): Der immer aktive Speech-Recognizer wartet auf Trigger-Tokens (`swabbleTriggerWords`). Bei einem Treffer startet er die Aufnahme, zeigt das Overlay mit partiellem Text und sendet nach Stille automatisch.
+- **Push-to-Talk (rechte Wahltaste halten)**: Halten Sie die rechte Wahltaste gedrückt, um die Aufnahme sofort zu starten — kein Trigger erforderlich. Das Overlay erscheint, solange die Taste gehalten wird; beim Loslassen wird finalisiert und nach einer kurzen Verzögerung weitergeleitet, damit Sie den Text noch anpassen können.
 
-## Laufzeitverhalten (Wake-Word)
+## Runtime-Verhalten (Wake-Word)
 
-- Der Speech-Recognizer befindet sich in `VoiceWakeRuntime`.
-- Der Auslöser wird nur aktiviert, wenn zwischen dem Wake-Word und dem nächsten Wort eine **deutliche Pause** liegt (Abstand von etwa 0,55 s). Das Overlay/Signal kann bei der Pause schon starten, noch bevor der Befehl beginnt.
-- Stillefenster: 2,0 s, wenn Sprache fließt, 5,0 s, wenn nur der Auslöser gehört wurde.
-- Harte Begrenzung: 120 s, um außer Kontrolle geratene Sitzungen zu verhindern.
-- Entprellung zwischen Sitzungen: 350 ms.
+- Der Speech-Recognizer lebt in `VoiceWakeRuntime`.
+- Der Trigger wird nur ausgelöst, wenn es zwischen dem Wake-Word und dem nächsten Wort eine **sinnvolle Pause** gibt (ca. 0,55 s Abstand). Das Overlay/Signal kann bereits bei der Pause beginnen, noch bevor der Befehl anfängt.
+- Stillefenster: 2,0 s, wenn Sprache fließt, 5,0 s, wenn nur der Trigger gehört wurde.
+- Harter Stopp: 120 s, um ausufernde Sitzungen zu verhindern.
+- Debounce zwischen Sitzungen: 350 ms.
 - Das Overlay wird über `VoiceWakeOverlayController` mit committed/volatile-Färbung gesteuert.
-- Nach dem Senden startet der Recognizer sauber neu, um auf den nächsten Auslöser zu warten.
+- Nach dem Senden startet der Recognizer sauber neu, um auf den nächsten Trigger zu warten.
 
-## Invarianten im Lebenszyklus
+## Invarianten des Lebenszyklus
 
-- Wenn Sprachaktivierung aktiviert ist und Berechtigungen erteilt wurden, sollte der Wake-Word-Recognizer lauschen (außer während einer expliziten Push-to-Talk-Erfassung).
-- Die Sichtbarkeit des Overlays, einschließlich des manuellen Schließens über die X-Schaltfläche, darf niemals verhindern, dass der Recognizer das Lauschen wieder aufnimmt.
+- Wenn Voice Wake aktiviert ist und Berechtigungen gewährt wurden, sollte der Wake-Word-Recognizer lauschen (außer während einer expliziten Push-to-Talk-Aufnahme).
+- Die Sichtbarkeit des Overlays (einschließlich manuellem Schließen über die X-Schaltfläche) darf niemals verhindern, dass der Recognizer die Arbeit wieder aufnimmt.
 
-## Fehlermodus bei festhängendem Overlay (früher)
+## Fehlerbild „hängendes Overlay“ (früher)
 
-Früher konnte Sprachaktivierung „tot“ wirken, wenn das Overlay sichtbar hängen blieb und du es manuell geschlossen hast, weil der Neustartversuch der Runtime durch die Sichtbarkeit des Overlays blockiert werden konnte und kein weiterer Neustart geplant wurde.
+Früher konnte es so wirken, als sei Voice Wake „tot“, wenn das Overlay sichtbar hängen blieb und Sie es manuell schlossen, weil der Neustartversuch der Runtime durch die Sichtbarkeit des Overlays blockiert werden konnte und kein weiterer Neustart geplant wurde.
 
 Härtung:
 
 - Der Neustart der Wake-Runtime wird nicht mehr durch die Sichtbarkeit des Overlays blockiert.
-- Das Abschließen des Schließens des Overlays löst über `VoiceSessionCoordinator` ein `VoiceWakeRuntime.refresh(...)` aus, sodass ein manuelles Schließen per X das Lauschen immer wieder aufnimmt.
+- Der Abschluss des Schließens des Overlays löst über `VoiceSessionCoordinator` ein `VoiceWakeRuntime.refresh(...)` aus, sodass ein manuelles Schließen über X das Lauschen immer wieder aufnimmt.
 
-## Push-to-Talk-spezifische Details
+## Besonderheiten von Push-to-Talk
 
-- Die Hotkey-Erkennung verwendet einen globalen `.flagsChanged`-Monitor für **rechte Wahltaste** (`keyCode 61` + `.option`). Wir beobachten Ereignisse nur (ohne sie zu unterdrücken).
-- Die Erfassungspipeline befindet sich in `VoicePushToTalk`: startet Speech sofort, streamt Teiltexte an das Overlay und ruft bei Freigabe `VoiceWakeForwarder` auf.
-- Wenn Push-to-Talk startet, pausieren wir die Wake-Word-Runtime, um konkurrierende Audio-Taps zu vermeiden; nach dem Loslassen startet sie automatisch neu.
-- Berechtigungen: erfordert Mikrofon + Speech; zum Erkennen von Ereignissen ist die Freigabe für Bedienungshilfen/Input Monitoring erforderlich.
-- Externe Tastaturen: Manche stellen rechte Wahltaste möglicherweise nicht wie erwartet bereit – biete einen Fallback-Kurzbefehl an, wenn Benutzer über Aussetzer berichten.
+- Die Erkennung des Hotkeys verwendet einen globalen `.flagsChanged`-Monitor für **rechte Wahltaste** (`keyCode 61` + `.option`). Wir beobachten Ereignisse nur (ohne sie zu verschlucken).
+- Die Aufnahme-Pipeline lebt in `VoicePushToTalk`: Sie startet Speech sofort, streamt partielle Ergebnisse an das Overlay und ruft beim Loslassen `VoiceWakeForwarder` auf.
+- Wenn Push-to-Talk startet, pausieren wir die Wake-Word-Runtime, um konkurrierende Audio-Taps zu vermeiden; sie startet nach dem Loslassen automatisch neu.
+- Berechtigungen: Erfordert Mikrofon + Speech; zum Erkennen von Ereignissen ist die Freigabe für Bedienungshilfen/Input Monitoring nötig.
+- Externe Tastaturen: Manche stellen die rechte Wahltaste möglicherweise nicht wie erwartet bereit — bieten Sie einen Fallback-Shortcut an, wenn Benutzer Aussetzer melden.
 
-## Benutzersichtbare Einstellungen
+## Benutzerseitige Einstellungen
 
-- Umschalter **Sprachaktivierung**: aktiviert die Wake-Word-Runtime.
-- **Cmd+Fn halten, um zu sprechen**: aktiviert den Push-to-Talk-Monitor. Deaktiviert unter macOS < 26.
-- Sprach- und Mikrofon-Auswahl, Live-Pegelmesser, Triggerwort-Tabelle, Tester (nur lokal; leitet nicht weiter).
-- Die Mikrofon-Auswahl behält die letzte Auswahl bei, wenn ein Gerät getrennt wird, zeigt einen Hinweis auf die Trennung an und fällt vorübergehend auf den Systemstandard zurück, bis das Gerät wieder verfügbar ist.
-- **Sounds**: Signaltöne bei Trigger-Erkennung und beim Senden; standardmäßig der macOS-Systemton „Glass“. Du kannst für jedes Ereignis jede mit `NSSound` ladbare Datei auswählen (z. B. MP3/WAV/AIFF) oder **No Sound** wählen.
+- Schalter **Voice Wake**: aktiviert die Wake-Word-Runtime.
+- **Cmd+Fn halten, um zu sprechen**: aktiviert den Push-to-Talk-Monitor. Unter macOS < 26 deaktiviert.
+- Sprach- und Mikrofonauswahl, Live-Pegelanzeige, Triggerwort-Tabelle, Tester (nur lokal; leitet nicht weiter).
+- Die Mikrofonauswahl behält die letzte Auswahl bei, wenn ein Gerät getrennt wird, zeigt einen Hinweis auf die Trennung und fällt vorübergehend auf das Systemstandardgerät zurück, bis es wieder verfügbar ist.
+- **Sounds**: Signaltöne bei Trigger-Erkennung und beim Senden; standardmäßig der macOS-Systemton „Glass“. Sie können für jedes Ereignis jede von `NSSound` ladbare Datei wählen (z. B. MP3/WAV/AIFF) oder **No Sound** auswählen.
 
 ## Weiterleitungsverhalten
 
-- Wenn Sprachaktivierung aktiviert ist, werden Transkripte an das aktive Gateway/den aktiven Agenten weitergeleitet (derselbe lokale bzw. entfernte Modus, den auch der Rest der Mac-App verwendet).
-- Antworten werden an den **zuletzt verwendeten Hauptanbieter** zugestellt (WhatsApp/Telegram/Discord/WebChat). Wenn die Zustellung fehlschlägt, wird der Fehler protokolliert und der Lauf ist weiterhin über WebChat/Sitzungsprotokolle sichtbar.
+- Wenn Voice Wake aktiviert ist, werden Transkripte an das aktive Gateway/den aktiven Agenten weitergeleitet (derselbe lokale bzw. Remote-Modus, den auch der Rest der mac-App verwendet).
+- Antworten werden an den **zuletzt verwendeten Haupt-Provider** zugestellt (WhatsApp/Telegram/Discord/WebChat). Wenn die Zustellung fehlschlägt, wird der Fehler protokolliert und der Lauf bleibt dennoch über WebChat/Sitzungslogs sichtbar.
 
-## Weiterleitungs-Payload
+## Payload der Weiterleitung
 
-- `VoiceWakeForwarder.prefixedTranscript(_:)` stellt vor dem Senden den Maschinenhinweis voran. Wird gemeinsam von den Pfaden für Wake-Word und Push-to-Talk verwendet.
+- `VoiceWakeForwarder.prefixedTranscript(_:)` stellt dem Transkript vor dem Senden den Rechnerhinweis voran. Wird gemeinsam von den Wake-Word- und Push-to-Talk-Pfaden verwendet.
 
-## Schnelle Überprüfung
+## Schnelle Verifizierung
 
-- Aktiviere Push-to-Talk, halte Cmd+Fn, sprich, lass los: Das Overlay sollte Teiltexte anzeigen und dann senden.
-- Während des Haltens sollten die Ohren in der Menüleiste vergrößert bleiben (verwendet `triggerVoiceEars(ttl:nil)`); nach dem Loslassen werden sie wieder kleiner.
+- Aktivieren Sie Push-to-Talk, halten Sie Cmd+Fn, sprechen Sie, lassen Sie los: Das Overlay sollte partielle Ergebnisse zeigen und dann senden.
+- Während des Haltens sollten die Ohren in der Menüleiste vergrößert bleiben (verwendet `triggerVoiceEars(ttl:nil)`); nach dem Loslassen fallen sie wieder zurück.
+
+## Verwandt
+
+- [Voice wake](/de/nodes/voicewake)
+- [Voice-Overlay](/de/platforms/mac/voice-overlay)
+- [macOS-App](/de/platforms/macos)

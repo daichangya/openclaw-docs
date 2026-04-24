@@ -1,74 +1,77 @@
 ---
 read_when:
-    - Du möchtest schnellen Zugriff auf wichtige Docs-Seiten
-summary: Kuratiere Links zu den am häufigsten verwendeten OpenClaw-Dokumentationen.
-title: Docs-Verzeichnis
+    - Sie möchten schnellen Zugriff auf wichtige Doku-Seiten.
+summary: Kuratiere Links zu den am häufigsten verwendeten OpenClaw-Dokumenten.
+title: Dokumentationsverzeichnis
 x-i18n:
-    generated_at: "2026-04-05T12:55:41Z"
+    generated_at: "2026-04-24T06:59:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3be1093c9e91ac53df6d115f3668ae8e5811170c751fbc708bcc00232ec9c88a
+    source_hash: 924ac5c5ef1f24fa7afc8f23a53ddab4df75a475d4dba380b9f8f384f3098876
     source_path: start/docs-directory.md
     workflow: 15
 ---
 
-# Docs-Verzeichnis
-
 <Note>
-Diese Seite ist ein kuratierter Index. Wenn du neu bist, beginne mit [Getting Started](/de/start/getting-started).
-Eine vollständige Übersicht der Docs findest du unter [Docs hubs](/start/hubs).
+Diese Seite ist ein kuratierter Index. Wenn Sie neu sind, beginnen Sie mit [Erste Schritte](/de/start/getting-started).
+Eine vollständige Übersicht über die Dokumentation finden Sie unter [Dokumentations-Hubs](/de/start/hubs).
 </Note>
 
-## Hier starten
+## Hier beginnen
 
-- [Docs hubs (alle Seiten verlinkt)](/start/hubs)
-- [Help](/de/help)
-- [Configuration](/de/gateway/configuration)
-- [Configuration examples](/de/gateway/configuration-examples)
-- [Slash commands](/tools/slash-commands)
-- [Multi-agent routing](/de/concepts/multi-agent)
-- [Updating and rollback](/de/install/updating)
-- [Pairing (DM und nodes)](/de/channels/pairing)
-- [Nix mode](/de/install/nix)
-- [OpenClaw assistant setup](/start/openclaw)
-- [Skills](/tools/skills)
-- [Skills config](/tools/skills-config)
-- [Workspace-Vorlagen](/reference/templates/AGENTS)
-- [RPC-Adapter](/reference/rpc)
+- [Dokumentations-Hubs (alle Seiten verlinkt)](/de/start/hubs)
+- [Hilfe](/de/help)
+- [Konfiguration](/de/gateway/configuration)
+- [Konfigurationsbeispiele](/de/gateway/configuration-examples)
+- [Slash-Commands](/de/tools/slash-commands)
+- [Multi-Agent-Routing](/de/concepts/multi-agent)
+- [Aktualisieren und Rollback](/de/install/updating)
+- [Pairing (DM und Nodes)](/de/channels/pairing)
+- [Nix-Modus](/de/install/nix)
+- [OpenClaw-Assistant einrichten](/de/start/openclaw)
+- [Skills](/de/tools/skills)
+- [Skills-Konfiguration](/de/tools/skills-config)
+- [Workspace-Vorlagen](/de/reference/templates/AGENTS)
+- [RPC-Adapter](/de/reference/rpc)
 - [Gateway-Runbook](/de/gateway)
 - [Nodes (iOS und Android)](/de/nodes)
-- [Web surfaces (Control UI)](/web)
-- [Discovery und Transports](/de/gateway/discovery)
-- [Remote access](/de/gateway/remote)
+- [Web-Oberflächen (Control UI)](/de/web)
+- [Discovery und Transporte](/de/gateway/discovery)
+- [Remote-Zugriff](/de/gateway/remote)
 
 ## Provider und UX
 
-- [WebChat](/web/webchat)
-- [Control UI (Browser)](/web/control-ui)
+- [WebChat](/de/web/webchat)
+- [Control UI (Browser)](/de/web/control-ui)
 - [Telegram](/de/channels/telegram)
 - [Discord](/de/channels/discord)
 - [Mattermost](/de/channels/mattermost)
 - [BlueBubbles (iMessage)](/de/channels/bluebubbles)
 - [QQ Bot](/de/channels/qqbot)
 - [iMessage (Legacy)](/de/channels/imessage)
-- [Groups](/de/channels/groups)
+- [Gruppen](/de/channels/groups)
 - [WhatsApp-Gruppennachrichten](/de/channels/group-messages)
-- [Media-Bilder](/de/nodes/images)
-- [Media-Audio](/de/nodes/audio)
+- [Medienbilder](/de/nodes/images)
+- [Medien-Audio](/de/nodes/audio)
 
 ## Begleit-Apps
 
-- [macOS-App](/platforms/macos)
+- [macOS-App](/de/platforms/macos)
 - [iOS-App](/de/platforms/ios)
 - [Android-App](/de/platforms/android)
-- [Windows (WSL2)](/platforms/windows)
+- [Windows (WSL2)](/de/platforms/windows)
 - [Linux-App](/de/platforms/linux)
 
 ## Betrieb und Sicherheit
 
-- [Sessions](/de/concepts/session)
-- [Cron jobs](/de/automation/cron-jobs)
+- [Sitzungen](/de/concepts/session)
+- [Cron-Jobs](/de/automation/cron-jobs)
 - [Webhooks](/de/automation/cron-jobs#webhooks)
 - [Gmail-Hooks (Pub/Sub)](/de/automation/cron-jobs#gmail-pubsub-integration)
-- [Security](/de/gateway/security)
-- [Troubleshooting](/de/gateway/troubleshooting)
+- [Sicherheit](/de/gateway/security)
+- [Fehlerbehebung](/de/gateway/troubleshooting)
+
+## Verwandt
+
+- [Erste Schritte](/de/start/getting-started)
+- [Dokumentations-Hubs](/de/start/hubs)

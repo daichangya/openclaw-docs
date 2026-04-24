@@ -1,45 +1,44 @@
 ---
 read_when:
     - Sie möchten kürzere Tool-Ergebnisse von `exec` oder `bash` in OpenClaw
-    - Sie möchten das gebündelte Tokenjuice-Plugin aktivieren
-    - Sie müssen verstehen, was Tokenjuice verändert und was es roh belässt
-summary: Rauschige Ergebnisse von Exec- und Bash-Tools mit einem optionalen gebündelten Plugin kompakt zusammenfassen
+    - Sie möchten das gebündelte Plugin Tokenjuice aktivieren
+    - Sie müssen verstehen, was Tokenjuice verändert und was unverändert roh bleibt
+summary: Rauschende Ergebnisse von Exec- und Bash-Tools mit einem optionalen gebündelten Plugin komprimieren
 title: Tokenjuice
 x-i18n:
-    generated_at: "2026-04-23T06:36:21Z"
+    generated_at: "2026-04-24T07:05:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9b9a1054c9b1cc62e43ac6d5904c7790f9b27d8e0d0700c9da6e287c00e91783
+    source_hash: 0ff542095eb730f06eadec213289b93e31f1afa179160b7d4e915329f09ad5f1
     source_path: tools/tokenjuice.md
     workflow: 15
 ---
 
-# Tokenjuice
+`tokenjuice` ist ein optionales gebündeltes Plugin, das rauschende Ergebnisse von `exec`- und `bash`-
+Tools komprimiert, nachdem der Befehl bereits ausgeführt wurde.
 
-`tokenjuice` ist ein optionales gebündeltes Plugin, das rauschige Tool-Ergebnisse von `exec` und `bash` kompakt zusammenfasst, nachdem der Befehl bereits ausgeführt wurde.
-
-Es verändert das zurückgegebene `tool_result`, nicht den Befehl selbst. Tokenjuice
+Es ändert das zurückgegebene `tool_result`, nicht den Befehl selbst. Tokenjuice
 schreibt keine Shell-Eingaben um, führt keine Befehle erneut aus und ändert keine Exit-Codes.
 
-Aktuell gilt dies für eingebettete Pi-Läufe, bei denen Tokenjuice in den eingebetteten
-Pfad von `tool_result` eingreift und die Ausgabe kürzt, die in die Sitzung zurückgeht.
+Heute gilt dies für eingebettete Pi-Läufe, bei denen Tokenjuice den eingebetteten
+`tool_result`-Pfad einhakt und die Ausgabe kürzt, die zurück in die Sitzung geht.
 
 ## Das Plugin aktivieren
 
-Schnellster Weg:
+Schneller Weg:
 
 ```bash
 openclaw config set plugins.entries.tokenjuice.enabled true
 ```
 
-Entspricht:
+Entsprechende Alternative:
 
 ```bash
 openclaw plugins enable tokenjuice
 ```
 
-OpenClaw liefert das Plugin bereits mit. Es gibt keinen separaten Schritt
-`plugins install` oder `tokenjuice install openclaw`.
+OpenClaw liefert das Plugin bereits mit. Es gibt keinen separaten Schritt `plugins install`
+oder `tokenjuice install openclaw`.
 
 Wenn Sie die Konfiguration lieber direkt bearbeiten möchten:
 
@@ -55,19 +54,19 @@ Wenn Sie die Konfiguration lieber direkt bearbeiten möchten:
 }
 ```
 
-## Was Tokenjuice verändert
+## Was tokenjuice verändert
 
-- Fasst rauschige Ergebnisse von `exec` und `bash` kompakt zusammen, bevor sie zurück in die Sitzung gespeist werden.
+- Komprimiert rauschende Ergebnisse von `exec` und `bash`, bevor sie zurück in die Sitzung eingespeist werden.
 - Lässt die ursprüngliche Befehlsausführung unverändert.
-- Bewahrt exakte Lesevorgänge von Dateiinhalten und andere Befehle, die Tokenjuice roh belassen soll.
-- Bleibt opt-in: Deaktivieren Sie das Plugin, wenn Sie überall wortgetreue Ausgaben möchten.
+- Bewahrt exakte Dateiinhalts-Lesevorgänge und andere Befehle, die Tokenjuice roh lassen soll.
+- Bleibt Opt-in: Deaktivieren Sie das Plugin, wenn Sie überall wortgetreue Ausgabe möchten.
 
-## Überprüfen, ob es funktioniert
+## Prüfen, ob es funktioniert
 
 1. Aktivieren Sie das Plugin.
 2. Starten Sie eine Sitzung, die `exec` aufrufen kann.
-3. Führen Sie einen rauschigen Befehl wie `git status` aus.
-4. Prüfen Sie, ob das zurückgegebene Tool-Ergebnis kürzer und stärker strukturiert ist als die rohe Shell-Ausgabe.
+3. Führen Sie einen rauschenden Befehl wie `git status` aus.
+4. Prüfen Sie, dass das zurückgegebene Tool-Ergebnis kürzer und strukturierter ist als die rohe Shell-Ausgabe.
 
 ## Das Plugin deaktivieren
 
@@ -80,3 +79,9 @@ Oder:
 ```bash
 openclaw plugins disable tokenjuice
 ```
+
+## Verwandt
+
+- [Exec tool](/de/tools/exec)
+- [Thinking levels](/de/tools/thinking)
+- [Context engine](/de/concepts/context-engine)

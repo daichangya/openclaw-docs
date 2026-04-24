@@ -1,28 +1,26 @@
 ---
 read_when:
-    - Sie müssen Core-Helfer aus einem Plugin aufrufen (TTS, STT, Bildgenerierung, Websuche, Subagent)
-    - Sie möchten verstehen, was `api.runtime` bereitstellt
-    - Sie greifen aus Plugin-Code auf Konfigurations-, Agent- oder Medien-Helfer zu
+    - Sie müssen aus einem Plugin Core-Helper aufrufen (TTS, STT, Bildgenerierung, Web-Suche, Subagent, Nodes).
+    - Sie möchten verstehen, was `api.runtime` bereitstellt.
+    - Sie greifen aus Plugin-Code auf Konfigurations-, Agent- oder Medien-Helper zu.
 sidebarTitle: Runtime Helpers
-summary: api.runtime -- die injizierten Runtime-Helfer, die Plugins zur Verfügung stehen
-title: Plugin-Runtime-Helfer
+summary: '`api.runtime` -- die in Plugins verfügbaren injizierten Runtime-Helper'
+title: Plugin-Runtime-Helper
 x-i18n:
-    generated_at: "2026-04-15T19:41:34Z"
+    generated_at: "2026-04-24T06:51:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c77a6e9cd48c84affa17dce684bbd0e072c8b63485e4a5d569f3793a4ea4f9c8
+    source_hash: 2327bdabc0dc1e05000ff83e507007fadff2698cceaae0d4a3e7bc4885440c55
     source_path: plugins/sdk-runtime.md
     workflow: 15
 ---
 
-# Plugin-Runtime-Helfer
-
-Referenz für das `api.runtime`-Objekt, das bei der Registrierung in jedes Plugin injiziert wird. Verwenden Sie diese Helfer, anstatt Host-Interna direkt zu importieren.
+Referenz für das Objekt `api.runtime`, das während der Registrierung in jedes Plugin injiziert wird. Verwenden Sie diese Helper, statt Host-Interna direkt zu importieren.
 
 <Tip>
-  **Suchen Sie nach einer Schritt-für-Schritt-Anleitung?** Siehe [Channel-Plugins](/de/plugins/sdk-channel-plugins)
-  oder [Provider-Plugins](/de/plugins/sdk-provider-plugins) für Schritt-für-Schritt-Anleitungen,
-  die diese Helfer im Kontext zeigen.
+  **Suchen Sie nach einer Schritt-für-Schritt-Anleitung?** Siehe [Channel Plugins](/de/plugins/sdk-channel-plugins)
+  oder [Provider Plugins](/de/plugins/sdk-provider-plugins) für Schritt-für-Schritt-Anleitungen,
+  die diese Helper im Kontext zeigen.
 </Tip>
 
 ```typescript
@@ -47,7 +45,7 @@ const workspaceDir = api.runtime.agent.resolveAgentWorkspaceDir(cfg);
 // Agent-Identität abrufen
 const identity = api.runtime.agent.resolveAgentIdentity(cfg);
 
-// Standard-Thinkinglevel abrufen
+// Standard-Thinking-Level abrufen
 const thinking = api.runtime.agent.resolveThinkingDefault(cfg, provider, model);
 
 // Agent-Timeout abrufen
@@ -56,23 +54,25 @@ const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 // Sicherstellen, dass der Workspace existiert
 await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-// Einen eingebetteten Agent-Durchlauf ausführen
+// Einen eingebetteten Agent-Turn ausführen
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 const result = await api.runtime.agent.runEmbeddedAgent({
   sessionId: "my-plugin:task-1",
   runId: crypto.randomUUID(),
   sessionFile: path.join(agentDir, "sessions", "my-plugin-task-1.jsonl"),
   workspaceDir: api.runtime.agent.resolveAgentWorkspaceDir(cfg),
-  prompt: "Summarize the latest changes",
+  prompt: "Fasse die neuesten Änderungen zusammen",
   timeoutMs: api.runtime.agent.resolveAgentTimeoutMs(cfg),
 });
 ```
 
-`runEmbeddedAgent(...)` ist der neutrale Helfer zum Starten eines normalen OpenClaw-Agent-Durchlaufs aus Plugin-Code. Er verwendet dieselbe Provider-/Modellauflösung und dieselbe Agent-Harness-Auswahl wie kanalgetriggerte Antworten.
+`runEmbeddedAgent(...)` ist der neutrale Helper zum Starten eines normalen OpenClaw-
+Agent-Turns aus Plugin-Code. Er verwendet dieselbe Auflösung von Provider/Modell und
+dieselbe Auswahl des Agent-Harness wie channel-ausgelöste Antworten.
 
 `runEmbeddedPiAgent(...)` bleibt als Kompatibilitätsalias erhalten.
 
-**Sitzungsspeicher-Helfer** befinden sich unter `api.runtime.agent.session`:
+**Session-Store-Helper** befinden sich unter `api.runtime.agent.session`:
 
 ```typescript
 const storePath = api.runtime.agent.session.resolveStorePath(cfg);
@@ -98,7 +98,7 @@ Subagent-Läufe im Hintergrund starten und verwalten.
 // Einen Subagent-Lauf starten
 const { runId } = await api.runtime.subagent.run({
   sessionKey: "agent:main:subagent:search-helper",
-  message: "Expand this query into focused follow-up searches.",
+  message: "Erweitere diese Query in fokussierte Suchanfragen zur Weiterverfolgung.",
   provider: "openai", // optionale Überschreibung
   model: "gpt-4.1-mini", // optionale Überschreibung
   deliver: false,
@@ -120,28 +120,49 @@ await api.runtime.subagent.deleteSession({
 ```
 
 <Warning>
-  Modellüberschreibungen (`provider`/`model`) erfordern eine ausdrückliche Freigabe durch den Operator über
+  Modell-Überschreibungen (`provider`/`model`) erfordern Opt-in des Operators über
   `plugins.entries.<id>.subagent.allowModelOverride: true` in der Konfiguration.
-  Nicht vertrauenswürdige Plugins können weiterhin Subagents ausführen, aber Überschreibungsanfragen werden abgelehnt.
+  Nicht vertrauenswürdige Plugins können weiterhin Subagenten ausführen, aber Override-Anfragen werden abgelehnt.
 </Warning>
+
+### `api.runtime.nodes`
+
+Verbundene Nodes auflisten und aus gateway-geladenem Plugin-Code einen Node-Host-Befehl aufrufen.
+Verwenden Sie dies, wenn ein Plugin lokale Arbeit auf einem gepaarten Gerät besitzt, zum Beispiel eine
+Browser- oder Audio-Bridge auf einem anderen Mac.
+
+```typescript
+const { nodes } = await api.runtime.nodes.list({ connected: true });
+
+const result = await api.runtime.nodes.invoke({
+  nodeId: "mac-studio",
+  command: "my-plugin.command",
+  params: { action: "start" },
+  timeoutMs: 30000,
+});
+```
+
+Diese Runtime ist nur innerhalb des Gateway verfügbar. Node-Befehle laufen weiterhin
+über normales Pairing von Gateway und Node, Command-Allowlist und node-lokale Command-
+Behandlung.
 
 ### `api.runtime.taskFlow`
 
-Eine TaskFlow-Runtime an einen vorhandenen OpenClaw-Sitzungsschlüssel oder einen vertrauenswürdigen Tool-Kontext binden und dann TaskFlows erstellen und verwalten, ohne bei jedem Aufruf einen Eigentümer zu übergeben.
+Eine TaskFlow-Runtime an einen bestehenden OpenClaw-Sitzungsschlüssel oder einen vertrauenswürdigen Tool-Kontext binden und dann TaskFlow erstellen und verwalten, ohne bei jedem Aufruf einen Owner zu übergeben.
 
 ```typescript
 const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
 
 const created = taskFlow.createManaged({
   controllerId: "my-plugin/review-batch",
-  goal: "Review new pull requests",
+  goal: "Neue Pull Requests prüfen",
 });
 
 const child = taskFlow.runTask({
   flowId: created.flowId,
   runtime: "acp",
   childSessionKey: "agent:main:subagent:reviewer",
-  task: "Review PR #123",
+  task: "PR #123 prüfen",
   status: "running",
   startedAt: Date.now(),
 });
@@ -154,22 +175,24 @@ const waiting = taskFlow.setWaiting({
 });
 ```
 
-Verwenden Sie `bindSession({ sessionKey, requesterOrigin })`, wenn Sie bereits einen vertrauenswürdigen OpenClaw-Sitzungsschlüssel aus Ihrer eigenen Bindungsschicht haben. Binden Sie nicht aus rohen Benutzereingaben.
+Verwenden Sie `bindSession({ sessionKey, requesterOrigin })`, wenn Sie bereits einen
+vertrauenswürdigen OpenClaw-Sitzungsschlüssel aus Ihrer eigenen Bindungsschicht haben. Binden Sie nicht anhand roher
+Benutzereingaben.
 
 ### `api.runtime.tts`
 
-Text-zu-Sprache-Synthese.
+Text-to-Speech-Synthese.
 
 ```typescript
 // Standard-TTS
 const clip = await api.runtime.tts.textToSpeech({
-  text: "Hello from OpenClaw",
+  text: "Hallo von OpenClaw",
   cfg: api.config,
 });
 
 // Für Telefonie optimiertes TTS
 const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
-  text: "Hello from OpenClaw",
+  text: "Hallo von OpenClaw",
   cfg: api.config,
 });
 
@@ -180,7 +203,8 @@ const voices = await api.runtime.tts.listVoices({
 });
 ```
 
-Verwendet die Core-Konfiguration `messages.tts` und die Providerauswahl. Gibt einen PCM-Audiopuffer plus Abtastrate zurück.
+Verwendet Core-Konfiguration `messages.tts` und Provider-Auswahl. Gibt PCM-Audio-
+Puffer + Sample-Rate zurück.
 
 ### `api.runtime.mediaUnderstanding`
 
@@ -198,7 +222,7 @@ const image = await api.runtime.mediaUnderstanding.describeImageFile({
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  mime: "audio/ogg", // optional, wenn der MIME-Typ nicht abgeleitet werden kann
+  mime: "audio/ogg", // optional, wenn MIME nicht abgeleitet werden kann
 });
 
 // Ein Video beschreiben
@@ -214,11 +238,11 @@ const result = await api.runtime.mediaUnderstanding.runFile({
 });
 ```
 
-Gibt `{ text: undefined }` zurück, wenn keine Ausgabe erzeugt wird (z. B. bei übersprungenen Eingaben).
+Gibt `{ text: undefined }` zurück, wenn keine Ausgabe erzeugt wird (z. B. übersprungene Eingabe).
 
 <Info>
-  `api.runtime.stt.transcribeAudioFile(...)` bleibt als Kompatibilitätsalias für
-  `api.runtime.mediaUnderstanding.transcribeAudioFile(...)` erhalten.
+  `api.runtime.stt.transcribeAudioFile(...)` bleibt als Kompatibilitätsalias
+  für `api.runtime.mediaUnderstanding.transcribeAudioFile(...)` erhalten.
 </Info>
 
 ### `api.runtime.imageGeneration`
@@ -227,7 +251,7 @@ Bildgenerierung.
 
 ```typescript
 const result = await api.runtime.imageGeneration.generate({
-  prompt: "A robot painting a sunset",
+  prompt: "Ein Roboter, der einen Sonnenuntergang malt",
   cfg: api.config,
 });
 
@@ -236,7 +260,7 @@ const providers = api.runtime.imageGeneration.listProviders({ cfg: api.config })
 
 ### `api.runtime.webSearch`
 
-Websuche.
+Web-Suche.
 
 ```typescript
 const providers = api.runtime.webSearch.listProviders({ config: api.config });
@@ -249,7 +273,7 @@ const result = await api.runtime.webSearch.search({
 
 ### `api.runtime.media`
 
-Low-Level-Medienwerkzeuge.
+Low-Level-Medien-Utilities.
 
 ```typescript
 const webMedia = await api.runtime.media.loadWebMedia(url);
@@ -258,11 +282,23 @@ const kind = api.runtime.media.mediaKindFromMime("image/jpeg"); // "image"
 const isVoice = api.runtime.media.isVoiceCompatibleAudio(filePath);
 const metadata = await api.runtime.media.getImageMetadata(filePath);
 const resized = await api.runtime.media.resizeToJpeg(buffer, { maxWidth: 800 });
+const terminalQr = await api.runtime.media.renderQrTerminal("https://openclaw.ai");
+const pngQr = await api.runtime.media.renderQrPngBase64("https://openclaw.ai", {
+  scale: 6, // 1-12
+  marginModules: 4, // 0-16
+});
+const pngQrDataUrl = await api.runtime.media.renderQrPngDataUrl("https://openclaw.ai");
+const tmpRoot = resolvePreferredOpenClawTmpDir();
+const pngQrFile = await api.runtime.media.writeQrPngTempFile("https://openclaw.ai", {
+  tmpRoot,
+  dirPrefix: "my-plugin-qr-",
+  fileName: "qr.png",
+});
 ```
 
 ### `api.runtime.config`
 
-Konfiguration laden und schreiben.
+Config laden und schreiben.
 
 ```typescript
 const cfg = await api.runtime.config.loadConfig();
@@ -271,7 +307,7 @@ await api.runtime.config.writeConfigFile(cfg);
 
 ### `api.runtime.system`
 
-Dienstprogramme auf Systemebene.
+Utilities auf Systemebene.
 
 ```typescript
 await api.runtime.system.enqueueSystemEvent(event);
@@ -282,7 +318,7 @@ const hint = api.runtime.system.formatNativeDependencyHint(pkg);
 
 ### `api.runtime.events`
 
-Ereignisabonnements.
+Event-Subscriptions.
 
 ```typescript
 api.runtime.events.onAgentEvent((event) => {
@@ -295,7 +331,7 @@ api.runtime.events.onSessionTranscriptUpdate((update) => {
 
 ### `api.runtime.logging`
 
-Protokollierung.
+Logging.
 
 ```typescript
 const verbose = api.runtime.logging.shouldLogVerbose();
@@ -304,7 +340,7 @@ const childLogger = api.runtime.logging.getChildLogger({ plugin: "my-plugin" }, 
 
 ### `api.runtime.modelAuth`
 
-Auflösung der Authentifizierung für Modell und Provider.
+Auflösung von Authentifizierung für Modell und Provider.
 
 ```typescript
 const auth = await api.runtime.modelAuth.getApiKeyForModel({ model, cfg });
@@ -324,7 +360,7 @@ const stateDir = api.runtime.state.resolveStateDir();
 
 ### `api.runtime.tools`
 
-Active Memory-Toolfabriken und CLI.
+Factories und CLI für Memory-Tools.
 
 ```typescript
 const getTool = api.runtime.tools.createMemoryGetTool(/* ... */);
@@ -334,9 +370,10 @@ api.runtime.tools.registerMemoryCli(/* ... */);
 
 ### `api.runtime.channel`
 
-Kanalspezifische Runtime-Helfer (verfügbar, wenn ein Channel-Plugin geladen ist).
+Channel-spezifische Runtime-Helper (verfügbar, wenn ein Channel-Plugin geladen ist).
 
-`api.runtime.channel.mentions` ist die gemeinsame Oberfläche für die Erwähnungsrichtlinie bei eingehenden Nachrichten für gebündelte Channel-Plugins, die Runtime-Injektion verwenden:
+`api.runtime.channel.mentions` ist die gemeinsame Oberfläche für Richtlinien eingehender Erwähnungen für
+gebündelte Channel-Plugins, die Runtime-Injection verwenden:
 
 ```typescript
 const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
@@ -363,7 +400,7 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 });
 ```
 
-Verfügbare Erwähnungshelfer:
+Verfügbare Mention-Helper:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -371,11 +408,14 @@ Verfügbare Erwähnungshelfer:
 - `implicitMentionKindWhen`
 - `resolveInboundMentionDecision`
 
-`api.runtime.channel.mentions` stellt die älteren Kompatibilitätshelfer `resolveMentionGating*` absichtlich nicht bereit. Bevorzugen Sie den normalisierten Pfad `{ facts, policy }`.
+`api.runtime.channel.mentions` stellt absichtlich die älteren Kompatibilitäts-Helper
+`resolveMentionGating*` nicht bereit. Bevorzugen Sie den normalisierten Pfad
+`{ facts, policy }`.
 
 ## Runtime-Referenzen speichern
 
-Verwenden Sie `createPluginRuntimeStore`, um die Runtime-Referenz zur Verwendung außerhalb des Callbacks `register` zu speichern:
+Verwenden Sie `createPluginRuntimeStore`, um die Runtime-Referenz zur Verwendung außerhalb
+des `register`-Callbacks zu speichern:
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -390,14 +430,14 @@ const store = createPluginRuntimeStore<PluginRuntime>({
 export default defineChannelPluginEntry({
   id: "my-plugin",
   name: "My Plugin",
-  description: "Example",
+  description: "Beispiel",
   plugin: myPlugin,
   setRuntime: store.setRuntime,
 });
 
 // In anderen Dateien
 export function getRuntime() {
-  return store.getRuntime(); // löst einen Fehler aus, wenn nicht initialisiert
+  return store.getRuntime(); // wirft einen Fehler, wenn nicht initialisiert
 }
 
 export function tryGetRuntime() {
@@ -405,24 +445,26 @@ export function tryGetRuntime() {
 }
 ```
 
-Bevorzugen Sie `pluginId` für die Identität des Runtime-Store. Die Low-Level-Form `key` ist für ungewöhnliche Fälle gedacht, in denen ein Plugin absichtlich mehr als einen Runtime-Slot benötigt.
+Bevorzugen Sie `pluginId` für die Identität des Runtime-Store. Die Low-Level-Form `key` ist
+für ungewöhnliche Fälle gedacht, in denen ein Plugin absichtlich mehr als einen Runtime-
+Slot benötigt.
 
 ## Andere Top-Level-Felder in `api`
 
-Zusätzlich zu `api.runtime` stellt das API-Objekt auch Folgendes bereit:
+Zusätzlich zu `api.runtime` stellt das API-Objekt außerdem Folgendes bereit:
 
-| Feld                     | Typ                       | Beschreibung                                                                                |
-| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | Plugin-ID                                                                                   |
-| `api.name`               | `string`                  | Anzeigename des Plugins                                                                     |
-| `api.config`             | `OpenClawConfig`          | Aktueller Konfigurations-Snapshot (aktiver In-Memory-Runtime-Snapshot, wenn verfügbar)     |
-| `api.pluginConfig`       | `Record<string, unknown>` | Plugin-spezifische Konfiguration aus `plugins.entries.<id>.config`                          |
-| `api.logger`             | `PluginLogger`            | Bereichsbezogener Logger (`debug`, `info`, `warn`, `error`)                                 |
-| `api.registrationMode`   | `PluginRegistrationMode`  | Aktueller Lademodus; `"setup-runtime"` ist das leichtgewichtige Startup-/Setup-Fenster vor dem vollständigen Entry |
-| `api.resolvePath(input)` | `(string) => string`      | Einen Pfad relativ zum Plugin-Root auflösen                                                 |
+| Feld                     | Typ                       | Beschreibung                                                                                 |
+| ------------------------ | ------------------------- | -------------------------------------------------------------------------------------------- |
+| `api.id`                 | `string`                  | Plugin-ID                                                                                    |
+| `api.name`               | `string`                  | Anzeigename des Plugins                                                                      |
+| `api.config`             | `OpenClawConfig`          | Aktueller Config-Snapshot (aktiver In-Memory-Runtime-Snapshot, sofern verfügbar)            |
+| `api.pluginConfig`       | `Record<string, unknown>` | Pluginspezifische Konfiguration aus `plugins.entries.<id>.config`                            |
+| `api.logger`             | `PluginLogger`            | Gescopter Logger (`debug`, `info`, `warn`, `error`)                                          |
+| `api.registrationMode`   | `PluginRegistrationMode`  | Aktueller Lademodus; `"setup-runtime"` ist das schlanke Vor-vollständigem-Einstieg Start-/Setup-Fenster |
+| `api.resolvePath(input)` | `(string) => string`      | Einen Pfad relativ zum Plugin-Root auflösen                                                  |
 
 ## Verwandt
 
-- [SDK-Überblick](/de/plugins/sdk-overview) -- Subpath-Referenz
-- [SDK-Einstiegspunkte](/de/plugins/sdk-entrypoints) -- Optionen für `definePluginEntry`
-- [Plugin-Interna](/de/plugins/architecture) -- Fähigkeitsmodell und Registry
+- [SDK Overview](/de/plugins/sdk-overview) -- Referenz der Subpfade
+- [SDK Entry Points](/de/plugins/sdk-entrypoints) -- Optionen für `definePluginEntry`
+- [Plugin Internals](/de/plugins/architecture) -- Fähigkeitsmodell und Registry

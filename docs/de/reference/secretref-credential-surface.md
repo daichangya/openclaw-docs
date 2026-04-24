@@ -1,31 +1,29 @@
 ---
 read_when:
-    - Überprüfen der SecretRef-Anmeldedatenabdeckung
-    - Prüfen, ob eine Anmeldedatenangabe für `secrets configure` oder `secrets apply` infrage kommt
-    - Überprüfen, warum eine Anmeldedatenangabe außerhalb der unterstützten Oberfläche liegt
-summary: Kanonische unterstützte bzw. nicht unterstützte SecretRef-Anmeldedatenoberfläche
+    - Abdeckung von SecretRef-Anmeldedaten verifizieren
+    - Prüfen, ob eine Anmeldedatenquelle für `secrets configure` oder `secrets apply` geeignet ist
+    - Prüfen, warum eine Anmeldedatenquelle außerhalb der unterstützten Oberfläche liegt
+summary: Kanonische unterstützte vs. nicht unterstützte SecretRef-Anmeldedatenoberfläche
 title: SecretRef-Anmeldedatenoberfläche
 x-i18n:
-    generated_at: "2026-04-15T06:22:03Z"
+    generated_at: "2026-04-24T06:58:00Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dd0b9c379236b17a72f552d6360b8b5a2269009e019c138c6bb50f4f7328ddaf
+    source_hash: ddb8d7660f2757e3d2a078c891f52325bf9ec9291ec7d5f5e06daef4041e2006
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
-
-# SecretRef-Anmeldedatenoberfläche
 
 Diese Seite definiert die kanonische SecretRef-Anmeldedatenoberfläche.
 
 Ziel des Geltungsbereichs:
 
-- Im Geltungsbereich: ausschließlich vom Benutzer bereitgestellte Anmeldedaten, die OpenClaw weder ausstellt noch rotiert.
-- Außerhalb des Geltungsbereichs: zur Laufzeit ausgestellte oder rotierende Anmeldedaten, OAuth-Aktualisierungsmaterial und sitzungsähnliche Artefakte.
+- Im Geltungsbereich: ausschließlich vom Benutzer bereitgestellte Anmeldedaten, die OpenClaw nicht selbst erzeugt oder rotiert.
+- Außerhalb des Geltungsbereichs: zur Laufzeit erzeugte oder rotierende Anmeldedaten, OAuth-Refresh-Material und sitzungsähnliche Artefakte.
 
 ## Unterstützte Anmeldedaten
 
-### `openclaw.json`-Ziele (`secrets configure` + `secrets apply` + `secrets audit`)
+### Ziele in `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 [//]: # "secretref-supported-list-start"
 
@@ -111,7 +109,7 @@ Ziel des Geltungsbereichs:
 - `channels.googlechat.serviceAccount` über benachbartes `serviceAccountRef` (Kompatibilitätsausnahme)
 - `channels.googlechat.accounts.*.serviceAccount` über benachbartes `serviceAccountRef` (Kompatibilitätsausnahme)
 
-### `auth-profiles.json`-Ziele (`secrets configure` + `secrets apply` + `secrets audit`)
+### Ziele in `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 - `profiles.*.keyRef` (`type: "api_key"`; nicht unterstützt, wenn `auth.profiles.<id>.mode = "oauth"`)
 - `profiles.*.tokenRef` (`type: "token"`; nicht unterstützt, wenn `auth.profiles.<id>.mode = "oauth"`)
@@ -120,17 +118,17 @@ Ziel des Geltungsbereichs:
 
 Hinweise:
 
-- Ziele von Auth-Profil-Plänen erfordern `agentId`.
-- Planeinträge zielen auf `profiles.*.key` / `profiles.*.token` und schreiben benachbarte Referenzen (`keyRef` / `tokenRef`).
-- Auth-Profil-Referenzen sind in die Laufzeitauflösung und Audit-Abdeckung eingeschlossen.
-- OAuth-Richtlinienbegrenzung: `auth.profiles.<id>.mode = "oauth"` kann nicht mit SecretRef-Eingaben für dieses Profil kombiniert werden. Start/Neuladen und die Auflösung des Auth-Profils schlagen bei Verstoß gegen diese Richtlinie sofort fehl.
-- Für SecretRef-verwaltete Modell-Provider behalten generierte `agents/*/agent/models.json`-Einträge nicht geheime Marker (keine aufgelösten geheimen Werte) für `apiKey`-/Header-Oberflächen bei.
-- Die Marker-Persistenz ist quellenautoritativ: OpenClaw schreibt Marker aus dem aktiven Quellkonfigurations-Snapshot (vor der Auflösung), nicht aus aufgelösten geheimen Laufzeitwerten.
-- Für die Websuche:
-  - Im expliziten Provider-Modus (`tools.web.search.provider` gesetzt) ist nur der Schlüssel des ausgewählten Providers aktiv.
-  - Im automatischen Modus (`tools.web.search.provider` nicht gesetzt) ist nur der erste Provider-Schlüssel aktiv, der gemäß Priorität aufgelöst wird.
-  - Im automatischen Modus werden Referenzen nicht ausgewählter Provider als inaktiv behandelt, bis sie ausgewählt werden.
-  - Veraltete `tools.web.search.*`-Providerpfade werden während des Kompatibilitätsfensters weiterhin aufgelöst, aber die kanonische SecretRef-Oberfläche ist `plugins.entries.<plugin>.config.webSearch.*`.
+- Plan-Ziele für Auth-Profile erfordern `agentId`.
+- Planeinträge zielen auf `profiles.*.key` / `profiles.*.token` und schreiben benachbarte Refs (`keyRef` / `tokenRef`).
+- Auth-Profil-Refs sind in der Laufzeitauflösung und Audit-Abdeckung enthalten.
+- OAuth-Richtlinien-Guard: `auth.profiles.<id>.mode = "oauth"` kann nicht mit SecretRef-Eingaben für dieses Profil kombiniert werden. Start/Reload und Auth-Profil-Auflösung schlagen fail-fast fehl, wenn diese Richtlinie verletzt wird.
+- Bei SecretRef-verwalteten Modell-Providern persistieren erzeugte Einträge in `agents/*/agent/models.json` nicht geheime Marker (keine aufgelösten Secret-Werte) für Oberflächen von `apiKey`/Headern.
+- Marker-Persistenz ist quellenautoritativ: OpenClaw schreibt Marker aus dem aktiven Snapshot der Quellkonfiguration (vor der Auflösung), nicht aus aufgelösten Secret-Werten zur Laufzeit.
+- Für Websuche gilt:
+  - Im expliziten Provider-Modus (`tools.web.search.provider` gesetzt) ist nur der ausgewählte Provider-Schlüssel aktiv.
+  - Im Auto-Modus (`tools.web.search.provider` nicht gesetzt) ist nur der erste Provider-Schlüssel aktiv, der gemäß Priorität aufgelöst wird.
+  - Im Auto-Modus werden Refs nicht ausgewählter Provider als inaktiv behandelt, bis sie ausgewählt werden.
+  - Veraltete Provider-Pfade `tools.web.search.*` werden während des Kompatibilitätsfensters weiterhin aufgelöst, aber die kanonische SecretRef-Oberfläche ist `plugins.entries.<plugin>.config.webSearch.*`.
 
 ## Nicht unterstützte Anmeldedaten
 
@@ -152,4 +150,9 @@ Anmeldedaten außerhalb des Geltungsbereichs umfassen:
 
 Begründung:
 
-- Diese Anmeldedaten sind ausgestellte, rotierende, sitzungsführende oder OAuth-dauerhafte Klassen, die nicht zu einer schreibgeschützten externen SecretRef-Auflösung passen.
+- Diese Anmeldedaten sind erzeugte, rotierende, sitzungsbehaftete oder OAuth-dauerhafte Klassen, die nicht zur schreibgeschützten externen SecretRef-Auflösung passen.
+
+## Verwandt
+
+- [Secrets management](/de/gateway/secrets)
+- [Auth credential semantics](/de/auth-credential-semantics)

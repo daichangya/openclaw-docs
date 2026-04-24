@@ -2,24 +2,24 @@
 read_when:
     - Sie möchten ein Systemereignis in die Warteschlange stellen, ohne einen Cron-Job zu erstellen
     - Sie müssen Heartbeats aktivieren oder deaktivieren
-    - Sie möchten System-Präsenzeinträge prüfen
-summary: CLI-Referenz für `openclaw system` (Systemereignisse, Heartbeat, Präsenz)
-title: system
+    - Sie möchten System-Presence-Einträge prüfen
+summary: CLI-Referenz für `openclaw system` (Systemereignisse, Heartbeat, Presence)
+title: System
 x-i18n:
-    generated_at: "2026-04-05T12:39:14Z"
+    generated_at: "2026-04-24T06:32:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a7d19afde9d9cde8a79b0bb8cec6e5673466f4cb9b575fb40111fc32f4eee5d7
+    source_hash: 0f4be30b0b2d18ee5653071d6375cebeb9fc94733e30bdb7b89a19c286df880b
     source_path: cli/system.md
     workflow: 15
 ---
 
 # `openclaw system`
 
-Hilfsfunktionen auf Systemebene für das Gateway: Systemereignisse in die Warteschlange stellen, Heartbeats steuern
-und Präsenz anzeigen.
+Helfer auf Systemebene für das Gateway: Systemereignisse in die Warteschlange stellen, Heartbeats steuern
+und Presence anzeigen.
 
-Alle `system`-Subcommands verwenden Gateway-RPC und akzeptieren die gemeinsamen Client-Flags:
+Alle `system`-Unterbefehle verwenden Gateway-RPC und akzeptieren die gemeinsamen Client-Flags:
 
 - `--url <url>`
 - `--token <token>`
@@ -29,8 +29,8 @@ Alle `system`-Subcommands verwenden Gateway-RPC und akzeptieren die gemeinsamen 
 ## Häufige Befehle
 
 ```bash
-openclaw system event --text "Check for urgent follow-ups" --mode now
-openclaw system event --text "Check for urgent follow-ups" --url ws://127.0.0.1:18789 --token "$OPENCLAW_GATEWAY_TOKEN"
+openclaw system event --text "Nach dringenden Nachfassaktionen suchen" --mode now
+openclaw system event --text "Nach dringenden Nachfassaktionen suchen" --url ws://127.0.0.1:18789 --token "$OPENCLAW_GATEWAY_TOKEN"
 openclaw system heartbeat enable
 openclaw system heartbeat last
 openclaw system presence
@@ -38,7 +38,7 @@ openclaw system presence
 
 ## `system event`
 
-Stellen Sie ein Systemereignis in der **Hauptsitzung** in die Warteschlange. Der nächste Heartbeat fügt
+Ein Systemereignis in der Warteschlange der **Haupt**sitzung einreihen. Der nächste Heartbeat fügt
 es als Zeile `System:` in den Prompt ein. Verwenden Sie `--mode now`, um den Heartbeat
 sofort auszulösen; `next-heartbeat` wartet auf den nächsten geplanten Tick.
 
@@ -53,8 +53,8 @@ Flags:
 
 Heartbeat-Steuerung:
 
-- `last`: letztes Heartbeat-Ereignis anzeigen.
-- `enable`: Heartbeats wieder einschalten (verwenden Sie dies, wenn sie deaktiviert wurden).
+- `last`: das letzte Heartbeat-Ereignis anzeigen.
+- `enable`: Heartbeats wieder aktivieren (verwenden Sie dies, wenn sie deaktiviert wurden).
 - `disable`: Heartbeats pausieren.
 
 Flags:
@@ -64,7 +64,7 @@ Flags:
 
 ## `system presence`
 
-Listet die aktuellen System-Präsenzeinträge auf, die dem Gateway bekannt sind (Nodes,
+Die aktuellen System-Presence-Einträge auflisten, die dem Gateway bekannt sind (Nodes,
 Instanzen und ähnliche Statuszeilen).
 
 Flags:
@@ -74,5 +74,9 @@ Flags:
 
 ## Hinweise
 
-- Erfordert ein laufendes Gateway, das über Ihre aktuelle Konfiguration erreichbar ist (lokal oder remote).
-- Systemereignisse sind flüchtig und bleiben über Neustarts hinweg nicht erhalten.
+- Erfordert ein laufendes Gateway, das über Ihre aktuelle Konfiguration erreichbar ist (lokal oder entfernt).
+- Systemereignisse sind flüchtig und werden nicht über Neustarts hinweg gespeichert.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)

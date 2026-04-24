@@ -1,45 +1,44 @@
 ---
 read_when:
-    - Sie möchten Perplexity als Web-Such-Provider konfigurieren
-    - Sie benötigen den API-Schlüssel für Perplexity oder die Einrichtung des OpenRouter-Proxys
-summary: Einrichtung des Perplexity-Web-Such-Providers (API-Schlüssel, Suchmodi, Filterung)
+    - Sie möchten Perplexity als Websuch-Provider konfigurieren
+    - Sie benötigen den Perplexity-API-Schlüssel oder die Einrichtung des OpenRouter-Proxys
+summary: Einrichtung des Perplexity-Websuch-Providers (API-Schlüssel, Suchmodi, Filterung)
 title: Perplexity
 x-i18n:
-    generated_at: "2026-04-12T23:32:48Z"
+    generated_at: "2026-04-24T06:55:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 55c089e96601ebe05480d305364272c7f0ac721caa79746297c73002a9f20f55
+    source_hash: 7b2d3d6912bc9952bbe89124dd8aea600c938c8ceff21df46508b6e44e0a1159
     source_path: providers/perplexity-provider.md
     workflow: 15
 ---
 
-# Perplexity (Web-Such-Provider)
+# Perplexity (Websuch-Provider)
 
-Das Perplexity-Plugin stellt Web-Suchfunktionen über die Perplexity
-Search API oder Perplexity Sonar über OpenRouter bereit.
+Das Perplexity-Plugin stellt Websuchfunktionen über die Perplexity Search API oder Perplexity Sonar über OpenRouter bereit.
 
 <Note>
-Diese Seite behandelt die Einrichtung des **Providers** Perplexity. Informationen zum Perplexity-
-**Tool** (wie der Agent es verwendet) finden Sie unter [Perplexity tool](/de/tools/perplexity-search).
+Diese Seite behandelt das Setup des **Providers** Perplexity. Für das **Tool** Perplexity
+(wie der Agent es verwendet) siehe [Perplexity-Tool](/de/tools/perplexity-search).
 </Note>
 
-| Eigenschaft | Wert                                                                   |
-| ----------- | ---------------------------------------------------------------------- |
-| Typ         | Web-Such-Provider (kein Modell-Provider)                               |
-| Auth        | `PERPLEXITY_API_KEY` (direkt) oder `OPENROUTER_API_KEY` (über OpenRouter) |
-| Konfigurationspfad | `plugins.entries.perplexity.config.webSearch.apiKey`           |
+| Eigenschaft  | Wert                                                                   |
+| ------------ | ---------------------------------------------------------------------- |
+| Typ          | Websuch-Provider (kein Modell-Provider)                                |
+| Auth         | `PERPLEXITY_API_KEY` (direkt) oder `OPENROUTER_API_KEY` (über OpenRouter) |
+| Konfig.-Pfad | `plugins.entries.perplexity.config.webSearch.apiKey`                   |
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="API-Schlüssel festlegen">
-    Führen Sie den interaktiven Konfigurationsablauf für die Web-Suche aus:
+  <Step title="Den API-Schlüssel setzen">
+    Führen Sie den interaktiven Konfigurationsablauf für Websuche aus:
 
     ```bash
     openclaw configure --section web
     ```
 
-    Oder legen Sie den Schlüssel direkt fest:
+    Oder setzen Sie den Schlüssel direkt:
 
     ```bash
     openclaw config set plugins.entries.perplexity.config.webSearch.apiKey "pplx-xxxxxxxxxxxx"
@@ -47,8 +46,8 @@ Diese Seite behandelt die Einrichtung des **Providers** Perplexity. Informatione
 
   </Step>
   <Step title="Mit der Suche beginnen">
-    Der Agent verwendet Perplexity automatisch für Web-Suchen, sobald der Schlüssel
-    konfiguriert ist. Es sind keine zusätzlichen Schritte erforderlich.
+    Der Agent verwendet Perplexity automatisch für Websuchen, sobald der Schlüssel
+    konfiguriert ist. Es sind keine weiteren Schritte erforderlich.
   </Step>
 </Steps>
 
@@ -59,12 +58,12 @@ Das Plugin wählt den Transport automatisch anhand des Präfixes des API-Schlüs
 <Tabs>
   <Tab title="Native Perplexity API (pplx-)">
     Wenn Ihr Schlüssel mit `pplx-` beginnt, verwendet OpenClaw die native Perplexity Search
-    API. Dieser Transport gibt strukturierte Ergebnisse zurück und unterstützt Domain-, Sprach-
+    API. Dieser Transport liefert strukturierte Ergebnisse zurück und unterstützt Domain-, Sprach-
     und Datumsfilter (siehe Filteroptionen unten).
   </Tab>
   <Tab title="OpenRouter / Sonar (sk-or-)">
-    Wenn Ihr Schlüssel mit `sk-or-` beginnt, leitet OpenClaw über OpenRouter unter Verwendung
-    des Perplexity-Sonar-Modells weiter. Dieser Transport gibt KI-synthetisierte Antworten mit
+    Wenn Ihr Schlüssel mit `sk-or-` beginnt, routet OpenClaw über OpenRouter unter Verwendung
+    des Perplexity-Sonar-Modells. Dieser Transport gibt KI-synthetisierte Antworten mit
     Zitaten zurück.
   </Tab>
 </Tabs>
@@ -78,42 +77,44 @@ Das Plugin wählt den Transport automatisch anhand des Präfixes des API-Schlüs
 
 <Note>
 Filteroptionen sind nur verfügbar, wenn die native Perplexity API
-(Schlüssel `pplx-`) verwendet wird. OpenRouter-/Sonar-Suchen unterstützen diese Parameter nicht.
+(`pplx-`-Schlüssel) verwendet wird. OpenRouter-/Sonar-Suchen unterstützen diese Parameter nicht.
 </Note>
 
-Bei Verwendung der nativen Perplexity API unterstützen Suchanfragen die folgenden Filter:
+Wenn die native Perplexity API verwendet wird, unterstützen Suchen die folgenden Filter:
 
-| Filter           | Beschreibung                            | Beispiel                            |
-| ---------------- | --------------------------------------- | ----------------------------------- |
-| Land             | 2-stelliger Ländercode                  | `us`, `de`, `jp`                    |
-| Sprache          | Sprachcode nach ISO 639-1               | `en`, `fr`, `zh`                    |
-| Datumsbereich    | Aktualitätsfenster                      | `day`, `week`, `month`, `year`      |
-| Domain-Filter    | Allowlist oder Denylist (max. 20 Domains) | `example.com`                     |
-| Inhaltsbudget    | Token-Limits pro Antwort / pro Seite    | `max_tokens`, `max_tokens_per_page` |
+| Filter         | Beschreibung                           | Beispiel                            |
+| -------------- | -------------------------------------- | ----------------------------------- |
+| Land           | 2-stelliger Ländercode                 | `us`, `de`, `jp`                    |
+| Sprache        | ISO-639-1-Sprachcode                   | `en`, `fr`, `zh`                    |
+| Datumsbereich  | Aktualitätsfenster                     | `day`, `week`, `month`, `year`      |
+| Domain-Filter  | Allowlist oder Denylist (max. 20 Domains) | `example.com`                    |
+| Inhaltsbudget  | Token-Limits pro Antwort / pro Seite   | `max_tokens`, `max_tokens_per_page` |
 
-## Erweiterte Hinweise
+## Erweiterte Konfiguration
 
 <AccordionGroup>
   <Accordion title="Umgebungsvariable für Daemon-Prozesse">
-    Wenn das OpenClaw Gateway als Daemon (launchd/systemd) läuft, stellen Sie sicher,
-    dass `PERPLEXITY_API_KEY` für diesen Prozess verfügbar ist.
+    Wenn das OpenClaw Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher, dass
+    `PERPLEXITY_API_KEY` diesem Prozess zur Verfügung steht.
 
     <Warning>
     Ein Schlüssel, der nur in `~/.profile` gesetzt ist, ist für einen launchd-/systemd-
-    Daemon nicht sichtbar, sofern diese Umgebung nicht explizit importiert wird. Legen Sie den Schlüssel in
-    `~/.openclaw/.env` oder über `env.shellEnv` fest, damit der Gateway-Prozess ihn lesen kann.
+    Daemon nicht sichtbar, sofern diese Umgebung nicht explizit importiert wird. Setzen Sie den Schlüssel in
+    `~/.openclaw/.env` oder über `env.shellEnv`, damit der Gateway-Prozess
+    ihn lesen kann.
     </Warning>
 
   </Accordion>
 
-  <Accordion title="Einrichtung des OpenRouter-Proxys">
-    Wenn Sie Perplexity-Suchen lieber über OpenRouter leiten möchten, setzen Sie
-    statt eines nativen Perplexity-Schlüssels einen `OPENROUTER_API_KEY` (Präfix `sk-or-`).
-    OpenClaw erkennt das Präfix und wechselt automatisch zum Sonar-Transport.
+  <Accordion title="Setup des OpenRouter-Proxys">
+    Wenn Sie Perplexity-Suchen lieber über OpenRouter routen möchten, setzen Sie
+    stattdessen `OPENROUTER_API_KEY` (Präfix `sk-or-`) statt eines nativen Perplexity-Schlüssels.
+    OpenClaw erkennt das Präfix und schaltet automatisch auf den Sonar-Transport
+    um.
 
     <Tip>
-    Der OpenRouter-Transport ist nützlich, wenn Sie bereits ein OpenRouter-Konto haben
-    und eine konsolidierte Abrechnung über mehrere Provider hinweg wünschen.
+    Der OpenRouter-Transport ist nützlich, wenn Sie bereits ein OpenRouter-Konto
+    haben und konsolidierte Abrechnung über mehrere Provider hinweg möchten.
     </Tip>
 
   </Accordion>
@@ -122,7 +123,7 @@ Bei Verwendung der nativen Perplexity API unterstützen Suchanfragen die folgend
 ## Verwandt
 
 <CardGroup cols={2}>
-  <Card title="Perplexity-Suchtool" href="/de/tools/perplexity-search" icon="magnifying-glass">
+  <Card title="Perplexity-Such-Tool" href="/de/tools/perplexity-search" icon="magnifying-glass">
     Wie der Agent Perplexity-Suchen aufruft und Ergebnisse interpretiert.
   </Card>
   <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference" icon="gear">

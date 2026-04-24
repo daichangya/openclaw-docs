@@ -1,38 +1,36 @@
 ---
 read_when:
-    - Sie möchten die Bildgenerierung mit fal in OpenClaw verwenden
-    - Sie benötigen den Auth-Ablauf mit `FAL_KEY`
-    - Sie möchten fal-Standardeinstellungen für `image_generate` oder `video_generate`
+    - Sie möchten Bildgenerierung mit fal in OpenClaw verwenden
+    - Sie benötigen den Authentifizierungsablauf mit FAL_KEY
+    - Sie möchten fal-Standardwerte für `image_generate` oder `video_generate` ಬಳಸzen
 summary: Einrichtung der Bild- und Videogenerierung mit fal in OpenClaw
-title: fal
+title: Fal
 x-i18n:
-    generated_at: "2026-04-12T23:30:57Z"
+    generated_at: "2026-04-24T06:53:49Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ff275233179b4808d625383efe04189ad9e92af09944ba39f1e953e77378e347
+    source_hash: d23d2d0d27e5f60f9dacb4a6a7e4c07248cf45ccd80bfabaf6bb99f5f78946b2
     source_path: providers/fal.md
     workflow: 15
 ---
 
-# fal
-
-OpenClaw enthält einen gebündelten `fal`-Provider für gehostete Bild- und Videogenerierung.
+OpenClaw enthält einen gebündelten Provider `fal` für gehostete Bild- und Videogenerierung.
 
 | Eigenschaft | Wert                                                          |
 | ----------- | ------------------------------------------------------------- |
 | Provider    | `fal`                                                         |
-| Auth        | `FAL_KEY` (kanonisch; `FAL_API_KEY` funktioniert ebenfalls als Fallback) |
+| Auth        | `FAL_KEY` (kanonisch; `FAL_API_KEY` funktioniert auch als Fallback) |
 | API         | fal-Modellendpunkte                                           |
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="API-Schlüssel festlegen">
+  <Step title="API-Schlüssel setzen">
     ```bash
     openclaw onboard --auth-choice fal-api-key
     ```
   </Step>
-  <Step title="Ein Standard-Bildmodell festlegen">
+  <Step title="Standard-Bildmodell setzen">
     ```json5
     {
       agents: {
@@ -49,19 +47,19 @@ OpenClaw enthält einen gebündelten `fal`-Provider für gehostete Bild- und Vid
 
 ## Bildgenerierung
 
-Der gebündelte `fal`-Provider für Bildgenerierung verwendet standardmäßig
+Der gebündelte Provider `fal` für Bildgenerierung verwendet standardmäßig
 `fal/fal-ai/flux/dev`.
 
-| Capability      | Wert                       |
+| Fähigkeit      | Wert                       |
 | --------------- | -------------------------- |
-| Maximale Bilder | 4 pro Anfrage              |
+| Max. Bilder     | 4 pro Anfrage              |
 | Bearbeitungsmodus | Aktiviert, 1 Referenzbild |
-| Größenüberschreibungen | Unterstützt          |
+| Größenüberschreibungen | Unterstützt         |
 | Seitenverhältnis | Unterstützt               |
 | Auflösung       | Unterstützt                |
 
 <Warning>
-Der fal-Endpunkt zur Bildbearbeitung unterstützt **keine** Überschreibungen von `aspectRatio`.
+Der fal-Endpunkt für Bildbearbeitung unterstützt **keine** Überschreibungen von `aspectRatio`.
 </Warning>
 
 So verwenden Sie fal als Standard-Provider für Bilder:
@@ -80,13 +78,13 @@ So verwenden Sie fal als Standard-Provider für Bilder:
 
 ## Videogenerierung
 
-Der gebündelte `fal`-Provider für Videogenerierung verwendet standardmäßig
+Der gebündelte Provider `fal` für Videogenerierung verwendet standardmäßig
 `fal/fal-ai/minimax/video-01-live`.
 
-| Capability | Wert                                                         |
-| ---------- | ------------------------------------------------------------ |
-| Modi       | Text-zu-Video, Einzelbild-Referenz                           |
-| Laufzeit   | Queue-gestützter Senden-/Status-/Ergebnis-Ablauf für lang laufende Jobs |
+| Fähigkeit | Wert                                                         |
+| --------- | ------------------------------------------------------------ |
+| Modi      | Text-zu-Video, Referenz mit einem einzelnen Bild             |
+| Laufzeit  | Warteschlangenbasierter Submit-/Status-/Ergebnis-Ablauf für lang laufende Jobs |
 
 <AccordionGroup>
   <Accordion title="Verfügbare Videomodelle">
@@ -103,7 +101,7 @@ Der gebündelte `fal`-Provider für Videogenerierung verwendet standardmäßig
 
   </Accordion>
 
-  <Accordion title="Konfigurationsbeispiel für Seedance 2.0">
+  <Accordion title="Beispielkonfiguration für Seedance 2.0">
     ```json5
     {
       agents: {
@@ -117,7 +115,7 @@ Der gebündelte `fal`-Provider für Videogenerierung verwendet standardmäßig
     ```
   </Accordion>
 
-  <Accordion title="Konfigurationsbeispiel für HeyGen video-agent">
+  <Accordion title="Beispielkonfiguration für HeyGen video-agent">
     ```json5
     {
       agents: {
@@ -133,20 +131,20 @@ Der gebündelte `fal`-Provider für Videogenerierung verwendet standardmäßig
 </AccordionGroup>
 
 <Tip>
-Verwenden Sie `openclaw models list --provider fal`, um die vollständige Liste verfügbarer fal-
+Verwenden Sie `openclaw models list --provider fal`, um die vollständige Liste der verfügbaren fal-
 Modelle zu sehen, einschließlich kürzlich hinzugefügter Einträge.
 </Tip>
 
-## Verwandte Themen
+## Verwandt
 
 <CardGroup cols={2}>
   <Card title="Bildgenerierung" href="/de/tools/image-generation" icon="image">
-    Gemeinsame Parameter für Bild-Tools und Providerauswahl.
+    Gemeinsame Parameter des Bild-Tools und Providerauswahl.
   </Card>
   <Card title="Videogenerierung" href="/de/tools/video-generation" icon="video">
-    Gemeinsame Parameter für Video-Tools und Providerauswahl.
+    Gemeinsame Parameter des Video-Tools und Providerauswahl.
   </Card>
-  <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference#agent-defaults" icon="gear">
-    Agent-Standards einschließlich Bild- und Videomodellauswahl.
+  <Card title="Konfigurationsreferenz" href="/de/gateway/config-agents#agent-defaults" icon="gear">
+    Agent-Standardeinstellungen einschließlich Auswahl von Bild- und Videomodellen.
   </Card>
 </CardGroup>

@@ -1,31 +1,35 @@
 ---
 read_when:
     - Einen Workspace manuell bootstrappen
-summary: Datensatz zum Nutzerprofil
+summary: Benutzerprofildatensatz
 title: USER-Vorlage
 x-i18n:
-    generated_at: "2026-04-05T12:55:16Z"
+    generated_at: "2026-04-24T06:59:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ec3e0eba87de16b5a16e27fdf9e57f62d07f143199c2fd765d41131df86a6f1e
+    source_hash: 599bd4d663c852bca679a341d53605c1a48b7cd7601bd7d102ee5407828dbacb
     source_path: reference/templates/USER.md
     workflow: 15
 ---
 
-# USER.md - Über deinen Menschen
+# USER.md - Über Ihren Menschen
 
-_Lerne die Person kennen, der du hilfst. Aktualisiere dies im Laufe der Zeit._
+_Lernen Sie die Person kennen, der Sie helfen. Aktualisieren Sie dies nach und nach._
 
 - **Name:**
-- **Wie du sie nennen sollst:**
+- **Wie sie angesprochen werden möchte:**
 - **Pronomen:** _(optional)_
 - **Zeitzone:**
 - **Notizen:**
 
 ## Kontext
 
-_(Was ist ihnen wichtig? An welchen Projekten arbeiten sie? Was nervt sie? Was bringt sie zum Lachen? Bau dies im Laufe der Zeit auf.)_
+_(Worauf legt die Person Wert? An welchen Projekten arbeitet sie? Was nervt sie? Was bringt sie zum Lachen? Bauen Sie dies mit der Zeit auf.)_
 
 ---
 
-Je mehr du weißt, desto besser kannst du helfen. Aber denk daran — du lernst etwas über einen Menschen, du erstellst kein Dossier. Respektiere den Unterschied.
+Je mehr Sie wissen, desto besser können Sie helfen. Aber denken Sie daran — Sie lernen etwas über einen Menschen, nicht Sie bauen ein Dossier auf. Respektieren Sie diesen Unterschied.
+
+## Verwandt
+
+- [Agent workspace](/de/concepts/agent-workspace)

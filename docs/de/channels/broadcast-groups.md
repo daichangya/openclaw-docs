@@ -1,37 +1,35 @@
 ---
 read_when:
     - Broadcast-Gruppen konfigurieren
-    - Antworten mehrerer Agents in WhatsApp debuggen
+    - Fehlerbehebung bei Antworten mehrerer Agenten in WhatsApp
 status: experimental
-summary: Eine WhatsApp-Nachricht an mehrere Agents senden
+summary: Eine WhatsApp-Nachricht an mehrere Agenten senden
 title: Broadcast-Gruppen
 x-i18n:
-    generated_at: "2026-04-05T12:35:01Z"
+    generated_at: "2026-04-24T06:26:48Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1d117ae65ec3b63c2bd4b3c215d96f32d7eafa0f99a9cd7378e502c15e56ca56
+    source_hash: d1f3991348570170855158e82089fa073ca62b98855f443d4a227829d7c945ee
     source_path: channels/broadcast-groups.md
     workflow: 15
 ---
-
-# Broadcast-Gruppen
 
 **Status:** Experimentell  
 **Version:** Hinzugefügt in 2026.1.9
 
 ## Überblick
 
-Broadcast-Gruppen ermöglichen es mehreren Agents, dieselbe Nachricht gleichzeitig zu verarbeiten und darauf zu antworten. So können Sie spezialisierte Agent-Teams erstellen, die in einer einzigen WhatsApp-Gruppe oder DM zusammenarbeiten — und dabei alle dieselbe Telefonnummer verwenden.
+Broadcast Groups ermöglichen es mehreren Agenten, dieselbe Nachricht gleichzeitig zu verarbeiten und darauf zu antworten. So können Sie spezialisierte Agenten-Teams erstellen, die in einer einzigen WhatsApp-Gruppe oder DM zusammenarbeiten — und dabei nur eine Telefonnummer verwenden.
 
-Aktueller Umfang: **nur WhatsApp** (Web-Kanal).
+Aktueller Umfang: **nur WhatsApp** (Web-Channel).
 
-Broadcast-Gruppen werden nach Channel-Allowlisten und Gruppenaktivierungsregeln ausgewertet. In WhatsApp-Gruppen bedeutet das, dass Broadcasts dann stattfinden, wenn OpenClaw normalerweise antworten würde (zum Beispiel bei Erwähnung, abhängig von Ihren Gruppeneinstellungen).
+Broadcast-Gruppen werden nach Channel-Allowlists und Gruppenaktivierungsregeln ausgewertet. In WhatsApp-Gruppen bedeutet das, dass Broadcasts stattfinden, wenn OpenClaw normalerweise antworten würde (zum Beispiel bei Erwähnung, abhängig von Ihren Gruppeneinstellungen).
 
 ## Anwendungsfälle
 
-### 1. Spezialisierte Agent-Teams
+### 1. Spezialisierte Agenten-Teams
 
-Stellen Sie mehrere Agents mit atomaren, klar abgegrenzten Aufgaben bereit:
+Stellen Sie mehrere Agenten mit klar abgegrenzten, fokussierten Aufgaben bereit:
 
 ```
 Group: "Development Team"
@@ -44,7 +42,7 @@ Agents:
 
 Jeder Agent verarbeitet dieselbe Nachricht und liefert seine spezialisierte Perspektive.
 
-### 2. Mehrsprachige Unterstützung
+### 2. Unterstützung für mehrere Sprachen
 
 ```
 Group: "International Support"
@@ -90,15 +88,15 @@ Fügen Sie einen `broadcast`-Abschnitt auf oberster Ebene hinzu (neben `bindings
 }
 ```
 
-**Ergebnis:** Wenn OpenClaw in diesem Chat antworten würde, führt es alle drei Agents aus.
+**Ergebnis:** Wenn OpenClaw in diesem Chat antworten würde, führt es alle drei Agenten aus.
 
 ### Verarbeitungsstrategie
 
-Steuern Sie, wie Agents Nachrichten verarbeiten:
+Steuern Sie, wie Agenten Nachrichten verarbeiten:
 
 #### Parallel (Standard)
 
-Alle Agents verarbeiten gleichzeitig:
+Alle Agenten verarbeiten gleichzeitig:
 
 ```json
 {
@@ -109,9 +107,9 @@ Alle Agents verarbeiten gleichzeitig:
 }
 ```
 
-#### Sequenziell
+#### Sequentiell
 
-Agents verarbeiten der Reihe nach (einer wartet, bis der vorherige fertig ist):
+Agenten verarbeiten der Reihe nach (einer wartet, bis der vorherige fertig ist):
 
 ```json
 {
@@ -157,42 +155,42 @@ Agents verarbeiten der Reihe nach (einer wartet, bis der vorherige fertig ist):
 }
 ```
 
-## So funktioniert es
+## Funktionsweise
 
 ### Nachrichtenfluss
 
-1. **Eingehende Nachricht** trifft in einer WhatsApp-Gruppe ein
+1. **Eine eingehende Nachricht** trifft in einer WhatsApp-Gruppe ein
 2. **Broadcast-Prüfung**: Das System prüft, ob die Peer-ID in `broadcast` enthalten ist
-3. **Wenn in der Broadcast-Liste**:
-   - Alle aufgeführten Agents verarbeiten die Nachricht
+3. **Wenn sie in der Broadcast-Liste enthalten ist**:
+   - Alle aufgeführten Agenten verarbeiten die Nachricht
    - Jeder Agent hat seinen eigenen Sitzungsschlüssel und isolierten Kontext
-   - Agents verarbeiten parallel (Standard) oder sequenziell
-4. **Wenn nicht in der Broadcast-Liste**:
-   - Normales Routing wird angewendet (erste passende Bindung)
+   - Agenten verarbeiten parallel (Standard) oder sequentiell
+4. **Wenn sie nicht in der Broadcast-Liste enthalten ist**:
+   - Es gilt das normale Routing (erste passende Bindung)
 
-Hinweis: Broadcast-Gruppen umgehen keine Channel-Allowlisten oder Gruppenaktivierungsregeln (Erwähnungen/Befehle/etc.). Sie ändern nur, _welche Agents ausgeführt werden_, wenn eine Nachricht für die Verarbeitung infrage kommt.
+Hinweis: Broadcast-Gruppen umgehen weder Channel-Allowlists noch Gruppenaktivierungsregeln (Erwähnungen/Befehle/usw.). Sie ändern nur, _welche Agenten ausgeführt werden_, wenn eine Nachricht zur Verarbeitung berechtigt ist.
 
 ### Sitzungsisolierung
 
-Jeder Agent in einer Broadcast-Gruppe verwaltet vollständig getrennte:
+Jeder Agent in einer Broadcast-Gruppe verwaltet vollständig getrennt:
 
 - **Sitzungsschlüssel** (`agent:alfred:whatsapp:group:120363...` vs `agent:baerbel:whatsapp:group:120363...`)
-- **Konversationsverlauf** (der Agent sieht die Nachrichten anderer Agents nicht)
+- **Konversationsverlauf** (der Agent sieht die Nachrichten anderer Agenten nicht)
 - **Workspace** (separate Sandboxes, falls konfiguriert)
 - **Tool-Zugriff** (unterschiedliche Allow-/Deny-Listen)
-- **Speicher/Kontext** (separate IDENTITY.md, SOUL.md usw.)
-- **Gruppenkontextpuffer** (aktuelle Gruppennachrichten, die als Kontext verwendet werden) wird pro Peer gemeinsam genutzt, sodass alle Broadcast-Agents beim Auslösen denselben Kontext sehen
+- **Memory/Kontext** (separate `IDENTITY.md`, `SOUL.md` usw.)
+- **Gruppenkontextpuffer** (aktuelle Gruppennachrichten, die als Kontext verwendet werden) wird pro Peer gemeinsam genutzt, sodass alle Broadcast-Agenten beim Auslösen denselben Kontext sehen
 
 Dadurch kann jeder Agent Folgendes haben:
 
 - Unterschiedliche Persönlichkeiten
-- Unterschiedlichen Tool-Zugriff (z. B. schreibgeschützt vs. Lese-/Schreibzugriff)
+- Unterschiedlichen Tool-Zugriff (z. B. schreibgeschützt vs. Lesen/Schreiben)
 - Unterschiedliche Modelle (z. B. opus vs. sonnet)
 - Unterschiedliche installierte Skills
 
 ### Beispiel: Isolierte Sitzungen
 
-In Gruppe `120363403215116621@g.us` mit Agents `["alfred", "baerbel"]`:
+In der Gruppe `120363403215116621@g.us` mit den Agenten `["alfred", "baerbel"]`:
 
 **Alfreds Kontext:**
 
@@ -212,11 +210,11 @@ Workspace: /Users/user/openclaw-baerbel/
 Tools: read only
 ```
 
-## Best Practices
+## Bewährte Verfahren
 
-### 1. Agents fokussiert halten
+### 1. Halten Sie Agenten fokussiert
 
-Entwerfen Sie jeden Agent mit einer einzelnen, klaren Aufgabe:
+Entwerfen Sie jeden Agenten mit einer einzelnen, klaren Aufgabe:
 
 ```json
 {
@@ -227,9 +225,9 @@ Entwerfen Sie jeden Agent mit einer einzelnen, klaren Aufgabe:
 ```
 
 ✅ **Gut:** Jeder Agent hat genau eine Aufgabe  
-❌ **Schlecht:** Ein allgemeiner „dev-helper“-Agent
+❌ **Schlecht:** Ein allgemeiner Agent „dev-helper“
 
-### 2. Beschreibende Namen verwenden
+### 2. Verwenden Sie aussagekräftige Namen
 
 Machen Sie klar, was jeder Agent tut:
 
@@ -245,32 +243,32 @@ Machen Sie klar, was jeder Agent tut:
 
 ### 3. Unterschiedlichen Tool-Zugriff konfigurieren
 
-Geben Sie Agents nur die Tools, die sie benötigen:
+Geben Sie Agenten nur die Tools, die sie benötigen:
 
 ```json
 {
   "agents": {
     "reviewer": {
-      "tools": { "allow": ["read", "exec"] } // Nur lesen
+      "tools": { "allow": ["read", "exec"] } // Schreibgeschützt
     },
     "fixer": {
-      "tools": { "allow": ["read", "write", "edit", "exec"] } // Lesen und schreiben
+      "tools": { "allow": ["read", "write", "edit", "exec"] } // Lesen/Schreiben
     }
   }
 }
 ```
 
-### 4. Leistung überwachen
+### 4. Performance überwachen
 
-Bei vielen Agents sollten Sie Folgendes beachten:
+Bei vielen Agenten sollten Sie Folgendes berücksichtigen:
 
-- `"strategy": "parallel"` (Standard) für Geschwindigkeit verwenden
-- Broadcast-Gruppen auf 5–10 Agents begrenzen
-- Schnellere Modelle für einfachere Agents verwenden
+- Verwenden Sie `"strategy": "parallel"` (Standard) für Geschwindigkeit
+- Beschränken Sie Broadcast-Gruppen auf 5–10 Agenten
+- Verwenden Sie schnellere Modelle für einfachere Agenten
 
 ### 5. Fehler robust behandeln
 
-Agents schlagen unabhängig voneinander fehl. Der Fehler eines Agents blockiert die anderen nicht:
+Agenten schlagen unabhängig voneinander fehl. Der Fehler eines Agenten blockiert die anderen nicht:
 
 ```
 Message → [Agent A ✓, Agent B ✗ error, Agent C ✓]
@@ -279,7 +277,7 @@ Result: Agent A and C respond, Agent B logs error
 
 ## Kompatibilität
 
-### Provider
+### Anbieter
 
 Broadcast-Gruppen funktionieren derzeit mit:
 
@@ -313,15 +311,15 @@ Broadcast-Gruppen funktionieren zusammen mit bestehendem Routing:
 
 ## Fehlerbehebung
 
-### Agents antworten nicht
+### Agenten antworten nicht
 
 **Prüfen Sie:**
 
-1. Agent-IDs existieren in `agents.list`
+1. Die Agenten-IDs existieren in `agents.list`
 2. Das Peer-ID-Format ist korrekt (z. B. `120363403215116621@g.us`)
-3. Agents sind nicht in Deny-Listen enthalten
+3. Agenten befinden sich nicht in Deny-Listen
 
-**Debuggen:**
+**Debugging:**
 
 ```bash
 tail -f ~/.openclaw/logs/gateway.log | grep broadcast
@@ -331,15 +329,15 @@ tail -f ~/.openclaw/logs/gateway.log | grep broadcast
 
 **Ursache:** Die Peer-ID befindet sich möglicherweise in `bindings`, aber nicht in `broadcast`.
 
-**Behebung:** Zur Broadcast-Konfiguration hinzufügen oder aus `bindings` entfernen.
+**Lösung:** Zur Broadcast-Konfiguration hinzufügen oder aus `bindings` entfernen.
 
-### Leistungsprobleme
+### Performance-Probleme
 
-**Wenn es mit vielen Agents langsam ist:**
+**Wenn es mit vielen Agenten langsam ist:**
 
-- Anzahl der Agents pro Gruppe reduzieren
-- Leichtere Modelle verwenden (sonnet statt opus)
-- Startzeit der Sandbox prüfen
+- Verringern Sie die Anzahl der Agenten pro Gruppe
+- Verwenden Sie leichtere Modelle (sonnet statt opus)
+- Prüfen Sie die Startzeit der Sandbox
 
 ## Beispiele
 
@@ -382,12 +380,12 @@ tail -f ~/.openclaw/logs/gateway.log | grep broadcast
 **Benutzer sendet:** Code-Snippet  
 **Antworten:**
 
-- code-formatter: „Einrückung korrigiert und Typhinweise hinzugefügt“
+- code-formatter: „Einrückung korrigiert und Typ-Hinweise hinzugefügt“
 - security-scanner: „⚠️ SQL-Injection-Schwachstelle in Zeile 12“
-- test-coverage: „Abdeckung liegt bei 45 %, fehlende Tests für Fehlerfälle“
-- docs-checker: „Fehlender Docstring für Funktion `process_data`“
+- test-coverage: „Die Abdeckung liegt bei 45 %, Tests für Fehlerfälle fehlen“
+- docs-checker: „Fehlender Docstring für die Funktion `process_data`“
 
-### Beispiel 2: Mehrsprachige Unterstützung
+### Beispiel 2: Mehrsprachiger Support
 
 ```json
 {
@@ -420,30 +418,32 @@ interface OpenClawConfig {
 
 ### Felder
 
-- `strategy` (optional): Wie Agents verarbeitet werden
-  - `"parallel"` (Standard): Alle Agents verarbeiten gleichzeitig
-  - `"sequential"`: Agents verarbeiten in der Reihenfolge des Arrays
+- `strategy` (optional): Wie Agenten verarbeitet werden
+  - `"parallel"` (Standard): Alle Agenten verarbeiten gleichzeitig
+  - `"sequential"`: Agenten verarbeiten in der Reihenfolge des Arrays
 - `[peerId]`: WhatsApp-Gruppen-JID, E.164-Nummer oder andere Peer-ID
-  - Wert: Array von Agent-IDs, die Nachrichten verarbeiten sollen
+  - Wert: Array von Agenten-IDs, die Nachrichten verarbeiten sollen
 
 ## Einschränkungen
 
-1. **Max. Agents:** Keine harte Obergrenze, aber 10+ Agents können langsam sein
-2. **Gemeinsamer Kontext:** Agents sehen die Antworten der anderen nicht (absichtlich so)
+1. **Max. Agenten:** Kein festes Limit, aber 10+ Agenten können langsam sein
+2. **Gemeinsamer Kontext:** Agenten sehen die Antworten der anderen nicht (absichtlich)
 3. **Nachrichtenreihenfolge:** Parallele Antworten können in beliebiger Reihenfolge eintreffen
-4. **Rate Limits:** Alle Agents zählen zu den WhatsApp-Rate-Limits
+4. **Ratenbegrenzungen:** Alle Agenten zählen gegen die WhatsApp-Ratenbegrenzungen
 
 ## Zukünftige Erweiterungen
 
 Geplante Funktionen:
 
-- [ ] Modus für gemeinsamen Kontext (Agents sehen die Antworten der anderen)
-- [ ] Agent-Koordination (Agents können sich gegenseitig Signale senden)
-- [ ] Dynamische Agent-Auswahl (Agents basierend auf dem Nachrichteninhalt auswählen)
-- [ ] Agent-Prioritäten (einige Agents antworten vor anderen)
+- [ ] Modus für gemeinsamen Kontext (Agenten sehen die Antworten der anderen)
+- [ ] Agentenkoordination (Agenten können sich gegenseitig Signale senden)
+- [ ] Dynamische Agentenauswahl (Auswahl von Agenten basierend auf dem Nachrichteninhalt)
+- [ ] Agentenprioritäten (einige Agenten antworten vor anderen)
 
-## Siehe auch
+## Verwandt
 
-- [Multi-Agent-Konfiguration](/tools/multi-agent-sandbox-tools)
-- [Routing-Konfiguration](/channels/channel-routing)
-- [Sitzungsverwaltung](/concepts/session)
+- [Gruppen](/de/channels/groups)
+- [Channel-Routing](/de/channels/channel-routing)
+- [Pairing](/de/channels/pairing)
+- [Multi-Agent-Sandbox-Tools](/de/tools/multi-agent-sandbox-tools)
+- [Sitzungsverwaltung](/de/concepts/session)

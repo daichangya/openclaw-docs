@@ -1,25 +1,23 @@
 ---
 read_when:
     - Entwerfen des Onboarding-Assistenten für macOS
-    - Implementieren von Authentifizierung oder Identitäts-Setup
+    - Implementieren von Authentifizierung oder Identitätseinrichtung
 sidebarTitle: 'Onboarding: macOS App'
-summary: Einrichtungsablauf beim ersten Start für OpenClaw (macOS-App)
+summary: Ablauf der Ersteinrichtung für OpenClaw (macOS-App)
 title: Onboarding (macOS-App)
 x-i18n:
-    generated_at: "2026-04-05T12:55:52Z"
+    generated_at: "2026-04-24T07:00:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a3c5f313a8e5c3a2e68a9488f07c40fcdf75b170dc868c7614565ad9f67755d6
+    source_hash: aa516f8f5b4c7318f27a5af4e7ac12f5685aef6f84579a68496c2497d6f9041d
     source_path: start/onboarding.md
     workflow: 15
 ---
 
-# Onboarding (macOS-App)
-
-Diese Doku beschreibt den **aktuellen** Einrichtungsablauf beim ersten Start. Das Ziel ist eine
-reibungslose „Day-0“-Erfahrung: auswählen, wo das Gateway läuft, Authentifizierung verbinden, den
-Assistenten ausführen und den Agenten sich selbst initialisieren lassen.
-Für einen allgemeinen Überblick über Onboarding-Pfade siehe [Onboarding Overview](/start/onboarding-overview).
+Diese Dokumentation beschreibt den **aktuellen** Ablauf der Ersteinrichtung. Ziel ist eine
+reibungslose „Tag 0“-Erfahrung: auswählen, wo das Gateway läuft, Auth verbinden, den
+Assistenten ausführen und den Agenten sich selbst bootstrappen lassen.
+Einen allgemeinen Überblick über Onboarding-Pfade finden Sie unter [Onboarding Overview](/de/start/onboarding-overview).
 
 <Steps>
 <Step title="macOS-Warnung bestätigen">
@@ -27,22 +25,22 @@ Für einen allgemeinen Überblick über Onboarding-Pfade siehe [Onboarding Overv
 <img src="/assets/macos-onboarding/01-macos-warning.jpeg" alt="" />
 </Frame>
 </Step>
-<Step title="Zugriff auf lokale Netzwerke erlauben">
+<Step title="Lokale Netzwerke finden erlauben">
 <Frame>
 <img src="/assets/macos-onboarding/02-local-networks.jpeg" alt="" />
 </Frame>
 </Step>
 <Step title="Willkommen und Sicherheitshinweis">
-<Frame caption="Lies den angezeigten Sicherheitshinweis und entscheide entsprechend">
+<Frame caption="Lesen Sie den angezeigten Sicherheitshinweis und entscheiden Sie entsprechend">
 <img src="/assets/macos-onboarding/03-security-notice.png" alt="" />
 </Frame>
 
-Vertrauensmodell für Sicherheit:
+Sicherheits-Vertrauensmodell:
 
-- Standardmäßig ist OpenClaw ein persönlicher Agent: eine vertrauenswürdige Operator-Grenze.
-- Gemeinsame/Multi-User-Setups erfordern Härtung (Vertrauensgrenzen trennen, Tool-Zugriff minimal halten und [Security](/de/gateway/security) befolgen).
-- Lokales Onboarding setzt neue Konfigurationen jetzt standardmäßig auf `tools.profile: "coding"`, damit frische lokale Setups Dateisystem-/Laufzeit-Tools behalten, ohne das uneingeschränkte Profil `full` zu erzwingen.
-- Wenn Hooks/Webhooks oder andere Feeds mit nicht vertrauenswürdigen Inhalten aktiviert sind, verwende ein starkes modernes Modell-Tier und halte strikte Tool-Richtlinien/Sandboxing ein.
+- Standardmäßig ist OpenClaw ein persönlicher Agent: eine vertrauenswürdige Operatorgrenze.
+- Gemeinsam genutzte/Mehrbenutzer-Setups erfordern Härtung (Vertrauensgrenzen aufteilen, Tool-Zugriff minimal halten und [Security](/de/gateway/security) befolgen).
+- Lokales Onboarding setzt neue Konfigurationen jetzt standardmäßig auf `tools.profile: "coding"`, sodass frische lokale Setups Dateisystem-/Laufzeit-Tools behalten, ohne das uneingeschränkte Profil `full` zu erzwingen.
+- Wenn Hooks/Webhooks oder andere Feeds mit nicht vertrauenswürdigen Inhalten aktiviert sind, verwenden Sie eine starke moderne Modellklasse und halten Sie Tool-Richtlinie/Sandboxing strikt.
 
 </Step>
 <Step title="Lokal vs. Remote">
@@ -52,32 +50,32 @@ Vertrauensmodell für Sicherheit:
 
 Wo läuft das **Gateway**?
 
-- **Dieser Mac (nur lokal):** Das Onboarding kann Authentifizierung konfigurieren und Credentials
+- **Dieser Mac (nur lokal):** Das Onboarding kann Auth konfigurieren und Zugangsdaten
   lokal schreiben.
-- **Remote (über SSH/Tailnet):** Das Onboarding konfiguriert **keine** lokale Authentifizierung;
-  Credentials müssen auf dem Gateway-Host vorhanden sein.
-- **Später konfigurieren:** Einrichtung überspringen und die App unkonfiguriert lassen.
+- **Remote (über SSH/Tailnet):** Das Onboarding konfiguriert **keine** lokale Auth;
+  Zugangsdaten müssen auf dem Gateway-Host vorhanden sein.
+- **Später konfigurieren:** Setup überspringen und die App unkonfiguriert lassen.
 
 <Tip>
-**Tipp zur Gateway-Authentifizierung:**
+**Tipp zur Gateway-Auth:**
 
-- Der Assistent generiert jetzt selbst für loopback einen **Token**, sodass lokale WS-Clients sich authentifizieren müssen.
-- Wenn du die Authentifizierung deaktivierst, kann sich jeder lokale Prozess verbinden; verwende das nur auf vollständig vertrauenswürdigen Rechnern.
-- Verwende einen **Token** für den Zugriff über mehrere Rechner oder für Bindings ohne loopback.
+- Der Assistent erzeugt jetzt selbst für Loopback ein **Token**, sodass lokale WS-Clients sich authentifizieren müssen.
+- Wenn Sie Auth deaktivieren, kann sich jeder lokale Prozess verbinden; verwenden Sie das nur auf vollständig vertrauenswürdigen Maschinen.
+- Verwenden Sie ein **Token** für Mehrmaschinenzugriff oder Binds außerhalb von Loopback.
 
 </Tip>
 </Step>
 <Step title="Berechtigungen">
-<Frame caption="Wähle aus, welche Berechtigungen du OpenClaw geben möchtest">
+<Frame caption="Wählen Sie aus, welche Berechtigungen Sie OpenClaw geben möchten">
 <img src="/assets/macos-onboarding/05-permissions.png" alt="" />
 </Frame>
 
-Das Onboarding fordert die für Folgendes benötigten TCC-Berechtigungen an:
+Das Onboarding fordert TCC-Berechtigungen an, die benötigt werden für:
 
 - Automatisierung (AppleScript)
-- Mitteilungen
+- Benachrichtigungen
 - Bedienungshilfen
-- Bildschirmaufnahme
+- Bildschirmaufzeichnung
 - Mikrofon
 - Spracherkennung
 - Kamera
@@ -86,14 +84,19 @@ Das Onboarding fordert die für Folgendes benötigten TCC-Berechtigungen an:
 </Step>
 <Step title="CLI">
   <Info>Dieser Schritt ist optional</Info>
-  Die App kann die globale `openclaw`-CLI über npm, pnpm oder bun installieren.
-  Sie bevorzugt zuerst npm, dann pnpm und dann bun, wenn dies der einzige erkannte
+  Die App kann die globale CLI `openclaw` über npm, pnpm oder bun installieren.
+  Sie bevorzugt zuerst npm, dann pnpm und dann bun, wenn dies der einzig erkannte
   Paketmanager ist. Für die Gateway-Laufzeit bleibt Node der empfohlene Pfad.
 </Step>
-<Step title="Onboarding-Chat (dedizierte Session)">
-  Nach der Einrichtung öffnet die App eine dedizierte Onboarding-Chat-Session, damit der Agent sich
-  vorstellen und die nächsten Schritte anleiten kann. So bleibt die Anleitung beim ersten Start getrennt
-  von deinem normalen Gespräch. Siehe [Bootstrapping](/start/bootstrapping), um zu erfahren,
-  was auf dem Gateway-Host beim ersten Lauf des Agenten passiert.
+<Step title="Onboarding-Chat (dedizierte Sitzung)">
+  Nach dem Setup öffnet die App eine dedizierte Onboarding-Chat-Sitzung, damit der Agent
+  sich vorstellen und die nächsten Schritte anleiten kann. Dadurch bleibt die Anleitung beim ersten Start
+  von Ihrer normalen Unterhaltung getrennt. Siehe [Bootstrapping](/de/start/bootstrapping) für
+  das, was auf dem Gateway-Host während des ersten Agent-Laufs geschieht.
 </Step>
 </Steps>
+
+## Verwandt
+
+- [Onboarding Overview](/de/start/onboarding-overview)
+- [Erste Schritte](/de/start/getting-started)

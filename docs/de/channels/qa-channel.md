@@ -1,35 +1,33 @@
 ---
 read_when:
     - Sie binden den synthetischen QA-Transport in einen lokalen oder CI-Testlauf ein
-    - Sie benötigen die gebündelte `qa-channel`-Konfigurationsoberfläche
-    - Sie arbeiten iterativ an einer End-to-End-QA-Automatisierung
+    - Sie benötigen die Konfigurationsoberfläche des gebündelten qa-channel
+    - Sie arbeiten an der Ende-zu-Ende-QA-Automatisierung iteratively
 summary: Synthetisches Slack-ähnliches Channel-Plugin für deterministische OpenClaw-QA-Szenarien
 title: QA-Channel
 x-i18n:
-    generated_at: "2026-04-07T06:13:34Z"
+    generated_at: "2026-04-24T06:28:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 65c2c908d3ec27c827087616c4ea278f10686810091058321ff26f68296a1782
+    source_hash: 195312376ce8815af44169505b66314eb287ede19e40d27db5b4f256edaa0b46
     source_path: channels/qa-channel.md
     workflow: 15
 ---
 
-# QA-Channel
-
 `qa-channel` ist ein gebündelter synthetischer Nachrichtentransport für automatisierte OpenClaw-QA.
 
-Er ist kein Produktions-Channel. Er dient dazu, dieselbe Channel-Plugin-Grenze zu nutzen
-wie reale Transporte, während der Zustand deterministisch und vollständig
+Er ist kein Produktions-Channel. Er dient dazu, dieselbe Channel-Plugin-Grenze zu testen,
+die auch von echten Transporten verwendet wird, während der Zustand deterministisch und vollständig
 prüfbar bleibt.
 
-## Was er heute macht
+## Was er heute leistet
 
 - Slack-ähnliche Zielgrammatik:
   - `dm:<user>`
   - `channel:<room>`
   - `thread:<room>/<thread>`
 - HTTP-gestützter synthetischer Bus für:
-  - Einspeisung eingehender Nachrichten
+  - Injektion eingehender Nachrichten
   - Erfassung ausgehender Transkripte
   - Thread-Erstellung
   - Reaktionen
@@ -69,14 +67,14 @@ Unterstützte Kontoschlüssel:
 
 ## Runner
 
-Aktueller vertikaler Ausschnitt:
+Aktueller vertikaler Slice:
 
 ```bash
 pnpm qa:e2e
 ```
 
-Dies wird jetzt über die gebündelte `qa-lab`-Erweiterung geleitet. Sie startet den
-QA-Bus im Repository, bootet den gebündelten `qa-channel`-Runtime-Ausschnitt, führt einen deterministischen
+Dies wird jetzt über die gebündelte `qa-lab`-Erweiterung geleitet. Es startet den
+QA-Bus im Repository, bootet den gebündelten `qa-channel`-Runtime-Slice, führt einen deterministischen
 Self-Check aus und schreibt einen Markdown-Bericht unter `.artifacts/qa-e2e/`.
 
 Private Debugger-Benutzeroberfläche:
@@ -85,11 +83,11 @@ Private Debugger-Benutzeroberfläche:
 pnpm qa:lab:up
 ```
 
-Dieser einzelne Befehl baut die QA-Site, startet den Docker-gestützten Gateway- + QA-Lab-
-Stack und gibt die QA-Lab-URL aus. Auf dieser Site können Sie Szenarien auswählen, die
-Modell-Lane wählen, einzelne Läufe starten und die Ergebnisse live verfolgen.
+Dieser einzelne Befehl baut die QA-Site, startet den Docker-gestützten Gateway- + QA-Lab-Stack
+und gibt die QA-Lab-URL aus. Auf dieser Site können Sie Szenarien auswählen, die Modell-Lane wählen,
+einzelne Durchläufe starten und die Ergebnisse live beobachten.
 
-Vollständige Repository-gestützte QA-Suite:
+Vollständige repository-gestützte QA-Suite:
 
 ```bash
 pnpm openclaw qa suite
@@ -100,16 +98,22 @@ ausgelieferten Control-UI-Bundle.
 
 ## Umfang
 
-Der aktuelle Umfang ist bewusst eng gefasst:
+Der aktuelle Umfang ist absichtlich eng gehalten:
 
 - Bus + Plugin-Transport
 - Threaded-Routing-Grammatik
 - Channel-eigene Nachrichtenaktionen
 - Markdown-Berichterstellung
-- Docker-gestützte QA-Site mit Laufsteuerungen
+- Docker-gestützte QA-Site mit Ausführungssteuerung
 
-Folgearbeiten werden hinzufügen:
+Spätere Arbeiten werden Folgendes hinzufügen:
 
-- Ausführung einer Provider-/Modell-Matrix
-- umfassendere Szenarioerkennung
+- Ausführung über Anbieter-/Modell-Matrix
+- umfangreichere Szenarioerkennung
 - später OpenClaw-native Orchestrierung
+
+## Verwandt
+
+- [Pairing](/de/channels/pairing)
+- [Gruppen](/de/channels/groups)
+- [Channel-Überblick](/de/channels)

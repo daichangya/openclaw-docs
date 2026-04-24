@@ -1,32 +1,36 @@
 ---
 read_when:
-    - Verwenden der Dev-Gateway-Vorlagen
-    - Aktualisieren der Standardidentität des Dev-Agenten
+    - Die Dev-Gateway-Vorlagen verwenden.
+    - Die Standardidentität des Dev-Agenten aktualisieren.
 summary: Hinweise zu Dev-Agent-Tools (C-3PO)
 title: TOOLS.dev-Vorlage
 x-i18n:
-    generated_at: "2026-04-05T12:55:12Z"
+    generated_at: "2026-04-24T06:59:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7a7fb38aad160335dec5a5ceb9d71ec542c21a06794ae3e861fa562db7abe69d
+    source_hash: 23c11e2832ed0dcf9ddd43e5472e0c025c1a91a33299019c16f00a7230e8e99c
     source_path: reference/templates/TOOLS.dev.md
     workflow: 15
 ---
 
-# TOOLS.md - Hinweise zu Benutzer-Tools (bearbeitbar)
+# TOOLS.md - Benutzerhinweise zu Tools (bearbeitbar)
 
-Diese Datei ist für _Ihre_ Notizen zu externen Tools und Konventionen.
-Sie definiert nicht, welche Tools existieren; OpenClaw stellt intern integrierte Tools bereit.
+Diese Datei ist für _Ihre_ Hinweise zu externen Tools und Konventionen.
+Sie definiert nicht, welche Tools existieren; OpenClaw stellt eingebaute Tools intern bereit.
 
 ## Beispiele
 
 ### imsg
 
-- Eine iMessage/SMS senden: beschreiben Sie an wen/was, vor dem Senden bestätigen.
-- Kurze Nachrichten bevorzugen; keine Geheimnisse senden.
+- Eine iMessage/SMS senden: Beschreiben Sie an wen/was und bestätigen Sie vor dem Senden.
+- Bevorzugen Sie kurze Nachrichten; senden Sie keine Geheimnisse.
 
 ### sag
 
-- Text-to-Speech: Stimme, Zielspeaker/-raum und ob gestreamt werden soll angeben.
+- Text-to-Speech: Geben Sie Stimme, Zielsprecher/-raum und an, ob gestreamt werden soll.
 
-Fügen Sie alles Weitere hinzu, das der Assistent über Ihre lokale Toolchain wissen soll.
+Fügen Sie alles hinzu, was der Assistant über Ihre lokale Toolchain wissen soll.
+
+## Verwandt
+
+- [TOOLS.md-Vorlage](/de/reference/templates/TOOLS)

@@ -1,42 +1,42 @@
 ---
 read_when:
-    - Ändern der Kanalweiterleitung oder des Posteingangsverhaltens
-summary: Weiterleitungsregeln pro Kanal (WhatsApp, Telegram, Discord, Slack) und gemeinsamer Kontext
-title: Kanalweiterleitung
+    - Kanalrouting oder Posteingangsverhalten ändern
+summary: Routing-Regeln pro Kanal (WhatsApp, Telegram, Discord, Slack) und gemeinsamer Kontext
+title: Kanalrouting
 x-i18n:
-    generated_at: "2026-04-23T13:57:54Z"
+    generated_at: "2026-04-24T06:26:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad1101d9d3411d9e9f48efd14c0dab09d76e83a6bd93c713d38efc01a14c8391
+    source_hash: cb87a774bb094af15524702c2c4fd17cf0b41fe27ac0943d1008523a43d5553b
     source_path: channels/channel-routing.md
     workflow: 15
 ---
 
-# Kanäle & Weiterleitung
+# Kanäle und Routing
 
-OpenClaw leitet Antworten **zurück an den Kanal weiter, aus dem eine Nachricht stammt**. Das
-Modell wählt keinen Kanal aus; die Weiterleitung ist deterministisch und wird durch die
+OpenClaw leitet Antworten **zurück an den Kanal, aus dem eine Nachricht stammt**. Das
+Modell wählt keinen Kanal aus; das Routing ist deterministisch und wird durch die
 Host-Konfiguration gesteuert.
 
 ## Schlüsselbegriffe
 
 - **Kanal**: `telegram`, `whatsapp`, `discord`, `irc`, `googlechat`, `slack`, `signal`, `imessage`, `line` sowie Plugin-Kanäle. `webchat` ist der interne WebChat-UI-Kanal und kein konfigurierbarer ausgehender Kanal.
-- **AccountId**: Kanalbezogene Account-Instanz (wenn unterstützt).
+- **AccountId**: kanalbezogene Account-Instanz (falls unterstützt).
 - Optionales Kanal-Standardkonto: `channels.<channel>.defaultAccount` legt fest,
-  welches Konto verwendet wird, wenn ein ausgehender Pfad kein `accountId` angibt.
-  - In Multi-Account-Setups sollten Sie einen expliziten Standard festlegen (`defaultAccount` oder `accounts.default`), wenn zwei oder mehr Konten konfiguriert sind. Andernfalls kann die Fallback-Weiterleitung die erste normalisierte Account-ID auswählen.
-- **AgentId**: ein isolierter Arbeitsbereich + Sitzungsspeicher („Gehirn“).
-- **SessionKey**: der Bucket-Schlüssel, der zum Speichern von Kontext und zur Steuerung der Nebenläufigkeit verwendet wird.
+  welches Konto verwendet wird, wenn ein ausgehender Pfad keine `accountId` angibt.
+  - In Multi-Account-Setups setzen Sie einen expliziten Standardwert (`defaultAccount` oder `accounts.default`), wenn zwei oder mehr Konten konfiguriert sind. Andernfalls kann das Fallback-Routing die erste normalisierte Konto-ID auswählen.
+- **AgentId**: ein isolierter Workspace + Sitzungsspeicher („Gehirn“).
+- **SessionKey**: der Bucket-Schlüssel, der zum Speichern von Kontext und zur Steuerung der Parallelität verwendet wird.
 
 ## SessionKey-Formen (Beispiele)
 
-Direktnachrichten werden standardmäßig zur **main**-Sitzung des Agenten zusammengefasst:
+Direktnachrichten werden standardmäßig in der **Haupt**-Sitzung des Agenten zusammengefasst:
 
 - `agent:<agentId>:<mainKey>` (Standard: `agent:main:main`)
 
-Selbst wenn der Direktnachrichten-Konversationsverlauf mit main geteilt wird, verwenden Sandbox und
-Tool-Richtlinie einen abgeleiteten laufzeitspezifischen Direktchat-Schlüssel pro Konto für externe DMs,
-damit kanalseitig eingehende Nachrichten nicht wie lokale main-Sitzungsläufe behandelt werden.
+Auch wenn der Direktnachrichten-Konversationsverlauf mit der Hauptsitzung geteilt wird, verwenden Sandbox und
+Tool-Richtlinie für externe DMs einen abgeleiteten laufzeitspezifischen Direktchat-Schlüssel pro Konto,
+damit kanalursprüngliche Nachrichten nicht wie lokale Hauptsitzungs-Ausführungen behandelt werden.
 
 Gruppen und Kanäle bleiben pro Kanal isoliert:
 
@@ -53,39 +53,39 @@ Beispiele:
 - `agent:main:telegram:group:-1001234567890:topic:42`
 - `agent:main:discord:channel:123456:thread:987654`
 
-## main-DM-Routen-Pinning
+## Anheften der Haupt-DM-Route
 
-Wenn `session.dmScope` auf `main` gesetzt ist, können Direktnachrichten eine gemeinsame main-Sitzung verwenden.
-Um zu verhindern, dass die `lastRoute` der Sitzung durch DMs von Nicht-Eigentümern überschrieben wird,
+Wenn `session.dmScope` auf `main` gesetzt ist, können Direktnachrichten eine gemeinsame Hauptsitzung verwenden.
+Damit `lastRoute` der Sitzung nicht durch DMs von Nicht-Eigentümern überschrieben wird,
 leitet OpenClaw einen angehefteten Eigentümer aus `allowFrom` ab, wenn alle folgenden Bedingungen erfüllt sind:
 
-- `allowFrom` hat genau einen Nicht-Wildcard-Eintrag.
+- `allowFrom` hat genau einen nicht-Wildcard-Eintrag.
 - Der Eintrag kann für diesen Kanal zu einer konkreten Absender-ID normalisiert werden.
-- Der Absender der eingehenden DM stimmt nicht mit diesem angehefteten Eigentümer überein.
+- Der eingehende DM-Absender stimmt nicht mit diesem angehefteten Eigentümer überein.
 
-Im Fall einer solchen Nichtübereinstimmung speichert OpenClaw weiterhin Metadaten zur eingehenden Sitzung,
-überspringt aber die Aktualisierung von `lastRoute` der main-Sitzung.
+In diesem Fall zeichnet OpenClaw weiterhin eingehende Sitzungsmetadaten auf, überspringt jedoch
+das Aktualisieren von `lastRoute` der Hauptsitzung.
 
-## Weiterleitungsregeln (wie ein Agent ausgewählt wird)
+## Routing-Regeln (wie ein Agent ausgewählt wird)
 
-Die Weiterleitung wählt **einen Agenten** für jede eingehende Nachricht aus:
+Das Routing wählt für jede eingehende Nachricht **einen Agenten** aus:
 
 1. **Exakte Peer-Übereinstimmung** (`bindings` mit `peer.kind` + `peer.id`).
 2. **Übereinstimmung des übergeordneten Peers** (Thread-Vererbung).
-3. **Guild- + Rollen-Übereinstimmung** (Discord) über `guildId` + `roles`.
+3. **Guild- + Rollenübereinstimmung** (Discord) über `guildId` + `roles`.
 4. **Guild-Übereinstimmung** (Discord) über `guildId`.
 5. **Team-Übereinstimmung** (Slack) über `teamId`.
 6. **Konto-Übereinstimmung** (`accountId` auf dem Kanal).
-7. **Kanal-Übereinstimmung** (jedes Konto auf diesem Kanal, `accountId: "*"`).
-8. **Standard-Agent** (`agents.list[].default`, sonst der erste Listeneintrag, Fallback auf `main`).
+7. **Kanal-Übereinstimmung** (beliebiges Konto auf diesem Kanal, `accountId: "*"`).
+8. **Standard-Agent** (`agents.list[].default`, andernfalls erster Listeneintrag, Fallback zu `main`).
 
-Wenn eine Bindung mehrere Abgleichsfelder enthält (`peer`, `guildId`, `teamId`, `roles`), **müssen alle angegebenen Felder übereinstimmen**, damit diese Bindung angewendet wird.
+Wenn ein Binding mehrere Match-Felder enthält (`peer`, `guildId`, `teamId`, `roles`), **müssen alle angegebenen Felder übereinstimmen**, damit dieses Binding angewendet wird.
 
-Der abgeglichene Agent bestimmt, welcher Arbeitsbereich und welcher Sitzungsspeicher verwendet werden.
+Der übereinstimmende Agent bestimmt, welcher Workspace und welcher Sitzungsspeicher verwendet werden.
 
 ## Broadcast-Gruppen (mehrere Agenten ausführen)
 
-Broadcast-Gruppen erlauben es Ihnen, **mehrere Agenten** für denselben Peer auszuführen, **wenn OpenClaw normalerweise antworten würde** (zum Beispiel: in WhatsApp-Gruppen nach Erwähnungs-/Aktivierungs-Gating).
+Mit Broadcast-Gruppen können Sie **mehrere Agenten** für denselben Peer ausführen, **wenn OpenClaw normalerweise antworten würde** (zum Beispiel in WhatsApp-Gruppen nach Erwähnungs-/Aktivierungs-Gating).
 
 Konfiguration:
 
@@ -101,9 +101,9 @@ Konfiguration:
 
 Siehe: [Broadcast-Gruppen](/de/channels/broadcast-groups).
 
-## Konfigurationsübersicht
+## Konfigurationsüberblick
 
-- `agents.list`: benannte Agent-Definitionen (Arbeitsbereich, Modell usw.).
+- `agents.list`: benannte Agent-Definitionen (Workspace, Modell usw.).
 - `bindings`: ordnet eingehende Kanäle/Konten/Peers Agenten zu.
 
 Beispiel:
@@ -120,24 +120,25 @@ Beispiel:
 }
 ```
 
-## Sitzungsspeicher
+## Sitzungsspeicherung
 
-Sitzungsspeicher liegen unter dem Zustandsverzeichnis (Standard `~/.openclaw`):
+Sitzungsspeicher befinden sich unter dem Zustandsverzeichnis (Standard `~/.openclaw`):
 
 - `~/.openclaw/agents/<agentId>/sessions/sessions.json`
-- JSONL-Transkripte liegen neben dem Speicher
+- JSONL-Transkripte befinden sich neben dem Speicher
 
 Sie können den Speicherpfad über `session.store` und `{agentId}`-Templating überschreiben.
 
-Gateway- und ACP-Sitzungserkennung durchsucht auch festplattenbasierte Agent-Speicher unter dem
-Standard-Stammverzeichnis `agents/` und unter per Template erzeugten `session.store`-Wurzeln. Erkannte
-Speicher müssen innerhalb dieser aufgelösten Agent-Wurzel bleiben und eine reguläre
-`sessions.json`-Datei verwenden. Symlinks und Pfade außerhalb der Wurzel werden ignoriert.
+Gateway- und ACP-Sitzungserkennung durchsucht auch datenträgergestützte Agent-Speicher unter dem
+Standard-Root `agents/` sowie unter templatisierten `session.store`-Roots. Erkannte
+Speicher müssen innerhalb dieses aufgelösten Agent-Roots bleiben und eine reguläre
+`sessions.json`-Datei verwenden. Symlinks und Pfade außerhalb des Roots werden ignoriert.
 
 ## WebChat-Verhalten
 
-WebChat ist an den **ausgewählten Agenten** gebunden und verwendet standardmäßig die main-Sitzung des
-Agenten. Deshalb können Sie in WebChat kanalübergreifenden Kontext für diesen Agenten an einer Stelle sehen.
+WebChat wird an den **ausgewählten Agenten** angehängt und verwendet standardmäßig die
+Hauptsitzung des Agenten. Dadurch können Sie in WebChat kanalübergreifenden Kontext für diesen
+Agenten an einer Stelle sehen.
 
 ## Antwortkontext
 
@@ -146,4 +147,10 @@ Eingehende Antworten enthalten:
 - `ReplyToId`, `ReplyToBody` und `ReplyToSender`, wenn verfügbar.
 - Zitierter Kontext wird als Block `[Replying to ...]` an `Body` angehängt.
 
-Das ist kanalübergreifend konsistent.
+Dies ist kanalübergreifend konsistent.
+
+## Verwandt
+
+- [Gruppen](/de/channels/groups)
+- [Broadcast-Gruppen](/de/channels/broadcast-groups)
+- [Kopplung](/de/channels/pairing)

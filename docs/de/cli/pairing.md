@@ -1,24 +1,24 @@
 ---
 read_when:
-    - Sie verwenden DMs im Pairing-Modus und müssen Absender genehmigen
-summary: CLI-Referenz für `openclaw pairing` (Pairing-Anfragen genehmigen/auflisten)
-title: pairing
+    - Sie verwenden DMs im Kopplungsmodus und müssen Absender genehmigen
+summary: CLI-Referenz für `openclaw pairing` (Kopplungsanfragen genehmigen/auflisten)
+title: Kopplung
 x-i18n:
-    generated_at: "2026-04-05T12:38:45Z"
+    generated_at: "2026-04-24T06:32:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 122a608ef83ec2b1011fdfd1b59b94950a4dcc8b598335b0956e2eedece4958f
+    source_hash: 9e81dc407138e958e41d565b0addb600ad1ba5187627bb219f0b85b92bd112d1
     source_path: cli/pairing.md
     workflow: 15
 ---
 
 # `openclaw pairing`
 
-DM-Pairing-Anfragen genehmigen oder prüfen (für Kanäle, die Pairing unterstützen).
+DM-Kopplungsanfragen genehmigen oder prüfen (für Kanäle, die Kopplung unterstützen).
 
 Verwandt:
 
-- Pairing-Ablauf: [Pairing](/channels/pairing)
+- Kopplungsablauf: [Pairing](/de/channels/pairing)
 
 ## Befehle
 
@@ -34,39 +34,44 @@ openclaw pairing approve --channel telegram --account work <code> --notify
 
 ## `pairing list`
 
-Ausstehende Pairing-Anfragen für einen Kanal auflisten.
+Ausstehende Kopplungsanfragen für einen Kanal auflisten.
 
 Optionen:
 
 - `[channel]`: positionale Kanal-ID
 - `--channel <channel>`: explizite Kanal-ID
-- `--account <accountId>`: Konto-ID für Kanäle mit mehreren Konten
+- `--account <accountId>`: Account-ID für Multi-Account-Kanäle
 - `--json`: maschinenlesbare Ausgabe
 
 Hinweise:
 
-- Wenn mehrere Pairing-fähige Kanäle konfiguriert sind, müssen Sie einen Kanal entweder positional oder mit `--channel` angeben.
-- Erweiterungskanäle sind zulässig, solange die Kanal-ID gültig ist.
+- Wenn mehrere kopplungsfähige Kanäle konfiguriert sind, müssen Sie einen Kanal entweder positional oder mit `--channel` angeben.
+- Extension-Kanäle sind erlaubt, solange die Kanal-ID gültig ist.
 
 ## `pairing approve`
 
-Einen ausstehenden Pairing-Code genehmigen und diesen Absender zulassen.
+Einen ausstehenden Kopplungscode genehmigen und diesen Absender erlauben.
 
 Verwendung:
 
 - `openclaw pairing approve <channel> <code>`
 - `openclaw pairing approve --channel <channel> <code>`
-- `openclaw pairing approve <code>`, wenn genau ein Pairing-fähiger Kanal konfiguriert ist
+- `openclaw pairing approve <code>`, wenn genau ein kopplungsfähiger Kanal konfiguriert ist
 
 Optionen:
 
 - `--channel <channel>`: explizite Kanal-ID
-- `--account <accountId>`: Konto-ID für Kanäle mit mehreren Konten
+- `--account <accountId>`: Account-ID für Multi-Account-Kanäle
 - `--notify`: eine Bestätigung über denselben Kanal an den Anfragenden senden
 
 ## Hinweise
 
-- Kanaleingabe: Geben Sie sie positional an (`pairing list telegram`) oder mit `--channel <channel>`.
-- `pairing list` unterstützt `--account <accountId>` für Kanäle mit mehreren Konten.
+- Kanaleingabe: Geben Sie sie positional (`pairing list telegram`) oder mit `--channel <channel>` an.
+- `pairing list` unterstützt `--account <accountId>` für Multi-Account-Kanäle.
 - `pairing approve` unterstützt `--account <accountId>` und `--notify`.
-- Wenn nur ein Pairing-fähiger Kanal konfiguriert ist, ist `pairing approve <code>` zulässig.
+- Wenn nur ein kopplungsfähiger Kanal konfiguriert ist, ist `pairing approve <code>` erlaubt.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Kanal-Kopplung](/de/channels/pairing)

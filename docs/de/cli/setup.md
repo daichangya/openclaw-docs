@@ -1,25 +1,25 @@
 ---
 read_when:
     - Sie führen die Ersteinrichtung ohne vollständiges CLI-Onboarding durch
-    - Sie möchten den Standardpfad für den Workspace festlegen
+    - Sie möchten den Standard-Workspace-Pfad festlegen
 summary: CLI-Referenz für `openclaw setup` (Konfiguration + Workspace initialisieren)
-title: setup
+title: Einrichtung
 x-i18n:
-    generated_at: "2026-04-05T12:39:03Z"
+    generated_at: "2026-04-24T06:32:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f538aac341c749043ad959e35f2ed99c844ab8c3500ff59aa159d940bd301792
+    source_hash: 650b0faf99ef1bc24ec6514661093a9a2ba7edead2e2622b863d51553c44f267
     source_path: cli/setup.md
     workflow: 15
 ---
 
 # `openclaw setup`
 
-Initialisieren Sie `~/.openclaw/openclaw.json` und den Agent Workspace.
+`~/.openclaw/openclaw.json` und den Agent-Workspace initialisieren.
 
 Verwandt:
 
-- Erste Schritte: [Getting started](/de/start/getting-started)
+- Erste Schritte: [Erste Schritte](/de/start/getting-started)
 - CLI-Onboarding: [Onboarding (CLI)](/de/start/wizard)
 
 ## Beispiele
@@ -33,12 +33,12 @@ openclaw setup --non-interactive --mode remote --remote-url wss://gateway-host:1
 
 ## Optionen
 
-- `--workspace <dir>`: Verzeichnis des Agent Workspace (wird als `agents.defaults.workspace` gespeichert)
+- `--workspace <dir>`: Workspace-Verzeichnis des Agenten (gespeichert als `agents.defaults.workspace`)
 - `--wizard`: Onboarding ausführen
-- `--non-interactive`: Onboarding ohne Prompts ausführen
+- `--non-interactive`: Onboarding ohne Eingabeaufforderungen ausführen
 - `--mode <local|remote>`: Onboarding-Modus
-- `--remote-url <url>`: WebSocket-URL des Remote-Gateway
-- `--remote-token <token>`: Token des Remote-Gateway
+- `--remote-url <url>`: WebSocket-URL des entfernten Gateway
+- `--remote-token <token>`: Token des entfernten Gateway
 
 So führen Sie das Onboarding über setup aus:
 
@@ -48,5 +48,10 @@ openclaw setup --wizard
 
 Hinweise:
 
-- Ein einfaches `openclaw setup` initialisiert Konfiguration + Workspace ohne den vollständigen Onboarding-Ablauf.
-- Onboarding wird automatisch ausgeführt, wenn Onboarding-Flags vorhanden sind (`--wizard`, `--non-interactive`, `--mode`, `--remote-url`, `--remote-token`).
+- Einfaches `openclaw setup` initialisiert Konfiguration + Workspace ohne den vollständigen Onboarding-Ablauf.
+- Das Onboarding wird automatisch ausgeführt, wenn irgendwelche Onboarding-Flags vorhanden sind (`--wizard`, `--non-interactive`, `--mode`, `--remote-url`, `--remote-token`).
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Installationsübersicht](/de/install)

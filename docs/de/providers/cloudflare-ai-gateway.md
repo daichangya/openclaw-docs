@@ -1,44 +1,42 @@
 ---
 read_when:
-    - Sie möchten Cloudflare AI Gateway mit OpenClaw verwenden
-    - Sie benötigen die Konto-ID, die Gateway-ID oder die API-Key-Env-Variable
+    - Sie möchten Cloudflare AI Gateway mit OpenClaw verwenden.
+    - Sie benötigen die Account-ID, die Gateway-ID oder die API-Key-Umgebungsvariable.
 summary: Einrichtung von Cloudflare AI Gateway (Authentifizierung + Modellauswahl)
 title: Cloudflare AI Gateway
 x-i18n:
-    generated_at: "2026-04-12T23:30:19Z"
+    generated_at: "2026-04-24T06:53:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 12e9589fe74e6a6335370b9cf2361a464876a392a33f8317d7fd30c3f163b2e5
+    source_hash: fb10ef4bd92db88b2b3dac1773439ab2ba37916a72d1925995d74ef787fa1c8b
     source_path: providers/cloudflare-ai-gateway.md
     workflow: 15
 ---
 
-# Cloudflare AI Gateway
-
-Cloudflare AI Gateway sitzt vor Provider-APIs und ermöglicht es Ihnen, Analysen, Caching und Kontrollen hinzuzufügen. Für Anthropic verwendet OpenClaw die Anthropic Messages API über Ihren Gateway-Endpunkt.
+Cloudflare AI Gateway sitzt vor Provider-APIs und ermöglicht Ihnen, Analysen, Caching und Steuerungen hinzuzufügen. Für Anthropic verwendet OpenClaw die Anthropic Messages API über Ihren Gateway-Endpunkt.
 
 | Eigenschaft   | Wert                                                                                     |
 | ------------- | ---------------------------------------------------------------------------------------- |
 | Provider      | `cloudflare-ai-gateway`                                                                  |
-| Base URL      | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`               |
-| Standardmodell | `cloudflare-ai-gateway/claude-sonnet-4-5`                                               |
-| API-Schlüssel | `CLOUDFLARE_AI_GATEWAY_API_KEY` (Ihr Provider-API-Schlüssel für Anfragen über das Gateway) |
+| Base URL      | `https://gateway.ai.cloudflare.com/v1/<account_id>/<gateway_id>/anthropic`              |
+| Standardmodell | `cloudflare-ai-gateway/claude-sonnet-4-6`                                               |
+| API-Key       | `CLOUDFLARE_AI_GATEWAY_API_KEY` (Ihr Provider-API-Key für Anfragen über das Gateway)     |
 
 <Note>
-Verwenden Sie für Anthropic-Modelle, die über Cloudflare AI Gateway geleitet werden, Ihren **Anthropic-API-Schlüssel** als Provider-Schlüssel.
+Für Anthropic-Modelle, die über Cloudflare AI Gateway geroutet werden, verwenden Sie Ihren **Anthropic-API-Key** als Provider-Schlüssel.
 </Note>
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="Provider-API-Schlüssel und Gateway-Details festlegen">
+  <Step title="Den Provider-API-Key und die Gateway-Details setzen">
     Führen Sie das Onboarding aus und wählen Sie die Auth-Option für Cloudflare AI Gateway:
 
     ```bash
     openclaw onboard --auth-choice cloudflare-ai-gateway-api-key
     ```
 
-    Dabei werden Ihre Konto-ID, Gateway-ID und Ihr API-Schlüssel abgefragt.
+    Dabei werden Sie nach Ihrer Account-ID, Gateway-ID und Ihrem API-Key gefragt.
 
   </Step>
   <Step title="Ein Standardmodell festlegen">
@@ -48,7 +46,7 @@ Verwenden Sie für Anthropic-Modelle, die über Cloudflare AI Gateway geleitet w
     {
       agents: {
         defaults: {
-          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-5" },
+          model: { primary: "cloudflare-ai-gateway/claude-sonnet-4-6" },
         },
       },
     }
@@ -64,7 +62,7 @@ Verwenden Sie für Anthropic-Modelle, die über Cloudflare AI Gateway geleitet w
 
 ## Nicht interaktives Beispiel
 
-Für skriptgesteuerte oder CI-Setups übergeben Sie alle Werte in der Befehlszeile:
+Für skriptbasierte oder CI-Setups übergeben Sie alle Werte in der Befehlszeile:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -79,7 +77,7 @@ openclaw onboard --non-interactive \
 
 <AccordionGroup>
   <Accordion title="Authentifizierte Gateways">
-    Wenn Sie die Gateway-Authentifizierung in Cloudflare aktiviert haben, fügen Sie den Header `cf-aig-authorization` hinzu. Dies geschieht **zusätzlich zu** Ihrem Provider-API-Schlüssel.
+    Wenn Sie Gateway-Authentifizierung in Cloudflare aktiviert haben, fügen Sie den Header `cf-aig-authorization` hinzu. Dies erfolgt **zusätzlich zu** Ihrem Provider-API-Key.
 
     ```json5
     {
@@ -96,26 +94,26 @@ openclaw onboard --non-interactive \
     ```
 
     <Tip>
-    Der Header `cf-aig-authorization` authentifiziert gegenüber dem Cloudflare Gateway selbst, während der Provider-API-Schlüssel (zum Beispiel Ihr Anthropic-Schlüssel) gegenüber dem Upstream-Provider authentifiziert.
+    Der Header `cf-aig-authorization` authentifiziert gegenüber dem Cloudflare Gateway selbst, während der Provider-API-Key (zum Beispiel Ihr Anthropic-Key) gegenüber dem Upstream-Provider authentifiziert.
     </Tip>
 
   </Accordion>
 
   <Accordion title="Hinweis zur Umgebung">
-    Wenn das Gateway als Daemon läuft (`launchd`/`systemd`), stellen Sie sicher, dass `CLOUDFLARE_AI_GATEWAY_API_KEY` für diesen Prozess verfügbar ist.
+    Wenn das Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher, dass `CLOUDFLARE_AI_GATEWAY_API_KEY` diesem Prozess zur Verfügung steht.
 
     <Warning>
-    Ein Schlüssel, der nur in `~/.profile` liegt, hilft einem `launchd`/`systemd`-Daemon nicht, es sei denn, diese Umgebung wird dort ebenfalls importiert. Setzen Sie den Schlüssel in `~/.openclaw/.env` oder über `env.shellEnv`, damit der Gateway-Prozess ihn lesen kann.
+    Ein Schlüssel, der nur in `~/.profile` liegt, hilft einem launchd/systemd-Daemon nicht, sofern diese Umgebung dort nicht ebenfalls importiert wird. Setzen Sie den Schlüssel in `~/.openclaw/.env` oder über `env.shellEnv`, damit der Gateway-Prozess ihn lesen kann.
     </Warning>
 
   </Accordion>
 </AccordionGroup>
 
-## Verwandte Themen
+## Verwandt
 
 <CardGroup cols={2}>
   <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
-    Provider, Modell-Refs und Failover-Verhalten auswählen.
+    Auswahl von Providern, Modellreferenzen und Failover-Verhalten.
   </Card>
   <Card title="Fehlerbehebung" href="/de/help/troubleshooting" icon="wrench">
     Allgemeine Fehlerbehebung und FAQ.

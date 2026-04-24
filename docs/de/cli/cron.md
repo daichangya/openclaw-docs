@@ -1,14 +1,14 @@
 ---
 read_when:
     - Sie möchten geplante Jobs und Aufweckvorgänge
-    - Sie debuggen die Cron-Ausführung und Protokolle
+    - Sie debuggen Cron-Ausführung und Logs
 summary: CLI-Referenz für `openclaw cron` (Hintergrundjobs planen und ausführen)
-title: cron
+title: Cron
 x-i18n:
-    generated_at: "2026-04-23T06:26:31Z"
+    generated_at: "2026-04-24T06:31:00Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f5216f220748b05df5202af778878b37148d6abe235be9fe82ddcf976d51532a
+    source_hash: d3f5c262092b9b5b821ec824bc02dbbd806936d91f1d03ac6eb789f7e71ffc07
     source_path: cli/cron.md
     workflow: 15
 ---
@@ -19,54 +19,81 @@ Cron-Jobs für den Gateway-Scheduler verwalten.
 
 Verwandt:
 
-- Cron-Jobs: [Cron-Jobs](/de/automation/cron-jobs)
+- Cron-Jobs: [Cron jobs](/de/automation/cron-jobs)
 
 Tipp: Führen Sie `openclaw cron --help` aus, um die vollständige Befehlsoberfläche anzuzeigen.
 
-Hinweis: `openclaw cron list` und `openclaw cron show <job-id>` zeigen eine Vorschau der aufgelösten Zustellroute. Bei `channel: "last"` zeigt die Vorschau, ob die Route aus der Haupt-/aktuellen Sitzung aufgelöst wurde oder fail-closed fehlschlägt.
+Hinweis: `openclaw cron list` und `openclaw cron show <job-id>` zeigen eine Vorschau der
+aufgelösten Zustellroute. Für `channel: "last"` zeigt die Vorschau, ob die
+Route aus der Hauptsitzung/aktuellen Sitzung aufgelöst wurde oder geschlossen fehlschlägt.
 
-Hinweis: Isolierte `cron add`-Jobs verwenden standardmäßig die Zustellung mit `--announce`. Verwenden Sie `--no-deliver`, um die Ausgabe intern zu halten. `--deliver` bleibt als veralteter Alias für `--announce` erhalten.
+Hinweis: Isolierte `cron add`-Jobs verwenden standardmäßig die Zustellung per `--announce`. Verwenden Sie `--no-deliver`, um
+die Ausgabe intern zu halten. `--deliver` bleibt als veralteter Alias für `--announce` erhalten.
 
-Hinweis: Die isolierte Cron-Chat-Zustellung ist gemeinsam genutzt. `--announce` ist die Runner-Fallback-Zustellung für die endgültige Antwort; `--no-deliver` deaktiviert diesen Fallback, entfernt aber nicht das `message`-Tool des Agent, wenn eine Chat-Route verfügbar ist.
+Hinweis: Die Chat-Zustellung für isolierte Cron-Jobs ist gemeinsam genutzt. `--announce` ist die Fallback-
+Zustellung des Runners für die endgültige Antwort; `--no-deliver` deaktiviert diesen Fallback, entfernt aber
+nicht das `message`-Tool des Agenten, wenn eine Chat-Route verfügbar ist.
 
-Hinweis: Einmalige (`--at`) Jobs werden nach Erfolg standardmäßig gelöscht. Verwenden Sie `--keep-after-run`, um sie beizubehalten.
+Hinweis: Einmalige Jobs (`--at`) werden nach erfolgreicher Ausführung standardmäßig gelöscht. Verwenden Sie `--keep-after-run`, um sie zu behalten.
 
 Hinweis: `--session` unterstützt `main`, `isolated`, `current` und `session:<id>`.
-Verwenden Sie `current`, um beim Erstellen an die aktive Sitzung zu binden, oder `session:<id>` für einen expliziten persistenten Sitzungsschlüssel.
+Verwenden Sie `current`, um beim Erstellen an die aktive Sitzung zu binden, oder `session:<id>` für
+einen expliziten persistenten Sitzungsschlüssel.
 
-Hinweis: Bei einmaligen CLI-Jobs werden `--at`-Datums-/Zeitangaben ohne Offset als UTC behandelt, sofern Sie nicht zusätzlich `--tz <iana>` übergeben, wodurch diese lokale Uhrzeit in der angegebenen Zeitzone interpretiert wird.
+Hinweis: Bei einmaligen CLI-Jobs werden Datums-/Zeitangaben mit `--at` ohne Offset als UTC behandelt, sofern Sie nicht zusätzlich
+`--tz <iana>` übergeben, was diese lokale Uhrzeit in der angegebenen Zeitzone interpretiert.
 
-Hinweis: Wiederkehrende Jobs verwenden jetzt nach aufeinanderfolgenden Fehlern exponentielles Retry-Backoff (30s → 1m → 5m → 15m → 60m) und kehren nach dem nächsten erfolgreichen Lauf zum normalen Zeitplan zurück.
+Hinweis: Wiederkehrende Jobs verwenden jetzt exponentiellen Wiederholungs-Backoff nach aufeinanderfolgenden Fehlern (30 s → 1 min → 5 min → 15 min → 60 min) und kehren dann nach dem nächsten erfolgreichen Lauf zum normalen Zeitplan zurück.
 
-Hinweis: `openclaw cron run` kehrt jetzt zurück, sobald der manuelle Lauf zur Ausführung eingereiht wurde. Erfolgreiche Antworten enthalten `{ ok: true, enqueued: true, runId }`; verwenden Sie `openclaw cron runs --id <job-id>`, um das spätere Ergebnis zu verfolgen.
+Hinweis: `openclaw cron run` gibt jetzt zurück, sobald der manuelle Lauf zur Ausführung eingereiht wurde. Erfolgreiche Antworten enthalten `{ ok: true, enqueued: true, runId }`; verwenden Sie `openclaw cron runs --id <job-id>`, um dem späteren Ergebnis zu folgen.
 
-Hinweis: `openclaw cron run <job-id>` erzwingt standardmäßig einen Lauf. Verwenden Sie `--due`, um das ältere Verhalten „nur ausführen, wenn fällig“ beizubehalten.
+Hinweis: `openclaw cron run <job-id>` erzwingt standardmäßig eine Ausführung. Verwenden Sie `--due`, um das
+ältere Verhalten „nur ausführen, wenn fällig“ beizubehalten.
 
-Hinweis: Isolierte Cron-Turns unterdrücken veraltete reine Bestätigungsantworten. Wenn das erste Ergebnis nur eine vorläufige Statusaktualisierung ist und kein nachgelagerter Subagent-Lauf für die endgültige Antwort verantwortlich ist, stellt Cron die Eingabe einmal erneut, um vor der Zustellung das echte Ergebnis zu erhalten.
+Hinweis: Isolierte Cron-Turns unterdrücken veraltete Antworten, die nur aus Bestätigungen bestehen. Wenn das
+erste Ergebnis nur ein vorläufiges Status-Update ist und kein nachgelagerter Subagent-Lauf
+für die spätere Antwort verantwortlich ist, fragt Cron vor der Zustellung einmalig nach dem echten Ergebnis.
 
-Hinweis: Wenn ein isolierter Cron-Lauf nur das stille Token (`NO_REPLY` / `no_reply`) zurückgibt, unterdrückt Cron sowohl die direkte ausgehende Zustellung als auch den Fallback-Weg über die eingereihte Zusammenfassung, sodass nichts in den Chat zurückgepostet wird.
+Hinweis: Wenn ein isolierter Cron-Lauf nur das stille Token (`NO_REPLY` /
+`no_reply`) zurückgibt, unterdrückt Cron sowohl die direkte ausgehende Zustellung als auch den Fallback-
+Zusammenfassungspfad in der Warteschlange, sodass nichts in den Chat zurückgesendet wird.
 
-Hinweis: `cron add|edit --model ...` verwendet für den Job dieses ausgewählte zulässige Modell.
-Wenn das Modell nicht zulässig ist, warnt Cron und greift stattdessen auf die Modellauswahl des Job-Agent bzw. des Standards zurück. Konfigurierte Fallback-Ketten gelten weiterhin, aber eine reine Modellüberschreibung ohne explizite Fallback-Liste pro Job hängt das primäre Agent-Modell nicht länger als verborgenes zusätzliches Retry-Ziel an.
+Hinweis: `cron add|edit --model ...` verwendet dieses ausgewählte zulässige Modell für den Job.
+Wenn das Modell nicht zulässig ist, gibt Cron eine Warnung aus und greift stattdessen auf die Modellwahl
+des Agenten/Standardmodells des Jobs zurück. Konfigurierte Fallback-Ketten gelten weiterhin, aber eine einfache
+Modellüberschreibung ohne explizite jobbezogene Fallback-Liste hängt das Primärmodell des Agenten nicht mehr als verstecktes zusätzliches Wiederholungsziel an.
 
-Hinweis: Bei isolierten Cron-Modellen gilt folgende Priorität: zuerst Gmail-Hook-Override, dann `--model` pro Job, dann ein gespeichertes Modell-Override der Cron-Sitzung und danach die normale Auswahl von Agent/Standard.
+Hinweis: Bei isoliertem Cron hat die Modellpriorität zuerst die Überschreibung durch den Gmail-Hook, dann jobbezogen
+`--model`, dann jede gespeicherte Modellüberschreibung der Cron-Sitzung und dann die normale
+Agenten-/Standardauswahl.
 
-Hinweis: Der isolierte Cron-Fast-Modus folgt der aufgelösten Live-Modellauswahl. Die Modellkonfiguration `params.fastMode` gilt standardmäßig, aber ein gespeichertes Sitzungs-Override `fastMode` hat weiterhin Vorrang vor der Konfiguration.
+Hinweis: Der schnelle Modus für isolierten Cron folgt der aufgelösten Live-Modellauswahl. Die Modell-
+Konfiguration `params.fastMode` gilt standardmäßig, aber eine gespeicherte Sitzungsüberschreibung für `fastMode`
+hat weiterhin Vorrang vor der Konfiguration.
 
-Hinweis: Wenn ein isolierter Lauf `LiveSessionModelSwitchError` auslöst, speichert Cron vor dem Retry den gewechselten Provider/das gewechselte Modell (und das gewechselte Auth-Profile-Override, falls vorhanden). Die äußere Retry-Schleife ist nach dem ersten Versuch auf 2 Switch-Retries begrenzt und bricht dann ab, statt endlos zu laufen.
+Hinweis: Wenn ein isolierter Lauf `LiveSessionModelSwitchError` auslöst, speichert Cron das
+gewechselte Provider/Modell (und die gewechselte Auth-Profil-Überschreibung, sofern vorhanden), bevor
+erneut versucht wird. Die äußere Wiederholungsschleife ist nach 2 Wechsel-Wiederholungen nach dem ersten
+Versuch begrenzt und bricht dann ab, statt endlos zu schleifen.
 
-Hinweis: Benachrichtigungen bei Fehlern verwenden zuerst `delivery.failureDestination`, dann global `cron.failureDestination` und greifen schließlich auf das primäre Ankündigungsziel des Jobs zurück, wenn kein explizites Fehlerziel konfiguriert ist.
+Hinweis: Fehlerbenachrichtigungen verwenden zuerst `delivery.failureDestination`, dann
+global `cron.failureDestination` und greifen schließlich auf das primäre
+Ankündigungsziel des Jobs zurück, wenn kein explizites Fehlerziel konfiguriert ist.
 
 Hinweis: Aufbewahrung/Bereinigung wird in der Konfiguration gesteuert:
 
-- `cron.sessionRetention` (Standard `24h`) bereinigt abgeschlossene isolierte Laufsitzungen.
+- `cron.sessionRetention` (Standard `24h`) bereinigt abgeschlossene isolierte Lauf-Sitzungen.
 - `cron.runLog.maxBytes` + `cron.runLog.keepLines` bereinigen `~/.openclaw/cron/runs/<jobId>.jsonl`.
 
-Upgrade-Hinweis: Wenn Sie ältere Cron-Jobs aus der Zeit vor dem aktuellen Zustell-/Speicherformat haben, führen Sie `openclaw doctor --fix` aus. Doctor normalisiert jetzt Legacy-Cron-Felder (`jobId`, `schedule.cron`, Top-Level-Zustellfelder einschließlich Legacy-`threadId`, Payload-`provider`-Zustellaliase) und migriert einfache `notify: true`-Webhook-Fallback-Jobs zu expliziter Webhook-Zustellung, wenn `cron.webhook` konfiguriert ist.
+Upgrade-Hinweis: Wenn Sie ältere Cron-Jobs aus der Zeit vor dem aktuellen Zustell-/Speicherformat haben, führen Sie
+`openclaw doctor --fix` aus. Doctor normalisiert jetzt Legacy-Cron-Felder (`jobId`, `schedule.cron`,
+Zustellfelder auf oberster Ebene einschließlich Legacy-`threadId`, Zustell-Aliase für Payload-`provider`) und migriert einfache
+Webhook-Fallback-Jobs mit `notify: true` zu expliziter Webhook-Zustellung, wenn `cron.webhook`
+konfiguriert ist.
 
 ## Häufige Bearbeitungen
 
-Zustellungseinstellungen aktualisieren, ohne die Nachricht zu ändern:
+Zustelleinstellungen aktualisieren, ohne die Nachricht zu ändern:
 
 ```bash
 openclaw cron edit <job-id> --announce --channel telegram --to "123456789"
@@ -94,21 +121,24 @@ Einen isolierten Job mit leichtgewichtigem Bootstrap-Kontext erstellen:
 
 ```bash
 openclaw cron add \
-  --name "Leichtgewichtiges Morgenbriefing" \
+  --name "Lightweight morning brief" \
   --cron "0 7 * * *" \
   --session isolated \
-  --message "Fasse die nächtlichen Aktualisierungen zusammen." \
+  --message "Summarize overnight updates." \
   --light-context \
   --no-deliver
 ```
 
-`--light-context` gilt nur für isolierte Agent-Turn-Jobs. Bei Cron-Läufen hält der Leichtgewichtsmodus den Bootstrap-Kontext leer, statt den vollständigen Workspace-Bootstrap-Satz einzufügen.
+`--light-context` gilt nur für isolierte Agenten-Turn-Jobs. Für Cron-Läufe hält der
+leichtgewichtige Modus den Bootstrap-Kontext leer, statt den vollständigen Bootstrap-Satz des Workspace zu injizieren.
 
-Hinweis zur Zustellungsverantwortung:
+Hinweis zur Zustellverantwortung:
 
-- Die isolierte Cron-Chat-Zustellung ist gemeinsam genutzt. Der Agent kann mit dem `message`-Tool direkt senden, wenn eine Chat-Route verfügbar ist.
-- `announce` stellt die endgültige Antwort per Fallback nur zu, wenn der Agent nicht direkt an das aufgelöste Ziel gesendet hat. `webhook` postet die fertige Nutzlast an eine URL.
-  `none` deaktiviert die Runner-Fallback-Zustellung.
+- Die Chat-Zustellung für isolierte Cron-Jobs ist gemeinsam genutzt. Der Agent kann direkt mit dem
+  `message`-Tool senden, wenn eine Chat-Route verfügbar ist.
+- `announce` stellt die endgültige Antwort nur dann per Fallback zu, wenn der Agent nicht direkt
+  an das aufgelöste Ziel gesendet hat. `webhook` sendet die fertige Payload per POST an eine URL.
+  `none` deaktiviert die Fallback-Zustellung durch den Runner.
 
 ## Häufige Admin-Befehle
 
@@ -122,10 +152,10 @@ openclaw cron run <job-id> --due
 openclaw cron runs --id <job-id> --limit 50
 ```
 
-Einträge in `cron runs` enthalten Zustellungsdiagnosen mit dem beabsichtigten Cron-Ziel,
-dem aufgelösten Ziel, `message`-Tool-Sendungen, Fallback-Verwendung und Zustellstatus.
+Einträge in `cron runs` enthalten Zustelldiagnosen mit dem beabsichtigten Cron-Ziel,
+dem aufgelösten Ziel, Sends per Message-Tool, Fallback-Nutzung und Zustellstatus.
 
-Neuausrichtung von Agent/Sitzung:
+Agenten-/Sitzungs-Umleitung:
 
 ```bash
 openclaw cron edit <job-id> --agent ops
@@ -134,7 +164,7 @@ openclaw cron edit <job-id> --session current
 openclaw cron edit <job-id> --session "session:daily-brief"
 ```
 
-Anpassungen bei der Zustellung:
+Anpassungen der Zustellung:
 
 ```bash
 openclaw cron edit <job-id> --announce --channel slack --to "channel:C1234567890"
@@ -146,7 +176,12 @@ openclaw cron edit <job-id> --no-deliver
 Hinweis zur Fehlerzustellung:
 
 - `delivery.failureDestination` wird für isolierte Jobs unterstützt.
-- Jobs der Hauptsitzung dürfen `delivery.failureDestination` nur verwenden, wenn
-  der primäre Zustellmodus `webhook` ist.
-- Wenn Sie kein Fehlerziel festlegen und der Job bereits an einen Kanal ankündigt,
-  verwenden Fehlerbenachrichtigungen dasselbe Ankündigungsziel wieder.
+- Jobs in der Hauptsitzung dürfen `delivery.failureDestination` nur verwenden, wenn der primäre
+  Zustellmodus `webhook` ist.
+- Wenn Sie kein Fehlerziel festlegen und der Job bereits an einen
+  Kanal ankündigt, verwenden Fehlerbenachrichtigungen dasselbe Ankündigungsziel erneut.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Geplante Aufgaben](/de/automation/cron-jobs)

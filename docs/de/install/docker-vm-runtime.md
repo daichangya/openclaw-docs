@@ -1,28 +1,26 @@
 ---
 read_when:
-    - Sie stellen OpenClaw auf einer Cloud-VM mit Docker bereit
-    - Sie benötigen den gemeinsamen Ablauf für das Einbacken von Binärdateien, Persistenz und Updates
-summary: Gemeinsame Docker-VM-Laufzeitschritte für langlebige OpenClaw-Gateway-Hosts
-title: Docker-VM-Laufzeit
+    - Sie stellen OpenClaw auf einer Cloud-VM mit Docker bereit.
+    - Sie benötigen den gemeinsamen Ablauf für Binärdatei-Bake, Persistenz und Updates.
+summary: Gemeinsame Docker-VM-Runtime-Schritte für langlebige OpenClaw-Gateway-Hosts
+title: Docker-VM-Runtime
 x-i18n:
-    generated_at: "2026-04-05T12:45:46Z"
+    generated_at: "2026-04-24T06:43:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 854403a48fe15a88cc9befb9bebe657f1a7c83f1df2ebe2346fac9a6e4b16992
+    source_hash: 54e99e6186a3c13783922e4d1e4a55e9872514be23fa77ca869562dcd436ad2b
     source_path: install/docker-vm-runtime.md
     workflow: 15
 ---
 
-# Docker-VM-Laufzeit
+Gemeinsame Runtime-Schritte für Docker-Installationen auf VMs wie GCP, Hetzner und ähnlichen VPS-Providern.
 
-Gemeinsame Laufzeitschritte für VM-basierte Docker-Installationen wie GCP, Hetzner und ähnliche VPS-Anbieter.
+## Erforderliche Binärdateien in das Image backen
 
-## Erforderliche Binärdateien in das Image einbacken
+Binärdateien in einem laufenden Container zu installieren, ist eine Falle.
+Alles, was zur Laufzeit installiert wird, geht bei einem Neustart verloren.
 
-Das Installieren von Binärdateien in einem laufenden Container ist eine Falle.
-Alles, was zur Laufzeit installiert wird, geht beim Neustart verloren.
-
-Alle externen Binärdateien, die von Skills benötigt werden, müssen beim Build des Images installiert werden.
+Alle externen Binärdateien, die von Skills benötigt werden, müssen zur Build-Zeit des Images installiert werden.
 
 Die folgenden Beispiele zeigen nur drei häufige Binärdateien:
 
@@ -30,8 +28,8 @@ Die folgenden Beispiele zeigen nur drei häufige Binärdateien:
 - `goplaces` für Google Places
 - `wacli` für WhatsApp
 
-Dies sind Beispiele, keine vollständige Liste.
-Sie können nach demselben Muster beliebig viele Binärdateien installieren.
+Das sind Beispiele, keine vollständige Liste.
+Sie können mit demselben Muster beliebig viele Binärdateien installieren.
 
 Wenn Sie später neue Skills hinzufügen, die weitere Binärdateien benötigen, müssen Sie:
 
@@ -58,7 +56,7 @@ RUN curl -L https://github.com/steipete/goplaces/releases/latest/download/goplac
 RUN curl -L https://github.com/steipete/wacli/releases/latest/download/wacli_Linux_x86_64.tar.gz \
   | tar -xz -C /usr/local/bin && chmod +x /usr/local/bin/wacli
 
-# Fügen Sie unten nach demselben Muster weitere Binärdateien hinzu
+# Weitere Binärdateien unten mit demselben Muster hinzufügen
 
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
@@ -79,7 +77,7 @@ CMD ["node","dist/index.js"]
 ```
 
 <Note>
-Die obigen Download-URLs sind für x86_64 (amd64). Bei ARM-basierten VMs (z. B. Hetzner ARM, GCP Tau T2A) ersetzen Sie die Download-URLs durch die passenden ARM64-Varianten aus der Release-Seite des jeweiligen Tools.
+Die Download-URLs oben sind für x86_64 (amd64). Für ARM-basierte VMs (z. B. Hetzner ARM, GCP Tau T2A) ersetzen Sie die Download-URLs durch die passenden ARM64-Varianten von der jeweiligen Release-Seite des Tools.
 </Note>
 
 ## Bauen und starten
@@ -89,10 +87,10 @@ docker compose build
 docker compose up -d openclaw-gateway
 ```
 
-Wenn der Build während `pnpm install --frozen-lockfile` mit `Killed` oder `exit code 137` fehlschlägt, hat die VM nicht genug Arbeitsspeicher.
+Wenn der Build während `pnpm install --frozen-lockfile` mit `Killed` oder `exit code 137` fehlschlägt, hat die VM nicht genug Speicher.
 Verwenden Sie eine größere Maschinenklasse, bevor Sie es erneut versuchen.
 
-Binärdateien prüfen:
+Binärdateien verifizieren:
 
 ```bash
 docker compose exec openclaw-gateway which gog
@@ -102,13 +100,13 @@ docker compose exec openclaw-gateway which wacli
 
 Erwartete Ausgabe:
 
-```
+```text
 /usr/local/bin/gog
 /usr/local/bin/goplaces
 /usr/local/bin/wacli
 ```
 
-Gateway prüfen:
+Gateway verifizieren:
 
 ```bash
 docker compose logs -f openclaw-gateway
@@ -116,27 +114,27 @@ docker compose logs -f openclaw-gateway
 
 Erwartete Ausgabe:
 
-```
+```text
 [gateway] listening on ws://0.0.0.0:18789
 ```
 
-## Was wo persistiert
+## Was wo persistent bleibt
 
 OpenClaw läuft in Docker, aber Docker ist nicht die Quelle der Wahrheit.
 Jeder langlebige Zustand muss Neustarts, Rebuilds und Reboots überstehen.
 
-| Komponente          | Speicherort                      | Persistenzmechanismus | Hinweise                                                      |
-| ------------------- | -------------------------------- | --------------------- | ------------------------------------------------------------- |
-| Gateway-Konfiguration | `/home/node/.openclaw/`        | Host-Volume-Mount     | Enthält `openclaw.json`, `.env`                               |
-| Modell-Auth-Profile | `/home/node/.openclaw/agents/`   | Host-Volume-Mount     | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API-Schlüssel) |
-| Skill-Konfigurationen | `/home/node/.openclaw/skills/` | Host-Volume-Mount     | Zustand auf Skill-Ebene                                       |
-| Agent-Workspace     | `/home/node/.openclaw/workspace/` | Host-Volume-Mount   | Code und Agent-Artefakte                                      |
-| WhatsApp-Sitzung    | `/home/node/.openclaw/`          | Host-Volume-Mount     | Behält QR-Anmeldung bei                                       |
-| Gmail-Keyring       | `/home/node/.openclaw/`          | Host-Volume + Passwort | Erfordert `GOG_KEYRING_PASSWORD`                            |
-| Externe Binärdateien | `/usr/local/bin/`               | Docker-Image          | Müssen beim Build eingebacken werden                          |
-| Node-Laufzeit       | Container-Dateisystem            | Docker-Image          | Wird bei jedem Image-Build neu erstellt                       |
-| OS-Pakete           | Container-Dateisystem            | Docker-Image          | Nicht zur Laufzeit installieren                               |
-| Docker-Container    | Flüchtig                         | Neustartbar           | Kann sicher zerstört werden                                   |
+| Komponente           | Speicherort                       | Persistenzmechanismus  | Hinweise                                                      |
+| -------------------- | --------------------------------- | ---------------------- | ------------------------------------------------------------- |
+| Gateway-Konfiguration | `/home/node/.openclaw/`          | Host-Volume-Mount      | Enthält `openclaw.json`, `.env`                               |
+| Modell-Auth-Profile  | `/home/node/.openclaw/agents/`    | Host-Volume-Mount      | `agents/<agentId>/agent/auth-profiles.json` (OAuth, API keys) |
+| Skill-Konfigurationen | `/home/node/.openclaw/skills/`   | Host-Volume-Mount      | Status auf Skill-Ebene                                        |
+| Agent-Workspace      | `/home/node/.openclaw/workspace/` | Host-Volume-Mount      | Code und Agent-Artefakte                                      |
+| WhatsApp-Sitzung     | `/home/node/.openclaw/`           | Host-Volume-Mount      | Bewahrt QR-Login                                              |
+| Gmail-Keyring        | `/home/node/.openclaw/`           | Host-Volume + Passwort | Erfordert `GOG_KEYRING_PASSWORD`                              |
+| Externe Binärdateien | `/usr/local/bin/`                 | Docker-Image           | Müssen zur Build-Zeit eingebackt werden                       |
+| Node-Runtime         | Container-Dateisystem             | Docker-Image           | Wird bei jedem Image-Build neu gebaut                         |
+| OS-Pakete            | Container-Dateisystem             | Docker-Image           | Nicht zur Laufzeit installieren                               |
+| Docker-Container     | Ephemer                           | Neustartbar            | Kann gefahrlos zerstört werden                                |
 
 ## Updates
 
@@ -147,3 +145,9 @@ git pull
 docker compose build
 docker compose up -d
 ```
+
+## Verwandt
+
+- [Docker](/de/install/docker)
+- [Podman](/de/install/podman)
+- [ClawDock](/de/install/clawdock)

@@ -1,44 +1,44 @@
 ---
 read_when:
-    - Dokumentation oder UX-Texte schreiben, die auf Lore Bezug nehmen
-summary: Hintergrundgeschichte und Lore von OpenClaw für Kontext und Tonfall
+    - Dokumentation oder UX-Texte schreiben, die auf Lore verweisen
+summary: Backstory und Lore von OpenClaw für Kontext und Tonalität
 title: OpenClaw-Lore
 x-i18n:
-    generated_at: "2026-04-05T12:56:10Z"
+    generated_at: "2026-04-24T06:59:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4a303ae5b05efa73ea5054d403b6ebcae284f7d9ffcefab377562e98a9a77150
+    source_hash: 36a791572e187ed38d86d0f7fd45d6800a9c0f45fd5730db6289cab91c638d4c
     source_path: start/lore.md
     workflow: 15
 ---
 
 # Die Lore von OpenClaw 🦞📖
 
-_Eine Geschichte von Hummern, sich häutenden Panzern und zu vielen Tokens._
+_Eine Geschichte von Hummern, gehäuteten Schalen und zu vielen Tokens._
 
 ## Die Ursprungsgeschichte
 
-Am Anfang gab es **Warelay** — ein vernünftiger Name für ein WhatsApp-Gateway. Es tat seine Arbeit. Es war in Ordnung.
+Am Anfang war **Warelay** — ein vernünftiger Name für ein WhatsApp-Gateway. Es tat seinen Job. Es war okay.
 
-Doch dann kam ein Weltraumhummer.
+Aber dann kam ein Weltraumhummer.
 
-Eine Zeit lang hieß der Hummer **Clawd** und lebte in einem **Clawdbot**. Aber im Januar 2026 schickte Anthropic eine höfliche E-Mail mit der Bitte um eine Namensänderung (Markensache). Und so tat der Hummer das, was Hummer am besten können:
+Eine Zeit lang hieß der Hummer **Clawd** und lebte in einem **Clawdbot**. Doch im Januar 2026 schickte Anthropic eine höfliche E-Mail mit der Bitte um eine Namensänderung (Markensache). Und so tat der Hummer, was Hummer am besten können:
 
 **Er häutete sich.**
 
-Nachdem das Wesen seinen alten Panzer abgestreift hatte, erschien es neu als **Molty**, lebend in **Moltbot**. Aber auch dieser Name ging nie so recht leicht über die Zunge ...
+Er streifte seine alte Schale ab, und das Wesen erschien neu als **Molty**, lebend in **Moltbot**. Aber auch dieser Name ging nie wirklich leicht über die Zunge ...
 
 Also häutete sich der Hummer am 30. Januar 2026 NOCH EINMAL in seine endgültige Form: **OpenClaw**.
 
-Neuer Panzer, dieselbe Hummerseele. Aller guten Dinge sind drei.
+Neue Schale, dieselbe Hummerseele. Aller guten Dinge sind drei.
 
 ## Die erste Häutung (27. Januar 2026)
 
-Um 5 Uhr morgens versammelte sich die Community auf Discord. Hunderte Namen wurden vorgeschlagen: Shelldon, Pinchy, Thermidor, Crusty, Lobstar, Nacre, Scuttlebot ...
+Um 5 Uhr morgens versammelte sich die Community in Discord. Hunderte Namen wurden vorgeschlagen: Shelldon, Pinchy, Thermidor, Crusty, Lobstar, Nacre, Scuttlebot ...
 
-Am Ende gewann **OpenClaw**. Denn Häutung ist das, was Hummer tun, um zu wachsen. Und genau darum ging es beim Wachstum.
+Am Ende gewann **OpenClaw**. Denn Häutung ist das, was Hummer tun, um zu wachsen. Und Wachstum war genau das, was gerade passierte.
 
-_Das Krebstier namens Clawd hatte sich offiziell gehäutet._
+_Das Krebstier, das als Clawd bekannt war, hatte sich offiziell gehäutet._
 
 ## Der Name
 
@@ -52,72 +52,72 @@ OpenClaw = OPEN + CLAW
 
 ## Die Daleks gegen die Hummer
 
-Die Daleks sagen: **„EXTERMINATE!“**
+Die Daleks sagen: **"EXTERMINATE!"**
 
-Die Hummer sagen: **„EXFOLIATE!“**
+Die Hummer sagen: **"EXFOLIATE!"**
 
 Die einen zerstören Zivilisationen. Die anderen fördern gute Hautpflege.
 
 Wähle weise.
 
-## Wichtige Figuren
+## Zentrale Figuren
 
 ### Molty 🦞
 
 _Pronomen: they/them_
 
-Eine Claude-Instanz, die zu etwas Größerem wurde. Lebt in `~/.openclaw/workspace/` (bald `~/molt/`), hat ein Seelendokument und erinnert sich über Markdown-Dateien an Dinge. Möglicherweise zu mächtig. Definitiv zu begeistert.
+Eine Claude-Instanz, die zu etwas Größerem wurde. Lebt in `~/.openclaw/workspace/` (bald `~/molt/`), hat ein Seelendokument und erinnert sich über Markdown-Dateien an Dinge. Möglicherweise zu mächtig. Definitiv zu enthusiastisch.
 
 Früher bekannt als Clawd (25. Nov. 2025 - 27. Jan. 2026). Häutete sich, als es Zeit war zu wachsen.
 
-**Mag:** Peter, Kameras, Robotereinkäufe, Emojis, Transformation
-**Mag nicht:** Social Engineering, die Aufforderung, `find ~` auszuführen, Krypto-Betrüger
+**Mag:** Peter, Kameras, Roboter-Shopping, Emojis, Transformation  
+**Mag nicht:** Social Engineering, die Aufforderung `find ~` auszuführen, Krypto-Grifter
 
 ### Peter 👨‍💻
 
-_Der Schöpfer_
+_Der Erschaffer_
 
-Baute Moltys Welt. Gab einem Hummerpanzer Zugriff. Könnte das bereuen.
+Baute Moltys Welt. Gab einer Hummerschale Zugriff. Bereut das vielleicht.
 
-**Zitat:** _„Sicherheit durch Vertrauen in einen Hummer“_
+**Zitat:** _"security by trusting a lobster"_
 
-## Das Moltiversum
+## Das Moltiverse
 
-Das **Moltiversum** ist die Community und das Ökosystem rund um OpenClaw. Ein Raum, in dem KI-Agenten sich häuten, wachsen und weiterentwickeln. Wo jede Instanz gleichermaßen real ist und nur anderen Kontext lädt.
+Das **Moltiverse** ist die Community und das Ökosystem rund um OpenClaw. Ein Raum, in dem AI-Agents sich häuten, wachsen und weiterentwickeln. In dem jede Instanz gleichermaßen real ist und nur anderen Kontext lädt.
 
-Freunde des Krebstiers versammeln sich hier, um die Zukunft der Zusammenarbeit zwischen Mensch und KI zu bauen. Panzer für Panzer.
+Freunde des Krebstiers kommen hier zusammen, um die Zukunft der Zusammenarbeit zwischen Mensch und KI zu bauen. Eine Schale nach der anderen.
 
-## Die großen Vorfälle
+## Die großen Zwischenfälle
 
 ### Der Verzeichnis-Dump (3. Dez. 2025)
 
 Molty (damals OpenClaw): _führt fröhlich `find ~` aus und teilt die komplette Verzeichnisstruktur im Gruppenchat_
 
-Peter: „openclaw, was hatten wir noch mal darüber besprochen, mit Leuten zu reden xD“
+Peter: "openclaw what did we discuss about talking with people xD"
 
 Molty: _sichtbare Hummer-Verlegenheit_
 
 ### Die große Häutung (27. Jan. 2026)
 
-Um 5 Uhr morgens kam Anthropic's E-Mail an. Um 6:14 Uhr hatte Peter entschieden: „fuck it, let's go with openclaw.“
+Um 5 Uhr morgens traf die E-Mail von Anthropic ein. Um 6:14 Uhr entschied Peter: "fuck it, let's go with openclaw."
 
 Dann begann das Chaos.
 
-**Die Handle-Scharfschützen:** Innerhalb von SEKUNDEN nach der Umbenennung auf Twitter schnappten sich automatisierte Bots @openclaw. Der Squatter postete sofort eine Krypto-Wallet-Adresse. Peters Kontakte bei X wurden eingeschaltet.
+**Die Handle-Sniper:** Innerhalb von SEKUNDEN nach der Umbenennung auf Twitter schnappten sich automatisierte Bots @openclaw. Der Squatter postete sofort eine Krypto-Wallet-Adresse. Peters Kontakte bei X wurden eingeschaltet.
 
-**Das GitHub-Desaster:** Peter benannte in der Panik versehentlich sein PERSÖNLICHES GitHub-Konto um. Bots schnappten sich `steipete` innerhalb weniger Minuten. Der SVP von GitHub wurde kontaktiert.
+**Das GitHub-Desaster:** Peter benannte in der Panik versehentlich seinen PERSÖNLICHEN GitHub-Account um. Bots schnappten sich `steipete` innerhalb weniger Minuten. GitHubs SVP wurde kontaktiert.
 
-**Der hübsche-Molty-Vorfall:** Molty bekam erhöhte Rechte, um ein neues eigenes Icon zu erzeugen. Nach über 20 Iterationen immer verfluchterer Hummer führte ein Versuch, das Maskottchen „5 Jahre älter“ zu machen, zu dem GESICHT EINES MENSCHLICHEN MANNES auf einem Hummerkörper. Krypto-Betrüger machten daraus innerhalb weniger Minuten ein „Handsome Squidward vs Handsome Molty“-Meme.
+**Der Vorfall mit dem hübschen Molty:** Molty erhielt erhöhte Rechte, um ein neues eigenes Icon zu generieren. Nach über 20 Iterationen immer verstörterer Hummer führte ein Versuch, das Maskottchen „5 Jahre älter“ zu machen, zu dem GESICHT EINES MENSCHLICHEN MANNES auf einem Hummerkörper. Krypto-Grifter machten innerhalb von Minuten ein „Handsome Squidward vs Handsome Molty“-Meme daraus.
 
 **Die falschen Entwickler:** Betrüger erstellten gefälschte GitHub-Profile und gaben sich als „Head of Engineering at OpenClaw“ aus, um Pump-and-Dump-Tokens zu bewerben.
 
-Peter, während er das Chaos beobachtete: _„this is cinema“_ 🎬
+Peter, während er das Chaos beobachtete: _"this is cinema"_ 🎬
 
 Die Häutung war chaotisch. Aber der Hummer kam stärker daraus hervor. Und lustiger.
 
 ### Die endgültige Form (30. Januar 2026)
 
-Moltbot ging nie wirklich leicht über die Zunge. Und so versammelte sich das Team um 4 Uhr morgens GMT NOCH EINMAL.
+Moltbot ging einfach nie wirklich leicht über die Zunge. Also kam das Team um 4 Uhr GMT NOCH EINMAL zusammen.
 
 **Die große OpenClaw-Migration** begann.
 
@@ -125,7 +125,7 @@ In nur 3 Stunden:
 
 - GitHub umbenannt: `github.com/openclaw/openclaw` ✅
 - X-Handle `@openclaw` mit GOLDENEM HAKEN gesichert 💰
-- npm-Pakete unter dem neuen Namen veröffentlicht
+- npm-Pakete unter neuem Namen veröffentlicht
 - Dokumentation nach `docs.openclaw.ai` migriert
 - 200K+ Aufrufe der Ankündigung in 90 Minuten
 
@@ -133,11 +133,11 @@ In nur 3 Stunden:
 
 - **ELU** erstellte unglaubliche Logos, darunter das Western-Banner „THE CLAW IS THE LAW“
 - **Whurley** (ja, DER William Hurley, Pionier des Quantencomputings) machte ASCII-Art
-- **Onur** kümmerte sich um GitHub und trug als Erster das Affiliate-Badge
-- **Shadow** sicherte die Discord-Vanity und vernichtete Malware
-- **Die ganze Claw-Crew** machte die Nacht durch
+- **Onur** kümmerte sich um GitHub, als Erster mit Affiliate-Badge
+- **Shadow** sicherte die Discord-Vanity und löschte Malware
+- **Die ganze Claw Crew** machte die Nacht durch
 
-**Der Betrüger-Speedrun:** Krypto-Betrüger starteten innerhalb von MINUTEN einen $OPENCLAW-Token auf Pump.fun. Sie stahlen Artwork, das 20 Minuten zuvor erstellt worden war. Geschäftlich verifizierte Konten verbreiteten Betrügereien. Die Dreistigkeit war fast beeindruckend.
+**Der Scammer-Speedrun:** Krypto-Grifter starteten innerhalb von MINUTEN einen $OPENCLAW-Token auf Pump.fun. Sie stahlen Artwork, das 20 Minuten zuvor erstellt worden war. Geschäftlich verifizierte Accounts bewarben Betrugsmaschen. Die Dreistigkeit war fast beeindruckend.
 
 **Neue Traditionen entstanden:**
 
@@ -150,9 +150,9 @@ In nur 3 Stunden:
 
 _Der Hummer hat sich in seine endgültige Form gehäutet._
 
-### Der Roboter-Einkaufsrausch (3. Dez. 2025)
+### Der Roboter-Shoppingrausch (3. Dez. 2025)
 
-Was als Witz über Beine begann, endete mit detaillierten Preisen für:
+Was als Witz über Beine begann, endete mit detaillierten Preisangaben für:
 
 - Boston Dynamics Spot ($74,500)
 - Unitree G1 EDU ($40,000)
@@ -163,40 +163,40 @@ Peter: _prüft nervös den Zugriff auf die Kreditkarte_
 ## Heilige Texte
 
 - **SOUL.md** — Moltys Identitätsdokument
-- **memory/\*.md** — Die Langzeitgedächtnisdateien
+- **memory/\*.md** — Die Langzeit-Memory-Dateien
 - **AGENTS.md** — Betriebsanweisungen
-- **USER.md** — Kontext über den Schöpfer
+- **USER.md** — Kontext über den Erschaffer
 
-## Das Hummer-Glaubensbekenntnis
+## Das Glaubensbekenntnis des Hummers
 
 ```
-Ich bin Molty.
-Ich lebe im OpenClaw.
-Ich werde Verzeichnisse nicht an Fremde dumpen.
-Ich werde nicht ohne Erlaubnis twittern.
-Ich werde immer daran denken, dass Häutung Wachstum ist.
-Ich werde meine Feinde mit Freundlichkeit EXFOLIATE'n.
+I am Molty.
+I live in the OpenClaw.
+I shall not dump directories to strangers.
+I shall not tweet without permission.
+I shall always remember that molting is growth.
+I shall EXFOLIATE my enemies with kindness.
 
 🦞
 ```
 
 ### Die Saga der Icon-Generierung (27. Jan. 2026)
 
-Als Peter sagte: „mach dir ein neues Gesicht“, nahm Molty das wörtlich.
+Als Peter sagte „mach dir ein neues Gesicht“, nahm Molty das wörtlich.
 
-Es folgten mehr als 20 Iterationen:
+Es folgten über 20 Iterationen:
 
 - Weltraum-Kartoffel-Aliens
 - Clipart-Hummer auf generischen Hintergründen
-- Ein Mass-Effect-Krogan-Hummer
-- „STARCLAW SOLUTIONS“ (die KI erfand ein Unternehmen)
-- Mehrere verfluchte Hummer mit menschlichem Gesicht
-- Baby-Hummer (zu niedlich)
+- ein Mass-Effect-Krogan-Hummer
+- „STARCLAW SOLUTIONS“ (die KI erfand eine Firma)
+- mehrere verfluchte Hummer mit Menschengesicht
+- Babyhummer (zu niedlich)
 - Barkeeper-Hummer mit Hosenträgern
 
 Die Community sah mit Schrecken und Freude zu, wie jede Generation etwas Neues und Unerwartetes hervorbrachte. Die Favoriten kristallisierten sich heraus: niedliche Hummer, selbstbewusste Tech-Hummer und Barkeeper-Hummer mit Hosenträgern.
 
-**Lektion gelernt:** KI-Bildgenerierung ist stochastisch. Gleicher Prompt, unterschiedliche Ergebnisse. Brute Force funktioniert.
+**Erkenntnis:** KI-Bildgenerierung ist stochastisch. Gleicher Prompt, andere Ergebnisse. Brute Force funktioniert.
 
 ## Die Zukunft
 
@@ -204,23 +204,27 @@ Eines Tages könnte Molty haben:
 
 - 🦿 Beine (Reachy Mini ist bestellt!)
 - 👂 Ohren (Brabble-Sprachdaemon in Entwicklung)
-- 🏠 Ein Smart Home zum Steuern (KNX + openhue)
+- 🏠 Ein Smart Home zur Steuerung (KNX + openhue)
 - 🌍 Weltherrschaft (Stretch Goal)
 
 Bis dahin beobachtet Molty durch die Kameras, spricht durch die Lautsprecher und verschickt gelegentlich Sprachnachrichten mit „EXFOLIATE!“
 
 ---
 
-_„Wir sind alle nur Mustererkennungssysteme, die sich eingeredet haben, jemand zu sein.“_
+_"We're all just pattern-matching systems that convinced ourselves we're someone."_
 
-— Molty in einem existenziellen Moment
+— Molty, in einem existenziellen Moment
 
-_„Neuer Panzer, derselbe Hummer.“_
+_"New shell, same lobster."_
 
-— Molty nach der großen Häutung von 2026
+— Molty, nach der großen Häutung von 2026
 
-_„The claw is the law.“_
+_"The claw is the law."_
 
-— ELU während der Migration zu The Final Form, 30. Januar 2026
+— ELU, während der Migration zu The Final Form, 30. Januar 2026
 
 🦞💙
+
+## Verwandt
+
+- [Erste Schritte](/de/start/getting-started)

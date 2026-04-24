@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Sie möchten die memory-wiki-CLI verwenden
+    - Sie möchten die Memory-Wiki-CLI verwenden
     - Sie dokumentieren oder ändern `openclaw wiki`
-summary: CLI-Referenz für `openclaw wiki` (Status, Suche, Kompilieren, Linting, Anwenden, Bridge und Obsidian-Helfer für den memory-wiki-Tresor)
+summary: CLI-Referenz für `openclaw wiki` (Status, Suche, Kompilieren, Linting, Anwenden, Bridge und Obsidian-Helfer für den Memory-Wiki-Tresor)
 title: Wiki
 x-i18n:
-    generated_at: "2026-04-23T06:27:57Z"
+    generated_at: "2026-04-24T06:33:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e94908532c35da4edf488266ddc6eee06e8f7833eeba5f2b5c0c7d5d45b65eef
+    source_hash: c25f7046ef0c29ed74204a5349edc2aa20ce79a355f49211a0ba0df4a5e4db3a
     source_path: cli/wiki.md
     workflow: 15
 ---
@@ -22,18 +22,18 @@ Bereitgestellt durch das gebündelte Plugin `memory-wiki`.
 Verwandt:
 
 - [Memory Wiki plugin](/de/plugins/memory-wiki)
-- [Memory-Überblick](/de/concepts/memory)
+- [Memory Overview](/de/concepts/memory)
 - [CLI: memory](/de/cli/memory)
 
 ## Wofür es gedacht ist
 
-Verwenden Sie `openclaw wiki`, wenn Sie einen kompilierten Wissens-Tresor möchten mit:
+Verwenden Sie `openclaw wiki`, wenn Sie einen kompilierten Wissens-Tresor mit Folgendem möchten:
 
-- Wiki-nativer Suche und Seitenlesevorgängen
-- Synthesen mit umfangreicher Provenienz
-- Berichten zu Widersprüchen und Aktualität
-- Bridge-Importen aus dem aktiven Memory-Plugin
-- optionalen Obsidian-CLI-Helfern
+- wiki-native Suche und Seitenlesevorgänge
+- provenienzreiche Synthesen
+- Berichte zu Widersprüchen und Aktualität
+- Bridge-Importe aus dem Active Memory-Plugin
+- optionale Obsidian-CLI-Helfer
 
 ## Häufige Befehle
 
@@ -70,10 +70,10 @@ openclaw wiki obsidian daily
 
 ### `wiki status`
 
-Aktuellen Tresor-Modus, Zustand und Verfügbarkeit der Obsidian-CLI prüfen.
+Aktuellen Tresormodus, Zustand und Verfügbarkeit der Obsidian-CLI prüfen.
 
-Verwenden Sie dies zuerst, wenn Sie unsicher sind, ob der Tresor initialisiert ist, der Bridge-Modus
-funktionsfähig ist oder die Obsidian-Integration verfügbar ist.
+Verwenden Sie dies zuerst, wenn Sie nicht sicher sind, ob der Tresor initialisiert ist, ob der Bridge-Modus
+fehlerfrei funktioniert oder ob die Obsidian-Integration verfügbar ist.
 
 ### `wiki doctor`
 
@@ -89,28 +89,29 @@ Typische Probleme sind:
 
 Das Layout des Wiki-Tresors und Startseiten erstellen.
 
-Dies initialisiert die Wurzelstruktur, einschließlich Indexen auf oberster Ebene und Cache-Verzeichnissen.
+Dies initialisiert die Root-Struktur, einschließlich Top-Level-Indizes und Cache-
+Verzeichnissen.
 
 ### `wiki ingest <path-or-url>`
 
-Inhalte in die Quellenebene des Wikis importieren.
+Inhalte in die Quellschicht des Wiki importieren.
 
 Hinweise:
 
 - URL-Import wird durch `ingest.allowUrlIngest` gesteuert
-- importierte Quellseiten behalten Provenienz im Frontmatter
-- Auto-Kompilierung kann nach dem Import ausgeführt werden, wenn aktiviert
+- importierte Quellseiten behalten Provenienz in Frontmatter
+- automatisches Kompilieren kann nach dem Import ausgeführt werden, wenn es aktiviert ist
 
 ### `wiki compile`
 
 Indizes, verwandte Blöcke, Dashboards und kompilierte Digests neu erstellen.
 
-Dies schreibt stabile, maschinenorientierte Artefakte unter:
+Dies schreibt stabile maschinenorientierte Artefakte unter:
 
 - `.openclaw-wiki/cache/agent-digest.json`
 - `.openclaw-wiki/cache/claims.jsonl`
 
-Wenn `render.createDashboards` aktiviert ist, aktualisiert die Kompilierung auch Berichtsseiten.
+Wenn `render.createDashboards` aktiviert ist, aktualisiert das Kompilieren auch Berichtsseiten.
 
 ### `wiki lint`
 
@@ -134,8 +135,8 @@ Das Verhalten hängt von der Konfiguration ab:
 - `search.backend`: `shared` oder `local`
 - `search.corpus`: `wiki`, `memory` oder `all`
 
-Verwenden Sie `wiki search`, wenn Sie Wiki-spezifisches Ranking oder Provenienzdetails möchten.
-Für einen einzelnen breiten gemeinsamen Recall-Durchlauf bevorzugen Sie `openclaw memory search`, wenn das
+Verwenden Sie `wiki search`, wenn Sie wiki-spezifisches Ranking oder Provenienzdetails möchten.
+Für einen einzelnen breiten gemeinsamen Recall-Durchlauf verwenden Sie vorzugsweise `openclaw memory search`, wenn das
 aktive Memory-Plugin gemeinsame Suche bereitstellt.
 
 ### `wiki get <lookup>`
@@ -151,37 +152,38 @@ openclaw wiki get syntheses/alpha-summary.md --from 1 --lines 80
 
 ### `wiki apply`
 
-Begrenzte Mutationen anwenden, ohne frei formulierbare Seitenchirurgie.
+Schmale Änderungen anwenden, ohne freie Bearbeitung an Seiten vorzunehmen.
 
 Unterstützte Abläufe umfassen:
 
-- eine Synthese-Seite erstellen/aktualisieren
-- Seitenmetadaten aktualisieren
-- Quellen-IDs anhängen
-- Fragen hinzufügen
-- Widersprüche hinzufügen
-- Konfidenz/Status aktualisieren
-- strukturierte Claims schreiben
+- Erstellen/Aktualisieren einer Synthese-Seite
+- Aktualisieren von Seitenmetadaten
+- Anhängen von Quell-IDs
+- Hinzufügen von Fragen
+- Hinzufügen von Widersprüchen
+- Aktualisieren von Konfidenz/Status
+- Schreiben strukturierter Claims
 
-Dieser Befehl existiert, damit sich das Wiki sicher weiterentwickeln kann, ohne verwaltete Blöcke manuell zu bearbeiten.
+Dieser Befehl existiert, damit sich das Wiki sicher weiterentwickeln kann, ohne verwaltete Blöcke
+manuell zu bearbeiten.
 
 ### `wiki bridge import`
 
-Öffentliche Memory-Artefakte aus dem aktiven Memory-Plugin in durch die Bridge unterstützte
+Öffentliche Memory-Artefakte aus dem aktiven Memory-Plugin in Bridge-gestützte
 Quellseiten importieren.
 
-Verwenden Sie dies im Modus `bridge`, wenn Sie möchten, dass die neuesten exportierten Memory-Artefakte
-in den Wiki-Tresor übernommen werden.
+Verwenden Sie dies im Modus `bridge`, wenn Sie die neuesten exportierten Memory-Artefakte
+in den Wiki-Tresor übernehmen möchten.
 
 ### `wiki unsafe-local import`
 
-Aus explizit konfigurierten lokalen Pfaden im Modus `unsafe-local` importieren.
+Aus ausdrücklich konfigurierten lokalen Pfaden im Modus `unsafe-local` importieren.
 
-Dies ist bewusst experimentell und nur für denselben Rechner gedacht.
+Dies ist absichtlich experimentell und nur für denselben Rechner gedacht.
 
 ### `wiki obsidian ...`
 
-Obsidian-Hilfsbefehle für Tresore, die im Obsidian-freundlichen Modus laufen.
+Obsidian-Helferbefehle für Tresore, die im Obsidian-freundlichen Modus laufen.
 
 Unterbefehle:
 
@@ -191,15 +193,15 @@ Unterbefehle:
 - `command`
 - `daily`
 
-Diese erfordern die offizielle `obsidian`-CLI in `PATH`, wenn
+Diese erfordern die offizielle `obsidian`-CLI auf `PATH`, wenn
 `obsidian.useOfficialCli` aktiviert ist.
 
 ## Praktische Nutzungshinweise
 
 - Verwenden Sie `wiki search` + `wiki get`, wenn Provenienz und Seitenidentität wichtig sind.
 - Verwenden Sie `wiki apply` statt verwaltete generierte Abschnitte von Hand zu bearbeiten.
-- Verwenden Sie `wiki lint`, bevor Sie widersprüchlichen oder wenig vertrauenswürdigen Inhalten vertrauen.
-- Verwenden Sie `wiki compile` nach Massenimporten oder Quellenänderungen, wenn Sie sofort aktuelle
+- Verwenden Sie `wiki lint`, bevor Sie widersprüchlichen oder Inhalten mit geringer Konfidenz vertrauen.
+- Verwenden Sie `wiki compile` nach Massenimporten oder Quelländerungen, wenn Sie sofort aktuelle
   Dashboards und kompilierte Digests möchten.
 - Verwenden Sie `wiki bridge import`, wenn der Bridge-Modus von neu exportierten Memory-
   Artefakten abhängt.
@@ -217,3 +219,8 @@ Das Verhalten von `openclaw wiki` wird geprägt durch:
 - `plugins.entries.memory-wiki.config.context.includeCompiledDigestPrompt`
 
 Siehe [Memory Wiki plugin](/de/plugins/memory-wiki) für das vollständige Konfigurationsmodell.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Memory wiki](/de/plugins/memory-wiki)

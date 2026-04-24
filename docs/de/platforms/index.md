@@ -1,62 +1,67 @@
 ---
 read_when:
-    - Nach Betriebssystemunterstützung oder Installationspfaden suchen
+    - Nach OS-Unterstützung oder Installationspfaden suchen
     - Entscheiden, wo das Gateway ausgeführt werden soll
 summary: Überblick über die Plattformunterstützung (Gateway + Companion-Apps)
 title: Plattformen
 x-i18n:
-    generated_at: "2026-04-05T12:48:46Z"
+    generated_at: "2026-04-24T06:47:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d5be4743fd39eca426d65db940f04f3a8fc3ff2c5e10b0e82bc55fc35a7d1399
+    source_hash: 3ebed9f219f3072ef760006eef47ca78f87169c40a6098c3585dfaf6169fc594
     source_path: platforms/index.md
     workflow: 15
 ---
 
-# Plattformen
-
 Der OpenClaw-Core ist in TypeScript geschrieben. **Node ist die empfohlene Laufzeit**.
-Bun wird für das Gateway nicht empfohlen (WhatsApp-/Telegram-Bugs).
+Bun wird für das Gateway nicht empfohlen — bekannte Probleme mit WhatsApp- und
+Telegram-Kanälen; siehe [Bun (experimentell)](/de/install/bun) für Details.
 
-Companion-Apps gibt es für macOS (Menüleisten-App) und mobile Nodes (iOS/Android). Companion-Apps für Windows und
-Linux sind geplant, aber das Gateway wird heute vollständig unterstützt.
+Companion-Apps existieren für macOS (Menüleisten-App) und mobile Nodes (iOS/Android). Companion-Apps für Windows und
+Linux sind geplant, aber das Gateway wird heute bereits vollständig unterstützt.
 Native Companion-Apps für Windows sind ebenfalls geplant; für das Gateway wird WSL2 empfohlen.
 
-## Ihr Betriebssystem wählen
+## Wählen Sie Ihr Betriebssystem
 
-- macOS: [macOS](/platforms/macos)
-- iOS: [iOS](/platforms/ios)
-- Android: [Android](/platforms/android)
-- Windows: [Windows](/platforms/windows)
-- Linux: [Linux](/platforms/linux)
+- macOS: [macOS](/de/platforms/macos)
+- iOS: [iOS](/de/platforms/ios)
+- Android: [Android](/de/platforms/android)
+- Windows: [Windows](/de/platforms/windows)
+- Linux: [Linux](/de/platforms/linux)
 
 ## VPS & Hosting
 
-- VPS-Hub: [VPS hosting](/vps)
-- Fly.io: [Fly.io](/install/fly)
-- Hetzner (Docker): [Hetzner](/install/hetzner)
-- GCP (Compute Engine): [GCP](/install/gcp)
-- Azure (Linux VM): [Azure](/install/azure)
-- exe.dev (VM + HTTPS-Proxy): [exe.dev](/install/exe-dev)
+- VPS-Hub: [VPS-Hosting](/de/vps)
+- Fly.io: [Fly.io](/de/install/fly)
+- Hetzner (Docker): [Hetzner](/de/install/hetzner)
+- GCP (Compute Engine): [GCP](/de/install/gcp)
+- Azure (Linux-VM): [Azure](/de/install/azure)
+- exe.dev (VM + HTTPS-Proxy): [exe.dev](/de/install/exe-dev)
 
 ## Häufige Links
 
-- Installationsanleitung: [Getting Started](/de/start/getting-started)
-- Gateway-Runbook: [Gateway](/gateway)
-- Gateway-Konfiguration: [Configuration](/gateway/configuration)
+- Installationsleitfaden: [Erste Schritte](/de/start/getting-started)
+- Gateway-Runbook: [Gateway](/de/gateway)
+- Gateway-Konfiguration: [Konfiguration](/de/gateway/configuration)
 - Dienststatus: `openclaw gateway status`
 
-## Gateway-Dienst installieren (CLI)
+## Installation des Gateway-Dienstes (CLI)
 
-Verwenden Sie eine der folgenden Möglichkeiten (alle unterstützt):
+Verwenden Sie eine der folgenden Optionen (alle werden unterstützt):
 
 - Assistent (empfohlen): `openclaw onboard --install-daemon`
 - Direkt: `openclaw gateway install`
-- Konfigurationsablauf: `openclaw configure` → **Gateway service** auswählen
-- Reparieren/migrieren: `openclaw doctor` (bietet an, den Dienst zu installieren oder zu reparieren)
+- Configure-Ablauf: `openclaw configure` → **Gateway service** auswählen
+- Reparieren/Migrieren: `openclaw doctor` (bietet an, den Dienst zu installieren oder zu reparieren)
 
 Das Dienstziel hängt vom Betriebssystem ab:
 
 - macOS: LaunchAgent (`ai.openclaw.gateway` oder `ai.openclaw.<profile>`; Legacy `com.openclaw.*`)
-- Linux/WSL2: systemd-User-Service (`openclaw-gateway[-<profile>].service`)
-- Natives Windows: Scheduled Task (`OpenClaw Gateway` oder `OpenClaw Gateway (<profile>)`), mit einem Fallback auf einen Login-Eintrag im Startup-Ordner pro Benutzer, wenn die Erstellung der Task verweigert wird
+- Linux/WSL2: systemd-Benutzerdienst (`openclaw-gateway[-<profile>].service`)
+- Natives Windows: Scheduled Task (`OpenClaw Gateway` oder `OpenClaw Gateway (<profile>)`), mit einem Fallback auf ein Login-Element im Startup-Ordner pro Benutzer, wenn die Erstellung der Aufgabe verweigert wird
+
+## Verwandt
+
+- [Installationsüberblick](/de/install)
+- [macOS-App](/de/platforms/macos)
+- [iOS-App](/de/platforms/ios)

@@ -1,30 +1,28 @@
 ---
 read_when:
-    - Sie möchten Gemini für web_search verwenden
+    - Sie möchten Gemini für `web_search` verwenden
     - Sie benötigen einen `GEMINI_API_KEY`
-    - Sie möchten Google-Search-Grounding
+    - Sie möchten Google-Search-Grounding nutzen
 summary: Gemini-Websuche mit Google-Search-Grounding
-title: Gemini Search
+title: Gemini-Suche
 x-i18n:
-    generated_at: "2026-04-05T12:57:20Z"
+    generated_at: "2026-04-24T07:03:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 42644176baca6b4b041142541618f6f68361d410d6f425cc4104cd88d9f7c480
+    source_hash: 0778ae326e23ea1bb719fdc694b2accc5a6651e08658a695d4d70e20fc5943a4
     source_path: tools/gemini-search.md
     workflow: 15
 ---
 
-# Gemini Search
-
 OpenClaw unterstützt Gemini-Modelle mit integriertem
-[Google Search grounding](https://ai.google.dev/gemini-api/docs/grounding),
-das KI-synthetisierte Antworten zurückgibt, die durch Live-Google-Suchergebnisse mit
-Zitaten gestützt werden.
+[Google Search Grounding](https://ai.google.dev/gemini-api/docs/grounding),
+das KI-synthetisierte Antworten zurückgibt, die durch Live-Ergebnisse der Google-Suche mit
+Zitationen gestützt werden.
 
 ## API-Schlüssel abrufen
 
 <Steps>
-  <Step title="Schlüssel erstellen">
+  <Step title="Einen Schlüssel erstellen">
     Gehen Sie zu [Google AI Studio](https://aistudio.google.com/apikey) und erstellen Sie einen
     API-Schlüssel.
   </Step>
@@ -47,8 +45,8 @@ Zitaten gestützt werden.
       google: {
         config: {
           webSearch: {
-            apiKey: "AIza...", // optional if GEMINI_API_KEY is set
-            model: "gemini-2.5-flash", // default
+            apiKey: "AIza...", // optional, wenn GEMINI_API_KEY gesetzt ist
+            model: "gemini-2.5-flash", // Standard
           },
         },
       },
@@ -64,29 +62,29 @@ Zitaten gestützt werden.
 }
 ```
 
-**Alternative über Umgebungsvariable:** Setzen Sie `GEMINI_API_KEY` in der Gateway-Umgebung.
-Für eine Gateway-Installation fügen Sie ihn in `~/.openclaw/.env` ein.
+**Alternative über Umgebungsvariablen:** Setzen Sie `GEMINI_API_KEY` in der Gateway-Umgebung.
+Für eine Gateway-Installation legen Sie ihn in `~/.openclaw/.env` ab.
 
-## So funktioniert es
+## Funktionsweise
 
-Anders als herkömmliche Suchanbieter, die eine Liste von Links und Snippets zurückgeben,
-verwendet Gemini Google-Search-Grounding, um KI-synthetisierte Antworten mit
-Inline-Zitaten zu erzeugen. Die Ergebnisse enthalten sowohl die synthetisierte Antwort als auch die Quell-
+Im Gegensatz zu traditionellen Suchprovidern, die eine Liste von Links und Snippets zurückgeben,
+verwendet Gemini Google Search Grounding, um KI-synthetisierte Antworten mit
+Inline-Zitationen zu erzeugen. Die Ergebnisse enthalten sowohl die synthetisierte Antwort als auch die Quell-
 URLs.
 
-- Zitat-URLs aus Gemini-Grounding werden automatisch von Google-
-  Weiterleitungs-URLs in direkte URLs aufgelöst.
-- Die Auflösung von Weiterleitungen verwendet den SSRF-Guard-Pfad (HEAD + Redirect-Prüfungen +
-  http/https-Validierung), bevor die endgültige Zitat-URL zurückgegeben wird.
-- Die Auflösung von Weiterleitungen verwendet strenge SSRF-Standards, sodass Weiterleitungen auf
-  private/interne Ziele blockiert werden.
+- Zitations-URLs aus Gemini Grounding werden automatisch von Google-
+  Redirect-URLs zu direkten URLs aufgelöst.
+- Die Auflösung von Redirects verwendet den SSRF-Guard-Pfad (HEAD + Redirect-Prüfungen +
+  http/https-Validierung), bevor die endgültige Zitations-URL zurückgegeben wird.
+- Die Auflösung von Redirects verwendet strenge SSRF-Standards, daher werden Redirects auf
+  private/interne Ziele blockiert.
 
 ## Unterstützte Parameter
 
 Die Gemini-Suche unterstützt `query`.
 
-`count` wird für die gemeinsame `web_search`-Kompatibilität akzeptiert, aber Gemini-Grounding
-gibt weiterhin eine synthetisierte Antwort mit Zitaten statt einer N-Ergebnis-
+`count` wird aus Kompatibilitätsgründen mit gemeinsamem `web_search` akzeptiert, aber Gemini Grounding
+gibt weiterhin eine einzelne synthetisierte Antwort mit Zitationen statt einer N-Ergebnis-
 Liste zurück.
 
 Providerspezifische Filter wie `country`, `language`, `freshness` und
@@ -100,6 +98,6 @@ Modell, das Grounding unterstützt, kann über
 
 ## Verwandt
 
-- [Überblick über Web Search](/tools/web) -- alle Provider und automatische Erkennung
-- [Brave Search](/tools/brave-search) -- strukturierte Ergebnisse mit Snippets
-- [Perplexity Search](/tools/perplexity-search) -- strukturierte Ergebnisse + Inhalts-Extraktion
+- [Web Search overview](/de/tools/web) -- alle Provider und automatische Erkennung
+- [Brave Search](/de/tools/brave-search) -- strukturierte Ergebnisse mit Snippets
+- [Perplexity Search](/de/tools/perplexity-search) -- strukturierte Ergebnisse + Inhaltsextraktion

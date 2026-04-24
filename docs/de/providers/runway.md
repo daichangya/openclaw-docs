@@ -1,38 +1,36 @@
 ---
 read_when:
-    - Sie möchten die Runway-Videogenerierung in OpenClaw verwenden
-    - Sie benötigen die Einrichtung von Runway-API-Schlüssel/Umgebungsvariablen
-    - Sie möchten Runway zum Standard-Video-Provider machen
-summary: Runway-Videogenerierung in OpenClaw einrichten
+    - Sie möchten die Runway-Videogenerierung in OpenClaw verwenden.
+    - Sie benötigen die Einrichtung von API key/Env für Runway.
+    - Sie möchten Runway zum Standard-Provider für Video machen.
+summary: Einrichtung der Runway-Videogenerierung in OpenClaw
 title: Runway
 x-i18n:
-    generated_at: "2026-04-12T23:33:06Z"
+    generated_at: "2026-04-24T06:55:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: fb9a2d26687920544222b0769f314743af245629fd45b7f456c0161a47476176
+    source_hash: 9648ca4403283cd23bf899d697f35a6b63986e8860227628c0d5789fceee3ce8
     source_path: providers/runway.md
     workflow: 15
 ---
 
-# Runway
+OpenClaw enthält einen gebündelten Provider `runway` für gehostete Videogenerierung.
 
-OpenClaw liefert einen gebündelten `runway`-Provider für gehostete Videogenerierung mit.
-
-| Eigenschaft | Wert                                                              |
-| ----------- | ----------------------------------------------------------------- |
-| Provider-ID | `runway`                                                          |
-| Auth        | `RUNWAYML_API_SECRET` (kanonisch) oder `RUNWAY_API_KEY`           |
-| API         | Aufgabenbasierte Runway-Videogenerierung (`GET /v1/tasks/{id}`-Polling) |
+| Eigenschaft  | Wert                                                              |
+| ------------ | ----------------------------------------------------------------- |
+| Provider-ID  | `runway`                                                          |
+| Auth         | `RUNWAYML_API_SECRET` (kanonisch) oder `RUNWAY_API_KEY`           |
+| API          | Task-basierte Runway-Videogenerierung (`GET /v1/tasks/{id}`-Polling) |
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="API-Schlüssel setzen">
+  <Step title="Den API key setzen">
     ```bash
     openclaw onboard --auth-choice runway-api-key
     ```
   </Step>
-  <Step title="Runway als Standard-Video-Provider festlegen">
+  <Step title="Runway als Standard-Provider für Video setzen">
     ```bash
     openclaw config set agents.defaults.videoGenerationModel.primary "runway/gen4.5"
     ```
@@ -44,19 +42,19 @@ OpenClaw liefert einen gebündelten `runway`-Provider für gehostete Videogeneri
 
 ## Unterstützte Modi
 
-| Modus          | Modell            | Referenzeingabe          |
-| -------------- | ----------------- | ------------------------ |
-| Text-zu-Video  | `gen4.5` (Standard) | Keine                  |
-| Bild-zu-Video  | `gen4.5`          | 1 lokales oder Remote-Bild |
-| Video-zu-Video | `gen4_aleph`      | 1 lokales oder Remote-Video |
+| Modus          | Modell            | Referenz-Input          |
+| -------------- | ----------------- | ----------------------- |
+| Text-zu-Video  | `gen4.5` (Standard) | Keine                 |
+| Bild-zu-Video  | `gen4.5`          | 1 lokales oder entferntes Bild |
+| Video-zu-Video | `gen4_aleph`      | 1 lokales oder entferntes Video |
 
 <Note>
-Lokale Bild- und Video-Referenzen werden über Daten-URIs unterstützt. Reine Textläufe
-bieten derzeit die Seitenverhältnisse `16:9` und `9:16`.
+Lokale Bild- und Video-Referenzen werden über Daten-URIs unterstützt. Rein textbasierte Läufe
+stellen derzeit die Seitenverhältnisse `16:9` und `9:16` bereit.
 </Note>
 
 <Warning>
-Video-zu-Video erfordert derzeit ausdrücklich `runway/gen4_aleph`.
+Video-zu-Video erfordert derzeit speziell `runway/gen4_aleph`.
 </Warning>
 
 ## Konfiguration
@@ -73,28 +71,28 @@ Video-zu-Video erfordert derzeit ausdrücklich `runway/gen4_aleph`.
 }
 ```
 
-## Erweiterte Hinweise
+## Erweiterte Konfiguration
 
 <AccordionGroup>
-  <Accordion title="Aliasse für Umgebungsvariablen">
+  <Accordion title="Aliase für Umgebungsvariablen">
     OpenClaw erkennt sowohl `RUNWAYML_API_SECRET` (kanonisch) als auch `RUNWAY_API_KEY`.
-    Beide Variablen authentifizieren den Runway-Provider.
+    Jede dieser Variablen authentifiziert den Runway-Provider.
   </Accordion>
 
   <Accordion title="Task-Polling">
-    Runway verwendet eine aufgabenbasierte API. Nach dem Absenden einer Generierungsanfrage führt OpenClaw
-    Polling auf `GET /v1/tasks/{id}` durch, bis das Video bereit ist. Für das Polling-Verhalten ist
-    keine zusätzliche Konfiguration erforderlich.
+    Runway verwendet eine task-basierte API. Nach dem Absenden einer Generierungsanfrage pollt OpenClaw
+    `GET /v1/tasks/{id}`, bis das Video bereit ist. Für das Polling-Verhalten ist keine zusätzliche
+    Konfiguration erforderlich.
   </Accordion>
 </AccordionGroup>
 
 ## Verwandt
 
 <CardGroup cols={2}>
-  <Card title="Videogenerierung" href="/de/tools/video-generation" icon="video">
-    Gemeinsame Tool-Parameter, Providerauswahl und asynchrones Verhalten.
+  <Card title="Video generation" href="/de/tools/video-generation" icon="video">
+    Gemeinsame Tool-Parameter, Provider-Auswahl und asynchrones Verhalten.
   </Card>
-  <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference#agent-defaults" icon="gear">
-    Standard-Agent-Einstellungen einschließlich des Modells für Videogenerierung.
+  <Card title="Configuration reference" href="/de/gateway/config-agents#agent-defaults" icon="gear">
+    Standard-Agent-Einstellungen einschließlich Modell für Videogenerierung.
   </Card>
 </CardGroup>

@@ -1,34 +1,34 @@
 ---
 read_when:
-    - Sie verwenden `openclaw browser` und möchten Beispiele für häufige Aufgaben.
-    - Sie möchten einen Browser steuern, der auf einem anderen Rechner über einen Node-Host ausgeführt wird.
-    - Sie möchten sich über Chrome MCP mit Ihrem lokal angemeldeten Chrome verbinden.
+    - Sie verwenden `openclaw browser` und möchten Beispiele für häufige Aufgaben
+    - Sie möchten einen Browser, der auf einem anderen Rechner läuft, über einen Node-Host steuern
+    - Sie möchten sich über Chrome MCP mit Ihrem lokal angemeldeten Chrome verbinden
 summary: CLI-Referenz für `openclaw browser` (Lebenszyklus, Profile, Tabs, Aktionen, Status und Debugging)
 title: Browser
 x-i18n:
-    generated_at: "2026-04-23T06:25:54Z"
+    generated_at: "2026-04-24T06:30:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0cf1a5168e690121d4fc4eac984580c89bc50844f15558413ba6d8a635da2ed6
+    source_hash: 1b93ea053b7fc047fad79397e0298cc530673a64d5873d98be9f910df1ea2fde
     source_path: cli/browser.md
     workflow: 15
 ---
 
 # `openclaw browser`
 
-Verwalten Sie die Browser-Steuerungsoberfläche von OpenClaw und führen Sie Browser-Aktionen aus (Lebenszyklus, Profile, Tabs, Snapshots, Screenshots, Navigation, Eingabe, Status-Emulation und Debugging).
+Die Browser-Steuerungsoberfläche von OpenClaw verwalten und Browser-Aktionen ausführen (Lebenszyklus, Profile, Tabs, Snapshots, Screenshots, Navigation, Eingabe, Status-Emulation und Debugging).
 
 Verwandt:
 
 - Browser-Tool + API: [Browser-Tool](/de/tools/browser)
 
-## Häufige Flags
+## Allgemeine Flags
 
-- `--url <gatewayWsUrl>`: Gateway-WebSocket-URL (standardmäßig aus der Konfiguration).
+- `--url <gatewayWsUrl>`: Gateway-WebSocket-URL (Standard aus der Konfiguration).
 - `--token <token>`: Gateway-Token (falls erforderlich).
 - `--timeout <ms>`: Anfrage-Timeout (ms).
-- `--expect-final`: auf eine abschließende Gateway-Antwort warten.
-- `--browser-profile <name>`: ein Browser-Profil auswählen (Standard aus der Konfiguration).
+- `--expect-final`: auf eine endgültige Gateway-Antwort warten.
+- `--browser-profile <name>`: Browser-Profil auswählen (Standard aus der Konfiguration).
 - `--json`: maschinenlesbare Ausgabe (wo unterstützt).
 
 ## Schnellstart (lokal)
@@ -42,7 +42,7 @@ openclaw browser --browser-profile openclaw snapshot
 
 ## Schnelle Fehlerbehebung
 
-Wenn `start` mit `not reachable after start` fehlschlägt, beheben Sie zuerst Probleme mit der CDP-Bereitschaft. Wenn `start` und `tabs` erfolgreich sind, aber `open` oder `navigate` fehlschlägt, ist die Browser-Steuerungsebene intakt und der Fehler liegt normalerweise an der SSRF-Richtlinie für Navigation.
+Wenn `start` mit `not reachable after start` fehlschlägt, beheben Sie zuerst Probleme mit der CDP-Bereitschaft. Wenn `start` und `tabs` erfolgreich sind, aber `open` oder `navigate` fehlschlägt, ist die Browser-Steuerungsebene in Ordnung und der Fehler liegt normalerweise an der SSRF-Richtlinie für Navigation.
 
 Minimale Sequenz:
 
@@ -52,7 +52,7 @@ openclaw browser --browser-profile openclaw tabs
 openclaw browser --browser-profile openclaw open https://example.com
 ```
 
-Detaillierte Anleitung: [Fehlerbehebung für Browser](/de/tools/browser#cdp-startup-failure-vs-navigation-ssrf-block)
+Detaillierte Anleitung: [Browser-Fehlerbehebung](/de/tools/browser#cdp-startup-failure-vs-navigation-ssrf-block)
 
 ## Lebenszyklus
 
@@ -65,7 +65,7 @@ openclaw browser --browser-profile openclaw reset-profile
 
 Hinweise:
 
-- Für `attachOnly`- und Remote-CDP-Profile schließt `openclaw browser stop` die
+- Für `attachOnly` und Remote-CDP-Profile schließt `openclaw browser stop` die
   aktive Steuerungssitzung und entfernt temporäre Emulationsüberschreibungen, auch wenn
   OpenClaw den Browser-Prozess nicht selbst gestartet hat.
 - Für lokal verwaltete Profile beendet `openclaw browser stop` den gestarteten Browser-
@@ -94,11 +94,11 @@ Verwandt: [Browser-Tool](/de/tools/browser#missing-browser-command-or-tool)
 
 ## Profile
 
-Profile sind benannte Browser-Routing-Konfigurationen. In der Praxis:
+Profile sind benannte Browser-Routing-Konfigurationen. In der Praxis bedeutet das:
 
-- `openclaw`: startet eine dedizierte von OpenClaw verwaltete Chrome-Instanz oder verbindet sich mit ihr (isoliertes Benutzerdatenverzeichnis).
+- `openclaw`: startet oder verbindet sich mit einer dedizierten, von OpenClaw verwalteten Chrome-Instanz (isoliertes User-Data-Verzeichnis).
 - `user`: steuert Ihre bestehende angemeldete Chrome-Sitzung über Chrome DevTools MCP.
-- benutzerdefinierte CDP-Profile: verweisen auf einen lokalen oder Remote-CDP-Endpunkt.
+- benutzerdefinierte CDP-Profile: zeigen auf einen lokalen oder entfernten CDP-Endpunkt.
 
 ```bash
 openclaw browser profiles
@@ -149,7 +149,7 @@ Hinweise:
 - `existing-session`- / `user`-Profile unterstützen Seiten-Screenshots und `--ref`-
   Screenshots aus der Snapshot-Ausgabe, aber keine CSS-`--element`-Screenshots.
 
-Navigate/click/type (ref-basierte UI-Automatisierung):
+Navigieren/Klicken/Tippen (ref-basierte UI-Automatisierung):
 
 ```bash
 openclaw browser navigate https://example.com
@@ -165,7 +165,7 @@ openclaw browser wait --text "Done"
 openclaw browser evaluate --fn '(el) => el.textContent' --ref <ref>
 ```
 
-Datei- und Dialog-Helfer:
+Hilfen für Dateien + Dialoge:
 
 ```bash
 openclaw browser upload /tmp/openclaw/uploads/file.pdf --ref <ref>
@@ -174,7 +174,7 @@ openclaw browser download <ref> report.pdf
 openclaw browser dialog --accept
 ```
 
-## Status und Speicher
+## Status und Speicherung
 
 Viewport + Emulation:
 
@@ -217,7 +217,7 @@ openclaw browser trace stop --out trace.zip
 
 ## Bestehendes Chrome über MCP
 
-Verwenden Sie das integrierte `user`-Profil oder erstellen Sie Ihr eigenes `existing-session`-Profil:
+Verwenden Sie das integrierte Profil `user` oder erstellen Sie Ihr eigenes `existing-session`-Profil:
 
 ```bash
 openclaw browser --browser-profile user tabs
@@ -226,11 +226,11 @@ openclaw browser create-profile --name brave-live --driver existing-session --us
 openclaw browser --browser-profile chrome-live tabs
 ```
 
-Dieser Pfad ist nur für den Host gedacht. Für Docker, Headless-Server, Browserless oder andere Remote-Setups verwenden Sie stattdessen ein CDP-Profil.
+Dieser Pfad ist nur für den Host. Für Docker, Headless-Server, Browserless oder andere Remote-Setups verwenden Sie stattdessen ein CDP-Profil.
 
 Aktuelle Einschränkungen von `existing-session`:
 
-- Snapshot-gesteuerte Aktionen verwenden Refs, keine CSS-Selektoren
+- snapshotgesteuerte Aktionen verwenden Refs, nicht CSS-Selektoren
 - `click` unterstützt nur Linksklick
 - `type` unterstützt `slowly=true` nicht
 - `press` unterstützt `delayMs` nicht
@@ -240,15 +240,20 @@ Aktuelle Einschränkungen von `existing-session`:
 - `wait --load networkidle` wird nicht unterstützt
 - Datei-Uploads erfordern `--ref` / `--input-ref`, unterstützen kein CSS-
   `--element` und unterstützen derzeit jeweils nur eine Datei
-- Dialog-Hooks unterstützen `--timeout` nicht
+- Dialog-Hooks unterstützen kein `--timeout`
 - Screenshots unterstützen Seitenaufnahmen und `--ref`, aber kein CSS-`--element`
-- `responsebody`, Download-Abfangung, PDF-Export und Batch-Aktionen erfordern weiterhin
+- `responsebody`, Download-Interception, PDF-Export und Batch-Aktionen erfordern weiterhin
   einen verwalteten Browser oder ein rohes CDP-Profil
 
 ## Remote-Browser-Steuerung (Node-Host-Proxy)
 
-Wenn das Gateway auf einem anderen Rechner als dem Browser läuft, führen Sie einen **Node-Host** auf dem Rechner aus, auf dem Chrome/Brave/Edge/Chromium vorhanden ist. Das Gateway leitet Browser-Aktionen an diesen Node weiter (kein separater Browser-Steuerungsserver erforderlich).
+Wenn das Gateway auf einem anderen Rechner als der Browser läuft, führen Sie einen **Node-Host** auf dem Rechner aus, der Chrome/Brave/Edge/Chromium besitzt. Das Gateway leitet Browser-Aktionen an diesen Node weiter (kein separater Browser-Steuerungsserver erforderlich).
 
-Verwenden Sie `gateway.nodes.browser.mode`, um das automatische Routing zu steuern, und `gateway.nodes.browser.node`, um einen bestimmten Node festzulegen, falls mehrere verbunden sind.
+Verwenden Sie `gateway.nodes.browser.mode`, um Auto-Routing zu steuern, und `gateway.nodes.browser.node`, um einen bestimmten Node festzulegen, falls mehrere verbunden sind.
 
 Sicherheit + Remote-Setup: [Browser-Tool](/de/tools/browser), [Remote-Zugriff](/de/gateway/remote), [Tailscale](/de/gateway/tailscale), [Sicherheit](/de/gateway/security)
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Browser](/de/tools/browser)

@@ -1,47 +1,45 @@
 ---
 read_when:
-    - Beim Auswählen eines Onboarding-Pfads
-    - Beim Einrichten einer neuen Umgebung
+    - Einen Onboarding-Pfad auswählen
+    - Eine neue Umgebung einrichten
 sidebarTitle: Onboarding Overview
 summary: Überblick über Onboarding-Optionen und -Abläufe von OpenClaw
 title: Onboarding-Überblick
 x-i18n:
-    generated_at: "2026-04-05T12:55:51Z"
+    generated_at: "2026-04-24T07:00:09Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 374697c1dbe0c3871c43164076fbed7119ef032f4a40d0f6e421051f914806e5
+    source_hash: 3a161e504f94c633873a497dd97c971ebfed6f31ef23a3fe9e85eec5a06d1d97
     source_path: start/onboarding-overview.md
     workflow: 15
 ---
-
-# Onboarding-Überblick
 
 OpenClaw hat zwei Onboarding-Pfade. Beide konfigurieren Authentifizierung, das Gateway und
 optionale Chat-Kanäle — sie unterscheiden sich nur darin, wie Sie mit dem Setup interagieren.
 
 ## Welchen Pfad sollte ich verwenden?
 
-|                | CLI-Onboarding                         | macOS-App-Onboarding      |
-| -------------- | -------------------------------------- | ------------------------- |
-| **Plattformen**  | macOS, Linux, Windows (nativ oder WSL2) | nur macOS                |
-| **Oberfläche**  | Terminal-Wizard                        | Geführte UI in der App      |
-| **Am besten geeignet für**   | Server, Headless, vollständige Kontrolle        | Desktop-Mac, visuelles Setup |
-| **Automatisierung** | `--non-interactive` für Skripte        | nur manuell               |
-| **Befehl**    | `openclaw onboard`                     | App starten            |
+|                | CLI-Onboarding                         | Onboarding in der macOS-App |
+| -------------- | -------------------------------------- | --------------------------- |
+| **Plattformen** | macOS, Linux, Windows (nativ oder WSL2) | nur macOS                  |
+| **Oberfläche** | Terminal-Assistent                     | Geführte UI in der App      |
+| **Am besten für** | Server, Headless, volle Kontrolle    | Desktop-Mac, visuelles Setup |
+| **Automatisierung** | `--non-interactive` für Skripte    | Nur manuell                 |
+| **Befehl**     | `openclaw onboard`                     | App starten                 |
 
-Die meisten Benutzer sollten mit dem **CLI-Onboarding** beginnen — es funktioniert überall und gibt
+Die meisten Benutzer sollten mit **CLI-Onboarding** beginnen — es funktioniert überall und gibt
 Ihnen die meiste Kontrolle.
 
-## Was Onboarding konfiguriert
+## Was das Onboarding konfiguriert
 
-Unabhängig davon, welchen Pfad Sie wählen, richtet Onboarding Folgendes ein:
+Unabhängig davon, welchen Pfad Sie wählen, richtet das Onboarding Folgendes ein:
 
 1. **Modell-Provider und Authentifizierung** — API-Schlüssel, OAuth oder Setup-Token für Ihren gewählten Provider
-2. **Workspace** — Verzeichnis für Agent-Dateien, Bootstrap-Vorlagen und Gedächtnis
-3. **Gateway** — Port, Bind-Adresse, Authentifizierungsmodus
+2. **Workspace** — Verzeichnis für Agent-Dateien, Bootstrap-Vorlagen und Memory
+3. **Gateway** — Port, Bind-Adresse, Auth-Modus
 4. **Kanäle** (optional) — integrierte und gebündelte Chat-Kanäle wie
    BlueBubbles, Discord, Feishu, Google Chat, Mattermost, Microsoft Teams,
-   Telegram, WhatsApp und weitere
+   Telegram, WhatsApp und mehr
 5. **Daemon** (optional) — Hintergrunddienst, damit das Gateway automatisch startet
 
 ## CLI-Onboarding
@@ -55,13 +53,14 @@ openclaw onboard
 Fügen Sie `--install-daemon` hinzu, um den Hintergrunddienst ebenfalls in einem Schritt zu installieren.
 
 Vollständige Referenz: [Onboarding (CLI)](/de/start/wizard)
-CLI-Befehlsdokumentation: [`openclaw onboard`](/cli/onboard)
+CLI-Befehlsdokumentation: [`openclaw onboard`](/de/cli/onboard)
 
-## macOS-App-Onboarding
+## Onboarding in der macOS-App
 
-Öffnen Sie die OpenClaw-App. Der Ersteinrichtungs-Wizard führt Sie mit einer visuellen Oberfläche durch dieselben Schritte.
+Öffnen Sie die OpenClaw-App. Der Assistent beim ersten Start führt Sie mit einer
+visuellen Oberfläche durch dieselben Schritte.
 
-Vollständige Referenz: [Onboarding (macOS-App)](/start/onboarding)
+Vollständige Referenz: [Onboarding (macOS App)](/de/start/onboarding)
 
 ## Benutzerdefinierte oder nicht aufgeführte Provider
 
@@ -69,7 +68,12 @@ Wenn Ihr Provider im Onboarding nicht aufgeführt ist, wählen Sie **Custom Prov
 geben Sie Folgendes ein:
 
 - API-Kompatibilitätsmodus (OpenAI-kompatibel, Anthropic-kompatibel oder automatische Erkennung)
-- Basis-URL und API-Schlüssel
-- Modell-ID und optionalen Alias
+- Base-URL und API-Schlüssel
+- Modell-ID und optionaler Alias
 
-Mehrere benutzerdefinierte Endpunkte können nebeneinander bestehen — jeder erhält eine eigene Endpunkt-ID.
+Mehrere benutzerdefinierte Endpunkte können nebeneinander existieren — jeder erhält eine eigene Endpoint-ID.
+
+## Verwandt
+
+- [Getting started](/de/start/getting-started)
+- [CLI setup reference](/de/start/wizard-cli-reference)

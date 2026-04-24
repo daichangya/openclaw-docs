@@ -1,23 +1,21 @@
 ---
 read_when:
-    - Node ist verbunden, aber Kamera-/Canvas-/Screen-/Exec-Tools schlagen fehl
-    - Sie brauchen das mentale Modell für Node-Pairing versus Approvals
-summary: Fehlerbehebung bei Node-Pairing, Vordergrundanforderungen, Berechtigungen und Tool-Fehlern
-title: Node-Fehlerbehebung
+    - Der Node ist verbunden, aber die Tools für Kamera/Canvas/Bildschirm/Exec schlagen fehl
+    - Sie benötigen das mentale Modell für Node-Kopplung versus Genehmigungen
+summary: Fehlerbehebung bei Node-Kopplung, Anforderungen im Vordergrund, Berechtigungen und Tool-Fehlern
+title: Fehlerbehebung bei Nodes
 x-i18n:
-    generated_at: "2026-04-05T12:48:37Z"
+    generated_at: "2026-04-24T06:46:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c2e431e6a35c482a655e01460bef9fab5d5a5ae7dc46f8f992ee51100f5c937e
+    source_hash: 59c7367d02945e972094b47832164d95573a2aab1122e8ccf6feb80bcfcd95be
     source_path: nodes/troubleshooting.md
     workflow: 15
 ---
 
-# Node-Fehlerbehebung
+Verwenden Sie diese Seite, wenn ein Node im Status sichtbar ist, aber Node-Tools fehlschlagen.
 
-Verwenden Sie diese Seite, wenn eine Node im Status sichtbar ist, Node-Tools aber fehlschlagen.
-
-## Befehlsabfolge
+## Befehlsleiter
 
 ```bash
 openclaw status
@@ -27,7 +25,7 @@ openclaw doctor
 openclaw channels status --probe
 ```
 
-Führen Sie dann Node-spezifische Prüfungen aus:
+Führen Sie dann node-spezifische Prüfungen aus:
 
 ```bash
 openclaw nodes status
@@ -37,15 +35,15 @@ openclaw approvals get --node <idOrNameOrIp>
 
 Gesunde Signale:
 
-- Node ist verbunden und für die Rolle `node` gepairt.
+- Der Node ist verbunden und für die Rolle `node` gekoppelt.
 - `nodes describe` enthält die Fähigkeit, die Sie aufrufen.
-- Exec-Approvals zeigen den erwarteten Modus/die erwartete Allowlist.
+- Exec approvals zeigen den erwarteten Modus/die erwartete Allowlist.
 
-## Vordergrundanforderungen
+## Anforderungen im Vordergrund
 
 `canvas.*`, `camera.*` und `screen.*` funktionieren auf iOS-/Android-Nodes nur im Vordergrund.
 
-Schnell prüfen und beheben:
+Schnellprüfung und Behebung:
 
 ```bash
 openclaw nodes describe --node <idOrNameOrIp>
@@ -53,26 +51,26 @@ openclaw nodes canvas snapshot --node <idOrNameOrIp>
 openclaw logs --follow
 ```
 
-Wenn Sie `NODE_BACKGROUND_UNAVAILABLE` sehen, holen Sie die Node-App in den Vordergrund und versuchen Sie es erneut.
+Wenn Sie `NODE_BACKGROUND_UNAVAILABLE` sehen, bringen Sie die Node-App in den Vordergrund und versuchen Sie es erneut.
 
 ## Berechtigungsmatrix
 
-| Fähigkeit                    | iOS                                     | Android                                      | macOS-Node-App                | Typischer Fehlercode           |
-| --------------------------- | --------------------------------------- | -------------------------------------------- | ----------------------------- | ------------------------------ |
-| `camera.snap`, `camera.clip` | Kamera (+ Mikrofon für Clip-Audio)     | Kamera (+ Mikrofon für Clip-Audio)           | Kamera (+ Mikrofon für Clip-Audio) | `*_PERMISSION_REQUIRED`   |
-| `screen.record`              | Bildschirmaufnahme (+ Mikro optional)  | Prompt für Bildschirmaufnahme (+ Mikro optional) | Bildschirmaufnahme         | `*_PERMISSION_REQUIRED`        |
-| `location.get`               | Beim Verwenden oder Immer (abhängig vom Modus) | Vordergrund-/Hintergrundstandort abhängig vom Modus | Standortberechtigung | `LOCATION_PERMISSION_REQUIRED` |
-| `system.run`                 | n/a (Node-Host-Pfad)                   | n/a (Node-Host-Pfad)                         | Exec-Approvals erforderlich   | `SYSTEM_RUN_DENIED`            |
+| Fähigkeit                    | iOS                                     | Android                                     | macOS-Node-App                 | Typischer Fehlercode           |
+| ---------------------------- | --------------------------------------- | ------------------------------------------- | ------------------------------ | ------------------------------ |
+| `camera.snap`, `camera.clip` | Kamera (+ Mikrofon für Clip-Audio)      | Kamera (+ Mikrofon für Clip-Audio)          | Kamera (+ Mikrofon für Clip-Audio) | `*_PERMISSION_REQUIRED`    |
+| `screen.record`              | Bildschirmaufnahme (+ Mikrofon optional) | Screen-Capture-Prompt (+ Mikrofon optional) | Bildschirmaufnahme             | `*_PERMISSION_REQUIRED`        |
+| `location.get`               | Während Nutzung oder Immer (je nach Modus) | Vordergrund-/Hintergrund-Ortung je nach Modus | Standortberechtigung         | `LOCATION_PERMISSION_REQUIRED` |
+| `system.run`                 | n/v (Node-Host-Pfad)                    | n/v (Node-Host-Pfad)                        | Exec approvals erforderlich    | `SYSTEM_RUN_DENIED`            |
 
-## Pairing versus Approvals
+## Kopplung versus Genehmigungen
 
-Dies sind unterschiedliche Schranken:
+Das sind unterschiedliche Schranken:
 
-1. **Device Pairing**: Darf diese Node mit dem Gateway verbinden?
-2. **Gateway-Node-Befehlsrichtlinie**: Ist die RPC-Befehls-ID durch `gateway.nodes.allowCommands` / `denyCommands` und Plattform-Standards erlaubt?
-3. **Exec-Approvals**: Darf diese Node lokal einen bestimmten Shell-Befehl ausführen?
+1. **Gerätekopplung**: Darf sich dieser Node mit dem Gateway verbinden?
+2. **Gateway-Richtlinie für Node-Befehle**: Ist die RPC-Befehls-ID durch `gateway.nodes.allowCommands` / `denyCommands` und die Plattform-Standardwerte erlaubt?
+3. **Exec approvals**: Darf dieser Node lokal einen bestimmten Shell-Befehl ausführen?
 
-Schnelle Prüfungen:
+Schnellprüfungen:
 
 ```bash
 openclaw devices list
@@ -81,31 +79,31 @@ openclaw approvals get --node <idOrNameOrIp>
 openclaw approvals allowlist add --node <idOrNameOrIp> "/usr/bin/uname"
 ```
 
-Wenn Pairing fehlt, genehmigen Sie zuerst das Node-Gerät.
-Wenn `nodes describe` einen Befehl nicht enthält, prüfen Sie die Gateway-Node-Befehlsrichtlinie und ob die Node diesen Befehl beim Verbinden tatsächlich deklariert hat.
-Wenn Pairing in Ordnung ist, `system.run` aber fehlschlägt, korrigieren Sie Exec-Approvals/Allowlist auf dieser Node.
+Wenn die Kopplung fehlt, genehmigen Sie zuerst das Node-Gerät.
+Wenn `nodes describe` einen Befehl nicht enthält, prüfen Sie die Gateway-Richtlinie für Node-Befehle und ob der Node diesen Befehl beim Verbinden tatsächlich deklariert hat.
+Wenn die Kopplung in Ordnung ist, aber `system.run` fehlschlägt, korrigieren Sie Exec approvals/Allowlist auf diesem Node.
 
-Node-Pairing ist eine Identitäts-/Vertrauensschranke, keine Genehmigungsoberfläche pro Befehl. Für `system.run` liegt die Richtlinie pro Node in der Exec-Approvals-Datei dieser Node (`openclaw approvals get --node ...`), nicht im Pairing-Datensatz des Gateways.
+Die Node-Kopplung ist eine Identitäts-/Vertrauensschranke, keine Genehmigungsoberfläche pro Befehl. Für `system.run` befindet sich die nodebezogene Richtlinie in der Exec-Approvals-Datei dieses Nodes (`openclaw approvals get --node ...`), nicht im Kopplungseintrag des Gateway.
 
-Für Approval-gestützte Läufe mit `host=node` bindet das Gateway die Ausführung außerdem an den
+Für approvalgestützte Ausführungen mit `host=node` bindet das Gateway die Ausführung außerdem an den
 vorbereiteten kanonischen `systemRunPlan`. Wenn ein späterer Aufrufer Befehl/cwd oder
-Sitzungsmetadaten verändert, bevor der genehmigte Lauf weitergeleitet wird, lehnt das Gateway den
-Lauf als Approval-Mismatch ab, statt der bearbeiteten Nutzlast zu vertrauen.
+Sitzungsmetadaten verändert, bevor der genehmigte Lauf weitergeleitet wird, weist das Gateway den
+Lauf als Approval-Mismatch zurück, anstatt der bearbeiteten Payload zu vertrauen.
 
 ## Häufige Node-Fehlercodes
 
-- `NODE_BACKGROUND_UNAVAILABLE` → App ist im Hintergrund; in den Vordergrund holen.
-- `CAMERA_DISABLED` → Kamera-Schalter in den Node-Einstellungen deaktiviert.
+- `NODE_BACKGROUND_UNAVAILABLE` → App ist im Hintergrund; bringen Sie sie in den Vordergrund.
+- `CAMERA_DISABLED` → Kamera-Umschalter in den Node-Einstellungen deaktiviert.
 - `*_PERMISSION_REQUIRED` → Betriebssystemberechtigung fehlt/wurde verweigert.
 - `LOCATION_DISABLED` → Standortmodus ist aus.
-- `LOCATION_PERMISSION_REQUIRED` → Angeforderter Standortmodus wurde nicht gewährt.
-- `LOCATION_BACKGROUND_UNAVAILABLE` → App ist im Hintergrund, aber es besteht nur die Berechtigung „While Using“.
-- `SYSTEM_RUN_DENIED: approval required` → Exec-Anfrage benötigt explizite Genehmigung.
+- `LOCATION_PERMISSION_REQUIRED` → angeforderter Standortmodus wurde nicht gewährt.
+- `LOCATION_BACKGROUND_UNAVAILABLE` → App ist im Hintergrund, aber es liegt nur die Berechtigung „While Using“ vor.
+- `SYSTEM_RUN_DENIED: approval required` → Exec-Request benötigt eine explizite Genehmigung.
 - `SYSTEM_RUN_DENIED: allowlist miss` → Befehl wird durch den Allowlist-Modus blockiert.
   Auf Windows-Node-Hosts werden Shell-Wrapper-Formen wie `cmd.exe /c ...` im
   Allowlist-Modus als Allowlist-Miss behandelt, sofern sie nicht über den Ask-Flow genehmigt wurden.
 
-## Schneller Wiederherstellungszyklus
+## Schnelle Wiederherstellungsschleife
 
 ```bash
 openclaw nodes status
@@ -114,17 +112,23 @@ openclaw approvals get --node <idOrNameOrIp>
 openclaw logs --follow
 ```
 
-Wenn Sie weiterhin nicht weiterkommen:
+Wenn Sie weiterhin blockiert sind:
 
-- Device Pairing erneut genehmigen.
-- Node-App erneut öffnen (Vordergrund).
-- Betriebssystemberechtigungen erneut gewähren.
-- Exec-Approval-Richtlinie neu erstellen/anpassen.
+- Genehmigen Sie die Gerätekopplung erneut.
+- Öffnen Sie die Node-App erneut (Vordergrund).
+- Erteilen Sie die OS-Berechtigungen erneut.
+- Erstellen/passen Sie die Exec-Genehmigungsrichtlinie neu an.
 
 Verwandt:
 
-- [/nodes/index](/nodes/index)
-- [/nodes/camera](/nodes/camera)
-- [/nodes/location-command](/nodes/location-command)
-- [/tools/exec-approvals](/tools/exec-approvals)
-- [/gateway/pairing](/gateway/pairing)
+- [/nodes/index](/de/nodes/index)
+- [/nodes/camera](/de/nodes/camera)
+- [/nodes/location-command](/de/nodes/location-command)
+- [/tools/exec-approvals](/de/tools/exec-approvals)
+- [/gateway/pairing](/de/gateway/pairing)
+
+## Verwandt
+
+- [Nodes-Überblick](/de/nodes)
+- [Gateway-Fehlerbehebung](/de/gateway/troubleshooting)
+- [Fehlerbehebung für Kanäle](/de/channels/troubleshooting)

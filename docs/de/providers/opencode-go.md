@@ -1,38 +1,36 @@
 ---
 read_when:
-    - Sie möchten den OpenCode-Go-Katalog
-    - Sie benötigen die Laufzeit-Modell-Refs für Go-gehostete Modelle
-summary: Verwenden Sie den OpenCode-Go-Katalog mit dem gemeinsamen OpenCode-Setup
+    - Sie möchten den OpenCode-Go-Katalog nutzen
+    - Sie benötigen die Laufzeit-Modellreferenzen für Go-gehostete Modelle
+summary: Den OpenCode-Go-Katalog mit dem gemeinsamen OpenCode-Setup verwenden
 title: OpenCode Go
 x-i18n:
-    generated_at: "2026-04-22T04:27:02Z"
+    generated_at: "2026-04-24T06:55:13Z"
     model: gpt-5.4
     provider: openai
-    source_hash: bb03bc609f0dfff2981eac13b67cbcae066184f4606ce54ba24ca6a5737fdae8
+    source_hash: d70ca7e7c63f95cbb698d5193c2d9fa48576a8d7311dbd7fa4e2f10a42e275a7
     source_path: providers/opencode-go.md
     workflow: 15
 ---
 
-# OpenCode Go
-
 OpenCode Go ist der Go-Katalog innerhalb von [OpenCode](/de/providers/opencode).
 Er verwendet denselben `OPENCODE_API_KEY` wie der Zen-Katalog, behält aber die Laufzeit-
-Anbieter-ID `opencode-go` bei, damit das Upstream-Routing pro Modell korrekt bleibt.
+Provider-ID `opencode-go`, damit das vorgelagerte Routing pro Modell korrekt bleibt.
 
 | Eigenschaft      | Wert                            |
 | ---------------- | ------------------------------- |
-| Laufzeitanbieter | `opencode-go`                   |
+| Laufzeit-Provider | `opencode-go`                  |
 | Auth             | `OPENCODE_API_KEY`              |
 | Übergeordnetes Setup | [OpenCode](/de/providers/opencode) |
 
-## Unterstützte Modelle
+## Integrierter Katalog
 
-OpenClaw bezieht den Go-Katalog aus der gebündelten pi-Modell-Registry. Führen Sie
-`openclaw models list --provider opencode-go` aus, um die aktuelle Modellliste anzuzeigen.
+OpenClaw bezieht den Go-Katalog aus der gebündelten Pi-Modell-Registry. Führen Sie
+`openclaw models list --provider opencode-go` aus, um die aktuelle Modellliste zu sehen.
 
-Stand des gebündelten pi-Katalogs enthält der Anbieter:
+Im gebündelten Pi-Katalog enthält der Provider derzeit:
 
-| Modell-Ref                 | Name                  |
+| Modellreferenz             | Name                  |
 | -------------------------- | --------------------- |
 | `opencode-go/glm-5`        | GLM-5                 |
 | `opencode-go/glm-5.1`      | GLM-5.1               |
@@ -70,7 +68,7 @@ Stand des gebündelten pi-Katalogs enthält der Anbieter:
 
   <Tab title="Nicht interaktiv">
     <Steps>
-      <Step title="Den Schlüssel direkt übergeben">
+      <Step title="Schlüssel direkt übergeben">
         ```bash
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
@@ -93,27 +91,27 @@ Stand des gebündelten pi-Katalogs enthält der Anbieter:
 }
 ```
 
-## Erweiterte Hinweise
+## Erweiterte Konfiguration
 
 <AccordionGroup>
   <Accordion title="Routing-Verhalten">
-    OpenClaw übernimmt das Routing pro Modell automatisch, wenn der Modell-Ref
-    `opencode-go/...` verwendet. Es ist keine zusätzliche Anbieterkonfiguration erforderlich.
+    OpenClaw übernimmt das Routing pro Modell automatisch, wenn die Modellreferenz
+    `opencode-go/...` verwendet. Es ist keine zusätzliche Provider-Konfiguration erforderlich.
   </Accordion>
 
-  <Accordion title="Konvention für Laufzeit-Refs">
-    Laufzeit-Refs bleiben explizit: `opencode/...` für Zen, `opencode-go/...` für Go.
-    Dadurch bleibt das Upstream-Routing pro Modell in beiden Katalogen korrekt.
+  <Accordion title="Konvention für Laufzeit-Referenzen">
+    Laufzeit-Referenzen bleiben explizit: `opencode/...` für Zen, `opencode-go/...` für Go.
+    So bleibt das vorgelagerte Routing pro Modell über beide Kataloge hinweg korrekt.
   </Accordion>
 
-  <Accordion title="Gemeinsame Anmeldedaten">
-    Derselbe `OPENCODE_API_KEY` wird sowohl vom Zen- als auch vom Go-Katalog verwendet. Wenn Sie
-    den Schlüssel während des Setups eingeben, werden Anmeldedaten für beide Laufzeitanbieter gespeichert.
+  <Accordion title="Gemeinsam genutzte Anmeldedaten">
+    Derselbe `OPENCODE_API_KEY` wird sowohl vom Zen- als auch vom Go-Katalog verwendet. Wenn
+    Sie den Schlüssel während des Setups eingeben, werden Anmeldedaten für beide Laufzeit-Provider gespeichert.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Siehe [OpenCode](/de/providers/opencode) für die gemeinsame Onboarding-Übersicht und die vollständige
+Siehe [OpenCode](/de/providers/opencode) für den gemeinsamen Überblick zum Onboarding und die vollständige
 Referenz für Zen- + Go-Katalog.
 </Tip>
 
@@ -121,9 +119,9 @@ Referenz für Zen- + Go-Katalog.
 
 <CardGroup cols={2}>
   <Card title="OpenCode (übergeordnet)" href="/de/providers/opencode" icon="server">
-    Gemeinsames Onboarding, Katalogübersicht und erweiterte Hinweise.
+    Gemeinsames Onboarding, Katalogüberblick und erweiterte Hinweise.
   </Card>
-  <Card title="Model selection" href="/de/concepts/model-providers" icon="layers">
-    Auswahl von Anbietern, Modell-Refs und Failover-Verhalten.
+  <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
+    Provider, Modellreferenzen und Failover-Verhalten auswählen.
   </Card>
 </CardGroup>

@@ -2,14 +2,18 @@
 summary: Weiterleitung zu /cli/message
 title: Umfragen
 x-i18n:
-    generated_at: "2026-04-23T13:57:51Z"
+    generated_at: "2026-04-24T06:26:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0639c4d35678e5cb0d3a262e2db9cd8db1e25e3eb26adc28bf76b5df14e5446f
+    source_hash: a277212ed680b7aeb9153d003bc084d2d0c918dc53f2f469c72f7fe5a881cfae
     source_path: automation/poll.md
     workflow: 15
 ---
 
-# Umfragen
+Diese Seite wurde nach [Nachrichten-Tool](/de/cli/message) verschoben. Informationen zur Umfrage-Dokumentation finden Sie unter [Nachrichten-Tool](/de/cli/message).
 
-Diese Seite wurde zu [Message tool](/de/cli/message) verschoben. Siehe [Message tool](/de/cli/message) für die Dokumentation zu Umfragen.
+## Verwandt
+
+- [Webhook](/de/automation/cron-jobs)
+- [Geplante Aufgaben](/de/automation/cron-jobs)
+- [Hintergrundaufgaben](/de/automation/tasks)

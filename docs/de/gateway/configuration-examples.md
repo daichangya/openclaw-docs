@@ -1,24 +1,22 @@
 ---
 read_when:
-    - Sie lernen, wie OpenClaw konfiguriert wird
-    - Sie suchen nach Konfigurationsbeispielen
-    - Sie richten OpenClaw zum ersten Mal ein
+    - Lernen, wie OpenClaw konfiguriert wird
+    - Suche nach Konfigurationsbeispielen
+    - OpenClaw zum ersten Mal einrichten
 summary: Schema-genaue Konfigurationsbeispiele für gängige OpenClaw-Setups
 title: Konfigurationsbeispiele
 x-i18n:
-    generated_at: "2026-04-05T12:42:26Z"
+    generated_at: "2026-04-24T06:36:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1c85643b02285cefa2aaa9dd7c1e3abebb505bc8b415b5153b5899efc3ade0f7
+    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-# Konfigurationsbeispiele
+Die folgenden Beispiele sind auf das aktuelle Konfigurationsschema abgestimmt. Die vollständige Referenz und feldbezogene Hinweise finden Sie unter [Configuration](/de/gateway/configuration).
 
-Die folgenden Beispiele sind auf das aktuelle Konfigurationsschema abgestimmt. Für die vollständige Referenz und Hinweise zu einzelnen Feldern siehe [Configuration](/gateway/configuration).
-
-## Schnelleinstieg
+## Schnellstart
 
 ### Absolutes Minimum
 
@@ -29,7 +27,7 @@ Die folgenden Beispiele sind auf das aktuelle Konfigurationsschema abgestimmt. F
 }
 ```
 
-Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von dieser Nummer aus eine DM senden.
+Speichern Sie dies in `~/.openclaw/openclaw.json`, und Sie können dem Bot von dieser Nummer aus DMs senden.
 
 ### Empfohlener Einstieg
 
@@ -37,7 +35,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
 {
   identity: {
     name: "Clawd",
-    theme: "hilfreicher Assistent",
+    theme: "helpful assistant",
     emoji: "🦞",
   },
   agent: {
@@ -55,7 +53,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
 
 ## Erweitertes Beispiel (wichtige Optionen)
 
-> JSON5 erlaubt Kommentare und nachgestellte Kommas. Normales JSON funktioniert ebenfalls.
+> JSON5 erlaubt Kommentare und abschließende Kommas. Reguläres JSON funktioniert ebenfalls.
 
 ```json5
 {
@@ -89,7 +87,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
   // Identität
   identity: {
     name: "Samantha",
-    theme: "hilfreiches Faultier",
+    theme: "helpful sloth",
     emoji: "🦥",
   },
 
@@ -157,7 +155,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
   // Sitzungsverhalten
   session: {
     scope: "per-sender",
-    dmScope: "per-channel-peer", // empfohlen für Multi-User-Posteingänge
+    dmScope: "per-channel-peer", // empfohlen für Multi-User-Postfächer
     reset: {
       mode: "daily",
       atHour: 4,
@@ -236,7 +234,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
     },
   },
 
-  // Agent-Laufzeit
+  // Agentenlaufzeit
   agents: {
     defaults: {
       workspace: "~/.openclaw/workspace",
@@ -253,7 +251,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
         "openai/gpt-5.4": { alias: "gpt" },
       },
-      skills: ["github", "weather"], // wird von Agenten geerbt, die list[].skills auslassen
+      skills: ["github", "weather"], // wird von Agenten geerbt, die list[].skills weglassen
       thinkingDefault: "low",
       verboseDefault: "off",
       elevatedDefault: "on",
@@ -293,7 +291,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
       },
       sandbox: {
         mode: "non-main",
-        scope: "session", // gegenüber dem veralteten perSession: true bevorzugt
+        scope: "session", // bevorzugt gegenüber Legacy perSession: true
         workspaceRoot: "~/.openclaw/sandboxes",
         docker: {
           image: "openclaw-sandbox:bookworm-slim",
@@ -315,7 +313,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
         // erbt defaults.skills -> github, weather
         thinkingDefault: "high", // agentenspezifische Thinking-Überschreibung
         reasoningDefault: "on", // agentenspezifische Sichtbarkeit von Reasoning
-        fastModeDefault: false, // agentenspezifischer Schnellmodus
+        fastModeDefault: false, // agentenspezifischer Fast-Modus
       },
       {
         id: "quick",
@@ -401,7 +399,7 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
         wakeMode: "now",
         name: "Gmail",
         sessionKey: "hook:gmail:{{messages[0].id}}",
-        messageTemplate: "Von: {{messages[0].from}}\nBetreff: {{messages[0].subject}}",
+        messageTemplate: "From: {{messages[0].from}}\nSubject: {{messages[0].subject}}",
         textTemplate: "{{messages[0].snippet}}",
         deliver: true,
         channel: "last",
@@ -466,9 +464,9 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
 }
 ```
 
-## Gängige Muster
+## Häufige Muster
 
-### Gemeinsame Skill-Basis mit einer Überschreibung
+### Gemeinsame Skill-Baseline mit einer Überschreibung
 
 ```json5
 {
@@ -485,8 +483,8 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
 }
 ```
 
-- `agents.defaults.skills` ist die gemeinsame Basis.
-- `agents.list[].skills` ersetzt diese Basis für einen Agenten.
+- `agents.defaults.skills` ist die gemeinsame Baseline.
+- `agents.list[].skills` ersetzt diese Baseline für einen Agenten.
 - Verwenden Sie `skills: []`, wenn ein Agent keine Skills sehen soll.
 
 ### Multi-Plattform-Setup
@@ -510,9 +508,9 @@ Speichern Sie dies in `~/.openclaw/openclaw.json`, dann können Sie dem Bot von 
 }
 ```
 
-### Sicherer DM-Modus (gemeinsamer Posteingang / Multi-User-DMs)
+### Sicherer DM-Modus (gemeinsames Postfach / Multi-User-DMs)
 
-Wenn mehr als eine Person Ihrem Bot eine DM senden kann (mehrere Einträge in `allowFrom`, Pairing-Freigaben für mehrere Personen oder `dmPolicy: "open"`), aktivieren Sie den **sicheren DM-Modus**, damit DMs von verschiedenen Absendern nicht standardmäßig denselben Kontext teilen:
+Wenn mehr als eine Person Ihrem Bot DMs senden kann (mehrere Einträge in `allowFrom`, Pairing-Genehmigungen für mehrere Personen oder `dmPolicy: "open"`), aktivieren Sie den **sicheren DM-Modus**, damit DMs von verschiedenen Absendern standardmäßig nicht einen gemeinsamen Kontext teilen:
 
 ```json5
 {
@@ -520,13 +518,13 @@ Wenn mehr als eine Person Ihrem Bot eine DM senden kann (mehrere Einträge in `a
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // Beispiel: WhatsApp-Posteingang für mehrere Benutzer
+    // Beispiel: WhatsApp-Postfach für mehrere Benutzer
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // Beispiel: Discord-Posteingang für mehrere Benutzer
+    // Beispiel: Discord-Postfach für mehrere Benutzer
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -536,8 +534,8 @@ Wenn mehr als eine Person Ihrem Bot eine DM senden kann (mehrere Einträge in `a
 }
 ```
 
-Für Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC ist die Absenderautorisierung standardmäßig ID-zuerst.
-Aktivieren Sie direktes Matching über veränderliche Namen/E-Mail/Nick nur mit `dangerouslyAllowNameMatching: true` des jeweiligen Kanals, wenn Sie dieses Risiko ausdrücklich akzeptieren.
+Für Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC ist die Autorisierung von Absendern standardmäßig ID-basiert.
+Aktivieren Sie direktes Matching veränderlicher Namen/E-Mail-Adressen/Nicks nur mit dem jeweiligen kanalspezifischen `dangerouslyAllowNameMatching: true`, wenn Sie dieses Risiko ausdrücklich akzeptieren.
 
 ### Anthropic-API-Schlüssel + MiniMax-Fallback
 
@@ -579,7 +577,7 @@ Aktivieren Sie direktes Matching über veränderliche Namen/E-Mail/Nick nur mit 
 {
   identity: {
     name: "WorkBot",
-    theme: "professioneller Assistent",
+    theme: "professional assistant",
   },
   agent: {
     workspace: "~/work-openclaw",
@@ -616,7 +614,7 @@ Aktivieren Sie direktes Matching über veränderliche Namen/E-Mail/Nick nur mit 
         models: [
           {
             id: "my-local-model",
-            name: "Lokales Modell",
+            name: "Local Model",
             reasoning: false,
             input: ["text"],
             cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
@@ -632,7 +630,12 @@ Aktivieren Sie direktes Matching über veränderliche Namen/E-Mail/Nick nur mit 
 
 ## Tipps
 
-- Wenn Sie `dmPolicy: "open"` setzen, muss die passende `allowFrom`-Liste `"*"` enthalten.
-- Provider-IDs unterscheiden sich (Telefonnummern, Benutzer-IDs, Kanal-IDs). Prüfen Sie in der Provider-Dokumentation das Format.
+- Wenn Sie `dmPolicy: "open"` setzen, muss die passende Liste `allowFrom` `"*"` enthalten.
+- Provider-IDs unterscheiden sich (Telefonnummern, Benutzer-IDs, Kanal-IDs). Prüfen Sie in der Provider-Dokumentation das richtige Format.
 - Optionale Abschnitte, die Sie später hinzufügen können: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
-- Siehe [Providers](/providers) und [Troubleshooting](/gateway/troubleshooting) für ausführlichere Einrichtungshinweise.
+- Siehe [Providers](/de/providers) und [Troubleshooting](/de/gateway/troubleshooting) für ausführlichere Hinweise zur Einrichtung.
+
+## Verwandt
+
+- [Konfigurationsreferenz](/de/gateway/configuration-reference)
+- [Konfiguration](/de/gateway/configuration)

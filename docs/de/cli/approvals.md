@@ -1,38 +1,38 @@
 ---
 read_when:
-    - Sie möchten Ausführungsgenehmigungen über die CLI bearbeiten.
-    - Sie müssen Zulassungslisten auf Gateway- oder Node-Hosts verwalten.
+    - Sie möchten Exec-Genehmigungen über die CLI bearbeiten
+    - Sie müssen Allowlists auf Gateway- oder Node-Hosts verwalten
 summary: CLI-Referenz für `openclaw approvals` und `openclaw exec-policy`
 title: Genehmigungen
 x-i18n:
-    generated_at: "2026-04-23T06:25:46Z"
+    generated_at: "2026-04-24T06:30:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4e4e031df737e3bdde97ece81fe50eafbb4384557b40c6d52cf2395cf30721a3
+    source_hash: 7403f0e35616db5baf3d1564c8c405b3883fc3e5032da9c6a19a32dba8c5fb7d
     source_path: cli/approvals.md
     workflow: 15
 ---
 
 # `openclaw approvals`
 
-Verwalten Sie Ausführungsgenehmigungen für den **lokalen Host**, den **Gateway-Host** oder einen **Node-Host**.
+Verwalten Sie Exec-Genehmigungen für den **lokalen Host**, den **Gateway-Host** oder einen **Node-Host**.
 Standardmäßig zielen Befehle auf die lokale Genehmigungsdatei auf dem Datenträger. Verwenden Sie `--gateway`, um das Gateway anzusprechen, oder `--node`, um eine bestimmte Node anzusprechen.
 
 Alias: `openclaw exec-approvals`
 
 Verwandt:
 
-- Ausführungsgenehmigungen: [Ausführungsgenehmigungen](/de/tools/exec-approvals)
+- Exec-Genehmigungen: [Exec approvals](/de/tools/exec-approvals)
 - Nodes: [Nodes](/de/nodes)
 
 ## `openclaw exec-policy`
 
 `openclaw exec-policy` ist der lokale Komfortbefehl, um die angeforderte
-Konfiguration `tools.exec.*` und die Genehmigungsdatei des lokalen Hosts in einem Schritt synchron zu halten.
+Konfiguration `tools.exec.*` und die lokale Host-Genehmigungsdatei in einem Schritt synchron zu halten.
 
 Verwenden Sie ihn, wenn Sie Folgendes möchten:
 
-- die lokal angeforderte Richtlinie, die Genehmigungsdatei des Hosts und die effektive Zusammenführung prüfen
+- die lokal angeforderte Richtlinie, die Host-Genehmigungsdatei und die effektive Zusammenführung prüfen
 - ein lokales Preset wie YOLO oder deny-all anwenden
 - lokales `tools.exec.*` und lokales `~/.openclaw/exec-approvals.json` synchronisieren
 
@@ -51,17 +51,17 @@ openclaw exec-policy set --host gateway --security full --ask off --ask-fallback
 Ausgabemodi:
 
 - ohne `--json`: gibt die menschenlesbare Tabellenansicht aus
-- `--json`: gibt maschinenlesbare strukturierte Ausgabe aus
+- mit `--json`: gibt maschinenlesbare strukturierte Ausgabe aus
 
 Aktueller Geltungsbereich:
 
 - `exec-policy` ist **nur lokal**
 - es aktualisiert die lokale Konfigurationsdatei und die lokale Genehmigungsdatei gemeinsam
 - es überträgt die Richtlinie **nicht** an den Gateway-Host oder einen Node-Host
-- `--host node` wird in diesem Befehl abgelehnt, weil Ausführungsgenehmigungen von Nodes zur Laufzeit von der Node abgerufen werden und stattdessen über gegen Nodes gerichtete Genehmigungsbefehle verwaltet werden müssen
-- `openclaw exec-policy show` kennzeichnet `host=node`-Bereiche als zur Laufzeit Node-verwaltet, statt eine effektive Richtlinie aus der lokalen Genehmigungsdatei abzuleiten
+- `--host node` wird in diesem Befehl abgelehnt, weil Node-Exec-Genehmigungen zur Laufzeit von der Node abgerufen werden und stattdessen über nodegerichtete Genehmigungsbefehle verwaltet werden müssen
+- `openclaw exec-policy show` markiert Bereiche mit `host=node` zur Laufzeit als Node-verwaltet, statt eine effektive Richtlinie aus der lokalen Genehmigungsdatei abzuleiten
 
-Wenn Sie Genehmigungen für entfernte Hosts direkt bearbeiten müssen, verwenden Sie weiterhin `openclaw approvals set --gateway`
+Wenn Sie Genehmigungen eines Remote-Hosts direkt bearbeiten müssen, verwenden Sie weiter `openclaw approvals set --gateway`
 oder `openclaw approvals set --node <id|name|ip>`.
 
 ## Häufige Befehle
@@ -72,18 +72,18 @@ openclaw approvals get --node <id|name|ip>
 openclaw approvals get --gateway
 ```
 
-`openclaw approvals get` zeigt jetzt die effektive Ausführungsrichtlinie für lokale, Gateway- und Node-Ziele an:
+`openclaw approvals get` zeigt jetzt die effektive Exec-Richtlinie für lokale, Gateway- und Node-Ziele an:
 
-- angeforderte Richtlinie `tools.exec`
-- Richtlinie der Genehmigungsdatei des Hosts
-- effektives Ergebnis nach Anwendung der Vorrangregeln
+- angeforderte `tools.exec`-Richtlinie
+- Host-Richtlinie aus der Genehmigungsdatei
+- effektives Ergebnis nach Anwendung der Prioritätsregeln
 
-Die Vorrangregeln sind beabsichtigt:
+Die Priorität ist beabsichtigt:
 
-- die Genehmigungsdatei des Hosts ist die durchsetzbare maßgebliche Quelle
-- die angeforderte Richtlinie `tools.exec` kann die Absicht einschränken oder erweitern, aber das effektive Ergebnis wird weiterhin aus den Host-Regeln abgeleitet
-- `--node` kombiniert die Genehmigungsdatei des Node-Hosts mit der Richtlinie `tools.exec` des Gateways, weil beide zur Laufzeit weiterhin gelten
-- wenn die Gateway-Konfiguration nicht verfügbar ist, greift die CLI auf den Genehmigungs-Schnappschuss der Node zurück und vermerkt, dass die endgültige Laufzeitrichtlinie nicht berechnet werden konnte
+- die Host-Genehmigungsdatei ist die durchsetzbare Quelle der Wahrheit
+- die angeforderte `tools.exec`-Richtlinie kann die Absicht einschränken oder erweitern, aber das effektive Ergebnis wird weiterhin aus den Host-Regeln abgeleitet
+- `--node` kombiniert die Node-Host-Genehmigungsdatei mit der Gateway-Richtlinie `tools.exec`, weil beides zur Laufzeit weiterhin gilt
+- wenn die Gateway-Konfiguration nicht verfügbar ist, greift die CLI auf den Snapshot der Node-Genehmigungen zurück und weist darauf hin, dass die endgültige Laufzeitrichtlinie nicht berechnet werden konnte
 
 ## Genehmigungen aus einer Datei ersetzen
 
@@ -100,7 +100,7 @@ openclaw approvals set --gateway --file ./exec-approvals.json
 
 ## Beispiel „Nie nachfragen“ / YOLO
 
-Für einen Host, der wegen Ausführungsgenehmigungen nie anhalten soll, setzen Sie die Standardwerte der Host-Genehmigungen auf `full` + `off`:
+Für einen Host, der bei Exec-Genehmigungen niemals anhalten soll, setzen Sie die Standardwerte der Host-Genehmigungen auf `full` + `off`:
 
 ```bash
 openclaw approvals set --stdin <<'EOF'
@@ -130,7 +130,7 @@ openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-Dies ändert nur die **Host-Genehmigungsdatei**. Um die angeforderte OpenClaw-Richtlinie synchron zu halten, setzen Sie außerdem:
+Dies ändert nur die **Host-Genehmigungsdatei**. Um die angeforderte OpenClaw-Richtlinie synchron zu halten, setzen Sie zusätzlich:
 
 ```bash
 openclaw config set tools.exec.host gateway
@@ -141,10 +141,10 @@ openclaw config set tools.exec.ask off
 Warum `tools.exec.host=gateway` in diesem Beispiel:
 
 - `host=auto` bedeutet weiterhin „Sandbox, wenn verfügbar, sonst Gateway“.
-- Bei YOLO geht es um Genehmigungen, nicht um Weiterleitung.
-- Wenn Sie Host-Ausführung möchten, auch wenn eine Sandbox konfiguriert ist, machen Sie die Host-Auswahl explizit mit `gateway` oder `/exec host=gateway`.
+- Bei YOLO geht es um Genehmigungen, nicht um Routing.
+- Wenn Sie Host-Exec auch dann möchten, wenn eine Sandbox konfiguriert ist, machen Sie die Host-Auswahl mit `gateway` oder `/exec host=gateway` explizit.
 
-Dies entspricht dem aktuellen YOLO-Verhalten mit Host-Standardwerten. Verschärfen Sie es, wenn Sie Genehmigungen möchten.
+Das entspricht dem aktuellen YOLO-Verhalten für Host-Standards. Verschärfen Sie es, wenn Sie Genehmigungen wünschen.
 
 Lokale Abkürzung:
 
@@ -153,9 +153,10 @@ openclaw exec-policy preset yolo
 ```
 
 Diese lokale Abkürzung aktualisiert sowohl die angeforderte lokale Konfiguration `tools.exec.*` als auch die
-lokalen Genehmigungsstandardwerte zusammen. Sie ist von der Absicht her gleichwertig mit der oben beschriebenen manuellen Einrichtung in zwei Schritten, aber nur für den lokalen Rechner.
+lokalen Standardgenehmigungen gemeinsam. Sie ist in ihrer Absicht gleichwertig mit der manuellen zweistufigen
+Einrichtung oben, aber nur für den lokalen Rechner.
 
-## Hilfen für Zulassungslisten
+## Allowlist-Helfer
 
 ```bash
 openclaw approvals allowlist add "~/Projects/**/bin/rg"
@@ -175,9 +176,9 @@ openclaw approvals allowlist remove "~/Projects/**/bin/rg"
 
 Hinweise zur Zielauswahl:
 
-- ohne Ziel-Flags ist die lokale Genehmigungsdatei auf dem Datenträger gemeint
+- ohne Zielflags ist die lokale Genehmigungsdatei auf dem Datenträger gemeint
 - `--gateway` zielt auf die Genehmigungsdatei des Gateway-Hosts
-- `--node` zielt nach der Auflösung von ID, Name, IP oder ID-Präfix auf einen Node-Host
+- `--node` zielt auf einen Node-Host, nachdem ID, Name, IP oder ID-Präfix aufgelöst wurde
 
 `allowlist add|remove` unterstützt außerdem:
 
@@ -186,6 +187,11 @@ Hinweise zur Zielauswahl:
 ## Hinweise
 
 - `--node` verwendet denselben Resolver wie `openclaw nodes` (ID, Name, IP oder ID-Präfix).
-- `--agent` hat standardmäßig den Wert `"*"`, was für alle Agents gilt.
-- Der Node-Host muss `system.execApprovals.get/set` ankündigen (macOS-App oder Headless-Node-Host).
+- `--agent` hat standardmäßig den Wert `"*"`, was für alle Agenten gilt.
+- Der Node-Host muss `system.execApprovals.get/set` bereitstellen (macOS-App oder headless Node-Host).
 - Genehmigungsdateien werden pro Host unter `~/.openclaw/exec-approvals.json` gespeichert.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Exec-Genehmigungen](/de/tools/exec-approvals)

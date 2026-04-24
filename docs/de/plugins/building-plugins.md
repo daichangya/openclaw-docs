@@ -1,26 +1,24 @@
 ---
 read_when:
-    - Sie möchten ein neues OpenClaw Plugin erstellen
-    - Sie benötigen einen Schnellstart für die Plugin-Entwicklung
-    - Sie fügen OpenClaw einen neuen Kanal, Provider, ein neues Tool oder eine andere Fähigkeit hinzu
+    - Sie möchten ein neues OpenClaw-Plugin erstellen.
+    - Sie benötigen einen Schnellstart für die Plugin-Entwicklung.
+    - Sie fügen OpenClaw einen neuen Channel, Provider, ein Tool oder eine andere Fähigkeit hinzu.
 sidebarTitle: Getting Started
-summary: Erstellen Sie in wenigen Minuten Ihr erstes OpenClaw Plugin
-title: Plugins erstellen
+summary: Erstellen Sie Ihr erstes OpenClaw-Plugin in wenigen Minuten.
+title: Building plugins
 x-i18n:
-    generated_at: "2026-04-23T06:30:45Z"
+    generated_at: "2026-04-24T06:49:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 35faa4e2722a58aa12330103b42d2dd6e14e56ee46720883d0945a984d991f79
+    source_hash: c14f4c4dc3ae853e385f6beeb9529ea9e360f3d9c5b99dc717cf0851ed02cbc8
     source_path: plugins/building-plugins.md
     workflow: 15
 ---
 
-# Plugins erstellen
-
-Plugins erweitern OpenClaw um neue Fähigkeiten: Kanäle, Modell-Provider,
-Sprache, Echtzeit-Transkription, Echtzeitstimme, Medienverständnis, Bild-
-generierung, Videogenerierung, Web-Fetch, Web-Suche, Agent-Tools oder eine
-beliebige Kombination davon.
+Plugins erweitern OpenClaw um neue Fähigkeiten: Channels, Modell-Provider,
+Sprache, Echtzeit-Transkription, Echtzeit-Voice, Medienverarbeitung, Bild-
+Generierung, Video-Generierung, Web-Fetch, Web-Suche, Agent-Tools oder jede
+Kombination daraus.
 
 Sie müssen Ihr Plugin nicht zum OpenClaw-Repository hinzufügen. Veröffentlichen Sie es auf
 [ClawHub](/de/tools/clawhub) oder npm, und Benutzer installieren es mit
@@ -31,32 +29,32 @@ fällt automatisch auf npm zurück.
 
 - Node >= 22 und ein Paketmanager (npm oder pnpm)
 - Vertrautheit mit TypeScript (ESM)
-- Für Plugins im Repository: Repository geklont und `pnpm install` ausgeführt
+- Für In-Repo-Plugins: Repository geklont und `pnpm install` ausgeführt
 
 ## Welche Art von Plugin?
 
 <CardGroup cols={3}>
-  <Card title="Kanal-Plugin" icon="messages-square" href="/de/plugins/sdk-channel-plugins">
+  <Card title="Channel plugin" icon="messages-square" href="/de/plugins/sdk-channel-plugins">
     OpenClaw mit einer Messaging-Plattform verbinden (Discord, IRC usw.)
   </Card>
-  <Card title="Provider-Plugin" icon="cpu" href="/de/plugins/sdk-provider-plugins">
+  <Card title="Provider plugin" icon="cpu" href="/de/plugins/sdk-provider-plugins">
     Einen Modell-Provider hinzufügen (LLM, Proxy oder benutzerdefinierter Endpunkt)
   </Card>
-  <Card title="Tool- / Hook-Plugin" icon="wrench">
-    Agent-Tools, Event-Hooks oder Services registrieren — unten fortfahren
+  <Card title="Tool / hook plugin" icon="wrench">
+    Agent-Tools, Event-Hooks oder Services registrieren — unten weiter
   </Card>
 </CardGroup>
 
-Wenn ein Kanal-Plugin optional ist und beim Ausführen von Onboarding/Setup
-möglicherweise nicht installiert ist, verwenden Sie `createOptionalChannelSetupSurface(...)` aus
-`openclaw/plugin-sdk/channel-setup`. Es erzeugt ein Setup-Adapter- + Assistenten-Paar,
-das die Installationsanforderung bekannt macht und echte Konfigurationsschreibvorgänge
-gesperrt fehlschlagen lässt, bis das Plugin installiert ist.
+Für ein Channel-Plugin, das beim Onboarding/Setup nicht garantiert installiert ist,
+verwenden Sie `createOptionalChannelSetupSurface(...)` aus
+`openclaw/plugin-sdk/channel-setup`. Es erzeugt ein Setup-Adapter- + Wizard-Paar,
+das die Installationsanforderung bekannt macht und bei echten Config-Schreibvorgängen fail-closed ist,
+bis das Plugin installiert ist.
 
 ## Schnellstart: Tool-Plugin
 
-Diese Anleitung erstellt ein minimales Plugin, das ein Agent-Tool registriert. Für Kanal-
-und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
+Diese Anleitung erstellt ein minimales Plugin, das ein Agent-Tool registriert. Channel-
+und Provider-Plugins haben eigene Anleitungen, auf die oben verlinkt wird.
 
 <Steps>
   <Step title="Paket und Manifest erstellen">
@@ -84,7 +82,7 @@ und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
     {
       "id": "my-plugin",
       "name": "My Plugin",
-      "description": "Adds a custom tool to OpenClaw",
+      "description": "Fügt OpenClaw ein benutzerdefiniertes Tool hinzu",
       "configSchema": {
         "type": "object",
         "additionalProperties": false
@@ -95,11 +93,11 @@ und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
 
     Jedes Plugin benötigt ein Manifest, auch ohne Konfiguration. Siehe
     [Manifest](/de/plugins/manifest) für das vollständige Schema. Die kanonischen ClawHub-
-    Veröffentlichungssnippets liegen in `docs/snippets/plugin-publish/`.
+    Publish-Snippets befinden sich in `docs/snippets/plugin-publish/`.
 
   </Step>
 
-  <Step title="Entry Point schreiben">
+  <Step title="Den Einstiegspunkt schreiben">
 
     ```typescript
     // index.ts
@@ -109,23 +107,23 @@ und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
     export default definePluginEntry({
       id: "my-plugin",
       name: "My Plugin",
-      description: "Adds a custom tool to OpenClaw",
+      description: "Fügt ein benutzerdefiniertes Tool hinzu",
       register(api) {
         api.registerTool({
           name: "my_tool",
-          description: "Do a thing",
+          description: "Eine Sache tun",
           parameters: Type.Object({ input: Type.String() }),
           async execute(_id, params) {
-            return { content: [{ type: "text", text: `Got: ${params.input}` }] };
+            return { content: [{ type: "text", text: `Erhalten: ${params.input}` }] };
           },
         });
       },
     });
     ```
 
-    `definePluginEntry` ist für Nicht-Kanal-Plugins. Für Kanäle verwenden Sie
-    `defineChannelPluginEntry` — siehe [Kanal-Plugins](/de/plugins/sdk-channel-plugins).
-    Für die vollständigen Entry-Point-Optionen siehe [Entry Points](/de/plugins/sdk-entrypoints).
+    `definePluginEntry` ist für Nicht-Channel-Plugins. Für Channels verwenden Sie
+    `defineChannelPluginEntry` — siehe [Channel Plugins](/de/plugins/sdk-channel-plugins).
+    Für alle Optionen des Einstiegspunkts siehe [Entry Points](/de/plugins/sdk-entrypoints).
 
   </Step>
 
@@ -139,10 +137,10 @@ und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
     openclaw plugins install clawhub:@myorg/openclaw-my-plugin
     ```
 
-    OpenClaw prüft vor npm auch ClawHub für einfache Paketspezifikationen wie
+    OpenClaw prüft ClawHub auch vor npm bei reinen Paketspezifikationen wie
     `@myorg/openclaw-my-plugin`.
 
-    **Plugins im Repository:** unter dem Workspace-Baum für gebündelte Plugins ablegen — werden automatisch erkannt.
+    **In-Repo-Plugins:** unter dem Workspace-Baum für gebündelte Plugins ablegen — wird automatisch erkannt.
 
     ```bash
     pnpm test -- <bundled-plugin-root>/my-plugin/
@@ -153,72 +151,72 @@ und Provider-Plugins gibt es oben verlinkte eigene Leitfäden.
 
 ## Plugin-Fähigkeiten
 
-Ein einzelnes Plugin kann beliebig viele Fähigkeiten über das Objekt `api` registrieren:
+Ein einzelnes Plugin kann über das Objekt `api` beliebig viele Fähigkeiten registrieren:
 
-| Fähigkeit              | Registrierungsmethode                           | Detaillierter Leitfaden                                                      |
-| ---------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------- |
-| Textinferenz (LLM)     | `api.registerProvider(...)`                     | [Provider-Plugins](/de/plugins/sdk-provider-plugins)                            |
-| CLI-Inferenz-Backend   | `api.registerCliBackend(...)`                   | [CLI Backends](/de/gateway/cli-backends)                                        |
-| Kanal / Messaging      | `api.registerChannel(...)`                      | [Kanal-Plugins](/de/plugins/sdk-channel-plugins)                                |
-| Sprache (TTS/STT)      | `api.registerSpeechProvider(...)`               | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Echtzeit-Transkription | `api.registerRealtimeTranscriptionProvider(...)` | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Echtzeitstimme         | `api.registerRealtimeVoiceProvider(...)`        | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Medienverständnis      | `api.registerMediaUnderstandingProvider(...)`   | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Bildgenerierung        | `api.registerImageGenerationProvider(...)`      | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Musikgenerierung       | `api.registerMusicGenerationProvider(...)`      | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Videogenerierung       | `api.registerVideoGenerationProvider(...)`      | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Web-Fetch              | `api.registerWebFetchProvider(...)`             | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Web-Suche              | `api.registerWebSearchProvider(...)`            | [Provider-Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Eingebettete Pi-Erweiterung | `api.registerEmbeddedExtensionFactory(...)` | [SDK-Übersicht](/de/plugins/sdk-overview#registration-api)                      |
-| Agent-Tools            | `api.registerTool(...)`                         | Unten                                                                        |
-| Benutzerdefinierte Befehle | `api.registerCommand(...)`                  | [Entry Points](/de/plugins/sdk-entrypoints)                                     |
-| Event-Hooks            | `api.registerHook(...)`                         | [Entry Points](/de/plugins/sdk-entrypoints)                                     |
-| HTTP-Routen            | `api.registerHttpRoute(...)`                    | [Internals](/de/plugins/architecture#gateway-http-routes)                       |
-| CLI-Unterbefehle       | `api.registerCli(...)`                          | [Entry Points](/de/plugins/sdk-entrypoints)                                     |
+| Fähigkeit               | Registrierungsmethode                         | Detaillierte Anleitung                                                            |
+| ----------------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
+| Text-Inferenz (LLM)     | `api.registerProvider(...)`                   | [Provider Plugins](/de/plugins/sdk-provider-plugins)                                 |
+| CLI-Inferenz-Backend    | `api.registerCliBackend(...)`                 | [CLI Backends](/de/gateway/cli-backends)                                             |
+| Channel / Messaging     | `api.registerChannel(...)`                    | [Channel Plugins](/de/plugins/sdk-channel-plugins)                                   |
+| Sprache (TTS/STT)       | `api.registerSpeechProvider(...)`             | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Echtzeit-Transkription  | `api.registerRealtimeTranscriptionProvider(...)` | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Echtzeit-Voice          | `api.registerRealtimeVoiceProvider(...)`      | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Medienverarbeitung      | `api.registerMediaUnderstandingProvider(...)` | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Bild-Generierung        | `api.registerImageGenerationProvider(...)`    | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Musik-Generierung       | `api.registerMusicGenerationProvider(...)`    | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Video-Generierung       | `api.registerVideoGenerationProvider(...)`    | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Web-Fetch               | `api.registerWebFetchProvider(...)`           | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Web-Suche               | `api.registerWebSearchProvider(...)`          | [Provider Plugins](/de/plugins/sdk-provider-plugins#step-5-add-extra-capabilities)   |
+| Embedded-Pi-Erweiterung | `api.registerEmbeddedExtensionFactory(...)`   | [SDK Overview](/de/plugins/sdk-overview#registration-api)                            |
+| Agent-Tools             | `api.registerTool(...)`                       | Unten                                                                             |
+| Benutzerdefinierte Befehle | `api.registerCommand(...)`                 | [Entry Points](/de/plugins/sdk-entrypoints)                                          |
+| Event-Hooks             | `api.registerHook(...)`                       | [Entry Points](/de/plugins/sdk-entrypoints)                                          |
+| HTTP-Routen             | `api.registerHttpRoute(...)`                  | [Internals](/de/plugins/architecture-internals#gateway-http-routes)                  |
+| CLI-Unterbefehle        | `api.registerCli(...)`                        | [Entry Points](/de/plugins/sdk-entrypoints)                                          |
 
-Für die vollständige Registrierungs-API siehe [SDK-Übersicht](/de/plugins/sdk-overview#registration-api).
+Für die vollständige Registrierungs-API siehe [SDK Overview](/de/plugins/sdk-overview#registration-api).
 
 Verwenden Sie `api.registerEmbeddedExtensionFactory(...)`, wenn ein Plugin Pi-native
-Hooks für den eingebetteten Runner benötigt, etwa asynchrones Umschreiben von `tool_result`,
-bevor die endgültige Tool-Ergebnismeldung ausgegeben wird. Bevorzugen Sie reguläre OpenClaw-
-Plugin-Hooks, wenn die Arbeit kein Timing auf Pi-Erweiterungsebene benötigt.
+Hooks des Embedded-Runners benötigt, etwa asynchrones Umschreiben von `tool_result`, bevor die finale
+Tool-Ergebnisnachricht ausgegeben wird. Bevorzugen Sie reguläre OpenClaw-Plugin-Hooks, wenn die Arbeit
+kein Pi-Erweiterungs-Timing benötigt.
 
-Wenn Ihr Plugin benutzerdefinierte Gateway-RPC-Methoden registriert, halten Sie sie unter einem
-pluginspezifischen Präfix. Core-Admin-Namensräume (`config.*`,
+Wenn Ihr Plugin benutzerdefinierte Gateway-RPC-Methoden registriert, halten Sie diese auf einem
+pluginspezifischen Präfix. Core-Admin-Namespaces (`config.*`,
 `exec.approvals.*`, `wizard.*`, `update.*`) bleiben reserviert und werden immer zu
-`operator.admin` aufgelöst, selbst wenn ein Plugin einen engeren Gültigkeitsbereich anfordert.
+`operator.admin` aufgelöst, selbst wenn ein Plugin einen engeren Scope anfordert.
 
-Zu beachtende Hook-Guard-Semantik:
+Semantik der Hook-Guards, die Sie beachten sollten:
 
 - `before_tool_call`: `{ block: true }` ist terminal und stoppt Handler mit niedrigerer Priorität.
 - `before_tool_call`: `{ block: false }` wird als keine Entscheidung behandelt.
-- `before_tool_call`: `{ requireApproval: true }` pausiert die Agent-Ausführung und fordert den Benutzer zur Genehmigung über das `exec`-Genehmigungs-Overlay, Telegram-Schaltflächen, Discord-Interaktionen oder den Befehl `/approve` auf einem beliebigen Kanal auf.
+- `before_tool_call`: `{ requireApproval: true }` pausiert die Agent-Ausführung und fordert den Benutzer zur Freigabe über das Exec-Freigabe-Overlay, Telegram-Buttons, Discord-Interaktionen oder den Befehl `/approve` in jedem Channel auf.
 - `before_install`: `{ block: true }` ist terminal und stoppt Handler mit niedrigerer Priorität.
 - `before_install`: `{ block: false }` wird als keine Entscheidung behandelt.
 - `message_sending`: `{ cancel: true }` ist terminal und stoppt Handler mit niedrigerer Priorität.
 - `message_sending`: `{ cancel: false }` wird als keine Entscheidung behandelt.
-- `message_received`: Bevorzugen Sie das typisierte Feld `threadId`, wenn Sie eingehendes Thread-/Topic-Routing benötigen. Behalten Sie `metadata` für kanalspezifische Zusätze.
-- `message_sending`: Bevorzugen Sie typisierte Routing-Felder `replyToId` / `threadId` gegenüber kanalspezifischen `metadata`-Schlüsseln.
+- `message_received`: bevorzugen Sie das typisierte Feld `threadId`, wenn Sie eingehendes Routing nach Thread/Thema benötigen. Behalten Sie `metadata` für channel-spezifische Extras.
+- `message_sending`: bevorzugen Sie typisierte Routing-Felder `replyToId` / `threadId` gegenüber channel-spezifischen Schlüsseln in den Metadaten.
 
-Der Befehl `/approve` verarbeitet sowohl `exec`- als auch Plugin-Genehmigungen mit begrenztem Fallback: Wenn eine `exec`-Genehmigungs-ID nicht gefunden wird, versucht OpenClaw dieselbe ID erneut über Plugin-Genehmigungen. Die Weiterleitung von Plugin-Genehmigungen kann unabhängig über `approvals.plugin` in der Konfiguration konfiguriert werden.
+Der Befehl `/approve` verarbeitet sowohl Exec- als auch Plugin-Freigaben mit begrenztem Fallback: Wenn eine Exec-Freigabe-ID nicht gefunden wird, versucht OpenClaw dieselbe ID erneut über Plugin-Freigaben. Das Weiterleiten von Plugin-Freigaben kann unabhängig über `approvals.plugin` in der Konfiguration eingestellt werden.
 
-Wenn benutzerdefinierte Genehmigungslogik genau diesen begrenzten Fallback-Fall erkennen muss,
+Wenn benutzerdefinierte Freigabe-Logik genau diesen begrenzten Fallback-Fall erkennen muss,
 verwenden Sie bevorzugt `isApprovalNotFoundError` aus `openclaw/plugin-sdk/error-runtime`,
-statt Strings für abgelaufene Genehmigungen manuell abzugleichen.
+anstatt Strings für abgelaufene Freigaben manuell zu matchen.
 
-Details finden Sie unter [SDK-Übersicht Hook-Entscheidungssemantik](/de/plugins/sdk-overview#hook-decision-semantics).
+Siehe [SDK Overview hook decision semantics](/de/plugins/sdk-overview#hook-decision-semantics) für Details.
 
 ## Agent-Tools registrieren
 
-Tools sind typisierte Funktionen, die das LLM aufrufen kann. Sie können erforderlich (immer
-verfügbar) oder optional (Opt-in durch den Benutzer) sein:
+Tools sind typisierte Funktionen, die das LLM aufrufen kann. Sie können erforderlich sein (immer
+verfügbar) oder optional (Opt-in durch den Benutzer):
 
 ```typescript
 register(api) {
   // Erforderliches Tool — immer verfügbar
   api.registerTool({
     name: "my_tool",
-    description: "Do a thing",
+    description: "Eine Sache tun",
     parameters: Type.Object({ input: Type.String() }),
     async execute(_id, params) {
       return { content: [{ type: "text", text: params.input }] };
@@ -229,7 +227,7 @@ register(api) {
   api.registerTool(
     {
       name: "workflow_tool",
-      description: "Run a workflow",
+      description: "Einen Workflow ausführen",
       parameters: Type.Object({ pipeline: Type.String() }),
       async execute(_id, params) {
         return { content: [{ type: "text", text: params.pipeline }] };
@@ -249,10 +247,10 @@ Benutzer aktivieren optionale Tools in der Konfiguration:
 ```
 
 - Tool-Namen dürfen nicht mit Core-Tools kollidieren (Konflikte werden übersprungen)
-- Verwenden Sie `optional: true` für Tools mit Seiteneffekten oder zusätzlichen Binäranforderungen
+- Verwenden Sie `optional: true` für Tools mit Seiteneffekten oder zusätzlichen Anforderungen an Binärdateien
 - Benutzer können alle Tools eines Plugins aktivieren, indem sie die Plugin-ID zu `tools.allow` hinzufügen
 
-## Importkonventionen
+## Import-Konventionen
 
 Importieren Sie immer aus fokussierten Pfaden `openclaw/plugin-sdk/<subpath>`:
 
@@ -260,76 +258,75 @@ Importieren Sie immer aus fokussierten Pfaden `openclaw/plugin-sdk/<subpath>`:
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
 
-// Falsch: monolithische Root (veraltet, wird entfernt)
+// Falsch: monolithischer Root (veraltet, wird entfernt)
 import { ... } from "openclaw/plugin-sdk";
 ```
 
-Für die vollständige Referenz der Unterpfade siehe [SDK-Übersicht](/de/plugins/sdk-overview).
+Für die vollständige Referenz der Subpfade siehe [SDK Overview](/de/plugins/sdk-overview).
 
-Verwenden Sie innerhalb Ihres Plugins lokale Barrel-Dateien (`api.ts`, `runtime-api.ts`) für
-interne Importe — importieren Sie Ihr eigenes Plugin niemals über seinen SDK-Pfad.
+Innerhalb Ihres Plugins verwenden Sie lokale Barrel-Dateien (`api.ts`, `runtime-api.ts`) für
+interne Imports — importieren Sie Ihr eigenes Plugin niemals über dessen SDK-Pfad.
 
-Bei Provider-Plugins sollten providerspezifische Helfer in diesen Barrels im Paket-Root
-bleiben, sofern die Schnittstelle nicht wirklich generisch ist. Aktuelle gebündelte Beispiele:
+Bei Provider-Plugins sollten provider-spezifische Helfer in diesen Package-Root-
+Barrels bleiben, es sei denn, die Schnittstelle ist wirklich generisch. Aktuelle gebündelte Beispiele:
 
-- Anthropic: Claude-Stream-Wrapper und `service_tier`- / Beta-Helfer
-- OpenAI: Provider-Builder, Standardmodell-Helfer, Echtzeit-Provider
-- OpenRouter: Provider-Builder plus Onboarding-/Konfigurationshelfer
+- Anthropic: Claude-Stream-Wrapper und Helfer für `service_tier` / Beta
+- OpenAI: Provider-Builder, Default-Model-Helfer, Realtime-Provider
+- OpenRouter: Provider-Builder plus Helfer für Onboarding/Konfiguration
 
-Wenn ein Helfer nur innerhalb eines gebündelten Provider-Pakets nützlich ist, belassen Sie ihn auf dieser
-Schnittstelle im Paket-Root, statt ihn nach `openclaw/plugin-sdk/*` hochzustufen.
+Wenn ein Helfer nur innerhalb eines gebündelten Provider-Pakets nützlich ist, behalten Sie ihn auf dieser
+Package-Root-Schnittstelle, statt ihn in `openclaw/plugin-sdk/*` hochzustufen.
 
-Einige generierte Hilfsschnittstellen `openclaw/plugin-sdk/<bundled-id>` existieren weiterhin für
-die Wartung und Kompatibilität gebündelter Plugins, zum Beispiel
+Einige generierte Hilfsschnittstellen `openclaw/plugin-sdk/<bundled-id>` existieren weiterhin für die Wartung gebündelter Plugins und aus Kompatibilitätsgründen, zum Beispiel
 `plugin-sdk/feishu-setup` oder `plugin-sdk/zalo-setup`. Behandeln Sie diese als reservierte
-Oberflächen, nicht als Standardmuster für neue Drittanbieter-Plugins.
+Oberflächen, nicht als Standardmuster für neue Third-Party-Plugins.
 
-## Checkliste vor der Einreichung
+## Checkliste vor dem Einreichen
 
 <Check>**package.json** hat korrekte `openclaw`-Metadaten</Check>
-<Check>**openclaw.plugin.json**-Manifest ist vorhanden und gültig</Check>
-<Check>Der Entry Point verwendet `defineChannelPluginEntry` oder `definePluginEntry`</Check>
-<Check>Alle Importe verwenden fokussierte Pfade `plugin-sdk/<subpath>`</Check>
-<Check>Interne Importe verwenden lokale Module, keine SDK-Selbstimporte</Check>
+<Check>Manifest **openclaw.plugin.json** ist vorhanden und gültig</Check>
+<Check>Der Einstiegspunkt verwendet `defineChannelPluginEntry` oder `definePluginEntry`</Check>
+<Check>Alle Imports verwenden fokussierte Pfade `plugin-sdk/<subpath>`</Check>
+<Check>Interne Imports verwenden lokale Module, keine SDK-Self-Imports</Check>
 <Check>Tests bestehen (`pnpm test -- <bundled-plugin-root>/my-plugin/`)</Check>
-<Check>`pnpm check` besteht (Plugins im Repository)</Check>
+<Check>`pnpm check` besteht (In-Repo-Plugins)</Check>
 
-## Testen von Beta-Releases
+## Beta-Release-Tests
 
-1. Achten Sie auf GitHub-Release-Tags auf [openclaw/openclaw](https://github.com/openclaw/openclaw/releases) und abonnieren Sie sie über `Watch` > `Releases`. Beta-Tags sehen aus wie `v2026.3.N-beta.1`. Sie können auch Benachrichtigungen für den offiziellen OpenClaw-X-Account [@openclaw](https://x.com/openclaw) für Release-Ankündigungen aktivieren.
-2. Testen Sie Ihr Plugin gegen das Beta-Tag, sobald es erscheint. Das Zeitfenster vor dem Stable-Release beträgt typischerweise nur wenige Stunden.
-3. Posten Sie nach dem Testen im Thread Ihres Plugins im Discord-Kanal `plugin-forum` entweder `all good` oder was kaputtgegangen ist. Wenn Sie noch keinen Thread haben, erstellen Sie einen.
-4. Wenn etwas kaputtgeht, eröffnen oder aktualisieren Sie ein Issue mit dem Titel `Beta blocker: <plugin-name> - <summary>` und weisen Sie das Label `beta-blocker` zu. Fügen Sie den Issue-Link in Ihren Thread ein.
-5. Eröffnen Sie einen PR gegen `main` mit dem Titel `fix(<plugin-id>): beta blocker - <summary>` und verlinken Sie das Issue sowohl im PR als auch in Ihrem Discord-Thread. Mitwirkende können PRs keine Labels zuweisen, daher ist der Titel das PR-seitige Signal für Maintainer und Automatisierung. Blocker mit einem PR werden zusammengeführt; Blocker ohne PR werden möglicherweise trotzdem ausgeliefert. Maintainer beobachten diese Threads während des Beta-Testens.
+1. Beobachten Sie GitHub-Release-Tags auf [openclaw/openclaw](https://github.com/openclaw/openclaw/releases) und abonnieren Sie sie über `Watch` > `Releases`. Beta-Tags sehen aus wie `v2026.3.N-beta.1`. Sie können auch Benachrichtigungen für das offizielle OpenClaw-X-Konto [@openclaw](https://x.com/openclaw) für Release-Ankündigungen aktivieren.
+2. Testen Sie Ihr Plugin gegen das Beta-Tag, sobald es erscheint. Das Fenster bis zur Stable-Version beträgt typischerweise nur wenige Stunden.
+3. Posten Sie nach dem Testen im Thread Ihres Plugins im Discord-Channel `plugin-forum` entweder `all good` oder was kaputt ist. Wenn Sie noch keinen Thread haben, erstellen Sie einen.
+4. Wenn etwas kaputt ist, öffnen oder aktualisieren Sie ein Issue mit dem Titel `Beta blocker: <plugin-name> - <summary>` und versehen Sie es mit dem Label `beta-blocker`. Setzen Sie den Link zum Issue in Ihren Thread.
+5. Öffnen Sie einen PR gegen `main` mit dem Titel `fix(<plugin-id>): beta blocker - <summary>` und verlinken Sie das Issue sowohl im PR als auch in Ihrem Discord-Thread. Mitwirkende können PRs nicht labeln, daher ist der Titel das Signal auf PR-Seite für Maintainer und Automatisierung. Blocker mit PR werden gemergt; Blocker ohne PR könnten trotzdem ausgeliefert werden. Maintainer beobachten diese Threads während der Beta-Tests.
 6. Schweigen bedeutet grün. Wenn Sie das Zeitfenster verpassen, landet Ihr Fix wahrscheinlich im nächsten Zyklus.
 
 ## Nächste Schritte
 
 <CardGroup cols={2}>
-  <Card title="Kanal-Plugins" icon="messages-square" href="/de/plugins/sdk-channel-plugins">
-    Ein Messaging-Kanal-Plugin erstellen
+  <Card title="Channel Plugins" icon="messages-square" href="/de/plugins/sdk-channel-plugins">
+    Ein Messaging-Channel-Plugin bauen
   </Card>
-  <Card title="Provider-Plugins" icon="cpu" href="/de/plugins/sdk-provider-plugins">
-    Ein Modell-Provider-Plugin erstellen
+  <Card title="Provider Plugins" icon="cpu" href="/de/plugins/sdk-provider-plugins">
+    Ein Modell-Provider-Plugin bauen
   </Card>
-  <Card title="SDK-Übersicht" icon="book-open" href="/de/plugins/sdk-overview">
+  <Card title="SDK Overview" icon="book-open" href="/de/plugins/sdk-overview">
     Referenz für Import-Map und Registrierungs-API
   </Card>
-  <Card title="Laufzeithelfer" icon="settings" href="/de/plugins/sdk-runtime">
+  <Card title="Runtime Helpers" icon="settings" href="/de/plugins/sdk-runtime">
     TTS, Suche, Subagent über api.runtime
   </Card>
-  <Card title="Tests" icon="test-tubes" href="/de/plugins/sdk-testing">
-    Testhilfen und Muster
+  <Card title="Testing" icon="test-tubes" href="/de/plugins/sdk-testing">
+    Test-Utilities und Muster
   </Card>
-  <Card title="Plugin-Manifest" icon="file-json" href="/de/plugins/manifest">
-    Vollständige Referenz des Manifest-Schemas
+  <Card title="Plugin Manifest" icon="file-json" href="/de/plugins/manifest">
+    Vollständige Referenz zum Manifest-Schema
   </Card>
 </CardGroup>
 
 ## Verwandt
 
 - [Plugin Architecture](/de/plugins/architecture) — tiefer Einblick in die interne Architektur
-- [SDK Overview](/de/plugins/sdk-overview) — Plugin-SDK-Referenz
+- [SDK Overview](/de/plugins/sdk-overview) — Referenz zum Plugin SDK
 - [Manifest](/de/plugins/manifest) — Format des Plugin-Manifests
-- [Channel Plugins](/de/plugins/sdk-channel-plugins) — Kanal-Plugins erstellen
-- [Provider Plugins](/de/plugins/sdk-provider-plugins) — Provider-Plugins erstellen
+- [Channel Plugins](/de/plugins/sdk-channel-plugins) — Channel-Plugins bauen
+- [Provider Plugins](/de/plugins/sdk-provider-plugins) — Provider-Plugins bauen

@@ -1,21 +1,27 @@
 ---
 read_when:
     - Sie möchten OpenClaw mit IRC-Kanälen oder Direktnachrichten verbinden
-    - Sie konfigurieren IRC-Zulassungslisten, Gruppenrichtlinien oder Erwähnungs-Gating
-summary: Einrichtung, Zugriffskontrollen und Fehlerbehebung für das IRC Plugin
+    - Sie konfigurieren IRC-Allowlisten, Gruppenrichtlinien oder Mention-Gating
+summary: Einrichtung des IRC-Plugin, Zugriffskontrollen und Fehlerbehebung
 title: IRC
 x-i18n:
-    generated_at: "2026-04-23T13:57:57Z"
+    generated_at: "2026-04-24T06:27:42Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e198c03db9aaf4ec64db462d44d42aa352a2ddba808bcd29e21eb2791d9755ad
+    source_hash: 76f316c0f026d0387a97dc5dcb6d8967f6e4841d94b95b36e42f6f6284882a69
     source_path: channels/irc.md
     workflow: 15
 ---
 
-# IRC
+Einrichtung des IRC-Plugin, Zugriffskontrollen und Fehlerbehebung
 
-Verwenden Sie IRC, wenn Sie OpenClaw in klassischen Kanälen (`#room`) und Direktnachrichten nutzen möchten.
+IRC
+
+Sie möchten OpenClaw mit IRC-Kanälen oder Direktnachrichten verbinden
+
+Sie konfigurieren IRC-Allowlisten, Gruppenrichtlinien oder Mention-Gating
+
+Verwenden Sie IRC, wenn Sie OpenClaw in klassischen Kanälen (`#room`) und Direktnachrichten einsetzen möchten.
 IRC wird als gebündeltes Plugin mitgeliefert, wird aber in der Hauptkonfiguration unter `channels.irc` konfiguriert.
 
 ## Schnellstart
@@ -38,50 +44,50 @@ IRC wird als gebündeltes Plugin mitgeliefert, wird aber in der Hauptkonfigurati
 }
 ```
 
-Bevorzugen Sie einen privaten IRC-Server für die Bot-Koordination. Wenn Sie absichtlich ein öffentliches IRC-Netzwerk verwenden, sind Libera.Chat, OFTC und Snoonet gängige Optionen. Vermeiden Sie vorhersehbare öffentliche Kanäle für Bot- oder Schwarm-Backchannel-Verkehr.
+Bevorzugen Sie für die Bot-Koordination einen privaten IRC-Server. Wenn Sie absichtlich ein öffentliches IRC-Netzwerk verwenden, sind Libera.Chat, OFTC und Snoonet gängige Optionen. Vermeiden Sie vorhersehbare öffentliche Kanäle für Bot- oder Schwarm-Backchannel-Verkehr.
 
-3. Starten Sie das Gateway oder starten Sie es neu:
+3. Starten Sie das Gateway bzw. starten Sie es neu:
 
 ```bash
 openclaw gateway run
 ```
 
-## Standardsicherheitseinstellungen
+## Sicherheitsstandards
 
-- `channels.irc.dmPolicy` ist standardmäßig auf `"pairing"` gesetzt.
-- `channels.irc.groupPolicy` ist standardmäßig auf `"allowlist"` gesetzt.
+- `channels.irc.dmPolicy` ist standardmäßig `"pairing"`.
+- `channels.irc.groupPolicy` ist standardmäßig `"allowlist"`.
 - Bei `groupPolicy="allowlist"` legen Sie mit `channels.irc.groups` die erlaubten Kanäle fest.
 - Verwenden Sie TLS (`channels.irc.tls=true`), sofern Sie nicht absichtlich unverschlüsselte Übertragung akzeptieren.
 
 ## Zugriffskontrolle
 
-Für IRC-Kanäle gibt es zwei getrennte „Sperren“:
+Für IRC-Kanäle gibt es zwei getrennte „Schranken“:
 
 1. **Kanalzugriff** (`groupPolicy` + `groups`): ob der Bot Nachrichten aus einem Kanal überhaupt akzeptiert.
 2. **Absenderzugriff** (`groupAllowFrom` / pro Kanal `groups["#channel"].allowFrom`): wer den Bot innerhalb dieses Kanals auslösen darf.
 
 Konfigurationsschlüssel:
 
-- DM-Zulassungsliste (Absenderzugriff für DMs): `channels.irc.allowFrom`
-- Zulassungsliste für Gruppenabsender (Absenderzugriff für Kanäle): `channels.irc.groupAllowFrom`
-- Steuerung pro Kanal (Kanal + Absender + Erwähnungsregeln): `channels.irc.groups["#channel"]`
-- `channels.irc.groupPolicy="open"` erlaubt nicht konfigurierte Kanäle (**standardmäßig weiterhin Erwähnungs-Gating**)
+- DM-Allowlist (DM-Absenderzugriff): `channels.irc.allowFrom`
+- Gruppen-Absender-Allowlist (Kanal-Absenderzugriff): `channels.irc.groupAllowFrom`
+- Pro-Kanal-Steuerung (Kanal + Absender + Mention-Regeln): `channels.irc.groups["#channel"]`
+- `channels.irc.groupPolicy="open"` erlaubt nicht konfigurierte Kanäle (**standardmäßig weiterhin durch Mention-Gating geschützt**)
 
-Einträge in Zulassungslisten sollten stabile Absenderidentitäten verwenden (`nick!user@host`).
-Der Abgleich nur anhand des Nicknamens ist veränderlich und wird nur aktiviert, wenn `channels.irc.dangerouslyAllowNameMatching: true` gesetzt ist.
+Allowlist-Einträge sollten stabile Absenderidentitäten verwenden (`nick!user@host`).
+Der Abgleich nur nach Nick ist veränderlich und wird nur aktiviert, wenn `channels.irc.dangerouslyAllowNameMatching: true` gesetzt ist.
 
-### Häufiger Stolperstein: `allowFrom` ist für DMs, nicht für Kanäle
+### Häufiger Stolperstein: `allowFrom` gilt für DMs, nicht für Kanäle
 
-Wenn Sie Protokolleinträge wie diese sehen:
+Wenn Sie Protokolle wie diese sehen:
 
 - `irc: drop group sender alice!ident@host (policy=allowlist)`
 
-…bedeutet das, dass der Absender für **Gruppen-/Kanal**-Nachrichten nicht zugelassen war. Beheben Sie das entweder durch:
+…bedeutet das, dass der Absender für **Gruppen-/Kanal**-Nachrichten nicht erlaubt war. Beheben Sie das entweder durch:
 
 - Setzen von `channels.irc.groupAllowFrom` (global für alle Kanäle), oder
-- Setzen kanalbezogener Absender-Zulassungslisten: `channels.irc.groups["#channel"].allowFrom`
+- Setzen von Absender-Allowlisten pro Kanal: `channels.irc.groups["#channel"].allowFrom`
 
-Beispiel (beliebigen Nutzern in `#tuirc-dev` erlauben, mit dem Bot zu sprechen):
+Beispiel (jede Person in `#tuirc-dev` darf mit dem Bot sprechen):
 
 ```json5
 {
@@ -96,13 +102,13 @@ Beispiel (beliebigen Nutzern in `#tuirc-dev` erlauben, mit dem Bot zu sprechen):
 }
 ```
 
-## Antwortauslösung (Erwähnungen)
+## Antwortauslösung (Mentions)
 
-Auch wenn ein Kanal erlaubt ist (über `groupPolicy` + `groups`) und der Absender erlaubt ist, verwendet OpenClaw in Gruppenkontexten standardmäßig **Erwähnungs-Gating**.
+Selbst wenn ein Kanal erlaubt ist (über `groupPolicy` + `groups`) und der Absender erlaubt ist, verwendet OpenClaw in Gruppenkontexten standardmäßig **Mention-Gating**.
 
-Das bedeutet, dass Sie möglicherweise Protokolleinträge wie `drop channel … (missing-mention)` sehen, sofern die Nachricht kein Erwähnungsmuster enthält, das zum Bot passt.
+Das bedeutet, dass Sie möglicherweise Protokolle wie `drop channel … (missing-mention)` sehen, sofern die Nachricht kein Mention-Muster enthält, das zum Bot passt.
 
-Damit der Bot in einem IRC-Kanal **ohne erforderliche Erwähnung** antwortet, deaktivieren Sie das Erwähnungs-Gating für diesen Kanal:
+Damit der Bot in einem IRC-Kanal **ohne erforderliche Mention** antwortet, deaktivieren Sie Mention-Gating für diesen Kanal:
 
 ```json5
 {
@@ -120,7 +126,7 @@ Damit der Bot in einem IRC-Kanal **ohne erforderliche Erwähnung** antwortet, de
 }
 ```
 
-Oder um **alle** IRC-Kanäle zu erlauben (keine Zulassungsliste pro Kanal) und trotzdem ohne Erwähnungen zu antworten:
+Oder um **alle** IRC-Kanäle zuzulassen (keine Allowlist pro Kanal) und trotzdem ohne Mentions zu antworten:
 
 ```json5
 {
@@ -135,9 +141,9 @@ Oder um **alle** IRC-Kanäle zu erlauben (keine Zulassungsliste pro Kanal) und t
 }
 ```
 
-## Sicherheitshinweis (für öffentliche Kanäle empfohlen)
+## Sicherheitshinweis (empfohlen für öffentliche Kanäle)
 
-Wenn Sie in einem öffentlichen Kanal `allowFrom: ["*"]` zulassen, kann jeder den Bot ansprechen.
+Wenn Sie `allowFrom: ["*"]` in einem öffentlichen Kanal zulassen, kann jede Person den Bot ansprechen.
 Um das Risiko zu verringern, beschränken Sie die Tools für diesen Kanal.
 
 ### Dieselben Tools für alle im Kanal
@@ -187,16 +193,16 @@ Verwenden Sie `toolsBySender`, um eine strengere Richtlinie auf `"*"` und eine w
 
 Hinweise:
 
-- Schlüssel in `toolsBySender` sollten `id:` für IRC-Absenderidentitätswerte verwenden:
-  `id:eigen` oder `id:eigen!~eigen@174.127.248.171` für einen stärkeren Abgleich.
+- `toolsBySender`-Schlüssel sollten `id:` für IRC-Absenderidentitätswerte verwenden:
+  `id:eigen` oder `id:eigen!~eigen@174.127.248.171` für stärkeren Abgleich.
 - Ältere Schlüssel ohne Präfix werden weiterhin akzeptiert und nur als `id:` abgeglichen.
-- Die erste passende Absenderrichtlinie gewinnt; `"*"` ist der Platzhalter-Fallback.
+- Die erste passende Absenderrichtlinie gewinnt; `"*"` ist der Wildcard-Fallback.
 
-Weitere Informationen zu Gruppenzugriff im Vergleich zu Erwähnungs-Gating (und deren Zusammenspiel) finden Sie unter: [/channels/groups](/de/channels/groups).
+Weitere Informationen zu Gruppenzugriff im Vergleich zu Mention-Gating (und wie beides zusammenspielt) finden Sie unter: [/channels/groups](/de/channels/groups).
 
 ## NickServ
 
-Zur Identifizierung bei NickServ nach dem Verbindungsaufbau:
+Zur Identifizierung bei NickServ nach dem Verbinden:
 
 ```json5
 {
@@ -212,7 +218,7 @@ Zur Identifizierung bei NickServ nach dem Verbindungsaufbau:
 }
 ```
 
-Optionale einmalige Registrierung beim Verbindungsaufbau:
+Optionale einmalige Registrierung beim Verbinden:
 
 ```json5
 {
@@ -227,7 +233,7 @@ Optionale einmalige Registrierung beim Verbindungsaufbau:
 }
 ```
 
-Deaktivieren Sie `register`, nachdem der Nick registriert wurde, um wiederholte REGISTER-Versuche zu vermeiden.
+Deaktivieren Sie `register`, nachdem der Nick registriert wurde, um wiederholte `REGISTER`-Versuche zu vermeiden.
 
 ## Umgebungsvariablen
 
@@ -248,14 +254,14 @@ Das Standardkonto unterstützt:
 
 ## Fehlerbehebung
 
-- Wenn der Bot eine Verbindung herstellt, aber in Kanälen nie antwortet, prüfen Sie `channels.irc.groups` **und** ob Erwähnungs-Gating Nachrichten verwirft (`missing-mention`). Wenn er ohne Pings antworten soll, setzen Sie `requireMention:false` für den Kanal.
-- Wenn die Anmeldung fehlschlägt, prüfen Sie die Verfügbarkeit des Nicks und das Serverpasswort.
-- Wenn TLS in einem benutzerdefinierten Netzwerk fehlschlägt, prüfen Sie Host/Port und die Zertifikatskonfiguration.
+- Wenn der Bot sich verbindet, aber in Kanälen nie antwortet, prüfen Sie `channels.irc.groups` **und** ob Mention-Gating Nachrichten verwirft (`missing-mention`). Wenn er ohne Pings antworten soll, setzen Sie `requireMention:false` für den Kanal.
+- Wenn die Anmeldung fehlschlägt, prüfen Sie die Verfügbarkeit des Nick und das Server-Passwort.
+- Wenn TLS in einem benutzerdefinierten Netzwerk fehlschlägt, prüfen Sie Host/Port und die Zertifikatseinrichtung.
 
 ## Verwandt
 
 - [Kanalübersicht](/de/channels) — alle unterstützten Kanäle
 - [Pairing](/de/channels/pairing) — DM-Authentifizierung und Pairing-Ablauf
-- [Groups](/de/channels/groups) — Verhalten in Gruppenchats und Erwähnungs-Gating
-- [Kanal-Routing](/de/channels/channel-routing) — Sitzungs-Routing für Nachrichten
+- [Gruppen](/de/channels/groups) — Verhalten in Gruppenchats und Mention-Gating
+- [Kanalweiterleitung](/de/channels/channel-routing) — Sitzungsweiterleitung für Nachrichten
 - [Sicherheit](/de/gateway/security) — Zugriffsmodell und Härtung

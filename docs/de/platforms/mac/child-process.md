@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Integrieren der Mac-App in den Gateway-Lebenszyklus
-summary: Gateway-Lebenszyklus unter macOS (launchd)
+    - Die Mac-App in den Gateway-Lebenszyklus integrieren
+summary: Gateway-Lebenszyklus auf macOS (launchd)
 title: Gateway-Lebenszyklus
 x-i18n:
-    generated_at: "2026-04-05T12:49:10Z"
+    generated_at: "2026-04-24T06:47:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 73e7eb64ef432c3bfc81b949a5cc2a344c64f2310b794228609aae1da817ec41
+    source_hash: a110d8f4384301987f7748cb9591f8899aa845fcf635035407a7aa401b132fc4
     source_path: platforms/mac/child-process.md
     workflow: 15
 ---
 
-# Gateway-Lebenszyklus unter macOS
+# Gateway-Lebenszyklus auf macOS
 
 Die macOS-App **verwaltet das Gateway standardmäßig über launchd** und startet
-das Gateway nicht als untergeordneten Prozess. Sie versucht zunächst, sich an ein bereits laufendes
-Gateway auf dem konfigurierten Port anzuhängen; wenn keines erreichbar ist, aktiviert sie den launchd-
-Service über die externe CLI `openclaw` (keine eingebettete Laufzeit). Das sorgt für
-zuverlässigen Auto-Start beim Anmelden und Neustarts bei Abstürzen.
+das Gateway nicht als Kindprozess. Sie versucht zuerst, sich mit einem bereits laufenden
+Gateway auf dem konfigurierten Port zu verbinden; wenn keines erreichbar ist,
+aktiviert sie den launchd-Dienst über die externe `openclaw` CLI (keine eingebettete Runtime). Dies bietet Ihnen
+zuverlässigen automatischen Start bei der Anmeldung und Neustart bei Abstürzen.
 
-Der Modus mit untergeordnetem Prozess (Gateway direkt von der App gestartet) wird heute **nicht verwendet**.
+Der Modus mit Kindprozess (Gateway wird direkt von der App gestartet) wird **heute nicht verwendet**.
 Wenn Sie eine engere Kopplung an die UI benötigen, führen Sie das Gateway manuell in einem Terminal aus.
 
 ## Standardverhalten (launchd)
@@ -40,36 +40,42 @@ launchctl bootout gui/$UID/ai.openclaw.gateway
 
 Ersetzen Sie das Label durch `ai.openclaw.<profile>`, wenn Sie ein benanntes Profil ausführen.
 
-## Unsigned Dev Builds
+## Nicht signierte Dev-Builds
 
 `scripts/restart-mac.sh --no-sign` ist für schnelle lokale Builds gedacht, wenn Sie keine
-Signaturschlüssel haben. Damit launchd nicht auf ein unsigniertes Relay-Binary zeigt, tut es Folgendes:
+Signaturschlüssel haben. Damit launchd nicht auf eine nicht signierte Relay-Binärdatei zeigt, wird:
 
-- Schreibt `~/.openclaw/disable-launchagent`.
+- `~/.openclaw/disable-launchagent` geschrieben.
 
-Signierte Ausführungen von `scripts/restart-mac.sh` löschen diese Überschreibung, wenn der Marker
+Signierte Ausführungen von `scripts/restart-mac.sh` löschen diese Überschreibung, wenn die Markierung
 vorhanden ist. Zum manuellen Zurücksetzen:
 
 ```bash
 rm ~/.openclaw/disable-launchagent
 ```
 
-## Attach-only-Modus
+## Modus „nur anhängen“
 
-Um die macOS-App zu zwingen, **niemals launchd zu installieren oder zu verwalten**, starten Sie sie mit
-`--attach-only` (oder `--no-launchd`). Dadurch wird `~/.openclaw/disable-launchagent` gesetzt,
-sodass sich die App nur an ein bereits laufendes Gateway anhängt. Dasselbe Verhalten können Sie in den Debug Settings umschalten.
+Um die macOS-App dazu zu zwingen, launchd **niemals zu installieren oder zu verwalten**, starten Sie
+sie mit `--attach-only` (oder `--no-launchd`). Dadurch wird `~/.openclaw/disable-launchagent` gesetzt,
+sodass sich die App nur an ein bereits laufendes Gateway anhängt. Dasselbe
+Verhalten können Sie in den Debug Settings umschalten.
 
 ## Remote-Modus
 
 Der Remote-Modus startet niemals ein lokales Gateway. Die App verwendet einen SSH-Tunnel zum
-Remote-Host und verbindet sich über diesen Tunnel.
+entfernten Host und verbindet sich über diesen Tunnel.
 
 ## Warum wir launchd bevorzugen
 
-- Auto-Start beim Anmelden.
-- Eingebaute Semantik für Neustarts/KeepAlive.
-- Vorhersagbare Logs und Überwachung.
+- Automatischer Start bei der Anmeldung.
+- Integrierte Neustart-/KeepAlive-Semantik.
+- Vorhersehbare Logs und Überwachung.
 
-Falls jemals wieder ein echter Modus mit untergeordnetem Prozess benötigt wird, sollte er als
+Wenn ein echter Kindprozessmodus jemals wieder benötigt wird, sollte er als
 separater, expliziter Nur-Dev-Modus dokumentiert werden.
+
+## Verwandt
+
+- [macOS-App](/de/platforms/macos)
+- [Gateway-Runbook](/de/gateway)

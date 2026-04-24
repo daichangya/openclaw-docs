@@ -1,19 +1,17 @@
 ---
 read_when:
-    - Sie möchten DeepSeek mit OpenClaw verwenden.
-    - Sie benötigen die API-Schlüssel-Umgebungsvariable oder die CLI-Option zur Authentifizierungsauswahl.
-summary: DeepSeek-Einrichtung (Authentifizierung + Modellauswahl)
+    - Sie möchten DeepSeek mit OpenClaw verwenden
+    - Sie benötigen die API-Key-Umgebungsvariable oder die CLI-Auth-Auswahl
+summary: DeepSeek-Einrichtung (Auth + Modellauswahl)
 title: DeepSeek
 x-i18n:
-    generated_at: "2026-04-12T23:30:43Z"
+    generated_at: "2026-04-24T06:53:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ad06880bd1ab89f72f9e31f4927e2c099dcf6b4e0ff2b3fcc91a24468fbc089d
+    source_hash: ead407c67c05bd8700db1cba36defdd9d47bdc9a071c76a07c4b4fb82f6b80e2
     source_path: providers/deepseek.md
     workflow: 15
 ---
-
-# DeepSeek
 
 [DeepSeek](https://www.deepseek.com) bietet leistungsstarke KI-Modelle mit einer OpenAI-kompatiblen API.
 
@@ -22,12 +20,12 @@ x-i18n:
 | Provider    | `deepseek`                 |
 | Auth        | `DEEPSEEK_API_KEY`         |
 | API         | OpenAI-kompatibel          |
-| Base-URL    | `https://api.deepseek.com` |
+| Base URL    | `https://api.deepseek.com` |
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="API-Schlüssel abrufen">
+  <Step title="Ihren API-Schlüssel holen">
     Erstellen Sie einen API-Schlüssel unter [platform.deepseek.com](https://platform.deepseek.com/api_keys).
   </Step>
   <Step title="Onboarding ausführen">
@@ -35,10 +33,10 @@ x-i18n:
     openclaw onboard --auth-choice deepseek-api-key
     ```
 
-    Dadurch werden Sie nach Ihrem API-Schlüssel gefragt und `deepseek/deepseek-chat` als Standardmodell festgelegt.
+    Dadurch werden Sie nach Ihrem API-Schlüssel gefragt, und `deepseek/deepseek-chat` wird als Standardmodell gesetzt.
 
   </Step>
-  <Step title="Prüfen, ob Modelle verfügbar sind">
+  <Step title="Prüfen, dass Modelle verfügbar sind">
     ```bash
     openclaw models list --provider deepseek
     ```
@@ -47,7 +45,7 @@ x-i18n:
 
 <AccordionGroup>
   <Accordion title="Nicht-interaktive Einrichtung">
-    Für skriptgesteuerte oder Headless-Installationen übergeben Sie alle Flags direkt:
+    Für skriptgesteuerte oder headless Installationen übergeben Sie alle Flags direkt:
 
     ```bash
     openclaw onboard --non-interactive \
@@ -69,13 +67,13 @@ diesem Prozess zur Verfügung steht (zum Beispiel in `~/.openclaw/.env` oder üb
 
 ## Integrierter Katalog
 
-| Modell-Ref                  | Name               | Eingabe | Kontext | Maximale Ausgabe | Hinweise                                          |
-| --------------------------- | ------------------ | ------- | ------- | ---------------- | ------------------------------------------------- |
-| `deepseek/deepseek-chat`     | DeepSeek Chat      | Text    | 131,072 | 8,192            | Standardmodell; DeepSeek-V3.2-Oberfläche ohne Thinking |
-| `deepseek/deepseek-reasoner` | DeepSeek Reasoner  | Text    | 131,072 | 65,536           | Reasoning-fähige V3.2-Oberfläche                  |
+| Modell-Ref                   | Name                | Eingabe | Kontext | Max. Ausgabe | Hinweise                                             |
+| ---------------------------- | ------------------- | ------- | ------- | ------------ | ---------------------------------------------------- |
+| `deepseek/deepseek-chat`     | DeepSeek Chat       | Text    | 131,072 | 8,192        | Standardmodell; DeepSeek V3.2 ohne Thinking-Oberfläche |
+| `deepseek/deepseek-reasoner` | DeepSeek Reasoner   | Text    | 131,072 | 65,536       | Thinking-fähige V3.2-Oberfläche                      |
 
 <Tip>
-Beide gebündelten Modelle deklarieren derzeit im Quellcode Kompatibilität mit Streaming-Nutzung.
+Beide gebündelten Modelle weisen derzeit in der Quelle Streaming-Usage-Kompatibilität aus.
 </Tip>
 
 ## Konfigurationsbeispiel
@@ -95,7 +93,7 @@ Beide gebündelten Modelle deklarieren derzeit im Quellcode Kompatibilität mit 
 
 <CardGroup cols={2}>
   <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
-    Auswahl von Providern, Modell-Refs und Failover-Verhalten.
+    Provider, Modell-Refs und Failover-Verhalten auswählen.
   </Card>
   <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference" icon="gear">
     Vollständige Konfigurationsreferenz für Agenten, Modelle und Provider.

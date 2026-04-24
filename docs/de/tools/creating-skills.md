@@ -1,30 +1,28 @@
 ---
 read_when:
-    - Sie erstellen einen neuen benutzerdefinierten Skill in Ihrem Workspace
-    - Sie benötigen einen kurzen Einstieg in den Workflow für Skills auf Basis von SKILL.md
-summary: Eigene Workspace-Skills mit SKILL.md erstellen und testen
+    - Sie erstellen eine neue benutzerdefinierte Skill in Ihrem Workspace
+    - Sie benötigen einen schnellen Starter-Workflow für SKILL.md-basierte Skills
+summary: Benutzerdefinierte Workspace-Skills mit SKILL.md erstellen und testen
 title: Skills erstellen
 x-i18n:
-    generated_at: "2026-04-05T12:57:00Z"
+    generated_at: "2026-04-24T07:02:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 747cebc5191b96311d1d6760bede1785a099acd7633a0b88de6b7882b57e1db6
+    source_hash: df9249e14936c65143580a6618679cf2d79a2960390e5c7afc5dbea1a9a6e045
     source_path: tools/creating-skills.md
     workflow: 15
 ---
 
-# Skills erstellen
-
-Skills bringen dem Agenten bei, wie und wann Tools verwendet werden sollen. Jeder Skill ist ein Verzeichnis,
+Skills bringen dem Agenten bei, wie und wann Tools verwendet werden sollen. Jede Skill ist ein Verzeichnis,
 das eine Datei `SKILL.md` mit YAML-Frontmatter und Markdown-Anweisungen enthält.
 
-Informationen dazu, wie Skills geladen und priorisiert werden, finden Sie unter [Skills](/tools/skills).
+Wie Skills geladen und priorisiert werden, finden Sie unter [Skills](/de/tools/skills).
 
-## Erstellen Sie Ihren ersten Skill
+## Ihre erste Skill erstellen
 
 <Steps>
-  <Step title="Skill-Verzeichnis erstellen">
-    Skills befinden sich in Ihrem Workspace. Erstellen Sie einen neuen Ordner:
+  <Step title="Das Skill-Verzeichnis erstellen">
+    Skills liegen in Ihrem Workspace. Erstellen Sie einen neuen Ordner:
 
     ```bash
     mkdir -p ~/.openclaw/workspace/skills/hello-world
@@ -34,7 +32,7 @@ Informationen dazu, wie Skills geladen und priorisiert werden, finden Sie unter 
 
   <Step title="SKILL.md schreiben">
     Erstellen Sie `SKILL.md` in diesem Verzeichnis. Das Frontmatter definiert Metadaten,
-    und der Markdown-Text enthält Anweisungen für den Agenten.
+    und der Markdown-Body enthält Anweisungen für den Agenten.
 
     ```markdown
     ---
@@ -51,24 +49,24 @@ Informationen dazu, wie Skills geladen und priorisiert werden, finden Sie unter 
   </Step>
 
   <Step title="Tools hinzufügen (optional)">
-    Sie können benutzerdefinierte Tool-Schemas im Frontmatter definieren oder den Agenten
-    anweisen, vorhandene System-Tools zu verwenden (wie `exec` oder `browser`). Skills können auch
-    innerhalb von Plugins zusammen mit den Tools ausgeliefert werden, die sie dokumentieren.
+    Sie können benutzerdefinierte Tool-Schemas im Frontmatter definieren oder den Agenten anweisen,
+    vorhandene System-Tools (wie `exec` oder `browser`) zu verwenden. Skills können auch
+    innerhalb von Plugins mit den Tools ausgeliefert werden, die sie dokumentieren.
 
   </Step>
 
-  <Step title="Den Skill laden">
-    Starten Sie eine neue Sitzung, damit OpenClaw den Skill übernimmt:
+  <Step title="Die Skill laden">
+    Starten Sie eine neue Sitzung, damit OpenClaw die Skill übernimmt:
 
     ```bash
-    # Aus dem Chat
+    # Aus dem Chat heraus
     /new
 
     # Oder das Gateway neu starten
     openclaw gateway restart
     ```
 
-    Prüfen Sie, ob der Skill geladen wurde:
+    Prüfen Sie, dass die Skill geladen wurde:
 
     ```bash
     openclaw skills list
@@ -76,8 +74,8 @@ Informationen dazu, wie Skills geladen und priorisiert werden, finden Sie unter 
 
   </Step>
 
-  <Step title="Ihn testen">
-    Senden Sie eine Nachricht, die den Skill auslösen sollte:
+  <Step title="Sie testen">
+    Senden Sie eine Nachricht, die die Skill auslösen sollte:
 
     ```bash
     openclaw agent --message "give me a greeting"
@@ -92,35 +90,35 @@ Informationen dazu, wie Skills geladen und priorisiert werden, finden Sie unter 
 
 Das YAML-Frontmatter unterstützt diese Felder:
 
-| Feld                                | Erforderlich | Beschreibung                                |
-| ----------------------------------- | ------------ | ------------------------------------------- |
-| `name`                              | Ja           | Eindeutige Kennung (`snake_case`)           |
+| Feld                                | Erforderlich | Beschreibung                                 |
+| ----------------------------------- | ------------ | -------------------------------------------- |
+| `name`                              | Ja           | Eindeutiger Bezeichner (`snake_case`)        |
 | `description`                       | Ja           | Einzeilige Beschreibung, die dem Agenten angezeigt wird |
-| `metadata.openclaw.os`              | Nein         | OS-Filter (`["darwin"]`, `["linux"]` usw.)  |
-| `metadata.openclaw.requires.bins`   | Nein         | Erforderliche Binärdateien im PATH          |
-| `metadata.openclaw.requires.config` | Nein         | Erforderliche Konfigurationsschlüssel       |
+| `metadata.openclaw.os`              | Nein         | OS-Filter (`["darwin"]`, `["linux"]` usw.)   |
+| `metadata.openclaw.requires.bins`   | Nein         | Erforderliche Binärdateien auf PATH          |
+| `metadata.openclaw.requires.config` | Nein         | Erforderliche Konfigurationsschlüssel        |
 
 ## Best Practices
 
-- **Seien Sie prägnant** — weisen Sie das Modell an, _was_ zu tun ist, nicht wie es eine KI sein soll
-- **Sicherheit zuerst** — wenn Ihr Skill `exec` verwendet, stellen Sie sicher, dass Prompts keine beliebige Befehlsinjektion aus nicht vertrauenswürdigen Eingaben zulassen
+- **Prägnant sein** — weisen Sie das Modell an, _was_ es tun soll, nicht wie es eine KI sein soll
+- **Sicherheit zuerst** — wenn Ihre Skill `exec` verwendet, stellen Sie sicher, dass Prompts keine beliebige Befehlsinjektion aus nicht vertrauenswürdigen Eingaben erlauben
 - **Lokal testen** — verwenden Sie `openclaw agent --message "..."`, um vor dem Teilen zu testen
-- **ClawHub verwenden** — durchsuchen Sie Skills und tragen Sie dazu bei unter [ClawHub](https://clawhub.ai)
+- **ClawHub verwenden** — Skills unter [ClawHub](https://clawhub.ai) durchsuchen und beitragen
 
-## Wo Skills gespeichert werden
+## Wo Skills liegen
 
-| Speicherort                    | Priorität | Geltungsbereich         |
-| ----------------------------- | --------- | ----------------------- |
-| `\<workspace\>/skills/`       | Höchste   | Pro Agent               |
-| `\<workspace\>/.agents/skills/` | Hoch    | Pro Workspace-Agent     |
-| `~/.agents/skills/`           | Mittel    | Geteiltes Agent-Profil  |
-| `~/.openclaw/skills/`         | Mittel    | Geteilt (alle Agenten)  |
-| Gebündelt (mit OpenClaw ausgeliefert) | Niedrig | Global         |
-| `skills.load.extraDirs`       | Niedrigste | Benutzerdefinierte geteilte Ordner |
+| Ort                              | Priorität | Geltungsbereich         |
+| -------------------------------- | --------- | ----------------------- |
+| `\<workspace\>/skills/`          | Höchste   | Pro Agent               |
+| `\<workspace\>/.agents/skills/`  | Hoch      | Pro Workspace-Agent     |
+| `~/.agents/skills/`              | Mittel    | Gemeinsames Agentenprofil |
+| `~/.openclaw/skills/`            | Mittel    | Gemeinsam (alle Agenten) |
+| Gebündelt (mit OpenClaw ausgeliefert) | Niedrig | Global                  |
+| `skills.load.extraDirs`          | Niedrigste| Benutzerdefinierte gemeinsame Ordner |
 
 ## Verwandt
 
-- [Skills-Referenz](/tools/skills) — Regeln für Laden, Priorität und Gating
-- [Skills-Konfiguration](/tools/skills-config) — Konfigurationsschema `skills.*`
-- [ClawHub](/tools/clawhub) — öffentliches Skill-Register
-- [Plugins erstellen](/plugins/building-plugins) — Plugins können Skills mitliefern
+- [Skills reference](/de/tools/skills) — Regeln zum Laden, zur Priorität und zum Gating
+- [Skills config](/de/tools/skills-config) — Konfigurationsschema `skills.*`
+- [ClawHub](/de/tools/clawhub) — öffentliche Skill-Registry
+- [Building Plugins](/de/plugins/building-plugins) — Plugins können Skills ausliefern

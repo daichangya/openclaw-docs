@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Sie möchten eine schnelle Diagnose des Kanalzustands und der letzten Sitzungsempfänger
-    - Sie möchten einen einfügbaren „all“-Status zum Debuggen
-summary: CLI-Referenz für `openclaw status` (Diagnose, Probes, Nutzungs-Snapshots)
-title: status
+    - Sie möchten eine schnelle Diagnose der Channel-Integrität und der letzten Sitzungsempfänger
+    - Sie möchten einen einfügbaren „all“-Status für das Debugging
+summary: CLI-Referenz für `openclaw status` (Diagnose, Prüfungen, Nutzungssnapshots)
+title: Status
 x-i18n:
-    generated_at: "2026-04-23T14:01:02Z"
+    generated_at: "2026-04-24T06:32:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 015614e329ec172a62c625581897fa64589f12dfe28edefe8a2764b5b5367b2a
+    source_hash: 369de48e283766ec23ef87f79df39893957101954c4a351e46ef24104d78ec1d
     source_path: cli/status.md
     workflow: 15
 ---
 
 # `openclaw status`
 
-Diagnose für Kanäle und Sitzungen.
+Diagnose für Channel + Sitzungen.
 
 ```bash
 openclaw status
@@ -26,18 +26,23 @@ openclaw status --usage
 
 Hinweise:
 
-- `--deep` führt Live-Probes aus (WhatsApp Web + Telegram + Discord + Slack + Signal).
-- `--usage` gibt normalisierte Provider-Nutzungsfenster als `X% left` aus.
-- Die Ausgabe des Sitzungsstatus trennt jetzt `Runtime:` von `Runner:`. `Runtime` ist der Ausführungspfad und der Sandbox-Status (`direct`, `docker/*`), während `Runner` angibt, ob die Sitzung eingebettetes Pi, einen CLI-basierten Provider oder ein ACP-Harness-Backend wie `codex (acp/acpx)` verwendet.
-- Die rohen Felder `usage_percent` / `usagePercent` von MiniMax geben das verbleibende Kontingent an, daher invertiert OpenClaw sie vor der Anzeige; zählungsbasierte Felder haben Vorrang, wenn vorhanden. Antworten von `model_remains` bevorzugen den Chat-Modell-Eintrag, leiten das Fensterlabel bei Bedarf aus Zeitstempeln ab und schließen den Modellnamen in das Plan-Label ein.
-- Wenn der aktuelle Sitzungssnapshot spärlich ist, kann `/status` Token- und Cache-Zähler aus dem neuesten Nutzungslog des Transkripts nachtragen. Vorhandene Live-Werte ungleich null haben weiterhin Vorrang vor dem Transkript-Fallback.
-- Der Transkript-Fallback kann auch das aktive Runtime-Modell-Label wiederherstellen, wenn es im Live-Sitzungseintrag fehlt. Wenn dieses Transkript-Modell vom ausgewählten Modell abweicht, löst Status das Kontextfenster anhand des wiederhergestellten Runtime-Modells statt des ausgewählten Modells auf.
-- Für die Erfassung der Prompt-Größe bevorzugt der Transkript-Fallback die größere promptorientierte Gesamtsumme, wenn Sitzungsmetadaten fehlen oder kleiner sind, damit Sitzungen mit benutzerdefinierten Providern nicht zu einer Anzeige von `0` Tokens zusammenfallen.
-- Die Ausgabe enthält Sitzungs-Stores pro Agent, wenn mehrere Agenten konfiguriert sind.
-- Die Übersicht enthält Gateway- sowie Installations-/Runtime-Status des Node-Host-Dienstes, wenn verfügbar.
-- Die Übersicht enthält Update-Kanal und Git-SHA (für Source-Checkouts).
-- Update-Informationen werden in der Übersicht angezeigt; wenn ein Update verfügbar ist, gibt Status einen Hinweis aus, `openclaw update` auszuführen (siehe [Updating](/de/install/updating)).
-- Schreibgeschützte Statusoberflächen (`status`, `status --json`, `status --all`) lösen unterstützte SecretRefs für ihre Ziel-Konfigurationspfade nach Möglichkeit auf.
-- Wenn ein unterstützter Channel-SecretRef konfiguriert, im aktuellen Befehlspfad aber nicht verfügbar ist, bleibt Status schreibgeschützt und meldet eine degradierte Ausgabe, statt abzustürzen. Die menschenlesbare Ausgabe zeigt Warnungen wie „configured token unavailable in this command path“, und die JSON-Ausgabe enthält `secretDiagnostics`.
-- Wenn die auf befehlslokaler Ebene erfolgende SecretRef-Auflösung erfolgreich ist, bevorzugt Status den aufgelösten Snapshot und entfernt temporäre Kanalmarkierungen wie „secret unavailable“ aus der endgültigen Ausgabe.
-- `status --all` enthält eine Übersichtszeile zu Secrets und einen Diagnoseabschnitt, der Secret-Diagnosen (zur besseren Lesbarkeit gekürzt) zusammenfasst, ohne die Berichtserzeugung zu stoppen.
+- `--deep` führt Live-Prüfungen aus (WhatsApp Web + Telegram + Discord + Slack + Signal).
+- `--usage` gibt normalisierte Nutzungsfenster als `X% left` aus.
+- Die Statusausgabe für Sitzungen trennt jetzt `Runtime:` von `Runner:`. `Runtime` ist der Ausführungspfad und der Sandbox-Zustand (`direct`, `docker/*`), während `Runner` angibt, ob die Sitzung eingebettetes Pi, einen CLI-gestützten Anbieter oder ein ACP-Harness-Backend wie `codex (acp/acpx)` verwendet.
+- Die Rohfelder `usage_percent` / `usagePercent` von MiniMax sind verbleibende Quote, daher invertiert OpenClaw sie vor der Anzeige; zählungsbasierte Felder haben Vorrang, wenn sie vorhanden sind. `model_remains`-Antworten bevorzugen den Eintrag des Chat-Modells, leiten bei Bedarf die Fensterbezeichnung aus Zeitstempeln ab und enthalten den Modellnamen in der Tarifbezeichnung.
+- Wenn der aktuelle Sitzungssnapshot spärlich ist, kann `/status` Token- und Cache-Zähler aus dem aktuellsten Transcript-Nutzungslog ergänzen. Vorhandene Live-Werte ungleich null haben weiterhin Vorrang vor Fallback-Werten aus dem Transcript.
+- Das Transcript-Fallback kann auch die aktive Runtime-Modellbezeichnung wiederherstellen, wenn sie im Live-Sitzungseintrag fehlt. Wenn dieses Transcript-Modell vom ausgewählten Modell abweicht, löst status das Kontextfenster anhand des wiederhergestellten Runtime-Modells statt des ausgewählten auf.
+- Für die Prompt-Größenberechnung bevorzugt das Transcript-Fallback die größere promptorientierte Gesamtsumme, wenn Sitzungsmetadaten fehlen oder kleiner sind, damit Sitzungen mit benutzerdefinierten Anbietern nicht auf Token-Anzeigen von `0` zusammenfallen.
+- Die Ausgabe enthält Session Stores pro Agent, wenn mehrere Agenten konfiguriert sind.
+- Der Überblick enthält Installations-/Laufzeitstatus des Gateway- + Node-Host-Service, wenn verfügbar.
+- Der Überblick enthält Update-Kanal + Git-SHA (für Source-Checkouts).
+- Update-Informationen erscheinen im Überblick; wenn ein Update verfügbar ist, gibt status einen Hinweis aus, `openclaw update` auszuführen (siehe [Aktualisieren](/de/install/updating)).
+- Schreibgeschützte Statusoberflächen (`status`, `status --json`, `status --all`) lösen unterstützte SecretRefs für ihre Zielkonfigurationspfade nach Möglichkeit auf.
+- Wenn ein unterstützter Channel-SecretRef konfiguriert, aber in diesem Befehlsablauf nicht verfügbar ist, bleibt status schreibgeschützt und meldet eine degradierte Ausgabe, statt abzustürzen. Die menschenlesbare Ausgabe zeigt Warnungen wie „configured token unavailable in this command path“, und die JSON-Ausgabe enthält `secretDiagnostics`.
+- Wenn die befehlslokale SecretRef-Auflösung erfolgreich ist, bevorzugt status den aufgelösten Snapshot und entfernt vorübergehende Channel-Markierungen wie „secret unavailable“ aus der endgültigen Ausgabe.
+- `status --all` enthält eine Übersichtszeile für Secrets und einen Diagnoseabschnitt, der Secret-Diagnosen (zur besseren Lesbarkeit gekürzt) zusammenfasst, ohne die Berichtserstellung zu stoppen.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Doctor](/de/gateway/doctor)

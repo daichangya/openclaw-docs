@@ -1,56 +1,56 @@
 ---
 read_when:
-    - OpenClaw Gateway in WSL2 ausführen, während Chrome unter Windows läuft
+    - |-
+      OpenClaw Gateway in WSL2 ausführen, während Chrome auf Windows läuft】【：】【“】【assistant to=functions.read  კომენტary  海南天天中彩票 ￣亚洲json
+      {"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-qa-testing/SKILL.md"}
     - Überlappende Browser-/Control-UI-Fehler in WSL2 und Windows sehen
-    - Zwischen host-lokalem Chrome MCP und rohem remote CDP in Split-Host-Setups entscheiden
-summary: WSL2-Gateway + Windows-Chrome mit remote CDP schichtweise beheben
-title: Fehlerbehebung für WSL2 + Windows + remote Chrome CDP
+    - Zwischen hostlokalem Chrome MCP und rohem Remote-CDP in Setups mit getrennten Hosts entscheiden
+summary: Fehlerbehebung für WSL2-Gateway + Windows-Chrome-Remote-CDP in Schichten
+title: Fehlerbehebung für WSL2 + Windows + Remote-Chrome-CDP
 x-i18n:
-    generated_at: "2026-04-05T12:56:47Z"
+    generated_at: "2026-04-24T07:01:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 99df2988d3c6cf36a8c2124d5b724228d095a60b2d2b552f3810709b5086127d
+    source_hash: 30c8b94332e74704f85cbce5891b677b264fd155bc180c44044ab600e84018fd
     source_path: tools/browser-wsl2-windows-remote-cdp-troubleshooting.md
     workflow: 15
 ---
 
-# Fehlerbehebung für WSL2 + Windows + remote Chrome CDP
-
 Diese Anleitung behandelt das häufige Split-Host-Setup, bei dem:
 
 - OpenClaw Gateway innerhalb von WSL2 läuft
-- Chrome unter Windows läuft
+- Chrome auf Windows läuft
 - Browser-Steuerung die Grenze zwischen WSL2 und Windows überqueren muss
 
-Sie behandelt außerdem das mehrschichtige Fehlermuster aus [Issue #39369](https://github.com/openclaw/openclaw/issues/39369): Mehrere unabhängige Probleme können gleichzeitig auftreten, wodurch zunächst die falsche Schicht fehlerhaft aussieht.
+Sie behandelt außerdem das mehrschichtige Fehlermuster aus [Issue #39369](https://github.com/openclaw/openclaw/issues/39369): Mehrere unabhängige Probleme können gleichzeitig auftreten, wodurch zunächst die falsche Schicht defekt zu sein scheint.
 
 ## Wählen Sie zuerst den richtigen Browser-Modus
 
 Sie haben zwei gültige Muster:
 
-### Option 1: Rohes remote CDP von WSL2 nach Windows
+### Option 1: Rohes Remote-CDP von WSL2 nach Windows
 
 Verwenden Sie ein Remote-Browserprofil, das von WSL2 auf einen Windows-Chrome-CDP-Endpunkt zeigt.
 
 Wählen Sie dies, wenn:
 
 - das Gateway innerhalb von WSL2 bleibt
-- Chrome unter Windows läuft
-- die Browser-Steuerung die Grenze zwischen WSL2 und Windows überqueren muss
+- Chrome auf Windows läuft
+- Browser-Steuerung die Grenze zwischen WSL2 und Windows überqueren muss
 
 ### Option 2: Host-lokales Chrome MCP
 
-Verwenden Sie `existing-session` / `user` nur, wenn das Gateway selbst auf demselben Host wie Chrome läuft.
+Verwenden Sie `existing-session` / `user` nur dann, wenn das Gateway selbst auf demselben Host wie Chrome läuft.
 
 Wählen Sie dies, wenn:
 
-- OpenClaw und Chrome auf derselben Maschine laufen
-- Sie den lokal angemeldeten Browser-Zustand verwenden möchten
+- OpenClaw und Chrome auf demselben Rechner laufen
+- Sie den lokal angemeldeten Browser-Status verwenden möchten
 - Sie keinen hostübergreifenden Browser-Transport benötigen
 - Sie keine erweiterten verwalteten/rohen-CDP-only-Routen wie `responsebody`, PDF-
   Export, Download-Abfangung oder Batch-Aktionen benötigen
 
-Für WSL2 Gateway + Windows Chrome sollten Sie rohes remote CDP bevorzugen. Chrome MCP ist host-lokal, keine Brücke von WSL2 nach Windows.
+Für Gateway in WSL2 + Chrome auf Windows bevorzugen Sie rohes Remote-CDP. Chrome MCP ist hostlokal, keine Bridge von WSL2 nach Windows.
 
 ## Funktionierende Architektur
 
@@ -60,54 +60,54 @@ Referenzform:
 - Windows öffnet die Control UI in einem normalen Browser unter `http://127.0.0.1:18789/`
 - Windows-Chrome stellt einen CDP-Endpunkt auf Port `9222` bereit
 - WSL2 kann diesen Windows-CDP-Endpunkt erreichen
-- OpenClaw verweist ein Browserprofil auf die Adresse, die von WSL2 aus erreichbar ist
+- OpenClaw richtet ein Browserprofil auf die Adresse aus, die von WSL2 aus erreichbar ist
 
 ## Warum dieses Setup verwirrend ist
 
 Mehrere Fehler können sich überlagern:
 
 - WSL2 kann den Windows-CDP-Endpunkt nicht erreichen
-- die Control UI wird von einem unsicheren Ursprung aus geöffnet
-- `gateway.controlUi.allowedOrigins` stimmt nicht mit dem Seitenursprung überein
+- die Control UI wird von einem nicht sicheren Origin aus geöffnet
+- `gateway.controlUi.allowedOrigins` passt nicht zum Seiten-Origin
 - Token oder Pairing fehlt
 - das Browserprofil zeigt auf die falsche Adresse
 
-Deshalb kann nach dem Beheben einer Schicht weiterhin ein anderer Fehler sichtbar bleiben.
+Deshalb kann das Beheben einer Schicht trotzdem noch einen anderen sichtbaren Fehler zurücklassen.
 
 ## Kritische Regel für die Control UI
 
-Wenn die UI von Windows aus geöffnet wird, verwenden Sie Windows-Localhost, es sei denn, Sie haben absichtlich ein HTTPS-Setup.
+Wenn die UI von Windows aus geöffnet wird, verwenden Sie Windows-Localhost, sofern Sie kein bewusstes HTTPS-Setup haben.
 
 Verwenden Sie:
 
 `http://127.0.0.1:18789/`
 
-Verwenden Sie für die Control UI nicht standardmäßig eine LAN-IP. Reines HTTP über eine LAN- oder Tailnet-Adresse kann Verhalten mit unsicherem Ursprung/Geräteauthentifizierung auslösen, das nichts mit CDP selbst zu tun hat. Siehe [Control UI](/web/control-ui).
+Verwenden Sie für die Control UI nicht standardmäßig eine LAN-IP. Reines HTTP auf einer LAN- oder Tailnet-Adresse kann Verhalten bei unsicherem Origin/Device-Auth auslösen, das nichts mit CDP selbst zu tun hat. Siehe [Control UI](/de/web/control-ui).
 
 ## In Schichten validieren
 
-Arbeiten Sie von oben nach unten. Überspringen Sie nichts.
+Arbeiten Sie von oben nach unten. Überspringen Sie keine Schritte.
 
-### Schicht 1: Prüfen, ob Chrome unter Windows CDP bereitstellt
+### Schicht 1: Prüfen, ob Chrome auf Windows CDP bereitstellt
 
-Starten Sie Chrome unter Windows mit aktiviertem Remote-Debugging:
+Starten Sie Chrome auf Windows mit aktiviertem Remote-Debugging:
 
 ```powershell
 chrome.exe --remote-debugging-port=9222
 ```
 
-Prüfen Sie zunächst von Windows aus Chrome selbst:
+Prüfen Sie von Windows aus zuerst Chrome selbst:
 
 ```powershell
 curl http://127.0.0.1:9222/json/version
 curl http://127.0.0.1:9222/json/list
 ```
 
-Wenn das unter Windows fehlschlägt, ist OpenClaw noch nicht das Problem.
+Wenn das auf Windows fehlschlägt, ist OpenClaw noch nicht das Problem.
 
 ### Schicht 2: Prüfen, ob WSL2 diesen Windows-Endpunkt erreichen kann
 
-Testen Sie von WSL2 aus genau die Adresse, die Sie in `cdpUrl` verwenden möchten:
+Testen Sie von WSL2 aus die genaue Adresse, die Sie in `cdpUrl` verwenden möchten:
 
 ```bash
 curl http://WINDOWS_HOST_OR_IP:9222/json/version
@@ -116,20 +116,20 @@ curl http://WINDOWS_HOST_OR_IP:9222/json/list
 
 Gutes Ergebnis:
 
-- `/json/version` gibt JSON mit Metadaten zu Browser / Protocol-Version zurück
+- `/json/version` gibt JSON mit Browser-/Protocol-Version-Metadaten zurück
 - `/json/list` gibt JSON zurück (ein leeres Array ist in Ordnung, wenn keine Seiten geöffnet sind)
 
 Wenn das fehlschlägt:
 
 - Windows stellt den Port für WSL2 noch nicht bereit
-- die Adresse ist auf der WSL2-Seite falsch
-- Firewall / Portweiterleitung / lokales Proxying fehlt noch
+- die Adresse ist für die WSL2-Seite falsch
+- Firewall / Port-Forwarding / lokales Proxying fehlt noch
 
-Beheben Sie das, bevor Sie die OpenClaw-Konfiguration anpassen.
+Beheben Sie das, bevor Sie die OpenClaw-Konfiguration anfassen.
 
 ### Schicht 3: Das richtige Browserprofil konfigurieren
 
-Für rohes remote CDP zeigen Sie OpenClaw auf die Adresse, die von WSL2 aus erreichbar ist:
+Für rohes Remote-CDP richten Sie OpenClaw auf die Adresse aus, die von WSL2 aus erreichbar ist:
 
 ```json5
 {
@@ -149,14 +149,14 @@ Für rohes remote CDP zeigen Sie OpenClaw auf die Adresse, die von WSL2 aus erre
 
 Hinweise:
 
-- verwenden Sie die von WSL2 aus erreichbare Adresse, nicht die, die nur unter Windows funktioniert
-- belassen Sie `attachOnly: true` für extern verwaltete Browser
+- verwenden Sie die von WSL2 aus erreichbare Adresse, nicht diejenige, die nur auf Windows funktioniert
+- lassen Sie `attachOnly: true` für extern verwaltete Browser gesetzt
 - `cdpUrl` kann `http://`, `https://`, `ws://` oder `wss://` sein
 - verwenden Sie HTTP(S), wenn OpenClaw `/json/version` erkennen soll
-- verwenden Sie WS(S) nur, wenn der Browser-Provider Ihnen eine direkte DevTools-Socket-URL gibt
+- verwenden Sie WS(S) nur dann, wenn der Browser-Provider Ihnen eine direkte DevTools-Socket-URL gibt
 - testen Sie dieselbe URL mit `curl`, bevor Sie erwarten, dass OpenClaw erfolgreich ist
 
-### Schicht 4: Die Schicht der Control UI getrennt prüfen
+### Schicht 4: Die Control-UI-Schicht getrennt prüfen
 
 Öffnen Sie die UI von Windows aus:
 
@@ -164,15 +164,15 @@ Hinweise:
 
 Prüfen Sie dann:
 
-- der Seitenursprung stimmt mit dem überein, was `gateway.controlUi.allowedOrigins` erwartet
-- Token-Authentifizierung oder Pairing ist korrekt konfiguriert
-- Sie debuggen kein Authentifizierungsproblem der Control UI, als wäre es ein Browserproblem
+- der Seiten-Origin passt zu dem, was `gateway.controlUi.allowedOrigins` erwartet
+- Token-Auth oder Pairing ist korrekt konfiguriert
+- Sie debuggen kein Auth-Problem der Control UI, als wäre es ein Browser-Problem
 
 Hilfreiche Seite:
 
-- [Control UI](/web/control-ui)
+- [Control UI](/de/web/control-ui)
 
-### Schicht 5: Ende-zu-Ende-Browser-Steuerung prüfen
+### Schicht 5: End-to-End-Browser-Steuerung prüfen
 
 Von WSL2 aus:
 
@@ -187,42 +187,48 @@ Gutes Ergebnis:
 - `openclaw browser tabs` gibt das Ziel zurück
 - spätere Aktionen (`snapshot`, `screenshot`, `navigate`) funktionieren mit demselben Profil
 
-## Häufige irreführende Fehler
+## Häufig irreführende Fehler
 
 Behandeln Sie jede Meldung als schichtspezifischen Hinweis:
 
 - `control-ui-insecure-auth`
-  - Problem mit UI-Ursprung / sicherem Kontext, kein CDP-Transportproblem
+  - Problem mit UI-Origin / sicherem Kontext, kein CDP-Transportproblem
 - `token_missing`
-  - Problem mit der Authentifizierungskonfiguration
+  - Problem mit der Auth-Konfiguration
 - `pairing required`
   - Problem mit der Gerätefreigabe
 - `Remote CDP for profile "remote" is not reachable`
-  - WSL2 kann die konfigurierte `cdpUrl` nicht erreichen
+  - WSL2 kann das konfigurierte `cdpUrl` nicht erreichen
 - `Browser attachOnly is enabled and CDP websocket for profile "remote" is not reachable`
   - der HTTP-Endpunkt hat geantwortet, aber der DevTools-WebSocket konnte trotzdem nicht geöffnet werden
-- veraltete Viewport-/Dark-Mode-/Locale-/Offline-Überschreibungen nach einer Remote-Sitzung
+- veraltete Viewport-/Dark-Mode-/Locale-/Offline-Overrides nach einer Remote-Sitzung
   - führen Sie `openclaw browser stop --browser-profile remote` aus
-  - dies schließt die aktive Steuerungssitzung und gibt den Emulationszustand von Playwright/CDP frei, ohne das Gateway oder den externen Browser neu zu starten
+  - dies schließt die aktive Steuerungssitzung und gibt den Emulationsstatus von Playwright/CDP frei, ohne das Gateway oder den externen Browser neu zu starten
 - `gateway timeout after 1500ms`
-  - oft immer noch ein Problem mit CDP-Erreichbarkeit oder ein langsamer/nicht erreichbarer Remote-Endpunkt
+  - oft weiterhin CDP-Erreichbarkeit oder ein langsamer/nicht erreichbarer Remote-Endpunkt
 - `No Chrome tabs found for profile="user"`
-  - lokales Chrome-MCP-Profil ausgewählt, obwohl keine host-lokalen Tabs verfügbar sind
+  - lokales Chrome-MCP-Profil ausgewählt, obwohl keine hostlokalen Tabs verfügbar sind
 
-## Schnelle Checkliste zur Triage
+## Schnelle Triage-Checkliste
 
-1. Windows: funktioniert `curl http://127.0.0.1:9222/json/version`?
-2. WSL2: funktioniert `curl http://WINDOWS_HOST_OR_IP:9222/json/version`?
-3. OpenClaw-Konfiguration: verwendet `browser.profiles.<name>.cdpUrl` genau diese von WSL2 aus erreichbare Adresse?
-4. Control UI: öffnen Sie `http://127.0.0.1:18789/` statt einer LAN-IP?
-5. Versuchen Sie, `existing-session` über WSL2 und Windows hinweg zu verwenden statt rohem remote CDP?
+1. Windows: Funktioniert `curl http://127.0.0.1:9222/json/version`?
+2. WSL2: Funktioniert `curl http://WINDOWS_HOST_OR_IP:9222/json/version`?
+3. OpenClaw-Konfiguration: Verwendet `browser.profiles.<name>.cdpUrl` genau diese von WSL2 aus erreichbare Adresse?
+4. Control UI: Öffnen Sie `http://127.0.0.1:18789/` statt einer LAN-IP?
+5. Versuchen Sie, `existing-session` über WSL2 und Windows hinweg statt rohem Remote-CDP zu verwenden?
 
-## Praktische Schlussfolgerung
+## Praktische Erkenntnis
 
-Das Setup ist normalerweise praktikabel. Der schwierige Teil ist, dass Browser-Transport, Ursprungssicherheit der Control UI und Token/Pairing jeweils unabhängig voneinander fehlschlagen können, während sie aus Nutzersicht ähnlich aussehen.
+Das Setup ist normalerweise praktikabel. Der schwierige Teil ist, dass Browser-Transport, Origin-Sicherheit der Control UI und Token/Pairing jeweils unabhängig voneinander ausfallen können, obwohl sie aus Sicht des Benutzers ähnlich aussehen.
 
 Im Zweifel:
 
 - prüfen Sie zuerst den Windows-Chrome-Endpunkt lokal
-- prüfen Sie denselben Endpunkt danach von WSL2 aus
-- debuggen Sie erst dann die OpenClaw-Konfiguration oder die Authentifizierung der Control UI
+- prüfen Sie zweitens denselben Endpunkt von WSL2 aus
+- debuggen Sie erst dann OpenClaw-Konfiguration oder Control-UI-Auth
+
+## Verwandt
+
+- [Browser](/de/tools/browser)
+- [Browser login](/de/tools/browser-login)
+- [Browser Linux troubleshooting](/de/tools/browser-linux-troubleshooting)

@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Sie müssen OpenClaw-Transportdaten lokal zum Debuggen aufzeichnen.
-    - Sie möchten Debug-Proxy-Sitzungen, Blobs oder integrierte Query-Presets prüfen.
+    - Sie müssen OpenClaw-Transportdatenverkehr lokal zur Fehlerbehebung mitschneiden
+    - Sie möchten Debug-Proxy-Sitzungen, Blobs oder integrierte Abfrage-Presets untersuchen
 summary: CLI-Referenz für `openclaw proxy`, den lokalen Debug-Proxy und Capture-Inspector
-title: proxy
+title: Proxy
 x-i18n:
-    generated_at: "2026-04-23T14:00:51Z"
+    generated_at: "2026-04-24T06:32:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 274de676a558153be85e345917c67647eb7e755b01869bc29e1effba66a7e828
+    source_hash: 7af5c596fb36f67e3fcffaff14dcbb4eabbcff0b95174ac6058a097ec9fd715f
     source_path: cli/proxy.md
     workflow: 15
 ---
 
 # `openclaw proxy`
 
-Den lokalen expliziten Debug-Proxy ausführen und aufgezeichneten Datenverkehr prüfen.
+Den lokalen expliziten Debug-Proxy ausführen und mitgeschnittenen Datenverkehr untersuchen.
 
 Dies ist ein Debugging-Befehl für Untersuchungen auf Transportebene. Er kann einen
-lokalen Proxy starten, einen Child-Befehl mit aktivierter Aufzeichnung ausführen, Aufzeichnungs-
-sitzungen auflisten, häufige Verkehrsmuster abfragen, aufgezeichnete Blobs lesen und lokale
-Aufzeichnungsdaten löschen.
+lokalen Proxy starten, einen untergeordneten Befehl mit aktiviertem Mitschnitt ausführen, Capture-Sitzungen auflisten,
+häufige Verkehrsmuster abfragen, mitgeschnittene Blobs lesen und lokale Capture-
+Daten bereinigen.
 
 ## Befehle
 
@@ -34,7 +34,7 @@ openclaw proxy blob --id <blobId>
 openclaw proxy purge
 ```
 
-## Query-Presets
+## Abfrage-Presets
 
 `openclaw proxy query --preset <name>` akzeptiert:
 
@@ -49,4 +49,9 @@ openclaw proxy purge
 
 - `start` verwendet standardmäßig `127.0.0.1`, sofern `--host` nicht gesetzt ist.
 - `run` startet einen lokalen Debug-Proxy und führt dann den Befehl nach `--` aus.
-- Aufzeichnungen sind lokale Debugging-Daten; verwenden Sie `openclaw proxy purge`, wenn Sie fertig sind.
+- Captures sind lokale Debugging-Daten; verwenden Sie `openclaw proxy purge`, wenn Sie fertig sind.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Trusted Proxy Auth](/de/gateway/trusted-proxy-auth)

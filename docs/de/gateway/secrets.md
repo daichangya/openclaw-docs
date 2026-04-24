@@ -1,89 +1,87 @@
 ---
 read_when:
-    - SecretRefs für Provider-Credentials und `auth-profiles.json`-Refs konfigurieren
-    - '`reload`, `audit`, `configure` und `apply` für Secrets sicher in Produktion betreiben'
-    - Startup-Fail-Fast, Inactive-Surface-Filterung und Last-Known-Good-Verhalten verstehen
-summary: 'Secrets-Management: SecretRef-Vertrag, Verhalten von Runtime-Snapshots und sichere einseitige Bereinigung'
+    - SecretRefs für Provider-Zugangsdaten und `auth-profiles.json`-Referenzen konfigurieren
+    - Secrets-Reload, Audit, Konfiguration und Apply sicher in Produktion betreiben
+    - Start-Fail-Fast, Filterung inaktiver Oberflächen und Last-Known-Good-Verhalten verstehen
+summary: 'Secrets Management: SecretRef-Vertrag, Verhalten von Runtime-Snapshots und sicheres einseitiges Scrubbing'
 title: Secrets Management
 x-i18n:
-    generated_at: "2026-04-05T12:44:31Z"
+    generated_at: "2026-04-24T06:39:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b91778cb7801fe24f050c15c0a9dd708dda91cb1ce86096e6bae57ebb6e0d41d
+    source_hash: 18e21f63bbf1815b7166dfe123900575754270de94113b446311d73dfd4f2343
     source_path: gateway/secrets.md
     workflow: 15
 ---
 
-# Secrets Management
+OpenClaw unterstützt additive SecretRefs, damit unterstützte Zugangsdaten nicht als Klartext in der Konfiguration gespeichert werden müssen.
 
-OpenClaw unterstützt additive SecretRefs, sodass unterstützte Credentials nicht als Klartext in der Konfiguration gespeichert werden müssen.
-
-Klartext funktioniert weiterhin. SecretRefs sind pro Credential ein Opt-in.
+Klartext funktioniert weiterhin. SecretRefs sind pro Zugangsdatenfeld ein Opt-in.
 
 ## Ziele und Runtime-Modell
 
-Secrets werden in einen In-Memory-Runtime-Snapshot aufgelöst.
+Secrets werden in einen Runtime-Snapshot im Arbeitsspeicher aufgelöst.
 
 - Die Auflösung erfolgt eager während der Aktivierung, nicht lazy auf Request-Pfaden.
-- Der Start schlägt schnell fehl, wenn ein effektiv aktiver SecretRef nicht aufgelöst werden kann.
-- Reload verwendet einen atomaren Austausch: vollständiger Erfolg oder Beibehaltung des zuletzt bekannten funktionierenden Snapshots.
-- Verstöße gegen die SecretRef-Richtlinie (zum Beispiel Auth-Profile im OAuth-Modus in Kombination mit SecretRef-Eingaben) lassen die Aktivierung vor dem Austausch des Runtime-Snapshots fehlschlagen.
-- Runtime-Requests lesen nur aus dem aktiven In-Memory-Snapshot.
-- Nach der ersten erfolgreichen Konfigurationsaktivierung/-ladung lesen Runtime-Codepfade weiter aus diesem aktiven In-Memory-Snapshot, bis ein erfolgreicher Reload ihn austauscht.
-- Pfade für ausgehende Zustellung lesen ebenfalls aus diesem aktiven Snapshot (zum Beispiel Discord-Antwort-/Thread-Zustellung und Telegram-Aktionssendungen); sie lösen SecretRefs nicht bei jeder Sendung neu auf.
+- Der Start schlägt sofort fehl, wenn ein effektiv aktiver SecretRef nicht aufgelöst werden kann.
+- Reload verwendet einen atomaren Austausch: vollständiger Erfolg oder Beibehaltung des Last-Known-Good-Snapshots.
+- Verstöße gegen die SecretRef-Richtlinie (zum Beispiel Auth-Profile im OAuth-Modus kombiniert mit SecretRef-Eingaben) lassen die Aktivierung vor dem Runtime-Swap fehlschlagen.
+- Runtime-Requests lesen nur aus dem aktiven Snapshot im Arbeitsspeicher.
+- Nach der ersten erfolgreichen Aktivierung/Ladung der Konfiguration lesen Runtime-Codepfade weiterhin aus diesem aktiven Snapshot im Arbeitsspeicher, bis ein erfolgreicher Reload ihn austauscht.
+- Pfade für ausgehende Zustellung lesen ebenfalls aus diesem aktiven Snapshot (zum Beispiel Discord-Reply-/Thread-Zustellung und Telegram-Aktionssendungen); sie lösen SecretRefs nicht bei jedem Senden erneut auf.
 
-Dadurch bleiben Ausfälle von Secret-Providern von heißen Request-Pfaden fern.
+So bleiben Ausfälle von Secret-Providern von heißen Request-Pfaden fern.
 
-## Active-Surface-Filterung
+## Filterung aktiver Oberflächen
 
 SecretRefs werden nur auf effektiv aktiven Oberflächen validiert.
 
-- Aktivierte Oberflächen: Nicht aufgelöste Refs blockieren Start/Reload.
-- Inaktive Oberflächen: Nicht aufgelöste Refs blockieren Start/Reload nicht.
-- Inaktive Refs erzeugen nicht fatale Diagnosen mit dem Code `SECRETS_REF_IGNORED_INACTIVE_SURFACE`.
+- Aktivierte Oberflächen: nicht aufgelöste Referenzen blockieren Start/Reload.
+- Inaktive Oberflächen: nicht aufgelöste Referenzen blockieren Start/Reload nicht.
+- Inaktive Referenzen erzeugen nicht fatale Diagnosen mit dem Code `SECRETS_REF_IGNORED_INACTIVE_SURFACE`.
 
 Beispiele für inaktive Oberflächen:
 
 - Deaktivierte Kanal-/Kontoeinträge.
-- Credentials auf oberster Kanalschicht, die kein aktiviertes Konto erbt.
+- Zugangsdaten eines Kanals auf oberster Ebene, die von keinem aktivierten Konto geerbt werden.
 - Deaktivierte Tool-/Feature-Oberflächen.
-- Websuch-spezifische Provider-Schlüssel, die nicht von `tools.web.search.provider` ausgewählt sind.
-  Im Auto-Modus (Provider nicht gesetzt) werden Schlüssel entsprechend ihrer Priorität für die automatische Provider-Erkennung konsultiert, bis einer erfolgreich aufgelöst wird.
+- Providerspezifische Schlüssel für die Websuche, die nicht von `tools.web.search.provider` ausgewählt werden.
+  Im Auto-Modus (Provider nicht gesetzt) werden Schlüssel in Prioritätsreihenfolge für die automatische Provider-Erkennung geprüft, bis einer aufgelöst wird.
   Nach der Auswahl werden Schlüssel nicht ausgewählter Provider als inaktiv behandelt, bis sie ausgewählt werden.
-- SSH-Auth-Material für Sandboxen (`agents.defaults.sandbox.ssh.identityData`,
+- SSH-Authentifizierungsmaterial für die Sandbox (`agents.defaults.sandbox.ssh.identityData`,
   `certificateData`, `knownHostsData` sowie Überschreibungen pro Agent) ist nur aktiv,
-  wenn das effektive Sandbox-Backend `ssh` für den Standard-Agenten oder einen aktivierten Agenten ist.
-- SecretRefs für `gateway.remote.token` / `gateway.remote.password` sind aktiv, wenn eine dieser Bedingungen wahr ist:
+  wenn das effektive Sandbox-Backend für den Standardagenten oder einen aktivierten Agenten `ssh` ist.
+- SecretRefs unter `gateway.remote.token` / `gateway.remote.password` sind aktiv, wenn eine dieser Bedingungen wahr ist:
   - `gateway.mode=remote`
   - `gateway.remote.url` ist konfiguriert
   - `gateway.tailscale.mode` ist `serve` oder `funnel`
   - Im lokalen Modus ohne diese Remote-Oberflächen:
-    - `gateway.remote.token` ist aktiv, wenn Token-Auth gewinnen kann und kein Env-/Auth-Token konfiguriert ist.
-    - `gateway.remote.password` ist nur aktiv, wenn Passwort-Auth gewinnen kann und kein Env-/Auth-Passwort konfiguriert ist.
-- SecretRefs für `gateway.auth.token` sind für die Startup-Auth-Auflösung inaktiv, wenn `OPENCLAW_GATEWAY_TOKEN` gesetzt ist, weil Eingaben über Env-Tokens für diese Runtime Vorrang haben.
+    - `gateway.remote.token` ist aktiv, wenn Token-Authentifizierung gewinnen kann und kein Env-/Auth-Token konfiguriert ist.
+    - `gateway.remote.password` ist nur aktiv, wenn Passwortauthentifizierung gewinnen kann und kein Env-/Auth-Passwort konfiguriert ist.
+- SecretRef unter `gateway.auth.token` ist für die Auflösung der Start-Authentifizierung inaktiv, wenn `OPENCLAW_GATEWAY_TOKEN` gesetzt ist, weil die Token-Eingabe aus der Umgebung für diese Runtime Vorrang hat.
 
-## Diagnosen der Gateway-Auth-Oberfläche
+## Diagnosen zur Gateway-Authentifizierungsoberfläche
 
-Wenn ein SecretRef auf `gateway.auth.token`, `gateway.auth.password`,
-`gateway.remote.token` oder `gateway.remote.password` konfiguriert ist, protokolliert Gateway-Startup/Reload den
-Status der Oberfläche explizit:
+Wenn ein SecretRef unter `gateway.auth.token`, `gateway.auth.password`,
+`gateway.remote.token` oder `gateway.remote.password` konfiguriert ist, protokolliert Gateway beim Start/Reload den
+Zustand der Oberfläche explizit:
 
-- `active`: Der SecretRef ist Teil der effektiven Auth-Oberfläche und muss aufgelöst werden.
-- `inactive`: Der SecretRef wird für diese Runtime ignoriert, weil eine andere Auth-Oberfläche gewinnt oder
-  weil Remote-Auth deaktiviert/nicht aktiv ist.
+- `active`: der SecretRef ist Teil der effektiven Authentifizierungsoberfläche und muss aufgelöst werden.
+- `inactive`: der SecretRef wird für diese Runtime ignoriert, weil eine andere Authentifizierungsoberfläche gewinnt oder
+  weil Remote-Authentifizierung deaktiviert/nicht aktiv ist.
 
-Diese Einträge werden mit `SECRETS_GATEWAY_AUTH_SURFACE` protokolliert und enthalten den durch die
-Active-Surface-Richtlinie verwendeten Grund, sodass Sie sehen können, warum ein Credential als aktiv oder inaktiv behandelt wurde.
+Diese Einträge werden mit `SECRETS_GATEWAY_AUTH_SURFACE` protokolliert und enthalten den vom
+Active-Surface-Policy verwendeten Grund, sodass Sie sehen können, warum ein Credential als aktiv oder inaktiv behandelt wurde.
 
-## Preflight für Onboarding-Referenzen
+## Vorabprüfung von Referenzen beim Onboarding
 
-Wenn das Onboarding im interaktiven Modus läuft und Sie SecretRef-Speicherung wählen, führt OpenClaw vor dem Speichern eine Preflight-Validierung aus:
+Wenn das Onboarding im interaktiven Modus läuft und Sie SecretRef-Speicherung wählen, führt OpenClaw vor dem Speichern eine Vorabvalidierung aus:
 
-- Env-Refs: validiert den Namen der Env-Variable und bestätigt, dass während des Setups ein nicht leerer Wert sichtbar ist.
-- Provider-Refs (`file` oder `exec`): validiert die Providerauswahl, löst `id` auf und prüft den Typ des aufgelösten Werts.
-- Quickstart-Wiederverwendungspfad: Wenn `gateway.auth.token` bereits ein SecretRef ist, löst das Onboarding ihn vor Probe-/Dashboard-Bootstrap auf (für `env`-, `file`- und `exec`-Refs) unter Verwendung derselben Fail-Fast-Grenze.
+- Env-Referenzen: validiert den Namen der Umgebungsvariablen und bestätigt, dass während der Einrichtung ein nicht leerer Wert sichtbar ist.
+- Provider-Referenzen (`file` oder `exec`): validiert die Provider-Auswahl, löst `id` auf und prüft den Typ des aufgelösten Werts.
+- Wiederverwendung über Quickstart-Pfad: wenn `gateway.auth.token` bereits ein SecretRef ist, löst OpenClaw ihn vor Probe-/Dashboard-Bootstrap auf (für Referenzen `env`, `file` und `exec`) und verwendet dabei dieselbe Fail-Fast-Schranke.
 
-Wenn die Validierung fehlschlägt, zeigt das Onboarding den Fehler an und lässt Sie es erneut versuchen.
+Wenn die Validierung fehlschlägt, zeigt das Onboarding den Fehler an und ermöglicht einen erneuten Versuch.
 
 ## SecretRef-Vertrag
 
@@ -101,8 +99,8 @@ Verwenden Sie überall dieselbe Objektform:
 
 Validierung:
 
-- `provider` muss `^[a-z][a-z0-9_-]{0,63}$` entsprechen
-- `id` muss `^[A-Z][A-Z0-9_]{0,127}$` entsprechen
+- `provider` muss auf `^[a-z][a-z0-9_-]{0,63}$` passen
+- `id` muss auf `^[A-Z][A-Z0-9_]{0,127}$` passen
 
 ### `source: "file"`
 
@@ -112,7 +110,7 @@ Validierung:
 
 Validierung:
 
-- `provider` muss `^[a-z][a-z0-9_-]{0,63}$` entsprechen
+- `provider` muss auf `^[a-z][a-z0-9_-]{0,63}$` passen
 - `id` muss ein absoluter JSON-Pointer sein (`/...`)
 - RFC6901-Escaping in Segmenten: `~` => `~0`, `/` => `~1`
 
@@ -124,9 +122,9 @@ Validierung:
 
 Validierung:
 
-- `provider` muss `^[a-z][a-z0-9_-]{0,63}$` entsprechen
-- `id` muss `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$` entsprechen
-- `id` darf `.` oder `..` nicht als slash-getrennte Pfadsegmente enthalten (zum Beispiel wird `a/../b` abgelehnt)
+- `provider` muss auf `^[a-z][a-z0-9_-]{0,63}$` passen
+- `id` muss auf `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$` passen
+- `id` darf keine mit Slashes getrennten Pfadsegmente `.` oder `..` enthalten (zum Beispiel wird `a/../b` abgelehnt)
 
 ## Provider-Konfiguration
 
@@ -167,32 +165,32 @@ Definieren Sie Provider unter `secrets.providers`:
 ### Env-Provider
 
 - Optionale Allowlist über `allowlist`.
-- Fehlende/leere Env-Werte lassen die Auflösung fehlschlagen.
+- Fehlende/leere Umgebungswerte lassen die Auflösung fehlschlagen.
 
 ### File-Provider
 
 - Liest lokale Datei aus `path`.
-- `mode: "json"` erwartet ein JSON-Objekt als Payload und löst `id` als Pointer auf.
-- `mode: "singleValue"` erwartet die Ref-ID `"value"` und gibt den Dateiinhalt zurück.
-- Der Pfad muss Eigentums-/Berechtigungsprüfungen bestehen.
-- Hinweis zu Windows-Fail-Closed: Wenn die ACL-Verifizierung für einen Pfad nicht verfügbar ist, schlägt die Auflösung fehl. Setzen Sie `allowInsecurePath: true` nur für vertrauenswürdige Pfade auf diesem Provider, um die Pfadsicherheitsprüfungen zu umgehen.
+- `mode: "json"` erwartet eine JSON-Objektnutzlast und löst `id` als Pointer auf.
+- `mode: "singleValue"` erwartet die Referenz-ID `"value"` und gibt den Dateiinhalt zurück.
+- Der Pfad muss Prüfungen zu Eigentümerschaft/Berechtigungen bestehen.
+- Hinweis zu Windows mit Fail-Closed: Wenn ACL-Prüfung für einen Pfad nicht verfügbar ist, schlägt die Auflösung fehl. Nur für vertrauenswürdige Pfade können Sie auf diesem Provider `allowInsecurePath: true` setzen, um Pfadsicherheitsprüfungen zu umgehen.
 
 ### Exec-Provider
 
-- Führt den konfigurierten absoluten Binärpfad ohne Shell aus.
+- Führt den konfigurierten absoluten Binärpfad aus, ohne Shell.
 - Standardmäßig muss `command` auf eine reguläre Datei zeigen (kein Symlink).
-- Setzen Sie `allowSymlinkCommand: true`, um Symlink-Befehlspfade zuzulassen (zum Beispiel Homebrew-Shims). OpenClaw validiert den aufgelösten Zielpfad.
+- Setzen Sie `allowSymlinkCommand: true`, um Pfade zu Befehlen mit Symlink zuzulassen (zum Beispiel Homebrew-Shims). OpenClaw validiert den aufgelösten Zielpfad.
 - Kombinieren Sie `allowSymlinkCommand` mit `trustedDirs` für Paketmanager-Pfade (zum Beispiel `["/opt/homebrew"]`).
-- Unterstützt Timeout, Timeout bei fehlender Ausgabe, Limits für Ausgabebytes, Env-Allowlist und vertrauenswürdige Verzeichnisse.
-- Hinweis zu Windows-Fail-Closed: Wenn die ACL-Verifizierung für den Befehlspfad nicht verfügbar ist, schlägt die Auflösung fehl. Setzen Sie `allowInsecurePath: true` nur für vertrauenswürdige Pfade auf diesem Provider, um die Pfadsicherheitsprüfungen zu umgehen.
+- Unterstützt Timeout, Timeout bei fehlender Ausgabe, Byte-Limits für Ausgabe, Env-Allowlist und vertrauenswürdige Verzeichnisse.
+- Hinweis zu Windows mit Fail-Closed: Wenn ACL-Prüfung für den Befehlspfad nicht verfügbar ist, schlägt die Auflösung fehl. Nur für vertrauenswürdige Pfade können Sie auf diesem Provider `allowInsecurePath: true` setzen, um Pfadsicherheitsprüfungen zu umgehen.
 
-Request-Payload (stdin):
+Request-Nutzlast (stdin):
 
 ```json
 { "protocolVersion": 1, "provider": "vault", "ids": ["providers/openai/apiKey"] }
 ```
 
-Response-Payload (stdout):
+Response-Nutzlast (stdout):
 
 ```jsonc
 { "protocolVersion": 1, "values": { "providers/openai/apiKey": "<openai-api-key>" } } // pragma: allowlist secret
@@ -208,7 +206,7 @@ Optionale Fehler pro ID:
 }
 ```
 
-## Beispiele für Exec-Integrationen
+## Beispiele für Exec-Integration
 
 ### 1Password CLI
 
@@ -219,7 +217,7 @@ Optionale Fehler pro ID:
       onepassword_openai: {
         source: "exec",
         command: "/opt/homebrew/bin/op",
-        allowSymlinkCommand: true, // für über Homebrew verlinkte Binärdateien erforderlich
+        allowSymlinkCommand: true, // erforderlich für Homebrew-binärdateien mit Symlink
         trustedDirs: ["/opt/homebrew"],
         args: ["read", "op://Personal/OpenClaw QA API Key/password"],
         passEnv: ["HOME"],
@@ -248,7 +246,7 @@ Optionale Fehler pro ID:
       vault_openai: {
         source: "exec",
         command: "/opt/homebrew/bin/vault",
-        allowSymlinkCommand: true, // für über Homebrew verlinkte Binärdateien erforderlich
+        allowSymlinkCommand: true, // erforderlich für Homebrew-binärdateien mit Symlink
         trustedDirs: ["/opt/homebrew"],
         args: ["kv", "get", "-field=OPENAI_API_KEY", "secret/openclaw"],
         passEnv: ["VAULT_ADDR", "VAULT_TOKEN"],
@@ -277,7 +275,7 @@ Optionale Fehler pro ID:
       sops_openai: {
         source: "exec",
         command: "/opt/homebrew/bin/sops",
-        allowSymlinkCommand: true, // für über Homebrew verlinkte Binärdateien erforderlich
+        allowSymlinkCommand: true, // erforderlich für Homebrew-binärdateien mit Symlink
         trustedDirs: ["/opt/homebrew"],
         args: ["-d", "--extract", '["providers"]["openai"]["apiKey"]', "/path/to/secrets.enc.json"],
         passEnv: ["SOPS_AGE_KEY_FILE"],
@@ -297,9 +295,9 @@ Optionale Fehler pro ID:
 }
 ```
 
-## MCP-Server-Umgebungsvariablen
+## Umgebungsvariablen für MCP-Server
 
-MCP-Server-Env-Variablen, die über `plugins.entries.acpx.config.mcpServers` konfiguriert werden, unterstützen SecretInput. Dadurch bleiben API-Keys und Tokens aus der Klartextkonfiguration heraus:
+Über `plugins.entries.acpx.config.mcpServers` konfigurierte Umgebungsvariablen von MCP-Servern unterstützen SecretInput. So bleiben API-Keys und Tokens aus der Klartextkonfiguration heraus:
 
 ```json5
 {
@@ -328,11 +326,11 @@ MCP-Server-Env-Variablen, die über `plugins.entries.acpx.config.mcpServers` kon
 }
 ```
 
-Klartext-String-Werte funktionieren weiterhin. Env-Template-Refs wie `${MCP_SERVER_API_KEY}` und SecretRef-Objekte werden während der Gateway-Aktivierung aufgelöst, bevor der MCP-Server-Prozess gestartet wird. Wie bei anderen SecretRef-Oberflächen blockieren nicht aufgelöste Refs die Aktivierung nur, wenn das `acpx`-Plugin effektiv aktiv ist.
+Klartext-String-Werte funktionieren weiterhin. Env-Template-Referenzen wie `${MCP_SERVER_API_KEY}` und SecretRef-Objekte werden während der Gateway-Aktivierung aufgelöst, bevor der MCP-Server-Prozess gestartet wird. Wie bei anderen SecretRef-Oberflächen blockieren nicht aufgelöste Referenzen die Aktivierung nur dann, wenn das Plugin `acpx` effektiv aktiv ist.
 
-## SSH-Auth-Material für Sandboxen
+## SSH-Authentifizierungsmaterial für die Sandbox
 
-Das Core-`ssh`-Sandbox-Backend unterstützt ebenfalls SecretRefs für SSH-Auth-Material:
+Das Core-Backend `ssh` für die Sandbox unterstützt ebenfalls SecretRefs für SSH-Authentifizierungsmaterial:
 
 ```json5
 {
@@ -355,91 +353,91 @@ Das Core-`ssh`-Sandbox-Backend unterstützt ebenfalls SecretRefs für SSH-Auth-M
 
 Runtime-Verhalten:
 
-- OpenClaw löst diese Refs während der Sandbox-Aktivierung auf, nicht lazy bei jedem SSH-Aufruf.
-- Aufgelöste Werte werden in temporäre Dateien mit restriktiven Berechtigungen geschrieben und in der generierten SSH-Konfiguration verwendet.
-- Wenn das effektive Sandbox-Backend nicht `ssh` ist, bleiben diese Refs inaktiv und blockieren den Start nicht.
+- OpenClaw löst diese Referenzen während der Sandbox-Aktivierung auf, nicht lazy bei jedem SSH-Aufruf.
+- Aufgelöste Werte werden mit restriktiven Berechtigungen in temporäre Dateien geschrieben und in der generierten SSH-Konfiguration verwendet.
+- Wenn das effektive Sandbox-Backend nicht `ssh` ist, bleiben diese Referenzen inaktiv und blockieren den Start nicht.
 
 ## Unterstützte Credential-Oberfläche
 
-Kanonisch unterstützte und nicht unterstützte Credentials sind aufgeführt unter:
+Kanonische unterstützte und nicht unterstützte Zugangsdaten sind aufgeführt unter:
 
-- [SecretRef Credential Surface](/reference/secretref-credential-surface)
+- [SecretRef Credential Surface](/de/reference/secretref-credential-surface)
 
-Zur Runtime geprägte oder rotierende Credentials sowie OAuth-Refresh-Material sind absichtlich von der schreibgeschützten SecretRef-Auflösung ausgeschlossen.
+Zur Laufzeit erzeugte oder rotierende Zugangsdaten und OAuth-Refresh-Material sind absichtlich von der schreibgeschützten SecretRef-Auflösung ausgeschlossen.
 
 ## Erforderliches Verhalten und Priorität
 
-- Feld ohne Ref: unverändert.
-- Feld mit Ref: auf aktiven Oberflächen während der Aktivierung erforderlich.
-- Wenn sowohl Klartext als auch Ref vorhanden sind, hat auf unterstützten Prioritätspfaden der Ref Vorrang.
-- Das Redaction-Sentinel `__OPENCLAW_REDACTED__` ist für interne Konfigurations-Redaktion/Wiederherstellung reserviert und wird als wörtlich eingereichte Konfigurationsdaten abgelehnt.
+- Feld ohne Referenz: unverändert.
+- Feld mit Referenz: auf aktiven Oberflächen während der Aktivierung erforderlich.
+- Wenn sowohl Klartext als auch Referenz vorhanden sind, hat die Referenz auf unterstützten Prioritätspfaden Vorrang.
+- Das Redaction-Sentinel `__OPENCLAW_REDACTED__` ist für interne Konfigurations-Redaction/-Wiederherstellung reserviert und wird als wörtlich eingereichte Konfigurationsdaten abgelehnt.
 
 Warn- und Audit-Signale:
 
 - `SECRETS_REF_OVERRIDES_PLAINTEXT` (Runtime-Warnung)
-- `REF_SHADOWED` (Audit-Finding, wenn Credentials in `auth-profiles.json` Vorrang vor Refs in `openclaw.json` haben)
+- `REF_SHADOWED` (Audit-Befund, wenn Zugangsdaten in `auth-profiles.json` Vorrang vor Referenzen in `openclaw.json` haben)
 
 Kompatibilitätsverhalten für Google Chat:
 
 - `serviceAccountRef` hat Vorrang vor Klartext-`serviceAccount`.
-- Der Klartextwert wird ignoriert, wenn ein benachbarter Ref gesetzt ist.
+- Der Klartextwert wird ignoriert, wenn die benachbarte Referenz gesetzt ist.
 
 ## Aktivierungsauslöser
 
-Die Secret-Aktivierung läuft bei:
+Secret-Aktivierung läuft bei:
 
-- Startup (Preflight plus finale Aktivierung)
-- Hot-Apply-Pfad beim Reload der Konfiguration
-- Restart-Check-Pfad beim Reload der Konfiguration
+- Start (Vorabprüfung plus endgültige Aktivierung)
+- Hot-Apply-Pfad beim Konfigurations-Reload
+- Restart-Check-Pfad beim Konfigurations-Reload
 - Manuellem Reload über `secrets.reload`
-- Gateway-Konfigurationsschreib-RPC-Preflight (`config.set` / `config.apply` / `config.patch`) für die Auflösbarkeit von SecretRefs auf aktiven Oberflächen innerhalb des übermittelten Konfigurations-Payloads vor dem Persistieren der Änderungen
+- Vorabprüfung bei Gateway-Konfigurations-Schreib-RPC (`config.set` / `config.apply` / `config.patch`) für die Auflösbarkeit von SecretRefs auf aktiven Oberflächen innerhalb der übergebenen Konfigurationsnutzlast, bevor Änderungen persistiert werden
 
 Aktivierungsvertrag:
 
 - Erfolg tauscht den Snapshot atomar aus.
-- Startup-Fehler bricht den Gateway-Start ab.
-- Runtime-Reload-Fehler behält den zuletzt bekannten funktionierenden Snapshot bei.
-- Write-RPC-Preflight-Fehler lehnt die übermittelte Konfiguration ab und lässt sowohl die Datenträgerkonfiguration als auch den aktiven Runtime-Snapshot unverändert.
-- Das Bereitstellen eines expliziten kanalspezifischen Tokens pro Aufruf für einen ausgehenden Helper-/Tool-Aufruf löst keine SecretRef-Aktivierung aus; Aktivierungspunkte bleiben Startup, Reload und explizites `secrets.reload`.
+- Ein Fehler beim Start bricht den Gateway-Start ab.
+- Ein Fehler beim Runtime-Reload behält den Last-Known-Good-Snapshot bei.
+- Ein Fehler bei der Vorabprüfung im Write-RPC lehnt die übermittelte Konfiguration ab und lässt sowohl die Konfiguration auf der Festplatte als auch den aktiven Runtime-Snapshot unverändert.
+- Das Bereitstellen eines expliziten kanalbezogenen Tokens pro Aufruf für einen Outbound-Helper-/Tool-Aufruf löst keine SecretRef-Aktivierung aus; Aktivierungspunkte bleiben Start, Reload und explizites `secrets.reload`.
 
-## Signale für degraded und recovered
+## Signale für degradierten und wiederhergestellten Zustand
 
-Wenn die Aktivierung zur Reload-Zeit nach einem gesunden Zustand fehlschlägt, wechselt OpenClaw in einen degraded-Secrets-Zustand.
+Wenn die Aktivierung beim Reload nach einem gesunden Zustand fehlschlägt, geht OpenClaw in einen degradierten Secrets-Zustand über.
 
-Einmalige Systemereignis- und Log-Codes:
+Einmalige System-Event- und Log-Codes:
 
 - `SECRETS_RELOADER_DEGRADED`
 - `SECRETS_RELOADER_RECOVERED`
 
 Verhalten:
 
-- Degraded: Die Runtime behält den zuletzt bekannten funktionierenden Snapshot bei.
-- Recovered: Wird genau einmal nach der nächsten erfolgreichen Aktivierung ausgegeben.
-- Wiederholte Fehler, während bereits degraded, protokollieren Warnungen, spammen aber keine Ereignisse.
-- Startup-Fail-Fast erzeugt keine degraded-Ereignisse, weil die Runtime nie aktiv wurde.
+- Degradiert: Die Runtime behält den Last-Known-Good-Snapshot bei.
+- Wiederhergestellt: Wird einmal nach der nächsten erfolgreichen Aktivierung ausgegeben.
+- Wiederholte Fehler, während bereits ein degradierter Zustand vorliegt, protokollieren Warnungen, erzeugen aber keine Event-Flut.
+- Das Fail-Fast-Verhalten beim Start erzeugt keine degradierten Events, weil die Runtime nie aktiv wurde.
 
 ## Auflösung auf Befehlspfaden
 
-Befehlspfade können sich über Gateway-Snapshot-RPC für unterstützte SecretRef-Auflösung entscheiden.
+Befehlspfade können sich per Gateway-Snapshot-RPC für die unterstützte SecretRef-Auflösung anmelden.
 
 Es gibt zwei grobe Verhaltensweisen:
 
-- Strikte Befehlspfade (zum Beispiel Remote-memory-Pfade von `openclaw memory` und `openclaw qr --remote`, wenn es Remote-Shared-Secret-Refs benötigt) lesen aus dem aktiven Snapshot und schlagen schnell fehl, wenn ein erforderlicher SecretRef nicht verfügbar ist.
-- Schreibgeschützte Befehlspfade (zum Beispiel `openclaw status`, `openclaw status --all`, `openclaw channels status`, `openclaw channels resolve`, `openclaw security audit` und schreibgeschützte Doctor-/Config-Repair-Abläufe) bevorzugen ebenfalls den aktiven Snapshot, degradieren aber statt abzubrechen, wenn ein gezielter SecretRef auf diesem Befehlspfad nicht verfügbar ist.
+- Strikte Befehlspfade (zum Beispiel Remote-Memory-Pfade von `openclaw memory` und `openclaw qr --remote`, wenn gemeinsam genutzte Secret-Referenzen des Remotes benötigt werden) lesen aus dem aktiven Snapshot und schlagen sofort fehl, wenn ein erforderlicher SecretRef nicht verfügbar ist.
+- Schreibgeschützte Befehlspfade (zum Beispiel `openclaw status`, `openclaw status --all`, `openclaw channels status`, `openclaw channels resolve`, `openclaw security audit` und schreibgeschützte Doctor-/Config-Repair-Abläufe) bevorzugen ebenfalls den aktiven Snapshot, degradieren aber statt abzubrechen, wenn ein gezielter SecretRef in diesem Befehlspfad nicht verfügbar ist.
 
-Verhalten bei schreibgeschützten Pfaden:
+Schreibgeschütztes Verhalten:
 
 - Wenn das Gateway läuft, lesen diese Befehle zuerst aus dem aktiven Snapshot.
-- Wenn die Gateway-Auflösung unvollständig ist oder das Gateway nicht verfügbar ist, versuchen sie einen gezielten lokalen Fallback für die spezifische Befehlsoberfläche.
-- Wenn ein gezielter SecretRef weiterhin nicht verfügbar ist, läuft der Befehl mit degradierter schreibgeschützter Ausgabe und expliziten Diagnosen weiter, wie „konfiguriert, aber auf diesem Befehlspfad nicht verfügbar“.
-- Dieses degradierte Verhalten ist nur befehlslokal. Es schwächt nicht Runtime-Startup, Reload oder Sende-/Auth-Pfade.
+- Wenn die Gateway-Auflösung unvollständig ist oder das Gateway nicht verfügbar ist, versuchen sie einen gezielten lokalen Fallback für die jeweilige Befehlsoberfläche.
+- Wenn ein gezielter SecretRef weiterhin nicht verfügbar ist, läuft der Befehl mit degradierter schreibgeschützter Ausgabe weiter und mit expliziten Diagnosen wie „konfiguriert, aber in diesem Befehlspfad nicht verfügbar“.
+- Dieses degradierte Verhalten gilt nur lokal für den Befehl. Es schwächt nicht Start, Reload oder Pfade für Senden/Auth der Runtime.
 
 Weitere Hinweise:
 
-- Die Aktualisierung des Snapshots nach Rotation von Backend-Secrets erfolgt über `openclaw secrets reload`.
-- Die von diesen Befehlspfaden verwendete Gateway-RPC-Methode ist `secrets.resolve`.
+- Die Aktualisierung des Snapshots nach einer Rotation von Backend-Secrets erfolgt über `openclaw secrets reload`.
+- Von diesen Befehlspfaden verwendete Gateway-RPC-Methode: `secrets.resolve`.
 
-## Audit- und Configure-Workflow
+## Workflow für Audit und Konfiguration
 
 Standardablauf für Operatoren:
 
@@ -451,17 +449,17 @@ openclaw secrets audit --check
 
 ### `secrets audit`
 
-Findings umfassen:
+Befunde umfassen:
 
 - Klartextwerte im Ruhezustand (`openclaw.json`, `auth-profiles.json`, `.env` und generierte `agents/*/agent/models.json`)
-- Klartext-Rückstände sensibler Provider-Header in generierten `models.json`-Einträgen
-- nicht aufgelöste Refs
-- Prioritätsabschattung (`auth-profiles.json` hat Vorrang vor Refs in `openclaw.json`)
-- veraltete Rückstände (`auth.json`, OAuth-Erinnerungen)
+- Rückstände sensibler Provider-Header im Klartext in generierten Einträgen von `models.json`
+- nicht aufgelöste Referenzen
+- Schattenbildung durch Priorität (`auth-profiles.json` hat Vorrang vor Referenzen in `openclaw.json`)
+- Legacy-Rückstände (`auth.json`, OAuth-Erinnerungen)
 
 Hinweis zu Exec:
 
-- Standardmäßig überspringt Audit Auflösbarkeitsprüfungen für Exec-SecretRefs, um Seiteneffekte von Befehlen zu vermeiden.
+- Standardmäßig überspringt Audit die Prüfung der Auflösbarkeit von Exec-SecretRefs, um Seiteneffekte durch Befehle zu vermeiden.
 - Verwenden Sie `openclaw secrets audit --allow-exec`, um Exec-Provider während des Audits auszuführen.
 
 Hinweis zu Header-Rückständen:
@@ -470,31 +468,31 @@ Hinweis zu Header-Rückständen:
 
 ### `secrets configure`
 
-Interaktiver Helfer, der:
+Interaktive Hilfe, die:
 
 - zuerst `secrets.providers` konfiguriert (`env`/`file`/`exec`, hinzufügen/bearbeiten/entfernen)
-- Sie unterstützte Felder mit Secrets in `openclaw.json` plus `auth-profiles.json` für einen Agent-Bereich auswählen lässt
-- im Ziel-Picker direkt eine neue `auth-profiles.json`-Zuordnung erstellen kann
-- SecretRef-Details erfasst (`source`, `provider`, `id`)
-- Preflight-Auflösung ausführt
+- Sie unterstützte Felder mit Secrets in `openclaw.json` sowie `auth-profiles.json` für einen Agenten-Scope auswählen lässt
+- direkt in der Zielauswahl eine neue Zuordnung in `auth-profiles.json` erstellen kann
+- Details für SecretRef erfasst (`source`, `provider`, `id`)
+- die Auflösung per Vorabprüfung ausführt
 - sofort anwenden kann
 
 Hinweis zu Exec:
 
-- Preflight überspringt Exec-SecretRef-Prüfungen, sofern `--allow-exec` nicht gesetzt ist.
-- Wenn Sie direkt aus `configure --apply` anwenden und der Plan Exec-Refs/-Provider enthält, lassen Sie `--allow-exec` auch für den Apply-Schritt gesetzt.
+- Die Vorabprüfung überspringt Exec-SecretRef-Prüfungen, sofern `--allow-exec` nicht gesetzt ist.
+- Wenn Sie direkt aus `configure --apply` anwenden und der Plan Exec-Referenzen/-Provider enthält, lassen Sie `--allow-exec` auch für den Apply-Schritt gesetzt.
 
-Hilfreiche Modi:
+Nützliche Modi:
 
 - `openclaw secrets configure --providers-only`
 - `openclaw secrets configure --skip-provider-setup`
 - `openclaw secrets configure --agent <id>`
 
-Standardwerte für `configure apply`:
+Standardverhalten von `configure` beim Anwenden:
 
-- passende statische Credentials aus `auth-profiles.json` für Ziel-Provider bereinigen
-- veraltete statische `api_key`-Einträge aus `auth.json` bereinigen
-- passende bekannte Secret-Zeilen aus `<config-dir>/.env` bereinigen
+- entfernt passende statische Zugangsdaten aus `auth-profiles.json` für die ausgewählten Provider
+- entfernt Legacy-Einträge `api_key` im Klartext aus `auth.json`
+- entfernt passende bekannte Secret-Zeilen aus `<config-dir>/.env`
 
 ### `secrets apply`
 
@@ -509,40 +507,40 @@ openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-
 
 Hinweis zu Exec:
 
-- Dry-Run überspringt Exec-Prüfungen, sofern `--allow-exec` nicht gesetzt ist.
-- Der Schreibmodus lehnt Pläne mit Exec-SecretRefs/-Providern ab, sofern `--allow-exec` nicht gesetzt ist.
+- `dry-run` überspringt Exec-Prüfungen, sofern `--allow-exec` nicht gesetzt ist.
+- Der Schreibmodus lehnt Pläne ab, die Exec-SecretRefs/-Provider enthalten, sofern `--allow-exec` nicht gesetzt ist.
 
-Für Details zum strikten Ziel-/Pfadvertrag und die genauen Ablehnungsregeln siehe:
+Für Details zum strikten Ziel-/Pfadvertrag und zu exakten Ablehnungsregeln siehe:
 
-- [Secrets Apply Plan Contract](/gateway/secrets-plan-contract)
+- [Secrets Apply Plan Contract](/de/gateway/secrets-plan-contract)
 
-## Einseitige Sicherheitsrichtlinie
+## Richtlinie für Einweg-Sicherheit
 
-OpenClaw schreibt absichtlich keine Rollback-Backups, die historische Klartext-Secret-Werte enthalten.
+OpenClaw schreibt absichtlich keine Rollback-Backups, die frühere Klartext-Secret-Werte enthalten.
 
 Sicherheitsmodell:
 
-- Preflight muss vor dem Schreibmodus erfolgreich sein
+- Die Vorabprüfung muss vor dem Schreibmodus erfolgreich sein
 - Runtime-Aktivierung wird vor dem Commit validiert
-- Apply aktualisiert Dateien über atomaren Dateiersatz und Best-Effort-Wiederherstellung bei Fehlern
+- Apply aktualisiert Dateien mit atomarem Dateiersatz und Best-Effort-Wiederherstellung bei Fehlern
 
 ## Hinweise zur Legacy-Auth-Kompatibilität
 
-Für statische Credentials hängt die Runtime nicht mehr von veralteter Auth-Speicherung im Klartext ab.
+Für statische Zugangsdaten hängt die Runtime nicht mehr von Legacy-Auth-Speicherung im Klartext ab.
 
-- Runtime-Quelle für Credentials ist der aufgelöste In-Memory-Snapshot.
-- Veraltete statische `api_key`-Einträge werden bereinigt, wenn sie gefunden werden.
-- OAuth-bezogenes Kompatibilitätsverhalten bleibt getrennt.
+- Die Credential-Quelle der Runtime ist der aufgelöste Snapshot im Arbeitsspeicher.
+- Legacy-Einträge `api_key` im Klartext werden entfernt, wenn sie gefunden werden.
+- Kompatibilitätsverhalten rund um OAuth bleibt getrennt.
 
-## Hinweis zur Web-UI
+## Hinweis zur Web UI
 
-Einige SecretInput-Unions lassen sich im Raw-Editor-Modus leichter konfigurieren als im Formularmodus.
+Einige SecretInput-Unionen lassen sich im Roheditor-Modus einfacher konfigurieren als im Formularmodus.
 
-## Zugehörige Dokumentation
+## Verwandte Dokumentation
 
-- CLI-Befehle: [secrets](/cli/secrets)
-- Details zum Planvertrag: [Secrets Apply Plan Contract](/gateway/secrets-plan-contract)
-- Credential-Oberfläche: [SecretRef Credential Surface](/reference/secretref-credential-surface)
-- Auth-Setup: [Authentication](/gateway/authentication)
-- Sicherheitslage: [Security](/gateway/security)
-- Env-Priorität: [Environment Variables](/help/environment)
+- CLI-Befehle: [secrets](/de/cli/secrets)
+- Details zum Planvertrag: [Secrets Apply Plan Contract](/de/gateway/secrets-plan-contract)
+- Credential-Oberfläche: [SecretRef Credential Surface](/de/reference/secretref-credential-surface)
+- Einrichtung von Auth: [Authentifizierung](/de/gateway/authentication)
+- Sicherheitslage: [Sicherheit](/de/gateway/security)
+- Priorität von Umgebungen: [Umgebungsvariablen](/de/help/environment)

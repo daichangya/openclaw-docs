@@ -1,40 +1,39 @@
 ---
 read_when:
-    - Sie möchten Vercel AI Gateway mit OpenClaw verwenden
-    - Sie benötigen die API-Schlüssel-Umgebungsvariable oder die CLI-Auth-Auswahl
+    - Sie möchten Vercel AI Gateway mit OpenClaw verwenden.
+    - Sie benötigen die API-Key-Umgebungsvariable oder die CLI-Authentifizierungsoption.
 summary: Einrichtung von Vercel AI Gateway (Authentifizierung + Modellauswahl)
 title: Vercel AI Gateway
 x-i18n:
-    generated_at: "2026-04-22T04:27:24Z"
+    generated_at: "2026-04-24T06:56:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 11c0f764d4c35633d0fbfc189bae0fc451dc799002fc1a6d0c84fc73842bbe31
+    source_hash: e1fa1c3c6e44e40d7a1fc89d93ee268c19124b746d4644d58014157be7cceeb9
     source_path: providers/vercel-ai-gateway.md
     workflow: 15
 ---
 
-# Vercel AI Gateway
-
-Das [Vercel AI Gateway](https://vercel.com/ai-gateway) bietet eine einheitliche API, um über einen einzelnen Endpunkt auf Hunderte von Modellen zuzugreifen.
+Das [Vercel AI Gateway](https://vercel.com/ai-gateway) bietet eine einheitliche API, um
+über einen einzigen Endpunkt auf Hunderte von Modellen zuzugreifen.
 
 | Eigenschaft   | Wert                             |
 | ------------- | -------------------------------- |
 | Provider      | `vercel-ai-gateway`              |
 | Auth          | `AI_GATEWAY_API_KEY`             |
-| API           | kompatibel mit Anthropic Messages |
+| API           | kompatibel zu Anthropic Messages |
 | Modellkatalog | automatisch erkannt über `/v1/models` |
 
 <Tip>
-OpenClaw erkennt den Gateway-Katalog `/v1/models` automatisch, sodass
+OpenClaw erkennt den Katalog `/v1/models` des Gateways automatisch, daher enthält
 `/models vercel-ai-gateway` aktuelle Modellreferenzen wie
-`vercel-ai-gateway/openai/gpt-5.4` und
-`vercel-ai-gateway/moonshotai/kimi-k2.6` enthält.
+`vercel-ai-gateway/openai/gpt-5.5` und
+`vercel-ai-gateway/moonshotai/kimi-k2.6`.
 </Tip>
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="API-Schlüssel festlegen">
+  <Step title="Den API-Key setzen">
     Führen Sie das Onboarding aus und wählen Sie die Auth-Option für AI Gateway:
 
     ```bash
@@ -65,7 +64,7 @@ OpenClaw erkennt den Gateway-Katalog `/v1/models` automatisch, sodass
 
 ## Nicht interaktives Beispiel
 
-Für skriptgesteuerte oder CI-Setups übergeben Sie alle Werte in der Befehlszeile:
+Für skriptbasierte oder CI-Setups übergeben Sie alle Werte in der Befehlszeile:
 
 ```bash
 openclaw onboard --non-interactive \
@@ -76,10 +75,11 @@ openclaw onboard --non-interactive \
 
 ## Kurzform für Modell-IDs
 
-OpenClaw akzeptiert Kurzformen von Vercel-Claude-Modellreferenzen und normalisiert sie zur Laufzeit:
+OpenClaw akzeptiert Kurzformen von Vercel-Claude-Modellreferenzen und normalisiert sie zur
+Laufzeit:
 
-| Kurzform-Eingabe                    | Normalisierte Modellreferenz                |
-| ----------------------------------- | ------------------------------------------- |
+| Eingabe in Kurzform                | Normalisierte Modellreferenz                |
+| ---------------------------------- | ------------------------------------------- |
 | `vercel-ai-gateway/claude-opus-4.6` | `vercel-ai-gateway/anthropic/claude-opus-4.6` |
 | `vercel-ai-gateway/opus-4.6`        | `vercel-ai-gateway/anthropic/claude-opus-4-6` |
 
@@ -87,28 +87,27 @@ OpenClaw akzeptiert Kurzformen von Vercel-Claude-Modellreferenzen und normalisie
 Sie können in Ihrer Konfiguration entweder die Kurzform oder die vollständig qualifizierte Modellreferenz verwenden. OpenClaw löst die kanonische Form automatisch auf.
 </Tip>
 
-## Erweiterte Hinweise
+## Erweiterte Konfiguration
 
 <AccordionGroup>
   <Accordion title="Umgebungsvariable für Daemon-Prozesse">
-    Wenn das OpenClaw Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher, dass
-    `AI_GATEWAY_API_KEY` für diesen Prozess verfügbar ist.
+    Wenn das OpenClaw Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher,
+    dass `AI_GATEWAY_API_KEY` diesem Prozess zur Verfügung steht.
 
     <Warning>
     Ein Schlüssel, der nur in `~/.profile` gesetzt ist, ist für einen launchd/systemd-
-    Daemon nicht sichtbar, sofern diese Umgebung nicht explizit importiert wird. Setzen Sie den Schlüssel in
-    `~/.openclaw/.env` oder über `env.shellEnv`, damit der Gateway-Prozess ihn
-    lesen kann.
+    Daemon nicht sichtbar, es sei denn, diese Umgebung wird explizit importiert. Setzen Sie den Schlüssel in
+    `~/.openclaw/.env` oder über `env.shellEnv`, damit der Gateway-Prozess ihn lesen kann.
     </Warning>
 
   </Accordion>
 
   <Accordion title="Provider-Routing">
-    Vercel AI Gateway leitet Requests anhand des Präfixes der Modellreferenz an den vorgelagerten Provider weiter. Zum Beispiel wird `vercel-ai-gateway/anthropic/claude-opus-4.6` über
-    Anthropic geleitet, während `vercel-ai-gateway/openai/gpt-5.4` über
+    Vercel AI Gateway leitet Anfragen basierend auf dem Präfix der Modellreferenz an den Upstream-Provider weiter. Zum Beispiel wird `vercel-ai-gateway/anthropic/claude-opus-4.6`
+    über Anthropic geroutet, während `vercel-ai-gateway/openai/gpt-5.5` über
     OpenAI und `vercel-ai-gateway/moonshotai/kimi-k2.6` über
-    MoonshotAI geleitet wird. Ihr einzelner `AI_GATEWAY_API_KEY` übernimmt die Authentifizierung für alle
-    vorgelagerten Provider.
+    MoonshotAI geroutet wird. Ihr einzelner `AI_GATEWAY_API_KEY` übernimmt die Authentifizierung für alle
+    Upstream-Provider.
   </Accordion>
 </AccordionGroup>
 
@@ -116,7 +115,7 @@ Sie können in Ihrer Konfiguration entweder die Kurzform oder die vollständig q
 
 <CardGroup cols={2}>
   <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
-    Provider, Modellreferenzen und Failover-Verhalten auswählen.
+    Auswahl von Providern, Modellreferenzen und Failover-Verhalten.
   </Card>
   <Card title="Fehlerbehebung" href="/de/help/troubleshooting" icon="wrench">
     Allgemeine Fehlerbehebung und FAQ.

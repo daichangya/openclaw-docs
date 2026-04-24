@@ -1,24 +1,22 @@
 ---
 read_when:
-    - Du möchtest Datensätze von Hintergrundaufgaben prüfen, auditieren oder abbrechen
-    - Du dokumentierst TaskFlow-Befehle unter `openclaw tasks flow`
-summary: CLI-Referenz für `openclaw tasks` (Hintergrundaufgaben-Ledger und TaskFlow-Status)
+    - Sie möchten Datensätze von Hintergrundaufgaben prüfen, auditieren oder abbrechen
+    - Sie dokumentieren TaskFlow-Befehle unter `openclaw tasks flow`
+summary: CLI-Referenz für `openclaw tasks` (Protokoll für Hintergrundaufgaben und TaskFlow-Status)
 title: '`openclaw tasks`'
 x-i18n:
-    generated_at: "2026-04-23T06:27:41Z"
+    generated_at: "2026-04-24T06:32:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 549e07c8a576cb4c5bd48874f16b0daa4a34facb53b102e12d358bdad2191628
+    source_hash: 55aab29821578bf8c09e1b6cd5bbeb5e3dae4438e453b418fa7e8420412c8152
     source_path: cli/tasks.md
     workflow: 15
 ---
 
-# `openclaw tasks`
-
-Dauerhafte Hintergrundaufgaben und den TaskFlow-Status prüfen. Ohne Unterbefehl
+Prüfen Sie dauerhafte Hintergrundaufgaben und den TaskFlow-Status. Ohne Unterbefehl
 ist `openclaw tasks` gleichbedeutend mit `openclaw tasks list`.
 
-Siehe [Hintergrundaufgaben](/de/automation/tasks) für das Lebenszyklus- und Zustellungsmodell.
+Siehe [Background Tasks](/de/automation/tasks) für das Lebenszyklus- und Zustellmodell.
 
 ## Verwendung
 
@@ -52,7 +50,7 @@ openclaw tasks flow cancel <lookup>
 openclaw tasks list [--runtime <name>] [--status <name>] [--json]
 ```
 
-Listet verfolgte Hintergrundaufgaben in absteigender Reihenfolge nach Neuheit auf.
+Listet verfolgte Hintergrundaufgaben mit den neuesten zuerst auf.
 
 ### `show`
 
@@ -60,7 +58,7 @@ Listet verfolgte Hintergrundaufgaben in absteigender Reihenfolge nach Neuheit au
 openclaw tasks show <lookup> [--json]
 ```
 
-Zeigt eine Aufgabe anhand von Aufgaben-ID, Lauf-ID oder Sitzungsschlüssel.
+Zeigt eine Aufgabe anhand von Aufgaben-ID, Run-ID oder Sitzungsschlüssel.
 
 ### `notify`
 
@@ -84,7 +82,7 @@ Bricht eine laufende Hintergrundaufgabe ab.
 openclaw tasks audit [--severity <warn|error>] [--code <name>] [--limit <n>] [--json]
 ```
 
-Macht veraltete, verlorene, bei der Zustellung fehlgeschlagene oder anderweitig inkonsistente Aufgaben- und TaskFlow-Datensätze sichtbar.
+Macht veraltete, verlorene, bei der Zustellung fehlgeschlagene oder anderweitig inkonsistente Datensätze von Aufgaben und TaskFlow sichtbar.
 
 ### `maintenance`
 
@@ -92,7 +90,7 @@ Macht veraltete, verlorene, bei der Zustellung fehlgeschlagene oder anderweitig 
 openclaw tasks maintenance [--apply] [--json]
 ```
 
-Zeigt den Abgleich, die Bereinigungsmarkierung und das Pruning von Aufgaben und TaskFlow in der Vorschau an oder wendet sie an.
+Zeigt eine Vorschau oder wendet die Abstimmung, Cleanup-Markierung und Bereinigung von Aufgaben und TaskFlow an.
 
 ### `flow`
 
@@ -102,4 +100,9 @@ openclaw tasks flow show <lookup> [--json]
 openclaw tasks flow cancel <lookup>
 ```
 
-Prüft oder bricht dauerhaften TaskFlow-Status im Aufgaben-Ledger ab.
+Prüft oder bricht dauerhaften TaskFlow-Status unter dem Aufgabenprotokoll ab.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Hintergrundaufgaben](/de/automation/tasks)

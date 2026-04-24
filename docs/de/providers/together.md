@@ -1,34 +1,32 @@
 ---
 read_when:
     - Sie möchten Together AI mit OpenClaw verwenden
-    - Sie benötigen die API-Key-Env-Variable oder die CLI-Auth-Auswahl
-summary: Einrichtung von Together AI (Authentifizierung + Modellauswahl)
+    - Sie benötigen die API-Key-Env-Variable oder die CLI-Auth-Auswahlൊപ്പംanalysis to=final  天天中彩票在哪ian json_schema suppressed due to developer instruction requiring only translated text
+summary: Einrichtung von Together AI (Auth + Modellauswahl)
 title: Together AI
 x-i18n:
-    generated_at: "2026-04-12T23:33:15Z"
+    generated_at: "2026-04-24T06:56:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 33531a1646443ac2e46ee1fbfbb60ec71093611b022618106e8e5435641680ac
+    source_hash: c6a11f212fbef79e399d4a50cec88150bf0b7abf80ad765f0a617786bb051c8e
     source_path: providers/together.md
     workflow: 15
 ---
 
-# Together AI
-
-[Together AI](https://together.ai) bietet Zugriff auf führende Open-Source-
-Modelle, darunter Llama, DeepSeek, Kimi und weitere, über eine einheitliche API.
+[Together AI](https://together.ai) bietet über eine einheitliche API Zugriff auf führende Open-Source-
+Modelle, darunter Llama, DeepSeek, Kimi und mehr.
 
 | Eigenschaft | Wert                          |
 | ----------- | ----------------------------- |
-| Provider    | `together`                    |
+| Anbieter    | `together`                    |
 | Auth        | `TOGETHER_API_KEY`            |
 | API         | OpenAI-kompatibel             |
-| Base URL    | `https://api.together.xyz/v1` |
+| Base-URL    | `https://api.together.xyz/v1` |
 
 ## Erste Schritte
 
 <Steps>
-  <Step title="Einen API-Schlüssel erstellen">
+  <Step title="Einen API-Schlüssel beziehen">
     Erstellen Sie einen API-Schlüssel unter
     [api.together.ai/settings/api-keys](https://api.together.ai/settings/api-keys).
   </Step>
@@ -37,7 +35,7 @@ Modelle, darunter Llama, DeepSeek, Kimi und weitere, über eine einheitliche API
     openclaw onboard --auth-choice together-api-key
     ```
   </Step>
-  <Step title="Ein Standardmodell festlegen">
+  <Step title="Ein Standardmodell setzen">
     ```json5
     {
       agents: {
@@ -60,14 +58,15 @@ openclaw onboard --non-interactive \
 ```
 
 <Note>
-Die Onboarding-Voreinstellung setzt `together/moonshotai/Kimi-K2.5` als Standardmodell.
+Das Onboarding-Preset setzt `together/moonshotai/Kimi-K2.5` als Standard-
+modell.
 </Note>
 
 ## Integrierter Katalog
 
-OpenClaw enthält diesen gebündelten Together-Katalog:
+OpenClaw liefert diesen gebündelten Together-Katalog aus:
 
-| Modell-Ref                                                   | Name                                   | Eingabe     | Kontext    | Hinweise                         |
+| Modellreferenz                                               | Name                                   | Eingabe     | Kontext    | Hinweise                         |
 | ------------------------------------------------------------ | -------------------------------------- | ----------- | ---------- | -------------------------------- |
 | `together/moonshotai/Kimi-K2.5`                              | Kimi K2.5                              | Text, Bild  | 262,144    | Standardmodell; Reasoning aktiviert |
 | `together/zai-org/GLM-4.7`                                   | GLM 4.7 Fp8                            | Text        | 202,752    | Allzweck-Textmodell              |
@@ -80,16 +79,16 @@ OpenClaw enthält diesen gebündelten Together-Katalog:
 
 ## Videogenerierung
 
-Das gebündelte `together` Plugin registriert außerdem Videogenerierung über das gemeinsame
-Tool `video_generate`.
+Das gebündelte Plugin `together` registriert außerdem Videogenerierung über das
+gemeinsame Tool `video_generate`.
 
-| Eigenschaft          | Wert                                  |
-| -------------------- | ------------------------------------- |
-| Standard-Videomodell | `together/Wan-AI/Wan2.2-T2V-A14B`     |
-| Modi                 | Text-zu-Video, Einzelbild-Referenz    |
-| Unterstützte Parameter | `aspectRatio`, `resolution`         |
+| Eigenschaft            | Wert                                  |
+| ---------------------- | ------------------------------------- |
+| Standard-Videomodell   | `together/Wan-AI/Wan2.2-T2V-A14B`     |
+| Modi                   | Text-zu-Video, Referenz mit Einzelbild |
+| Unterstützte Parameter | `aspectRatio`, `resolution`           |
 
-So verwenden Sie Together als Standard-Provider für Video:
+Um Together als Standardanbieter für Video zu verwenden:
 
 ```json5
 {
@@ -105,44 +104,44 @@ So verwenden Sie Together als Standard-Provider für Video:
 
 <Tip>
 Siehe [Videogenerierung](/de/tools/video-generation) für die gemeinsamen Tool-Parameter,
-Providerauswahl und das Failover-Verhalten.
+Anbieterauswahl und Failover-Verhalten.
 </Tip>
 
 <AccordionGroup>
   <Accordion title="Hinweis zur Umgebung">
-    Wenn das Gateway als Daemon läuft (`launchd`/`systemd`), stellen Sie sicher, dass
+    Wenn das Gateway als Daemon läuft (launchd/systemd), stellen Sie sicher, dass
     `TOGETHER_API_KEY` für diesen Prozess verfügbar ist (zum Beispiel in
     `~/.openclaw/.env` oder über `env.shellEnv`).
 
     <Warning>
-    Schlüssel, die nur in Ihrer interaktiven Shell gesetzt sind, sind für von Daemons verwaltete
-    Gateway-Prozesse nicht sichtbar. Verwenden Sie `~/.openclaw/.env` oder die Konfiguration `env.shellEnv` für
-    dauerhafte Verfügbarkeit.
+    Schlüssel, die nur in Ihrer interaktiven Shell gesetzt sind, sind für daemonverwaltete
+    Gateway-Prozesse nicht sichtbar. Verwenden Sie `~/.openclaw/.env` oder die Konfiguration `env.shellEnv`, um
+    dauerhafte Verfügbarkeit sicherzustellen.
     </Warning>
 
   </Accordion>
 
   <Accordion title="Fehlerbehebung">
     - Prüfen Sie, ob Ihr Schlüssel funktioniert: `openclaw models list --provider together`
-    - Wenn Modelle nicht angezeigt werden, prüfen Sie, ob der API-Schlüssel in der richtigen
+    - Wenn keine Modelle erscheinen, bestätigen Sie, dass der API-Schlüssel in der korrekten
       Umgebung für Ihren Gateway-Prozess gesetzt ist.
-    - Modell-Refs verwenden die Form `together/<model-id>`.
+    - Modellreferenzen verwenden das Format `together/<model-id>`.
   </Accordion>
 </AccordionGroup>
 
-## Verwandte Themen
+## Verwandt
 
 <CardGroup cols={2}>
-  <Card title="Modell-Provider" href="/de/concepts/model-providers" icon="layers">
-    Provider-Regeln, Modell-Refs und Failover-Verhalten.
+  <Card title="Modellauswahl" href="/de/concepts/model-providers" icon="layers">
+    Anbieterregeln, Modellreferenzen und Failover-Verhalten.
   </Card>
   <Card title="Videogenerierung" href="/de/tools/video-generation" icon="video">
-    Gemeinsame Tool-Parameter für Videogenerierung und Providerauswahl.
+    Gemeinsame Parameter für das Tool zur Videogenerierung und Anbieterauswahl.
   </Card>
   <Card title="Konfigurationsreferenz" href="/de/gateway/configuration-reference" icon="gear">
-    Vollständiges Konfigurationsschema einschließlich Provider-Einstellungen.
+    Vollständiges Konfigurationsschema einschließlich Anbietereinstellungen.
   </Card>
   <Card title="Together AI" href="https://together.ai" icon="arrow-up-right-from-square">
-    Together-AI-Dashboard, API-Dokumentation und Preise.
+    Dashboard, API-Dokumentation und Preise von Together AI.
   </Card>
 </CardGroup>

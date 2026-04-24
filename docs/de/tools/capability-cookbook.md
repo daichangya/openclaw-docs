@@ -1,59 +1,56 @@
 ---
 read_when:
-    - Hinzufügen einer neuen Core-Fähigkeit und Plugin-Registrierungsoberfläche
+    - Eine neue Core-Capability und Oberfläche zur Plugin-Registrierung hinzufügen
     - Entscheiden, ob Code in den Core, ein Vendor-Plugin oder ein Feature-Plugin gehört
-    - Verdrahten einer neuen Laufzeithilfe für Channels oder Tools
+    - Einen neuen Runtime-Helper für Kanäle oder Tools verdrahten
 sidebarTitle: Adding Capabilities
-summary: Leitfaden für Mitwirkende zum Hinzufügen einer neuen gemeinsam genutzten Fähigkeit zum OpenClaw-Plugin-System
-title: Fähigkeiten hinzufügen (Leitfaden für Mitwirkende)
+summary: Leitfaden für Mitwirkende zum Hinzufügen einer neuen gemeinsamen Capability zum OpenClaw-Plugin-System
+title: Capabilities hinzufügen (Leitfaden für Mitwirkende)
 x-i18n:
-    generated_at: "2026-04-05T12:56:46Z"
+    generated_at: "2026-04-24T07:02:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 29604d88e6df5205b835d71f3078b6223c58b6294135c3e201756c1bcac33ea3
+    source_hash: f1e3251b9150c9744d967e91f531dfce01435b13aea3a17088ccd54f2145d14f
     source_path: tools/capability-cookbook.md
     workflow: 15
 ---
 
-# Fähigkeiten hinzufügen
-
 <Info>
-  Dies ist ein **Leitfaden für Mitwirkende** für OpenClaw-Core-Entwickler. Wenn du
-  ein externes Plugin erstellst, siehe stattdessen [Building Plugins](/plugins/building-plugins).
+  Dies ist ein **Leitfaden für Mitwirkende** für OpenClaw-Core-Entwickler. Wenn Sie
+  ein externes Plugin erstellen, siehe stattdessen [Plugins erstellen](/de/plugins/building-plugins).
 </Info>
 
-Verwende dies, wenn OpenClaw einen neuen Bereich braucht, zum Beispiel Bildgenerierung, Video-
-Generierung oder einen künftigen, von einem Vendor unterstützten Funktionsbereich.
+Verwenden Sie dies, wenn OpenClaw einen neuen Bereich benötigt, etwa Bildgenerierung, Video-
+generierung oder einen zukünftigen, von Vendoren gestützten Funktionsbereich.
 
 Die Regel:
 
-- plugin = Ownership-Grenze
-- capability = gemeinsamer Core-Vertrag
+- Plugin = Eigentumsgrenze
+- Capability = gemeinsamer Core-Vertrag
 
-Das bedeutet, dass du nicht damit beginnen solltest, einen Vendor direkt in einen Channel oder ein
-Tool zu verdrahten. Beginne damit, die Fähigkeit zu definieren.
+Das bedeutet, Sie sollten nicht damit beginnen, einen Vendor direkt in einen Kanal oder ein
+Tool zu verdrahten. Beginnen Sie damit, die Capability zu definieren.
 
-## Wann eine Fähigkeit erstellt werden sollte
+## Wann eine Capability erstellt werden sollte
 
-Erstelle eine neue Fähigkeit, wenn all dies zutrifft:
+Erstellen Sie eine neue Capability, wenn all dies zutrifft:
 
 1. mehr als ein Vendor könnte sie plausibel implementieren
-2. Channels, Tools oder Feature-Plugins sollten sie nutzen können, ohne sich um
-   den Vendor zu kümmern
-3. der Core muss Fallback-, Richtlinien-, Konfigurations- oder Zustellverhalten besitzen
+2. Kanäle, Tools oder Feature-Plugins sollten sie konsumieren, ohne sich für
+   den Vendor zu interessieren
+3. der Core muss Fallback, Richtlinie, Konfiguration oder Zustellungsverhalten besitzen
 
-Wenn die Arbeit nur für einen Vendor gedacht ist und noch kein gemeinsamer Vertrag existiert, stoppe
-und definiere zuerst den Vertrag.
+Wenn die Arbeit nur vendorspezifisch ist und noch kein gemeinsamer Vertrag existiert, stoppen Sie und definieren Sie zuerst den Vertrag.
 
-## Die Standardabfolge
+## Die Standardsequenz
 
-1. Definiere den typisierten Core-Vertrag.
-2. Füge Plugin-Registrierung für diesen Vertrag hinzu.
-3. Füge eine gemeinsame Laufzeithilfe hinzu.
-4. Verdrahte ein echtes Vendor-Plugin als Nachweis.
-5. Stelle Feature-/Channel-Konsumenten auf die Laufzeithilfe um.
-6. Füge Vertragstests hinzu.
-7. Dokumentiere die operator-seitige Konfiguration und das Ownership-Modell.
+1. Den typisierten Core-Vertrag definieren.
+2. Plugin-Registrierung für diesen Vertrag hinzufügen.
+3. Einen gemeinsamen Runtime-Helper hinzufügen.
+4. Ein echtes Vendor-Plugin als Beweis verdrahten.
+5. Feature-/Kanal-Consumer auf den Runtime-Helper umstellen.
+6. Vertragstests hinzufügen.
+7. Die operatorseitige Konfiguration und das Eigentumsmodell dokumentieren.
 
 ## Was wohin gehört
 
@@ -62,24 +59,24 @@ Core:
 - Request-/Response-Typen
 - Provider-Registry + Auflösung
 - Fallback-Verhalten
-- Konfigurationsschema plus weitergegebene `title`- / `description`-Docs-Metadaten auf verschachtelten Objekt-, Wildcard-, Array-Item- und Kompositionsknoten
-- Oberfläche der Laufzeithilfe
+- Konfigurationsschema plus weitergereichte Dokumentationsmetadaten `title` / `description` auf verschachtelten Objekt-, Wildcard-, Array-Element- und Kompositionsknoten
+- Runtime-Helper-Oberfläche
 
 Vendor-Plugin:
 
 - Vendor-API-Aufrufe
-- Vendor-Authentifizierungshandhabung
+- Vendor-spezifische Authentifizierungsbehandlung
 - Vendor-spezifische Request-Normalisierung
-- Registrierung der Fähigkeitsimplementierung
+- Registrierung der Capability-Implementierung
 
-Feature-/Channel-Plugin:
+Feature-/Kanal-Plugin:
 
-- ruft `api.runtime.*` oder die passende Hilfe `plugin-sdk/*-runtime` auf
+- ruft `api.runtime.*` oder den passenden Helper `plugin-sdk/*-runtime` auf
 - ruft niemals direkt eine Vendor-Implementierung auf
 
 ## Dateicheckliste
 
-Für eine neue Fähigkeit wirst du voraussichtlich diese Bereiche anfassen:
+Für eine neue Capability werden Sie voraussichtlich diese Bereiche anfassen:
 
 - `src/<capability>/types.ts`
 - `src/<capability>/...registry/runtime.ts`
@@ -92,34 +89,40 @@ Für eine neue Fähigkeit wirst du voraussichtlich diese Bereiche anfassen:
 - `src/plugin-sdk/<capability>.ts`
 - `src/plugin-sdk/<capability>-runtime.ts`
 - ein oder mehrere gebündelte Plugin-Pakete
-- Konfiguration/Docs/Tests
+- Konfiguration/Dokumentation/Tests
 
 ## Beispiel: Bildgenerierung
 
-Die Bildgenerierung folgt der Standardform:
+Bildgenerierung folgt der Standardform:
 
-1. der Core definiert `ImageGenerationProvider`
-2. der Core stellt `registerImageGenerationProvider(...)` bereit
-3. der Core stellt `runtime.imageGeneration.generate(...)` bereit
-4. die Plugins `openai`, `google`, `fal` und `minimax` registrieren Vendor-gestützte Implementierungen
-5. künftige Vendoren können denselben Vertrag registrieren, ohne Channels/Tools zu ändern
+1. Der Core definiert `ImageGenerationProvider`
+2. Der Core stellt `registerImageGenerationProvider(...)` bereit
+3. Der Core stellt `runtime.imageGeneration.generate(...)` bereit
+4. Die Plugins `openai`, `google`, `fal` und `minimax` registrieren von Vendoren gestützte Implementierungen
+5. Zukünftige Vendoren können denselben Vertrag registrieren, ohne Kanäle/Tools zu ändern
 
-Der Konfigurationsschlüssel ist getrennt vom Routing der Vision-Analyse:
+Der Konfigurationsschlüssel ist von der Routing-Logik für Bildanalyse getrennt:
 
 - `agents.defaults.imageModel` = Bilder analysieren
 - `agents.defaults.imageGenerationModel` = Bilder generieren
 
-Halte diese getrennt, damit Fallback und Richtlinien explizit bleiben.
+Halten Sie diese getrennt, damit Fallback und Richtlinie explizit bleiben.
 
-## Prüfcheckliste
+## Checkliste für Reviews
 
-Bevor du eine neue Fähigkeit auslieferst, verifiziere:
+Bevor Sie eine neue Capability ausliefern, prüfen Sie:
 
-- kein Channel/Tool importiert Vendor-Code direkt
-- die Laufzeithilfe ist der gemeinsame Pfad
-- mindestens ein Vertragstest bestätigt gebündeltes Ownership
-- Konfigurations-Docs nennen den neuen Modell-/Konfigurationsschlüssel
-- Plugin-Docs erklären die Ownership-Grenze
+- Kein Kanal/Tool importiert Vendor-Code direkt
+- Der Runtime-Helper ist der gemeinsame Pfad
+- Mindestens ein Vertragstest bestätigt gebündeltes Eigentum
+- Die Konfigurationsdokumentation benennt den neuen Modell-/Konfigurationsschlüssel
+- Die Plugin-Dokumentation erklärt die Eigentumsgrenze
 
-Wenn ein PR die Fähigkeitsebene überspringt und Vendor-Verhalten fest in einen
-Channel/ein Tool codiert, schicke ihn zurück und definiere zuerst den Vertrag.
+Wenn ein PR die Capability-Schicht überspringt und Vendor-Verhalten fest in einen
+Kanal/ein Tool codiert, schicken Sie ihn zurück und definieren Sie zuerst den Vertrag.
+
+## Verwandt
+
+- [Plugin](/de/tools/plugin)
+- [Skills erstellen](/de/tools/creating-skills)
+- [Tools und Plugins](/de/tools)

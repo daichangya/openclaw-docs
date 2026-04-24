@@ -1,36 +1,34 @@
 ---
 read_when:
-    - Beim Ausführen von Skripten aus dem Repository
-    - Beim Hinzufügen oder Ändern von Skripten unter ./scripts
-summary: 'Repository-Skripte: Zweck, Umfang und Sicherheitshinweise'
+    - Skripte aus dem Repository ausführen
+    - Skripte unter ./scripts hinzufügen oder ändern
+summary: 'Repository-Skripte: Zweck, Geltungsbereich und Sicherheitshinweise'
 title: Skripte
 x-i18n:
-    generated_at: "2026-04-08T02:15:24Z"
+    generated_at: "2026-04-24T06:41:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3ecf1e9327929948fb75f80e306963af49b353c0aa8d3b6fa532ca964ff8b975
+    source_hash: 8d76777402670abe355b9ad2a0337f96211af1323e36f2ab1ced9f04f87083f5
     source_path: help/scripts.md
     workflow: 15
 ---
 
-# Skripte
-
 Das Verzeichnis `scripts/` enthält Hilfsskripte für lokale Workflows und Betriebsaufgaben.
-Verwenden Sie diese, wenn eine Aufgabe eindeutig an ein Skript gebunden ist; andernfalls bevorzugen Sie die CLI.
+Verwenden Sie diese, wenn eine Aufgabe klar an ein Skript gebunden ist; andernfalls bevorzugen Sie die CLI.
 
 ## Konventionen
 
-- Skripte sind **optional**, sofern sie nicht in der Dokumentation oder in Release-Checklisten referenziert werden.
-- Bevorzugen Sie CLI-Oberflächen, wenn sie vorhanden sind (Beispiel: Authentifizierungsüberwachung verwendet `openclaw models status --check`).
-- Gehen Sie davon aus, dass Skripte hostspezifisch sind; lesen Sie sie vor der Ausführung auf einem neuen Rechner.
+- Skripte sind **optional**, sofern sie nicht in der Dokumentation oder in Release-Checklisten erwähnt werden.
+- Bevorzugen Sie CLI-Oberflächen, wenn sie existieren (Beispiel: Auth-Monitoring verwendet `openclaw models status --check`).
+- Gehen Sie davon aus, dass Skripte hostspezifisch sind; lesen Sie sie, bevor Sie sie auf einem neuen Rechner ausführen.
 
-## Skripte zur Authentifizierungsüberwachung
+## Skripte zur Auth-Überwachung
 
-Die Authentifizierungsüberwachung wird in [Authentication](/de/gateway/authentication) behandelt. Die Skripte unter `scripts/` sind optionale Extras für systemd-/Termux-Telefon-Workflows.
+Die Auth-Überwachung wird unter [Authentication](/de/gateway/authentication) behandelt. Die Skripte unter `scripts/` sind optionale Extras für systemd-/Termux-Telefon-Workflows.
 
-## GitHub-Lesehilfe
+## GitHub-Lesehelfer
 
-Verwenden Sie `scripts/gh-read`, wenn `gh` für Repository-bezogene Leseaufrufe ein GitHub-App-Installationstoken verwenden soll, während normales `gh` für Schreibaktionen mit Ihrem persönlichen Login weiterläuft.
+Verwenden Sie `scripts/gh-read`, wenn `gh` für repositorybezogene Leseaufrufe ein GitHub-App-Installationstoken verwenden soll, während normales `gh` für Schreibaktionen bei Ihrem persönlichen Login bleibt.
 
 Erforderliche Umgebungsvariablen:
 
@@ -39,10 +37,10 @@ Erforderliche Umgebungsvariablen:
 
 Optionale Umgebungsvariablen:
 
-- `OPENCLAW_GH_READ_INSTALLATION_ID`, wenn Sie die installationsbasierte Ermittlung über das Repository überspringen möchten
-- `OPENCLAW_GH_READ_PERMISSIONS` als kommagetrenntes Override für die anzufordernde Teilmenge an Leseberechtigungen
+- `OPENCLAW_GH_READ_INSTALLATION_ID`, wenn Sie die installationsbezogene Suche anhand des Repository überspringen möchten
+- `OPENCLAW_GH_READ_PERMISSIONS` als kommaseparierte Überschreibung für die anzufordernde Teilmenge von Leseberechtigungen
 
-Reihenfolge der Repository-Auflösung:
+Auflösungsreihenfolge für Repositorys:
 
 - `gh ... -R owner/repo`
 - `GH_REPO`
@@ -57,4 +55,9 @@ Beispiele:
 ## Beim Hinzufügen von Skripten
 
 - Halten Sie Skripte fokussiert und dokumentiert.
-- Fügen Sie einen kurzen Eintrag in der relevanten Dokumentation hinzu (oder erstellen Sie eine, falls sie fehlt).
+- Fügen Sie einen kurzen Eintrag in die relevante Dokumentation ein (oder erstellen Sie einen, wenn er fehlt).
+
+## Verwandt
+
+- [Testing](/de/help/testing)
+- [Testing live](/de/help/testing-live)

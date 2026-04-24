@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Sie möchten Gateway Plugins oder kompatible Bundles installieren oder verwalten
-    - Sie möchten Fehler beim Laden von Plugins debuggen
-summary: CLI-Referenz für `openclaw plugins` (list, install, Marketplace, uninstall, aktivieren/deaktivieren, doctor)
+    - Sie möchten Gateway-Plugins oder kompatible Bundles installieren oder verwalten
+    - Sie möchten Plugin-Ladefehler debuggen
+summary: CLI-Referenz für `openclaw plugins` (`list`, `install`, `marketplace`, `uninstall`, `enable`/`disable`, `doctor`)
 title: Plugins
 x-i18n:
-    generated_at: "2026-04-23T14:00:34Z"
+    generated_at: "2026-04-24T06:32:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 469364823c0766f6534c5d7eee963877f98fe23ecfa45251696a34ef65d57599
+    source_hash: 35ef8f54c64ea52d7618a0ef8b90d3d75841a27ae4cd689b4ca8e0cfdcddc408
     source_path: cli/plugins.md
     workflow: 15
 ---
 
 # `openclaw plugins`
 
-Gateway Plugins, Hook-Pakete und kompatible Bundles verwalten.
+Verwalten von Gateway-Plugins, Hook-Paketen und kompatiblen Bundles.
 
 Verwandt:
 
@@ -50,12 +50,12 @@ Gebündelte Plugins werden mit OpenClaw ausgeliefert. Einige sind standardmäßi
 gebündelte Modell-Provider, gebündelte Sprach-Provider und das gebündelte Browser-
 Plugin); andere erfordern `plugins enable`.
 
-Native OpenClaw Plugins müssen `openclaw.plugin.json` mit einem eingebetteten JSON-
-Schema (`configSchema`, auch wenn es leer ist) enthalten. Kompatible Bundles verwenden stattdessen ihre eigenen Bundle-
-Manifeste.
+Native OpenClaw-Plugins müssen `openclaw.plugin.json` mit einem Inline-JSON-
+Schema (`configSchema`, auch wenn es leer ist) mitliefern. Kompatible Bundles verwenden stattdessen ihre
+eigenen Bundle-Manifeste.
 
-`plugins list` zeigt `Format: openclaw` oder `Format: bundle`. Die ausführliche Ausgabe von list/info
-zeigt außerdem den Bundle-Untertyp (`codex`, `claude` oder `cursor`) sowie erkannte Bundle-
+`plugins list` zeigt `Format: openclaw` oder `Format: bundle`. Die ausführliche Ausgabe von `list`/`info`
+zeigt außerdem den Bundle-Subtyp (`codex`, `claude` oder `cursor`) plus erkannte Bundle-
 Fähigkeiten.
 
 ### Installieren
@@ -72,65 +72,61 @@ openclaw plugins install <plugin> --marketplace <name>  # Marketplace (explizit)
 openclaw plugins install <plugin> --marketplace https://github.com/<owner>/<repo>
 ```
 
-Unqualifizierte Paketnamen werden zuerst gegen ClawHub und danach gegen npm geprüft. Sicherheitshinweis:
+Reine Paketnamen werden zuerst gegen ClawHub geprüft, dann gegen npm. Sicherheitshinweis:
 Behandeln Sie Plugin-Installationen so, als würden Sie Code ausführen. Bevorzugen Sie angeheftete Versionen.
 
-Wenn Ihr Abschnitt `plugins` durch ein einzelnes `$include` in einer Datei unterstützt wird, schreiben
-`plugins install/update/enable/disable/uninstall` in diese eingebundene Datei und lassen
-`openclaw.json` unverändert. Root-Includes, Include-Arrays und Includes mit überschreibenden
-Geschwistereinträgen schlagen geschlossen fehl, statt abgeflacht zu werden. Siehe [Config includes](/de/gateway/configuration) für die unterstützten Formen.
+Wenn Ihr Abschnitt `plugins` durch ein einzelnes `$include` in einer Datei gestützt wird, schreiben `plugins install/update/enable/disable/uninstall` in diese eingebundene Datei und lassen `openclaw.json` unberührt. Root-Includes, Include-Arrays und Includes mit benachbarten Überschreibungen schlagen fail-closed fehl, anstatt abgeflacht zu werden. Siehe [Config includes](/de/gateway/configuration) für die unterstützten Formen.
 
-Wenn die Konfiguration ungültig ist, schlägt `plugins install` normalerweise geschlossen fehl und weist Sie an,
+Wenn die Konfiguration ungültig ist, schlägt `plugins install` normalerweise fail-closed fehl und fordert Sie auf,
 zuerst `openclaw doctor --fix` auszuführen. Die einzige dokumentierte Ausnahme ist ein enger
-Wiederherstellungspfad für gebündelte Plugins für Plugins, die sich ausdrücklich für
+Wiederherstellungspfad für gebündelte Plugins bei Plugins, die sich ausdrücklich für
 `openclaw.install.allowInvalidConfigRecovery` entscheiden.
 
 `--force` verwendet das vorhandene Installationsziel erneut und überschreibt ein bereits installiertes
-Plugin oder Hook-Paket direkt vor Ort. Verwenden Sie dies, wenn Sie absichtlich dieselbe ID
-aus einem neuen lokalen Pfad, Archiv, ClawHub-Paket oder npm-Artefakt erneut installieren.
-Für routinemäßige Upgrades eines bereits verfolgten npm-Plugins verwenden Sie bevorzugt
+Plugin oder Hook-Paket direkt. Verwenden Sie dies, wenn Sie absichtlich dieselbe ID von einem neuen lokalen Pfad, Archiv, ClawHub-Paket oder npm-Artefakt neu installieren.
+Für routinemäßige Upgrades eines bereits verfolgten npm-Plugins bevorzugen Sie
 `openclaw plugins update <id-or-npm-spec>`.
 
 Wenn Sie `plugins install` für eine Plugin-ID ausführen, die bereits installiert ist, stoppt OpenClaw
-und verweist Sie für ein normales Upgrade auf `plugins update <id-or-npm-spec>`
-oder auf `plugins install <package> --force`, wenn Sie die aktuelle Installation wirklich
-aus einer anderen Quelle überschreiben möchten.
+und verweist Sie für ein normales Upgrade auf `plugins update <id-or-npm-spec>`,
+oder auf `plugins install <package> --force`, wenn Sie die
+aktuelle Installation wirklich aus einer anderen Quelle überschreiben möchten.
 
 `--pin` gilt nur für npm-Installationen. Es wird mit `--marketplace` nicht unterstützt,
-da Marketplace-Installationen Marketplace-Quellmetadaten statt einer
+weil Marketplace-Installationen Metadaten zur Marketplace-Quelle statt einer
 npm-Spezifikation speichern.
 
-`--dangerously-force-unsafe-install` ist eine Notfalloption für Fehlalarme
-im integrierten Scanner für gefährlichen Code. Sie erlaubt der Installation fortzufahren, auch
-wenn der integrierte Scanner `critical`-Befunde meldet, aber sie umgeht **nicht**
-Richtlinienblockierungen durch Plugin-`before_install`-Hooks und umgeht **nicht** Scan-
-Fehlschläge.
+`--dangerously-force-unsafe-install` ist eine Break-Glass-Option für False Positives
+im integrierten Scanner für gefährlichen Code. Sie erlaubt die Fortsetzung der Installation,
+selbst wenn der integrierte Scanner Befunde vom Typ `critical` meldet, aber sie **umgeht**
+keine Plugin-Richtlinienblockaden von `before_install` und **umgeht** keine durch Scans
+verursachten Fehler.
 
-Dieses CLI-Flag gilt für Plugin-Installations-/Update-Abläufe. Gateway-gestützte Skill-
-Abhängigkeitsinstallationen verwenden die entsprechende Anfrageüberschreibung
-`dangerouslyForceUnsafeInstall`, während `openclaw skills install` ein separater ClawHub-Skill-
-Download-/Installationsablauf bleibt.
+Dieses CLI-Flag gilt für Plugin-Installations-/Update-Abläufe. Gateway-gestützte
+Abhängigkeitsinstallationen für Skills verwenden die passende Request-Überschreibung
+`dangerouslyForceUnsafeInstall`, während `openclaw skills install` ein separater
+Download-/Installationsablauf für Skills über ClawHub bleibt.
 
 `plugins install` ist auch die Installationsoberfläche für Hook-Pakete, die
-`openclaw.hooks` in `package.json` bereitstellen. Verwenden Sie `openclaw hooks` für gefilterte Hook-
-Sichtbarkeit und Aktivierung pro Hook, nicht für die Paketinstallation.
+`openclaw.hooks` in `package.json` bereitstellen. Verwenden Sie `openclaw hooks` für
+gefilterte Hook-Sichtbarkeit und Aktivierung pro Hook, nicht für die Paketinstallation.
 
-Npm-Spezifikationen sind **nur Registry-Spezifikationen** (Paketname + optionale **exakte Version** oder
-**Dist-Tag**). Git-/URL-/Datei-Spezifikationen und Semver-Bereiche werden abgelehnt. Abhängigkeits-
+Npm-Spezifikationen sind **nur Registry-basiert** (Paketname plus optional **exakte Version** oder
+**dist-tag**). Git-/URL-/Datei-Spezifikationen und Semver-Bereiche werden abgelehnt. Abhängigkeits-
 Installationen laufen aus Sicherheitsgründen mit `--ignore-scripts`.
 
-Unqualifizierte Spezifikationen und `@latest` bleiben auf dem stabilen Track. Wenn npm eine von beiden
-auf ein Prerelease auflöst, stoppt OpenClaw und fordert Sie auf, sich ausdrücklich mit einem
-Prerelease-Tag wie `@beta`/`@rc` oder einer exakten Prerelease-Version wie
+Reine Spezifikationen und `@latest` bleiben auf dem stabilen Track. Wenn npm eines
+davon auf eine Vorabversion auflöst, stoppt OpenClaw und fordert Sie auf, sich explizit mit einem
+Vorabversions-Tag wie `@beta`/`@rc` oder einer exakten Vorabversionsnummer wie
 `@1.2.3-beta.4` dafür zu entscheiden.
 
-Wenn eine unqualifizierte Installationsspezifikation zu einer gebündelten Plugin-ID passt (zum Beispiel `diffs`), installiert OpenClaw
-das gebündelte Plugin direkt. Um ein npm-Paket mit demselben Namen zu installieren,
-verwenden Sie eine explizite Scoped-Spezifikation (zum Beispiel `@scope/diffs`).
+Wenn eine reine Installationsspezifikation einer ID eines gebündelten Plugins entspricht (zum Beispiel `diffs`), installiert OpenClaw
+das gebündelte Plugin direkt. Um ein npm-Paket mit demselben
+Namen zu installieren, verwenden Sie eine explizite Scoped-Spezifikation (zum Beispiel `@scope/diffs`).
 
 Unterstützte Archive: `.zip`, `.tgz`, `.tar.gz`, `.tar`.
 
-Installationen aus dem Claude Marketplace werden ebenfalls unterstützt.
+Claude-Marketplace-Installationen werden ebenfalls unterstützt.
 
 ClawHub-Installationen verwenden einen expliziten Locator `clawhub:<package>`:
 
@@ -139,7 +135,7 @@ openclaw plugins install clawhub:openclaw-codex-app-server
 openclaw plugins install clawhub:openclaw-codex-app-server@1.2.3
 ```
 
-OpenClaw bevorzugt jetzt auch ClawHub für unqualifizierte npm-sichere Plugin-Spezifikationen. Es greift nur dann
+OpenClaw bevorzugt jetzt auch ClawHub für reine npm-sichere Plugin-Spezifikationen. Es fällt nur dann
 auf npm zurück, wenn ClawHub dieses Paket oder diese Version nicht hat:
 
 ```bash
@@ -147,18 +143,18 @@ openclaw plugins install openclaw-codex-app-server
 ```
 
 OpenClaw lädt das Paketarchiv von ClawHub herunter, prüft die beworbene
-Plugin-API- / Mindest-Gateway-Kompatibilität und installiert es dann über den normalen
-Archivpfad. Aufgezeichnete Installationen behalten ihre ClawHub-Quellmetadaten für spätere
+Kompatibilität der Plugin-API / des minimalen Gateway und installiert es dann über den normalen
+Archivpfad. Erfasste Installationen behalten ihre Metadaten zur ClawHub-Quelle für spätere
 Updates.
 
-Verwenden Sie die Kurzform `plugin@marketplace`, wenn der Marketplace-Name im lokalen Registry-Cache von Claude unter `~/.claude/plugins/known_marketplaces.json` existiert:
+Verwenden Sie die Kurzform `plugin@marketplace`, wenn der Marketplace-Name im lokalen Registry-Cache von Claude unter `~/.claude/plugins/known_marketplaces.json` vorhanden ist:
 
 ```bash
 openclaw plugins marketplace list <marketplace-name>
 openclaw plugins install <plugin-name>@<marketplace-name>
 ```
 
-Verwenden Sie `--marketplace`, wenn Sie die Marketplace-Quelle explizit angeben möchten:
+Verwenden Sie `--marketplace`, wenn Sie die Marketplace-Quelle explizit übergeben möchten:
 
 ```bash
 openclaw plugins install <plugin-name> --marketplace <marketplace-name>
@@ -169,31 +165,31 @@ openclaw plugins install <plugin-name> --marketplace ./my-marketplace
 
 Marketplace-Quellen können sein:
 
-- ein Claude-Known-Marketplace-Name aus `~/.claude/plugins/known_marketplaces.json`
+- ein Claude-known-marketplace-Name aus `~/.claude/plugins/known_marketplaces.json`
 - ein lokaler Marketplace-Root oder ein Pfad zu `marketplace.json`
 - eine GitHub-Repo-Kurzform wie `owner/repo`
 - eine GitHub-Repo-URL wie `https://github.com/owner/repo`
 - eine Git-URL
 
-Für entfernte Marketplaces, die von GitHub oder Git geladen werden, müssen Plugin-Einträge
-innerhalb des geklonten Marketplace-Repos bleiben. OpenClaw akzeptiert relative Pfadquellen aus
+Für Remote-Marketplaces, die aus GitHub oder Git geladen werden, müssen Plugin-Einträge innerhalb des
+geklonten Marketplace-Repositorys bleiben. OpenClaw akzeptiert relative Pfadquellen aus
 diesem Repo und lehnt HTTP(S)-, absolute Pfad-, Git-, GitHub- und andere Nicht-Pfad-
-Plugin-Quellen aus entfernten Manifesten ab.
+Plugin-Quellen aus Remote-Manifesten ab.
 
 Für lokale Pfade und Archive erkennt OpenClaw automatisch:
 
-- native OpenClaw Plugins (`openclaw.plugin.json`)
+- native OpenClaw-Plugins (`openclaw.plugin.json`)
 - Codex-kompatible Bundles (`.codex-plugin/plugin.json`)
-- Claude-kompatible Bundles (`.claude-plugin/plugin.json` oder das Standard-Layout der Claude-
+- Claude-kompatible Bundles (`.claude-plugin/plugin.json` oder das Standard-Layout für Claude-
   Komponenten)
 - Cursor-kompatible Bundles (`.cursor-plugin/plugin.json`)
 
-Kompatible Bundles werden im normalen Plugin-Root installiert und nehmen
-am selben list/info/enable/disable-Ablauf teil. Heute werden Bundle-Skills, Claude
-command-skills, Claude-Standardwerte aus `settings.json`, Claude `.lsp.json` /
-manifestdeklarierte Standardwerte für `lspServers`, Cursor command-skills und kompatible
+Kompatible Bundles werden in den normalen Plugin-Root installiert und nehmen
+am selben Ablauf für `list`/`info`/`enable`/`disable` teil. Derzeit werden Bundle-Skills, Claude-
+Befehls-Skills, Claude-Standardeinstellungen aus `settings.json`, Claude `.lsp.json` /
+Manifest-definierte Standards für `lspServers`, Cursor-Befehls-Skills und kompatible
 Codex-Hook-Verzeichnisse unterstützt; andere erkannte Bundle-Fähigkeiten werden
-in Diagnosen/info angezeigt, sind aber noch nicht an die Laufzeitausführung angebunden.
+in Diagnosen/`info` angezeigt, sind aber noch nicht in die Runtime-Ausführung eingebunden.
 
 ### Auflisten
 
@@ -205,8 +201,8 @@ openclaw plugins list --json
 ```
 
 Verwenden Sie `--enabled`, um nur geladene Plugins anzuzeigen. Verwenden Sie `--verbose`, um von der
-Tabellenansicht auf Detailzeilen pro Plugin mit Metadaten zu Quelle/Ursprung/Version/Aktivierung
-umzuschalten. Verwenden Sie `--json` für maschinenlesbares Inventar plus Registry-
+Tabellenansicht zu detaillierten Zeilen pro Plugin mit Metadaten zu Quelle/Ursprung/Version/Aktivierung
+zu wechseln. Verwenden Sie `--json` für ein maschinenlesbares Inventar plus Registry-
 Diagnosen.
 
 Verwenden Sie `--link`, um das Kopieren eines lokalen Verzeichnisses zu vermeiden (fügt zu `plugins.load.paths` hinzu):
@@ -216,7 +212,7 @@ openclaw plugins install -l ./my-plugin
 ```
 
 `--force` wird mit `--link` nicht unterstützt, weil verlinkte Installationen den
-Quellpfad wiederverwenden, statt über ein verwaltetes Installationsziel zu kopieren.
+Quellpfad wiederverwenden, anstatt über ein verwaltetes Installationsziel zu kopieren.
 
 Verwenden Sie `--pin` bei npm-Installationen, um die aufgelöste exakte Spezifikation (`name@version`) in
 `plugins.installs` zu speichern, während das Standardverhalten nicht angeheftet bleibt.
@@ -230,12 +226,12 @@ openclaw plugins uninstall <id> --keep-files
 ```
 
 `uninstall` entfernt Plugin-Einträge aus `plugins.entries`, `plugins.installs`,
-der Plugin-Zulassungsliste und verlinkten Einträgen in `plugins.load.paths`, wenn zutreffend.
-Bei Active Memory Plugins wird der Speicher-Slot auf `memory-core` zurückgesetzt.
+der Plugin-Allowlist und verlinkte Einträge in `plugins.load.paths`, falls zutreffend.
+Bei aktiven Memory-Plugins wird der Memory-Slot auf `memory-core` zurückgesetzt.
 
-Standardmäßig entfernt die Deinstallation auch das Plugin-Installationsverzeichnis unter dem aktiven
-State-Dir-Plugin-Root. Verwenden Sie
-`--keep-files`, um Dateien auf der Festplatte zu behalten.
+Standardmäßig entfernt `uninstall` auch das Plugin-Installationsverzeichnis unter dem aktiven
+Plugin-Root des State-Dir. Verwenden Sie
+`--keep-files`, um Dateien auf dem Datenträger zu behalten.
 
 `--keep-config` wird als veralteter Alias für `--keep-files` unterstützt.
 
@@ -249,56 +245,57 @@ openclaw plugins update @openclaw/voice-call@beta
 openclaw plugins update openclaw-codex-app-server --dangerously-force-unsafe-install
 ```
 
-Updates gelten für verfolgte Installationen in `plugins.installs` und verfolgte Hook-Paket-
+Updates gelten für verfolgte Installationen in `plugins.installs` und verfolgte Hook-Pack-
 Installationen in `hooks.internal.installs`.
 
 Wenn Sie eine Plugin-ID übergeben, verwendet OpenClaw die für dieses
-Plugin aufgezeichnete Installationsspezifikation erneut. Das bedeutet, dass zuvor gespeicherte Dist-Tags wie `@beta`
-und exakte angeheftete Versionen auch bei späteren Läufen von `update <id>` weiterverwendet werden.
+Plugin gespeicherte Installationsspezifikation erneut. Das bedeutet, dass zuvor gespeicherte dist-tags wie `@beta` und
+exakte angeheftete Versionen auch bei späteren Ausführungen von `update <id>` weiterverwendet werden.
 
-Bei npm-Installationen können Sie auch eine explizite npm-Paketspezifikation mit Dist-Tag
-oder exakter Version übergeben. OpenClaw löst diesen Paketnamen zurück auf den verfolgten Plugin-
-Eintrag auf, aktualisiert dieses installierte Plugin und zeichnet die neue npm-Spezifikation für zukünftige
-ID-basierte Updates auf.
+Für npm-Installationen können Sie auch eine explizite npm-Paketspezifikation mit einem dist-tag
+oder einer exakten Version übergeben. OpenClaw löst diesen Paketnamen zurück auf den verfolgten Plugin-
+Eintrag auf, aktualisiert dieses installierte Plugin und speichert die neue npm-Spezifikation für zukünftige
+ID-basierte Updates.
 
-Die Übergabe des npm-Paketnamens ohne Version oder Tag wird ebenfalls zurück auf den
-verfolgten Plugin-Eintrag aufgelöst. Verwenden Sie dies, wenn ein Plugin an eine exakte Version angeheftet war und
-Sie es zurück auf die Standard-Release-Linie der Registry bringen möchten.
+Die Übergabe des npm-Paketnamens ohne Version oder Tag wird ebenfalls auf den verfolgten Plugin-
+Eintrag zurückgeführt. Verwenden Sie dies, wenn ein Plugin auf eine exakte Version angeheftet war und
+Sie es zurück auf die Standard-Release-Linie der Registry verschieben möchten.
 
-Vor einem Live-npm-Update prüft OpenClaw die installierte Paketversion gegen die npm-Registry-Metadaten.
-Wenn die installierte Version und die aufgezeichnete Artefaktidentität bereits dem aufgelösten Ziel entsprechen,
-wird das Update übersprungen, ohne herunterzuladen, neu zu installieren oder `openclaw.json` neu zu schreiben.
+Vor einem Live-npm-Update prüft OpenClaw die installierte Paketversion gegen
+die npm-Registry-Metadaten. Wenn die installierte Version und die gespeicherte Artefakt-
+Identität bereits mit dem aufgelösten Ziel übereinstimmen, wird das Update übersprungen, ohne
+etwas herunterzuladen, neu zu installieren oder `openclaw.json` neu zu schreiben.
 
-Wenn ein gespeicherter Integritäts-Hash existiert und sich der Hash des abgerufenen Artefakts ändert,
-behandelt OpenClaw dies als npm-Artefakt-Drift. Der interaktive
+Wenn ein gespeicherter Integrity-Hash existiert und sich der Hash des abgerufenen Artefakts ändert,
+behandelt OpenClaw dies als npm-Artefaktdrift. Der interaktive
 Befehl `openclaw plugins update` gibt die erwarteten und tatsächlichen Hashes aus und fragt
-vor dem Fortfahren nach Bestätigung. Nicht interaktive Update-Helfer schlagen geschlossen fehl,
+vor dem Fortfahren nach einer Bestätigung. Nicht interaktive Update-Helfer schlagen fail-closed fehl,
 sofern der Aufrufer keine explizite Fortsetzungsrichtlinie angibt.
 
 `--dangerously-force-unsafe-install` ist auch bei `plugins update` als
-Notfallüberschreibung für Fehlalarme bei integrierten Scans auf gefährlichen Code während
-Plugin-Updates verfügbar. Es umgeht weiterhin keine Plugin-`before_install`-Richtlinienblockierungen
-oder Blockierungen wegen fehlgeschlagener Scans, und es gilt nur für Plugin-Updates, nicht für Hook-Paket-
+Break-Glass-Überschreibung für False Positives des integrierten Scans auf gefährlichen Code während
+Plugin-Updates verfügbar. Es umgeht weiterhin keine Plugin-Richtlinienblockaden von `before_install`
+oder blockierende Scan-Fehler und gilt nur für Plugin-Updates, nicht für Hook-Pack-
 Updates.
 
-### Inspizieren
+### Prüfen
 
 ```bash
 openclaw plugins inspect <id>
 openclaw plugins inspect <id> --json
 ```
 
-Tiefe Inspektion für ein einzelnes Plugin. Zeigt Identität, Ladestatus, Quelle,
-registrierte Fähigkeiten, Hooks, Tools, Befehle, Services, Gateway-Methoden,
+Tiefe Introspektion für ein einzelnes Plugin. Zeigt Identität, Ladestatus, Quelle,
+registrierte Fähigkeiten, Hooks, Tools, Befehle, Dienste, Gateway-Methoden,
 HTTP-Routen, Richtlinien-Flags, Diagnosen, Installationsmetadaten, Bundle-Fähigkeiten
-sowie jede erkannte MCP- oder LSP-Server-Unterstützung.
+sowie erkannte Unterstützung für MCP- oder LSP-Server.
 
-Jedes Plugin wird danach klassifiziert, was es zur Laufzeit tatsächlich registriert:
+Jedes Plugin wird danach klassifiziert, was es tatsächlich zur Laufzeit registriert:
 
-- **plain-capability** — ein Fähigkeitstyp (z. B. ein reines Provider-Plugin)
+- **plain-capability** — ein Fähigkeitstyp (z. B. ein Plugin nur für einen Provider)
 - **hybrid-capability** — mehrere Fähigkeitstypen (z. B. Text + Sprache + Bilder)
 - **hook-only** — nur Hooks, keine Fähigkeiten oder Oberflächen
-- **non-capability** — Tools/Befehle/Services, aber keine Fähigkeiten
+- **non-capability** — Tools/Befehle/Dienste, aber keine Fähigkeiten
 
 Siehe [Plugin shapes](/de/plugins/architecture#plugin-shapes) für weitere Informationen zum Fähigkeitsmodell.
 
@@ -320,8 +317,9 @@ openclaw plugins doctor
 Kompatibilitätshinweise. Wenn alles sauber ist, wird `No plugin issues
 detected.` ausgegeben.
 
-Bei Modul-Shape-Fehlern wie fehlenden Exporten `register`/`activate` führen Sie den Befehl erneut
-mit `OPENCLAW_PLUGIN_LOAD_DEBUG=1` aus, um in der Diagnoseausgabe eine kompakte Zusammenfassung der Export-Shape einzuschließen.
+Bei Fehlern der Modulform wie fehlenden Exporten `register`/`activate` führen Sie den Befehl
+mit `OPENCLAW_PLUGIN_LOAD_DEBUG=1` erneut aus, um eine kompakte Zusammenfassung der Exportform in
+der Diagnoseausgabe einzuschließen.
 
 ### Marketplace
 
@@ -330,7 +328,13 @@ openclaw plugins marketplace list <source>
 openclaw plugins marketplace list <source> --json
 ```
 
-Marketplace list akzeptiert einen lokalen Marketplace-Pfad, einen Pfad zu `marketplace.json`, eine
+`marketplace list` akzeptiert einen lokalen Marketplace-Pfad, einen Pfad zu `marketplace.json`, eine
 GitHub-Kurzform wie `owner/repo`, eine GitHub-Repo-URL oder eine Git-URL. `--json`
-gibt das aufgelöste Quellenlabel plus das geparste Marketplace-Manifest und
+gibt das aufgelöste Quellenlabel sowie das geparste Marketplace-Manifest und
 Plugin-Einträge aus.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Plugins erstellen](/de/plugins/building-plugins)
+- [Community-Plugins](/de/plugins/community)

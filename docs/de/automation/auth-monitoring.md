@@ -1,15 +1,18 @@
 ---
 summary: Weiterleitung zu /gateway/authentication
-title: Auth-Überwachung
+title: Authentifizierungsüberwachung
 x-i18n:
-    generated_at: "2026-04-05T12:33:57Z"
+    generated_at: "2026-04-24T06:26:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 42aa1b4aa76201b20e07d8ad77231607855e7e7421fa032830055144ccd8819a
+    source_hash: a80b75d3f35d0255213907562a5ac0416d9bf9fe6f8026193bff07e2f33086a2
     source_path: automation/auth-monitoring.md
     workflow: 15
 ---
 
-# Auth-Überwachung
+Diese Seite wurde nach [Authentifizierung](/de/gateway/authentication) verschoben. Informationen zur Dokumentation der Authentifizierungsüberwachung finden Sie unter [Authentifizierung](/de/gateway/authentication).
 
-Diese Seite wurde nach [Authentication](/gateway/authentication) verschoben. Siehe [Authentication](/gateway/authentication) für die Dokumentation zur Auth-Überwachung.
+## Verwandt
+
+- [Fehlerbehebung bei der Automatisierung](/de/automation/cron-jobs)
+- [Hooks](/de/automation/hooks)

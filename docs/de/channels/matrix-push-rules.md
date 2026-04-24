@@ -1,23 +1,21 @@
 ---
 read_when:
     - Einrichten von leisem Matrix-Streaming für selbstgehostetes Synapse oder Tuwunel
-    - Benutzer möchten Benachrichtigungen nur bei abgeschlossenen Blöcken, nicht bei jeder Vorschau-Bearbeitung
-summary: Matrix-Push-Regeln pro Empfänger für leise finalisierte Vorschau-Bearbeitungen
+    - Benutzer möchten Benachrichtigungen nur bei fertiggestellten Blöcken, nicht bei jeder Vorschau-Bearbeitung
+summary: Matrix-Push-Regeln pro Empfänger für leise abgeschlossene Vorschau-Bearbeitungen
 title: Matrix-Push-Regeln für leise Vorschauen
 x-i18n:
-    generated_at: "2026-04-23T14:55:30Z"
+    generated_at: "2026-04-24T06:27:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dbfdf2552ca352858d4e8d03a2a0f5f3b420d33b01063c111c0335c0229f0534
+    source_hash: 07a8cf9a4041b63e13feb21ee2eb22909cb14931d6929bedf6b94315f7a270cf
     source_path: channels/matrix-push-rules.md
     workflow: 15
 ---
 
-# Matrix-Push-Regeln für leise Vorschauen
+Wenn `channels.matrix.streaming` auf `"quiet"` gesetzt ist, bearbeitet OpenClaw ein einzelnes Vorschau-Ereignis direkt und markiert die abgeschlossene Bearbeitung mit einem benutzerdefinierten Content-Flag. Matrix-Clients benachrichtigen nur bei der finalen Bearbeitung, wenn eine Push-Regel pro Benutzer auf dieses Flag passt. Diese Seite richtet sich an Operatoren, die Matrix selbst hosten und diese Regel für jedes Empfängerkonto installieren möchten.
 
-Wenn `channels.matrix.streaming` auf `"quiet"` gesetzt ist, bearbeitet OpenClaw ein einzelnes Vorschau-Ereignis direkt vor Ort und markiert die finalisierte Bearbeitung mit einem benutzerdefinierten Content-Flag. Matrix-Clients benachrichtigen nur bei der finalen Bearbeitung, wenn eine Push-Regel pro Benutzer zu diesem Flag passt. Diese Seite richtet sich an Betreiber, die Matrix selbst hosten und diese Regel für jedes Empfängerkonto installieren möchten.
-
-Wenn Sie nur das standardmäßige Matrix-Benachrichtigungsverhalten möchten, verwenden Sie `streaming: "partial"` oder lassen Sie Streaming deaktiviert. Siehe [Einrichtung des Matrix-Kanals](/de/channels/matrix#streaming-previews).
+Wenn Sie nur das Standard-Benachrichtigungsverhalten von Matrix möchten, verwenden Sie `streaming: "partial"` oder lassen Sie Streaming deaktiviert. Siehe [Matrix-Channel-Einrichtung](/de/channels/matrix#streaming-previews).
 
 ## Voraussetzungen
 
@@ -25,7 +23,7 @@ Wenn Sie nur das standardmäßige Matrix-Benachrichtigungsverhalten möchten, ve
 - Bot-Benutzer = das OpenClaw-Matrix-Konto, das die Antwort sendet
 - verwenden Sie für die folgenden API-Aufrufe das Zugriffstoken des Empfängerbenutzers
 - gleichen Sie `sender` in der Push-Regel mit der vollständigen MXID des Bot-Benutzers ab
-- das Empfängerkonto muss bereits funktionierende Pusher haben — Regeln für leise Vorschauen funktionieren nur, wenn die normale Matrix-Push-Zustellung fehlerfrei funktioniert
+- das Empfängerkonto muss bereits funktionierende Pusher haben — Regeln für leise Vorschauen funktionieren nur, wenn die normale Matrix-Push-Zustellung korrekt funktioniert
 
 ## Schritte
 
@@ -44,7 +42,7 @@ Wenn Sie nur das standardmäßige Matrix-Benachrichtigungsverhalten möchten, ve
 
   </Step>
 
-  <Step title="Das Zugriffstoken des Empfängers abrufen">
+  <Step title="Zugriffstoken des Empfängers abrufen">
     Verwenden Sie nach Möglichkeit ein vorhandenes Client-Sitzungstoken erneut. Um ein neues zu erstellen:
 
 ```bash
@@ -72,8 +70,8 @@ Wenn keine Pusher zurückgegeben werden, beheben Sie zuerst die normale Matrix-P
 
   </Step>
 
-  <Step title="Die Override-Push-Regel installieren">
-    OpenClaw markiert finalisierte rein textbasierte Vorschau-Bearbeitungen mit `content["com.openclaw.finalized_preview"] = true`. Installieren Sie eine Regel, die auf diesen Marker plus die Bot-MXID als Absender passt:
+  <Step title="Die Push-Regel vom Typ override installieren">
+    OpenClaw markiert abgeschlossene rein textbasierte Vorschau-Bearbeitungen mit `content["com.openclaw.finalized_preview"] = true`. Installieren Sie eine Regel, die auf diesen Marker plus die Bot-MXID als Absender passt:
 
 ```bash
 curl -sS -X PUT \
@@ -103,12 +101,12 @@ curl -sS -X PUT \
   }'
 ```
 
-    Ersetzen Sie vor dem Ausführen Folgendes:
+    Vor dem Ausführen ersetzen:
 
     - `https://matrix.example.org`: die Basis-URL Ihres Homeservers
     - `$USER_ACCESS_TOKEN`: das Zugriffstoken des Empfängerbenutzers
     - `openclaw-finalized-preview-botname`: eine Regel-ID, die pro Bot und Empfänger eindeutig ist (Muster: `openclaw-finalized-preview-<botname>`)
-    - `@bot:example.org`: Ihre OpenClaw-Bot-MXID, nicht die des Empfängers
+    - `@bot:example.org`: die MXID Ihres OpenClaw-Bots, nicht die des Empfängers
 
   </Step>
 
@@ -120,38 +118,38 @@ curl -sS \
   "https://matrix.example.org/_matrix/client/v3/pushrules/global/override/openclaw-finalized-preview-botname"
 ```
 
-Testen Sie dann eine gestreamte Antwort. Im leisen Modus zeigt der Raum eine unauffällige Entwurfsvorschau an und benachrichtigt einmal, wenn der Block oder Turn abgeschlossen ist.
+Testen Sie dann eine gestreamte Antwort. Im leisen Modus zeigt der Raum eine leise Entwurfsvorschau an und benachrichtigt einmal, wenn der Block oder Turn abgeschlossen ist.
 
   </Step>
 </Steps>
 
-Um die Regel später zu entfernen, senden Sie `DELETE` an dieselbe Regel-URL mit dem Token des Empfängers.
+Um die Regel später zu entfernen, führen Sie mit dem Token des Empfängers `DELETE` auf dieselbe Regel-URL aus.
 
-## Hinweise zu mehreren Bots
+## Hinweise für mehrere Bots
 
-Push-Regeln werden über `ruleId` indiziert: Ein erneutes `PUT` gegen dieselbe ID aktualisiert eine einzelne Regel. Wenn mehrere OpenClaw-Bots denselben Empfänger benachrichtigen, erstellen Sie eine Regel pro Bot mit einer eindeutigen Absenderübereinstimmung.
+Push-Regeln sind über `ruleId` verschlüsselt: Wenn `PUT` erneut mit derselben ID ausgeführt wird, wird eine einzelne Regel aktualisiert. Wenn mehrere OpenClaw-Bots denselben Empfänger benachrichtigen, erstellen Sie eine Regel pro Bot mit einer eigenen Absenderübereinstimmung.
 
-Neue benutzerdefinierte `override`-Regeln werden vor den standardmäßigen Unterdrückungsregeln eingefügt, daher ist kein zusätzlicher Ordnungsparameter erforderlich. Die Regel wirkt sich nur auf rein textbasierte Vorschau-Bearbeitungen aus, die direkt vor Ort finalisiert werden können; Media-Fallbacks und Stale-Preview-Fallbacks verwenden die normale Matrix-Zustellung.
+Neue benutzerdefinierte `override`-Regeln werden vor den standardmäßigen Unterdrückungsregeln eingefügt, daher ist kein zusätzlicher Ordnungsparameter erforderlich. Die Regel wirkt sich nur auf rein textbasierte Vorschau-Bearbeitungen aus, die direkt abgeschlossen werden können; Media-Fallbacks und Stale-Preview-Fallbacks verwenden die normale Matrix-Zustellung.
 
 ## Hinweise zum Homeserver
 
 <AccordionGroup>
   <Accordion title="Synapse">
-    Es ist keine spezielle Änderung an `homeserver.yaml` erforderlich. Wenn normale Matrix-Benachrichtigungen diesen Benutzer bereits erreichen, sind das Empfängertoken und der oben gezeigte `pushrules`-Aufruf der wichtigste Einrichtungsschritt.
+    Es ist keine spezielle Änderung in `homeserver.yaml` erforderlich. Wenn normale Matrix-Benachrichtigungen diesen Benutzer bereits erreichen, sind das Empfängertoken und der obige `pushrules`-Aufruf der wichtigste Einrichtungsschritt.
 
-    Wenn Sie Synapse hinter einem Reverse-Proxy oder mit Workern betreiben, stellen Sie sicher, dass `/_matrix/client/.../pushrules/` Synapse korrekt erreicht. Die Push-Zustellung wird vom Hauptprozess oder von `synapse.app.pusher` / konfigurierten Pusher-Workern verarbeitet — stellen Sie sicher, dass diese fehlerfrei funktionieren.
+    Wenn Sie Synapse hinter einem Reverse-Proxy oder mit Workers betreiben, stellen Sie sicher, dass `/_matrix/client/.../pushrules/` Synapse korrekt erreicht. Die Push-Zustellung wird vom Hauptprozess oder von `synapse.app.pusher` bzw. konfigurierten Pusher-Workers verarbeitet — stellen Sie sicher, dass diese fehlerfrei funktionieren.
 
   </Accordion>
 
   <Accordion title="Tuwunel">
-    Derselbe Ablauf wie bei Synapse; für den Marker der finalisierten Vorschau ist keine Tuwunel-spezifische Konfiguration erforderlich.
+    Derselbe Ablauf wie bei Synapse; für den Marker der abgeschlossenen Vorschau ist keine Tuwunel-spezifische Konfiguration erforderlich.
 
-    Wenn Benachrichtigungen verschwinden, während der Benutzer auf einem anderen Gerät aktiv ist, prüfen Sie, ob `suppress_push_when_active` aktiviert ist. Tuwunel hat diese Option in 1.4.2 (September 2025) hinzugefügt, und sie kann Pushes zu anderen Geräten absichtlich unterdrücken, während ein Gerät aktiv ist.
+    Wenn Benachrichtigungen verschwinden, während der Benutzer auf einem anderen Gerät aktiv ist, prüfen Sie, ob `suppress_push_when_active` aktiviert ist. Tuwunel hat diese Option in 1.4.2 (September 2025) hinzugefügt, und sie kann Pushes an andere Geräte absichtlich unterdrücken, während ein Gerät aktiv ist.
 
   </Accordion>
 </AccordionGroup>
 
-## Verwandte Themen
+## Verwandt
 
-- [Einrichtung des Matrix-Kanals](/de/channels/matrix)
+- [Matrix-Channel-Einrichtung](/de/channels/matrix)
 - [Streaming-Konzepte](/de/concepts/streaming)

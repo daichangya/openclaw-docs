@@ -1,46 +1,44 @@
 ---
 read_when:
-    - Debuggen wiederholter Node-Exec-Abschlussereignisse
-    - An Heartbeat-/System-Event-Deduplizierung arbeiten
+    - Wiederholte Abschlussereignisse von Node-Exec debuggen
+    - Arbeiten an Heartbeat-/System-Event-Deduplizierung
 summary: Untersuchungsnotizen zur doppelten Injektion des Abschlusses asynchroner Exec-Ausführung
-title: Untersuchung zur doppelten Vervollständigung von Async Exec
+title: Untersuchung doppelter Abschlüsse bei asynchroner Exec-Ausführung
 x-i18n:
-    generated_at: "2026-04-23T14:06:40Z"
+    generated_at: "2026-04-24T06:57:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8b0a3287b78bbc4c41e4354e9062daba7ae790fa207eee9a5f77515b958b510b
+    source_hash: e448cdcff6c799bf7f40caea2698c3293d1a78ed85ba5ffdfe10f53ce125f0ab
     source_path: refactor/async-exec-duplicate-completion-investigation.md
     workflow: 15
 ---
 
-# Untersuchung zur doppelten Vervollständigung von Async Exec
-
-## Geltungsbereich
+## Umfang
 
 - Sitzung: `agent:main:telegram:group:-1003774691294:topic:1`
-- Symptom: Dieselbe Async-Exec-Vervollständigung für Sitzung/Run `keen-nexus` wurde in LCM zweimal als Benutzer-Turn aufgezeichnet.
-- Ziel: Feststellen, ob dies höchstwahrscheinlich eine doppelte Sitzungsinjektion oder nur ein einfacher Retry der ausgehenden Zustellung ist.
+- Symptom: Derselbe Abschluss einer asynchronen Exec-Ausführung für Sitzung/Lauf `keen-nexus` wurde in LCM zweimal als Benutzerdurchlauf aufgezeichnet.
+- Ziel: feststellen, ob dies am wahrscheinlichsten eine doppelte Sitzungsinjektion oder ein bloßer Retry der ausgehenden Zustellung ist.
 
 ## Fazit
 
-Höchstwahrscheinlich handelt es sich um eine **doppelte Sitzungsinjektion**, nicht um einen reinen Retry der ausgehenden Zustellung.
+Am wahrscheinlichsten handelt es sich um eine **doppelte Sitzungsinjektion**, nicht um einen reinen Retry der ausgehenden Zustellung.
 
-Die stärkste Lücke auf Gateway-Seite liegt im **Node-Exec-Vervollständigungspfad**:
+Die stärkste Lücke auf Gateway-Seite liegt im **Pfad für den Abschluss von Node-Exec**:
 
-1. Ein Node-seitiges Exec-Ende sendet `exec.finished` mit vollständigem `runId`.
+1. Der Abschluss einer node-seitigen Exec-Ausführung sendet `exec.finished` mit der vollständigen `runId`.
 2. Gateway `server-node-events` wandelt dies in ein Systemereignis um und fordert einen Heartbeat an.
-3. Der Heartbeat-Lauf injiziert den geleerten Systemereignisblock in den Agent-Prompt.
-4. Der eingebettete Runner speichert diesen Prompt als neuen Benutzer-Turn im Sitzungs-Transkript.
+3. Der Heartbeat-Lauf injiziert den geleerten Systemereignis-Block in den Agent-Prompt.
+4. Der eingebettete Runner persistiert diesen Prompt als neuen Benutzerdurchlauf im Sitzungs-Transkript.
 
-Wenn dasselbe `exec.finished` aus irgendeinem Grund zweimal mit demselben `runId` das Gateway erreicht (Replay, doppelte Zustellung nach Reconnect, Upstream-Resend, doppelter Producer), hat OpenClaw auf diesem Pfad derzeit **keine Idempotenzprüfung mit Schlüssel `runId`/`contextKey`**. Die zweite Kopie wird zu einer zweiten Benutzernachricht mit demselben Inhalt.
+Wenn dasselbe `exec.finished` aus irgendeinem Grund (Replay, doppeltes Ereignis nach Reconnect, Upstream-Resend, duplizierter Producer) mit derselben `runId` zweimal das Gateway erreicht, hat OpenClaw auf diesem Pfad derzeit **keine Idempotenzprüfung anhand von `runId`/`contextKey`**. Die zweite Kopie wird zu einer zweiten Benutzernachricht mit identischem Inhalt.
 
 ## Exakter Codepfad
 
-### 1. Producer: Node-Exec-Vervollständigungsereignis
+### 1. Producer: Ereignis für den Abschluss von Node-Exec
 
 - `src/node-host/invoke.ts:340-360`
-  - `sendExecFinishedEvent(...)` sendet `node.event` mit Ereignis `exec.finished`.
-  - Die Payload enthält `sessionKey` und vollständiges `runId`.
+  - `sendExecFinishedEvent(...)` sendet `node.event` mit dem Ereignis `exec.finished`.
+  - Die Payload enthält `sessionKey` und die vollständige `runId`.
 
 ### 2. Gateway-Ereignisaufnahme
 
@@ -48,9 +46,9 @@ Wenn dasselbe `exec.finished` aus irgendeinem Grund zweimal mit demselben `runId
   - Behandelt `exec.finished`.
   - Erstellt Text:
     - `Exec finished (node=..., id=<runId>, code ...)`
-  - Reiht ihn ein über:
+  - Stellt ihn in die Queue über:
     - `enqueueSystemEvent(text, { sessionKey, contextKey: runId ? \`exec:${runId}\` : "exec", trusted: false })`
-  - Fordert sofort ein Wake an:
+  - Fordert sofort einen Wake an:
     - `requestHeartbeatNow(scopedHeartbeatWakeOptions(sessionKey, { reason: "exec-event" }))`
 
 ### 3. Schwäche bei der Deduplizierung von Systemereignissen
@@ -59,79 +57,84 @@ Wenn dasselbe `exec.finished` aus irgendeinem Grund zweimal mit demselben `runId
   - `enqueueSystemEvent(...)` unterdrückt nur **aufeinanderfolgende doppelte Texte**:
     - `if (entry.lastText === cleaned) return false`
   - Es speichert `contextKey`, verwendet `contextKey` aber **nicht** für Idempotenz.
-  - Nach dem Leeren wird die Deduplizierungsunterdrückung zurückgesetzt.
+  - Nach dem Drain wird die Unterdrückung von Duplikaten zurückgesetzt.
 
-Das bedeutet: Ein wiederholtes `exec.finished` mit demselben `runId` kann später erneut akzeptiert werden, obwohl der Code bereits einen stabilen Kandidaten für Idempotenz hatte (`exec:<runId>`).
+Das bedeutet, dass ein erneut abgespieltes `exec.finished` mit derselben `runId` später erneut akzeptiert werden kann, obwohl der Code bereits einen stabilen Kandidaten für Idempotenz hatte (`exec:<runId>`).
 
-### 4. Wake-Handling ist nicht der primäre Duplikator
+### 4. Wake-Handling ist nicht der primäre Verursacher von Duplikaten
 
 - `src/infra/heartbeat-wake.ts:79-117`
-  - Wakes werden per `(agentId, sessionKey)` zusammengefasst.
-  - Doppelte Wake-Anfragen für dasselbe Ziel fallen zu einem einzelnen ausstehenden Wake-Eintrag zusammen.
+  - Wakes werden nach `(agentId, sessionKey)` zusammengeführt.
+  - Doppelte Wake-Anfragen für dasselbe Ziel kollabieren zu einem ausstehenden Wake-Eintrag.
 
-Dadurch ist **doppeltes Wake-Handling allein** eine schwächere Erklärung als doppelte Ereignisaufnahme.
+Dadurch ist **dupliziertes Wake-Handling allein** eine schwächere Erklärung als doppelte Ereignisaufnahme.
 
-### 5. Heartbeat verbraucht das Ereignis und wandelt es in Prompt-Eingabe um
+### 5. Heartbeat konsumiert das Ereignis und wandelt es in Prompt-Eingabe um
 
 - `src/infra/heartbeat-runner.ts:535-574`
-  - Preflight schaut in ausstehende Systemereignisse und klassifiziert Läufe vom Typ Exec-Event.
+  - Preflight schaut auf ausstehende Systemereignisse und klassifiziert Läufe mit Exec-Ereignissen.
 - `src/auto-reply/reply/session-system-events.ts:86-90`
   - `drainFormattedSystemEvents(...)` leert die Queue für die Sitzung.
 - `src/auto-reply/reply/get-reply-run.ts:400-427`
-  - Der geleerte Systemereignisblock wird dem Agent-Prompt-Body vorangestellt.
+  - Der geleerte Systemereignis-Block wird dem Agent-Prompt-Body vorangestellt.
 
-### 6. Transkript-Injektionspunkt
+### 6. Punkt der Transkript-Injektion
 
 - `src/agents/pi-embedded-runner/run/attempt.ts:2000-2017`
   - `activeSession.prompt(effectivePrompt)` übergibt den vollständigen Prompt an die eingebettete PI-Sitzung.
-  - Das ist der Punkt, an dem der von der Vervollständigung abgeleitete Prompt zu einem gespeicherten Benutzer-Turn wird.
+  - Das ist der Punkt, an dem der vom Abschluss abgeleitete Prompt zu einem persistierten Benutzerdurchlauf wird.
 
-Sobald also dasselbe Systemereignis zweimal in den Prompt eingebaut wird, sind doppelte LCM-Benutzernachrichten erwartbar.
+Sobald dasselbe Systemereignis zweimal in den Prompt eingebaut wird, sind doppelte LCM-Benutzernachrichten also zu erwarten.
 
 ## Warum ein reiner Retry der ausgehenden Zustellung weniger wahrscheinlich ist
 
-Es gibt einen realen Fehlerpfad für ausgehende Zustellung im Heartbeat-Runner:
+Es gibt einen echten Pfad für ausgehende Fehler im Heartbeat-Runner:
 
 - `src/infra/heartbeat-runner.ts:1194-1242`
   - Die Antwort wird zuerst erzeugt.
   - Die ausgehende Zustellung erfolgt später über `deliverOutboundPayloads(...)`.
-  - Ein Fehler dort gibt `{ status: "failed" }` zurück.
+  - Ein Fehlschlag dort gibt `{ status: "failed" }` zurück.
 
-Für denselben Eintrag in der Systemereignis-Queue reicht dies allein jedoch **nicht aus**, um die doppelten Benutzer-Turns zu erklären:
+Für denselben Systemereignis-Queue-Eintrag ist das allein jedoch **nicht ausreichend**, um die doppelten Benutzerdurchläufe zu erklären:
 
 - `src/auto-reply/reply/session-system-events.ts:86-90`
-  - Die Systemereignis-Queue ist bereits vor der ausgehenden Zustellung geleert.
+  - Die Queue der Systemereignisse wird bereits vor der ausgehenden Zustellung geleert.
 
-Ein Retry beim Senden an den Kanal würde also das exakt gleiche in die Queue eingereihte Ereignis nicht von selbst erneut erzeugen. Er könnte fehlende/fehlgeschlagene externe Zustellung erklären, aber nicht allein eine zweite identische Benutzernachricht in der Sitzung.
+Ein Channel-Send-Retry allein würde also nicht exakt denselben Queue-Eintrag erneut erzeugen. Er könnte fehlende/fehlgeschlagene externe Zustellung erklären, aber für sich genommen keine zweite identische Benutzernachricht in der Sitzung.
 
 ## Sekundäre Möglichkeit mit geringerer Sicherheit
 
-Es gibt eine Full-Run-Retry-Schleife im Agent-Runner:
+Es gibt eine vollständige Retry-Schleife für den Lauf im Agent-Runner:
 
 - `src/auto-reply/reply/agent-runner-execution.ts:741-1473`
-  - Bestimmte transiente Fehler können den gesamten Lauf wiederholen und denselben `commandBody` erneut übermitteln.
+  - Bestimmte transiente Fehler können den gesamten Lauf erneut versuchen und denselben `commandBody` erneut senden.
 
-Das kann einen gespeicherten Benutzer-Prompt **innerhalb derselben Antwortausführung** duplizieren, wenn der Prompt bereits angehängt wurde, bevor die Retry-Bedingung ausgelöst wurde.
+Das kann einen persistierten Benutzer-Prompt **innerhalb derselben Antwortausführung** duplizieren, wenn der Prompt bereits angehängt war, bevor die Retry-Bedingung ausgelöst wurde.
 
 Ich bewerte dies niedriger als doppelte Aufnahme von `exec.finished`, weil:
 
-- die beobachtete Lücke etwa 51 Sekunden betrug, was eher wie ein zweiter Wake/Turn als wie ein In-Process-Retry aussieht;
-- der Bericht bereits wiederholte Fehlversuche beim Senden von Nachrichten erwähnt, was eher auf einen separaten späteren Turn als auf einen unmittelbaren Modell-/Laufzeit-Retry hindeutet.
+- der beobachtete Abstand bei etwa 51 Sekunden lag, was eher wie ein zweiter Wake/Turn als wie ein In-Process-Retry wirkt;
+- der Bericht bereits wiederholte Fehlschläge beim Senden von Nachrichten erwähnt, was eher auf einen separaten späteren Durchlauf als auf einen unmittelbaren Modell-/Runtime-Retry hindeutet.
 
 ## Root-Cause-Hypothese
 
 Hypothese mit der höchsten Sicherheit:
 
-- Die Vervollständigung von `keen-nexus` kam über den **Node-Exec-Ereignispfad**.
+- Der Abschluss von `keen-nexus` kam über den **Node-Exec-Ereignispfad**.
 - Dasselbe `exec.finished` wurde zweimal an `server-node-events` zugestellt.
-- Gateway akzeptierte beide, weil `enqueueSystemEvent(...)` nicht per `contextKey` / `runId` dedupliziert.
-- Jedes akzeptierte Ereignis löste einen Heartbeat aus und wurde als Benutzer-Turn in das PI-Transkript injiziert.
+- Gateway akzeptierte beide, weil `enqueueSystemEvent(...)` nicht nach `contextKey` / `runId` dedupliziert.
+- Jedes akzeptierte Ereignis löste einen Heartbeat aus und wurde als Benutzerdurchlauf in das PI-Transkript injiziert.
 
-## Vorgeschlagener kleiner chirurgischer Fix
+## Vorgeschlagene kleine chirurgische Korrektur
 
-Falls ein Fix gewünscht ist, ist die kleinste Änderung mit hohem Nutzen:
+Wenn eine Korrektur gewünscht ist, ist die kleinste wertvolle Änderung:
 
-- Idempotenz für Exec-/Systemereignisse so ändern, dass `contextKey` für einen kurzen Horizont berücksichtigt wird, zumindest für exakte Wiederholungen von `(sessionKey, contextKey, text)`;
-- oder eine dedizierte Deduplizierung in `server-node-events` für `exec.finished` hinzufügen, mit Schlüssel `(sessionKey, runId, event kind)`.
+- Die Idempotenz von Exec-/Systemereignissen sollte `contextKey` über einen kurzen Zeitraum berücksichtigen, mindestens für exakte Wiederholungen von `(sessionKey, contextKey, text)`;
+- oder eine dedizierte Deduplizierung in `server-node-events` für `exec.finished` hinzufügen, verschlüsselt nach `(sessionKey, runId, event kind)`.
 
-Das würde wiederholte Duplikate von `exec.finished` direkt blockieren, bevor sie zu Sitzungs-Turns werden.
+Dadurch würden erneut abgespielte Duplikate von `exec.finished` direkt blockiert, bevor sie zu Sitzungsdurchläufen werden.
+
+## Verwandt
+
+- [Exec-Tool](/de/tools/exec)
+- [Sitzungsverwaltung](/de/concepts/session)

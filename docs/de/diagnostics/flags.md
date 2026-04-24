@@ -1,28 +1,26 @@
 ---
 read_when:
-    - Sie benötigen gezielte Debug-Logs, ohne globale Logging-Level zu erhöhen
-    - Sie müssen subsystemspezifische Logs für den Support erfassen
+    - Sie benötigen gezielte Debug-Logs, ohne globale Logging-Level anzuheben.
+    - Sie müssen subsystemspezifische Logs für den Support erfassen.
 summary: Diagnose-Flags für gezielte Debug-Logs
 title: Diagnose-Flags
 x-i18n:
-    generated_at: "2026-04-05T12:41:31Z"
+    generated_at: "2026-04-24T06:36:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: daf0eca0e6bd1cbc2c400b2e94e1698709a96b9cdba1a8cf00bd580a61829124
+    source_hash: b7e5ec9c5e28ef51f1e617baf62412897df8096f227a74d86a0824e269aafd9d
     source_path: diagnostics/flags.md
     workflow: 15
 ---
 
-# Diagnose-Flags
-
-Mit Diagnose-Flags können Sie gezielte Debug-Logs aktivieren, ohne überall ausführliches Logging einzuschalten. Flags sind Opt-in und haben keine Wirkung, es sei denn, ein Subsystem prüft sie.
+Diagnose-Flags ermöglichen es Ihnen, gezielte Debug-Logs zu aktivieren, ohne überall ausführliches Logging einzuschalten. Flags sind opt-in und haben keine Wirkung, sofern ein Subsystem sie nicht prüft.
 
 ## So funktioniert es
 
-- Flags sind Zeichenfolgen (Groß-/Kleinschreibung wird nicht beachtet).
-- Sie können Flags in der Konfiguration oder über eine env-Überschreibung aktivieren.
+- Flags sind Strings (case-insensitive).
+- Sie können Flags in der Konfiguration oder über eine Env-Überschreibung aktivieren.
 - Wildcards werden unterstützt:
-  - `telegram.*` entspricht `telegram.http`
+  - `telegram.*` passt auf `telegram.http`
   - `*` aktiviert alle Flags
 
 ## Über die Konfiguration aktivieren
@@ -63,7 +61,7 @@ OPENCLAW_DIAGNOSTICS=0
 
 Flags schreiben Logs in die Standard-Diagnose-Logdatei. Standardmäßig:
 
-```
+```text
 /tmp/openclaw/openclaw-YYYY-MM-DD.log
 ```
 
@@ -77,22 +75,27 @@ Die neueste Logdatei auswählen:
 ls -t /tmp/openclaw/openclaw-*.log | head -n 1
 ```
 
-Nach Telegram-HTTP-Diagnose filtern:
+Nach Telegram-HTTP-Diagnosen filtern:
 
 ```bash
 rg "telegram http error" /tmp/openclaw/openclaw-*.log
 ```
 
-Oder beim Reproduzieren live verfolgen:
+Oder während der Reproduktion mitverfolgen:
 
 ```bash
 tail -f /tmp/openclaw/openclaw-$(date +%F).log | rg "telegram http error"
 ```
 
-Für Remote-Gateways können Sie auch `openclaw logs --follow` verwenden (siehe [/cli/logs](/cli/logs)).
+Für Remote-Gateways können Sie auch `openclaw logs --follow` verwenden (siehe [/cli/logs](/de/cli/logs)).
 
 ## Hinweise
 
-- Wenn `logging.level` höher als `warn` gesetzt ist, werden diese Logs möglicherweise unterdrückt. Der Standardwert `info` ist in Ordnung.
-- Es ist unbedenklich, Flags aktiviert zu lassen; sie beeinflussen nur das Log-Volumen für das jeweilige Subsystem.
-- Verwenden Sie [/logging](/logging), um Log-Ziele, Levels und Redaction zu ändern.
+- Wenn `logging.level` höher als `warn` gesetzt ist, können diese Logs unterdrückt werden. Der Standard `info` ist in Ordnung.
+- Flags können gefahrlos aktiviert bleiben; sie beeinflussen nur das Log-Volumen für das jeweilige Subsystem.
+- Verwenden Sie [/logging](/de/logging), um Log-Ziele, Levels und Redaction zu ändern.
+
+## Verwandt
+
+- [Gateway diagnostics](/de/gateway/diagnostics)
+- [Gateway troubleshooting](/de/gateway/troubleshooting)

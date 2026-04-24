@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Sie möchten Gmail-Pub/Sub-Ereignisse in OpenClaw einbinden
-    - Sie möchten Webhook-Hilfsbefehle verwenden
-summary: CLI-Referenz für `openclaw webhooks` (Webhook-Helfer + Gmail Pub/Sub)
-title: webhooks
+    - Sie möchten Gmail-Pub/Sub-Ereignisse in OpenClaw einspeisen
+    - Sie möchten Hilfsbefehle für Webhooks
+summary: CLI-Referenz für `openclaw webhooks` (Webhook-Hilfsfunktionen + Gmail Pub/Sub)
+title: Webhooks
 x-i18n:
-    generated_at: "2026-04-05T12:39:22Z"
+    generated_at: "2026-04-24T06:33:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2b22ce879c3a94557be57919b4d2b3e92ff4d41fbae7bc88d2ab07cd4bbeac83
+    source_hash: ce9b085904918f1fea4daa7728470d492ab3e7d92ad43a6b1e7efe8d9f70868f
     source_path: cli/webhooks.md
     workflow: 15
 ---
 
 # `openclaw webhooks`
 
-Webhook-Helfer und Integrationen (Gmail Pub/Sub, Webhook-Helfer).
+Webhook-Hilfsfunktionen und Integrationen (Gmail Pub/Sub, Webhook-Hilfsfunktionen).
 
 Verwandt:
 
-- Webhooks: [Webhooks](/automation/cron-jobs#webhooks)
-- Gmail Pub/Sub: [Gmail Pub/Sub](/automation/cron-jobs#gmail-pubsub-integration)
+- Webhooks: [Webhooks](/de/automation/cron-jobs#webhooks)
+- Gmail Pub/Sub: [Gmail PubSub](/de/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gmail
 
@@ -68,7 +68,7 @@ openclaw webhooks gmail setup --account you@example.com --hook-url https://gatew
 
 ### `webhooks gmail run`
 
-`gog watch serve` zusammen mit der automatischen Watch-Erneuerungsschleife ausführen.
+`gog watch serve` zusammen mit der Auto-Renew-Schleife für Watch ausführen.
 
 Optionen:
 
@@ -95,4 +95,9 @@ Beispiel:
 openclaw webhooks gmail run --account you@example.com
 ```
 
-Siehe [Gmail-Pub/Sub-Dokumentation](/automation/cron-jobs#gmail-pubsub-integration) für den vollständigen Einrichtungsablauf und betriebliche Details.
+Siehe [Gmail-PubSub-Dokumentation](/de/automation/cron-jobs#gmail-pubsub-integration) für den vollständigen Einrichtungsablauf und betriebliche Details.
+
+## Verwandt
+
+- [CLI-Referenz](/de/cli)
+- [Webhook-Automatisierung](/de/automation/cron-jobs)

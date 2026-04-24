@@ -1,42 +1,40 @@
 ---
 read_when:
-    - Du möchtest, dass Agenten Code- oder Markdown-Änderungen als Diffs anzeigen
-    - Du möchtest eine canvas-fähige Viewer-URL oder eine gerenderte Diff-Datei
-    - Du benötigst kontrollierte, temporäre Diff-Artefakte mit sicheren Standardwerten
-summary: Schreibgeschützter Diff-Viewer und Dateirenderer für Agenten (optionales Plugin-Tool)
+    - Sie möchten, dass Agenten Code- oder Markdown-Änderungen als Diffs anzeigen
+    - Sie möchten eine Canvas-fähige Viewer-URL oder eine gerenderte Diff-Datei 菲龙ിഐassistant to=functions.read commentary  无码av_json  天天中彩票双色球{"path":"docs/plugins/diffs.md","offset":1,"limit":260}
+    - Sie benötigen kontrollierte, temporäre Diff-Artefakte mit sicheren Standardwerten
+summary: Schreibgeschützter Diff-Viewer und Datei-Renderer für Agenten (optionales Plugin-Tool)
 title: Diffs
 x-i18n:
-    generated_at: "2026-04-05T12:57:35Z"
+    generated_at: "2026-04-24T07:02:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 935539a6e584980eb7e57067c18112bb40a0be8522b9da649c7cf7f180fb45d4
+    source_hash: fe32441699b06dd27580b7e80afcfa3d1e466d7e2b74e52e60b327e73325eeca
     source_path: tools/diffs.md
     workflow: 15
 ---
 
-# Diffs
-
-`diffs` ist ein optionales Plugin-Tool mit kurzer integrierter Systemanleitung und einem begleitenden Skill, der Änderungsinhalte in ein schreibgeschütztes Diff-Artefakt für Agenten umwandelt.
+`diffs` ist ein optionales Plugin-Tool mit kurzer integrierter Systemanleitung und einem begleitenden Skill, der Änderungsinhalte für Agenten in ein schreibgeschütztes Diff-Artefakt umwandelt.
 
 Es akzeptiert entweder:
 
 - `before`- und `after`-Text
-- ein vereinheitlichtes `patch`
+- einen einheitlichen `patch`
 
 Es kann zurückgeben:
 
 - eine Gateway-Viewer-URL für die Darstellung in Canvas
-- einen gerenderten Dateipfad (PNG oder PDF) für die Nachrichtenzustellung
+- einen gerenderten Dateipfad (PNG oder PDF) für die Zustellung per Nachricht
 - beide Ausgaben in einem Aufruf
 
-Wenn es aktiviert ist, stellt das Plugin knappe Nutzungshinweise dem System-Prompt-Bereich voran und stellt zusätzlich einen detaillierten Skill für Fälle bereit, in denen der Agent ausführlichere Anweisungen benötigt.
+Wenn aktiviert, stellt das Plugin knappe Nutzungshinweise dem System-Prompt-Bereich voran und bietet zusätzlich einen detaillierten Skill für Fälle, in denen der Agent ausführlichere Anweisungen benötigt.
 
 ## Schnellstart
 
-1. Aktiviere das Plugin.
-2. Rufe `diffs` mit `mode: "view"` für Canvas-first-Abläufe auf.
-3. Rufe `diffs` mit `mode: "file"` für Chat-Dateizustellungsabläufe auf.
-4. Rufe `diffs` mit `mode: "both"` auf, wenn du beide Artefakte brauchst.
+1. Das Plugin aktivieren.
+2. `diffs` mit `mode: "view"` für Canvas-First-Flows aufrufen.
+3. `diffs` mit `mode: "file"` für Flows mit Dateizustellung im Chat aufrufen.
+4. `diffs` mit `mode: "both"` aufrufen, wenn Sie beide Artefakte benötigen.
 
 ## Das Plugin aktivieren
 
@@ -54,7 +52,7 @@ Wenn es aktiviert ist, stellt das Plugin knappe Nutzungshinweise dem System-Prom
 
 ## Integrierte Systemanleitung deaktivieren
 
-Wenn du das `diffs`-Tool aktiviert lassen, aber seine integrierte System-Prompt-Anleitung deaktivieren möchtest, setze `plugins.entries.diffs.hooks.allowPromptInjection` auf `false`:
+Wenn Sie das Tool `diffs` aktiviert lassen, aber seine integrierte System-Prompt-Anleitung deaktivieren möchten, setzen Sie `plugins.entries.diffs.hooks.allowPromptInjection` auf `false`:
 
 ```json5
 {
@@ -73,16 +71,16 @@ Wenn du das `diffs`-Tool aktiviert lassen, aber seine integrierte System-Prompt-
 
 Dadurch wird der Hook `before_prompt_build` des Diffs-Plugins blockiert, während Plugin, Tool und begleitender Skill weiterhin verfügbar bleiben.
 
-Wenn du sowohl die Anleitung als auch das Tool deaktivieren möchtest, deaktiviere stattdessen das Plugin.
+Wenn Sie sowohl die Anleitung als auch das Tool deaktivieren möchten, deaktivieren Sie stattdessen das Plugin.
 
-## Typischer Agent-Workflow
+## Typischer Workflow für Agenten
 
-1. Der Agent ruft `diffs` auf.
-2. Der Agent liest die Felder in `details`.
-3. Der Agent:
+1. Agent ruft `diffs` auf.
+2. Agent liest die Felder in `details`.
+3. Agent führt dann entweder Folgendes aus:
    - öffnet `details.viewerUrl` mit `canvas present`
    - sendet `details.filePath` mit `message` unter Verwendung von `path` oder `filePath`
-   - oder tut beides
+   - oder beides
 
 ## Eingabebeispiele
 
@@ -110,25 +108,25 @@ Patch:
 
 Alle Felder sind optional, sofern nicht anders angegeben:
 
-- `before` (`string`): ursprünglicher Text. Erforderlich zusammen mit `after`, wenn `patch` weggelassen wird.
+- `before` (`string`): Originaltext. Erforderlich zusammen mit `after`, wenn `patch` weggelassen wird.
 - `after` (`string`): aktualisierter Text. Erforderlich zusammen mit `before`, wenn `patch` weggelassen wird.
-- `patch` (`string`): vereinheitlichter Diff-Text. Gegenseitig ausschließend mit `before` und `after`.
-- `path` (`string`): angezeigter Dateiname für den Modus with before/after.
-- `lang` (`string`): Sprach-Override-Hinweis für den Modus with before/after. Unbekannte Werte fallen auf Klartext zurück.
-- `title` (`string`): Override für den Viewer-Titel.
+- `patch` (`string`): einheitlicher Diff-Text. Gegenseitig ausschließend mit `before` und `after`.
+- `path` (`string`): angezeigter Dateiname für den Before-/After-Modus.
+- `lang` (`string`): Hint zum Überschreiben der Sprache für den Before-/After-Modus. Unbekannte Werte fallen auf Klartext zurück.
+- `title` (`string`): Überschreibung des Viewer-Titels.
 - `mode` (`"view" | "file" | "both"`): Ausgabemodus. Standard ist der Plugin-Standard `defaults.mode`.
-  Veralteter Alias: `"image"` verhält sich wie `"file"` und wird aus Gründen der Abwärtskompatibilität weiterhin akzeptiert.
+  Veralteter Alias: `"image"` verhält sich wie `"file"` und wird aus Gründen der Rückwärtskompatibilität weiterhin akzeptiert.
 - `theme` (`"light" | "dark"`): Viewer-Theme. Standard ist der Plugin-Standard `defaults.theme`.
 - `layout` (`"unified" | "split"`): Diff-Layout. Standard ist der Plugin-Standard `defaults.layout`.
-- `expandUnchanged` (`boolean`): unveränderte Abschnitte erweitern, wenn vollständiger Kontext verfügbar ist. Nur Aufrufoption (kein Plugin-Standardschlüssel).
+- `expandUnchanged` (`boolean`): unveränderte Abschnitte erweitern, wenn vollständiger Kontext verfügbar ist. Nur Option pro Aufruf (kein Plugin-Standard-Schlüssel).
 - `fileFormat` (`"png" | "pdf"`): gerendertes Dateiformat. Standard ist der Plugin-Standard `defaults.fileFormat`.
 - `fileQuality` (`"standard" | "hq" | "print"`): Qualitäts-Preset für PNG- oder PDF-Rendering.
-- `fileScale` (`number`): Override für Geräteskalierung (`1`-`4`).
+- `fileScale` (`number`): Override für den Device-Scale (`1`-`4`).
 - `fileMaxWidth` (`number`): maximale Renderbreite in CSS-Pixeln (`640`-`2400`).
-- `ttlSeconds` (`number`): Artefakt-TTL in Sekunden für Viewer- und eigenständige Dateiausgaben. Standard 1800, Maximum 21600.
-- `baseUrl` (`string`): Override für den Ursprung der Viewer-URL. Überschreibt das Plugin-`viewerBaseUrl`. Muss `http` oder `https` sein, ohne Query/Hash.
+- `ttlSeconds` (`number`): TTL des Artefakts in Sekunden für Viewer- und eigenständige Dateiausgaben. Standard 1800, max. 21600.
+- `baseUrl` (`string`): Override für die Ursprung-URL des Viewers. Überschreibt das Plugin-`viewerBaseUrl`. Muss `http` oder `https` sein, ohne Query/Hash.
 
-Legacy-Eingabealiase werden aus Gründen der Abwärtskompatibilität weiterhin akzeptiert:
+Legacy-Eingabe-Aliasse werden zur Rückwärtskompatibilität weiterhin akzeptiert:
 
 - `format` -> `fileFormat`
 - `imageFormat` -> `fileFormat`
@@ -136,16 +134,16 @@ Legacy-Eingabealiase werden aus Gründen der Abwärtskompatibilität weiterhin a
 - `imageScale` -> `fileScale`
 - `imageMaxWidth` -> `fileMaxWidth`
 
-Validierung und Grenzen:
+Validierung und Limits:
 
 - `before` und `after` jeweils max. 512 KiB.
 - `patch` max. 2 MiB.
 - `path` max. 2048 Bytes.
 - `lang` max. 128 Bytes.
 - `title` max. 1024 Bytes.
-- Begrenzung der Patch-Komplexität: max. 128 Dateien und 120000 Gesamtzeilen.
+- Limit für Patch-Komplexität: max. 128 Dateien und 120000 Zeilen insgesamt.
 - `patch` zusammen mit `before` oder `after` wird abgelehnt.
-- Sicherheitsgrenzen für gerenderte Dateien (gelten für PNG und PDF):
+- Sicherheitslimits für gerenderte Dateien (gelten für PNG und PDF):
   - `fileQuality: "standard"`: max. 8 MP (8.000.000 gerenderte Pixel).
   - `fileQuality: "hq"`: max. 14 MP (14.000.000 gerenderte Pixel).
   - `fileQuality: "print"`: max. 24 MP (24.000.000 gerenderte Pixel).
@@ -188,23 +186,23 @@ Kompatibilitäts-Aliasse werden für bestehende Aufrufer ebenfalls zurückgegebe
 - `imageScale` (derselbe Wert wie `fileScale`)
 - `imageMaxWidth` (derselbe Wert wie `fileMaxWidth`)
 
-Zusammenfassung des Modusverhaltens:
+Zusammenfassung des Verhaltens der Modi:
 
 - `mode: "view"`: nur Viewer-Felder.
 - `mode: "file"`: nur Dateifelder, kein Viewer-Artefakt.
-- `mode: "both"`: Viewer-Felder plus Dateifelder. Wenn das Dateirendering fehlschlägt, wird der Viewer trotzdem mit `fileError` und dem Kompatibilitätsalias `imageError` zurückgegeben.
+- `mode: "both"`: Viewer-Felder plus Dateifelder. Wenn das Rendern der Datei fehlschlägt, wird der Viewer dennoch mit `fileError` und dem Kompatibilitäts-Alias `imageError` zurückgegeben.
 
 ## Eingeklappte unveränderte Abschnitte
 
 - Der Viewer kann Zeilen wie `N unmodified lines` anzeigen.
-- Bedienelemente zum Erweitern in diesen Zeilen sind bedingt und nicht für jede Eingabeart garantiert.
-- Bedienelemente zum Erweitern erscheinen, wenn der gerenderte Diff erweiterbare Kontextdaten enthält, was typisch für before-/after-Eingaben ist.
-- Bei vielen vereinheitlichten Patch-Eingaben sind ausgelassene Kontextkörper in den geparsten Patch-Hunks nicht verfügbar, sodass die Zeile ohne Bedienelemente zum Erweitern erscheinen kann. Das ist erwartetes Verhalten.
-- `expandUnchanged` gilt nur, wenn erweiterbarer Kontext existiert.
+- Expand-Steuerelemente in diesen Zeilen sind bedingt und nicht für jede Art von Eingabe garantiert.
+- Expand-Steuerelemente erscheinen, wenn der gerenderte Diff erweiterbare Kontextdaten enthält, was typischerweise bei Before-/After-Eingaben der Fall ist.
+- Bei vielen einheitlichen Patch-Eingaben sind ausgelassene Kontext-Bodies in den geparsten Patch-Hunks nicht verfügbar, daher kann die Zeile ohne Expand-Steuerelemente erscheinen. Das ist erwartetes Verhalten.
+- `expandUnchanged` gilt nur dann, wenn erweiterbarer Kontext existiert.
 
-## Plugin-Standardeinstellungen
+## Plugin-Standards
 
-Setze pluginweite Standardwerte in `~/.openclaw/openclaw.json`:
+Setzen Sie pluginweite Standardwerte in `~/.openclaw/openclaw.json`:
 
 ```json5
 {
@@ -255,7 +253,7 @@ Unterstützte Standardwerte:
 
 Explizite Tool-Parameter überschreiben diese Standardwerte.
 
-Persistente Viewer-URL-Konfiguration:
+Persistente Konfiguration der Viewer-URL:
 
 - `viewerBaseUrl` (`string`, optional)
   - Plugin-eigener Fallback für zurückgegebene Viewer-Links, wenn ein Tool-Aufruf kein `baseUrl` übergibt.
@@ -281,7 +279,7 @@ Beispiel:
 ## Sicherheitskonfiguration
 
 - `security.allowRemoteViewer` (`boolean`, Standard `false`)
-  - `false`: Anfragen ohne loopback an Viewer-Routen werden abgelehnt.
+  - `false`: Nicht-Loopback-Anfragen an Viewer-Routen werden abgelehnt.
   - `true`: Remote-Viewer sind erlaubt, wenn der tokenisierte Pfad gültig ist.
 
 Beispiel:
@@ -303,21 +301,21 @@ Beispiel:
 }
 ```
 
-## Artefakt-Lebenszyklus und Speicherung
+## Lebenszyklus und Speicherung von Artefakten
 
-- Artefakte werden unter dem temp-Unterordner gespeichert: `$TMPDIR/openclaw-diffs`.
-- Viewer-Artefakt-Metadaten enthalten:
+- Artefakte werden im temporären Unterordner gespeichert: `$TMPDIR/openclaw-diffs`.
+- Metadaten von Viewer-Artefakten enthalten:
   - zufällige Artefakt-ID (20 Hex-Zeichen)
   - zufälliges Token (48 Hex-Zeichen)
   - `createdAt` und `expiresAt`
   - gespeicherten Pfad `viewer.html`
-- Die Standard-Artefakt-TTL beträgt 30 Minuten, wenn nichts angegeben ist.
-- Die maximal akzeptierte Viewer-TTL beträgt 6 Stunden.
-- Das Bereinigen läuft opportunistisch nach der Artefakterstellung.
+- Die Standard-TTL für Artefakte beträgt 30 Minuten, wenn nichts angegeben wird.
+- Die maximal akzeptierte TTL für Viewer beträgt 6 Stunden.
+- Die Bereinigung läuft opportunistisch nach der Erstellung von Artefakten.
 - Abgelaufene Artefakte werden gelöscht.
-- Fallback-Bereinigung entfernt veraltete Ordner, die älter als 24 Stunden sind, wenn Metadaten fehlen.
+- Eine Fallback-Bereinigung entfernt veraltete Ordner, die älter als 24 Stunden sind, wenn Metadaten fehlen.
 
-## Viewer-URL- und Netzwerkverhalten
+## Verhalten von Viewer-URL und Netzwerk
 
 Viewer-Route:
 
@@ -328,13 +326,13 @@ Viewer-Assets:
 - `/plugins/diffs/assets/viewer.js`
 - `/plugins/diffs/assets/viewer-runtime.js`
 
-Das Viewer-Dokument löst diese Assets relativ zur Viewer-URL auf, sodass ein optionales `baseUrl`-Pfadpräfix auch für diese Asset-Anfragen erhalten bleibt.
+Das Viewer-Dokument löst diese Assets relativ zur Viewer-URL auf, sodass ein optionales Pfadpräfix in `baseUrl` auch für Asset-Anfragen beibehalten wird.
 
-Verhalten beim URL-Aufbau:
+Verhalten beim Erstellen von URLs:
 
-- Wenn `baseUrl` im Tool-Aufruf angegeben ist, wird es nach strikter Validierung verwendet.
-- Sonst wird, falls das Plugin-`viewerBaseUrl` konfiguriert ist, dieses verwendet.
-- Ohne eines dieser Overrides ist die Viewer-URL standardmäßig auf loopback `127.0.0.1`.
+- Wenn im Tool-Aufruf `baseUrl` angegeben ist, wird dies nach strikter Validierung verwendet.
+- Andernfalls wird, wenn im Plugin `viewerBaseUrl` konfiguriert ist, dieses verwendet.
+- Ohne eines dieser Overrides wird die Viewer-URL standardmäßig auf Loopback `127.0.0.1` gesetzt.
 - Wenn der Gateway-Bind-Modus `custom` ist und `gateway.customBindHost` gesetzt ist, wird dieser Host verwendet.
 
 Regeln für `baseUrl`:
@@ -347,23 +345,23 @@ Regeln für `baseUrl`:
 
 Härtung des Viewers:
 
-- Standardmäßig nur loopback.
-- Tokenisierte Viewer-Pfade mit strikter ID- und Token-Validierung.
+- Standardmäßig nur Loopback.
+- Tokenisierte Viewer-Pfade mit strikter Validierung von ID und Token.
 - CSP der Viewer-Antwort:
   - `default-src 'none'`
   - Skripte und Assets nur von self
   - kein ausgehendes `connect-src`
-- Drosselung bei Remote-Fehlschlägen, wenn Remote-Zugriff aktiviert ist:
-  - 40 Fehler pro 60 Sekunden
-  - 60 Sekunden Sperre (`429 Too Many Requests`)
+- Drosselung bei Remote-Misses, wenn Remote-Zugriff aktiviert ist:
+  - 40 Fehlschläge pro 60 Sekunden
+  - 60 Sekunden Lockout (`429 Too Many Requests`)
 
-Härtung des Dateirenderings:
+Härtung beim Rendern von Dateien:
 
-- Request-Routing des Screenshot-Browsers ist standardmäßig deny-by-default.
+- Request-Routing für Screenshot-Browser ist standardmäßig verweigert.
 - Nur lokale Viewer-Assets von `http://127.0.0.1/plugins/diffs/assets/*` sind erlaubt.
 - Externe Netzwerkanfragen werden blockiert.
 
-## Browser-Anforderungen für Dateimodus
+## Browser-Anforderungen für den Dateimodus
 
 `mode: "file"` und `mode: "both"` benötigen einen Chromium-kompatiblen Browser.
 
@@ -374,68 +372,68 @@ Reihenfolge der Auflösung:
    - `OPENCLAW_BROWSER_EXECUTABLE_PATH`
    - `BROWSER_EXECUTABLE_PATH`
    - `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`
-3. Plattformweites Fallback für Befehls-/Pfaderkennung.
+3. Fallback über plattformspezifische Befehls-/Pfaderkennung.
 
 Häufiger Fehlertext:
 
 - `Diff PNG/PDF rendering requires a Chromium-compatible browser...`
 
-Behebe das durch Installation von Chrome, Chromium, Edge oder Brave oder durch Setzen einer der oben genannten Pfadoptionen für die ausführbare Datei.
+Beheben Sie dies, indem Sie Chrome, Chromium, Edge oder Brave installieren oder einen der obigen Pfadoptionen für ausführbare Dateien setzen.
 
 ## Fehlerbehebung
 
-Eingabevalidierungsfehler:
+Validierungsfehler bei Eingaben:
 
 - `Provide patch or both before and after text.`
-  - Gib sowohl `before` als auch `after` an oder stelle `patch` bereit.
+  - Geben Sie sowohl `before` als auch `after` an oder stellen Sie `patch` bereit.
 - `Provide either patch or before/after input, not both.`
-  - Mische die Eingabemodi nicht.
+  - Mischen Sie keine Eingabemodi.
 - `Invalid baseUrl: ...`
-  - Verwende einen `http(s)`-Origin mit optionalem Pfad, ohne Query/Hash.
+  - Verwenden Sie einen `http(s)`-Origin mit optionalem Pfad, ohne Query/Hash.
 - `{field} exceeds maximum size (...)`
-  - Reduziere die Größe des Payloads.
+  - Reduzieren Sie die Payload-Größe.
 - Ablehnung wegen großem Patch
-  - Reduziere die Anzahl der Dateien oder die Gesamtzeilen im Patch.
+  - Reduzieren Sie die Anzahl der Dateien im Patch oder die Gesamtzahl der Zeilen.
 
 Probleme mit der Erreichbarkeit des Viewers:
 
-- Viewer-URLs werden standardmäßig zu `127.0.0.1` aufgelöst.
-- Für Remote-Zugriffsszenarien gilt entweder:
-  - setze das Plugin-`viewerBaseUrl`, oder
-  - übergib `baseUrl` pro Tool-Aufruf, oder
-  - verwende `gateway.bind=custom` und `gateway.customBindHost`
-- Wenn `gateway.trustedProxies` loopback für einen Proxy auf demselben Host enthält (zum Beispiel Tailscale Serve), schlagen rohe loopback-Viewer-Anfragen ohne weitergeleitete Client-IP-Header konstruktionsbedingt fail-closed fehl.
+- Viewer-URL wird standardmäßig zu `127.0.0.1` aufgelöst.
+- Für Remote-Zugriffsszenarien entweder:
+  - Plugin-`viewerBaseUrl` setzen, oder
+  - `baseUrl` pro Tool-Aufruf übergeben, oder
+  - `gateway.bind=custom` und `gateway.customBindHost` verwenden
+- Wenn `gateway.trustedProxies` Loopback für einen Proxy auf demselben Host enthält (zum Beispiel Tailscale Serve), schlagen rohe Loopback-Viewer-Anfragen ohne weitergeleitete Client-IP-Header absichtlich fail-closed fehl.
 - Für diese Proxy-Topologie:
-  - bevorzuge `mode: "file"` oder `mode: "both"`, wenn du nur einen Anhang brauchst, oder
-  - aktiviere absichtlich `security.allowRemoteViewer` und setze das Plugin-`viewerBaseUrl` oder übergib ein Proxy-/öffentliches `baseUrl`, wenn du eine teilbare Viewer-URL brauchst
-- Aktiviere `security.allowRemoteViewer` nur, wenn du externen Viewer-Zugriff beabsichtigst.
+  - bevorzugen Sie `mode: "file"` oder `mode: "both"`, wenn Sie nur einen Anhang benötigen, oder
+  - aktivieren Sie bewusst `security.allowRemoteViewer` und setzen Sie Plugin-`viewerBaseUrl` oder übergeben Sie ein Proxy-/öffentliches `baseUrl`, wenn Sie eine teilbare Viewer-URL benötigen
+- Aktivieren Sie `security.allowRemoteViewer` nur, wenn Sie tatsächlich externen Viewer-Zugriff beabsichtigen.
 
-Die Zeile für unveränderte Zeilen hat keinen Erweitern-Button:
+Zeile mit unveränderten Zeilen hat keinen Expand-Button:
 
-- Das kann bei Patch-Eingabe passieren, wenn der Patch keinen erweiterbaren Kontext enthält.
-- Das ist erwartet und weist nicht auf einen Fehler des Viewers hin.
+- Dies kann bei Patch-Eingaben vorkommen, wenn der Patch keinen erweiterbaren Kontext enthält.
+- Das ist erwartetes Verhalten und weist nicht auf einen Viewer-Fehler hin.
 
 Artefakt nicht gefunden:
 
-- Artefakt ist wegen TTL abgelaufen.
-- Token oder Pfad wurde geändert.
+- Artefakt ist aufgrund der TTL abgelaufen.
+- Token oder Pfad wurden geändert.
 - Die Bereinigung hat veraltete Daten entfernt.
 
-## Betriebshinweise
+## Betriebliche Hinweise
 
-- Bevorzuge `mode: "view"` für lokale interaktive Prüfungen in Canvas.
-- Bevorzuge `mode: "file"` für ausgehende Chat-Channels, die einen Anhang benötigen.
-- Lasse `allowRemoteViewer` deaktiviert, es sei denn, dein Deployment benötigt Remote-Viewer-URLs.
-- Setze explizite kurze `ttlSeconds` für sensible Diffs.
-- Vermeide es, Secrets in Diff-Eingaben zu senden, wenn dies nicht erforderlich ist.
-- Wenn dein Channel Bilder stark komprimiert (zum Beispiel Telegram oder WhatsApp), bevorzuge PDF-Ausgabe (`fileFormat: "pdf"`).
+- Bevorzugen Sie `mode: "view"` für lokale interaktive Reviews in Canvas.
+- Bevorzugen Sie `mode: "file"` für ausgehende Chat-Kanäle, die einen Anhang benötigen.
+- Lassen Sie `allowRemoteViewer` deaktiviert, sofern Ihr Deployment keine Remote-Viewer-URLs erfordert.
+- Setzen Sie für sensible Diffs explizit kurze `ttlSeconds`.
+- Vermeiden Sie es, Secrets in die Diff-Eingabe aufzunehmen, wenn dies nicht erforderlich ist.
+- Wenn Ihr Kanal Bilder aggressiv komprimiert (zum Beispiel Telegram oder WhatsApp), bevorzugen Sie PDF-Ausgabe (`fileFormat: "pdf"`).
 
 Diff-Rendering-Engine:
 
 - Bereitgestellt von [Diffs](https://diffs.com).
 
-## Zugehörige Docs
+## Verwandte Dokumentation
 
-- [Tools overview](/tools)
-- [Plugins](/tools/plugin)
-- [Browser](/tools/browser)
+- [Tool-Überblick](/de/tools)
+- [Plugins](/de/tools/plugin)
+- [Browser](/de/tools/browser)
