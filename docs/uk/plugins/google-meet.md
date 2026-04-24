@@ -2,46 +2,47 @@
 read_when:
     - Ви хочете, щоб агент OpenClaw приєднався до дзвінка Google Meet
     - Ви налаштовуєте Chrome або Twilio як транспорт Google Meet
-summary: 'Плагін Google Meet: приєднання за явними URL-адресами Meet через Chrome або Twilio із типовими налаштуваннями голосу в реальному часі'
-title: Плагін Google Meet
+summary: 'Plugin Google Meet: приєднання до явних URL-адрес Meet через Chrome або Twilio з типовими налаштуваннями голосу в реальному часі'
+title: Google Meet Plugin
 x-i18n:
-    generated_at: "2026-04-24T01:19:39Z"
+    generated_at: "2026-04-24T01:59:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ab22760314dd48f5392b3bbd1dba1a11ea2dae530f5e0a1255e6c47cb077042a
+    source_hash: 92e61135fc2b767f26b17628a9cdf699015114ddb6cf8313510bd8c3298a908c
     source_path: plugins/google-meet.md
     workflow: 15
 ---
 
-# Google Meet (плагін)
+# Google Meet (Plugin)
 
 Підтримка учасника Google Meet для OpenClaw.
 
-Плагін є навмисно явним за дизайном:
+Plugin є явно керованим за задумом:
 
 - Він приєднується лише за явною URL-адресою `https://meet.google.com/...`.
-- Голос `realtime` є типовим режимом.
+- Голос `realtime` є режимом за замовчуванням.
+- Голос у режимі realtime може звертатися назад до повного агента OpenClaw, коли потрібні глибші міркування або інструменти.
 - Автентифікація починається з особистого Google OAuth або вже виконаного входу в профіль Chrome.
-- Автоматичного оголошення про згоду немає.
-- Типовим аудіобекендом Chrome є `BlackHole 2ch`.
-- Twilio приймає номер для дозвону та необов’язковий PIN-код або послідовність DTMF.
-- Командою CLI є `googlemeet`; `meet` зарезервовано для ширших сценаріїв телеконференцій агентів.
+- Автоматичного оголошення згоди немає.
+- Типовий аудіобекенд Chrome — `BlackHole 2ch`.
+- Twilio приймає номер для дозвону та необов’язковий PIN або послідовність DTMF.
+- Команда CLI — `googlemeet`; `meet` зарезервовано для ширших сценаріїв агентських телеконференцій.
 
 ## Транспорти
 
 ### Chrome
 
-Транспорт Chrome відкриває URL-адресу Meet у Google Chrome і приєднується як профіль Chrome, у якому виконано вхід. На macOS плагін перевіряє наявність `BlackHole 2ch` перед запуском. Якщо це налаштовано, він також запускає команду перевірки працездатності аудіомоста та команду запуску перед відкриттям Chrome.
+Транспорт Chrome відкриває URL-адресу Meet у Google Chrome і приєднується як профіль Chrome, у якому виконано вхід. На macOS Plugin перед запуском перевіряє наявність `BlackHole 2ch`. Якщо це налаштовано, він також запускає команду перевірки стану аудіомоста та команду запуску перед відкриттям Chrome.
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij --transport chrome
 ```
 
-Спрямуйте аудіо мікрофона та динаміків Chrome через локальний аудіоміст OpenClaw. Якщо `BlackHole 2ch` не встановлено, приєднання завершується помилкою налаштування замість того, щоб тихо приєднатися без аудіошляху.
+Спрямуйте аудіо мікрофона та динаміка Chrome через локальний аудіоміст OpenClaw. Якщо `BlackHole 2ch` не встановлено, приєднання завершується помилкою налаштування замість того, щоб мовчки приєднатися без аудіошляху.
 
 ### Twilio
 
-Транспорт Twilio — це суворий план набору, делегований плагіну Voice Call. Він не аналізує сторінки Meet для пошуку телефонних номерів.
+Транспорт Twilio — це суворий план набору, делегований Plugin Voice Call. Він не аналізує сторінки Meet для пошуку телефонних номерів.
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij \
@@ -50,7 +51,7 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
   --pin 123456
 ```
 
-Використовуйте `--dtmf-sequence`, коли для зустрічі потрібна спеціальна послідовність:
+Використовуйте `--dtmf-sequence`, коли для зустрічі потрібна власна послідовність:
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij \
@@ -61,7 +62,7 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
 
 ## OAuth і попередня перевірка
 
-Доступ до Google Meet Media API спочатку використовує особистий клієнт OAuth. Налаштуйте `oauth.clientId` і, за потреби, `oauth.clientSecret`, а потім виконайте:
+Доступ до Google Meet Media API спочатку використовує особистий OAuth-клієнт. Налаштуйте `oauth.clientId` і, за потреби, `oauth.clientSecret`, а потім виконайте:
 
 ```bash
 openclaw googlemeet auth login --json
@@ -69,7 +70,7 @@ openclaw googlemeet auth login --json
 
 Команда виводить блок конфігурації `oauth` з токеном оновлення. Вона використовує PKCE, callback localhost на `http://localhost:8085/oauth2callback` і ручний потік копіювання/вставлення з `--manual`.
 
-Як резервні варіанти приймаються такі змінні середовища:
+Ці змінні середовища приймаються як резервні:
 
 - `OPENCLAW_GOOGLE_MEET_CLIENT_ID` або `GOOGLE_MEET_CLIENT_ID`
 - `OPENCLAW_GOOGLE_MEET_CLIENT_SECRET` або `GOOGLE_MEET_CLIENT_SECRET`
@@ -86,17 +87,17 @@ openclaw googlemeet auth login --json
 openclaw googlemeet resolve-space --meeting https://meet.google.com/abc-defg-hij
 ```
 
-Запустіть попередню перевірку перед роботою з медіа:
+Запускайте попередню перевірку перед роботою з медіа:
 
 ```bash
 openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
 ```
 
-Установлюйте `preview.enrollmentAcknowledged: true` лише після підтвердження, що ваш Cloud project, OAuth principal і учасники зустрічі зареєстровані в Google Workspace Developer Preview Program для медіа-API Meet.
+Встановлюйте `preview.enrollmentAcknowledged: true` лише після підтвердження, що ваш проєкт Cloud, принципал OAuth і учасники зустрічі зареєстровані в програмі Google Workspace Developer Preview Program для Meet media APIs.
 
 ## Конфігурація
 
-Установіть конфігурацію в `plugins.entries.google-meet.config`:
+Задавайте конфігурацію в `plugins.entries.google-meet.config`:
 
 ```json5
 {
@@ -117,7 +118,7 @@ openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
             audioBackend: "blackhole-2ch",
             launch: true,
             browserProfile: "Default",
-            // Парний міст команд: вхід записує 8 кГц аудіо G.711 mu-law у stdout.
+            // Command-pair bridge: input writes 8 kHz G.711 mu-law audio to stdout.
             audioInputCommand: [
               "rec",
               "-q",
@@ -133,7 +134,7 @@ openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
               "8",
               "-",
             ],
-            // Вихід читає 8 кГц аудіо G.711 mu-law зі stdin.
+            // Output reads 8 kHz G.711 mu-law audio from stdin.
             audioOutputCommand: [
               "play",
               "-q",
@@ -162,7 +163,7 @@ openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
           realtime: {
             provider: "openai",
             model: "gpt-realtime",
-            instructions: "Ви приєднуєтеся до приватної зустрічі Google Meet як агент OpenClaw Пітера. Відповідайте стисло, якщо не попросять про інше.",
+            instructions: "You are joining a private Google Meet as Peter's OpenClaw agent. Keep replies brief unless asked.",
             toolPolicy: "safe-read-only",
             providers: {
               openai: {
@@ -197,15 +198,17 @@ openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
 }
 ```
 
-Використовуйте `action: "status"`, щоб переглянути активні сесії або перевірити ідентифікатор сесії. Використовуйте `action: "leave"`, щоб позначити сесію як завершену.
+Використовуйте `action: "status"`, щоб перелічити активні сеанси або перевірити ідентифікатор сеансу. Використовуйте `action: "leave"`, щоб позначити сеанс як завершений.
 
 ## Примітки
 
-Офіційний медіа-API Google Meet орієнтований на приймання, тому для мовлення в дзвінок Meet усе ще потрібен шлях учасника. Цей плагін робить цю межу видимою: Chrome обробляє участь через браузер і локальну маршрутизацію аудіо; Twilio обробляє участь через телефонний дозвін.
+Офіційний media API Google Meet орієнтований на отримання, тому для розмови в дзвінку Meet усе ще потрібен шлях участі як учасника. Цей Plugin зберігає цю межу видимою: Chrome відповідає за участь через браузер і локальне маршрутизування аудіо; Twilio відповідає за участь через телефонний дозвін.
 
-Режиму realtime у Chrome потрібне одне з такого:
+Режим Realtime надає голосовій моделі один інструмент, `openclaw_agent_consult`, якщо тільки `realtime.toolPolicy` не має значення `none`. Цей інструмент звертається до звичайного агента OpenClaw по стислу усну відповідь, використовуючи нещодавню стенограму зустрічі як контекст. Із `safe-read-only` запуск consult обмежується інструментами читання/пошуку/пам’яті. Із `owner` він успадковує звичайну політику інструментів агента.
 
-- `chrome.audioInputCommand` плюс `chrome.audioOutputCommand`: OpenClaw керує мостом моделі realtime і передає 8 кГц аудіо G.711 mu-law між цими командами та вибраним постачальником голосу realtime.
+Режим Chrome realtime потребує одного з варіантів:
+
+- `chrome.audioInputCommand` плюс `chrome.audioOutputCommand`: OpenClaw керує мостом моделі realtime і передає аудіо 8 kHz G.711 mu-law між цими командами та вибраним провайдером голосу realtime.
 - `chrome.audioBridgeCommand`: зовнішня команда моста керує всім локальним аудіошляхом і має завершитися після запуску або перевірки свого демона.
 
-Для чистого двостороннього аудіо спрямовуйте вихід Meet і мікрофон Meet через окремі віртуальні пристрої або граф віртуальних пристроїв у стилі Loopback. Один спільний пристрій BlackHole може повертати голоси інших учасників назад у дзвінок.
+Для чистого дуплексного аудіо спрямовуйте вихід Meet і мікрофон Meet через окремі віртуальні пристрої або граф віртуальних пристроїв у стилі Loopback. Один спільний пристрій BlackHole може повертати голоси інших учасників назад у дзвінок.
