@@ -1,25 +1,23 @@
 ---
 read_when:
-    - OpenClaw не працює, і вам потрібен найшвидший шлях до виправлення
-    - Ви хочете пройти етап тріажу перед зануренням у детальні runbook-и
-summary: Центр усунення несправностей OpenClaw з підходом «від симптому»
-title: Загальне усунення несправностей
+    - OpenClaw не працює, і вам потрібен найшвидший шлях до виправлення проблеми
+    - Ви хочете пройти шлях первинної діагностики, перш ніж занурюватися в детальні інструкції усунення неполадок
+summary: Центр усунення неполадок OpenClaw за симптомами
+title: Загальне усунення неполадок
 x-i18n:
-    generated_at: "2026-04-23T20:56:05Z"
+    generated_at: "2026-04-24T07:11:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ce06ddce9de9e5824b4c5e8c182df07b29ce3ff113eb8e29c62aef9a4682e8e9
+    source_hash: c832c3f7609c56a5461515ed0f693d2255310bf2d3958f69f57c482bcbef97f0
     source_path: help/troubleshooting.md
     workflow: 15
 ---
 
-# Усунення несправностей
-
-Якщо у вас є лише 2 хвилини, використовуйте цю сторінку як вхідну точку для тріажу.
+Якщо у вас є лише 2 хвилини, використовуйте цю сторінку як вхідну точку для первинної діагностики.
 
 ## Перші 60 секунд
 
-Виконайте цей точний ланцюжок команд по порядку:
+Виконайте цю точну послідовність команд по порядку:
 
 ```bash
 openclaw status
@@ -31,15 +29,15 @@ openclaw channels status --probe
 openclaw logs --follow
 ```
 
-Хороший результат в одному рядку:
+Ознаки коректного виводу в одному рядку:
 
-- `openclaw status` → показує налаштовані канали та не має очевидних помилок auth.
-- `openclaw status --all` → повний звіт присутній і його можна поширити.
-- `openclaw gateway probe` → очікувана ціль gateway доступна (`Reachable: yes`). `Capability: ...` показує, який рівень auth probe змогла підтвердити, а `Read probe: limited - missing scope: operator.read` означає деградовану діагностику, а не збій підключення.
-- `openclaw gateway status` → `Runtime: running`, `Connectivity probe: ok` і правдоподібний рядок `Capability: ...`. Використовуйте `--require-rpc`, якщо вам також потрібне підтвердження RPC з областю доступу читання.
-- `openclaw doctor` → немає блокуючих помилок config/service.
-- `openclaw channels status --probe` → доступний gateway повертає live-стан транспорту для кожного облікового запису плюс результати probe/audit, як-от `works` або `audit ok`; якщо gateway недоступний, команда повертається до зведень лише з конфігурації.
-- `openclaw logs --follow` → стабільна активність, без повторюваних фатальних помилок.
+- `openclaw status` → показує налаштовані канали й відсутність явних помилок автентифікації.
+- `openclaw status --all` → повний звіт присутній і ним можна поділитися.
+- `openclaw gateway probe` → очікувана ціль Gateway досяжна (`Reachable: yes`). `Capability: ...` показує, який рівень автентифікації вдалося підтвердити під час перевірки, а `Read probe: limited - missing scope: operator.read` означає погіршену діагностику, а не збій з’єднання.
+- `openclaw gateway status` → `Runtime: running`, `Connectivity probe: ok` і правдоподібний рядок `Capability: ...`. Використайте `--require-rpc`, якщо вам також потрібне підтвердження RPC з областю читання.
+- `openclaw doctor` → немає блокувальних помилок конфігурації чи сервісу.
+- `openclaw channels status --probe` → досяжний Gateway повертає стан транспорту для кожного облікового запису в реальному часі, а також результати перевірки/аудиту, як-от `works` або `audit ok`; якщо Gateway недосяжний, команда повертається до зведень лише за конфігурацією.
+- `openclaw logs --follow` → стабільна активність, без повторюваних критичних помилок.
 
 ## Anthropic long context 429
 
@@ -47,31 +45,31 @@ openclaw logs --follow
 `HTTP 429: rate_limit_error: Extra usage is required for long context requests`,
 перейдіть до [/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context](/uk/gateway/troubleshooting#anthropic-429-extra-usage-required-for-long-context).
 
-## Локальний backend, сумісний з OpenAI, працює напряму, але не працює в OpenClaw
+## Локальний OpenAI-compatible backend працює напряму, але не працює в OpenClaw
 
-Якщо ваш локальний або self-hosted backend `/v1` відповідає на малі прямі
-probe `/v1/chat/completions`, але не працює з `openclaw infer model run` або на звичайних
-ходах агента:
+Якщо ваш локальний або self-hosted бекенд `/v1` відповідає на невеликі прямі
+перевірки `/v1/chat/completions`, але завершується помилкою під час `openclaw infer model run` або звичайних
+ходів агента:
 
 1. Якщо помилка згадує, що `messages[].content` очікує рядок, установіть
    `models.providers.<provider>.models[].compat.requiresStringContent: true`.
-2. Якщо backend усе ще не працює лише на ходах агента OpenClaw, установіть
+2. Якщо бекенд усе ще збоїть лише під час ходів агента OpenClaw, установіть
    `models.providers.<provider>.models[].compat.supportsTools: false` і повторіть спробу.
-3. Якщо малі прямі виклики все ще працюють, а більші prompt OpenClaw аварійно
-   завершують backend, розглядайте залишкову проблему як обмеження моделі/сервера на стороні upstream і
-   переходьте до детального runbook:
+3. Якщо крихітні прямі виклики все ще працюють, але більші запити OpenClaw аварійно зупиняють
+   бекенд, розглядайте решту проблеми як обмеження моделі/сервера на боці апстриму і
+   продовжуйте в детальній інструкції:
    [/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail](/uk/gateway/troubleshooting#local-openai-compatible-backend-passes-direct-probes-but-agent-runs-fail)
 
-## Встановлення Plugin завершується помилкою через відсутні openclaw extensions
+## Установлення Plugin завершується помилкою через відсутність openclaw extensions
 
-Якщо встановлення завершується помилкою `package.json missing openclaw.extensions`, пакет Plugin
-використовує стару форму, яку OpenClaw більше не приймає.
+Якщо встановлення завершується помилкою `package.json missing openclaw.extensions`, пакет plugin
+використовує стару структуру, яку OpenClaw більше не приймає.
 
-Виправлення в пакеті Plugin:
+Виправлення в пакеті plugin:
 
-1. Додайте `openclaw.extensions` у `package.json`.
+1. Додайте `openclaw.extensions` до `package.json`.
 2. Спрямуйте записи на зібрані runtime-файли (зазвичай `./dist/index.js`).
-3. Повторно опублікуйте Plugin і знову виконайте `openclaw plugins install <package>`.
+3. Перевидайте plugin і знову виконайте `openclaw plugins install <package>`.
 
 Приклад:
 
@@ -85,7 +83,7 @@ probe `/v1/chat/completions`, але не працює з `openclaw infer model 
 }
 ```
 
-Довідка: [Plugin architecture](/uk/plugins/architecture)
+Довідка: [Архітектура Plugin](/uk/plugins/architecture)
 
 ## Дерево рішень
 
@@ -94,19 +92,19 @@ flowchart TD
   A[OpenClaw не працює] --> B{Що ламається першим}
   B --> C[Немає відповідей]
   B --> D[Dashboard або Control UI не підключається]
-  B --> E[Gateway не запускається або service не працює]
+  B --> E[Gateway не запускається або сервіс не працює]
   B --> F[Канал підключається, але повідомлення не проходять]
-  B --> G[Cron або Heartbeat не спрацювали або не доставили]
-  B --> H[Node спарено, але camera canvas screen exec не працює]
-  B --> I[Не працює інструмент браузера]
+  B --> G[Cron або Heartbeat не спрацював чи не доставив повідомлення]
+  B --> H[Node спарений, але не працюють інструменти camera canvas screen exec]
+  B --> I[Не працює інструмент browser]
 
-  C --> C1[/Розділ Без відповідей/]
-  D --> D1[/Розділ Control UI/]
-  E --> E1[/Розділ Gateway/]
-  F --> F1[/Розділ Потік каналу/]
-  G --> G1[/Розділ Автоматизація/]
-  H --> H1[/Розділ Інструменти Node/]
-  I --> I1[/Розділ Браузер/]
+  C --> C1[/Розділ «Немає відповідей»/]
+  D --> D1[/Розділ «Control UI»/]
+  E --> E1[/Розділ «Gateway»/]
+  F --> F1[/Розділ «Потік каналу»/]
+  G --> G1[/Розділ «Автоматизація»/]
+  H --> H1[/Розділ «Інструменти Node»/]
+  I --> I1[/Розділ «Browser»/]
 ```
 
 <AccordionGroup>
@@ -119,19 +117,19 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
     - `Runtime: running`
     - `Connectivity probe: ok`
     - `Capability: read-only`, `write-capable` або `admin-capable`
-    - Ваш канал показує підключений транспорт і, де це підтримується, `works` або `audit ok` у `channels status --probe`
-    - Відправник позначений як схвалений (або політика DM — open/allowlist)
+    - Ваш канал показує підключений транспорт і, де підтримується, `works` або `audit ok` у `channels status --probe`
+    - Відправник позначений як схвалений (або політика DM відкрита/є allowlist)
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
-    - `drop guild message (mention required` → перевірка згадки заблокувала повідомлення в Discord.
-    - `pairing request` → відправника не схвалено, і він очікує погодження спарювання DM.
-    - `blocked` / `allowlist` у журналах каналу → відправника, кімнату або групу відфільтровано.
+    - `drop guild message (mention required` → фільтрація за згадками заблокувала повідомлення в Discord.
+    - `pairing request` → відправник не схвалений і очікує схвалення спарювання в DM.
+    - `blocked` / `allowlist` у журналах каналу → відправник, кімната або група відфільтровані.
 
     Детальні сторінки:
 
@@ -150,29 +148,25 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
-    - `Dashboard: http://...` показано в `openclaw gateway status`
+    - `Dashboard: http://...` показується в `openclaw gateway status`
     - `Connectivity probe: ok`
     - `Capability: read-only`, `write-capable` або `admin-capable`
-    - У журналах немає циклу auth
+    - У журналах немає циклу автентифікації
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
     - `device identity required` → HTTP/незахищений контекст не може завершити автентифікацію пристрою.
-    - `origin not allowed` → browser `Origin` не дозволений для
-      цілі gateway Control UI.
-    - `AUTH_TOKEN_MISMATCH` з підказками повторної спроби (`canRetryWithDeviceToken=true`) → одна повторна спроба з кешованим токеном пристрою може відбутися автоматично.
-    - Ця повторна спроба з кешованим токеном повторно використовує набір scope, кешований разом із paired
-      device token. Виклики з явним `deviceToken` / явними `scopes` зберігають
-      власний запитаний набір scope.
-    - На асинхронному шляху Tailscale Serve Control UI невдалі спроби для того самого
-      `{scope, ip}` серіалізуються до того, як обмежувач зафіксує помилку, тож
+    - `origin not allowed` → `Origin` браузера не дозволений для цілі Gateway у Control UI.
+    - `AUTH_TOKEN_MISMATCH` із підказками повторної спроби (`canRetryWithDeviceToken=true`) → може автоматично відбутися одна повторна спроба з довіреним токеном пристрою.
+    - Ця повторна спроба з кешованим токеном повторно використовує кешований набір областей доступу, збережений разом зі спареним токеном пристрою. Виклики з явним `deviceToken` / явними `scopes` натомість зберігають запитаний ними набір областей.
+    - В асинхронному шляху Control UI через Tailscale Serve невдалі спроби для того самого
+      `{scope, ip}` серіалізуються до того, як лімітер зафіксує невдачу, тому
       друга одночасна невдала повторна спроба вже може показати `retry later`.
-    - `too many failed authentication attempts (retry later)` з localhost-origin браузера → повторні збої з того самого `Origin` тимчасово
-      блокуються; інший localhost-origin використовує окремий bucket.
-    - повторюване `unauthorized` після цієї повторної спроби → неправильний токен/пароль, невідповідність режиму auth або застарілий paired device token.
-    - `gateway connect failed:` → UI націлений на неправильний URL/port або недоступний gateway.
+    - `too many failed authentication attempts (retry later)` з браузерного localhost origin → повторні невдалі спроби з того самого `Origin` тимчасово блокуються; інший localhost origin використовує окремий bucket.
+    - повторюване `unauthorized` після цієї повторної спроби → неправильний токен/пароль, невідповідність режиму автентифікації або застарілий токен спареного пристрою.
+    - `gateway connect failed:` → UI націлений на неправильну URL-адресу/порт або на недосяжний Gateway.
 
     Детальні сторінки:
 
@@ -182,7 +176,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Gateway не запускається або service встановлено, але він не працює">
+  <Accordion title="Gateway не запускається або сервіс установлено, але він не працює">
     ```bash
     openclaw status
     openclaw gateway status
@@ -191,18 +185,18 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
     - `Service: ... (loaded)`
     - `Runtime: running`
     - `Connectivity probe: ok`
     - `Capability: read-only`, `write-capable` або `admin-capable`
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
-    - `Gateway start blocked: set gateway.mode=local` або `existing config is missing gateway.mode` → режим gateway — remote, або у файлі конфігурації немає позначки локального режиму, і його слід відновити.
-    - `refusing to bind gateway ... without auth` → bind не в loopback без валідного шляху auth gateway (токен/пароль або trusted-proxy, якщо це налаштовано).
-    - `another gateway instance is already listening` або `EADDRINUSE` → порт уже зайнято.
+    - `Gateway start blocked: set gateway.mode=local` або `existing config is missing gateway.mode` → режим gateway є remote, або у файлі конфігурації відсутня позначка local-mode, і його слід виправити.
+    - `refusing to bind gateway ... without auth` → прив’язка не до loopback без чинного шляху автентифікації gateway (токен/пароль або trusted-proxy, якщо налаштовано).
+    - `another gateway instance is already listening` або `EADDRINUSE` → порт уже зайнятий.
 
     Детальні сторінки:
 
@@ -221,16 +215,16 @@ flowchart TD
     openclaw channels status --probe
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
-    - Транспорт каналу підключено.
-    - Перевірки pairing/allowlist проходять.
-    - Згадки визначаються там, де вони потрібні.
+    - Транспорт каналу підключений.
+    - Перевірки pairing/allowlist проходять успішно.
+    - Згадки виявляються там, де це потрібно.
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
-    - `mention required` → перевірка згадки в групі заблокувала обробку.
-    - `pairing` / `pending` → відправника DM ще не схвалено.
+    - `mention required` → фільтрація групових згадок заблокувала обробку.
+    - `pairing` / `pending` → відправник DM ще не схвалений.
     - `not_in_channel`, `missing_scope`, `Forbidden`, `401/403` → проблема з токеном дозволів каналу.
 
     Детальні сторінки:
@@ -240,7 +234,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Cron або Heartbeat не спрацювали або не доставили">
+  <Accordion title="Cron або Heartbeat не спрацював чи не доставив повідомлення">
     ```bash
     openclaw status
     openclaw gateway status
@@ -250,21 +244,21 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
-    - `cron.status` показує, що планувальник увімкнено й є наступне пробудження.
-    - `cron runs` показує недавні записи `ok`.
+    - `cron.status` показує, що функцію ввімкнено і є час наступного пробудження.
+    - `cron runs` показує нещодавні записи `ok`.
     - Heartbeat увімкнено й він не поза активними годинами.
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
     - `cron: scheduler disabled; jobs will not run automatically` → cron вимкнено.
     - `heartbeat skipped` з `reason=quiet-hours` → поза налаштованими активними годинами.
-    - `heartbeat skipped` з `reason=empty-heartbeat-file` → `HEARTBEAT.md` існує, але містить лише порожній вміст/каркас із заголовків.
-    - `heartbeat skipped` з `reason=no-tasks-due` → у `HEARTBEAT.md` активний режим завдань, але для жодного інтервалу завдань ще не настав час.
-    - `heartbeat skipped` з `reason=alerts-disabled` → усю видимість heartbeat вимкнено (`showOk`, `showAlerts` і `useIndicator` одночасно вимкнені).
-    - `requests-in-flight` → основна доріжка зайнята; пробудження heartbeat відкладено.
-    - `unknown accountId` → цільовий account для доставки heartbeat не існує.
+    - `heartbeat skipped` з `reason=empty-heartbeat-file` → `HEARTBEAT.md` існує, але містить лише порожній каркас або лише заголовки.
+    - `heartbeat skipped` з `reason=no-tasks-due` → у `HEARTBEAT.md` активний режим завдань, але для жодного з інтервалів завдань ще не настав час.
+    - `heartbeat skipped` з `reason=alerts-disabled` → уся видимість Heartbeat вимкнена (`showOk`, `showAlerts` і `useIndicator` усі вимкнені).
+    - `requests-in-flight` → основна смуга зайнята; пробудження heartbeat було відкладене.
+    - `unknown accountId` → цільовий обліковий запис доставки heartbeat не існує.
 
     Детальні сторінки:
 
@@ -274,7 +268,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Node спарено, але не працює інструмент camera canvas screen exec">
+  <Accordion title="Node спарений, але інструмент не працює: camera canvas screen exec">
     ```bash
     openclaw status
     openclaw gateway status
@@ -283,18 +277,18 @@ flowchart TD
     openclaw logs --follow
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
-    - Node позначено як підключений і спарений для ролі `node`.
-    - Для команди, яку ви викликаєте, існує відповідна можливість.
-    - Для інструмента надано потрібний стан дозволу.
+    - Node указано як підключений і спарений для ролі `node`.
+    - Для команди, яку ви викликаєте, існує відповідна capability.
+    - Для інструмента надано стан дозволу.
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
-    - `NODE_BACKGROUND_UNAVAILABLE` → переведіть застосунок Node на передній план.
-    - `*_PERMISSION_REQUIRED` → дозвіл ОС було відхилено або не надано.
-    - `SYSTEM_RUN_DENIED: approval required` → погодження exec очікує.
-    - `SYSTEM_RUN_DENIED: allowlist miss` → команда відсутня в allowlist exec.
+    - `NODE_BACKGROUND_UNAVAILABLE` → переведіть застосунок node на передній план.
+    - `*_PERMISSION_REQUIRED` → дозвіл ОС було відхилено або він відсутній.
+    - `SYSTEM_RUN_DENIED: approval required` → схвалення exec очікує надання.
+    - `SYSTEM_RUN_DENIED: allowlist miss` → команда відсутня в allowlist для exec.
 
     Детальні сторінки:
 
@@ -304,7 +298,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Exec раптом почав запитувати погодження">
+  <Accordion title="Exec раптово почав запитувати схвалення">
     ```bash
     openclaw config get tools.exec.host
     openclaw config get tools.exec.security
@@ -314,14 +308,14 @@ flowchart TD
 
     Що змінилося:
 
-    - Якщо `tools.exec.host` не задано, типове значення — `auto`.
-    - `host=auto` визначається як `sandbox`, коли активний runtime sandbox, і як `gateway` в іншому випадку.
-    - `host=auto` відповідає лише за маршрутизацію; поведінка без запиту в стилі "YOLO" походить від `security=full` плюс `ask=off` на gateway/node.
-    - Для `gateway` і `node` незадане `tools.exec.security` типово дорівнює `full`.
-    - Незадане `tools.exec.ask` типово дорівнює `off`.
-    - Результат: якщо ви бачите запити на погодження, значить якась локальна для хоста або для сесії policy зробила exec суворішим порівняно з поточними типовими значеннями.
+    - Якщо `tools.exec.host` не задано, значенням за замовчуванням є `auto`.
+    - `host=auto` визначається як `sandbox`, коли активне sandbox runtime, і як `gateway` — у протилежному випадку.
+    - `host=auto` відповідає лише за маршрутизацію; поведінка "YOLO" без запиту підтвердження походить від `security=full` разом із `ask=off` на gateway/node.
+    - Для `gateway` і `node`, якщо `tools.exec.security` не задано, значенням за замовчуванням є `full`.
+    - Якщо `tools.exec.ask` не задано, значенням за замовчуванням є `off`.
+    - Результат: якщо ви бачите запити на схвалення, значить якась локальна для хоста або поточної сесії політика зробила exec суворішим порівняно з поточними значеннями за замовчуванням.
 
-    Відновіть поточну типову поведінку без погодження:
+    Відновіть поточну поведінку за замовчуванням без схвалення:
 
     ```bash
     openclaw config set tools.exec.host gateway
@@ -332,14 +326,14 @@ flowchart TD
 
     Безпечніші альтернативи:
 
-    - Установіть лише `tools.exec.host=gateway`, якщо вам просто потрібна стабільна маршрутизація через хост.
-    - Використовуйте `security=allowlist` з `ask=on-miss`, якщо хочете host exec, але все ж хочете перевірку при пропусках allowlist.
+    - Установіть лише `tools.exec.host=gateway`, якщо вам потрібна просто стабільна маршрутизація хоста.
+    - Використайте `security=allowlist` разом із `ask=on-miss`, якщо ви хочете exec на хості, але при цьому хочете перевірку в разі промахів по allowlist.
     - Увімкніть режим sandbox, якщо хочете, щоб `host=auto` знову визначався як `sandbox`.
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
     - `Approval required.` → команда очікує на `/approve ...`.
-    - `SYSTEM_RUN_DENIED: approval required` → очікує погодження exec на хості node.
+    - `SYSTEM_RUN_DENIED: approval required` → очікує схвалення exec на хості node.
     - `exec host=sandbox requires a sandbox runtime for this session` → неявно/явно вибрано sandbox, але режим sandbox вимкнено.
 
     Детальні сторінки:
@@ -350,7 +344,7 @@ flowchart TD
 
   </Accordion>
 
-  <Accordion title="Не працює інструмент браузера">
+  <Accordion title="Інструмент browser не працює">
     ```bash
     openclaw status
     openclaw gateway status
@@ -359,22 +353,22 @@ flowchart TD
     openclaw doctor
     ```
 
-    Хороший результат виглядає так:
+    Ознаки коректного виводу:
 
-    - У статусі браузера показано `running: true` і вибраний browser/profile.
-    - `openclaw` запускається, або `user` бачить локальні вкладки Chrome.
+    - Статус browser показує `running: true` і вибраний browser/profile.
+    - `openclaw` запускається, або `user` може бачити локальні вкладки Chrome.
 
-    Поширені сигнатури в журналах:
+    Типові сигнатури в журналах:
 
-    - `unknown command "browser"` або `unknown command 'browser'` → задано `plugins.allow`, і він не включає `browser`.
-    - `Failed to start Chrome CDP on port` → не вдалося запустити локальний браузер.
-    - `browser.executablePath not found` → налаштовано неправильний шлях до бінарного файла.
-    - `browser.cdpUrl must be http(s) or ws(s)` → налаштований CDP URL використовує непідтримувану схему.
-    - `browser.cdpUrl has invalid port` → налаштований CDP URL має некоректний або вихідний за межі діапазону port.
-    - `No Chrome tabs found for profile="user"` → для profile підключення Chrome MCP немає відкритих локальних вкладок Chrome.
-    - `Remote CDP for profile "<name>" is not reachable` → налаштований endpoint віддаленого CDP недоступний із цього хоста.
-    - `Browser attachOnly is enabled ... not reachable` або `Browser attachOnly is enabled and CDP websocket ... is not reachable` → profile attach-only не має живої цілі CDP.
-    - застарілі перевизначення viewport / dark-mode / locale / offline для attach-only або profile віддаленого CDP → виконайте `openclaw browser stop --browser-profile <name>`, щоб закрити активну керувальну сесію й звільнити стан емуляції без перезапуску gateway.
+    - `unknown command "browser"` або `unknown command 'browser'` → установлено `plugins.allow`, і воно не містить `browser`.
+    - `Failed to start Chrome CDP on port` → не вдалося запустити локальний browser.
+    - `browser.executablePath not found` → налаштований шлях до бінарного файла неправильний.
+    - `browser.cdpUrl must be http(s) or ws(s)` → налаштований URL CDP використовує непідтримувану схему.
+    - `browser.cdpUrl has invalid port` → налаштований URL CDP має некоректний або неприпустимий порт.
+    - `No Chrome tabs found for profile="user"` → профіль підключення Chrome MCP не має відкритих локальних вкладок Chrome.
+    - `Remote CDP for profile "<name>" is not reachable` → налаштована віддалена кінцева точка CDP недосяжна з цього хоста.
+    - `Browser attachOnly is enabled ... not reachable` або `Browser attachOnly is enabled and CDP websocket ... is not reachable` → профіль attach-only не має живої цілі CDP.
+    - застарілі перевизначення viewport / dark-mode / locale / offline на профілях attach-only або remote CDP → виконайте `openclaw browser stop --browser-profile <name>`, щоб закрити активну керівну сесію та скинути стан емуляції без перезапуску gateway.
 
     Детальні сторінки:
 
@@ -389,8 +383,8 @@ flowchart TD
 
 ## Пов’язане
 
-- [FAQ](/uk/help/faq) — поширені запитання
-- [Gateway Troubleshooting](/uk/gateway/troubleshooting) — проблеми, специфічні для gateway
-- [Doctor](/uk/gateway/doctor) — автоматизовані перевірки стану й відновлення
-- [Channel Troubleshooting](/uk/channels/troubleshooting) — проблеми з підключенням каналів
-- [Automation Troubleshooting](/uk/automation/cron-jobs#troubleshooting) — проблеми з cron і Heartbeat
+- [FAQ](/uk/help/faq) — часті запитання
+- [Усунення неполадок Gateway](/uk/gateway/troubleshooting) — проблеми, пов’язані з gateway
+- [Doctor](/uk/gateway/doctor) — автоматизовані перевірки стану та виправлення
+- [Усунення неполадок каналів](/uk/channels/troubleshooting) — проблеми з підключенням каналів
+- [Усунення неполадок автоматизації](/uk/automation/cron-jobs#troubleshooting) — проблеми з cron і Heartbeat
