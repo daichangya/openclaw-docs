@@ -18,7 +18,7 @@ jobs:
     name: Translate ${{ inputs.locale }}
     runs-on: ubuntu-latest
     concurrency:
-      group: docs-i18n-publish-main
+      group: translate-${{ inputs.locale_slug }}
       cancel-in-progress: false
     steps:
       - name: Checkout publish repo
