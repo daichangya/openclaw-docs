@@ -1,58 +1,57 @@
 ---
 read_when:
     - Вам потрібно зрозуміти, чому завдання CI запустилося або не запустилося
-    - Ви налагоджуєте перевірки GitHub Actions, що завершуються з помилкою
-summary: Граф завдань CI, шлюзи області дії та локальні еквіваленти команд
-title: Конвеєр CI
+    - Ви налагоджуєте збої перевірок GitHub Actions
+summary: Граф завдань CI, межі перевірок і локальні еквіваленти команд
+title: конвеєр CI
 x-i18n:
-    generated_at: "2026-04-23T23:47:31Z"
+    generated_at: "2026-04-24T00:54:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ada7a931acf451ef2dd3d132f701f3a87b6976fb476ed4f4f52ecc09c4191b12
+    source_hash: 43550d4c57343a35eb8b725936a50963cb5886e589eaebcec2168c25ae2891ac
     source_path: ci.md
     workflow: 15
 ---
 
-CI запускається при кожному push до `main` і для кожного pull request. Він використовує розумне визначення області дії, щоб пропускати дорогі завдання, коли змінено лише непов’язані ділянки.
+CI запускається при кожному push до `main` і для кожного pull request. Він використовує розумне обмеження за областю змін, щоб пропускати дорогі завдання, коли змінено лише не пов’язані ділянки.
 
-QA Lab має окремі смуги CI поза основним workflow з розумним визначенням області дії. Workflow
-`Parity gate` запускається для відповідних змін у PR і при ручному запуску; він
-збирає приватне QA runtime і порівнює агентні пакети mock GPT-5.4 та Opus 4.6.
-Workflow `QA-Lab - All Lanes` запускається щоночі на `main` і при
-ручному запуску; він розгалужує mock parity gate, live Matrix lane та live
-Telegram lane як паралельні завдання. Live-завдання використовують середовище `qa-live-shared`,
-а Telegram lane використовує оренди Convex. `OpenClaw Release
-Checks` також запускає ті самі смуги QA Lab перед затвердженням релізу.
+QA Lab має окремі доріжки CI поза основним workflow з розумним обмеженням за областю змін. Workflow
+`Parity gate` запускається для відповідних змін у PR і через manual dispatch; він
+збирає приватне середовище виконання QA та порівнює агентні набори mock GPT-5.4 і Opus 4.6.
+Workflow `QA-Lab - All Lanes` запускається щоночі на `main` і через
+manual dispatch; він розгалужує mock parity gate, live-доріжку Matrix і live-доріжку
+Telegram як паралельні завдання. Live-завдання використовують середовище `qa-live-shared`,
+а доріжка Telegram використовує Convex leases. `OpenClaw Release
+Checks` також запускає ті самі доріжки QA Lab перед схваленням релізу.
 
-Workflow `Duplicate PRs After Merge` — це ручний workflow для мейнтейнерів для
-очищення дублікатів після злиття. За замовчуванням він працює в режимі dry-run і
-закриває лише явно перелічені PR, коли `apply=true`. Перед змінами на GitHub
-він перевіряє, що злитий PR справді об’єднано, і що кожен дублікат має або
-спільний згаданий issue, або перетин змінених фрагментів.
+Workflow `Duplicate PRs After Merge` — це ручний workflow для супроводу від maintainer
+для очищення дублікатів після злиття. За замовчуванням він працює в dry-run режимі й
+закриває лише явно вказані PR, коли `apply=true`. Перш ніж змінювати GitHub,
+він перевіряє, що злитий PR справді merged, і що кожен дублікат має або спільне посилання на issue,
+або перекривні змінені hunks.
 
-Workflow `Docs Agent` — це керована подіями смуга обслуговування Codex для
-підтримання наявної документації у відповідності до нещодавно внесених змін. Вона не має окремого запуску за розкладом:
-її може запустити успішний CI-прогін push не від бота на `main`, а також її можна
-запустити вручну. Виклики через workflow-run пропускаються, якщо `main` уже пішов далі
-або якщо інший непропущений запуск Docs Agent був створений протягом останньої години. Коли вона запускається,
-вона переглядає діапазон комітів від попереднього непропущеного source SHA Docs Agent до
-поточного `main`, тож один щогодинний запуск може охопити всі зміни в main,
-що накопичилися з часу останнього проходу документації.
+Workflow `Docs Agent` — це event-driven доріжка обслуговування Codex для підтримання
+узгодженості наявної документації з нещодавно внесеними змінами. Вона не має окремого запуску за розкладом:
+її може запустити успішний небойовий push CI на `main`, а manual dispatch може
+запустити її напряму. Виклики через workflow-run пропускаються, якщо `main` уже змінився або якщо
+за останню годину вже було створено інший неперепущений запуск Docs Agent. Коли вона виконується, вона
+переглядає діапазон комітів від попереднього неперепущеного source SHA Docs Agent до
+поточного `main`, тому один щогодинний запуск може охопити всі зміни в main, накопичені
+з моменту останнього проходу документації.
 
-Workflow `Test Performance Agent` — це керована подіями смуга обслуговування Codex
+Workflow `Test Performance Agent` — це event-driven доріжка обслуговування Codex
 для повільних тестів. Вона не має окремого запуску за розкладом:
-її може запустити успішний CI-прогін push не від бота на `main`, але
-вона пропускається, якщо інший виклик через workflow-run уже відпрацював або виконується в ту ж UTC-добу.
-Ручний запуск обходить цю добову перевірку активності. Смуга збирає
-звіт про продуктивність Vitest для повного набору тестів із групуванням, дозволяє Codex
-вносити лише невеликі виправлення продуктивності тестів без втрати покриття замість широких рефакторингів,
-потім повторно запускає звіт для повного набору і відхиляє зміни, які
-зменшують базову кількість тестів, що проходять. Якщо в базовому стані є тести, що падають,
-Codex може виправляти лише очевидні збої, і післяагентний звіт для повного набору
-має проходити, перш ніж щось буде закомічено. Коли `main` просувається далі до того, як push бота потрапить у гілку,
-смуга перебазовує перевірений патч, повторно запускає `pnpm check:changed` і
-повторює push; конфліктні застарілі патчі пропускаються. Вона використовує Ubuntu, розміщену на GitHub,
-щоб дія Codex могла зберігати ту саму безпечну модель drop-sudo, що й docs agent.
+її може запустити успішний небойовий push CI на `main`, але вона пропускається, якщо інший виклик через workflow-run
+уже виконався або виконується цього UTC-дня. Manual dispatch обходить це щоденне
+обмеження активності. Доріжка будує згрупований звіт про продуктивність Vitest для повного набору тестів,
+дозволяє Codex вносити лише невеликі виправлення продуктивності тестів зі збереженням покриття замість
+широких рефакторингів, потім повторно запускає звіт для повного набору та відхиляє зміни,
+які зменшують базову кількість тестів, що проходять. Якщо в базовому стані є тести, що падають,
+Codex може виправляти лише очевидні збої, а післяагентний звіт для повного набору тестів має пройти,
+перш ніж щось буде закомічено. Коли `main` просувається вперед до того, як bot push буде застосовано, доріжка
+перебазовує перевірений патч, повторно запускає `pnpm check:changed` і повторює push;
+застарілі патчі з конфліктами пропускаються. Вона використовує GitHub-hosted Ubuntu, щоб дія
+Codex могла зберігати ту саму безпечну модель drop-sudo, що й docs agent.
 
 ```bash
 gh workflow run duplicate-after-merge.yml \
@@ -63,74 +62,77 @@ gh workflow run duplicate-after-merge.yml \
 
 ## Огляд завдань
 
-| Job                              | Призначення                                                                                  | Коли запускається                    |
-| -------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `preflight`                      | Виявлення змін лише в docs, змінених областей, змінених extensions і побудова CI-маніфесту  | Завжди для push і PR не в draft      |
-| `security-scm-fast`              | Виявлення приватних ключів і аудит workflow через `zizmor`                                   | Завжди для push і PR не в draft      |
-| `security-dependency-audit`      | Аудит production lockfile без залежностей щодо advisory npm                                  | Завжди для push і PR не в draft      |
-| `security-fast`                  | Обов’язковий агрегат для швидких security-завдань                                            | Завжди для push і PR не в draft      |
-| `build-artifacts`                | Збирання `dist/`, Control UI, перевірки built-artifact і повторно використовувані downstream artifacts | Зміни, що стосуються Node            |
-| `checks-fast-core`               | Швидкі Linux-смуги коректності, наприклад перевірки bundled/plugin-contract/protocol         | Зміни, що стосуються Node            |
-| `checks-fast-contracts-channels` | Розшардовані перевірки channel contract зі стабільним агрегованим результатом перевірки      | Зміни, що стосуються Node            |
-| `checks-node-extensions`         | Повні шарди тестів bundled-plugin по всьому набору extension                                 | Зміни, що стосуються Node            |
-| `checks-node-core-test`          | Шарди основних Node-тестів, без channel, bundled, contract і extension-смуг                  | Зміни, що стосуються Node            |
-| `extension-fast`                 | Цільові тести лише для змінених bundled plugins                                              | Pull request зі змінами в extension  |
-| `check`                          | Розшардований еквівалент основного локального шлюзу: prod types, lint, guards, test types і strict smoke | Зміни, що стосуються Node            |
-| `check-additional`               | Архітектурні, boundary, extension-surface guards, package-boundary і gateway-watch shards    | Зміни, що стосуються Node            |
-| `build-smoke`                    | Smoke-тести зібраного CLI і smoke startup-memory                                             | Зміни, що стосуються Node            |
-| `checks`                         | Верифікатор для built-artifact channel tests плюс сумісність з Node 22 лише для push         | Зміни, що стосуються Node            |
-| `check-docs`                     | Форматування docs, lint і перевірки битих посилань                                           | Docs змінено                         |
-| `skills-python`                  | Ruff + pytest для Python-backed Skills                                                       | Зміни, що стосуються Python Skills   |
-| `checks-windows`                 | Windows-специфічні тестові смуги                                                             | Зміни, що стосуються Windows         |
-| `macos-node`                     | Смуга TypeScript-тестів на macOS із використанням спільних built artifacts                   | Зміни, що стосуються macOS           |
-| `macos-swift`                    | Swift lint, збірка та тести для застосунку macOS                                             | Зміни, що стосуються macOS           |
-| `android`                        | Android unit-тести для обох flavor плюс одна debug APK build                                 | Зміни, що стосуються Android         |
-| `test-performance-agent`         | Щоденна оптимізація повільних тестів Codex після довіреної активності                        | Успіх main CI або ручний запуск      |
+| Завдання                          | Призначення                                                                                  | Коли запускається                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `preflight`                       | Визначає зміни лише в документації, змінені області, змінені розширення та будує маніфест CI | Завжди для недрафтових pushes і PR   |
+| `security-scm-fast`               | Виявлення приватних ключів і аудит workflow через `zizmor`                                   | Завжди для недрафтових pushes і PR   |
+| `security-dependency-audit`       | Аудит production lockfile без залежностей щодо advisory npm                                  | Завжди для недрафтових pushes і PR   |
+| `security-fast`                   | Обов’язковий агрегат для швидких завдань безпеки                                             | Завжди для недрафтових pushes і PR   |
+| `build-artifacts`                 | Збирає `dist/`, Control UI, перевірки зібраних артефактів і повторно використовувані downstream артефакти | Зміни, релевантні для Node           |
+| `checks-fast-core`                | Швидкі доріжки коректності Linux, як-от перевірки bundled/plugin-contract/protocol           | Зміни, релевантні для Node           |
+| `checks-fast-contracts-channels`  | Шардовані перевірки контрактів каналів зі стабільним агрегованим результатом                 | Зміни, релевантні для Node           |
+| `checks-node-extensions`          | Повні шарди тестів bundled-plugin для всього набору розширень                                | Зміни, релевантні для Node           |
+| `checks-node-core-test`           | Шарди основних Node-тестів, без доріжок каналів, bundled, контрактів і розширень             | Зміни, релевантні для Node           |
+| `extension-fast`                  | Прицільні тести лише для змінених bundled plugins                                            | Pull requests зі змінами в розширеннях |
+| `check`                           | Шардований еквівалент основної локальної перевірки: prod types, lint, guards, test types і strict smoke | Зміни, релевантні для Node           |
+| `check-additional`                | Перевірки архітектури, меж, поверхні розширень, меж пакетів і шарди gateway-watch            | Зміни, релевантні для Node           |
+| `build-smoke`                     | Smoke-тести зібраного CLI та smoke перевірка пам’яті під час запуску                         | Зміни, релевантні для Node           |
+| `checks`                          | Верифікатор для тестів каналів зі зібраними артефактами плюс сумісність Node 22 лише для push | Зміни, релевантні для Node           |
+| `check-docs`                      | Форматування документації, lint і перевірки битих посилань                                   | Документацію змінено                 |
+| `skills-python`                   | Ruff + pytest для Skills на основі Python                                                    | Зміни, релевантні для Python Skills  |
+| `checks-windows`                  | Специфічні для Windows доріжки тестування                                                    | Зміни, релевантні для Windows        |
+| `macos-node`                      | Доріжка тестів TypeScript на macOS з використанням спільних зібраних артефактів              | Зміни, релевантні для macOS          |
+| `macos-swift`                     | Swift lint, збірка та тести для застосунку macOS                                             | Зміни, релевантні для macOS          |
+| `android`                         | Android unit-тести для обох flavors плюс одна збірка debug APK                               | Зміни, релевантні для Android        |
+| `test-performance-agent`          | Щоденна оптимізація повільних тестів Codex після довіреної активності                         | Успішний main CI або manual dispatch |
 
 ## Порядок Fail-Fast
 
-Завдання впорядковані так, щоб дешеві перевірки завершувалися з помилкою раніше, ніж запускаються дорогі:
+Завдання впорядковано так, щоб дешеві перевірки падали раніше, ніж запустяться дорогі:
 
-1. `preflight` визначає, які смуги взагалі існують. Логіка `docs-scope` і `changed-scope` — це кроки всередині цього завдання, а не окремі завдання.
-2. `security-scm-fast`, `security-dependency-audit`, `security-fast`, `check`, `check-additional`, `check-docs` і `skills-python` швидко падають, не чекаючи важчих завдань артефактів і платформної матриці.
-3. `build-artifacts` виконується паралельно зі швидкими Linux-смугами, щоб downstream-споживачі могли стартувати, щойно спільна збірка буде готова.
-4. Після цього розгалужуються важчі платформні та runtime-смуги: `checks-fast-core`, `checks-fast-contracts-channels`, `checks-node-extensions`, `checks-node-core-test`, лише-PR `extension-fast`, `checks`, `checks-windows`, `macos-node`, `macos-swift` і `android`.
+1. `preflight` вирішує, які доріжки взагалі існують. Логіка `docs-scope` і `changed-scope` — це кроки всередині цього завдання, а не окремі завдання.
+2. `security-scm-fast`, `security-dependency-audit`, `security-fast`, `check`, `check-additional`, `check-docs` і `skills-python` швидко падають, не чекаючи важчих матричних завдань для артефактів і платформ.
+3. `build-artifacts` виконується паралельно зі швидкими Linux-доріжками, щоб downstream-споживачі могли стартувати, щойно спільна збірка буде готова.
+4. Після цього розгалужуються важчі платформні доріжки й доріжки виконання: `checks-fast-core`, `checks-fast-contracts-channels`, `checks-node-extensions`, `checks-node-core-test`, лише-PR `extension-fast`, `checks`, `checks-windows`, `macos-node`, `macos-swift` і `android`.
 
-Логіка області дії знаходиться в `scripts/ci-changed-scope.mjs` і покрита unit-тестами в `src/scripts/ci-changed-scope.test.ts`.
-Зміни CI workflow перевіряють граф Node CI і lint для workflow, але самі по собі не примушують запускати нативні збірки Windows, Android або macOS; ці платформні смуги залишаються прив’язаними до змін у коді відповідних платформ.
-Перевірки Windows Node прив’язані до Windows-специфічних обгорток process/path, допоміжних засобів npm/pnpm/UI runner, конфігурації package manager і поверхонь CI workflow, які запускають цю смугу; непов’язані зміни у вихідному коді, plugin, install-smoke і лише тестах залишаються на Linux Node-смугах, щоб не резервувати Windows worker на 16 vCPU для покриття, яке вже забезпечується звичайними test shards.
-Окремий workflow `install-smoke` повторно використовує той самий скрипт області дії через власне завдання `preflight`. Він обчислює `run_install_smoke` із вужчого сигналу changed-smoke, тому Docker/install smoke запускається для змін, що стосуються install, packaging, контейнерів, production-змін bundled extension і поверхонь core plugin/channel/gateway/Plugin SDK, які використовують завдання Docker smoke. Зміни лише в тестах і лише в docs не резервують Docker workers. Його QR package smoke змушує шар Docker `pnpm install` виконуватися повторно, зберігаючи кеш BuildKit pnpm store, тож він усе одно перевіряє встановлення без повторного завантаження залежностей при кожному запуску. Його gateway-network e2e повторно використовує runtime image, зібраний раніше в межах цього завдання, тож додає реальне покриття WebSocket контейнер-до-контейнера без додавання ще однієї Docker-збірки. Локальна команда `test:docker:all` попередньо збирає один спільний live-test image і один спільний image зібраного застосунку `scripts/e2e/Dockerfile`, а потім запускає смуги live/E2E паралельно з `OPENCLAW_SKIP_DOCKER_BUILD=1`; налаштуйте стандартний паралелізм 4 через `OPENCLAW_DOCKER_ALL_PARALLELISM`. Локальний агрегат за замовчуванням припиняє планувати нові pooled lanes після першої помилки, і кожна смуга має тайм-аут 120 хвилин, який можна перевизначити через `OPENCLAW_DOCKER_ALL_LANE_TIMEOUT_MS`. Смуги, чутливі до startup або provider, виконуються ексклюзивно після паралельного пулу. Повторно використовуваний workflow live/E2E віддзеркалює патерн спільного image, збираючи й публікуючи один Docker E2E image із SHA-тегом у GHCR перед Docker matrix, а потім запускаючи матрицю з `OPENCLAW_SKIP_DOCKER_BUILD=1`. Запланований workflow live/E2E щодня запускає повний Docker-набір за шляхом релізу. Docker-тести QR та installer зберігають власні Dockerfile, орієнтовані на встановлення. Окреме завдання `docker-e2e-fast` запускає обмежений Docker-профіль bundled-plugin з тайм-аутом команди 120 секунд: setup-entry repair залежностей плюс синтетична ізоляція збоїв bundled-loader. Повна матриця bundled update/channel залишається ручною/для повного набору, оскільки виконує повторні реальні проходи npm update і doctor repair.
+Логіка областей змін міститься в `scripts/ci-changed-scope.mjs` і покрита unit-тестами в `src/scripts/ci-changed-scope.test.ts`.
+Зміни workflow CI перевіряють граф Node CI і lint workflow, але самі по собі не примушують запускати нативні збірки Windows, Android або macOS; ці платформні доріжки й далі обмежуються змінами в коді відповідних платформ.
+Перевірки Windows Node обмежені Windows-специфічними обгортками process/path, допоміжними утилітами npm/pnpm/UI runner, конфігурацією менеджера пакетів і поверхнями workflow CI, які запускають цю доріжку; не пов’язані зміни у вихідному коді, plugin, install-smoke та лише тестах залишаються на Linux Node-доріжках, щоб не резервувати 16-vCPU Windows worker для покриття, яке вже виконується звичайними шардами тестів.
+Окремий workflow `install-smoke` повторно використовує той самий скрипт обмеження областей змін через власне завдання `preflight`. Він ділить smoke-покриття на `run_fast_install_smoke` і `run_full_install_smoke`. Pull requests запускають швидкий шлях для поверхонь Docker/package, змін package/manifest bundled plugin, а також поверхонь core plugin/channel/gateway/Plugin SDK, які використовують Docker smoke-завдання. Зміни лише у вихідному коді bundled plugin, лише в тестах і лише в документації не резервують Docker workers. Швидкий шлях один раз збирає образ root Dockerfile, перевіряє CLI, запускає container gateway-network e2e, перевіряє build arg bundled extension і запускає обмежений Docker profile bundled-plugin із timeout команди 120 секунд. Повний шлях зберігає покриття встановлення QR package і installer Docker/update для pushes у `main`, нічних запусків за розкладом, manual dispatch, release checks через workflow-call і справжніх змін installer/package/Docker. Повільний smoke для image-provider із глобальним встановленням Bun керується окремо через `run_bun_global_install_smoke`; він запускається за нічним розкладом і з workflow release checks, а manual dispatch `install-smoke` може явно його ввімкнути, але pull requests його не запускають. Тести QR і installer Docker зберігають власні Dockerfiles, орієнтовані на встановлення. Локальний `test:docker:all` заздалегідь збирає один спільний образ live-test і один спільний образ built-app `scripts/e2e/Dockerfile`, а потім запускає доріжки live/E2E smoke паралельно з `OPENCLAW_SKIP_DOCKER_BUILD=1`; налаштуйте типову паралельність 4 через `OPENCLAW_DOCKER_ALL_PARALLELISM`. Локальний агрегат за замовчуванням припиняє планувати нові pooled-доріжки після першої помилки, а кожна доріжка має timeout 120 хвилин, який можна перевизначити через `OPENCLAW_DOCKER_ALL_LANE_TIMEOUT_MS`. Доріжки, чутливі до запуску або provider, виконуються ексклюзивно після паралельного пулу. Повторно використовуваний workflow live/E2E віддзеркалює шаблон спільного образу: він збирає й публікує один GHCR Docker E2E image із тегом SHA до Docker-матриці, а потім запускає матрицю з `OPENCLAW_SKIP_DOCKER_BUILD=1`. Запланований workflow live/E2E щодня запускає повний Docker-набір для шляху релізу. Повна матриця bundled update/channel залишається ручною/full-suite, оскільки виконує повторні реальні проходи npm update і doctor repair.
 
-Локальна логіка changed-lane знаходиться в `scripts/changed-lanes.mjs` і виконується через `scripts/check-changed.mjs`. Цей локальний шлюз суворіший щодо архітектурних меж, ніж широка платформна область дії CI: зміни core production запускають core prod typecheck плюс core tests, зміни лише core test запускають лише core test typecheck/tests, зміни extension production запускають extension prod typecheck плюс extension tests, а зміни лише extension test запускають лише extension test typecheck/tests. Зміни в публічному Plugin SDK або plugin-contract розширюють валідацію на extension, оскільки extension залежать від цих core contracts. Зміни лише в метаданих релізу для version bump запускають цільові перевірки version/config/root-dependency. Невідомі зміни в root/config безпечно переводять виконання на всі смуги.
+Локальна логіка changed-lane міститься в `scripts/changed-lanes.mjs` і виконується через `scripts/check-changed.mjs`. Ця локальна перевірка суворіша щодо архітектурних меж, ніж широке CI-обмеження за платформами: зміни в core production запускають prod typecheck для core плюс тести core, зміни лише в core tests запускають лише typecheck/tests для тестів core, зміни в extension production запускають prod typecheck для extension плюс тести extension, а зміни лише в extension tests запускають лише typecheck/tests для тестів extension. Зміни в публічному Plugin SDK або plugin-contract розширюють перевірку на extension, оскільки extensions залежать від цих контрактів core. Підвищення версії лише в release metadata запускають прицільні перевірки version/config/root-dependency. Невідомі зміни в root/config безпечно розширюються до всіх доріжок.
 
-Для push матриця `checks` додає смугу `compat-node22`, що запускається лише для push. Для pull request ця смуга пропускається, а матриця залишається зосередженою на звичайних тестових/channel-смугах.
+Для pushes матриця `checks` додає доріжку `compat-node22`, яка запускається лише для push. Для pull requests ця доріжка пропускається, і матриця залишається зосередженою на звичайних доріжках тестів/каналів.
 
-Найповільніші сімейства Node-тестів розділено або збалансовано так, щоб кожне завдання залишалося невеликим без надмірного резервування runner-ів: channel contracts виконуються у трьох зважених shards, тести bundled plugin збалансовані між шістьма extension worker-ами, невеликі core unit lanes попарно об’єднані, auto-reply виконується на трьох збалансованих worker-ах замість шести крихітних, а agentic gateway/plugin configs розподілено по наявних source-only agentic Node jobs замість очікування built artifacts. Широкі browser, QA, media та miscellaneous plugin-тести використовують свої окремі конфігурації Vitest замість спільного універсального plugin catch-all. Завдання extension shards запускають групи plugin config послідовно з одним worker-ом Vitest і більшим heap Node, щоб пакети plugin із великим обсягом імпортів не перевантажували невеликі CI runner-и. Широка agents lane використовує спільний файлопаралельний планувальник Vitest, оскільки в ній домінують імпорти/планування, а не один окремий повільний тестовий файл. `runtime-config` виконується разом із shard `infra core-runtime`, щоб спільний runtime shard не затримував завершення. `check-additional` тримає package-boundary compile/canary роботу разом і відокремлює архітектуру runtime topology від покриття gateway watch; shard boundary guard запускає свої невеликі незалежні guards паралельно в межах одного завдання. Gateway watch, channel tests і core support-boundary shard виконуються паралельно всередині `build-artifacts` після того, як `dist/` і `dist-runtime/` уже зібрані, зберігаючи свої старі назви check як легкі завдання-верифікатори та уникаючи двох додаткових Blacksmith worker-ів і другої черги споживачів артефактів.
-Android CI запускає і `testPlayDebugUnitTest`, і `testThirdPartyDebugUnitTest`, а потім збирає Play debug APK. Flavor third-party не має окремого source set або manifest; його смуга unit-тестів усе одно компілює цей flavor із прапорцями BuildConfig для SMS/call-log, водночас уникаючи дублювання завдання пакування debug APK для кожного push, що стосується Android.
-`extension-fast` є лише для PR, оскільки push-запуски вже виконують повні shard-и bundled plugin. Це зберігає швидкий зворотний зв’язок для changed-plugin під час рев’ю без резервування додаткового Blacksmith worker-а на `main` для покриття, яке вже є в `checks-node-extensions`.
+Найповільніші сімейства Node-тестів розділено або збалансовано так, щоб кожне завдання залишалося невеликим без надмірного резервування раннерів: контракти каналів працюють у трьох зважених шардах, тести bundled plugin збалансовані між шістьма workers для розширень, малі core unit-доріжки об’єднані в пари, auto-reply виконується у трьох збалансованих workers замість шести дрібних workers, а конфігурації agentic gateway/plugin розподілені між наявними source-only agentic Node-завданнями замість очікування на зібрані артефакти. Широкі browser-, QA-, media- та різні plugin-тести використовують свої окремі конфігурації Vitest замість спільного універсального набору для plugins. Завдання шардінгу розширень виконують групи конфігурацій plugin послідовно з одним worker Vitest і більшим Node heap, щоб пакетні набори plugins із великим імпортним навантаженням не перевантажували невеликі CI-раннери. Широка доріжка agents використовує спільний файлово-паралельний планувальник Vitest, оскільки в ній домінують імпорти/планування, а не один повільний тестовий файл. `runtime-config` виконується разом із шардом infra core-runtime, щоб спільний runtime-shard не замикав на собі хвіст. `check-additional` тримає разом package-boundary compile/canary-роботи й відокремлює архітектуру runtime topology від покриття gateway watch; шард boundary guard запускає свої невеликі незалежні guards паралельно в межах одного завдання. Gateway watch, тести каналів і core support-boundary shard працюють паралельно всередині `build-artifacts` після того, як `dist/` і `dist-runtime/` уже зібрано, зберігаючи свої старі назви перевірок як легкі завдання-верифікатори й водночас уникаючи двох додаткових workers Blacksmith і другої черги споживачів артефактів.
 
-GitHub може позначати заміщені завдання як `cancelled`, коли новіший push потрапляє в той самий PR або ref `main`. Сприймайте це як шум CI, якщо лише найновіший запуск для того самого ref також не завершується з помилкою. Агреговані shard checks використовують `!cancelled() && always()`, щоб вони все одно повідомляли про звичайні збої shard-ів, але не ставали в чергу після того, як увесь workflow уже було заміщено.
-Ключ конкурентності CI має версію (`CI-v7-*`), щоб zombie-процес на боці GitHub у старій групі черги не міг безкінечно блокувати новіші запуски `main`.
+Android CI запускає і `testPlayDebugUnitTest`, і `testThirdPartyDebugUnitTest`, а потім збирає Play debug APK. Для flavor third-party немає окремого source set чи manifest; його доріжка unit-тестів усе одно компілює цей flavor із прапорцями SMS/call-log у BuildConfig, водночас уникаючи дублювання завдання пакування debug APK для кожного Android-релевантного push.
 
-## Runner-и
+`extension-fast` виконується лише для PR, оскільки push-запуски вже виконують повні шарди bundled plugin. Це зберігає швидкий зворотний зв’язок щодо змінених plugins під час review, не резервуючи додатковий worker Blacksmith на `main` для покриття, яке вже є в `checks-node-extensions`.
 
-| Runner                           | Jobs                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ubuntu-24.04`                   | `preflight`, швидкі security-завдання та агрегати (`security-scm-fast`, `security-dependency-audit`, `security-fast`), швидкі protocol/contract/bundled checks, шардовані перевірки channel contract, shards `check`, окрім lint, shards і агрегати `check-additional`, aggregate verifiers Node-тестів, перевірки docs, Python Skills, workflow-sanity, labeler, auto-response; preflight для install-smoke також використовує GitHub-hosted Ubuntu, щоб матриця Blacksmith могла ставати в чергу раніше |
-| `blacksmith-8vcpu-ubuntu-2404`   | `build-artifacts`, build-smoke, шарди Linux Node-тестів, шарди тестів bundled plugin, `android`                                                                                                                                                                                                                                                                                                                                                                           |
-| `blacksmith-16vcpu-ubuntu-2404`  | `check-lint`, який залишається достатньо чутливим до CPU, тож 8 vCPU коштували більше, ніж дали вигоди; Docker-збірки install-smoke, де вартість часу очікування 32-vCPU була вищою за вигоду                                                                                                                                                                                                                                                                       |
-| `blacksmith-16vcpu-windows-2025` | `checks-windows`                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `blacksmith-6vcpu-macos-latest`  | `macos-node` у `openclaw/openclaw`; для fork використовується запасний варіант `macos-latest`                                                                                                                                                                                                                                                                                                                                                                           |
-| `blacksmith-12vcpu-macos-latest` | `macos-swift` у `openclaw/openclaw`; для fork використовується запасний варіант `macos-latest`                                                                                                                                                                                                                                                                                                                                                                          |
+GitHub може позначати замінені новішими завдання як `cancelled`, коли новіший push потрапляє в той самий PR або ref `main`. Вважайте це шумом CI, якщо тільки найновіший запуск для того самого ref також не завершується збоєм. Агреговані перевірки шардів використовують `!cancelled() && always()`, тож вони все одно повідомляють про звичайні збої шардів, але не стають у чергу після того, як увесь workflow уже було замінено новішим.
+
+Ключ конкурентності CI має версіонування (`CI-v7-*`), щоб zombie на боці GitHub у старій групі черги не міг безстроково блокувати новіші запуски `main`.
+
+## Раннери
+
+| Раннер                           | Завдання                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ubuntu-24.04`                   | `preflight`, швидкі завдання безпеки й агрегати (`security-scm-fast`, `security-dependency-audit`, `security-fast`), швидкі перевірки protocol/contract/bundled, шардовані перевірки контрактів каналів, шарди `check`, крім lint, шарди й агрегати `check-additional`, агреговані верифікатори Node-тестів, перевірки docs, Python Skills, workflow-sanity, labeler, auto-response; preflight для install-smoke також використовує GitHub-hosted Ubuntu, щоб матриця Blacksmith могла раніше стати в чергу |
+| `blacksmith-8vcpu-ubuntu-2404`   | `build-artifacts`, build-smoke, шарди Linux Node-тестів, шарди тестів bundled plugin, `android`                                                                                                                                                                                                                                                                                                                                                                          |
+| `blacksmith-16vcpu-ubuntu-2404`  | `check-lint`, який лишається достатньо чутливим до CPU, тож 8 vCPU коштували дорожче, ніж давали вигоди; Docker-збірки install-smoke, де витрати часу на чергу для 32 vCPU перевищували виграш                                                                                                                                                                                                                                                                          |
+| `blacksmith-16vcpu-windows-2025` | `checks-windows`                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `blacksmith-6vcpu-macos-latest`  | `macos-node` у `openclaw/openclaw`; forks використовують `macos-latest` як запасний варіант                                                                                                                                                                                                                                                                                                                                                                              |
+| `blacksmith-12vcpu-macos-latest` | `macos-swift` у `openclaw/openclaw`; forks використовують `macos-latest` як запасний варіант                                                                                                                                                                                                                                                                                                                                                                             |
 
 ## Локальні еквіваленти
 
 ```bash
-pnpm changed:lanes   # перевірити локальний класифікатор changed-lane для origin/main...HEAD
-pnpm check:changed   # розумний локальний шлюз: changed typecheck/lint/tests за boundary lane
-pnpm check          # швидкий локальний шлюз: production tsgo + sharded lint + parallel fast guards
+pnpm changed:lanes   # переглянути локальний класифікатор changed-lane для origin/main...HEAD
+pnpm check:changed   # розумна локальна перевірка: changed typecheck/lint/tests за граничною доріжкою
+pnpm check          # швидка локальна перевірка: production tsgo + шардований lint + паралельні швидкі guards
 pnpm check:test-types
-pnpm check:timed    # той самий шлюз із таймінгами для кожного етапу
+pnpm check:timed    # та сама перевірка з таймінгами для кожного етапу
 pnpm build:strict-smoke
 pnpm check:architecture
 pnpm test:gateway:watch-regression
@@ -138,9 +140,9 @@ pnpm test           # тести vitest
 pnpm test:channels
 pnpm test:contracts:channels
 pnpm check:docs     # форматування docs + lint + биті посилання
-pnpm build          # збірка dist, коли важливі смуги CI artifact/build-smoke
-node scripts/ci-run-timings.mjs <run-id>      # підсумок wall time, queue time і найповільніших jobs
-node scripts/ci-run-timings.mjs --recent 10   # порівняння нещодавніх успішних запусків main CI
+pnpm build          # збірка dist, коли важливі CI-доріжки artifact/build-smoke
+node scripts/ci-run-timings.mjs <run-id>      # підсумувати wall time, час у черзі та найповільніші завдання
+node scripts/ci-run-timings.mjs --recent 10   # порівняти нещодавні успішні запуски main CI
 pnpm test:perf:groups --full-suite --allow-failures --output .artifacts/test-perf/baseline-before.json
 pnpm test:perf:groups:compare .artifacts/test-perf/baseline-before.json .artifacts/test-perf/after-agent.json
 ```
