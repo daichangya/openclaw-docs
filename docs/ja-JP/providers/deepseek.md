@@ -1,42 +1,42 @@
 ---
 read_when:
-    - OpenClawでDeepSeekを使いたい場合
-    - API keyのenv varまたはCLI auth choiceが必要な場合
-summary: DeepSeekのセットアップ（auth + model選択）
+    - OpenClaw で DeepSeek を使いたい場合
+    - API キーの環境変数または CLI の認証オプションが必要です
+summary: DeepSeek のセットアップ（認証 + モデル選択）
 title: DeepSeek
 x-i18n:
-    generated_at: "2026-04-24T05:14:29Z"
+    generated_at: "2026-04-24T15:21:31Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ead407c67c05bd8700db1cba36defdd9d47bdc9a071c76a07c4b4fb82f6b80e2
+    source_hash: 5b0d2345c72328e14351d71c5784204dc6ed9dc922f919b6adfac394001c3261
     source_path: providers/deepseek.md
     workflow: 15
 ---
 
-[DeepSeek](https://www.deepseek.com) は、OpenAI互換APIを持つ強力なAIモデルを提供します。
+[DeepSeek](https://www.deepseek.com) は、OpenAI互換APIを備えた高性能なAIモデルを提供しています。
 
-| Property | Value                      |
+| プロパティ | 値                         |
 | -------- | -------------------------- |
-| Provider | `deepseek`                 |
-| Auth     | `DEEPSEEK_API_KEY`         |
+| プロバイダー | `deepseek`                 |
+| 認証     | `DEEPSEEK_API_KEY`         |
 | API      | OpenAI互換                 |
 | Base URL | `https://api.deepseek.com` |
 
 ## はじめに
 
 <Steps>
-  <Step title="API keyを取得する">
-    [platform.deepseek.com](https://platform.deepseek.com/api_keys) でAPI keyを作成してください。
+  <Step title="API キーを取得">
+    [platform.deepseek.com](https://platform.deepseek.com/api_keys) でAPI キーを作成します。
   </Step>
-  <Step title="オンボーディングを実行する">
+  <Step title="オンボーディングを実行">
     ```bash
     openclaw onboard --auth-choice deepseek-api-key
     ```
 
-    これによりAPI keyの入力を求められ、デフォルトmodelとして `deepseek/deepseek-chat` が設定されます。
+    API キーの入力を求められ、`deepseek/deepseek-v4-flash` がデフォルトモデルとして設定されます。
 
   </Step>
-  <Step title="モデルが利用可能であることを確認する">
+  <Step title="モデルが利用可能であることを確認">
     ```bash
     openclaw models list --provider deepseek
     ```
@@ -44,8 +44,8 @@ x-i18n:
 </Steps>
 
 <AccordionGroup>
-  <Accordion title="非対話セットアップ">
-    スクリプト化またはheadlessなインストールでは、すべてのflagを直接渡してください:
+  <Accordion title="非対話型セットアップ">
+    スクリプト化されたインストールやヘッドレス環境でのインストールでは、すべてのフラグを直接渡します。
 
     ```bash
     openclaw onboard --non-interactive \
@@ -60,30 +60,32 @@ x-i18n:
 </AccordionGroup>
 
 <Warning>
-Gatewayがdaemon（launchd/systemd）として動作する場合、`DEEPSEEK_API_KEY`
-がそのprocessで利用可能であることを確認してください（たとえば `~/.openclaw/.env` や
+Gateway がデーモン（launchd/systemd）として実行される場合は、`DEEPSEEK_API_KEY`
+がそのプロセスで利用可能であることを確認してください（たとえば、`~/.openclaw/.env` または
 `env.shellEnv` 経由）。
 </Warning>
 
-## 組み込みcatalog
+## 組み込みカタログ
 
-| Model ref                    | Name              | Input | Context | Max output | 注記                                               |
-| ---------------------------- | ----------------- | ----- | ------- | ---------- | -------------------------------------------------- |
-| `deepseek/deepseek-chat`     | DeepSeek Chat     | text  | 131,072 | 8,192      | デフォルトmodel; DeepSeek V3.2のnon-thinkingサーフェス |
-| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text  | 131,072 | 65,536     | reasoning有効なV3.2サーフェス                      |
+| モデル参照                   | 名前              | 入力   | コンテキスト | 最大出力   | 注記                                       |
+| ---------------------------- | ----------------- | ----- | --------- | ---------- | ------------------------------------------ |
+| `deepseek/deepseek-v4-flash` | DeepSeek V4 Flash | text  | 1,000,000 | 384,000    | デフォルトモデル; V4の思考対応サーフェス |
+| `deepseek/deepseek-v4-pro`   | DeepSeek V4 Pro   | text  | 1,000,000 | 384,000    | V4の思考対応サーフェス                |
+| `deepseek/deepseek-chat`     | DeepSeek Chat     | text  | 131,072   | 8,192      | DeepSeek V3.2の非思考サーフェス         |
+| `deepseek/deepseek-reasoner` | DeepSeek Reasoner | text  | 131,072   | 65,536     | 推論対応のV3.2サーフェス             |
 
 <Tip>
-現在、両方の同梱modelはsource上でstreaming usage compatibilityを広告しています。
+V4モデルはDeepSeekの`thinking`制御をサポートしています。OpenClaw は、ツール呼び出しを含む思考セッションを継続できるように、フォローアップターンでDeepSeek の`reasoning_content`も再送します。
 </Tip>
 
-## Config例
+## 設定例
 
 ```json5
 {
   env: { DEEPSEEK_API_KEY: "sk-..." },
   agents: {
     defaults: {
-      model: { primary: "deepseek/deepseek-chat" },
+      model: { primary: "deepseek/deepseek-v4-flash" },
     },
   },
 }
@@ -93,9 +95,9 @@ Gatewayがdaemon（launchd/systemd）として動作する場合、`DEEPSEEK_API
 
 <CardGroup cols={2}>
   <Card title="モデル選択" href="/ja-JP/concepts/model-providers" icon="layers">
-    provider、model ref、failover動作の選び方。
+    プロバイダー、モデル参照、フェイルオーバー動作の選び方。
   </Card>
   <Card title="設定リファレンス" href="/ja-JP/gateway/configuration-reference" icon="gear">
-    agent、model、provider向けの完全なconfigリファレンス。
+    エージェント、モデル、プロバイダーの完全な設定リファレンス。
   </Card>
 </CardGroup>

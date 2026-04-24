@@ -1,28 +1,28 @@
 ---
 read_when:
-    - GatewayのPluginまたは互換バンドルをインストールまたは管理したい場合
-    - Pluginの読み込み失敗をデバッグしたい場合
+    - Gatewayプラグインまたは互換バンドルをインストールまたは管理したい場合
+    - プラグインの読み込み失敗をデバッグしたい場合
 summary: '`openclaw plugins` のCLIリファレンス（list、install、marketplace、uninstall、enable/disable、doctor）'
-title: Plugins
+title: プラグイン
 x-i18n:
-    generated_at: "2026-04-24T04:51:32Z"
+    generated_at: "2026-04-24T15:21:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 35ef8f54c64ea52d7618a0ef8b90d3d75841a27ae4cd689b4ca8e0cfdcddc408
+    source_hash: bc693d5e3bc49057e1a108ba65a4dcb3bb662c00229e6fa38a0335afba8240e5
     source_path: cli/plugins.md
     workflow: 15
 ---
 
 # `openclaw plugins`
 
-GatewayのPlugin、フックパック、互換バンドルを管理します。
+Gatewayプラグイン、フックパック、および互換バンドルを管理します。
 
-関連:
+関連項目:
 
-- Pluginシステム: [Plugins](/ja-JP/tools/plugin)
-- バンドル互換性: [Plugin bundles](/ja-JP/plugins/bundles)
-- Plugin manifest + schema: [Plugin manifest](/ja-JP/plugins/manifest)
-- セキュリティ強化: [Security](/ja-JP/gateway/security)
+- Pluginシステム: [プラグイン](/ja-JP/tools/plugin)
+- バンドル互換性: [Pluginバンドル](/ja-JP/plugins/bundles)
+- Pluginマニフェスト + スキーマ: [Pluginマニフェスト](/ja-JP/plugins/manifest)
+- セキュリティ強化: [セキュリティ](/ja-JP/gateway/security)
 
 ## コマンド
 
@@ -46,118 +46,77 @@ openclaw plugins marketplace list <marketplace>
 openclaw plugins marketplace list <marketplace> --json
 ```
 
-同梱PluginはOpenClawに含まれています。デフォルトで有効なものもあります（たとえば
-同梱モデルプロバイダー、同梱音声プロバイダー、同梱browser
-plugin）。それ以外は `plugins enable` が必要です。
+バンドル済みPluginはOpenClawに同梱されています。いくつかはデフォルトで有効です（たとえば、バンドル済みのモデルプロバイダー、バンドル済みの音声プロバイダー、バンドル済みのブラウザPlugin）。それ以外は `plugins enable` が必要です。
 
-ネイティブOpenClaw Pluginは、インラインJSON
-Schema（空でも `configSchema` が必要）を含む `openclaw.plugin.json` を提供する必要があります。
-互換バンドルは代わりに独自のバンドルmanifestを使用します。
+ネイティブOpenClaw Pluginは、インラインJSON Schema（空の場合でも `configSchema`）を含む `openclaw.plugin.json` を含める必要があります。互換バンドルは代わりに独自のバンドルマニフェストを使用します。
 
-`plugins list` には `Format: openclaw` または `Format: bundle` が表示されます。詳細なlist/info
-出力では、bundle subtype（`codex`、`claude`、または `cursor`）と、検出されたbundle
-capabilitiesも表示されます。
+`plugins list` は `Format: openclaw` または `Format: bundle` を表示します。詳細なlist/info出力では、バンドルのサブタイプ（`codex`、`claude`、または `cursor`）に加えて、検出されたバンドル機能も表示されます。
 
 ### インストール
 
 ```bash
-openclaw plugins install <package>                      # まずClawHub、その後npm
+openclaw plugins install <package>                      # まずClawHub、次にnpm
 openclaw plugins install clawhub:<package>              # ClawHubのみ
 openclaw plugins install <package> --force              # 既存のインストールを上書き
 openclaw plugins install <package> --pin                # バージョンを固定
 openclaw plugins install <package> --dangerously-force-unsafe-install
 openclaw plugins install <path>                         # ローカルパス
-openclaw plugins install <plugin>@<marketplace>         # marketplace
-openclaw plugins install <plugin> --marketplace <name>  # marketplace（明示指定）
+openclaw plugins install <plugin>@<marketplace>         # マーケットプレイス
+openclaw plugins install <plugin> --marketplace <name>  # マーケットプレイス（明示指定）
 openclaw plugins install <plugin> --marketplace https://github.com/<owner>/<repo>
 ```
 
-プレーンなパッケージ名は、まずClawHub、次にnpmで確認されます。セキュリティ上の注意:
-Pluginのインストールはコード実行と同等に扱ってください。バージョン固定を推奨します。
+素のパッケージ名は、まずClawHub、次にnpmで確認されます。セキュリティ上の注意: Pluginのインストールはコードの実行と同様に扱ってください。固定バージョンを推奨します。
 
-`plugins` セクションが単一ファイルの `$include` で管理されている場合、
-`plugins install/update/enable/disable/uninstall` はそのinclude先ファイルに書き込み、
-`openclaw.json` には触れません。ルートinclude、include配列、および兄弟override付きincludeは、
-フラット化せずフェイルクローズします。サポートされる形については [Config includes](/ja-JP/gateway/configuration) を参照してください。
+`plugins` セクションが単一ファイルの `$include` で構成されている場合、`plugins install/update/enable/disable/uninstall` はそのインクルード先ファイルに書き込み、`openclaw.json` は変更しません。ルートインクルード、インクルード配列、兄弟オーバーライドを持つインクルードは、フラット化せずにフェイルクローズします。対応する形状については [Config includes](/ja-JP/gateway/configuration) を参照してください。
 
-configが不正な場合、`plugins install` は通常フェイルクローズし、
-まず `openclaw doctor --fix` を実行するよう案内します。唯一の文書化された例外は、
-明示的に
-`openclaw.install.allowInvalidConfigRecovery`
-へオプトインしているPlugin向けの、限定的な同梱Plugin復旧パスです。
+設定が無効な場合、`plugins install` は通常フェイルクローズし、まず `openclaw doctor --fix` を実行するよう案内します。文書化されている唯一の例外は、`openclaw.install.allowInvalidConfigRecovery` に明示的にオプトインしたPlugin向けの、限定的なバンドル済みPlugin復旧パスです。
 
-`--force` は既存のインストール先を再利用し、すでにインストール済みの
-Pluginまたはフックパックをその場で上書きします。新しいローカルパス、archive、ClawHubパッケージ、またはnpm artifactから、
-同じidを意図的に再インストールするときに使ってください。
-すでに追跡されているnpm Pluginの通常の更新には、
-`openclaw plugins update <id-or-npm-spec>` を推奨します。
+`--force` は既存のインストール先を再利用し、すでにインストール済みのPluginまたはフックパックをその場で上書きします。同じidを新しいローカルパス、アーカイブ、ClawHubパッケージ、またはnpmアーティファクトから意図的に再インストールする場合に使用します。すでに追跡されているnpm Pluginを通常アップグレードするには、`openclaw plugins update <id-or-npm-spec>` を使ってください。
 
-すでにインストール済みのplugin idに対して `plugins install` を実行すると、OpenClawは
-停止し、通常の更新には `plugins update <id-or-npm-spec>`、
-本当に別ソースから現在のインストールを上書きしたい場合は
-`plugins install <package> --force` を案内します。
+すでにインストール済みのPlugin idに対して `plugins install` を実行すると、OpenClawは停止し、通常のアップグレードには `plugins update <id-or-npm-spec>` を、本当に別ソースから現在のインストールを上書きしたい場合には `plugins install <package> --force` を案内します。
 
-`--pin` はnpmインストール専用です。`--marketplace` とは併用できません。
-marketplaceインストールはnpm specではなくmarketplaceソースメタデータを保存するためです。
+`--pin` はnpmインストールにのみ適用されます。マーケットプレイスのインストールはnpm specではなくマーケットプレイスのソースメタデータを保持するため、`--marketplace` とは併用できません。
 
-`--dangerously-force-unsafe-install` は、組み込みの危険コードスキャナーでの誤検知に対する
-緊急用オプションです。組み込みスキャナーが `critical` findings を報告しても
-インストールを継続できますが、pluginの `before_install` フックによるポリシーブロックや、
-scan failureは**回避しません**。
+`--dangerously-force-unsafe-install` は、組み込みの危険コードスキャナーによる誤検知に対する最終手段のオプションです。組み込みスキャナーが `critical` の検出結果を報告してもインストールを続行できますが、Pluginの `before_install` フックポリシーによるブロックは回避できず、スキャン失敗も回避できません。
 
-このCLIフラグはplugin install/updateフローに適用されます。GatewayバックドのSkills
-依存関係インストールでは対応する `dangerouslyForceUnsafeInstall` リクエスト
-overrideを使います。一方、`openclaw skills install` は別のClawHub Skill
-ダウンロード/インストールフローです。
+このCLIフラグはPluginのinstall/updateフローに適用されます。Gateway経由のSkills依存関係インストールでは対応する `dangerouslyForceUnsafeInstall` リクエストオーバーライドを使用します。一方で、`openclaw skills install` は別個のClawHub Skillsダウンロード/インストールフローのままです。
 
-`plugins install` は、`package.json` で `openclaw.hooks` を公開するフックパックの
-インストール面でもあります。フィルタ済みのフック表示やフックごとの有効化には
-パッケージインストールではなく `openclaw hooks` を使ってください。
+`plugins install` は、`package.json` に `openclaw.hooks` を公開するフックパックのインストール面でもあります。フィルタされたフック可視性やフックごとの有効化には `openclaw hooks` を使い、パッケージのインストールには使わないでください。
 
-npm specは**レジストリ専用**です（パッケージ名 + 任意の**厳密なバージョン**または
-**dist-tag**）。Git/URL/file specおよびsemver rangeは拒否されます。依存関係の
-インストールは安全のため `--ignore-scripts` 付きで実行されます。
+npm spec は**レジストリ専用**です（パッケージ名 + 任意の**正確なバージョン**または**dist-tag**）。Git/URL/file specやsemver rangeは拒否されます。安全のため、依存関係のインストールは `--ignore-scripts` 付きで実行されます。
 
-プレーンspecと `@latest` はstableトラックに留まります。npmがそのいずれかをprereleaseに解決した場合、
-OpenClawは停止し、`@beta`/`@rc` のようなprerelease tag、または
-`@1.2.3-beta.4` のような厳密なprerelease versionで明示的にオプトインするよう求めます。
+素のspecと `@latest` は安定版トラックのままです。npmがそのいずれかをプレリリースに解決した場合、OpenClawは停止し、`@beta`/`@rc` のようなプレリリースタグ、または `@1.2.3-beta.4` のような正確なプレリリースバージョンで明示的にオプトインするよう求めます。
 
-プレーンなインストールspecが同梱plugin id（たとえば `diffs`）と一致する場合、OpenClawは
-同梱pluginを直接インストールします。同名のnpmパッケージをインストールしたい場合は、
-明示的なscoped spec（たとえば `@scope/diffs`）を使ってください。
+素のインストールspecがバンドル済みPlugin id（たとえば `diffs`）と一致する場合、OpenClawはそのバンドル済みPluginを直接インストールします。同名のnpmパッケージをインストールするには、明示的なスコープ付きspec（たとえば `@scope/diffs`）を使用してください。
 
-サポートされるarchive: `.zip`, `.tgz`, `.tar.gz`, `.tar`。
+サポートされるアーカイブ: `.zip`、`.tgz`、`.tar.gz`、`.tar`。
 
-Claude marketplaceインストールもサポートされています。
+Claudeマーケットプレイスからのインストールにも対応しています。
 
-ClawHubインストールでは明示的な `clawhub:<package>` locatorを使います:
+ClawHubインストールでは、明示的な `clawhub:<package>` ロケーターを使用します:
 
 ```bash
 openclaw plugins install clawhub:openclaw-codex-app-server
 openclaw plugins install clawhub:openclaw-codex-app-server@1.2.3
 ```
 
-OpenClawは現在、プレーンなnpm安全plugin specに対してもClawHubを優先します。
-ClawHubにそのパッケージまたはバージョンがない場合にのみnpmへフォールバックします:
+OpenClawは現在、npmで安全な素のPlugin specに対してもClawHubを優先します。ClawHubにそのパッケージまたはバージョンがない場合にのみnpmへフォールバックします:
 
 ```bash
 openclaw plugins install openclaw-codex-app-server
 ```
 
-OpenClawはClawHubからパッケージarchiveをダウンロードし、通知された
-plugin API / 最小gateway互換性を確認してから、通常の
-archiveパス経由でインストールします。記録されたインストールには、後の更新のためにClawHub
-ソースメタデータが保持されます。
+OpenClawはClawHubからパッケージアーカイブをダウンロードし、告知されたplugin API / 最小gateway互換性を確認したうえで、通常のアーカイブ経路でインストールします。記録されたインストールには、後の更新のためにClawHubのソースメタデータが保持されます。
 
-marketplace名がClaudeのローカルレジストリキャッシュ `~/.claude/plugins/known_marketplaces.json` に存在する場合は、
-`plugin@marketplace` 省略記法を使用します:
+Claudeのローカルレジストリキャッシュ `~/.claude/plugins/known_marketplaces.json` にマーケットプレイス名が存在する場合は、`plugin@marketplace` の短縮記法を使用します:
 
 ```bash
 openclaw plugins marketplace list <marketplace-name>
 openclaw plugins install <plugin-name>@<marketplace-name>
 ```
 
-marketplaceソースを明示的に渡したい場合は `--marketplace` を使います:
+マーケットプレイスのソースを明示的に渡したい場合は `--marketplace` を使用します:
 
 ```bash
 openclaw plugins install <plugin-name> --marketplace <marketplace-name>
@@ -166,35 +125,26 @@ openclaw plugins install <plugin-name> --marketplace https://github.com/<owner>/
 openclaw plugins install <plugin-name> --marketplace ./my-marketplace
 ```
 
-marketplaceソースには次のものを使用できます:
+マーケットプレイスのソースには次のものを指定できます:
 
-- `~/.claude/plugins/known_marketplaces.json` にあるClaude known-marketplace名
-- ローカルのmarketplaceルートまたは `marketplace.json` パス
-- `owner/repo` のようなGitHubリポジトリ省略記法
+- `~/.claude/plugins/known_marketplaces.json` にあるClaude既知マーケットプレイス名
+- ローカルのマーケットプレイスルート、または `marketplace.json` のパス
+- `owner/repo` のようなGitHubリポジトリ短縮表記
 - `https://github.com/owner/repo` のようなGitHubリポジトリURL
 - git URL
 
-GitHubまたはgitから読み込まれたリモートmarketplaceでは、pluginエントリは
-クローンされたmarketplaceリポジトリ内に留まる必要があります。OpenClawは、その
-リポジトリからの相対パスsourceは受け入れますが、リモートmanifestからのHTTP(S)、絶対パス、git、GitHub、
-その他の非パスplugin sourceは拒否します。
+GitHubまたはgitから読み込まれたリモートマーケットプレイスでは、Pluginエントリはクローンされたマーケットプレイスリポジトリ内にとどまる必要があります。OpenClawはそのリポジトリからの相対パスソースを受け入れ、リモートマニフェスト内のHTTP(S)、絶対パス、git、GitHub、およびその他の非パスPluginソースを拒否します。
 
-ローカルパスとarchiveでは、OpenClawは次を自動検出します:
+ローカルパスとアーカイブについては、OpenClawが次を自動検出します:
 
 - ネイティブOpenClaw Plugin（`openclaw.plugin.json`）
 - Codex互換バンドル（`.codex-plugin/plugin.json`）
-- Claude互換バンドル（`.claude-plugin/plugin.json` またはデフォルトのClaude
-  component layout）
+- Claude互換バンドル（`.claude-plugin/plugin.json` またはデフォルトのClaudeコンポーネントレイアウト）
 - Cursor互換バンドル（`.cursor-plugin/plugin.json`）
 
-互換バンドルは通常のpluginルートにインストールされ、同じ
-list/info/enable/disableフローに参加します。現在のところ、bundle Skills、Claude
-command-skills、Claude `settings.json` デフォルト、Claude `.lsp.json` /
-manifest宣言の `lspServers` デフォルト、Cursor command-skills、および互換
-Codexフックディレクトリがサポートされています。その他の検出されたbundle capabilitiesは
-診断/infoには表示されますが、まだランタイム実行には接続されていません。
+互換バンドルは通常のPluginルートにインストールされ、同じlist/info/enable/disableフローに参加します。現在は、バンドルのSkills、Claude command-skills、Claude `settings.json` のデフォルト、Claude `.lsp.json` / マニフェスト宣言の `lspServers` デフォルト、Cursor command-skills、および互換Codexフックディレクトリがサポートされています。その他の検出されたバンドル機能はdiagnostics/infoに表示されますが、まだランタイム実行には接続されていません。
 
-### 一覧表示
+### 一覧
 
 ```bash
 openclaw plugins list
@@ -203,22 +153,25 @@ openclaw plugins list --verbose
 openclaw plugins list --json
 ```
 
-読み込まれているPluginだけを表示するには `--enabled` を使います。`--verbose` を使うと、
-テーブル表示から、source/origin/version/activation
-メタデータ付きのPluginごとの詳細行表示に切り替わります。`--json` は機械可読なインベントリとregistry
-診断を出力します。
+`--enabled` を使うと、読み込まれたPluginのみを表示します。`--verbose` を使うと、テーブル表示から、ソース/由来/バージョン/アクティベーションメタデータを含むPluginごとの詳細行に切り替わります。機械可読なインベントリとレジストリdiagnosticsには `--json` を使用します。
 
-ローカルディレクトリをコピーせずに使うには `--link` を使用します（`plugins.load.paths` に追加）:
+`plugins list` は、現在のCLI環境と設定から検出を実行します。Pluginが有効か、読み込み可能かを確認するのには便利ですが、すでに実行中のGatewayプロセスに対するライブなランタイムプローブではありません。Pluginコード、有効化状態、フックポリシー、または `plugins.load.paths` を変更した後は、新しい `register(api)` コードやフックが実行されることを期待する前に、そのチャネルを提供しているGatewayを再起動してください。リモート/コンテナデプロイでは、ラッパープロセスだけでなく、実際の `openclaw gateway run` 子プロセスを再起動していることを確認してください。
+
+ランタイムフックのデバッグ用:
+
+- `openclaw plugins inspect <id> --json` は、モジュール読み込み済みのinspectionパスから、登録されたフックとdiagnosticsを表示します。
+- `openclaw gateway status --deep --require-rpc` は、到達可能なGateway、サービス/プロセスのヒント、configパス、RPCの健全性を確認します。
+- バンドルされていない会話フック（`llm_input`、`llm_output`、`agent_end`）には `plugins.entries.<id>.hooks.allowConversationAccess=true` が必要です。
+
+ローカルディレクトリをコピーせずに使うには `--link` を使用します（`plugins.load.paths` に追加されます）:
 
 ```bash
 openclaw plugins install -l ./my-plugin
 ```
 
-リンクインストールは管理されたインストール先にコピーせず、source pathを再利用するため、
-`--link` と `--force` は併用できません。
+リンクインストールでは管理対象のインストール先へコピーせずソースパスを再利用するため、`--force` は `--link` と併用できません。
 
-npmインストールで `--pin` を使うと、デフォルト動作は非固定のままにしつつ、解決された厳密spec（`name@version`）を
-`plugins.installs` に保存できます。
+npmインストールで `--pin` を使用すると、デフォルト動作を固定しないまま、解決された正確なspec（`name@version`）が `plugins.installs` に保存されます。
 
 ### アンインストール
 
@@ -228,13 +181,9 @@ openclaw plugins uninstall <id> --dry-run
 openclaw plugins uninstall <id> --keep-files
 ```
 
-`uninstall` は `plugins.entries`、`plugins.installs`、
-plugin allowlist、および適用される場合はリンクされた `plugins.load.paths`
-エントリからpluginレコードを削除します。アクティブなメモリPluginについては、memory slotは `memory-core` にリセットされます。
+`uninstall` は、`plugins.entries`、`plugins.installs`、Plugin許可リスト、および該当する場合はリンクされた `plugins.load.paths` エントリからPluginレコードを削除します。Active Memory Pluginの場合、メモリスロットは `memory-core` にリセットされます。
 
-デフォルトでは、アンインストールはアクティブな
-state-dir pluginルート下のpluginインストールディレクトリも削除します。ディスク上のファイルを残したい場合は
-`--keep-files` を使ってください。
+デフォルトでは、アンインストール時にアクティブなstate-dirのPluginルート配下にあるPluginインストールディレクトリも削除されます。ディスク上のファイルを残すには `--keep-files` を使用してください。
 
 `--keep-config` は `--keep-files` の非推奨エイリアスとしてサポートされています。
 
@@ -248,37 +197,19 @@ openclaw plugins update @openclaw/voice-call@beta
 openclaw plugins update openclaw-codex-app-server --dangerously-force-unsafe-install
 ```
 
-更新は `plugins.installs` の追跡対象インストールと、`hooks.internal.installs` の追跡対象フックパック
-インストールに適用されます。
+更新は、`plugins.installs` 内の追跡対象インストールと、`hooks.internal.installs` 内の追跡対象フックパックインストールに適用されます。
 
-plugin idを渡すと、OpenClawはその
-pluginに記録されたインストールspecを再利用します。つまり、以前保存された `@beta` のようなdist-tagや
-厳密に固定されたバージョンは、後の `update <id>` 実行でも引き続き使われます。
+Plugin idを渡すと、OpenClawはそのPluginに記録されているインストールspecを再利用します。つまり、以前保存された `@beta` のようなdist-tagや、正確に固定されたバージョンは、その後の `update <id>` 実行でも引き続き使用されます。
 
-npmインストールでは、dist-tag
-または厳密バージョン付きの明示的なnpm package specを渡すこともできます。OpenClawはそのパッケージ名を追跡対象plugin
-レコードへ解決し、そのインストール済みpluginを更新して、将来の
-idベース更新のために新しいnpm specを記録します。
+npmインストールでは、dist-tagまたは正確なバージョンを含む明示的なnpmパッケージspecを渡すこともできます。OpenClawはそのパッケージ名を追跡対象Pluginレコードに解決し、そのインストール済みPluginを更新し、今後のidベース更新のために新しいnpm specを記録します。
 
-バージョンやtagなしでnpm package名を渡しても、追跡対象plugin
-レコードへ解決されます。pluginが厳密バージョンに固定されていて、
-レジストリのデフォルトリリースラインへ戻したい場合に使ってください。
+バージョンやタグなしでnpmパッケージ名を渡した場合も、追跡対象Pluginレコードに解決されます。これは、Pluginが正確なバージョンに固定されていて、それをレジストリのデフォルトリリース系列に戻したい場合に使用します。
 
-ライブのnpm更新前に、OpenClawはインストール済みパッケージのバージョンを
-npmレジストリメタデータと照合します。インストール済みバージョンと記録済みartifact
-identityが、解決された対象とすでに一致している場合、更新は
-ダウンロード、再インストール、`openclaw.json` の書き換えを行わずにスキップされます。
+ライブのnpm更新の前に、OpenClawはインストール済みパッケージのバージョンをnpmレジストリメタデータと照合します。インストール済みバージョンと記録済みアーティファクト識別子が、解決された対象とすでに一致している場合、更新はスキップされ、ダウンロード、再インストール、`openclaw.json` の書き換えは行われません。
 
-保存済みintegrity hashが存在し、取得したartifact hashが変化している場合、
-OpenClawはそれをnpm artifact driftとして扱います。対話式の
-`openclaw plugins update` コマンドは期待値と実際のhashを表示し、
-続行前に確認を求めます。非対話の更新ヘルパーは、呼び出し元が明示的な継続ポリシーを
-指定しない限りフェイルクローズします。
+保存済みのintegrityハッシュが存在し、取得したアーティファクトのハッシュが変化した場合、OpenClawはそれをnpmアーティファクトドリフトとして扱います。対話型の `openclaw plugins update` コマンドは、想定されたハッシュと実際のハッシュを表示し、続行前に確認を求めます。非対話型の更新ヘルパーは、呼び出し側が明示的な続行ポリシーを指定しない限り、フェイルクローズします。
 
-`--dangerously-force-unsafe-install` は `plugins update` でも、
-plugin更新中の組み込み危険コードスキャン誤検知に対する緊急用overrideとして利用できます。
-それでもpluginの `before_install` ポリシーブロックや
-scan-failureブロックは回避せず、hook-pack更新ではなくplugin更新にのみ適用されます。
+`--dangerously-force-unsafe-install` は、Plugin更新中に組み込みの危険コードスキャンで誤検知が起きた場合の最終手段オーバーライドとして、`plugins update` でも利用できます。これは依然としてPluginの `before_install` ポリシーブロックやスキャン失敗によるブロックを回避せず、Plugin更新にのみ適用され、フックパック更新には適用されません。
 
 ### Inspect
 
@@ -287,24 +218,20 @@ openclaw plugins inspect <id>
 openclaw plugins inspect <id> --json
 ```
 
-単一pluginの詳細な内観表示です。identity、読み込み状態、source、
-登録済みcapabilities、フック、ツール、コマンド、サービス、gateway methods、
-HTTP routes、ポリシーフラグ、診断、インストールメタデータ、bundle capabilities、
-および検出されたMCPまたはLSP serverサポートを表示します。
+単一Pluginの詳細なイントロスペクションです。ID、読み込み状態、ソース、登録された機能、フック、ツール、コマンド、サービス、Gatewayメソッド、HTTPルート、ポリシーフラグ、diagnostics、インストールメタデータ、バンドル機能、検出されたMCPまたはLSPサーバー対応を表示します。
 
-各pluginは、ランタイムで実際に何を登録したかによって分類されます:
+各Pluginは、実行時に実際に登録する内容によって分類されます:
 
-- **plain-capability** — 1種類のcapabilityタイプのみ（例: provider専用plugin）
-- **hybrid-capability** — 複数のcapabilityタイプ（例: text + speech + images）
-- **hook-only** — フックのみで、capabilitiesやsurfaceはなし
-- **non-capability** — capabilitiesはないがtools/commands/servicesはある
+- **plain-capability** — 1種類の機能タイプ（例: プロバイダー専用Plugin）
+- **hybrid-capability** — 複数の機能タイプ（例: テキスト + 音声 + 画像）
+- **hook-only** — フックのみで、機能やサーフェスなし
+- **non-capability** — ツール/コマンド/サービスはあるが機能なし
 
-capabilityモデルの詳細は [Plugin shapes](/ja-JP/plugins/architecture#plugin-shapes) を参照してください。
+機能モデルの詳細については [Plugin shapes](/ja-JP/plugins/architecture#plugin-shapes) を参照してください。
 
 `--json` フラグは、スクリプトや監査に適した機械可読レポートを出力します。
 
-`inspect --all` は、shape、capability kinds、
-互換性通知、bundle capabilities、フック要約カラムを含む全体テーブルを表示します。
+`inspect --all` は、shape、capability kind、互換性通知、バンドル機能、およびフック概要の列を含む全体テーブルを表示します。
 
 `info` は `inspect` のエイリアスです。
 
@@ -314,13 +241,9 @@ capabilityモデルの詳細は [Plugin shapes](/ja-JP/plugins/architecture#plug
 openclaw plugins doctor
 ```
 
-`doctor` はpluginの読み込みエラー、manifest/検出診断、
-互換性通知を報告します。問題がなければ `No plugin issues
-detected.` と表示します。
+`doctor` は、Pluginの読み込みエラー、マニフェスト/検出diagnostics、および互換性通知を報告します。問題がない場合は `No plugin issues detected.` と表示します。
 
-`register`/`activate` export欠落のようなmodule-shape障害については、
-`OPENCLAW_PLUGIN_LOAD_DEBUG=1` を付けて再実行すると、
-診断出力にコンパクトなexport-shape要約が含まれます。
+`register`/`activate` エクスポートの欠落のようなモジュール形状の失敗については、`OPENCLAW_PLUGIN_LOAD_DEBUG=1` を付けて再実行すると、diagnostic出力にコンパクトなエクスポート形状の要約が含まれます。
 
 ### Marketplace
 
@@ -329,13 +252,10 @@ openclaw plugins marketplace list <source>
 openclaw plugins marketplace list <source> --json
 ```
 
-marketplace listは、ローカルmarketplaceパス、`marketplace.json` パス、
-`owner/repo` のようなGitHub省略記法、GitHubリポジトリURL、またはgit URLを受け付けます。`--json`
-は、解決されたsourceラベルに加えて、解析されたmarketplace manifestと
-pluginエントリを出力します。
+マーケットプレイス一覧では、ローカルのマーケットプレイスパス、`marketplace.json` のパス、`owner/repo` のようなGitHub短縮表記、GitHubリポジトリURL、またはgit URLを受け付けます。`--json` は、解決されたソースラベルに加え、解析済みのマーケットプレイスマニフェストとPluginエントリを出力します。
 
 ## 関連
 
-- [CLI reference](/ja-JP/cli)
-- [Building plugins](/ja-JP/plugins/building-plugins)
-- [Community plugins](/ja-JP/plugins/community)
+- [CLIリファレンス](/ja-JP/cli)
+- [Pluginのビルド](/ja-JP/plugins/building-plugins)
+- [コミュニティPlugin](/ja-JP/plugins/community)
