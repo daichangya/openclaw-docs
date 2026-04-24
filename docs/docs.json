@@ -1221,6 +1221,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "tools/browser",
+                      "tools/browser-control",
                       "tools/browser-login",
                       "tools/browser-linux-troubleshooting",
                       "tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -1253,6 +1254,7 @@
                   "tools/agent-send",
                   "tools/subagents",
                   "tools/acp-agents",
+                  "tools/acp-agents-setup",
                   "tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -2615,6 +2617,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "ja-JP/tools/browser",
+                      "ja-JP/tools/browser-control",
                       "ja-JP/tools/browser-login",
                       "ja-JP/tools/browser-linux-troubleshooting",
                       "ja-JP/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -2647,6 +2650,7 @@
                   "ja-JP/tools/agent-send",
                   "ja-JP/tools/subagents",
                   "ja-JP/tools/acp-agents",
+                  "ja-JP/tools/acp-agents-setup",
                   "ja-JP/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -3394,6 +3398,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "es/tools/browser",
+                      "es/tools/browser-control",
                       "es/tools/browser-login",
                       "es/tools/browser-linux-troubleshooting",
                       "es/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -3426,6 +3431,7 @@
                   "es/tools/agent-send",
                   "es/tools/subagents",
                   "es/tools/acp-agents",
+                  "es/tools/acp-agents-setup",
                   "es/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -4173,6 +4179,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "pt-BR/tools/browser",
+                      "pt-BR/tools/browser-control",
                       "pt-BR/tools/browser-login",
                       "pt-BR/tools/browser-linux-troubleshooting",
                       "pt-BR/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -4205,6 +4212,7 @@
                   "pt-BR/tools/agent-send",
                   "pt-BR/tools/subagents",
                   "pt-BR/tools/acp-agents",
+                  "pt-BR/tools/acp-agents-setup",
                   "pt-BR/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -4952,6 +4960,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "ko/tools/browser",
+                      "ko/tools/browser-control",
                       "ko/tools/browser-login",
                       "ko/tools/browser-linux-troubleshooting",
                       "ko/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -4984,6 +4993,7 @@
                   "ko/tools/agent-send",
                   "ko/tools/subagents",
                   "ko/tools/acp-agents",
+                  "ko/tools/acp-agents-setup",
                   "ko/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -5731,6 +5741,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "de/tools/browser",
+                      "de/tools/browser-control",
                       "de/tools/browser-login",
                       "de/tools/browser-linux-troubleshooting",
                       "de/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -5763,6 +5774,7 @@
                   "de/tools/agent-send",
                   "de/tools/subagents",
                   "de/tools/acp-agents",
+                  "de/tools/acp-agents-setup",
                   "de/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -6510,6 +6522,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "fr/tools/browser",
+                      "fr/tools/browser-control",
                       "fr/tools/browser-login",
                       "fr/tools/browser-linux-troubleshooting",
                       "fr/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -6542,6 +6555,7 @@
                   "fr/tools/agent-send",
                   "fr/tools/subagents",
                   "fr/tools/acp-agents",
+                  "fr/tools/acp-agents-setup",
                   "fr/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -7289,6 +7303,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "ar/tools/browser",
+                      "ar/tools/browser-control",
                       "ar/tools/browser-login",
                       "ar/tools/browser-linux-troubleshooting",
                       "ar/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -7321,6 +7336,7 @@
                   "ar/tools/agent-send",
                   "ar/tools/subagents",
                   "ar/tools/acp-agents",
+                  "ar/tools/acp-agents-setup",
                   "ar/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -8068,6 +8084,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "it/tools/browser",
+                      "it/tools/browser-control",
                       "it/tools/browser-login",
                       "it/tools/browser-linux-troubleshooting",
                       "it/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -8100,6 +8117,7 @@
                   "it/tools/agent-send",
                   "it/tools/subagents",
                   "it/tools/acp-agents",
+                  "it/tools/acp-agents-setup",
                   "it/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -8847,6 +8865,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "tr/tools/browser",
+                      "tr/tools/browser-control",
                       "tr/tools/browser-login",
                       "tr/tools/browser-linux-troubleshooting",
                       "tr/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -8879,6 +8898,7 @@
                   "tr/tools/agent-send",
                   "tr/tools/subagents",
                   "tr/tools/acp-agents",
+                  "tr/tools/acp-agents-setup",
                   "tr/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -9626,6 +9646,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "uk/tools/browser",
+                      "uk/tools/browser-control",
                       "uk/tools/browser-login",
                       "uk/tools/browser-linux-troubleshooting",
                       "uk/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -9658,6 +9679,7 @@
                   "uk/tools/agent-send",
                   "uk/tools/subagents",
                   "uk/tools/acp-agents",
+                  "uk/tools/acp-agents-setup",
                   "uk/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -10405,6 +10427,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "id/tools/browser",
+                      "id/tools/browser-control",
                       "id/tools/browser-login",
                       "id/tools/browser-linux-troubleshooting",
                       "id/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -10437,6 +10460,7 @@
                   "id/tools/agent-send",
                   "id/tools/subagents",
                   "id/tools/acp-agents",
+                  "id/tools/acp-agents-setup",
                   "id/tools/multi-agent-sandbox-tools"
                 ]
               }
@@ -11184,6 +11208,7 @@
                     "group": "Web Browser",
                     "pages": [
                       "pl/tools/browser",
+                      "pl/tools/browser-control",
                       "pl/tools/browser-login",
                       "pl/tools/browser-linux-troubleshooting",
                       "pl/tools/browser-wsl2-windows-remote-cdp-troubleshooting"
@@ -11216,6 +11241,7 @@
                   "pl/tools/agent-send",
                   "pl/tools/subagents",
                   "pl/tools/acp-agents",
+                  "pl/tools/acp-agents-setup",
                   "pl/tools/multi-agent-sandbox-tools"
                 ]
               }
