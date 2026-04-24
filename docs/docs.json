@@ -1173,6 +1173,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "plugins/building-plugins",
+                      "plugins/hooks",
                       "plugins/sdk-channel-plugins",
                       "plugins/sdk-provider-plugins",
                       "plugins/sdk-migration"
@@ -2612,6 +2613,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "ja-JP/plugins/building-plugins",
+                      "ja-JP/plugins/hooks",
                       "ja-JP/plugins/sdk-channel-plugins",
                       "ja-JP/plugins/sdk-provider-plugins",
                       "ja-JP/plugins/sdk-migration"
@@ -3436,6 +3438,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "es/plugins/building-plugins",
+                      "es/plugins/hooks",
                       "es/plugins/sdk-channel-plugins",
                       "es/plugins/sdk-provider-plugins",
                       "es/plugins/sdk-migration"
@@ -4260,6 +4263,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "pt-BR/plugins/building-plugins",
+                      "pt-BR/plugins/hooks",
                       "pt-BR/plugins/sdk-channel-plugins",
                       "pt-BR/plugins/sdk-provider-plugins",
                       "pt-BR/plugins/sdk-migration"
@@ -5084,6 +5088,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "ko/plugins/building-plugins",
+                      "ko/plugins/hooks",
                       "ko/plugins/sdk-channel-plugins",
                       "ko/plugins/sdk-provider-plugins",
                       "ko/plugins/sdk-migration"
@@ -5908,6 +5913,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "de/plugins/building-plugins",
+                      "de/plugins/hooks",
                       "de/plugins/sdk-channel-plugins",
                       "de/plugins/sdk-provider-plugins",
                       "de/plugins/sdk-migration"
@@ -6732,6 +6738,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "fr/plugins/building-plugins",
+                      "fr/plugins/hooks",
                       "fr/plugins/sdk-channel-plugins",
                       "fr/plugins/sdk-provider-plugins",
                       "fr/plugins/sdk-migration"
@@ -7556,6 +7563,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "ar/plugins/building-plugins",
+                      "ar/plugins/hooks",
                       "ar/plugins/sdk-channel-plugins",
                       "ar/plugins/sdk-provider-plugins",
                       "ar/plugins/sdk-migration"
@@ -8380,6 +8388,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "it/plugins/building-plugins",
+                      "it/plugins/hooks",
                       "it/plugins/sdk-channel-plugins",
                       "it/plugins/sdk-provider-plugins",
                       "it/plugins/sdk-migration"
@@ -9204,6 +9213,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "tr/plugins/building-plugins",
+                      "tr/plugins/hooks",
                       "tr/plugins/sdk-channel-plugins",
                       "tr/plugins/sdk-provider-plugins",
                       "tr/plugins/sdk-migration"
@@ -10028,6 +10038,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "uk/plugins/building-plugins",
+                      "uk/plugins/hooks",
                       "uk/plugins/sdk-channel-plugins",
                       "uk/plugins/sdk-provider-plugins",
                       "uk/plugins/sdk-migration"
@@ -10852,6 +10863,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "id/plugins/building-plugins",
+                      "id/plugins/hooks",
                       "id/plugins/sdk-channel-plugins",
                       "id/plugins/sdk-provider-plugins",
                       "id/plugins/sdk-migration"
@@ -11676,6 +11688,7 @@
                     "group": "Building plugins",
                     "pages": [
                       "pl/plugins/building-plugins",
+                      "pl/plugins/hooks",
                       "pl/plugins/sdk-channel-plugins",
                       "pl/plugins/sdk-provider-plugins",
                       "pl/plugins/sdk-migration"
