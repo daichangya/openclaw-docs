@@ -1,46 +1,50 @@
 ---
 read_when:
-    - Розуміння того, що відбувається під час першого запуску агента
-    - Пояснення, де знаходяться файли bootstrap-налаштування
-    - Налагодження налаштування identity під час onboarding
+    - Розуміння того, що відбувається під час першого запуску agent
+    - Пояснення, де розміщуються файли початкового налаштування
+    - Налагодження налаштування ідентичності під час онбордингу
 sidebarTitle: Bootstrapping
-summary: Ритуал bootstrap агента, який ініціалізує workspace та файли identity
-title: Bootstrap агента
+summary: Ритуал початкового налаштування agent, що заповнює workspace і файли ідентичності
+title: Початкове налаштування agent
 x-i18n:
-    generated_at: "2026-04-23T21:11:33Z"
+    generated_at: "2026-04-24T19:53:07Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0c23a204a7afbf2ca0c0d19a227286cf0ae396181073403055db41dafa764d2a
+    source_hash: 435eb2a14707623903ab7873774cc8d4489b960719cf6a525d547983f8338027
     source_path: start/bootstrapping.md
     workflow: 15
 ---
 
-Bootstrap-налаштування — це ритуал **першого запуску**, який готує workspace агента й
-збирає деталі identity. Воно відбувається після onboarding, коли агент запускається
-вперше.
+Початкове налгодування — це ритуал **першого запуску**, який готує workspace agent і
+збирає відомості про ідентичність. Він відбувається після онбордингу, коли agent
+запускається вперше.
 
-## Що робить bootstrap-налаштування
+## Що робить початкове налаштування
 
-Під час першого запуску агента OpenClaw виконує bootstrap-налаштування workspace (за замовчуванням
+Під час першого запуску agent OpenClaw ініціалізує workspace (типово
 `~/.openclaw/workspace`):
 
-- Ініціалізує `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`.
+- Заповнює `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`.
 - Запускає короткий ритуал запитань і відповідей (по одному запитанню за раз).
-- Записує identity + preferences у `IDENTITY.md`, `USER.md`, `SOUL.md`.
-- Видаляє `BOOTSTRAP.md` після завершення, щоб це виконувалося лише один раз.
+- Записує ідентичність і налаштування до `IDENTITY.md`, `USER.md`, `SOUL.md`.
+- Видаляє `BOOTSTRAP.md` після завершення, щоб він виконувався лише один раз.
+
+## Пропуск початкового налаштування
+
+Щоб пропустити це для попередньо заповненого workspace, виконайте `openclaw onboard --skip-bootstrap`.
 
 ## Де це виконується
 
-Bootstrap-налаштування завжди виконується на **host gateway**. Якщо застосунок macOS підключається до
-віддаленого Gateway, workspace і файли bootstrap-налаштування живуть на тій віддаленій
+Початкове налаштування завжди виконується на **хості gateway**. Якщо застосунок macOS підключається до
+віддаленого Gateway, workspace і файли початкового налаштування зберігаються на тій віддаленій
 машині.
 
 <Note>
-Коли Gateway працює на іншій машині, редагуйте файли workspace на host
-gateway (наприклад, `user@gateway-host:~/.openclaw/workspace`).
+Коли Gateway працює на іншій машині, редагуйте файли workspace на хості gateway
+(наприклад, `user@gateway-host:~/.openclaw/workspace`).
 </Note>
 
-## Пов’язані документи
+## Пов’язана документація
 
-- Onboarding застосунку macOS: [Onboarding](/uk/start/onboarding)
-- Макет workspace: [Agent workspace](/uk/concepts/agent-workspace)
+- Онбординг застосунку macOS: [Онбординг](/uk/start/onboarding)
+- Структура workspace: [Workspace agent](/uk/concepts/agent-workspace)

@@ -1,20 +1,20 @@
 ---
 read_when:
-    - Ви автоматизуєте onboarding у скриптах або CI
+    - Ви автоматизуєте онбординг у скриптах або CI
     - Вам потрібні неінтерактивні приклади для конкретних провайдерів
 sidebarTitle: CLI automation
-summary: Скриптовий onboarding і налаштування агента для CLI OpenClaw
+summary: Скриптовий онбординг і налаштування agent для CLI OpenClaw
 title: Автоматизація CLI
 x-i18n:
-    generated_at: "2026-04-23T23:06:46Z"
+    generated_at: "2026-04-24T19:53:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
+    source_hash: 4d36801439b9243ea5cc0ab93757dde23d1ecd86c8f5b991541ee14f41bf05ac
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
 
-Використовуйте `--non-interactive` для автоматизації `openclaw onboard`.
+Використовуйте `--non-interactive`, щоб автоматизувати `openclaw onboard`.
 
 <Note>
 `--json` не означає неінтерактивний режим. Для скриптів використовуйте `--non-interactive` (і `--workspace`).
@@ -32,16 +32,19 @@ openclaw onboard --non-interactive \
   --gateway-bind loopback \
   --install-daemon \
   --daemon-runtime node \
+  --skip-bootstrap \
   --skip-skills
 ```
 
-Додайте `--json`, щоб отримати машинозчитуване зведення.
+Додайте `--json` для зведення у форматі, придатному для машинної обробки.
 
-Використовуйте `--secret-input-mode ref`, щоб зберігати в auth-профілях env-посилання замість значень у відкритому вигляді.
-Інтерактивний вибір між env-посиланнями та налаштованими посиланнями провайдера (`file` або `exec`) доступний у потоці onboarding.
+Використовуйте `--skip-bootstrap`, коли ваша автоматизація попередньо заповнює файли workspace і не хоче, щоб онбординг створював типові файли початкового налаштування.
 
-У неінтерактивному режимі `ref` env-змінні провайдера мають бути задані в середовищі процесу.
-Передавання вбудованих прапорців ключів без відповідної env-змінної тепер одразу завершується помилкою.
+Використовуйте `--secret-input-mode ref`, щоб зберігати в профілях автентифікації посилання на env замість значень у відкритому вигляді.
+Інтерактивний вибір між env-посиланнями та налаштованими посиланнями провайдера (`file` або `exec`) доступний у потоці онбордингу.
+
+У неінтерактивному режимі `ref` змінні середовища провайдера мають бути задані в середовищі процесу.
+Передавання вбудованих прапорців ключів без відповідної змінної середовища тепер одразу завершується помилкою.
 
 Приклад:
 
@@ -56,7 +59,7 @@ openclaw onboard --non-interactive \
 ## Приклади для конкретних провайдерів
 
 <AccordionGroup>
-  <Accordion title="Приклад API key Anthropic">
+  <Accordion title="Приклад ключа API Anthropic">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -128,7 +131,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Приклад Synthetic">
+  <Accordion title="Синтетичний приклад">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -174,7 +177,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` не є обов’язковим. Якщо його не вказано, onboarding перевіряє `CUSTOM_API_KEY`.
+    `--custom-api-key` необов’язковий. Якщо його не вказано, онбординг перевіряє `CUSTOM_API_KEY`.
 
     Варіант режиму ref:
 
@@ -192,18 +195,18 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    У цьому режимі onboarding зберігає `apiKey` як `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
+    У цьому режимі онбординг зберігає `apiKey` як `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
 
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token і далі доступний як підтримуваний шлях токена для onboarding, але тепер OpenClaw віддає перевагу повторному використанню Claude CLI, коли це можливо.
-Для продакшну віддавайте перевагу API key Anthropic.
+`setup-token` Anthropic залишається доступним як підтримуваний шлях токена онбордингу, але тепер OpenClaw надає перевагу повторному використанню Claude CLI, коли це можливо.
+Для production віддавайте перевагу ключу API Anthropic.
 
-## Додати ще одного агента
+## Додати ще одного agent
 
-Використовуйте `openclaw agents add <name>`, щоб створити окремого агента з власними workspace,
-сеансами й auth-профілями. Запуск без `--workspace` відкриває майстер.
+Використовуйте `openclaw agents add <name>`, щоб створити окремого agent із власним workspace,
+сеансами та профілями автентифікації. Запуск без `--workspace` відкриває майстер.
 
 ```bash
 openclaw agents add work \
@@ -228,6 +231,6 @@ openclaw agents add work \
 
 ## Пов’язана документація
 
-- Центр onboarding: [Onboarding (CLI)](/uk/start/wizard)
+- Центр онбордингу: [Онбординг (CLI)](/uk/start/wizard)
 - Повний довідник: [Довідник із налаштування CLI](/uk/start/wizard-cli-reference)
 - Довідник команд: [`openclaw onboard`](/uk/cli/onboard)
