@@ -1,44 +1,44 @@
 ---
 read_when:
-    - Projektowanie lub refaktoryzacja rozumienia multimediów
-    - Dostrajanie wstępnego przetwarzania przychodzącego audio/wideo/obrazu
-summary: Rozumienie przychodzących obrazów/audio/wideo (opcjonalne) z fallbackami providera + CLI
-title: Rozumienie multimediów
+    - Projektowanie lub refaktoryzacja rozumienia mediów
+    - Dostrajanie preprocessingu przychodzącego audio/wideo/obrazu
+summary: Rozumienie przychodzących obrazów/audio/wideo (opcjonalne) z fallbackami dostawcy i CLI
+title: Rozumienie mediów
 x-i18n:
-    generated_at: "2026-04-24T09:19:10Z"
+    generated_at: "2026-04-25T13:50:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a9eb9449fbc1bed170bbef213aa43d71d4146edbc0dd626ef50af9e044a8e299
+    source_hash: 573883a2e0bf27fc04da1a5464e53ba41d006ecad5a04704c24467e77c8eda3d
     source_path: nodes/media-understanding.md
     workflow: 15
 ---
 
-# Rozumienie multimediów — przychodzące (2026-01-17)
+# Rozumienie mediów — przychodzące (2026-01-17)
 
-OpenClaw może **podsumowywać przychodzące multimedia** (obraz/audio/wideo) przed uruchomieniem potoku odpowiedzi. Automatycznie wykrywa dostępność lokalnych narzędzi lub kluczy providera i może zostać wyłączone albo dostosowane. Jeśli rozumienie jest wyłączone, modele nadal otrzymują oryginalne pliki/URL-e jak zwykle.
+OpenClaw może **podsumowywać przychodzące media** (obraz/audio/wideo) przed uruchomieniem potoku odpowiedzi. Automatycznie wykrywa, kiedy dostępne są narzędzia lokalne lub klucze dostawców, i może zostać wyłączone albo dostosowane. Jeśli rozumienie jest wyłączone, modele nadal otrzymują oryginalne pliki/URL-e jak zwykle.
 
-Zachowanie multimediów specyficzne dla vendora jest rejestrowane przez Pluginy vendora, podczas gdy rdzeń OpenClaw zarządza współdzieloną konfiguracją `tools.media`, kolejnością fallbacków i integracją z potokiem odpowiedzi.
+Zachowanie mediów specyficzne dla dostawcy jest rejestrowane przez Pluginy dostawców, podczas gdy
+rdzeń OpenClaw odpowiada za współdzieloną konfigurację `tools.media`, kolejność fallbacków i integrację z potokiem odpowiedzi.
 
 ## Cele
 
-- Opcjonalność: wstępne przetrawienie przychodzących multimediów do krótkiego tekstu dla szybszego routingu + lepszego parsowania poleceń.
-- Zawsze zachowywać dostarczanie oryginalnych multimediów do modelu.
-- Obsługa **API providerów** i **fallbacków CLI**.
-- Umożliwienie wielu modeli z uporządkowanym fallbackiem (błąd/rozmiar/timeout).
+- Opcjonalne: wstępne przetwarzanie przychodzących mediów do krótkiego tekstu dla szybszego routingu i lepszego parsowania poleceń.
+- Zachowanie oryginalnego dostarczenia mediów do modelu (zawsze).
+- Obsługa **API dostawców** oraz **fallbacków CLI**.
+- Umożliwienie użycia wielu modeli z uporządkowanym fallbackiem (błąd/rozmiar/timeout).
 
-## Zachowanie na wysokim poziomie
+## Zachowanie wysokiego poziomu
 
 1. Zbierz przychodzące załączniki (`MediaPaths`, `MediaUrls`, `MediaTypes`).
 2. Dla każdej włączonej możliwości (obraz/audio/wideo) wybierz załączniki zgodnie z polityką (domyślnie: **pierwszy**).
-3. Wybierz pierwszy kwalifikujący się wpis modelu (rozmiar + możliwość + auth).
-4. Jeśli model zakończy się błędem lub multimedia są zbyt duże, następuje **fallback do następnego wpisu**.
-5. Po sukcesie:
-   - `Body` staje się blokiem `[Image]`, `[Audio]` lub `[Video]`.
-   - Audio ustawia `{{Transcript}}`; parsowanie poleceń używa tekstu podpisu, jeśli jest obecny,
-     w przeciwnym razie transkryptu.
+3. Wybierz pierwszy kwalifikujący się wpis modelu (rozmiar + możliwość + uwierzytelnianie).
+4. Jeśli model zawiedzie albo media będą zbyt duże, następuje **fallback do następnego wpisu**.
+5. Przy powodzeniu:
+   - `Body` staje się blokiem `[Image]`, `[Audio]` albo `[Video]`.
+   - Dla audio ustawiane jest `{{Transcript}}`; parsowanie poleceń używa tekstu podpisu, jeśli jest obecny, w przeciwnym razie transkryptu.
    - Podpisy są zachowywane jako `User text:` wewnątrz bloku.
 
-Jeśli rozumienie zakończy się błędem lub jest wyłączone, **przepływ odpowiedzi jest kontynuowany** z oryginalnym body + załącznikami.
+Jeśli rozumienie się nie powiedzie albo jest wyłączone, **przepływ odpowiedzi jest kontynuowany** z oryginalnym body + załącznikami.
 
 ## Przegląd konfiguracji
 
@@ -47,12 +47,12 @@ Jeśli rozumienie zakończy się błędem lub jest wyłączone, **przepływ odpo
 - `tools.media.models`: współdzielona lista modeli (użyj `capabilities` do bramkowania).
 - `tools.media.image` / `tools.media.audio` / `tools.media.video`:
   - wartości domyślne (`prompt`, `maxChars`, `maxBytes`, `timeoutSeconds`, `language`)
-  - nadpisania providera (`baseUrl`, `headers`, `providerOptions`)
+  - nadpisania dostawcy (`baseUrl`, `headers`, `providerOptions`)
   - opcje audio Deepgram przez `tools.media.audio.providerOptions.deepgram`
-  - kontrolki echa transkryptu audio (`echoTranscript`, domyślnie `false`; `echoFormat`)
+  - kontrola echa transkryptu audio (`echoTranscript`, domyślnie `false`; `echoFormat`)
   - opcjonalna **lista `models` per możliwość** (preferowana przed modelami współdzielonymi)
   - polityka `attachments` (`mode`, `maxAttachments`, `prefer`)
-  - `scope` (opcjonalne bramkowanie przez kanał/chatType/klucz sesji)
+  - `scope` (opcjonalne bramkowanie według kanału/chatType/klucza sesji)
 - `tools.media.concurrency`: maksymalna liczba równoległych uruchomień możliwości (domyślnie **2**).
 
 ```json5
@@ -60,18 +60,18 @@ Jeśli rozumienie zakończy się błędem lub jest wyłączone, **przepływ odpo
   tools: {
     media: {
       models: [
-        /* współdzielona lista */
+        /* shared list */
       ],
       image: {
-        /* opcjonalne nadpisania */
+        /* optional overrides */
       },
       audio: {
-        /* opcjonalne nadpisania */
+        /* optional overrides */
         echoTranscript: true,
         echoFormat: '📝 "{transcript}"',
       },
       video: {
-        /* opcjonalne nadpisania */
+        /* optional overrides */
       },
     },
   },
@@ -84,14 +84,14 @@ Każdy wpis `models[]` może być typu **provider** albo **CLI**:
 
 ```json5
 {
-  type: "provider", // domyślnie, jeśli pominięte
+  type: "provider", // default if omitted
   provider: "openai",
   model: "gpt-5.5",
   prompt: "Describe the image in <= 500 chars.",
   maxChars: 500,
   maxBytes: 10485760,
   timeoutSeconds: 60,
-  capabilities: ["image"], // opcjonalne, używane dla wpisów wielomodalnych
+  capabilities: ["image"], // optional, used for multi‑modal entries
   profile: "vision-profile",
   preferredProfile: "vision-fallback",
 }
@@ -117,9 +117,9 @@ Każdy wpis `models[]` może być typu **provider** albo **CLI**:
 
 Szablony CLI mogą także używać:
 
-- `{{MediaDir}}` (katalog zawierający plik multimediów)
-- `{{OutputDir}}` (katalog scratch utworzony dla tego uruchomienia)
-- `{{OutputBase}}` (podstawowa ścieżka pliku scratch, bez rozszerzenia)
+- `{{MediaDir}}` (katalog zawierający plik mediów)
+- `{{OutputDir}}` (katalog roboczy utworzony dla tego uruchomienia)
+- `{{OutputBase}}` (bazowa ścieżka pliku roboczego, bez rozszerzenia)
 
 ## Wartości domyślne i limity
 
@@ -128,51 +128,51 @@ Zalecane wartości domyślne:
 - `maxChars`: **500** dla obrazu/wideo (krótkie, przyjazne dla poleceń)
 - `maxChars`: **nieustawione** dla audio (pełny transkrypt, chyba że ustawisz limit)
 - `maxBytes`:
-  - obraz: **10 MB**
-  - audio: **20 MB**
-  - wideo: **50 MB**
+  - obraz: **10MB**
+  - audio: **20MB**
+  - wideo: **50MB**
 
-Reguły:
+Zasady:
 
-- Jeśli multimedia przekraczają `maxBytes`, ten model jest pomijany i **próbowany jest następny model**.
-- Pliki audio mniejsze niż **1024 bajty** są traktowane jako puste/uszkodzone i pomijane przed transkrypcją provider/CLI.
-- Jeśli model zwróci więcej niż `maxChars`, dane wyjściowe są przycinane.
+- Jeśli media przekraczają `maxBytes`, dany model jest pomijany, a **próbowany jest następny model**.
+- Pliki audio mniejsze niż **1024 bajty** są traktowane jako puste/uszkodzone i pomijane przed transkrypcją przez provider/CLI.
+- Jeśli model zwróci więcej niż `maxChars`, wynik jest przycinany.
 - `prompt` domyślnie przyjmuje prostą postać „Describe the {media}.” wraz ze wskazówką `maxChars` (tylko obraz/wideo).
-- Jeśli aktywny podstawowy model obrazu natywnie obsługuje vision, OpenClaw
+- Jeśli aktywny główny model obrazu natywnie obsługuje vision, OpenClaw
   pomija blok podsumowania `[Image]` i zamiast tego przekazuje oryginalny obraz do
   modelu.
-- Jeśli podstawowy model Gateway/WebChat jest tylko tekstowy, załączniki obrazów są
-  zachowywane jako odciążone odwołania `media://inbound/*`, dzięki czemu narzędzie obrazu lub skonfigurowany
-  model obrazu nadal mogą je sprawdzić zamiast utracić załącznik.
+- Jeśli główny model Gateway/WebChat jest wyłącznie tekstowy, załączniki obrazów są
+  zachowywane jako odciążone referencje `media://inbound/*`, aby narzędzia obrazu/PDF lub
+  skonfigurowany model obrazu nadal mogły je sprawdzić zamiast utracić załącznik.
 - Jawne żądania `openclaw infer image describe --model <provider/model>`
-  są inne: uruchamiają bezpośrednio ten provider/model obsługujący obrazy, w tym
-  odwołania Ollama takie jak `ollama/qwen2.5vl:7b`.
-- Jeśli `<capability>.enabled: true`, ale nie skonfigurowano modeli, OpenClaw próbuje
-  użyć **aktywnego modelu odpowiedzi**, jeśli provider go obsługuje.
+  są inne: uruchamiają bezpośrednio tego providera/model obsługujący obrazy, w tym
+  referencje Ollama, takie jak `ollama/qwen2.5vl:7b`.
+- Jeśli `<capability>.enabled: true`, ale nie skonfigurowano modeli, OpenClaw próbuje użyć
+  **aktywnego modelu odpowiedzi**, jeśli jego provider obsługuje daną możliwość.
 
-### Automatyczne wykrywanie rozumienia multimediów (domyślnie)
+### Automatyczne wykrywanie rozumienia mediów (domyślne)
 
-Jeśli `tools.media.<capability>.enabled` **nie** jest ustawione na `false` i nie
-skonfigurowałeś modeli, OpenClaw wykrywa automatycznie w tej kolejności i **zatrzymuje się na pierwszej
+Jeśli `tools.media.<capability>.enabled` **nie** jest ustawione na `false` i nie masz
+skonfigurowanych modeli, OpenClaw automatycznie wykrywa w tej kolejności i **zatrzymuje się na pierwszej
 działającej opcji**:
 
 1. **Aktywny model odpowiedzi**, jeśli jego provider obsługuje daną możliwość.
-2. **Podstawowe/zapasowe odwołania `agents.defaults.imageModel`** (tylko obraz).
+2. Referencje primary/fallback **`agents.defaults.imageModel`** (tylko obraz).
 3. **Lokalne CLI** (tylko audio; jeśli zainstalowane)
    - `sherpa-onnx-offline` (wymaga `SHERPA_ONNX_MODEL_DIR` z encoder/decoder/joiner/tokens)
-   - `whisper-cli` (`whisper-cpp`; używa `WHISPER_CPP_MODEL` lub dołączonego modelu tiny)
-   - `whisper` (Python CLI; pobiera modele automatycznie)
+   - `whisper-cli` (`whisper-cpp`; używa `WHISPER_CPP_MODEL` albo dołączonego małego modelu)
+   - `whisper` (Python CLI; automatycznie pobiera modele)
 4. **Gemini CLI** (`gemini`) używające `read_many_files`
-5. **Auth providera**
-   - Skonfigurowane wpisy `models.providers.*`, które obsługują daną możliwość, są
-     próbowane przed dołączoną kolejnością fallbacków.
-   - Providerzy konfiguracji tylko obrazów z modelem obsługującym obrazy automatycznie rejestrują się do
-     rozumienia multimediów, nawet jeśli nie są dołączonym Pluginem vendora.
-   - Rozumienie obrazów Ollama jest dostępne po jawnym wybraniu, na
+5. **Uwierzytelnianie providera**
+   - Skonfigurowane wpisy `models.providers.*` obsługujące daną możliwość są
+     wypróbowywane przed dołączoną kolejnością fallbacków.
+   - Providerzy skonfigurowani tylko dla obrazów z modelem obsługującym obrazy są automatycznie rejestrowani dla
+     rozumienia mediów, nawet jeśli nie są dołączonym Pluginem dostawcy.
+   - Rozumienie obrazów przez Ollama jest dostępne przy wyborze jawnym, na
      przykład przez `agents.defaults.imageModel` albo
      `openclaw infer image describe --model ollama/<vision-model>`.
    - Dołączona kolejność fallbacków:
-     - Audio: OpenAI → Groq → xAI → Deepgram → Google → Mistral
+     - Audio: OpenAI → Groq → xAI → Deepgram → Google → SenseAudio → ElevenLabs → Mistral
      - Obraz: OpenAI → Anthropic → Google → MiniMax → MiniMax Portal → Z.AI
      - Wideo: Google → Qwen → Moonshot
 
@@ -190,90 +190,90 @@ Aby wyłączyć automatyczne wykrywanie, ustaw:
 }
 ```
 
-Uwaga: wykrywanie binariów jest best-effort na macOS/Linux/Windows; upewnij się, że CLI jest w `PATH` (rozwijamy `~`), albo ustaw jawny model CLI z pełną ścieżką polecenia.
+Uwaga: wykrywanie binarek jest realizowane metodą best-effort na macOS/Linux/Windows; upewnij się, że CLI jest w `PATH` (rozwijamy `~`) albo ustaw jawny model CLI z pełną ścieżką polecenia.
 
 ### Obsługa środowiska proxy (modele providerów)
 
-Gdy włączone jest rozumienie multimediów **audio** i **wideo** oparte na providerach, OpenClaw
-honoruje standardowe zmienne środowiskowe wychodzącego proxy dla wywołań HTTP providera:
+Gdy rozumienie mediów **audio** i **wideo** oparte na providerach jest włączone, OpenClaw
+respektuje standardowe zmienne środowiskowe proxy dla wychodzących wywołań HTTP do providerów:
 
 - `HTTPS_PROXY`
 - `HTTP_PROXY`
 - `https_proxy`
 - `http_proxy`
 
-Jeśli nie ustawiono żadnych zmiennych środowiskowych proxy, rozumienie multimediów używa bezpośredniego wyjścia.
-Jeśli wartość proxy jest nieprawidłowa, OpenClaw zapisuje ostrzeżenie i wraca do bezpośredniego
+Jeśli nie ustawiono żadnych zmiennych środowiskowych proxy, rozumienie mediów używa bezpośredniego wyjścia.
+Jeśli wartość proxy jest nieprawidłowa, OpenClaw zapisuje ostrzeżenie w logach i wraca do bezpośredniego
 pobierania.
 
 ## Możliwości (opcjonalne)
 
-Jeśli ustawisz `capabilities`, wpis będzie uruchamiany tylko dla tych typów multimediów. Dla list
+Jeśli ustawisz `capabilities`, wpis działa tylko dla tych typów mediów. Dla list
 współdzielonych OpenClaw może wywnioskować wartości domyślne:
 
-- `openai`, `anthropic`, `minimax`: **obraz**
-- `minimax-portal`: **obraz**
-- `moonshot`: **obraz + wideo**
-- `openrouter`: **obraz**
-- `google` (Gemini API): **obraz + audio + wideo**
-- `qwen`: **obraz + wideo**
+- `openai`, `anthropic`, `minimax`: **image**
+- `minimax-portal`: **image**
+- `moonshot`: **image + video**
+- `openrouter`: **image**
+- `google` (Gemini API): **image + audio + video**
+- `qwen`: **image + video**
 - `mistral`: **audio**
-- `zai`: **obraz**
+- `zai`: **image**
 - `groq`: **audio**
 - `xai`: **audio**
 - `deepgram`: **audio**
-- Dowolny katalog `models.providers.<id>.models[]` z modelem obsługującym obrazy:
-  **obraz**
+- Każdy katalog `models.providers.<id>.models[]` z modelem obsługującym obrazy:
+  **image**
 
 Dla wpisów CLI **ustaw `capabilities` jawnie**, aby uniknąć zaskakujących dopasowań.
-Jeśli pominiesz `capabilities`, wpis kwalifikuje się dla listy, w której się znajduje.
+Jeśli pominiesz `capabilities`, wpis kwalifikuje się do listy, w której się pojawia.
 
 ## Macierz obsługi providerów (integracje OpenClaw)
 
-| Możliwość | Integracja providera                                                                                                         | Uwagi                                                                                                                                                                                                                                   |
+| Możliwość | Integracja providera                                                                                                           | Uwagi                                                                                                                                                                                                                                   |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Obraz      | OpenAI, OpenAI Codex OAuth, serwer aplikacji Codex, OpenRouter, Anthropic, Google, MiniMax, Moonshot, Qwen, Z.AI, providerzy konfiguracji | Pluginy vendora rejestrują obsługę obrazów; `openai-codex/*` używa mechanizmu providera OAuth; `codex/*` używa ograniczonej tury serwera aplikacji Codex; MiniMax i MiniMax OAuth używają `MiniMax-VL-01`; providerzy konfiguracji obsługujący obrazy rejestrują się automatycznie. |
-| Audio      | OpenAI, Groq, Deepgram, Google, Mistral                                                                                      | Transkrypcja providera (Whisper/Deepgram/Gemini/Voxtral).                                                                                                                                                                               |
-| Wideo      | Google, Qwen, Moonshot                                                                                                       | Rozumienie wideo providera przez Pluginy vendora; rozumienie wideo Qwen używa standardowych punktów końcowych DashScope.                                                                                                               |
+| Obraz      | OpenAI, OpenAI Codex OAuth, Codex app-server, OpenRouter, Anthropic, Google, MiniMax, Moonshot, Qwen, Z.AI, config providers | Pluginy dostawców rejestrują obsługę obrazów; `openai-codex/*` używa mechaniki providera OAuth; `codex/*` używa ograniczonej tury Codex app-server; MiniMax i MiniMax OAuth oba używają `MiniMax-VL-01`; providerzy konfiguracji obsługujący obrazy rejestrują się automatycznie. |
+| Audio      | OpenAI, Groq, xAI, Deepgram, Google, SenseAudio, ElevenLabs, Mistral                                                         | Transkrypcja przez providera (Whisper/Groq/xAI/Deepgram/Gemini/SenseAudio/Scribe/Voxtral).                                                                                                                                             |
+| Wideo      | Google, Qwen, Moonshot                                                                                                       | Rozumienie wideo przez providera za pomocą Pluginów dostawców; rozumienie wideo Qwen używa standardowych endpointów DashScope.                                                                                                       |
 
-Uwaga o MiniMax:
+Uwaga dotycząca MiniMax:
 
-- Rozumienie obrazów `minimax` i `minimax-portal` pochodzi z należącego do Pluginu
+- Rozumienie obrazów przez `minimax` i `minimax-portal` pochodzi z należącego do Plugin
   providera mediów `MiniMax-VL-01`.
 - Dołączony katalog tekstowy MiniMax nadal zaczyna się od modeli tylko tekstowych; jawne
-  wpisy `models.providers.minimax` materializują odwołania czatu M2.7 obsługujące obrazy.
+  wpisy `models.providers.minimax` materializują referencje czatu M2.7 obsługujące obrazy.
 
-## Wskazówki dotyczące wyboru modeli
+## Wskazówki dotyczące wyboru modelu
 
-- Preferuj najsilniejszy model najnowszej generacji dostępny dla każdej możliwości multimedialnej, gdy liczy się jakość i bezpieczeństwo.
-- Dla agentów z włączonymi narzędziami obsługujących nieufne wejścia unikaj starszych/słabszych modeli multimedialnych.
-- Zachowaj co najmniej jeden fallback per możliwość dla dostępności (model jakościowy + szybszy/tańszy model).
+- Preferuj najsilniejszy najnowszej generacji model dostępny dla każdej możliwości mediów, gdy liczy się jakość i bezpieczeństwo.
+- Dla agentów z włączonymi narzędziami obsługujących niezaufane dane wejściowe unikaj starszych/słabszych modeli mediów.
+- Zachowaj co najmniej jeden fallback na możliwość dla dostępności (model jakościowy + model szybszy/tańszy).
 - Fallbacki CLI (`whisper-cli`, `whisper`, `gemini`) są przydatne, gdy API providerów są niedostępne.
-- Uwaga o `parakeet-mlx`: z `--output-dir` OpenClaw odczytuje `<output-dir>/<media-basename>.txt`, gdy format wyjściowy to `txt` (lub nie został określony); formaty inne niż `txt` wracają do stdout.
+- Uwaga dotycząca `parakeet-mlx`: z `--output-dir` OpenClaw odczytuje `<output-dir>/<media-basename>.txt`, gdy format wyjściowy to `txt` (lub nieokreślony); formaty inne niż `txt` wracają do stdout.
 
 ## Polityka załączników
 
 Per możliwość `attachments` kontroluje, które załączniki są przetwarzane:
 
 - `mode`: `first` (domyślnie) lub `all`
-- `maxAttachments`: ogranicza liczbę przetwarzanych załączników (domyślnie **1**)
+- `maxAttachments`: ogranicza liczbę przetwarzanych (domyślnie **1**)
 - `prefer`: `first`, `last`, `path`, `url`
 
-Gdy `mode: "all"`, dane wyjściowe są oznaczane jako `[Image 1/2]`, `[Audio 2/2]` itd.
+Gdy `mode: "all"`, wyniki są oznaczane jako `[Image 1/2]`, `[Audio 2/2]` itd.
 
 Zachowanie ekstrakcji załączników plikowych:
 
-- Wyodrębniony tekst pliku jest opakowywany jako **nieufna treść zewnętrzna** przed
-  dołączeniem do promptu multimediów.
-- Wstrzyknięty blok używa jawnych znaczników granicznych takich jak
+- Wyodrębniony tekst pliku jest opakowywany jako **niezaufana treść zewnętrzna**, zanim
+  zostanie dołączony do promptu mediów.
+- Wstrzykiwany blok używa jawnych znaczników granicznych, takich jak
   `<<<EXTERNAL_UNTRUSTED_CONTENT id="...">>>` /
-  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>` i zawiera linię metadanych
+  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>`, i zawiera linię metadanych
   `Source: External`.
-- Ta ścieżka ekstrakcji załączników celowo pomija długi
-  banner `SECURITY NOTICE:`, aby nie rozdymać promptu multimediów; znaczniki
-  graniczne i metadane nadal pozostają.
+- Ta ścieżka ekstrakcji załączników celowo pomija długi baner
+  `SECURITY NOTICE:`, aby nie rozdąć promptu mediów; znaczniki graniczne
+  i metadane nadal pozostają.
 - Jeśli plik nie ma tekstu możliwego do wyodrębnienia, OpenClaw wstrzykuje `[No extractable text]`.
-- Jeśli PDF w tej ścieżce wraca do renderowanych obrazów stron, prompt multimediów zachowuje
+- Jeśli PDF na tej ścieżce wraca do renderowanych obrazów stron, prompt mediów zachowuje
   placeholder `[PDF content rendered to images; images not forwarded to model]`,
   ponieważ ten krok ekstrakcji załączników przekazuje bloki tekstowe, a nie renderowane obrazy PDF.
 
@@ -425,23 +425,23 @@ Zachowanie ekstrakcji załączników plikowych:
 }
 ```
 
-## Dane wyjściowe statusu
+## Wynik statusu
 
-Gdy uruchamia się rozumienie multimediów, `/status` zawiera krótką linię podsumowania:
+Gdy działa rozumienie mediów, `/status` zawiera krótką linię podsumowania:
 
 ```
-📎 Multimedia: obraz ok (openai/gpt-5.4) · audio pominięte (maxBytes)
+📎 Media: image ok (openai/gpt-5.4) · audio skipped (maxBytes)
 ```
 
-To pokazuje wyniki per możliwość oraz wybranego providera/model, jeśli ma to zastosowanie.
+Pokazuje to wyniki per możliwość oraz wybrany provider/model, gdy ma to zastosowanie.
 
 ## Uwagi
 
-- Rozumienie działa w trybie **best-effort**. Błędy nie blokują odpowiedzi.
-- Załączniki są nadal przekazywane do modeli, nawet gdy rozumienie jest wyłączone.
-- Użyj `scope`, aby ograniczyć miejsca, w których uruchamia się rozumienie (np. tylko wiadomości bezpośrednie).
+- Rozumienie jest wykonywane metodą **best-effort**. Błędy nie blokują odpowiedzi.
+- Załączniki są nadal przekazywane do modeli nawet wtedy, gdy rozumienie jest wyłączone.
+- Użyj `scope`, aby ograniczyć miejsca, w których działa rozumienie (np. tylko DM).
 
 ## Powiązana dokumentacja
 
-- [Konfiguracja](/pl/gateway/configuration)
-- [Obsługa obrazów i multimediów](/pl/nodes/images)
+- [Configuration](/pl/gateway/configuration)
+- [Image & Media Support](/pl/nodes/images)

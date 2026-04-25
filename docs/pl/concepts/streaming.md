@@ -1,193 +1,224 @@
 ---
 read_when:
-    - Wyjaśnianie, jak działa streaming lub dzielenie na fragmenty w kanałach
-    - Zmiana zachowania streamingu bloków lub dzielenia kanałów na fragmenty
-    - Debugowanie zduplikowanych/przedwczesnych odpowiedzi blokowych lub streamingu podglądu kanału
-summary: Zachowanie streamingu + dzielenia na fragmenty (odpowiedzi blokowe, streaming podglądu kanału, mapowanie trybów)
-title: Streaming i dzielenie na fragmenty
+    - Wyjaśnianie, jak działa strumieniowanie lub chunkowanie na kanałach
+    - Zmiana zachowania strumieniowania blokowego lub chunkowania kanału
+    - Debugowanie zduplikowanych/wczesnych odpowiedzi blokowych lub strumieniowania podglądu kanału
+summary: Zachowanie strumieniowania i chunkowania (odpowiedzi blokowe, strumieniowanie podglądu kanału, mapowanie trybów)
+title: Strumieniowanie i chunkowanie
 x-i18n:
-    generated_at: "2026-04-24T09:07:47Z"
+    generated_at: "2026-04-25T13:45:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 48d0391644e410d08f81cc2fb2d02a4aeb836ab04f37ea34a6c94bec9bc16b07
+    source_hash: ba308b79b12886f3a1bc36bc277e3df0e2b9c6018aa260b432ccea89a235819f
     source_path: concepts/streaming.md
     workflow: 15
 ---
 
-# Streaming + dzielenie na fragmenty
+OpenClaw ma dwie oddzielne warstwy strumieniowania:
 
-OpenClaw ma dwie oddzielne warstwy streamingu:
+- **Strumieniowanie blokowe (kanały):** emituje ukończone **bloki**, gdy asystent pisze. Są to zwykłe wiadomości kanałowe (nie delty tokenów).
+- **Strumieniowanie podglądu (Telegram/Discord/Slack):** aktualizuje tymczasową **wiadomość podglądu** podczas generowania.
 
-- **Streaming bloków (kanały):** emituje ukończone **bloki** podczas pisania przez asystenta. Są to zwykłe wiadomości kanałowe (nie delty tokenów).
-- **Streaming podglądu (Telegram/Discord/Slack):** aktualizuje tymczasową **wiadomość podglądu** podczas generowania.
+Obecnie **nie ma prawdziwego strumieniowania delt tokenów** do wiadomości kanałowych. Strumieniowanie podglądu jest oparte na wiadomościach (wysłanie + edycje/dopisania).
 
-Obecnie nie ma **prawdziwego streamingu delt tokenów** do wiadomości kanałowych. Streaming podglądu jest oparty na wiadomościach (wysłanie + edycje/dopisania).
+## Strumieniowanie blokowe (wiadomości kanałowe)
 
-## Streaming bloków (wiadomości kanałowe)
-
-Streaming bloków wysyła dane wyjściowe asystenta w większych fragmentach, gdy stają się dostępne.
+Strumieniowanie blokowe wysyła wynik asystenta w zgrubnych chunkach, gdy stają się dostępne.
 
 ```
 Dane wyjściowe modelu
   └─ text_delta/events
        ├─ (blockStreamingBreak=text_end)
-       │    └─ chunker emituje bloki w miarę wzrostu bufora
+       │    └─ chunker emituje bloki wraz ze wzrostem bufora
        └─ (blockStreamingBreak=message_end)
             └─ chunker opróżnia przy message_end
-                   └─ wysłanie do kanału (odpowiedzi blokowe)
+                   └─ wysłanie kanałowe (odpowiedzi blokowe)
 ```
 
 Legenda:
 
-- `text_delta/events`: zdarzenia strumienia modelu (mogą być rzadkie dla modeli bez streamingu).
-- `chunker`: `EmbeddedBlockChunker` stosujący minimalne/maksymalne granice + preferencję podziału.
+- `text_delta/events`: zdarzenia strumienia modelu (mogą być rzadkie dla modeli niestrumieniowych).
+- `chunker`: `EmbeddedBlockChunker` stosujący dolne/górne granice + preferencję podziału.
 - `channel send`: rzeczywiste wiadomości wychodzące (odpowiedzi blokowe).
 
-**Kontrole:**
+**Elementy sterujące:**
 
 - `agents.defaults.blockStreamingDefault`: `"on"`/`"off"` (domyślnie off).
-- Nadpisania kanałów: `*.blockStreaming` (oraz warianty per konto), aby wymusić `"on"`/`"off"` dla kanału.
+- Nadpisania kanału: `*.blockStreaming` (oraz warianty per konto), aby wymusić `"on"`/`"off"` per kanał.
 - `agents.defaults.blockStreamingBreak`: `"text_end"` lub `"message_end"`.
 - `agents.defaults.blockStreamingChunk`: `{ minChars, maxChars, breakPreference? }`.
-- `agents.defaults.blockStreamingCoalesce`: `{ minChars?, maxChars?, idleMs? }` (scalanie streamowanych bloków przed wysłaniem).
-- Twardy limit kanału: `*.textChunkLimit` (np. `channels.whatsapp.textChunkLimit`).
-- Tryb dzielenia kanału: `*.chunkMode` (`length` domyślnie, `newline` dzieli po pustych liniach (granice akapitów) przed dzieleniem według długości).
-- Miękki limit Discord: `channels.discord.maxLinesPerMessage` (domyślnie 17) dzieli wysokie odpowiedzi, aby uniknąć obcinania w UI.
+- `agents.defaults.blockStreamingCoalesce`: `{ minChars?, maxChars?, idleMs? }` (scala strumieniowane bloki przed wysłaniem).
+- Sztywny limit kanału: `*.textChunkLimit` (np. `channels.whatsapp.textChunkLimit`).
+- Tryb chunkowania kanału: `*.chunkMode` (`length` domyślnie, `newline` dzieli na pustych liniach (granice akapitów) przed chunkowaniem po długości).
+- Miękki limit Discord: `channels.discord.maxLinesPerMessage` (domyślnie 17) dzieli wysokie odpowiedzi, aby uniknąć przycinania w UI.
 
 **Semantyka granic:**
 
-- `text_end`: streamuj bloki, gdy tylko chunker je wyemituje; opróżniaj przy każdym `text_end`.
-- `message_end`: poczekaj, aż wiadomość asystenta się zakończy, a następnie opróżnij zbuforowane dane wyjściowe.
+- `text_end`: strumieniuj bloki, gdy tylko chunker je wyemituje; opróżniaj przy każdym `text_end`.
+- `message_end`: czekaj, aż wiadomość asystenta się zakończy, a następnie opróżnij zbuforowany wynik.
 
-`message_end` nadal używa chunkera, jeśli zbuforowany tekst przekracza `maxChars`, więc może wyemitować wiele fragmentów na końcu.
+`message_end` nadal używa chunkera, jeśli zbuforowany tekst przekracza `maxChars`, więc może wyemitować wiele chunków na końcu.
 
-## Algorytm dzielenia na fragmenty (niskie/wysokie granice)
+### Dostarczanie multimediów przy strumieniowaniu blokowym
 
-Dzielenie bloków na fragmenty jest zaimplementowane przez `EmbeddedBlockChunker`:
+Dyrektywy `MEDIA:` są zwykłymi metadanymi dostarczania. Gdy strumieniowanie blokowe wyśle
+wcześnie blok multimedialny, OpenClaw zapamiętuje to dostarczenie dla tej tury. Jeśli końcowy
+ładunek asystenta powtarza ten sam URL medium, końcowe dostarczenie usuwa
+duplikat medium zamiast wysyłać załącznik ponownie.
 
-- **Dolna granica:** nie emituj, dopóki bufor nie osiągnie `minChars` (chyba że wymuszone).
+Dokładne duplikaty końcowych ładunków są tłumione. Jeśli końcowy ładunek dodaje
+odrębny tekst wokół medium, które zostało już zastrumieniowane, OpenClaw nadal wysyła
+nowy tekst, zachowując pojedyncze dostarczenie medium. Zapobiega to duplikowaniu notatek głosowych
+lub plików na kanałach takich jak Telegram, gdy agent emituje `MEDIA:` podczas
+strumieniowania, a provider uwzględnia je także w ukończonej odpowiedzi.
+
+## Algorytm chunkowania (dolne/górne granice)
+
+Chunkowanie blokowe jest realizowane przez `EmbeddedBlockChunker`:
+
+- **Dolna granica:** nie emituj, dopóki bufor < `minChars` (chyba że wymuszone).
 - **Górna granica:** preferuj podziały przed `maxChars`; jeśli wymuszone, dziel przy `maxChars`.
 - **Preferencja podziału:** `paragraph` → `newline` → `sentence` → `whitespace` → twardy podział.
-- **Bloki kodu:** nigdy nie dziel wewnątrz bloków; przy wymuszeniu przy `maxChars` zamknij i ponownie otwórz blok, aby zachować poprawny Markdown.
+- **Ogrodzenia kodu:** nigdy nie dziel wewnątrz ogrodzeń; gdy wymuszone przy `maxChars`, zamknij i otwórz ponownie ogrodzenie, aby Markdown pozostał poprawny.
 
 `maxChars` jest ograniczane do `textChunkLimit` kanału, więc nie można przekroczyć limitów per kanał.
 
-## Scalanie (łączenie streamowanych bloków)
+## Scalanie (łączenie strumieniowanych bloków)
 
-Gdy streaming bloków jest włączony, OpenClaw może **scalać kolejne fragmenty bloków**
-przed ich wysłaniem. Zmniejsza to „spam pojedynczymi liniami”, a jednocześnie zapewnia
-progresywne dane wyjściowe.
+Gdy strumieniowanie blokowe jest włączone, OpenClaw może **scalać kolejne chunki bloków**
+przed ich wysłaniem. Ogranicza to „spam pojedynczymi liniami”, a jednocześnie zapewnia
+postępowe dane wyjściowe.
 
 - Scalanie czeka na **przerwy bezczynności** (`idleMs`) przed opróżnieniem.
-- Bufory są ograniczane przez `maxChars` i zostaną opróżnione po jego przekroczeniu.
-- `minChars` zapobiega wysyłaniu drobnych fragmentów, dopóki nie zbierze się wystarczająco dużo tekstu
+- Bufory są ograniczone przez `maxChars` i zostaną opróżnione po ich przekroczeniu.
+- `minChars` zapobiega wysyłaniu drobnych fragmentów, dopóki nie zgromadzi się wystarczająco dużo tekstu
   (końcowe opróżnienie zawsze wysyła pozostały tekst).
-- Łącznik jest wyprowadzany z `blockStreamingChunk.breakPreference`
+- Łącznik wynika z `blockStreamingChunk.breakPreference`
   (`paragraph` → `\n\n`, `newline` → `\n`, `sentence` → spacja).
-- Nadpisania kanałów są dostępne przez `*.blockStreamingCoalesce` (w tym konfiguracje per konto).
-- Domyślne `minChars` dla scalenia jest podbijane do 1500 dla Signal/Slack/Discord, chyba że zostanie nadpisane.
+- Nadpisania kanału są dostępne przez `*.blockStreamingCoalesce` (w tym konfiguracje per konto).
+- Domyślne `minChars` dla scalania jest podnoszone do 1500 dla Signal/Slack/Discord, chyba że zostanie nadpisane.
 
-## Naturalne opóźnienie między blokami
+## Naturalne opóźnienia między blokami
 
-Gdy streaming bloków jest włączony, możesz dodać **losową pauzę** między
-odpowiedziami blokowymi (po pierwszym bloku). Dzięki temu odpowiedzi wielobąbelkowe wydają się
+Gdy strumieniowanie blokowe jest włączone, możesz dodać **losową pauzę** między
+odpowiedziami blokowymi (po pierwszym bloku). Sprawia to, że odpowiedzi w wielu bąbelkach wydają się
 bardziej naturalne.
 
 - Konfiguracja: `agents.defaults.humanDelay` (nadpisanie per agent przez `agents.list[].humanDelay`).
 - Tryby: `off` (domyślnie), `natural` (800–2500 ms), `custom` (`minMs`/`maxMs`).
-- Dotyczy tylko **odpowiedzi blokowych**, nie odpowiedzi końcowych ani podsumowań narzędzi.
+- Dotyczy tylko **odpowiedzi blokowych**, nie końcowych odpowiedzi ani podsumowań narzędzi.
 
-## „Streamuj fragmenty czy wszystko”
+## „Strumieniuj chunki albo wszystko”
 
 Mapuje się to na:
 
-- **Streamuj fragmenty:** `blockStreamingDefault: "on"` + `blockStreamingBreak: "text_end"` (emituj na bieżąco). Kanały inne niż Telegram wymagają też `*.blockStreaming: true`.
-- **Streamuj wszystko na końcu:** `blockStreamingBreak: "message_end"` (jedno opróżnienie, ewentualnie wiele fragmentów, jeśli odpowiedź jest bardzo długa).
-- **Brak streamingu bloków:** `blockStreamingDefault: "off"` (tylko odpowiedź końcowa).
+- **Strumieniuj chunki:** `blockStreamingDefault: "on"` + `blockStreamingBreak: "text_end"` (emituj na bieżąco). Kanały inne niż Telegram wymagają również `*.blockStreaming: true`.
+- **Strumieniuj wszystko na końcu:** `blockStreamingBreak: "message_end"` (opróżnij raz, ewentualnie w wielu chunkach, jeśli bardzo długie).
+- **Brak strumieniowania blokowego:** `blockStreamingDefault: "off"` (tylko końcowa odpowiedź).
 
-**Uwaga o kanałach:** Streaming bloków jest **wyłączony, chyba że**
-`*.blockStreaming` jest jawnie ustawione na `true`. Kanały mogą streamować aktywny podgląd
+**Uwaga dotycząca kanałów:** Strumieniowanie blokowe jest **wyłączone, dopóki**
+`*.blockStreaming` nie zostanie jawnie ustawione na `true`. Kanały mogą strumieniować podgląd na żywo
 (`channels.<channel>.streaming`) bez odpowiedzi blokowych.
 
-Przypomnienie o lokalizacji konfiguracji: domyślne wartości `blockStreaming*` znajdują się w
+Przypomnienie o lokalizacji konfiguracji: domyślne wartości `blockStreaming*` znajdują się pod
 `agents.defaults`, a nie w głównej konfiguracji.
 
-## Tryby streamingu podglądu
+## Tryby strumieniowania podglądu
 
-Klucz kanoniczny: `channels.<channel>.streaming`
+Kanoniczny klucz: `channels.<channel>.streaming`
 
 Tryby:
 
-- `off`: wyłącza streaming podglądu.
+- `off`: wyłącza strumieniowanie podglądu.
 - `partial`: pojedynczy podgląd zastępowany najnowszym tekstem.
-- `block`: aktualizacje podglądu w krokach dzielonych na fragmenty/dopisywanych.
-- `progress`: podgląd postępu/statusu podczas generowania, odpowiedź końcowa po zakończeniu.
+- `block`: aktualizacje podglądu w chunkach/dopisaniach.
+- `progress`: podgląd postępu/statusu podczas generowania, końcowa odpowiedź po zakończeniu.
 
 ### Mapowanie kanałów
 
 | Kanał      | `off` | `partial` | `block` | `progress`        |
 | ---------- | ----- | --------- | ------- | ----------------- |
-| Telegram   | ✅    | ✅        | ✅      | mapuje się do `partial` |
-| Discord    | ✅    | ✅        | ✅      | mapuje się do `partial` |
+| Telegram   | ✅    | ✅        | ✅      | mapuje do `partial` |
+| Discord    | ✅    | ✅        | ✅      | mapuje do `partial` |
 | Slack      | ✅    | ✅        | ✅      | ✅                |
 | Mattermost | ✅    | ✅        | ✅      | ✅                |
 
 Tylko Slack:
 
-- `channels.slack.streaming.nativeTransport` przełącza natywne wywołania Slack streaming API, gdy `channels.slack.streaming.mode="partial"` (domyślnie: `true`).
-- Natywny streaming Slack i status wątku asystenta Slack wymagają docelowego wątku odpowiedzi; wiadomości bezpośrednie najwyższego poziomu nie pokazują tego rodzaju podglądu wątku.
+- `channels.slack.streaming.nativeTransport` przełącza natywne wywołania API strumieniowania Slack, gdy `channels.slack.streaming.mode="partial"` (domyślnie: `true`).
+- Natywne strumieniowanie Slack i status wątku asystenta Slack wymagają celu będącego wątkiem odpowiedzi; DM najwyższego poziomu nie pokazują takiego podglądu w stylu wątku.
 
 Migracja starszych kluczy:
 
-- Telegram: `streamMode` + boolowski `streaming` są automatycznie migrowane do wyliczenia `streaming`.
-- Discord: `streamMode` + boolowski `streaming` są automatycznie migrowane do wyliczenia `streaming`.
-- Slack: `streamMode` jest automatycznie migrowane do `streaming.mode`; boolowski `streaming` jest automatycznie migrowany do `streaming.mode` plus `streaming.nativeTransport`; starszy `nativeStreaming` jest automatycznie migrowany do `streaming.nativeTransport`.
+- Telegram: starsze wartości `streamMode` oraz skalarne/boolean `streaming` są wykrywane i migrowane przez ścieżki kompatybilności doctor/config do `streaming.mode`.
+- Discord: `streamMode` + boolean `streaming` są automatycznie migrowane do enum `streaming`.
+- Slack: `streamMode` jest automatycznie migrowane do `streaming.mode`; boolean `streaming` jest automatycznie migrowane do `streaming.mode` plus `streaming.nativeTransport`; starsze `nativeStreaming` jest automatycznie migrowane do `streaming.nativeTransport`.
 
-### Zachowanie runtime
+### Zachowanie w czasie działania
 
 Telegram:
 
-- Używa `sendMessage` + aktualizacji podglądu `editMessageText` w wiadomościach bezpośrednich i grupach/tematach.
-- Streaming podglądu jest pomijany, gdy streaming bloków Telegram jest jawnie włączony (aby uniknąć podwójnego streamingu).
+- Używa aktualizacji podglądu `sendMessage` + `editMessageText` w DM oraz grupach/tematach.
+- Strumieniowanie podglądu jest pomijane, gdy strumieniowanie blokowe Telegram jest jawnie włączone (aby uniknąć podwójnego strumieniowania).
 - `/reasoning stream` może zapisywać reasoning do podglądu.
 
 Discord:
 
 - Używa wiadomości podglądu typu send + edit.
-- Tryb `block` używa dzielenia szkicu na fragmenty (`draftChunk`).
-- Streaming podglądu jest pomijany, gdy streaming bloków Discord jest jawnie włączony.
-- Końcowe ładunki multimediów, błędów i jawnych odpowiedzi anulują oczekujące podglądy bez opróżniania nowego szkicu, a następnie używają zwykłego dostarczania.
+- Tryb `block` używa chunkowania szkicu (`draftChunk`).
+- Strumieniowanie podglądu jest pomijane, gdy strumieniowanie blokowe Discord jest jawnie włączone.
+- Końcowe ładunki multimediów, błędów i jawnych odpowiedzi anulują oczekujące podglądy bez opróżniania nowego szkicu, a następnie używają zwykłego dostarczenia.
 
 Slack:
 
-- `partial` może używać natywnego streamingu Slack (`chat.startStream`/`append`/`stop`), gdy jest dostępny.
-- `block` używa podglądów szkiców w stylu dopisywania.
-- `progress` używa tekstu podglądu statusu, a następnie odpowiedzi końcowej.
-- Końcowe ładunki multimediów/błędów i końce progress nie tworzą jednorazowych wiadomości szkicu; tylko końce tekstowe/blokowe, które mogą edytować podgląd, opróżniają oczekujący tekst szkicu.
+- `partial` może używać natywnego strumieniowania Slack (`chat.startStream`/`append`/`stop`), gdy jest dostępne.
+- `block` używa podglądów szkicu w stylu dopisywania.
+- `progress` używa tekstu podglądu statusu, a następnie końcowej odpowiedzi.
+- Natywne strumieniowanie i strumieniowanie szkicu tłumią odpowiedzi blokowe dla tej tury, więc odpowiedź Slack jest strumieniowana tylko jedną ścieżką dostarczenia.
+- Końcowe ładunki multimediów/błędów i końcowe ładunki postępu nie tworzą jednorazowych wiadomości szkicu; tylko końcowe ładunki tekstowe/blokowe, które mogą edytować podgląd, opróżniają oczekujący tekst szkicu.
 
 Mattermost:
 
-- Streamuje thinking, aktywność narzędzi i częściowy tekst odpowiedzi do jednego posta szkicu podglądu, który finalizuje się na miejscu, gdy odpowiedź końcowa jest bezpieczna do wysłania.
-- Wraca do wysłania nowego końcowego posta, jeśli post podglądu został usunięty lub jest w inny sposób niedostępny przy finalizacji.
-- Końcowe ładunki multimediów/błędów anulują oczekujące aktualizacje podglądu przed zwykłym dostarczaniem zamiast opróżniać tymczasowy post podglądu.
+- Strumieniuje myślenie, aktywność narzędzi i częściowy tekst odpowiedzi do jednego szkicu posta podglądu, który jest finalizowany w miejscu, gdy końcową odpowiedź można bezpiecznie wysłać.
+- Wraca do wysłania nowego końcowego posta, jeśli post podglądu został usunięty lub jest niedostępny w momencie finalizacji.
+- Końcowe ładunki multimediów/błędów anulują oczekujące aktualizacje podglądu przed zwykłym dostarczeniem zamiast opróżniać tymczasowy post podglądu.
 
 Matrix:
 
-- Szkice podglądu finalizują się na miejscu, gdy końcowy tekst może ponownie użyć zdarzenia podglądu.
-- Końce tylko z multimediami, błędami i z niedopasowaniem celu odpowiedzi anulują oczekujące aktualizacje podglądu przed zwykłym dostarczaniem; już widoczny nieaktualny podgląd jest redagowany.
+- Szkice podglądu są finalizowane w miejscu, gdy końcowy tekst może ponownie użyć zdarzenia podglądu.
+- Końcowe ładunki tylko z mediami, błędami i niedopasowaniem celu odpowiedzi anulują oczekujące aktualizacje podglądu przed zwykłym dostarczeniem; już widoczny nieaktualny podgląd jest redagowany.
 
 ### Aktualizacje podglądu postępu narzędzi
 
-Streaming podglądu może również obejmować aktualizacje **postępu narzędzi** — krótkie linie statusu, takie jak „searching the web”, „reading file” lub „calling tool” — które pojawiają się w tej samej wiadomości podglądu podczas działania narzędzi, przed odpowiedzią końcową. Dzięki temu wieloetapowe tury narzędzi pozostają wizualnie aktywne zamiast milczeć między pierwszym podglądem thinking a odpowiedzią końcową.
+Strumieniowanie podglądu może też obejmować aktualizacje **postępu narzędzi** — krótkie linie statusu, takie jak „searching the web”, „reading file” lub „calling tool”, które pojawiają się w tej samej wiadomości podglądu podczas działania narzędzi, przed końcową odpowiedzią. Dzięki temu tury narzędzi wieloetapowych wyglądają wizualnie na aktywne, a nie milczące między pierwszym podglądem myślenia a końcową odpowiedzią.
 
 Obsługiwane powierzchnie:
 
-- **Discord**, **Slack** i **Telegram** streamują postęp narzędzi do edycji aktywnego podglądu.
-- **Mattermost** już scala aktywność narzędzi do swojego pojedynczego posta szkicu podglądu (zobacz wyżej).
-- Edycje postępu narzędzi podążają za aktywnym trybem streamingu podglądu; są pomijane, gdy streaming podglądu ma wartość `off` lub gdy streaming bloków przejął wiadomość.
+- **Discord**, **Slack** i **Telegram** domyślnie strumieniują postęp narzędzi do edycji podglądu na żywo, gdy strumieniowanie podglądu jest aktywne.
+- Telegram ma włączone aktualizacje podglądu postępu narzędzi od `v2026.4.22`; pozostawienie ich włączonych zachowuje to wydane zachowanie.
+- **Mattermost** już scala aktywność narzędzi w swoim pojedynczym poście szkicu podglądu (zobacz wyżej).
+- Edycje postępu narzędzi podążają za aktywnym trybem strumieniowania podglądu; są pomijane, gdy strumieniowanie podglądu ma wartość `off` lub gdy strumieniowanie blokowe przejęło wiadomość.
+- Aby zachować strumieniowanie podglądu, ale ukryć linie postępu narzędzi, ustaw `streaming.preview.toolProgress` na `false` dla tego kanału. Aby całkowicie wyłączyć edycje podglądu, ustaw `streaming.mode` na `off`.
+
+Przykład:
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "streaming": {
+        "mode": "partial",
+        "preview": {
+          "toolProgress": false
+        }
+      }
+    }
+  }
+}
+```
 
 ## Powiązane
 
 - [Wiadomości](/pl/concepts/messages) — cykl życia wiadomości i dostarczanie
-- [Retry](/pl/concepts/retry) — zachowanie ponawiania przy błędzie dostarczania
-- [Kanały](/pl/channels) — obsługa streamingu per kanał
+- [Retry](/pl/concepts/retry) — zachowanie ponawiania przy niepowodzeniu dostarczenia
+- [Kanały](/pl/channels) — obsługa strumieniowania per kanał

@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Chcesz dostępu do modeli hostowanych przez OpenCode.
-    - Chcesz wybrać między katalogami Zen i Go.
-summary: Używanie katalogów OpenCode Zen i Go z OpenClaw
+    - Chcesz dostępu do modeli hostowanych przez OpenCode
+    - Chcesz wybrać między katalogami Zen i Go
+summary: Używaj katalogów OpenCode Zen i Go z OpenClaw
 title: OpenCode
 x-i18n:
-    generated_at: "2026-04-24T09:29:00Z"
+    generated_at: "2026-04-25T13:56:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d59c82a46988ef7dbbc98895af34441a5b378e5110ea636104df5f9c3672e3f0
+    source_hash: cb0521b038e519f139c66f98ddef4919d8c43ce64018ef8af8f7b42ac00114a4
     source_path: providers/opencode.md
     workflow: 15
 ---
@@ -20,15 +20,15 @@ OpenCode udostępnia w OpenClaw dwa hostowane katalogi:
 | **Zen** | `opencode/...`    | `opencode`       |
 | **Go**  | `opencode-go/...` | `opencode-go`    |
 
-Oba katalogi używają tego samego klucza API OpenCode. OpenClaw utrzymuje rozdzielone identyfikatory dostawców runtime,
-aby routing per model upstream pozostawał poprawny, ale onboarding i dokumentacja traktują je
+Oba katalogi używają tego samego klucza API OpenCode. OpenClaw zachowuje rozdzielone identyfikatory dostawców runtime,
+aby routing upstream dla poszczególnych modeli pozostał poprawny, ale onboarding i dokumentacja traktują je
 jako jedną konfigurację OpenCode.
 
 ## Pierwsze kroki
 
 <Tabs>
   <Tab title="Katalog Zen">
-    **Najlepszy dla:** kuratorowanego wielomodelowego proxy OpenCode (Claude, GPT, Gemini).
+    **Najlepsze do:** wyselekcjonowanego wielomodelowego proxy OpenCode (Claude, GPT, Gemini).
 
     <Steps>
       <Step title="Uruchom onboarding">
@@ -47,7 +47,7 @@ jako jedną konfigurację OpenCode.
         openclaw config set agents.defaults.model.primary "opencode/claude-opus-4-6"
         ```
       </Step>
-      <Step title="Zweryfikuj dostępność modeli">
+      <Step title="Sprawdź, czy modele są dostępne">
         ```bash
         openclaw models list --provider opencode
         ```
@@ -57,7 +57,7 @@ jako jedną konfigurację OpenCode.
   </Tab>
 
   <Tab title="Katalog Go">
-    **Najlepszy dla:** hostowanej przez OpenCode linii modeli Kimi, GLM i MiniMax.
+    **Najlepsze do:** hostowanej przez OpenCode linii modeli Kimi, GLM i MiniMax.
 
     <Steps>
       <Step title="Uruchom onboarding">
@@ -73,10 +73,10 @@ jako jedną konfigurację OpenCode.
       </Step>
       <Step title="Ustaw model Go jako domyślny">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
+        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
-      <Step title="Zweryfikuj dostępność modeli">
+      <Step title="Sprawdź, czy modele są dostępne">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -109,7 +109,7 @@ jako jedną konfigurację OpenCode.
 | Właściwość       | Wartość                                                                 |
 | ---------------- | ----------------------------------------------------------------------- |
 | Dostawca runtime | `opencode-go`                                                           |
-| Przykładowe modele | `opencode-go/kimi-k2.5`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
+| Przykładowe modele | `opencode-go/kimi-k2.6`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
 
 ## Konfiguracja zaawansowana
 
@@ -119,27 +119,27 @@ jako jedną konfigurację OpenCode.
   </Accordion>
 
   <Accordion title="Współdzielone poświadczenia">
-    Wprowadzenie jednego klucza OpenCode podczas konfiguracji zapisuje poświadczenia dla obu dostawców runtime. Nie trzeba osobno przechodzić onboardingu dla każdego katalogu.
+    Wprowadzenie jednego klucza OpenCode podczas konfiguracji zapisuje poświadczenia dla obu dostawców runtime. Nie musisz przechodzić onboardingu osobno dla każdego katalogu.
   </Accordion>
 
-  <Accordion title="Billing i dashboard">
-    Logujesz się do OpenCode, dodajesz dane rozliczeniowe i kopiujesz klucz API. Billing
-    i dostępność katalogów są zarządzane z dashboardu OpenCode.
+  <Accordion title="Rozliczanie i panel">
+    Logujesz się do OpenCode, dodajesz dane rozliczeniowe i kopiujesz swój klucz API. Rozliczanie
+    i dostępność katalogów są zarządzane z panelu OpenCode.
   </Accordion>
 
-  <Accordion title="Zachowanie replay Gemini">
-    Odwołania OpenCode oparte na Gemini pozostają na ścieżce proxy-Gemini, więc OpenClaw zachowuje
-    tam sanityzację sygnatur thought Gemini bez włączania natywnej
-    walidacji replay Gemini ani przepisania bootstrap.
+  <Accordion title="Zachowanie odtwarzania Gemini">
+    Odwołania OpenCode oparte na Gemini pozostają na ścieżce proxy-Gemini, więc OpenClaw zachowuje tam
+    sanityzację sygnatur myślenia Gemini bez włączania natywnej walidacji odtwarzania Gemini
+    ani przepisów bootstrap.
   </Accordion>
 
-  <Accordion title="Zachowanie replay non-Gemini">
-    Odwołania OpenCode inne niż Gemini zachowują minimalną politykę replay zgodną z OpenAI.
+  <Accordion title="Zachowanie odtwarzania dla modeli innych niż Gemini">
+    Odwołania OpenCode inne niż Gemini zachowują minimalną politykę odtwarzania zgodną z OpenAI.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Wprowadzenie jednego klucza OpenCode podczas konfiguracji zapisuje poświadczenia dla obu dostawców runtime Zen i
+Wprowadzenie jednego klucza OpenCode podczas konfiguracji zapisuje poświadczenia dla dostawców runtime Zen i
 Go, więc onboarding wystarczy przejść tylko raz.
 </Tip>
 

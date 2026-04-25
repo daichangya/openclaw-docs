@@ -1,28 +1,28 @@
 ---
 read_when:
     - Generowanie obrazów przez agenta
-    - Konfigurowanie providerów i modeli do generowania obrazów
+    - Konfigurowanie dostawców i modeli generowania obrazów
     - Zrozumienie parametrów narzędzia `image_generate`
-summary: Generowanie i edycja obrazów przy użyciu skonfigurowanych providerów (OpenAI, OpenAI Codex OAuth, Google Gemini, OpenRouter, fal, MiniMax, ComfyUI, Vydra, xAI)
+summary: Generuj i edytuj obrazy przy użyciu skonfigurowanych dostawców (OpenAI, OpenAI Codex OAuth, Google Gemini, OpenRouter, fal, MiniMax, ComfyUI, Vydra, xAI)
 title: Generowanie obrazów
 x-i18n:
-    generated_at: "2026-04-24T09:36:47Z"
+    generated_at: "2026-04-25T13:59:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 51ffc32165c5e25925460f95f3a6e674a004e6640b7a4b9e88d025eb40943b4b
+    source_hash: 02369928fecac147729ca586cd39e1a88791219ffe26d8e94429d0ea4b1af411
     source_path: tools/image-generation.md
     workflow: 15
 ---
 
-Narzędzie `image_generate` pozwala agentowi tworzyć i edytować obrazy przy użyciu skonfigurowanych providerów. Wygenerowane obrazy są automatycznie dostarczane jako załączniki multimedialne w odpowiedzi agenta.
+Narzędzie `image_generate` pozwala agentowi tworzyć i edytować obrazy przy użyciu skonfigurowanych dostawców. Wygenerowane obrazy są automatycznie dostarczane jako załączniki multimedialne w odpowiedzi agenta.
 
 <Note>
-Narzędzie pojawia się tylko wtedy, gdy dostępny jest co najmniej jeden provider generowania obrazów. Jeśli nie widzisz `image_generate` w narzędziach agenta, skonfiguruj `agents.defaults.imageGenerationModel`, ustaw klucz API providera albo zaloguj się przez OpenAI Codex OAuth.
+Narzędzie pojawia się tylko wtedy, gdy dostępny jest co najmniej jeden dostawca generowania obrazów. Jeśli nie widzisz `image_generate` w narzędziach swojego agenta, skonfiguruj `agents.defaults.imageGenerationModel`, ustaw klucz API dostawcy albo zaloguj się przez OpenAI Codex OAuth.
 </Note>
 
 ## Szybki start
 
-1. Ustaw klucz API dla co najmniej jednego providera (na przykład `OPENAI_API_KEY`, `GEMINI_API_KEY` lub `OPENROUTER_API_KEY`) albo zaloguj się przez OpenAI Codex OAuth.
+1. Ustaw klucz API dla co najmniej jednego dostawcy (na przykład `OPENAI_API_KEY`, `GEMINI_API_KEY` albo `OPENROUTER_API_KEY`) albo zaloguj się przez OpenAI Codex OAuth.
 2. Opcjonalnie ustaw preferowany model:
 
 ```json5
@@ -39,32 +39,47 @@ Narzędzie pojawia się tylko wtedy, gdy dostępny jest co najmniej jeden provid
 
 Codex OAuth używa tego samego odwołania do modelu `openai/gpt-image-2`. Gdy
 skonfigurowany jest profil OAuth `openai-codex`, OpenClaw kieruje żądania obrazów
-przez ten sam profil OAuth zamiast najpierw próbować użyć `OPENAI_API_KEY`.
-Jawna własna konfiguracja obrazu `models.providers.openai`, taka jak klucz API lub
-własny/bazowy URL Azure, przełącza z powrotem na bezpośrednią ścieżkę OpenAI Images API.
-W przypadku endpointów OpenAI-compatible w LAN, takich jak LocalAI, zachowaj własny
-`models.providers.openai.baseUrl` i jawnie włącz
+przez ten sam profil OAuth zamiast najpierw próbować `OPENAI_API_KEY`.
+Jawna niestandardowa konfiguracja obrazu `models.providers.openai`, taka jak klucz API lub
+niestandardowy/bazowy URL Azure, ponownie włącza bezpośrednią trasę OpenAI Images API.
+Dla endpointów OpenAI-compatible w sieci LAN, takich jak LocalAI, zachowaj niestandardowe
+`models.providers.openai.baseUrl` i jawnie włącz zgodę przez
 `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork: true`; prywatne/wewnętrzne
-endpointy obrazów pozostają domyślnie zablokowane.
+endpointy obrazów pozostają domyślnie blokowane.
 
 3. Poproś agenta: _„Wygeneruj obraz przyjaznej maskotki robota.”_
 
-Agent automatycznie wywoła `image_generate`. Nie trzeba dodawać narzędzia do listy dozwolonych — jest domyślnie włączone, gdy provider jest dostępny.
+Agent wywołuje `image_generate` automatycznie. Nie trzeba dodawać go do listy dozwolonych narzędzi — jest domyślnie włączone, gdy dostawca jest dostępny.
 
-## Obsługiwani providerzy
+## Typowe ścieżki
 
-| Provider   | Model domyślny                          | Obsługa edycji                      | Auth                                                  |
-| ---------- | --------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
-| OpenAI     | `gpt-image-2`                           | Tak (do 4 obrazów)                 | `OPENAI_API_KEY` lub OpenAI Codex OAuth               |
-| OpenRouter | `google/gemini-3.1-flash-image-preview` | Tak (do 5 obrazów wejściowych)     | `OPENROUTER_API_KEY`                                  |
-| Google     | `gemini-3.1-flash-image-preview`        | Tak                                | `GEMINI_API_KEY` lub `GOOGLE_API_KEY`                 |
-| fal        | `fal-ai/flux/dev`                       | Tak                                | `FAL_KEY`                                             |
-| MiniMax    | `image-01`                              | Tak (odwołanie do obiektu)         | `MINIMAX_API_KEY` lub MiniMax OAuth (`minimax-portal`) |
-| ComfyUI    | `workflow`                              | Tak (1 obraz, konfigurowany przez workflow) | `COMFY_API_KEY` lub `COMFY_CLOUD_API_KEY` dla chmury |
-| Vydra      | `grok-imagine`                          | Nie                                | `VYDRA_API_KEY`                                       |
-| xAI        | `grok-imagine-image`                    | Tak (do 5 obrazów)                 | `XAI_API_KEY`                                         |
+| Cel                                                  | Odwołanie do modelu                                | Auth                                |
+| ---------------------------------------------------- | -------------------------------------------------- | ----------------------------------- |
+| Generowanie obrazów OpenAI z rozliczaniem API        | `openai/gpt-image-2`                               | `OPENAI_API_KEY`                    |
+| Generowanie obrazów OpenAI z auth subskrypcji Codex  | `openai/gpt-image-2`                               | OpenAI Codex OAuth                  |
+| Generowanie obrazów OpenRouter                       | `openrouter/google/gemini-3.1-flash-image-preview` | `OPENROUTER_API_KEY`                |
+| Generowanie obrazów Google Gemini                    | `google/gemini-3.1-flash-image-preview`            | `GEMINI_API_KEY` lub `GOOGLE_API_KEY` |
 
-Użyj `action: "list"`, aby sprawdzić dostępnych providerów i modele w czasie działania:
+To samo narzędzie `image_generate` obsługuje generowanie tekst-do-obrazu i
+edycję z obrazem referencyjnym. Użyj `image` dla jednego odwołania albo `images` dla wielu odwołań.
+Obsługiwane przez dostawcę wskazówki wyjściowe, takie jak `quality`, `outputFormat` i
+specyficzne dla OpenAI `background`, są przekazywane tam, gdzie to możliwe, i zgłaszane jako
+zignorowane, gdy dostawca ich nie obsługuje.
+
+## Obsługiwani dostawcy
+
+| Dostawca  | Model domyślny                          | Obsługa edycji                     | Auth                                                  |
+| --------- | --------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
+| OpenAI    | `gpt-image-2`                           | Tak (do 4 obrazów)                 | `OPENAI_API_KEY` lub OpenAI Codex OAuth               |
+| OpenRouter | `google/gemini-3.1-flash-image-preview` | Tak (do 5 obrazów wejściowych)    | `OPENROUTER_API_KEY`                                  |
+| Google    | `gemini-3.1-flash-image-preview`        | Tak                                | `GEMINI_API_KEY` lub `GOOGLE_API_KEY`                 |
+| fal       | `fal-ai/flux/dev`                       | Tak                                | `FAL_KEY`                                             |
+| MiniMax   | `image-01`                              | Tak (odwołanie do obiektu)         | `MINIMAX_API_KEY` lub MiniMax OAuth (`minimax-portal`) |
+| ComfyUI   | `workflow`                              | Tak (1 obraz, zależnie od konfiguracji workflow) | `COMFY_API_KEY` lub `COMFY_CLOUD_API_KEY` dla chmury |
+| Vydra     | `grok-imagine`                          | Nie                                | `VYDRA_API_KEY`                                       |
+| xAI       | `grok-imagine-image`                    | Tak (do 5 obrazów)                 | `XAI_API_KEY`                                         |
+
+Użyj `action: "list"`, aby sprawdzić dostępnych dostawców i modele w runtime:
 
 ```
 /tool image_generate action=list
@@ -77,11 +92,11 @@ Prompt generowania obrazu. Wymagany dla `action: "generate"`.
 </ParamField>
 
 <ParamField path="action" type="'generate' | 'list'" default="generate">
-Użyj `"list"`, aby sprawdzić dostępnych providerów i modele w czasie działania.
+Użyj `"list"`, aby sprawdzić dostępnych dostawców i modele w runtime.
 </ParamField>
 
 <ParamField path="model" type="string">
-Nadpisanie provider/model, np. `openai/gpt-image-2`.
+Nadpisanie dostawcy/modelu, np. `openai/gpt-image-2`.
 </ParamField>
 
 <ParamField path="image" type="string">
@@ -105,11 +120,11 @@ Wskazówka rozdzielczości.
 </ParamField>
 
 <ParamField path="quality" type="'low' | 'medium' | 'high' | 'auto'">
-Wskazówka jakości, jeśli provider to obsługuje.
+Wskazówka jakości, gdy dostawca ją obsługuje.
 </ParamField>
 
 <ParamField path="outputFormat" type="'png' | 'jpeg' | 'webp'">
-Wskazówka formatu wyjściowego, jeśli provider to obsługuje.
+Wskazówka formatu wyjściowego, gdy dostawca ją obsługuje.
 </ParamField>
 
 <ParamField path="count" type="number">
@@ -117,7 +132,7 @@ Liczba obrazów do wygenerowania (1–4).
 </ParamField>
 
 <ParamField path="timeoutMs" type="number">
-Opcjonalny limit czasu żądania do providera w milisekundach.
+Opcjonalny limit czasu żądania do dostawcy w milisekundach.
 </ParamField>
 
 <ParamField path="filename" type="string">
@@ -128,9 +143,9 @@ Wskazówka nazwy pliku wyjściowego.
 Wskazówki tylko dla OpenAI: `background`, `moderation`, `outputCompression` i `user`.
 </ParamField>
 
-Nie wszyscy providerzy obsługują wszystkie parametry. Gdy provider fallback obsługuje zbliżoną opcję geometrii zamiast dokładnie żądanej, OpenClaw mapuje ją na najbliższy obsługiwany rozmiar, proporcje albo rozdzielczość przed wysłaniem żądania. Nieobsługiwane wskazówki wyjściowe, takie jak `quality` czy `outputFormat`, są pomijane dla providerów, którzy nie deklarują obsługi, i są raportowane w wyniku narzędzia.
+Nie wszyscy dostawcy obsługują wszystkie parametry. Gdy zapasowy dostawca obsługuje zbliżoną opcję geometrii zamiast dokładnie żądanej, OpenClaw mapuje ją na najbliższy obsługiwany rozmiar, proporcje lub rozdzielczość przed wysłaniem. Nieobsługiwane wskazówki wyjściowe, takie jak `quality` lub `outputFormat`, są odrzucane dla dostawców, którzy nie deklarują ich obsługi, i zgłaszane w wyniku narzędzia.
 
-Wyniki narzędzia raportują zastosowane ustawienia. Gdy OpenClaw mapuje geometrię podczas fallbacku providera, zwracane wartości `size`, `aspectRatio` i `resolution` odzwierciedlają to, co faktycznie zostało wysłane, a `details.normalization` zawiera translację z wartości żądanych na zastosowane.
+Wyniki narzędzia raportują zastosowane ustawienia. Gdy OpenClaw mapuje geometrię podczas przejścia do dostawcy zapasowego, zwrócone wartości `size`, `aspectRatio` i `resolution` odzwierciedlają to, co zostało faktycznie wysłane, a `details.normalization` przechwytuje tłumaczenie z żądanych wartości na zastosowane.
 
 ## Konfiguracja
 
@@ -153,35 +168,38 @@ Wyniki narzędzia raportują zastosowane ustawienia. Gdy OpenClaw mapuje geometr
 }
 ```
 
-### Kolejność wyboru providera
+### Kolejność wyboru dostawcy
 
-Podczas generowania obrazu OpenClaw próbuje providerów w tej kolejności:
+Podczas generowania obrazu OpenClaw próbuje dostawców w tej kolejności:
 
 1. **Parametr `model`** z wywołania narzędzia (jeśli agent go poda)
 2. **`imageGenerationModel.primary`** z konfiguracji
-3. **`imageGenerationModel.fallbacks`** po kolei
-4. **Automatyczne wykrywanie** — używa tylko domyślnych providerów opartych na auth:
-   - najpierw bieżący provider domyślny
-   - następnie pozostali zarejestrowani providerzy generowania obrazów w kolejności provider-id
+3. **`imageGenerationModel.fallbacks`** w podanej kolejności
+4. **Automatyczne wykrywanie** — używa tylko domyślnych dostawców opartych na auth:
+   - najpierw bieżący domyślny dostawca
+   - potem pozostali zarejestrowani dostawcy generowania obrazów w kolejności identyfikatorów dostawców
 
-Jeśli provider zawiedzie (błąd auth, limit szybkości itd.), automatycznie próbowany jest kolejny kandydat. Jeśli zawiodą wszyscy, błąd zawiera szczegóły każdej próby.
+Jeśli dostawca zawiedzie (błąd auth, limit szybkości itd.), automatycznie próbowany jest kolejny skonfigurowany kandydat. Jeśli zawiodą wszyscy, błąd zawiera szczegóły z każdej próby.
 
 Uwagi:
 
-- Automatyczne wykrywanie uwzględnia auth. Domyślny provider trafia na listę kandydatów
-  tylko wtedy, gdy OpenClaw może rzeczywiście uwierzytelnić tego providera.
+- Nadpisanie `model` dla pojedynczego wywołania jest dokładne: OpenClaw próbuje tylko tego dostawcy/modelu
+  i nie przechodzi do skonfigurowanych `primary`/`fallbacks` ani do automatycznie wykrytych
+  dostawców.
+- Automatyczne wykrywanie jest świadome auth. Domyślny dostawca trafia na listę kandydatów
+  tylko wtedy, gdy OpenClaw rzeczywiście może się uwierzytelnić u tego dostawcy.
 - Automatyczne wykrywanie jest domyślnie włączone. Ustaw
   `agents.defaults.mediaGenerationAutoProviderFallback: false`, jeśli chcesz, aby generowanie obrazów
   używało tylko jawnych wpisów `model`, `primary` i `fallbacks`.
-- Użyj `action: "list"`, aby sprawdzić aktualnie zarejestrowanych providerów, ich
-  modele domyślne i wskazówki dotyczące zmiennych env do auth.
+- Użyj `action: "list"`, aby sprawdzić aktualnie zarejestrowanych dostawców, ich
+  modele domyślne i wskazówki dotyczące zmiennych środowiskowych auth.
 
 ### Edycja obrazów
 
 OpenAI, OpenRouter, Google, fal, MiniMax, ComfyUI i xAI obsługują edycję obrazów referencyjnych. Przekaż ścieżkę lub URL obrazu referencyjnego:
 
 ```
-"Generate a watercolor version of this photo" + image: "/path/to/photo.jpg"
+"Wygeneruj akwarelową wersję tego zdjęcia" + image: "/path/to/photo.jpg"
 ```
 
 OpenAI, OpenRouter, Google i xAI obsługują do 5 obrazów referencyjnych przez parametr `images`. fal, MiniMax i ComfyUI obsługują 1.
@@ -202,22 +220,24 @@ Generowanie obrazów OpenRouter używa tego samego `OPENROUTER_API_KEY` i przech
 }
 ```
 
-OpenClaw przekazuje do OpenRouter `prompt`, `count`, obrazy referencyjne oraz zgodne z Gemini wskazówki `aspectRatio` / `resolution`. Obecne wbudowane skróty modeli obrazów OpenRouter obejmują `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview` i `openai/gpt-5.4-image-2`; użyj `action: "list"`, aby zobaczyć, co udostępnia Twój skonfigurowany Plugin.
+OpenClaw przekazuje do OpenRouter `prompt`, `count`, obrazy referencyjne oraz wskazówki `aspectRatio` / `resolution` zgodne z Gemini. Obecne wbudowane skróty modeli obrazów OpenRouter obejmują `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview` i `openai/gpt-5.4-image-2`; użyj `action: "list"`, aby zobaczyć, co udostępnia skonfigurowany plugin.
 
 ### OpenAI `gpt-image-2`
 
-OpenAI do generowania obrazów domyślnie używa `openai/gpt-image-2`. Jeśli
-skonfigurowano profil OAuth `openai-codex`, OpenClaw używa ponownie tego samego profilu OAuth,
-który jest używany przez modele czatu subskrypcji Codex, i wysyła żądanie obrazu
-przez backend Codex Responses; nie przełącza się po cichu na
-`OPENAI_API_KEY` dla tego żądania. Aby wymusić bezpośrednie kierowanie do OpenAI Images API,
-skonfiguruj jawnie `models.providers.openai` z kluczem API, własnym bazowym URL
-lub endpointem Azure. Starszy model
-`openai/gpt-image-1` nadal można wybrać jawnie, ale nowe żądania OpenAI
-dotyczące generowania i edycji obrazów powinny używać `gpt-image-2`.
+Generowanie obrazów OpenAI domyślnie używa `openai/gpt-image-2`. Jeśli
+skonfigurowany jest profil OAuth `openai-codex`, OpenClaw ponownie używa tego samego profilu OAuth
+co modele czatu subskrypcji Codex i wysyła żądanie obrazu
+przez backend Codex Responses. Starsze bazowe URL Codex, takie jak
+`https://chatgpt.com/backend-api`, są kanonizowane do
+`https://chatgpt.com/backend-api/codex` dla żądań obrazów. Nie następuje
+ciche przejście awaryjne do `OPENAI_API_KEY` dla tego żądania. Aby wymusić bezpośrednie kierowanie do OpenAI
+Images API, skonfiguruj jawnie `models.providers.openai` z kluczem API,
+niestandardowym bazowym URL albo endpointem Azure. Starszy model
+`openai/gpt-image-1` nadal można wybrać jawnie, ale nowe żądania generowania
+i edycji obrazów OpenAI powinny używać `gpt-image-2`.
 
-`gpt-image-2` obsługuje zarówno generowanie tekst-do-obrazu, jak i edycję
-obrazu referencyjnego przez to samo narzędzie `image_generate`. OpenClaw przekazuje do OpenAI `prompt`,
+`gpt-image-2` obsługuje zarówno generowanie tekst-do-obrazu, jak i edycję z obrazem referencyjnym
+przez to samo narzędzie `image_generate`. OpenClaw przekazuje do OpenAI `prompt`,
 `count`, `size`, `quality`, `outputFormat` i obrazy referencyjne.
 OpenAI nie otrzymuje bezpośrednio `aspectRatio` ani `resolution`; gdy to możliwe,
 OpenClaw mapuje je na obsługiwany `size`, w przeciwnym razie narzędzie zgłasza je jako
@@ -238,8 +258,8 @@ Opcje specyficzne dla OpenAI znajdują się w obiekcie `openai`:
 }
 ```
 
-`openai.background` akceptuje `transparent`, `opaque` lub `auto`; wyjścia przezroczyste
-wymagają `outputFormat` równego `png` lub `webp`. `openai.outputCompression`
+`openai.background` akceptuje `transparent`, `opaque` lub `auto`; przezroczyste
+wyjścia wymagają `outputFormat` równego `png` lub `webp`. `openai.outputCompression`
 dotyczy wyjść JPEG/WebP.
 
 Wygeneruj jeden obraz 4K w orientacji poziomej:
@@ -260,56 +280,56 @@ Edytuj jeden lokalny obraz referencyjny:
 /tool image_generate action=generate model=openai/gpt-image-2 prompt="Keep the subject, replace the background with a bright studio setup" image=/path/to/reference.png size=1024x1536
 ```
 
-Edytuj z użyciem wielu obrazów referencyjnych:
+Edycja z wieloma odwołaniami:
 
 ```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="Combine the character identity from the first image with the color palette from the second" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Połącz tożsamość postaci z pierwszego obrazu z paletą kolorów z drugiego" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
 ```
 
 Aby kierować generowanie obrazów OpenAI przez wdrożenie Azure OpenAI zamiast
-`api.openai.com`, zobacz [Endpointy Azure OpenAI](/pl/providers/openai#azure-openai-endpoints)
-w dokumentacji providera OpenAI.
+`api.openai.com`, zobacz [Azure OpenAI endpoints](/pl/providers/openai#azure-openai-endpoints)
+w dokumentacji dostawcy OpenAI.
 
-Generowanie obrazów MiniMax jest dostępne przez obie dołączone ścieżki auth MiniMax:
+Generowanie obrazów MiniMax jest dostępne przez obie wbudowane ścieżki auth MiniMax:
 
 - `minimax/image-01` dla konfiguracji z kluczem API
-- `minimax-portal/image-01` dla konfiguracji z OAuth
+- `minimax-portal/image-01` dla konfiguracji OAuth
 
-## Możliwości providerów
+## Capability dostawców
 
-| Możliwość             | OpenAI               | Google               | fal                 | MiniMax                    | ComfyUI                            | Vydra   | xAI                  |
+| Capability            | OpenAI               | Google               | fal                 | MiniMax                    | ComfyUI                            | Vydra   | xAI                  |
 | --------------------- | -------------------- | -------------------- | ------------------- | -------------------------- | ---------------------------------- | ------- | -------------------- |
-| Generowanie           | Tak (do 4)           | Tak (do 4)           | Tak (do 4)          | Tak (do 9)                 | Tak (wyniki zdefiniowane przez workflow) | Tak (1) | Tak (do 4)           |
-| Edycja/referencja     | Tak (do 5 obrazów)   | Tak (do 5 obrazów)   | Tak (1 obraz)       | Tak (1 obraz, referencja obiektu) | Tak (1 obraz, konfigurowany przez workflow) | Nie     | Tak (do 5 obrazów)   |
-| Sterowanie rozmiarem  | Tak (do 4K)          | Tak                  | Tak                 | Nie                        | Nie                                | Nie     | Nie                  |
-| Proporcje obrazu      | Nie                  | Tak                  | Tak (tylko generowanie) | Tak                     | Nie                                | Nie     | Tak                  |
+| Generowanie           | Tak (do 4)           | Tak (do 4)           | Tak (do 4)          | Tak (do 9)                 | Tak (wyjścia zdefiniowane przez workflow) | Tak (1) | Tak (do 4)           |
+| Edycja/odwołanie      | Tak (do 5 obrazów)   | Tak (do 5 obrazów)   | Tak (1 obraz)       | Tak (1 obraz, odwołanie do obiektu) | Tak (1 obraz, zależnie od konfiguracji workflow) | Nie     | Tak (do 5 obrazów) |
+| Kontrola rozmiaru     | Tak (do 4K)          | Tak                  | Tak                 | Nie                        | Nie                                | Nie     | Nie                  |
+| Proporcje obrazu      | Nie                  | Tak                  | Tak (tylko generowanie) | Tak                    | Nie                                | Nie     | Tak                  |
 | Rozdzielczość (1K/2K/4K) | Nie               | Tak                  | Tak                 | Nie                        | Nie                                | Nie     | Tak (1K/2K)          |
 
 ### xAI `grok-imagine-image`
 
-Dołączony provider xAI używa `/v1/images/generations` dla żądań opartych tylko na promptach
+Wbudowany dostawca xAI używa `/v1/images/generations` dla żądań tylko z promptem
 oraz `/v1/images/edits`, gdy obecne jest `image` lub `images`.
 
 - Modele: `xai/grok-imagine-image`, `xai/grok-imagine-image-pro`
 - Count: do 4
-- Referencje: jedno `image` lub do pięciu `images`
+- Odwołania: jedno `image` lub do pięciu `images`
 - Proporcje obrazu: `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `2:3`, `3:2`
 - Rozdzielczości: `1K`, `2K`
-- Dane wyjściowe: zwracane jako załączniki obrazów zarządzane przez OpenClaw
+- Wyjścia: zwracane jako załączniki obrazów zarządzane przez OpenClaw
 
 OpenClaw celowo nie udostępnia natywnych dla xAI opcji `quality`, `mask`, `user` ani
-dodatkowych proporcji obrazu dostępnych wyłącznie natywnie, dopóki te ustawienia nie będą istnieć w
-współdzielonym, wieloproviderowym kontrakcie `image_generate`.
+dodatkowych proporcji obrazu dostępnych tylko natywnie, dopóki te kontrolki nie pojawią się w
+współdzielonym, międzydostawcowym kontrakcie `image_generate`.
 
 ## Powiązane
 
-- [Przegląd narzędzi](/pl/tools) — wszystkie dostępne narzędzia agenta
-- [fal](/pl/providers/fal) — konfiguracja providera obrazów i wideo fal
-- [ComfyUI](/pl/providers/comfy) — konfiguracja lokalnego workflow ComfyUI i Comfy Cloud
-- [Google (Gemini)](/pl/providers/google) — konfiguracja providera obrazów Gemini
-- [MiniMax](/pl/providers/minimax) — konfiguracja providera obrazów MiniMax
-- [OpenAI](/pl/providers/openai) — konfiguracja providera OpenAI Images
+- [Tools Overview](/pl/tools) — wszystkie dostępne narzędzia agenta
+- [fal](/pl/providers/fal) — konfiguracja dostawcy obrazów i wideo fal
+- [ComfyUI](/pl/providers/comfy) — konfiguracja lokalnego ComfyUI i workflow Comfy Cloud
+- [Google (Gemini)](/pl/providers/google) — konfiguracja dostawcy obrazów Gemini
+- [MiniMax](/pl/providers/minimax) — konfiguracja dostawcy obrazów MiniMax
+- [OpenAI](/pl/providers/openai) — konfiguracja dostawcy OpenAI Images
 - [Vydra](/pl/providers/vydra) — konfiguracja obrazów, wideo i mowy Vydra
-- [xAI](/pl/providers/xai) — konfiguracja Grok dla obrazów, wideo, wyszukiwania, wykonywania kodu i TTS
-- [Dokumentacja konfiguracji](/pl/gateway/config-agents#agent-defaults) — konfiguracja `imageGenerationModel`
-- [Modele](/pl/concepts/models) — konfiguracja modeli i failover
+- [xAI](/pl/providers/xai) — konfiguracja obrazów, wideo, wyszukiwania, wykonywania kodu i TTS Grok
+- [Configuration Reference](/pl/gateway/config-agents#agent-defaults) — konfiguracja `imageGenerationModel`
+- [Models](/pl/concepts/models) — konfiguracja modeli i failover

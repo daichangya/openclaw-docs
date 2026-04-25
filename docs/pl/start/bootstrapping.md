@@ -1,36 +1,41 @@
 ---
 read_when:
     - Zrozumienie, co dzieje się przy pierwszym uruchomieniu agenta
-    - Wyjaśnienie, gdzie znajdują się pliki bootstrapowania
-    - Debugowanie konfiguracji tożsamości podczas onboardingu
+    - Wyjaśnianie, gdzie znajdują się pliki bootstrapowania
+    - Debugowanie konfiguracji tożsamości podczas wdrażania
 sidebarTitle: Bootstrapping
-summary: Rytuał bootstrapowania agenta, który zasiewa obszar roboczy i pliki tożsamości
+summary: Rytuał bootstrapowania agenta, który inicjuje obszar roboczy i pliki tożsamości
 title: Bootstrapowanie agenta
 x-i18n:
-    generated_at: "2026-04-24T09:33:30Z"
+    generated_at: "2026-04-25T13:58:06Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0c23a204a7afbf2ca0c0d19a227286cf0ae396181073403055db41dafa764d2a
+    source_hash: 435eb2a14707623903ab7873774cc8d4489b960719cf6a525d547983f8338027
     source_path: start/bootstrapping.md
     workflow: 15
 ---
 
 Bootstrapowanie to rytuał **pierwszego uruchomienia**, który przygotowuje obszar roboczy agenta i
-zbiera szczegóły tożsamości. Dzieje się to po onboardingu, gdy agent uruchamia się po raz pierwszy.
+zbiera szczegóły tożsamości. Dzieje się po wdrożeniu, gdy agent uruchamia się
+po raz pierwszy.
 
 ## Co robi bootstrapowanie
 
 Przy pierwszym uruchomieniu agenta OpenClaw bootstrapuje obszar roboczy (domyślnie
 `~/.openclaw/workspace`):
 
-- Zasiewa `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`.
-- Uruchamia krótki rytuał pytań i odpowiedzi (jedno pytanie naraz).
-- Zapisuje tożsamość + preferencje do `IDENTITY.md`, `USER.md`, `SOUL.md`.
+- Inicjuje `AGENTS.md`, `BOOTSTRAP.md`, `IDENTITY.md`, `USER.md`.
+- Uruchamia krótki rytuał pytań i odpowiedzi (po jednym pytaniu naraz).
+- Zapisuje tożsamość i preferencje do `IDENTITY.md`, `USER.md`, `SOUL.md`.
 - Usuwa `BOOTSTRAP.md` po zakończeniu, aby uruchamiał się tylko raz.
 
-## Gdzie to działa
+## Pomijanie bootstrapowania
 
-Bootstrapowanie zawsze działa na **hoście gateway**. Jeśli aplikacja macOS łączy się z
+Aby pominąć ten krok dla wstępnie przygotowanego obszaru roboczego, uruchom `openclaw onboard --skip-bootstrap`.
+
+## Gdzie jest uruchamiane
+
+Bootstrapowanie zawsze działa na **hoście Gateway**. Jeśli aplikacja macOS łączy się z
 zdalnym Gateway, obszar roboczy i pliki bootstrapowania znajdują się na tej zdalnej
 maszynie.
 
@@ -39,7 +44,7 @@ Gdy Gateway działa na innej maszynie, edytuj pliki obszaru roboczego na hoście
 (na przykład `user@gateway-host:~/.openclaw/workspace`).
 </Note>
 
-## Powiązana dokumentacja
+## Powiązane dokumenty
 
-- Onboarding aplikacji macOS: [Onboarding](/pl/start/onboarding)
+- Wdrażanie aplikacji macOS: [Wdrażanie](/pl/start/onboarding)
 - Układ obszaru roboczego: [Obszar roboczy agenta](/pl/concepts/agent-workspace)

@@ -1,37 +1,35 @@
 ---
 read_when:
-    - Aktualizowanie mapowań identyfikatorów modeli urządzeń albo plików NOTICE/licencji.
-    - Zmiana sposobu wyświetlania nazw urządzeń w UI Instances.
-summary: Jak OpenClaw vendoryzuje identyfikatory modeli urządzeń Apple do przyjaznych nazw w aplikacji macOS.
-title: Baza modeli urządzeń
+    - Aktualizowanie mapowań identyfikatorów modeli urządzeń lub plików NOTICE/licencji
+    - Zmiana sposobu, w jaki interfejs użytkownika Instances wyświetla nazwy urządzeń
+summary: Jak OpenClaw dostarcza identyfikatory modeli urządzeń Apple, aby wyświetlać przyjazne nazwy w aplikacji macOS.
+title: Baza danych modeli urządzeń
 x-i18n:
-    generated_at: "2026-04-24T09:31:13Z"
+    generated_at: "2026-04-25T13:57:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e892bf439a878b737d2322188acec850aa5bda2e7051ee0481850c921c69facb
+    source_hash: f20e035f787ba7d9bb48d2a18263679d20b295e12ffb263a63c3a0ef72312d34
     source_path: reference/device-models.md
     workflow: 15
 ---
 
-# Baza modeli urządzeń (przyjazne nazwy)
+Aplikacja towarzysząca macOS wyświetla przyjazne nazwy modeli urządzeń Apple w interfejsie **Instances**, mapując identyfikatory modeli Apple (np. `iPad16,6`, `Mac16,6`) na czytelne dla użytkownika nazwy.
 
-Aplikacja towarzysząca na macOS pokazuje przyjazne nazwy modeli urządzeń Apple w UI **Instances**, mapując identyfikatory modeli Apple (np. `iPad16,6`, `Mac16,6`) na nazwy czytelne dla człowieka.
-
-Mapowanie jest vendoryzowane jako JSON pod ścieżką:
+Mapowanie jest dostarczane jako JSON w katalogu:
 
 - `apps/macos/Sources/OpenClaw/Resources/DeviceModels/`
 
 ## Źródło danych
 
-Obecnie vendoryzujemy mapowanie z repozytorium na licencji MIT:
+Obecnie dostarczamy mapowanie z repozytorium na licencji MIT:
 
 - `kyle-seongwoo-jun/apple-device-identifiers`
 
-Aby buildy były deterministyczne, pliki JSON są przypięte do konkretnych commitów upstream (zapisanych w `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`).
+Aby zachować deterministyczność kompilacji, pliki JSON są przypięte do konkretnych commitów upstream (zapisanych w `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`).
 
 ## Aktualizowanie bazy danych
 
-1. Wybierz commity upstream, do których chcesz przypiąć dane (jeden dla iOS, jeden dla macOS).
+1. Wybierz commity upstream, do których chcesz przypiąć wersje (jeden dla iOS, jeden dla macOS).
 2. Zaktualizuj hashe commitów w `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`.
 3. Pobierz ponownie pliki JSON, przypięte do tych commitów:
 
@@ -46,8 +44,8 @@ curl -fsSL "https://raw.githubusercontent.com/kyle-seongwoo-jun/apple-device-ide
   -o apps/macos/Sources/OpenClaw/Resources/DeviceModels/mac-device-identifiers.json
 ```
 
-4. Upewnij się, że `apps/macos/Sources/OpenClaw/Resources/DeviceModels/LICENSE.apple-device-identifiers.txt` nadal odpowiada upstreamowi (zastąp go, jeśli licencja upstream się zmieni).
-5. Zweryfikuj, że aplikacja macOS buduje się poprawnie (bez ostrzeżeń):
+4. Upewnij się, że `apps/macos/Sources/OpenClaw/Resources/DeviceModels/LICENSE.apple-device-identifiers.txt` nadal odpowiada wersji upstream (zastąp go, jeśli licencja upstream się zmieni).
+5. Zweryfikuj, że aplikacja macOS kompiluje się poprawnie (bez ostrzeżeń):
 
 ```bash
 swift build --package-path apps/macos
@@ -55,5 +53,5 @@ swift build --package-path apps/macos
 
 ## Powiązane
 
-- [Node](/pl/nodes)
+- [Nodes](/pl/nodes)
 - [Rozwiązywanie problemów z Node](/pl/nodes/troubleshooting)

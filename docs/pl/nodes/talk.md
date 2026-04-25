@@ -1,14 +1,14 @@
 ---
 read_when:
     - Implementowanie trybu Talk na macOS/iOS/Android
-    - Zmiana zachowania voice/TTS/interrupt ചെയ്തു to=functions.read in commentary արզjson  玩大发快三path":"docs/concepts/talk.md"}
-summary: 'Tryb Talk: ciągłe rozmowy głosowe z ElevenLabs TTS'
+    - Zmiana zachowania voice/TTS/interrupt
+summary: 'Tryb Talk: ciągłe rozmowy głosowe ze skonfigurowanymi dostawcami TTS'
 title: Tryb Talk
 x-i18n:
-    generated_at: "2026-04-24T09:19:22Z"
+    generated_at: "2026-04-25T13:51:01Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 49286cd39a104d4514eb1df75627a2f64182313b11792bb246f471178a702198
+    source_hash: 84c99149c43bfe9fa4866b20271089d88d7e3d2f5abe6d16477a26915dad7829
     source_path: nodes/talk.md
     workflow: 15
 ---
@@ -16,33 +16,33 @@ x-i18n:
 Tryb Talk to ciągła pętla rozmowy głosowej:
 
 1. Nasłuchuj mowy
-2. Wyślij transkrypt do modelu (główna sesja, `chat.send`)
+2. Wyślij transkrypcję do modelu (główna sesja, `chat.send`)
 3. Poczekaj na odpowiedź
-4. Odtwórz ją przez skonfigurowanego providera Talk (`talk.speak`)
+4. Wypowiedz ją przez skonfigurowanego dostawcę Talk (`talk.speak`)
 
 ## Zachowanie (macOS)
 
 - **Zawsze aktywna nakładka**, gdy tryb Talk jest włączony.
 - Przejścia faz **Listening → Thinking → Speaking**.
-- Przy **krótkiej pauzie** (okno ciszy) bieżący transkrypt jest wysyłany.
+- Po **krótkiej przerwie** (oknie ciszy) bieżąca transkrypcja jest wysyłana.
 - Odpowiedzi są **zapisywane do WebChat** (tak samo jak przy pisaniu).
-- **Interrupt on speech** (domyślnie włączone): jeśli użytkownik zacznie mówić, gdy asystent mówi, zatrzymujemy odtwarzanie i zapisujemy znacznik czasu przerwania do następnego promptu.
+- **Przerywanie przy mowie** (domyślnie włączone): jeśli użytkownik zacznie mówić, gdy asystent mówi, zatrzymujemy odtwarzanie i zapisujemy znacznik czasu przerwania do następnego promptu.
 
 ## Dyrektywy głosowe w odpowiedziach
 
-Asystent może poprzedzić odpowiedź **jednym wierszem JSON**, aby sterować głosem:
+Asystent może poprzedzić swoją odpowiedź **pojedynczą linią JSON**, aby sterować głosem:
 
 ```json
 { "voice": "<voice-id>", "once": true }
 ```
 
-Reguły:
+Zasady:
 
 - Tylko pierwszy niepusty wiersz.
 - Nieznane klucze są ignorowane.
 - `once: true` dotyczy tylko bieżącej odpowiedzi.
-- Bez `once` głos staje się nowym domyślnym głosem dla trybu Talk.
-- Wiersz JSON jest usuwany przed odtworzeniem TTS.
+- Bez `once` głos staje się nowym domyślnym głosem trybu Talk.
+- Linia JSON jest usuwana przed odtwarzaniem TTS.
 
 Obsługiwane klucze:
 
@@ -52,15 +52,24 @@ Obsługiwane klucze:
 - `seed`, `normalize`, `lang`, `output_format`, `latency_tier`
 - `once`
 
-## Konfiguracja (`~/.openclaw/openclaw.json`)
+## Config (`~/.openclaw/openclaw.json`)
 
 ```json5
 {
   talk: {
-    voiceId: "elevenlabs_voice_id",
-    modelId: "eleven_v3",
-    outputFormat: "mp3_44100_128",
-    apiKey: "elevenlabs_api_key",
+    provider: "elevenlabs",
+    providers: {
+      elevenlabs: {
+        voiceId: "elevenlabs_voice_id",
+        modelId: "eleven_v3",
+        outputFormat: "mp3_44100_128",
+        apiKey: "elevenlabs_api_key",
+      },
+      mlx: {
+        modelId: "mlx-community/Soprano-80M-bf16",
+      },
+      system: {},
+    },
     silenceTimeoutMs: 1500,
     interruptOnSpeech: true,
   },
@@ -70,34 +79,37 @@ Obsługiwane klucze:
 Wartości domyślne:
 
 - `interruptOnSpeech`: true
-- `silenceTimeoutMs`: jeśli nieustawione, Talk zachowuje domyślne okno pauzy platformy przed wysłaniem transkryptu (`700 ms na macOS i Android, 900 ms na iOS`)
-- `voiceId`: fallback do `ELEVENLABS_VOICE_ID` / `SAG_VOICE_ID` (albo pierwszego głosu ElevenLabs, gdy klucz API jest dostępny)
-- `modelId`: domyślnie `eleven_v3`, jeśli nieustawione
-- `apiKey`: fallback do `ELEVENLABS_API_KEY` (albo profilu powłoki gateway, jeśli dostępny)
-- `outputFormat`: domyślnie `pcm_44100` na macOS/iOS i `pcm_24000` na Android (ustaw `mp3_*`, aby wymusić strumieniowanie MP3)
+- `silenceTimeoutMs`: gdy nie jest ustawione, Talk zachowuje domyślne dla platformy okno pauzy przed wysłaniem transkrypcji (`700 ms` na macOS i Android, `900 ms` na iOS)
+- `provider`: wybiera aktywnego dostawcę Talk. Użyj `elevenlabs`, `mlx` albo `system` dla lokalnych ścieżek odtwarzania na macOS.
+- `providers.<provider>.voiceId`: używa wartości zapasowej z `ELEVENLABS_VOICE_ID` / `SAG_VOICE_ID` dla ElevenLabs (albo pierwszego głosu ElevenLabs, gdy dostępny jest klucz API).
+- `providers.elevenlabs.modelId`: domyślnie `eleven_v3`, gdy nie ustawiono.
+- `providers.mlx.modelId`: domyślnie `mlx-community/Soprano-80M-bf16`, gdy nie ustawiono.
+- `providers.elevenlabs.apiKey`: używa wartości zapasowej z `ELEVENLABS_API_KEY` (albo profilu powłoki gateway, jeśli dostępny).
+- `outputFormat`: domyślnie `pcm_44100` na macOS/iOS i `pcm_24000` na Androidzie (ustaw `mp3_*`, aby wymusić strumieniowanie MP3)
 
-## Interfejs macOS
+## macOS UI
 
-- Przełącznik na pasku menu: **Talk**
-- Karta konfiguracji: grupa **Talk Mode** (voice id + przełącznik interrupt)
+- Przełącznik paska menu: **Talk**
+- Zakładka config: grupa **Talk Mode** (ID głosu + przełącznik przerwań)
 - Nakładka:
-  - **Listening**: chmura pulsuje zgodnie z poziomem mikrofonu
+  - **Listening**: pulsująca chmura z poziomem mikrofonu
   - **Thinking**: animacja opadania
-  - **Speaking**: promieniujące kręgi
-  - Kliknięcie chmury: zatrzymaj mówienie
-  - Kliknięcie X: wyjdź z trybu Talk
+  - **Speaking**: rozchodzące się pierścienie
+  - Kliknięcie chmury: zatrzymanie mówienia
+  - Kliknięcie X: wyjście z trybu Talk
 
 ## Uwagi
 
-- Wymaga uprawnień Speech + Microphone.
+- Wymaga uprawnień do Speech i Microphone.
 - Używa `chat.send` względem klucza sesji `main`.
-- Gateway rozwiązuje odtwarzanie Talk przez `talk.speak`, używając aktywnego providera Talk. Android wraca do lokalnego systemowego TTS tylko wtedy, gdy to RPC jest niedostępne.
+- Gateway rozwiązuje odtwarzanie Talk przez `talk.speak` przy użyciu aktywnego dostawcy Talk. Android wraca do lokalnego systemowego TTS tylko wtedy, gdy to RPC jest niedostępne.
+- Lokalne odtwarzanie MLX na macOS używa dołączonego pomocnika `openclaw-mlx-tts`, jeśli jest obecny, albo pliku wykonywalnego z `PATH`. Ustaw `OPENCLAW_MLX_TTS_BIN`, aby podczas developmentu wskazać własny binarny plik pomocnika.
 - `stability` dla `eleven_v3` jest walidowane do `0.0`, `0.5` albo `1.0`; inne modele akceptują `0..1`.
 - `latency_tier` jest walidowane do `0..4`, gdy jest ustawione.
-- Android obsługuje formaty wyjściowe `pcm_16000`, `pcm_22050`, `pcm_24000` i `pcm_44100` dla niskolatencyjnego strumieniowania AudioTrack.
+- Android obsługuje formaty wyjściowe `pcm_16000`, `pcm_22050`, `pcm_24000` i `pcm_44100` dla strumieniowania AudioTrack o niskich opóźnieniach.
 
 ## Powiązane
 
 - [Voice wake](/pl/nodes/voicewake)
 - [Audio i notatki głosowe](/pl/nodes/audio)
-- [Rozumienie multimediów](/pl/nodes/media-understanding)
+- [Rozumienie mediów](/pl/nodes/media-understanding)

@@ -1,20 +1,20 @@
 ---
 read_when:
-    - Chcesz wielu odizolowanych agentów (obszary robocze + routing + uwierzytelnianie)
-summary: Dokumentacja referencyjna CLI dla `openclaw agents` (`list`/`add`/`delete`/`bindings`/`bind`/`unbind`/`set identity`)
+    - Chcesz wielu odizolowanych agentów (obszary robocze + routing + uwierzytelnianie).
+summary: Dokumentacja CLI dla `openclaw agents` (`list`/`add`/`delete`/`bindings`/`bind`/`unbind`/`set identity`)
 title: Agenci
 x-i18n:
-    generated_at: "2026-04-24T09:01:31Z"
+    generated_at: "2026-04-25T13:43:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04d0ce4f3fb3d0c0ba8ffb3676674cda7d9a60441a012bc94ff24a17105632f1
+    source_hash: fcd0698f0821f9444e84cd82fe78ee46071447fb4c3cada6d1a98b5130147691
     source_path: cli/agents.md
     workflow: 15
 ---
 
 # `openclaw agents`
 
-Zarządzanie odizolowanymi agentami (obszary robocze + uwierzytelnianie + routing).
+Zarządzaj odizolowanymi agentami (obszary robocze + uwierzytelnianie + routing).
 
 Powiązane:
 
@@ -39,9 +39,9 @@ openclaw agents delete work
 
 ## Powiązania routingu
 
-Używaj powiązań routingu, aby przypisać przychodzący ruch kanału do konkretnego agenta.
+Używaj powiązań routingu, aby przypiąć przychodzący ruch z kanału do konkretnego agenta.
 
-Jeśli chcesz także mieć różną widoczność Skills dla każdego agenta, skonfiguruj
+Jeśli chcesz też mieć różne widoczne Skills dla poszczególnych agentów, skonfiguruj
 `agents.defaults.skills` i `agents.list[].skills` w `openclaw.json`. Zobacz
 [Skills config](/pl/tools/skills-config) oraz
 [Configuration Reference](/pl/gateway/config-agents#agents-defaults-skills).
@@ -60,15 +60,15 @@ Dodawanie powiązań:
 openclaw agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-Jeśli pominiesz `accountId` (`--bind <channel>`), OpenClaw rozwiąże go na podstawie domyślnych ustawień kanału i haków konfiguracji Pluginów, jeśli są dostępne.
+Jeśli pominiesz `accountId` (`--bind <channel>`), OpenClaw ustali je na podstawie domyślnych ustawień kanału i haków konfiguracji Plugin, gdy są dostępne.
 
-Jeśli pominiesz `--agent` dla `bind` lub `unbind`, OpenClaw kieruje operację do bieżącego domyślnego agenta.
+Jeśli pominiesz `--agent` dla `bind` lub `unbind`, OpenClaw wybierze bieżącego domyślnego agenta.
 
-### Zachowanie zakresu powiązań
+### Zachowanie zakresu powiązania
 
 - Powiązanie bez `accountId` pasuje tylko do domyślnego konta kanału.
-- `accountId: "*"` jest ustawieniem awaryjnym dla całego kanału (wszystkie konta) i ma mniejszą specyficzność niż jawne powiązanie konta.
-- Jeśli ten sam agent ma już pasujące powiązanie kanału bez `accountId`, a później dodasz powiązanie z jawnym lub rozwiązanym `accountId`, OpenClaw uaktualni istniejące powiązanie w miejscu zamiast dodawać duplikat.
+- `accountId: "*"` jest ustawieniem rezerwowym dla całego kanału (wszystkie konta) i jest mniej specyficzne niż jawne powiązanie konta.
+- Jeśli ten sam agent ma już pasujące powiązanie kanału bez `accountId`, a później dodasz powiązanie z jawnym lub ustalonym `accountId`, OpenClaw uaktualni istniejące powiązanie na miejscu zamiast dodawać duplikat.
 
 Przykład:
 
@@ -80,7 +80,7 @@ openclaw agents bind --agent work --bind telegram
 openclaw agents bind --agent work --bind telegram:ops
 ```
 
-Po uaktualnieniu routing dla tego powiązania jest ograniczony do `telegram:ops`. Jeśli chcesz także routing dla konta domyślnego, dodaj go jawnie (na przykład `--bind telegram:default`).
+Po uaktualnieniu routing tego powiązania jest ograniczony do `telegram:ops`. Jeśli chcesz też routing dla konta domyślnego, dodaj go jawnie (na przykład `--bind telegram:default`).
 
 Usuwanie powiązań:
 
@@ -89,20 +89,20 @@ openclaw agents unbind --agent work --bind telegram:ops
 openclaw agents unbind --agent work --all
 ```
 
-`unbind` akceptuje albo `--all`, albo co najmniej jedną wartość `--bind`, ale nie oba naraz.
+`unbind` akceptuje albo `--all`, albo co najmniej jedną wartość `--bind`, ale nie oba jednocześnie.
 
 ## Powierzchnia poleceń
 
 ### `agents`
 
-Uruchomienie `openclaw agents` bez podpolecenia jest równoważne `openclaw agents list`.
+Uruchomienie `openclaw agents` bez podpolecenia jest równoważne z `openclaw agents list`.
 
 ### `agents list`
 
 Opcje:
 
 - `--json`
-- `--bindings`: dołącz pełne reguły routingu, a nie tylko liczniki/podsumowania per agent
+- `--bindings`: uwzględnia pełne reguły routingu, a nie tylko liczniki/podsumowania per agent
 
 ### `agents add [name]`
 
@@ -117,9 +117,9 @@ Opcje:
 
 Uwagi:
 
-- Przekazanie dowolnych jawnych flag dodawania przełącza polecenie w tryb nieinteraktywny.
+- Przekazanie dowolnych jawnych flag dodawania przełącza polecenie do ścieżki nieinteraktywnej.
 - Tryb nieinteraktywny wymaga zarówno nazwy agenta, jak i `--workspace`.
-- `main` jest zarezerwowane i nie może być użyte jako identyfikator nowego agenta.
+- `main` jest zarezerwowane i nie może być użyte jako nowy identyfikator agenta.
 
 ### `agents bindings`
 
@@ -154,27 +154,30 @@ Opcje:
 
 Uwagi:
 
-- `main` nie może zostać usunięte.
-- Bez `--force` wymagana jest interaktywna prośba o potwierdzenie.
-- Katalogi obszaru roboczego, stanu agenta i transkryptów sesji są przenoszone do Kosza, a nie trwale usuwane.
+- `main` nie może zostać usunięty.
+- Bez `--force` wymagane jest potwierdzenie interaktywne.
+- Katalogi obszaru roboczego, stanu agenta i transkryptów sesji są przenoszone do Kosza, a nie usuwane trwale.
+- Jeśli obszar roboczy innego agenta ma tę samą ścieżkę, znajduje się wewnątrz tego obszaru roboczego albo zawiera ten obszar roboczy,
+  obszar roboczy zostaje zachowany, a `--json` zgłasza `workspaceRetained`,
+  `workspaceRetainedReason` oraz `workspaceSharedWith`.
 
 ## Pliki tożsamości
 
-Każdy obszar roboczy agenta może zawierać `IDENTITY.md` w katalogu głównym obszaru roboczego:
+Każdy obszar roboczy agenta może zawierać plik `IDENTITY.md` w katalogu głównym obszaru roboczego:
 
 - Przykładowa ścieżka: `~/.openclaw/workspace/IDENTITY.md`
-- `set-identity --from-identity` odczytuje dane z katalogu głównego obszaru roboczego (lub z jawnie podanego `--identity-file`)
+- `set-identity --from-identity` odczytuje z katalogu głównego obszaru roboczego (lub z jawnego `--identity-file`)
 
-Ścieżki awatarów są rozwiązywane względem katalogu głównego obszaru roboczego.
+Ścieżki avatar są rozwiązywane względem katalogu głównego obszaru roboczego.
 
 ## Ustawianie tożsamości
 
-`set-identity` zapisuje pola do `agents.list[].identity`:
+`set-identity` zapisuje pola w `agents.list[].identity`:
 
 - `name`
 - `theme`
 - `emoji`
-- `avatar` (ścieżka względna względem obszaru roboczego, URL http(s) lub URI danych)
+- `avatar` (ścieżka względna względem obszaru roboczego, URL `http(s)` lub URI danych)
 
 Opcje:
 
@@ -194,7 +197,7 @@ Uwagi:
 - Jeśli polegasz na `--workspace`, a wiele agentów współdzieli ten obszar roboczy, polecenie zakończy się błędem i poprosi o przekazanie `--agent`.
 - Gdy nie podano jawnych pól tożsamości, polecenie odczytuje dane tożsamości z `IDENTITY.md`.
 
-Wczytanie z `IDENTITY.md`:
+Wczytywanie z `IDENTITY.md`:
 
 ```bash
 openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
@@ -228,6 +231,6 @@ Przykład konfiguracji:
 
 ## Powiązane
 
-- [Dokumentacja referencyjna CLI](/pl/cli)
-- [Routing wielu agentów](/pl/concepts/multi-agent)
+- [Dokumentacja CLI](/pl/cli)
+- [Multi-agent routing](/pl/concepts/multi-agent)
 - [Agent workspace](/pl/concepts/agent-workspace)

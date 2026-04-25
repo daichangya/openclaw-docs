@@ -1,35 +1,35 @@
 ---
 read_when:
     - Chcesz zrozumieć domyślny backend pamięci
-    - Chcesz skonfigurować dostawców embeddingów lub wyszukiwanie hybrydowe
+    - Chcesz skonfigurować providerów embeddingów lub wyszukiwanie hybrydowe
 summary: Domyślny backend pamięci oparty na SQLite z wyszukiwaniem słów kluczowych, wektorowym i hybrydowym
 title: Wbudowany silnik pamięci
 x-i18n:
-    generated_at: "2026-04-24T09:05:54Z"
+    generated_at: "2026-04-25T13:45:08Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f82c1f4dc37b4fc6c075a7fcd2ec78bfcbfbebbcba7e48d366a1da3afcaff508
+    source_hash: 9ccf0b70bd3ed4e2138ae1d811573f6920c95eb3f8117693b242732012779dc6
     source_path: concepts/memory-builtin.md
     workflow: 15
 ---
 
 Wbudowany silnik to domyślny backend pamięci. Przechowuje indeks pamięci w
-bazie SQLite per agent i nie wymaga żadnych dodatkowych zależności na start.
+bazie danych SQLite per agent i nie wymaga żadnych dodatkowych zależności na start.
 
 ## Co zapewnia
 
-- **Wyszukiwanie słów kluczowych** przez pełnotekstowe indeksowanie FTS5 (ocena BM25).
-- **Wyszukiwanie wektorowe** przez embeddingi od dowolnego obsługiwanego dostawcy.
-- **Wyszukiwanie hybrydowe**, które łączy oba podejścia dla najlepszych wyników.
+- **Wyszukiwanie słów kluczowych** przez indeksowanie pełnotekstowe FTS5 (punktacja BM25).
+- **Wyszukiwanie wektorowe** przez embeddingi z dowolnego obsługiwanego providera.
+- **Wyszukiwanie hybrydowe** łączące oba podejścia dla najlepszych wyników.
 - **Obsługę CJK** przez tokenizację trigramową dla języków chińskiego, japońskiego i koreańskiego.
 - **Przyspieszenie sqlite-vec** dla zapytań wektorowych w bazie danych (opcjonalnie).
 
 ## Pierwsze kroki
 
 Jeśli masz klucz API do OpenAI, Gemini, Voyage lub Mistral, wbudowany
-silnik wykryje go automatycznie i włączy wyszukiwanie wektorowe. Konfiguracja nie jest wymagana.
+silnik automatycznie go wykrywa i włącza wyszukiwanie wektorowe. Konfiguracja nie jest potrzebna.
 
-Aby jawnie ustawić dostawcę:
+Aby jawnie ustawić providera:
 
 ```json5
 {
@@ -43,9 +43,10 @@ Aby jawnie ustawić dostawcę:
 }
 ```
 
-Bez dostawcy embeddingów dostępne jest tylko wyszukiwanie słów kluczowych.
+Bez providera embeddingów dostępne jest tylko wyszukiwanie słów kluczowych.
 
-Aby wymusić użycie wbudowanego lokalnego dostawcy embeddingów, wskaż `local.modelPath`
+Aby wymusić wbudowanego lokalnego providera embeddingów, zainstaluj opcjonalny
+pakiet runtime `node-llama-cpp` obok OpenClaw, a następnie skieruj `local.modelPath`
 na plik GGUF:
 
 ```json5
@@ -64,33 +65,33 @@ na plik GGUF:
 }
 ```
 
-## Obsługiwani dostawcy embeddingów
+## Obsługiwani providerzy embeddingów
 
-| Provider | ID        | Auto-detected | Notes                               |
-| -------- | --------- | ------------- | ----------------------------------- |
-| OpenAI   | `openai`  | Yes           | Domyślnie: `text-embedding-3-small` |
-| Gemini   | `gemini`  | Yes           | Obsługuje multimodalność (obraz + audio) |
-| Voyage   | `voyage`  | Yes           |                                     |
-| Mistral  | `mistral` | Yes           |                                     |
-| Ollama   | `ollama`  | No            | Lokalny, ustaw jawnie               |
-| Local    | `local`   | Yes (first)   | Model GGUF, pobieranie ~0,6 GB      |
+| Provider | ID        | Wykrywany automatycznie | Uwagi                                |
+| -------- | --------- | ----------------------- | ------------------------------------ |
+| OpenAI   | `openai`  | Tak                     | Domyślnie: `text-embedding-3-small`  |
+| Gemini   | `gemini`  | Tak                     | Obsługuje multimodalność (obraz + audio) |
+| Voyage   | `voyage`  | Tak                     |                                      |
+| Mistral  | `mistral` | Tak                     |                                      |
+| Ollama   | `ollama`  | Nie                     | Lokalny, ustawiany jawnie            |
+| Local    | `local`   | Tak (pierwszy)          | Opcjonalny runtime `node-llama-cpp`  |
 
-Automatyczne wykrywanie wybiera pierwszego dostawcę, dla którego można rozwiązać klucz API, w
+Automatyczne wykrywanie wybiera pierwszego providera, którego klucz API można rozwiązać, w
 pokazanej kolejności. Ustaw `memorySearch.provider`, aby to nadpisać.
 
 ## Jak działa indeksowanie
 
-OpenClaw indeksuje `MEMORY.md` i `memory/*.md` do chunków (~400 tokenów z
-nakładaniem 80 tokenów) i zapisuje je w bazie SQLite per agent.
+OpenClaw indeksuje `MEMORY.md` oraz `memory/*.md` do chunków (~400 tokenów z
+nakładaniem 80 tokenów) i przechowuje je w bazie danych SQLite per agent.
 
 - **Lokalizacja indeksu:** `~/.openclaw/memory/<agentId>.sqlite`
-- **Obserwowanie plików:** zmiany w plikach pamięci wyzwalają opóźnione ponowne indeksowanie (1,5 s).
-- **Automatyczne ponowne indeksowanie:** gdy dostawca embeddingów, model lub konfiguracja chunkingu
-  się zmienią, cały indeks jest automatycznie przebudowywany.
+- **Obserwowanie plików:** zmiany w plikach pamięci wywołują opóźnione ponowne indeksowanie (1,5 s).
+- **Automatyczne ponowne indeksowanie:** gdy provider embeddingów, model lub konfiguracja chunkowania
+  się zmienia, cały indeks jest automatycznie przebudowywany.
 - **Ponowne indeksowanie na żądanie:** `openclaw memory index --force`
 
 <Info>
-Możesz także indeksować pliki Markdown spoza obszaru roboczego przy użyciu
+Możesz też indeksować pliki Markdown spoza workspace za pomocą
 `memorySearch.extraPaths`. Zobacz
 [dokumentację konfiguracji](/pl/reference/memory-config#additional-memory-paths).
 </Info>
@@ -101,43 +102,43 @@ Wbudowany silnik to właściwy wybór dla większości użytkowników:
 
 - Działa od razu bez dodatkowych zależności.
 - Dobrze obsługuje wyszukiwanie słów kluczowych i wektorowe.
-- Obsługuje wszystkich dostawców embeddingów.
+- Obsługuje wszystkich providerów embeddingów.
 - Wyszukiwanie hybrydowe łączy najlepsze cechy obu podejść do wyszukiwania.
 
-Rozważ przejście na [QMD](/pl/concepts/memory-qmd), jeśli potrzebujesz rerankingu, rozwijania zapytań
-lub chcesz indeksować katalogi spoza obszaru roboczego.
+Rozważ przejście na [QMD](/pl/concepts/memory-qmd), jeśli potrzebujesz rerankingu, rozwijania
+zapytań lub chcesz indeksować katalogi spoza workspace.
 
-Rozważ [Honcho](/pl/concepts/memory-honcho), jeśli chcesz pamięci między sesjami z
+Rozważ [Honcho](/pl/concepts/memory-honcho), jeśli chcesz mieć pamięć między sesjami z
 automatycznym modelowaniem użytkownika.
 
 ## Rozwiązywanie problemów
 
-**Wyszukiwanie pamięci wyłączone?** Sprawdź `openclaw memory status`. Jeśli nie wykryto dostawcy,
-ustaw go jawnie lub dodaj klucz API.
+**Wyszukiwanie pamięci wyłączone?** Sprawdź `openclaw memory status`. Jeśli nie wykryto providera,
+ustaw go jawnie albo dodaj klucz API.
 
-**Lokalny dostawca nie został wykryty?** Potwierdź, że lokalna ścieżka istnieje, i uruchom:
+**Lokalny provider nie jest wykrywany?** Upewnij się, że ścieżka lokalna istnieje, i uruchom:
 
 ```bash
 openclaw memory status --deep --agent main
 openclaw memory index --force --agent main
 ```
 
-Zarówno samodzielne polecenia CLI, jak i Gateway używają tego samego identyfikatora dostawcy `local`.
-Jeśli dostawca jest ustawiony na `auto`, lokalne embeddingi są rozważane jako pierwsze tylko
-wtedy, gdy `memorySearch.local.modelPath` wskazuje na istniejący lokalny plik.
+Zarówno samodzielne polecenia CLI, jak i Gateway używają tego samego identyfikatora providera `local`.
+Jeśli provider jest ustawiony na `auto`, lokalne embeddingi są rozważane jako pierwsze tylko
+wtedy, gdy `memorySearch.local.modelPath` wskazuje na istniejący plik lokalny.
 
-**Nieaktualne wyniki?** Uruchom `openclaw memory index --force`, aby przebudować indeks. Watcher
-w rzadkich przypadkach brzegowych może przeoczyć zmiany.
+**Nieaktualne wyniki?** Uruchom `openclaw memory index --force`, aby przebudować indeks. Obserwator
+w rzadkich przypadkach może nie wychwycić zmian.
 
-**`sqlite-vec` nie ładuje się?** OpenClaw automatycznie wraca do podobieństwa cosinusowego w procesie.
-Sprawdź logi, aby zobaczyć konkretny błąd ładowania.
+**`sqlite-vec` się nie ładuje?** OpenClaw automatycznie wraca do obliczania podobieństwa cosinusowego
+w procesie. Sprawdź logi, aby zobaczyć konkretny błąd ładowania.
 
 ## Konfiguracja
 
-Konfigurację dostawców embeddingów, dostrajanie wyszukiwania hybrydowego (wagi, MMR, czasowy
-zanik), indeksowanie wsadowe, pamięć multimodalną, sqlite-vec, dodatkowe ścieżki i wszystkie
-pozostałe opcje konfiguracji znajdziesz w
-[dokumentacji konfiguracji pamięci](/pl/reference/memory-config).
+Aby skonfigurować providera embeddingów, dostroić wyszukiwanie hybrydowe (wagi, MMR, zanikanie
+czasowe), indeksowanie wsadowe, pamięć multimodalną, sqlite-vec, dodatkowe ścieżki i wszystkie
+inne opcje konfiguracji, zobacz
+[dokumentację konfiguracji pamięci](/pl/reference/memory-config).
 
 ## Powiązane
 

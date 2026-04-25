@@ -2,24 +2,24 @@
 read_when:
     - Weryfikowanie zakresu poświadczeń SecretRef
     - Sprawdzanie, czy poświadczenie kwalifikuje się do `secrets configure` lub `secrets apply`
-    - Weryfikowanie, dlaczego poświadczenie znajduje się poza obsługiwaną powierzchnią
+    - Weryfikowanie, dlaczego poświadczenie jest poza obsługiwaną powierzchnią
 summary: Kanoniczna obsługiwana i nieobsługiwana powierzchnia poświadczeń SecretRef
 title: Powierzchnia poświadczeń SecretRef
 x-i18n:
-    generated_at: "2026-04-24T09:31:54Z"
+    generated_at: "2026-04-25T13:57:42Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ddb8d7660f2757e3d2a078c891f52325bf9ec9291ec7d5f5e06daef4041e2006
+    source_hash: 50a4602939970d92831c0de9339e84b0f42b119c2e25ea30375925282f55d237
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
 
 Ta strona definiuje kanoniczną powierzchnię poświadczeń SecretRef.
 
-Zakres zamierzonego użycia:
+Cel zakresu:
 
-- W zakresie: ściśle poświadczenia dostarczane przez użytkownika, których OpenClaw nie tworzy ani nie rotuje.
-- Poza zakresem: poświadczenia tworzone w runtime lub rotowane, materiał odświeżania OAuth oraz artefakty podobne do sesji.
+- W zakresie: wyłącznie poświadczenia dostarczane przez użytkownika, których OpenClaw nie tworzy ani nie rotuje.
+- Poza zakresem: poświadczenia tworzone w czasie działania lub rotowane, materiały odświeżania OAuth oraz artefakty podobne do sesji.
 
 ## Obsługiwane poświadczenia
 
@@ -106,8 +106,8 @@ Zakres zamierzonego użycia:
 - `channels.zalo.webhookSecret`
 - `channels.zalo.accounts.*.botToken`
 - `channels.zalo.accounts.*.webhookSecret`
-- `channels.googlechat.serviceAccount` przez sąsiednie `serviceAccountRef` (wyjątek zgodności)
-- `channels.googlechat.accounts.*.serviceAccount` przez sąsiednie `serviceAccountRef` (wyjątek zgodności)
+- `channels.googlechat.serviceAccount` przez sąsiedni `serviceAccountRef` (wyjątek zgodności)
+- `channels.googlechat.accounts.*.serviceAccount` przez sąsiedni `serviceAccountRef` (wyjątek zgodności)
 
 ### Cele `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
@@ -118,17 +118,18 @@ Zakres zamierzonego użycia:
 
 Uwagi:
 
-- Cele planu auth-profile wymagają `agentId`.
-- Wpisy planu celują w `profiles.*.key` / `profiles.*.token` i zapisują sąsiednie refy (`keyRef` / `tokenRef`).
-- Refy auth-profile są uwzględnione w rozwiązywaniu runtime i pokryciu audytu.
-- Zabezpieczenie polityki OAuth: `auth.profiles.<id>.mode = "oauth"` nie może być łączone z wejściami SecretRef dla tego profilu. Uruchomienie/przeładowanie i rozwiązywanie auth-profile kończą się błędem natychmiast po naruszeniu tej polityki.
-- Dla dostawców modeli zarządzanych przez SecretRef wygenerowane wpisy `agents/*/agent/models.json` utrwalają markery niezawierające sekretów (a nie rozwiązane wartości sekretów) dla powierzchni `apiKey`/nagłówków.
-- Utrwalanie markerów jest źródłowo autorytatywne: OpenClaw zapisuje markery z aktywnego snapshotu konfiguracji źródłowej (przed rozwiązywaniem), a nie z rozwiązanych wartości sekretów w runtime.
+- Cele planu profili auth wymagają `agentId`.
+- Wpisy planu wskazują na `profiles.*.key` / `profiles.*.token` i zapisują sąsiednie referencje (`keyRef` / `tokenRef`).
+- Referencje profili auth są uwzględniane w rozwiązywaniu w czasie działania i w zakresie audytu.
+- W `openclaw.json` SecretRefs muszą używać strukturalnych obiektów, takich jak `{"source":"env","provider":"default","id":"DISCORD_BOT_TOKEN"}`. Starsze ciągi markerów `secretref-env:<ENV_VAR>` są odrzucane na ścieżkach poświadczeń SecretRef; uruchom `openclaw doctor --fix`, aby zmigrować prawidłowe markery.
+- Ochrona zasad OAuth: `auth.profiles.<id>.mode = "oauth"` nie może być łączone z wejściami SecretRef dla tego profilu. Uruchomienie/przeładowanie oraz rozwiązywanie profilu auth kończą się natychmiastowym błędem przy naruszeniu tej zasady.
+- Dla dostawców modeli zarządzanych przez SecretRef wygenerowane wpisy `agents/*/agent/models.json` zachowują markery niebędące sekretami (a nie rozwiązane wartości sekretów) dla powierzchni `apiKey`/nagłówków.
+- Trwałość markerów jest autorytatywna względem źródła: OpenClaw zapisuje markery z aktywnego snapshotu konfiguracji źródłowej (przed rozwiązaniem), a nie z rozwiązanych wartości sekretów w czasie działania.
 - Dla wyszukiwania w sieci:
-  - W trybie jawnego dostawcy (ustawione `tools.web.search.provider`) aktywny jest tylko klucz wybranego dostawcy.
-  - W trybie auto (nieustawione `tools.web.search.provider`) aktywny jest tylko pierwszy klucz dostawcy, który zostanie rozwiązany zgodnie z priorytetem.
-  - W trybie auto refy niewybranych dostawców są traktowane jako nieaktywne, dopóki nie zostaną wybrane.
-  - Starsze ścieżki dostawców `tools.web.search.*` nadal są rozwiązywane w okresie zgodności, ale kanoniczną powierzchnią SecretRef jest `plugins.entries.<plugin>.config.webSearch.*`.
+  - W trybie jawnego dostawcy (`tools.web.search.provider` ustawione) aktywny jest tylko klucz wybranego dostawcy.
+  - W trybie auto (`tools.web.search.provider` nieustawione) aktywny jest tylko pierwszy klucz dostawcy, który zostanie rozwiązany zgodnie z priorytetem.
+  - W trybie auto referencje niewybranych dostawców są traktowane jako nieaktywne do momentu wyboru.
+  - Starsze ścieżki dostawców `tools.web.search.*` są nadal rozwiązywane w okresie zgodności, ale kanoniczną powierzchnią SecretRef jest `plugins.entries.<plugin>.config.webSearch.*`.
 
 ## Nieobsługiwane poświadczenia
 

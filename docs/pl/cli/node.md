@@ -1,49 +1,49 @@
 ---
 read_when:
-    - Uruchamianie bezgłowego hosta Node.
-    - Parowanie node innego niż macOS dla `system.run`
+    - Uruchamianie bezgłowego hosta Node
+    - Parowanie węzła spoza macOS dla `system.run`
 summary: Dokumentacja CLI dla `openclaw node` (bezgłowy host Node)
 title: Node
 x-i18n:
-    generated_at: "2026-04-24T09:03:38Z"
+    generated_at: "2026-04-25T13:44:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9f2bd6d61ee87d36f7691207d03a91c914e6460549256e0cc6ea7bebfa713923
+    source_hash: d8c4b4697da3c0a4594dedd0033a114728ec599a7d33089a33e290e3cfafa5cd
     source_path: cli/node.md
     workflow: 15
 ---
 
 # `openclaw node`
 
-Uruchom **bezgłowy host Node**, który łączy się z Gateway WebSocket i udostępnia
+Uruchamia **bezgłowego hosta Node**, który łączy się z WebSocket Gateway i udostępnia
 `system.run` / `system.which` na tej maszynie.
 
-## Dlaczego warto używać hosta Node?
+## Dlaczego używać hosta Node?
 
-Użyj hosta Node, gdy chcesz, aby agenci **uruchamiali polecenia na innych maszynach** w twojej
-sieci bez instalowania pełnej aplikacji pomocniczej macOS.
+Użyj hosta Node, gdy chcesz, aby agenci **uruchamiali polecenia na innych maszynach** w Twojej
+sieci bez instalowania tam pełnej aplikacji towarzyszącej dla macOS.
 
-Typowe przypadki użycia:
+Typowe zastosowania:
 
-- Uruchamianie poleceń na zdalnych maszynach Linux/Windows (serwery buildów, maszyny labowe, NAS).
-- Zachowanie exec w trybie **sandboxed** na gateway, ale delegowanie zatwierdzonych uruchomień na inne hosty.
-- Udostępnienie lekkiego, bezgłowego celu wykonania dla automatyzacji lub węzłów CI.
+- Uruchamianie poleceń na zdalnych maszynach Linux/Windows (serwery buildów, maszyny laboratoryjne, NAS).
+- Zachowanie **sandboxingu** exec na Gateway, ale delegowanie zatwierdzonych uruchomień na inne hosty.
+- Zapewnienie lekkiego, bezgłowego celu wykonania dla automatyzacji lub węzłów CI.
 
-Wykonywanie jest nadal chronione przez **zatwierdzenia exec** i listy dozwolonych per agent na
-hoście Node, dzięki czemu dostęp do poleceń pozostaje ograniczony i jawny.
+Wykonanie jest nadal chronione przez **zatwierdzenia exec** i allowlisty per agent na
+hoście Node, dzięki czemu możesz utrzymać dostęp do poleceń w zakresie ograniczonym i jawnym.
 
 ## Proxy przeglądarki (zero-config)
 
-Hosty Node automatycznie deklarują proxy przeglądarki, jeśli `browser.enabled` nie jest
-wyłączone na node. Dzięki temu agent może używać automatyzacji przeglądarki na tym node
+Hosty Node automatycznie anonsują proxy przeglądarki, jeśli `browser.enabled` nie jest
+wyłączone na węźle. Pozwala to agentowi korzystać z automatyzacji przeglądarki na tym węźle
 bez dodatkowej konfiguracji.
 
-Domyślnie proxy udostępnia standardową powierzchnię profilu przeglądarki node. Jeśli
+Domyślnie proxy udostępnia zwykłą powierzchnię profili przeglądarki węzła. Jeśli
 ustawisz `nodeHost.browserProxy.allowProfiles`, proxy staje się restrykcyjne:
-celowanie w profile spoza listy dozwolonych jest odrzucane, a trasy tworzenia/usuwania
+kierowanie na profile spoza allowlisty jest odrzucane, a trasy tworzenia/usuwania
 trwałych profili są blokowane przez proxy.
 
-W razie potrzeby wyłącz je na node:
+W razie potrzeby wyłącz je na węźle:
 
 ```json5
 {
@@ -55,7 +55,7 @@ W razie potrzeby wyłącz je na node:
 }
 ```
 
-## Uruchamianie (pierwszy plan)
+## Uruchamianie (na pierwszym planie)
 
 ```bash
 openclaw node run --host <gateway-host> --port 18789
@@ -63,34 +63,34 @@ openclaw node run --host <gateway-host> --port 18789
 
 Opcje:
 
-- `--host <host>`: host Gateway WebSocket (domyślnie: `127.0.0.1`)
-- `--port <port>`: port Gateway WebSocket (domyślnie: `18789`)
-- `--tls`: używa TLS dla połączenia z gateway
+- `--host <host>`: host WebSocket Gateway (domyślnie: `127.0.0.1`)
+- `--port <port>`: port WebSocket Gateway (domyślnie: `18789`)
+- `--tls`: użyj TLS dla połączenia z Gateway
 - `--tls-fingerprint <sha256>`: oczekiwany fingerprint certyfikatu TLS (sha256)
-- `--node-id <id>`: nadpisuje identyfikator node (czyści token parowania)
-- `--display-name <name>`: nadpisuje nazwę wyświetlaną node
+- `--node-id <id>`: nadpisz identyfikator Node (czyści token parowania)
+- `--display-name <name>`: nadpisz nazwę wyświetlaną węzła
 
 ## Uwierzytelnianie Gateway dla hosta Node
 
-`openclaw node run` i `openclaw node install` rozwiązują uwierzytelnianie gateway z config/env (polecenia node nie mają flag `--token`/`--password`):
+`openclaw node run` i `openclaw node install` rozwiązują uwierzytelnianie Gateway z config/env (polecenia node nie mają flag `--token`/`--password`):
 
 - Najpierw sprawdzane są `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`.
 - Następnie fallback do lokalnej konfiguracji: `gateway.auth.token` / `gateway.auth.password`.
 - W trybie lokalnym host Node celowo nie dziedziczy `gateway.remote.token` / `gateway.remote.password`.
-- Jeśli `gateway.auth.token` / `gateway.auth.password` są jawnie skonfigurowane przez SecretRef i nie zostaną rozwiązane, rozwiązywanie uwierzytelniania node kończy się zamknięciem awaryjnym (bez maskującego zdalnego fallbacku).
-- W `gateway.mode=remote` pola klienta zdalnego (`gateway.remote.token` / `gateway.remote.password`) również kwalifikują się zgodnie z regułami pierwszeństwa trybu zdalnego.
-- Rozwiązywanie uwierzytelniania hosta Node uwzględnia tylko zmienne środowiskowe `OPENCLAW_GATEWAY_*`.
+- Jeśli `gateway.auth.token` / `gateway.auth.password` są jawnie skonfigurowane przez SecretRef i nierozwiązane, rozwiązywanie uwierzytelniania Node kończy się bezpieczną odmową (bez maskującego fallbacku zdalnego).
+- W `gateway.mode=remote` pola klienta zdalnego (`gateway.remote.token` / `gateway.remote.password`) również mogą być użyte zgodnie z zasadami pierwszeństwa dla trybu zdalnego.
+- Rozwiązywanie uwierzytelniania hosta Node honoruje tylko zmienne środowiskowe `OPENCLAW_GATEWAY_*`.
 
-Dla node łączącego się z nie-loopbackowym `ws://` Gateway w zaufanej prywatnej
-sieci ustaw `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1`. Bez tego start node kończy się
-zamknięciem awaryjnym i prośbą o użycie `wss://`, tunelu SSH albo Tailscale.
-Jest to zgoda przez zmienną środowiskową procesu, a nie klucz konfiguracji `openclaw.json`.
-`openclaw node install` zapisuje ją w nadzorowanej usłudze node, jeśli jest
-obecna w środowisku polecenia instalacji.
+Dla węzła łączącego się z Gateway `ws://` bez loopback na zaufanej prywatnej
+sieci ustaw `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1`. Bez tego uruchomienie węzła
+kończy się bezpieczną odmową i prosi o użycie `wss://`, tunelu SSH lub Tailscale.
+To opt-in w środowisku procesu, a nie klucz konfiguracji `openclaw.json`.
+`openclaw node install` utrwala go w nadzorowanej usłudze Node, jeśli jest
+obecny w środowisku polecenia instalacji.
 
 ## Usługa (w tle)
 
-Zainstaluj bezgłowy host Node jako usługę użytkownika.
+Zainstaluj bezgłowego hosta Node jako usługę użytkownika.
 
 ```bash
 openclaw node install --host <gateway-host> --port 18789
@@ -98,14 +98,14 @@ openclaw node install --host <gateway-host> --port 18789
 
 Opcje:
 
-- `--host <host>`: host Gateway WebSocket (domyślnie: `127.0.0.1`)
-- `--port <port>`: port Gateway WebSocket (domyślnie: `18789`)
-- `--tls`: używa TLS dla połączenia z gateway
+- `--host <host>`: host WebSocket Gateway (domyślnie: `127.0.0.1`)
+- `--port <port>`: port WebSocket Gateway (domyślnie: `18789`)
+- `--tls`: użyj TLS dla połączenia z Gateway
 - `--tls-fingerprint <sha256>`: oczekiwany fingerprint certyfikatu TLS (sha256)
-- `--node-id <id>`: nadpisuje identyfikator node (czyści token parowania)
-- `--display-name <name>`: nadpisuje nazwę wyświetlaną node
-- `--runtime <runtime>`: runtime usługi (`node` albo `bun`)
-- `--force`: reinstaluje/nadpisuje, jeśli już zainstalowano
+- `--node-id <id>`: nadpisz identyfikator Node (czyści token parowania)
+- `--display-name <name>`: nadpisz nazwę wyświetlaną węzła
+- `--runtime <runtime>`: runtime usługi (`node` lub `bun`)
+- `--force`: zainstaluj ponownie/nadpisz, jeśli już zainstalowano
 
 Zarządzanie usługą:
 
@@ -118,38 +118,57 @@ openclaw node uninstall
 
 Użyj `openclaw node run` dla hosta Node na pierwszym planie (bez usługi).
 
-Polecenia usługi akceptują `--json` dla czytelnego dla maszyn wyjścia.
+Polecenia usługi akceptują `--json` dla wyjścia czytelnego maszynowo.
 
 ## Parowanie
 
-Pierwsze połączenie tworzy oczekujące żądanie parowania urządzenia (`role: node`) na Gateway.
-Zatwierdź je przez:
+Pierwsze połączenie tworzy oczekującą prośbę o sparowanie urządzenia (`role: node`) na Gateway.
+Zatwierdź ją przez:
 
 ```bash
 openclaw devices list
 openclaw devices approve <requestId>
 ```
 
-Jeśli node ponowi próbę parowania ze zmienionymi danymi uwierzytelnienia (rola/zakresy/klucz publiczny),
-poprzednie oczekujące żądanie zostaje zastąpione i tworzony jest nowy `requestId`.
-Przed zatwierdzeniem uruchom ponownie `openclaw devices list`.
+W ściśle kontrolowanych sieciach Node operator Gateway może jawnie włączyć
+automatyczne zatwierdzanie pierwszego parowania Node z zaufanych CIDR:
 
-Host Node przechowuje swój identyfikator node, token, nazwę wyświetlaną i informacje o połączeniu z gateway w
+```json5
+{
+  gateway: {
+    nodes: {
+      pairing: {
+        autoApproveCidrs: ["192.168.1.0/24"],
+      },
+    },
+  },
+}
+```
+
+Jest to domyślnie wyłączone. Dotyczy tylko świeżego parowania `role: node` bez
+żądanych zakresów. Klienci operatora/przeglądarki, Control UI, WebChat oraz zmiany roli,
+zakresu, metadanych lub klucza publicznego nadal wymagają ręcznego zatwierdzenia.
+
+Jeśli węzeł ponawia próbę parowania ze zmienionymi danymi uwierzytelniania (rola/zakresy/klucz publiczny),
+poprzednia oczekująca prośba zostaje zastąpiona i tworzony jest nowy `requestId`.
+Przed zatwierdzeniem ponownie uruchom `openclaw devices list`.
+
+Host Node przechowuje identyfikator Node, token, nazwę wyświetlaną i informacje o połączeniu z Gateway w
 `~/.openclaw/node.json`.
 
 ## Zatwierdzenia exec
 
-`system.run` jest chronione przez lokalne zatwierdzenia exec:
+`system.run` jest kontrolowane przez lokalne zatwierdzenia exec:
 
 - `~/.openclaw/exec-approvals.json`
 - [Zatwierdzenia exec](/pl/tools/exec-approvals)
 - `openclaw approvals --node <id|name|ip>` (edycja z Gateway)
 
-Dla zatwierdzonego asynchronicznego exec na node OpenClaw przygotowuje kanoniczny `systemRunPlan`
-przed wyświetleniem monitu. Późniejsze przekazanie zatwierdzonego `system.run` używa ponownie tego zapisanego
-planu, więc edycje pól command/cwd/session po utworzeniu żądania zatwierdzenia są odrzucane zamiast zmieniać to, co node wykona.
+Dla zatwierdzonego asynchronicznego exec na Node OpenClaw przygotowuje kanoniczny `systemRunPlan`
+przed wyświetleniem monitu. Późniejsze zatwierdzone przekazanie `system.run` ponownie używa tego zapisanego
+planu, więc edycje pól command/cwd/session po utworzeniu prośby o zatwierdzenie są odrzucane zamiast zmieniać to, co wykonuje węzeł.
 
 ## Powiązane
 
 - [Dokumentacja CLI](/pl/cli)
-- [Node](/pl/nodes)
+- [Nodes](/pl/nodes)

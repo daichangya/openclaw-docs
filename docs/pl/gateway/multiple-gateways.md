@@ -1,61 +1,59 @@
 ---
 read_when:
-    - Uruchamianie więcej niż jednego Gateway na tej samej maszynie
-    - Potrzebujesz izolowanej konfiguracji/stanu/portów dla każdego Gateway
+    - Uruchamianie więcej niż jednego Gateway na tej samej maszynie.
+    - Potrzebujesz odizolowanej konfiguracji/stanu/portów dla każdego Gateway.
 summary: Uruchamianie wielu Gateway OpenClaw na jednym hoście (izolacja, porty i profile)
-title: Wiele Gateway
+title: Wiele Gatewayów
 x-i18n:
-    generated_at: "2026-04-24T09:10:51Z"
+    generated_at: "2026-04-25T13:48:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1700a0d29ceee3e2a242a8455a3c948895fb25750a2b1bce5c4bd0690a051881
+    source_hash: 6477a16dc55b694cb73ad6b5140e94529071bad8fc2100ecca88daaa31f9c3c0
     source_path: gateway/multiple-gateways.md
     workflow: 15
 ---
 
-# Wiele Gateway (ten sam host)
+W większości konfiguracji należy używać jednego Gateway, ponieważ pojedynczy Gateway może obsługiwać wiele połączeń komunikacyjnych i agentów. Jeśli potrzebujesz silniejszej izolacji lub nadmiarowości (np. rescue bota), uruchom osobne Gatewaye z odizolowanymi profilami/portami.
 
-W większości konfiguracji należy używać jednego Gateway, ponieważ pojedynczy Gateway może obsłużyć wiele połączeń komunikacyjnych i agentów. Jeśli potrzebujesz silniejszej izolacji lub nadmiarowości (np. bota ratunkowego), uruchom osobne Gateway z izolowanymi profilami/portami.
+## Najbardziej zalecana konfiguracja
 
-## Najlepsza zalecana konfiguracja
+Dla większości użytkowników najprostsza konfiguracja rescue bota to:
 
-Dla większości użytkowników najprostsza konfiguracja bota ratunkowego wygląda tak:
+- pozostawienie głównego bota na domyślnym profilu
+- uruchomienie rescue bota z `--profile rescue`
+- użycie całkowicie osobnego bota Telegram dla konta rescue
+- utrzymywanie rescue bota na innym porcie bazowym, takim jak `19789`
 
-- pozostaw głównego bota na profilu domyślnym
-- uruchom bota ratunkowego na `--profile rescue`
-- użyj całkowicie oddzielnego bota Telegram dla konta ratunkowego
-- utrzymuj bota ratunkowego na innym porcie bazowym, np. `19789`
-
-To utrzymuje bota ratunkowego w izolacji od głównego bota, dzięki czemu może debugować lub stosować
+Dzięki temu rescue bot jest odizolowany od głównego bota, więc może debugować lub stosować
 zmiany konfiguracji, jeśli główny bot nie działa. Zachowaj co najmniej 20 portów odstępu między
 portami bazowymi, aby pochodne porty browser/canvas/CDP nigdy się nie zderzyły.
 
-## Szybki start dla bota ratunkowego
+## Szybki start rescue bota
 
-Używaj tego jako domyślnej ścieżki, chyba że masz mocny powód, aby zrobić coś
+Używaj tego jako domyślnej ścieżki, chyba że masz silny powód, by zrobić coś
 innego:
 
 ```bash
-# Bot ratunkowy (oddzielny bot Telegram, oddzielny profil, port 19789)
+# Rescue bot (osobny bot Telegram, osobny profil, port 19789)
 openclaw --profile rescue onboard
 openclaw --profile rescue gateway install --port 19789
 ```
 
-Jeśli główny bot już działa, to zwykle wszystko, czego potrzebujesz.
+Jeśli Twój główny bot już działa, zazwyczaj to wszystko, czego potrzebujesz.
 
 Podczas `openclaw --profile rescue onboard`:
 
-- użyj oddzielnego tokenu bota Telegram
-- pozostaw profil `rescue`
+- użyj osobnego tokena bota Telegram
+- zachowaj profil `rescue`
 - użyj portu bazowego co najmniej 20 wyższego niż dla głównego bota
-- zaakceptuj domyślny obszar roboczy ratunkowy, chyba że już sam nim zarządzasz
+- zaakceptuj domyślny obszar roboczy rescue, chyba że już zarządzasz własnym
 
-Jeśli onboarding już zainstalował usługę ratunkową za ciebie, końcowe
+Jeśli onboarding już zainstalował usługę rescue, końcowe
 `gateway install` nie jest potrzebne.
 
 ## Dlaczego to działa
 
-Bot ratunkowy pozostaje niezależny, ponieważ ma własne:
+Rescue bot pozostaje niezależny, ponieważ ma własne:
 
 - profil/konfigurację
 - katalog stanu
@@ -63,19 +61,19 @@ Bot ratunkowy pozostaje niezależny, ponieważ ma własne:
 - port bazowy (plus porty pochodne)
 - token bota Telegram
 
-W większości konfiguracji używaj całkowicie oddzielnego bota Telegram dla profilu ratunkowego:
+W większości konfiguracji używaj całkowicie osobnego bota Telegram dla profilu rescue:
 
-- łatwo utrzymać go jako operator-only
-- oddzielny token i tożsamość bota
+- łatwo utrzymać go jako wyłącznie operatorski
+- osobny token i tożsamość bota
 - niezależność od instalacji kanału/aplikacji głównego bota
-- prosta ścieżka odzyskiwania oparta na wiadomościach prywatnych, gdy główny bot jest uszkodzony
+- prosta ścieżka odzyskiwania oparta na DM, gdy główny bot jest uszkodzony
 
 ## Co zmienia `--profile rescue onboard`
 
 `openclaw --profile rescue onboard` używa normalnego przepływu onboardingu, ale
-zapisuje wszystko do osobnego profilu.
+zapisuje wszystko w osobnym profilu.
 
-W praktyce oznacza to, że bot ratunkowy dostaje własne:
+W praktyce oznacza to, że rescue bot dostaje własne:
 
 - plik konfiguracji
 - katalog stanu
@@ -84,16 +82,16 @@ W praktyce oznacza to, że bot ratunkowy dostaje własne:
 
 Poza tym prompty są takie same jak przy zwykłym onboardingu.
 
-## Ogólna konfiguracja wielo-Gateway
+## Ogólna konfiguracja wielu Gatewayów
 
-Powyższy układ bota ratunkowego jest najłatwiejszą opcją domyślną, ale ten sam wzorzec
-izolacji działa dla dowolnej pary lub grupy Gateway na jednym hoście.
+Powyższy układ rescue bota to najłatwiejsza opcja domyślna, ale ten sam wzorzec izolacji
+działa dla dowolnej pary lub grupy Gatewayów na jednym hoście.
 
-W bardziej ogólnej konfiguracji nadaj każdemu dodatkowemu Gateway własny nazwany profil i
+W bardziej ogólnej konfiguracji nadaj każdemu dodatkowemu Gatewayowi własny nazwany profil i
 własny port bazowy:
 
 ```bash
-# main (profil domyślny)
+# główny (profil domyślny)
 openclaw setup
 openclaw gateway --port 18789
 
@@ -102,7 +100,7 @@ openclaw --profile ops setup
 openclaw --profile ops gateway --port 19789
 ```
 
-Jeśli chcesz, aby oba Gateway używały nazwanych profili, to również działa:
+Jeśli chcesz, aby oba Gatewaye używały nazwanych profili, to też działa:
 
 ```bash
 openclaw --profile main setup
@@ -112,45 +110,45 @@ openclaw --profile ops setup
 openclaw --profile ops gateway --port 19789
 ```
 
-Usługi działają według tego samego wzorca:
+Usługi stosują ten sam wzorzec:
 
 ```bash
 openclaw gateway install
 openclaw --profile ops gateway install --port 19789
 ```
 
-Użyj szybkiego startu bota ratunkowego, gdy chcesz mieć zapasowy tor operatora. Użyj
-ogólnego wzorca profili, gdy chcesz mieć wiele długotrwałych Gateway dla
+Użyj szybkiego startu rescue bota, gdy chcesz mieć zapasową ścieżkę operatorską. Użyj
+ogólnego wzorca profili, gdy chcesz mieć wiele długotrwale działających Gatewayów dla
 różnych kanałów, tenantów, obszarów roboczych lub ról operacyjnych.
 
 ## Lista kontrolna izolacji
 
-Utrzymuj te elementy unikalne dla każdej instancji Gateway:
+Zachowaj unikalność tych elementów dla każdej instancji Gateway:
 
-- `OPENCLAW_CONFIG_PATH` — plik konfiguracji per instancja
-- `OPENCLAW_STATE_DIR` — sesje, poświadczenia, cache per instancja
-- `agents.defaults.workspace` — katalog główny obszaru roboczego per instancja
-- `gateway.port` (lub `--port`) — unikalny per instancja
+- `OPENCLAW_CONFIG_PATH` — plik konfiguracji dla instancji
+- `OPENCLAW_STATE_DIR` — sesje, dane uwierzytelniające, cache dla instancji
+- `agents.defaults.workspace` — katalog główny obszaru roboczego dla instancji
+- `gateway.port` (lub `--port`) — unikalny dla każdej instancji
 - pochodne porty browser/canvas/CDP
 
-Jeśli te elementy są współdzielone, wystąpią wyścigi konfiguracji i konflikty portów.
+Jeśli będą współdzielone, wystąpią konflikty konfiguracji i portów.
 
 ## Mapowanie portów (pochodne)
 
 Port bazowy = `gateway.port` (lub `OPENCLAW_GATEWAY_PORT` / `--port`).
 
 - port usługi sterowania przeglądarką = baza + 2 (tylko loopback)
-- host Canvas jest serwowany przez serwer HTTP Gateway (ten sam port co `gateway.port`)
-- porty CDP profili Browser są automatycznie przydzielane z zakresu `browser.controlPort + 9 .. + 108`
+- host canvas jest serwowany przez serwer HTTP Gateway (ten sam port co `gateway.port`)
+- porty Browser profile CDP są automatycznie przydzielane z zakresu `browser.controlPort + 9 .. + 108`
 
-Jeśli nadpisujesz którykolwiek z nich w konfiguracji lub env, musisz utrzymać ich unikalność per instancja.
+Jeśli nadpisujesz którykolwiek z nich w konfiguracji lub env, muszą pozostać unikalne dla każdej instancji.
 
-## Uwagi dotyczące Browser/CDP (częsta pułapka)
+## Uwagi o Browser/CDP (częsta pułapka)
 
 - **Nie** przypinaj `browser.cdpUrl` do tych samych wartości w wielu instancjach.
 - Każda instancja potrzebuje własnego portu sterowania przeglądarką i własnego zakresu CDP (pochodnego od portu gateway).
-- Jeśli potrzebujesz jawnych portów CDP, ustaw `browser.profiles.<name>.cdpPort` per instancja.
-- Zdalny Chrome: użyj `browser.profiles.<name>.cdpUrl` (per profil, per instancja).
+- Jeśli potrzebujesz jawnych portów CDP, ustaw `browser.profiles.<name>.cdpPort` dla każdej instancji.
+- Zdalny Chrome: użyj `browser.profiles.<name>.cdpUrl` (dla każdego profilu, dla każdej instancji).
 
 ## Przykład ręcznego env
 
@@ -164,7 +162,7 @@ OPENCLAW_STATE_DIR=~/.openclaw-rescue \
 openclaw gateway --port 19789
 ```
 
-## Szybkie sprawdzenia
+## Szybkie kontrole
 
 ```bash
 openclaw gateway status --deep
@@ -177,11 +175,11 @@ openclaw --profile rescue browser status
 
 Interpretacja:
 
-- `gateway status --deep` pomaga wykryć nieaktualne usługi launchd/systemd/schtasks z wcześniejszych instalacji.
-- Tekst ostrzeżenia `gateway probe`, taki jak `multiple reachable gateways detected`, jest oczekiwany tylko wtedy, gdy celowo uruchamiasz więcej niż jedno izolowane gateway.
+- `gateway status --deep` pomaga wykryć przestarzałe usługi launchd/systemd/schtasks ze starszych instalacji.
+- Tekst ostrzeżenia `gateway probe`, taki jak `multiple reachable gateways detected`, jest oczekiwany tylko wtedy, gdy celowo uruchamiasz więcej niż jeden odizolowany gateway.
 
 ## Powiązane
 
-- [Instrukcja operacyjna Gateway](/pl/gateway)
+- [Runbook Gateway](/pl/gateway)
 - [Blokada Gateway](/pl/gateway/gateway-lock)
 - [Konfiguracja](/pl/gateway/configuration)

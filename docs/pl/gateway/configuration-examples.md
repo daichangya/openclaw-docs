@@ -1,20 +1,20 @@
 ---
 read_when:
-    - Nauka konfigurowania OpenClaw
+    - Nauka konfiguracji OpenClaw
     - Szukasz przykładów konfiguracji
     - Konfigurowanie OpenClaw po raz pierwszy
-summary: Przykłady konfiguracji zgodne ze schematem dla typowych konfiguracji OpenClaw
+summary: Przykłady konfiguracji OpenClaw zgodne ze schematem dla typowych konfiguracji
 title: Przykłady konfiguracji
 x-i18n:
-    generated_at: "2026-04-24T09:08:57Z"
+    generated_at: "2026-04-25T13:46:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
+    source_hash: 2f31f70459d6232d2aefe668440312bb1800f18de0ef3c2783befa1de05f25f6
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-Poniższe przykłady są zgodne z bieżącym schematem konfiguracji. Pełną dokumentację oraz uwagi dla poszczególnych pól znajdziesz w [Configuration](/pl/gateway/configuration).
+Poniższe przykłady są zgodne z bieżącym schematem konfiguracji. Pełną dokumentację referencyjną i uwagi dla każdego pola znajdziesz w [Configuration](/pl/gateway/configuration).
 
 ## Szybki start
 
@@ -27,7 +27,7 @@ Poniższe przykłady są zgodne z bieżącym schematem konfiguracji. Pełną dok
 }
 ```
 
-Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z tego numeru.
+Zapisz do `~/.openclaw/openclaw.json`, a będziesz mieć możliwość wysyłania botowi wiadomości prywatnych z tego numeru.
 
 ### Zalecana konfiguracja startowa
 
@@ -35,7 +35,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
 {
   identity: {
     name: "Clawd",
-    theme: "pomocny asystent",
+    theme: "helpful assistant",
     emoji: "🦞",
   },
   agent: {
@@ -69,7 +69,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
     },
   },
 
-  // Metadane profili uwierzytelniania (sekrety znajdują się w auth-profiles.json)
+  // Metadane profilu uwierzytelniania (sekrety znajdują się w auth-profiles.json)
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -87,7 +87,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
   // Tożsamość
   identity: {
     name: "Samantha",
-    theme: "pomocny leniwiec",
+    theme: "helpful sloth",
     emoji: "🦥",
   },
 
@@ -139,7 +139,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // Opcjonalny fallback CLI (plik binarny Whisper):
+          // Opcjonalny fallback CLI (binarka Whisper):
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -173,7 +173,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
       rotateBytes: "10mb",
       resetArchiveRetention: "30d", // czas trwania lub false
       maxDiskBytes: "500mb", // opcjonalne
-      highWaterBytes: "400mb", // opcjonalne (domyślnie 80% z maxDiskBytes)
+      highWaterBytes: "400mb", // opcjonalne (domyślnie 80% maxDiskBytes)
     },
     typingIntervalSeconds: 5,
     sendPolicy: {
@@ -312,8 +312,8 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
         default: true,
         // dziedziczy defaults.skills -> github, weather
         thinkingDefault: "high", // nadpisanie myślenia per agent
-        reasoningDefault: "on", // widoczność rozumowania per agent
-        fastModeDefault: false, // tryb fast per agent
+        reasoningDefault: "on", // widoczność reasoning per agent
+        fastModeDefault: false, // tryb szybki per agent
       },
       {
         id: "quick",
@@ -346,7 +346,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
     },
   },
 
-  // Niestandardowi providerzy modeli
+  // Własni dostawcy modeli
   models: {
     mode: "merge",
     providers: {
@@ -384,7 +384,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
     },
   },
 
-  // Hooki
+  // Webhooki
   hooks: {
     enabled: true,
     path: "/hooks",
@@ -399,7 +399,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
         wakeMode: "now",
         name: "Gmail",
         sessionKey: "hook:gmail:{{messages[0].id}}",
-        messageTemplate: "Od: {{messages[0].from}}\nTemat: {{messages[0].subject}}",
+        messageTemplate: "From: {{messages[0].from}}\nSubject: {{messages[0].subject}}",
         textTemplate: "{{messages[0].snippet}}",
         deliver: true,
         channel: "last",
@@ -466,7 +466,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
 
 ## Typowe wzorce
 
-### Współdzielona baza skill z jednym nadpisaniem
+### Wspólna baza Skills z jednym nadpisaniem
 
 ```json5
 {
@@ -483,7 +483,7 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
 }
 ```
 
-- `agents.defaults.skills` to współdzielona baza.
+- `agents.defaults.skills` to wspólna baza.
 - `agents.list[].skills` zastępuje tę bazę dla jednego agenta.
 - Użyj `skills: []`, gdy agent nie powinien widzieć żadnych Skills.
 
@@ -508,23 +508,45 @@ Zapisz do `~/.openclaw/openclaw.json`, a będziesz mógł wysyłać DM do bota z
 }
 ```
 
-### Bezpieczny tryb DM (współdzielona skrzynka odbiorcza / DM wielu użytkowników)
+### Automatyczne zatwierdzanie zaufanej sieci Node
 
-Jeśli więcej niż jedna osoba może wysyłać DM do Twojego bota (wiele wpisów w `allowFrom`, zatwierdzenia parowania dla wielu osób lub `dmPolicy: "open"`), włącz **bezpieczny tryb DM**, aby wiadomości DM od różnych nadawców domyślnie nie współdzieliły jednego kontekstu:
+Pozostaw parowanie urządzeń jako ręczne, chyba że kontrolujesz ścieżkę sieciową. Dla dedykowanej
+podsiec lab lub tailnet możesz opcjonalnie włączyć automatyczne zatwierdzanie pierwszego parowania
+urządzeń Node przy użyciu dokładnych CIDR lub adresów IP:
 
 ```json5
 {
-  // Bezpieczny tryb DM (zalecany dla agentów DM wielu użytkowników lub wrażliwych)
+  gateway: {
+    nodes: {
+      pairing: {
+        autoApproveCidrs: ["192.168.1.0/24", "fd00:1234:5678::/64"],
+      },
+    },
+  },
+}
+```
+
+Ta funkcja pozostaje wyłączona, gdy nie jest ustawiona. Dotyczy tylko nowego parowania `role: node` bez
+żądanych zakresów. Klienci operator/przeglądarka oraz rozszerzenia roli, zakresu, metadanych lub
+klucza publicznego nadal wymagają ręcznego zatwierdzenia.
+
+### Bezpieczny tryb wiadomości prywatnych (wspólna skrzynka odbiorcza / wiadomości prywatne wielu użytkowników)
+
+Jeśli więcej niż jedna osoba może wysyłać botowi wiadomości prywatne (wiele wpisów w `allowFrom`, zatwierdzenia parowania dla wielu osób albo `dmPolicy: "open"`), włącz **bezpieczny tryb wiadomości prywatnych**, aby wiadomości prywatne od różnych nadawców domyślnie nie współdzieliły jednego kontekstu:
+
+```json5
+{
+  // Bezpieczny tryb wiadomości prywatnych (zalecany dla agentów wiadomości prywatnych wielu użytkowników lub wrażliwych)
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // Przykład: skrzynka odbiorcza WhatsApp dla wielu użytkowników
+    // Przykład: wieloużytkownikowa skrzynka odbiorcza WhatsApp
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // Przykład: skrzynka odbiorcza Discord dla wielu użytkowników
+    // Przykład: wieloużytkownikowa skrzynka odbiorcza Discord
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -534,8 +556,8 @@ Jeśli więcej niż jedna osoba może wysyłać DM do Twojego bota (wiele wpisó
 }
 ```
 
-Dla Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC autoryzacja nadawcy jest domyślnie oparta najpierw na identyfikatorze.
-Włączaj bezpośrednie dopasowanie mutowalnych nazw/emaili/nicków przez `dangerouslyAllowNameMatching: true` danego kanału tylko wtedy, gdy jawnie akceptujesz to ryzyko.
+W przypadku Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC autoryzacja nadawcy jest domyślnie oparta najpierw na identyfikatorze.
+Włączaj bezpośrednie dopasowanie zmiennych nazw/emaili/nicków przy użyciu `dangerouslyAllowNameMatching: true` dla danego kanału tylko wtedy, gdy jawnie akceptujesz to ryzyko.
 
 ### Klucz API Anthropic + fallback MiniMax
 
@@ -571,13 +593,13 @@ Włączaj bezpośrednie dopasowanie mutowalnych nazw/emaili/nicków przez `dange
 }
 ```
 
-### Bot do pracy (ograniczony dostęp)
+### Bot roboczy (ograniczony dostęp)
 
 ```json5
 {
   identity: {
     name: "WorkBot",
-    theme: "profesjonalny asystent",
+    theme: "professional assistant",
   },
   agent: {
     workspace: "~/work-openclaw",
@@ -630,12 +652,12 @@ Włączaj bezpośrednie dopasowanie mutowalnych nazw/emaili/nicków przez `dange
 
 ## Wskazówki
 
-- Jeśli ustawisz `dmPolicy: "open"`, pasująca lista `allowFrom` musi zawierać `"*"`.
-- Identyfikatory providerów różnią się (numery telefonów, identyfikatory użytkowników, identyfikatory kanałów). Użyj dokumentacji providera, aby potwierdzić format.
+- Jeśli ustawisz `dmPolicy: "open"`, odpowiednia lista `allowFrom` musi zawierać `"*"`.
+- Identyfikatory dostawców różnią się między sobą (numery telefonów, identyfikatory użytkowników, identyfikatory kanałów). Sprawdź dokumentację dostawcy, aby potwierdzić format.
 - Opcjonalne sekcje do dodania później: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
 - Zobacz [Providers](/pl/providers) i [Troubleshooting](/pl/gateway/troubleshooting), aby uzyskać bardziej szczegółowe uwagi dotyczące konfiguracji.
 
 ## Powiązane
 
-- [Configuration reference](/pl/gateway/configuration-reference)
-- [Configuration](/pl/gateway/configuration)
+- [Dokumentacja konfiguracji](/pl/gateway/configuration-reference)
+- [Konfiguracja](/pl/gateway/configuration)

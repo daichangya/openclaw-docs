@@ -1,49 +1,48 @@
 ---
 read_when:
-    - Łączysz zachowanie cyklu życia silnika kontekstu z harnessem Codex
-    - Potrzebujesz, aby lossless-claw lub inny Plugin silnika kontekstu działał z osadzonymi sesjami harness `codex/*`
+    - Podłączasz zachowanie cyklu życia silnika kontekstu do wiązki Codex
+    - Potrzebujesz, aby lossless-claw lub inny Plugin silnika kontekstu działał z sesjami osadzonej wiązki codex/*
     - Porównujesz zachowanie kontekstu osadzonego PI i app-server Codex
-summary: Specyfikacja sprawiająca, że dołączony harness app-server Codex uwzględnia Pluginy silnika kontekstu OpenClaw
-title: Port silnika kontekstu harnessu Codex
+summary: Specyfikacja, jak sprawić, by dołączona wiązka app-server Codex respektowała Pluginy silnika kontekstu OpenClaw
+title: Port silnika kontekstu wiązki Codex
 x-i18n:
-    generated_at: "2026-04-24T09:20:03Z"
+    generated_at: "2026-04-25T13:51:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9d6b106915f2888337cb08c831c1722770ad8ec6612c575efe88fe2fc263dec5
+    source_hash: 61c29a6cd8955a41510b8da1575b89ed003565d564b25b37b3b0c7f65df6b663
     source_path: plan/codex-context-engine-harness.md
     workflow: 15
 ---
 
-# Port silnika kontekstu harnessu Codex
-
 ## Status
 
-Robocza specyfikacja implementacji.
+Wstępna specyfikacja implementacji.
 
 ## Cel
 
-Sprawić, aby dołączony harness app-server Codex respektował ten sam kontrakt cyklu życia
-silnika kontekstu OpenClaw, który respektują już osadzone tury PI.
+Sprawić, aby dołączona wiązka app-server Codex respektowała ten sam kontrakt
+cyklu życia silnika kontekstu OpenClaw, który respektują już osadzone tury PI.
 
 Sesja używająca `agents.defaults.embeddedHarness.runtime: "codex"` albo modelu
-`codex/*` powinna nadal pozwalać wybranemu Pluginowi silnika kontekstu, takiemu jak
-`lossless-claw`, kontrolować składanie kontekstu, ingest po turze, utrzymanie oraz
-politykę Compaction na poziomie OpenClaw w takim zakresie, na jaki pozwala granica app-server Codex.
+`codex/*` powinna nadal pozwalać wybranemu Plugin silnika kontekstu, takiemu jak
+`lossless-claw`, kontrolować składanie kontekstu, przetwarzanie po turze,
+utrzymanie i zasady Compaction na poziomie OpenClaw w takim zakresie, na jaki
+pozwala granica app-server Codex.
 
-## Cele nieobjęte zakresem
+## Rzeczy poza zakresem
 
-- Nie implementować od nowa wewnętrznych mechanizmów app-server Codex.
-- Nie sprawiać, by natywna Compaction wątków Codex tworzyła podsumowanie lossless-claw.
-- Nie wymagać od modeli innych niż Codex używania harnessu Codex.
-- Nie zmieniać zachowania sesji ACP/acpx. Ta specyfikacja dotyczy wyłącznie
-  nie-ACP ścieżki osadzonego harnessu agenta.
-- Nie sprawiać, by Pluginy firm trzecich rejestrowały fabryki rozszerzeń app-server Codex;
-  istniejąca granica zaufania dołączonych Pluginów pozostaje bez zmian.
+- Nie implementować ponownie wewnętrznych elementów app-server Codex.
+- Nie sprawiać, aby natywny Compaction wątku Codex tworzył podsumowanie lossless-claw.
+- Nie wymagać, aby modele inne niż Codex używały wiązki Codex.
+- Nie zmieniać zachowania sesji ACP/acpx. Ta specyfikacja dotyczy tylko
+  ścieżki wiązki osadzonego agenta bez ACP.
+- Nie wymagać, aby zewnętrzne Pluginy rejestrowały fabryki rozszerzeń app-server Codex;
+  istniejąca granica zaufania dołączonych Plugin pozostaje bez zmian.
 
-## Bieżąca architektura
+## Obecna architektura
 
-Osadzona pętla uruchomieniowa rozwiązuje skonfigurowany silnik kontekstu raz na przebieg przed
-wybraniem konkretnego niskopoziomowego harnessu:
+Pętla uruchamiania osadzonego agenta rozwiązuje skonfigurowany silnik kontekstu raz na uruchomienie przed
+wyborem konkretnej wiązki niskiego poziomu:
 
 - `src/agents/pi-embedded-runner/run.ts`
   - inicjalizuje Pluginy silnika kontekstu
@@ -51,48 +50,48 @@ wybraniem konkretnego niskopoziomowego harnessu:
   - przekazuje `contextEngine` i `contextTokenBudget` do
     `runEmbeddedAttemptWithBackend(...)`
 
-`runEmbeddedAttemptWithBackend(...)` deleguje do wybranego harnessu agenta:
+`runEmbeddedAttemptWithBackend(...)` deleguje do wybranej wiązki agenta:
 
 - `src/agents/pi-embedded-runner/run/backend.ts`
 - `src/agents/harness/selection.ts`
 
-Harness app-server Codex jest rejestrowany przez dołączony Plugin Codex:
+Wiązka app-server Codex jest rejestrowana przez dołączony Plugin Codex:
 
 - `extensions/codex/index.ts`
 - `extensions/codex/harness.ts`
 
-Implementacja harnessu Codex otrzymuje te same `EmbeddedRunAttemptParams`, co próby oparte na PI:
+Implementacja wiązki Codex otrzymuje te same `EmbeddedRunAttemptParams` co próby oparte na PI:
 
 - `extensions/codex/src/app-server/run-attempt.ts`
 
 To oznacza, że wymagany punkt zaczepienia znajduje się w kodzie kontrolowanym przez OpenClaw. Zewnętrzną
-granicą jest sam protokół app-server Codex: OpenClaw może kontrolować, co wysyła do
-`thread/start`, `thread/resume` i `turn/start`, oraz może obserwować powiadomienia, ale
-nie może zmienić wewnętrznego magazynu wątków ani natywnego kompaktora Codex.
+granicą jest sam protokół app-server Codex: OpenClaw może kontrolować to, co
+wysyła do `thread/start`, `thread/resume` i `turn/start`, oraz może obserwować
+powiadomienia, ale nie może zmieniać wewnętrznego magazynu wątków ani natywnego kompaktora Codex.
 
-## Bieżąca luka
+## Obecna luka
 
 Osadzone próby PI wywołują cykl życia silnika kontekstu bezpośrednio:
 
 - bootstrap/utrzymanie przed próbą
 - assemble przed wywołaniem modelu
-- afterTurn lub ingest po próbie
+- afterTurn albo ingest po próbie
 - utrzymanie po pomyślnej turze
 - Compaction silnika kontekstu dla silników, które zarządzają Compaction
 
-Istotny kod PI:
+Odpowiedni kod PI:
 
 - `src/agents/pi-embedded-runner/run/attempt.ts`
 - `src/agents/pi-embedded-runner/run/attempt.context-engine-helpers.ts`
 - `src/agents/pi-embedded-runner/context-engine-maintenance.ts`
 
-Próby app-server Codex obecnie uruchamiają ogólne haki harnessu agenta i odzwierciedlają
+Próby app-server Codex obecnie uruchamiają ogólne haki wiązki agenta i odzwierciedlają
 transkrypt, ale nie wywołują `params.contextEngine.bootstrap`,
 `params.contextEngine.assemble`, `params.contextEngine.afterTurn`,
 `params.contextEngine.ingestBatch`, `params.contextEngine.ingest` ani
 `params.contextEngine.maintain`.
 
-Istotny kod Codex:
+Odpowiedni kod Codex:
 
 - `extensions/codex/src/app-server/run-attempt.ts`
 - `extensions/codex/src/app-server/thread-lifecycle.ts`
@@ -101,83 +100,84 @@ Istotny kod Codex:
 
 ## Pożądane zachowanie
 
-Dla tur harnessu Codex OpenClaw powinien zachować następujący cykl życia:
+Dla tur wiązki Codex OpenClaw powinien zachować ten cykl życia:
 
 1. Odczytać odzwierciedlony transkrypt sesji OpenClaw.
-2. Zbootstrapować aktywny silnik kontekstu, gdy istnieje poprzedni plik sesji.
-3. Uruchomić utrzymanie bootstrap, gdy jest dostępne.
+2. Zbootstrapować aktywny silnik kontekstu, gdy istnieje plik poprzedniej sesji.
+3. Uruchomić utrzymanie bootstrap, jeśli jest dostępne.
 4. Złożyć kontekst przy użyciu aktywnego silnika kontekstu.
-5. Przekształcić złożony kontekst do wejść zgodnych z Codex.
-6. Uruchomić lub wznowić wątek Codex z instrukcjami deweloperskimi, które zawierają
-   wszelkie `systemPromptAddition` silnika kontekstu.
-7. Uruchomić turę Codex ze złożonym promptem skierowanym do użytkownika.
+5. Przekształcić złożony kontekst w dane wejściowe zgodne z Codex.
+6. Uruchomić albo wznowić wątek Codex z instrukcjami deweloperskimi zawierającymi
+   dowolne `systemPromptAddition` silnika kontekstu.
+7. Rozpocząć turę Codex ze złożonym promptem widocznym dla użytkownika.
 8. Odzwierciedlić wynik Codex z powrotem do transkryptu OpenClaw.
 9. Wywołać `afterTurn`, jeśli jest zaimplementowane, w przeciwnym razie `ingestBatch`/`ingest`, używając
-   odzwierciedlonej migawki transkryptu.
+   snapshotu odzwierciedlonego transkryptu.
 10. Uruchomić utrzymanie tury po pomyślnych, nieprzerwanych turach.
-11. Zachować natywne sygnały Compaction Codex oraz haki Compaction OpenClaw.
+11. Zachować natywne sygnały Compaction Codex i haki Compaction OpenClaw.
 
 ## Ograniczenia projektowe
 
-### App-server Codex pozostaje kanoniczny dla natywnego stanu wątku
+### App-server Codex pozostaje źródłem kanonicznym dla natywnego stanu wątku
 
-Codex zarządza swoim natywnym wątkiem i wszelką wewnętrzną rozszerzoną historią. OpenClaw nie
-powinien próbować mutować wewnętrznej historii app-server poza wspieranymi
+Codex zarządza swoim natywnym wątkiem i wszelką wewnętrzną rozszerzoną historią. OpenClaw
+nie powinien próbować mutować wewnętrznej historii app-server poza obsługiwanymi
 wywołaniami protokołu.
 
-Lustrzany transkrypt OpenClaw pozostaje źródłem dla funkcji OpenClaw:
+Odzwierciedlony transkrypt OpenClaw pozostaje źródłem dla funkcji OpenClaw:
 
 - historia czatu
 - wyszukiwanie
-- ewidencja `/new` i `/reset`
-- przyszłe przełączanie modelu lub harnessu
-- stan Pluginu silnika kontekstu
+- księgowość `/new` i `/reset`
+- przyszłe przełączanie modelu albo wiązki
+- stan Plugin silnika kontekstu
 
-### Składanie silnika kontekstu musi zostać rzutowane na wejścia Codex
+### Składanie silnika kontekstu musi być rzutowane na dane wejściowe Codex
 
-Interfejs silnika kontekstu zwraca `AgentMessage[]` OpenClaw, a nie łatkę wątku Codex. App-server Codex `turn/start` akceptuje bieżące wejście użytkownika, natomiast
+Interfejs silnika kontekstu zwraca `AgentMessage[]` OpenClaw, a nie łatkę wątku Codex.
+`turn/start` app-server Codex akceptuje bieżące wejście użytkownika, podczas gdy
 `thread/start` i `thread/resume` akceptują instrukcje deweloperskie.
 
 Dlatego implementacja potrzebuje warstwy projekcji. Bezpieczna pierwsza wersja
 powinna unikać udawania, że może zastąpić wewnętrzną historię Codex. Powinna
-wstrzykiwać złożony kontekst jako deterministyczny materiał promptu/instrukcji deweloperskich wokół
-bieżącej tury.
+wstrzykiwać złożony kontekst jako deterministyczny materiał promptu/instrukcji deweloperskich
+wokół bieżącej tury.
 
 ### Stabilność prompt-cache ma znaczenie
 
 Dla silników takich jak lossless-claw złożony kontekst powinien być deterministyczny
-dla niezmienionych wejść. Nie dodawaj znaczników czasu, losowych identyfikatorów ani
-niedeterministycznego porządku do wygenerowanego tekstu kontekstu.
+przy niezmienionych danych wejściowych. Nie dodawaj znaczników czasu, losowych ID ani
+niedeterministycznego porządku do generowanego tekstu kontekstu.
 
-### Semantyka fallbacku PI nie zmienia się
+### Semantyka fallback PI nie zmienia się
 
-Wybór harnessu pozostaje bez zmian:
+Wybór wiązki pozostaje bez zmian:
 
 - `runtime: "pi"` wymusza PI
-- `runtime: "codex"` wybiera zarejestrowany harness Codex
-- `runtime: "auto"` pozwala harnessom Pluginów przejmować obsługiwanych dostawców
-- `fallback: "none"` wyłącza fallback PI, gdy żaden harness Pluginu nie pasuje
+- `runtime: "codex"` wybiera zarejestrowaną wiązkę Codex
+- `runtime: "auto"` pozwala wiązkom Plugin przejmować obsługę wspieranych dostawców
+- `fallback: "none"` wyłącza fallback PI, gdy żadna wiązka Plugin nie pasuje
 
-Ta praca zmienia to, co dzieje się po wybraniu harnessu Codex.
+Ta praca zmienia to, co dzieje się po wybraniu wiązki Codex.
 
 ## Plan implementacji
 
-### 1. Wyeksportować lub przenieść współużywalne pomocniki prób silnika kontekstu
+### 1. Wyeksportować albo przenieść wielokrotnego użytku pomocników prób silnika kontekstu
 
-Obecnie współużywalne pomocniki cyklu życia znajdują się pod runnerem PI:
+Dziś pomocniki cyklu życia wielokrotnego użytku znajdują się pod runnerem PI:
 
 - `src/agents/pi-embedded-runner/run/attempt.context-engine-helpers.ts`
 - `src/agents/pi-embedded-runner/run/attempt.prompt-helpers.ts`
 - `src/agents/pi-embedded-runner/context-engine-maintenance.ts`
 
-Codex nie powinien importować ze ścieżki implementacyjnej, której nazwa sugeruje PI, jeśli
-możemy tego uniknąć.
+Codex nie powinien importować ze ścieżki implementacyjnej, której nazwa sugeruje PI,
+jeśli da się tego uniknąć.
 
-Utwórz moduł neutralny względem harnessu, na przykład:
+Utwórz moduł neutralny względem wiązki, na przykład:
 
 - `src/agents/harness/context-engine-lifecycle.ts`
 
-Przenieś lub reeksportuj:
+Przenieś albo wyeksportuj ponownie:
 
 - `runAttemptContextEngineBootstrap`
 - `assembleAttemptContextEngine`
@@ -186,8 +186,7 @@ Przenieś lub reeksportuj:
 - `buildAfterTurnRuntimeContextFromUsage`
 - mały wrapper wokół `runContextEngineMaintenance`
 
-Zachowaj działanie importów PI albo przez reeksport ze starych plików, albo przez aktualizację
-miejsc wywołania PI w tym samym PR.
+Zachowaj działanie importów PI przez ponowny eksport ze starych plików albo przez aktualizację miejsc wywołania PI w tym samym PR.
 
 Neutralne nazwy pomocników nie powinny wspominać o PI.
 
@@ -199,19 +198,19 @@ Sugerowane nazwy:
 - `buildHarnessContextEngineRuntimeContext`
 - `runHarnessContextEngineMaintenance`
 
-### 2. Dodać pomocnik projekcji kontekstu Codex
+### 2. Dodać pomocnika projekcji kontekstu Codex
 
 Dodaj nowy moduł:
 
 - `extensions/codex/src/app-server/context-engine-projection.ts`
 
-Zakres odpowiedzialności:
+Odpowiedzialności:
 
-- Przyjąć złożone `AgentMessage[]`, oryginalną odzwierciedloną historię oraz bieżący
+- Przyjmować złożone `AgentMessage[]`, oryginalną odzwierciedloną historię i bieżący
   prompt.
-- Ustalić, który kontekst należy do instrukcji deweloperskich, a który do bieżącego
+- Określać, który kontekst należy do instrukcji deweloperskich, a który do bieżącego
   wejścia użytkownika.
-- Zachować bieżący prompt użytkownika jako końcowe żądanie wykonywalne.
+- Zachować bieżący prompt użytkownika jako końcowe, wykonywalne żądanie.
 - Renderować wcześniejsze wiadomości w stabilnym, jawnym formacie.
 - Unikać zmiennych metadanych.
 
@@ -237,9 +236,9 @@ Zalecana pierwsza projekcja:
 
 - Umieść `systemPromptAddition` w instrukcjach deweloperskich.
 - Umieść złożony kontekst transkryptu przed bieżącym promptem w `promptText`.
-- Oznacz go wyraźnie jako kontekst złożony przez OpenClaw.
+- Oznacz go wyraźnie jako złożony kontekst OpenClaw.
 - Zachowaj bieżący prompt na końcu.
-- Wyklucz zduplikowany bieżący prompt użytkownika, jeśli już występuje na końcu.
+- Wyklucz zduplikowany bieżący prompt użytkownika, jeśli już pojawia się na końcu.
 
 Przykładowy kształt promptu:
 
@@ -258,24 +257,23 @@ Current user request:
 ...
 ```
 
-To jest mniej eleganckie niż natywna chirurgia historii Codex, ale można to zaimplementować
+To jest mniej eleganckie niż natywna chirurgia historii Codex, ale da się to zaimplementować
 wewnątrz OpenClaw i zachowuje semantykę silnika kontekstu.
 
-Przyszłe ulepszenie: jeśli app-server Codex udostępni protokół do zastępowania lub
+Przyszłe ulepszenie: jeśli app-server Codex udostępni protokół do zastępowania albo
 uzupełniania historii wątku, zamień tę warstwę projekcji tak, aby używała tego API.
 
 ### 3. Podłączyć bootstrap przed uruchomieniem wątku Codex
 
 W `extensions/codex/src/app-server/run-attempt.ts`:
 
-- Odczytaj odzwierciedloną historię sesji jak dotąd.
-- Ustal, czy plik sesji istniał przed tym uruchomieniem. Preferuj pomocnik,
-  który sprawdza `fs.stat(params.sessionFile)` przed zapisami lustrzanymi.
-- Otwórz `SessionManager` albo użyj wąskiego adaptera menedżera sesji, jeśli pomocnik
-  tego wymaga.
+- Odczytaj odzwierciedloną historię sesji tak jak obecnie.
+- Ustal, czy plik sesji istniał przed tym uruchomieniem. Preferuj pomocnika,
+  który sprawdza `fs.stat(params.sessionFile)` przed zapisami mirror.
+- Otwórz `SessionManager` albo użyj wąskiego adaptera menedżera sesji, jeśli pomocnik tego wymaga.
 - Wywołaj neutralny pomocnik bootstrap, gdy istnieje `params.contextEngine`.
 
-Pseudo-przepływ:
+Przepływ pseudo-kodu:
 
 ```ts
 const hadSessionFile = await fileExists(params.sessionFile);
@@ -295,21 +293,18 @@ await bootstrapHarnessContextEngine({
 });
 ```
 
-Użyj tej samej konwencji `sessionKey`, co most narzędzi Codex i lustro transkryptu.
-Obecnie Codex oblicza `sandboxSessionKey` z `params.sessionKey` lub
-`params.sessionId`; używaj tego konsekwentnie, chyba że istnieje powód, by zachować surowe `params.sessionKey`.
+Użyj tej samej konwencji `sessionKey` co most narzędzi Codex i mirror transkryptu. Dziś Codex oblicza `sandboxSessionKey` z `params.sessionKey` albo `params.sessionId`; używaj tego konsekwentnie, chyba że istnieje powód, by zachować surowe `params.sessionKey`.
 
 ### 4. Podłączyć assemble przed `thread/start` / `thread/resume` i `turn/start`
 
 W `runCodexAppServerAttempt`:
 
-1. Najpierw zbuduj dynamiczne narzędzia, aby silnik kontekstu widział rzeczywiste
-   dostępne nazwy narzędzi.
+1. Najpierw zbuduj dynamiczne narzędzia, aby silnik kontekstu widział rzeczywiste dostępne nazwy narzędzi.
 2. Odczytaj odzwierciedloną historię sesji.
 3. Uruchom `assemble(...)` silnika kontekstu, gdy istnieje `params.contextEngine`.
-4. Rzutuj złożony wynik do:
-   - dodatku do instrukcji deweloperskich
-   - tekstu promptu dla `turn/start`
+4. Rzutuj złożony wynik na:
+   - dodatek do instrukcji deweloperskich
+   - tekst promptu dla `turn/start`
 
 Istniejące wywołanie haka:
 
@@ -328,53 +323,52 @@ powinno stać się świadome kontekstu:
 2. zastosuj składanie/projekcję silnika kontekstu
 3. uruchom `before_prompt_build` z rzutowanym promptem/instrukcjami deweloperskimi
 
-Ta kolejność pozwala ogólnym hakom promptu widzieć ten sam prompt, który otrzyma Codex. Jeśli
-potrzebujemy ścisłej zgodności z PI, uruchom składanie silnika kontekstu przed kompozycją haków,
+Taka kolejność pozwala ogólnym hakom promptu zobaczyć ten sam prompt, który otrzyma Codex. Jeśli
+potrzebujemy ścisłej zgodności z PI, uruchom składanie silnika kontekstu przed kompozycją hooków,
 ponieważ PI stosuje `systemPromptAddition` silnika kontekstu do końcowego promptu systemowego po swoim
-potoku promptu. Ważną niezmienną jest to, że zarówno silnik kontekstu, jak i haki otrzymują
+potoku promptu. Ważną niezmienną jest to, że zarówno silnik kontekstu, jak i haki dostają
 deterministyczną, udokumentowaną kolejność.
 
 Zalecana kolejność dla pierwszej implementacji:
 
 1. `buildDeveloperInstructions(params)`
 2. `assemble()` silnika kontekstu
-3. dołącz/poprzedź `systemPromptAddition` do instrukcji deweloperskich
+3. dołącz na początku/końcu `systemPromptAddition` do instrukcji deweloperskich
 4. rzutuj złożone wiadomości do tekstu promptu
 5. `resolveAgentHarnessBeforePromptBuildResult(...)`
 6. przekaż końcowe instrukcje deweloperskie do `startOrResumeThread(...)`
 7. przekaż końcowy tekst promptu do `buildTurnStartParams(...)`
 
-Specyfikacja powinna zostać zakodowana w testach, aby przyszłe zmiany nie przestawiły
-tej kolejności przez przypadek.
+Specyfikacja powinna zostać zakodowana w testach, aby przyszłe zmiany nie zmieniły kolejności przypadkiem.
 
 ### 5. Zachować stabilne formatowanie prompt-cache
 
-Pomocnik projekcji musi produkować stabilne bajtowo dane wyjściowe dla identycznych wejść:
+Pomocnik projekcji musi tworzyć bajtowo stabilne dane wyjściowe dla identycznych wejść:
 
 - stabilna kolejność wiadomości
 - stabilne etykiety ról
 - brak generowanych znaczników czasu
-- brak wycieku kolejności kluczy obiektów
-- brak losowych separatorów
-- brak identyfikatorów per uruchomienie
+- brak przecieków kolejności kluczy obiektu
+- brak losowych ograniczników
+- brak ID per uruchomienie
 
-Używaj stałych separatorów i jawnych sekcji.
+Używaj stałych ograniczników i jawnych sekcji.
 
-### 6. Podłączyć logikę po turze po odzwierciedleniu transkryptu
+### 6. Podłączyć przetwarzanie po turze po odzwierciedleniu transkryptu
 
-Lustrzany `CodexAppServerEventProjector` buduje lokalny `messagesSnapshot` dla
-bieżącej tury. `mirrorTranscriptBestEffort(...)` zapisuje tę migawkę do
-odzwierciedlonego transkryptu OpenClaw.
+`CodexAppServerEventProjector` w Codex buduje lokalny `messagesSnapshot` dla
+bieżącej tury. `mirrorTranscriptBestEffort(...)` zapisuje ten snapshot do
+odzwierciedlenia transkryptu OpenClaw.
 
-Po pomyślnym lub nieudanym odzwierciedleniu wywołaj finalizator silnika kontekstu z
-najlepszą dostępną migawką wiadomości:
+Po pomyślnym albo nieudanym odzwierciedleniu wywołaj finalizator silnika kontekstu z
+najlepszym dostępnym snapshotem wiadomości:
 
 - Preferuj pełny odzwierciedlony kontekst sesji po zapisie, ponieważ `afterTurn`
-  oczekuje migawki sesji, a nie tylko bieżącej tury.
-- Wróć awaryjnie do `historyMessages + result.messagesSnapshot`, jeśli nie da się
-  ponownie otworzyć pliku sesji.
+  oczekuje snapshotu sesji, a nie tylko bieżącej tury.
+- Wracaj do `historyMessages + result.messagesSnapshot`, jeśli nie można ponownie otworzyć
+  pliku sesji.
 
-Pseudo-przepływ:
+Przepływ pseudo-kodu:
 
 ```ts
 const prePromptMessageCount = historyMessages.length;
@@ -407,135 +401,134 @@ await finalizeHarnessContextEngineTurn({
 });
 ```
 
-Jeśli odzwierciedlenie się nie powiedzie, nadal wywołaj `afterTurn` z migawką
-awaryjną, ale zaloguj, że silnik kontekstu wykonuje ingest z awaryjnych danych tury.
+Jeśli odzwierciedlenie się nie powiedzie, nadal wywołaj `afterTurn` ze snapshotem zapasowym, ale zaloguj,
+że silnik kontekstu przetwarza ingest z zapasowych danych tury.
 
-### 7. Znormalizować użycie i kontekst runtime prompt-cache
+### 7. Znormalizować usage i runtime context prompt-cache
 
-Wyniki Codex zawierają znormalizowane użycie z powiadomień tokenów app-server, gdy
-jest dostępne. Przekaż to użycie do kontekstu runtime silnika kontekstu.
+Wyniki Codex zawierają znormalizowane usage z powiadomień tokenów app-server, gdy
+są dostępne. Przekaż to usage do runtime context silnika kontekstu.
 
-Jeśli app-server Codex kiedyś ujawni szczegóły odczytu/zapisu cache, odwzoruj je do
-`ContextEnginePromptCacheInfo`. Do tego czasu pomijaj `promptCache` zamiast
-wymyślać zera.
+Jeśli app-server Codex w przyszłości ujawni szczegóły odczytu/zapisu cache, odwzoruj je do
+`ContextEnginePromptCacheInfo`. Do tego czasu pomijaj `promptCache`, zamiast wymyślać zera.
 
-### 8. Zasada Compaction
+### 8. Zasady Compaction
 
 Istnieją dwa systemy Compaction:
 
 1. `compact()` silnika kontekstu OpenClaw
 2. natywne `thread/compact/start` app-server Codex
 
-Nie łącz ich po cichu.
+Nie utożsamiaj ich po cichu.
 
-#### `/compact` i jawna Compaction OpenClaw
+#### `/compact` i jawny Compaction OpenClaw
 
-Gdy wybrany silnik kontekstu ma `info.ownsCompaction === true`, jawna
-Compaction OpenClaw powinna preferować wynik `compact()` silnika kontekstu dla
-odzwierciedlonego transkryptu OpenClaw i stanu Pluginu.
+Gdy wybrany silnik kontekstu ma `info.ownsCompaction === true`, jawny
+Compaction OpenClaw powinien preferować wynik `compact()` silnika kontekstu dla
+odzwierciedlenia transkryptu OpenClaw i stanu Plugin.
 
-Gdy wybrany harness Codex ma natywne powiązanie wątku, możemy dodatkowo
-zażądać natywnej Compaction Codex, aby utrzymać zdrowie wątku app-server, ale to
-musi być raportowane jako osobna akcja backendu w szczegółach.
+Gdy wybrana wiązka Codex ma natywne powiązanie wątku, możemy dodatkowo
+zażądać natywnego Compaction Codex, aby utrzymać zdrowie wątku app-server, ale
+musi to być raportowane jako osobne działanie backendu w szczegółach.
 
 Zalecane zachowanie:
 
 - Jeśli `contextEngine.info.ownsCompaction === true`:
   - najpierw wywołaj `compact()` silnika kontekstu
-  - następnie wykonaj best-effort wywołanie natywnej Compaction Codex, gdy istnieje powiązanie wątku
+  - następnie spróbuj best-effort wywołać natywny Compaction Codex, gdy istnieje powiązanie wątku
   - zwróć wynik silnika kontekstu jako wynik główny
-  - uwzględnij status natywnej Compaction Codex w `details.codexNativeCompaction`
+  - uwzględnij stan natywnego Compaction Codex w `details.codexNativeCompaction`
 - Jeśli aktywny silnik kontekstu nie zarządza Compaction:
   - zachowaj bieżące natywne zachowanie Compaction Codex
 
 Prawdopodobnie wymaga to zmiany `extensions/codex/src/app-server/compact.ts` albo
-owinięcia go z ogólnej ścieżki Compaction, zależnie od miejsca wywołania
-`maybeCompactAgentHarnessSession(...)`.
+opakowania go z ogólnej ścieżki Compaction, zależnie od tego, gdzie
+wywoływane jest `maybeCompactAgentHarnessSession(...)`.
 
-#### Zdarzenia natywnej `contextCompaction` Codex w trakcie tury
+#### Natywne zdarzenia `contextCompaction` Codex w trakcie tury
 
-Codex może emitować zdarzenia elementów `contextCompaction` podczas tury. Zachowaj bieżącą
-emisję haków przed/po Compaction w `event-projector.ts`, ale nie traktuj tego jako
-ukończonej Compaction silnika kontekstu.
+Codex może emitować zdarzenia elementów `contextCompaction` podczas tury. Zachowaj bieżącą emisję hooków
+before/after compaction w `event-projector.ts`, ale nie traktuj tego jako
+zakończonego Compaction silnika kontekstu.
 
-Dla silników zarządzających Compaction emituj jawną diagnostykę, gdy Codex mimo to wykonuje
-natywną Compaction:
+Dla silników, które zarządzają Compaction, emituj jawną diagnostykę, gdy Codex mimo to wykonuje
+natywny Compaction:
 
 - nazwa strumienia/zdarzenia: istniejący strumień `compaction` jest akceptowalny
 - szczegóły: `{ backend: "codex-app-server", ownsCompaction: true }`
 
-Dzięki temu podział pozostaje możliwy do audytu.
+Dzięki temu podział pozostaje audytowalny.
 
-### 9. Zachowanie resetu sesji i powiązań
+### 9. Zachowanie resetowania sesji i powiązań
 
-Istniejące `reset(...)` harnessu Codex usuwa powiązanie app-server Codex z
+Istniejące `reset(...)` wiązki Codex czyści powiązanie app-server Codex z
 pliku sesji OpenClaw. Zachowaj to zachowanie.
 
-Upewnij się również, że czyszczenie stanu silnika kontekstu nadal odbywa się przez istniejące
+Upewnij się też, że czyszczenie stanu silnika kontekstu nadal odbywa się przez istniejące
 ścieżki cyklu życia sesji OpenClaw. Nie dodawaj czyszczenia specyficznego dla Codex, chyba że
-cykl życia silnika kontekstu obecnie pomija zdarzenia reset/delete dla wszystkich harnessów.
+cykl życia silnika kontekstu obecnie pomija zdarzenia resetowania/usuwania dla wszystkich wiązek.
 
 ### 10. Obsługa błędów
 
-Podążaj za semantyką PI:
+Stosuj semantykę PI:
 
-- błędy bootstrap ostrzegają i kontynuują
-- błędy assemble ostrzegają i wracają do niezłożonych wiadomości/promptu potoku
-- błędy afterTurn/ingest ostrzegają i oznaczają finalizację po turze jako nieudaną
-- utrzymanie działa tylko po pomyślnych, nieprzerwanych turach i bez yield abort
-- błędy Compaction nie powinny być ponawiane jako nowe prompty
+- błędy bootstrap generują ostrzeżenie i kontynuują
+- błędy assemble generują ostrzeżenie i wracają do niezłożonych wiadomości/promptu potoku
+- błędy afterTurn/ingest generują ostrzeżenie i oznaczają finalizację po turze jako nieudaną
+- utrzymanie działa tylko po pomyślnych, nieprzerwanych turach bez yield
+- błędy Compaction nie powinny być ponawiane jako świeże prompty
 
 Dodatki specyficzne dla Codex:
 
-- Jeśli projekcja kontekstu się nie powiedzie, ostrzegaj i wracaj do oryginalnego promptu.
-- Jeśli odzwierciedlenie transkryptu się nie powiedzie, nadal próbuj finalizacji silnika kontekstu z
-  wiadomościami awaryjnymi.
-- Jeśli natywna Compaction Codex zawiedzie po pomyślnym zakończeniu Compaction silnika kontekstu,
-  nie kończ błędem całej Compaction OpenClaw, gdy silnik kontekstu jest główny.
+- Jeśli projekcja kontekstu się nie powiedzie, wygeneruj ostrzeżenie i wróć do oryginalnego promptu.
+- Jeśli odzwierciedlenie transkryptu się nie powiedzie, nadal spróbuj finalizacji silnika kontekstu z
+  wiadomościami zapasowymi.
+- Jeśli natywny Compaction Codex się nie powiedzie po pomyślnym Compaction silnika kontekstu,
+  nie psuj całego Compaction OpenClaw, gdy silnik kontekstu jest główny.
 
 ## Plan testów
 
 ### Testy jednostkowe
 
-Dodaj testy w `extensions/codex/src/app-server`:
+Dodaj testy pod `extensions/codex/src/app-server`:
 
 1. `run-attempt.context-engine.test.ts`
    - Codex wywołuje `bootstrap`, gdy istnieje plik sesji.
    - Codex wywołuje `assemble` z odzwierciedlonymi wiadomościami, budżetem tokenów, nazwami narzędzi,
-     trybem cytowań, identyfikatorem modelu i promptem.
-   - `systemPromptAddition` jest uwzględnione w instrukcjach deweloperskich.
+     trybem cytowań, ID modelu i promptem.
+   - `systemPromptAddition` jest uwzględniane w instrukcjach deweloperskich.
    - Złożone wiadomości są rzutowane do promptu przed bieżącym żądaniem.
    - Codex wywołuje `afterTurn` po odzwierciedleniu transkryptu.
-   - Bez `afterTurn` Codex wywołuje `ingestBatch` lub `ingest` per wiadomość.
+   - Bez `afterTurn` Codex wywołuje `ingestBatch` albo `ingest` per wiadomość.
    - Utrzymanie tury działa po pomyślnych turach.
-   - Utrzymanie tury nie działa przy błędzie promptu, abort ani yield abort.
+   - Utrzymanie tury nie działa przy błędzie promptu, przerwaniu albo przerwaniu yield.
 
 2. `context-engine-projection.test.ts`
    - stabilne dane wyjściowe dla identycznych wejść
    - brak duplikatu bieżącego promptu, gdy złożona historia go zawiera
    - obsługa pustej historii
    - zachowanie kolejności ról
-   - uwzględnienie dodatku promptu systemowego tylko w instrukcjach deweloperskich
+   - uwzględnianie dodatku promptu systemowego tylko w instrukcjach deweloperskich
 
 3. `compact.context-engine.test.ts`
-   - główny wynik silnika kontekstu zarządzającego Compaction wygrywa
-   - status natywnej Compaction Codex pojawia się w szczegółach, gdy jest też wykonywana
-   - niepowodzenie natywnej Compaction Codex nie powoduje błędu Compaction silnika kontekstu zarządzającego nią
-   - silnik kontekstu niezarządzający Compaction zachowuje obecne natywne zachowanie Compaction
+   - główny wynik należącego do silnika kontekstu wygrywa
+   - stan natywnego Compaction Codex pojawia się w szczegółach, gdy także podjęto próbę
+   - natywna awaria Codex nie psuje Compaction należącego do silnika kontekstu
+   - silnik kontekstu bez ownsCompaction zachowuje bieżące natywne zachowanie Compaction
 
 ### Istniejące testy do aktualizacji
 
 - `extensions/codex/src/app-server/run-attempt.test.ts`, jeśli istnieje, w przeciwnym razie
   najbliższe testy uruchomień app-server Codex.
-- `extensions/codex/src/app-server/event-projector.test.ts` tylko wtedy, gdy zmienią się
-  szczegóły zdarzeń Compaction.
-- `src/agents/harness/selection.test.ts` nie powinno wymagać zmian, chyba że zmieni się
-  zachowanie konfiguracji; powinno pozostać stabilne.
+- `extensions/codex/src/app-server/event-projector.test.ts` tylko jeśli szczegóły zdarzeń
+  Compaction się zmienią.
+- `src/agents/harness/selection.test.ts` nie powinien wymagać zmian, chyba że zmieni się
+  zachowanie config; powinien pozostać stabilny.
 - Testy silnika kontekstu PI powinny nadal przechodzić bez zmian.
 
-### Testy integration / live
+### Testy integracyjne / live
 
-Dodaj lub rozszerz testy smoke live harnessu Codex:
+Dodaj albo rozszerz testy smoke wiązki live Codex:
 
 - skonfiguruj `plugins.slots.contextEngine` na silnik testowy
 - skonfiguruj `agents.defaults.model` na model `codex/*`
@@ -543,11 +536,11 @@ Dodaj lub rozszerz testy smoke live harnessu Codex:
 - potwierdź, że silnik testowy zaobserwował:
   - bootstrap
   - assemble
-  - afterTurn lub ingest
+  - afterTurn albo ingest
   - utrzymanie
 
-Unikaj wymagania `lossless-claw` w testach core OpenClaw. Użyj małego
-fałszywego Pluginu silnika kontekstu wewnątrz repo.
+Unikaj wymagania lossless-claw w testach core OpenClaw. Użyj małego
+fałszywego Plugin silnika kontekstu w repo.
 
 ## Obserwowalność
 
@@ -559,12 +552,12 @@ Dodaj logi debug wokół wywołań cyklu życia silnika kontekstu Codex:
 - `codex context engine maintenance skipped` z powodem
 - `codex native compaction completed alongside context-engine compaction`
 
-Unikaj logowania pełnych promptów lub zawartości transkryptu.
+Unikaj logowania pełnych promptów albo zawartości transkryptu.
 
-Dodaj uporządkowane pola tam, gdzie przydatne:
+Tam, gdzie to przydatne, dodaj pola strukturalne:
 
 - `sessionId`
-- `sessionKey` zredagowany lub pominięty zgodnie z istniejącą praktyką logowania
+- `sessionKey` zredagowany albo pominięty zgodnie z istniejącą praktyką logowania
 - `engineId`
 - `threadId`
 - `turnId`
@@ -574,56 +567,55 @@ Dodaj uporządkowane pola tam, gdzie przydatne:
 
 ## Migracja / zgodność
 
-Powinno to być zgodne wstecznie:
+To powinno być zgodne wstecz:
 
-- Jeśli żaden silnik kontekstu nie jest skonfigurowany, starsze zachowanie silnika kontekstu
-  powinno być równoważne dzisiejszemu zachowaniu harnessu Codex.
+- Jeśli nie skonfigurowano silnika kontekstu, zachowanie starszego silnika kontekstu powinno być
+  równoważne dzisiejszemu zachowaniu wiązki Codex.
 - Jeśli `assemble` silnika kontekstu się nie powiedzie, Codex powinien kontynuować z oryginalną
   ścieżką promptu.
-- Istniejące powiązania wątków Codex powinny pozostać ważne.
-- Dynamiczne fingerprintowanie narzędzi nie powinno zawierać danych wyjściowych silnika kontekstu; w przeciwnym razie
-  każda zmiana kontekstu mogłaby wymuszać nowy wątek Codex. Na dynamiczny fingerprint narzędzi
-  powinien wpływać tylko katalog narzędzi.
+- Istniejące powiązania wątków Codex powinny pozostać prawidłowe.
+- Odcisk palca dynamicznych narzędzi nie powinien zawierać danych wyjściowych silnika kontekstu; w przeciwnym razie
+  każda zmiana kontekstu mogłaby wymuszać nowy wątek Codex. Tylko katalog narzędzi
+  powinien wpływać na odcisk palca dynamicznych narzędzi.
 
 ## Otwarte pytania
 
 1. Czy złożony kontekst powinien być wstrzykiwany w całości do promptu użytkownika, w całości
    do instrukcji deweloperskich, czy podzielony?
 
-   Rekomendacja: podzielony. Umieść `systemPromptAddition` w instrukcjach deweloperskich;
-   umieść złożony kontekst transkryptu w opakowaniu promptu użytkownika. To najlepiej odpowiada
-   bieżącemu protokołowi Codex bez mutowania natywnej historii wątku.
+   Zalecenie: podzielony. Umieść `systemPromptAddition` w instrukcjach deweloperskich;
+   umieść złożony kontekst transkryptu w wrapperze promptu użytkownika. To najlepiej pasuje
+   do obecnego protokołu Codex bez mutowania natywnej historii wątku.
 
-2. Czy natywna Compaction Codex powinna być wyłączona, gdy silnik kontekstu zarządza
+2. Czy natywny Compaction Codex powinien być wyłączony, gdy silnik kontekstu zarządza
    Compaction?
 
-   Rekomendacja: nie, przynajmniej początkowo. Natywna Compaction Codex może nadal być
-   konieczna do utrzymania działania wątku app-server. Ale musi być raportowana jako
-   natywna Compaction Codex, a nie jako Compaction silnika kontekstu.
+   Zalecenie: nie, przynajmniej na początku. Natywny Compaction Codex może nadal być
+   konieczny do utrzymania wątku app-server przy życiu. Musi jednak być raportowany jako
+   natywny Compaction Codex, a nie jako Compaction silnika kontekstu.
 
-3. Czy `before_prompt_build` powinno działać przed czy po złożeniu silnika kontekstu?
+3. Czy `before_prompt_build` powinno działać przed czy po składaniu silnika kontekstu?
 
-   Rekomendacja: po projekcji silnika kontekstu dla Codex, aby ogólne haki harnessu
-   widziały rzeczywiste instrukcje promptu/deweloperskie, które otrzyma Codex. Jeśli zgodność z PI
-   wymaga czegoś przeciwnego, zakoduj wybraną kolejność w testach i udokumentuj to
+   Zalecenie: po projekcji silnika kontekstu dla Codex, aby ogólne haki wiązki
+   widziały rzeczywisty prompt/instrukcje deweloperskie, które otrzyma Codex. Jeśli zgodność z PI
+   wymaga odwrotnej kolejności, zakoduj wybraną kolejność w testach i udokumentuj ją
    tutaj.
 
 4. Czy app-server Codex może przyjąć przyszłe ustrukturyzowane nadpisanie kontekstu/historii?
 
-   Nie wiadomo. Jeśli tak, zastąp tekstową warstwę projekcji tym protokołem i
+   Nie wiadomo. Jeśli tak, zastąp warstwę projekcji tekstu tym protokołem i
    pozostaw wywołania cyklu życia bez zmian.
 
 ## Kryteria akceptacji
 
-- Tura osadzonego harnessu `codex/*` wywołuje cykl życia `assemble`
-  wybranego silnika kontekstu.
+- Tura osadzonej wiązki `codex/*` wywołuje cykl życia assemble wybranego silnika kontekstu.
 - `systemPromptAddition` silnika kontekstu wpływa na instrukcje deweloperskie Codex.
-- Złożony kontekst wpływa na wejście tury Codex w sposób deterministyczny.
-- Pomyślne tury Codex wywołują `afterTurn` lub awaryjny ingest.
+- Złożony kontekst wpływa deterministycznie na dane wejściowe tury Codex.
+- Pomyślne tury Codex wywołują `afterTurn` albo zapasowy ingest.
 - Pomyślne tury Codex uruchamiają utrzymanie tury silnika kontekstu.
-- Tury zakończone błędem/przerwane/zakończone yield-abort nie uruchamiają utrzymania tury.
-- Compaction zarządzana przez silnik kontekstu pozostaje główna dla stanu OpenClaw/Pluginu.
-- Natywna Compaction Codex pozostaje możliwa do audytu jako natywne zachowanie Codex.
-- Istniejące zachowanie silnika kontekstu PI pozostaje bez zmian.
-- Istniejące zachowanie harnessu Codex pozostaje bez zmian, gdy nie wybrano żadnego silnika kontekstu innego niż legacy
-  lub gdy assemble zakończy się błędem.
+- Nieudane/przerwane/przerwane przez yield tury nie uruchamiają utrzymania tury.
+- Compaction zarządzany przez silnik kontekstu pozostaje główny dla stanu OpenClaw/Plugin.
+- Natywny Compaction Codex pozostaje audytowalny jako natywne zachowanie Codex.
+- Istniejące zachowanie silnika kontekstu PI nie zmienia się.
+- Istniejące zachowanie wiązki Codex nie zmienia się, gdy nie wybrano żadnego silnika kontekstu innego niż legacy
+  albo gdy assemble się nie powiedzie.

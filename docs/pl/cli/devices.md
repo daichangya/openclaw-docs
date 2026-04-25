@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Zatwierdzasz żądania parowania urządzeń.
-    - Musisz rotować lub unieważniać tokeny urządzeń.
-summary: Dokumentacja CLI dla `openclaw devices` (parowanie urządzeń + rotacja/unieważnianie tokenów)
+    - Zatwierdzasz żądania parowania urządzeń
+    - Musisz obrócić lub unieważnić tokeny urządzeń
+summary: Dokumentacja referencyjna CLI dla `openclaw devices` (parowanie urządzeń + rotacja/unieważnianie tokenów)
 title: Urządzenia
 x-i18n:
-    generated_at: "2026-04-24T09:02:43Z"
+    generated_at: "2026-04-25T13:44:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c4ae835807ba4b0aea1073b9a84410a10fa0394d7d34e49d645071108cea6a35
+    source_hash: 168afa3c784565c09ebdac854acc33cb7c0cacf4eba6a1a038c88c96af3c1430
     source_path: cli/devices.md
     workflow: 15
 ---
@@ -21,26 +21,26 @@ Zarządzaj żądaniami parowania urządzeń i tokenami o zakresie urządzenia.
 
 ### `openclaw devices list`
 
-Wyświetla oczekujące żądania parowania i sparowane urządzenia.
+Wyświetl oczekujące żądania parowania i sparowane urządzenia.
 
-```text
+```
 openclaw devices list
 openclaw devices list --json
 ```
 
-Dane wyjściowe oczekujących żądań pokazują żądany dostęp obok aktualnie
+W danych wyjściowych oczekującego żądania żądany dostęp jest pokazywany obok bieżącego
 zatwierdzonego dostępu urządzenia, gdy urządzenie jest już sparowane. Dzięki temu
-rozszerzenia zakresu/roli są widoczne wprost zamiast sprawiać wrażenie, że parowanie zostało utracone.
+rozszerzenia zakresu/roli są widoczne zamiast sprawiać wrażenie, że parowanie zostało utracone.
 
 ### `openclaw devices remove <deviceId>`
 
 Usuń jeden wpis sparowanego urządzenia.
 
-Gdy jesteś uwierzytelniony tokenem sparowanego urządzenia, wywołujący bez uprawnień administratora może
-usunąć tylko wpis **własnego** urządzenia. Usunięcie innego urządzenia wymaga
+Gdy uwierzytelniasz się za pomocą tokena sparowanego urządzenia, wywołujący bez uprawnień administratora mogą
+usuwać tylko wpis **własnego** urządzenia. Usunięcie innego urządzenia wymaga
 `operator.admin`.
 
-```text
+```
 openclaw devices remove <deviceId>
 openclaw devices remove <deviceId> --json
 ```
@@ -49,7 +49,7 @@ openclaw devices remove <deviceId> --json
 
 Wyczyść sparowane urządzenia zbiorczo.
 
-```text
+```
 openclaw devices clear --yes
 openclaw devices clear --yes --pending
 openclaw devices clear --yes --pending --json
@@ -57,22 +57,28 @@ openclaw devices clear --yes --pending --json
 
 ### `openclaw devices approve [requestId] [--latest]`
 
-Zatwierdź oczekujące żądanie parowania urządzenia po dokładnym `requestId`. Jeśli `requestId`
-zostanie pominięte albo zostanie przekazane `--latest`, OpenClaw tylko wypisze wybrane oczekujące
-żądanie i zakończy działanie; uruchom zatwierdzenie ponownie z dokładnym identyfikatorem żądania po zweryfikowaniu szczegółów.
+Zatwierdź oczekujące żądanie parowania urządzenia według dokładnego `requestId`. Jeśli `requestId`
+zostanie pominięte lub zostanie przekazane `--latest`, OpenClaw tylko wyświetli wybrane
+oczekujące żądanie i zakończy działanie; uruchom zatwierdzanie ponownie z dokładnym ID
+żądania po zweryfikowaniu szczegółów.
 
-Uwaga: jeśli urządzenie ponowi próbę parowania ze zmienionymi danymi uwierzytelnienia (rola/zakresy/klucz
-publiczny), OpenClaw zastępuje poprzedni oczekujący wpis i wydaje nowy
-`requestId`. Uruchom `openclaw devices list` tuż przed zatwierdzeniem, aby użyć
-aktualnego identyfikatora.
+Uwaga: jeśli urządzenie ponawia próbę parowania ze zmienionymi danymi uwierzytelniania (rola/zakresy/klucz
+publiczny), OpenClaw zastępuje poprzedni oczekujący wpis i wydaje nowe
+`requestId`. Uruchom `openclaw devices list` bezpośrednio przed zatwierdzeniem, aby użyć
+bieżącego ID.
 
-Jeśli urządzenie jest już sparowane i żąda szerszych zakresów albo szerszej roli,
-OpenClaw pozostawia istniejące zatwierdzenie i tworzy nowe oczekujące żądanie
+Jeśli urządzenie jest już sparowane i prosi o szersze zakresy lub szerszą rolę,
+OpenClaw zachowuje istniejące zatwierdzenie i tworzy nowe oczekujące żądanie
 rozszerzenia. Przejrzyj kolumny `Requested` i `Approved` w `openclaw devices list`
 albo użyj `openclaw devices approve --latest`, aby podejrzeć dokładne rozszerzenie przed
 jego zatwierdzeniem.
 
-```text
+Jeśli Gateway jest jawnie skonfigurowany z
+`gateway.nodes.pairing.autoApproveCidrs`, żądania `role: node` od nowych urządzeń z
+pasujących adresów IP klientów mogą zostać zatwierdzone, zanim pojawią się na tej liście. Ta zasada
+jest domyślnie wyłączona i nigdy nie dotyczy klientów operator/browser ani żądań rozszerzenia.
+
+```
 openclaw devices approve
 openclaw devices approve <requestId>
 openclaw devices approve --latest
@@ -82,39 +88,39 @@ openclaw devices approve --latest
 
 Odrzuć oczekujące żądanie parowania urządzenia.
 
-```text
+```
 openclaw devices reject <requestId>
 ```
 
 ### `openclaw devices rotate --device <id> --role <role> [--scope <scope...>]`
 
 Obróć token urządzenia dla określonej roli (opcjonalnie aktualizując zakresy).
-Docelowa rola musi już istnieć w zatwierdzonym kontrakcie parowania tego urządzenia;
-rotacja nie może utworzyć nowej niezatwierdzonej roli.
-Jeśli pominiesz `--scope`, późniejsze ponowne połączenia z zapisanym obróconym tokenem użyją ponownie
-pamięci podręcznej zatwierdzonych zakresów tego tokenu. Jeśli przekażesz jawne wartości `--scope`,
+Rola docelowa musi już istnieć w zatwierdzonym kontrakcie parowania tego urządzenia;
+rotacja nie może wygenerować nowej niezatwierdzonej roli.
+Jeśli pominiesz `--scope`, późniejsze ponowne połączenia ze zapisanym obróconym tokenem ponownie użyją
+buforowanych zatwierdzonych zakresów tego tokena. Jeśli przekażesz jawne wartości `--scope`,
 staną się one zapisanym zestawem zakresów dla przyszłych ponownych połączeń z tokenem z pamięci podręcznej.
-Wywołujący bez uprawnień administratora używający sesji sparowanego urządzenia może obracać tylko token **własnego**
-urządzenia.
-Ponadto wszelkie jawne wartości `--scope` muszą mieścić się w zakresie operatora bieżącej
-sesji wywołującej; rotacja nie może utworzyć szerszego tokenu operatora niż ten, który
-wywołujący już posiada.
+Wywołujący bez uprawnień administratora, używający sparowanego urządzenia, mogą obracać tylko
+token **własnego** urządzenia.
+Ponadto wszelkie jawne wartości `--scope` muszą mieścić się w zakresie własnych
+zakresów operatora sesji wywołującego; rotacja nie może wygenerować szerszego tokena operatora niż ten,
+który wywołujący już ma.
 
-```text
+```
 openclaw devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
-Zwraca ładunek nowego tokenu jako JSON.
+Zwraca nowy ładunek tokena jako JSON.
 
 ### `openclaw devices revoke --device <id> --role <role>`
 
 Unieważnij token urządzenia dla określonej roli.
 
-Wywołujący bez uprawnień administratora używający sesji sparowanego urządzenia może unieważnić tylko token **własnego**
-urządzenia.
-Unieważnienie tokenu innego urządzenia wymaga `operator.admin`.
+Wywołujący bez uprawnień administratora, używający sparowanego urządzenia, mogą unieważniać tylko
+token **własnego** urządzenia.
+Unieważnienie tokena innego urządzenia wymaga `operator.admin`.
 
-```text
+```
 openclaw devices revoke --device <deviceId> --role node
 ```
 
@@ -122,40 +128,42 @@ Zwraca wynik unieważnienia jako JSON.
 
 ## Typowe opcje
 
-- `--url <url>`: URL WebSocket Gateway (domyślnie `gateway.remote.url`, jeśli jest skonfigurowany).
+- `--url <url>`: URL WebSocket Gateway (domyślnie `gateway.remote.url`, jeśli skonfigurowano).
 - `--token <token>`: token Gateway (jeśli wymagany).
 - `--password <password>`: hasło Gateway (uwierzytelnianie hasłem).
 - `--timeout <ms>`: limit czasu RPC.
 - `--json`: wyjście JSON (zalecane do skryptów).
 
-Uwaga: po ustawieniu `--url` CLI nie korzysta z konfiguracji ani zmiennych środowiskowych jako źródła poświadczeń.
-Przekaż jawnie `--token` albo `--password`. Brak jawnych poświadczeń jest błędem.
+Uwaga: gdy ustawisz `--url`, CLI nie używa zapasowo poświadczeń z config ani środowiska.
+Przekaż jawnie `--token` lub `--password`. Brak jawnych poświadczeń jest błędem.
 
 ## Uwagi
 
-- Rotacja tokenu zwraca nowy token (wrażliwy). Traktuj go jak sekret.
+- Rotacja tokena zwraca nowy token (wrażliwy). Traktuj go jak sekret.
 - Te polecenia wymagają zakresu `operator.pairing` (lub `operator.admin`).
-- Rotacja tokenu pozostaje w obrębie zatwierdzonego zestawu ról parowania i zatwierdzonej
-  bazowej linii zakresów dla tego urządzenia. Przypadkowy wpis tokenu z pamięci podręcznej nie przyznaje nowego
-  celu rotacji.
-- Dla sesji tokenu sparowanego urządzenia zarządzanie między urządzeniami jest tylko dla administratora:
-  `remove`, `rotate` i `revoke` są dostępne tylko dla własnego urządzenia, chyba że wywołujący ma
+- `gateway.nodes.pairing.autoApproveCidrs` to opcjonalna zasada Gateway dla
+  parowania tylko nowych urządzeń node; nie zmienia uprawnień zatwierdzania w CLI.
+- Rotacja tokena pozostaje w granicach zatwierdzonego zestawu ról parowania i zatwierdzonej
+  bazowej linii zakresów dla tego urządzenia. Przypadkowy wpis tokena z pamięci podręcznej nie przyznaje
+  nowego celu rotacji.
+- W przypadku sesji tokena sparowanego urządzenia zarządzanie między urządzeniami jest tylko dla administratora:
+  `remove`, `rotate` i `revoke` dotyczą tylko własnego urządzenia, chyba że wywołujący ma
   `operator.admin`.
 - `devices clear` jest celowo chronione przez `--yes`.
-- Jeśli zakres parowania nie jest dostępny na local loopback (i nie przekazano jawnego `--url`), list/approve mogą użyć lokalnego fallbacku parowania.
-- `devices approve` wymaga jawnego identyfikatora żądania przed utworzeniem tokenów; pominięcie `requestId` albo przekazanie `--latest` tylko podgląda najnowsze oczekujące żądanie.
+- Jeśli zakres parowania jest niedostępny w local loopback (i nie przekazano jawnie `--url`), `list`/`approve` mogą użyć lokalnego trybu zapasowego parowania.
+- `devices approve` wymaga jawnego ID żądania przed wygenerowaniem tokenów; pominięcie `requestId` lub przekazanie `--latest` tylko wyświetla podgląd najnowszego oczekującego żądania.
 
 ## Lista kontrolna odzyskiwania po rozjechaniu tokenów
 
-Użyj tego, gdy Control UI lub inni klienci stale kończą się błędem `AUTH_TOKEN_MISMATCH` albo `AUTH_DEVICE_TOKEN_MISMATCH`.
+Użyj jej, gdy Control UI lub inni klienci nadal zawodzą z `AUTH_TOKEN_MISMATCH` lub `AUTH_DEVICE_TOKEN_MISMATCH`.
 
-1. Potwierdź bieżące źródło tokenu Gateway:
+1. Potwierdź bieżące źródło tokena gateway:
 
 ```bash
 openclaw config get gateway.auth.token
 ```
 
-2. Wyświetl sparowane urządzenia i zidentyfikuj identyfikator problematycznego urządzenia:
+2. Wyświetl sparowane urządzenia i zidentyfikuj ID problematycznego urządzenia:
 
 ```bash
 openclaw devices list
@@ -167,7 +175,7 @@ openclaw devices list
 openclaw devices rotate --device <deviceId> --role operator
 ```
 
-4. Jeśli sama rotacja nie wystarcza, usuń nieaktualne parowanie i zatwierdź ponownie:
+4. Jeśli rotacja nie wystarcza, usuń nieaktualne parowanie i zatwierdź ponownie:
 
 ```bash
 openclaw devices remove <deviceId>
@@ -175,19 +183,19 @@ openclaw devices list
 openclaw devices approve <requestId>
 ```
 
-5. Ponów próbę połączenia klienta przy użyciu bieżącego współdzielonego tokenu/hasła.
+5. Ponów próbę połączenia klienta z bieżącym współdzielonym tokenem/hasłem.
 
 Uwagi:
 
-- Normalna kolejność uwierzytelniania przy ponownym połączeniu to najpierw jawny współdzielony token/hasło, potem jawny `deviceToken`, potem zapisany token urządzenia, a na końcu token bootstrap.
-- Zaufane odzyskiwanie po `AUTH_TOKEN_MISMATCH` może tymczasowo wysłać jednocześnie współdzielony token i zapisany token urządzenia w ramach jednej ograniczonej próby ponowienia.
+- Zwykła kolejność pierwszeństwa uwierzytelniania przy ponownym połączeniu to najpierw jawny współdzielony token/hasło, potem jawny `deviceToken`, następnie zapisany token urządzenia, a na końcu token bootstrap.
+- Zaufane odzyskiwanie po `AUTH_TOKEN_MISMATCH` może tymczasowo wysłać razem zarówno współdzielony token, jak i zapisany token urządzenia dla jednej ograniczonej próby ponowienia.
 
 Powiązane:
 
-- [Rozwiązywanie problemów z uwierzytelnianiem dashboardu](/pl/web/dashboard#if-you-see-unauthorized-1008)
+- [Rozwiązywanie problemów z uwierzytelnianiem Dashboard](/pl/web/dashboard#if-you-see-unauthorized-1008)
 - [Rozwiązywanie problemów z Gateway](/pl/gateway/troubleshooting#dashboard-control-ui-connectivity)
 
 ## Powiązane
 
-- [Dokumentacja CLI](/pl/cli)
-- [Node](/pl/nodes)
+- [Dokumentacja referencyjna CLI](/pl/cli)
+- [Nodes](/pl/nodes)
