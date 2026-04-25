@@ -1,45 +1,43 @@
 ---
 read_when:
-    - Zalo özellikleri veya webhook'lar üzerinde çalışırken
-summary: Zalo bot desteği durumu, yetenekleri ve yapılandırması
+    - Zalo özellikleri veya Webhook'lar üzerinde çalışma
+summary: Zalo bot desteğinin durumu, yetenekleri ve yapılandırması
 title: Zalo
 x-i18n:
-    generated_at: "2026-04-05T13:47:25Z"
+    generated_at: "2026-04-25T13:42:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ab94642ba28e79605b67586af8f71c18bc10e0af60343a7df508e6823b6f4119
+    source_hash: e7eb9d5b1879fcdf70220c4b1542e843e47e12048ff567eeb0e1cb3367b3d200
     source_path: channels/zalo.md
     workflow: 15
 ---
 
-# Zalo (Bot API)
+Durum: deneysel. DM'ler desteklenir. Aşağıdaki [Yetenekler](#capabilities) bölümü mevcut Marketplace botu davranışını yansıtır.
 
-Durum: deneysel. DM'ler desteklenir. Aşağıdaki [Yetenekler](#capabilities) bölümü mevcut Marketplace bot davranışını yansıtır.
+## Paketlenmiş Plugin
 
-## Paketlenmiş plugin
+Zalo, mevcut OpenClaw sürümlerinde paketlenmiş bir Plugin olarak gelir; bu nedenle normal paketlenmiş
+derlemeler ayrı bir kurulum gerektirmez.
 
-Zalo, mevcut OpenClaw sürümlerinde paketlenmiş bir plugin olarak gelir; bu nedenle normal paketlenmiş
-derlemelerde ayrı bir kurulum gerekmez.
+Eski bir derlemeyi veya Zalo'yu dışlayan özel bir kurulumu kullanıyorsanız, bunu
+elle kurun:
 
-Daha eski bir derlemeyi veya Zalo'yu içermeyen özel bir kurulumu kullanıyorsanız bunu
-el ile yükleyin:
-
-- CLI ile yükleyin: `openclaw plugins install @openclaw/zalo`
-- Veya bir kaynak checkout'tan: `openclaw plugins install ./path/to/local/zalo-plugin`
-- Ayrıntılar: [Plugins](/tools/plugin)
+- CLI ile kurun: `openclaw plugins install @openclaw/zalo`
+- Veya kaynak checkout içinden: `openclaw plugins install ./path/to/local/zalo-plugin`
+- Ayrıntılar: [Plugins](/tr/tools/plugin)
 
 ## Hızlı kurulum (başlangıç)
 
-1. Zalo plugin'inin kullanılabilir olduğundan emin olun.
-   - Güncel paketlenmiş OpenClaw sürümleri bunu zaten içerir.
-   - Eski/özel kurulumlar bunu yukarıdaki komutlarla el ile ekleyebilir.
+1. Zalo Plugin'inin kullanılabilir olduğundan emin olun.
+   - Mevcut paketlenmiş OpenClaw sürümleri bunu zaten paketler.
+   - Eski/özel kurulumlar bunu yukarıdaki komutlarla elle ekleyebilir.
 2. Token'ı ayarlayın:
    - Ortam değişkeni: `ZALO_BOT_TOKEN=...`
    - Veya yapılandırma: `channels.zalo.accounts.default.botToken: "..."`.
 3. Gateway'i yeniden başlatın (veya kurulumu tamamlayın).
 4. DM erişimi varsayılan olarak eşleştirmedir; ilk temasta eşleştirme kodunu onaylayın.
 
-Asgari yapılandırma:
+Minimal yapılandırma:
 
 ```json5
 {
@@ -60,15 +58,15 @@ Asgari yapılandırma:
 ## Nedir
 
 Zalo, Vietnam odaklı bir mesajlaşma uygulamasıdır; Bot API'si Gateway'in 1:1 konuşmalar için bir bot çalıştırmasına olanak tanır.
-Yanıtların belirlenimli olarak Zalo'ya geri yönlendirilmesini istediğiniz destek veya bildirim senaryoları için iyi bir seçenektir.
+Yanıtların deterministik olarak Zalo'ya geri yönlendirilmesini istediğiniz destek veya bildirim senaryoları için uygundur.
 
 Bu sayfa, **Zalo Bot Creator / Marketplace botları** için mevcut OpenClaw davranışını yansıtır.
-**Zalo Official Account (OA) botları** Zalo'nun farklı bir ürün yüzeyidir ve farklı davranabilir.
+**Zalo Official Account (OA) botları** farklı bir Zalo ürün yüzeyidir ve farklı davranabilir.
 
-- Gateway'e ait bir Zalo Bot API kanalı.
-- Belirlenimli yönlendirme: yanıtlar Zalo'ya geri gider; model kanalları seçmez.
+- Gateway'in sahip olduğu bir Zalo Bot API kanalı.
+- Deterministik yönlendirme: yanıtlar Zalo'ya geri gider; model kanalları asla seçmez.
 - DM'ler ajanın ana oturumunu paylaşır.
-- Aşağıdaki [Yetenekler](#capabilities) bölümü mevcut Marketplace bot desteğini gösterir.
+- Aşağıdaki [Yetenekler](#capabilities) bölümü mevcut Marketplace botu desteğini gösterir.
 
 ## Kurulum (hızlı yol)
 
@@ -76,7 +74,7 @@ Bu sayfa, **Zalo Bot Creator / Marketplace botları** için mevcut OpenClaw davr
 
 1. [https://bot.zaloplatforms.com](https://bot.zaloplatforms.com) adresine gidin ve oturum açın.
 2. Yeni bir bot oluşturun ve ayarlarını yapılandırın.
-3. Tam bot token'ını kopyalayın (genellikle `numeric_id:secret`). Marketplace botları için kullanılabilir çalışma zamanı token'ı, oluşturma işleminden sonra botun hoş geldin mesajında görünebilir.
+3. Tam bot token'ını kopyalayın (genellikle `numeric_id:secret`). Marketplace botları için kullanılabilir çalışma zamanı token'ı, oluşturma sonrasında botun hoş geldiniz mesajında görünebilir.
 
 ### 2) Token'ı yapılandırın (ortam değişkeni veya yapılandırma)
 
@@ -98,105 +96,105 @@ Bu sayfa, **Zalo Bot Creator / Marketplace botları** için mevcut OpenClaw davr
 }
 ```
 
-Daha sonra grupların kullanılabildiği bir Zalo bot yüzeyine geçerseniz `groupPolicy` ve `groupAllowFrom` gibi gruba özgü yapılandırmaları açıkça ekleyebilirsiniz. Mevcut Marketplace bot davranışı için bkz. [Yetenekler](#capabilities).
+Daha sonra grup desteğinin mevcut olduğu bir Zalo bot yüzeyine geçerseniz, `groupPolicy` ve `groupAllowFrom` gibi gruba özgü yapılandırmaları açıkça ekleyebilirsiniz. Mevcut Marketplace botu davranışı için [Yetenekler](#capabilities) bölümüne bakın.
 
 Ortam değişkeni seçeneği: `ZALO_BOT_TOKEN=...` (yalnızca varsayılan hesap için çalışır).
 
 Çoklu hesap desteği: hesap başına token ve isteğe bağlı `name` ile `channels.zalo.accounts` kullanın.
 
-3. Gateway'i yeniden başlatın. Zalo, bir token çözümlendiğinde (ortam değişkeni veya yapılandırma) başlar.
-4. DM erişimi varsayılan olarak eşleştirmedir. Bot ile ilk kez iletişime geçildiğinde kodu onaylayın.
+3. Gateway'i yeniden başlatın. Zalo, bir token çözümlendiğinde başlar (ortam değişkeni veya yapılandırma).
+4. DM erişimi varsayılan olarak eşleştirmedir. Botla ilk temas kurulduğunda kodu onaylayın.
 
 ## Nasıl çalışır (davranış)
 
 - Gelen mesajlar, medya yer tutucularıyla paylaşılan kanal zarfına normalize edilir.
 - Yanıtlar her zaman aynı Zalo sohbetine geri yönlendirilir.
-- Varsayılan olarak long-polling kullanılır; `channels.zalo.webhookUrl` ile webhook modu kullanılabilir.
+- Varsayılan olarak long-polling; `channels.zalo.webhookUrl` ile Webhook modu kullanılabilir.
 
 ## Sınırlar
 
 - Giden metin 2000 karaktere bölünür (Zalo API sınırı).
 - Medya indirme/yükleme işlemleri `channels.zalo.mediaMaxMb` ile sınırlandırılır (varsayılan 5).
-- 2000 karakter sınırı akışı daha az yararlı hale getirdiği için akış varsayılan olarak engellenir.
+- 2000 karakter sınırı, akışı daha az kullanışlı hâle getirdiği için akış varsayılan olarak engellenir.
 
 ## Erişim denetimi (DM'ler)
 
 ### DM erişimi
 
-- Varsayılan: `channels.zalo.dmPolicy = "pairing"`. Bilinmeyen göndericiler bir eşleştirme kodu alır; onaylanana kadar mesajlar yok sayılır (kodların süresi 1 saat sonra dolar).
-- Şununla onaylayın:
+- Varsayılan: `channels.zalo.dmPolicy = "pairing"`. Bilinmeyen gönderenler bir eşleştirme kodu alır; onaylanana kadar mesajlar yok sayılır (kodların süresi 1 saat sonra dolar).
+- Onaylamak için:
   - `openclaw pairing list zalo`
   - `openclaw pairing approve zalo <CODE>`
 - Eşleştirme varsayılan token değişimidir. Ayrıntılar: [Eşleştirme](/tr/channels/pairing)
-- `channels.zalo.allowFrom` sayısal kullanıcı kimliklerini kabul eder (kullanıcı adı araması yoktur).
+- `channels.zalo.allowFrom`, sayısal kullanıcı kimliklerini kabul eder (kullanıcı adı araması yoktur).
 
 ## Erişim denetimi (Gruplar)
 
-**Zalo Bot Creator / Marketplace botları** için grup desteği pratikte mevcut değildi çünkü bot hiçbir şekilde bir gruba eklenemiyordu.
+**Zalo Bot Creator / Marketplace botları** için grup desteği pratikte mevcut değildi, çünkü bot bir gruba hiç eklenemiyordu.
 
 Bu, aşağıdaki grupla ilgili yapılandırma anahtarlarının şemada bulunduğu ancak Marketplace botları için kullanılamadığı anlamına gelir:
 
-- `channels.zalo.groupPolicy`, gruplardaki gelen işlemeyi denetler: `open | allowlist | disabled`.
+- `channels.zalo.groupPolicy`, grup gelen işleme davranışını kontrol eder: `open | allowlist | disabled`.
 - `channels.zalo.groupAllowFrom`, gruplarda hangi gönderici kimliklerinin botu tetikleyebileceğini sınırlar.
-- `groupAllowFrom` ayarlanmamışsa Zalo, gönderici denetimleri için `allowFrom` değerine geri döner.
-- Çalışma zamanı notu: `channels.zalo` tamamen eksikse çalışma zamanı güvenlik için yine `groupPolicy="allowlist"` değerine geri döner.
+- `groupAllowFrom` ayarlanmamışsa, Zalo gönderici denetimleri için `allowFrom` değerine geri döner.
+- Çalışma zamanı notu: `channels.zalo` tamamen yoksa, çalışma zamanı güvenlik için yine `groupPolicy="allowlist"` değerine geri döner.
 
-Grup ilkesi değerleri (grup erişimi bot yüzeyinizde mevcut olduğunda) şunlardır:
+Grup erişimi bot yüzeyinizde mevcut olduğunda grup politikası değerleri şunlardır:
 
 - `groupPolicy: "disabled"` — tüm grup mesajlarını engeller.
-- `groupPolicy: "open"` — herhangi bir grup üyesine izin verir (bahsetme geçidiyle).
-- `groupPolicy: "allowlist"` — başarısızlık durumunda kapalı varsayılan; yalnızca izin verilen göndericiler kabul edilir.
+- `groupPolicy: "open"` — herhangi bir grup üyesine izin verir (bahsetme kapılı).
+- `groupPolicy: "allowlist"` — varsayılan olarak kapalıdır; yalnızca izin verilen göndericiler kabul edilir.
 
-Farklı bir Zalo bot ürün yüzeyi kullanıyorsanız ve çalışan grup davranışını doğruladıysanız bunun Marketplace bot akışıyla eşleştiğini varsaymak yerine bunu ayrı olarak belgeleyin.
+Farklı bir Zalo bot ürün yüzeyi kullanıyorsanız ve çalışan grup davranışını doğruladıysanız, bunun Marketplace botu akışıyla eşleştiğini varsaymak yerine bunu ayrıca belgeleyin.
 
-## Long-polling ve webhook karşılaştırması
+## Long-polling ve webhook
 
 - Varsayılan: long-polling (genel bir URL gerekmez).
 - Webhook modu: `channels.zalo.webhookUrl` ve `channels.zalo.webhookSecret` ayarlayın.
   - Webhook secret 8-256 karakter olmalıdır.
-  - Webhook URL'si HTTPS kullanmalıdır.
-  - Zalo, doğrulama için olayları `X-Bot-Api-Secret-Token` başlığı ile gönderir.
-  - Gateway HTTP, webhook isteklerini `channels.zalo.webhookPath` üzerinde işler (varsayılan olarak webhook URL yolu).
+  - Webhook URL HTTPS kullanmalıdır.
+  - Zalo, doğrulama için olayları `X-Bot-Api-Secret-Token` başlığıyla gönderir.
+  - Gateway HTTP, Webhook isteklerini `channels.zalo.webhookPath` adresinde işler (varsayılan olarak Webhook URL yoludur).
   - İstekler `Content-Type: application/json` (veya `+json` medya türleri) kullanmalıdır.
   - Yinelenen olaylar (`event_name + message_id`) kısa bir tekrar penceresi boyunca yok sayılır.
   - Ani trafik artışı yol/kaynak başına hız sınırına tabidir ve HTTP 429 döndürebilir.
 
-**Not:** Zalo API belgelerine göre getUpdates (polling) ve webhook hesap başına birbirini dışlar.
+**Not:** Zalo API belgelerine göre getUpdates (polling) ve Webhook hesap başına birbirini dışlar.
 
 ## Desteklenen mesaj türleri
 
-Hızlı bir destek anlık görüntüsü için bkz. [Yetenekler](#capabilities). Aşağıdaki notlar, davranışın ek bağlam gerektirdiği yerlere ayrıntı ekler.
+Hızlı bir destek özeti için [Yetenekler](#capabilities) bölümüne bakın. Aşağıdaki notlar, davranışın ek bağlam gerektirdiği yerlere ayrıntı ekler.
 
-- **Metin mesajları**: 2000 karaktere bölme ile tam destek.
+- **Metin mesajları**: 2000 karakter parçalamayla tam destek.
 - **Metin içindeki düz URL'ler**: Normal metin girdisi gibi davranır.
-- **Bağlantı önizlemeleri / zengin bağlantı kartları**: Marketplace bot durumuna bakmak için bkz. [Yetenekler](#capabilities); güvenilir şekilde yanıt tetiklemediler.
-- **Görüntü mesajları**: Marketplace bot durumuna bakmak için bkz. [Yetenekler](#capabilities); gelen görüntü işleme güvenilir değildi (son yanıt olmadan yazıyor göstergesi).
-- **Sticker'lar**: Marketplace bot durumuna bakmak için bkz. [Yetenekler](#capabilities).
-- **Sesli notlar / ses dosyaları / video / genel dosya ekleri**: Marketplace bot durumuna bakmak için bkz. [Yetenekler](#capabilities).
+- **Bağlantı önizlemeleri / zengin bağlantı kartları**: Marketplace botu durumu için [Yetenekler](#capabilities) bölümüne bakın; güvenilir şekilde yanıtı tetiklemediler.
+- **Görsel mesajları**: Marketplace botu durumu için [Yetenekler](#capabilities) bölümüne bakın; gelen görsel işleme güvenilir değildi (nihai bir yanıt olmadan yazıyor göstergesi).
+- **Sticker'lar**: Marketplace botu durumu için [Yetenekler](#capabilities) bölümüne bakın.
+- **Sesli notlar / ses dosyaları / video / genel dosya ekleri**: Marketplace botu durumu için [Yetenekler](#capabilities) bölümüne bakın.
 - **Desteklenmeyen türler**: Günlüğe kaydedilir (örneğin, korumalı kullanıcılardan gelen mesajlar).
 
 ## Yetenekler
 
-Bu tablo, OpenClaw'daki mevcut **Zalo Bot Creator / Marketplace bot** davranışını özetler.
+Bu tablo, OpenClaw içindeki mevcut **Zalo Bot Creator / Marketplace botu** davranışını özetler.
 
 | Özellik                     | Durum                                   |
 | --------------------------- | --------------------------------------- |
-| Doğrudan mesajlar           | ✅ Desteklenir                          |
+| Doğrudan mesajlar           | ✅ Destekleniyor                        |
 | Gruplar                     | ❌ Marketplace botları için mevcut değil |
-| Medya (gelen görüntüler)    | ⚠️ Sınırlı / ortamınızda doğrulayın     |
-| Medya (giden görüntüler)    | ⚠️ Marketplace botları için yeniden test edilmedi |
-| Metin içindeki düz URL'ler  | ✅ Desteklenir                          |
-| Bağlantı önizlemeleri       | ⚠️ Marketplace botları için güvenilmez  |
-| Reaksiyonlar                | ❌ Desteklenmez                         |
+| Medya (gelen görseller)     | ⚠️ Sınırlı / ortamınızda doğrulayın     |
+| Medya (giden görseller)     | ⚠️ Marketplace botları için yeniden test edilmedi |
+| Metin içindeki düz URL'ler  | ✅ Destekleniyor                        |
+| Bağlantı önizlemeleri       | ⚠️ Marketplace botları için güvenilir değil |
+| Tepkiler                    | ❌ Desteklenmiyor                       |
 | Sticker'lar                 | ⚠️ Marketplace botları için ajan yanıtı yok |
 | Sesli notlar / ses / video  | ⚠️ Marketplace botları için ajan yanıtı yok |
 | Dosya ekleri                | ⚠️ Marketplace botları için ajan yanıtı yok |
-| Konular                     | ❌ Desteklenmez                         |
-| Polls                       | ❌ Desteklenmez                         |
-| Yerel komutlar              | ❌ Desteklenmez                         |
-| Akış                        | ⚠️ Engellenir (2000 karakter sınırı)    |
+| İş parçacıkları             | ❌ Desteklenmiyor                       |
+| Anketler                    | ❌ Desteklenmiyor                       |
+| Yerel komutlar              | ❌ Desteklenmiyor                       |
+| Akış                        | ⚠️ Engellenmiş (2000 karakter sınırı)   |
 
-## Teslimat hedefleri (CLI/cron)
+## Teslim hedefleri (CLI/cron)
 
 - Hedef olarak bir sohbet kimliği kullanın.
 - Örnek: `openclaw message send --channel zalo --target 123456789 --message "hi"`.
@@ -211,30 +209,30 @@ Bu tablo, OpenClaw'daki mevcut **Zalo Bot Creator / Marketplace bot** davranış
 
 **Webhook olay almıyor:**
 
-- Webhook URL'sinin HTTPS kullandığından emin olun
+- Webhook URL'nin HTTPS kullandığından emin olun
 - Secret token'ın 8-256 karakter olduğunu doğrulayın
-- Gateway HTTP uç noktasının yapılandırılmış yolda erişilebilir olduğunu doğrulayın
-- getUpdates polling işleminin çalışmadığını kontrol edin (birbirini dışlar)
+- Gateway HTTP uç noktasına yapılandırılan yolda erişilebildiğini doğrulayın
+- getUpdates polling'in çalışmadığını kontrol edin (birbirini dışlar)
 
 ## Yapılandırma başvurusu (Zalo)
 
-Tam yapılandırma: [Yapılandırma](/gateway/configuration)
+Tam yapılandırma: [Yapılandırma](/tr/gateway/configuration)
 
-Düz üst düzey anahtarlar (`channels.zalo.botToken`, `channels.zalo.dmPolicy` ve benzerleri) eski tek hesaplı kısa yazımdır. Yeni yapılandırmalar için `channels.zalo.accounts.<id>.*` kullanmayı tercih edin. Her iki biçim de şemada bulunduğu için burada hâlâ belgelenir.
+Düz üst düzey anahtarlar (`channels.zalo.botToken`, `channels.zalo.dmPolicy` ve benzerleri) eski tek hesaplı kısayoldur. Yeni yapılandırmalarda `channels.zalo.accounts.<id>.*` tercih edin. Her iki biçim de şemada bulunduğu için burada hâlâ belgelenmiştir.
 
 Sağlayıcı seçenekleri:
 
-- `channels.zalo.enabled`: kanal başlatmayı etkinleştirir/devre dışı bırakır.
-- `channels.zalo.botToken`: Zalo Bot Platform'dan bot token'ı.
-- `channels.zalo.tokenFile`: token'ı normal bir dosya yolundan okur. Symlink'ler reddedilir.
+- `channels.zalo.enabled`: kanal başlangıcını etkinleştir/devre dışı bırak.
+- `channels.zalo.botToken`: Zalo Bot Platform'dan alınan bot token'ı.
+- `channels.zalo.tokenFile`: token'ı normal bir dosya yolundan oku. Symlink'ler reddedilir.
 - `channels.zalo.dmPolicy`: `pairing | allowlist | open | disabled` (varsayılan: pairing).
-- `channels.zalo.allowFrom`: DM izin listesi (kullanıcı kimlikleri). `open`, `"*"` gerektirir. Sihirbaz sayısal kimlikleri sorar.
-- `channels.zalo.groupPolicy`: `open | allowlist | disabled` (varsayılan: allowlist). Yapılandırmada bulunur; mevcut Marketplace bot davranışı için bkz. [Yetenekler](#capabilities) ve [Erişim denetimi (Gruplar)](#access-control-groups).
-- `channels.zalo.groupAllowFrom`: grup gönderici izin listesi (kullanıcı kimlikleri). Ayarlanmadığında `allowFrom` değerine geri döner.
+- `channels.zalo.allowFrom`: DM izin listesi (kullanıcı kimlikleri). `open`, `"*"` gerektirir. Sihirbaz sayısal kimlikleri soracaktır.
+- `channels.zalo.groupPolicy`: `open | allowlist | disabled` (varsayılan: allowlist). Yapılandırmada bulunur; mevcut Marketplace botu davranışı için [Yetenekler](#capabilities) ve [Erişim denetimi (Gruplar)](#access-control-groups) bölümlerine bakın.
+- `channels.zalo.groupAllowFrom`: grup gönderen izin listesi (kullanıcı kimlikleri). Ayarlanmadığında `allowFrom` değerine geri döner.
 - `channels.zalo.mediaMaxMb`: gelen/giden medya sınırı (MB, varsayılan 5).
-- `channels.zalo.webhookUrl`: webhook modunu etkinleştirir (HTTPS gereklidir).
-- `channels.zalo.webhookSecret`: webhook secret'ı (8-256 karakter).
-- `channels.zalo.webhookPath`: gateway HTTP sunucusundaki webhook yolu.
+- `channels.zalo.webhookUrl`: Webhook modunu etkinleştirir (HTTPS gereklidir).
+- `channels.zalo.webhookSecret`: Webhook secret'ı (8-256 karakter).
+- `channels.zalo.webhookPath`: gateway HTTP sunucusundaki Webhook yolu.
 - `channels.zalo.proxy`: API istekleri için proxy URL'si.
 
 Çoklu hesap seçenekleri:
@@ -242,20 +240,20 @@ Sağlayıcı seçenekleri:
 - `channels.zalo.accounts.<id>.botToken`: hesap başına token.
 - `channels.zalo.accounts.<id>.tokenFile`: hesap başına normal token dosyası. Symlink'ler reddedilir.
 - `channels.zalo.accounts.<id>.name`: görünen ad.
-- `channels.zalo.accounts.<id>.enabled`: hesabı etkinleştirir/devre dışı bırakır.
-- `channels.zalo.accounts.<id>.dmPolicy`: hesap başına DM ilkesi.
+- `channels.zalo.accounts.<id>.enabled`: hesabı etkinleştir/devre dışı bırak.
+- `channels.zalo.accounts.<id>.dmPolicy`: hesap başına DM politikası.
 - `channels.zalo.accounts.<id>.allowFrom`: hesap başına izin listesi.
-- `channels.zalo.accounts.<id>.groupPolicy`: hesap başına grup ilkesi. Yapılandırmada bulunur; mevcut Marketplace bot davranışı için bkz. [Yetenekler](#capabilities) ve [Erişim denetimi (Gruplar)](#access-control-groups).
-- `channels.zalo.accounts.<id>.groupAllowFrom`: hesap başına grup gönderici izin listesi.
-- `channels.zalo.accounts.<id>.webhookUrl`: hesap başına webhook URL'si.
-- `channels.zalo.accounts.<id>.webhookSecret`: hesap başına webhook secret'ı.
-- `channels.zalo.accounts.<id>.webhookPath`: hesap başına webhook yolu.
+- `channels.zalo.accounts.<id>.groupPolicy`: hesap başına grup politikası. Yapılandırmada bulunur; mevcut Marketplace botu davranışı için [Yetenekler](#capabilities) ve [Erişim denetimi (Gruplar)](#access-control-groups) bölümlerine bakın.
+- `channels.zalo.accounts.<id>.groupAllowFrom`: hesap başına grup gönderen izin listesi.
+- `channels.zalo.accounts.<id>.webhookUrl`: hesap başına Webhook URL'si.
+- `channels.zalo.accounts.<id>.webhookSecret`: hesap başına Webhook secret'ı.
+- `channels.zalo.accounts.<id>.webhookPath`: hesap başına Webhook yolu.
 - `channels.zalo.accounts.<id>.proxy`: hesap başına proxy URL'si.
 
 ## İlgili
 
 - [Kanallara Genel Bakış](/tr/channels) — desteklenen tüm kanallar
 - [Eşleştirme](/tr/channels/pairing) — DM kimlik doğrulaması ve eşleştirme akışı
-- [Gruplar](/tr/channels/groups) — grup sohbeti davranışı ve bahsetme geçidi
-- [Kanal Yönlendirme](/tr/channels/channel-routing) — mesajlar için oturum yönlendirme
-- [Güvenlik](/gateway/security) — erişim modeli ve sağlamlaştırma
+- [Gruplar](/tr/channels/groups) — grup sohbeti davranışı ve bahsetme kapısı
+- [Kanal Yönlendirme](/tr/channels/channel-routing) — mesajlar için oturum yönlendirmesi
+- [Güvenlik](/tr/gateway/security) — erişim modeli ve sıkılaştırma

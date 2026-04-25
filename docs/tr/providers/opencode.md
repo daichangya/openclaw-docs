@@ -1,37 +1,37 @@
 ---
 read_when:
-    - OpenCode barındırmalı model erişimi istiyorsunuz
+    - OpenCode tarafından barındırılan model erişimini istiyorsunuz
     - Zen ve Go katalogları arasında seçim yapmak istiyorsunuz
 summary: OpenClaw ile OpenCode Zen ve Go kataloglarını kullanın
 title: OpenCode
 x-i18n:
-    generated_at: "2026-04-24T09:27:08Z"
+    generated_at: "2026-04-25T13:56:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d59c82a46988ef7dbbc98895af34441a5b378e5110ea636104df5f9c3672e3f0
+    source_hash: cb0521b038e519f139c66f98ddef4919d8c43ce64018ef8af8f7b42ac00114a4
     source_path: providers/opencode.md
     workflow: 15
 ---
 
-OpenCode, OpenClaw içinde iki barındırılan katalog sunar:
+OpenCode, OpenClaw içinde iki barındırılan katalog açığa çıkarır:
 
-| Katalog | Önek             | Çalışma zamanı sağlayıcısı |
-| ------- | ---------------- | -------------------------- |
-| **Zen** | `opencode/...`   | `opencode`                 |
-| **Go**  | `opencode-go/...` | `opencode-go`             |
+| Catalog | Prefix            | Runtime provider |
+| ------- | ----------------- | ---------------- |
+| **Zen** | `opencode/...`    | `opencode`       |
+| **Go**  | `opencode-go/...` | `opencode-go`    |
 
-Her iki katalog da aynı OpenCode API anahtarını kullanır. OpenClaw, upstream model başına yönlendirmenin doğru kalması için çalışma zamanı sağlayıcı kimliklerini
+Her iki katalog da aynı OpenCode API anahtarını kullanır. OpenClaw, yukarı akış model başına yönlendirmenin doğru kalması için çalışma zamanı sağlayıcı kimliklerini
 ayrı tutar, ancak onboarding ve belgeler bunları
 tek bir OpenCode kurulumu olarak ele alır.
 
 ## Başlarken
 
 <Tabs>
-  <Tab title="Zen katalogu">
-    **Şunun için en iyisi:** küratörlü OpenCode çoklu model proxy'si (Claude, GPT, Gemini).
+  <Tab title="Zen kataloğu">
+    **Şunun için en iyisi:** küratörlü OpenCode çok modelli proxy (Claude, GPT, Gemini).
 
     <Steps>
-      <Step title="Onboarding çalıştırın">
+      <Step title="Onboarding'i çalıştırın">
         ```bash
         openclaw onboard --auth-choice opencode-zen
         ```
@@ -42,7 +42,7 @@ tek bir OpenCode kurulumu olarak ele alır.
         openclaw onboard --opencode-zen-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Bir Zen modelini varsayılan yapın">
+      <Step title="Varsayılan olarak bir Zen modeli ayarlayın">
         ```bash
         openclaw config set agents.defaults.model.primary "opencode/claude-opus-4-6"
         ```
@@ -56,11 +56,11 @@ tek bir OpenCode kurulumu olarak ele alır.
 
   </Tab>
 
-  <Tab title="Go katalogu">
-    **Şunun için en iyisi:** OpenCode tarafından barındırılan Kimi, GLM ve MiniMax dizisi.
+  <Tab title="Go kataloğu">
+    **Şunun için en iyisi:** OpenCode tarafından barındırılan Kimi, GLM ve MiniMax dizilimi.
 
     <Steps>
-      <Step title="Onboarding çalıştırın">
+      <Step title="Onboarding'i çalıştırın">
         ```bash
         openclaw onboard --auth-choice opencode-go
         ```
@@ -71,9 +71,9 @@ tek bir OpenCode kurulumu olarak ele alır.
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Bir Go modelini varsayılan yapın">
+      <Step title="Varsayılan olarak bir Go modeli ayarlayın">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
+        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
       <Step title="Modellerin kullanılabilir olduğunu doğrulayın">
@@ -86,7 +86,7 @@ tek bir OpenCode kurulumu olarak ele alır.
   </Tab>
 </Tabs>
 
-## Config örneği
+## Yapılandırma örneği
 
 ```json5
 {
@@ -99,17 +99,17 @@ tek bir OpenCode kurulumu olarak ele alır.
 
 ### Zen
 
-| Özellik          | Değer                                                                   |
+| Property         | Value                                                                   |
 | ---------------- | ----------------------------------------------------------------------- |
-| Çalışma zamanı sağlayıcısı | `opencode`                                                    |
-| Örnek modeller   | `opencode/claude-opus-4-6`, `opencode/gpt-5.5`, `opencode/gemini-3-pro` |
+| Runtime provider | `opencode`                                                              |
+| Example models   | `opencode/claude-opus-4-6`, `opencode/gpt-5.5`, `opencode/gemini-3-pro` |
 
 ### Go
 
-| Özellik          | Değer                                                                     |
-| ---------------- | ------------------------------------------------------------------------- |
-| Çalışma zamanı sağlayıcısı | `opencode-go`                                                  |
-| Örnek modeller   | `opencode-go/kimi-k2.5`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
+| Property         | Value                                                                    |
+| ---------------- | ------------------------------------------------------------------------ |
+| Runtime provider | `opencode-go`                                                            |
+| Example models   | `opencode-go/kimi-k2.6`, `opencode-go/glm-5`, `opencode-go/minimax-m2.5` |
 
 ## Gelişmiş yapılandırma
 
@@ -119,38 +119,38 @@ tek bir OpenCode kurulumu olarak ele alır.
   </Accordion>
 
   <Accordion title="Paylaşılan kimlik bilgileri">
-    Kurulum sırasında tek bir OpenCode anahtarı girmek, kimlik bilgilerini her iki çalışma zamanı
-    sağlayıcısı için saklar. Her kataloğu ayrı ayrı onboard etmeniz gerekmez.
+    Kurulum sırasında tek bir OpenCode anahtarı girildiğinde, kimlik bilgileri her iki çalışma zamanı
+    sağlayıcısı için de saklanır. Her kataloğu ayrı ayrı onboard etmeniz gerekmez.
   </Accordion>
 
-  <Accordion title="Faturalandırma ve pano">
-    OpenCode'a giriş yapar, faturalandırma bilgilerini eklersiniz ve API anahtarınızı kopyalarsınız. Faturalandırma
-    ve katalog kullanılabilirliği OpenCode panosundan yönetilir.
+  <Accordion title="Faturalandırma ve kontrol paneli">
+    OpenCode'da oturum açar, faturalandırma bilgilerinizi eklersiniz ve API anahtarınızı kopyalarsınız. Faturalandırma
+    ve katalog kullanılabilirliği OpenCode kontrol panelinden yönetilir.
   </Accordion>
 
-  <Accordion title="Gemini replay davranışı">
-    Gemini destekli OpenCode ref'leri proxy-Gemini yolunda kalır; bu yüzden OpenClaw,
+  <Accordion title="Gemini yeniden oynatma davranışı">
+    Gemini destekli OpenCode başvuruları proxy-Gemini yolunda kalır, bu yüzden OpenClaw
     yerel Gemini
-    replay doğrulamasını veya bootstrap yeniden yazımlarını etkinleştirmeden orada Gemini thought-signature sanitization yapmaya devam eder.
+    yeniden oynatma doğrulamasını veya bootstrap yeniden yazımlarını etkinleştirmeden orada Gemini düşünce-imzası sanitize işlemini korur.
   </Accordion>
 
-  <Accordion title="Gemini olmayan replay davranışı">
-    Gemini olmayan OpenCode ref'leri, en az OpenAI uyumlu replay ilkesini korur.
+  <Accordion title="Gemini olmayan yeniden oynatma davranışı">
+    Gemini olmayan OpenCode başvuruları en düşük düzeyde OpenAI uyumlu yeniden oynatma ilkesini korur.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Kurulum sırasında tek bir OpenCode anahtarı girmek, kimlik bilgilerini hem Zen hem de
-Go çalışma zamanı sağlayıcıları için saklar; dolayısıyla yalnızca bir kez onboarding yapmanız gerekir.
+Kurulum sırasında tek bir OpenCode anahtarı girmek, hem Zen hem de
+Go çalışma zamanı sağlayıcıları için kimlik bilgilerini saklar; bu yüzden yalnızca bir kez onboard etmeniz yeterlidir.
 </Tip>
 
 ## İlgili
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model ref'lerini ve failover davranışını seçme.
+  <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
+    Sağlayıcıları, model başvurularını ve failover davranışını seçme.
   </Card>
-  <Card title="Configuration reference" href="/tr/gateway/configuration-reference" icon="gear">
+  <Card title="Yapılandırma başvurusu" href="/tr/gateway/configuration-reference" icon="gear">
     Aracılar, modeller ve sağlayıcılar için tam config başvurusu.
   </Card>
 </CardGroup>

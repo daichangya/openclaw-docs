@@ -1,32 +1,31 @@
 ---
 read_when:
-    - Ajan çalışma alanını veya dosya düzenini açıklamanız gerekiyor
-    - Bir ajan çalışma alanını yedeklemek veya taşımak istiyorsunuz
-summary: 'Ajan çalışma alanı: konum, düzen ve yedekleme stratejisi'
-title: Ajan çalışma alanı
+    - Aracı çalışma alanını veya dosya düzenini açıklamanız gerekiyor
+    - Bir aracı çalışma alanını yedeklemek veya taşımak istiyorsunuz
+summary: 'Aracı çalışma alanı: konum, düzen ve yedekleme stratejisi'
+title: Aracı çalışma alanı
 x-i18n:
-    generated_at: "2026-04-24T09:04:26Z"
+    generated_at: "2026-04-25T13:44:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d6441991b5f9f71b13b2423d3c36b688a2d7d96386381e610a525aaccd55c9bf
+    source_hash: 51f9531dbd0f7d0c297f448a5e37f413bae48d75068f15ac88b6fdf7f153c974
     source_path: concepts/agent-workspace.md
     workflow: 15
 ---
 
-Çalışma alanı ajanın evidir. Dosya araçları ve çalışma alanı bağlamı için kullanılan tek çalışma dizinidir.
-Bunu gizli tutun ve bellek gibi değerlendirin.
+Çalışma alanı aracının evidir. Dosya araçları ve çalışma alanı bağlamı için kullanılan
+tek çalışma dizinidir. Özel tutun ve bellek gibi davranın.
 
-Bu, yapılandırma, kimlik bilgileri ve
-oturumları depolayan `~/.openclaw/` konumundan ayrıdır.
+Bu, config, kimlik bilgileri ve
+oturumları depolayan `~/.openclaw/` dizininden ayrıdır.
 
-**Önemli:** çalışma alanı varsayılan **cwd**'dir, katı bir sandbox değildir. Araçlar
-göreli yolları çalışma alanına göre çözer, ancak sandbox etkin değilse mutlak yollar
-yine de ana bilgisayarda başka yerlere erişebilir. Yalıtım gerekiyorsa
-[`agents.defaults.sandbox`](/tr/gateway/sandboxing) (ve/veya ajan başına sandbox yapılandırması)
-kullanın.
-Sandbox etkinse ve `workspaceAccess` `"rw"` değilse araçlar,
-ana bilgisayar çalışma alanınız yerine `~/.openclaw/sandboxes` altındaki bir sandbox çalışma alanı
-içinde çalışır.
+**Önemli:** çalışma alanı, katı bir sandbox değil, **varsayılan cwd**'dir. Araçlar
+göreli yolları çalışma alanına göre çözümler, ancak sandboxing etkin değilse mutlak yollar
+yine de ana makinede başka yerlere erişebilir. Yalıtım gerekiyorsa
+[`agents.defaults.sandbox`](/tr/gateway/sandboxing) (ve/veya aracı başına sandbox yapılandırması)
+kullanın. Sandboxing etkinse ve `workspaceAccess` `"rw"` değilse, araçlar
+ana makine çalışma alanınızda değil, `~/.openclaw/sandboxes` altındaki bir sandbox çalışma alanında
+çalışır.
 
 ## Varsayılan konum
 
@@ -37,71 +36,72 @@ içinde çalışır.
 
 ```json5
 {
-  agent: {
-    workspace: "~/.openclaw/workspace",
+  agents: {
+    defaults: {
+      workspace: "~/.openclaw/workspace",
+    },
   },
 }
 ```
 
-`openclaw onboard`, `openclaw configure` veya `openclaw setup`
-çalışma alanını oluşturur ve eksikse başlangıç dosyalarını tohumlar.
-Sandbox tohum kopyaları yalnızca çalışma alanı içindeki normal dosyaları kabul eder;
-kaynak çalışma alanı dışına çözümlenen symlink/hardlink
+`openclaw onboard`, `openclaw configure` veya `openclaw setup`,
+çalışma alanını oluşturur ve eksikse bootstrap dosyalarını yerleştirir.
+Sandbox tohum kopyaları yalnızca çalışma alanı içindeki normal dosyaları kabul eder; kaynak çalışma alanı dışına çözümlenen symlink/hardlink
 takma adları yok sayılır.
 
-Çalışma alanı dosyalarını zaten kendiniz yönetiyorsanız başlangıç
+Çalışma alanı dosyalarını zaten kendiniz yönetiyorsanız, bootstrap
 dosyası oluşturmayı devre dışı bırakabilirsiniz:
 
 ```json5
-{ agent: { skipBootstrap: true } }
+{ agents: { defaults: { skipBootstrap: true } } }
 ```
 
 ## Ek çalışma alanı klasörleri
 
-Eski kurulumlar `~/openclaw` oluşturmuş olabilir. Birden fazla çalışma alanı
-dizinini ortalıkta tutmak kafa karıştırıcı kimlik doğrulama veya durum kaymasına yol açabilir,
-çünkü aynı anda yalnızca bir çalışma alanı etkindir.
+Eski kurulumlar `~/openclaw` oluşturmuş olabilir. Birden çok çalışma alanı
+dizinini etrafta tutmak, aynı anda yalnızca bir çalışma alanı etkin olduğu için
+karışık kimlik doğrulama veya durum kaymasına neden olabilir.
 
-**Öneri:** tek bir etkin çalışma alanı tutun. Ek klasörleri artık
-kullanmıyorsanız arşivleyin veya Çöp Kutusu'na taşıyın (örneğin `trash ~/openclaw`).
-Bilerek birden fazla çalışma alanı tutuyorsanız
-`agents.defaults.workspace` değerinin etkin olanı işaret ettiğinden emin olun.
+**Öneri:** tek bir etkin çalışma alanı tutun. Ek
+klasörleri artık kullanmıyorsanız arşivleyin veya Çöp'e taşıyın (örneğin `trash ~/openclaw`).
+Bilerek birden çok çalışma alanı tutuyorsanız,
+`agents.defaults.workspace` öğesinin etkin olana işaret ettiğinden emin olun.
 
-`openclaw doctor`, ek çalışma alanı dizinleri algıladığında uyarır.
+`openclaw doctor`, ek çalışma alanı dizinleri algıladığında uyarı verir.
 
 ## Çalışma alanı dosya haritası (her dosyanın anlamı)
 
-Bunlar OpenClaw'ın çalışma alanı içinde beklediği standart dosyalardır:
+Bunlar, OpenClaw'ın çalışma alanı içinde beklediği standart dosyalardır:
 
 - `AGENTS.md`
-  - Ajan için işletim talimatları ve belleği nasıl kullanması gerektiği.
+  - Aracı için çalışma talimatları ve belleği nasıl kullanması gerektiği.
   - Her oturumun başında yüklenir.
   - Kurallar, öncelikler ve "nasıl davranmalı" ayrıntıları için iyi bir yerdir.
 
 - `SOUL.md`
   - Persona, ton ve sınırlar.
   - Her oturumda yüklenir.
-  - Rehber: [SOUL.md Kişilik Rehberi](/tr/concepts/soul)
+  - Rehber: [SOUL.md Personality Guide](/tr/concepts/soul)
 
 - `USER.md`
   - Kullanıcının kim olduğu ve ona nasıl hitap edileceği.
   - Her oturumda yüklenir.
 
 - `IDENTITY.md`
-  - Ajanın adı, havası ve emojisi.
-  - Başlangıç ritüeli sırasında oluşturulur/güncellenir.
+  - Aracının adı, havası ve emojisi.
+  - Bootstrap ritüeli sırasında oluşturulur/güncellenir.
 
 - `TOOLS.md`
   - Yerel araçlarınız ve kurallarınız hakkında notlar.
-  - Araç kullanılabilirliğini kontrol etmez; yalnızca yönlendirme sağlar.
+  - Araç kullanılabilirliğini denetlemez; yalnızca yol göstericidir.
 
 - `HEARTBEAT.md`
   - Heartbeat çalıştırmaları için isteğe bağlı küçük kontrol listesi.
-  - Belirteç tüketimini önlemek için kısa tutun.
+  - Token tüketimini önlemek için kısa tutun.
 
 - `BOOT.md`
-  - Gateway yeniden başlatmasında otomatik çalıştırılan isteğe bağlı başlangıç kontrol listesi ([internal hooks](/tr/automation/hooks) etkin olduğunda).
-  - Kısa tutun; giden gönderimler için message aracını kullanın.
+  - Gateway yeniden başlatıldığında otomatik çalışan isteğe bağlı başlangıç kontrol listesi ([dahili kancalar](/tr/automation/hooks) etkin olduğunda).
+  - Kısa tutun; giden gönderimler için mesaj aracını kullanın.
 
 - `BOOTSTRAP.md`
   - Tek seferlik ilk çalıştırma ritüeli.
@@ -110,52 +110,53 @@ Bunlar OpenClaw'ın çalışma alanı içinde beklediği standart dosyalardır:
 
 - `memory/YYYY-MM-DD.md`
   - Günlük bellek günlüğü (günde bir dosya).
-  - Oturum başlangıcında bugün + dünü okumanız önerilir.
+  - Oturum başlangıcında bugün + dün dosyalarının okunması önerilir.
 
 - `MEMORY.md` (isteğe bağlı)
-  - Küratörlü uzun vadeli bellek.
+  - Düzenlenmiş uzun vadeli bellek.
   - Yalnızca ana, özel oturumda yükleyin (paylaşılan/grup bağlamlarında değil).
 
 İş akışı ve otomatik bellek boşaltma için bkz. [Memory](/tr/concepts/memory).
 
 - `skills/` (isteğe bağlı)
   - Çalışma alanına özgü Skills.
-  - O çalışma alanı için en yüksek öncelikli skill konumu.
-  - Ad çakıştığında proje ajan skills, kişisel ajan skills, yönetilen skills, paketlenmiş skills ve `skills.load.extraDirs` konumlarını geçersiz kılar.
+  - O çalışma alanı için en yüksek öncelikli Skills konumu.
+  - Adlar çakıştığında proje aracı Skills, kişisel aracı Skills, yönetilen Skills, paketlenmiş Skills ve `skills.load.extraDirs` değerlerini geçersiz kılar.
 
 - `canvas/` (isteğe bağlı)
   - Node ekranları için Canvas UI dosyaları (örneğin `canvas/index.html`).
 
-Herhangi bir başlangıç dosyası eksikse OpenClaw, oturuma bir "eksik dosya"
-işaretçisi ekler ve devam eder. Büyük başlangıç dosyaları eklenirken kırpılır;
+Herhangi bir bootstrap dosyası eksikse, OpenClaw
+oturuma bir "eksik dosya" işaretçisi ekler ve devam eder. Büyük bootstrap dosyaları eklenirken kesilir;
 sınırları `agents.defaults.bootstrapMaxChars` (varsayılan: 12000) ve
 `agents.defaults.bootstrapTotalMaxChars` (varsayılan: 60000) ile ayarlayın.
-`openclaw setup`, mevcut dosyaların üzerine yazmadan eksik varsayılanları yeniden oluşturabilir.
+`openclaw setup`, mevcut
+dosyaların üzerine yazmadan eksik varsayılanları yeniden oluşturabilir.
 
 ## Çalışma alanında OLMAYANLAR
 
 Bunlar `~/.openclaw/` altında bulunur ve çalışma alanı deposuna commit edilmemelidir:
 
-- `~/.openclaw/openclaw.json` (yapılandırma)
+- `~/.openclaw/openclaw.json` (config)
 - `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (model kimlik doğrulama profilleri: OAuth + API anahtarları)
-- `~/.openclaw/credentials/` (kanal/sağlayıcı durumu ve eski OAuth içe aktarma verileri)
-- `~/.openclaw/agents/<agentId>/sessions/` (oturum transkriptleri + meta veriler)
-- `~/.openclaw/skills/` (yönetilen skills)
+- `~/.openclaw/credentials/` (kanal/sağlayıcı durumu artı eski OAuth içe aktarma verileri)
+- `~/.openclaw/agents/<agentId>/sessions/` (oturum dökümleri + meta veriler)
+- `~/.openclaw/skills/` (yönetilen Skills)
 
-Oturumları veya yapılandırmayı taşımanız gerekiyorsa, bunları ayrı kopyalayın ve
+Oturumları veya config'i taşımanız gerekiyorsa, bunları ayrı kopyalayın ve
 sürüm kontrolü dışında tutun.
 
-## Git yedekleme (önerilen, özel)
+## Git yedeği (önerilir, özel)
 
-Çalışma alanını özel bellek gibi değerlendirin. Yedeklenebilir ve geri alınabilir olması için
+Çalışma alanına özel bellek gibi davranın. Yedeklenmiş ve kurtarılabilir olması için
 onu **özel** bir git deposuna koyun.
 
 Bu adımları Gateway'in çalıştığı makinede uygulayın (çalışma alanı orada bulunur).
 
 ### 1) Depoyu başlatın
 
-Git yüklüyse yepyeni çalışma alanları otomatik olarak başlatılır. Bu
-çalışma alanı zaten bir depo değilse şunu çalıştırın:
+git yüklüyse, yepyeni çalışma alanları otomatik olarak başlatılır. Bu
+çalışma alanı henüz bir repo değilse şunu çalıştırın:
 
 ```bash
 cd ~/.openclaw/workspace
@@ -164,14 +165,14 @@ git add AGENTS.md SOUL.md TOOLS.md IDENTITY.md USER.md HEARTBEAT.md memory/
 git commit -m "Add agent workspace"
 ```
 
-### 2) Özel bir uzak depo ekleyin (başlangıç dostu seçenekler)
+### 2) Özel bir remote ekleyin (başlangıç dostu seçenekler)
 
-Seçenek A: GitHub web UI
+Seçenek A: GitHub web arayüzü
 
 1. GitHub üzerinde yeni bir **özel** depo oluşturun.
-2. README ile başlatmayın (birleştirme çakışmalarını önler).
-3. HTTPS uzak depo URL'sini kopyalayın.
-4. Uzak depoyu ekleyin ve gönderin:
+2. README ile başlatmayın (merge çakışmalarını önler).
+3. HTTPS remote URL'sini kopyalayın.
+4. Remote'u ekleyin ve push edin:
 
 ```bash
 git branch -M main
@@ -186,12 +187,12 @@ gh auth login
 gh repo create openclaw-workspace --private --source . --remote origin --push
 ```
 
-Seçenek C: GitLab web UI
+Seçenek C: GitLab web arayüzü
 
 1. GitLab üzerinde yeni bir **özel** depo oluşturun.
-2. README ile başlatmayın (birleştirme çakışmalarını önler).
-3. HTTPS uzak depo URL'sini kopyalayın.
-4. Uzak depoyu ekleyin ve gönderin:
+2. README ile başlatmayın (merge çakışmalarını önler).
+3. HTTPS remote URL'sini kopyalayın.
+4. Remote'u ekleyin ve push edin:
 
 ```bash
 git branch -M main
@@ -199,7 +200,7 @@ git remote add origin <https-url>
 git push -u origin main
 ```
 
-### 3) Sürekli güncellemeler
+### 3) Devam eden güncellemeler
 
 ```bash
 git status
@@ -212,14 +213,14 @@ git push
 
 Özel bir depoda bile gizli bilgileri çalışma alanında saklamaktan kaçının:
 
-- API anahtarları, OAuth belirteçleri, parolalar veya özel kimlik bilgileri.
-- `~/.openclaw/` altındaki hiçbir şey.
+- API anahtarları, OAuth token'ları, parolalar veya özel kimlik bilgileri.
+- `~/.openclaw/` altındaki her şey.
 - Sohbetlerin ham dökümleri veya hassas ekler.
 
-Hassas başvurular saklamanız gerekiyorsa yer tutucular kullanın ve gerçek
-gizli bilgiyi başka yerde tutun (parola yöneticisi, ortam değişkenleri veya `~/.openclaw/`).
+Hassas başvurular depolamanız gerekiyorsa yer tutucular kullanın ve gerçek
+gizli bilgiyi başka bir yerde tutun (parola yöneticisi, ortam değişkenleri veya `~/.openclaw/`).
 
-Önerilen başlangıç `.gitignore`:
+Önerilen başlangıç `.gitignore` dosyası:
 
 ```gitignore
 .DS_Store
@@ -232,22 +233,21 @@ gizli bilgiyi başka yerde tutun (parola yöneticisi, ortam değişkenleri veya 
 ## Çalışma alanını yeni bir makineye taşıma
 
 1. Depoyu istenen yola klonlayın (varsayılan `~/.openclaw/workspace`).
-2. `~/.openclaw/openclaw.json` içinde `agents.defaults.workspace` değerini bu yola ayarlayın.
-3. Eksik dosyaları tohumlamak için `openclaw setup --workspace <path>` çalıştırın.
-4. Oturumlara ihtiyacınız varsa eski makineden `~/.openclaw/agents/<agentId>/sessions/`
-   dizinini ayrı olarak kopyalayın.
+2. `~/.openclaw/openclaw.json` içinde `agents.defaults.workspace` öğesini bu yola ayarlayın.
+3. Eksik dosyaları yerleştirmek için `openclaw setup --workspace <path>` çalıştırın.
+4. Oturumlara ihtiyacınız varsa, `~/.openclaw/agents/<agentId>/sessions/` dizinini
+   eski makineden ayrıca kopyalayın.
 
 ## Gelişmiş notlar
 
-- Çok ajanlı yönlendirme ajan başına farklı çalışma alanları kullanabilir. Yönlendirme yapılandırması için
-  [Kanal yönlendirme](/tr/channels/channel-routing) sayfasına bakın.
+- Çok aracı yönlendirme, aracı başına farklı çalışma alanları kullanabilir. Yönlendirme yapılandırması için
+  [Channel routing](/tr/channels/channel-routing) sayfasına bakın.
 - `agents.defaults.sandbox` etkinse, ana olmayan oturumlar
-  `agents.defaults.sandbox.workspaceRoot` altında oturum başına sandbox çalışma
-  alanları kullanabilir.
+  `agents.defaults.sandbox.workspaceRoot` altındaki oturum başına sandbox çalışma alanlarını kullanabilir.
 
 ## İlgili
 
-- [Sürekli Talimatlar](/tr/automation/standing-orders) — çalışma alanı dosyalarındaki kalıcı talimatlar
-- [Heartbeat](/tr/gateway/heartbeat) — HEARTBEAT.md çalışma alanı dosyası
-- [Oturum](/tr/concepts/session) — oturum depolama yolları
+- [Standing Orders](/tr/automation/standing-orders) — çalışma alanı dosyalarındaki kalıcı talimatlar
+- [Heartbeat](/tr/gateway/heartbeat) — `HEARTBEAT.md` çalışma alanı dosyası
+- [Session](/tr/concepts/session) — oturum depolama yolları
 - [Sandboxing](/tr/gateway/sandboxing) — sandbox ortamlarında çalışma alanı erişimi

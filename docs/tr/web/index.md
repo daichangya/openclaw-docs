@@ -1,34 +1,35 @@
 ---
 read_when:
     - Gateway'e Tailscale üzerinden erişmek istiyorsunuz
-    - Tarayıcıdaki Control UI'yi ve yapılandırma düzenlemeyi istiyorsunuz
-summary: 'Gateway web yüzeyleri: Control UI, bağlanma modları ve güvenlik'
+    - Tarayıcıdaki Control UI ve yapılandırma düzenlemeyi istiyorsunuz
+summary: 'Gateway web yüzeyleri: Control UI, bağlama modları ve güvenlik'
 title: Web
 x-i18n:
-    generated_at: "2026-04-24T09:38:46Z"
+    generated_at: "2026-04-25T14:01:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0336a6597cebf4a8a83d348abd3d59ff4b9bd7349a32c8a0a0093da0f656e97d
+    source_hash: 424704a35ce3a0f5960486372514751cc93ae90e4b75d0ed114e045664256d2d
     source_path: web/index.md
     workflow: 15
 ---
 
-Gateway, Gateway WebSocket ile aynı porttan küçük bir **tarayıcı Control UI** (Vite + Lit) sunar:
+Gateway, Gateway WebSocket ile aynı bağlantı noktasından küçük bir **tarayıcı Control UI** (Vite + Lit) sunar:
 
 - varsayılan: `http://<host>:18789/`
+- `gateway.tls.enabled: true` ile: `https://<host>:18789/`
 - isteğe bağlı önek: `gateway.controlUi.basePath` ayarlayın (ör. `/openclaw`)
 
 Yetenekler [Control UI](/tr/web/control-ui) içinde yer alır.
-Bu sayfa bağlanma modlarına, güvenliğe ve web'e dönük yüzeylere odaklanır.
+Bu sayfa bağlama modlarına, güvenliğe ve web'e dönük yüzeylere odaklanır.
 
 ## Webhook'lar
 
-`hooks.enabled=true` olduğunda Gateway, aynı HTTP sunucusunda küçük bir webhook uç noktası da açığa çıkarır.
-Auth + payload'lar için bkz. [Gateway configuration](/tr/gateway/configuration) → `hooks`.
+`hooks.enabled=true` olduğunda Gateway, aynı HTTP sunucusunda küçük bir Webhook uç noktası da sunar.
+Kimlik doğrulama + yükler için bkz. [Gateway yapılandırması](/tr/gateway/configuration) → `hooks`.
 
 ## Yapılandırma (varsayılan olarak açık)
 
-Varlıklar mevcut olduğunda (`dist/control-ui`) Control UI **varsayılan olarak etkindir**.
+Control UI, varlıklar mevcut olduğunda (`dist/control-ui`) **varsayılan olarak etkindir**.
 Bunu yapılandırma üzerinden denetleyebilirsiniz:
 
 ```json5
@@ -41,9 +42,9 @@ Bunu yapılandırma üzerinden denetleyebilirsiniz:
 
 ## Tailscale erişimi
 
-### Tümleşik Serve (önerilen)
+### Entegre Serve (önerilir)
 
-Gateway'i loopback üzerinde tutun ve Tailscale Serve'in bunu proxy etmesine izin verin:
+Gateway'i loopback üzerinde tutun ve Tailscale Serve'in onu proxy'lemesine izin verin:
 
 ```json5
 {
@@ -60,11 +61,11 @@ Ardından gateway'i başlatın:
 openclaw gateway
 ```
 
-Açın:
+Şunu açın:
 
 - `https://<magicdns>/` (veya yapılandırdığınız `gateway.controlUi.basePath`)
 
-### Tailnet bind + token
+### Tailnet bağlama + token
 
 ```json5
 {
@@ -76,14 +77,14 @@ Açın:
 }
 ```
 
-Ardından gateway'i başlatın (bu loopback olmayan örnek paylaşılan gizli anahtar token
-auth kullanır):
+Ardından gateway'i başlatın (bu loopback olmayan örnek, paylaşılan gizli token
+kimlik doğrulaması kullanır):
 
 ```bash
 openclaw gateway
 ```
 
-Açın:
+Şunu açın:
 
 - `http://<tailscale-ip>:18789/` (veya yapılandırdığınız `gateway.controlUi.basePath`)
 
@@ -101,30 +102,32 @@ Açın:
 
 ## Güvenlik notları
 
-- Gateway auth varsayılan olarak zorunludur (token, password, trusted-proxy veya etkinleştirildiğinde Tailscale Serve kimlik başlıkları).
-- Loopback olmayan bind'ler de yine Gateway auth **gerektirir**. Pratikte bu, token/password auth veya `gateway.auth.mode: "trusted-proxy"` ile kimlik farkındalıklı bir reverse proxy anlamına gelir.
-- Sihirbaz varsayılan olarak paylaşılan gizli anahtar auth oluşturur ve genellikle bir
+- Gateway kimlik doğrulaması varsayılan olarak gereklidir (token, parola, trusted-proxy veya etkinleştirildiğinde Tailscale Serve kimlik üst bilgileri).
+- Loopback olmayan bağlamalar yine de **gateway kimlik doğrulaması** gerektirir. Pratikte bu, token/parola kimlik doğrulaması veya `gateway.auth.mode: "trusted-proxy"` kullanan kimlik farkındalıklı bir ters proxy anlamına gelir.
+- Sihirbaz varsayılan olarak paylaşılan gizli kimlik doğrulaması oluşturur ve genellikle bir
   gateway token'ı üretir (loopback üzerinde bile).
-- Paylaşılan gizli anahtar modunda UI, `connect.params.auth.token` veya
+- Paylaşılan gizli modda UI, `connect.params.auth.token` veya
   `connect.params.auth.password` gönderir.
-- Tailscale Serve veya `trusted-proxy` gibi kimlik taşıyan modlarda ise
-  WebSocket auth denetimi bunun yerine istek başlıklarından karşılanır.
-- Loopback olmayan Control UI dağıtımlarında `gateway.controlUi.allowedOrigins`
-  değerini açıkça ayarlayın (tam origin'ler). Bu olmadan gateway başlangıcı varsayılan olarak reddedilir.
+- `gateway.tls.enabled: true` olduğunda, yerel pano ve durum yardımcıları
+  `https://` pano URL'leri ve `wss://` WebSocket URL'leri oluşturur.
+- Tailscale Serve veya `trusted-proxy` gibi kimlik taşıyan modlarda,
+  WebSocket kimlik doğrulama denetimi bunun yerine istek üst bilgilerinden karşılanır.
+- Loopback olmayan Control UI dağıtımları için `gateway.controlUi.allowedOrigins`
+  değerini açıkça ayarlayın (tam origin'ler). Bu ayar olmadan gateway başlangıcı varsayılan olarak reddedilir.
 - `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true`,
   Host-header origin fallback modunu etkinleştirir, ancak bu tehlikeli bir güvenlik düşüşüdür.
-- Serve ile `gateway.auth.allowTailscale` değeri `true` olduğunda
-  Tailscale kimlik başlıkları Control UI/WebSocket auth'u karşılayabilir (token/password gerekmez).
-  HTTP API uç noktaları bu Tailscale kimlik başlıklarını kullanmaz; bunun yerine
-  gateway'in normal HTTP auth modunu izler. Açık kimlik bilgileri istemek için
+- Serve ile, `gateway.auth.allowTailscale` değeri `true` olduğunda Tailscale kimlik üst bilgileri
+  Control UI/WebSocket kimlik doğrulamasını karşılayabilir (token/parola gerekmez).
+  HTTP API uç noktaları bu Tailscale kimlik üst bilgilerini kullanmaz; bunun yerine
+  gateway'in normal HTTP kimlik doğrulama modunu izler. Açık kimlik bilgileri gerektirmek için
   `gateway.auth.allowTailscale: false` ayarlayın. Bkz.
-  [Tailscale](/tr/gateway/tailscale) ve [Security](/tr/gateway/security). Bu
+  [Tailscale](/tr/gateway/tailscale) ve [Güvenlik](/tr/gateway/security). Bu
   tokensız akış, gateway host'una güvenildiğini varsayar.
-- `gateway.tailscale.mode: "funnel"` için `gateway.auth.mode: "password"` gerekir (paylaşılan password).
+- `gateway.tailscale.mode: "funnel"`, `gateway.auth.mode: "password"` gerektirir (paylaşılan parola).
 
-## UI'yi oluşturma
+## UI'yi derleme
 
-Gateway, `dist/control-ui` içinden statik dosyalar sunar. Bunları şu komutla oluşturun:
+Gateway, statik dosyaları `dist/control-ui` içinden sunar. Bunları şu komutla derleyin:
 
 ```bash
 pnpm ui:build

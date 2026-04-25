@@ -1,27 +1,29 @@
 ---
 read_when:
-    - OpenClaw'ta daha kısa `exec` veya `bash` araç sonuçları istiyorsunuz
-    - Paketlenmiş tokenjuice Plugin'ini etkinleştirmek istiyorsunuz
-    - Tokenjuice'un neyi değiştirdiğini ve neyi ham bıraktığını anlamanız gerekiyor
-summary: İsteğe bağlı paketlenmiş bir Plugin ile gürültülü exec ve bash araç sonuçlarını sıkıştırma
-title: İsteğe bağlı paketlenmiş bir Plugin ile gürültülü exec ve bash araç sonuçlarını sıkıştırma
+    - OpenClaw'da daha kısa `exec` veya `bash` araç sonuçları istiyorsunuz
+    - Paketlenmiş Tokenjuice plugin'ini etkinleştirmek istiyorsunuz
+    - Tokenjuice'ın neyi değiştirdiğini ve neyi ham bıraktığını anlamanız gerekiyor
+summary: İsteğe bağlı paketlenmiş bir plugin ile gürültülü exec ve bash araç sonuçlarını sıkıştırın
+title: Tokenjuice
 x-i18n:
-    generated_at: "2026-04-24T09:37:42Z"
+    generated_at: "2026-04-25T14:00:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 0ff542095eb730f06eadec213289b93e31f1afa179160b7d4e915329f09ad5f1
+    source_hash: 04328cc7a13ccd64f8309ddff867ae893387f93c26641dfa1a4013a4c3063962
     source_path: tools/tokenjuice.md
     workflow: 15
 ---
 
-`tokenjuice`, komut zaten çalıştıktan sonra gürültülü `exec` ve `bash`
-araç sonuçlarını sıkıştıran isteğe bağlı paketlenmiş bir Plugin'dir.
+`tokenjuice`, komut zaten çalıştırıldıktan sonra gürültülü `exec` ve `bash`
+araç sonuçlarını sıkıştıran isteğe bağlı paketlenmiş bir plugin'dir.
 
 Komutun kendisini değil, döndürülen `tool_result` değerini değiştirir. Tokenjuice
-shell girdisini yeniden yazmaz, komutları yeniden çalıştırmaz veya çıkış kodlarını değiştirmez.
+shell girdisini yeniden yazmaz, komutları yeniden çalıştırmaz ve çıkış kodlarını değiştirmez.
 
-Bugün bu, Pi gömülü çalıştırmalarına uygulanır; tokenjuice burada gömülü
-`tool_result` yoluna kanca olur ve oturuma geri dönen çıktıyı kırpar.
+Bugün bu, PI gömülü çalıştırmalarına ve Codex
+app-server harness içindeki OpenClaw dinamik araçlarına uygulanır. Tokenjuice, OpenClaw'ın
+araç sonucu middleware'ine bağlanır ve çıktı etkin harness oturumuna geri gitmeden önce
+kırpar.
 
 ## Plugin'i etkinleştirin
 
@@ -37,7 +39,7 @@ Eşdeğeri:
 openclaw plugins enable tokenjuice
 ```
 
-OpenClaw Plugin'i zaten paketlenmiş olarak getirir. Ayrı bir `plugins install`
+OpenClaw plugin'i zaten paketlenmiş olarak sunar. Ayrı bir `plugins install`
 veya `tokenjuice install openclaw` adımı yoktur.
 
 Yapılandırmayı doğrudan düzenlemeyi tercih ederseniz:
@@ -54,19 +56,19 @@ Yapılandırmayı doğrudan düzenlemeyi tercih ederseniz:
 }
 ```
 
-## Tokenjuice neyi değiştirir
+## Tokenjuice'ın değiştirdiği şeyler
 
 - Gürültülü `exec` ve `bash` sonuçlarını oturuma geri beslenmeden önce sıkıştırır.
-- Asıl komut yürütmesini dokunmadan bırakır.
-- Tam dosya içeriği okumalarını ve tokenjuice'un ham bırakması gereken diğer komutları korur.
-- İsteğe bağlıdır: her yerde birebir çıktı istiyorsanız Plugin'i devre dışı bırakın.
+- Özgün komut yürütmesini değiştirmeden bırakır.
+- Tam dosya içeriği okumalarını ve Tokenjuice'ın ham bırakması gereken diğer komutları korur.
+- İsteğe bağlı kalır: her yerde birebir çıktı istiyorsanız plugin'i devre dışı bırakın.
 
 ## Çalıştığını doğrulayın
 
 1. Plugin'i etkinleştirin.
 2. `exec` çağırabilen bir oturum başlatın.
 3. `git status` gibi gürültülü bir komut çalıştırın.
-4. Dönen araç sonucunun ham shell çıktısından daha kısa ve daha yapılandırılmış olduğunu denetleyin.
+4. Döndürülen araç sonucunun ham shell çıktısından daha kısa ve daha yapılandırılmış olduğunu kontrol edin.
 
 ## Plugin'i devre dışı bırakın
 
@@ -82,6 +84,6 @@ openclaw plugins disable tokenjuice
 
 ## İlgili
 
-- [Exec aracı](/tr/tools/exec)
-- [Thinking düzeyleri](/tr/tools/thinking)
-- [Bağlam motoru](/tr/concepts/context-engine)
+- [Exec tool](/tr/tools/exec)
+- [Thinking levels](/tr/tools/thinking)
+- [Context engine](/tr/concepts/context-engine)

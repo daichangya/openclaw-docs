@@ -1,22 +1,22 @@
 ---
 read_when:
-    - Discord kanal özellikleri üzerinde çalışıyorsunuz
+    - Discord kanal özellikleri üzerinde çalışılıyor
 summary: Discord bot desteği durumu, yetenekleri ve yapılandırması
 title: Discord
 x-i18n:
-    generated_at: "2026-04-24T08:57:47Z"
+    generated_at: "2026-04-25T13:41:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ce73e0e6995702f3b2453b2e5ab4e55b02190e64fdf5805f53b4002be63140a2
+    source_hash: 685dd2dce8a299233b14e7bdd5f502ee92f740b7dbb3104e86e0c2f36aabcfe1
     source_path: channels/discord.md
     workflow: 15
 ---
 
-Resmi Discord gateway üzerinden DM'ler ve sunucu kanalları için hazır.
+Resmî Discord gateway üzerinden Discord DM'leri ve sunucu kanalları için hazır.
 
 <CardGroup cols={3}>
   <Card title="Eşleştirme" icon="link" href="/tr/channels/pairing">
-    Discord DM'leri varsayılan olarak eşleştirme modunu kullanır.
+    Discord DM'leri varsayılan olarak eşleştirme modundadır.
   </Card>
   <Card title="Slash komutları" icon="terminal" href="/tr/tools/slash-commands">
     Yerel komut davranışı ve komut kataloğu.
@@ -28,22 +28,22 @@ Resmi Discord gateway üzerinden DM'ler ve sunucu kanalları için hazır.
 
 ## Hızlı kurulum
 
-Yeni bir uygulama oluşturmanız, botu sunucunuza eklemeniz ve OpenClaw ile eşleştirmeniz gerekir. Botunuzu kendi özel sunucunuza eklemenizi öneririz. Henüz yoksa önce [bir tane oluşturun](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (**Create My Own > For me and my friends** seçeneğini seçin).
+Bot içeren yeni bir uygulama oluşturmanız, botu sunucunuza eklemeniz ve onu OpenClaw ile eşleştirmeniz gerekir. Botunuzu kendi özel sunucunuza eklemenizi öneririz. Henüz yoksa önce [bir tane oluşturun](https://support.discord.com/hc/en-us/articles/204849977-How-do-I-create-a-server) (**Create My Own > For me and my friends** seçin).
 
 <Steps>
-  <Step title="Bir Discord uygulaması ve bot oluşturun">
+  <Step title="Bir Discord uygulaması ve botu oluşturun">
     [Discord Developer Portal](https://discord.com/developers/applications) adresine gidin ve **New Application** seçeneğine tıklayın. Buna "OpenClaw" gibi bir ad verin.
 
-    Kenar çubuğunda **Bot** seçeneğine tıklayın. **Username** alanını OpenClaw aracınıza verdiğiniz ad olarak ayarlayın.
+    Kenar çubuğunda **Bot** seçeneğine tıklayın. **Username** alanını, OpenClaw ajanınıza verdiğiniz ad olarak ayarlayın.
 
   </Step>
 
   <Step title="Ayrıcalıklı intent'leri etkinleştirin">
-    Hâlâ **Bot** sayfasındayken aşağı kaydırarak **Privileged Gateway Intents** bölümüne gidin ve şunları etkinleştirin:
+    Hâlâ **Bot** sayfasındayken aşağı kaydırarak **Privileged Gateway Intents** bölümüne gelin ve şunları etkinleştirin:
 
-    - **Message Content Intent** (zorunlu)
-    - **Server Members Intent** (önerilir; rol izin listeleri ve adtan-kimliğe eşleştirme için zorunludur)
-    - **Presence Intent** (isteğe bağlı; yalnızca presence güncellemeleri için gereklidir)
+    - **Message Content Intent** (gerekli)
+    - **Server Members Intent** (önerilir; rol izin listeleri ve addan kimliğe eşleme için gereklidir)
+    - **Presence Intent** (isteğe bağlı; yalnızca durum güncellemeleri için gerekir)
 
   </Step>
 
@@ -51,22 +51,22 @@ Yeni bir uygulama oluşturmanız, botu sunucunuza eklemeniz ve OpenClaw ile eşl
     **Bot** sayfasında tekrar yukarı kaydırın ve **Reset Token** seçeneğine tıklayın.
 
     <Note>
-    Adına rağmen bu ilk token'ınızı üretir — hiçbir şey "sıfırlanmıyor".
+    Adına rağmen bu işlem ilk token'ınızı oluşturur — hiçbir şey "sıfırlanmıyor".
     </Note>
 
-    Token'ı kopyalayın ve bir yere kaydedin. Bu sizin **Bot Token** değerinizdir ve birazdan buna ihtiyacınız olacak.
+    Token'ı kopyalayıp bir yere kaydedin. Bu sizin **Bot Token** değerinizdir ve birazdan buna ihtiyacınız olacak.
 
   </Step>
 
   <Step title="Bir davet URL'si oluşturun ve botu sunucunuza ekleyin">
     Kenar çubuğunda **OAuth2** seçeneğine tıklayın. Botu sunucunuza eklemek için doğru izinlere sahip bir davet URL'si oluşturacaksınız.
 
-    Aşağı kaydırarak **OAuth2 URL Generator** bölümüne gidin ve şunları etkinleştirin:
+    Aşağı kaydırarak **OAuth2 URL Generator** bölümüne gelin ve şunları etkinleştirin:
 
     - `bot`
     - `applications.commands`
 
-    Aşağıda bir **Bot Permissions** bölümü görünecektir. En azından şunları etkinleştirin:
+    Altında bir **Bot Permissions** bölümü görünecektir. En azından şunları etkinleştirin:
 
     **General Permissions**
       - View Channels
@@ -77,31 +77,31 @@ Yeni bir uygulama oluşturmanız, botu sunucunuza eklemeniz ve OpenClaw ile eşl
       - Attach Files
       - Add Reactions (isteğe bağlı)
 
-    Bu, normal metin kanalları için temel kümedir. Discord thread'lerinde gönderi paylaşmayı planlıyorsanız, forum veya medya kanalı iş akışları dahil olmak üzere bir thread oluşturacak veya sürdürecek senaryolarda ayrıca **Send Messages in Threads** iznini de etkinleştirin.
+    Bu, normal metin kanalları için temel kümedir. Discord başlıklarında paylaşım yapmayı planlıyorsanız — buna bir başlık oluşturan veya sürdüren forum ya da medya kanalı iş akışları da dahildir — ayrıca **Send Messages in Threads** iznini de etkinleştirin.
     Alttaki oluşturulan URL'yi kopyalayın, tarayıcınıza yapıştırın, sunucunuzu seçin ve bağlanmak için **Continue** seçeneğine tıklayın. Artık botunuzu Discord sunucusunda görmelisiniz.
 
   </Step>
 
-  <Step title="Developer Mode'u etkinleştirin ve ID'lerinizi toplayın">
-    Discord uygulamasına geri dönün; dahili ID'leri kopyalayabilmek için Developer Mode'u etkinleştirmeniz gerekir.
+  <Step title="Developer Mode'u etkinleştirin ve kimliklerinizi toplayın">
+    Tekrar Discord uygulamasına dönün; dahili kimlikleri kopyalayabilmek için Developer Mode'u etkinleştirmeniz gerekir.
 
     1. **User Settings** seçeneğine tıklayın (avatarınızın yanındaki dişli simgesi) → **Advanced** → **Developer Mode** seçeneğini açın
     2. Kenar çubuğunda **sunucu simgenize** sağ tıklayın → **Copy Server ID**
     3. **Kendi avatarınıza** sağ tıklayın → **Copy User ID**
 
-    **Server ID** ve **User ID** değerlerinizi Bot Token ile birlikte kaydedin — sonraki adımda üçünü de OpenClaw'a göndereceksiniz.
+    **Server ID** ve **User ID** değerlerinizi Bot Token ile birlikte kaydedin — bir sonraki adımda üçünü de OpenClaw'a göndereceksiniz.
 
   </Step>
 
   <Step title="Sunucu üyelerinden gelen DM'lere izin verin">
     Eşleştirmenin çalışması için Discord'un botunuzun size DM göndermesine izin vermesi gerekir. **Sunucu simgenize** sağ tıklayın → **Privacy Settings** → **Direct Messages** seçeneğini açın.
 
-    Bu, sunucu üyelerinin (botlar dahil) size DM göndermesine izin verir. OpenClaw ile Discord DM'lerini kullanmak istiyorsanız bunu açık tutun. Yalnızca sunucu kanallarını kullanmayı planlıyorsanız, eşleştirmeden sonra DM'leri kapatabilirsiniz.
+    Bu, sunucu üyelerinin (botlar dahil) size DM göndermesine izin verir. OpenClaw ile Discord DM'lerini kullanmak istiyorsanız bunu açık bırakın. Yalnızca sunucu kanallarını kullanmayı planlıyorsanız eşleştirmeden sonra DM'leri kapatabilirsiniz.
 
   </Step>
 
   <Step title="Bot token'ınızı güvenli şekilde ayarlayın (sohbette göndermeyin)">
-    Discord bot token'ınız bir sırdır (parola gibidir). Aracınıza mesaj göndermeden önce bunu OpenClaw çalışan makinede ayarlayın.
+    Discord bot token'ınız bir sırdır (parola gibi). Ajanınıza mesaj göndermeden önce bunu OpenClaw çalıştıran makinede ayarlayın.
 
 ```bash
 export DISCORD_BOT_TOKEN="YOUR_BOT_TOKEN"
@@ -111,19 +111,19 @@ openclaw config set channels.discord.enabled true --strict-json
 openclaw gateway
 ```
 
-    OpenClaw zaten arka plan hizmeti olarak çalışıyorsa, OpenClaw Mac uygulaması üzerinden veya `openclaw gateway run` sürecini durdurup yeniden başlatarak yeniden başlatın.
+    OpenClaw zaten arka plan hizmeti olarak çalışıyorsa OpenClaw Mac uygulaması üzerinden veya `openclaw gateway run` sürecini durdurup yeniden başlatarak yeniden başlatın.
 
   </Step>
 
   <Step title="OpenClaw'ı yapılandırın ve eşleştirin">
 
     <Tabs>
-      <Tab title="Aracınıza sorun">
-        Mevcut herhangi bir kanalda (ör. Telegram) OpenClaw aracınızla sohbet edin ve ona söyleyin. Discord ilk kanalınızsa bunun yerine CLI / config sekmesini kullanın.
+      <Tab title="Ajanınıza sorun">
+        OpenClaw ajanınızla mevcut herhangi bir kanalda (ör. Telegram) sohbet edin ve bunu söyleyin. Discord ilk kanalınızsa bunun yerine CLI / yapılandırma sekmesini kullanın.
 
-        > "Discord bot token'ımı zaten config içinde ayarladım. Lütfen User ID `<user_id>` ve Server ID `<server_id>` ile Discord kurulumunu tamamla."
+        > "Discord bot token'ımı zaten yapılandırmada ayarladım. Lütfen User ID `<user_id>` ve Server ID `<server_id>` ile Discord kurulumunu tamamla."
       </Tab>
-      <Tab title="CLI / config">
+      <Tab title="CLI / yapılandırma">
         Dosya tabanlı yapılandırmayı tercih ediyorsanız şunu ayarlayın:
 
 ```json5
@@ -141,13 +141,13 @@ openclaw gateway
 }
 ```
 
-        Varsayılan hesap için env fallback:
+        Varsayılan hesap için env geri dönüşü:
 
 ```bash
 DISCORD_BOT_TOKEN=...
 ```
 
-        Düz metin `token` değerleri desteklenir. SecretRef değerleri de `channels.discord.token` için env/file/exec sağlayıcıları genelinde desteklenir. Bkz. [Secrets Management](/tr/gateway/secrets).
+        Düz metin `token` değerleri desteklenir. `channels.discord.token` için env/file/exec sağlayıcıları genelinde SecretRef değerleri de desteklenir. Bkz. [Secrets Management](/tr/gateway/secrets).
 
       </Tab>
     </Tabs>
@@ -155,11 +155,11 @@ DISCORD_BOT_TOKEN=...
   </Step>
 
   <Step title="İlk DM eşleştirmesini onaylayın">
-    Gateway çalışır duruma gelene kadar bekleyin, sonra Discord'da botunuza DM gönderin. Size bir eşleştirme koduyla yanıt verecektir.
+    Gateway çalışana kadar bekleyin, ardından Discord'da botunuza DM gönderin. Size bir eşleştirme koduyla yanıt verecektir.
 
     <Tabs>
-      <Tab title="Aracınıza sorun">
-        Eşleştirme kodunu mevcut kanalınızdaki aracınıza gönderin:
+      <Tab title="Ajanınıza sorun">
+        Eşleştirme kodunu mevcut kanalınızda ajanınıza gönderin:
 
         > "Bu Discord eşleştirme kodunu onayla: `<CODE>`"
       </Tab>
@@ -175,29 +175,29 @@ openclaw pairing approve discord <CODE>
 
     Eşleştirme kodlarının süresi 1 saat sonra dolar.
 
-    Artık Discord'da DM üzerinden aracınızla sohbet edebilmelisiniz.
+    Artık Discord'da DM üzerinden ajanınızla sohbet edebilmelisiniz.
 
   </Step>
 </Steps>
 
 <Note>
-Token çözümleme hesap farkındalıklıdır. Config içindeki token değerleri env fallback'e üstün gelir. `DISCORD_BOT_TOKEN` yalnızca varsayılan hesap için kullanılır.
-Gelişmiş giden çağrılar için (mesaj aracı/kanal eylemleri), açık bir çağrı başına `token` o çağrı için kullanılır. Bu, gönderme ve okuma/probe tarzı eylemler için geçerlidir (örneğin read/search/fetch/thread/pins/permissions). Hesap ilkesi/retry ayarları yine etkin çalışma zamanı anlık görüntüsündeki seçili hesaptan gelir.
+Token çözümlemesi hesap farkındalığına sahiptir. Yapılandırmadaki token değerleri env geri dönüşüne üstün gelir. `DISCORD_BOT_TOKEN` yalnızca varsayılan hesap için kullanılır.
+Gelişmiş giden çağrılar için (mesaj aracı/kanal eylemleri), açık bir çağrı başına `token` o çağrı için kullanılır. Bu; gönderme ve okuma/inceleme tarzı eylemler (örneğin read/search/fetch/thread/pins/permissions) için geçerlidir. Hesap ilkesi/yeniden deneme ayarları ise etkin çalışma zamanı anlık görüntüsünde seçili hesaptan gelmeye devam eder.
 </Note>
 
 ## Önerilen: Bir sunucu çalışma alanı kurun
 
-DM'ler çalıştıktan sonra, Discord sunucunuzu tam bir çalışma alanı olarak ayarlayabilirsiniz; burada her kanal kendi bağlamına sahip kendi aracı oturumunu alır. Bu, yalnızca sizin ve botunuzun bulunduğu özel sunucular için önerilir.
+DM'ler çalıştıktan sonra, Discord sunucunuzu her kanalın kendi bağlamına sahip kendi ajan oturumunu aldığı tam bir çalışma alanı olarak kurabilirsiniz. Bu, yalnızca siz ve botunuzun bulunduğu özel sunucular için önerilir.
 
 <Steps>
   <Step title="Sunucunuzu sunucu izin listesine ekleyin">
-    Bu, aracınızın yalnızca DM'lerde değil, sunucunuzdaki herhangi bir kanalda yanıt vermesini sağlar.
+    Bu, ajanınızın yalnızca DM'lerde değil, sunucunuzdaki herhangi bir kanalda yanıt vermesini sağlar.
 
     <Tabs>
-      <Tab title="Aracınıza sorun">
+      <Tab title="Ajanınıza sorun">
         > "Discord Server ID `<server_id>` değerimi sunucu izin listesine ekle"
       </Tab>
-      <Tab title="Config">
+      <Tab title="Yapılandırma">
 
 ```json5
 {
@@ -220,14 +220,14 @@ DM'ler çalıştıktan sonra, Discord sunucunuzu tam bir çalışma alanı olara
 
   </Step>
 
-  <Step title="@mention olmadan yanıtlara izin verin">
-    Varsayılan olarak aracınız sunucu kanallarında yalnızca @mention yapıldığında yanıt verir. Özel bir sunucuda muhtemelen her mesaja yanıt vermesini istersiniz.
+  <Step title="@mention olmadan yanıt verilmesine izin verin">
+    Varsayılan olarak ajanınız sunucu kanallarında yalnızca @mention yapıldığında yanıt verir. Özel bir sunucu için muhtemelen her mesaja yanıt vermesini istersiniz.
 
     <Tabs>
-      <Tab title="Aracınıza sorun">
-        > "Aracımın bu sunucuda @mention yapılmasına gerek kalmadan yanıt vermesine izin ver"
+      <Tab title="Ajanınıza sorun">
+        > "Ajanımın bu sunucuda @mention yapılmasına gerek olmadan yanıt vermesine izin ver"
       </Tab>
-      <Tab title="Config">
+      <Tab title="Yapılandırma">
         Sunucu yapılandırmanızda `requireMention: false` ayarlayın:
 
 ```json5
@@ -250,75 +250,76 @@ DM'ler çalıştıktan sonra, Discord sunucunuzu tam bir çalışma alanı olara
   </Step>
 
   <Step title="Sunucu kanallarında bellek için plan yapın">
-    Varsayılan olarak uzun vadeli bellek (`MEMORY.md`) yalnızca DM oturumlarında yüklenir. Sunucu kanalları `MEMORY.md` dosyasını otomatik yüklemez.
+    Varsayılan olarak uzun süreli bellek (MEMORY.md) yalnızca DM oturumlarında yüklenir. Sunucu kanalları MEMORY.md dosyasını otomatik yüklemez.
 
     <Tabs>
-      <Tab title="Aracınıza sorun">
-        > "Discord kanallarında soru sorduğumda, `MEMORY.md` içinden uzun vadeli bağlama ihtiyaç duyarsan memory_search veya memory_get kullan."
+      <Tab title="Ajanınıza sorun">
+        > "Discord kanallarında soru sorduğumda, MEMORY.md dosyasından uzun süreli bağlam gerekirse memory_search veya memory_get kullan."
       </Tab>
-      <Tab title="Manual">
-        Her kanalda paylaşılan bağlama ihtiyacınız varsa, kararlı talimatları `AGENTS.md` veya `USER.md` içine koyun (bunlar her oturum için enjekte edilir). Uzun vadeli notları `MEMORY.md` içinde tutun ve gerektiğinde bellek araçlarıyla erişin.
+      <Tab title="Manuel">
+        Her kanalda paylaşılan bağlam gerekiyorsa sabit yönergeleri `AGENTS.md` veya `USER.md` içine koyun (bunlar her oturum için enjekte edilir). Uzun süreli notları `MEMORY.md` içinde tutun ve gerektiğinde bellek araçlarıyla erişin.
       </Tab>
     </Tabs>
 
   </Step>
 </Steps>
 
-Şimdi Discord sunucunuzda birkaç kanal oluşturun ve sohbete başlayın. Aracınız kanal adını görebilir ve her kanal kendi yalıtılmış oturumunu alır — böylece `#coding`, `#home`, `#research` veya iş akışınıza uyan başka kanallar kurabilirsiniz.
+Şimdi Discord sunucunuzda bazı kanallar oluşturun ve sohbet etmeye başlayın. Ajanınız kanal adını görebilir ve her kanal kendi yalıtılmış oturumunu alır — böylece `#coding`, `#home`, `#research` veya iş akışınıza uyan başka kanallar kurabilirsiniz.
 
 ## Çalışma zamanı modeli
 
-- Discord bağlantısının sahibi Gateway'dir.
-- Yanıt yönlendirme deterministiktir: Discord'dan gelenler tekrar Discord'a yanıtlanır.
-- Varsayılan olarak (`session.dmScope=main`), doğrudan sohbetler aracının ana oturumunu paylaşır (`agent:main:main`).
+- Gateway, Discord bağlantısını sahiplenir.
+- Yanıt yönlendirmesi belirleyicidir: Discord'dan gelen girişler yine Discord'a yanıtlanır.
+- Varsayılan olarak (`session.dmScope=main`), doğrudan sohbetler ajan ana oturumunu paylaşır (`agent:main:main`).
 - Sunucu kanalları yalıtılmış oturum anahtarlarıdır (`agent:<agentId>:discord:channel:<channelId>`).
 - Grup DM'leri varsayılan olarak yok sayılır (`channels.discord.dm.groupEnabled=false`).
-- Yerel slash komutları yalıtılmış komut oturumlarında çalışır (`agent:<agentId>:discord:slash:<userId>`), ancak yine de yönlendirilen konuşma oturumuna `CommandTargetSessionKey` taşır.
+- Yerel slash komutları, yönlendirilmiş konuşma oturumuna `CommandTargetSessionKey` taşımaya devam ederken yalıtılmış komut oturumlarında çalışır (`agent:<agentId>:discord:slash:<userId>`).
+- Yalnızca metin Cron/Heartbeat duyuru teslimi Discord'a, ajan tarafından görünür son yanıtı bir kez kullanır. Medya ve yapılandırılmış bileşen yükleri, ajan birden fazla teslim edilebilir yük yaydığında çoklu mesaj olarak kalır.
 
 ## Forum kanalları
 
-Discord forum ve medya kanalları yalnızca thread gönderilerini kabul eder. OpenClaw bunları oluşturmak için iki yolu destekler:
+Discord forum ve medya kanalları yalnızca başlık gönderilerini kabul eder. OpenClaw bunları oluşturmak için iki yolu destekler:
 
-- Bir thread'i otomatik oluşturmak için forum üst öğesine (`channel:<forumId>`) mesaj gönderin. Thread başlığı mesajınızın ilk boş olmayan satırını kullanır.
-- Doğrudan bir thread oluşturmak için `openclaw message thread create` kullanın. Forum kanalları için `--message-id` geçirmeyin.
+- Bir başlığı otomatik oluşturmak için forum üst öğesine (`channel:<forumId>`) bir mesaj gönderin. Başlık adı, mesajınızın ilk boş olmayan satırını kullanır.
+- Doğrudan bir başlık oluşturmak için `openclaw message thread create` kullanın. Forum kanalları için `--message-id` geçirmeyin.
 
-Örnek: bir thread oluşturmak için forum üst öğesine gönderme
+Örnek: başlık oluşturmak için forum üst öğesine gönderme
 
 ```bash
 openclaw message send --channel discord --target channel:<forumId> \
   --message "Topic title\nBody of the post"
 ```
 
-Örnek: açıkça bir forum thread'i oluşturma
+Örnek: açıkça bir forum başlığı oluşturma
 
 ```bash
 openclaw message thread create --channel discord --target channel:<forumId> \
   --thread-name "Topic title" --message "Body of the post"
 ```
 
-Forum üst öğeleri Discord bileşenlerini kabul etmez. Bileşenlere ihtiyacınız varsa thread'in kendisine gönderin (`channel:<threadId>`).
+Forum üst öğeleri Discord bileşenlerini kabul etmez. Bileşenlere ihtiyacınız varsa başlığın kendisine gönderin (`channel:<threadId>`).
 
 ## Etkileşimli bileşenler
 
-OpenClaw, aracı mesajları için Discord components v2 container desteği sunar. `components` payload ile mesaj aracını kullanın. Etkileşim sonuçları, normal gelen mesajlar olarak tekrar aracıya yönlendirilir ve mevcut Discord `replyToMode` ayarlarını izler.
+OpenClaw, ajan mesajları için Discord components v2 container desteği sunar. `components` yükü ile mesaj aracını kullanın. Etkileşim sonuçları, normal gelen mesajlar olarak yeniden ajana yönlendirilir ve mevcut Discord `replyToMode` ayarlarını izler.
 
 Desteklenen bloklar:
 
 - `text`, `section`, `separator`, `actions`, `media-gallery`, `file`
-- Action row'lar en fazla 5 düğmeye veya tek bir seçim menüsüne izin verir
+- Eylem satırları en fazla 5 düğmeye veya tek bir seçim menüsüne izin verir
 - Seçim türleri: `string`, `user`, `role`, `mentionable`, `channel`
 
 Varsayılan olarak bileşenler tek kullanımlıktır. Düğmelerin, seçimlerin ve formların süreleri dolana kadar birden fazla kez kullanılmasına izin vermek için `components.reusable=true` ayarlayın.
 
-Bir düğmeye kimlerin tıklayabileceğini kısıtlamak için o düğmede `allowedUsers` ayarlayın (Discord kullanıcı ID'leri, etiketler veya `*`). Yapılandırıldığında, eşleşmeyen kullanıcılar geçici bir red yanıtı alır.
+Bir düğmeye kimin tıklayabileceğini kısıtlamak için o düğmede `allowedUsers` ayarlayın (Discord kullanıcı kimlikleri, etiketler veya `*`). Yapılandırıldığında, eşleşmeyen kullanıcılar geçici bir reddetme iletisi alır.
 
-`/model` ve `/models` slash komutları, sağlayıcı ve model açılır menülerinin yanı sıra bir Gönder adımı içeren etkileşimli bir model seçiciyi açar. `commands.modelsWrite=false` olmadığı sürece `/models add`, sohbetten yeni bir sağlayıcı/model girdisi eklemeyi de destekler ve yeni eklenen modeller gateway yeniden başlatılmadan görünür. Seçici yanıtı geçicidir ve yalnızca komutu çağıran kullanıcı bunu kullanabilir.
+`/model` ve `/models` slash komutları; sağlayıcı, model ve uyumlu çalışma zamanı açılır menülerinin yanı sıra bir Submit adımı içeren etkileşimli bir model seçici açar. `/models add` kullanımdan kaldırılmıştır ve artık sohbetten model kaydetmek yerine bir kullanımdan kaldırma iletisi döndürür. Seçici yanıtı geçicidir ve yalnızca komutu çağıran kullanıcı onu kullanabilir.
 
 Dosya ekleri:
 
 - `file` blokları bir ek referansını işaret etmelidir (`attachment://<filename>`)
 - Eki `media`/`path`/`filePath` üzerinden sağlayın (tek dosya); birden fazla dosya için `media-gallery` kullanın
-- Yükleme adı ek referansıyla eşleşmesi gerektiğinde bunu geçersiz kılmak için `filename` kullanın
+- Yükleme adı ek referansıyla eşleşmeliyse bunu geçersiz kılmak için `filename` kullanın
 
 Modal formlar:
 
@@ -333,7 +334,7 @@ Modal formlar:
   channel: "discord",
   action: "send",
   to: "channel:123456789012345678",
-  message: "İsteğe bağlı geri dönüş metni",
+  message: "İsteğe bağlı yedek metin",
   components: {
     reusable: true,
     text: "Bir yol seçin",
@@ -353,7 +354,7 @@ Modal formlar:
         type: "actions",
         select: {
           type: "string",
-          placeholder: "Bir seçenek seçin",
+          placeholder: "Bir seçenek belirleyin",
           options: [
             { label: "Seçenek A", value: "a" },
             { label: "Seçenek B", value: "b" },
@@ -365,7 +366,7 @@ Modal formlar:
       title: "Ayrıntılar",
       triggerLabel: "Formu aç",
       fields: [
-        { type: "text", label: "İstek sahibi" },
+        { type: "text", label: "Talep eden" },
         {
           type: "select",
           label: "Öncelik",
@@ -395,8 +396,8 @@ Modal formlar:
 
     Çoklu hesap önceliği:
 
-    - `channels.discord.accounts.default.allowFrom` yalnızca `default` hesabı için geçerlidir.
-    - Adlandırılmış hesaplar, kendi `allowFrom` ayarları yapılmamışsa `channels.discord.allowFrom` değerini devralır.
+    - `channels.discord.accounts.default.allowFrom` yalnızca `default` hesap için geçerlidir.
+    - Adlandırılmış hesaplar, kendi `allowFrom` değerleri ayarlanmamışsa `channels.discord.allowFrom` değerini devralır.
     - Adlandırılmış hesaplar `channels.discord.accounts.default.allowFrom` değerini devralmaz.
 
     Teslimat için DM hedef biçimi:
@@ -404,12 +405,12 @@ Modal formlar:
     - `user:<id>`
     - `<@id>` mention
 
-    Düz sayısal ID'ler belirsizdir ve açık bir kullanıcı/kanal hedef türü sağlanmadıkça reddedilir.
+    Salt sayısal kimlikler belirsizdir ve açık bir kullanıcı/kanal hedef türü verilmedikçe reddedilir.
 
   </Tab>
 
   <Tab title="Sunucu ilkesi">
-    Sunucu işleme davranışı `channels.discord.groupPolicy` ile denetlenir:
+    Sunucu işlemesi `channels.discord.groupPolicy` ile denetlenir:
 
     - `open`
     - `allowlist`
@@ -420,10 +421,10 @@ Modal formlar:
     `allowlist` davranışı:
 
     - sunucu `channels.discord.guilds` ile eşleşmelidir (`id` tercih edilir, slug kabul edilir)
-    - isteğe bağlı gönderen izin listeleri: `users` (kararlı ID'ler önerilir) ve `roles` (yalnızca rol ID'leri); bunlardan biri yapılandırılmışsa, gönderenler `users` VEYA `roles` ile eşleştiğinde izinli olur
-    - doğrudan ad/etiket eşleştirme varsayılan olarak devre dışıdır; bunu yalnızca acil durum uyumluluk modu olarak `channels.discord.dangerouslyAllowNameMatching: true` ile etkinleştirin
-    - `users` için adlar/etiketler desteklenir, ancak ID'ler daha güvenlidir; ad/etiket girdileri kullanıldığında `openclaw security audit` uyarı verir
-    - bir sunucuda `channels` yapılandırılmışsa, listede olmayan kanallar reddedilir
+    - isteğe bağlı gönderici izin listeleri: `users` (kararlı kimlikler önerilir) ve `roles` (yalnızca rol kimlikleri); bunlardan biri yapılandırılmışsa, göndericilere `users` VEYA `roles` ile eşleştiğinde izin verilir
+    - doğrudan ad/etiket eşleştirme varsayılan olarak devre dışıdır; bunu yalnızca acil durum uyumluluk modu olarak etkinleştirmek için `channels.discord.dangerouslyAllowNameMatching: true` kullanın
+    - `users` için adlar/etiketler desteklenir, ancak kimlikler daha güvenlidir; ad/etiket girdileri kullanıldığında `openclaw security audit` uyarı verir
+    - bir sunucuda `channels` yapılandırılmışsa listelenmeyen kanallar reddedilir
     - bir sunucuda `channels` bloğu yoksa, izin listesine alınmış o sunucudaki tüm kanallara izin verilir
 
     Örnek:
@@ -450,33 +451,33 @@ Modal formlar:
 }
 ```
 
-    Yalnızca `DISCORD_BOT_TOKEN` ayarlayıp bir `channels.discord` bloğu oluşturmazsanız, çalışma zamanı fallback değeri `groupPolicy="allowlist"` olur (günlüklerde bir uyarıyla), `channels.defaults.groupPolicy` değeri `open` olsa bile.
+    Yalnızca `DISCORD_BOT_TOKEN` ayarlarsanız ve bir `channels.discord` bloğu oluşturmazsanız, çalışma zamanı geri dönüşü `groupPolicy="allowlist"` olur (günlüklerde uyarı ile), `channels.defaults.groupPolicy` değeri `open` olsa bile.
 
   </Tab>
 
   <Tab title="Mention'lar ve grup DM'leri">
-    Sunucu mesajları varsayılan olarak mention ile denetlenir.
+    Sunucu mesajları varsayılan olarak mention ile sınırlandırılır.
 
-    Mention algılaması şunları içerir:
+    Mention algılama şunları içerir:
 
     - açık bot mention'ı
-    - yapılandırılmış mention desenleri (`agents.list[].groupChat.mentionPatterns`, fallback `messages.groupChat.mentionPatterns`)
-    - desteklenen durumlarda örtük bota yanıt davranışı
+    - yapılandırılmış mention kalıpları (`agents.list[].groupChat.mentionPatterns`, geri dönüş olarak `messages.groupChat.mentionPatterns`)
+    - desteklenen durumlarda örtük bot-yanıtına-cevap davranışı
 
-    `requireMention`, sunucu/kanal başına yapılandırılır (`channels.discord.guilds...`).
-    `ignoreOtherMentions`, isteğe bağlı olarak başka bir kullanıcıdan/rolden bahseden ancak bottan bahsetmeyen mesajları bırakır (@everyone/@here hariç).
+    `requireMention` her sunucu/kanal için yapılandırılır (`channels.discord.guilds...`).
+    `ignoreOtherMentions`, başka bir kullanıcıdan/rolden mention alan ancak bottan almayan mesajları isteğe bağlı olarak yok sayar (@everyone/@here hariç).
 
     Grup DM'leri:
 
     - varsayılan: yok sayılır (`dm.groupEnabled=false`)
-    - isteğe bağlı izin listesi: `dm.groupChannels` (kanal ID'leri veya slug'lar)
+    - isteğe bağlı izin listesi: `dm.groupChannels` (kanal kimlikleri veya slug'lar)
 
   </Tab>
 </Tabs>
 
-### Rol tabanlı aracı yönlendirme
+### Rol tabanlı ajan yönlendirme
 
-Discord sunucu üyelerini rol ID'sine göre farklı aracılara yönlendirmek için `bindings[].match.roles` kullanın. Rol tabanlı binding'ler yalnızca rol ID'lerini kabul eder ve eş binding veya üst-eş binding'lerden sonra, yalnızca sunucu binding'lerinden önce değerlendirilir. Bir binding başka eşleşme alanları da ayarlıyorsa (örneğin `peer` + `guildId` + `roles`), yapılandırılmış tüm alanların eşleşmesi gerekir.
+Discord sunucu üyelerini rol kimliğine göre farklı ajanlara yönlendirmek için `bindings[].match.roles` kullanın. Rol tabanlı bağlamalar yalnızca rol kimliklerini kabul eder ve eş düzey veya üst eş düzey bağlamalardan sonra, yalnızca sunucuya özel bağlamalardan önce değerlendirilir. Bir bağlama başka eşleşme alanları da ayarlıyorsa (örneğin `peer` + `guildId` + `roles`), yapılandırılmış tüm alanlar eşleşmelidir.
 
 ```json5
 {
@@ -506,11 +507,11 @@ Discord sunucu üyelerini rol ID'sine göre farklı aracılara yönlendirmek iç
 - Kanal başına geçersiz kılma: `channels.discord.commands.native`.
 - `commands.native=false`, daha önce kaydedilmiş Discord yerel komutlarını açıkça temizler.
 - Yerel komut kimlik doğrulaması, normal mesaj işleme ile aynı Discord izin listelerini/ilkelerini kullanır.
-- Komutlar, yetkili olmayan kullanıcılar için yine de Discord arayüzünde görünür olabilir; ancak yürütme sırasında OpenClaw kimlik doğrulaması yine uygulanır ve "not authorized" döner.
+- Discord arayüzünde yetkili olmayan kullanıcılar için komutlar yine de görünür olabilir; ancak yürütme yine de OpenClaw kimlik doğrulamasını uygular ve "yetkili değil" döndürür.
 
 Komut kataloğu ve davranış için bkz. [Slash commands](/tr/tools/slash-commands).
 
-Varsayılan slash komutu ayarları:
+Varsayılan slash komut ayarları:
 
 - `ephemeral: true`
 
@@ -518,33 +519,30 @@ Varsayılan slash komutu ayarları:
 
 <AccordionGroup>
   <Accordion title="Yanıt etiketleri ve yerel yanıtlar">
-    Discord, aracı çıktısında yanıt etiketlerini destekler:
+    Discord, ajan çıktısında yanıt etiketlerini destekler:
 
     - `[[reply_to_current]]`
     - `[[reply_to:<id>]]`
 
-    Şununla denetlenir: `channels.discord.replyToMode`:
+    `channels.discord.replyToMode` ile denetlenir:
 
     - `off` (varsayılan)
     - `first`
     - `all`
     - `batched`
 
-    Not: `off`, örtük yanıt thread'lemeyi devre dışı bırakır. Açık `[[reply_to_*]]` etiketlerine yine de uyulur.
-    `first`, her tur için ilk giden Discord mesajına her zaman örtük yerel yanıt referansını ekler.
-    `batched`, Discord'un örtük yerel yanıt referansını yalnızca
-    gelen tur birden çok mesajdan oluşan debounce edilmiş bir toplu işlem olduğunda ekler. Bu,
-    yerel yanıtları esas olarak belirsiz, patlamalı sohbetler için isteyip her
-    tek mesajlık tur için istemediğinizde kullanışlıdır.
+    Not: `off`, örtük yanıt iş parçacığını devre dışı bırakır. Açık `[[reply_to_*]]` etiketlerine yine de uyulur.
+    `first`, tur için ilk giden Discord mesajına örtük yerel yanıt referansını her zaman ekler.
+    `batched`, Discord'un örtük yerel yanıt referansını yalnızca gelen tur birden fazla mesajın debounce edilmiş bir toplu paketi olduğunda ekler. Bu, yerel yanıtları her tek mesajlık tur için değil, esas olarak belirsiz ve patlamalı sohbetler için istediğinizde kullanışlıdır.
 
-    Aracıların belirli mesajları hedefleyebilmesi için mesaj ID'leri bağlam/geçmiş içinde görünür hâle getirilir.
+    Mesaj kimlikleri bağlam/geçmişte görünür hâle getirilir, böylece ajanlar belirli mesajları hedefleyebilir.
 
   </Accordion>
 
   <Accordion title="Canlı akış önizlemesi">
-    OpenClaw, geçici bir mesaj gönderip metin geldikçe bunu düzenleyerek taslak yanıtları akış hâlinde iletebilir. `channels.discord.streaming`, `off` (varsayılan) | `partial` | `block` | `progress` değerlerini alır. `progress`, Discord'da `partial` ile eşlenir; `streamMode` eski bir takma addır ve otomatik olarak taşınır.
+    OpenClaw, geçici bir mesaj gönderip metin geldikçe onu düzenleyerek taslak yanıtları akış hâlinde verebilir. `channels.discord.streaming` şu değerleri alır: `off` (varsayılan) | `partial` | `block` | `progress`. `progress`, Discord'da `partial` olarak eşlenir; `streamMode` eski bir takma addır ve otomatik olarak taşınır.
 
-    Varsayılan değer `off` olarak kalır çünkü Discord önizleme düzenlemeleri, birden çok bot veya gateway aynı hesabı paylaştığında hız sınırlarına hızla takılır.
+    Varsayılan değer `off` olarak kalır çünkü birden fazla bot veya Gateway aynı hesabı paylaştığında Discord önizleme düzenlemeleri hız sınırlarına çabuk takılır.
 
 ```json5
 {
@@ -562,19 +560,19 @@ Varsayılan slash komutu ayarları:
 ```
 
     - `partial`, token'lar geldikçe tek bir önizleme mesajını düzenler.
-    - `block`, taslak boyutunda parçalar yayınlar (boyutu ve bölünme noktalarını ayarlamak için `draftChunk` kullanın; `textChunkLimit` ile sınırlandırılır).
-    - Medya, hata ve açık yanıt nihai mesajları bekleyen önizleme düzenlemelerini iptal eder.
+    - `block`, taslak boyutlu parçalar yayar (boyut ve kesme noktalarını ayarlamak için `draftChunk` kullanın; `textChunkLimit` ile sınırlandırılır).
+    - Medya, hata ve açık-yanıt final mesajları bekleyen önizleme düzenlemelerini iptal eder.
     - `streaming.preview.toolProgress` (varsayılan `true`), araç/ilerleme güncellemelerinin önizleme mesajını yeniden kullanıp kullanmayacağını denetler.
 
-    Önizleme akışı yalnızca metindir; medya yanıtları normal teslimata geri döner. `block` akışı açıkça etkinleştirildiğinde OpenClaw çift akışı önlemek için önizleme akışını atlar.
+    Önizleme akışı yalnızca metindir; medya yanıtları normal teslimata geri döner. `block` akışı açıkça etkinleştirildiğinde, OpenClaw çift akışı önlemek için önizleme akışını atlar.
 
   </Accordion>
 
-  <Accordion title="Geçmiş, bağlam ve thread davranışı">
+  <Accordion title="Geçmiş, bağlam ve başlık davranışı">
     Sunucu geçmişi bağlamı:
 
     - `channels.discord.historyLimit` varsayılan `20`
-    - fallback: `messages.groupChat.historyLimit`
+    - geri dönüş: `messages.groupChat.historyLimit`
     - `0` devre dışı bırakır
 
     DM geçmişi denetimleri:
@@ -582,27 +580,27 @@ Varsayılan slash komutu ayarları:
     - `channels.discord.dmHistoryLimit`
     - `channels.discord.dms["<user_id>"].historyLimit`
 
-    Thread davranışı:
+    Başlık davranışı:
 
-    - Discord thread'leri kanal oturumları olarak yönlendirilir ve geçersiz kılınmadıkça üst kanal yapılandırmasını devralır.
-    - `channels.discord.thread.inheritParent` (varsayılan `false`), yeni otomatik thread'lerin üst transkriptten tohumlanmasını etkinleştirir. Hesap başına geçersiz kılmalar `channels.discord.accounts.<id>.thread.inheritParent` altında bulunur.
+    - Discord başlıkları kanal oturumları olarak yönlendirilir ve aksi belirtilmedikçe üst kanal yapılandırmasını devralır.
+    - `channels.discord.thread.inheritParent` (varsayılan `false`), yeni otomatik başlıkların üst transkriptten tohumlanmasını seçmeli olarak etkinleştirir. Hesap başına geçersiz kılmalar `channels.discord.accounts.<id>.thread.inheritParent` altında bulunur.
     - Mesaj aracı tepkileri `user:<id>` DM hedeflerini çözümleyebilir.
-    - `guilds.<guild>.channels.<channel>.requireMention: false`, yanıt aşaması etkinleştirme fallback'i sırasında korunur.
+    - `guilds.<guild>.channels.<channel>.requireMention: false`, yanıt aşaması etkinleştirme geri dönüşü sırasında korunur.
 
-    Kanal konuları **güvenilmeyen** bağlam olarak enjekte edilir. İzin listeleri, aracıyı kimlerin tetikleyebileceğini denetler; bu tam bir ek bağlam redaksiyon sınırı değildir.
+    Kanal konuları **güvenilmez** bağlam olarak enjekte edilir. İzin listeleri, ajanın kim tarafından tetiklenebileceğini sınırlar; bu tam bir ek bağlam sansürleme sınırı değildir.
 
   </Accordion>
 
-  <Accordion title="Alt aracılar için thread'e bağlı oturumlar">
-    Discord, bir thread'i bir oturum hedefine bağlayabilir; böylece o thread'deki takip mesajları aynı oturuma yönlenmeye devam eder (alt aracı oturumları dahil).
+  <Accordion title="Alt ajanlar için başlığa bağlı oturumlar">
+    Discord, bir başlığı bir oturum hedefine bağlayabilir; böylece o başlıktaki takip mesajları aynı oturuma yönlendirilmeye devam eder (alt ajan oturumları dahil).
 
     Komutlar:
 
-    - `/focus <target>` geçerli/yeni thread'i bir alt aracı/oturum hedefine bağlar
-    - `/unfocus` geçerli thread binding'ini kaldırır
-    - `/agents` etkin çalıştırmaları ve binding durumunu gösterir
-    - `/session idle <duration|off>` odaklı binding'ler için etkinliksizlik nedeniyle otomatik odak kaldırmayı inceler/günceller
-    - `/session max-age <duration|off>` odaklı binding'ler için katı azami yaşı inceler/günceller
+    - `/focus <target>` geçerli/yeni başlığı bir alt ajan/oturum hedefine bağlar
+    - `/unfocus` geçerli başlık bağlamasını kaldırır
+    - `/agents` etkin çalıştırmaları ve bağlama durumunu gösterir
+    - `/session idle <duration|off>` odaklanmış bağlamalar için hareketsizlik nedeniyle otomatik odağı kaldırmayı inceler/günceller
+    - `/session max-age <duration|off>` odaklanmış bağlamalar için katı azami yaşı inceler/günceller
 
     Yapılandırma:
 
@@ -621,7 +619,7 @@ Varsayılan slash komutu ayarları:
         enabled: true,
         idleHours: 24,
         maxAgeHours: 0,
-        spawnSubagentSessions: false, // katılmalı
+        spawnSubagentSessions: false, // seçmeli
       },
     },
   },
@@ -632,16 +630,16 @@ Varsayılan slash komutu ayarları:
 
     - `session.threadBindings.*` genel varsayılanları ayarlar.
     - `channels.discord.threadBindings.*`, Discord davranışını geçersiz kılar.
-    - `sessions_spawn({ thread: true })` için thread'leri otomatik oluşturmak/bağlamak üzere `spawnSubagentSessions` true olmalıdır.
-    - ACP için (`/acp spawn ... --thread ...` veya `sessions_spawn({ runtime: "acp", thread: true })`) thread'leri otomatik oluşturmak/bağlamak üzere `spawnAcpSessions` true olmalıdır.
-    - Bir hesap için thread binding'leri devre dışıysa, `/focus` ve ilgili thread binding işlemleri kullanılamaz.
+    - `sessions_spawn({ thread: true })` için başlıkları otomatik oluşturmak/bağlamak üzere `spawnSubagentSessions` değeri `true` olmalıdır.
+    - ACP için (`/acp spawn ... --thread ...` veya `sessions_spawn({ runtime: "acp", thread: true })`) başlıkları otomatik oluşturmak/bağlamak üzere `spawnAcpSessions` değeri `true` olmalıdır.
+    - Bir hesap için başlık bağlamaları devre dışıysa, `/focus` ve ilgili başlık bağlama işlemleri kullanılamaz.
 
     Bkz. [Sub-agents](/tr/tools/subagents), [ACP Agents](/tr/tools/acp-agents) ve [Configuration Reference](/tr/gateway/configuration-reference).
 
   </Accordion>
 
-  <Accordion title="Kalıcı ACP kanal binding'leri">
-    Kararlı "her zaman açık" ACP çalışma alanları için, Discord konuşmalarını hedefleyen üst düzey türlendirilmiş ACP binding'leri yapılandırın.
+  <Accordion title="Kalıcı ACP kanal bağlamaları">
+    Kararlı, "her zaman açık" ACP çalışma alanları için, Discord konuşmalarını hedefleyen üst düzey tiplenmiş ACP bağlamalarını yapılandırın.
 
     Yapılandırma yolu:
 
@@ -697,11 +695,11 @@ Varsayılan slash komutu ayarları:
 
     Notlar:
 
-    - `/acp spawn codex --bind here`, geçerli kanalı veya thread'i yerinde bağlar ve gelecekteki mesajları aynı ACP oturumunda tutar. Thread mesajları üst kanal binding'ini devralır.
-    - Bağlı bir kanal veya thread içinde, `/new` ve `/reset` aynı ACP oturumunu yerinde sıfırlar. Geçici thread binding'leri etkin oldukları sürece hedef çözümlemeyi geçersiz kılabilir.
-    - `spawnAcpSessions` yalnızca OpenClaw'ın `--thread auto|here` yoluyla bir alt thread oluşturması/bağlaması gerektiğinde gereklidir.
+    - `/acp spawn codex --bind here`, geçerli kanal veya başlığı yerinde bağlar ve gelecekteki mesajları aynı ACP oturumunda tutar. Başlıktaki mesajlar üst kanal bağlamasını devralır.
+    - Bağlı bir kanal veya başlıkta, `/new` ve `/reset` aynı ACP oturumunu yerinde sıfırlar. Geçici başlık bağlamaları etkin olduklarında hedef çözümlemeyi geçersiz kılabilir.
+    - `spawnAcpSessions` yalnızca OpenClaw'ın `--thread auto|here` aracılığıyla bir alt başlık oluşturması/bağlaması gerektiğinde zorunludur.
 
-    Binding davranışı ayrıntıları için bkz. [ACP Agents](/tr/tools/acp-agents).
+    Bağlama davranışı ayrıntıları için bkz. [ACP Agents](/tr/tools/acp-agents).
 
   </Accordion>
 
@@ -713,7 +711,7 @@ Varsayılan slash komutu ayarları:
     - `all`
     - `allowlist` (`guilds.<id>.users` kullanır)
 
-    Tepki olayları sistem olaylarına dönüştürülür ve yönlendirilen Discord oturumuna eklenir.
+    Tepki olayları sistem olaylarına dönüştürülür ve yönlendirilmiş Discord oturumuna eklenir.
 
   </Accordion>
 
@@ -725,21 +723,21 @@ Varsayılan slash komutu ayarları:
     - `channels.discord.accounts.<accountId>.ackReaction`
     - `channels.discord.ackReaction`
     - `messages.ackReaction`
-    - aracı kimliği emoji fallback'i (`agents.list[].identity.emoji`, aksi halde "👀")
+    - ajan kimliği emoji geri dönüşü (`agents.list[].identity.emoji`, aksi takdirde "👀")
 
     Notlar:
 
-    - Discord unicode emoji veya özel emoji adlarını kabul eder.
+    - Discord unicode emojilerini veya özel emoji adlarını kabul eder.
     - Bir kanal veya hesap için tepkiyi devre dışı bırakmak üzere `""` kullanın.
 
   </Accordion>
 
-  <Accordion title="Config yazımları">
-    Kanal tarafından başlatılan config yazımları varsayılan olarak etkindir.
+  <Accordion title="Yapılandırma yazımları">
+    Kanal tarafından başlatılan yapılandırma yazımları varsayılan olarak etkindir.
 
     Bu, `/config set|unset` akışlarını etkiler (komut özellikleri etkin olduğunda).
 
-    Devre dışı bırakma:
+    Devre dışı bırakmak için:
 
 ```json5
 {
@@ -754,7 +752,7 @@ Varsayılan slash komutu ayarları:
   </Accordion>
 
   <Accordion title="Gateway proxy">
-    Discord gateway WebSocket trafiğini ve başlangıç REST aramalarını (uygulama ID'si + allowlist çözümlemesi) `channels.discord.proxy` ile bir HTTP(S) proxy üzerinden yönlendirin.
+    Discord gateway WebSocket trafiğini ve başlangıç REST aramalarını (uygulama kimliği + izin listesi çözümlemesi), `channels.discord.proxy` ile bir HTTP(S) proxy üzerinden yönlendirin.
 
 ```json5
 {
@@ -802,15 +800,15 @@ Varsayılan slash komutu ayarları:
 
     Notlar:
 
-    - allowlist'ler `pk:<memberId>` kullanabilir
-    - üye görüntüleme adları, yalnızca `channels.discord.dangerouslyAllowNameMatching: true` olduğunda ad/slug ile eşleştirilir
-    - aramalar özgün mesaj ID'sini kullanır ve zaman penceresiyle sınırlıdır
-    - arama başarısız olursa, proxy'lenmiş mesajlar bot mesajı olarak değerlendirilir ve `allowBots=true` olmadıkça bırakılır
+    - izin listeleri `pk:<memberId>` kullanabilir
+    - üye görünen adları yalnızca `channels.discord.dangerouslyAllowNameMatching: true` olduğunda ad/slug ile eşleştirilir
+    - aramalar özgün mesaj kimliğini kullanır ve zaman penceresiyle sınırlıdır
+    - arama başarısız olursa, proxy'lenmiş mesajlar bot mesajı olarak değerlendirilir ve `allowBots=true` olmadığı sürece bırakılır
 
   </Accordion>
 
-  <Accordion title="Presence yapılandırması">
-    Presence güncellemeleri, bir durum veya etkinlik alanı ayarladığınızda ya da otomatik presence'ı etkinleştirdiğinizde uygulanır.
+  <Accordion title="Durum yapılandırması">
+    Bir durum veya etkinlik alanı ayarladığınızda ya da otomatik durumu etkinleştirdiğinizde durum güncellemeleri uygulanır.
 
     Yalnızca durum örneği:
 
@@ -837,7 +835,7 @@ Varsayılan slash komutu ayarları:
 }
 ```
 
-    Akış örneği:
+    Yayın örneği:
 
 ```json5
 {
@@ -853,14 +851,14 @@ Varsayılan slash komutu ayarları:
 
     Etkinlik türü eşlemesi:
 
-    - 0: Oynuyor
-    - 1: Yayında (`activityUrl` gerektirir)
-    - 2: Dinliyor
-    - 3: İzliyor
-    - 4: Özel (etkinlik metnini durum durumu olarak kullanır; emoji isteğe bağlıdır)
-    - 5: Yarışıyor
+    - 0: Playing
+    - 1: Streaming (`activityUrl` gerektirir)
+    - 2: Listening
+    - 3: Watching
+    - 4: Custom (etkinlik metnini durum durumu olarak kullanır; emoji isteğe bağlıdır)
+    - 5: Competing
 
-    Otomatik presence örneği (çalışma zamanı sağlık sinyali):
+    Otomatik durum örneği (çalışma zamanı sağlık sinyali):
 
 ```json5
 {
@@ -877,7 +875,7 @@ Varsayılan slash komutu ayarları:
 }
 ```
 
-    Otomatik presence, çalışma zamanı kullanılabilirliğini Discord durumuna eşler: sağlıklı => online, bozulmuş veya bilinmiyor => idle, tükenmiş veya kullanılamıyor => dnd. İsteğe bağlı metin geçersiz kılmaları:
+    Otomatik durum, çalışma zamanı kullanılabilirliğini Discord durumuna eşler: healthy => online, degraded veya unknown => idle, exhausted veya unavailable => dnd. İsteğe bağlı metin geçersiz kılmaları:
 
     - `autoPresence.healthyText`
     - `autoPresence.degradedText`
@@ -885,63 +883,61 @@ Varsayılan slash komutu ayarları:
 
   </Accordion>
 
-  <Accordion title="Discord'da onaylar">
+  <Accordion title="Discord içinde onaylar">
     Discord, DM'lerde düğme tabanlı onay işlemeyi destekler ve isteğe bağlı olarak onay istemlerini kaynak kanalda yayınlayabilir.
 
-    Config yolu:
+    Yapılandırma yolu:
 
     - `channels.discord.execApprovals.enabled`
-    - `channels.discord.execApprovals.approvers` (isteğe bağlı; mümkün olduğunda `commands.ownerAllowFrom` değerine fallback yapar)
+    - `channels.discord.execApprovals.approvers` (isteğe bağlı; mümkün olduğunda `commands.ownerAllowFrom` değerine geri döner)
     - `channels.discord.execApprovals.target` (`dm` | `channel` | `both`, varsayılan: `dm`)
     - `agentFilter`, `sessionFilter`, `cleanupAfterResolve`
 
-    Discord, `enabled` ayarlanmamışsa veya `"auto"` ise ve `execApprovals.approvers` ya da `commands.ownerAllowFrom` üzerinden en az bir onaylayıcı çözümlenebiliyorsa yerel exec onaylarını otomatik olarak etkinleştirir. Discord, exec onaylayıcılarını kanal `allowFrom`, eski `dm.allowFrom` veya doğrudan mesaj `defaultTo` değerlerinden türetmez. Discord'u yerel onay istemcisi olarak açıkça devre dışı bırakmak için `enabled: false` ayarlayın.
+    `enabled` ayarlanmamış veya `"auto"` olduğunda ve en az bir onaylayıcı çözümlenebildiğinde Discord yerel exec onaylarını otomatik etkinleştirir; bu çözümleme ya `execApprovals.approvers` içinden ya da `commands.ownerAllowFrom` içinden gelir. Discord, exec onaylayıcılarını kanal `allowFrom`, eski `dm.allowFrom` veya doğrudan mesaj `defaultTo` üzerinden türetmez. Discord'u yerel bir onay istemcisi olarak açıkça devre dışı bırakmak için `enabled: false` ayarlayın.
 
-    `target`, `channel` veya `both` olduğunda onay istemi kanalda görünür. Düğmeleri yalnızca çözümlenen onaylayıcılar kullanabilir; diğer kullanıcılar geçici bir ret alır. Onay istemleri komut metnini içerir, bu nedenle kanal teslimini yalnızca güvenilen kanallarda etkinleştirin. Kanal ID'si oturum anahtarından türetilemezse OpenClaw DM teslimine fallback yapar.
+    `target` değeri `channel` veya `both` olduğunda, onay istemi kanalda görünür olur. Düğmeleri yalnızca çözümlenmiş onaylayıcılar kullanabilir; diğer kullanıcılar geçici bir reddetme alır. Onay istemleri komut metnini içerir, bu nedenle kanal teslimini yalnızca güvenilen kanallarda etkinleştirin. Kanal kimliği oturum anahtarından türetilemezse OpenClaw DM teslimine geri döner.
 
-    Discord ayrıca diğer sohbet kanalları tarafından kullanılan paylaşılan onay düğmelerini de işler. Yerel Discord adaptörü esas olarak onaylayıcı DM yönlendirmesi ve kanal fanout'u ekler.
-    Bu düğmeler mevcut olduğunda, bunlar birincil onay UX'i olur; OpenClaw
-    yalnızca araç sonucu sohbet onaylarının kullanılamadığını veya tek yolun
-    manuel onay olduğunu söylediğinde manuel bir `/approve` komutu eklemelidir.
+    Discord ayrıca diğer sohbet kanalları tarafından kullanılan paylaşılan onay düğmelerini de işler. Yerel Discord adaptörü esas olarak onaylayıcı DM yönlendirmesi ve kanal çoğaltımı ekler.
+    Bu düğmeler mevcut olduğunda bunlar birincil onay kullanıcı deneyimi olur; OpenClaw yalnızca araç sonucu sohbet onaylarının kullanılamadığını veya tek yolun manuel onay olduğunu söylediğinde manuel `/approve` komutu eklemelidir.
 
-    Gateway kimlik doğrulaması ve onay çözümlemesi paylaşılan Gateway istemci sözleşmesini izler (`plugin:` ID'leri `plugin.approval.resolve` üzerinden çözülür; diğer ID'ler `exec.approval.resolve` üzerinden çözülür). Onayların süresi varsayılan olarak 30 dakika sonra dolar.
+    Gateway kimlik doğrulaması ve onay çözümlemesi, paylaşılan Gateway istemci sözleşmesini izler (`plugin:` kimlikleri `plugin.approval.resolve` üzerinden çözülür; diğer kimlikler `exec.approval.resolve` üzerinden çözülür). Onayların süresi varsayılan olarak 30 dakika sonra dolar.
 
     Bkz. [Exec approvals](/tr/tools/exec-approvals).
 
   </Accordion>
 </AccordionGroup>
 
-## Araçlar ve eylem geçitleri
+## Araçlar ve eylem kapıları
 
-Discord mesaj eylemleri mesajlaşma, kanal yönetimi, moderasyon, presence ve meta veri eylemlerini içerir.
+Discord mesaj eylemleri; mesajlaşma, kanal yönetimi, moderasyon, durum ve meta veri eylemlerini içerir.
 
 Temel örnekler:
 
 - mesajlaşma: `sendMessage`, `readMessages`, `editMessage`, `deleteMessage`, `threadReply`
 - tepkiler: `react`, `reactions`, `emojiList`
 - moderasyon: `timeout`, `kick`, `ban`
-- presence: `setPresence`
+- durum: `setPresence`
 
-`event-create` eylemi, planlanmış etkinlik kapak görselini ayarlamak için isteğe bağlı bir `image` parametresi (URL veya yerel dosya yolu) kabul eder.
+`event-create` eylemi, planlanmış etkinlik kapak görselini ayarlamak için isteğe bağlı bir `image` parametresini (URL veya yerel dosya yolu) kabul eder.
 
-Eylem geçitleri `channels.discord.actions.*` altında bulunur.
+Eylem kapıları `channels.discord.actions.*` altında bulunur.
 
-Varsayılan geçit davranışı:
+Varsayılan kapı davranışı:
 
-| Eylem grubu                                                                                                                                                               | Varsayılan |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Eylem grubu                                                                                                                                                              | Varsayılan |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
 | reactions, messages, threads, pins, polls, search, memberInfo, roleInfo, channelInfo, channels, voiceStatus, events, stickers, emojiUploads, stickerUploads, permissions | etkin      |
-| roles                                                                                                                                                                     | devre dışı |
-| moderation                                                                                                                                                                | devre dışı |
-| presence                                                                                                                                                                  | devre dışı |
+| roles                                                                                                                                                                    | devre dışı |
+| moderation                                                                                                                                                               | devre dışı |
+| presence                                                                                                                                                                 | devre dışı |
 
 ## Components v2 UI
 
-OpenClaw, exec onayları ve bağlamlar arası işaretleyiciler için Discord components v2 kullanır. Discord mesaj eylemleri özel UI için `components` de kabul edebilir (ileri düzey; discord aracı üzerinden bir component payload oluşturmayı gerektirir), eski `embeds` ise kullanılabilir olmaya devam eder ancak önerilmez.
+OpenClaw, exec onayları ve bağlamlar arası işaretleyiciler için Discord components v2 kullanır. Discord mesaj eylemleri, özel kullanıcı arayüzü için `components` de kabul edebilir (ileri düzey; discord aracı üzerinden bir bileşen yükü oluşturmayı gerektirir), eski `embeds` ise kullanılabilir olmaya devam eder ancak önerilmez.
 
-- `channels.discord.ui.components.accentColor`, Discord component container'ları için kullanılan vurgu rengini ayarlar (hex).
-- Hesap başına ayarlamak için `channels.discord.accounts.<id>.ui.components.accentColor` kullanın.
-- Components v2 mevcut olduğunda `embeds` yok sayılır.
+- `channels.discord.ui.components.accentColor`, Discord bileşen kapsayıcıları için kullanılan vurgu rengini ayarlar (hex).
+- Hesap başına `channels.discord.accounts.<id>.ui.components.accentColor` ile ayarlayın.
+- components v2 mevcut olduğunda `embeds` yok sayılır.
 
 Örnek:
 
@@ -961,17 +957,26 @@ OpenClaw, exec onayları ve bağlamlar arası işaretleyiciler için Discord com
 
 ## Ses
 
-Discord'un iki ayrı ses yüzeyi vardır: gerçek zamanlı **ses kanalları** (sürekli konuşmalar) ve **sesli mesaj ekleri** (dalga formu önizleme biçimi). Gateway her ikisini de destekler.
+Discord'un iki ayrı ses yüzeyi vardır: gerçek zamanlı **ses kanalları** (sürekli konuşmalar) ve **sesli mesaj ekleri** (dalga biçimi önizleme biçimi). Gateway ikisini de destekler.
 
 ### Ses kanalları
 
-Gereksinimler:
+Kurulum kontrol listesi:
 
-- Yerel komutları etkinleştirin (`commands.native` veya `channels.discord.commands.native`).
-- `channels.discord.voice` yapılandırın.
-- Botun hedef ses kanalında Connect + Speak izinlerine sahip olması gerekir.
+1. Discord Developer Portal içinde Message Content Intent'i etkinleştirin.
+2. Rol/kullanıcı izin listeleri kullanıldığında Server Members Intent'i etkinleştirin.
+3. Botu `bot` ve `applications.commands` kapsamlarıyla davet edin.
+4. Hedef ses kanalında Connect, Speak, Send Messages ve Read Message History izinlerini verin.
+5. Yerel komutları etkinleştirin (`commands.native` veya `channels.discord.commands.native`).
+6. `channels.discord.voice` yapılandırmasını yapın.
 
-Oturumları denetlemek için `/vc join|leave|status` kullanın. Komut, hesap varsayılan aracısını kullanır ve diğer Discord komutlarıyla aynı allowlist ve grup ilkesi kurallarını izler.
+Oturumları denetlemek için `/vc join|leave|status` kullanın. Komut, hesap varsayılan ajanını kullanır ve diğer Discord komutlarıyla aynı izin listesi ve sunucu ilkesi kurallarını izler.
+
+```bash
+/vc join channel:<voice-channel-id>
+/vc status
+/vc leave
+```
 
 Otomatik katılma örneği:
 
@@ -981,6 +986,7 @@ Otomatik katılma örneği:
     discord: {
       voice: {
         enabled: true,
+        model: "openai/gpt-5.4-mini",
         autoJoin: [
           {
             guildId: "123456789012345678",
@@ -991,7 +997,7 @@ Otomatik katılma örneği:
         decryptionFailureTolerance: 24,
         tts: {
           provider: "openai",
-          openai: { voice: "alloy" },
+          openai: { voice: "onyx" },
         },
       },
     },
@@ -1002,19 +1008,31 @@ Otomatik katılma örneği:
 Notlar:
 
 - `voice.tts`, yalnızca ses oynatma için `messages.tts` değerini geçersiz kılar.
-- Ses transkript dönüşleri, sahip durumunu Discord `allowFrom` (veya `dm.allowFrom`) üzerinden türetir; sahip olmayan konuşmacılar yalnızca sahip araçlarına erişemez (örneğin `gateway` ve `cron`).
+- `voice.model`, yalnızca Discord ses kanalı yanıtları için kullanılan LLM'yi geçersiz kılar. Yönlendirilmiş ajan modelini devralmak için ayarsız bırakın.
+- STT, `tools.media.audio` kullanır; `voice.model` transkripsiyonu etkilemez.
+- Ses transkript turları sahip durumunu Discord `allowFrom` (veya `dm.allowFrom`) üzerinden türetir; sahip olmayan konuşmacılar yalnızca sahip araçlarına erişemez (örneğin `gateway` ve `cron`).
 - Ses varsayılan olarak etkindir; devre dışı bırakmak için `channels.discord.voice.enabled=false` ayarlayın.
-- `voice.daveEncryption` ve `voice.decryptionFailureTolerance`, `@discordjs/voice` katılma seçeneklerine olduğu gibi aktarılır.
-- `@discordjs/voice` varsayılanları, ayarlanmamışsa `daveEncryption=true` ve `decryptionFailureTolerance=24` değerleridir.
-- OpenClaw ayrıca alma çözme hatalarını izler ve kısa bir zaman penceresinde tekrarlanan hatalardan sonra ses kanalından ayrılıp yeniden katılarak otomatik kurtarma yapar.
-- Alma günlüklerinde tekrar tekrar `DecryptionFailed(UnencryptedWhenPassthroughDisabled)` görünüyorsa, bu [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419) içinde izlenen üst akış `@discordjs/voice` alma hatası olabilir.
+- `voice.daveEncryption` ve `voice.decryptionFailureTolerance`, `@discordjs/voice` katılma seçeneklerine doğrudan aktarılır.
+- `@discordjs/voice` varsayılanları, ayarlanmamışsa `daveEncryption=true` ve `decryptionFailureTolerance=24` olur.
+- OpenClaw ayrıca alma şifre çözme hatalarını izler ve kısa bir zaman aralığında tekrarlanan hatalardan sonra ses kanalından ayrılıp yeniden katılarak otomatik toparlanır.
+- Güncellemeden sonra alma günlüklerinde tekrar tekrar `DecryptionFailed(UnencryptedWhenPassthroughDisabled)` görünüyorsa, bir bağımlılık raporu ve günlükleri toplayın. Paketlenmiş `@discordjs/voice` satırı, discord.js PR #11449'daki upstream dolgu düzeltmesini içerir; bu düzeltme discord.js issue #11419'u kapatmıştır.
+
+Ses kanalı işlem hattı:
+
+- Discord PCM yakalama, geçici bir WAV dosyasına dönüştürülür.
+- `tools.media.audio`, örneğin `openai/gpt-4o-mini-transcribe` gibi STT işlemlerini yürütür.
+- Transkript normal Discord giriş ve yönlendirme akışından geçirilir.
+- Ayarlandığında `voice.model`, yalnızca bu ses kanalı turu için yanıt LLM'sini geçersiz kılar.
+- `voice.tts`, `messages.tts` üzerine birleştirilir; ortaya çıkan ses bağlı olunan kanalda çalınır.
+
+Kimlik bilgileri bileşen başına çözülür: `voice.model` için LLM yönlendirme kimlik doğrulaması, `tools.media.audio` için STT kimlik doğrulaması ve `messages.tts`/`voice.tts` için TTS kimlik doğrulaması.
 
 ### Sesli mesajlar
 
-Discord sesli mesajları bir dalga formu önizlemesi gösterir ve OGG/Opus ses gerektirir. OpenClaw dalga formunu otomatik üretir, ancak inceleme ve dönüştürme için gateway sunucusunda `ffmpeg` ve `ffprobe` gerektirir.
+Discord sesli mesajları bir dalga biçimi önizlemesi gösterir ve OGG/Opus ses gerektirir. OpenClaw dalga biçimini otomatik olarak üretir, ancak inceleme ve dönüştürme için gateway ana makinesinde `ffmpeg` ve `ffprobe` bulunmalıdır.
 
-- Bir **yerel dosya yolu** sağlayın (URL'ler reddedilir).
-- Metin içeriğini atlayın (Discord aynı payload içinde metin + sesli mesajı reddeder).
+- **Yerel bir dosya yolu** sağlayın (URL'ler reddedilir).
+- Metin içeriğini atlayın (Discord aynı yükte metin + sesli mesajı reddeder).
 - Herhangi bir ses biçimi kabul edilir; OpenClaw gerektiğinde OGG/Opus'a dönüştürür.
 
 ```bash
@@ -1024,7 +1042,7 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
 ## Sorun giderme
 
 <AccordionGroup>
-  <Accordion title="İzin verilmeyen intent'ler kullanıldı veya bot sunucu mesajlarını görmüyor">
+  <Accordion title="İzin verilmeyen intent'ler kullanıldı veya bot hiçbir sunucu mesajını görmüyor">
 
     - Message Content Intent'i etkinleştirin
     - kullanıcı/üye çözümlemesine bağlıysanız Server Members Intent'i etkinleştirin
@@ -1034,10 +1052,10 @@ message(action="send", channel="discord", target="channel:123", path="/path/to/a
 
   <Accordion title="Sunucu mesajları beklenmedik şekilde engelleniyor">
 
-    - `groupPolicy` doğrulayın
-    - `channels.discord.guilds` altındaki sunucu allowlist'ini doğrulayın
+    - `groupPolicy` değerini doğrulayın
+    - `channels.discord.guilds` altındaki sunucu izin listesini doğrulayın
     - sunucu `channels` eşlemesi varsa yalnızca listelenen kanallara izin verilir
-    - `requireMention` davranışını ve mention desenlerini doğrulayın
+    - `requireMention` davranışını ve mention kalıplarını doğrulayın
 
     Yararlı kontroller:
 
@@ -1052,13 +1070,13 @@ openclaw logs --follow
   <Accordion title="Require mention false ama yine de engelleniyor">
     Yaygın nedenler:
 
-    - Eşleşen sunucu/kanal allowlist'i olmadan `groupPolicy="allowlist"`
-    - `requireMention` yanlış yerde yapılandırılmış ( `channels.discord.guilds` veya kanal girdisi altında olmalıdır)
-    - gönderen sunucu/kanal `users` allowlist'i tarafından engelleniyor
+    - eşleşen sunucu/kanal izin listesi olmadan `groupPolicy="allowlist"`
+    - `requireMention` yanlış yerde yapılandırılmış (şu konumda olmalıdır: `channels.discord.guilds` veya kanal girdisi altında)
+    - gönderici sunucu/kanal `users` izin listesi tarafından engelleniyor
 
   </Accordion>
 
-  <Accordion title="Uzun süren işleyiciler zaman aşımına uğruyor veya yinelenen yanıtlar oluşuyor">
+  <Accordion title="Uzun çalışan işleyiciler zaman aşımına uğruyor veya yinelenen yanıtlar oluşuyor">
 
     Tipik günlükler:
 
@@ -1066,7 +1084,7 @@ openclaw logs --follow
     - `Slow listener detected ...`
     - `discord inbound worker timed out after ...`
 
-    Dinleyici bütçesi ayarı:
+    Listener bütçe ayarı:
 
     - tek hesap: `channels.discord.eventQueue.listenerTimeout`
     - çoklu hesap: `channels.discord.accounts.<accountId>.eventQueue.listenerTimeout`
@@ -1098,15 +1116,14 @@ openclaw logs --follow
 }
 ```
 
-    Yavaş dinleyici kurulumu için `eventQueue.listenerTimeout`, kuyruğa alınmış aracı turları için ayrı bir güvenlik supabı istiyorsanız
-    yalnızca `inboundWorker.runTimeoutMs` kullanın.
+    Yavaş listener kurulumu için `eventQueue.listenerTimeout`, kuyruğa alınmış ajan turları için ayrı bir güvenlik valfi istiyorsanız yalnızca `inboundWorker.runTimeoutMs` kullanın.
 
   </Accordion>
 
   <Accordion title="İzin denetimi uyuşmazlıkları">
-    `channels status --probe` izin kontrolleri yalnızca sayısal kanal ID'leri için çalışır.
+    `channels status --probe` izin kontrolleri yalnızca sayısal kanal kimlikleri için çalışır.
 
-    Slug anahtarları kullanıyorsanız, çalışma zamanı eşleşmesi yine de çalışabilir, ancak probe izinleri tam olarak doğrulayamaz.
+    Slug anahtarları kullanırsanız çalışma zamanı eşleştirmesi yine de çalışabilir, ancak probe izinleri tam olarak doğrulayamaz.
 
   </Accordion>
 
@@ -1121,20 +1138,20 @@ openclaw logs --follow
   <Accordion title="Botlar arası döngüler">
     Varsayılan olarak bot tarafından yazılmış mesajlar yok sayılır.
 
-    `channels.discord.allowBots=true` ayarlarsanız, döngü davranışını önlemek için katı mention ve allowlist kuralları kullanın.
-    Yalnızca bottan bahseden bot mesajlarını kabul etmek için `channels.discord.allowBots="mentions"` tercih edin.
+    `channels.discord.allowBots=true` ayarlarsanız, döngü davranışını önlemek için katı mention ve izin listesi kuralları kullanın.
+    Yalnızca botu mention eden bot mesajlarını kabul etmek için `channels.discord.allowBots="mentions"` tercih edin.
 
   </Accordion>
 
   <Accordion title="Ses STT, DecryptionFailed(...) ile düşüyor">
 
-    - Discord ses alma kurtarma mantığının mevcut olması için OpenClaw'ı güncel tutun (`openclaw update`)
+    - Discord ses alma kurtarma mantığının mevcut olduğundan emin olmak için OpenClaw'ı güncel tutun (`openclaw update`)
     - `channels.discord.voice.daveEncryption=true` değerini doğrulayın (varsayılan)
-    - `channels.discord.voice.decryptionFailureTolerance=24` (üst akış varsayılanı) ile başlayın ve yalnızca gerekirse ayarlayın
-    - günlükleri şunlar için izleyin:
+    - `channels.discord.voice.decryptionFailureTolerance=24` ile başlayın (upstream varsayılanı) ve yalnızca gerekirse ayarlayın
+    - günlüklerde şunları izleyin:
       - `discord voice: DAVE decrypt failures detected`
       - `discord voice: repeated decrypt failures; attempting rejoin`
-    - otomatik yeniden katılmadan sonra da hatalar sürerse günlükleri toplayın ve [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419) ile karşılaştırın
+    - otomatik yeniden katılmadan sonra sorunlar devam ederse günlükleri toplayın ve upstream DAVE alma geçmişiyle [discord.js #11419](https://github.com/discordjs/discord.js/issues/11419) ve [discord.js #11449](https://github.com/discordjs/discord.js/pull/11449) içinde karşılaştırın
 
   </Accordion>
 </AccordionGroup>
@@ -1148,24 +1165,24 @@ Birincil başvuru: [Configuration reference - Discord](/tr/gateway/config-channe
 - başlangıç/kimlik doğrulama: `enabled`, `token`, `accounts.*`, `allowBots`
 - ilke: `groupPolicy`, `dm.*`, `guilds.*`, `guilds.*.channels.*`
 - komut: `commands.native`, `commands.useAccessGroups`, `configWrites`, `slashCommand.*`
-- olay kuyruğu: `eventQueue.listenerTimeout` (dinleyici bütçesi), `eventQueue.maxQueueSize`, `eventQueue.maxConcurrency`
+- olay kuyruğu: `eventQueue.listenerTimeout` (listener bütçesi), `eventQueue.maxQueueSize`, `eventQueue.maxConcurrency`
 - inbound worker: `inboundWorker.runTimeoutMs`
 - yanıt/geçmiş: `replyToMode`, `historyLimit`, `dmHistoryLimit`, `dms.*.historyLimit`
 - teslimat: `textChunkLimit`, `chunkMode`, `maxLinesPerMessage`
 - akış: `streaming` (eski takma ad: `streamMode`), `streaming.preview.toolProgress`, `draftChunk`, `blockStreaming`, `blockStreamingCoalesce`
-- medya/retry: `mediaMaxMb` (giden Discord yüklemelerini sınırlar, varsayılan `100MB`), `retry`
+- medya/yeniden deneme: `mediaMaxMb` (giden Discord yüklemelerini sınırlar, varsayılan `100MB`), `retry`
 - eylemler: `actions.*`
-- presence: `activity`, `status`, `activityType`, `activityUrl`
+- durum: `activity`, `status`, `activityType`, `activityUrl`
 - UI: `ui.components.accentColor`
 - özellikler: `threadBindings`, üst düzey `bindings[]` (`type: "acp"`), `pluralkit`, `execApprovals`, `intents`, `agentComponents`, `heartbeat`, `responsePrefix`
 
 </Accordion>
 
-## Güvenlik ve operasyonlar
+## Güvenlik ve işlemler
 
-- Bot token'larını sır olarak değerlendirin (denetlenen ortamlarda `DISCORD_BOT_TOKEN` tercih edilir).
-- En az ayrıcalıklı Discord izinlerini verin.
-- Komut dağıtımı/durumu bayatsa gateway'i yeniden başlatın ve `openclaw channels status --probe` ile yeniden kontrol edin.
+- Bot token'larını sır olarak değerlendirin (gözetimli ortamlarda `DISCORD_BOT_TOKEN` tercih edilir).
+- En az ayrıcalık ilkesine uygun Discord izinleri verin.
+- Komut dağıtımı/durumu bayatsa gateway'i yeniden başlatın ve `openclaw channels status --probe` ile tekrar kontrol edin.
 
 ## İlgili
 
@@ -1174,16 +1191,16 @@ Birincil başvuru: [Configuration reference - Discord](/tr/gateway/config-channe
     Bir Discord kullanıcısını gateway ile eşleştirin.
   </Card>
   <Card title="Gruplar" icon="users" href="/tr/channels/groups">
-    Grup sohbeti ve allowlist davranışı.
+    Grup sohbeti ve izin listesi davranışı.
   </Card>
   <Card title="Kanal yönlendirme" icon="route" href="/tr/channels/channel-routing">
-    Gelen mesajları aracılara yönlendirin.
+    Gelen mesajları ajanlara yönlendirin.
   </Card>
   <Card title="Güvenlik" icon="shield" href="/tr/gateway/security">
-    Tehdit modeli ve sertleştirme.
+    Tehdit modeli ve sağlamlaştırma.
   </Card>
-  <Card title="Çoklu aracı yönlendirme" icon="sitemap" href="/tr/concepts/multi-agent">
-    Sunucuları ve kanalları aracılara eşleyin.
+  <Card title="Çoklu ajan yönlendirme" icon="sitemap" href="/tr/concepts/multi-agent">
+    Sunucuları ve kanalları ajanlara eşleyin.
   </Card>
   <Card title="Slash komutları" icon="terminal" href="/tr/tools/slash-commands">
     Yerel komut davranışı.

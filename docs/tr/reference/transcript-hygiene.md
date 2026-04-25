@@ -1,82 +1,94 @@
 ---
 read_when:
-    - Döküm şekline bağlı sağlayıcı istek reddetmelerinde hata ayıklıyorsunuz
-    - Döküm temizleme veya araç çağrısı onarım mantığını değiştiriyorsunuz
+    - Transkript biçimine bağlı sağlayıcı istek reddetmelerinde hata ayıklıyorsunuz
+    - Transkript temizleme veya araç çağrısı onarım mantığını değiştiriyorsunuz
     - Sağlayıcılar arasında araç çağrısı kimliği uyuşmazlıklarını araştırıyorsunuz
-summary: 'Başvuru: sağlayıcıya özgü döküm temizleme ve onarım kuralları'
-title: Döküm temizliği
+summary: 'Başvuru: sağlayıcıya özgü transkript temizleme ve onarma kuralları'
+title: Transkript hijyeni
 x-i18n:
-    generated_at: "2026-04-24T09:31:08Z"
+    generated_at: "2026-04-25T13:57:36Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c206186f2c4816775db0f2c4663f07f5a55831a8920d1d0261ff9998bd82efc0
+    source_hash: 00cac47fb9a238e3cb8b6ea69b47210685ca6769a31973b4aeef1d18e75d78e6
     source_path: reference/transcript-hygiene.md
     workflow: 15
 ---
 
-# Döküm Temizliği (Sağlayıcı Düzeltmeleri)
-
-Bu belge, bir çalıştırmadan önce dökümlere uygulanan **sağlayıcıya özgü düzeltmeleri**
-açıklar (model bağlamı oluşturulurken). Bunlar, katı sağlayıcı
-gereksinimlerini karşılamak için kullanılan **bellek içi** ayarlamalardır. Bu
-temizlik adımları disk üzerindeki saklanan JSONL dökümünü **yeniden yazmaz**; ancak ayrı bir oturum dosyası
-onarım geçişi, oturum yüklenmeden önce geçersiz satırları düşürerek hatalı JSONL dosyalarını
-yeniden yazabilir. Bir onarım gerçekleştiğinde özgün dosya, oturum dosyasının yanında yedeklenir.
+Bu belge, bir çalıştırmadan önce transkriptlere uygulanan **sağlayıcıya özgü düzeltmeleri**
+(model bağlamı oluşturma) açıklar. Bunlar, katı
+sağlayıcı gereksinimlerini karşılamak için kullanılan **bellek içi** ayarlamalardır. Bu hijyen adımları, diskte saklanan JSONL transkriptini
+yeniden yazmaz; ancak ayrı bir oturum dosyası onarım geçişi, oturum yüklenmeden önce
+geçersiz satırları bırakarak bozuk JSONL dosyalarını yeniden yazabilir. Bir onarım gerçekleştiğinde, özgün
+dosya oturum dosyasının yanında yedeklenir.
 
 Kapsam şunları içerir:
 
+- Çalışma zamanı için olan istem bağlamının kullanıcıya görünür transkript turlarının dışında kalması
 - Araç çağrısı kimliği temizleme
 - Araç çağrısı girdisi doğrulama
 - Araç sonucu eşleştirme onarımı
 - Tur doğrulama / sıralama
 - Düşünce imzası temizleme
-- Görüntü payload temizleme
-- Kullanıcı girdi kaynağı etiketleme (oturumlar arası yönlendirilen prompt'lar için)
+- Görsel yükü temizleme
+- Kullanıcı girdisi kökeni etiketleme (oturumlar arası yönlendirilen istemler için)
 
-Döküm depolama ayrıntılarına ihtiyacınız varsa bkz.:
+Transkript depolama ayrıntılarına ihtiyacınız varsa bkz.:
 
-- [/reference/session-management-compaction](/tr/reference/session-management-compaction)
+- [Oturum yönetimi derin inceleme](/tr/reference/session-management-compaction)
+
+---
+
+## Genel kural: çalışma zamanı bağlamı kullanıcı transkripti değildir
+
+Çalışma zamanı/sistem bağlamı bir tur için model istemine eklenebilir, ancak bu
+son kullanıcı tarafından yazılmış içerik değildir. OpenClaw, Gateway yanıtları,
+kuyruğa alınmış takipler, ACP, CLI ve gömülü Pi
+çalıştırmaları için transkripte dönük ayrı bir istem gövdesi tutar. Saklanan görünür kullanıcı turları,
+çalışma zamanı ile zenginleştirilmiş istem yerine bu transkript gövdesini kullanır.
+
+Çalışma zamanı sarmalayıcılarını zaten kalıcı hale getirmiş eski oturumlar için,
+Gateway geçmiş yüzeyleri WebChat,
+TUI, REST veya SSE istemcilerine iletileri döndürmeden önce bir görüntüleme izdüşümü uygular.
 
 ---
 
 ## Bunun çalıştığı yer
 
-Tüm döküm temizliği gömülü çalıştırıcıda merkezileştirilmiştir:
+Tüm transkript hijyeni gömülü çalıştırıcıda merkezileştirilmiştir:
 
 - İlke seçimi: `src/agents/transcript-policy.ts`
 - Temizleme/onarım uygulaması: `src/agents/pi-embedded-runner/replay-history.ts` içindeki `sanitizeSessionHistory`
 
-İlke, ne uygulanacağına karar vermek için `provider`, `modelApi` ve `modelId` kullanır.
+İlke, neyin uygulanacağına karar vermek için `provider`, `modelApi` ve `modelId` kullanır.
 
-Döküm temizliğinden ayrı olarak, oturum dosyaları yüklemeden önce gerekirse onarılır:
+Transkript hijyeninden ayrı olarak, oturum dosyaları yüklemeden önce (gerekirse) onarılır:
 
 - `src/agents/session-file-repair.ts` içindeki `repairSessionFileIfNeeded`
-- `run/attempt.ts` ve `compact.ts` tarafından çağrılır (gömülü çalıştırıcı)
+- `run/attempt.ts` ve `compact.ts` içinden çağrılır (gömülü çalıştırıcı)
 
 ---
 
-## Genel kural: görüntü temizleme
+## Genel kural: görsel temizleme
 
-Sağlayıcı tarafı reddedilmeleri boyut
-sınırları nedeniyle önlemek için görüntü payload'ları her zaman temizlenir
-(aşırı büyük base64 görüntüler küçültülür/yeniden sıkıştırılır).
+Görsel yükleri, boyut
+sınırları nedeniyle sağlayıcı tarafında reddi önlemek için her zaman temizlenir (aşırı büyük base64 görseller küçültülür/yeniden sıkıştırılır).
 
-Bu ayrıca vision yetenekli modeller için görüntü kaynaklı token baskısını denetlemeye de yardımcı olur.
-Daha düşük maksimum boyutlar genellikle token kullanımını azaltır; daha yüksek boyutlar ayrıntıyı korur.
+Bu ayrıca görsel destekli modeller için görsel kaynaklı belirteç baskısını denetlemeye yardımcı olur.
+Daha düşük azami boyutlar genelde belirteç kullanımını azaltır; daha yüksek boyutlar ayrıntıyı korur.
 
 Uygulama:
 
 - `src/agents/pi-embedded-helpers/images.ts` içindeki `sanitizeSessionMessagesImages`
 - `src/agents/tool-images.ts` içindeki `sanitizeContentBlocksImages`
-- Maksimum görüntü kenarı `agents.defaults.imageMaxDimensionPx` ile yapılandırılabilir (varsayılan: `1200`).
+- Azami görsel kenarı `agents.defaults.imageMaxDimensionPx` ile yapılandırılabilir (varsayılan: `1200`).
 
 ---
 
-## Genel kural: hatalı araç çağrıları
+## Genel kural: bozuk araç çağrıları
 
-Hem `input` hem de `arguments` alanları eksik olan assistant araç çağrısı blokları,
-model bağlamı oluşturulmadan önce düşürülür. Bu, kısmen
-kalıcılaştırılmış araç çağrılarından kaynaklanan sağlayıcı reddetmelerini önler (örneğin, bir hız sınırı hatasından sonra).
+Hem `input` hem de `arguments` alanı eksik olan asistan araç çağrısı blokları,
+model bağlamı oluşturulmadan önce bırakılır. Bu, kısmen
+kalıcı hale getirilmiş araç çağrılarından kaynaklanan sağlayıcı reddini önler (örneğin, hız sınırı hatasından sonra).
 
 Uygulama:
 
@@ -85,48 +97,47 @@ Uygulama:
 
 ---
 
-## Genel kural: oturumlar arası girdi kaynağı
+## Genel kural: oturumlar arası girdi kökeni
 
-Bir agent, `sessions_send` aracılığıyla (agent-to-agent yanıt/duyuru adımları dahil)
-başka bir oturuma prompt gönderdiğinde OpenClaw oluşturulan kullanıcı turunu şu şekilde kalıcılaştırır:
+Bir aracı `sessions_send` aracılığıyla başka bir oturuma istem gönderdiğinde (
+aracıdan aracıya yanıt/duyuru adımları dahil), OpenClaw oluşturulan kullanıcı turunu şu şekilde kalıcı hale getirir:
 
 - `message.provenance.kind = "inter_session"`
 
-Bu meta veriler, döküm ekleme anında yazılır ve rolü değiştirmez
-(`role: "user"` sağlayıcı uyumluluğu için korunur). Döküm okuyucuları,
-yönlendirilmiş iç prompt'ları son kullanıcı tarafından yazılmış talimatlar gibi ele almamak için
-bunu kullanabilir.
+Bu meta veri, transkripte ekleme zamanında yazılır ve rolü değiştirmez
+(sağlayıcı uyumluluğu için `role: "user"` olarak kalır). Transkript okuyucuları bunu,
+yönlendirilmiş iç istemleri son kullanıcı tarafından yazılmış yönergeler gibi değerlendirmemek için kullanabilir.
 
-Bağlam yeniden oluşturma sırasında OpenClaw, modelin bunları
-harici son kullanıcı talimatlarından ayırt edebilmesi için bu kullanıcı turlarının başına bellek içinde kısa bir `[Inter-session message]`
-işaretleyicisi de ekler.
+Bağlam yeniden oluşturma sırasında OpenClaw ayrıca, modelin bunları
+harici son kullanıcı yönergelerinden ayırt edebilmesi için bu kullanıcı turlarına bellekte kısa bir `[Inter-session message]`
+işaretçisi ekler.
 
 ---
 
-## Sağlayıcı matrisi (geçerli davranış)
+## Sağlayıcı matrisi (mevcut davranış)
 
 **OpenAI / OpenAI Codex**
 
-- Yalnızca görüntü temizleme.
-- OpenAI Responses/Codex dökümleri için yetim reasoning imzalarını (ardından içerik bloğu gelmeyen bağımsız reasoning öğeleri) düşürür.
+- Yalnızca görsel temizleme.
+- OpenAI Responses/Codex transkriptleri için sahipsiz reasoning imzalarını (ardından içerik bloğu gelmeyen bağımsız reasoning öğeleri) bırakır ve model rota değişiminden sonra yeniden oynatılabilir OpenAI reasoning öğelerini bırakır.
 - Araç çağrısı kimliği temizleme yok.
-- Araç sonucu eşleştirme onarımı yok.
+- Araç sonucu eşleştirme onarımı gerçek eşleşmiş çıktıları taşıyabilir ve eksik araç çağrıları için Codex tarzı `aborted` çıktıları sentezleyebilir.
 - Tur doğrulama veya yeniden sıralama yok.
-- Sentetik araç sonucu yok.
-- Düşünce imzası sıyırma yok.
+- Eksik OpenAI Responses ailesi araç çıktıları, Codex yeniden oynatma normalleştirmesiyle eşleşmesi için `aborted` olarak sentezlenir.
+- Düşünce imzası ayıklama yok.
 
 **Google (Generative AI / Gemini CLI / Antigravity)**
 
 - Araç çağrısı kimliği temizleme: katı alfasayısal.
 - Araç sonucu eşleştirme onarımı ve sentetik araç sonuçları.
-- Tur doğrulama (Gemini tarzı tur ardışıklığı).
-- Google tur sıralama düzeltmesi (geçmiş assistant ile başlıyorsa başa minik bir kullanıcı bootstrap ekler).
-- Antigravity Claude: thinking imzalarını normalize eder; imzasız thinking bloklarını düşürür.
+- Tur doğrulama (Gemini tarzı tur dönüşümlülüğü).
+- Google tur sıralama düzeltmesi (geçmiş asistan ile başlıyorsa küçük bir kullanıcı bootstrap'ı başa ekler).
+- Antigravity Claude: düşünme imzalarını normalleştirir; imzasız düşünme bloklarını bırakır.
 
-**Anthropic / Minimax (Anthropic-compatible)**
+**Anthropic / Minimax (Anthropic uyumlu)**
 
 - Araç sonucu eşleştirme onarımı ve sentetik araç sonuçları.
-- Tur doğrulama (katı ardışıklığı sağlamak için art arda gelen kullanıcı turlarını birleştirir).
+- Tur doğrulama (katı dönüşümlülüğü karşılamak için ardışık kullanıcı turlarını birleştirir).
 
 **Mistral (model kimliği tabanlı algılama dahil)**
 
@@ -134,32 +145,32 @@ işaretleyicisi de ekler.
 
 **OpenRouter Gemini**
 
-- Düşünce imzası temizleme: base64 olmayan `thought_signature` değerlerini sıyırır (base64 olanı korur).
+- Düşünce imzası temizleme: base64 olmayan `thought_signature` değerlerini ayıklar (base64 korunur).
 
 **Diğer her şey**
 
-- Yalnızca görüntü temizleme.
+- Yalnızca görsel temizleme.
 
 ---
 
-## Tarihsel davranış (2026.1.22 öncesi)
+## Geçmiş davranış (2026.1.22 öncesi)
 
-2026.1.22 sürümünden önce OpenClaw, birden fazla döküm temizleme katmanı uygular:
+2026.1.22 sürümünden önce OpenClaw birden çok katmanlı transkript hijyeni uyguluyordu:
 
-- Her bağlam oluşturma işleminde çalışan bir **transcript-sanitize extension** vardı ve şunları yapabiliyordu:
-  - Araç kullanımı/sonucu eşleşmesini onarmak.
-  - Araç çağrısı kimliklerini temizlemek ( `_`/`-` karakterlerini koruyan katı olmayan mod dahil).
-- Çalıştırıcı ayrıca sağlayıcıya özgü temizleme yapıyordu; bu da işi yineletiyordu.
-- Sağlayıcı ilkesinin dışında ek mutasyonlar da oluyordu; bunlar arasında:
-  - Kalıcılaştırmadan önce assistant metninden `<final>` etiketlerini sıyırma.
-  - Boş assistant hata turlarını düşürme.
-  - Araç çağrılarından sonra assistant içeriğini kırpma.
+- Her bağlam oluşturmada çalışan bir **transcript-sanitize extension** şunları yapabiliyordu:
+  - Araç kullanım/sonuç eşleşmesini onarmak.
+  - Araç çağrısı kimliklerini temizlemek (`_`/`-` karakterlerini koruyan katı olmayan mod dahil).
+- Çalıştırıcı ayrıca sağlayıcıya özgü temizleme de yapıyordu, bu da işi yineliyordu.
+- Sağlayıcı ilkesinin dışında ek mutasyonlar gerçekleşiyordu, örneğin:
+  - Kalıcı hale getirmeden önce asistan metninden `<final>` etiketlerini ayıklamak.
+  - Boş asistan hata turlarını bırakmak.
+  - Araç çağrılarından sonra asistan içeriğini kırpmak.
 
-Bu karmaşıklık sağlayıcılar arası regresyonlara yol açtı (özellikle `openai-responses`
-`call_id|fc_id` eşleşmesi). 2026.1.22 temizliği extension'ı kaldırdı, mantığı çalıştırıcıda merkezileştirdi ve OpenAI'yi görüntü temizleme dışında **dokunulmaz**
-hale getirdi.
+Bu karmaşıklık, sağlayıcılar arası gerilemelere neden oldu (özellikle `openai-responses`
+`call_id|fc_id` eşleşmesi). 2026.1.22 temizliği uzantıyı kaldırdı, mantığı
+çalıştırıcıda merkezileştirdi ve OpenAI'ı görsel temizleme dışında **dokunmasız** hale getirdi.
 
 ## İlgili
 
-- [Session management](/tr/concepts/session)
-- [Session pruning](/tr/concepts/session-pruning)
+- [Oturum yönetimi](/tr/concepts/session)
+- [Oturum budama](/tr/concepts/session-pruning)

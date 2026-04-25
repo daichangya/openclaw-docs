@@ -1,14 +1,14 @@
 ---
 read_when:
-    - TUI için başlangıç dostu adım adım anlatım istiyorsunuz
+    - TUI için yeni başlayanlara uygun adım adım bir rehber istiyorsunuz
     - TUI özelliklerinin, komutlarının ve kısayollarının tam listesine ihtiyacınız var
 summary: 'Terminal UI (TUI): Gateway''e bağlanın veya yerel olarak gömülü modda çalıştırın'
 title: TUI
 x-i18n:
-    generated_at: "2026-04-24T09:38:53Z"
+    generated_at: "2026-04-25T14:01:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6168ab6cec8e0069f660ddcfca03275c407b613b6eb756aa6ef7e97f2312effe
+    source_hash: 6eaa938fb3a50b7478341fe51cafb09e352f6d3cb402373222153ed93531a5f5
     source_path: web/tui.md
     workflow: 15
 ---
@@ -23,7 +23,7 @@ x-i18n:
 openclaw gateway
 ```
 
-2. TUI'ı açın.
+2. TUI'yi açın.
 
 ```bash
 openclaw tui
@@ -37,11 +37,11 @@ Uzak Gateway:
 openclaw tui --url ws://<host>:<port> --token <gateway-token>
 ```
 
-Gateway'iniz parola auth kullanıyorsa `--password` kullanın.
+Gateway'iniz parola kimlik doğrulaması kullanıyorsa `--password` kullanın.
 
 ### Yerel mod
 
-TUI'ı Gateway olmadan çalıştırın:
+TUI'yi Gateway olmadan çalıştırın:
 
 ```bash
 openclaw chat
@@ -54,22 +54,23 @@ Notlar:
 - `openclaw chat` ve `openclaw terminal`, `openclaw tui --local` için takma addır.
 - `--local`, `--url`, `--token` veya `--password` ile birlikte kullanılamaz.
 - Yerel mod, gömülü aracı çalışma zamanını doğrudan kullanır. Çoğu yerel araç çalışır, ancak yalnızca Gateway'e özgü özellikler kullanılamaz.
+- `openclaw` ve `openclaw crestodian` da bu TUI kabuğunu kullanır; Crestodian, yerel kurulum ve onarım sohbet arka ucu olarak kullanılır.
 
-## Ne görürsünüz
+## Gördükleriniz
 
-- Başlık: bağlantı URL'si, geçerli aracı, geçerli oturum.
+- Üst bilgi: bağlantı URL'si, geçerli aracı, geçerli oturum.
 - Sohbet günlüğü: kullanıcı mesajları, asistan yanıtları, sistem bildirimleri, araç kartları.
-- Durum satırı: bağlantı/çalıştırma durumu (bağlanıyor, çalışıyor, akışta, boşta, hata).
-- Alt bilgi: bağlantı durumu + aracı + oturum + model + think/fast/verbose/trace/reasoning + token sayıları + deliver.
-- Girdi: otomatik tamamlama içeren metin düzenleyici.
+- Durum satırı: bağlantı/çalıştırma durumu (bağlanıyor, çalışıyor, akıyor, boşta, hata).
+- Alt bilgi: bağlantı durumu + aracı + oturum + model + think/fast/verbose/trace/reasoning + belirteç sayıları + deliver.
+- Girdi: otomatik tamamlamalı metin düzenleyici.
 
 ## Zihinsel model: aracılar + oturumlar
 
 - Aracılar benzersiz slug'lardır (ör. `main`, `research`). Gateway listeyi sunar.
 - Oturumlar geçerli aracıya aittir.
 - Oturum anahtarları `agent:<agentId>:<sessionKey>` olarak saklanır.
-  - `/session main` yazarsanız TUI bunu `agent:<currentAgent>:main` olarak genişletir.
-  - `/session agent:other:main` yazarsanız açıkça o aracı oturumuna geçersiniz.
+  - `/session main` yazarsanız, TUI bunu `agent:<currentAgent>:main` olarak genişletir.
+  - `/session agent:other:main` yazarsanız, açıkça o aracı oturumuna geçersiniz.
 - Oturum kapsamı:
   - `per-sender` (varsayılan): her aracının birçok oturumu vardır.
   - `global`: TUI her zaman `global` oturumunu kullanır (seçici boş olabilir).
@@ -88,21 +89,21 @@ Notlar:
 - Model seçici: kullanılabilir modelleri listeler ve oturum geçersiz kılmasını ayarlar.
 - Aracı seçici: farklı bir aracı seçin.
 - Oturum seçici: yalnızca geçerli aracı için oturumları gösterir.
-- Ayarlar: deliver, araç çıktısı genişletme ve thinking görünürlüğünü açıp kapatır.
+- Ayarlar: deliver, araç çıktısı genişletme ve düşünme görünürlüğünü açıp kapatın.
 
 ## Klavye kısayolları
 
 - Enter: mesaj gönder
 - Esc: etkin çalıştırmayı iptal et
-- Ctrl+C: girdiyi temizle (çıkmak için iki kez basın)
+- Ctrl+C: girdiyi temizle (çıkmak için iki kez bas)
 - Ctrl+D: çık
 - Ctrl+L: model seçici
 - Ctrl+G: aracı seçici
 - Ctrl+P: oturum seçici
 - Ctrl+O: araç çıktısı genişletmeyi aç/kapat
-- Ctrl+T: thinking görünürlüğünü aç/kapat (geçmişi yeniden yükler)
+- Ctrl+T: düşünme görünürlüğünü aç/kapat (geçmişi yeniden yükler)
 
-## Slash komutları
+## Eğik çizgi komutları
 
 Çekirdek:
 
@@ -133,26 +134,26 @@ Oturum yaşam döngüsü:
 
 Yalnızca yerel mod:
 
-- `/auth [provider]`, TUI içinde sağlayıcı auth/login akışını açar.
+- `/auth [provider]`, sağlayıcı kimlik doğrulama/oturum açma akışını TUI içinde açar.
 
-Diğer Gateway slash komutları (örneğin `/context`) Gateway'e iletilir ve sistem çıktısı olarak gösterilir. Bkz. [Slash commands](/tr/tools/slash-commands).
+Diğer Gateway eğik çizgi komutları (örneğin `/context`) Gateway'e iletilir ve sistem çıktısı olarak gösterilir. Bkz. [Eğik çizgi komutları](/tr/tools/slash-commands).
 
 ## Yerel kabuk komutları
 
-- Bir satırın başına `!` koyarak TUI sunucusunda yerel kabuk komutu çalıştırın.
-- TUI, oturum başına bir kez yerel yürütmeye izin vermek için sorar; reddederseniz o oturum için `!` devre dışı kalır.
-- Komutlar TUI çalışma dizininde taze, etkileşimsiz bir kabukta çalışır (kalıcı `cd`/env yoktur).
+- TUI ana bilgisayarında yerel kabuk komutu çalıştırmak için bir satırın başına `!` ekleyin.
+- TUI, yerel yürütmeye izin vermek için oturum başına bir kez sorar; reddederseniz o oturum için `!` devre dışı kalır.
+- Komutlar TUI çalışma dizininde yeni, etkileşimli olmayan bir kabukta çalışır (`cd`/env kalıcı değildir).
 - Yerel kabuk komutları ortamlarında `OPENCLAW_SHELL=tui-local` alır.
-- Tek başına `!`, normal mesaj olarak gönderilir; baştaki boşluklar yerel exec tetiklemez.
+- Tek başına `!`, normal mesaj olarak gönderilir; baştaki boşluklar yerel exec'i tetiklemez.
 
-## Yerel TUI'dan config onarma
+## Yerel TUI'den yapılandırmaları onarma
 
-Geçerli config zaten doğrulanıyorsa ve
+Geçerli yapılandırma zaten doğrulanıyorsa ve
 gömülü aracının aynı makinede bunu incelemesini, belgelerle karşılaştırmasını
-ve çalışan bir Gateway'e bağlı olmadan kaymaları onarmaya yardımcı olmasını istiyorsanız yerel modu kullanın.
+ve çalışan bir Gateway'e bağımlı olmadan sapmaları onarmaya yardımcı olmasını istiyorsanız yerel modu kullanın.
 
-`openclaw config validate` zaten başarısız oluyorsa önce `openclaw configure`
-veya `openclaw doctor --fix` ile başlayın. `openclaw chat`, geçersiz config
+`openclaw config validate` zaten başarısız oluyorsa, önce `openclaw configure`
+veya `openclaw doctor --fix` ile başlayın. `openclaw chat`, geçersiz yapılandırma
 korumasını atlamaz.
 
 Tipik döngü:
@@ -163,10 +164,10 @@ Tipik döngü:
 openclaw chat
 ```
 
-2. Aracıya neyi kontrol etmesini istediğinizi söyleyin, örneğin:
+2. Aracıya neyi kontrol etmesini istediğinizi sorun, örneğin:
 
 ```text
-Gateway auth config'imi belgelerle karşılaştır ve en küçük düzeltmeyi öner.
+Gateway kimlik doğrulama yapılandırmamı belgelerle karşılaştır ve en küçük düzeltmeyi öner.
 ```
 
 3. Kesin kanıt ve doğrulama için yerel kabuk komutlarını kullanın:
@@ -178,53 +179,53 @@ Gateway auth config'imi belgelerle karşılaştır ve en küçük düzeltmeyi ö
 !openclaw doctor
 ```
 
-4. `openclaw config set` veya `openclaw configure` ile dar değişiklikler uygulayın, sonra `!openclaw config validate` yeniden çalıştırın.
-5. Doctor otomatik bir migration veya onarım önerirse bunu gözden geçirin ve `!openclaw doctor --fix` çalıştırın.
+4. `openclaw config set` veya `openclaw configure` ile dar değişiklikler uygulayın, ardından `!openclaw config validate` komutunu yeniden çalıştırın.
+5. Doctor otomatik taşıma veya onarım önerirse, bunu gözden geçirin ve `!openclaw doctor --fix` çalıştırın.
 
 İpuçları:
 
 - `openclaw.json` dosyasını elle düzenlemek yerine `openclaw config set` veya `openclaw configure` tercih edin.
-- `openclaw docs "<query>"`, aynı makineden canlı belge dizininde arama yapar.
-- Yapılandırılmış şema ve SecretRef/çözülebilirlik hataları istediğinizde `openclaw config validate --json` kullanışlıdır.
+- `openclaw docs "<query>"`, aynı makineden canlı dokümantasyon dizininde arama yapar.
+- `openclaw config validate --json`, yapılandırılmış şema ve SecretRef/çözümlenebilirlik hataları istediğinizde kullanışlıdır.
 
 ## Araç çıktısı
 
-- Araç çağrıları bağımsız değişkenler + sonuçlarla kartlar olarak gösterilir.
+- Araç çağrıları argümanlar + sonuçlarla kartlar olarak gösterilir.
 - Ctrl+O, daraltılmış/genişletilmiş görünümler arasında geçiş yapar.
-- Araçlar çalışırken kısmi güncellemeler aynı karta akar.
+- Araçlar çalışırken, kısmi güncellemeler aynı karta akar.
 
 ## Terminal renkleri
 
-- TUI, hem koyu hem açık terminallerde okunabilir kalması için asistan gövde metnini terminalinizin varsayılan ön plan renginde tutar.
-- Terminaliniz açık arka plan kullanıyorsa ve otomatik algılama yanlışsa `openclaw tui` başlatmadan önce `OPENCLAW_THEME=light` ayarlayın.
+- TUI, hem koyu hem açık terminallerin okunabilir kalması için asistan gövde metnini terminalinizin varsayılan ön plan renginde tutar.
+- Terminaliniz açık arka plan kullanıyorsa ve otomatik algılama yanlışsa, `openclaw tui` başlatmadan önce `OPENCLAW_THEME=light` ayarlayın.
 - Bunun yerine özgün koyu paleti zorlamak için `OPENCLAW_THEME=dark` ayarlayın.
 
 ## Geçmiş + akış
 
 - Bağlantıda TUI en son geçmişi yükler (varsayılan 200 mesaj).
-- Akış halindeki yanıtlar tamamlanana kadar yerinde güncellenir.
-- TUI ayrıca daha zengin araç kartları için aracı araç olaylarını da dinler.
+- Akan yanıtlar sonlandırılana kadar yerinde güncellenir.
+- TUI ayrıca daha zengin araç kartları için aracı araç olaylarını dinler.
 
 ## Bağlantı ayrıntıları
 
 - TUI, Gateway'e `mode: "tui"` olarak kaydolur.
-- Yeniden bağlantılar sistem mesajı gösterir; olay boşlukları günlüğe yansıtılır.
+- Yeniden bağlanmalar sistem mesajı gösterir; olay boşlukları günlüğe yansıtılır.
 
 ## Seçenekler
 
 - `--local`: Yerel gömülü aracı çalışma zamanına karşı çalıştır
-- `--url <url>`: Gateway WebSocket URL'si (varsayılan config veya `ws://127.0.0.1:<port>`)
+- `--url <url>`: Gateway WebSocket URL'si (varsayılan olarak yapılandırma veya `ws://127.0.0.1:<port>`)
 - `--token <token>`: Gateway token'ı (gerekiyorsa)
 - `--password <password>`: Gateway parolası (gerekiyorsa)
 - `--session <key>`: Oturum anahtarı (varsayılan: `main`, kapsam global olduğunda `global`)
 - `--deliver`: Asistan yanıtlarını sağlayıcıya teslim et (varsayılan kapalı)
-- `--thinking <level>`: Gönderimler için thinking düzeyini geçersiz kıl
-- `--message <text>`: Bağlandıktan sonra ilk mesajı gönder
-- `--timeout-ms <ms>`: Aracı zaman aşımı, ms cinsinden (varsayılan `agents.defaults.timeoutSeconds`)
+- `--thinking <level>`: Gönderimler için düşünme düzeyini geçersiz kıl
+- `--message <text>`: Bağlandıktan sonra başlangıç mesajı gönder
+- `--timeout-ms <ms>`: Aracı zaman aşımı ms cinsinden (varsayılan olarak `agents.defaults.timeoutSeconds`)
 - `--history-limit <n>`: Yüklenecek geçmiş girdileri (varsayılan `200`)
 
-Not: `--url` ayarladığınızda TUI config veya ortam kimlik bilgilerinə fallback yapmaz.
-`--token` veya `--password` değerini açıkça geçin. Açık kimlik bilgisi eksikse hata olur.
+Not: `--url` ayarladığınızda TUI yapılandırma veya ortam kimlik bilgilerine geri dönmez.
+`--token` veya `--password` değerini açıkça geçin. Açık kimlik bilgileri eksikse bu bir hatadır.
 Yerel modda `--url`, `--token` veya `--password` geçmeyin.
 
 ## Sorun giderme
@@ -234,17 +235,17 @@ Mesaj gönderdikten sonra çıktı yok:
 - Gateway'in bağlı ve boşta/meşgul olduğunu doğrulamak için TUI içinde `/status` çalıştırın.
 - Gateway günlüklerini kontrol edin: `openclaw logs --follow`.
 - Aracının çalışabildiğini doğrulayın: `openclaw status` ve `openclaw models status`.
-- Bir sohbet kanalında mesaj bekliyorsanız teslimi etkinleştirin (`/deliver on` veya `--deliver`).
+- Bir sohbet kanalında mesajlar bekliyorsanız teslimi etkinleştirin (`/deliver on` veya `--deliver`).
 
 ## Bağlantı sorun giderme
 
 - `disconnected`: Gateway'in çalıştığından ve `--url/--token/--password` değerlerinizin doğru olduğundan emin olun.
-- Seçicide aracı yok: `openclaw agents list` ve yönlendirme config'inizi kontrol edin.
-- Boş oturum seçici: global kapsamda olabilirsiniz veya henüz oturumunuz olmayabilir.
+- Seçicide aracı yok: `openclaw agents list` ve yönlendirme yapılandırmanızı kontrol edin.
+- Boş oturum seçici: global kapsamda olabilirsiniz veya henüz hiç oturumunuz olmayabilir.
 
 ## İlgili
 
 - [Control UI](/tr/web/control-ui) — web tabanlı denetim arayüzü
-- [Config](/tr/cli/config) — `openclaw.json` dosyasını inceleyin, doğrulayın ve düzenleyin
-- [Doctor](/tr/cli/doctor) — rehberli onarım ve migration denetimleri
-- [CLI Reference](/tr/cli) — tam CLI komut başvurusu
+- [Yapılandırma](/tr/cli/config) — `openclaw.json` dosyasını inceleyin, doğrulayın ve düzenleyin
+- [Doctor](/tr/cli/doctor) — rehberli onarım ve taşıma denetimleri
+- [CLI Başvurusu](/tr/cli) — tam CLI komut başvurusu

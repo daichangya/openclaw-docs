@@ -1,96 +1,93 @@
 ---
 read_when:
-    - Bağlam motoru yaşam döngüsü davranışını Codex harness’ına bağlıyorsunuz
-    - lossless-claw veya başka bir bağlam motoru Plugin'inin codex/* gömülü harness oturumlarıyla çalışmasına ihtiyacınız var
-    - Gömülü PI ve Codex app-server bağlam davranışını karşılaştırıyorsunuz
-summary: Paketle gelen Codex app-server harness’ının OpenClaw bağlam motoru Plugin'lerini dikkate almasını sağlama belirtimi
-title: Codex Harness Bağlam Motoru Taşıması
+    - Context-engine yaşam döngüsü davranışını Codex harness içine bağlıyorsunuz
+    - lossless-claw veya başka bir context-engine Plugin'inin codex/* gömülü harness oturumlarıyla çalışması gerekiyor
+    - Gömülü Pi ve Codex uygulama sunucusu bağlam davranışını karşılaştırıyorsunuz
+summary: Paketlenmiş Codex uygulama sunucusu harness'ının OpenClaw context-engine Plugin'lerini dikkate almasını sağlama spesifikasyonu
+title: Codex Harness Context Engine Aktarımı
 x-i18n:
-    generated_at: "2026-04-24T09:18:48Z"
+    generated_at: "2026-04-25T13:50:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9d6b106915f2888337cb08c831c1722770ad8ec6612c575efe88fe2fc263dec5
+    source_hash: 61c29a6cd8955a41510b8da1575b89ed003565d564b25b37b3b0c7f65df6b663
     source_path: plan/codex-context-engine-harness.md
     workflow: 15
 ---
 
-# Codex Harness Bağlam Motoru Taşıması
-
 ## Durum
 
-Taslak uygulama belirtimi.
+Taslak uygulama spesifikasyonu.
 
 ## Hedef
 
-Paketle gelen Codex app-server harness’ının, gömülü PI dönüşlerinin zaten dikkate aldığı aynı OpenClaw bağlam motoru yaşam döngüsü sözleşmesini dikkate almasını sağlamak.
+Paketlenmiş Codex uygulama sunucusu harness'ının, gömülü Pi turlarının zaten dikkate aldığı aynı OpenClaw context-engine
+yaşam döngüsü sözleşmesini dikkate almasını sağlamak.
 
-`agents.defaults.embeddedHarness.runtime: "codex"` veya
-bir `codex/*` modeli kullanan bir oturum, seçilen bağlam motoru Plugin'inin, örneğin
-`lossless-claw`, bağlam oluşturmayı, dönüş sonrası alımı, bakımı ve
-OpenClaw düzeyi Compaction ilkesini Codex app-server sınırının izin verdiği ölçüde denetlemesine yine de izin vermelidir.
+`agents.defaults.embeddedHarness.runtime: "codex"` veya bir
+`codex/*` modeli kullanan bir oturum, seçili context-engine Plugin'inin, örneğin
+`lossless-claw`'ın, Codex uygulama sunucusu sınırının izin verdiği ölçüde bağlam oluşturmayı, tur sonrası alımı, bakımı ve
+OpenClaw düzeyindeki Compaction ilkesini denetlemesine yine de izin vermelidir.
 
-## Hedef dışı konular
+## Hedef dışı
 
-- Codex app-server iç işleyişini yeniden uygulamayın.
-- Codex doğal iş parçacığı Compaction'ının lossless-claw özeti üretmesini sağlamayın.
-- Codex dışı modellerin Codex harness’ını kullanmasını zorunlu kılmayın.
-- ACP/acpx oturum davranışını değiştirmeyin. Bu belirtim yalnızca
+- Codex uygulama sunucusu iç işleyişini yeniden uygulamayın.
+- Codex yerel iş parçacığı Compaction'ının lossless-claw özeti üretmesini sağlamayın.
+- Codex dışı modellerin Codex harness'ını kullanmasını zorunlu kılmayın.
+- ACP/acpx oturum davranışını değiştirmeyin. Bu spesifikasyon yalnızca
   ACP olmayan gömülü aracı harness yolu içindir.
-- Üçüncü taraf Plugin'lerin Codex app-server uzantı fabrikaları kaydetmesini sağlamayın;
+- Üçüncü taraf Plugin'lerin Codex uygulama sunucusu uzantı fabrikalarını kaydetmesini sağlamayın;
   mevcut paketlenmiş Plugin güven sınırı değişmeden kalır.
 
 ## Geçerli mimari
 
-Gömülü çalıştırma döngüsü, somut düşük düzeyli bir harness seçmeden önce
-çalıştırma başına yapılandırılmış bağlam motorunu bir kez çözer:
+Gömülü çalışma döngüsü, somut bir düşük düzey harness seçmeden önce çalışma başına yapılandırılmış context engine'i bir kez çözümler:
 
 - `src/agents/pi-embedded-runner/run.ts`
-  - bağlam motoru Plugin'lerini başlatır
+  - context-engine Plugin'lerini başlatır
   - `resolveContextEngine(params.config)` çağırır
   - `contextEngine` ve `contextTokenBudget` değerlerini
     `runEmbeddedAttemptWithBackend(...)` içine geçirir
 
-`runEmbeddedAttemptWithBackend(...)`, seçilen aracı harness’ına devreder:
+`runEmbeddedAttemptWithBackend(...)`, seçilen aracı harness'ına devreder:
 
 - `src/agents/pi-embedded-runner/run/backend.ts`
 - `src/agents/harness/selection.ts`
 
-Codex app-server harness’ı paketlenmiş Codex Plugin'i tarafından kaydedilir:
+Codex uygulama sunucusu harness'ı, paketlenmiş Codex Plugin'i tarafından kaydedilir:
 
 - `extensions/codex/index.ts`
 - `extensions/codex/harness.ts`
 
-Codex harness uygulaması, PI destekli denemelerle aynı `EmbeddedRunAttemptParams`
-nesnesini alır:
+Codex harness uygulaması, Pi destekli denemelerle aynı `EmbeddedRunAttemptParams`
+değerini alır:
 
 - `extensions/codex/src/app-server/run-attempt.ts`
 
-Bu, gerekli hook noktasının OpenClaw denetimindeki kod içinde olduğu anlamına gelir. Harici
-sınır, Codex app-server protokolünün kendisidir: OpenClaw `thread/start`, `thread/resume` ve
-`turn/start` için ne gönderdiğini denetleyebilir ve bildirimleri gözlemleyebilir, ancak
-Codex’in dahili iş parçacığı deposunu veya doğal Compaction'ını değiştiremez.
+Bu, gerekli kanca noktasının OpenClaw tarafından denetlenen kodda olduğu anlamına gelir. Dış
+sınır Codex uygulama sunucusu protokolünün kendisidir: OpenClaw, `thread/start`, `thread/resume` ve
+`turn/start` çağrılarına ne gönderdiğini denetleyebilir ve bildirimleri gözlemleyebilir, ancak Codex'in dahili iş parçacığı deposunu veya yerel compactor'ını değiştiremez.
 
 ## Geçerli boşluk
 
-Gömülü PI denemeleri bağlam motoru yaşam döngüsünü doğrudan çağırır:
+Gömülü Pi denemeleri context-engine yaşam döngüsünü doğrudan çağırır:
 
 - denemeden önce bootstrap/bakım
 - model çağrısından önce assemble
 - denemeden sonra afterTurn veya ingest
-- başarılı bir dönüşten sonra bakım
-- Compaction'a sahip motorlar için bağlam motoru Compaction'ı
+- başarılı bir turdan sonra bakım
+- Compaction'ın context-engine'e ait olduğu motorlar için context-engine Compaction'ı
 
-İlgili PI kodu:
+İlgili Pi kodu:
 
 - `src/agents/pi-embedded-runner/run/attempt.ts`
 - `src/agents/pi-embedded-runner/run/attempt.context-engine-helpers.ts`
 - `src/agents/pi-embedded-runner/context-engine-maintenance.ts`
 
-Codex app-server denemeleri şu anda genel aracı-harness hook'larını çalıştırır ve
-transkripti yansıtır, ancak `params.contextEngine.bootstrap`,
+Codex uygulama sunucusu denemeleri şu anda genel aracı-harness kancalarını çalıştırıyor ve
+dökümü yansıtıyor, ancak `params.contextEngine.bootstrap`,
 `params.contextEngine.assemble`, `params.contextEngine.afterTurn`,
 `params.contextEngine.ingestBatch`, `params.contextEngine.ingest` veya
-`params.contextEngine.maintain` çağrılarını yapmaz.
+`params.contextEngine.maintain` çağrılarını yapmıyor.
 
 İlgili Codex kodu:
 
@@ -101,92 +98,91 @@ transkripti yansıtır, ancak `params.contextEngine.bootstrap`,
 
 ## İstenen davranış
 
-Codex harness dönüşleri için OpenClaw şu yaşam döngüsünü korumalıdır:
+Codex harness turları için OpenClaw şu yaşam döngüsünü korumalıdır:
 
-1. Yansıtılmış OpenClaw oturum transkriptini oku.
-2. Önceki bir oturum dosyası varsa etkin bağlam motorunu bootstrap et.
+1. Yansıtılmış OpenClaw oturum dökümünü oku.
+2. Önceki bir oturum dosyası varsa etkin context engine'i bootstrap et.
 3. Varsa bootstrap bakımını çalıştır.
-4. Etkin bağlam motorunu kullanarak bağlamı assemble et.
-5. Assemble edilen bağlamı Codex uyumlu girdilere dönüştür.
-6. Bağlam motoru `systemPromptAddition` değerini içeren geliştirici yönergeleriyle
+4. Etkin context engine kullanarak bağlamı assemble et.
+5. Assemble edilmiş bağlamı Codex uyumlu girdilere dönüştür.
+6. Context-engine `systemPromptAddition` değerini içeren geliştirici talimatlarıyla
    Codex iş parçacığını başlat veya sürdür.
-7. Assemble edilen kullanıcıya dönük istemle Codex dönüşünü başlat.
-8. Codex sonucunu OpenClaw transkriptine geri yansıt.
-9. Uygulanmışsa `afterTurn`, aksi halde yansıtılmış transkript anlık görüntüsünü kullanarak
-   `ingestBatch`/`ingest` çağır.
-10. Başarılı, iptal edilmemiş dönüşlerden sonra dönüş bakımını çalıştır.
-11. Codex doğal Compaction sinyallerini ve OpenClaw Compaction hook'larını koru.
+7. Assemble edilmiş kullanıcıya dönük prompt ile Codex turunu başlat.
+8. Codex sonucunu OpenClaw dökümüne geri yansıt.
+9. Uygulanmışsa `afterTurn`, aksi halde
+   yansıtılmış döküm anlık görüntüsünü kullanarak `ingestBatch`/`ingest` çağır.
+10. Başarılı ve iptal edilmemiş turlardan sonra tur bakımını çalıştır.
+11. Codex yerel Compaction sinyallerini ve OpenClaw Compaction kancalarını koru.
 
 ## Tasarım kısıtları
 
-### Codex app-server doğal iş parçacığı durumu için kanonik kalır
+### Codex uygulama sunucusu, yerel iş parçacığı durumu için kanonik kalır
 
-Codex, doğal iş parçacığını ve tüm dahili genişletilmiş geçmişi sahiplenir. OpenClaw
-app-server’ın dahili geçmişini desteklenen protokol çağrıları dışında değiştirmeye çalışmamalıdır.
+Codex, yerel iş parçacığının ve içerdeki genişletilmiş geçmişin sahibidir. OpenClaw
+uygulama sunucusunun dahili geçmişini desteklenen protokol çağrıları dışında değiştirmeye çalışmamalıdır.
 
-OpenClaw’ın transkript yansıması OpenClaw özellikleri için kaynak olarak kalır:
+OpenClaw'ın döküm aynası OpenClaw özellikleri için kaynak olmaya devam eder:
 
 - sohbet geçmişi
 - arama
-- `/new` ve `/reset` kayıt işlemleri
-- gelecekte model veya harness değiştirme
-- bağlam motoru Plugin durumu
+- `/new` ve `/reset` kayıt tutma
+- gelecekteki model veya harness değiştirme
+- context-engine Plugin durumu
 
-### Bağlam motoru assembly’si Codex girdilerine yansıtılmalıdır
+### Context engine assembly, Codex girdilerine yansıtılmalıdır
 
-Bağlam motoru arayüzü bir Codex
-iş parçacığı yaması değil, OpenClaw `AgentMessage[]` döndürür. Codex app-server `turn/start` geçerli kullanıcı girdisini kabul ederken,
-`thread/start` ve `thread/resume` geliştirici yönergelerini kabul eder.
+Context-engine arayüzü, bir Codex
+iş parçacığı yaması değil, OpenClaw `AgentMessage[]` döndürür. Codex uygulama sunucusu `turn/start` geçerli kullanıcı girdisini kabul ederken,
+`thread/start` ve `thread/resume` geliştirici talimatlarını kabul eder.
 
-Bu nedenle uygulamanın bir yansıtma katmanına ihtiyacı vardır. Güvenli ilk sürüm
-Codex dahili geçmişini değiştirebiliyormuş gibi davranmaktan kaçınmalıdır. Assemble edilen bağlamı
-geçerli dönüş çevresinde deterministik istem/geliştirici yönergesi materyali olarak enjekte etmelidir.
+Bu nedenle uygulama bir yansıtma katmanına ihtiyaç duyar. Güvenli ilk sürüm,
+Codex dahili geçmişinin yerini alabileceğini varsaymaktan kaçınmalıdır. Assemble edilmiş bağlamı
+geçerli tur etrafında deterministik prompt/geliştirici talimatı malzemesi olarak enjekte etmelidir.
 
-### İstem önbelleği kararlılığı önemlidir
+### Prompt önbelleği kararlılığı önemlidir
 
-lossless-claw gibi motorlar için assemble edilen bağlam, değişmeyen girdiler için deterministik olmalıdır.
-Üretilen bağlam metnine zaman damgaları, rastgele kimlikler veya belirlenemeyen sıralama eklemeyin.
+lossless-claw gibi motorlar için, assemble edilmiş bağlam değişmemiş girdiler için deterministik olmalıdır. Üretilen bağlam metnine zaman damgaları, rastgele kimlikler veya deterministik olmayan sıralama eklemeyin.
 
-### PI geri dönüş semantiği değişmez
+### Pi geri dönüş semantiği değişmez
 
 Harness seçimi olduğu gibi kalır:
 
-- `runtime: "pi"` PI’yi zorlar
-- `runtime: "codex"` kayıtlı Codex harness’ını seçer
-- `runtime: "auto"` Plugin harness’larının desteklenen sağlayıcıları sahiplenmesine izin verir
-- `fallback: "none"` eşleşen Plugin harness’ı olmadığında PI geri dönüşünü devre dışı bırakır
+- `runtime: "pi"` Pi'yi zorlar
+- `runtime: "codex"` kayıtlı Codex harness'ını seçer
+- `runtime: "auto"` Plugin harness'larının desteklenen sağlayıcıları sahiplenmesine izin verir
+- `fallback: "none"` eşleşen Plugin harness yoksa Pi geri dönüşünü devre dışı bırakır
 
-Bu çalışma Codex harness’ı seçildikten sonra ne olduğunu değiştirir.
+Bu çalışma, Codex harness'ı seçildikten sonra ne olacağını değiştirir.
 
 ## Uygulama planı
 
-### 1. Yeniden kullanılabilir bağlam motoru deneme yardımcılarını dışa aktarın veya taşıyın
+### 1. Yeniden kullanılabilir context-engine deneme yardımcılarını dışa aktarın veya taşıyın
 
-Bugün yeniden kullanılabilir yaşam döngüsü yardımcıları PI çalıştırıcısı altında yaşıyor:
+Bugün yeniden kullanılabilir yaşam döngüsü yardımcıları Pi runner altında yaşıyor:
 
 - `src/agents/pi-embedded-runner/run/attempt.context-engine-helpers.ts`
 - `src/agents/pi-embedded-runner/run/attempt.prompt-helpers.ts`
 - `src/agents/pi-embedded-runner/context-engine-maintenance.ts`
 
-Mümkünse Codex, adı PI’yi ima eden bir uygulama yolundan içe aktarmamalıdır.
+Kaçınabiliyorsak Codex, adı Pi çağrıştıran bir uygulama yolundan içe aktarmamalıdır.
 
-Örneğin harness’ten bağımsız bir modül oluşturun:
+Harness'tan bağımsız bir modül oluşturun, örneğin:
 
 - `src/agents/harness/context-engine-lifecycle.ts`
 
-Taşıyın veya yeniden dışa aktarın:
+Şunları taşıyın veya yeniden dışa aktarın:
 
 - `runAttemptContextEngineBootstrap`
 - `assembleAttemptContextEngine`
 - `finalizeAttemptContextEngineTurn`
 - `buildAfterTurnRuntimeContext`
 - `buildAfterTurnRuntimeContextFromUsage`
-- `runContextEngineMaintenance` için küçük bir sarmalayıcı
+- `runContextEngineMaintenance` etrafında küçük bir sarmalayıcı
 
-Eski dosyalardan yeniden dışa aktararak veya aynı PR içinde PI çağrı noktalarını
-güncelleyerek PI içe aktarmalarını çalışır tutun.
+Eski dosyalardan yeniden dışa aktararak veya aynı PR'da Pi
+çağrı noktalarını güncelleyerek Pi içe aktarmalarını çalışır durumda tutun.
 
-Tarafsız yardımcı adları PI’den söz etmemelidir.
+Nötr yardımcı adları Pi'den söz etmemelidir.
 
 Önerilen adlar:
 
@@ -205,12 +201,12 @@ Yeni bir modül ekleyin:
 Sorumluluklar:
 
 - Assemble edilmiş `AgentMessage[]`, özgün yansıtılmış geçmiş ve geçerli
-  istemi kabul edin.
-- Hangi bağlamın geliştirici yönergelerinde, hangisinin geçerli kullanıcı
-  girdisinde yer alacağını belirleyin.
-- Geçerli kullanıcı istemini son eyleme geçirilebilir istek olarak koruyun.
-- Önceki mesajları kararlı, açık bir biçimde oluşturun.
-- Değişken meta verilerden kaçının.
+  prompt'u kabul et.
+- Hangi bağlamın geliştirici talimatlarına, hangisinin geçerli kullanıcı
+  girdisine ait olduğunu belirle.
+- Geçerli kullanıcı prompt'unu son eyleme dönük istek olarak koru.
+- Önceki mesajları kararlı, açık bir biçimde işle.
+- Oynak meta verilerden kaçın.
 
 Önerilen API:
 
@@ -232,16 +228,16 @@ export function projectContextEngineAssemblyForCodex(params: {
 
 Önerilen ilk yansıtma:
 
-- `systemPromptAddition` değerini geliştirici yönergelerine koyun.
-- Assemble edilen transkript bağlamını geçerli istemden önce `promptText` içine koyun.
-- Bunu OpenClaw assemble edilmiş bağlamı olarak açıkça etiketleyin.
-- Geçerli istemi en sona koyun.
-- Kuyrukta zaten görünüyorsa yinelenen geçerli kullanıcı istemini hariç tutun.
+- `systemPromptAddition` değerini geliştirici talimatlarına koy.
+- Assemble edilmiş döküm bağlamını geçerli prompt'tan önce `promptText` içine koy.
+- Bunu OpenClaw assemble edilmiş bağlamı olarak açıkça etiketle.
+- Geçerli prompt'u sonda tut.
+- Zaten sonda görünüyorsa yinelenen geçerli kullanıcı prompt'unu hariç tut.
 
-Örnek istem biçimi:
+Örnek prompt biçimi:
 
 ```text
-Bu dönüş için OpenClaw tarafından assemble edilmiş bağlam:
+OpenClaw assembled context for this turn:
 
 <conversation_context>
 [user]
@@ -251,27 +247,26 @@ Bu dönüş için OpenClaw tarafından assemble edilmiş bağlam:
 ...
 </conversation_context>
 
-Geçerli kullanıcı isteği:
+Current user request:
 ...
 ```
 
-Bu, doğal Codex geçmişi cerrahisinden daha az zariftir, ancak OpenClaw içinde uygulanabilir
-ve bağlam motoru semantiğini korur.
+Bu, yerel Codex geçmişi üzerinde cerrahi işlem yapmaktan daha az zariftir, ancak
+OpenClaw içinde uygulanabilir ve context-engine semantiğini korur.
 
-Gelecekteki iyileştirme: Codex app-server iş parçacığı geçmişini değiştirmek veya
-tamamlamak için bir protokol açığa çıkarırsa bu yansıtma katmanını o API’yi kullanacak şekilde değiştirin.
+Gelecekteki iyileştirme: Codex uygulama sunucusu iş parçacığı geçmişini değiştirmek veya tamamlamak için bir protokol sunarsa, bu yansıtma katmanını o API'yi kullanacak şekilde değiştirin.
 
-### 3. Codex iş parçacığı başlangıcından önce bootstrap’i bağlayın
+### 3. Codex iş parçacığı başlatmadan önce bootstrap'i bağlayın
 
 `extensions/codex/src/app-server/run-attempt.ts` içinde:
 
-- Bugünkü gibi yansıtılmış oturum geçmişini okuyun.
-- Oturum dosyasının bu çalıştırmadan önce var olup olmadığını belirleyin. Tercihen,
+- Bugünkü gibi yansıtılmış oturum geçmişini oku.
+- Bu çalıştırmadan önce oturum dosyasının var olup olmadığını belirle. Tercihen
   yansıtma yazımlarından önce `fs.stat(params.sessionFile)` kontrol eden bir yardımcı kullanın.
-- Yardımcı bunu gerektiriyorsa bir `SessionManager` açın veya dar bir oturum yöneticisi bağdaştırıcısı kullanın.
-- `params.contextEngine` mevcut olduğunda tarafsız bootstrap yardımcısını çağırın.
+- Bir `SessionManager` açın veya yardımcı bunu gerektiriyorsa dar kapsamlı bir session manager bağdaştırıcısı kullanın.
+- `params.contextEngine` varsa nötr bootstrap yardımcısını çağırın.
 
-Sahte akış:
+Sözde akış:
 
 ```ts
 const hadSessionFile = await fileExists(params.sessionFile);
@@ -291,22 +286,22 @@ await bootstrapHarnessContextEngine({
 });
 ```
 
-Codex araç köprüsü ve transkript yansıması ile aynı `sessionKey` kuralını kullanın. Bugün Codex,
-`params.sessionKey` veya `params.sessionId` değerinden `sandboxSessionKey` hesaplıyor; ham `params.sessionKey` değerini korumak için bir neden yoksa bunu tutarlı biçimde kullanın.
+Codex araç köprüsü ve döküm aynasıyla aynı `sessionKey` kuralını kullanın. Bugün Codex, `sandboxSessionKey` değerini `params.sessionKey` veya
+`params.sessionId` içinden hesaplıyor; ham `params.sessionKey`'i korumak için bir neden yoksa bunu tutarlı biçimde kullanın.
 
-### 4. `thread/start` / `thread/resume` ve `turn/start` öncesi assemble’i bağlayın
+### 4. `thread/start` / `thread/resume` ve `turn/start` öncesine assemble'i bağlayın
 
 `runCodexAppServerAttempt` içinde:
 
-1. Önce dinamik araçları oluşturun, böylece bağlam motoru gerçekten mevcut
+1. Önce dinamik araçları oluşturun; böylece context engine gerçekten kullanılabilir
    araç adlarını görür.
 2. Yansıtılmış oturum geçmişini okuyun.
-3. `params.contextEngine` mevcut olduğunda bağlam motoru `assemble(...)` çalıştırın.
-4. Assemble edilen sonucu şunlara yansıtın:
-   - geliştirici yönergesi eklemesi
-   - `turn/start` için istem metni
+3. `params.contextEngine` varsa context-engine `assemble(...)` çalıştırın.
+4. Assemble edilmiş sonucu şunlara yansıtın:
+   - geliştirici talimatı eklemesi
+   - `turn/start` için prompt metni
 
-Mevcut hook çağrısı:
+Mevcut kanca çağrısı:
 
 ```ts
 resolveAgentHarnessBeforePromptBuildResult({
@@ -317,52 +312,54 @@ resolveAgentHarnessBeforePromptBuildResult({
 });
 ```
 
-bağlam farkındalıklı hâle gelmelidir:
+bağlam farkında hâle gelmelidir:
 
-1. `buildDeveloperInstructions(params)` ile temel geliştirici yönergelerini hesaplayın
-2. bağlam motoru assembly/yansıtmayı uygulayın
-3. Yansıtılan istem/geliştirici yönergeleriyle `before_prompt_build` çalıştırın
+1. `buildDeveloperInstructions(params)` ile temel geliştirici talimatlarını hesapla
+2. context-engine assembly/yansıtmayı uygula
+3. yansıtılmış prompt/geliştirici talimatlarıyla `before_prompt_build` çalıştır
 
-Bu sıra, genel istem hook'larının Codex’in alacağı aynı istemi görmesini sağlar. Sıkı PI eşliği gerekiyorsa,
-istem işlem hattısından sonra bağlam motoru `systemPromptAddition` değerini son sistem istemine uyguladığından,
-hook birleşiminden önce bağlam motoru assembly’sini çalıştırın. Önemli değişmez, hem bağlam
-motorunun hem de hook'ların deterministik, belgelenmiş bir sıra elde etmesidir.
+Bu sıra, genel prompt kancalarının Codex'in alacağı aynı prompt'u görmesini sağlar. Eğer katı Pi parity gerekiyorsa, Pi prompt hattından sonra son sistem prompt'una context-engine `systemPromptAddition` uyguladığı için, kanca bileşiminden önce context-engine assembly çalıştırın. Önemli değişmez, hem context engine'in hem kancaların deterministik, belgelenmiş bir sıra almasıdır.
 
 İlk uygulama için önerilen sıra:
 
 1. `buildDeveloperInstructions(params)`
-2. bağlam motoru `assemble()`
-3. `systemPromptAddition` değerini geliştirici yönergelerine ekle/önüne koy
-4. assemble edilen mesajları istem metnine yansıt
+2. context-engine `assemble()`
+3. `systemPromptAddition` değerini geliştirici talimatlarına ekle/önekle
+4. assemble edilmiş mesajları prompt metnine yansıt
 5. `resolveAgentHarnessBeforePromptBuildResult(...)`
-6. son geliştirici yönergelerini `startOrResumeThread(...)` içine geçir
-7. son istem metnini `buildTurnStartParams(...)` içine geçir
+6. son geliştirici talimatlarını `startOrResumeThread(...)` içine geçir
+7. son prompt metnini `buildTurnStartParams(...)` içine geçir
 
-Belirtim testlerde kodlanmalıdır; böylece gelecekteki değişiklikler bunu kazara yeniden sıralamaz.
+Spesifikasyon testlerle kodlanmalıdır; böylece gelecekteki değişiklikler bunu kazayla yeniden sıralamaz.
 
-### 5. İstem önbelleği açısından kararlı biçimlendirmeyi koruyun
+### 5. Prompt önbelleği açısından kararlı biçimlendirmeyi koruyun
 
-Yansıtma yardımcısı aynı girdiler için bayt düzeyinde kararlı çıktı üretmelidir:
+Yansıtma yardımcısı özdeş girdiler için bayt düzeyinde kararlı çıktı üretmelidir:
 
 - kararlı mesaj sırası
 - kararlı rol etiketleri
 - üretilmiş zaman damgaları yok
 - nesne anahtarı sırası sızıntısı yok
 - rastgele ayraçlar yok
-- çalıştırma başına kimlik yok
+- çalışma başına kimlik yok
 
 Sabit ayraçlar ve açık bölümler kullanın.
 
-### 6. Transkript yansımasından sonra dönüş sonrasını bağlayın
+### 6. Tur sonrası işlemleri döküm yansıtıldıktan sonra bağlayın
 
-Codex’in `CodexAppServerEventProjector` bileşeni geçerli dönüş için yerel bir `messagesSnapshot` oluşturur. `mirrorTranscriptBestEffort(...)` bu anlık görüntüyü OpenClaw transkript yansımasına yazar.
+Codex'in `CodexAppServerEventProjector` bileşeni geçerli tur için yerel bir `messagesSnapshot`
+oluşturur. `mirrorTranscriptBestEffort(...)` bu anlık görüntüyü
+OpenClaw döküm aynasına yazar.
 
-Yansıtma başarılı da olsa başarısız da olsa, mevcut en iyi mesaj anlık görüntüsüyle bağlam motoru sonlandırıcısını çağırın:
+Yansıtma başarılı da olsa başarısız da olsa, context-engine sonlandırıcısını
+eldeki en iyi mesaj anlık görüntüsüyle çağırın:
 
-- `afterTurn`, yalnızca geçerli dönüşü değil, oturum anlık görüntüsünü beklediğinden, yazımdan sonraki tam yansıtılmış oturum bağlamını tercih edin.
-- Oturum dosyası yeniden açılamazsa `historyMessages + result.messagesSnapshot` değerine geri düşün.
+- Tercihen yazımdan sonraki tam yansıtılmış oturum bağlamını kullanın, çünkü `afterTurn`
+  yalnızca geçerli turu değil, oturum anlık görüntüsünü bekler.
+- Oturum dosyası yeniden açılamıyorsa `historyMessages + result.messagesSnapshot`
+  değerine geri dönün.
 
-Sahte akış:
+Sözde akış:
 
 ```ts
 const prePromptMessageCount = historyMessages.length;
@@ -395,81 +392,81 @@ await finalizeHarnessContextEngineTurn({
 });
 ```
 
-Yansıtma başarısız olursa yine de geri dönüş anlık görüntüsüyle `afterTurn` çağırın, ancak bağlam motorunun geri dönüş dönüş verisinden alım yaptığını günlüğe kaydedin.
+Yansıtma başarısız olursa yine de geri dönüş anlık görüntüsüyle `afterTurn` çağrısı yapın, ancak
+context engine'in geri dönüş tur verilerinden alım yaptığını günlüğe kaydedin.
 
-### 7. Kullanım ve istem önbelleği çalışma zamanı bağlamını normalleştirin
+### 7. Kullanım ve prompt önbelleği çalışma zamanı bağlamını normalize edin
 
-Codex sonuçları, varsa app-server token bildirimlerinden normalleştirilmiş kullanım içerir. Bu kullanımı bağlam motoru çalışma zamanı bağlamına geçirin.
+Codex sonuçları, mevcut olduğunda uygulama sunucusu token bildirimlerinden normalize edilmiş kullanımı içerir. Bu kullanımı context-engine çalışma zamanı bağlamına geçirin.
 
-Codex app-server sonunda önbellek okuma/yazma ayrıntılarını açığa çıkarırsa bunları `ContextEnginePromptCacheInfo` içine eşleyin. O zamana kadar sıfır uydurmak yerine `promptCache` alanını atlayın.
+Codex uygulama sunucusu gelecekte önbellek okuma/yazma ayrıntılarını açığa çıkarırsa, bunları
+`ContextEnginePromptCacheInfo` içine eşleyin. O zamana kadar `promptCache` alanını sıfırlar uydurmak yerine atlayın.
 
 ### 8. Compaction ilkesi
 
 İki Compaction sistemi vardır:
 
-1. OpenClaw bağlam motoru `compact()`
-2. Codex app-server doğal `thread/compact/start`
+1. OpenClaw context-engine `compact()`
+2. Codex uygulama sunucusu yerel `thread/compact/start`
 
-Bunları sessizce birleştirmeyin.
+Bunları sessizce birbirine karıştırmayın.
 
 #### `/compact` ve açık OpenClaw Compaction'ı
 
-Seçilen bağlam motorunda `info.ownsCompaction === true` varsa açık
-OpenClaw Compaction'ı OpenClaw transkript yansıması ve Plugin durumu için
-bağlam motorunun `compact()` sonucunu tercih etmelidir.
+Seçili context engine `info.ownsCompaction === true` değerine sahipse, açık
+OpenClaw Compaction'ı OpenClaw döküm aynası ve Plugin durumu için öncelikle
+context engine'in `compact()` sonucunu tercih etmelidir.
 
-Seçilen Codex harness’ında doğal bir iş parçacığı bağı varsa app-server iş parçacığını sağlıklı tutmak için
-ek olarak Codex doğal Compaction isteyebiliriz, ancak bu ayrıntılarda ayrı bir arka uç eylemi olarak raporlanmalıdır.
+Seçili Codex harness'ının yerel bir iş parçacığı bağı varsa, uygulama sunucusu iş parçacığını sağlıklı tutmak için ayrıca Codex yerel Compaction'ını isteyebiliriz; ancak bu, ayrıntılarda ayrı bir arka uç eylemi olarak raporlanmalıdır.
 
 Önerilen davranış:
 
 - Eğer `contextEngine.info.ownsCompaction === true` ise:
-  - önce bağlam motoru `compact()` çağrılır
-  - ardından bir iş parçacığı bağı varsa en iyi çabayla Codex doğal Compaction çağrılır
-  - birincil sonuç olarak bağlam motoru sonucu döndürülür
-  - Codex doğal Compaction durumu `details.codexNativeCompaction` içine dahil edilir
-- Etkin bağlam motoru Compaction'a sahip değilse:
-  - mevcut Codex doğal Compaction davranışı korunur
+  - önce context-engine `compact()` çağrısı yapın
+  - ardından bir iş parçacığı bağı varsa en iyi çabayla Codex yerel Compaction çağrısı yapın
+  - birincil sonuç olarak context-engine sonucunu döndürün
+  - Codex yerel Compaction durumunu `details.codexNativeCompaction` içine ekleyin
+- Etkin context engine Compaction'ın sahibi değilse:
+  - geçerli Codex yerel Compaction davranışını koruyun
 
 Bu, `extensions/codex/src/app-server/compact.ts` dosyasını değiştirmeyi veya
-`maybeCompactAgentHarnessSession(...)` nerede çağrıldığına bağlı olarak bunu genel Compaction yolundan
-sarmalamayı gerektirebilir.
+`maybeCompactAgentHarnessSession(...)` nerede çağrıldığına bağlı olarak bunu genel Compaction yolundan sarmalamayı gerektirebilir.
 
-#### Dönüş içi Codex doğal `contextCompaction` olayları
+#### Tur içi Codex yerel `contextCompaction` olayları
 
-Codex bir dönüş sırasında `contextCompaction` öğe olayları yayabilir. `event-projector.ts` içinde mevcut
-Compaction öncesi/sonrası hook üretimini koruyun, ancak bunu tamamlanmış bir bağlam motoru Compaction'ı olarak ele almayın.
+Codex, bir tur sırasında `contextCompaction` öğe olayları yayabilir. `event-projector.ts` içindeki
+geçerli önce/sonra Compaction kanca yayımını koruyun, ancak bunu tamamlanmış bir context-engine Compaction'ı olarak değerlendirmeyin.
 
-Compaction'a sahip motorlar için Codex yine de doğal Compaction yaptığında açık bir tanılama üretin:
+Compaction'ın sahibi olan motorlar için, Codex yine de yerel Compaction yaptığında açık bir tanılama yayımlayın:
 
 - akış/olay adı: mevcut `compaction` akışı kabul edilebilir
 - ayrıntılar: `{ backend: "codex-app-server", ownsCompaction: true }`
 
-Bu ayrımı denetlenebilir kılar.
+Bu, ayrımı denetlenebilir kılar.
 
-### 9. Oturum sıfırlama ve bağlama davranışı
+### 9. Oturum sıfırlama ve bağ davranışı
 
-Mevcut Codex harness `reset(...)` davranışı, OpenClaw oturum dosyasından Codex app-server bağını temizler. Bu davranışı koruyun.
+Mevcut Codex harness `reset(...)`, OpenClaw oturum dosyasından Codex uygulama sunucusu bağını temizler. Bu davranışı koruyun.
 
-Ayrıca bağlam motoru durum temizliğinin mevcut
-OpenClaw oturum yaşam döngüsü yolları üzerinden devam ettiğinden emin olun. Bağlam motoru yaşam döngüsü şu anda tüm harness’lar için sıfırlama/silme olaylarını kaçırmıyorsa Codex’e özgü temizlik eklemeyin.
+Ayrıca context-engine durumu temizliğinin mevcut
+OpenClaw oturum yaşam döngüsü yolları üzerinden olmaya devam ettiğinden emin olun. Context-engine yaşam döngüsü şu anda tüm harness'lar için sıfırla/sil olaylarını kaçırmıyorsa Codex'e özgü temizlik eklemeyin.
 
-### 10. Hata yönetimi
+### 10. Hata işleme
 
-PI semantiğini izleyin:
+Pi semantiğini izleyin:
 
-- bootstrap hataları uyarır ve devam eder
-- assemble hataları uyarır ve assemble edilmemiş işlem hattı mesajlarına/isteme geri döner
-- afterTurn/ingest hataları uyarır ve dönüş sonrası sonlandırmayı başarısız olarak işaretler
-- bakım yalnızca başarılı, iptal edilmemiş, yield yapılmamış dönüşlerden sonra çalışır
-- Compaction hataları yeni istemler olarak yeniden denenmemelidir
+- bootstrap hataları uyarı verir ve devam eder
+- assemble hataları uyarı verir ve assemble edilmemiş hat/prompt'a geri döner
+- afterTurn/ingest hataları uyarı verir ve tur sonrası sonlandırmayı başarısız olarak işaretler
+- bakım yalnızca başarılı, iptal edilmemiş, yield edilmemiş turlardan sonra çalışır
+- Compaction hataları yeni prompt'lar olarak yeniden denenmemelidir
 
-Codex’e özgü eklemeler:
+Codex'e özgü ekler:
 
-- Bağlam yansıtma başarısız olursa uyarın ve özgün isteme geri dönün.
-- Transkript yansıması başarısız olursa yine de geri dönüş mesajlarıyla bağlam motoru sonlandırmasını deneyin.
-- Bağlam motoru Compaction'ı başarılı olduktan sonra Codex doğal Compaction'ı başarısız olursa,
-  bağlam motoru birincil olduğunda tüm OpenClaw Compaction'ını başarısız kılmayın.
+- Bağlam yansıtma başarısız olursa uyarı verin ve özgün prompt'a geri dönün.
+- Döküm aynası başarısız olursa yine de geri dönüş mesajlarıyla context-engine sonlandırmasını deneyin.
+- Context-engine Compaction'ı başarılı olduktan sonra Codex yerel Compaction'ı başarısız olursa,
+  context engine birincil olduğunda tüm OpenClaw Compaction'ını başarısız yapmayın.
 
 ## Test planı
 
@@ -479,70 +476,69 @@ Codex’e özgü eklemeler:
 
 1. `run-attempt.context-engine.test.ts`
    - Bir oturum dosyası varsa Codex `bootstrap` çağırır.
-   - Codex, yansıtılmış mesajlar, token bütçesi, araç adları,
-     citations mode, model kimliği ve istem ile `assemble` çağırır.
-   - `systemPromptAddition` geliştirici yönergelerine dahil edilir.
-   - Assemble edilen mesajlar geçerli istekten önce isteme yansıtılır.
-   - Codex, transkript yansımasından sonra `afterTurn` çağırır.
+   - Codex, `assemble` çağrısını yansıtılmış mesajlar, token bütçesi, araç adları,
+     alıntı modu, model kimliği ve prompt ile yapar.
+   - `systemPromptAddition`, geliştirici talimatlarına eklenir.
+   - Assemble edilmiş mesajlar, geçerli istekten önce prompt'a yansıtılır.
+   - Codex, döküm yansıtıldıktan sonra `afterTurn` çağırır.
    - `afterTurn` yoksa Codex `ingestBatch` veya mesaj başına `ingest` çağırır.
-   - Dönüş bakımı başarılı dönüşlerden sonra çalışır.
-   - Dönüş bakımı istem hatası, iptal veya yield iptalinde çalışmaz.
+   - Tur bakımı başarılı turlardan sonra çalışır.
+   - Tur bakımı prompt hatası, iptal veya yield iptalinde çalışmaz.
 
 2. `context-engine-projection.test.ts`
-   - aynı girdiler için kararlı çıktı
-   - assemble edilmiş geçmiş onu içerdiğinde yinelenen geçerli istem yok
+   - özdeş girdiler için kararlı çıktı
+   - assemble edilmiş geçmiş bunu içerdiğinde geçerli prompt'u yinelemez
    - boş geçmişi işler
    - rol sırasını korur
-   - sistem istemi eklemesini yalnızca geliştirici yönergelerine dahil eder
+   - sistem prompt eklemesini yalnızca geliştirici talimatlarına ekler
 
 3. `compact.context-engine.test.ts`
-   - Compaction'a sahip bağlam motorunun birincil sonucu kazanır
-   - Codex doğal Compaction durumu, o da denendiğinde ayrıntılarda görünür
-   - Codex doğal başarısızlığı, Compaction'a sahip bağlam motoru Compaction'ını başarısız kılmaz
-   - Compaction'a sahip olmayan bağlam motoru mevcut doğal Compaction davranışını korur
+   - sahibi olan context engine birincil sonucu kazanır
+   - ayrıca denendiğinde Codex yerel Compaction durumu ayrıntılarda görünür
+   - Codex yerel hatası, sahibi olan context-engine Compaction'ını başarısız yapmaz
+   - sahibi olmayan context engine geçerli yerel Compaction davranışını korur
 
 ### Güncellenecek mevcut testler
 
-- `extensions/codex/src/app-server/run-attempt.test.ts` varsa, yoksa
-  en yakın Codex app-server çalıştırma testleri.
-- `extensions/codex/src/app-server/event-projector.test.ts` yalnızca Compaction
-  olay ayrıntıları değişirse.
-- `src/agents/harness/selection.test.ts`, yapılandırma
-  davranışı değişmedikçe değişiklik gerektirmemelidir; kararlı kalmalıdır.
-- PI bağlam motoru testleri değişmeden geçmeye devam etmelidir.
+- Varsa `extensions/codex/src/app-server/run-attempt.test.ts`, yoksa
+  en yakın Codex uygulama sunucusu çalışma testleri.
+- Yalnızca Compaction olay ayrıntıları değişirse `extensions/codex/src/app-server/event-projector.test.ts`.
+- Config davranışı değişmediği sürece `src/agents/harness/selection.test.ts`
+  değişiklik gerektirmemelidir; kararlı kalmalıdır.
+- Pi context-engine testleri değişmeden geçmeye devam etmelidir.
 
 ### Entegrasyon / canlı testler
 
-Canlı Codex harness smoke testlerini ekleyin veya genişletin:
+Canlı Codex harness smoke testleri ekleyin veya genişletin:
 
-- `plugins.slots.contextEngine` değerini bir test motoruna yapılandırın
+- `plugins.slots.contextEngine` değerini bir test engine'ine yapılandırın
 - `agents.defaults.model` değerini bir `codex/*` modeline yapılandırın
-- `agents.defaults.embeddedHarness.runtime = "codex"` yapılandırın
-- test motorunun şunları gözlemlediğini doğrulayın:
+- `agents.defaults.embeddedHarness.runtime = "codex"` ayarlayın
+- test engine'inin şunları gözlemlediğini doğrulayın:
   - bootstrap
   - assemble
   - afterTurn veya ingest
   - bakım
 
-OpenClaw çekirdek testlerinde lossless-claw gerektirmekten kaçının. Depo içindeki küçük bir sahte
-bağlam motoru Plugin'i kullanın.
+OpenClaw çekirdek testlerinde lossless-claw gerektirmekten kaçının. Depo içi küçük bir
+sahte context engine Plugin'i kullanın.
 
 ## Gözlemlenebilirlik
 
-Codex bağlam motoru yaşam döngüsü çağrıları çevresine hata ayıklama günlükleri ekleyin:
+Codex context-engine yaşam döngüsü çağrıları etrafına hata ayıklama günlükleri ekleyin:
 
 - `codex context engine bootstrap started/completed/failed`
 - `codex context engine assemble applied`
 - `codex context engine finalize completed/failed`
-- `codex context engine maintenance skipped` neden ile birlikte
+- neden ile birlikte `codex context engine maintenance skipped`
 - `codex native compaction completed alongside context-engine compaction`
 
-Tam istemleri veya transkript içeriklerini günlüğe kaydetmekten kaçının.
+Tam prompt'ları veya döküm içeriklerini günlüğe kaydetmeyin.
 
-Yararlı olduğu yerlerde yapılandırılmış alanlar ekleyin:
+Uygun olduğunda yapılandırılmış alanlar ekleyin:
 
 - `sessionId`
-- `sessionKey`, mevcut günlükleme uygulamasına göre sansürlenmiş veya çıkarılmış
+- mevcut günlükleme uygulamasına göre redakte edilmiş veya atlanmış `sessionKey`
 - `engineId`
 - `threadId`
 - `turnId`
@@ -554,54 +550,53 @@ Yararlı olduğu yerlerde yapılandırılmış alanlar ekleyin:
 
 Bu geriye dönük uyumlu olmalıdır:
 
-- Hiçbir bağlam motoru yapılandırılmamışsa eski bağlam motoru davranışı
-  bugünkü Codex harness davranışına eşdeğer olmalıdır.
-- Bağlam motoru `assemble` başarısız olursa Codex özgün
-  istem yoluyla devam etmelidir.
+- Hiçbir context engine yapılandırılmamışsa, eski context engine davranışı
+  bugünkü Codex harness davranışıyla eşdeğer olmalıdır.
+- Context-engine `assemble` başarısız olursa, Codex özgün
+  prompt yoluyla devam etmelidir.
 - Mevcut Codex iş parçacığı bağları geçerli kalmalıdır.
-- Dinamik araç parmak izi bağlam motoru çıktısını içermemelidir; aksi takdirde
+- Dinamik araç fingerprinting context-engine çıktısını içermemelidir; aksi hâlde
   her bağlam değişikliği yeni bir Codex iş parçacığını zorlayabilir. Yalnızca araç kataloğu
-  dinamik araç parmak izini etkilemelidir.
+  dinamik araç fingerprint'ini etkilemelidir.
 
 ## Açık sorular
 
-1. Assemble edilen bağlam bütünüyle kullanıcı istemine mi, bütünüyle
-   geliştirici yönergelerine mi, yoksa bölünmüş mü enjekte edilmeli?
+1. Assemble edilmiş bağlam tamamen kullanıcı prompt'una mı, tamamen
+   geliştirici talimatlarına mı, yoksa bölünerek mi enjekte edilmeli?
 
-   Öneri: bölünmüş. `systemPromptAddition` değerini geliştirici yönergelerine koyun;
-   assemble edilmiş transkript bağlamını kullanıcı istemi sarmalayıcısına koyun. Bu en iyi şekilde
-   doğal iş parçacığı geçmişini değiştirmeden geçerli Codex protokolüyle eşleşir.
+   Öneri: bölünmeli. `systemPromptAddition` geliştirici talimatlarında olsun;
+   assemble edilmiş döküm bağlamı kullanıcı prompt sarmalayıcısında olsun. Bu, yerel iş parçacığı geçmişini değiştirmeden
+   mevcut Codex protokolüyle en iyi uyumu sağlar.
 
-2. Bir bağlam motoru Compaction'a sahipse Codex doğal Compaction
+2. Bir context engine Compaction'ın sahibi olduğunda Codex yerel Compaction'ı
    devre dışı bırakılmalı mı?
 
-   Öneri: hayır, en azından başlangıçta değil. Codex doğal Compaction yine de
-   app-server iş parçacığını canlı tutmak için gerekli olabilir. Ancak bu
-   bağlam motoru Compaction'ı olarak değil, doğal Codex Compaction'ı olarak raporlanmalıdır.
+   Öneri: hayır, en azından başlangıçta değil. Codex yerel Compaction'ı yine de
+   uygulama sunucusu iş parçacığını ayakta tutmak için gerekli olabilir. Ancak bu,
+   context-engine Compaction'ı olarak değil, yerel Codex Compaction'ı olarak raporlanmalıdır.
 
-3. `before_prompt_build`, bağlam motoru assembly’sinden önce mi sonra mı çalışmalı?
+3. `before_prompt_build`, context-engine assembly'den önce mi sonra mı çalışmalı?
 
-   Öneri: Codex için bağlam motoru yansıtmasından sonra, böylece genel harness
-   hook'ları Codex’in gerçekten alacağı istem/geliştirici yönergelerini görür. PI
-   eşliği tersi sırayı gerektiriyorsa seçilen sırayı testlerde kodlayın ve burada
-   belgeleyin.
+   Öneri: Codex için context-engine yansıtmasından sonra; böylece genel harness
+   kancaları Codex'in gerçekten alacağı prompt/geliştirici talimatlarını görür. Eğer Pi
+   parity tersini gerektiriyorsa, seçilen sırayı testlerde kodlayın ve burada belgeleyin.
 
-4. Codex app-server gelecekte yapılandırılmış bir bağlam/geçmiş geçersiz kılmasını kabul edebilir mi?
+4. Codex uygulama sunucusu gelecekte yapılandırılmış bir bağlam/geçmiş geçersiz kılması kabul edebilir mi?
 
-   Bilinmiyor. Eğer kabul edebiliyorsa metin yansıtma katmanını o protokolle değiştirin ve
-   yaşam döngüsü çağrılarını aynı tutun.
+   Bilinmiyor. Kabul edebiliyorsa, metin yansıtma katmanını o protokolle değiştirin ve
+   yaşam döngüsü çağrılarını değiştirmeden koruyun.
 
-## Kabul ölçütleri
+## Kabul kriterleri
 
-- Bir `codex/*` gömülü harness dönüşü seçilen bağlam motorunun
+- Bir `codex/*` gömülü harness turu, seçili context engine'in
   assemble yaşam döngüsünü çağırır.
-- Bir bağlam motoru `systemPromptAddition`, Codex geliştirici yönergelerini etkiler.
-- Assemble edilen bağlam Codex dönüş girdisini deterministik olarak etkiler.
-- Başarılı Codex dönüşleri `afterTurn` veya ingest geri dönüşünü çağırır.
-- Başarılı Codex dönüşleri bağlam motoru dönüş bakımını çalıştırır.
-- Başarısız/iptal edilmiş/yield iptal edilmiş dönüşler dönüş bakımını çalıştırmaz.
-- Bağlam motoruna ait Compaction, OpenClaw/Plugin durumu için birincil kalır.
-- Codex doğal Compaction, doğal Codex davranışı olarak denetlenebilir kalır.
-- Mevcut PI bağlam motoru davranışı değişmez.
-- Eski olmayan bir bağlam motoru seçilmediğinde veya assembly başarısız olduğunda
+- Bir context-engine `systemPromptAddition`, Codex geliştirici talimatlarını etkiler.
+- Assemble edilmiş bağlam, Codex tur girdisini deterministik olarak etkiler.
+- Başarılı Codex turları `afterTurn` veya ingest geri dönüşü çağırır.
+- Başarılı Codex turları context-engine tur bakımını çalıştırır.
+- Başarısız/iptal edilmiş/yield-ipta edilmiş turlar tur bakımını çalıştırmaz.
+- Context-engine'e ait Compaction, OpenClaw/Plugin durumu için birincil kalır.
+- Codex yerel Compaction'ı, yerel Codex davranışı olarak denetlenebilir kalır.
+- Mevcut Pi context-engine davranışı değişmez.
+- Eski olmayan bir context engine seçilmediğinde veya assembly başarısız olduğunda
   mevcut Codex harness davranışı değişmez.

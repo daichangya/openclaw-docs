@@ -5,17 +5,17 @@ read_when:
 summary: '`openclaw devices` için CLI başvurusu (cihaz eşleştirme + belirteç döndürme/iptal etme)'
 title: Cihazlar
 x-i18n:
-    generated_at: "2026-04-24T09:02:02Z"
+    generated_at: "2026-04-25T13:43:52Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c4ae835807ba4b0aea1073b9a84410a10fa0394d7d34e49d645071108cea6a35
+    source_hash: 168afa3c784565c09ebdac854acc33cb7c0cacf4eba6a1a038c88c96af3c1430
     source_path: cli/devices.md
     workflow: 15
 ---
 
 # `openclaw devices`
 
-Cihaz eşleştirme isteklerini ve cihaza kapsamlı belirteçleri yönetin.
+Cihaz eşleştirme isteklerini ve cihaz kapsamlı belirteçleri yönetin.
 
 ## Komutlar
 
@@ -29,16 +29,16 @@ openclaw devices list --json
 ```
 
 Bekleyen istek çıktısı, cihaz zaten eşleştirilmişse cihazın mevcut
-onaylanmış erişiminin yanında istenen erişimi gösterir. Bu, kapsam/rol
+onaylı erişiminin yanında istenen erişimi gösterir. Bu, kapsam/rol
 yükseltmelerini eşleştirmenin kaybolmuş gibi görünmesi yerine açık hale getirir.
 
 ### `openclaw devices remove <deviceId>`
 
-Tek bir eşleştirilmiş cihaz girişini kaldırın.
+Tek bir eşleştirilmiş cihaz girdisini kaldırın.
 
-Eşleştirilmiş bir cihaz belirteciyle kimlik doğruladıysanız, yönetici olmayan çağıranlar
-yalnızca **kendi** cihaz girişlerini kaldırabilir. Başka bir cihazı kaldırmak için
-`operator.admin` gerekir.
+Eşleştirilmiş bir cihaz belirteciyle kimlik doğrulaması yaptıysanız, admin olmayan çağıranlar
+yalnızca **kendi** cihaz girdilerini kaldırabilir. Başka bir cihazı kaldırmak
+için `operator.admin` gerekir.
 
 ```
 openclaw devices remove <deviceId>
@@ -59,17 +59,22 @@ openclaw devices clear --yes --pending --json
 
 Bekleyen bir cihaz eşleştirme isteğini tam `requestId` ile onaylayın. `requestId`
 atlanırsa veya `--latest` geçirilirse, OpenClaw yalnızca seçilen bekleyen
-isteği yazdırır ve çıkar; ayrıntıları doğruladıktan sonra
-tam istek kimliğiyle onayı yeniden çalıştırın.
+isteği yazdırır ve çıkar; ayrıntıları doğruladıktan sonra tam istek kimliğiyle
+onayı yeniden çalıştırın.
 
-Not: bir cihaz değişmiş kimlik doğrulama ayrıntılarıyla (rol/kapsamlar/açık
-anahtar) eşleştirmeyi yeniden denerse, OpenClaw önceki bekleyen girdinin yerine geçer ve yeni bir
-`requestId` oluşturur. Geçerli kimliği kullanmak için onaydan hemen önce `openclaw devices list` çalıştırın.
+Not: Bir cihaz değişmiş kimlik doğrulama ayrıntılarıyla (rol/kapsamlar/public
+key) yeniden eşleştirme denerse, OpenClaw önceki bekleyen girdinin yerine geçer ve yeni bir
+`requestId` verir. Geçerli kimliği kullanmak için onaydan hemen önce `openclaw devices list` çalıştırın.
 
-Cihaz zaten eşleştirilmişse ve daha geniş kapsamlar veya daha geniş bir rol isterse,
-OpenClaw mevcut onayı yerinde tutar ve yeni bir bekleyen yükseltme
+Cihaz zaten eşleştirilmişse ve daha geniş kapsamlar veya daha geniş bir rol
+istiyorsa, OpenClaw mevcut onayı yerinde tutar ve yeni bir bekleyen yükseltme
 isteği oluşturur. `openclaw devices list` içindeki `Requested` ve `Approved` sütunlarını inceleyin
 veya onaylamadan önce tam yükseltmeyi önizlemek için `openclaw devices approve --latest` kullanın.
+
+Gateway açıkça
+`gateway.nodes.pairing.autoApproveCidrs` ile yapılandırılmışsa, eşleşen istemci IP'lerinden gelen ilk kez yapılan `role: node`
+istekleri bu listede görünmeden önce onaylanabilir. Bu ilke
+varsayılan olarak devre dışıdır ve operator/browser istemcilerine veya yükseltme isteklerine asla uygulanmaz.
 
 ```
 openclaw devices approve
@@ -87,26 +92,28 @@ openclaw devices reject <requestId>
 
 ### `openclaw devices rotate --device <id> --role <role> [--scope <scope...>]`
 
-Belirli bir rol için cihaz belirtecini döndürün (isteğe bağlı olarak kapsamları güncelleyerek).
-Hedef rol, o cihazın onaylanmış eşleştirme sözleşmesinde zaten bulunmalıdır;
-döndürme yeni, onaylanmamış bir rol üretemez.
-`--scope` atlanırsa, saklanan döndürülmüş belirteçle sonraki yeniden bağlanmalar o
-belirtecin önbelleğe alınmış onaylı kapsamlarını yeniden kullanır. Açık `--scope` değerleri geçirirseniz, bunlar gelecekteki önbelleğe alınmış belirteç yeniden bağlanmaları için saklanan kapsam kümesi olur.
-Yönetici olmayan eşleştirilmiş cihaz çağıranları yalnızca **kendi** cihaz belirteçlerini döndürebilir.
-Ayrıca, açık `--scope` değerlerinin tümü çağıran oturumun kendi
-operatör kapsamları içinde kalmalıdır; döndürme, çağıranın zaten sahip olduğundan daha geniş bir operatör belirteci üretemez.
+Belirli bir rol için bir cihaz belirtecini döndürün (isteğe bağlı olarak kapsamları güncelleyerek).
+Hedef rol, bu cihazın onaylı eşleştirme sözleşmesinde zaten mevcut olmalıdır;
+döndürme yeni ve onaylanmamış bir rol oluşturamaz.
+`--scope` atlanırsa, daha sonra depolanan döndürülmüş belirteçle yapılan yeniden bağlantılar
+bu belirtecin önbelleğe alınmış onaylı kapsamlarını yeniden kullanır. Açık `--scope`
+değerleri geçirirseniz, bunlar gelecekteki önbelleğe alınmış belirteç yeniden bağlantıları için
+depolanan kapsam kümesi olur.
+Admin olmayan eşleştirilmiş cihaz çağıranları yalnızca **kendi** cihaz belirteçlerini döndürebilir.
+Ayrıca, açık `--scope` değerleri çağıran oturumunun kendi
+operator kapsamları içinde kalmalıdır; döndürme, çağıranın zaten sahip olduğundan daha geniş bir operator belirteci oluşturamaz.
 
 ```
 openclaw devices rotate --device <deviceId> --role operator --scope operator.read --scope operator.write
 ```
 
-Yeni belirteç payload'ını JSON olarak döndürür.
+Yeni belirteç yükünü JSON olarak döndürür.
 
 ### `openclaw devices revoke --device <id> --role <role>`
 
-Belirli bir rol için cihaz belirtecini iptal edin.
+Belirli bir rol için bir cihaz belirtecini iptal edin.
 
-Yönetici olmayan eşleştirilmiş cihaz çağıranları yalnızca **kendi** cihaz belirteçlerini iptal edebilir.
+Admin olmayan eşleştirilmiş cihaz çağıranları yalnızca **kendi** cihaz belirteçlerini iptal edebilir.
 Başka bir cihazın belirtecini iptal etmek için `operator.admin` gerekir.
 
 ```
@@ -115,32 +122,31 @@ openclaw devices revoke --device <deviceId> --role node
 
 İptal sonucunu JSON olarak döndürür.
 
-## Yaygın seçenekler
+## Ortak seçenekler
 
 - `--url <url>`: Gateway WebSocket URL'si (yapılandırılmışsa varsayılan olarak `gateway.remote.url` kullanılır).
 - `--token <token>`: Gateway belirteci (gerekiyorsa).
 - `--password <password>`: Gateway parolası (parola kimlik doğrulaması).
 - `--timeout <ms>`: RPC zaman aşımı.
-- `--json`: JSON çıktısı (betik yazımı için önerilir).
+- `--json`: JSON çıktısı (betikler için önerilir).
 
 Not: `--url` ayarladığınızda, CLI yapılandırma veya ortam kimlik bilgilerine geri dönmez.
-`--token` veya `--password` değerini açıkça geçin. Açık kimlik bilgileri eksikse bu bir hatadır.
+`--token` veya `--password` değerini açıkça geçirin. Açık kimlik bilgileri eksikse hata oluşur.
 
 ## Notlar
 
-- Belirteç döndürme yeni bir belirteç döndürür (hassas). Bunu bir gizli anahtar gibi değerlendirin.
+- Belirteç döndürme yeni bir belirteç döndürür (hassas). Bunu bir gizli anahtar gibi ele alın.
 - Bu komutlar `operator.pairing` (veya `operator.admin`) kapsamı gerektirir.
-- Belirteç döndürme, o cihaz için onaylanmış eşleştirme rol kümesi ve onaylanmış kapsam
-  taban çizgisi içinde kalır. Başıboş bir önbelleğe alınmış belirteç girişi yeni bir
-  döndürme hedefi vermez.
-- Eşleştirilmiş cihaz belirteç oturumları için, cihazlar arası yönetim yalnızca yöneticiye özeldir:
-  çağıranın `operator.admin` yetkisi yoksa `remove`, `rotate` ve `revoke`
-  yalnızca kendine yöneliktir.
-- `devices clear` bilinçli olarak `--yes` ile geçitlenmiştir.
-- local loopback üzerinde eşleştirme kapsamı kullanılamıyorsa (ve açık `--url` geçirilmemişse), list/approve yerel eşleştirme geri dönüşünü kullanabilir.
-- `devices approve`, belirteç oluşturmadan önce açık bir istek kimliği gerektirir; `requestId` atlanırsa veya `--latest` geçirilirse yalnızca en yeni bekleyen istek önizlenir.
+- `gateway.nodes.pairing.autoApproveCidrs`, yalnızca yeni node cihaz eşleştirmesi için isteğe bağlı bir Gateway ilkesidir; CLI onay yetkisini değiştirmez.
+- Belirteç döndürme, bu cihaz için onaylanan eşleştirme rol kümesi ve onaylı kapsam temeli içinde kalır. Başıboş bir önbelleğe alınmış belirteç girdisi yeni bir döndürme hedefi vermez.
+- Eşleştirilmiş cihaz belirteç oturumları için, cihazlar arası yönetim yalnızca admin'e açıktır:
+  `remove`, `rotate` ve `revoke`, çağıran `operator.admin` yetkisine sahip değilse
+  yalnızca kendine uygulanabilir.
+- `devices clear` kasıtlı olarak `--yes` ile korunur.
+- Eşleştirme kapsamı local loopback üzerinde kullanılamıyorsa (ve açık `--url` geçirilmemişse), list/approve yerel bir eşleştirme geri dönüşünü kullanabilir.
+- `devices approve`, belirteç oluşturmadan önce açık bir istek kimliği gerektirir; `requestId` atlamak veya `--latest` geçirmek yalnızca en yeni bekleyen isteği önizler.
 
-## Belirteç sapması kurtarma kontrol listesi
+## Belirteç sapması kurtarma denetim listesi
 
 Control UI veya diğer istemciler `AUTH_TOKEN_MISMATCH` ya da `AUTH_DEVICE_TOKEN_MISMATCH` ile başarısız olmaya devam ettiğinde bunu kullanın.
 
@@ -156,13 +162,13 @@ openclaw config get gateway.auth.token
 openclaw devices list
 ```
 
-3. Etkilenen cihaz için operatör belirtecini döndürün:
+3. Etkilenen cihaz için operator belirtecini döndürün:
 
 ```bash
 openclaw devices rotate --device <deviceId> --role operator
 ```
 
-4. Döndürme yeterli değilse, eski eşleştirmeyi kaldırın ve yeniden onaylayın:
+4. Döndürme yeterli değilse, bayat eşleştirmeyi kaldırın ve yeniden onaylayın:
 
 ```bash
 openclaw devices remove <deviceId>
@@ -174,15 +180,15 @@ openclaw devices approve <requestId>
 
 Notlar:
 
-- Normal yeniden bağlanma kimlik doğrulama önceliği önce açık paylaşılan belirteç/parola, sonra açık `deviceToken`, sonra saklanan cihaz belirteci, ardından bootstrap belirtecidir.
-- Güvenilir `AUTH_TOKEN_MISMATCH` kurtarması, tek bir sınırlı yeniden deneme için hem paylaşılan belirteci hem de saklanan cihaz belirtecini birlikte geçici olarak gönderebilir.
+- Normal yeniden bağlantı kimlik doğrulama önceliği önce açık paylaşılan belirteç/parola, sonra açık `deviceToken`, ardından depolanan cihaz belirteci, ardından bootstrap belirtecidir.
+- Güvenilir `AUTH_TOKEN_MISMATCH` kurtarması, tek bir sınırlı yeniden deneme için paylaşılan belirteci ve depolanan cihaz belirtecini birlikte geçici olarak gönderebilir.
 
 İlgili:
 
-- [Dashboard auth sorun giderme](/tr/web/dashboard#if-you-see-unauthorized-1008)
-- [Gateway sorun giderme](/tr/gateway/troubleshooting#dashboard-control-ui-connectivity)
+- [Dashboard auth troubleshooting](/tr/web/dashboard#if-you-see-unauthorized-1008)
+- [Gateway troubleshooting](/tr/gateway/troubleshooting#dashboard-control-ui-connectivity)
 
 ## İlgili
 
-- [CLI başvurusu](/tr/cli)
-- [Node'lar](/tr/nodes)
+- [CLI reference](/tr/cli)
+- [Nodes](/tr/nodes)

@@ -1,59 +1,59 @@
 ---
 read_when:
     - Medya anlamayı tasarlama veya yeniden düzenleme
-    - Gelen ses/video/görsel ön işleme ayarlarını iyileştirme
-summary: Gelen görsel/ses/video anlama (isteğe bağlı), sağlayıcı ve CLI geri dönüşleriyle birlikte
+    - Gelen ses/video/görsel ön işlemeyi ayarlama
+summary: Sağlayıcı ve CLI yedekleriyle isteğe bağlı gelen görsel/ses/video anlama
 title: Medya anlama
 x-i18n:
-    generated_at: "2026-04-24T09:18:08Z"
+    generated_at: "2026-04-25T13:50:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a9eb9449fbc1bed170bbef213aa43d71d4146edbc0dd626ef50af9e044a8e299
+    source_hash: 573883a2e0bf27fc04da1a5464e53ba41d006ecad5a04704c24467e77c8eda3d
     source_path: nodes/media-understanding.md
     workflow: 15
 ---
 
 # Medya Anlama - Gelen (2026-01-17)
 
-OpenClaw, yanıt işlem hattı çalışmadan önce **gelen medyayı özetleyebilir** (görsel/ses/video). Yerel araçlar veya sağlayıcı anahtarları mevcut olduğunda bunu otomatik algılar ve devre dışı bırakılabilir ya da özelleştirilebilir. Anlama kapalıysa modeller yine özgün dosyaları/URL'leri her zamanki gibi alır.
+OpenClaw, yanıt hattı çalışmadan önce **gelen medyayı özetleyebilir** (görsel/ses/video). Yerel araçlar veya sağlayıcı anahtarları mevcut olduğunda bunu otomatik algılar; ayrıca devre dışı bırakılabilir veya özelleştirilebilir. Anlama kapalıysa modeller yine de özgün dosyaları/URL'leri her zamanki gibi alır.
 
-Sağlayıcıya özgü medya davranışı sağlayıcı Plugin'leri tarafından kaydedilirken, OpenClaw çekirdeği paylaşılan `tools.media` yapılandırmasına, geri dönüş sırasına ve yanıt işlem hattı entegrasyonuna sahiptir.
+Satıcıya özgü medya davranışı satıcı Plugin'leri tarafından kaydedilirken, OpenClaw
+çekirdeği paylaşılan `tools.media` config'ine, yedek sırasına ve yanıt hattı entegrasyonuna sahiptir.
 
 ## Hedefler
 
-- İsteğe bağlı: daha hızlı yönlendirme + daha iyi komut ayrıştırma için gelen medyayı önceden kısa metne indirgemek.
-- Özgün medya teslimini modele her zaman korumak.
-- **Sağlayıcı API'lerini** ve **CLI geri dönüşlerini** desteklemek.
-- Sıralı geri dönüşe sahip birden çok modele izin vermek (hata/boyut/zaman aşımı).
+- İsteğe bağlı: daha hızlı yönlendirme ve daha iyi komut ayrıştırma için gelen medyayı önceden kısa metne dönüştürmek.
+- Özgün medya teslimini modele korumak (her zaman).
+- **Sağlayıcı API'lerini** ve **CLI yedeklerini** desteklemek.
+- Sıralı yedeklemeyle birden çok modeli desteklemek (hata/boyut/zaman aşımı).
 
-## Yüksek düzey davranış
+## Üst düzey davranış
 
-1. Gelen ekleri toplayın (`MediaPaths`, `MediaUrls`, `MediaTypes`).
-2. Etkin her yetenek için (görsel/ses/video), ilkeye göre ekleri seçin (varsayılan: **ilk**).
-3. İlk uygun model girdisini seçin (boyut + yetenek + auth).
-4. Bir model başarısız olursa veya medya çok büyükse **sonraki girdiye geri dönün**.
-5. Başarılı olursa:
+1. Gelen ekleri topla (`MediaPaths`, `MediaUrls`, `MediaTypes`).
+2. Etkin her yetenek için (görsel/ses/video), ilkeye göre ekleri seç (varsayılan: **ilk**).
+3. Uygun ilk model girdisini seç (boyut + yetenek + kimlik doğrulama).
+4. Bir model başarısız olursa veya medya çok büyükse, **sonraki girdiye geri dön**.
+5. Başarı durumunda:
    - `Body`, `[Image]`, `[Audio]` veya `[Video]` bloğu olur.
-   - Seste `{{Transcript}}` ayarlanır; komut ayrıştırma, varsa başlık metnini,
-     yoksa transcript'i kullanır.
-   - Başlıklar blok içinde `User text:` olarak korunur.
+   - Ses, `{{Transcript}}` ayarlar; komut ayrıştırma varsa açıklama metnini, yoksa transkripti kullanır.
+   - Açıklamalar blok içinde `User text:` olarak korunur.
 
-Anlama başarısız olursa veya devre dışıysa **yanıt akışı**, özgün gövde + eklerle devam eder.
+Anlama başarısız olursa veya devre dışıysa, **yanıt akışı** özgün body + eklerle devam eder.
 
 ## Yapılandırma genel bakışı
 
-`tools.media`, **paylaşılan modelleri** artı yetenek başına geçersiz kılmaları destekler:
+`tools.media`, **paylaşılan modelleri** ve yetenek başına geçersiz kılmaları destekler:
 
-- `tools.media.models`: paylaşılan model listesi (`capabilities` ile sınırlandırın).
+- `tools.media.models`: paylaşılan model listesi (`capabilities` ile kapılayın).
 - `tools.media.image` / `tools.media.audio` / `tools.media.video`:
   - varsayılanlar (`prompt`, `maxChars`, `maxBytes`, `timeoutSeconds`, `language`)
   - sağlayıcı geçersiz kılmaları (`baseUrl`, `headers`, `providerOptions`)
   - `tools.media.audio.providerOptions.deepgram` üzerinden Deepgram ses seçenekleri
-  - ses transcript yansıma denetimleri (`echoTranscript`, varsayılan `false`; `echoFormat`)
+  - ses transcript yankı denetimleri (`echoTranscript`, varsayılan `false`; `echoFormat`)
   - isteğe bağlı **yetenek başına `models` listesi** (paylaşılan modellerden önce tercih edilir)
   - `attachments` ilkesi (`mode`, `maxAttachments`, `prefer`)
-  - `scope` (kanal/chatType/oturum anahtarı bazında isteğe bağlı sınırlandırma)
-- `tools.media.concurrency`: en yüksek eşzamanlı yetenek çalıştırması (varsayılan **2**).
+  - `scope` (kanal/sohbet türü/oturum anahtarına göre isteğe bağlı kapılama)
+- `tools.media.concurrency`: eşzamanlı azami yetenek çalıştırması (varsayılan **2**).
 
 ```json5
 {
@@ -91,7 +91,7 @@ Her `models[]` girdisi **sağlayıcı** veya **CLI** olabilir:
   maxChars: 500,
   maxBytes: 10485760,
   timeoutSeconds: 60,
-  capabilities: ["image"], // isteğe bağlı, çok modlu girdiler için kullanılır
+  capabilities: ["image"], // isteğe bağlı, çok kipli girdiler için kullanılır
   profile: "vision-profile",
   preferredProfile: "vision-fallback",
 }
@@ -115,7 +115,7 @@ Her `models[]` girdisi **sağlayıcı** veya **CLI** olabilir:
 }
 ```
 
-CLI şablonları ayrıca şunları kullanabilir:
+CLI şablonları ayrıca şunları da kullanabilir:
 
 - `{{MediaDir}}` (medya dosyasını içeren dizin)
 - `{{OutputDir}}` (bu çalıştırma için oluşturulan geçici dizin)
@@ -126,7 +126,7 @@ CLI şablonları ayrıca şunları kullanabilir:
 Önerilen varsayılanlar:
 
 - `maxChars`: görsel/video için **500** (kısa, komut dostu)
-- `maxChars`: ses için **ayarsız** (sınır koymazsanız tam transcript)
+- `maxChars`: ses için **ayarlanmamış** (sınır koymazsanız tam transcript)
 - `maxBytes`:
   - görsel: **10MB**
   - ses: **20MB**
@@ -134,44 +134,43 @@ CLI şablonları ayrıca şunları kullanabilir:
 
 Kurallar:
 
-- Medya `maxBytes` değerini aşarsa, o model atlanır ve **sonraki model denenir**.
-- **1024 bayttan** küçük ses dosyaları boş/bozuk kabul edilir ve sağlayıcı/CLI transcript işleminden önce atlanır.
+- Medya `maxBytes` sınırını aşarsa o model atlanır ve **sonraki model denenir**.
+- **1024 bayttan** küçük ses dosyaları boş/bozuk sayılır ve sağlayıcı/CLI transkripsiyonundan önce atlanır.
 - Model `maxChars` değerinden fazla döndürürse çıktı kırpılır.
-- `prompt` varsayılan olarak basit bir “Describe the {media}.” artı `maxChars` yönlendirmesi kullanır (yalnızca görsel/video).
-- Etkin birincil görsel model zaten yerel olarak görsel desteği sunuyorsa OpenClaw,
-  `[Image]` özet bloğunu atlar ve bunun yerine özgün görseli modele geçirir.
+- `prompt`, varsayılan olarak basit bir “Describe the {media}.” ifadesine ve `maxChars` yönlendirmesine dayanır (yalnızca görsel/video).
+- Etkin birincil görsel modeli zaten yerel olarak vision destekliyorsa OpenClaw
+  `[Image]` özet bloğunu atlar ve özgün görseli doğrudan modele geçirir.
 - Bir Gateway/WebChat birincil modeli yalnızca metinse, görsel ekleri
-  ekin kaybolmaması için image aracı veya yapılandırılmış
-  image modeli tarafından incelenebilen offload edilmiş `media://inbound/*` ref'leri olarak korunur.
-- Açık `openclaw infer image describe --model <provider/model>` istekleri
-  farklıdır: bunlar, `ollama/qwen2.5vl:7b` gibi
-  Ollama ref'leri dahil, o görsel destekli sağlayıcı/modeli doğrudan çalıştırır.
-- `<capability>.enabled: true` ancak hiçbir model yapılandırılmamışsa OpenClaw,
-  sağlayıcısı yeteneği destekliyorsa **etkin yanıt modelini** dener.
+  `media://inbound/*` referansları olarak korunur; böylece görsel/PDF araçları veya
+  yapılandırılmış görsel modeli eki kaybetmek yerine bunları yine inceleyebilir.
+- Açık `openclaw infer image describe --model <provider/model>` istekleri farklıdır:
+  bunlar belirtilen görsel yetenekli sağlayıcı/modeli doğrudan çalıştırır; buna
+  `ollama/qwen2.5vl:7b` gibi Ollama referansları da dahildir.
+- `<capability>.enabled: true` ancak yapılandırılmış model yoksa OpenClaw,
+  sağlayıcısı bu yeteneği desteklediğinde **etkin yanıt modelini** dener.
 
 ### Medya anlamayı otomatik algılama (varsayılan)
 
-`tools.media.<capability>.enabled`, açıkça `false` olarak ayarlanmadıysa ve
-modeller yapılandırılmadıysa OpenClaw şu sırayla otomatik algılar ve **çalışan ilk
+`tools.media.<capability>.enabled` açıkça `false` olarak ayarlanmamışsa ve
+model yapılandırmadıysanız, OpenClaw şu sırayla otomatik algılar ve **çalışan ilk
 seçenekte durur**:
 
-1. Sağlayıcısı yeteneği destekliyorsa **etkin yanıt modeli**.
-2. **`agents.defaults.imageModel`** primary/fallback ref'leri (yalnızca görsel).
+1. Sağlayıcısı bu yeteneği destekliyorsa **etkin yanıt modeli**.
+2. **`agents.defaults.imageModel`** birincil/yedek referansları (yalnızca görsel).
 3. **Yerel CLI'ler** (yalnızca ses; kuruluysa)
-   - `sherpa-onnx-offline` (`SHERPA_ONNX_MODEL_DIR` ile encoder/decoder/joiner/tokens gerektirir)
+   - `sherpa-onnx-offline` (`SHERPA_ONNX_MODEL_DIR` gerekir; encoder/decoder/joiner/tokens ile)
    - `whisper-cli` (`whisper-cpp`; `WHISPER_CPP_MODEL` veya paketle gelen tiny modeli kullanır)
    - `whisper` (Python CLI; modelleri otomatik indirir)
-4. **Gemini CLI** (`gemini`) `read_many_files` kullanarak
-5. **Sağlayıcı auth**
+4. `read_many_files` kullanan **Gemini CLI** (`gemini`)
+5. **Sağlayıcı kimlik doğrulaması**
    - Yeteneği destekleyen yapılandırılmış `models.providers.*` girdileri,
-     paketle gelen geri dönüş sırasından önce denenir.
-   - Görsel destekli bir modele sahip yalnızca görsel yapılandırma sağlayıcıları,
-     paketle gelen bir satıcı Plugin'i olmasalar bile medya anlama için otomatik kaydolur.
-   - Ollama görsel anlama, örneğin
-     `agents.defaults.imageModel` veya
-     `openclaw infer image describe --model ollama/<vision-model>` üzerinden açıkça seçildiğinde kullanılabilir.
-   - Paketle gelen geri dönüş sırası:
-     - Ses: OpenAI → Groq → xAI → Deepgram → Google → Mistral
+     paketle gelen yedek sırasından önce denenir.
+   - Görsel yetenekli modele sahip yalnızca görsel yapılandırma sağlayıcıları,
+     paketle gelen satıcı Plugin'i olmasalar bile medya anlama için otomatik kaydolur.
+   - Ollama görsel anlama, örneğin `agents.defaults.imageModel` veya
+     `openclaw infer image describe --model ollama/<vision-model>` yoluyla açıkça seçildiğinde kullanılabilir.
+   - Paketle gelen yedek sıra:
+     - Ses: OpenAI → Groq → xAI → Deepgram → Google → SenseAudio → ElevenLabs → Mistral
      - Görsel: OpenAI → Anthropic → Google → MiniMax → MiniMax Portal → Z.AI
      - Video: Google → Qwen → Moonshot
 
@@ -189,26 +188,26 @@ Otomatik algılamayı devre dışı bırakmak için şunu ayarlayın:
 }
 ```
 
-Not: Binary algılama macOS/Linux/Windows genelinde en iyi çaba ile yapılır; CLI'nin `PATH` üzerinde olduğundan emin olun (`~` genişletilir) veya tam komut yoluyla açık bir CLI modeli ayarlayın.
+Not: İkili dosya algılama macOS/Linux/Windows'ta en iyi çabayla çalışır; CLI'nin `PATH` üzerinde olduğundan emin olun (`~` genişletilir) veya tam komut yoluyla açık bir CLI modeli ayarlayın.
 
-### Proxy ortam desteği (sağlayıcı modelleri)
+### Proxy ortamı desteği (sağlayıcı modelleri)
 
 Sağlayıcı tabanlı **ses** ve **video** medya anlama etkin olduğunda OpenClaw,
-sağlayıcı HTTP çağrıları için standart giden proxy ortam değişkenlerini dikkate alır:
+sağlayıcı HTTP çağrıları için standart giden proxy ortam değişkenlerine uyar:
 
 - `HTTPS_PROXY`
 - `HTTP_PROXY`
 - `https_proxy`
 - `http_proxy`
 
-Hiç proxy env değişkeni ayarlı değilse medya anlama doğrudan dış erişim kullanır.
-Proxy değeri bozuksa OpenClaw bir uyarı kaydeder ve doğrudan
-erişime geri döner.
+Hiçbir proxy env değişkeni ayarlanmamışsa, medya anlama doğrudan çıkış kullanır.
+Proxy değeri bozuksa OpenClaw bir uyarı günlüğü yazar ve doğrudan
+almaya geri döner.
 
 ## Yetenekler (isteğe bağlı)
 
-`capabilities` ayarlarsanız girdi yalnızca o medya türleri için çalışır. Paylaşılan
-listeler için OpenClaw varsayılanları çıkarabilir:
+`capabilities` ayarlarsanız girdi yalnızca bu medya türleri için çalışır. Paylaşılan
+listelerde OpenClaw varsayılanları çıkarabilir:
 
 - `openai`, `anthropic`, `minimax`: **görsel**
 - `minimax-portal`: **görsel**
@@ -221,61 +220,58 @@ listeler için OpenClaw varsayılanları çıkarabilir:
 - `groq`: **ses**
 - `xai`: **ses**
 - `deepgram`: **ses**
-- Görsel destekli modele sahip herhangi bir `models.providers.<id>.models[]` kataloğu:
+- Görsel yetenekli modele sahip herhangi bir `models.providers.<id>.models[]` kataloğu:
   **görsel**
 
-CLI girdileri için beklenmedik eşleşmeleri önlemek amacıyla **`capabilities` değerini açıkça ayarlayın**.
-`capabilities` atlanırsa girdi, göründüğü liste için uygun kabul edilir.
+CLI girdileri için şaşırtıcı eşleşmelerden kaçınmak amacıyla **`capabilities` değerini açıkça ayarlayın**.
+`capabilities` atlanırsa girdi, bulunduğu liste için uygun sayılır.
 
 ## Sağlayıcı destek matrisi (OpenClaw entegrasyonları)
 
-| Yetenek | Sağlayıcı entegrasyonu                                                                                                        | Notlar                                                                                                                                                                                                                                          |
-| ------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Görsel  | OpenAI, OpenAI Codex OAuth, Codex uygulama sunucusu, OpenRouter, Anthropic, Google, MiniMax, Moonshot, Qwen, Z.AI, config sağlayıcıları | Satıcı Plugin'leri görsel desteğini kaydeder; `openai-codex/*` OAuth sağlayıcı tesisatını kullanır; `codex/*` sınırlı bir Codex uygulama sunucusu dönüşü kullanır; MiniMax ve MiniMax OAuth ikisi de `MiniMax-VL-01` kullanır; görsel destekli config sağlayıcıları otomatik kaydolur. |
-| Ses     | OpenAI, Groq, Deepgram, Google, Mistral                                                                                       | Sağlayıcı transcript işlemi (Whisper/Deepgram/Gemini/Voxtral).                                                                                                                                                                                 |
-| Video   | Google, Qwen, Moonshot                                                                                                        | Satıcı Plugin'leri üzerinden sağlayıcı video anlama; Qwen video anlama Standard DashScope uç noktalarını kullanır.                                                                                                                              |
+| Yetenek   | Sağlayıcı entegrasyonu                                                                                                    | Notlar                                                                                                                                                                                                                           |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Görsel    | OpenAI, OpenAI Codex OAuth, Codex app-server, OpenRouter, Anthropic, Google, MiniMax, Moonshot, Qwen, Z.AI, config sağlayıcıları | Satıcı Plugin'leri görsel desteğini kaydeder; `openai-codex/*` OAuth sağlayıcı altyapısını kullanır; `codex/*` sınırlı bir Codex app-server dönüşü kullanır; MiniMax ve MiniMax OAuth ikisi de `MiniMax-VL-01` kullanır; görsel yetenekli config sağlayıcıları otomatik kaydolur. |
+| Ses       | OpenAI, Groq, xAI, Deepgram, Google, SenseAudio, ElevenLabs, Mistral                                                      | Sağlayıcı transkripsiyonu (Whisper/Groq/xAI/Deepgram/Gemini/SenseAudio/Scribe/Voxtral).                                                                                                                                        |
+| Video     | Google, Qwen, Moonshot                                                                                                    | Satıcı Plugin'leri üzerinden sağlayıcı video anlama; Qwen video anlama Standard DashScope uç noktalarını kullanır.                                                                                                            |
 
 MiniMax notu:
 
-- `minimax` ve `minimax-portal` görsel anlama, Plugin sahipli
+- `minimax` ve `minimax-portal` görsel anlama, Plugin'e ait
   `MiniMax-VL-01` medya sağlayıcısından gelir.
-- Paketle gelen MiniMax metin kataloğu yine yalnızca metinle başlar; açık
-  `models.providers.minimax` girdileri görsel destekli M2.7 sohbet ref'lerini somutlaştırır.
+- Paketle gelen MiniMax metin kataloğu yine de yalnızca metinle başlar; açık
+  `models.providers.minimax` girdileri görsel yetenekli M2.7 sohbet referanslarını somutlaştırır.
 
-## Model seçimi rehberi
+## Model seçimi yönlendirmesi
 
-- Kalite ve güvenlik önemli olduğunda, her medya yeteneği için mevcut en güçlü en yeni nesil modeli tercih edin.
-- Güvenilmeyen girdileri işleyen araç etkin aracılar için eski/daha zayıf medya modellerinden kaçının.
-- Kullanılabilirlik için yetenek başına en az bir geri dönüş tutun (kalite modeli + daha hızlı/daha ucuz model).
-- CLI geri dönüşleri (`whisper-cli`, `whisper`, `gemini`), sağlayıcı API'leri kullanılamadığında yararlıdır.
+- Kalite ve güvenlik önemli olduğunda, her medya yeteneği için mevcut en güçlü yeni nesil modeli tercih edin.
+- Güvenilmeyen girdileri işleyen araç etkin ajanlarda, eski/zayıf medya modellerinden kaçının.
+- Kullanılabilirlik için yetenek başına en az bir yedek tutun (kaliteli model + daha hızlı/ucuz model).
+- Sağlayıcı API'leri kullanılamadığında CLI yedekleri (`whisper-cli`, `whisper`, `gemini`) yararlıdır.
 - `parakeet-mlx` notu: `--output-dir` ile OpenClaw, çıktı biçimi `txt` olduğunda (veya belirtilmediğinde) `<output-dir>/<media-basename>.txt` dosyasını okur; `txt` dışındaki biçimler stdout'a geri döner.
 
 ## Ek ilkesi
 
-Yetenek başına `attachments`, hangi eklerin işleneceğini denetler:
+Yetenek başına `attachments`, hangi eklerin işleneceğini kontrol eder:
 
 - `mode`: `first` (varsayılan) veya `all`
-- `maxAttachments`: işlenecek en yüksek sayı (varsayılan **1**)
+- `maxAttachments`: işlenecek azami sayı (varsayılan **1**)
 - `prefer`: `first`, `last`, `path`, `url`
 
 `mode: "all"` olduğunda çıktılar `[Image 1/2]`, `[Audio 2/2]` vb. olarak etiketlenir.
 
-Dosya eki çıkarma davranışı:
+Dosya eki çıkarım davranışı:
 
-- Çıkarılan dosya metni, medya istemine
-  eklenmeden önce **güvenilmeyen harici içerik** olarak sarılır.
+- Çıkarılan dosya metni, medya istemine eklenmeden önce **güvenilmeyen harici içerik** olarak sarılır.
 - Enjekte edilen blok,
   `<<<EXTERNAL_UNTRUSTED_CONTENT id="...">>>` /
-  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>` gibi açık sınır işaretleyicileri kullanır ve
-  bir `Source: External` metadata satırı içerir.
-- Bu ek çıkarma yolu, medya istemini şişirmemek için
-  uzun `SECURITY NOTICE:` başlığını kasıtlı olarak atlar; sınır
-  işaretleyicileri ve metadata yine de kalır.
+  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>` gibi açık sınır işaretçileri kullanır ve
+  `Source: External` meta veri satırı içerir.
+- Bu ek çıkarım yolu, medya istemini şişirmemek için uzun
+  `SECURITY NOTICE:` afişini kasıtlı olarak atlar; sınır işaretçileri ve meta veriler yine de kalır.
 - Bir dosyada çıkarılabilir metin yoksa OpenClaw `[No extractable text]` enjekte eder.
-- Bir PDF bu yolda işlenmiş sayfa görsellerine geri dönerse medya istemi,
-  bu ek çıkarma adımı işlenmiş PDF görsellerini değil metin bloklarını ilettiği için
+- Bir PDF bu yolda oluşturulmuş sayfa görsellerine geri dönerse, medya istemi
   `[PDF content rendered to images; images not forwarded to model]`
-  yer tutucusunu korur.
+  yer tutucusunu korur; çünkü bu ek çıkarım adımı oluşturulmuş PDF görsellerini değil metin bloklarını iletir.
 
 ## Yapılandırma örnekleri
 
@@ -316,7 +312,7 @@ Dosya eki çıkarma davranışı:
 }
 ```
 
-### 2) Yalnızca Ses + Video (görsel kapalı)
+### 2) Yalnızca ses + video (görsel kapalı)
 
 ```json5
 {
@@ -387,7 +383,7 @@ Dosya eki çıkarma davranışı:
 }
 ```
 
-### 4) Çok modlu tek girdi (açık yetenekler)
+### 4) Çok kipli tek girdi (açık yetenekler)
 
 ```json5
 {
@@ -427,19 +423,19 @@ Dosya eki çıkarma davranışı:
 
 ## Durum çıktısı
 
-Medya anlama çalıştığında `/status`, kısa bir özet satırı içerir:
+Medya anlama çalıştığında `/status` kısa bir özet satırı içerir:
 
 ```
 📎 Media: image ok (openai/gpt-5.4) · audio skipped (maxBytes)
 ```
 
-Bu, yetenek başına sonuçları ve uygun olduğunda seçilen sağlayıcı/modeli gösterir.
+Bu, yetenek başına sonuçları ve uygunsa seçilen sağlayıcı/modeli gösterir.
 
 ## Notlar
 
-- Anlama **en iyi çaba** esasına göredir. Hatalar yanıtları engellemez.
-- Anlama devre dışı olsa bile ekler yine modellere geçirilir.
-- Anlamanın nerede çalışacağını sınırlamak için `scope` kullanın (ör. yalnızca DM'lerde).
+- Anlama **en iyi çaba** ilkesindedir. Hatalar yanıtları engellemez.
+- Anlama devre dışı olsa bile ekler modellere yine iletilir.
+- Anlamanın nerede çalışacağını sınırlamak için `scope` kullanın (örneğin yalnızca DM'ler).
 
 ## İlgili belgeler
 

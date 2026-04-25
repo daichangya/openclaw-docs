@@ -1,20 +1,20 @@
 ---
 read_when:
-    - OpenClaw'ı nasıl yapılandıracağınızı öğrenme
-    - Yapılandırma örnekleri arıyor եք.
-    - OpenClaw'ı ilk kez yapılandırma
+    - OpenClaw'ın nasıl yapılandırılacağını öğrenme
+    - Yapılandırma örnekleri arama
+    - OpenClaw'ı ilk kez kurma
 summary: Yaygın OpenClaw kurulumları için şemaya uygun yapılandırma örnekleri
 title: Yapılandırma örnekleri
 x-i18n:
-    generated_at: "2026-04-24T09:08:25Z"
+    generated_at: "2026-04-25T13:46:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
+    source_hash: 2f31f70459d6232d2aefe668440312bb1800f18de0ef3c2783befa1de05f25f6
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-Aşağıdaki örnekler mevcut yapılandırma şemasıyla uyumludur. Kapsamlı başvuru ve alan başına notlar için bkz. [Yapılandırma](/tr/gateway/configuration).
+Aşağıdaki örnekler, geçerli config şemasıyla uyumludur. Kapsamlı başvuru ve alan bazlı notlar için bkz. [Configuration](/tr/gateway/configuration).
 
 ## Hızlı başlangıç
 
@@ -27,9 +27,9 @@ Aşağıdaki örnekler mevcut yapılandırma şemasıyla uyumludur. Kapsamlı ba
 }
 ```
 
-Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönderebilirsiniz.
+Bunu `~/.openclaw/openclaw.json` içine kaydedin; bu numaradan bota DM gönderebilirsiniz.
 
-### Önerilen başlangıç
+### Önerilen başlangıç yapılandırması
 
 ```json5
 {
@@ -53,7 +53,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
 
 ## Genişletilmiş örnek (başlıca seçenekler)
 
-> JSON5, yorumlar ve sonda virgül kullanmanıza izin verir. Normal JSON da çalışır.
+> JSON5, yorumlar ve sondaki virgülleri kullanmanıza izin verir. Normal JSON da çalışır.
 
 ```json5
 {
@@ -69,7 +69,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
     },
   },
 
-  // Kimlik doğrulama profili meta verileri (gizli bilgiler auth-profiles.json içinde bulunur)
+  // Kimlik doğrulama profili meta verileri (secret'lar auth-profiles.json içinde yaşar)
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -139,7 +139,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
         maxBytes: 20971520,
         models: [
           { provider: "openai", model: "gpt-4o-mini-transcribe" },
-          // İsteğe bağlı CLI yedeği (Whisper ikilisi):
+          // İsteğe bağlı CLI geri dönüşü (Whisper binary):
           // { type: "cli", command: "whisper", args: ["--model", "base", "{{MediaPath}}"] }
         ],
         timeoutSeconds: 120,
@@ -234,7 +234,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
     },
   },
 
-  // Ajan çalışma zamanı
+  // Aracı çalışma zamanı
   agents: {
     defaults: {
       workspace: "~/.openclaw/workspace",
@@ -251,7 +251,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
         "anthropic/claude-sonnet-4-6": { alias: "sonnet" },
         "openai/gpt-5.4": { alias: "gpt" },
       },
-      skills: ["github", "weather"], // list[].skills belirtmeyen ajanlar tarafından devralınır
+      skills: ["github", "weather"], // list[].skills değerini atlayan aracılar tarafından devralınır
       thinkingDefault: "low",
       verboseDefault: "off",
       elevatedDefault: "on",
@@ -310,15 +310,15 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
       {
         id: "main",
         default: true,
-        // varsayılan skills devralınır -> github, weather
-        thinkingDefault: "high", // ajan başına düşünme geçersiz kılması
-        reasoningDefault: "on", // ajan başına akıl yürütme görünürlüğü
-        fastModeDefault: false, // bu ajan için hızlı kip
+        // defaults.skills değerini devralır -> github, weather
+        thinkingDefault: "high", // aracı başına düşünme geçersiz kılması
+        reasoningDefault: "on", // aracı başına akıl yürütme görünürlüğü
+        fastModeDefault: false, // aracı başına hızlı mod
       },
       {
         id: "quick",
-        skills: [], // bu ajan için skill yok
-        fastModeDefault: true, // bu ajan her zaman hızlı çalışır
+        skills: [], // bu aracı için Skills yok
+        fastModeDefault: true, // bu aracı her zaman hızlı çalışır
         thinkingDefault: "off",
       },
     ],
@@ -384,7 +384,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
     },
   },
 
-  // Webhook'lar
+  // Webhooks
   hooks: {
     enabled: true,
     path: "/hooks",
@@ -466,7 +466,7 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
 
 ## Yaygın desenler
 
-### Tek bir geçersiz kılma ile paylaşılan skill tabanı
+### Tek geçersiz kılmalı paylaşılan Skills temeli
 
 ```json5
 {
@@ -483,9 +483,9 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
 }
 ```
 
-- `agents.defaults.skills` paylaşılan tabandır.
-- `agents.list[].skills`, bir ajan için bu tabanı değiştirir.
-- Bir ajanın hiç skill görmemesi gerekiyorsa `skills: []` kullanın.
+- `agents.defaults.skills`, paylaşılan temel kümedir.
+- `agents.list[].skills`, bu temel kümeyi tek bir aracı için değiştirir.
+- Bir aracının hiç Skills görmemesi gerekiyorsa `skills: []` kullanın.
 
 ### Çok platformlu kurulum
 
@@ -508,13 +508,35 @@ Bunu `~/.openclaw/openclaw.json` dosyasına kaydedin; bu numaradan bota DM gönd
 }
 ```
 
-### Güvenli DM modu (paylaşılan gelen kutusu / çok kullanıcılı DM'ler)
+### Güvenilir Node ağı otomatik onayı
 
-Botunuza birden fazla kişi DM gönderebiliyorsa (`allowFrom` içinde birden fazla girdi, birden fazla kişi için Pairing onayı veya `dmPolicy: "open"`), farklı gönderenlerden gelen DM'lerin varsayılan olarak tek bir bağlamı paylaşmaması için **güvenli DM modunu** etkinleştirin:
+Ağ yolunu denetlemiyorsanız cihaz eşlemesini manuel bırakın. Ayrılmış bir
+laboratuvar veya tailnet alt ağı için, tam CIDR'ler veya IP'lerle ilk kez Node cihazı
+otomatik onayına katılabilirsiniz:
 
 ```json5
 {
-  // Güvenli DM modu (çok kullanıcılı veya hassas DM ajanları için önerilir)
+  gateway: {
+    nodes: {
+      pairing: {
+        autoApproveCidrs: ["192.168.1.0/24", "fd00:1234:5678::/64"],
+      },
+    },
+  },
+}
+```
+
+Bu, ayarlanmadığında kapalı kalır. Yalnızca yeni `role: node` eşlemesine,
+istenen kapsam olmadığında uygulanır. Operatör/tarayıcı istemcileri ile rol, kapsam, meta veri
+veya açık anahtar yükseltmeleri yine manuel onay gerektirir.
+
+### Güvenli DM modu (paylaşılan gelen kutusu / çok kullanıcılı DM'ler)
+
+Birden fazla kişi botunuza DM gönderebiliyorsa (`allowFrom` içinde birden çok giriş, birden fazla kişi için eşleme onayları veya `dmPolicy: "open"`), farklı gönderenlerden gelen DM'lerin varsayılan olarak tek bağlamı paylaşmaması için **güvenli DM modu**nu etkinleştirin:
+
+```json5
+{
+  // Güvenli DM modu (çok kullanıcılı veya hassas DM aracılar için önerilir)
   session: { dmScope: "per-channel-peer" },
 
   channels: {
@@ -534,10 +556,10 @@ Botunuza birden fazla kişi DM gönderebiliyorsa (`allowFrom` içinde birden faz
 }
 ```
 
-Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC için gönderen yetkilendirmesi varsayılan olarak önce kimlik temellidir.
-Yalnızca bu riski açıkça kabul ediyorsanız, doğrudan değişebilir ad/e-posta/nick eşleştirmesini her kanalın `dangerouslyAllowNameMatching: true` ayarıyla etkinleştirin.
+Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRC için, gönderen yetkilendirmesi varsayılan olarak önce kimlik üzerinden yapılır.
+Doğrudan değiştirilebilir ad/e-posta/takma ad eşleştirmesini yalnızca bu riski açıkça kabul ediyorsanız her kanalın `dangerouslyAllowNameMatching: true` ayarıyla etkinleştirin.
 
-### Anthropic API anahtarı + MiniMax geri düşmesi
+### Anthropic API anahtarı + MiniMax geri dönüşü
 
 ```json5
 {
@@ -631,11 +653,11 @@ Yalnızca bu riski açıkça kabul ediyorsanız, doğrudan değişebilir ad/e-po
 ## İpuçları
 
 - `dmPolicy: "open"` ayarlarsanız, eşleşen `allowFrom` listesi `"*"` içermelidir.
-- Sağlayıcı kimlikleri farklıdır (telefon numaraları, kullanıcı kimlikleri, kanal kimlikleri). Biçimi doğrulamak için sağlayıcı belgelerini kullanın.
+- Sağlayıcı kimlikleri farklılık gösterir (telefon numaraları, kullanıcı kimlikleri, kanal kimlikleri). Biçimi doğrulamak için sağlayıcı belgelerine bakın.
 - Daha sonra eklenebilecek isteğe bağlı bölümler: `web`, `browser`, `ui`, `discovery`, `canvasHost`, `talk`, `signal`, `imessage`.
-- Daha ayrıntılı kurulum notları için [Providers](/tr/providers) ve [Sorun giderme](/tr/gateway/troubleshooting) sayfalarına bakın.
+- Daha ayrıntılı kurulum notları için bkz. [Providers](/tr/providers) ve [Troubleshooting](/tr/gateway/troubleshooting).
 
 ## İlgili
 
-- [Yapılandırma başvurusu](/tr/gateway/configuration-reference)
-- [Yapılandırma](/tr/gateway/configuration)
+- [Configuration reference](/tr/gateway/configuration-reference)
+- [Configuration](/tr/gateway/configuration)

@@ -5,10 +5,10 @@ read_when:
 summary: '`openclaw nodes` için CLI başvurusu (durum, eşleştirme, invoke, kamera/canvas/ekran)'
 title: Node'lar
 x-i18n:
-    generated_at: "2026-04-24T09:03:04Z"
+    generated_at: "2026-04-25T13:44:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a1f1b440b3113b71338ae9cab5e1ded607dba79b9429f5c0b1b5f9e758b9f73e
+    source_hash: 68a5701ce0dcba399d93f6eed864b0b0ae34320501de0176aeaad1712d392834
     source_path: cli/nodes.md
     workflow: 15
 ---
@@ -43,17 +43,20 @@ openclaw nodes status --last-connected 24h
 ```
 
 `nodes list`, bekleyen/eşleştirilmiş tabloları yazdırır. Eşleştirilmiş satırlar en son bağlantı yaşını (Last Connect) içerir.
-Yalnızca şu anda bağlı Node'ları göstermek için `--connected` kullanın. Bir süre içinde bağlanan Node'lara
-filtrelemek için `--last-connected <duration>` kullanın (ör. `24h`, `7d`).
+Yalnızca şu anda bağlı Node'ları göstermek için `--connected` kullanın. Bir süre içinde bağlanan
+Node'lara filtrelemek için `--last-connected <duration>` kullanın (ör. `24h`, `7d`).
 
 Onay notu:
 
 - `openclaw nodes pending` yalnızca eşleştirme kapsamına ihtiyaç duyar.
-- `openclaw nodes approve <requestId>`, ek kapsam gereksinimlerini bekleyen
-  istekten devralır:
+- `gateway.nodes.pairing.autoApproveCidrs`, yalnızca açıkça güvenilen, ilk kez yapılan `role: node` cihaz eşleştirmesi için
+  bekleyen adımını atlayabilir. Varsayılan olarak kapalıdır ve
+  yükseltmeleri onaylamaz.
+- `openclaw nodes approve <requestId>`, bekleyen isteğin
+  ek kapsam gereksinimlerini devralır:
   - komutsuz istek: yalnızca eşleştirme
-  - exec olmayan Node komutları: eşleştirme + yazma
-  - `system.run` / `system.run.prepare` / `system.which`: eşleştirme + yönetici
+  - exec olmayan Node komutları: eşleştirme + write
+  - `system.run` / `system.run.prepare` / `system.which`: eşleştirme + admin
 
 ## Invoke
 
@@ -63,7 +66,7 @@ openclaw nodes invoke --node <id|name|ip> --command <command> --params <json>
 
 Invoke bayrakları:
 
-- `--params <json>`: JSON nesne dizgesi (varsayılan `{}`).
+- `--params <json>`: JSON nesne dizesi (varsayılan `{}`).
 - `--invoke-timeout <ms>`: Node invoke zaman aşımı (varsayılan `15000`).
 - `--idempotency-key <key>`: isteğe bağlı idempotency anahtarı.
 - `system.run` ve `system.run.prepare` burada engellenir; kabuk yürütmesi için `host=node` ile `exec` aracını kullanın.

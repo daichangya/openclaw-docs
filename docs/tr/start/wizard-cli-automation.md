@@ -1,20 +1,20 @@
 ---
 read_when:
-    - İlk kullanım akışını betiklerde veya CI içinde otomatikleştiriyorsunuz
+    - Betiklerde veya CI içinde ilk kurulumu otomatikleştiriyorsunuz
     - Belirli sağlayıcılar için etkileşimsiz örneklere ihtiyacınız var
 sidebarTitle: CLI automation
-summary: OpenClaw CLI için betiklenmiş ilk kullanım akışı ve agent kurulumu
+summary: OpenClaw CLI için betik tabanlı ilk kurulum ve ajan kurulumu
 title: CLI otomasyonu
 x-i18n:
-    generated_at: "2026-04-24T09:32:22Z"
+    generated_at: "2026-04-25T13:57:51Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
+    source_hash: 4d36801439b9243ea5cc0ab93757dde23d1ecd86c8f5b991541ee14f41bf05ac
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
 
-`openclaw onboard` komutunu otomatikleştirmek için `--non-interactive` kullanın.
+`openclaw onboard` otomasyonu için `--non-interactive` kullanın.
 
 <Note>
 `--json`, etkileşimsiz modu ima etmez. Betikler için `--non-interactive` (ve `--workspace`) kullanın.
@@ -32,16 +32,19 @@ openclaw onboard --non-interactive \
   --gateway-bind loopback \
   --install-daemon \
   --daemon-runtime node \
+  --skip-bootstrap \
   --skip-skills
 ```
 
 Makine tarafından okunabilir özet için `--json` ekleyin.
 
-Düz metin değerler yerine auth profillerinde env destekli ref'ler saklamak için `--secret-input-mode ref` kullanın.
-İlk kullanım akışında env ref'leri ile yapılandırılmış sağlayıcı ref'leri (`file` veya `exec`) arasında etkileşimli seçim yapılabilir.
+Otomasyonunuz çalışma alanı dosyalarını önceden tohumluyorsa ve ilk kurulumun varsayılan önyükleme dosyalarını oluşturmasını istemiyorsa `--skip-bootstrap` kullanın.
 
-Etkileşimsiz `ref` modunda sağlayıcı env değişkenleri işlem ortamında ayarlı olmalıdır.
-Eşleşen env değişkeni olmadan satır içi anahtar bayrakları vermek artık hızlı şekilde başarısız olur.
+Düz metin değerler yerine auth profillerinde ortam destekli başvuruları saklamak için `--secret-input-mode ref` kullanın.
+Ortam başvuruları ile yapılandırılmış sağlayıcı başvuruları (`file` veya `exec`) arasında etkileşimli seçim ilk kurulum akışında mevcuttur.
+
+Etkileşimsiz `ref` modunda sağlayıcı ortam değişkenleri süreç ortamında ayarlanmış olmalıdır.
+Eşleşen ortam değişkeni olmadan satır içi anahtar bayrakları geçirmek artık hızlı şekilde başarısız olur.
 
 Örnek:
 
@@ -147,7 +150,7 @@ openclaw onboard --non-interactive \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
-    Go kataloğu için `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` ile değiştirin.
+    Go kataloğu için `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` kullanın.
   </Accordion>
   <Accordion title="Ollama örneği">
     ```bash
@@ -174,7 +177,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` isteğe bağlıdır. Atlanırsa ilk kullanım akışı `CUSTOM_API_KEY` değerini denetler.
+    `--custom-api-key` isteğe bağlıdır. Boş bırakılırsa ilk kurulum `CUSTOM_API_KEY` değerini denetler.
 
     Ref modu varyantı:
 
@@ -192,18 +195,18 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    Bu modda ilk kullanım akışı `apiKey` değerini `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }` olarak saklar.
+    Bu modda ilk kurulum, `apiKey` değerini `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }` olarak saklar.
 
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token, desteklenen bir ilk kullanım token yolu olarak kullanılmaya devam eder, ancak OpenClaw artık mümkün olduğunda Claude CLI yeniden kullanımını tercih eder.
+Anthropic kurulum token'ı hâlâ desteklenen bir ilk kurulum token yolu olarak kullanılabilir, ancak OpenClaw artık mevcut olduğunda Claude CLI yeniden kullanımını tercih eder.
 Üretim için bir Anthropic API anahtarı tercih edin.
 
-## Başka bir agent ekleyin
+## Başka bir ajan ekle
 
-Kendi çalışma alanı,
-oturumları ve auth profilleri olan ayrı bir agent oluşturmak için `openclaw agents add <name>` kullanın. `--workspace` olmadan çalıştırmak sihirbazı başlatır.
+Kendi çalışma alanına,
+oturumlarına ve auth profillerine sahip ayrı bir ajan oluşturmak için `openclaw agents add <name>` kullanın. `--workspace` olmadan çalıştırmak sihirbazı başlatır.
 
 ```bash
 openclaw agents add work \
@@ -222,12 +225,12 @@ Ayarladıkları:
 
 Notlar:
 
-- Varsayılan çalışma alanları `~/.openclaw/workspace-<agentId>` biçimini izler.
-- Gelen iletileri yönlendirmek için `bindings` ekleyin (sihirbaz bunu yapabilir).
+- Varsayılan çalışma alanları `~/.openclaw/workspace-<agentId>` desenini izler.
+- Gelen mesajları yönlendirmek için `bindings` ekleyin (sihirbaz bunu yapabilir).
 - Etkileşimsiz bayraklar: `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
 
 ## İlgili belgeler
 
-- İlk kullanım merkezi: [İlk kullanım (CLI)](/tr/start/wizard)
+- İlk kurulum merkezi: [İlk kurulum (CLI)](/tr/start/wizard)
 - Tam başvuru: [CLI Kurulum Başvurusu](/tr/start/wizard-cli-reference)
 - Komut başvurusu: [`openclaw onboard`](/tr/cli/onboard)

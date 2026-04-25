@@ -1,28 +1,28 @@
 ---
 read_when:
-    - Aracı üzerinden görsel oluşturma
-    - Görsel oluşturma sağlayıcılarını ve modellerini yapılandırma
-    - '`image_generate` araç parametrelerini anlama'
+    - Ajan aracılığıyla görsel üretme
+    - Görsel üretim sağlayıcılarını ve modellerini yapılandırma
+    - image_generate araç parametrelerini anlama
 summary: Yapılandırılmış sağlayıcıları kullanarak görseller oluşturun ve düzenleyin (OpenAI, OpenAI Codex OAuth, Google Gemini, OpenRouter, fal, MiniMax, ComfyUI, Vydra, xAI)
-title: Görsel oluşturma
+title: Görsel üretimi
 x-i18n:
-    generated_at: "2026-04-24T09:35:25Z"
+    generated_at: "2026-04-25T13:58:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 51ffc32165c5e25925460f95f3a6e674a004e6640b7a4b9e88d025eb40943b4b
+    source_hash: 02369928fecac147729ca586cd39e1a88791219ffe26d8e94429d0ea4b1af411
     source_path: tools/image-generation.md
     workflow: 15
 ---
 
-`image_generate` aracı, aracının yapılandırılmış sağlayıcılarınızı kullanarak görseller oluşturmasına ve düzenlemesine olanak tanır. Oluşturulan görseller, aracının yanıtında medya eki olarak otomatik teslim edilir.
+`image_generate` aracı, ajanın yapılandırılmış sağlayıcılarınızı kullanarak görseller oluşturmasına ve düzenlemesine izin verir. Oluşturulan görseller, ajanın yanıtında medya eki olarak otomatik şekilde teslim edilir.
 
 <Note>
-Araç yalnızca en az bir görsel oluşturma sağlayıcısı mevcut olduğunda görünür. Aracınızın araçlarında `image_generate` görünmüyorsa `agents.defaults.imageGenerationModel` yapılandırın, bir sağlayıcı API anahtarı ayarlayın veya OpenAI Codex OAuth ile oturum açın.
+Bu araç yalnızca en az bir görsel üretim sağlayıcısı kullanılabilir olduğunda görünür. Ajanınızın araçlarında `image_generate` görünmüyorsa `agents.defaults.imageGenerationModel` yapılandırın, bir sağlayıcı API anahtarı ayarlayın veya OpenAI Codex OAuth ile oturum açın.
 </Note>
 
 ## Hızlı başlangıç
 
-1. En az bir sağlayıcı için API anahtarı ayarlayın (örneğin `OPENAI_API_KEY`, `GEMINI_API_KEY` veya `OPENROUTER_API_KEY`) ya da OpenAI Codex OAuth ile oturum açın.
+1. En az bir sağlayıcı için bir API anahtarı ayarlayın (örneğin `OPENAI_API_KEY`, `GEMINI_API_KEY` veya `OPENROUTER_API_KEY`) ya da OpenAI Codex OAuth ile oturum açın.
 2. İsteğe bağlı olarak tercih ettiğiniz modeli ayarlayın:
 
 ```json5
@@ -37,34 +37,49 @@ Araç yalnızca en az bir görsel oluşturma sağlayıcısı mevcut olduğunda g
 }
 ```
 
-Codex OAuth aynı `openai/gpt-image-2` model ref'ini kullanır. Bir
-`openai-codex` OAuth profili yapılandırıldığında OpenClaw, görsel isteklerini
+Codex OAuth aynı `openai/gpt-image-2` model başvurusunu kullanır. Bir
+`openai-codex` OAuth profili yapılandırıldığında OpenClaw görsel isteklerini
 önce `OPENAI_API_KEY` denemek yerine aynı OAuth profili üzerinden yönlendirir.
-API anahtarı veya özel/Azure base URL gibi açık özel
-`models.providers.openai` görsel config'i, doğrudan OpenAI Images API yoluna
-yeniden geçiş yapar. LocalAI gibi OpenAI uyumlu LAN uç noktaları için özel
-`models.providers.openai.baseUrl` değerini koruyun ve açıkça
-`browser.ssrfPolicy.dangerouslyAllowPrivateNetwork: true` ile katılın; özel/dahili
-görsel uç noktaları varsayılan olarak engellenmeye devam eder.
+API anahtarı veya özel/Azure base URL gibi açık özel `models.providers.openai`
+görsel yapılandırmaları yeniden doğrudan OpenAI Images API yoluna katılım sağlar.
+LocalAI gibi OpenAI uyumlu LAN uç noktaları için özel
+`models.providers.openai.baseUrl` değerini koruyun ve
+`browser.ssrfPolicy.dangerouslyAllowPrivateNetwork: true` ile açıkça katılım sağlayın; özel/dahili
+görsel uç noktaları varsayılan olarak engellenmiş kalır.
 
-3. Aracıya şunu söyleyin: _"Dost canlısı bir robot maskotu görseli oluştur."_
+3. Ajana şunu söyleyin: _"Dost canlısı bir robot maskotunun görselini üret."_
 
-Aracı `image_generate` aracını otomatik olarak çağırır. Araç allow-list'e alma gerekmez — bir sağlayıcı mevcut olduğunda varsayılan olarak etkindir.
+Ajan `image_generate` aracını otomatik olarak çağırır. Araç izin listesi gerekmez — sağlayıcı mevcut olduğunda varsayılan olarak etkindir.
+
+## Yaygın yollar
+
+| Amaç                                                  | Model başvurusu                                   | Kimlik doğrulama                    |
+| ----------------------------------------------------- | ------------------------------------------------- | ----------------------------------- |
+| API faturalandırmasıyla OpenAI görsel üretimi         | `openai/gpt-image-2`                              | `OPENAI_API_KEY`                    |
+| Codex abonelik kimlik doğrulamasıyla OpenAI görsel üretimi | `openai/gpt-image-2`                          | OpenAI Codex OAuth                  |
+| OpenRouter görsel üretimi                             | `openrouter/google/gemini-3.1-flash-image-preview` | `OPENROUTER_API_KEY`              |
+| Google Gemini görsel üretimi                          | `google/gemini-3.1-flash-image-preview`           | `GEMINI_API_KEY` veya `GOOGLE_API_KEY` |
+
+Aynı `image_generate` aracı hem metinden görsele hem de referans görsel
+düzenlemeye hizmet eder. Tek bir referans için `image`, birden fazla referans için
+`images` kullanın. `quality`, `outputFormat` ve
+OpenAI'ye özgü `background` gibi sağlayıcı destekli çıktı ipuçları, mevcut olduğunda iletilir ve
+bir sağlayıcı bunları desteklemediğinde yok sayıldı olarak raporlanır.
 
 ## Desteklenen sağlayıcılar
 
-| Sağlayıcı | Varsayılan model                        | Düzenleme desteği                   | Auth                                                  |
-| --------- | --------------------------------------- | ----------------------------------- | ----------------------------------------------------- |
-| OpenAI    | `gpt-image-2`                           | Evet (4 görsele kadar)              | `OPENAI_API_KEY` veya OpenAI Codex OAuth              |
-| OpenRouter | `google/gemini-3.1-flash-image-preview` | Evet (5 giriş görseline kadar)      | `OPENROUTER_API_KEY`                                  |
-| Google    | `gemini-3.1-flash-image-preview`        | Evet                                | `GEMINI_API_KEY` veya `GOOGLE_API_KEY`                |
-| fal       | `fal-ai/flux/dev`                       | Evet                                | `FAL_KEY`                                             |
-| MiniMax   | `image-01`                              | Evet (özne referansı)               | `MINIMAX_API_KEY` veya MiniMax OAuth (`minimax-portal`) |
-| ComfyUI   | `workflow`                              | Evet (1 görsel, workflow yapılandırmalı) | bulut için `COMFY_API_KEY` veya `COMFY_CLOUD_API_KEY` |
-| Vydra     | `grok-imagine`                          | Hayır                               | `VYDRA_API_KEY`                                       |
-| xAI       | `grok-imagine-image`                    | Evet (5 görsele kadar)              | `XAI_API_KEY`                                         |
+| Sağlayıcı  | Varsayılan model                         | Düzenleme desteği                  | Kimlik doğrulama                                      |
+| ---------- | --------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
+| OpenAI     | `gpt-image-2`                           | Evet (en fazla 4 görsel)           | `OPENAI_API_KEY` veya OpenAI Codex OAuth              |
+| OpenRouter | `google/gemini-3.1-flash-image-preview` | Evet (en fazla 5 giriş görseli)    | `OPENROUTER_API_KEY`                                  |
+| Google     | `gemini-3.1-flash-image-preview`        | Evet                               | `GEMINI_API_KEY` veya `GOOGLE_API_KEY`                |
+| fal        | `fal-ai/flux/dev`                       | Evet                               | `FAL_KEY`                                             |
+| MiniMax    | `image-01`                              | Evet (özne referansı)              | `MINIMAX_API_KEY` veya MiniMax OAuth (`minimax-portal`) |
+| ComfyUI    | `workflow`                              | Evet (1 görsel, iş akışı yapılandırmalı) | bulut için `COMFY_API_KEY` veya `COMFY_CLOUD_API_KEY` |
+| Vydra      | `grok-imagine`                          | Hayır                              | `VYDRA_API_KEY`                                       |
+| xAI        | `grok-imagine-image`                    | Evet (en fazla 5 görsel)           | `XAI_API_KEY`                                         |
 
-Çalışma zamanında mevcut sağlayıcıları ve modelleri incelemek için `action: "list"` kullanın:
+Çalışma zamanında kullanılabilir sağlayıcıları ve modelleri incelemek için `action: "list"` kullanın:
 
 ```
 /tool image_generate action=list
@@ -73,15 +88,15 @@ Aracı `image_generate` aracını otomatik olarak çağırır. Araç allow-list'
 ## Araç parametreleri
 
 <ParamField path="prompt" type="string" required>
-Görsel oluşturma prompt'u. `action: "generate"` için zorunludur.
+Görsel üretim istemi. `action: "generate"` için gereklidir.
 </ParamField>
 
 <ParamField path="action" type="'generate' | 'list'" default="generate">
-Çalışma zamanında mevcut sağlayıcıları ve modelleri incelemek için `"list"` kullanın.
+Çalışma zamanında kullanılabilir sağlayıcıları ve modelleri incelemek için `"list"` kullanın.
 </ParamField>
 
 <ParamField path="model" type="string">
-Sağlayıcı/model geçersiz kılması, ör. `openai/gpt-image-2`.
+Sağlayıcı/model geçersiz kılması, örneğin `openai/gpt-image-2`.
 </ParamField>
 
 <ParamField path="image" type="string">
@@ -105,15 +120,15 @@ En-boy oranı: `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, 
 </ParamField>
 
 <ParamField path="quality" type="'low' | 'medium' | 'high' | 'auto'">
-Sağlayıcı desteklediğinde kalite ipucu.
+Sağlayıcı bunu desteklediğinde kalite ipucu.
 </ParamField>
 
 <ParamField path="outputFormat" type="'png' | 'jpeg' | 'webp'">
-Sağlayıcı desteklediğinde çıktı biçimi ipucu.
+Sağlayıcı bunu desteklediğinde çıktı biçimi ipucu.
 </ParamField>
 
 <ParamField path="count" type="number">
-Oluşturulacak görsel sayısı (1–4).
+Üretilecek görsel sayısı (1–4).
 </ParamField>
 
 <ParamField path="timeoutMs" type="number">
@@ -128,11 +143,11 @@ Milisaniye cinsinden isteğe bağlı sağlayıcı istek zaman aşımı.
 Yalnızca OpenAI ipuçları: `background`, `moderation`, `outputCompression` ve `user`.
 </ParamField>
 
-Tüm sağlayıcılar tüm parametreleri desteklemez. Bir fallback sağlayıcı tam istenen seçenek yerine yakın bir geometri seçeneğini desteklediğinde OpenClaw, göndermeden önce en yakın desteklenen boyut, en-boy oranı veya çözünürlüğe yeniden eşler. `quality` veya `outputFormat` gibi desteklenmeyen çıktı ipuçları, bu desteği bildirmeyen sağlayıcılar için kaldırılır ve araç sonucunda raporlanır.
+Tüm sağlayıcılar tüm parametreleri desteklemez. Bir geri dönüş sağlayıcısı tam istenen geometri yerine yakın bir geometri seçeneğini desteklediğinde OpenClaw, gönderimden önce en yakın desteklenen boyut, en-boy oranı veya çözünürlüğe yeniden eşler. `quality` veya `outputFormat` gibi desteklenmeyen çıktı ipuçları, bunları desteklediğini bildirmeyen sağlayıcılar için düşürülür ve araç sonucunda raporlanır.
 
-Araç sonuçları uygulanan ayarları bildirir. OpenClaw sağlayıcı fallback'i sırasında geometriyi yeniden eşlediğinde dönen `size`, `aspectRatio` ve `resolution` değerleri gerçekte ne gönderildiyse onu yansıtır ve `details.normalization` istenenden uygulanana çeviriyi yakalar.
+Araç sonuçları uygulanan ayarları raporlar. OpenClaw sağlayıcı geri dönüşü sırasında geometriyi yeniden eşlediğinde döndürülen `size`, `aspectRatio` ve `resolution` değerleri gerçekten gönderileni yansıtır ve `details.normalization` istekten uygulanan ayara çeviriyi yakalar.
 
-## Config
+## Yapılandırma
 
 ### Model seçimi
 
@@ -155,40 +170,43 @@ Araç sonuçları uygulanan ayarları bildirir. OpenClaw sağlayıcı fallback'i
 
 ### Sağlayıcı seçim sırası
 
-Bir görsel oluşturulurken OpenClaw sağlayıcıları şu sırayla dener:
+Bir görsel üretilirken OpenClaw sağlayıcıları şu sırayla dener:
 
-1. Araç çağrısındaki **`model` parametresi** (aracı bir tane belirtirse)
-2. Config'teki **`imageGenerationModel.primary`**
-3. Sırayla **`imageGenerationModel.fallbacks`**
+1. Araç çağrısından gelen **`model` parametresi** (ajan bir tane belirtirse)
+2. Yapılandırmadaki **`imageGenerationModel.primary`**
+3. Sırasıyla **`imageGenerationModel.fallbacks`**
 4. **Otomatik algılama** — yalnızca auth destekli sağlayıcı varsayılanlarını kullanır:
-   - önce geçerli varsayılan sağlayıcı
-   - sonra sağlayıcı kimliği sırasına göre kalan kayıtlı görsel oluşturma sağlayıcıları
+   - önce mevcut varsayılan sağlayıcı
+   - sonra kalan kayıtlı görsel üretim sağlayıcıları sağlayıcı kimliği sırasıyla
 
-Bir sağlayıcı başarısız olursa (auth hatası, oran sınırlaması vb.) bir sonraki aday otomatik denenir. Hepsi başarısız olursa hata her denemeden ayrıntılar içerir.
+Bir sağlayıcı başarısız olursa (auth hatası, hız sınırı vb.), sonraki yapılandırılmış aday otomatik olarak denenir. Hepsi başarısız olursa hata her denemeden ayrıntılar içerir.
 
 Notlar:
 
-- Otomatik algılama auth farkındalığına sahiptir. Bir sağlayıcı varsayılanı aday listesine ancak
-  OpenClaw o sağlayıcıda gerçekten kimlik doğrulaması yapabiliyorsa girer.
-- Otomatik algılama varsayılan olarak etkindir. Görsel oluşturmanın yalnızca açık
-  `model`, `primary` ve `fallbacks` girdilerini kullanmasını istiyorsanız
-  `agents.defaults.mediaGenerationAutoProviderFallback: false` ayarlayın.
-- Geçerli kayıtlı sağlayıcıları, varsayılan modellerini ve auth env var ipuçlarını
-  incelemek için `action: "list"` kullanın.
+- Çağrı başına `model` geçersiz kılması kesindir: OpenClaw yalnızca o sağlayıcı/modeli dener
+  ve yapılandırılmış birincil/geri dönüş veya otomatik algılanan
+  sağlayıcılara devam etmez.
+- Otomatik algılama auth farkındalıklıdır. Bir sağlayıcı varsayılanı, aday listesine yalnızca
+  OpenClaw bu sağlayıcı için gerçekten kimlik doğrulaması yapabildiğinde girer.
+- Otomatik algılama varsayılan olarak etkindir. Görsel
+  üretimin yalnızca açık `model`, `primary` ve `fallbacks`
+  girdilerini kullanmasını istiyorsanız `agents.defaults.mediaGenerationAutoProviderFallback: false` ayarlayın.
+- O anda kayıtlı sağlayıcıları,
+  varsayılan modellerini ve auth env-var ipuçlarını incelemek için `action: "list"` kullanın.
 
 ### Görsel düzenleme
 
-OpenAI, OpenRouter, Google, fal, MiniMax, ComfyUI ve xAI referans görselleri düzenlemeyi destekler. Referans görsel yolu veya URL'si verin:
+OpenAI, OpenRouter, Google, fal, MiniMax, ComfyUI ve xAI referans görselleri düzenlemeyi destekler. Bir referans görsel yolu veya URL'si verin:
 
 ```
-"Bu fotoğrafın suluboya versiyonunu oluştur" + image: "/path/to/photo.jpg"
+"Bu fotoğrafın suluboya sürümünü üret" + image: "/path/to/photo.jpg"
 ```
 
-OpenAI, OpenRouter, Google ve xAI, `images` parametresi üzerinden en fazla 5 referans görseli destekler. fal, MiniMax ve ComfyUI 1 tane destekler.
+OpenAI, OpenRouter, Google ve xAI, `images` parametresi aracılığıyla en fazla 5 referans görseli destekler. fal, MiniMax ve ComfyUI 1 görsel destekler.
 
 ### OpenRouter görsel modelleri
 
-OpenRouter görsel oluşturma, aynı `OPENROUTER_API_KEY` değerini kullanır ve OpenRouter'ın chat completions image API'si üzerinden yönlendirilir. OpenRouter görsel modellerini `openrouter/` önekiyle seçin:
+OpenRouter görsel üretimi aynı `OPENROUTER_API_KEY` değerini kullanır ve OpenRouter'ın sohbet tamamlama görsel API'si üzerinden yönlendirilir. OpenRouter görsel modellerini `openrouter/` önekiyle seçin:
 
 ```json5
 {
@@ -202,26 +220,28 @@ OpenRouter görsel oluşturma, aynı `OPENROUTER_API_KEY` değerini kullanır ve
 }
 ```
 
-OpenClaw, `prompt`, `count`, referans görseller ve Gemini uyumlu `aspectRatio` / `resolution` ipuçlarını OpenRouter'a iletir. Mevcut yerleşik OpenRouter görsel model kısayolları arasında `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview` ve `openai/gpt-5.4-image-2` bulunur; yapılandırılmış Plugin'inizin ne sunduğunu görmek için `action: "list"` kullanın.
+OpenClaw `prompt`, `count`, referans görseller ve Gemini uyumlu `aspectRatio` / `resolution` ipuçlarını OpenRouter'a iletir. Mevcut yerleşik OpenRouter görsel model kısayolları arasında `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview` ve `openai/gpt-5.4-image-2` bulunur; yapılandırdığınız Plugin'in neyi açığa çıkardığını görmek için `action: "list"` kullanın.
 
 ### OpenAI `gpt-image-2`
 
-OpenAI görsel oluşturma varsayılan olarak `openai/gpt-image-2` kullanır. Bir
-`openai-codex` OAuth profili yapılandırılmışsa OpenClaw, Codex abonelik sohbet
-modellerinde kullanılan aynı OAuth profilini yeniden kullanır ve görsel isteğini
-Codex Responses backend'i üzerinden gönderir; bu istek için sessizce
-`OPENAI_API_KEY` değerine fallback yapmaz. Doğrudan OpenAI Images API
-yönlendirmesini zorlamak için `models.providers.openai` değerini API anahtarı,
-özel base URL veya Azure uç noktasıyla açıkça yapılandırın. Daha eski
+OpenAI görsel üretimi varsayılan olarak `openai/gpt-image-2` kullanır. Bir
+`openai-codex` OAuth profili yapılandırılmışsa OpenClaw, Codex abonelik sohbet modelleri tarafından kullanılan aynı OAuth
+profilini yeniden kullanır ve görsel isteğini
+Codex Responses arka ucu üzerinden gönderir. `https://chatgpt.com/backend-api` gibi
+eski Codex base URL'leri, görsel istekleri için
+`https://chatgpt.com/backend-api/codex` biçimine kanonikleştirilir. Bu istek için
+sessizce `OPENAI_API_KEY` değerine geri düşmez. Doğrudan OpenAI
+Images API yönlendirmesini zorlamak için `models.providers.openai` değerini açıkça bir API
+anahtarı, özel base URL veya Azure uç noktasıyla yapılandırın. Eski
 `openai/gpt-image-1` modeli hâlâ açıkça seçilebilir, ancak yeni OpenAI
-görsel oluşturma ve görsel düzenleme istekleri `gpt-image-2` kullanmalıdır.
+görsel üretim ve görsel düzenleme istekleri `gpt-image-2` kullanmalıdır.
 
 `gpt-image-2`, aynı `image_generate` aracı üzerinden hem metinden görsel
-oluşturmayı hem de referans görsel düzenlemeyi destekler. OpenClaw `prompt`,
-`count`, `size`, `quality`, `outputFormat` ve referans görselleri OpenAI'a
-iletir. OpenAI `aspectRatio` veya `resolution` değerlerini doğrudan almaz;
-mümkün olduğunda OpenClaw bunları desteklenen bir `size` değerine eşler, aksi
-halde araç bunları yoksayılan geçersiz kılmalar olarak raporlar.
+üretimi hem de referans görsel düzenlemeyi destekler. OpenClaw `prompt`,
+`count`, `size`, `quality`, `outputFormat` ve referans görselleri OpenAI'a iletir.
+OpenAI `aspectRatio` veya `resolution` değerlerini doğrudan almaz; mümkün olduğunda
+OpenClaw bunları desteklenen bir `size` değerine eşler, aksi takdirde araç bunları
+yok sayılmış geçersiz kılmalar olarak raporlar.
 
 OpenAI'ye özgü seçenekler `openai` nesnesi altında bulunur:
 
@@ -240,37 +260,35 @@ OpenAI'ye özgü seçenekler `openai` nesnesi altında bulunur:
 
 `openai.background`, `transparent`, `opaque` veya `auto` kabul eder; şeffaf
 çıktılar `outputFormat` olarak `png` veya `webp` gerektirir. `openai.outputCompression`
-JPEG/WebP çıktılara uygulanır.
+JPEG/WebP çıktıları için geçerlidir.
 
-Bir adet 4K yatay görsel oluşturun:
-
-```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="OpenClaw image generation için temiz bir editoryal poster" size=3840x2160 count=1
-```
-
-İki kare görsel oluşturun:
+Bir adet 4K yatay görsel üretin:
 
 ```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="Sakin bir üretkenlik uygulaması simgesi için iki görsel yön" size=1024x1024 count=2
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="A clean editorial poster for OpenClaw image generation" size=3840x2160 count=1
 ```
 
-Bir yerel referans görseli düzenleyin:
+İki adet kare görsel üretin:
 
 ```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="Özneyi koru, arka planı parlak bir stüdyo kurulumuyla değiştir" image=/path/to/reference.png size=1024x1536
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Two visual directions for a calm productivity app icon" size=1024x1024 count=2
+```
+
+Bir yerel referans görselini düzenleyin:
+
+```
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Keep the subject, replace the background with a bright studio setup" image=/path/to/reference.png size=1024x1536
 ```
 
 Birden fazla referansla düzenleyin:
 
 ```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="İlk görseldeki karakter kimliğini ikinci görseldeki renk paletiyle birleştir" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Combine the character identity from the first image with the color palette from the second" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
 ```
 
-OpenAI görsel oluşturmayı `api.openai.com` yerine bir Azure OpenAI deployment'ı
-üzerinden yönlendirmek için OpenAI sağlayıcı belgelerindeki
-[Azure OpenAI endpoints](/tr/providers/openai#azure-openai-endpoints) bölümüne bakın.
+OpenAI görsel üretimini `api.openai.com` yerine bir Azure OpenAI dağıtımı üzerinden yönlendirmek için OpenAI sağlayıcı belgelerindeki [Azure OpenAI uç noktaları](/tr/providers/openai#azure-openai-endpoints) bölümüne bakın.
 
-MiniMax görsel oluşturma, paketlenmiş iki MiniMax auth yolu üzerinden de kullanılabilir:
+MiniMax görsel üretimi, paketlenmiş her iki MiniMax auth yolu üzerinden de kullanılabilir:
 
 - API anahtarı kurulumları için `minimax/image-01`
 - OAuth kurulumları için `minimax-portal/image-01`
@@ -279,16 +297,16 @@ MiniMax görsel oluşturma, paketlenmiş iki MiniMax auth yolu üzerinden de kul
 
 | Yetenek               | OpenAI               | Google               | fal                 | MiniMax                    | ComfyUI                            | Vydra   | xAI                  |
 | --------------------- | -------------------- | -------------------- | ------------------- | -------------------------- | ---------------------------------- | ------- | -------------------- |
-| Oluşturma             | Evet (4'e kadar)     | Evet (4'e kadar)     | Evet (4'e kadar)    | Evet (9'a kadar)           | Evet (workflow tanımlı çıktılar)   | Evet (1) | Evet (4'e kadar)     |
-| Düzenleme/referans    | Evet (5 görsele kadar) | Evet (5 görsele kadar) | Evet (1 görsel)   | Evet (1 görsel, özne ref)  | Evet (1 görsel, workflow yapılandırmalı) | Hayır | Evet (5 görsele kadar) |
+| Üretim                | Evet (en fazla 4)    | Evet (en fazla 4)    | Evet (en fazla 4)   | Evet (en fazla 9)          | Evet (iş akışı tanımlı çıktılar)   | Evet (1) | Evet (en fazla 4)    |
+| Düzenleme/referans    | Evet (en fazla 5 görsel) | Evet (en fazla 5 görsel) | Evet (1 görsel) | Evet (1 görsel, özne referansı) | Evet (1 görsel, iş akışı yapılandırmalı) | Hayır | Evet (en fazla 5 görsel) |
 | Boyut denetimi        | Evet (4K'ya kadar)   | Evet                 | Evet                | Hayır                      | Hayır                              | Hayır   | Hayır                |
-| En-boy oranı          | Hayır                | Evet                 | Evet (yalnızca oluşturma) | Evet                  | Hayır                              | Hayır   | Evet                 |
+| En-boy oranı          | Hayır                | Evet                 | Evet (yalnızca üretim) | Evet                     | Hayır                              | Hayır   | Evet                 |
 | Çözünürlük (1K/2K/4K) | Hayır                | Evet                 | Evet                | Hayır                      | Hayır                              | Hayır   | Evet (1K/2K)         |
 
 ### xAI `grok-imagine-image`
 
-Paketlenmiş xAI sağlayıcısı, yalnızca prompt içeren istekler için `/v1/images/generations`
-ve `image` veya `images` mevcut olduğunda `/v1/images/edits` kullanır.
+Paketlenmiş xAI sağlayıcısı, yalnızca istem içeren istekler için `/v1/images/generations`,
+`image` veya `images` mevcut olduğunda ise `/v1/images/edits` kullanır.
 
 - Modeller: `xai/grok-imagine-image`, `xai/grok-imagine-image-pro`
 - Sayı: en fazla 4
@@ -298,18 +316,18 @@ ve `image` veya `images` mevcut olduğunda `/v1/images/edits` kullanır.
 - Çıktılar: OpenClaw tarafından yönetilen görsel ekleri olarak döndürülür
 
 OpenClaw, bu denetimler paylaşılan
-sağlayıcılar arası `image_generate` sözleşmesinde var olana kadar xAI-yerel `quality`, `mask`, `user`
-veya ek yalnızca-yerel en-boy oranlarını bilerek açığa çıkarmaz.
+sağlayıcılar arası `image_generate` sözleşmesinde yer alana kadar xAI'ye özgü `quality`, `mask`, `user` veya
+ek yalnızca yerel en-boy oranlarını bilerek açığa çıkarmaz.
 
 ## İlgili
 
-- [Tools Overview](/tr/tools) — mevcut tüm aracı araçları
+- [Araçlara Genel Bakış](/tr/tools) — kullanılabilir tüm ajan araçları
 - [fal](/tr/providers/fal) — fal görsel ve video sağlayıcı kurulumu
-- [ComfyUI](/tr/providers/comfy) — yerel ComfyUI ve Comfy Cloud workflow kurulumu
+- [ComfyUI](/tr/providers/comfy) — yerel ComfyUI ve Comfy Cloud iş akışı kurulumu
 - [Google (Gemini)](/tr/providers/google) — Gemini görsel sağlayıcı kurulumu
 - [MiniMax](/tr/providers/minimax) — MiniMax görsel sağlayıcı kurulumu
 - [OpenAI](/tr/providers/openai) — OpenAI Images sağlayıcı kurulumu
 - [Vydra](/tr/providers/vydra) — Vydra görsel, video ve konuşma kurulumu
 - [xAI](/tr/providers/xai) — Grok görsel, video, arama, kod yürütme ve TTS kurulumu
-- [Configuration Reference](/tr/gateway/config-agents#agent-defaults) — `imageGenerationModel` config
-- [Models](/tr/concepts/models) — model yapılandırması ve failover
+- [Yapılandırma Başvurusu](/tr/gateway/config-agents#agent-defaults) — `imageGenerationModel` yapılandırması
+- [Modeller](/tr/concepts/models) — model yapılandırması ve hata durumunda devretme

@@ -4,37 +4,31 @@ read_when:
     - QQ Bot kimlik bilgisi kurulumuna ihtiyacınız var
     - QQ Bot grup veya özel sohbet desteği istiyorsunuz
 summary: QQ Bot kurulumu, yapılandırması ve kullanımı
-title: QQ bot
+title: QQ botu
 x-i18n:
-    generated_at: "2026-04-24T08:59:22Z"
+    generated_at: "2026-04-25T13:41:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8127ec59d3a17222e7fe883e77aa1c7d384b231b7d479385421df51c995f7dc2
+    source_hash: 1219f8d6ca3996272b293cc042364300f0fdfea6c7f19585e4ee514ac2182d46
     source_path: channels/qqbot.md
     workflow: 15
 ---
 
-QQ Bot, resmi QQ Bot API'si (WebSocket gateway) üzerinden OpenClaw'a bağlanır. Bu
-Plugin, C2C özel sohbeti, grup @mesajlarını ve zengin medya (görseller, ses, video, dosyalar)
-içeren guild kanal mesajlarını destekler.
+QQ Bot, resmi QQ Bot API'si (WebSocket Gateway) üzerinden OpenClaw'a bağlanır. Plugin; C2C özel sohbeti, grup @mesajlarını ve guild kanal mesajlarını zengin medya (görseller, ses, video, dosyalar) ile destekler.
 
-Durum: paketlenmiş Plugin. Doğrudan mesajlar, grup sohbetleri, guild kanalları ve
-medya desteklenir. Tepkiler ve ileti dizileri desteklenmez.
+Durum: paketle birlikte gelen Plugin. Doğrudan mesajlar, grup sohbetleri, guild kanalları ve medya desteklenir. Tepkiler ve iş parçacıkları desteklenmez.
 
-## Paketlenmiş Plugin
+## Paketle birlikte gelen Plugin
 
-Güncel OpenClaw sürümleri QQ Bot'u paketlenmiş olarak içerir, bu nedenle normal paketlenmiş derlemelerde
-ayrı bir `openclaw plugins install` adımı gerekmez.
+Güncel OpenClaw sürümleri QQ Bot'u paketle birlikte sunar; bu nedenle normal paketlenmiş derlemelerde ayrı bir `openclaw plugins install` adımı gerekmez.
 
 ## Kurulum
 
-1. [QQ Open Platform](https://q.qq.com/) adresine gidin ve kaydolmak / oturum açmak için
-   telefonunuzdaki QQ ile QR kodunu tarayın.
+1. [QQ Open Platform](https://q.qq.com/) adresine gidin ve kayıt olmak / giriş yapmak için telefonunuzdaki QQ ile QR kodunu tarayın.
 2. Yeni bir QQ botu oluşturmak için **Create Bot** seçeneğine tıklayın.
-3. Bot ayarları sayfasında **AppID** ve **AppSecret** değerlerini bulun ve kopyalayın.
+3. Botun ayarlar sayfasında **AppID** ve **AppSecret** değerlerini bulun ve kopyalayın.
 
-> AppSecret düz metin olarak saklanmaz — kaydetmeden sayfadan ayrılırsanız,
-> yenisini yeniden oluşturmanız gerekir.
+> AppSecret düz metin olarak saklanmaz — kaydetmeden sayfadan ayrılırsanız yenisini üretmeniz gerekir.
 
 4. Kanalı ekleyin:
 
@@ -53,7 +47,7 @@ openclaw configure --section channels
 
 ## Yapılandırma
 
-Minimum yapılandırma:
+En düşük yapılandırma:
 
 ```json5
 {
@@ -72,7 +66,7 @@ Varsayılan hesap ortam değişkenleri:
 - `QQBOT_APP_ID`
 - `QQBOT_CLIENT_SECRET`
 
-Dosya destekli AppSecret:
+Dosya tabanlı AppSecret:
 
 ```json5
 {
@@ -88,10 +82,9 @@ Dosya destekli AppSecret:
 
 Notlar:
 
-- Ortam geri dönüşü yalnızca varsayılan QQ Bot hesabı için geçerlidir.
-- `openclaw channels add --channel qqbot --token-file ...`, yalnızca
-  AppSecret'ı sağlar; AppID zaten yapılandırmada veya `QQBOT_APP_ID` içinde ayarlanmış olmalıdır.
-- `clientSecret`, yalnızca düz metin dizeyi değil, SecretRef girdisini de kabul eder.
+- Ortam değişkeni yedeği yalnızca varsayılan QQ Bot hesabı için geçerlidir.
+- `openclaw channels add --channel qqbot --token-file ...` yalnızca AppSecret sağlar; AppID'nin yapılandırmada veya `QQBOT_APP_ID` içinde zaten ayarlanmış olması gerekir.
+- `clientSecret`, yalnızca düz metin dizesi değil, SecretRef girdisini de kabul eder.
 
 ### Çoklu hesap kurulumu
 
@@ -116,8 +109,7 @@ Tek bir OpenClaw örneği altında birden fazla QQ botu çalıştırın:
 }
 ```
 
-Her hesap kendi WebSocket bağlantısını başlatır ve bağımsız bir
-belirteç önbelleği tutar (`appId` ile yalıtılmıştır).
+Her hesap kendi WebSocket bağlantısını başlatır ve bağımsız bir token önbelleğini (`appId` ile yalıtılmış) korur.
 
 CLI ile ikinci bir bot ekleyin:
 
@@ -127,12 +119,12 @@ openclaw channels add --channel qqbot --account bot2 --token "222222222:secret-o
 
 ### Ses (STT / TTS)
 
-STT ve TTS desteği, öncelikli geri dönüşe sahip iki düzeyli yapılandırmayı destekler:
+STT ve TTS desteği, öncelik yedeği ile iki seviyeli yapılandırmayı destekler:
 
-| Ayar | Plugin'e özgü         | Framework geri dönüşü         |
-| ---- | --------------------- | ----------------------------- |
+| Ayar | Plugin'e özgü         | Framework yedeği             |
+| ---- | --------------------- | ---------------------------- |
 | STT  | `channels.qqbot.stt`  | `tools.media.audio.models[0]` |
-| TTS  | `channels.qqbot.tts`  | `messages.tts`                |
+| TTS  | `channels.qqbot.tts`  | `messages.tts`               |
 
 ```json5
 {
@@ -154,70 +146,68 @@ STT ve TTS desteği, öncelikli geri dönüşe sahip iki düzeyli yapılandırma
 
 Devre dışı bırakmak için herhangi birinde `enabled: false` ayarlayın.
 
-Giden ses yükleme/dönüştürme davranışı ayrıca
-`channels.qqbot.audioFormatPolicy` ile ayarlanabilir:
+Gelen QQ ses ekleri, ham ses dosyalarını genel `MediaPaths` dışında tutarken ajanlara ses medya meta verisi olarak sunulur. TTS yapılandırıldığında `[[audio_as_voice]]` düz metin yanıtları TTS sentezler ve yerel bir QQ ses mesajı gönderir.
+
+Giden ses yükleme/dönüştürme davranışı da `channels.qqbot.audioFormatPolicy` ile ayarlanabilir:
 
 - `sttDirectFormats`
 - `uploadDirectFormats`
 - `transcodeEnabled`
 
-## Hedef biçimleri
+## Hedef biçimler
 
-| Biçim                     | Açıklama            |
-| ------------------------- | ------------------- |
-| `qqbot:c2c:OPENID`        | Özel sohbet (C2C)   |
-| `qqbot:group:GROUP_OPENID` | Grup sohbeti       |
-| `qqbot:channel:CHANNEL_ID` | Guild kanalı       |
+| Biçim                      | Açıklama          |
+| -------------------------- | ----------------- |
+| `qqbot:c2c:OPENID`         | Özel sohbet (C2C) |
+| `qqbot:group:GROUP_OPENID` | Grup sohbeti      |
+| `qqbot:channel:CHANNEL_ID` | Guild kanalı      |
 
-> Her botun kendine ait bir kullanıcı OpenID kümesi vardır. Bot A tarafından alınan bir OpenID,
-> Bot B üzerinden mesaj göndermek için **kullanılamaz**.
+> Her botun kendine ait bir kullanıcı OpenID kümesi vardır. Bot A tarafından alınan bir OpenID, Bot B üzerinden mesaj göndermek için **kullanılamaz**.
 
 ## Slash komutları
 
 AI kuyruğundan önce yakalanan yerleşik komutlar:
 
-| Komut         | Açıklama                                                                                           |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| `/bot-ping`   | Gecikme testi                                                                                      |
-| `/bot-version` | OpenClaw framework sürümünü gösterir                                                              |
-| `/bot-help`   | Tüm komutları listeler                                                                             |
-| `/bot-upgrade` | QQBot yükseltme kılavuzu bağlantısını gösterir                                                    |
-| `/bot-logs`   | Son gateway günlüklerini dosya olarak dışa aktarır                                                 |
-| `/bot-approve` | Bekleyen bir QQ Bot eylemini (örneğin C2C veya grup yüklemesini onaylama) yerel akış üzerinden onaylar. |
+| Komut         | Açıklama                                                                                                         |
+| ------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/bot-ping`   | Gecikme testi                                                                                                    |
+| `/bot-version`| OpenClaw framework sürümünü gösterir                                                                             |
+| `/bot-help`   | Tüm komutları listeler                                                                                           |
+| `/bot-upgrade`| QQBot yükseltme kılavuzu bağlantısını gösterir                                                                   |
+| `/bot-logs`   | Son Gateway günlüklerini dosya olarak dışa aktarır                                                               |
+| `/bot-approve`| Bekleyen bir QQ Bot eylemini onaylar (örneğin, bir C2C veya grup yüklemesini yerel akış üzerinden doğrulama). |
 
-Kullanım yardımı için herhangi bir komuta `?` ekleyin (örneğin `/bot-upgrade ?`).
+Kullanım yardımını görmek için herhangi bir komutun sonuna `?` ekleyin (örneğin `/bot-upgrade ?`).
 
 ## Motor mimarisi
 
-QQ Bot, Plugin içinde kendi kendine yeterli bir motor olarak gelir:
+QQ Bot, Plugin içinde kendi kendine yeten bir motor olarak gelir:
 
-- Her hesap, `appId` ile anahtarlanan yalıtılmış bir kaynak yığınına (WebSocket bağlantısı, API istemcisi, belirteç önbelleği, medya depolama kökü) sahiptir. Hesaplar gelen/giden durumu asla paylaşmaz.
-- Çoklu hesap günlükleyicisi, tek bir gateway altında birden fazla bot çalıştırdığınızda tanıların ayrılabilir kalması için günlük satırlarını sahip hesapla etiketler.
-- Gelen, giden ve gateway köprüsü yolları, `~/.openclaw/media` altında tek bir medya payload kökünü paylaşır; böylece yüklemeler, indirmeler ve dönüştürme önbellekleri alt sistem başına bir ağaç yerine korumalı tek bir dizine yerleşir.
-- Kimlik bilgileri standart OpenClaw kimlik bilgisi anlık görüntülerinin parçası olarak yedeklenip geri yüklenebilir; motor, yeni bir QR kod eşleştirmesi gerektirmeden geri yükleme sırasında her hesabın kaynak yığınını yeniden bağlar.
+- Her hesap, `appId` ile anahtarlanan yalıtılmış bir kaynak yığınına (WebSocket bağlantısı, API istemcisi, token önbelleği, medya depolama kökü) sahiptir. Hesaplar gelen/giden durumu asla paylaşmaz.
+- Çoklu hesap günlükleyici, tek bir Gateway altında birden fazla bot çalıştırdığınızda tanılamaların ayrılabilir kalması için günlük satırlarını ilgili hesapla etiketler.
+- Gelen, giden ve Gateway köprüsü yolları `~/.openclaw/media` altında tek bir medya yükü kökünü paylaşır; böylece yüklemeler, indirmeler ve dönüştürme önbellekleri alt sistem başına ağaç yerine tek bir korumalı dizine yerleşir.
+- Kimlik bilgileri, standart OpenClaw kimlik bilgisi anlık görüntülerinin parçası olarak yedeklenip geri yüklenebilir; motor, geri yükleme sırasında her hesabın kaynak yığınını yeni bir QR kodu eşleştirmesi gerektirmeden yeniden bağlar.
 
-## QR kodu ile ilk kurulum
+## QR koduyla eşleme
 
-`AppID:AppSecret` değerini elle yapıştırmaya alternatif olarak, motor bir QQ Bot'u OpenClaw'a bağlamak için QR kodu ile ilk kurulum akışını destekler:
+`AppID:AppSecret` değerini elle yapıştırmaya alternatif olarak motor, bir QQ Bot'u OpenClaw'a bağlamak için QR kodlu eşleme akışını destekler:
 
 1. QQ Bot kurulum yolunu çalıştırın (örneğin `openclaw channels add --channel qqbot`) ve istendiğinde QR kodu akışını seçin.
 2. Oluşturulan QR kodunu, hedef QQ Bot'a bağlı telefon uygulamasıyla tarayın.
-3. Eşleştirmeyi telefonda onaylayın. OpenClaw, dönen kimlik bilgilerini doğru hesap kapsamı altında `credentials/` içine kalıcı olarak kaydeder.
+3. Telefonda eşlemeyi onaylayın. OpenClaw, dönen kimlik bilgilerini doğru hesap kapsamı altında `credentials/` içine kaydeder.
 
-Botun kendisi tarafından üretilen onay istemleri (örneğin, QQ Bot API tarafından sunulan "bu eyleme izin verilsin mi?" akışları), ham QQ istemcisi üzerinden yanıt vermek yerine `/bot-approve` ile kabul edebileceğiniz yerel OpenClaw istemleri olarak gösterilir.
+Botun kendisi tarafından oluşturulan onay istemleri (örneğin, QQ Bot API'sinin sunduğu "bu eyleme izin verilsin mi?" akışları), ham QQ istemcisi üzerinden yanıt vermek yerine `/bot-approve` ile kabul edebileceğiniz yerel OpenClaw istemleri olarak görünür.
 
 ## Sorun giderme
 
 - **Bot "gone to Mars" yanıtı veriyor:** kimlik bilgileri yapılandırılmamış veya Gateway başlatılmamış.
-- **Gelen mesaj yok:** `appId` ve `clientSecret` değerlerinin doğru olduğunu ve
-  botun QQ Open Platform üzerinde etkinleştirildiğini doğrulayın.
-- **`--token-file` ile kurulum hala yapılandırılmamış görünüyor:** `--token-file` yalnızca
-  AppSecret'ı ayarlar. Hâlâ yapılandırmada veya `QQBOT_APP_ID` içinde `appId` gerekir.
-- **Proaktif mesajlar ulaşmıyor:** kullanıcı yakın zamanda etkileşim kurmadıysa QQ bot tarafından başlatılan mesajları engelleyebilir.
-- **Ses yazıya dökülmüyor:** STT'nin yapılandırıldığından ve sağlayıcının erişilebilir olduğundan emin olun.
+- **Gelen mesaj yok:** `appId` ve `clientSecret` değerlerinin doğru olduğunu ve botun QQ Open Platform üzerinde etkinleştirildiğini doğrulayın.
+- **`--token-file` ile kurulum hâlâ yapılandırılmamış görünüyor:** `--token-file` yalnızca AppSecret ayarlar. Yine de yapılandırmada veya `QQBOT_APP_ID` içinde `appId` gerekir.
+- **Proaktif mesajlar ulaşmıyor:** kullanıcı kısa süre önce etkileşime girmediyse QQ, bot tarafından başlatılan mesajları engelleyebilir.
+- **Ses yazıya dökülmüyor:** STT'nin yapılandırıldığından ve sağlayıcıya erişilebildiğinden emin olun.
 
 ## İlgili
 
-- [Eşleştirme](/tr/channels/pairing)
+- [Eşleme](/tr/channels/pairing)
 - [Gruplar](/tr/channels/groups)
 - [Kanal sorun giderme](/tr/channels/troubleshooting)

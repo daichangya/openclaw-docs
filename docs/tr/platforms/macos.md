@@ -1,74 +1,74 @@
 ---
 read_when:
     - macOS uygulaması özelliklerini uygulama
-    - macOS üzerinde gateway yaşam döngüsünü veya Node köprülemesini değiştirme
-summary: OpenClaw macOS yardımcı uygulaması (menü çubuğu + gateway aracısı)
+    - macOS'te Gateway yaşam döngüsünü veya Node köprülemesini değiştirme
+summary: OpenClaw macOS yardımcı uygulaması (menü çubuğu + Gateway aracısı)
 title: macOS uygulaması
 x-i18n:
-    generated_at: "2026-04-24T09:20:28Z"
+    generated_at: "2026-04-25T13:51:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6c7911d0a2e7be7fa437c5ef01a98c0f7da5e44388152ba182581cd2e381ba8b
+    source_hash: 852c93694ebb4ac083b9a44c2e4d6e40274e6e7f3aa6fa664a8eba1a82aaf5b1
     source_path: platforms/macos.md
     workflow: 15
 ---
 
-macOS uygulaması, OpenClaw için **menü çubuğu yardımcı uygulamasıdır**. İzinlere sahiptir,
-Gateway'i yerelde (launchd veya manuel) yönetir/ona bağlanır ve macOS
-yeteneklerini aracıya bir Node olarak açar.
+macOS uygulaması, OpenClaw için **menü çubuğu yardımcı uygulamasıdır**. İzinlerin sahibidir,
+Gateway'i yerelde yönetir/ona bağlanır (launchd veya manuel) ve macOS
+yeteneklerini ajan için bir Node olarak sunar.
 
 ## Ne yapar
 
-- Yerel bildirimleri ve menü çubuğu durumunu gösterir.
-- TCC istemlerine sahiptir (Bildirimler, Erişilebilirlik, Ekran Kaydı, Mikrofon,
+- Menü çubuğunda yerel bildirimleri ve durumu gösterir.
+- TCC istemlerinin sahibidir (Bildirimler, Erişilebilirlik, Ekran Kaydı, Mikrofon,
   Konuşma Tanıma, Automation/AppleScript).
 - Gateway'i çalıştırır veya ona bağlanır (yerel veya uzak).
-- macOS'a özgü araçları açar (Canvas, Kamera, Ekran Kaydı, `system.run`).
-- **Remote** modda yerel Node host hizmetini (launchd) başlatır ve **Local** modda durdurur.
+- macOS'a özgü araçları açığa çıkarır (Canvas, Camera, Screen Recording, `system.run`).
+- Yerel Node host hizmetini **remote** kipte başlatır (launchd) ve **local** kipte durdurur.
 - İsteğe bağlı olarak UI otomasyonu için **PeekabooBridge** barındırır.
-- İstek üzerine genel CLI'yi (`openclaw`) npm, pnpm veya bun ile kurar (uygulama önce npm'i, sonra pnpm'i, sonra bun'ı tercih eder; Gateway için önerilen çalışma zamanı yine Node'dur).
+- İstek üzerine genel CLI'yi (`openclaw`) npm, pnpm veya bun üzerinden kurar (uygulama önce npm'i, sonra pnpm'i, sonra bun'ı tercih eder; Node ise önerilen Gateway çalışma zamanı olmaya devam eder).
 
-## Yerel ve uzak mod
+## Yerel ve uzak kip
 
-- **Local** (varsayılan): uygulama, varsa çalışan yerel Gateway'e bağlanır;
+- **Local** (varsayılan): uygulama, varsa çalışan yerel bir Gateway'e bağlanır;
   yoksa `openclaw gateway install` ile launchd hizmetini etkinleştirir.
-- **Remote**: uygulama, Gateway'e SSH/Tailscale üzerinden bağlanır ve asla
+- **Remote**: uygulama bir Gateway'e SSH/Tailscale üzerinden bağlanır ve asla
   yerel bir süreç başlatmaz.
-  Uygulama, uzak Gateway'in bu Mac'e ulaşabilmesi için yerel **Node host service** hizmetini başlatır.
-  Uygulama, Gateway'i alt süreç olarak başlatmaz.
+  Uygulama, uzak Gateway'in bu Mac'e ulaşabilmesi için yerel **Node host hizmetini** başlatır.
+  Uygulama Gateway'i alt süreç olarak başlatmaz.
   Gateway keşfi artık ham tailnet IP'leri yerine Tailscale MagicDNS adlarını tercih eder,
   böylece tailnet IP'leri değiştiğinde Mac uygulaması daha güvenilir şekilde toparlanır.
 
 ## Launchd denetimi
 
-Uygulama, kullanıcı başına `ai.openclaw.gateway`
-(veya `--profile`/`OPENCLAW_PROFILE` kullanıldığında `ai.openclaw.<profile>`; eski `com.openclaw.*` yine unload edilir) etiketli bir LaunchAgent yönetir.
+Uygulama, `ai.openclaw.gateway` etiketli kullanıcı başına bir LaunchAgent yönetir
+(`--profile`/`OPENCLAW_PROFILE` kullanılırken `ai.openclaw.<profile>`; eski `com.openclaw.*` yine de kaldırılır).
 
 ```bash
 launchctl kickstart -k gui/$UID/ai.openclaw.gateway
 launchctl bootout gui/$UID/ai.openclaw.gateway
 ```
 
-Adlandırılmış profil çalıştırırken etiketi `ai.openclaw.<profile>` ile değiştirin.
+Adlandırılmış bir profil çalıştırıyorsanız etiketi `ai.openclaw.<profile>` ile değiştirin.
 
-LaunchAgent kurulu değilse uygulamadan etkinleştirin veya
+LaunchAgent kurulu değilse bunu uygulamadan etkinleştirin veya
 `openclaw gateway install` çalıştırın.
 
 ## Node yetenekleri (mac)
 
-macOS uygulaması kendini bir Node olarak sunar. Yaygın komutlar:
+macOS uygulaması kendisini bir Node olarak sunar. Yaygın komutlar:
 
 - Canvas: `canvas.present`, `canvas.navigate`, `canvas.eval`, `canvas.snapshot`, `canvas.a2ui.*`
 - Kamera: `camera.snap`, `camera.clip`
 - Ekran: `screen.snapshot`, `screen.record`
 - Sistem: `system.run`, `system.notify`
 
-Node, aracıların neye izin verildiğine karar verebilmesi için bir `permissions` eşlemesi bildirir.
+Node, ajanların neye izin verildiğine karar verebilmesi için bir `permissions` haritası bildirir.
 
-Node service + uygulama IPC:
+Node hizmeti + uygulama IPC:
 
-- Başsız Node host service çalışırken (remote mod), Gateway WS'ye bir Node olarak bağlanır.
-- `system.run`, macOS uygulamasında (UI/TCC bağlamı) yerel Unix soketi üzerinden çalışır; istemler + çıktı uygulama içinde kalır.
+- Headless Node host hizmeti çalışırken (remote kip), bir Node olarak Gateway WS'ye bağlanır.
+- `system.run`, yerel bir Unix soketi üzerinden macOS uygulamasında (UI/TCC bağlamı) yürütülür; istemler + çıktı uygulama içinde kalır.
 
 Diyagram (SCI):
 
@@ -79,10 +79,10 @@ Gateway -> Node Service (WS)
              Mac App (UI + TCC + system.run)
 ```
 
-## Exec approvals (`system.run`)
+## Exec onayları (`system.run`)
 
-`system.run`, macOS uygulamasındaki **Exec approvals** üzerinden denetlenir (Ayarlar → Exec approvals).
-Güvenlik + sor + izin listesi Mac üzerinde şu konumda yerel olarak saklanır:
+`system.run`, macOS uygulamasındaki **Exec approvals** ile kontrol edilir (Ayarlar → Exec approvals).
+Security + ask + allowlist, Mac üzerinde yerel olarak şu dosyada saklanır:
 
 ```
 ~/.openclaw/exec-approvals.json
@@ -109,12 +109,12 @@ Güvenlik + sor + izin listesi Mac üzerinde şu konumda yerel olarak saklanır:
 
 Notlar:
 
-- `allowlist` girdileri çözülmüş binary yolları için glob desenleridir.
-- Kabuk denetimi veya genişletme söz dizimi (`&&`, `||`, `;`, `|`, `` ` ``, `$`, `<`, `>`, `(`, `)`) içeren ham kabuk komut metni, izin listesi kaçırması olarak değerlendirilir ve açık onay gerektirir (veya kabuk binary'sinin izin listesine alınmasını gerektirir).
-- İstemde “Always Allow” seçmek o komutu izin listesine ekler.
-- `system.run` ortam geçersiz kılmaları filtrelenir (`PATH`, `DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4` kaldırılır) ve ardından uygulamanın ortamıyla birleştirilir.
-- Kabuk sarmalayıcıları için (`bash|sh|zsh ... -c/-lc`), istek kapsamlı ortam geçersiz kılmaları küçük, açık bir izin listesine indirgenir (`TERM`, `LANG`, `LC_*`, `COLORTERM`, `NO_COLOR`, `FORCE_COLOR`).
-- İzin listesi modunda her zaman izin ver kararları için, bilinen dispatch sarmalayıcıları (`env`, `nice`, `nohup`, `stdbuf`, `timeout`) sarmalayıcı yolları yerine iç yürütülebilir yolları kalıcılaştırır. Sarmalayıcıyı açmak güvenli değilse otomatik olarak hiçbir izin listesi girdisi kalıcılaştırılmaz.
+- `allowlist` girdileri, çözümlenmiş ikili dosya yolları için glob desenleri veya PATH ile çağrılan komutlar için yalın komut adlarıdır.
+- Kabuk denetimi veya genişletme söz dizimi içeren ham kabuk komut metni (`&&`, `||`, `;`, `|`, `` ` ``, `$`, `<`, `>`, `(`, `)`) izin listesi kaçırması olarak değerlendirilir ve açık onay gerektirir (veya kabuk ikili dosyasının izin listesine alınması gerekir).
+- İstemde “Always Allow” seçildiğinde bu komut izin listesine eklenir.
+- `system.run` ortam geçersiz kılmaları filtrelenir (`PATH`, `DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4` atılır) ve sonra uygulamanın ortamıyla birleştirilir.
+- Kabuk sarmalayıcıları için (`bash|sh|zsh ... -c/-lc`), istek kapsamlı ortam geçersiz kılmaları küçük bir açık izin listesine indirgenir (`TERM`, `LANG`, `LC_*`, `COLORTERM`, `NO_COLOR`, `FORCE_COLOR`).
+- İzin listesi kipinde her zaman izin ver kararları için, bilinen dağıtım sarmalayıcıları (`env`, `nice`, `nohup`, `stdbuf`, `timeout`) sarmalayıcı yolları yerine iç yürütülebilir dosya yollarını kalıcılaştırır. Sarmalayıcıyı açmak güvenli değilse hiçbir izin listesi girdisi otomatik kalıcılaştırılmaz.
 
 ## Deep link'ler
 
@@ -131,35 +131,35 @@ Sorgu parametreleri:
 - `thinking` (isteğe bağlı)
 - `deliver` / `to` / `channel` (isteğe bağlı)
 - `timeoutSeconds` (isteğe bağlı)
-- `key` (isteğe bağlı başıboş mod anahtarı)
+- `key` (isteğe bağlı gözetimsiz kip anahtarı)
 
 Güvenlik:
 
 - `key` olmadan uygulama onay ister.
 - `key` olmadan uygulama, onay istemi için kısa mesaj sınırı uygular ve `deliver` / `to` / `channel` değerlerini yok sayar.
-- Geçerli bir `key` ile çalıştırma başıboştur (kişisel otomasyonlar için amaçlanmıştır).
+- Geçerli bir `key` ile çalıştırma gözetimsizdir (kişisel otomasyonlar için amaçlanmıştır).
 
-## İlk kurulum akışı (tipik)
+## Onboarding akışı (tipik)
 
-1. **OpenClaw.app** kurun ve başlatın.
-2. İzinler kontrol listesini tamamlayın (TCC istemleri).
-3. **Local** modun etkin olduğundan ve Gateway'in çalıştığından emin olun.
+1. **OpenClaw.app** uygulamasını yükleyin ve başlatın.
+2. İzin denetim listesini tamamlayın (TCC istemleri).
+3. **Local** kipin etkin ve Gateway'in çalışıyor olduğundan emin olun.
 4. Terminal erişimi istiyorsanız CLI'yi kurun.
 
 ## Durum dizini yerleşimi (macOS)
 
-OpenClaw durum dizininizi iCloud veya diğer bulut eşlemeli klasörlere koymaktan kaçının.
-Eşitleme destekli yollar gecikme ekleyebilir ve bazen
-oturumlar ile kimlik bilgileri için dosya kilidi/eşitleme yarışlarına neden olabilir.
+OpenClaw durum dizininizi iCloud veya başka bulut eşzamanlı klasörlere koymaktan kaçının.
+Eşzamanlama destekli yollar gecikme ekleyebilir ve bazen
+oturumlar ile kimlik bilgileri için dosya kilidi/eşzamanlama yarışlarına neden olabilir.
 
-Aşağıdaki gibi eşitlenmeyen yerel bir durum yolu tercih edin:
+Şu gibi yerel, eşzamanlanmayan bir durum yolu tercih edin:
 __OC_I18N_900005__
-`openclaw doctor`, durumu şu konumlarda algılarsa:
+`openclaw doctor`, durumun şu yollar altında olduğunu algılarsa:
 
 - `~/Library/Mobile Documents/com~apple~CloudDocs/...`
 - `~/Library/CloudStorage/...`
 
-uyarır ve yeniden yerel yola taşımayı önerir.
+uyarı verir ve yerel bir yola geri taşımayı önerir.
 
 ## Derleme ve geliştirme iş akışı (yerel)
 
@@ -167,49 +167,49 @@ uyarır ve yeniden yerel yola taşımayı önerir.
 - `swift run OpenClaw` (veya Xcode)
 - Uygulamayı paketleyin: `scripts/package-mac-app.sh`
 
-## Gateway bağlantısını hata ayıklama (macOS CLI)
+## Gateway bağlantısında hata ayıklama (macOS CLI)
 
 Uygulamayı başlatmadan, macOS uygulamasının kullandığı aynı Gateway WebSocket el sıkışmasını ve keşif
 mantığını çalıştırmak için hata ayıklama CLI'sini kullanın.
 __OC_I18N_900006__
 Bağlantı seçenekleri:
 
-- `--url <ws://host:port>`: yapılandırmayı geçersiz kılar
-- `--mode <local|remote>`: yapılandırmadan çözümler (varsayılan: yapılandırma veya local)
-- `--probe`: yeni bir sağlık yoklamasını zorlar
+- `--url <ws://host:port>`: config'i geçersiz kıl
+- `--mode <local|remote>`: config'den çözümle (varsayılan: config veya local)
+- `--probe`: yeni bir sağlık probunu zorla
 - `--timeout <ms>`: istek zaman aşımı (varsayılan: `15000`)
 - `--json`: karşılaştırma için yapılandırılmış çıktı
 
 Keşif seçenekleri:
 
-- `--include-local`: “local” olarak filtrelenecek gateway'leri dahil eder
+- `--include-local`: “local” olarak filtrelenecek Gateway'leri dahil et
 - `--timeout <ms>`: genel keşif penceresi (varsayılan: `2000`)
 - `--json`: karşılaştırma için yapılandırılmış çıktı
 
-İpucu: macOS uygulamasının keşif işlem hattısının (`local.` artı yapılandırılmış geniş alan domain'i, geniş alan ve Tailscale Serve geri dönüşleri ile birlikte)
-Node CLI'nin `dns-sd` tabanlı keşfinden
-farklı olup olmadığını görmek için `openclaw gateway discover --json` komutuyla karşılaştırın.
+İpucu: macOS uygulamasının keşif hattının (`local.` artı yapılandırılmış geniş alan etki alanı, geniş alan ve Tailscale Serve yedekleriyle)
+Node CLI'nin `dns-sd` tabanlı keşfinden farklı olup olmadığını görmek için
+`openclaw gateway discover --json` ile karşılaştırın.
 
-## Uzak bağlantı tesisatı (SSH tünelleri)
+## Uzak bağlantı altyapısı (SSH tünelleri)
 
-macOS uygulaması **Remote** modda çalıştığında, yerel UI
+macOS uygulaması **Remote** kipte çalıştığında, yerel UI
 bileşenlerinin uzak bir Gateway ile localhost üzerindeymiş gibi konuşabilmesi için bir SSH tüneli açar.
 
-### Kontrol tüneli (Gateway WebSocket portu)
+### Denetim tüneli (Gateway WebSocket portu)
 
-- **Amaç:** sağlık kontrolleri, durum, Web Chat, yapılandırma ve diğer denetim düzlemi çağrıları.
-- **Yerel port:** Gateway portu (varsayılan `18789`), her zaman kararlıdır.
+- **Amaç:** sağlık denetimleri, durum, Web Chat, config ve diğer kontrol düzlemi çağrıları.
+- **Yerel port:** Gateway portu (varsayılan `18789`), her zaman kararlı.
 - **Uzak port:** uzak host üzerindeki aynı Gateway portu.
-- **Davranış:** rastgele yerel port yoktur; uygulama mevcut sağlıklı tüneli yeniden kullanır
+- **Davranış:** rastgele yerel port yok; uygulama mevcut sağlıklı tüneli yeniden kullanır
   veya gerekirse yeniden başlatır.
 - **SSH biçimi:** BatchMode +
   ExitOnForwardFailure + keepalive seçenekleriyle `ssh -N -L <local>:127.0.0.1:<remote>`.
-- **IP raporlama:** SSH tüneli loopback kullandığı için gateway Node
-  IP'sini `127.0.0.1` olarak görür. Gerçek istemci
-  IP'sinin görünmesini istiyorsanız **Direct (ws/wss)** aktarımı kullanın (bkz. [macOS uzak erişimi](/tr/platforms/mac/remote)).
+- **IP bildirimi:** SSH tüneli loopback kullandığından Gateway, Node
+  IP'sini `127.0.0.1` olarak görür. Gerçek istemci IP'sinin görünmesini istiyorsanız
+  **Direct (ws/wss)** taşımasını kullanın (bkz. [macOS uzaktan erişim](/tr/platforms/mac/remote)).
 
-Kurulum adımları için bkz. [macOS uzak erişimi](/tr/platforms/mac/remote). Protokol
-ayrıntıları için bkz. [Gateway protokolü](/tr/gateway/protocol).
+Kurulum adımları için [macOS uzaktan erişim](/tr/platforms/mac/remote) bölümüne bakın. Protokol
+ayrıntıları için [Gateway protocol](/tr/gateway/protocol) bölümüne bakın.
 
 ## İlgili belgeler
 

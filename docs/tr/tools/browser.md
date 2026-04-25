@@ -1,58 +1,62 @@
 ---
 read_when:
-    - Agent tarafından denetlenen tarayıcı otomasyonu ekleme
-    - OpenClaw'ın kendi Chrome'unuza neden müdahale ettiğini hata ayıklama
-    - macOS uygulamasında tarayıcı ayarlarını + yaşam döngüsünü uygulama
-summary: Tümleşik tarayıcı denetim servisi + eylem komutları
+    - Ajan tarafından kontrol edilen tarayıcı otomasyonu ekleme
+    - openclaw'un kendi Chrome'unuza neden müdahale ettiğini ayıklama
+    - macOS uygulamasında tarayıcı ayarlarını ve yaşam döngüsünü uygulama
+summary: Entegre tarayıcı kontrol hizmeti + eylem komutları
 title: Tarayıcı (OpenClaw tarafından yönetilen)
 x-i18n:
-    generated_at: "2026-04-24T09:33:42Z"
+    generated_at: "2026-04-25T14:03:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 80805676213ef5195093163874a848955b3c25364b20045a8d759d03ac088e14
+    source_hash: 2f6915568d2119d2473fc4ee489a03582ffd34218125835d5e073476d3009896
     source_path: tools/browser.md
     workflow: 15
 ---
 
-OpenClaw, agent'in denetlediği **özel bir Chrome/Brave/Edge/Chromium profili** çalıştırabilir.
-Bu profil kişisel tarayıcınızdan yalıtılmıştır ve
-Gateway içindeki küçük bir yerel denetim servisi üzerinden yönetilir (yalnızca local loopback).
+OpenClaw, ajan tarafından kontrol edilen **özel bir Chrome/Brave/Edge/Chromium profili** çalıştırabilir.
+Bu, kişisel tarayıcınızdan yalıtılmıştır ve Gateway içindeki küçük bir yerel
+kontrol hizmeti aracılığıyla yönetilir (yalnızca loopback).
 
-Başlangıç dostu bakış:
+Başlangıç düzeyi görünüm:
 
-- Bunu **ayrı, yalnızca agent'e ait bir tarayıcı** gibi düşünün.
-- `openclaw` profili kişisel tarayıcı profilinize **dokunmaz**.
-- Agent, güvenli bir hatta **sekme açabilir, sayfaları okuyabilir, tıklayabilir ve yazabilir**.
-- Yerleşik `user` profili, Chrome MCP üzerinden gerçek oturum açılmış Chrome oturumunuza bağlanır.
+- Bunu **ayrı, yalnızca ajana özel bir tarayıcı** olarak düşünün.
+- `openclaw` profili, kişisel tarayıcı profilinize **dokunmaz**.
+- Ajan, güvenli bir alanda **sekme açabilir, sayfaları okuyabilir, tıklayabilir ve yazı yazabilir**.
+- Yerleşik `user` profili, Chrome MCP aracılığıyla gerçek oturum açılmış Chrome oturumunuza bağlanır.
 
-## Elde ettikleriniz
+## Elde edecekleriniz
 
-- Varsayılan olarak turuncu vurguya sahip, **openclaw** adlı ayrı bir tarayıcı profili.
-- Deterministik sekme denetimi (listele/aç/odakla/kapat).
-- Agent eylemleri (tıklama/yazma/sürükleme/seçme), anlık görüntüler, ekran görüntüleri, PDF'ler.
+- **openclaw** adlı ayrı bir tarayıcı profili (varsayılan olarak turuncu vurgu).
+- Deterministik sekme kontrolü (listele/aç/odakla/kapat).
+- Ajan eylemleri (tıkla/yaz/sürükle/seç), anlık görüntüler, ekran görüntüleri, PDF'ler.
+- Tarayıcı plugin'i etkinleştirildiğinde ajanlara anlık görüntü,
+  kararlı sekme, stale-ref ve manuel engel kurtarma döngüsünü öğreten paketlenmiş bir `browser-automation`
+  Skill.
 - İsteğe bağlı çoklu profil desteği (`openclaw`, `work`, `remote`, ...).
 
-Bu tarayıcı günlük ana tarayıcınız **değildir**. Agent otomasyonu ve doğrulama için
+Bu tarayıcı günlük ana tarayıcınız **değildir**. Bu, ajan otomasyonu ve doğrulama için
 güvenli, yalıtılmış bir yüzeydir.
 
 ## Hızlı başlangıç
 
 ```bash
+openclaw browser --browser-profile openclaw doctor
 openclaw browser --browser-profile openclaw status
 openclaw browser --browser-profile openclaw start
 openclaw browser --browser-profile openclaw open https://example.com
 openclaw browser --browser-profile openclaw snapshot
 ```
 
-“Browser disabled” hatası alırsanız bunu yapılandırmada etkinleştirin (aşağıya bakın) ve
+“Browser disabled” alırsanız, bunu config içinde etkinleştirin (aşağıya bakın) ve
 Gateway'i yeniden başlatın.
 
-`openclaw browser` tamamen yoksa veya agent tarayıcı aracının
-kullanılamadığını söylüyorsa [Missing browser command or tool](/tr/tools/browser#missing-browser-command-or-tool) bölümüne gidin.
+`openclaw browser` tamamen yoksa veya ajan tarayıcı aracının
+kullanılamadığını söylüyorsa, [Eksik tarayıcı komutu veya aracı](/tr/tools/browser#missing-browser-command-or-tool) bölümüne gidin.
 
-## Plugin denetimi
+## Plugin kontrolü
 
-Varsayılan `browser` aracı paketli bir plugin'dir. Aynı `browser` araç adını kaydeden başka bir plugin ile değiştirmek için bunu devre dışı bırakın:
+Varsayılan `browser` aracı paketlenmiş bir Plugin'dir. Aynı `browser` araç adını kaydeden başka bir Plugin ile değiştirmek için bunu devre dışı bırakın:
 
 ```json5
 {
@@ -66,13 +70,30 @@ Varsayılan `browser` aracı paketli bir plugin'dir. Aynı `browser` araç adın
 }
 ```
 
-Varsayılanların çalışması için hem `plugins.entries.browser.enabled` **hem de** `browser.enabled=true` gerekir. Yalnızca plugin'i devre dışı bırakmak, `openclaw browser` CLI'yi, `browser.request` Gateway yöntemini, agent aracını ve denetim servisini tek birim halinde kaldırır; `browser.*` yapılandırmanız yerine geçecek çözüm için olduğu gibi kalır.
+Varsayılanlar için hem `plugins.entries.browser.enabled` **hem de** `browser.enabled=true` gerekir. Yalnızca Plugin'i devre dışı bırakmak, `openclaw browser` CLI'sini, `browser.request` gateway yöntemini, ajan aracını ve kontrol hizmetini tek bir birim olarak kaldırır; `browser.*` config'iniz yedek bir çözüm için olduğu gibi kalır.
 
-Tarayıcı yapılandırma değişiklikleri, plugin'in servisini yeniden kaydedebilmesi için Gateway yeniden başlatması gerektirir.
+Tarayıcı config değişiklikleri, Plugin'in hizmetini yeniden kaydedebilmesi için Gateway yeniden başlatması gerektirir.
+
+## Ajan rehberliği
+
+Tarayıcı plugin'i iki düzeyde ajan rehberliği sunar:
+
+- `browser` araç açıklaması, her zaman etkin olan kompakt sözleşmeyi taşır: doğru
+  profili seçin, referansları aynı sekmede tutun, sekme hedefleme için `tabId`/etiketleri kullanın
+  ve çok adımlı işler için tarayıcı Skill'ini yükleyin.
+- Paketlenmiş `browser-automation` Skill'i daha uzun işletim döngüsünü taşır:
+  önce durumu/sekmeleri kontrol edin, görev sekmelerini etiketleyin, işlemden önce anlık görüntü alın, kullanıcı arayüzü değişikliklerinden sonra
+  yeniden anlık görüntü alın,
+  stale ref durumunu bir kez kurtarın ve tahminde bulunmak yerine giriş/2FA/captcha veya
+  kamera/mikrofon engellerini manuel eylem olarak bildirin.
+
+Plugin ile paketlenmiş Skills, Plugin
+etkin olduğunda ajanın kullanılabilir Skills listesinde gösterilir. Tam Skill yönergeleri isteğe bağlı olarak yüklenir, bu nedenle rutin
+dönüşlerde tam token maliyeti ödenmez.
 
 ## Eksik tarayıcı komutu veya aracı
 
-Yükseltmeden sonra `openclaw browser` bilinmiyorsa, `browser.request` eksikse veya agent tarayıcı aracının kullanılamadığını bildiriyorsa olağan neden `browser` değerini içermeyen bir `plugins.allow` listesidir. Bunu ekleyin:
+Yükseltmeden sonra `openclaw browser` bilinmiyorsa, `browser.request` eksikse veya ajan tarayıcı aracının kullanılamadığını bildiriyorsa, olağan neden `browser` öğesini içermeyen bir `plugins.allow` listesidir. Bunu ekleyin:
 
 ```json5
 {
@@ -82,22 +103,22 @@ Yükseltmeden sonra `openclaw browser` bilinmiyorsa, `browser.request` eksikse v
 }
 ```
 
-`browser.enabled=true`, `plugins.entries.browser.enabled=true` ve `tools.alsoAllow: ["browser"]` allowlist üyeliğinin yerini tutmaz — allowlist plugin yüklemeyi kapılar ve araç ilkesi ancak yüklemeden sonra çalışır. `plugins.allow` alanını tamamen kaldırmak da varsayılanı geri getirir.
+`browser.enabled=true`, `plugins.entries.browser.enabled=true` ve `tools.alsoAllow: ["browser"]`, izin listesi üyeliğinin yerini tutmaz — izin listesi Plugin yüklemeyi denetler ve araç ilkesi yalnızca yüklemeden sonra çalışır. `plugins.allow` değerini tamamen kaldırmak da varsayılanı geri yükler.
 
-## Profiller: `openclaw` ile `user`
+## Profiller: `openclaw` ve `user`
 
-- `openclaw`: yönetilen, yalıtılmış tarayıcı (extension gerekmez).
-- `user`: gerçek **oturum açılmış Chrome**
+- `openclaw`: yönetilen, yalıtılmış tarayıcı (uzantı gerekmez).
+- `user`: sizin **gerçek oturum açılmış Chrome**
   oturumunuz için yerleşik Chrome MCP bağlanma profili.
 
-Agent tarayıcı araç çağrıları için:
+Ajan tarayıcı araç çağrıları için:
 
 - Varsayılan: yalıtılmış `openclaw` tarayıcısını kullanın.
 - Mevcut oturum açılmış oturumlar önemliyse ve kullanıcı
-  attach istemine tıklamak/onaylamak için bilgisayar başındaysa `profile="user"` tercih edin.
+  herhangi bir bağlanma istemine tıklayıp onaylamak için bilgisayar başındaysa `profile="user"` tercih edin.
 - Belirli bir tarayıcı modu istediğinizde `profile` açık geçersiz kılmadır.
 
-Yönetilen modu varsayılan yapmak istiyorsanız `browser.defaultProfile: "openclaw"` ayarlayın.
+Varsayılan olarak yönetilen modu istiyorsanız `browser.defaultProfile: "openclaw"` ayarlayın.
 
 ## Yapılandırma
 
@@ -108,14 +129,23 @@ Tarayıcı ayarları `~/.openclaw/openclaw.json` içinde bulunur.
   browser: {
     enabled: true, // varsayılan: true
     ssrfPolicy: {
-      // dangerouslyAllowPrivateNetwork: true, // yalnızca güvenilir özel ağ erişimi için opt in
+      // dangerouslyAllowPrivateNetwork: true, // yalnızca güvenilir özel ağ erişimi için isteğe bağlı etkinleştirin
       // allowPrivateNetwork: true, // eski takma ad
       // hostnameAllowlist: ["*.example.com", "example.com"],
       // allowedHostnames: ["localhost"],
     },
     // cdpUrl: "http://127.0.0.1:18792", // eski tek profil geçersiz kılması
     remoteCdpTimeoutMs: 1500, // uzak CDP HTTP zaman aşımı (ms)
-    remoteCdpHandshakeTimeoutMs: 3000, // uzak CDP WebSocket handshake zaman aşımı (ms)
+    remoteCdpHandshakeTimeoutMs: 3000, // uzak CDP WebSocket el sıkışma zaman aşımı (ms)
+    localLaunchTimeoutMs: 15000, // yerel yönetilen Chrome keşif zaman aşımı (ms)
+    localCdpReadyTimeoutMs: 8000, // başlatma sonrası yerel yönetilen CDP hazır olma zaman aşımı (ms)
+    actionTimeoutMs: 60000, // varsayılan tarayıcı act zaman aşımı (ms)
+    tabCleanup: {
+      enabled: true, // varsayılan: true
+      idleMinutes: 120, // boşta temizlemeyi devre dışı bırakmak için 0 ayarlayın
+      maxTabsPerSession: 8, // oturum başına üst sınırı devre dışı bırakmak için 0 ayarlayın
+      sweepMinutes: 5,
+    },
     defaultProfile: "openclaw",
     color: "#FF4500",
     headless: false,
@@ -124,7 +154,12 @@ Tarayıcı ayarları `~/.openclaw/openclaw.json` içinde bulunur.
     executablePath: "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
     profiles: {
       openclaw: { cdpPort: 18800, color: "#FF4500" },
-      work: { cdpPort: 18801, color: "#0066CC" },
+      work: {
+        cdpPort: 18801,
+        color: "#0066CC",
+        headless: true,
+        executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      },
       user: {
         driver: "existing-session",
         attachOnly: true,
@@ -144,46 +179,74 @@ Tarayıcı ayarları `~/.openclaw/openclaw.json` içinde bulunur.
 
 <AccordionGroup>
 
-<Accordion title="Portlar ve erişilebilirlik">
+<Accordion title="Bağlantı noktaları ve erişilebilirlik">
 
-- Denetim servisi, `gateway.port` değerinden türetilen bir portta local loopback'e bağlanır (varsayılan `18791` = gateway + 2). `gateway.port` veya `OPENCLAW_GATEWAY_PORT` değerini geçersiz kılmak, türetilmiş portları aynı aile içinde kaydırır.
-- Yerel `openclaw` profilleri `cdpPort`/`cdpUrl` değerlerini otomatik atar; bunları yalnızca uzak CDP için ayarlayın. `cdpUrl`, ayarlanmadığında yönetilen yerel CDP portuna varsayılan olur.
-- `remoteCdpTimeoutMs`, uzak (local loopback olmayan) CDP HTTP erişilebilirlik denetimlerine uygulanır; `remoteCdpHandshakeTimeoutMs`, uzak CDP WebSocket handshake'lerine uygulanır.
+- Kontrol hizmeti, `gateway.port` üzerinden türetilen bir bağlantı noktasında loopback'e bağlanır (varsayılan `18791` = gateway + 2). `gateway.port` veya `OPENCLAW_GATEWAY_PORT` geçersiz kılınırsa, türetilen bağlantı noktaları aynı aile içinde kayar.
+- Yerel `openclaw` profilleri `cdpPort`/`cdpUrl` değerlerini otomatik atar; bunları yalnızca uzak CDP için ayarlayın. `cdpUrl`, ayarlanmadığında yönetilen yerel CDP bağlantı noktasını varsayılan olarak kullanır.
+- `remoteCdpTimeoutMs`, uzak (loopback olmayan) CDP HTTP erişilebilirlik kontrolleri için geçerlidir; `remoteCdpHandshakeTimeoutMs` uzak CDP WebSocket el sıkışmaları için geçerlidir.
+- `localLaunchTimeoutMs`, yerel olarak başlatılan yönetilen bir Chrome
+  sürecinin CDP HTTP uç noktasını açığa çıkarması için ayrılan süredir. `localCdpReadyTimeoutMs`,
+  süreç keşfedildikten sonra CDP websocket hazır olma durumu için
+  takip süresidir.
+  Chromium'un
+  yavaş başladığı Raspberry Pi, düşük özellikli VPS veya eski donanımlarda bunları artırın. Değerler 120000 ms ile sınırlandırılır.
+- `actionTimeoutMs`, çağıran taraf `timeoutMs` geçmediğinde tarayıcı `act` istekleri için varsayılan süredir. İstemci taşıma katmanı küçük bir ek tolerans penceresi ekler, böylece uzun beklemeler HTTP sınırında zaman aşımına uğramak yerine tamamlanabilir.
+- `tabCleanup`, birincil ajan tarayıcı oturumları tarafından açılan sekmeler için en iyi çabayla yapılan temizlemedir. Alt ajan, cron ve ACP yaşam döngüsü temizliği yine de oturum sonunda açıkça izlenen sekmelerini kapatır; birincil oturumlar etkin sekmeleri yeniden kullanılabilir tutar, ardından boşta kalan veya fazla izlenen sekmeleri arka planda kapatır.
 
 </Accordion>
 
 <Accordion title="SSRF ilkesi">
 
-- Tarayıcı gezintisi ve sekme açma, gezinti öncesinde SSRF korumasından geçer ve ardından son `http(s)` URL üzerinde best-effort olarak yeniden kontrol edilir.
-- Katı SSRF modunda uzak CDP uç noktası keşfi ve `/json/version` probe'ları (`cdpUrl`) da kontrol edilir.
+- Tarayıcı gezinmesi ve sekme açma işlemi, gezinmeden önce SSRF korumasından geçer ve son `http(s)` URL'sinde sonrasında en iyi çabayla yeniden kontrol edilir.
+- Katı SSRF modunda, uzak CDP uç noktası keşfi ve `/json/version` yoklamaları (`cdpUrl`) da kontrol edilir.
+- Gateway/provider `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` ve `NO_PROXY` ortam değişkenleri OpenClaw tarafından yönetilen tarayıcıyı otomatik olarak proxy'lemez. Yönetilen Chrome varsayılan olarak doğrudan başlatılır, böylece provider proxy ayarları tarayıcı SSRF kontrollerini zayıflatmaz.
+- Yönetilen tarayıcının kendisini proxy'lemek için `browser.extraArgs` üzerinden `--proxy-server=...` veya `--proxy-pac-url=...` gibi açık Chrome proxy bayrakları geçin. Katı SSRF modu, özel ağ tarayıcı erişimi kasıtlı olarak etkinleştirilmedikçe açık tarayıcı proxy yönlendirmesini engeller.
 - `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork` varsayılan olarak kapalıdır; yalnızca özel ağ tarayıcı erişimine bilerek güvenildiğinde etkinleştirin.
-- `browser.ssrfPolicy.allowPrivateNetwork`, eski takma ad olarak desteklenmeye devam eder.
+- `browser.ssrfPolicy.allowPrivateNetwork`, eski bir takma ad olarak desteklenmeye devam eder.
 
 </Accordion>
 
 <Accordion title="Profil davranışı">
 
-- `attachOnly: true`, asla yerel tarayıcı başlatma anlamına gelir; yalnızca zaten çalışıyorsa bağlanır.
-- `color` (üst düzey ve profil başına), hangi profilin etkin olduğunu görebilmeniz için tarayıcı arayüzünü renklendirir.
-- Varsayılan profil `openclaw`'dır (yönetilen bağımsız). Oturum açılmış kullanıcı tarayıcısına dahil olmak için `defaultProfile: "user"` kullanın.
+- `attachOnly: true`, asla yerel bir tarayıcı başlatma anlamına gelir; yalnızca zaten çalışıyorsa bağlanır.
+- `headless`, genel olarak veya yerel yönetilen profil başına ayarlanabilir. Profil başına değerler `browser.headless` değerini geçersiz kılar, böylece yerel olarak başlatılan bir profil headless kalırken diğeri görünür kalabilir.
+- `POST /start?headless=true` ve `openclaw browser start --headless`,
+  `browser.headless` veya profil config'ini yeniden yazmadan
+  yerel yönetilen profiller için tek seferlik bir headless başlatma ister. Mevcut oturum, yalnızca bağlanma ve
+  uzak CDP profilleri bu geçersiz kılmayı reddeder çünkü OpenClaw bu
+  tarayıcı süreçlerini başlatmaz.
+- Linux ana makinelerinde `DISPLAY` veya `WAYLAND_DISPLAY` yoksa, ne ortam ne de profil/genel
+  config açıkça başlıklı modu seçmediğinde yerel yönetilen profiller
+  otomatik olarak varsayılan olarak headless olur. `openclaw browser status --json`
+  `headlessSource` değerini `env`, `profile`, `config`,
+  `request`, `linux-display-fallback` veya `default` olarak bildirir.
+- `OPENCLAW_BROWSER_HEADLESS=1`, geçerli süreç için yerel yönetilen başlatmaları
+  headless olmaya zorlar. `OPENCLAW_BROWSER_HEADLESS=0`, sıradan
+  başlatmalar için başlıklı modu zorlar ve görüntü sunucusu olmayan Linux ana makinelerinde
+  eyleme dönüştürülebilir bir hata döndürür;
+  açık bir `start --headless` isteği yine de o tek başlatma için önceliklidir.
+- `executablePath`, genel olarak veya yerel yönetilen profil başına ayarlanabilir. Profil başına değerler `browser.executablePath` değerini geçersiz kılar, böylece farklı yönetilen profiller farklı Chromium tabanlı tarayıcılar başlatabilir.
+- `color` (üst düzey ve profil başına), hangi profilin etkin olduğunu görebilmeniz için tarayıcı kullanıcı arayüzünü renklendirir.
+- Varsayılan profil `openclaw`'dır (yönetilen bağımsız). Oturum açılmış kullanıcı tarayıcısını tercih etmek için `defaultProfile: "user"` kullanın.
 - Otomatik algılama sırası: Chromium tabanlıysa sistem varsayılan tarayıcısı; aksi halde Chrome → Brave → Edge → Chromium → Chrome Canary.
 - `driver: "existing-session"`, ham CDP yerine Chrome DevTools MCP kullanır. Bu sürücü için `cdpUrl` ayarlamayın.
-- Mevcut bir oturum profili varsayılan olmayan bir Chromium kullanıcı profiline (Brave, Edge vb.) bağlanacaksa `browser.profiles.<name>.userDataDir` ayarlayın.
+- Mevcut oturum profili varsayılan olmayan bir Chromium kullanıcı profiline (Brave, Edge vb.) bağlanacaksa `browser.profiles.<name>.userDataDir` ayarlayın.
 
 </Accordion>
 
 </AccordionGroup>
 
-## Brave kullanın (veya başka bir Chromium tabanlı tarayıcı)
+## Brave'i kullanın (veya başka bir Chromium tabanlı tarayıcıyı)
 
-**Sistem varsayılanı** tarayıcınız Chromium tabanlıysa (Chrome/Brave/Edge/vb.),
-OpenClaw bunu otomatik olarak kullanır. Otomatik algılamayı geçersiz kılmak için `browser.executablePath` ayarlayın:
+**Sistem varsayılan** tarayıcınız Chromium tabanlıysa (Chrome/Brave/Edge/vb.),
+OpenClaw bunu otomatik olarak kullanır. Otomatik algılamayı geçersiz kılmak için `browser.executablePath` ayarlayın. `~`, işletim sistemi ana dizininize genişletilir:
 
 ```bash
 openclaw config set browser.executablePath "/usr/bin/google-chrome"
+openclaw config set browser.profiles.work.executablePath "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-Veya bunu platforma göre yapılandırmada ayarlayın:
+Ya da bunu config içinde platforma göre ayarlayın:
 
 <Tabs>
   <Tab title="macOS">
@@ -215,42 +278,51 @@ Veya bunu platforma göre yapılandırmada ayarlayın:
   </Tab>
 </Tabs>
 
-## Yerel ve uzak denetim
+Profil başına `executablePath` yalnızca OpenClaw'ın
+başlattığı yerel yönetilen profilleri etkiler. `existing-session` profilleri bunun yerine
+zaten çalışan bir tarayıcıya bağlanır ve uzak CDP profilleri `cdpUrl` arkasındaki tarayıcıyı kullanır.
 
-- **Yerel denetim (varsayılan):** Gateway local loopback denetim servisini başlatır ve yerel bir tarayıcı başlatabilir.
-- **Uzak denetim (Node sunucusu):** Tarayıcının bulunduğu makinede bir Node sunucusu çalıştırın; Gateway tarayıcı eylemlerini ona proxy eder.
-- **Uzak CDP:** Uzak Chromium tabanlı bir tarayıcıya bağlanmak için `browser.profiles.<name>.cdpUrl` (veya `browser.cdpUrl`) ayarlayın.
-  Bu durumda OpenClaw yerel tarayıcı başlatmaz.
+## Yerel ve uzak kontrol
 
-Durdurma davranışı profil moduna göre farklılık gösterir:
+- **Yerel kontrol (varsayılan):** Gateway loopback kontrol hizmetini başlatır ve yerel bir tarayıcı başlatabilir.
+- **Uzak kontrol (Node ana makinesi):** tarayıcının bulunduğu makinede bir Node ana makinesi çalıştırın; Gateway tarayıcı eylemlerini buna proxy'ler.
+- **Uzak CDP:** uzak bir Chromium tabanlı tarayıcıya
+  bağlanmak için `browser.profiles.<name>.cdpUrl` (veya `browser.cdpUrl`) ayarlayın. Bu durumda OpenClaw yerel bir tarayıcı başlatmaz.
+- `headless` yalnızca OpenClaw'ın başlattığı yerel yönetilen profilleri etkiler. Mevcut oturum veya uzak CDP tarayıcılarını yeniden başlatmaz ya da değiştirmez.
+- `executablePath` aynı yerel yönetilen profil kuralını izler. Çalışan bir
+  yerel yönetilen profilde bunu değiştirmek, sonraki
+  başlatmada yeni ikilinin kullanılması için o profili yeniden başlatma/uzlaştırma olarak işaretler.
 
-- yerel yönetilen profiller: `openclaw browser stop`, OpenClaw'ın başlattığı tarayıcı sürecini durdurur
-- attach-only ve uzak CDP profilleri: `openclaw browser stop`, aktif
-  denetim oturumunu kapatır ve Playwright/CDP benzetim geçersiz kılmalarını (viewport,
-  color scheme, locale, timezone, offline mode ve benzeri durumları) serbest bırakır;
-  OpenClaw tarafından herhangi bir tarayıcı süreci başlatılmamış olsa bile
+Durdurma davranışı profil moduna göre değişir:
 
-Uzak CDP URL'leri auth içerebilir:
+- yerel yönetilen profiller: `openclaw browser stop`, OpenClaw'ın
+  başlattığı tarayıcı sürecini durdurur
+- yalnızca bağlanma ve uzak CDP profilleri: `openclaw browser stop`, etkin
+  kontrol oturumunu kapatır ve Playwright/CDP öykünme geçersiz kılmalarını (görüntü alanı,
+  renk düzeni, yerel ayar, saat dilimi, çevrimdışı mod ve benzeri durumlar) serbest bırakır;
+  OpenClaw tarafından hiçbir tarayıcı süreci başlatılmamış olsa bile
+
+Uzak CDP URL'leri kimlik doğrulama içerebilir:
 
 - Sorgu token'ları (ör. `https://provider.example?token=<token>`)
-- HTTP Basic auth (ör. `https://user:pass@provider.example`)
+- HTTP Basic kimlik doğrulama (ör. `https://user:pass@provider.example`)
 
 OpenClaw, `/json/*` uç noktalarını çağırırken ve
-CDP WebSocket'e bağlanırken auth'u korur. Token'ları yapılandırma dosyalarına
-commit etmek yerine ortam değişkenlerini veya secret yöneticilerini tercih edin.
+CDP WebSocket'ine bağlanırken kimlik doğrulamayı korur. Token'ları config dosyalarına
+kaydetmek yerine ortam değişkenlerini veya gizli bilgi yöneticilerini tercih edin.
 
-## Node tarayıcı proxy'si (sıfır yapılandırmalı varsayılan)
+## Node tarayıcı proxy'si (sıfır config varsayılanı)
 
-Tarayıcınızın bulunduğu makinede bir **Node sunucusu** çalıştırıyorsanız OpenClaw,
-ek tarayıcı yapılandırması olmadan tarayıcı araç çağrılarını otomatik olarak o Node'a yönlendirebilir.
-Bu, uzak Gateway'ler için varsayılan yoldur.
+Tarayıcınızın bulunduğu makinede bir **Node ana makinesi** çalıştırırsanız, OpenClaw
+ek tarayıcı config'i olmadan tarayıcı araç çağrılarını otomatik olarak bu Node'a yönlendirebilir.
+Bu, uzak gateway'ler için varsayılan yoldur.
 
 Notlar:
 
-- Node sunucusu, yerel tarayıcı denetim sunucusunu bir **proxy komutu** üzerinden açığa çıkarır.
-- Profiller, Node'un kendi `browser.profiles` yapılandırmasından gelir (yerelle aynı).
-- `nodeHost.browserProxy.allowProfiles` isteğe bağlıdır. Eski/varsayılan davranış için boş bırakın: yapılandırılmış tüm profiller, profil oluşturma/silme rotaları dahil proxy üzerinden erişilebilir kalır.
-- `nodeHost.browserProxy.allowProfiles` ayarlarsanız OpenClaw bunu en az ayrıcalık sınırı olarak ele alır: yalnızca allowlist'e alınmış profiller hedeflenebilir ve kalıcı profil oluşturma/silme rotaları proxy yüzeyinde engellenir.
+- Node ana makinesi, yerel tarayıcı kontrol sunucusunu bir **proxy komutu** aracılığıyla açığa çıkarır.
+- Profiller Node'un kendi `browser.profiles` config'inden gelir (yerel ile aynı).
+- `nodeHost.browserProxy.allowProfiles` isteğe bağlıdır. Eski/varsayılan davranış için bunu boş bırakın: profil oluşturma/silme yolları dahil tüm yapılandırılmış profiller proxy üzerinden erişilebilir kalır.
+- `nodeHost.browserProxy.allowProfiles` ayarlarsanız, OpenClaw bunu en az ayrıcalık sınırı olarak değerlendirir: yalnızca izin verilen profiller hedeflenebilir ve kalıcı profil oluşturma/silme yolları proxy yüzeyinde engellenir.
 - İstemiyorsanız devre dışı bırakın:
   - Node üzerinde: `nodeHost.browserProxy.enabled=false`
   - Gateway üzerinde: `gateway.nodes.browser.mode="off"`
@@ -258,8 +330,9 @@ Notlar:
 ## Browserless (barındırılan uzak CDP)
 
 [Browserless](https://browserless.io), HTTPS ve WebSocket üzerinden
-CDP bağlantı URL'leri açığa çıkaran barındırılmış bir Chromium servisidir. OpenClaw her iki biçimi de kullanabilir, ancak
-uzak bir tarayıcı profili için en basit seçenek Browserless'ın bağlantı belgelerindeki doğrudan WebSocket URL'sidir.
+CDP bağlantı URL'leri sunan barındırılan bir Chromium hizmetidir. OpenClaw her iki biçimi de kullanabilir, ancak
+uzak bir tarayıcı profili için en basit seçenek
+Browserless'ın bağlantı belgelerindeki doğrudan WebSocket URL'sidir.
 
 Örnek:
 
@@ -284,35 +357,37 @@ Notlar:
 
 - `<BROWSERLESS_API_KEY>` yerine gerçek Browserless token'ınızı yazın.
 - Browserless hesabınıza uyan bölge uç noktasını seçin (belgelerine bakın).
-- Browserless size bir HTTPS temel URL verirse, doğrudan CDP bağlantısı için bunu `wss://` biçimine dönüştürebilir veya
-  HTTPS URL'yi koruyup OpenClaw'ın `/json/version` keşfi yapmasına izin verebilirsiniz.
+- Browserless size bir HTTPS taban URL veriyorsa, bunu ya doğrudan CDP bağlantısı için
+  `wss://` biçimine dönüştürebilir ya da HTTPS URL'sini koruyup OpenClaw'ın
+  `/json/version` keşfi yapmasına izin verebilirsiniz.
 
 ## Doğrudan WebSocket CDP sağlayıcıları
 
-Bazı barındırılmış tarayıcı servisleri, standart HTTP tabanlı CDP keşfi (`/json/version`) yerine
-**doğrudan bir WebSocket** uç noktası açığa çıkarır. OpenClaw üç
-CDP URL şeklini kabul eder ve doğru bağlantı stratejisini otomatik olarak seçer:
+Bazı barındırılan tarayıcı hizmetleri, standart HTTP tabanlı CDP keşfi (`/json/version`)
+yerine **doğrudan WebSocket** uç noktası sunar. OpenClaw üç
+CDP URL biçimini kabul eder ve doğru bağlantı stratejisini otomatik olarak seçer:
 
 - **HTTP(S) keşfi** — `http://host[:port]` veya `https://host[:port]`.
   OpenClaw, WebSocket hata ayıklayıcı URL'sini keşfetmek için `/json/version` çağırır, ardından
-  bağlanır. WebSocket fallback'i yoktur.
+  bağlanır. WebSocket geri dönüşü yoktur.
 - **Doğrudan WebSocket uç noktaları** — `ws://host[:port]/devtools/<kind>/<id>` veya
-  `wss://...` ile `/devtools/browser|page|worker|shared_worker|service_worker/<id>`
-  yolu. OpenClaw doğrudan WebSocket handshake ile bağlanır ve
-  `/json/version` aşamasını tamamen atlar.
+  `/devtools/browser|page|worker|shared_worker|service_worker/<id>`
+  yolunu içeren `wss://...`. OpenClaw doğrudan WebSocket el sıkışmasıyla bağlanır ve
+  `/json/version` adımını tamamen atlar.
 - **Çıplak WebSocket kökleri** — `ws://host[:port]` veya `wss://host[:port]`, `/devtools/...` yolu olmadan
   (ör. [Browserless](https://browserless.io),
   [Browserbase](https://www.browserbase.com)). OpenClaw önce HTTP
-  `/json/version` keşfini dener (`http`/`https` şemasına normalize ederek);
-  keşif bir `webSocketDebuggerUrl` döndürürse onu kullanır, aksi halde OpenClaw
-  çıplak kökte doğrudan WebSocket handshake'e geri düşer. Bu, yerel bir Chrome'a yöneltilmiş çıplak `ws://` bağlantısının da
-  bağlanmasını sağlar; çünkü Chrome yalnızca `/json/version`
-  çıktısındaki hedefe özgü yolda WebSocket yükseltmelerini kabul eder.
+  `/json/version` keşfini dener (`http`/`https` şemasına normalleştirerek);
+  keşif bir `webSocketDebuggerUrl` döndürürse bu kullanılır, aksi halde OpenClaw
+  çıplak kökte doğrudan WebSocket el sıkışmasına geri döner. Bu sayede
+  yerel bir Chrome'a yönelen çıplak bir `ws://` yine de bağlanabilir, çünkü Chrome yalnızca
+  WebSocket yükseltmelerini `/json/version`
+  tarafından verilen belirli hedef-başına yol üzerinde kabul eder.
 
 ### Browserbase
 
-[Browserbase](https://www.browserbase.com), yerleşik CAPTCHA çözme, gizlilik modu ve residential
-proxy'lerle headless tarayıcı çalıştırmak için bulut tabanlı bir platformdur.
+[Browserbase](https://www.browserbase.com), yerleşik CAPTCHA çözme, gizlilik modu ve konut tipi
+proxy'lerle headless tarayıcılar çalıştırmak için bir bulut platformudur.
 
 ```json5
 {
@@ -333,74 +408,78 @@ proxy'lerle headless tarayıcı çalıştırmak için bulut tabanlı bir platfor
 
 Notlar:
 
-- [Kaydolun](https://www.browserbase.com/sign-up) ve [Overview dashboard](https://www.browserbase.com/overview) üzerinden **API Key**'inizi kopyalayın.
+- [Kaydolun](https://www.browserbase.com/sign-up) ve
+  [Genel Bakış panosundan](https://www.browserbase.com/overview) **API Key** değerinizi kopyalayın.
 - `<BROWSERBASE_API_KEY>` yerine gerçek Browserbase API anahtarınızı yazın.
-- Browserbase, WebSocket bağlantısında tarayıcı oturumunu otomatik oluşturur; bu nedenle
-  elle oturum oluşturma adımı gerekmez.
-- Ücretsiz katman, aynı anda bir oturuma ve ayda bir tarayıcı saatine izin verir.
-  Ücretli plan sınırları için [pricing](https://www.browserbase.com/pricing) sayfasına bakın.
+- Browserbase, WebSocket bağlantısında otomatik olarak bir tarayıcı oturumu oluşturur; bu yüzden
+  manuel oturum oluşturma adımı gerekmez.
+- Ücretsiz katman ayda bir eşzamanlı oturuma ve bir tarayıcı saatine izin verir.
+  Ücretli plan sınırları için [fiyatlandırma](https://www.browserbase.com/pricing) sayfasına bakın.
 - Tam API
-  başvurusu, SDK kılavuzları ve entegrasyon örnekleri için [Browserbase docs](https://docs.browserbase.com) sayfasına bakın.
+  referansı, SDK kılavuzları ve entegrasyon örnekleri için [Browserbase belgelerine](https://docs.browserbase.com) bakın.
 
 ## Güvenlik
 
 Temel fikirler:
 
-- Tarayıcı denetimi yalnızca local loopback'tir; erişim Gateway auth veya Node eşleştirmesi üzerinden akar.
-- Bağımsız local loopback tarayıcı HTTP API'si yalnızca **paylaşılan gizli anahtar auth** kullanır:
-  Gateway token bearer auth, `x-openclaw-password` veya
-  yapılandırılmış Gateway password ile HTTP Basic auth.
-- Tailscale Serve kimlik başlıkları ve `gateway.auth.mode: "trusted-proxy"`,
-  bu bağımsız local loopback tarayıcı API'sini kimlik doğrulamaz.
-- Tarayıcı denetimi etkinse ve paylaşılan gizli anahtar auth yapılandırılmamışsa OpenClaw,
-  başlangıçta `gateway.auth.token` değerini otomatik üretir ve bunu yapılandırmaya kalıcı yazar.
+- Tarayıcı kontrolü yalnızca loopback'tir; erişim Gateway kimlik doğrulaması veya Node eşleştirmesi üzerinden akar.
+- Bağımsız loopback tarayıcı HTTP API'si **yalnızca paylaşılan gizli anahtar kimlik doğrulaması** kullanır:
+  gateway token bearer kimlik doğrulaması, `x-openclaw-password` veya
+  yapılandırılmış gateway parolasıyla HTTP Basic kimlik doğrulama.
+- Tailscale Serve kimlik başlıkları ve `gateway.auth.mode: "trusted-proxy"`
+  bu bağımsız loopback tarayıcı API'sinin kimliğini **doğrulamaz**.
+- Tarayıcı kontrolü etkinse ve yapılandırılmış bir paylaşılan gizli anahtar kimlik doğrulaması yoksa, OpenClaw
+  başlangıçta `gateway.auth.token` değerini otomatik üretir ve config'e kaydeder.
 - `gateway.auth.mode`
-  zaten `password`, `none` veya `trusted-proxy` olduğunda OpenClaw bu token'ı otomatik üretmez.
-- Gateway'i ve tüm Node sunucularını özel ağda (Tailscale) tutun; genel açığa çıkarmadan kaçının.
-- Uzak CDP URL'lerini/token'larını secret gibi değerlendirin; env değişkenlerini veya bir secret yöneticisini tercih edin.
+  zaten `password`, `none` veya `trusted-proxy` olduğunda OpenClaw bu token'ı **otomatik üretmez**.
+- Gateway ve tüm Node ana makinelerini özel bir ağda (Tailscale) tutun; herkese açık erişimden kaçının.
+- Uzak CDP URL'lerini/token'larını gizli bilgi gibi değerlendirin; ortam değişkenlerini veya bir gizli bilgi yöneticisini tercih edin.
 
 Uzak CDP ipuçları:
 
-- Mümkün olduğunda şifrelenmiş uç noktaları (HTTPS veya WSS) ve kısa ömürlü token'ları tercih edin.
-- Uzun ömürlü token'ları doğrudan yapılandırma dosyalarına gömmekten kaçının.
+- Mümkün olduğunda şifreli uç noktaları (HTTPS veya WSS) ve kısa ömürlü token'ları tercih edin.
+- Uzun ömürlü token'ları doğrudan config dosyalarına gömmekten kaçının.
 
 ## Profiller (çoklu tarayıcı)
 
-OpenClaw, birden fazla adlandırılmış profili (yönlendirme yapılandırmaları) destekler. Profiller şunlar olabilir:
+OpenClaw birden fazla adlandırılmış profili (yönlendirme config'leri) destekler. Profiller şunlar olabilir:
 
-- **openclaw-managed**: kendi kullanıcı verisi dizini + CDP portuna sahip, özel bir Chromium tabanlı tarayıcı örneği
-- **remote**: açık bir CDP URL'si (başka yerde çalışan Chromium tabanlı tarayıcı)
-- **existing session**: Chrome DevTools MCP otomatik bağlanma üzerinden mevcut Chrome profiliniz
+- **OpenClaw tarafından yönetilen**: kendi kullanıcı veri dizinine + CDP bağlantı noktasına sahip ayrılmış bir Chromium tabanlı tarayıcı örneği
+- **uzak**: açık bir CDP URL'si (başka bir yerde çalışan Chromium tabanlı tarayıcı)
+- **mevcut oturum**: Chrome DevTools MCP otomatik bağlanma aracılığıyla mevcut Chrome profiliniz
 
 Varsayılanlar:
 
 - `openclaw` profili eksikse otomatik oluşturulur.
-- `user` profili, Chrome MCP existing-session attach için yerleşiktir.
-- `user` dışındaki existing-session profilleri opt-in'dir; bunları `--driver existing-session` ile oluşturun.
-- Yerel CDP portları varsayılan olarak **18800–18899** aralığından ayrılır.
+- `user` profili, Chrome MCP mevcut oturum bağlanması için yerleşiktir.
+- `user` dışındaki mevcut oturum profilleri isteğe bağlıdır; bunları `--driver existing-session` ile oluşturun.
+- Yerel CDP bağlantı noktaları varsayılan olarak **18800–18899** aralığından ayrılır.
 - Bir profil silindiğinde yerel veri dizini Çöp Kutusu'na taşınır.
 
-Tüm denetim uç noktaları `?profile=<name>` kabul eder; CLI ise `--browser-profile` kullanır.
+Tüm kontrol uç noktaları `?profile=<name>` kabul eder; CLI `--browser-profile` kullanır.
 
-## Chrome DevTools MCP üzerinden existing-session
+## Chrome DevTools MCP aracılığıyla mevcut oturum
 
-OpenClaw, resmi Chrome DevTools MCP sunucusu aracılığıyla çalışan bir Chromium tabanlı tarayıcı profiline de bağlanabilir. Bu, o tarayıcı profilinde zaten açık olan sekmeleri ve giriş durumunu yeniden kullanır.
+OpenClaw ayrıca çalışan bir Chromium tabanlı tarayıcı profiline
+resmi Chrome DevTools MCP sunucusu aracılığıyla bağlanabilir. Bu, o tarayıcı profilinde
+zaten açık olan sekmeleri ve oturum açma durumunu yeniden kullanır.
 
 Resmi arka plan ve kurulum başvuruları:
 
-- [Chrome for Developers: Use Chrome DevTools MCP with your browser session](https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session)
+- [Chrome for Developers: Tarayıcı oturumunuzla Chrome DevTools MCP kullanın](https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session)
 - [Chrome DevTools MCP README](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
 Yerleşik profil:
 
 - `user`
 
-İsteğe bağlı: farklı bir ad, renk veya tarayıcı veri dizini istiyorsanız
-kendi özel existing-session profilinizi oluşturun.
+İsteğe bağlı: farklı bir ad, renk veya tarayıcı veri dizini
+istiyorsanız kendi özel mevcut oturum profilinizi oluşturun.
 
 Varsayılan davranış:
 
-- Yerleşik `user` profili, varsayılan yerel Google Chrome profilini hedefleyen Chrome MCP auto-connect kullanır.
+- Yerleşik `user` profili Chrome MCP otomatik bağlanma kullanır; bu,
+  varsayılan yerel Google Chrome profilini hedefler.
 
 Brave, Edge, Chromium veya varsayılan olmayan bir Chrome profili için `userDataDir` kullanın:
 
@@ -421,17 +500,17 @@ Brave, Edge, Chromium veya varsayılan olmayan bir Chrome profili için `userDat
 
 Ardından eşleşen tarayıcıda:
 
-1. O tarayıcının uzaktan hata ayıklama inspect sayfasını açın.
-2. Uzaktan hata ayıklamayı etkinleştirin.
-3. Tarayıcıyı açık tutun ve OpenClaw bağlandığında bağlantı istemini onaylayın.
+1. O tarayıcının uzak hata ayıklama için inceleme sayfasını açın.
+2. Uzak hata ayıklamayı etkinleştirin.
+3. Tarayıcıyı çalışır durumda tutun ve OpenClaw bağlandığında bağlantı istemini onaylayın.
 
-Yaygın inspect sayfaları:
+Yaygın inceleme sayfaları:
 
 - Chrome: `chrome://inspect/#remote-debugging`
 - Brave: `brave://inspect/#remote-debugging`
 - Edge: `edge://inspect/#remote-debugging`
 
-Canlı attach smoke testi:
+Canlı bağlanma smoke testi:
 
 ```bash
 openclaw browser --browser-profile user start
@@ -440,61 +519,86 @@ openclaw browser --browser-profile user tabs
 openclaw browser --browser-profile user snapshot --format ai
 ```
 
-Başarının görünümü:
+Başarılı olduğunda görünüm:
 
 - `status`, `driver: existing-session` gösterir
 - `status`, `transport: chrome-mcp` gösterir
 - `status`, `running: true` gösterir
-- `tabs`, zaten açık tarayıcı sekmelerinizi listeler
-- `snapshot`, seçili canlı sekmeden ref'ler döndürür
+- `tabs`, zaten açık olan tarayıcı sekmelerinizi listeler
+- `snapshot`, seçili canlı sekmeden referanslar döndürür
 
-Attach çalışmıyorsa kontrol edilecekler:
+Bağlantı çalışmıyorsa kontrol edilmesi gerekenler:
 
-- hedef Chromium tabanlı tarayıcı sürümü `144+` mü
-- uzaktan hata ayıklama o tarayıcının inspect sayfasında etkin mi
-- tarayıcı attach onay istemini gösterdi mi ve siz kabul ettiniz mi
-- `openclaw doctor`, eski extension tabanlı tarayıcı yapılandırmasını taşır ve
-  varsayılan otomatik bağlanma profilleri için Chrome'un yerelde kurulu olduğunu denetler, ancak sizin yerinize tarayıcı tarafı uzaktan hata ayıklamayı etkinleştiremez
+- hedef Chromium tabanlı tarayıcı sürümü `144+` olmalı
+- o tarayıcının inceleme sayfasında uzak hata ayıklama etkin olmalı
+- tarayıcı bağlantı onay istemini göstermiş olmalı ve siz kabul etmiş olmalısınız
+- `openclaw doctor`, eski uzantı tabanlı tarayıcı config'ini taşır ve
+  varsayılan otomatik bağlanma profilleri için Chrome'un yerel olarak kurulu olduğunu kontrol eder, ancak
+  sizin yerinize tarayıcı tarafı uzak hata ayıklamayı etkinleştiremez
 
-Agent kullanımı:
+Ajan kullanımı:
 
-- Kullanıcının giriş yapmış tarayıcı durumuna ihtiyacınız olduğunda `profile="user"` kullanın.
-- Özel bir existing-session profili kullanıyorsanız o açık profil adını geçin.
-- Bu modu yalnızca kullanıcı attach
+- Kullanıcının oturum açmış tarayıcı durumuna ihtiyacınız olduğunda `profile="user"` kullanın.
+- Özel bir mevcut oturum profili kullanıyorsanız, bu açık profil adını geçin.
+- Bu modu yalnızca kullanıcı bağlanma
   istemini onaylamak için bilgisayar başındayken seçin.
-- Gateway veya Node sunucusu `npx chrome-devtools-mcp@latest --autoConnect` çalıştırabilir
+- Gateway veya Node ana makinesi `npx chrome-devtools-mcp@latest --autoConnect` başlatabilir
 
 Notlar:
 
-- Bu yol, giriş yapılmış tarayıcı oturumunuz içinde
-  eylem yapabildiği için yalıtılmış `openclaw` profiline göre daha yüksek risklidir.
+- Bu yol, oturum açılmış tarayıcı oturumunuz içinde
+  işlem yapabildiği için yalıtılmış `openclaw` profilinden daha yüksek risklidir.
 - OpenClaw bu sürücü için tarayıcıyı başlatmaz; yalnızca bağlanır.
-- OpenClaw burada resmi Chrome DevTools MCP `--autoConnect` akışını kullanır. `userDataDir`
-  ayarlıysa hedef kullanıcı veri dizinini seçmek için iletilir.
-- Existing-session, seçilen host üzerinde veya bağlı bir
-  tarayıcı Node'u üzerinden bağlanabilir. Chrome başka yerde yaşıyorsa ve tarayıcı Node'u bağlı değilse
-  bunun yerine uzak CDP veya bir Node sunucusu kullanın.
+- OpenClaw burada resmi Chrome DevTools MCP `--autoConnect` akışını kullanır. Eğer
+  `userDataDir` ayarlıysa, o kullanıcı veri dizinini hedeflemek için aktarılır.
+- Mevcut oturum seçili ana makinede veya bağlı bir
+  tarayıcı Node'u üzerinden bağlanabilir. Chrome başka yerdeyse ve bağlı bir tarayıcı Node'u yoksa,
+  bunun yerine uzak CDP veya bir Node ana makinesi kullanın.
 
-<Accordion title="Existing-session özellik sınırlamaları">
+### Özel Chrome MCP başlatma
 
-Yönetilen `openclaw` profiline kıyasla existing-session sürücüleri daha kısıtlıdır:
+Varsayılan
+`npx chrome-devtools-mcp@latest` akışı istediğiniz şey değilse (çevrimdışı ana makineler,
+sabitlenmiş sürümler, vendored ikililer) profil başına başlatılan Chrome DevTools MCP sunucusunu geçersiz kılın:
 
-- **Ekran görüntüleri** — sayfa yakalamaları ve `--ref` öğe yakalamaları çalışır; CSS `--element` seçicileri çalışmaz. `--full-page`, `--ref` veya `--element` ile birleştirilemez. Sayfa veya ref tabanlı öğe ekran görüntüleri için Playwright gerekmez.
-- **Eylemler** — `click`, `type`, `hover`, `scrollIntoView`, `drag` ve `select`, snapshot ref'leri gerektirir (CSS seçicileri yok). `click` yalnızca sol düğme içindir. `type`, `slowly=true` desteklemez; `fill` veya `press` kullanın. `press`, `delayMs` desteklemez. `type`, `hover`, `scrollIntoView`, `drag`, `select`, `fill` ve `evaluate`, çağrı başına zaman aşımı desteklemez. `select` tek bir değer kabul eder.
-- **Wait / upload / dialog** — `wait --url`, tam, alt dize ve glob desenlerini destekler; `wait --load networkidle` desteklenmez. Upload hook'ları `ref` veya `inputRef` gerektirir, her seferinde bir dosya, CSS `element` yoktur. Dialog hook'ları zaman aşımı geçersiz kılmaları desteklemez.
-- **Yalnızca yönetilen özellikler** — toplu eylemler, PDF dışa aktarma, indirme yakalama ve `responsebody` yine yönetilen tarayıcı yolunu gerektirir.
+| Alan        | Ne işe yarar                                                                                                                |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `mcpCommand` | `npx` yerine başlatılacak yürütülebilir dosya. Olduğu gibi çözülür; mutlak yollar desteklenir.                             |
+| `mcpArgs`    | `mcpCommand` öğesine olduğu gibi geçirilen argüman dizisi. Varsayılan `chrome-devtools-mcp@latest --autoConnect` argümanlarının yerini alır. |
+
+Bir `existing-session` profili üzerinde `cdpUrl` ayarlandığında, OpenClaw
+`--autoConnect` adımını atlar ve uç noktayı otomatik olarak Chrome MCP'ye iletir:
+
+- `http(s)://...` → `--browserUrl <url>` (DevTools HTTP keşif uç noktası).
+- `ws(s)://...` → `--wsEndpoint <url>` (doğrudan CDP WebSocket).
+
+Uç nokta bayrakları ve `userDataDir` birlikte kullanılamaz: `cdpUrl` ayarlandığında,
+Chrome MCP başlatması için `userDataDir` yok sayılır, çünkü Chrome MCP bir profil
+dizini açmak yerine uç noktanın arkasındaki çalışan tarayıcıya bağlanır.
+
+<Accordion title="Mevcut oturum özellik sınırlamaları">
+
+Yönetilen `openclaw` profiliyle karşılaştırıldığında, mevcut oturum sürücüleri daha sınırlıdır:
+
+- **Ekran görüntüleri** — sayfa yakalamaları ve `--ref` öğe yakalamaları çalışır; CSS `--element` seçicileri çalışmaz. `--full-page`, `--ref` veya `--element` ile birlikte kullanılamaz. Sayfa veya ref tabanlı öğe ekran görüntüleri için Playwright gerekmez.
+- **Eylemler** — `click`, `type`, `hover`, `scrollIntoView`, `drag` ve `select`, anlık görüntü ref'leri gerektirir (CSS seçicisi yoktur). `click-coords`, görünür görüntü alanı koordinatlarına tıklar ve anlık görüntü ref'i gerektirmez. `click` yalnızca sol düğme içindir. `type`, `slowly=true` desteği vermez; `fill` veya `press` kullanın. `press`, `delayMs` desteği vermez. `type`, `hover`, `scrollIntoView`, `drag`, `select`, `fill` ve `evaluate`, çağrı başına zaman aşımı desteği vermez. `select` tek bir değer kabul eder.
+- **Bekleme / yükleme / iletişim kutusu** — `wait --url`, tam eşleşme, alt dize ve glob desenlerini destekler; `wait --load networkidle` desteklenmez. Yükleme kancaları `ref` veya `inputRef` gerektirir, bir seferde tek dosya destekler, CSS `element` desteklemez. İletişim kutusu kancaları zaman aşımı geçersiz kılmalarını desteklemez.
+- **Yalnızca yönetilen özellikler** — toplu eylemler, PDF dışa aktarma, indirme yakalama ve `responsebody` hâlâ yönetilen tarayıcı yolunu gerektirir.
 
 </Accordion>
 
 ## Yalıtım garantileri
 
-- **Özel kullanıcı veri dizini**: kişisel tarayıcı profilinize asla dokunmaz.
-- **Özel portlar**: geliştirme iş akışlarıyla çakışmayı önlemek için `9222` kullanılmaz.
-- **Deterministik sekme denetimi**: hedef sekmeler `targetId` ile seçilir, “son sekme” ile değil.
+- **Ayrılmış kullanıcı veri dizini**: kişisel tarayıcı profilinize asla dokunmaz.
+- **Ayrılmış bağlantı noktaları**: geliştirme iş akışlarıyla çakışmaları önlemek için `9222` kullanılmaz.
+- **Deterministik sekme kontrolü**: `tabs`, önce `suggestedTargetId`, ardından
+  `t1` gibi kararlı `tabId` tanıtıcıları, isteğe bağlı etiketler ve ham `targetId` döndürür.
+  Ajanlar `suggestedTargetId` değerini yeniden kullanmalıdır; ham kimlikler
+  ayıklama ve uyumluluk için kullanılabilir kalır.
 
 ## Tarayıcı seçimi
 
-Yerelde başlatırken OpenClaw ilk bulunanı seçer:
+Yerel olarak başlatırken OpenClaw ilk kullanılabilir olanı seçer:
 
 1. Chrome
 2. Brave
@@ -506,41 +610,43 @@ Bunu `browser.executablePath` ile geçersiz kılabilirsiniz.
 
 Platformlar:
 
-- macOS: `/Applications` ve `~/Applications` denetlenir.
-- Linux: `google-chrome`, `brave`, `microsoft-edge`, `chromium` vb. aranır.
-- Windows: yaygın kurulum konumları denetlenir.
+- macOS: `/Applications` ve `~/Applications` konumlarını kontrol eder.
+- Linux: `/usr/bin`,
+  `/snap/bin`, `/opt/google`, `/opt/brave.com`, `/usr/lib/chromium` ve
+  `/usr/lib/chromium-browser` altındaki yaygın Chrome/Brave/Edge/Chromium konumlarını kontrol eder.
+- Windows: yaygın kurulum konumlarını kontrol eder.
 
-## Denetim API'si (isteğe bağlı)
+## Kontrol API'si (isteğe bağlı)
 
-Betik yazımı ve hata ayıklama için Gateway, küçük bir **yalnızca local loopback HTTP
-denetim API'si** ile eşleşen bir `openclaw browser` CLI açığa çıkarır (anlık görüntüler, ref'ler, wait
-güçlendirmeleri, JSON çıktısı, hata ayıklama iş akışları). Tam başvuru için
-bkz. [Browser control API](/tr/tools/browser-control).
+Betik yazma ve ayıklama için Gateway küçük bir **yalnızca loopback HTTP
+kontrol API'si** ve buna karşılık gelen bir `openclaw browser` CLI'si sunar (anlık görüntüler, ref'ler, bekleme
+güçlendirmeleri, JSON çıktısı, ayıklama iş akışları). Tam başvuru için
+[Tarıcıcı kontrol API'si](/tr/tools/browser-control) bölümüne bakın.
 
 ## Sorun giderme
 
-Linux'a özgü sorunlar için (özellikle snap Chromium) bkz.
-[Browser troubleshooting](/tr/tools/browser-linux-troubleshooting).
+Linux'a özgü sorunlar için (özellikle snap Chromium), bkz.
+[Tarayıcı sorun giderme](/tr/tools/browser-linux-troubleshooting).
 
-WSL2 Gateway + Windows Chrome bölünmüş host kurulumları için bkz.
-[WSL2 + Windows + remote Chrome CDP troubleshooting](/tr/tools/browser-wsl2-windows-remote-cdp-troubleshooting).
+WSL2 Gateway + Windows Chrome bölünmüş ana makine kurulumları için bkz.
+[WSL2 + Windows + uzak Chrome CDP sorun giderme](/tr/tools/browser-wsl2-windows-remote-cdp-troubleshooting).
 
-### CDP başlangıç hatası ile gezinme SSRF engeli
+### CDP başlatma hatası ile gezinme SSRF engeli
 
 Bunlar farklı hata sınıflarıdır ve farklı kod yollarına işaret ederler.
 
-- **CDP başlangıç veya hazırlık hatası**, OpenClaw'ın tarayıcı denetim düzleminin sağlıklı olduğunu doğrulayamadığı anlamına gelir.
-- **Gezinme SSRF engeli**, tarayıcı denetim düzleminin sağlıklı olduğu ancak bir sayfa gezinme hedefinin ilke tarafından reddedildiği anlamına gelir.
+- **CDP başlatma veya hazır olma hatası**, OpenClaw'ın tarayıcı kontrol düzleminin sağlıklı olduğunu doğrulayamadığı anlamına gelir.
+- **Gezinme SSRF engeli**, tarayıcı kontrol düzleminin sağlıklı olduğu, ancak bir sayfa gezinme hedefinin ilke tarafından reddedildiği anlamına gelir.
 
 Yaygın örnekler:
 
-- CDP başlangıç veya hazırlık hatası:
+- CDP başlatma veya hazır olma hatası:
   - `Chrome CDP websocket for profile "openclaw" is not reachable after start`
   - `Remote CDP for profile "<name>" is not reachable at <cdpUrl>`
 - Gezinme SSRF engeli:
-  - `open`, `navigate`, snapshot veya sekme açma akışları, `start` ve `tabs` hâlâ çalışırken tarayıcı/ağ ilkesi hatasıyla başarısız olur
+  - `open`, `navigate`, anlık görüntü veya sekme açma akışları bir tarayıcı/ağ ilkesi hatasıyla başarısız olurken `start` ve `tabs` yine de çalışır
 
-Bu ikisini ayırmak için şu asgari sıralamayı kullanın:
+İkisini ayırmak için şu en düşük diziyi kullanın:
 
 ```bash
 openclaw browser --browser-profile openclaw start
@@ -548,47 +654,48 @@ openclaw browser --browser-profile openclaw tabs
 openclaw browser --browser-profile openclaw open https://example.com
 ```
 
-Sonuçlar nasıl okunur:
+Sonuçları okuma şekli:
 
-- `start`, `not reachable after start` ile başarısız olursa önce CDP hazırlığını giderin.
-- `start` başarılı ama `tabs` başarısızsa denetim düzlemi hâlâ sağlıksızdır. Bunu sayfa-gezinme sorunu değil, CDP erişilebilirlik sorunu olarak değerlendirin.
-- `start` ve `tabs` başarılı ama `open` veya `navigate` başarısızsa tarayıcı denetim düzlemi ayaktadır ve hata gezinme ilkesi veya hedef sayfadadır.
-- `start`, `tabs` ve `open` başarılıysa temel yönetilen tarayıcı denetim yolu sağlıklıdır.
+- `start`, `not reachable after start` ile başarısız olursa önce CDP hazır olma durumunu giderin.
+- `start` başarılı olup `tabs` başarısız olursa kontrol düzlemi hâlâ sağlıklı değildir. Bunu sayfa gezinme sorunu değil, CDP erişilebilirlik sorunu olarak değerlendirin.
+- `start` ve `tabs` başarılı olup `open` veya `navigate` başarısız olursa tarayıcı kontrol düzlemi çalışıyordur ve hata gezinme ilkesi veya hedef sayfadadır.
+- `start`, `tabs` ve `open` üçü de başarılı olursa temel yönetilen tarayıcı kontrol yolu sağlıklıdır.
 
 Önemli davranış ayrıntıları:
 
-- Tarayıcı yapılandırması, `browser.ssrfPolicy` ayarlamasanız bile varsayılan olarak kapalı başarısız SSRF ilke nesnesine sahiptir.
-- Yerel local loopback `openclaw` yönetilen profili için CDP sağlık denetimleri, OpenClaw'ın kendi yerel denetim düzlemi için tarayıcı SSRF erişilebilirlik uygulamasını bilerek atlar.
-- Gezinme koruması ayrıdır. Başarılı `start` veya `tabs` sonucu, daha sonraki `open` veya `navigate` hedefinin izinli olduğu anlamına gelmez.
+- Tarayıcı config'i, `browser.ssrfPolicy` yapılandırmasanız bile varsayılan olarak fail-closed bir SSRF ilke nesnesi kullanır.
+- Yerel loopback `openclaw` yönetilen profili için CDP sağlık kontrolleri, OpenClaw'ın kendi yerel kontrol düzlemi için tarayıcı SSRF erişilebilirlik zorlamasını bilinçli olarak atlar.
+- Gezinme koruması ayrıdır. `start` veya `tabs` sonucunun başarılı olması, daha sonra `open` veya `navigate` hedefinin izinli olduğu anlamına gelmez.
 
-Güvenlik yönergeleri:
+Güvenlik rehberi:
 
-- Varsayılan olarak tarayıcı SSRF ilkesini gevşetmeyin.
-- Geniş özel ağ erişimi yerine `hostnameAllowlist` veya `allowedHostnames` gibi dar host istisnalarını tercih edin.
-- `dangerouslyAllowPrivateNetwork: true` ayarını yalnızca özel ağ tarayıcı erişiminin gerekli ve gözden geçirilmiş olduğu bilerek güvenilen ortamlarda kullanın.
+- Varsayılan olarak tarayıcı SSRF ilkesini **gevşetmeyin**.
+- Geniş özel ağ erişimi yerine `hostnameAllowlist` veya `allowedHostnames` gibi dar ana makine istisnalarını tercih edin.
+- `dangerouslyAllowPrivateNetwork: true` seçeneğini yalnızca özel ağ tarayıcı erişiminin gerekli ve incelenmiş olduğu, kasıtlı olarak güvenilen ortamlarda kullanın.
 
-## Agent araçları + denetimin nasıl çalıştığı
+## Ajan araçları + kontrolün çalışma şekli
 
-Agent tarayıcı otomasyonu için **tek bir araç** alır:
+Ajan, tarayıcı otomasyonu için **tek bir araç** alır:
 
-- `browser` — status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
+- `browser` — doctor/status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
 
-Nasıl eşlenir:
+Eşlemesi:
 
-- `browser snapshot`, kararlı bir UI ağacı döndürür (AI veya ARIA).
-- `browser act`, tıklamak/yazmak/sürüklemek/seçmek için snapshot `ref` kimliklerini kullanır.
-- `browser screenshot`, piksel yakalar (tam sayfa veya öğe).
+- `browser snapshot`, kararlı bir kullanıcı arayüzü ağacı döndürür (AI veya ARIA).
+- `browser act`, tıklama/yazma/sürükleme/seçme için anlık görüntü `ref` kimliklerini kullanır.
+- `browser screenshot`, pikselleri yakalar (tam sayfa, öğe veya etiketli ref'ler).
+- `browser doctor`, Gateway, Plugin, profil, tarayıcı ve sekme hazır olma durumunu kontrol eder.
 - `browser` şunları kabul eder:
-  - adlandırılmış bir tarayıcı profili seçmek için `profile` (`openclaw`, `chrome` veya uzak CDP).
-  - tarayıcının nerede yaşadığını seçmek için `target` (`sandbox` | `host` | `node`).
+  - adlandırılmış bir tarayıcı profili seçmek için `profile` (openclaw, chrome veya uzak CDP).
+  - tarayıcının nerede bulunduğunu seçmek için `target` (`sandbox` | `host` | `node`).
   - Sandbox'lı oturumlarda `target: "host"` için `agents.defaults.sandbox.browser.allowHostControl=true` gerekir.
-  - `target` atlanırsa: sandbox'lı oturumlar varsayılan olarak `sandbox`, sandbox'sız oturumlar varsayılan olarak `host` kullanır.
-  - Tarayıcı yetenekli bir Node bağlıysa, `target="host"` veya `target="node"` ile sabitlemediğiniz sürece araç buna otomatik yönlenebilir.
+  - `target` belirtilmezse: sandbox'lı oturumlar varsayılan olarak `sandbox`, sandbox'sız oturumlar varsayılan olarak `host` kullanır.
+  - Tarayıcı özellikli bir Node bağlıysa, `target="host"` veya `target="node"` ile sabitlemediğiniz sürece araç buna otomatik yönlenebilir.
 
-Bu, agent'i deterministik tutar ve kırılgan seçicilerden kaçınır.
+Bu, ajanı deterministik tutar ve kırılgan seçicilerden kaçınır.
 
 ## İlgili
 
-- [Tools Overview](/tr/tools) — kullanılabilir tüm agent araçları
-- [Sandboxing](/tr/gateway/sandboxing) — sandbox'lı ortamlarda tarayıcı denetimi
-- [Security](/tr/gateway/security) — tarayıcı denetimi riskleri ve sağlamlaştırma
+- [Araçlara Genel Bakış](/tr/tools) — kullanılabilir tüm ajan araçları
+- [Sandboxing](/tr/gateway/sandboxing) — sandbox'lı ortamlarda tarayıcı kontrolü
+- [Güvenlik](/tr/gateway/security) — tarayıcı kontrolü riskleri ve sağlamlaştırma

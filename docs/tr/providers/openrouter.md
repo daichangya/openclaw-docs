@@ -1,21 +1,21 @@
 ---
 read_when:
     - Birçok LLM için tek bir API anahtarı istiyorsunuz
-    - OpenClaw içinde OpenRouter üzerinden modeller çalıştırmak istiyorsunuz
-    - OpenClaw içinde görüntü oluşturma için OpenRouter kullanmak istiyorsunuz
-summary: Birçok modele OpenClaw içinde erişmek için OpenRouter’ın birleşik API’sini kullanın
+    - OpenClaw'da modelleri OpenRouter üzerinden çalıştırmak istiyorsunuz
+    - OpenRouter'ı görsel üretimi için kullanmak istiyorsunuz
+summary: OpenClaw'da birçok modele erişmek için OpenRouter'ın birleşik API'sini kullanma
 title: OpenRouter
 x-i18n:
-    generated_at: "2026-04-24T09:27:10Z"
+    generated_at: "2026-04-25T13:56:31Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7516910f67a8adfb107d07cadd73c34ddd110422ecb90278025d4d6344937aac
+    source_hash: f0dfbe92fbe229b3d0c22fa7997adc1906609bc3ee63c780b1f66f545d327f49
     source_path: providers/openrouter.md
     workflow: 15
 ---
 
-OpenRouter, birçok modele tek bir
-uç nokta ve API anahtarı arkasından istek yönlendiren **birleşik bir API** sağlar. OpenAI ile uyumludur, bu nedenle çoğu OpenAI SDK’sı temel URL değiştirilerek çalışır.
+OpenRouter, istekleri tek bir
+uç nokta ve API anahtarı arkasında birçok modele yönlendiren **birleşik bir API** sağlar. OpenAI uyumludur, bu nedenle çoğu OpenAI SDK'sı base URL değiştirilerek çalışır.
 
 ## Başlarken
 
@@ -54,22 +54,22 @@ uç nokta ve API anahtarı arkasından istek yönlendiren **birleşik bir API** 
 ## Model başvuruları
 
 <Note>
-Model başvuruları `openrouter/<provider>/<model>` biçimini izler. Kullanılabilir
-sağlayıcıların ve modellerin tam listesi için [/concepts/model-providers](/tr/concepts/model-providers) sayfasına bakın.
+Model başvuruları `openrouter/<provider>/<model>` desenini izler. Kullanılabilir
+sağlayıcıların ve modellerin tam listesi için bkz. [/concepts/model-providers](/tr/concepts/model-providers).
 </Note>
 
-Paketlenmiş yedek örnekler:
+Paketlenmiş geri dönüş örnekleri:
 
-| Model başvurusu                       | Notlar                        |
-| ------------------------------------ | ----------------------------- |
-| `openrouter/auto`                    | OpenRouter otomatik yönlendirme |
-| `openrouter/moonshotai/kimi-k2.6`    | MoonshotAI üzerinden Kimi K2.6 |
+| Model başvurusu                     | Notlar                         |
+| ----------------------------------- | ------------------------------ |
+| `openrouter/auto`                   | OpenRouter otomatik yönlendirme |
+| `openrouter/moonshotai/kimi-k2.6`   | MoonshotAI üzerinden Kimi K2.6 |
 | `openrouter/openrouter/healer-alpha` | OpenRouter Healer Alpha yolu  |
 | `openrouter/openrouter/hunter-alpha` | OpenRouter Hunter Alpha yolu  |
 
-## Görüntü oluşturma
+## Görsel üretimi
 
-OpenRouter, `image_generate` aracısını da destekleyebilir. `agents.defaults.imageGenerationModel` altında bir OpenRouter görüntü modeli kullanın:
+OpenRouter, `image_generate` aracını da destekleyebilir. `agents.defaults.imageGenerationModel` altında bir OpenRouter görsel modelini kullanın:
 
 ```json5
 {
@@ -84,56 +84,81 @@ OpenRouter, `image_generate` aracısını da destekleyebilir. `agents.defaults.i
 }
 ```
 
-OpenClaw, görüntü isteklerini OpenRouter’ın chat completions image API’sine `modalities: ["image", "text"]` ile gönderir. Gemini görüntü modelleri, desteklenen `aspectRatio` ve `resolution` ipuçlarını OpenRouter’ın `image_config` alanı üzerinden alır.
+OpenClaw, görsel isteklerini `modalities: ["image", "text"]` ile OpenRouter'ın sohbet tamamlama görsel API'sine gönderir. Gemini görsel modelleri, OpenRouter'ın `image_config` yapısı üzerinden desteklenen `aspectRatio` ve `resolution` ipuçlarını alır.
 
-## Kimlik doğrulama ve üstbilgiler
+## Metinden konuşmaya
 
-OpenRouter arka planda API anahtarınızla bir Bearer token kullanır.
+OpenRouter, OpenAI uyumlu
+`/audio/speech` uç noktası üzerinden TTS sağlayıcısı olarak da kullanılabilir.
+
+```json5
+{
+  messages: {
+    tts: {
+      auto: "always",
+      provider: "openrouter",
+      providers: {
+        openrouter: {
+          model: "hexgrad/kokoro-82m",
+          voice: "af_alloy",
+          responseFormat: "mp3",
+        },
+      },
+    },
+  },
+}
+```
+
+`messages.tts.providers.openrouter.apiKey` boş bırakılırsa TTS,
+önce `models.providers.openrouter.apiKey`, sonra `OPENROUTER_API_KEY` değerini yeniden kullanır.
+
+## Kimlik doğrulama ve başlıklar
+
+OpenRouter, perde arkasında API anahtarınızla birlikte bir Bearer token kullanır.
 
 Gerçek OpenRouter isteklerinde (`https://openrouter.ai/api/v1`), OpenClaw ayrıca
-OpenRouter’ın belgelenmiş uygulama ilişkilendirme üstbilgilerini de ekler:
+OpenRouter'ın belgelenmiş uygulama ilişkilendirme başlıklarını da ekler:
 
-| Üstbilgi                  | Değer                 |
+| Başlık                    | Değer                 |
 | ------------------------- | --------------------- |
 | `HTTP-Referer`            | `https://openclaw.ai` |
 | `X-OpenRouter-Title`      | `OpenClaw`            |
 | `X-OpenRouter-Categories` | `cli-agent`           |
 
 <Warning>
-OpenRouter sağlayıcısını başka bir proxy’ye veya temel URL’ye yönlendirirseniz, OpenClaw
-bu OpenRouter’a özgü üstbilgileri veya Anthropic önbellek işaretleyicilerini **eklemez**.
+OpenRouter sağlayıcısını başka bir proxy'ye veya başka bir base URL'ye yeniden yönlendirirseniz, OpenClaw bu OpenRouter'a özgü başlıkları veya Anthropic önbellek işaretleyicilerini **eklemez**.
 </Warning>
 
 ## Gelişmiş yapılandırma
 
 <AccordionGroup>
   <Accordion title="Anthropic önbellek işaretleyicileri">
-    Doğrulanmış OpenRouter yollarında, Anthropic model başvuruları,
-    sistem/geliştirici istem bloklarında daha iyi istem önbelleği yeniden kullanımı için OpenClaw’un kullandığı
-    OpenRouter’a özgü Anthropic `cache_control` işaretleyicilerini korur.
+    Doğrulanmış OpenRouter yollarında, Anthropic model başvuruları
+    sistem/geliştirici istem bloklarında daha iyi istem önbelleği yeniden kullanımı için
+    OpenClaw'ın kullandığı OpenRouter'a özgü Anthropic `cache_control` işaretleyicilerini korur.
   </Accordion>
 
-  <Accordion title="Thinking / akıl yürütme ekleme">
-    Desteklenen `auto` olmayan yollarda OpenClaw, seçilen thinking düzeyini
-    OpenRouter proxy akıl yürütme yüklerine eşler. Desteklenmeyen model ipuçları ve
-    `openrouter/auto`, bu akıl yürütme eklemesini atlar.
+  <Accordion title="Thinking / reasoning ekleme">
+    Desteklenen `auto` olmayan yollarda OpenClaw, seçilen thinking seviyesini
+    OpenRouter proxy reasoning payload'larına eşler. Desteklenmeyen model ipuçları ve
+    `openrouter/auto` bu reasoning eklemesini atlar.
   </Accordion>
 
-  <Accordion title="Yalnızca OpenAI için istek şekillendirme">
-    OpenRouter yine proxy tarzı OpenAI uyumlu yol üzerinden çalışır; bu nedenle
+  <Accordion title="Yalnızca OpenAI isteği şekillendirme">
+    OpenRouter yine proxy tarzı OpenAI uyumlu yol üzerinden çalıştığı için
     `serviceTier`, Responses `store`,
-    OpenAI akıl yürütme uyumluluk yükleri ve istem önbelleği ipuçları gibi yalnızca yerel OpenAI’ye özgü istek şekillendirme öğeleri iletilmez.
+    OpenAI reasoning uyumluluk payload'ları ve istem önbelleği ipuçları gibi yalnızca yerel OpenAI istek şekillendirmeleri iletilmez.
   </Accordion>
 
   <Accordion title="Gemini destekli yollar">
-    Gemini destekli OpenRouter başvuruları proxy-Gemini yolu üzerinde kalır: OpenClaw
-    burada Gemini düşünce-imzası temizliğini korur, ancak yerel Gemini
-    yeniden oynatma doğrulamasını veya önyükleme yeniden yazımlarını etkinleştirmez.
+    Gemini destekli OpenRouter başvuruları proxy-Gemini yolunda kalır: OpenClaw
+    orada Gemini thought-signature temizliğini korur, ancak yerel Gemini
+    yeniden oynatma doğrulamasını veya bootstrap yeniden yazımlarını etkinleştirmez.
   </Accordion>
 
-  <Accordion title="Sağlayıcı yönlendirme metaverileri">
-    Model parametreleri altında OpenRouter sağlayıcı yönlendirmesi geçirirseniz, OpenClaw
-    bunu paylaşılan akış sarmalayıcıları çalışmadan önce OpenRouter yönlendirme metaverileri olarak iletir.
+  <Accordion title="Sağlayıcı yönlendirme meta verisi">
+    Model parametreleri altında OpenRouter sağlayıcı yönlendirmesini iletirseniz, OpenClaw bunu
+    paylaşılan akış sarmalayıcıları çalışmadan önce OpenRouter yönlendirme meta verisi olarak iletir.
   </Accordion>
 </AccordionGroup>
 
@@ -141,9 +166,9 @@ bu OpenRouter’a özgü üstbilgileri veya Anthropic önbellek işaretleyiciler
 
 <CardGroup cols={2}>
   <Card title="Model seçimi" href="/tr/concepts/model-providers" icon="layers">
-    Sağlayıcıları, model başvurularını ve yük devretme davranışını seçme.
+    Sağlayıcıları, model başvurularını ve hata durumunda devretme davranışını seçme.
   </Card>
   <Card title="Yapılandırma başvurusu" href="/tr/gateway/configuration-reference" icon="gear">
-    Aracılar, modeller ve sağlayıcılar için tam yapılandırma başvurusu.
+    Ajanlar, modeller ve sağlayıcılar için tam yapılandırma başvurusu.
   </Card>
 </CardGroup>

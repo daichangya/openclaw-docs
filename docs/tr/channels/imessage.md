@@ -2,26 +2,24 @@
 read_when:
     - iMessage desteğini ayarlama
     - iMessage gönderme/alma sorunlarını ayıklama
-summary: imsg aracılığıyla eski iMessage desteği (stdio üzerinden JSON-RPC). Yeni kurulumlar BlueBubbles kullanmalıdır.
+summary: imsg aracılığıyla eski iMessage desteği (`stdio` üzerinden JSON-RPC). Yeni kurulumlarda BlueBubbles kullanılmalıdır.
 title: iMessage
 x-i18n:
-    generated_at: "2026-04-24T08:58:16Z"
+    generated_at: "2026-04-25T13:41:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ff2773ebcfced8834bc5d28378d9a6e3c20826cc0e08d6ea5480f8a5975fd8e3
+    source_hash: 4b693b222ab60fe9fee8be47ec4b347ba126f11558888d336220e39425023dcd
     source_path: channels/imessage.md
     workflow: 15
 ---
 
-# iMessage (eski: imsg)
-
 <Warning>
 Yeni iMessage dağıtımları için <a href="/tr/channels/bluebubbles">BlueBubbles</a> kullanın.
 
-`imsg` entegrasyonu eskidir ve gelecekteki bir sürümde kaldırılabilir.
+`imsg` entegrasyonu eski durumdadır ve gelecekteki bir sürümde kaldırılabilir.
 </Warning>
 
-Durum: eski harici CLI entegrasyonu. Gateway, `imsg rpc` başlatır ve stdio üzerinde JSON-RPC ile iletişim kurar (ayrı bir daemon/port yoktur).
+Durum: eski harici CLI entegrasyonu. Gateway, `imsg rpc` başlatır ve `stdio` üzerinden JSON-RPC ile iletişim kurar (ayrı bir daemon/port yoktur).
 
 <CardGroup cols={3}>
   <Card title="BlueBubbles (önerilen)" icon="message-circle" href="/tr/channels/bluebubbles">
@@ -31,7 +29,7 @@ Durum: eski harici CLI entegrasyonu. Gateway, `imsg rpc` başlatır ve stdio üz
     iMessage DM'leri varsayılan olarak eşleştirme modunu kullanır.
   </Card>
   <Card title="Yapılandırma başvurusu" icon="settings" href="/tr/gateway/config-channels#imessage">
-    Tam iMessage alan başvurusu.
+    iMessage için tam alan başvurusu.
   </Card>
 </CardGroup>
 
@@ -87,7 +85,7 @@ openclaw pairing approve imessage <CODE>
   </Tab>
 
   <Tab title="SSH üzerinden uzak Mac">
-    OpenClaw yalnızca stdio uyumlu bir `cliPath` gerektirir; bu nedenle `cliPath` değerini uzak bir Mac'e SSH ile bağlanıp `imsg` çalıştıran bir sarmalayıcı betiğe yönlendirebilirsiniz.
+    OpenClaw yalnızca `stdio` ile uyumlu bir `cliPath` gerektirir; bu nedenle `cliPath` değerini uzak bir Mac'e SSH ile bağlanıp `imsg` çalıştıran bir sarmalayıcı betiğe yönlendirebilirsiniz.
 
 ```bash
 #!/usr/bin/env bash
@@ -113,9 +111,9 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-    `remoteHost` ayarlanmadıysa OpenClaw, SSH sarmalayıcı betiğini ayrıştırarak bunu otomatik algılamaya çalışır.
-    `remoteHost` değeri `host` veya `user@host` olmalıdır (boşluk veya SSH seçenekleri olmadan).
-    OpenClaw, SCP için sıkı ana makine anahtarı denetimi kullanır; bu nedenle röle ana makine anahtarı `~/.ssh/known_hosts` içinde zaten bulunmalıdır.
+    `remoteHost` ayarlanmazsa OpenClaw, SSH sarmalayıcı betiğini ayrıştırarak bunu otomatik algılamayı dener.
+    `remoteHost`, `host` veya `user@host` olmalıdır (boşluk veya SSH seçeneği içermez).
+    OpenClaw, SCP için katı host anahtarı denetimi kullanır; bu nedenle aktarma host anahtarı önceden `~/.ssh/known_hosts` içinde bulunmalıdır.
     Ek yolları, izin verilen köklere göre doğrulanır (`attachmentRoots` / `remoteAttachmentRoots`).
 
   </Tab>
@@ -124,11 +122,11 @@ exec ssh -T gateway-host imsg "$@"
 ## Gereksinimler ve izinler (macOS)
 
 - Messages, `imsg` çalıştıran Mac'te oturum açmış olmalıdır.
-- OpenClaw/`imsg` çalıştıran süreç bağlamı için Full Disk Access gereklidir (Messages veritabanı erişimi).
-- Messages.app üzerinden mesaj göndermek için Automation izni gereklidir.
+- OpenClaw/`imsg` çalıştıran süreç bağlamı için Full Disk Access gereklidir (Messages DB erişimi).
+- Messages.app üzerinden ileti göndermek için Automation izni gereklidir.
 
 <Tip>
-İzinler süreç bağlamı başına verilir. Gateway başsız çalışıyorsa (LaunchAgent/SSH), istemleri tetiklemek için aynı bağlamda bir kez etkileşimli komut çalıştırın:
+İzinler süreç bağlamı başına verilir. Gateway başsız çalışıyorsa (LaunchAgent/SSH), istemleri tetiklemek için aynı bağlamda bir defalık etkileşimli komut çalıştırın:
 
 ```bash
 imsg chats --limit 1
@@ -141,8 +139,8 @@ imsg send <handle> "test"
 ## Erişim denetimi ve yönlendirme
 
 <Tabs>
-  <Tab title="DM ilkesi">
-    `channels.imessage.dmPolicy`, doğrudan mesajları denetler:
+  <Tab title="DM politikası">
+    `channels.imessage.dmPolicy`, doğrudan iletileri kontrol eder:
 
     - `pairing` (varsayılan)
     - `allowlist`
@@ -151,12 +149,12 @@ imsg send <handle> "test"
 
     İzin listesi alanı: `channels.imessage.allowFrom`.
 
-    İzin listesi girdileri handle veya sohbet hedefleri olabilir (`chat_id:*`, `chat_guid:*`, `chat_identifier:*`).
+    İzin listesi girdileri, handle veya sohbet hedefleri olabilir (`chat_id:*`, `chat_guid:*`, `chat_identifier:*`).
 
   </Tab>
 
-  <Tab title="Grup ilkesi + bahsetmeler">
-    `channels.imessage.groupPolicy`, grup işlemeyi denetler:
+  <Tab title="Grup politikası + bahsetmeler">
+    `channels.imessage.groupPolicy`, grup işlemeyi kontrol eder:
 
     - `allowlist` (yapılandırıldığında varsayılan)
     - `open`
@@ -164,29 +162,29 @@ imsg send <handle> "test"
 
     Grup gönderen izin listesi: `channels.imessage.groupAllowFrom`.
 
-    Çalışma zamanı geri dönüşü: `groupAllowFrom` ayarlanmamışsa, iMessage grup gönderen denetimleri varsa `allowFrom` değerine geri döner.
-    Çalışma zamanı notu: `channels.imessage` tamamen eksikse, çalışma zamanı `groupPolicy="allowlist"` değerine geri döner ve bir uyarı günlüğe kaydeder (`channels.defaults.groupPolicy` ayarlanmış olsa bile).
+    Çalışma zamanı geri dönüşü: `groupAllowFrom` ayarlanmamışsa, iMessage grup gönderen denetimleri mevcut olduğunda `allowFrom` değerine geri döner.
+    Çalışma zamanı notu: `channels.imessage` tamamen yoksa, çalışma zamanı `groupPolicy="allowlist"` değerine geri döner ve bir uyarı günlüğe yazar (`channels.defaults.groupPolicy` ayarlı olsa bile).
 
-    Gruplar için bahsetme geçitlemesi:
+    Gruplar için bahsetme kapısı:
 
-    - iMessage yerel bahsetme meta verisine sahip değildir
-    - bahsetme algılama regex desenlerini kullanır (`agents.list[].groupChat.mentionPatterns`, geri dönüş olarak `messages.groupChat.mentionPatterns`)
-    - yapılandırılmış desen yoksa bahsetme geçitlemesi zorunlu tutulamaz
+    - iMessage, yerel bahsetme meta verisine sahip değildir
+    - bahsetme algılama regex desenleri kullanır (`agents.list[].groupChat.mentionPatterns`, geri dönüş olarak `messages.groupChat.mentionPatterns`)
+    - yapılandırılmış desen yoksa, bahsetme kapısı zorunlu kılınamaz
 
-    Yetkili gönderenlerden gelen kontrol komutları gruplarda bahsetme geçitlemesini atlayabilir.
+    Yetkili gönderenlerden gelen kontrol komutları, gruplarda bahsetme kapısını atlayabilir.
 
   </Tab>
 
   <Tab title="Oturumlar ve deterministik yanıtlar">
     - DM'ler doğrudan yönlendirme kullanır; gruplar grup yönlendirmesi kullanır.
-    - Varsayılan `session.dmScope=main` ile iMessage DM'leri aracının ana oturumunda birleşir.
+    - Varsayılan `session.dmScope=main` ile iMessage DM'leri ajan ana oturumunda birleşir.
     - Grup oturumları yalıtılmıştır (`agent:<agentId>:imessage:group:<chat_id>`).
-    - Yanıtlar, kaynak kanal/hedef meta verileri kullanılarak yeniden iMessage'a yönlendirilir.
+    - Yanıtlar, kaynak kanal/hedef meta verisi kullanılarak tekrar iMessage'a yönlendirilir.
 
     Grup benzeri iş parçacığı davranışı:
 
     Bazı çok katılımcılı iMessage iş parçacıkları `is_group=false` ile gelebilir.
-    Bu `chat_id`, `channels.imessage.groups` altında açıkça yapılandırılmışsa OpenClaw bunu grup trafiği olarak değerlendirir (grup geçitlemesi + grup oturumu yalıtımı).
+    Bu `chat_id`, `channels.imessage.groups` altında açıkça yapılandırılmışsa, OpenClaw bunu grup trafiği olarak ele alır (grup kapısı + grup oturumu yalıtımı).
 
   </Tab>
 </Tabs>
@@ -198,13 +196,13 @@ Eski iMessage sohbetleri ACP oturumlarına da bağlanabilir.
 Hızlı operatör akışı:
 
 - DM veya izin verilen grup sohbeti içinde `/acp spawn codex --bind here` çalıştırın.
-- Aynı iMessage konuşmasındaki sonraki mesajlar oluşturulan ACP oturumuna yönlendirilir.
+- Aynı iMessage konuşmasındaki gelecekteki iletiler, oluşturulan ACP oturumuna yönlendirilir.
 - `/new` ve `/reset`, aynı bağlı ACP oturumunu yerinde sıfırlar.
 - `/acp close`, ACP oturumunu kapatır ve bağlamayı kaldırır.
 
 Yapılandırılmış kalıcı bağlamalar, `type: "acp"` ve `match.channel: "imessage"` içeren üst düzey `bindings[]` girdileriyle desteklenir.
 
-`match.peer.id` şunları kullanabilir:
+`match.peer.id` şu biçimleri kullanabilir:
 
 - `+15555550123` veya `user@example.com` gibi normalize edilmiş DM handle
 - `chat_id:<id>` (kararlı grup bağlamaları için önerilir)
@@ -241,31 +239,31 @@ Yapılandırılmış kalıcı bağlamalar, `type: "acp"` ve `match.channel: "ime
 }
 ```
 
-Paylaşılan ACP bağlama davranışı için [ACP Aracıları](/tr/tools/acp-agents) sayfasına bakın.
+Paylaşılan ACP bağlama davranışı için [ACP Ajanları](/tr/tools/acp-agents) bölümüne bakın.
 
-## Dağıtım desenleri
+## Dağıtım kalıpları
 
 <AccordionGroup>
-  <Accordion title="Özel bot macOS kullanıcısı (ayrı iMessage kimliği)">
-    Bot trafiğinin kişisel Messages profilinizden yalıtılması için özel bir Apple ID ve macOS kullanıcısı kullanın.
+  <Accordion title="Ayrılmış bot macOS kullanıcısı (ayrı iMessage kimliği)">
+    Bot trafiğinin kişisel Messages profilinizden yalıtılması için ayrılmış bir Apple ID ve macOS kullanıcısı kullanın.
 
     Tipik akış:
 
-    1. Özel bir macOS kullanıcısı oluşturun/oturum açın.
-    2. O kullanıcıda bot Apple ID'si ile Messages'e giriş yapın.
-    3. Bu kullanıcıda `imsg` kurun.
-    4. OpenClaw'ın bu kullanıcı bağlamında `imsg` çalıştırabilmesi için SSH sarmalayıcı oluşturun.
-    5. `channels.imessage.accounts.<id>.cliPath` ve `.dbPath` alanlarını bu kullanıcı profiline yönlendirin.
+    1. Ayrılmış bir macOS kullanıcısı oluşturun/oturum açın.
+    2. Bu kullanıcıda bot Apple ID ile Messages'ta oturum açın.
+    3. Bu kullanıcıya `imsg` kurun.
+    4. OpenClaw'ın bu kullanıcı bağlamında `imsg` çalıştırabilmesi için SSH sarmalayıcısı oluşturun.
+    5. `channels.imessage.accounts.<id>.cliPath` ve `.dbPath` değerlerini bu kullanıcı profiline yönlendirin.
 
-    İlk çalıştırmada bu bot kullanıcı oturumunda GUI onayları (Automation + Full Disk Access) gerekebilir.
+    İlk çalıştırma, bu bot kullanıcı oturumunda GUI onayları (Automation + Full Disk Access) gerektirebilir.
 
   </Accordion>
 
   <Accordion title="Tailscale üzerinden uzak Mac (örnek)">
     Yaygın topoloji:
 
-    - Gateway Linux/VM üzerinde çalışır
-    - iMessage + `imsg`, tailnet'inizdeki bir Mac'te çalışır
+    - gateway Linux/VM üzerinde çalışır
+    - iMessage + `imsg`, tailnet'inizde bir Mac üzerinde çalışır
     - `cliPath` sarmalayıcısı, `imsg` çalıştırmak için SSH kullanır
     - `remoteHost`, SCP ek alma işlemlerini etkinleştirir
 
@@ -291,14 +289,14 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 ```
 
     Hem SSH hem de SCP etkileşimsiz olsun diye SSH anahtarları kullanın.
-    `known_hosts` doldurulsun diye önce ana makine anahtarının güvenildiğinden emin olun (örneğin `ssh bot@mac-mini.tailnet-1234.ts.net`).
+    `known_hosts` doldurulsun diye önce host anahtarının güvenilir olduğundan emin olun (örneğin `ssh bot@mac-mini.tailnet-1234.ts.net`).
 
   </Accordion>
 
-  <Accordion title="Çok hesaplı desen">
+  <Accordion title="Çok hesaplı kalıp">
     iMessage, `channels.imessage.accounts` altında hesap başına yapılandırmayı destekler.
 
-    Her hesap `cliPath`, `dbPath`, `allowFrom`, `groupPolicy`, `mediaMaxMb`, geçmiş ayarları ve ek kök izin listeleri gibi alanları geçersiz kılabilir.
+    Her hesap, `cliPath`, `dbPath`, `allowFrom`, `groupPolicy`, `mediaMaxMb`, geçmiş ayarları ve ek kök izin listeleri gibi alanları geçersiz kılabilir.
 
   </Accordion>
 </AccordionGroup>
@@ -313,7 +311,7 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
       - `channels.imessage.attachmentRoots` (yerel)
       - `channels.imessage.remoteAttachmentRoots` (uzak SCP modu)
       - varsayılan kök deseni: `/Users/*/Library/Messages/Attachments`
-    - SCP sıkı ana makine anahtarı denetimi kullanır (`StrictHostKeyChecking=yes`)
+    - SCP, katı host anahtarı denetimi kullanır (`StrictHostKeyChecking=yes`)
     - giden medya boyutu `channels.imessage.mediaMaxMb` kullanır (varsayılan 16 MB)
   </Accordion>
 
@@ -346,7 +344,7 @@ imsg chats --limit 20
 
 ## Yapılandırma yazmaları
 
-iMessage, kanal tarafından başlatılan yapılandırma yazmalarına varsayılan olarak izin verir (`commands.config: true` olduğunda `/config set|unset` için).
+iMessage, varsayılan olarak kanal tarafından başlatılan yapılandırma yazmalarına izin verir (`commands.config: true` olduğunda `/config set|unset` için).
 
 Devre dışı bırakmak için:
 
@@ -371,7 +369,7 @@ imsg rpc --help
 openclaw channels status --probe
 ```
 
-    Probe, RPC desteklenmediğini bildiriyorsa `imsg` güncelleyin.
+    Sorgulama RPC'nin desteklenmediğini bildirirse `imsg` güncelleyin.
 
   </Accordion>
 
@@ -384,7 +382,7 @@ openclaw channels status --probe
 
   </Accordion>
 
-  <Accordion title="Grup mesajları yok sayılıyor">
+  <Accordion title="Grup iletileri yok sayılıyor">
     Şunları kontrol edin:
 
     - `channels.imessage.groupPolicy`
@@ -399,9 +397,9 @@ openclaw channels status --probe
 
     - `channels.imessage.remoteHost`
     - `channels.imessage.remoteAttachmentRoots`
-    - Gateway ana makinesinden SSH/SCP anahtar kimlik doğrulaması
-    - Gateway ana makinesinde ana makine anahtarı `~/.ssh/known_hosts` içinde mevcut
-    - Messages çalıştıran Mac'te uzak yol okunabilirliği
+    - gateway host'tan SSH/SCP anahtar kimlik doğrulaması
+    - host anahtarı, gateway host üzerindeki `~/.ssh/known_hosts` içinde mevcut
+    - Messages çalıştıran Mac üzerindeki uzak yolun okunabilirliği
 
   </Accordion>
 
@@ -413,7 +411,7 @@ imsg chats --limit 1
 imsg send <handle> "test"
 ```
 
-    OpenClaw/`imsg` çalıştıran süreç bağlamına Full Disk Access + Automation verildiğini doğrulayın.
+    OpenClaw/`imsg` çalıştıran süreç bağlamı için Full Disk Access + Automation izinlerinin verildiğini doğrulayın.
 
   </Accordion>
 </AccordionGroup>
@@ -427,8 +425,8 @@ imsg send <handle> "test"
 
 ## İlgili
 
-- [Kanallara genel bakış](/tr/channels) — desteklenen tüm kanallar
+- [Kanallara Genel Bakış](/tr/channels) — desteklenen tüm kanallar
 - [Eşleştirme](/tr/channels/pairing) — DM kimlik doğrulaması ve eşleştirme akışı
-- [Gruplar](/tr/channels/groups) — grup sohbeti davranışı ve bahsetme geçitlemesi
-- [Kanal yönlendirme](/tr/channels/channel-routing) — mesajlar için oturum yönlendirmesi
-- [Güvenlik](/tr/gateway/security) — erişim modeli ve sağlamlaştırma
+- [Gruplar](/tr/channels/groups) — grup sohbeti davranışı ve bahsetme kapısı
+- [Kanal Yönlendirme](/tr/channels/channel-routing) — iletiler için oturum yönlendirmesi
+- [Güvenlik](/tr/gateway/security) — erişim modeli ve sıkılaştırma
