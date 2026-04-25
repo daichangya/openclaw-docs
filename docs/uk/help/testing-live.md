@@ -1,35 +1,35 @@
 ---
 read_when:
-    - Запуск smoke-тестів живої матриці моделей / бекенду CLI / ACP / провайдера медіа
+    - Запуск перевірок smoke для живої матриці моделей / бекенду CLI / ACP / медіапровайдера
     - Налагодження визначення облікових даних для живих тестів
     - Додавання нового живого тесту, специфічного для провайдера
 sidebarTitle: Live tests
-summary: 'Живі (мережеві) тести: матриця моделей, бекенди CLI, ACP, провайдери медіа, облікові дані'
+summary: 'Живі (із зверненням до мережі) тести: матриця моделей, бекенди CLI, ACP, медіапровайдери, облікові дані'
 title: 'Тестування: живі набори тестів'
 x-i18n:
-    generated_at: "2026-04-25T10:05:02Z"
+    generated_at: "2026-04-25T12:43:16Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4c91bfba6853db576e120893b8c2a55f9d396d523ad5b5eb6a25829766ee477f
+    source_hash: b9b2c2954eddd1b911dde5bb3a834a6f9429c91429f3fb07a509eec80183cc52
     source_path: help/testing-live.md
     workflow: 15
 ---
 
-Для швидкого старту, раннерів QA, модульних/інтеграційних наборів і Docker-процесів див.
-[Тестування](/uk/help/testing). На цій сторінці описано **живі** (мережеві) набори тестів:
-матрицю моделей, бекенди CLI, ACP і живі тести провайдерів медіа, а також
-обробку облікових даних.
+Щоб швидко ознайомитися зі стартом, раннерами QA, наборами unit/integration тестів і Docker-потоками, див.
+[Тестування](/uk/help/testing). На цій сторінці описано **живі** (із зверненням до мережі) набори тестів:
+матриця моделей, бекенди CLI, ACP і живі тести медіапровайдерів, а також
+обробка облікових даних.
 
-## Живе: локальні команди smoke-тестів профілю
+## Живе: локальні команди smoke для профілю
 
-Підключіть `~/.profile` перед довільними живими перевірками, щоб ключі провайдерів і локальні шляхи до інструментів
-відповідали вашій оболонці:
+Виконайте `source ~/.profile` перед довільними живими перевірками, щоб ключі провайдерів і локальні шляхи
+до інструментів відповідали вашій оболонці:
 
 ```bash
 source ~/.profile
 ```
 
-Безпечний smoke-тест медіа:
+Безпечна медіа smoke-перевірка:
 
 ```bash
 pnpm openclaw infer tts convert --local --json \
@@ -37,131 +37,131 @@ pnpm openclaw infer tts convert --local --json \
   --output /tmp/openclaw-live-smoke.mp3
 ```
 
-Безпечний smoke-тест готовності голосових викликів:
+Безпечна smoke-перевірка готовності голосового дзвінка:
 
 ```bash
 pnpm openclaw voicecall setup --json
 pnpm openclaw voicecall smoke --to "+15555550123"
 ```
 
-`voicecall smoke` — це пробний запуск, якщо також не вказано `--yes`. Використовуйте `--yes` лише
-коли ви свідомо хочете здійснити реальний виклик сповіщення. Для Twilio, Telnyx і
-Plivo успішна перевірка готовності потребує публічної URL-адреси Webhook; лише локальні
-fallback-варіанти loopback/private навмисно відхиляються.
+`voicecall smoke` — це сухий запуск, якщо також не вказано `--yes`. Використовуйте `--yes` лише
+тоді, коли ви свідомо хочете здійснити реальний сповіщувальний дзвінок. Для Twilio, Telnyx і
+Plivo успішна перевірка готовності вимагає публічної URL-адреси Webhook; локальні резервні варіанти
+на основі loopback/приватної мережі навмисно відхиляються.
 
 ## Живе: повний перегляд можливостей Android Node
 
 - Тест: `src/gateway/android-node.capabilities.live.test.ts`
 - Скрипт: `pnpm android:test:integration`
-- Мета: викликати **кожну команду, яку зараз оголошує** підключений Android Node, і перевірити поведінку контракту команди.
+- Мета: викликати **кожну команду, яку наразі оголошує** підключений Android Node, і перевірити поведінку контракту команди.
 - Обсяг:
-  - Попередньо підготовлене/ручне налаштування (набір не встановлює/не запускає/не спаровує застосунок).
-  - Перевірка `node.invoke` Gateway для вибраного Android Node команда за командою.
-- Необхідне попереднє налаштування:
-  - Android-застосунок уже підключено й спарено з Gateway.
+  - Попередньо підготовлене/ручне налаштування (набір тестів не встановлює/не запускає/не спарює застосунок).
+  - Перевірка `node.invoke` у Gateway для вибраного Android Node, команда за командою.
+- Потрібне попереднє налаштування:
+  - Застосунок Android уже підключено та спарено з Gateway.
   - Застосунок утримується на передньому плані.
-  - Для можливостей, які ви очікуєте пройти, надано дозволи/згоду на захоплення.
+  - Для можливостей, які мають пройти перевірку, надано дозволи/згоду на захоплення.
 - Необов’язкові перевизначення цілі:
   - `OPENCLAW_ANDROID_NODE_ID` або `OPENCLAW_ANDROID_NODE_NAME`.
   - `OPENCLAW_ANDROID_GATEWAY_URL` / `OPENCLAW_ANDROID_GATEWAY_TOKEN` / `OPENCLAW_ANDROID_GATEWAY_PASSWORD`.
-- Докладні відомості про повне налаштування Android: [Android App](/uk/platforms/android)
+- Повні подробиці налаштування Android: [Android App](/uk/platforms/android)
 
-## Живе: smoke-тест моделі (ключі профілю)
+## Живе: smoke моделей (ключі профілю)
 
 Живі тести поділено на два шари, щоб ми могли ізолювати збої:
 
-- «Пряма модель» показує, чи може провайдер/модель взагалі відповісти з наданим ключем.
-- «Smoke-тест Gateway» показує, чи працює для цієї моделі повний конвеєр gateway+agent (сеанси, історія, інструменти, політика sandbox тощо).
+- «Пряма модель» показує, чи провайдер/модель взагалі може відповісти з наданим ключем.
+- «Smoke Gateway» показує, чи працює для цієї моделі повний конвеєр Gateway+агента (сесії, історія, інструменти, політика sandbox тощо).
 
-### Шар 1: Пряме завершення моделі (без gateway)
+### Шар 1: пряме завершення моделі (без Gateway)
 
 - Тест: `src/agents/models.profiles.live.test.ts`
 - Мета:
-  - Перерахувати виявлені моделі
+  - Перелічити виявлені моделі
   - Використати `getApiKeyForModel`, щоб вибрати моделі, для яких у вас є облікові дані
   - Виконати невелике завершення для кожної моделі (і цільові регресійні перевірки, де потрібно)
 - Як увімкнути:
   - `pnpm test:live` (або `OPENCLAW_LIVE_TEST=1`, якщо ви викликаєте Vitest напряму)
-- Установіть `OPENCLAW_LIVE_MODELS=modern` (або `all`, псевдонім для modern), щоб справді запускати цей набір; інакше його буде пропущено, щоб `pnpm test:live` залишався зосередженим на smoke-тесті gateway
-- Як вибрати моделі:
-  - `OPENCLAW_LIVE_MODELS=modern`, щоб запустити modern allowlist (Opus/Sonnet 4.6+, GPT-5.2 + Codex, Gemini 3, DeepSeek V4, GLM 4.7, MiniMax M2.7, Grok 4)
-  - `OPENCLAW_LIVE_MODELS=all` — це псевдонім для modern allowlist
-  - або `OPENCLAW_LIVE_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-6,..."` (allowlist через коми)
-  - Перегляди modern/all за замовчуванням мають підібране обмеження з високим сигналом; установіть `OPENCLAW_LIVE_MAX_MODELS=0` для вичерпного modern-перегляду або додатне число для меншого обмеження.
-  - Для вичерпних переглядів використовується `OPENCLAW_LIVE_TEST_TIMEOUT_MS` як тайм-аут усього прямого тесту моделі. Типове значення: 60 хвилин.
-  - Проби прямої моделі за замовчуванням виконуються з паралелізмом у 20 потоків; щоб перевизначити, установіть `OPENCLAW_LIVE_MODEL_CONCURRENCY`.
-- Як вибрати провайдерів:
-  - `OPENCLAW_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"` (allowlist через коми)
+- Установіть `OPENCLAW_LIVE_MODELS=modern` (або `all`, псевдонім для modern), щоб дійсно запустити цей набір тестів; інакше його буде пропущено, щоб `pnpm test:live` залишався зосередженим на smoke Gateway
+- Як вибирати моделі:
+  - `OPENCLAW_LIVE_MODELS=modern`, щоб запустити сучасний allowlist (Opus/Sonnet 4.6+, GPT-5.2 + Codex, Gemini 3, DeepSeek V4, GLM 4.7, MiniMax M2.7, Grok 4)
+  - `OPENCLAW_LIVE_MODELS=all` — це псевдонім для сучасного allowlist
+  - або `OPENCLAW_LIVE_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-6,..."` (allowlist через кому)
+  - Для переглядів modern/all за замовчуванням використовується підібране обмеження з високою інформативністю; установіть `OPENCLAW_LIVE_MAX_MODELS=0` для вичерпного перегляду modern або додатне число для меншого обмеження.
+  - Для вичерпних переглядів використовується `OPENCLAW_LIVE_TEST_TIMEOUT_MS` як тайм-аут усього тесту прямої моделі. За замовчуванням: 60 хвилин.
+  - За замовчуванням перевірки прямої моделі виконуються з паралелізмом 20; щоб перевизначити це, установіть `OPENCLAW_LIVE_MODEL_CONCURRENCY`.
+- Як вибирати провайдерів:
+  - `OPENCLAW_LIVE_PROVIDERS="google,google-antigravity,google-gemini-cli"` (allowlist через кому)
 - Звідки беруться ключі:
-  - За замовчуванням: сховище профілів і fallback через env
+  - За замовчуванням: сховище профілів і резервні значення env
   - Установіть `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати **лише сховище профілів**
 - Навіщо це існує:
-  - Відокремлює «API провайдера зламане / ключ недійсний» від «конвеєр gateway agent зламаний»
-  - Містить малі ізольовані регресії (приклад: потоки повторення міркування OpenAI Responses/Codex Responses + виклик інструментів)
+  - Відокремлює «API провайдера зламане / ключ недійсний» від «конвеєр агента Gateway зламаний»
+  - Містить невеликі ізольовані регресії (приклад: повторне відтворення міркувань OpenAI Responses/Codex Responses + потоки виклику інструментів)
 
-### Шар 2: smoke-тест Gateway + dev agent (те, що насправді робить "@openclaw")
+### Шар 2: smoke Gateway + dev-агента (що насправді робить "@openclaw")
 
 - Тест: `src/gateway/gateway-models.profiles.live.test.ts`
 - Мета:
-  - Запустити внутрішньопроцесний Gateway
-  - Створити/пропатчити сеанс `agent:dev:*` (перевизначення моделі для кожного запуску)
-  - Ітерувати моделі з ключами та перевіряти:
+  - Підняти внутрішньопроцесний Gateway
+  - Створити/змінити сесію `agent:dev:*` (перевизначення моделі для кожного запуску)
+  - Перебрати моделі з ключами й перевірити:
     - «змістовну» відповідь (без інструментів)
-    - роботу реального виклику інструмента (проба читання)
-    - необов’язкові додаткові проби інструментів (проба exec+read)
-    - що регресійні шляхи OpenAI (лише tool-call → подальший крок) і далі працюють
-- Подробиці проб (щоб ви могли швидко пояснювати збої):
-  - проба `read`: тест записує файл nonce у робочому просторі й просить agent `read` його та повернути nonce.
-  - проба `exec+read`: тест просить agent записати nonce у тимчасовий файл через `exec`, а потім прочитати його назад через `read`.
-  - проба зображення: тест прикріплює згенерований PNG (cat + рандомізований код) і очікує, що модель поверне `cat <CODE>`.
+    - що працює реальний виклик інструмента (`read` probe)
+    - необов’язкові додаткові перевірки інструментів (`exec+read` probe)
+    - що регресійні шляхи OpenAI (лише виклик інструмента → подальший крок) продовжують працювати
+- Подробиці probe (щоб ви могли швидко пояснювати збої):
+  - `read` probe: тест записує файл із nonce у робочому просторі й просить агента `read` прочитати його та повернути nonce у відповіді.
+  - `exec+read` probe: тест просить агента `exec` записати nonce у тимчасовий файл, а потім `read` прочитати його назад.
+  - image probe: тест додає згенерований PNG (cat + випадковий код) й очікує, що модель поверне `cat <CODE>`.
   - Посилання на реалізацію: `src/gateway/gateway-models.profiles.live.test.ts` і `src/gateway/live-image-probe.ts`.
 - Як увімкнути:
   - `pnpm test:live` (або `OPENCLAW_LIVE_TEST=1`, якщо ви викликаєте Vitest напряму)
-- Як вибрати моделі:
-  - За замовчуванням: modern allowlist (Opus/Sonnet 4.6+, GPT-5.2 + Codex, Gemini 3, DeepSeek V4, GLM 4.7, MiniMax M2.7, Grok 4)
-  - `OPENCLAW_LIVE_GATEWAY_MODELS=all` — це псевдонім для modern allowlist
+- Як вибирати моделі:
+  - За замовчуванням: сучасний allowlist (Opus/Sonnet 4.6+, GPT-5.2 + Codex, Gemini 3, DeepSeek V4, GLM 4.7, MiniMax M2.7, Grok 4)
+  - `OPENCLAW_LIVE_GATEWAY_MODELS=all` — це псевдонім для сучасного allowlist
   - Або встановіть `OPENCLAW_LIVE_GATEWAY_MODELS="provider/model"` (або список через кому), щоб звузити вибір
-  - Перегляди modern/all для gateway за замовчуванням мають підібране обмеження з високим сигналом; установіть `OPENCLAW_LIVE_GATEWAY_MAX_MODELS=0` для вичерпного modern-перегляду або додатне число для меншого обмеження.
-- Як вибрати провайдерів (уникнути «OpenRouter everything»):
-  - `OPENCLAW_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"` (allowlist через коми)
-- Проби інструментів і зображень у цьому живому тесті завжди ввімкнені:
-  - проба `read` + проба `exec+read` (навантаження на інструменти)
-  - проба зображення запускається, коли модель заявляє підтримку введення зображень
+  - Для переглядів modern/all у Gateway за замовчуванням використовується підібране обмеження з високою інформативністю; установіть `OPENCLAW_LIVE_GATEWAY_MAX_MODELS=0` для вичерпного перегляду modern або додатне число для меншого обмеження.
+- Як вибирати провайдерів (уникнути сценарію «усе OpenRouter»):
+  - `OPENCLAW_LIVE_GATEWAY_PROVIDERS="google,google-antigravity,google-gemini-cli,openai,anthropic,zai,minimax"` (allowlist через кому)
+- Перевірки інструментів і зображень у цьому живому тесті завжди ввімкнені:
+  - `read` probe + `exec+read` probe (навантажувальна перевірка інструментів)
+  - image probe виконується, коли модель оголошує підтримку вхідних зображень
   - Потік (на високому рівні):
-    - Тест генерує крихітний PNG з «CAT» + випадковим кодом (`src/gateway/live-image-probe.ts`)
+    - Тест генерує крихітний PNG із “CAT” + випадковим кодом (`src/gateway/live-image-probe.ts`)
     - Надсилає його через `agent` `attachments: [{ mimeType: "image/png", content: "<base64>" }]`
     - Gateway розбирає вкладення в `images[]` (`src/gateway/server-methods/agent.ts` + `src/gateway/chat-attachments.ts`)
-    - Вбудований agent передає моделі мультимодальне повідомлення користувача
-    - Перевірка: відповідь містить `cat` + код (допуск OCR: незначні помилки дозволені)
+    - Вбудований агент передає мультимодальне повідомлення користувача моделі
+    - Перевірка: відповідь містить `cat` + код (стійкість до OCR: незначні помилки допускаються)
 
-Порада: щоб побачити, що саме можна тестувати на вашій машині (і точні ідентифікатори `provider/model`), виконайте:
+Порада: щоб побачити, що ви можете тестувати на своїй машині (і точні ідентифікатори `provider/model`), виконайте:
 
 ```bash
 openclaw models list
 openclaw models list --json
 ```
 
-## Живе: smoke-тест бекенду CLI (Claude, Codex, Gemini або інші локальні CLI)
+## Живе: smoke бекенду CLI (Claude, Codex, Gemini або інші локальні CLI)
 
 - Тест: `src/gateway/gateway-cli-backend.live.test.ts`
-- Мета: перевірити конвеєр Gateway + agent з використанням локального бекенду CLI, не торкаючись вашої типової конфігурації.
-- Типові значення smoke-тестів, специфічні для бекенду, знаходяться у визначенні `cli-backend.ts` відповідного розширення-власника.
+- Мета: перевірити конвеєр Gateway + агента з використанням локального бекенду CLI, не торкаючись вашої типової конфігурації.
+- Типові параметри smoke для конкретного бекенду містяться у визначенні `cli-backend.ts` розширення-власника.
 - Увімкнення:
   - `pnpm test:live` (або `OPENCLAW_LIVE_TEST=1`, якщо ви викликаєте Vitest напряму)
   - `OPENCLAW_LIVE_CLI_BACKEND=1`
 - Типові значення:
   - Типовий провайдер/модель: `claude-cli/claude-sonnet-4-6`
-  - Поведінка command/args/image береться з метаданих Plugin CLI-бекенду-власника.
+  - Поведінка command/args/image походить із метаданих plugin бекенду CLI-власника.
 - Перевизначення (необов’язково):
   - `OPENCLAW_LIVE_CLI_BACKEND_MODEL="codex-cli/gpt-5.2"`
   - `OPENCLAW_LIVE_CLI_BACKEND_COMMAND="/full/path/to/codex"`
   - `OPENCLAW_LIVE_CLI_BACKEND_ARGS='["exec","--json","--color","never","--sandbox","read-only","--skip-git-repo-check"]'`
-  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_PROBE=1`, щоб надіслати реальне вкладення-зображення (шляхи впроваджуються у prompt). У рецептах Docker це за замовчуванням вимкнено, якщо явно не запитано.
-  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_ARG="--image"`, щоб передавати шляхи до файлів зображень як аргументи CLI замість впровадження в prompt.
-  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"` (або `"list"`), щоб керувати передаванням аргументів зображень, коли встановлено `IMAGE_ARG`.
+  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_PROBE=1`, щоб надіслати реальне вкладення зображення (шляхи інжектуються в prompt). У рецептах Docker це типово вимкнено, якщо явно не запитано.
+  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_ARG="--image"`, щоб передавати шляхи до файлів зображень як аргументи CLI замість інжекції в prompt.
+  - `OPENCLAW_LIVE_CLI_BACKEND_IMAGE_MODE="repeat"` (або `"list"`), щоб керувати тим, як передаються аргументи зображень, коли встановлено `IMAGE_ARG`.
   - `OPENCLAW_LIVE_CLI_BACKEND_RESUME_PROBE=1`, щоб надіслати другий хід і перевірити потік відновлення.
-  - `OPENCLAW_LIVE_CLI_BACKEND_MODEL_SWITCH_PROBE=1`, щоб увімкнути пробу безперервності того самого сеансу Claude Sonnet -> Opus, коли вибрана модель підтримує ціль перемикання. У рецептах Docker це за замовчуванням вимкнено для загальної надійності.
-  - `OPENCLAW_LIVE_CLI_BACKEND_MCP_PROBE=1`, щоб увімкнути loopback-пробу MCP/інструмента. У рецептах Docker це за замовчуванням вимкнено, якщо явно не запитано.
+  - `OPENCLAW_LIVE_CLI_BACKEND_MODEL_SWITCH_PROBE=1`, щоб увімкнути перевірку безперервності тієї самої сесії Claude Sonnet -> Opus, коли вибрана модель підтримує ціль перемикання. У рецептах Docker це типово вимкнено для загальної надійності.
+  - `OPENCLAW_LIVE_CLI_BACKEND_MCP_PROBE=1`, щоб увімкнути loopback-перевірку MCP/інструментів. У рецептах Docker це типово вимкнено, якщо явно не запитано.
 
 Приклад:
 
@@ -177,7 +177,7 @@ OPENCLAW_LIVE_CLI_BACKEND=1 \
 pnpm test:docker:live-cli-backend
 ```
 
-Рецепти Docker для одного провайдера:
+Docker-рецепти для одного провайдера:
 
 ```bash
 pnpm test:docker:live-cli-backend:claude
@@ -188,40 +188,43 @@ pnpm test:docker:live-cli-backend:gemini
 
 Примітки:
 
-- Раннер Docker знаходиться тут: `scripts/test-live-cli-backend-docker.sh`.
-- Він запускає живий smoke-тест CLI-бекенду всередині Docker-образу репозиторію від імені непривілейованого користувача `node`.
-- Він визначає метадані smoke-тесту CLI з розширення-власника, а потім встановлює відповідний Linux-пакет CLI (`@anthropic-ai/claude-code`, `@openai/codex` або `@google/gemini-cli`) у кешований каталог із правом запису за префіксом `OPENCLAW_DOCKER_CLI_TOOLS_DIR` (типово: `~/.cache/openclaw/docker-cli-tools`).
-- `pnpm test:docker:live-cli-backend:claude-subscription` потребує portable Claude Code subscription OAuth через `~/.claude/.credentials.json` з `claudeAiOauth.subscriptionType` або `CLAUDE_CODE_OAUTH_TOKEN` із `claude setup-token`. Спочатку він підтверджує прямий `claude -p` у Docker, а потім виконує два ходи Gateway CLI-бекенду без збереження змінних середовища ключа Anthropic API. Для цього шляху підписки за замовчуванням вимкнено проби Claude MCP/інструмента та зображень, оскільки Claude наразі маршрутизує використання сторонніх застосунків через оплату за додаткове використання, а не через звичайні ліміти плану підписки.
-- Живий smoke-тест CLI-бекенду тепер виконує той самий наскрізний потік для Claude, Codex і Gemini: текстовий хід, хід класифікації зображення, а потім виклик інструмента MCP `cron`, перевірений через gateway CLI.
-- Типовий smoke-тест Claude також патчить сеанс із Sonnet на Opus і перевіряє, що відновлений сеанс усе ще пам’ятає попередню нотатку.
+- Docker runner розташовано в `scripts/test-live-cli-backend-docker.sh`.
+- Він запускає живу smoke-перевірку CLI-бекенду всередині Docker-образу репозиторію від імені непривілейованого користувача `node`.
+- Він визначає метадані CLI smoke з розширення-власника, а потім встановлює відповідний Linux-пакет CLI (`@anthropic-ai/claude-code`, `@openai/codex` або `@google/gemini-cli`) у кешований доступний для запису префікс за адресою `OPENCLAW_DOCKER_CLI_TOOLS_DIR` (типово: `~/.cache/openclaw/docker-cli-tools`).
+- `pnpm test:docker:live-cli-backend:claude-subscription` вимагає переносиму OAuth-підписку Claude Code через `~/.claude/.credentials.json` із `claudeAiOauth.subscriptionType` або `CLAUDE_CODE_OAUTH_TOKEN` із `claude setup-token`. Спочатку він доводить прямий `claude -p` у Docker, а потім виконує два ходи Gateway CLI-backend без збереження env-змінних ключів Anthropic API. Ця гілка підписки типово вимикає перевірки Claude MCP/інструментів і зображень, тому що Claude наразі маршрутизує використання сторонніх застосунків через тарифікацію за додаткове використання замість звичайних лімітів плану підписки.
+- Жива smoke-перевірка CLI-бекенду тепер виконує однаковий наскрізний потік для Claude, Codex і Gemini: текстовий хід, хід класифікації зображення, потім виклик інструмента MCP `cron`, перевірений через Gateway CLI.
+- Типова smoke-перевірка Claude також змінює сесію із Sonnet на Opus і перевіряє, що відновлена сесія все ще пам’ятає раніше зроблену нотатку.
 
-## Живе: smoke-тест прив’язки ACP (`/acp spawn ... --bind here`)
+## Живе: smoke прив’язки ACP (`/acp spawn ... --bind here`)
 
 - Тест: `src/gateway/gateway-acp-bind.live.test.ts`
-- Мета: перевірити реальний потік conversation-bind ACP із живим ACP agent:
+- Мета: перевірити реальний потік прив’язки розмови ACP з живим ACP-агентом:
   - надіслати `/acp spawn <agent> --bind here`
   - прив’язати синтетичну розмову каналу повідомлень на місці
-  - надіслати звичайний подальший запит у тій самій розмові
-  - перевірити, що подальший запит потрапляє до стенограми прив’язаного сеансу ACP
+  - надіслати звичайний подальший крок у цій самій розмові
+  - перевірити, що подальший крок потрапив у транскрипт прив’язаної сесії ACP
 - Увімкнення:
   - `pnpm test:live src/gateway/gateway-acp-bind.live.test.ts`
   - `OPENCLAW_LIVE_ACP_BIND=1`
 - Типові значення:
-  - ACP agents у Docker: `claude,codex,gemini`
-  - ACP agent для прямого `pnpm test:live ...`: `claude`
-  - Синтетичний канал: контекст розмови у стилі Slack DM
+  - ACP-агенти в Docker: `claude,codex,gemini`
+  - ACP-агент для прямого `pnpm test:live ...`: `claude`
+  - Синтетичний канал: контекст розмови в стилі Slack DM
   - Бекенд ACP: `acpx`
 - Перевизначення:
   - `OPENCLAW_LIVE_ACP_BIND_AGENT=claude`
   - `OPENCLAW_LIVE_ACP_BIND_AGENT=codex`
   - `OPENCLAW_LIVE_ACP_BIND_AGENT=gemini`
+  - `OPENCLAW_LIVE_ACP_BIND_AGENT=opencode`
   - `OPENCLAW_LIVE_ACP_BIND_AGENTS=claude,codex,gemini`
   - `OPENCLAW_LIVE_ACP_BIND_AGENT_COMMAND='npx -y @agentclientprotocol/claude-agent-acp@<version>'`
   - `OPENCLAW_LIVE_ACP_BIND_CODEX_MODEL=gpt-5.2`
+  - `OPENCLAW_LIVE_ACP_BIND_OPENCODE_MODEL=opencode/kimi-k2.6`
+  - `OPENCLAW_LIVE_ACP_BIND_REQUIRE_TRANSCRIPT=1`
   - `OPENCLAW_LIVE_ACP_BIND_PARENT_MODEL=openai/gpt-5.2`
 - Примітки:
-  - Цей шлях використовує поверхню gateway `chat.send` з адміністративними синтетичними полями originating-route, щоб тести могли приєднати контекст каналу повідомлень без удавання зовнішньої доставки.
-  - Коли `OPENCLAW_LIVE_ACP_BIND_AGENT_COMMAND` не встановлено, тест використовує вбудований реєстр agent вбудованого Plugin `acpx` для вибраного ACP harness agent.
+  - Ця гілка використовує поверхню gateway `chat.send` з адміністративними полями synthetic originating-route, щоб тести могли додавати контекст каналу повідомлень без імітації зовнішньої доставки.
+  - Коли `OPENCLAW_LIVE_ACP_BIND_AGENT_COMMAND` не задано, тест використовує вбудований реєстр агентів plugin `acpx` для вибраного ACP harness-агента.
 
 Приклад:
 
@@ -231,53 +234,55 @@ OPENCLAW_LIVE_ACP_BIND=1 \
   pnpm test:live src/gateway/gateway-acp-bind.live.test.ts
 ```
 
-Рецепт Docker:
+Docker-рецепт:
 
 ```bash
 pnpm test:docker:live-acp-bind
 ```
 
-Рецепти Docker для одного agent:
+Docker-рецепти для одного агента:
 
 ```bash
 pnpm test:docker:live-acp-bind:claude
 pnpm test:docker:live-acp-bind:codex
 pnpm test:docker:live-acp-bind:gemini
+pnpm test:docker:live-acp-bind:opencode
 ```
 
 Примітки щодо Docker:
 
-- Раннер Docker знаходиться тут: `scripts/test-live-acp-bind-docker.sh`.
-- За замовчуванням він запускає smoke-тест прив’язки ACP послідовно для всіх підтримуваних живих агентів CLI: `claude`, `codex`, потім `gemini`.
-- Використовуйте `OPENCLAW_LIVE_ACP_BIND_AGENTS=claude`, `OPENCLAW_LIVE_ACP_BIND_AGENTS=codex` або `OPENCLAW_LIVE_ACP_BIND_AGENTS=gemini`, щоб звузити матрицю.
-- Він підключає `~/.profile`, готує відповідні матеріали автентифікації CLI в контейнері, установлює `acpx` у npm-префікс із правом запису, а потім установлює запитаний живий CLI (`@anthropic-ai/claude-code`, `@openai/codex` або `@google/gemini-cli`), якщо його немає.
-- Усередині Docker раннер встановлює `OPENCLAW_LIVE_ACP_BIND_ACPX_COMMAND=$HOME/.npm-global/bin/acpx`, щоб `acpx` зберігав змінні середовища провайдера з підключеного профілю доступними для дочірнього CLI harness.
+- Docker runner розташовано в `scripts/test-live-acp-bind-docker.sh`.
+- За замовчуванням він запускає smoke-перевірку ACP bind для сукупних живих CLI-агентів послідовно: `claude`, `codex`, потім `gemini`.
+- Використовуйте `OPENCLAW_LIVE_ACP_BIND_AGENTS=claude`, `OPENCLAW_LIVE_ACP_BIND_AGENTS=codex`, `OPENCLAW_LIVE_ACP_BIND_AGENTS=gemini` або `OPENCLAW_LIVE_ACP_BIND_AGENTS=opencode`, щоб звузити матрицю.
+- Він виконує `source ~/.profile`, готує відповідні матеріали автентифікації CLI в контейнері, а потім встановлює запитаний живий CLI (`@anthropic-ai/claude-code`, `@openai/codex`, `@google/gemini-cli` або `opencode-ai`), якщо його немає. Сам бекенд ACP — це вбудований пакет `acpx/runtime` з plugin `acpx`.
+- Варіант Docker для OpenCode — це сувора регресійна гілка для одного агента. Після виконання `source ~/.profile` він записує тимчасову типову модель `OPENCODE_CONFIG_CONTENT` з `OPENCLAW_LIVE_ACP_BIND_OPENCODE_MODEL` (типово `opencode/kimi-k2.6`), а `pnpm test:docker:live-acp-bind:opencode` вимагає прив’язаного транскрипту асистента замість прийняття загального пропуску після bind.
+- Прямі виклики CLI `acpx` — це лише ручний/обхідний шлях для порівняння поведінки поза Gateway. Docker smoke-перевірка ACP bind перевіряє вбудований бекенд runtime `acpx` в OpenClaw.
 
-## Живе: smoke-тест harness app-server Codex
+## Живе: smoke Codex app-server harness
 
-- Мета: перевірити harness Codex, яким володіє Plugin, через звичайний метод gateway
-  `agent`:
-  - завантажити вбудований Plugin `codex`
+- Мета: перевірити harness Codex, що належить plugin, через звичайний
+  метод gateway `agent`:
+  - завантажити вбудований plugin `codex`
   - вибрати `OPENCLAW_AGENT_RUNTIME=codex`
-  - надіслати перший хід gateway agent до `openai/gpt-5.2` із примусовим використанням harness Codex
-  - надіслати другий хід у той самий сеанс OpenClaw і перевірити, що потік
+  - надіслати перший хід gateway agent до `openai/gpt-5.2` із примусово вибраним harness Codex
+  - надіслати другий хід до тієї самої сесії OpenClaw і перевірити, що потік
     app-server може відновитися
-  - запустити `/codex status` і `/codex models` через той самий шлях команди
-    gateway
-  - необов’язково запустити дві ескальовані shell-проби, перевірені Guardian: одну безпечну
-    команду, яку слід схвалити, і одне фальшиве вивантаження секрету, яке слід
-    відхилити, щоб agent перепитав
+  - виконати `/codex status` і `/codex models` через той самий командний
+    шлях gateway
+  - за потреби виконати дві перевірки оболонки з підвищеними правами, схвалені Guardian: одну безпечну
+    команду, яку слід дозволити, і одне фіктивне вивантаження секрету, яке має бути
+    відхилене, щоб агент перепитав
 - Тест: `src/gateway/gateway-codex-harness.live.test.ts`
 - Увімкнення: `OPENCLAW_LIVE_CODEX_HARNESS=1`
 - Типова модель: `openai/gpt-5.2`
-- Необов’язкова проба зображення: `OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE=1`
-- Необов’язкова проба MCP/інструмента: `OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE=1`
-- Необов’язкова проба Guardian: `OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE=1`
-- Smoke-тест установлює `OPENCLAW_AGENT_HARNESS_FALLBACK=none`, щоб зламаний harness Codex
-  не міг пройти, непомітно переключившись на fallback до Pi.
-- Автентифікація: автентифікація app-server Codex із локального входу до підписки Codex. Docker
-  smoke-тести також можуть надавати `OPENAI_API_KEY` для не-Codex проб, де це застосовно,
-  а також необов’язково скопійовані `~/.codex/auth.json` і `~/.codex/config.toml`.
+- Необов’язкова image probe: `OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE=1`
+- Необов’язкова MCP/tool probe: `OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE=1`
+- Необов’язкова Guardian probe: `OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE=1`
+- Для smoke встановлюється `OPENCLAW_AGENT_HARNESS_FALLBACK=none`, щоб зламаний Codex
+  harness не міг пройти, непомітно переключившись на резервний PI.
+- Автентифікація: автентифікація Codex app-server із локального входу до підписки Codex. Docker
+  smoke-перевірки також можуть надавати `OPENAI_API_KEY` для не-Codex перевірок, де це застосовно,
+  а також за потреби скопійовані `~/.codex/auth.json` і `~/.codex/config.toml`.
 
 Локальний рецепт:
 
@@ -291,7 +296,7 @@ OPENCLAW_LIVE_CODEX_HARNESS=1 \
   pnpm test:live -- src/gateway/gateway-codex-harness.live.test.ts
 ```
 
-Рецепт Docker:
+Docker-рецепт:
 
 ```bash
 source ~/.profile
@@ -300,59 +305,59 @@ pnpm test:docker:live-codex-harness
 
 Примітки щодо Docker:
 
-- Раннер Docker знаходиться тут: `scripts/test-live-codex-harness-docker.sh`.
-- Він підключає змонтований `~/.profile`, передає `OPENAI_API_KEY`, копіює файли
-  автентифікації CLI Codex, якщо вони є, установлює `@openai/codex` у змонтований npm-префікс
-  із правом запису, готує дерево джерел, а потім запускає лише живий тест Codex-harness.
-- У Docker проби зображення, MCP/інструмента та Guardian увімкнені за замовчуванням. Установіть
+- Docker runner розташовано в `scripts/test-live-codex-harness-docker.sh`.
+- Він виконує `source` для змонтованого `~/.profile`, передає `OPENAI_API_KEY`, копіює файли
+  автентифікації CLI Codex за наявності, встановлює `@openai/codex` у доступний для запису змонтований npm
+  префікс, готує дерево вихідного коду, а потім запускає лише живий тест Codex-harness.
+- Docker типово вмикає image, MCP/tool і Guardian probe. Установіть
   `OPENCLAW_LIVE_CODEX_HARNESS_IMAGE_PROBE=0` або
   `OPENCLAW_LIVE_CODEX_HARNESS_MCP_PROBE=0` або
   `OPENCLAW_LIVE_CODEX_HARNESS_GUARDIAN_PROBE=0`, коли потрібен вужчий налагоджувальний
   запуск.
 - Docker також експортує `OPENCLAW_AGENT_HARNESS_FALLBACK=none`, що відповідає конфігурації живого
-  тесту, щоб застарілі псевдоніми або fallback до Pi не могли приховати регресію
-  harness Codex.
+  тесту, тож застарілі псевдоніми або резервний PI не можуть приховати регресію
+  Codex harness.
 
 ### Рекомендовані живі рецепти
 
-Вузькі, явні allowlist працюють найшвидше й найменше схильні до збоїв:
+Вузькі, явні allowlist — найшвидші й найменш схильні до збоїв:
 
-- Одна модель, напряму (без gateway):
+- Одна модель, напряму (без Gateway):
   - `OPENCLAW_LIVE_MODELS="openai/gpt-5.2" pnpm test:live src/agents/models.profiles.live.test.ts`
 
-- Одна модель, smoke-тест gateway:
+- Одна модель, smoke Gateway:
   - `OPENCLAW_LIVE_GATEWAY_MODELS="openai/gpt-5.2" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-- Виклик інструментів для кількох провайдерів:
+- Виклик інструментів через кількох провайдерів:
   - `OPENCLAW_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-6,google/gemini-3-flash-preview,deepseek/deepseek-v4-flash,zai/glm-4.7,minimax/MiniMax-M2.7" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 - Фокус на Google (ключ API Gemini + Antigravity):
   - Gemini (ключ API): `OPENCLAW_LIVE_GATEWAY_MODELS="google/gemini-3-flash-preview" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
   - Antigravity (OAuth): `OPENCLAW_LIVE_GATEWAY_MODELS="google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-pro-high" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
-- Smoke-тест адаптивного мислення Google:
-  - Якщо локальні ключі знаходяться в профілі shell: `source ~/.profile`
-  - Gemini 3 dynamic default: `pnpm openclaw qa manual --provider-mode live-frontier --model google/gemini-3.1-pro-preview --alt-model google/gemini-3.1-pro-preview --message '/think adaptive Reply exactly: GEMINI_ADAPTIVE_OK' --timeout-ms 180000`
-  - Gemini 2.5 dynamic budget: `pnpm openclaw qa manual --provider-mode live-frontier --model google/gemini-2.5-flash --alt-model google/gemini-2.5-flash --message '/think adaptive Reply exactly: GEMINI25_ADAPTIVE_OK' --timeout-ms 180000`
+- Жива smoke-перевірка адаптивного мислення Google:
+  - Якщо локальні ключі містяться в профілі оболонки: `source ~/.profile`
+  - Динамічний типовий Gemini 3: `pnpm openclaw qa manual --provider-mode live-frontier --model google/gemini-3.1-pro-preview --alt-model google/gemini-3.1-pro-preview --message '/think adaptive Reply exactly: GEMINI_ADAPTIVE_OK' --timeout-ms 180000`
+  - Динамічний бюджет Gemini 2.5: `pnpm openclaw qa manual --provider-mode live-frontier --model google/gemini-2.5-flash --alt-model google/gemini-2.5-flash --message '/think adaptive Reply exactly: GEMINI25_ADAPTIVE_OK' --timeout-ms 180000`
 
 Примітки:
 
 - `google/...` використовує API Gemini (ключ API).
-- `google-antigravity/...` використовує міст OAuth Antigravity (кінцева точка agent у стилі Cloud Code Assist).
+- `google-antigravity/...` використовує OAuth-міст Antigravity (кінцева точка агента в стилі Cloud Code Assist).
 - `google-gemini-cli/...` використовує локальний Gemini CLI на вашій машині (окрема автентифікація + особливості інструментів).
 - API Gemini проти Gemini CLI:
-  - API: OpenClaw викликає розміщений Google API Gemini через HTTP (автентифікація через ключ API / профіль); саме це більшість користувачів мають на увазі під «Gemini».
-  - CLI: OpenClaw викликає локальний бінарник `gemini`; він має власну автентифікацію й може поводитися інакше (streaming/підтримка інструментів/розбіжність версій).
+  - API: OpenClaw викликає розміщений Google API Gemini через HTTP (автентифікація ключем API / профілем); саме це більшість користувачів мають на увазі під «Gemini».
+  - CLI: OpenClaw викликає локальний двійковий файл `gemini`; він має власну автентифікацію і може поводитися інакше (streaming/підтримка інструментів/розходження версій).
 
 ## Живе: матриця моделей (що ми покриваємо)
 
-Фіксованого «списку моделей CI» немає (живі тести вмикаються за бажанням), але ось **рекомендовані** моделі для регулярного покриття на машині розробника з ключами.
+Фіксованого «списку моделей CI» немає (живі тести — opt-in), але це **рекомендовані** моделі, які слід регулярно покривати на машині розробника з ключами.
 
-### Сучасний набір smoke-тестів (виклик інструментів + зображення)
+### Сучасний набір smoke (виклик інструментів + зображення)
 
-Це запуск «поширених моделей», який, як ми очікуємо, має залишатися працездатним:
+Це запуск «поширених моделей», який ми очікуємо зберігати працездатним:
 
-- OpenAI (не-Codex): `openai/gpt-5.2`
+- OpenAI (не Codex): `openai/gpt-5.2`
 - OpenAI Codex OAuth: `openai-codex/gpt-5.2`
 - Anthropic: `anthropic/claude-opus-4-6` (або `anthropic/claude-sonnet-4-6`)
 - Google (API Gemini): `google/gemini-3.1-pro-preview` і `google/gemini-3-flash-preview` (уникайте старіших моделей Gemini 2.x)
@@ -361,12 +366,12 @@ pnpm test:docker:live-codex-harness
 - Z.AI (GLM): `zai/glm-4.7`
 - MiniMax: `minimax/MiniMax-M2.7`
 
-Запуск smoke-тесту gateway з інструментами + зображенням:
+Запустіть smoke Gateway з інструментами + зображенням:
 `OPENCLAW_LIVE_GATEWAY_MODELS="openai/gpt-5.2,openai-codex/gpt-5.2,anthropic/claude-opus-4-6,google/gemini-3.1-pro-preview,google/gemini-3-flash-preview,google-antigravity/claude-opus-4-6-thinking,google-antigravity/gemini-3-flash,deepseek/deepseek-v4-flash,zai/glm-4.7,minimax/MiniMax-M2.7" pnpm test:live src/gateway/gateway-models.profiles.live.test.ts`
 
 ### Базовий рівень: виклик інструментів (Read + необов’язковий Exec)
 
-Виберіть принаймні одну модель для кожної сім’ї провайдерів:
+Виберіть щонайменше одну модель для кожного сімейства провайдерів:
 
 - OpenAI: `openai/gpt-5.2`
 - Anthropic: `anthropic/claude-opus-4-6` (або `anthropic/claude-sonnet-4-6`)
@@ -375,51 +380,51 @@ pnpm test:docker:live-codex-harness
 - Z.AI (GLM): `zai/glm-4.7`
 - MiniMax: `minimax/MiniMax-M2.7`
 
-Необов’язкове додаткове покриття (бажано мати):
+Необов’язкове додаткове покриття (було б добре мати):
 
 - xAI: `xai/grok-4` (або найновіша доступна)
-- Mistral: `mistral/`… (виберіть одну модель із підтримкою `tools`, яку у вас ввімкнено)
-- Cerebras: `cerebras/`… (якщо у вас є доступ)
+- Mistral: `mistral/`… (виберіть одну модель із підтримкою “tools”, яку у вас ввімкнено)
+- Cerebras: `cerebras/`… (якщо маєте доступ)
 - LM Studio: `lmstudio/`… (локально; виклик інструментів залежить від режиму API)
 
 ### Vision: надсилання зображення (вкладення → мультимодальне повідомлення)
 
-Додайте принаймні одну модель із підтримкою зображень у `OPENCLAW_LIVE_GATEWAY_MODELS` (Claude/Gemini/варіанти OpenAI із підтримкою vision тощо), щоб перевірити пробу зображення.
+Додайте щонайменше одну модель із підтримкою зображень у `OPENCLAW_LIVE_GATEWAY_MODELS` (варіанти Claude/Gemini/OpenAI із підтримкою vision тощо), щоб перевірити image probe.
 
-### Агрегатори / альтернативні gateway
+### Агрегатори / альтернативні Gateway
 
 Якщо у вас увімкнено ключі, ми також підтримуємо тестування через:
 
-- OpenRouter: `openrouter/...` (сотні моделей; використовуйте `openclaw models scan`, щоб знайти кандидатів із підтримкою `tool`+`image`)
+- OpenRouter: `openrouter/...` (сотні моделей; використовуйте `openclaw models scan`, щоб знайти кандидатів із підтримкою tools+image)
 - OpenCode: `opencode/...` для Zen і `opencode-go/...` для Go (автентифікація через `OPENCODE_API_KEY` / `OPENCODE_ZEN_API_KEY`)
 
-Інші провайдери, яких можна включити до живої матриці (якщо у вас є облікові дані/конфігурація):
+Більше провайдерів, які можна включити до живої матриці (якщо у вас є облікові дані/конфігурація):
 
 - Вбудовані: `openai`, `openai-codex`, `anthropic`, `google`, `google-vertex`, `google-antigravity`, `google-gemini-cli`, `zai`, `openrouter`, `opencode`, `opencode-go`, `xai`, `groq`, `cerebras`, `mistral`, `github-copilot`
-- Через `models.providers` (власні кінцеві точки): `minimax` (хмара/API), а також будь-який сумісний із OpenAI/Anthropic проксі (LM Studio, vLLM, LiteLLM тощо)
+- Через `models.providers` (власні кінцеві точки): `minimax` (хмара/API), а також будь-який OpenAI/Anthropic-сумісний проксі (LM Studio, vLLM, LiteLLM тощо)
 
-Порада: не намагайтеся жорстко прописати в документації «всі моделі». Авторитетний список — це те, що `discoverModels(...)` повертає на вашій машині + які ключі доступні.
+Порада: не намагайтеся жорстко фіксувати в документації «усі моделі». Авторитетний список — це все, що повертає `discoverModels(...)` на вашій машині, плюс усі доступні ключі.
 
 ## Облікові дані (ніколи не комітьте)
 
-Живі тести виявляють облікові дані так само, як це робить CLI. Практичні наслідки:
+Живі тести виявляють облікові дані так само, як і CLI. Практичні наслідки:
 
-- Якщо CLI працює, живі тести мають знаходити ті самі ключі.
-- Якщо живий тест повідомляє «немає облікових даних», налагоджуйте це так само, як ви налагоджували б `openclaw models list` / вибір моделі.
+- Якщо CLI працює, живі тести повинні знаходити ті самі ключі.
+- Якщо живий тест каже «немає облікових даних», налагоджуйте це так само, як ви налагоджували б `openclaw models list` / вибір моделі.
 
-- Профілі автентифікації для кожного agent: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (саме це в живих тестах означає «ключі профілю»)
+- Профілі автентифікації для кожного агента: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` (саме це у живих тестах означає «ключі профілю»)
 - Конфігурація: `~/.openclaw/openclaw.json` (або `OPENCLAW_CONFIG_PATH`)
-- Застарілий каталог стану: `~/.openclaw/credentials/` (копіюється в підготовлений живий home, якщо присутній, але це не основне сховище ключів профілю)
-- Локальні живі запуски за замовчуванням копіюють активну конфігурацію, файли `auth-profiles.json` для кожного agent, застарілий `credentials/` і підтримувані зовнішні каталоги автентифікації CLI до тимчасового тестового home; у підготовлених живих home пропускаються `workspace/` і `sandboxes/`, а перевизначення шляхів `agents.*.workspace` / `agentDir` видаляються, щоб проби не торкалися вашого реального робочого простору хоста.
+- Застарілий каталог стану: `~/.openclaw/credentials/` (копіюється до staged live home за наявності, але це не основне сховище ключів профілю)
+- Локальні живі запуски типово копіюють активну конфігурацію, файли `auth-profiles.json` для кожного агента, застарілий `credentials/` і підтримувані зовнішні каталоги автентифікації CLI до тимчасового test home; staged live home пропускають `workspace/` і `sandboxes/`, а перевизначення шляхів `agents.*.workspace` / `agentDir` прибираються, щоб перевірки не торкалися вашого реального робочого простору хоста.
 
-Якщо ви хочете покладатися на ключі env (наприклад, експортовані у вашому `~/.profile`), запускайте локальні тести після `source ~/.profile` або використовуйте наведені нижче раннери Docker (вони можуть монтувати `~/.profile` у контейнер).
+Якщо ви хочете покладатися на env-ключі (наприклад, експортовані у вашому `~/.profile`), запускайте локальні тести після `source ~/.profile`, або використовуйте наведені нижче Docker runner-и (вони можуть монтувати `~/.profile` у контейнер).
 
 ## Живе: Deepgram (транскрибування аудіо)
 
 - Тест: `extensions/deepgram/audio.live.test.ts`
 - Увімкнення: `DEEPGRAM_API_KEY=... DEEPGRAM_LIVE_TEST=1 pnpm test:live extensions/deepgram/audio.live.test.ts`
 
-## Живе: coding plan BytePlus
+## Живе: план кодування BytePlus
 
 - Тест: `extensions/byteplus/live.test.ts`
 - Увімкнення: `BYTEPLUS_API_KEY=... BYTEPLUS_LIVE_TEST=1 pnpm test:live extensions/byteplus/live.test.ts`
@@ -430,9 +435,9 @@ pnpm test:docker:live-codex-harness
 - Тест: `extensions/comfy/comfy.live.test.ts`
 - Увімкнення: `OPENCLAW_LIVE_TEST=1 COMFY_LIVE_TEST=1 pnpm test:live -- extensions/comfy/comfy.live.test.ts`
 - Обсяг:
-  - Перевіряє вбудовані шляхи comfy для зображень, відео та `music_generate`
+  - Перевіряє вбудовані шляхи comfy для зображень, відео і `music_generate`
   - Пропускає кожну можливість, якщо не налаштовано `plugins.entries.comfy.config.<capability>`
-  - Корисно після змін у надсиланні workflow comfy, опитуванні, завантаженнях або реєстрації Plugin
+  - Корисно після змін у надсиланні workflow comfy, опитуванні, завантаженнях або реєстрації plugin
 
 ## Живе: генерація зображень
 
@@ -440,13 +445,13 @@ pnpm test:docker:live-codex-harness
 - Команда: `pnpm test:live test/image-generation.runtime.live.test.ts`
 - Harness: `pnpm test:live:media image`
 - Обсяг:
-  - Перераховує кожен зареєстрований Plugin провайдера генерації зображень
-  - Завантажує відсутні env-змінні провайдера з вашої оболонки входу (`~/.profile`) перед пробами
+  - Перелічує кожен зареєстрований plugin провайдера генерації зображень
+  - Завантажує відсутні env-змінні провайдерів із вашої login shell (`~/.profile`) перед перевіркою
   - За замовчуванням використовує живі/env API-ключі раніше за збережені профілі автентифікації, щоб застарілі тестові ключі в `auth-profiles.json` не маскували реальні облікові дані оболонки
   - Пропускає провайдерів без придатної автентифікації/профілю/моделі
-  - Проганяє кожного налаштованого провайдера через спільний runtime генерації зображень:
+  - Запускає кожного налаштованого провайдера через спільний runtime генерації зображень:
     - `<provider>:generate`
-    - `<provider>:edit`, коли провайдер заявляє підтримку редагування
+    - `<provider>:edit`, коли провайдер оголошує підтримку редагування
 - Поточні вбудовані провайдери, які покриваються:
   - `fal`
   - `google`
@@ -460,10 +465,10 @@ pnpm test:docker:live-codex-harness
   - `OPENCLAW_LIVE_IMAGE_GENERATION_MODELS="openai/gpt-image-2,google/gemini-3.1-flash-image-preview,openrouter/google/gemini-3.1-flash-image-preview,xai/grok-imagine-image"`
   - `OPENCLAW_LIVE_IMAGE_GENERATION_CASES="google:flash-generate,google:pro-edit,openrouter:generate,xai:default-generate,xai:default-edit"`
 - Необов’язкова поведінка автентифікації:
-  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію через сховище профілів і ігнорувати перевизначення лише через env
+  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію зі сховища профілів і ігнорувати перевизначення лише через env
 
-Для шляху CLI, що постачається, додайте smoke-тест `infer` після того, як живий
-тест провайдера/runtime пройде успішно:
+Для шляху shipped CLI додайте smoke-перевірку `infer` після того, як живий тест
+провайдера/runtime пройде:
 
 ```bash
 OPENCLAW_LIVE_TEST=1 OPENCLAW_LIVE_INFER_CLI_TEST=1 pnpm test:live -- test/image-generation.infer-cli.live.test.ts
@@ -476,7 +481,7 @@ openclaw infer image generate \
 ```
 
 Це покриває розбір аргументів CLI, визначення config/default-agent, активацію вбудованого
-Plugin, ремонт залежностей runtime на вимогу, спільний
+plugin, відновлення залежностей bundled runtime на вимогу, спільний
 runtime генерації зображень і живий запит до провайдера.
 
 ## Живе: генерація музики
@@ -485,15 +490,15 @@ runtime генерації зображень і живий запит до пр
 - Увімкнення: `OPENCLAW_LIVE_TEST=1 pnpm test:live -- extensions/music-generation-providers.live.test.ts`
 - Harness: `pnpm test:live:media music`
 - Обсяг:
-  - Перевіряє спільний шлях вбудованого провайдера генерації музики
+  - Перевіряє спільний шлях bundled-провайдера генерації музики
   - Наразі покриває Google і MiniMax
-  - Завантажує env-змінні провайдера з вашої оболонки входу (`~/.profile`) перед пробами
+  - Завантажує env-змінні провайдерів із вашої login shell (`~/.profile`) перед перевіркою
   - За замовчуванням використовує живі/env API-ключі раніше за збережені профілі автентифікації, щоб застарілі тестові ключі в `auth-profiles.json` не маскували реальні облікові дані оболонки
   - Пропускає провайдерів без придатної автентифікації/профілю/моделі
-  - Запускає обидва заявлені режими runtime, коли вони доступні:
-    - `generate` з введенням лише prompt
-    - `edit`, коли провайдер заявляє `capabilities.edit.enabled`
-  - Поточне покриття спільного шляху:
+  - Запускає обидва оголошені режими runtime, коли вони доступні:
+    - `generate` з вхідними даними лише у вигляді prompt
+    - `edit`, коли провайдер оголошує `capabilities.edit.enabled`
+  - Поточне покриття у спільній гілці:
     - `google`: `generate`, `edit`
     - `minimax`: `generate`
     - `comfy`: окремий живий файл Comfy, не цей спільний перегляд
@@ -501,7 +506,7 @@ runtime генерації зображень і живий запит до пр
   - `OPENCLAW_LIVE_MUSIC_GENERATION_PROVIDERS="google,minimax"`
   - `OPENCLAW_LIVE_MUSIC_GENERATION_MODELS="google/lyria-3-clip-preview,minimax/music-2.6"`
 - Необов’язкова поведінка автентифікації:
-  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію через сховище профілів і ігнорувати перевизначення лише через env
+  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію зі сховища профілів і ігнорувати перевизначення лише через env
 
 ## Живе: генерація відео
 
@@ -509,43 +514,43 @@ runtime генерації зображень і живий запит до пр
 - Увімкнення: `OPENCLAW_LIVE_TEST=1 pnpm test:live -- extensions/video-generation-providers.live.test.ts`
 - Harness: `pnpm test:live:media video`
 - Обсяг:
-  - Перевіряє спільний шлях вбудованого провайдера генерації відео
-  - За замовчуванням використовує безпечний для релізу шлях smoke-тесту: провайдери не-FAL, один запит text-to-video на провайдера, односекундний lobster-prompt і обмеження операції на провайдера з `OPENCLAW_LIVE_VIDEO_GENERATION_TIMEOUT_MS` (`180000` за замовчуванням)
+  - Перевіряє спільний шлях bundled-провайдера генерації відео
+  - За замовчуванням використовує безпечний для релізу шлях smoke: провайдери не-FAL, один запит text-to-video на провайдера, односекундний prompt із лобстером і обмеження операції для кожного провайдера з `OPENCLAW_LIVE_VIDEO_GENERATION_TIMEOUT_MS` (`180000` за замовчуванням)
   - За замовчуванням пропускає FAL, оскільки затримка черги на боці провайдера може домінувати в часі релізу; передайте `--video-providers fal` або `OPENCLAW_LIVE_VIDEO_GENERATION_PROVIDERS="fal"`, щоб запустити його явно
-  - Завантажує env-змінні провайдера з вашої оболонки входу (`~/.profile`) перед пробами
+  - Завантажує env-змінні провайдерів із вашої login shell (`~/.profile`) перед перевіркою
   - За замовчуванням використовує живі/env API-ключі раніше за збережені профілі автентифікації, щоб застарілі тестові ключі в `auth-profiles.json` не маскували реальні облікові дані оболонки
   - Пропускає провайдерів без придатної автентифікації/профілю/моделі
   - За замовчуванням запускає лише `generate`
-  - Установіть `OPENCLAW_LIVE_VIDEO_GENERATION_FULL_MODES=1`, щоб також запускати заявлені режими трансформації, коли вони доступні:
-    - `imageToVideo`, коли провайдер заявляє `capabilities.imageToVideo.enabled` і вибраний провайдер/модель приймає локальне введення зображення на основі buffer у спільному перегляді
-    - `videoToVideo`, коли провайдер заявляє `capabilities.videoToVideo.enabled` і вибраний провайдер/модель приймає локальне введення відео на основі buffer у спільному перегляді
-  - Поточні заявлені, але пропущені провайдери `imageToVideo` у спільному перегляді:
-    - `vydra`, оскільки вбудований `veo3` є лише text-only, а вбудований `kling` потребує віддаленої URL-адреси зображення
-  - Покриття Vydra, специфічне для провайдера:
+  - Установіть `OPENCLAW_LIVE_VIDEO_GENERATION_FULL_MODES=1`, щоб також запускати оголошені режими transform, коли вони доступні:
+    - `imageToVideo`, коли провайдер оголошує `capabilities.imageToVideo.enabled` і вибраний провайдер/модель приймає локальний вхід зображення на основі buffer у спільному перегляді
+    - `videoToVideo`, коли провайдер оголошує `capabilities.videoToVideo.enabled` і вибраний провайдер/модель приймає локальний вхід відео на основі buffer у спільному перегляді
+  - Поточні провайдери `imageToVideo`, оголошені, але пропущені у спільному перегляді:
+    - `vydra`, тому що вбудований `veo3` підтримує лише text-to-video, а вбудований `kling` вимагає віддалену URL-адресу зображення
+  - Специфічне для провайдера покриття Vydra:
     - `OPENCLAW_LIVE_TEST=1 OPENCLAW_LIVE_VYDRA_VIDEO=1 pnpm test:live -- extensions/vydra/vydra.live.test.ts`
-    - цей файл запускає `veo3` text-to-video плюс шлях `kling`, який за замовчуванням використовує віддалений fixture URL-адреси зображення
+    - цей файл запускає `veo3` text-to-video плюс гілку `kling`, яка за замовчуванням використовує fixture віддаленої URL-адреси зображення
   - Поточне живе покриття `videoToVideo`:
     - лише `runway`, коли вибрана модель — `runway/gen4_aleph`
-  - Поточні заявлені, але пропущені провайдери `videoToVideo` у спільному перегляді:
-    - `alibaba`, `qwen`, `xai`, оскільки ці шляхи зараз потребують віддалених опорних URL-адрес `http(s)` / MP4
-    - `google`, оскільки поточний спільний шлях Gemini/Veo використовує локальне введення на основі buffer, і цей шлях не приймається в спільному перегляді
-    - `openai`, оскільки поточний спільний шлях не гарантує доступу до відео inpaint/remix, специфічного для організації
+  - Поточні провайдери `videoToVideo`, оголошені, але пропущені у спільному перегляді:
+    - `alibaba`, `qwen`, `xai`, тому що ці шляхи наразі вимагають віддалені URL-адреси посилань `http(s)` / MP4
+    - `google`, тому що поточна спільна гілка Gemini/Veo використовує локальний вхід на основі buffer, і цей шлях не приймається у спільному перегляді
+    - `openai`, тому що поточна спільна гілка не має гарантій доступу до video inpaint/remix, специфічних для org
 - Необов’язкове звуження:
   - `OPENCLAW_LIVE_VIDEO_GENERATION_PROVIDERS="google,openai,runway"`
   - `OPENCLAW_LIVE_VIDEO_GENERATION_MODELS="google/veo-3.1-fast-generate-preview,openai/sora-2,runway/gen4_aleph"`
-  - `OPENCLAW_LIVE_VIDEO_GENERATION_SKIP_PROVIDERS=""`, щоб включити кожного провайдера в типовий перегляд, зокрема FAL
-  - `OPENCLAW_LIVE_VIDEO_GENERATION_TIMEOUT_MS=60000`, щоб зменшити обмеження операції кожного провайдера для агресивного smoke-запуску
+  - `OPENCLAW_LIVE_VIDEO_GENERATION_SKIP_PROVIDERS=""`, щоб включити кожного провайдера до типового перегляду, зокрема FAL
+  - `OPENCLAW_LIVE_VIDEO_GENERATION_TIMEOUT_MS=60000`, щоб зменшити обмеження операції для кожного провайдера в агресивному smoke-запуску
 - Необов’язкова поведінка автентифікації:
-  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію через сховище профілів і ігнорувати перевизначення лише через env
+  - `OPENCLAW_LIVE_REQUIRE_PROFILE_KEYS=1`, щоб примусово використовувати автентифікацію зі сховища профілів і ігнорувати перевизначення лише через env
 
-## Media live harness
+## Harness для живих медіатестів
 
 - Команда: `pnpm test:live:media`
 - Призначення:
-  - Запускає спільні живі набори для зображень, музики й відео через одну нативну точку входу репозиторію
-  - Автоматично завантажує відсутні env-змінні провайдера з `~/.profile`
-  - За замовчуванням автоматично звужує кожен набір до провайдерів, які наразі мають придатну автентифікацію
-  - Повторно використовує `scripts/test-live.mjs`, тому поведінка Heartbeat і quiet-mode залишається узгодженою
+  - Запускає спільні живі набори тестів для зображень, музики й відео через одну вбудовану точку входу репозиторію
+  - Автоматично завантажує відсутні env-змінні провайдерів із `~/.profile`
+  - За замовчуванням автоматично звужує кожен набір тестів до провайдерів, для яких наразі є придатна автентифікація
+  - Повторно використовує `scripts/test-live.mjs`, тож поведінка Heartbeat і тихого режиму залишається узгодженою
 - Приклади:
   - `pnpm test:live:media`
   - `pnpm test:live:media image video --providers openai,google,minimax`
@@ -554,4 +559,4 @@ runtime генерації зображень і живий запит до пр
 
 ## Пов’язане
 
-- [Тестування](/uk/help/testing) — модульні, інтеграційні, QA та Docker-набори
+- [Тестування](/uk/help/testing) — набори unit, integration, QA і Docker тестів
