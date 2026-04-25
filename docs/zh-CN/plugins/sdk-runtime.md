@@ -1,26 +1,24 @@
 ---
 read_when:
-    - 你需要从插件调用核心辅助方法（TTS、STT、图像生成、网络搜索、子智能体、节点）
+    - 你需要从插件调用核心辅助工具（TTS、STT、图像生成、网页搜索、子智能体、节点）
     - 你想了解 `api.runtime` 暴露了什么
-    - 你正在从插件代码中访问配置、智能体或媒体辅助方法
+    - 你正在从插件代码中访问配置、智能体或媒体辅助工具
 sidebarTitle: Runtime Helpers
-summary: '`api.runtime`——提供给插件的注入式运行时辅助方法'
-title: 插件运行时辅助方法
+summary: '`api.runtime` —— 可供插件使用的注入式运行时辅助工具'
+title: 插件运行时辅助工具
 x-i18n:
-    generated_at: "2026-04-24T04:34:53Z"
+    generated_at: "2026-04-25T03:16:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2327bdabc0dc1e05000ff83e507007fadff2698cceaae0d4a3e7bc4885440c55
+    source_hash: f8c3e5d4db970299c4c6f9f703a63bc42f244627989f1b3489adf43aa87c8952
     source_path: plugins/sdk-runtime.md
     workflow: 15
 ---
 
-注册期间注入到每个插件中的 `api.runtime` 对象参考。请使用这些辅助方法，而不要直接导入宿主内部实现。
+每个插件在注册期间都会注入 `api.runtime` 对象，本文档是它的参考说明。请使用这些辅助工具，而不是直接导入宿主内部实现。
 
 <Tip>
-  **想看操作演练？** 请参阅 [渠道插件](/zh-CN/plugins/sdk-channel-plugins)
-  或 [提供商插件](/zh-CN/plugins/sdk-provider-plugins) 的分步指南，
-  这些指南会结合上下文展示这些辅助方法的用法。
+  **想看操作演练？** 请参阅 [渠道插件](/zh-CN/plugins/sdk-channel-plugins) 或 [提供商插件](/zh-CN/plugins/sdk-provider-plugins) 中的分步指南，这些指南会在实际上下文中展示这些辅助工具的用法。
 </Tip>
 
 ```typescript
@@ -33,7 +31,7 @@ register(api) {
 
 ### `api.runtime.agent`
 
-智能体身份、目录和会话管理。
+智能体身份、目录与会话管理。
 
 ```typescript
 // 解析智能体的工作目录
@@ -54,7 +52,7 @@ const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 // 确保工作区存在
 await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-// 运行一个嵌入式智能体轮次
+// 运行一次嵌入式智能体轮次
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 const result = await api.runtime.agent.runEmbeddedAgent({
   sessionId: "my-plugin:task-1",
@@ -66,12 +64,11 @@ const result = await api.runtime.agent.runEmbeddedAgent({
 });
 ```
 
-`runEmbeddedAgent(...)` 是一个中立的辅助方法，用于从插件代码启动一次普通的 OpenClaw
-智能体轮次。它使用与渠道触发回复相同的提供商/模型解析逻辑，以及相同的智能体 harness 选择逻辑。
+`runEmbeddedAgent(...)` 是一个中立辅助工具，用于从插件代码中启动一次普通的 OpenClaw 智能体轮次。它使用与渠道触发回复相同的 provider / model 解析逻辑，以及相同的 Agent harness 选择方式。
 
-`runEmbeddedPiAgent(...)` 仍然保留，作为兼容性别名。
+`runEmbeddedPiAgent(...)` 仍然保留为兼容性别名。
 
-**会话存储辅助方法** 位于 `api.runtime.agent.session` 下：
+**会话存储辅助工具** 位于 `api.runtime.agent.session` 下：
 
 ```typescript
 const storePath = api.runtime.agent.session.resolveStorePath(cfg);
@@ -112,22 +109,20 @@ const { messages } = await api.runtime.subagent.getSessionMessages({
   limit: 10,
 });
 
-// 删除一个会话
+// 删除会话
 await api.runtime.subagent.deleteSession({
   sessionKey: "agent:main:subagent:search-helper",
 });
 ```
 
 <Warning>
-  模型覆盖（`provider`/`model`）要求操作员在配置中显式启用
-  `plugins.entries.<id>.subagent.allowModelOverride: true`。
-  不受信任的插件仍然可以运行子智能体，但覆盖请求会被拒绝。
+  模型覆盖（`provider` / `model`）需要操作员在配置中显式启用 `plugins.entries.<id>.subagent.allowModelOverride: true`。
+  不受信任的插件仍然可以运行子智能体，但其覆盖请求会被拒绝。
 </Warning>
 
 ### `api.runtime.nodes`
 
-列出已连接的节点，并从 Gateway 网关加载的插件代码中调用节点宿主命令。
-当插件在配对设备上拥有本地工作时，请使用此方法，例如在另一台 Mac 上运行的浏览器桥接或音频桥接。
+列出已连接节点，并从 Gateway 网关加载的插件代码或插件 CLI 命令中调用节点宿主命令。当某个插件拥有配对设备上的本地工作时，请使用此功能，例如另一台 Mac 上的浏览器桥接或音频桥接。
 
 ```typescript
 const { nodes } = await api.runtime.nodes.list({ connected: true });
@@ -140,11 +135,11 @@ const result = await api.runtime.nodes.invoke({
 });
 ```
 
-此运行时仅在 Gateway 网关内部可用。节点命令仍然会经过正常的 Gateway 网关节点配对、命令允许列表和节点本地命令处理流程。
+在 Gateway 网关内部，这个运行时是进程内调用。在插件 CLI 命令中，它会通过 RPC 调用已配置的 Gateway 网关，因此像 `openclaw googlemeet recover-tab` 这样的命令也可以从终端检查已配对的节点。节点命令仍然会经过正常的 Gateway 网关节点配对、命令允许列表以及节点本地命令处理流程。
 
 ### `api.runtime.taskFlow`
 
-将 Task Flow 运行时绑定到现有的 OpenClaw 会话键或受信任的工具上下文，然后在每次调用时无需传递 owner，即可创建和管理 Task Flow。
+将 Task Flow 运行时绑定到现有的 OpenClaw 会话键或受信任的工具上下文，然后在不需要每次调用都传入所有者的情况下创建和管理 Task Flows。
 
 ```typescript
 const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
@@ -171,12 +166,11 @@ const waiting = taskFlow.setWaiting({
 });
 ```
 
-如果你已经从自己的绑定层获得了一个受信任的 OpenClaw 会话键，请使用
-`bindSession({ sessionKey, requesterOrigin })`。不要从原始用户输入进行绑定。
+当你已经从自己的绑定层中获得受信任的 OpenClaw 会话键时，请使用 `bindSession({ sessionKey, requesterOrigin })`。不要从原始用户输入中进行绑定。
 
 ### `api.runtime.tts`
 
-文本转语音合成。
+文本转语音。
 
 ```typescript
 // 标准 TTS
@@ -191,35 +185,35 @@ const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
   cfg: api.config,
 });
 
-// 列出可用音色
+// 列出可用语音
 const voices = await api.runtime.tts.listVoices({
   provider: "elevenlabs",
   cfg: api.config,
 });
 ```
 
-使用核心 `messages.tts` 配置和提供商选择逻辑。返回 PCM 音频缓冲区和采样率。
+使用核心 `messages.tts` 配置和 provider 选择逻辑。返回 PCM 音频缓冲区和采样率。
 
 ### `api.runtime.mediaUnderstanding`
 
 图像、音频和视频分析。
 
 ```typescript
-// 描述一张图像
+// 描述图像
 const image = await api.runtime.mediaUnderstanding.describeImageFile({
   filePath: "/tmp/inbound-photo.jpg",
   cfg: api.config,
   agentDir: "/tmp/agent",
 });
 
-// 转录音频
+// 转写音频
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  mime: "audio/ogg", // 可选，用于无法推断 MIME 的情况
+  mime: "audio/ogg", // 可选，用于无法推断 MIME 时
 });
 
-// 描述一段视频
+// 描述视频
 const video = await api.runtime.mediaUnderstanding.describeVideoFile({
   filePath: "/tmp/inbound-video.mp4",
   cfg: api.config,
@@ -232,11 +226,10 @@ const result = await api.runtime.mediaUnderstanding.runFile({
 });
 ```
 
-当未产生输出时（例如跳过输入），返回 `{ text: undefined }`。
+如果没有生成输出（例如输入被跳过），则返回 `{ text: undefined }`。
 
 <Info>
-  `api.runtime.stt.transcribeAudioFile(...)` 仍然保留，作为
-  `api.runtime.mediaUnderstanding.transcribeAudioFile(...)` 的兼容性别名。
+  `api.runtime.stt.transcribeAudioFile(...)` 仍然保留为 `api.runtime.mediaUnderstanding.transcribeAudioFile(...)` 的兼容性别名。
 </Info>
 
 ### `api.runtime.imageGeneration`
@@ -254,7 +247,7 @@ const providers = api.runtime.imageGeneration.listProviders({ cfg: api.config })
 
 ### `api.runtime.webSearch`
 
-网络搜索。
+网页搜索。
 
 ```typescript
 const providers = api.runtime.webSearch.listProviders({ config: api.config });
@@ -292,7 +285,7 @@ const pngQrFile = await api.runtime.media.writeQrPngTempFile("https://openclaw.a
 
 ### `api.runtime.config`
 
-配置加载和写入。
+配置加载与写入。
 
 ```typescript
 const cfg = await api.runtime.config.loadConfig();
@@ -334,7 +327,7 @@ const childLogger = api.runtime.logging.getChildLogger({ plugin: "my-plugin" }, 
 
 ### `api.runtime.modelAuth`
 
-模型和提供商认证解析。
+模型和提供商凭证解析。
 
 ```typescript
 const auth = await api.runtime.modelAuth.getApiKeyForModel({ model, cfg });
@@ -364,9 +357,9 @@ api.runtime.tools.registerMemoryCli(/* ... */);
 
 ### `api.runtime.channel`
 
-渠道专用运行时辅助方法（在加载渠道插件时可用）。
+渠道专用运行时辅助工具（在加载渠道插件时可用）。
 
-`api.runtime.channel.mentions` 是供使用运行时注入的内置渠道插件共享的入站提及策略接口：
+`api.runtime.channel.mentions` 是使用运行时注入的内置渠道插件共享的入站提及策略接口：
 
 ```typescript
 const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
@@ -393,7 +386,7 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 });
 ```
 
-可用的提及辅助方法：
+可用的提及辅助工具包括：
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -401,14 +394,11 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 - `implicitMentionKindWhen`
 - `resolveInboundMentionDecision`
 
-`api.runtime.channel.mentions` 有意不暴露旧版的
-`resolveMentionGating*` 兼容性辅助方法。请优先使用标准化的
-`{ facts, policy }` 路径。
+`api.runtime.channel.mentions` 有意不暴露较旧的 `resolveMentionGating*` 兼容性辅助工具。请优先使用标准化的 `{ facts, policy }` 路径。
 
 ## 存储运行时引用
 
-使用 `createPluginRuntimeStore` 存储运行时引用，以便在 `register`
-回调之外使用：
+使用 `createPluginRuntimeStore` 存储运行时引用，以便在 `register` 回调之外使用：
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -430,7 +420,7 @@ export default defineChannelPluginEntry({
 
 // 在其他文件中
 export function getRuntime() {
-  return store.getRuntime(); // 如果未初始化则抛出
+  return store.getRuntime(); // 如果未初始化则抛出异常
 }
 
 export function tryGetRuntime() {
@@ -438,24 +428,24 @@ export function tryGetRuntime() {
 }
 ```
 
-对于 runtime-store 标识，优先使用 `pluginId`。更底层的 `key` 形式适用于少见场景，即一个插件有意需要多个运行时槽位的情况。
+对于 runtime-store 标识，优先使用 `pluginId`。更底层的 `key` 形式适用于不常见的情况：某个插件有意需要多个运行时槽位。
 
 ## 其他顶层 `api` 字段
 
 除了 `api.runtime` 之外，API 对象还提供：
 
-| 字段 | 类型 | 描述 |
-| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | 插件 id |
-| `api.name`               | `string`                  | 插件显示名称 |
-| `api.config`             | `OpenClawConfig`          | 当前配置快照（如果可用，则为活动的内存中运行时快照） |
-| `api.pluginConfig`       | `Record<string, unknown>` | 来自 `plugins.entries.<id>.config` 的插件专属配置 |
-| `api.logger`             | `PluginLogger`            | 作用域日志记录器（`debug`、`info`、`warn`、`error`） |
-| `api.registrationMode`   | `PluginRegistrationMode`  | 当前加载模式；`"setup-runtime"` 是完整入口启动/设置之前的轻量预启动/设置窗口 |
-| `api.resolvePath(input)` | `(string) => string`      | 解析相对于插件根目录的路径 |
+| 字段                     | 类型                      | 说明                                                                                         |
+| ------------------------ | ------------------------- | -------------------------------------------------------------------------------------------- |
+| `api.id`                 | `string`                  | 插件 id                                                                                      |
+| `api.name`               | `string`                  | 插件显示名称                                                                                 |
+| `api.config`             | `OpenClawConfig`          | 当前配置快照（如果可用，则为活动的内存中运行时快照）                                         |
+| `api.pluginConfig`       | `Record<string, unknown>` | 来自 `plugins.entries.<id>.config` 的插件专用配置                                            |
+| `api.logger`             | `PluginLogger`            | 作用域化日志记录器（`debug`、`info`、`warn`、`error`）                                       |
+| `api.registrationMode`   | `PluginRegistrationMode`  | 当前加载模式；`"setup-runtime"` 是完整入口启动 / 设置之前的轻量级启动 / 设置窗口             |
+| `api.resolvePath(input)` | `(string) => string`      | 解析相对于插件根目录的路径                                                                   |
 
 ## 相关内容
 
 - [SDK 概览](/zh-CN/plugins/sdk-overview) -- 子路径参考
-- [SDK Entry Points](/zh-CN/plugins/sdk-entrypoints) -- `definePluginEntry` 选项
-- [插件内部机制](/zh-CN/plugins/architecture) -- 能力模型和注册表
+- [SDK 入口点](/zh-CN/plugins/sdk-entrypoints) -- `definePluginEntry` 选项
+- [插件架构内部机制](/zh-CN/plugins/architecture) -- 能力模型与注册表
