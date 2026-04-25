@@ -1,26 +1,28 @@
 ---
 read_when:
-    - 更改 Control UI 中的助手输出渲染
-    - 调试 `[embed ...]`、`MEDIA:`、reply 或音频展示指令
-summary: 用于 embeds、媒体、音频提示和回复的富输出短代码协议
+    - 更改 Control UI 中的智能体输出渲染方式
+    - 调试 `[embed ...]`、`MEDIA:`、回复或音频呈现指令
+summary: 用于嵌入、媒体、音频提示和回复的富输出短代码协议
 title: 富输出协议
 x-i18n:
-    generated_at: "2026-04-24T03:43:28Z"
+    generated_at: "2026-04-25T04:54:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 688d60c97180b4ba250e731d765e8469a01c68588c149b760c32eab77955f69b
+    source_hash: 3ccd0698d88aae86d8f857f4f16f999d161e08542bf6d02bbd54a4a23bdbd5a8
     source_path: reference/rich-output-protocol.md
     workflow: 15
 ---
 
-助手输出可以携带一小组投递/渲染指令：
+智能体输出可以携带一小组传递/渲染指令：
 
-- `MEDIA:` 用于附件投递
-- `[[audio_as_voice]]` 用于音频展示提示
+- `MEDIA:` 用于附件传递
+- `[[audio_as_voice]]` 用于音频呈现提示
 - `[[reply_to_current]]` / `[[reply_to:<id>]]` 用于回复元数据
 - `[embed ...]` 用于 Control UI 富渲染
 
-这些指令彼此独立。`MEDIA:` 和 reply/voice 标签仍然属于投递元数据；`[embed ...]` 是仅限 Web 的富渲染路径。
+这些指令彼此独立。`MEDIA:` 和回复/语音标签仍然是传递元数据；`[embed ...]` 是仅限 Web 的富渲染路径。
+
+启用分块流式传输后，`MEDIA:` 仍然是单次会话回合的单次传递元数据。如果同一个媒体 URL 在流式块中发送，并在最终智能体载荷中重复出现，OpenClaw 会只传递一次附件，并从最终载荷中移除重复项。
 
 ## `[embed ...]`
 
@@ -35,15 +37,15 @@ x-i18n:
 规则：
 
 - `[view ...]` 不再适用于新的输出。
-- Embed 短代码仅会在助手消息界面中渲染。
-- 只有基于 URL 的 embed 才会被渲染。请使用 `ref="..."` 或 `url="..."`。
+- Embed 短代码只会在智能体消息界面中渲染。
+- 只会渲染由 URL 支持的嵌入。请使用 `ref="..."` 或 `url="..."`。
 - 块形式的内联 HTML embed 短代码不会被渲染。
-- Web UI 会从可见文本中剥离该短代码，并将 embed 内联渲染。
-- `MEDIA:` 不是 embed 别名，不应用于富 embed 渲染。
+- Web UI 会从可见文本中移除该短代码，并以内联方式渲染嵌入内容。
+- `MEDIA:` 不是 embed 的别名，不应用于富嵌入渲染。
 
-## 已存储的渲染形状
+## 存储的渲染形态
 
-规范化/存储后的助手内容块是一个结构化的 `canvas` 项：
+标准化/存储后的智能体内容块是一个结构化的 `canvas` 项：
 
 ```json
 {
@@ -60,9 +62,9 @@ x-i18n:
 }
 ```
 
-已存储/已渲染的富块会直接使用这个 `canvas` 形状。`present_view` 不会被识别。
+已存储/已渲染的富块会直接使用这个 `canvas` 形态。`present_view` 不会被识别。
 
 ## 相关内容
 
-- [RPC adapters](/zh-CN/reference/rpc)
+- [RPC 适配器](/zh-CN/reference/rpc)
 - [Typebox](/zh-CN/concepts/typebox)
