@@ -1,35 +1,35 @@
 ---
 read_when:
-    - '`openclaw browser`를 사용 중이며 일반적인 작업에 대한 예시가 필요합니다'
+    - '`openclaw browser`을 사용하며 일반적인 작업에 대한 예시가 필요합니다'
     - Node 호스트를 통해 다른 머신에서 실행 중인 브라우저를 제어하려고 합니다
     - Chrome MCP를 통해 로컬에서 로그인된 Chrome에 연결하려고 합니다
-summary: '`openclaw browser`용 CLI 참조(수명 주기, 프로필, 탭, 작업, 상태 및 디버깅)'
+summary: '`openclaw browser`의 CLI 참조(수명 주기, 프로필, 탭, 작업, 상태 및 디버깅)'
 title: 브라우저
 x-i18n:
-    generated_at: "2026-04-25T05:58:07Z"
+    generated_at: "2026-04-25T12:23:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d9da317f18128075203febae3b4c0e416d3a797cb92d473d35488098814a005d
+    source_hash: 9a2157146e54c77fecafcc5e89dd65244bd7ebecc37f86b45921ccea025188a8
     source_path: cli/browser.md
     workflow: 15
 ---
 
 # `openclaw browser`
 
-OpenClaw의 브라우저 제어 표면을 관리하고 브라우저 작업을 실행합니다(수명 주기, 프로필, 탭, 스냅샷, 스크린샷, 탐색, 입력, 상태 에뮬레이션, 디버깅).
+OpenClaw의 브라우저 제어 표면을 관리하고 브라우저 작업을 실행합니다(수명 주기, 프로필, 탭, 스냅샷, 스크린샷, 탐색, 입력, 상태 에뮬레이션 및 디버깅).
 
 관련 항목:
 
-- 브라우저 도구 + API: [Browser tool](/ko/tools/browser)
+- 브라우저 도구 + API: [브라우저 도구](/ko/tools/browser)
 
 ## 공통 플래그
 
-- `--url <gatewayWsUrl>`: Gateway WebSocket URL(config 기본값 사용).
+- `--url <gatewayWsUrl>`: Gateway WebSocket URL(기본값은 config).
 - `--token <token>`: Gateway 토큰(필요한 경우).
 - `--timeout <ms>`: 요청 타임아웃(ms).
-- `--expect-final`: 최종 Gateway 응답까지 대기.
-- `--browser-profile <name>`: 브라우저 프로필 선택(config 기본값 사용).
-- `--json`: 기계 판독 가능한 출력(지원되는 경우).
+- `--expect-final`: 최종 Gateway 응답을 기다립니다.
+- `--browser-profile <name>`: 브라우저 프로필을 선택합니다(기본값은 config에서 가져옴).
+- `--json`: 기계 판독 가능 출력(지원되는 경우).
 
 ## 빠른 시작(로컬)
 
@@ -40,11 +40,11 @@ openclaw browser --browser-profile openclaw open https://example.com
 openclaw browser --browser-profile openclaw snapshot
 ```
 
-에이전트도 `browser({ action: "doctor" })`로 같은 준비 상태 검사를 실행할 수 있습니다.
+에이전트는 `browser({ action: "doctor" })`로 동일한 준비 상태 검사를 실행할 수 있습니다.
 
 ## 빠른 문제 해결
 
-`start`가 `not reachable after start`로 실패하면 먼저 CDP 준비 상태를 점검하세요. `start`와 `tabs`는 성공하지만 `open`이나 `navigate`가 실패한다면, 브라우저 제어 평면은 정상이며 실패 원인은 대체로 탐색 SSRF 정책입니다.
+`start`가 `not reachable after start`와 함께 실패하면 먼저 CDP 준비 상태를 점검하세요. `start`와 `tabs`는 성공하지만 `open` 또는 `navigate`가 실패하는 경우, 브라우저 제어 플레인은 정상이며 실패 원인은 대개 탐색 SSRF 정책입니다.
 
 최소 순서:
 
@@ -63,20 +63,23 @@ openclaw browser --browser-profile openclaw open https://example.com
 openclaw browser status
 openclaw browser doctor
 openclaw browser start
+openclaw browser start --headless
 openclaw browser stop
 openclaw browser --browser-profile openclaw reset-profile
 ```
 
 참고:
 
-- `attachOnly` 및 원격 CDP 프로필에서는, OpenClaw가 브라우저 프로세스를 직접 시작하지 않았더라도 `openclaw browser stop`이 활성 제어 세션을 닫고 임시 에뮬레이션 재정의를 지웁니다.
-- 로컬 관리형 프로필에서는 `openclaw browser stop`이 생성된 브라우저 프로세스를 중지합니다.
+- `attachOnly` 및 원격 CDP 프로필의 경우, `openclaw browser stop`은 OpenClaw가 브라우저 프로세스를 직접 시작하지 않았더라도 활성 제어 세션을 종료하고 임시 에뮬레이션 재정의를 지웁니다.
+- 로컬 관리형 프로필의 경우, `openclaw browser stop`은 생성된 브라우저 프로세스를 중지합니다.
+- `openclaw browser start --headless`는 해당 시작 요청에만 적용되며, OpenClaw가 로컬 관리형 브라우저를 시작하는 경우에만 적용됩니다. `browser.headless`나 프로필 config를 다시 쓰지 않으며, 이미 실행 중인 브라우저에는 아무 동작도 하지 않습니다.
+- `DISPLAY` 또는 `WAYLAND_DISPLAY`가 없는 Linux 호스트에서는 `OPENCLAW_BROWSER_HEADLESS=0`, `browser.headless=false`, 또는 `browser.profiles.<name>.headless=false`로 표시형 브라우저를 명시적으로 요청하지 않는 한 로컬 관리형 프로필이 자동으로 headless로 실행됩니다.
 
-## 명령어가 없을 때
+## 명령이 없는 경우
 
-`openclaw browser`가 알 수 없는 명령어라면 `~/.openclaw/openclaw.json`의 `plugins.allow`를 확인하세요.
+`openclaw browser`가 알 수 없는 명령이라면 `~/.openclaw/openclaw.json`의 `plugins.allow`를 확인하세요.
 
-`plugins.allow`가 있으면 번들된 브라우저 Plugin을 명시적으로 나열해야 합니다:
+`plugins.allow`가 존재하면, 번들된 브라우저 Plugin을 명시적으로 나열해야 합니다:
 
 ```json5
 {
@@ -86,17 +89,17 @@ openclaw browser --browser-profile openclaw reset-profile
 }
 ```
 
-Plugin 허용 목록에서 `browser`가 제외되면 `browser.enabled=true`를 설정해도 CLI 하위 명령은 복원되지 않습니다.
+플러그인 허용 목록에서 `browser`를 제외한 경우 `browser.enabled=true`는 CLI 하위 명령을 복원하지 않습니다.
 
-관련 항목: [Browser tool](/ko/tools/browser#missing-browser-command-or-tool)
+관련: [브라우저 도구](/ko/tools/browser#missing-browser-command-or-tool)
 
 ## 프로필
 
 프로필은 이름이 지정된 브라우저 라우팅 config입니다. 실제로는 다음과 같습니다:
 
-- `openclaw`: 전용 OpenClaw 관리 Chrome 인스턴스를 시작하거나 여기에 연결합니다(격리된 사용자 데이터 디렉터리).
-- `user`: Chrome DevTools MCP를 통해 기존에 로그인된 Chrome 세션을 제어합니다.
-- 사용자 지정 CDP 프로필: 로컬 또는 원격 CDP 엔드포인트를 가리킵니다.
+- `openclaw`: 전용 OpenClaw 관리 Chrome 인스턴스를 시작하거나 연결합니다(격리된 사용자 데이터 디렉터리).
+- `user`: Chrome DevTools MCP를 통해 기존 로그인된 Chrome 세션을 제어합니다.
+- 사용자 정의 CDP 프로필: 로컬 또는 원격 CDP 엔드포인트를 가리킵니다.
 
 ```bash
 openclaw browser profiles
@@ -125,7 +128,7 @@ openclaw browser focus docs
 openclaw browser close t1
 ```
 
-`tabs`는 먼저 `suggestedTargetId`를 반환하고, 그다음 `t1` 같은 안정적인 `tabId`, 선택적 레이블, 원시 `targetId`를 반환합니다. 에이전트는 `focus`, `close`, 스냅샷, 작업에 `suggestedTargetId`를 다시 전달해야 합니다. `open --label`, `tab new --label`, `tab label`로 레이블을 지정할 수 있으며, 레이블, 탭 id, 원시 target id, 고유한 target-id 접두사가 모두 허용됩니다.
+`tabs`는 먼저 `suggestedTargetId`를 반환하고, 그다음 `t1`과 같은 안정적인 `tabId`, 선택적 레이블, 원시 `targetId`를 반환합니다. 에이전트는 `focus`, `close`, 스냅샷 및 작업에 `suggestedTargetId`를 다시 전달해야 합니다. `open --label`, `tab new --label`, 또는 `tab label`로 레이블을 지정할 수 있으며, 레이블, 탭 ID, 원시 타깃 ID, 고유한 타깃 ID 접두사는 모두 허용됩니다.
 
 ## 스냅샷 / 스크린샷 / 작업
 
@@ -148,15 +151,16 @@ openclaw browser screenshot --labels
 참고:
 
 - `--full-page`는 페이지 캡처 전용이며 `--ref` 또는 `--element`와 함께 사용할 수 없습니다.
-- `existing-session` / `user` 프로필은 페이지 스크린샷과 스냅샷 출력의 `--ref` 스크린샷은 지원하지만 CSS `--element` 스크린샷은 지원하지 않습니다.
+- `existing-session` / `user` 프로필은 페이지 스크린샷과 스냅샷 출력의 `--ref` 스크린샷을 지원하지만 CSS `--element` 스크린샷은 지원하지 않습니다.
 - `--labels`는 현재 스냅샷 ref를 스크린샷 위에 오버레이합니다.
-- `snapshot --urls`는 발견된 링크 대상을 AI 스냅샷에 추가하므로, 에이전트가 링크 텍스트만으로 추측하지 않고 직접 탐색 대상을 선택할 수 있습니다.
+- `snapshot --urls`는 발견된 링크 대상을 AI 스냅샷에 추가하므로 에이전트가 링크 텍스트만으로 추측하지 않고 직접 탐색 대상을 선택할 수 있습니다.
 
 탐색/클릭/입력(ref 기반 UI 자동화):
 
 ```bash
 openclaw browser navigate https://example.com
 openclaw browser click <ref>
+openclaw browser click-coords 120 340
 openclaw browser type <ref> "hello"
 openclaw browser press Enter
 openclaw browser hover <ref>
@@ -176,6 +180,8 @@ openclaw browser waitfordownload
 openclaw browser download <ref> report.pdf
 openclaw browser dialog --accept
 ```
+
+관리형 Chrome 프로필은 일반적인 클릭으로 트리거된 다운로드를 OpenClaw 다운로드 디렉터리(기본값 `/tmp/openclaw/downloads` 또는 설정된 임시 루트)에 저장합니다. 에이전트가 특정 파일을 기다리고 해당 경로를 반환해야 하는 경우 `waitfordownload` 또는 `download`를 사용하세요. 이러한 명시적 대기자는 다음 다운로드를 소유합니다.
 
 ## 상태 및 저장소
 
@@ -220,7 +226,7 @@ openclaw browser trace stop --out trace.zip
 
 ## MCP를 통한 기존 Chrome
 
-내장 `user` 프로필을 사용하거나 직접 `existing-session` 프로필을 만드세요:
+내장된 `user` 프로필을 사용하거나, 직접 `existing-session` 프로필을 만들 수 있습니다:
 
 ```bash
 openclaw browser --browser-profile user tabs
@@ -229,29 +235,30 @@ openclaw browser create-profile --name brave-live --driver existing-session --us
 openclaw browser --browser-profile chrome-live tabs
 ```
 
-이 경로는 호스트 전용입니다. Docker, 헤드리스 서버, Browserless 또는 기타 원격 설정에는 대신 CDP 프로필을 사용하세요.
+이 경로는 호스트 전용입니다. Docker, headless 서버, Browserless 또는 기타 원격 설정의 경우 대신 CDP 프로필을 사용하세요.
 
 현재 existing-session 제한 사항:
 
 - 스냅샷 기반 작업은 CSS 선택자가 아니라 ref를 사용합니다
+- `browser.actionTimeoutMs`는 호출자가 `timeoutMs`를 생략할 때 지원되는 `act` 요청의 기본값을 60000ms로 설정합니다. 호출별 `timeoutMs`가 있으면 그것이 우선합니다.
 - `click`은 왼쪽 클릭만 지원합니다
 - `type`은 `slowly=true`를 지원하지 않습니다
 - `press`는 `delayMs`를 지원하지 않습니다
 - `hover`, `scrollintoview`, `drag`, `select`, `fill`, `evaluate`는 호출별 타임아웃 재정의를 거부합니다
 - `select`는 값 하나만 지원합니다
 - `wait --load networkidle`은 지원되지 않습니다
-- 파일 업로드에는 `--ref` / `--input-ref`가 필요하며 CSS `--element`는 지원하지 않고, 현재 한 번에 파일 하나만 지원합니다
+- 파일 업로드는 `--ref` / `--input-ref`가 필요하고 CSS `--element`를 지원하지 않으며, 현재 한 번에 파일 하나만 지원합니다
 - 대화상자 훅은 `--timeout`을 지원하지 않습니다
 - 스크린샷은 페이지 캡처와 `--ref`는 지원하지만 CSS `--element`는 지원하지 않습니다
 - `responsebody`, 다운로드 가로채기, PDF 내보내기, 일괄 작업은 여전히 관리형 브라우저 또는 원시 CDP 프로필이 필요합니다
 
-## 원격 브라우저 제어(Node 호스트 프록시)
+## 원격 브라우저 제어(node host 프록시)
 
-Gateway가 브라우저와 다른 머신에서 실행되는 경우, Chrome/Brave/Edge/Chromium이 있는 머신에서 **Node 호스트**를 실행하세요. Gateway가 브라우저 작업을 해당 노드로 프록시합니다(별도의 브라우저 제어 서버는 필요 없음).
+Gateway가 브라우저와 다른 머신에서 실행되는 경우, Chrome/Brave/Edge/Chromium이 있는 머신에서 **node host**를 실행하세요. Gateway는 브라우저 작업을 해당 node로 프록시합니다(별도의 브라우저 제어 서버는 필요 없음).
 
-자동 라우팅을 제어하려면 `gateway.nodes.browser.mode`를 사용하고, 여러 노드가 연결되어 있을 때 특정 노드에 고정하려면 `gateway.nodes.browser.node`를 사용하세요.
+자동 라우팅을 제어하려면 `gateway.nodes.browser.mode`를 사용하고, 여러 node가 연결된 경우 특정 node를 고정하려면 `gateway.nodes.browser.node`를 사용하세요.
 
-보안 + 원격 설정: [Browser tool](/ko/tools/browser), [원격 액세스](/ko/gateway/remote), [Tailscale](/ko/gateway/tailscale), [보안](/ko/gateway/security)
+보안 + 원격 설정: [브라우저 도구](/ko/tools/browser), [원격 액세스](/ko/gateway/remote), [Tailscale](/ko/gateway/tailscale), [보안](/ko/gateway/security)
 
 ## 관련 항목
 
