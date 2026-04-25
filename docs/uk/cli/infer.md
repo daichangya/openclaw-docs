@@ -1,25 +1,25 @@
 ---
 read_when:
     - Додавання або змінення команд `openclaw infer`
-    - Проєктування стабільної автоматизації headless можливостей
-summary: CLI з пріоритетним визначенням для робочих процесів моделей, зображень, аудіо, TTS, відео, вебу та ембедингів на основі провайдерів
+    - Проєктування стабільної автоматизації headless-можливостей
+summary: Infer-first CLI для робочих процесів із моделями, зображеннями, аудіо, TTS, відео, вебом і ембедингами на основі провайдерів
 title: CLI для інференсу
 x-i18n:
-    generated_at: "2026-04-25T17:32:12Z"
+    generated_at: "2026-04-25T19:09:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 23242bfa8a354b949473322f47da90876e05a5e54d467ca134f2e59c3ae8bb02
+    source_hash: 2e4ee27a124a5969231fb3363e582cf90323f887e9625dc7c8aa3e7640b54224
     source_path: cli/infer.md
     workflow: 15
 ---
 
 `openclaw infer` — це канонічна headless-поверхня для робочих процесів інференсу на основі провайдерів.
 
-Вона навмисно надає сімейства можливостей, а не сирі назви Gateway RPC і не сирі ідентифікатори інструментів агента.
+Вона навмисно надає сімейства можливостей, а не сирі назви RPC Gateway і не сирі ідентифікатори інструментів агентів.
 
 ## Перетворіть infer на skill
 
-Скопіюйте й вставте це агенту:
+Скопіюйте й вставте це в агента:
 
 ```text
 Read https://docs.openclaw.ai/cli/infer, then create a skill that routes my common workflows to `openclaw infer`.
@@ -28,12 +28,12 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 
 Хороший skill на основі infer має:
 
-- зіставляти поширені наміри користувача з правильним підкомандним викликом infer
-- містити кілька канонічних прикладів infer для робочих процесів, які він охоплює
-- надавати перевагу `openclaw infer ...` у прикладах і підказках
+- зіставляти поширені наміри користувача з правильними підкомандами infer
+- включати кілька канонічних прикладів infer для робочих процесів, які він охоплює
+- віддавати перевагу `openclaw infer ...` у прикладах і рекомендаціях
 - уникати повторного документування всієї поверхні infer у тілі skill
 
-Типове охоплення skill, зосередженого на infer:
+Типове покриття skill, зосередженого на infer:
 
 - `openclaw infer model run`
 - `openclaw infer image generate`
@@ -44,17 +44,17 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 
 ## Навіщо використовувати infer
 
-`openclaw infer` надає один узгоджений CLI для завдань інференсу на основі провайдерів в OpenClaw.
+`openclaw infer` надає один узгоджений CLI для завдань інференсу на основі провайдерів у межах OpenClaw.
 
 Переваги:
 
-- Використовуйте провайдерів і моделі, уже налаштовані в OpenClaw, замість налаштування одноразових обгорток для кожного бекенда.
-- Тримайте робочі процеси моделей, зображень, транскрибування аудіо, TTS, відео, вебу та ембедингів в одному дереві команд.
+- Використовуйте провайдерів і моделі, уже налаштовані в OpenClaw, замість того щоб підключати окремі одноразові обгортки для кожного бекенда.
+- Тримайте робочі процеси для моделей, зображень, транскрибування аудіо, TTS, відео, вебу й ембедингів в одному дереві команд.
 - Використовуйте стабільну форму виводу `--json` для скриптів, автоматизації та робочих процесів, керованих агентами.
-- Надавайте перевагу first-party поверхні OpenClaw, коли завдання по суті полягає у «виконанні інференсу».
+- Віддавайте перевагу first-party поверхні OpenClaw, коли завдання по суті зводиться до «запустити інференс».
 - Використовуйте звичайний локальний шлях без потреби в Gateway для більшості команд infer.
 
-Для наскрізних перевірок провайдерів надавайте перевагу `openclaw infer ...`, коли тести провайдерів нижчого рівня вже проходять успішно. Це перевіряє поставлений CLI, завантаження конфігурації, визначення default-agent, активацію вбудованого Plugin, відновлення залежностей часу виконання та спільне середовище виконання можливостей до того, як буде зроблено запит до провайдера.
+Для наскрізних перевірок провайдерів віддавайте перевагу `openclaw infer ...`, щойно нижчорівневі тести провайдерів уже зелені. Це перевіряє поставлюваний CLI, завантаження конфігурації, визначення агента за замовчуванням, активацію вбудованих Plugin, виправлення залежностей під час виконання та спільне середовище виконання можливостей до того, як буде зроблено запит до провайдера.
 
 ## Дерево команд
 
@@ -113,12 +113,12 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 
 | Завдання                | Команда                                                                | Примітки                                              |
 | ----------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------- |
-| Запустити текстовий/модельний prompt | `openclaw infer model run --prompt "..." --json`                       | Типово використовує звичайний локальний шлях          |
+| Виконати текстовий/модельний запит | `openclaw infer model run --prompt "..." --json`                       | За замовчуванням використовує звичайний локальний шлях |
 | Згенерувати зображення  | `openclaw infer image generate --prompt "..." --json`                  | Використовуйте `image edit`, якщо починаєте з наявного файлу |
-| Описати файл зображення | `openclaw infer image describe --file ./image.png --json`              | `--model` має бути image-capable `<provider/model>`   |
+| Описати файл зображення | `openclaw infer image describe --file ./image.png --json`              | `--model` має бути `<provider/model>`, здатною працювати із зображеннями |
 | Транскрибувати аудіо    | `openclaw infer audio transcribe --file ./memo.m4a --json`             | `--model` має бути `<provider/model>`                 |
 | Синтезувати мовлення    | `openclaw infer tts convert --text "..." --output ./speech.mp3 --json` | `tts status` орієнтований на gateway                  |
-| Згенерувати відео       | `openclaw infer video generate --prompt "..." --json`                  | Підтримує підказки для провайдерів, такі як `--resolution` |
+| Згенерувати відео       | `openclaw infer video generate --prompt "..." --json`                  | Підтримує підказки для провайдера, наприклад `--resolution` |
 | Описати відеофайл       | `openclaw infer video describe --file ./clip.mp4 --json`               | `--model` має бути `<provider/model>`                 |
 | Шукати у вебі           | `openclaw infer web search --query "..." --json`                       |                                                       |
 | Отримати вебсторінку    | `openclaw infer web fetch --url https://example.com --json`            |                                                       |
@@ -127,18 +127,18 @@ Focus on model runs, image generation, video generation, audio transcription, TT
 ## Поведінка
 
 - `openclaw infer ...` — основна CLI-поверхня для цих робочих процесів.
-- Використовуйте `--json`, коли вивід буде споживатися іншою командою або скриптом.
+- Використовуйте `--json`, коли вивід споживатиметься іншою командою або скриптом.
 - Використовуйте `--provider` або `--model provider/model`, коли потрібен конкретний бекенд.
-- Для `image describe`, `audio transcribe` і `video describe` параметр `--model` має використовувати форму `<provider/model>`.
-- Для `image describe` явний `--model` запускає цього провайдера/цю модель безпосередньо. Модель має підтримувати роботу із зображеннями в каталозі моделей або конфігурації провайдера. `codex/<model>` запускає обмежений хід розуміння зображень через app-server Codex; `openai-codex/<model>` використовує шлях провайдера OpenAI Codex OAuth.
-- Команди безстанового виконання типово виконуються локально.
-- Команди зі станом, керованим Gateway, типово використовують gateway.
-- Звичайний локальний шлях не вимагає, щоб Gateway був запущений.
-- `model run` — одноразова команда. MCP-сервери, відкриті через середовище виконання агента для цієї команди, завершуються після відповіді як у локальному режимі, так і з `--gateway`, тож повторні виклики в скриптах не залишають дочірні процеси stdio MCP активними.
+- Для `image describe`, `audio transcribe` і `video describe` `--model` має використовувати форму `<provider/model>`.
+- Для `image describe` явний `--model` запускає цю пару провайдер/модель безпосередньо. Модель має підтримувати зображення в каталозі моделей або конфігурації провайдера. `codex/<model>` запускає обмежений поворот image-understanding через сервер застосунку Codex; `openai-codex/<model>` використовує шлях провайдера OpenAI Codex OAuth.
+- Команди безстанового виконання за замовчуванням локальні.
+- Команди для стану, яким керує Gateway, за замовчуванням використовують gateway.
+- Звичайний локальний шлях не потребує запущеного Gateway.
+- `model run` — одноразова команда. MCP-сервери, відкриті через середовище виконання агента для цієї команди, закриваються після відповіді як для локального виконання, так і для `--gateway`, тож повторні виклики у скриптах не залишають дочірні stdio MCP-процеси активними.
 
 ## Model
 
-Використовуйте `model` для текстового інференсу на основі провайдерів та перевірки моделей/провайдерів.
+Використовуйте `model` для текстового інференсу на основі провайдерів і перевірки моделей/провайдерів.
 
 ```bash
 openclaw infer model run --prompt "Reply with exactly: smoke-ok" --json
@@ -149,8 +149,8 @@ openclaw infer model inspect --name gpt-5.5 --json
 
 Примітки:
 
-- `model run` повторно використовує середовище виконання агента, тому перевизначення провайдера/моделі поводяться як у звичайному виконанні агента.
-- Оскільки `model run` призначено для headless-автоматизації, він не зберігає вбудовані MCP runtime для сесії після завершення команди.
+- `model run` повторно використовує середовище виконання агента, тому перевизначення провайдера/моделі поводяться так само, як і під час звичайного виконання агента.
+- Оскільки `model run` призначена для headless-автоматизації, вона не зберігає вбудовані MCP-середовища виконання для сесії після завершення команди.
 - `model auth login`, `model auth logout` і `model auth status` керують збереженим станом автентифікації провайдера.
 
 ## Image
@@ -160,7 +160,9 @@ openclaw infer model inspect --name gpt-5.5 --json
 ```bash
 openclaw infer image generate --prompt "friendly lobster illustration" --json
 openclaw infer image generate --prompt "cinematic product photo of headphones" --json
+openclaw infer image generate --model openai/gpt-image-1.5 --output-format png --openai-background transparent --prompt "simple red circle sticker on a transparent background" --json
 openclaw infer image generate --prompt "slow image backend" --timeout-ms 180000 --json
+openclaw infer image edit --file ./logo.png --model openai/gpt-image-1.5 --output-format png --openai-background transparent --prompt "keep the logo, remove the background" --json
 openclaw infer image describe --file ./photo.jpg --json
 openclaw infer image describe --file ./ui-screenshot.png --model openai/gpt-4.1-mini --json
 openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --json
@@ -169,8 +171,9 @@ openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --j
 Примітки:
 
 - Використовуйте `image edit`, якщо починаєте з наявних вхідних файлів.
+- Використовуйте `--output-format png --openai-background transparent` разом із `--model openai/gpt-image-1.5` для PNG-виводу OpenAI з прозорим фоном. Ці специфічні для OpenAI прапорці доступні як у `image generate`, так і в `image edit`.
 - Використовуйте `image providers --json`, щоб перевірити, які вбудовані провайдери зображень можна виявити, налаштовано, вибрано, а також які можливості генерації/редагування надає кожен провайдер.
-- Використовуйте `image generate --model <provider/model> --json` як найвужчу живу CLI-перевірку для змін генерації зображень. Приклад:
+- Використовуйте `image generate --model <provider/model> --json` як найвужчу живу CLI-перевірку для змін у генерації зображень. Приклад:
 
   ```bash
   openclaw infer image providers --json
@@ -181,10 +184,10 @@ openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --j
     --json
   ```
 
-  JSON-відповідь повідомляє `ok`, `provider`, `model`, `attempts` і шляхи записаних вихідних файлів. Якщо задано `--output`, фінальне розширення може відповідати MIME-типу, який повернув провайдер.
+  Відповідь JSON повідомляє `ok`, `provider`, `model`, `attempts` і шляхи записаних вихідних файлів. Якщо задано `--output`, остаточне розширення може відповідати MIME-типу, який повернув провайдер.
 
-- Для `image describe` параметр `--model` має бути image-capable `<provider/model>`.
-- Для локальних vision-моделей Ollama спочатку завантажте модель і встановіть `OLLAMA_API_KEY` у будь-яке заповнювальне значення, наприклад `ollama-local`. Див. [Ollama](/uk/providers/ollama#vision-and-image-description).
+- Для `image describe` `--model` має бути `<provider/model>`, здатною працювати із зображеннями.
+- Для локальних візуальних моделей Ollama спочатку завантажте модель і встановіть `OLLAMA_API_KEY` у будь-яке умовне значення, наприклад `ollama-local`. Див. [Ollama](/uk/providers/ollama#vision-and-image-description).
 
 ## Audio
 
@@ -198,12 +201,12 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 
 Примітки:
 
-- `audio transcribe` призначено для транскрибування файлів, а не для керування сесіями в реальному часі.
+- `audio transcribe` призначена для транскрибування файлів, а не для керування сеансами в реальному часі.
 - `--model` має бути `<provider/model>`.
 
 ## TTS
 
-Використовуйте `tts` для синтезу мовлення та стану провайдера TTS.
+Використовуйте `tts` для синтезу мовлення та стану TTS-провайдера.
 
 ```bash
 openclaw infer tts convert --text "hello from openclaw" --output ./hello.mp3 --json
@@ -214,8 +217,8 @@ openclaw infer tts status --json
 
 Примітки:
 
-- `tts status` типово використовує gateway, оскільки відображає стан TTS, керований gateway.
-- Використовуйте `tts providers`, `tts voices` і `tts set-provider` для перевірки та налаштування поведінки TTS.
+- `tts status` за замовчуванням використовує gateway, оскільки відображає стан TTS, яким керує gateway.
+- Використовуйте `tts providers`, `tts voices` і `tts set-provider`, щоб перевіряти та налаштовувати поведінку TTS.
 
 ## Video
 
@@ -230,12 +233,12 @@ openclaw infer video describe --file ./clip.mp4 --model openai/gpt-4.1-mini --js
 
 Примітки:
 
-- `video generate` приймає `--size`, `--aspect-ratio`, `--resolution`, `--duration`, `--audio`, `--watermark` і `--timeout-ms` та передає їх до runtime генерації відео.
-- Для `video describe` параметр `--model` має бути `<provider/model>`.
+- `video generate` приймає `--size`, `--aspect-ratio`, `--resolution`, `--duration`, `--audio`, `--watermark` і `--timeout-ms` та передає їх у середовище виконання генерації відео.
+- Для `video describe` `--model` має бути `<provider/model>`.
 
 ## Web
 
-Використовуйте `web` для робочих процесів пошуку та отримання сторінок.
+Використовуйте `web` для робочих процесів пошуку й отримання сторінок.
 
 ```bash
 openclaw infer web search --query "OpenClaw docs" --json
@@ -246,7 +249,7 @@ openclaw infer web providers --json
 
 Примітки:
 
-- Використовуйте `web providers`, щоб перевірити доступних, налаштованих і вибраних провайдерів.
+- Використовуйте `web providers`, щоб переглянути доступних, налаштованих і вибраних провайдерів.
 
 ## Embedding
 
@@ -260,7 +263,7 @@ openclaw infer embedding providers --json
 
 ## Вивід JSON
 
-Команди infer нормалізують вивід JSON у спільному контейнері:
+Команди infer нормалізують вивід JSON у спільній оболонці:
 
 ```json
 {
@@ -274,7 +277,7 @@ openclaw infer embedding providers --json
 }
 ```
 
-Поля верхнього рівня є стабільними:
+Поля верхнього рівня стабільні:
 
 - `ok`
 - `capability`
@@ -285,23 +288,23 @@ openclaw infer embedding providers --json
 - `outputs`
 - `error`
 
-Для команд генерації медіа `outputs` містить файли, записані OpenClaw. Використовуйте `path`, `mimeType`, `size` і будь-які специфічні для медіа розміри в цьому масиві для автоматизації замість парсингу людиночитаного stdout.
+Для команд, що генерують медіа, `outputs` містить файли, записані OpenClaw. Для автоматизації використовуйте в цьому масиві `path`, `mimeType`, `size` і будь-які специфічні для медіа розміри замість розбору людиночитного stdout.
 
 ## Поширені помилки
 
 ```bash
-# Bad
+# Погано
 openclaw infer media image generate --prompt "friendly lobster"
 
-# Good
+# Добре
 openclaw infer image generate --prompt "friendly lobster"
 ```
 
 ```bash
-# Bad
+# Погано
 openclaw infer audio transcribe --file ./memo.m4a --model whisper-1 --json
 
-# Good
+# Добре
 openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --json
 ```
 
@@ -309,7 +312,7 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 
 - `openclaw capability ...` — це псевдонім для `openclaw infer ...`.
 
-## Пов’язані матеріали
+## Пов’язане
 
-- [Довідник CLI](/uk/cli)
+- [Довідка CLI](/uk/cli)
 - [Моделі](/uk/concepts/models)
