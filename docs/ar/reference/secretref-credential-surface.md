@@ -1,29 +1,29 @@
 ---
 read_when:
     - التحقق من تغطية بيانات اعتماد SecretRef
-    - تدقيق ما إذا كانت بيانات الاعتماد مؤهلة لـ `secrets configure` أو `secrets apply`
+    - مراجعة ما إذا كانت بيانات الاعتماد مؤهلة لـ `secrets configure` أو `secrets apply`
     - التحقق من سبب كون بيانات الاعتماد خارج السطح المدعوم
-summary: السطح الرسمي المدعوم وغير المدعوم لبيانات اعتماد SecretRef
+summary: السطح المعتمد القياسي لبيانات اعتماد SecretRef المدعومة مقابل غير المدعومة
 title: سطح بيانات اعتماد SecretRef
 x-i18n:
-    generated_at: "2026-04-24T08:03:21Z"
+    generated_at: "2026-04-25T13:57:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ddb8d7660f2757e3d2a078c891f52325bf9ec9291ec7d5f5e06daef4041e2006
+    source_hash: 50a4602939970d92831c0de9339e84b0f42b119c2e25ea30375925282f55d237
     source_path: reference/secretref-credential-surface.md
     workflow: 15
 ---
 
-تحدد هذه الصفحة السطح الرسمي لبيانات اعتماد SecretRef.
+تحدد هذه الصفحة السطح القياسي لبيانات اعتماد SecretRef.
 
-غرض النطاق:
+نية النطاق:
 
-- ضمن النطاق: بيانات الاعتماد التي يزوّدها المستخدم بشكل صارم والتي لا يقوم OpenClaw بإصدارها أو تدويرها.
-- خارج النطاق: بيانات الاعتماد التي تُصدرها بيئة التشغيل أو تُدار دوريًا، ومواد تحديث OAuth، والقطع الشبيهة بالجلسات.
+- ضمن النطاق: بيانات الاعتماد التي يقدّمها المستخدم بشكل صارم والتي لا يقوم OpenClaw بإصدارها أو تدويرها.
+- خارج النطاق: بيانات الاعتماد التي تُصدر أثناء وقت التشغيل أو تُدوَّر، ومواد تحديث OAuth، والعناصر الشبيهة بالجلسات.
 
 ## بيانات الاعتماد المدعومة
 
-### أهداف `openclaw.json` ‏(`secrets configure` + `secrets apply` + `secrets audit`)
+### أهداف `openclaw.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
 [//]: # "secretref-supported-list-start"
 
@@ -109,30 +109,31 @@ x-i18n:
 - `channels.googlechat.serviceAccount` عبر `serviceAccountRef` الشقيق (استثناء توافق)
 - `channels.googlechat.accounts.*.serviceAccount` عبر `serviceAccountRef` الشقيق (استثناء توافق)
 
-### أهداف `auth-profiles.json` ‏(`secrets configure` + `secrets apply` + `secrets audit`)
+### أهداف `auth-profiles.json` (`secrets configure` + `secrets apply` + `secrets audit`)
 
-- `profiles.*.keyRef` ‏(`type: "api_key"`؛ وغير مدعوم عندما تكون `auth.profiles.<id>.mode = "oauth"`)
-- `profiles.*.tokenRef` ‏(`type: "token"`؛ وغير مدعوم عندما تكون `auth.profiles.<id>.mode = "oauth"`)
+- `profiles.*.keyRef` (`type: "api_key"`; غير مدعوم عندما يكون `auth.profiles.<id>.mode = "oauth"`)
+- `profiles.*.tokenRef` (`type: "token"`; غير مدعوم عندما يكون `auth.profiles.<id>.mode = "oauth"`)
 
 [//]: # "secretref-supported-list-end"
 
 ملاحظات:
 
-- تتطلب أهداف خطة auth-profile وجود `agentId`.
+- تتطلب أهداف خطة ملف المصادقة `agentId`.
 - تستهدف إدخالات الخطة `profiles.*.key` / `profiles.*.token` وتكتب المراجع الشقيقة (`keyRef` / `tokenRef`).
-- تُضمَّن مراجع auth-profile في حلّ وقت التشغيل وفي تغطية التدقيق.
-- حاجز سياسة OAuth: لا يمكن الجمع بين `auth.profiles.<id>.mode = "oauth"` ومدخلات SecretRef لذلك الملف الشخصي. ويفشل بدء التشغيل/إعادة التحميل وحلّ auth-profile سريعًا عندما يتم انتهاك هذه السياسة.
-- بالنسبة إلى مزودي النماذج المُدارة عبر SecretRef، تحتفظ إدخالات `agents/*/agent/models.json` المولّدة بعلامات غير سرية (وليست قيم أسرار محلولة) لأسطح `apiKey`/الرؤوس.
-- تكون استمرارية العلامات معتمدة على المصدر: يكتب OpenClaw العلامات من لقطة إعدادات المصدر النشطة (قبل الحلّ)، وليس من قيم الأسرار المحلولة في وقت التشغيل.
+- تُدرج مراجع ملفات المصادقة في تغطية الحل أثناء وقت التشغيل والتدقيق.
+- في `openclaw.json`، يجب أن تستخدم SecretRefs كائنات منظَّمة مثل `{"source":"env","provider":"default","id":"DISCORD_BOT_TOKEN"}`. تُرفض سلاسل العلامات القديمة `secretref-env:<ENV_VAR>` على مسارات بيانات اعتماد SecretRef؛ شغّل `openclaw doctor --fix` لترحيل العلامات الصالحة.
+- حاجز سياسة OAuth: لا يمكن دمج `auth.profiles.<id>.mode = "oauth"` مع مدخلات SecretRef لذلك الملف. يفشل بدء التشغيل/إعادة التحميل وحل ملف المصادقة بسرعة عند انتهاك هذه السياسة.
+- بالنسبة إلى مزوّدي النماذج المُدارين بواسطة SecretRef، تستمر إدخالات `agents/*/agent/models.json` المُولّدة في حفظ علامات غير سرية (وليست قيمًا سرية محلولة) لأسطح `apiKey`/الرؤوس.
+- يُعد حفظ العلامات معتمدًا على المصدر: يكتب OpenClaw العلامات من لقطة إعدادات المصدر النشطة (قبل الحل)، وليس من القيم السرية المحلولة أثناء وقت التشغيل.
 - بالنسبة إلى البحث على الويب:
-  - في وضع provider الصريح (عند ضبط `tools.web.search.provider`)، يكون مفتاح provider المحدد فقط نشطًا.
-  - في الوضع التلقائي (عندما لا يتم ضبط `tools.web.search.provider`)، يكون مفتاح provider الأول الذي يُحل وفق الأولوية هو النشط فقط.
-  - في الوضع التلقائي، تُعامل مراجع providers غير المحددة على أنها غير نشطة إلى أن يتم اختيارها.
-  - لا تزال مسارات provider القديمة `tools.web.search.*` تُحل خلال نافذة التوافق، لكن السطح الرسمي لـ SecretRef هو `plugins.entries.<plugin>.config.webSearch.*`.
+  - في وضع المزوّد الصريح (عند ضبط `tools.web.search.provider`)، يكون مفتاح المزوّد المحدد فقط نشطًا.
+  - في الوضع التلقائي (عند عدم ضبط `tools.web.search.provider`)، يكون مفتاح المزوّد الأول فقط الذي يُحل بحسب الأسبقية نشطًا.
+  - في الوضع التلقائي، تُعامل مراجع المزوّدين غير المحددين على أنها غير نشطة حتى يتم تحديدها.
+  - ما تزال مسارات المزوّد القديمة `tools.web.search.*` تُحل خلال نافذة التوافق، لكن السطح القياسي لـ SecretRef هو `plugins.entries.<plugin>.config.webSearch.*`.
 
 ## بيانات الاعتماد غير المدعومة
 
-تشمل بيانات الاعتماد خارج النطاق ما يلي:
+تشمل بيانات الاعتماد الخارجة عن النطاق:
 
 [//]: # "secretref-unsupported-list-start"
 
@@ -150,7 +151,7 @@ x-i18n:
 
 المبرر:
 
-- هذه بيانات اعتماد مُصدَرة أو مُدارة دوريًا أو حاملة للجلسات أو من فئات OAuth دائمة لا تتوافق مع حلّ SecretRef الخارجي للقراءة فقط.
+- هذه بيانات اعتماد مُصدرة أو مُدوّرة أو حاملة للجلسات أو من فئات دائمة لـ OAuth لا تناسب حل SecretRef الخارجي للقراءة فقط.
 
 ## ذو صلة
 

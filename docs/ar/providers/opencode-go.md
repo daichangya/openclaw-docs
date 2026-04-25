@@ -1,47 +1,47 @@
 ---
 read_when:
-    - تريد كتالوج OpenCode Go
+    - تريد فهرس OpenCode Go
     - تحتاج إلى مراجع نماذج وقت التشغيل للنماذج المستضافة على Go
-summary: استخدم كتالوج OpenCode Go مع إعداد OpenCode المشترك
+summary: استخدم فهرس OpenCode Go مع إعداد OpenCode المشترك
 title: OpenCode Go
 x-i18n:
-    generated_at: "2026-04-24T08:00:09Z"
+    generated_at: "2026-04-25T13:56:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d70ca7e7c63f95cbb698d5193c2d9fa48576a8d7311dbd7fa4e2f10a42e275a7
+    source_hash: 42aba47207d85cdc6d2c5d85c3726da660b456320765c83df92ee705f005d3c3
     source_path: providers/opencode-go.md
     workflow: 15
 ---
 
-OpenCode Go هو كتالوج Go داخل [OpenCode](/ar/providers/opencode).
-ويستخدم مفتاح `OPENCODE_API_KEY` نفسه الخاص بكتالوج Zen، لكنه يحتفظ
-بمعرّف مزوّد وقت التشغيل `opencode-go` بحيث يبقى التوجيه upstream لكل نموذج صحيحًا.
+OpenCode Go هو فهرس Go ضمن [OpenCode](/ar/providers/opencode).
+يستخدم `OPENCODE_API_KEY` نفسه مثل فهرس Zen، لكنه يحتفظ
+بمعرّف موفر وقت التشغيل `opencode-go` حتى يبقى التوجيه العلوي لكل نموذج صحيحًا.
 
 | الخاصية         | القيمة                          |
-| --------------- | ------------------------------- |
-| مزوّد وقت التشغيل | `opencode-go`                   |
-| المصادقة        | `OPENCODE_API_KEY`              |
-| الإعداد الأب    | [OpenCode](/ar/providers/opencode) |
+| ---------------- | ------------------------------- |
+| موفر وقت التشغيل | `opencode-go`                   |
+| المصادقة         | `OPENCODE_API_KEY`              |
+| الإعداد الأصل    | [OpenCode](/ar/providers/opencode) |
 
-## الكتالوج المضمن
+## الفهرس المضمّن
 
-يستمد OpenClaw كتالوج Go من سجل نماذج pi المضمن. شغّل
+يستمد OpenClaw فهرس Go من سجل نماذج Pi المضمّن. شغّل
 `openclaw models list --provider opencode-go` للحصول على قائمة النماذج الحالية.
 
-اعتبارًا من كتالوج pi المضمن، يتضمن المزوّد ما يلي:
+اعتبارًا من فهرس Pi المضمّن، يتضمن الموفّر:
 
-| مرجع النموذج               | الاسم                    |
-| -------------------------- | ------------------------ |
-| `opencode-go/glm-5`        | GLM-5                    |
-| `opencode-go/glm-5.1`      | GLM-5.1                  |
-| `opencode-go/kimi-k2.5`    | Kimi K2.5                |
-| `opencode-go/kimi-k2.6`    | Kimi K2.6 (حدود 3x)      |
-| `opencode-go/mimo-v2-omni` | MiMo V2 Omni             |
-| `opencode-go/mimo-v2-pro`  | MiMo V2 Pro              |
-| `opencode-go/minimax-m2.5` | MiniMax M2.5             |
-| `opencode-go/minimax-m2.7` | MiniMax M2.7             |
-| `opencode-go/qwen3.5-plus` | Qwen3.5 Plus             |
-| `opencode-go/qwen3.6-plus` | Qwen3.6 Plus             |
+| مرجع النموذج               | الاسم                  |
+| -------------------------- | --------------------- |
+| `opencode-go/glm-5`        | GLM-5                 |
+| `opencode-go/glm-5.1`      | GLM-5.1               |
+| `opencode-go/kimi-k2.5`    | Kimi K2.5             |
+| `opencode-go/kimi-k2.6`    | Kimi K2.6 (حدود 3x)   |
+| `opencode-go/mimo-v2-omni` | MiMo V2 Omni          |
+| `opencode-go/mimo-v2-pro`  | MiMo V2 Pro           |
+| `opencode-go/minimax-m2.5` | MiniMax M2.5          |
+| `opencode-go/minimax-m2.7` | MiniMax M2.7          |
+| `opencode-go/qwen3.5-plus` | Qwen3.5 Plus          |
+| `opencode-go/qwen3.6-plus` | Qwen3.6 Plus          |
 
 ## البدء
 
@@ -53,9 +53,9 @@ OpenCode Go هو كتالوج Go داخل [OpenCode](/ar/providers/opencode).
         openclaw onboard --auth-choice opencode-go
         ```
       </Step>
-      <Step title="اضبط نموذج Go كنموذج افتراضي">
+      <Step title="عيّن نموذج Go كنموذج افتراضي">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
+        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
       <Step title="تحقق من أن النماذج متاحة">
@@ -82,46 +82,46 @@ OpenCode Go هو كتالوج Go داخل [OpenCode](/ar/providers/opencode).
   </Tab>
 </Tabs>
 
-## مثال على الإعدادات
+## مثال على التهيئة
 
 ```json5
 {
   env: { OPENCODE_API_KEY: "YOUR_API_KEY_HERE" }, // pragma: allowlist secret
-  agents: { defaults: { model: { primary: "opencode-go/kimi-k2.5" } } },
+  agents: { defaults: { model: { primary: "opencode-go/kimi-k2.6" } } },
 }
 ```
 
-## الإعداد المتقدم
+## تهيئة متقدمة
 
 <AccordionGroup>
   <Accordion title="سلوك التوجيه">
     يتولى OpenClaw التوجيه لكل نموذج تلقائيًا عندما يستخدم مرجع النموذج
-    `opencode-go/...`. ولا حاجة إلى إعداد مزوّد إضافي.
+    `opencode-go/...`. ولا يلزم أي إعداد إضافي للموفّر.
   </Accordion>
 
-  <Accordion title="اصطلاح مراجع وقت التشغيل">
-    تبقى مراجع وقت التشغيل صريحة: `opencode/...` لكتالوج Zen، و`opencode-go/...` لكتالوج Go.
-    ويحافظ هذا على صحة التوجيه upstream لكل نموذج عبر كلا الكتالوجين.
+  <Accordion title="اصطلاح مرجع وقت التشغيل">
+    تبقى مراجع وقت التشغيل صريحة: `opencode/...` لـ Zen، و`opencode-go/...` لـ Go.
+    وهذا يحافظ على صحة التوجيه العلوي لكل نموذج عبر كلا الفهرسين.
   </Accordion>
 
-  <Accordion title="بيانات الاعتماد المشتركة">
-    يُستخدم `OPENCODE_API_KEY` نفسه في كل من كتالوجي Zen وGo. وعند إدخال
-    المفتاح أثناء الإعداد، يتم تخزين بيانات الاعتماد لكلا مزوّدي وقت التشغيل.
+  <Accordion title="بيانات اعتماد مشتركة">
+    يُستخدم `OPENCODE_API_KEY` نفسه لكلٍّ من فهرسي Zen وGo. يؤدي إدخال
+    المفتاح أثناء الإعداد إلى تخزين بيانات الاعتماد لكلا موفري وقت التشغيل.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-راجع [OpenCode](/ar/providers/opencode) للحصول على نظرة عامة مشتركة على الإعداد الأولي والمرجع الكامل
-لكتالوجي Zen + Go.
+راجع [OpenCode](/ar/providers/opencode) للاطلاع على نظرة عامة على الإعداد الأولي المشترك والمرجع الكامل
+لفهرسي Zen + Go.
 </Tip>
 
 ## ذو صلة
 
 <CardGroup cols={2}>
-  <Card title="OpenCode (الأب)" href="/ar/providers/opencode" icon="server">
-    الإعداد الأولي المشترك، ونظرة عامة على الكتالوج، والملاحظات المتقدمة.
+  <Card title="OpenCode (الأصل)" href="/ar/providers/opencode" icon="server">
+    الإعداد الأولي المشترك، ونظرة عامة على الفهرس، وملاحظات متقدمة.
   </Card>
   <Card title="اختيار النموذج" href="/ar/concepts/model-providers" icon="layers">
-    اختيار المزوّدين، ومراجع النماذج، وسلوك الرجوع عند الفشل.
+    اختيار الموفّرين، ومراجع النماذج، وسلوك الرجوع الاحتياطي.
   </Card>
 </CardGroup>

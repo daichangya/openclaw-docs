@@ -2,117 +2,118 @@
 read_when:
     - أنت تبني Plugin جديدة لقناة مراسلة
     - تريد توصيل OpenClaw بمنصة مراسلة
-    - تحتاج إلى فهم سطح محول ChannelPlugin
+    - تحتاج إلى فهم واجهة مواءمة ChannelPlugin
 sidebarTitle: Channel Plugins
-summary: دليل خطوة بخطوة لبناء Plugin لقناة مراسلة لـ OpenClaw
-title: بناء Plugins للقنوات
+summary: دليل خطوة بخطوة لبناء Plugin لقناة مراسلة في OpenClaw
+title: بناء Plugins القنوات
 x-i18n:
-    generated_at: "2026-04-24T07:55:16Z"
+    generated_at: "2026-04-25T13:53:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e08340e7984b4aa5307c4ba126b396a80fa8dcb3d6f72561f643806a8034fb88
+    source_hash: 0a466decff828bdce1d9d3e85127867b88f43c6eca25aa97306f8bd0df39f3a9
     source_path: plugins/sdk-channel-plugins.md
     workflow: 15
 ---
 
-يرشدك هذا الدليل خلال بناء Plugin لقناة تربط OpenClaw بمنصة
-مراسلة. وبحلول النهاية سيكون لديك قناة عاملة تتضمن أمان الرسائل الخاصة،
+يرشدك هذا الدليل خلال إنشاء Plugin قناة يربط OpenClaw بمنصة
+مراسلة. بحلول النهاية سيكون لديك قناة عاملة مع أمان الرسائل الخاصة،
 والاقتران، وتسلسل الردود، والمراسلة الصادرة.
 
 <Info>
-  إذا لم تكن قد بنيت أي Plugin لـ OpenClaw من قبل، فاقرأ
-  [البدء](/ar/plugins/building-plugins) أولًا لمعرفة بنية الحزمة الأساسية
-  وإعداد manifest.
+  إذا لم تكن قد أنشأت أي Plugin لـ OpenClaw من قبل، فاقرأ
+  [البدء](/ar/plugins/building-plugins) أولًا للاطلاع على بنية
+  الحزمة الأساسية وإعداد البيان.
 </Info>
 
 ## كيف تعمل Plugins القنوات
 
 لا تحتاج Plugins القنوات إلى أدوات send/edit/react خاصة بها. يحتفظ OpenClaw
-بأداة `message` مشتركة واحدة في النواة. وتمتلك Plugin الخاصة بك ما يلي:
+بأداة `message` مشتركة واحدة في النواة. ويتولى Plugin الخاص بك ما يلي:
 
-- **الإعداد** — حل الحسابات ومعالج الإعداد
+- **الإعداد** — تحليل الحساب ومعالج الإعداد
 - **الأمان** — سياسة الرسائل الخاصة وقوائم السماح
 - **الاقتران** — تدفق الموافقة على الرسائل الخاصة
-- **نحو الجلسة** — كيفية ربط معرّفات المحادثات الخاصة بالموفر بالمحادثات الأساسية ومعرّفات السلاسل والرجوع إلى الأصل
+- **صياغة الجلسة** — كيف تُربط معرّفات المحادثات الخاصة بالموفر بالمحادثات الأساسية ومعرّفات السلاسل وبدائل الأصل
 - **الصادر** — إرسال النصوص والوسائط والاستطلاعات إلى المنصة
-- **التسلسل** — كيفية تسلسل الردود
-- **كتابة Heartbeat** — إشارات كتابة/انشغال اختيارية لأهداف تسليم Heartbeat
+- **التسلسل** — كيفية ترتيب الردود في سلاسل
+- **كتابة Heartbeat** — إشارات اختيارية للكتابة/الانشغال لأهداف تسليم Heartbeat
 
-تمتلك النواة أداة الرسائل المشتركة، وربط المطالبات، وشكل مفتاح الجلسة الخارجي،
-وسجل `:thread:` العام، والإرسال.
+تتولى النواة أداة الرسائل المشتركة، وربط الموجّه، والشكل الخارجي لمفتاح الجلسة،
+والاحتفاظ العام بـ `:thread:`، والتوزيع.
 
-إذا كانت قناتك تدعم مؤشرات الكتابة خارج الردود الواردة، فاكشف
-`heartbeat.sendTyping(...)` على Plugin القناة. تستدعيها النواة مع هدف
-تسليم Heartbeat المحلول قبل بدء تشغيل نموذج Heartbeat وتستخدم دورة الحياة
-المشتركة لإبقاء الكتابة/التنظيف حية. وأضف `heartbeat.clearTyping(...)`
+إذا كانت قناتك تدعم مؤشرات الكتابة خارج الردود الواردة، فوفّر
+`heartbeat.sendTyping(...)` على Plugin القناة. تستدعيه النواة مع
+هدف تسليم Heartbeat الذي تم تحليله قبل بدء تشغيل نموذج Heartbeat
+وتستخدم دورة الحياة المشتركة للإبقاء على الكتابة/التنظيف. أضف `heartbeat.clearTyping(...)`
 عندما تحتاج المنصة إلى إشارة توقف صريحة.
 
-إذا كانت قناتك تضيف معاملات إلى أداة الرسائل تحمل مصادر وسائط، فاكشف أسماء
-هذه المعاملات عبر `describeMessageTool(...).mediaSourceParams`. تستخدم النواة
-هذه القائمة الصريحة من أجل تطبيع مسارات sandbox وسياسة الوصول إلى الوسائط
-الصادرة، لذلك لا تحتاج Plugins إلى حالات خاصة في النواة المشتركة لمعلمات
-الصور الرمزية أو المرفقات أو صور الغلاف الخاصة بكل موفر.
-ويُفضّل إرجاع خريطة قائمة على الإجراء مثل
+إذا كانت قناتك تضيف معاملات message-tool تحمل مصادر وسائط، فاكشف عن أسماء
+هذه المعاملات من خلال `describeMessageTool(...).mediaSourceParams`. تستخدم النواة
+هذه القائمة الصريحة لتطبيع مسار sandbox وسياسة الوصول إلى الوسائط الصادرة،
+بحيث لا تحتاج Plugins إلى حالات خاصة في النواة المشتركة لمعلمات الصورة الرمزية أو
+المرفقات أو صورة الغلاف الخاصة بموفر معين.
+ويُفضّل إرجاع خريطة مفاتيحها الإجراءات مثل
 `{ "set-profile": ["avatarUrl", "avatarPath"] }` حتى لا ترث الإجراءات غير المرتبطة
-معلمات وسائط تخص إجراء آخر. ولا تزال المصفوفة المسطحة تعمل للمعاملات التي
-يُقصد مشاركتها عمدًا عبر كل إجراء مكشوف.
+وسائط إجراء آخر. وما يزال المصفوفة المسطحة تعمل للمعاملات التي
+تتم مشاركتها عمدًا عبر كل إجراء مكشوف.
 
 إذا كانت منصتك تخزن نطاقًا إضافيًا داخل معرّفات المحادثات، فأبقِ هذا التحليل
-داخل Plugin باستخدام `messaging.resolveSessionConversation(...)`. فهذا هو الخطاف
-القياسي لربط `rawId` بمعرّف المحادثة الأساسي، ومعرّف السلسلة الاختياري،
-و`baseConversationId` الصريح، وأي `parentConversationCandidates`.
-وعندما تعيد `parentConversationCandidates`، فاحرص على ترتيبها من
+داخل Plugin باستخدام `messaging.resolveSessionConversation(...)`. هذه هي
+النقطة القياسية لربط `rawId` بمعرّف المحادثة الأساسي، ومعرّف السلسلة
+الاختياري، و`baseConversationId` الصريح، وأي `parentConversationCandidates`.
+عند إرجاع `parentConversationCandidates`، أبقها مرتبة من
 الأصل الأضيق إلى المحادثة الأوسع/الأساسية.
 
-يمكن أيضًا للPlugins المضمنة التي تحتاج إلى التحليل نفسه قبل إقلاع سجل
-القنوات أن تكشف ملف `session-key-api.ts` أعلى المستوى مع تصدير مطابق
-لـ `resolveSessionConversation(...)`. وتستخدم النواة هذا السطح الآمن عند
-التمهيد فقط عندما لا يكون سجل Plugin وقت التشغيل متاحًا بعد.
+يمكن أيضًا لـ Plugins المضمّنة التي تحتاج التحليل نفسه قبل إقلاع سجل القنوات
+كشف ملف علوي باسم `session-key-api.ts` مع
+تصدير `resolveSessionConversation(...)` مطابق. تستخدم النواة هذه الواجهة الآمنة
+للإقلاع فقط عندما لا يكون سجل Plugin وقت التشغيل متاحًا بعد.
 
-تظل `messaging.resolveParentConversationCandidates(...)` متاحة كرجوع قديم
-للتوافق عندما تحتاج Plugin فقط إلى الرجوع إلى الأصول فوق المعرّف العام/الخام.
-وإذا وُجد الخطافان معًا، تستخدم النواة
-`resolveSessionConversation(...).parentConversationCandidates` أولًا، ولا ترجع إلى
-`resolveParentConversationCandidates(...)` إلا عندما يحذفها الخطاف القياسي.
+يبقى `messaging.resolveParentConversationCandidates(...)` متاحًا
+كبديل توافق قديم عندما يحتاج Plugin فقط إلى بدائل أصل فوق
+المعرّف الخام/العام. إذا وُجدت كلتا النقطتين، تستخدم النواة
+`resolveSessionConversation(...).parentConversationCandidates` أولًا ثم
+تعود إلى `resolveParentConversationCandidates(...)` فقط عندما تُهمل
+النقطة القياسية هذه القيم.
 
-## الموافقات وقدرات القناة
+## الموافقات وإمكانات القناة
 
 لا تحتاج معظم Plugins القنوات إلى شيفرة خاصة بالموافقات.
 
-- تمتلك النواة أوامر `/approve` داخل المحادثة نفسها، وحمولات أزرار الموافقة المشتركة، والتسليم الاحتياطي العام.
+- تتولى النواة `/approve` داخل الدردشة نفسها، وحمولات أزرار الموافقة المشتركة، والتسليم الاحتياطي العام.
 - فضّل كائن `approvalCapability` واحدًا على Plugin القناة عندما تحتاج القناة إلى سلوك خاص بالموافقة.
-- تمت إزالة `ChannelPlugin.approvals`. ضع حقائق التسليم/الأصلي/العرض/المصادقة الخاصة بالموافقة على `approvalCapability`.
-- يقتصر `plugin.auth` على login/logout فقط؛ ولم تعد النواة تقرأ خطافات مصادقة الموافقة من هذا الكائن.
-- تمثل `approvalCapability.authorizeActorAction` و`approvalCapability.getActionAvailabilityState` خط المصادقة القياسي للموافقات.
-- استخدم `approvalCapability.getActionAvailabilityState` لإتاحة مصادقة الموافقة داخل المحادثة نفسها.
-- إذا كانت قناتك تكشف موافقات exec أصلية، فاستخدم `approvalCapability.getExecInitiatingSurfaceState` لحالة سطح البدء/العميل الأصلي عندما تختلف عن مصادقة الموافقة داخل المحادثة نفسها. تستخدم النواة هذا الخطاف الخاص بـ exec للتمييز بين `enabled` و`disabled`، وتحديد ما إذا كانت قناة البدء تدعم موافقات exec الأصلية، وتضمين القناة في إرشادات الرجوع الخاصة بالعميل الأصلي. تملأ `createApproverRestrictedNativeApprovalCapability(...)` هذا في الحالة الشائعة.
-- استخدم `outbound.shouldSuppressLocalPayloadPrompt` أو `outbound.beforeDeliverPayload` لسلوك دورة حياة الحمولة الخاص بالقناة مثل إخفاء مطالبات الموافقة المحلية المكررة أو إرسال مؤشرات الكتابة قبل التسليم.
-- استخدم `approvalCapability.delivery` فقط لتوجيه الموافقة الأصلية أو كبت الرجوع.
-- استخدم `approvalCapability.nativeRuntime` للحقائق الأصلية الخاصة بالموافقة التي تملكها القناة. وأبقِها lazy على نقاط دخول القناة الساخنة باستخدام `createLazyChannelApprovalNativeRuntimeAdapter(...)`، الذي يمكنه استيراد وحدة وقت التشغيل عند الطلب مع السماح للنواة بتجميع دورة حياة الموافقة.
-- استخدم `approvalCapability.render` فقط عندما تحتاج القناة فعلًا إلى حمولات موافقة مخصصة بدلًا من المصيّر المشترك.
-- استخدم `approvalCapability.describeExecApprovalSetup` عندما تريد القناة أن يشرح رد المسار المعطل مقابض الإعداد الدقيقة المطلوبة لتمكين موافقات exec الأصلية. يتلقى الخطاف `{ channel, channelLabel, accountId }`؛ ويجب أن تعرض القنوات متعددة الحسابات مسارات بنطاق الحساب مثل `channels.<channel>.accounts.<id>.execApprovals.*` بدلًا من القيم الافتراضية على المستوى الأعلى.
-- إذا كانت القناة تستطيع استنتاج هويات مستقرة شبيهة بالمالك في الرسائل الخاصة من الإعدادات الموجودة، فاستخدم `createResolvedApproverActionAuthAdapter` من `openclaw/plugin-sdk/approval-runtime` لتقييد `/approve` داخل المحادثة نفسها من دون إضافة منطق خاص بالموافقة إلى النواة.
-- إذا كانت القناة تحتاج إلى تسليم موافقة أصلية، فأبقِ شيفرة القناة مركزة على تطبيع الهدف وحقائق النقل/العرض. استخدم `createChannelExecApprovalProfile` و`createChannelNativeOriginTargetResolver` و`createChannelApproverDmTargetResolver` و`createApproverRestrictedNativeApprovalCapability` من `openclaw/plugin-sdk/approval-runtime`. ضع الحقائق الخاصة بالقناة خلف `approvalCapability.nativeRuntime`، ويفضل عبر `createChannelApprovalNativeRuntimeAdapter(...)` أو `createLazyChannelApprovalNativeRuntimeAdapter(...)`، حتى تتمكن النواة من تجميع المعالج وامتلاك تصفية الطلبات والتوجيه وإزالة التكرار وانتهاء الصلاحية واشتراك gateway وإشعارات التوجيه إلى مكان آخر. ينقسم `nativeRuntime` إلى بعض الخطوط الأصغر:
-- `availability` — ما إذا كان الحساب مضبوطًا وما إذا كان يجب التعامل مع الطلب
-- `presentation` — ربط نموذج عرض الموافقة المشترك إلى حمولات أصلية معلقة/محلولة/منتهية أو إجراءات نهائية
-- `transport` — إعداد الأهداف بالإضافة إلى إرسال/تحديث/حذف رسائل الموافقة الأصلية
-- `interactions` — خطافات bind/unbind/clear-action الاختيارية للأزرار أو التفاعلات الأصلية
-- `observe` — خطافات تشخيص تسليم اختيارية
-- إذا كانت القناة تحتاج إلى كائنات يمتلكها وقت التشغيل مثل عميل أو token أو تطبيق Bolt أو مستقبل webhook، فسجّلها عبر `openclaw/plugin-sdk/channel-runtime-context`. يتيح سجل runtime-context العام للنواة تمهيد معالجات تقودها القدرات من حالة بدء القناة من دون إضافة طبقة glue خاصة بالموافقة.
-- لا تلجأ إلى `createChannelApprovalHandler` أو `createChannelNativeApprovalRuntime` منخفضي المستوى إلا عندما لا يكون الخط القائم على القدرات معبرًا بما فيه الكفاية بعد.
-- يجب على قنوات الموافقة الأصلية توجيه كل من `accountId` و`approvalKind` عبر هذه المساعدات. فـ `accountId` يبقي سياسة الموافقات متعددة الحسابات ضمن نطاق حساب البوت الصحيح، و`approvalKind` يبقي سلوك الموافقة بين exec وPlugin متاحًا للقناة من دون فروع hardcoded في النواة.
-- تمتلك النواة الآن إشعارات إعادة توجيه الموافقات أيضًا. ويجب ألا ترسل Plugins القنوات رسائل متابعة خاصة بها من نوع "تم إرسال الموافقة إلى الرسائل الخاصة / إلى قناة أخرى" من `createChannelNativeApprovalRuntime`؛ بل يجب أن تكشف توجيهًا دقيقًا للأصل + الرسائل الخاصة بالموافق عبر مساعدات القدرة المشتركة للموافقة وتدع النواة تجمع التسليمات الفعلية قبل نشر أي إشعار في الدردشة التي بدأت الطلب.
-- حافظ على نوع معرّف الموافقة المُسلّم من البداية إلى النهاية. ولا ينبغي للعملاء الأصليين
-  تخمين أو إعادة كتابة توجيه موافقات exec مقابل Plugin من الحالة المحلية للقناة.
-- يمكن لأنواع الموافقات المختلفة أن تكشف عمدًا أسطحًا أصلية مختلفة.
-  الأمثلة المضمنة الحالية:
-  - يحتفظ Slack بإتاحة توجيه الموافقات الأصلية لكل من معرّفات exec وPlugin.
+- تمت إزالة `ChannelPlugin.approvals`. ضع حقائق تسليم/أصلي/عرض/مصادقة الموافقة على `approvalCapability`.
+- يقتصر `plugin.auth` على login/logout فقط؛ لم تعد النواة تقرأ خطافات مصادقة الموافقة من هذا الكائن.
+- تمثل `approvalCapability.authorizeActorAction` و`approvalCapability.getActionAvailabilityState` الواجهة القياسية لمصادقة الموافقة.
+- استخدم `approvalCapability.getActionAvailabilityState` لإتاحة مصادقة الموافقة داخل الدردشة نفسها.
+- إذا كانت قناتك تكشف موافقات exec أصلية، فاستخدم `approvalCapability.getExecInitiatingSurfaceState` لحالة السطح البادئ/العميل الأصلي عندما تختلف عن مصادقة الموافقة داخل الدردشة نفسها. تستخدم النواة هذا الخطاف الخاص بـ exec للتمييز بين `enabled` و`disabled`، وتقرير ما إذا كانت القناة البادئة تدعم موافقات exec الأصلية، وتضمين القناة في إرشادات الرجوع إلى العميل الأصلي. يملأ `createApproverRestrictedNativeApprovalCapability(...)` ذلك في الحالة الشائعة.
+- استخدم `outbound.shouldSuppressLocalPayloadPrompt` أو `outbound.beforeDeliverPayload` لسلوك دورة حياة الحمولة الخاص بالقناة مثل إخفاء مطالبات الموافقة المحلية المكررة أو إرسال مؤشرات كتابة قبل التسليم.
+- استخدم `approvalCapability.delivery` فقط لتوجيه الموافقة الأصلي أو منع التسليم الاحتياطي.
+- استخدم `approvalCapability.nativeRuntime` للحقائق الأصلية للموافقة التي تملكها القناة. أبقه كسولًا في نقاط دخول القناة الساخنة باستخدام `createLazyChannelApprovalNativeRuntimeAdapter(...)`، الذي يمكنه استيراد وحدة وقت التشغيل لديك عند الطلب مع السماح للنواة بتجميع دورة حياة الموافقة.
+- استخدم `approvalCapability.render` فقط عندما تحتاج القناة فعلًا إلى حمولات موافقة مخصصة بدلًا من العارض المشترك.
+- استخدم `approvalCapability.describeExecApprovalSetup` عندما تريد القناة أن يشرح رد المسار المعطّل مفاتيح الإعداد الدقيقة اللازمة لتمكين موافقات exec الأصلية. يتلقى الخطاف `{ channel, channelLabel, accountId }`؛ ويجب أن تعرض القنوات ذات الحسابات المسماة مسارات ذات نطاق حساب مثل `channels.<channel>.accounts.<id>.execApprovals.*` بدلًا من القيم الافتراضية العلوية.
+- إذا كان بإمكان القناة استنتاج هويات رسائل خاصة مستقرة شبيهة بالمالك من الإعداد الموجود، فاستخدم `createResolvedApproverActionAuthAdapter` من `openclaw/plugin-sdk/approval-runtime` لتقييد `/approve` داخل الدردشة نفسها من دون إضافة منطق خاص بالموافقة في النواة.
+- إذا كانت القناة تحتاج إلى تسليم موافقة أصلي، فأبقِ شيفرة القناة مركزة على تطبيع الهدف وحقائق النقل/العرض. استخدم `createChannelExecApprovalProfile` و`createChannelNativeOriginTargetResolver` و`createChannelApproverDmTargetResolver` و`createApproverRestrictedNativeApprovalCapability` من `openclaw/plugin-sdk/approval-runtime`. ضع الحقائق الخاصة بالقناة خلف `approvalCapability.nativeRuntime`، ويفضّل عبر `createChannelApprovalNativeRuntimeAdapter(...)` أو `createLazyChannelApprovalNativeRuntimeAdapter(...)`، حتى تتمكن النواة من تجميع المعالج وامتلاك ترشيح الطلبات والتوجيه وإزالة التكرار وانتهاء الصلاحية واشتراك Gateway وإشعارات التوجيه إلى مكان آخر. ينقسم `nativeRuntime` إلى عدة واجهات أصغر:
+- `availability` — ما إذا كان الحساب مُعدًا وما إذا كان ينبغي التعامل مع الطلب
+- `presentation` — ربط نموذج العرض المشترك للموافقة بحمولات أصلية معلّقة/محسومة/منتهية أو إجراءات نهائية
+- `transport` — تجهيز الأهداف ثم إرسال/تحديث/حذف رسائل الموافقة الأصلية
+- `interactions` — خطافات اختيارية للربط/إلغاء الربط/مسح الإجراء للأزرار أو التفاعلات الأصلية
+- `observe` — خطافات اختيارية لتشخيصات التسليم
+- إذا كانت القناة تحتاج إلى كائنات يملكها وقت التشغيل مثل عميل أو رمز مميز أو تطبيق Bolt أو مستقبل Webhook، فسجّلها عبر `openclaw/plugin-sdk/channel-runtime-context`. يتيح سجل runtime-context العام للنواة إقلاع معالجات تعتمد على الإمكانات من حالة بدء القناة من دون إضافة طبقة تغليف خاصة بالموافقات.
+- استخدم المستوى الأدنى `createChannelApprovalHandler` أو `createChannelNativeApprovalRuntime` فقط عندما لا تكون الواجهة المعتمدة على الإمكانات معبّرة بما يكفي بعد.
+- يجب على قنوات الموافقة الأصلية تمرير كلٍّ من `accountId` و`approvalKind` عبر هذه المساعدات. يحافظ `accountId` على تقييد سياسة الموافقة متعددة الحسابات على حساب البوت الصحيح، ويُبقي `approvalKind` سلوك موافقات exec مقابل موافقات Plugin متاحًا للقناة من دون تفرعات ثابتة في النواة.
+- تتولى النواة الآن أيضًا إشعارات إعادة توجيه الموافقة. يجب ألا ترسل Plugins القنوات رسائل متابعة خاصة بها من نوع "ذهبت الموافقة إلى الرسائل الخاصة / قناة أخرى" من `createChannelNativeApprovalRuntime`؛ بل اكشف بدلًا من ذلك عن توجيه دقيق للأصل + الرسائل الخاصة للمُوافق عبر مساعدات إمكانات الموافقة المشتركة ودَع النواة تجمع عمليات التسليم الفعلية قبل نشر أي إشعار مرة أخرى إلى الدردشة البادئة.
+- حافظ على نوع معرّف الموافقة المُسلَّم من البداية إلى النهاية. يجب ألا تقوم العملاء الأصلية
+  بتخمين أو إعادة كتابة توجيه موافقات exec مقابل موافقات Plugin من حالة محلية للقناة.
+- يمكن لأنواع الموافقات المختلفة أن تكشف عمدًا عن أسطح أصلية مختلفة.
+  الأمثلة المضمّنة الحالية:
+  - يحتفظ Slack بإتاحة توجيه الموافقة الأصلية لكل من معرّفات exec وPlugin.
   - يحتفظ Matrix بتوجيه الرسائل الخاصة/القنوات الأصلي نفسه وتجربة التفاعل نفسها لموافقات exec
-    وPlugin، مع السماح باختلاف المصادقة حسب نوع الموافقة.
-- لا تزال `createApproverRestrictedNativeApprovalAdapter` موجودة كغلاف توافق، لكن الشيفرة الجديدة يجب أن تفضل باني القدرات وتكشف `approvalCapability` على Plugin.
+    وPlugin، مع السماح مع ذلك باختلاف المصادقة حسب نوع الموافقة.
+- ما يزال `createApproverRestrictedNativeApprovalAdapter` موجودًا كغلاف توافق، لكن يجب أن تفضّل الشيفرة الجديدة منشئ الإمكانات وأن تكشف `approvalCapability` على Plugin.
 
-بالنسبة إلى نقاط دخول القناة الساخنة، فضّل المسارات الفرعية الضيقة لوقت التشغيل عندما
-تحتاج فقط إلى جزء واحد من تلك العائلة:
+في نقاط دخول القناة الساخنة، فضّل المسارات الفرعية الأضيق لوقت التشغيل عندما
+تحتاج إلى جزء واحد فقط من هذه المجموعة:
 
 - `openclaw/plugin-sdk/approval-auth-runtime`
 - `openclaw/plugin-sdk/approval-client-runtime`
@@ -124,102 +125,111 @@ x-i18n:
 - `openclaw/plugin-sdk/approval-reply-runtime`
 - `openclaw/plugin-sdk/channel-runtime-context`
 
-وبالمثل، فضّل `openclaw/plugin-sdk/setup-runtime`,
-و`openclaw/plugin-sdk/setup-adapter-runtime`,
-و`openclaw/plugin-sdk/reply-runtime`,
-و`openclaw/plugin-sdk/reply-dispatch-runtime`,
-و`openclaw/plugin-sdk/reply-reference`, و
+وبالمثل، فضّل `openclaw/plugin-sdk/setup-runtime`،
+و`openclaw/plugin-sdk/setup-adapter-runtime`،
+و`openclaw/plugin-sdk/reply-runtime`،
+و`openclaw/plugin-sdk/reply-dispatch-runtime`،
+و`openclaw/plugin-sdk/reply-reference`، و
 `openclaw/plugin-sdk/reply-chunking` عندما لا تحتاج إلى السطح
-الأوسع المظلّي.
+المظلي الأوسع.
 
 وبالنسبة إلى الإعداد تحديدًا:
 
-- يغطي `openclaw/plugin-sdk/setup-runtime` المساعدات الآمنة في وقت التشغيل الخاصة بالإعداد:
-  محولات setup patch الآمنة للاستيراد (`createPatchedAccountSetupAdapter`,
+- يغطي `openclaw/plugin-sdk/setup-runtime` مساعدات الإعداد الآمنة وقت التشغيل:
+  موائمات ترقيع الإعداد الآمنة للاستيراد (`createPatchedAccountSetupAdapter`,
   `createEnvPatchedAccountSetupAdapter`,
   `createSetupInputPresenceValidator`)، ومخرجات
-  lookup-note، و`promptResolvedAllowFrom`، و`splitSetupEntries`، وبناة
-  setup-proxy المفوضة
-- يُعد `openclaw/plugin-sdk/setup-adapter-runtime` الخط الضيق
-  الواعي بالبيئة من أجل `createEnvPatchedAccountSetupAdapter`
-- يغطي `openclaw/plugin-sdk/channel-setup` بناة الإعداد الاختياري للتثبيت
-  بالإضافة إلى بعض البدائيات الآمنة للإعداد:
+  ملاحظة البحث، و`promptResolvedAllowFrom`، و`splitSetupEntries`، ومنشئات
+  الوكيل المفوض للإعداد
+- يمثّل `openclaw/plugin-sdk/setup-adapter-runtime` الواجهة الضيقة الواعية بالبيئة
+  لـ `createEnvPatchedAccountSetupAdapter`
+- يغطي `openclaw/plugin-sdk/channel-setup` منشئات الإعداد ذات التثبيت الاختياري
+  بالإضافة إلى عدد قليل من البدائيات الآمنة للإعداد:
   `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`,
 
-إذا كانت قناتك تدعم إعدادًا أو مصادقة مدفوعين بالبيئة وكان يجب أن تعرف
-تدفقات بدء التشغيل/الإعدادات العامة أسماء متغيرات البيئة تلك قبل تحميل وقت التشغيل، فصرّح بها في
-manifest الخاصة بـ Plugin باستخدام `channelEnvVars`. وأبقِ `envVars` الخاصة بوقت تشغيل القناة
-أو الثوابت المحلية فقط من أجل النصوص الموجهة للمشغل.
+إذا كانت قناتك تدعم إعدادًا أو مصادقة مدفوعة بمتغيرات البيئة، أو إذا كان ينبغي
+لتدفقات بدء التشغيل/الإعداد العامة معرفة أسماء متغيرات البيئة هذه قبل تحميل وقت التشغيل،
+فأعلن عنها في بيان Plugin باستخدام `channelEnvVars`. وأبقِ `envVars` في وقت تشغيل القناة
+أو الثوابت المحلية للنسخ الموجهة للمشغل فقط.
 
-إذا كانت قناتك يمكن أن تظهر في `status` أو `channels list` أو `channels status` أو
-فحوصات SecretRef قبل بدء وقت تشغيل Plugin، فأضف `openclaw.setupEntry` في
-`package.json`. ويجب أن تكون نقطة الدخول هذه آمنة للاستيراد في مسارات أوامر القراءة فقط
-وأن تعيد بيانات وصفية للقناة، ومحول إعدادات آمن للإعداد، ومحول حالة، وبيانات وصفية
-لهدف سر القناة المطلوبة لتلك الملخصات. ولا تبدأ
-عملاء أو مستمعين أو أوقات تشغيل النقل من نقطة دخول الإعداد.
+إذا كان يمكن لقناتك أن تظهر في `status` أو `channels list` أو `channels status` أو
+عمليات فحص SecretRef قبل بدء وقت تشغيل Plugin، فأضف `openclaw.setupEntry` في
+`package.json`. يجب أن تكون نقطة الدخول هذه آمنة للاستيراد في مسارات الأوامر
+للقراءة فقط، ويجب أن تُرجع بيانات تعريف القناة، وموائم الإعداد الآمن،
+وموائم الحالة، وبيانات تعريف الهدف السري للقناة اللازمة لهذه الملخصات. لا تقم
+بتشغيل العملاء أو المستمعين أو أوقات تشغيل النقل من نقطة دخول الإعداد.
 
-`createOptionalChannelSetupWizard`, `DEFAULT_ACCOUNT_ID`,
-`createTopLevelChannelDmPolicy`, `setSetupChannelEnabled`, و
+أبقِ مسار استيراد إدخال القناة الرئيسي ضيقًا أيضًا. يمكن لعملية الاكتشاف تقييم
+الإدخال ووحدة Plugin القناة لتسجيل الإمكانات من دون تفعيل القناة.
+يجب أن تصدّر ملفات مثل `channel-plugin-api.ts` كائن Plugin القناة
+من دون استيراد معالجات الإعداد أو عملاء النقل أو مستمعي socket أو
+مشغلات العمليات الفرعية أو وحدات بدء الخدمة. ضع أجزاء وقت التشغيل هذه
+في وحدات تُحمّل من `registerFull(...)` أو واضعات وقت التشغيل أو موائمات
+الإمكانات الكسولة.
+
+`createOptionalChannelSetupWizard`، و`DEFAULT_ACCOUNT_ID`،
+و`createTopLevelChannelDmPolicy`، و`setSetupChannelEnabled`، و
 `splitSetupEntries`
 
-- استخدم السطح الأوسع `openclaw/plugin-sdk/setup` فقط عندما تحتاج أيضًا إلى
-  مساعدات الإعداد/الضبط الأثقل المشتركة مثل
+- استخدم الواجهة الأوسع `openclaw/plugin-sdk/setup` فقط عندما تحتاج أيضًا إلى
+  مساعدات الإعداد/التهيئة المشتركة الأثقل مثل
   `moveSingleAccountChannelSectionToDefaultAccount(...)`
 
-إذا كانت قناتك تريد فقط الإعلان عن "ثبّت هذه Plugin أولًا" في أسطح الإعداد،
-ففضّل `createOptionalChannelSetupSurface(...)`. حيث تفشل
-المحول/المعالج الناتجان بشكل مغلق في كتابات الإعدادات والإنهاء، ويعيدان استخدام رسالة التثبيت المطلوبة نفسها عبر التحقق والإنهاء ونصوص الروابط في الوثائق.
+إذا كانت قناتك تريد فقط الإعلان عن "ثبّت هذا Plugin أولًا" في أسطح
+الإعداد، ففضّل `createOptionalChannelSetupSurface(...)`. يفشل
+المحوّل/المعالج المُولَّدان بشكل مغلق عند كتابة الإعدادات والإنهاء، ويعيدان استخدام
+رسالة التثبيت المطلوبة نفسها عبر التحقق والإنهاء ونسخة رابط الوثائق.
 
-وبالنسبة إلى المسارات الساخنة الأخرى للقناة، فضّل المساعدات الضيقة على الأسطح القديمة الأوسع:
+وبالنسبة إلى مسارات القناة الساخنة الأخرى، فضّل المساعدات الضيقة على الأسطح
+القديمة الأوسع:
 
-- `openclaw/plugin-sdk/account-core`,
-  `openclaw/plugin-sdk/account-id`,
-  `openclaw/plugin-sdk/account-resolution`، و
-  `openclaw/plugin-sdk/account-helpers` لإعدادات تعدد الحسابات
+- `openclaw/plugin-sdk/account-core`،
+  و`openclaw/plugin-sdk/account-id`،
+  و`openclaw/plugin-sdk/account-resolution`، و
+  `openclaw/plugin-sdk/account-helpers` لإعدادات الحسابات المتعددة
   والرجوع إلى الحساب الافتراضي
 - `openclaw/plugin-sdk/inbound-envelope` و
-  `openclaw/plugin-sdk/inbound-reply-dispatch` من أجل التوجيه/الغلاف الوارد
-  وربط التسجيل ثم الإرسال
+  `openclaw/plugin-sdk/inbound-reply-dispatch` للمسار/الظرف الوارد و
+  ربط التسجيل والتوزيع
 - `openclaw/plugin-sdk/messaging-targets` لتحليل/مطابقة الأهداف
 - `openclaw/plugin-sdk/outbound-media` و
   `openclaw/plugin-sdk/outbound-runtime` لتحميل الوسائط بالإضافة إلى
-  مفوضي الهوية/الإرسال الصادر وتخطيط الحمولة
+  مفوضات الهوية/الإرسال الصادرة وتخطيط الحمولة
 - `buildThreadAwareOutboundSessionRoute(...)` من
-  `openclaw/plugin-sdk/channel-core` عندما يجب أن يحافظ المسار الصادر على
-  `replyToId`/`threadId` صريحين أو أن يستعيد جلسة `:thread:` الحالية
-  بعد أن يظل مفتاح الجلسة الأساسي مطابقًا. ويمكن Plugins الموفّرين تجاوز
-  الأولوية، وسلوك اللاحقة، وتطبيع معرّف السلسلة عندما تكون لمنصتهم دلالات
-  أصلية لتسليم السلاسل.
+  `openclaw/plugin-sdk/channel-core` عندما ينبغي لمسار صادر أن يحافظ على
+  `replyToId`/`threadId` صريح أو أن يستعيد جلسة `:thread:` الحالية
+  بعد أن يبقى مفتاح الجلسة الأساسي متطابقًا. يمكن Plugins الموفرين تجاوز
+  الأولوية وسلوك اللاحقة وتطبيع معرّف السلسلة عندما تكون لمنصتهم
+  دلالات تسليم أصلية للسلاسل.
 - `openclaw/plugin-sdk/thread-bindings-runtime` لدورة حياة ربط السلاسل
   وتسجيل المحولات
-- `openclaw/plugin-sdk/agent-media-payload` فقط عندما تكون هناك حاجة
-  إلى تخطيط حقول قديم لحمولة الوكيل/الوسائط
-- `openclaw/plugin-sdk/telegram-command-config` من أجل تطبيع أوامر Telegram
-  المخصصة، والتحقق من التكرارات/التعارضات، وعقد إعدادات أوامر مستقر في
-  حالات الرجوع
+- `openclaw/plugin-sdk/agent-media-payload` فقط عندما يكون تخطيط
+  حقل حمولة agent/media القديم ما يزال مطلوبًا
+- `openclaw/plugin-sdk/telegram-command-config` لتطبيع الأوامر المخصصة في Telegram،
+  والتحقق من التكرار/التعارض، وعقد إعداد أوامر مستقر عند الرجوع
 
-يمكن لقنوات المصادقة فقط أن تتوقف عادة عند المسار الافتراضي: فالنواة تتولى الموافقات، وتكشف Plugin فقط إمكانات الصادر/المصادقة. أما القنوات ذات الموافقات الأصلية مثل Matrix وSlack وTelegram ووسائط النقل المخصصة للدردشة، فيجب أن تستخدم المساعدات الأصلية المشتركة بدلًا من بناء دورة حياة الموافقة الخاصة بها.
+يمكن للقنوات المخصّصة للمصادقة فقط عادةً التوقف عند المسار الافتراضي: تتولى النواة الموافقات ويكشف Plugin فقط إمكانات الصادر/المصادقة. أما قنوات الموافقة الأصلية مثل Matrix وSlack وTelegram وناقلات الدردشة المخصصة فيجب أن تستخدم المساعدات الأصلية المشتركة بدلًا من بناء دورة حياة الموافقة الخاصة بها.
 
 ## سياسة الإشارة الواردة
 
-أبقِ معالجة الإشارة الواردة منقسمة إلى طبقتين:
+أبقِ التعامل مع الإشارة الواردة مقسّمًا إلى طبقتين:
 
 - جمع الأدلة المملوك لـ Plugin
-- تقييم السياسة المشترك
+- تقييم السياسة المشتركة
 
-استخدم `openclaw/plugin-sdk/channel-mention-gating` لقرارات سياسة الإشارة.
-واستخدم `openclaw/plugin-sdk/channel-inbound` فقط عندما تحتاج إلى
-شريط المساعدات الأوسع الخاص بالوارد.
+استخدم `openclaw/plugin-sdk/channel-mention-gating` لقرارات
+سياسة الإشارة. واستخدم `openclaw/plugin-sdk/channel-inbound` فقط عندما تحتاج إلى
+شريط مساعدات الوارد الأوسع.
 
-ما يناسب المنطق المحلي في Plugin:
+مناسب جيدًا للمنطق المحلي في Plugin:
 
-- اكتشاف الرد على البوت
-- اكتشاف اقتباس البوت
+- كشف الرد على البوت
+- كشف الاقتباس من البوت
 - فحوصات المشاركة في السلسلة
 - استثناءات رسائل الخدمة/النظام
-- ذاكرات مؤقتة أصلية في المنصة مطلوبة لإثبات مشاركة البوت
+- الذاكرات المؤقتة الأصلية للمنصة اللازمة لإثبات مشاركة البوت
 
-ما يناسب المساعد المشترك:
+مناسب جيدًا للمساعد المشترك:
 
 - `requireMention`
 - نتيجة الإشارة الصريحة
@@ -230,7 +240,7 @@ manifest الخاصة بـ Plugin باستخدام `channelEnvVars`. وأبقِ 
 التدفق المفضل:
 
 1. احسب حقائق الإشارة المحلية.
-2. مرر هذه الحقائق إلى `resolveInboundMentionDecision({ facts, policy })`.
+2. مرّر تلك الحقائق إلى `resolveInboundMentionDecision({ facts, policy })`.
 3. استخدم `decision.effectiveWasMentioned` و`decision.shouldBypassMention` و`decision.shouldSkip` في بوابة الوارد لديك.
 
 ```typescript
@@ -270,8 +280,8 @@ const decision = resolveInboundMentionDecision({
 if (decision.shouldSkip) return;
 ```
 
-يكشف `api.runtime.channel.mentions` مساعدات الإشارة المشتركة نفسها من أجل
-Plugins القنوات المضمنة التي تعتمد بالفعل على حقن وقت التشغيل:
+يكشف `api.runtime.channel.mentions` عن مساعدات الإشارة المشتركة نفسها
+لـ Plugins القنوات المضمّنة التي تعتمد بالفعل على حقن وقت التشغيل:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -282,20 +292,20 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
 إذا كنت تحتاج فقط إلى `implicitMentionKindWhen` و
 `resolveInboundMentionDecision`، فاستورد من
 `openclaw/plugin-sdk/channel-mention-gating` لتجنب تحميل مساعدات وقت تشغيل
-أخرى غير مرتبطة بالوارد.
+وارد غير مرتبطة.
 
-تظل مساعدات `resolveMentionGating*` الأقدم على
-`openclaw/plugin-sdk/channel-inbound` كتصديرات توافق فقط. ويجب على الشيفرة الجديدة
-استخدام `resolveInboundMentionDecision({ facts, policy })`.
+تبقى مساعدات `resolveMentionGating*` الأقدم موجودة على
+`openclaw/plugin-sdk/channel-inbound` كتصديرات توافق فقط. يجب أن تستخدم
+الشيفرة الجديدة `resolveInboundMentionDecision({ facts, policy })`.
 
-## الشرح خطوة بخطوة
+## شرح تفصيلي
 
 <Steps>
   <a id="step-1-package-and-manifest"></a>
-  <Step title="الحزمة وmanifest">
-    أنشئ ملفات Plugin القياسية. إن الحقل `channel` في `package.json` هو
-    ما يجعل هذه Plugin لقناة. وللاطلاع على سطح بيانات الحزمة الوصفية الكامل،
-    راجع [إعداد Plugin والإعدادات](/ar/plugins/sdk-setup#openclaw-channel):
+  <Step title="الحزمة والبيان">
+    أنشئ ملفات Plugin القياسية. الحقل `channel` في `package.json` هو
+    ما يجعل هذا Plugin قناة. وللاطلاع على السطح الكامل لبيانات تعريف الحزمة،
+    راجع [إعداد Plugin وتهيئته](/ar/plugins/sdk-setup#openclaw-channel):
 
     <CodeGroup>
     ```json package.json
@@ -325,15 +335,25 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
       "configSchema": {
         "type": "object",
         "additionalProperties": false,
-        "properties": {
-          "acme-chat": {
+        "properties": {}
+      },
+      "channelConfigs": {
+        "acme-chat": {
+          "schema": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
               "token": { "type": "string" },
               "allowFrom": {
                 "type": "array",
                 "items": { "type": "string" }
               }
+            }
+          },
+          "uiHints": {
+            "token": {
+              "label": "رمز البوت",
+              "sensitive": true
             }
           }
         }
@@ -342,11 +362,16 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     ```
     </CodeGroup>
 
+    يتحقق `configSchema` من `plugins.entries.acme-chat.config`. استخدمه من أجل
+    الإعدادات المملوكة لـ Plugin التي لا تمثل إعداد حساب القناة. يتحقق `channelConfigs`
+    من `channels.acme-chat` وهو مصدر المسار البارد الذي تستخدمه
+    مخططات الإعدادات والإعداد وواجهات المستخدم قبل تحميل وقت تشغيل Plugin.
+
   </Step>
 
-  <Step title="ابنِ كائن Plugin القناة">
-    تحتوي واجهة `ChannelPlugin` على العديد من أسطح المحولات الاختيارية. ابدأ
-    بالحد الأدنى — `id` و`setup` — ثم أضف المحولات حسب الحاجة.
+  <Step title="أنشئ كائن Plugin القناة">
+    تحتوي واجهة `ChannelPlugin` على العديد من أسطح المحولات الاختيارية. ابدأ بالحد
+    الأدنى — `id` و`setup` — ثم أضف المحولات حسب الحاجة.
 
     أنشئ `src/channel.ts`:
 
@@ -441,19 +466,27 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     });
     ```
 
-    <Accordion title="ما الذي تقوم به createChatChannelPlugin من أجلك">
-      بدلًا من تنفيذ واجهات محولات منخفضة المستوى يدويًا، فإنك تمرر
-      خيارات تعريفية ويقوم الباني بتركيبها:
+    <Accordion title="ما الذي يقدمه لك createChatChannelPlugin">
+      بدلًا من تنفيذ واجهات المحولات منخفضة المستوى يدويًا، فإنك تمرّر
+      خيارات وصفية ويقوم المُنشئ بتركيبها:
 
       | الخيار | ما الذي يربطه |
       | --- | --- |
-      | `security.dm` | محلل أمان DM محدود النطاق من حقول الإعدادات |
-      | `pairing.text` | تدفق اقتران DM قائم على النص مع تبادل رمز |
-      | `threading` | محلل وضع reply-to ‏(ثابت، أو بنطاق الحساب، أو مخصص) |
-      | `outbound.attachedResults` | دوال إرسال تعيد بيانات وصفية للنتائج (معرّفات الرسائل) |
+      | `security.dm` | محلل أمان الرسائل الخاصة المقيّد من حقول الإعداد |
+      | `pairing.text` | تدفق اقتران رسائل خاصة قائم على النص مع تبادل رمز |
+      | `threading` | محلل وضع الرد (ثابت أو مقيّد بالحساب أو مخصص) |
+      | `outbound.attachedResults` | دوال إرسال تُرجع بيانات تعريف النتيجة (معرّفات الرسائل) |
 
-      يمكنك أيضًا تمرير كائنات محولات خام بدلًا من الخيارات التعريفية
+      يمكنك أيضًا تمرير كائنات محولات خام بدلًا من الخيارات الوصفية
       إذا كنت تحتاج إلى تحكم كامل.
+
+      يمكن لمحولات الصادر الخام تعريف دالة `chunker(text, limit, ctx)`.
+      يحمل `ctx.formatting` الاختياري قرارات التنسيق وقت التسليم
+      مثل `maxLinesPerMessage`؛ طبّقها قبل الإرسال حتى تُحل
+      حدود تسلسل الردود والكتل مرة واحدة بواسطة التسليم الصادر المشترك.
+      تتضمن سياقات الإرسال أيضًا `replyToIdSource` (`implicit` أو `explicit`)
+      عندما يُحل هدف رد أصلي، حتى تتمكن مساعدات الحمولة من الحفاظ على
+      وسوم الرد الصريحة دون استهلاك خانة رد ضمني أحادية الاستخدام.
     </Accordion>
 
   </Step>
@@ -495,21 +528,21 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     ```
 
     ضع واصفات CLI المملوكة للقناة في `registerCliMetadata(...)` حتى يتمكن OpenClaw
-    من عرضها في المساعدة الجذرية من دون تفعيل وقت تشغيل القناة الكامل،
-    بينما تلتقط الأحمال الكاملة العادية الواصفات نفسها من أجل التسجيل الحقيقي للأوامر.
-    وأبقِ `registerFull(...)` للعمل الخاص بوقت التشغيل فقط.
-    إذا سجّلت `registerFull(...)` أساليب Gateway RPC، فاستخدم
-    بادئة خاصة بـ Plugin. تظل مساحات أسماء الإدارة الأساسية (`config.*`,
-    `exec.approvals.*`, `wizard.*`, `update.*`) محجوزة وتُحل دائمًا إلى
+    من عرضها في المساعدة الجذرية دون تفعيل وقت تشغيل القناة الكامل،
+    بينما تلتقط التحميلات الكاملة العادية الواصفات نفسها لتسجيل الأوامر الفعلي.
+    وأبقِ `registerFull(...)` للأعمال الخاصة بوقت التشغيل فقط.
+    إذا كان `registerFull(...)` يسجل أساليب Gateway RPC، فاستخدم
+    بادئة خاصة بالـ Plugin. تبقى مساحات أسماء الإدارة في النواة (`config.*`،
+    و`exec.approvals.*`، و`wizard.*`، و`update.*`) محجوزة وتُحل دائمًا إلى
     `operator.admin`.
-    تتولى `defineChannelPluginEntry` تقسيم أوضاع التسجيل تلقائيًا. راجع
-    [نقاط الدخول](/ar/plugins/sdk-entrypoints#definechannelpluginentry) لجميع
+    يتولى `defineChannelPluginEntry` تقسيم وضع التسجيل تلقائيًا. راجع
+    [نقاط الدخول](/ar/plugins/sdk-entrypoints#definechannelpluginentry) للاطلاع على جميع
     الخيارات.
 
   </Step>
 
-  <Step title="أضف setup entry">
-    أنشئ `setup-entry.ts` من أجل التحميل الخفيف أثناء onboarding:
+  <Step title="أضف نقطة دخول للإعداد">
+    أنشئ `setup-entry.ts` للتحميل الخفيف أثناء الإعداد الأولي:
 
     ```typescript setup-entry.ts
     import { defineSetupPluginEntry } from "openclaw/plugin-sdk/channel-core";
@@ -518,21 +551,21 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     export default defineSetupPluginEntry(acmeChatPlugin);
     ```
 
-    يقوم OpenClaw بتحميل هذا بدلًا من نقطة الدخول الكاملة عندما تكون القناة معطلة
-    أو غير مضبوطة. ويتجنب هذا سحب شيفرة وقت التشغيل الثقيلة أثناء تدفقات الإعداد.
+    يحمّل OpenClaw هذا بدلًا من نقطة الدخول الكاملة عندما تكون القناة معطلة
+    أو غير مُعدّة. وهذا يتجنب سحب شيفرة وقت تشغيل ثقيلة أثناء تدفقات الإعداد.
     راجع [الإعداد والتهيئة](/ar/plugins/sdk-setup#setup-entry) للتفاصيل.
 
-    يمكن لقنوات مساحة العمل المضمنة التي تقسم الصادرات الآمنة للإعداد إلى وحدات
-    sidecar استخدام `defineBundledChannelSetupEntry(...)` من
+    يمكن لقنوات مساحة العمل المضمّنة التي تفصل التصديرات الآمنة للإعداد إلى
+    وحدات جانبية استخدام `defineBundledChannelSetupEntry(...)` من
     `openclaw/plugin-sdk/channel-entry-contract` عندما تحتاج أيضًا إلى
-    setter صريح لوقت تشغيل أثناء الإعداد.
+    واضع وقت تشغيل صريح خاص بوقت الإعداد.
 
   </Step>
 
   <Step title="تعامل مع الرسائل الواردة">
-    تحتاج Plugin الخاصة بك إلى استقبال الرسائل من المنصة وتمريرها إلى
-    OpenClaw. النمط المعتاد هو Webhook تتحقق من الطلب
-    وترسله عبر معالج الوارد الخاص بقناتك:
+    يحتاج Plugin الخاص بك إلى استلام الرسائل من المنصة وإعادة توجيهها إلى
+    OpenClaw. النمط المعتاد هو Webhook يتحقق من الطلب ويقوم
+    بتوزيعه عبر معالج الوارد الخاص بقناتك:
 
     ```typescript
     registerFull(api) {
@@ -556,16 +589,16 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     ```
 
     <Note>
-      تكون معالجة الرسائل الواردة خاصة بكل قناة. فكل Plugin قناة تملك
-      مسار الوارد الخاص بها. انظر إلى Plugins القنوات المضمنة
-      (على سبيل المثال حزمة Plugin الخاصة بـ Microsoft Teams أو Google Chat) للحصول على أنماط حقيقية.
+      يكون التعامل مع الرسائل الواردة خاصًا بالقناة. يمتلك كل Plugin قناة
+      خط معالجة الوارد الخاص به. ألقِ نظرة على Plugins القنوات المضمّنة
+      (على سبيل المثال حزمة Plugin الخاصة بـ Microsoft Teams أو Google Chat) للاطلاع على أنماط فعلية.
     </Note>
 
   </Step>
 
 <a id="step-6-test"></a>
 <Step title="الاختبار">
-اكتب اختبارات موضوعة مع الشيفرة في `src/channel.test.ts`:
+اكتب اختبارات متجاورة في `src/channel.test.ts`:
 
     ```typescript src/channel.test.ts
     import { describe, it, expect } from "vitest";
@@ -603,7 +636,7 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
     pnpm test -- <bundled-plugin-root>/acme-chat/
     ```
 
-    بالنسبة إلى مساعدات الاختبار المشتركة، راجع [الاختبار](/ar/plugins/sdk-testing).
+    للاطلاع على مساعدات الاختبار المشتركة، راجع [الاختبار](/ar/plugins/sdk-testing).
 
   </Step>
 </Steps>
@@ -612,52 +645,52 @@ Plugins القنوات المضمنة التي تعتمد بالفعل على ح
 
 ```
 <bundled-plugin-root>/acme-chat/
-├── package.json              # openclaw.channel metadata
-├── openclaw.plugin.json      # Manifest with config schema
+├── package.json              # بيانات تعريف openclaw.channel
+├── openclaw.plugin.json      # البيان مع مخطط الإعداد
 ├── index.ts                  # defineChannelPluginEntry
 ├── setup-entry.ts            # defineSetupPluginEntry
-├── api.ts                    # Public exports (optional)
-├── runtime-api.ts            # Internal runtime exports (optional)
+├── api.ts                    # التصديرات العامة (اختياري)
+├── runtime-api.ts            # تصديرات وقت التشغيل الداخلية (اختياري)
 └── src/
-    ├── channel.ts            # ChannelPlugin via createChatChannelPlugin
-    ├── channel.test.ts       # Tests
-    ├── client.ts             # Platform API client
-    └── runtime.ts            # Runtime store (if needed)
+    ├── channel.ts            # ChannelPlugin عبر createChatChannelPlugin
+    ├── channel.test.ts       # الاختبارات
+    ├── client.ts             # عميل API الخاص بالمنصة
+    └── runtime.ts            # مخزن وقت التشغيل (عند الحاجة)
 ```
 
 ## موضوعات متقدمة
 
 <CardGroup cols={2}>
   <Card title="خيارات التسلسل" icon="git-branch" href="/ar/plugins/sdk-entrypoints#registration-mode">
-    أوضاع reply ثابتة أو بنطاق الحساب أو مخصصة
+    أوضاع رد ثابتة أو مقيّدة بالحساب أو مخصصة
   </Card>
   <Card title="تكامل أداة الرسائل" icon="puzzle" href="/ar/plugins/architecture#channel-plugins-and-the-shared-message-tool">
     describeMessageTool واكتشاف الإجراءات
   </Card>
-  <Card title="حل الأهداف" icon="crosshair" href="/ar/plugins/architecture-internals#channel-target-resolution">
-    inferTargetChatType, looksLikeId, resolveTarget
+  <Card title="تحليل الهدف" icon="crosshair" href="/ar/plugins/architecture-internals#channel-target-resolution">
+    inferTargetChatType وlooksLikeId وresolveTarget
   </Card>
   <Card title="مساعدات وقت التشغيل" icon="settings" href="/ar/plugins/sdk-runtime">
-    TTS وSTT والوسائط والوكيل الفرعي عبر api.runtime
+    TTS وSTT والوسائط وsubagent عبر api.runtime
   </Card>
 </CardGroup>
 
 <Note>
-لا تزال بعض الخطوط المساعدة المضمنة موجودة لصيانة Plugins المضمنة
-ولأغراض التوافق. وهي ليست النمط الموصى به لPlugins القنوات الجديدة؛
-فضّل المسارات الفرعية العامة الخاصة بالقناة/الإعداد/الرد/وقت التشغيل من سطح
-SDK المشترك ما لم تكن تصون عائلة Plugin المضمنة تلك مباشرة.
+ما تزال بعض واجهات المساعدات المضمّنة موجودة لصيانة Plugins المضمّنة
+والتوافق. وهي ليست النمط الموصى به لـ Plugins القنوات الجديدة؛
+فضّل المسارات الفرعية العامة للقناة/الإعداد/الرد/وقت التشغيل من سطح SDK
+المشترك ما لم تكن تصون عائلة Plugin المضمّنة تلك مباشرة.
 </Note>
 
 ## الخطوات التالية
 
-- [Plugins الموفّرين](/ar/plugins/sdk-provider-plugins) — إذا كانت Plugin الخاصة بك توفّر نماذج أيضًا
-- [نظرة عامة على SDK](/ar/plugins/sdk-overview) — المرجع الكامل لاستيرادات المسارات الفرعية
+- [Plugins الموفر](/ar/plugins/sdk-provider-plugins) — إذا كان Plugin الخاص بك يوفّر أيضًا نماذج
+- [نظرة عامة على SDK](/ar/plugins/sdk-overview) — المرجع الكامل للاستيراد عبر المسارات الفرعية
 - [اختبار SDK](/ar/plugins/sdk-testing) — أدوات الاختبار واختبارات العقود
-- [Plugin Manifest](/ar/plugins/manifest) — مخطط manifest الكامل
+- [بيان Plugin](/ar/plugins/manifest) — مخطط البيان الكامل
 
 ## ذو صلة
 
 - [إعداد Plugin SDK](/ar/plugins/sdk-setup)
-- [بناء Plugins](/ar/plugins/building-plugins)
-- [Plugins harness الخاصة بالوكلاء](/ar/plugins/sdk-agent-harness)
+- [إنشاء Plugins](/ar/plugins/building-plugins)
+- [Plugins حزام agent](/ar/plugins/sdk-agent-harness)

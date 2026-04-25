@@ -1,28 +1,30 @@
 ---
 read_when:
-    - أنت تحتاج إلى معرفة المسار الفرعي في SDK الذي يجب الاستيراد منه
-    - أنت تريد مرجعًا لجميع طرق التسجيل على OpenClawPluginApi
+    - تحتاج إلى معرفة المسار الفرعي في SDK الذي يجب الاستيراد منه
+    - تريد مرجعًا لجميع أساليب التسجيل في OpenClawPluginApi
     - أنت تبحث عن عنصر تصدير محدد في SDK
 sidebarTitle: SDK overview
-summary: خريطة الاستيراد، ومرجع API التسجيل، وبنية SDK
+summary: خريطة الاستيراد، ومرجع واجهة برمجة تطبيقات التسجيل، ومعمارية SDK
 title: نظرة عامة على Plugin SDK
 x-i18n:
-    generated_at: "2026-04-24T07:55:47Z"
+    generated_at: "2026-04-25T13:54:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7f4209c245a3d3462c5d5f51ad3c6e4327240ed402fdbac3f01f8a761ba75233
+    source_hash: 825efe8d9b2283734730348f9803e40cabaaa6399993648f4bb5822b20e588ee
     source_path: plugins/sdk-overview.md
     workflow: 15
 ---
 
-تمثل Plugin SDK العقد typed بين plugins والنواة. وهذه الصفحة هي المرجع الخاص بـ **ما الذي يجب استيراده** و**ما الذي يمكنك تسجيله**.
+Plugin SDK هو العقد المعرّف بالأنواع بين Plugins والنواة. هذه الصفحة هي
+المرجع الخاص بـ **ما الذي يجب استيراده** و**ما الذي يمكنك تسجيله**.
 
 <Tip>
-  هل تبحث بدلًا من ذلك عن دليل عملي؟
+  هل تبحث عن دليل إرشادي بدلًا من ذلك؟
 
-- أول Plugin؟ ابدأ من [Building plugins](/ar/plugins/building-plugins).
-- Plugin قناة؟ راجع [Channel plugins](/ar/plugins/sdk-channel-plugins).
-- Plugin مزوّد؟ راجع [Provider plugins](/ar/plugins/sdk-provider-plugins).
+- أول Plugin؟ ابدأ من [بناء Plugins](/ar/plugins/building-plugins).
+- Plugin قناة؟ راجع [Plugins القنوات](/ar/plugins/sdk-channel-plugins).
+- Plugin مزود؟ راجع [Plugins المزودين](/ar/plugins/sdk-provider-plugins).
+- Plugin أداة أو خطاف دورة حياة؟ راجع [خطافات Plugin](/ar/plugins/hooks).
   </Tip>
 
 ## اصطلاح الاستيراد
@@ -34,106 +36,113 @@ import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
 ```
 
-كل مسار فرعي هو وحدة صغيرة ومستقلة ذاتيًا. وهذا يحافظ على سرعة بدء التشغيل
-ويمنع مشكلات الاعتماد الدائري. وبالنسبة إلى مساعدات الإدخال/البناء الخاصة بالقنوات،
-فضّل `openclaw/plugin-sdk/channel-core`؛ واحتفظ بـ `openclaw/plugin-sdk/core` من أجل
-السطح الأشمل والمساعدات المشتركة مثل
+كل مسار فرعي هو وحدة صغيرة مستقلة بذاتها. هذا يحافظ على سرعة بدء التشغيل
+ويمنع مشكلات التبعيات الدائرية. بالنسبة إلى مساعدات الإدخال/البناء الخاصة
+بالقنوات، يُفضّل استخدام `openclaw/plugin-sdk/channel-core`؛ واحتفظ بـ `openclaw/plugin-sdk/core`
+للسطح المظلي الأوسع والمساعدات المشتركة مثل
 `buildChannelConfigSchema`.
 
-<Warning>
-  لا تستورد حدود الراحة ذات العلامة الخاصة بالمزوّد أو القناة (مثل
-  `openclaw/plugin-sdk/slack`، أو `.../discord`، أو `.../signal`، أو `.../whatsapp`).
-  فالـ plugins المضمّنة تركّب مسارات SDK الفرعية العامة داخل ملفات
-  `api.ts` / `runtime-api.ts` الخاصة بها؛ أما مستهلكو النواة فعليهم إما استخدام
-  هذه الملفات المحلية الخاصة بالـ plugin أو إضافة عقدة SDK عامة ضيقة عندما تكون
-  الحاجة مشتركة بين القنوات فعلًا.
+بالنسبة إلى إعدادات القناة، انشر JSON Schema المملوكة للقناة عبر
+`openclaw.plugin.json#channelConfigs`. المسار الفرعي `plugin-sdk/channel-config-schema`
+مخصص للعناصر الأولية المشتركة للمخطط والباني العام. وأي عمليات تصدير للمخططات
+تسمى بأسماء قنوات مضمّنة على ذلك المسار الفرعي هي عمليات تصدير توافقية قديمة،
+وليست نمطًا للPlugins الجديدة.
 
-ما تزال مجموعة صغيرة من حدود المساعدة الخاصة بالـ plugins المضمّنة (`plugin-sdk/feishu`,
-`plugin-sdk/zalo`, `plugin-sdk/matrix*`، وما شابه) تظهر في
-خريطة التصدير المولدة. وهي موجودة فقط من أجل صيانة الـ plugins المضمّنة وليست
-مسارات استيراد موصى بها لـ plugins الجديدة التابعة لجهات خارجية.
+<Warning>
+  لا تستورد مسارات الراحة الموسومة باسم مزود أو قناة (على سبيل المثال
+  `openclaw/plugin-sdk/slack`، `.../discord`، `.../signal`، `.../whatsapp`).
+  تقوم Plugins المضمّنة بتركيب المسارات الفرعية العامة لـ SDK داخل حاويات
+  `api.ts` / `runtime-api.ts` الخاصة بها؛ ويجب على مستهلكي النواة إما استخدام
+  تلك الحاويات المحلية الخاصة بـ Plugin أو إضافة عقد SDK عام ضيق عندما تكون
+  الحاجة فعلًا عابرة للقنوات.
+
+لا تزال مجموعة صغيرة من مسارات المساعدة الخاصة بالPlugins المضمّنة (`plugin-sdk/feishu`،
+`plugin-sdk/zalo`، `plugin-sdk/matrix*`، وما شابهها) تظهر في
+خريطة التصدير المولدة. وهي موجودة فقط لصيانة Plugins المضمّنة وليست
+مسارات استيراد موصى بها لPlugins الخارجية الجديدة.
 </Warning>
 
 ## مرجع المسارات الفرعية
 
-تُعرض Plugin SDK كمجموعة من المسارات الفرعية الضيقة المجمعة حسب المجال (إدخال
-Plugin، والقناة، والمزوّد، والمصادقة، ووقت التشغيل، والقدرات، والذاكرة، ومساعدات
-plugins المضمّنة المحجوزة). وللاطلاع على الكتالوج الكامل — مجمّعًا ومرتبطًا —
-راجع [Plugin SDK subpaths](/ar/plugins/sdk-subpaths).
+يُعرَض Plugin SDK كمجموعة من المسارات الفرعية الضيقة المجمعة حسب المجال (إدخال
+Plugin، القناة، المزود، المصادقة، وقت التشغيل، الإمكانية، الذاكرة، ومساعدات
+Plugins المضمّنة المحجوزة). للاطلاع على الفهرس الكامل — مجمّعًا ومرتبطًا —
+راجع [المسارات الفرعية لـ Plugin SDK](/ar/plugins/sdk-subpaths).
 
 توجد القائمة المولدة التي تضم أكثر من 200 مسار فرعي في `scripts/lib/plugin-sdk-entrypoints.json`.
 
-## API التسجيل
+## واجهة برمجة تطبيقات التسجيل
 
-يتلقى callback الخاص بـ `register(api)` كائن `OpenClawPluginApi` بهذه
-الطرق:
+يستقبل رد النداء `register(api)` كائن `OpenClawPluginApi` بهذه
+الأساليب:
 
-### تسجيل القدرات
+### تسجيل الإمكانيات
 
-| الطريقة                                         | ما الذي تسجله                         |
-| ----------------------------------------------- | ------------------------------------- |
-| `api.registerProvider(...)`                     | الاستدلال النصي (LLM)                 |
-| `api.registerAgentHarness(...)`                 | منفذ وكيل منخفض المستوى تجريبي        |
-| `api.registerCliBackend(...)`                   | واجهة CLI خلفية محلية للاستدلال       |
-| `api.registerChannel(...)`                      | قناة مراسلة                           |
-| `api.registerSpeechProvider(...)`               | Text-to-speech / STT synthesis        |
-| `api.registerRealtimeTranscriptionProvider(...)`| نسخ فوري متدفق                        |
-| `api.registerRealtimeVoiceProvider(...)`        | جلسات صوت فورية ثنائية الاتجاه        |
-| `api.registerMediaUnderstandingProvider(...)`   | تحليل الصور/الصوت/الفيديو             |
-| `api.registerImageGenerationProvider(...)`      | توليد الصور                           |
-| `api.registerMusicGenerationProvider(...)`      | توليد الموسيقى                        |
-| `api.registerVideoGenerationProvider(...)`      | توليد الفيديو                         |
-| `api.registerWebFetchProvider(...)`             | مزوّد جلب / كشط الويب                 |
-| `api.registerWebSearchProvider(...)`            | البحث في الويب                        |
+| الأسلوب                                           | ما الذي يسجله                     |
+| ------------------------------------------------ | ------------------------------------- |
+| `api.registerProvider(...)`                      | الاستدلال النصي (LLM)                  |
+| `api.registerAgentHarness(...)`                  | منفذ عامل منخفض المستوى تجريبي |
+| `api.registerCliBackend(...)`                    | واجهة خلفية محلية لاستدلال CLI           |
+| `api.registerChannel(...)`                       | قناة مراسلة                     |
+| `api.registerSpeechProvider(...)`                | تحويل النص إلى كلام / تركيب STT        |
+| `api.registerRealtimeTranscriptionProvider(...)` | النسخ الفوري المتدفق      |
+| `api.registerRealtimeVoiceProvider(...)`         | جلسات صوتية فورية ثنائية الاتجاه        |
+| `api.registerMediaUnderstandingProvider(...)`    | تحليل الصور/الصوت/الفيديو            |
+| `api.registerImageGenerationProvider(...)`       | توليد الصور                      |
+| `api.registerMusicGenerationProvider(...)`       | توليد الموسيقى                      |
+| `api.registerVideoGenerationProvider(...)`       | توليد الفيديو                      |
+| `api.registerWebFetchProvider(...)`              | مزود جلب / كشط الويب           |
+| `api.registerWebSearchProvider(...)`             | البحث على الويب                            |
 
 ### الأدوات والأوامر
 
-| الطريقة                         | ما الذي تسجله                                   |
-| --------------------------------| ----------------------------------------------- |
-| `api.registerTool(tool, opts?)` | أداة وكيل (مطلوبة أو `{ optional: true }`)     |
-| `api.registerCommand(def)`      | أمر مخصص (يتجاوز LLM)                          |
+| الأسلوب                          | ما الذي يسجله                             |
+| ------------------------------- | --------------------------------------------- |
+| `api.registerTool(tool, opts?)` | أداة العامل (مطلوبة أو `{ optional: true }`) |
+| `api.registerCommand(def)`      | أمر مخصص (يتجاوز LLM)             |
 
 ### البنية التحتية
 
-| الطريقة                                         | ما الذي تسجله                        |
-| ----------------------------------------------- | ------------------------------------ |
-| `api.registerHook(events, handler, opts?)`      | Event hook                           |
-| `api.registerHttpRoute(params)`                 | نقطة نهاية Gateway HTTP              |
-| `api.registerGatewayMethod(name, handler)`      | طريقة Gateway RPC                    |
-| `api.registerGatewayDiscoveryService(service)`  | معلن اكتشاف محلي لـ Gateway          |
-| `api.registerCli(registrar, opts?)`             | أمر CLI فرعي                         |
-| `api.registerService(service)`                  | خدمة خلفية                           |
-| `api.registerInteractiveHandler(registration)`  | معالج تفاعلي                         |
-| `api.registerEmbeddedExtensionFactory(factory)` | مصنع امتداد لـ Pi embedded-runner    |
-| `api.registerMemoryPromptSupplement(builder)`   | قسم إضافي ملاصق للذاكرة في المطالبة  |
-| `api.registerMemoryCorpusSupplement(adapter)`   | corpus إضافي للبحث/القراءة في الذاكرة |
+| الأسلوب                                         | ما الذي يسجله                       |
+| ---------------------------------------------- | --------------------------------------- |
+| `api.registerHook(events, handler, opts?)`     | خطاف حدث                              |
+| `api.registerHttpRoute(params)`                | نقطة نهاية HTTP في Gateway                   |
+| `api.registerGatewayMethod(name, handler)`     | أسلوب RPC في Gateway                      |
+| `api.registerGatewayDiscoveryService(service)` | معلن اكتشاف Gateway محلي      |
+| `api.registerCli(registrar, opts?)`            | أمر فرعي في CLI                          |
+| `api.registerService(service)`                 | خدمة في الخلفية                      |
+| `api.registerInteractiveHandler(registration)` | معالج تفاعلي                     |
+| `api.registerAgentToolResultMiddleware(...)`   | برمجية وسيطة لنتيجة الأداة في وقت التشغيل          |
+| `api.registerMemoryPromptSupplement(builder)`  | قسم إضافي ملاصق لذاكرة الموجّه |
+| `api.registerMemoryCorpusSupplement(adapter)`  | متن إضافي للبحث/القراءة في الذاكرة      |
 
 <Note>
-  تظل مساحات أسماء الإدارة الأساسية المحجوزة (`config.*`, `exec.approvals.*`, `wizard.*`,
-  `update.*`) دائمًا ضمن `operator.admin`، حتى لو حاولت plugin تعيين
-  نطاق أضيق لطريقة gateway. فضّل البادئات الخاصة بالـ plugin
-  للطرق التي تملكها plugin.
+  تظل مساحات أسماء إدارة النواة المحجوزة (`config.*`، `exec.approvals.*`، `wizard.*`،
+  `update.*`) دائمًا `operator.admin`، حتى إذا حاول Plugin تعيين
+  نطاق أضيق لأسلوب Gateway. ويفضل استخدام بادئات خاصة بالPlugin للأساليب
+  التي يملكها Plugin.
 </Note>
 
-<Accordion title="متى تستخدم registerEmbeddedExtensionFactory">
-  استخدم `api.registerEmbeddedExtensionFactory(...)` عندما تحتاج plugin إلى
-  توقيت أحداث أصلي لـ Pi أثناء التشغيلات المضمّنة في OpenClaw — مثل
-  إعادة كتابة `tool_result` غير المتزامنة التي يجب أن تحدث قبل إصدار
-  رسالة نتيجة الأداة النهائية.
+<Accordion title="متى تستخدم البرمجية الوسيطة لنتيجة الأداة">
+  يمكن للPlugins المضمّنة استخدام `api.registerAgentToolResultMiddleware(...)` عندما
+  تحتاج إلى إعادة كتابة نتيجة أداة بعد التنفيذ وقبل أن يعيد وقت التشغيل
+  تمرير تلك النتيجة إلى النموذج. هذا هو المسار الموثوق والمحايد لوقت التشغيل
+  لمخففات المخرجات غير المتزامنة مثل tokenjuice.
 
-هذا حدّ فاصل خاص بالـ plugins المضمّنة اليوم: لا يجوز إلا للـ plugins المضمّنة تسجيله،
-وعليها إعلان `contracts.embeddedExtensionFactories: ["pi"]` داخل
-`openclaw.plugin.json`. احتفظ بـ hooks العادية الخاصة بـ OpenClaw لكل شيء
-لا يحتاج إلى هذا الحد الأدنى المستوى.
+يجب على Plugins المضمّنة التصريح بـ `contracts.agentToolResultMiddleware` لكل
+وقت تشغيل مستهدف، على سبيل المثال `["pi", "codex"]`. لا يمكن
+للPlugins الخارجية تسجيل هذه البرمجية الوسيطة؛ احتفظ بخطافات OpenClaw Plugin العادية للأعمال
+التي لا تحتاج إلى توقيت نتيجة الأداة قبل النموذج. وقد تمت إزالة مسار تسجيل
+مصنع الامتدادات المضمّنة القديم الخاص بـ Pi فقط.
 </Accordion>
 
 ### تسجيل اكتشاف Gateway
 
-يتيح `api.registerGatewayDiscoveryService(...)` للـ plugin إعلان
-Gateway النشطة على وسيلة نقل اكتشاف محلية مثل mDNS/Bonjour. يستدعي OpenClaw
-الخدمة أثناء بدء تشغيل Gateway عندما يكون الاكتشاف المحلي مفعّلًا، ويمرر منافذ
-Gateway الحالية وبيانات تلميح TXT غير السرية، ويستدعي معالج
-`stop` المُعاد أثناء إيقاف Gateway.
+يتيح `api.registerGatewayDiscoveryService(...)` لـ Plugin الإعلان عن
+Gateway النشط على وسيط اكتشاف محلي مثل mDNS/Bonjour. يستدعي OpenClaw
+الخدمة أثناء بدء تشغيل Gateway عندما يكون الاكتشاف المحلي مفعّلًا، ويمرر
+منافذ Gateway الحالية وبيانات تلميحات TXT غير السرية، ويستدعي معالج
+`stop` المعاد أثناء إيقاف تشغيل Gateway.
 
 ```typescript
 api.registerGatewayDiscoveryService({
@@ -149,20 +158,21 @@ api.registerGatewayDiscoveryService({
 });
 ```
 
-يجب ألا تتعامل plugins الخاصة باكتشاف Gateway مع قيم TXT المُعلنة كأسرار أو
-مصادقة. فالاكتشاف هو تلميح توجيه؛ بينما تظل مصادقة Gateway وتثبيت TLS هما
-مالكي الثقة.
+يجب ألا تتعامل Plugins اكتشاف Gateway مع قيم TXT المُعلَن عنها على أنها أسرار أو
+مصادقة. الاكتشاف هو تلميح توجيه؛ وما تزال مصادقة Gateway وتثبيت TLS هما
+المسؤولين عن الثقة.
 
-### بيانات وصفية لتسجيل CLI
+### بيانات التسجيل الوصفية لـ CLI
 
 يقبل `api.registerCli(registrar, opts?)` نوعين من البيانات الوصفية على المستوى الأعلى:
 
-- `commands`: جذور أوامر صريحة يملكها registrar
-- `descriptors`: واصفات أوامر وقت التحليل المستخدمة في مساعدة CLI الجذرية،
-  والتوجيه، والتسجيل الكسول لـ CLI الخاصة بالـ plugin
+- `commands`: جذور أوامر صريحة يملكها المسجّل
+- `descriptors`: واصفات أوامر وقت التحليل المستخدمة لمساعدة CLI الجذرية،
+  والتوجيه، وتسجيل CLI الكسول الخاص بالPlugin
 
-إذا كنت تريد أن يظل أمر plugin محمّلًا كسولًا في المسار الجذري العادي لـ CLI،
-فوفّر `descriptors` تغطي كل جذر أمر من المستوى الأعلى يكشفه ذلك registrar.
+إذا أردت أن يبقى أمر Plugin محمّلًا كسولًا في مسار CLI الجذري العادي،
+فقدّم `descriptors` تغطي كل جذر أمر من المستوى الأعلى يعرضه
+ذلك المسجّل.
 
 ```typescript
 api.registerCli(
@@ -174,7 +184,7 @@ api.registerCli(
     descriptors: [
       {
         name: "matrix",
-        description: "Manage Matrix accounts, verification, devices, and profile state",
+        description: "إدارة حسابات Matrix، والتحقق، والأجهزة، وحالة الملف الشخصي",
         hasSubcommands: true,
       },
     ],
@@ -182,93 +192,97 @@ api.registerCli(
 );
 ```
 
-استخدم `commands` وحدها فقط عندما لا تحتاج إلى تسجيل كسول في CLI الجذرية.
-وما يزال مسار التوافق eager هذا مدعومًا، لكنه لا يثبت
-عناصر placeholder مدعومة بـ descriptor من أجل التحميل الكسول وقت التحليل.
+استخدم `commands` وحده فقط عندما لا تحتاج إلى تسجيل CLI جذري كسول.
+لا يزال مسار التوافق المتلهف هذا مدعومًا، لكنه لا يثبّت عناصر نائبة
+مدعومة بالواصفات من أجل التحميل الكسول في وقت التحليل.
 
-### تسجيل واجهة CLI الخلفية
+### تسجيل الواجهة الخلفية لـ CLI
 
-يتيح `api.registerCliBackend(...)` للـ plugin امتلاك الإعداد الافتراضي لواجهة
-AI CLI خلفية محلية مثل `codex-cli`.
+يتيح `api.registerCliBackend(...)` لـ Plugin امتلاك الإعداد الافتراضي
+لواجهة خلفية محلية لـ CLI للذكاء الاصطناعي مثل `codex-cli`.
 
-- يصبح `id` الخاصة بالواجهة الخلفية هي بادئة المزوّد في مراجع النماذج مثل `codex-cli/gpt-5`.
-- يستخدم `config` الخاصة بالواجهة الخلفية البنية نفسها التي تستخدمها `agents.defaults.cliBackends.<id>`.
-- يظل إعداد المستخدم هو الفائز. يدمج OpenClaw القيمة `agents.defaults.cliBackends.<id>` فوق
-  القيمة الافتراضية الخاصة بالـ plugin قبل تشغيل CLI.
-- استخدم `normalizeConfig` عندما تحتاج واجهة خلفية إلى إعادة كتابة توافقية بعد الدمج
-  (مثل تسوية أشكال الأعلام القديمة).
+- يصبح `id` للواجهة الخلفية بادئة المزود في مراجع النماذج مثل `codex-cli/gpt-5`.
+- يستخدم `config` للواجهة الخلفية نفس البنية الموجودة في `agents.defaults.cliBackends.<id>`.
+- يبقى إعداد المستخدم هو الحاسم. يدمج OpenClaw `agents.defaults.cliBackends.<id>` فوق
+  الإعداد الافتراضي للPlugin قبل تشغيل CLI.
+- استخدم `normalizeConfig` عندما تحتاج الواجهة الخلفية إلى إعادة كتابات توافقية بعد الدمج
+  (مثلًا توحيد أشكال العلامات القديمة).
 
-### الخانات الحصرية
+### الفتحات الحصرية
 
-| الطريقة                                    | ما الذي تسجله                                                                                                                                              |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api.registerContextEngine(id, factory)`   | محرك السياق (واحد فقط نشط في كل مرة). يتلقى callback الخاص بـ `assemble()` القيمتين `availableTools` و`citationsMode` حتى يتمكن المحرك من تخصيص الإضافات على المطالبة. |
-| `api.registerMemoryCapability(capability)` | قدرة ذاكرة موحدة                                                                                                                                          |
-| `api.registerMemoryPromptSection(builder)` | منشئ قسم مطالبة الذاكرة                                                                                                                                   |
-| `api.registerMemoryFlushPlan(resolver)`    | محلل خطة flush الخاصة بالذاكرة                                                                                                                            |
-| `api.registerMemoryRuntime(runtime)`       | مهايئ وقت تشغيل الذاكرة                                                                                                                                   |
+| الأسلوب                                     | ما الذي يسجله                                                                                                                                         |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api.registerContextEngine(id, factory)`   | محرك سياق (واحد فقط نشط في كل مرة). يتلقى رد النداء `assemble()` القيمتين `availableTools` و`citationsMode` حتى يتمكن المحرك من تخصيص إضافات الموجّه. |
+| `api.registerMemoryCapability(capability)` | إمكانية ذاكرة موحدة                                                                                                                                 |
+| `api.registerMemoryPromptSection(builder)` | باني قسم موجّه الذاكرة                                                                                                                             |
+| `api.registerMemoryFlushPlan(resolver)`    | محلل خطة تفريغ الذاكرة                                                                                                                                |
+| `api.registerMemoryRuntime(runtime)`       | مهايئ وقت تشغيل الذاكرة                                                                                                                                    |
 
-### مهايئات embedding الخاصة بالذاكرة
+### مهايئات تضمين الذاكرة
 
-| الطريقة                                        | ما الذي تسجله                                 |
-| ---------------------------------------------- | --------------------------------------------- |
-| `api.registerMemoryEmbeddingProvider(adapter)` | مهايئ embedding للذاكرة من أجل plugin النشطة |
+| الأسلوب                                         | ما الذي يسجله                              |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `api.registerMemoryEmbeddingProvider(adapter)` | مهايئ تضمين الذاكرة للPlugin النشط |
 
-- `registerMemoryCapability` هي API المفضلة الحصرية الخاصة بـ plugin الذاكرة.
-- يمكن لـ `registerMemoryCapability` أيضًا كشف `publicArtifacts.listArtifacts(...)`
-  حتى تتمكن plugins المصاحبة من استهلاك عناصر الذاكرة المصدرة عبر
-  `openclaw/plugin-sdk/memory-host-core` بدلًا من الوصول إلى التخطيط الخاص
-  بplugin ذاكرة محددة.
-- تمثل `registerMemoryPromptSection` و`registerMemoryFlushPlan` و
-  `registerMemoryRuntime` واجهات API حصرية متوافقة مع الذاكرة القديمة.
-- يتيح `registerMemoryEmbeddingProvider` لـ plugin الذاكرة النشطة تسجيل
-  معرّف واحد أو أكثر لمهايئ embedding (مثل `openai` أو `gemini` أو معرّف
-  مخصص تعرّفه plugin).
-- تتحلل إعدادات المستخدم مثل `agents.defaults.memorySearch.provider` و
-  `agents.defaults.memorySearch.fallback` مقابل معرّفات المهايئات المسجلة تلك.
+- `registerMemoryCapability` هو واجهة API المفضلة والحصرية لـ Plugin الذاكرة.
+- قد يعرض `registerMemoryCapability` أيضًا `publicArtifacts.listArtifacts(...)`
+  حتى تتمكن Plugins المرافقة من استهلاك العناصر المُصدَّرة الخاصة بالذاكرة عبر
+  `openclaw/plugin-sdk/memory-host-core` بدلًا من الوصول إلى التخطيط
+  الخاص الداخلي لإحدى Plugins الذاكرة.
+- `registerMemoryPromptSection` و`registerMemoryFlushPlan` و
+  `registerMemoryRuntime` هي واجهات API حصرية ومتوافقة مع الأنظمة القديمة لـ Plugins الذاكرة.
+- يتيح `registerMemoryEmbeddingProvider` لـ Plugin الذاكرة النشط تسجيل
+  معرف مهايئ تضمين واحد أو أكثر (مثل `openai` أو `gemini` أو معرف
+  مخصص يعرّفه Plugin).
+- يُحل إعداد المستخدم مثل `agents.defaults.memorySearch.provider` و
+  `agents.defaults.memorySearch.fallback` بالرجوع إلى معرفات المهايئات
+  المسجلة تلك.
 
 ### الأحداث ودورة الحياة
 
-| الطريقة                                      | ما الذي تفعله             |
-| -------------------------------------------- | ------------------------- |
-| `api.on(hookName, handler, opts?)`           | hook لدورة حياة typed     |
-| `api.onConversationBindingResolved(handler)` | callback لحل ربط المحادثة |
+| الأسلوب                                       | ما الذي يفعله                  |
+| -------------------------------------------- | ----------------------------- |
+| `api.on(hookName, handler, opts?)`           | خطاف دورة حياة معرّف الأنواع          |
+| `api.onConversationBindingResolved(handler)` | رد نداء ربط المحادثة |
 
-### دلالات قرار hook
+راجع [خطافات Plugin](/ar/plugins/hooks) للاطلاع على الأمثلة، وأسماء الخطافات الشائعة، ودلالات
+الحراسة.
 
-- `before_tool_call`: تؤدي إعادة `{ block: true }` إلى قرار نهائي. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_tool_call`: تُعامل إعادة `{ block: false }` على أنها بلا قرار (مثل حذف `block`) وليست تجاوزًا.
-- `before_install`: تؤدي إعادة `{ block: true }` إلى قرار نهائي. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `before_install`: تُعامل إعادة `{ block: false }` على أنها بلا قرار (مثل حذف `block`) وليست تجاوزًا.
-- `reply_dispatch`: تؤدي إعادة `{ handled: true, ... }` إلى قرار نهائي. وبمجرد أن يدّعي أي معالج أنه تعامل مع الإرسال، يتم تخطي المعالجات ذات الأولوية الأدنى ومسار الإرسال الافتراضي للنموذج.
-- `message_sending`: تؤدي إعادة `{ cancel: true }` إلى قرار نهائي. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
-- `message_sending`: تُعامل إعادة `{ cancel: false }` على أنها بلا قرار (مثل حذف `cancel`) وليست تجاوزًا.
-- `message_received`: استخدم الحقل typed `threadId` عندما تحتاج إلى توجيه thread/topic الوارد. واحتفظ بـ `metadata` للإضافات الخاصة بالقناة.
-- `message_sending`: استخدم حقول التوجيه typed `replyToId` / `threadId` قبل الرجوع إلى `metadata` الخاصة بالقناة.
-- `gateway_start`: استخدم `ctx.config` و`ctx.workspaceDir` و`ctx.getCron?.()` لحالة بدء التشغيل المملوكة لـ gateway بدلًا من الاعتماد على hooks الداخلية `gateway:startup`.
+### دلالات قرار الخطاف
+
+- `before_tool_call`: تكون إعادة `{ block: true }` نهائية. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
+- `before_tool_call`: تُعامل إعادة `{ block: false }` على أنها بلا قرار (مثل حذف `block`)، وليست تجاوزًا.
+- `before_install`: تكون إعادة `{ block: true }` نهائية. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
+- `before_install`: تُعامل إعادة `{ block: false }` على أنها بلا قرار (مثل حذف `block`)، وليست تجاوزًا.
+- `reply_dispatch`: تكون إعادة `{ handled: true, ... }` نهائية. وبمجرد أن يدّعي أي معالج الإرسال، يتم تخطي المعالجات ذات الأولوية الأدنى ومسار إرسال النموذج الافتراضي.
+- `message_sending`: تكون إعادة `{ cancel: true }` نهائية. وبمجرد أن يضبطها أي معالج، يتم تخطي المعالجات ذات الأولوية الأدنى.
+- `message_sending`: تُعامل إعادة `{ cancel: false }` على أنها بلا قرار (مثل حذف `cancel`)، وليست تجاوزًا.
+- `message_received`: استخدم الحقل المعرّف بالأنواع `threadId` عندما تحتاج إلى توجيه سلسلة الرسائل/الموضوع الوارد. واحتفظ بـ `metadata` للإضافات الخاصة بالقناة.
+- `message_sending`: استخدم حقول التوجيه المعرّفة بالأنواع `replyToId` / `threadId` قبل الرجوع إلى `metadata` الخاصة بالقناة.
+- `gateway_start`: استخدم `ctx.config` و`ctx.workspaceDir` و`ctx.getCron?.()` لحالة بدء التشغيل المملوكة لـ Gateway بدلًا من الاعتماد على خطافات `gateway:startup` الداخلية.
 
 ### حقول كائن API
 
-| الحقل                    | النوع                     | الوصف                                                                                           |
-| ------------------------ | ------------------------- | ----------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | معرّف Plugin                                                                                   |
-| `api.name`               | `string`                  | اسم العرض                                                                                       |
-| `api.version`            | `string?`                 | إصدار Plugin (اختياري)                                                                          |
-| `api.description`        | `string?`                 | وصف Plugin (اختياري)                                                                            |
-| `api.source`             | `string`                  | مسار مصدر Plugin                                                                                |
-| `api.rootDir`            | `string?`                 | الدليل الجذري لـ Plugin (اختياري)                                                               |
-| `api.config`             | `OpenClawConfig`          | لقطة الإعداد الحالية (لقطة وقت التشغيل النشطة داخل الذاكرة عند توفرها)                          |
-| `api.pluginConfig`       | `Record<string, unknown>` | إعداد خاص بالـ Plugin من `plugins.entries.<id>.config`                                          |
+| الحقل                    | النوع                      | الوصف                                                                                 |
+| ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
+| `api.id`                 | `string`                  | معرف Plugin                                                                                   |
+| `api.name`               | `string`                  | اسم العرض                                                                                |
+| `api.version`            | `string?`                 | إصدار Plugin (اختياري)                                                                   |
+| `api.description`        | `string?`                 | وصف Plugin (اختياري)                                                               |
+| `api.source`             | `string`                  | مسار مصدر Plugin                                                                          |
+| `api.rootDir`            | `string?`                 | الدليل الجذري لـ Plugin (اختياري)                                                            |
+| `api.config`             | `OpenClawConfig`          | لقطة الإعداد الحالية (لقطة وقت التشغيل النشطة داخل الذاكرة عند توفرها)                  |
+| `api.pluginConfig`       | `Record<string, unknown>` | إعداد خاص بـ Plugin من `plugins.entries.<id>.config`                                   |
 | `api.runtime`            | `PluginRuntime`           | [مساعدات وقت التشغيل](/ar/plugins/sdk-runtime)                                                     |
-| `api.logger`             | `PluginLogger`            | مسجل محدد النطاق (`debug`, `info`, `warn`, `error`)                                             |
-| `api.registrationMode`   | `PluginRegistrationMode`  | وضع التحميل الحالي؛ وتمثل `"setup-runtime"` نافذة بدء تشغيل/إعداد خفيفة قبل تحميل الإدخال الكامل |
-| `api.resolvePath(input)` | `(string) => string`      | تحليل المسار نسبةً إلى جذر Plugin                                                               |
+| `api.logger`             | `PluginLogger`            | مسجل بنطاق محدد (`debug`، `info`، `warn`، `error`)                                            |
+| `api.registrationMode`   | `PluginRegistrationMode`  | وضع التحميل الحالي؛ تمثل `"setup-runtime"` نافذة البدء/الإعداد الخفيفة السابقة للإدخال الكامل |
+| `api.resolvePath(input)` | `(string) => string`      | حل المسار نسبةً إلى جذر Plugin                                                        |
 
-## اصطلاح الوحدات الداخلية
+## اصطلاح الوحدة الداخلية
 
-داخل Plugin الخاصة بك، استخدم ملفات barrel محلية للاستيرادات الداخلية:
+داخل Plugin الخاص بك، استخدم ملفات barrel محلية لعمليات الاستيراد الداخلية:
 
-```text
+```
 my-plugin/
   api.ts            # صادرات عامة للمستهلكين الخارجيين
   runtime-api.ts    # صادرات داخلية فقط لوقت التشغيل
@@ -277,54 +291,53 @@ my-plugin/
 ```
 
 <Warning>
-  لا تستورد Plugin الخاصة بك أبدًا عبر `openclaw/plugin-sdk/<your-plugin>`
-  من شيفرة الإنتاج. وجّه الاستيرادات الداخلية عبر `./api.ts` أو
-  `./runtime-api.ts`. فمسار SDK هو العقد الخارجي فقط.
+  لا تستورد Plugin الخاص بك أبدًا عبر `openclaw/plugin-sdk/<your-plugin>`
+  من كود الإنتاج. وجّه عمليات الاستيراد الداخلية عبر `./api.ts` أو
+  `./runtime-api.ts`. مسار SDK هو العقد الخارجي فقط.
 </Warning>
 
-تفضّل الأسطح العامة للـ bundled plugin المحمّلة عبر facade (`api.ts`, `runtime-api.ts`,
-`index.ts`, `setup-entry.ts`، وملفات الإدخال العامة المشابهة) استخدام
-لقطة إعداد وقت التشغيل النشطة عندما يكون OpenClaw قيد التشغيل بالفعل. وإذا لم توجد
-لقطة وقت تشغيل بعد، فإنها تعود إلى ملف الإعداد المحلّل على القرص.
+تُفضّل الأسطح العامة للPlugins المضمّنة المحمّلة عبر الواجهة (`api.ts` و`runtime-api.ts`،
+و`index.ts` و`setup-entry.ts` وملفات الإدخال العامة المشابهة) لقطة
+إعدادات وقت التشغيل النشطة عندما يكون OpenClaw قيد التشغيل بالفعل. وإذا لم تكن
+لقطة وقت التشغيل موجودة بعد، فإنها تعود إلى ملف الإعدادات المحلول على القرص.
 
-يمكن لـ Provider Plugins كشف barrel محلي ضيق للعقد إذا كان
-المساعد خاصًا عمدًا بالمزوّد ولا ينتمي بعد إلى مسار فرعي عام في SDK.
+يمكن لـ Plugins المزودين عرض barrel محلي ضيق للعقد عندما تكون إحدى
+المساعدات خاصة بالمزود عن قصد ولا تنتمي بعد إلى مسار فرعي عام في SDK.
 أمثلة مضمّنة:
 
-- **Anthropic**: الحد الفاصل العام `api.ts` / `contract-api.ts` الخاص
-  بمساعدات Claude beta-header و`service_tier` streams.
-- **`@openclaw/openai-provider`**: يصدّر `api.ts` بُناة المزوّد،
-  ومساعدات النماذج الافتراضية، وبُناة مزوّدي realtime.
-- **`@openclaw/openrouter-provider`**: يصدّر `api.ts` باني المزوّد
-  بالإضافة إلى مساعدات onboarding/config.
+- **Anthropic**: مسار عام `api.ts` / `contract-api.ts` لمساعدات تدفق
+  رأس Claude التجريبي و`service_tier`.
+- **`@openclaw/openai-provider`**: يصدّر `api.ts` بناة المزود،
+  ومساعدات النموذج الافتراضي، وبناة مزود الوقت الفعلي.
+- **`@openclaw/openrouter-provider`**: يصدّر `api.ts` باني المزود
+  بالإضافة إلى مساعدات الإعداد/التهيئة.
 
 <Warning>
-  يجب على شيفرة الإنتاج الخاصة بالامتدادات أيضًا تجنب استيرادات
-  `openclaw/plugin-sdk/<other-plugin>`. وإذا كان المساعد مشتركًا فعلًا، فقم
-  بترقيته إلى مسار فرعي محايد في SDK مثل `openclaw/plugin-sdk/speech` أو
-  `.../provider-model-shared` أو سطح آخر موجّه حسب القدرة بدلًا من
-  ربط pluginين معًا.
+  يجب أن يتجنب كود الإنتاج في الامتدادات أيضًا عمليات الاستيراد من `openclaw/plugin-sdk/<other-plugin>`.
+  وإذا كانت إحدى المساعدات مشتركة فعلًا، فانقلها إلى مسار فرعي محايد في SDK
+  مثل `openclaw/plugin-sdk/speech` أو `.../provider-model-shared` أو إلى سطح آخر
+  موجّه حسب الإمكانية بدلًا من ربط Pluginين معًا.
 </Warning>
 
 ## ذو صلة
 
 <CardGroup cols={2}>
-  <Card title="Entry points" icon="door-open" href="/ar/plugins/sdk-entrypoints">
+  <Card title="نقاط الإدخال" icon="door-open" href="/ar/plugins/sdk-entrypoints">
     خيارات `definePluginEntry` و`defineChannelPluginEntry`.
   </Card>
-  <Card title="Runtime helpers" icon="gears" href="/ar/plugins/sdk-runtime">
+  <Card title="مساعدات وقت التشغيل" icon="gears" href="/ar/plugins/sdk-runtime">
     المرجع الكامل لمساحة الأسماء `api.runtime`.
   </Card>
-  <Card title="Setup and config" icon="sliders" href="/ar/plugins/sdk-setup">
-    التعبئة، وmanifestات، ومخططات الإعداد.
+  <Card title="الإعداد والتهيئة" icon="sliders" href="/ar/plugins/sdk-setup">
+    الحزم وملفات البيان ومخططات الإعدادات.
   </Card>
-  <Card title="Testing" icon="vial" href="/ar/plugins/sdk-testing">
+  <Card title="الاختبار" icon="vial" href="/ar/plugins/sdk-testing">
     أدوات الاختبار وقواعد lint.
   </Card>
-  <Card title="SDK migration" icon="arrows-turn-right" href="/ar/plugins/sdk-migration">
-    الترحيل من الأسطح المهملة.
+  <Card title="ترحيل SDK" icon="arrows-turn-right" href="/ar/plugins/sdk-migration">
+    الترحيل من الأسطح المتقادمة.
   </Card>
-  <Card title="Plugin internals" icon="diagram-project" href="/ar/plugins/architecture">
-    التعمق في البنية ونموذج القدرات.
+  <Card title="البنية الداخلية للPlugin" icon="diagram-project" href="/ar/plugins/architecture">
+    المعمارية العميقة ونموذج الإمكانيات.
   </Card>
 </CardGroup>

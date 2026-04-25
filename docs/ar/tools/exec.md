@@ -1,21 +1,21 @@
 ---
 read_when:
-    - استخدام أداة exec أو تعديلها
-    - تصحيح سلوك stdin أو TTY
+    - استخدام أداة Exec أو تعديلها
+    - تصحيح سلوك stdin أو TTY واستكشاف أخطائهما وإصلاحها
 summary: استخدام أداة Exec، وأوضاع stdin، ودعم TTY
 title: أداة Exec
 x-i18n:
-    generated_at: "2026-04-24T08:08:51Z"
+    generated_at: "2026-04-25T13:59:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 4cad17fecfaf7d6a523282ef4f0090e4ffaab89ab53945b5cd831e426f3fc3ac
+    source_hash: 358f9155120382fa2b03b22e22408bdb9e51715f80c8b1701a1ff7fd05850188
     source_path: tools/exec.md
     workflow: 15
 ---
 
-شغّل أوامر shell في مساحة العمل. ويدعم التنفيذ في الواجهة الأمامية + الخلفية عبر `process`.
-إذا كانت `process` غير مسموح بها، فإن `exec` تعمل بشكل متزامن وتتجاهل `yieldMs`/`background`.
-تكون الجلسات الخلفية مقيّدة بكل وكيل؛ ولا ترى `process` إلا الجلسات التابعة للوكيل نفسه.
+شغّل أوامر shell في مساحة العمل. يدعم التنفيذ في الواجهة الأمامية + الخلفية عبر `process`.
+إذا كان `process` غير مسموح به، فإن `exec` يعمل بشكل متزامن ويتجاهل `yieldMs`/`background`.
+جلسات الخلفية تكون ضمن نطاق كل عامل؛ ولا يرى `process` إلا الجلسات التابعة للعامل نفسه.
 
 ## المعلمات
 
@@ -28,15 +28,15 @@ x-i18n:
 </ParamField>
 
 <ParamField path="env" type="object">
-تجاوزات بيئة على شكل مفتاح/قيمة يتم دمجها فوق البيئة الموروثة.
+تجاوزات بيئة على شكل مفتاح/قيمة تُدمج فوق البيئة الموروثة.
 </ParamField>
 
 <ParamField path="yieldMs" type="number" default="10000">
-تحويل الأمر تلقائيًا إلى الخلفية بعد هذا التأخير (مللي ثانية).
+نقل الأمر تلقائيًا إلى الخلفية بعد هذا التأخير (بالملي ثانية).
 </ParamField>
 
 <ParamField path="background" type="boolean" default="false">
-تشغيل الأمر في الخلفية فورًا بدلًا من انتظار `yieldMs`.
+انقل الأمر إلى الخلفية فورًا بدلًا من الانتظار حتى `yieldMs`.
 </ParamField>
 
 <ParamField path="timeout" type="number" default="1800">
@@ -44,15 +44,15 @@ x-i18n:
 </ParamField>
 
 <ParamField path="pty" type="boolean" default="false">
-شغّله في pseudo-terminal عند توفره. استخدمه لأدوات CLI التي لا تعمل إلا مع TTY، ولوكلاء البرمجة، وواجهات الطرفية.
+شغّل في طرفية زائفة عند توفرها. استخدمه لأدوات CLI التي تتطلب TTY فقط، ووكلاء البرمجة، وواجهات الطرفية.
 </ParamField>
 
 <ParamField path="host" type="'auto' | 'sandbox' | 'gateway' | 'node'" default="auto">
-مكان التنفيذ. تحل `auto` إلى `sandbox` عندما يكون وقت تشغيل sandbox نشطًا وإلى `gateway` بخلاف ذلك.
+مكان التنفيذ. تُحل القيمة `auto` إلى `sandbox` عندما يكون وقت تشغيل sandbox نشطًا، وإلى `gateway` خلاف ذلك.
 </ParamField>
 
 <ParamField path="security" type="'deny' | 'allowlist' | 'full'">
-وضع الإنفاذ لتنفيذ `gateway` / `node`.
+وضع فرض القيود لتنفيذ `gateway` / `node`.
 </ParamField>
 
 <ParamField path="ask" type="'off' | 'on-miss' | 'always'">
@@ -60,59 +60,59 @@ x-i18n:
 </ParamField>
 
 <ParamField path="node" type="string">
-معرّف/اسم Node عندما تكون `host=node`.
+معرّف/اسم Node عندما يكون `host=node`.
 </ParamField>
 
 <ParamField path="elevated" type="boolean" default="false">
-اطلب الوضع المرتفع — الخروج من sandbox إلى مسار المضيف المهيأ. يتم فرض `security=full` فقط عندما تُحل elevated إلى `full`.
+اطلب الوضع المرتفع — الهروب من sandbox إلى مسار المضيف المضبوط. لا يُفرض `security=full` إلا عندما يُحل elevated إلى `full`.
 </ParamField>
 
 ملاحظات:
 
-- القيمة الافتراضية لـ `host` هي `auto`: ‏sandbox عندما يكون وقت تشغيل sandbox نشطًا للجلسة، وإلا gateway.
-- تمثل `auto` إستراتيجية التوجيه الافتراضية، وليست wildcard. يُسمح باستدعاء `host=node` لكل طلب من `auto`؛ أما `host=gateway` لكل طلب فلا يُسمح به إلا عندما لا يكون وقت تشغيل sandbox نشطًا.
-- من دون إعداد إضافي، لا يزال `host=auto` "يعمل ببساطة": عدم وجود sandbox يعني أنه يُحل إلى `gateway`؛ ووجود sandbox حية يعني أنه يبقى داخل sandbox.
-- تؤدي `elevated` إلى الخروج من sandbox إلى مسار المضيف المهيأ: `gateway` افتراضيًا، أو `node` عندما تكون `tools.exec.host=node` (أو عندما يكون افتراضي الجلسة هو `host=node`). وهي متاحة فقط عندما يكون الوصول المرتفع مفعّلًا للجلسة/المزوّد الحاليين.
-- يتم التحكم في موافقات `gateway`/`node` عبر `~/.openclaw/exec-approvals.json`.
-- تتطلب `node` وجود Node مقترنة (تطبيق مرافق أو مضيف عقدة بلا واجهة).
-- إذا كانت عدة Nodes متاحة، فاضبط `exec.node` أو `tools.exec.node` لاختيار واحدة.
-- تُعد `exec host=node` هي مسار تنفيذ shell الوحيد للعقد؛ وقد تمت إزالة الغلاف القديم `nodes.run`.
-- على المضيفات غير Windows، تستخدم exec قيمة `SHELL` عند ضبطها؛ وإذا كانت `SHELL` هي `fish`، فإنه يفضّل `bash` (أو `sh`)
-  من `PATH` لتجنب النصوص غير المتوافقة مع fish، ثم يرجع احتياطيًا إلى `SHELL` إذا لم يوجد أي منهما.
-- على مضيفات Windows، تفضّل exec اكتشاف PowerShell 7 ‏(`pwsh`) (داخل Program Files، ثم ProgramW6432، ثم PATH)،
-  ثم ترجع احتياطيًا إلى Windows PowerShell 5.1.
-- يرفض تنفيذ المضيف (`gateway`/`node`) تجاوزات `env.PATH` وتجاوزات loader ‏(`LD_*`/`DYLD_*`) لمنع
-  اختطاف الملفات التنفيذية أو حقن الشيفرة.
-- يضبط OpenClaw القيمة `OPENCLAW_SHELL=exec` في بيئة الأمر المُولَّد (بما في ذلك تنفيذ PTY وsandbox) حتى تتمكن قواعد shell/profile من اكتشاف سياق أداة exec.
-- مهم: تكون sandboxing **معطلة افتراضيًا**. إذا كانت sandboxing معطلة، فإن `host=auto`
-  الضمنية تُحل إلى `gateway`. أما `host=sandbox` الصريحة فلا تزال تفشل بشكل مغلق بدلًا من التشغيل بصمت
-  على مضيف gateway. فعّل sandboxing أو استخدم `host=gateway` مع الموافقات.
-- لا تفحص فحوصات script preflight (للأخطاء الشائعة في صياغة shell الخاصة بـ Python/Node) إلا الملفات الموجودة داخل
-  حد `workdir` الفعلي. وإذا تحلل مسار script إلى خارج `workdir`، يتم تخطي preflight
-  لذلك الملف.
+- القيمة الافتراضية لـ `host` هي `auto`: sandbox عندما يكون وقت تشغيل sandbox نشطًا للجلسة، وإلا gateway.
+- `auto` هي استراتيجية التوجيه الافتراضية، وليست wildcard. يُسمح بـ `host=node` لكل استدعاء انطلاقًا من `auto`؛ ويُسمح بـ `host=gateway` لكل استدعاء فقط عندما لا يكون وقت تشغيل sandbox نشطًا.
+- من دون إعداد إضافي، يظل `host=auto` "يعمل ببساطة": إذا لم توجد sandbox فإنه يُحل إلى `gateway`؛ وإذا كانت sandbox حية فإنه يبقى داخل sandbox.
+- يقوم `elevated` بالهروب من sandbox إلى مسار المضيف المضبوط: `gateway` افتراضيًا، أو `node` عندما يكون `tools.exec.host=node` (أو يكون الافتراضي للجلسة هو `host=node`). وهو متاح فقط عندما يكون الوصول المرتفع مفعّلًا للجلسة/المزوّد الحالي.
+- تتحكم `~/.openclaw/exec-approvals.json` في موافقات `gateway`/`node`.
+- يتطلب `node` Node مقترنًا (التطبيق المرافق أو مضيف Node بدون واجهة).
+- إذا كانت هناك عدة Nodes متاحة، فاضبط `exec.node` أو `tools.exec.node` لاختيار إحداها.
+- `exec host=node` هو مسار تنفيذ shell الوحيد لـ Nodes؛ وقد أُزيل الغلاف القديم `nodes.run`.
+- على المضيفات غير Windows، يستخدم exec القيمة `SHELL` عندما تكون مضبوطة؛ وإذا كانت `SHELL` تساوي `fish`، فإنه يفضّل `bash` (أو `sh`)
+  من `PATH` لتجنب السكربتات غير المتوافقة مع fish، ثم يعود إلى `SHELL` إذا لم يوجد أي منهما.
+- على مضيفات Windows، يفضّل exec اكتشاف PowerShell 7 (`pwsh`) (ضمن Program Files وProgramW6432 ثم PATH)،
+  ثم يعود إلى Windows PowerShell 5.1.
+- يرفض تنفيذ المضيف (`gateway`/`node`) كلاً من `env.PATH` وتجاوزات المُحمّل (`LD_*`/`DYLD_*`) من أجل
+  منع اختطاف الثنائيات أو حقن الشيفرة.
+- يضبط OpenClaw المتغير `OPENCLAW_SHELL=exec` في بيئة الأمر المشغَّل (بما في ذلك PTY وتنفيذ sandbox) حتى تتمكن قواعد shell/profile من اكتشاف سياق أداة exec.
+- مهم: يكون sandboxing **معطّلًا افتراضيًا**. إذا كان sandboxing معطلًا، فإن `host=auto`
+  الضمني يُحل إلى `gateway`. بينما يفشل `host=sandbox` الصريح بشكل مغلق بدلًا من
+  التشغيل بصمت على مضيف gateway. فعّل sandboxing أو استخدم `host=gateway` مع الموافقات.
+- لا تفحص اختبارات preflight للسكربتات (للأخطاء الشائعة في صياغة shell الخاصة بـ Python/Node) إلا الملفات الموجودة داخل
+  حدود `workdir` الفعّالة. إذا جرى حل مسار سكربت خارج `workdir`، فيُتخطى preflight لذلك
+  الملف.
 - بالنسبة إلى الأعمال طويلة التشغيل التي تبدأ الآن، ابدأها مرة واحدة واعتمد على
-  التنبيه التلقائي عند الاكتمال عندما يكون مفعّلًا ويصدر الأمر مخرجات أو يفشل.
-  استخدم `process` للسجلات، أو الحالة، أو الإدخال، أو التدخل؛ ولا تحاكِ
-  الجدولة عبر حلقات sleep، أو حلقات timeout، أو polling المتكرر.
-- بالنسبة إلى العمل الذي يجب أن يحدث لاحقًا أو وفق جدول زمني، فاستخدم Cron بدلًا من
-  أنماط النوم/التأخير في `exec`.
+  تنبيه الإكمال التلقائي عند تفعيله وعندما يُخرج الأمر مخرجات أو يفشل.
+  استخدم `process` للسجلات أو الحالة أو الإدخال أو التدخل؛ ولا تحاكِ
+  الجدولة باستخدام حلقات sleep أو حلقات timeout أو الاستطلاع المتكرر.
+- بالنسبة إلى الأعمال التي يجب أن تحدث لاحقًا أو وفق جدول، استخدم Cron بدلًا من
+  أنماط sleep/delay في `exec`.
 
-## الإعداد
+## الإعدادات
 
-- `tools.exec.notifyOnExit` (الافتراضي: true): عندما تكون true، تقوم جلسات exec الخلفية بإدراج حدث نظام وطلب Heartbeat عند الخروج.
-- `tools.exec.approvalRunningNoticeMs` (الافتراضي: 10000): إصدار إشعار واحد "قيد التشغيل" عندما تستمر exec الخاضعة للموافقة لأكثر من هذه المدة (‏0 للتعطيل).
-- `tools.exec.host` (الافتراضي: `auto`؛ وتُحل إلى `sandbox` عندما يكون وقت تشغيل sandbox نشطًا، وإلى `gateway` بخلاف ذلك)
-- `tools.exec.security` (الافتراضي: `deny` لـ sandbox، و`full` لـ gateway + node عند عدم الضبط)
+- `tools.exec.notifyOnExit` (الافتراضي: true): عند تفعيله، تدرج جلسات exec التي نُقلت إلى الخلفية حدث نظام وتطلب Heartbeat عند الخروج.
+- `tools.exec.approvalRunningNoticeMs` (الافتراضي: 10000): يُصدر إشعارًا واحدًا "قيد التشغيل" عندما يستمر exec الخاضع للموافقة لمدة أطول من هذا (0 يعطّل).
+- `tools.exec.host` (الافتراضي: `auto`؛ ويُحل إلى `sandbox` عندما يكون وقت تشغيل sandbox نشطًا، وإلا إلى `gateway`)
+- `tools.exec.security` (الافتراضي: `deny` لـ sandbox، و`full` لـ gateway + node عندما لا يكون مضبوطًا)
 - `tools.exec.ask` (الافتراضي: `off`)
-- يمثل no-approval host exec الوضع الافتراضي لكل من gateway + node. وإذا كنت تريد سلوك الموافقات/قائمة السماح، فشدّد كلاً من `tools.exec.*` وسياسة المضيف في `~/.openclaw/exec-approvals.json`؛ راجع [موافقات Exec](/ar/tools/exec-approvals#no-approval-yolo-mode).
-- يأتي YOLO من افتراضيات سياسة المضيف (`security=full`، و`ask=off`)، وليس من `host=auto`. وإذا كنت تريد فرض توجيه gateway أو node، فاضبط `tools.exec.host` أو استخدم `/exec host=...`.
-- في وضع `security=full` مع `ask=off`، يتبع host exec السياسة المهيأة مباشرة؛ ولا توجد طبقة إضافية للاستدلال على إخفاء الأوامر أو رفض script-preflight.
+- تنفيذ المضيف بلا موافقة هو الافتراضي لكل من gateway + node. إذا أردت سلوك الموافقات/قائمة السماح، فشدّد كلًا من `tools.exec.*` وسياسة المضيف في `~/.openclaw/exec-approvals.json`؛ راجع [موافقات Exec](/ar/tools/exec-approvals#no-approval-yolo-mode).
+- يأتي وضع YOLO من القيم الافتراضية لسياسة المضيف (`security=full`, `ask=off`)، وليس من `host=auto`. إذا أردت فرض التوجيه إلى gateway أو node، فاضبط `tools.exec.host` أو استخدم `/exec host=...`.
+- في وضع `security=full` مع `ask=off`، يتبع exec على المضيف السياسة المضبوطة مباشرة؛ ولا توجد طبقة إضافية من الترشيح المسبق الاستدلالي لإخفاء الأوامر أو رفض preflight للسكربتات.
 - `tools.exec.node` (الافتراضي: غير مضبوط)
-- `tools.exec.strictInlineEval` (الافتراضي: false): عندما تكون true، تتطلب صيغ eval المضمنة داخل المفسر مثل `python -c` و`node -e` و`ruby -e` و`perl -e` و`php -r` و`lua -e` و`osascript -e` دائمًا موافقة صريحة. ويمكن لـ `allow-always` أن تحفظ استدعاءات benign للمفسر/البرنامج النصي، لكن صيغ inline-eval لا تزال تطالب بالموافقة في كل مرة.
-- `tools.exec.pathPrepend`: قائمة بالأدلة التي تُسبق إلى `PATH` في تشغيلات exec (gateway + sandbox فقط).
-- `tools.exec.safeBins`: ملفات تنفيذية آمنة خاصة بـ stdin فقط يمكن تشغيلها من دون إدخالات صريحة في قائمة السماح. ولمعرفة تفاصيل السلوك، راجع [Safe bins](/ar/tools/exec-approvals-advanced#safe-bins-stdin-only).
-- `tools.exec.safeBinTrustedDirs`: أدلة صريحة إضافية موثوقة لفحوصات مسارات الملفات التنفيذية في `safeBins`. ولا تُعتبر إدخالات `PATH` موثوقة تلقائيًا أبدًا. الافتراضيات المدمجة هي `/bin` و`/usr/bin`.
-- `tools.exec.safeBinProfiles`: سياسة argv مخصصة اختيارية لكل safe bin (`minPositional`، و`maxPositional`، و`allowedValueFlags`، و`deniedFlags`).
+- `tools.exec.strictInlineEval` (الافتراضي: false): عند تفعيله، تتطلب دائمًا صيغ eval المضمنة الخاصة بالمفسرات مثل `python -c` و`node -e` و`ruby -e` و`perl -e` و`php -r` و`lua -e` و`osascript -e` موافقة صريحة. وما يزال بإمكان `allow-always` حفظ ثقة دائمة لاستدعاءات المفسر/السكربت غير الضارة، لكن صيغ inline-eval تظل تطلب الموافقة في كل مرة.
+- `tools.exec.pathPrepend`: قائمة دلائل تُسبق إلى `PATH` أثناء تشغيل exec (لـ gateway + sandbox فقط).
+- `tools.exec.safeBins`: ثنائيات آمنة تعتمد على stdin فقط ويمكن تشغيلها من دون إدخالات صريحة في قائمة السماح. راجع [Safe bins](/ar/tools/exec-approvals-advanced#safe-bins-stdin-only) لتفاصيل السلوك.
+- `tools.exec.safeBinTrustedDirs`: دلائل صريحة إضافية موثوقة لفحوصات مسارات الملفات التنفيذية الخاصة بـ `safeBins`. لا تُوثق إدخالات `PATH` تلقائيًا أبدًا. والقيم الافتراضية المضمّنة هي `/bin` و`/usr/bin`.
+- `tools.exec.safeBinProfiles`: سياسة argv مخصصة اختيارية لكل safe bin (`minPositional`, `maxPositional`, `allowedValueFlags`, `deniedFlags`).
 
 مثال:
 
@@ -128,29 +128,30 @@ x-i18n:
 
 ### التعامل مع PATH
 
-- `host=gateway`: يدمج قيمة `PATH` الخاصة بـ login-shell في بيئة exec. ويتم
-  رفض تجاوزات `env.PATH` لتنفيذ المضيف. أما daemon نفسها فلا تزال تعمل مع `PATH` دنيا:
-  - macOS: ‏`/opt/homebrew/bin`، و`/usr/local/bin`، و`/usr/bin`، و`/bin`
-  - Linux: ‏`/usr/local/bin`، و`/usr/bin`، و`/bin`
-- `host=sandbox`: يشغّل `sh -lc` (login shell) داخل الحاوية، لذا قد تعيد `/etc/profile` ضبط `PATH`.
-  يسبق OpenClaw قيمة `env.PATH` بعد تحميل profile عبر متغير env داخلي (من دون interpolation في shell)؛ وتنطبق `tools.exec.pathPrepend` هنا أيضًا.
-- `host=node`: تُرسل إلى node فقط تجاوزات env التي تمر من الحظر. وتُرفض تجاوزات `env.PATH`
-  لتنفيذ المضيف ويتم تجاهلها من قِبل مضيفات node. وإذا كنت تحتاج إلى إدخالات PATH إضافية على node،
-  فاضبط بيئة خدمة مضيف node ‏(systemd/launchd) أو ثبّت الأدوات في مواقع قياسية.
+- `host=gateway`: يدمج `PATH` الخاص بصدفة تسجيل الدخول لديك ضمن بيئة exec. تُرفض تجاوزات `env.PATH`
+  لتنفيذ المضيف. بينما يعمل daemon نفسه باستخدام `PATH` محدود:
+  - macOS: `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, `/bin`
+  - Linux: `/usr/local/bin`, `/usr/bin`, `/bin`
+- `host=sandbox`: يشغّل `sh -lc` (صدفة تسجيل دخول) داخل الحاوية، لذا قد يعيد `/etc/profile` ضبط `PATH`.
+  يسبق OpenClaw قيمة `env.PATH` بعد تحميل profile عبر متغير بيئة داخلي (من دون استيفاء shell)؛
+  كما يطبَّق `tools.exec.pathPrepend` هنا أيضًا.
+- `host=node`: لا تُرسل إلى Node إلا تجاوزات البيئة غير المحظورة التي تمرّرها. تُرفض تجاوزات `env.PATH`
+  لتنفيذ المضيف، ويتجاهلها مضيفو Node. إذا كنت بحاجة إلى إدخالات PATH إضافية على Node،
+  فاضبط بيئة خدمة مضيف Node (systemd/launchd) أو ثبّت الأدوات في مواقع قياسية.
 
-ربط Node لكل وكيل (استخدم فهرس قائمة الوكلاء في الإعداد):
+ربط Node لكل عامل (استخدم فهرس قائمة العامل في الإعدادات):
 
 ```bash
 openclaw config get agents.list
 openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
-واجهة Control UI: تتضمن علامة تبويب Nodes لوحة صغيرة بعنوان “Exec node binding” للإعدادات نفسها.
+Control UI: تتضمن علامة تبويب Nodes لوحة صغيرة باسم “Exec node binding” للإعدادات نفسها.
 
 ## تجاوزات الجلسة (`/exec`)
 
-استخدم `/exec` لضبط القيم الافتراضية **لكل جلسة** لـ `host`، و`security`، و`ask`، و`node`.
-أرسل `/exec` من دون وسائط لعرض القيم الحالية.
+استخدم `/exec` لضبط القيم الافتراضية **لكل جلسة** لـ `host` و`security` و`ask` و`node`.
+أرسل `/exec` من دون وسيطات لعرض القيم الحالية.
 
 مثال:
 
@@ -160,51 +161,53 @@ openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 
 ## نموذج التفويض
 
-لا يتم التعامل مع `/exec` إلا من **المرسلين المصرّح لهم** (قوائم السماح/الاقتران في القناة بالإضافة إلى `commands.useAccessGroups`).
-وهو يحدّث **حالة الجلسة فقط** ولا يكتب الإعداد. ولتعطيل exec بشكل صارم، امنعه عبر سياسة الأداة
-(`tools.deny: ["exec"]` أو لكل وكيل). ولا تزال موافقات المضيف تُطبّق ما لم تضبط صراحةً
-`security=full` و`ask=off`.
+لا يُحترم `/exec` إلا للمرسلين **المصرَّح لهم** (قوائم السماح/الإقران الخاصة بالقنوات مع `commands.useAccessGroups`).
+وهو يحدّث **حالة الجلسة فقط** ولا يكتب إلى الإعدادات. لتعطيل exec بشكل كامل، امنعه عبر
+سياسة الأداة (`tools.deny: ["exec"]` أو على مستوى كل عامل). وما تزال موافقات المضيف تُطبق ما لم تضبط
+صراحةً `security=full` و`ask=off`.
 
 ## موافقات Exec (التطبيق المرافق / مضيف Node)
 
-يمكن للوكلاء المعزولين عبر sandbox أن يطلبوا موافقة لكل طلب قبل أن تعمل `exec` على مضيف gateway أو node.
-راجع [موافقات Exec](/ar/tools/exec-approvals) لمعرفة السياسة، وقائمة السماح، وتدفق واجهة المستخدم.
+يمكن للوكلاء ضمن sandbox أن يطلبوا موافقة لكل طلب قبل أن يعمل `exec` على مضيف gateway أو node.
+راجع [موافقات Exec](/ar/tools/exec-approvals) للاطلاع على السياسة وقائمة السماح وتدفق واجهة المستخدم.
 
 عندما تكون الموافقات مطلوبة، تعيد أداة exec فورًا
 `status: "approval-pending"` ومعرّف موافقة. وبعد الموافقة (أو الرفض / انتهاء المهلة)،
-تصدر Gateway أحداث نظام (`Exec finished` / `Exec denied`). وإذا ظل الأمر
-قيد التشغيل بعد `tools.exec.approvalRunningNoticeMs`، فسيتم إصدار إشعار واحد `Exec running`.
-وعلى القنوات التي تحتوي على بطاقات/أزرار موافقة أصلية، ينبغي أن يعتمد الوكيل على
-واجهة المستخدم الأصلية تلك أولًا وألا يتضمن أمر `/approve` يدويًا إلا عندما
-تقول نتيجة الأداة صراحةً إن موافقات الدردشة غير متاحة أو إن الموافقة اليدوية
-هي المسار الوحيد.
+يصدر Gateway أحداث نظام (`Exec finished` / `Exec denied`). وإذا كان الأمر ما يزال
+قيد التشغيل بعد `tools.exec.approvalRunningNoticeMs`، فيصدر إشعارًا واحدًا `Exec running`.
+وعلى القنوات التي تتضمن بطاقات/أزرار موافقة أصلية، يجب على العامل أن يعتمد على
+واجهة المستخدم الأصلية أولًا وألا يضيف أمر `/approve` يدوي إلا عندما
+تذكر نتيجة الأداة صراحةً أن موافقات الدردشة غير متاحة أو أن الموافقة اليدوية هي
+المسار الوحيد.
 
-## Allowlist + safe bins
+## قائمة السماح + safe bins
 
-يطابق إنفاذ قائمة السماح اليدوية **مسارات الملفات التنفيذية المحلولة فقط** (ولا توجد مطابقات لأسماء الأساس). عندما
-تكون `security=allowlist`، يتم السماح تلقائيًا بأوامر shell فقط إذا كانت كل مقاطع pipeline
-موجودة في قائمة السماح أو Safe bins. ويتم رفض chaining ‏(`;`، و`&&`، و`||`) وعمليات إعادة التوجيه في
-وضع قائمة السماح ما لم يستوفِ كل مقطع من المقاطع العليا قائمة السماح (بما في ذلك Safe bins).
-ولا تزال عمليات إعادة التوجيه غير مدعومة.
-ولا تتجاوز الثقة الدائمة من نوع `allow-always` هذه القاعدة: فالأمر المتسلسل لا يزال يتطلب أن يطابق كل
-مقطع من المقاطع العليا.
+يطابق فرض قائمة السماح اليدوية glob لمسارات الملفات التنفيذية المحلولة وglob لأسماء الأوامر المجردة.
+وتطابق الأسماء المجردة فقط الأوامر المستدعاة عبر PATH، لذا يمكن لـ `rg` أن يطابق
+`/opt/homebrew/bin/rg` عندما يكون الأمر هو `rg`، ولكن ليس `./rg` أو `/tmp/rg`.
+وعندما يكون `security=allowlist`، لا تُسمح أوامر shell تلقائيًا إلا إذا كان كل مقطع في pipeline
+موجودًا في قائمة السماح أو كان safe bin. كما تُرفض السلاسل (`;`, `&&`, `||`) وعمليات إعادة التوجيه
+في وضع allowlist إلا إذا حقق كل مقطع من المستوى الأعلى
+قائمة السماح (بما في ذلك safe bins). وما تزال عمليات إعادة التوجيه غير مدعومة.
+الثقة الدائمة عبر `allow-always` لا تتجاوز هذه القاعدة: فالأمر المتسلسل يظل يتطلب مطابقة كل
+مقطع من المستوى الأعلى.
 
-يمثل `autoAllowSkills` مسار راحة منفصلًا ضمن موافقات exec. وهو ليس الشيء نفسه مثل
-إدخالات قائمة السماح للمسارات اليدوية. وإذا كنت تريد ثقة صريحة صارمة، فأبقِ `autoAllowSkills` معطلة.
+`autoAllowSkills` هو مسار تسهيلي منفصل ضمن موافقات exec. وهو ليس مثل
+إدخالات قائمة السماح اليدوية للمسارات. وللحفاظ على ثقة صريحة صارمة، أبقِ `autoAllowSkills` معطلًا.
 
-استخدم أداة التحكمين هذين لوظيفتين مختلفتين:
+استخدم أداتي التحكم هاتين لوظيفتين مختلفتين:
 
-- `tools.exec.safeBins`: مرشحات تدفق صغيرة خاصة بـ stdin فقط.
-- `tools.exec.safeBinTrustedDirs`: أدلة موثوقة صريحة إضافية لمسارات الملفات التنفيذية الخاصة بـ safe-bin.
-- `tools.exec.safeBinProfiles`: سياسة argv صريحة لـ safe bins المخصصة.
-- allowlist: ثقة صريحة لمسارات الملفات التنفيذية.
+- `tools.exec.safeBins`: مرشحات تدفق صغيرة تعتمد على stdin فقط.
+- `tools.exec.safeBinTrustedDirs`: دلائل صريحة إضافية موثوقة لمسارات الملفات التنفيذية الخاصة بـ safe-bin.
+- `tools.exec.safeBinProfiles`: سياسة argv صريحة لـ safe bins مخصصة.
+- قائمة السماح: ثقة صريحة لمسارات الملفات التنفيذية.
 
-لا تتعامل مع `safeBins` على أنها قائمة سماح عامة، ولا تضف ملفات تنفيذية خاصة بالمفسرات/بيئات التشغيل (مثل `python3`، أو `node`، أو `ruby`، أو `bash`). وإذا كنت تحتاج إلى هذه الملفات، فاستخدم إدخالات صريحة في قائمة السماح وأبقِ مطالبات الموافقة مفعّلة.
-يحذّر `openclaw security audit` عندما تكون إدخالات `safeBins` الخاصة بالمفسرات/بيئات التشغيل تفتقد إلى profiles صريحة، ويمكن لـ `openclaw doctor --fix` إنشاء إدخالات `safeBinProfiles` المخصصة المفقودة.
-كما يحذّر `openclaw security audit` و`openclaw doctor` أيضًا عندما تضيف صراحةً ملفات تنفيذية واسعة السلوك مثل `jq` مرة أخرى إلى `safeBins`.
-إذا قمت بإضافة المفسرات صراحةً إلى قائمة السماح، ففعّل `tools.exec.strictInlineEval` بحيث لا تزال صيغ eval المضمنة تتطلب موافقة جديدة.
+لا تعامل `safeBins` على أنها قائمة سماح عامة، ولا تضف ثنائيات المفسرات/بيئات التشغيل (مثل `python3` أو `node` أو `ruby` أو `bash`). إذا احتجت إليها، فاستخدم إدخالات صريحة في قائمة السماح وأبقِ مطالبات الموافقة مفعّلة.
+يحذر `openclaw security audit` عندما تفتقر إدخالات `safeBins` الخاصة بالمفسرات/بيئات التشغيل إلى ملفات تعريف صريحة، ويمكن لـ `openclaw doctor --fix` إنشاء إدخالات `safeBinProfiles` المخصصة المفقودة.
+كما يحذر `openclaw security audit` و`openclaw doctor` أيضًا عندما تضيف صراحةً ملفات تشغيل ذات سلوك واسع مثل `jq` مرة أخرى إلى `safeBins`.
+وإذا أضفت المفسرات صراحةً إلى قائمة السماح، ففعّل `tools.exec.strictInlineEval` حتى تظل صيغ تقييم الشيفرة المضمنة تتطلب موافقة جديدة.
 
-للتفاصيل الكاملة للسياسة والأمثلة، راجع [موافقات Exec](/ar/tools/exec-approvals-advanced#safe-bins-stdin-only) و[Safe bins مقابل allowlist](/ar/tools/exec-approvals-advanced#safe-bins-versus-allowlist).
+للتفاصيل الكاملة للسياسة والأمثلة، راجع [موافقات Exec](/ar/tools/exec-approvals-advanced#safe-bins-stdin-only) و[Safe bins مقابل قائمة السماح](/ar/tools/exec-approvals-advanced#safe-bins-versus-allowlist).
 
 ## أمثلة
 
@@ -214,15 +217,15 @@ openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 { "tool": "exec", "command": "ls -la" }
 ```
 
-الخلفية + poll:
+الخلفية + الاستطلاع:
 
 ```json
 {"tool":"exec","command":"npm run build","yieldMs":1000}
 {"tool":"process","action":"poll","sessionId":"<id>"}
 ```
 
-يمثل polling حالة حسب الطلب، وليس حلقات انتظار. وإذا
-كان التنبيه التلقائي عند الاكتمال مفعّلًا، فيمكن للأمر أن يوقظ الجلسة عندما يصدر مخرجات أو يفشل.
+الاستطلاع مخصص للحالة عند الطلب، وليس حلقات الانتظار. وإذا كان تنبيه الإكمال التلقائي
+مفعّلًا، فيمكن للأمر إيقاظ الجلسة عندما يُخرج مخرجات أو يفشل.
 
 إرسال المفاتيح (على نمط tmux):
 
@@ -232,13 +235,13 @@ openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 {"tool":"process","action":"send-keys","sessionId":"<id>","keys":["Up","Up","Enter"]}
 ```
 
-إرسال Submit ‏(إرسال CR فقط):
+إرسال (إرسال CR فقط):
 
 ```json
 { "tool": "process", "action": "submit", "sessionId": "<id>" }
 ```
 
-اللصق (بشكل bracketed افتراضيًا):
+لصق (بين أقواس bracketed افتراضيًا):
 
 ```json
 { "tool": "process", "action": "paste", "sessionId": "<id>", "text": "line1\nline2\n" }
@@ -246,9 +249,9 @@ openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 
 ## apply_patch
 
-تُعد `apply_patch` أداة فرعية من `exec` من أجل تعديلات منظمة على عدة ملفات.
-وهي مفعّلة افتراضيًا لنماذج OpenAI وOpenAI Codex. استخدم الإعداد فقط
-عندما تريد تعطيلها أو تقييدها على نماذج محددة:
+`apply_patch` أداة فرعية من `exec` من أجل التعديلات المنظمة متعددة الملفات.
+وهي مفعّلة افتراضيًا لنماذج OpenAI وOpenAI Codex. استخدم الإعدادات فقط
+عندما تريد تعطيلها أو قصرها على نماذج محددة:
 
 ```json5
 {
@@ -263,14 +266,14 @@ openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ملاحظات:
 
 - متاحة فقط لنماذج OpenAI/OpenAI Codex.
-- لا تزال سياسة الأداة منطبقة؛ فالقيمة `allow: ["write"]` تسمح ضمنيًا بـ `apply_patch`.
-- يعيش الإعداد تحت `tools.exec.applyPatch`.
-- تكون `tools.exec.applyPatch.enabled` افتراضيًا `true`؛ اضبطها على `false` لتعطيل الأداة لنماذج OpenAI.
-- تكون `tools.exec.applyPatch.workspaceOnly` افتراضيًا `true` (ضمن مساحة العمل). اضبطها على `false` فقط إذا كنت تريد عمدًا أن تقوم `apply_patch` بالكتابة/الحذف خارج دليل مساحة العمل.
+- ما تزال سياسة الأداة مطبقة؛ إذ إن `allow: ["write"]` يسمح ضمنيًا بـ `apply_patch`.
+- توجد الإعدادات تحت `tools.exec.applyPatch`.
+- القيمة الافتراضية لـ `tools.exec.applyPatch.enabled` هي `true`؛ اضبطها على `false` لتعطيل الأداة لنماذج OpenAI.
+- القيمة الافتراضية لـ `tools.exec.applyPatch.workspaceOnly` هي `true` (محتواة داخل مساحة العمل). اضبطها على `false` فقط إذا كنت تقصد عمدًا أن يقوم `apply_patch` بالكتابة/الحذف خارج دليل مساحة العمل.
 
 ## ذو صلة
 
 - [موافقات Exec](/ar/tools/exec-approvals) — بوابات الموافقة لأوامر shell
 - [Sandboxing](/ar/gateway/sandboxing) — تشغيل الأوامر في بيئات معزولة
-- [عملية الخلفية](/ar/gateway/background-process) — exec طويلة التشغيل وأداة process
-- [الأمان](/ar/gateway/security) — سياسة الأدوات والوصول المرتفع
+- [العملية الخلفية](/ar/gateway/background-process) — exec طويل التشغيل وأداة process
+- [الأمان](/ar/gateway/security) — سياسة الأداة والوصول المرتفع

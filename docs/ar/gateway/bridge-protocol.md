@@ -1,99 +1,97 @@
 ---
 read_when:
-    - إنشاء أو تصحيح أخطاء عملاء Node ‏(وضع Node على iOS/Android/macOS)
-    - التحقيق في أعطال الاقتران أو مصادقة الجسر
-    - تدقيق سطح Node الذي يكشفه gateway
-summary: 'بروتوكول الجسر التاريخي (Nodes القديمة): TCP JSONL، والاقتران، وRPC محدود النطاق'
+    - بناء عملاء العُقد أو تصحيح أخطائهم (وضع العقدة على iOS/Android/macOS)
+    - التحقيق في حالات فشل pairing أو مصادقة الجسر
+    - تدقيق سطح العقدة الذي يكشفه الـ Gateway
+summary: 'بروتوكول الجسر التاريخي (العُقد القديمة): ‏TCP JSONL، وpairing، وRPC ذي النطاقات المحددة'
 title: بروتوكول الجسر
 x-i18n:
-    generated_at: "2026-04-24T07:40:08Z"
+    generated_at: "2026-04-25T13:46:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6b2a54f439e586ea7e535cedae4a07c365f95702835b05ba5a779d590dcf967e
+    source_hash: cb07ec4dab4394dd03b4c0002d6a842a9d77d12a1fc2f141f01d5a306fab1615
     source_path: gateway/bridge-protocol.md
     workflow: 15
 ---
 
-# بروتوكول الجسر (نقل Node القديم)
-
 <Warning>
-تمت **إزالة** جسر TCP. لا تشحن إصدارات OpenClaw الحالية مستمع الجسر، ولم تعد مفاتيح إعداد `bridge.*` موجودة في المخطط. تم الاحتفاظ بهذه الصفحة كمرجع تاريخي فقط. استخدم [بروتوكول Gateway](/ar/gateway/protocol) لجميع عملاء node/operator.
+تمت **إزالة** جسر TCP. لا تشحن إصدارات OpenClaw الحالية مستمع الجسر، ولم تعد مفاتيح الإعداد `bridge.*` موجودة في المخطط. تُحفظ هذه الصفحة للرجوع التاريخي فقط. استخدم [بروتوكول Gateway](/ar/gateway/protocol) لجميع عملاء العقدة/المشغّل.
 </Warning>
 
 ## لماذا كان موجودًا
 
 - **حد أمني**: يكشف الجسر قائمة سماح صغيرة بدلًا من
-  سطح API الكامل الخاص بـ gateway.
-- **الاقتران + هوية Node**: يملك gateway قبول Node ويكون ذلك مرتبطًا
-  برمز مميز لكل Node.
-- **تجربة الاكتشاف**: يمكن لـ Nodes اكتشاف Gateways عبر Bonjour على LAN، أو الاتصال
+  سطح API الكامل للـ Gateway.
+- **Pairing + هوية العقدة**: يملك الـ Gateway قبول العقدة ويربطه
+  بـ token لكل عقدة.
+- **تجربة اكتشاف**: يمكن للعُقد اكتشاف Gateways عبر Bonjour على الشبكة المحلية، أو الاتصال
   مباشرة عبر tailnet.
 - **Loopback WS**: تظل طبقة التحكم الكاملة عبر WS محلية ما لم يتم تمريرها عبر SSH.
 
 ## النقل
 
-- TCP، كائن JSON واحد في كل سطر (JSONL).
-- TLS اختياري (عندما تكون `bridge.tls.enabled` تساوي true).
-- كان منفذ المستمع الافتراضي تاريخيًا هو `18790` ‏(لكن الإصدارات الحالية لا تبدأ
+- ‏TCP، وكائن JSON واحد لكل سطر (JSONL).
+- ‏TLS اختياري (عندما تكون `bridge.tls.enabled` هي true).
+- كان منفذ المستمع الافتراضي التاريخي هو `18790` (لا تبدأ الإصدارات الحالية
   جسر TCP).
 
 عند تمكين TLS، تتضمن سجلات TXT الخاصة بالاكتشاف `bridgeTls=1` بالإضافة إلى
-`bridgeTlsSha256` كتلميح غير سري. لاحظ أن سجلات Bonjour/mDNS TXT غير
-موثقة؛ ويجب ألا يعامل العملاء البصمة المُعلن عنها على أنها تثبيت موثوق
-من دون قصد صريح من المستخدم أو تحقق آخر خارج النطاق.
+`bridgeTlsSha256` كتلميح غير سري. لاحظ أن سجلات TXT في Bonjour/mDNS غير
+موثقة؛ ويجب على العملاء ألا يتعاملوا مع البصمة المُعلن عنها على أنها
+تثبيت موثوق من دون نية صريحة من المستخدم أو تحقق آخر خارج النطاق.
 
-## المصافحة + الاقتران
+## المصافحة + pairing
 
-1. يرسل العميل `hello` مع بيانات Node الوصفية + الرمز المميز (إذا كان مقترنًا بالفعل).
-2. إذا لم يكن مقترنًا، يرد gateway بـ `error` ‏(`NOT_PAIRED`/`UNAUTHORIZED`).
+1. يرسل العميل `hello` مع بيانات تعريف العقدة + token (إذا كانت مقترنة بالفعل).
+2. إذا لم تكن مقترنة، يرد الـ Gateway بـ `error` (`NOT_PAIRED`/`UNAUTHORIZED`).
 3. يرسل العميل `pair-request`.
-4. ينتظر gateway الموافقة، ثم يرسل `pair-ok` و`hello-ok`.
+4. ينتظر الـ Gateway الموافقة، ثم يرسل `pair-ok` و`hello-ok`.
 
-تاريخيًا، كانت `hello-ok` تعيد `serverName` وكان يمكن أن تتضمن
+تاريخيًا، كان `hello-ok` يعيد `serverName` وكان يمكن أن يتضمن
 `canvasHostUrl`.
 
 ## الإطارات
 
 العميل → Gateway:
 
-- `req` / `res`: ‏RPC محدود النطاق لـ gateway ‏(chat، sessions، config، health، voicewake، skills.bins)
-- `event`: إشارات Node ‏(نص صوتي، طلب وكيل، اشتراك دردشة، دورة حياة exec)
+- `req` / `res`: ‏RPC Gateway ذو نطاقات محددة (الدردشة، والجلسات، والإعداد، والصحة، وvoicewake، وskills.bins)
+- `event`: إشارات العقدة (نص صوتي، وطلب وكيل، واشتراك دردشة، ودورة حياة exec)
 
 Gateway → العميل:
 
-- `invoke` / `invoke-res`: أوامر Node ‏(`canvas.*`, `camera.*`, `screen.record`,
-  `location.get`, `sms.send`)
+- `invoke` / `invoke-res`: أوامر العقدة (`canvas.*` و`camera.*` و`screen.record` و
+  `location.get` و`sms.send`)
 - `event`: تحديثات الدردشة للجلسات المشتركة
 - `ping` / `pong`: إبقاء الاتصال حيًا
 
-كان تطبيق قائمة السماح القديمة موجودًا في `src/gateway/server-bridge.ts` ‏(وقد أزيل).
+كان تنفيذ قائمة السماح القديمة موجودًا في `src/gateway/server-bridge.ts` (تمت إزالته).
 
 ## أحداث دورة حياة Exec
 
-يمكن لـ Nodes إصدار أحداث `exec.finished` أو `exec.denied` لإظهار نشاط system.run.
-ويتم ربطها بأحداث نظام في gateway. ‏(قد تستمر Nodes القديمة في إصدار `exec.started`.)
+يمكن للعُقد إطلاق أحداث `exec.finished` أو `exec.denied` لإظهار نشاط system.run.
+ويتم ربطها بأحداث النظام في الـ Gateway. (وقد تظل العُقد القديمة تطلق `exec.started`.)
 
-حقول الحمولة (جميعها اختيارية ما لم يُذكر خلاف ذلك):
+حقول الحمولة (كلها اختيارية ما لم يُذكر خلاف ذلك):
 
-- `sessionKey` ‏(مطلوب): جلسة الوكيل التي ستتلقى حدث النظام.
-- `runId`: معرّف exec فريد لأغراض التجميع.
+- `sessionKey` (مطلوب): جلسة الوكيل التي ستستقبل حدث النظام.
+- `runId`: معرّف exec فريد للتجميع.
 - `command`: سلسلة الأمر الخام أو المنسقة.
-- `exitCode`, `timedOut`, `success`, `output`: تفاصيل الإكمال (في finished فقط).
+- `exitCode` و`timedOut` و`success` و`output`: تفاصيل الإكمال (في finished فقط).
 - `reason`: سبب الرفض (في denied فقط).
 
-## الاستخدام التاريخي لـ tailnet
+## استخدام tailnet التاريخي
 
-- اربط الجسر بعنوان tailnet IP: ‏`bridge.bind: "tailnet"` في
-  `~/.openclaw/openclaw.json` ‏(لأغراض تاريخية فقط؛ لم تعد `bridge.*` صالحة).
-- يتصل العملاء عبر اسم MagicDNS أو عنوان tailnet IP.
-- لا يعبر Bonjour الشبكات **بينها**؛ استخدم host/port يدويًا أو DNS‑SD على نطاق واسع
+- اربط الجسر بعنوان IP لـ tailnet: ‏`bridge.bind: "tailnet"` في
+  `~/.openclaw/openclaw.json` (تاريخي فقط؛ لم يعد `bridge.*` صالحًا).
+- يتصل العملاء عبر اسم MagicDNS أو عنوان IP لـ tailnet.
+- لا يعبر Bonjour **الشبكات**؛ استخدم المضيف/المنفذ اليدوي أو DNS‑SD واسع النطاق
   عند الحاجة.
 
 ## الإصدار
 
-كان الجسر **v1 ضمنيًا** ‏(من دون تفاوض min/max). هذا القسم
-مرجع تاريخي فقط؛ إذ يستخدم عملاء node/operator الحاليون بروتوكول WebSocket
-[Gateway Protocol](/ar/gateway/protocol).
+كان الجسر **v1 ضمنيًا** (من دون تفاوض min/max). هذا القسم
+مرجع تاريخي فقط؛ وتستخدم عملاء العقدة/المشغّل الحالية [بروتوكول Gateway](/ar/gateway/protocol)
+عبر WebSocket.
 
 ## ذو صلة
 

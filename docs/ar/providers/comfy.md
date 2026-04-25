@@ -1,67 +1,69 @@
 ---
 read_when:
-    - تريد استخدام مهام سير ComfyUI المحلية مع OpenClaw
-    - تريد استخدام Comfy Cloud مع مهام سير الصور أو الفيديو أو الموسيقى
-    - تحتاج إلى مفاتيح إعدادات Plugin ‏comfy المضمّنة
-summary: إعداد توليد الصور والفيديو والموسيقى عبر ComfyUI workflow في OpenClaw
+    - تريد استخدام سير عمل ComfyUI المحلية مع OpenClaw
+    - تريد استخدام Comfy Cloud مع سير عمل الصور أو الفيديو أو الموسيقى
+    - تحتاج إلى مفاتيح إعدادات comfy plugin المضمّنة
+summary: إعداد إنشاء الصور والفيديو والموسيقى في سير عمل ComfyUI في OpenClaw
 title: ComfyUI
 x-i18n:
-    generated_at: "2026-04-24T07:58:32Z"
+    generated_at: "2026-04-25T13:55:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d8b39c49df3ad23018372b481681ce89deac3271da5dbdf94580712ace7fef7f
+    source_hash: 41dda4be24d5b2c283fa499a345cf9f38747ec19b4010163ceffd998307ca086
     source_path: providers/comfy.md
     workflow: 15
 ---
 
-يشحن OpenClaw Plugin مضمّنة باسم `comfy` لتشغيلات ComfyUI المعتمدة على workflow. وتعتمد Plugin بالكامل على workflow، لذلك لا يحاول OpenClaw تعيين عناصر تحكم عامة مثل `size` أو `aspectRatio` أو `resolution` أو `durationSeconds` أو عناصر تحكم على نمط TTS إلى الرسم البياني الخاص بك.
+يشحن OpenClaw Plugin مضمّنًا باسم `comfy` لتشغيلات ComfyUI المعتمدة على سير العمل. يعتمد Plugin بالكامل على سير العمل، لذلك لا يحاول OpenClaw مواءمة عناصر تحكم عامة مثل `size` أو `aspectRatio` أو `resolution` أو `durationSeconds` أو عناصر تحكم على نمط TTS مع الرسم البياني لديك.
 
 | الخاصية | التفاصيل |
-| ------- | --------- |
-| Provider | `comfy` |
+| --------------- | -------------------------------------------------------------------------------- |
+| الموفّر | `comfy` |
 | النماذج | `comfy/workflow` |
-| الأسطح المشتركة | `image_generate` و`video_generate` و`music_generate` |
-| المصادقة | لا شيء لـ ComfyUI المحلي؛ و`COMFY_API_KEY` أو `COMFY_CLOUD_API_KEY` لـ Comfy Cloud |
-| API | ‏ComfyUI ‏`/prompt` / `/history` / `/view` وComfy Cloud ‏`/api/*` |
+| الواجهات المشتركة | `image_generate`, `video_generate`, `music_generate` |
+| المصادقة | لا شيء لـ ComfyUI المحلي؛ أو `COMFY_API_KEY` أو `COMFY_CLOUD_API_KEY` لـ Comfy Cloud |
+| API | ComfyUI `/prompt` / `/history` / `/view` وComfy Cloud `/api/*` |
 
 ## ما الذي يدعمه
 
-- توليد الصور من ملف workflow JSON
-- تحرير الصور مع صورة مرجعية مرفوعة واحدة
-- توليد الفيديو من ملف workflow JSON
-- توليد الفيديو مع صورة مرجعية مرفوعة واحدة
-- توليد الموسيقى أو الصوت عبر الأداة المشتركة `music_generate`
-- تنزيل المخرجات من node مضبوطة أو من جميع عقد المخرجات المطابقة
+- إنشاء الصور من ملف JSON لسير العمل
+- تحرير الصور باستخدام صورة مرجعية واحدة مرفوعة
+- إنشاء الفيديو من ملف JSON لسير العمل
+- إنشاء الفيديو باستخدام صورة مرجعية واحدة مرفوعة
+- إنشاء الموسيقى أو الصوت عبر الأداة المشتركة `music_generate`
+- تنزيل المخرجات من Node مُعدّ أو من كل Nodes المخرجات المطابقة
 
 ## البدء
 
 اختر بين تشغيل ComfyUI على جهازك أو استخدام Comfy Cloud.
 
 <Tabs>
-  <Tab title="محلي">
-    **الأفضل لـ:** تشغيل مثيل ComfyUI الخاص بك على جهازك أو شبكتك المحلية.
+  <Tab title="Local">
+    **الأفضل لـ:** تشغيل مثيل ComfyUI الخاص بك على جهازك أو على شبكة LAN.
 
     <Steps>
-      <Step title="ابدأ ComfyUI محليًا">
-        تأكد من أن مثيل ComfyUI المحلي يعمل (الافتراضي `http://127.0.0.1:8188`).
+      <Step title="تشغيل ComfyUI محليًا">
+        تأكد من أن مثيل ComfyUI المحلي قيد التشغيل (القيمة الافتراضية هي `http://127.0.0.1:8188`).
       </Step>
-      <Step title="جهّز workflow JSON الخاصة بك">
-        صدّر أو أنشئ ملف workflow JSON لـ ComfyUI. دوّن معرّفات node الخاصة بعقدة إدخال prompt وعقدة الإخراج التي تريد أن يقرأ منها OpenClaw.
+      <Step title="تحضير JSON الخاص بسير العمل">
+        صدّر أو أنشئ ملف JSON لسير عمل ComfyUI. دوّن معرّفات Node الخاصة بعقدة إدخال الموجّه وعقدة الإخراج التي تريد أن يقرأ OpenClaw منها.
       </Step>
-      <Step title="اضبط provider">
-        اضبط `mode: "local"` وأشر إلى ملف workflow الخاص بك. إليك مثالًا حدّيًا أدنى للصور:
+      <Step title="إعداد الموفّر">
+        اضبط `mode: "local"` ووجّه إلى ملف سير العمل. إليك مثالًا بسيطًا للصور:
 
         ```json5
         {
-          models: {
-            providers: {
+          plugins: {
+            entries: {
               comfy: {
-                mode: "local",
-                baseUrl: "http://127.0.0.1:8188",
-                image: {
-                  workflowPath: "./workflows/flux-api.json",
-                  promptNodeId: "6",
-                  outputNodeId: "9",
+                config: {
+                  mode: "local",
+                  baseUrl: "http://127.0.0.1:8188",
+                  image: {
+                    workflowPath: "./workflows/flux-api.json",
+                    promptNodeId: "6",
+                    outputNodeId: "9",
+                  },
                 },
               },
             },
@@ -69,8 +71,8 @@ x-i18n:
         }
         ```
       </Step>
-      <Step title="اضبط النموذج الافتراضي">
-        وجّه OpenClaw إلى نموذج `comfy/workflow` للقدرة التي ضبطتها:
+      <Step title="تعيين النموذج الافتراضي">
+        وجّه OpenClaw إلى النموذج `comfy/workflow` للإمكانات التي قمت بإعدادها:
 
         ```json5
         {
@@ -84,7 +86,7 @@ x-i18n:
         }
         ```
       </Step>
-      <Step title="تحقق">
+      <Step title="التحقق">
         ```bash
         openclaw models list --provider comfy
         ```
@@ -94,42 +96,44 @@ x-i18n:
   </Tab>
 
   <Tab title="Comfy Cloud">
-    **الأفضل لـ:** تشغيل workflows على Comfy Cloud من دون إدارة موارد GPU محلية.
+    **الأفضل لـ:** تشغيل سير العمل على Comfy Cloud من دون إدارة موارد GPU محلية.
 
     <Steps>
-      <Step title="احصل على مفتاح API">
+      <Step title="الحصول على مفتاح API">
         سجّل في [comfy.org](https://comfy.org) وأنشئ مفتاح API من لوحة حسابك.
       </Step>
-      <Step title="اضبط مفتاح API">
-        قدّم مفتاحك بإحدى هذه الطرق:
+      <Step title="تعيين مفتاح API">
+        وفّر المفتاح بإحدى الطرق التالية:
 
         ```bash
-        # Environment variable (preferred)
+        # متغير بيئة (مفضل)
         export COMFY_API_KEY="your-key"
 
-        # Alternative environment variable
+        # متغير بيئة بديل
         export COMFY_CLOUD_API_KEY="your-key"
 
-        # Or inline in config
-        openclaw config set models.providers.comfy.apiKey "your-key"
+        # أو مباشرة داخل الإعدادات
+        openclaw config set plugins.entries.comfy.config.apiKey "your-key"
         ```
       </Step>
-      <Step title="جهّز workflow JSON الخاصة بك">
-        صدّر أو أنشئ ملف workflow JSON لـ ComfyUI. دوّن معرّفات node الخاصة بعقدة إدخال prompt وعقدة الإخراج.
+      <Step title="تحضير JSON الخاص بسير العمل">
+        صدّر أو أنشئ ملف JSON لسير عمل ComfyUI. دوّن معرّفات Node الخاصة بعقدة إدخال الموجّه وعقدة الإخراج.
       </Step>
-      <Step title="اضبط provider">
-        اضبط `mode: "cloud"` وأشر إلى ملف workflow الخاص بك:
+      <Step title="إعداد الموفّر">
+        اضبط `mode: "cloud"` ووجّه إلى ملف سير العمل:
 
         ```json5
         {
-          models: {
-            providers: {
+          plugins: {
+            entries: {
               comfy: {
-                mode: "cloud",
-                image: {
-                  workflowPath: "./workflows/flux-api.json",
-                  promptNodeId: "6",
-                  outputNodeId: "9",
+                config: {
+                  mode: "cloud",
+                  image: {
+                    workflowPath: "./workflows/flux-api.json",
+                    promptNodeId: "6",
+                    outputNodeId: "9",
+                  },
                 },
               },
             },
@@ -138,10 +142,10 @@ x-i18n:
         ```
 
         <Tip>
-        يستخدم وضع Cloud افتراضيًا `baseUrl` بالقيمة `https://cloud.comfy.org`. ولا تحتاج إلى ضبط `baseUrl` إلا إذا كنت تستخدم نقطة نهاية سحابية مخصصة.
+        يستخدم وضع cloud القيمة الافتراضية `https://cloud.comfy.org` لـ `baseUrl`. لا تحتاج إلى ضبط `baseUrl` إلا إذا كنت تستخدم نقطة نهاية cloud مخصصة.
         </Tip>
       </Step>
-      <Step title="اضبط النموذج الافتراضي">
+      <Step title="تعيين النموذج الافتراضي">
         ```json5
         {
           agents: {
@@ -154,7 +158,7 @@ x-i18n:
         }
         ```
       </Step>
-      <Step title="تحقق">
+      <Step title="التحقق">
         ```bash
         openclaw models list --provider comfy
         ```
@@ -166,29 +170,31 @@ x-i18n:
 
 ## الإعدادات
 
-يدعم Comfy إعدادات اتصال مشتركة من المستوى الأعلى بالإضافة إلى أقسام workflow لكل قدرة (`image` و`video` و`music`):
+يدعم comfy إعدادات اتصال مشتركة على المستوى الأعلى بالإضافة إلى أقسام سير عمل خاصة بكل قدرة (`image` و`video` و`music`):
 
 ```json5
 {
-  models: {
-    providers: {
+  plugins: {
+    entries: {
       comfy: {
-        mode: "local",
-        baseUrl: "http://127.0.0.1:8188",
-        image: {
-          workflowPath: "./workflows/flux-api.json",
-          promptNodeId: "6",
-          outputNodeId: "9",
-        },
-        video: {
-          workflowPath: "./workflows/video-api.json",
-          promptNodeId: "12",
-          outputNodeId: "21",
-        },
-        music: {
-          workflowPath: "./workflows/music-api.json",
-          promptNodeId: "3",
-          outputNodeId: "18",
+        config: {
+          mode: "local",
+          baseUrl: "http://127.0.0.1:8188",
+          image: {
+            workflowPath: "./workflows/flux-api.json",
+            promptNodeId: "6",
+            outputNodeId: "9",
+          },
+          video: {
+            workflowPath: "./workflows/video-api.json",
+            promptNodeId: "12",
+            outputNodeId: "21",
+          },
+          music: {
+            workflowPath: "./workflows/music-api.json",
+            promptNodeId: "3",
+            outputNodeId: "18",
+          },
         },
       },
     },
@@ -199,36 +205,36 @@ x-i18n:
 ### المفاتيح المشتركة
 
 | المفتاح | النوع | الوصف |
-| ------- | ------ | ------ |
-| `mode` | `"local"` أو `"cloud"` | وضع الاتصال. |
-| `baseUrl` | string | القيمة الافتراضية هي `http://127.0.0.1:8188` للوضع المحلي أو `https://cloud.comfy.org` للوضع السحابي. |
-| `apiKey` | string | مفتاح مضمّن اختياري، بديل عن متغيرات البيئة `COMFY_API_KEY` / `COMFY_CLOUD_API_KEY`. |
-| `allowPrivateNetwork` | boolean | السماح باستخدام `baseUrl` خاصة/محلية في وضع cloud. |
+| --------------------- | ---------------------- | ------------------------------------------------------------------------------------- |
+| `mode` | `"local"` or `"cloud"` | وضع الاتصال. |
+| `baseUrl` | string | القيمة الافتراضية هي `http://127.0.0.1:8188` للوضع المحلي أو `https://cloud.comfy.org` لوضع cloud. |
+| `apiKey` | string | مفتاح مضمن اختياري، بديل عن متغيرات البيئة `COMFY_API_KEY` / `COMFY_CLOUD_API_KEY`. |
+| `allowPrivateNetwork` | boolean | السماح باستخدام `baseUrl` خاص/على شبكة LAN في وضع cloud. |
 
-### مفاتيح كل قدرة
+### المفاتيح الخاصة بكل قدرة
 
 تنطبق هذه المفاتيح داخل أقسام `image` أو `video` أو `music`:
 
 | المفتاح | مطلوب | الافتراضي | الوصف |
-| ------- | ------ | ---------- | ------ |
-| `workflow` أو `workflowPath` | نعم | -- | المسار إلى ملف workflow JSON الخاص بـ ComfyUI. |
-| `promptNodeId` | نعم | -- | معرّف node التي تستقبل prompt النصية. |
-| `promptInputName` | لا | `"text"` | اسم الإدخال على عقدة prompt. |
-| `outputNodeId` | لا | -- | معرّف node التي تُقرأ منها المخرجات. وإذا حُذفت، تُستخدم جميع عقد الإخراج المطابقة. |
-| `pollIntervalMs` | لا | -- | فترة الاستطلاع بالمللي ثانية لاكتمال المهمة. |
-| `timeoutMs` | لا | -- | المهلة بالمللي ثانية لتشغيل workflow. |
+| ---------------------------- | -------- | -------- | ---------------------------------------------------------------------------- |
+| `workflow` or `workflowPath` | نعم | -- | مسار ملف JSON لسير عمل ComfyUI. |
+| `promptNodeId` | نعم | -- | معرّف Node الذي يستقبل موجّه النص. |
+| `promptInputName` | لا | `"text"` | اسم الإدخال على Node الموجّه. |
+| `outputNodeId` | لا | -- | معرّف Node الذي تُقرأ منه المخرجات. إذا تم حذفه، تُستخدم كل Nodes المخرجات المطابقة. |
+| `pollIntervalMs` | لا | -- | فاصل الاستطلاع بالميلي ثانية لاكتمال المهمة. |
+| `timeoutMs` | لا | -- | المهلة بالميلي ثانية لتشغيل سير العمل. |
 
-كما يدعم قسمَا `image` و`video` ما يلي:
+يدعم قسما `image` و`video` أيضًا ما يلي:
 
 | المفتاح | مطلوب | الافتراضي | الوصف |
-| ------- | ------ | ---------- | ------ |
-| `inputImageNodeId` | نعم (عند تمرير صورة مرجعية) | -- | معرّف node التي تستقبل الصورة المرجعية المرفوعة. |
-| `inputImageInputName` | لا | `"image"` | اسم الإدخال على عقدة الصورة. |
+| --------------------- | ------------------------------------ | --------- | --------------------------------------------------- |
+| `inputImageNodeId` | نعم (عند تمرير صورة مرجعية) | -- | معرّف Node الذي يستقبل الصورة المرجعية المرفوعة. |
+| `inputImageInputName` | لا | `"image"` | اسم الإدخال على Node الصورة. |
 
-## تفاصيل workflow
+## تفاصيل سير العمل
 
 <AccordionGroup>
-  <Accordion title="مهام سير الصور">
+  <Accordion title="Image workflows">
     اضبط نموذج الصور الافتراضي على `comfy/workflow`:
 
     ```json5
@@ -245,19 +251,21 @@ x-i18n:
 
     **مثال على التحرير باستخدام صورة مرجعية:**
 
-    لتفعيل تحرير الصور باستخدام صورة مرجعية مرفوعة، أضف `inputImageNodeId` إلى إعدادات الصور لديك:
+    لتمكين تحرير الصور باستخدام صورة مرجعية مرفوعة، أضف `inputImageNodeId` إلى إعدادات الصورة لديك:
 
     ```json5
     {
-      models: {
-        providers: {
+      plugins: {
+        entries: {
           comfy: {
-            image: {
-              workflowPath: "./workflows/edit-api.json",
-              promptNodeId: "6",
-              inputImageNodeId: "7",
-              inputImageInputName: "image",
-              outputNodeId: "9",
+            config: {
+              image: {
+                workflowPath: "./workflows/edit-api.json",
+                promptNodeId: "6",
+                inputImageNodeId: "7",
+                inputImageInputName: "image",
+                outputNodeId: "9",
+              },
             },
           },
         },
@@ -267,7 +275,7 @@ x-i18n:
 
   </Accordion>
 
-  <Accordion title="مهام سير الفيديو">
+  <Accordion title="Video workflows">
     اضبط نموذج الفيديو الافتراضي على `comfy/workflow`:
 
     ```json5
@@ -282,58 +290,60 @@ x-i18n:
     }
     ```
 
-    تدعم مهام سير الفيديو في Comfy كلاً من text-to-video وimage-to-video عبر الرسم البياني المضبوط.
+    تدعم سير عمل الفيديو في Comfy تحويل النص إلى فيديو وتحويل الصورة إلى فيديو عبر الرسم البياني المُعد.
 
     <Note>
-    لا يمرر OpenClaw مقاطع الفيديو المدخلة إلى مهام سير Comfy. فالمَدخَلات المدعومة هي prompts النصية والصور المرجعية المفردة فقط.
+    لا يمرّر OpenClaw مقاطع فيديو الإدخال إلى سير عمل Comfy. المدخلات المدعومة هي موجّهات النصوص والصور المرجعية المفردة فقط.
     </Note>
 
   </Accordion>
 
-  <Accordion title="مهام سير الموسيقى">
-    تسجل Plugin المضمنة مزودًا لتوليد الموسيقى لنتائج الصوت أو الموسيقى المحددة بواسطة workflow، ويتم كشفه عبر الأداة المشتركة `music_generate`:
+  <Accordion title="Music workflows">
+    يسجّل Plugin المضمّن موفّرًا لإنشاء الموسيقى من أجل مخرجات الصوت أو الموسيقى المعرّفة عبر سير العمل، ويتم عرضه عبر الأداة المشتركة `music_generate`:
 
     ```text
     /tool music_generate prompt="Warm ambient synth loop with soft tape texture"
     ```
 
-    استخدم قسم إعدادات `music` للإشارة إلى workflow JSON الخاصة بالصوت وعقدة الإخراج.
+    استخدم قسم إعدادات `music` للتوجيه إلى JSON الخاص بسير عمل الصوت وعقدة الإخراج.
 
   </Accordion>
 
-  <Accordion title="التوافق مع الإصدارات السابقة">
-    لا تزال إعدادات الصور القديمة ذات المستوى الأعلى (من دون القسم المتداخل `image`) تعمل:
+  <Accordion title="Backward compatibility">
+    ما زالت إعدادات الصور القديمة على المستوى الأعلى (من دون قسم `image` المتداخل) تعمل:
 
     ```json5
     {
-      models: {
-        providers: {
+      plugins: {
+        entries: {
           comfy: {
-            workflowPath: "./workflows/flux-api.json",
-            promptNodeId: "6",
-            outputNodeId: "9",
+            config: {
+              workflowPath: "./workflows/flux-api.json",
+              promptNodeId: "6",
+              outputNodeId: "9",
+            },
           },
         },
       },
     }
     ```
 
-    يعامل OpenClaw هذا الشكل القديم على أنه إعدادات workflow للصور. ولا تحتاج إلى الترحيل فورًا، لكن الأقسام المتداخلة `image` / `video` / `music` موصى بها للإعدادات الجديدة.
+    يتعامل OpenClaw مع هذا الشكل القديم باعتباره إعدادات سير عمل الصور. لا تحتاج إلى الترحيل فورًا، لكن يُنصح باستخدام الأقسام المتداخلة `image` / `video` / `music` في الإعدادات الجديدة.
 
     <Tip>
-    إذا كنت تستخدم توليد الصور فقط، فإن الإعدادات المسطحة القديمة والقسم المتداخل `image` الجديد متكافئان وظيفيًا.
+    إذا كنت تستخدم إنشاء الصور فقط، فإن الإعدادات المسطحة القديمة وقسم `image` المتداخل الجديد متكافئان وظيفيًا.
     </Tip>
 
   </Accordion>
 
-  <Accordion title="الاختبارات المباشرة">
-    توجد تغطية مباشرة اختيارية لـ Plugin المضمنة:
+  <Accordion title="Live tests">
+    توجد تغطية live اختيارية لـ Plugin المضمّن:
 
     ```bash
     OPENCLAW_LIVE_TEST=1 COMFY_LIVE_TEST=1 pnpm test:live -- extensions/comfy/comfy.live.test.ts
     ```
 
-    يتجاوز الاختبار المباشر حالات الصور أو الفيديو أو الموسيقى الفردية ما لم يكن قسم workflow المطابق في Comfy مضبوطًا.
+    يتخطى اختبار live الحالات الفردية للصور أو الفيديو أو الموسيقى ما لم يكن قسم سير عمل Comfy المطابق مُعدًا.
 
   </Accordion>
 </AccordionGroup>
@@ -341,19 +351,19 @@ x-i18n:
 ## ذو صلة
 
 <CardGroup cols={2}>
-  <Card title="توليد الصور" href="/ar/tools/image-generation" icon="image">
-    إعدادات واستخدام أداة توليد الصور.
+  <Card title="إنشاء الصور" href="/ar/tools/image-generation" icon="image">
+    إعدادات أداة إنشاء الصور وطريقة استخدامها.
   </Card>
-  <Card title="توليد الفيديو" href="/ar/tools/video-generation" icon="video">
-    إعدادات واستخدام أداة توليد الفيديو.
+  <Card title="إنشاء الفيديو" href="/ar/tools/video-generation" icon="video">
+    إعدادات أداة إنشاء الفيديو وطريقة استخدامها.
   </Card>
-  <Card title="توليد الموسيقى" href="/ar/tools/music-generation" icon="music">
-    إعداد أداة توليد الموسيقى والصوت.
+  <Card title="إنشاء الموسيقى" href="/ar/tools/music-generation" icon="music">
+    إعداد أداة إنشاء الموسيقى والصوت.
   </Card>
-  <Card title="دليل Providers" href="/ar/providers/index" icon="layers">
-    نظرة عامة على جميع providers ومراجع النماذج.
+  <Card title="دليل الموفّرين" href="/ar/providers/index" icon="layers">
+    نظرة عامة على جميع الموفّرين ومراجع النماذج.
   </Card>
   <Card title="مرجع الإعدادات" href="/ar/gateway/config-agents#agent-defaults" icon="gear">
-    مرجع الإعدادات الكامل بما في ذلك الإعدادات الافتراضية للوكلاء.
+    مرجع الإعدادات الكامل بما في ذلك الإعدادات الافتراضية للوكيل.
   </Card>
 </CardGroup>

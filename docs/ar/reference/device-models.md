@@ -1,39 +1,38 @@
 ---
 read_when:
     - تحديث تعيينات معرّفات طرازات الأجهزة أو ملفات NOTICE/license
-    - تغيير طريقة عرض واجهة المستخدم الخاصة بـ Instances لأسماء الأجهزة
-summary: كيف يضمّن OpenClaw معرّفات طرازات أجهزة Apple للحصول على أسماء سهلة الاستخدام في تطبيق macOS.
+    - تغيير طريقة عرض واجهة مستخدم Instances لأسماء الأجهزة
+summary: كيف يضمّن OpenClaw معرّفات طرازات أجهزة Apple للحصول على أسماء ودية في تطبيق macOS.
 title: قاعدة بيانات طرازات الأجهزة
 x-i18n:
-    generated_at: "2026-04-24T08:02:35Z"
+    generated_at: "2026-04-25T13:57:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e892bf439a878b737d2322188acec850aa5bda2e7051ee0481850c921c69facb
+    source_hash: f20e035f787ba7d9bb48d2a18263679d20b295e12ffb263a63c3a0ef72312d34
     source_path: reference/device-models.md
     workflow: 15
 ---
 
-# قاعدة بيانات طرازات الأجهزة (الأسماء السهلة الاستخدام)
+يعرض التطبيق المساعد على macOS أسماءً ودية لطرازات أجهزة Apple في واجهة مستخدم **Instances** من خلال تعيين معرّفات طرازات Apple (مثل `iPad16,6` و`Mac16,6`) إلى أسماء مقروءة للبشر.
 
-يعرض التطبيق المرافق لنظام macOS أسماء سهلة الاستخدام لطرازات أجهزة Apple في واجهة **Instances** من خلال تعيين معرّفات طرازات Apple (مثل `iPad16,6` و`Mac16,6`) إلى أسماء مقروءة للبشر.
-
-يتم تضمين التعيين على شكل JSON ضمن:
+يتم تضمين هذا التعيين كبنية JSON ضمن:
 
 - `apps/macos/Sources/OpenClaw/Resources/DeviceModels/`
 
 ## مصدر البيانات
 
-نحن نضمّن حاليًا هذا التعيين من المستودع المرخّص بترخيص MIT:
+نقوم حاليًا بتضمين التعيين من المستودع المرخّص بترخيص MIT التالي:
 
 - `kyle-seongwoo-jun/apple-device-identifiers`
 
-وللحفاظ على حتمية عمليات البناء، تُثبَّت ملفات JSON على التزامات upstream محددة (ومسجلة في `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`).
+وللحفاظ على حتمية الإصدارات، يتم تثبيت ملفات JSON على عمليات التزام upstream محددة
+(مُسجّلة في `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`).
 
 ## تحديث قاعدة البيانات
 
-1. اختر التزامات upstream التي تريد تثبيتها عليها (واحد لـ iOS وواحد لـ macOS).
-2. حدّث قيم تجزئة الالتزامات في `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`.
-3. أعد تنزيل ملفات JSON مع تثبيتها على تلك الالتزامات:
+1. اختر عمليات التزام upstream التي تريد تثبيتها (واحدة لـ iOS وواحدة لـ macOS).
+2. حدّث تجزئات عمليات الالتزام في `apps/macos/Sources/OpenClaw/Resources/DeviceModels/NOTICE.md`.
+3. أعد تنزيل ملفات JSON مع تثبيتها على تلك العمليات:
 
 ```bash
 IOS_COMMIT="<commit sha for ios-device-identifiers.json>"
@@ -46,7 +45,7 @@ curl -fsSL "https://raw.githubusercontent.com/kyle-seongwoo-jun/apple-device-ide
   -o apps/macos/Sources/OpenClaw/Resources/DeviceModels/mac-device-identifiers.json
 ```
 
-4. تأكد من أن `apps/macos/Sources/OpenClaw/Resources/DeviceModels/LICENSE.apple-device-identifiers.txt` لا يزال مطابقًا للمصدر upstream (واستبدله إذا تغيّر ترخيص upstream).
+4. تأكد من أن `apps/macos/Sources/OpenClaw/Resources/DeviceModels/LICENSE.apple-device-identifiers.txt` لا يزال مطابقًا لـ upstream (واستبدله إذا تغيّر ترخيص upstream).
 5. تحقّق من أن تطبيق macOS يُبنى بشكل نظيف (من دون تحذيرات):
 
 ```bash
