@@ -1,28 +1,28 @@
 ---
 read_when:
-    - 查找合适的 `openclaw` 子命令
+    - 找到合适的 `openclaw` 子命令
     - 查找全局标志或输出样式规则
-summary: OpenClaw CLI 索引：命令列表、全局标志和各命令页面链接
-title: CLI 参考
+summary: OpenClaw CLI 索引：命令列表、全局标志，以及指向各命令页面的链接
+title: CLI 参考资料
 x-i18n:
-    generated_at: "2026-04-23T20:43:57Z"
+    generated_at: "2026-04-25T08:03:59Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9fec51767cf6c2a0abeb684f00877371dae3ac05ed864eff03a581976e90c1ce
+    source_hash: b8a61396b8ec7f57d15988d40b09f90458745bbb29e90bd387134aa032214853
     source_path: cli/index.md
     workflow: 15
 ---
 
-`openclaw` 是主 CLI 入口点。每个核心命令要么有独立的参考页面，要么记录在其所别名的命令页面中；本索引列出了这些命令、全局标志以及适用于整个 CLI 的输出样式规则。
+`openclaw` 是主要的 CLI 入口点。每个核心命令要么有专门的参考页面，要么与其别名命令一起记录；本索引列出了命令、全局标志，以及适用于整个 CLI 的输出样式规则。
 
 ## 命令页面
 
 | 区域 | 命令 |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 设置和新手引导 | [`setup`](/zh-CN/cli/setup) · [`onboard`](/zh-CN/cli/onboard) · [`configure`](/zh-CN/cli/configure) · [`config`](/zh-CN/cli/config) · [`completion`](/zh-CN/cli/completion) · [`doctor`](/zh-CN/cli/doctor) · [`dashboard`](/zh-CN/cli/dashboard) |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 设置和新手引导 | [`crestodian`](/zh-CN/cli/crestodian) · [`setup`](/zh-CN/cli/setup) · [`onboard`](/zh-CN/cli/onboard) · [`configure`](/zh-CN/cli/configure) · [`config`](/zh-CN/cli/config) · [`completion`](/zh-CN/cli/completion) · [`doctor`](/zh-CN/cli/doctor) · [`dashboard`](/zh-CN/cli/dashboard) |
 | 重置和卸载 | [`backup`](/zh-CN/cli/backup) · [`reset`](/zh-CN/cli/reset) · [`uninstall`](/zh-CN/cli/uninstall) · [`update`](/zh-CN/cli/update) |
 | 消息和智能体 | [`message`](/zh-CN/cli/message) · [`agent`](/zh-CN/cli/agent) · [`agents`](/zh-CN/cli/agents) · [`acp`](/zh-CN/cli/acp) · [`mcp`](/zh-CN/cli/mcp) |
-| 健康和会话 | [`status`](/zh-CN/cli/status) · [`health`](/zh-CN/cli/health) · [`sessions`](/zh-CN/cli/sessions) |
+| 健康状态和会话 | [`status`](/zh-CN/cli/status) · [`health`](/zh-CN/cli/health) · [`sessions`](/zh-CN/cli/sessions) |
 | Gateway 网关和日志 | [`gateway`](/zh-CN/cli/gateway) · [`logs`](/zh-CN/cli/logs) · [`system`](/zh-CN/cli/system) |
 | 模型和推理 | [`models`](/zh-CN/cli/models) · [`infer`](/zh-CN/cli/infer) · `capability`（[`infer`](/zh-CN/cli/infer) 的别名） · [`memory`](/zh-CN/cli/memory) · [`wiki`](/zh-CN/cli/wiki) |
 | 网络和节点 | [`directory`](/zh-CN/cli/directory) · [`nodes`](/zh-CN/cli/nodes) · [`devices`](/zh-CN/cli/devices) · [`node`](/zh-CN/cli/node) |
@@ -31,28 +31,28 @@ x-i18n:
 | 设备发现和文档 | [`dns`](/zh-CN/cli/dns) · [`docs`](/zh-CN/cli/docs) |
 | 配对和渠道 | [`pairing`](/zh-CN/cli/pairing) · [`qr`](/zh-CN/cli/qr) · [`channels`](/zh-CN/cli/channels) |
 | 安全和插件 | [`security`](/zh-CN/cli/security) · [`secrets`](/zh-CN/cli/secrets) · [`skills`](/zh-CN/cli/skills) · [`plugins`](/zh-CN/cli/plugins) · [`proxy`](/zh-CN/cli/proxy) |
-| 旧版别名 | [`daemon`](/zh-CN/cli/daemon)（gateway 服务） · [`clawbot`](/zh-CN/cli/clawbot)（命名空间） |
-| 插件（可选） | [`voicecall`](/zh-CN/cli/voicecall)（如已安装） |
+| 旧版别名 | [`daemon`](/zh-CN/cli/daemon)（Gateway 网关服务） · [`clawbot`](/zh-CN/cli/clawbot)（命名空间） |
+| 插件（可选） | [`voicecall`](/zh-CN/cli/voicecall)（如果已安装） |
 
 ## 全局标志
 
 | 标志 | 用途 |
 | ----------------------- | --------------------------------------------------------------------- |
-| `--dev` | 将状态隔离到 `~/.openclaw-dev` 下，并切换默认端口 |
-| `--profile <name>` | 将状态隔离到 `~/.openclaw-<name>` 下 |
-| `--container <name>` | 将执行目标指向指定容器 |
+| `--dev` | 将状态隔离在 `~/.openclaw-dev` 下，并切换默认端口 |
+| `--profile <name>` | 将状态隔离在 `~/.openclaw-<name>` 下 |
+| `--container <name>` | 将执行目标指定为某个已命名容器 |
 | `--no-color` | 禁用 ANSI 颜色（也支持 `NO_COLOR=1`） |
-| `--update` | [`openclaw update`](/zh-CN/cli/update) 的简写（仅源代码安装） |
+| `--update` | [`openclaw update`](/zh-CN/cli/update) 的简写形式（仅适用于源码安装） |
 | `-V`, `--version`, `-v` | 打印版本并退出 |
 
 ## 输出模式
 
 - ANSI 颜色和进度指示器仅在 TTY 会话中渲染。
 - OSC-8 超链接会在支持时渲染为可点击链接；否则 CLI 会回退为普通 URL。
-- `--json`（以及支持时的 `--plain`）会禁用样式，以获得干净的输出。
-- 长时间运行的命令会显示进度指示器（支持时使用 OSC 9;4）。
+- `--json`（以及在支持时的 `--plain`）会禁用样式，以获得干净的输出。
+- 长时间运行的命令会显示进度指示器（在支持时使用 OSC 9;4）。
 
-调色板单一真相源：`src/terminal/palette.ts`。
+调色板的唯一可信来源：`src/terminal/palette.ts`。
 
 ## 命令树
 
@@ -60,6 +60,7 @@ x-i18n:
 
 ```
 openclaw [--dev] [--profile <name>] <command>
+  crestodian
   setup
   onboard
   configure
@@ -349,26 +350,26 @@ openclaw [--dev] [--profile <name>] <command>
   terminal (alias: tui --local)
 ```
 
-插件可以添加额外的顶层命令（例如 `openclaw voicecall`）。
+插件可以添加额外的顶级命令（例如 `openclaw voicecall`）。
 
 </Accordion>
 
 ## 聊天斜杠命令
 
-聊天消息支持 `/...` 命令。请参阅[斜杠命令](/zh-CN/tools/slash-commands)。
+聊天消息支持 `/...` 命令。请参阅 [斜杠命令](/zh-CN/tools/slash-commands)。
 
 重点包括：
 
 - `/status` — 快速诊断。
-- `/trace` — 会话级插件 trace/debug 行。
-- `/config` — 持久化配置更改。
-- `/debug` — 仅运行时配置覆盖（仅内存，不写磁盘；需要 `commands.debug: true`）。
+- `/trace` — 会话范围内的插件追踪/调试行。
+- `/config` — 持久化的配置更改。
+- `/debug` — 仅运行时的配置覆盖（保存在内存中，不写入磁盘；需要 `commands.debug: true`）。
 
 ## 用量跟踪
 
-当 OAuth/API 凭证可用时，`openclaw status --usage` 和控制 UI 会显示提供商用量/配额。数据直接来自提供商用量端点，并规范化为 `X% left`。当前具有用量窗口的提供商包括：Anthropic、GitHub Copilot、Gemini CLI、OpenAI Codex、MiniMax、小米和 z.ai。
+当 OAuth/API 凭证可用时，`openclaw status --usage` 和 Control UI 会显示提供商的用量/配额。数据直接来自提供商的用量端点，并被标准化为 `X% left`。当前支持用量窗口的提供商有：Anthropic、GitHub Copilot、Gemini CLI、OpenAI Codex、MiniMax、Xiaomi 和 z.ai。
 
-详情请参阅[用量跟踪](/zh-CN/concepts/usage-tracking)。
+详见 [用量跟踪](/zh-CN/concepts/usage-tracking)。
 
 ## 相关内容
 
