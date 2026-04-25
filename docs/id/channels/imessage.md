@@ -1,46 +1,44 @@
 ---
 read_when:
     - Menyiapkan dukungan iMessage
-    - Men-debug kirim/terima iMessage
-summary: Dukungan iMessage lama melalui imsg (JSON-RPC melalui stdio). Penyiapan baru sebaiknya menggunakan BlueBubbles.
+    - Men-debug pengiriman/penerimaan iMessage
+summary: Dukungan iMessage lama melalui imsg (JSON-RPC melalui stdio). Pengaturan baru sebaiknya menggunakan BlueBubbles.
 title: iMessage
 x-i18n:
-    generated_at: "2026-04-24T08:58:09Z"
+    generated_at: "2026-04-25T13:41:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ff2773ebcfced8834bc5d28378d9a6e3c20826cc0e08d6ea5480f8a5975fd8e3
+    source_hash: 4b693b222ab60fe9fee8be47ec4b347ba126f11558888d336220e39425023dcd
     source_path: channels/imessage.md
     workflow: 15
 ---
 
-# iMessage (lama: imsg)
-
 <Warning>
 Untuk deployment iMessage baru, gunakan <a href="/id/channels/bluebubbles">BlueBubbles</a>.
 
-Integrasi `imsg` adalah lama dan mungkin akan dihapus pada rilis mendatang.
+Integrasi `imsg` bersifat lama dan dapat dihapus pada rilis mendatang.
 </Warning>
 
-Status: integrasi CLI eksternal lama. Gateway menjalankan `imsg rpc` dan berkomunikasi melalui JSON-RPC di stdio (tanpa daemon/port terpisah).
+Status: integrasi CLI eksternal lama. Gateway menjalankan `imsg rpc` dan berkomunikasi melalui JSON-RPC pada stdio (tanpa daemon/port terpisah).
 
 <CardGroup cols={3}>
-  <Card title="BlueBubbles (recommended)" icon="message-circle" href="/id/channels/bluebubbles">
-    Jalur iMessage yang disarankan untuk penyiapan baru.
+  <Card title="BlueBubbles (disarankan)" icon="message-circle" href="/id/channels/bluebubbles">
+    Jalur iMessage yang dipilih untuk pengaturan baru.
   </Card>
   <Card title="Pairing" icon="link" href="/id/channels/pairing">
     DM iMessage secara default menggunakan mode pairing.
   </Card>
-  <Card title="Configuration reference" icon="settings" href="/id/gateway/config-channels#imessage">
-    Referensi field iMessage lengkap.
+  <Card title="Referensi konfigurasi" icon="settings" href="/id/gateway/config-channels#imessage">
+    Referensi lengkap field iMessage.
   </Card>
 </CardGroup>
 
-## Penyiapan cepat
+## Pengaturan cepat
 
 <Tabs>
-  <Tab title="Local Mac (fast path)">
+  <Tab title="Mac lokal (jalur cepat)">
     <Steps>
-      <Step title="Install and verify imsg">
+      <Step title="Instal dan verifikasi imsg">
 
 ```bash
 brew install steipete/tap/imsg
@@ -49,7 +47,7 @@ imsg rpc --help
 
       </Step>
 
-      <Step title="Configure OpenClaw">
+      <Step title="Konfigurasikan OpenClaw">
 
 ```json5
 {
@@ -65,7 +63,7 @@ imsg rpc --help
 
       </Step>
 
-      <Step title="Start gateway">
+      <Step title="Mulai gateway">
 
 ```bash
 openclaw gateway
@@ -73,7 +71,7 @@ openclaw gateway
 
       </Step>
 
-      <Step title="Approve first DM pairing (default dmPolicy)">
+      <Step title="Setujui pairing DM pertama (dmPolicy default)">
 
 ```bash
 openclaw pairing list imessage
@@ -86,15 +84,15 @@ openclaw pairing approve imessage <CODE>
 
   </Tab>
 
-  <Tab title="Remote Mac over SSH">
-    OpenClaw hanya memerlukan `cliPath` yang kompatibel dengan stdio, jadi Anda dapat mengarahkan `cliPath` ke skrip wrapper yang melakukan SSH ke Mac jarak jauh dan menjalankan `imsg`.
+  <Tab title="Mac jarak jauh melalui SSH">
+    OpenClaw hanya memerlukan `cliPath` yang kompatibel dengan stdio, jadi Anda dapat mengarahkan `cliPath` ke skrip pembungkus yang melakukan SSH ke Mac jarak jauh dan menjalankan `imsg`.
 
 ```bash
 #!/usr/bin/env bash
 exec ssh -T gateway-host imsg "$@"
 ```
 
-    Konfigurasi yang disarankan saat lampiran diaktifkan:
+    Konfigurasi yang direkomendasikan saat lampiran diaktifkan:
 
 ```json5
 {
@@ -104,7 +102,7 @@ exec ssh -T gateway-host imsg "$@"
       cliPath: "~/.openclaw/scripts/imsg-ssh",
       remoteHost: "user@gateway-host", // digunakan untuk pengambilan lampiran SCP
       includeAttachments: true,
-      // Opsional: override root lampiran yang diizinkan.
+      // Opsional: ganti root lampiran yang diizinkan.
       // Default mencakup /Users/*/Library/Messages/Attachments
       attachmentRoots: ["/Users/*/Library/Messages/Attachments"],
       remoteAttachmentRoots: ["/Users/*/Library/Messages/Attachments"],
@@ -113,9 +111,9 @@ exec ssh -T gateway-host imsg "$@"
 }
 ```
 
-    Jika `remoteHost` tidak disetel, OpenClaw mencoba mendeteksinya secara otomatis dengan mem-parse skrip wrapper SSH.
+    Jika `remoteHost` tidak diatur, OpenClaw mencoba mendeteksinya secara otomatis dengan mem-parse skrip pembungkus SSH.
     `remoteHost` harus berupa `host` atau `user@host` (tanpa spasi atau opsi SSH).
-    OpenClaw menggunakan pemeriksaan host-key yang ketat untuk SCP, jadi host key relay harus sudah ada di `~/.ssh/known_hosts`.
+    OpenClaw menggunakan pemeriksaan host-key ketat untuk SCP, jadi host key relay harus sudah ada di `~/.ssh/known_hosts`.
     Path lampiran divalidasi terhadap root yang diizinkan (`attachmentRoots` / `remoteAttachmentRoots`).
 
   </Tab>
@@ -128,7 +126,7 @@ exec ssh -T gateway-host imsg "$@"
 - Izin Automation diperlukan untuk mengirim pesan melalui Messages.app.
 
 <Tip>
-Izin diberikan per konteks proses. Jika gateway berjalan tanpa antarmuka (LaunchAgent/SSH), jalankan perintah interaktif satu kali dalam konteks yang sama untuk memicu prompt:
+Izin diberikan per konteks proses. Jika gateway berjalan secara headless (LaunchAgent/SSH), jalankan perintah interaktif satu kali dalam konteks yang sama untuk memicu prompt:
 
 ```bash
 imsg chats --limit 1
@@ -141,7 +139,7 @@ imsg send <handle> "test"
 ## Kontrol akses dan perutean
 
 <Tabs>
-  <Tab title="DM policy">
+  <Tab title="Kebijakan DM">
     `channels.imessage.dmPolicy` mengontrol pesan langsung:
 
     - `pairing` (default)
@@ -155,7 +153,7 @@ imsg send <handle> "test"
 
   </Tab>
 
-  <Tab title="Group policy + mentions">
+  <Tab title="Kebijakan grup + mention">
     `channels.imessage.groupPolicy` mengontrol penanganan grup:
 
     - `allowlist` (default saat dikonfigurasi)
@@ -164,29 +162,29 @@ imsg send <handle> "test"
 
     Allowlist pengirim grup: `channels.imessage.groupAllowFrom`.
 
-    Fallback runtime: jika `groupAllowFrom` tidak disetel, pemeriksaan pengirim grup iMessage akan fallback ke `allowFrom` jika tersedia.
-    Catatan runtime: jika `channels.imessage` sama sekali tidak ada, runtime fallback ke `groupPolicy="allowlist"` dan mencatat peringatan (bahkan jika `channels.defaults.groupPolicy` disetel).
+    Fallback runtime: jika `groupAllowFrom` tidak diatur, pemeriksaan pengirim grup iMessage akan fallback ke `allowFrom` jika tersedia.
+    Catatan runtime: jika `channels.imessage` tidak ada sama sekali, runtime fallback ke `groupPolicy="allowlist"` dan mencatat peringatan (bahkan jika `channels.defaults.groupPolicy` diatur).
 
     Pembatasan mention untuk grup:
 
     - iMessage tidak memiliki metadata mention bawaan
     - deteksi mention menggunakan pola regex (`agents.list[].groupChat.mentionPatterns`, fallback `messages.groupChat.mentionPatterns`)
-    - tanpa pola yang dikonfigurasi, pembatasan mention tidak dapat diterapkan
+    - tanpa pola yang dikonfigurasi, pembatasan mention tidak dapat ditegakkan
 
     Perintah kontrol dari pengirim yang diotorisasi dapat melewati pembatasan mention di grup.
 
   </Tab>
 
-  <Tab title="Sessions and deterministic replies">
+  <Tab title="Sesi dan balasan deterministik">
     - DM menggunakan perutean langsung; grup menggunakan perutean grup.
     - Dengan `session.dmScope=main` default, DM iMessage digabungkan ke sesi utama agen.
     - Sesi grup diisolasi (`agent:<agentId>:imessage:group:<chat_id>`).
     - Balasan dirutekan kembali ke iMessage menggunakan metadata saluran/target asal.
 
-    Perilaku thread mirip grup:
+    Perilaku utas mirip grup:
 
-    Beberapa thread iMessage multi-peserta dapat masuk dengan `is_group=false`.
-    Jika `chat_id` itu secara eksplisit dikonfigurasi di bawah `channels.imessage.groups`, OpenClaw memperlakukannya sebagai lalu lintas grup (pembatasan grup + isolasi sesi grup).
+    Beberapa utas iMessage dengan banyak peserta dapat masuk dengan `is_group=false`.
+    Jika `chat_id` tersebut secara eksplisit dikonfigurasi di bawah `channels.imessage.groups`, OpenClaw memperlakukannya sebagai lalu lintas grup (pembatasan grup + isolasi sesi grup).
 
   </Tab>
 </Tabs>
@@ -198,11 +196,11 @@ Chat iMessage lama juga dapat diikat ke sesi ACP.
 Alur operator cepat:
 
 - Jalankan `/acp spawn codex --bind here` di dalam DM atau chat grup yang diizinkan.
-- Pesan berikutnya dalam percakapan iMessage yang sama akan dirutekan ke sesi ACP yang dihasilkan.
+- Pesan berikutnya dalam percakapan iMessage yang sama akan dirutekan ke sesi ACP yang dibuat.
 - `/new` dan `/reset` mereset sesi ACP terikat yang sama di tempat.
 - `/acp close` menutup sesi ACP dan menghapus binding.
 
-Binding persisten yang dikonfigurasi didukung melalui entri tingkat atas `bindings[]` dengan `type: "acp"` dan `match.channel: "imessage"`.
+Binding persisten yang dikonfigurasi didukung melalui entri `bindings[]` tingkat atas dengan `type: "acp"` dan `match.channel: "imessage"`.
 
 `match.peer.id` dapat menggunakan:
 
@@ -241,32 +239,32 @@ Contoh:
 }
 ```
 
-Lihat [ACP Agents](/id/tools/acp-agents) untuk perilaku binding ACP bersama.
+Lihat [Agen ACP](/id/tools/acp-agents) untuk perilaku binding ACP bersama.
 
 ## Pola deployment
 
 <AccordionGroup>
-  <Accordion title="Dedicated bot macOS user (separate iMessage identity)">
-    Gunakan Apple ID dan pengguna macOS bot khusus agar lalu lintas bot terpisah dari profil Messages pribadi Anda.
+  <Accordion title="Pengguna bot macOS khusus (identitas iMessage terpisah)">
+    Gunakan Apple ID dan pengguna macOS khusus agar lalu lintas bot terpisah dari profil Messages pribadi Anda.
 
     Alur umum:
 
-    1. Buat/masuk ke pengguna macOS khusus.
+    1. Buat/masuk dengan pengguna macOS khusus.
     2. Masuk ke Messages dengan Apple ID bot pada pengguna tersebut.
     3. Instal `imsg` pada pengguna tersebut.
-    4. Buat wrapper SSH agar OpenClaw dapat menjalankan `imsg` dalam konteks pengguna tersebut.
+    4. Buat pembungkus SSH agar OpenClaw dapat menjalankan `imsg` dalam konteks pengguna tersebut.
     5. Arahkan `channels.imessage.accounts.<id>.cliPath` dan `.dbPath` ke profil pengguna tersebut.
 
-    Eksekusi pertama mungkin memerlukan persetujuan GUI (Automation + Full Disk Access) di sesi pengguna bot tersebut.
+    Proses pertama kali mungkin memerlukan persetujuan GUI (Automation + Full Disk Access) di sesi pengguna bot tersebut.
 
   </Accordion>
 
-  <Accordion title="Remote Mac over Tailscale (example)">
+  <Accordion title="Mac jarak jauh melalui Tailscale (contoh)">
     Topologi umum:
 
     - gateway berjalan di Linux/VM
     - iMessage + `imsg` berjalan di Mac dalam tailnet Anda
-    - wrapper `cliPath` menggunakan SSH untuk menjalankan `imsg`
+    - pembungkus `cliPath` menggunakan SSH untuk menjalankan `imsg`
     - `remoteHost` mengaktifkan pengambilan lampiran SCP
 
     Contoh:
@@ -290,15 +288,15 @@ Lihat [ACP Agents](/id/tools/acp-agents) untuk perilaku binding ACP bersama.
 exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 ```
 
-    Gunakan kunci SSH agar SSH dan SCP sama-sama non-interaktif.
+    Gunakan SSH key agar SSH maupun SCP bersifat non-interaktif.
     Pastikan host key sudah dipercaya terlebih dahulu (misalnya `ssh bot@mac-mini.tailnet-1234.ts.net`) agar `known_hosts` terisi.
 
   </Accordion>
 
-  <Accordion title="Multi-account pattern">
+  <Accordion title="Pola multi-akun">
     iMessage mendukung konfigurasi per akun di bawah `channels.imessage.accounts`.
 
-    Setiap akun dapat meng-override field seperti `cliPath`, `dbPath`, `allowFrom`, `groupPolicy`, `mediaMaxMb`, pengaturan riwayat, dan allowlist root lampiran.
+    Setiap akun dapat mengganti field seperti `cliPath`, `dbPath`, `allowFrom`, `groupPolicy`, `mediaMaxMb`, pengaturan riwayat, dan allowlist root lampiran.
 
   </Accordion>
 </AccordionGroup>
@@ -306,28 +304,28 @@ exec ssh -T bot@mac-mini.tailnet-1234.ts.net imsg "$@"
 ## Media, chunking, dan target pengiriman
 
 <AccordionGroup>
-  <Accordion title="Attachments and media">
+  <Accordion title="Lampiran dan media">
     - ingest lampiran masuk bersifat opsional: `channels.imessage.includeAttachments`
-    - path lampiran jarak jauh dapat diambil melalui SCP saat `remoteHost` disetel
+    - path lampiran jarak jauh dapat diambil melalui SCP saat `remoteHost` diatur
     - path lampiran harus cocok dengan root yang diizinkan:
       - `channels.imessage.attachmentRoots` (lokal)
       - `channels.imessage.remoteAttachmentRoots` (mode SCP jarak jauh)
       - pola root default: `/Users/*/Library/Messages/Attachments`
-    - SCP menggunakan pemeriksaan host-key yang ketat (`StrictHostKeyChecking=yes`)
+    - SCP menggunakan pemeriksaan host-key ketat (`StrictHostKeyChecking=yes`)
     - ukuran media keluar menggunakan `channels.imessage.mediaMaxMb` (default 16 MB)
   </Accordion>
 
-  <Accordion title="Outbound chunking">
-    - batas potongan teks: `channels.imessage.textChunkLimit` (default 4000)
+  <Accordion title="Chunking keluar">
+    - batas chunk teks: `channels.imessage.textChunkLimit` (default 4000)
     - mode chunk: `channels.imessage.chunkMode`
       - `length` (default)
-      - `newline` (pemecahan dengan paragraf terlebih dahulu)
+      - `newline` (pemecahan dengan prioritas paragraf)
   </Accordion>
 
-  <Accordion title="Addressing formats">
+  <Accordion title="Format pengalamatan">
     Target eksplisit yang disarankan:
 
-    - `chat_id:123` (disarankan untuk perutean stabil)
+    - `chat_id:123` (disarankan untuk perutean yang stabil)
     - `chat_guid:...`
     - `chat_identifier:...`
 
@@ -344,9 +342,9 @@ imsg chats --limit 20
   </Accordion>
 </AccordionGroup>
 
-## Penulisan config
+## Penulisan konfigurasi
 
-iMessage mengizinkan penulisan config yang dimulai saluran secara default (untuk `/config set|unset` saat `commands.config: true`).
+iMessage mengizinkan penulisan konfigurasi yang diprakarsai saluran secara default (untuk `/config set|unset` saat `commands.config: true`).
 
 Nonaktifkan:
 
@@ -363,7 +361,7 @@ Nonaktifkan:
 ## Pemecahan masalah
 
 <AccordionGroup>
-  <Accordion title="imsg not found or RPC unsupported">
+  <Accordion title="imsg tidak ditemukan atau RPC tidak didukung">
     Validasi binary dan dukungan RPC:
 
 ```bash
@@ -375,7 +373,7 @@ openclaw channels status --probe
 
   </Accordion>
 
-  <Accordion title="DMs are ignored">
+  <Accordion title="DM diabaikan">
     Periksa:
 
     - `channels.imessage.dmPolicy`
@@ -384,7 +382,7 @@ openclaw channels status --probe
 
   </Accordion>
 
-  <Accordion title="Group messages are ignored">
+  <Accordion title="Pesan grup diabaikan">
     Periksa:
 
     - `channels.imessage.groupPolicy`
@@ -394,18 +392,18 @@ openclaw channels status --probe
 
   </Accordion>
 
-  <Accordion title="Remote attachments fail">
+  <Accordion title="Lampiran jarak jauh gagal">
     Periksa:
 
     - `channels.imessage.remoteHost`
     - `channels.imessage.remoteAttachmentRoots`
-    - autentikasi kunci SSH/SCP dari host gateway
+    - autentikasi key SSH/SCP dari host gateway
     - host key ada di `~/.ssh/known_hosts` pada host gateway
     - keterbacaan path jarak jauh pada Mac yang menjalankan Messages
 
   </Accordion>
 
-  <Accordion title="macOS permission prompts were missed">
+  <Accordion title="Prompt izin macOS terlewat">
     Jalankan ulang di terminal GUI interaktif dalam konteks pengguna/sesi yang sama dan setujui prompt:
 
 ```bash
@@ -413,15 +411,15 @@ imsg chats --limit 1
 imsg send <handle> "test"
 ```
 
-    Konfirmasikan Full Disk Access + Automation diberikan untuk konteks proses yang menjalankan OpenClaw/`imsg`.
+    Konfirmasikan bahwa Full Disk Access + Automation diberikan untuk konteks proses yang menjalankan OpenClaw/`imsg`.
 
   </Accordion>
 </AccordionGroup>
 
-## Petunjuk referensi konfigurasi
+## Penunjuk referensi konfigurasi
 
 - [Referensi konfigurasi - iMessage](/id/gateway/config-channels#imessage)
-- [Konfigurasi Gateway](/id/gateway/configuration)
+- [Konfigurasi gateway](/id/gateway/configuration)
 - [Pairing](/id/channels/pairing)
 - [BlueBubbles](/id/channels/bluebubbles)
 
@@ -429,6 +427,6 @@ imsg send <handle> "test"
 
 - [Ikhtisar Saluran](/id/channels) — semua saluran yang didukung
 - [Pairing](/id/channels/pairing) — autentikasi DM dan alur pairing
-- [Groups](/id/channels/groups) — perilaku chat grup dan pembatasan mention
+- [Grup](/id/channels/groups) — perilaku chat grup dan pembatasan mention
 - [Perutean Saluran](/id/channels/channel-routing) — perutean sesi untuk pesan
-- [Keamanan](/id/gateway/security) — model akses dan hardening
+- [Keamanan](/id/gateway/security) — model akses dan penguatan

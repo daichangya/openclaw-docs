@@ -1,47 +1,47 @@
 ---
 read_when:
-    - Menghubungkan Codex, Claude Code, atau klien MCP lain ke kanal yang didukung OpenClaw
+    - Menghubungkan Codex, Claude Code, atau klien MCP lain ke channel yang didukung OpenClaw
     - Menjalankan `openclaw mcp serve`
-    - Mengelola definisi server MCP tersimpan OpenClaw
-summary: Tampilkan percakapan kanal OpenClaw melalui MCP dan kelola definisi server MCP yang disimpan
+    - Mengelola definisi server MCP yang disimpan OpenClaw
+summary: Ekspos percakapan channel OpenClaw melalui MCP dan kelola definisi server MCP yang tersimpan
 title: MCP
 x-i18n:
-    generated_at: "2026-04-24T09:02:00Z"
+    generated_at: "2026-04-25T13:43:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b9df42ebc547f07698f84888d8cd6125340d0f0e02974a965670844589e1fbf8
+    source_hash: ca2a76d1dbca71b4048659c21ac7ff98a01cc6095f6baad67df5347f45cd32e6
     source_path: cli/mcp.md
     workflow: 15
 ---
 
-`openclaw mcp` memiliki dua fungsi:
+`openclaw mcp` memiliki dua tugas:
 
 - menjalankan OpenClaw sebagai server MCP dengan `openclaw mcp serve`
-- mengelola definisi server MCP keluar yang dimiliki OpenClaw dengan `list`, `show`,
+- mengelola definisi server MCP keluar milik OpenClaw dengan `list`, `show`,
   `set`, dan `unset`
 
 Dengan kata lain:
 
 - `serve` adalah OpenClaw yang bertindak sebagai server MCP
-- `list` / `show` / `set` / `unset` adalah OpenClaw yang bertindak sebagai registry
-  sisi klien MCP untuk server MCP lain yang runtime-nya mungkin digunakan nanti
+- `list` / `show` / `set` / `unset` adalah OpenClaw yang bertindak sebagai registri
+  sisi-klien MCP untuk server MCP lain yang nantinya mungkin digunakan runtime-nya
 
 Gunakan [`openclaw acp`](/id/cli/acp) ketika OpenClaw harus meng-host sesi coding harness
-itu sendiri dan merutekan runtime tersebut melalui ACP.
+sendiri dan merutekan runtime tersebut melalui ACP.
 
 ## OpenClaw sebagai server MCP
 
-Ini adalah jalur `openclaw mcp serve`.
+Ini adalah path `openclaw mcp serve`.
 
 ## Kapan menggunakan `serve`
 
 Gunakan `openclaw mcp serve` ketika:
 
 - Codex, Claude Code, atau klien MCP lain harus berbicara langsung dengan
-  percakapan kanal yang didukung OpenClaw
-- Anda sudah memiliki Gateway OpenClaw lokal atau remote dengan sesi yang sudah dirutekan
-- Anda menginginkan satu server MCP yang bekerja di seluruh backend kanal OpenClaw alih-alih
-  menjalankan bridge terpisah per kanal
+  percakapan channel yang didukung OpenClaw
+- Anda sudah memiliki Gateway OpenClaw lokal atau remote dengan sesi yang telah dirutekan
+- Anda menginginkan satu server MCP yang berfungsi di seluruh backend channel OpenClaw alih-alih
+  menjalankan bridge terpisah per channel
 
 Gunakan [`openclaw acp`](/id/cli/acp) sebagai gantinya ketika OpenClaw harus meng-host runtime
 coding itu sendiri dan mempertahankan sesi agen di dalam OpenClaw.
@@ -49,31 +49,34 @@ coding itu sendiri dan mempertahankan sesi agen di dalam OpenClaw.
 ## Cara kerjanya
 
 `openclaw mcp serve` memulai server MCP stdio. Klien MCP memiliki proses
-tersebut. Selama klien mempertahankan sesi stdio tetap terbuka, bridge terhubung ke
-Gateway OpenClaw lokal atau remote melalui WebSocket dan menampilkan percakapan kanal
-yang sudah dirutekan melalui MCP.
+tersebut. Selama klien mempertahankan sesi stdio itu tetap terbuka, bridge akan terhubung ke
+Gateway OpenClaw lokal atau remote melalui WebSocket dan mengekspos percakapan channel
+yang dirutekan melalui MCP.
 
 Siklus hidup:
 
-1. klien MCP menjalankan `openclaw mcp serve`
+1. klien MCP memunculkan `openclaw mcp serve`
 2. bridge terhubung ke Gateway
-3. sesi yang sudah dirutekan menjadi percakapan MCP dan tool transkrip/riwayat
-4. event live diantrikan di memori selama bridge terhubung
-5. jika mode kanal Claude diaktifkan, sesi yang sama juga dapat menerima
+3. sesi yang dirutekan menjadi percakapan MCP dan tool transkrip/riwayat
+4. peristiwa langsung diantrekan di memori selama bridge terhubung
+5. jika mode channel Claude diaktifkan, sesi yang sama juga dapat menerima
    notifikasi push khusus Claude
 
 Perilaku penting:
 
-- status antrean live dimulai saat bridge terhubung
+- status antrean langsung dimulai saat bridge terhubung
 - riwayat transkrip yang lebih lama dibaca dengan `messages_read`
 - notifikasi push Claude hanya ada selama sesi MCP masih hidup
-- ketika klien terputus, bridge keluar dan antrean live hilang
-- server MCP stdio yang dijalankan oleh OpenClaw (bawaan atau dikonfigurasi pengguna) akan
-  dimatikan sebagai pohon proses saat shutdown, sehingga subproses turunan yang dimulai oleh
+- saat klien terputus, bridge keluar dan antrean langsung hilang
+- titik masuk agen sekali jalan seperti `openclaw agent` dan
+  `openclaw infer model run` menghentikan runtime MCP bawaan apa pun yang mereka buka ketika
+  balasan selesai, sehingga proses skrip berulang tidak menumpuk proses anak MCP stdio
+- server MCP stdio yang diluncurkan oleh OpenClaw (bawaan atau dikonfigurasi pengguna) dimatikan
+  sebagai pohon proses saat shutdown, sehingga subproses anak yang dimulai oleh
   server tidak bertahan setelah klien stdio induk keluar
 - menghapus atau mereset sesi akan membuang klien MCP sesi tersebut melalui
-  jalur cleanup runtime bersama, sehingga tidak ada koneksi stdio yang tertinggal
-  terkait sesi yang dihapus
+  path pembersihan runtime bersama, sehingga tidak ada koneksi stdio yang tertinggal
+  yang terikat ke sesi yang dihapus
 
 ## Pilih mode klien
 
@@ -82,17 +85,16 @@ Gunakan bridge yang sama dengan dua cara berbeda:
 - Klien MCP generik: hanya tool MCP standar. Gunakan `conversations_list`,
   `messages_read`, `events_poll`, `events_wait`, `messages_send`, dan
   tool persetujuan.
-- Claude Code: tool MCP standar plus adaptor kanal khusus Claude.
+- Claude Code: tool MCP standar ditambah adaptor channel khusus Claude.
   Aktifkan `--claude-channel-mode on` atau biarkan default `auto`.
 
-Saat ini, `auto` berperilaku sama seperti `on`. Belum ada deteksi kapabilitas
-klien.
+Saat ini, `auto` berperilaku sama dengan `on`. Belum ada deteksi kemampuan klien.
 
-## Apa yang ditampilkan `serve`
+## Apa yang diekspos oleh `serve`
 
-Bridge menggunakan metadata route sesi Gateway yang sudah ada untuk menampilkan
-percakapan yang didukung kanal. Sebuah percakapan muncul ketika OpenClaw sudah memiliki status
-sesi dengan route yang diketahui seperti:
+Bridge menggunakan metadata rute sesi Gateway yang ada untuk mengekspos percakapan
+yang didukung channel. Percakapan akan muncul ketika OpenClaw sudah memiliki status sesi
+dengan rute yang diketahui seperti:
 
 - `channel`
 - metadata penerima atau tujuan
@@ -101,22 +103,22 @@ sesi dengan route yang diketahui seperti:
 
 Ini memberi klien MCP satu tempat untuk:
 
-- mencantumkan percakapan yang baru saja dirutekan
+- mencantumkan percakapan yang baru-baru ini dirutekan
 - membaca riwayat transkrip terbaru
-- menunggu event inbound baru
-- mengirim balasan kembali melalui route yang sama
+- menunggu peristiwa masuk baru
+- mengirim balasan kembali melalui rute yang sama
 - melihat permintaan persetujuan yang tiba saat bridge terhubung
 
 ## Penggunaan
 
 ```bash
-# Gateway Lokal
+# Gateway lokal
 openclaw mcp serve
 
-# Gateway Remote
+# Gateway remote
 openclaw mcp serve --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
 
-# Gateway remote dengan autentikasi password
+# Gateway remote dengan auth password
 openclaw mcp serve --url wss://gateway-host:18789 --password-file ~/.openclaw/gateway.password
 
 # Aktifkan log bridge verbose
@@ -128,7 +130,7 @@ openclaw mcp serve --claude-channel-mode off
 
 ## Tool bridge
 
-Bridge saat ini menampilkan tool MCP berikut:
+Bridge saat ini mengekspos tool MCP berikut:
 
 - `conversations_list`
 - `conversation_get`
@@ -142,7 +144,7 @@ Bridge saat ini menampilkan tool MCP berikut:
 
 ### `conversations_list`
 
-Mencantumkan percakapan berbasis sesi terbaru yang sudah memiliki metadata route di
+Mencantumkan percakapan terbaru yang didukung sesi yang sudah memiliki metadata rute di
 status sesi Gateway.
 
 Filter yang berguna:
@@ -159,53 +161,52 @@ Mengembalikan satu percakapan berdasarkan `session_key`.
 
 ### `messages_read`
 
-Membaca pesan transkrip terbaru untuk satu percakapan berbasis sesi.
+Membaca pesan transkrip terbaru untuk satu percakapan yang didukung sesi.
 
 ### `attachments_fetch`
 
 Mengekstrak blok konten pesan non-teks dari satu pesan transkrip. Ini adalah
-tampilan metadata atas konten transkrip, bukan penyimpanan blob lampiran tahan lama
-yang berdiri sendiri.
+tampilan metadata atas konten transkrip, bukan penyimpanan blob lampiran mandiri yang tahan lama.
 
 ### `events_poll`
 
-Membaca event live yang diantrikan sejak kursor numerik.
+Membaca peristiwa langsung yang diantrekan sejak kursor numerik.
 
 ### `events_wait`
 
-Long-poll hingga event yang cocok berikutnya tiba atau timeout berakhir.
+Long-poll sampai peristiwa antrean berikutnya yang cocok tiba atau timeout berakhir.
 
-Gunakan ini ketika klien MCP generik memerlukan pengiriman mendekati real-time tanpa
+Gunakan ini saat klien MCP generik memerlukan pengiriman hampir real-time tanpa
 protokol push khusus Claude.
 
 ### `messages_send`
 
-Mengirim teks kembali melalui route yang sama yang sudah direkam pada sesi.
+Mengirim teks kembali melalui rute yang sama yang sudah tercatat pada sesi.
 
 Perilaku saat ini:
 
-- memerlukan route percakapan yang sudah ada
-- menggunakan kanal sesi, penerima, account id, dan thread id sesi
+- memerlukan rute percakapan yang sudah ada
+- menggunakan channel sesi, penerima, ID akun, dan ID thread
 - hanya mengirim teks
 
 ### `permissions_list_open`
 
-Mencantumkan permintaan persetujuan exec/Plugin tertunda yang telah diamati bridge sejak
+Mencantumkan permintaan persetujuan exec/plugin yang masih tertunda yang diamati bridge sejak
 terhubung ke Gateway.
 
 ### `permissions_respond`
 
-Menyelesaikan satu permintaan persetujuan exec/Plugin tertunda dengan:
+Menyelesaikan satu permintaan persetujuan exec/plugin tertunda dengan:
 
 - `allow-once`
 - `allow-always`
 - `deny`
 
-## Model event
+## Model peristiwa
 
-Bridge mempertahankan antrean event di memori selama bridge terhubung.
+Bridge menyimpan antrean peristiwa di memori selama terhubung.
 
-Jenis event saat ini:
+Jenis peristiwa saat ini:
 
 - `message`
 - `exec_approval_requested`
@@ -216,24 +217,24 @@ Jenis event saat ini:
 
 Batasan penting:
 
-- antrean hanya live; dimulai saat bridge MCP dimulai
-- `events_poll` dan `events_wait` tidak memutar ulang riwayat Gateway yang lebih lama
+- antrean bersifat live-only; dimulai saat bridge MCP dimulai
+- `events_poll` dan `events_wait` tidak memutar ulang riwayat Gateway lama
   dengan sendirinya
 - backlog tahan lama sebaiknya dibaca dengan `messages_read`
 
-## Notifikasi kanal Claude
+## Notifikasi channel Claude
 
-Bridge juga dapat menampilkan notifikasi kanal khusus Claude. Ini adalah
-padanan OpenClaw untuk adaptor kanal Claude Code: tool MCP standar tetap
-tersedia, tetapi pesan inbound live juga dapat tiba sebagai notifikasi MCP khusus Claude.
+Bridge juga dapat mengekspos notifikasi channel khusus Claude. Ini adalah
+padanan OpenClaw untuk adaptor channel Claude Code: tool MCP standar tetap
+tersedia, tetapi pesan masuk langsung juga dapat tiba sebagai notifikasi MCP khusus Claude.
 
 Flag:
 
 - `--claude-channel-mode off`: hanya tool MCP standar
-- `--claude-channel-mode on`: aktifkan notifikasi kanal Claude
-- `--claude-channel-mode auto`: default saat ini; perilaku bridge sama seperti `on`
+- `--claude-channel-mode on`: aktifkan notifikasi channel Claude
+- `--claude-channel-mode auto`: default saat ini; perilaku bridge sama dengan `on`
 
-Saat mode kanal Claude diaktifkan, server mengiklankan kapabilitas eksperimental Claude
+Saat mode channel Claude diaktifkan, server mengiklankan kemampuan eksperimental Claude
 dan dapat memancarkan:
 
 - `notifications/claude/channel`
@@ -241,15 +242,15 @@ dan dapat memancarkan:
 
 Perilaku bridge saat ini:
 
-- pesan transkrip inbound `user` diteruskan sebagai
+- pesan transkrip `user` masuk diteruskan sebagai
   `notifications/claude/channel`
 - permintaan izin Claude yang diterima melalui MCP dilacak di memori
-- jika percakapan tertaut kemudian mengirim `yes abcde` atau `no abcde`, bridge
-  mengonversinya menjadi `notifications/claude/channel/permission`
-- notifikasi ini hanya berlaku untuk sesi live; jika klien MCP terputus,
+- jika percakapan yang tertaut kemudian mengirim `yes abcde` atau `no abcde`, bridge
+  mengubahnya menjadi `notifications/claude/channel/permission`
+- notifikasi ini hanya untuk sesi langsung; jika klien MCP terputus,
   tidak ada target push
 
-Ini sengaja bersifat khusus klien. Klien MCP generik harus mengandalkan
+Ini sengaja dibuat khusus klien. Klien MCP generik sebaiknya mengandalkan
 tool polling standar.
 
 ## Konfigurasi klien MCP
@@ -274,7 +275,7 @@ Contoh konfigurasi klien stdio:
 }
 ```
 
-Untuk sebagian besar klien MCP generik, mulai dengan permukaan tool standar dan abaikan
+Untuk sebagian besar klien MCP generik, mulailah dengan permukaan tool standar dan abaikan
 mode Claude. Aktifkan mode Claude hanya untuk klien yang benar-benar memahami
 metode notifikasi khusus Claude.
 
@@ -288,31 +289,31 @@ metode notifikasi khusus Claude.
 - `--password <password>`: password Gateway
 - `--password-file <path>`: baca password dari file
 - `--claude-channel-mode <auto|on|off>`: mode notifikasi Claude
-- `-v`, `--verbose`: log verbose ke stderr
+- `-v`, `--verbose`: log verbose di stderr
 
-Gunakan `--token-file` atau `--password-file` daripada secret inline jika memungkinkan.
+Utamakan `--token-file` atau `--password-file` dibanding secret inline jika memungkinkan.
 
 ## Keamanan dan batas kepercayaan
 
-Bridge tidak menciptakan routing. Bridge hanya menampilkan percakapan yang
-sudah diketahui Gateway cara merutekannya.
+Bridge tidak menciptakan perutean. Ia hanya mengekspos percakapan yang sudah
+diketahui Gateway cara merutekannya.
 
 Artinya:
 
-- allowlist pengirim, pairing, dan kepercayaan tingkat kanal tetap menjadi
-  bagian dari konfigurasi kanal OpenClaw yang mendasarinya
-- `messages_send` hanya dapat membalas melalui route tersimpan yang sudah ada
-- status persetujuan hanya live/di memori untuk sesi bridge saat ini
-- autentikasi bridge harus menggunakan kontrol token atau password Gateway yang sama seperti yang Anda
-  percaya untuk klien Gateway remote lainnya
+- allowlist pengirim, pairing, dan kepercayaan tingkat channel tetap menjadi bagian
+  dari konfigurasi channel OpenClaw yang mendasarinya
+- `messages_send` hanya dapat membalas melalui rute tersimpan yang sudah ada
+- status persetujuan hanya bersifat live/in-memory untuk sesi bridge saat ini
+- auth bridge sebaiknya menggunakan kontrol token atau password Gateway yang sama seperti yang Anda
+  percayai untuk klien Gateway remote lainnya
 
-Jika suatu percakapan tidak ada di `conversations_list`, penyebab biasanya bukan
-konfigurasi MCP. Penyebabnya adalah metadata route yang hilang atau tidak lengkap pada sesi
-Gateway yang mendasarinya.
+Jika percakapan tidak ada di `conversations_list`, penyebab biasanya bukan
+konfigurasi MCP. Penyebabnya adalah metadata rute yang hilang atau tidak lengkap di
+sesi Gateway yang mendasarinya.
 
 ## Pengujian
 
-OpenClaw menyediakan smoke Docker deterministik untuk bridge ini:
+OpenClaw menyertakan smoke Docker deterministik untuk bridge ini:
 
 ```bash
 pnpm test:docker:mcp-channels
@@ -320,15 +321,14 @@ pnpm test:docker:mcp-channels
 
 Smoke tersebut:
 
-- memulai container Gateway yang sudah diseed
-- memulai container kedua yang menjalankan `openclaw mcp serve`
+- memulai container Gateway yang telah diberi seed
+- memulai container kedua yang memunculkan `openclaw mcp serve`
 - memverifikasi penemuan percakapan, pembacaan transkrip, pembacaan metadata lampiran,
-  perilaku antrean event live, dan routing pengiriman keluar
-- memvalidasi notifikasi kanal dan izin bergaya Claude melalui bridge MCP stdio
-  yang nyata
+  perilaku antrean peristiwa langsung, dan perutean pengiriman keluar
+- memvalidasi notifikasi channel dan izin bergaya Claude melalui bridge MCP stdio yang nyata
 
 Ini adalah cara tercepat untuk membuktikan bridge berfungsi tanpa menghubungkan akun
-Telegram, Discord, atau iMessage nyata ke dalam test run.
+Telegram, Discord, atau iMessage nyata ke proses pengujian.
 
 Untuk konteks pengujian yang lebih luas, lihat [Testing](/id/help/testing).
 
@@ -336,14 +336,14 @@ Untuk konteks pengujian yang lebih luas, lihat [Testing](/id/help/testing).
 
 ### Tidak ada percakapan yang dikembalikan
 
-Biasanya berarti sesi Gateway belum dapat dirutekan. Pastikan bahwa sesi
-yang mendasarinya memiliki metadata route channel/provider, penerima, dan
-account/thread opsional yang tersimpan.
+Biasanya berarti sesi Gateway belum dapat dirutekan. Pastikan sesi yang
+mendasari sudah menyimpan metadata rute channel/provider, penerima, dan
+akun/thread opsional.
 
 ### `events_poll` atau `events_wait` melewatkan pesan lama
 
-Ini memang diharapkan. Antrean live dimulai saat bridge terhubung. Baca riwayat transkrip
-yang lebih lama dengan `messages_read`.
+Ini memang diharapkan. Antrean langsung dimulai saat bridge terhubung. Baca riwayat
+transkrip lama dengan `messages_read`.
 
 ### Notifikasi Claude tidak muncul
 
@@ -352,40 +352,43 @@ Periksa semua hal berikut:
 - klien mempertahankan sesi MCP stdio tetap terbuka
 - `--claude-channel-mode` adalah `on` atau `auto`
 - klien benar-benar memahami metode notifikasi khusus Claude
-- pesan inbound terjadi setelah bridge terhubung
+- pesan masuk terjadi setelah bridge terhubung
 
-### Persetujuan tidak ada
+### Persetujuan tidak muncul
 
 `permissions_list_open` hanya menampilkan permintaan persetujuan yang diamati saat bridge
 terhubung. Ini bukan API riwayat persetujuan yang tahan lama.
 
-## OpenClaw sebagai registry klien MCP
+## OpenClaw sebagai registri klien MCP
 
-Ini adalah jalur `openclaw mcp list`, `show`, `set`, dan `unset`.
+Ini adalah path `openclaw mcp list`, `show`, `set`, dan `unset`.
 
-Perintah-perintah ini tidak menampilkan OpenClaw melalui MCP. Perintah-perintah ini mengelola definisi server MCP
-yang dimiliki OpenClaw di bawah `mcp.servers` dalam konfigurasi OpenClaw.
+Perintah-perintah ini tidak mengekspos OpenClaw melalui MCP. Perintah ini mengelola definisi server MCP
+milik OpenClaw di bawah `mcp.servers` dalam konfigurasi OpenClaw.
 
-Definisi yang disimpan tersebut ditujukan untuk runtime yang dijalankan atau dikonfigurasi
-OpenClaw nanti, seperti Pi tertanam dan adaptor runtime lainnya. OpenClaw menyimpan
-definisi secara terpusat sehingga runtime tersebut tidak perlu menyimpan daftar server
-MCP duplikat sendiri.
+Definisi yang disimpan tersebut ditujukan untuk runtime yang akan diluncurkan atau dikonfigurasi OpenClaw
+nantinya, seperti Pi tersemat dan adaptor runtime lainnya. OpenClaw menyimpan
+definisi tersebut secara terpusat agar runtime tersebut tidak perlu menyimpan daftar server
+MCP duplikat mereka sendiri.
 
 Perilaku penting:
 
-- perintah-perintah ini hanya membaca atau menulis konfigurasi OpenClaw
-- perintah-perintah ini tidak terhubung ke server MCP target
-- perintah-perintah ini tidak memvalidasi apakah perintah, URL, atau transport remote
+- perintah ini hanya membaca atau menulis konfigurasi OpenClaw
+- perintah ini tidak terhubung ke server MCP target
+- perintah ini tidak memvalidasi apakah perintah, URL, atau transport remote
   dapat dijangkau saat ini
-- adaptor runtime memutuskan bentuk transport mana yang benar-benar didukung pada
+- adaptor runtime memutuskan bentuk transport mana yang benar-benar mereka dukung saat
   waktu eksekusi
-- Pi tertanam menampilkan tool MCP yang dikonfigurasi dalam profil tool `coding` dan `messaging`
+- Pi tersemat mengekspos tool MCP yang dikonfigurasi dalam profil tool `coding` dan `messaging`
   normal; `minimal` tetap menyembunyikannya, dan `tools.deny: ["bundle-mcp"]`
   menonaktifkannya secara eksplisit
+- runtime MCP bawaan berskala sesi dipanen setelah `mcp.sessionIdleTtlMs`
+  milidetik waktu idle (default 10 menit; setel `0` untuk menonaktifkan) dan
+  proses tersemat sekali jalan membersihkannya saat akhir proses
 
-## Definisi server MCP tersimpan
+## Definisi server MCP yang disimpan
 
-OpenClaw juga menyimpan registry server MCP ringan dalam konfigurasi untuk permukaan
+OpenClaw juga menyimpan registri server MCP ringan dalam konfigurasi untuk permukaan
 yang menginginkan definisi MCP yang dikelola OpenClaw.
 
 Perintah:
@@ -398,8 +401,8 @@ Perintah:
 Catatan:
 
 - `list` mengurutkan nama server.
-- `show` tanpa nama mencetak objek server MCP yang dikonfigurasi secara lengkap.
-- `set` mengharapkan satu nilai objek JSON pada baris perintah.
+- `show` tanpa nama mencetak objek server MCP terkonfigurasi lengkap.
+- `set` mengharapkan satu nilai objek JSON di baris perintah.
 - `unset` gagal jika server bernama tersebut tidak ada.
 
 Contoh:
@@ -432,20 +435,20 @@ Contoh bentuk konfigurasi:
 
 ### Transport stdio
 
-Menjalankan proses anak lokal dan berkomunikasi melalui stdin/stdout.
+Meluncurkan proses anak lokal dan berkomunikasi melalui stdin/stdout.
 
-| Field                      | Deskripsi                            |
-| -------------------------- | ------------------------------------ |
-| `command`                  | Executable yang dijalankan (wajib)   |
-| `args`                     | Array argumen command-line           |
-| `env`                      | Variabel lingkungan tambahan         |
-| `cwd` / `workingDirectory` | Direktori kerja untuk proses tersebut |
+| Field                      | Deskripsi                        |
+| -------------------------- | -------------------------------- |
+| `command`                  | Executable yang akan dijalankan (wajib) |
+| `args`                     | Array argumen baris perintah     |
+| `env`                      | Variabel lingkungan tambahan     |
+| `cwd` / `workingDirectory` | Direktori kerja untuk proses     |
 
 #### Filter keamanan env stdio
 
-OpenClaw menolak key env startup interpreter yang dapat mengubah cara server MCP stdio dijalankan sebelum RPC pertama, meskipun key tersebut muncul dalam blok `env` server. Key yang diblokir mencakup `NODE_OPTIONS`, `PYTHONSTARTUP`, `PYTHONPATH`, `PERL5OPT`, `RUBYOPT`, `SHELLOPTS`, `PS4`, dan variabel kontrol runtime serupa. Startup menolak key-key ini dengan error konfigurasi agar key tersebut tidak dapat menyuntikkan prelude implisit, menukar interpreter, atau mengaktifkan debugger terhadap proses stdio. Env var biasa untuk kredensial, proxy, dan spesifik server (`GITHUB_TOKEN`, `HTTP_PROXY`, `*_API_KEY` kustom, dll.) tidak terpengaruh.
+OpenClaw menolak key env startup interpreter yang dapat mengubah cara server MCP stdio dimulai sebelum RPC pertama, bahkan jika key tersebut muncul di blok `env` milik server. Key yang diblokir mencakup `NODE_OPTIONS`, `PYTHONSTARTUP`, `PYTHONPATH`, `PERL5OPT`, `RUBYOPT`, `SHELLOPTS`, `PS4`, dan variabel kontrol runtime serupa. Startup menolak key-key ini dengan error konfigurasi sehingga key tersebut tidak dapat menyisipkan prelude implisit, menukar interpreter, atau mengaktifkan debugger terhadap proses stdio. Variabel env kredensial, proxy, dan khusus server biasa (`GITHUB_TOKEN`, `HTTP_PROXY`, `*_API_KEY` kustom, dll.) tidak terpengaruh.
 
-Jika server MCP Anda benar-benar memerlukan salah satu variabel yang diblokir, setel variabel itu pada proses host gateway, bukan di bawah `env` server stdio.
+Jika server MCP Anda benar-benar memerlukan salah satu variabel yang diblokir, setel variabel tersebut pada proses host gateway alih-alih di bawah `env` server stdio.
 
 ### Transport SSE / HTTP
 
@@ -454,7 +457,7 @@ Terhubung ke server MCP remote melalui HTTP Server-Sent Events.
 | Field                 | Deskripsi                                                            |
 | --------------------- | -------------------------------------------------------------------- |
 | `url`                 | URL HTTP atau HTTPS dari server remote (wajib)                       |
-| `headers`             | Peta key-value opsional dari header HTTP (misalnya token autentikasi) |
+| `headers`             | Peta key-value opsional dari header HTTP (misalnya token auth)       |
 | `connectionTimeoutMs` | Timeout koneksi per server dalam ms (opsional)                       |
 
 Contoh:
@@ -477,16 +480,16 @@ Contoh:
 Nilai sensitif dalam `url` (userinfo) dan `headers` disamarkan dalam log dan
 output status.
 
-### Transport HTTP streaming
+### Transport Streamable HTTP
 
-`streamable-http` adalah opsi transport tambahan selain `sse` dan `stdio`. Transport ini menggunakan streaming HTTP untuk komunikasi dua arah dengan server MCP remote.
+`streamable-http` adalah opsi transport tambahan selain `sse` dan `stdio`. Ini menggunakan HTTP streaming untuk komunikasi dua arah dengan server MCP remote.
 
-| Field                 | Deskripsi                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------- |
-| `url`                 | URL HTTP atau HTTPS dari server remote (wajib)                                           |
+| Field                 | Deskripsi                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| `url`                 | URL HTTP atau HTTPS dari server remote (wajib)                                              |
 | `transport`           | Setel ke `"streamable-http"` untuk memilih transport ini; jika dihilangkan, OpenClaw menggunakan `sse` |
-| `headers`             | Peta key-value opsional dari header HTTP (misalnya token autentikasi)                    |
-| `connectionTimeoutMs` | Timeout koneksi per server dalam ms (opsional)                                           |
+| `headers`             | Peta key-value opsional dari header HTTP (misalnya token auth)                              |
+| `connectionTimeoutMs` | Timeout koneksi per server dalam ms (opsional)                                              |
 
 Contoh:
 
@@ -507,23 +510,23 @@ Contoh:
 }
 ```
 
-Perintah-perintah ini hanya mengelola konfigurasi yang disimpan. Perintah-perintah ini tidak memulai bridge kanal,
-membuka sesi klien MCP live, atau membuktikan bahwa server target dapat dijangkau.
+Perintah-perintah ini hanya mengelola konfigurasi yang disimpan. Perintah ini tidak memulai bridge channel,
+membuka sesi klien MCP langsung, atau membuktikan bahwa server target dapat dijangkau.
 
 ## Batasan saat ini
 
-Halaman ini mendokumentasikan bridge sebagaimana dirilis saat ini.
+Halaman ini mendokumentasikan bridge sebagaimana dikirim hari ini.
 
 Batasan saat ini:
 
-- penemuan percakapan bergantung pada metadata route sesi Gateway yang sudah ada
+- penemuan percakapan bergantung pada metadata rute sesi Gateway yang sudah ada
 - belum ada protokol push generik selain adaptor khusus Claude
-- belum ada tool edit pesan atau reaksi
-- transport HTTP/SSE/streamable-http terhubung ke satu server remote; belum ada upstream termultipleks
-- `permissions_list_open` hanya mencakup persetujuan yang diamati saat bridge sedang
+- belum ada tool edit pesan atau react
+- transport HTTP/SSE/streamable-http terhubung ke satu server remote; belum ada upstream multiplexed
+- `permissions_list_open` hanya mencakup persetujuan yang diamati saat bridge
   terhubung
 
 ## Terkait
 
 - [Referensi CLI](/id/cli)
-- [Plugins](/id/cli/plugins)
+- [Plugin](/id/cli/plugins)

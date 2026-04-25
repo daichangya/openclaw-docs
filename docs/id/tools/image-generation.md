@@ -6,24 +6,24 @@ read_when:
 summary: Hasilkan dan edit gambar menggunakan provider yang dikonfigurasi (OpenAI, OpenAI Codex OAuth, Google Gemini, OpenRouter, fal, MiniMax, ComfyUI, Vydra, xAI)
 title: Pembuatan gambar
 x-i18n:
-    generated_at: "2026-04-24T09:31:25Z"
+    generated_at: "2026-04-25T13:57:33Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 51ffc32165c5e25925460f95f3a6e674a004e6640b7a4b9e88d025eb40943b4b
+    source_hash: 02369928fecac147729ca586cd39e1a88791219ffe26d8e94429d0ea4b1af411
     source_path: tools/image-generation.md
     workflow: 15
 ---
 
-Tool `image_generate` memungkinkan agen membuat dan mengedit gambar menggunakan provider yang Anda konfigurasi. Gambar yang dihasilkan dikirim otomatis sebagai lampiran media dalam balasan agen.
+Tool `image_generate` memungkinkan agen membuat dan mengedit gambar menggunakan provider yang telah Anda konfigurasi. Gambar yang dihasilkan dikirim otomatis sebagai lampiran media dalam balasan agen.
 
 <Note>
-Tool ini hanya muncul ketika setidaknya satu provider pembuatan gambar tersedia. Jika Anda tidak melihat `image_generate` di tools agen Anda, konfigurasikan `agents.defaults.imageGenerationModel`, siapkan API key provider, atau login dengan OpenAI Codex OAuth.
+Tool ini hanya muncul ketika setidaknya satu provider pembuatan gambar tersedia. Jika Anda tidak melihat `image_generate` di tool agen Anda, konfigurasikan `agents.defaults.imageGenerationModel`, siapkan API key provider, atau masuk dengan OpenAI Codex OAuth.
 </Note>
 
-## Mulai cepat
+## Memulai dengan cepat
 
-1. Atur API key untuk setidaknya satu provider (misalnya `OPENAI_API_KEY`, `GEMINI_API_KEY`, atau `OPENROUTER_API_KEY`) atau login dengan OpenAI Codex OAuth.
-2. Opsional, atur model pilihan Anda:
+1. Setel API key untuk setidaknya satu provider (misalnya `OPENAI_API_KEY`, `GEMINI_API_KEY`, atau `OPENROUTER_API_KEY`) atau masuk dengan OpenAI Codex OAuth.
+2. Opsional, setel model pilihan Anda:
 
 ```json5
 {
@@ -37,31 +37,47 @@ Tool ini hanya muncul ketika setidaknya satu provider pembuatan gambar tersedia.
 }
 ```
 
-Codex OAuth menggunakan ref model `openai/gpt-image-2` yang sama. Saat profil
+Codex OAuth menggunakan model ref `openai/gpt-image-2` yang sama. Saat profil
 OAuth `openai-codex` dikonfigurasi, OpenClaw merutekan permintaan gambar
-melalui profil OAuth yang sama alih-alih terlebih dahulu mencoba `OPENAI_API_KEY`.
+melalui profil OAuth yang sama tersebut alih-alih terlebih dahulu mencoba `OPENAI_API_KEY`.
 Config gambar `models.providers.openai` kustom yang eksplisit, seperti API key atau
-base URL kustom/Azure, akan mengaktifkan kembali rute OpenAI Images API langsung.
+base URL kustom/Azure, akan memilih kembali rute langsung OpenAI Images API.
 Untuk endpoint LAN yang kompatibel dengan OpenAI seperti LocalAI, pertahankan
-`models.providers.openai.baseUrl` kustom dan ikut sertakan secara eksplisit dengan
+`models.providers.openai.baseUrl` kustom dan lakukan opt-in secara eksplisit dengan
 `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork: true`; endpoint gambar privat/internal tetap diblokir secara default.
 
 3. Minta agen: _"Generate an image of a friendly robot mascot."_
 
-Agen memanggil `image_generate` secara otomatis. Tidak perlu allow-listing tool — tool ini aktif secara default ketika provider tersedia.
+Agen memanggil `image_generate` secara otomatis. Tidak perlu allow-listing tool — tool ini diaktifkan secara default saat provider tersedia.
+
+## Rute umum
+
+| Tujuan                                               | Model ref                                          | Auth                                 |
+| ---------------------------------------------------- | -------------------------------------------------- | ------------------------------------ |
+| Pembuatan gambar OpenAI dengan penagihan API         | `openai/gpt-image-2`                               | `OPENAI_API_KEY`                     |
+| Pembuatan gambar OpenAI dengan auth langganan Codex  | `openai/gpt-image-2`                               | OpenAI Codex OAuth                   |
+| Pembuatan gambar OpenRouter                          | `openrouter/google/gemini-3.1-flash-image-preview` | `OPENROUTER_API_KEY`                 |
+| Pembuatan gambar Google Gemini                       | `google/gemini-3.1-flash-image-preview`            | `GEMINI_API_KEY` atau `GOOGLE_API_KEY` |
+
+Tool `image_generate` yang sama menangani text-to-image dan
+pengeditan gambar referensi. Gunakan `image` untuk satu referensi atau `images` untuk
+beberapa referensi.
+Petunjuk output yang didukung provider seperti `quality`, `outputFormat`, dan
+`background` khusus OpenAI akan diteruskan jika tersedia dan dilaporkan sebagai
+diabaikan ketika provider tidak mendukungnya.
 
 ## Provider yang didukung
 
-| Provider   | Model default                            | Dukungan edit                      | Auth                                                  |
-| ---------- | ---------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
-| OpenAI     | `gpt-image-2`                            | Ya (hingga 4 gambar)               | `OPENAI_API_KEY` atau OpenAI Codex OAuth              |
-| OpenRouter | `google/gemini-3.1-flash-image-preview`  | Ya (hingga 5 gambar input)         | `OPENROUTER_API_KEY`                                  |
-| Google     | `gemini-3.1-flash-image-preview`         | Ya                                 | `GEMINI_API_KEY` atau `GOOGLE_API_KEY`                |
-| fal        | `fal-ai/flux/dev`                        | Ya                                 | `FAL_KEY`                                             |
-| MiniMax    | `image-01`                               | Ya (referensi subjek)              | `MINIMAX_API_KEY` atau MiniMax OAuth (`minimax-portal`) |
-| ComfyUI    | `workflow`                               | Ya (1 gambar, dikonfigurasi workflow) | `COMFY_API_KEY` atau `COMFY_CLOUD_API_KEY` untuk cloud |
-| Vydra      | `grok-imagine`                           | Tidak                              | `VYDRA_API_KEY`                                       |
-| xAI        | `grok-imagine-image`                     | Ya (hingga 5 gambar)               | `XAI_API_KEY`                                         |
+| Provider   | Model default                           | Dukungan edit                      | Auth                                                  |
+| ---------- | --------------------------------------- | ---------------------------------- | ----------------------------------------------------- |
+| OpenAI     | `gpt-image-2`                           | Ya (hingga 4 gambar)               | `OPENAI_API_KEY` atau OpenAI Codex OAuth              |
+| OpenRouter | `google/gemini-3.1-flash-image-preview` | Ya (hingga 5 gambar input)         | `OPENROUTER_API_KEY`                                  |
+| Google     | `gemini-3.1-flash-image-preview`        | Ya                                 | `GEMINI_API_KEY` atau `GOOGLE_API_KEY`                |
+| fal        | `fal-ai/flux/dev`                       | Ya                                 | `FAL_KEY`                                             |
+| MiniMax    | `image-01`                              | Ya (referensi subjek)              | `MINIMAX_API_KEY` atau MiniMax OAuth (`minimax-portal`) |
+| ComfyUI    | `workflow`                              | Ya (1 gambar, dikonfigurasi workflow) | `COMFY_API_KEY` atau `COMFY_CLOUD_API_KEY` untuk cloud    |
+| Vydra      | `grok-imagine`                          | Tidak                              | `VYDRA_API_KEY`                                       |
+| xAI        | `grok-imagine-image`                    | Ya (hingga 5 gambar)               | `XAI_API_KEY`                                         |
 
 Gunakan `action: "list"` untuk memeriksa provider dan model yang tersedia saat runtime:
 
@@ -104,11 +120,11 @@ Petunjuk resolusi.
 </ParamField>
 
 <ParamField path="quality" type="'low' | 'medium' | 'high' | 'auto'">
-Petunjuk kualitas ketika provider mendukungnya.
+Petunjuk kualitas saat provider mendukungnya.
 </ParamField>
 
 <ParamField path="outputFormat" type="'png' | 'jpeg' | 'webp'">
-Petunjuk format output ketika provider mendukungnya.
+Petunjuk format output saat provider mendukungnya.
 </ParamField>
 
 <ParamField path="count" type="number">
@@ -127,9 +143,9 @@ Petunjuk nama file output.
 Petunjuk khusus OpenAI: `background`, `moderation`, `outputCompression`, dan `user`.
 </ParamField>
 
-Tidak semua provider mendukung semua parameter. Ketika provider fallback mendukung opsi geometri yang dekat alih-alih yang diminta secara tepat, OpenClaw memetakan ulang ke ukuran, rasio aspek, atau resolusi yang paling dekat didukung sebelum pengiriman. Petunjuk output yang tidak didukung seperti `quality` atau `outputFormat` dibuang untuk provider yang tidak mendeklarasikan dukungan dan dilaporkan dalam hasil tool.
+Tidak semua provider mendukung semua parameter. Saat provider fallback mendukung opsi geometri yang mendekati alih-alih yang diminta secara tepat, OpenClaw memetakan ulang ke ukuran, rasio aspek, atau resolusi terdekat yang didukung sebelum pengiriman. Petunjuk output yang tidak didukung seperti `quality` atau `outputFormat` akan dibuang untuk provider yang tidak menyatakan dukungan dan dilaporkan dalam hasil tool.
 
-Hasil tool melaporkan pengaturan yang diterapkan. Ketika OpenClaw memetakan ulang geometri selama fallback provider, nilai `size`, `aspectRatio`, dan `resolution` yang dikembalikan mencerminkan apa yang benar-benar dikirim, dan `details.normalization` mencatat terjemahan dari permintaan ke yang diterapkan.
+Hasil tool melaporkan pengaturan yang diterapkan. Saat OpenClaw memetakan ulang geometri selama fallback provider, nilai `size`, `aspectRatio`, dan `resolution` yang dikembalikan mencerminkan apa yang benar-benar dikirim, dan `details.normalization` menangkap terjemahan dari nilai yang diminta ke yang diterapkan.
 
 ## Konfigurasi
 
@@ -156,24 +172,27 @@ Hasil tool melaporkan pengaturan yang diterapkan. Ketika OpenClaw memetakan ulan
 
 Saat menghasilkan gambar, OpenClaw mencoba provider dalam urutan ini:
 
-1. Parameter **`model`** dari pemanggilan tool (jika agen menentukannya)
+1. **Parameter `model`** dari pemanggilan tool (jika agen menentukannya)
 2. **`imageGenerationModel.primary`** dari config
-3. **`imageGenerationModel.fallbacks`** secara berurutan
+3. **`imageGenerationModel.fallbacks`** sesuai urutan
 4. **Deteksi otomatis** — hanya menggunakan default provider yang didukung auth:
    - provider default saat ini terlebih dahulu
    - provider pembuatan gambar terdaftar yang tersisa dalam urutan id provider
 
-Jika sebuah provider gagal (error auth, rate limit, dll.), kandidat berikutnya dicoba secara otomatis. Jika semuanya gagal, error akan menyertakan detail dari setiap percobaan.
+Jika provider gagal (error auth, batas laju, dll.), kandidat terkonfigurasi berikutnya akan dicoba secara otomatis. Jika semuanya gagal, error akan menyertakan detail dari setiap percobaan.
 
 Catatan:
 
-- Deteksi otomatis sadar-auth. Default provider hanya masuk ke daftar kandidat
+- Override `model` per pemanggilan bersifat exact: OpenClaw hanya mencoba provider/model tersebut
+  dan tidak melanjutkan ke provider `primary`/`fallback` yang dikonfigurasi atau provider yang
+  terdeteksi otomatis.
+- Deteksi otomatis bersifat auth-aware. Default provider hanya masuk ke daftar kandidat
   ketika OpenClaw benar-benar dapat mengautentikasi provider tersebut.
-- Deteksi otomatis aktif secara default. Atur
-  `agents.defaults.mediaGenerationAutoProviderFallback: false` jika Anda ingin pembuatan gambar hanya menggunakan entri `model`, `primary`, dan `fallbacks`
-  yang eksplisit.
+- Deteksi otomatis diaktifkan secara default. Setel
+  `agents.defaults.mediaGenerationAutoProviderFallback: false` jika Anda ingin pembuatan gambar
+  hanya menggunakan entri `model`, `primary`, dan `fallbacks` yang eksplisit.
 - Gunakan `action: "list"` untuk memeriksa provider yang saat ini terdaftar, model
-  default mereka, dan petunjuk env-var auth.
+  defaultnya, dan petunjuk variabel env auth.
 
 ### Pengeditan gambar
 
@@ -187,7 +206,7 @@ OpenAI, OpenRouter, Google, dan xAI mendukung hingga 5 gambar referensi melalui 
 
 ### Model gambar OpenRouter
 
-Pembuatan gambar OpenRouter menggunakan `OPENROUTER_API_KEY` yang sama dan dirutekan melalui API gambar chat completions milik OpenRouter. Pilih model gambar OpenRouter dengan prefiks `openrouter/`:
+Pembuatan gambar OpenRouter menggunakan `OPENROUTER_API_KEY` yang sama dan dirutekan melalui API gambar chat completions OpenRouter. Pilih model gambar OpenRouter dengan prefix `openrouter/`:
 
 ```json5
 {
@@ -201,25 +220,27 @@ Pembuatan gambar OpenRouter menggunakan `OPENROUTER_API_KEY` yang sama dan dirut
 }
 ```
 
-OpenClaw meneruskan `prompt`, `count`, gambar referensi, dan petunjuk `aspectRatio` / `resolution` yang kompatibel dengan Gemini ke OpenRouter. Shortcut model gambar OpenRouter bawaan saat ini mencakup `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview`, dan `openai/gpt-5.4-image-2`; gunakan `action: "list"` untuk melihat apa yang diekspos Plugin terkonfigurasi Anda.
+OpenClaw meneruskan `prompt`, `count`, gambar referensi, dan petunjuk `aspectRatio` / `resolution` yang kompatibel dengan Gemini ke OpenRouter. Shortcut model gambar OpenRouter bawaan saat ini mencakup `google/gemini-3.1-flash-image-preview`, `google/gemini-3-pro-image-preview`, dan `openai/gpt-5.4-image-2`; gunakan `action: "list"` untuk melihat apa yang diekspos Plugin yang Anda konfigurasi.
 
 ### OpenAI `gpt-image-2`
 
-Pembuatan gambar OpenAI default-nya menggunakan `openai/gpt-image-2`. Jika profil
-OAuth `openai-codex` dikonfigurasi, OpenClaw menggunakan ulang profil OAuth yang sama
-yang dipakai oleh model chat langganan Codex dan mengirim permintaan gambar
-melalui backend Codex Responses; OpenClaw tidak diam-diam fallback ke
-`OPENAI_API_KEY` untuk permintaan itu. Untuk memaksa perutean OpenAI Images API langsung,
-konfigurasikan `models.providers.openai` secara eksplisit dengan API key, base URL kustom,
-atau endpoint Azure. Model lama
-`openai/gpt-image-1` masih bisa dipilih secara eksplisit, tetapi permintaan
-pembuatan gambar dan pengeditan gambar OpenAI yang baru sebaiknya menggunakan `gpt-image-2`.
+Pembuatan gambar OpenAI secara default menggunakan `openai/gpt-image-2`. Jika profil
+OAuth `openai-codex` dikonfigurasi, OpenClaw menggunakan kembali profil OAuth yang sama
+yang digunakan oleh model chat langganan Codex dan mengirim permintaan gambar
+melalui backend Codex Responses. Base URL Codex lama seperti
+`https://chatgpt.com/backend-api` akan dikanonisasi menjadi
+`https://chatgpt.com/backend-api/codex` untuk permintaan gambar. OpenClaw tidak
+diam-diam fallback ke `OPENAI_API_KEY` untuk permintaan tersebut. Untuk memaksa perutean langsung ke OpenAI
+Images API, konfigurasikan `models.providers.openai` secara eksplisit dengan API
+key, base URL kustom, atau endpoint Azure. Model lama
+`openai/gpt-image-1` masih dapat dipilih secara eksplisit, tetapi permintaan baru OpenAI
+untuk pembuatan dan pengeditan gambar sebaiknya menggunakan `gpt-image-2`.
 
 `gpt-image-2` mendukung pembuatan text-to-image dan
 pengeditan gambar referensi melalui tool `image_generate` yang sama. OpenClaw meneruskan `prompt`,
 `count`, `size`, `quality`, `outputFormat`, dan gambar referensi ke OpenAI.
-OpenAI tidak menerima `aspectRatio` atau `resolution` secara langsung; bila memungkinkan
-OpenClaw memetakan keduanya ke `size` yang didukung, jika tidak maka tool melaporkannya sebagai
+OpenAI tidak menerima `aspectRatio` atau `resolution` secara langsung; jika memungkinkan
+OpenClaw memetakan nilai-nilai tersebut ke `size` yang didukung, jika tidak maka tool melaporkannya sebagai
 override yang diabaikan.
 
 Opsi khusus OpenAI berada di bawah objek `openai`:
@@ -262,32 +283,32 @@ Edit satu gambar referensi lokal:
 Edit dengan beberapa referensi:
 
 ```
-/tool image_generate action=generate model=openai/gpt-image-2 prompt="Combine the character identity from the first image with the color palette from the second" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
+/tool image_generate action=generate model=openai/gpt-image-2 prompt="Gabungkan identitas karakter dari gambar pertama dengan palet warna dari gambar kedua" images='["/path/to/character.png","/path/to/palette.jpg"]' size=1536x1024
 ```
 
 Untuk merutekan pembuatan gambar OpenAI melalui deployment Azure OpenAI
 alih-alih `api.openai.com`, lihat [Azure OpenAI endpoints](/id/providers/openai#azure-openai-endpoints)
-di dokumentasi provider OpenAI.
+di docs provider OpenAI.
 
 Pembuatan gambar MiniMax tersedia melalui kedua jalur auth MiniMax bawaan:
 
 - `minimax/image-01` untuk penyiapan API key
 - `minimax-portal/image-01` untuk penyiapan OAuth
 
-## Kapabilitas provider
+## Kemampuan provider
 
-| Kapabilitas           | OpenAI               | Google               | fal                 | MiniMax                     | ComfyUI                            | Vydra   | xAI                  |
-| --------------------- | -------------------- | -------------------- | ------------------- | --------------------------- | ---------------------------------- | ------- | -------------------- |
-| Generate              | Ya (hingga 4)        | Ya (hingga 4)        | Ya (hingga 4)       | Ya (hingga 9)               | Ya (output ditentukan workflow)    | Ya (1)  | Ya (hingga 4)        |
-| Edit/referensi        | Ya (hingga 5 gambar) | Ya (hingga 5 gambar) | Ya (1 gambar)       | Ya (1 gambar, referensi subjek) | Ya (1 gambar, dikonfigurasi workflow) | Tidak   | Ya (hingga 5 gambar) |
-| Kontrol ukuran        | Ya (hingga 4K)       | Ya                   | Ya                  | Tidak                       | Tidak                              | Tidak   | Tidak                |
-| Rasio aspek           | Tidak                | Ya                   | Ya (khusus generate) | Ya                         | Tidak                              | Tidak   | Ya                   |
-| Resolusi (1K/2K/4K)   | Tidak                | Ya                   | Ya                  | Tidak                       | Tidak                              | Tidak   | Ya (1K/2K)           |
+| Kemampuan             | OpenAI               | Google               | fal                 | MiniMax                    | ComfyUI                            | Vydra   | xAI                  |
+| --------------------- | -------------------- | -------------------- | ------------------- | -------------------------- | ---------------------------------- | ------- | -------------------- |
+| Generate              | Ya (hingga 4)        | Ya (hingga 4)        | Ya (hingga 4)       | Ya (hingga 9)              | Ya (output ditentukan workflow)    | Ya (1)  | Ya (hingga 4)        |
+| Edit/reference        | Ya (hingga 5 gambar) | Ya (hingga 5 gambar) | Ya (1 gambar)       | Ya (1 gambar, referensi subjek) | Ya (1 gambar, dikonfigurasi workflow) | Tidak   | Ya (hingga 5 gambar) |
+| Kontrol ukuran        | Ya (hingga 4K)       | Ya                   | Ya                  | Tidak                      | Tidak                              | Tidak   | Tidak                |
+| Rasio aspek           | Tidak                | Ya                   | Ya (hanya generate) | Ya                         | Tidak                              | Tidak   | Ya                   |
+| Resolusi (1K/2K/4K)   | Tidak                | Ya                   | Ya                  | Tidak                      | Tidak                              | Tidak   | Ya (1K/2K)           |
 
 ### xAI `grok-imagine-image`
 
-Provider xAI bawaan menggunakan `/v1/images/generations` untuk permintaan yang hanya berisi prompt
-dan `/v1/images/edits` saat `image` atau `images` ada.
+Provider xAI bawaan menggunakan `/v1/images/generations` untuk permintaan
+khusus prompt dan `/v1/images/edits` ketika `image` atau `images` ada.
 
 - Model: `xai/grok-imagine-image`, `xai/grok-imagine-image-pro`
 - Jumlah: hingga 4
@@ -296,8 +317,8 @@ dan `/v1/images/edits` saat `image` atau `images` ada.
 - Resolusi: `1K`, `2K`
 - Output: dikembalikan sebagai lampiran gambar yang dikelola OpenClaw
 
-OpenClaw sengaja tidak mengekspos `quality`, `mask`, `user` native milik xAI, atau
-rasio aspek tambahan yang hanya native sampai kontrol tersebut ada dalam
+OpenClaw sengaja tidak mengekspos `quality`, `mask`, `user`, atau
+rasio aspek tambahan khusus native xAI hingga kontrol tersebut ada dalam
 kontrak `image_generate` lintas-provider bersama.
 
 ## Terkait
@@ -308,7 +329,7 @@ kontrak `image_generate` lintas-provider bersama.
 - [Google (Gemini)](/id/providers/google) — penyiapan provider gambar Gemini
 - [MiniMax](/id/providers/minimax) — penyiapan provider gambar MiniMax
 - [OpenAI](/id/providers/openai) — penyiapan provider OpenAI Images
-- [Vydra](/id/providers/vydra) — penyiapan gambar, video, dan speech Vydra
+- [Vydra](/id/providers/vydra) — penyiapan gambar, video, dan suara Vydra
 - [xAI](/id/providers/xai) — penyiapan gambar, video, pencarian, eksekusi kode, dan TTS Grok
 - [Referensi Konfigurasi](/id/gateway/config-agents#agent-defaults) — config `imageGenerationModel`
 - [Models](/id/concepts/models) — konfigurasi model dan failover

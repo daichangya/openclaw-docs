@@ -1,98 +1,103 @@
 ---
 read_when:
-    - Menambahkan kapabilitas inti baru dan permukaan registrasi Plugin
-    - Menentukan apakah kode sebaiknya berada di inti, Plugin vendor, atau Plugin fitur
-    - Menghubungkan helper runtime baru untuk channel atau tool
+    - Menambahkan kemampuan inti baru dan permukaan pendaftaran Plugin
+    - Menentukan apakah kode harus berada di inti, Plugin vendor, atau Plugin fitur
+    - Menyambungkan helper runtime baru untuk channel atau tool
 sidebarTitle: Adding Capabilities
-summary: Panduan kontributor untuk menambahkan kapabilitas bersama baru ke sistem Plugin OpenClaw
-title: Menambahkan kapabilitas (panduan kontributor)
+summary: Panduan kontributor untuk menambahkan kemampuan bersama baru ke sistem Plugin OpenClaw
+title: Menambahkan kemampuan (panduan kontributor)
 x-i18n:
-    generated_at: "2026-04-24T09:29:53Z"
+    generated_at: "2026-04-25T13:57:14Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 864506dd3f61aa64e7c997c9d9e05ce0ad70c80a26a734d4f83b2e80331be4ab
+    source_hash: a2879b8a4a215dcc44086181e49c510edae93caff01e52c2f5e6b79e6cb02d7b
     source_path: tools/capability-cookbook.md
     workflow: 15
 ---
 
 <Info>
-  Ini adalah **panduan kontributor** untuk developer inti OpenClaw. Jika Anda
-  sedang membangun Plugin eksternal, lihat [Membangun Plugin](/id/plugins/building-plugins)
+  Ini adalah **panduan kontributor** untuk pengembang inti OpenClaw. Jika Anda
+  sedang membangun Plugin eksternal, lihat [Building Plugins](/id/plugins/building-plugins)
   sebagai gantinya.
 </Info>
 
-Gunakan ini saat OpenClaw membutuhkan domain baru seperti generasi gambar, generasi video, atau area fitur masa depan lain yang didukung vendor.
+Gunakan ini saat OpenClaw memerlukan domain baru seperti pembuatan gambar, video
+generation, atau area fitur masa depan lain yang didukung vendor.
 
 Aturannya:
 
-- plugin = batas kepemilikan
-- capability = kontrak inti bersama
+- Plugin = batas kepemilikan
+- kemampuan = kontrak inti bersama
 
-Artinya Anda tidak seharusnya memulai dengan menghubungkan vendor secara langsung ke channel atau
-tool. Mulailah dengan mendefinisikan capability.
+Artinya, Anda tidak seharusnya mulai dengan menyambungkan vendor langsung ke channel atau
+tool. Mulailah dengan mendefinisikan kemampuannya.
 
-## Kapan membuat capability
+## Kapan membuat kemampuan
 
-Buat capability baru ketika semua ini benar:
+Buat kemampuan baru jika semua hal berikut benar:
 
-1. lebih dari satu vendor secara masuk akal bisa mengimplementasikannya
-2. channel, tool, atau Plugin fitur seharusnya menggunakannya tanpa peduli
+1. lebih dari satu vendor secara masuk akal dapat mengimplementasikannya
+2. channel, tool, atau Plugin fitur harus dapat mengonsumsinya tanpa peduli
    pada vendornya
-3. inti perlu memiliki fallback, kebijakan, konfigurasi, atau perilaku pengiriman
+3. inti perlu memiliki perilaku fallback, kebijakan, config, atau pengiriman
 
-Jika pekerjaan hanya milik vendor dan belum ada kontrak bersama, berhenti dan definisikan
+Jika pekerjaan ini hanya khusus vendor dan belum ada kontrak bersama, berhenti dan definisikan
 kontraknya terlebih dahulu.
 
 ## Urutan standar
 
-1. Definisikan kontrak inti yang bertipe.
-2. Tambahkan registrasi Plugin untuk kontrak tersebut.
+1. Definisikan kontrak inti bertipe.
+2. Tambahkan pendaftaran Plugin untuk kontrak tersebut.
 3. Tambahkan helper runtime bersama.
-4. Hubungkan satu Plugin vendor nyata sebagai pembuktian.
-5. Pindahkan consumer fitur/channel ke helper runtime.
-6. Tambahkan contract test.
-7. Dokumentasikan konfigurasi yang menghadap operator dan model kepemilikan.
+4. Sambungkan satu Plugin vendor nyata sebagai bukti.
+5. Pindahkan konsumen fitur/channel ke helper runtime.
+6. Tambahkan uji kontrak.
+7. Dokumentasikan config yang menghadap operator dan model kepemilikan.
 
-## Apa yang diletakkan di mana
+## Apa ditempatkan di mana
 
 Inti:
 
 - tipe request/response
-- registry provider + resolusi
+- registri provider + resolusi
 - perilaku fallback
-- skema konfigurasi plus metadata dokumen `title` / `description` yang dipropagasikan pada node objek bersarang, wildcard, item-array, dan komposisi
+- skema config ditambah metadata docs `title` / `description` yang dipropagasikan pada node objek bertingkat, wildcard, item array, dan komposisi
 - permukaan helper runtime
 
 Plugin vendor:
 
 - panggilan API vendor
 - penanganan auth vendor
-- normalisasi permintaan khusus vendor
-- registrasi implementasi capability
+- normalisasi request khusus vendor
+- pendaftaran implementasi kemampuan
 
 Plugin fitur/channel:
 
-- memanggil `api.runtime.*` atau helper `plugin-sdk/*-runtime` yang cocok
+- memanggil `api.runtime.*` atau helper `plugin-sdk/*-runtime` yang sesuai
 - tidak pernah memanggil implementasi vendor secara langsung
 
-## Provider dan batas Harness
+## Seams provider dan harness
 
-Gunakan hook provider saat perilaku tersebut milik kontrak provider model
-alih-alih loop agen generik. Contohnya mencakup param permintaan khusus provider setelah pemilihan transport, preferensi auth-profile, overlay prompt, dan routing fallback tindak lanjut setelah failover model/profile.
+Gunakan hook provider saat perilaku tersebut termasuk dalam kontrak provider model
+alih-alih loop agen generik. Contohnya termasuk param request khusus provider
+setelah pemilihan transport, preferensi auth-profile, prompt overlay, dan
+perutean fallback lanjutan setelah failover model/profile.
 
-Gunakan hook agent harness saat perilaku tersebut milik runtime yang
-mengeksekusi sebuah giliran. Harness dapat mengklasifikasikan hasil upaya yang berhasil tetapi tidak dapat digunakan seperti respons kosong, hanya reasoning, atau hanya planning sehingga kebijakan fallback model luar dapat membuat keputusan retry.
+Gunakan hook harness agen saat perilaku tersebut termasuk dalam runtime yang
+mengeksekusi suatu turn. Harness dapat mengklasifikasikan hasil upaya yang berhasil tetapi
+tidak dapat digunakan, seperti respons kosong, hanya reasoning, atau hanya perencanaan, sehingga kebijakan
+fallback model terluar dapat membuat keputusan retry.
 
-Jaga kedua batas ini tetap sempit:
+Jaga kedua seam tetap sempit:
 
 - inti memiliki kebijakan retry/fallback
-- Plugin provider memiliki petunjuk request/auth/routing khusus provider
+- Plugin provider memiliki petunjuk request/auth/perutean khusus provider
 - Plugin harness memiliki klasifikasi upaya khusus runtime
-- Plugin pihak ketiga mengembalikan petunjuk, bukan mutasi langsung terhadap status inti
+- Plugin pihak ketiga mengembalikan petunjuk, bukan mutasi langsung atas state inti
 
-## Checklist file
+## Daftar file
 
-Untuk capability baru, perkirakan Anda akan menyentuh area ini:
+Untuk kemampuan baru, perkirakan akan menyentuh area berikut:
 
 - `src/<capability>/types.ts`
 - `src/<capability>/...registry/runtime.ts`
@@ -104,41 +109,41 @@ Untuk capability baru, perkirakan Anda akan menyentuh area ini:
 - `src/plugins/runtime/index.ts`
 - `src/plugin-sdk/<capability>.ts`
 - `src/plugin-sdk/<capability>-runtime.ts`
-- satu atau lebih paket Plugin bundled
+- satu atau lebih paket Plugin bawaan
 - config/docs/tests
 
-## Contoh: generasi gambar
+## Contoh: pembuatan gambar
 
-Generasi gambar mengikuti bentuk standar:
+Pembuatan gambar mengikuti bentuk standar:
 
 1. inti mendefinisikan `ImageGenerationProvider`
 2. inti mengekspos `registerImageGenerationProvider(...)`
 3. inti mengekspos `runtime.imageGeneration.generate(...)`
 4. Plugin `openai`, `google`, `fal`, dan `minimax` mendaftarkan implementasi yang didukung vendor
-5. vendor di masa depan dapat mendaftarkan kontrak yang sama tanpa mengubah channel/tool
+5. vendor mendatang dapat mendaftarkan kontrak yang sama tanpa mengubah channel/tool
 
-Kunci konfigurasi dipisahkan dari routing vision-analysis:
+Key config terpisah dari perutean analisis vision:
 
 - `agents.defaults.imageModel` = menganalisis gambar
 - `agents.defaults.imageGenerationModel` = menghasilkan gambar
 
-Jaga keduanya terpisah agar fallback dan kebijakan tetap eksplisit.
+Pertahankan keduanya terpisah agar fallback dan kebijakan tetap eksplisit.
 
-## Checklist review
+## Daftar periksa review
 
-Sebelum merilis capability baru, verifikasi:
+Sebelum merilis kemampuan baru, verifikasi:
 
 - tidak ada channel/tool yang mengimpor kode vendor secara langsung
 - helper runtime adalah jalur bersama
-- setidaknya satu contract test menegaskan kepemilikan bundled
-- dokumen konfigurasi menyebutkan model/kunci konfigurasi baru
-- dokumen Plugin menjelaskan batas kepemilikan
+- setidaknya satu uji kontrak menyatakan kepemilikan bawaan
+- docs config menyebutkan key model/config baru
+- docs Plugin menjelaskan batas kepemilikan
 
-Jika sebuah PR melewati lapisan capability dan meng-hardcode perilaku vendor ke dalam
-channel/tool, kembalikan PR itu dan definisikan kontraknya terlebih dahulu.
+Jika sebuah PR melewati lapisan kemampuan dan meng-hardcode perilaku vendor ke dalam
+channel/tool, kembalikan dan definisikan kontraknya terlebih dahulu.
 
 ## Terkait
 
 - [Plugin](/id/tools/plugin)
-- [Membuat skill](/id/tools/creating-skills)
-- [Tools dan Plugin](/id/tools)
+- [Creating skills](/id/tools/creating-skills)
+- [Tools and plugins](/id/tools)

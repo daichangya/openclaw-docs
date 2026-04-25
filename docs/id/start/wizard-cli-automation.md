@@ -1,15 +1,15 @@
 ---
 read_when:
     - Anda sedang mengotomatiskan onboarding dalam skrip atau CI
-    - Anda memerlukan contoh non-interaktif untuk provider tertentu
+    - Anda memerlukan contoh non-interaktif untuk penyedia tertentu
 sidebarTitle: CLI automation
-summary: Onboarding terotomatisasi dan penyiapan agen untuk CLI OpenClaw
+summary: Onboarding dan penyiapan agen dengan skrip untuk OpenClaw CLI
 title: Otomatisasi CLI
 x-i18n:
-    generated_at: "2026-04-24T09:28:45Z"
+    generated_at: "2026-04-25T13:56:40Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
+    source_hash: 4d36801439b9243ea5cc0ab93757dde23d1ecd86c8f5b991541ee14f41bf05ac
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
@@ -17,7 +17,7 @@ x-i18n:
 Gunakan `--non-interactive` untuk mengotomatiskan `openclaw onboard`.
 
 <Note>
-`--json` tidak mengimplikasikan mode non-interaktif. Gunakan `--non-interactive` (dan `--workspace`) untuk skrip.
+`--json` tidak menyiratkan mode non-interaktif. Gunakan `--non-interactive` (dan `--workspace`) untuk skrip.
 </Note>
 
 ## Contoh dasar non-interaktif
@@ -32,16 +32,19 @@ openclaw onboard --non-interactive \
   --gateway-bind loopback \
   --install-daemon \
   --daemon-runtime node \
+  --skip-bootstrap \
   --skip-skills
 ```
 
 Tambahkan `--json` untuk ringkasan yang dapat dibaca mesin.
 
-Gunakan `--secret-input-mode ref` untuk menyimpan ref berbasis env di auth profile alih-alih nilai plaintext.
-Pemilihan interaktif antara env ref dan provider ref yang dikonfigurasi (`file` atau `exec`) tersedia dalam alur onboarding.
+Gunakan `--skip-bootstrap` saat otomatisasi Anda sudah menanamkan file workspace dan tidak ingin onboarding membuat file bootstrap default.
 
-Dalam mode `ref` non-interaktif, env var provider harus disetel di lingkungan proses.
-Memberikan flag key inline tanpa env var yang cocok sekarang akan gagal cepat.
+Gunakan `--secret-input-mode ref` untuk menyimpan ref berbasis env dalam profil autentikasi alih-alih nilai plaintext.
+Pemilihan interaktif antara env ref dan ref penyedia yang dikonfigurasi (`file` atau `exec`) tersedia dalam alur onboarding.
+
+Dalam mode `ref` non-interaktif, env var penyedia harus diatur di environment proses.
+Meneruskan flag kunci inline tanpa env var yang sesuai kini akan langsung gagal.
 
 Contoh:
 
@@ -53,10 +56,10 @@ openclaw onboard --non-interactive \
   --accept-risk
 ```
 
-## Contoh khusus provider
+## Contoh khusus penyedia
 
 <AccordionGroup>
-  <Accordion title="Contoh API key Anthropic">
+  <Accordion title="Contoh kunci API Anthropic">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -160,7 +163,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Contoh provider kustom">
+  <Accordion title="Contoh penyedia kustom">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -174,7 +177,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` bersifat opsional. Jika dihilangkan, onboarding memeriksa `CUSTOM_API_KEY`.
+    `--custom-api-key` bersifat opsional. Jika dihilangkan, onboarding akan memeriksa `CUSTOM_API_KEY`.
 
     Varian mode ref:
 
@@ -197,13 +200,13 @@ openclaw onboard --non-interactive \
   </Accordion>
 </AccordionGroup>
 
-Setup-token Anthropic tetap tersedia sebagai jalur token onboarding yang didukung, tetapi OpenClaw sekarang lebih memilih penggunaan ulang Claude CLI jika tersedia.
-Untuk produksi, pilih Anthropic API key.
+Token penyiapan Anthropic tetap tersedia sebagai jalur token onboarding yang didukung, tetapi OpenClaw kini lebih memilih penggunaan ulang Claude CLI saat tersedia.
+Untuk produksi, gunakan kunci API Anthropic.
 
 ## Tambahkan agen lain
 
 Gunakan `openclaw agents add <name>` untuk membuat agen terpisah dengan workspace,
-sesi, dan auth profile-nya sendiri. Menjalankan tanpa `--workspace` akan meluncurkan wizard.
+sesi, dan profil autentikasinya sendiri. Menjalankan tanpa `--workspace` akan membuka wizard.
 
 ```bash
 openclaw agents add work \
@@ -214,7 +217,7 @@ openclaw agents add work \
   --json
 ```
 
-Yang disetel:
+Yang diatur:
 
 - `agents.list[].name`
 - `agents.list[].workspace`
@@ -228,6 +231,6 @@ Catatan:
 
 ## Dokumen terkait
 
-- Hub onboarding: [Onboarding (CLI)](/id/start/wizard)
+- Pusat onboarding: [Onboarding (CLI)](/id/start/wizard)
 - Referensi lengkap: [Referensi Penyiapan CLI](/id/start/wizard-cli-reference)
 - Referensi perintah: [`openclaw onboard`](/id/cli/onboard)

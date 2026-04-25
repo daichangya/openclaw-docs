@@ -1,39 +1,37 @@
 ---
 read_when:
-    - Anda ingin mengonfigurasi Perplexity sebagai provider web search
+    - Anda ingin mengonfigurasi Perplexity sebagai penyedia pencarian web
     - Anda memerlukan penyiapan API key Perplexity atau proxy OpenRouter
-summary: Penyiapan provider web search Perplexity (API key, mode pencarian, pemfilteran)
+summary: Penyiapan penyedia pencarian web Perplexity (API key, mode pencarian, pemfilteran)
 title: Perplexity
 x-i18n:
-    generated_at: "2026-04-24T09:24:22Z"
+    generated_at: "2026-04-25T13:55:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7b2d3d6912bc9952bbe89124dd8aea600c938c8ceff21df46508b6e44e0a1159
+    source_hash: d913d71c1b3a5cfbd755efff9235adfd5dd460ef606a6d229d2cceb5134174d3
     source_path: providers/perplexity-provider.md
     workflow: 15
 ---
 
-# Perplexity (Provider Web Search)
-
-Plugin Perplexity menyediakan kapabilitas web search melalui API Perplexity
-Search atau Perplexity Sonar melalui OpenRouter.
+Plugin Perplexity menyediakan kemampuan pencarian web melalui Perplexity
+Search API atau Perplexity Sonar melalui OpenRouter.
 
 <Note>
-Halaman ini membahas penyiapan **provider** Perplexity. Untuk **alat**
-Perplexity (bagaimana agen menggunakannya), lihat [alat Perplexity](/id/tools/perplexity-search).
+Halaman ini membahas penyiapan **penyedia** Perplexity. Untuk **tool**
+Perplexity (bagaimana agen menggunakannya), lihat [tool Perplexity](/id/tools/perplexity-search).
 </Note>
 
-| Properti    | Nilai                                                                 |
-| ----------- | --------------------------------------------------------------------- |
-| Jenis       | Provider web search (bukan provider model)                            |
-| Auth        | `PERPLEXITY_API_KEY` (langsung) atau `OPENROUTER_API_KEY` (via OpenRouter) |
-| Path config | `plugins.entries.perplexity.config.webSearch.apiKey`                  |
+| Property    | Value                                                                  |
+| ----------- | ---------------------------------------------------------------------- |
+| Tipe        | Penyedia pencarian web (bukan penyedia model)                          |
+| Auth        | `PERPLEXITY_API_KEY` (langsung) atau `OPENROUTER_API_KEY` (melalui OpenRouter) |
+| Jalur config | `plugins.entries.perplexity.config.webSearch.apiKey`                  |
 
 ## Memulai
 
 <Steps>
   <Step title="Tetapkan API key">
-    Jalankan alur konfigurasi web-search interaktif:
+    Jalankan alur konfigurasi pencarian web interaktif:
 
     ```bash
     openclaw configure --section web
@@ -47,32 +45,32 @@ Perplexity (bagaimana agen menggunakannya), lihat [alat Perplexity](/id/tools/pe
 
   </Step>
   <Step title="Mulai mencari">
-    Agen akan otomatis menggunakan Perplexity untuk web search setelah key
+    Agen akan otomatis menggunakan Perplexity untuk pencarian web setelah key
     dikonfigurasi. Tidak diperlukan langkah tambahan.
   </Step>
 </Steps>
 
 ## Mode pencarian
 
-Plugin memilih transport secara otomatis berdasarkan prefix API key:
+Plugin secara otomatis memilih transport berdasarkan prefiks API key:
 
 <Tabs>
-  <Tab title="Native Perplexity API (pplx-)">
-    Ketika key Anda dimulai dengan `pplx-`, OpenClaw menggunakan API Search Perplexity
-    native. Transport ini mengembalikan hasil terstruktur dan mendukung filter domain, bahasa,
-    dan tanggal (lihat opsi pemfilteran di bawah).
+  <Tab title="API Perplexity native (pplx-)">
+    Saat key Anda diawali dengan `pplx-`, OpenClaw menggunakan Perplexity Search
+    API native. Transport ini mengembalikan hasil terstruktur dan mendukung filter
+    domain, bahasa, dan tanggal (lihat opsi pemfilteran di bawah).
   </Tab>
   <Tab title="OpenRouter / Sonar (sk-or-)">
-    Ketika key Anda dimulai dengan `sk-or-`, OpenClaw merutekan melalui OpenRouter menggunakan
+    Saat key Anda diawali dengan `sk-or-`, OpenClaw merutekan melalui OpenRouter menggunakan
     model Perplexity Sonar. Transport ini mengembalikan jawaban hasil sintesis AI dengan
     sitasi.
   </Tab>
 </Tabs>
 
-| Prefix key | Transport                      | Fitur                                            |
-| ---------- | ------------------------------ | ------------------------------------------------ |
-| `pplx-`    | API Search Perplexity native   | Hasil terstruktur, filter domain/bahasa/tanggal  |
-| `sk-or-`   | OpenRouter (Sonar)             | Jawaban hasil sintesis AI dengan sitasi          |
+| Prefiks key | Transport                    | Fitur                                            |
+| ----------- | ---------------------------- | ------------------------------------------------ |
+| `pplx-`     | Perplexity Search API native | Hasil terstruktur, filter domain/bahasa/tanggal |
+| `sk-or-`    | OpenRouter (Sonar)           | Jawaban hasil sintesis AI dengan sitasi         |
 
 ## Pemfilteran API native
 
@@ -83,39 +81,39 @@ Opsi pemfilteran hanya tersedia saat menggunakan API Perplexity native
 
 Saat menggunakan API Perplexity native, pencarian mendukung filter berikut:
 
-| Filter         | Deskripsi                              | Contoh                               |
-| -------------- | -------------------------------------- | ------------------------------------ |
-| Negara         | Kode negara 2 huruf                    | `us`, `de`, `jp`                     |
-| Bahasa         | Kode bahasa ISO 639-1                  | `en`, `fr`, `zh`                     |
-| Rentang tanggal | Jendela recency                       | `day`, `week`, `month`, `year`       |
-| Filter domain  | Allowlist atau denylist (maks 20 domain) | `example.com`                      |
-| Anggaran konten | Batas token per respons / per halaman | `max_tokens`, `max_tokens_per_page`  |
+| Filter         | Deskripsi                              | Contoh                              |
+| -------------- | -------------------------------------- | ----------------------------------- |
+| Negara         | Kode negara 2 huruf                    | `us`, `de`, `jp`                    |
+| Bahasa         | Kode bahasa ISO 639-1                  | `en`, `fr`, `zh`                    |
+| Rentang tanggal | Jendela kebaruan                      | `day`, `week`, `month`, `year`      |
+| Filter domain  | Allowlist atau denylist (maks 20 domain) | `example.com`                     |
+| Anggaran konten | Batas token per respons / per halaman | `max_tokens`, `max_tokens_per_page` |
 
 ## Konfigurasi lanjutan
 
 <AccordionGroup>
-  <Accordion title="Environment variable untuk proses daemon">
-    Jika Gateway OpenClaw berjalan sebagai daemon (launchd/systemd), pastikan
-    `PERPLEXITY_API_KEY` tersedia untuk proses itu.
+  <Accordion title="Variabel environment untuk proses daemon">
+    Jika OpenClaw Gateway berjalan sebagai daemon (launchd/systemd), pastikan
+    `PERPLEXITY_API_KEY` tersedia untuk proses tersebut.
 
     <Warning>
-    Key yang hanya diatur di `~/.profile` tidak akan terlihat oleh daemon
-    launchd/systemd kecuali environment itu diimpor secara eksplisit. Atur key di
-    `~/.openclaw/.env` atau melalui `env.shellEnv` untuk memastikan proses gateway dapat
+    Key yang hanya ditetapkan di `~/.profile` tidak akan terlihat oleh daemon
+    launchd/systemd kecuali environment tersebut diimpor secara eksplisit. Tetapkan key di
+    `~/.openclaw/.env` atau melalui `env.shellEnv` agar proses gateway dapat
     membacanya.
     </Warning>
 
   </Accordion>
 
   <Accordion title="Penyiapan proxy OpenRouter">
-    Jika Anda lebih suka merutekan pencarian Perplexity melalui OpenRouter, atur
-    `OPENROUTER_API_KEY` (prefix `sk-or-`) alih-alih key Perplexity native.
-    OpenClaw akan mendeteksi prefix tersebut dan beralih ke transport Sonar
+    Jika Anda lebih suka merutekan pencarian Perplexity melalui OpenRouter, tetapkan
+    `OPENROUTER_API_KEY` (prefiks `sk-or-`) alih-alih key Perplexity native.
+    OpenClaw akan mendeteksi prefiks tersebut dan beralih ke transport Sonar
     secara otomatis.
 
     <Tip>
     Transport OpenRouter berguna jika Anda sudah memiliki akun OpenRouter
-    dan ingin penagihan yang terkonsolidasi lintas beberapa provider.
+    dan menginginkan penagihan terpusat di berbagai penyedia.
     </Tip>
 
   </Accordion>
@@ -124,10 +122,10 @@ Saat menggunakan API Perplexity native, pencarian mendukung filter berikut:
 ## Terkait
 
 <CardGroup cols={2}>
-  <Card title="Perplexity search tool" href="/id/tools/perplexity-search" icon="magnifying-glass">
-    Bagaimana agen memanggil pencarian Perplexity dan menafsirkan hasilnya.
+  <Card title="Tool pencarian Perplexity" href="/id/tools/perplexity-search" icon="magnifying-glass">
+    Cara agen memanggil pencarian Perplexity dan menafsirkan hasil.
   </Card>
-  <Card title="Configuration reference" href="/id/gateway/configuration-reference" icon="gear">
+  <Card title="Referensi konfigurasi" href="/id/gateway/configuration-reference" icon="gear">
     Referensi konfigurasi lengkap termasuk entri Plugin.
   </Card>
 </CardGroup>

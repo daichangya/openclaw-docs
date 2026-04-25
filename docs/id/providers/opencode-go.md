@@ -1,34 +1,34 @@
 ---
 read_when:
-    - Anda menginginkan katalog OpenCode Go
-    - Anda memerlukan ref model runtime untuk model yang di-host Go
-summary: Gunakan katalog OpenCode Go dengan penyiapan OpenCode bersama
+    - Anda menginginkan katalog Go OpenCode
+    - Anda memerlukan ref model runtime untuk model yang dihosting Go
+summary: Gunakan katalog Go OpenCode dengan penyiapan OpenCode bersama
 title: OpenCode Go
 x-i18n:
-    generated_at: "2026-04-24T09:24:04Z"
+    generated_at: "2026-04-25T13:54:55Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d70ca7e7c63f95cbb698d5193c2d9fa48576a8d7311dbd7fa4e2f10a42e275a7
+    source_hash: 42aba47207d85cdc6d2c5d85c3726da660b456320765c83df92ee705f005d3c3
     source_path: providers/opencode-go.md
     workflow: 15
 ---
 
 OpenCode Go adalah katalog Go di dalam [OpenCode](/id/providers/opencode).
-Katalog ini menggunakan `OPENCODE_API_KEY` yang sama seperti katalog Zen, tetapi tetap mempertahankan
-id provider runtime `opencode-go` agar perutean per-model upstream tetap benar.
+Ini menggunakan `OPENCODE_API_KEY` yang sama dengan katalog Zen, tetapi tetap memakai
+ID penyedia runtime `opencode-go` agar perutean per-model upstream tetap benar.
 
-| Properti         | Nilai                           |
+| Property         | Value                           |
 | ---------------- | ------------------------------- |
-| Provider runtime | `opencode-go`                   |
+| Penyedia runtime | `opencode-go`                   |
 | Auth             | `OPENCODE_API_KEY`              |
 | Penyiapan induk  | [OpenCode](/id/providers/opencode) |
 
 ## Katalog bawaan
 
-OpenClaw mengambil katalog Go dari registri model pi bawaan. Jalankan
+OpenClaw mengambil katalog Go dari registri model Pi bawaan. Jalankan
 `openclaw models list --provider opencode-go` untuk daftar model saat ini.
 
-Sesuai katalog pi bawaan, provider ini mencakup:
+Berdasarkan katalog Pi bawaan, penyedia ini mencakup:
 
 | Ref model                  | Nama                  |
 | -------------------------- | --------------------- |
@@ -55,10 +55,10 @@ Sesuai katalog pi bawaan, provider ini mencakup:
       </Step>
       <Step title="Tetapkan model Go sebagai default">
         ```bash
-        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.5"
+        openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
-      <Step title="Verifikasi model tersedia">
+      <Step title="Verifikasi bahwa model tersedia">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -73,7 +73,7 @@ Sesuai katalog pi bawaan, provider ini mencakup:
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Verifikasi model tersedia">
+      <Step title="Verifikasi bahwa model tersedia">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -87,7 +87,7 @@ Sesuai katalog pi bawaan, provider ini mencakup:
 ```json5
 {
   env: { OPENCODE_API_KEY: "YOUR_API_KEY_HERE" }, // pragma: allowlist secret
-  agents: { defaults: { model: { primary: "opencode-go/kimi-k2.5" } } },
+  agents: { defaults: { model: { primary: "opencode-go/kimi-k2.6" } } },
 }
 ```
 
@@ -96,7 +96,7 @@ Sesuai katalog pi bawaan, provider ini mencakup:
 <AccordionGroup>
   <Accordion title="Perilaku perutean">
     OpenClaw menangani perutean per-model secara otomatis saat ref model menggunakan
-    `opencode-go/...`. Tidak diperlukan config provider tambahan.
+    `opencode-go/...`. Tidak diperlukan config penyedia tambahan.
   </Accordion>
 
   <Accordion title="Konvensi ref runtime">
@@ -105,14 +105,13 @@ Sesuai katalog pi bawaan, provider ini mencakup:
   </Accordion>
 
   <Accordion title="Kredensial bersama">
-    `OPENCODE_API_KEY` yang sama digunakan oleh katalog Zen maupun Go. Memasukkan
-    key saat setup menyimpan kredensial untuk kedua provider runtime.
+    `OPENCODE_API_KEY` yang sama digunakan oleh katalog Zen dan Go. Memasukkan
+    key saat penyiapan akan menyimpan kredensial untuk kedua penyedia runtime.
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-Lihat [OpenCode](/id/providers/opencode) untuk ikhtisar onboarding bersama dan referensi lengkap
-katalog Zen + Go.
+Lihat [OpenCode](/id/providers/opencode) untuk ikhtisar onboarding bersama dan referensi lengkap katalog Zen + Go.
 </Tip>
 
 ## Terkait
@@ -122,6 +121,6 @@ katalog Zen + Go.
     Onboarding bersama, ikhtisar katalog, dan catatan lanjutan.
   </Card>
   <Card title="Pemilihan model" href="/id/concepts/model-providers" icon="layers">
-    Memilih provider, ref model, dan perilaku failover.
+    Memilih penyedia, ref model, dan perilaku failover.
   </Card>
 </CardGroup>

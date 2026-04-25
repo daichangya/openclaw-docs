@@ -1,60 +1,61 @@
 ---
 read_when:
     - Menambahkan atau memodifikasi Skills
-    - Changing skill gating or load rules
+    - Mengubah aturan gating atau pemuatan Skills
 summary: 'Skills: terkelola vs workspace, aturan gating, dan wiring config/env'
 title: Skills
 x-i18n:
-    generated_at: "2026-04-24T09:33:04Z"
+    generated_at: "2026-04-25T13:58:23Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3c7db23e1eb818d62283376cb33353882a9cb30e4476c5775218137da2ba82d9
+    source_hash: 44f946d91588c878754340aaf55e0e3b9096bba12aea36fb90c445cd41e4f892
     source_path: tools/skills.md
     workflow: 15
 ---
 
-Skills menggunakan folder skill yang kompatibel dengan **[AgentSkills](https://agentskills.io)** untuk mengajarkan agen cara menggunakan alat. Setiap skill adalah direktori yang berisi `SKILL.md` dengan frontmatter YAML dan instruksi. OpenClaw memuat **Skills bawaan** plus override lokal opsional, dan memfilternya saat waktu pemuatan berdasarkan environment, config, dan keberadaan biner.
+OpenClaw menggunakan folder skill yang kompatibel dengan **[AgentSkills](https://agentskills.io)** untuk mengajarkan agen cara menggunakan tool. Setiap skill adalah direktori yang berisi `SKILL.md` dengan frontmatter YAML dan instruksi. OpenClaw memuat **Skills bawaan** ditambah override lokal opsional, lalu memfilternya saat waktu pemuatan berdasarkan environment, config, dan keberadaan biner.
 
 ## Lokasi dan prioritas
 
-OpenClaw memuat Skills dari sumber-sumber ini:
+OpenClaw memuat Skills dari sumber berikut:
 
 1. **Folder skill tambahan**: dikonfigurasi dengan `skills.load.extraDirs`
-2. **Skills bawaan**: dikirim bersama instalasi (paket npm atau OpenClaw.app)
+2. **Skills bawaan**: dikirim bersama instalasi (package npm atau OpenClaw.app)
 3. **Skills terkelola/lokal**: `~/.openclaw/skills`
-4. **Skills agen pribadi**: `~/.agents/skills`
+4. **Skills agen personal**: `~/.agents/skills`
 5. **Skills agen proyek**: `<workspace>/.agents/skills`
 6. **Skills workspace**: `<workspace>/skills`
 
-Jika ada konflik nama skill, prioritasnya adalah:
+Jika nama skill bertabrakan, urutan prioritasnya adalah:
 
 `<workspace>/skills` (tertinggi) → `<workspace>/.agents/skills` → `~/.agents/skills` → `~/.openclaw/skills` → Skills bawaan → `skills.load.extraDirs` (terendah)
 
-## Skills per-agen vs bersama
+## Skills per-agent vs bersama
 
-Dalam penyiapan **multi-agen**, setiap agen memiliki workspace sendiri. Artinya:
+Dalam penyiapan **multi-agent**, setiap agen memiliki workspace sendiri. Itu berarti:
 
-- **Skills per-agen** berada di `<workspace>/skills` hanya untuk agen tersebut.
+- **Skills per-agent** berada di `<workspace>/skills` hanya untuk agen tersebut.
 - **Skills agen proyek** berada di `<workspace>/.agents/skills` dan berlaku untuk
-  workspace itu sebelum folder `skills/` workspace normal.
-- **Skills agen pribadi** berada di `~/.agents/skills` dan berlaku lintas
+  workspace tersebut sebelum folder `skills/` workspace normal.
+- **Skills agen personal** berada di `~/.agents/skills` dan berlaku di seluruh
   workspace pada mesin tersebut.
 - **Skills bersama** berada di `~/.openclaw/skills` (terkelola/lokal) dan terlihat
   oleh **semua agen** pada mesin yang sama.
-- **Folder bersama** juga dapat ditambahkan melalui `skills.load.extraDirs` (prioritas terendah) jika Anda ingin satu paket Skills umum yang digunakan oleh beberapa agen.
+- **Folder bersama** juga dapat ditambahkan melalui `skills.load.extraDirs` (prioritas
+  terendah) jika Anda menginginkan paket skill umum yang digunakan oleh banyak agen.
 
 Jika nama skill yang sama ada di lebih dari satu tempat, prioritas biasa
-tetap berlaku: workspace menang, lalu Skills agen proyek, kemudian Skills agen pribadi,
-kemudian terkelola/lokal, lalu bawaan, lalu direktori tambahan.
+berlaku: workspace menang, lalu Skills agen proyek, lalu Skills agen personal,
+lalu terkelola/lokal, lalu bawaan, lalu extra dirs.
 
-## Allowlists skill agen
+## Allowlist skill agen
 
 **Lokasi** skill dan **visibilitas** skill adalah kontrol yang terpisah.
 
-- Lokasi/prioritas menentukan salinan skill bernama sama mana yang menang.
-- Allowlist agen menentukan skill yang terlihat mana yang benar-benar dapat digunakan agen.
+- Lokasi/prioritas menentukan salinan mana dari skill dengan nama yang sama yang menang.
+- Allowlist agen menentukan skill mana yang terlihat yang benar-benar dapat digunakan oleh agen.
 
-Gunakan `agents.defaults.skills` untuk baseline bersama, lalu override per agen dengan
+Gunakan `agents.defaults.skills` untuk baseline bersama, lalu timpa per agen dengan
 `agents.list[].skills`:
 
 ```json5
@@ -66,7 +67,7 @@ Gunakan `agents.defaults.skills` untuk baseline bersama, lalu override per agen 
     list: [
       { id: "writer" }, // mewarisi github, weather
       { id: "docs", skills: ["docs-search"] }, // menggantikan default
-      { id: "locked-down", skills: [] }, // tanpa Skills
+      { id: "locked-down", skills: [] }, // tanpa skill
     ],
   },
 }
@@ -74,49 +75,49 @@ Gunakan `agents.defaults.skills` untuk baseline bersama, lalu override per agen 
 
 Aturan:
 
-- Hilangkan `agents.defaults.skills` agar Skills tidak dibatasi secara default.
+- Hilangkan `agents.defaults.skills` untuk skill yang tidak dibatasi secara default.
 - Hilangkan `agents.list[].skills` untuk mewarisi `agents.defaults.skills`.
-- Setel `agents.list[].skills: []` agar agen **tidak memiliki Skills**.
-- Daftar `agents.list[].skills` yang tidak kosong adalah himpunan final untuk agen tersebut; daftar ini tidak digabungkan dengan default.
+- Set `agents.list[].skills: []` untuk tanpa skill.
+- Daftar `agents.list[].skills` yang tidak kosong adalah set akhir untuk agen tersebut; itu
+  tidak digabung dengan default.
 
-OpenClaw menerapkan himpunan skill agen yang efektif di seluruh pembangunan prompt,
-penemuan slash-command skill, sinkronisasi sandbox, dan snapshot skill.
+OpenClaw menerapkan set skill agen efektif di seluruh pembangunan prompt, penemuan slash-command skill, sinkronisasi sandbox, dan snapshot skill.
 
-## Plugins + Skills
+## Plugin + Skills
 
-Plugins dapat mengirim Skills mereka sendiri dengan mencantumkan direktori `skills` di
+Plugin dapat mengirim skill mereka sendiri dengan mencantumkan direktori `skills` di
 `openclaw.plugin.json` (path relatif terhadap root Plugin). Skill Plugin dimuat
-saat Plugin diaktifkan. Saat ini direktori tersebut digabungkan ke path
-berprioritas rendah yang sama seperti `skills.load.extraDirs`, sehingga skill bawaan, terkelola,
-agen, atau workspace yang bernama sama akan menimpanya.
-Anda dapat mengendalikan ini melalui `metadata.openclaw.requires.config` pada entri config Plugin.
-Lihat [Plugins](/id/tools/plugin) untuk discovery/config dan [Tools](/id/tools) untuk permukaan
-alat yang diajarkan oleh skill tersebut.
+saat Plugin diaktifkan. Ini adalah tempat yang tepat untuk panduan operasi khusus tool
+yang terlalu panjang untuk deskripsi tool tetapi harus tersedia
+kapan pun Plugin diinstal; misalnya, plugin browser mengirim skill
+`browser-automation` untuk kontrol browser multi-langkah. Saat ini direktori-direktori tersebut digabung ke jalur prioritas rendah yang sama seperti
+`skills.load.extraDirs`, sehingga skill bawaan, terkelola, agen, atau workspace
+dengan nama yang sama akan menimpanya.
+Anda dapat melakukan gating terhadapnya melalui `metadata.openclaw.requires.config` pada entri config Plugin.
+Lihat [Plugin](/id/tools/plugin) untuk penemuan/config dan [Tools](/id/tools) untuk
+permukaan tool yang diajarkan oleh skill tersebut.
 
 ## Skill Workshop
 
 Plugin Skill Workshop yang opsional dan eksperimental dapat membuat atau memperbarui Skills workspace
-dari prosedur yang dapat digunakan ulang yang diamati selama pekerjaan agen. Plugin ini nonaktif
-secara default dan harus diaktifkan secara eksplisit melalui
+dari prosedur yang dapat digunakan ulang yang diamati selama pekerjaan agen. Plugin ini nonaktif secara default dan harus diaktifkan secara eksplisit melalui
 `plugins.entries.skill-workshop`.
 
 Skill Workshop hanya menulis ke `<workspace>/skills`, memindai konten yang dihasilkan,
 mendukung persetujuan tertunda atau penulisan aman otomatis, mengarantina
-proposal yang tidak aman, dan me-refresh snapshot skill setelah penulisan berhasil sehingga skill baru
-dapat tersedia tanpa restart Gateway.
+usulan yang tidak aman, dan menyegarkan snapshot skill setelah penulisan berhasil agar skill baru dapat tersedia tanpa restart Gateway.
 
-Gunakan ketika Anda ingin koreksi seperti “lain kali, verifikasi atribusi GIF” atau
-alur kerja yang susah didapat seperti checklist QA media menjadi instruksi prosedural
-yang tahan lama. Mulai dengan persetujuan tertunda; gunakan penulisan otomatis hanya di
-workspace tepercaya setelah meninjau proposalnya. Panduan lengkap:
-[Skill Workshop Plugin](/id/plugins/skill-workshop).
+Gunakan ini saat Anda ingin koreksi seperti “lain kali, verifikasi atribusi GIF” atau
+alur kerja yang diperoleh dengan susah payah seperti checklist QA media menjadi instruksi prosedural yang tahan lama. Mulailah dengan persetujuan tertunda; gunakan
+penulisan otomatis hanya di workspace tepercaya setelah meninjau usulannya. Panduan lengkap:
+[Plugin Skill Workshop](/id/plugins/skill-workshop).
 
 ## ClawHub (instal + sinkronisasi)
 
-ClawHub adalah registry Skills publik untuk OpenClaw. Jelajahi di
+ClawHub adalah registri Skills publik untuk OpenClaw. Jelajahi di
 [https://clawhub.ai](https://clawhub.ai). Gunakan perintah native `openclaw skills`
-untuk menemukan/memasang/memperbarui Skills, atau CLI `clawhub` terpisah ketika
-Anda memerlukan alur publish/sinkronisasi.
+untuk menemukan/menginstal/memperbarui skill, atau CLI `clawhub` terpisah saat
+Anda memerlukan alur kerja publish/sync.
 Panduan lengkap: [ClawHub](/id/tools/clawhub).
 
 Alur umum:
@@ -125,26 +126,26 @@ Alur umum:
   - `openclaw skills install <skill-slug>`
 - Perbarui semua skill yang terinstal:
   - `openclaw skills update --all`
-- Sinkronkan (scan + publish pembaruan):
+- Sinkronkan (pindai + publikasikan pembaruan):
   - `clawhub sync --all`
 
 `openclaw skills install` native menginstal ke direktori `skills/`
 workspace aktif. CLI `clawhub` terpisah juga menginstal ke `./skills` di bawah
-direktori kerja saat ini (atau fallback ke workspace OpenClaw yang dikonfigurasi).
+direktori kerja Anda saat ini (atau fallback ke workspace OpenClaw yang dikonfigurasi).
 OpenClaw akan mengambilnya sebagai `<workspace>/skills` pada sesi berikutnya.
 
 ## Catatan keamanan
 
 - Perlakukan skill pihak ketiga sebagai **kode tidak tepercaya**. Baca sebelum mengaktifkannya.
-- Pilih run yang disandbox untuk input tidak tepercaya dan alat berisiko. Lihat [Sandboxing](/id/gateway/sandboxing).
-- Penemuan skill workspace dan extra-dir hanya menerima root skill dan file `SKILL.md` yang realpath hasil resolusinya tetap berada di dalam root yang dikonfigurasi.
-- Instalasi dependensi skill yang didukung Gateway (`skills.install`, onboarding, dan UI pengaturan Skills) menjalankan scanner kode berbahaya bawaan sebelum mengeksekusi metadata installer. Temuan `critical` memblokir secara default kecuali pemanggil secara eksplisit menyetel override berbahaya; temuan mencurigakan tetap hanya memberi peringatan.
-- `openclaw skills install <slug>` berbeda: perintah ini mengunduh folder skill ClawHub ke workspace dan tidak menggunakan jalur metadata installer di atas.
+- Utamakan run tersandbox untuk input tidak tepercaya dan tool berisiko. Lihat [Sandboxing](/id/gateway/sandboxing).
+- Penemuan skill workspace dan extra-dir hanya menerima root skill dan file `SKILL.md` yang realpath hasil resolve-nya tetap berada di dalam root yang dikonfigurasi.
+- Instalasi dependensi skill yang didukung Gateway (`skills.install`, onboarding, dan UI pengaturan Skills) menjalankan pemindai dangerous-code bawaan sebelum mengeksekusi metadata installer. Temuan `critical` memblokir secara default kecuali pemanggil secara eksplisit menetapkan dangerous override; temuan mencurigakan tetap hanya memberi peringatan.
+- `openclaw skills install <slug>` berbeda: ini mengunduh folder skill ClawHub ke workspace dan tidak menggunakan jalur metadata installer di atas.
 - `skills.entries.*.env` dan `skills.entries.*.apiKey` menyuntikkan secret ke proses **host**
-  untuk giliran agen tersebut (bukan ke sandbox). Jauhkan secret dari prompt dan log.
-- Untuk model ancaman dan checklist yang lebih luas, lihat [Security](/id/gateway/security).
+  untuk giliran agen tersebut (bukan sandbox). Jauhkan secret dari prompt dan log.
+- Untuk threat model dan checklist yang lebih luas, lihat [Keamanan](/id/gateway/security).
 
-## Format (AgentSkills + kompatibel Pi)
+## Format (AgentSkills + kompatibel dengan Pi)
 
 `SKILL.md` setidaknya harus menyertakan:
 
@@ -157,22 +158,22 @@ description: Generate or edit images via a provider-backed image workflow
 
 Catatan:
 
-- Kami mengikuti spesifikasi AgentSkills untuk tata letak/tujuan.
-- Parser yang digunakan oleh agen tersemat hanya mendukung kunci frontmatter **satu baris**.
+- Kami mengikuti spesifikasi AgentSkills untuk layout/maksud.
+- Parser yang digunakan oleh agen tersemat hanya mendukung key frontmatter **satu baris**.
 - `metadata` harus berupa **objek JSON satu baris**.
 - Gunakan `{baseDir}` dalam instruksi untuk mereferensikan path folder skill.
-- Kunci frontmatter opsional:
+- Key frontmatter opsional:
   - `homepage` — URL yang ditampilkan sebagai “Website” di UI Skills macOS (juga didukung melalui `metadata.openclaw.homepage`).
   - `user-invocable` — `true|false` (default: `true`). Saat `true`, skill diekspos sebagai slash command pengguna.
   - `disable-model-invocation` — `true|false` (default: `false`). Saat `true`, skill dikecualikan dari prompt model (tetap tersedia melalui pemanggilan pengguna).
-  - `command-dispatch` — `tool` (opsional). Saat disetel ke `tool`, slash command melewati model dan mengirim langsung ke alat.
-  - `command-tool` — nama alat yang dipanggil saat `command-dispatch: tool` disetel.
-  - `command-arg-mode` — `raw` (default). Untuk dispatch alat, meneruskan string arg mentah ke alat (tanpa parsing core).
+  - `command-dispatch` — `tool` (opsional). Saat disetel ke `tool`, slash command melewati model dan langsung dikirim ke tool.
+  - `command-tool` — nama tool yang akan dipanggil saat `command-dispatch: tool` disetel.
+  - `command-arg-mode` — `raw` (default). Untuk dispatch tool, meneruskan string arg mentah ke tool (tanpa parsing inti).
 
-    Alat dipanggil dengan parameter:
+    Tool dipanggil dengan params:
     `{ command: "<raw args>", commandName: "<slash command>", skillName: "<skill name>" }`.
 
-## Gating (filter saat pemuatan)
+## Gating (filter saat waktu pemuatan)
 
 OpenClaw **memfilter Skills saat waktu pemuatan** menggunakan `metadata` (JSON satu baris):
 
@@ -199,20 +200,25 @@ Field di bawah `metadata.openclaw`:
 - `os` — daftar platform opsional (`darwin`, `linux`, `win32`). Jika disetel, skill hanya memenuhi syarat pada OS tersebut.
 - `requires.bins` — daftar; masing-masing harus ada di `PATH`.
 - `requires.anyBins` — daftar; setidaknya satu harus ada di `PATH`.
-- `requires.env` — daftar; var env harus ada **atau** disediakan di config.
+- `requires.env` — daftar; variabel env harus ada **atau** disediakan dalam config.
 - `requires.config` — daftar path `openclaw.json` yang harus truthy.
-- `primaryEnv` — nama var env yang diasosiasikan dengan `skills.entries.<name>.apiKey`.
-- `install` — array spesifikasi installer opsional yang digunakan oleh UI Skills macOS (brew/node/go/uv/download).
+- `primaryEnv` — nama variabel env yang terkait dengan `skills.entries.<name>.apiKey`.
+- `install` — array opsional spesifikasi installer yang digunakan oleh UI Skills macOS (brew/node/go/uv/download).
+
+Blok `metadata.clawdbot` lama masih diterima ketika
+`metadata.openclaw` tidak ada, sehingga skill lama yang sudah diinstal tetap mempertahankan
+gating dependensi dan petunjuk installer mereka. Skills baru dan yang diperbarui harus menggunakan
+`metadata.openclaw`.
 
 Catatan tentang sandboxing:
 
 - `requires.bins` diperiksa pada **host** saat waktu pemuatan skill.
-- Jika sebuah agen disandbox, biner tersebut juga harus ada **di dalam container**.
+- Jika suatu agen disandbox, binernya juga harus ada **di dalam container**.
   Instal melalui `agents.defaults.sandbox.docker.setupCommand` (atau image kustom).
   `setupCommand` berjalan sekali setelah container dibuat.
-  Instalasi package juga memerlukan network egress, root FS yang dapat ditulis, dan pengguna root di sandbox.
-  Contoh: skill `summarize` (`skills/summarize/SKILL.md`) membutuhkan CLI `summarize`
-  di container sandbox agar dapat berjalan di sana.
+  Instalasi package juga memerlukan network egress, root FS yang dapat ditulis, dan user root di sandbox.
+  Contoh: skill `summarize` (`skills/summarize/SKILL.md`) memerlukan CLI `summarize`
+  di dalam container sandbox agar dapat berjalan di sana.
 
 Contoh installer:
 
@@ -243,27 +249,27 @@ metadata:
 
 Catatan:
 
-- Jika beberapa installer tercantum, gateway memilih **satu** opsi pilihan (brew saat tersedia, jika tidak node).
+- Jika beberapa installer dicantumkan, gateway memilih satu opsi **preferensi** (brew jika tersedia, jika tidak node).
 - Jika semua installer adalah `download`, OpenClaw mencantumkan setiap entri agar Anda dapat melihat artefak yang tersedia.
-- Spesifikasi installer dapat menyertakan `os: ["darwin"|"linux"|"win32"]` untuk memfilter opsi berdasarkan platform.
-- Instalasi Node menghormati `skills.install.nodeManager` di `openclaw.json` (default: npm; opsi: npm/pnpm/yarn/bun).
-  Ini hanya memengaruhi **instalasi skill**; runtime Gateway tetap seharusnya Node
+- Spesifikasi installer dapat menyertakan `os: ["darwin"|"linux"|"win32"]` untuk memfilter opsi menurut platform.
+- Instalasi node menghormati `skills.install.nodeManager` di `openclaw.json` (default: npm; opsi: npm/pnpm/yarn/bun).
+  Ini hanya memengaruhi **instalasi skill**; runtime Gateway tetap harus Node
   (Bun tidak direkomendasikan untuk WhatsApp/Telegram).
-- Pemilihan installer yang didukung Gateway berbasis preferensi, bukan hanya node:
-  ketika spesifikasi instalasi mencampur beberapa jenis, OpenClaw memilih Homebrew jika
+- Pemilihan installer yang didukung Gateway didorong oleh preferensi, bukan hanya node:
+  saat spesifikasi install mencampur berbagai jenis, OpenClaw mengutamakan Homebrew saat
   `skills.install.preferBrew` diaktifkan dan `brew` ada, lalu `uv`, lalu
   node manager yang dikonfigurasi, lalu fallback lain seperti `go` atau `download`.
-- Jika setiap spesifikasi instalasi adalah `download`, OpenClaw menampilkan semua opsi unduhan
-  alih-alih meruntuhkannya menjadi satu installer pilihan.
-- Instalasi Go: jika `go` tidak ada dan `brew` tersedia, gateway menginstal Go via Homebrew terlebih dahulu dan menyetel `GOBIN` ke `bin` Homebrew bila memungkinkan.
-- Instalasi download: `url` (wajib), `archive` (`tar.gz` | `tar.bz2` | `zip`), `extract` (default: otomatis saat arsip terdeteksi), `stripComponents`, `targetDir` (default: `~/.openclaw/tools/<skillKey>`).
+- Jika setiap spesifikasi install adalah `download`, OpenClaw menampilkan semua opsi unduhan
+  alih-alih menciutkannya menjadi satu installer yang dipilih.
+- Instalasi Go: jika `go` tidak ada dan `brew` tersedia, gateway akan menginstal Go melalui Homebrew terlebih dahulu dan menyetel `GOBIN` ke `bin` milik Homebrew jika memungkinkan.
+- Instalasi unduhan: `url` (wajib), `archive` (`tar.gz` | `tar.bz2` | `zip`), `extract` (default: otomatis saat archive terdeteksi), `stripComponents`, `targetDir` (default: `~/.openclaw/tools/<skillKey>`).
 
 Jika tidak ada `metadata.openclaw`, skill selalu memenuhi syarat (kecuali
-dinonaktifkan di config atau diblokir oleh `skills.allowBundled` untuk Skills bawaan).
+dinonaktifkan dalam config atau diblokir oleh `skills.allowBundled` untuk Skills bawaan).
 
 ## Override config (`~/.openclaw/openclaw.json`)
 
-Skills bawaan/terkelola dapat di-toggle dan diberi nilai env:
+Skills bawaan/terkelola dapat diaktifkan/dinonaktifkan dan diberi nilai env:
 
 ```json5
 {
@@ -287,34 +293,34 @@ Skills bawaan/terkelola dapat di-toggle dan diberi nilai env:
 }
 ```
 
-Catatan: jika nama skill mengandung tanda hubung, beri tanda kutip pada kuncinya (JSON5 mengizinkan kunci yang dikutip).
+Catatan: jika nama skill mengandung tanda hubung, beri tanda kutip pada key tersebut (JSON5 mengizinkan key bertanda kutip).
 
-Jika Anda menginginkan generasi/edit gambar bawaan di dalam OpenClaw sendiri, gunakan alat inti
-`image_generate` dengan `agents.defaults.imageGenerationModel` alih-alih skill
-bawaan. Contoh skill di sini ditujukan untuk alur kerja kustom atau pihak ketiga.
+Jika Anda menginginkan pembuatan/pengeditan gambar bawaan di dalam OpenClaw sendiri, gunakan tool inti
+`image_generate` dengan `agents.defaults.imageGenerationModel` alih-alih
+skill bawaan. Contoh skill di sini ditujukan untuk alur kerja kustom atau pihak ketiga.
 
-Untuk analisis gambar native, gunakan alat `image` dengan `agents.defaults.imageModel`.
-Untuk generasi/edit gambar native, gunakan `image_generate` dengan
-`agents.defaults.imageGenerationModel`. Jika Anda memilih model gambar `openai/*`, `google/*`,
-`fal/*`, atau model gambar khusus provider lain, tambahkan auth/API
-key provider tersebut juga.
+Untuk analisis gambar native, gunakan tool `image` dengan `agents.defaults.imageModel`.
+Untuk pembuatan/pengeditan gambar native, gunakan `image_generate` dengan
+`agents.defaults.imageGenerationModel`. Jika Anda memilih `openai/*`, `google/*`,
+`fal/*`, atau model gambar khusus penyedia lainnya, tambahkan auth/API
+key penyedia tersebut juga.
 
-Kunci config secara default cocok dengan **nama skill**. Jika sebuah skill mendefinisikan
-`metadata.openclaw.skillKey`, gunakan kunci tersebut di bawah `skills.entries`.
+Key config cocok dengan **nama skill** secara default. Jika suatu skill mendefinisikan
+`metadata.openclaw.skillKey`, gunakan key tersebut di bawah `skills.entries`.
 
 Aturan:
 
-- `enabled: false` menonaktifkan skill meskipun skill itu bawaan/terinstal.
+- `enabled: false` menonaktifkan skill meskipun skill tersebut dibundel/diinstal.
 - `env`: disuntikkan **hanya jika** variabel tersebut belum disetel di proses.
 - `apiKey`: kemudahan untuk skill yang mendeklarasikan `metadata.openclaw.primaryEnv`.
   Mendukung string plaintext atau objek SecretRef (`{ source, provider, id }`).
-- `config`: bag opsional untuk field khusus per-skill; kunci kustom harus hidup di sini.
-- `allowBundled`: allowlist opsional untuk **Skills bawaan** saja. Jika disetel, hanya
-  Skills bawaan dalam daftar yang memenuhi syarat (skill terkelola/workspace tidak terpengaruh).
+- `config`: bag opsional untuk field kustom per-skill; key kustom harus berada di sini.
+- `allowBundled`: allowlist opsional hanya untuk **Skills bawaan**. Jika disetel, hanya
+  Skills bawaan dalam daftar yang memenuhi syarat (Skills terkelola/workspace tidak terpengaruh).
 
-## Injeksi environment (per run agen)
+## Penyuntikan environment (per run agen)
 
-Saat sebuah run agen dimulai, OpenClaw:
+Saat run agen dimulai, OpenClaw:
 
 1. Membaca metadata skill.
 2. Menerapkan `skills.entries.<key>.env` atau `skills.entries.<key>.apiKey` ke
@@ -322,30 +328,30 @@ Saat sebuah run agen dimulai, OpenClaw:
 3. Membangun prompt sistem dengan Skills yang **memenuhi syarat**.
 4. Memulihkan environment asli setelah run berakhir.
 
-Ini **dibatasi ke run agen**, bukan environment shell global.
+Ini **dicakup ke run agen**, bukan environment shell global.
 
-Untuk backend `claude-cli` bawaan, OpenClaw juga mematerialisasikan snapshot yang sama
-ke Plugin Claude Code sementara dan meneruskannya dengan
-`--plugin-dir`. Claude Code kemudian dapat menggunakan resolver skill native-nya
-sementara OpenClaw tetap memiliki prioritas, allowlist per-agen, gating, dan
-injeksi env/API key `skills.entries.*`. Backend CLI lain hanya menggunakan katalog prompt.
+Untuk backend `claude-cli` bawaan, OpenClaw juga mewujudkan snapshot eligible yang sama sebagai Plugin Claude Code sementara dan meneruskannya dengan
+`--plugin-dir`. Claude Code kemudian dapat menggunakan resolver skill native-nya sementara
+OpenClaw tetap memiliki prioritas, allowlist per-agent, gating, dan
+penyuntikan env/API key `skills.entries.*`. Backend CLI lain hanya menggunakan
+katalog prompt.
 
 ## Snapshot sesi (performa)
 
-OpenClaw mengambil snapshot skill yang memenuhi syarat **saat sesi dimulai** dan menggunakan kembali daftar tersebut untuk giliran berikutnya dalam sesi yang sama. Perubahan pada skill atau config berlaku pada sesi baru berikutnya.
+OpenClaw membuat snapshot Skills yang memenuhi syarat **saat sesi dimulai** dan menggunakan ulang daftar itu untuk giliran berikutnya dalam sesi yang sama. Perubahan pada Skills atau config berlaku pada sesi baru berikutnya.
 
-Skills juga dapat me-refresh di tengah sesi saat watcher skill diaktifkan atau saat Node remote baru yang memenuhi syarat muncul (lihat di bawah). Anggap ini sebagai **hot reload**: daftar yang telah di-refresh diambil pada giliran agen berikutnya.
+Skills juga dapat disegarkan di tengah sesi saat watcher Skills diaktifkan atau saat node remote baru yang memenuhi syarat muncul (lihat di bawah). Anggap ini sebagai **hot reload**: daftar yang disegarkan akan diambil pada giliran agen berikutnya.
 
-Jika allowlist skill agen yang efektif berubah untuk sesi tersebut, OpenClaw
-me-refresh snapshot agar Skills yang terlihat tetap selaras dengan agen saat ini.
+Jika allowlist skill agen efektif berubah untuk sesi tersebut, OpenClaw
+menyegarkan snapshot agar Skills yang terlihat tetap selaras dengan agen saat ini.
 
 ## Node macOS remote (Gateway Linux)
 
-Jika Gateway berjalan di Linux tetapi sebuah **Node macOS** terhubung **dengan `system.run` diizinkan** (keamanan persetujuan Exec tidak disetel ke `deny`), OpenClaw dapat memperlakukan skill khusus macOS sebagai memenuhi syarat ketika biner yang diperlukan ada di Node tersebut. Agen seharusnya mengeksekusi skill itu melalui alat `exec` dengan `host=node`.
+Jika Gateway berjalan di Linux tetapi **node macOS** terhubung **dengan `system.run` diizinkan** (keamanan Persetujuan exec tidak disetel ke `deny`), OpenClaw dapat memperlakukan skill khusus macOS sebagai memenuhi syarat saat biner yang diperlukan ada di node tersebut. Agen harus mengeksekusi skill tersebut melalui tool `exec` dengan `host=node`.
 
-Ini bergantung pada Node yang melaporkan dukungan perintahnya dan pada probe bin melalui `system.run`. Jika Node macOS kemudian offline, skill tetap terlihat; pemanggilan mungkin gagal sampai Node terhubung kembali.
+Ini bergantung pada node yang melaporkan dukungan perintahnya dan pada probe bin melalui `system.run`. Jika node macOS kemudian offline, skill tersebut tetap terlihat; pemanggilan dapat gagal sampai node tersambung kembali.
 
-## Watcher Skills (refresh otomatis)
+## Watcher Skills (penyegaran otomatis)
 
 Secara default, OpenClaw memantau folder skill dan menaikkan snapshot Skills saat file `SKILL.md` berubah. Konfigurasikan ini di bawah `skills.load`:
 
@@ -360,12 +366,12 @@ Secara default, OpenClaw memantau folder skill dan menaikkan snapshot Skills saa
 }
 ```
 
-## Dampak token (daftar skill)
+## Dampak token (daftar Skills)
 
-Saat Skills memenuhi syarat, OpenClaw menyuntikkan daftar XML ringkas dari Skills yang tersedia ke prompt sistem (melalui `formatSkillsForPrompt` di `pi-coding-agent`). Biayanya deterministik:
+Saat Skills memenuhi syarat, OpenClaw menyuntikkan daftar XML ringkas dari skill yang tersedia ke prompt sistem (melalui `formatSkillsForPrompt` di `pi-coding-agent`). Biayanya deterministik:
 
 - **Overhead dasar (hanya saat ≥1 skill):** 195 karakter.
-- **Per skill:** 97 karakter + panjang nilai XML-escaped `<name>`, `<description>`, dan `<location>`.
+- **Per skill:** 97 karakter + panjang nilai `<name>`, `<description>`, dan `<location>` yang di-escape XML.
 
 Rumus (karakter):
 
@@ -376,18 +382,18 @@ total = 195 + Σ (97 + len(name_escaped) + len(description_escaped) + len(locati
 Catatan:
 
 - XML escaping memperluas `& < > " '` menjadi entitas (`&amp;`, `&lt;`, dll.), sehingga menambah panjang.
-- Jumlah token bervariasi menurut tokenizer model. Estimasi kasar bergaya OpenAI adalah ~4 karakter/token, jadi **97 karakter ≈ 24 token** per skill ditambah panjang field Anda yang sebenarnya.
+- Jumlah token bervariasi menurut tokenizer model. Perkiraan kasar bergaya OpenAI adalah ~4 karakter/token, jadi **97 karakter ≈ 24 token** per skill ditambah panjang field aktual Anda.
 
 ## Siklus hidup Skills terkelola
 
-OpenClaw mengirim seperangkat skill dasar sebagai **Skills bawaan** sebagai bagian dari
-instalasi (paket npm atau OpenClaw.app). `~/.openclaw/skills` ada untuk
-override lokal (misalnya, mem-pin/mem-patch skill tanpa mengubah salinan
-bawaan). Skills workspace dimiliki pengguna dan menimpa keduanya pada konflik nama.
+OpenClaw mengirim set baseline Skills sebagai **Skills bawaan** sebagai bagian dari
+instalasi (package npm atau OpenClaw.app). `~/.openclaw/skills` ada untuk override lokal
+(misalnya, pinning/patching skill tanpa mengubah salinan bawaan).
+Skills workspace dimiliki pengguna dan menimpa keduanya saat terjadi konflik nama.
 
 ## Referensi config
 
-Lihat [Skills config](/id/tools/skills-config) untuk skema konfigurasi lengkap.
+Lihat [config Skills](/id/tools/skills-config) untuk skema konfigurasi lengkap.
 
 ## Mencari lebih banyak Skills?
 
@@ -397,7 +403,7 @@ Jelajahi [https://clawhub.ai](https://clawhub.ai).
 
 ## Terkait
 
-- [Creating Skills](/id/tools/creating-skills) — membangun skill kustom
-- [Skills Config](/id/tools/skills-config) — referensi konfigurasi skill
+- [Membuat Skills](/id/tools/creating-skills) — membangun skill kustom
+- [Config Skills](/id/tools/skills-config) — referensi konfigurasi skill
 - [Slash Commands](/id/tools/slash-commands) — semua slash command yang tersedia
-- [Plugins](/id/tools/plugin) — ikhtisar sistem Plugin
+- [Plugin](/id/tools/plugin) — gambaran umum sistem Plugin

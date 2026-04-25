@@ -1,14 +1,14 @@
 ---
 read_when:
     - Memperbarui OpenClaw
-    - Ada sesuatu yang rusak setelah pembaruan
+    - Ada yang rusak setelah pembaruan
 summary: Memperbarui OpenClaw dengan aman (instalasi global atau source), plus strategi rollback
 title: Memperbarui
 x-i18n:
-    generated_at: "2026-04-24T09:14:54Z"
+    generated_at: "2026-04-25T13:49:09Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04ed583916ce64c9f60639c8145a46ce5b27ebf5a6dfd09924312d7acfefe1ab
+    source_hash: af88eaa285145dd5fc370b28c0f9d91069b815c75ec416df726cfce4271a6b54
     source_path: install/updating.md
     workflow: 15
 ---
@@ -17,13 +17,13 @@ Jaga OpenClaw tetap mutakhir.
 
 ## Direkomendasikan: `openclaw update`
 
-Cara tercepat untuk memperbarui. Perintah ini mendeteksi jenis instalasi Anda (npm atau git), mengambil versi terbaru, menjalankan `openclaw doctor`, dan memulai ulang gateway.
+Cara tercepat untuk memperbarui. Perintah ini mendeteksi jenis instalasi Anda (npm atau git), mengambil versi terbaru, menjalankan `openclaw doctor`, dan me-restart gateway.
 
 ```bash
 openclaw update
 ```
 
-Untuk mengganti channel atau menargetkan versi tertentu:
+Untuk berpindah channel atau menargetkan versi tertentu:
 
 ```bash
 openclaw update --channel beta
@@ -31,11 +31,11 @@ openclaw update --tag main
 openclaw update --dry-run   # pratinjau tanpa menerapkan
 ```
 
-`--channel beta` mengutamakan beta, tetapi runtime akan fallback ke stable/latest saat
-tag beta tidak ada atau lebih lama dari rilis stable terbaru. Gunakan `--tag beta`
-jika Anda menginginkan dist-tag beta npm mentah untuk pembaruan paket satu kali.
+`--channel beta` memprioritaskan beta, tetapi runtime fallback ke stable/latest saat
+tag beta tidak ada atau lebih lama daripada rilis stable terbaru. Gunakan `--tag beta`
+jika Anda menginginkan npm beta dist-tag mentah untuk pembaruan paket satu kali.
 
-Lihat [Channel pengembangan](/id/install/development-channels) untuk semantik channel.
+Lihat [Development channels](/id/install/development-channels) untuk semantik channel.
 
 ## Alternatif: jalankan ulang installer
 
@@ -59,28 +59,33 @@ pnpm add -g openclaw@latest
 bun add -g openclaw@latest
 ```
 
-### Instalasi npm global milik root
+### Instalasi npm global dan dependensi runtime
 
-Beberapa penyiapan npm Linux menginstal paket global di bawah direktori milik root seperti
-`/usr/lib/node_modules/openclaw`. OpenClaw mendukung tata letak itu: paket yang diinstal
-diperlakukan sebagai read-only saat runtime, dan dependensi runtime Plugin bawaan
-di-stage ke direktori runtime yang dapat ditulis alih-alih memodifikasi
-pohon paket.
+OpenClaw memperlakukan instalasi global yang dipaketkan sebagai hanya-baca saat runtime, bahkan ketika direktori paket global dapat ditulis oleh pengguna saat ini. Dependensi runtime plugin bawaan di-stage ke direktori runtime yang dapat ditulis alih-alih memodifikasi tree paket. Ini menjaga `openclaw update` agar tidak balapan dengan gateway atau agen lokal yang sedang berjalan yang memperbaiki dependensi plugin selama instalasi yang sama.
 
-Untuk unit systemd yang diperketat, atur direktori stage yang dapat ditulis dan disertakan dalam
-`ReadWritePaths`:
+Beberapa penyiapan npm Linux menginstal paket global di bawah direktori milik root seperti `/usr/lib/node_modules/openclaw`. OpenClaw mendukung tata letak itu melalui jalur staging eksternal yang sama.
+
+Untuk unit systemd yang diperkeras, tetapkan direktori stage yang dapat ditulis yang disertakan dalam `ReadWritePaths`:
 
 ```ini
 Environment=OPENCLAW_PLUGIN_STAGE_DIR=/var/lib/openclaw/plugin-runtime-deps
 ReadWritePaths=/var/lib/openclaw /home/openclaw/.openclaw /tmp
 ```
 
-Jika `OPENCLAW_PLUGIN_STAGE_DIR` tidak diatur, OpenClaw menggunakan `$STATE_DIRECTORY` saat
+Jika `OPENCLAW_PLUGIN_STAGE_DIR` tidak ditetapkan, OpenClaw menggunakan `$STATE_DIRECTORY` saat
 systemd menyediakannya, lalu fallback ke `~/.openclaw/plugin-runtime-deps`.
+
+### Dependensi runtime plugin bawaan
+
+Instalasi paket menyimpan dependensi runtime plugin bawaan di luar tree paket yang hanya-baca. Saat startup dan selama `openclaw doctor --fix`, OpenClaw memperbaiki dependensi runtime hanya untuk plugin bawaan yang aktif dalam konfigurasi, aktif melalui konfigurasi channel lama, atau diaktifkan oleh default manifest bawaannya.
+
+Penonaktifan eksplisit menang. Plugin atau channel yang dinonaktifkan tidak akan diperbaiki
+dependensi runtime-nya hanya karena ada di dalam paket. Plugin eksternal dan jalur pemuatan kustom tetap menggunakan `openclaw plugins install` atau
+`openclaw plugins update`.
 
 ## Auto-updater
 
-Auto-updater dinonaktifkan secara default. Aktifkan di `~/.openclaw/openclaw.json`:
+Auto-updater nonaktif secara default. Aktifkan di `~/.openclaw/openclaw.json`:
 
 ```json5
 {
@@ -96,11 +101,11 @@ Auto-updater dinonaktifkan secara default. Aktifkan di `~/.openclaw/openclaw.jso
 }
 ```
 
-| Channel  | Perilaku                                                                                                      |
-| -------- | ------------------------------------------------------------------------------------------------------------- |
-| `stable` | Menunggu `stableDelayHours`, lalu menerapkan dengan jitter deterministik di sepanjang `stableJitterHours` (rollout tersebar). |
-| `beta`   | Memeriksa setiap `betaCheckIntervalHours` (default: tiap jam) dan langsung menerapkan.                       |
-| `dev`    | Tidak ada penerapan otomatis. Gunakan `openclaw update` secara manual.                                       |
+| Channel  | Perilaku                                                                                                         |
+| -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `stable` | Menunggu `stableDelayHours`, lalu menerapkan dengan jitter deterministik sepanjang `stableJitterHours` (rollout tersebar). |
+| `beta`   | Memeriksa setiap `betaCheckIntervalHours` (default: per jam) dan langsung menerapkan.                           |
+| `dev`    | Tidak ada penerapan otomatis. Gunakan `openclaw update` secara manual.                                           |
 
 Gateway juga mencatat petunjuk pembaruan saat startup (nonaktifkan dengan `update.checkOnStart: false`).
 
@@ -114,9 +119,9 @@ Gateway juga mencatat petunjuk pembaruan saat startup (nonaktifkan dengan `updat
 openclaw doctor
 ```
 
-Memigrasikan config, mengaudit kebijakan DM, dan memeriksa kesehatan gateway. Detail: [Doctor](/id/gateway/doctor)
+Memigrasikan konfigurasi, mengaudit kebijakan DM, dan memeriksa kesehatan gateway. Detail: [Doctor](/id/gateway/doctor)
 
-### Mulai ulang gateway
+### Restart gateway
 
 ```bash
 openclaw gateway restart
@@ -151,17 +156,17 @@ pnpm install && pnpm build
 openclaw gateway restart
 ```
 
-Untuk kembali ke terbaru: `git checkout main && git pull`.
+Untuk kembali ke latest: `git checkout main && git pull`.
 
 ## Jika Anda buntu
 
-- Jalankan `openclaw doctor` lagi dan baca outputnya dengan cermat.
-- Untuk `openclaw update --channel dev` pada checkout source, updater secara otomatis mem-bootstrap `pnpm` saat diperlukan. Jika Anda melihat error bootstrap pnpm/corepack, instal `pnpm` secara manual (atau aktifkan kembali `corepack`) lalu jalankan ulang pembaruan.
-- Periksa: [Pemecahan masalah](/id/gateway/troubleshooting)
-- Tanyakan di Discord: [https://discord.gg/clawd](https://discord.gg/clawd)
+- Jalankan `openclaw doctor` lagi dan baca output-nya dengan saksama.
+- Untuk `openclaw update --channel dev` pada source checkout, updater otomatis mem-bootstrap `pnpm` bila diperlukan. Jika Anda melihat error bootstrap pnpm/corepack, instal `pnpm` secara manual (atau aktifkan kembali `corepack`) lalu jalankan ulang pembaruan.
+- Periksa: [Troubleshooting](/id/gateway/troubleshooting)
+- Tanya di Discord: [https://discord.gg/clawd](https://discord.gg/clawd)
 
 ## Terkait
 
-- [Ikhtisar Instalasi](/id/install) — semua metode instalasi
+- [Ringkasan instalasi](/id/install) — semua metode instalasi
 - [Doctor](/id/gateway/doctor) — pemeriksaan kesehatan setelah pembaruan
 - [Migrating](/id/install/migrating) — panduan migrasi versi mayor

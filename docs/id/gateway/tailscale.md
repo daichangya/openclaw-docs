@@ -1,57 +1,55 @@
 ---
 read_when:
-    - Mengekspos UI Control Gateway di luar localhost
-    - Mengotomatisasi akses dashboard tailnet atau publik
+    - Mengekspos UI Kontrol Gateway di luar localhost
+    - Mengotomatiskan akses dashboard tailnet atau publik
 summary: Tailscale Serve/Funnel terintegrasi untuk dashboard Gateway
 title: Tailscale
 x-i18n:
-    generated_at: "2026-04-24T09:10:03Z"
+    generated_at: "2026-04-25T13:48:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 30bfe5fa2c9295dcf7164a1a89876d2e097f54d42bd261dfde973fddbd9185ce
+    source_hash: 6042ddaf7194b34f003b1cdf5226f4693da22663d4007c65c79580e7f8ea2835
     source_path: gateway/tailscale.md
     workflow: 15
 ---
 
-# Tailscale (dashboard Gateway)
-
-OpenClaw dapat mengonfigurasi otomatis Tailscale **Serve** (tailnet) atau **Funnel** (publik) untuk
-dashboard Gateway dan port WebSocket. Ini menjaga Gateway tetap terikat ke loopback sementara
+OpenClaw dapat mengonfigurasi Tailscale **Serve** (tailnet) atau **Funnel** (publik) secara otomatis untuk
+dashboard Gateway dan port WebSocket. Ini membuat Gateway tetap terikat ke loopback sementara
 Tailscale menyediakan HTTPS, perutean, dan (untuk Serve) header identitas.
 
 ## Mode
 
-- `serve`: Serve khusus Tailnet melalui `tailscale serve`. Gateway tetap di `127.0.0.1`.
+- `serve`: Serve khusus tailnet melalui `tailscale serve`. Gateway tetap di `127.0.0.1`.
 - `funnel`: HTTPS publik melalui `tailscale funnel`. OpenClaw memerlukan password bersama.
-- `off`: Default (tanpa otomasi Tailscale).
+- `off`: Default (tanpa otomatisasi Tailscale).
 
 ## Auth
 
 Setel `gateway.auth.mode` untuk mengontrol handshake:
 
-- `none` (hanya ingress privat)
+- `none` (khusus private ingress)
 - `token` (default saat `OPENCLAW_GATEWAY_TOKEN` disetel)
-- `password` (shared secret melalui `OPENCLAW_GATEWAY_PASSWORD` atau config)
-- `trusted-proxy` (reverse proxy sadar identitas; lihat [Trusted Proxy Auth](/id/gateway/trusted-proxy-auth))
+- `password` (secret bersama melalui `OPENCLAW_GATEWAY_PASSWORD` atau konfigurasi)
+- `trusted-proxy` (reverse proxy sadar-identitas; lihat [Auth Trusted Proxy](/id/gateway/trusted-proxy-auth))
 
 Saat `tailscale.mode = "serve"` dan `gateway.auth.allowTailscale` bernilai `true`,
-auth UI Control/WebSocket dapat menggunakan header identitas Tailscale
-(`tailscale-user-login`) tanpa memberikan token/password. OpenClaw memverifikasi
-identitas tersebut dengan menyelesaikan alamat `x-forwarded-for` melalui daemon Tailscale
-lokal (`tailscale whois`) dan mencocokkannya dengan header sebelum menerimanya.
-OpenClaw hanya memperlakukan sebuah permintaan sebagai Serve jika permintaan itu datang dari loopback dengan
-header `x-forwarded-for`, `x-forwarded-proto`, dan `x-forwarded-host` dari Tailscale.
-Endpoint API HTTP (misalnya `/v1/*`, `/tools/invoke`, dan `/api/channels/*`)
+auth UI Kontrol/WebSocket dapat menggunakan header identitas Tailscale
+(`tailscale-user-login`) tanpa menyuplai token/password. OpenClaw memverifikasi
+identitas dengan menyelesaikan alamat `x-forwarded-for` melalui daemon Tailscale lokal
+(`tailscale whois`) dan mencocokkannya dengan header sebelum menerimanya.
+OpenClaw hanya memperlakukan permintaan sebagai Serve saat permintaan datang dari loopback dengan
+header `x-forwarded-for`, `x-forwarded-proto`, dan `x-forwarded-host`
+milik Tailscale.
+Endpoint HTTP API (misalnya `/v1/*`, `/tools/invoke`, dan `/api/channels/*`)
 **tidak** menggunakan auth header identitas Tailscale. Endpoint tersebut tetap mengikuti
-mode auth HTTP normal gateway: auth shared-secret secara default, atau penyiapan
-trusted-proxy / private-ingress `none` yang memang dikonfigurasi dengan sengaja.
+mode auth HTTP normal gateway: auth shared-secret secara default, atau penyiapan `trusted-proxy` / private-ingress `none` yang dikonfigurasi secara sengaja.
 Alur tanpa token ini mengasumsikan host gateway tepercaya. Jika kode lokal yang tidak tepercaya
-mungkin berjalan di host yang sama, nonaktifkan `gateway.auth.allowTailscale` dan
-wajibkan auth token/password sebagai gantinya.
+mungkin berjalan di host yang sama, nonaktifkan `gateway.auth.allowTailscale` dan minta
+auth token/password sebagai gantinya.
 Untuk mewajibkan kredensial shared-secret eksplisit, setel `gateway.auth.allowTailscale: false`
 dan gunakan `gateway.auth.mode: "token"` atau `"password"`.
 
-## Contoh config
+## Contoh konfigurasi
 
 ### Khusus tailnet (Serve)
 
@@ -68,7 +66,7 @@ Buka: `https://<magicdns>/` (atau `gateway.controlUi.basePath` yang Anda konfigu
 
 ### Khusus tailnet (bind ke IP Tailnet)
 
-Gunakan ini saat Anda ingin Gateway mendengarkan langsung pada IP Tailnet (tanpa Serve/Funnel).
+Gunakan ini saat Anda ingin Gateway mendengarkan langsung di IP Tailnet (tanpa Serve/Funnel).
 
 ```json5
 {
@@ -81,7 +79,7 @@ Gunakan ini saat Anda ingin Gateway mendengarkan langsung pada IP Tailnet (tanpa
 
 Hubungkan dari perangkat Tailnet lain:
 
-- UI Control: `http://<tailscale-ip>:18789/`
+- UI Kontrol: `http://<tailscale-ip>:18789/`
 - WebSocket: `ws://<tailscale-ip>:18789`
 
 Catatan: loopback (`http://127.0.0.1:18789`) **tidak** akan berfungsi dalam mode ini.
@@ -98,7 +96,7 @@ Catatan: loopback (`http://127.0.0.1:18789`) **tidak** akan berfungsi dalam mode
 }
 ```
 
-Utamakan `OPENCLAW_GATEWAY_PASSWORD` daripada meng-commit password ke disk.
+Utamakan `OPENCLAW_GATEWAY_PASSWORD` daripada mengomit password ke disk.
 
 ## Contoh CLI
 
@@ -110,27 +108,27 @@ openclaw gateway --tailscale funnel --auth password
 ## Catatan
 
 - Tailscale Serve/Funnel memerlukan CLI `tailscale` yang sudah terinstal dan login.
-- `tailscale.mode: "funnel"` menolak untuk memulai kecuali mode auth adalah `password` agar terhindar dari eksposur publik.
+- `tailscale.mode: "funnel"` menolak untuk mulai kecuali mode auth adalah `password` guna menghindari eksposur publik.
 - Setel `gateway.tailscale.resetOnExit` jika Anda ingin OpenClaw membatalkan konfigurasi `tailscale serve`
   atau `tailscale funnel` saat shutdown.
 - `gateway.bind: "tailnet"` adalah bind Tailnet langsung (tanpa HTTPS, tanpa Serve/Funnel).
-- `gateway.bind: "auto"` mengutamakan loopback; gunakan `tailnet` jika Anda ingin khusus Tailnet.
+- `gateway.bind: "auto"` mengutamakan loopback; gunakan `tailnet` jika Anda menginginkan mode khusus Tailnet.
 - Serve/Funnel hanya mengekspos **UI kontrol Gateway + WS**. Node terhubung melalui
-  endpoint WS Gateway yang sama, sehingga Serve dapat berfungsi untuk akses node.
+  endpoint WS Gateway yang sama, jadi Serve dapat berfungsi untuk akses node.
 
-## Kontrol browser (Gateway jarak jauh + browser lokal)
+## Kontrol browser (Gateway remote + browser lokal)
 
 Jika Anda menjalankan Gateway di satu mesin tetapi ingin mengendalikan browser di mesin lain,
-jalankan **host node** di mesin browser dan biarkan keduanya tetap berada di tailnet yang sama.
-Gateway akan mem-proxy tindakan browser ke node; tidak perlu server kontrol terpisah atau URL Serve.
+jalankan **host node** di mesin browser dan pertahankan keduanya pada tailnet yang sama.
+Gateway akan mem-proxy aksi browser ke node; tidak diperlukan server kontrol atau URL Serve terpisah.
 
 Hindari Funnel untuk kontrol browser; perlakukan pairing node seperti akses operator.
 
 ## Prasyarat + batasan Tailscale
 
-- Serve memerlukan HTTPS yang diaktifkan untuk tailnet Anda; CLI akan meminta jika belum ada.
-- Serve menyuntikkan header identitas Tailscale; Funnel tidak.
-- Funnel memerlukan Tailscale v1.38.3+, MagicDNS, HTTPS aktif, dan atribut node funnel.
+- Serve memerlukan HTTPS diaktifkan untuk tailnet Anda; CLI akan meminta jika belum ada.
+- Serve menyisipkan header identitas Tailscale; Funnel tidak.
+- Funnel memerlukan Tailscale v1.38.3+, MagicDNS, HTTPS diaktifkan, dan atribut node funnel.
 - Funnel hanya mendukung port `443`, `8443`, dan `10000` melalui TLS.
 - Funnel di macOS memerlukan varian aplikasi Tailscale open-source.
 

@@ -1,27 +1,27 @@
 ---
 read_when:
-    - Anda sedang mengelola Node yang dipasangkan (kamera, layar, canvas)
-    - Anda perlu menyetujui permintaan atau menjalankan perintah Node
-summary: Referensi CLI untuk `openclaw nodes` (status, pairing, invoke, kamera/canvas/layar)
+    - Anda sedang mengelola Node yang dipasangkan (camera, screen, canvas)
+    - Anda perlu menyetujui permintaan atau memanggil perintah Node
+summary: Referensi CLI untuk `openclaw nodes` (status, pairing, invoke, camera/canvas/screen)
 title: Node
 x-i18n:
-    generated_at: "2026-04-24T09:02:16Z"
+    generated_at: "2026-04-25T13:43:56Z"
     model: gpt-5.4
     provider: openai
-    source_hash: a1f1b440b3113b71338ae9cab5e1ded607dba79b9429f5c0b1b5f9e758b9f73e
+    source_hash: 68a5701ce0dcba399d93f6eed864b0b0ae34320501de0176aeaad1712d392834
     source_path: cli/nodes.md
     workflow: 15
 ---
 
 # `openclaw nodes`
 
-Kelola Node (perangkat) yang dipasangkan dan jalankan kapabilitas Node.
+Kelola Node (perangkat) yang dipasangkan dan panggil kapabilitas Node.
 
 Terkait:
 
-- Ikhtisar Node: [Node](/id/nodes)
-- Kamera: [Node kamera](/id/nodes/camera)
-- Gambar: [Node gambar](/id/nodes/images)
+- Ringkasan Node: [Node](/id/nodes)
+- Camera: [Node camera](/id/nodes/camera)
+- Images: [Node image](/id/nodes/images)
 
 Opsi umum:
 
@@ -42,14 +42,17 @@ openclaw nodes status --connected
 openclaw nodes status --last-connected 24h
 ```
 
-`nodes list` mencetak tabel pending/paired. Baris paired menyertakan usia koneksi terbaru (Last Connect).
+`nodes list` mencetak tabel pending/paired. Baris paired mencakup usia koneksi terbaru (Last Connect).
 Gunakan `--connected` untuk hanya menampilkan Node yang sedang terhubung. Gunakan `--last-connected <duration>` untuk
-memfilter Node yang terhubung dalam suatu durasi (misalnya `24h`, `7d`).
+memfilter ke Node yang terhubung dalam durasi tertentu (misalnya `24h`, `7d`).
 
 Catatan persetujuan:
 
-- `openclaw nodes pending` hanya memerlukan cakupan pairing.
-- `openclaw nodes approve <requestId>` mewarisi persyaratan cakupan tambahan dari
+- `openclaw nodes pending` hanya memerlukan scope pairing.
+- `gateway.nodes.pairing.autoApproveCidrs` dapat melewati langkah pending hanya untuk
+  pairing perangkat `role: node` pertama kali yang secara eksplisit tepercaya. Ini nonaktif secara
+  default dan tidak menyetujui upgrade.
+- `openclaw nodes approve <requestId>` mewarisi kebutuhan scope tambahan dari
   permintaan pending:
   - permintaan tanpa perintah: hanya pairing
   - perintah Node non-exec: pairing + write
@@ -64,15 +67,15 @@ openclaw nodes invoke --node <id|name|ip> --command <command> --params <json>
 Flag invoke:
 
 - `--params <json>`: string objek JSON (default `{}`).
-- `--invoke-timeout <ms>`: batas waktu invoke Node (default `15000`).
-- `--idempotency-key <key>`: kunci idempotensi opsional.
+- `--invoke-timeout <ms>`: timeout invoke Node (default `15000`).
+- `--idempotency-key <key>`: key idempotensi opsional.
 - `system.run` dan `system.run.prepare` diblokir di sini; gunakan alat `exec` dengan `host=node` untuk eksekusi shell.
 
-Untuk eksekusi shell di Node, gunakan alat `exec` dengan `host=node`, bukan `openclaw nodes run`.
-CLI `nodes` sekarang berfokus pada kapabilitas: RPC langsung melalui `nodes invoke`, ditambah pairing, kamera,
-layar, lokasi, canvas, dan notifikasi.
+Untuk eksekusi shell pada Node, gunakan alat `exec` dengan `host=node` alih-alih `openclaw nodes run`.
+CLI `nodes` kini berfokus pada kapabilitas: RPC langsung melalui `nodes invoke`, plus pairing, camera,
+screen, location, canvas, dan notifications.
 
 ## Terkait
 
-- [Referensi CLI](/id/cli)
+- [CLI reference](/id/cli)
 - [Node](/id/nodes)

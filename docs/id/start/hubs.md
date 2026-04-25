@@ -1,34 +1,34 @@
 ---
 read_when:
     - Anda menginginkan peta dokumentasi yang lengkap
-summary: Hub yang menautkan ke setiap dokumen OpenClaw
-title: Hub dokumentasi
+summary: Hub yang menaut ke setiap dokumen OpenClaw
+title: Hub dokumen
 x-i18n:
-    generated_at: "2026-04-24T09:28:10Z"
+    generated_at: "2026-04-25T13:56:34Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 711d23631ca29b122054b1a048058ec5bd787043e7ffc8c3108b17cf275c2c8e
+    source_hash: db591029047b57e65141c5992760a81b838580602b1073e94d1bc2690415c0aa
     source_path: start/hubs.md
     workflow: 15
 ---
 
 <Note>
-Jika Anda baru mengenal OpenClaw, mulai dari [Getting Started](/id/start/getting-started).
+Jika Anda baru mengenal OpenClaw, mulai dengan [Getting Started](/id/start/getting-started).
 </Note>
 
-Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan dokumentasi referensi yang tidak muncul di navigasi kiri.
+Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan dokumen referensi yang tidak muncul di navigasi kiri.
 
-## Mulai dari sini
+## Mulai di sini
 
-- [Index](/id)
+- [Indeks](/id)
 - [Getting Started](/id/start/getting-started)
 - [Onboarding](/id/start/onboarding)
 - [Onboarding (CLI)](/id/start/wizard)
 - [Setup](/id/start/setup)
 - [Dashboard (Gateway lokal)](http://127.0.0.1:18789/)
-- [Help](/id/help)
-- [Direktori dokumentasi](/id/start/docs-directory)
-- [Configuration](/id/gateway/configuration)
+- [Bantuan](/id/help)
+- [Direktori dokumen](/id/start/docs-directory)
+- [Konfigurasi](/id/gateway/configuration)
 - [Contoh konfigurasi](/id/gateway/configuration-examples)
 - [Asisten OpenClaw](/id/start/openclaw)
 - [Showcase](/id/start/showcase)
@@ -38,33 +38,33 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 
 - [Docker](/id/install/docker)
 - [Nix](/id/install/nix)
-- [Updating / rollback](/id/install/updating)
-- [Bun workflow (eksperimental)](/id/install/bun)
+- [Memperbarui / rollback](/id/install/updating)
+- [Alur kerja Bun (eksperimental)](/id/install/bun)
 
 ## Konsep inti
 
-- [Architecture](/id/concepts/architecture)
-- [Features](/id/concepts/features)
+- [Arsitektur](/id/concepts/architecture)
+- [Fitur](/id/concepts/features)
 - [Hub jaringan](/id/network)
 - [Runtime agen](/id/concepts/agent)
 - [Workspace agen](/id/concepts/agent-workspace)
-- [Memory](/id/concepts/memory)
+- [Memori](/id/concepts/memory)
 - [Loop agen](/id/concepts/agent-loop)
 - [Streaming + chunking](/id/concepts/streaming)
 - [Routing multi-agen](/id/concepts/multi-agent)
 - [Compaction](/id/concepts/compaction)
 - [Sesi](/id/concepts/session)
-- [Session pruning](/id/concepts/session-pruning)
+- [Pemangkasan sesi](/id/concepts/session-pruning)
 - [Tool sesi](/id/concepts/session-tool)
-- [Queue](/id/concepts/queue)
+- [Antrean](/id/concepts/queue)
 - [Perintah slash](/id/tools/slash-commands)
-- [Adaptor RPC](/id/reference/rpc)
+- [Adapter RPC](/id/reference/rpc)
 - [Skema TypeBox](/id/concepts/typebox)
-- [Penanganan timezone](/id/concepts/timezone)
-- [Presence](/id/concepts/presence)
+- [Penanganan zona waktu](/id/concepts/timezone)
+- [Presensi](/id/concepts/presence)
 - [Discovery + transport](/id/gateway/discovery)
 - [Bonjour](/id/gateway/bonjour)
-- [Routing kanal](/id/channels/channel-routing)
+- [Routing channel](/id/channels/channel-routing)
 - [Grup](/id/channels/groups)
 - [Pesan grup](/id/channels/group-messages)
 - [Failover model](/id/concepts/model-failover)
@@ -72,7 +72,7 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 
 ## Provider + ingress
 
-- [Hub kanal obrolan](/id/channels)
+- [Hub channel chat](/id/channels)
 - [Hub provider model](/id/providers/models)
 - [WhatsApp](/id/channels/whatsapp)
 - [Telegram](/id/channels/telegram)
@@ -82,8 +82,8 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 - [Signal](/id/channels/signal)
 - [BlueBubbles (iMessage)](/id/channels/bluebubbles)
 - [QQ Bot](/id/channels/qqbot)
-- [iMessage (legacy)](/id/channels/imessage)
-- [Parsing lokasi](/id/channels/location)
+- [iMessage (lama)](/id/channels/imessage)
+- [Penguraian lokasi](/id/channels/location)
 - [WebChat](/id/web/webchat)
 - [Webhook](/id/automation/cron-jobs#webhooks)
 - [Gmail Pub/Sub](/id/automation/cron-jobs#gmail-pubsub-integration)
@@ -93,49 +93,49 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 - [Runbook Gateway](/id/gateway)
 - [Model jaringan](/id/gateway/network-model)
 - [Pairing Gateway](/id/gateway/pairing)
-- [Gateway lock](/id/gateway/gateway-lock)
+- [Kunci Gateway](/id/gateway/gateway-lock)
 - [Proses latar belakang](/id/gateway/background-process)
-- [Health](/id/gateway/health)
+- [Kesehatan](/id/gateway/health)
 - [Heartbeat](/id/gateway/heartbeat)
 - [Doctor](/id/gateway/doctor)
 - [Logging](/id/gateway/logging)
 - [Sandboxing](/id/gateway/sandboxing)
 - [Dashboard](/id/web/dashboard)
-- [Control UI](/id/web/control-ui)
+- [UI Kontrol](/id/web/control-ui)
 - [Akses jarak jauh](/id/gateway/remote)
-- [README gateway remote](/id/gateway/remote-gateway-readme)
+- [README gateway jarak jauh](/id/gateway/remote-gateway-readme)
 - [Tailscale](/id/gateway/tailscale)
-- [Security](/id/gateway/security)
+- [Keamanan](/id/gateway/security)
 - [Pemecahan masalah](/id/gateway/troubleshooting)
 
-## Tools + otomatisasi
+## Tool + otomatisasi
 
-- [Permukaan tools](/id/tools)
+- [Surface tool](/id/tools)
 - [OpenProse](/id/prose)
 - [Referensi CLI](/id/cli)
 - [Tool exec](/id/tools/exec)
 - [Tool PDF](/id/tools/pdf)
 - [Mode elevated](/id/tools/elevated)
-- [Job Cron](/id/automation/cron-jobs)
-- [Automation & Tasks](/id/automation)
+- [Cron jobs](/id/automation/cron-jobs)
+- [Otomatisasi & Task](/id/automation)
 - [Thinking + verbose](/id/tools/thinking)
-- [Models](/id/concepts/models)
+- [Model](/id/concepts/models)
 - [Sub-agen](/id/tools/subagents)
-- [CLI agent send](/id/tools/agent-send)
-- [Terminal UI](/id/web/tui)
+- [CLI kirim agen](/id/tools/agent-send)
+- [UI Terminal](/id/web/tui)
 - [Kontrol browser](/id/tools/browser)
 - [Browser (pemecahan masalah Linux)](/id/tools/browser-linux-troubleshooting)
-- [Polls](/id/cli/message)
+- [Polling](/id/cli/message)
 
 ## Node, media, suara
 
-- [Ikhtisar Nodes](/id/nodes)
+- [Ikhtisar Node](/id/nodes)
 - [Kamera](/id/nodes/camera)
 - [Gambar](/id/nodes/images)
 - [Audio](/id/nodes/audio)
 - [Perintah lokasi](/id/nodes/location-command)
-- [Voice wake](/id/nodes/voicewake)
-- [Talk mode](/id/nodes/talk)
+- [Pemicu suara](/id/nodes/voicewake)
+- [Mode bicara](/id/nodes/talk)
 
 ## Platform
 
@@ -145,39 +145,40 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 - [Android](/id/platforms/android)
 - [Windows (WSL2)](/id/platforms/windows)
 - [Linux](/id/platforms/linux)
-- [Permukaan web](/id/web)
+- [Surface web](/id/web)
 
 ## Aplikasi pendamping macOS (lanjutan)
 
 - [Setup dev macOS](/id/platforms/mac/dev-setup)
-- [Menu bar macOS](/id/platforms/mac/menu-bar)
-- [Voice wake macOS](/id/platforms/mac/voicewake)
-- [Voice overlay macOS](/id/platforms/mac/voice-overlay)
+- [Bilah menu macOS](/id/platforms/mac/menu-bar)
+- [Pemicu suara macOS](/id/platforms/mac/voicewake)
+- [Overlay suara macOS](/id/platforms/mac/voice-overlay)
 - [WebChat macOS](/id/platforms/mac/webchat)
 - [Canvas macOS](/id/platforms/mac/canvas)
-- [Child process macOS](/id/platforms/mac/child-process)
-- [Health macOS](/id/platforms/mac/health)
+- [Proses anak macOS](/id/platforms/mac/child-process)
+- [Kesehatan macOS](/id/platforms/mac/health)
 - [Ikon macOS](/id/platforms/mac/icon)
 - [Logging macOS](/id/platforms/mac/logging)
 - [Izin macOS](/id/platforms/mac/permissions)
-- [Remote macOS](/id/platforms/mac/remote)
-- [Signing macOS](/id/platforms/mac/signing)
+- [Jarak jauh macOS](/id/platforms/mac/remote)
+- [Penandatanganan macOS](/id/platforms/mac/signing)
 - [Gateway macOS (launchd)](/id/platforms/mac/bundled-gateway)
 - [XPC macOS](/id/platforms/mac/xpc)
 - [Skills macOS](/id/platforms/mac/skills)
 - [Peekaboo macOS](/id/platforms/mac/peekaboo)
 
-## Plugins
+## Plugin
 
-- [Ikhtisar Plugins](/id/tools/plugin)
-- [Building plugins](/id/plugins/building-plugins)
-- [Manifest Plugin](/id/plugins/manifest)
+- [Ikhtisar plugin](/id/tools/plugin)
+- [Membangun plugin](/id/plugins/building-plugins)
+- [Hook plugin](/id/plugins/hooks)
+- [Manifest plugin](/id/plugins/manifest)
 - [Tool agen](/id/plugins/building-plugins#registering-agent-tools)
-- [Bundel Plugin](/id/plugins/bundles)
+- [Bundel plugin](/id/plugins/bundles)
 - [Plugin komunitas](/id/plugins/community)
-- [Capability cookbook](/id/plugins/architecture)
+- [Buku resep kapabilitas](/id/plugins/architecture)
 - [Plugin voice call](/id/plugins/voice-call)
-- [Plugin Zalo user](/id/plugins/zalouser)
+- [Plugin pengguna Zalo](/id/plugins/zalouser)
 
 ## Workspace + template
 
@@ -195,14 +196,14 @@ Gunakan hub ini untuk menemukan setiap halaman, termasuk pembahasan mendalam dan
 
 ## Proyek
 
-- [Credits](/id/reference/credits)
+- [Kredit](/id/reference/credits)
 
 ## Pengujian + rilis
 
-- [Testing](/id/reference/test)
+- [Pengujian](/id/reference/test)
 - [Kebijakan rilis](/id/reference/RELEASING)
 - [Model perangkat](/id/reference/device-models)
 
 ## Terkait
 
-- [Getting started](/id/start/getting-started)
+- [Memulai](/id/start/getting-started)

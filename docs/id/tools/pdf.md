@@ -1,45 +1,46 @@
 ---
 read_when:
     - Anda ingin menganalisis PDF dari agen
-    - Anda memerlukan parameter dan batas tool PDF yang tepat
-    - Anda sedang men-debug mode PDF native vs fallback ekstraksi
+    - Anda memerlukan parameter dan batas alat pdf yang tepat
+    - Anda sedang men-debug mode PDF native versus fallback ekstraksi
 summary: Analisis satu atau lebih dokumen PDF dengan dukungan provider native dan fallback ekstraksi
-title: Tool PDF
+title: Alat PDF
 x-i18n:
-    generated_at: "2026-04-24T09:32:31Z"
+    generated_at: "2026-04-25T13:58:24Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 945838d1e1164a15720ca76eb156f9f299bf7f603f4591c8fa557b43e4cc93a8
+    source_hash: 89bbc675f2b87729e283659f9604724be7a827b50b11edc853a42c448bbaaf6e
     source_path: tools/pdf.md
     workflow: 15
 ---
 
 `pdf` menganalisis satu atau lebih dokumen PDF dan mengembalikan teks.
 
-Perilaku cepat:
+Perilaku singkat:
 
 - Mode provider native untuk provider model Anthropic dan Google.
-- Mode fallback ekstraksi untuk provider lain (ekstrak teks terlebih dahulu, lalu gambar halaman saat diperlukan).
-- Mendukung input tunggal (`pdf`) atau multi (`pdfs`), maksimal 10 PDF per panggilan.
+- Mode fallback ekstraksi untuk provider lain (ekstrak teks terlebih dahulu, lalu gambar halaman bila diperlukan).
+- Mendukung input tunggal (`pdf`) atau multi (`pdfs`), maksimum 10 PDF per pemanggilan.
 
 ## Ketersediaan
 
-Tool ini hanya didaftarkan ketika OpenClaw dapat me-resolve konfigurasi model yang mampu PDF untuk agen:
+Alat ini hanya didaftarkan ketika OpenClaw dapat meresolusikan konfigurasi model yang mendukung PDF untuk agen:
 
 1. `agents.defaults.pdfModel`
 2. fallback ke `agents.defaults.imageModel`
-3. fallback ke model sesi/default hasil resolve agen
-4. jika provider PDF native didukung auth, prioritaskan mereka di atas kandidat fallback gambar generik
+3. fallback ke model sesi/default yang telah diresolusikan untuk agen
+4. jika provider PDF-native berbasis auth, utamakan mereka di depan kandidat fallback image generik
 
-Jika tidak ada model yang dapat digunakan dan dapat di-resolve, tool `pdf` tidak diekspos.
+Jika tidak ada model yang dapat digunakan yang bisa diresolusikan, alat `pdf` tidak diekspos.
 
 Catatan ketersediaan:
 
-- Rantai fallback sadar auth. `provider/model` yang dikonfigurasi hanya dihitung jika
+- Rantai fallback sadar-auth. `provider/model` yang dikonfigurasi hanya dihitung jika
   OpenClaw benar-benar dapat mengautentikasi provider tersebut untuk agen.
 - Provider PDF native saat ini adalah **Anthropic** dan **Google**.
-- Jika provider sesi/default hasil resolve sudah memiliki model vision/PDF
-  yang dikonfigurasi, tool PDF menggunakan ulang model tersebut sebelum kembali ke provider lain yang didukung auth.
+- Jika provider sesi/default yang telah diresolusikan sudah memiliki model vision/PDF
+  yang dikonfigurasi, alat PDF akan menggunakannya kembali sebelum fallback ke provider
+  lain yang berbasis auth.
 
 ## Referensi input
 
@@ -69,9 +70,9 @@ Batas ukuran per PDF dalam MB. Default ke `agents.defaults.pdfMaxBytesMb` atau `
 
 Catatan input:
 
-- `pdf` dan `pdfs` digabungkan dan di-dedup sebelum dimuat.
-- Jika tidak ada input PDF yang diberikan, tool akan error.
-- `pages` diparse sebagai nomor halaman berbasis 1, di-dedup, diurutkan, dan dijepit ke halaman maksimum yang dikonfigurasi.
+- `pdf` dan `pdfs` digabungkan dan dideduplikasi sebelum dimuat.
+- Jika tidak ada input PDF yang diberikan, alat mengembalikan error.
+- `pages` diparse sebagai nomor halaman berbasis 1, dideduplikasi, diurutkan, dan dibatasi ke jumlah halaman maksimum yang dikonfigurasi.
 - `maxBytesMb` default ke `agents.defaults.pdfMaxBytesMb` atau `10`.
 
 ## Referensi PDF yang didukung
@@ -79,23 +80,25 @@ Catatan input:
 - path file lokal (termasuk ekspansi `~`)
 - URL `file://`
 - URL `http://` dan `https://`
+- ref inbound yang dikelola OpenClaw seperti `media://inbound/<id>`
 
 Catatan referensi:
 
 - Skema URI lain (misalnya `ftp://`) ditolak dengan `unsupported_pdf_reference`.
-- Dalam mode sandbox, URL `http(s)` remote ditolak.
-- Dengan kebijakan file workspace-only diaktifkan, path file lokal di luar root yang diizinkan ditolak.
+- Dalam mode sandbox, URL `http(s)` jarak jauh ditolak.
+- Dengan kebijakan file workspace-only aktif, path file lokal di luar root yang diizinkan akan ditolak.
+- Ref inbound terkelola dan path replay di bawah penyimpanan media inbound OpenClaw diizinkan dengan kebijakan file workspace-only.
 
 ## Mode eksekusi
 
 ### Mode provider native
 
 Mode native digunakan untuk provider `anthropic` dan `google`.
-Tool ini mengirim byte PDF mentah langsung ke API provider.
+Alat mengirim byte PDF mentah langsung ke API provider.
 
 Batas mode native:
 
-- `pages` tidak didukung. Jika disetel, tool akan mengembalikan error.
+- `pages` tidak didukung. Jika disetel, alat mengembalikan error.
 - Input multi-PDF didukung; setiap PDF dikirim sebagai blok dokumen native /
   bagian PDF inline sebelum prompt.
 
@@ -106,17 +109,19 @@ Mode fallback digunakan untuk provider non-native.
 Alur:
 
 1. Ekstrak teks dari halaman yang dipilih (hingga `agents.defaults.pdfMaxPages`, default `20`).
-2. Jika panjang teks yang diekstrak kurang dari `200` karakter, render halaman yang dipilih menjadi gambar PNG dan sertakan.
-3. Kirim konten yang diekstrak beserta prompt ke model yang dipilih.
+2. Jika panjang teks yang diekstrak di bawah `200` karakter, render halaman yang dipilih ke gambar PNG dan sertakan.
+3. Kirim konten yang diekstrak plus prompt ke model yang dipilih.
 
 Detail fallback:
 
 - Ekstraksi gambar halaman menggunakan anggaran piksel `4,000,000`.
-- Jika model target tidak mendukung input gambar dan tidak ada teks yang dapat diekstrak, tool akan error.
-- Jika ekstraksi teks berhasil tetapi ekstraksi gambar memerlukan vision pada
-  model yang hanya teks, OpenClaw menghapus gambar yang dirender dan melanjutkan
-  dengan teks yang diekstrak.
-- Fallback ekstraksi memerlukan `pdfjs-dist` (dan `@napi-rs/canvas` untuk rendering gambar).
+- Jika model target tidak mendukung input gambar dan tidak ada teks yang dapat diekstrak, alat mengembalikan error.
+- Jika ekstraksi teks berhasil tetapi ekstraksi gambar akan memerlukan vision pada
+  model text-only, OpenClaw menghapus gambar yang dirender dan melanjutkan dengan teks
+  yang diekstrak.
+- Fallback ekstraksi menggunakan Plugin `document-extract` yang dibundel. Plugin tersebut memiliki
+  `pdfjs-dist`; `@napi-rs/canvas` hanya digunakan ketika fallback rendering gambar
+  tersedia.
 
 ## Konfigurasi
 
@@ -139,26 +144,26 @@ Lihat [Referensi Konfigurasi](/id/gateway/configuration-reference) untuk detail 
 
 ## Detail output
 
-Tool mengembalikan teks di `content[0].text` dan metadata terstruktur di `details`.
+Alat ini mengembalikan teks di `content[0].text` dan metadata terstruktur di `details`.
 
-Field `details` yang umum:
+Field `details` umum:
 
-- `model`: ref model hasil resolve (`provider/model`)
+- `model`: ref model yang diresolusikan (`provider/model`)
 - `native`: `true` untuk mode provider native, `false` untuk fallback
 - `attempts`: upaya fallback yang gagal sebelum berhasil
 
 Field path:
 
 - input PDF tunggal: `details.pdf`
-- input PDF ganda: `details.pdfs[]` dengan entri `pdf`
+- input beberapa PDF: `details.pdfs[]` dengan entri `pdf`
 - metadata penulisan ulang path sandbox (jika berlaku): `rewrittenFrom`
 
 ## Perilaku error
 
 - Input PDF hilang: melempar `pdf required: provide a path or URL to a PDF document`
-- Terlalu banyak PDF: mengembalikan error terstruktur di `details.error = "too_many_pdfs"`
+- Terlalu banyak PDF: mengembalikan error terstruktur dalam `details.error = "too_many_pdfs"`
 - Skema referensi tidak didukung: mengembalikan `details.error = "unsupported_pdf_reference"`
-- Mode native dengan `pages`: melempar error jelas `pages is not supported with native PDF providers`
+- Mode native dengan `pages`: melempar error yang jelas `pages is not supported with native PDF providers`
 
 ## Contoh
 
@@ -180,7 +185,7 @@ Beberapa PDF:
 }
 ```
 
-Model fallback yang difilter halaman:
+Model fallback dengan filter halaman:
 
 ```json
 {
@@ -193,5 +198,5 @@ Model fallback yang difilter halaman:
 
 ## Terkait
 
-- [Ikhtisar Tools](/id/tools) — semua tool agen yang tersedia
+- [Ikhtisar Alat](/id/tools) — semua alat agen yang tersedia
 - [Referensi Konfigurasi](/id/gateway/config-agents#agent-defaults) — konfigurasi pdfMaxBytesMb dan pdfMaxPages
