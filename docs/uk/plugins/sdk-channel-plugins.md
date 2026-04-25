@@ -1,122 +1,122 @@
 ---
 read_when:
-    - Ви створюєте новий плагін каналу обміну повідомленнями
+    - Ви створюєте новий plugin каналу повідомлень
     - Ви хочете підключити OpenClaw до платформи обміну повідомленнями
     - Вам потрібно зрозуміти поверхню адаптера ChannelPlugin
 sidebarTitle: Channel Plugins
-summary: Покроковий посібник зі створення плагіна каналу обміну повідомленнями для OpenClaw
-title: Створення плагінів каналів
+summary: Покроковий посібник зі створення plugin каналу повідомлень для OpenClaw
+title: Створення plugin каналів
 x-i18n:
-    generated_at: "2026-04-25T02:02:04Z"
+    generated_at: "2026-04-25T02:39:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ac64ec8cc8963eaa5aff862e9b318951a156f10c2f6963cd7fce24780fb028ac
+    source_hash: 0a466decff828bdce1d9d3e85127867b88f43c6eca25aa97306f8bd0df39f3a9
     source_path: plugins/sdk-channel-plugins.md
     workflow: 15
 ---
 
-Цей посібник допоможе вам створити плагін каналу, який підключає OpenClaw до
+Цей посібник описує створення plugin каналу, який підключає OpenClaw до
 платформи обміну повідомленнями. Наприкінці у вас буде робочий канал із
-безпекою DM, паруванням, потоками відповідей і вихідними повідомленнями.
+безпекою DM, сполученням, прив’язкою відповідей до гілок і вихідними повідомленнями.
 
 <Info>
-  Якщо ви раніше не створювали жодного плагіна OpenClaw, спочатку прочитайте
-  [Початок роботи](/uk/plugins/building-plugins), щоб ознайомитися з базовою
+  Якщо ви раніше не створювали жодного plugin для OpenClaw, спочатку прочитайте
+  [Getting Started](/uk/plugins/building-plugins), щоб ознайомитися з базовою
   структурою пакета та налаштуванням маніфесту.
 </Info>
 
-## Як працюють плагіни каналів
+## Як працюють plugin каналів
 
-Плагінам каналів не потрібні власні інструменти send/edit/react. OpenClaw
-зберігає один спільний інструмент `message` у ядрі. Ваш плагін відповідає за:
+Plugin каналів не потребують власних інструментів send/edit/react. OpenClaw
+зберігає один спільний інструмент `message` у core. Ваш plugin відповідає за:
 
 - **Config** — визначення облікового запису та майстер налаштування
 - **Security** — політика DM і списки дозволених
 - **Pairing** — потік підтвердження DM
-- **Session grammar** — як специфічні для провайдера ідентифікатори розмов зіставляються з базовими чатами, ідентифікаторами потоків і резервними батьківськими значеннями
+- **Session grammar** — як специфічні для провайдера ідентифікатори розмов зіставляються з базовими чатами, ідентифікаторами гілок і резервними батьківськими значеннями
 - **Outbound** — надсилання тексту, медіа та опитувань на платформу
-- **Threading** — як організуються потоки відповідей
-- **Heartbeat typing** — необов’язкові сигнали typing/busy для цілей доставки heartbeat
+- **Threading** — як відповіді прив’язуються до гілок
+- **Heartbeat typing** — необов’язкові сигнали typing/busy для цілей доставки Heartbeat
 
-Ядро відповідає за спільний інструмент повідомлень, прив’язку промптів, зовнішню форму ключа сесії,
-загальний облік `:thread:` і диспетчеризацію.
+Core відповідає за спільний інструмент повідомлень, підключення prompt, зовнішню
+форму ключа сесії, загальний облік `:thread:` і диспетчеризацію.
 
-Якщо ваш канал підтримує індикатори набору поза межами вхідних відповідей,
-надайте `heartbeat.sendTyping(...)` у плагіні каналу. Ядро викликає його з
+Якщо ваш канал підтримує індикатори набору поза вхідними відповідями,
+експонуйте `heartbeat.sendTyping(...)` у plugin каналу. Core викликає його з
 визначеною ціллю доставки heartbeat до початку запуску моделі heartbeat і
-використовує спільний життєвий цикл keepalive/cleanup для typing. Додайте `heartbeat.clearTyping(...)`,
-коли платформі потрібен явний сигнал зупинки.
+використовує спільний життєвий цикл typing keepalive/cleanup. Додайте
+`heartbeat.clearTyping(...)`, якщо платформі потрібен явний сигнал зупинки.
 
-Якщо ваш канал додає параметри інструмента повідомлень, які передають джерела
-медіа, надайте ці назви параметрів через `describeMessageTool(...).mediaSourceParams`.
-Ядро використовує цей явний список для нормалізації шляхів sandbox і політики
-доступу до вихідних медіа, тому плагінам не потрібні спеціальні випадки в
-спільному ядрі для специфічних для провайдера параметрів аватара, вкладення
-або обкладинки.
-Рекомендується повертати мапу з ключами дій, наприклад
+Якщо ваш канал додає параметри інструмента message, які містять джерела медіа,
+експонуйте ці імена параметрів через `describeMessageTool(...).mediaSourceParams`.
+Core використовує цей явний список для нормалізації шляхів sandbox і політики
+доступу до вихідних медіа, тому plugins не потребують спеціальних випадків у
+спільному core для специфічних для провайдера параметрів avatar, attachment або
+cover-image.
+Рекомендовано повертати мапу з ключами дій, наприклад
 `{ "set-profile": ["avatarUrl", "avatarPath"] }`, щоб не пов’язані дії не
-успадковували медіааргументи іншої дії. Плоский масив також працює для
-параметрів, які навмисно спільні для кожної доступної дії.
+успадковували медіа-аргументи іншої дії. Плоский масив також працює для
+параметрів, які навмисно є спільними для кожної експонованої дії.
 
-Якщо ваша платформа зберігає додаткову область видимості в ідентифікаторах
-розмов, залишайте цей розбір у плагіні через `messaging.resolveSessionConversation(...)`.
-Це канонічний хук для зіставлення `rawId` із базовим ідентифікатором розмови,
-необов’язковим `thread` id, явним `baseConversationId` і будь-якими
+Якщо ваша платформа зберігає додаткову область в ідентифікаторах розмов,
+залишайте цей розбір у plugin за допомогою `messaging.resolveSessionConversation(...)`.
+Це канонічний hook для зіставлення `rawId` з базовим ідентифікатором розмови,
+необов’язковим ідентифікатором гілки, явним `baseConversationId` і будь-якими
 `parentConversationCandidates`.
 Коли ви повертаєте `parentConversationCandidates`, зберігайте їхній порядок від
-найвужчого батьківського елемента до найширшої/базової розмови.
+найвужчого батьківського значення до найширшої/базової розмови.
 
-Вбудовані плагіни, яким потрібен той самий розбір до запуску реєстру каналів,
-також можуть надавати файл верхнього рівня `session-key-api.ts` із відповідним
-експортом `resolveSessionConversation(...)`. Ядро використовує цю безпечну для
-bootstrap поверхню лише тоді, коли реєстр плагінів часу виконання ще недоступний.
+Вбудовані plugins, яким потрібен той самий розбір до запуску реєстру каналів,
+також можуть експонувати файл верхнього рівня `session-key-api.ts` з відповідним
+експортом `resolveSessionConversation(...)`. Core використовує цю безпечну для
+bootstrap поверхню лише тоді, коли реєстр runtime plugin ще недоступний.
 
-`messaging.resolveParentConversationCandidates(...)` залишається доступним як
-застарілий резервний варіант сумісності, коли плагіну потрібні лише
-резервні батьківські значення поверх загального/сирого id. Якщо обидва хуки
-існують, ядро спочатку використовує
-`resolveSessionConversation(...).parentConversationCandidates` і лише потім
-переходить до `resolveParentConversationCandidates(...)`, якщо канонічний хук
-їх не повертає.
+`messaging.resolveParentConversationCandidates(...)` лишається доступним як
+застарілий резервний варіант сумісності, коли plugin потребує лише резервних
+батьківських значень поверх загального/raw id. Якщо існують обидва hooks, core
+спочатку використовує
+`resolveSessionConversation(...).parentConversationCandidates` і переходить до
+`resolveParentConversationCandidates(...)` лише тоді, коли канонічний hook
+їх не вказує.
 
 ## Підтвердження та можливості каналів
 
-Більшості плагінів каналів не потрібен код, специфічний для підтверджень.
+Більшості plugin каналів не потрібен код, специфічний для підтверджень.
 
-- Ядро відповідає за `/approve` у тому самому чаті, спільні payload кнопок підтвердження та загальну резервну доставку.
-- Надавайте перевагу одному об’єкту `approvalCapability` у плагіні каналу, коли каналу потрібна поведінка, специфічна для підтверджень.
-- `ChannelPlugin.approvals` видалено. Розміщуйте факти доставки/native/render/auth підтверджень у `approvalCapability`.
-- `plugin.auth` призначений лише для login/logout; ядро більше не читає хуки auth підтверджень із цього об’єкта.
-- `approvalCapability.authorizeActorAction` і `approvalCapability.getActionAvailabilityState` — це канонічна межа для auth підтверджень.
+- Core відповідає за `/approve` у тому самому чаті, спільні payload кнопок підтвердження та загальну резервну доставку.
+- Надавайте перевагу одному об’єкту `approvalCapability` у plugin каналу, якщо каналу потрібна поведінка, специфічна для підтверджень.
+- `ChannelPlugin.approvals` видалено. Розміщуйте факти про доставку/native/render/auth підтверджень у `approvalCapability`.
+- `plugin.auth` призначений лише для login/logout; core більше не читає hooks auth підтверджень із цього об’єкта.
+- `approvalCapability.authorizeActorAction` і `approvalCapability.getActionAvailabilityState` — це канонічна межа approval-auth.
 - Використовуйте `approvalCapability.getActionAvailabilityState` для доступності auth підтверджень у тому самому чаті.
-- Якщо ваш канал надає native exec підтвердження, використовуйте `approvalCapability.getExecInitiatingSurfaceState` для стану initiating-surface/native-client, коли він відрізняється від auth підтверджень у тому самому чаті. Ядро використовує цей специфічний для exec хук, щоб розрізняти `enabled` і `disabled`, визначати, чи підтримує ініціювальний канал native exec підтвердження, і включати канал до підказок резервного переходу для native-client. `createApproverRestrictedNativeApprovalCapability(...)` заповнює це для типового випадку.
-- Використовуйте `outbound.shouldSuppressLocalPayloadPrompt` або `outbound.beforeDeliverPayload` для специфічної для каналу поведінки життєвого циклу payload, такої як приховування дубльованих локальних промптів підтвердження або надсилання індикаторів набору перед доставкою.
-- Використовуйте `approvalCapability.delivery` лише для native-маршрутизації підтверджень або пригнічення резервної доставки.
-- Використовуйте `approvalCapability.nativeRuntime` для фактів native-підтверджень, що належать каналу. Зберігайте його lazy на гарячих entrypoint каналу за допомогою `createLazyChannelApprovalNativeRuntimeAdapter(...)`, який може за потреби імпортувати модуль вашого часу виконання, водночас дозволяючи ядру збирати життєвий цикл підтвердження.
+- Якщо ваш канал експонує native exec підтвердження, використовуйте `approvalCapability.getExecInitiatingSurfaceState` для стану initiating-surface/native-client, коли він відрізняється від auth підтверджень у тому самому чаті. Core використовує цей специфічний для exec hook, щоб розрізняти `enabled` і `disabled`, визначати, чи підтримує initiating channel native exec підтвердження, і включати канал до вказівок із резервного переходу native-client. `createApproverRestrictedNativeApprovalCapability(...)` заповнює це для поширеного випадку.
+- Використовуйте `outbound.shouldSuppressLocalPayloadPrompt` або `outbound.beforeDeliverPayload` для специфічної для каналу поведінки життєвого циклу payload, як-от приховування дубльованих локальних prompts підтвердження або надсилання індикаторів typing перед доставкою.
+- Використовуйте `approvalCapability.delivery` лише для native-маршрутизації підтверджень або вимкнення резервної доставки.
+- Використовуйте `approvalCapability.nativeRuntime` для фактів native підтверджень, якими керує канал. Залишайте його lazy на гарячих точках входу каналу за допомогою `createLazyChannelApprovalNativeRuntimeAdapter(...)`, який може імпортувати ваш runtime-модуль на вимогу, водночас дозволяючи core збирати життєвий цикл підтверджень.
 - Використовуйте `approvalCapability.render` лише тоді, коли каналу справді потрібні власні payload підтвердження замість спільного renderer.
-- Використовуйте `approvalCapability.describeExecApprovalSetup`, коли канал хоче, щоб відповідь у вимкненому стані пояснювала точні параметри config, потрібні для ввімкнення native exec підтверджень. Хук отримує `{ channel, channelLabel, accountId }`; канали з іменованими обліковими записами мають відображати шляхи з областю видимості облікового запису, наприклад `channels.<channel>.accounts.<id>.execApprovals.*`, а не значення верхнього рівня за замовчуванням.
-- Якщо канал може виводити стабільні DM-ідентичності, подібні до власника, з наявного config, використовуйте `createResolvedApproverActionAuthAdapter` з `openclaw/plugin-sdk/approval-runtime`, щоб обмежити `/approve` у тому самому чаті без додавання специфічної для підтверджень логіки в ядро.
-- Якщо каналу потрібна native-доставка підтверджень, зосередьте код каналу на нормалізації цілі плюс фактах транспорту/представлення. Використовуйте `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver` і `createApproverRestrictedNativeApprovalCapability` з `openclaw/plugin-sdk/approval-runtime`. Розміщуйте специфічні для каналу факти за `approvalCapability.nativeRuntime`, бажано через `createChannelApprovalNativeRuntimeAdapter(...)` або `createLazyChannelApprovalNativeRuntimeAdapter(...)`, щоб ядро могло зібрати обробник і взяти на себе фільтрацію запитів, маршрутизацію, усунення дублікатів, завершення строку дії, підписку Gateway і сповіщення про маршрутизацію в інше місце. `nativeRuntime` поділено на кілька менших меж:
+- Використовуйте `approvalCapability.describeExecApprovalSetup`, коли канал хоче, щоб відповідь на вимкнений шлях пояснювала точні параметри config, потрібні для ввімкнення native exec підтверджень. Hook отримує `{ channel, channelLabel, accountId }`; канали з іменованими обліковими записами мають відображати шляхи з областю облікового запису, як-от `channels.<channel>.accounts.<id>.execApprovals.*`, а не defaults верхнього рівня.
+- Якщо канал може вивести стабільні схожі на власника DM-ідентичності з наявного config, використовуйте `createResolvedApproverActionAuthAdapter` з `openclaw/plugin-sdk/approval-runtime`, щоб обмежити `/approve` у тому самому чаті без додавання логіки core, специфічної для підтверджень.
+- Якщо каналу потрібна native-доставка підтверджень, зосередьте код каналу на нормалізації цілей і фактах transport/presentation. Використовуйте `createChannelExecApprovalProfile`, `createChannelNativeOriginTargetResolver`, `createChannelApproverDmTargetResolver` і `createApproverRestrictedNativeApprovalCapability` з `openclaw/plugin-sdk/approval-runtime`. Розміщуйте специфічні для каналу факти за `approvalCapability.nativeRuntime`, бажано через `createChannelApprovalNativeRuntimeAdapter(...)` або `createLazyChannelApprovalNativeRuntimeAdapter(...)`, щоб core міг зібрати handler і взяти на себе фільтрацію запитів, маршрутизацію, дедуплікацію, строки дії, підписку Gateway і сповіщення routed-elsewhere. `nativeRuntime` поділено на кілька менших меж:
 - `availability` — чи налаштовано обліковий запис і чи слід обробляти запит
-- `presentation` — зіставлення спільної view model підтвердження з native payload у стані pending/resolved/expired або з фінальними діями
+- `presentation` — зіставлення спільної view model підтвердження з native payload у станах pending/resolved/expired або з фінальними діями
 - `transport` — підготовка цілей плюс надсилання/оновлення/видалення native-повідомлень підтвердження
-- `interactions` — необов’язкові хуки bind/unbind/clear-action для native-кнопок або реакцій
-- `observe` — необов’язкові хуки діагностики доставки
-- Якщо каналу потрібні об’єкти, що належать часу виконання, такі як client, token, Bolt app або Webhook receiver, реєструйте їх через `openclaw/plugin-sdk/channel-runtime-context`. Загальний реєстр runtime-context дозволяє ядру bootstrap capability-driven обробників зі стану запуску каналу без додавання обгорткового glue-коду, специфічного для підтверджень.
-- Звертайтеся до нижчорівневих `createChannelApprovalHandler` або `createChannelNativeApprovalRuntime` лише тоді, коли межа capability-driven ще недостатньо виразна.
-- Канали native-підтверджень мають маршрутизувати і `accountId`, і `approvalKind` через ці helper-и. `accountId` зберігає область видимості політики підтверджень для кількох облікових записів у межах правильного bot account, а `approvalKind` зберігає доступність поведінки exec і Plugin-підтверджень для каналу без жорстко закодованих розгалужень у ядрі.
-- Ядро тепер також відповідає за сповіщення про перенаправлення підтверджень. Плагіни каналів не повинні надсилати власні follow-up повідомлення на кшталт «підтвердження надійшло в DM / інший канал» з `createChannelNativeApprovalRuntime`; натомість надавайте точну маршрутизацію origin + approver-DM через спільні helper-и можливостей підтверджень і дозвольте ядру агрегувати фактичні доставки перед публікацією будь-якого сповіщення назад у чат-ініціатор.
-- Зберігайте тип id доставленого підтвердження наскрізно. Native-клієнти не повинні
-  вгадувати чи переписувати маршрутизацію exec або Plugin-підтверджень на основі локального стану каналу.
-- Різні типи підтверджень можуть навмисно надавати різні native-поверхні.
+- `interactions` — необов’язкові hooks bind/unbind/clear-action для native-кнопок або реакцій
+- `observe` — необов’язкові hooks діагностики доставки
+- Якщо каналу потрібні об’єкти, якими володіє runtime, як-от client, token, Bolt app або Webhook receiver, реєструйте їх через `openclaw/plugin-sdk/channel-runtime-context`. Загальний реєстр runtime-context дозволяє core ініціалізувати handlers, керовані capability, зі стану запуску каналу без додавання обгорток glue, специфічних для підтверджень.
+- Звертайтеся до низькорівневих `createChannelApprovalHandler` або `createChannelNativeApprovalRuntime` лише тоді, коли межа, керована capability, ще недостатньо виразна.
+- Канали native підтверджень мають маршрутизувати і `accountId`, і `approvalKind` через ці helper-и. `accountId` зберігає політику підтверджень для кількох облікових записів у правильній області bot-облікового запису, а `approvalKind` зберігає поведінку exec проти plugin підтверджень доступною для каналу без жорстко закодованих гілок у core.
+- Core тепер також відповідає за сповіщення про перенаправлення підтверджень. Plugin каналів не повинні надсилати власні додаткові повідомлення на кшталт «підтвердження перейшло в DM / інший канал» з `createChannelNativeApprovalRuntime`; натомість експонуйте точну маршрутизацію origin + approver-DM через спільні helper-и capability підтверджень і дозвольте core агрегувати фактичні доставки перед публікацією будь-якого сповіщення назад в initiating chat.
+- Зберігайте вид доставленого id підтвердження наскрізно. Native clients не повинні
+  вгадувати або переписувати маршрутизацію exec проти plugin підтверджень на основі локального стану каналу.
+- Різні види підтверджень можуть навмисно експонувати різні native-поверхні.
   Поточні вбудовані приклади:
-  - Slack зберігає доступність native-маршрутизації підтверджень як для exec, так і для Plugin id.
-  - Matrix зберігає ту саму native-маршрутизацію DM/каналу та UX реакцій для exec
-    і Plugin-підтверджень, водночас дозволяючи auth відрізнятися залежно від типу підтвердження.
-- `createApproverRestrictedNativeApprovalAdapter` усе ще існує як обгортка сумісності, але новий код має надавати перевагу конструктору можливостей і надавати `approvalCapability` у плагіні.
+  - Slack зберігає доступною native-маршрутизацію підтверджень як для exec-, так і для plugin-id.
+  - Matrix зберігає ту саму native DM/channel-маршрутизацію та UX реакцій для exec-
+    і plugin-підтверджень, водночас дозволяючи auth відрізнятися за видом підтвердження.
+- `createApproverRestrictedNativeApprovalAdapter` усе ще існує як обгортка сумісності, але новий код має надавати перевагу builder-у capability та експонувати `approvalCapability` у plugin.
 
-Для гарячих entrypoint каналу надавайте перевагу вужчим підшляхам часу виконання, коли вам потрібна лише
-одна частина цього сімейства:
+Для гарячих точок входу каналу надавайте перевагу вужчим runtime subpath, коли вам потрібна лише
+одна частина цієї сім’ї:
 
 - `openclaw/plugin-sdk/approval-auth-runtime`
 - `openclaw/plugin-sdk/approval-client-runtime`
@@ -128,56 +128,62 @@ bootstrap поверхню лише тоді, коли реєстр плагін
 - `openclaw/plugin-sdk/approval-reply-runtime`
 - `openclaw/plugin-sdk/channel-runtime-context`
 
-Так само надавайте перевагу `openclaw/plugin-sdk/setup-runtime`,
+Аналогічно надавайте перевагу `openclaw/plugin-sdk/setup-runtime`,
 `openclaw/plugin-sdk/setup-adapter-runtime`,
 `openclaw/plugin-sdk/reply-runtime`,
 `openclaw/plugin-sdk/reply-dispatch-runtime`,
 `openclaw/plugin-sdk/reply-reference` і
-`openclaw/plugin-sdk/reply-chunking`, коли вам не потрібна ширша
-узагальнена поверхня.
+`openclaw/plugin-sdk/reply-chunking`, коли вам не потрібна ширша umbrella-
+поверхня.
 
-Зокрема для налаштування:
+Зокрема для setup:
 
-- `openclaw/plugin-sdk/setup-runtime` охоплює безпечні для часу виконання helper-и налаштування:
-  безпечні для імпорту patched-адаптери налаштування (`createPatchedAccountSetupAdapter`,
+- `openclaw/plugin-sdk/setup-runtime` охоплює безпечні для runtime helper-и setup:
+  безпечні для імпорту адаптери patch setup (`createPatchedAccountSetupAdapter`,
   `createEnvPatchedAccountSetupAdapter`,
-  `createSetupInputPresenceValidator`), вивід lookup-note,
-  `promptResolvedAllowFrom`, `splitSetupEntries` і делеговані
-  конструктори setup-proxy
-- `openclaw/plugin-sdk/setup-adapter-runtime` — це вузька env-aware межа адаптера
+  `createSetupInputPresenceValidator`), виведення приміток lookup,
+  `promptResolvedAllowFrom`, `splitSetupEntries` і builders делегованого
+  setup-proxy
+- `openclaw/plugin-sdk/setup-adapter-runtime` — це вузька env-aware межа adapter
   для `createEnvPatchedAccountSetupAdapter`
-- `openclaw/plugin-sdk/channel-setup` охоплює конструктори налаштування з необов’язковим встановленням
-  плюс кілька примітивів, безпечних для setup:
+- `openclaw/plugin-sdk/channel-setup` охоплює builders setup для необов’язкового встановлення плюс кілька setup-safe примітивів:
   `createOptionalChannelSetupSurface`, `createOptionalChannelSetupAdapter`,
 
-Якщо ваш канал підтримує налаштування або auth через env і загальні потоки startup/config
-мають знати ці назви env до завантаження часу виконання, оголошуйте їх у
-маніфесті плагіна через `channelEnvVars`. Зберігайте `envVars` часу виконання каналу
-або локальні константи лише для операторського тексту.
+Якщо ваш канал підтримує setup або auth на основі env і загальні потоки startup/config
+мають знати ці імена env до завантаження runtime, оголосіть їх у
+маніфесті plugin через `channelEnvVars`. Залишайте `envVars` runtime каналу або локальні
+константи лише для копірайту, орієнтованого на операторів.
 
-Якщо ваш канал може з’являтися в `status`, `channels list`, `channels status` або в перевірках SecretRef
-до запуску часу виконання плагіна, додайте `openclaw.setupEntry` у `package.json`.
-Ця entrypoint має бути безпечною для імпорту в read-only шляхах команд і
-повертати метадані каналу, безпечний для setup адаптер config, адаптер status
-і метадані цілей секретів каналу, потрібні для цих зведень. Не запускайте
-clients, listeners або transport runtime з entry налаштування.
+Якщо ваш канал може з’являтися в `status`, `channels list`, `channels status` або
+скануваннях SecretRef до запуску runtime plugin, додайте `openclaw.setupEntry` у
+`package.json`. Ця точка входу має бути безпечною для імпорту в read-only шляхах команд
+і має повертати метадані каналу, безпечний для setup adapter config, adapter status
+і метадані channel secret target, потрібні для цих зведень. Не запускайте clients,
+listeners або runtime transport із точки входу setup.
+
+Тримайте вузьким і головний шлях імпорту точки входу каналу. Виявлення може
+обчислювати точку входу та модуль plugin каналу для реєстрації capability без
+активації каналу. Файли на кшталт `channel-plugin-api.ts` мають експортувати об’єкт plugin каналу
+без імпорту майстрів setup, clients transport, listeners socket, запускальників subprocess
+або модулів запуску сервісів. Розміщуйте ці runtime-частини в модулях, що
+завантажуються з `registerFull(...)`, setter-ів runtime або lazy adapter-ів capability.
 
 `createOptionalChannelSetupWizard`, `DEFAULT_ACCOUNT_ID`,
 `createTopLevelChannelDmPolicy`, `setSetupChannelEnabled` і
 `splitSetupEntries`
 
 - використовуйте ширшу межу `openclaw/plugin-sdk/setup` лише тоді, коли вам також потрібні
-  важчі спільні helper-и setup/config, такі як
+  важчі спільні helper-и setup/config, як-от
   `moveSingleAccountChannelSectionToDefaultAccount(...)`
 
-Якщо ваш канал хоче лише повідомляти «спочатку встановіть цей плагін» у поверхнях
-налаштування, надавайте перевагу `createOptionalChannelSetupSurface(...)`. Згенеровані
-adapter/wizard безпечно відмовляють у записах config і фіналізації та повторно
-використовують те саме повідомлення про потрібне встановлення для валідації, finalize
-і тексту з посиланням на документацію.
+Якщо ваш канал лише хоче показувати «спочатку встановіть цей plugin» у поверхнях
+setup, надавайте перевагу `createOptionalChannelSetupSurface(...)`. Згенеровані
+adapter/wizard безпечно відмовляють у записі config і завершенні, а також
+повторно використовують те саме повідомлення про обов’язкове встановлення в
+валідації, завершенні та тексті з посиланням на документацію.
 
-Для інших гарячих шляхів каналу надавайте перевагу вузьким helper-ам замість ширших застарілих
-поверхонь:
+Для інших гарячих шляхів каналу надавайте перевагу вузьким helper-ам замість
+ширших застарілих поверхонь:
 
 - `openclaw/plugin-sdk/account-core`,
   `openclaw/plugin-sdk/account-id`,
@@ -185,59 +191,60 @@ adapter/wizard безпечно відмовляють у записах config 
   `openclaw/plugin-sdk/account-helpers` для config з кількома обліковими записами та
   резервного переходу до облікового запису за замовчуванням
 - `openclaw/plugin-sdk/inbound-envelope` і
-  `openclaw/plugin-sdk/inbound-reply-dispatch` для вхідного route/envelope та
-  прив’язки record-and-dispatch
+  `openclaw/plugin-sdk/inbound-reply-dispatch` для маршруту/конверта inbound і
+  зв’язування record-and-dispatch
 - `openclaw/plugin-sdk/messaging-targets` для розбору/зіставлення цілей
 - `openclaw/plugin-sdk/outbound-media` і
-  `openclaw/plugin-sdk/outbound-runtime` для завантаження медіа плюс вихідних
-  делегатів identity/send і планування payload
+  `openclaw/plugin-sdk/outbound-runtime` для завантаження медіа плюс outbound
+  identity/send delegate-ів і планування payload
 - `buildThreadAwareOutboundSessionRoute(...)` з
-  `openclaw/plugin-sdk/channel-core`, коли вихідний маршрут має зберігати
-  явний `replyToId`/`threadId` або відновлювати поточну сесію `:thread:`
-  після того, як базовий ключ сесії все ще збігається. Плагіни провайдерів можуть
-  перевизначати пріоритет, поведінку суфіксів і нормалізацію thread id, коли їхня платформа
-  має native-семантику доставки в потоки.
-- `openclaw/plugin-sdk/thread-bindings-runtime` для життєвого циклу прив’язки потоків
-  і реєстрації адаптерів
-- `openclaw/plugin-sdk/agent-media-payload` лише тоді, коли застаріле
-  компонування полів payload агента/медіа все ще потрібне
-- `openclaw/plugin-sdk/telegram-command-config` для нормалізації
-  власних команд Telegram, валідації дублікатів/конфліктів і стабільного при резервному переході контракту config команд
+  `openclaw/plugin-sdk/channel-core`, коли маршрут outbound має зберігати явний
+  `replyToId`/`threadId` або відновлювати поточну сесію `:thread:`,
+  якщо базовий ключ сесії все ще збігається. Plugins провайдерів можуть
+  перевизначати пріоритет, поведінку суфіксів і нормалізацію id гілки, коли
+  їхня платформа має native-семантику доставки в гілки.
+- `openclaw/plugin-sdk/thread-bindings-runtime` для життєвого циклу thread-binding
+  і реєстрації adapter-ів
+- `openclaw/plugin-sdk/agent-media-payload` лише тоді, коли все ще потрібне
+  застаріле компонування полів payload агента/медіа
+- `openclaw/plugin-sdk/telegram-command-config` для нормалізації користувацьких
+  команд Telegram, валідації дублікатів/конфліктів і стабільного щодо fallback
+  контракту config команд
 
-Для каналів лише з auth зазвичай достатньо шляху за замовчуванням: ядро обробляє підтвердження, а плагін лише надає можливості outbound/auth. Канали native-підтверджень, такі як Matrix, Slack, Telegram і спеціальні chat-транспорти, мають використовувати спільні native helper-и замість створення власного життєвого циклу підтверджень.
+Канали лише з auth зазвичай можуть зупинитися на шляху за замовчуванням: core обробляє підтвердження, а plugin лише експонує можливості outbound/auth. Канали native підтверджень, як-от Matrix, Slack, Telegram і власні chat-транспорти, мають використовувати спільні native helper-и замість створення власного життєвого циклу підтверджень.
 
 ## Політика вхідних згадок
 
-Обробку вхідних згадок слід тримати розділеною на два шари:
+Зберігайте обробку вхідних згадок розділеною на два рівні:
 
-- збирання доказів, що належить плагіну
-- оцінка спільної політики
+- збирання доказів, яким володіє plugin
+- спільне оцінювання політики
 
 Використовуйте `openclaw/plugin-sdk/channel-mention-gating` для рішень політики згадок.
 Використовуйте `openclaw/plugin-sdk/channel-inbound` лише тоді, коли вам потрібен ширший
-barrel helper-ів для вхідних даних.
+barrel helper-ів inbound.
 
-Добре підходить для локальної логіки плагіна:
+Добре підходить для локальної логіки plugin:
 
 - виявлення reply-to-bot
 - виявлення quoted-bot
-- перевірки участі в потоці
-- виключення сервісних/системних повідомлень
-- специфічні для платформи native-кеші, потрібні для доведення участі бота
+- перевірки участі в гілці
+- виключення службових/системних повідомлень
+- native-кеші платформи, потрібні для підтвердження участі бота
 
 Добре підходить для спільного helper-а:
 
 - `requireMention`
 - явний результат згадки
-- список дозволених неявних згадок
-- обхід для команд
-- остаточне рішення про пропуск
+- allowlist неявних згадок
+- обхід команд
+- фінальне рішення про пропуск
 
 Рекомендований потік:
 
 1. Обчисліть локальні факти згадки.
-2. Передайте ці факти до `resolveInboundMentionDecision({ facts, policy })`.
-3. Використовуйте `decision.effectiveWasMentioned`, `decision.shouldBypassMention` і `decision.shouldSkip` у своєму вхідному gate.
+2. Передайте ці факти в `resolveInboundMentionDecision({ facts, policy })`.
+3. Використовуйте `decision.effectiveWasMentioned`, `decision.shouldBypassMention` і `decision.shouldSkip` у вашому вхідному шлюзі.
 
 ```typescript
 import {
@@ -276,8 +283,8 @@ const decision = resolveInboundMentionDecision({
 if (decision.shouldSkip) return;
 ```
 
-`api.runtime.channel.mentions` надає ті самі спільні helper-и для згадок для
-вбудованих плагінів каналів, які вже залежать від injection часу виконання:
+`api.runtime.channel.mentions` експонує ті самі спільні helper-и згадок для
+вбудованих plugin каналів, які вже залежать від ін’єкції runtime:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -288,10 +295,10 @@ if (decision.shouldSkip) return;
 Якщо вам потрібні лише `implicitMentionKindWhen` і
 `resolveInboundMentionDecision`, імпортуйте з
 `openclaw/plugin-sdk/channel-mention-gating`, щоб уникнути завантаження не пов’язаних
-helper-ів вхідного часу виконання.
+helper-ів runtime inbound.
 
-Старіші helper-и `resolveMentionGating*` залишаються в
-`openclaw/plugin-sdk/channel-inbound` лише як сумісні експорти. Новий код
+Старі helper-и `resolveMentionGating*` залишаються в
+`openclaw/plugin-sdk/channel-inbound` лише як експорти сумісності. Новий код
 має використовувати `resolveInboundMentionDecision({ facts, policy })`.
 
 ## Покроковий розбір
@@ -299,9 +306,9 @@ helper-ів вхідного часу виконання.
 <Steps>
   <a id="step-1-package-and-manifest"></a>
   <Step title="Пакет і маніфест">
-    Створіть стандартні файли плагіна. Поле `channel` у `package.json`
-    робить цей плагін плагіном каналу. Повну поверхню метаданих пакета
-    див. у [Налаштування плагіна та Config](/uk/plugins/sdk-setup#openclaw-channel):
+    Створіть стандартні файли plugin. Поле `channel` у `package.json` —
+    це те, що робить його plugin каналу. Для повної поверхні метаданих пакета
+    див. [Налаштування і Config plugin](/uk/plugins/sdk-setup#openclaw-channel):
 
     <CodeGroup>
     ```json package.json
@@ -358,16 +365,16 @@ helper-ів вхідного часу виконання.
     ```
     </CodeGroup>
 
-    `configSchema` перевіряє `plugins.entries.acme-chat.config`. Використовуйте його для
-    налаштувань, що належать плагіну і не є config облікового запису каналу. `channelConfigs`
-    перевіряє `channels.acme-chat` і є джерелом холодного шляху, яке використовується config
-    schema, setup і UI-поверхнями до завантаження часу виконання плагіна.
+    `configSchema` валідує `plugins.entries.acme-chat.config`. Використовуйте його для
+    налаштувань, якими володіє plugin, що не є config облікового запису каналу. `channelConfigs`
+    валідує `channels.acme-chat` і є джерелом cold-path, яке використовують schema
+    config, setup і поверхні UI до завантаження runtime plugin.
 
   </Step>
 
-  <Step title="Створіть об’єкт плагіна каналу">
-    Інтерфейс `ChannelPlugin` має багато необов’язкових поверхонь адаптера. Почніть із
-    мінімуму — `id` і `setup` — і додавайте адаптери за потреби.
+  <Step title="Створіть об’єкт plugin каналу">
+    Інтерфейс `ChannelPlugin` має багато необов’язкових поверхонь adapter-ів. Почніть із
+    мінімуму — `id` і `setup` — і додавайте adapter-и за потреби.
 
     Створіть `src/channel.ts`:
 
@@ -463,31 +470,31 @@ helper-ів вхідного часу виконання.
     ```
 
     <Accordion title="Що для вас робить createChatChannelPlugin">
-      Замість ручної реалізації низькорівневих інтерфейсів адаптерів ви передаєте
+      Замість ручної реалізації низькорівневих інтерфейсів adapter-ів ви передаєте
       декларативні параметри, а builder компонує їх:
 
-      | Параметр | Що він підключає |
+      | Option | Що він підключає |
       | --- | --- |
-      | `security.dm` | Resolver безпеки DM з областю видимості на основі полів config |
-      | `pairing.text` | Потік парування DM на основі тексту з обміном кодами |
-      | `threading` | Resolver режиму reply-to (фіксований, з областю видимості облікового запису або власний) |
-      | `outbound.attachedResults` | Функції надсилання, які повертають метадані результату (ID повідомлень) |
+      | `security.dm` | Розв’язувач безпеки DM з областю каналу на основі полів config |
+      | `pairing.text` | Потік текстового сполучення DM з обміном кодами |
+      | `threading` | Розв’язувач режиму reply-to (фіксований, з областю облікового запису або власний) |
+      | `outbound.attachedResults` | Функції надсилання, які повертають метадані результату (id повідомлень) |
 
-      Ви також можете передавати сирі об’єкти адаптерів замість декларативних параметрів,
+      Ви також можете передавати сирі об’єкти adapter-ів замість декларативних параметрів,
       якщо вам потрібен повний контроль.
 
-      Сирі outbound-адаптери можуть визначати функцію `chunker(text, limit, ctx)`.
-      Необов’язковий `ctx.formatting` містить рішення форматування на момент доставки,
-      наприклад `maxLinesPerMessage`; застосовуйте його перед надсиланням, щоб потоки відповідей
-      і межі chunk вирішувалися один раз спільною вихідною доставкою.
+      Сирі adapter-и outbound можуть визначати функцію `chunker(text, limit, ctx)`.
+      Необов’язковий `ctx.formatting` містить рішення форматування під час доставки,
+      як-от `maxLinesPerMessage`; застосовуйте його до надсилання, щоб прив’язка
+      відповідей до гілок і межі chunk визначалися один раз спільною outbound-доставкою.
       Контексти надсилання також містять `replyToIdSource` (`implicit` або `explicit`),
-      коли було визначено native-ціль відповіді, щоб helper-и payload могли зберігати
-      явні теги відповіді, не витрачаючи неявний одноразовий слот reply.
+      коли native-ціль відповіді було визначено, щоб helper-и payload могли зберігати
+      явні теги відповіді без використання неявного одноразового слота reply.
     </Accordion>
 
   </Step>
 
-  <Step title="Підключіть entry point">
+  <Step title="Підключіть точку входу">
     Створіть `index.ts`:
 
     ```typescript index.ts
@@ -523,22 +530,23 @@ helper-ів вхідного часу виконання.
     });
     ```
 
-    Розміщуйте дескриптори CLI, що належать каналу, у `registerCliMetadata(...)`, щоб OpenClaw
-    міг показувати їх у кореневій довідці без активації повного часу виконання каналу,
-    тоді як звичайні повні завантаження все одно підхоплюватимуть ті самі дескриптори для фактичної
-    реєстрації команд. Залишайте `registerFull(...)` для роботи лише під час виконання.
-    Якщо `registerFull(...)` реєструє методи Gateway RPC, використовуйте
-    префікс, специфічний для плагіна. Простори імен адміністратора ядра (`config.*`,
+    Розміщуйте CLI descriptors, якими володіє канал, у `registerCliMetadata(...)`, щоб OpenClaw
+    міг показувати їх у кореневій довідці без активації повного runtime каналу,
+    тоді як звичайні повні завантаження все одно підхоплюватимуть ті самі descriptors для реєстрації
+    реальних команд. Залишайте `registerFull(...)` для роботи, що виконується лише в runtime.
+    Якщо `registerFull(...)` реєструє gateway RPC methods, використовуйте
+    префікс, специфічний для plugin.
+    Простори імен адміністрування core (`config.*`,
     `exec.approvals.*`, `wizard.*`, `update.*`) залишаються зарезервованими й завжди
-    визначаються як `operator.admin`.
+    зіставляються з `operator.admin`.
     `defineChannelPluginEntry` автоматично обробляє це розділення режимів реєстрації. Див.
     [Entry Points](/uk/plugins/sdk-entrypoints#definechannelpluginentry) для всіх
     параметрів.
 
   </Step>
 
-  <Step title="Додайте entry point для setup">
-    Створіть `setup-entry.ts` для полегшеного завантаження під час онбордингу:
+  <Step title="Додайте точку входу setup">
+    Створіть `setup-entry.ts` для полегшеного завантаження під час onboarding:
 
     ```typescript setup-entry.ts
     import { defineSetupPluginEntry } from "openclaw/plugin-sdk/channel-core";
@@ -547,33 +555,33 @@ helper-ів вхідного часу виконання.
     export default defineSetupPluginEntry(acmeChatPlugin);
     ```
 
-    OpenClaw завантажує це замість повного entry, коли канал вимкнений
-    або не налаштований. Це дає змогу уникнути підключення важкого коду часу виконання під час потоків setup.
-    Докладніше див. у [Налаштування та Config](/uk/plugins/sdk-setup#setup-entry).
+    OpenClaw завантажує це замість повної точки входу, коли канал вимкнено
+    або не налаштовано. Це дає змогу уникнути підключення важкого runtime-коду під час потоків setup.
+    Докладніше див. у [Setup and Config](/uk/plugins/sdk-setup#setup-entry).
 
-    Вбудовані workspace-канали, які розділяють безпечні для setup експорти на sidecar-модулі,
-    можуть використовувати `defineBundledChannelSetupEntry(...)` з
+    Вбудовані workspace-канали, які розділяють безпечні для setup експорти в sidecar-
+    модулях, можуть використовувати `defineBundledChannelSetupEntry(...)` з
     `openclaw/plugin-sdk/channel-entry-contract`, коли їм також потрібен
-    явний setter часу виконання для setup.
+    явний setter runtime під час setup.
 
   </Step>
 
   <Step title="Обробляйте вхідні повідомлення">
-    Ваш плагін має отримувати повідомлення з платформи й пересилати їх до
+    Ваш plugin має отримувати повідомлення з платформи та пересилати їх до
     OpenClaw. Типовий шаблон — це Webhook, який перевіряє запит і
-    диспетчеризує його через вхідний обробник вашого каналу:
+    диспетчеризує його через inbound handler вашого каналу:
 
     ```typescript
     registerFull(api) {
       api.registerHttpRoute({
         path: "/acme-chat/webhook",
-        auth: "plugin", // auth, яким керує плагін (перевіряйте підписи самостійно)
+        auth: "plugin", // auth, яким керує plugin (підписи перевіряйте самі)
         handler: async (req, res) => {
           const event = parseWebhookPayload(req);
 
-          // Ваш вхідний обробник диспетчеризує повідомлення до OpenClaw.
-          // Точна прив’язка залежить від SDK вашої платформи —
-          // реальний приклад див. у пакеті вбудованого плагіна Microsoft Teams або Google Chat.
+          // Ваш inbound handler диспетчеризує повідомлення до OpenClaw.
+          // Точне підключення залежить від SDK вашої платформи —
+          // реальний приклад див. у вбудованому пакеті plugin Microsoft Teams або Google Chat.
           await handleAcmeChatInbound(api, event);
 
           res.statusCode = 200;
@@ -585,16 +593,16 @@ helper-ів вхідного часу виконання.
     ```
 
     <Note>
-      Обробка вхідних повідомлень є специфічною для каналу. Кожен плагін каналу
-      відповідає за власний вхідний pipeline. Подивіться на вбудовані плагіни каналів
-      (наприклад, пакет плагіна Microsoft Teams або Google Chat), щоб побачити реальні шаблони.
+      Обробка вхідних повідомлень є специфічною для каналу. Кожен plugin каналу
+      володіє власним inbound pipeline. Подивіться на вбудовані plugins каналів
+      (наприклад, пакет plugin Microsoft Teams або Google Chat), щоб побачити реальні шаблони.
     </Note>
 
   </Step>
 
 <a id="step-6-test"></a>
 <Step title="Тестування">
-Пишіть колоковані тести у `src/channel.test.ts`:
+Пишіть colocated-тести в `src/channel.test.ts`:
 
     ```typescript src/channel.test.ts
     import { describe, it, expect } from "vitest";
@@ -632,7 +640,7 @@ helper-ів вхідного часу виконання.
     pnpm test -- <bundled-plugin-root>/acme-chat/
     ```
 
-    Для спільних helper-ів тестування див. [Тестування](/uk/plugins/sdk-testing).
+    Спільні helper-и для тестування див. у [Testing](/uk/plugins/sdk-testing).
 
   </Step>
 </Steps>
@@ -646,47 +654,47 @@ helper-ів вхідного часу виконання.
 ├── index.ts                  # defineChannelPluginEntry
 ├── setup-entry.ts            # defineSetupPluginEntry
 ├── api.ts                    # Публічні експорти (необов’язково)
-├── runtime-api.ts            # Внутрішні експорти часу виконання (необов’язково)
+├── runtime-api.ts            # Внутрішні runtime-експорти (необов’язково)
 └── src/
     ├── channel.ts            # ChannelPlugin через createChatChannelPlugin
     ├── channel.test.ts       # Тести
     ├── client.ts             # API client платформи
-    └── runtime.ts            # Сховище часу виконання (за потреби)
+    └── runtime.ts            # Сховище runtime (за потреби)
 ```
 
 ## Розширені теми
 
 <CardGroup cols={2}>
-  <Card title="Параметри потоків" icon="git-branch" href="/uk/plugins/sdk-entrypoints#registration-mode">
-    Фіксовані, з областю видимості облікового запису або власні режими відповіді
+  <Card title="Варіанти thread-прив’язки" icon="git-branch" href="/uk/plugins/sdk-entrypoints#registration-mode">
+    Фіксовані, з областю облікового запису або власні режими reply
   </Card>
-  <Card title="Інтеграція інструмента повідомлень" icon="puzzle" href="/uk/plugins/architecture#channel-plugins-and-the-shared-message-tool">
+  <Card title="Інтеграція інструмента message" icon="puzzle" href="/uk/plugins/architecture#channel-plugins-and-the-shared-message-tool">
     describeMessageTool і виявлення дій
   </Card>
-  <Card title="Визначення цілі" icon="crosshair" href="/uk/plugins/architecture-internals#channel-target-resolution">
+  <Card title="Розв’язання цілей" icon="crosshair" href="/uk/plugins/architecture-internals#channel-target-resolution">
     inferTargetChatType, looksLikeId, resolveTarget
   </Card>
-  <Card title="Helper-и часу виконання" icon="settings" href="/uk/plugins/sdk-runtime">
+  <Card title="Helper-и runtime" icon="settings" href="/uk/plugins/sdk-runtime">
     TTS, STT, медіа, subagent через api.runtime
   </Card>
 </CardGroup>
 
 <Note>
-Деякі вбудовані helper-seam усе ще існують для підтримки вбудованих плагінів і
-сумісності. Це не рекомендований шаблон для нових плагінів каналів;
-надавайте перевагу загальним підшляхам channel/setup/reply/runtime зі спільної
-поверхні SDK, якщо тільки ви не підтримуєте безпосередньо це сімейство вбудованих плагінів.
+Деякі вбудовані helper seams усе ще існують для підтримки вбудованих plugins і
+сумісності. Це не рекомендований шаблон для нових plugin каналів;
+надавайте перевагу загальним subpath channel/setup/reply/runtime зі спільної
+поверхні SDK, якщо лише ви не підтримуєте цю родину вбудованих plugins безпосередньо.
 </Note>
 
 ## Наступні кроки
 
-- [Плагіни провайдерів](/uk/plugins/sdk-provider-plugins) — якщо ваш плагін також надає моделі
-- [Огляд SDK](/uk/plugins/sdk-overview) — повний довідник щодо імпортів підшляхів
+- [Plugins провайдерів](/uk/plugins/sdk-provider-plugins) — якщо ваш plugin також надає моделі
+- [Огляд SDK](/uk/plugins/sdk-overview) — повний довідник імпортів subpath
 - [Тестування SDK](/uk/plugins/sdk-testing) — утиліти тестування та контрактні тести
-- [Маніфест плагіна](/uk/plugins/manifest) — повна schema маніфесту
+- [Маніфест plugin](/uk/plugins/manifest) — повна schema маніфесту
 
 ## Пов’язане
 
-- [Налаштування SDK плагіна](/uk/plugins/sdk-setup)
-- [Створення плагінів](/uk/plugins/building-plugins)
-- [Плагіни harness агента](/uk/plugins/sdk-agent-harness)
+- [Налаштування SDK plugin](/uk/plugins/sdk-setup)
+- [Створення plugins](/uk/plugins/building-plugins)
+- [Plugins harness агента](/uk/plugins/sdk-agent-harness)
