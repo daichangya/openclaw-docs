@@ -5,10 +5,10 @@ read_when:
 summary: Використання моделей MiniMax в OpenClaw
 title: MiniMax
 x-i18n:
-    generated_at: "2026-04-25T00:30:49Z"
+    generated_at: "2026-04-25T04:07:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 108e0e8de748d0ed68342e1391c7a661136e21e0b255b4afbccf913b6825c6ec
+    source_hash: 202b0852f3f1f484193d6f9a019b179c807dc13d7bed497f1122c36eae03e980
     source_path: providers/minimax.md
     workflow: 15
 ---
@@ -33,25 +33,25 @@ MiniMax також надає:
 
 | Модель                   | Тип              | Опис                                     |
 | ------------------------ | ---------------- | ---------------------------------------- |
-| `MiniMax-M2.7`           | Чат (міркування) | Типова хостингова модель для міркування  |
+| `MiniMax-M2.7`           | Чат (міркування) | Типова розміщена модель для міркування   |
 | `MiniMax-M2.7-highspeed` | Чат (міркування) | Швидший рівень міркування M2.7           |
-| `MiniMax-VL-01`          | Vision           | Модель для розпізнавання зображень       |
+| `MiniMax-VL-01`          | Vision           | Модель розпізнавання зображень           |
 | `image-01`               | Генерація зображень | Перетворення тексту на зображення та редагування зображення за зображенням |
-| `music-2.5+`             | Генерація музики | Типова музична модель                    |
+| `music-2.5+`             | Генерація музики | Типова модель музики                     |
 | `music-2.5`              | Генерація музики | Попередній рівень генерації музики       |
 | `music-2.0`              | Генерація музики | Застарілий рівень генерації музики       |
-| `MiniMax-Hailuo-2.3`     | Генерація відео  | Потоки перетворення тексту на відео та використання зображення як референсу |
+| `MiniMax-Hailuo-2.3`     | Генерація відео  | Потоки «текст у відео» та з опорним зображенням |
 
 ## Початок роботи
 
-Виберіть бажаний спосіб автентифікації та виконайте кроки налаштування.
+Оберіть бажаний спосіб автентифікації та виконайте кроки налаштування.
 
 <Tabs>
   <Tab title="OAuth (Coding Plan)">
-    **Найкраще підходить для:** швидкого налаштування MiniMax Coding Plan через OAuth, ключ API не потрібен.
+    **Найкраще для:** швидкого налаштування MiniMax Coding Plan через OAuth, без потреби в API key.
 
     <Tabs>
-      <Tab title="International">
+      <Tab title="Міжнародний">
         <Steps>
           <Step title="Запустіть онбординг">
             ```bash
@@ -67,7 +67,7 @@ MiniMax також надає:
           </Step>
         </Steps>
       </Tab>
-      <Tab title="China">
+      <Tab title="Китай">
         <Steps>
           <Step title="Запустіть онбординг">
             ```bash
@@ -96,17 +96,17 @@ MiniMax також надає:
   </Tab>
 
   <Tab title="API key">
-    **Найкраще підходить для:** хостингового MiniMax з API, сумісним з Anthropic.
+    **Найкраще для:** розміщеного MiniMax з API, сумісним з Anthropic.
 
     <Tabs>
-      <Tab title="International">
+      <Tab title="Міжнародний">
         <Steps>
           <Step title="Запустіть онбординг">
             ```bash
             openclaw onboard --auth-choice minimax-global-api
             ```
 
-            Це налаштовує `api.minimax.io` як базову URL-адресу.
+            Це налаштовує `api.minimax.io` як базовий URL.
           </Step>
           <Step title="Перевірте, що модель доступна">
             ```bash
@@ -115,14 +115,14 @@ MiniMax також надає:
           </Step>
         </Steps>
       </Tab>
-      <Tab title="China">
+      <Tab title="Китай">
         <Steps>
           <Step title="Запустіть онбординг">
             ```bash
             openclaw onboard --auth-choice minimax-cn-api
             ```
 
-            Це налаштовує `api.minimaxi.com` як базову URL-адресу.
+            Це налаштовує `api.minimaxi.com` як базовий URL.
           </Step>
           <Step title="Перевірте, що модель доступна">
             ```bash
@@ -173,7 +173,7 @@ MiniMax також надає:
     ```
 
     <Warning>
-    У сумісному з Anthropic потоковому режимі OpenClaw за замовчуванням вимикає thinking для MiniMax, якщо ви явно не встановите `thinking` самостійно. Потоковий ендпоінт MiniMax повертає `reasoning_content` у дельта-чанках у стилі OpenAI замість нативних блоків thinking Anthropic, що може призвести до витоку внутрішніх міркувань у видимий вивід, якщо залишити цю можливість неявно ввімкненою.
+    У сумісному з Anthropic потоковому режимі OpenClaw за замовчуванням вимикає мислення MiniMax, якщо ви явно не встановите `thinking` самостійно. Потокова кінцева точка MiniMax надсилає `reasoning_content` у дельта-фрагментах у стилі OpenAI замість нативних блоків thinking Anthropic, що може призвести до витоку внутрішнього міркування у видимий вивід, якщо залишити це неявно ввімкненим.
     </Warning>
 
     <Note>
@@ -194,21 +194,21 @@ MiniMax також надає:
     ```
   </Step>
   <Step title="Виберіть Model/auth">
-    Виберіть у меню **Model/auth**.
+    У меню виберіть **Model/auth**.
   </Step>
-  <Step title="Виберіть параметр автентифікації MiniMax">
+  <Step title="Оберіть варіант автентифікації MiniMax">
     Виберіть один із доступних варіантів MiniMax:
 
     | Варіант автентифікації | Опис |
     | --- | --- |
-    | `minimax-global-oauth` | International OAuth (Coding Plan) |
-    | `minimax-cn-oauth` | China OAuth (Coding Plan) |
+    | `minimax-global-oauth` | Міжнародний OAuth (Coding Plan) |
+    | `minimax-cn-oauth` | OAuth для Китаю (Coding Plan) |
     | `minimax-global-api` | Міжнародний API key |
     | `minimax-cn-api` | API key для Китаю |
 
   </Step>
-  <Step title="Виберіть типову модель">
-    Коли з’явиться запит, виберіть типову модель.
+  <Step title="Виберіть модель за замовчуванням">
+    Коли з’явиться запит, виберіть модель за замовчуванням.
   </Step>
 </Steps>
 
@@ -216,12 +216,12 @@ MiniMax також надає:
 
 ### Генерація зображень
 
-Плагін MiniMax реєструє модель `image-01` для інструмента `image_generate`. Вона підтримує:
+Plugin MiniMax реєструє модель `image-01` для інструмента `image_generate`. Підтримується:
 
 - **Генерація зображень із тексту** з керуванням співвідношенням сторін
-- **Редагування зображення за зображенням** (референс об’єкта) з керуванням співвідношенням сторін
+- **Редагування зображення за зображенням** (опорний об’єкт) з керуванням співвідношенням сторін
 - До **9 вихідних зображень** на запит
-- До **1 референсного зображення** на запит редагування
+- До **1 опорного зображення** на запит редагування
 - Підтримувані співвідношення сторін: `1:1`, `16:9`, `4:3`, `3:2`, `2:3`, `3:4`, `9:16`, `21:9`
 
 Щоб використовувати MiniMax для генерації зображень, встановіть його як провайдера генерації зображень:
@@ -236,7 +236,7 @@ MiniMax також надає:
 }
 ```
 
-Плагін використовує той самий `MINIMAX_API_KEY` або OAuth-автентифікацію, що й текстові моделі. Додаткова конфігурація не потрібна, якщо MiniMax уже налаштовано.
+Plugin використовує той самий `MINIMAX_API_KEY` або OAuth-автентифікацію, що й текстові моделі. Додаткова конфігурація не потрібна, якщо MiniMax уже налаштовано.
 
 І `minimax`, і `minimax-portal` реєструють `image_generate` з тією самою
 моделлю `image-01`. Налаштування з API key використовують `MINIMAX_API_KEY`; налаштування OAuth можуть натомість використовувати
@@ -245,22 +245,45 @@ MiniMax також надає:
 Коли онбординг або налаштування API key записує явні записи `models.providers.minimax`,
 OpenClaw матеріалізує `MiniMax-M2.7` і
 `MiniMax-M2.7-highspeed` як текстові чат-моделі. Розпізнавання зображень
-експонується окремо через медіапровайдера `MiniMax-VL-01`, що належить плагіну.
+надається окремо через медіапровайдер `MiniMax-VL-01`, що належить plugin.
 
 <Note>
 Див. [Генерація зображень](/uk/tools/image-generation), щоб ознайомитися зі спільними параметрами інструмента, вибором провайдера та поведінкою failover.
 </Note>
 
+### Перетворення тексту на мовлення
+
+Вбудований plugin `minimax` реєструє MiniMax T2A v2 як провайдера мовлення для
+`messages.tts`.
+
+- Типова модель TTS: `speech-2.8-hd`
+- Типовий голос: `English_expressive_narrator`
+- Звичайні аудіовкладення залишаються у форматі MP3.
+- Цілі voice-note, такі як Feishu і Telegram, перекодовуються з MP3 MiniMax
+  у 48kHz Opus через `ffmpeg`, оскільки API файлів Feishu/Lark
+  приймає лише `file_type: "opus"` для нативних аудіоповідомлень.
+- MiniMax T2A приймає дробові значення `speed` і `vol`, але `pitch` надсилається як
+  ціле число; OpenClaw відкидає дробову частину значень `pitch` перед запитом до API.
+
+| Налаштування                             | Змінна середовища      | Типове значення            | Опис                                 |
+| ---------------------------------------- | ---------------------- | -------------------------- | ------------------------------------ |
+| `messages.tts.providers.minimax.baseUrl` | `MINIMAX_API_HOST`     | `https://api.minimax.io`   | Хост API MiniMax T2A.                |
+| `messages.tts.providers.minimax.model`   | `MINIMAX_TTS_MODEL`    | `speech-2.8-hd`            | ID моделі TTS.                       |
+| `messages.tts.providers.minimax.voiceId` | `MINIMAX_TTS_VOICE_ID` | `English_expressive_narrator` | ID голосу, що використовується для мовленнєвого виводу. |
+| `messages.tts.providers.minimax.speed`   |                        | `1.0`                      | Швидкість відтворення, `0.5..2.0`.   |
+| `messages.tts.providers.minimax.vol`     |                        | `1.0`                      | Гучність, `(0, 10]`.                 |
+| `messages.tts.providers.minimax.pitch`   |                        | `0`                        | Цілочисельне зміщення тону, `-12..12`. |
+
 ### Генерація музики
 
-Вбудований плагін `minimax` також реєструє генерацію музики через спільний
+Вбудований plugin `minimax` також реєструє генерацію музики через спільний
 інструмент `music_generate`.
 
 - Типова музична модель: `minimax/music-2.5+`
 - Також підтримуються `minimax/music-2.5` і `minimax/music-2.0`
-- Керування підказкою: `lyrics`, `instrumental`, `durationSeconds`
+- Керування prompt: `lyrics`, `instrumental`, `durationSeconds`
 - Формат виводу: `mp3`
-- Запуски з підтримкою сесій від’єднуються через спільний потік завдань/статусу, зокрема `action: "status"`
+- Запуски із session-відстеженням відокремлюються через спільний потік завдань/статусу, включно з `action: "status"`
 
 Щоб використовувати MiniMax як типовий музичний провайдер:
 
@@ -282,11 +305,11 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
 
 ### Генерація відео
 
-Вбудований плагін `minimax` також реєструє генерацію відео через спільний
+Вбудований plugin `minimax` також реєструє генерацію відео через спільний
 інструмент `video_generate`.
 
 - Типова відеомодель: `minimax/MiniMax-Hailuo-2.3`
-- Режими: перетворення тексту на відео та потоки з одним референсним зображенням
+- Режими: «текст у відео» та потоки з одним опорним зображенням
 - Підтримує `aspectRatio` і `resolution`
 
 Щоб використовувати MiniMax як типовий відеопровайдер:
@@ -309,7 +332,7 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
 
 ### Розпізнавання зображень
 
-Плагін MiniMax реєструє розпізнавання зображень окремо від текстового
+Plugin MiniMax реєструє розпізнавання зображень окремо від текстового
 каталогу:
 
 | ID провайдера    | Типова модель зображень |
@@ -318,24 +341,24 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
 | `minimax-portal` | `MiniMax-VL-01`         |
 
 Саме тому автоматична маршрутизація медіа може використовувати розпізнавання зображень MiniMax навіть
-коли вбудований каталог текстових провайдерів усе ще показує лише текстові чат-посилання M2.7.
+тоді, коли вбудований каталог текстового провайдера все ще показує лише текстові посилання чату M2.7.
 
 ### Вебпошук
 
-Плагін MiniMax також реєструє `web_search` через API пошуку MiniMax Coding Plan.
+Plugin MiniMax також реєструє `web_search` через API пошуку MiniMax Coding Plan.
 
 - ID провайдера: `minimax`
-- Структуровані результати: заголовки, URL-адреси, фрагменти, пов’язані запити
-- Пріоритетна змінна середовища: `MINIMAX_CODE_PLAN_KEY`
-- Псевдонім змінної середовища, що також приймається: `MINIMAX_CODING_API_KEY`
-- Резервна сумісність: `MINIMAX_API_KEY`, якщо він уже вказує на токен coding-plan
-- Повторне використання регіону: `plugins.entries.minimax.config.webSearch.region`, потім `MINIMAX_API_HOST`, потім базові URL-адреси провайдера MiniMax
-- Пошук залишається на ID провайдера `minimax`; налаштування OAuth CN/global однаково можуть опосередковано спрямовувати регіон через `models.providers.minimax-portal.baseUrl`
+- Структуровані результати: заголовки, URL, фрагменти, пов’язані запити
+- Бажана змінна середовища: `MINIMAX_CODE_PLAN_KEY`
+- Прийнятний псевдонім змінної середовища: `MINIMAX_CODING_API_KEY`
+- Сумісний запасний варіант: `MINIMAX_API_KEY`, якщо він уже вказує на токен coding plan
+- Повторне використання регіону: `plugins.entries.minimax.config.webSearch.region`, потім `MINIMAX_API_HOST`, потім базові URL провайдера MiniMax
+- Пошук залишається на ID провайдера `minimax`; налаштування OAuth CN/global усе ще можуть опосередковано спрямовувати регіон через `models.providers.minimax-portal.baseUrl`
 
 Конфігурація розміщується в `plugins.entries.minimax.config.webSearch.*`.
 
 <Note>
-Див. [Пошук MiniMax](/uk/tools/minimax-search) для повної конфігурації та використання вебпошуку.
+Див. [MiniMax Search](/uk/tools/minimax-search), щоб ознайомитися з повною конфігурацією та використанням вебпошуку.
 </Note>
 
 ## Розширена конфігурація
@@ -344,8 +367,8 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
   <Accordion title="Параметри конфігурації">
     | Параметр | Опис |
     | --- | --- |
-    | `models.providers.minimax.baseUrl` | Рекомендовано `https://api.minimax.io/anthropic` (сумісний з Anthropic); `https://api.minimax.io/v1` є додатковим варіантом для payload, сумісних з OpenAI |
-    | `models.providers.minimax.api` | Рекомендовано `anthropic-messages`; `openai-completions` є додатковим варіантом для payload, сумісних з OpenAI |
+    | `models.providers.minimax.baseUrl` | Рекомендовано `https://api.minimax.io/anthropic` (сумісний з Anthropic); `https://api.minimax.io/v1` є необов’язковим для навантажень, сумісних з OpenAI |
+    | `models.providers.minimax.api` | Рекомендовано `anthropic-messages`; `openai-completions` є необов’язковим для навантажень, сумісних з OpenAI |
     | `models.providers.minimax.apiKey` | API key MiniMax (`MINIMAX_API_KEY`) |
     | `models.providers.minimax.models` | Визначає `id`, `name`, `reasoning`, `contextWindow`, `maxTokens`, `cost` |
     | `agents.defaults.models` | Псевдоніми моделей, які ви хочете додати до allowlist |
@@ -353,18 +376,18 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
   </Accordion>
 
   <Accordion title="Типові значення thinking">
-    Для `api: "anthropic-messages"` OpenClaw додає `thinking: { type: "disabled" }`, якщо thinking вже не задано явно в params/config.
+    Для `api: "anthropic-messages"` OpenClaw додає `thinking: { type: "disabled" }`, якщо thinking ще не задано явно в params/config.
 
-    Це запобігає тому, щоб потоковий ендпоінт MiniMax надсилав `reasoning_content` у дельта-чанках у стилі OpenAI, що призводило б до витоку внутрішніх міркувань у видимий вивід.
+    Це запобігає тому, щоб потокова кінцева точка MiniMax надсилала `reasoning_content` у дельта-фрагментах у стилі OpenAI, що призвело б до витоку внутрішнього міркування у видимий вивід.
 
   </Accordion>
 
   <Accordion title="Швидкий режим">
-    `/fast on` або `params.fastMode: true` переписує `MiniMax-M2.7` на `MiniMax-M2.7-highspeed` у сумісному з Anthropic потоковому шляху.
+    `/fast on` або `params.fastMode: true` замінює `MiniMax-M2.7` на `MiniMax-M2.7-highspeed` у сумісному з Anthropic потоковому шляху.
   </Accordion>
 
   <Accordion title="Приклад failover">
-    **Найкраще підходить для:** використання вашої найсильнішої актуальної моделі нового покоління як основної з переходом на MiniMax M2.7 у разі збою. У прикладі нижче Opus використано як конкретну основну модель; замініть її на бажану вами актуальну основну модель нового покоління.
+    **Найкраще для:** зберегти вашу найсильнішу основну модель останнього покоління як primary і перейти на MiniMax M2.7 у разі відмови. У прикладі нижче як конкретну primary використано Opus; замініть її на бажану primary модель останнього покоління.
 
     ```json5
     {
@@ -388,9 +411,9 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
 
   <Accordion title="Деталі використання Coding Plan">
     - API використання Coding Plan: `https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains` (потрібен ключ coding plan).
-    - OpenClaw нормалізує використання coding plan MiniMax до того самого відображення `% left`, що й в інших провайдерів. Сирі поля `usage_percent` / `usagePercent` у MiniMax означають залишкову квоту, а не використану квоту, тому OpenClaw інвертує їх. Поля на основі підрахунку мають пріоритет, якщо вони доступні.
-    - Коли API повертає `model_remains`, OpenClaw надає перевагу запису chat-моделі, за потреби виводить мітку вікна з `start_time` / `end_time` і включає вибрану назву моделі до мітки плану, щоб вікна coding plan було легше розрізняти.
-    - Знімки використання розглядають `minimax`, `minimax-cn` і `minimax-portal` як одну й ту саму поверхню квоти MiniMax та надають перевагу збереженому OAuth MiniMax перед переходом до змінних середовища з ключем Coding Plan.
+    - OpenClaw нормалізує використання coding plan MiniMax до того самого відображення `% left`, що й в інших провайдерів. Необроблені поля MiniMax `usage_percent` / `usagePercent` — це квота, що залишилася, а не вже використана квота, тому OpenClaw інвертує їх. Поля на основі лічильників мають пріоритет, якщо вони присутні.
+    - Коли API повертає `model_remains`, OpenClaw віддає перевагу запису чат-моделі, за потреби виводить мітку вікна з `start_time` / `end_time` і включає вибрану назву моделі в мітку плану, щоб вікна coding plan було легше розрізняти.
+    - Знімки використання трактують `minimax`, `minimax-cn` і `minimax-portal` як одну й ту саму поверхню квоти MiniMax і віддають перевагу збереженому OAuth MiniMax, перш ніж переходити до змінних середовища ключа Coding Plan.
   </Accordion>
 </AccordionGroup>
 
@@ -402,28 +425,28 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
 - Типова чат-модель: `MiniMax-M2.7`
 - Альтернативна чат-модель: `MiniMax-M2.7-highspeed`
 - Онбординг і пряме налаштування API key записують визначення лише текстових моделей для обох варіантів M2.7
-- Для розпізнавання зображень використовується медіапровайдер `MiniMax-VL-01`, що належить плагіну
+- Для розпізнавання зображень використовується медіапровайдер `MiniMax-VL-01`, що належить plugin
 - Оновіть значення цін у `models.json`, якщо вам потрібне точне відстеження вартості
-- Використовуйте `openclaw models list`, щоб підтвердити поточний ID провайдера, а потім перемкніться за допомогою `openclaw models set minimax/MiniMax-M2.7` або `openclaw models set minimax-portal/MiniMax-M2.7`
+- Використовуйте `openclaw models list`, щоб підтвердити поточний ID провайдера, а потім перемкніть його через `openclaw models set minimax/MiniMax-M2.7` або `openclaw models set minimax-portal/MiniMax-M2.7`
 
 <Tip>
 Реферальне посилання для MiniMax Coding Plan (знижка 10%): [MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
 </Tip>
 
 <Note>
-Див. [Провайдери моделей](/uk/concepts/model-providers) для правил провайдерів.
+Див. [Провайдери моделей](/uk/concepts/model-providers), щоб ознайомитися з правилами для провайдерів.
 </Note>
 
 ## Усунення несправностей
 
 <AccordionGroup>
-  <Accordion title='"Невідома модель: minimax/MiniMax-M2.7"'>
-    Зазвичай це означає, що **провайдер MiniMax не налаштований** (немає відповідного запису провайдера і не знайдено профілю автентифікації/env key MiniMax). Виправлення для цього виявлення є у **2026.1.12**. Виправити можна так:
+  <Accordion title='"Unknown model: minimax/MiniMax-M2.7"'>
+    Зазвичай це означає, що **провайдер MiniMax не налаштовано** (немає відповідного запису провайдера і не знайдено профілю автентифікації/env key MiniMax). Виправлення для цього виявлення входить до **2026.1.12**. Виправити можна так:
 
-    - Оновіться до **2026.1.12** (або запустіть із вихідного коду `main`), а потім перезапустіть Gateway.
-    - Запустіть `openclaw configure` і виберіть параметр автентифікації **MiniMax**, або
+    - Оновіть до **2026.1.12** (або запустіть із вихідного коду `main`), а потім перезапустіть Gateway.
+    - Запустіть `openclaw configure` і виберіть варіант автентифікації **MiniMax**, або
     - Додайте відповідний блок `models.providers.minimax` або `models.providers.minimax-portal` вручну, або
-    - Задайте `MINIMAX_API_KEY`, `MINIMAX_OAUTH_TOKEN` або профіль автентифікації MiniMax, щоб можна було інжектувати відповідний провайдер.
+    - Встановіть `MINIMAX_API_KEY`, `MINIMAX_OAUTH_TOKEN` або профіль автентифікації MiniMax, щоб можна було підставити відповідний провайдер.
 
     Переконайтеся, що ID моделі **чутливий до регістру**:
 
@@ -450,15 +473,15 @@ OpenClaw матеріалізує `MiniMax-M2.7` і
     Вибір провайдерів, посилань на моделі та поведінки failover.
   </Card>
   <Card title="Генерація зображень" href="/uk/tools/image-generation" icon="image">
-    Спільні параметри інструмента для зображень і вибір провайдера.
+    Спільні параметри інструмента зображень і вибір провайдера.
   </Card>
   <Card title="Генерація музики" href="/uk/tools/music-generation" icon="music">
-    Спільні параметри музичного інструмента та вибір провайдера.
+    Спільні параметри інструмента музики і вибір провайдера.
   </Card>
   <Card title="Генерація відео" href="/uk/tools/video-generation" icon="video">
-    Спільні параметри відеоінструмента та вибір провайдера.
+    Спільні параметри інструмента відео і вибір провайдера.
   </Card>
-  <Card title="Пошук MiniMax" href="/uk/tools/minimax-search" icon="magnifying-glass">
+  <Card title="MiniMax Search" href="/uk/tools/minimax-search" icon="magnifying-glass">
     Конфігурація вебпошуку через MiniMax Coding Plan.
   </Card>
   <Card title="Усунення несправностей" href="/uk/help/troubleshooting" icon="wrench">
