@@ -1,21 +1,21 @@
 ---
 read_when:
-    - Vuoi eseguire un turno dell'agente da script (facoltativamente consegnando la risposta)
-summary: Riferimento CLI per `openclaw agent` (invia un turno dell'agente tramite il Gateway)
+    - Vuoi eseguire un turno agente da script (con consegna facoltativa della risposta)
+summary: Riferimento CLI per `openclaw agent` (invia un turno agente tramite il Gateway)
 title: Agente
 x-i18n:
-    generated_at: "2026-04-24T08:32:35Z"
+    generated_at: "2026-04-25T13:43:00Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c4d57b8e368891a0010b053a7504d6313ad2233b5f5f43b34be1f9aa92caa86c
+    source_hash: e06681ffbed56cb5be05c7758141e784eac8307ed3c6fc973f71534238b407e1
     source_path: cli/agent.md
     workflow: 15
 ---
 
 # `openclaw agent`
 
-Esegui un turno dell'agente tramite il Gateway (usa `--local` per la modalità embedded).
-Usa `--agent <id>` per puntare direttamente a un agente configurato.
+Esegui un turno agente tramite il Gateway (usa `--local` per la modalità incorporata).
+Usa `--agent <id>` per indirizzare direttamente un agente configurato.
 
 Passa almeno un selettore di sessione:
 
@@ -23,23 +23,23 @@ Passa almeno un selettore di sessione:
 - `--session-id <id>`
 - `--agent <id>`
 
-Correlato:
+Correlati:
 
 - Strumento di invio agente: [Agent send](/it/tools/agent-send)
 
 ## Opzioni
 
-- `-m, --message <text>`: corpo del messaggio obbligatorio
+- `-m, --message <text>`: corpo del messaggio richiesto
 - `-t, --to <dest>`: destinatario usato per derivare la chiave di sessione
-- `--session-id <id>`: ID sessione esplicito
-- `--agent <id>`: ID agente; sovrascrive i binding di instradamento
-- `--thinking <level>`: livello di ragionamento dell'agente (`off`, `minimal`, `low`, `medium`, `high`, più livelli personalizzati supportati dal provider come `xhigh`, `adaptive` o `max`)
-- `--verbose <on|off>`: persiste il livello verbose per la sessione
+- `--session-id <id>`: id sessione esplicito
+- `--agent <id>`: id agente; sovrascrive i binding di instradamento
+- `--thinking <level>`: livello di ragionamento dell'agente (`off`, `minimal`, `low`, `medium`, `high`, oltre a livelli personalizzati supportati dal provider come `xhigh`, `adaptive` o `max`)
+- `--verbose <on|off>`: mantiene il livello verbose per la sessione
 - `--channel <channel>`: canale di consegna; omettilo per usare il canale della sessione principale
-- `--reply-to <target>`: override della destinazione di consegna
-- `--reply-channel <channel>`: override del canale di consegna
-- `--reply-account <id>`: override dell'account di consegna
-- `--local`: esegue direttamente l'agente embedded (dopo il preload del registro Plugin)
+- `--reply-to <target>`: sovrascrittura della destinazione di consegna
+- `--reply-channel <channel>`: sovrascrittura del canale di consegna
+- `--reply-account <id>`: sovrascrittura dell'account di consegna
+- `--local`: esegui direttamente l'agente incorporato (dopo il preload del registro Plugin)
 - `--deliver`: invia la risposta al canale/destinazione selezionato
 - `--timeout <seconds>`: sovrascrive il timeout dell'agente (predefinito 600 o valore di configurazione)
 - `--json`: output JSON
@@ -57,11 +57,13 @@ openclaw agent --agent ops --message "Run locally" --local
 
 ## Note
 
-- La modalità Gateway ripiega sull'agente embedded quando la richiesta al Gateway non riesce. Usa `--local` per forzare subito l'esecuzione embedded.
-- `--local` precarica comunque prima il registro Plugin, così provider, strumenti e canali forniti dai Plugin restano disponibili durante le esecuzioni embedded.
+- La modalità Gateway usa come fallback l'agente incorporato quando la richiesta al Gateway fallisce. Usa `--local` per forzare subito l'esecuzione incorporata.
+- `--local` esegue comunque prima il preload del registro Plugin, così provider, strumenti e canali forniti dai Plugin restano disponibili durante le esecuzioni incorporate.
+- Ogni invocazione di `openclaw agent` è trattata come esecuzione una tantum. I server MCP inclusi o configurati dall'utente aperti per quell'esecuzione vengono ritirati dopo la risposta, anche quando il comando usa il percorso Gateway, quindi i processi figli stdio MCP non restano attivi tra invocazioni da script.
 - `--channel`, `--reply-channel` e `--reply-account` influiscono sulla consegna della risposta, non sull'instradamento della sessione.
-- Quando questo comando attiva la rigenerazione di `models.json`, le credenziali del provider gestite tramite SecretRef vengono mantenute come marcatori non segreti (per esempio nomi di variabili d'ambiente, `secretref-env:ENV_VAR_NAME` o `secretref-managed`), non come testo in chiaro dei segreti risolti.
-- Le scritture dei marcatori sono autorevoli rispetto alla sorgente: OpenClaw mantiene i marcatori dall'istantanea attiva della configurazione sorgente, non dai valori segreti risolti a runtime.
+- `--json` mantiene stdout riservato alla risposta JSON. Le diagnostiche del Gateway, del Plugin e del fallback incorporato vengono instradate a stderr così gli script possono analizzare direttamente stdout.
+- Quando questo comando attiva la rigenerazione di `models.json`, le credenziali del provider gestite da SecretRef vengono mantenute come marcatori non segreti (per esempio nomi di variabili d'ambiente, `secretref-env:ENV_VAR_NAME` o `secretref-managed`), non come testo in chiaro dei segreti risolti.
+- Le scritture dei marcatori sono autorevoli rispetto alla sorgente: OpenClaw mantiene i marcatori dallo snapshot della configurazione sorgente attiva, non dai valori segreti risolti a runtime.
 
 ## Correlati
 

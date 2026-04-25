@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Scripting o debug del browser dell'agente tramite l'API di controllo locale
-    - Cerchi il riferimento CLI di `openclaw browser`
-    - Aggiunta di automazione browser personalizzata con snapshot e ref
+    - Scriptare o eseguire il debug del browser dell'agente tramite l'API di controllo locale
+    - Cerchi il riferimento CLI `openclaw browser`
+    - Aggiunta di automazione personalizzata del browser con snapshot e ref
 summary: API di controllo del browser OpenClaw, riferimento CLI e azioni di scripting
 title: API di controllo del browser
 x-i18n:
-    generated_at: "2026-04-24T09:04:02Z"
+    generated_at: "2026-04-25T13:57:45Z"
     model: gpt-5.4
     provider: openai
-    source_hash: e29ad295085e2c36a6c2ce01366a4186e45a7ecfe1d3c3072353c55794b05b5f
+    source_hash: 1515ca1e31e6fd8fd3e0f34f17ce309c52202e26ed3b79e24a460380efab040d
     source_path: tools/browser-control.md
     workflow: 15
 ---
 
-Per configurazione, impostazione e risoluzione dei problemi, vedi [Browser](/it/tools/browser).
+Per configurazione iniziale, impostazione e risoluzione dei problemi, vedi [Browser](/it/tools/browser).
 Questa pagina è il riferimento per l'API HTTP di controllo locale, la CLI `openclaw browser`
-e i pattern di scripting (snapshot, ref, wait, flussi di debug).
+e i pattern di scripting (snapshot, ref, attese, flussi di debug).
 
 ## API di controllo (facoltativa)
 
-Per integrazioni solo locali, il Gateway espone una piccola API HTTP loopback:
+Solo per integrazioni locali, il Gateway espone una piccola API HTTP loopback:
 
 - Stato/avvio/arresto: `GET /`, `POST /start`, `POST /stop`
 - Schede: `GET /tabs`, `POST /tabs/open`, `POST /tabs/focus`, `DELETE /tabs/:targetId`
@@ -35,23 +35,27 @@ Per integrazioni solo locali, il Gateway espone una piccola API HTTP loopback:
 - Stato: `GET /storage/:kind`, `POST /storage/:kind/set`, `POST /storage/:kind/clear`
 - Impostazioni: `POST /set/offline`, `POST /set/headers`, `POST /set/credentials`, `POST /set/geolocation`, `POST /set/media`, `POST /set/timezone`, `POST /set/locale`, `POST /set/device`
 
-Tutti gli endpoint accettano `?profile=<name>`.
+Tutti gli endpoint accettano `?profile=<name>`. `POST /start?headless=true` richiede
+un avvio headless one-shot per profili locali gestiti senza modificare la
+configurazione persistente del browser; i profili solo-attach, CDP remoto e sessione esistente rifiutano
+questa sostituzione perché OpenClaw non avvia quei processi browser.
 
-Se è configurata l'autenticazione del gateway con segreto condiviso, anche le route HTTP del browser richiedono autenticazione:
+Se è configurata l'autenticazione del gateway con secret condiviso, anche le route HTTP del browser richiedono autenticazione:
 
 - `Authorization: Bearer <gateway token>`
 - `x-openclaw-password: <gateway password>` oppure autenticazione HTTP Basic con quella password
 
 Note:
 
-- Questa API browser loopback standalone **non** usa gli header di identità di trusted-proxy o Tailscale Serve.
+- Questa API browser loopback standalone **non** consuma header di identità di trusted-proxy o
+  Tailscale Serve.
 - Se `gateway.auth.mode` è `none` o `trusted-proxy`, queste route browser loopback
-  non ereditano quelle modalità basate su identità; mantienile solo loopback.
+  non ereditano quelle modalità con identità; mantienile solo loopback.
 
-### Contratto di errore di `/act`
+### Contratto di errore `/act`
 
-`POST /act` usa una risposta di errore strutturata per errori di convalida e
-policy a livello di route:
+`POST /act` usa una risposta di errore strutturata per validazione a livello di route e
+fallimenti di policy:
 
 ```json
 { "error": "<message>", "code": "ACT_*" }
@@ -60,73 +64,75 @@ policy a livello di route:
 Valori `code` attuali:
 
 - `ACT_KIND_REQUIRED` (HTTP 400): `kind` manca o non è riconosciuto.
-- `ACT_INVALID_REQUEST` (HTTP 400): il payload dell'azione non ha superato normalizzazione o convalida.
+- `ACT_INVALID_REQUEST` (HTTP 400): il payload dell'azione non ha superato normalizzazione o validazione.
 - `ACT_SELECTOR_UNSUPPORTED` (HTTP 400): `selector` è stato usato con un tipo di azione non supportato.
 - `ACT_EVALUATE_DISABLED` (HTTP 403): `evaluate` (o `wait --fn`) è disabilitato dalla configurazione.
-- `ACT_TARGET_ID_MISMATCH` (HTTP 403): `targetId` di primo livello o batch è in conflitto con il target della richiesta.
-- `ACT_EXISTING_SESSION_UNSUPPORTED` (HTTP 501): l'azione non è supportata per profili existing-session.
+- `ACT_TARGET_ID_MISMATCH` (HTTP 403): `targetId` di primo livello o in batch è in conflitto con il target della richiesta.
+- `ACT_EXISTING_SESSION_UNSUPPORTED` (HTTP 501): l'azione non è supportata per profili con sessione esistente.
 
-Altri errori runtime possono ancora restituire `{ "error": "<message>" }` senza
-un campo `code`.
+Altri errori di runtime possono comunque restituire `{ "error": "<message>" }` senza un
+campo `code`.
 
 ### Requisito Playwright
 
-Alcune funzionalità (navigate/act/AI snapshot/role snapshot, screenshot di elementi,
+Alcune funzionalità (navigate/act/AI snapshot/role snapshot, screenshot degli elementi,
 PDF) richiedono Playwright. Se Playwright non è installato, quegli endpoint restituiscono
 un chiaro errore 501.
 
-Cosa funziona ancora senza Playwright:
+Cosa continua a funzionare senza Playwright:
 
 - Snapshot ARIA
-- Screenshot della pagina per il browser `openclaw` gestito quando è disponibile un WebSocket CDP per scheda
+- Screenshot della pagina per il browser `openclaw` gestito quando è disponibile un WebSocket CDP
+  per scheda
 - Screenshot della pagina per profili `existing-session` / Chrome MCP
-- Screenshot basati su ref in `existing-session` (`--ref`) dall'output dello snapshot
+- Screenshot basati su ref di `existing-session` (`--ref`) dall'output dello snapshot
 
 Cosa richiede ancora Playwright:
 
 - `navigate`
 - `act`
-- AI snapshot / role snapshot
+- Snapshot AI / role snapshot
 - Screenshot di elementi con selettore CSS (`--element`)
 - Esportazione PDF completa del browser
 
 Gli screenshot degli elementi rifiutano anche `--full-page`; la route restituisce `fullPage is
 not supported for element screenshots`.
 
-Se vedi `Playwright is not available in this gateway build`, ripara le dipendenze runtime del plugin browser bundle in modo che `playwright-core` sia installato,
+Se vedi `Playwright is not available in this gateway build`, ripara le dipendenze runtime del Plugin browser incluso in modo che `playwright-core` sia installato,
 poi riavvia il gateway. Per installazioni pacchettizzate, esegui `openclaw doctor --fix`.
 Per Docker, installa anche i binari del browser Chromium come mostrato sotto.
 
-#### Installazione Docker di Playwright
+#### Installazione Docker Playwright
 
-Se il tuo Gateway gira in Docker, evita `npx playwright` (conflitti con override npm).
-Usa invece la CLI bundle:
+Se il tuo Gateway gira in Docker, evita `npx playwright` (conflitti di override npm).
+Usa invece la CLI inclusa:
 
 ```bash
 docker compose run --rm openclaw-cli \
   node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
-Per rendere persistenti i download del browser, imposta `PLAYWRIGHT_BROWSERS_PATH` (ad esempio,
+Per rendere persistenti i download del browser, imposta `PLAYWRIGHT_BROWSERS_PATH` (per esempio,
 `/home/node/.cache/ms-playwright`) e assicurati che `/home/node` sia persistente tramite
 `OPENCLAW_HOME_VOLUME` o un bind mount. Vedi [Docker](/it/install/docker).
 
-## Come funziona (internamente)
+## Come funziona (interno)
 
-Un piccolo server di controllo loopback accetta richieste HTTP e si connette ai browser basati su Chromium tramite CDP. Le azioni avanzate (click/type/snapshot/PDF) passano attraverso Playwright sopra CDP; quando Playwright manca, sono disponibili solo le operazioni non-Playwright. L'agente vede un'unica interfaccia stabile mentre browser e profili locali/remoti possono cambiare liberamente sotto il cofano.
+Un piccolo server di controllo loopback accetta richieste HTTP e si connette ai browser basati su Chromium tramite CDP. Le azioni avanzate (click/type/snapshot/PDF) passano attraverso Playwright sopra CDP; quando Playwright manca, sono disponibili solo le operazioni che non usano Playwright. L'agente vede un'unica interfaccia stabile mentre browser e profili locali/remoti si scambiano liberamente sotto.
 
 ## Riferimento rapido CLI
 
-Tutti i comandi accettano `--browser-profile <name>` per puntare a un profilo specifico, e `--json` per output leggibile dalla macchina.
+Tutti i comandi accettano `--browser-profile <name>` per puntare a un profilo specifico, e `--json` per output leggibile dalle macchine.
 
 <AccordionGroup>
 
-<Accordion title="Base: stato, schede, open/focus/close">
+<Accordion title="Nozioni di base: stato, schede, apri/focus/chiudi">
 
 ```bash
 openclaw browser status
 openclaw browser start
-openclaw browser stop            # cancella anche l'emulazione su attach-only/remote CDP
+openclaw browser start --headless # avvio headless one-shot locale gestito
+openclaw browser stop            # cancella anche l'emulazione su solo-attach/CDP remoto
 openclaw browser tabs
 openclaw browser tab             # scorciatoia per la scheda corrente
 openclaw browser tab new
@@ -145,11 +151,13 @@ openclaw browser close abcd1234
 openclaw browser screenshot
 openclaw browser screenshot --full-page
 openclaw browser screenshot --ref 12        # oppure --ref e12
+openclaw browser screenshot --labels
 openclaw browser snapshot
 openclaw browser snapshot --format aria --limit 200
 openclaw browser snapshot --interactive --compact --depth 6
 openclaw browser snapshot --efficient
 openclaw browser snapshot --labels
+openclaw browser snapshot --urls
 openclaw browser snapshot --selector "#main" --interactive
 openclaw browser snapshot --frame "iframe#main" --interactive
 openclaw browser console --level error
@@ -167,6 +175,7 @@ openclaw browser responsebody "**/api" --max-chars 5000
 openclaw browser navigate https://example.com
 openclaw browser resize 1280 720
 openclaw browser click 12 --double           # oppure e12 per role ref
+openclaw browser click-coords 120 340        # coordinate viewport
 openclaw browser type 23 "hello" --submit
 openclaw browser press Enter
 openclaw browser hover 44
@@ -213,18 +222,19 @@ openclaw browser set device "iPhone 14"
 
 Note:
 
-- `upload` e `dialog` sono chiamate di **arming**; eseguile prima del click/press che attiva il chooser/dialog.
-- `click`/`type`/ecc. richiedono un `ref` da `snapshot` (`12` numerico oppure role ref `e12`). I selettori CSS sono intenzionalmente non supportati per le azioni.
-- I percorsi di download, trace e upload sono vincolati alle root temporanee di OpenClaw: `/tmp/openclaw{,/downloads,/uploads}` (fallback: `${os.tmpdir()}/openclaw/...`).
-- `upload` può anche impostare direttamente gli input file tramite `--input-ref` o `--element`.
+- `upload` e `dialog` sono chiamate di **attivazione preventiva**; eseguili prima del click/press che attiva il selettore/dialogo.
+- `click`/`type`/ecc. richiedono un `ref` da `snapshot` (numerico `12`, role ref `e12` o ref ARIA azionabile `ax12`). I selettori CSS intenzionalmente non sono supportati per le azioni. Usa `click-coords` quando la posizione visibile nel viewport è l'unico target affidabile.
+- I percorsi di download, trace e upload sono vincolati alle radici temp di OpenClaw: `/tmp/openclaw{,/downloads,/uploads}` (fallback: `${os.tmpdir()}/openclaw/...`).
+- `upload` può anche impostare direttamente input file tramite `--input-ref` o `--element`.
 
-Flag degli snapshot in breve:
+Panoramica dei flag snapshot:
 
-- `--format ai` (predefinito con Playwright): AI snapshot con ref numerici (`aria-ref="<n>"`).
-- `--format aria`: albero di accessibilità, senza ref; solo ispezione.
-- `--efficient` (o `--mode efficient`): preset compatto per role snapshot. Imposta `browser.snapshotDefaults.mode: "efficient"` per renderlo il predefinito (vedi [Configurazione del Gateway](/it/gateway/configuration-reference#browser)).
+- `--format ai` (predefinito con Playwright): snapshot AI con ref numerici (`aria-ref="<n>"`).
+- `--format aria`: albero di accessibilità con ref `axN`. Quando Playwright è disponibile, OpenClaw collega i ref con id DOM backend alla pagina live così le azioni successive possono usarli; altrimenti tratta l'output solo come ispezione.
+- `--efficient` (o `--mode efficient`): preset compatto di role snapshot. Imposta `browser.snapshotDefaults.mode: "efficient"` per renderlo il predefinito (vedi [Configurazione Gateway](/it/gateway/configuration-reference#browser)).
 - `--interactive`, `--compact`, `--depth`, `--selector` forzano un role snapshot con ref `ref=e12`. `--frame "<iframe>"` limita i role snapshot a un iframe.
 - `--labels` aggiunge uno screenshot solo viewport con etichette ref sovrapposte (stampa `MEDIA:<path>`).
+- `--urls` aggiunge all'AI snapshot le destinazioni dei link rilevate.
 
 ## Snapshot e ref
 
@@ -239,24 +249,35 @@ OpenClaw supporta due stili di “snapshot”:
   - Output: un elenco/albero basato sui ruoli con `[ref=e12]` (e facoltativamente `[nth=1]`).
   - Azioni: `openclaw browser click e12`, `openclaw browser highlight e12`.
   - Internamente, il ref viene risolto tramite `getByRole(...)` (più `nth()` per i duplicati).
-  - Aggiungi `--labels` per includere uno screenshot viewport con etichette `e12` sovrapposte.
+  - Aggiungi `--labels` per includere uno screenshot del viewport con etichette `e12` sovrapposte.
+  - Aggiungi `--urls` quando il testo del link è ambiguo e l'agente ha bisogno di target di navigazione concreti.
+
+- **Snapshot ARIA (ref ARIA come `ax12`)**: `openclaw browser snapshot --format aria`
+  - Output: l'albero di accessibilità come nodi strutturati.
+  - Azioni: `openclaw browser click ax12` funziona quando il percorso dello snapshot può collegare
+    il ref tramite Playwright e gli id DOM backend di Chrome.
+  - Se Playwright non è disponibile, gli snapshot ARIA possono comunque essere utili per
+    l'ispezione, ma i ref potrebbero non essere azionabili. Riesegui uno snapshot con `--format ai`
+    o `--interactive` quando ti servono ref azionabili.
 
 Comportamento dei ref:
 
-- I ref **non sono stabili tra navigazioni**; se qualcosa fallisce, riesegui `snapshot` e usa un ref aggiornato.
-- Se il role snapshot è stato acquisito con `--frame`, i role ref sono limitati a quell'iframe fino al successivo role snapshot.
+- I ref **non sono stabili tra le navigazioni**; se qualcosa fallisce, riesegui `snapshot` e usa un ref nuovo.
+- Se il role snapshot è stato acquisito con `--frame`, i role ref sono limitati a quell'iframe fino al role snapshot successivo.
+- I ref `axN` sconosciuti o obsoleti falliscono immediatamente invece di ricadere sul
+  selettore `aria-ref` di Playwright. In quel caso esegui uno snapshot nuovo sulla stessa scheda.
 
-## Potenziamenti di wait
+## Potenziamenti di attesa
 
-Puoi attendere più cose oltre al semplice tempo/testo:
+Puoi attendere più di semplice tempo/testo:
 
-- Attendere un URL (glob supportati da Playwright):
+- Attendi un URL (glob supportati da Playwright):
   - `openclaw browser wait --url "**/dash"`
-- Attendere uno stato di caricamento:
+- Attendi uno stato di caricamento:
   - `openclaw browser wait --load networkidle`
-- Attendere un predicato JS:
+- Attendi un predicato JS:
   - `openclaw browser wait --fn "window.ready===true"`
-- Attendere che un selettore diventi visibile:
+- Attendi che un selettore diventi visibile:
   - `openclaw browser wait "#main"`
 
 Questi possono essere combinati:
@@ -271,22 +292,22 @@ openclaw browser wait "#main" \
 
 ## Flussi di debug
 
-Quando un'azione fallisce (ad esempio “not visible”, “strict mode violation”, “covered”):
+Quando un'azione fallisce (per esempio “not visible”, “strict mode violation”, “covered”):
 
 1. `openclaw browser snapshot --interactive`
-2. Usa `click <ref>` / `type <ref>` (preferisci role ref in modalità interattiva)
-3. Se fallisce ancora: `openclaw browser highlight <ref>` per vedere cosa sta targettando Playwright
+2. Usa `click <ref>` / `type <ref>` (preferisci i role ref in modalità interattiva)
+3. Se fallisce ancora: `openclaw browser highlight <ref>` per vedere cosa sta puntando Playwright
 4. Se la pagina si comporta in modo strano:
    - `openclaw browser errors --clear`
    - `openclaw browser requests --filter api --clear`
-5. Per un debug approfondito: registra una trace:
+5. Per un debug approfondito: registra un trace:
    - `openclaw browser trace start`
    - riproduci il problema
    - `openclaw browser trace stop` (stampa `TRACE:<path>`)
 
 ## Output JSON
 
-`--json` serve per scripting e tooling strutturato.
+`--json` è per scripting e strumenti strutturati.
 
 Esempi:
 
@@ -297,35 +318,35 @@ openclaw browser requests --filter api --json
 openclaw browser cookies --json
 ```
 
-I role snapshot in JSON includono `refs` più un piccolo blocco `stats` (righe/caratteri/ref/interattivo) così gli strumenti possono ragionare sulla dimensione e la densità del payload.
+I role snapshot in JSON includono `refs` più un piccolo blocco `stats` (righe/caratteri/ref/interattivo) così gli strumenti possono ragionare su dimensione e densità del payload.
 
-## Manopole di stato e ambiente
+## Impostazioni di stato e ambiente
 
-Queste sono utili per flussi di lavoro del tipo “fai comportare il sito come X”:
+Sono utili per flussi del tipo “fai comportare il sito come X”:
 
 - Cookie: `cookies`, `cookies set`, `cookies clear`
 - Storage: `storage local|session get|set|clear`
 - Offline: `set offline on|off`
-- Header: `set headers --headers-json '{"X-Debug":"1"}'` (il legacy `set headers --json '{"X-Debug":"1"}'` continua a essere supportato)
-- Auth HTTP basic: `set credentials user pass` (oppure `--clear`)
+- Header: `set headers --headers-json '{"X-Debug":"1"}'` (il legacy `set headers --json '{"X-Debug":"1"}'` resta supportato)
+- Autenticazione HTTP basic: `set credentials user pass` (oppure `--clear`)
 - Geolocalizzazione: `set geo <lat> <lon> --origin "https://example.com"` (oppure `--clear`)
 - Media: `set media dark|light|no-preference|none`
-- Fuso orario / locale: `set timezone ...`, `set locale ...`
-- Device / viewport:
-  - `set device "iPhone 14"` (preset Playwright per dispositivi)
+- Fuso orario / lingua: `set timezone ...`, `set locale ...`
+- Dispositivo / viewport:
+  - `set device "iPhone 14"` (preset dispositivo Playwright)
   - `set viewport 1280 720`
 
 ## Sicurezza e privacy
 
-- Il profilo browser openclaw può contenere sessioni con login attivo; trattalo come sensibile.
+- Il profilo browser openclaw può contenere sessioni con accesso già effettuato; trattalo come sensibile.
 - `browser act kind=evaluate` / `openclaw browser evaluate` e `wait --fn`
-  eseguono JavaScript arbitrario nel contesto della pagina. Il prompt injection può
-  orientare questo comportamento. Disabilitalo con `browser.evaluateEnabled=false` se non ti serve.
-- Per login e note anti-bot (X/Twitter, ecc.), vedi [Login del browser + pubblicazione su X/Twitter](/it/tools/browser-login).
-- Mantieni privato il Gateway/node host (solo loopback o solo tailnet).
-- Gli endpoint CDP remoti sono potenti; usa tunnel e proteggili.
+  eseguono JavaScript arbitrario nel contesto della pagina. Il prompt injection può indirizzare
+  questo comportamento. Disabilitalo con `browser.evaluateEnabled=false` se non ti serve.
+- Per note su login e anti-bot (X/Twitter, ecc.), vedi [Browser login + pubblicazione su X/Twitter](/it/tools/browser-login).
+- Mantieni privato l'host Gateway/node (solo loopback o tailnet).
+- Gli endpoint CDP remoti sono potenti; incanala il traffico in tunnel e proteggili.
 
-Esempio strict-mode (blocca per impostazione predefinita destinazioni private/interne):
+Esempio in modalità strict (blocca per impostazione predefinita destinazioni private/interne):
 
 ```json5
 {
@@ -333,7 +354,7 @@ Esempio strict-mode (blocca per impostazione predefinita destinazioni private/in
     ssrfPolicy: {
       dangerouslyAllowPrivateNetwork: false,
       hostnameAllowlist: ["*.example.com", "example.com"],
-      allowedHostnames: ["localhost"], // optional exact allow
+      allowedHostnames: ["localhost"], // allow esatto facoltativo
     },
   },
 }
@@ -342,6 +363,6 @@ Esempio strict-mode (blocca per impostazione predefinita destinazioni private/in
 ## Correlati
 
 - [Browser](/it/tools/browser) — panoramica, configurazione, profili, sicurezza
-- [Login del browser](/it/tools/browser-login) — accesso ai siti
-- [Risoluzione dei problemi del browser su Linux](/it/tools/browser-linux-troubleshooting)
-- [Risoluzione dei problemi del browser su WSL2](/it/tools/browser-wsl2-windows-remote-cdp-troubleshooting)
+- [Browser login](/it/tools/browser-login) — accesso ai siti
+- [Risoluzione dei problemi Browser su Linux](/it/tools/browser-linux-troubleshooting)
+- [Risoluzione dei problemi Browser su WSL2](/it/tools/browser-wsl2-windows-remote-cdp-troubleshooting)

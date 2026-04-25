@@ -1,22 +1,21 @@
 ---
 read_when:
     - Vuoi scegliere un provider di modelli
-    - Hai bisogno di una rapida panoramica dei backend LLM supportati
+    - Ti serve una rapida panoramica dei backend LLM supportati
 summary: Provider di modelli (LLM) supportati da OpenClaw
 title: Directory dei provider
 x-i18n:
-    generated_at: "2026-04-24T08:56:43Z"
+    generated_at: "2026-04-25T13:55:44Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8e76c2688398e12a4467327505bf5fe8b40cf66c74a66dd586c0ccadd50e6705
+    source_hash: 9e031e997f0dbf97e3e26d5ee05bd99c2877653daa04423d210d01b9045d8c5c
     source_path: providers/index.md
     workflow: 15
 ---
 
 # Provider di modelli
 
-OpenClaw può usare molti provider LLM. Scegli un provider, autenticati, poi imposta il
-modello predefinito come `provider/model`.
+OpenClaw può usare molti provider LLM. Scegli un provider, autenticati, quindi imposta il modello predefinito come `provider/model`.
 
 Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Mattermost (Plugin)/ecc.)? Vedi [Canali](/it/channels).
 
@@ -47,6 +46,7 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 - [fal](/it/providers/fal)
 - [Fireworks](/it/providers/fireworks)
 - [GitHub Copilot](/it/providers/github-copilot)
+- [Gradium](/it/providers/gradium)
 - [Modelli GLM](/it/providers/glm)
 - [Google (Gemini)](/it/providers/google)
 - [Groq (inferenza LPU)](/it/providers/groq)
@@ -68,12 +68,13 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 - [Qianfan](/it/providers/qianfan)
 - [Qwen Cloud](/it/providers/qwen)
 - [Runway](/it/providers/runway)
+- [SenseAudio](/it/providers/senseaudio)
 - [SGLang (modelli locali)](/it/providers/sglang)
 - [StepFun](/it/providers/stepfun)
 - [Synthetic](/it/providers/synthetic)
 - [Tencent Cloud (TokenHub)](/it/providers/tencent)
 - [Together AI](/it/providers/together)
-- [Venice (Venice AI, incentrato sulla privacy)](/it/providers/venice)
+- [Venice (Venice AI, focalizzato sulla privacy)](/it/providers/venice)
 - [Vercel AI Gateway](/it/providers/vercel-ai-gateway)
 - [vLLM (modelli locali)](/it/providers/vllm)
 - [Volcengine (Doubao)](/it/providers/volcengine)
@@ -84,10 +85,10 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 
 ## Pagine panoramiche condivise
 
-- [Varianti bundle aggiuntive](/it/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy e Gemini CLI OAuth
-- [Generazione immagini](/it/tools/image-generation) - Strumento condiviso `image_generate`, selezione del provider e failover
-- [Generazione musicale](/it/tools/music-generation) - Strumento condiviso `music_generate`, selezione del provider e failover
-- [Generazione video](/it/tools/video-generation) - Strumento condiviso `video_generate`, selezione del provider e failover
+- [Varianti aggiuntive incluse](/it/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy e Gemini CLI OAuth
+- [Generazione di immagini](/it/tools/image-generation) - strumento condiviso `image_generate`, selezione del provider e failover
+- [Generazione musicale](/it/tools/music-generation) - strumento condiviso `music_generate`, selezione del provider e failover
+- [Generazione video](/it/tools/video-generation) - strumento condiviso `video_generate`, selezione del provider e failover
 
 ## Provider di trascrizione
 
@@ -95,11 +96,11 @@ Cerchi la documentazione dei canali chat (WhatsApp/Telegram/Discord/Slack/Matter
 - [ElevenLabs](/it/providers/elevenlabs#speech-to-text)
 - [Mistral](/it/providers/mistral#audio-transcription-voxtral)
 - [OpenAI](/it/providers/openai#speech-to-text)
+- [SenseAudio](/it/providers/senseaudio)
 - [xAI](/it/providers/xai#speech-to-text)
 
 ## Strumenti della community
 
-- [Claude Max API Proxy](/it/providers/claude-max-api-proxy) - Proxy della community per credenziali di abbonamento Claude (verifica policy/termini di Anthropic prima dell'uso)
+- [Claude Max API Proxy](/it/providers/claude-max-api-proxy) - Proxy della community per credenziali di abbonamento Claude (verifica la policy/i termini Anthropic prima dell'uso)
 
-Per il catalogo completo dei provider (xAI, Groq, Mistral, ecc.) e la configurazione avanzata,
-vedi [Provider di modelli](/it/concepts/model-providers).
+Per il catalogo completo dei provider (xAI, Groq, Mistral, ecc.) e la configurazione avanzata, vedi [Provider di modelli](/it/concepts/model-providers).

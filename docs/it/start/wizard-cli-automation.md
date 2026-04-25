@@ -3,13 +3,13 @@ read_when:
     - Stai automatizzando l'onboarding in script o CI
     - Hai bisogno di esempi non interattivi per provider specifici
 sidebarTitle: CLI automation
-summary: Onboarding e configurazione dell'agente tramite script per la CLI OpenClaw
+summary: Onboarding tramite script e configurazione dell'agente per la CLI di OpenClaw
 title: Automazione CLI
 x-i18n:
-    generated_at: "2026-04-24T09:03:24Z"
+    generated_at: "2026-04-25T13:57:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
+    source_hash: 4d36801439b9243ea5cc0ab93757dde23d1ecd86c8f5b991541ee14f41bf05ac
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
@@ -20,7 +20,7 @@ Usa `--non-interactive` per automatizzare `openclaw onboard`.
 `--json` non implica la modalità non interattiva. Usa `--non-interactive` (e `--workspace`) per gli script.
 </Note>
 
-## Esempio base non interattivo
+## Esempio non interattivo di base
 
 ```bash
 openclaw onboard --non-interactive \
@@ -32,16 +32,19 @@ openclaw onboard --non-interactive \
   --gateway-bind loopback \
   --install-daemon \
   --daemon-runtime node \
+  --skip-bootstrap \
   --skip-skills
 ```
 
-Aggiungi `--json` per un riepilogo leggibile dalla macchina.
+Aggiungi `--json` per un riepilogo leggibile dalle macchine.
 
-Usa `--secret-input-mode ref` per archiviare riferimenti supportati da env nei profili auth invece di valori plaintext.
-La selezione interattiva tra riferimenti env e riferimenti ai provider configurati (`file` o `exec`) è disponibile nel flusso di onboarding.
+Usa `--skip-bootstrap` quando la tua automazione preinizializza i file del workspace e non vuole che l'onboarding crei i file di bootstrap predefiniti.
 
-In modalità non interattiva `ref`, le variabili env del provider devono essere impostate nell'ambiente del processo.
-Passare flag di chiavi inline senza la corrispondente variabile env ora provoca un fail fast.
+Usa `--secret-input-mode ref` per archiviare riferimenti basati su variabili d'ambiente nei profili di autenticazione invece di valori in testo semplice.
+La selezione interattiva tra riferimenti env e riferimenti provider configurati (`file` o `exec`) è disponibile nel flusso di onboarding.
+
+Nella modalità `ref` non interattiva, le variabili d'ambiente del provider devono essere impostate nell'ambiente del processo.
+Il passaggio di flag di chiavi inline senza la variabile d'ambiente corrispondente ora fallisce immediatamente.
 
 Esempio:
 
@@ -147,7 +150,7 @@ openclaw onboard --non-interactive \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
-    Passa a `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` per il catalogo Go.
+    Sostituisci con `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` per il catalogo Go.
   </Accordion>
   <Accordion title="Esempio Ollama">
     ```bash
@@ -160,7 +163,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Esempio provider personalizzato">
+  <Accordion title="Esempio di provider personalizzato">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -197,13 +200,13 @@ openclaw onboard --non-interactive \
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token resta disponibile come percorso token di onboarding supportato, ma OpenClaw ora preferisce il riuso di Claude CLI quando disponibile.
+Il setup-token Anthropic rimane disponibile come percorso token di onboarding supportato, ma OpenClaw ora preferisce il riutilizzo della CLI Claude quando disponibile.
 Per la produzione, preferisci una chiave API Anthropic.
 
-## Aggiungi un altro agente
+## Aggiungere un altro agente
 
 Usa `openclaw agents add <name>` per creare un agente separato con il proprio workspace,
-sessioni e profili auth. L'esecuzione senza `--workspace` avvia la procedura guidata.
+sessioni e profili di autenticazione. L'esecuzione senza `--workspace` avvia la procedura guidata.
 
 ```bash
 openclaw agents add work \
@@ -228,6 +231,6 @@ Note:
 
 ## Documentazione correlata
 
-- Hub onboarding: [Onboarding (CLI)](/it/start/wizard)
-- Riferimento completo: [Riferimento CLI Setup](/it/start/wizard-cli-reference)
-- Riferimento comando: [`openclaw onboard`](/it/cli/onboard)
+- Hub di onboarding: [Onboarding (CLI)](/it/start/wizard)
+- Riferimento completo: [Riferimento configurazione CLI](/it/start/wizard-cli-reference)
+- Riferimento comandi: [`openclaw onboard`](/it/cli/onboard)
