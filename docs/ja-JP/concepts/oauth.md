@@ -1,183 +1,187 @@
 ---
 read_when:
-    - OpenClawのOAuthをエンドツーエンドで理解したい場合
+    - OpenClaw の OAuth をエンドツーエンドで理解したい場合
     - トークン無効化 / ログアウトの問題に遭遇した場合
-    - Claude CLIまたはOAuth認証フローが必要な場合
-    - 複数アカウントまたはプロファイルルーティングが必要な場合
-summary: 'OpenClawにおけるOAuth: トークン交換、保存、およびマルチアカウントパターン'
+    - Claude CLI または OAuth の auth フローを使いたい場合
+    - 複数アカウントまたは profile ルーティングを使いたい場合
+summary: 'OpenClaw における OAuth: トークン交換、保存、多重アカウントパターン'
 title: OAuth
 x-i18n:
-    generated_at: "2026-04-24T04:54:17Z"
+    generated_at: "2026-04-25T13:45:46Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 81b8891850123c32a066dbfb855feb132bc1f2bbc694f10ee2797b694bd5d848
+    source_hash: c793c52f48a3f49c0677d8e55a84c2bf5cdf0d385e6a858f26c0701d45583211
     source_path: concepts/oauth.md
     workflow: 15
 ---
 
-OpenClawは、それを提供するプロバイダー向けに、OAuthによる「サブスクリプション認証」をサポートしています
-（特に**OpenAI Codex（ChatGPT OAuth）**）。Anthropicについては、現在の実用的な区分は次のとおりです。
+OpenClaw は、対応する provider に対して OAuth による「subscription auth」をサポートしています
+（特に **OpenAI Codex（ChatGPT OAuth）**）。Anthropic については、実用上の区分は現在次のとおりです。
 
-- **Anthropic API key**: 通常のAnthropic API課金
-- **OpenClaw内のAnthropic Claude CLI / サブスクリプション認証**: Anthropicスタッフから、この使用法は再び許可されていると案内されています
+- **Anthropic API key**: 通常の Anthropic API 課金
+- **OpenClaw 内での Anthropic Claude CLI / subscription auth**: Anthropic スタッフから
+  この利用は再び許可されていると伝えられています
 
-OpenAI Codex OAuthは、OpenClawのような外部ツールでの使用が明示的にサポートされています。
-このページでは、次を説明します。
+OpenAI Codex OAuth は、OpenClaw のような外部ツールでの利用が明示的にサポートされています。
+このページでは次を説明します。
 
-本番環境のAnthropicでは、API key認証のほうがより安全で推奨される経路です。
+本番運用の Anthropic では、API key auth の方がより安全な推奨経路です。
 
-- OAuthの**トークン交換**がどのように機能するか（PKCE）
+- OAuth の**トークン交換**がどのように動くか（PKCE）
 - トークンが**どこに保存**されるか（およびその理由）
-- **複数アカウント**の扱い方（プロファイル + セッションごとの上書き）
+- **複数アカウント**をどう扱うか（profile + セッションごとのオーバーライド）
 
-OpenClawは、独自のOAuthまたはAPI-key
-フローを同梱する**プロバイダーPlugin**もサポートします。実行には次を使用します。
+OpenClaw は、独自の OAuth または API‑key
+フローを提供する **provider Plugin** もサポートしています。実行するには:
 
 ```bash
 openclaw models auth login --provider <id>
 ```
 
-## トークンシンク（これが存在する理由）
+## token sink（なぜ存在するのか）
 
-OAuthプロバイダーは、ログイン/リフレッシュフローのたびに**新しいrefresh token**を発行することがよくあります。一部のプロバイダー（またはOAuthクライアント）は、同じユーザー/アプリに対して新しいものが発行されると、古いrefresh tokenを無効化することがあります。
+OAuth provider は、ログイン/リフレッシュフロー中に**新しい refresh token** を発行することがよくあります。provider（または OAuth client）によっては、同じ user/app に対して新しいものが発行された際に、古い refresh token が無効化されることがあります。
 
 実際の症状:
 
-- OpenClaw _と_ Claude Code / Codex CLIの両方でログインすると → 後でどちらか一方がランダムに「ログアウト」される
+- OpenClaw _と_ Claude Code / Codex CLI の両方でログインすると、後でどちらか一方がランダムに「ログアウト」状態になる
 
-これを減らすため、OpenClawは`auth-profiles.json`を**トークンシンク**として扱います。
+これを減らすために、OpenClaw は `auth-profiles.json` を **token sink** として扱います。
 
-- ランタイムは**1か所**から資格情報を読み取る
-- 複数プロファイルを保持し、決定的にルーティングできる
-- Codex CLIのような外部CLIから資格情報を再利用する場合、OpenClawは
-  それらを来歴付きでミラーし、refresh token自体を回転させる代わりに
-  その外部ソースを再読込する
+- ランタイムは **1 か所** から資格情報を読み取ります
+- 複数の profile を保持し、決定的にルーティングできます
+- 外部 CLI の再利用は provider ごとの扱いです: Codex CLI は空の
+  `openai-codex:default` profile を bootstrap できますが、OpenClaw にローカル OAuth profile が存在するようになると、
+  ローカル refresh token が正規となります。ほかの統合は引き続き外部管理のままとし、
+  その CLI auth store を再読込できます
 
-## 保存（トークンの保存先）
+## 保存場所（トークンはどこに保存されるか）
 
-シークレットは**エージェントごと**に保存されます。
+secret は **agent ごと** に保存されます。
 
-- Authプロファイル（OAuth + API keys + 任意の値レベルref）: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
-- レガシー互換ファイル: `~/.openclaw/agents/<agentId>/agent/auth.json`
-  （静的な`api_key`エントリは発見時に除去されます）
+- Auth profile（OAuth + API key + 任意の value-level ref）: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+- 旧互換ファイル: `~/.openclaw/agents/<agentId>/agent/auth.json`
+  （静的な `api_key` エントリは見つかり次第除去されます）
 
-レガシーのインポート専用ファイル（引き続きサポートされますが、メインストアではありません）:
+旧来のインポート専用ファイル（引き続きサポートされますが、メインの保存先ではありません）:
 
-- `~/.openclaw/credentials/oauth.json`（初回使用時に`auth-profiles.json`へインポートされます）
+- `~/.openclaw/credentials/oauth.json`（初回使用時に `auth-profiles.json` へインポート）
 
-上記はすべて`$OPENCLAW_STATE_DIR`（state dir上書き）にも従います。完全なリファレンス: [/gateway/configuration](/ja-JP/gateway/configuration-reference#auth-storage)
+上記のすべては `$OPENCLAW_STATE_DIR`（state dir 上書き）にも従います。完全なリファレンス: [/gateway/configuration](/ja-JP/gateway/configuration-reference#auth-storage)
 
-静的なSecretRefとランタイムスナップショット有効化動作については、[Secrets Management](/ja-JP/gateway/secrets)を参照してください。
+静的 secret ref とランタイムスナップショットの有効化動作については、[Secrets Management](/ja-JP/gateway/secrets) を参照してください。
 
-## Anthropicレガシートークン互換性
+## Anthropic の旧トークン互換性
 
 <Warning>
-Anthropicの公開Claude Codeドキュメントでは、Claude Codeを直接使用する場合は
-Claudeのサブスクリプション制限内にとどまるとされており、AnthropicスタッフからもOpenClaw風のClaude
-CLI使用は再び許可されていると案内されています。そのためOpenClawは、Anthropicが
-新しいポリシーを公開しない限り、この連携におけるClaude CLI再利用と
-`claude -p`使用を許可済みとして扱います。
+Anthropic の公開 Claude Code ドキュメントでは、Claude Code の直接利用は
+Claude subscription の上限内に収まるとされており、Anthropic スタッフからも OpenClaw スタイルの Claude
+CLI 利用は再び許可されていると伝えられています。そのため OpenClaw は、Anthropic
+が新しいポリシーを公開しない限り、この統合において Claude CLI の再利用と
+`claude -p` 利用を認可済みとして扱います。
 
-Anthropicの現在の直接Claude Codeプランのドキュメントについては、
-[Using Claude Code
+Anthropic の現在の direct-Claude-Code プラン文書については、[Using Claude Code
 with your Pro or Max
 plan](https://support.claude.com/en/articles/11145838-using-claude-code-with-your-pro-or-max-plan)
-および[Using Claude Code with your Team or Enterprise
-plan](https://support.anthropic.com/en/articles/11845131-using-claude-code-with-your-team-or-enterprise-plan/)を参照してください。
+および [Using Claude Code with your Team or Enterprise
+plan](https://support.anthropic.com/en/articles/11845131-using-claude-code-with-your-team-or-enterprise-plan/) を参照してください。
 
-OpenClawで他のサブスクリプション型オプションが必要な場合は、[OpenAI
+OpenClaw で他の subscription スタイルの選択肢を使いたい場合は、[OpenAI
 Codex](/ja-JP/providers/openai)、[Qwen Cloud Coding
 Plan](/ja-JP/providers/qwen)、[MiniMax Coding Plan](/ja-JP/providers/minimax)、
-および[Z.AI / GLM Coding Plan](/ja-JP/providers/glm)を参照してください。
+および [Z.AI / GLM Coding Plan](/ja-JP/providers/glm) を参照してください。
 </Warning>
 
-OpenClawはAnthropic setup-tokenもサポートされたトークン認証パスとして公開していますが、現在は可能ならClaude CLI再利用と`claude -p`を優先します。
+OpenClaw は、サポートされる token-auth 経路として Anthropic setup-token も公開していますが、現在は利用可能な場合に Claude CLI の再利用と `claude -p` を優先します。
 
-## Anthropic Claude CLI移行
+## Anthropic Claude CLI 移行
 
-OpenClawはAnthropic Claude CLI再利用を再びサポートしています。ホスト上に既存の
-Claudeログインがある場合、オンボーディング/設定からそれを直接再利用できます。
+OpenClaw は Anthropic Claude CLI の再利用を再びサポートしています。ホスト上にすでにローカルの
+Claude ログインがある場合、onboarding/configure はそれを直接再利用できます。
 
-## OAuth交換（ログインの仕組み）
+## OAuth 交換（ログインの仕組み）
 
-OpenClawの対話型ログインフローは`@mariozechner/pi-ai`に実装されており、ウィザード/コマンドに接続されています。
+OpenClaw の対話型ログインフローは `@mariozechner/pi-ai` に実装されており、各種ウィザード/コマンドに接続されています。
 
 ### Anthropic setup-token
 
-フローの形:
+フロー形状:
 
-1. OpenClawからAnthropic setup-tokenを開始するか、トークンを貼り付ける
-2. OpenClawが、得られたAnthropic資格情報をauthプロファイルに保存する
-3. モデル選択は`anthropic/...`のまま維持される
-4. 既存のAnthropic authプロファイルは、ロールバック/順序制御のため引き続き利用可能
+1. OpenClaw から Anthropic setup-token または paste-token を開始
+2. OpenClaw が結果の Anthropic 資格情報を auth profile に保存
+3. model 選択は `anthropic/...` のまま
+4. 既存の Anthropic auth profile はロールバック/順序制御用に引き続き利用可能
 
 ### OpenAI Codex（ChatGPT OAuth）
 
-OpenAI Codex OAuthは、Codex CLI外部での使用、OpenClawワークフローを含めて、明示的にサポートされています。
+OpenAI Codex OAuth は、Codex CLI の外部でも、OpenClaw ワークフローを含めて利用が明示的にサポートされています。
 
-フローの形（PKCE）:
+フロー形状（PKCE）:
 
-1. PKCE verifier/challenge + ランダム`state`を生成する
-2. `https://auth.openai.com/oauth/authorize?...`を開く
-3. `http://127.0.0.1:1455/auth/callback`でコールバックの取得を試みる
-4. コールバックをbindできない場合（またはリモート/ヘッドレス環境の場合）、リダイレクトURL/codeを貼り付ける
-5. `https://auth.openai.com/oauth/token`で交換する
-6. access tokenから`accountId`を抽出し、`{ access, refresh, expires, accountId }`を保存する
+1. PKCE verifier/challenge とランダムな `state` を生成
+2. `https://auth.openai.com/oauth/authorize?...` を開く
+3. `http://127.0.0.1:1455/auth/callback` でコールバック取得を試みる
+4. コールバックを bind できない場合（またはリモート/ヘッドレス環境の場合）、リダイレクト URL/code を貼り付ける
+5. `https://auth.openai.com/oauth/token` で交換
+6. アクセストークンから `accountId` を抽出し、`{ access, refresh, expires, accountId }` を保存
 
-ウィザード経路は`openclaw onboard` → auth選択`openai-codex`です。
+ウィザード経路は `openclaw onboard` → auth 選択 `openai-codex` です。
 
 ## リフレッシュ + 有効期限
 
-プロファイルには`expires`タイムスタンプが保存されます。
+profile には `expires` タイムスタンプが保存されます。
 
-実行時:
+ランタイムでは:
 
-- `expires`が未来なら → 保存済みaccess tokenを使用する
+- `expires` が未来なら → 保存済みアクセストークンを使う
 - 期限切れなら → リフレッシュし（ファイルロック下で）、保存済み資格情報を上書きする
-- 例外: 再利用された外部CLI資格情報は外部管理のままであり、OpenClawは
-  CLI認証ストアを再読込し、コピーしたrefresh token自体は決して消費しない
+- 例外: 一部の外部 CLI 資格情報は外部管理のままです。OpenClaw
+  はコピーした refresh token を消費する代わりに、それらの CLI auth store を再読込します。
+  Codex CLI bootstrap は意図的により限定的です: 空の
+  `openai-codex:default` profile を作成し、その後は OpenClaw 所有のリフレッシュによってローカル
+  profile を正規に保ちます。
 
-リフレッシュフローは自動であり、通常はトークンを手動管理する必要はありません。
+リフレッシュフローは自動で行われるため、通常は手動でトークン管理する必要はありません。
 
-## 複数アカウント（プロファイル） + ルーティング
+## 複数アカウント（profile）+ ルーティング
 
-2つのパターンがあります。
+パターンは 2 つあります。
 
-### 1) 推奨: エージェントを分ける
+### 1) 推奨: agent を分ける
 
-「personal」と「work」を決して相互作用させたくない場合は、分離されたエージェント（セッション + 資格情報 + ワークスペースを分離）を使います。
+「個人用」と「仕事用」を決して混在させたくない場合は、分離 agent を使ってください（セッション + 資格情報 + ワークスペースを分離）。
 
 ```bash
 openclaw agents add work
 openclaw agents add personal
 ```
 
-その後、エージェントごとに認証を設定し（ウィザード）、適切なエージェントへチャットをルーティングします。
+その後、agent ごとに auth を設定し（ウィザード）、チャットを正しい agent にルーティングします。
 
-### 2) 高度: 1つのエージェント内で複数プロファイルを使う
+### 2) 上級者向け: 1 つの agent に複数 profile
 
-`auth-profiles.json`は、同じプロバイダーに対して複数のプロファイルIDをサポートします。
+`auth-profiles.json` は、同じ provider に対して複数の profile ID をサポートしています。
 
-どのプロファイルを使うかの指定方法:
+どの profile を使うかは次で選びます。
 
-- グローバルには設定順序（`auth.order`）経由
-- セッションごとには`/model ...@<profileId>`経由
+- config の順序付けによるグローバル指定（`auth.order`）
+- セッションごとの `/model ...@<profileId>`
 
 例（セッション上書き）:
 
 - `/model Opus@anthropic:work`
 
-存在するプロファイルIDを確認する方法:
+存在する profile ID を確認する方法:
 
-- `openclaw channels list --json`（`auth[]`を表示します）
+- `openclaw channels list --json`（`auth[]` を表示）
 
 関連ドキュメント:
 
-- [/concepts/model-failover](/ja-JP/concepts/model-failover)（ローテーション + クールダウンルール）
-- [/tools/slash-commands](/ja-JP/tools/slash-commands)（コマンドインターフェース）
+- [model フェイルオーバー](/ja-JP/concepts/model-failover)（ローテーション + クールダウンルール）
+- [スラッシュコマンド](/ja-JP/tools/slash-commands)（コマンド画面）
 
 ## 関連
 
-- [Authentication](/ja-JP/gateway/authentication) — モデルプロバイダー認証の概要
-- [Secrets](/ja-JP/gateway/secrets) — 資格情報ストレージとSecretRef
-- [Configuration Reference](/ja-JP/gateway/configuration-reference#auth-storage) — 認証設定キー
+- [Authentication](/ja-JP/gateway/authentication) — model provider auth の概要
+- [Secrets](/ja-JP/gateway/secrets) — 資格情報保存と SecretRef
+- [Configuration Reference](/ja-JP/gateway/configuration-reference#auth-storage) — auth config キー

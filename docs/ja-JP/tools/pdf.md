@@ -1,55 +1,52 @@
 ---
 read_when:
-    - エージェントからPDFを解析したい場合
-    - '`pdf`ツールの正確なパラメーターと制限が必要な場合'
-    - ネイティブPDFモードと抽出フォールバックをデバッグしている場合
-summary: ネイティブプロバイダーサポートと抽出フォールバックを使って1つ以上のPDFドキュメントを解析する
-title: PDFツール
+    - エージェントから PDF を解析したいです
+    - '`pdf` ツールの正確なパラメーターと制限が必要です'
+    - ネイティブ PDF モードと抽出フォールバックをデバッグしています
+summary: ネイティブ provider サポートと抽出フォールバックで 1 つ以上の PDF ドキュメントを解析する
+title: PDF ツール
 x-i18n:
-    generated_at: "2026-04-24T05:26:07Z"
+    generated_at: "2026-04-25T14:01:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 945838d1e1164a15720ca76eb156f9f299bf7f603f4591c8fa557b43e4cc93a8
+    source_hash: 89bbc675f2b87729e283659f9604724be7a827b50b11edc853a42c448bbaaf6e
     source_path: tools/pdf.md
     workflow: 15
 ---
 
-`pdf`は、1つ以上のPDFドキュメントを解析してテキストを返します。
+`pdf` は 1 つ以上の PDF ドキュメントを解析してテキストを返します。
 
-クイック動作:
+主な動作:
 
-- AnthropicおよびGoogleモデルプロバイダー向けのネイティブプロバイダーモード。
-- その他のプロバイダー向けの抽出フォールバックモード（まずテキストを抽出し、必要に応じてページ画像を使用）。
-- 単一入力（`pdf`）または複数入力（`pdfs`）をサポートし、1回の呼び出しあたり最大10個のPDFに対応。
+- Anthropic および Google モデル provider 向けのネイティブ provider モード。
+- その他の provider 向けの抽出フォールバックモード（まずテキストを抽出し、必要に応じてページ画像を使用）。
+- 単一入力（`pdf`）または複数入力（`pdfs`）をサポートし、1 回の呼び出しあたり最大 10 件の PDF に対応。
 
-## 利用可能条件
+## 利用可能性
 
-このツールは、OpenClawがそのエージェント向けにPDF対応モデル設定を解決できる場合にのみ登録されます。
+このツールは、OpenClaw がエージェント用の PDF 対応モデル config を解決できる場合にのみ登録されます。
 
 1. `agents.defaults.pdfModel`
-2. `agents.defaults.imageModel`へのフォールバック
-3. エージェントの解決済みsession/default modelへのフォールバック
-4. ネイティブPDFプロバイダーがauth-backedである場合、汎用画像フォールバック候補より前に優先する
+2. `agents.defaults.imageModel` にフォールバック
+3. エージェントの解決済みセッション/デフォルトモデルにフォールバック
+4. ネイティブ PDF provider が auth ベースの場合、汎用画像フォールバック候補より先に優先する
 
-使用可能なモデルを解決できない場合、`pdf`ツールは公開されません。
+利用可能なモデルを解決できない場合、`pdf` ツールは公開されません。
 
-利用可能条件に関する注意:
+利用可能性に関する注意:
 
-- フォールバックチェーンは認証を考慮します。設定済みの`provider/model`は、
-  OpenClawがそのエージェント向けにそのプロバイダーで実際に認証できる場合にのみ有効です。
-- 現在のネイティブPDFプロバイダーは**Anthropic**と**Google**です。
-- 解決済みsession/default providerが、すでに設定済みのvision/PDF
-  modelを持っている場合、PDFツールは他のauth-backed
-  providerへフォールバックする前にそれを再利用します。
+- フォールバックチェーンは auth を認識します。設定された `provider/model` は、OpenClaw がその provider をそのエージェント向けに実際に認証できる場合にのみ有効と見なされます。
+- 現在のネイティブ PDF provider は **Anthropic** と **Google** です。
+- 解決済みセッション/デフォルト provider が、すでに設定済みの vision/PDF モデルを持っている場合、PDF ツールは他の auth ベース provider にフォールバックする前にそれを再利用します。
 
 ## 入力リファレンス
 
 <ParamField path="pdf" type="string">
-1つのPDFパスまたはURL。
+1 つの PDF パスまたは URL。
 </ParamField>
 
 <ParamField path="pdfs" type="string[]">
-複数のPDFパスまたはURL。合計最大10件まで。
+複数の PDF パスまたは URL。合計最大 10 件。
 </ParamField>
 
 <ParamField path="prompt" type="string" default="Analyze this PDF document.">
@@ -57,68 +54,68 @@ x-i18n:
 </ParamField>
 
 <ParamField path="pages" type="string">
-`1-5`または`1,3,7-9`のようなページフィルター。
+`1-5` や `1,3,7-9` のようなページフィルター。
 </ParamField>
 
 <ParamField path="model" type="string">
-`provider/model`形式の任意のモデル上書き。
+`provider/model` 形式の任意のモデルオーバーライド。
 </ParamField>
 
 <ParamField path="maxBytesMb" type="number">
-PDFごとのサイズ上限（MB）。デフォルトは`agents.defaults.pdfMaxBytesMb`または`10`。
+PDF 1 件あたりのサイズ上限（MB）。デフォルトは `agents.defaults.pdfMaxBytesMb` または `10`。
 </ParamField>
 
 入力に関する注意:
 
-- `pdf`と`pdfs`は、読み込み前にマージおよび重複排除されます。
-- PDF入力が指定されていない場合、ツールはエラーになります。
-- `pages`は1始まりのページ番号として解析され、重複排除・ソートされ、設定済み最大ページ数にクランプされます。
-- `maxBytesMb`のデフォルトは`agents.defaults.pdfMaxBytesMb`または`10`です。
+- `pdf` と `pdfs` は読み込み前にマージおよび重複排除されます。
+- PDF 入力が指定されていない場合、ツールはエラーになります。
+- `pages` は 1 ベースのページ番号として解析され、重複排除、ソート、および設定済み最大ページ数にクランプされます。
+- `maxBytesMb` のデフォルトは `agents.defaults.pdfMaxBytesMb` または `10` です。
 
-## サポートされるPDF参照
+## サポートされる PDF 参照
 
-- ローカルファイルパス（`~`展開を含む）
+- ローカルファイルパス（`~` 展開を含む）
 - `file://` URL
-- `http://`および`https://` URL
+- `http://` および `https://` URL
+- `media://inbound/<id>` のような OpenClaw 管理の受信 ref
 
 参照に関する注意:
 
-- その他のURIスキーム（例: `ftp://`）は`unsupported_pdf_reference`で拒否されます。
-- sandboxモードでは、リモート`http(s)` URLは拒否されます。
-- workspace-only file policyが有効な場合、許可されたroot外のローカルファイルパスは拒否されます。
+- その他の URI スキーム（たとえば `ftp://`）は `unsupported_pdf_reference` として拒否されます。
+- サンドボックスモードでは、リモート `http(s)` URL は拒否されます。
+- workspace-only ファイルポリシーが有効な場合、許可されたルート外のローカルファイルパスは拒否されます。
+- OpenClaw の受信メディアストア配下の管理済み受信 ref と再生パスは、workspace-only ファイルポリシーでも許可されます。
 
 ## 実行モード
 
-### ネイティブプロバイダーモード
+### ネイティブ provider モード
 
-ネイティブモードは、`anthropic`および`google`プロバイダーで使われます。
-このツールは生のPDFバイトを直接プロバイダーAPIへ送信します。
+ネイティブモードは provider `anthropic` と `google` に使用されます。
+このツールは、生の PDF バイトを provider API に直接送信します。
 
 ネイティブモードの制限:
 
-- `pages`はサポートされません。設定されている場合、ツールはエラーを返します。
-- 複数PDF入力はサポートされます。各PDFは、プロンプトの前にネイティブdocument block /
-  inline PDF partとして送信されます。
+- `pages` はサポートされません。設定されている場合、ツールはエラーを返します。
+- 複数 PDF 入力はサポートされます。各 PDF は、プロンプトの前にネイティブ document block / inline PDF part として送信されます。
 
 ### 抽出フォールバックモード
 
-フォールバックモードは、ネイティブでないプロバイダーで使われます。
+フォールバックモードは非ネイティブ provider に使用されます。
 
 フロー:
 
-1. 選択されたページからテキストを抽出する（最大`agents.defaults.pdfMaxPages`、デフォルト`20`）。
-2. 抽出テキスト長が`200`文字未満の場合、選択ページをPNG画像へレンダリングして含める。
-3. 抽出した内容とプロンプトを選択されたモデルへ送信する。
+1. 選択したページからテキストを抽出する（最大 `agents.defaults.pdfMaxPages`、デフォルト `20`）。
+2. 抽出テキスト長が `200` 文字未満の場合、選択したページを PNG 画像としてレンダリングして含める。
+3. 抽出コンテンツとプロンプトを選択したモデルへ送信する。
 
-フォールバック詳細:
+フォールバックの詳細:
 
-- ページ画像抽出では`4,000,000`のピクセル予算を使用します。
-- 対象モデルが画像入力をサポートせず、かつ抽出可能なテキストがない場合、ツールはエラーになります。
-- テキスト抽出に成功していても、画像抽出に
-  text-only model上でvisionが必要な場合、OpenClawはレンダリング画像を破棄し、抽出テキストのみで続行します。
-- 抽出フォールバックには`pdfjs-dist`（および画像レンダリング用の`@napi-rs/canvas`）が必要です。
+- ページ画像抽出は `4,000,000` のピクセル予算を使用します。
+- 対象モデルが画像入力をサポートしておらず、抽出可能なテキストもない場合、ツールはエラーになります。
+- テキスト抽出が成功していて、画像抽出がテキスト専用モデル上で vision を必要とする場合、OpenClaw はレンダリング画像を落として抽出テキストのみで続行します。
+- 抽出フォールバックはバンドル済みの `document-extract` Plugin を使用します。この Plugin が `pdfjs-dist` を所有し、`@napi-rs/canvas` は画像レンダリングフォールバックが利用可能な場合にのみ使われます。
 
-## 設定
+## config
 
 ```json5
 {
@@ -135,34 +132,34 @@ PDFごとのサイズ上限（MB）。デフォルトは`agents.defaults.pdfMaxB
 }
 ```
 
-完全なフィールド詳細は[Configuration Reference](/ja-JP/gateway/configuration-reference)を参照してください。
+完全なフィールド詳細については [Configuration Reference](/ja-JP/gateway/configuration-reference) を参照してください。
 
-## 出力詳細
+## 出力の詳細
 
-このツールは`content[0].text`にテキストを返し、`details`に構造化メタデータを返します。
+このツールは `content[0].text` にテキストを返し、`details` に構造化メタデータを返します。
 
-共通の`details`フィールド:
+一般的な `details` フィールド:
 
-- `model`: 解決済みモデル参照（`provider/model`）
-- `native`: ネイティブプロバイダーモードなら`true`、フォールバックなら`false`
+- `model`: 解決されたモデル ref（`provider/model`）
+- `native`: ネイティブ provider モードでは `true`、フォールバックでは `false`
 - `attempts`: 成功前に失敗したフォールバック試行
 
 パスフィールド:
 
-- 単一PDF入力: `details.pdf`
-- 複数PDF入力: `details.pdfs[]`内の`pdf`エントリ
-- sandbox path rewriteメタデータ（該当する場合）: `rewrittenFrom`
+- 単一 PDF 入力: `details.pdf`
+- 複数 PDF 入力: `details.pdfs[]` に `pdf` エントリ
+- サンドボックスパス書き換えメタデータ（該当する場合）: `rewrittenFrom`
 
 ## エラー動作
 
-- PDF入力不足: `pdf required: provide a path or URL to a PDF document`をスロー
-- PDFが多すぎる: `details.error = "too_many_pdfs"`で構造化エラーを返す
-- 非対応参照スキーム: `details.error = "unsupported_pdf_reference"`を返す
-- `pages`付きのネイティブモード: 明確な`pages is not supported with native PDF providers`エラーをスロー
+- PDF 入力なし: `pdf required: provide a path or URL to a PDF document` をスロー
+- PDF が多すぎる: `details.error = "too_many_pdfs"` に構造化エラーを返す
+- 未対応の参照スキーム: `details.error = "unsupported_pdf_reference"` を返す
+- `pages` を指定したネイティブモード: 明確な `pages is not supported with native PDF providers` エラーをスロー
 
 ## 例
 
-単一PDF:
+単一 PDF:
 
 ```json
 {
@@ -171,7 +168,7 @@ PDFごとのサイズ上限（MB）。デフォルトは`agents.defaults.pdfMaxB
 }
 ```
 
-複数PDF:
+複数 PDF:
 
 ```json
 {
@@ -194,4 +191,4 @@ PDFごとのサイズ上限（MB）。デフォルトは`agents.defaults.pdfMaxB
 ## 関連
 
 - [Tools Overview](/ja-JP/tools) — 利用可能なすべてのエージェントツール
-- [Configuration Reference](/ja-JP/gateway/config-agents#agent-defaults) — pdfMaxBytesMbおよびpdfMaxPages設定
+- [Configuration Reference](/ja-JP/gateway/config-agents#agent-defaults) — `pdfMaxBytesMb` と `pdfMaxPages` の config

@@ -1,123 +1,122 @@
 ---
 read_when:
-    - どのSDK subpathからimportすべきかを知る必要がある
-    - OpenClawPluginApiのすべての登録メソッドに関するリファレンスが欲しい
-    - 特定のSDK exportを調べている
+    - どの SDK サブパスから import するべきかを知る必要があります
+    - OpenClawPluginApi のすべての登録メソッドに関するリファレンスが必要です
+    - 特定の SDK エクスポートを調べています
 sidebarTitle: SDK overview
-summary: import map、登録APIリファレンス、およびSDKアーキテクチャ
-title: Plugin SDK概要
+summary: インポートマップ、登録 API リファレンス、SDK アーキテクチャ
+title: Plugin SDK の概要
 x-i18n:
-    generated_at: "2026-04-24T09:01:15Z"
+    generated_at: "2026-04-25T13:55:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 7f4209c245a3d3462c5d5f51ad3c6e4327240ed402fdbac3f01f8a761ba75233
+    source_hash: 825efe8d9b2283734730348f9803e40cabaaa6399993648f4bb5822b20e588ee
     source_path: plugins/sdk-overview.md
     workflow: 15
 ---
 
-plugin SDKは、pluginとcoreの間の型付きcontractです。このページは、**何をimportするか**と**何を登録できるか**のリファレンスです。
+Plugin SDK は、Plugin とコアの間にある型付きコントラクトです。このページは、**何を import するか** と **何を登録できるか** のリファレンスです。
 
 <Tip>
-  手順ガイドを探していますか?
+  ハウツーガイドを探していますか？
 
-- 最初のPluginですか? [Pluginの構築](/ja-JP/plugins/building-plugins)から始めてください。
-- Channel Pluginですか? [Channel plugins](/ja-JP/plugins/sdk-channel-plugins)を参照してください。
-- Provider Pluginですか? [Provider plugins](/ja-JP/plugins/sdk-provider-plugins)を参照してください。
+- 最初の Plugin ですか？ [Building plugins](/ja-JP/plugins/building-plugins) から始めてください。
+- Channel Plugin ですか？ [Channel plugins](/ja-JP/plugins/sdk-channel-plugins) を参照してください。
+- Provider Plugin ですか？ [Provider plugins](/ja-JP/plugins/sdk-provider-plugins) を参照してください。
+- ツールまたはライフサイクルフック Plugin ですか？ [Plugin hooks](/ja-JP/plugins/hooks) を参照してください。
   </Tip>
 
-## import規約
+## import の規約
 
-必ず特定のsubpathからimportしてください:
+必ず特定のサブパスから import してください。
 
 ```typescript
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { defineChannelPluginEntry } from "openclaw/plugin-sdk/channel-core";
 ```
 
-各subpathは、小さく自己完結したmoduleです。これにより起動を高速に保ち、循環依存の問題を防ぎます。channel固有のentry/build helperには、`openclaw/plugin-sdk/core`よりも`openclaw/plugin-sdk/channel-core`を優先してください。`openclaw/plugin-sdk/core`は、より広いumbrella surfaceと、`buildChannelConfigSchema`のような共有helper向けに使ってください。
+各サブパスは、小さく自己完結したモジュールです。これにより、起動を高速に保ち、循環依存の問題を防ぎます。channel 固有の entry/build ヘルパーについては、`openclaw/plugin-sdk/channel-core` を優先し、より広いアンブレラサーフェスと `buildChannelConfigSchema` のような共有ヘルパーには `openclaw/plugin-sdk/core` を使ってください。
+
+channel config については、channel が所有する JSON Schema を `openclaw.plugin.json#channelConfigs` を通じて公開してください。`plugin-sdk/channel-config-schema` サブパスは、共有スキーマプリミティブと汎用ビルダー用です。そのサブパス上にある同梱 channel 名付きの schema export は、レガシー互換 export であり、新しい Plugin のパターンではありません。
 
 <Warning>
-  providerまたはchannel名付きのconvenience seam（たとえば
-  `openclaw/plugin-sdk/slack`、`.../discord`、`.../signal`、`.../whatsapp`）をimportしないでください。
-  bundled pluginは、汎用SDK subpathを自分たちの`api.ts` /
-  `runtime-api.ts` barrel内で構成します。core consumerは、それらのpluginローカル
-  barrelを使うか、必要性が本当にcross-channelである場合にだけ、狭い汎用SDK contractを追加してください。
+  provider または channel のブランド付き convenience seam（たとえば
+  `openclaw/plugin-sdk/slack`、`.../discord`、`.../signal`、`.../whatsapp`）を import しないでください。
+  同梱 Plugin は、自身の `api.ts` /
+  `runtime-api.ts` バレル内で汎用 SDK サブパスを組み合わせています。コア利用側は、それらの Plugin ローカルな
+  バレルを使うか、必要性が本当に
+  channel 横断である場合に限って、狭く汎用的な SDK コントラクトを追加してください。
 
-bundled-plugin helper seamの小さな一群（`plugin-sdk/feishu`、
-`plugin-sdk/zalo`、`plugin-sdk/matrix*`など）は、生成されたexport mapにまだ現れます。これらはbundled-plugin保守専用であり、新しいサードパーティplugin向けの推奨import pathではありません。
+少数の同梱 Plugin ヘルパーシーム（`plugin-sdk/feishu`、
+`plugin-sdk/zalo`、`plugin-sdk/matrix*` など）は、生成された
+export map にまだ現れます。これらは同梱 Plugin の保守専用に存在しており、新しいサードパーティ Plugin には推奨される import パスではありません。
 </Warning>
 
-## subpathリファレンス
+## サブパス リファレンス
 
-plugin SDKは、領域ごとにまとめられた狭いsubpath群として公開されています（plugin
-entry、channel、provider、auth、runtime、capability、memory、および予約済みbundled-plugin helper）。完全なカタログをグループ化・リンク付きで見るには、[Plugin SDK subpaths](/ja-JP/plugins/sdk-subpaths)を参照してください。
+Plugin SDK は、領域ごとにグループ化された狭いサブパス群（plugin
+entry、channel、provider、auth、runtime、capability、memory、および同梱 Plugin 向けに予約されたヘルパー）として公開されています。グループ化され、リンク付きの完全なカタログについては、[Plugin SDK subpaths](/ja-JP/plugins/sdk-subpaths) を参照してください。
 
-200超のsubpathからなる生成済みリストは`scripts/lib/plugin-sdk-entrypoints.json`にあります。
+200 以上のサブパスの生成済み一覧は `scripts/lib/plugin-sdk-entrypoints.json` にあります。
 
-## 登録API
+## 登録 API
 
-`register(api)`コールバックは、次のメソッドを持つ`OpenClawPluginApi` objectを受け取ります:
+`register(api)` コールバックは、次のメソッドを持つ `OpenClawPluginApi` オブジェクトを受け取ります。
 
-### capability登録
+### Capability の登録
 
-| Method                                           | 登録するもの                           |
-| ------------------------------------------------ | -------------------------------------- |
-| `api.registerProvider(...)`                      | テキスト推論（LLM）                    |
-| `api.registerAgentHarness(...)`                  | 実験的な低レベルagent executor         |
-| `api.registerCliBackend(...)`                    | ローカルCLI推論バックエンド            |
-| `api.registerChannel(...)`                       | メッセージングchannel                  |
-| `api.registerSpeechProvider(...)`                | Text-to-speech / STT synthesis         |
+| Method                                           | 登録するもの                         |
+| ------------------------------------------------ | ------------------------------------ |
+| `api.registerProvider(...)`                      | テキスト推論（LLM）                  |
+| `api.registerAgentHarness(...)`                  | 実験的な低レベルエージェント実行子   |
+| `api.registerCliBackend(...)`                    | ローカル CLI 推論バックエンド        |
+| `api.registerChannel(...)`                       | メッセージング channel               |
+| `api.registerSpeechProvider(...)`                | Text-to-speech / STT 合成            |
 | `api.registerRealtimeTranscriptionProvider(...)` | ストリーミングのリアルタイム文字起こし |
-| `api.registerRealtimeVoiceProvider(...)`         | 双方向リアルタイム音声session          |
-| `api.registerMediaUnderstandingProvider(...)`    | 画像/音声/動画解析                     |
-| `api.registerImageGenerationProvider(...)`       | 画像生成                               |
-| `api.registerMusicGenerationProvider(...)`       | 音楽生成                               |
-| `api.registerVideoGenerationProvider(...)`       | 動画生成                               |
-| `api.registerWebFetchProvider(...)`              | Webフェッチ / スクレイプprovider       |
-| `api.registerWebSearchProvider(...)`             | Web検索                                |
+| `api.registerRealtimeVoiceProvider(...)`         | 双方向リアルタイム音声セッション     |
+| `api.registerMediaUnderstandingProvider(...)`    | 画像/音声/動画解析                   |
+| `api.registerImageGenerationProvider(...)`       | 画像生成                             |
+| `api.registerMusicGenerationProvider(...)`       | 音楽生成                             |
+| `api.registerVideoGenerationProvider(...)`       | 動画生成                             |
+| `api.registerWebFetchProvider(...)`              | Web fetch / scrape provider          |
+| `api.registerWebSearchProvider(...)`             | Web 検索                             |
 
-### toolとcommand
+### ツールとコマンド
 
-| Method                          | 登録するもの                                 |
-| ------------------------------- | -------------------------------------------- |
-| `api.registerTool(tool, opts?)` | agent tool（必須、または`{ optional: true }`） |
-| `api.registerCommand(def)`      | custom command（LLMをバイパスする）          |
+| Method                          | 登録するもの                                  |
+| ------------------------------- | --------------------------------------------- |
+| `api.registerTool(tool, opts?)` | エージェントツール（必須または `{ optional: true }`） |
+| `api.registerCommand(def)`      | カスタムコマンド（LLM をバイパスする）        |
 
 ### インフラストラクチャ
 
-| Method                                          | 登録するもの                           |
-| ----------------------------------------------- | -------------------------------------- |
-| `api.registerHook(events, handler, opts?)`      | event hook                             |
-| `api.registerHttpRoute(params)`                 | Gateway HTTP endpoint                  |
-| `api.registerGatewayMethod(name, handler)`      | Gateway RPCメソッド                    |
-| `api.registerGatewayDiscoveryService(service)`  | ローカルGateway discovery advertiser   |
-| `api.registerCli(registrar, opts?)`             | CLI subcommand                         |
-| `api.registerService(service)`                  | バックグラウンドservice                |
-| `api.registerInteractiveHandler(registration)`  | interactive handler                    |
-| `api.registerEmbeddedExtensionFactory(factory)` | Pi embedded-runner extension factory   |
-| `api.registerMemoryPromptSupplement(builder)`   | 加算的なmemory隣接prompt section       |
-| `api.registerMemoryCorpusSupplement(adapter)`   | 加算的なmemory search/read corpus      |
+| Method                                         | 登録するもの                            |
+| ---------------------------------------------- | --------------------------------------- |
+| `api.registerHook(events, handler, opts?)`     | イベントフック                          |
+| `api.registerHttpRoute(params)`                | Gateway HTTP エンドポイント             |
+| `api.registerGatewayMethod(name, handler)`     | Gateway RPC メソッド                    |
+| `api.registerGatewayDiscoveryService(service)` | ローカル Gateway discovery advertiser   |
+| `api.registerCli(registrar, opts?)`            | CLI サブコマンド                        |
+| `api.registerService(service)`                 | バックグラウンドサービス                |
+| `api.registerInteractiveHandler(registration)` | インタラクティブハンドラー              |
+| `api.registerAgentToolResultMiddleware(...)`   | ランタイムのツール結果ミドルウェア      |
+| `api.registerMemoryPromptSupplement(builder)`  | 加算的な memory 隣接プロンプトセクション |
+| `api.registerMemoryCorpusSupplement(adapter)`  | 加算的な memory search/read コーパス    |
 
 <Note>
-  予約済みのcore admin namespace（`config.*`、`exec.approvals.*`、`wizard.*`、
-  `update.*`）は、pluginがより狭いgateway method scopeを割り当てようとしても、常に`operator.admin`のままです。
-  plugin所有のmethodには、plugin固有のprefixを優先してください。
+  予約されたコア管理名前空間（`config.*`、`exec.approvals.*`、`wizard.*`、
+  `update.*`）は、Plugin がより狭い gateway method scope を割り当てようとしても、常に `operator.admin` のままです。Plugin 所有のメソッドには、Plugin 固有のプレフィックスを使ってください。
 </Note>
 
-<Accordion title="registerEmbeddedExtensionFactoryを使うべきタイミング">
-  `api.registerEmbeddedExtensionFactory(...)`は、pluginがOpenClaw embedded run中にPiネイティブの
-  event timingを必要とする場合に使います。たとえば、最終的なtool-result
-  messageが送信される前に行わなければならない、非同期の`tool_result`
-  rewriteなどです。
+<Accordion title="ツール結果ミドルウェアを使うべきタイミング">
+  同梱 Plugin は、ツール実行後かつランタイムがその結果をモデルへ返す前に、ツール結果を書き換える必要がある場合に `api.registerAgentToolResultMiddleware(...)` を使えます。これは、tokenjuice のような非同期出力リデューサー向けの、信頼済みでランタイム中立なシームです。
 
-これは現在bundled-plugin seamです。登録できるのはbundled pluginだけで、`openclaw.plugin.json`で
-`contracts.embeddedExtensionFactories: ["pi"]`を宣言しなければなりません。
-より低レベルなseamを必要としないものについては、通常のOpenClaw plugin hookを使ってください。
+同梱 Plugin は、対象ランタイムごとに `contracts.agentToolResultMiddleware` を宣言する必要があります。たとえば `["pi", "codex"]` です。外部 Plugin はこのミドルウェアを登録できません。モデル前のツール結果タイミングを必要としない処理には、通常の OpenClaw Plugin フックを使ってください。古い Pi 専用の組み込み拡張ファクトリー登録パスは削除されました。
 </Accordion>
 
-### Gateway discovery登録
+### Gateway discovery の登録
 
-`api.registerGatewayDiscoveryService(...)`を使うと、pluginはmDNS/Bonjourのようなローカルdiscovery transport上でアクティブなGatewayを通知できます。OpenClawはローカルdiscoveryが有効なときにGateway起動中にこのserviceを呼び出し、現在のGateway portとsecretではないTXT hint dataを渡し、Gateway shutdown中に返された`stop` handlerを呼び出します。
+`api.registerGatewayDiscoveryService(...)` を使うと、Plugin は mDNS/Bonjour のようなローカル discovery トランスポートでアクティブな Gateway を通知できます。OpenClaw は、ローカル discovery が有効なときに Gateway 起動中にこのサービスを呼び出し、現在の Gateway ポートと秘密でない TXT ヒントデータを渡し、Gateway シャットダウン中に返された `stop` ハンドラーを呼び出します。
 
 ```typescript
 api.registerGatewayDiscoveryService({
@@ -133,16 +132,16 @@ api.registerGatewayDiscoveryService({
 });
 ```
 
-Gateway discovery pluginは、通知されるTXT値をsecretやauthenticationとして扱ってはなりません。discoveryはrouting hintです。trustは引き続きGateway authとTLS pinningが担います。
+Gateway discovery Plugin は、通知された TXT 値を秘密情報や認証として扱ってはいけません。discovery はルーティングヒントであり、信頼は引き続き Gateway auth と TLS pinning が担います。
 
-### CLI登録metadata
+### CLI 登録メタデータ
 
-`api.registerCli(registrar, opts?)`は、2種類のトップレベルmetadataを受け付けます:
+`api.registerCli(registrar, opts?)` は、2 種類のトップレベルメタデータを受け取ります。
 
-- `commands`: registrarが所有する明示的なcommand root
-- `descriptors`: root CLI help、routing、およびlazy plugin CLI登録に使われるparse-time command descriptor
+- `commands`: registrar が所有する明示的なコマンドルート
+- `descriptors`: ルート CLI ヘルプ、ルーティング、遅延 Plugin CLI 登録に使われる parse-time コマンド記述子
 
-通常のroot CLI pathでplugin commandをlazy-loadのままにしたい場合は、そのregistrarが公開するすべてのトップレベルcommand rootをカバーする`descriptors`を指定してください。
+Plugin コマンドを通常のルート CLI パスで遅延ロードのままにしたい場合は、その registrar が公開するすべてのトップレベルコマンドルートをカバーする `descriptors` を指定してください。
 
 ```typescript
 api.registerCli(
@@ -154,7 +153,7 @@ api.registerCli(
     descriptors: [
       {
         name: "matrix",
-        description: "Matrixアカウント、認証、device、およびprofile stateを管理する",
+        description: "Manage Matrix accounts, verification, devices, and profile state",
         hasSubcommands: true,
       },
     ],
@@ -162,131 +161,129 @@ api.registerCli(
 );
 ```
 
-lazy root CLI登録が不要な場合にのみ、`commands`単体を使ってください。このeager互換パスは引き続きサポートされていますが、parse-time lazy loading用のdescriptor-backed placeholderはインストールしません。
+`commands` 単体の使用は、遅延ルート CLI 登録が不要な場合に限ってください。その eager な互換パスは引き続きサポートされていますが、parse-time の遅延ロード用 descriptor ベースのプレースホルダーはインストールしません。
 
-### CLI backend登録
+### CLI バックエンドの登録
 
-`api.registerCliBackend(...)`を使うと、pluginは`codex-cli`のようなローカル
-AI CLI backendのデフォルトconfigを所有できます。
+`api.registerCliBackend(...)` を使うと、Plugin は `codex-cli` のようなローカル AI CLI バックエンドのデフォルト config を所有できます。
 
-- backendの`id`は、`codex-cli/gpt-5`のようなmodel refでprovider prefixになります。
-- backendの`config`は、`agents.defaults.cliBackends.<id>`と同じ形を使います。
-- user configが常に優先されます。OpenClawはCLIを実行する前に、plugin defaultの上に`agents.defaults.cliBackends.<id>`をmergeします。
-- backendがmerge後に互換性rewritesを必要とする場合（たとえば古いflag形状の正規化）には、`normalizeConfig`を使ってください。
+- バックエンドの `id` は、`codex-cli/gpt-5` のような model ref における provider プレフィックスになります。
+- バックエンドの `config` は `agents.defaults.cliBackends.<id>` と同じ形を使います。
+- ユーザー config が引き続き優先されます。OpenClaw は CLI 実行前に、Plugin デフォルトの上へ `agents.defaults.cliBackends.<id>` をマージします。
+- マージ後に互換性のための書き換えが必要なバックエンドでは、`normalizeConfig` を使ってください（たとえば古いフラグ形状の正規化など）。
 
-### exclusive slot
+### 排他的スロット
 
-| Method                                     | 登録するもの                                                                                                                                                   |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `api.registerContextEngine(id, factory)`   | Context engine（一度に1つだけ有効）。`assemble()`コールバックは`availableTools`と`citationsMode`を受け取るため、engineはそれに応じてprompt追加内容を調整できます。 |
-| `api.registerMemoryCapability(capability)` | 統合memory capability                                                                                                                                          |
-| `api.registerMemoryPromptSection(builder)` | Memory prompt section builder                                                                                                                                  |
-| `api.registerMemoryFlushPlan(resolver)`    | Memory flush plan resolver                                                                                                                                     |
-| `api.registerMemoryRuntime(runtime)`       | Memory runtime adapter                                                                                                                                         |
+| Method                                     | 登録するもの                                                                                                                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `api.registerContextEngine(id, factory)`   | コンテキストエンジン（一度に 1 つだけアクティブ）。`assemble()` コールバックは `availableTools` と `citationsMode` を受け取り、エンジンがプロンプト追加を調整できるようにします。 |
+| `api.registerMemoryCapability(capability)` | 統合 memory capability                                                                                                                               |
+| `api.registerMemoryPromptSection(builder)` | memory プロンプトセクションビルダー                                                                                                                  |
+| `api.registerMemoryFlushPlan(resolver)`    | memory flush plan resolver                                                                                                                           |
+| `api.registerMemoryRuntime(runtime)`       | memory ランタイムアダプター                                                                                                                          |
 
-### memory embedding adapter
+### Memory 埋め込みアダプター
 
-| Method                                         | 登録するもの                                      |
-| ---------------------------------------------- | ------------------------------------------------- |
-| `api.registerMemoryEmbeddingProvider(adapter)` | アクティブplugin向けのmemory embedding adapter    |
+| Method                                         | 登録するもの                              |
+| ---------------------------------------------- | ----------------------------------------- |
+| `api.registerMemoryEmbeddingProvider(adapter)` | アクティブ Plugin 用の memory 埋め込みアダプター |
 
-- `registerMemoryCapability`は、推奨されるexclusive memory-plugin APIです。
-- `registerMemoryCapability`は`publicArtifacts.listArtifacts(...)`も公開できるため、companion pluginは特定のmemory pluginのprivate layoutにreachする代わりに、`openclaw/plugin-sdk/memory-host-core`を通じてexportされたmemory artifactを利用できます。
-- `registerMemoryPromptSection`、`registerMemoryFlushPlan`、および
-  `registerMemoryRuntime`は、legacy互換のexclusive memory-plugin APIです。
-- `registerMemoryEmbeddingProvider`により、アクティブなmemory pluginは1つ以上のembedding adapter id（たとえば`openai`、`gemini`、またはcustom plugin定義id）を登録できます。
-- `agents.defaults.memorySearch.provider`や
-  `agents.defaults.memorySearch.fallback`のようなuser configは、それらの登録済みadapter idに対して解決されます。
+- `registerMemoryCapability` が推奨される排他的 memory Plugin API です。
+- `registerMemoryCapability` は `publicArtifacts.listArtifacts(...)` も公開できるため、コンパニオン Plugin は特定の memory Plugin の private layout に直接触れる代わりに、`openclaw/plugin-sdk/memory-host-core` を通じてエクスポート済み memory artifact を利用できます。
+- `registerMemoryPromptSection`、`registerMemoryFlushPlan`、`registerMemoryRuntime` は、レガシー互換の排他的 memory Plugin API です。
+- `registerMemoryEmbeddingProvider` を使うと、アクティブ memory Plugin は 1 つ以上の埋め込みアダプター id（たとえば `openai`、`gemini`、または Plugin 定義のカスタム id）を登録できます。
+- `agents.defaults.memorySearch.provider` や `agents.defaults.memorySearch.fallback` のようなユーザー config は、これらの登録済みアダプター id に対して解決されます。
 
-### eventとlifecycle
+### イベントとライフサイクル
 
-| Method                                       | 役割                           |
-| -------------------------------------------- | ------------------------------ |
-| `api.on(hookName, handler, opts?)`           | 型付きlifecycle hook           |
-| `api.onConversationBindingResolved(handler)` | conversation binding callback  |
+| Method                                       | 役割                          |
+| -------------------------------------------- | ----------------------------- |
+| `api.on(hookName, handler, opts?)`           | 型付きライフサイクルフック    |
+| `api.onConversationBindingResolved(handler)` | Conversation binding コールバック |
 
-### hook decisionセマンティクス
+例、一般的なフック名、ガードセマンティクスについては、[Plugin hooks](/ja-JP/plugins/hooks) を参照してください。
 
-- `before_tool_call`: `{ block: true }`を返すと最終決定になります。いずれかのhandlerがこれを設定すると、それより低い優先度のhandlerはスキップされます。
-- `before_tool_call`: `{ block: false }`を返しても、上書きではなく決定なしとして扱われます（`block`を省略した場合と同じです）。
-- `before_install`: `{ block: true }`を返すと最終決定になります。いずれかのhandlerがこれを設定すると、それより低い優先度のhandlerはスキップされます。
-- `before_install`: `{ block: false }`を返しても、上書きではなく決定なしとして扱われます（`block`を省略した場合と同じです）。
-- `reply_dispatch`: `{ handled: true, ... }`を返すと最終決定になります。いずれかのhandlerがdispatchを引き受けると、それより低い優先度のhandlerとデフォルトのmodel dispatch pathはスキップされます。
-- `message_sending`: `{ cancel: true }`を返すと最終決定になります。いずれかのhandlerがこれを設定すると、それより低い優先度のhandlerはスキップされます。
-- `message_sending`: `{ cancel: false }`を返しても、上書きではなく決定なしとして扱われます（`cancel`を省略した場合と同じです）。
-- `message_received`: 受信したthread/topic routingが必要な場合は、typedな`threadId` fieldを使ってください。`metadata`はchannel固有の追加情報用に残してください。
-- `message_sending`: channel固有の`metadata`にフォールバックする前に、typedな`replyToId` / `threadId` routing fieldを使ってください。
-- `gateway_start`: 内部の`gateway:startup` hookに依存するのではなく、gateway所有の起動stateには`ctx.config`、`ctx.workspaceDir`、`ctx.getCron?.()`を使ってください。
+### フック決定セマンティクス
 
-### API object field
+- `before_tool_call`: `{ block: true }` を返すと終端になります。いずれかのハンドラーがこれを設定した時点で、より低優先度のハンドラーはスキップされます。
+- `before_tool_call`: `{ block: false }` を返しても決定とは見なされません（`block` を省略した場合と同じ）であり、オーバーライドではありません。
+- `before_install`: `{ block: true }` を返すと終端になります。いずれかのハンドラーがこれを設定した時点で、より低優先度のハンドラーはスキップされます。
+- `before_install`: `{ block: false }` を返しても決定とは見なされません（`block` を省略した場合と同じ）であり、オーバーライドではありません。
+- `reply_dispatch`: `{ handled: true, ... }` を返すと終端になります。いずれかのハンドラーがディスパッチを引き受けた時点で、より低優先度のハンドラーとデフォルトのモデルディスパッチ経路はスキップされます。
+- `message_sending`: `{ cancel: true }` を返すと終端になります。いずれかのハンドラーがこれを設定した時点で、より低優先度のハンドラーはスキップされます。
+- `message_sending`: `{ cancel: false }` を返しても決定とは見なされません（`cancel` を省略した場合と同じ）であり、オーバーライドではありません。
+- `message_received`: 受信スレッド/トピックのルーティングが必要な場合は、型付きの `threadId` フィールドを使用してください。`metadata` は channel 固有の追加情報のために残しておいてください。
+- `message_sending`: channel 固有の `metadata` にフォールバックする前に、型付きの `replyToId` / `threadId` ルーティングフィールドを使用してください。
+- `gateway_start`: 内部の `gateway:startup` フックに依存するのではなく、Gateway 所有の起動状態には `ctx.config`、`ctx.workspaceDir`、`ctx.getCron?.()` を使用してください。
 
-| Field                    | Type                      | 説明                                                                                         |
-| ------------------------ | ------------------------- | -------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | Plugin id                                                                                    |
-| `api.name`               | `string`                  | 表示名                                                                                       |
-| `api.version`            | `string?`                 | Plugin version（任意）                                                                       |
-| `api.description`        | `string?`                 | Plugin description（任意）                                                                   |
-| `api.source`             | `string`                  | Plugin source path                                                                           |
-| `api.rootDir`            | `string?`                 | Plugin root directory（任意）                                                                |
-| `api.config`             | `OpenClawConfig`          | 現在のconfig snapshot（利用可能な場合はアクティブなin-memory runtime snapshot）             |
-| `api.pluginConfig`       | `Record<string, unknown>` | `plugins.entries.<id>.config`からのplugin固有config                                          |
-| `api.runtime`            | `PluginRuntime`           | [Runtime helper](/ja-JP/plugins/sdk-runtime)                                                       |
-| `api.logger`             | `PluginLogger`            | スコープ付きlogger（`debug`、`info`、`warn`、`error`）                                       |
-| `api.registrationMode`   | `PluginRegistrationMode`  | 現在のload mode。`"setup-runtime"`は、軽量なfull-entry前のstartup/setup windowです           |
-| `api.resolvePath(input)` | `(string) => string`      | plugin rootを基準にpathを解決する                                                            |
+### API オブジェクトのフィールド
 
-## 内部module規約
+| Field                    | Type                      | 説明                                                                                           |
+| ------------------------ | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `api.id`                 | `string`                  | Plugin id                                                                                      |
+| `api.name`               | `string`                  | 表示名                                                                                         |
+| `api.version`            | `string?`                 | Plugin バージョン（任意）                                                                      |
+| `api.description`        | `string?`                 | Plugin 説明（任意）                                                                            |
+| `api.source`             | `string`                  | Plugin ソースパス                                                                              |
+| `api.rootDir`            | `string?`                 | Plugin ルートディレクトリ（任意）                                                              |
+| `api.config`             | `OpenClawConfig`          | 現在の config スナップショット（利用可能な場合は、アクティブなインメモリランタイムスナップショット） |
+| `api.pluginConfig`       | `Record<string, unknown>` | `plugins.entries.<id>.config` からの Plugin 固有 config                                        |
+| `api.runtime`            | `PluginRuntime`           | [Runtime helpers](/ja-JP/plugins/sdk-runtime)                                                        |
+| `api.logger`             | `PluginLogger`            | スコープ付きロガー（`debug`、`info`、`warn`、`error`）                                         |
+| `api.registrationMode`   | `PluginRegistrationMode`  | 現在のロードモード。`"setup-runtime"` は、完全なエントリー起動/セットアップ前の軽量ウィンドウです |
+| `api.resolvePath(input)` | `(string) => string`      | Plugin ルート基準でパスを解決する                                                              |
 
-plugin内では、内部importにローカルbarrel fileを使ってください:
+## 内部モジュール規約
+
+Plugin 内では、内部 import にローカルバレルファイルを使ってください。
 
 ```
 my-plugin/
-  api.ts            # 外部consumer向けの公開export
-  runtime-api.ts    # 内部専用runtime export
-  index.ts          # Plugin entry point
-  setup-entry.ts    # 軽量なsetup専用entry（任意）
+  api.ts            # 外部利用者向けの公開 export
+  runtime-api.ts    # 内部専用ランタイム export
+  index.ts          # Plugin エントリーポイント
+  setup-entry.ts    # 軽量セットアップ専用エントリー（任意）
 ```
 
 <Warning>
-  production codeから`openclaw/plugin-sdk/<your-plugin>`経由で自分自身のpluginをimportしないでください。
-  内部importは`./api.ts`または`./runtime-api.ts`を経由させてください。
-  SDK pathは外部contract専用です。
+  本番コードから、自分自身の Plugin を `openclaw/plugin-sdk/<your-plugin>`
+  経由で import しないでください。内部 import は `./api.ts` または
+  `./runtime-api.ts` を通してください。SDK パスは外部コントラクト専用です。
 </Warning>
 
-facadeロードされるbundled pluginの公開surface（`api.ts`、`runtime-api.ts`、
-`index.ts`、`setup-entry.ts`、および類似の公開entry file）は、OpenClawがすでに動作中であればアクティブなruntime config snapshotを優先します。まだruntime snapshotが存在しない場合は、disk上で解決されたconfig fileにフォールバックします。
+ファサード経由でロードされる同梱 Plugin の公開サーフェス（`api.ts`、`runtime-api.ts`、
+`index.ts`、`setup-entry.ts`、および同様の公開エントリーファイル）は、OpenClaw がすでに実行中であれば、アクティブなランタイム config スナップショットを優先します。まだランタイムスナップショットが存在しない場合は、ディスク上の解決済み config file にフォールバックします。
 
-provider pluginは、helperが意図的にprovider固有であり、まだ汎用SDK
-subpathに属さない場合、狭いpluginローカルcontract barrelを公開できます。bundledの例:
+Provider Plugin は、ヘルパーが意図的に provider 固有で、まだ汎用 SDK
+サブパスに属していない場合、狭い Plugin ローカルのコントラクトバレルを公開できます。同梱の例:
 
-- **Anthropic**: Claudeのbeta-headerおよび`service_tier` stream helper向けの公開`api.ts` / `contract-api.ts` seam。
-- **`@openclaw/openai-provider`**: `api.ts`がprovider builder、default-model helper、およびrealtime provider builderをexportします。
-- **`@openclaw/openrouter-provider`**: `api.ts`がprovider builderに加えて、onboarding/config helperをexportします。
+- **Anthropic**: Claude の beta-header と `service_tier` ストリームヘルパー向けの公開 `api.ts` / `contract-api.ts` シーム。
+- **`@openclaw/openai-provider`**: `api.ts` は provider ビルダー、デフォルトモデルヘルパー、リアルタイム provider ビルダーを export します。
+- **`@openclaw/openrouter-provider`**: `api.ts` は provider ビルダーに加えてオンボーディング/config ヘルパーを export します。
 
 <Warning>
-  extension production codeも、`openclaw/plugin-sdk/<other-plugin>`のimportを避けるべきです。
-  helperが本当に共有されるべきものなら、2つのpluginを密結合させるのではなく、`openclaw/plugin-sdk/speech`、`.../provider-model-shared`、または別のcapability指向surfaceのような中立的なSDK subpathへ昇格させてください。
+  extensions の本番コードでも、`openclaw/plugin-sdk/<other-plugin>` の import は避けるべきです。ヘルパーが本当に共有されるべきなら、2 つの Plugin を結合する代わりに、`openclaw/plugin-sdk/speech`、`.../provider-model-shared`、または他の capability 指向サーフェスのような中立的な SDK サブパスへ昇格させてください。
 </Warning>
 
 ## 関連
 
 <CardGroup cols={2}>
-  <Card title="entry point" icon="door-open" href="/ja-JP/plugins/sdk-entrypoints">
-    `definePluginEntry`と`defineChannelPluginEntry`のオプション。
+  <Card title="エントリーポイント" icon="door-open" href="/ja-JP/plugins/sdk-entrypoints">
+    `definePluginEntry` と `defineChannelPluginEntry` のオプション。
   </Card>
-  <Card title="Runtime helper" icon="gears" href="/ja-JP/plugins/sdk-runtime">
-    完全な`api.runtime` namespaceリファレンス。
+  <Card title="Runtime helpers" icon="gears" href="/ja-JP/plugins/sdk-runtime">
+    完全な `api.runtime` 名前空間リファレンス。
   </Card>
-  <Card title="Setupとconfig" icon="sliders" href="/ja-JP/plugins/sdk-setup">
-    パッケージング、manifest、およびconfig schema。
+  <Card title="セットアップと config" icon="sliders" href="/ja-JP/plugins/sdk-setup">
+    パッケージング、マニフェスト、config schema。
   </Card>
   <Card title="テスト" icon="vial" href="/ja-JP/plugins/sdk-testing">
-    テストユーティリティとlint rule。
+    テストユーティリティと lint ルール。
   </Card>
   <Card title="SDK migration" icon="arrows-turn-right" href="/ja-JP/plugins/sdk-migration">
-    非推奨surfaceからの移行。
+    非推奨サーフェスからの移行。
   </Card>
-  <Card title="Plugin内部構造" icon="diagram-project" href="/ja-JP/plugins/architecture">
-    詳細アーキテクチャとcapabilityモデル。
+  <Card title="Plugin internals" icon="diagram-project" href="/ja-JP/plugins/architecture">
+    詳細なアーキテクチャと capability モデル。
   </Card>
 </CardGroup>

@@ -1,58 +1,62 @@
 ---
 read_when:
-    - 新しいOpenClaw Pluginを作成したい
+    - 新しいOpenClaw Pluginを作成したい場合
     - Plugin開発のクイックスタートが必要です
-    - OpenClawに新しいチャネル、プロバイダ、ツール、またはその他の機能を追加している
+    - 新しいチャネル、プロバイダー、ツール、またはその他のcapabilityをOpenClawに追加しています
 sidebarTitle: Getting Started
 summary: 数分で最初のOpenClaw Pluginを作成する
-title: Pluginの作成
+title: Pluginの構築
 x-i18n:
-    generated_at: "2026-04-24T05:09:34Z"
+    generated_at: "2026-04-25T13:53:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c14f4c4dc3ae853e385f6beeb9529ea9e360f3d9c5b99dc717cf0851ed02cbc8
+    source_hash: 69c7ffb65750fd0c1fa786600c55a371dace790b8b1034fa42f4b80f5f7146df
     source_path: plugins/building-plugins.md
     workflow: 15
 ---
 
-Pluginは、新しい機能をOpenClawに追加します: チャネル、モデルプロバイダ、
-音声、リアルタイム文字起こし、リアルタイム音声、メディア理解、画像生成、
-動画生成、Web fetch、Web search、エージェントツール、またはそれらの任意の組み合わせです。
+Pluginは、OpenClawに新しいcapabilityを追加します: チャネル、モデルプロバイダー、
+speech、realtime transcription、realtime voice、media understanding、image
+generation、video generation、web fetch、web search、agent tool、またはそれらの任意の組み合わせです。
 
-PluginをOpenClawリポジトリに追加する必要はありません。
-[ClawHub](/ja-JP/tools/clawhub) またはnpmに公開し、ユーザーは
-`openclaw plugins install <package-name>` でインストールします。OpenClawはまずClawHubを試し、自動的にnpmへフォールバックします。
+PluginをOpenClaw repositoryに追加する必要はありません。
+[ClawHub](/ja-JP/tools/clawhub) またはnpmへ公開し、ユーザーは
+`openclaw plugins install <package-name>` でインストールします。OpenClawはまずClawHubを試し、
+自動でnpmへフォールバックします。
 
 ## 前提条件
 
-- Node >= 22 とパッケージマネージャ（npm または pnpm）
-- TypeScript（ESM）への習熟
-- リポジトリ内Pluginの場合: リポジトリをclone済みで、`pnpm install` 済み
+- Node >= 22 と package manager（npm または pnpm）
+- TypeScript（ESM）に慣れていること
+- repo内Pluginの場合: repositoryをclone済みで `pnpm install` 済み
 
-## どの種類のPluginか？
+## どの種類のPluginですか？
 
 <CardGroup cols={3}>
   <Card title="チャネルPlugin" icon="messages-square" href="/ja-JP/plugins/sdk-channel-plugins">
-    OpenClawをメッセージングプラットフォーム（Discord、IRC など）に接続する
+    OpenClawをメッセージングプラットフォーム（Discord、IRCなど）に接続する
   </Card>
-  <Card title="プロバイダPlugin" icon="cpu" href="/ja-JP/plugins/sdk-provider-plugins">
-    モデルプロバイダ（LLM、proxy、またはカスタムendpoint）を追加する
+  <Card title="プロバイダーPlugin" icon="cpu" href="/ja-JP/plugins/sdk-provider-plugins">
+    モデルプロバイダー（LLM、proxy、またはカスタムendpoint）を追加する
   </Card>
-  <Card title="ツール / フックPlugin" icon="wrench">
-    エージェントツール、イベントフック、またはサービスを登録する — 以下へ進む
+  <Card title="ツール / hook Plugin" icon="wrench" href="/ja-JP/plugins/hooks">
+    agent tool、event hook、またはserviceを登録する — 以下を続けてください
   </Card>
 </CardGroup>
 
-オンボーディング/セットアップ実行時に必ずインストールされているとは限らないチャネルPluginには、
+オンボーディング/セットアップ実行時にインストールされている保証がないチャネルPluginでは、
 `openclaw/plugin-sdk/channel-setup` の
-`createOptionalChannelSetupSurface(...)` を使ってください。これは、インストール要件を通知し、Pluginがインストールされるまで実際の設定書き込み時にはフェイルクローズドになるsetup adapter + wizardの組を生成します。
+`createOptionalChannelSetupSurface(...)` を使ってください。これにより、
+インストール要件を告知し、Pluginがインストールされるまで実際のconfig書き込みではfail-closedする
+setup adapter + ウィザードが生成されます。
 
 ## クイックスタート: ツールPlugin
 
-この手順では、エージェントツールを登録する最小限のPluginを作成します。チャネルPluginとプロバイダPluginには、上にリンクした専用ガイドがあります。
+このウォークスルーでは、agent toolを登録する最小Pluginを作成します。チャネル
+PluginとプロバイダーPluginには、上記リンク先の専用ガイドがあります。
 
 <Steps>
-  <Step title="パッケージとmanifestを作成する">
+  <Step title="packageとmanifestを作成する">
     <CodeGroup>
     ```json package.json
     {
@@ -77,7 +81,7 @@ PluginをOpenClawリポジトリに追加する必要はありません。
     {
       "id": "my-plugin",
       "name": "My Plugin",
-      "description": "Adds a custom tool to OpenClaw",
+      "description": "OpenClawにカスタムツールを追加します",
       "configSchema": {
         "type": "object",
         "additionalProperties": false
@@ -86,13 +90,13 @@ PluginをOpenClawリポジトリに追加する必要はありません。
     ```
     </CodeGroup>
 
-    設定がなくても、すべてのPluginにはmanifestが必要です。完全なschemaについては
-    [Manifest](/ja-JP/plugins/manifest) を参照してください。正式なClawHub公開用snippetは
-    `docs/snippets/plugin-publish/` にあります。
+    設定がなくても、すべてのPluginにmanifestが必要です。完全なschemaについては
+    [Manifest](/ja-JP/plugins/manifest) を参照してください。正式なClawHub
+    publish snippetは `docs/snippets/plugin-publish/` にあります。
 
   </Step>
 
-  <Step title="エントリポイントを書く">
+  <Step title="entry pointを書く">
 
     ```typescript
     // index.ts
@@ -116,9 +120,9 @@ PluginをOpenClawリポジトリに追加する必要はありません。
     });
     ```
 
-    `definePluginEntry` は非チャネルPlugin用です。チャネルには
-    `defineChannelPluginEntry` を使います — [チャネルPlugin](/ja-JP/plugins/sdk-channel-plugins) を参照してください。
-    完全なエントリポイントオプションについては [Entry Points](/ja-JP/plugins/sdk-entrypoints) を参照してください。
+    `definePluginEntry` は非チャネルPlugin用です。チャネルでは
+    `defineChannelPluginEntry` を使ってください — [Channel Plugins](/ja-JP/plugins/sdk-channel-plugins) を参照してください。
+    完全なentry pointオプションについては [Entry Points](/ja-JP/plugins/sdk-entrypoints) を参照してください。
 
   </Step>
 
@@ -132,10 +136,10 @@ PluginをOpenClawリポジトリに追加する必要はありません。
     openclaw plugins install clawhub:@myorg/openclaw-my-plugin
     ```
 
-    OpenClawは、`@myorg/openclaw-my-plugin` のようなプレフィックスなしpackage specに対しても、
+    OpenClawは、`@myorg/openclaw-my-plugin` のような素のpackage specでも
     npmより先にClawHubを確認します。
 
-    **リポジトリ内Plugin:** バンドル済みPlugin workspace tree配下に置きます — 自動検出されます。
+    **repo内Plugin:** バンドル済みPlugin workspace tree配下に置けば — 自動検出されます。
 
     ```bash
     pnpm test -- <bundled-plugin-root>/my-plugin/
@@ -144,62 +148,74 @@ PluginをOpenClawリポジトリに追加する必要はありません。
   </Step>
 </Steps>
 
-## Plugin capabilities
+## Plugincapability
 
-単一のPluginは、`api` オブジェクト経由で任意の数のcapabilityを登録できます:
+1つのPluginは、`api` オブジェクトを通じて任意個のcapabilityを登録できます:
 
-| Capability | 登録メソッド | 詳細ガイド |
+| Capability             | 登録メソッド                                     | 詳細ガイド                                                                      |
 | ---------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------- |
-| テキスト推論（LLM） | `api.registerProvider(...)`                      | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins) |
-| CLI推論バックエンド | `api.registerCliBackend(...)`                    | [CLIバックエンド](/ja-JP/gateway/cli-backends) |
-| チャネル / メッセージング | `api.registerChannel(...)`                       | [チャネルPlugin](/ja-JP/plugins/sdk-channel-plugins) |
-| 音声（TTS/STT） | `api.registerSpeechProvider(...)`                | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| リアルタイム文字起こし | `api.registerRealtimeTranscriptionProvider(...)` | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| リアルタイム音声 | `api.registerRealtimeVoiceProvider(...)`         | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| メディア理解 | `api.registerMediaUnderstandingProvider(...)`    | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| 画像生成 | `api.registerImageGenerationProvider(...)`       | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| 音楽生成 | `api.registerMusicGenerationProvider(...)`       | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| 動画生成 | `api.registerVideoGenerationProvider(...)`       | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Web fetch | `api.registerWebFetchProvider(...)`              | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Web search | `api.registerWebSearchProvider(...)`             | [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
-| Embedded Pi拡張 | `api.registerEmbeddedExtensionFactory(...)`      | [SDK概要](/ja-JP/plugins/sdk-overview#registration-api) |
-| エージェントツール | `api.registerTool(...)`                          | 下記 |
-| カスタムコマンド | `api.registerCommand(...)`                       | [Entry Points](/ja-JP/plugins/sdk-entrypoints) |
-| イベントフック | `api.registerHook(...)`                          | [Entry Points](/ja-JP/plugins/sdk-entrypoints) |
-| HTTPルート | `api.registerHttpRoute(...)`                     | [Internals](/ja-JP/plugins/architecture-internals#gateway-http-routes) |
-| CLIサブコマンド | `api.registerCli(...)`                           | [Entry Points](/ja-JP/plugins/sdk-entrypoints) |
+| テキスト推論（LLM）    | `api.registerProvider(...)`                      | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins)                               |
+| CLI推論バックエンド    | `api.registerCliBackend(...)`                    | [CLI Backends](/ja-JP/gateway/cli-backends)                                           |
+| チャネル / messaging   | `api.registerChannel(...)`                       | [Channel Plugins](/ja-JP/plugins/sdk-channel-plugins)                                 |
+| Speech (TTS/STT)       | `api.registerSpeechProvider(...)`                | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Realtime transcription | `api.registerRealtimeTranscriptionProvider(...)` | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Realtime voice         | `api.registerRealtimeVoiceProvider(...)`         | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Media understanding    | `api.registerMediaUnderstandingProvider(...)`    | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Image generation       | `api.registerImageGenerationProvider(...)`       | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Music generation       | `api.registerMusicGenerationProvider(...)`       | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Video generation       | `api.registerVideoGenerationProvider(...)`       | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Web fetch              | `api.registerWebFetchProvider(...)`              | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Web search             | `api.registerWebSearchProvider(...)`             | [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins#step-5-add-extra-capabilities) |
+| Tool-result middleware | `api.registerAgentToolResultMiddleware(...)`     | [SDK Overview](/ja-JP/plugins/sdk-overview#registration-api)                          |
+| Agent tools            | `api.registerTool(...)`                          | 以下                                                                           |
+| Custom commands        | `api.registerCommand(...)`                       | [Entry Points](/ja-JP/plugins/sdk-entrypoints)                                        |
+| Plugin hooks           | `api.on(...)`                                    | [Plugin hooks](/ja-JP/plugins/hooks)                                                  |
+| Internal event hooks   | `api.registerHook(...)`                          | [Entry Points](/ja-JP/plugins/sdk-entrypoints)                                        |
+| HTTP routes            | `api.registerHttpRoute(...)`                     | [Internals](/ja-JP/plugins/architecture-internals#gateway-http-routes)                |
+| CLI subcommands        | `api.registerCli(...)`                           | [Entry Points](/ja-JP/plugins/sdk-entrypoints)                                        |
 
-完全な登録APIについては [SDK概要](/ja-JP/plugins/sdk-overview#registration-api) を参照してください。
+完全な登録APIについては [SDK Overview](/ja-JP/plugins/sdk-overview#registration-api) を参照してください。
 
-最終的なツール結果メッセージが送出される前の、非同期な `tool_result` 書き換えのようなPiネイティブ埋め込みrunnerフックが必要な場合は、`api.registerEmbeddedExtensionFactory(...)` を使ってください。その作業にPi拡張のタイミングが不要なら、通常のOpenClaw Pluginフックを優先してください。
+バンドル済みPluginは、モデルが出力を見る前に非同期のtool-result書き換えが必要な場合、
+`api.registerAgentToolResultMiddleware(...)` を使えます。
+対象runtimeは `contracts.agentToolResultMiddleware` で宣言してください。たとえば
+`["pi", "codex"]` です。これは信頼されたバンドル済みPlugin用のseamです。外部
+Pluginは、このcapability向けにOpenClawが明示的な信頼ポリシーを拡張するまでは、
+通常のOpenClaw Plugin hookを優先してください。
 
-Pluginがカスタムgateway RPCメソッドを登録する場合は、Plugin固有のプレフィックスに置いてください。コアの管理namespace（`config.*`、`exec.approvals.*`、`wizard.*`、`update.*`）は予約済みであり、Pluginがより狭いscopeを要求しても、常に `operator.admin` に解決されます。
+PluginがカスタムGateway RPCメソッドを登録する場合は、
+Plugin固有のプレフィックスに保ってください。core admin namespace（`config.*`,
+`exec.approvals.*`, `wizard.*`, `update.*`）は予約済みであり、Pluginが
+より狭いscopeを要求しても常に `operator.admin` に解決されます。
 
-覚えておくべきフックガードのセマンティクス:
+覚えておくべきhook guardの意味論:
 
-- `before_tool_call`: `{ block: true }` は終端であり、より低い優先度のハンドラを停止する。
-- `before_tool_call`: `{ block: false }` は未決定として扱われる。
-- `before_tool_call`: `{ requireApproval: true }` はagent実行を一時停止し、exec approval overlay、Telegramボタン、Discord interactions、または任意チャネルの `/approve` コマンドを通じてユーザー承認を求める。
-- `before_install`: `{ block: true }` は終端であり、より低い優先度のハンドラを停止する。
-- `before_install`: `{ block: false }` は未決定として扱われる。
-- `message_sending`: `{ cancel: true }` は終端であり、より低い優先度のハンドラを停止する。
-- `message_sending`: `{ cancel: false }` は未決定として扱われる。
-- `message_received`: 受信スレッド/トピックルーティングが必要な場合は、型付きの `threadId` フィールドを優先する。`metadata` はチャネル固有の追加情報用に保つ。
-- `message_sending`: チャネル固有のmetadataキーより、型付きの `replyToId` / `threadId` ルーティングフィールドを優先する。
+- `before_tool_call`: `{ block: true }` は終端であり、より低優先度のhandlerを停止します。
+- `before_tool_call`: `{ block: false }` は判断なしとして扱われます。
+- `before_tool_call`: `{ requireApproval: true }` はagent実行を一時停止し、exec approval overlay、Telegram button、Discord interaction、または任意チャネルの `/approve` コマンド経由でユーザー承認を求めます。
+- `before_install`: `{ block: true }` は終端であり、より低優先度のhandlerを停止します。
+- `before_install`: `{ block: false }` は判断なしとして扱われます。
+- `message_sending`: `{ cancel: true }` は終端であり、より低優先度のhandlerを停止します。
+- `message_sending`: `{ cancel: false }` は判断なしとして扱われます。
+- `message_received`: 受信thread/topicルーティングが必要な場合は、型付きの `threadId` フィールドを優先してください。`metadata` はチャネル固有の追加情報向けに残してください。
+- `message_sending`: チャネル固有metadata keyより、型付きの `replyToId` / `threadId` ルーティングフィールドを優先してください。
 
-`/approve` コマンドは、制限付きフォールバックでexec承認とplugin承認の両方を扱います。exec approval idが見つからない場合、OpenClawは同じidをplugin approvals経由で再試行します。Plugin approval forwardingは、設定の `approvals.plugin` で個別に構成できます。
+`/approve` コマンドは、制限付きフォールバックでexec承認とplugin承認の両方を処理します。exec approval idが見つからない場合、OpenClawは同じidをplugin approvals経由で再試行します。Plugin approval forwardingは、configの `approvals.plugin` で個別に設定できます。
 
-カスタム承認処理でその同じ制限付きフォールバックケースを検出する必要があるなら、承認期限切れ文字列を手動一致させる代わりに、`openclaw/plugin-sdk/error-runtime` の `isApprovalNotFoundError` を優先してください。
+同じ制限付きフォールバックケースをカスタム承認処理で検出する必要がある場合は、
+承認期限切れ文字列を手動で照合する代わりに、
+`openclaw/plugin-sdk/error-runtime` の `isApprovalNotFoundError` を優先してください。
 
-詳細は [SDK概要のフック決定セマンティクス](/ja-JP/plugins/sdk-overview#hook-decision-semantics) を参照してください。
+例とhookリファレンスについては [Plugin hooks](/ja-JP/plugins/hooks) を参照してください。
 
-## エージェントツールの登録
+## agent toolの登録
 
-ツールは、LLMが呼び出せる型付き関数です。required（常に利用可能）にもoptional（ユーザーのオプトイン）にもできます:
+ツールは、LLMが呼び出せる型付き関数です。required（常に
+利用可能）にもoptional（ユーザーのオプトイン）にもできます:
 
 ```typescript
 register(api) {
-  // Required tool — always available
+  // Required tool — 常に利用可能
   api.registerTool({
     name: "my_tool",
     description: "Do a thing",
@@ -209,7 +225,7 @@ register(api) {
     },
   });
 
-  // Optional tool — user must add to allowlist
+  // Optional tool — ユーザーがallowlistに追加する必要がある
   api.registerTool(
     {
       name: "workflow_tool",
@@ -224,7 +240,7 @@ register(api) {
 }
 ```
 
-ユーザーは設定でoptionalツールを有効にします:
+ユーザーはconfigでoptional toolを有効にします:
 
 ```json5
 {
@@ -232,72 +248,78 @@ register(api) {
 }
 ```
 
-- ツール名はコアツールと衝突してはならない（衝突時はスキップされる）
-- 副作用や追加バイナリ要件を持つツールには `optional: true` を使う
-- ユーザーは、Plugin idを `tools.allow` に追加することで、そのPluginのすべてのツールを有効にできる
+- ツール名はcore toolと衝突してはいけません（衝突したものはスキップされます）
+- 副作用があるツールや追加バイナリ要件のあるツールには `optional: true` を使ってください
+- ユーザーは、Plugin idを `tools.allow` に追加することで、そのPluginの全ツールを有効化できます
 
 ## import規約
 
-常に、焦点の絞られた `openclaw/plugin-sdk/<subpath>` パスからimportしてください:
+必ず、焦点化された `openclaw/plugin-sdk/<subpath>` パスからimportしてください:
 
 ```typescript
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
 
-// Wrong: monolithic root (deprecated, will be removed)
+// 間違い: 単一のルート（非推奨、将来削除予定）
 import { ... } from "openclaw/plugin-sdk";
 ```
 
-完全なsubpathリファレンスについては [SDK概要](/ja-JP/plugins/sdk-overview) を参照してください。
+完全なsubpathリファレンスについては [SDK Overview](/ja-JP/plugins/sdk-overview) を参照してください。
 
-Plugin内部では、内部importにはローカルbarrelファイル（`api.ts`、`runtime-api.ts`）を使ってください — 自分のPluginをそのSDKパス経由でimportしてはなりません。
+Plugin内部では、内部importにローカルbarrel file（`api.ts`, `runtime-api.ts`）を使ってください —
+自分自身のPluginをそのSDK path経由でimportしてはいけません。
 
-プロバイダPluginでは、provider固有のヘルパーは、その継ぎ目が本当に汎用的でない限り、それらのpackage-root barrelに置いてください。現在のバンドル済み例:
+プロバイダーPluginでは、そのseamが本当に汎用的でない限り、プロバイダー固有helperはそれらのpackage-root
+barrelに保ってください。現在のバンドル済み例:
 
-- Anthropic: Claude stream wrappers と `service_tier` / beta helpers
-- OpenAI: provider builders、default-model helpers、realtime providers
-- OpenRouter: provider builder と onboarding/config helpers
+- Anthropic: Claude stream wrapperと `service_tier` / beta helper
+- OpenAI: provider builder、default-model helper、realtime provider
+- OpenRouter: provider builder と onboarding/config helper
 
-あるヘルパーが1つのバンドル済みprovider packageの内部でしか役に立たないなら、それを `openclaw/plugin-sdk/*` へ昇格させるのではなく、そのpackage-root seamに置いてください。
+あるhelperが1つのバンドル済みprovider package内でしか役に立たない場合は、
+それを `openclaw/plugin-sdk/*` へ昇格させるのではなく、その
+package-root seamに置いてください。
 
-一部の生成済み `openclaw/plugin-sdk/<bundled-id>` ヘルパーseamは、バンドル済みPluginの保守および互換性のために引き続き存在します。たとえば
-`plugin-sdk/feishu-setup` や `plugin-sdk/zalo-setup` です。これらは、新しいサードパーティPluginのデフォルトパターンではなく、予約済みサーフェスとして扱ってください。
+生成済みの `openclaw/plugin-sdk/<bundled-id>` helper seamの一部は、
+バンドル済みPluginの保守と互換性のために引き続き存在します。たとえば
+`plugin-sdk/feishu-setup` や `plugin-sdk/zalo-setup` です。これらは予約済みサーフェスとして扱い、
+新しいサードパーティPluginのデフォルトパターンにはしないでください。
 
 ## 提出前チェックリスト
 
-<Check>**package.json** に正しい `openclaw` メタデータがある</Check>
-<Check>**openclaw.plugin.json** manifest が存在し、有効である</Check>
-<Check>エントリポイントが `defineChannelPluginEntry` または `definePluginEntry` を使っている</Check>
-<Check>すべてのimportが、焦点の絞られた `plugin-sdk/<subpath>` パスを使っている</Check>
-<Check>内部importが、SDK自己importではなくローカルモジュールを使っている</Check>
+<Check>**package.json** に正しい `openclaw` metadataがある</Check>
+<Check>**openclaw.plugin.json** manifestが存在し、有効である</Check>
+<Check>entry pointで `defineChannelPluginEntry` または `definePluginEntry` を使っている</Check>
+<Check>すべてのimportが焦点化された `plugin-sdk/<subpath>` パスを使っている</Check>
+<Check>内部importがSDK self-importではなくローカルmoduleを使っている</Check>
 <Check>テストが通る（`pnpm test -- <bundled-plugin-root>/my-plugin/`）</Check>
-<Check>`pnpm check` が通る（リポジトリ内Plugin）</Check>
+<Check>`pnpm check` が通る（repo内Plugin）</Check>
 
 ## ベータリリーステスト
 
-1. [openclaw/openclaw](https://github.com/openclaw/openclaw/releases) のGitHubリリースタグを監視し、`Watch` > `Releases` で購読してください。ベータタグは `v2026.3.N-beta.1` のような形式です。リリース告知のために、公式OpenClaw Xアカウント [@openclaw](https://x.com/openclaw) の通知も有効にできます。
-2. ベータタグが現れたら、できるだけ早くそのタグに対してPluginをテストしてください。stableまでの猶予は通常数時間しかありません。
-3. テスト後、`plugin-forum` Discordチャネル内の自分のPluginスレッドに、`all good` か、壊れた内容を書き込んでください。まだスレッドがなければ作成してください。
+1. [openclaw/openclaw](https://github.com/openclaw/openclaw/releases) のGitHub release tagを監視し、`Watch` > `Releases` で購読してください。beta tagは `v2026.3.N-beta.1` のような形式です。リリース告知については、公式OpenClaw Xアカウント [@openclaw](https://x.com/openclaw) の通知も有効にできます。
+2. beta tagが出たらすぐに、そのbeta tagに対してPluginをテストしてください。stable化までの猶予は通常数時間しかありません。
+3. テスト後、`plugin-forum` Discordチャネル内のあなたのPluginスレッドに、`all good` か壊れた内容を投稿してください。まだスレッドがない場合は作成してください。
 4. 何か壊れていたら、`Beta blocker: <plugin-name> - <summary>` というタイトルのissueを作成または更新し、`beta-blocker` ラベルを付けてください。そのissueリンクをスレッドに貼ってください。
-5. `main` に対して `fix(<plugin-id>): beta blocker - <summary>` というタイトルのPRを開き、PRとDiscordスレッドの両方でissueをリンクしてください。コントリビューターはPRにラベルを付けられないため、このタイトルがメンテナと自動化に対するPR側のシグナルになります。PR付きのblockerはマージされます。PRがないblockerは、そのまま出荷される可能性があります。メンテナはベータテスト中にこれらのスレッドを監視しています。
-6. 無言はグリーンを意味します。タイミングを逃した場合、その修正はおそらく次のサイクルに入ります。
+5. `main` 向けに `fix(<plugin-id>): beta blocker - <summary>` というタイトルのPRを開き、PRとDiscordスレッドの両方にissueをリンクしてください。contributorはPRにラベルを付けられないため、このタイトルがメンテナーと自動化に対するPR側のシグナルになります。PR付きのblockerはマージされます。PRがないblockerは、そのまま出荷される可能性があります。メンテナーはbeta testing中にこれらのスレッドを監視しています。
+6. 反応がないことは問題なしを意味します。タイミングを逃した場合、修正はおそらく次のサイクルに入ります。
 
 ## 次のステップ
 
 <CardGroup cols={2}>
-  <Card title="チャネルPlugin" icon="messages-square" href="/ja-JP/plugins/sdk-channel-plugins">
-    メッセージングチャネルPluginを作成する
+  <Card title="Channel Plugins" icon="messages-square" href="/ja-JP/plugins/sdk-channel-plugins">
+    メッセージングチャネルPluginを構築する
   </Card>
-  <Card title="プロバイダPlugin" icon="cpu" href="/ja-JP/plugins/sdk-provider-plugins">
-    モデルプロバイダPluginを作成する
+  <Card title="Provider Plugins" icon="cpu" href="/ja-JP/plugins/sdk-provider-plugins">
+    モデルプロバイダーPluginを構築する
   </Card>
-  <Card title="SDK概要" icon="book-open" href="/ja-JP/plugins/sdk-overview">
+  <Card title="SDK Overview" icon="book-open" href="/ja-JP/plugins/sdk-overview">
     import mapと登録APIリファレンス
   </Card>
-  <Card title="ランタイムヘルパー" icon="settings" href="/ja-JP/plugins/sdk-runtime">
+  <Card title="Runtime Helpers" icon="settings" href="/ja-JP/plugins/sdk-runtime">
     `api.runtime` 経由のTTS、search、subagent
   </Card>
-  <Card title="テスト" icon="test-tubes" href="/ja-JP/plugins/sdk-testing">
+  <Card title="Testing" icon="test-tubes" href="/ja-JP/plugins/sdk-testing">
     テストユーティリティとパターン
   </Card>
   <Card title="Plugin Manifest" icon="file-json" href="/ja-JP/plugins/manifest">
@@ -307,8 +329,8 @@ Plugin内部では、内部importにはローカルbarrelファイル（`api.ts`
 
 ## 関連
 
-- [Plugin Architecture](/ja-JP/plugins/architecture) — 内部アーキテクチャの詳細
-- [SDK概要](/ja-JP/plugins/sdk-overview) — Plugin SDKリファレンス
+- [Plugin Architecture](/ja-JP/plugins/architecture) — 内部アーキテクチャの詳細解説
+- [SDK Overview](/ja-JP/plugins/sdk-overview) — Plugin SDKリファレンス
 - [Manifest](/ja-JP/plugins/manifest) — plugin manifest形式
-- [チャネルPlugin](/ja-JP/plugins/sdk-channel-plugins) — チャネルPluginの作成
-- [プロバイダPlugin](/ja-JP/plugins/sdk-provider-plugins) — プロバイダPluginの作成
+- [Channel Plugins](/ja-JP/plugins/sdk-channel-plugins) — チャネルPluginの構築
+- [Provider Plugins](/ja-JP/plugins/sdk-provider-plugins) — プロバイダーPluginの構築

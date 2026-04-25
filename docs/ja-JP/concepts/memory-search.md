@@ -1,56 +1,55 @@
 ---
 read_when:
-    - '`memory_search` の仕組みを理解したい場合'
-    - 埋め込みプロバイダを選びたい場合
+    - '`memory_search`がどのように動作するかを理解したい場合'
+    - embedding providerを選びたい場合
     - 検索品質を調整したい場合
-summary: 埋め込みとハイブリッド検索を使って memory search が関連するノートを見つける仕組み
-title: Memory search
+summary: memory searchがembeddingとハイブリッド検索を使って関連ノートを見つける仕組み
+title: memory search
 x-i18n:
-    generated_at: "2026-04-24T04:53:54Z"
+    generated_at: "2026-04-25T13:45:42Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04db62e519a691316ce40825c082918094bcaa9c36042cc8101c6504453d238e
+    source_hash: 5cc6bbaf7b0a755bbe44d3b1b06eed7f437ebdc41a81c48cca64bd08bbc546b7
     source_path: concepts/memory-search.md
     workflow: 15
 ---
 
-`memory_search` は、元の文言と表現が異なっていても、メモリファイルから関連するノートを見つけます。これは、メモリを小さなチャンクにインデックス化し、埋め込み、キーワード、またはその両方を使って検索することで動作します。
+`memory_search`は、元の文面と表現が異なる場合でも、memoryファイルから関連ノートを見つけます。これは、memoryを小さなチャンクにインデックス化し、embedding、キーワード、またはその両方を使って検索することで実現します。
 
 ## クイックスタート
 
-GitHub Copilot サブスクリプション、OpenAI、Gemini、Voyage、または Mistral
-の API キーが設定されていれば、memory search は自動的に動作します。プロバイダを明示的に設定するには:
+GitHub Copilotサブスクリプション、OpenAI、Gemini、Voyage、またはMistralのAPIキーが設定されていれば、memory searchは自動的に動作します。providerを明示的に設定するには、次のようにします。
 
 ```json5
 {
   agents: {
     defaults: {
       memorySearch: {
-        provider: "openai", // または "gemini", "local", "ollama" など
+        provider: "openai", // or "gemini", "local", "ollama", etc.
       },
     },
   },
 }
 ```
 
-API キーなしでローカル埋め込みを使う場合は `provider: "local"` を使ってください（`node-llama-cpp` が必要）。
+APIキーなしでローカルembeddingを使う場合は、任意の`node-llama-cpp` runtime packageをOpenClawの隣にインストールし、`provider: "local"`を使用します。
 
-## サポートされるプロバイダ
+## サポートされるprovider
 
-| プロバイダ       | ID               | API キーが必要 | 注記                                                     |
-| ---------------- | ---------------- | -------------- | -------------------------------------------------------- |
-| Bedrock          | `bedrock`        | No             | AWS 認証情報チェーンが解決されると自動検出されます       |
-| Gemini           | `gemini`         | Yes            | 画像/音声インデックスをサポートします                    |
-| GitHub Copilot   | `github-copilot` | No             | 自動検出され、Copilot サブスクリプションを使います       |
-| Local            | `local`          | No             | GGUF モデル、約 0.6 GB のダウンロード                     |
-| Mistral          | `mistral`        | Yes            | 自動検出されます                                         |
-| Ollama           | `ollama`         | No             | ローカル。明示的に設定する必要があります                 |
-| OpenAI           | `openai`         | Yes            | 自動検出され、高速です                                   |
-| Voyage           | `voyage`         | Yes            | 自動検出されます                                         |
+| Provider | ID | APIキーが必要 | 備考 |
+| -------------- | ---------------- | ------------- | ---------------------------------------------------- |
+| Bedrock | `bedrock` | いいえ | AWS認証情報チェーンが解決されると自動検出されます |
+| Gemini | `gemini` | はい | 画像/音声インデックスをサポートします |
+| GitHub Copilot | `github-copilot` | いいえ | 自動検出され、Copilotサブスクリプションを使用します |
+| Local | `local` | いいえ | GGUFモデル、約0.6 GBのダウンロード |
+| Mistral | `mistral` | はい | 自動検出されます |
+| Ollama | `ollama` | いいえ | ローカル、明示的に設定する必要があります |
+| OpenAI | `openai` | はい | 自動検出、高速 |
+| Voyage | `voyage` | はい | 自動検出されます |
 
 ## 検索の仕組み
 
-OpenClaw は 2 つの検索経路を並列で実行し、その結果をマージします:
+OpenClawは2つの検索経路を並列で実行し、その結果をマージします。
 
 ```mermaid
 flowchart LR
@@ -63,37 +62,31 @@ flowchart LR
     M --> R["Top Results"]
 ```
 
-- **ベクトル検索** は、意味が似ているノートを見つけます（「gateway host」が
-  「OpenClaw を実行しているマシン」に一致するなど）。
-- **BM25 キーワード検索** は、厳密一致を見つけます（ID、エラー文字列、設定キーなど）。
+- **ベクトル検索**は、意味が似ているノートを見つけます（「gateway host」が「OpenClawを実行しているマシン」に一致するなど）。
+- **BM25キーワード検索**は、正確な一致を見つけます（ID、エラー文字列、configキーなど）。
 
-一方の経路しか使えない場合（埋め込みなし、または FTS なし）は、使える方だけが実行されます。
+片方の経路しか利用できない場合（embeddingなし、またはFTSなし）は、もう片方だけが実行されます。
 
-埋め込みが利用できない場合でも、OpenClaw は生の完全一致順序のみにフォールバックするのではなく、FTS 結果に対して語彙ベースのランキングを引き続き使います。この劣化モードでは、クエリ語のカバレッジが強いチャンクや関連するファイルパスが強化されるため、`sqlite-vec` や埋め込みプロバイダがなくても有用なリコールを維持できます。
+embeddingが利用できない場合でも、OpenClawは生の完全一致順序だけにフォールバックするのではなく、FTS結果に対する語彙ランキングを引き続き使用します。この劣化モードでは、クエリ語のカバレッジが強いチャンクや関連するファイルパスをブーストするため、`sqlite-vec`やembedding providerがなくても有用な再現率を維持できます。
 
 ## 検索品質の改善
 
-ノート履歴が大きい場合に役立つ任意機能が 2 つあります:
+大量のノート履歴がある場合、2つの任意機能が役立ちます。
 
 ### 時間減衰
 
-古いノートは徐々にランキング重みを失い、最近の情報が先に出やすくなります。
-デフォルトの半減期 30 日では、先月のノートは元の重みの 50% で評価されます。
-`MEMORY.md` のような恒常的なファイルには減衰が適用されません。
+古いノートは徐々にランキング重みを失うため、最近の情報が先に表示されます。デフォルトの半減期30日では、先月のノートは元の重みの50%でスコアリングされます。`MEMORY.md`のようなエバーグリーンファイルは減衰しません。
 
 <Tip>
-数か月分の日次ノートがあり、古い情報が最近のコンテキストより上位に出続ける場合は、
-時間減衰を有効にしてください。
+agentに数か月分の日次ノートがあり、古い情報が最近のコンテキストより上位に出続ける場合は、時間減衰を有効にしてください。
 </Tip>
 
 ### MMR（多様性）
 
-重複した結果を減らします。5 つのノートすべてが同じルーター設定に言及している場合、
-MMR はトップ結果が同じ内容を繰り返すのではなく、異なる話題をカバーするようにします。
+冗長な結果を減らします。5つのノートが同じルーター設定に言及している場合、MMRは上位結果が同じ内容の繰り返しではなく、異なるトピックをカバーするようにします。
 
 <Tip>
-`memory_search` が異なる日次ノートからほぼ重複のスニペットばかり返す場合は、
-MMR を有効にしてください。
+`memory_search`が異なる日次ノートからほぼ重複したスニペットを返し続ける場合は、MMRを有効にしてください。
 </Tip>
 
 ### 両方を有効にする
@@ -115,34 +108,27 @@ MMR を有効にしてください。
 }
 ```
 
-## マルチモーダルメモリ
+## マルチモーダルmemory
 
-Gemini Embedding 2 を使うと、Markdown と一緒に画像や音声ファイルも
-インデックス化できます。検索クエリ自体はテキストのままですが、視覚・音声コンテンツにも一致します。セットアップについては [Memory configuration reference](/ja-JP/reference/memory-config) を参照してください。
+Gemini Embedding 2を使うと、Markdownと一緒に画像や音声ファイルもインデックス化できます。検索クエリは引き続きテキストですが、視覚コンテンツや音声コンテンツにも一致します。セットアップについては、[Memory configuration reference](/ja-JP/reference/memory-config)を参照してください。
 
-## セッションメモリ検索
+## セッションmemory search
 
-任意でセッショントランスクリプトをインデックス化して、`memory_search` が
-過去の会話を思い出せるようにできます。これは
-`memorySearch.experimental.sessionMemory` によるオプトインです。詳細は
-[configuration reference](/ja-JP/reference/memory-config) を参照してください。
+必要に応じてセッションtranscriptをインデックス化し、`memory_search`が過去の会話を想起できるようにすることもできます。これは`memorySearch.experimental.sessionMemory`によるオプトインです。詳しくは[configuration reference](/ja-JP/reference/memory-config)を参照してください。
 
 ## トラブルシューティング
 
-**結果が出ない場合**: インデックスを確認するには `openclaw memory status` を実行してください。空であれば
-`openclaw memory index --force` を実行してください。
+**結果が出ない場合**: インデックスを確認するには`openclaw memory status`を実行してください。空の場合は`openclaw memory index --force`を実行します。
 
-**キーワード一致しか出ない場合**: 埋め込みプロバイダが設定されていない可能性があります。`openclaw memory status --deep`
-を確認してください。
+**キーワード一致しか出ない場合**: embedding providerが設定されていない可能性があります。`openclaw memory status --deep`を確認してください。
 
-**CJK テキストが見つからない場合**: 次で FTS インデックスを再構築してください:
-`openclaw memory index --force`。
+**CJKテキストが見つからない場合**: `openclaw memory index --force`でFTSインデックスを再構築してください。
 
-## 参考情報
+## さらに読む
 
-- [Active Memory](/ja-JP/concepts/active-memory) -- 対話型チャットセッション向けのサブエージェントメモリ
-- [Memory](/ja-JP/concepts/memory) -- ファイルレイアウト、バックエンド、ツール
-- [Memory configuration reference](/ja-JP/reference/memory-config) -- すべての設定項目
+- [Active Memory](/ja-JP/concepts/active-memory) -- 対話型チャットセッション向けのsub-agent memory
+- [Memory](/ja-JP/concepts/memory) -- ファイルレイアウト、バックエンド、tools
+- [Memory configuration reference](/ja-JP/reference/memory-config) -- すべてのconfigノブ
 
 ## 関連
 

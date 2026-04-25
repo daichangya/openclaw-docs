@@ -1,26 +1,26 @@
 ---
 read_when:
-    - 詳細な診断のために、トラブルシューティングハブからここに案内されました
-    - 症状ベースで整理された、正確なコマンド付きの安定した手順書セクションが必要です
-summary: Gateway、チャネル、自動化、Node、ブラウザ向けの詳細なトラブルシューティング手順書
+    - トラブルシューティングハブから、より詳細な診断のためにここへ案内されました
+    - 正確なコマンド付きの、安定した症状ベースの runbook セクションが必要な場合
+summary: Gateway、channels、自動化、nodes、および browser 向けの詳細なトラブルシューティング runbook
 title: トラブルシューティング
 x-i18n:
-    generated_at: "2026-04-24T08:57:50Z"
+    generated_at: "2026-04-25T13:49:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 20066bdab03f05304b3a620fbadc38e4dc74b740da151c58673dcf5196e5f1e1
+    source_hash: c2270f05cf34592269894278e1eb75b8d47c02a4ff1c74bf62afb3d8f4fc4640
     source_path: gateway/troubleshooting.md
     workflow: 15
 ---
 
-# Gatewayのトラブルシューティング
+# Gateway のトラブルシューティング
 
-このページは詳細な手順書です。  
-まずは高速なトリアージフローを使いたい場合は[/help/troubleshooting](/ja-JP/help/troubleshooting)から始めてください。
+このページは詳細な runbook です。  
+まず高速なトリアージフローを使いたい場合は、[/help/troubleshooting](/ja-JP/help/troubleshooting) から始めてください。
 
-## コマンドの段階的確認
+## コマンドラダー
 
-まず、次の順序で実行してください。
+まず次のコマンドを、この順番で実行してください。
 
 ```bash
 openclaw status
@@ -30,16 +30,18 @@ openclaw doctor
 openclaw channels status --probe
 ```
 
-正常時に期待されるシグナル:
+想定される正常シグナル:
 
-- `openclaw gateway status`に`Runtime: running`、`Connectivity probe: ok`、および`Capability: ...`行が表示される。
-- `openclaw doctor`が、設定やサービスに関するブロッキングな問題なしと報告する。
-- `openclaw channels status --probe`が、アカウントごとのライブなトランスポート状態と、サポートされている場合は`works`や`audit ok`のようなprobe/audit結果を表示する。
+- `openclaw gateway status` に `Runtime: running`、`Connectivity probe: ok`、および `Capability: ...` 行が表示される。
+- `openclaw doctor` が、ブロッキングな config/service 問題を報告しない。
+- `openclaw channels status --probe` が、アカウントごとのライブな transport status と、
+  対応している場合は `works` や `audit ok` のような probe/audit 結果を表示する。
 
-## 長いコンテキストに対してAnthropic 429で追加利用が必要
+## 長いコンテキストで Anthropic 429 の extra usage required が出る
 
-ログやエラーに次が含まれる場合に使用します:  
-`HTTP 429: rate_limit_error: Extra usage is required for long context requests`.
+ログ/エラーに
+`HTTP 429: rate_limit_error: Extra usage is required for long context requests`
+が含まれる場合は、これを使用してください。
 
 ```bash
 openclaw logs --follow
@@ -47,31 +49,31 @@ openclaw models status
 openclaw config get agents.defaults.models
 ```
 
-確認ポイント:
+確認する点:
 
-- 選択されたAnthropicのOpus/Sonnetモデルで`params.context1m: true`になっている。
-- 現在のAnthropic認証情報が長いコンテキスト利用の対象ではない。
-- 失敗するのが、1Mベータパスを必要とする長いセッションやモデル実行時だけである。
+- 選択されている Anthropic Opus/Sonnet モデルに `params.context1m: true` がある。
+- 現在の Anthropic credential が、long-context usage の対象ではない。
+- リクエストが失敗するのが、1M beta パスを必要とする長いセッション/モデル実行のときだけである。
 
-対処方法:
+修正方法:
 
-1. そのモデルの`context1m`を無効にして、通常のコンテキストウィンドウにフォールバックする。
-2. 長いコンテキストリクエストに対応したAnthropic認証情報を使用するか、Anthropic APIキーに切り替える。
-3. Anthropicの長いコンテキストリクエストが拒否されたときにも実行が継続するよう、フォールバックモデルを設定する。
+1. そのモデルの `context1m` を無効にして、通常のコンテキストウィンドウへ戻す。
+2. long-context request の対象となる Anthropic credential を使うか、Anthropic API key に切り替える。
+3. Anthropic の long-context request が拒否されたときでも実行が継続するように、fallback model を設定する。
 
 関連:
 
-- [/providers/anthropic](/ja-JP/providers/anthropic)
-- [/reference/token-use](/ja-JP/reference/token-use)
-- [/help/faq-first-run#why-am-i-seeing-http-429-ratelimiterror-from-anthropic](/ja-JP/help/faq-first-run#why-am-i-seeing-http-429-ratelimiterror-from-anthropic)
+- [Anthropic](/ja-JP/providers/anthropic)
+- [Token use and costs](/ja-JP/reference/token-use)
+- [Why am I seeing HTTP 429 from Anthropic?](/ja-JP/help/faq-first-run#why-am-i-seeing-http-429-ratelimiterror-from-anthropic)
 
-## ローカルのOpenAI互換バックエンドは直接probeでは通るが、エージェント実行は失敗する
+## ローカルの OpenAI-compatible backend は直接 probe では通るが、agent 実行は失敗する
 
-次の場合に使用します:
+次のような場合に使用します。
 
-- `curl ... /v1/models`は動作する
-- 小さな直接の`/v1/chat/completions`呼び出しは動作する
-- OpenClawのモデル実行が通常のエージェントターンでのみ失敗する
+- `curl ... /v1/models` は動作する
+- 小さな直接 `/v1/chat/completions` 呼び出しは動作する
+- OpenClaw の model 実行が、通常の agent turn でのみ失敗する
 
 ```bash
 curl http://127.0.0.1:1234/v1/models
@@ -82,34 +84,47 @@ openclaw infer model run --model <provider/model> --prompt "hi" --json
 openclaw logs --follow
 ```
 
-確認ポイント:
+確認する点:
 
-- 小さな直接呼び出しは成功するが、OpenClawの実行は大きなプロンプトでのみ失敗する
-- `messages[].content`が文字列であることを期待するバックエンドエラー
-- より大きいプロンプトトークン数や完全なエージェントランタイムプロンプトでのみ発生するバックエンドクラッシュ
+- 直接の小さな呼び出しは成功するが、OpenClaw の実行は大きいプロンプトでのみ失敗する
+- backend エラーに、`messages[].content` が文字列を期待しているという内容がある
+- backend クラッシュが、大きい prompt-token 数や完全な agent
+  runtime prompt でのみ発生する
 
 よくあるシグネチャ:
 
-- `messages[...].content: invalid type: sequence, expected a string` → バックエンドが構造化されたChat Completionsのcontent partsを拒否している。対処: `models.providers.<provider>.models[].compat.requiresStringContent: true`を設定する。
-- 小さな直接リクエストは成功するが、OpenClawのエージェント実行はバックエンド/モデルのクラッシュで失敗する（例: 一部の`inferrs`ビルド上のGemma）→ OpenClawのトランスポートはすでに正しい可能性が高く、バックエンドがより大きいエージェントランタイムのプロンプト形状で失敗している。
-- ツールを無効にすると失敗は減るが消えない → ツールスキーマが負荷の一部だったが、残っている問題は依然として上流のモデル/サーバー容量不足またはバックエンドバグである。
+- `messages[...].content: invalid type: sequence, expected a string` → backend が
+  構造化された Chat Completions content parts を拒否している。修正:  
+  `models.providers.<provider>.models[].compat.requiresStringContent: true` を設定する。
+- 直接の小さなリクエストは成功するが、OpenClaw の agent 実行が backend/model
+  クラッシュで失敗する（例: 一部の `inferrs` ビルド上の Gemma）→ OpenClaw の transport は
+  すでに正しい可能性が高い。backend 側が、より大きい agent-runtime
+  prompt shape で失敗している。
+- tools を無効にすると失敗は減るが消えない → tool schema が
+  負荷の一部だったが、残る問題は依然として upstream の model/server
+  capacity または backend bug である。
 
-対処方法:
+修正方法:
 
-1. 文字列のみのChat Completionsバックエンドには`compat.requiresStringContent: true`を設定する。
-2. OpenClawのツールスキーマ面を安定して処理できないモデル/バックエンドには`compat.supportsTools: false`を設定する。
-3. 可能な範囲でプロンプト負荷を下げる: より小さいワークスペースブートストラップ、より短いセッション履歴、より軽量なローカルモデル、または長いコンテキスト対応がより強いバックエンドを使う。
-4. 小さな直接リクエストが通り続ける一方で、OpenClawのエージェントターンが依然としてバックエンド内部でクラッシュする場合は、上流サーバー/モデルの制限として扱い、受理されたpayload shapeとともにそちらへ再現手順を報告する。
+1. 文字列のみの Chat Completions backend には `compat.requiresStringContent: true` を設定する。
+2. OpenClaw の tool schema surface を確実に扱えない
+   model/backend には `compat.supportsTools: false` を設定する。
+3. 可能な範囲で prompt の負荷を下げる: より小さい workspace bootstrap、より短い
+   session history、より軽い local model、またはより強い long-context
+   support を持つ backend を使う。
+4. 直接の小さなリクエストは通るのに OpenClaw の agent turn が backend 内で依然としてクラッシュする場合、
+   upstream の server/model 制限として扱い、受理される payload shape を添えて
+   そちらに repro を報告する。
 
 関連:
 
-- [/gateway/local-models](/ja-JP/gateway/local-models)
-- [/gateway/configuration](/ja-JP/gateway/configuration)
-- [/gateway/configuration-reference#openai-compatible-endpoints](/ja-JP/gateway/configuration-reference#openai-compatible-endpoints)
+- [Local models](/ja-JP/gateway/local-models)
+- [Configuration](/ja-JP/gateway/configuration)
+- [OpenAI-compatible endpoints](/ja-JP/gateway/configuration-reference#openai-compatible-endpoints)
 
 ## 返信がない
 
-チャネルが起動しているのに何も応答しない場合は、何かを再接続する前にルーティングとポリシーを確認してください。
+channels が稼働していても何も応答しない場合、何かを再接続する前に、ルーティングとポリシーを確認してください。
 
 ```bash
 openclaw status
@@ -119,27 +134,27 @@ openclaw config get channels
 openclaw logs --follow
 ```
 
-確認ポイント:
+確認する点:
 
-- DM送信者に対してペアリングが保留中である。
-- グループでのメンション必須設定（`requireMention`、`mentionPatterns`）。
-- チャネル/グループのallowlist不一致。
+- DM 送信者に対して pairing が pending になっている。
+- グループの mention gating（`requireMention`、`mentionPatterns`）。
+- channel/group allowlist の不一致。
 
 よくあるシグネチャ:
 
-- `drop guild message (mention required` → メンションがあるまでグループメッセージは無視される。
+- `drop guild message (mention required` → mention されるまでグループメッセージは無視される。
 - `pairing request` → 送信者に承認が必要。
-- `blocked` / `allowlist` → 送信者またはチャネルがポリシーによってフィルタされた。
+- `blocked` / `allowlist` → 送信者/channel がポリシーによりフィルタされた。
 
 関連:
 
-- [/channels/troubleshooting](/ja-JP/channels/troubleshooting)
-- [/channels/pairing](/ja-JP/channels/pairing)
-- [/channels/groups](/ja-JP/channels/groups)
+- [Channel troubleshooting](/ja-JP/channels/troubleshooting)
+- [Pairing](/ja-JP/channels/pairing)
+- [Groups](/ja-JP/channels/groups)
 
-## Dashboard control UIの接続性
+## Dashboard control ui の接続性
 
-dashboard/control UIが接続できない場合は、URL、認証モード、セキュアコンテキスト前提を検証してください。
+dashboard/control UI が接続できない場合、URL、auth mode、および secure context 前提を検証してください。
 
 ```bash
 openclaw gateway status
@@ -149,38 +164,46 @@ openclaw doctor
 openclaw gateway status --json
 ```
 
-確認ポイント:
+確認する点:
 
-- 正しいprobe URLとdashboard URL。
-- クライアントとgateway間での認証モード/トークン不一致。
-- デバイスIDが必要な場面でHTTPを使用している。
+- 正しい probe URL と dashboard URL。
+- client と gateway の間で auth mode/token が一致している。
+- device identity が必要な場面で HTTP を使っている。
 
 よくあるシグネチャ:
 
-- `device identity required` → 非セキュアコンテキスト、またはデバイス認証がない。
-- `origin not allowed` → ブラウザの`Origin`が`gateway.controlUi.allowedOrigins`に含まれていない（または、非loopbackのブラウザoriginから明示的allowlistなしで接続している）。
-- `device nonce required` / `device nonce mismatch` → クライアントがチャレンジベースのデバイス認証フロー（`connect.challenge` + `device.nonce`）を完了していない。
-- `device signature invalid` / `device signature expired` → クライアントが現在のハンドシェイクに対して誤ったpayload（または古いタイムスタンプ）に署名している。
-- `AUTH_TOKEN_MISMATCH`かつ`canRetryWithDeviceToken=true` → クライアントはキャッシュされたデバイストークンで1回だけ信頼済み再試行ができる。
-- そのキャッシュトークン再試行では、ペア済みデバイストークンとともに保存されたキャッシュ済みスコープセットが再利用される。明示的な`deviceToken` / 明示的な`scopes`呼び出し元は、要求したスコープセットをそのまま保持する。
-- その再試行パス以外では、接続認証の優先順位は、明示的な共有トークン/パスワードが先、次に明示的`deviceToken`、次に保存済みデバイストークン、最後にbootstrapトークン。
-- 非同期のTailscale Serve Control UIパスでは、同じ`{scope, ip}`に対する失敗試行は、リミッターが失敗を記録する前に直列化される。したがって、同じクライアントからの不正な同時再試行2件では、2件とも通常の不一致になる代わりに、2件目で`retry later`が出ることがある。
-- ブラウザoriginのloopbackクライアントからの`too many failed authentication attempts (retry later)` → 同じ正規化済み`Origin`からの繰り返し失敗は一時的にロックアウトされる。別のlocalhost originは別バケットを使う。
-- その再試行後も`unauthorized`が続く → 共有トークン/デバイストークンのずれ。必要に応じてトークン設定を更新し、デバイストークンを再承認/ローテーションする。
-- `gateway connect failed:` → host/port/urlの対象が誤っている。
+- `device identity required` → non-secure context または device auth の欠落。
+- `origin not allowed` → browser の `Origin` が `gateway.controlUi.allowedOrigins`
+  に含まれていない（または、明示的な allowlist なしで non-loopback の browser origin から接続している）。
+- `device nonce required` / `device nonce mismatch` → client が
+  チャレンジベースの device auth フロー（`connect.challenge` + `device.nonce`）を完了していない。
+- `device signature invalid` / `device signature expired` → client が現在の handshake に対して
+  誤った payload（または古い timestamp）に署名している。
+- `AUTH_TOKEN_MISMATCH` で `canRetryWithDeviceToken=true` → client はキャッシュ済み device token で 1 回だけ trusted retry できる。
+- その cached-token retry では、承認済み device token とともに保存された
+  cached scope set を再利用する。明示的な `deviceToken` / 明示的な `scopes` 呼び出し元は、要求した scope set を維持する。
+- その retry path の外では、connect auth の優先順位は、明示的な shared
+  token/password が最優先で、その次が明示的な `deviceToken`、その次が保存済み device token、
+  最後が bootstrap token。
+- 非同期の Tailscale Serve Control UI パスでは、同じ `{scope, ip}` に対する失敗した試行は、
+  limiter が失敗を記録する前に直列化される。そのため、同じ client からの 2 回の不正な同時 retry では、
+  2 回とも単純な mismatch ではなく、2 回目で `retry later` が出ることがある。
+- browser-origin の loopback client からの `too many failed authentication attempts (retry later)` → 同じ正規化された `Origin` からの繰り返し失敗は一時的にロックアウトされる。別の localhost origin は別バケットを使う。
+- その retry 後も繰り返し `unauthorized` → shared token/device token の不整合。token config を更新し、必要なら device token を再承認/ローテーションする。
+- `gateway connect failed:` → host/port/url target が誤っている。
 
-### 認証詳細コードのクイック対応表
+### Auth detail code クイックマップ
 
-失敗した`connect`レスポンスの`error.details.code`を使って次の対応を決めてください。
+失敗した `connect` レスポンスの `error.details.code` を使って、次のアクションを選んでください。
 
-| 詳細コード                   | 意味                                                                                                                                                                      | 推奨アクション                                                                                                                                                                                                                                                                          |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_TOKEN_MISSING`         | クライアントが必要な共有トークンを送信していない。                                                                                                                        | クライアントにトークンを貼り付け/設定して再試行する。dashboard系では: `openclaw config get gateway.auth.token`を実行し、その値をControl UI設定に貼り付ける。                                                                                                                        |
-| `AUTH_TOKEN_MISMATCH`        | 共有トークンがgateway認証トークンと一致しなかった。                                                                                                                       | `canRetryWithDeviceToken=true`なら、信頼済み再試行を1回許可する。キャッシュトークン再試行では保存済み承認スコープが再利用される。明示的な`deviceToken` / `scopes`呼び出し元は要求スコープを保持する。それでも失敗するなら、[token drift recovery checklist](/ja-JP/cli/devices#token-drift-recovery-checklist)を実行する。 |
-| `AUTH_DEVICE_TOKEN_MISMATCH` | キャッシュされたデバイスごとのトークンが古いか失効している。                                                                                                               | [devices CLI](/ja-JP/cli/devices)を使ってデバイストークンをローテーション/再承認してから再接続する。                                                                                                                                                                                       |
-| `PAIRING_REQUIRED`           | デバイスIDに承認が必要。`error.details.reason`で`not-paired`、`scope-upgrade`、`role-upgrade`、`metadata-upgrade`を確認し、存在する場合は`requestId` / `remediationHint`を使う。 | 保留中リクエストを承認する: `openclaw devices list`を実行し、その後`openclaw devices approve <requestId>`を実行する。スコープ/ロールのアップグレードも、要求されたアクセスを確認したうえで同じフローを使う。                                                                      |
+| Detail code                  | 意味                                                                                                                                                                                         | 推奨アクション                                                                                                                                                                                                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_TOKEN_MISSING`         | client が必須の shared token を送信していない。                                                                                                                                            | client に token を貼り付け/設定して再試行する。dashboard パスでは: `openclaw config get gateway.auth.token` を実行し、Control UI settings に貼り付ける。                                                                                                                       |
+| `AUTH_TOKEN_MISMATCH`        | shared token が gateway auth token と一致しなかった。                                                                                                                                       | `canRetryWithDeviceToken=true` なら、trusted retry を 1 回許可する。cached-token retry は保存済みの承認スコープを再利用し、明示的な `deviceToken` / `scopes` 呼び出し元は要求した scope を維持する。それでも失敗する場合は [token drift recovery checklist](/ja-JP/cli/devices#token-drift-recovery-checklist) を実行する。 |
+| `AUTH_DEVICE_TOKEN_MISMATCH` | デバイスごとのキャッシュ済み token が古いか失効している。                                                                                                                                   | [devices CLI](/ja-JP/cli/devices) を使って device token をローテーション/再承認し、その後再接続する。                                                                                                                                                                                  |
+| `PAIRING_REQUIRED`           | device identity に承認が必要。`error.details.reason` の `not-paired`、`scope-upgrade`、`role-upgrade`、`metadata-upgrade` を確認し、存在する場合は `requestId` / `remediationHint` を使う。 | pending request を承認する: `openclaw devices list`、次に `openclaw devices approve <requestId>`。scope/role upgrade も、要求されたアクセスを確認した後は同じフローを使う。                                                                                                   |
 
-device auth v2移行確認:
+Device auth v2 の移行確認:
 
 ```bash
 openclaw --version
@@ -188,61 +211,63 @@ openclaw doctor
 openclaw gateway status
 ```
 
-ログにnonce/signatureエラーが出る場合は、接続側クライアントを更新し、次を確認してください。
+ログに nonce/signature エラーが出る場合は、接続側 client を更新し、次を確認してください。
 
-1. `connect.challenge`を待機する
-2. challengeに束縛されたpayloadへ署名する
-3. 同じchallenge nonceで`connect.params.device.nonce`を送信する
+1. `connect.challenge` を待機する
+2. challenge に結び付いた payload に署名する
+3. 同じ challenge nonce を使って `connect.params.device.nonce` を送信する
 
-`openclaw devices rotate` / `revoke` / `remove`が予期せず拒否される場合:
+`openclaw devices rotate` / `revoke` / `remove` が予期せず拒否される場合:
 
-- ペア済みデバイストークンセッションは、呼び出し元が`operator.admin`も持っていない限り、**自分自身の**デバイスしか管理できない
-- `openclaw devices rotate --scope ...`は、呼び出し元セッションがすでに保持しているoperatorスコープのみ要求できる
+- paired-device token session は、呼び出し元が
+  `operator.admin` も持っていない限り、**自分自身の** device しか管理できない
+- `openclaw devices rotate --scope ...` は、呼び出し元 session が
+  すでに保持している operator scope しか要求できない
 
 関連:
 
-- [/web/control-ui](/ja-JP/web/control-ui)
-- [/gateway/configuration](/ja-JP/gateway/configuration)（gateway認証モード）
-- [/gateway/trusted-proxy-auth](/ja-JP/gateway/trusted-proxy-auth)
-- [/gateway/remote](/ja-JP/gateway/remote)
-- [/cli/devices](/ja-JP/cli/devices)
+- [Control UI](/ja-JP/web/control-ui)
+- [Configuration](/ja-JP/gateway/configuration)（gateway auth mode）
+- [Trusted proxy auth](/ja-JP/gateway/trusted-proxy-auth)
+- [Remote access](/ja-JP/gateway/remote)
+- [Devices](/ja-JP/cli/devices)
 
-## Gatewayサービスが動作していない
+## Gateway service が動作していない
 
-サービスはインストールされているが、プロセスが起動し続けない場合に使用します。
+service はインストールされているが、process が稼働し続けない場合に使用します。
 
 ```bash
 openclaw gateway status
 openclaw status
 openclaw logs --follow
 openclaw doctor
-openclaw gateway status --deep   # システムレベルのサービスもスキャン
+openclaw gateway status --deep   # system-level service もスキャン
 ```
 
-確認ポイント:
+確認する点:
 
-- 終了のヒント付きで`Runtime: stopped`になっている。
-- サービス設定の不一致（`Config (cli)`と`Config (service)`）。
-- ポート/リスナー競合。
-- `--deep`使用時に、余分なlaunchd/systemd/schtasksインストールがある。
-- `Other gateway-like services detected (best effort)`のクリーンアップヒント。
+- `Runtime: stopped` と exit hint が表示される。
+- service config の不一致（`Config (cli)` と `Config (service)`）。
+- port/listener の競合。
+- `--deep` 使用時の、追加の launchd/systemd/schtasks インストール。
+- `Other gateway-like services detected (best effort)` の cleanup hint。
 
 よくあるシグネチャ:
 
-- `Gateway start blocked: set gateway.mode=local` または `existing config is missing gateway.mode` → ローカルGatewayモードが有効になっていないか、設定ファイルが壊れて`gateway.mode`が失われています。対処: 設定で`gateway.mode="local"`を設定するか、`openclaw onboard --mode local`または`openclaw setup`を再実行して、想定されるローカルモード設定を再作成してください。Podman経由でOpenClawを実行している場合、デフォルトの設定パスは`~/.openclaw/openclaw.json`です。
-- `refusing to bind gateway ... without auth` → 有効なgateway認証経路（token/password、または設定済みのtrusted-proxy）がない状態で、非loopback bindを行おうとしています。
-- `another gateway instance is already listening` / `EADDRINUSE` → ポート競合です。
-- `Other gateway-like services detected (best effort)` → 古い、または並行するlaunchd/systemd/schtasksユニットが存在します。ほとんどの構成では、1台のマシンにつき1つのGatewayにするべきです。複数必要な場合は、ポート、設定/状態、ワークスペースを分離してください。[/gateway#multiple-gateways-same-host](/ja-JP/gateway#multiple-gateways-same-host)を参照してください。
+- `Gateway start blocked: set gateway.mode=local` または `existing config is missing gateway.mode` → local gateway mode が有効ではない、または config file が壊れて `gateway.mode` を失っています。修正: config に `gateway.mode="local"` を設定するか、`openclaw onboard --mode local` / `openclaw setup` を再実行して、期待される local-mode config を再スタンプしてください。OpenClaw を Podman 経由で実行している場合、デフォルトの config path は `~/.openclaw/openclaw.json` です。
+- `refusing to bind gateway ... without auth` → 有効な gateway auth 経路（token/password、または設定済みの trusted-proxy）がない状態で non-loopback bind をしようとしている。
+- `another gateway instance is already listening` / `EADDRINUSE` → port 競合。
+- `Other gateway-like services detected (best effort)` → 古い、または並列の launchd/systemd/schtasks unit が存在する。多くの構成では 1 台のマシンにつき 1 つの gateway にすべきです。複数必要な場合は、port + config/state/workspace を分離してください。[/gateway#multiple-gateways-same-host](/ja-JP/gateway#multiple-gateways-same-host) を参照してください。
 
 関連:
 
-- [/gateway/background-process](/ja-JP/gateway/background-process)
-- [/gateway/configuration](/ja-JP/gateway/configuration)
-- [/gateway/doctor](/ja-JP/gateway/doctor)
+- [Background exec and process tool](/ja-JP/gateway/background-process)
+- [Configuration](/ja-JP/gateway/configuration)
+- [Doctor](/ja-JP/gateway/doctor)
 
-## Gatewayがlast-known-good設定を復元した
+## Gateway が last-known-good config を復元した
 
-Gatewayは起動するものの、ログに`openclaw.json`を復元したと出る場合に使用します。
+Gateway は起動するが、ログに `openclaw.json` を復元したとある場合に使用します。
 
 ```bash
 openclaw logs --follow
@@ -251,20 +276,23 @@ openclaw config validate
 openclaw doctor
 ```
 
-確認ポイント:
+確認する点:
 
 - `Config auto-restored from last-known-good`
 - `gateway: invalid config was restored from last-known-good backup`
 - `config reload restored last-known-good config after invalid-config`
-- アクティブな設定の横にタイムスタンプ付きの`openclaw.json.clobbered.*`ファイルがある
-- `Config recovery warning`で始まるメインエージェントのシステムイベントがある
+- アクティブな config の横に、タイムスタンプ付きの `openclaw.json.clobbered.*` ファイルがある
+- `Config recovery warning` で始まる main-agent system event がある
 
-起きたこと:
+何が起きたか:
 
-- 拒否された設定が、起動時またはホットリロード時の検証を通らなかった。
-- OpenClawは拒否されたpayloadを`.clobbered.*`として保存した。
-- アクティブな設定は、最後に検証済みだったlast-known-goodのコピーから復元された。
-- 次回のメインエージェントターンでは、拒否された設定を無条件に書き直さないよう警告される。
+- 拒否された config が、起動時またはホットリロード時の検証に通らなかった。
+- OpenClaw は、その拒否された payload を `.clobbered.*` として保存した。
+- アクティブな config は、最後に検証済みだった last-known-good コピーから復元された。
+- 次の main-agent turn には、拒否された config を無造作に再書き込みしないよう警告が出る。
+- 検証問題がすべて `plugins.entries.<id>...` 配下だけだった場合、OpenClaw は
+  ファイル全体を復元しない。Plugin ローカルの失敗は目立つままにしつつ、無関係な
+  ユーザー設定はアクティブな config に残す。
 
 確認と修復:
 
@@ -278,29 +306,29 @@ openclaw doctor
 
 よくあるシグネチャ:
 
-- `.clobbered.*`が存在する → 外部からの直接編集、または起動時の読み込み内容が復元された。
-- `.rejected.*`が存在する → OpenClaw自身による設定書き込みが、コミット前にスキーマまたはclobberチェックに失敗した。
-- `Config write rejected:` → 必須のshapeを落とす、ファイルサイズを大きく縮小する、または無効な設定を永続化しようとした。
-- `missing-meta-vs-last-good`、`gateway-mode-missing-vs-last-good`、または`size-drop-vs-last-good:*` → 起動時に、last-known-goodバックアップと比べてフィールドやサイズが失われていたため、現在のファイルを破損済みとして扱った。
-- `Config last-known-good promotion skipped` → 候補に`***`のような秘匿済みシークレットプレースホルダーが含まれていた。
+- `.clobbered.*` が存在する → 外部からの直接編集または起動時読み込みが復元された。
+- `.rejected.*` が存在する → OpenClaw 管理の config 書き込みが、コミット前に schema または clobber チェックに失敗した。
+- `Config write rejected:` → 書き込みが、必須 shape を欠落させる、ファイルサイズを急激に縮小させる、または無効な config を永続化しようとした。
+- `missing-meta-vs-last-good`、`gateway-mode-missing-vs-last-good`、または `size-drop-vs-last-good:*` → 現在のファイルが、last-known-good backup と比較してフィールドやサイズを失っていたため、起動時に clobbered と判定された。
+- `Config last-known-good promotion skipped` → 候補に `***` のような redact 済み secret placeholder が含まれていた。
 
-対処方法:
+修正方法:
 
-1. 復元されたアクティブ設定が正しいなら、そのまま使う。
-2. `.clobbered.*`または`.rejected.*`から意図したキーだけをコピーし、`openclaw config set`または`config.patch`で適用する。
-3. 再起動前に`openclaw config validate`を実行する。
-4. 手動編集する場合は、変更したい部分オブジェクトだけでなく、JSON5設定全体を保つ。
+1. 復元されたアクティブ config が正しければ、それをそのまま維持する。
+2. `.clobbered.*` または `.rejected.*` から意図したキーだけをコピーし、`openclaw config set` または `config.patch` で適用する。
+3. 再起動前に `openclaw config validate` を実行する。
+4. 手作業で編集する場合は、変更したい部分の部分オブジェクトだけではなく、完全な JSON5 config を維持する。
 
 関連:
 
-- [/gateway/configuration#strict-validation](/ja-JP/gateway/configuration#strict-validation)
-- [/gateway/configuration#config-hot-reload](/ja-JP/gateway/configuration#config-hot-reload)
-- [/cli/config](/ja-JP/cli/config)
-- [/gateway/doctor](/ja-JP/gateway/doctor)
+- [Configuration: strict validation](/ja-JP/gateway/configuration#strict-validation)
+- [Configuration: hot reload](/ja-JP/gateway/configuration#config-hot-reload)
+- [Config](/ja-JP/cli/config)
+- [Doctor](/ja-JP/gateway/doctor)
 
-## Gateway probe警告
+## Gateway probe warnings
 
-`openclaw gateway probe`が何かに到達しているものの、なお警告ブロックを表示する場合に使用します。
+`openclaw gateway probe` が何かには到達するが、それでも warning block を表示する場合に使用します。
 
 ```bash
 openclaw gateway probe
@@ -308,28 +336,28 @@ openclaw gateway probe --json
 openclaw gateway probe --ssh user@gateway-host
 ```
 
-確認ポイント:
+確認する点:
 
-- JSON出力内の`warnings[].code`と`primaryTargetId`。
-- 警告がSSHフォールバック、複数Gateway、不足スコープ、または未解決の認証参照に関するものかどうか。
+- JSON 出力の `warnings[].code` と `primaryTargetId`。
+- warning が SSH fallback、複数 gateway、scope 欠落、または未解決 auth ref に関するものかどうか。
 
 よくあるシグネチャ:
 
-- `SSH tunnel failed to start; falling back to direct probes.` → SSH設定に失敗したが、コマンドは設定済みまたはloopbackの対象へ直接probeを試みた。
-- `multiple reachable gateways detected` → 複数の対象が応答した。通常は意図した複数Gateway構成か、古い/重複リスナーがあることを意味する。
-- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → 接続自体は成功したが、詳細RPCはスコープ制限を受けている。デバイスIDをペアリングするか、`operator.read`を持つ認証情報を使用する。
-- `Capability: pairing-pending` または `gateway closed (1008): pairing required` → Gatewayは応答したが、このクライアントは通常のoperatorアクセス前にまだペアリング/承認が必要。
-- 未解決の`gateway.auth.*` / `gateway.remote.*` SecretRef警告文 → 失敗した対象に対するこのコマンド経路では認証情報が利用できなかった。
+- `SSH tunnel failed to start; falling back to direct probes.` → SSH セットアップが失敗したが、コマンドは引き続き、設定済み/loopback target への direct probe を試した。
+- `multiple reachable gateways detected` → 複数の target が応答した。通常は、意図的な multi-gateway 構成か、古い/重複 listener を意味する。
+- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → connect は成功したが、detail RPC は scope により制限されている。device identity を pair するか、`operator.read` を持つ credential を使用する。
+- `Capability: pairing-pending` または `gateway closed (1008): pairing required` → gateway は応答しているが、この client は通常の operator access 前に pairing/approval が必要。
+- 未解決の `gateway.auth.*` / `gateway.remote.*` SecretRef warning text → このコマンド経路で、その失敗 target 向けの auth material が利用できなかった。
 
 関連:
 
-- [/cli/gateway](/ja-JP/cli/gateway)
-- [/gateway#multiple-gateways-same-host](/ja-JP/gateway#multiple-gateways-same-host)
-- [/gateway/remote](/ja-JP/gateway/remote)
+- [Gateway](/ja-JP/cli/gateway)
+- [Multiple gateways on the same host](/ja-JP/gateway#multiple-gateways-same-host)
+- [Remote access](/ja-JP/gateway/remote)
 
-## チャネルは接続済みだがメッセージが流れない
+## Channel は接続されているがメッセージが流れない
 
-チャネル状態は接続済みなのにメッセージフローが止まっている場合は、ポリシー、権限、チャネル固有の配信ルールに注目してください。
+channel の状態は connected なのに message flow が止まっている場合は、policy、permission、および channel 固有の配信ルールに注目してください。
 
 ```bash
 openclaw channels status --probe
@@ -339,28 +367,28 @@ openclaw logs --follow
 openclaw config get channels
 ```
 
-確認ポイント:
+確認する点:
 
-- DMポリシー（`pairing`、`allowlist`、`open`、`disabled`）。
-- グループallowlistとメンション必須設定。
-- 不足しているチャネルAPI権限/スコープ。
+- DM policy（`pairing`、`allowlist`、`open`、`disabled`）。
+- Group allowlist と mention requirement。
+- channel API permission/scope の欠落。
 
 よくあるシグネチャ:
 
-- `mention required` → グループメンションポリシーによりメッセージが無視された。
-- `pairing` / 保留中承認のトレース → 送信者が未承認。
-- `missing_scope`、`not_in_channel`、`Forbidden`、`401/403` → チャネル認証/権限の問題。
+- `mention required` → グループ mention ポリシーによりメッセージが無視された。
+- `pairing` / pending approval traces → 送信者が未承認。
+- `missing_scope`、`not_in_channel`、`Forbidden`、`401/403` → channel auth/permission の問題。
 
 関連:
 
-- [/channels/troubleshooting](/ja-JP/channels/troubleshooting)
-- [/channels/whatsapp](/ja-JP/channels/whatsapp)
-- [/channels/telegram](/ja-JP/channels/telegram)
-- [/channels/discord](/ja-JP/channels/discord)
+- [Channel troubleshooting](/ja-JP/channels/troubleshooting)
+- [WhatsApp](/ja-JP/channels/whatsapp)
+- [Telegram](/ja-JP/channels/telegram)
+- [Discord](/ja-JP/channels/discord)
 
-## CronとHeartbeatの配信
+## Cron と Heartbeat の配信
 
-CronまたはHeartbeatが実行されなかった、または配信されなかった場合は、まずスケジューラー状態を確認し、その後配信先を確認してください。
+Cron または Heartbeat が実行されなかった、または配信されなかった場合は、まず scheduler の状態を確認し、その後で配信 target を確認してください。
 
 ```bash
 openclaw cron status
@@ -370,31 +398,31 @@ openclaw system heartbeat last
 openclaw logs --follow
 ```
 
-確認ポイント:
+確認する点:
 
-- Cronが有効で、次回起動時刻がある。
-- ジョブ実行履歴の状態（`ok`、`skipped`、`error`）。
-- Heartbeatのスキップ理由（`quiet-hours`、`requests-in-flight`、`alerts-disabled`、`empty-heartbeat-file`、`no-tasks-due`）。
+- Cron が有効で、次の wake が存在する。
+- Job run history の status（`ok`、`skipped`、`error`）。
+- Heartbeat skip reason（`quiet-hours`、`requests-in-flight`、`alerts-disabled`、`empty-heartbeat-file`、`no-tasks-due`）。
 
 よくあるシグネチャ:
 
-- `cron: scheduler disabled; jobs will not run automatically` → Cronが無効。
-- `cron: timer tick failed` → スケジューラーのtickに失敗。ファイル/ログ/ランタイムエラーを確認する。
-- `heartbeat skipped` かつ `reason=quiet-hours` → アクティブ時間帯の外。
-- `heartbeat skipped` かつ `reason=empty-heartbeat-file` → `HEARTBEAT.md`は存在するが、空行またはMarkdown見出ししか含まれていないため、OpenClawがモデル呼び出しをスキップしている。
-- `heartbeat skipped` かつ `reason=no-tasks-due` → `HEARTBEAT.md`に`tasks:`ブロックはあるが、このtick時点で期限が来ているタスクがない。
-- `heartbeat: unknown accountId` → Heartbeat配信先のaccount idが無効。
-- `heartbeat skipped` かつ `reason=dm-blocked` → Heartbeat対象がDM形式の宛先に解決された一方で、`agents.defaults.heartbeat.directPolicy`（またはエージェントごとの上書き）が`block`に設定されている。
+- `cron: scheduler disabled; jobs will not run automatically` → cron が無効。
+- `cron: timer tick failed` → scheduler tick が失敗。file/log/runtime error を確認する。
+- `heartbeat skipped` で `reason=quiet-hours` → アクティブ時間帯の外側。
+- `heartbeat skipped` で `reason=empty-heartbeat-file` → `HEARTBEAT.md` は存在するが、空行または markdown header しか含まれていないため、OpenClaw が model call をスキップした。
+- `heartbeat skipped` で `reason=no-tasks-due` → `HEARTBEAT.md` に `tasks:` block はあるが、この tick では期限到来タスクがない。
+- `heartbeat: unknown accountId` → Heartbeat 配信 target の account id が無効。
+- `heartbeat skipped` で `reason=dm-blocked` → Heartbeat target が DM 形式の宛先に解決されたが、`agents.defaults.heartbeat.directPolicy`（またはエージェントごとの override）が `block` に設定されている。
 
 関連:
 
-- [/automation/cron-jobs#troubleshooting](/ja-JP/automation/cron-jobs#troubleshooting)
-- [/automation/cron-jobs](/ja-JP/automation/cron-jobs)
-- [/gateway/heartbeat](/ja-JP/gateway/heartbeat)
+- [Scheduled tasks: troubleshooting](/ja-JP/automation/cron-jobs#troubleshooting)
+- [Scheduled tasks](/ja-JP/automation/cron-jobs)
+- [Heartbeat](/ja-JP/gateway/heartbeat)
 
-## Nodeのペア済みツールが失敗する
+## ペアリング済み Node でツールが失敗する
 
-Nodeはペア済みだがツールが失敗する場合は、フォアグラウンド、権限、承認状態を切り分けてください。
+node はペアリング済みだがツールが失敗する場合は、foreground、permission、および approval state を切り分けてください。
 
 ```bash
 openclaw nodes status
@@ -404,28 +432,28 @@ openclaw logs --follow
 openclaw status
 ```
 
-確認ポイント:
+確認する点:
 
-- Nodeがオンラインで、期待される機能を持っている。
-- カメラ/マイク/位置情報/画面に対するOS権限が付与されている。
-- exec承認とallowlist状態。
+- 期待した capability を持つ node が online である。
+- camera/mic/location/screen に対する OS permission が付与されている。
+- Exec approval と allowlist の状態。
 
 よくあるシグネチャ:
 
-- `NODE_BACKGROUND_UNAVAILABLE` → Nodeアプリがフォアグラウンドにある必要がある。
-- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → OS権限が不足している。
-- `SYSTEM_RUN_DENIED: approval required` → exec承認が保留中。
-- `SYSTEM_RUN_DENIED: allowlist miss` → コマンドがallowlistでブロックされた。
+- `NODE_BACKGROUND_UNAVAILABLE` → node app が foreground である必要がある。
+- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → OS permission が不足している。
+- `SYSTEM_RUN_DENIED: approval required` → exec approval が pending。
+- `SYSTEM_RUN_DENIED: allowlist miss` → command が allowlist によりブロックされた。
 
 関連:
 
-- [/nodes/troubleshooting](/ja-JP/nodes/troubleshooting)
-- [/nodes/index](/ja-JP/nodes/index)
-- [/tools/exec-approvals](/ja-JP/tools/exec-approvals)
+- [Node troubleshooting](/ja-JP/nodes/troubleshooting)
+- [Nodes](/ja-JP/nodes/index)
+- [Exec approvals](/ja-JP/tools/exec-approvals)
 
-## ブラウザツールが失敗する
+## Browser tool が失敗する
 
-Gateway自体は正常なのにブラウザツールの操作が失敗する場合に使用します。
+gateway 自体は正常なのに browser tool のアクションが失敗する場合に使用します。
 
 ```bash
 openclaw browser status
@@ -435,46 +463,46 @@ openclaw logs --follow
 openclaw doctor
 ```
 
-確認ポイント:
+確認する点:
 
-- `plugins.allow`が設定されていて、`browser`を含んでいるかどうか。
-- 有効なブラウザ実行ファイルパス。
-- CDPプロファイルに到達可能かどうか。
-- `existing-session` / `user`プロファイル用のローカルChromeが利用可能かどうか。
+- `plugins.allow` が設定されていて、`browser` を含んでいるか。
+- browser executable path が有効か。
+- CDP profile に到達できるか。
+- `existing-session` / `user` profile 用のローカル Chrome が利用可能か。
 
 よくあるシグネチャ:
 
-- `unknown command "browser"` または `unknown command 'browser'` → 同梱のbrowser Pluginが`plugins.allow`によって除外されています。
-- `browser`ツールが見つからない / 利用不可なのに`browser.enabled=true` → `plugins.allow`が`browser`を除外しているため、Pluginが読み込まれていません。
-- `Failed to start Chrome CDP on port` → ブラウザプロセスの起動に失敗しました。
-- `browser.executablePath not found` → 設定されたパスが無効です。
-- `browser.cdpUrl must be http(s) or ws(s)` → 設定されたCDP URLが`file:`や`ftp:`のような未対応スキームを使っています。
-- `browser.cdpUrl has invalid port` → 設定されたCDP URLのポートが不正、または範囲外です。
-- `Could not find DevToolsActivePort for chrome` → Chrome MCP existing-sessionが、選択したブラウザデータディレクトリへまだ接続できません。ブラウザのinspectページを開き、remote debuggingを有効にし、ブラウザを開いたままにして、最初の接続プロンプトを承認してから再試行してください。サインイン状態が不要なら、管理対象の`openclaw`プロファイルを優先してください。
-- `No Chrome tabs found for profile="user"` → Chrome MCPのattachプロファイルに、開いているローカルChromeタブがありません。
-- `Remote CDP for profile "<name>" is not reachable` → 設定されたリモートCDPエンドポイントへGatewayホストから到達できません。
-- `Browser attachOnly is enabled ... not reachable` または `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-onlyプロファイルに到達可能な対象がないか、HTTPエンドポイントは応答してもCDP WebSocketをまだ開けませんでした。
-- `Playwright is not available in this gateway build; '<feature>' is unsupported.` → 現在のGatewayインストールには、同梱browser Pluginの`playwright-core`ランタイム依存関係がありません。`openclaw doctor --fix`を実行し、その後Gatewayを再起動してください。ARIAスナップショットと基本的なページスクリーンショットは引き続き使えますが、ナビゲーション、AIスナップショット、CSSセレクターによる要素スクリーンショット、PDFエクスポートは利用できないままです。
-- `fullPage is not supported for element screenshots` → スクリーンショット要求で`--full-page`と`--ref`または`--element`を混在させています。
-- `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session`のスクリーンショット呼び出しでは、CSSの`--element`ではなく、ページキャプチャまたはスナップショットの`--ref`を使う必要があります。
-- `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCPのアップロードフックでは、CSSセレクターではなくスナップショット参照を使う必要があります。
-- `existing-session file uploads currently support one file at a time.` → Chrome MCPプロファイルでは、1回の呼び出しにつき1ファイルずつアップロードしてください。
-- `existing-session dialog handling does not support timeoutMs.` → Chrome MCPプロファイルのダイアログフックでは、timeout上書きはサポートされていません。
-- `existing-session type does not support timeoutMs overrides.` → `profile="user"` / Chrome MCP existing-sessionプロファイルで`act:type`に対して`timeoutMs`を指定しないでください。カスタムtimeoutが必要な場合は、管理対象またはCDPブラウザプロファイルを使ってください。
-- `existing-session evaluate does not support timeoutMs overrides.` → `profile="user"` / Chrome MCP existing-sessionプロファイルで`act:evaluate`に対して`timeoutMs`を指定しないでください。カスタムtimeoutが必要な場合は、管理対象またはCDPブラウザプロファイルを使ってください。
-- `response body is not supported for existing-session profiles yet.` → `responsebody`は、現時点では管理対象ブラウザまたは生のCDPプロファイルが必要です。
-- attach-onlyまたはリモートCDPプロファイルでviewport / dark-mode / locale / offline上書きが古いまま残る → `openclaw browser stop --browser-profile <name>`を実行して、Gateway全体を再起動せずに、アクティブな制御セッションを閉じてPlaywright/CDPのエミュレーション状態を解放してください。
+- `unknown command "browser"` または `unknown command 'browser'` → バンドル済み browser Plugin が `plugins.allow` によって除外されている。
+- `browser` ツールが見つからない / 利用不可なのに `browser.enabled=true` → `plugins.allow` が `browser` を除外しているため、Plugin が読み込まれていない。
+- `Failed to start Chrome CDP on port` → browser process の起動に失敗した。
+- `browser.executablePath not found` → 設定されたパスが無効。
+- `browser.cdpUrl must be http(s) or ws(s)` → 設定された CDP URL が `file:` や `ftp:` のような未対応スキームを使っている。
+- `browser.cdpUrl has invalid port` → 設定された CDP URL の port が不正または範囲外。
+- `Could not find DevToolsActivePort for chrome` → Chrome MCP existing-session が、選択された browser data dir にまだアタッチできていない。browser の inspect page を開き、remote debugging を有効にし、browser を開いたままにして、最初の attach prompt を承認してから再試行する。サインイン状態が不要なら、管理対象の `openclaw` profile を優先する。
+- `No Chrome tabs found for profile="user"` → Chrome MCP attach profile に、ローカルの開いている Chrome タブがない。
+- `Remote CDP for profile "<name>" is not reachable` → 設定されたリモート CDP endpoint に gateway host から到達できない。
+- `Browser attachOnly is enabled ... not reachable` または `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profile に到達可能な target がない、または HTTP endpoint は応答したが CDP WebSocket を開けなかった。
+- `Playwright is not available in this gateway build; '<feature>' is unsupported.` → 現在の gateway install には、バンドル済み browser Plugin の `playwright-core` ランタイム依存関係がない。`openclaw doctor --fix` を実行し、その後 gateway を再起動する。ARIA snapshot と基本的な page screenshot は引き続き動作するが、navigation、AI snapshot、CSS selector による element screenshot、PDF export は引き続き利用できない。
+- `fullPage is not supported for element screenshots` → screenshot request で `--full-page` と `--ref` または `--element` を混在させている。
+- `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session` の screenshot 呼び出しでは、CSS `--element` ではなく page capture または snapshot `--ref` を使う必要がある。
+- `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCP の upload hook には CSS selector ではなく snapshot ref が必要。
+- `existing-session file uploads currently support one file at a time.` → Chrome MCP profile では、1 回の呼び出しにつき 1 ファイルずつ upload する。
+- `existing-session dialog handling does not support timeoutMs.` → Chrome MCP profile の dialog hook は timeout override をサポートしない。
+- `existing-session type does not support timeoutMs overrides.` → `profile="user"` / Chrome MCP existing-session profile での `act:type` では `timeoutMs` を省略するか、カスタム timeout が必要なら管理対象/CDP browser profile を使用する。
+- `existing-session evaluate does not support timeoutMs overrides.` → `profile="user"` / Chrome MCP existing-session profile での `act:evaluate` では `timeoutMs` を省略するか、カスタム timeout が必要なら管理対象/CDP browser profile を使用する。
+- `response body is not supported for existing-session profiles yet.` → `responsebody` は依然として管理対象 browser または生の CDP profile を必要とする。
+- attach-only または remote CDP profile で viewport / dark-mode / locale / offline override が古いまま残る → `openclaw browser stop --browser-profile <name>` を実行して、gateway 全体を再起動せずに、アクティブな control session を閉じて Playwright/CDP のエミュレーション状態を解放する。
 
 関連:
 
-- [/tools/browser-linux-troubleshooting](/ja-JP/tools/browser-linux-troubleshooting)
-- [/tools/browser](/ja-JP/tools/browser)
+- [Browser troubleshooting](/ja-JP/tools/browser-linux-troubleshooting)
+- [Browser (OpenClaw-managed)](/ja-JP/tools/browser)
 
 ## アップグレード後に突然何かが壊れた場合
 
-アップグレード後の不具合の多くは、設定のずれか、より厳格になったデフォルト設定が適用されたことが原因です。
+アップグレード後の不具合の大半は、config drift または、より厳格になったデフォルトが適用されるようになったことが原因です。
 
-### 1) 認証とURL上書きの挙動が変わった
+### 1) Auth と URL override の動作が変わった
 
 ```bash
 openclaw gateway status
@@ -485,15 +513,15 @@ openclaw config get gateway.auth.mode
 
 確認すること:
 
-- `gateway.mode=remote`の場合、CLI呼び出しはリモートを対象にしている可能性があり、ローカルサービス自体は正常かもしれません。
-- 明示的な`--url`呼び出しは、保存済み認証情報へフォールバックしません。
+- `gateway.mode=remote` の場合、ローカル service は正常でも、CLI 呼び出しが remote を対象にしている可能性がある。
+- 明示的な `--url` 呼び出しは、保存済み credential にフォールバックしない。
 
 よくあるシグネチャ:
 
-- `gateway connect failed:` → URLの対象が誤っている。
-- `unauthorized` → エンドポイントには到達しているが認証が誤っている。
+- `gateway connect failed:` → URL target が誤っている。
+- `unauthorized` → endpoint には到達しているが auth が誤っている。
 
-### 2) bindと認証のガードレールが厳格化された
+### 2) Bind と auth のガードレールがより厳格になった
 
 ```bash
 openclaw config get gateway.bind
@@ -505,15 +533,15 @@ openclaw logs --follow
 
 確認すること:
 
-- 非loopback bind（`lan`、`tailnet`、`custom`）には、有効なgateway認証経路が必要です。共有token/password認証、または正しく設定された非loopbackの`trusted-proxy`デプロイを使ってください。
-- `gateway.token`のような古いキーは、`gateway.auth.token`の代わりにはなりません。
+- non-loopback bind（`lan`、`tailnet`、`custom`）には、有効な gateway auth 経路が必要: shared token/password auth、または正しく設定された non-loopback の `trusted-proxy` デプロイメント。
+- `gateway.token` のような古いキーは `gateway.auth.token` の代わりにはならない。
 
 よくあるシグネチャ:
 
-- `refusing to bind gateway ... without auth` → 有効なgateway認証経路なしで非loopback bindを行おうとしている。
-- `Connectivity probe: failed`なのにruntimeは動作中 → Gatewayは生きているが、現在の認証/URLでは到達できない。
+- `refusing to bind gateway ... without auth` → 有効な gateway auth 経路なしで non-loopback bind している。
+- runtime は動作中なのに `Connectivity probe: failed` → gateway 自体は生きているが、現在の auth/url では到達できない。
 
-### 3) ペアリングとデバイスID状態が変わった
+### 3) Pairing と device identity の状態が変わった
 
 ```bash
 openclaw devices list
@@ -524,15 +552,15 @@ openclaw doctor
 
 確認すること:
 
-- dashboard/nodes向けに保留中のデバイス承認がある。
-- ポリシーまたはID変更後に、DMペアリング承認が保留中になっている。
+- dashboard/nodes 向けに pending の device approval がある。
+- policy または identity 変更後に、DM pairing approval が pending になっている。
 
 よくあるシグネチャ:
 
-- `device identity required` → デバイス認証要件が満たされていない。
-- `pairing required` → 送信者/デバイスの承認が必要。
+- `device identity required` → device auth が満たされていない。
+- `pairing required` → sender/device の承認が必要。
 
-確認後もサービス設定とruntimeの不一致が続く場合は、同じprofile/stateディレクトリからサービスメタデータを再インストールしてください。
+確認後も service config と runtime の不一致が続く場合は、同じ profile/state directory から service metadata を再インストールしてください。
 
 ```bash
 openclaw gateway install --force
@@ -541,9 +569,9 @@ openclaw gateway restart
 
 関連:
 
-- [/gateway/pairing](/ja-JP/gateway/pairing)
-- [/gateway/authentication](/ja-JP/gateway/authentication)
-- [/gateway/background-process](/ja-JP/gateway/background-process)
+- [Gateway-owned pairing](/ja-JP/gateway/pairing)
+- [Authentication](/ja-JP/gateway/authentication)
+- [Background exec and process tool](/ja-JP/gateway/background-process)
 
 ## 関連
 

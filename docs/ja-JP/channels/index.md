@@ -1,54 +1,60 @@
 ---
 read_when:
-    - OpenClaw 用のチャットチャネルを選びたい場合
-    - サポートされているメッセージングプラットフォームの概要をすばやく確認したい場合
-summary: OpenClaw が接続できるメッセージングプラットフォーム
+    - OpenClawのチャットチャネルを選びたい場合
+    - 対応しているメッセージングプラットフォームの概要をすばやく確認したい場合
+summary: OpenClawが接続できるメッセージングプラットフォーム
 title: チャットチャネル
 x-i18n:
-    generated_at: "2026-04-24T04:46:11Z"
+    generated_at: "2026-04-25T13:41:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c016b78b16724e73b21946d6bed0009f4cbebd1f887620431b9b4bff70f2b1ff
+    source_hash: e97818dce89ea06a60f2cccd0cc8a78cba48d66ea39e4769f2b583690a4f75d0
     source_path: channels/index.md
     workflow: 15
 ---
 
-OpenClaw は、あなたがすでに使っている任意のチャットアプリで対話できます。各チャネルは Gateway 経由で接続されます。
-テキストはどこでもサポートされていますが、メディアやリアクションはチャネルによって異なります。
+OpenClawは、すでに使っている任意のチャットアプリであなたとやり取りできます。各チャネルはGateway経由で接続します。
+テキストはすべての環境でサポートされますが、メディアとリアクションはチャネルによって異なります。
 
-## サポートされているチャネル
+## 配信に関する注意
 
-- [BlueBubbles](/ja-JP/channels/bluebubbles) — **iMessage に推奨**。BlueBubbles macOS server REST API を使用し、完全な機能サポートがあります（同梱 Plugin。編集、送信取り消し、エフェクト、リアクション、グループ管理。編集は現在 macOS 26 Tahoe で動作しません）。
-- [Discord](/ja-JP/channels/discord) — Discord Bot API + Gateway。サーバー、チャネル、DM をサポートします。
-- [Feishu](/ja-JP/channels/feishu) — WebSocket 経由の Feishu/Lark ボット（同梱 Plugin）。
-- [Google Chat](/ja-JP/channels/googlechat) — HTTP Webhook 経由の Google Chat API アプリ。
-- [iMessage (legacy)](/ja-JP/channels/imessage) — imsg CLI 経由の従来の macOS 統合（非推奨。新規セットアップでは BlueBubbles を使用してください）。
-- [IRC](/ja-JP/channels/irc) — 従来型の IRC サーバー。ペアリング/許可リスト制御付きのチャネル + DM。
-- [LINE](/ja-JP/channels/line) — LINE Messaging API ボット（同梱 Plugin）。
-- [Matrix](/ja-JP/channels/matrix) — Matrix プロトコル（同梱 Plugin）。
-- [Mattermost](/ja-JP/channels/mattermost) — Bot API + WebSocket。チャネル、グループ、DM（同梱 Plugin）。
-- [Microsoft Teams](/ja-JP/channels/msteams) — Bot Framework。エンタープライズ対応（同梱 Plugin）。
-- [Nextcloud Talk](/ja-JP/channels/nextcloud-talk) — Nextcloud Talk 経由のセルフホストチャット（同梱 Plugin）。
-- [Nostr](/ja-JP/channels/nostr) — NIP-04 経由の分散型 DM（同梱 Plugin）。
-- [QQ Bot](/ja-JP/channels/qqbot) — QQ Bot API。プライベートチャット、グループチャット、リッチメディア（同梱 Plugin）。
-- [Signal](/ja-JP/channels/signal) — signal-cli。プライバシー重視。
+- `![alt](url)`のようなMarkdown画像構文を含むTelegramの返信は、可能な場合、最終的な送信経路でメディア返信に変換されます。
+- Slackの複数人DMはグループチャットとして扱われるため、グループポリシー、メンションの動作、グループセッションのルールがMPIM会話に適用されます。
+- WhatsAppのセットアップは必要時インストールです。オンボーディングでは、Baileysのランタイム依存関係が配置される前にセットアップフローが表示されることがあり、Gatewayはチャネルが実際に有効なときにのみWhatsAppランタイムを読み込みます。
+
+## 対応チャネル
+
+- [BlueBubbles](/ja-JP/channels/bluebubbles) — **iMessageに推奨**。BlueBubbles macOSサーバーREST APIを使用し、完全な機能サポートを提供します（バンドル済みPlugin。編集、送信取り消し、エフェクト、リアクション、グループ管理。編集は現在macOS 26 Tahoeで動作しません）。
+- [Discord](/ja-JP/channels/discord) — Discord Bot API + Gateway。サーバー、チャネル、DMをサポートします。
+- [Feishu](/ja-JP/channels/feishu) — WebSocket経由のFeishu/Larkボット（バンドル済みPlugin）。
+- [Google Chat](/ja-JP/channels/googlechat) — HTTP Webhook経由のGoogle Chat APIアプリ。
+- [iMessage (legacy)](/ja-JP/channels/imessage) — `imsg` CLI経由のレガシーmacOS統合（非推奨。新規セットアップではBlueBubblesを使用してください）。
+- [IRC](/ja-JP/channels/irc) — クラシックなIRCサーバー。ペアリング/許可リスト制御付きのチャネル + DM。
+- [LINE](/ja-JP/channels/line) — LINE Messaging APIボット（バンドル済みPlugin）。
+- [Matrix](/ja-JP/channels/matrix) — Matrixプロトコル（バンドル済みPlugin）。
+- [Mattermost](/ja-JP/channels/mattermost) — Bot API + WebSocket。チャネル、グループ、DM（バンドル済みPlugin）。
+- [Microsoft Teams](/ja-JP/channels/msteams) — Bot Framework。エンタープライズ対応（バンドル済みPlugin）。
+- [Nextcloud Talk](/ja-JP/channels/nextcloud-talk) — Nextcloud Talk経由のセルフホスト型チャット（バンドル済みPlugin）。
+- [Nostr](/ja-JP/channels/nostr) — NIP-04経由の分散型DM（バンドル済みPlugin）。
+- [QQ Bot](/ja-JP/channels/qqbot) — QQ Bot API。プライベートチャット、グループチャット、リッチメディア（バンドル済みPlugin）。
+- [Signal](/ja-JP/channels/signal) — `signal-cli`。プライバシー重視。
 - [Slack](/ja-JP/channels/slack) — Bolt SDK。ワークスペースアプリ。
-- [Synology Chat](/ja-JP/channels/synology-chat) — 送信 + 受信 Webhook 経由の Synology NAS Chat（同梱 Plugin）。
-- [Telegram](/ja-JP/channels/telegram) — grammY 経由の Bot API。グループをサポートします。
-- [Tlon](/ja-JP/channels/tlon) — Urbit ベースのメッセンジャー（同梱 Plugin）。
-- [Twitch](/ja-JP/channels/twitch) — IRC 接続経由の Twitch チャット（同梱 Plugin）。
-- [Voice Call](/ja-JP/plugins/voice-call) — Plivo または Twilio 経由の電話通信（Plugin、別途インストール）。
-- [WebChat](/ja-JP/web/webchat) — WebSocket 経由の Gateway WebChat UI。
-- [WeChat](/ja-JP/channels/wechat) — QR ログイン経由の Tencent iLink Bot plugin。プライベートチャットのみ（外部 Plugin）。
-- [WhatsApp](/ja-JP/channels/whatsapp) — 最も一般的。Baileys を使用し、QR ペアリングが必要です。
-- [Zalo](/ja-JP/channels/zalo) — Zalo Bot API。ベトナムで人気のメッセンジャー（同梱 Plugin）。
-- [Zalo Personal](/ja-JP/channels/zalouser) — QR ログイン経由の Zalo 個人アカウント（同梱 Plugin）。
+- [Synology Chat](/ja-JP/channels/synology-chat) — 送信+受信Webhook経由のSynology NAS Chat（バンドル済みPlugin）。
+- [Telegram](/ja-JP/channels/telegram) — grammY経由のBot API。グループをサポートします。
+- [Tlon](/ja-JP/channels/tlon) — Urbitベースのメッセンジャー（バンドル済みPlugin）。
+- [Twitch](/ja-JP/channels/twitch) — IRC接続経由のTwitchチャット（バンドル済みPlugin）。
+- [Voice Call](/ja-JP/plugins/voice-call) — PlivoまたはTwilio経由の電話通信（Plugin、別途インストール）。
+- [WebChat](/ja-JP/web/webchat) — WebSocket経由のGateway WebChat UI。
+- [WeChat](/ja-JP/channels/wechat) — QRログイン経由のTencent iLink Bot plugin。プライベートチャットのみ（外部Plugin）。
+- [WhatsApp](/ja-JP/channels/whatsapp) — 最も一般的。Baileysを使用し、QRペアリングが必要です。
+- [Zalo](/ja-JP/channels/zalo) — Zalo Bot API。ベトナムで人気のメッセンジャー（バンドル済みPlugin）。
+- [Zalo Personal](/ja-JP/channels/zalouser) — QRログイン経由のZalo個人アカウント（バンドル済みPlugin）。
 
-## 注意
+## 注意事項
 
-- チャネルは同時に実行できます。複数を設定すると、OpenClaw はチャットごとにルーティングします。
-- 最もすばやくセットアップできるのは通常 **Telegram** です（シンプルなボットトークン）。WhatsApp は QR ペアリングが必要で、より多くの状態をディスクに保存します。
-- グループでの挙動はチャネルによって異なります。[グループ](/ja-JP/channels/groups)を参照してください。
-- DM ペアリングと許可リストは安全性のために強制されます。[セキュリティ](/ja-JP/gateway/security)を参照してください。
-- トラブルシューティング: [チャネルのトラブルシューティング](/ja-JP/channels/troubleshooting)。
-- モデルプロバイダーは別途ドキュメント化されています。[モデルプロバイダー](/ja-JP/providers/models)を参照してください。
+- チャネルは同時に実行できます。複数を設定すると、OpenClawがチャットごとにルーティングします。
+- 最も簡単にセットアップできるのは通常**Telegram**です（シンプルなボットトークン）。WhatsAppはQRペアリングが必要で、より多くの状態をディスクに保存します。
+- グループの挙動はチャネルによって異なります。[Groups](/ja-JP/channels/groups)を参照してください。
+- 安全のため、DMのペアリングと許可リストが適用されます。[Security](/ja-JP/gateway/security)を参照してください。
+- トラブルシューティング: [Channel troubleshooting](/ja-JP/channels/troubleshooting)。
+- モデルプロバイダーは別途ドキュメント化されています。[Model Providers](/ja-JP/providers/models)を参照してください。

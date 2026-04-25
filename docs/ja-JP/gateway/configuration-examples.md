@@ -1,24 +1,24 @@
 ---
 read_when:
-    - OpenClawの設定方法を学んでいる場合
+    - OpenClawの設定方法を学びたい場合
     - 設定例を探している場合
-    - 初めてOpenClawをセットアップしている場合
-summary: 一般的なOpenClawセットアップ向けのスキーマ準拠設定例
+    - 初めてOpenClawをセットアップする場合
+summary: 一般的なOpenClawセットアップ向けのスキーマに正確な設定例
 title: 設定例
 x-i18n:
-    generated_at: "2026-04-24T04:56:22Z"
+    generated_at: "2026-04-25T13:46:58Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 909cb2a80a4bc31438a387d49ad9893bbe54b299686a8c7c1b2baae40bf1130f
+    source_hash: 2f31f70459d6232d2aefe668440312bb1800f18de0ef3c2783befa1de05f25f6
     source_path: gateway/configuration-examples.md
     workflow: 15
 ---
 
-以下の例は、現在の設定スキーマに合わせています。網羅的なリファレンスと各フィールドの注記については、[Configuration](/ja-JP/gateway/configuration)を参照してください。
+以下の例は、現在の設定スキーマに合わせています。完全なリファレンスと各フィールドの注記については、[Configuration](/ja-JP/gateway/configuration)を参照してください。
 
 ## クイックスタート
 
-### 最小構成
+### 必要最小限
 
 ```json5
 {
@@ -27,7 +27,7 @@ x-i18n:
 }
 ```
 
-これを`~/.openclaw/openclaw.json`に保存すると、その番号からボットへDMできます。
+これを`~/.openclaw/openclaw.json`に保存すると、その番号からbotにDMできます。
 
 ### 推奨スターター構成
 
@@ -53,7 +53,7 @@ x-i18n:
 
 ## 拡張例（主要オプション）
 
-> JSON5ではコメントと末尾カンマを使用できます。通常のJSONでも動作します。
+> JSON5ではコメントと末尾カンマを使えます。通常のJSONでも動作します。
 
 ```json5
 {
@@ -69,7 +69,7 @@ x-i18n:
     },
   },
 
-  // Authプロファイルメタデータ（シークレットはauth-profiles.jsonに保存）
+  // 認証プロファイルのメタデータ（シークレットはauth-profiles.jsonに保存）
   auth: {
     profiles: {
       "anthropic:default": { provider: "anthropic", mode: "api_key" },
@@ -84,7 +84,7 @@ x-i18n:
     },
   },
 
-  // identity
+  // Identity
   identity: {
     name: "Samantha",
     theme: "helpful sloth",
@@ -100,7 +100,7 @@ x-i18n:
     redactSensitive: "tools",
   },
 
-  // メッセージ整形
+  // メッセージ書式
   messages: {
     messagePrefix: "[openclaw]",
     responsePrefix: ">",
@@ -131,7 +131,7 @@ x-i18n:
     },
   },
 
-  // ツール機能
+  // ツール
   tools: {
     media: {
       audio: {
@@ -152,10 +152,10 @@ x-i18n:
     },
   },
 
-  // セッション動作
+  // セッションの挙動
   session: {
     scope: "per-sender",
-    dmScope: "per-channel-peer", // マルチユーザー受信箱向けに推奨
+    dmScope: "per-channel-peer", // マルチユーザー受信箱に推奨
     reset: {
       mode: "daily",
       atHour: 4,
@@ -171,7 +171,7 @@ x-i18n:
       pruneAfter: "30d",
       maxEntries: 500,
       rotateBytes: "10mb",
-      resetArchiveRetention: "30d", // durationまたはfalse
+      resetArchiveRetention: "30d", // 期間またはfalse
       maxDiskBytes: "500mb", // 任意
       highWaterBytes: "400mb", // 任意（デフォルトはmaxDiskBytesの80%）
     },
@@ -291,7 +291,7 @@ x-i18n:
       },
       sandbox: {
         mode: "non-main",
-        scope: "session", // レガシーのperSession: trueより推奨
+        scope: "session", // 旧来のperSession: trueより推奨
         workspaceRoot: "~/.openclaw/sandboxes",
         docker: {
           image: "openclaw-sandbox:bookworm-slim",
@@ -310,15 +310,15 @@ x-i18n:
       {
         id: "main",
         default: true,
-        // defaults.skills -> github, weather を継承
+        // defaults.skillsを継承 -> github, weather
         thinkingDefault: "high", // エージェントごとのthinking上書き
         reasoningDefault: "on", // エージェントごとのreasoning可視性
-        fastModeDefault: false, // エージェントごとのfast mode
+        fastModeDefault: false, // エージェントごとのfastモード
       },
       {
         id: "quick",
-        skills: [], // このエージェントにはSkillsなし
-        fastModeDefault: true, // このエージェントは常に高速実行
+        skills: [], // このエージェントではSkillsなし
+        fastModeDefault: true, // このエージェントは常にfastで実行
         thinkingDefault: "off",
       },
     ],
@@ -384,7 +384,7 @@ x-i18n:
     },
   },
 
-  // Webhook
+  // Webhooks
   hooks: {
     enabled: true,
     path: "/hooks",
@@ -464,9 +464,9 @@ x-i18n:
 }
 ```
 
-## 一般的なパターン
+## よくあるパターン
 
-### 共有Skillベースライン + 1つの上書き
+### 共有Skillベースラインと1つの上書き
 
 ```json5
 {
@@ -484,8 +484,8 @@ x-i18n:
 ```
 
 - `agents.defaults.skills`は共有ベースラインです。
-- `agents.list[].skills`は、その1つのエージェントについてベースラインを置き換えます。
-- エージェントにSkillsを一切見せたくない場合は`skills: []`を使用します。
+- `agents.list[].skills`は、そのエージェント1つに対してそのベースラインを置き換えます。
+- エージェントにSkillsを見せたくない場合は`skills: []`を使います。
 
 ### マルチプラットフォーム構成
 
@@ -508,23 +508,45 @@ x-i18n:
 }
 ```
 
-### セキュアDMモード（共有受信箱 / マルチユーザーDM）
+### 信頼されたNodeネットワークの自動承認
 
-複数人がボットへDMできる場合（`allowFrom`に複数エントリがある、複数人分のペアリング承認がある、または`dmPolicy: "open"`）、異なる送信者からのDMがデフォルトで同じコンテキストを共有しないように、**セキュアDMモード**を有効にしてください。
+ネットワーク経路を自分で管理している場合を除き、デバイスのペアリングは手動のままにしてください。専用の
+labまたはtailnetサブネットでは、正確なCIDRまたはIPを使って、初回のNodeデバイス自動承認に
+オプトインできます。
 
 ```json5
 {
-  // セキュアDMモード（マルチユーザーまたは機密性の高いDMエージェントに推奨）
+  gateway: {
+    nodes: {
+      pairing: {
+        autoApproveCidrs: ["192.168.1.0/24", "fd00:1234:5678::/64"],
+      },
+    },
+  },
+}
+```
+
+これは未設定時には無効のままです。適用されるのは、要求スコープのない新規`role: node`ペアリングに
+限られます。operator/browserクライアントや、ロール、スコープ、メタデータ、
+公開鍵のアップグレードには、引き続き手動承認が必要です。
+
+### セキュアDMモード（共有受信箱 / 複数ユーザーDM）
+
+複数人がbotへDMできる場合（`allowFrom`に複数エントリがある、複数人に対するペアリング承認がある、または`dmPolicy: "open"`を使う場合）、デフォルトで異なる送信者のDMが1つのコンテキストを共有しないよう、**セキュアDMモード**を有効にしてください。
+
+```json5
+{
+  // セキュアDMモード（複数ユーザーまたは機密性の高いDMエージェントに推奨）
   session: { dmScope: "per-channel-peer" },
 
   channels: {
-    // 例: WhatsAppマルチユーザー受信箱
+    // 例: WhatsAppの複数ユーザー受信箱
     whatsapp: {
       dmPolicy: "allowlist",
       allowFrom: ["+15555550123", "+15555550124"],
     },
 
-    // 例: Discordマルチユーザー受信箱
+    // 例: Discordの複数ユーザー受信箱
     discord: {
       enabled: true,
       token: "YOUR_DISCORD_BOT_TOKEN",
@@ -535,9 +557,9 @@ x-i18n:
 ```
 
 Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRCでは、送信者認可はデフォルトでID優先です。
-可変な名前/メールアドレス/nickの直接一致は、そのリスクを明示的に受け入れる場合にのみ、各チャネルの`dangerouslyAllowNameMatching: true`で有効にしてください。
+可変な名前/メール/ニックによる直接一致を使うリスクを明示的に受け入れる場合にのみ、各チャネルの`dangerouslyAllowNameMatching: true`を有効にしてください。
 
-### Anthropic API key + MiniMaxフォールバック
+### Anthropic APIキー + MiniMaxフォールバック
 
 ```json5
 {
@@ -571,7 +593,7 @@ Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRCでは、送信者認可
 }
 ```
 
-### Work bot（制限付きアクセス）
+### 業務用bot（制限付きアクセス）
 
 ```json5
 {
@@ -630,10 +652,10 @@ Discord/Slack/Google Chat/Microsoft Teams/Mattermost/IRCでは、送信者認可
 
 ## ヒント
 
-- `dmPolicy: "open"`を設定する場合、対応する`allowFrom`リストには`"*"`を含める必要があります。
-- プロバイダーIDは異なります（電話番号、ユーザーID、チャネルID）。形式は各プロバイダーのドキュメントで確認してください。
+- `dmPolicy: "open"`を設定する場合、対応する`allowFrom`一覧には`"*"`を含める必要があります。
+- プロバイダーIDは異なります（電話番号、ユーザーID、チャネルIDなど）。形式は各プロバイダーのドキュメントで確認してください。
 - 後から追加できる任意セクション: `web`、`browser`、`ui`、`discovery`、`canvasHost`、`talk`、`signal`、`imessage`。
-- より深いセットアップの注意については、[Providers](/ja-JP/providers)および[Troubleshooting](/ja-JP/gateway/troubleshooting)を参照してください。
+- より詳しいセットアップ注記については、[Providers](/ja-JP/providers)と[Troubleshooting](/ja-JP/gateway/troubleshooting)を参照してください。
 
 ## 関連
 

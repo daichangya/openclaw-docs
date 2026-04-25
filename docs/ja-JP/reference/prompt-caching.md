@@ -1,40 +1,37 @@
 ---
 read_when:
-    - キャッシュ保持でプロンプト token コストを下げたい場合＿日本assistant to=functions.read in commentary  诺果json  content{"path":"../AGENTS.md"}  彩神争霸输钱analysis to=functions.read code  在天天中彩票json  content{"path":"../AGENTS.md"}
-    - マルチエージェント構成でエージェントごとのキャッシュ動作が必要な場合
-    - Heartbeat と cache-ttl pruning を一緒に調整している場合
-summary: プロンプトキャッシュの設定項目、マージ順序、プロバイダー動作、チューニングパターン
+    - キャッシュ保持によってプロンプトトークンのコストを削減したい場合
+    - マルチエージェント構成では、エージェントごとのキャッシュ動作が必要です
+    - Heartbeat と cache-ttl の pruning を一緒に調整しています
+summary: プロンプトキャッシュの設定項目、マージ順序、Provider の動作、チューニングパターン
 title: プロンプトキャッシュ
 x-i18n:
-    generated_at: "2026-04-24T05:18:49Z"
+    generated_at: "2026-04-25T13:58:32Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2534a5648db39dae0979bd8b84263f83332fbaa2dc2c0675409c307fa991c7c8
+    source_hash: 4f3d1a5751ca0cab4c5b83c8933ec732b58c60d430e00c24ae9a75036aa0a6a3
     source_path: reference/prompt-caching.md
     workflow: 15
 ---
 
-プロンプトキャッシュとは、モデルプロバイダーが、毎回再処理する代わりに、ターンをまたいで変化しないプロンプト接頭辞（通常は system/developer 指示やその他の安定したコンテキスト）を再利用できることを意味します。OpenClaw は、上流 API がそれらのカウンターを直接公開している場合、プロバイダーの使用量を `cacheRead` と `cacheWrite` に正規化します。
+プロンプトキャッシュとは、モデル Provider が、毎回再処理する代わりに、ターンをまたいで変更されていないプロンプト接頭辞（通常は system/developer 指示やその他の安定したコンテキスト）を再利用できることを意味します。OpenClaw は、上流 API がそれらのカウンタを直接公開している場合、Provider の使用量を `cacheRead` と `cacheWrite` に正規化します。
 
-status サーフェスは、ライブセッションスナップショットにキャッシュカウンターが欠けているとき、最新のトランスクリプト
-usage ログからそれらを復元することもできます。そのため `/status` は、
-部分的にセッションメタデータが失われた後でもキャッシュ行を表示し続けられます。既存の非ゼロのライブ
-キャッシュ値は、引き続きトランスクリプト由来のフォールバック値より優先されます。
+ステータス画面では、ライブセッションのスナップショットにキャッシュカウンタがない場合でも、直近の transcript 使用量ログからそれらを復元できるため、部分的にセッションメタデータが失われた後でも `/status` はキャッシュ行を表示し続けられます。既存の 0 以外のライブキャッシュ値は、引き続き transcript からのフォールバック値より優先されます。
 
-これが重要な理由: token コストの低減、応答の高速化、長時間セッションにおけるより予測可能なパフォーマンス。キャッシュがない場合、入力の大部分が変化していなくても、繰り返されるプロンプトは毎ターン完全なプロンプトコストを支払います。
+これが重要な理由: トークンコストの削減、応答速度の向上、長時間セッションでのより予測可能なパフォーマンスにつながるためです。キャッシュがない場合、ほとんどの入力が変わっていなくても、繰り返されるプロンプトは毎ターン完全なプロンプトコストを支払うことになります。
 
-このページでは、プロンプト再利用と token コストに影響する、すべてのキャッシュ関連設定項目を扱います。
+以下のセクションでは、プロンプト再利用とトークンコストに影響する、すべてのキャッシュ関連設定項目を扱います。
 
-プロバイダー参照:
+Provider リファレンス:
 
-- Anthropic prompt caching: [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
-- OpenAI prompt caching: [https://developers.openai.com/api/docs/guides/prompt-caching](https://developers.openai.com/api/docs/guides/prompt-caching)
-- OpenAI API headers and request IDs: [https://developers.openai.com/api/reference/overview](https://developers.openai.com/api/reference/overview)
-- Anthropic request IDs and errors: [https://platform.claude.com/docs/en/api/errors](https://platform.claude.com/docs/en/api/errors)
+- Anthropic のプロンプトキャッシュ: [https://platform.claude.com/docs/en/build-with-claude/prompt-caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)
+- OpenAI のプロンプトキャッシュ: [https://developers.openai.com/api/docs/guides/prompt-caching](https://developers.openai.com/api/docs/guides/prompt-caching)
+- OpenAI API ヘッダーとリクエスト ID: [https://developers.openai.com/api/reference/overview](https://developers.openai.com/api/reference/overview)
+- Anthropic のリクエスト ID とエラー: [https://platform.claude.com/docs/en/api/errors](https://platform.claude.com/docs/en/api/errors)
 
 ## 主な設定項目
 
-### `cacheRetention`（グローバルデフォルト、モデル、エージェントごと）
+### `cacheRetention`（グローバルデフォルト、モデルごと、エージェントごと）
 
 すべてのモデルに対するグローバルデフォルトとしてキャッシュ保持を設定します。
 
@@ -45,7 +42,7 @@ agents:
       cacheRetention: "long" # none | short | long
 ```
 
-モデルごとに上書き:
+モデルごとに上書きする場合:
 
 ```yaml
 agents:
@@ -66,7 +63,7 @@ agents:
         cacheRetention: "none"
 ```
 
-config のマージ順序:
+設定のマージ順序:
 
 1. `agents.defaults.params`（グローバルデフォルト — すべてのモデルに適用）
 2. `agents.defaults.models["provider/model"].params`（モデルごとの上書き）
@@ -74,7 +71,7 @@ config のマージ順序:
 
 ### `contextPruning.mode: "cache-ttl"`
 
-キャッシュ TTL ウィンドウ後に古い tool-result コンテキストを削減し、アイドル後のリクエストで大きすぎる履歴を再キャッシュしないようにします。
+キャッシュ TTL ウィンドウ経過後に古いツール結果コンテキストを pruning し、アイドル後のリクエストで過大な履歴が再キャッシュされないようにします。
 
 ```yaml
 agents:
@@ -84,11 +81,11 @@ agents:
       ttl: "1h"
 ```
 
-完全な動作については [Session Pruning](/ja-JP/concepts/session-pruning) を参照してください。
+完全な動作については、[セッション pruning](/ja-JP/concepts/session-pruning) を参照してください。
 
-### Heartbeat keep-warm
+### Heartbeat の keep-warm
 
-Heartbeat はキャッシュウィンドウを温かい状態に保ち、アイドルギャップ後の繰り返しのキャッシュ書き込みを減らせます。
+Heartbeat はキャッシュウィンドウを warm な状態に保ち、アイドル間隔の後に繰り返し発生するキャッシュ書き込みを減らすことができます。
 
 ```yaml
 agents:
@@ -99,109 +96,89 @@ agents:
 
 エージェントごとの Heartbeat は `agents.list[].heartbeat` でサポートされます。
 
-## プロバイダーの動作
+## Provider の動作
 
 ### Anthropic（直接 API）
 
-- `cacheRetention` をサポートします。
-- Anthropic API キー auth profile では、未設定時に Anthropic model ref に対して OpenClaw が `cacheRetention: "short"` を投入します。
-- Anthropic ネイティブ Messages 応答は `cache_read_input_tokens` と `cache_creation_input_tokens` の両方を公開するため、OpenClaw は `cacheRead` と `cacheWrite` の両方を表示できます。
-- ネイティブ Anthropic リクエストでは、`cacheRetention: "short"` はデフォルトの 5 分 ephemeral キャッシュに対応し、`cacheRetention: "long"` は直接の `api.anthropic.com` ホスト上でのみ 1 時間 TTL に引き上げられます。
+- `cacheRetention` がサポートされます。
+- Anthropic の API キー認証プロファイルでは、未設定時に OpenClaw は Anthropic のモデル参照に `cacheRetention: "short"` を初期設定します。
+- Anthropic ネイティブ Messages レスポンスは `cache_read_input_tokens` と `cache_creation_input_tokens` の両方を公開するため、OpenClaw は `cacheRead` と `cacheWrite` の両方を表示できます。
+- ネイティブ Anthropic リクエストでは、`cacheRetention: "short"` はデフォルトの 5 分エフェメラルキャッシュにマッピングされ、`cacheRetention: "long"` は直接の `api.anthropic.com` ホストでのみ 1 時間 TTL にアップグレードされます。
 
 ### OpenAI（直接 API）
 
-- プロンプトキャッシュは、サポートされる最近のモデルで自動です。OpenClaw がブロックレベルのキャッシュマーカーを注入する必要はありません。
-- OpenClaw はターンをまたいでキャッシュルーティングを安定させるために `prompt_cache_key` を使い、直接の OpenAI ホスト上で `cacheRetention: "long"` が選択された場合にのみ `prompt_cache_retention: "24h"` を使います。
-- OpenAI 応答は、`usage.prompt_tokens_details.cached_tokens`（または Responses API イベントの `input_tokens_details.cached_tokens`）経由でキャッシュ済みプロンプト token を公開します。OpenClaw はこれを `cacheRead` にマッピングします。
-- OpenAI は separate な cache-write token カウンターを公開しないため、プロバイダーがキャッシュを温めていても OpenAI パスでは `cacheWrite` は `0` のままです。
-- OpenAI は `x-request-id`、`openai-processing-ms`、`x-ratelimit-*` のような有用な tracing と rate-limit ヘッダーを返しますが、cache-hit 会計はヘッダーではなく usage ペイロードから取得すべきです。
-- 実際には、OpenAI は Anthropic 方式の移動する全履歴再利用より、初期接頭辞キャッシュのように振る舞うことが多いです。安定した長い接頭辞テキストターンは、現在のライブプローブでは `4864` cached token 付近の plateau に達することがあり、一方 tool-heavy または MCP 形式のトランスクリプトは、完全に同じ再実行でも `4608` cached token 付近で plateau することが多いです。
+- プロンプトキャッシュは、サポートされている最近のモデルでは自動です。OpenClaw はブロック単位のキャッシュマーカーを挿入する必要はありません。
+- OpenClaw はターン間でキャッシュルーティングを安定させるために `prompt_cache_key` を使い、`cacheRetention: "long"` が直接の OpenAI ホストで選択されている場合にのみ `prompt_cache_retention: "24h"` を使います。
+- OpenAI 互換 Completions Provider は、モデル設定で `compat.supportsPromptCacheKey: true` が明示されている場合にのみ `prompt_cache_key` を受け取ります。`cacheRetention: "none"` は引き続きそれを抑制します。
+- OpenAI のレスポンスは、`usage.prompt_tokens_details.cached_tokens`（または Responses API イベント上の `input_tokens_details.cached_tokens`）を通じてキャッシュ済みプロンプトトークンを公開します。OpenClaw はこれを `cacheRead` にマッピングします。
+- OpenAI は個別のキャッシュ書き込みトークンカウンタを公開しないため、Provider がキャッシュを warm にしている場合でも、OpenAI 経路では `cacheWrite` は `0` のままです。
+- OpenAI は `x-request-id`、`openai-processing-ms`、`x-ratelimit-*` のような有用なトレースおよびレート制限ヘッダーを返しますが、キャッシュヒットの計上はヘッダーではなく usage ペイロードから取得すべきです。
+- 実際には、OpenAI は Anthropic 形式の移動する全履歴再利用というより、初期接頭辞キャッシュのように動作することがよくあります。現在のライブプローブでは、安定した長い接頭辞のテキストターンは `4864` キャッシュ済みトークン付近で頭打ちになることがあり、ツールが多い transcript や MCP 形式の transcript は、完全に同じ繰り返しでも `4608` キャッシュ済みトークン付近で頭打ちになることがよくあります。
 
 ### Anthropic Vertex
 
-- Vertex AI 上の Anthropic モデル（`anthropic-vertex/*`）は、直接 Anthropic と同様に `cacheRetention` をサポートします。
-- `cacheRetention: "long"` は、Vertex AI エンドポイント上で実際の 1 時間 prompt-cache TTL に対応します。
-- `anthropic-vertex` のデフォルトキャッシュ保持は、直接 Anthropic のデフォルトと一致します。
-- Vertex リクエストは boundary-aware なキャッシュ整形を通るため、キャッシュ再利用はプロバイダーが実際に受け取る内容と整合したままになります。
+- Vertex AI 上の Anthropic モデル（`anthropic-vertex/*`）は、直接の Anthropic と同じ方法で `cacheRetention` をサポートします。
+- `cacheRetention: "long"` は、Vertex AI エンドポイント上の実際の 1 時間プロンプトキャッシュ TTL にマッピングされます。
+- `anthropic-vertex` のデフォルトキャッシュ保持は、直接の Anthropic のデフォルトと一致します。
+- Vertex リクエストは、キャッシュ再利用が Provider に実際に届く内容と揃うよう、境界認識型のキャッシュシェーピングを通してルーティングされます。
 
 ### Amazon Bedrock
 
-- Anthropic Claude model ref（`amazon-bedrock/*anthropic.claude*`）は、明示的な `cacheRetention` のパススルーをサポートします。
-- 非 Anthropic の Bedrock モデルは、ランタイム時に `cacheRetention: "none"` に強制されます。
+- Anthropic Claude モデル参照（`amazon-bedrock/*anthropic.claude*`）は、明示的な `cacheRetention` のパススルーをサポートします。
+- Anthropic 以外の Bedrock モデルは、実行時に `cacheRetention: "none"` に強制されます。
 
-### OpenRouter Anthropic モデル
+### OpenRouter モデル
 
-`openrouter/anthropic/*` model ref に対して、OpenClaw は Anthropic の
-`cache_control` を system/developer プロンプトブロックに注入し、OpenRouter 固有の Anthropic キャッシュマーカーを停止せずに、
-リクエストがまだ検証済み OpenRouter ルート
-（デフォルトエンドポイント上の `openrouter`、または `openrouter.ai` に解決される任意の provider/base URL）を対象にしている場合にのみ prompt-cache
-再利用を改善します。
+`openrouter/anthropic/*` のモデル参照について、OpenClaw は、リクエストがまだ検証済みの OpenRouter ルート（デフォルトエンドポイント上の `openrouter`、または `openrouter.ai` に解決される任意の provider/base URL）を対象としている場合にのみ、プロンプトキャッシュ再利用を改善するため、system/developer プロンプトブロックに Anthropic の `cache_control` を注入します。
 
-モデルを任意の OpenAI 互換 proxy URL に向け直した場合、OpenClaw は
-それらの OpenRouter 固有 Anthropic キャッシュマーカーの注入を停止します。
+`openrouter/deepseek/*`、`openrouter/moonshot*/*`、`openrouter/zai/*` のモデル参照では、OpenRouter が Provider 側のプロンプトキャッシュを自動処理するため、`contextPruning.mode: "cache-ttl"` が許可されます。OpenClaw はそれらのリクエストに Anthropic の `cache_control` マーカーを注入しません。
 
-### その他のプロバイダー
+DeepSeek のキャッシュ構築はベストエフォートで、数秒かかることがあります。直後のフォローアップではまだ `cached_tokens: 0` と表示される場合があります。短い遅延の後に同じ接頭辞のリクエストを繰り返して確認し、キャッシュヒットのシグナルとして `usage.prompt_tokens_details.cached_tokens` を使ってください。
 
-プロバイダーがこのキャッシュモードをサポートしない場合、`cacheRetention` は効果を持ちません。
+モデルを任意の OpenAI 互換プロキシ URL に向け直した場合、OpenClaw はそれらの OpenRouter 固有の Anthropic キャッシュマーカーの注入を停止します。
+
+### その他の Provider
+
+Provider がこのキャッシュモードをサポートしていない場合、`cacheRetention` は効果を持ちません。
 
 ### Google Gemini 直接 API
 
-- 直接 Gemini トランスポート（`api: "google-generative-ai"`）は、
-  上流の `cachedContentTokenCount` を通じて cache hit を報告します。OpenClaw はこれを `cacheRead` にマッピングします。
-- 直接 Gemini モデルに `cacheRetention` が設定されている場合、OpenClaw は
-  Google AI Studio 実行に対して system プロンプト用の `cachedContents` リソースを自動で
-  作成、再利用、更新します。つまり、cached-content ハンドルを手動で事前作成する必要はありません。
-- 設定済みモデル上の `params.cachedContent`（または旧来の `params.cached_content`）として、
-  既存の Gemini cached-content ハンドルを渡すことも引き続き可能です。
-- これは Anthropic/OpenAI の prompt-prefix キャッシュとは別物です。Gemini では、
-  OpenClaw はリクエストにキャッシュマーカーを注入するのではなく、プロバイダー固有の
-  `cachedContents` リソースを管理します。
+- 直接の Gemini トランスポート（`api: "google-generative-ai"`）は、上流の `cachedContentTokenCount` を通じてキャッシュヒットを報告し、OpenClaw はそれを `cacheRead` にマッピングします。
+- 直接の Gemini モデルに `cacheRetention` が設定されている場合、OpenClaw は Google AI Studio 実行で、system プロンプト用の `cachedContents` リソースを自動的に作成、再利用、更新します。これにより、キャッシュ済みコンテンツハンドルを手動で事前作成する必要がなくなります。
+- 既存の Gemini キャッシュ済みコンテンツハンドルを、設定済みモデルの `params.cachedContent`（またはレガシーの `params.cached_content`）として引き続き渡すこともできます。
+- これは Anthropic/OpenAI のプロンプト接頭辞キャッシュとは別物です。Gemini では、OpenClaw はリクエストにキャッシュマーカーを注入する代わりに、Provider ネイティブの `cachedContents` リソースを管理します。
 
-### Gemini CLI JSON usage
+### Gemini CLI JSON 使用量
 
-- Gemini CLI JSON 出力も、`stats.cached` を通じて cache hit を表面化できます。
-  OpenClaw はこれを `cacheRead` にマッピングします。
-- CLI が直接の `stats.input` 値を省略した場合、OpenClaw は
-  `stats.input_tokens - stats.cached` から入力 token を導出します。
-- これは usage の正規化にすぎません。OpenClaw が Gemini CLI に対して
-  Anthropic/OpenAI 方式の prompt-cache マーカーを作成していることを意味するものではありません。
+- Gemini CLI の JSON 出力でも、`stats.cached` を通じてキャッシュヒットが表れることがあり、OpenClaw はそれを `cacheRead` にマッピングします。
+- CLI が直接の `stats.input` 値を省略した場合、OpenClaw は `stats.input_tokens - stats.cached` から入力トークンを導出します。
+- これは使用量の正規化にすぎません。OpenClaw が Gemini CLI に対して Anthropic/OpenAI 形式のプロンプトキャッシュマーカーを作成していることを意味するわけではありません。
 
-## システムプロンプトのキャッシュ境界
+## system プロンプトのキャッシュ境界
 
-OpenClaw は、システムプロンプトを内部のキャッシュ接頭辞境界で区切られた **安定した接頭辞** と **変動するサフィックス** に分割します。境界より上の内容（tool 定義、Skills メタデータ、workspace ファイル、その他の比較的静的なコンテキスト）は、ターンをまたいでバイト列が同一に保たれるよう順序付けされます。境界より下の内容（たとえば `HEARTBEAT.md`、ランタイムタイムスタンプ、その他のターンごとのメタデータ）は、キャッシュ済み接頭辞を無効化せずに変化できるようにします。
+OpenClaw は system プロンプトを、内部のキャッシュ接頭辞境界で区切られた **安定した接頭辞** と **変動する接尾辞** に分割します。境界より上のコンテンツ（ツール定義、Skills メタデータ、ワークスペースファイル、その他の比較的静的なコンテキスト）は、ターン間でバイト列が同一のままになるように順序付けされます。境界より下のコンテンツ（たとえば `HEARTBEAT.md`、ランタイムタイムスタンプ、その他のターンごとのメタデータ）は、キャッシュ済み接頭辞を無効化せずに変更できます。
 
-主な設計選択:
+主な設計上の選択:
 
-- 安定した workspace の project-context ファイルは `HEARTBEAT.md` より前に並べられるため、
-  heartbeat の変動が安定接頭辞を壊しません。
-- 境界は Anthropic 系、OpenAI 系、Google、および
-  CLI トランスポート整形全体に適用されるため、サポートされるすべてのプロバイダーが同じ接頭辞安定性の恩恵を受けます。
-- Codex Responses と Anthropic Vertex リクエストは
-  boundary-aware なキャッシュ整形を通るため、キャッシュ再利用はプロバイダーが実際に受け取る内容と整合したままです。
-- システムプロンプトのフィンガープリントは正規化されます（空白、改行、
-  フック追加コンテキスト、ランタイム capability 順序）。そのため、意味的に変化していない
-  プロンプトはターンをまたいで KV/キャッシュを共有します。
+- 安定したワークスペースのプロジェクトコンテキストファイルは `HEARTBEAT.md` より前に順序付けされるため、Heartbeat の変動によって安定した接頭辞が壊れません。
+- この境界は Anthropic 系、OpenAI 系、Google、および CLI トランスポートシェーピング全体に適用されるため、サポートされているすべての Provider が同じ接頭辞安定性の恩恵を受けます。
+- Codex Responses と Anthropic Vertex リクエストは、キャッシュ再利用が Provider に実際に届く内容と揃うよう、境界認識型キャッシュシェーピングを通じてルーティングされます。
+- system プロンプトのフィンガープリントは正規化されます（空白、改行、フックで追加されたコンテキスト、ランタイム機能の順序など）。これにより、意味的に変化していないプロンプトはターンをまたいで KV/キャッシュを共有できます。
 
-config や workspace 変更後に予期しない `cacheWrite` の急増が見られる場合は、
-その変更がキャッシュ境界の上か下かを確認してください。変動する内容を境界の下へ移す
-（またはそれを安定化する）ことで、問題が解決することがよくあります。
+設定やワークスペースの変更後に予期しない `cacheWrite` の急増が見られる場合は、その変更がキャッシュ境界の上と下のどちらに入るかを確認してください。変動するコンテンツを境界の下に移す（または安定化する）ことで、問題が解決することがよくあります。
 
 ## OpenClaw のキャッシュ安定性ガード
 
-OpenClaw はまた、プロバイダーに届く前にいくつかのキャッシュ感度の高いペイロード形状を決定的に保ちます。
+OpenClaw は、リクエストが Provider に到達する前に、いくつかのキャッシュ感度の高いペイロード形状も決定的に保ちます。
 
-- Bundle MCP tool カタログは tool
-  登録前に決定的にソートされるため、`listTools()` 順序の変化が tools ブロックを変動させて
-  prompt-cache 接頭辞を壊すことはありません。
-- 永続化された画像ブロックを持つ旧来セッションでは、**直近 3 つの完了ターン**がそのまま保持されます。それより古い、すでに処理済みの画像ブロックは
-  マーカーに置き換えられることがあり、画像の多いフォローアップで大きな
-  古いペイロードを再送し続けないようにします。
+- Bundle MCP ツールカタログは、ツール登録前に決定的にソートされるため、`listTools()` の順序変更によって tools ブロックが変動し、プロンプトキャッシュ接頭辞が壊れることを防ぎます。
+- 永続化された画像ブロックを持つレガシーセッションでは、**直近 3 件の完了ターン** をそのまま保持します。より古く、すでに処理済みの画像ブロックはマーカーに置き換えられる場合があるため、画像の多いフォローアップで古い大きなペイロードが再送され続けません。
 
 ## チューニングパターン
 
 ### 混在トラフィック（推奨デフォルト）
 
-メインエージェントでは長寿命のベースラインを保ち、バースト的な notifier エージェントではキャッシュを無効にします。
+メインエージェントには長寿命のベースラインを維持し、バースト的な notifier エージェントではキャッシュを無効にします。
 
 ```yaml
 agents:
@@ -222,80 +199,77 @@ agents:
         cacheRetention: "none"
 ```
 
-### コスト優先ベースライン
+### コスト優先のベースライン
 
-- ベースライン `cacheRetention: "short"` を設定する。
-- `contextPruning.mode: "cache-ttl"` を有効にする。
-- TTL 未満の Heartbeat は、温かいキャッシュの恩恵を受けるエージェントに対してのみ維持する。
+- ベースラインを `cacheRetention: "short"` に設定します。
+- `contextPruning.mode: "cache-ttl"` を有効にします。
+- warm キャッシュの恩恵を受けるエージェントに対してのみ、TTL 未満の Heartbeat を維持します。
 
 ## キャッシュ診断
 
-OpenClaw は、埋め込みエージェント実行に対して専用の cache-trace 診断を公開します。
+OpenClaw は、埋め込みエージェント実行向けに専用のキャッシュトレース診断を公開しています。
 
-通常のユーザー向け診断では、ライブセッションエントリーにそれらのカウンターがない場合、
-`/status` やその他の usage サマリーは、
-`cacheRead` /
-`cacheWrite` のフォールバックソースとして最新のトランスクリプト usage エントリーを使えます。
+通常のユーザー向け診断では、ライブセッションエントリにそれらのカウンタがない場合、`/status` やその他の使用量サマリーは、`cacheRead` / `cacheWrite` のフォールバックソースとして最新の transcript 使用量エントリを使えます。
 
 ## ライブ回帰テスト
 
-OpenClaw は、繰り返し接頭辞、tool ターン、画像ターン、MCP 形式の tool トランスクリプト、および Anthropic の no-cache コントロールに対する、1 つの統合ライブキャッシュ回帰ゲートを維持しています。
+OpenClaw は、繰り返し接頭辞、ツールターン、画像ターン、MCP 形式ツール transcript、Anthropic の no-cache コントロールに対して、1 つの統合ライブキャッシュ回帰ゲートを維持しています。
 
 - `src/agents/live-cache-regression.live.test.ts`
 - `src/agents/live-cache-regression-baseline.ts`
 
-絞り込まれたライブゲートを実行するには:
+絞り込んだライブゲートを実行するには:
 
 ```sh
 OPENCLAW_LIVE_TEST=1 OPENCLAW_LIVE_CACHE_TEST=1 pnpm test:live:cache
 ```
 
-baseline ファイルには、直近で観測されたライブ値と、テストで使われるプロバイダー固有の回帰下限値が保存されます。
-runner はまた、以前のキャッシュ state が現在の回帰サンプルを汚染しないように、新しい実行ごとのセッション ID と prompt namespace を使います。
+ベースラインファイルには、直近に観測されたライブ値と、テストで使用される Provider 固有の回帰下限が保存されます。
+ランナーは、以前のキャッシュ状態が現在の回帰サンプルを汚染しないよう、実行ごとに新しいセッション ID とプロンプト名前空間も使用します。
 
-これらのテストは、意図的にプロバイダー間で同一の成功基準を使っていません。
+これらのテストでは、Provider 間で意図的に同一の成功基準を使用していません。
 
 ### Anthropic のライブ期待値
 
-- `cacheWrite` による明示的な warmup write を期待する。
-- Anthropic の cache control は会話をまたいでキャッシュブレークポイントを進めるため、繰り返しターンでほぼ完全な履歴再利用を期待する。
-- 現在のライブアサーションは、安定、tool、画像パスに対して引き続き高い hit-rate 閾値を使う。
+- `cacheWrite` を通じた明示的な warmup 書き込みを期待します。
+- Anthropic の cache control が会話を通じてキャッシュ境界点を前進させるため、繰り返しターンではほぼ全履歴の再利用を期待します。
+- 現在のライブアサーションでも、安定、ツール、画像の各経路に対して高いヒット率のしきい値を使用しています。
 
 ### OpenAI のライブ期待値
 
-- `cacheRead` のみを期待する。`cacheWrite` は `0` のまま。
-- 繰り返しターンのキャッシュ再利用は、Anthropic 方式の移動する全履歴再利用ではなく、プロバイダー固有の plateau として扱う。
-- 現在のライブアサーションは、`gpt-5.4-mini` 上の観測済みライブ動作から導出された保守的な下限チェックを使う:
-  - 安定接頭辞: `cacheRead >= 4608`, hit rate `>= 0.90`
-  - tool トランスクリプト: `cacheRead >= 4096`, hit rate `>= 0.85`
-  - 画像トランスクリプト: `cacheRead >= 3840`, hit rate `>= 0.82`
-  - MCP 形式トランスクリプト: `cacheRead >= 4096`, hit rate `>= 0.85`
+- `cacheRead` のみを期待します。`cacheWrite` は `0` のままです。
+- 繰り返しターンでのキャッシュ再利用は、Anthropic 形式の移動する全履歴再利用ではなく、Provider 固有の頭打ち値として扱います。
+- 現在のライブアサーションでは、`gpt-5.4-mini` で観測されたライブ動作から導いた保守的な下限チェックを使用しています。
+  - 安定した接頭辞: `cacheRead >= 4608`、ヒット率 `>= 0.90`
+  - ツール transcript: `cacheRead >= 4096`、ヒット率 `>= 0.85`
+  - 画像 transcript: `cacheRead >= 3840`、ヒット率 `>= 0.82`
+  - MCP 形式 transcript: `cacheRead >= 4096`、ヒット率 `>= 0.85`
 
-2026-04-04 の新しい統合ライブ検証結果:
+2026-04-04 時点での最新の統合ライブ検証結果:
 
-- 安定接頭辞: `cacheRead=4864`, hit rate `0.966`
-- tool トランスクリプト: `cacheRead=4608`, hit rate `0.896`
-- 画像トランスクリプト: `cacheRead=4864`, hit rate `0.954`
-- MCP 形式トランスクリプト: `cacheRead=4608`, hit rate `0.891`
+- 安定した接頭辞: `cacheRead=4864`、ヒット率 `0.966`
+- ツール transcript: `cacheRead=4608`、ヒット率 `0.896`
+- 画像 transcript: `cacheRead=4864`、ヒット率 `0.954`
+- MCP 形式 transcript: `cacheRead=4608`、ヒット率 `0.891`
 
-統合ゲートの最近のローカル実測 wall-clock time は約 `88s` でした。
+統合ゲートの最近のローカル実行時間は約 `88s` でした。
 
 アサーションが異なる理由:
 
-- Anthropic は明示的なキャッシュブレークポイントと、会話履歴の移動する再利用を公開します。
-- OpenAI の prompt caching も依然として正確な接頭辞に敏感ですが、ライブ Responses トラフィックで実際に再利用可能な接頭辞は、完全なプロンプトより早く plateau することがあります。
-- そのため、Anthropic と OpenAI を 1 つのプロバイダー横断パーセンテージ閾値で比較すると、偽の回帰が生じます。
+- Anthropic は明示的なキャッシュ境界点と、移動する会話履歴の再利用を公開しています。
+- OpenAI のプロンプトキャッシュも引き続き正確な接頭辞に敏感ですが、ライブ Responses トラフィックで実際に再利用可能な接頭辞は、完全なプロンプトより早い段階で頭打ちになることがあります。
+- そのため、Anthropic と OpenAI を単一の Provider 横断パーセンテージしきい値で比較すると、誤った回帰検出が発生します。
 
-### `diagnostics.cacheTrace` config
+### `diagnostics.cacheTrace` 設定
 
 ```yaml
 diagnostics:
   cacheTrace:
     enabled: true
-    filePath: "~/.openclaw/logs/cache-trace.jsonl" # 任意
-    includeMessages: false # デフォルト true
-    includePrompt: false # デフォルト true
-    includeSystem: false # デフォルト true
+    filePath: "~/.openclaw/logs/cache-trace.jsonl" # optional
+    includeMessages: false # default true
+    includePrompt: false # default true
+    includeSystem: false # default true
 ```
 
 デフォルト:
@@ -305,36 +279,36 @@ diagnostics:
 - `includePrompt`: `true`
 - `includeSystem`: `true`
 
-### Env トグル（単発デバッグ）
+### 環境変数トグル（一時的なデバッグ）
 
-- `OPENCLAW_CACHE_TRACE=1` で cache tracing を有効化。
-- `OPENCLAW_CACHE_TRACE_FILE=/path/to/cache-trace.jsonl` で出力パスを上書き。
-- `OPENCLAW_CACHE_TRACE_MESSAGES=0|1` で完全なメッセージペイロード取得を切り替え。
-- `OPENCLAW_CACHE_TRACE_PROMPT=0|1` でプロンプトテキスト取得を切り替え。
-- `OPENCLAW_CACHE_TRACE_SYSTEM=0|1` でシステムプロンプト取得を切り替え。
+- `OPENCLAW_CACHE_TRACE=1` でキャッシュトレースを有効化します。
+- `OPENCLAW_CACHE_TRACE_FILE=/path/to/cache-trace.jsonl` で出力パスを上書きします。
+- `OPENCLAW_CACHE_TRACE_MESSAGES=0|1` で完全なメッセージペイロード取得を切り替えます。
+- `OPENCLAW_CACHE_TRACE_PROMPT=0|1` でプロンプトテキスト取得を切り替えます。
+- `OPENCLAW_CACHE_TRACE_SYSTEM=0|1` で system プロンプト取得を切り替えます。
 
-### 確認すべきこと
+### 確認すべき内容
 
-- Cache trace イベントは JSONL で、`session:loaded`、`prompt:before`、`stream:context`、`session:after` のような段階的スナップショットを含みます。
-- ターンごとのキャッシュ token 影響は、通常の usage サーフェスを通じて `cacheRead` と `cacheWrite` で確認できます（たとえば `/usage full` や session usage サマリー）。
-- Anthropic では、キャッシュが有効なら `cacheRead` と `cacheWrite` の両方が出ることを期待してください。
-- OpenAI では、cache hit 時に `cacheRead` が出て、`cacheWrite` は `0` のままであることを期待してください。OpenAI は separate な cache-write token フィールドを公開しません。
-- リクエスト tracing が必要なら、request ID と rate-limit ヘッダーはキャッシュメトリクスとは別に記録してください。OpenClaw の現在の cache-trace 出力は、生の provider 応答ヘッダーより、prompt/session 形状と正規化された token usage に焦点を当てています。
+- キャッシュトレースイベントは JSONL で、`session:loaded`、`prompt:before`、`stream:context`、`session:after` などの段階的スナップショットを含みます。
+- ターンごとのキャッシュトークン影響は、通常の使用量画面で `cacheRead` と `cacheWrite` を通じて確認できます（例: `/usage full` やセッション使用量サマリー）。
+- Anthropic では、キャッシュが有効なとき `cacheRead` と `cacheWrite` の両方が見えることを期待してください。
+- OpenAI では、キャッシュヒット時に `cacheRead` が見え、`cacheWrite` は `0` のままであることを期待してください。OpenAI は個別のキャッシュ書き込みトークン項目を公開していません。
+- リクエストトレースが必要な場合は、リクエスト ID とレート制限ヘッダーをキャッシュメトリクスとは別に記録してください。現在の OpenClaw のキャッシュトレース出力は、生の Provider レスポンスヘッダーではなく、プロンプト/セッション形状と正規化済みトークン使用量に焦点を当てています。
 
 ## クイックトラブルシューティング
 
-- 多くのターンで `cacheWrite` が高い: 変動するシステムプロンプト入力を確認し、モデル/プロバイダーがそのキャッシュ設定をサポートしていることを検証してください。
-- Anthropic で `cacheWrite` が高い: 多くの場合、キャッシュブレークポイントが毎回変化する内容に着地していることを意味します。
-- OpenAI で `cacheRead` が低い: 安定した接頭辞が先頭にあること、繰り返される接頭辞が少なくとも 1024 token あること、およびキャッシュを共有すべきターンで同じ `prompt_cache_key` が再利用されていることを確認してください。
-- `cacheRetention` が効かない: モデルキーが `agents.defaults.models["provider/model"]` と一致していることを確認してください。
-- キャッシュ設定付きの Bedrock Nova/Mistral リクエスト: ランタイムで `none` に強制されるのは想定された動作です。
+- 多くのターンで `cacheWrite` が高い: 変動する system プロンプト入力を確認し、モデル/Provider がキャッシュ設定をサポートしていることを検証してください。
+- Anthropic で `cacheWrite` が高い: 多くの場合、キャッシュ境界点がリクエストごとに変化するコンテンツに当たっていることを意味します。
+- OpenAI で `cacheRead` が低い: 安定した接頭辞が先頭にあること、繰り返される接頭辞が少なくとも 1024 トークンあること、キャッシュを共有すべきターンで同じ `prompt_cache_key` が再利用されていることを確認してください。
+- `cacheRetention` の効果がない: モデルキーが `agents.defaults.models["provider/model"]` と一致していることを確認してください。
+- キャッシュ設定付きの Bedrock Nova/Mistral リクエスト: 実行時に `none` へ強制されるのは想定どおりです。
 
 関連ドキュメント:
 
 - [Anthropic](/ja-JP/providers/anthropic)
-- [Token Use and Costs](/ja-JP/reference/token-use)
-- [Session Pruning](/ja-JP/concepts/session-pruning)
-- [Gateway Configuration Reference](/ja-JP/gateway/configuration-reference)
+- [トークン使用量とコスト](/ja-JP/reference/token-use)
+- [セッション pruning](/ja-JP/concepts/session-pruning)
+- [Gateway 設定リファレンス](/ja-JP/gateway/configuration-reference)
 
 ## 関連
 

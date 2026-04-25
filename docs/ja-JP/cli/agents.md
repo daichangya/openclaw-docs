@@ -1,13 +1,13 @@
 ---
 read_when:
     - 複数の分離されたエージェント（ワークスペース + ルーティング + 認証）が必要な場合
-summary: '`openclaw agents` のCLIリファレンス（list/add/delete/bindings/bind/unbind/set identity）'
+summary: '`openclaw agents` の CLI リファレンス（list/add/delete/bindings/bind/unbind/set identity）'
 title: エージェント
 x-i18n:
-    generated_at: "2026-04-24T04:49:18Z"
+    generated_at: "2026-04-25T13:43:16Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 04d0ce4f3fb3d0c0ba8ffb3676674cda7d9a60441a012bc94ff24a17105632f1
+    source_hash: fcd0698f0821f9444e84cd82fe78ee46071447fb4c3cada6d1a98b5130147691
     source_path: cli/agents.md
     workflow: 15
 ---
@@ -19,8 +19,8 @@ x-i18n:
 関連:
 
 - マルチエージェントルーティング: [Multi-Agent Routing](/ja-JP/concepts/multi-agent)
-- エージェントワークスペース: [Agent workspace](/ja-JP/concepts/agent-workspace)
-- Skills可視性設定: [Skills config](/ja-JP/tools/skills-config)
+- Agent workspace: [Agent workspace](/ja-JP/concepts/agent-workspace)
+- Skills の可視性設定: [Skills config](/ja-JP/tools/skills-config)
 
 ## 例
 
@@ -39,14 +39,14 @@ openclaw agents delete work
 
 ## ルーティングバインディング
 
-受信チャネルトラフィックを特定のエージェントに固定するには、ルーティングバインディングを使用します。
+受信チャネルのトラフィックを特定のエージェントに固定するには、ルーティングバインディングを使用します。
 
-エージェントごとに表示されるSkillsも変えたい場合は、`openclaw.json`で
-`agents.defaults.skills`と`agents.list[].skills`を設定してください。詳細は
-[Skills config](/ja-JP/tools/skills-config)および
-[Configuration Reference](/ja-JP/gateway/config-agents#agents-defaults-skills)を参照してください。
+エージェントごとに見える Skills も変えたい場合は、
+`openclaw.json` の `agents.defaults.skills` と `agents.list[].skills` を設定してください。  
+[Skills config](/ja-JP/tools/skills-config) と
+[Configuration Reference](/ja-JP/gateway/config-agents#agents-defaults-skills) を参照してください。
 
-バインディングを一覧表示するには:
+バインディングを一覧表示:
 
 ```bash
 openclaw agents bindings
@@ -54,48 +54,48 @@ openclaw agents bindings --agent work
 openclaw agents bindings --json
 ```
 
-バインディングを追加するには:
+バインディングを追加:
 
 ```bash
 openclaw agents bind --agent work --bind telegram:ops --bind discord:guild-a
 ```
 
-`accountId`（`--bind <channel>`）を省略した場合、OpenClawは利用可能な場合にチャネルのデフォルト値とPluginセットアップフックからそれを解決します。
+`accountId`（`--bind <channel>`）を省略すると、利用可能な場合は OpenClaw がチャネルのデフォルト値と Plugin のセットアップフックからそれを解決します。
 
-`bind`または`unbind`で`--agent`を省略した場合、OpenClawは現在のデフォルトエージェントを対象にします。
+`bind` または `unbind` で `--agent` を省略すると、OpenClaw は現在のデフォルトエージェントを対象にします。
 
 ### バインディングスコープの動作
 
-- `accountId`なしのバインディングは、チャネルのデフォルトアカウントにのみ一致します。
-- `accountId: "*"`はチャネル全体のフォールバック（すべてのアカウント）であり、明示的なアカウントバインディングより具体性が低くなります。
-- 同じエージェントに対して`accountId`なしの一致するチャネルバインディングがすでに存在し、後から明示的または解決済みの`accountId`でバインドした場合、OpenClawは重複を追加する代わりに既存のバインディングをその場でアップグレードします。
+- `accountId` なしのバインディングは、チャネルのデフォルトアカウントのみに一致します。
+- `accountId: "*"` はチャネル全体のフォールバック（全アカウント）であり、明示的なアカウントバインディングより具体性が低くなります。
+- 同じエージェントに、すでに `accountId` なしの一致するチャネルバインディングがある状態で、後から明示的または解決済みの `accountId` を付けてバインドすると、OpenClaw は重複を追加する代わりに、その既存バインディングをその場でアップグレードします。
 
 例:
 
 ```bash
-# initial channel-only binding
+# 初期のチャネルのみのバインディング
 openclaw agents bind --agent work --bind telegram
 
-# later upgrade to account-scoped binding
+# 後でアカウントスコープのバインディングにアップグレード
 openclaw agents bind --agent work --bind telegram:ops
 ```
 
-アップグレード後、そのバインディングのルーティングは`telegram:ops`にスコープされます。デフォルトアカウントのルーティングも必要な場合は、明示的に追加してください（たとえば`--bind telegram:default`）。
+アップグレード後、そのバインディングのルーティングは `telegram:ops` にスコープされます。デフォルトアカウントのルーティングも必要な場合は、明示的に追加してください（たとえば `--bind telegram:default`）。
 
-バインディングを削除するには:
+バインディングを削除:
 
 ```bash
 openclaw agents unbind --agent work --bind telegram:ops
 openclaw agents unbind --agent work --all
 ```
 
-`unbind`は`--all`または1つ以上の`--bind`値のいずれかを受け付けます。両方は指定できません。
+`unbind` は `--all` か、1つ以上の `--bind` 値のどちらか一方のみを受け付けます。両方は指定できません。
 
-## コマンド一覧
+## コマンドサーフェス
 
 ### `agents`
 
-サブコマンドなしで`openclaw agents`を実行することは、`openclaw agents list`と同等です。
+サブコマンドなしで `openclaw agents` を実行すると、`openclaw agents list` と同等です。
 
 ### `agents list`
 
@@ -111,15 +111,15 @@ openclaw agents unbind --agent work --all
 - `--workspace <dir>`
 - `--model <id>`
 - `--agent-dir <dir>`
-- `--bind <channel[:accountId]>`（繰り返し可能）
+- `--bind <channel[:accountId]>`（繰り返し指定可）
 - `--non-interactive`
 - `--json`
 
 注意:
 
-- 明示的なaddフラグを1つでも渡すと、コマンドは非対話パスに切り替わります。
-- 非対話モードでは、エージェント名と`--workspace`の両方が必要です。
-- `main`は予約済みであり、新しいエージェントIDとして使用できません。
+- 明示的な add フラグを1つでも渡すと、そのコマンドは非対話モードになります。
+- 非対話モードでは、エージェント名と `--workspace` の両方が必要です。
+- `main` は予約済みであり、新しいエージェント id としては使用できません。
 
 ### `agents bindings`
 
@@ -133,7 +133,7 @@ openclaw agents unbind --agent work --all
 オプション:
 
 - `--agent <id>`（デフォルトは現在のデフォルトエージェント）
-- `--bind <channel[:accountId]>`（繰り返し可能）
+- `--bind <channel[:accountId]>`（繰り返し指定可）
 - `--json`
 
 ### `agents unbind`
@@ -141,7 +141,7 @@ openclaw agents unbind --agent work --all
 オプション:
 
 - `--agent <id>`（デフォルトは現在のデフォルトエージェント）
-- `--bind <channel[:accountId]>`（繰り返し可能）
+- `--bind <channel[:accountId]>`（繰り返し指定可）
 - `--all`
 - `--json`
 
@@ -154,27 +154,30 @@ openclaw agents unbind --agent work --all
 
 注意:
 
-- `main`は削除できません。
-- `--force`なしでは、対話的な確認が必要です。
-- ワークスペース、エージェント状態、セッショントランスクリプトのディレクトリは完全削除されず、Trashに移動されます。
+- `main` は削除できません。
+- `--force` がない場合は、対話的な確認が必要です。
+- ワークスペース、エージェント状態、セッショントランスクリプトのディレクトリは完全削除されず、Trash に移動されます。
+- 別のエージェントのワークスペースが同じパスである場合、そのワークスペース内にある場合、またはそのワークスペースを含んでいる場合、
+  そのワークスペースは保持され、`--json` では `workspaceRetained`、
+  `workspaceRetainedReason`、`workspaceSharedWith` が報告されます。
 
-## IDENTITYファイル
+## IDENTITY ファイル
 
-各エージェントワークスペースには、ワークスペースルートに`IDENTITY.md`を含めることができます。
+各エージェントワークスペースには、ワークスペースルートに `IDENTITY.md` を含めることができます。
 
-- 例のパス: `~/.openclaw/workspace/IDENTITY.md`
-- `set-identity --from-identity`はワークスペースルート（または明示的な`--identity-file`）から読み取ります
+- パス例: `~/.openclaw/workspace/IDENTITY.md`
+- `set-identity --from-identity` はワークスペースルートから読み取ります（または明示的な `--identity-file`）
 
-アバターパスはワークスペースルートからの相対パスとして解決されます。
+アバターパスはワークスペースルート基準で解決されます。
 
-## identityの設定
+## IDENTITY を設定
 
-`set-identity`はフィールドを`agents.list[].identity`に書き込みます。
+`set-identity` はフィールドを `agents.list[].identity` に書き込みます:
 
 - `name`
 - `theme`
 - `emoji`
-- `avatar`（ワークスペース相対パス、http(s) URL、またはdata URI）
+- `avatar`（ワークスペース相対パス、http(s) URL、または data URI）
 
 オプション:
 
@@ -190,17 +193,17 @@ openclaw agents unbind --agent work --all
 
 注意:
 
-- 対象エージェントの選択には`--agent`または`--workspace`を使用できます。
-- `--workspace`に依存していて、複数のエージェントがそのワークスペースを共有している場合、コマンドは失敗し、`--agent`を渡すよう求められます。
-- 明示的なidentityフィールドが指定されていない場合、コマンドは`IDENTITY.md`からidentityデータを読み取ります。
+- 対象エージェントの選択には `--agent` または `--workspace` を使用できます。
+- `--workspace` に依存していて複数のエージェントがそのワークスペースを共有している場合、コマンドは失敗し、`--agent` を渡すよう求められます。
+- 明示的な identity フィールドが指定されていない場合、コマンドは `IDENTITY.md` から identity データを読み取ります。
 
-`IDENTITY.md`から読み込むには:
+`IDENTITY.md` から読み込む:
 
 ```bash
 openclaw agents set-identity --workspace ~/.openclaw/workspace --from-identity
 ```
 
-フィールドを明示的に上書きするには:
+フィールドを明示的に上書きする:
 
 ```bash
 openclaw agents set-identity --agent main --name "OpenClaw" --emoji "🦞" --avatar avatars/openclaw.png
