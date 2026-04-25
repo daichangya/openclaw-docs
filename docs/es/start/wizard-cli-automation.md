@@ -1,15 +1,15 @@
 ---
 read_when:
-    - You are automating onboarding in scripts or CI
+    - Estás automatizando el onboarding en scripts o CI
     - Necesitas ejemplos no interactivos para proveedores específicos
 sidebarTitle: CLI automation
-summary: Incorporación con scripts y configuración de agentes para la CLI de OpenClaw
+summary: Onboarding con scripts y configuración del agente para la CLI de OpenClaw
 title: Automatización de CLI
 x-i18n:
-    generated_at: "2026-04-24T05:51:22Z"
+    generated_at: "2026-04-25T13:57:10Z"
     model: gpt-5.4
     provider: openai
-    source_hash: b114b6b4773af8f23be0e65485bdcb617848e35cfde1642776c75108d470cea3
+    source_hash: 4d36801439b9243ea5cc0ab93757dde23d1ecd86c8f5b991541ee14f41bf05ac
     source_path: start/wizard-cli-automation.md
     workflow: 15
 ---
@@ -32,16 +32,19 @@ openclaw onboard --non-interactive \
   --gateway-bind loopback \
   --install-daemon \
   --daemon-runtime node \
+  --skip-bootstrap \
   --skip-skills
 ```
 
-Añade `--json` para un resumen legible por máquinas.
+Añade `--json` para obtener un resumen legible por máquina.
 
-Usa `--secret-input-mode ref` para almacenar referencias respaldadas por env en perfiles de autenticación en lugar de valores en texto plano.
-La selección interactiva entre referencias env y referencias de proveedor configuradas (`file` o `exec`) está disponible en el flujo de onboarding.
+Usa `--skip-bootstrap` cuando tu automatización precargue archivos del workspace y no quiera que el onboarding cree los archivos bootstrap predeterminados.
 
-En modo no interactivo `ref`, las variables env del proveedor deben estar configuradas en el entorno del proceso.
-Pasar indicadores de clave inline sin la variable env correspondiente ahora falla inmediatamente.
+Usa `--secret-input-mode ref` para almacenar referencias respaldadas por variables de entorno en los perfiles de autenticación en lugar de valores en texto plano.
+La selección interactiva entre referencias de entorno y referencias de proveedor configuradas (`file` o `exec`) está disponible en el flujo de onboarding.
+
+En modo `ref` no interactivo, las variables de entorno del proveedor deben estar configuradas en el entorno del proceso.
+Pasar indicadores de clave en línea sin la variable de entorno correspondiente ahora falla rápidamente.
 
 Ejemplo:
 
@@ -56,7 +59,7 @@ openclaw onboard --non-interactive \
 ## Ejemplos específicos por proveedor
 
 <AccordionGroup>
-  <Accordion title="Ejemplo de clave API de Anthropic">
+  <Accordion title="Ejemplo de clave de API de Anthropic">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -147,7 +150,7 @@ openclaw onboard --non-interactive \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
-    Cámbialo por `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` para el catálogo Go.
+    Cambia a `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` para el catálogo Go.
   </Accordion>
   <Accordion title="Ejemplo de Ollama">
     ```bash
@@ -174,7 +177,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` es opcional. Si se omite, onboarding comprueba `CUSTOM_API_KEY`.
+    `--custom-api-key` es opcional. Si se omite, el onboarding comprueba `CUSTOM_API_KEY`.
 
     Variante en modo ref:
 
@@ -192,17 +195,17 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    En este modo, onboarding almacena `apiKey` como `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
+    En este modo, el onboarding almacena `apiKey` como `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
 
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token sigue disponible como ruta compatible de token de onboarding, pero OpenClaw ahora prefiere reutilizar Claude CLI cuando está disponible.
-Para producción, prefiere una clave API de Anthropic.
+El token de configuración de Anthropic sigue disponible como ruta de token de onboarding admitida, pero OpenClaw ahora prefiere reutilizar Claude CLI cuando está disponible.
+Para producción, prefiere una clave de API de Anthropic.
 
 ## Añadir otro agente
 
-Usa `openclaw agents add <name>` para crear un agente independiente con su propio espacio de trabajo,
+Usa `openclaw agents add <name>` para crear un agente independiente con su propio workspace,
 sesiones y perfiles de autenticación. Ejecutarlo sin `--workspace` inicia el asistente.
 
 ```bash
@@ -214,7 +217,7 @@ openclaw agents add work \
   --json
 ```
 
-Qué establece:
+Qué configura:
 
 - `agents.list[].name`
 - `agents.list[].workspace`
@@ -222,12 +225,12 @@ Qué establece:
 
 Notas:
 
-- Los espacios de trabajo predeterminados siguen `~/.openclaw/workspace-<agentId>`.
+- Los workspaces predeterminados siguen el patrón `~/.openclaw/workspace-<agentId>`.
 - Añade `bindings` para enrutar mensajes entrantes (el asistente puede hacerlo).
 - Indicadores no interactivos: `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
 
-## Documentación relacionada
+## Documentos relacionados
 
 - Centro de onboarding: [Onboarding (CLI)](/es/start/wizard)
-- Referencia completa: [Referencia de configuración CLI](/es/start/wizard-cli-reference)
+- Referencia completa: [Referencia de configuración de CLI](/es/start/wizard-cli-reference)
 - Referencia de comandos: [`openclaw onboard`](/es/cli/onboard)

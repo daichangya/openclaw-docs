@@ -1,38 +1,38 @@
 ---
 read_when:
-    - Configurar el control de acceso para mensajes directos
-    - Vincular un nuevo nodo de iOS/Android
-    - Revisar la postura de seguridad de OpenClaw
-summary: 'Descripción general de la vinculación: aprobar quién puede enviarte mensajes directos + qué nodos pueden unirse'
-title: Vinculación
+    - Configuración del control de acceso por mensajes directos
+    - Emparejar un nuevo Node de iOS/Android
+    - Revisión de la postura de seguridad de OpenClaw
+summary: 'Descripción general del emparejamiento: aprueba quién puede enviarte mensajes directos y qué Nodes pueden unirse'
+title: Emparejamiento
 x-i18n:
-    generated_at: "2026-04-24T05:19:55Z"
+    generated_at: "2026-04-25T13:41:39Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 373eaa02865995ada0c906df9bad4e8328f085a8bb3679b0a5820dc397130137
+    source_hash: 8f11c992f7cbde12f8c6963279dbaea420941e2fc088179d3fd259e4aa007e34
     source_path: channels/pairing.md
     workflow: 15
 ---
 
-La “vinculación” es el paso explícito de **aprobación del propietario** de OpenClaw.
+“Emparejamiento” es el paso explícito de **aprobación del propietario** de OpenClaw.
 Se usa en dos lugares:
 
-1. **Vinculación de mensajes directos** (quién puede hablar con el bot)
-2. **Vinculación de nodos** (qué dispositivos/nodos pueden unirse a la red de gateway)
+1. **Emparejamiento de mensajes directos** (quién puede hablar con el bot)
+2. **Emparejamiento de Node** (qué dispositivos/nodes pueden unirse a la red del Gateway)
 
-Contexto de seguridad: [Seguridad](/es/gateway/security)
+Contexto de seguridad: [Security](/es/gateway/security)
 
-## 1) Vinculación de mensajes directos (acceso a chat entrante)
+## 1) Emparejamiento de mensajes directos (acceso al chat entrante)
 
-Cuando un canal está configurado con la política de mensajes directos `pairing`, los remitentes desconocidos reciben un código corto y su mensaje **no se procesa** hasta que lo apruebes.
+Cuando un canal se configura con la política de mensajes directos `pairing`, los remitentes desconocidos reciben un código corto y su mensaje **no se procesa** hasta que lo apruebes.
 
-Las políticas predeterminadas de mensajes directos están documentadas en: [Seguridad](/es/gateway/security)
+Las políticas predeterminadas de mensajes directos están documentadas en: [Security](/es/gateway/security)
 
-Códigos de vinculación:
+Códigos de emparejamiento:
 
 - 8 caracteres, en mayúsculas, sin caracteres ambiguos (`0O1I`).
-- **Caducan después de 1 hora**. El bot solo envía el mensaje de vinculación cuando se crea una nueva solicitud (aproximadamente una vez por hora por remitente).
-- Las solicitudes pendientes de vinculación de mensajes directos están limitadas a **3 por canal** de forma predeterminada; las solicitudes adicionales se ignoran hasta que una caduque o sea aprobada.
+- **Caducan después de 1 hora**. El bot solo envía el mensaje de emparejamiento cuando se crea una nueva solicitud (aproximadamente una vez por hora por remitente).
+- Las solicitudes pendientes de emparejamiento de mensajes directos están limitadas a **3 por canal** de forma predeterminada; las solicitudes adicionales se ignoran hasta que una caduque o sea aprobada.
 
 ### Aprobar un remitente
 
@@ -43,7 +43,7 @@ openclaw pairing approve telegram <CODE>
 
 Canales compatibles: `bluebubbles`, `discord`, `feishu`, `googlechat`, `imessage`, `irc`, `line`, `matrix`, `mattermost`, `msteams`, `nextcloud-talk`, `nostr`, `openclaw-weixin`, `signal`, `slack`, `synology-chat`, `telegram`, `twitch`, `whatsapp`, `zalo`, `zalouser`.
 
-### Dónde se guarda el estado
+### Dónde se almacena el estado
 
 Se almacena en `~/.openclaw/credentials/`:
 
@@ -54,46 +54,46 @@ Se almacena en `~/.openclaw/credentials/`:
 
 Comportamiento del alcance por cuenta:
 
-- Las cuentas no predeterminadas solo leen/escriben su archivo de lista de permitidos con alcance.
-- La cuenta predeterminada usa el archivo de lista de permitidos sin alcance del canal.
+- Las cuentas no predeterminadas solo leen/escriben su archivo de lista de permitidos con alcance específico.
+- La cuenta predeterminada usa el archivo de lista de permitidos del canal sin alcance específico.
 
-Trata estos archivos como sensibles (controlan el acceso a tu asistente).
+Trátalos como datos sensibles (controlan el acceso a tu asistente).
 
 Importante: este almacén es para acceso por mensajes directos. La autorización de grupos es independiente.
-Aprobar un código de vinculación de mensaje directo no permite automáticamente que ese remitente ejecute comandos de grupo ni controle el bot en grupos. Para el acceso a grupos, configura las listas de permitidos explícitas del canal para grupos (por ejemplo `groupAllowFrom`, `groups` o sobrescrituras por grupo/tema según el canal).
+Aprobar un código de emparejamiento de mensaje directo no permite automáticamente que ese remitente ejecute comandos de grupo ni controle el bot en grupos. Para el acceso a grupos, configura las listas de permitidos explícitas del canal para grupos (por ejemplo, `groupAllowFrom`, `groups` o anulaciones por grupo/tema según el canal).
 
-## 2) Vinculación de dispositivos nodo (nodos iOS/Android/macOS/sin interfaz)
+## 2) Emparejamiento de dispositivos Node (nodes de iOS/Android/macOS/sin interfaz)
 
-Los nodos se conectan a Gateway como **dispositivos** con `role: node`. Gateway
-crea una solicitud de vinculación de dispositivo que debe aprobarse.
+Los Nodes se conectan al Gateway como **dispositivos** con `role: node`. El Gateway
+crea una solicitud de emparejamiento de dispositivo que debe aprobarse.
 
-### Vincular mediante Telegram (recomendado para iOS)
+### Emparejar mediante Telegram (recomendado para iOS)
 
-Si usas el Plugin `device-pair`, puedes hacer la vinculación inicial del dispositivo completamente desde Telegram:
+Si usas el Plugin `device-pair`, puedes realizar el emparejamiento inicial del dispositivo completamente desde Telegram:
 
 1. En Telegram, envía a tu bot: `/pair`
-2. El bot responde con dos mensajes: un mensaje de instrucciones y un mensaje aparte con el **código de configuración** (fácil de copiar/pegar en Telegram).
-3. En tu teléfono, abre la app OpenClaw para iOS → Ajustes → Gateway.
+2. El bot responde con dos mensajes: un mensaje de instrucciones y un mensaje independiente con el **código de configuración** (fácil de copiar y pegar en Telegram).
+3. En tu teléfono, abre la app de OpenClaw para iOS → Settings → Gateway.
 4. Pega el código de configuración y conéctate.
-5. De vuelta en Telegram: `/pair pending` (revisa los ID de solicitud, el rol y los alcances) y luego aprueba.
+5. De vuelta en Telegram: `/pair pending` (revisa los ID de solicitud, el rol y los ámbitos), luego aprueba.
 
 El código de configuración es una carga JSON codificada en base64 que contiene:
 
-- `url`: la URL WebSocket de Gateway (`ws://...` o `wss://...`)
-- `bootstrapToken`: un token de arranque inicial de un solo dispositivo y corta duración usado para el protocolo inicial de vinculación
+- `url`: la URL WebSocket del Gateway (`ws://...` o `wss://...`)
+- `bootstrapToken`: un token bootstrap temporal de un solo dispositivo usado para el protocolo inicial de emparejamiento
 
-Ese token de arranque inicial contiene el perfil integrado de arranque para vinculación:
+Ese token bootstrap lleva el perfil bootstrap de emparejamiento incorporado:
 
 - el token `node` principal transferido sigue siendo `scopes: []`
-- cualquier token `operator` transferido sigue limitado a la lista de permitidos de arranque:
+- cualquier token `operator` transferido sigue limitado a la lista de permitidos bootstrap:
   `operator.approvals`, `operator.read`, `operator.talk.secrets`, `operator.write`
-- las comprobaciones de alcance de arranque usan prefijos por rol, no un único conjunto plano de alcances:
-  las entradas de alcance de operador solo satisfacen solicitudes de operador, y los roles que no son de operador
-  deben seguir solicitando alcances bajo el prefijo de su propio rol
+- las comprobaciones de ámbitos bootstrap usan prefijos por rol, no un único conjunto plano de ámbitos:
+  las entradas de ámbitos de operator solo satisfacen solicitudes de operator, y los roles que no son operator
+  deben seguir solicitando ámbitos bajo su propio prefijo de rol
 
 Trata el código de configuración como una contraseña mientras sea válido.
 
-### Aprobar un dispositivo nodo
+### Aprobar un dispositivo Node
 
 ```bash
 openclaw devices list
@@ -101,36 +101,58 @@ openclaw devices approve <requestId>
 openclaw devices reject <requestId>
 ```
 
-Si el mismo dispositivo reintenta con detalles de autenticación distintos (por ejemplo, distinto
-rol/alcances/clave pública), la solicitud pendiente anterior se reemplaza y se crea un nuevo
+Si el mismo dispositivo vuelve a intentarlo con distintos datos de autenticación (por ejemplo, distinto
+rol/ámbitos/clave pública), la solicitud pendiente anterior se reemplaza y se crea un nuevo
 `requestId`.
 
-Importante: un dispositivo ya vinculado no obtiene acceso más amplio en silencio. Si
-se reconecta solicitando más alcances o un rol más amplio, OpenClaw mantiene la
-aprobación existente tal como está y crea una nueva solicitud pendiente de actualización. Usa
-`openclaw devices list` para comparar el acceso actualmente aprobado con el acceso
-recién solicitado antes de aprobar.
+Importante: un dispositivo ya emparejado no obtiene acceso más amplio de forma silenciosa. Si
+se vuelve a conectar solicitando más ámbitos o un rol más amplio, OpenClaw mantiene la
+aprobación existente tal como está y crea una nueva solicitud pendiente de ampliación. Usa
+`openclaw devices list` para comparar el acceso aprobado actualmente con el acceso recién
+solicitado antes de aprobar.
 
-### Almacenamiento del estado de vinculación de nodos
+### Autoaprobación opcional de Node con CIDR de confianza
+
+El emparejamiento de dispositivos sigue siendo manual de forma predeterminada. Para redes de nodes muy controladas,
+puedes habilitar opcionalmente la autoaprobación inicial de Node con CIDR explícitos o IP exactas:
+
+```json5
+{
+  gateway: {
+    nodes: {
+      pairing: {
+        autoApproveCidrs: ["192.168.1.0/24"],
+      },
+    },
+  },
+}
+```
+
+Esto solo se aplica a solicitudes nuevas de emparejamiento `role: node` sin
+ámbitos solicitados. Los clientes operator, browser, Control UI y WebChat siguen requiriendo
+aprobación manual. Los cambios de rol, ámbitos, metadatos y clave pública siguen requiriendo
+aprobación manual.
+
+### Almacenamiento del estado de emparejamiento de Node
 
 Se almacena en `~/.openclaw/devices/`:
 
 - `pending.json` (de corta duración; las solicitudes pendientes caducan)
-- `paired.json` (dispositivos vinculados + tokens)
+- `paired.json` (dispositivos emparejados + tokens)
 
 ### Notas
 
 - La API heredada `node.pair.*` (CLI: `openclaw nodes pending|approve|reject|rename`) es un
-  almacén de vinculación independiente propiedad de gateway. Los nodos WS siguen requiriendo vinculación de dispositivo.
-- El registro de vinculación es la fuente de verdad duradera para los roles aprobados. Los
+  almacén de emparejamiento independiente propiedad del Gateway. Los nodes WS siguen requiriendo emparejamiento de dispositivo.
+- El registro de emparejamiento es la fuente de verdad duradera para los roles aprobados. Los
   tokens de dispositivo activos siguen limitados a ese conjunto de roles aprobados; una entrada de token aislada
   fuera de los roles aprobados no crea acceso nuevo.
 
 ## Documentación relacionada
 
-- Modelo de seguridad + inyección de prompts: [Seguridad](/es/gateway/security)
-- Actualización segura (ejecutar doctor): [Actualización](/es/install/updating)
-- Configuraciones de canal:
+- Modelo de seguridad + inyección de prompts: [Security](/es/gateway/security)
+- Actualizar de forma segura (ejecutar doctor): [Updating](/es/install/updating)
+- Configuraciones de canales:
   - Telegram: [Telegram](/es/channels/telegram)
   - WhatsApp: [WhatsApp](/es/channels/whatsapp)
   - Signal: [Signal](/es/channels/signal)
