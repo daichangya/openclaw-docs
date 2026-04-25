@@ -1,26 +1,26 @@
 ---
 read_when:
-    - Вам потрібно викликати основні допоміжні засоби з plugin-а (`TTS`, `STT`, генерацію зображень, вебпошук, субагента, nodes)
+    - Вам потрібно викликати допоміжні засоби ядра з Pluginа (`TTS`, `STT`, генерація зображень, вебпошук, субагент, вузли)
     - Ви хочете зрозуміти, що надає `api.runtime`
-    - Ви звертаєтеся до допоміжних засобів конфігурації, агента або медіа з коду plugin-а
+    - Ви звертаєтеся до допоміжних засобів конфігурації, агента або медіа з коду Pluginа
 sidebarTitle: Runtime Helpers
-summary: api.runtime — вбудовані допоміжні засоби середовища виконання, доступні для plugin-ів
-title: Допоміжні засоби середовища виконання Plugin
+summary: api.runtime — інʼєктовані допоміжні засоби середовища виконання, доступні для Pluginів
+title: допоміжні засоби середовища виконання Pluginа
 x-i18n:
-    generated_at: "2026-04-24T04:35:27Z"
+    generated_at: "2026-04-25T03:16:26Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2327bdabc0dc1e05000ff83e507007fadff2698cceaae0d4a3e7bc4885440c55
+    source_hash: f8c3e5d4db970299c4c6f9f703a63bc42f244627989f1b3489adf43aa87c8952
     source_path: plugins/sdk-runtime.md
     workflow: 15
 ---
 
-Довідник щодо об’єкта `api.runtime`, який вбудовується в кожен plugin під час
+Довідник для об’єкта `api.runtime`, який інʼєктується в кожен Plugin під час
 реєстрації. Використовуйте ці допоміжні засоби замість прямого імпорту внутрішніх
 компонентів хоста.
 
 <Tip>
-  **Шукаєте покрокове пояснення?** Дивіться [Channel Plugins](/uk/plugins/sdk-channel-plugins)
+  **Шукаєте покрокове пояснення?** Див. [Channel Plugins](/uk/plugins/sdk-channel-plugins)
   або [Provider Plugins](/uk/plugins/sdk-provider-plugins) для покрокових посібників,
   які показують ці допоміжні засоби в контексті.
 </Tip>
@@ -47,7 +47,7 @@ const workspaceDir = api.runtime.agent.resolveAgentWorkspaceDir(cfg);
 // Отримати ідентичність агента
 const identity = api.runtime.agent.resolveAgentIdentity(cfg);
 
-// Отримати типовий рівень мислення
+// Отримати типовий рівень thinking
 const thinking = api.runtime.agent.resolveThinkingDefault(cfg, provider, model);
 
 // Отримати тайм-аут агента
@@ -56,7 +56,7 @@ const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 // Переконатися, що робочий простір існує
 await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-// Запустити вбудований хід агента
+// Виконати вбудований хід агента
 const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 const result = await api.runtime.agent.runEmbeddedAgent({
   sessionId: "my-plugin:task-1",
@@ -68,13 +68,13 @@ const result = await api.runtime.agent.runEmbeddedAgent({
 });
 ```
 
-`runEmbeddedAgent(...)` — це нейтральний допоміжний засіб для запуску звичайного ходу
-агента OpenClaw із коду plugin-а. Він використовує той самий механізм визначення
-provider/model і той самий вибір agent-harness, що й відповіді, запущені каналом.
+`runEmbeddedAgent(...)` — це нейтральний допоміжний засіб для запуску звичайного ходу агента OpenClaw
+з коду Pluginа. Він використовує той самий механізм визначення provider/model і
+вибір harness агента, що й відповіді, запущені каналом.
 
-`runEmbeddedPiAgent(...)` залишається псевдонімом для сумісності.
+`runEmbeddedPiAgent(...)` залишається сумісним псевдонімом.
 
-**Допоміжні засоби сховища сесій** розташовані в `api.runtime.agent.session`:
+**Допоміжні засоби сховища сесій** розміщені в `api.runtime.agent.session`:
 
 ```typescript
 const storePath = api.runtime.agent.session.resolveStorePath(cfg);
@@ -85,19 +85,19 @@ const filePath = api.runtime.agent.session.resolveSessionFilePath(cfg, sessionId
 
 ### `api.runtime.agent.defaults`
 
-Сталі типових model і provider:
+Константи типових model і provider:
 
 ```typescript
-const model = api.runtime.agent.defaults.model; // наприклад, "anthropic/claude-sonnet-4-6"
-const provider = api.runtime.agent.defaults.provider; // наприклад, "anthropic"
+const model = api.runtime.agent.defaults.model; // напр. "anthropic/claude-sonnet-4-6"
+const provider = api.runtime.agent.defaults.provider; // напр. "anthropic"
 ```
 
 ### `api.runtime.subagent`
 
-Запуск і керування фоновими запусками субагентів.
+Запуск і керування фоновими виконаннями субагента.
 
 ```typescript
-// Запустити субагента
+// Запустити виконання субагента
 const { runId } = await api.runtime.subagent.run({
   sessionKey: "agent:main:subagent:search-helper",
   message: "Expand this query into focused follow-up searches.",
@@ -122,16 +122,16 @@ await api.runtime.subagent.deleteSession({
 ```
 
 <Warning>
-  Перевизначення model (`provider`/`model`) потребують явного дозволу оператора через
-  `plugins.entries.<id>.subagent.allowModelOverride: true` у config.
-  Ненадійні plugin-и все ще можуть запускати субагентів, але запити на перевизначення відхиляються.
+  Перевизначення model (`provider`/`model`) потребує явної згоди оператора через
+  `plugins.entries.<id>.subagent.allowModelOverride: true` у конфігурації.
+  Ненадійні Plugins усе ще можуть запускати субагентів, але запити на перевизначення відхиляються.
 </Warning>
 
 ### `api.runtime.nodes`
 
-Перелік підключених nodes і виклик команди хоста node з коду plugin-а,
-завантаженого через Gateway. Використовуйте це, коли plugin відповідає за локальну роботу
-на спареному пристрої, наприклад за браузер або аудіоміст на іншому Mac.
+Перелік підключених Nodeів і виклик команди хоста Nodeа з коду Pluginа, завантаженого Gateway,
+або з CLI-команд Pluginа. Використовуйте це, коли Plugin володіє локальною роботою на
+спареному пристрої, наприклад браузером або аудіомостом на іншому Mac.
 
 ```typescript
 const { nodes } = await api.runtime.nodes.list({ connected: true });
@@ -144,15 +144,15 @@ const result = await api.runtime.nodes.invoke({
 });
 ```
 
-Це середовище виконання доступне лише всередині Gateway. Команди node, як і раніше,
-проходять через звичайне спарювання Gateway node, списки дозволених команд і локальну
-обробку команд на node.
+Усередині Gateway це середовище виконання працює в процесі. У CLI-командах Pluginа воно викликає
+налаштований Gateway через RPC, тож команди на кшталт `openclaw googlemeet
+recover-tab` можуть перевіряти спарені Nodeи з термінала. Команди Nodeів, як і раніше, проходять
+через звичайне спарювання Nodeів Gateway, списки дозволених команд і локальну обробку команд на Nodeі.
 
 ### `api.runtime.taskFlow`
 
-Прив’язати середовище виконання TaskFlow до наявного ключа сесії OpenClaw або
-довіреного контексту інструмента, а потім створювати й керувати TaskFlow без
-передавання власника в кожному виклику.
+Прив’язати середовище виконання TaskFlow до наявного ключа сесії OpenClaw або довіреного контексту tool,
+а потім створювати та керувати TaskFlow без передавання власника в кожному виклику.
 
 ```typescript
 const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
@@ -180,8 +180,8 @@ const waiting = taskFlow.setWaiting({
 ```
 
 Використовуйте `bindSession({ sessionKey, requesterOrigin })`, коли у вас уже є
-довірений ключ сесії OpenClaw із вашого власного шару прив’язки. Не виконуйте
-прив’язку на основі сирого користувацького вводу.
+довірений ключ сесії OpenClaw із вашого власного шару прив’язки. Не виконуйте прив’язку на основі сирого
+користувацького введення.
 
 ### `api.runtime.tts`
 
@@ -207,8 +207,8 @@ const voices = await api.runtime.tts.listVoices({
 });
 ```
 
-Використовує основну конфігурацію `messages.tts` і вибір provider. Повертає буфер
-PCM-аудіо + частоту дискретизації.
+Використовує базову конфігурацію `messages.tts` і вибір provider. Повертає PCM-аудіобуфер
++ частоту дискретизації.
 
 ### `api.runtime.mediaUnderstanding`
 
@@ -226,7 +226,7 @@ const image = await api.runtime.mediaUnderstanding.describeImageFile({
 const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
   filePath: "/tmp/inbound-audio.ogg",
   cfg: api.config,
-  mime: "audio/ogg", // необов’язково, якщо MIME неможливо визначити
+  mime: "audio/ogg", // необов’язково, коли MIME неможливо визначити
 });
 
 // Описати відео
@@ -245,7 +245,7 @@ const result = await api.runtime.mediaUnderstanding.runFile({
 Повертає `{ text: undefined }`, коли вихідні дані не створено (наприклад, якщо вхід пропущено).
 
 <Info>
-  `api.runtime.stt.transcribeAudioFile(...)` залишається псевдонімом для сумісності
+  `api.runtime.stt.transcribeAudioFile(...)` залишається сумісним псевдонімом
   для `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`.
 </Info>
 
@@ -277,7 +277,7 @@ const result = await api.runtime.webSearch.search({
 
 ### `api.runtime.media`
 
-Низькорівневі допоміжні засоби для медіа.
+Низькорівневі медіаутиліти.
 
 ```typescript
 const webMedia = await api.runtime.media.loadWebMedia(url);
@@ -302,7 +302,7 @@ const pngQrFile = await api.runtime.media.writeQrPngTempFile("https://openclaw.a
 
 ### `api.runtime.config`
 
-Завантаження й запис config.
+Завантаження та запис конфігурації.
 
 ```typescript
 const cfg = await api.runtime.config.loadConfig();
@@ -311,7 +311,7 @@ await api.runtime.config.writeConfigFile(cfg);
 
 ### `api.runtime.system`
 
-Системні допоміжні засоби.
+Системні утиліти.
 
 ```typescript
 await api.runtime.system.enqueueSystemEvent(event);
@@ -335,7 +335,7 @@ api.runtime.events.onSessionTranscriptUpdate((update) => {
 
 ### `api.runtime.logging`
 
-Журналювання.
+Логування.
 
 ```typescript
 const verbose = api.runtime.logging.shouldLogVerbose();
@@ -374,10 +374,10 @@ api.runtime.tools.registerMemoryCli(/* ... */);
 
 ### `api.runtime.channel`
 
-Допоміжні засоби середовища виконання, специфічні для каналу (доступні, коли завантажено channel plugin).
+Допоміжні засоби середовища виконання, специфічні для каналу (доступні, коли завантажено Channel Plugin).
 
 `api.runtime.channel.mentions` — це спільна поверхня політики вхідних згадок для
-вбудованих channel plugin-ів, які використовують вбудоване середовище виконання:
+вбудованих Channel Pluginів, які використовують інʼєкцію середовища виконання:
 
 ```typescript
 const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
@@ -404,7 +404,7 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 });
 ```
 
-Доступні допоміжні засоби для згадок:
+Доступні допоміжні засоби згадок:
 
 - `buildMentionRegexes`
 - `matchesMentionPatterns`
@@ -412,14 +412,14 @@ const decision = api.runtime.channel.mentions.resolveInboundMentionDecision({
 - `implicitMentionKindWhen`
 - `resolveInboundMentionDecision`
 
-`api.runtime.channel.mentions` навмисно не надає старіші допоміжні засоби сумісності
-`resolveMentionGating*`. Надавайте перевагу нормалізованому шляху
-`{ facts, policy }`.
+`api.runtime.channel.mentions` навмисно не надає старіші сумісні
+допоміжні засоби `resolveMentionGating*`. Надавайте перевагу нормалізованому
+шляху `{ facts, policy }`.
 
 ## Зберігання посилань на середовище виконання
 
-Використовуйте `createPluginRuntimeStore`, щоб зберегти посилання на середовище виконання
-для використання поза зворотним викликом `register`:
+Використовуйте `createPluginRuntimeStore`, щоб зберігати посилання на середовище виконання для
+використання поза callback `register`:
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -430,7 +430,7 @@ const store = createPluginRuntimeStore<PluginRuntime>({
   errorMessage: "my-plugin runtime not initialized",
 });
 
-// У вашій точці входу
+// In your entry point
 export default defineChannelPluginEntry({
   id: "my-plugin",
   name: "My Plugin",
@@ -439,19 +439,19 @@ export default defineChannelPluginEntry({
   setRuntime: store.setRuntime,
 });
 
-// В інших файлах
+// In other files
 export function getRuntime() {
-  return store.getRuntime(); // викидає помилку, якщо не ініціалізовано
+  return store.getRuntime(); // throws if not initialized
 }
 
 export function tryGetRuntime() {
-  return store.tryGetRuntime(); // повертає null, якщо не ініціалізовано
+  return store.tryGetRuntime(); // returns null if not initialized
 }
 ```
 
 Надавайте перевагу `pluginId` для ідентичності runtime-store. Низькорівнева форма `key`
-призначена для нетипових випадків, коли одному plugin-у навмисно потрібно більше
-одного слота середовища виконання.
+призначена для нечастих випадків, коли одному Pluginу навмисно потрібно більше ніж один слот
+середовища виконання.
 
 ## Інші поля верхнього рівня `api`
 
@@ -459,16 +459,16 @@ export function tryGetRuntime() {
 
 | Поле                     | Тип                       | Опис                                                                                        |
 | ------------------------ | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `api.id`                 | `string`                  | Ідентифікатор Plugin                                                                        |
-| `api.name`               | `string`                  | Відображувана назва Plugin                                                                  |
-| `api.config`             | `OpenClawConfig`          | Поточний знімок config (активний знімок середовища виконання в пам’яті, коли доступний)    |
-| `api.pluginConfig`       | `Record<string, unknown>` | Конфігурація, специфічна для Plugin, із `plugins.entries.<id>.config`                       |
-| `api.logger`             | `PluginLogger`            | Logger з відповідною областю видимості (`debug`, `info`, `warn`, `error`)                  |
-| `api.registrationMode`   | `PluginRegistrationMode`  | Поточний режим завантаження; `"setup-runtime"` — це легковагове вікно запуску/налаштування до повного входу |
-| `api.resolvePath(input)` | `(string) => string`      | Визначити шлях відносно кореня plugin-а                                                     |
+| `api.id`                 | `string`                  | Ідентифікатор Pluginа                                                                       |
+| `api.name`               | `string`                  | Відображувана назва Pluginа                                                                 |
+| `api.config`             | `OpenClawConfig`          | Поточний знімок конфігурації (активний знімок середовища виконання в пам’яті, якщо доступний) |
+| `api.pluginConfig`       | `Record<string, unknown>` | Конфігурація Pluginа з `plugins.entries.<id>.config`                                        |
+| `api.logger`             | `PluginLogger`            | Logger з обмеженою областю (`debug`, `info`, `warn`, `error`)                               |
+| `api.registrationMode`   | `PluginRegistrationMode`  | Поточний режим завантаження; `"setup-runtime"` — це полегшене вікно запуску/налаштування до повного входу |
+| `api.resolvePath(input)` | `(string) => string`      | Визначити шлях відносно кореня Pluginа                                                      |
 
 ## Пов’язане
 
 - [Огляд SDK](/uk/plugins/sdk-overview) -- довідка щодо підшляху
 - [Точки входу SDK](/uk/plugins/sdk-entrypoints) -- параметри `definePluginEntry`
-- [Внутрішня архітектура Plugin](/uk/plugins/architecture) -- модель можливостей і реєстр
+- [Внутрішня архітектура Pluginів](/uk/plugins/architecture) -- модель можливостей і реєстр
