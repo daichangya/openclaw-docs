@@ -1,73 +1,75 @@
 ---
 read_when:
-    - |-
-      Chcesz ograniczyć wzrost kontekstu spowodowany danymi wyjściowymi narzędzi กรุงเทพมหานครฯassistant to=final code ცა
-      print("Chcesz ograniczyć wzrost kontekstu spowodowany danymi wyjściowymi narzędzi")
-    - Chcesz zrozumieć optymalizację cache promptów Anthropic
-summary: Przycinanie starych wyników narzędzi, aby utrzymać lekki kontekst i wydajny cache
+    - Chcesz ograniczyć rozrost kontekstu spowodowany wynikami narzędzi
+    - Chcesz zrozumieć optymalizację pamięci podręcznej promptów Anthropic
+summary: Przycinanie starych wyników narzędzi, aby zachować lekki kontekst i wydajne buforowanie
 title: Przycinanie sesji
 x-i18n:
-    generated_at: "2026-04-24T09:07:20Z"
+    generated_at: "2026-04-26T11:27:54Z"
     model: gpt-5.4
     provider: openai
-    source_hash: af47997b83cd478dac0e2ebb6d277a948713f28651751bec6cff4ef4b70a16c6
+    source_hash: 3ea07f0ae23076906e2ff0246ac75813572f98cffa50afddb6a6b0af8964c4a9
     source_path: concepts/session-pruning.md
     workflow: 15
 ---
 
-Przycinanie sesji usuwa z kontekstu **stare wyniki narzędzi** przed każdym
-wywołaniem LLM. Ogranicza puchnięcie kontekstu spowodowane nagromadzonymi danymi wyjściowymi narzędzi (wyniki exec, odczyty
-plików, wyniki wyszukiwania) bez przepisywania zwykłego tekstu konwersacji.
+Przycinanie sesji przycina **stare wyniki narzędzi** z kontekstu przed każdym
+wywołaniem LLM. Ogranicza rozrost kontekstu spowodowany nagromadzonymi wynikami narzędzi (wyniki `exec`, odczyty plików, wyniki wyszukiwania), bez przepisywania zwykłego tekstu rozmowy.
 
 <Info>
-Przycinanie odbywa się tylko w pamięci — nie modyfikuje transkryptu sesji na dysku.
+Przycinanie działa tylko w pamięci -- nie modyfikuje transkryptu sesji na dysku.
 Pełna historia jest zawsze zachowywana.
 </Info>
 
 ## Dlaczego to ma znaczenie
 
-Długie sesje gromadzą dane wyjściowe narzędzi, które zwiększają rozmiar okna kontekstowego. To
-zwiększa koszt i może wymusić [Compaction](/pl/concepts/compaction) wcześniej, niż
-to konieczne.
+Długie sesje gromadzą wyniki narzędzi, które powiększają okno kontekstu. To
+zwiększa koszty i może wymusić [Compaction](/pl/concepts/compaction) wcześniej, niż
+jest to konieczne.
 
-Przycinanie jest szczególnie wartościowe dla **cache promptów Anthropic**. Po wygaśnięciu TTL
-cache następne żądanie ponownie zapisuje w cache cały prompt. Przycinanie zmniejsza rozmiar
-zapisu do cache, bezpośrednio obniżając koszt.
+Przycinanie jest szczególnie wartościowe dla **pamięci podręcznej promptów Anthropic**. Po wygaśnięciu
+TTL pamięci podręcznej następne żądanie ponownie zapisuje w cache cały prompt. Przycinanie zmniejsza rozmiar zapisu do cache, bezpośrednio obniżając koszt.
 
 ## Jak to działa
 
-1. Poczekaj, aż TTL cache wygaśnie (domyślnie 5 minut).
-2. Znajdź stare wyniki narzędzi do zwykłego przycinania (tekst konwersacji pozostaje bez zmian).
-3. **Miękko przytnij** zbyt duże wyniki — zachowaj początek i koniec, wstaw `...`.
-4. **Twardo wyczyść** resztę — zastąp placeholderem.
-5. Zresetuj TTL, aby kolejne żądania używały świeżego cache.
+1. Poczekaj na wygaśnięcie TTL cache (domyślnie 5 minut).
+2. Znajdź stare wyniki narzędzi do zwykłego przycinania (tekst rozmowy pozostaje bez zmian).
+3. **Miękkie przycięcie** zbyt dużych wyników -- zachowaj początek i koniec, wstaw `...`.
+4. **Twarde wyczyszczenie** pozostałych -- zastąp placeholderem.
+5. Zresetuj TTL, aby kolejne żądania korzystały ze świeżego cache.
 
-## Czyszczenie starszych obrazów legacy
+## Czyszczenie starszych obrazów
 
-OpenClaw uruchamia też oddzielne idempotentne czyszczenie dla starszych sesji legacy, które
-zachowywały surowe bloki obrazów w historii.
+OpenClaw buduje też osobny idempotentny widok odtwarzania dla sesji, które
+zachowują surowe bloki obrazów lub znaczniki mediów z hydracji promptu w historii.
 
-- Zachowuje **3 najnowsze ukończone tury** bajt w bajt, aby prefiksy cache promptów
-  dla ostatnich kontynuacji pozostawały stabilne.
-- Starsze, już przetworzone bloki obrazów w historii `user` lub `toolResult` mogą zostać
-  zastąpione przez `[image data removed - already processed by model]`.
-- To jest oddzielone od zwykłego przycinania według TTL cache. Istnieje po to, aby zatrzymać
-  powtarzające się ładunki obrazów przed psuciem cache promptów w późniejszych turach.
+- Zachowuje **3 najnowsze ukończone tury** bajt w bajt, aby prefiksy pamięci podręcznej promptu dla ostatnich działań następczych pozostały stabilne.
+- W widoku odtwarzania starsze już przetworzone bloki obrazów z historii `user` lub
+  `toolResult` mogą zostać zastąpione przez
+  `[image data removed - already processed by model]`.
+- Starsze tekstowe odwołania do mediów, takie jak `[media attached: ...]`,
+  `[Image: source: ...]` i `media://inbound/...`, mogą zostać zastąpione przez
+  `[media reference removed - already processed by model]`. Znaczniki załączników bieżącej tury pozostają nienaruszone, aby modele vision nadal mogły hydratuować nowe
+  obrazy.
+- Surowy transkrypt sesji nie jest przepisywany, więc przeglądarki historii nadal mogą
+  renderować oryginalne wpisy wiadomości i ich obrazy.
+- To rozwiązanie jest oddzielne od zwykłego przycinania według TTL cache. Istnieje po to, by zatrzymać powtarzające się
+  ładunki obrazów lub nieaktualne odwołania do mediów przed psuciem pamięci podręcznej promptów w późniejszych turach.
 
-## Inteligentne ustawienia domyślne
+## Inteligentne wartości domyślne
 
 OpenClaw automatycznie włącza przycinanie dla profili Anthropic:
 
 | Typ profilu                                            | Przycinanie włączone | Heartbeat |
 | ------------------------------------------------------ | -------------------- | --------- |
-| Uwierzytelnianie Anthropic OAuth/token (w tym ponowne użycie Claude CLI) | Tak      | 1 godzina |
+| Uwierzytelnianie Anthropic OAuth/token (w tym ponowne użycie Claude CLI) | Tak                  | 1 godzina |
 | Klucz API                                              | Tak                  | 30 min    |
 
 Jeśli ustawisz jawne wartości, OpenClaw ich nie nadpisze.
 
 ## Włączanie lub wyłączanie
 
-Przycinanie jest domyślnie wyłączone dla providerów innych niż Anthropic. Aby je włączyć:
+Przycinanie jest domyślnie wyłączone dla dostawców innych niż Anthropic. Aby je włączyć:
 
 ```json5
 {
@@ -85,21 +87,21 @@ Aby wyłączyć: ustaw `mode: "off"`.
 
 |            | Przycinanie         | Compaction              |
 | ---------- | ------------------- | ----------------------- |
-| **Co**     | Przycina wyniki narzędzi | Podsumowuje konwersację |
-| **Zapisywane?** | Nie (na żądanie) | Tak (w transkrypcie)     |
-| **Zakres** | Tylko wyniki narzędzi | Cała konwersacja      |
+| **Co**     | Przycina wyniki narzędzi | Streszcza rozmowę   |
+| **Zapisywane?** | Nie (na żądanie) | Tak (w transkrypcie)    |
+| **Zakres** | Tylko wyniki narzędzi | Cała rozmowa         |
 
-Te mechanizmy się uzupełniają — przycinanie utrzymuje lekkie dane wyjściowe narzędzi pomiędzy
+Uzupełniają się nawzajem -- przycinanie utrzymuje lekkie wyniki narzędzi pomiędzy
 cyklami Compaction.
 
 ## Dalsza lektura
 
-- [Compaction](/pl/concepts/compaction) — redukcja kontekstu oparta na podsumowywaniu
-- [Konfiguracja Gateway](/pl/gateway/configuration) — wszystkie ustawienia przycinania
+- [Compaction](/pl/concepts/compaction) -- redukcja kontekstu oparta na streszczaniu
+- [Konfiguracja Gateway](/pl/gateway/configuration) -- wszystkie ustawienia konfiguracyjne przycinania
   (`contextPruning.*`)
 
 ## Powiązane
 
-- [Zarządzanie sesją](/pl/concepts/session)
+- [Zarządzanie sesjami](/pl/concepts/session)
 - [Narzędzia sesji](/pl/concepts/session-tool)
 - [Silnik kontekstu](/pl/concepts/context-engine)

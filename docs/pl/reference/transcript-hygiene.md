@@ -3,50 +3,53 @@ read_when:
     - Debugujesz odrzucenia żądań dostawcy powiązane z kształtem transkryptu
     - Zmieniasz logikę sanityzacji transkryptu lub naprawy wywołań narzędzi
     - Badasz niedopasowania identyfikatorów wywołań narzędzi między dostawcami
-summary: 'Dokumentacja: reguły sanityzacji i naprawy transkryptów specyficzne dla dostawcy'
+summary: 'Dokumentacja: reguły sanityzacji i naprawy transkryptu specyficzne dla dostawcy'
 title: Higiena transkryptu
 x-i18n:
-    generated_at: "2026-04-25T13:58:04Z"
+    generated_at: "2026-04-26T11:41:09Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 00cac47fb9a238e3cb8b6ea69b47210685ca6769a31973b4aeef1d18e75d78e6
+    source_hash: e380be2b011afca5fedf89579e702c6d221d42e777c23bd766c8df07ff05ed18
     source_path: reference/transcript-hygiene.md
     workflow: 15
 ---
 
 Ten dokument opisuje **poprawki specyficzne dla dostawcy** stosowane do transkryptów przed uruchomieniem
-(budowaniem kontekstu modelu). Są to korekty **w pamięci** używane do spełnienia rygorystycznych
-wymagań dostawców. Te kroki higieny **nie** przepisują zapisanego na dysku transkryptu JSONL;
-jednak oddzielny etap naprawy pliku sesji może przepisać nieprawidłowe pliki JSONL
-przez odrzucenie błędnych wierszy przed załadowaniem sesji. Gdy dochodzi do naprawy, oryginalny
-plik jest zapisywany jako kopia zapasowa obok pliku sesji.
+(budowaniem kontekstu modelu). Większość z nich to korekty **w pamięci**, używane do spełnienia
+ścisłych wymagań dostawców. Oddzielny przebieg naprawy pliku sesji może również przepisywać
+przechowywany JSONL przed załadowaniem sesji, albo przez usuwanie błędnych linii JSONL, albo
+przez naprawę utrwalonych tur, które są składniowo poprawne, ale wiadomo, że są odrzucane przez
+dostawcę podczas odtwarzania. Gdy nastąpi naprawa, oryginalny plik jest archiwizowany obok
+pliku sesji.
 
 Zakres obejmuje:
 
-- Kontekst promptu tylko w runtime, pozostający poza widocznymi dla użytkownika turami transkryptu
+- Kontekst promptu tylko dla środowiska uruchomieniowego, pozostający poza widocznymi dla użytkownika turami transkryptu
 - Sanityzację identyfikatorów wywołań narzędzi
-- Walidację wejść wywołań narzędzi
+- Walidację danych wejściowych wywołań narzędzi
 - Naprawę parowania wyników narzędzi
-- Walidację / kolejność tur
-- Czyszczenie sygnatur thinking
-- Sanityzację payloadów obrazów
-- Tagowanie pochodzenia wejścia użytkownika (dla promptów kierowanych między sesjami)
+- Walidację / porządkowanie tur
+- Czyszczenie sygnatur myśli
+- Czyszczenie sygnatur Thinking
+- Sanityzację ładunków obrazów
+- Tagowanie pochodzenia danych wejściowych użytkownika (dla promptów kierowanych między sesjami)
+- Naprawę pustych tur błędów asystenta dla odtwarzania Bedrock Converse
 
-Jeśli potrzebujesz szczegółów dotyczących przechowywania transkryptów, zobacz:
+Jeśli potrzebujesz szczegółów przechowywania transkryptów, zobacz:
 
-- [Session management deep dive](/pl/reference/session-management-compaction)
+- [Szczegółowe omówienie zarządzania sesjami](/pl/reference/session-management-compaction)
 
 ---
 
-## Reguła globalna: kontekst runtime nie jest transkryptem użytkownika
+## Reguła globalna: kontekst środowiska uruchomieniowego nie jest transkryptem użytkownika
 
-Kontekst runtime/system może zostać dodany do promptu modelu dla danej tury, ale nie jest
-treścią napisaną przez użytkownika końcowego. OpenClaw utrzymuje osobną treść promptu
-przeznaczoną dla transkryptu dla odpowiedzi Gateway, kolejkowanych działań następczych, ACP, CLI oraz osadzonych
-uruchomień Pi. Zapisane widoczne tury użytkownika używają tej treści transkryptu zamiast
-promptu wzbogaconego o runtime.
+Kontekst runtime/system może zostać dodany do promptu modelu dla danej tury, ale nie
+jest treścią stworzoną przez użytkownika końcowego. OpenClaw utrzymuje osobne ciało
+promptu widoczne dla transkryptu dla odpowiedzi Gateway, follow-upów w kolejce, ACP, CLI i osadzonych
+uruchomień Pi. Przechowywane widoczne tury użytkownika używają tego ciała transkryptu zamiast
+promptu wzbogaconego przez środowisko uruchomieniowe.
 
-W przypadku starszych sesji, które zapisały już wrappery runtime, powierzchnie historii Gateway
+W przypadku starszych sesji, które już utrwaliły opakowania środowiska uruchomieniowego, powierzchnie historii Gateway
 stosują projekcję wyświetlania przed zwróceniem wiadomości do klientów WebChat,
 TUI, REST lub SSE.
 
@@ -54,41 +57,41 @@ TUI, REST lub SSE.
 
 ## Gdzie to działa
 
-Cała higiena transkryptu jest scentralizowana we wbudowanym runnerze:
+Cała higiena transkryptu jest scentralizowana w osadzonym runnerze:
 
 - Wybór polityki: `src/agents/transcript-policy.ts`
-- Stosowanie sanityzacji/napraw: `sanitizeSessionHistory` w `src/agents/pi-embedded-runner/replay-history.ts`
+- Zastosowanie sanityzacji/naprawy: `sanitizeSessionHistory` w `src/agents/pi-embedded-runner/replay-history.ts`
 
-Polityka używa `provider`, `modelApi` i `modelId`, aby zdecydować, co zastosować.
+Polityka używa `provider`, `modelApi` i `modelId` do określenia, co zastosować.
 
-Oddzielnie od higieny transkryptu pliki sesji są naprawiane (jeśli trzeba) przed załadowaniem:
+Niezależnie od higieny transkryptu pliki sesji są naprawiane (jeśli to potrzebne) przed załadowaniem:
 
 - `repairSessionFileIfNeeded` w `src/agents/session-file-repair.ts`
-- Wywoływane z `run/attempt.ts` i `compact.ts` (wbudowany runner)
+- Wywoływane z `run/attempt.ts` i `compact.ts` (osadzony runner)
 
 ---
 
 ## Reguła globalna: sanityzacja obrazów
 
-Payloady obrazów są zawsze sanityzowane, aby zapobiec odrzuceniu po stronie dostawcy z powodu limitów rozmiaru
-(skalowanie w dół/ponowna kompresja zbyt dużych obrazów base64).
+Ładunki obrazów są zawsze sanityzowane, aby zapobiec odrzuceniu po stronie dostawcy z powodu limitów
+rozmiaru (skalowanie w dół/ponowna kompresja zbyt dużych obrazów base64).
 
-Pomaga to również kontrolować nacisk obrazów na liczbę tokenów dla modeli obsługujących vision.
-Mniejsze maksymalne wymiary zwykle zmniejszają zużycie tokenów; większe wymiary zachowują więcej szczegółów.
+Pomaga to również kontrolować presję tokenów powodowaną przez obrazy dla modeli obsługujących vision.
+Mniejsze maksymalne wymiary zwykle zmniejszają użycie tokenów; większe wymiary zachowują więcej szczegółów.
 
 Implementacja:
 
 - `sanitizeSessionMessagesImages` w `src/agents/pi-embedded-helpers/images.ts`
 - `sanitizeContentBlocksImages` w `src/agents/tool-images.ts`
-- Maksymalny bok obrazu jest konfigurowalny przez `agents.defaults.imageMaxDimensionPx` (domyślnie: `1200`).
+- Maksymalny bok obrazu można konfigurować przez `agents.defaults.imageMaxDimensionPx` (domyślnie: `1200`).
 
 ---
 
-## Reguła globalna: nieprawidłowe wywołania narzędzi
+## Reguła globalna: błędne wywołania narzędzi
 
-Bloki wywołań narzędzi asystenta, którym brakuje zarówno `input`, jak i `arguments`, są odrzucane
-przed zbudowaniem kontekstu modelu. Zapobiega to odrzuceniom po stronie dostawcy z powodu częściowo
-zapisanych wywołań narzędzi (na przykład po awarii z powodu limitu szybkości).
+Bloki wywołań narzędzi asystenta, którym brakuje zarówno `input`, jak i `arguments`, są usuwane
+przed zbudowaniem kontekstu modelu. Zapobiega to odrzuceniom po stronie dostawcy wynikającym z częściowo
+utrwalonych wywołań narzędzi (na przykład po błędzie limitu szybkości).
 
 Implementacja:
 
@@ -97,19 +100,19 @@ Implementacja:
 
 ---
 
-## Reguła globalna: pochodzenie wejścia między sesjami
+## Reguła globalna: pochodzenie danych wejściowych między sesjami
 
 Gdy agent wysyła prompt do innej sesji przez `sessions_send` (w tym
-kroki odpowiedzi/ogłoszenia agent-do-agenta), OpenClaw zapisuje utworzoną turę użytkownika z:
+kroki odpowiedzi/ogłaszania agent-do-agenta), OpenClaw utrwala utworzoną turę użytkownika z:
 
 - `message.provenance.kind = "inter_session"`
 
 Te metadane są zapisywane podczas dopisywania do transkryptu i nie zmieniają roli
-(`role: "user"` pozostaje dla zgodności z dostawcami). Czytniki transkryptu mogą używać
-tego, aby nie traktować kierowanych promptów wewnętrznych jako instrukcji napisanych przez użytkownika końcowego.
+(`role: "user"` pozostaje dla zgodności z dostawcą). Odczytujący transkrypt mogą ich używać,
+aby nie traktować kierowanych promptów wewnętrznych jako instrukcji tworzonych przez użytkownika końcowego.
 
-Podczas odbudowy kontekstu OpenClaw poprzedza też te tury użytkownika w pamięci krótkim markerem
-`[Inter-session message]`, aby model mógł odróżnić je od
+Podczas odbudowy kontekstu OpenClaw również dodaje na początku w pamięci krótki znacznik `[Inter-session message]`
+do tych tur użytkownika, aby model mógł odróżnić je od
 zewnętrznych instrukcji użytkownika końcowego.
 
 ---
@@ -119,33 +122,53 @@ zewnętrznych instrukcji użytkownika końcowego.
 **OpenAI / OpenAI Codex**
 
 - Tylko sanityzacja obrazów.
-- Odrzucanie osieroconych sygnatur reasoning (samodzielnych elementów reasoning bez następującego po nich bloku content) dla transkryptów OpenAI Responses/Codex oraz odrzucanie odtwarzalnego OpenAI reasoning po przełączeniu trasy modelu.
+- Usuwanie osieroconych sygnatur reasoning (samodzielnych elementów reasoning bez następującego po nich bloku treści) dla transkryptów OpenAI Responses/Codex oraz usuwanie odtwarzalnego OpenAI reasoning po zmianie trasy modelu.
 - Brak sanityzacji identyfikatorów wywołań narzędzi.
-- Naprawa parowania wyników narzędzi może przenosić rzeczywiste dopasowane wyniki i syntetyzować wyjścia w stylu Codex `aborted` dla brakujących wywołań narzędzi.
-- Brak walidacji tur lub zmiany ich kolejności.
-- Brakujące wyniki narzędzi rodziny OpenAI Responses są syntetyzowane jako `aborted`, aby dopasować normalizację odtwarzania Codex.
-- Brak usuwania sygnatur thinking.
+- Naprawa parowania wyników narzędzi może przenosić rzeczywiste dopasowane wyniki i syntetyzować wyjścia `aborted` w stylu Codex dla brakujących wywołań narzędzi.
+- Brak walidacji tur ani zmiany ich kolejności.
+- Brakujące wyniki narzędzi z rodziny OpenAI Responses są syntetyzowane jako `aborted`, aby odpowiadać normalizacji odtwarzania Codex.
+- Brak usuwania sygnatur myśli.
 
 **Google (Generative AI / Gemini CLI / Antigravity)**
 
-- Sanityzacja identyfikatorów wywołań narzędzi: ścisłe alfanumeryczne.
+- Sanityzacja identyfikatorów wywołań narzędzi: ścisły alfanumeryczny.
 - Naprawa parowania wyników narzędzi i syntetyczne wyniki narzędzi.
 - Walidacja tur (naprzemienność tur w stylu Gemini).
-- Poprawka kolejności tur Google (dodaje krótki bootstrap użytkownika, jeśli historia zaczyna się od asystenta).
-- Antigravity Claude: normalizacja sygnatur thinking; odrzucanie niepodpisanych bloków thinking.
+- Poprawka kolejności tur Google (dodanie na początku małego bootstrapu użytkownika, jeśli historia zaczyna się od asystenta).
+- Antigravity Claude: normalizacja sygnatur Thinking; usuwanie niepodpisanych bloków Thinking.
 
 **Anthropic / Minimax (zgodne z Anthropic)**
 
 - Naprawa parowania wyników narzędzi i syntetyczne wyniki narzędzi.
-- Walidacja tur (łączenie kolejnych tur użytkownika, aby spełnić wymóg ścisłej naprzemienności).
+- Walidacja tur (łączenie kolejnych tur użytkownika, aby spełnić ścisłą naprzemienność).
+- Bloki Thinking z brakującymi, pustymi lub zawierającymi wyłącznie białe znaki sygnaturami odtwarzania są usuwane
+  przed konwersją dostawcy. Jeśli to opróżnia turę asystenta, OpenClaw zachowuje
+  kształt tury z niepustym tekstem pominiętego reasoning.
+- Starsze tury asystenta zawierające wyłącznie Thinking, które muszą zostać usunięte, są zastępowane
+  niepustym tekstem pominiętego reasoning, aby adaptery dostawcy nie usuwały
+  odtwarzanej tury.
 
-**Mistral (w tym wykrywanie oparte na identyfikatorze modelu)**
+**Amazon Bedrock (Converse API)**
+
+- Puste tury błędów strumienia asystenta są naprawiane do niepustego zastępczego bloku tekstowego
+  przed odtwarzaniem. Bedrock Converse odrzuca wiadomości asystenta z `content: []`, więc
+  utrwalone tury asystenta z `stopReason: "error"` i pustą treścią są także
+  naprawiane na dysku przed załadowaniem.
+- Bloki Claude Thinking z brakującymi, pustymi lub zawierającymi wyłącznie białe znaki sygnaturami odtwarzania są
+  usuwane przed odtwarzaniem Converse. Jeśli to opróżnia turę asystenta, OpenClaw
+  zachowuje kształt tury z niepustym tekstem pominiętego reasoning.
+- Starsze tury asystenta zawierające wyłącznie Thinking, które muszą zostać usunięte, są zastępowane
+  niepustym tekstem pominiętego reasoning, aby odtwarzanie Converse zachowało ścisły kształt tury.
+- Odtwarzanie filtruje tury asystenta z lustrzanego odbicia dostarczania OpenClaw i wstrzyknięte przez Gateway.
+- Sanityzacja obrazów jest stosowana przez regułę globalną.
+
+**Mistral (w tym wykrywanie oparte na model-id)**
 
 - Sanityzacja identyfikatorów wywołań narzędzi: strict9 (alfanumeryczne o długości 9).
 
 **OpenRouter Gemini**
 
-- Czyszczenie sygnatur thinking: usuwanie wartości `thought_signature`, które nie są base64 (zachowanie base64).
+- Czyszczenie sygnatur myśli: usuwanie wartości `thought_signature`, które nie są base64 (zachowuje base64).
 
 **Wszystko inne**
 
@@ -153,24 +176,24 @@ zewnętrznych instrukcji użytkownika końcowego.
 
 ---
 
-## Zachowanie historyczne (przed 2026.1.22)
+## Zachowanie historyczne (sprzed 2026.1.22)
 
 Przed wydaniem 2026.1.22 OpenClaw stosował wiele warstw higieny transkryptu:
 
-- Rozszerzenie **transcript-sanitize** było uruchamiane przy każdym budowaniu kontekstu i mogło:
-  - Naprawiać parowanie użyć/wyników narzędzi.
+- Rozszerzenie **transcript-sanitize** działało przy każdym budowaniu kontekstu i mogło:
+  - Naprawiać parowanie użycia/wyniku narzędzia.
   - Sanityzować identyfikatory wywołań narzędzi (w tym tryb nieścisły, który zachowywał `_`/`-`).
-- Runner wykonywał też sanityzację specyficzną dla dostawców, co dublowało pracę.
+- Runner wykonywał również sanityzację specyficzną dla dostawcy, co dublowało pracę.
 - Dodatkowe mutacje występowały poza polityką dostawcy, w tym:
-  - Usuwanie tagów `<final>` z tekstu asystenta przed zapisaniem.
-  - Odrzucanie pustych tur błędów asystenta.
+  - Usuwanie tagów `<final>` z tekstu asystenta przed utrwaleniem.
+  - Usuwanie pustych tur błędów asystenta.
   - Przycinanie treści asystenta po wywołaniach narzędzi.
 
-Ta złożoność powodowała regresje między dostawcami (zwłaszcza parowanie `openai-responses`
-`call_id|fc_id`). Porządki w wersji 2026.1.22 usunęły rozszerzenie, scentralizowały
-logikę w runnerze i sprawiły, że OpenAI pozostał **nietknięty** poza sanityzacją obrazów.
+Ta złożoność powodowała regresje między dostawcami (szczególnie w parowaniu
+`call_id|fc_id` dla `openai-responses`). Porządki w 2026.1.22 usunęły rozszerzenie, scentralizowały
+logikę w runnerze i uczyniły OpenAI **nietykalnym** poza sanityzacją obrazów.
 
 ## Powiązane
 
-- [Session management](/pl/concepts/session)
-- [Session pruning](/pl/concepts/session-pruning)
+- [Zarządzanie sesjami](/pl/concepts/session)
+- [Przycinanie sesji](/pl/concepts/session-pruning)

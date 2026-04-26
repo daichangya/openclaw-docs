@@ -1,79 +1,85 @@
 ---
 read_when:
-    - Konfigurowanie zatwierdzeń exec lub list dozwolonych
-    - Implementowanie UX zatwierdzeń exec w aplikacji macOS
-    - Przegląd promptów ucieczki z sandboxa i ich konsekwencji
-summary: Zatwierdzenia exec, listy dozwolonych i prompty ucieczki z sandboxa
+    - Konfigurowanie zatwierdzeń exec lub list dozwolonych poleceń
+    - Wdrażanie UX zatwierdzania exec w aplikacji macOS
+    - Przeglądanie promptów ucieczki z sandboxa i ich konsekwencji
+sidebarTitle: Exec approvals
+summary: 'Zatwierdzenia host exec: ustawienia zasad, listy dozwolonych poleceń i przepływ pracy YOLO/strict'
 title: Zatwierdzenia exec
 x-i18n:
-    generated_at: "2026-04-25T13:59:21Z"
+    generated_at: "2026-04-26T11:42:25Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 44bf7af57d322280f6d0089207041214b1233d0c9eca99656d51fc4aed88941b
+    source_hash: 868cee97882f7298a092bdcb9ec8fd058a5d7cb8745fad2edd712fabfb512e52
     source_path: tools/exec-approvals.md
     workflow: 15
 ---
 
 Zatwierdzenia exec to **zabezpieczenie aplikacji towarzyszącej / hosta node** umożliwiające
-agentowi działającemu w sandboxie uruchamianie poleceń na rzeczywistym hoście (`gateway` lub `node`). To blokada bezpieczeństwa: polecenia są dozwolone tylko wtedy, gdy polityka + lista dozwolonych + (opcjonalnie) zatwierdzenie użytkownika są zgodne. Zatwierdzenia exec nakładają się **na** politykę narzędzi i bramkowanie elevated (chyba że elevated jest ustawione na `full`, co pomija zatwierdzenia).
+agentowi działającemu w sandboxie uruchamianie poleceń na rzeczywistym hoście (`gateway` lub `node`). To
+blokada bezpieczeństwa: polecenia są dozwolone tylko wtedy, gdy zgadzają się
+zasada + lista dozwolonych poleceń + (opcjonalnie) zatwierdzenie użytkownika. Zatwierdzenia exec nakładają się **ponad**
+zasady narzędzi i bramkowanie elevated (chyba że elevated ustawiono na `full`, co
+pomija zatwierdzenia).
 
 <Note>
-Efektywna polityka to **bardziej restrykcyjna** z `tools.exec.*` i domyślnych ustawień zatwierdzeń;
-jeśli pole zatwierdzeń zostanie pominięte, używana jest wartość `tools.exec`. Host exec
-korzysta też z lokalnego stanu zatwierdzeń na tej maszynie — lokalne na hoście `ask: "always"`
-w `~/.openclaw/exec-approvals.json` nadal będzie wymuszać prompty, nawet jeśli domyślne ustawienia sesji lub konfiguracji żądają `ask: "on-miss"`.
+Efektywna zasada jest **bardziej rygorystyczną** z `tools.exec.*` i domyślnych ustawień
+zatwierdzeń; jeśli pole zatwierdzeń jest pominięte, używana jest wartość z
+`tools.exec`. Host exec używa także lokalnego stanu zatwierdzeń na tej maszynie —
+lokalne dla hosta `ask: "always"` w `~/.openclaw/exec-approvals.json` będzie nadal
+wyświetlać prompt, nawet jeśli domyślne ustawienia sesji lub konfiguracji żądają `ask: "on-miss"`.
 </Note>
 
-## Sprawdzanie efektywnej polityki
+## Sprawdzanie efektywnej zasady
 
-- `openclaw approvals get`, `... --gateway`, `... --node <id|name|ip>` — pokazują żądaną politykę, źródła polityki hosta i wynik efektywny.
-- `openclaw exec-policy show` — scalony widok dla maszyny lokalnej.
-- `openclaw exec-policy set|preset` — synchronizuje lokalnie żądaną politykę z lokalnym plikiem zatwierdzeń hosta w jednym kroku.
+| Polecenie                                                        | Co pokazuje                                                                           |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `openclaw approvals get` / `--gateway` / `--node <id\|name\|ip>` | Żądaną zasadę, źródła zasad hosta i wynik efektywny.                                  |
+| `openclaw exec-policy show`                                      | Scalony widok maszyny lokalnej.                                                       |
+| `openclaw exec-policy set` / `preset`                            | Synchronizuje lokalną żądaną zasadę z lokalnym plikiem zatwierdzeń hosta w jednym kroku. |
 
-Gdy zakres lokalny żąda `host=node`, `exec-policy show` zgłasza ten zakres
-w czasie działania jako zarządzany przez node, zamiast udawać, że lokalny plik zatwierdzeń jest
-źródłem prawdy.
+Gdy lokalny zakres żąda `host=node`, `exec-policy show` raportuje ten
+zakres jako zarządzany przez node w czasie działania, zamiast udawać, że lokalny
+plik zatwierdzeń jest źródłem prawdy.
 
 Jeśli UI aplikacji towarzyszącej jest **niedostępne**, każde żądanie, które normalnie
-wywołałoby prompt, jest rozstrzygane przez **ask fallback** (domyślnie: deny).
+wyświetliłoby prompt, jest rozstrzygane przez **rezerwę ask** (domyślnie: `deny`).
 
 <Tip>
-Natywne klienckie mechanizmy zatwierdzania w czacie mogą zasilać komunikat oczekującego zatwierdzenia
-udogodnieniami specyficznymi dla kanału. Na przykład Matrix dodaje skróty reakcji (`✅`
-zezwól raz, `❌` odmów, `♾️` zawsze zezwalaj), pozostawiając jednocześnie polecenia `/approve ...`
-w wiadomości jako fallback.
+Natywni klienci zatwierdzeń w czacie mogą zasilać wiadomość oczekującego zatwierdzenia
+udogodnieniami specyficznymi dla kanału. Na przykład Matrix dodaje skróty reakcji
+(`✅` zezwól raz, `❌` odmów, `♾️` zezwól zawsze), nadal pozostawiając
+polecenia `/approve ...` w wiadomości jako rozwiązanie awaryjne.
 </Tip>
 
-## Gdzie to obowiązuje
+## Gdzie ma to zastosowanie
 
-Zatwierdzenia exec są egzekwowane lokalnie na hoście wykonania:
+Zatwierdzenia exec są wymuszane lokalnie na hoście wykonawczym:
 
-- **host gateway** → proces `openclaw` na maszynie Gateway
-- **host node** → runner node (aplikacja towarzysząca macOS lub bezgłowy host node)
+- **Host Gateway** → proces `openclaw` na maszynie Gateway.
+- **Host Node** → runner node (aplikacja towarzysząca macOS lub bezgłowy host node).
 
-Uwaga dotycząca modelu zaufania:
+### Model zaufania
 
-- Wywołujący uwierzytelnieni względem Gateway są zaufanymi operatorami tego Gateway.
-- Sparowane node rozszerzają tę zdolność zaufanego operatora na host node.
-- Zatwierdzenia exec ograniczają ryzyko przypadkowego wykonania, ale nie są granicą uwierzytelniania per użytkownik.
-- Zatwierdzone uruchomienia na hoście node wiążą kanoniczny kontekst wykonania: kanoniczne cwd, dokładne argv, powiązanie env jeśli istnieje oraz przypiętą ścieżkę wykonywalną, gdy ma zastosowanie.
-- W przypadku skryptów powłoki i bezpośrednich wywołań plików interpretera/runtime OpenClaw próbuje także powiązać
-  jeden konkretny lokalny operand plikowy. Jeśli ten powiązany plik zmieni się po zatwierdzeniu, ale przed wykonaniem,
-  uruchomienie zostanie odrzucone zamiast wykonać zmodyfikowaną treść.
-- To wiązanie pliku jest celowo najlepszym możliwym podejściem, a nie kompletnym modelem semantycznym każdej
-  ścieżki ładowania interpretera/runtime. Jeśli tryb zatwierdzania nie może zidentyfikować dokładnie jednego konkretnego lokalnego
-  pliku do powiązania, odmawia utworzenia uruchomienia opartego na zatwierdzeniu, zamiast udawać pełne pokrycie.
+- Wywołujący uwierzytelnieni w Gateway są zaufanymi operatorami dla tego Gateway.
+- Sparowane node’y rozszerzają tę zdolność zaufanego operatora na host node.
+- Zatwierdzenia exec zmniejszają ryzyko przypadkowego wykonania, ale **nie** są granicą uwierzytelniania per użytkownik.
+- Zatwierdzone uruchomienia na hoście node wiążą kanoniczny kontekst wykonania: kanoniczny cwd, dokładne argv, powiązanie env, gdy występuje, oraz przypiętą ścieżkę wykonywalną, gdy ma to zastosowanie.
+- Dla skryptów powłoki i bezpośrednich wywołań plików interpretera/środowiska wykonawczego OpenClaw próbuje też powiązać jeden konkretny lokalny operand pliku. Jeśli ten powiązany plik zmieni się po zatwierdzeniu, ale przed wykonaniem, uruchomienie zostanie odrzucone zamiast wykonywać zmienioną treść.
+- Powiązanie pliku jest celowo best-effort, **nie** stanowi pełnego modelu semantycznego każdej ścieżki ładowania interpretera/środowiska wykonawczego. Jeśli tryb zatwierdzania nie potrafi zidentyfikować dokładnie jednego konkretnego lokalnego pliku do powiązania, odmawia utworzenia uruchomienia opartego na zatwierdzeniu zamiast udawać pełne pokrycie.
 
-Podział macOS:
+### Podział macOS
 
-- **usługa hosta node** przekazuje `system.run` do **aplikacji macOS** przez lokalne IPC.
-- **aplikacja macOS** egzekwuje zatwierdzenia i wykonuje polecenie w kontekście UI.
+- **Usługa hosta node** przekazuje `system.run` do **aplikacji macOS** przez lokalne IPC.
+- **Aplikacja macOS** egzekwuje zatwierdzenia i wykonuje polecenie w kontekście UI.
 
 ## Ustawienia i przechowywanie
 
-Zatwierdzenia znajdują się w lokalnym pliku JSON na hoście wykonania:
+Zatwierdzenia znajdują się w lokalnym pliku JSON na hoście wykonawczym:
 
-`~/.openclaw/exec-approvals.json`
+```text
+~/.openclaw/exec-approvals.json
+```
 
 Przykładowy schemat:
 
@@ -110,74 +116,136 @@ Przykładowy schemat:
 }
 ```
 
-## Tryb „YOLO” bez zatwierdzeń
+## Ustawienia zasad
 
-Jeśli chcesz, aby host exec działał bez promptów zatwierdzenia, musisz otworzyć **obie** warstwy polityki:
+### `exec.security`
 
-- żądaną politykę exec w konfiguracji OpenClaw (`tools.exec.*`)
-- lokalną dla hosta politykę zatwierdzeń w `~/.openclaw/exec-approvals.json`
+<ParamField path="security" type='"deny" | "allowlist" | "full"'>
+  - `deny` — blokuje wszystkie żądania host exec.
+  - `allowlist` — zezwala tylko na polecenia z listy dozwolonych.
+  - `full` — zezwala na wszystko (odpowiednik elevated).
+</ParamField>
 
-To jest teraz domyślne zachowanie hosta, chyba że jawnie je zaostrzysz:
+### `exec.ask`
 
-- `tools.exec.security`: `full` na `gateway`/`node`
-- `tools.exec.ask`: `off`
-- host `askFallback`: `full`
+<ParamField path="ask" type='"off" | "on-miss" | "always"'>
+  - `off` — nigdy nie wyświetla promptu.
+  - `on-miss` — wyświetla prompt tylko wtedy, gdy lista dozwolonych nie pasuje.
+  - `always` — wyświetla prompt przy każdym poleceniu. Trwałe zaufanie `allow-always` **nie** wyłącza promptów, gdy efektywny tryb ask to `always`.
+</ParamField>
 
-Ważne rozróżnienie:
+### `askFallback`
 
-- `tools.exec.host=auto` wybiera miejsce uruchomienia exec: sandbox, jeśli jest dostępny, w przeciwnym razie gateway.
-- YOLO wybiera sposób zatwierdzania host exec: `security=full` plus `ask=off`.
-- Dostawcy opierający się na CLI, którzy udostępniają własny nieinteraktywny tryb uprawnień, mogą stosować tę politykę.
-  Claude CLI dodaje `--permission-mode bypassPermissions`, gdy żądana polityka exec OpenClaw to
-  YOLO. Nadpisz to zachowanie backendu jawnymi argumentami Claude pod
-  `agents.defaults.cliBackends.claude-cli.args` / `resumeArgs`, na przykład
-  `--permission-mode default`, `acceptEdits` lub `bypassPermissions`.
-- W trybie YOLO OpenClaw nie dodaje osobnej heurystycznej bramki zatwierdzania dla zaciemniania poleceń ani warstwy odrzucania skryptów przed wykonaniem ponad skonfigurowaną politykę host exec.
-- `auto` nie czyni routingu gateway darmowym obejściem z sesji sandboxowanej. Żądanie per wywołanie `host=node` jest dozwolone z `auto`, a `host=gateway` jest dozwolone z `auto` tylko wtedy, gdy nie jest aktywne środowisko sandbox. Jeśli chcesz stabilnej domyślnej wartości innej niż auto, ustaw `tools.exec.host` lub użyj jawnie `/exec host=...`.
+<ParamField path="askFallback" type='"deny" | "allowlist" | "full"'>
+  Rozstrzygnięcie, gdy prompt jest wymagany, ale nie można dotrzeć do UI.
 
-Jeśli chcesz bardziej konserwatywnej konfiguracji, zaostrz jedną z warstw z powrotem do `allowlist` / `on-miss`
-lub `deny`.
+- `deny` — blokuje.
+- `allowlist` — zezwala tylko wtedy, gdy pasuje lista dozwolonych.
+- `full` — zezwala.
+  </ParamField>
 
-Trwała konfiguracja hosta gateway „nigdy nie pytaj”:
+### `tools.exec.strictInlineEval`
 
-```bash
-openclaw config set tools.exec.host gateway
-openclaw config set tools.exec.security full
-openclaw config set tools.exec.ask off
-openclaw gateway restart
-```
+<ParamField path="strictInlineEval" type="boolean">
+  Gdy ma wartość `true`, OpenClaw traktuje formy inline code-eval jako wymagające wyłącznie zatwierdzenia,
+  nawet jeśli sama binarka interpretera znajduje się na liście dozwolonych. To obrona warstwowa
+  dla loaderów interpreterów, które nie mapują się czysto na jeden stabilny
+  operand pliku.
+</ParamField>
 
-Następnie ustaw zgodnie plik zatwierdzeń hosta:
+Przykłady wykrywane przez tryb strict:
 
-```bash
-openclaw approvals set --stdin <<'EOF'
-{
-  version: 1,
-  defaults: {
-    security: "full",
-    ask: "off",
-    askFallback: "full"
-  }
-}
-EOF
-```
+- `python -c`
+- `node -e`, `node --eval`, `node -p`
+- `ruby -e`
+- `perl -e`, `perl -E`
+- `php -r`
+- `lua -e`
+- `osascript -e`
 
-Lokalny skrót do tej samej polityki hosta gateway na bieżącej maszynie:
+W trybie strict te polecenia nadal wymagają jawnego zatwierdzenia, a
+`allow-always` nie utrwala dla nich automatycznie nowych wpisów listy dozwolonych.
+
+## Tryb YOLO (bez zatwierdzeń)
+
+Jeśli chcesz, aby host exec działał bez promptów zatwierdzeń, musisz otworzyć
+**obie** warstwy zasad — żądaną zasadę exec w konfiguracji OpenClaw
+(`tools.exec.*`) **i** lokalną dla hosta zasadę zatwierdzeń w
+`~/.openclaw/exec-approvals.json`.
+
+YOLO jest domyślnym zachowaniem hosta, chyba że jawnie je zaostrzysz:
+
+| Warstwa              | Ustawienie YOLO            |
+| -------------------- | -------------------------- |
+| `tools.exec.security` | `full` na `gateway`/`node` |
+| `tools.exec.ask`      | `off`                      |
+| Host `askFallback`    | `full`                     |
+
+<Warning>
+**Ważne rozróżnienia:**
+
+- `tools.exec.host=auto` wybiera **gdzie** działa exec: w sandboxie, jeśli jest dostępny, w przeciwnym razie na gateway.
+- YOLO wybiera **jak** host exec jest zatwierdzany: `security=full` plus `ask=off`.
+- W trybie YOLO OpenClaw **nie** dodaje osobnej heurystycznej bramki zatwierdzenia dla zaciemniania poleceń ani warstwy odrzucania skryptów przed uruchomieniem ponad skonfigurowaną zasadę host exec.
+- `auto` nie czyni routingu do gateway darmowym nadpisaniem z sesji działającej w sandboxie. Żądanie per wywołanie `host=node` jest dozwolone z `auto`; `host=gateway` jest dozwolone z `auto` tylko wtedy, gdy nie jest aktywne środowisko wykonawcze sandbox. Aby uzyskać stabilne domyślne ustawienie inne niż auto, ustaw `tools.exec.host` lub użyj jawnie `/exec host=...`.
+  </Warning>
+
+Dostawcy oparci na CLI, którzy udostępniają własny tryb nieinteraktywnych uprawnień,
+mogą podążać za tą zasadą. Claude CLI dodaje
+`--permission-mode bypassPermissions`, gdy żądana przez OpenClaw zasada exec
+to YOLO. Zastąp to zachowanie backendu jawnymi argumentami Claude
+w `agents.defaults.cliBackends.claude-cli.args` / `resumeArgs` —
+na przykład `--permission-mode default`, `acceptEdits` lub
+`bypassPermissions`.
+
+Jeśli chcesz bardziej konserwatywnej konfiguracji, zaostrz którąkolwiek warstwę z powrotem do
+`allowlist` / `on-miss` albo `deny`.
+
+### Trwała konfiguracja hosta Gateway „nigdy nie wyświetlaj promptu”
+
+<Steps>
+  <Step title="Ustaw żądaną zasadę konfiguracji">
+    ```bash
+    openclaw config set tools.exec.host gateway
+    openclaw config set tools.exec.security full
+    openclaw config set tools.exec.ask off
+    openclaw gateway restart
+    ```
+  </Step>
+  <Step title="Dopasuj plik zatwierdzeń hosta">
+    ```bash
+    openclaw approvals set --stdin <<'EOF'
+    {
+      version: 1,
+      defaults: {
+        security: "full",
+        ask: "off",
+        askFallback: "full"
+      }
+    }
+    EOF
+    ```
+  </Step>
+</Steps>
+
+### Skrót lokalny
 
 ```bash
 openclaw exec-policy preset yolo
 ```
 
-Ten lokalny skrót aktualizuje oba elementy:
+Ten lokalny skrót aktualizuje jednocześnie:
 
-- lokalne `tools.exec.host/security/ask`
-- lokalne domyślne `~/.openclaw/exec-approvals.json`
+- Lokalne `tools.exec.host/security/ask`.
+- Domyślne lokalne `~/.openclaw/exec-approvals.json`.
 
-Jest on celowo wyłącznie lokalny. Jeśli musisz zdalnie zmienić zatwierdzenia hosta gateway lub hosta node,
-nadal używaj `openclaw approvals set --gateway` lub
+Jest on celowo tylko lokalny. Aby zdalnie zmienić zatwierdzenia hosta gateway lub hosta node,
+użyj `openclaw approvals set --gateway` lub
 `openclaw approvals set --node <id|name|ip>`.
 
-W przypadku hosta node zastosuj ten sam plik zatwierdzeń na tym node:
+### Host Node
+
+Dla hosta node zastosuj ten sam plik zatwierdzeń na tym node:
 
 ```bash
 openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
@@ -192,71 +260,36 @@ openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-Ważne ograniczenie tylko lokalne:
+<Note>
+**Ograniczenia tylko lokalne:**
 
-- `openclaw exec-policy` nie synchronizuje zatwierdzeń node
-- `openclaw exec-policy set --host node` jest odrzucane
-- zatwierdzenia exec dla node są pobierane z node w czasie działania, więc aktualizacje skierowane do node muszą używać `openclaw approvals --node ...`
+- `openclaw exec-policy` nie synchronizuje zatwierdzeń node.
+- `openclaw exec-policy set --host node` jest odrzucane.
+- Zatwierdzenia exec node są pobierane z node w czasie działania, więc aktualizacje kierowane do node muszą używać `openclaw approvals --node ...`.
+  </Note>
 
-Skrót tylko dla sesji:
+### Skrót tylko dla sesji
 
 - `/exec security=full ask=off` zmienia tylko bieżącą sesję.
-- `/elevated full` to awaryjny skrót break-glass, który również pomija zatwierdzenia exec dla tej sesji.
+- `/elevated full` to awaryjny skrót break-glass, który także pomija zatwierdzenia exec dla tej sesji.
 
-Jeśli plik zatwierdzeń hosta pozostaje bardziej restrykcyjny niż konfiguracja, nadal wygrywa bardziej restrykcyjna polityka hosta.
+Jeśli plik zatwierdzeń hosta pozostaje bardziej rygorystyczny niż konfiguracja, nadal wygrywa
+bardziej rygorystyczna zasada hosta.
 
-## Pokrętła polityki
+## Lista dozwolonych poleceń (per agent)
 
-### Security (`exec.security`)
+Listy dozwolonych poleceń są **per agent**. Jeśli istnieje wielu agentów, przełącz,
+którego agenta edytujesz w aplikacji macOS. Wzorce są dopasowaniami glob.
 
-- **deny**: blokuje wszystkie żądania host exec.
-- **allowlist**: pozwala tylko na polecenia z listy dozwolonych.
-- **full**: pozwala na wszystko (odpowiednik elevated).
+Wzorce mogą być globami rozstrzygniętej ścieżki binarki albo globami samych nazw poleceń.
+Same nazwy pasują tylko do poleceń wywoływanych przez `PATH`, więc `rg` może pasować do
+`/opt/homebrew/bin/rg`, gdy polecenie to `rg`, ale **nie** do `./rg` ani
+`/tmp/rg`. Użyj globu ścieżki, gdy chcesz zaufać jednej konkretnej lokalizacji
+binarki.
 
-### Ask (`exec.ask`)
-
-- **off**: nigdy nie pytaj.
-- **on-miss**: pytaj tylko wtedy, gdy lista dozwolonych nie pasuje.
-- **always**: pytaj o każde polecenie.
-- trwałe zaufanie `allow-always` nie tłumi promptów, gdy efektywny tryb ask to `always`
-
-### Ask fallback (`askFallback`)
-
-Jeśli prompt jest wymagany, ale żaden UI nie jest osiągalny, fallback decyduje:
-
-- **deny**: blokuj.
-- **allowlist**: pozwalaj tylko wtedy, gdy lista dozwolonych pasuje.
-- **full**: pozwalaj.
-
-### Utwardzanie inline interpreter eval (`tools.exec.strictInlineEval`)
-
-Gdy `tools.exec.strictInlineEval=true`, OpenClaw traktuje formy inline code-eval jako wymagające zatwierdzenia, nawet jeśli samo binarium interpretera znajduje się na liście dozwolonych.
-
-Przykłady:
-
-- `python -c`
-- `node -e`, `node --eval`, `node -p`
-- `ruby -e`
-- `perl -e`, `perl -E`
-- `php -r`
-- `lua -e`
-- `osascript -e`
-
-To defense-in-depth dla loaderów interpreterów, które nie mapują się czysto na jeden stabilny operand plikowy. W trybie strict:
-
-- te polecenia nadal wymagają jawnego zatwierdzenia;
-- `allow-always` nie zapisuje dla nich automatycznie nowych wpisów listy dozwolonych.
-
-## Lista dozwolonych (per agent)
-
-Listy dozwolonych są **per agent**. Jeśli istnieje wielu agentów, przełącz agenta,
-którego edytujesz, w aplikacji macOS. Wzorce są dopasowaniami glob.
-Wzorce mogą być globami rozwiązanych ścieżek binarnych albo zwykłymi globami nazw poleceń. Zwykłe nazwy
-pasują tylko do poleceń wywoływanych przez PATH, więc `rg` może pasować do `/opt/homebrew/bin/rg`,
-gdy poleceniem jest `rg`, ale nie do `./rg` ani `/tmp/rg`. Użyj globu ścieżki, gdy
-chcesz ufać jednej konkretnej lokalizacji binarnej.
-Starsze wpisy `agents.default` są migrowane do `agents.main` podczas ładowania.
-Łańcuchy powłoki, takie jak `echo ok && pwd`, nadal wymagają, aby każdy segment najwyższego poziomu spełniał reguły listy dozwolonych.
+Starsze wpisy `agents.default` są podczas ładowania migrowane do `agents.main`.
+Łańcuchy powłoki, takie jak `echo ok && pwd`, nadal wymagają, aby każdy segment najwyższego poziomu
+spełniał reguły listy dozwolonych.
 
 Przykłady:
 
@@ -267,103 +300,109 @@ Przykłady:
 
 Każdy wpis listy dozwolonych śledzi:
 
-- **id** stabilny UUID używany do tożsamości w UI (opcjonalny)
-- **ostatnie użycie** znacznik czasu
-- **ostatnio użyte polecenie**
-- **ostatnio rozwiązana ścieżka**
+| Pole               | Znaczenie                           |
+| ------------------ | ----------------------------------- |
+| `id`               | Stabilny UUID używany jako tożsamość UI |
+| `lastUsedAt`       | Znacznik czasu ostatniego użycia    |
+| `lastUsedCommand`  | Ostatnie polecenie, które pasowało  |
+| `lastResolvedPath` | Ostatnia rozstrzygnięta ścieżka binarki |
 
 ## Automatyczne zezwalanie na CLI Skills
 
-Gdy włączone jest **Auto-allow skill CLIs**, pliki wykonywalne wskazane przez znane Skills
-są traktowane na node jako znajdujące się na liście dozwolonych (macOS node lub bezgłowy host node). Używa to
-`skills.bins` przez Gateway RPC do pobrania listy binariów skill. Wyłącz to, jeśli chcesz ścisłych ręcznych list dozwolonych.
+Gdy włączona jest opcja **Automatycznie zezwalaj na CLI Skills**, pliki wykonywalne wskazywane przez
+znane Skills są traktowane jako znajdujące się na liście dozwolonych na node’ach (macOS node lub bezgłowy
+host node). Wykorzystuje to `skills.bins` przez RPC Gateway do pobrania listy binarek
+Skills. Wyłącz to, jeśli chcesz ściśle ręcznych list dozwolonych.
 
-Ważne uwagi o zaufaniu:
-
-- To **niejawna wygodna lista dozwolonych**, oddzielna od ręcznych wpisów listy dozwolonych ścieżek.
-- Jest przeznaczona dla środowisk zaufanych operatorów, gdzie Gateway i node znajdują się w tej samej granicy zaufania.
-- Jeśli wymagasz ścisłego jawnego zaufania, ustaw `autoAllowSkills: false` i używaj wyłącznie ręcznych wpisów listy dozwolonych ścieżek.
+<Warning>
+- To **domyślna wygodna lista dozwolonych**, oddzielna od ręcznych wpisów listy dozwolonych ścieżek.
+- Jest przeznaczona dla środowisk zaufanych operatorów, w których Gateway i node znajdują się w tej samej granicy zaufania.
+- Jeśli wymagasz ściśle jawnego zaufania, pozostaw `autoAllowSkills: false` i używaj wyłącznie ręcznych wpisów listy dozwolonych ścieżek.
+</Warning>
 
 ## Safe bins i przekazywanie zatwierdzeń
 
-Informacje o safe bins (szybkiej ścieżce tylko przez stdin), szczegółach wiązania interpreterów oraz o tym,
-jak przekazywać prompty zatwierdzeń do Slack/Discord/Telegram (lub uruchamiać je jako natywne
-klienty zatwierdzania), znajdziesz w [Exec approvals — advanced](/pl/tools/exec-approvals-advanced).
-
-<!-- moved to /tools/exec-approvals-advanced -->
+Informacje o safe bins (szybkiej ścieżce tylko ze stdin), szczegółach wiązania interpreterów oraz
+o tym, jak przekazywać prompty zatwierdzeń do Slack/Discord/Telegram (lub uruchamiać je jako
+natywnych klientów zatwierdzeń), znajdziesz w
+[Zatwierdzenia exec — zaawansowane](/pl/tools/exec-approvals-advanced).
 
 ## Edycja w Control UI
 
-Użyj karty **Control UI → Nodes → Exec approvals**, aby edytować ustawienia domyślne, nadpisania per agent
-i listy dozwolonych. Wybierz zakres (Defaults lub agent), dostosuj politykę,
-dodaj/usuń wzorce listy dozwolonych, a następnie kliknij **Save**. UI pokazuje metadane **last used**
-dla każdego wzorca, dzięki czemu możesz utrzymać porządek na liście.
+Użyj karty **Control UI → Nodes → Exec approvals**, aby edytować wartości domyślne,
+nadpisania per agent i listy dozwolonych poleceń. Wybierz zakres (Defaults lub agent),
+dostosuj zasadę, dodaj/usuń wzorce listy dozwolonych poleceń, a następnie kliknij **Save**. UI
+pokazuje metadane ostatniego użycia dla każdego wzorca, aby ułatwić utrzymanie porządku na liście.
 
-Selektor celu wybiera **Gateway** (lokalne zatwierdzenia) albo **Node**. Node
-muszą reklamować `system.execApprovals.get/set` (aplikacja macOS lub bezgłowy host node).
-Jeśli node nie reklamuje jeszcze zatwierdzeń exec, edytuj bezpośrednio jego lokalny
-`~/.openclaw/exec-approvals.json`.
+Selektor celu wybiera **Gateway** (lokalne zatwierdzenia) albo **Node**.
+Node’y muszą ogłaszać `system.execApprovals.get/set` (aplikacja macOS lub
+bezgłowy host node). Jeśli node nie ogłasza jeszcze zatwierdzeń exec,
+edytuj jego lokalny plik `~/.openclaw/exec-approvals.json` bezpośrednio.
 
-CLI: `openclaw approvals` obsługuje edycję gateway lub node (zobacz [CLI zatwierdzeń](/pl/cli/approvals)).
+CLI: `openclaw approvals` obsługuje edycję gateway lub node — zobacz
+[CLI zatwierdzeń](/pl/cli/approvals).
 
-## Przepływ zatwierdzania
+## Przepływ zatwierdzeń
 
-Gdy wymagany jest prompt, gateway rozsyła `exec.approval.requested` do klientów operatorów.
-Control UI i aplikacja macOS rozstrzygają go przez `exec.approval.resolve`, po czym gateway przekazuje
+Gdy wymagany jest prompt, gateway rozsyła
+`exec.approval.requested` do klientów operatorów. Control UI i aplikacja macOS
+rozwiązują to przez `exec.approval.resolve`, a następnie gateway przekazuje
 zatwierdzone żądanie do hosta node.
 
-Dla `host=node` żądania zatwierdzenia zawierają kanoniczny ładunek `systemRunPlan`. Gateway używa
-tego planu jako autorytatywnego kontekstu polecenia/cwd/sesji przy przekazywaniu zatwierdzonych żądań `system.run`.
+Dla `host=node` żądania zatwierdzenia zawierają kanoniczny ładunek
+`systemRunPlan`. Gateway używa tego planu jako autorytatywnego
+kontekstu polecenia/cwd/sesji podczas przekazywania zatwierdzonych żądań
+`system.run`.
 
-Ma to znaczenie przy opóźnieniu asynchronicznego zatwierdzania:
+Ma to znaczenie przy opóźnieniach asynchronicznego zatwierdzania:
 
-- ścieżka exec node przygotowuje z góry jeden kanoniczny plan
-- rekord zatwierdzenia przechowuje ten plan i jego metadane powiązania
-- po zatwierdzeniu końcowe przekazane wywołanie `system.run` ponownie używa zapisanego planu
-  zamiast ufać późniejszym zmianom wywołującego
-- jeśli wywołujący zmieni `command`, `rawCommand`, `cwd`, `agentId` lub
-  `sessionKey` po utworzeniu żądania zatwierdzenia, gateway odrzuci
-  przekazane uruchomienie jako niedopasowanie zatwierdzenia
+- Ścieżka exec node przygotowuje z góry jeden kanoniczny plan.
+- Rekord zatwierdzenia przechowuje ten plan i jego metadane powiązania.
+- Po zatwierdzeniu końcowe przekazane wywołanie `system.run` ponownie używa zapisanego planu, zamiast ufać późniejszym zmianom wywołującego.
+- Jeśli wywołujący zmieni `command`, `rawCommand`, `cwd`, `agentId` lub `sessionKey` po utworzeniu żądania zatwierdzenia, gateway odrzuci przekazane uruchomienie jako niedopasowanie zatwierdzenia.
 
 ## Zdarzenia systemowe
 
-Cykl życia exec jest udostępniany jako komunikaty systemowe:
+Cykl życia exec jest ujawniany jako komunikaty systemowe:
 
-- `Exec running` (tylko jeśli polecenie przekroczy próg powiadomienia o uruchomieniu)
-- `Exec finished`
-- `Exec denied`
+- `Exec running` (tylko jeśli polecenie przekroczy próg komunikatu o uruchomieniu).
+- `Exec finished`.
+- `Exec denied`.
 
-Są one publikowane w sesji agenta po zgłoszeniu zdarzenia przez node.
-Zatwierdzenia exec hosta gateway emitują te same zdarzenia cyklu życia, gdy polecenie się zakończy (oraz opcjonalnie, gdy działa dłużej niż próg).
-Execy bramkowane zatwierdzeniem używają ponownie identyfikatora zatwierdzenia jako `runId` w tych wiadomościach, co ułatwia korelację.
+Są one publikowane do sesji agenta po zgłoszeniu zdarzenia przez node.
+Zatwierdzenia exec na hoście Gateway emitują te same zdarzenia cyklu życia, gdy
+polecenie się zakończy (oraz opcjonalnie, gdy działa dłużej niż próg).
+Execi objęte zatwierdzeniami używają ponownie identyfikatora zatwierdzenia jako `runId` w tych
+wiadomościach, aby ułatwić korelację.
 
 ## Zachowanie przy odrzuconym zatwierdzeniu
 
-Gdy asynchroniczne zatwierdzenie exec zostanie odrzucone, OpenClaw uniemożliwia agentowi ponowne użycie
-wyniku z wcześniejszego uruchomienia tego samego polecenia w sesji. Powód odrzucenia
-jest przekazywany wraz z jawną informacją, że żaden wynik polecenia nie jest dostępny, co powstrzymuje
-agenta przed twierdzeniem, że istnieje nowy wynik, lub przed powtarzaniem odrzuconego polecenia z
-nieaktualnymi rezultatami z wcześniejszego udanego uruchomienia.
+Gdy asynchroniczne zatwierdzenie exec zostanie odrzucone, OpenClaw uniemożliwia agentowi
+ponowne użycie danych wyjściowych z wcześniejszego uruchomienia tego samego polecenia w sesji.
+Powód odrzucenia jest przekazywany wraz z jawną informacją, że żadne dane wyjściowe polecenia
+nie są dostępne, co powstrzymuje agenta przed twierdzeniem, że istnieją nowe dane wyjściowe, lub
+przed powtarzaniem odrzuconego polecenia ze starymi wynikami z wcześniejszego udanego
+uruchomienia.
 
 ## Konsekwencje
 
-- **full** jest potężne; gdy to możliwe, preferuj listy dozwolonych.
-- **ask** pozwala Ci zachować kontrolę, a jednocześnie umożliwia szybkie zatwierdzanie.
-- Listy dozwolonych per agent zapobiegają przenikaniu zatwierdzeń jednego agenta do innych.
-- Zatwierdzenia dotyczą tylko żądań host exec od **autoryzowanych nadawców**. Nieautoryzowani nadawcy nie mogą wydawać `/exec`.
-- `/exec security=full` to wygodne ustawienie na poziomie sesji dla autoryzowanych operatorów i zgodnie z założeniem pomija zatwierdzenia. Aby twardo zablokować host exec, ustaw security zatwierdzeń na `deny` lub zablokuj narzędzie `exec` przez politykę narzędzi.
+- **`full`** jest potężne; jeśli to możliwe, preferuj listy dozwolonych poleceń.
+- **`ask`** utrzymuje Cię w pętli, jednocześnie pozwalając na szybkie zatwierdzenia.
+- Listy dozwolonych poleceń per agent zapobiegają przenikaniu zatwierdzeń jednego agenta do innych.
+- Zatwierdzenia mają zastosowanie tylko do żądań host exec od **autoryzowanych nadawców**. Nieautoryzowani nadawcy nie mogą wydawać `/exec`.
+- `/exec security=full` to wygodne ustawienie na poziomie sesji dla autoryzowanych operatorów i zgodnie z projektem pomija zatwierdzenia. Aby twardo zablokować host exec, ustaw zatwierdzenia security na `deny` lub zabroń narzędzia `exec` przez zasadę narzędzi.
 
 ## Powiązane
 
 <CardGroup cols={2}>
-  <Card title="Exec approvals — advanced" href="/pl/tools/exec-approvals-advanced" icon="gear">
+  <Card title="Zatwierdzenia exec — zaawansowane" href="/pl/tools/exec-approvals-advanced" icon="gear">
     Safe bins, wiązanie interpreterów i przekazywanie zatwierdzeń do czatu.
   </Card>
   <Card title="Narzędzie exec" href="/pl/tools/exec" icon="terminal">
     Narzędzie do wykonywania poleceń powłoki.
   </Card>
-  <Card title="Tryb podwyższonych uprawnień" href="/pl/tools/elevated" icon="shield-exclamation">
-    Ścieżka awaryjna break-glass, która także pomija zatwierdzenia.
+  <Card title="Tryb elevated" href="/pl/tools/elevated" icon="shield-exclamation">
+    Ścieżka break-glass, która również pomija zatwierdzenia.
   </Card>
   <Card title="Sandboxing" href="/pl/gateway/sandboxing" icon="box">
     Tryby sandboxa i dostęp do obszaru roboczego.
@@ -371,8 +410,8 @@ nieaktualnymi rezultatami z wcześniejszego udanego uruchomienia.
   <Card title="Bezpieczeństwo" href="/pl/gateway/security" icon="lock">
     Model bezpieczeństwa i utwardzanie.
   </Card>
-  <Card title="Sandbox vs tool policy vs elevated" href="/pl/gateway/sandbox-vs-tool-policy-vs-elevated" icon="sliders">
-    Kiedy używać każdej z tych kontrolek.
+  <Card title="Sandbox a zasada narzędzi a elevated" href="/pl/gateway/sandbox-vs-tool-policy-vs-elevated" icon="sliders">
+    Kiedy sięgnąć po każdą z tych kontrolek.
   </Card>
   <Card title="Skills" href="/pl/tools/skills" icon="sparkles">
     Zachowanie automatycznego zezwalania oparte na Skills.

@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Chcesz wybrać dostawcę modelu
+    - Chcesz wybrać providera modeli
     - Potrzebujesz szybkiego przeglądu obsługiwanych backendów LLM
-summary: Dostawcy modeli (LLM) obsługiwani przez OpenClaw
-title: Katalog dostawców
+summary: Providery modeli (LLM) obsługiwane przez OpenClaw
+title: Katalog providerów
 x-i18n:
-    generated_at: "2026-04-25T13:56:37Z"
+    generated_at: "2026-04-26T11:39:30Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9e031e997f0dbf97e3e26d5ee05bd99c2877653daa04423d210d01b9045d8c5c
+    source_hash: b5d3bf5b30bd7a1dbd8b1348f4f07f178fea9bfea523afa96cad2a30d566a139
     source_path: providers/index.md
     workflow: 15
 ---
@@ -18,7 +18,7 @@ x-i18n:
 OpenClaw może korzystać z wielu dostawców LLM. Wybierz dostawcę, uwierzytelnij się, a następnie ustaw
 domyślny model jako `provider/model`.
 
-Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/itd.)? Zobacz [Kanały](/pl/channels).
+Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost (plugin)/itp.)? Zobacz [Kanały](/pl/channels).
 
 ## Szybki start
 
@@ -38,6 +38,7 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 - [Amazon Bedrock Mantle](/pl/providers/bedrock-mantle)
 - [Anthropic (API + Claude CLI)](/pl/providers/anthropic)
 - [Arcee AI (modele Trinity)](/pl/providers/arcee)
+- [Azure Speech](/pl/providers/azure-speech)
 - [BytePlus (międzynarodowy)](/pl/concepts/model-providers#byteplus-international)
 - [Chutes](/pl/providers/chutes)
 - [Cloudflare AI Gateway](/pl/providers/cloudflare-ai-gateway)
@@ -60,7 +61,7 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 - [Mistral](/pl/providers/mistral)
 - [Moonshot AI (Kimi + Kimi Coding)](/pl/providers/moonshot)
 - [NVIDIA](/pl/providers/nvidia)
-- [Ollama (chmura + modele lokalne)](/pl/providers/ollama)
+- [Ollama (modele chmurowe i lokalne)](/pl/providers/ollama)
 - [OpenAI (API + Codex)](/pl/providers/openai)
 - [OpenCode](/pl/providers/opencode)
 - [OpenCode Go](/pl/providers/opencode-go)
@@ -87,9 +88,9 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 ## Wspólne strony przeglądowe
 
 - [Dodatkowe dołączone warianty](/pl/providers/models#additional-bundled-provider-variants) - Anthropic Vertex, Copilot Proxy i Gemini CLI OAuth
-- [Generowanie obrazów](/pl/tools/image-generation) - Wspólne narzędzie `image_generate`, wybór dostawcy i failover
-- [Generowanie muzyki](/pl/tools/music-generation) - Wspólne narzędzie `music_generate`, wybór dostawcy i failover
-- [Generowanie wideo](/pl/tools/video-generation) - Wspólne narzędzie `video_generate`, wybór dostawcy i failover
+- [Generowanie obrazów](/pl/tools/image-generation) - Wspólne narzędzie `image_generate`, wybór dostawcy i przełączanie awaryjne
+- [Generowanie muzyki](/pl/tools/music-generation) - Wspólne narzędzie `music_generate`, wybór dostawcy i przełączanie awaryjne
+- [Generowanie wideo](/pl/tools/video-generation) - Wspólne narzędzie `video_generate`, wybór dostawcy i przełączanie awaryjne
 
 ## Dostawcy transkrypcji
 
@@ -102,7 +103,7 @@ Szukasz dokumentacji kanałów czatu (WhatsApp/Telegram/Discord/Slack/Mattermost
 
 ## Narzędzia społeczności
 
-- [Claude Max API Proxy](/pl/providers/claude-max-api-proxy) - Społecznościowy proxy dla poświadczeń subskrypcji Claude (przed użyciem zweryfikuj zasady/warunki Anthropic)
+- [Claude Max API Proxy](/pl/providers/claude-max-api-proxy) - Społecznościowy serwer proxy dla poświadczeń subskrypcji Claude (przed użyciem zweryfikuj zasady/warunki Anthropic)
 
-Pełny katalog dostawców (xAI, Groq, Mistral itd.) oraz konfigurację zaawansowaną
-znajdziesz w [Dostawcy modeli](/pl/concepts/model-providers).
+Pełny katalog dostawców (xAI, Groq, Mistral itp.) oraz zaawansowaną konfigurację
+znajdziesz w sekcji [Dostawcy modeli](/pl/concepts/model-providers).

@@ -1,38 +1,42 @@
 ---
 read_when:
-    - Parowanie Node iOS/Android z gateway
-    - Używanie canvas/kamery Node do kontekstu agenta
+    - Parowanie Node iOS/Android z Gateway
+    - Używanie canvas/camera Node jako kontekstu agenta
     - Dodawanie nowych poleceń Node lub pomocników CLI
-summary: 'Node: parowanie, możliwości, uprawnienia i pomocniki CLI dla canvas/kamery/ekranu/urządzenia/powiadomień/systemu'
-title: Node
+summary: 'Nodes: parowanie, możliwości, uprawnienia i pomocniki CLI dla canvas/camera/screen/device/notifications/system'
+title: Nodes
 x-i18n:
-    generated_at: "2026-04-24T09:19:03Z"
+    generated_at: "2026-04-26T11:35:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1a210a5b90d78870dd6d17c0f0a81181a8897dc41149618c4359d7c03ef342fd
+    source_hash: 611678b91b0e54910fded6f7d25bf4b5ef03e0a4e1da6d72f5ccf30d18054d3d
     source_path: nodes/index.md
     workflow: 15
 ---
 
-Node to urządzenie towarzyszące (macOS/iOS/Android/headless), które łączy się z Gateway **WebSocket** (ten sam port co operatorzy) z `role: "node"` i udostępnia powierzchnię poleceń (np. `canvas.*`, `camera.*`, `device.*`, `notifications.*`, `system.*`) przez `node.invoke`. Szczegóły protokołu: [Protokół Gateway](/pl/gateway/protocol).
+**Node** to urządzenie towarzyszące (macOS/iOS/Android/headless), które łączy się z Gateway **WebSocket** (ten sam port co operatorzy) z `role: "node"` i udostępnia powierzchnię poleceń (np. `canvas.*`, `camera.*`, `device.*`, `notifications.*`, `system.*`) przez `node.invoke`. Szczegóły protokołu: [Protokół Gateway](/pl/gateway/protocol).
 
 Starszy transport: [Protokół Bridge](/pl/gateway/bridge-protocol) (TCP JSONL;
-wyłącznie historyczny dla bieżących Node).
+wyłącznie historyczny dla obecnych węzłów).
 
-macOS może też działać w **trybie node**: aplikacja na pasku menu łączy się z serwerem WS Gateway i udostępnia swoje lokalne polecenia canvas/camera jako Node (dzięki czemu `openclaw nodes …` działa względem tego Maca).
+macOS może też działać w **trybie node**: aplikacja paska menu łączy się z serwerem
+WS Gateway i udostępnia swoje lokalne polecenia canvas/camera jako node (więc
+`openclaw nodes …` działa względem tego Maca). W trybie zdalnego gateway
+automatyzację przeglądarki obsługuje host CLI node (`openclaw node run` lub
+zainstalowana usługa node), a nie node natywnej aplikacji.
 
 Uwagi:
 
-- Node to **urządzenia peryferyjne**, a nie gateway. Nie uruchamiają usługi gateway.
-- Wiadomości Telegram/WhatsApp itd. trafiają do **gateway**, a nie do Node.
+- Węzły to **urządzenia peryferyjne**, a nie gatewaye. Nie uruchamiają usługi gateway.
+- Wiadomości z Telegram/WhatsApp/itp. trafiają do **gateway**, a nie do węzłów.
 - Instrukcja rozwiązywania problemów: [/nodes/troubleshooting](/pl/nodes/troubleshooting)
 
 ## Parowanie + status
 
-**Node WS używają parowania urządzenia.** Node przedstawiają tożsamość urządzenia podczas `connect`; Gateway
-tworzy żądanie parowania urządzenia dla `role: node`. Zatwierdź przez CLI urządzeń (albo UI).
+**Węzły WS używają parowania urządzeń.** Węzły przedstawiają tożsamość urządzenia podczas `connect`; Gateway
+tworzy żądanie parowania urządzenia dla `role: node`. Zatwierdź przez CLI urządzeń (lub interfejs UI).
 
-Szybkie CLI:
+Szybkie polecenia CLI:
 
 ```bash
 openclaw devices list
@@ -42,59 +46,59 @@ openclaw nodes status
 openclaw nodes describe --node <idOrNameOrIp>
 ```
 
-Jeśli Node ponowi próbę ze zmienionymi danymi auth (rola/zakresy/klucz publiczny), poprzednie
+Jeśli węzeł ponowi próbę z zmienionymi danymi uwierzytelniania (rola/zakresy/klucz publiczny), poprzednie
 oczekujące żądanie zostaje zastąpione i tworzony jest nowy `requestId`. Uruchom ponownie
 `openclaw devices list` przed zatwierdzeniem.
 
 Uwagi:
 
-- `nodes status` oznacza Node jako **paired**, gdy rola jego parowania urządzenia obejmuje `node`.
-- Rekord parowania urządzenia jest trwałym kontraktem zatwierdzonej roli. Rotacja
-  tokenu pozostaje wewnątrz tego kontraktu; nie może podnieść sparowanego Node do
-  innej roli, której zatwierdzenie parowania nigdy nie przyznało.
-- `node.pair.*` (CLI: `openclaw nodes pending/approve/reject/rename`) to oddzielny magazyn parowania Node zarządzany przez gateway;
-  **nie** steruje handshake WS `connect`.
-- Zakres zatwierdzenia zależy od zadeklarowanych poleceń w oczekującym żądaniu:
+- `nodes status` oznacza węzeł jako **paired**, gdy jego rola parowania urządzenia obejmuje `node`.
+- Rekord parowania urządzenia to trwały kontrakt zatwierdzonych ról. Rotacja
+  tokena pozostaje w ramach tego kontraktu; nie może zmienić sparowanego węzła na
+  inną rolę, której zatwierdzenie parowania nigdy nie przyznało.
+- `node.pair.*` (CLI: `openclaw nodes pending/approve/reject/rename`) to oddzielny, należący do gateway
+  magazyn parowania węzłów; **nie** steruje on uzgadnianiem WS `connect`.
+- Zakres zatwierdzenia zależy od poleceń zadeklarowanych w oczekującym żądaniu:
   - żądanie bez poleceń: `operator.pairing`
-  - polecenia Node bez exec: `operator.pairing` + `operator.write`
+  - polecenia node bez exec: `operator.pairing` + `operator.write`
   - `system.run` / `system.run.prepare` / `system.which`: `operator.pairing` + `operator.admin`
 
-## Zdalny host Node (`system.run`)
+## Zdalny host node (`system.run`)
 
-Użyj **hosta Node**, gdy twoje Gateway działa na jednej maszynie, a chcesz, aby polecenia
-wykonywały się na innej. Model nadal rozmawia z **gateway**; gateway
-przekazuje wywołania `exec` do **hosta Node**, gdy wybrano `host=node`.
+Użyj **hosta node**, gdy Gateway działa na jednej maszynie, a chcesz, aby polecenia
+były wykonywane na innej. Model nadal komunikuje się z **gateway**; gateway
+przekazuje wywołania `exec` do **hosta node**, gdy wybrano `host=node`.
 
 ### Co działa gdzie
 
-- **Host Gateway**: odbiera wiadomości, uruchamia model, kieruje wywołania narzędzi.
-- **Host Node**: wykonuje `system.run`/`system.which` na maszynie Node.
-- **Zatwierdzenia**: egzekwowane na hoście Node przez `~/.openclaw/exec-approvals.json`.
+- **Host Gateway**: odbiera wiadomości, uruchamia model, kieruje wywołaniami narzędzi.
+- **Host node**: wykonuje `system.run`/`system.which` na maszynie węzła.
+- **Zatwierdzenia**: wymuszane na hoście node przez `~/.openclaw/exec-approvals.json`.
 
-Uwaga o zatwierdzeniach:
+Uwaga dotycząca zatwierdzeń:
 
-- Przebiegi Node oparte na zatwierdzeniach wiążą dokładny kontekst żądania.
-- Dla bezpośrednich wykonań powłoki/pliku runtime OpenClaw dodatkowo best-effort wiąże jeden konkretny lokalny
-  operand pliku i odrzuca wykonanie, jeśli ten plik zmieni się przed uruchomieniem.
-- Jeśli OpenClaw nie potrafi zidentyfikować dokładnie jednego konkretnego lokalnego pliku dla polecenia interpretera/runtime,
-  wykonanie oparte na zatwierdzeniu jest odrzucane zamiast udawać pełne pokrycie runtime. Użyj sandboxingu,
-  oddzielnych hostów albo jawnej zaufanej allowlisty/pełnego workflow dla szerszej semantyki interpreterów.
+- Uruchomienia node oparte na zatwierdzeniach wiążą dokładny kontekst żądania.
+- W przypadku bezpośrednich wykonań powłoki/środowiska uruchomieniowego plików OpenClaw dodatkowo w miarę możliwości wiąże jeden konkretny lokalny
+  operand pliku i odrzuca uruchomienie, jeśli ten plik zmieni się przed wykonaniem.
+- Jeśli OpenClaw nie może zidentyfikować dokładnie jednego konkretnego lokalnego pliku dla polecenia interpretera/środowiska uruchomieniowego,
+  wykonanie oparte na zatwierdzeniu jest odrzucane zamiast udawania pełnego pokrycia środowiska uruchomieniowego. Użyj sandboxingu,
+  oddzielnych hostów albo jawnej zaufanej listy dozwolonych elementów/pełnego przepływu pracy dla szerszej semantyki interpretera.
 
-### Uruchom hosta Node (pierwszy plan)
+### Uruchamianie hosta node (na pierwszym planie)
 
-Na maszynie Node:
+Na maszynie węzła:
 
 ```bash
 openclaw node run --host <gateway-host> --port 18789 --display-name "Build Node"
 ```
 
-### Zdalne gateway przez tunel SSH (powiązanie loopback)
+### Zdalny gateway przez tunel SSH (powiązanie loopback)
 
-Jeśli Gateway wiąże się do loopback (`gateway.bind=loopback`, domyślnie w trybie lokalnym),
-zdalne hosty Node nie mogą połączyć się bezpośrednio. Utwórz tunel SSH i skieruj
-host Node na lokalny koniec tunelu.
+Jeśli Gateway nasłuchuje na loopback (`gateway.bind=loopback`, domyślnie w trybie lokalnym),
+zdalne hosty node nie mogą łączyć się bezpośrednio. Utwórz tunel SSH i skieruj
+hosta node na lokalny koniec tunelu.
 
-Przykład (host Node -> host gateway):
+Przykład (host node -> host gateway):
 
 ```bash
 # Terminal A (pozostaw uruchomiony): przekieruj lokalny 18790 -> gateway 127.0.0.1:18789
@@ -107,22 +111,23 @@ openclaw node run --host 127.0.0.1 --port 18790 --display-name "Build Node"
 
 Uwagi:
 
-- `openclaw node run` obsługuje auth tokenem albo hasłem.
+- `openclaw node run` obsługuje uwierzytelnianie tokenem lub hasłem.
 - Preferowane są zmienne środowiskowe: `OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`.
-- Fallback z konfiguracji to `gateway.auth.token` / `gateway.auth.password`.
-- W trybie lokalnym host Node celowo ignoruje `gateway.remote.token` / `gateway.remote.password`.
-- W trybie zdalnym `gateway.remote.token` / `gateway.remote.password` kwalifikują się zgodnie z regułami priorytetu zdalnego.
-- Jeśli skonfigurowane są aktywne lokalne SecretRef `gateway.auth.*`, ale nie da się ich rozwiązać, auth hosta Node bezpiecznie kończy się odmową.
-- Rozwiązywanie auth hosta Node honoruje tylko zmienne env `OPENCLAW_GATEWAY_*`.
+- Zapasowa konfiguracja to `gateway.auth.token` / `gateway.auth.password`.
+- W trybie lokalnym host node celowo ignoruje `gateway.remote.token` / `gateway.remote.password`.
+- W trybie zdalnym `gateway.remote.token` / `gateway.remote.password` kwalifikują się zgodnie z regułami pierwszeństwa dla trybu zdalnego.
+- Jeśli skonfigurowano aktywne lokalne SecretRefs `gateway.auth.*`, ale nie zostały rozwiązane, uwierzytelnianie hosta node kończy się odmową.
+- Rozwiązywanie uwierzytelniania hosta node uwzględnia tylko zmienne środowiskowe `OPENCLAW_GATEWAY_*`.
 
-### Uruchom hosta Node (usługa)
+### Uruchamianie hosta node (usługa)
 
 ```bash
 openclaw node install --host <gateway-host> --port 18789 --display-name "Build Node"
+openclaw node start
 openclaw node restart
 ```
 
-### Sparuj + nazwij
+### Parowanie + nazwa
 
 Na hoście gateway:
 
@@ -132,26 +137,26 @@ openclaw devices approve <requestId>
 openclaw nodes status
 ```
 
-Jeśli Node ponowi próbę ze zmienionymi danymi auth, uruchom ponownie `openclaw devices list`
+Jeśli węzeł ponowi próbę z zmienionymi danymi uwierzytelniania, uruchom ponownie `openclaw devices list`
 i zatwierdź bieżący `requestId`.
 
 Opcje nazewnictwa:
 
-- `--display-name` w `openclaw node run` / `openclaw node install` (utrwalane w `~/.openclaw/node.json` na Node).
-- `openclaw nodes rename --node <id|name|ip> --name "Build Node"` (nadpisanie gateway).
+- `--display-name` w `openclaw node run` / `openclaw node install` (utrwalane w `~/.openclaw/node.json` na węźle).
+- `openclaw nodes rename --node <id|name|ip> --name "Build Node"` (nadpisanie po stronie gateway).
 
-### Dodaj polecenia do allowlisty
+### Dodawanie poleceń do listy dozwolonych
 
-Zatwierdzenia exec są **per host Node**. Dodawaj wpisy allowlisty z gateway:
+Zatwierdzenia exec są **przypisane do konkretnego hosta node**. Dodaj wpisy listy dozwolonych z poziomu gateway:
 
 ```bash
 openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/uname"
 openclaw approvals allowlist add --node <id|name|ip> "/usr/bin/sw_vers"
 ```
 
-Zatwierdzenia znajdują się na hoście Node w `~/.openclaw/exec-approvals.json`.
+Zatwierdzenia znajdują się na hoście node w `~/.openclaw/exec-approvals.json`.
 
-### Skieruj exec na Node
+### Kierowanie exec do węzła
 
 Skonfiguruj wartości domyślne (konfiguracja gateway):
 
@@ -161,20 +166,20 @@ openclaw config set tools.exec.security allowlist
 openclaw config set tools.exec.node "<id-or-name>"
 ```
 
-Albo per sesja:
+Lub dla sesji:
 
 ```
 /exec host=node security=allowlist node=<id-or-name>
 ```
 
-Po ustawieniu każde wywołanie `exec` z `host=node` działa na hoście Node (z zastrzeżeniem
-allowlisty/zatwierdzeń Node).
+Po ustawieniu każde wywołanie `exec` z `host=node` działa na hoście node (z zastrzeżeniem
+listy dozwolonych/zatwierdzeń węzła).
 
-`host=auto` nie wybierze niejawnie Node sam z siebie, ale jawne żądanie `host=node` per wywołanie jest dozwolone z `auto`. Jeśli chcesz, aby exec na Node był domyślny dla sesji, ustaw `tools.exec.host=node` albo `/exec host=node ...` jawnie.
+`host=auto` nie wybierze automatycznie węzła samodzielnie, ale jawne żądanie `host=node` dla pojedynczego wywołania jest dozwolone z `auto`. Jeśli chcesz, aby exec na węźle był domyślny dla sesji, ustaw jawnie `tools.exec.host=node` lub `/exec host=node ...`.
 
 Powiązane:
 
-- [CLI hosta Node](/pl/cli/node)
+- [CLI hosta node](/pl/cli/node)
 - [Narzędzie exec](/pl/tools/exec)
 - [Zatwierdzenia exec](/pl/tools/exec-approvals)
 
@@ -186,11 +191,11 @@ Niski poziom (surowe RPC):
 openclaw nodes invoke --node <idOrNameOrIp> --command canvas.eval --params '{"javaScript":"location.href"}'
 ```
 
-Istnieją też pomocniki wyższego poziomu dla typowych przepływów „daj agentowi załącznik MEDIA”.
+Istnieją też pomocnicze polecenia wyższego poziomu dla typowych przepływów pracy „przekaż agentowi załącznik MEDIA”.
 
-## Zrzuty ekranu (snapshoty canvas)
+## Zrzuty ekranu (migawki canvas)
 
-Jeśli Node pokazuje Canvas (WebView), `canvas.snapshot` zwraca `{ format, base64 }`.
+Jeśli węzeł wyświetla Canvas (WebView), `canvas.snapshot` zwraca `{ format, base64 }`.
 
 Pomocnik CLI (zapisuje do pliku tymczasowego i wypisuje `MEDIA:<path>`):
 
@@ -210,8 +215,8 @@ openclaw nodes canvas eval --node <idOrNameOrIp> --js "document.title"
 
 Uwagi:
 
-- `canvas present` akceptuje URL-e albo lokalne ścieżki plików (`--target`), plus opcjonalne `--x/--y/--width/--height` do pozycjonowania.
-- `canvas eval` akceptuje inline JS (`--js`) albo argument pozycyjny.
+- `canvas present` akceptuje adresy URL lub lokalne ścieżki plików (`--target`), a także opcjonalne `--x/--y/--width/--height` do pozycjonowania.
+- `canvas eval` akceptuje JS inline (`--js`) albo argument pozycyjny.
 
 ### A2UI (Canvas)
 
@@ -225,13 +230,13 @@ Uwagi:
 
 - Obsługiwany jest tylko A2UI v0.8 JSONL (v0.9/createSurface jest odrzucane).
 
-## Zdjęcia + wideo (kamera Node)
+## Zdjęcia + wideo (kamera node)
 
 Zdjęcia (`jpg`):
 
 ```bash
 openclaw nodes camera list --node <idOrNameOrIp>
-openclaw nodes camera snap --node <idOrNameOrIp>            # domyślnie: obie strony (2 linie MEDIA)
+openclaw nodes camera snap --node <idOrNameOrIp>            # domyślnie: obie strony (2 wiersze MEDIA)
 openclaw nodes camera snap --node <idOrNameOrIp> --facing front
 ```
 
@@ -244,13 +249,13 @@ openclaw nodes camera clip --node <idOrNameOrIp> --duration 3000 --no-audio
 
 Uwagi:
 
-- Node musi być **na pierwszym planie** dla `canvas.*` i `camera.*` (wywołania w tle zwracają `NODE_BACKGROUND_UNAVAILABLE`).
-- Czas klipu jest ograniczany (obecnie `<= 60s`), aby uniknąć zbyt dużych ładunków base64.
-- Android w miarę możliwości wyświetli prośbę o uprawnienia `CAMERA`/`RECORD_AUDIO`; odrzucone uprawnienia kończą się błędem `*_PERMISSION_REQUIRED`.
+- Węzeł musi działać **na pierwszym planie** dla `canvas.*` i `camera.*` (wywołania w tle zwracają `NODE_BACKGROUND_UNAVAILABLE`).
+- Czas trwania klipu jest ograniczany (obecnie `<= 60s`), aby uniknąć zbyt dużych ładunków base64.
+- Android poprosi o uprawnienia `CAMERA`/`RECORD_AUDIO`, gdy to możliwe; odrzucone uprawnienia kończą się błędem `*_PERMISSION_REQUIRED`.
 
-## Nagrania ekranu (Node)
+## Nagrania ekranu (węzły)
 
-Obsługiwane Node udostępniają `screen.record` (`mp4`). Przykład:
+Obsługiwane węzły udostępniają `screen.record` (mp4). Przykład:
 
 ```bash
 openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10
@@ -259,14 +264,14 @@ openclaw nodes screen record --node <idOrNameOrIp> --duration 10s --fps 10 --no-
 
 Uwagi:
 
-- Dostępność `screen.record` zależy od platformy Node.
+- Dostępność `screen.record` zależy od platformy węzła.
 - Nagrania ekranu są ograniczane do `<= 60s`.
 - `--no-audio` wyłącza przechwytywanie mikrofonu na obsługiwanych platformach.
-- Użyj `--screen <index>`, aby wybrać wyświetlacz, gdy dostępnych jest wiele ekranów.
+- Użyj `--screen <index>`, aby wybrać ekran, gdy dostępnych jest kilka ekranów.
 
-## Lokalizacja (Node)
+## Lokalizacja (węzły)
 
-Node udostępniają `location.get`, gdy Lokalizacja jest włączona w ustawieniach.
+Węzły udostępniają `location.get`, gdy lokalizacja jest włączona w ustawieniach.
 
 Pomocnik CLI:
 
@@ -278,14 +283,14 @@ openclaw nodes location get --node <idOrNameOrIp> --accuracy precise --max-age 1
 Uwagi:
 
 - Lokalizacja jest **domyślnie wyłączona**.
-- Tryb „Always” wymaga uprawnień systemowych; pobieranie w tle działa best-effort.
-- Odpowiedź zawiera lat/lon, dokładność (metry) i znacznik czasu.
+- „Always” wymaga uprawnienia systemowego; pobieranie w tle działa na zasadzie best-effort.
+- Odpowiedź zawiera szer./dł. geogr., dokładność (w metrach) i znacznik czasu.
 
-## SMS (Node Android)
+## SMS (węzły Android)
 
-Node Android mogą udostępniać `sms.send`, gdy użytkownik przyzna uprawnienie **SMS**, a urządzenie obsługuje telefonię.
+Węzły Android mogą udostępniać `sms.send`, gdy użytkownik przyzna uprawnienie **SMS**, a urządzenie obsługuje telefonię.
 
-Wywołanie niskiego poziomu:
+Wywołanie niskopoziomowe:
 
 ```bash
 openclaw nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"+15555550123","message":"Hello from OpenClaw"}'
@@ -293,12 +298,12 @@ openclaw nodes invoke --node <idOrNameOrIp> --command sms.send --params '{"to":"
 
 Uwagi:
 
-- Monit o uprawnienie musi zostać zaakceptowany na urządzeniu Android, zanim możliwość zostanie ogłoszona.
-- Urządzenia tylko z Wi‑Fi bez telefonii nie będą ogłaszać `sms.send`.
+- Monit o uprawnienie musi zostać zaakceptowany na urządzeniu Android, zanim funkcja zostanie ogłoszona.
+- Urządzenia tylko z Wi‑Fi bez obsługi telefonii nie będą ogłaszać `sms.send`.
 
-## Polecenia urządzenia Android + danych osobowych
+## Polecenia urządzenia Android + danych osobistych
 
-Node Android mogą ogłaszać dodatkowe rodziny poleceń, gdy odpowiednie możliwości są włączone.
+Węzły Android mogą ogłaszać dodatkowe rodziny poleceń, gdy odpowiednie możliwości są włączone.
 
 Dostępne rodziny:
 
@@ -321,12 +326,12 @@ openclaw nodes invoke --node <idOrNameOrIp> --command photos.latest --params '{"
 
 Uwagi:
 
-- Polecenia motion są ograniczane przez możliwości dostępnych sensorów.
+- Polecenia ruchu są ograniczane przez dostępne czujniki.
 
-## Polecenia systemowe (host Node / mac node)
+## Polecenia systemowe (host node / mac node)
 
-Node macOS udostępnia `system.run`, `system.notify` i `system.execApprovals.get/set`.
-Host Node headless udostępnia `system.run`, `system.which` i `system.execApprovals.get/set`.
+Węzeł macOS udostępnia `system.run`, `system.notify` i `system.execApprovals.get/set`.
+Headless host node udostępnia `system.run`, `system.which` i `system.execApprovals.get/set`.
 
 Przykłady:
 
@@ -338,42 +343,42 @@ openclaw nodes invoke --node <idOrNameOrIp> --command system.which --params '{"n
 Uwagi:
 
 - `system.run` zwraca stdout/stderr/kod wyjścia w ładunku.
-- Wykonanie powłoki przechodzi teraz przez narzędzie `exec` z `host=node`; `nodes` pozostaje powierzchnią bezpośredniego RPC dla jawnych poleceń Node.
+- Wykonanie powłoki odbywa się teraz przez narzędzie `exec` z `host=node`; `nodes` pozostaje bezpośrednią powierzchnią RPC dla jawnych poleceń node.
 - `nodes invoke` nie udostępnia `system.run` ani `system.run.prepare`; pozostają one wyłącznie na ścieżce exec.
 - Ścieżka exec przygotowuje kanoniczny `systemRunPlan` przed zatwierdzeniem. Gdy
-  zatwierdzenie zostanie przyznane, gateway przekazuje ten zapisany plan, a nie później
-  edytowane przez wywołującego pola command/cwd/session.
-- `system.notify` respektuje stan uprawnień do powiadomień w aplikacji macOS.
-- Nierozpoznane metadane `platform` / `deviceFamily` Node używają zachowawczej domyślnej allowlisty, która wyklucza `system.run` i `system.which`. Jeśli celowo potrzebujesz tych poleceń dla nieznanej platformy, dodaj je jawnie przez `gateway.nodes.allowCommands`.
+  zatwierdzenie zostanie przyznane, gateway przekazuje ten zapisany plan, a nie żadne później
+  zmienione przez wywołującego pola command/cwd/session.
+- `system.notify` uwzględnia stan uprawnień powiadomień w aplikacji macOS.
+- Nierozpoznane metadane node `platform` / `deviceFamily` używają konserwatywnej domyślnej listy dozwolonych poleceń, która wyklucza `system.run` i `system.which`. Jeśli celowo potrzebujesz tych poleceń dla nieznanej platformy, dodaj je jawnie przez `gateway.nodes.allowCommands`.
 - `system.run` obsługuje `--cwd`, `--env KEY=VAL`, `--command-timeout` i `--needs-screen-recording`.
-- Dla wrapperów powłoki (`bash|sh|zsh ... -c/-lc`) wartości `--env` ograniczone do zakresu żądania są redukowane do jawnej allowlisty (`TERM`, `LANG`, `LC_*`, `COLORTERM`, `NO_COLOR`, `FORCE_COLOR`).
-- Dla decyzji allow-always w trybie allowlisty znane wrappery dyspozycji (`env`, `nice`, `nohup`, `stdbuf`, `timeout`) utrwalają wewnętrzne ścieżki plików wykonywalnych zamiast ścieżek wrapperów. Jeśli bezpieczne rozpakowanie nie jest możliwe, żaden wpis allowlisty nie jest automatycznie utrwalany.
-- Na hostach Windows Node w trybie allowlisty uruchomienia wrapperów powłoki przez `cmd.exe /c` wymagają zatwierdzenia (sam wpis allowlisty nie daje automatycznego zezwolenia dla formy wrappera).
+- Dla wrapperów powłoki (`bash|sh|zsh ... -c/-lc`) wartości `--env` o zakresie żądania są redukowane do jawnej listy dozwolonych (`TERM`, `LANG`, `LC_*`, `COLORTERM`, `NO_COLOR`, `FORCE_COLOR`).
+- W przypadku decyzji allow-always w trybie listy dozwolonych znane wrappery dyspozycji (`env`, `nice`, `nohup`, `stdbuf`, `timeout`) utrwalają wewnętrzne ścieżki plików wykonywalnych zamiast ścieżek wrapperów. Jeśli rozpakowanie nie jest bezpieczne, żaden wpis listy dozwolonych nie jest utrwalany automatycznie.
+- Na hostach node Windows w trybie listy dozwolonych uruchomienia wrappera powłoki przez `cmd.exe /c` wymagają zatwierdzenia (sam wpis na liście dozwolonych nie powoduje automatycznego zezwolenia na formę wrappera).
 - `system.notify` obsługuje `--priority <passive|active|timeSensitive>` i `--delivery <system|overlay|auto>`.
-- Hosty Node ignorują nadpisania `PATH` i usuwają niebezpieczne klucze startowe/powłoki (`DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4`). Jeśli potrzebujesz dodatkowych wpisów PATH, skonfiguruj środowisko usługi hosta Node (albo zainstaluj narzędzia w standardowych lokalizacjach) zamiast przekazywać `PATH` przez `--env`.
-- W trybie mac node `system.run` jest ograniczane przez zatwierdzenia exec w aplikacji macOS (Settings → Exec approvals).
-  Ask/allowlist/full zachowują się tak samo jak headless host Node; odrzucone prompty zwracają `SYSTEM_RUN_DENIED`.
-- Na headless hoście Node `system.run` jest ograniczane przez zatwierdzenia exec (`~/.openclaw/exec-approvals.json`).
+- Hosty node ignorują nadpisania `PATH` i usuwają niebezpieczne klucze startowe/powłoki (`DYLD_*`, `LD_*`, `NODE_OPTIONS`, `PYTHON*`, `PERL*`, `RUBYOPT`, `SHELLOPTS`, `PS4`). Jeśli potrzebujesz dodatkowych wpisów PATH, skonfiguruj środowisko usługi hosta node (lub zainstaluj narzędzia w standardowych lokalizacjach) zamiast przekazywać `PATH` przez `--env`.
+- W trybie macOS node `system.run` jest ograniczane przez zatwierdzenia exec w aplikacji macOS (Ustawienia → Exec approvals).
+  Ask/allowlist/full działają tak samo jak w headless hoście node; odrzucone prompty zwracają `SYSTEM_RUN_DENIED`.
+- W headless hoście node `system.run` jest ograniczane przez zatwierdzenia exec (`~/.openclaw/exec-approvals.json`).
 
-## Powiązanie exec z Node
+## Powiązanie exec z node
 
-Gdy dostępnych jest wiele Node, możesz powiązać exec z konkretnym Node.
-Ustawia to domyślny Node dla `exec host=node` (i może być nadpisane per agent).
+Gdy dostępnych jest wiele węzłów, możesz powiązać exec z określonym węzłem.
+Ustawia to domyślny węzeł dla `exec host=node` (i może zostać nadpisane dla agenta).
 
-Globalna wartość domyślna:
+Domyślnie globalnie:
 
 ```bash
 openclaw config set tools.exec.node "node-id-or-name"
 ```
 
-Nadpisanie per agent:
+Nadpisanie dla agenta:
 
 ```bash
 openclaw config get agents.list
 openclaw config set agents.list[0].tools.exec.node "node-id-or-name"
 ```
 
-Usuń ustawienie, aby zezwolić na dowolny Node:
+Usuń ustawienie, aby zezwolić na dowolny węzeł:
 
 ```bash
 openclaw config unset tools.exec.node
@@ -382,15 +387,15 @@ openclaw config unset agents.list[0].tools.exec.node
 
 ## Mapa uprawnień
 
-Node mogą zawierać mapę `permissions` w `node.list` / `node.describe`, kluczowaną nazwą uprawnienia (np. `screenRecording`, `accessibility`) z wartościami logicznymi (`true` = przyznane).
+Węzły mogą zawierać mapę `permissions` w `node.list` / `node.describe`, z kluczami będącymi nazwami uprawnień (np. `screenRecording`, `accessibility`) i wartościami logicznymi (`true` = przyznane).
 
-## Headless host Node (wieloplatformowy)
+## Headless host node (wieloplatformowy)
 
-OpenClaw może uruchamiać **headless host Node** (bez UI), który łączy się z Gateway
+OpenClaw może uruchamiać **headless host node** (bez interfejsu UI), który łączy się z Gateway
 WebSocket i udostępnia `system.run` / `system.which`. Jest to przydatne na Linux/Windows
-albo do uruchamiania minimalnego Node obok serwera.
+lub do uruchamiania minimalnego węzła obok serwera.
 
-Uruchom go:
+Uruchamianie:
 
 ```bash
 openclaw node run --host <gateway-host> --port 18789
@@ -399,15 +404,15 @@ openclaw node run --host <gateway-host> --port 18789
 Uwagi:
 
 - Parowanie jest nadal wymagane (Gateway pokaże prompt parowania urządzenia).
-- Host Node przechowuje swój identyfikator Node, token, nazwę wyświetlaną i informacje o połączeniu gateway w `~/.openclaw/node.json`.
-- Zatwierdzenia exec są egzekwowane lokalnie przez `~/.openclaw/exec-approvals.json`
+- Host node przechowuje swój identyfikator node, token, nazwę wyświetlaną i informacje o połączeniu z gateway w `~/.openclaw/node.json`.
+- Zatwierdzenia exec są wymuszane lokalnie przez `~/.openclaw/exec-approvals.json`
   (zobacz [Zatwierdzenia exec](/pl/tools/exec-approvals)).
-- Na macOS headless host Node domyślnie wykonuje `system.run` lokalnie. Ustaw
+- Na macOS headless host node domyślnie wykonuje `system.run` lokalnie. Ustaw
   `OPENCLAW_NODE_EXEC_HOST=app`, aby kierować `system.run` przez host exec aplikacji towarzyszącej; dodaj
-  `OPENCLAW_NODE_EXEC_FALLBACK=0`, aby wymagać hosta aplikacji i bezpiecznie zakończyć odmową, jeśli jest niedostępny.
+  `OPENCLAW_NODE_EXEC_FALLBACK=0`, aby wymagać hosta aplikacji i kończyć się odmową, jeśli jest niedostępny.
 - Dodaj `--tls` / `--tls-fingerprint`, gdy Gateway WS używa TLS.
 
-## Tryb mac node
+## Tryb macOS node
 
-- Aplikacja macOS na pasku menu łączy się z serwerem Gateway WS jako Node (dzięki czemu `openclaw nodes …` działa względem tego Maca).
+- Aplikacja paska menu macOS łączy się z serwerem Gateway WS jako node (więc `openclaw nodes …` działa względem tego Maca).
 - W trybie zdalnym aplikacja otwiera tunel SSH dla portu Gateway i łączy się z `localhost`.

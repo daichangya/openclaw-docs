@@ -1,94 +1,141 @@
 ---
 read_when:
-    - Szukasz przeglądu możliwości mediów
-    - Wybór dostawcy mediów do skonfigurowania
-    - Zrozumienie działania asynchronicznego generowania mediów
-summary: Ujednolicona strona główna dla generowania mediów, rozumienia mediów i funkcji mowy
+    - Szukasz przeglądu możliwości mediów w OpenClaw
+    - Wybieranie dostawcy mediów do skonfigurowania
+    - Zrozumienie, jak działa asynchroniczne generowanie mediów
+sidebarTitle: Media overview
+summary: Możliwości obrazów, wideo, muzyki, mowy i rozumienia mediów w skrócie
 title: Przegląd mediów
 x-i18n:
-    generated_at: "2026-04-25T13:59:52Z"
+    generated_at: "2026-04-26T11:42:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c674df701b88c807842078b2e2e53821f1b2fc6037fd2e4d688caea147e769f1
+    source_hash: 70be8062c01f57bf53ab08aad4f1561e3958adc94e478224821d722fd500e09f
     source_path: tools/media-overview.md
     workflow: 15
 ---
 
-# Generowanie i rozumienie mediów
+OpenClaw generuje obrazy, wideo i muzykę, rozumie przychodzące media
+(obrazy, audio, wideo) i odczytuje odpowiedzi na głos za pomocą syntezy mowy. Wszystkie
+możliwości mediów są sterowane narzędziami: agent decyduje, kiedy ich użyć na podstawie
+rozmowy, a każde narzędzie pojawia się tylko wtedy, gdy skonfigurowany jest co najmniej jeden
+wspierający dostawca.
 
-OpenClaw generuje obrazy, filmy i muzykę, rozumie media przychodzące (obrazy, audio, wideo) oraz odczytuje odpowiedzi na głos za pomocą text-to-speech. Wszystkie możliwości związane z mediami są sterowane przez narzędzia: agent decyduje, kiedy z nich skorzystać na podstawie rozmowy, a każde narzędzie pojawia się tylko wtedy, gdy skonfigurowano co najmniej jednego dostawcę zaplecza.
+## Możliwości
 
-## Możliwości w skrócie
-
-| Możliwość             | Narzędzie        | Dostawcy                                                                                     | Co robi                                                 |
-| --------------------- | ---------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Generowanie obrazów   | `image_generate` | ComfyUI, fal, Google, MiniMax, OpenAI, Vydra, xAI                                            | Tworzy lub edytuje obrazy na podstawie promptów tekstowych lub odwołań |
-| Generowanie wideo     | `video_generate` | Alibaba, BytePlus, ComfyUI, fal, Google, MiniMax, OpenAI, Qwen, Runway, Together, Vydra, xAI | Tworzy filmy na podstawie tekstu, obrazów lub istniejących filmów |
-| Generowanie muzyki    | `music_generate` | ComfyUI, Google, MiniMax                                                                     | Tworzy muzykę lub ścieżki audio na podstawie promptów tekstowych |
-| Text-to-speech (TTS)  | `tts`            | ElevenLabs, Google, Gradium, Local CLI, Microsoft, MiniMax, OpenAI, Vydra, xAI, Xiaomi MiMo  | Zamienia odpowiedzi wychodzące na mowę                  |
-| Rozumienie mediów     | (automatyczne)   | Dowolny dostawca modeli obsługujących vision/audio oraz zapasowe rozwiązania CLI             | Podsumowuje przychodzące obrazy, audio i wideo          |
+<CardGroup cols={2}>
+  <Card title="Generowanie obrazów" href="/pl/tools/image-generation" icon="image">
+    Twórz i edytuj obrazy z promptów tekstowych lub obrazów referencyjnych przez
+    `image_generate`. Synchroniczne — kończy się w tej samej odpowiedzi.
+  </Card>
+  <Card title="Generowanie wideo" href="/pl/tools/video-generation" icon="video">
+    Tekst na wideo, obraz na wideo i wideo na wideo przez `video_generate`.
+    Asynchroniczne — działa w tle i publikuje wynik, gdy będzie gotowy.
+  </Card>
+  <Card title="Generowanie muzyki" href="/pl/tools/music-generation" icon="music">
+    Generuj muzykę lub ścieżki audio przez `music_generate`. Asynchroniczne u współdzielonych
+    dostawców; ścieżka workflow ComfyUI działa synchronicznie.
+  </Card>
+  <Card title="Synteza mowy" href="/pl/tools/tts" icon="microphone">
+    Zamieniaj odpowiedzi wychodzące na dźwięk mówiony przez narzędzie `tts` oraz
+    konfigurację `messages.tts`. Synchroniczne.
+  </Card>
+  <Card title="Rozumienie mediów" href="/pl/nodes/media-understanding" icon="eye">
+    Podsumowuj przychodzące obrazy, audio i wideo przy użyciu dostawców modeli
+    obsługujących vision i dedykowanych Pluginów rozumienia mediów.
+  </Card>
+  <Card title="Zamiana mowy na tekst" href="/pl/nodes/audio" icon="ear-listen">
+    Transkrybuj przychodzące wiadomości głosowe przez wsadowe STT lub dostawców
+    strumieniowego STT dla Voice Call.
+  </Card>
+</CardGroup>
 
 ## Macierz możliwości dostawców
 
-Ta tabela pokazuje, którzy dostawcy obsługują poszczególne możliwości medialne na całej platformie.
-
-| Dostawca    | Obrazy | Wideo | Muzyka | TTS | STT / Transkrypcja | Głos w czasie rzeczywistym | Rozumienie mediów |
-| ----------- | ------ | ----- | ------ | --- | ------------------ | -------------------------- | ----------------- |
-| Alibaba     |        | Tak   |        |     |                    |                            |                   |
-| BytePlus    |        | Tak   |        |     |                    |                            |                   |
-| ComfyUI     | Tak    | Tak   | Tak    |     |                    |                            |                   |
-| Deepgram    |        |       |        |     | Tak                | Tak                        |                   |
-| ElevenLabs  |        |       |        | Tak | Tak                |                            |                   |
-| fal         | Tak    | Tak   |        |     |                    |                            |                   |
-| Google      | Tak    | Tak   | Tak    | Tak |                    | Tak                        | Tak               |
-| Gradium     |        |       |        | Tak |                    |                            |                   |
-| Local CLI   |        |       |        | Tak |                    |                            |                   |
-| Microsoft   |        |       |        | Tak |                    |                            |                   |
-| MiniMax     | Tak    | Tak   | Tak    | Tak |                    |                            |                   |
-| Mistral     |        |       |        |     | Tak                |                            |                   |
-| OpenAI      | Tak    | Tak   |        | Tak | Tak                | Tak                        | Tak               |
-| Qwen        |        | Tak   |        |     |                    |                            |                   |
-| Runway      |        | Tak   |        |     |                    |                            |                   |
-| SenseAudio  |        |       |        |     | Tak                |                            |                   |
-| Together    |        | Tak   |        |     |                    |                            |                   |
-| Vydra       | Tak    | Tak   |        | Tak |                    |                            |                   |
-| xAI         | Tak    | Tak   |        | Tak | Tak                | Tak                        | Tak               |
-| Xiaomi MiMo | Tak    |       |        | Tak |                    |                            | Tak               |
+| Dostawca    | Obraz | Wideo | Muzyka | TTS | STT | Głos realtime | Rozumienie mediów |
+| ----------- | :---: | :---: | :----: | :-: | :-: | :-----------: | :---------------: |
+| Alibaba     |       |   ✓   |        |     |     |               |                   |
+| BytePlus    |       |   ✓   |        |     |     |               |                   |
+| ComfyUI     |   ✓   |   ✓   |   ✓    |     |     |               |                   |
+| Deepgram    |       |       |        |     |  ✓  |       ✓       |                   |
+| ElevenLabs  |       |       |        |  ✓  |  ✓  |               |                   |
+| fal         |   ✓   |   ✓   |        |     |     |               |                   |
+| Google      |   ✓   |   ✓   |   ✓    |  ✓  |     |       ✓       |         ✓         |
+| Gradium     |       |       |        |  ✓  |     |               |                   |
+| Local CLI   |       |       |        |  ✓  |     |               |                   |
+| Microsoft   |       |       |        |  ✓  |     |               |                   |
+| MiniMax     |   ✓   |   ✓   |   ✓    |  ✓  |     |               |                   |
+| Mistral     |       |       |        |     |  ✓  |               |                   |
+| OpenAI      |   ✓   |   ✓   |        |  ✓  |  ✓  |       ✓       |         ✓         |
+| Qwen        |       |   ✓   |        |     |     |               |                   |
+| Runway      |       |   ✓   |        |     |     |               |                   |
+| SenseAudio  |       |       |        |     |  ✓  |               |                   |
+| Together    |       |   ✓   |        |     |     |               |                   |
+| Vydra       |   ✓   |   ✓   |        |  ✓  |     |               |                   |
+| xAI         |   ✓   |   ✓   |        |  ✓  |  ✓  |               |         ✓         |
+| Xiaomi MiMo |   ✓   |       |        |  ✓  |     |               |         ✓         |
 
 <Note>
-Rozumienie mediów korzysta z dowolnego modelu obsługującego vision lub audio zarejestrowanego w konfiguracji dostawców. Powyższa tabela wyróżnia dostawców z dedykowaną obsługą rozumienia mediów; większość dostawców LLM z modelami multimodalnymi (Anthropic, Google, OpenAI itd.) również może rozumieć media przychodzące, gdy są skonfigurowane jako aktywny model odpowiedzi.
+Rozumienie mediów używa każdego modelu obsługującego vision lub audio zarejestrowanego
+w konfiguracji dostawcy. Powyższa macierz wymienia dostawców z dedykowaną
+obsługą rozumienia mediów; większość multimodalnych dostawców LLM (Anthropic, Google,
+OpenAI itd.) potrafi również rozumieć przychodzące media, gdy są skonfigurowani jako aktywny
+model odpowiedzi.
 </Note>
 
-## Jak działa generowanie asynchroniczne
+## Asynchroniczne vs synchroniczne
 
-Generowanie wideo i muzyki działa jako zadania w tle, ponieważ przetwarzanie po stronie dostawców zwykle trwa od 30 sekund do kilku minut. Gdy agent wywołuje `video_generate` lub `music_generate`, OpenClaw wysyła żądanie do dostawcy, natychmiast zwraca identyfikator zadania i śledzi zadanie w rejestrze zadań. Agent może dalej odpowiadać na inne wiadomości, podczas gdy zadanie jest wykonywane. Gdy dostawca zakończy przetwarzanie, OpenClaw wybudza agenta, aby mógł opublikować gotowe media z powrotem w oryginalnym kanale. Generowanie obrazów i TTS są synchroniczne i kończą się inline wraz z odpowiedzią.
+| Możliwość       | Tryb            | Dlaczego                                                          |
+| --------------- | --------------- | ----------------------------------------------------------------- |
+| Obraz           | Synchroniczny   | Odpowiedzi dostawców wracają w kilka sekund; kończy się w odpowiedzi. |
+| Synteza mowy    | Synchroniczny   | Odpowiedzi dostawców wracają w kilka sekund; są dołączane do audio odpowiedzi. |
+| Wideo           | Asynchroniczny  | Przetwarzanie po stronie dostawcy trwa od 30 s do kilku minut.    |
+| Muzyka (współdzielona) | Asynchroniczny | Ma tę samą charakterystykę przetwarzania po stronie dostawcy co wideo. |
+| Muzyka (ComfyUI) | Synchroniczny  | Lokalny workflow działa inline względem skonfigurowanego serwera ComfyUI. |
+
+Dla narzędzi asynchronicznych OpenClaw wysyła żądanie do dostawcy, natychmiast zwraca
+identyfikator zadania i śledzi zadanie w rejestrze zadań. Agent nadal odpowiada
+na inne wiadomości, gdy zadanie jest wykonywane. Gdy dostawca zakończy pracę,
+OpenClaw wybudza agenta, aby mógł opublikować gotowe media z powrotem w
+oryginalnym kanale.
+
+## Zamiana mowy na tekst i Voice Call
 
 Deepgram, ElevenLabs, Mistral, OpenAI, SenseAudio i xAI mogą transkrybować
 przychodzące audio przez wsadową ścieżkę `tools.media.audio`, jeśli są skonfigurowane.
-Deepgram, ElevenLabs, Mistral, OpenAI i xAI rejestrują również dostawców
-strumieniowego STT dla Voice Call, dzięki czemu dźwięk z połączeń telefonicznych na żywo może być przekazywany do wybranego
-dostawcy bez oczekiwania na zakończenie nagrania.
+Pluginy kanałów, które wykonują wstępne sprawdzenie notatki głosowej pod kątem bramek wzmianek lub
+parsowania poleceń, oznaczają przetranskrybowany załącznik w kontekście wejściowym, dzięki czemu współdzielony
+przebieg rozumienia mediów ponownie używa tej transkrypcji zamiast wykonywać drugie
+wywołanie STT dla tego samego audio.
 
-Google mapuje się na powierzchnie OpenClaw dla obrazów, wideo, muzyki, wsadowego TTS, backendowego głosu w czasie rzeczywistym
-oraz rozumienia mediów. OpenAI mapuje się na powierzchnie OpenClaw dla obrazów,
-wideo, wsadowego TTS, wsadowego STT, strumieniowego STT dla Voice Call, backendowego głosu w czasie rzeczywistym
-oraz osadzeń pamięci. xAI obecnie mapuje się na powierzchnie OpenClaw dla obrazów, wideo,
-wyszukiwania, wykonywania kodu, wsadowego TTS, wsadowego STT oraz strumieniowego STT dla Voice Call.
-Głos xAI Realtime jest możliwością po stronie upstream, ale nie jest
-rejestrowany w OpenClaw, dopóki wspólny kontrakt głosu w czasie rzeczywistym nie będzie mógł go
-reprezentować.
+Deepgram, ElevenLabs, Mistral, OpenAI i xAI rejestrują też dostawców
+strumieniowego STT dla Voice Call, więc dźwięk z połączenia na żywo może być przekazywany do wybranego
+dostawcy bez czekania na ukończenie nagrania.
 
-## Szybkie linki
+## Mapowania dostawców (jak dostawcy są podzieleni między powierzchnie)
 
-- [Generowanie obrazów](/pl/tools/image-generation) -- generowanie i edycja obrazów
-- [Generowanie wideo](/pl/tools/video-generation) -- text-to-video, image-to-video i video-to-video
-- [Generowanie muzyki](/pl/tools/music-generation) -- tworzenie muzyki i ścieżek audio
-- [Text-to-Speech](/pl/tools/tts) -- zamienianie odpowiedzi na mowę
-- [Rozumienie mediów](/pl/nodes/media-understanding) -- rozumienie przychodzących obrazów, audio i wideo
+<AccordionGroup>
+  <Accordion title="Google">
+    Powierzchnie obrazów, wideo, muzyki, wsadowego TTS, backendowego głosu realtime oraz
+    rozumienia mediów.
+  </Accordion>
+  <Accordion title="OpenAI">
+    Powierzchnie obrazów, wideo, wsadowego TTS, wsadowego STT, strumieniowego STT dla Voice Call,
+    backendowego głosu realtime i embeddingów pamięci.
+  </Accordion>
+  <Accordion title="xAI">
+    Obrazy, wideo, wyszukiwanie, wykonywanie kodu, wsadowy TTS, wsadowy STT i
+    strumieniowy STT dla Voice Call. Głos realtime xAI jest funkcją upstream, ale
+    nie jest rejestrowany w OpenClaw, dopóki współdzielony kontrakt głosu realtime nie
+    będzie mógł go reprezentować.
+  </Accordion>
+</AccordionGroup>
 
 ## Powiązane
 
 - [Generowanie obrazów](/pl/tools/image-generation)
 - [Generowanie wideo](/pl/tools/video-generation)
 - [Generowanie muzyki](/pl/tools/music-generation)
-- [Text-to-speech](/pl/tools/tts)
+- [Synteza mowy](/pl/tools/tts)
+- [Rozumienie mediów](/pl/nodes/media-understanding)
+- [Węzły audio](/pl/nodes/audio)

@@ -2,25 +2,25 @@
 read_when:
     - Chcesz używać generowania obrazów fal w OpenClaw
     - Potrzebujesz przepływu uwierzytelniania FAL_KEY
-    - Chcesz domyślnych ustawień fal dla `image_generate` lub `video_generate`
+    - Chcesz wartości domyślne fal dla `image_generate` lub `video_generate`
 summary: Konfiguracja generowania obrazów i wideo fal w OpenClaw
 title: Fal
 x-i18n:
-    generated_at: "2026-04-24T09:27:29Z"
+    generated_at: "2026-04-26T11:39:19Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d23d2d0d27e5f60f9dacb4a6a7e4c07248cf45ccd80bfabaf6bb99f5f78946b2
+    source_hash: e6789f0fa1140cf76f0206c7384a79ee8b96de4af9e1dfedc00e5a3382f742bb
     source_path: providers/fal.md
     workflow: 15
 ---
 
 OpenClaw dostarcza dołączonego dostawcę `fal` do hostowanego generowania obrazów i wideo.
 
-| Właściwość | Wartość                                                       |
-| ---------- | ------------------------------------------------------------- |
-| Dostawca   | `fal`                                                         |
-| Uwierzytelnianie | `FAL_KEY` (kanoniczne; `FAL_API_KEY` działa również jako fallback) |
-| API        | endpointy modeli fal                                          |
+| Właściwość | Wartość                                                      |
+| ---------- | ------------------------------------------------------------ |
+| Dostawca   | `fal`                                                        |
+| Auth       | `FAL_KEY` (kanoniczne; `FAL_API_KEY` działa również jako fallback) |
+| API        | endpointy modeli fal                                         |
 
 ## Pierwsze kroki
 
@@ -50,17 +50,22 @@ OpenClaw dostarcza dołączonego dostawcę `fal` do hostowanego generowania obra
 Dołączony dostawca generowania obrazów `fal` domyślnie używa
 `fal/fal-ai/flux/dev`.
 
-| Możliwość      | Wartość                    |
-| -------------- | -------------------------- |
-| Maks. liczba obrazów | 4 na żądanie              |
-| Tryb edycji    | Włączony, 1 obraz referencyjny |
-| Nadpisania rozmiaru | Obsługiwane              |
-| Proporcje obrazu | Obsługiwane               |
-| Rozdzielczość  | Obsługiwana                |
+| Możliwość       | Wartość                    |
+| --------------- | -------------------------- |
+| Maks. liczba obrazów | 4 na żądanie         |
+| Tryb edycji     | Włączony, 1 obraz referencyjny |
+| Nadpisania rozmiaru | Obsługiwane            |
+| Aspect ratio    | Obsługiwane                |
+| Rozdzielczość   | Obsługiwana                |
+| Format wyjściowy | `png` albo `jpeg`         |
 
 <Warning>
-Endpoint edycji obrazów fal **nie** obsługuje nadpisań `aspectRatio`.
+Endpoint edycji obrazu fal **nie** obsługuje nadpisań `aspectRatio`.
 </Warning>
+
+Użyj `outputFormat: "png"`, gdy chcesz uzyskać wyjście PNG. fal nie deklaruje
+jawnej kontroli przezroczystego tła w OpenClaw, więc `background:
+"transparent"` jest zgłaszane jako zignorowane nadpisanie dla modeli fal.
 
 Aby używać fal jako domyślnego dostawcy obrazów:
 
@@ -81,10 +86,10 @@ Aby używać fal jako domyślnego dostawcy obrazów:
 Dołączony dostawca generowania wideo `fal` domyślnie używa
 `fal/fal-ai/minimax/video-01-live`.
 
-| Możliwość | Wartość                                                        |
-| ---------- | ------------------------------------------------------------ |
-| Tryby      | Tekst na wideo, pojedynczy obraz referencyjny               |
-| Runtime    | Przepływ submit/status/result oparty na kolejce dla długotrwałych zadań |
+| Możliwość | Wartość                                                              |
+| --------- | -------------------------------------------------------------------- |
+| Tryby     | Tekst-na-wideo, pojedynczy obraz referencyjny, Seedance reference-to-video |
+| Runtime   | Przepływ submit/status/result oparty na kolejce dla długotrwałych zadań |
 
 <AccordionGroup>
   <Accordion title="Dostępne modele wideo">
@@ -96,8 +101,10 @@ Dołączony dostawca generowania wideo `fal` domyślnie używa
 
     - `fal/bytedance/seedance-2.0/fast/text-to-video`
     - `fal/bytedance/seedance-2.0/fast/image-to-video`
+    - `fal/bytedance/seedance-2.0/fast/reference-to-video`
     - `fal/bytedance/seedance-2.0/text-to-video`
     - `fal/bytedance/seedance-2.0/image-to-video`
+    - `fal/bytedance/seedance-2.0/reference-to-video`
 
   </Accordion>
 
@@ -113,6 +120,25 @@ Dołączony dostawca generowania wideo `fal` domyślnie używa
       },
     }
     ```
+  </Accordion>
+
+  <Accordion title="Przykład konfiguracji Seedance 2.0 reference-to-video">
+    ```json5
+    {
+      agents: {
+        defaults: {
+          videoGenerationModel: {
+            primary: "fal/bytedance/seedance-2.0/fast/reference-to-video",
+          },
+        },
+      },
+    }
+    ```
+
+    Reference-to-video akceptuje do 9 obrazów, 3 wideo i 3 referencje audio
+    przez współdzielone parametry `images`, `videos` i `audioRefs` narzędzia `video_generate`,
+    przy maksymalnie 12 plikach referencyjnych łącznie.
+
   </Accordion>
 
   <Accordion title="Przykład konfiguracji HeyGen video-agent">
@@ -132,7 +158,7 @@ Dołączony dostawca generowania wideo `fal` domyślnie używa
 
 <Tip>
 Użyj `openclaw models list --provider fal`, aby zobaczyć pełną listę dostępnych modeli fal,
-w tym wszelkie niedawno dodane wpisy.
+w tym wszelkie ostatnio dodane wpisy.
 </Tip>
 
 ## Powiązane
@@ -145,6 +171,6 @@ w tym wszelkie niedawno dodane wpisy.
     Współdzielone parametry narzędzia wideo i wybór dostawcy.
   </Card>
   <Card title="Dokumentacja referencyjna konfiguracji" href="/pl/gateway/config-agents#agent-defaults" icon="gear">
-    Ustawienia domyślne agenta, w tym wybór modelu obrazu i wideo.
+    Domyślne ustawienia agentów, w tym wybór modeli obrazów i wideo.
   </Card>
 </CardGroup>

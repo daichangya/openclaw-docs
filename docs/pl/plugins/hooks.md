@@ -1,30 +1,30 @@
 ---
 read_when:
-    - Tworzysz Plugin, który potrzebuje `before_tool_call`, `before_agent_reply`, hooków wiadomości albo hooków cyklu życia
-    - Musisz blokować, przepisywać albo wymagać zatwierdzenia dla wywołań narzędzi z Plugin
+    - Tworzysz Plugin, który wymaga `before_tool_call`, `before_agent_reply`, hooków wiadomości lub hooków cyklu życia
+    - Musisz blokować, przepisywać lub wymagać zatwierdzenia dla wywołań narzędzi z Plugin
     - Decydujesz między hookami wewnętrznymi a hookami Plugin
-summary: 'Haki Plugin: przechwytywanie zdarzeń cyklu życia agenta, narzędzi, wiadomości, sesji i Gateway'
-title: Haki Plugin
+summary: 'Hooki Plugin: przechwytują zdarzenia cyklu życia agenta, narzędzia, wiadomości, sesji i Gateway'
+title: Hooki Plugin
 x-i18n:
-    generated_at: "2026-04-25T13:52:59Z"
+    generated_at: "2026-04-26T11:36:28Z"
     model: gpt-5.4
     provider: openai
-    source_hash: f263fb9064811de79fc4744ce13c5a7b9afb2d3b00330975426348af3411dc76
+    source_hash: 62d8c21db885abcb70c7aa940e3ce937df09d077587b153015c4c6c5169f4f1d
     source_path: plugins/hooks.md
     workflow: 15
 ---
 
-Haki Plugin to punkty rozszerzeń działające w tym samym procesie dla Plugin OpenClaw. Używaj ich,
-gdy Plugin musi sprawdzać albo zmieniać uruchomienia agenta, wywołania narzędzi, przepływ wiadomości,
-cykl życia sesji, routing subagentów, instalacje albo uruchamianie Gateway.
+Hooki Plugin to punkty rozszerzeń in-process dla pluginów OpenClaw. Używaj ich,
+gdy Plugin musi sprawdzać lub zmieniać uruchomienia agenta, wywołania narzędzi, przepływ wiadomości,
+cykl życia sesji, routowanie subagentów, instalacje lub uruchamianie Gateway.
 
-Zamiast tego użyj [hooków wewnętrznych](/pl/automation/hooks), gdy chcesz mały
-instalowany przez operatora skrypt `HOOK.md` dla poleceń i zdarzeń Gateway, takich jak
-`/new`, `/reset`, `/stop`, `agent:bootstrap` albo `gateway:startup`.
+Zamiast tego użyj [hooków wewnętrznych](/pl/automation/hooks), jeśli chcesz użyć małego
+instalowanego przez operatora skryptu `HOOK.md` dla poleceń i zdarzeń Gateway, takich jak
+`/new`, `/reset`, `/stop`, `agent:bootstrap` lub `gateway:startup`.
 
 ## Szybki start
 
-Rejestruj typowane haki Plugin za pomocą `api.on(...)` z punktu wejścia Plugin:
+Zarejestruj typowane hooki Plugin za pomocą `api.on(...)` z punktu wejścia pluginu:
 
 ```typescript
 import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
@@ -42,8 +42,8 @@ export default definePluginEntry({
 
         return {
           requireApproval: {
-            title: "Uruchomić wyszukiwanie w sieci",
-            description: `Zezwolić na zapytanie wyszukiwania: ${String(event.params.query ?? "")}`,
+            title: "Run web search",
+            description: `Allow search query: ${String(event.params.query ?? "")}`,
             severity: "info",
             timeoutMs: 60_000,
             timeoutBehavior: "deny",
@@ -56,68 +56,71 @@ export default definePluginEntry({
 });
 ```
 
-Handlery hooków działają sekwencyjnie według malejącego `priority`. Hooki o tym samym priorytecie
+Handlery hooków działają sekwencyjnie w malejącej kolejności `priority`. Hooki o tym samym priorytecie
 zachowują kolejność rejestracji.
 
 ## Katalog hooków
 
-Hooki są pogrupowane według powierzchni, którą rozszerzają. Nazwy pogrubione
-(**...**) akceptują wynik decyzyjny (block, cancel, override albo require approval); wszystkie pozostałe służą tylko do obserwacji.
+Hooki są pogrupowane według powierzchni, którą rozszerzają. Nazwy pogrubione w **bold** akceptują
+wynik decyzji (blokada, anulowanie, nadpisanie lub wymaganie zatwierdzenia); wszystkie pozostałe
+służą tylko do obserwacji.
 
 **Tura agenta**
 
-- `before_model_resolve` — nadpisuje dostawcę albo model przed załadowaniem wiadomości sesji
-- `before_prompt_build` — dodaje dynamiczny kontekst albo tekst promptu systemowego przed wywołaniem modelu
-- `before_agent_start` — faza łączona tylko dla zgodności; preferuj dwa powyższe hooki
-- **`before_agent_reply`** — skraca turę modelu przez syntetyczną odpowiedź albo ciszę
-- `agent_end` — obserwuje końcowe wiadomości, stan powodzenia i czas trwania uruchomienia
+- `before_model_resolve` — nadpisanie providera lub modelu przed załadowaniem wiadomości sesji
+- `before_prompt_build` — dodanie dynamicznego kontekstu lub tekstu system prompt przed wywołaniem modelu
+- `before_agent_start` — połączona faza tylko dla zgodności; zamiast niej preferuj dwa hooki powyżej
+- **`before_agent_reply`** — skrócenie tury modelu za pomocą syntetycznej odpowiedzi lub ciszy
+- **`before_agent_finalize`** — sprawdzenie naturalnej odpowiedzi końcowej i zażądanie jeszcze jednego przebiegu modelu
+- `agent_end` — obserwacja końcowych wiadomości, stanu powodzenia i czasu trwania uruchomienia
 
-**Obserwacja rozmowy**
+**Obserwacja konwersacji**
 
-- `llm_input` — obserwuje wejście dostawcy (prompt systemowy, prompt, historia)
-- `llm_output` — obserwuje wyjście dostawcy
+- `model_call_started` / `model_call_ended` — obserwacja oczyszczonych metadanych wywołania providera/modelu, czasu, wyniku oraz ograniczonych hashy request-id bez treści promptu lub odpowiedzi
+- `llm_input` — obserwacja wejścia providera (system prompt, prompt, historia)
+- `llm_output` — obserwacja wyjścia providera
 
 **Narzędzia**
 
-- **`before_tool_call`** — przepisuje parametry narzędzia, blokuje wykonanie albo wymaga zatwierdzenia
-- `after_tool_call` — obserwuje wyniki narzędzia, błędy i czas trwania
-- **`tool_result_persist`** — przepisuje wiadomość asystenta utworzoną z wyniku narzędzia
-- **`before_message_write`** — sprawdza albo blokuje trwający zapis wiadomości (rzadkie)
+- **`before_tool_call`** — przepisywanie parametrów narzędzia, blokowanie wykonania lub wymaganie zatwierdzenia
+- `after_tool_call` — obserwacja wyników narzędzia, błędów i czasu trwania
+- **`tool_result_persist`** — przepisanie wiadomości asystenta wygenerowanej z wyniku narzędzia
+- **`before_message_write`** — sprawdzenie lub zablokowanie zapisu wiadomości w toku (rzadkie)
 
 **Wiadomości i dostarczanie**
 
-- **`inbound_claim`** — przejmuje przychodzącą wiadomość przed routingiem agenta (syntetyczne odpowiedzi)
-- `message_received` — obserwuje treść przychodzącą, nadawcę, wątek i metadane
-- **`message_sending`** — przepisuje treść wychodzącą albo anuluje dostarczenie
-- `message_sent` — obserwuje powodzenie albo niepowodzenie dostarczenia wychodzącego
-- **`before_dispatch`** — sprawdza albo przepisuje wychodzący dispatch przed przekazaniem do kanału
-- **`reply_dispatch`** — uczestniczy w końcowym potoku dispatch odpowiedzi
+- **`inbound_claim`** — przejęcie wiadomości przychodzącej przed routowaniem do agenta (syntetyczne odpowiedzi)
+- `message_received` — obserwacja treści przychodzącej, nadawcy, wątku i metadanych
+- **`message_sending`** — przepisanie treści wychodzącej lub anulowanie dostarczenia
+- `message_sent` — obserwacja powodzenia lub niepowodzenia dostarczenia wychodzącego
+- **`before_dispatch`** — sprawdzenie lub przepisanie wychodzącej dyspozycji przed przekazaniem do kanału
+- **`reply_dispatch`** — udział w końcowym pipeline dyspozycji odpowiedzi
 
 **Sesje i Compaction**
 
-- `session_start` / `session_end` — śledzą granice cyklu życia sesji
-- `before_compaction` / `after_compaction` — obserwują albo adnotują cykle Compaction
-- `before_reset` — obserwuje zdarzenia resetowania sesji (`/reset`, resetowania programowe)
+- `session_start` / `session_end` — śledzenie granic cyklu życia sesji
+- `before_compaction` / `after_compaction` — obserwacja lub adnotowanie cykli Compaction
+- `before_reset` — obserwacja zdarzeń resetu sesji (`/reset`, resetów programowych)
 
 **Subagenci**
 
-- `subagent_spawning` / `subagent_delivery_target` / `subagent_spawned` / `subagent_ended` — koordynują routing subagentów i dostarczanie po zakończeniu
+- `subagent_spawning` / `subagent_delivery_target` / `subagent_spawned` / `subagent_ended` — koordynacja routowania subagentów i dostarczania po zakończeniu
 
 **Cykl życia**
 
-- `gateway_start` / `gateway_stop` — uruchamiają albo zatrzymują usługi należące do Plugin wraz z Gateway
-- **`before_install`** — sprawdza skanowanie instalacji Skills albo Plugin i opcjonalnie blokuje
+- `gateway_start` / `gateway_stop` — uruchamianie lub zatrzymywanie usług należących do pluginu razem z Gateway
+- **`before_install`** — sprawdzenie skanów instalacji Skills lub pluginów i opcjonalne zablokowanie
 
-## Zasady wywołań narzędzi
+## Polityka wywołań narzędzi
 
 `before_tool_call` otrzymuje:
 
 - `event.toolName`
 - `event.params`
-- opcjonalne `event.runId`
-- opcjonalne `event.toolCallId`
-- pola kontekstu, takie jak `ctx.agentId`, `ctx.sessionKey`, `ctx.sessionId`, oraz
-  diagnostyczne `ctx.trace`
+- opcjonalnie `event.runId`
+- opcjonalnie `event.toolCallId`
+- pola kontekstowe takie jak `ctx.agentId`, `ctx.sessionKey`, `ctx.sessionId`,
+  `ctx.runId`, `ctx.jobId` (ustawiane przy uruchomieniach wyzwalanych przez Cron) oraz diagnostyczne `ctx.trace`
 
 Może zwrócić:
 
@@ -143,32 +146,63 @@ type BeforeToolCallResult = {
 Zasady:
 
 - `block: true` jest końcowe i pomija handlery o niższym priorytecie.
-- `block: false` jest traktowane jak brak decyzji.
+- `block: false` jest traktowane jako brak decyzji.
 - `params` przepisuje parametry narzędzia do wykonania.
-- `requireApproval` wstrzymuje uruchomienie agenta i pyta użytkownika przez
-  zatwierdzenia Plugin. Polecenie `/approve` może zatwierdzać zarówno zatwierdzenia exec, jak i Plugin.
-- `block: true` o niższym priorytecie nadal może zablokować po tym, jak hook o wyższym priorytecie
+- `requireApproval` wstrzymuje uruchomienie agenta i pyta użytkownika przez zatwierdzenia pluginu. Polecenie `/approve` może zatwierdzać zarówno exec, jak i zatwierdzenia pluginów.
+- `block: true` z hooka o niższym priorytecie nadal może zablokować wykonanie po tym, jak hook o wyższym priorytecie
   zażądał zatwierdzenia.
 - `onResolution` otrzymuje rozstrzygniętą decyzję zatwierdzenia — `allow-once`,
-  `allow-always`, `deny`, `timeout` albo `cancelled`.
+  `allow-always`, `deny`, `timeout` lub `cancelled`.
+
+### Utrwalanie wyników narzędzi
+
+Wyniki narzędzi mogą zawierać strukturalne `details` do renderowania w UI, diagnostyki,
+routowania multimediów lub metadanych należących do pluginu. Traktuj `details` jako metadane środowiska uruchomieniowego,
+a nie treść promptu:
+
+- OpenClaw usuwa `toolResult.details` przed ponownym odtworzeniem dla providera i wejściem Compaction, aby metadane nie stawały się kontekstem modelu.
+- Utrwalone wpisy sesji zachowują tylko ograniczone `details`. Zbyt duże details są
+  zastępowane zwartym podsumowaniem oraz `persistedDetailsTruncated: true`.
+- `tool_result_persist` i `before_message_write` działają przed końcowym
+  limitem utrwalania. Hooki nadal powinny utrzymywać zwracane `details` małe i unikać
+  umieszczania tekstu istotnego dla promptu wyłącznie w `details`; wyjście narzędzia widoczne dla modelu
+  umieszczaj w `content`.
 
 ## Hooki promptu i modelu
 
-Dla nowych Plugin używaj hooków specyficznych dla faz:
+Dla nowych pluginów używaj hooków specyficznych dla fazy:
 
-- `before_model_resolve`: otrzymuje tylko bieżący prompt i metadane
-  załączników. Zwróć `providerOverride` albo `modelOverride`.
+- `before_model_resolve`: otrzymuje tylko bieżący prompt i metadane załączników. Zwróć `providerOverride` lub `modelOverride`.
 - `before_prompt_build`: otrzymuje bieżący prompt i wiadomości sesji.
-  Zwróć `prependContext`, `systemPrompt`, `prependSystemContext` albo
+  Zwróć `prependContext`, `systemPrompt`, `prependSystemContext` lub
   `appendSystemContext`.
 
-`before_agent_start` pozostaje dla zgodności. Preferuj powyższe jawne hooki,
-aby Plugin nie zależał od starszej fazy łączonej.
+`before_agent_start` pozostaje dla zgodności. Preferuj jawne hooki powyżej,
+aby Plugin nie zależał od starej połączonej fazy.
 
 `before_agent_start` i `agent_end` zawierają `event.runId`, gdy OpenClaw może
-zidentyfikować aktywne uruchomienie. Ta sama wartość jest też dostępna w `ctx.runId`.
+zidentyfikować aktywne uruchomienie. Ta sama wartość jest również dostępna w `ctx.runId`.
+Uruchomienia wyzwalane przez Cron udostępniają też `ctx.jobId` (id źródłowego zadania cron), aby
+hooki Plugin mogły ograniczać metryki, efekty uboczne lub stan do konkretnego zaplanowanego
+zadania.
 
-Pluginy niedołączone, które potrzebują `llm_input`, `llm_output` albo `agent_end`, muszą ustawić:
+Używaj `model_call_started` i `model_call_ended` dla telemetrii wywołań providera,
+która nie powinna otrzymywać surowych promptów, historii, odpowiedzi, nagłówków, treści
+żądań ani request ID providera. Te hooki zawierają stabilne metadane takie jak
+`runId`, `callId`, `provider`, `model`, opcjonalne `api`/`transport`, końcowe
+`durationMs`/`outcome` oraz `upstreamRequestIdHash`, gdy OpenClaw może wyprowadzić
+ograniczony hash request-id providera.
+
+`before_agent_finalize` działa tylko wtedy, gdy harness ma właśnie zaakceptować naturalną
+końcową odpowiedź asystenta. Nie jest to ścieżka anulowania `/stop` i nie
+działa, gdy użytkownik przerwie turę. Zwróć `{ action: "revise", reason }`, aby poprosić
+harness o jeszcze jeden przebieg modelu przed finalizacją, `{ action:
+"finalize", reason? }`, aby wymusić finalizację, albo pomiń wynik, aby kontynuować.
+Natywne hooki `Stop` Codex są przekazywane do tego hooka jako decyzje OpenClaw
+`before_agent_finalize`.
+
+Niebundlowane pluginy, które potrzebują `llm_input`, `llm_output`,
+`before_agent_finalize` lub `agent_end`, muszą ustawić:
 
 ```json
 {
@@ -184,78 +218,76 @@ Pluginy niedołączone, które potrzebują `llm_input`, `llm_output` albo `agent
 }
 ```
 
-Hooki mutujące prompt mogą być wyłączone per Plugin przez
+Hooki modyfikujące prompt można wyłączyć per plugin za pomocą
 `plugins.entries.<id>.hooks.allowPromptInjection=false`.
 
 ## Hooki wiadomości
 
-Używaj hooków wiadomości do routingu na poziomie kanału i zasad dostarczania:
+Używaj hooków wiadomości do routowania na poziomie kanału i polityki dostarczania:
 
-- `message_received`: obserwuje przychodzącą treść, nadawcę, `threadId`, `messageId`,
-  `senderId`, opcjonalną korelację uruchomienia/sesji i metadane.
-- `message_sending`: przepisuje `content` albo zwraca `{ cancel: true }`.
-- `message_sent`: obserwuje końcowe powodzenie albo niepowodzenie.
+- `message_received`: obserwacja treści przychodzącej, nadawcy, `threadId`, `messageId`,
+  `senderId`, opcjonalnej korelacji uruchomienia/sesji oraz metadanych.
+- `message_sending`: przepisanie `content` lub zwrócenie `{ cancel: true }`.
+- `message_sent`: obserwacja końcowego powodzenia lub niepowodzenia.
 
-Dla odpowiedzi TTS wyłącznie audio `content` może zawierać ukryty transkrypt mowy
-nawet wtedy, gdy ładunek kanału nie ma widocznego tekstu/podpisu. Przepisanie tego
-`content` aktualizuje tylko transkrypt widoczny dla hooka; nie jest renderowane jako
-podpis mediów.
+Dla odpowiedzi TTS zawierających tylko audio `content` może zawierać ukrytą transkrypcję mówioną,
+nawet jeśli ładunek kanału nie ma widocznego tekstu/podpisu. Przepisanie tego
+`content` aktualizuje tylko transkrypcję widoczną dla hooka; nie jest renderowane jako podpis medium.
 
 Konteksty hooków wiadomości udostępniają stabilne pola korelacji, gdy są dostępne:
 `ctx.sessionKey`, `ctx.runId`, `ctx.messageId`, `ctx.senderId`, `ctx.trace`,
-`ctx.traceId`, `ctx.spanId`, `ctx.parentSpanId` i `ctx.callDepth`. Preferuj te pola
-pierwszej klasy przed odczytywaniem starszych metadanych.
+`ctx.traceId`, `ctx.spanId`, `ctx.parentSpanId` i `ctx.callDepth`. Preferuj
+te pola pierwszej klasy, zanim sięgniesz po starsze metadane.
 
-Preferuj typowane pola `threadId` i `replyToId` przed użyciem metadanych specyficznych dla kanału.
+Preferuj typowane pola `threadId` i `replyToId` zamiast używania metadanych specyficznych dla kanału.
 
-Zasady decyzji:
+Zasady decyzyjne:
 
 - `message_sending` z `cancel: true` jest końcowe.
-- `message_sending` z `cancel: false` jest traktowane jak brak decyzji.
-- Przepisane `content` trafia dalej do hooków o niższym priorytecie, chyba że późniejszy hook
+- `message_sending` z `cancel: false` jest traktowane jako brak decyzji.
+- Przepisane `content` przechodzi do hooków o niższym priorytecie, chyba że późniejszy hook
   anuluje dostarczenie.
 
 ## Hooki instalacji
 
-`before_install` działa po wbudowanym skanowaniu instalacji Skills i Plugin.
-Zwróć dodatkowe ustalenia albo `{ block: true, blockReason }`, aby zatrzymać
+`before_install` działa po wbudowanym skanowaniu instalacji Skills i pluginów.
+Zwróć dodatkowe ustalenia lub `{ block: true, blockReason }`, aby zatrzymać
 instalację.
 
-`block: true` jest końcowe. `block: false` jest traktowane jak brak decyzji.
+`block: true` jest końcowe. `block: false` jest traktowane jako brak decyzji.
 
 ## Cykl życia Gateway
 
-Używaj `gateway_start` dla usług Plugin, które potrzebują stanu należącego do Gateway.
-Kontekst udostępnia `ctx.config`, `ctx.workspaceDir` i `ctx.getCron?.()` do
-inspekcji i aktualizacji Cron. Używaj `gateway_stop`, aby czyścić długotrwałe
-zasoby.
+Używaj `gateway_start` dla usług pluginu, które potrzebują stanu należącego do Gateway. Kontekst
+udostępnia `ctx.config`, `ctx.workspaceDir` i `ctx.getCron?.()` do
+sprawdzania i aktualizowania Cron. Używaj `gateway_stop` do czyszczenia długo działających
+zasobów.
 
-Nie polegaj na wewnętrznym hooku `gateway:startup` dla usług runtime należących do Plugin.
+Nie polegaj na wewnętrznym hooku `gateway:startup` dla usług środowiska uruchomieniowego należących do pluginu.
 
-## Nadchodzące przestarzałości
+## Nadchodzące wycofania
 
-Kilka powierzchni powiązanych z hookami jest przestarzałych, ale nadal obsługiwanych. Zmigruj
-przed następnym dużym wydaniem:
+Kilka powierzchni związanych z hookami jest wycofanych, ale nadal obsługiwanych. Zmigruj
+przed następnym głównym wydaniem:
 
 - **Plaintext channel envelopes** w handlerach `inbound_claim` i `message_received`.
-  Odczytuj `BodyForAgent` i ustrukturyzowane bloki kontekstu użytkownika
-  zamiast parsować płaski tekst envelope. Zobacz
+  Odczytuj `BodyForAgent` i strukturalne bloki kontekstu użytkownika
+  zamiast parsować płaski tekst koperty. Zobacz
   [Plaintext channel envelopes → BodyForAgent](/pl/plugins/sdk-migration#active-deprecations).
-- **`before_agent_start`** pozostaje dla zgodności. Nowe Pluginy powinny używać
-  `before_model_resolve` i `before_prompt_build` zamiast fazy łączonej.
+- **`before_agent_start`** pozostaje dla zgodności. Nowe pluginy powinny używać
+  `before_model_resolve` i `before_prompt_build` zamiast połączonej
+  fazy.
 - **`onResolution` w `before_tool_call`** używa teraz typowanego
   unii `PluginApprovalResolution` (`allow-once` / `allow-always` / `deny` /
   `timeout` / `cancelled`) zamiast dowolnego `string`.
 
-Pełną listę — rejestracja możliwości pamięci, profil myślenia dostawcy,
-zewnętrzni dostawcy auth, typy wykrywania dostawców, akcesory runtime zadań
-oraz zmianę nazwy `command-auth` → `command-status` — znajdziesz w
+Pełna lista — rejestracja możliwości pamięci, profil myślenia providera, zewnętrzni providerzy uwierzytelniania, typy wykrywania providerów, akcesory środowiska uruchomieniowego zadań oraz zmiana nazwy `command-auth` → `command-status` — znajduje się w
 [Plugin SDK migration → Active deprecations](/pl/plugins/sdk-migration#active-deprecations).
 
 ## Powiązane
 
-- [Plugin SDK migration](/pl/plugins/sdk-migration) — aktywne przestarzałości i harmonogram usunięcia
-- [Tworzenie Plugin](/pl/plugins/building-plugins)
+- [Plugin SDK migration](/pl/plugins/sdk-migration) — aktywne wycofania i harmonogram usuwania
+- [Tworzenie pluginów](/pl/plugins/building-plugins)
 - [Przegląd Plugin SDK](/pl/plugins/sdk-overview)
 - [Punkty wejścia Plugin](/pl/plugins/sdk-entrypoints)
 - [Hooki wewnętrzne](/pl/automation/hooks)
