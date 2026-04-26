@@ -1,87 +1,84 @@
 ---
 read_when:
-    - Налаштування SecretRef для облікових даних provider-а і ref `auth-profiles.json`
-    - Безпечна робота з reload, audit, configure та apply секретів у production
-    - Розуміння fail-fast під час запуску, фільтрації неактивної поверхні та поведінки last-known-good
-summary: 'Керування секретами: контракт SecretRef, поведінка runtime snapshot і безпечне одностороннє очищення'
+    - Налаштування SecretRef для облікових даних провайдера та посилань `auth-profiles.json`
+    - Безпечне використання в продакшні перезавантаження, аудиту, налаштування та застосування секретів
+    - Розуміння fail-fast під час запуску, фільтрації неактивних поверхонь і поведінки останньої відомої коректної конфігурації
+sidebarTitle: Secrets management
+summary: 'Керування секретами: контракт SecretRef, поведінка знімка середовища виконання та безпечне одностороннє очищення'
 title: Керування секретами
 x-i18n:
-    generated_at: "2026-04-23T20:54:47Z"
+    generated_at: "2026-04-26T07:48:50Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 18e21f63bbf1815b7166dfe123900575754270de94113b446311d73dfd4f2343
+    source_hash: a8697a8eb15cf6ef9b105e3f12cfdad6205284d4c45f1314cd7aec2e2c81fed1
     source_path: gateway/secrets.md
     workflow: 15
 ---
 
-OpenClaw підтримує адитивні SecretRef, тому підтримувані облікові дані не потрібно зберігати у відкритому тексті в конфігурації.
+OpenClaw підтримує адитивні SecretRef, щоб підтримувані облікові дані не потрібно було зберігати у відкритому вигляді в конфігурації.
 
-Відкритий текст усе ще працює. SecretRef — це добровільне ввімкнення для кожного облікового запису окремо.
+<Note>
+Відкритий текст усе ще працює. SecretRef вмикаються окремо для кожного облікового запису.
+</Note>
 
-## Цілі та runtime model
+## Цілі та модель середовища виконання
 
-Секрети розв’язуються в runtime snapshot у пам’яті.
+Секрети перетворюються на знімок середовища виконання в пам’яті.
 
-- Розв’язання відбувається eagerly під час активації, а не ліниво в шляхах запиту.
-- Під час запуску спрацьовує fail-fast, якщо effectively active SecretRef неможливо розв’язати.
-- Reload використовує atomic swap: або повний успіх, або зберігається last-known-good snapshot.
-- Порушення політики SecretRef (наприклад, auth profiles у режимі OAuth, поєднані з введенням SecretRef) зупиняють активацію до заміни runtime snapshot.
-- Runtime-запити читають лише з активного snapshot у пам’яті.
-- Після першої успішної активації/завантаження конфігурації runtime paths продовжують читати цей активний snapshot у пам’яті, доки успішний reload не замінить його.
-- Шляхи вихідної доставки також читають із цього активного snapshot (наприклад, доставка відповідей/тредів Discord і надсилання дій Telegram); вони не розв’язують SecretRef повторно при кожному надсиланні.
+- Розв’язання відбувається eagerly під час активації, а не ліниво в шляхах запитів.
+- Запуск завершується fail-fast, якщо ефективно активний SecretRef не вдається розв’язати.
+- Перезавантаження використовує атомарну заміну: або повний успіх, або зберігається останній відомий коректний знімок.
+- Порушення політики SecretRef (наприклад, профілі автентифікації в режимі OAuth у поєднанні з введенням SecretRef) завершують активацію помилкою до заміни середовища виконання.
+- Запити середовища виконання читають лише з активного знімка в пам’яті.
+- Після першої успішної активації/завантаження конфігурації шляхи коду середовища виконання продовжують читати цей активний знімок у пам’яті, доки успішне перезавантаження не замінить його.
+- Шляхи вихідної доставки також читають із цього активного знімка (наприклад, доставка відповідей/тредів Discord і надсилання дій Telegram); вони не виконують повторне розв’язання SecretRef для кожного надсилання.
 
-Це прибирає збої secret-provider-ів із гарячих шляхів запитів.
+Це прибирає збої постачальника секретів із гарячих шляхів запитів.
 
-## Фільтрація активної поверхні
+## Фільтрація активних поверхонь
 
-SecretRef перевіряються лише на effectively active surfaces.
+SecretRef перевіряються лише на ефективно активних поверхнях.
 
-- Увімкнені поверхні: нерозв’язані refs блокують startup/reload.
-- Неактивні поверхні: нерозв’язані refs не блокують startup/reload.
-- Неактивні refs генерують нефатальні діагностики з кодом `SECRETS_REF_IGNORED_INACTIVE_SURFACE`.
+- Увімкнені поверхні: нерозв’язані посилання блокують запуск/перезавантаження.
+- Неактивні поверхні: нерозв’язані посилання не блокують запуск/перезавантаження.
+- Неактивні посилання генерують нефатальні діагностичні повідомлення з кодом `SECRETS_REF_IGNORED_INACTIVE_SURFACE`.
 
-Приклади неактивних поверхонь:
+<AccordionGroup>
+  <Accordion title="Приклади неактивних поверхонь">
+    - Вимкнені записи каналів/облікових записів.
+    - Облікові дані каналу верхнього рівня, які не успадковує жодний увімкнений обліковий запис.
+    - Вимкнені поверхні інструментів/можливостей.
+    - Ключі, специфічні для постачальника вебпошуку, які не вибрані через `tools.web.search.provider`. У режимі auto (постачальник не заданий) ключі перевіряються за пріоритетом для автовизначення постачальника, доки один не буде розв’язано. Після вибору ключі невибраних постачальників вважаються неактивними, доки не будуть вибрані.
+    - Матеріали SSH-автентифікації sandbox (`agents.defaults.sandbox.ssh.identityData`, `certificateData`, `knownHostsData`, а також перевизначення для окремих агентів) активні лише тоді, коли ефективний backend sandbox — `ssh` для типового агента або увімкненого агента.
+    - SecretRef `gateway.remote.token` / `gateway.remote.password` активні, якщо виконується одна з умов:
+      - `gateway.mode=remote`
+      - налаштовано `gateway.remote.url`
+      - `gateway.tailscale.mode` має значення `serve` або `funnel`
+      - У локальному режимі без цих віддалених поверхонь:
+        - `gateway.remote.token` активний, коли може перемогти автентифікація токеном і не налаштовано env/auth токен.
+        - `gateway.remote.password` активний лише тоді, коли може перемогти автентифікація паролем і не налаштовано env/auth пароль.
+    - SecretRef `gateway.auth.token` неактивний для розв’язання автентифікації під час запуску, коли задано `OPENCLAW_GATEWAY_TOKEN`, оскільки для цього середовища виконання перевагу має вхід із env-токена.
+  </Accordion>
+</AccordionGroup>
 
-- Вимкнені записи channel/account.
-- Верхньорівневі облікові дані каналу, які не успадковує жоден увімкнений обліковий запис.
-- Вимкнені поверхні tool/feature.
-- Ключі, специфічні для provider-а web search, які не вибрано в `tools.web.search.provider`.
-  У режимі auto (provider не задано) ключі враховуються за precedence для автовизначення provider-а, доки один не розв’яжеться.
-  Після вибору ключі невибраних provider-ів вважаються неактивними, доки їх не буде вибрано.
-- Матеріали sandbox SSH auth (`agents.defaults.sandbox.ssh.identityData`,
-  `certificateData`, `knownHostsData`, а також перевизначення для окремих агентів) активні лише
-  коли ефективний backend sandbox — `ssh` для типового агента або увімкненого агента.
-- SecretRef `gateway.remote.token` / `gateway.remote.password` активні, якщо істинна одна з цих умов:
-  - `gateway.mode=remote`
-  - налаштовано `gateway.remote.url`
-  - `gateway.tailscale.mode` має значення `serve` або `funnel`
-  - У локальному режимі без цих віддалених поверхонь:
-    - `gateway.remote.token` активний, коли може перемогти token auth і не налаштовано env/auth token.
-    - `gateway.remote.password` активний лише коли може перемогти password auth і не налаштовано env/auth password.
-- SecretRef `gateway.auth.token` неактивний для startup auth resolution, коли встановлено `OPENCLAW_GATEWAY_TOKEN`, оскільки env token input має пріоритет для цього runtime.
+## Діагностика поверхні автентифікації Gateway
 
-## Діагностика поверхні auth Gateway
+Коли SecretRef налаштовано для `gateway.auth.token`, `gateway.auth.password`, `gateway.remote.token` або `gateway.remote.password`, запуск/перезавантаження Gateway явно журналює стан поверхні:
 
-Коли SecretRef налаштовано на `gateway.auth.token`, `gateway.auth.password`,
-`gateway.remote.token` або `gateway.remote.password`, startup/reload gateway явно логує
-стан поверхні:
+- `active`: SecretRef є частиною ефективної поверхні автентифікації та має бути розв’язаний.
+- `inactive`: SecretRef ігнорується для цього середовища виконання, оскільки перемагає інша поверхня автентифікації або тому, що віддалену автентифікацію вимкнено/вона неактивна.
 
-- `active`: SecretRef є частиною ефективної auth surface і має розв’язуватися.
-- `inactive`: SecretRef ігнорується для цього runtime, оскільки перемагає інша auth surface або
-  тому, що remote auth вимкнено/неактивний.
+Ці записи журналюються з `SECRETS_GATEWAY_AUTH_SURFACE` і містять причину, яку використала політика активної поверхні, щоб ви могли бачити, чому облікові дані було розцінено як активні або неактивні.
 
-Ці записи логуються як `SECRETS_GATEWAY_AUTH_SURFACE` і містять причину, використану
-політикою active-surface, тож ви можете побачити, чому credential вважався активним або неактивним.
+## Попередня перевірка посилань під час onboarding
 
-## Попередня перевірка reference під час онбордингу
+Коли onboarding працює в інтерактивному режимі й ви вибираєте зберігання SecretRef, OpenClaw виконує попередню перевірку перед збереженням:
 
-Коли онбординг працює в інтерактивному режимі й ви обираєте зберігання через SecretRef, OpenClaw перед збереженням запускає preflight validation:
+- Посилання env: перевіряє ім’я змінної env і підтверджує, що під час налаштування видно непорожнє значення.
+- Посилання постачальника (`file` або `exec`): перевіряє вибір постачальника, розв’язує `id` і перевіряє тип розв’язаного значення.
+- Шлях повторного використання quickstart: коли `gateway.auth.token` уже є SecretRef, onboarding розв’язує його перед ініціалізацією probe/dashboard (для посилань `env`, `file` і `exec`) з використанням того самого fail-fast бар’єра.
 
-- Env refs: перевіряє ім’я env var і підтверджує, що під час налаштування видно непорожнє значення.
-- Provider refs (`file` або `exec`): перевіряє вибір provider-а, розв’язує `id` і перевіряє тип розв’язаного значення.
-- Шлях повторного використання quickstart: коли `gateway.auth.token` уже є SecretRef, онбординг розв’язує його перед bootstrap probe/dashboard (для refs `env`, `file` і `exec`) з використанням того самого fail-fast фільтра.
-
-Якщо перевірка не проходить, онбординг показує помилку й дає змогу повторити спробу.
+Якщо перевірка не вдається, onboarding показує помилку й дає змогу повторити спробу.
 
 ## Контракт SecretRef
 
@@ -91,44 +88,47 @@ SecretRef перевіряються лише на effectively active surfaces.
 { source: "env" | "file" | "exec", provider: "default", id: "..." }
 ```
 
-### `source: "env"`
+<Tabs>
+  <Tab title="env">
+    ```json5
+    { source: "env", provider: "default", id: "OPENAI_API_KEY" }
+    ```
 
-```json5
-{ source: "env", provider: "default", id: "OPENAI_API_KEY" }
-```
+    Перевірка:
 
-Валідація:
+    - `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
+    - `id` має відповідати `^[A-Z][A-Z0-9_]{0,127}$`
 
-- `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
-- `id` має відповідати `^[A-Z][A-Z0-9_]{0,127}$`
+  </Tab>
+  <Tab title="file">
+    ```json5
+    { source: "file", provider: "filemain", id: "/providers/openai/apiKey" }
+    ```
 
-### `source: "file"`
+    Перевірка:
 
-```json5
-{ source: "file", provider: "filemain", id: "/providers/openai/apiKey" }
-```
+    - `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
+    - `id` має бути абсолютним JSON pointer (`/...`)
+    - екранування RFC6901 у сегментах: `~` => `~0`, `/` => `~1`
 
-Валідація:
+  </Tab>
+  <Tab title="exec">
+    ```json5
+    { source: "exec", provider: "vault", id: "providers/openai/apiKey" }
+    ```
 
-- `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
-- `id` має бути абсолютним JSON pointer (`/...`)
-- Екранування RFC6901 у сегментах: `~` => `~0`, `/` => `~1`
+    Перевірка:
 
-### `source: "exec"`
+    - `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
+    - `id` має відповідати `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$`
+    - `id` не має містити `.` або `..` як сегменти шляху, розділені `/` (наприклад, `a/../b` відхиляється)
 
-```json5
-{ source: "exec", provider: "vault", id: "providers/openai/apiKey" }
-```
+  </Tab>
+</Tabs>
 
-Валідація:
+## Конфігурація постачальника
 
-- `provider` має відповідати `^[a-z][a-z0-9_-]{0,63}$`
-- `id` має відповідати `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$`
-- `id` не повинен містити `.` або `..` як slash-delimited сегменти шляху (наприклад, `a/../b` відхиляється)
-
-## Конфігурація provider-а
-
-Визначайте providers у `secrets.providers`:
+Визначайте постачальників у `secrets.providers`:
 
 ```json5
 {
@@ -162,142 +162,143 @@ SecretRef перевіряються лише на effectively active surfaces.
 }
 ```
 
-### Env provider
+<AccordionGroup>
+  <Accordion title="Постачальник env">
+    - Необов’язковий allowlist через `allowlist`.
+    - Відсутні/порожні значення env призводять до помилки розв’язання.
+  </Accordion>
+  <Accordion title="Постачальник file">
+    - Читає локальний файл із `path`.
+    - `mode: "json"` очікує корисне навантаження JSON-об’єкта та розв’язує `id` як pointer.
+    - `mode: "singleValue"` очікує id посилання `"value"` і повертає вміст файлу.
+    - Шлях має проходити перевірки власника/дозволів.
+    - Примітка про fail-closed у Windows: якщо перевірка ACL недоступна для шляху, розв’язання завершується помилкою. Лише для довірених шляхів установіть `allowInsecurePath: true` у цього постачальника, щоб обійти перевірки безпеки шляху.
+  </Accordion>
+  <Accordion title="Постачальник exec">
+    - Запускає налаштований абсолютний шлях до бінарного файла, без shell.
+    - За замовчуванням `command` має вказувати на звичайний файл (не symlink).
+    - Установіть `allowSymlinkCommand: true`, щоб дозволити шляхи команд через symlink (наприклад, шими Homebrew). OpenClaw перевіряє розв’язаний цільовий шлях.
+    - Поєднуйте `allowSymlinkCommand` із `trustedDirs` для шляхів менеджера пакетів (наприклад, `["/opt/homebrew"]`).
+    - Підтримує timeout, timeout без виводу, обмеження байтів виводу, allowlist env і trusted dirs.
+    - Примітка про fail-closed у Windows: якщо перевірка ACL недоступна для шляху команди, розв’язання завершується помилкою. Лише для довірених шляхів установіть `allowInsecurePath: true` у цього постачальника, щоб обійти перевірки безпеки шляху.
 
-- Необов’язковий allowlist через `allowlist`.
-- Відсутні/порожні env-значення призводять до збою розв’язання.
+    Корисне навантаження запиту (stdin):
 
-### File provider
+    ```json
+    { "protocolVersion": 1, "provider": "vault", "ids": ["providers/openai/apiKey"] }
+    ```
 
-- Читає локальний файл із `path`.
-- `mode: "json"` очікує payload у вигляді JSON-об’єкта й розв’язує `id` як pointer.
-- `mode: "singleValue"` очікує ref id `"value"` і повертає вміст файлу.
-- Шлях має проходити перевірки власника/дозволів.
-- Примітка fail-closed для Windows: якщо перевірка ACL недоступна для шляху, розв’язання завершується помилкою. Лише для довірених шляхів установіть `allowInsecurePath: true` для цього provider-а, щоб обійти перевірки безпеки шляху.
+    Корисне навантаження відповіді (stdout):
 
-### Exec provider
+    ```jsonc
+    { "protocolVersion": 1, "values": { "providers/openai/apiKey": "<openai-api-key>" } } // pragma: allowlist secret
+    ```
 
-- Запускає налаштований абсолютний шлях до binary, без shell.
-- Типово `command` має вказувати на звичайний файл (не symlink).
-- Установіть `allowSymlinkCommand: true`, щоб дозволити шляхи команд через symlink (наприклад, шими Homebrew). OpenClaw перевіряє розв’язаний цільовий шлях.
-- Поєднуйте `allowSymlinkCommand` із `trustedDirs` для шляхів package manager-а (наприклад `["/opt/homebrew"]`).
-- Підтримує timeout, timeout за відсутності виводу, ліміти байтів виводу, allowlist env і trusted dirs.
-- Примітка fail-closed для Windows: якщо перевірка ACL недоступна для шляху команди, розв’язання завершується помилкою. Лише для довірених шляхів установіть `allowInsecurePath: true` для цього provider-а, щоб обійти перевірки безпеки шляху.
+    Необов’язкові помилки для окремих id:
 
-Payload запиту (stdin):
+    ```json
+    {
+      "protocolVersion": 1,
+      "values": {},
+      "errors": { "providers/openai/apiKey": { "message": "not found" } }
+    }
+    ```
 
-```json
-{ "protocolVersion": 1, "provider": "vault", "ids": ["providers/openai/apiKey"] }
-```
-
-Payload відповіді (stdout):
-
-```jsonc
-{ "protocolVersion": 1, "values": { "providers/openai/apiKey": "<openai-api-key>" } } // pragma: allowlist secret
-```
-
-Необов’язкові помилки для окремих id:
-
-```json
-{
-  "protocolVersion": 1,
-  "values": {},
-  "errors": { "providers/openai/apiKey": { "message": "not found" } }
-}
-```
+  </Accordion>
+</AccordionGroup>
 
 ## Приклади інтеграції exec
 
-### CLI 1Password
-
-```json5
-{
-  secrets: {
-    providers: {
-      onepassword_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/op",
-        allowSymlinkCommand: true, // потрібно для бінарних файлів Homebrew через symlink
-        trustedDirs: ["/opt/homebrew"],
-        args: ["read", "op://Personal/OpenClaw QA API Key/password"],
-        passEnv: ["HOME"],
-        jsonOnly: false,
+<AccordionGroup>
+  <Accordion title="CLI 1Password">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          onepassword_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/op",
+            allowSymlinkCommand: true, // обов’язково для бінарних файлів Homebrew через symlink
+            trustedDirs: ["/opt/homebrew"],
+            args: ["read", "op://Personal/OpenClaw QA API Key/password"],
+            passEnv: ["HOME"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "onepassword_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "onepassword_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
-
-### CLI HashiCorp Vault
-
-```json5
-{
-  secrets: {
-    providers: {
-      vault_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/vault",
-        allowSymlinkCommand: true, // потрібно для бінарних файлів Homebrew через symlink
-        trustedDirs: ["/opt/homebrew"],
-        args: ["kv", "get", "-field=OPENAI_API_KEY", "secret/openclaw"],
-        passEnv: ["VAULT_ADDR", "VAULT_TOKEN"],
-        jsonOnly: false,
+    }
+    ```
+  </Accordion>
+  <Accordion title="CLI HashiCorp Vault">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          vault_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/vault",
+            allowSymlinkCommand: true, // обов’язково для бінарних файлів Homebrew через symlink
+            trustedDirs: ["/opt/homebrew"],
+            args: ["kv", "get", "-field=OPENAI_API_KEY", "secret/openclaw"],
+            passEnv: ["VAULT_ADDR", "VAULT_TOKEN"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "vault_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "vault_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
-
-### `sops`
-
-```json5
-{
-  secrets: {
-    providers: {
-      sops_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/sops",
-        allowSymlinkCommand: true, // потрібно для бінарних файлів Homebrew через symlink
-        trustedDirs: ["/opt/homebrew"],
-        args: ["-d", "--extract", '["providers"]["openai"]["apiKey"]', "/path/to/secrets.enc.json"],
-        passEnv: ["SOPS_AGE_KEY_FILE"],
-        jsonOnly: false,
+    }
+    ```
+  </Accordion>
+  <Accordion title="sops">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          sops_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/sops",
+            allowSymlinkCommand: true, // обов’язково для бінарних файлів Homebrew через symlink
+            trustedDirs: ["/opt/homebrew"],
+            args: ["-d", "--extract", '["providers"]["openai"]["apiKey"]', "/path/to/secrets.enc.json"],
+            passEnv: ["SOPS_AGE_KEY_FILE"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "sops_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "sops_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
-## Змінні середовища сервера MCP
+## Змінні середовища MCP-сервера
 
-Env vars сервера MCP, налаштовані через `plugins.entries.acpx.config.mcpServers`, підтримують SecretInput. Це дозволяє не тримати ключі API й токени у відкритому тексті конфігурації:
+Змінні env MCP-сервера, налаштовані через `plugins.entries.acpx.config.mcpServers`, підтримують SecretInput. Це дозволяє не зберігати API-ключі та токени у відкритому вигляді в конфігурації:
 
 ```json5
 {
@@ -326,11 +327,11 @@ Env vars сервера MCP, налаштовані через `plugins.entries.
 }
 ```
 
-Рядкові значення відкритим текстом усе ще працюють. Env-template refs на кшталт `${MCP_SERVER_API_KEY}` і об’єкти SecretRef розв’язуються під час активації gateway до запуску процесу MCP server. Як і для інших поверхонь SecretRef, нерозв’язані refs блокують активацію лише тоді, коли Plugin `acpx` є effectively active.
+Рядкові значення у відкритому вигляді все ще працюють. Посилання env-template на кшталт `${MCP_SERVER_API_KEY}` і об’єкти SecretRef розв’язуються під час активації Gateway до породження процесу MCP-сервера. Як і з іншими поверхнями SecretRef, нерозв’язані посилання блокують активацію лише тоді, коли Plugin `acpx` є ефективно активним.
 
-## Матеріали SSH auth для sandbox
+## Матеріали SSH-автентифікації sandbox
 
-Основний backend sandbox `ssh` також підтримує SecretRef для матеріалів SSH auth:
+Базовий backend sandbox `ssh` також підтримує SecretRef для матеріалів SSH-автентифікації:
 
 ```json5
 {
@@ -351,196 +352,220 @@ Env vars сервера MCP, налаштовані через `plugins.entries.
 }
 ```
 
-Поведінка під час виконання:
+Поведінка середовища виконання:
 
-- OpenClaw розв’язує ці refs під час активації sandbox, а не ліниво під час кожного SSH-виклику.
-- Розв’язані значення записуються у тимчасові файли з суворими дозволами й використовуються в згенерованій SSH config.
-- Якщо ефективний backend sandbox не `ssh`, ці refs лишаються неактивними й не блокують startup.
+- OpenClaw розв’язує ці посилання під час активації sandbox, а не ліниво під час кожного SSH-виклику.
+- Розв’язані значення записуються в тимчасові файли з обмежувальними дозволами й використовуються в згенерованій конфігурації SSH.
+- Якщо ефективний backend sandbox не `ssh`, ці посилання залишаються неактивними й не блокують запуск.
 
 ## Підтримувана поверхня облікових даних
 
-Канонічний список підтримуваних і непідтримуваних облікових даних наведено в:
+Канонічний список підтримуваних і непідтримуваних облікових даних наведено тут:
 
-- [SecretRef Credential Surface](/uk/reference/secretref-credential-surface)
+- [Поверхня облікових даних SecretRef](/uk/reference/secretref-credential-surface)
 
-Облікові дані, створені під час виконання або такі, що ротуються, і матеріали OAuth refresh навмисно виключено з розв’язання SecretRef лише для читання.
+<Note>
+Облікові дані, що створюються під час виконання або обертаються, а також матеріали OAuth refresh навмисно виключені з read-only розв’язання SecretRef.
+</Note>
 
-## Обов’язкова поведінка та precedence
+## Обов’язкова поведінка та пріоритет
 
-- Поле без ref: без змін.
-- Поле з ref: обов’язкове на активних поверхнях під час активації.
-- Якщо присутні і відкритий текст, і ref, на підтримуваних шляхах precedence пріоритет має ref.
-- Sentinel редагування `__OPENCLAW_REDACTED__` зарезервовано для внутрішнього редагування/відновлення конфігурації і відхиляється як буквальні дані конфігурації, надіслані користувачем.
+- Поле без посилання: без змін.
+- Поле з посиланням: обов’язкове на активних поверхнях під час активації.
+- Якщо присутні і відкритий текст, і посилання, на підтримуваних шляхах пріоритету перевагу має посилання.
+- Сентинел редагування `__OPENCLAW_REDACTED__` зарезервований для внутрішнього редагування/відновлення конфігурації й відхиляється як буквально подані дані конфігурації.
 
-Сигнали попереджень і аудиту:
+Попередження та сигнали аудиту:
 
-- `SECRETS_REF_OVERRIDES_PLAINTEXT` (runtime warning)
-- `REF_SHADOWED` (результат аудиту, коли облікові дані в `auth-profiles.json` мають пріоритет над refs у `openclaw.json`)
+- `SECRETS_REF_OVERRIDES_PLAINTEXT` (попередження середовища виконання)
+- `REF_SHADOWED` (знахідка аудиту, коли облікові дані `auth-profiles.json` мають пріоритет над посиланнями `openclaw.json`)
 
 Поведінка сумісності Google Chat:
 
 - `serviceAccountRef` має пріоритет над відкритим текстом `serviceAccount`.
-- Значення відкритого тексту ігнорується, коли задано сусідній ref.
+- Значення відкритого тексту ігнорується, коли задано сусіднє посилання.
 
 ## Тригери активації
 
 Активація секретів виконується під час:
 
-- Startup (preflight плюс фінальна активація)
-- Шляху гарячого застосування reload конфігурації
-- Шляху restart-check при reload конфігурації
-- Ручного reload через `secrets.reload`
-- RPC preflight запису конфігурації Gateway (`config.set` / `config.apply` / `config.patch`) для можливості розв’язання SecretRef на активній поверхні в поданому payload конфігурації до збереження змін
+- Запуску (preflight плюс фінальна активація)
+- Шляху hot-apply перезавантаження конфігурації
+- Шляху restart-check перезавантаження конфігурації
+- Ручного перезавантаження через `secrets.reload`
+- preflight RPC запису конфігурації Gateway (`config.set` / `config.apply` / `config.patch`) для можливості розв’язання SecretRef на активних поверхнях у межах поданого корисного навантаження конфігурації до збереження змін
 
 Контракт активації:
 
-- Успіх атомарно замінює snapshot.
-- Збій під час startup перериває запуск gateway.
-- Збій runtime reload зберігає last-known-good snapshot.
-- Збій write-RPC preflight відхиляє подану конфігурацію і залишає без змін як конфігурацію на диску, так і активний runtime snapshot.
-- Передавання явного token каналу для одного виклику helper/tool outbound не запускає активацію SecretRef; точками активації залишаються startup, reload і явний `secrets.reload`.
+- Успіх атомарно замінює знімок.
+- Помилка запуску перериває запуск gateway.
+- Помилка перезавантаження під час виконання зберігає останній відомий коректний знімок.
+- Помилка preflight Write-RPC відхиляє подану конфігурацію й залишає без змін як конфігурацію на диску, так і активний знімок середовища виконання.
+- Надання явного токена каналу для окремого виклику допоміжного засобу/інструмента вихідної взаємодії не запускає активацію SecretRef; точками активації залишаються запуск, перезавантаження та явний `secrets.reload`.
 
-## Сигнали деградації й відновлення
+## Сигнали деградації та відновлення
 
-Коли активація під час reload не вдається після здорового стану, OpenClaw переходить у degraded secrets state.
+Коли активація під час перезавантаження завершується помилкою після коректного стану, OpenClaw переходить у деградований стан секретів.
 
-Одноразові системні події та коди логів:
+Коди одноразових системних подій і журналів:
 
 - `SECRETS_RELOADER_DEGRADED`
 - `SECRETS_RELOADER_RECOVERED`
 
 Поведінка:
 
-- Degraded: runtime зберігає last-known-good snapshot.
-- Recovered: генерується один раз після наступної успішної активації.
-- Повторні збої, коли стан уже degraded, логують попередження, але не засмічують подіями.
-- Fail-fast під час startup не генерує degraded events, оскільки runtime так і не став активним.
+- Деградований стан: середовище виконання зберігає останній відомий коректний знімок.
+- Відновлений стан: генерується один раз після наступної успішної активації.
+- Повторні збої, коли система вже деградована, журналюють попередження, але не засипають подіями.
+- fail-fast під час запуску не генерує подій деградації, оскільки середовище виконання так і не стало активним.
 
-## Розв’язання в шляху команд
+## Розв’язання в шляхах команд
 
-Шляхи команд можуть явно ввімкнути підтримуване розв’язання SecretRef через RPC snapshot gateway.
+Шляхи команд можуть увімкнути підтримуване розв’язання SecretRef через snapshot RPC gateway.
 
 Є дві широкі моделі поведінки:
 
-- Суворі шляхи команд (наприклад, віддалені шляхи `openclaw memory` і `openclaw qr --remote`, коли йому потрібні віддалені refs shared-secret) читають з активного snapshot і одразу завершуються з помилкою, якщо потрібний SecretRef недоступний.
-- Шляхи команд лише для читання (наприклад, `openclaw status`, `openclaw status --all`, `openclaw channels status`, `openclaw channels resolve`, `openclaw security audit` і потоки відновлення doctor/config лише для читання) також надають перевагу активному snapshot, але деградують замість переривання, коли цільовий SecretRef недоступний у цьому шляху команди.
+<Tabs>
+  <Tab title="Строгі шляхи команд">
+    Наприклад, шляхи віддаленої пам’яті `openclaw memory` і `openclaw qr --remote`, коли їм потрібні посилання на віддалені спільні секрети. Вони читають з активного знімка й завершуються fail-fast, коли потрібний SecretRef недоступний.
+  </Tab>
+  <Tab title="Read-only шляхи команд">
+    Наприклад, `openclaw status`, `openclaw status --all`, `openclaw channels status`, `openclaw channels resolve`, `openclaw security audit` і read-only потоки doctor/config repair. Вони також надають перевагу активному знімку, але деградують замість переривання, коли цільовий SecretRef недоступний у цьому шляху команди.
 
-Поведінка лише для читання:
+    Поведінка read-only:
 
-- Коли gateway запущено, ці команди спочатку читають з активного snapshot.
-- Якщо розв’язання gateway неповне або gateway недоступний, вони намагаються виконати цільовий локальний fallback для конкретної поверхні команди.
-- Якщо цільовий SecretRef усе ще недоступний, команда продовжується з деградованим виводом лише для читання й явною діагностикою на кшталт “configured but unavailable in this command path”.
-- Ця деградована поведінка локальна для конкретної команди. Вона не послаблює runtime startup, reload або шляхи send/auth.
+    - Коли gateway запущений, ці команди спочатку читають з активного знімка.
+    - Якщо розв’язання gateway неповне або gateway недоступний, вони намагаються виконати цільовий локальний fallback для конкретної поверхні команди.
+    - Якщо цільовий SecretRef усе ще недоступний, команда продовжується з деградованим read-only виведенням і явною діагностикою, наприклад «налаштовано, але недоступно в цьому шляху команди».
+    - Ця деградована поведінка є лише локальною для команди. Вона не послаблює шляхи запуску, перезавантаження чи надсилання/автентифікації середовища виконання.
+
+  </Tab>
+</Tabs>
 
 Інші примітки:
 
-- Оновлення snapshot після ротації секрету в backend обробляється через `openclaw secrets reload`.
-- RPC-метод gateway, який використовують ці шляхи команд: `secrets.resolve`.
+- Оновлення знімка після ротації секрету в backend виконується через `openclaw secrets reload`.
+- Метод Gateway RPC, який використовують ці шляхи команд: `secrets.resolve`.
 
-## Процес audit і configure
+## Робочий процес аудиту й налаштування
 
-Типовий процес для оператора:
+Типовий операторський потік:
 
-```bash
-openclaw secrets audit --check
-openclaw secrets configure
-openclaw secrets audit --check
-```
+<Steps>
+  <Step title="Аудит поточного стану">
+    ```bash
+    openclaw secrets audit --check
+    ```
+  </Step>
+  <Step title="Налаштування SecretRef">
+    ```bash
+    openclaw secrets configure
+    ```
+  </Step>
+  <Step title="Повторний аудит">
+    ```bash
+    openclaw secrets audit --check
+    ```
+  </Step>
+</Steps>
 
-### `secrets audit`
+<AccordionGroup>
+  <Accordion title="secrets audit">
+    Знахідки включають:
 
-Результати включають:
+    - значення відкритого тексту at rest (`openclaw.json`, `auth-profiles.json`, `.env` і згенерований `agents/*/agent/models.json`)
+    - залишки чутливих заголовків постачальників у відкритому вигляді в згенерованих записах `models.json`
+    - нерозв’язані посилання
+    - затінення пріоритету (`auth-profiles.json` має пріоритет над посиланнями `openclaw.json`)
+    - застарілі залишки (`auth.json`, нагадування OAuth)
 
-- значення відкритого тексту в стані спокою (`openclaw.json`, `auth-profiles.json`, `.env` і згенерований `agents/*/agent/models.json`)
-- залишки чутливих заголовків provider-а у відкритому тексті в згенерованих записах `models.json`
-- нерозв’язані refs
-- затінення precedence (`auth-profiles.json` має пріоритет над refs у `openclaw.json`)
-- застарілі залишки (`auth.json`, нагадування OAuth)
+    Примітка щодо exec:
 
-Примітка щодо exec:
+    - За замовчуванням аудит пропускає перевірки можливості розв’язання exec SecretRef, щоб уникати побічних ефектів команди.
+    - Використовуйте `openclaw secrets audit --allow-exec`, щоб виконувати постачальників exec під час аудиту.
 
-- Типово audit пропускає перевірки можливості розв’язання `exec` SecretRef, щоб уникнути побічних ефектів команд.
-- Використовуйте `openclaw secrets audit --allow-exec`, щоб виконувати exec providers під час аудиту.
+    Примітка щодо залишків заголовків:
 
-Примітка щодо залишків у заголовках:
+    - Виявлення чутливих заголовків постачальників базується на евристиці назв (поширені назви й фрагменти заголовків автентифікації/облікових даних, як-от `authorization`, `x-api-key`, `token`, `secret`, `password` і `credential`).
 
-- Виявлення чутливих заголовків provider-а базується на евристиці назв (поширені назви/фрагменти auth або credential header, такі як `authorization`, `x-api-key`, `token`, `secret`, `password` і `credential`).
+  </Accordion>
+  <Accordion title="secrets configure">
+    Інтерактивний помічник, який:
 
-### `secrets configure`
+    - спочатку налаштовує `secrets.providers` (`env`/`file`/`exec`, додавання/редагування/видалення)
+    - дозволяє вибирати підтримувані поля, що містять секрети, у `openclaw.json` плюс `auth-profiles.json` для однієї області агента
+    - може створити нове зіставлення `auth-profiles.json` безпосередньо в засобі вибору цілі
+    - збирає деталі SecretRef (`source`, `provider`, `id`)
+    - виконує preflight-розв’язання
+    - може застосувати зміни негайно
 
-Інтерактивний helper, який:
+    Примітка щодо exec:
 
-- спочатку налаштовує `secrets.providers` (`env`/`file`/`exec`, add/edit/remove)
-- дає змогу вибирати підтримувані поля з секретами в `openclaw.json` і `auth-profiles.json` для однієї області агента
-- може безпосередньо в picker цілей створити нове зіставлення `auth-profiles.json`
-- збирає деталі SecretRef (`source`, `provider`, `id`)
-- запускає preflight-розв’язання
-- може застосувати зміни одразу
+    - Preflight пропускає перевірки exec SecretRef, якщо не задано `--allow-exec`.
+    - Якщо ви застосовуєте зміни безпосередньо з `configure --apply`, і план містить exec-посилання/постачальників, залиште `--allow-exec` також увімкненим для етапу застосування.
 
-Примітка щодо exec:
+    Корисні режими:
 
-- Preflight пропускає перевірки `exec` SecretRef, якщо не задано `--allow-exec`.
-- Якщо ви застосовуєте безпосередньо з `configure --apply` і план містить refs/providers `exec`, залишайте `--allow-exec` увімкненим і для кроку apply.
+    - `openclaw secrets configure --providers-only`
+    - `openclaw secrets configure --skip-provider-setup`
+    - `openclaw secrets configure --agent <id>`
 
-Корисні режими:
+    Типові параметри apply у `configure`:
 
-- `openclaw secrets configure --providers-only`
-- `openclaw secrets configure --skip-provider-setup`
-- `openclaw secrets configure --agent <id>`
+    - очищує відповідні статичні облікові дані з `auth-profiles.json` для цільових постачальників
+    - очищує застарілі статичні записи `api_key` з `auth.json`
+    - очищує відповідні відомі рядки секретів із `<config-dir>/.env`
 
-Типові дії apply для `configure`:
+  </Accordion>
+  <Accordion title="secrets apply">
+    Застосувати збережений план:
 
-- очищати відповідні статичні облікові дані з `auth-profiles.json` для цільових provider-ів
-- очищати застарілі статичні записи `api_key` з `auth.json`
-- очищати відповідні відомі рядки секретів із `<config-dir>/.env`
+    ```bash
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --allow-exec
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-exec
+    ```
 
-### `secrets apply`
+    Примітка щодо exec:
 
-Застосувати збережений план:
+    - dry-run пропускає перевірки exec, якщо не задано `--allow-exec`.
+    - режим запису відхиляє плани, що містять exec SecretRef/постачальників, якщо не задано `--allow-exec`.
 
-```bash
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --allow-exec
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-exec
-```
+    Докладні відомості про строгий контракт цілі/шляху й точні правила відхилення див. у [Контракт плану застосування секретів](/uk/gateway/secrets-plan-contract).
 
-Примітка щодо exec:
+  </Accordion>
+</AccordionGroup>
 
-- `dry-run` пропускає перевірки exec, якщо не задано `--allow-exec`.
-- Режим запису відхиляє плани з `exec` SecretRef/providers, якщо не задано `--allow-exec`.
+## Політика односторонньої безпеки
 
-Деталі суворого контракту цілей/шляхів і точні правила відхилення див. в:
-
-- [Secrets Apply Plan Contract](/uk/gateway/secrets-plan-contract)
-
-## Одностороння політика безпеки
-
-OpenClaw навмисно не записує резервні копії для відкату, які містять історичні секретні значення у відкритому тексті.
+<Warning>
+OpenClaw навмисно не записує резервні копії для відкату, які містять історичні значення секретів у відкритому вигляді.
+</Warning>
 
 Модель безпеки:
 
-- preflight має завершитися успішно до режиму запису
-- активація runtime перевіряється до commit
-- apply оновлює файли через атомарну заміну файлу й best-effort відновлення в разі збою
+- preflight має завершитися успішно перед режимом запису
+- активація середовища виконання перевіряється до коміту
+- apply оновлює файли за допомогою атомарної заміни файлів і відновлення best-effort у разі збою
 
-## Примітки щодо сумісності з legacy auth
+## Примітки щодо сумісності зі застарілою автентифікацією
 
-Для статичних облікових даних runtime більше не залежить від legacy auth storage у відкритому тексті.
+Для статичних облікових даних середовище виконання більше не залежить від застарілого зберігання автентифікації у відкритому вигляді.
 
-- Джерелом облікових даних runtime є розв’язаний snapshot у пам’яті.
-- Застарілі статичні записи `api_key` очищаються, щойно їх виявлено.
-- Поведінка сумісності, пов’язана з OAuth, лишається окремою.
+- Джерело облікових даних середовища виконання — розв’язаний знімок у пам’яті.
+- Застарілі статичні записи `api_key` очищуються при виявленні.
+- Поведінка сумісності, пов’язана з OAuth, залишається окремою.
 
-## Примітка щодо Web UI
+## Примітка щодо вебінтерфейсу
 
-Деякі union-и SecretInput простіше налаштовувати в режимі raw editor, ніж у form mode.
+Деякі об’єднання SecretInput простіше налаштовувати в режимі raw editor, ніж у режимі форми.
 
-## Пов’язана документація
+## Пов’язане
 
-- Команди CLI: [secrets](/uk/cli/secrets)
-- Деталі контракту плану: [Secrets Apply Plan Contract](/uk/gateway/secrets-plan-contract)
-- Поверхня облікових даних: [SecretRef Credential Surface](/uk/reference/secretref-credential-surface)
-- Налаштування auth: [Authentication](/uk/gateway/authentication)
-- Позиція безпеки: [Security](/uk/gateway/security)
-- Precedence змінних середовища: [Environment Variables](/uk/help/environment)
+- [Автентифікація](/uk/gateway/authentication) — налаштування автентифікації
+- [CLI: secrets](/uk/cli/secrets) — команди CLI
+- [Змінні середовища](/uk/help/environment) — пріоритет змінних середовища
+- [Поверхня облікових даних SecretRef](/uk/reference/secretref-credential-surface) — поверхня облікових даних
+- [Контракт плану застосування секретів](/uk/gateway/secrets-plan-contract) — подробиці контракту плану
+- [Безпека](/uk/gateway/security) — модель безпеки
