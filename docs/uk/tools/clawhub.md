@@ -1,300 +1,323 @@
 ---
 read_when:
-    - Представлення ClawHub новим користувачам
-    - Встановлення, пошук або публікація Skills чи Plugin
-    - Пояснення прапорців CLI ClawHub і поведінки синхронізації
-summary: 'Посібник із ClawHub: публічний реєстр, native-потоки встановлення OpenClaw і робочі процеси CLI ClawHub'
+    - Пошук, встановлення або оновлення Skills чи Plugin
+    - Публікація Skills або Plugin у реєстрі
+    - Налаштування CLI clawhub або його перевизначень через середовище
+sidebarTitle: ClawHub
+summary: 'ClawHub: публічний реєстр Skills і Plugin для OpenClaw, нативні потоки встановлення та CLI clawhub'
 title: ClawHub
 x-i18n:
-    generated_at: "2026-04-23T23:07:33Z"
+    generated_at: "2026-04-26T07:03:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 887bbf942238e3aee84389aa1c85b31b263144021301de37452522e215a0b1e5
+    source_hash: 9e002bb56b643bfdfb5715ac3632d854df182475be632ebe36c46d04008cf6e5
     source_path: tools/clawhub.md
     workflow: 15
 ---
 
 ClawHub — це публічний реєстр для **Skills і Plugin OpenClaw**.
 
-- Використовуйте native-команди `openclaw`, щоб шукати/встановлювати/оновлювати Skills і встановлювати
-  Plugin з ClawHub.
-- Використовуйте окремий CLI `clawhub`, коли вам потрібні auth реєстру, публікація, видалення,
-  відновлення видаленого або робочі процеси sync.
+- Використовуйте нативні команди `openclaw` для пошуку, встановлення та оновлення Skills, а також для встановлення Plugin із ClawHub.
+- Використовуйте окремий CLI `clawhub` для автентифікації в реєстрі, публікації, видалення/відновлення та робочих процесів синхронізації.
 
 Сайт: [clawhub.ai](https://clawhub.ai)
 
-## Native-потоки OpenClaw
+## Швидкий старт
 
-Skills:
+<Steps>
+  <Step title="Пошук">
+    ```bash
+    openclaw skills search "calendar"
+    ```
+  </Step>
+  <Step title="Установлення">
+    ```bash
+    openclaw skills install <skill-slug>
+    ```
+  </Step>
+  <Step title="Використання">
+    Почніть нову сесію OpenClaw — вона підхопить новий Skill.
+  </Step>
+  <Step title="Публікація (необов’язково)">
+    Для робочих процесів з автентифікацією в реєстрі (публікація, синхронізація, керування) установіть
+    окремий CLI `clawhub`:
 
-```bash
-openclaw skills search "calendar"
-openclaw skills install <skill-slug>
-openclaw skills update --all
-```
+    ```bash
+    npm i -g clawhub
+    # or
+    pnpm add -g clawhub
+    ```
 
-Plugins:
+  </Step>
+</Steps>
 
-```bash
-openclaw plugins install clawhub:<package>
-openclaw plugins update --all
-```
+## Нативні потоки OpenClaw
 
-Прості специфікації Plugin, безпечні для npm, також перевіряються через ClawHub перед npm:
+<Tabs>
+  <Tab title="Skills">
+    ```bash
+    openclaw skills search "calendar"
+    openclaw skills install <skill-slug>
+    openclaw skills update --all
+    ```
 
-```bash
-openclaw plugins install openclaw-codex-app-server
-```
+    Нативні команди `openclaw` установлюють у ваш активний робочий простір і
+    зберігають метадані джерела, щоб подальші виклики `update` могли лишатися на ClawHub.
 
-Native-команди `openclaw` встановлюють у ваш активний workspace і зберігають
-метадані джерела, щоб подальші виклики `update` могли залишатися на ClawHub.
+  </Tab>
+  <Tab title="Plugins">
+    ```bash
+    openclaw plugins install clawhub:<package>
+    openclaw plugins update --all
+    ```
 
-Встановлення Plugin перевіряє сумісність оголошених `pluginApi` і `minGatewayVersion`
-до запуску встановлення архіву, тож несумісні host аварійно завершуються на ранньому етапі,
-а не встановлюють package частково.
+    Прості специфікації Plugin, безпечні для npm, також спочатку перевіряються в ClawHub, а вже потім у npm:
 
-`openclaw plugins install clawhub:...` приймає лише сімейства Plugin, які можна встановити.
-Якщо package у ClawHub насправді є Skill, OpenClaw зупиняється й підказує вам
-використати `openclaw skills install <slug>`.
+    ```bash
+    openclaw plugins install openclaw-codex-app-server
+    ```
+
+    Під час установлення Plugin перевіряється сумісність заявлених `pluginApi` і
+    `minGatewayVersion` до запуску встановлення архіву, тож
+    несумісні хости безпечно завершуються раніше, замість часткового встановлення
+    пакета.
+
+  </Tab>
+</Tabs>
+
+<Note>
+`openclaw plugins install clawhub:...` приймає лише інстальовні сімейства Plugin. Якщо пакет ClawHub насправді є Skill, OpenClaw зупиняється й натомість
+вказує на `openclaw skills install <slug>`.
+
+Анонімні встановлення Plugin з ClawHub також безпечно завершуються помилкою для приватних пакетів.
+Канали спільноти або інші неофіційні канали все ще можуть встановлюватися, але OpenClaw
+показує попередження, щоб оператори могли перевірити джерело й перевірку перед
+увімкненням.
+</Note>
 
 ## Що таке ClawHub
 
 - Публічний реєстр для Skills і Plugin OpenClaw.
-- Версійоване сховище bundle Skills і метаданих.
-- Surface виявлення для пошуку, тегів і сигналів використання.
+- Версіоноване сховище наборів Skills і метаданих.
+- Поверхня виявлення для пошуку, тегів і сигналів використання.
 
-## Як це працює
+Типовий Skill — це версіонований набір файлів, який містить:
 
-1. Користувач публікує bundle Skill (файли + метадані).
-2. ClawHub зберігає bundle, розбирає метадані й призначає версію.
-3. Реєстр індексує Skill для пошуку та виявлення.
-4. Користувачі переглядають, завантажують і встановлюють Skills в OpenClaw.
-
-## Що можна робити
-
-- Публікувати нові Skills і нові версії наявних Skills.
-- Знаходити Skills за назвою, тегами або пошуком.
-- Завантажувати bundle Skills і переглядати їхні файли.
-- Повідомляти про Skills, які є шкідливими або небезпечними.
-- Якщо ви модератор, приховувати, показувати знову, видаляти або банити.
-
-## Для кого це (зручно для початківців)
-
-Якщо ви хочете додати нові можливості своєму агенту OpenClaw, ClawHub — це найпростіший спосіб знайти й установити Skills. Вам не потрібно знати, як працює бекенд. Ви можете:
-
-- Шукати Skills звичайною мовою.
-- Установлювати Skill у свій workspace.
-- Оновлювати Skills пізніше однією командою.
-- Робити резервну копію власних Skills шляхом публікації.
-
-## Швидкий старт (нетехнічний)
-
-1. Знайдіть те, що вам потрібно:
-   - `openclaw skills search "calendar"`
-2. Установіть Skill:
-   - `openclaw skills install <skill-slug>`
-3. Почніть нову сесію OpenClaw, щоб він підхопив новий Skill.
-4. Якщо ви хочете публікувати або керувати auth реєстру, також установіть окремий
-   CLI `clawhub`.
-
-## Установлення CLI ClawHub
-
-Це потрібно лише для робочих процесів з auth реєстру, таких як publish/sync:
-
-```bash
-npm i -g clawhub
-```
-
-```bash
-pnpm add -g clawhub
-```
-
-## Як це вбудовується в OpenClaw
-
-Native `openclaw skills install` установлює в каталог `skills/`
-активного workspace. `openclaw plugins install clawhub:...` записує звичайне кероване
-встановлення Plugin плюс метадані джерела ClawHub для оновлень.
-
-Анонімні встановлення Plugin з ClawHub також аварійно завершуються для приватних package.
-Спільнотні або інші неофіційні канали все ще можна встановлювати, але OpenClaw попереджає,
-щоб оператори могли перевірити джерело й верифікацію перед увімкненням.
-
-Окремий CLI `clawhub` також установлює Skills до `./skills` у вашому
-поточному робочому каталозі. Якщо налаштовано workspace OpenClaw, `clawhub`
-перемикається на цей workspace, якщо ви не перевизначите `--workdir` (або
-`CLAWHUB_WORKDIR`). OpenClaw завантажує Skills workspace з `<workspace>/skills`
-і підхопить їх у **наступній** сесії. Якщо ви вже використовуєте
-`~/.openclaw/skills` або bundled Skills, Skills workspace мають пріоритет.
-
-Докладніше про те, як Skills завантажуються, спільно використовуються та
-контролюються запобіжниками, див. [Skills](/uk/tools/skills).
-
-## Огляд системи Skills
-
-Skill — це версійований bundle файлів, який навчає OpenClaw виконувати
-конкретне завдання. Кожна публікація створює нову версію, а реєстр зберігає
-історію версій, щоб користувачі могли перевіряти зміни.
-
-Типовий Skill містить:
-
-- Файл `SKILL.md` з основним описом і використанням.
+- Файл `SKILL.md` з основним описом і способом використання.
 - Необов’язкові конфігурації, скрипти або допоміжні файли, які використовує Skill.
-- Метадані, такі як теги, підсумок і вимоги до встановлення.
+- Метадані, як-от теги, підсумок і вимоги до встановлення.
 
-ClawHub використовує метадані для виявлення та безпечного відкриття можливостей Skill.
-Реєстр також відстежує сигнали використання (наприклад, зірки та завантаження), щоб покращувати
-ранжування й видимість.
+ClawHub використовує метадані для підтримки пошуку та безпечного відкриття
+можливостей Skill. Реєстр відстежує сигнали використання (зірки, завантаження), щоб
+поліпшувати ранжування та видимість. Кожна публікація створює нову
+semver-версію, а реєстр зберігає історію версій, щоб користувачі могли перевіряти
+зміни.
 
-## Що надає сервіс (можливості)
+## Робочий простір і завантаження Skills
 
-- **Публічний перегляд** Skills та їхнього вмісту `SKILL.md`.
-- **Пошук** на основі embeddings (векторний пошук), а не лише ключових слів.
-- **Версіонування** із semver, changelog і тегами (зокрема `latest`).
-- **Завантаження** як zip для кожної версії.
-- **Зірки та коментарі** для зворотного зв’язку від спільноти.
-- **Hooks модерації** для погоджень і аудитів.
-- **Зручний для CLI API** для автоматизації та скриптів.
+Окремий CLI `clawhub` також установлює Skills у `./skills` у межах
+поточного робочого каталогу. Якщо налаштовано робочий простір OpenClaw,
+`clawhub` повертається до цього робочого простору, якщо ви не перевизначите `--workdir`
+(або `CLAWHUB_WORKDIR`). OpenClaw завантажує Skills робочого простору з
+`<workspace>/skills` і підхоплює їх у **наступній** сесії.
 
-## Безпека та модерація
+Якщо ви вже використовуєте `~/.openclaw/skills` або вбудовані Skills,
+Skills робочого простору мають пріоритет. Докладніше про те, як завантажуються,
+спільно використовуються й обмежуються Skills, див. у [Skills](/uk/tools/skills).
 
-ClawHub за замовчуванням відкритий. Будь-хто може завантажувати Skills, але для публікації
-обліковий запис GitHub має існувати щонайменше один тиждень. Це допомагає сповільнити зловживання, не блокуючи
-легітимних учасників.
+## Можливості сервісу
 
-Повідомлення та модерація:
+| Можливість        | Примітки                                                    |
+| ----------------- | ----------------------------------------------------------- |
+| Публічний перегляд | Skills та їхній вміст `SKILL.md` доступні для публічного перегляду. |
+| Пошук             | На основі embeddings (векторний пошук), а не лише ключових слів. |
+| Версіонування     | Semver, changelog-и й теги (зокрема `latest`).              |
+| Завантаження      | Zip для кожної версії.                                      |
+| Зірки й коментарі | Відгуки спільноти.                                          |
+| Модерація         | Схвалення й перевірки.                                      |
+| API, зручний для CLI | Підходить для автоматизації та скриптів.                 |
 
-- Будь-який користувач, який увійшов у систему, може поскаржитися на Skill.
-- Причини скарги обов’язкові й записуються.
-- Кожен користувач може мати до 20 активних скарг одночасно.
-- Skills з більш ніж 3 унікальними скаргами автоматично приховуються за замовчуванням.
-- Модератори можуть переглядати приховані Skills, показувати їх знову, видаляти або банити користувачів.
-- Зловживання функцією скарг може призвести до бану облікового запису.
+## Безпека й модерація
 
-Хочете стати модератором? Запитайте в Discord OpenClaw і зв’яжіться з
-модератором або супровідником.
+ClawHub типово відкритий — будь-хто може завантажувати Skills, але обліковий запис GitHub має бути **не молодшим за один тиждень**, щоб публікувати. Це уповільнює
+зловживання, не блокуючи добросовісних учасників.
 
-## Команди CLI та параметри
+<AccordionGroup>
+  <Accordion title="Скарги">
+    - Будь-який користувач, що увійшов у систему, може поскаржитися на Skill.
+    - Причини скарги є обов’язковими та зберігаються.
+    - Кожен користувач може мати до 20 активних скарг одночасно.
+    - Skills із понад 3 унікальними скаргами типово автоматично приховуються.
+  </Accordion>
+  <Accordion title="Модерація">
+    - Модератори можуть переглядати приховані Skills, відкривати їх, видаляти їх або блокувати користувачів.
+    - Зловживання функцією скарг може призвести до блокування облікового запису.
+    - Хочете стати модератором? Запитайте в Discord OpenClaw і зв’яжіться з модератором або супроводжувачем.
+  </Accordion>
+</AccordionGroup>
 
-Глобальні параметри (застосовуються до всіх команд):
+## CLI ClawHub
 
-- `--workdir <dir>`: Робочий каталог (типово: поточний каталог; fallback до workspace OpenClaw).
-- `--dir <dir>`: Каталог Skills, відносний до workdir (типово: `skills`).
-- `--site <url>`: Базовий URL сайту (вхід через браузер).
-- `--registry <url>`: Базовий URL API реєстру.
-- `--no-input`: Вимкнути запити (неінтерактивний режим).
-- `-V, --cli-version`: Вивести версію CLI.
+Він потрібен лише для робочих процесів з автентифікацією в реєстрі, таких як
+публікація/синхронізація.
 
-Auth:
+### Глобальні параметри
 
-- `clawhub login` (потік через браузер) або `clawhub login --token <token>`
-- `clawhub logout`
-- `clawhub whoami`
+<ParamField path="--workdir <dir>" type="string">
+  Робочий каталог. Типово: поточний каталог; резервно використовується робочий простір OpenClaw.
+</ParamField>
+<ParamField path="--dir <dir>" type="string" default="skills">
+  Каталог Skills, відносно workdir.
+</ParamField>
+<ParamField path="--site <url>" type="string">
+  Базовий URL сайту (вхід через браузер).
+</ParamField>
+<ParamField path="--registry <url>" type="string">
+  Базовий URL API реєстру.
+</ParamField>
+<ParamField path="--no-input" type="boolean">
+  Вимкнути запити вводу (неінтерактивний режим).
+</ParamField>
+<ParamField path="-V, --cli-version" type="boolean">
+  Показати версію CLI.
+</ParamField>
 
-Параметри:
+### Команди
 
-- `--token <token>`: Вставити API-токен.
-- `--label <label>`: Мітка, що зберігається для токенів входу через браузер (типово: `CLI token`).
-- `--no-browser`: Не відкривати браузер (потрібен `--token`).
+<AccordionGroup>
+  <Accordion title="Автентифікація (login / logout / whoami)">
+    ```bash
+    clawhub login              # browser flow
+    clawhub login --token <token>
+    clawhub logout
+    clawhub whoami
+    ```
 
-Пошук:
+    Параметри входу:
 
-- `clawhub search "query"`
-- `--limit <n>`: Максимум результатів.
+    - `--token <token>` — вставити API-токен.
+    - `--label <label>` — мітка, що зберігається для токенів входу через браузер (типово: `CLI token`).
+    - `--no-browser` — не відкривати браузер (потрібен `--token`).
 
-Встановлення:
+  </Accordion>
+  <Accordion title="Пошук">
+    ```bash
+    clawhub search "query"
+    ```
 
-- `clawhub install <slug>`
-- `--version <version>`: Установити конкретну версію.
-- `--force`: Перезаписати, якщо папка вже існує.
+    - `--limit <n>` — максимальна кількість результатів.
 
-Оновлення:
+  </Accordion>
+  <Accordion title="Установлення / оновлення / список">
+    ```bash
+    clawhub install <slug>
+    clawhub update <slug>
+    clawhub update --all
+    clawhub list
+    ```
 
-- `clawhub update <slug>`
-- `clawhub update --all`
-- `--version <version>`: Оновити до конкретної версії (лише для одного slug).
-- `--force`: Перезаписати, коли локальні файли не відповідають жодній опублікованій версії.
+    Параметри:
 
-Список:
+    - `--version <version>` — установити або оновити до конкретної версії (для одного slug лише в `update`).
+    - `--force` — перезаписати, якщо папка вже існує, або коли локальні файли не збігаються з жодною опублікованою версією.
+    - `clawhub list` читає `.clawhub/lock.json`.
 
-- `clawhub list` (читає `.clawhub/lock.json`)
+  </Accordion>
+  <Accordion title="Публікація Skills">
+    ```bash
+    clawhub skill publish <path>
+    ```
 
-Публікація Skills:
+    Параметри:
 
-- `clawhub skill publish <path>`
-- `--slug <slug>`: Slug Skill.
-- `--name <name>`: Відображувана назва.
-- `--version <version>`: Semver-версія.
-- `--changelog <text>`: Текст changelog (може бути порожнім).
-- `--tags <tags>`: Теги, розділені комами (типово: `latest`).
+    - `--slug <slug>` — slug Skill.
+    - `--name <name>` — відображувана назва.
+    - `--version <version>` — semver-версія.
+    - `--changelog <text>` — текст changelog (може бути порожнім).
+    - `--tags <tags>` — теги, розділені комами (типово: `latest`).
 
-Публікація Plugin:
+  </Accordion>
+  <Accordion title="Публікація Plugin">
+    ```bash
+    clawhub package publish <source>
+    ```
 
-- `clawhub package publish <source>`
-- `<source>` може бути локальною папкою, `owner/repo`, `owner/repo@ref` або URL GitHub.
-- `--dry-run`: Побудувати точний план публікації без завантаження будь-чого.
-- `--json`: Виводити машиночитний результат для CI.
-- `--source-repo`, `--source-commit`, `--source-ref`: Необов’язкові перевизначення, коли автовизначення недостатньо.
+    `<source>` може бути локальною папкою, `owner/repo`, `owner/repo@ref` або
+    URL GitHub.
 
-Видалення/відновлення видаленого (лише власник/адміністратор):
+    Параметри:
 
-- `clawhub delete <slug> --yes`
-- `clawhub undelete <slug> --yes`
+    - `--dry-run` — побудувати точний план публікації без завантаження будь-чого.
+    - `--json` — виводити машиночитаний результат для CI.
+    - `--source-repo`, `--source-commit`, `--source-ref` — необов’язкові перевизначення, коли автовиявлення недостатнє.
 
-Sync (сканувати локальні Skills + публікувати нові/оновлені):
+  </Accordion>
+  <Accordion title="Видалення / відновлення (власник або адміністратор)">
+    ```bash
+    clawhub delete <slug> --yes
+    clawhub undelete <slug> --yes
+    ```
+  </Accordion>
+  <Accordion title="Синхронізація (сканування локального + публікація нового або оновленого)">
+    ```bash
+    clawhub sync
+    ```
 
-- `clawhub sync`
-- `--root <dir...>`: Додаткові корені сканування.
-- `--all`: Завантажити все без запитів.
-- `--dry-run`: Показати, що було б завантажено.
-- `--bump <type>`: `patch|minor|major` для оновлень (типово: `patch`).
-- `--changelog <text>`: Changelog для неінтерактивних оновлень.
-- `--tags <tags>`: Теги, розділені комами (типово: `latest`).
-- `--concurrency <n>`: Перевірки реєстру (типово: 4).
+    Параметри:
 
-## Типові робочі процеси для агентів
+    - `--root <dir...>` — додаткові корені сканування.
+    - `--all` — завантажити все без запитів.
+    - `--dry-run` — показати, що було б завантажено.
+    - `--bump <type>` — `patch|minor|major` для оновлень (типово: `patch`).
+    - `--changelog <text>` — changelog для неінтерактивних оновлень.
+    - `--tags <tags>` — теги, розділені комами (типово: `latest`).
+    - `--concurrency <n>` — перевірки реєстру (типово: `4`).
 
-### Пошук Skills
+  </Accordion>
+</AccordionGroup>
 
-```bash
-clawhub search "postgres backups"
-```
+## Типові робочі процеси
 
-### Завантаження нових Skills
+<Tabs>
+  <Tab title="Пошук">
+    ```bash
+    clawhub search "postgres backups"
+    ```
+  </Tab>
+  <Tab title="Установлення">
+    ```bash
+    clawhub install my-skill-pack
+    ```
+  </Tab>
+  <Tab title="Оновити все">
+    ```bash
+    clawhub update --all
+    ```
+  </Tab>
+  <Tab title="Опублікувати один Skill">
+    ```bash
+    clawhub skill publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
+    ```
+  </Tab>
+  <Tab title="Синхронізувати багато Skills">
+    ```bash
+    clawhub sync --all
+    ```
+  </Tab>
+  <Tab title="Опублікувати Plugin з GitHub">
+    ```bash
+    clawhub package publish your-org/your-plugin --dry-run
+    clawhub package publish your-org/your-plugin
+    clawhub package publish your-org/your-plugin@v1.0.0
+    clawhub package publish https://github.com/your-org/your-plugin
+    ```
+  </Tab>
+</Tabs>
 
-```bash
-clawhub install my-skill-pack
-```
+### Метадані пакетів Plugin
 
-### Оновлення встановлених Skills
-
-```bash
-clawhub update --all
-```
-
-### Резервне копіювання ваших Skills (publish або sync)
-
-Для однієї папки Skill:
-
-```bash
-clawhub skill publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
-```
-
-Щоб просканувати й зберегти резервну копію багатьох Skills одразу:
-
-```bash
-clawhub sync --all
-```
-
-### Публікація Plugin із GitHub
-
-```bash
-clawhub package publish your-org/your-plugin --dry-run
-clawhub package publish your-org/your-plugin
-clawhub package publish your-org/your-plugin@v1.0.0
-clawhub package publish https://github.com/your-org/your-plugin
-```
-
-Кодові Plugin мають містити потрібні метадані OpenClaw у `package.json`:
+Кодові Plugin мають містити обов’язкові метадані OpenClaw у
+`package.json`:
 
 ```json
 {
@@ -316,50 +339,59 @@ clawhub package publish https://github.com/your-org/your-plugin
 }
 ```
 
-Опубліковані package мають постачати зібраний JavaScript і вказувати `runtimeExtensions`
-на цей вивід. Установлення з checkout Git усе ще можуть повертатися до вихідного коду TypeScript,
-коли зібраних файлів немає, але зібрані runtime-entry уникають runtime-компіляції TypeScript
-у шляхах startup, doctor і завантаження Plugin.
+Опубліковані пакети мають постачатися зі **зібраним JavaScript** і вказувати
+`runtimeExtensions` на цей результат. Установлення з checkout Git усе ще можуть
+резервно використовувати вихідний TypeScript, якщо зібраних файлів немає, але зібрані записи runtime
+дозволяють уникнути компіляції TypeScript під час запуску, doctor і
+шляхів завантаження Plugin.
 
-## Розширені деталі (технічні)
+## Версіонування, lockfile і телеметрія
 
-### Версіонування та теги
+<AccordionGroup>
+  <Accordion title="Версіонування й теги">
+    - Кожна публікація створює нову **semver** `SkillVersion`.
+    - Теги (як-от `latest`) вказують на версію; переміщення тегів дає змогу відкотитися.
+    - Changelog-и прив’язуються до кожної версії й можуть бути порожніми під час синхронізації або публікації оновлень.
+  </Accordion>
+  <Accordion title="Локальні зміни проти версій реєстру">
+    Оновлення порівнюють локальний вміст Skill із версіями реєстру за допомогою
+    хешу вмісту. Якщо локальні файли не збігаються з жодною опублікованою версією,
+    CLI запитує підтвердження перед перезаписом (або вимагає `--force` у
+    неінтерактивних запусках).
+  </Accordion>
+  <Accordion title="Сканування sync і резервні корені">
+    `clawhub sync` спочатку сканує ваш поточний workdir. Якщо Skills не
+    знайдено, він резервно переходить до відомих застарілих розташувань (наприклад
+    `~/openclaw/skills` і `~/.openclaw/skills`). Це зроблено для того, щоб
+    знаходити старі встановлення Skills без додаткових прапорців.
+  </Accordion>
+  <Accordion title="Сховище й lockfile">
+    - Установлені Skills записуються в `.clawhub/lock.json` у межах вашого workdir.
+    - Токени автентифікації зберігаються у файлі конфігурації CLI ClawHub (перевизначається через `CLAWHUB_CONFIG_PATH`).
+  </Accordion>
+  <Accordion title="Телеметрія (кількість встановлень)">
+    Коли ви запускаєте `clawhub sync` у стані входу, CLI надсилає мінімальний
+    знімок для обчислення кількості встановлень. Це можна повністю вимкнути:
 
-- Кожна публікація створює нову **semver**-версію `SkillVersion`.
-- Теги (наприклад, `latest`) вказують на версію; переміщення тегів дає змогу відкотитися.
-- Changelog прив’язуються до кожної версії й можуть бути порожніми під час sync або публікації оновлень.
+    ```bash
+    export CLAWHUB_DISABLE_TELEMETRY=1
+    ```
 
-### Локальні зміни проти версій у реєстрі
-
-Оновлення порівнюють локальний вміст Skill із версіями в реєстрі за допомогою хеша вмісту. Якщо локальні файли не відповідають жодній опублікованій версії, CLI запитує підтвердження перед перезаписом (або вимагає `--force` у неінтерактивних запусках).
-
-### Сканування sync і fallback-корені
-
-`clawhub sync` спочатку сканує ваш поточний workdir. Якщо Skills не знайдено, він повертається до відомих застарілих розташувань (наприклад, `~/openclaw/skills` і `~/.openclaw/skills`). Це зроблено для пошуку старіших установлень Skills без додаткових прапорців.
-
-### Сховище та lockfile
-
-- Установлені Skills записуються в `.clawhub/lock.json` у вашому workdir.
-- Auth-токени зберігаються у файлі конфігурації CLI ClawHub (перевизначається через `CLAWHUB_CONFIG_PATH`).
-
-### Телеметрія (кількість встановлень)
-
-Коли ви запускаєте `clawhub sync`, увійшовши в систему, CLI надсилає мінімальний snapshot для обчислення кількості встановлень. Ви можете повністю вимкнути це:
-
-```bash
-export CLAWHUB_DISABLE_TELEMETRY=1
-```
+  </Accordion>
+</AccordionGroup>
 
 ## Змінні середовища
 
-- `CLAWHUB_SITE`: Перевизначає URL сайту.
-- `CLAWHUB_REGISTRY`: Перевизначає URL API реєстру.
-- `CLAWHUB_CONFIG_PATH`: Перевизначає місце, де CLI зберігає токен/конфігурацію.
-- `CLAWHUB_WORKDIR`: Перевизначає типовий workdir.
-- `CLAWHUB_DISABLE_TELEMETRY=1`: Вимикає телеметрію для `sync`.
+| Змінна                      | Дія                                                  |
+| --------------------------- | ---------------------------------------------------- |
+| `CLAWHUB_SITE`              | Перевизначає URL сайту.                              |
+| `CLAWHUB_REGISTRY`          | Перевизначає URL API реєстру.                        |
+| `CLAWHUB_CONFIG_PATH`       | Перевизначає місце, де CLI зберігає токен/конфігурацію. |
+| `CLAWHUB_WORKDIR`           | Перевизначає типовий workdir.                        |
+| `CLAWHUB_DISABLE_TELEMETRY=1` | Вимикає телеметрію для `sync`.                     |
 
 ## Пов’язане
 
-- [Plugin](/uk/tools/plugin)
+- [Plugin спільноти](/uk/plugins/community)
+- [Plugins](/uk/tools/plugin)
 - [Skills](/uk/tools/skills)
-- [Спільнотні Plugin](/uk/plugins/community)
