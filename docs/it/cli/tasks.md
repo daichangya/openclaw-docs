@@ -5,10 +5,10 @@ read_when:
 summary: Riferimento CLI per `openclaw tasks` (registro delle attività in background e stato di TaskFlow)
 title: '`openclaw tasks`'
 x-i18n:
-    generated_at: "2026-04-24T08:35:40Z"
+    generated_at: "2026-04-26T11:26:29Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 55aab29821578bf8c09e1b6cd5bbeb5e3dae4438e453b418fa7e8420412c8152
+    source_hash: 6e61fb0b67a2bdd932b29543199fb219890f256260a66881c8e7ffeb9fadee33
     source_path: cli/tasks.md
     workflow: 15
 ---
@@ -16,9 +16,9 @@ x-i18n:
 Ispeziona le attività in background durevoli e lo stato di TaskFlow. Senza sottocomando,
 `openclaw tasks` equivale a `openclaw tasks list`.
 
-Vedi [Attività in background](/it/automation/tasks) per il ciclo di vita e il modello di consegna.
+Consulta [Background Tasks](/it/automation/tasks) per il ciclo di vita e il modello di recapito.
 
-## Utilizzo
+## Uso
 
 ```bash
 openclaw tasks
@@ -36,7 +36,7 @@ openclaw tasks flow show <lookup>
 openclaw tasks flow cancel <lookup>
 ```
 
-## Opzioni radice
+## Opzioni root
 
 - `--json`: output JSON.
 - `--runtime <name>`: filtra per tipo: `subagent`, `acp`, `cron` o `cli`.
@@ -50,7 +50,7 @@ openclaw tasks flow cancel <lookup>
 openclaw tasks list [--runtime <name>] [--status <name>] [--json]
 ```
 
-Elenca le attività in background tracciate dalla più recente alla meno recente.
+Elenca le attività in background tracciate, dalla più recente.
 
 ### `show`
 
@@ -58,7 +58,7 @@ Elenca le attività in background tracciate dalla più recente alla meno recente
 openclaw tasks show <lookup> [--json]
 ```
 
-Mostra un'attività in base a task ID, run ID o chiave di sessione.
+Mostra un’attività per ID attività, ID esecuzione o chiave di sessione.
 
 ### `notify`
 
@@ -66,7 +66,7 @@ Mostra un'attività in base a task ID, run ID o chiave di sessione.
 openclaw tasks notify <lookup> <done_only|state_changes|silent>
 ```
 
-Modifica il criterio di notifica per un'attività in esecuzione.
+Modifica il criterio di notifica per un’attività in esecuzione.
 
 ### `cancel`
 
@@ -74,7 +74,7 @@ Modifica il criterio di notifica per un'attività in esecuzione.
 openclaw tasks cancel <lookup>
 ```
 
-Annulla un'attività in background in esecuzione.
+Annulla un’attività in background in esecuzione.
 
 ### `audit`
 
@@ -82,7 +82,7 @@ Annulla un'attività in background in esecuzione.
 openclaw tasks audit [--severity <warn|error>] [--code <name>] [--limit <n>] [--json]
 ```
 
-Evidenzia record di attività e TaskFlow obsoleti, persi, con consegna fallita o altrimenti incoerenti.
+Evidenzia record di attività e TaskFlow obsoleti, lost, con recapito non riuscito o altrimenti incoerenti. Le attività lost conservate fino a `cleanupAfter` sono avvisi; le attività lost scadute o senza marcatura temporale sono errori.
 
 ### `maintenance`
 
@@ -90,7 +90,10 @@ Evidenzia record di attività e TaskFlow obsoleti, persi, con consegna fallita o
 openclaw tasks maintenance [--apply] [--json]
 ```
 
-Mostra in anteprima o applica riconciliazione, marcatura di pulizia e potatura di attività e TaskFlow.
+Mostra in anteprima o applica la riconciliazione, la marcatura della pulizia e l’eliminazione per le attività e TaskFlow.
+Per le attività Cron, la riconciliazione usa i log persistenti delle esecuzioni e lo stato del processo prima di contrassegnare come `lost` una vecchia attività attiva, così le esecuzioni Cron completate non diventano falsi errori di audit
+solo perché lo stato runtime in memoria del Gateway non è più disponibile. L’audit CLI offline
+non è autorevole per l’insieme dei processi Cron attivi locale al processo del Gateway.
 
 ### `flow`
 

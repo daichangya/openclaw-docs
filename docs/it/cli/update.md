@@ -1,14 +1,14 @@
 ---
 read_when:
-    - Vuoi aggiornare in sicurezza un checkout del sorgente
-    - Hai bisogno di capire il comportamento abbreviato di `--update`
-summary: Riferimento CLI per `openclaw update` (aggiornamento del sorgente relativamente sicuro + riavvio automatico del gateway)
+    - Vuoi aggiornare un checkout della sorgente in modo sicuro
+    - Devi capire il comportamento abbreviato di `--update`
+summary: Riferimento CLI per `openclaw update` (aggiornamento della sorgente abbastanza sicuro + riavvio automatico del gateway)
 title: Aggiornamento
 x-i18n:
-    generated_at: "2026-04-24T08:35:28Z"
+    generated_at: "2026-04-26T11:26:31Z"
     model: gpt-5.4
     provider: openai
-    source_hash: c7ab28ae6fe91c094826ccbd9fa11c5d7c41849cc95d570a634a0721b82f0e3a
+    source_hash: e86e7f8ffbf3f4ccd0787ba06aead35cb96e8db98c5d32c99b18ef9fda62efd6
     source_path: cli/update.md
     workflow: 15
 ---
@@ -18,7 +18,7 @@ x-i18n:
 Aggiorna OpenClaw in modo sicuro e passa tra i canali stable/beta/dev.
 
 Se hai installato tramite **npm/pnpm/bun** (installazione globale, senza metadati git),
-gli aggiornamenti avvengono tramite il flusso del gestore pacchetti descritto in [Updating](/it/install/updating).
+gli aggiornamenti avvengono tramite il flusso del gestore di pacchetti in [Aggiornamento](/it/install/updating).
 
 ## Utilizzo
 
@@ -39,21 +39,21 @@ openclaw --update
 
 ## Opzioni
 
-- `--no-restart`: salta il riavvio del servizio Gateway dopo un aggiornamento riuscito.
-- `--channel <stable|beta|dev>`: imposta il canale di aggiornamento (git + npm; persistito in configurazione).
-- `--tag <dist-tag|version|spec>`: sostituisce la destinazione del pacchetto solo per questo aggiornamento. Per installazioni da pacchetto, `main` corrisponde a `github:openclaw/openclaw#main`.
-- `--dry-run`: mostra in anteprima le azioni di aggiornamento pianificate (canale/tag/destinazione/flusso di riavvio) senza scrivere configurazione, installare, sincronizzare Plugin o riavviare.
-- `--json`: stampa JSON `UpdateRunResult` leggibile dalle macchine, inclusi
-  `postUpdate.plugins.integrityDrifts` quando durante la sincronizzazione dei Plugin post-aggiornamento
-  viene rilevata una divergenza di integrità degli artefatti npm dei Plugin.
-- `--timeout <seconds>`: timeout per passaggio (il predefinito è 1200s).
+- `--no-restart`: salta il riavvio del servizio Gateway dopo un aggiornamento riuscito. Gli aggiornamenti tramite gestore di pacchetti che riavviano il Gateway verificano che il servizio riavviato riporti la versione aggiornata prevista prima che il comando abbia esito positivo.
+- `--channel <stable|beta|dev>`: imposta il canale di aggiornamento (git + npm; persistito nella configurazione).
+- `--tag <dist-tag|version|spec>`: sovrascrive il target del pacchetto solo per questo aggiornamento. Per le installazioni da pacchetto, `main` corrisponde a `github:openclaw/openclaw#main`.
+- `--dry-run`: mostra in anteprima le azioni di aggiornamento pianificate (canale/tag/target/flusso di riavvio) senza scrivere la configurazione, installare, sincronizzare i Plugin o riavviare.
+- `--json`: stampa JSON `UpdateRunResult` leggibile da macchina, inclusi
+  `postUpdate.plugins.integrityDrifts` quando viene rilevata una deriva di
+  integrità degli artifact dei plugin npm durante la sincronizzazione post-aggiornamento dei Plugin.
+- `--timeout <seconds>`: timeout per passaggio (il valore predefinito è 1800 s).
 - `--yes`: salta le richieste di conferma (per esempio la conferma del downgrade)
 
-Nota: i downgrade richiedono conferma perché le versioni più vecchie possono rompere la configurazione.
+Nota: i downgrade richiedono conferma perché le versioni meno recenti possono rompere la configurazione.
 
 ## `update status`
 
-Mostra il canale di aggiornamento attivo + tag/branch/SHA git (per i checkout del sorgente), oltre alla disponibilità di aggiornamenti.
+Mostra il canale di aggiornamento attivo + tag/branch/SHA git (per i checkout della sorgente), oltre alla disponibilità di aggiornamenti.
 
 ```bash
 openclaw update status
@@ -63,73 +63,77 @@ openclaw update status --timeout 10
 
 Opzioni:
 
-- `--json`: stampa JSON di stato leggibile dalle macchine.
-- `--timeout <seconds>`: timeout per i controlli (predefinito 3s).
+- `--json`: stampa JSON di stato leggibile da macchina.
+- `--timeout <seconds>`: timeout per i controlli (il valore predefinito è 3 s).
 
 ## `update wizard`
 
 Flusso interattivo per scegliere un canale di aggiornamento e confermare se riavviare il Gateway
-dopo l’aggiornamento (il comportamento predefinito è riavviare). Se selezioni `dev` senza un checkout git,
-viene offerta la possibilità di crearne uno.
+dopo l'aggiornamento (l'impostazione predefinita è riavviare). Se selezioni `dev` senza un checkout git,
+offre di crearne uno.
 
 Opzioni:
 
-- `--timeout <seconds>`: timeout per ogni passaggio dell’aggiornamento (predefinito `1200`)
+- `--timeout <seconds>`: timeout per ogni passaggio dell'aggiornamento (predefinito `1800`)
 
 ## Cosa fa
 
-Quando cambi esplicitamente canale (`--channel ...`), OpenClaw mantiene anche
+Quando cambi canale esplicitamente (`--channel ...`), OpenClaw mantiene anche
 allineato il metodo di installazione:
 
-- `dev` → garantisce un checkout git (predefinito: `~/openclaw`, sostituibile con `OPENCLAW_GIT_DIR`),
+- `dev` → garantisce un checkout git (predefinito: `~/openclaw`, sovrascrivibile con `OPENCLAW_GIT_DIR`),
   lo aggiorna e installa la CLI globale da quel checkout.
 - `stable` → installa da npm usando `latest`.
-- `beta` → preferisce il dist-tag npm `beta`, ma usa come fallback `latest` quando beta è
-  mancante o più vecchio dell’attuale release stable.
+- `beta` → preferisce il dist-tag npm `beta`, ma ripiega su `latest` quando `beta` è
+  assente o più vecchio della release stable corrente.
 
-L’auto-updater del core Gateway (quando abilitato tramite configurazione) riutilizza questo stesso percorso di aggiornamento.
+L'auto-updater del core Gateway (quando abilitato tramite configurazione) riutilizza questo stesso percorso di aggiornamento.
 
-Per le installazioni tramite gestore pacchetti, `openclaw update` risolve la versione
-del pacchetto di destinazione prima di invocare il gestore pacchetti. Se la versione installata
-corrisponde esattamente alla destinazione e non è necessario rendere persistente alcun cambio
-di canale di aggiornamento, il comando termina come saltato prima di installazione del pacchetto, sincronizzazione Plugin, refresh del completamento
-o riavvio del gateway.
+Per le installazioni tramite gestore di pacchetti, `openclaw update` risolve la
+versione target del pacchetto prima di invocare il gestore di pacchetti. Anche quando la versione installata
+corrisponde già al target, il comando aggiorna l'installazione globale del pacchetto,
+poi esegue la sincronizzazione dei Plugin, l'aggiornamento del completamento e il lavoro di riavvio. Questo mantiene allineati
+i sidecar pacchettizzati e i record dei Plugin posseduti dal canale con la build OpenClaw
+installata.
 
-## Flusso per checkout git
+## Flusso del checkout git
 
 Canali:
 
-- `stable`: effettua il checkout dell’ultimo tag non beta, poi build + doctor.
-- `beta`: preferisce l’ultimo tag `-beta`, ma usa come fallback l’ultimo tag stable
-  quando beta è mancante o più vecchio.
-- `dev`: effettua il checkout di `main`, poi fetch + rebase.
+- `stable`: esegue il checkout dell'ultimo tag non beta, poi build + doctor.
+- `beta`: preferisce l'ultimo tag `-beta`, ma ripiega sull'ultimo tag stable
+  quando `beta` è assente o più vecchio.
+- `dev`: esegue il checkout di `main`, poi fetch + rebase.
 
 Panoramica di alto livello:
 
-1. Richiede un worktree pulito (nessuna modifica non salvata nel commit).
+1. Richiede un worktree pulito (nessuna modifica non sottoposta a commit).
 2. Passa al canale selezionato (tag o branch).
-3. Esegue fetch dall’upstream (solo dev).
-4. Solo dev: esegue lint di preflight + build TypeScript in un worktree temporaneo; se la punta fallisce, torna indietro fino a 10 commit per trovare la build pulita più recente.
-5. Esegue rebase sul commit selezionato (solo dev).
-6. Installa le dipendenze con il gestore pacchetti del repository. Per i checkout pnpm, l’updater inizializza `pnpm` su richiesta (prima tramite `corepack`, poi con fallback temporaneo `npm install pnpm@10`) invece di eseguire `npm run build` dentro un workspace pnpm.
+3. Esegue fetch dell'upstream (solo dev).
+4. Solo dev: preflight lint + build TypeScript in un worktree temporaneo; se il tip fallisce, torna indietro fino a 10 commit per trovare la build pulita più recente.
+5. Esegue il rebase sul commit selezionato (solo dev).
+6. Installa le dipendenze con il gestore di pacchetti del repo. Per i checkout pnpm, l'updater esegue il bootstrap di `pnpm` on demand (prima tramite `corepack`, poi con fallback temporaneo `npm install pnpm@10`) invece di eseguire `npm run build` dentro un workspace pnpm.
 7. Esegue la build + la build della Control UI.
 8. Esegue `openclaw doctor` come controllo finale di “aggiornamento sicuro”.
-9. Sincronizza i Plugin con il canale attivo (dev usa Plugin inclusi; stable/beta usa npm) e aggiorna i Plugin installati tramite npm.
+9. Sincronizza i Plugin con il canale attivo (dev usa Plugin inclusi; stable/beta usa npm) e aggiorna i plugin installati tramite npm.
 
-Se un aggiornamento di un Plugin npm fissato a una versione esatta si risolve in un artefatto la cui integrità
-differisce dal record di installazione memorizzato, `openclaw update` interrompe quell’aggiornamento
-dell’artefatto del Plugin invece di installarlo. Reinstalla o aggiorna il Plugin
-esplicitamente solo dopo aver verificato che il nuovo artefatto sia affidabile.
+Se un aggiornamento esatto di un plugin npm fissato risolve a un artifact la cui integrità
+differisce dal record di installazione memorizzato, `openclaw update` interrompe
+quell'aggiornamento dell'artifact del plugin invece di installarlo. Reinstalla o aggiorna il Plugin
+esplicitamente solo dopo aver verificato di fidarti del nuovo artifact.
 
-Se l’inizializzazione di pnpm continua a fallire, l’updater ora si ferma prima con un errore specifico del gestore pacchetti invece di provare `npm run build` dentro il checkout.
+I fallimenti della sincronizzazione post-aggiornamento dei Plugin fanno fallire il risultato dell'aggiornamento e arrestano il lavoro di riavvio successivo. Correggi l'errore di installazione/aggiornamento del plugin, poi riesegui
+`openclaw update`.
+
+Se il bootstrap di pnpm continua a fallire, l'updater ora si ferma subito con un errore specifico del gestore di pacchetti invece di tentare `npm run build` nel checkout.
 
 ## Forma abbreviata `--update`
 
-`openclaw --update` viene riscritto come `openclaw update` (utile per shell e script launcher).
+`openclaw --update` viene riscritto come `openclaw update` (utile per shell e script di avvio).
 
 ## Correlati
 
-- `openclaw doctor` (propone di eseguire prima l’aggiornamento sui checkout git)
+- `openclaw doctor` (offre di eseguire prima l'aggiornamento sui checkout git)
 - [Canali di sviluppo](/it/install/development-channels)
-- [Updating](/it/install/updating)
+- [Aggiornamento](/it/install/updating)
 - [Riferimento CLI](/it/cli)

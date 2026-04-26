@@ -2,37 +2,37 @@
 read_when:
     - Configurazione del controllo di accesso ai messaggi diretti
     - Associare un nuovo Node iOS/Android
-    - Esaminare il livello di sicurezza di OpenClaw
-summary: 'Panoramica dell''associazione: approva chi può inviarti messaggi diretti + quali Node possono unirsi'
+    - Esaminare la postura di sicurezza di OpenClaw
+summary: 'Panoramica dell’associazione: approva chi può inviarti messaggi diretti + quali Node possono unirsi'
 title: Associazione
 x-i18n:
-    generated_at: "2026-04-25T13:41:43Z"
+    generated_at: "2026-04-26T11:24:02Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 8f11c992f7cbde12f8c6963279dbaea420941e2fc088179d3fd259e4aa007e34
+    source_hash: f9d28547baacce638347ce0062e3bc4f194704eb369b4ca45f7158d5e16cee93
     source_path: channels/pairing.md
     workflow: 15
 ---
 
-L'“associazione” è il passaggio esplicito di **approvazione del proprietario** di OpenClaw.
-Viene usata in due casi:
+“Associazione” è il passaggio esplicito di **approvazione del proprietario** di OpenClaw.
+Viene usata in due punti:
 
 1. **Associazione DM** (chi è autorizzato a parlare con il bot)
-2. **Associazione Node** (quali dispositivi/Node sono autorizzati a unirsi alla rete del gateway)
+2. **Associazione Node** (quali dispositivi/node sono autorizzati a unirsi alla rete Gateway)
 
-Contesto di sicurezza: [Sicurezza](/it/gateway/security)
+Contesto di sicurezza: [Security](/it/gateway/security)
 
-## 1) Associazione DM (accesso chat in entrata)
+## 1) Associazione DM (accesso alla chat in ingresso)
 
-Quando un canale è configurato con la policy DM `pairing`, i mittenti sconosciuti ricevono un codice breve e il loro messaggio **non viene elaborato** finché non lo approvi.
+Quando un canale è configurato con criterio DM `pairing`, i mittenti sconosciuti ricevono un codice breve e il loro messaggio **non viene elaborato** finché non lo approvi.
 
-Le policy DM predefinite sono documentate in: [Sicurezza](/it/gateway/security)
+I criteri DM predefiniti sono documentati in: [Security](/it/gateway/security)
 
 Codici di associazione:
 
 - 8 caratteri, maiuscoli, senza caratteri ambigui (`0O1I`).
-- **Scadono dopo 1 ora**. Il bot invia il messaggio di associazione solo quando viene creata una nuova richiesta (circa una volta all'ora per mittente).
-- Le richieste di associazione DM in sospeso sono limitate a **3 per canale** per impostazione predefinita; le richieste aggiuntive vengono ignorate finché una non scade o viene approvata.
+- **Scadono dopo 1 ora**. Il bot invia il messaggio di associazione solo quando viene creata una nuova richiesta (circa una volta all’ora per mittente).
+- Le richieste DM di associazione in sospeso sono limitate per impostazione predefinita a **3 per canale**; le richieste aggiuntive vengono ignorate finché una non scade o viene approvata.
 
 ### Approvare un mittente
 
@@ -48,48 +48,50 @@ Canali supportati: `bluebubbles`, `discord`, `feishu`, `googlechat`, `imessage`,
 Memorizzato in `~/.openclaw/credentials/`:
 
 - Richieste in sospeso: `<channel>-pairing.json`
-- Archivio allowlist approvata:
+- Archivio della allowlist approvata:
   - Account predefinito: `<channel>-allowFrom.json`
   - Account non predefinito: `<channel>-<accountId>-allowFrom.json`
 
-Comportamento dell'ambito account:
+Comportamento dell’ambito dell’account:
 
-- Gli account non predefiniti leggono/scrivono solo il proprio file allowlist con ambito.
-- L'account predefinito usa il file allowlist senza ambito del canale.
+- Gli account non predefiniti leggono/scrivono solo il proprio file di allowlist con ambito.
+- L’account predefinito usa il file di allowlist senza ambito relativo al canale.
 
-Considerali dati sensibili (controllano l'accesso al tuo assistente).
+Tratta questi file come sensibili (controllano l’accesso al tuo assistente).
 
-Importante: questo archivio è per l'accesso DM. L'autorizzazione dei gruppi è separata.
-Approvare un codice di associazione DM non consente automaticamente a quel mittente di eseguire comandi di gruppo o controllare il bot nei gruppi. Per l'accesso ai gruppi, configura le allowlist esplicite del canale per i gruppi (ad esempio `groupAllowFrom`, `groups` o override per gruppo/per topic a seconda del canale).
+Importante: questo archivio è per l’accesso DM. L’autorizzazione dei gruppi è separata.
+Approvare un codice di associazione DM non consente automaticamente a quel mittente di eseguire comandi di gruppo o controllare il bot nei gruppi. Per l’accesso ai gruppi, configura le allowlist esplicite del canale per i gruppi (ad esempio `groupAllowFrom`, `groups` o override per gruppo/per topic a seconda del canale).
 
-## 2) Associazione del dispositivo Node (Node iOS/Android/macOS/headless)
+## 2) Associazione del dispositivo Node (node iOS/Android/macOS/headless)
 
-I Node si connettono al Gateway come **dispositivi** con `role: node`. Il Gateway
+I Node si collegano al Gateway come **dispositivi** con `role: node`. Il Gateway
 crea una richiesta di associazione del dispositivo che deve essere approvata.
 
 ### Associare tramite Telegram (consigliato per iOS)
 
-Se usi il plugin `device-pair`, puoi eseguire la prima associazione del dispositivo interamente da Telegram:
+Se usi il Plugin `device-pair`, puoi effettuare la prima associazione del dispositivo interamente da Telegram:
 
 1. In Telegram, invia al tuo bot: `/pair`
 2. Il bot risponde con due messaggi: un messaggio di istruzioni e un messaggio separato con il **codice di configurazione** (facile da copiare/incollare in Telegram).
-3. Sul telefono, apri l'app iOS di OpenClaw → Impostazioni → Gateway.
+3. Sul tuo telefono, apri l’app OpenClaw per iOS → Impostazioni → Gateway.
 4. Incolla il codice di configurazione e connettiti.
-5. Torna in Telegram: `/pair pending` (controlla ID richiesta, ruolo e scope), quindi approva.
+5. Torna in Telegram: `/pair pending` (esamina gli ID delle richieste, il ruolo e gli scope), poi approva.
 
 Il codice di configurazione è un payload JSON codificato in base64 che contiene:
 
-- `url`: l'URL WebSocket del Gateway (`ws://...` o `wss://...`)
-- `bootstrapToken`: un token bootstrap a breve durata per singolo dispositivo usato per l'handshake iniziale di associazione
+- `url`: l’URL WebSocket del Gateway (`ws://...` o `wss://...`)
+- `bootstrapToken`: un token bootstrap a breve durata per singolo dispositivo usato per l’handshake iniziale di associazione
 
 Quel token bootstrap include il profilo bootstrap di associazione integrato:
 
 - il token `node` primario trasferito resta `scopes: []`
-- qualsiasi token `operator` trasferito resta limitato all'allowlist bootstrap:
+- qualsiasi token `operator` trasferito resta limitato alla allowlist bootstrap:
   `operator.approvals`, `operator.read`, `operator.talk.secrets`, `operator.write`
-- i controlli degli scope bootstrap hanno prefisso di ruolo, non un singolo pool piatto di scope:
-  le voci di scope operator soddisfano solo le richieste operator, e i ruoli non-operator
+- i controlli degli scope bootstrap hanno prefisso di ruolo, non un unico pool piatto di scope:
+  le voci di scope operator soddisfano solo richieste operator, e i ruoli non operator
   devono comunque richiedere scope sotto il proprio prefisso di ruolo
+- la successiva rotazione/revoca dei token resta limitata sia dal contratto di ruolo
+  approvato del dispositivo sia dagli scope operator della sessione chiamante
 
 Tratta il codice di configurazione come una password finché è valido.
 
@@ -101,18 +103,13 @@ openclaw devices approve <requestId>
 openclaw devices reject <requestId>
 ```
 
-Se lo stesso dispositivo riprova con dettagli di autenticazione diversi (ad esempio ruolo/scope/chiave pubblica diversi), la richiesta precedente in sospeso viene sostituita e viene creato un nuovo `requestId`.
+Se lo stesso dispositivo ritenta con dettagli di autenticazione diversi (ad esempio ruolo/scope/chiave pubblica differenti), la precedente richiesta in sospeso viene sostituita e viene creato un nuovo `requestId`.
 
-Importante: un dispositivo già associato non ottiene accesso più ampio in modo silenzioso. Se
-si riconnette chiedendo più scope o un ruolo più ampio, OpenClaw mantiene
-l'approvazione esistente così com'è e crea una nuova richiesta di upgrade in sospeso. Usa
-`openclaw devices list` per confrontare l'accesso attualmente approvato con il nuovo
-accesso richiesto prima di approvare.
+Importante: un dispositivo già associato non ottiene automaticamente un accesso più ampio. Se si ricollega richiedendo più scope o un ruolo più ampio, OpenClaw mantiene invariata l’approvazione esistente e crea una nuova richiesta di upgrade in sospeso. Usa `openclaw devices list` per confrontare l’accesso attualmente approvato con l’accesso appena richiesto prima di approvare.
 
-### Auto-approvazione facoltativa dei Node tramite CIDR attendibili
+### Auto-approvazione opzionale dei Node attendibili tramite CIDR
 
-L'associazione dei dispositivi resta manuale per impostazione predefinita. Per reti di Node strettamente controllate,
-puoi abilitare esplicitamente l'auto-approvazione iniziale dei Node con CIDR espliciti o IP esatti:
+L’associazione dei dispositivi resta manuale per impostazione predefinita. Per reti di Node strettamente controllate, puoi abilitare facoltativamente l’auto-approvazione al primo utilizzo dei Node con CIDR espliciti o IP esatti:
 
 ```json5
 {
@@ -126,10 +123,7 @@ puoi abilitare esplicitamente l'auto-approvazione iniziale dei Node con CIDR esp
 }
 ```
 
-Questo si applica solo a richieste nuove di associazione `role: node` senza
-scope richiesti. I client operator, browser, Control UI e WebChat richiedono comunque
-approvazione manuale. Le modifiche a ruolo, scope, metadati e chiave pubblica richiedono comunque
-approvazione manuale.
+Questo vale solo per richieste di associazione nuove `role: node` senza scope richiesti. I client operator, browser, Control UI e WebChat richiedono comunque approvazione manuale. Modifiche a ruolo, scope, metadati e chiave pubblica richiedono comunque approvazione manuale.
 
 ### Archiviazione dello stato di associazione dei Node
 
@@ -140,16 +134,13 @@ Memorizzato in `~/.openclaw/devices/`:
 
 ### Note
 
-- L'API legacy `node.pair.*` (CLI: `openclaw nodes pending|approve|reject|rename`) è un
-  archivio di associazione separato gestito dal gateway. I Node WS richiedono comunque l'associazione del dispositivo.
-- Il record di associazione è la fonte di verità persistente per i ruoli approvati. I
-  token attivi dei dispositivi restano limitati a quell'insieme di ruoli approvati; una voce di token isolata
-  al di fuori dei ruoli approvati non crea nuovo accesso.
+- La API legacy `node.pair.*` (CLI: `openclaw nodes pending|approve|reject|rename`) è un archivio di associazione separato di proprietà del gateway. I Node WS richiedono comunque l’associazione del dispositivo.
+- Il record di associazione è la fonte di verità durevole per i ruoli approvati. I token attivi del dispositivo restano limitati a quell’insieme di ruoli approvati; una voce token anomala al di fuori dei ruoli approvati non crea nuovo accesso.
 
 ## Documentazione correlata
 
-- Modello di sicurezza + prompt injection: [Sicurezza](/it/gateway/security)
-- Aggiornare in sicurezza (esegui doctor): [Aggiornamento](/it/install/updating)
+- Modello di sicurezza + prompt injection: [Security](/it/gateway/security)
+- Aggiornare in sicurezza (esegui doctor): [Updating](/it/install/updating)
 - Configurazioni dei canali:
   - Telegram: [Telegram](/it/channels/telegram)
   - WhatsApp: [WhatsApp](/it/channels/whatsapp)
