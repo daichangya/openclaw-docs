@@ -1,26 +1,26 @@
 ---
 read_when:
-    - 你想将 OpenClaw 的模型使用情况、消息流或会话指标发送到 OpenTelemetry 收集器
+    - 你想将 OpenClaw 模型使用情况、消息流或会话指标发送到 OpenTelemetry 收集器
     - 你正在将追踪、指标或日志接入 Grafana、Datadog、Honeycomb、New Relic、Tempo 或其他 OTLP 后端
-    - 你需要精确的指标名称、span 名称或属性结构来构建仪表板或告警
+    - 你需要确切的指标名称、span 名称或属性结构来构建仪表板或告警
 summary: 通过 diagnostics-otel 插件（OTLP/HTTP）将 OpenClaw 诊断数据导出到任意 OpenTelemetry 收集器
 title: OpenTelemetry 导出
 x-i18n:
-    generated_at: "2026-04-26T18:13:23Z"
+    generated_at: "2026-04-26T19:56:12Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1301b5d8e7852b8e94be3a5928b5075c0109a3f3879033e52efcd1a75098cac9
+    source_hash: 379e0cada90888a3703785147d62ebe418f48216169577443cc8c95dc2a9fff8
     source_path: gateway/opentelemetry.md
     workflow: 15
 ---
 
-OpenClaw 通过内置的 `diagnostics-otel` 插件，使用 **OTLP/HTTP（protobuf）** 导出诊断数据。任何接受 OTLP/HTTP 的收集器或后端都无需修改代码即可使用。关于本地文件日志以及如何读取它们，请参阅 [日志记录](/zh-CN/logging)。
+OpenClaw 通过内置的 `diagnostics-otel` 插件使用 **OTLP/HTTP（protobuf）** 导出诊断数据。任何接受 OTLP/HTTP 的收集器或后端都可以直接使用，无需修改代码。关于本地文件日志及其读取方式，请参见 [日志](/zh-CN/logging)。
 
-## 它是如何协同工作的
+## 工作原理
 
 - **诊断事件** 是由 Gateway 网关和内置插件发出的结构化进程内记录，用于模型运行、消息流、会话、队列和 exec。
 - **`diagnostics-otel` 插件** 订阅这些事件，并通过 OTLP/HTTP 将其导出为 OpenTelemetry **指标**、**追踪** 和 **日志**。
-- **提供商调用** 会从 OpenClaw 可信的模型调用 span 上下文接收一个 W3C `traceparent` 标头，前提是提供商传输支持自定义标头。插件发出的追踪上下文不会被传播。
+- 当提供商传输支持自定义请求头时，**提供商调用** 会从 OpenClaw 受信任的模型调用 span 上下文中接收一个 W3C `traceparent` 请求头。插件发出的追踪上下文不会被传播。
 - 只有在诊断功能面和插件都启用时，导出器才会附加，因此默认情况下进程内开销几乎为零。
 
 ## 快速开始
@@ -66,9 +66,9 @@ openclaw plugins enable diagnostics-otel
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **指标** | 用于 token 使用量、成本、运行时长、消息流、队列通道、会话状态、exec 和内存压力的计数器与直方图。 |
 | **追踪** | 用于模型使用、模型调用、harness 生命周期、工具执行、exec、webhook/消息处理、上下文组装和工具循环的 span。 |
-| **日志** | 当 `diagnostics.otel.logs` 启用时，通过 OTLP 导出的结构化 `logging.file` 记录。 |
+| **日志** | 当启用 `diagnostics.otel.logs` 时，通过 OTLP 导出的结构化 `logging.file` 记录。 |
 
-你可以独立切换 `traces`、`metrics` 和 `logs`。当 `diagnostics.otel.enabled` 为 true 时，这三者默认都开启。
+可以分别切换 `traces`、`metrics` 和 `logs`。当 `diagnostics.otel.enabled` 为 true 时，这三者默认都会开启。
 
 ## 配置参考
 
@@ -108,33 +108,34 @@ openclaw plugins enable diagnostics-otel
 | 变量 | 用途 |
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | 覆盖 `diagnostics.otel.endpoint`。如果该值已包含 `/v1/traces`、`/v1/metrics` 或 `/v1/logs`，则按原样使用。 |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` / `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` / `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | 当对应的 `diagnostics.otel.*Endpoint` 配置键未设置时，使用按信号划分的端点覆盖。按信号划分的配置优先于按信号划分的环境变量，后者又优先于共享端点。 |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` / `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` / `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | 当对应的 `diagnostics.otel.*Endpoint` 配置键未设置时，用作按信号区分的 endpoint 覆盖。按信号区分的配置优先于按信号区分的环境变量，后者优先于共享 endpoint。 |
 | `OTEL_SERVICE_NAME` | 覆盖 `diagnostics.otel.serviceName`。 |
-| `OTEL_EXPORTER_OTLP_PROTOCOL` | 覆盖线传输协议（当前仅 `http/protobuf` 会生效）。 |
-| `OTEL_SEMCONV_STABILITY_OPT_IN` | 设置为 `gen_ai_latest_experimental`，即可发出最新的实验性 GenAI span 属性 `gen_ai.provider.name`，而不是旧版的 `gen_ai.system`。无论如何，GenAI 指标始终使用有界的、低基数的语义属性。 |
-| `OPENCLAW_OTEL_PRELOADED` | 当其他预加载项或宿主进程已经注册了全局 OpenTelemetry SDK 时，将其设为 `1`。此时插件会跳过自身的 NodeSDK 生命周期，但仍会连接诊断监听器，并遵循 `traces`/`metrics`/`logs`。 |
+| `OTEL_EXPORTER_OTLP_PROTOCOL` | 覆盖线协议（当前仅 `http/protobuf` 会生效）。 |
+| `OTEL_SEMCONV_STABILITY_OPT_IN` | 设置为 `gen_ai_latest_experimental`，以发出最新的实验性 GenAI span 属性 `gen_ai.provider.name`，而不是旧版的 `gen_ai.system`。GenAI 指标始终使用有界、低基数的语义属性。 |
+| `OPENCLAW_OTEL_PRELOADED` | 当另一个预加载项或宿主进程已注册全局 OpenTelemetry SDK 时，将其设置为 `1`。这样插件会跳过自身的 NodeSDK 生命周期，但仍会连接诊断监听器并遵循 `traces`/`metrics`/`logs`。 |
 
-## 隐私与内容捕获
+## 隐私与内容采集
 
-默认情况下，原始模型/工具内容 **不会** 被导出。span 携带的是有界标识符（渠道、提供商、模型、错误类别、仅哈希的请求 ID），绝不会包含提示词文本、响应文本、工具输入、工具输出或会话键。
+默认**不会**导出原始模型/工具内容。span 携带的是有界标识符（渠道、提供商、模型、错误类别、仅哈希的请求 id），绝不包含提示词文本、响应文本、工具输入、工具输出或会话键。
 
-出站模型请求可能会包含一个 W3C `traceparent` 标头。该标头仅根据 OpenClaw 自有的、针对当前模型调用的诊断追踪上下文生成。现有的调用方提供的 `traceparent` 标头会被替换，因此插件或自定义提供商选项无法伪造跨服务追踪祖先关系。
+出站模型请求可能包含 W3C `traceparent` 请求头。该请求头仅根据 OpenClaw 自有的活动模型调用诊断追踪上下文生成。现有的调用方提供的 `traceparent` 请求头会被替换，因此插件或自定义提供商选项无法伪造跨服务追踪祖先关系。
 
-只有在你的收集器和保留策略已获批准可处理提示词、响应、工具或系统提示文本时，才将 `diagnostics.otel.captureContent.*` 设为 `true`。每个子键都需要独立选择启用：
+仅当你的收集器和保留策略已获准存储提示词、响应、工具或系统提示文本时，才将 `diagnostics.otel.captureContent.*` 设为 `true`。每个子键都需要单独选择加入：
 
 - `inputMessages` — 用户提示内容。
 - `outputMessages` — 模型响应内容。
 - `toolInputs` — 工具参数负载。
 - `toolOutputs` — 工具结果负载。
-- `systemPrompt` — 已组装的 system/developer 提示词。
+- `systemPrompt` — 组装后的 system/developer 提示词。
 
-当启用了任意子键时，模型和工具 span 将仅针对该类别附加有界、已脱敏的 `openclaw.content.*` 属性。
+当任一子键启用时，模型和工具 span 会仅针对该类内容附加有界、已脱敏的 `openclaw.content.*` 属性。
 
 ## 采样与刷新
 
 - **追踪：** `diagnostics.otel.sampleRate`（仅根 span，`0.0` 表示全部丢弃，`1.0` 表示全部保留）。
 - **指标：** `diagnostics.otel.flushIntervalMs`（最小值为 `1000`）。
-- **日志：** OTLP 日志遵循 `logging.level`（文件日志级别）。它们使用诊断日志记录脱敏路径，而不是控制台格式化。对于高流量安装，建议优先使用 OTLP 收集器采样/过滤，而非本地采样。
+- **日志：** OTLP 日志遵循 `logging.level`（文件日志级别）。它们使用诊断日志记录脱敏路径，而不是控制台格式化。高流量部署应优先使用 OTLP 收集器采样/过滤，而不是本地采样。
+- **文件日志关联：** 当日志调用携带有效的诊断追踪上下文时，JSONL 文件日志会包含顶层的 `traceId`、`spanId`、`parentSpanId` 和 `traceFlags`，这样日志处理器就可以将本地日志行与导出的 span 关联起来。
 
 ## 导出的指标
 
@@ -158,7 +159,7 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.message.delivery.started`（计数器，属性：`openclaw.channel`、`openclaw.delivery.kind`）
 - `openclaw.message.delivery.duration_ms`（直方图，属性：`openclaw.channel`、`openclaw.delivery.kind`、`openclaw.outcome`、`openclaw.errorCategory`）
 
-### 队列与会话
+### 队列和会话
 
 - `openclaw.queue.lane.enqueue`（计数器，属性：`openclaw.lane`）
 - `openclaw.queue.lane.dequeue`（计数器，属性：`openclaw.lane`）
@@ -171,7 +172,7 @@ openclaw plugins enable diagnostics-otel
 
 ### Harness 生命周期
 
-- `openclaw.harness.duration_ms`（直方图，属性：`openclaw.harness.id`、`openclaw.harness.plugin`、`openclaw.outcome`、错误时的 `openclaw.harness.phase`）
+- `openclaw.harness.duration_ms`（直方图，属性：`openclaw.harness.id`、`openclaw.harness.plugin`、`openclaw.outcome`，出错时还包括 `openclaw.harness.phase`）
 
 ### Exec
 
@@ -185,19 +186,19 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.tool.loop.iterations`（计数器，属性：`openclaw.toolName`、`openclaw.outcome`）
 - `openclaw.tool.loop.duration_ms`（直方图，属性：`openclaw.toolName`、`openclaw.outcome`）
 
-## 导出的 spans
+## 导出的 span
 
 - `openclaw.model.usage`
   - `openclaw.channel`、`openclaw.provider`、`openclaw.model`
   - `openclaw.tokens.*`（input/output/cache_read/cache_write/total）
-  - 默认使用 `gen_ai.system`，或者在选择启用最新 GenAI 语义约定时使用 `gen_ai.provider.name`
+  - 默认使用 `gen_ai.system`，或者在启用最新 GenAI 语义约定时使用 `gen_ai.provider.name`
   - `gen_ai.request.model`、`gen_ai.operation.name`、`gen_ai.usage.*`
 - `openclaw.run`
   - `openclaw.outcome`、`openclaw.channel`、`openclaw.provider`、`openclaw.model`、`openclaw.errorCategory`
 - `openclaw.model.call`
-  - 默认使用 `gen_ai.system`，或者在选择启用最新 GenAI 语义约定时使用 `gen_ai.provider.name`
+  - 默认使用 `gen_ai.system`，或者在启用最新 GenAI 语义约定时使用 `gen_ai.provider.name`
   - `gen_ai.request.model`、`gen_ai.operation.name`、`openclaw.provider`、`openclaw.model`、`openclaw.api`、`openclaw.transport`
-  - `openclaw.provider.request_id_hash`（上游提供商请求 ID 的有界、基于 SHA 的哈希；不会导出原始 ID）
+  - `openclaw.provider.request_id_hash`（上游提供商请求 id 的有界 SHA 哈希；不会导出原始 id）
 - `openclaw.harness.run`
   - `openclaw.harness.id`、`openclaw.harness.plugin`、`openclaw.outcome`、`openclaw.provider`、`openclaw.model`、`openclaw.channel`
   - 完成时：`openclaw.harness.result_classification`、`openclaw.harness.yield_detected`、`openclaw.harness.items.started`、`openclaw.harness.items.completed`、`openclaw.harness.items.active`
@@ -223,15 +224,15 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.memory.pressure`
   - `openclaw.memory.level`、`openclaw.memory.heap_used_bytes`、`openclaw.memory.rss_bytes`
 
-当显式启用内容捕获时，模型和工具 span 还可以包含针对你选择启用的特定内容类别的有界、已脱敏 `openclaw.content.*` 属性。
+当显式启用内容采集时，模型和工具 span 还可以包含你选择加入的特定内容类别对应的有界、已脱敏 `openclaw.content.*` 属性。
 
 ## 诊断事件目录
 
-下面的事件为上述指标和 span 提供基础。插件也可以直接订阅这些事件，而无需进行 OTLP 导出。
+下列事件为上述指标和 span 提供支撑。插件也可以在不进行 OTLP 导出的情况下直接订阅这些事件。
 
 **模型使用情况**
 
-- `model.usage` — token、成本、时长、上下文、提供商/模型/渠道、会话 ID。`usage` 是提供商/轮次级别的成本与遥测统计；`context.used` 是当前提示词/上下文快照，在涉及缓存输入或工具循环调用时，可能低于提供商的 `usage.total`。
+- `model.usage` — token、成本、时长、上下文、提供商/模型/渠道、会话 id。`usage` 是用于成本和遥测的提供商/轮次统计；`context.used` 是当前提示词/上下文快照，在涉及缓存输入或工具循环调用时，可能低于提供商的 `usage.total`。
 
 **消息流**
 
@@ -239,7 +240,7 @@ openclaw plugins enable diagnostics-otel
 - `message.queued` / `message.processed`
 - `message.delivery.started` / `message.delivery.completed` / `message.delivery.error`
 
-**队列与会话**
+**队列和会话**
 
 - `queue.lane.enqueue` / `queue.lane.dequeue`
 - `session.state` / `session.stuck`
@@ -248,7 +249,7 @@ openclaw plugins enable diagnostics-otel
 
 **Harness 生命周期**
 
-- `harness.run.started` / `harness.run.completed` / `harness.run.error` — 智能体 harness 的单次运行生命周期。包含 `harnessId`、可选的 `pluginId`、提供商/模型/渠道和运行 ID。完成事件会增加 `durationMs`、`outcome`、可选的 `resultClassification`、`yieldDetected` 和 `itemLifecycle` 计数。错误事件会增加 `phase`（`prepare`/`start`/`send`/`resolve`/`cleanup`）、`errorCategory` 和可选的 `cleanupFailed`。
+- `harness.run.started` / `harness.run.completed` / `harness.run.error` — 智能体 harness 的每次运行生命周期。包含 `harnessId`、可选的 `pluginId`、provider/model/channel 以及 run id。完成事件会新增 `durationMs`、`outcome`、可选的 `resultClassification`、`yieldDetected` 和 `itemLifecycle` 计数。错误事件会新增 `phase`（`prepare`/`start`/`send`/`resolve`/`cleanup`）、`errorCategory` 以及可选的 `cleanupFailed`。
 
 **Exec**
 
@@ -256,7 +257,7 @@ openclaw plugins enable diagnostics-otel
 
 ## 不使用导出器
 
-你可以在不运行 `diagnostics-otel` 的情况下，让诊断事件仍然可供插件或自定义 sink 使用：
+你可以在不运行 `diagnostics-otel` 的情况下，仍然让诊断事件可供插件或自定义接收端使用：
 
 ```json5
 {
@@ -264,7 +265,7 @@ openclaw plugins enable diagnostics-otel
 }
 ```
 
-如需定向调试输出而不提高 `logging.level`，请使用诊断标志。标志不区分大小写，并支持通配符（例如 `telegram.*` 或 `*`）：
+如果想在不提高 `logging.level` 的情况下输出定向调试信息，请使用诊断标志。标志不区分大小写，并支持通配符（例如 `telegram.*` 或 `*`）：
 
 ```json5
 {
@@ -278,7 +279,7 @@ openclaw plugins enable diagnostics-otel
 OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
 ```
 
-标志输出会写入标准日志文件（`logging.file`），并且仍会由 `logging.redactSensitive` 进行脱敏。完整指南：
+标志输出会进入标准日志文件（`logging.file`），并且仍会由 `logging.redactSensitive` 进行脱敏。完整指南：
 [诊断标志](/zh-CN/diagnostics/flags)。
 
 ## 禁用
@@ -289,12 +290,12 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
 }
 ```
 
-你也可以不把 `diagnostics-otel` 放入 `plugins.allow`，或者运行
+你也可以不在 `plugins.allow` 中加入 `diagnostics-otel`，或者运行
 `openclaw plugins disable diagnostics-otel`。
 
 ## 相关内容
 
-- [日志记录](/zh-CN/logging) — 文件日志、控制台输出、CLI tail 以及 Control UI 的日志标签页
+- [日志](/zh-CN/logging) — 文件日志、控制台输出、CLI tail，以及 Control UI 的日志标签页
 - [Gateway 网关日志内部机制](/zh-CN/gateway/logging) — WS 日志样式、子系统前缀和控制台捕获
 - [诊断标志](/zh-CN/diagnostics/flags) — 定向调试日志标志
 - [诊断导出](/zh-CN/gateway/diagnostics) — 面向运维的支持包工具（与 OTEL 导出分开）
