@@ -2,38 +2,39 @@
 read_when:
     - 更改日志输出或格式
     - 调试 CLI 或 Gateway 网关输出
-summary: 日志输出界面、文件日志、WS 日志样式和控制台格式
+summary: 日志输出面、文件日志、WS 日志样式，以及控制台格式化
 title: Gateway 网关日志
 x-i18n:
-    generated_at: "2026-04-25T23:50:19Z"
+    generated_at: "2026-04-26T06:01:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 706c9eb05f805057c2465cf00a4654dea81d53d24acb4b6fc63658bc959bc8ff
+    source_hash: c005cfc4cfe456b3734d3928a16c9cd131a2b465d46f2aba9c9c61db22dcc399
     source_path: gateway/logging.md
     workflow: 15
 ---
 
-# 日志
+# 日志记录
 
-如需查看面向用户的概览（CLI + Control UI + 配置），请参阅 [/logging](/zh-CN/logging)。
+如需面向用户的概览（CLI + Control UI + 配置），请参见 [/logging](/zh-CN/logging)。
 
-OpenClaw 有两个日志“输出界面”：
+OpenClaw 有两个日志“输出面”：
 
 - **控制台输出**（你在终端 / Debug UI 中看到的内容）。
-- **文件日志**（JSON 行），由 Gateway 网关日志记录器写入。
+- **文件日志**（JSON lines），由 Gateway 网关日志记录器写入。
 
 ## 基于文件的日志记录器
 
 - 默认滚动日志文件位于 `/tmp/openclaw/` 下（每天一个文件）：`openclaw-YYYY-MM-DD.log`
   - 日期使用 Gateway 网关主机的本地时区。
+- 活动日志文件会在达到 `logging.maxFileBytes` 时轮转（默认：100 MB），最多保留五个带编号的归档文件，然后继续写入新的活动文件。
 - 日志文件路径和级别可通过 `~/.openclaw/openclaw.json` 配置：
   - `logging.file`
   - `logging.level`
 
 文件格式为每行一个 JSON 对象。
 
-Control UI 的 Logs 标签页会通过 Gateway 网关跟踪此文件（`logs.tail`）。
-CLI 也可以执行同样的操作：
+Control UI 的 Logs 标签页通过 Gateway 网关跟随此文件（`logs.tail`）。
+CLI 也可以执行同样操作：
 
 ```bash
 openclaw logs --follow
@@ -42,15 +43,12 @@ openclaw logs --follow
 **详细模式与日志级别**
 
 - **文件日志** 仅由 `logging.level` 控制。
-- `--verbose` 只影响 **控制台详细程度**（以及 WS 日志样式）；它**不会**
-  提高文件日志级别。
-- 如需在文件日志中捕获仅详细模式可见的细节，请将 `logging.level` 设置为 `debug` 或
-  `trace`。
+- `--verbose` 只影响 **控制台详细程度**（以及 WS 日志样式）；它 **不会** 提高文件日志级别。
+- 若要在文件日志中捕获仅详细模式可见的细节，请将 `logging.level` 设为 `debug` 或 `trace`。
 
 ## 控制台捕获
 
-CLI 会捕获 `console.log/info/warn/error/debug/trace` 并将其写入文件日志，
-同时仍然输出到 stdout/stderr。
+CLI 会捕获 `console.log/info/warn/error/debug/trace` 并将其写入文件日志，同时仍然输出到 stdout/stderr。
 
 你可以通过以下方式独立调整控制台详细程度：
 
@@ -59,20 +57,19 @@ CLI 会捕获 `console.log/info/warn/error/debug/trace` 并将其写入文件日
 
 ## 工具摘要脱敏
 
-详细的工具摘要（例如 `🛠️ Exec: ...`）在进入
-控制台流之前，可以屏蔽敏感令牌。这**仅适用于工具**，不会更改文件日志。
+详细的工具摘要（例如 `🛠️ Exec: ...`）可以在进入控制台流之前屏蔽敏感令牌。这 **仅适用于工具**，不会更改文件日志。
 
-- `logging.redactSensitive`: `off` | `tools`（默认：`tools`）
-- `logging.redactPatterns`: 正则表达式字符串数组（覆盖默认值）
-  - 使用原始正则字符串（自动加上 `gi`），或者在需要自定义标志时使用 `/pattern/flags`。
-  - 匹配内容会被屏蔽：保留前 6 个字符 + 后 4 个字符（长度 >= 18），否则为 `***`。
-  - 默认规则涵盖常见的密钥赋值、CLI 标志、JSON 字段、bearer 标头、PEM 块以及常见令牌前缀。
+- `logging.redactSensitive`：`off` | `tools`（默认：`tools`）
+- `logging.redactPatterns`：正则表达式字符串数组（覆盖默认值）
+  - 使用原始正则字符串（自动加 `gi`），如果你需要自定义标志，也可以使用 `/pattern/flags`。
+  - 匹配结果会被屏蔽：保留前 6 个字符 + 后 4 个字符（长度 >= 18），否则为 `***`。
+  - 默认规则涵盖常见的密钥赋值、CLI 标志、JSON 字段、bearer 标头、PEM 块，以及常见的令牌前缀。
 
 ## Gateway 网关 WebSocket 日志
 
-Gateway 网关会以两种模式打印 WebSocket 协议日志：
+Gateway 网关以两种模式打印 WebSocket 协议日志：
 
-- **普通模式（不使用 `--verbose`）**：只打印“值得关注”的 RPC 结果：
+- **普通模式（不使用 `--verbose`）**：仅打印“重要”的 RPC 结果：
   - 错误（`ok=false`）
   - 慢调用（默认阈值：`>= 50ms`）
   - 解析错误
@@ -80,7 +77,7 @@ Gateway 网关会以两种模式打印 WebSocket 协议日志：
 
 ### WS 日志样式
 
-`openclaw gateway` 支持按 Gateway 网关设置样式切换：
+`openclaw gateway` 支持按 Gateway 网关切换样式：
 
 - `--ws-log auto`（默认）：普通模式经过优化；详细模式使用紧凑输出
 - `--ws-log compact`：详细模式下使用紧凑输出（配对的请求/响应）
@@ -90,37 +87,37 @@ Gateway 网关会以两种模式打印 WebSocket 协议日志：
 示例：
 
 ```bash
-# optimized (only errors/slow)
+# 优化模式（仅错误/慢调用）
 openclaw gateway
 
-# show all WS traffic (paired)
+# 显示所有 WS 流量（配对）
 openclaw gateway --verbose --ws-log compact
 
-# show all WS traffic (full meta)
+# 显示所有 WS 流量（完整元数据）
 openclaw gateway --verbose --ws-log full
 ```
 
 ## 控制台格式化（子系统日志）
 
-控制台格式化器**可感知 TTY**，并打印一致的带前缀行。
-子系统日志记录器会让输出保持分组且易于浏览。
+控制台格式化器 **可感知 TTY**，并输出一致且带前缀的行。
+子系统日志记录器会让输出保持分组且易于扫描。
 
 行为：
 
 - 每行都有 **子系统前缀**（例如 `[gateway]`、`[canvas]`、`[tailscale]`）
-- **子系统颜色**（每个子系统固定）以及级别着色
-- **当输出为 TTY 或环境看起来像丰富终端时启用颜色**（`TERM`/`COLORTERM`/`TERM_PROGRAM`），并遵循 `NO_COLOR`
-- **缩短的子系统前缀**：去掉前导 `gateway/` 和 `channels/`，保留最后 2 段（例如 `whatsapp/outbound`）
+- **子系统颜色**（每个子系统保持稳定）以及级别颜色
+- 当输出为 TTY 或环境看起来像富终端时启用 **颜色**（`TERM` / `COLORTERM` / `TERM_PROGRAM`），并遵循 `NO_COLOR`
+- **缩短的子系统前缀**：去掉前导 `gateway/` + `channels/`，保留最后 2 个段（例如 `whatsapp/outbound`）
 - **按子系统划分的子日志记录器**（自动前缀 + 结构化字段 `{ subsystem }`）
-- 用于 QR/UX 输出的 **`logRaw()`**（无前缀、无格式化）
+- 用于 QR / UX 输出的 **`logRaw()`**（无前缀、无格式化）
 - **控制台样式**（例如 `pretty | compact | json`）
-- **控制台日志级别** 与文件日志级别分离（当 `logging.level` 设置为 `debug`/`trace` 时，文件仍保留完整细节）
-- **WhatsApp 消息正文** 记录在 `debug` 级别（使用 `--verbose` 可查看）
+- **控制台日志级别** 与文件日志级别分离（当 `logging.level` 设为 `debug` / `trace` 时，文件仍保留完整细节）
+- **WhatsApp 消息正文** 以 `debug` 级别记录（使用 `--verbose` 可查看）
 
-这样可以在保持现有文件日志稳定的同时，让交互式输出更易于浏览。
+这样既能保持现有文件日志稳定，又能让交互式输出更易于扫描。
 
 ## 相关内容
 
-- [日志](/zh-CN/logging)
+- [日志记录](/zh-CN/logging)
 - [OpenTelemetry 导出](/zh-CN/gateway/opentelemetry)
 - [诊断导出](/zh-CN/gateway/diagnostics)
