@@ -1,28 +1,29 @@
 ---
 read_when: You want multiple isolated agents (workspaces + auth) in one gateway process.
+sidebarTitle: Multi-agent routing
 status: active
-summary: 'Маршрутизація мультиагентності: ізольовані агенти, облікові записи каналів і прив’язки'
-title: маршрутизація мультиагентності
+summary: 'Багатоагентна маршрутизація: ізольовані агенти, облікові записи каналів і прив’язки'
+title: Багатоагентна маршрутизація
 x-i18n:
-    generated_at: "2026-04-23T22:58:54Z"
+    generated_at: "2026-04-26T11:00:15Z"
     model: gpt-5.4
     provider: openai
-    source_hash: ef6f91c53a14bf92427f08243930e4aab50ac7853c9b22b0dbdbb853ea1a93d2
+    source_hash: 845149ac1076d4746cc5038bd4444c2fc6117710f724b8cabdc31dc9ef6abbe8
     source_path: concepts/multi-agent.md
     workflow: 15
 ---
 
-Запускайте кілька _ізольованих_ агентів — кожен із власним робочим простором, каталогом стану (`agentDir`) та історією сесій — а також кілька облікових записів каналів (наприклад, два WhatsApp) в одному запущеному Gateway. Вхідні повідомлення маршрутизуються до правильного агента через прив’язки.
+Запускайте кількох _ізольованих_ агентів — кожного з власним робочим простором, каталогом стану (`agentDir`) та історією сеансів — а також кілька облікових записів каналів (наприклад, два WhatsApp) в одному запущеному Gateway. Вхідні повідомлення маршрутизуються до потрібного агента через прив’язки.
 
-**Агент** тут — це повна область для окремої персони: файли робочого простору, профілі автентифікації, реєстр моделей і сховище сесій. `agentDir` — це каталог стану на диску, який містить цю конфігурацію для окремого агента за шляхом `~/.openclaw/agents/<agentId>/`. **Прив’язка** зіставляє обліковий запис каналу (наприклад, робочий простір Slack або номер WhatsApp) з одним із таких агентів.
+Тут **агент** — це повна область для окремої персони: файли робочого простору, профілі автентифікації, реєстр моделей і сховище сеансів. `agentDir` — це каталог стану на диску, у якому зберігається ця конфігурація агента за шляхом `~/.openclaw/agents/<agentId>/`. **Прив’язка** зіставляє обліковий запис каналу (наприклад, робочий простір Slack або номер WhatsApp) з одним із цих агентів.
 
 ## Що таке «один агент»?
 
 **Агент** — це повністю ізольований інтелект із власними:
 
 - **Робочим простором** (файли, AGENTS.md/SOUL.md/USER.md, локальні нотатки, правила персони).
-- **Каталогом стану** (`agentDir`) для профілів автентифікації, реєстру моделей і конфігурації окремого агента.
-- **Сховищем сесій** (історія чатів + стан маршрутизації) у `~/.openclaw/agents/<agentId>/sessions`.
+- **Каталогом стану** (`agentDir`) для профілів автентифікації, реєстру моделей і конфігурації агента.
+- **Сховищем сеансів** (історія чатів + стан маршрутизації) у `~/.openclaw/agents/<agentId>/sessions`.
 
 Профілі автентифікації є **окремими для кожного агента**. Кожен агент читає зі свого:
 
@@ -30,36 +31,42 @@ x-i18n:
 ~/.openclaw/agents/<agentId>/agent/auth-profiles.json
 ```
 
-`sessions_history` тут теж є безпечнішим шляхом для відновлення між сесіями: він повертає обмежене, очищене подання, а не сирий дамп транскрипту. Відновлення для помічника прибирає thinking-теги, шаблон `<relevant-memories>`, XML-пейлоади викликів інструментів у відкритому тексті (включно з `<tool_call>...</tool_call>`, `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` і обрізаними блоками викликів інструментів), понижений шаблон викликів інструментів, витеклі ASCII/повноширинні керівні токени моделі та некоректний XML викликів інструментів MiniMax перед редагуванням/обрізанням.
+<Note>
+`sessions_history` тут також є безпечнішим шляхом для пригадування між сеансами: він повертає обмежене, очищене подання, а не необроблений дамп стенограми. Пригадування асистента прибирає теги мислення, каркас `<relevant-memories>`, XML-навантаження викликів інструментів у звичайному тексті (включно з `<tool_call>...</tool_call>`, `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>` і обрізаними блоками викликів інструментів), знижений до звичайного тексту каркас викликів інструментів, витіклі ASCII/повноширинні токени керування моделлю та некоректний XML викликів інструментів MiniMax до редагування/обрізання.
+</Note>
 
-Облікові дані основного агента **не** спільні автоматично. Ніколи не використовуйте `agentDir` повторно для кількох агентів (це спричиняє конфлікти автентифікації/сесій). Якщо ви хочете поділитися обліковими даними, скопіюйте `auth-profiles.json` до `agentDir` іншого агента.
+<Warning>
+Облікові дані основного агента **не** надаються спільно автоматично. Ніколи не використовуйте один `agentDir` для кількох агентів повторно (це спричиняє конфлікти автентифікації/сеансів). Якщо ви хочете поділитися обліковими даними, скопіюйте `auth-profiles.json` до `agentDir` іншого агента.
+</Warning>
 
-Skills завантажуються з робочого простору кожного агента, а також зі спільних коренів, таких як `~/.openclaw/skills`, а потім фільтруються за ефективним allowlist Skills агента, якщо його налаштовано. Використовуйте `agents.defaults.skills` для спільної базової конфігурації та `agents.list[].skills` для заміни на рівні агента. Див. [Skills: per-agent vs shared](/uk/tools/skills#per-agent-vs-shared-skills) і [Skills: agent skill allowlists](/uk/tools/skills#agent-skill-allowlists).
+Skills завантажуються з робочого простору кожного агента, а також зі спільних кореневих каталогів, таких як `~/.openclaw/skills`, а потім фільтруються ефективним списком дозволених Skills агента, якщо його налаштовано. Використовуйте `agents.defaults.skills` для спільної базової конфігурації та `agents.list[].skills` для заміни на рівні окремого агента. Див. [Skills: для агента чи спільні](/uk/tools/skills#per-agent-vs-shared-skills) і [Skills: списки дозволених Skills агента](/uk/tools/skills#agent-skill-allowlists).
 
-Gateway може розміщувати **одного агента** (за замовчуванням) або **багатьох агентів** паралельно.
+Gateway може розміщувати **одного агента** (типово) або **багатьох агентів** паралельно.
 
-**Примітка щодо робочого простору:** робочий простір кожного агента є **cwd за замовчуванням**, а не жорсткою пісочницею. Відносні шляхи розв’язуються в межах робочого простору, але абсолютні шляхи можуть досягати інших розташувань на хості, якщо пісочницю не ввімкнено. Див. [Sandboxing](/uk/gateway/sandboxing).
+<Note>
+**Примітка щодо робочого простору:** робочий простір кожного агента є **типовим cwd**, а не жорсткою пісочницею. Відносні шляхи розв’язуються всередині робочого простору, але абсолютні шляхи можуть досягати інших розташувань хоста, якщо пісочницю не ввімкнено. Див. [Ізоляція в пісочниці](/uk/gateway/sandboxing).
+</Note>
 
 ## Шляхи (швидка схема)
 
 - Конфігурація: `~/.openclaw/openclaw.json` (або `OPENCLAW_CONFIG_PATH`)
 - Каталог стану: `~/.openclaw` (або `OPENCLAW_STATE_DIR`)
 - Робочий простір: `~/.openclaw/workspace` (або `~/.openclaw/workspace-<agentId>`)
-- Agent dir: `~/.openclaw/agents/<agentId>/agent` (або `agents.list[].agentDir`)
-- Сесії: `~/.openclaw/agents/<agentId>/sessions`
+- Каталог агента: `~/.openclaw/agents/<agentId>/agent` (або `agents.list[].agentDir`)
+- Сеанси: `~/.openclaw/agents/<agentId>/sessions`
 
-### Режим одного агента (за замовчуванням)
+### Режим одного агента (типовий)
 
-Якщо ви нічого не робите, OpenClaw запускає одного агента:
+Якщо нічого не робити, OpenClaw запускає одного агента:
 
-- `agentId` за замовчуванням має значення **`main`**.
-- Сесії мають ключі у форматі `agent:main:<mainKey>`.
-- Робочий простір за замовчуванням — `~/.openclaw/workspace` (або `~/.openclaw/workspace-<profile>`, якщо встановлено `OPENCLAW_PROFILE`).
-- Стан за замовчуванням — `~/.openclaw/agents/main/agent`.
+- `agentId` типово дорівнює **`main`**.
+- Сеанси мають ключі у форматі `agent:main:<mainKey>`.
+- Робочий простір типово `~/.openclaw/workspace` (або `~/.openclaw/workspace-<profile>`, коли задано `OPENCLAW_PROFILE`).
+- Стан типово `~/.openclaw/agents/main/agent`.
 
-## Помічник агента
+## Помічник для агентів
 
-Скористайтеся майстром агентів, щоб додати нового ізольованого агента:
+Використовуйте майстер агентів, щоб додати нового ізольованого агента:
 
 ```bash
 openclaw agents add work
@@ -77,64 +84,55 @@ openclaw agents list --bindings
 
 <Steps>
   <Step title="Створіть робочий простір для кожного агента">
+    Використайте майстер або створіть робочі простори вручну:
 
-Скористайтеся майстром або створіть робочі простори вручну:
+    ```bash
+    openclaw agents add coding
+    openclaw agents add social
+    ```
 
-```bash
-openclaw agents add coding
-openclaw agents add social
-```
-
-Кожен агент отримує власний робочий простір із `SOUL.md`, `AGENTS.md` і необов’язковим `USER.md`, а також окремий `agentDir` і сховище сесій у `~/.openclaw/agents/<agentId>`.
+    Кожен агент отримує власний робочий простір із `SOUL.md`, `AGENTS.md` та необов’язковим `USER.md`, а також окремий `agentDir` і сховище сеансів у `~/.openclaw/agents/<agentId>`.
 
   </Step>
-
   <Step title="Створіть облікові записи каналів">
+    Створіть по одному обліковому запису на агента у вибраних каналах:
 
-Створіть по одному обліковому запису на агента в бажаних каналах:
+    - Discord: один бот на агента, увімкніть Message Content Intent, скопіюйте кожен токен.
+    - Telegram: один бот на агента через BotFather, скопіюйте кожен токен.
+    - WhatsApp: прив’яжіть кожен номер телефону до окремого облікового запису.
 
-- Discord: по одному боту на агента, увімкніть Message Content Intent, скопіюйте кожен токен.
-- Telegram: по одному боту на агента через BotFather, скопіюйте кожен токен.
-- WhatsApp: прив’яжіть кожен номер телефону до окремого облікового запису.
+    ```bash
+    openclaw channels login --channel whatsapp --account work
+    ```
 
-```bash
-openclaw channels login --channel whatsapp --account work
-```
-
-Див. посібники з каналів: [Discord](/uk/channels/discord), [Telegram](/uk/channels/telegram), [WhatsApp](/uk/channels/whatsapp).
+    Див. посібники для каналів: [Discord](/uk/channels/discord), [Telegram](/uk/channels/telegram), [WhatsApp](/uk/channels/whatsapp).
 
   </Step>
-
   <Step title="Додайте агентів, облікові записи та прив’язки">
-
-Додайте агентів до `agents.list`, облікові записи каналів до `channels.<channel>.accounts` і з’єднайте їх через `bindings` (приклади нижче).
-
+    Додайте агентів до `agents.list`, облікові записи каналів до `channels.<channel>.accounts` і з’єднайте їх за допомогою `bindings` (приклади нижче).
   </Step>
-
   <Step title="Перезапустіть і перевірте">
-
-```bash
-openclaw gateway restart
-openclaw agents list --bindings
-openclaw channels status --probe
-```
-
+    ```bash
+    openclaw gateway restart
+    openclaw agents list --bindings
+    openclaw channels status --probe
+    ```
   </Step>
 </Steps>
 
 ## Кілька агентів = кілька людей, кілька особистостей
 
-У разі **кількох агентів** кожен `agentId` стає **повністю ізольованою персоною**:
+З **кількома агентами** кожен `agentId` стає **повністю ізольованою персоною**:
 
-- **Різні номери телефонів/облікові записи** (для кожного каналу `accountId`).
-- **Різні особистості** (через файли робочого простору окремого агента, такі як `AGENTS.md` і `SOUL.md`).
-- **Окремі автентифікація й сесії** (без перетину, якщо це не ввімкнено явно).
+- **Різні номери телефонів/облікові записи** (через `accountId` для кожного каналу).
+- **Різні особистості** (через файли робочого простору агента, як-от `AGENTS.md` і `SOUL.md`).
+- **Окрема автентифікація + сеанси** (без перетину, якщо це явно не ввімкнено).
 
-Це дозволяє **кільком людям** спільно використовувати один сервер Gateway, зберігаючи ізоляцію їхніх AI-«мозків» і даних.
+Це дає змогу **кільком людям** спільно використовувати один сервер Gateway, зберігаючи ізоляцію їхніх AI-«інтелектів» і даних.
 
 ## Пошук у пам’яті QMD між агентами
 
-Якщо один агент має виконувати пошук у транскриптах сесій QMD іншого агента, додайте додаткові колекції в `agents.list[].memorySearch.qmd.extraCollections`. Використовуйте `agents.defaults.memorySearch.qmd.extraCollections` лише тоді, коли всі агенти мають успадковувати однакові спільні колекції транскриптів.
+Якщо один агент має шукати в QMD-стенограмах сеансів іншого агента, додайте додаткові колекції в `agents.list[].memorySearch.qmd.extraCollections`. Використовуйте `agents.defaults.memorySearch.qmd.extraCollections` лише тоді, коли кожен агент має успадковувати той самий спільний набір колекцій стенограм.
 
 ```json5
 {
@@ -153,7 +151,7 @@ openclaw channels status --probe
         workspace: "~/workspaces/main",
         memorySearch: {
           qmd: {
-            extraCollections: [{ path: "notes" }], // розв’язується в межах робочого простору -> колекція з назвою "notes-main"
+            extraCollections: [{ path: "notes" }], // розв’язується всередині робочого простору -> колекція з назвою "notes-main"
           },
         },
       },
@@ -167,13 +165,15 @@ openclaw channels status --probe
 }
 ```
 
-Шлях до додаткової колекції може бути спільним для агентів, але назва колекції залишається явною, якщо шлях лежить поза робочим простором агента. Шляхи в межах робочого простору залишаються прив’язаними до агента, тож кожен агент зберігає власний набір пошуку за транскриптами.
+Шлях до додаткової колекції може бути спільним для кількох агентів, але назва колекції залишається явною, коли шлях розташований поза робочим простором агента. Шляхи всередині робочого простору залишаються в області агента, тож кожен агент зберігає власний набір для пошуку в стенограмах.
 
 ## Один номер WhatsApp, кілька людей (розподіл DM)
 
-Ви можете маршрутизувати **різні WhatsApp DM** до різних агентів, залишаючись в межах **одного облікового запису WhatsApp**. Відповідність виконується за E.164 відправника (наприклад, `+15551234567`) із `peer.kind: "direct"`. Відповіді все одно надходитимуть з того самого номера WhatsApp (без окремої ідентичності відправника для агента).
+Ви можете маршрутизувати **різні DM у WhatsApp** до різних агентів, залишаючись в межах **одного облікового запису WhatsApp**. Зіставлення виконується за E.164 відправника (наприклад, `+15551234567`) з `peer.kind: "direct"`. Відповіді все одно надходитимуть з того самого номера WhatsApp (без окремої ідентичності відправника для кожного агента).
 
-Важлива деталь: прямі чати згортаються до **основного ключа сесії** агента, тому справжня ізоляція вимагає **одного агента на людину**.
+<Note>
+Прямі чати зводяться до **основного ключа сеансу** агента, тож справжня ізоляція вимагає **одного агента на людину**.
+</Note>
 
 Приклад:
 
@@ -206,38 +206,59 @@ openclaw channels status --probe
 
 Примітки:
 
-- Керування доступом до DM є **глобальним для кожного облікового запису WhatsApp** (pairing/allowlist), а не окремим для кожного агента.
-- Для спільних груп прив’яжіть групу до одного агента або використовуйте [Broadcast groups](/uk/channels/broadcast-groups).
+- Керування доступом до DM є **глобальним для кожного облікового запису WhatsApp** (спарювання/список дозволених), а не на рівні агента.
+- Для спільних груп прив’яжіть групу до одного агента або використовуйте [Групи мовлення](/uk/channels/broadcast-groups).
 
 ## Правила маршрутизації (як повідомлення вибирають агента)
 
-Прив’язки є **детермінованими**, і **найбільш специфічна має пріоритет**:
+Прив’язки є **детермінованими**, і **перемагає найспецифічніше зіставлення**:
 
-1. відповідність `peer` (точний id DM/групи/каналу)
-2. відповідність `parentPeer` (успадкування треду)
-3. `guildId + roles` (маршрутизація за ролями Discord)
-4. `guildId` (Discord)
-5. `teamId` (Slack)
-6. відповідність `accountId` для каналу
-7. відповідність на рівні каналу (`accountId: "*"`)
-8. повернення до агента за замовчуванням (`agents.list[].default`, інакше перший запис у списку, за замовчуванням: `main`)
+<Steps>
+  <Step title="збіг peer">
+    Точний id DM/групи/каналу.
+  </Step>
+  <Step title="збіг parentPeer">
+    Успадкування потоку.
+  </Step>
+  <Step title="guildId + roles">
+    Маршрутизація Discord за ролями.
+  </Step>
+  <Step title="guildId">
+    Discord.
+  </Step>
+  <Step title="teamId">
+    Slack.
+  </Step>
+  <Step title="збіг accountId для каналу">
+    Резервний варіант для окремого облікового запису.
+  </Step>
+  <Step title="Збіг на рівні каналу">
+    `accountId: "*"`.
+  </Step>
+  <Step title="Типовий агент">
+    Резервний варіант — `agents.list[].default`, інакше перший елемент списку, типово: `main`.
+  </Step>
+</Steps>
 
-Якщо кілька прив’язок збігаються в межах одного рівня, перемагає перша за порядком у конфігурації.
-Якщо прив’язка задає кілька полів відповідності (наприклад, `peer` + `guildId`), усі вказані поля є обов’язковими (семантика `AND`).
-
-Важлива деталь щодо області облікового запису:
-
-- Прив’язка без `accountId` відповідає лише обліковому запису за замовчуванням.
-- Використовуйте `accountId: "*"` для резервного варіанта на рівні каналу для всіх облікових записів.
-- Якщо ви пізніше додасте таку саму прив’язку для того самого агента з явним id облікового запису, OpenClaw оновить наявну прив’язку лише на рівні каналу до області облікового запису замість створення дубліката.
+<AccordionGroup>
+  <Accordion title="Розв’язання нічиїх і семантика AND">
+    - Якщо кілька прив’язок збігаються в межах одного рівня, перемагає перша за порядком у конфігурації.
+    - Якщо прив’язка задає кілька полів зіставлення (наприклад, `peer` + `guildId`), потрібні всі вказані поля (семантика `AND`).
+  </Accordion>
+  <Accordion title="Деталі області дії облікового запису">
+    - Прив’язка без `accountId` збігається лише з типовим обліковим записом.
+    - Використовуйте `accountId: "*"` для резервного варіанта на рівні каналу для всіх облікових записів.
+    - Якщо пізніше ви додасте таку саму прив’язку для того самого агента з явним id облікового запису, OpenClaw оновить наявну прив’язку лише на рівні каналу до прив’язки в області облікового запису замість дублювання.
+  </Accordion>
+</AccordionGroup>
 
 ## Кілька облікових записів / номерів телефонів
 
-Канали, які підтримують **кілька облікових записів** (наприклад, WhatsApp), використовують `accountId` для ідентифікації кожного входу. Кожен `accountId` можна маршрутизувати до іншого агента, тому один сервер може розміщувати кілька номерів телефонів без змішування сесій.
+Канали, що підтримують **кілька облікових записів** (наприклад, WhatsApp), використовують `accountId` для ідентифікації кожного входу. Кожен `accountId` можна спрямувати до іншого агента, тож один сервер може обслуговувати кілька номерів телефонів без змішування сеансів.
 
-Якщо вам потрібен обліковий запис каналу за замовчуванням, коли `accountId` не вказано, установіть `channels.<channel>.defaultAccount` (необов’язково). Якщо його не задано, OpenClaw використовує `default`, якщо він є, інакше — перший налаштований id облікового запису (у відсортованому порядку).
+Якщо ви хочете мати типовий обліковий запис для всього каналу, коли `accountId` опущено, задайте `channels.<channel>.defaultAccount` (необов’язково). Якщо його не задано, OpenClaw використовує `default`, якщо він є, інакше — перший налаштований id облікового запису (відсортований).
 
-Поширені канали, які підтримують цей шаблон:
+Поширені канали, що підтримують цей шаблон:
 
 - `whatsapp`, `telegram`, `discord`, `slack`, `signal`, `imessage`
 - `irc`, `line`, `googlechat`, `mattermost`, `matrix`, `nextcloud-talk`
@@ -245,294 +266,298 @@ openclaw channels status --probe
 
 ## Поняття
 
-- `agentId`: один «мозок» (робочий простір, окрема автентифікація агента, окреме сховище сесій агента).
+- `agentId`: один «інтелект» (робочий простір, автентифікація агента, сховище сеансів агента).
 - `accountId`: один екземпляр облікового запису каналу (наприклад, обліковий запис WhatsApp `"personal"` проти `"biz"`).
 - `binding`: маршрутизує вхідні повідомлення до `agentId` за `(channel, accountId, peer)` і, за потреби, за id guild/team.
-- Прямі чати згортаються до `agent:<agentId>:<mainKey>` (основний ключ на агента; `session.mainKey`).
+- Прямі чати зводяться до `agent:<agentId>:<mainKey>` (основний сеанс агента; `session.mainKey`).
 
 ## Приклади для платформ
 
-### Боти Discord для кожного агента
+<AccordionGroup>
+  <Accordion title="Discord-боти для кожного агента">
+    Кожен обліковий запис Discord-бота зіставляється з унікальним `accountId`. Прив’яжіть кожен обліковий запис до агента та підтримуйте списки дозволених окремо для кожного бота.
 
-Кожен обліковий запис бота Discord зіставляється з унікальним `accountId`. Прив’яжіть кожен обліковий запис до агента та зберігайте allowlist окремо для кожного бота.
-
-```json5
-{
-  agents: {
-    list: [
-      { id: "main", workspace: "~/.openclaw/workspace-main" },
-      { id: "coding", workspace: "~/.openclaw/workspace-coding" },
-    ],
-  },
-  bindings: [
-    { agentId: "main", match: { channel: "discord", accountId: "default" } },
-    { agentId: "coding", match: { channel: "discord", accountId: "coding" } },
-  ],
-  channels: {
-    discord: {
-      groupPolicy: "allowlist",
-      accounts: {
-        default: {
-          token: "DISCORD_BOT_TOKEN_MAIN",
-          guilds: {
-            "123456789012345678": {
-              channels: {
-                "222222222222222222": { allow: true, requireMention: false },
+    ```json5
+    {
+      agents: {
+        list: [
+          { id: "main", workspace: "~/.openclaw/workspace-main" },
+          { id: "coding", workspace: "~/.openclaw/workspace-coding" },
+        ],
+      },
+      bindings: [
+        { agentId: "main", match: { channel: "discord", accountId: "default" } },
+        { agentId: "coding", match: { channel: "discord", accountId: "coding" } },
+      ],
+      channels: {
+        discord: {
+          groupPolicy: "allowlist",
+          accounts: {
+            default: {
+              token: "DISCORD_BOT_TOKEN_MAIN",
+              guilds: {
+                "123456789012345678": {
+                  channels: {
+                    "222222222222222222": { allow: true, requireMention: false },
+                  },
+                },
+              },
+            },
+            coding: {
+              token: "DISCORD_BOT_TOKEN_CODING",
+              guilds: {
+                "123456789012345678": {
+                  channels: {
+                    "333333333333333333": { allow: true, requireMention: false },
+                  },
+                },
               },
             },
           },
         },
-        coding: {
-          token: "DISCORD_BOT_TOKEN_CODING",
-          guilds: {
-            "123456789012345678": {
-              channels: {
-                "333333333333333333": { allow: true, requireMention: false },
-              },
+      },
+    }
+    ```
+
+    - Запросіть кожного бота до guild і ввімкніть Message Content Intent.
+    - Токени зберігаються в `channels.discord.accounts.<id>.token` (типовий обліковий запис може використовувати `DISCORD_BOT_TOKEN`).
+
+  </Accordion>
+  <Accordion title="Telegram-боти для кожного агента">
+    ```json5
+    {
+      agents: {
+        list: [
+          { id: "main", workspace: "~/.openclaw/workspace-main" },
+          { id: "alerts", workspace: "~/.openclaw/workspace-alerts" },
+        ],
+      },
+      bindings: [
+        { agentId: "main", match: { channel: "telegram", accountId: "default" } },
+        { agentId: "alerts", match: { channel: "telegram", accountId: "alerts" } },
+      ],
+      channels: {
+        telegram: {
+          accounts: {
+            default: {
+              botToken: "123456:ABC...",
+              dmPolicy: "pairing",
+            },
+            alerts: {
+              botToken: "987654:XYZ...",
+              dmPolicy: "allowlist",
+              allowFrom: ["tg:123456789"],
             },
           },
         },
       },
-    },
-  },
-}
-```
+    }
+    ```
 
-Примітки:
+    - Створіть по одному боту на агента через BotFather і скопіюйте кожен токен.
+    - Токени зберігаються в `channels.telegram.accounts.<id>.botToken` (типовий обліковий запис може використовувати `TELEGRAM_BOT_TOKEN`).
 
-- Запросіть кожного бота до guild і ввімкніть Message Content Intent.
-- Токени зберігаються в `channels.discord.accounts.<id>.token` (обліковий запис за замовчуванням може використовувати `DISCORD_BOT_TOKEN`).
+  </Accordion>
+  <Accordion title="Номери WhatsApp для кожного агента">
+    Прив’яжіть кожен обліковий запис перед запуском Gateway:
 
-### Боти Telegram для кожного агента
+    ```bash
+    openclaw channels login --channel whatsapp --account personal
+    openclaw channels login --channel whatsapp --account biz
+    ```
 
-```json5
-{
-  agents: {
-    list: [
-      { id: "main", workspace: "~/.openclaw/workspace-main" },
-      { id: "alerts", workspace: "~/.openclaw/workspace-alerts" },
-    ],
-  },
-  bindings: [
-    { agentId: "main", match: { channel: "telegram", accountId: "default" } },
-    { agentId: "alerts", match: { channel: "telegram", accountId: "alerts" } },
-  ],
-  channels: {
-    telegram: {
-      accounts: {
-        default: {
-          botToken: "123456:ABC...",
-          dmPolicy: "pairing",
-        },
-        alerts: {
-          botToken: "987654:XYZ...",
-          dmPolicy: "allowlist",
-          allowFrom: ["tg:123456789"],
-        },
-      },
-    },
-  },
-}
-```
+    `~/.openclaw/openclaw.json` (JSON5):
 
-Примітки:
-
-- Створіть по одному боту на агента через BotFather і скопіюйте кожен токен.
-- Токени зберігаються в `channels.telegram.accounts.<id>.botToken` (обліковий запис за замовчуванням може використовувати `TELEGRAM_BOT_TOKEN`).
-
-### Номери WhatsApp для кожного агента
-
-Прив’яжіть кожен обліковий запис перед запуском Gateway:
-
-```bash
-openclaw channels login --channel whatsapp --account personal
-openclaw channels login --channel whatsapp --account biz
-```
-
-`~/.openclaw/openclaw.json` (JSON5):
-
-```js
-{
-  agents: {
-    list: [
-      {
-        id: "home",
-        default: true,
-        name: "Home",
-        workspace: "~/.openclaw/workspace-home",
-        agentDir: "~/.openclaw/agents/home/agent",
-      },
-      {
-        id: "work",
-        name: "Work",
-        workspace: "~/.openclaw/workspace-work",
-        agentDir: "~/.openclaw/agents/work/agent",
-      },
-    ],
-  },
-
-  // Детермінована маршрутизація: перший збіг перемагає (спочатку найспецифічніші).
-  bindings: [
-    { agentId: "home", match: { channel: "whatsapp", accountId: "personal" } },
-    { agentId: "work", match: { channel: "whatsapp", accountId: "biz" } },
-
-    // Необов’язкове перевизначення для конкретного peer (приклад: надсилати певну групу агенту work).
+    ```js
     {
-      agentId: "work",
-      match: {
-        channel: "whatsapp",
-        accountId: "personal",
-        peer: { kind: "group", id: "1203630...@g.us" },
+      agents: {
+        list: [
+          {
+            id: "home",
+            default: true,
+            name: "Home",
+            workspace: "~/.openclaw/workspace-home",
+            agentDir: "~/.openclaw/agents/home/agent",
+          },
+          {
+            id: "work",
+            name: "Work",
+            workspace: "~/.openclaw/workspace-work",
+            agentDir: "~/.openclaw/agents/work/agent",
+          },
+        ],
       },
-    },
-  ],
 
-  // Вимкнено за замовчуванням: обмін повідомленнями між агентами має бути явно ввімкнений + доданий до allowlist.
-  tools: {
-    agentToAgent: {
-      enabled: false,
-      allow: ["home", "work"],
-    },
-  },
+      // Детермінована маршрутизація: перший збіг перемагає (спочатку найспецифічніші).
+      bindings: [
+        { agentId: "home", match: { channel: "whatsapp", accountId: "personal" } },
+        { agentId: "work", match: { channel: "whatsapp", accountId: "biz" } },
 
-  channels: {
-    whatsapp: {
-      accounts: {
-        personal: {
-          // Необов’язкове перевизначення. За замовчуванням: ~/.openclaw/credentials/whatsapp/personal
-          // authDir: "~/.openclaw/credentials/whatsapp/personal",
+        // Необов’язкове перевизначення для окремого peer (приклад: надсилати конкретну групу до робочого агента).
+        {
+          agentId: "work",
+          match: {
+            channel: "whatsapp",
+            accountId: "personal",
+            peer: { kind: "group", id: "1203630...@g.us" },
+          },
         },
-        biz: {
-          // Необов’язкове перевизначення. За замовчуванням: ~/.openclaw/credentials/whatsapp/biz
-          // authDir: "~/.openclaw/credentials/whatsapp/biz",
+      ],
+
+      // Вимкнено типово: обмін повідомленнями між агентами потрібно явно ввімкнути + додати до списку дозволених.
+      tools: {
+        agentToAgent: {
+          enabled: false,
+          allow: ["home", "work"],
         },
       },
-    },
-  },
-}
-```
 
-## Приклад: щоденний чат у WhatsApp + глибока робота в Telegram
-
-Розділення за каналом: маршрутизуйте WhatsApp до швидкого повсякденного агента, а Telegram — до агента Opus.
-
-```json5
-{
-  agents: {
-    list: [
-      {
-        id: "chat",
-        name: "Everyday",
-        workspace: "~/.openclaw/workspace-chat",
-        model: "anthropic/claude-sonnet-4-6",
+      channels: {
+        whatsapp: {
+          accounts: {
+            personal: {
+              // Необов’язкове перевизначення. Типово: ~/.openclaw/credentials/whatsapp/personal
+              // authDir: "~/.openclaw/credentials/whatsapp/personal",
+            },
+            biz: {
+              // Необов’язкове перевизначення. Типово: ~/.openclaw/credentials/whatsapp/biz
+              // authDir: "~/.openclaw/credentials/whatsapp/biz",
+            },
+          },
+        },
       },
-      {
-        id: "opus",
-        name: "Deep Work",
-        workspace: "~/.openclaw/workspace-opus",
-        model: "anthropic/claude-opus-4-6",
-      },
-    ],
-  },
-  bindings: [
-    { agentId: "chat", match: { channel: "whatsapp" } },
-    { agentId: "opus", match: { channel: "telegram" } },
-  ],
-}
-```
+    }
+    ```
 
-Примітки:
+  </Accordion>
+</AccordionGroup>
 
-- Якщо у вас є кілька облікових записів для каналу, додайте `accountId` до прив’язки (наприклад, `{ channel: "whatsapp", accountId: "personal" }`).
-- Щоб маршрутизувати один DM/групу до Opus, залишивши решту на chat, додайте прив’язку `match.peer` для цього peer; відповідності peer завжди мають пріоритет над правилами для всього каналу.
+## Поширені шаблони
 
-## Приклад: той самий канал, один peer до Opus
+<Tabs>
+  <Tab title="Щоденний WhatsApp + глибока робота в Telegram">
+    Розділення за каналами: маршрутизуйте WhatsApp до швидкого повсякденного агента, а Telegram — до агента Opus.
 
-Залиште WhatsApp на швидкому агенті, але маршрутизуйте один DM до Opus:
-
-```json5
-{
-  agents: {
-    list: [
-      {
-        id: "chat",
-        name: "Everyday",
-        workspace: "~/.openclaw/workspace-chat",
-        model: "anthropic/claude-sonnet-4-6",
-      },
-      {
-        id: "opus",
-        name: "Deep Work",
-        workspace: "~/.openclaw/workspace-opus",
-        model: "anthropic/claude-opus-4-6",
-      },
-    ],
-  },
-  bindings: [
+    ```json5
     {
-      agentId: "opus",
-      match: { channel: "whatsapp", peer: { kind: "direct", id: "+15551234567" } },
-    },
-    { agentId: "chat", match: { channel: "whatsapp" } },
-  ],
-}
-```
-
-Прив’язки peer завжди мають пріоритет, тому розміщуйте їх вище за правило для всього каналу.
-
-## Сімейний агент, прив’язаний до групи WhatsApp
-
-Прив’яжіть окремого сімейного агента до однієї групи WhatsApp із gating за згадками та суворішою політикою інструментів:
-
-```json5
-{
-  agents: {
-    list: [
-      {
-        id: "family",
-        name: "Family",
-        workspace: "~/.openclaw/workspace-family",
-        identity: { name: "Family Bot" },
-        groupChat: {
-          mentionPatterns: ["@family", "@familybot", "@Family Bot"],
-        },
-        sandbox: {
-          mode: "all",
-          scope: "agent",
-        },
-        tools: {
-          allow: [
-            "exec",
-            "read",
-            "sessions_list",
-            "sessions_history",
-            "sessions_send",
-            "sessions_spawn",
-            "session_status",
-          ],
-          deny: ["write", "edit", "apply_patch", "browser", "canvas", "nodes", "cron"],
-        },
+      agents: {
+        list: [
+          {
+            id: "chat",
+            name: "Everyday",
+            workspace: "~/.openclaw/workspace-chat",
+            model: "anthropic/claude-sonnet-4-6",
+          },
+          {
+            id: "opus",
+            name: "Deep Work",
+            workspace: "~/.openclaw/workspace-opus",
+            model: "anthropic/claude-opus-4-6",
+          },
+        ],
       },
-    ],
-  },
-  bindings: [
+      bindings: [
+        { agentId: "chat", match: { channel: "whatsapp" } },
+        { agentId: "opus", match: { channel: "telegram" } },
+      ],
+    }
+    ```
+
+    Примітки:
+
+    - Якщо у вас є кілька облікових записів для каналу, додайте `accountId` до прив’язки (наприклад, `{ channel: "whatsapp", accountId: "personal" }`).
+    - Щоб маршрутизувати один DM/групу до Opus, залишивши все інше на chat, додайте прив’язку `match.peer` для цього peer; збіги за peer завжди мають пріоритет над правилами для всього каналу.
+
+  </Tab>
+  <Tab title="Той самий канал, один peer до Opus">
+    Залиште WhatsApp на швидкому агенті, але маршрутизуйте один DM до Opus:
+
+    ```json5
     {
-      agentId: "family",
-      match: {
-        channel: "whatsapp",
-        peer: { kind: "group", id: "120363999999999999@g.us" },
+      agents: {
+        list: [
+          {
+            id: "chat",
+            name: "Everyday",
+            workspace: "~/.openclaw/workspace-chat",
+            model: "anthropic/claude-sonnet-4-6",
+          },
+          {
+            id: "opus",
+            name: "Deep Work",
+            workspace: "~/.openclaw/workspace-opus",
+            model: "anthropic/claude-opus-4-6",
+          },
+        ],
       },
-    },
-  ],
-}
-```
+      bindings: [
+        {
+          agentId: "opus",
+          match: { channel: "whatsapp", peer: { kind: "direct", id: "+15551234567" } },
+        },
+        { agentId: "chat", match: { channel: "whatsapp" } },
+      ],
+    }
+    ```
 
-Примітки:
+    Прив’язки за peer завжди мають пріоритет, тому розміщуйте їх вище за правило для всього каналу.
 
-- Списки allow/deny інструментів — це **інструменти**, а не Skills. Якщо Skill має запускати бінарний файл, переконайтеся, що `exec` дозволено і що бінарний файл існує в пісочниці.
-- Для суворішого gating задайте `agents.list[].groupChat.mentionPatterns` і залиште allowlist груп увімкненими для каналу.
+  </Tab>
+  <Tab title="Сімейний агент, прив’язаний до групи WhatsApp">
+    Прив’яжіть окремого сімейного агента до однієї групи WhatsApp, із вимогою згадування та жорсткішою політикою інструментів:
 
-## Налаштування пісочниці та інструментів для кожного агента
+    ```json5
+    {
+      agents: {
+        list: [
+          {
+            id: "family",
+            name: "Family",
+            workspace: "~/.openclaw/workspace-family",
+            identity: { name: "Family Bot" },
+            groupChat: {
+              mentionPatterns: ["@family", "@familybot", "@Family Bot"],
+            },
+            sandbox: {
+              mode: "all",
+              scope: "agent",
+            },
+            tools: {
+              allow: [
+                "exec",
+                "read",
+                "sessions_list",
+                "sessions_history",
+                "sessions_send",
+                "sessions_spawn",
+                "session_status",
+              ],
+              deny: ["write", "edit", "apply_patch", "browser", "canvas", "nodes", "cron"],
+            },
+          },
+        ],
+      },
+      bindings: [
+        {
+          agentId: "family",
+          match: {
+            channel: "whatsapp",
+            peer: { kind: "group", id: "120363999999999999@g.us" },
+          },
+        },
+      ],
+    }
+    ```
+
+    Примітки:
+
+    - Списки allow/deny для інструментів стосуються **інструментів**, а не Skills. Якщо Skill має запускати бінарний файл, переконайтеся, що `exec` дозволено і бінарний файл існує в пісочниці.
+    - Для жорсткішого контролю задайте `agents.list[].groupChat.mentionPatterns` і залишайте ввімкненими списки дозволених груп для каналу.
+
+  </Tab>
+</Tabs>
+
+## Пісочниця та конфігурація інструментів для кожного агента
 
 Кожен агент може мати власну пісочницю та обмеження інструментів:
 
@@ -569,25 +594,26 @@ openclaw channels login --channel whatsapp --account biz
 }
 ```
 
-Примітка: `setupCommand` розміщується в `sandbox.docker` і виконується один раз під час створення контейнера.
-Перевизначення `sandbox.docker.*` для окремого агента ігноруються, коли визначена область має значення `"shared"`.
+<Note>
+`setupCommand` розташовується в `sandbox.docker` і виконується один раз під час створення контейнера. Перевизначення `sandbox.docker.*` для окремого агента ігноруються, коли підсумкова область дії дорівнює `"shared"`.
+</Note>
 
 **Переваги:**
 
-- **Ізоляція безпеки**: обмежуйте інструменти для недовірених агентів
-- **Керування ресурсами**: ізолюйте в пісочниці окремих агентів, залишаючи інших на хості
-- **Гнучкі політики**: різні дозволи для різних агентів
+- **Ізоляція безпеки**: обмежуйте інструменти для недовірених агентів.
+- **Керування ресурсами**: ізолюйте в пісочниці окремих агентів, залишаючи інших на хості.
+- **Гнучкі політики**: різні дозволи для різних агентів.
 
-Примітка: `tools.elevated` є **глобальним** і базується на відправнику; його не можна налаштовувати окремо для кожного агента.
-Якщо вам потрібні межі на рівні агента, використовуйте `agents.list[].tools`, щоб заборонити `exec`.
-Для націлювання на групи використовуйте `agents.list[].groupChat.mentionPatterns`, щоб @згадки чітко зіставлялися з потрібним агентом.
+<Note>
+`tools.elevated` є **глобальним** і базується на відправнику; його не можна налаштувати для окремого агента. Якщо вам потрібні межі на рівні агента, використовуйте `agents.list[].tools`, щоб заборонити `exec`. Для адресації в групах використовуйте `agents.list[].groupChat.mentionPatterns`, щоб @згадки однозначно зіставлялися з потрібним агентом.
+</Note>
 
-Див. [Multi-Agent Sandbox & Tools](/uk/tools/multi-agent-sandbox-tools) для докладних прикладів.
+Див. [Пісочниця та інструменти для кількох агентів](/uk/tools/multi-agent-sandbox-tools) для докладних прикладів.
 
 ## Пов’язане
 
+- [ACP agents](/uk/tools/acp-agents) — запуск зовнішніх середовищ кодування
 - [Маршрутизація каналів](/uk/channels/channel-routing) — як повідомлення маршрутизуються до агентів
-- [Субагенти](/uk/tools/subagents) — запуск фонових агентських процесів
-- [ACP Agents](/uk/tools/acp-agents) — запуск зовнішніх harness для програмування
-- [Присутність](/uk/concepts/presence) — присутність і доступність агентів
-- [Сесія](/uk/concepts/session) — ізоляція та маршрутизація сесій
+- [Присутність](/uk/concepts/presence) — присутність і доступність агента
+- [Сеанс](/uk/concepts/session) — ізоляція та маршрутизація сеансів
+- [Підагенти](/uk/tools/subagents) — запуск фонових виконань агентів
