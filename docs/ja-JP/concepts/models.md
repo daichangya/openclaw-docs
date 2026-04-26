@@ -1,121 +1,131 @@
 ---
 read_when:
-    - モデル CLI の追加または変更（models list/set/scan/aliases/fallbacks）
-    - モデルのフォールバック動作または選択 UX を変更する
-    - モデルスキャンプローブ（tools/images）の更新
-summary: 'Models CLI: list、set、aliases、fallbacks、scan、status'
-title: モデル CLI
+    - models CLI（models list/set/scan/aliases/fallbacks）を追加または変更する
+    - model fallback動作または選択UXを変更する
+    - model scan probe（tools/images）を更新する
+sidebarTitle: Models CLI
+summary: 'Models CLI: 一覧表示、設定、alias、fallback、scan、status'
+title: Models CLI
 x-i18n:
-    generated_at: "2026-04-25T13:45:46Z"
+    generated_at: "2026-04-26T11:28:05Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 370453529596e87e724c4de7d2ae9d20334c29393116059bc01363b47c017d5d
+    source_hash: d70dfb3f69532c6bfff5d8854ee7a5db3134e5ede3e1875410cea95072ca42a0
     source_path: concepts/models.md
     workflow: 15
 ---
 
-[モデルフェイルオーバー](/ja-JP/concepts/model-failover) を参照して、auth profile の
-ローテーション、クールダウン、およびそれがフォールバックとどう相互作用するかを確認してください。  
-簡単な provider 概要と例: [/concepts/model-providers](/ja-JP/concepts/model-providers)。  
-モデル ref は provider と model を選択します。通常、低レベルの
-エージェントランタイムは選択しません。たとえば、`openai/gpt-5.5` は
-通常の OpenAI provider パス経由でも、Codex app-server ランタイム経由でも実行できます。どちらになるかは
-`agents.defaults.embeddedHarness.runtime` に依存します。参照:
-[/concepts/agent-runtimes](/ja-JP/concepts/agent-runtimes)。
+<CardGroup cols={2}>
+  <Card title="Model failover" href="/ja-JP/concepts/model-failover">
+    auth profileのローテーション、cooldown、およびそれらがfallbackとどう相互作用するか。
+  </Card>
+  <Card title="Model providers" href="/ja-JP/concepts/model-providers">
+    providerの概要と例を手早く確認できます。
+  </Card>
+  <Card title="Agent runtimes" href="/ja-JP/concepts/agent-runtimes">
+    Pi、Codex、その他のagent loop runtime。
+  </Card>
+  <Card title="Configuration reference" href="/ja-JP/gateway/config-agents#agent-defaults">
+    model config key。
+  </Card>
+</CardGroup>
 
-## モデル選択の仕組み
+model refはproviderとmodelを選択します。通常、低レベルのagent runtimeは選択しません。たとえば、`openai/gpt-5.5` は、`agents.defaults.agentRuntime.id` に応じて、通常のOpenAI provider経路またはCodex app-server runtime経由で実行できます。[Agent runtimes](/ja-JP/concepts/agent-runtimes)を参照してください。
 
-OpenClaw は次の順序でモデルを選択します。
+## model選択の仕組み
 
-1. **Primary** モデル（`agents.defaults.model.primary` または `agents.defaults.model`）。
-2. `agents.defaults.model.fallbacks` 内の**フォールバック**（順番どおり）。
-3. **Provider auth フェイルオーバー** は、次のモデルへ移る前に
-   provider 内部で発生します。
+OpenClawは次の順序でmodelを選択します。
 
-関連:
+<Steps>
+  <Step title="Primary model">
+    `agents.defaults.model.primary`（または `agents.defaults.model`）。
+  </Step>
+  <Step title="Fallbacks">
+    `agents.defaults.model.fallbacks`（順番どおり）。
+  </Step>
+  <Step title="Provider auth failover">
+    auth failoverは、次のmodelへ移る前にprovider内部で発生します。
+  </Step>
+</Steps>
 
-- `agents.defaults.models` は、OpenClaw が使用できるモデルの許可リスト/カタログです（alias を含む）。
-- `agents.defaults.imageModel` は、primary モデルが画像を受け取れない**場合のみ**使用されます。
-- `agents.defaults.pdfModel` は `pdf` ツールで使用されます。省略した場合、このツールは
-  `agents.defaults.imageModel`、続いて解決済みのセッション/デフォルト
-  モデルへフォールバックします。
-- `agents.defaults.imageGenerationModel` は共有画像生成機能で使用されます。省略した場合でも、`image_generate` は auth が設定された provider のデフォルトを推論できます。現在のデフォルト provider を最初に試し、その後、登録済みの残りの画像生成 provider を provider-id 順で試します。特定の provider/model を設定する場合は、その provider の auth/API key も設定してください。
-- `agents.defaults.musicGenerationModel` は共有音楽生成機能で使用されます。省略した場合でも、`music_generate` は auth が設定された provider のデフォルトを推論できます。現在のデフォルト provider を最初に試し、その後、登録済みの残りの音楽生成 provider を provider-id 順で試します。特定の provider/model を設定する場合は、その provider の auth/API key も設定してください。
-- `agents.defaults.videoGenerationModel` は共有動画生成機能で使用されます。省略した場合でも、`video_generate` は auth が設定された provider のデフォルトを推論できます。現在のデフォルト provider を最初に試し、その後、登録済みの残りの動画生成 provider を provider-id 順で試します。特定の provider/model を設定する場合は、その provider の auth/API key も設定してください。
-- エージェントごとのデフォルトは、`agents.list[].model` とバインディングを通じて `agents.defaults.model` を上書きできます（[/concepts/multi-agent](/ja-JP/concepts/multi-agent) を参照）。
+<AccordionGroup>
+  <Accordion title="関連するmodel surface">
+    - `agents.defaults.models` は、OpenClawが使用できるmodelのallowlist/catalogです（aliasを含む）。
+    - `agents.defaults.imageModel` は、primary modelがimageを受け付けられない**場合にのみ**使われます。
+    - `agents.defaults.pdfModel` は `pdf` toolで使われます。省略した場合、このtoolは `agents.defaults.imageModel`、次に解決済みsession/default modelへfallbackします。
+    - `agents.defaults.imageGenerationModel` は共有image-generation capabilityで使われます。省略した場合でも、`image_generate` はauth対応のprovider defaultを推論できます。まず現在のdefault providerを試し、その後、残りの登録済みimage-generation providerをprovider-id順に試します。特定のprovider/modelを設定する場合は、そのproviderのauth/API keyも設定してください。
+    - `agents.defaults.musicGenerationModel` は共有music-generation capabilityで使われます。省略した場合でも、`music_generate` はauth対応のprovider defaultを推論できます。まず現在のdefault providerを試し、その後、残りの登録済みmusic-generation providerをprovider-id順に試します。特定のprovider/modelを設定する場合は、そのproviderのauth/API keyも設定してください。
+    - `agents.defaults.videoGenerationModel` は共有video-generation capabilityで使われます。省略した場合でも、`video_generate` はauth対応のprovider defaultを推論できます。まず現在のdefault providerを試し、その後、残りの登録済みvideo-generation providerをprovider-id順に試します。特定のprovider/modelを設定する場合は、そのproviderのauth/API keyも設定してください。
+    - agentごとのdefaultは、`agents.list[].model` とbindingによって `agents.defaults.model` を上書きできます（[Multi-agent routing](/ja-JP/concepts/multi-agent)を参照）。
+  </Accordion>
+</AccordionGroup>
 
-## クイックモデルポリシー
+## クイックmodelポリシー
 
-- primary には、利用可能な中で最も強力な最新世代モデルを設定してください。
-- コスト/レイテンシ重視のタスクや重要度の低いチャットにはフォールバックを使用してください。
-- ツール有効エージェントや信頼できない入力に対しては、古い/弱いモデル tier は避けてください。
+- primaryには、自分が利用できる中で最も強力な最新世代modelを設定してください。
+- fallbackは、コスト/レイテンシ重視のタスクや重要度の低いchatに使ってください。
+- tool有効agentや信頼できない入力に対しては、古い/弱いmodel tierは避けてください。
 
 ## オンボーディング（推奨）
 
-設定を手動編集したくない場合は、オンボーディングを実行してください。
+手でconfigを編集したくない場合は、onboardingを実行してください。
 
 ```bash
 openclaw onboard
 ```
 
-これにより、一般的な provider 向けの model + auth をセットアップできます。これには **OpenAI Code (Codex)
-subscription**（OAuth）および **Anthropic**（API key または Claude CLI）が含まれます。
+これは、**OpenAI Code (Codex) subscription**（OAuth）や**Anthropic**（API keyまたはClaude CLI）を含む一般的なprovider向けに、model + authをセットアップできます。
 
-## 設定キー（概要）
+## Config key（概要）
 
 - `agents.defaults.model.primary` と `agents.defaults.model.fallbacks`
 - `agents.defaults.imageModel.primary` と `agents.defaults.imageModel.fallbacks`
 - `agents.defaults.pdfModel.primary` と `agents.defaults.pdfModel.fallbacks`
 - `agents.defaults.imageGenerationModel.primary` と `agents.defaults.imageGenerationModel.fallbacks`
 - `agents.defaults.videoGenerationModel.primary` と `agents.defaults.videoGenerationModel.fallbacks`
-- `agents.defaults.models`（許可リスト + alias + provider params）
-- `models.providers`（`models.json` に書き込まれるカスタム provider）
+- `agents.defaults.models`（allowlist + alias + provider param）
+- `models.providers`（`models.json` に書き込まれるcustom provider）
 
-モデル ref は小文字に正規化されます。`z.ai/*` のような provider alias は
-`zai/*` に正規化されます。
+<Note>
+model refは小文字に正規化されます。`z.ai/*` のようなprovider aliasは `zai/*` に正規化されます。
 
-OpenCode を含む provider 設定例は
-[/providers/opencode](/ja-JP/providers/opencode) にあります。
+OpenCodeを含むprovider設定例は[OpenCode](/ja-JP/providers/opencode)にあります。
+</Note>
 
-### 安全な許可リスト編集
+### 安全なallowlist編集
 
-`agents.defaults.models` を手動更新する場合は、加算的な書き込みを使用してください。
+`agents.defaults.models` を手で更新する場合は、加算的な書き込みを使ってください。
 
 ```bash
 openclaw config set agents.defaults.models '{"openai/gpt-5.4":{}}' --strict-json --merge
 ```
 
-`openclaw config set` は、モデル/provider map を誤った上書きから保護します。  
-`agents.defaults.models`、`models.providers`、または
-`models.providers.<id>.models` への通常のオブジェクト代入は、
-既存エントリを削除する場合は拒否されます。加算的変更には `--merge` を使用し、
-指定値を完全な対象値にしたい場合にのみ `--replace` を使用してください。
+<AccordionGroup>
+  <Accordion title="上書き防止ルール">
+    `openclaw config set` は、model/provider mapの意図しない上書きから保護します。`agents.defaults.models`、`models.providers`、または `models.providers.<id>.models` に対する単純なobject代入で、既存entryを削除する場合は拒否されます。加算的な変更には `--merge` を使ってください。指定した値を完全なtarget値にしたい場合にのみ `--replace` を使ってください。
 
-対話的な provider セットアップと `openclaw configure --section model` でも、
-既存の許可リストに provider スコープの選択をマージするため、Codex、
-Ollama、または他の provider を追加しても無関係なモデルエントリは失われません。  
-configure は、provider auth が再適用されても既存の `agents.defaults.model.primary` を保持します。  
-`openclaw models auth login --provider <id> --set-default` や
-`openclaw models set <model>` のような明示的なデフォルト設定コマンドは、引き続き `agents.defaults.model.primary` を置き換えます。
+    対話型providerセットアップと `openclaw configure --section model` も、provider単位の選択を既存allowlistにマージするため、Codex、Ollama、または別のproviderを追加しても、無関係なmodel entryは失われません。configureは、provider authが再適用されても既存の `agents.defaults.model.primary` を保持します。`openclaw models auth login --provider <id> --set-default` や `openclaw models set <model>` のような明示的なdefault設定commandは、引き続き `agents.defaults.model.primary` を置き換えます。
 
-## 「Model is not allowed」（そして返信が止まる理由）
+  </Accordion>
+</AccordionGroup>
 
-`agents.defaults.models` が設定されている場合、それは `/model` と
-セッション上書きに対する**許可リスト**になります。ユーザーがその許可リストにないモデルを選択すると、
-OpenClaw は次を返します。
+## 「Model is not allowed」（そしてなぜ返信が止まるのか）
+
+`agents.defaults.models` が設定されている場合、それは `/model` とsession overrideの**allowlist**になります。ユーザーがそのallowlistにないmodelを選ぶと、OpenClawは次を返します。
 
 ```
 Model "provider/model" is not allowed. Use /model to list available models.
 ```
 
-これは通常の返信が生成される**前**に発生するため、
-「返信しなかった」ように感じられることがあります。修正方法は次のいずれかです。
+<Warning>
+これは通常の返信が生成される**前に**発生するため、「応答しなかった」ように感じることがあります。修正方法は次のいずれかです。
 
-- モデルを `agents.defaults.models` に追加する
-- 許可リストをクリアする（`agents.defaults.models` を削除する）
-- `/model list` からモデルを選ぶ
+- modelを `agents.defaults.models` に追加する
+- allowlistをクリアする（`agents.defaults.models` を削除する）
+- `/model list` からmodelを選ぶ
+  </Warning>
 
-許可リスト設定例:
+allowlist configの例:
 
 ```json5
 {
@@ -129,9 +139,9 @@ Model "provider/model" is not allowed. Use /model to list available models.
 }
 ```
 
-## チャットでモデルを切り替える（`/model`）
+## chat内でのmodel切り替え（`/model`）
 
-再起動せずに現在のセッションのモデルを切り替えられます。
+再起動せずに、現在のsessionのmodelを切り替えられます。
 
 ```
 /model
@@ -141,30 +151,33 @@ Model "provider/model" is not allowed. Use /model to list available models.
 /model status
 ```
 
-注意:
+<AccordionGroup>
+  <Accordion title="pickerの動作">
+    - `/model`（および `/model list`）は、コンパクトな番号付きpickerです（model family + 利用可能provider）。
+    - Discordでは、`/model` と `/models` は、providerとmodelのドロップダウンにSubmitステップを加えた対話型pickerを開きます。
+    - `/models add` は非推奨で、chatからmodelを登録する代わりに非推奨メッセージを返すようになりました。
+    - `/model <#>` はそのpickerから選択します。
+  </Accordion>
+  <Accordion title="永続化とライブ切り替え">
+    - `/model` は新しいsession選択を即座に永続化します。
+    - agentがidleなら、次のrunですぐに新しいmodelが使われます。
+    - すでにrunがアクティブな場合、OpenClawはライブ切り替えを保留としてマークし、クリーンなretry pointでのみ新しいmodelへ再起動します。
+    - すでにtool activityやreply outputが始まっている場合、保留中の切り替えは、後のretry機会または次のuser turnまでキューされたままになることがあります。
+    - `/model status` は詳細ビューです（auth candidate、および設定されている場合はprovider endpointの `baseUrl` + `api` mode）。
+  </Accordion>
+  <Accordion title="ref parsing">
+    - model refは**最初の** `/` で分割して解析されます。`/model <ref>` を入力するときは `provider/model` を使ってください。
+    - model ID自体に `/` が含まれる場合（OpenRouterスタイル）、provider prefixを含める必要があります（例: `/model openrouter/moonshotai/kimi-k2`）。
+    - providerを省略した場合、OpenClawは入力を次の順序で解決します。
+      1. alias一致
+      2. その正確なprefixなしmodel idに対する、一意なconfigured-provider一致
+      3. 設定済みdefault providerへの非推奨fallback — そのproviderが設定済みdefault modelをもう公開していない場合、OpenClawは古い削除済みprovider defaultを表面化しないように、代わりに最初のconfigured provider/modelへfallbackします。
+  </Accordion>
+</AccordionGroup>
 
-- `/model`（および `/model list`）は、コンパクトな番号付き picker です（モデル family + 利用可能な provider）。
-- Discord では、`/model` と `/models` は、provider と model のドロップダウンおよび Submit ステップを備えた対話型 picker を開きます。
-- `/models add` は非推奨であり、チャットからモデルを登録する代わりに非推奨メッセージを返すようになりました。
-- `/model <#>` はその picker から選択します。
-- `/model` は新しいセッション選択を即座に永続化します。
-- エージェントが idle の場合、次の実行ですぐに新しいモデルが使用されます。
-- すでに実行がアクティブな場合、OpenClaw はライブ切り替えを pending としてマークし、クリーンなリトライポイントでのみ新しいモデルへ再起動します。
-- ツールアクティビティまたは返信出力がすでに開始している場合、pending 切り替えは、後のリトライ機会または次のユーザーターンまでキューに残ることがあります。
-- `/model status` は詳細ビューです（auth 候補と、設定されている場合は provider endpoint の `baseUrl` + `api` mode）。
-- モデル ref は**最初の** `/` で分割して解析されます。`/model <ref>` を入力するときは `provider/model` を使用してください。
-- モデル ID 自体に `/` が含まれる場合（OpenRouter スタイル）、provider prefix を含める必要があります（例: `/model openrouter/moonshotai/kimi-k2`）。
-- provider を省略した場合、OpenClaw は次の順で入力を解決します。
-  1. alias 一致
-  2. その正確な prefix なし model id に対する、一意な configured-provider 一致
-  3. configured default provider への非推奨フォールバック  
-     その provider が設定済みデフォルトモデルをもう公開していない場合、OpenClaw
-     は、古い削除済み provider デフォルトを見せないように、
-     代わりに最初の configured provider/model にフォールバックします。
+完全なcommand動作/config: [Slash commands](/ja-JP/tools/slash-commands)。
 
-完全なコマンド動作/設定: [Slash commands](/ja-JP/tools/slash-commands)。
-
-## CLI コマンド
+## CLI command
 
 ```bash
 openclaw models list
@@ -187,40 +200,45 @@ openclaw models image-fallbacks remove <provider/model>
 openclaw models image-fallbacks clear
 ```
 
-`openclaw models`（サブコマンドなし）は `models status` のショートカットです。
+`openclaw models`（subcommandなし）は `models status` のshortcutです。
 
 ### `models list`
 
-デフォルトでは設定済みモデルを表示します。便利なフラグ:
+デフォルトでは設定済みmodelを表示します。便利なflag:
 
-- `--all`: 完全なカタログ
-- `--local`: ローカル provider のみ
-- `--provider <id>`: provider id でフィルター。たとえば `moonshot`。対話型 picker の表示
-  ラベルは受け付けられません
-- `--plain`: 1 行に 1 モデル
-- `--json`: 機械可読出力
-
-`--all` には、auth がまだ設定されていない段階でも、バンドル済みの provider 管理静的カタログ行が含まれます。そのため、発見専用ビューでは、対応する provider 認証情報を追加するまで利用できないモデルも表示できます。
+<ParamField path="--all" type="boolean">
+  完全なcatalog。auth設定前でも、同梱providerが持つ静的catalog rowを含むため、discovery専用ビューでは、一致するprovider credentialを追加するまで利用不可のmodelも表示できます。
+</ParamField>
+<ParamField path="--local" type="boolean">
+  ローカルproviderのみ。
+</ParamField>
+<ParamField path="--provider <id>" type="string">
+  provider idで絞り込みます。たとえば `moonshot`。対話型pickerの表示ラベルは受け付けられません。
+</ParamField>
+<ParamField path="--plain" type="boolean">
+  1行に1model。
+</ParamField>
+<ParamField path="--json" type="boolean">
+  機械可読出力。
+</ParamField>
 
 ### `models status`
 
-解決済みの primary モデル、フォールバック、image model、および
-設定済み provider の auth 概要を表示します。また、auth store 内で見つかった profile の OAuth 失効状態も表示します
-（デフォルトでは 24 時間以内に警告）。`--plain` は解決済み primary モデルのみを出力します。  
-OAuth ステータスは常に表示され（`--json` 出力にも含まれます）。設定済み
-provider に認証情報がない場合、`models status` は **Missing auth** セクションを表示します。  
-JSON には `auth.oauth`（警告ウィンドウ + profiles）と `auth.providers`
-（env ベース認証情報を含む provider ごとの有効 auth）が含まれます。`auth.oauth`
-は auth-store profile の健全性のみです。env-only provider はそこには表示されません。  
-自動化には `--check` を使用してください（missing/expired なら exit `1`、expiring なら `2`）。  
-ライブ auth チェックには `--probe` を使用してください。probe 行は auth profile、env
-認証情報、または `models.json` から取得できます。  
-明示的な `auth.order.<provider>` が保存済み profile を省略している場合、probe は
-それを試す代わりに `excluded_by_auth_order` を報告します。auth が存在してもその provider に対して probe 可能な model を解決できない場合、probe は `status: no_model` を報告します。
+解決されたprimary model、fallback、image model、および設定済みproviderのauth概要を表示します。また、auth store内で見つかったprofileのOAuth有効期限状態も表示します（デフォルトでは24時間以内に警告）。`--plain` は解決されたprimary modelのみを表示します。
 
-auth の選択は provider/account に依存します。常時稼働の gateway host では、
-通常 API key が最も予測可能です。Claude CLI の再利用や既存の Anthropic
-OAuth/token profile もサポートされています。
+<AccordionGroup>
+  <Accordion title="authとprobeの動作">
+    - OAuth statusは常に表示され（`--json` 出力にも含まれます）、設定済みproviderにcredentialがない場合、`models status` は **Missing auth** セクションを表示します。
+    - JSONには `auth.oauth`（警告ウィンドウ + profile）と `auth.providers`（env対応credentialを含む、providerごとの実効auth）が含まれます。`auth.oauth` はauth-store profileの健全性のみであり、env-only providerはここには表示されません。
+    - automationには `--check` を使ってください（不足/期限切れでexit `1`、期限間近で `2`）。
+    - ライブauth確認には `--probe` を使ってください。probe rowはauth profile、env credential、または `models.json` から来ることがあります。
+    - 明示的な `auth.order.<provider>` が保存済みprofileを省略している場合、probeはそれを試す代わりに `excluded_by_auth_order` を報告します。authは存在するが、そのprovider向けにprobe可能なmodelを解決できない場合、probeは `status: no_model` を報告します。
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+auth選択はprovider/account依存です。常時稼働のgateway hostでは、通常API keyが最も予測しやすい方法です。Claude CLIの再利用や、既存のAnthropic OAuth/token profileもサポートされています。
+</Note>
 
 例（Claude CLI）:
 
@@ -229,69 +247,80 @@ claude auth login
 openclaw models status
 ```
 
-## スキャン（OpenRouter free models）
+## Scanning（OpenRouter free model）
 
-`openclaw models scan` は OpenRouter の **free model catalog** を調査し、
-必要に応じてツールおよび画像サポートについてモデルを probe できます。
+`openclaw models scan` はOpenRouterの**free model catalog**を検査し、任意でtoolおよびimage対応についてmodelをprobeできます。
 
-主なフラグ:
+<ParamField path="--no-probe" type="boolean">
+  ライブprobeをスキップします（metadataのみ）。
+</ParamField>
+<ParamField path="--min-params <b>" type="number">
+  最小parameterサイズ（10億単位）。
+</ParamField>
+<ParamField path="--max-age-days <days>" type="number">
+  古いmodelをスキップします。
+</ParamField>
+<ParamField path="--provider <name>" type="string">
+  provider prefix filter。
+</ParamField>
+<ParamField path="--max-candidates <n>" type="number">
+  fallback listサイズ。
+</ParamField>
+<ParamField path="--set-default" type="boolean">
+  `agents.defaults.model.primary` を最初の選択に設定します。
+</ParamField>
+<ParamField path="--set-image" type="boolean">
+  `agents.defaults.imageModel.primary` を最初のimage選択に設定します。
+</ParamField>
 
-- `--no-probe`: ライブ probe をスキップ（メタデータのみ）
-- `--min-params <b>`: 最小パラメータサイズ（10 億単位）
-- `--max-age-days <days>`: 古いモデルをスキップ
-- `--provider <name>`: provider prefix フィルター
-- `--max-candidates <n>`: フォールバックリストサイズ
-- `--set-default`: `agents.defaults.model.primary` を最初の選択に設定
-- `--set-image`: `agents.defaults.imageModel.primary` を最初の画像選択に設定
+<Note>
+OpenRouterの `/models` catalogは公開されているため、metadataのみのscanではkeyなしでfree candidateを一覧できます。probeとinferenceには引き続きOpenRouter API key（auth profileまたは `OPENROUTER_API_KEY`）が必要です。keyが利用できない場合、`openclaw models scan` はmetadataのみの出力にフォールバックし、configは変更しません。明示的にmetadataのみモードを要求するには `--no-probe` を使用してください。
+</Note>
 
-OpenRouter の `/models` カタログは公開されているため、メタデータのみのスキャンでは
-キーなしで free 候補を一覧できます。probe と推論には引き続き
-OpenRouter API key（auth profile または `OPENROUTER_API_KEY` 由来）が必要です。キーが
-利用できない場合、`openclaw models scan` はメタデータのみの出力へフォールバックし、設定は変更しません。メタデータのみモードを明示的に要求するには `--no-probe` を使用してください。
+scan結果は次の順序で順位付けされます。
 
-スキャン結果は次の順にランキングされます。
+1. image対応
+2. toolレイテンシ
+3. contextサイズ
+4. parameter数
 
-1. 画像サポート
-2. ツールレイテンシ
-3. コンテキストサイズ
-4. パラメータ数
+入力:
 
-入力
+- OpenRouter `/models` 一覧（` :free` でfilter）
+- ライブprobeには、auth profileまたは `OPENROUTER_API_KEY` からのOpenRouter API keyが必要です（[Environment variables](/ja-JP/help/environment)を参照）
+- 任意のfilter: `--max-age-days`、`--min-params`、`--provider`、`--max-candidates`
+- request/probe制御: `--timeout`、`--concurrency`
 
-- OpenRouter `/models` 一覧（`:free` フィルター）
-- ライブ probe には、auth profile または `OPENROUTER_API_KEY` からの OpenRouter API key が必要です（[/environment](/ja-JP/help/environment) を参照）
-- 任意のフィルター: `--max-age-days`、`--min-params`、`--provider`、`--max-candidates`
-- リクエスト/probe 制御: `--timeout`、`--concurrency`
+TTYでライブprobeが実行されると、fallbackを対話的に選択できます。非対話モードでは、デフォルトを受け入れるために `--yes` を渡してください。metadataのみの結果は情報提供用です。`--set-default` と `--set-image` はライブprobeを必要とします。これは、OpenClawが使えないkeyなしOpenRouter modelを設定しないようにするためです。
 
-TTY でライブ probe を実行すると、フォールバックを対話的に選択できます。  
-非対話モードでは、デフォルトを受け入れるために `--yes` を渡してください。メタデータのみの結果は
-情報提供用です。`--set-default` と `--set-image` はライブ probe を必要とするため、
-OpenClaw はキーのない使用不能な OpenRouter モデルを設定しません。
+## Models registry（`models.json`）
 
-## モデルレジストリ（`models.json`）
+`models.providers` 内のcustom providerは、agent directory配下の `models.json` に書き込まれます（デフォルトは `~/.openclaw/agents/<agentId>/agent/models.json`）。このfileは、`models.mode` が `replace` に設定されていない限り、デフォルトでマージされます。
 
-`models.providers` 内のカスタム provider は、agent ディレクトリ配下の `models.json` に書き込まれます
-（デフォルトは `~/.openclaw/agents/<agentId>/agent/models.json`）。このファイルは、
-`models.mode` が `replace` に設定されていない限り、デフォルトでマージされます。
+<AccordionGroup>
+  <Accordion title="マージモードの優先順位">
+    一致するprovider IDに対するマージモードの優先順位:
 
-一致する provider ID に対するマージモードの優先順位:
+    - agentの `models.json` にすでに存在する空でない `baseUrl` が優先されます。
+    - agentの `models.json` にある空でない `apiKey` は、そのproviderが現在のconfig/auth-profile contextでSecretRef管理されていない場合にのみ優先されます。
+    - SecretRef管理されたproviderの `apiKey` 値は、解決済みsecretを永続化する代わりに、source marker（env refなら `ENV_VAR_NAME`、file/exec refなら `secretref-managed`）から更新されます。
+    - SecretRef管理されたprovider header値は、source marker（env refなら `secretref-env:ENV_VAR_NAME`、file/exec refなら `secretref-managed`）から更新されます。
+    - agentの `apiKey` / `baseUrl` が空または欠落している場合、configの `models.providers` にフォールバックします。
+    - その他のprovider fieldはconfigと正規化されたcatalog dataから更新されます。
 
-- agent の `models.json` にすでに存在する空でない `baseUrl` が優先されます。
-- agent の `models.json` にある空でない `apiKey` は、その provider が現在の config/auth-profile コンテキストで SecretRef 管理されていない場合にのみ優先されます。
-- SecretRef 管理の provider `apiKey` 値は、解決済みシークレットを永続化するのではなく、ソースマーカー（env ref の場合は `ENV_VAR_NAME`、file/exec ref の場合は `secretref-managed`）から更新されます。
-- SecretRef 管理の provider header 値は、ソースマーカー（env ref の場合は `secretref-env:ENV_VAR_NAME`、file/exec ref の場合は `secretref-managed`）から更新されます。
-- 空または欠落している agent の `apiKey`/`baseUrl` は、config の `models.providers` にフォールバックします。
-- その他の provider フィールドは、config と正規化されたカタログデータから更新されます。
+  </Accordion>
+</AccordionGroup>
 
-マーカーの永続化はソース権威です。OpenClaw は、解決済みのランタイムシークレット値ではなく、アクティブなソース設定スナップショット（解決前）からマーカーを書き込みます。  
-これは、`openclaw agent` のようなコマンド駆動の経路を含め、OpenClaw が `models.json` を再生成するたびに適用されます。
+<Note>
+markerの永続化はsource authoritativeです。OpenClawは、解決済みruntime secret値からではなく、アクティブなsource config snapshot（解決前）からmarkerを書き込みます。これは、`openclaw agent` のようなcommand駆動経路を含め、OpenClawが `models.json` を再生成するたびに適用されます。
+</Note>
 
 ## 関連
 
-- [Model Providers](/ja-JP/concepts/model-providers) — provider ルーティングと auth
-- [Agent Runtimes](/ja-JP/concepts/agent-runtimes) — PI、Codex、およびその他のエージェントループランタイム
-- [Model Failover](/ja-JP/concepts/model-failover) — フォールバックチェーン
-- [Image Generation](/ja-JP/tools/image-generation) — 画像モデル設定
-- [Music Generation](/ja-JP/tools/music-generation) — 音楽モデル設定
-- [Video Generation](/ja-JP/tools/video-generation) — 動画モデル設定
-- [Configuration Reference](/ja-JP/gateway/config-agents#agent-defaults) — モデル設定キー
+- [Agent runtimes](/ja-JP/concepts/agent-runtimes) — Pi、Codex、その他のagent loop runtime
+- [Configuration reference](/ja-JP/gateway/config-agents#agent-defaults) — model config key
+- [Image generation](/ja-JP/tools/image-generation) — image model設定
+- [Model failover](/ja-JP/concepts/model-failover) — fallback chain
+- [Model providers](/ja-JP/concepts/model-providers) — providerルーティングとauth
+- [Music generation](/ja-JP/tools/music-generation) — music model設定
+- [Video generation](/ja-JP/tools/video-generation) — video model設定

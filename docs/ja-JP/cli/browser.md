@@ -1,34 +1,34 @@
 ---
 read_when:
-    - '`openclaw browser`を使用していて、一般的なタスクの例が欲しい場合'
-    - nodeホスト経由で別のマシン上で実行中のブラウザを制御したい場合
-    - Chrome MCP経由で、ローカルでサインイン済みのChromeにアタッチしたい場合
-summary: '`openclaw browser`のCLIリファレンス（ライフサイクル、プロファイル、タブ、アクション、状態、デバッグ）'
-title: ブラウザ
+    - '`openclaw browser` を使用していて、一般的なタスクの例を探しています'
+    - nodeホスト経由で別のマシン上で動作しているBrowserを制御したい場合
+    - Chrome MCP経由で、ローカルでサインイン済みのChromeに接続したい場合
+summary: '`openclaw browser` のCLIリファレンス（ライフサイクル、プロファイル、タブ、アクション、状態、デバッグ）'
+title: Browser
 x-i18n:
-    generated_at: "2026-04-25T13:43:38Z"
+    generated_at: "2026-04-26T11:25:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9a2157146e54c77fecafcc5e89dd65244bd7ebecc37f86b45921ccea025188a8
+    source_hash: b42511e841e768bfa4031463f213d78c67d5c63efb655a90f65c7e8c71da9881
     source_path: cli/browser.md
     workflow: 15
 ---
 
 # `openclaw browser`
 
-OpenClawのブラウザ制御サーフェスを管理し、ブラウザ操作を実行します（ライフサイクル、プロファイル、タブ、スナップショット、スクリーンショット、ナビゲーション、入力、状態エミュレーション、デバッグ）。
+OpenClawのBrowser制御サーフェスを管理し、Browserアクション（ライフサイクル、プロファイル、タブ、スナップショット、スクリーンショット、ナビゲーション、入力、状態エミュレーション、デバッグ）を実行します。
 
 関連:
 
 - Browserツール + API: [Browser tool](/ja-JP/tools/browser)
 
-## 共通フラグ
+## よく使うフラグ
 
 - `--url <gatewayWsUrl>`: Gateway WebSocket URL（デフォルトは設定値）。
 - `--token <token>`: Gatewayトークン（必要な場合）。
 - `--timeout <ms>`: リクエストタイムアウト（ms）。
-- `--expect-final`: 最終的なGatewayレスポンスを待機します。
-- `--browser-profile <name>`: ブラウザプロファイルを選択します（デフォルトは設定値）。
+- `--expect-final`: Gatewayの最終レスポンスを待機します。
+- `--browser-profile <name>`: Browserプロファイルを選択します（デフォルトは設定値）。
 - `--json`: 機械可読な出力（対応している場合）。
 
 ## クイックスタート（ローカル）
@@ -40,13 +40,13 @@ openclaw browser --browser-profile openclaw open https://example.com
 openclaw browser --browser-profile openclaw snapshot
 ```
 
-エージェントは`browser({ action: "doctor" })`で同じ準備確認を実行できます。
+エージェントは `browser({ action: "doctor" })` で同じ準備状況チェックを実行できます。
 
-## クイックトラブルシューティング
+## すぐできるトラブルシューティング
 
-`start`が`not reachable after start`で失敗する場合は、まずCDPの準備状態を確認してください。`start`と`tabs`が成功していて`open`または`navigate`が失敗する場合、ブラウザ制御プレーンは健全であり、失敗の原因は通常ナビゲーションSSRFポリシーです。
+`start` が `not reachable after start` で失敗する場合は、まずCDPの準備状況をトラブルシュートしてください。`start` と `tabs` が成功するのに `open` や `navigate` が失敗する場合、Browser制御プレーンは正常で、失敗原因は通常ナビゲーションのSSRFポリシーです。
 
-最小手順:
+最小シーケンス:
 
 ```bash
 openclaw browser --browser-profile openclaw doctor
@@ -55,13 +55,14 @@ openclaw browser --browser-profile openclaw tabs
 openclaw browser --browser-profile openclaw open https://example.com
 ```
 
-詳細ガイド: [Browser troubleshooting](/ja-JP/tools/browser#cdp-startup-failure-vs-navigation-ssrf-block)
+詳細ガイダンス: [Browser troubleshooting](/ja-JP/tools/browser#cdp-startup-failure-vs-navigation-ssrf-block)
 
 ## ライフサイクル
 
 ```bash
 openclaw browser status
 openclaw browser doctor
+openclaw browser doctor --deep
 openclaw browser start
 openclaw browser start --headless
 openclaw browser stop
@@ -70,16 +71,17 @@ openclaw browser --browser-profile openclaw reset-profile
 
 注意:
 
-- `attachOnly`およびリモートCDPプロファイルでは、`openclaw browser stop`は、OpenClaw自身がブラウザプロセスを起動していない場合でも、アクティブな制御セッションを閉じ、一時的なエミュレーション上書きをクリアします。
-- ローカル管理プロファイルでは、`openclaw browser stop`は起動されたブラウザプロセスを停止します。
-- `openclaw browser start --headless`は、その開始リクエストにのみ適用され、かつOpenClawがローカル管理ブラウザを起動する場合にのみ有効です。`browser.headless`やプロファイル設定を書き換えることはなく、すでに実行中のブラウザに対しては何もしません。
-- Linuxホストで`DISPLAY`または`WAYLAND_DISPLAY`がない場合、`OPENCLAW_BROWSER_HEADLESS=0`、`browser.headless=false`、または`browser.profiles.<name>.headless=false`で可視ブラウザを明示要求しない限り、ローカル管理プロファイルは自動的にヘッドレスで実行されます。
+- `doctor --deep` はライブスナップショットのプローブを追加します。基本的なCDP準備状況がグリーンでも、現在のタブを検査できる証拠が必要な場合に便利です。
+- `attachOnly` とリモートCDPプロファイルでは、`openclaw browser stop` は、OpenClaw自身がBrowserプロセスを起動していなくても、アクティブな制御セッションを閉じ、一時的なエミュレーション上書きをクリアします。
+- ローカル管理プロファイルでは、`openclaw browser stop` は起動されたBrowserプロセスを停止します。
+- `openclaw browser start --headless` はその開始リクエストにのみ適用され、OpenClawがローカル管理Browserを起動する場合にのみ有効です。`browser.headless` やプロファイル設定を書き換えることはなく、すでに実行中のBrowserに対しては no-op です。
+- Linuxホストで `DISPLAY` または `WAYLAND_DISPLAY` がない場合、ローカル管理プロファイルは、`OPENCLAW_BROWSER_HEADLESS=0`、`browser.headless=false`、または `browser.profiles.<name>.headless=false` で明示的に可視Browserを要求しない限り、自動的にヘッドレスで実行されます。
 
-## コマンドが見つからない場合
+## コマンドが存在しない場合
 
-`openclaw browser`が不明なコマンドである場合は、`~/.openclaw/openclaw.json`の`plugins.allow`を確認してください。
+`openclaw browser` が未知のコマンドである場合は、`~/.openclaw/openclaw.json` の `plugins.allow` を確認してください。
 
-`plugins.allow`が存在する場合、バンドル済みbrowser pluginを明示的に一覧に含める必要があります。
+`plugins.allow` が存在する場合、バンドルされているbrowser Pluginを明示的に列挙する必要があります。
 
 ```json5
 {
@@ -89,16 +91,16 @@ openclaw browser --browser-profile openclaw reset-profile
 }
 ```
 
-`plugins.allow`の許可リストから`browser`が除外されている場合、`browser.enabled=true`を設定してもCLIサブコマンドは復元されません。
+`browser.enabled=true` を設定しても、Pluginの許可リストで `browser` が除外されている場合、CLIサブコマンドは復元されません。
 
 関連: [Browser tool](/ja-JP/tools/browser#missing-browser-command-or-tool)
 
 ## プロファイル
 
-プロファイルは名前付きのブラウザルーティング設定です。実際には次のように使います。
+プロファイルは、名前付きのBrowserルーティング設定です。実際には次のとおりです。
 
-- `openclaw`: OpenClaw管理の専用Chromeインスタンスを起動またはアタッチします（分離されたユーザーデータディレクトリ）。
-- `user`: Chrome DevTools MCP経由で、既存のサインイン済みChromeセッションを制御します。
+- `openclaw`: 専用のOpenClaw管理Chromeインスタンスを起動または接続します（分離されたユーザーデータディレクトリ）。
+- `user`: Chrome DevTools MCP経由で既存のサインイン済みChromeセッションを制御します。
 - カスタムCDPプロファイル: ローカルまたはリモートのCDPエンドポイントを指定します。
 
 ```bash
@@ -128,9 +130,9 @@ openclaw browser focus docs
 openclaw browser close t1
 ```
 
-`tabs`は、安定した`tabId`（`t1`など）、任意のラベル、raw `targetId`より先に`suggestedTargetId`を返します。エージェントは、`focus`、`close`、スナップショット、および各種操作に` suggestedTargetId`を戻して渡す必要があります。`open --label`、`tab new --label`、または`tab label`でラベルを割り当てられます。ラベル、tab id、raw target id、一意なtarget-idプレフィックスはいずれも受け付けられます。
+`tabs` は、安定した `t1` のような `tabId`、任意のラベル、生の `targetId` より前に、まず `suggestedTargetId` を返します。エージェントは、`focus`、`close`、スナップショット、アクションに `suggestedTargetId` を渡し返すべきです。ラベルは `open --label`、`tab new --label`、または `tab label` で割り当てられ、ラベル、tab id、生のtarget id、一意なtarget-idプレフィックスのいずれも受け付けられます。Chromiumがナビゲーションまたはフォーム送信中に基盤となる生targetを置き換えた場合、OpenClawは一致を証明できるときに、安定した `tabId` / ラベルを置き換え先タブに維持します。生のtarget idは依然として不安定なため、`suggestedTargetId` を優先してください。
 
-## スナップショット / スクリーンショット / 操作
+## スナップショット / スクリーンショット / アクション
 
 スナップショット:
 
@@ -150,12 +152,12 @@ openclaw browser screenshot --labels
 
 注意:
 
-- `--full-page`はページキャプチャ専用で、`--ref`や`--element`とは併用できません。
-- `existing-session` / `user`プロファイルは、ページスクリーンショットおよびスナップショット出力からの`--ref`スクリーンショットには対応しますが、CSS `--element`スクリーンショットには対応しません。
-- `--labels`は、現在のスナップショット参照をスクリーンショット上に重ねて表示します。
-- `snapshot --urls`は、発見されたリンク先をAIスナップショットに付加するため、エージェントはリンクテキストだけから推測するのではなく、直接ナビゲーション先を選べます。
+- `--full-page` はページキャプチャ専用で、`--ref` または `--element` と組み合わせることはできません。
+- `existing-session` / `user` プロファイルはページスクリーンショットと、スナップショット出力の `--ref` スクリーンショットをサポートしますが、CSS `--element` スクリーンショットはサポートしません。
+- `--labels` は現在のスナップショット参照をスクリーンショット上に重ねて表示します。
+- `snapshot --urls` は、検出されたリンク先をAIスナップショットに追加するため、エージェントはリンクテキストだけから推測するのではなく、直接のナビゲーション先を選べます。
 
-ナビゲーション/クリック/入力（refベースのUI自動化）:
+ナビゲート/クリック/入力（refベースUI自動化）:
 
 ```bash
 openclaw browser navigate https://example.com
@@ -172,7 +174,9 @@ openclaw browser wait --text "Done"
 openclaw browser evaluate --fn '(el) => el.textContent' --ref <ref>
 ```
 
-ファイル + ダイアログ補助:
+アクションレスポンスは、OpenClawが置き換えタブを証明できる場合、アクションによるページ置換後の現在の生 `targetId` を返します。それでも、スクリプトは長期間のワークフロー向けに `suggestedTargetId` / ラベルを保存して渡すべきです。
+
+ファイル + ダイアログヘルパー:
 
 ```bash
 openclaw browser upload /tmp/openclaw/uploads/file.pdf --ref <ref>
@@ -181,7 +185,7 @@ openclaw browser download <ref> report.pdf
 openclaw browser dialog --accept
 ```
 
-管理対象Chromeプロファイルでは、通常のクリックでトリガーされたダウンロードはOpenClawダウンロードディレクトリ（デフォルトは`/tmp/openclaw/downloads`、または設定された一時ルート）に保存されます。特定のファイルを待機してパスを返す必要がある場合は`waitfordownload`または`download`を使用してください。これらの明示的な待機処理が次のダウンロードを所有します。
+管理されたChromeプロファイルは、通常のクリックで開始されたダウンロードをOpenClawのダウンロードディレクトリ（デフォルトは `/tmp/openclaw/downloads`、または設定された一時ルート）に保存します。エージェントが特定のファイルを待機してそのパスを返す必要がある場合は、`waitfordownload` または `download` を使用してください。これらの明示的な待機機能が次のダウンロードを所有します。
 
 ## 状態とストレージ
 
@@ -226,7 +230,7 @@ openclaw browser trace stop --out trace.zip
 
 ## MCP経由の既存Chrome
 
-組み込みの`user`プロファイルを使用するか、自分で`existing-session`プロファイルを作成します:
+組み込みの `user` プロファイルを使用するか、独自の `existing-session` プロファイルを作成します。
 
 ```bash
 openclaw browser --browser-profile user tabs
@@ -235,28 +239,28 @@ openclaw browser create-profile --name brave-live --driver existing-session --us
 openclaw browser --browser-profile chrome-live tabs
 ```
 
-この経路はホスト専用です。Docker、ヘッドレスサーバー、Browserless、その他のリモートセットアップでは、代わりにCDPプロファイルを使用してください。
+この経路はホスト専用です。Docker、ヘッドレスサーバー、Browserless、その他のリモート構成では、代わりにCDPプロファイルを使用してください。
 
 現在のexisting-sessionの制限:
 
-- スナップショット駆動の操作は、CSSセレクターではなくrefを使用します
-- `browser.actionTimeoutMs`は、呼び出し側が`timeoutMs`を省略した`act`リクエストに対して、デフォルトで60000 msを適用します。呼び出しごとの`timeoutMs`がある場合はそちらが優先されます。
-- `click`は左クリックのみ対応
-- `type`は`slowly=true`に対応しません
-- `press`は`delayMs`に対応しません
-- `hover`、`scrollintoview`、`drag`、`select`、`fill`、`evaluate`は、呼び出しごとのタイムアウト上書きを拒否します
-- `select`は1つの値のみ対応
-- `wait --load networkidle`は非対応
-- ファイルアップロードは`--ref` / `--input-ref`が必要で、CSS `--element`には対応せず、現在は一度に1ファイルのみ対応
-- ダイアログフックは`--timeout`に対応しません
-- スクリーンショットはページキャプチャと`--ref`に対応しますが、CSS `--element`には対応しません
-- `responsebody`、ダウンロードインターセプト、PDFエクスポート、バッチ操作は、引き続き管理対象ブラウザまたはraw CDPプロファイルが必要です
+- スナップショット駆動アクションはCSSセレクターではなくrefを使用します
+- `browser.actionTimeoutMs` は、呼び出し元が `timeoutMs` を省略した場合、サポートされる `act` リクエストのデフォルトを60000 msにします。呼び出しごとの `timeoutMs` がある場合はそちらが優先されます。
+- `click` は左クリックのみです
+- `type` は `slowly=true` をサポートしません
+- `press` は `delayMs` をサポートしません
+- `hover`、`scrollintoview`、`drag`、`select`、`fill`、`evaluate` は呼び出しごとのタイムアウト上書きを拒否します
+- `select` は1つの値のみサポートします
+- `wait --load networkidle` はサポートされません
+- ファイルアップロードは `--ref` / `--input-ref` が必要で、CSS `--element` をサポートせず、現在は1回に1ファイルのみサポートします
+- ダイアログフックは `--timeout` をサポートしません
+- スクリーンショットはページキャプチャと `--ref` をサポートしますが、CSS `--element` はサポートしません
+- `responsebody`、ダウンロードインターセプト、PDFエクスポート、バッチアクションは、引き続き管理Browserまたは生CDPプロファイルが必要です
 
-## リモートブラウザ制御（node hostプロキシ）
+## リモートBrowser制御（nodeホストプロキシ）
 
-Gatewayがブラウザとは別のマシンで動作している場合は、Chrome/Brave/Edge/Chromiumがあるマシン上で**node host**を実行してください。Gatewayはブラウザ操作をそのnodeへプロキシします（別個のブラウザ制御サーバーは不要です）。
+GatewayがBrowserとは別のマシンで実行されている場合は、Chrome/Brave/Edge/Chromiumがあるマシンで **node host** を実行してください。GatewayはBrowserアクションをそのnodeへプロキシします（別個のBrowser制御サーバーは不要です）。
 
-自動ルーティングの制御には`gateway.nodes.browser.mode`を使い、複数のnodeが接続されている場合に特定のnodeへ固定するには`gateway.nodes.browser.node`を使います。
+自動ルーティングを制御するには `gateway.nodes.browser.mode` を使用し、複数のnodeが接続されている場合に特定のnodeへ固定するには `gateway.nodes.browser.node` を使用します。
 
 セキュリティ + リモートセットアップ: [Browser tool](/ja-JP/tools/browser), [Remote access](/ja-JP/gateway/remote), [Tailscale](/ja-JP/gateway/tailscale), [Security](/ja-JP/gateway/security)
 

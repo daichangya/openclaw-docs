@@ -1,151 +1,150 @@
 ---
 read_when:
-    - Bonjour検出/advertisingを実装または変更する】【。analysis to=final code  omitted
-    - リモート接続モード（direct vs SSH）を調整する
-    - リモートNode向けのNode検出 + ペアリングを設計する
-summary: Gatewayを見つけるためのNode検出とtransport（Bonjour、Tailscale、SSH）
-title: 検出とtransport
+    - Bonjour の検出/告知を実装または変更すること
+    - リモート接続モード（direct と SSH）の調整
+    - リモート Node 用の Node 検出 + ペアリングを設計すること
+summary: Gateway を見つけるための Node 検出とトランスポート（Bonjour、Tailscale、SSH）
+title: 検出とトランスポート
 x-i18n:
-    generated_at: "2026-04-24T04:57:14Z"
+    generated_at: "2026-04-26T11:29:18Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 684e5aeb1f74a90bf8689f8b25830be2c9e497fcdeda390d98f204d7cb4134b8
+    source_hash: 615be0f501470772c257beb8e798c522c108b09081a603f44218404277fdf269
     source_path: gateway/discovery.md
     workflow: 15
 ---
 
-# 検出とtransport
+# 検出とトランスポート
 
-OpenClawには、表面的には似て見えても、実際には異なる2つの問題があります。
+OpenClaw には、表面上は似て見えても異なる 2 つの問題があります。
 
-1. **オペレーターのリモート制御**: 別の場所で動作しているGatewayを、macOSメニューバーアプリが制御すること。
-2. **Nodeペアリング**: iOS/Android（および将来のNode）がGatewayを見つけて、安全にペアリングすること。
+1. **オペレーターのリモート制御**: 別の場所で動作している Gateway を macOS メニューバーアプリが制御すること。
+2. **Node のペアリング**: iOS/Android（および将来の Node）が Gateway を見つけて安全にペアリングすること。
 
-設計目標は、すべてのネットワーク検出/advertisingを**Node Gateway**（`openclaw gateway`）に集約し、クライアント（macアプリ、iOS）はその利用者にとどめることです。
+設計目標は、すべてのネットワーク検出/告知を **Node Gateway**（`openclaw gateway`）に集約し、クライアント（mac アプリ、iOS）は利用側に保つことです。
 
 ## 用語
 
-- **Gateway**: 状態（セッション、ペアリング、node registry）を所有し、チャンネルを実行する単一の長時間動作するgateway process。ほとんどの構成ではホストごとに1つです。分離されたマルチgateway構成も可能です。
-- **Gateway WS（control plane）**: デフォルトでは `127.0.0.1:18789` 上のWebSocketエンドポイント。`gateway.bind` によってLAN/tailnetへバインドできます。
-- **Direct WS transport**: LAN/tailnet向けのGateway WSエンドポイント（SSHなし）。
-- **SSH transport（フォールバック）**: `127.0.0.1:18789` をSSH経由でforwardして行うリモート制御。
-- **Legacy TCP bridge（削除済み）**: 以前のnode transport（
-  [Bridge protocol](/ja-JP/gateway/bridge-protocol) を参照）。現在のビルドでは
-  discovery向けにadvertiseされず、含まれていません。
+- **Gateway**: 状態（sessions、pairing、Node レジストリ）を保持し、チャネルを実行する単一の長時間実行 Gateway プロセス。多くの構成ではホストごとに 1 つですが、分離されたマルチ Gateway 構成も可能です。
+- **Gateway WS（コントロールプレーン）**: デフォルトでは `127.0.0.1:18789` 上の WebSocket エンドポイント。`gateway.bind` によって LAN/tailnet にバインドできます。
+- **Direct WS transport**: LAN/tailnet 向けの Gateway WS エンドポイント（SSH なし）。
+- **SSH transport（フォールバック）**: `127.0.0.1:18789` を SSH 経由で転送することによるリモート制御。
+- **Legacy TCP bridge（削除済み）**: 旧式の Node トランスポート（[Bridge protocol](/ja-JP/gateway/bridge-protocol) を参照）。現在は検出用に告知されず、現行ビルドの一部でもありません。
 
-プロトコル詳細:
+プロトコルの詳細:
 
 - [Gateway protocol](/ja-JP/gateway/protocol)
-- [Bridge protocol (legacy)](/ja-JP/gateway/bridge-protocol)
+- [Bridge protocol（legacy）](/ja-JP/gateway/bridge-protocol)
 
-## なぜ「direct」とSSHの両方を維持するのか
+## なぜ「direct」と SSH の両方を維持するのか
 
-- **Direct WS** は、同じネットワーク内やtailnet内で最良のUXです:
-  - BonjourによるLAN上の自動検出
-  - pairing token + ACLはgatewayが所有
-  - shellアクセス不要。プロトコルサーフェスを狭く保ち、監査しやすい
-- **SSH** は依然として汎用的なフォールバックです:
-  - SSHアクセスがある場所ならどこでも使える（無関係なネットワーク間でも）
-  - multicast/mDNSの問題を回避できる
-  - SSH以外の新たな受信ポートを必要としない
+- **Direct WS** は、同一ネットワーク内や tailnet 内では最もよい UX です。
+  - Bonjour による LAN 上での自動検出
+  - Gateway が管理するペアリングトークン + ACL
+  - シェルアクセス不要。プロトコル面を限定的かつ監査しやすく保てる
+- **SSH** は依然として汎用的なフォールバックです。
+  - SSH アクセスさえあればどこでも動作する（無関係なネットワーク間でも）
+  - マルチキャスト/mDNS の問題を回避できる
+  - SSH 以外に新しい受信ポートを必要としない
 
-## Discovery入力（クライアントがGatewayの場所を知る方法）
+## 検出入力（クライアントが Gateway の場所を知る方法）
 
-### 1) Bonjour / DNS-SD discovery
+### 1) Bonjour / DNS-SD 検出
 
-Multicast Bonjourはベストエフォートであり、ネットワークを越えません。OpenClawは、
-設定された広域DNS-SDドメイン経由でも同じgateway beaconを参照できるため、discoveryは次をカバーできます:
+マルチキャスト Bonjour はベストエフォートであり、ネットワークをまたぎません。OpenClaw は、
+設定された広域 DNS-SD ドメイン経由でも同じ Gateway ビーコンを参照できるため、検出範囲は次をカバーできます。
 
-- 同一LAN上の `local.`
-- クロスネットワークdiscovery用に設定されたunicast DNS-SDドメイン
+- 同一 LAN 上の `local.`
+- クロスネットワーク検出用に設定されたユニキャスト DNS-SD ドメイン
 
-対象方向:
+対象となる方向:
 
-- **gateway** はBonjour経由で自身のWSエンドポイントをadvertiseします。
-- クライアントは参照して「gatewayを選ぶ」一覧を表示し、選択されたエンドポイントを保存します。
+- **Gateway** が、Bonjour 経由で自身の WS エンドポイントを告知します。
+- クライアントはそれを参照して「Gateway を選択する」一覧を表示し、選択したエンドポイントを保存します。
 
-トラブルシューティングとbeacon詳細: [Bonjour](/ja-JP/gateway/bonjour)。
+トラブルシューティングとビーコンの詳細: [Bonjour](/ja-JP/gateway/bonjour)。
 
-#### Service beacon詳細
+#### サービスビーコンの詳細
 
-- Service type:
-  - `_openclaw-gw._tcp`（gateway transport beacon）
-- TXTキー（秘密情報ではない）:
+- サービスタイプ:
+  - `_openclaw-gw._tcp`（Gateway transport ビーコン）
+- TXT キー（非シークレット）:
   - `role=gateway`
   - `transport=gateway`
-  - `displayName=<friendly name>`（オペレーター設定の表示名）
+  - `displayName=<friendly name>`（オペレーターが設定した表示名）
   - `lanHost=<hostname>.local`
   - `gatewayPort=18789`（Gateway WS + HTTP）
-  - `gatewayTls=1`（TLS有効時のみ）
-  - `gatewayTlsSha256=<sha256>`（TLS有効かつfingerprintが利用可能な場合のみ）
-  - `canvasPort=<port>`（canvas hostポート。現在、canvas host有効時は `gatewayPort` と同じ）
-  - `tailnetDns=<magicdns>`（任意のヒント。Tailscale利用時に自動検出）
-  - `sshPort=<port>`（mDNS full modeのみ。wide-area DNS-SDでは省略されることがあり、その場合SSHデフォルトは `22` のまま）
-  - `cliPath=<path>`（mDNS full modeのみ。wide-area DNS-SDでもリモートインストールヒントとして書き込まれます）
+  - `gatewayTls=1`（TLS が有効な場合のみ）
+  - `gatewayTlsSha256=<sha256>`（TLS が有効で、フィンガープリントが利用可能な場合のみ）
+  - `canvasPort=<port>`（canvas host ポート。現在は canvas host が有効な場合、`gatewayPort` と同じ）
+  - `tailnetDns=<magicdns>`（任意のヒント。Tailscale が利用可能な場合は自動検出）
+  - `sshPort=<port>`（mDNS フルモードのみ。広域 DNS-SD では省略されることがあり、その場合 SSH のデフォルトは `22` のまま）
+  - `cliPath=<path>`（mDNS フルモードのみ。広域 DNS-SD でもリモートインストールのヒントとして書き込まれます）
 
 セキュリティに関する注記:
 
-- Bonjour/mDNS TXTレコードは**認証されていません**。クライアントはTXT値をUXヒントとしてのみ扱う必要があります。
-- ルーティング（host/port）は、TXTの `lanHost`、`tailnetDns`、`gatewayPort` よりも、**解決済みservice endpoint**（SRV + A/AAAA）を優先すべきです。
-- TLS pinningでは、advertiseされた `gatewayTlsSha256` が、以前保存済みのpinを上書きできてはなりません。
-- iOS/Android Nodeでは、選ばれたルートがsecure/TLSベースの場合、初回のpin保存前に必ず明示的な「このfingerprintを信頼する」確認（帯域外検証）を要求すべきです。
+- Bonjour/mDNS の TXT レコードは **認証されません**。クライアントは TXT 値を UX のヒントとしてのみ扱う必要があります。
+- ルーティング（host/port）は、TXT 提供の `lanHost`、`tailnetDns`、`gatewayPort` よりも、**解決されたサービスエンドポイント**（SRV + A/AAAA）を優先すべきです。
+- TLS ピンニングでは、告知された `gatewayTlsSha256` が以前に保存された pin を上書きできてはなりません。
+- iOS/Android Node は、選択したルートが secure/TLS ベースである場合、初回 pin を保存する前に、明示的な「このフィンガープリントを信頼する」確認（帯域外検証）を要求すべきです。
 
-無効化/override:
+無効化/上書き:
 
-- `OPENCLAW_DISABLE_BONJOUR=1` でadvertisingを無効化します。
-- `~/.openclaw/openclaw.json` の `gateway.bind` がGatewayのbind modeを制御します。
-- `OPENCLAW_SSH_PORT` は、`sshPort` を出力する際のadvertiseされるSSHポートを上書きします。
+- `OPENCLAW_DISABLE_BONJOUR=1` は告知を無効化します。
+- Docker Compose では、ブリッジネットワークが通常 mDNS マルチキャストを信頼性高く運ばないため、デフォルトで `OPENCLAW_DISABLE_BONJOUR=1` です。host、macvlan、または他の mDNS 対応ネットワーク上でのみ `0` を使ってください。
+- `~/.openclaw/openclaw.json` の `gateway.bind` が Gateway のバインドモードを制御します。
+- `OPENCLAW_SSH_PORT` は、`sshPort` が出力されるときに告知される SSH ポートを上書きします。
 - `OPENCLAW_TAILNET_DNS` は `tailnetDns` ヒント（MagicDNS）を公開します。
-- `OPENCLAW_CLI_PATH` はadvertiseされるCLIパスを上書きします。
+- `OPENCLAW_CLI_PATH` は告知される CLI パスを上書きします。
 
-### 2) Tailnet（クロスネットワーク）
+### 2) tailnet（クロスネットワーク）
 
-London/Viennaスタイルの構成では、Bonjourは役に立ちません。推奨される「direct」ターゲットは次です:
+London/Vienna スタイルの構成では、Bonjour は役に立ちません。推奨される「direct」対象は次です。
 
-- Tailscale MagicDNS名（推奨）または安定したtailnet IP。
+- Tailscale MagicDNS 名（推奨）または安定した tailnet IP。
 
-gatewayがTailscale上で動作していることを検出できる場合、クライアント向けの任意ヒントとして `tailnetDns` を公開します（wide-area beaconを含む）。
+Gateway が Tailscale 上で動作していることを検出できる場合、クライアント向けの任意ヒントとして `tailnetDns` を公開します（広域ビーコンも含む）。
 
-macOSアプリは現在、gateway discoveryで生のTailscale IPよりもMagicDNS名を優先します。これにより、tailnet IPが変わった場合（たとえばnode再起動後やCGNAT再割り当て後）でも、MagicDNS名が現在のIPへ自動解決されるため、信頼性が向上します。
+macOS アプリは現在、Gateway 検出で生の Tailscale IP よりも MagicDNS 名を優先します。これにより、tailnet IP が変わる場合（たとえば Node 再起動後や CGNAT の再割り当て後）でも、MagicDNS 名が自動的に現在の IP に解決されるため、信頼性が向上します。
 
-モバイルNodeペアリングでは、discoveryヒントによってtailnet/publicルートのtransportセキュリティが緩和されることはありません:
+モバイル Node のペアリングでは、検出ヒントによって tailnet/公開ルート上のトランスポートセキュリティ要件は緩和されません。
 
-- iOS/Androidでは、初回のtailnet/public接続は引き続きsecureな接続経路（`wss://` またはTailscale Serve/Funnel）が必要です。
-- 発見された生のtailnet IPはルーティングヒントであって、平文のリモート `ws://` を使ってよいという許可ではありません。
-- プライベートLANでのdirect-connect `ws://` は引き続きサポートされます。
-- モバイルNode向けに最も簡単なTailscale経路を使いたい場合は、Tailscale Serveを使って、discoveryとセットアップコードの両方が同じsecureなMagicDNSエンドポイントへ解決されるようにしてください。
+- iOS/Android では、初回の tailnet/公開接続経路に引き続き secure な経路（`wss://` または Tailscale Serve/Funnel）が必要です。
+- 検出された生の tailnet IP はルーティングヒントであり、平文のリモート `ws://` を使う許可ではありません。
+- プライベート LAN 上の direct-connect `ws://` は引き続きサポートされます。
+- モバイル Node で最も簡単な Tailscale 経路が欲しい場合は、検出とセットアップコードの両方が同じ secure な MagicDNS エンドポイントに解決されるよう、Tailscale Serve を使ってください。
 
-### 3) 手動 / SSHターゲット
+### 3) 手動 / SSH 対象
 
-directルートがない場合（またはdirectが無効な場合）、クライアントはいつでもloopback gatewayポートをforwardするSSH経由で接続できます。
+direct 経路がない場合（または direct が無効な場合）、クライアントはいつでも SSH で loopback Gateway ポートを転送して接続できます。
 
 [Remote access](/ja-JP/gateway/remote) を参照してください。
 
-## Transport選択（クライアントポリシー）
+## トランスポート選択（クライアントポリシー）
 
 推奨されるクライアント動作:
 
-1. ペア済みのdirectエンドポイントが設定され、到達可能なら、それを使う。
-2. そうでなければ、discoveryが `local.` または設定済みwide-area domain上でgatewayを見つけた場合、ワンタップの「このgatewayを使う」選択を提示し、それをdirectエンドポイントとして保存する。
-3. そうでなければ、tailnet DNS/IPが設定されていればdirectを試す。
-   モバイルNodeのtailnet/publicルートでは、directとはsecureなエンドポイントを意味し、平文のリモート `ws://` ではありません。
-4. それでもだめなら、SSHへフォールバックする。
+1. ペアリング済みの direct エンドポイントが設定されており到達可能なら、それを使う。
+2. そうでなければ、検出で `local.` または設定済み広域ドメイン上に Gateway が見つかった場合、ワンタップの「この Gateway を使う」選択肢を提示し、direct エンドポイントとして保存する。
+3. そうでなければ、tailnet DNS/IP が設定されていれば direct を試す。
+   tailnet/公開ルート上のモバイル Node では、direct は平文のリモート `ws://` ではなく secure なエンドポイントを意味します。
+4. それでもだめなら SSH にフォールバックする。
 
-## ペアリング + auth（direct transport）
+## ペアリング + 認証（direct transport）
 
-gatewayはnode/client受け入れの信頼できる情報源です。
+Gateway は Node/クライアント受け入れの信頼できる唯一の情報源です。
 
-- ペアリング要求はgateway内で作成/承認/拒否されます（[Gateway pairing](/ja-JP/gateway/pairing) を参照）。
-- gatewayは次を強制します:
-  - auth（token / keypair）
-  - scope/ACL（gatewayはすべてのメソッドへの生proxyではありません）
+- ペアリング要求は Gateway で作成/承認/拒否されます（[Gateway pairing](/ja-JP/gateway/pairing) を参照）。
+- Gateway は次を強制します。
+  - 認証（token / keypair）
+  - スコープ/ACL（Gateway はあらゆるメソッドへの生のプロキシではありません）
   - レート制限
 
 ## コンポーネントごとの責務
 
-- **Gateway**: discovery beaconをadvertiseし、ペアリング判定を所有し、WSエンドポイントをホストする。
-- **macOSアプリ**: gateway選択を補助し、ペアリングプロンプトを表示し、SSHはフォールバックとしてのみ使う。
-- **iOS/Android Node**: 利便性のためにBonjourを参照し、ペア済みGateway WSに接続する。
+- **Gateway**: 検出ビーコンを告知し、ペアリング判断を管理し、WS エンドポイントをホストする。
+- **macOS アプリ**: Gateway 選択を支援し、ペアリングプロンプトを表示し、SSH はフォールバックとしてのみ使用する。
+- **iOS/Android Node**: 利便性のために Bonjour を参照し、ペアリング済み Gateway WS に接続する。
 
 ## 関連
 

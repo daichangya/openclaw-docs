@@ -1,36 +1,36 @@
 ---
 read_when:
-    - OpenClaw で fal 画像生成を使いたい場合
-    - '`FAL_KEY` 認証フローが必要な場合'
-    - '`image_generate` または `video_generate` 向けの fal デフォルト設定が必要な場合'
-summary: OpenClaw での fal 画像・動画生成セットアップ
+    - OpenClaw で fal の画像生成を使いたいです
+    - '`FAL_KEY` 認証フローが必要です'
+    - '`image_generate` または `video_generate` の fal デフォルトを使いたいです'
+summary: OpenClaw での fal の画像および動画生成セットアップ
 title: Fal
 x-i18n:
-    generated_at: "2026-04-24T05:14:35Z"
+    generated_at: "2026-04-26T11:38:57Z"
     model: gpt-5.4
     provider: openai
-    source_hash: d23d2d0d27e5f60f9dacb4a6a7e4c07248cf45ccd80bfabaf6bb99f5f78946b2
+    source_hash: e6789f0fa1140cf76f0206c7384a79ee8b96de4af9e1dfedc00e5a3382f742bb
     source_path: providers/fal.md
     workflow: 15
 ---
 
-OpenClaw には、ホスト型の画像生成と動画生成向けに同梱の `fal` プロバイダがあります。
+OpenClaw には、ホスト型の画像生成と動画生成向けに、バンドルされた `fal` provider が含まれています。
 
-| 項目       | 値                                                              |
-| ---------- | --------------------------------------------------------------- |
-| プロバイダ | `fal`                                                           |
-| 認証       | `FAL_KEY`（正式。`FAL_API_KEY` もフォールバックとして動作）     |
-| API        | fal モデルエンドポイント                                        |
+| Property | Value                                                         |
+| -------- | ------------------------------------------------------------- |
+| Provider | `fal`                                                         |
+| Auth     | `FAL_KEY`（正式。`FAL_API_KEY` もフォールバックとして動作） |
+| API      | fal model endpoint                                            |
 
 ## はじめに
 
 <Steps>
-  <Step title="API キーを設定">
+  <Step title="API キーを設定する">
     ```bash
     openclaw onboard --auth-choice fal-api-key
     ```
   </Step>
-  <Step title="デフォルト画像モデルを設定">
+  <Step title="デフォルトの画像 model を設定する">
     ```json5
     {
       agents: {
@@ -47,22 +47,27 @@ OpenClaw には、ホスト型の画像生成と動画生成向けに同梱の `
 
 ## 画像生成
 
-同梱の `fal` 画像生成プロバイダのデフォルトは
+バンドルされた `fal` の画像生成 provider のデフォルトは
 `fal/fal-ai/flux/dev` です。
 
-| 機能             | 値                         |
-| ---------------- | -------------------------- |
-| 最大画像数       | リクエストあたり 4         |
-| 編集モード       | 有効、参照画像 1 枚        |
-| サイズ上書き     | サポート                   |
-| アスペクト比     | サポート                   |
-| 解像度           | サポート                   |
+| Capability     | Value                      |
+| -------------- | -------------------------- |
+| Max images     | リクエストごとに最大 4 枚      |
+| Edit mode      | 有効、参照画像は 1 枚         |
+| Size overrides | サポートあり                 |
+| Aspect ratio   | サポートあり                 |
+| Resolution     | サポートあり                 |
+| Output format  | `png` または `jpeg`         |
 
 <Warning>
-fal の画像編集エンドポイントは `aspectRatio` 上書きを **サポートしません**。
+fal の画像編集 endpoint は `aspectRatio` の override を **サポートしていません**。
 </Warning>
 
-fal をデフォルト画像プロバイダとして使うには:
+PNG 出力が必要な場合は `outputFormat: "png"` を使用してください。fal では
+OpenClaw 内で明示的な透明背景の制御を宣言していないため、`background:
+"transparent"` は fal model では無視される override として報告されます。
+
+fal をデフォルトの画像 provider として使うには:
 
 ```json5
 {
@@ -78,16 +83,16 @@ fal をデフォルト画像プロバイダとして使うには:
 
 ## 動画生成
 
-同梱の `fal` 動画生成プロバイダのデフォルトは
+バンドルされた `fal` の動画生成 provider のデフォルトは
 `fal/fal-ai/minimax/video-01-live` です。
 
-| 機能       | 値                                                             |
-| ---------- | -------------------------------------------------------------- |
-| モード     | テキストから動画、単一画像参照                                 |
-| ランタイム | 長時間実行ジョブ向けの、キュー型 submit / status / result フロー |
+| Capability | Value                                                              |
+| ---------- | ------------------------------------------------------------------ |
+| Modes      | テキストから動画、単一画像参照、Seedance の参照から動画 |
+| Runtime    | 長時間実行ジョブ向けの、キューを使った submit/status/result フロー       |
 
 <AccordionGroup>
-  <Accordion title="利用可能な動画モデル">
+  <Accordion title="利用可能な動画 model">
     **HeyGen video-agent:**
 
     - `fal/fal-ai/heygen/v2/video-agent`
@@ -96,12 +101,14 @@ fal をデフォルト画像プロバイダとして使うには:
 
     - `fal/bytedance/seedance-2.0/fast/text-to-video`
     - `fal/bytedance/seedance-2.0/fast/image-to-video`
+    - `fal/bytedance/seedance-2.0/fast/reference-to-video`
     - `fal/bytedance/seedance-2.0/text-to-video`
     - `fal/bytedance/seedance-2.0/image-to-video`
+    - `fal/bytedance/seedance-2.0/reference-to-video`
 
   </Accordion>
 
-  <Accordion title="Seedance 2.0 設定例">
+  <Accordion title="Seedance 2.0 の設定例">
     ```json5
     {
       agents: {
@@ -115,7 +122,26 @@ fal をデフォルト画像プロバイダとして使うには:
     ```
   </Accordion>
 
-  <Accordion title="HeyGen video-agent 設定例">
+  <Accordion title="Seedance 2.0 の reference-to-video 設定例">
+    ```json5
+    {
+      agents: {
+        defaults: {
+          videoGenerationModel: {
+            primary: "fal/bytedance/seedance-2.0/fast/reference-to-video",
+          },
+        },
+      },
+    }
+    ```
+
+    reference-to-video では、共有 `video_generate` の `images`、`videos`、`audioRefs`
+    パラメーターを通じて、最大 9 枚の画像、3 本の動画、3 件の音声参照を受け付けます。
+    参照ファイルの合計は最大 12 件です。
+
+  </Accordion>
+
+  <Accordion title="HeyGen video-agent の設定例">
     ```json5
     {
       agents: {
@@ -131,20 +157,20 @@ fal をデフォルト画像プロバイダとして使うには:
 </AccordionGroup>
 
 <Tip>
-利用可能な fal
-モデルの完全一覧（最近追加されたエントリを含む）を見るには `openclaw models list --provider fal` を使ってください。
+利用可能な fal model の完全な一覧を確認するには `openclaw models list --provider fal` を使ってください。
+最近追加された項目も含まれます。
 </Tip>
 
-## 関連
+## 関連情報
 
 <CardGroup cols={2}>
   <Card title="画像生成" href="/ja-JP/tools/image-generation" icon="image">
-    共通画像ツールパラメータとプロバイダ選択。
+    共通の画像 tool パラメーターと provider 選択。
   </Card>
   <Card title="動画生成" href="/ja-JP/tools/video-generation" icon="video">
-    共通動画ツールパラメータとプロバイダ選択。
+    共通の動画 tool パラメーターと provider 選択。
   </Card>
   <Card title="設定リファレンス" href="/ja-JP/gateway/config-agents#agent-defaults" icon="gear">
-    画像 / 動画モデル選択を含むエージェントデフォルト。
+    画像と動画の model 選択を含む agent のデフォルト設定。
   </Card>
 </CardGroup>

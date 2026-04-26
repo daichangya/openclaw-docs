@@ -1,40 +1,40 @@
 ---
 read_when:
-    - macOS UI なしで Node ペアリング承認を実装すること
-    - リモート Node を承認するための CLI フローを追加すること
-    - Node 管理を使って Gateway プロトコルを拡張すること
-summary: iOS およびその他のリモート Node 向けの Gateway 管理 Node ペアリング（Option B）
-title: Gateway 管理ペアリング
+    - macOS UIなしでNodeペアリング承認を実装すること
+    - remote Nodeを承認するためのCLIフローを追加すること
+    - Node管理によってGateway protocolを拡張すること
+summary: iOSおよびその他のremote Node向けのGateway管理Nodeペアリング（Option B）
+title: Gateway管理ペアリング
 x-i18n:
-    generated_at: "2026-04-25T13:49:13Z"
+    generated_at: "2026-04-26T11:30:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3b512fbf97e7557a1f467732f1b68d8c1b8183695e436b3f87b4c4aca1478cb5
+    source_hash: 436391f7576b7285733eb4a8283b73d7b4c52f22b227dd915c09313cfec776bd
     source_path: gateway/pairing.md
     workflow: 15
 ---
 
-Gateway 管理ペアリングでは、どの Node の参加を許可するかについての信頼できる情報源は **Gateway** です。UI（macOS app、将来のクライアント）は、保留中リクエストを承認または拒否するためのフロントエンドにすぎません。
+Gateway管理ペアリングでは、どのNodeの参加を許可するかのソースオブトゥルースは**Gateway**です。UI（macOS app、将来のclient）は、保留中のrequestを承認または拒否するフロントエンドにすぎません。
 
-**重要:** WS Node は `connect` 時に **device pairing**（role `node`）を使用します。`node.pair.*` は別個のペアリングストアであり、WS ハンドシェイクを制御しません。このフローを使うのは、明示的に `node.pair.*` を呼び出すクライアントだけです。
+**重要:** WS Nodeは、`connect` 中に**device pairing**（role `node`）を使用します。`node.pair.*` は別のpairing storeであり、WS handshakeを制御しません。このフローを使うのは、明示的に `node.pair.*` を呼び出すclientだけです。
 
 ## 概念
 
-- **保留中リクエスト**: Node が参加を要求した状態。承認が必要です。
-- **ペア済み Node**: 承認され、認証トークンが発行された Node。
-- **トランスポート**: Gateway WS エンドポイントはリクエストを転送しますが、参加可否は決定しません。（旧来の TCP ブリッジサポートは削除されました。）
+- **Pending request**: 参加を要求したNode。承認が必要です。
+- **Paired node**: 承認され、auth tokenが発行されたNode。
+- **Transport**: Gateway WS endpointはrequestを転送しますが、membershipは決定しません。（旧TCP bridgeサポートは削除されました。）
 
 ## ペアリングの仕組み
 
-1. Node が Gateway WS に接続してペアリングを要求します。
-2. Gateway は **保留中リクエスト** を保存し、`node.pair.requested` を発行します。
-3. リクエストを承認または拒否します（CLI または UI）。
-4. 承認時、Gateway は **新しいトークン** を発行します（再ペアリング時にはトークンがローテーションされます）。
-5. Node はそのトークンを使って再接続し、「ペア済み」になります。
+1. NodeがGateway WSに接続し、pairingを要求します。
+2. Gatewayは **pending request** を保存し、`node.pair.requested` を発行します。
+3. requestを承認または拒否します（CLIまたはUI）。
+4. 承認時に、Gatewayは**新しいtoken**を発行します（再pair時にはtokenがローテーションされます）。
+5. Nodeはそのtokenを使って再接続し、「paired」状態になります。
 
-保留中リクエストは **5 分** で自動的に期限切れになります。
+pending requestは**5分**後に自動で期限切れになります。
 
-## CLI ワークフロー（ヘッドレス対応）
+## CLIワークフロー（ヘッドレス対応）
 
 ```bash
 openclaw nodes pending
@@ -44,78 +44,75 @@ openclaw nodes status
 openclaw nodes rename --node <id|name|ip> --name "Living Room iPad"
 ```
 
-`nodes status` は、ペア済み/接続中の Node とその capabilities を表示します。
+`nodes status` はpaired / connected Nodeと、そのcapabilityを表示します。
 
-## API サーフェス（Gateway プロトコル）
+## API surface（Gateway protocol）
 
 イベント:
 
-- `node.pair.requested` — 新しい保留中リクエストが作成されたときに発行されます。
-- `node.pair.resolved` — リクエストが承認/拒否/期限切れになったときに発行されます。
+- `node.pair.requested` — 新しいpending requestが作成されたときに発行されます。
+- `node.pair.resolved` — requestが承認 / 拒否 / 期限切れになったときに発行されます。
 
 メソッド:
 
-- `node.pair.request` — 保留中リクエストを作成または再利用する。
-- `node.pair.list` — 保留中 + ペア済み Node を一覧表示する（`operator.pairing`）。
-- `node.pair.approve` — 保留中リクエストを承認する（トークンを発行）。
-- `node.pair.reject` — 保留中リクエストを拒否する。
-- `node.pair.verify` — `{ nodeId, token }` を検証する。
+- `node.pair.request` — pending requestを作成または再利用します。
+- `node.pair.list` — pending + paired Nodeを一覧表示します（`operator.pairing`）。
+- `node.pair.approve` — pending requestを承認します（tokenを発行）。
+- `node.pair.reject` — pending requestを拒否します。
+- `node.pair.verify` — `{ nodeId, token }` を検証します。
 
 注記:
 
-- `node.pair.request` は Node ごとに冪等です。繰り返し呼び出すと同じ保留中リクエストが返されます。
-- 同じ保留中 Node に対する繰り返しリクエストでは、保存済み Node メタデータと、operator 可視性のための最新の許可済み declared command スナップショットも更新されます。
-- 承認では **常に** 新しいトークンが生成されます。`node.pair.request` からトークンが返されることはありません。
-- リクエストには、自動承認フローへのヒントとして `silent: true` を含めることができます。
-- `node.pair.approve` は、保留中リクエストの declared commands を使って追加の承認スコープを強制します:
-  - command なしのリクエスト: `operator.pairing`
-  - 非 exec コマンドのリクエスト: `operator.pairing` + `operator.write`
-  - `system.run` / `system.run.prepare` / `system.which` のリクエスト:
+- `node.pair.request` はNodeごとにidempotentです。繰り返し呼び出しても同じpending requestが返ります。
+- 同じpending Nodeへの繰り返しrequestでは、operator可視化のために、保存済みNode metadataと最新のallowlist済み宣言command snapshotも更新されます。
+- 承認では**常に**新しいtokenが生成されます。`node.pair.request` からtokenが返されることはありません。
+- requestには、自動承認フロー向けのhintとして `silent: true` を含めることができます。
+- `node.pair.approve` は、追加の承認scopeを強制するためにpending requestの宣言commandを使います。
+  - commandなしrequest: `operator.pairing`
+  - 非exec command request: `operator.pairing` + `operator.write`
+  - `system.run` / `system.run.prepare` / `system.which` request:
     `operator.pairing` + `operator.admin`
 
 重要:
 
-- Node ペアリングは、信頼/ID フローに加えてトークン発行を行うものです。
-- これは、Node ごとの live command surface を固定するものではありません。
-- live node commands は、Node が接続時に宣言した内容から来ます。その後、gateway のグローバルな node command policy（`gateway.nodes.allowCommands` /
-  `denyCommands`）が適用されます。
-- Node ごとの `system.run` の allow/ask policy は、ペアリングレコードではなく Node 側の
-  `exec.approvals.node.*` に存在します。
+- Node pairingは、trust / identityフローとtoken発行です。
+- これは、Nodeごとのlive command surfaceをpinするものでは**ありません**。
+- live Node commandは、Nodeが接続時に宣言したものから取得され、その後、GatewayのグローバルNode command policy（`gateway.nodes.allowCommands` / `denyCommands`）が適用されます。
+- Nodeごとの `system.run` allow / ask policyは、pairing recordではなく、Node上の `exec.approvals.node.*` にあります。
 
-## Node コマンドゲーティング（2026.3.31+）
+## Node command gating（2026.3.31+）
 
 <Warning>
-**破壊的変更:** `2026.3.31` 以降、Node コマンドは Node ペアリングが承認されるまで無効です。device pairing だけでは、宣言された Node コマンドは公開されなくなります。
+**破壊的変更:** `2026.3.31` 以降、Node commandはNode pairingが承認されるまで無効です。device pairingだけでは、宣言されたNode commandを公開するのに十分ではなくなりました。
 </Warning>
 
-Node が初めて接続すると、ペアリングは自動的に要求されます。ペアリングリクエストが承認されるまで、その Node からの保留中 Node コマンドはすべてフィルタリングされ、実行されません。ペアリング承認によって信頼が確立されると、Node が宣言したコマンドは通常のコマンドポリシーに従って利用可能になります。
+Nodeが初めて接続すると、pairingは自動的に要求されます。pairing requestが承認されるまで、そのNodeからの保留中Node commandはすべてfilterされ、実行されません。pairing承認によってtrustが確立されると、そのNodeが宣言したcommandは通常のcommand policyに従って利用可能になります。
 
 これは次を意味します。
 
-- 以前は device pairing だけでコマンド公開を行っていた Node も、今後は Node ペアリングを完了しなければなりません。
-- ペアリング承認前にキューされたコマンドは延期されず、破棄されます。
+- 以前、device pairingだけに依存してcommandを公開していたNodeは、今後はNode pairingを完了する必要があります。
+- pairing承認前にキューされたcommandは保留されず、破棄されます。
 
-## Node イベントの信頼境界（2026.3.31+）
+## Node event trust boundary（2026.3.31+）
 
 <Warning>
-**破壊的変更:** Node 起点の run は、より限定された信頼サーフェスに留まるようになりました。
+**破壊的変更:** Node起点のrunは、より制限されたtrusted surface内に留まるようになりました。
 </Warning>
 
-Node 起点の要約および関連セッションイベントは、意図された信頼サーフェスに制限されます。以前はより広い host または session の tool アクセスに依存していた通知駆動または Node トリガーのフローは、調整が必要になる場合があります。この強化により、Node イベントが、その Node の信頼境界を超えて host レベルの tool アクセスへ昇格することを防ぎます。
+Node起点のsummaryおよび関連session eventは、意図されたtrusted surfaceに制限されます。以前はより広いhostまたはsession tool accessに依存していた通知駆動またはNodeトリガーのフローでは、調整が必要になる場合があります。このhardeningにより、Node eventが、Nodeのtrust boundaryを超えてhostレベルtool accessへ昇格できないようになります。
 
 ## 自動承認（macOS app）
 
-macOS app は、次の場合に任意で **サイレント承認** を試行できます。
+macOS appは、次の条件を満たす場合に、任意で**silent approval**を試行できます。
 
-- リクエストが `silent` としてマークされており、かつ
-- app が同じユーザーで gateway host への SSH 接続を検証できる場合。
+- requestに `silent` が付いている
+- appが同じユーザーでGateway hostへのSSH接続を検証できる
 
-サイレント承認に失敗した場合は、通常の「Approve/Reject」プロンプトにフォールバックします。
+silent approvalに失敗した場合は、通常の「Approve / Reject」promptにフォールバックします。
 
-## Trusted-CIDR device 自動承認
+## Trusted-CIDR device自動承認
 
-`role: node` 用の WS device pairing は、デフォルトでは引き続き手動です。Gateway がすでにネットワーク経路を信頼しているプライベート
-Node ネットワークでは、運用者は明示的な CIDR または完全一致 IP でオプトインできます。
+`role: node` に対するWS device pairingは、引き続きデフォルトでは手動です。Gatewayがすでにnetwork pathを信頼しているprivate Node networkでは、operatorは明示的なCIDRまたは正確なIPでopt-inできます。
 
 ```json5
 {
@@ -132,54 +129,48 @@ Node ネットワークでは、運用者は明示的な CIDR または完全一
 セキュリティ境界:
 
 - `gateway.nodes.pairing.autoApproveCidrs` が未設定の場合は無効です。
-- 包括的な LAN またはプライベートネットワーク自動承認モードは存在しません。
-- 対象となるのは、要求スコープを持たない新規の `role: node` device pairing のみです。
-- operator、browser、Control UI、WebChat クライアントは引き続き手動です。
-- role、scope、metadata、public-key のアップグレードは引き続き手動です。
-- 同一 host の loopback trusted-proxy header 経路は、ローカル呼び出し元が偽装できるため対象外です。
+- LAN全体またはprivate network全体を対象にした包括的な自動承認モードは存在しません。
+- 対象になるのは、要求scopeのない新規の `role: node` device pairingだけです。
+- operator、browser、Control UI、WebChat clientは引き続き手動です。
+- role、scope、metadata、public keyのupgradeは引き続き手動です。
+- 同一host loopback trusted-proxy header経路は対象外です。この経路はローカルcallerにより偽装できるためです。
 
-## Metadata-upgrade 自動承認
+## Metadata-upgrade自動承認
 
-すでにペア済みの device が、非機微な metadata
-変更だけで再接続した場合（たとえば表示名やクライアントプラットフォームのヒント）、OpenClaw はそれを `metadata-upgrade` として扱います。サイレント自動承認は狭い範囲に限定されています。対象は、loopback 経由で共有 token または password の保持をすでに証明した、信頼できるローカル CLI/ヘルパー再接続のみです。browser/Control UI クライアントやリモートクライアントは、引き続き明示的な再承認フローを使用します。スコープのアップグレード（read から
-write/admin）および public key の変更は、**metadata-upgrade 自動承認の対象外** です。これらは引き続き明示的な再承認リクエストになります。
+すでにpaired済みのdeviceが、非機密metadataのみの変更（たとえばdisplay nameやclient platform hint）で再接続した場合、OpenClawはそれを `metadata-upgrade` として扱います。silent auto-approvalは限定的で、localまたはshared credentialの所持をすでに証明している、信頼された非browserローカル再接続にのみ適用されます。これには、OS version metadata変更後の同一host native app再接続も含まれます。browser / Control UI clientおよびremote clientは、引き続き明示的な再承認フローを使用します。scope upgrade（readからwrite / admin）およびpublic key変更は **metadata-upgrade自動承認の対象外** であり、引き続き明示的な再承認requestになります。
 
-## QR ペアリングヘルパー
+## QRペアリングヘルパー
 
-`/pair qr` はペアリングペイロードを構造化メディアとしてレンダリングするため、モバイルおよび
-browser クライアントが直接スキャンできます。
+`/pair qr` はpairing payloadを構造化mediaとして描画するため、mobile clientやbrowser clientが直接それをscanできます。
 
-device を削除すると、その device id に対する古い保留中ペアリングリクエストも一掃されるため、`nodes pending` に revoke 後の孤立行は表示されません。
+deviceを削除すると、そのdevice idに対する古いpending pairing requestも一掃されるため、revoke後に `nodes pending` に孤立した行が表示されません。
 
-## ローカリティと転送ヘッダー
+## ローカリティとforwarded header
 
-Gateway ペアリングは、生ソケットと上流 proxy の証拠の両方が一致する場合にのみ、接続を loopback として扱います。リクエストが loopback で到着しても、
-`X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` ヘッダーによって非ローカルの origin が示されている場合、その転送ヘッダー証拠によって
-loopback ローカリティの主張は無効になります。その場合、ペアリング経路は明示的承認を必要とし、同一 host 接続としてサイレントに扱われることはありません。同等ルールについては、
-operator auth 側の [Trusted Proxy Auth](/ja-JP/gateway/trusted-proxy-auth) を参照してください。
+Gateway pairingは、生socketとupstream proxyの証拠の両方が一致した場合にのみ、接続をloopbackとみなします。requestがloopback上に到着しても、`X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` headerが非ローカルoriginを指している場合、そのforwarded-headerの証拠によってloopbackローカリティ主張は無効になります。その場合、pairing経路では同一host接続として暗黙的に扱わず、明示的承認が必要になります。operator authにおける同等ルールについては、[Trusted Proxy Auth](/ja-JP/gateway/trusted-proxy-auth)を参照してください。
 
-## ストレージ（ローカル、非公開）
+## ストレージ（ローカル、private）
 
-ペアリング状態は Gateway state ディレクトリ配下に保存されます（デフォルト `~/.openclaw`）。
+pairing stateはGateway state directory配下に保存されます（デフォルトは `~/.openclaw`）。
 
 - `~/.openclaw/nodes/paired.json`
 - `~/.openclaw/nodes/pending.json`
 
-`OPENCLAW_STATE_DIR` を上書きしている場合、`nodes/` フォルダーも一緒に移動します。
+`OPENCLAW_STATE_DIR` を上書きした場合、`nodes/` folderも一緒に移動します。
 
-セキュリティ上の注意:
+セキュリティ注記:
 
-- トークンは秘密情報です。`paired.json` は機微情報として扱ってください。
-- トークンをローテーションするには再承認（または Node エントリ削除）が必要です。
+- tokenは秘密情報です。`paired.json` は機密ファイルとして扱ってください。
+- tokenをローテーションするには再承認が必要です（またはNode entryの削除）。
 
-## トランスポート動作
+## Transport動作
 
-- トランスポートは **ステートレス** です。参加情報は保存しません。
-- Gateway がオフライン、またはペアリングが無効な場合、Node はペアリングできません。
-- Gateway がリモートモードでも、ペアリングは引き続きそのリモート Gateway のストアに対して行われます。
+- transportは**stateless**です。membershipは保存しません。
+- Gatewayがoffline、またはpairingが無効な場合、Nodeはpairできません。
+- Gatewayがremote modeでも、pairingは引き続きremote Gatewayのstoreに対して行われます。
 
 ## 関連
 
-- [チャンネルペアリング](/ja-JP/channels/pairing)
+- [Channel pairing](/ja-JP/channels/pairing)
 - [Nodes](/ja-JP/nodes)
 - [Devices CLI](/ja-JP/cli/devices)

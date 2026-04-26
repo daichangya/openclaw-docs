@@ -1,39 +1,39 @@
 ---
 read_when:
-    - '`openclaw infer` コマンドの追加または変更'
-    - 安定したヘッドレス機能の自動化を設計する
-summary: プロバイダーバックのモデル、画像、音声、TTS、動画、Web、埋め込みワークフロー向けの推論優先CLI
-title: 推論CLI
+    - '`openclaw infer` コマンドを追加または変更する'
+    - 安定したヘッドレスcapability automationを設計しています
+summary: provider対応のmodel、image、audio、TTS、video、web、embeddingワークフロー向けのinfer-first CLI
+title: Inference CLI
 x-i18n:
-    generated_at: "2026-04-25T18:16:38Z"
+    generated_at: "2026-04-26T11:26:38Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 23242bfa8a354b949473322f47da90876e05a5e54d467ca134f2e59c3ae8bb02
+    source_hash: bf07b306d80535b58d811aa33c0bbe2ecac57b22c3ab27f6f2ae6518ceb21e49
     source_path: cli/infer.md
     workflow: 15
 ---
 
-`openclaw infer` は、プロバイダーバックの推論ワークフロー向けの正規のヘッドレスサーフェスです。
+`openclaw infer` は、provider対応のinferenceワークフロー向けの標準的なヘッドレスsurfaceです。
 
-これは意図的に、未加工の gateway RPC 名や未加工のエージェントツール ID ではなく、機能ファミリーを公開します。
+これは、raw Gateway RPC名やraw agent tool idではなく、capabilityファミリーを意図的に公開します。
 
-## infer を Skill にする
+## inferをSkillにする
 
-これをエージェントにコピーして貼り付けます:
+これをagentにコピーして貼り付けてください。
 
 ```text
-https://docs.openclaw.ai/cli/infer を読んでから、私の一般的なワークフローを `openclaw infer` にルーティングする Skill を作成してください。
-モデル実行、画像生成、動画生成、音声文字起こし、TTS、Web 検索、埋め込みに重点を置いてください。
+Read https://docs.openclaw.ai/cli/infer, then create a skill that routes my common workflows to `openclaw infer`.
+Focus on model runs, image generation, video generation, audio transcription, TTS, web search, and embeddings.
 ```
 
-優れた infer ベースの Skill は次のようになります:
+良いinferベースのSkillは、次のことを行うべきです。
 
-- 一般的なユーザー意図を正しい infer サブコマンドに対応付ける
-- 対応対象のワークフローについて、いくつかの正規の infer 例を含める
+- 一般的なユーザー意図を正しいinfer subcommandにマップする
+- 対応するワークフロー向けに、いくつかの標準的なinfer例を含める
 - 例や提案では `openclaw infer ...` を優先する
-- Skill 本文内で infer サーフェス全体を再文書化しない
+- Skill本文の中でinfer surface全体を再度ドキュメント化しない
 
-典型的な infer 重視の Skill の対象範囲:
+典型的なinfer中心のSkill対象範囲:
 
 - `openclaw infer model run`
 - `openclaw infer image generate`
@@ -42,24 +42,22 @@ https://docs.openclaw.ai/cli/infer を読んでから、私の一般的なワー
 - `openclaw infer web search`
 - `openclaw infer embedding create`
 
-## infer を使う理由
+## inferを使う理由
 
-`openclaw infer` は、OpenClaw 内のプロバイダーバック推論タスク向けに一貫した単一の CLI を提供します。
+`openclaw infer` は、OpenClaw内のprovider対応inferenceタスク向けに、一貫した1つのCLIを提供します。
 
 利点:
 
-- バックエンドごとに単発のラッパーを配線するのではなく、OpenClaw ですでに設定されているプロバイダーとモデルを使えます。
-- モデル、画像、音声文字起こし、TTS、動画、Web、埋め込みのワークフローを、1 つのコマンドツリーの下にまとめられます。
-- スクリプト、自動化、エージェント駆動ワークフロー向けに、安定した `--json` 出力形式を使えます。
-- タスクが本質的に「推論を実行する」ものである場合は、ファーストパーティの OpenClaw サーフェスを優先できます。
-- ほとんどの infer コマンドでは、gateway を必要とせず通常のローカルパスを使えます。
+- backendごとに単発のwrapperを用意する代わりに、OpenClawですでに設定されているproviderとmodelを使える
+- model、image、audio transcription、TTS、video、web、embeddingのワークフローを1つのcommand tree配下にまとめられる
+- script、automation、agent駆動ワークフロー向けに、安定した `--json` 出力形式を使える
+- タスクが本質的に「inferenceを実行する」ことである場合、OpenClawのファーストパーティsurfaceを優先できる
+- 多くのinfer commandで、Gatewayを必要とせず通常のローカル経路を使える
 
-エンドツーエンドのプロバイダーチェックでは、下位レベルの
-プロバイダーテストがグリーンになったら `openclaw infer ...` を優先します。これにより、プロバイダーリクエストが実行される前に、出荷済み CLI、設定読み込み、
-デフォルトエージェント解決、同梱 Plugin の有効化、ランタイム依存関係の修復、
-共有機能ランタイムが実行されます。
+エンドツーエンドのprovider確認では、より低レベルのprovider testがgreenになった後は `openclaw infer ...` を優先してください。
+これにより、実際に出荷されるCLI、config読み込み、default agent解決、同梱Plugin有効化、runtime dependency修復、および共有capability runtimeが、provider requestの前段で実行されます。
 
-## コマンドツリー
+## Command tree
 
 ```text
  openclaw infer
@@ -110,38 +108,38 @@ https://docs.openclaw.ai/cli/infer を読んでから、私の一般的なワー
     providers
 ```
 
-## 一般的なタスク
+## よくあるタスク
 
-この表は、一般的な推論タスクを対応する infer コマンドに対応付けたものです。
+この表は、一般的なinferenceタスクを対応するinfer commandに対応付けます。
 
-| タスク | コマンド | 注記 |
-| ----------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------- |
-| テキスト/モデルプロンプトを実行する | `openclaw infer model run --prompt "..." --json` | デフォルトで通常のローカルパスを使います |
-| 画像を生成する | `openclaw infer image generate --prompt "..." --json` | 既存ファイルから始める場合は `image edit` を使います |
-| 画像ファイルを説明する | `openclaw infer image describe --file ./image.png --json` | `--model` は画像対応の `<provider/model>` である必要があります |
-| 音声を文字起こしする | `openclaw infer audio transcribe --file ./memo.m4a --json` | `--model` は `<provider/model>` である必要があります |
-| 音声を合成する | `openclaw infer tts convert --text "..." --output ./speech.mp3 --json` | `tts status` は gateway 指向です |
-| 動画を生成する | `openclaw infer video generate --prompt "..." --json` | `--resolution` のようなプロバイダーヒントをサポートします |
-| 動画ファイルを説明する | `openclaw infer video describe --file ./clip.mp4 --json` | `--model` は `<provider/model>` である必要があります |
-| Web を検索する | `openclaw infer web search --query "..." --json` |  |
-| Web ページを取得する | `openclaw infer web fetch --url https://example.com --json` |  |
-| 埋め込みを作成する | `openclaw infer embedding create --text "..." --json` |  |
+| タスク | Command | 注記 |
+| ------- | ------- | ---- |
+| テキスト/model promptを実行する | `openclaw infer model run --prompt "..." --json` | デフォルトでは通常のローカル経路を使用 |
+| imageを生成する | `openclaw infer image generate --prompt "..." --json` | 既存ファイルから始める場合は `image edit` を使用 |
+| image fileを説明する | `openclaw infer image describe --file ./image.png --json` | `--model` はimage対応の `<provider/model>` である必要があります |
+| audioを文字起こしする | `openclaw infer audio transcribe --file ./memo.m4a --json` | `--model` は `<provider/model>` である必要があります |
+| 音声を合成する | `openclaw infer tts convert --text "..." --output ./speech.mp3 --json` | `tts status` はGateway指向です |
+| videoを生成する | `openclaw infer video generate --prompt "..." --json` | `--resolution` などのprovider hintをサポート |
+| video fileを説明する | `openclaw infer video describe --file ./clip.mp4 --json` | `--model` は `<provider/model>` である必要があります |
+| webを検索する | `openclaw infer web search --query "..." --json` | |
+| web pageを取得する | `openclaw infer web fetch --url https://example.com --json` | |
+| embeddingを作成する | `openclaw infer embedding create --text "..." --json` | |
 
 ## 動作
 
-- `openclaw infer ...` は、これらのワークフロー向けの主要な CLI サーフェスです。
-- 出力を別のコマンドやスクリプトで利用する場合は `--json` を使います。
-- 特定のバックエンドが必要な場合は `--provider` または `--model provider/model` を使います。
+- `openclaw infer ...` は、これらのワークフロー向けの主要なCLI surfaceです。
+- 出力を別のcommandやscriptで消費する場合は `--json` を使ってください。
+- 特定のbackendが必要な場合は `--provider` または `--model provider/model` を使ってください。
 - `image describe`、`audio transcribe`、`video describe` では、`--model` は `<provider/model>` 形式である必要があります。
-- `image describe` では、明示的な `--model` はその provider/model を直接実行します。モデルはモデルカタログまたはプロバイダー設定で画像対応である必要があります。`codex/<model>` は境界付きの Codex app-server 画像理解ターンを実行し、`openai-codex/<model>` は OpenAI Codex OAuth プロバイダーパスを使います。
-- ステートレス実行コマンドのデフォルトは local です。
-- gateway 管理状態コマンドのデフォルトは gateway です。
-- 通常のローカルパスでは、gateway を実行しておく必要はありません。
-- `model run` はワンショットです。そのコマンドのエージェントランタイム経由で開かれた MCP サーバーは、local と `--gateway` 実行のどちらでも応答後に終了するため、繰り返しのスクリプト呼び出しで stdio MCP 子プロセスが生き続けることはありません。
+- `image describe` では、明示的な `--model` により、そのprovider/modelを直接実行します。modelはmodel catalogまたはprovider configでimage対応である必要があります。`codex/<model>` は境界付きのCodex app-server image-understanding turnを実行し、`openai-codex/<model>` はOpenAI Codex OAuth provider経路を使用します。
+- stateless execution commandはデフォルトでlocalです。
+- Gateway管理state commandはデフォルトでgatewayです。
+- 通常のローカル経路では、Gatewayが起動している必要はありません。
+- `model run` はone-shotです。そのcommandのためにagent runtime経由で開かれたMCP serverは、local実行でも `--gateway` 実行でも、応答後に破棄されます。そのため、繰り返しのscript実行でstdio MCP child processが生き残ることはありません。
 
 ## Model
 
-`model` は、プロバイダーバックのテキスト推論と model/provider の検査に使います。
+provider対応のtext inferenceおよびmodel/provider検査には `model` を使います。
 
 ```bash
 openclaw infer model run --prompt "Reply with exactly: smoke-ok" --json
@@ -152,18 +150,21 @@ openclaw infer model inspect --name gpt-5.5 --json
 
 注記:
 
-- `model run` はエージェントランタイムを再利用するため、プロバイダー/モデルのオーバーライドは通常のエージェント実行と同様に動作します。
-- `model run` はヘッドレス自動化を目的としているため、コマンド終了後にセッションごとの同梱 MCP ランタイムを保持しません。
-- `model auth login`、`model auth logout`、`model auth status` は、保存済みのプロバイダー認証状態を管理します。
+- `model run` はagent runtimeを再利用するため、provider/model overrideは通常のagent実行と同様に動作します。
+- `model run` はヘッドレスautomation向けであるため、command完了後にsession単位の同梱MCP runtimeを保持しません。
+- `model auth login`、`model auth logout`、`model auth status` は保存されたprovider auth stateを管理します。
 
-## 画像
+## Image
 
-`image` は、生成、編集、説明に使います。
+生成、編集、説明には `image` を使います。
 
 ```bash
 openclaw infer image generate --prompt "friendly lobster illustration" --json
 openclaw infer image generate --prompt "cinematic product photo of headphones" --json
+openclaw infer image generate --model openai/gpt-image-1.5 --output-format png --background transparent --prompt "simple red circle sticker on a transparent background" --json
 openclaw infer image generate --prompt "slow image backend" --timeout-ms 180000 --json
+openclaw infer image edit --file ./logo.png --model openai/gpt-image-1.5 --output-format png --background transparent --prompt "keep the logo, remove the background" --json
+openclaw infer image edit --file ./poster.png --prompt "make this a vertical story ad" --size 2160x3840 --aspect-ratio 9:16 --resolution 4K --json
 openclaw infer image describe --file ./photo.jpg --json
 openclaw infer image describe --file ./ui-screenshot.png --model openai/gpt-4.1-mini --json
 openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --json
@@ -171,12 +172,11 @@ openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --j
 
 注記:
 
-- 既存の入力ファイルから始める場合は `image edit` を使います。
-- `image providers --json` を使うと、どの同梱画像プロバイダーが
-  検出可能か、設定済みか、選択済みか、また各プロバイダーがどの生成/編集機能を
-  公開しているかを確認できます。
-- `image generate --model <provider/model> --json` は、画像生成変更に対する最も限定的なライブ
-  CLI スモークとして使います。例:
+- 既存の入力ファイルから始める場合は `image edit` を使ってください。
+- `image edit` で、参照image編集時のgeometry hintをサポートするprovider/modelでは、`--size`、`--aspect-ratio`、`--resolution` を使ってください。
+- 透過背景のOpenAI PNG出力には、`--model openai/gpt-image-1.5` とともに `--output-format png --background transparent` を使ってください。`--openai-background` もOpenAI専用aliasとして引き続き使えます。backgroundサポートを宣言していないproviderでは、そのhintは無視されたoverrideとして報告されます。
+- 同梱image providerのうち、どれが検出可能か、設定済みか、選択中か、また各providerがどのgeneration/edit capabilityを公開しているかを確認するには、`image providers --json` を使ってください。
+- image生成変更の最も狭いlive CLI smokeとして `image generate --model <provider/model> --json` を使ってください。例:
 
   ```bash
   openclaw infer image providers --json
@@ -187,16 +187,14 @@ openclaw infer image describe --file ./photo.jpg --model ollama/qwen2.5vl:7b --j
     --json
   ```
 
-  JSON 応答は `ok`、`provider`、`model`、`attempts`、書き込まれた
-  出力パスを報告します。`--output` が設定されている場合、最終拡張子は
-  プロバイダーが返した MIME type に従うことがあります。
+  JSON応答では `ok`、`provider`、`model`、`attempts`、書き込まれたoutput pathが報告されます。`--output` が設定されている場合、最終的な拡張子はproviderが返したMIME typeに従うことがあります。
 
-- `image describe` では、`--model` は画像対応の `<provider/model>` である必要があります。
-- ローカルの Ollama ビジョンモデルでは、最初にモデルを pull し、`OLLAMA_API_KEY` を任意のプレースホルダー値、たとえば `ollama-local` に設定します。[Ollama](/ja-JP/providers/ollama#vision-and-image-description) を参照してください。
+- `image describe` では、`--model` はimage対応の `<provider/model>` である必要があります。
+- ローカルOllama vision modelでは、先にmodelをpullし、`OLLAMA_API_KEY` に任意のプレースホルダー値（たとえば `ollama-local`）を設定してください。[Ollama](/ja-JP/providers/ollama#vision-and-image-description)を参照してください。
 
-## 音声
+## Audio
 
-`audio` はファイルの文字起こしに使います。
+ファイル文字起こしには `audio` を使います。
 
 ```bash
 openclaw infer audio transcribe --file ./memo.m4a --json
@@ -206,12 +204,12 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 
 注記:
 
-- `audio transcribe` はファイル文字起こし用であり、リアルタイムセッション管理用ではありません。
+- `audio transcribe` はファイル文字起こし用であり、realtime session管理用ではありません。
 - `--model` は `<provider/model>` である必要があります。
 
 ## TTS
 
-`tts` は音声合成と TTS プロバイダー状態に使います。
+音声合成およびTTS provider stateには `tts` を使います。
 
 ```bash
 openclaw infer tts convert --text "hello from openclaw" --output ./hello.mp3 --json
@@ -222,12 +220,12 @@ openclaw infer tts status --json
 
 注記:
 
-- `tts status` は gateway 管理の TTS 状態を反映するため、デフォルトで gateway を使います。
-- `tts providers`、`tts voices`、`tts set-provider` を使って TTS の動作を検査および設定します。
+- `tts status` はGateway管理のTTS stateを反映するため、デフォルトでgatewayを使います。
+- TTS動作の確認と設定には、`tts providers`、`tts voices`、`tts set-provider` を使ってください。
 
-## 動画
+## Video
 
-`video` は生成と説明に使います。
+生成と説明には `video` を使います。
 
 ```bash
 openclaw infer video generate --prompt "cinematic sunset over the ocean" --json
@@ -238,12 +236,12 @@ openclaw infer video describe --file ./clip.mp4 --model openai/gpt-4.1-mini --js
 
 注記:
 
-- `video generate` は `--size`、`--aspect-ratio`、`--resolution`、`--duration`、`--audio`、`--watermark`、`--timeout-ms` を受け付け、それらを動画生成ランタイムに転送します。
+- `video generate` は `--size`、`--aspect-ratio`、`--resolution`、`--duration`、`--audio`、`--watermark`、`--timeout-ms` を受け付け、video-generation runtimeへ転送します。
 - `video describe` では、`--model` は `<provider/model>` である必要があります。
 
 ## Web
 
-`web` は検索と取得のワークフローに使います。
+検索および取得ワークフローには `web` を使います。
 
 ```bash
 openclaw infer web search --query "OpenClaw docs" --json
@@ -254,11 +252,11 @@ openclaw infer web providers --json
 
 注記:
 
-- `web providers` を使うと、利用可能、設定済み、選択済みのプロバイダーを検査できます。
+- 利用可能、設定済み、選択中のproviderを確認するには `web providers` を使ってください。
 
-## 埋め込み
+## Embedding
 
-`embedding` はベクトル作成と埋め込みプロバイダーの検査に使います。
+vector作成およびembedding provider検査には `embedding` を使います。
 
 ```bash
 openclaw infer embedding create --text "friendly lobster" --json
@@ -266,9 +264,9 @@ openclaw infer embedding create --text "customer support ticket: delayed shipmen
 openclaw infer embedding providers --json
 ```
 
-## JSON 出力
+## JSON出力
 
-infer コマンドは、JSON 出力を共有エンベロープの下に正規化します:
+infer commandはJSON出力を共有envelope配下で正規化します。
 
 ```json
 {
@@ -282,7 +280,7 @@ infer コマンドは、JSON 出力を共有エンベロープの下に正規化
 }
 ```
 
-トップレベルフィールドは安定しています:
+トップレベルfieldは安定しています。
 
 - `ok`
 - `capability`
@@ -293,8 +291,8 @@ infer コマンドは、JSON 出力を共有エンベロープの下に正規化
 - `outputs`
 - `error`
 
-生成メディアコマンドでは、`outputs` に OpenClaw が書き込んだファイルが入ります。自動化では、
-人間向けの stdout を解析する代わりに、その配列内の `path`、`mimeType`、`size`、およびメディア固有の寸法を使ってください。
+生成media commandでは、`outputs` にOpenClawが書き込んだファイルが含まれます。
+automationでは、人間向けstdoutを解析する代わりに、その配列内の `path`、`mimeType`、`size`、およびmedia固有のdimensionを使ってください。
 
 ## よくある落とし穴
 
@@ -316,9 +314,9 @@ openclaw infer audio transcribe --file ./memo.m4a --model openai/whisper-1 --jso
 
 ## 注記
 
-- `openclaw capability ...` は `openclaw infer ...` のエイリアスです。
+- `openclaw capability ...` は `openclaw infer ...` のaliasです。
 
 ## 関連
 
-- [CLI リファレンス](/ja-JP/cli)
-- [モデル](/ja-JP/concepts/models)
+- [CLIリファレンス](/ja-JP/cli)
+- [Models](/ja-JP/concepts/models)

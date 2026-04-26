@@ -1,52 +1,54 @@
 ---
 read_when:
-    - テストを実行または修正する
-summary: ローカルでテストを実行する方法（Vitest）と、force/coverage モードを使うべき場面
+    - テストの実行または修正
+summary: ローカルでテスト（vitest）を実行する方法と、force モード / coverage モードを使うべきタイミング
 title: テスト
 x-i18n:
-    generated_at: "2026-04-25T13:58:56Z"
+    generated_at: "2026-04-26T11:40:10Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dc138f5e3543b45598ab27b9f7bc9ce43979510b4508580a0cf95c43f97bac53
+    source_hash: 24eb2d122c806237bd4b90dffbd293479763c11a42cfcd195e1aed59efc71a5b
     source_path: reference/test.md
     workflow: 15
 ---
 
 - 完全なテストキット（スイート、live、Docker）: [Testing](/ja-JP/help/testing)
 
-- `pnpm test:force`: デフォルト control port を保持している残存 gateway プロセスを kill し、その後、実行中インスタンスと server テストが衝突しないよう、分離された gateway port で完全な Vitest スイートを実行します。以前の gateway 実行で port 18789 が占有されたままのときに使ってください。
-- `pnpm test:coverage`: V8 coverage 付きで unit スイートを実行します（`vitest.unit.config.ts` 経由）。これは whole-repo の all-file coverage ではなく、読み込まれたファイルに対する unit coverage gate です。しきい値は lines/functions/statements が 70%、branches が 55% です。`coverage.all` が false のため、この gate は split-lane source ファイル全体を未カバーと見なすのではなく、unit coverage スイートで読み込まれたファイルを測定します。
-- `pnpm test:coverage:changed`: `origin/main` から変更されたファイルに対してのみ unit coverage を実行します。
-- `pnpm test:changed`: diff がルーティング可能な source/test ファイルのみに触れている場合、変更された git path を scoped Vitest lane に展開します。config/setup 変更は引き続きネイティブ root projects 実行にフォールバックするため、必要なときは配線変更で広く再実行されます。
-- `pnpm changed:lanes`: `origin/main` との差分によって発火するアーキテクチャ lane を表示します。
-- `pnpm check:changed`: `origin/main` との差分に対して smart changed gate を実行します。core 作業は core test lane とともに、extension 作業は extension test lane とともに、test-only 作業は test typecheck/tests のみに限定して実行します。公開 Plugin SDK や plugin-contract 変更は 1 回の extension 検証へ拡張され、リリースメタデータだけのバージョン更新は対象を絞った version/config/root-dependency チェックのまま維持されます。
-- `pnpm test`: 明示的な file/directory ターゲットを scoped Vitest lane 経由でルーティングします。ターゲット指定なしの実行では固定 shard group を使い、ローカル並列実行のために leaf config へ展開されます。extension group は、巨大な root-project プロセス 1 つではなく、常に extension ごとの shard config に展開されます。
-- 完全スイートと extension shard 実行は、ローカル timing データを `.artifacts/vitest-shard-timings.json` に更新します。後続の実行では、その timing を使って遅い shard と速い shard のバランスを取ります。ローカル timing artifact を無視するには `OPENCLAW_TEST_PROJECTS_TIMINGS=0` を設定してください。
-- 一部の `plugin-sdk` と `commands` テストファイルは、`test/setup.ts` だけを維持する専用の軽量 lane にルーティングされ、ランタイムが重いケースは既存 lane のまま維持されます。
-- 一部の `plugin-sdk` と `commands` ヘルパー source ファイルも、`pnpm test:changed` をそれらの軽量 lane 内の明示的な sibling test にマップするため、小さなヘルパー編集で重いランタイム依存スイート全体を再実行せずに済みます。
-- `auto-reply` も 3 つの専用 config（`core`、`top-level`、`reply`）に分割され、reply harness が軽量な top-level status/token/helper テストを支配しないようになりました。
-- ベース Vitest config は現在 `pool: "threads"` と `isolate: false` をデフォルトとし、共有の非分離 runner が repo 全体の config で有効になっています。
+- `pnpm test:force`: デフォルトの control ポートを保持している残留 Gateway プロセスを終了してから、分離された Gateway ポートで完全な Vitest スイートを実行し、サーバーテストが実行中インスタンスと衝突しないようにします。以前の Gateway 実行でポート 18789 が占有されたままになっている場合に使用してください。
+- `pnpm test:coverage`: V8 カバレッジ付きで unit スイートを実行します（`vitest.unit.config.ts` 経由）。これは、リポジトリ全体の全ファイルカバレッジではなく、読み込まれたファイルに対する unit カバレッジゲートです。しきい値は、lines/functions/statements が 70%、branches が 55% です。`coverage.all` が false のため、このゲートは unit coverage スイートで読み込まれたファイルを測定し、分割レーン内のすべてのソースファイルを未カバーとして扱うことはしません。
+- `pnpm test:coverage:changed`: `origin/main` 以降で変更されたファイルに対してのみ unit coverage を実行します。
+- `pnpm test:changed`: diff がルーティング可能なソース/テストファイルのみを変更している場合、変更された git パスをスコープ付き Vitest レーンに展開します。config/setup の変更は、必要に応じて配線変更を広く再実行するため、引き続きネイティブなルートプロジェクト実行へフォールバックします。
+- `pnpm test:changed:focused`: 内側ループ向けの changed test 実行です。直接編集されたテスト、兄弟 `*.test.ts` ファイル、明示的なソースマッピング、およびローカル import graph から正確なターゲットだけを実行します。広範な変更 / config / package の変更は、完全な changed-test フォールバックに展開する代わりにスキップされます。
+- `pnpm changed:lanes`: `origin/main` に対する diff によってトリガーされるアーキテクチャレーンを表示します。
+- `pnpm check:changed`: `origin/main` に対する diff 用のスマート changed gate を実行します。core の作業は core test レーンで、extension の作業は extension test レーンで、テスト専用の作業は test typecheck/tests のみで実行し、公開 Plugin SDK または plugin-contract の変更は extension 検証 1 回に展開し、リリースメタデータのみの version bump は対象を絞った version/config/root-dependency チェックに留めます。
+- `pnpm test`: 明示的なファイル/ディレクトリターゲットを、スコープ付き Vitest レーン経由でルーティングします。ターゲット未指定の実行では固定 shard グループを使用し、ローカル並列実行のため leaf config に展開されます。extension グループは、1 つの巨大な root-project プロセスではなく、常に extension ごとの shard config に展開されます。
+- full、extension、および include-pattern shard 実行は、ローカルのタイミングデータを `.artifacts/vitest-shard-timings.json` に更新します。後続の whole-config 実行では、そのタイミングを使って遅い shard と速い shard のバランスを取ります。include-pattern の CI shards は shard 名をタイミングキーに追加するため、フィルターされた shard のタイミングは、whole-config のタイミングデータを置き換えずに可視のままになります。ローカルのタイミングアーティファクトを無視するには `OPENCLAW_TEST_PROJECTS_TIMINGS=0` を設定してください。
+- 選択された `plugin-sdk` および `commands` のテストファイルは、`test/setup.ts` のみを維持する専用の軽量レーン経由でルーティングされ、runtime が重いケースは既存レーンに残ります。
+- 兄弟テストを持つソースファイルは、より広いディレクトリ glob にフォールバックする前に、その兄弟テストへマッピングされます。`test/helpers/channels` と `test/helpers/plugins` 配下の helper 編集は、依存パスが正確な場合、すべての shard を広く実行する代わりに、ローカル import graph を使ってそれらを import しているテストを実行します。
+- `auto-reply` は、reply harness がより軽い top-level の status/token/helper テストを支配しないように、3 つの専用 config（`core`、`top-level`、`reply`）にも分割されました。
+- ベースの Vitest config は現在、`pool: "threads"` と `isolate: false` をデフォルトとし、共有の非分離ランナーがリポジトリ内の各 config で有効になっています。
 - `pnpm test:channels` は `vitest.channels.config.ts` を実行します。
-- `pnpm test:extensions` と `pnpm test extensions` は、すべての extension/Plugin shard を実行します。重い channel Plugin、browser Plugin、OpenAI は専用 shard として実行され、その他の Plugin group はバッチのままです。1 つのバンドル済み Plugin lane には `pnpm test extensions/<id>` を使ってください。
-- `pnpm test:perf:imports`: Vitest の import-duration + import-breakdown レポートを有効にしつつ、明示的な file/directory ターゲットには引き続き scoped lane ルーティングを使います。
-- `pnpm test:perf:imports:changed`: 同じ import profiling を、`origin/main` から変更されたファイルに対してのみ実行します。
-- `pnpm test:perf:changed:bench -- --ref <git-ref>` は、同じコミット済み git diff に対して、ルーティングされた changed-mode path とネイティブ root-project 実行をベンチマーク比較します。
-- `pnpm test:perf:changed:bench -- --worktree` は、先にコミットせず現在の worktree 変更セットをベンチマークします。
-- `pnpm test:perf:profile:main`: Vitest main thread の CPU profile を書き出します（`.artifacts/vitest-main-profile`）。
-- `pnpm test:perf:profile:runner`: unit runner の CPU + heap profile を書き出します（`.artifacts/vitest-runner-profile`）。
-- `pnpm test:perf:groups --full-suite --allow-failures --output .artifacts/test-perf/baseline-before.json`: すべての full-suite Vitest leaf config を直列実行し、grouped duration データと config ごとの JSON/log artifact を書き出します。Test Performance Agent は、遅いテストの修正を試みる前の baseline としてこれを使います。
-- `pnpm test:perf:groups:compare .artifacts/test-perf/baseline-before.json .artifacts/test-perf/after-agent.json`: パフォーマンス重視の変更後に grouped report を比較します。
-- Gateway integration: `OPENCLAW_TEST_INCLUDE_GATEWAY=1 pnpm test` または `pnpm test:gateway` でオプトインします。
-- `pnpm test:e2e`: gateway の end-to-end スモークテスト（multi-instance WS/HTTP/node pairing）を実行します。デフォルトでは `vitest.e2e.config.ts` 内で `threads` + `isolate: false` と adaptive worker を使います。`OPENCLAW_E2E_WORKERS=<n>` で調整し、詳細ログには `OPENCLAW_E2E_VERBOSE=1` を設定してください。
-- `pnpm test:live`: provider live テスト（minimax/zai）を実行します。API キーと `LIVE=1`（または provider 固有の `*_LIVE_TEST=1`）が必要で、これにより unskip されます。
-- `pnpm test:docker:all`: 共有 live-test image と Docker E2E image を一度だけビルドし、その後 `OPENCLAW_SKIP_DOCKER_BUILD=1` を付けて Docker スモーク lane を weighted scheduler 経由で実行します。`OPENCLAW_DOCKER_ALL_PARALLELISM=<n>` は process slot を制御し、デフォルトは 10 です。`OPENCLAW_DOCKER_ALL_TAIL_PARALLELISM=<n>` は provider-sensitive tail pool を制御し、デフォルトは 10 です。重い lane の上限はデフォルトで `OPENCLAW_DOCKER_ALL_LIVE_LIMIT=9`、`OPENCLAW_DOCKER_ALL_NPM_LIMIT=10`、`OPENCLAW_DOCKER_ALL_SERVICE_LIMIT=7` です。provider 上限はデフォルトで provider ごとに 1 重い lane で、`OPENCLAW_DOCKER_ALL_LIVE_CLAUDE_LIMIT=4`、`OPENCLAW_DOCKER_ALL_LIVE_CODEX_LIMIT=4`、`OPENCLAW_DOCKER_ALL_LIVE_GEMINI_LIMIT=4` です。より大きなホストでは `OPENCLAW_DOCKER_ALL_WEIGHT_LIMIT` または `OPENCLAW_DOCKER_ALL_DOCKER_LIMIT` を使ってください。lane の開始は、ローカル Docker daemon の create ストームを避けるため、デフォルトで 2 秒ずつずらされます。`OPENCLAW_DOCKER_ALL_START_STAGGER_MS=<ms>` で上書きできます。runner はデフォルトで Docker を事前確認し、古い OpenClaw E2E コンテナを掃除し、30 秒ごとに active-lane status を出力し、互換 lane 間で provider CLI tool cache を共有し、一時的な live-provider 失敗をデフォルトで 1 回再試行し（`OPENCLAW_DOCKER_ALL_LIVE_RETRIES=<n>`）、後続実行で longest-first 順に並べるために lane timing を `.artifacts/docker-tests/lane-timings.json` に保存します。Docker を実行せず lane manifest だけ表示するには `OPENCLAW_DOCKER_ALL_DRY_RUN=1`、status 出力を調整するには `OPENCLAW_DOCKER_ALL_STATUS_INTERVAL_MS=<ms>`、timing 再利用を無効にするには `OPENCLAW_DOCKER_ALL_TIMINGS=0` を使ってください。決定的/ローカル lane のみには `OPENCLAW_DOCKER_ALL_LIVE_MODE=skip`、live-provider lane のみには `OPENCLAW_DOCKER_ALL_LIVE_MODE=only` を使います。package alias は `pnpm test:docker:local:all` と `pnpm test:docker:live:all` です。live-only モードでは main と tail の live lane を 1 つの longest-first pool に統合するため、provider bucket が Claude、Codex、Gemini の作業を一緒に詰め込めます。runner は、`OPENCLAW_DOCKER_ALL_FAIL_FAST=0` が設定されていない限り、最初の失敗後は新しい pooled lane のスケジュールを停止します。各 lane には 120 分の fallback timeout があり、`OPENCLAW_DOCKER_ALL_LANE_TIMEOUT_MS` で上書きできます。選択された live/tail lane には、より厳しい lane 単位の上限が使われます。CLI backend Docker setup command には独自の timeout があり、`OPENCLAW_LIVE_CLI_BACKEND_SETUP_TIMEOUT_SECONDS`（デフォルト 180）で制御されます。lane ごとのログは `.artifacts/docker-tests/<run-id>/` に書き出されます。
-- CLI backend live Docker probe は、たとえば `pnpm test:docker:live-cli-backend:codex`、`pnpm test:docker:live-cli-backend:codex:resume`、`pnpm test:docker:live-cli-backend:codex:mcp` のように focused lane として実行できます。Claude と Gemini にも対応する `:resume` と `:mcp` alias があります。
-- `pnpm test:docker:openwebui`: Docker 化された OpenClaw + Open WebUI を起動し、Open WebUI 経由でサインインし、`/api/models` を確認し、その後 `/api/chat/completions` を通る実際の proxied chat を実行します。使用可能な live model key（たとえば `~/.profile` 内の OpenAI）が必要で、外部 Open WebUI image を pull し、通常の unit/e2e スイートのように CI 安定であることは想定されていません。
-- `pnpm test:docker:mcp-channels`: seed 済み Gateway コンテナと、`openclaw mcp serve` を起動する第 2 クライアントコンテナを開始し、ルーティングされた会話発見、transcript 読み取り、添付ファイルメタデータ、live event queue の動作、outbound send routing、Claude 風の channel + permission 通知を、実際の stdio bridge 上で検証します。Claude 通知アサーションは生の stdio MCP frame を直接読み取るため、このスモークは bridge が実際に出力するものを反映します。
+- `pnpm test:extensions` と `pnpm test extensions` は、すべての extension/plugin shards を実行します。重い channel plugins、browser plugin、および OpenAI は専用 shards として実行され、その他の plugin グループは引き続きバッチ化されます。1 つのバンドル済み plugin レーンに対しては `pnpm test extensions/<id>` を使用してください。
+- `pnpm test:perf:imports`: Vitest の import-duration と import-breakdown レポートを有効にしつつ、明示的なファイル/ディレクトリターゲットには引き続きスコープ付きレーンルーティングを使用します。
+- `pnpm test:perf:imports:changed`: 同じ import プロファイリングですが、`origin/main` 以降で変更されたファイルに対してのみ実行します。
+- `pnpm test:perf:changed:bench -- --ref <git-ref>`: 同じコミット済み git diff に対して、ルーティングされた changed-mode パスとネイティブな root-project 実行をベンチマーク比較します。
+- `pnpm test:perf:changed:bench -- --worktree`: 先にコミットせず、現在の worktree の変更セットをベンチマークします。
+- `pnpm test:perf:profile:main`: Vitest の main thread 用 CPU profile を書き出します（`.artifacts/vitest-main-profile`）。
+- `pnpm test:perf:profile:runner`: unit runner 用の CPU + heap profiles を書き出します（`.artifacts/vitest-runner-profile`）。
+- `pnpm test:perf:groups --full-suite --allow-failures --output .artifacts/test-perf/baseline-before.json`: full-suite の各 Vitest leaf config を直列実行し、グループ化された duration データと per-config の JSON/log アーティファクトを書き出します。Test Performance Agent は、遅いテストの修正を試みる前のベースラインとしてこれを使用します。
+- `pnpm test:perf:groups:compare .artifacts/test-perf/baseline-before.json .artifacts/test-perf/after-agent.json`: パフォーマンス重視の変更後にグループ化レポートを比較します。
+- Gateway integration: `OPENCLAW_TEST_INCLUDE_GATEWAY=1 pnpm test` または `pnpm test:gateway` で opt-in します。
+- `pnpm test:e2e`: Gateway の end-to-end smoke tests（複数インスタンスの WS/HTTP/node pairing）を実行します。`vitest.e2e.config.ts` ではデフォルトで `threads` + `isolate: false` と adaptive workers を使用します。`OPENCLAW_E2E_WORKERS=<n>` で調整し、詳細ログには `OPENCLAW_E2E_VERBOSE=1` を設定してください。
+- `pnpm test:live`: provider の live tests（minimax/zai）を実行します。スキップ解除には API keys と `LIVE=1`（または provider 固有の `*_LIVE_TEST=1`）が必要です。
+- `pnpm test:docker:all`: 共有 live-test image と Docker E2E image を 1 回だけビルドし、その後 Docker smoke lanes を `OPENCLAW_SKIP_DOCKER_BUILD=1` で重み付きスケジューラ経由で実行します。`OPENCLAW_DOCKER_ALL_PARALLELISM=<n>` はプロセススロットを制御し、デフォルトは 10 です。`OPENCLAW_DOCKER_ALL_TAIL_PARALLELISM=<n>` は provider に敏感な tail pool を制御し、デフォルトは 10 です。重いレーン上限はデフォルトで `OPENCLAW_DOCKER_ALL_LIVE_LIMIT=9`、`OPENCLAW_DOCKER_ALL_NPM_LIMIT=10`、`OPENCLAW_DOCKER_ALL_SERVICE_LIMIT=7` です。provider 上限はデフォルトで provider ごとに重いレーン 1 本で、`OPENCLAW_DOCKER_ALL_LIVE_CLAUDE_LIMIT=4`、`OPENCLAW_DOCKER_ALL_LIVE_CODEX_LIMIT=4`、`OPENCLAW_DOCKER_ALL_LIVE_GEMINI_LIMIT=4` です。より大きいホストでは `OPENCLAW_DOCKER_ALL_WEIGHT_LIMIT` または `OPENCLAW_DOCKER_ALL_DOCKER_LIMIT` を使用してください。レーン開始は、ローカル Docker daemon の create ストームを避けるためデフォルトで 2 秒ずつずらされます。上書きには `OPENCLAW_DOCKER_ALL_START_STAGGER_MS=<ms>` を使用してください。ランナーはデフォルトで Docker を preflight し、古い OpenClaw E2E containers をクリーンアップし、30 秒ごとに active-lane status を出力し、互換レーン間で provider CLI tool caches を共有し、一時的な live-provider failure をデフォルトで 1 回再試行し（`OPENCLAW_DOCKER_ALL_LIVE_RETRIES=<n>`）、後続実行で longest-first 順序に使うため `.artifacts/docker-tests/lane-timings.json` にレーンタイミングを保存します。実行せずにレーン manifest を表示するには `OPENCLAW_DOCKER_ALL_DRY_RUN=1`、status 出力を調整するには `OPENCLAW_DOCKER_ALL_STATUS_INTERVAL_MS=<ms>`、タイミング再利用を無効にするには `OPENCLAW_DOCKER_ALL_TIMINGS=0` を使います。決定的 / ローカルレーンのみには `OPENCLAW_DOCKER_ALL_LIVE_MODE=skip`、live-provider レーンのみには `OPENCLAW_DOCKER_ALL_LIVE_MODE=only` を使用します。package aliases は `pnpm test:docker:local:all` と `pnpm test:docker:live:all` です。live-only モードでは、main と tail の live lanes を 1 つの longest-first pool に統合し、provider バケットで Claude、Codex、Gemini の作業をまとめて詰め込めるようにします。`OPENCLAW_DOCKER_ALL_FAIL_FAST=0` を設定しない限り、ランナーは最初の failure 後に新しい pooled lanes のスケジューリングを停止します。また、各レーンには 120 分のフォールバック timeout があり、`OPENCLAW_DOCKER_ALL_LANE_TIMEOUT_MS` で上書きできます。選択された live/tail lanes では、より厳しい per-lane 上限が使われます。CLI backend の Docker setup コマンドには、独自の timeout として `OPENCLAW_LIVE_CLI_BACKEND_SETUP_TIMEOUT_SECONDS`（デフォルト 180）があります。per-lane logs は `.artifacts/docker-tests/<run-id>/` 配下に書き込まれます。
+- `pnpm test:docker:browser-cdp-snapshot`: Chromium ベースの source E2E container をビルドし、生の CDP と分離された Gateway を起動して、`browser doctor --deep` を実行し、CDP の role snapshots に link URL、cursor で昇格した clickables、iframe refs、および frame metadata が含まれることを検証します。
+- CLI backend の live Docker probes は、たとえば `pnpm test:docker:live-cli-backend:codex`、`pnpm test:docker:live-cli-backend:codex:resume`、`pnpm test:docker:live-cli-backend:codex:mcp` のように、フォーカスされたレーンとして実行できます。Claude と Gemini にも、対応する `:resume` および `:mcp` aliases があります。
+- `pnpm test:docker:openwebui`: Docker 化された OpenClaw + Open WebUI を起動し、Open WebUI 経由でサインインし、`/api/models` を確認した後、`/api/chat/completions` 経由で実際のプロキシチャットを実行します。使用可能な live model key（たとえば `~/.profile` 内の OpenAI）が必要で、外部の Open WebUI image を pull し、通常の unit/e2e スイートのように CI 安定であることは想定されていません。
+- `pnpm test:docker:mcp-channels`: シード済み Gateway container と、`openclaw mcp serve` を起動する 2 つ目の client container を開始し、ルーティングされた会話検出、transcript 読み取り、添付ファイルメタデータ、live event queue の動作、送信ルーティング、および実際の stdio bridge 上での Claude 形式の channel + permission notifications を検証します。Claude notification のアサーションは生の stdio MCP frames を直接読み取るため、この smoke は bridge が実際に出力するものを反映します。
 
-## ローカル PR gate
+## ローカル PR ゲート
 
-ローカルで PR の land/gate チェックを行うには、次を実行してください。
+ローカルでの PR land/gate チェックでは、次を実行します。
 
 - `pnpm check:changed`
 - `pnpm check`
@@ -55,20 +57,20 @@ x-i18n:
 - `pnpm test`
 - `pnpm check:docs`
 
-`pnpm test` が負荷の高いホストで flaky な場合、回帰とみなす前に 1 回だけ再実行し、それから `pnpm test <path/to/test>` で切り分けてください。メモリ制約のあるホストでは、次を使ってください。
+`pnpm test` が負荷の高いホストで flake した場合、回帰と見なす前に 1 回だけ再実行し、その後 `pnpm test <path/to/test>` で切り分けてください。メモリ制約のあるホストでは、次を使用します。
 
 - `OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test`
 - `OPENCLAW_VITEST_FS_MODULE_CACHE_PATH=/tmp/openclaw-vitest-cache pnpm test:changed`
 
-## model レイテンシベンチ（ローカルキー）
+## モデル遅延ベンチ（ローカルキー）
 
 スクリプト: [`scripts/bench-model.ts`](https://github.com/openclaw/openclaw/blob/main/scripts/bench-model.ts)
 
 使い方:
 
 - `source ~/.profile && pnpm tsx scripts/bench-model.ts --runs 10`
-- 任意の env: `MINIMAX_API_KEY`、`MINIMAX_BASE_URL`、`MINIMAX_MODEL`、`ANTHROPIC_API_KEY`
-- デフォルト prompt: 「Reply with a single word: ok. No punctuation or extra text.」
+- 任意の env: `MINIMAX_API_KEY`, `MINIMAX_BASE_URL`, `MINIMAX_MODEL`, `ANTHROPIC_API_KEY`
+- デフォルトの prompt: 「Reply with a single word: ok. No punctuation or extra text.」
 
 前回実行（2025-12-31、20 runs）:
 
@@ -98,39 +100,39 @@ x-i18n:
 
 プリセット:
 
-- `startup`: `--version`、`--help`、`health`、`health --json`、`status --json`、`status`
-- `real`: `health`、`status`、`status --json`、`sessions`、`sessions --json`、`agents list --json`、`gateway status`、`gateway status --json`、`gateway health --json`、`config get gateway.port`
+- `startup`: `--version`, `--help`, `health`, `health --json`, `status --json`, `status`
+- `real`: `health`, `status`, `status --json`, `sessions`, `sessions --json`, `agents list --json`, `gateway status`, `gateway status --json`, `gateway health --json`, `config get gateway.port`
 - `all`: 両方のプリセット
 
-出力には、各コマンドについて `sampleCount`、avg、p50、p95、min/max、exit-code/signal 分布、および max RSS 要約が含まれます。任意の `--cpu-prof-dir` / `--heap-prof-dir` は run ごとに V8 profile を書き出すため、タイミング計測と profile 取得に同じハーネスを使えます。
+出力には、各コマンドの `sampleCount`、avg、p50、p95、min/max、exit-code/signal distribution、および max RSS summaries が含まれます。任意の `--cpu-prof-dir` / `--heap-prof-dir` は実行ごとの V8 profiles を書き出すため、タイミング取得と profile 収集で同じ harness を使用します。
 
-保存済み出力の慣例:
+保存済み出力の規約:
 
-- `pnpm test:startup:bench:smoke` は対象を絞ったスモーク artifact を `.artifacts/cli-startup-bench-smoke.json` に書き出します
-- `pnpm test:startup:bench:save` は full-suite artifact を `runs=5`、`warmup=1` で `.artifacts/cli-startup-bench-all.json` に書き出します
-- `pnpm test:startup:bench:update` は、チェックイン済み baseline fixture を `runs=5`、`warmup=1` で `test/fixtures/cli-startup-bench.json` に更新します
+- `pnpm test:startup:bench:smoke` は、対象の smoke アーティファクトを `.artifacts/cli-startup-bench-smoke.json` に書き出します
+- `pnpm test:startup:bench:save` は、`runs=5` と `warmup=1` を使用して、full-suite アーティファクトを `.artifacts/cli-startup-bench-all.json` に書き出します
+- `pnpm test:startup:bench:update` は、`runs=5` と `warmup=1` を使用して、チェックイン済みの baseline fixture を `test/fixtures/cli-startup-bench.json` で更新します
 
 チェックイン済み fixture:
 
 - `test/fixtures/cli-startup-bench.json`
-- 更新は `pnpm test:startup:bench:update`
-- 現在結果と fixture を比較するには `pnpm test:startup:bench:check`
+- `pnpm test:startup:bench:update` で更新します
+- `pnpm test:startup:bench:check` で現在の結果を fixture と比較します
 
-## Onboarding E2E（Docker）
+## オンボーディング E2E（Docker）
 
-Docker は任意です。これはコンテナ化された onboarding スモークテストにのみ必要です。
+Docker は任意です。これはコンテナ化されたオンボーディング smoke テストにのみ必要です。
 
-クリーンな Linux コンテナでの完全なコールドスタートフロー:
+クリーンな Linux container での完全なコールドスタートフロー:
 
 ```bash
 scripts/e2e/onboard-docker.sh
 ```
 
-このスクリプトは擬似 TTY を通じて対話型ウィザードを操作し、config/workspace/session ファイルを検証した後、gateway を起動して `openclaw health` を実行します。
+このスクリプトは、pseudo-tty 経由で対話型ウィザードを操作し、config/workspace/session ファイルを検証した後、Gateway を起動して `openclaw health` を実行します。
 
-## QR import スモーク（Docker）
+## QR import smoke（Docker）
 
-メンテナンス対象の QR ランタイムヘルパーが、サポート対象の Docker Node ランタイム（デフォルトの Node 24、互換の Node 22）で読み込まれることを確認します。
+メンテナンス対象の QR ランタイムヘルパーが、サポート対象の Docker Node ランタイム（デフォルトの Node 24、互換の Node 22）でロードされることを確認します。
 
 ```bash
 pnpm test:docker:qr

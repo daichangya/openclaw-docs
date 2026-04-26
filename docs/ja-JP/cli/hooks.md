@@ -1,42 +1,42 @@
 ---
 read_when:
-    - agent hooksを管理したい場合
-    - hookの利用可否を確認したり、workspace hooksを有効にしたりしたい場合
-summary: '`openclaw hooks`（agent hooks）のCLIリファレンス'
-title: Hooks
+    - エージェントフックを管理したい場合
+    - フックの利用可否を確認したい場合、またはワークスペースフックを有効にしたい場合
+summary: '`openclaw hooks` の CLI リファレンス（エージェントフック）'
+title: フック
 x-i18n:
-    generated_at: "2026-04-25T13:44:29Z"
+    generated_at: "2026-04-26T11:26:27Z"
     model: gpt-5.4
     provider: openai
-    source_hash: dd84cc984b24996c5509ce6b69f9bb76c61c4fa65b002809fdf5776abe67b48b
+    source_hash: 874c3c7e7b603066209857e8b8b39bbe23eb8d1eda148025c74907c05bacd8f2
     source_path: cli/hooks.md
     workflow: 15
 ---
 
 # `openclaw hooks`
 
-agent hooks（`/new`、`/reset`、Gateway起動などのコマンド向けイベント駆動オートメーション）を管理します。
+エージェントフック（`/new`、`/reset`、および Gateway 起動のようなコマンドに対するイベント駆動型自動化）を管理します。
 
-サブコマンドなしで`openclaw hooks`を実行すると、`openclaw hooks list`と同等です。
+サブコマンドなしで `openclaw hooks` を実行すると、`openclaw hooks list` と同等です。
 
 関連:
 
-- Hooks: [Hooks](/ja-JP/automation/hooks)
-- Plugin hooks: [Plugin hooks](/ja-JP/plugins/hooks)
+- フック: [フック](/ja-JP/automation/hooks)
+- Plugin フック: [Plugin hooks](/ja-JP/plugins/hooks)
 
-## すべてのhookを一覧表示
+## すべてのフックを一覧表示
 
 ```bash
 openclaw hooks list
 ```
 
-workspace、managed、extra、bundledディレクトリから見つかったすべてのhookを一覧表示します。  
-Gateway起動時には、少なくとも1つのinternal hookが設定されるまで、internal hook handlerは読み込まれません。
+ワークスペース、管理済み、追加、およびバンドル済みディレクトリから検出されたすべてのフックを一覧表示します。
+少なくとも 1 つの内部フックが設定されるまで、Gateway 起動時には内部フックハンドラーは読み込まれません。
 
 **オプション:**
 
-- `--eligible`: 対象条件を満たすhookのみ表示
-- `--json`: JSONとして出力
+- `--eligible`: 適格なフックのみを表示（要件を満たしているもの）
+- `--json`: JSON として出力
 - `-v, --verbose`: 不足している要件を含む詳細情報を表示
 
 **出力例:**
@@ -57,7 +57,7 @@ Ready:
 openclaw hooks list --verbose
 ```
 
-対象条件を満たさないhookについて、不足している要件を表示します。
+適格でないフックに不足している要件を表示します。
 
 **例（JSON）:**
 
@@ -65,23 +65,23 @@ openclaw hooks list --verbose
 openclaw hooks list --json
 ```
 
-プログラム利用向けに構造化JSONを返します。
+プログラムで利用できる構造化 JSON を返します。
 
-## hook情報を取得
+## フック情報を取得
 
 ```bash
 openclaw hooks info <name>
 ```
 
-特定のhookの詳細情報を表示します。
+特定のフックの詳細情報を表示します。
 
 **引数:**
 
-- `<name>`: hook名またはhookキー（例: `session-memory`）
+- `<name>`: フック名またはフックキー（例: `session-memory`）
 
 **オプション:**
 
-- `--json`: JSONとして出力
+- `--json`: JSON として出力
 
 **例:**
 
@@ -107,17 +107,17 @@ Requirements:
   Config: ✓ workspace.dir
 ```
 
-## hookの対象条件を確認
+## フックの適格性を確認
 
 ```bash
 openclaw hooks check
 ```
 
-hookの対象条件ステータスの概要（readyとnot readyの件数）を表示します。
+フックの適格性ステータスの要約（利用可能数と利用不可数）を表示します。
 
 **オプション:**
 
-- `--json`: JSONとして出力
+- `--json`: JSON として出力
 
 **出力例:**
 
@@ -129,19 +129,19 @@ Ready: 4
 Not ready: 0
 ```
 
-## hookを有効化
+## フックを有効化
 
 ```bash
 openclaw hooks enable <name>
 ```
 
-特定のhookをconfig（デフォルトでは`~/.openclaw/openclaw.json`）に追加して有効化します。
+設定（デフォルトでは `~/.openclaw/openclaw.json`）に追加して、特定のフックを有効化します。
 
-**注:** workspace hooksは、ここまたはconfigで有効化するまでデフォルトで無効です。pluginが管理するhookは`openclaw hooks list`で`plugin:<id>`と表示され、ここでは有効化/無効化できません。代わりにpluginを有効化/無効化してください。
+**注:** ワークスペースフックは、ここまたは config で有効化されるまでデフォルトで無効です。Plugin によって管理されるフックは `openclaw hooks list` に `plugin:<id>` と表示され、ここでは有効化/無効化できません。代わりに Plugin を有効化/無効化してください。
 
 **引数:**
 
-- `<name>`: hook名（例: `session-memory`）
+- `<name>`: フック名（例: `session-memory`）
 
 **例:**
 
@@ -157,27 +157,28 @@ openclaw hooks enable session-memory
 
 **実行内容:**
 
-- hookが存在し、対象条件を満たしているか確認
-- config内の`hooks.internal.entries.<name>.enabled = true`を更新
-- configをディスクに保存
+- フックが存在し、適格かどうかを確認
+- config の `hooks.internal.entries.<name>.enabled = true` を更新
+- config をディスクに保存
 
-hookが`<workspace>/hooks/`由来の場合、Gatewayがそれを読み込むには、このオプトイン手順が必要です。
+フックが `<workspace>/hooks/` 由来の場合、Gateway がそれを読み込む前に
+このオプトイン手順が必要です。
 
 **有効化後:**
 
-- hookを再読み込みするためにGatewayを再起動してください（macOSではメニューバーアプリを再起動するか、devではgatewayプロセスを再起動します）。
+- フックを再読み込みするために Gateway を再起動してください（macOS ではメニューバーアプリを再起動、開発環境では Gateway プロセスを再起動）。
 
-## hookを無効化
+## フックを無効化
 
 ```bash
 openclaw hooks disable <name>
 ```
 
-特定のhookをconfig更新によって無効化します。
+config を更新して特定のフックを無効化します。
 
 **引数:**
 
-- `<name>`: hook名（例: `command-logger`）
+- `<name>`: フック名（例: `command-logger`）
 
 **例:**
 
@@ -193,14 +194,14 @@ openclaw hooks disable command-logger
 
 **無効化後:**
 
-- hookを再読み込みするためにGatewayを再起動してください
+- フックを再読み込みするために Gateway を再起動してください
 
 ## 注意
 
-- `openclaw hooks list --json`、`info --json`、`check --json`は、構造化JSONを直接stdoutへ書き出します。
-- plugin管理hookはここでは有効化または無効化できません。代わりに所有pluginを有効化または無効化してください。
+- `openclaw hooks list --json`、`info --json`、および `check --json` は、構造化 JSON を直接 stdout に書き出します。
+- Plugin 管理フックはここでは有効化または無効化できません。代わりに所有元の Plugin を有効化または無効化してください。
 
-## hook packをインストール
+## Hook pack をインストール
 
 ```bash
 openclaw plugins install <package>        # ClawHub first, then npm
@@ -208,68 +209,75 @@ openclaw plugins install <package> --pin  # pin version
 openclaw plugins install <path>           # local path
 ```
 
-統一されたpluginsインストーラーを通じてhook packをインストールします。
+統一された Plugin インストーラーを通じて Hook pack をインストールします。
 
-`openclaw hooks install`も互換エイリアスとして引き続き使えますが、非推奨警告を表示して`openclaw plugins install`へ転送します。
+`openclaw hooks install` も互換性エイリアスとして引き続き利用できますが、
+非推奨警告を表示したうえで `openclaw plugins install` に転送されます。
 
-npm指定は**registry-only**です（パッケージ名 + 任意の**正確なversion**または**dist-tag**）。Git/URL/file指定とsemver rangeは拒否されます。依存関係のインストールは、安全のため`--ignore-scripts`付きで実行されます。
+npm spec は**レジストリ専用**です（パッケージ名 + 任意の**正確なバージョン**または
+**dist-tag**）。Git/URL/file spec および semver range は拒否されます。依存関係の
+インストールは、安全のため、シェルにグローバル npm install 設定があっても
+`--ignore-scripts` を付けてプロジェクトローカルで実行されます。
 
-素の指定および`@latest`はstableトラックに留まります。npmがそれらのいずれかをprereleaseに解決した場合、OpenClawは停止し、`@beta`/`@rc`のようなprerelease tagまたは正確なprerelease versionで明示的にオプトインするよう求めます。
+bare spec と `@latest` は安定トラックのままです。npm がこれらのいずれかを prerelease に解決した場合、OpenClaw は停止し、`@beta`/`@rc` のような prerelease tag または正確な prerelease バージョンで明示的にオプトインするよう求めます。
 
 **実行内容:**
 
-- hook packを`~/.openclaw/hooks/<id>`にコピー
-- インストールしたhookを`hooks.internal.entries.*`で有効化
-- インストール内容を`hooks.internal.installs`に記録
+- Hook pack を `~/.openclaw/hooks/<id>` にコピー
+- インストールしたフックを `hooks.internal.entries.*` で有効化
+- インストール内容を `hooks.internal.installs` に記録
 
 **オプション:**
 
-- `-l, --link`: ローカルディレクトリをコピーせずリンクします（`hooks.internal.load.extraDirs`に追加）
-- `--pin`: npmインストールを、解決済みの正確な`name@version`として`hooks.internal.installs`に記録
+- `-l, --link`: コピーせずにローカルディレクトリをリンクします（`hooks.internal.load.extraDirs` に追加）
+- `--pin`: npm インストールを、解決済みの正確な `name@version` として `hooks.internal.installs` に記録
 
-**対応アーカイブ:** `.zip`, `.tgz`, `.tar.gz`, `.tar`
+**サポートされるアーカイブ:** `.zip`, `.tgz`, `.tar.gz`, `.tar`
 
 **例:**
 
 ```bash
-# Local directory
+# ローカルディレクトリ
 openclaw plugins install ./my-hook-pack
 
-# Local archive
+# ローカルアーカイブ
 openclaw plugins install ./my-hook-pack.zip
 
-# NPM package
+# NPM パッケージ
 openclaw plugins install @openclaw/my-hook-pack
 
-# Link a local directory without copying
+# コピーせずにローカルディレクトリをリンク
 openclaw plugins install -l ./my-hook-pack
 ```
 
-リンクされたhook packは、workspace hooksではなく、オペレーター設定ディレクトリからのmanaged hooksとして扱われます。
+リンクされた Hook pack は、ワークスペースフックではなく、オペレーター設定ディレクトリからの管理フックとして扱われます。
 
-## hook packを更新
+## Hook pack を更新
 
 ```bash
 openclaw plugins update <id>
 openclaw plugins update --all
 ```
 
-統一されたpluginsアップデーターを通じて、追跡中のnpmベースhook packを更新します。
+統一された Plugin アップデーターを通じて、追跡中の npm ベース Hook pack を更新します。
 
-`openclaw hooks update`も互換エイリアスとして引き続き使えますが、非推奨警告を表示して`openclaw plugins update`へ転送します。
+`openclaw hooks update` も互換性エイリアスとして引き続き利用できますが、
+非推奨警告を表示したうえで `openclaw plugins update` に転送されます。
 
 **オプション:**
 
-- `--all`: 追跡中のすべてのhook packを更新
-- `--dry-run`: 書き込まずに何が変わるかを表示
+- `--all`: 追跡中のすべての Hook pack を更新
+- `--dry-run`: 書き込みを行わず、何が変わるかを表示
 
-保存済みintegrity hashが存在し、取得したartifact hashが変化している場合、OpenClawは警告を表示し、続行前に確認を求めます。CI/非対話実行でプロンプトを回避するには、グローバル`--yes`を使用してください。
+保存済みの整合性ハッシュが存在し、取得したアーティファクトのハッシュが変わった場合、
+OpenClaw は警告を表示し、続行前に確認を求めます。CI/非対話実行で
+プロンプトを回避するには、グローバル `--yes` を使用してください。
 
-## バンドルされたHooks
+## バンドル済みフック
 
 ### session-memory
 
-`/new`または`/reset`を実行したときに、セッションコンテキストをmemoryへ保存します。
+`/new` または `/reset` を発行したときに、セッションコンテキストを memory に保存します。
 
 **有効化:**
 
@@ -283,7 +291,7 @@ openclaw hooks enable session-memory
 
 ### bootstrap-extra-files
 
-`agent:bootstrap`中に、追加のbootstrapファイル（たとえばmonorepoローカルの`AGENTS.md` / `TOOLS.md`）を注入します。
+`agent:bootstrap` 中に追加の bootstrap ファイル（たとえば monorepo ローカルの `AGENTS.md` / `TOOLS.md`）を注入します。
 
 **有効化:**
 
@@ -295,7 +303,7 @@ openclaw hooks enable bootstrap-extra-files
 
 ### command-logger
 
-すべてのコマンドイベントを一元化された監査ファイルに記録します。
+すべてのコマンドイベントを中央監査ファイルに記録します。
 
 **有効化:**
 
@@ -305,16 +313,16 @@ openclaw hooks enable command-logger
 
 **出力:** `~/.openclaw/logs/commands.log`
 
-**ログを表示:**
+**ログの表示:**
 
 ```bash
-# Recent commands
+# 最近のコマンド
 tail -n 20 ~/.openclaw/logs/commands.log
 
-# Pretty-print
+# 整形表示
 cat ~/.openclaw/logs/commands.log | jq .
 
-# Filter by action
+# アクションで絞り込み
 grep '"action":"new"' ~/.openclaw/logs/commands.log | jq .
 ```
 
@@ -322,7 +330,7 @@ grep '"action":"new"' ~/.openclaw/logs/commands.log | jq .
 
 ### boot-md
 
-Gateway起動時（channel起動後）に`BOOT.md`を実行します。
+Gateway の起動時（チャンネル起動後）に `BOOT.md` を実行します。
 
 **イベント**: `gateway:startup`
 

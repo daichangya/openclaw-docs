@@ -1,92 +1,102 @@
 ---
 read_when:
-    - あなたはOpenClaw Pluginを保守しています
-    - Plugin互換性の警告が表示される
-    - Plugin SDKまたはマニフェストの移行を計画している
-summary: Plugin互換性コントラクト、廃止予定メタデータ、移行時の期待事項
-title: Plugin互換性
+    - あなたは OpenClaw Plugin を保守しています
+    - Plugin の互換性に関する警告が表示されます
+    - あなたは Plugin SDK またはマニフェストの移行を計画しています
+summary: Plugin の互換性コントラクト、非推奨メタデータ、および移行に関する想定事項
+title: Plugin の互換性
 x-i18n:
-    generated_at: "2026-04-25T18:19:06Z"
+    generated_at: "2026-04-26T11:36:04Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 511bd12cff1e72a93091cbb1ac7d75377b0b9d2f016b55f4cdc77293f6172a00
+    source_hash: 3b4e11dc57c29eac72844b91bec75a9d48005bbd3c89a2a9d7a5634ab782e5fc
     source_path: plugins/compatibility.md
     workflow: 15
 ---
 
-OpenClawは、古いPluginコントラクトを削除する前に、名前付きの互換アダプターを通して接続したままにします。これにより、SDK、マニフェスト、セットアップ、設定、agentランタイムのコントラクトが進化しても、既存のバンドル済みPluginと外部Pluginが保護されます。
+OpenClaw は、Plugin SDK、マニフェスト、セットアップ、設定、エージェントランタイムのコントラクトが進化する間も、既存のバンドル済みおよび外部 Plugin を保護するために、古い Plugin コントラクトを削除する前に、名前付きの互換性アダプターを通じて接続したままにします。
 
 ## 互換性レジストリ
 
-Plugin互換性コントラクトは、コアレジストリ
-`src/plugins/compat/registry.ts` で追跡されます。
+Plugin の互換性コントラクトは、コアレジストリ `src/plugins/compat/registry.ts` で追跡されます。
 
-各レコードには次が含まれます。
+各レコードには次の情報があります。
 
 - 安定した互換性コード
 - ステータス: `active`、`deprecated`、`removal-pending`、または `removed`
-- owner: SDK、config、setup、channel、provider、plugin execution、agent runtime、
-  または core
-- 該当する場合は導入日と廃止予定日
-- 置き換えガイダンス
+- オーナー: SDK、config、setup、channel、provider、plugin execution、agent runtime、または core
+- 該当する場合の導入日と非推奨化日
+- 置き換えに関するガイダンス
 - 古い動作と新しい動作をカバーする docs、diagnostics、tests
 
-このレジストリは、メンテナーの計画と将来のplugin inspectorチェックのための情報源です。Plugin向け動作が変更される場合は、アダプターを追加する変更と同じ変更内で、互換性レコードを追加または更新してください。
+このレジストリは、メンテナーによる計画立案と、将来の Plugin inspector チェックの情報源です。Plugin 向けの動作が変更される場合は、アダプターを追加するのと同じ変更内で互換性レコードを追加または更新してください。
 
-## plugin inspector パッケージ
+Doctor の修復および移行の互換性は、`src/commands/doctor/shared/deprecation-compat.ts` で別途追跡されます。これらのレコードは、古い config 形状、install-ledger レイアウト、およびランタイム互換性パスが削除された後も利用可能なままである必要がある修復 shim を対象とします。
 
-plugin inspector は、バージョン付きの互換性およびマニフェストコントラクトを基盤とする、コアOpenClawリポジトリ外の別パッケージ/別リポジトリとして存在すべきです。
+リリース時の確認では、両方のレジストリをチェックする必要があります。対応するランタイムまたは config の互換性レコードが期限切れになったからといって、Doctor の移行を削除しないでください。まず、その修復をまだ必要とするサポート対象のアップグレードパスが存在しないことを確認してください。また、provider や channel が core の外に移動するにつれて Plugin の所有権や config の範囲が変わる可能性があるため、リリース計画時には各置き換え注記を再検証してください。
 
-初日のCLIは次のとおりです。
+## Plugin inspector パッケージ
+
+Plugin inspector は、バージョン管理された互換性コントラクトおよびマニフェストコントラクトに基づく、core OpenClaw リポジトリ外の別パッケージ / 別リポジトリとして存在するべきです。
+
+初期段階の CLI は次のようになります。
 
 ```sh
 openclaw-plugin-inspector ./my-plugin
 ```
 
-出力するべきもの:
+これは次を出力するべきです。
 
-- マニフェスト/schema 検証
+- manifest/schema の検証
 - チェック対象のコントラクト互換性バージョン
-- install/source メタデータチェック
-- コールドパス import チェック
-- 廃止予定および互換性の警告
+- install/source メタデータのチェック
+- コールドパスの import チェック
+- 非推奨および互換性の警告
 
-CI annotation で安定した機械可読出力を得るには `--json` を使います。OpenClaw
-coreは、inspectorが利用できるコントラクトとfixtureを公開すべきですが、
-メインの `openclaw` パッケージから inspector バイナリを公開してはいけません。
+CI アノテーションで安定した機械可読出力を得るには `--json` を使用します。OpenClaw core は inspector が利用できるコントラクトとフィクスチャを公開するべきですが、メインの `openclaw` パッケージから inspector バイナリを公開するべきではありません。
 
-## 廃止予定ポリシー
+## 非推奨化ポリシー
 
-OpenClawは、置き換えを導入したのと同じリリースで、文書化されたPluginコントラクトを削除してはいけません。
+OpenClaw は、文書化された Plugin コントラクトを、その置き換えを導入した同じリリースで削除するべきではありません。
 
-移行シーケンスは次のとおりです。
+移行の順序は次のとおりです。
 
 1. 新しいコントラクトを追加する。
-2. 古い動作を名前付き互換アダプター経由で接続したままにする。
-3. Plugin作成者が対応できる時点で diagnostics または warnings を出す。
-4. 置き換えとタイムラインを文書化する。
-5. 古い経路と新しい経路の両方をテストする。
-6. 告知した移行ウィンドウを待つ。
-7. 明示的な破壊的リリース承認がある場合にのみ削除する。
+2. 古い動作を、名前付き互換性アダプターを通じて接続したままにする。
+3. Plugin 作成者が対応可能な時点で diagnostics または warnings を出す。
+4. 置き換え先とタイムラインを文書化する。
+5. 古いパスと新しいパスの両方をテストする。
+6. 告知済みの移行期間が経過するまで待つ。
+7. 明示的な破壊的変更リリースの承認がある場合にのみ削除する。
 
-廃止予定レコードには、warning開始日、置き換え、docsリンク、および既知であれば削除予定日を含める必要があります。
+非推奨レコードには、警告開始日、置き換え先、docs リンク、および警告開始から 3 か月以内の最終削除日を必ず含める必要があります。メンテナーがそれを恒久的な互換性であると明示的に判断して `active` とマークしない限り、削除期限が未定のままの非推奨互換性パスを追加しないでください。
 
 ## 現在の互換性領域
 
 現在の互換性レコードには次が含まれます。
 
-- `openclaw/plugin-sdk/compat` のようなレガシーな広範SDK import
-- レガシーなhook専用Plugin形状と `before_agent_start`
-- バンドル済みPluginのallowlistおよび有効化動作
-- レガシーなprovider/channel env-var マニフェストメタデータ
-- マニフェストのcontribution ownership に置き換えられつつある activation hint
-- public naming が `agentRuntime` に移行する間の、`embeddedHarness` と `agent-harness` の命名エイリアス
-- レジストリ優先の `channelConfigs` メタデータが導入される間の、生成済みバンドルチャネル設定メタデータのフォールバック
-- 永続化されたplugin registry disable env。これは、operator を
-  `openclaw plugins registry --refresh` と `openclaw doctor --fix` へ移行する repair flow の期間中のものです
+- `openclaw/plugin-sdk/compat` などのレガシーな広範囲 SDK import
+- レガシーな hook 専用 Plugin 形状と `before_agent_start`
+- Plugin が `register(api)` に移行するまでの間の、レガシーな `activate(api)` Plugin エントリーポイント
+- `openclaw/extension-api`、`openclaw/plugin-sdk/channel-runtime`、`openclaw/plugin-sdk/command-auth` の status builder、`openclaw/plugin-sdk/test-utils`、および `ClawdbotConfig` / `OpenClawSchemaType` 型エイリアスなどのレガシー SDK エイリアス
+- バンドル済み Plugin の allowlist と有効化動作
+- レガシーな provider/channel の env-var manifest メタデータ
+- provider が明示的な catalog、auth、thinking、replay、transport hook に移行する間の、レガシーな provider Plugin hook と型エイリアス
+- `api.runtime.taskFlow`、`api.runtime.subagent.getSession`、`api.runtime.stt` などのレガシーなランタイムエイリアス
+- memory Plugin が `registerMemoryCapability` に移行する間の、レガシーな memory-Plugin 分割登録
+- ネイティブメッセージスキーマ、mention ゲーティング、受信 envelope 形式化、approval capability のネストに関するレガシー channel SDK ヘルパー
+- manifest contribution ownership に置き換えられつつある activation hints
+- setup descriptor がコールドな `setup.requiresRuntime: false` メタデータに移行する間の `setup-api` ランタイムフォールバック
+- provider catalog hook が `catalog.run(...)` に移行する間の provider `discovery` hook
+- channel パッケージが `openclaw.channel.exposure` に移行する間の channel `showConfigured` / `showInSetup` メタデータ
+- Doctor がオペレーターを `agentRuntime` に移行する間のレガシー runtime-policy config キー
+- レジストリ優先の `channelConfigs` メタデータが導入されるまでの、生成済みバンドル channel config メタデータフォールバック
+- 修復フローがオペレーターを `openclaw plugins registry --refresh` と `openclaw doctor --fix` に移行する間の、永続化された plugin registry disable および install-migration env フラグ
+- Doctor がそれらを `plugins.entries.<plugin>.config` に移行する間の、レガシーな Plugin 所有の web search、web fetch、および x_search config パス
+- install メタデータが状態管理される Plugin ledger に移行する間の、レガシーな `plugins.installs` 作成 config とバンドル済み Plugin の load-path エイリアス
 
-新しいPluginコードでは、レジストリおよび個別の移行ガイドに記載された置き換えを優先するべきです。既存のPluginは、docs、diagnostics、release notes が削除ウィンドウを告知するまでは、互換経路を使い続けることができます。
+新しい Plugin コードでは、レジストリおよび個別の移行ガイドに記載された置き換え先を優先して使用するべきです。既存の Plugin は、docs、diagnostics、release notes で削除期間が告知されるまでは、互換性パスを引き続き使用できます。
 
 ## リリースノート
 
-リリースノートには、予定日と移行ドキュメントへのリンク付きで、今後のPlugin廃止予定を含めるべきです。その警告は、互換経路が `removal-pending` または `removed` に移る前に行う必要があります。
+リリースノートには、予定されている Plugin の非推奨化について、目標日と移行 docs へのリンクを含める必要があります。その警告は、互換性パスが `removal-pending` または `removed` に移る前に行う必要があります。

@@ -1,68 +1,79 @@
 ---
 read_when:
-    - exec 承認または allowlist の設定
-    - macOS アプリで exec 承認 UX を実装する
-    - sandbox エスケーププロンプトとその影響の確認
-summary: exec 承認、allowlist、および sandbox エスケーププロンプト
-title: exec 承認
+    - 実行承認または allowlist を設定する場合
+    - macOS アプリで実行承認 UX を実装する場合
+    - sandbox-escape プロンプトとその影響をレビューする場合
+sidebarTitle: Exec approvals
+summary: 'ホスト実行の承認: ポリシー設定項目、allowlist、および YOLO/strict ワークフロー'
+title: 実行承認
 x-i18n:
-    generated_at: "2026-04-25T14:00:20Z"
+    generated_at: "2026-04-26T11:41:20Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 44bf7af57d322280f6d0089207041214b1233d0c9eca99656d51fc4aed88941b
+    source_hash: 868cee97882f7298a092bdcb9ec8fd058a5d7cb8745fad2edd712fabfb512e52
     source_path: tools/exec-approvals.md
     workflow: 15
 ---
 
-exec 承認は、sandbox 化されたエージェントが実際のホスト（`gateway` または `node`）上でコマンドを実行できるようにするための **companion app / node host ガードレール** です。これは安全インターロックであり、コマンドはポリシー + allowlist + （任意の）ユーザー承認のすべてが一致した場合にのみ許可されます。exec 承認は、tool policy および elevated gating の**上に重なって**適用されます（ただし、elevated が `full` に設定されている場合は承認をスキップします）。
+実行承認は、sandbox 化されたエージェントが実ホスト（`gateway` または `node`）上でコマンドを実行できるようにするための **companion app / node host のガードレール** です。
+安全インターロックとして機能し、コマンドは policy + allowlist +
+（任意の）ユーザー承認のすべてが一致した場合にのみ許可されます。実行承認は
+tool policy と elevated gating の **上に積み重なって** 適用されます（ただし elevated が `full` に設定されている場合は承認をスキップします）。
 
 <Note>
-実効ポリシーは `tools.exec.*` と approvals defaults の**より厳しい方**です。approvals フィールドが省略されている場合は、`tools.exec` の値が使用されます。host exec はそのマシン上のローカル approvals state も使用します。`~/.openclaw/exec-approvals.json` にあるホストローカルの `ask: "always"` は、セッションまたは config の defaults が `ask: "on-miss"` を要求していても、引き続きプロンプトを表示します。
+有効な policy は `tools.exec.*` と approvals defaults の **より厳しい方** です。approvals フィールドが省略されている場合は、`tools.exec` の値が使用されます。ホスト実行はそのマシン上のローカル approvals state も使用します。`~/.openclaw/exec-approvals.json` にあるホストローカルの `ask: "always"` は、session または config の defaults が `ask: "on-miss"` を要求していても、引き続きプロンプトを表示します。
 </Note>
 
-## 実効ポリシーの確認
+## 有効な policy を確認する
 
-- `openclaw approvals get`、`... --gateway`、`... --node <id|name|ip>` — 要求されたポリシー、ホストポリシーのソース、および実効結果を表示します。
-- `openclaw exec-policy show` — ローカルマシンのマージ済みビュー。
-- `openclaw exec-policy set|preset` — ローカルで要求されたポリシーとローカルホスト approvals ファイルを 1 ステップで同期します。
+| Command                                                          | 表示内容                                                                               |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `openclaw approvals get` / `--gateway` / `--node <id\|name\|ip>` | 要求された policy、ホスト policy のソース、および有効な結果。                         |
+| `openclaw exec-policy show`                                      | ローカルマシン上でマージされたビュー。                                                 |
+| `openclaw exec-policy set` / `preset`                            | ローカルで要求された policy をローカルホストの approvals file と1ステップで同期します。 |
 
-ローカルスコープが `host=node` を要求している場合、`exec-policy show` は、そのスコープをローカル approvals ファイルが真実のソースであるかのように見せるのではなく、実行時には node 管理として報告します。
+ローカルスコープが `host=node` を要求する場合、`exec-policy show` は、
+ローカル approvals file が正しい情報源であるかのように見せるのではなく、
+そのスコープを実行時に node 管理として報告します。
 
-companion app UI が**利用できない**場合、通常はプロンプトを表示するリクエストは **ask fallback**（デフォルト: deny）によって解決されます。
+companion app UI が **利用できない** 場合、本来プロンプトを表示するはずだった要求はすべて **ask fallback**（デフォルト: `deny`）で解決されます。
 
 <Tip>
-ネイティブ chat approval クライアントは、保留中の承認メッセージに channel 固有の affordance を事前設定できます。たとえば Matrix は、メッセージ内にフォールバックとして `/approve ...` コマンドを残しつつ、reaction ショートカット（`✅`
-一度だけ許可、`❌` 拒否、`♾️` 常に許可）を事前設定します。
+ネイティブ chat 承認クライアントは、保留中の承認メッセージに channel 固有の affordance を埋め込めます。たとえば Matrix は reaction shortcut
+（`✅` で allow once、`❌` で deny、`♾️` で allow always）を埋め込みつつ、
+フォールバックとしてメッセージ内に `/approve ...` コマンドも残します。
 </Tip>
 
-## 適用される場所
+## 適用対象
 
-exec 承認は実行ホスト上でローカルに強制されます。
+実行承認は、実行ホスト上でローカルに適用されます。
 
-- **gateway host** → gateway マシン上の `openclaw` プロセス
-- **node host** → node runner（macOS companion app または headless node host）
+- **Gateway host** → gateway マシン上の `openclaw` プロセス。
+- **Node host** → node runner（macOS companion app またはヘッドレス node host）。
 
-trust モデルに関する注意:
+### 信頼モデル
 
-- Gateway 認証済みの呼び出し元は、その Gateway の信頼されたオペレーターです。
-- ペアリングされた nodes は、その信頼されたオペレーター能力を node host に拡張します。
-- exec 承認は偶発的な実行リスクを減らしますが、ユーザー単位の auth 境界ではありません。
-- 承認された node-host 実行は、標準化された実行コンテキストをバインドします: 正規化された cwd、正確な argv、存在する場合は env バインディング、該当する場合は固定された executable path。
-- shell script および interpreter/runtime の直接ファイル呼び出しでは、OpenClaw は 1 つの具体的なローカル file operand もバインドしようとします。そのバインドされたファイルが承認後かつ実行前に変更された場合、内容がずれたまま実行する代わりに、その実行は拒否されます。
-- このファイルバインディングは、あらゆる interpreter/runtime loader path の完全な意味モデルではなく、意図的に best-effort です。承認モードでバインドすべき具体的なローカルファイルをちょうど 1 つ特定できない場合、完全にカバーしているふりをするのではなく、承認付き実行の発行を拒否します。
+- Gateway で認証された caller は、その Gateway の信頼された operator です。
+- ペアリングされた node は、その trusted operator capability を node host にまで拡張します。
+- 実行承認は偶発的な実行リスクを低減しますが、**ユーザーごとの認証境界ではありません**。
+- 承認された node-host 実行は、正規の実行コンテキストに結び付けられます: 正規の cwd、正確な argv、存在する場合の env binding、適用可能な場合の固定された executable path。
+- shell script および interpreter/runtime file の直接実行では、OpenClaw は1つの具体的なローカル file operand も結び付けようとします。その bound file が承認後かつ実行前に変更された場合、内容がずれたまま実行する代わりに、その実行は拒否されます。
+- file binding は意図的にベストエフォートであり、すべての interpreter/runtime loader path の完全な意味モデル **ではありません**。承認モードでちょうど1つの具体的なローカル file を結び付けられない場合、完全にカバーしているふりをするのではなく、approval-backed run の発行を拒否します。
 
-macOS の分割:
+### macOS の分離
 
 - **node host service** は `system.run` をローカル IPC 経由で **macOS app** に転送します。
-- **macOS app** は承認を強制し、UI コンテキストでコマンドを実行します。
+- **macOS app** が承認を適用し、UI コンテキストでコマンドを実行します。
 
 ## 設定と保存先
 
-承認は、実行ホスト上のローカル JSON ファイルに保存されます。
+承認は、実行ホスト上のローカル JSON file に保存されます。
 
-`~/.openclaw/exec-approvals.json`
+```text
+~/.openclaw/exec-approvals.json
+```
 
-スキーマ例:
+schema の例:
 
 ```json
 {
@@ -97,56 +108,113 @@ macOS の分割:
 }
 ```
 
-## 承認なしの「YOLO」モード
+## Policy 設定項目
 
-承認プロンプトなしで host exec を実行したい場合は、**両方**のポリシーレイヤーを開く必要があります。
+### `exec.security`
 
-- OpenClaw config 内の要求 exec policy（`tools.exec.*`）
-- `~/.openclaw/exec-approvals.json` 内の host-local approvals policy
+<ParamField path="security" type='"deny" | "allowlist" | "full"'>
+  - `deny` — すべてのホスト実行要求をブロックします。
+  - `allowlist` — allowlist にあるコマンドのみ許可します。
+  - `full` — すべて許可します（elevated と同等）。
+</ParamField>
 
-これは現在、明示的に厳しくしない限りデフォルトの host 挙動です。
+### `exec.ask`
 
-- `tools.exec.security`: `gateway`/`node` で `full`
-- `tools.exec.ask`: `off`
-- host `askFallback`: `full`
+<ParamField path="ask" type='"off" | "on-miss" | "always"'>
+  - `off` — プロンプトを表示しません。
+  - `on-miss` — allowlist が一致しない場合のみプロンプトを表示します。
+  - `always` — すべてのコマンドでプロンプトを表示します。effective ask mode が `always` の場合、`allow-always` の永続的な信頼は **プロンプトを抑制しません**。
+</ParamField>
 
-重要な違い:
+### `askFallback`
 
-- `tools.exec.host=auto` は exec をどこで実行するかを選びます: sandbox が利用可能なら sandbox、そうでなければ gateway。
-- YOLO は host exec がどのように承認されるかを選びます: `security=full` と `ask=off`。
-- 独自の非対話 permission mode を公開する CLI バック provider は、このポリシーに従えます。
-  Claude CLI は、OpenClaw の要求 exec policy が YOLO の場合に `--permission-mode bypassPermissions` を追加します。そのバックエンド動作は、`agents.defaults.cliBackends.claude-cli.args` / `resumeArgs` 配下の明示的な Claude 引数、たとえば `--permission-mode default`、`acceptEdits`、`bypassPermissions` で上書きできます。
-- YOLO モードでは、OpenClaw は設定済み host exec policy の上に、別個のヒューリスティックなコマンド難読化承認ゲートや script-preflight 拒否レイヤーを追加しません。
-- `auto` は、sandbox 化されたセッションから gateway ルーティングを自由に上書きできることを意味しません。呼び出し単位の `host=node` リクエストは `auto` から許可され、`host=gateway` は sandbox ランタイムがアクティブでない場合にのみ `auto` から許可されます。安定した非 auto デフォルトが必要な場合は、`tools.exec.host` を設定するか、`/exec host=...` を明示的に使用してください。
+<ParamField path="askFallback" type='"deny" | "allowlist" | "full"'>
+  プロンプトが必要だが UI に到達できない場合の解決方法。
 
-より保守的な設定にしたい場合は、いずれかのレイヤーを `allowlist` / `on-miss`
-または `deny` に戻してください。
+- `deny` — ブロックします。
+- `allowlist` — allowlist が一致する場合のみ許可します。
+- `full` — 許可します。
+  </ParamField>
 
-gateway host の永続的な「プロンプトを出さない」設定:
+### `tools.exec.strictInlineEval`
 
-```bash
-openclaw config set tools.exec.host gateway
-openclaw config set tools.exec.security full
-openclaw config set tools.exec.ask off
-openclaw gateway restart
-```
+<ParamField path="strictInlineEval" type="boolean">
+  `true` の場合、OpenClaw はインライン code-eval 形式を、
+  interpreter binary 自体が allowlist に含まれていても、承認専用として扱います。これは、1つの安定した file operand にきれいに対応しない interpreter loader に対する多層防御です。
+</ParamField>
 
-次に、host approvals ファイルも一致するように設定します。
+strict mode が検出する例:
 
-```bash
-openclaw approvals set --stdin <<'EOF'
-{
-  version: 1,
-  defaults: {
-    security: "full",
-    ask: "off",
-    askFallback: "full"
-  }
-}
-EOF
-```
+- `python -c`
+- `node -e`, `node --eval`, `node -p`
+- `ruby -e`
+- `perl -e`, `perl -E`
+- `php -r`
+- `lua -e`
+- `osascript -e`
 
-現在のマシンで同じ gateway-host ポリシーを設定するローカルショートカット:
+strict mode では、これらのコマンドには引き続き明示的な承認が必要であり、
+`allow-always` はそれらに対して新しい allowlist エントリを自動的には永続化しません。
+
+## YOLO モード（承認なし）
+
+承認プロンプトなしでホスト実行を行いたい場合は、OpenClaw config の要求された実行 policy
+（`tools.exec.*`）と、`~/.openclaw/exec-approvals.json` のホストローカル approvals policy という **両方** の policy レイヤーを開く必要があります。
+
+YOLO は、明示的に厳しくしない限りデフォルトのホスト動作です。
+
+| Layer                 | YOLO 設定                  |
+| --------------------- | -------------------------- |
+| `tools.exec.security` | `gateway`/`node` で `full` |
+| `tools.exec.ask`      | `off`                      |
+| Host `askFallback`    | `full`                     |
+
+<Warning>
+**重要な違い:**
+
+- `tools.exec.host=auto` は、実行を **どこで** 行うかを選択します: sandbox が利用可能なら sandbox、そうでなければ gateway。
+- YOLO は、ホスト実行を **どのように** 承認するかを選択します: `security=full` と `ask=off`。
+- YOLO モードでは、OpenClaw は設定済みのホスト実行 policy の上に、別個のヒューリスティックな command-obfuscation 承認ゲートや script-preflight 拒否レイヤーを追加しません。
+- `auto` は、sandbox 化された session から gateway routing を自由な上書きにするものではありません。呼び出しごとの `host=node` 要求は `auto` から許可されます。`host=gateway` は、sandbox runtime が有効でない場合にのみ `auto` から許可されます。安定した non-auto のデフォルトが必要なら、`tools.exec.host` を設定するか、`/exec host=...` を明示的に使用してください。
+  </Warning>
+
+独自の noninteractive permission mode を公開する CLI ベースの provider は、この policy に従えます。
+Claude CLI は、OpenClaw の要求された実行 policy が YOLO の場合、
+`--permission-mode bypassPermissions` を追加します。このバックエンド動作は、
+`agents.defaults.cliBackends.claude-cli.args` / `resumeArgs` 配下の明示的な Claude 引数
+— たとえば `--permission-mode default`、`acceptEdits`、または
+`bypassPermissions` — で上書きできます。
+
+より保守的な設定にしたい場合は、どちらかのレイヤーを `allowlist` / `on-miss` または `deny` に戻してください。
+
+### 永続的な gateway-host 「never prompt」設定
+
+<Steps>
+  <Step title="要求された config policy を設定する">
+    ```bash
+    openclaw config set tools.exec.host gateway
+    openclaw config set tools.exec.security full
+    openclaw config set tools.exec.ask off
+    openclaw gateway restart
+    ```
+  </Step>
+  <Step title="ホスト approvals file を一致させる">
+    ```bash
+    openclaw approvals set --stdin <<'EOF'
+    {
+      version: 1,
+      defaults: {
+        security: "full",
+        ask: "off",
+        askFallback: "full"
+      }
+    }
+    EOF
+    ```
+  </Step>
+</Steps>
+
+### ローカルショートカット
 
 ```bash
 openclaw exec-policy preset yolo
@@ -154,14 +222,16 @@ openclaw exec-policy preset yolo
 
 このローカルショートカットは、次の両方を更新します。
 
-- ローカルの `tools.exec.host/security/ask`
-- ローカルの `~/.openclaw/exec-approvals.json` defaults
+- ローカルの `tools.exec.host/security/ask`。
+- ローカルの `~/.openclaw/exec-approvals.json` defaults。
 
-これは意図的にローカル専用です。gateway-host または node-host approvals を
-リモートで変更する必要がある場合は、引き続き `openclaw approvals set --gateway` または
+これは意図的にローカル専用です。gateway-host または node-host の
+approvals をリモートで変更するには、`openclaw approvals set --gateway` または
 `openclaw approvals set --node <id|name|ip>` を使用してください。
 
-node host については、同じ approvals ファイルをその node に適用してください。
+### Node host
+
+node host の場合は、同じ approvals file をその node に適用します。
 
 ```bash
 openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
@@ -176,71 +246,34 @@ openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-重要なローカル専用の制限:
+<Note>
+**ローカル専用の制限:**
 
-- `openclaw exec-policy` は node approvals を同期しない
-- `openclaw exec-policy set --host node` は拒否される
-- node exec approvals は実行時に node から取得されるため、node 向け更新には `openclaw approvals --node ...` を使用する必要がある
+- `openclaw exec-policy` は node approvals を同期しません。
+- `openclaw exec-policy set --host node` は拒否されます。
+- node 実行承認は実行時に node から取得されるため、node を対象とした更新では `openclaw approvals --node ...` を使用する必要があります。
+  </Note>
 
-セッション専用ショートカット:
+### Session 専用ショートカット
 
-- `/exec security=full ask=off` は現在のセッションだけを変更します。
-- `/elevated full` は、そのセッションの exec 承認もスキップする緊急用ショートカットです。
+- `/exec security=full ask=off` は現在の session のみを変更します。
+- `/elevated full` はブレークグラス用ショートカットであり、その session では実行承認もスキップします。
 
-host approvals ファイルが config より厳しいままである場合は、より厳しい host policy が引き続き優先されます。
-
-## ポリシー設定項目
-
-### Security (`exec.security`)
-
-- **deny**: すべての host exec リクエストをブロックします。
-- **allowlist**: allowlist に載っているコマンドのみ許可します。
-- **full**: すべてを許可します（elevated と同等）。
-
-### Ask (`exec.ask`)
-
-- **off**: プロンプトを一切表示しない。
-- **on-miss**: allowlist に一致しない場合のみプロンプトを表示する。
-- **always**: すべてのコマンドでプロンプトを表示する。
-- 実効 ask モードが `always` の場合、`allow-always` の永続的信頼はプロンプトを抑制しません
-
-### Ask fallback (`askFallback`)
-
-プロンプトが必要だが到達可能な UI がない場合、fallback で次を決めます。
-
-- **deny**: ブロックする。
-- **allowlist**: allowlist に一致する場合のみ許可する。
-- **full**: 許可する。
-
-### インライン interpreter eval の hardening (`tools.exec.strictInlineEval`)
-
-`tools.exec.strictInlineEval=true` の場合、OpenClaw は interpreter バイナリ自体が allowlist に載っていても、インライン code-eval 形式を承認専用として扱います。
-
-例:
-
-- `python -c`
-- `node -e`, `node --eval`, `node -p`
-- `ruby -e`
-- `perl -e`, `perl -E`
-- `php -r`
-- `lua -e`
-- `osascript -e`
-
-これは、1 つの安定した file operand にきれいに対応しない interpreter loader に対する defense-in-depth です。strict モードでは:
-
-- これらのコマンドには引き続き明示的な承認が必要です。
-- `allow-always` は、それらに対する新しい allowlist エントリを自動的には永続化しません。
+ホスト approvals file が config より厳しいままであれば、より厳しいホスト
+policy が引き続き優先されます。
 
 ## Allowlist（agent ごと）
 
-allowlist は **agent ごと** です。複数の agents が存在する場合は、macOS app で
-編集対象の agent を切り替えてください。パターンは glob 一致です。
-パターンには、解決済みバイナリパスの glob か、素のコマンド名 glob を使用できます。素の名前は
-PATH 経由で呼び出されたコマンドにのみ一致するため、コマンドが `rg` であれば `rg` は `/opt/homebrew/bin/rg`
-に一致できますが、`./rg` や `/tmp/rg` には一致しません。特定のバイナリ位置だけを
-信頼したい場合は、パス glob を使用してください。
-レガシーな `agents.default` エントリは読み込み時に `agents.main` へ移行されます。
-`echo ok && pwd` のような shell 連結でも、最上位の各セグメントがすべて allowlist ルールを満たす必要があります。
+allowlist は **agent ごと** です。複数の agent が存在する場合は、
+macOS app で編集中の agent を切り替えてください。pattern は glob 一致です。
+
+pattern には、解決済み binary path glob または単なる command-name glob を使用できます。
+単なる名前は `PATH` 経由で呼び出されたコマンドにのみ一致するため、`rg` は
+コマンドが `rg` の場合に `/opt/homebrew/bin/rg` と一致できますが、`./rg` や
+`/tmp/rg` とは **一致しません**。特定の binary location のみを信頼したい場合は path glob を使用してください。
+
+レガシーな `agents.default` エントリは、読み込み時に `agents.main` に移行されます。
+`echo ok && pwd` のような shell chain では、各トップレベル segment が引き続き allowlist ルールを満たす必要があります。
 
 例:
 
@@ -249,115 +282,110 @@ PATH 経由で呼び出されたコマンドにのみ一致するため、コマ
 - `~/.local/bin/*`
 - `/opt/homebrew/bin/rg`
 
-各 allowlist エントリは次を追跡します。
+各 allowlist エントリは以下を追跡します。
 
-- **id** UI 識別用の安定 UUID（任意）
-- **last used** タイムスタンプ
-- **last used command**
-- **last resolved path**
+| Field              | 意味                                   |
+| ------------------ | -------------------------------------- |
+| `id`               | UI 識別用の安定した UUID               |
+| `lastUsedAt`       | 最終使用時刻                           |
+| `lastUsedCommand`  | 一致した最後のコマンド                 |
+| `lastResolvedPath` | 最後に解決された binary path           |
 
 ## Skill CLI の自動許可
 
-**Auto-allow skill CLIs** が有効な場合、既知の Skills が参照する executable は
-nodes（macOS node または headless node host）上で allowlist 済みとして扱われます。これは
-Gateway RPC 経由の `skills.bins` を使って skill bin 一覧を取得します。厳格な手動 allowlist を使いたい場合は無効にしてください。
+**Auto-allow skill CLIs** が有効な場合、既知の Skills で参照される executable は
+node 上で allowlist 済みとして扱われます（macOS node または headless
+node host）。これは、skill の bin list を取得するために Gateway RPC 経由で `skills.bins` を使用します。厳格な手動 allowlist を望む場合は、これを無効にしてください。
 
-重要な trust に関する注意:
+<Warning>
+- これは手動の path allowlist エントリとは別の、**暗黙の利便性 allowlist** です。
+- これは Gateway と node が同じ信頼境界にある、信頼された operator 環境向けです。
+- 厳格で明示的な信頼が必要な場合は、`autoAllowSkills: false` のままにし、手動の path allowlist エントリのみを使用してください。
+</Warning>
 
-- これは手動パス allowlist エントリとは別の、**暗黙的な利便性 allowlist** です。
-- Gateway と node が同じ trust boundary にある、信頼されたオペレーター環境向けです。
-- 厳格で明示的な trust が必要な場合は、`autoAllowSkills: false` のままにし、手動パス allowlist エントリのみを使用してください。
+## Safe bins と承認転送
 
-## safe bins と承認転送
-
-safe bins（stdin-only fast-path）、interpreter binding の詳細、および
-承認プロンプトを Slack/Discord/Telegram に転送する方法（またはそれらをネイティブ承認クライアントとして実行する方法）については、[Exec approvals — advanced](/ja-JP/tools/exec-approvals-advanced) を参照してください。
-
-<!-- moved to /tools/exec-approvals-advanced -->
+safe bins（stdin-only の高速パス）、interpreter binding の詳細、および
+承認プロンプトを Slack/Discord/Telegram に転送する方法（またはネイティブ承認クライアントとして実行する方法）については、
+[Exec approvals — advanced](/ja-JP/tools/exec-approvals-advanced) を参照してください。
 
 ## Control UI での編集
 
-**Control UI → Nodes → Exec approvals** カードを使用して、defaults、agent ごとの
-overrides、および allowlists を編集します。スコープ（Defaults または agent）を選び、ポリシーを調整し、
-allowlist パターンを追加/削除してから **Save** を押します。UI には、一覧を整理しやすいよう、
-パターンごとの **last used** メタデータが表示されます。
+**Control UI → Nodes → Exec approvals** カードを使用して、defaults、
+agent ごとの override、および allowlist を編集します。スコープ（Defaults または agent）を選び、policy を調整し、allowlist pattern を追加/削除してから **Save** を押してください。UI には pattern ごとの最終使用 metadata が表示されるため、リストを整理した状態に保てます。
 
-ターゲットセレクターでは **Gateway**（ローカル approvals）または **Node** を選びます。Nodes は
-`system.execApprovals.get/set`（macOS app または headless node host）を公開している必要があります。
-node がまだ exec approvals を公開していない場合は、そのローカルの
+ターゲットセレクターは **Gateway**（ローカル承認）または **Node** を選択します。
+Node は `system.execApprovals.get/set` を通知している必要があります（macOS app または
+headless node host）。node がまだ実行承認を通知していない場合は、そのローカル
 `~/.openclaw/exec-approvals.json` を直接編集してください。
 
-CLI: `openclaw approvals` は gateway または node の編集をサポートしています（[Approvals CLI](/ja-JP/cli/approvals) を参照）。
+CLI: `openclaw approvals` は gateway または node の編集をサポートします。詳細は
+[Approvals CLI](/ja-JP/cli/approvals) を参照してください。
 
 ## 承認フロー
 
-プロンプトが必要な場合、gateway は `exec.approval.requested` を operator クライアントにブロードキャストします。
-Control UI と macOS app はこれを `exec.approval.resolve` で解決し、その後 gateway は
-承認されたリクエストを node host に転送します。
+プロンプトが必要な場合、gateway は
+`exec.approval.requested` を operator client にブロードキャストします。Control UI と macOS
+app はこれを `exec.approval.resolve` で解決し、その後 gateway が
+承認済みリクエストを node host に転送します。
 
-`host=node` の場合、承認リクエストには正規化された `systemRunPlan` payload が含まれます。gateway は、
-承認済み `system.run` リクエストを転送する際、この plan を権威ある command/cwd/session コンテキストとして使用します。
+`host=node` の場合、承認リクエストには正規の `systemRunPlan`
+payload が含まれます。gateway は、承認済みの `system.run`
+リクエストを転送する際に、その plan を権威ある
+command/cwd/session context として使用します。
 
-これは非同期承認の待ち時間において重要です。
+これは、非同期承認の待機時間にとって重要です。
 
-- node exec パスは最初に 1 つの正規化された plan を準備する
-- 承認レコードはその plan とその binding metadata を保存する
-- 承認後、最終的に転送される `system.run` 呼び出しは、後からの呼び出し元編集を信用する代わりに、
-  保存済み plan を再利用する
-- 承認リクエスト作成後に呼び出し元が `command`、`rawCommand`、`cwd`、`agentId`、または
-  `sessionKey` を変更した場合、gateway は承認不一致として
-  転送実行を拒否する
+- node 実行パスは、最初に1つの正規 plan を準備します。
+- 承認レコードは、その plan とその binding metadata を保存します。
+- 承認されると、最終的に転送される `system.run` 呼び出しは、後からの caller 編集を信用するのではなく、保存済み plan を再利用します。
+- 承認リクエスト作成後に caller が `command`、`rawCommand`、`cwd`、`agentId`、または `sessionKey` を変更した場合、gateway は承認不一致として転送実行を拒否します。
 
 ## システムイベント
 
-exec のライフサイクルは system message として公開されます:
+実行ライフサイクルはシステムメッセージとして表示されます。
 
-- `Exec running`（コマンドが実行中通知のしきい値を超えた場合のみ）
-- `Exec finished`
-- `Exec denied`
+- `Exec running`（コマンドが running notice しきい値を超えた場合のみ）。
+- `Exec finished`。
+- `Exec denied`。
 
-これらは、node がイベントを報告した後に agent のセッションへ投稿されます。
-gateway-host exec 承認も、コマンド完了時に同じライフサイクルイベントを発行します
-（しきい値より長く実行された場合は、任意で実行中イベントも発行）。
-承認ゲート付き exec では、相関付けを容易にするため、これらのメッセージで
-承認 id を `runId` として再利用します。
+これらは、node がイベントを報告した後に agent の session に投稿されます。
+Gateway-host 実行承認も、コマンド完了時（および任意でしきい値を超えて長時間実行した場合）に同じライフサイクルイベントを発行します。
+承認ゲート付き実行では、相関しやすいように、これらのメッセージ内で approval id を `runId` として再利用します。
 
-## 承認拒否時の挙動
+## 承認拒否時の動作
 
-非同期 exec 承認が拒否されると、OpenClaw はエージェントがそのセッション内で
-同じコマンドの以前の実行結果を再利用できないようにします。拒否理由は、
-コマンド出力が利用できないという明示的なガイダンス付きで渡されるため、
-エージェントが新しい出力があると主張したり、以前の成功実行の古い結果を使って
-拒否されたコマンドを繰り返したりすることを防ぎます。
+非同期実行承認が拒否された場合、OpenClaw はその session 内で同じコマンドの以前の実行からの出力をエージェントが再利用することを防ぎます。
+拒否理由は、「利用可能なコマンド出力はない」という明示的なガイダンス付きで渡されます。これにより、エージェントが新しい出力があると主張したり、以前に成功した実行の古い結果を使って拒否されたコマンドを繰り返したりすることを防ぎます。
 
-## 影響
+## 意味すること
 
-- **full** は強力です。可能な限り allowlist を優先してください。
-- **ask** を使うと、高速な承認を維持しつつ、確認のループに入れます。
-- agent ごとの allowlist により、ある agent の承認が他の agent に漏れるのを防げます。
-- 承認は、**認可済み送信者** からの host exec リクエストにのみ適用されます。未認可の送信者は `/exec` を発行できません。
-- `/exec security=full` は認可済みオペレーター向けのセッションレベルの利便機能であり、設計上、承認をスキップします。host exec を強制的にブロックしたい場合は、approvals security を `deny` に設定するか、tool policy で `exec` ツールを拒否してください。
+- **`full`** は強力です。可能な限り allowlist を優先してください。
+- **`ask`** は、高速な承認を可能にしつつ、ユーザーをループ内に保ちます。
+- agent ごとの allowlist により、ある agent の承認が他の agent に漏れることを防ぎます。
+- 承認は、**認可された送信者** からのホスト実行要求にのみ適用されます。未認可の送信者は `/exec` を発行できません。
+- `/exec security=full` は認可された operator 向けの session レベルの利便機能であり、設計上承認をスキップします。ホスト実行を強制的にブロックしたい場合は、approvals security を `deny` に設定するか、tool policy で `exec` tool を拒否してください。
 
-## 関連
+## 関連項目
 
 <CardGroup cols={2}>
   <Card title="Exec approvals — advanced" href="/ja-JP/tools/exec-approvals-advanced" icon="gear">
-    safe bins、interpreter binding、および chat への承認転送。
+    Safe bins、interpreter binding、および chat への承認転送。
   </Card>
   <Card title="Exec tool" href="/ja-JP/tools/exec" icon="terminal">
-    シェルコマンド実行ツール。
+    shell コマンド実行 tool。
   </Card>
   <Card title="Elevated mode" href="/ja-JP/tools/elevated" icon="shield-exclamation">
-    承認もスキップする緊急用パス。
+    承認もスキップするブレークグラス用パス。
   </Card>
   <Card title="Sandboxing" href="/ja-JP/gateway/sandboxing" icon="box">
-    sandbox モードとワークスペースアクセス。
+    sandbox モードと workspace アクセス。
   </Card>
   <Card title="Security" href="/ja-JP/gateway/security" icon="lock">
-    セキュリティモデルと hardening。
+    セキュリティモデルとハードニング。
   </Card>
   <Card title="Sandbox vs tool policy vs elevated" href="/ja-JP/gateway/sandbox-vs-tool-policy-vs-elevated" icon="sliders">
-    それぞれの制御をいつ使うべきか。
+    どの制御を使うべきか。
   </Card>
   <Card title="Skills" href="/ja-JP/tools/skills" icon="sparkles">
     Skill ベースの自動許可動作。

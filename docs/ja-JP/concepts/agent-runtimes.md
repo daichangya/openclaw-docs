@@ -1,109 +1,165 @@
 ---
 read_when:
-    - Pi、Codex、ACP、または別のネイティブagent runtimeのどれを選ぶかを決めている場合
-    - statusやconfigにあるprovider/model/runtimeのラベルの違いが分かりにくい場合
-    - ネイティブharnessのサポート互換性を文書化している場合
-summary: OpenClawがモデルプロバイダー、モデル、channel、agent runtimeをどのように分離しているか
-title: agent runtimes
+    - Pi、Codex、ACP、または別のネイティブエージェントランタイムのどれを選ぶかを検討している場合
+    - status や config に表示される provider/model/runtime のラベルに混乱している場合
+    - ネイティブハーネスのサポート同等性をドキュメント化している場合
+summary: OpenClaw がモデルプロバイダー、モデル、チャンネル、およびエージェントランタイムをどのように分離しているか
+title: エージェントランタイム
 x-i18n:
-    generated_at: "2026-04-25T13:45:06Z"
+    generated_at: "2026-04-26T11:27:21Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 6f492209da2334361060f0827c243d5d845744be906db9ef116ea00384879b33
+    source_hash: f99e88a47a78c48b2f2408a3feedf15cde66a6bacc4e7bfadb9e47c74f7ce633
     source_path: concepts/agent-runtimes.md
     workflow: 15
 ---
 
-**agent runtime**は、1つの準備済みモデルループを担当するコンポーネントです。プロンプトを受け取り、モデル出力を進め、ネイティブツール呼び出しを処理し、完了したターンをOpenClawに返します。
+**エージェントランタイム**は、準備済みの 1 つのモデルループを所有するコンポーネントです。プロンプトを受け取り、モデル出力を駆動し、ネイティブツール呼び出しを処理して、完了したターンを OpenClaw に返します。
 
-runtimeは、どちらもモデル設定の近くに現れるため、providerと混同しやすい概念です。これらは別のレイヤーです。
+ランタイムは、どちらもモデル設定の近くに現れるため、プロバイダーと混同しやすいですが、異なるレイヤーです。
 
-| レイヤー | 例 | 意味 |
-| ------------- | ------------------------------------- | ------------------------------------------------------------------- |
-| Provider | `openai`, `anthropic`, `openai-codex` | OpenClawがどのように認証し、モデルを検出し、model refに名前を付けるか。 |
-| Model | `gpt-5.5`, `claude-opus-4-6` | agentターンに選択されたモデル。 |
-| Agent runtime | `pi`, `codex`, ACP-backed runtimes | 準備済みターンを実行する低レベルループ。 |
-| Channel | Telegram, Discord, Slack, WhatsApp | メッセージがOpenClawに入出力される場所。 |
+| レイヤー             | 例                                    | 意味                                                           |
+| -------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| プロバイダー         | `openai`, `anthropic`, `openai-codex` | OpenClaw がどのように認証し、モデルを検出し、model ref を命名するか。 |
+| モデル               | `gpt-5.5`, `claude-opus-4-6`          | エージェントターンに選択されるモデル。                         |
+| エージェントランタイム | `pi`, `codex`, `claude-cli`           | 準備済みターンを実行する低レベルのループまたはバックエンド。   |
+| チャンネル           | Telegram, Discord, Slack, WhatsApp    | メッセージが OpenClaw に入出力される場所。                     |
 
-コードやconfigでは**harness**という語も見かけます。harnessは、agent runtimeを提供する実装です。たとえば、バンドルされたCodex harnessは`codex` runtimeを実装します。互換性のためconfigキー名は引き続き`embeddedHarness`ですが、ユーザー向けドキュメントやstatus出力では、通常はruntimeと表記すべきです。
+コード内では **harness** という語も見かけます。harness はエージェントランタイムを提供する実装です。たとえば、バンドルされた Codex harness は `codex` ランタイムを実装します。公開 config では `agentRuntime.id` を使用し、`openclaw doctor --fix` は古い runtime-policy キーをその形に書き換えます。
 
-一般的なCodexセットアップでは、`openai` providerと`codex` runtimeを使用します。
+ランタイムには 2 つのファミリーがあります。
+
+- **組み込み harness** は OpenClaw の準備済みエージェントループ内で実行されます。現在は、組み込みの `pi` ランタイムと、`codex` など登録済みの Plugin harness が該当します。
+- **CLI バックエンド** は、model ref を正規のまま保ちながらローカル CLI プロセスを実行します。たとえば、`agentRuntime.id: "claude-cli"` を伴う `anthropic/claude-opus-4-7` は、「Anthropic モデルを選び、Claude CLI 経由で実行する」という意味です。`claude-cli` は組み込み harness id ではないため、AgentHarness 選択に渡してはいけません。
+
+## Codex という名前の 3 つのもの
+
+混乱の大半は、Codex という名前を共有する 3 つの異なる面に由来します。
+
+| 対象                                                 | OpenClaw 名 / config                  | 動作内容                                                                                             |
+| ---------------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Codex OAuth provider ルート                          | `openai-codex/*` model refs           | 通常の OpenClaw PI ランナーを通じて ChatGPT/Codex サブスクリプション OAuth を使用します。           |
+| ネイティブ Codex app-server ランタイム               | `agentRuntime.id: "codex"`            | バンドルされた Codex app-server harness を通じて組み込みエージェントターンを実行します。            |
+| Codex ACP アダプター                                 | `runtime: "acp"`, `agentId: "codex"`  | 外部 ACP/acpx 制御プレーンを通じて Codex を実行します。ACP/acpx が明示的に要求された場合にのみ使用します。 |
+| ネイティブ Codex chat-control コマンドセット         | `/codex ...`                          | チャットから Codex app-server スレッドをバインド、再開、操作、停止、確認します。                    |
+| GPT/Codex 系モデル向け OpenAI Platform API ルート    | `openai/*` model refs                 | `runtime: "codex"` のようなランタイム上書きでターンを実行しない限り、OpenAI API キー認証を使用します。 |
+
+これらの面は意図的に独立しています。`codex` Plugin を有効にすると、ネイティブ app-server 機能が利用可能になりますが、`openai-codex/*` を `openai/*` に書き換えたり、既存セッションを変更したり、ACP を Codex のデフォルトにしたりはしません。`openai-codex/*` を選ぶとは、「別途ランタイムを強制しない限り、Codex OAuth provider ルートを使う」という意味です。
+
+一般的な Codex セットアップでは、`codex` ランタイムとともに `openai` provider を使用します。
 
 ```json5
 {
   agents: {
     defaults: {
       model: "openai/gpt-5.5",
-      embeddedHarness: {
-        runtime: "codex",
+      agentRuntime: {
+        id: "codex",
       },
     },
   },
 }
 ```
 
-これは、OpenClawがOpenAIのmodel refを選択し、その後Codex app-server runtimeに埋め込みagentターンの実行を依頼することを意味します。channel、モデルprovider catalog、またはOpenClawセッションストアがCodexになることを意味するわけではありません。
+これは、OpenClaw が OpenAI model ref を選択し、その後 Codex app-server ランタイムに組み込みエージェントターンの実行を依頼することを意味します。チャンネル、モデル provider カタログ、または OpenClaw セッションストアが Codex になるという意味ではありません。
 
-OpenAI系プレフィックスの分割については、[OpenAI](/ja-JP/providers/openai)と[Model providers](/ja-JP/concepts/model-providers)を参照してください。Codex runtimeのサポート契約については、[Codex harness](/ja-JP/plugins/codex-harness#v1-support-contract)を参照してください。
+バンドルされた `codex` Plugin が有効な場合、自然言語の Codex 制御には、ACP ではなくネイティブの `/codex` コマンド画面（`/codex bind`、`/codex threads`、`/codex resume`、`/codex steer`、`/codex stop`）を使用してください。Codex に ACP を使用するのは、ユーザーが ACP/acpx を明示的に要求した場合、または ACP アダプターパスをテストしている場合のみです。Claude Code、Gemini CLI、OpenCode、Cursor、および同様の外部 harness は引き続き ACP を使用します。
 
-## Runtime ownership
+これはエージェント向けの判断フローです。
 
-runtimeごとに、ループのどこまでを担当するかは異なります。
+1. ユーザーが **Codex の bind/control/thread/resume/steer/stop** を求めている場合、バンドルされた `codex` Plugin が有効ならネイティブの `/codex` コマンド画面を使います。
+2. ユーザーが **組み込みランタイムとしての Codex** を求めている場合、`agentRuntime.id: "codex"` とともに `openai/<model>` を使います。
+3. ユーザーが **通常の OpenClaw ランナー上での Codex OAuth/subscription 認証** を求めている場合、`openai-codex/<model>` を使い、ランタイムは PI のままにします。
+4. ユーザーが明示的に **ACP**、**acpx**、または **Codex ACP adapter** と言っている場合、`runtime: "acp"` と `agentId: "codex"` で ACP を使います。
+5. リクエストが **Claude Code、Gemini CLI、OpenCode、Cursor、Droid、または別の外部 harness** 向けである場合、ネイティブ sub-agent ランタイムではなく ACP/acpx を使います。
 
-| Surface | OpenClaw Pi embedded | Codex app-server |
-| --------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
-| モデルループの所有者 | PI embedded runnerを通したOpenClaw | Codex app-server |
-| 正式なスレッド状態 | OpenClaw transcript | Codex thread、およびOpenClaw transcript mirror |
-| OpenClaw dynamic tools | ネイティブなOpenClawツールループ | Codex adapterを介してブリッジ |
-| ネイティブshellおよびfile tools | Pi/OpenClaw経路 | Codexネイティブtools。サポートされる場合はnative hooks経由でブリッジ |
-| コンテキストエンジン | ネイティブなOpenClawコンテキスト組み立て | OpenClawがプロジェクト化したコンテキストをCodexターンに組み立て |
-| Compaction | OpenClawまたは選択されたコンテキストエンジン | CodexネイティブCompaction。OpenClaw通知とmirror維持付き |
-| Channel配信 | OpenClaw | OpenClaw |
+| 意味しているもの                         | 使用するもの                                  |
+| ---------------------------------------- | --------------------------------------------- |
+| Codex app-server のチャット/スレッド制御 | バンドルされた `codex` Plugin の `/codex ...` |
+| Codex app-server の組み込みエージェントランタイム | `agentRuntime.id: "codex"`            |
+| PI ランナー上の OpenAI Codex OAuth       | `openai-codex/*` model refs                   |
+| Claude Code または別の外部 harness       | ACP/acpx                                      |
 
-このownership分割が主要な設計ルールです。
+OpenAI ファミリーのプレフィックス分割については、[OpenAI](/ja-JP/providers/openai) と
+[Model providers](/ja-JP/concepts/model-providers) を参照してください。Codex ランタイムのサポート契約については、[Codex harness](/ja-JP/plugins/codex-harness#v1-support-contract) を参照してください。
 
-- OpenClawがsurfaceを所有している場合、OpenClawは通常のplugin hook動作を提供できます。
-- ネイティブruntimeがsurfaceを所有している場合、OpenClawにはruntime eventsまたはnative hooksが必要です。
-- ネイティブruntimeが正式なスレッド状態を所有している場合、OpenClawはmirrorとコンテキスト投影を行うべきであり、未サポートの内部実装を書き換えるべきではありません。
+## ランタイムの所有権
 
-## Runtime selection
+ランタイムごとに、ループの所有範囲は異なります。
 
-OpenClawは、providerとmodelの解決後に埋め込みruntimeを選択します。
+| 対象                        | OpenClaw PI 組み込み                | Codex app-server                                                            |
+| --------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| モデルループの所有者        | PI 組み込みランナー経由の OpenClaw  | Codex app-server                                                            |
+| 正規スレッド状態            | OpenClaw transcript                 | Codex スレッド + OpenClaw transcript ミラー                                |
+| OpenClaw 動的ツール         | ネイティブ OpenClaw ツールループ    | Codex アダプター経由でブリッジ                                              |
+| ネイティブ shell/file ツール | PI/OpenClaw パス                    | Codex ネイティブツール。サポートされる場合はネイティブフック経由でブリッジ |
+| コンテキストエンジン        | ネイティブ OpenClaw コンテキスト構築 | OpenClaw がプロジェクト化したコンテキストを Codex ターンに組み立て         |
+| Compaction                  | OpenClaw または選択されたコンテキストエンジン | Codex ネイティブ Compaction + OpenClaw 通知とミラー保守              |
+| チャンネル配信              | OpenClaw                            | OpenClaw                                                                    |
 
-1. セッションに記録されたruntimeが優先されます。config変更によって、既存transcriptを別のネイティブthread systemへホットスイッチすることはありません。
-2. `OPENCLAW_AGENT_RUNTIME=<id>`は、新規またはリセットされたセッションに対してそのruntimeを強制します。
-3. `agents.defaults.embeddedHarness.runtime`または`agents.list[].embeddedHarness.runtime`で、`auto`、`pi`、または`codex`のような登録済みruntime idを設定できます。
-4. `auto`モードでは、登録済みplugin runtimeが対応するprovider/modelの組み合わせを引き受けることができます。
-5. `auto`モードでどのruntimeもターンを引き受けず、`fallback: "pi"`が設定されている場合（デフォルト）、OpenClawは互換性フォールバックとしてPiを使用します。未一致の`auto`モード選択を失敗させたい場合は、`fallback: "none"`を設定してください。
+この所有権分割が主な設計ルールです。
 
-明示的なplugin runtimeは、デフォルトでfail closedです。たとえば、`runtime: "codex"`は、同じ上書きスコープで`fallback: "pi"`を設定しない限り、Codexまたは明確な選択エラーを意味します。runtime overrideはより広いfallback設定を継承しないため、agentレベルの`runtime: "codex"`が、defaultsで`fallback: "pi"`を使っていたからといって、暗黙にPiへ戻されることはありません。
+- OpenClaw がその面を所有しているなら、通常の Plugin フック動作を提供できます。
+- ネイティブランタイムがその面を所有しているなら、OpenClaw にはランタイムイベントまたはネイティブフックが必要です。
+- ネイティブランタイムが正規スレッド状態を所有しているなら、OpenClaw は未サポートの内部状態を書き換えるのではなく、ミラーとコンテキスト投影を行うべきです。
 
-## Compatibility contract
+## ランタイム選択
 
-runtimeがPiでない場合、そのruntimeは、どのOpenClaw surfaceをサポートするかを文書化すべきです。runtimeドキュメントには次の形式を使用してください。
+OpenClaw は、provider と model の解決後に組み込みランタイムを選択します。
 
-| 問い | 重要である理由 |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 誰がモデルループを所有するか | リトライ、ツール継続、最終回答の判断がどこで行われるかを決定します。 |
-| 誰が正式なスレッド履歴を所有するか | OpenClawが履歴を編集できるのか、mirrorしかできないのかを決定します。 |
-| OpenClaw dynamic toolsは動作するか | メッセージング、セッション、Cron、およびOpenClaw所有toolsはこれに依存します。 |
-| dynamic tool hooksは動作するか | pluginは、OpenClaw所有toolsの周囲で`before_tool_call`、`after_tool_call`、middlewareを期待します。 |
-| native tool hooksは動作するか | shell、patch、runtime所有toolsには、ポリシーと観測のためnative hookサポートが必要です。 |
-| コンテキストエンジンのライフサイクルは動作するか | メモリとコンテキストpluginは、assemble、ingest、after-turn、Compactionライフサイクルに依存します。 |
-| どのCompactionデータが公開されるか | pluginによっては通知だけで十分ですが、保持/破棄メタデータが必要なものもあります。 |
-| 意図的に未サポートなものは何か | ネイティブruntimeがより多くの状態を所有する場合、ユーザーはPi同等と想定すべきではありません。 |
+1. セッションに記録されたランタイムが優先されます。config の変更で、既存 transcript が別のネイティブスレッドシステムにホットスイッチされることはありません。
+2. `OPENCLAW_AGENT_RUNTIME=<id>` は、新規またはリセットされたセッションに対してそのランタイムを強制します。
+3. `agents.defaults.agentRuntime.id` または `agents.list[].agentRuntime.id` では、`auto`、`pi`、`codex` のような登録済み組み込み harness id、または `claude-cli` のようなサポート対象 CLI バックエンドエイリアスを設定できます。
+4. `auto` モードでは、登録済み Plugin ランタイムがサポートする provider/model ペアを claim できます。
+5. `auto` モードでどのランタイムもターンを claim せず、`fallback: "pi"` が設定されている場合（デフォルト）、OpenClaw は互換性フォールバックとして PI を使用します。`auto` モードで一致しない選択を失敗させたい場合は、`fallback: "none"` を設定してください。
 
-Codex runtimeのサポート契約は、[Codex harness](/ja-JP/plugins/codex-harness#v1-support-contract)に記載されています。
+明示的な Plugin ランタイムは、デフォルトで fail closed です。たとえば、`runtime: "codex"` は、同じ上書きスコープに `fallback: "pi"` を設定しない限り、Codex になるか、明確な選択エラーになるかのどちらかです。ランタイム上書きは、より広い fallback 設定を継承しないため、デフォルトで `fallback: "pi"` を使っていたとしても、エージェントレベルの `runtime: "codex"` が黙って PI に戻されることはありません。
 
-## Status labels
+CLI バックエンドエイリアスは、組み込み harness id とは異なります。推奨される Claude CLI 形式は次のとおりです。
 
-status出力には`Execution`と`Runtime`の両方のラベルが表示されることがあります。これらはprovider名ではなく診断情報として読んでください。
+```json5
+{
+  agents: {
+    defaults: {
+      model: "anthropic/claude-opus-4-7",
+      agentRuntime: { id: "claude-cli" },
+    },
+  },
+}
+```
 
-- `openai/gpt-5.5`のようなmodel refは、選択されたprovider/modelを示します。
-- `codex`のようなruntime idは、どのループがそのターンを実行しているかを示します。
-- TelegramやDiscordのようなchannel labelは、会話がどこで行われているかを示します。
+`claude-cli/claude-opus-4-7` のような古い ref も互換性のため引き続きサポートされますが、新しい config では provider/model を正規のまま保ち、実行バックエンドは `agentRuntime.id` に置くべきです。
 
-runtime configを変更した後もセッションがPiのまま表示される場合は、`/new`で新しいセッションを開始するか、`/reset`で現在のセッションをクリアしてください。既存セッションは記録されたruntimeを保持するため、1つのtranscriptが互換性のない2つのネイティブsession systemを通して再生されることはありません。
+`auto` モードは意図的に保守的です。Plugin ランタイムは理解できる provider/model ペアを claim できますが、Codex Plugin は `auto` モードで `openai-codex` provider を claim しません。これにより、`openai-codex/*` は明示的な PI Codex OAuth ルートのまま維持され、subscription 認証 config が黙ってネイティブ app-server harness に移行するのを防ぎます。
+
+`openclaw doctor` が、`codex` Plugin は有効なのに `openai-codex/*` がまだ PI 経由でルーティングされていると警告した場合、それは移行ではなく診断として扱ってください。PI Codex OAuth を望んでいるなら config は変更しないでください。ネイティブ Codex app-server 実行を望む場合にのみ、`openai/<model>` と `agentRuntime.id: "codex"` に切り替えてください。
+
+## 互換性契約
+
+ランタイムが PI でない場合、それがサポートする OpenClaw の面を文書化する必要があります。ランタイムドキュメントには次の形を使用してください。
+
+| 問い                                   | 重要である理由                                                                                  |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| モデルループの所有者は誰か             | リトライ、ツール継続、最終回答の判断がどこで行われるかを決定します。                           |
+| 正規スレッド履歴の所有者は誰か         | OpenClaw が履歴を編集できるのか、ミラーしかできないのかを決定します。                          |
+| OpenClaw 動的ツールは動作するか        | メッセージング、セッション、Cron、および OpenClaw 所有ツールはこれに依存します。              |
+| 動的ツールフックは動作するか           | Plugin は、OpenClaw 所有ツールの周囲に `before_tool_call`、`after_tool_call`、middleware を期待します。 |
+| ネイティブツールフックは動作するか     | shell、patch、およびランタイム所有ツールには、ポリシーと観測のためにネイティブフック対応が必要です。 |
+| コンテキストエンジンのライフサイクルは動くか | memory とコンテキスト Plugin は、assemble、ingest、after-turn、および compaction ライフサイクルに依存します。 |
+| どの compaction データが公開されるか   | 通知だけ必要な Plugin もあれば、保持/破棄メタデータが必要な Plugin もあります。                |
+| 意図的に未サポートなものは何か         | ネイティブランタイムがより多くの状態を所有する場合、ユーザーは PI 同等性を想定すべきではありません。 |
+
+Codex ランタイムのサポート契約は [Codex harness](/ja-JP/plugins/codex-harness#v1-support-contract) に文書化されています。
+
+## ステータスラベル
+
+status 出力には `Execution` と `Runtime` の両方のラベルが表示されることがあります。これらは provider 名ではなく、診断情報として読んでください。
+
+- `openai/gpt-5.5` のような model ref は、選択された provider/model を示します。
+- `codex` のような runtime id は、どのループがそのターンを実行しているかを示します。
+- Telegram や Discord のような channel ラベルは、その会話がどこで行われているかを示します。
+
+ランタイム config を変更した後もセッションに PI が表示される場合は、`/new` で新しいセッションを開始するか、`/reset` で現在のセッションをクリアしてください。既存セッションは記録されたランタイムを保持するため、1 つの transcript が互換性のない 2 つのネイティブセッションシステムを通して再生されることはありません。
 
 ## 関連
 

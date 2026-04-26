@@ -1,29 +1,28 @@
 ---
 read_when:
-    - model provider を選びたい場合
-    - サポートされる LLM バックエンドの概要を手早く確認したい場合
-summary: OpenClaw がサポートする model provider（LLM）
-title: provider ディレクトリ
+    - model providerを選びたい場合
+    - サポートされているLLM backendの概要を手早く知りたい場合
+summary: OpenClawがサポートするmodel provider（LLM）
+title: providerディレクトリ
 x-i18n:
-    generated_at: "2026-04-25T13:57:30Z"
+    generated_at: "2026-04-26T11:39:10Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 9e031e997f0dbf97e3e26d5ee05bd99c2877653daa04423d210d01b9045d8c5c
+    source_hash: b5d3bf5b30bd7a1dbd8b1348f4f07f178fea9bfea523afa96cad2a30d566a139
     source_path: providers/index.md
     workflow: 15
 ---
 
 # Model Providers
 
-OpenClaw は多くの LLM provider を使えます。provider を選び、認証し、その後
-デフォルト model を `provider/model` として設定してください。
+OpenClawは多くのLLM providerを利用できます。providerを選び、認証し、その後デフォルトmodelを `provider/model` として設定してください。
 
-チャットチャネルのドキュメント（WhatsApp/Telegram/Discord/Slack/Mattermost（Plugin）など）を探していますか？ [Channels](/ja-JP/channels) を参照してください。
+chat channelのdoc（WhatsApp/Telegram/Discord/Slack/Mattermost (plugin) / など）を探していますか？ [Channels](/ja-JP/channels) を参照してください。
 
 ## クイックスタート
 
-1. provider で認証します（通常は `openclaw onboard` 経由）。
-2. デフォルト model を設定します。
+1. providerで認証します（通常は `openclaw onboard` を使います）。
+2. デフォルトmodelを設定します。
 
 ```json5
 {
@@ -31,13 +30,14 @@ OpenClaw は多くの LLM provider を使えます。provider を選び、認証
 }
 ```
 
-## provider ドキュメント
+## providerドキュメント
 
 - [Alibaba Model Studio](/ja-JP/providers/alibaba)
 - [Amazon Bedrock](/ja-JP/providers/bedrock)
 - [Amazon Bedrock Mantle](/ja-JP/providers/bedrock-mantle)
 - [Anthropic (API + Claude CLI)](/ja-JP/providers/anthropic)
 - [Arcee AI (Trinity models)](/ja-JP/providers/arcee)
+- [Azure Speech](/ja-JP/providers/azure-speech)
 - [BytePlus (International)](/ja-JP/concepts/model-providers#byteplus-international)
 - [Chutes](/ja-JP/providers/chutes)
 - [Cloudflare AI Gateway](/ja-JP/providers/cloudflare-ai-gateway)
@@ -84,14 +84,14 @@ OpenClaw は多くの LLM provider を使えます。provider を選び、認証
 - [Xiaomi](/ja-JP/providers/xiaomi)
 - [Z.AI](/ja-JP/providers/zai)
 
-## 共有概要ページ
+## 共有overviewページ
 
 - [Additional bundled variants](/ja-JP/providers/models#additional-bundled-provider-variants) - Anthropic Vertex、Copilot Proxy、Gemini CLI OAuth
-- [Image Generation](/ja-JP/tools/image-generation) - 共有 `image_generate` ツール、provider 選択、フェイルオーバー
-- [Music Generation](/ja-JP/tools/music-generation) - 共有 `music_generate` ツール、provider 選択、フェイルオーバー
-- [Video Generation](/ja-JP/tools/video-generation) - 共有 `video_generate` ツール、provider 選択、フェイルオーバー
+- [Image Generation](/ja-JP/tools/image-generation) - 共有 `image_generate` tool、provider選択、およびfailover
+- [Music Generation](/ja-JP/tools/music-generation) - 共有 `music_generate` tool、provider選択、およびfailover
+- [Video Generation](/ja-JP/tools/video-generation) - 共有 `video_generate` tool、provider選択、およびfailover
 
-## 文字起こし provider
+## transcription provider
 
 - [Deepgram (audio transcription)](/ja-JP/providers/deepgram)
 - [ElevenLabs](/ja-JP/providers/elevenlabs#speech-to-text)
@@ -100,9 +100,9 @@ OpenClaw は多くの LLM provider を使えます。provider を選び、認証
 - [SenseAudio](/ja-JP/providers/senseaudio)
 - [xAI](/ja-JP/providers/xai#speech-to-text)
 
-## コミュニティツール
+## コミュニティtool
 
-- [Claude Max API Proxy](/ja-JP/providers/claude-max-api-proxy) - Claude subscription 資格情報向けコミュニティ proxy（使用前に Anthropic のポリシー/規約を確認してください）
+- [Claude Max API Proxy](/ja-JP/providers/claude-max-api-proxy) - Claude subscription credential向けのコミュニティproxy（使用前にAnthropicのpolicy / termsを確認してください）
 
-完全な provider catalog（xAI、Groq、Mistral など）と高度な設定については、
-[Model providers](/ja-JP/concepts/model-providers) を参照してください。
+完全なprovider catalog（xAI、Groq、Mistralなど）と高度な設定については、
+[Model providers](/ja-JP/concepts/model-providers)を参照してください。

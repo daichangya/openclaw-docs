@@ -1,131 +1,132 @@
 ---
 read_when:
-    - プロバイダー認証情報と `auth-profiles.json` ref 向けに SecretRef を設定する
-    - 本番環境で secrets のリロード、監査、設定、適用を安全に運用する
-    - 起動時 fail-fast、非アクティブサーフェスのフィルタリング、last-known-good 動作を理解する
-summary: 'シークレット管理: SecretRef 契約、ランタイムスナップショット動作、安全な一方向スクラビング'
+    - provider 認証情報と `auth-profiles.json` ref 用に SecretRef を設定すること
+    - 本番環境で secrets の reload、audit、configure、apply を安全に運用すること
+    - 起動時の fail-fast、非アクティブサーフェスのフィルタリング、last-known-good 動作を理解すること
+sidebarTitle: Secrets management
+summary: 'シークレット管理: SecretRef の契約、ランタイムスナップショット動作、安全な一方向スクラビング'
 title: シークレット管理
 x-i18n:
-    generated_at: "2026-04-24T04:59:35Z"
+    generated_at: "2026-04-26T11:31:22Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 18e21f63bbf1815b7166dfe123900575754270de94113b446311d73dfd4f2343
+    source_hash: a8697a8eb15cf6ef9b105e3f12cfdad6205284d4c45f1314cd7aec2e2c81fed1
     source_path: gateway/secrets.md
     workflow: 15
 ---
 
-OpenClaw は additive SecretRef をサポートしているため、サポート対象の認証情報を設定にプレーンテキストで保存する必要はありません。
+OpenClaw は加算的な SecretRef をサポートしているため、対応する認証情報を config に平文で保存する必要はありません。
 
-プレーンテキストも引き続き使えます。SecretRef は認証情報ごとのオプトインです。
+<Note>
+平文も引き続き利用できます。SecretRef は認証情報ごとのオプトインです。
+</Note>
 
-## 目的とランタイムモデル
+## 目標とランタイムモデル
 
 シークレットはインメモリのランタイムスナップショットに解決されます。
 
-- 解決はリクエスト経路での遅延実行ではなく、アクティベーション中に eager に行われます。
-- 実効的にアクティブな SecretRef が解決できない場合、起動は fail-fast します。
-- リロードは atomic swap を使います。全面成功するか、last-known-good スナップショットを維持するかのどちらかです。
-- SecretRef ポリシー違反（たとえば OAuth モードの auth profile と SecretRef 入力の組み合わせ）は、ランタイム swap 前にアクティベーションを失敗させます。
-- ランタイムリクエストは、アクティブなインメモリスナップショットからのみ読み取ります。
-- 最初の config アクティベーション/読み込み成功後、ランタイムコードパスは、成功したリロードで swap されるまでそのアクティブなインメモリスナップショットを読み続けます。
-- 送信系の配信パスもそのアクティブなスナップショットから読み取ります（たとえば Discord の reply/thread 配信や Telegram action の送信）。送信ごとに SecretRef を再解決しません。
+- 解決はリクエスト経路での遅延実行ではなく、有効化中に eager に行われます。
+- 実効的に active な SecretRef を解決できない場合、起動は fail-fast します。
+- reload はアトミックスワップを使います。完全に成功するか、last-known-good スナップショットを維持します。
+- SecretRef ポリシー違反（たとえば OAuth モードの auth profile と SecretRef 入力の組み合わせ）は、ランタイムスワップ前の有効化段階で失敗します。
+- ランタイムリクエストは active なインメモリスナップショットからのみ読み取ります。
+- 最初の config 有効化/読み込みに成功した後、ランタイムコードパスは成功した reload がそれを入れ替えるまで、その active なインメモリスナップショットを読み続けます。
+- 送信配信経路もその active スナップショットから読み取ります（たとえば Discord の返信/スレッド配信や Telegram のアクション送信）。送信ごとに SecretRef を再解決しません。
 
-これにより、シークレットプロバイダー障害がホットリクエストパスに乗らないようにしています。
+これにより、シークレットプロバイダー障害がホットなリクエスト経路に入り込まないようにします。
 
-## アクティブサーフェスフィルタリング
+## アクティブサーフェスのフィルタリング
 
-SecretRef は実効的にアクティブなサーフェスに対してのみ検証されます。
+SecretRef は実効的に active なサーフェス上でのみ検証されます。
 
-- 有効なサーフェス: 未解決 ref は起動/リロードをブロックします。
-- 非アクティブなサーフェス: 未解決 ref は起動/リロードをブロックしません。
+- 有効なサーフェス: 未解決の ref は起動/reload をブロックします。
+- 非アクティブなサーフェス: 未解決の ref は起動/reload をブロックしません。
 - 非アクティブな ref は、コード `SECRETS_REF_IGNORED_INACTIVE_SURFACE` の非致命的診断を出します。
 
-非アクティブサーフェスの例:
+<AccordionGroup>
+  <Accordion title="非アクティブなサーフェスの例">
+    - 無効化されたチャネル/アカウントエントリ。
+    - 有効なアカウントが継承しないトップレベルチャネル認証情報。
+    - 無効化されたツール/機能サーフェス。
+    - `tools.web.search.provider` で選択されていない Web 検索 provider 固有キー。auto モード（provider 未設定）では、1 つが解決されるまで provider 自動検出の優先順でキーが参照されます。選択後は、未選択の provider キーは選択されるまで非アクティブとして扱われます。
+    - sandbox SSH 認証マテリアル（`agents.defaults.sandbox.ssh.identityData`、`certificateData`、`knownHostsData`、および agent ごとのオーバーライド）は、実効的な sandbox backend が default agent または有効な agent に対して `ssh` のときのみ active です。
+    - `gateway.remote.token` / `gateway.remote.password` SecretRef は、次のいずれかが true の場合に active です:
+      - `gateway.mode=remote`
+      - `gateway.remote.url` が設定されている
+      - `gateway.tailscale.mode` が `serve` または `funnel`
+      - それらの remote サーフェスがない local モードでは:
+        - `gateway.remote.token` は token auth が勝てて、かつ env/auth token が設定されていない場合に active
+        - `gateway.remote.password` は password auth が勝てて、かつ env/auth password が設定されていない場合にのみ active
+    - `gateway.auth.token` SecretRef は、`OPENCLAW_GATEWAY_TOKEN` が設定されている場合、起動時認証解決では非アクティブです。これは、そのランタイムでは env token 入力が優先されるためです。
+  </Accordion>
+</AccordionGroup>
 
-- 無効化されたチャンネル/アカウントエントリー。
-- 有効なアカウントに継承されないトップレベルチャンネル認証情報。
-- 無効化された tool/機能サーフェス。
-- `tools.web.search.provider` で選択されていない Web 検索プロバイダー固有キー。
-  auto モード（provider 未設定）では、1 つ解決されるまでプロバイダー自動検出の優先順位に従ってキーが参照されます。
-  選択後は、未選択のプロバイダーキーは選択されるまで非アクティブとして扱われます。
-- sandbox SSH 認証素材（`agents.defaults.sandbox.ssh.identityData`,
-  `certificateData`, `knownHostsData` とそのエージェント単位の上書き）は、
-  実効 sandbox backend が default agent または有効化された agent に対して `ssh` のときのみアクティブです。
-- `gateway.remote.token` / `gateway.remote.password` SecretRef は、次のいずれかが真ならアクティブです:
-  - `gateway.mode=remote`
-  - `gateway.remote.url` が設定されている
-  - `gateway.tailscale.mode` が `serve` または `funnel`
-  - これらの remote サーフェスがない local mode では:
-    - `gateway.remote.token` は、token auth が勝ちうる状態で env/auth token が設定されていないときアクティブです。
-    - `gateway.remote.password` は、password auth が勝ちうる状態で env/auth password が設定されていないときのみアクティブです。
-- `gateway.auth.token` SecretRef は、`OPENCLAW_GATEWAY_TOKEN` が設定されている場合、起動時 auth 解決では非アクティブです。これはそのランタイムでは env token 入力が優先されるためです。
+## Gateway 認証サーフェス診断
 
-## Gateway auth サーフェス診断
+`gateway.auth.token`、`gateway.auth.password`、`gateway.remote.token`、または `gateway.remote.password` に SecretRef が設定されている場合、Gateway の起動/reload はそのサーフェス状態を明示的にログ出力します。
 
-`gateway.auth.token`, `gateway.auth.password`,
-`gateway.remote.token`, `gateway.remote.password` のいずれかに SecretRef が設定されている場合、
-gateway の起動/リロードではサーフェス状態を明示的にログ出力します。
+- `active`: SecretRef は実効的な認証サーフェスの一部であり、解決されなければなりません。
+- `inactive`: 別の認証サーフェスが優先されるか、remote 認証が無効/非アクティブであるため、このランタイムでは SecretRef は無視されます。
 
-- `active`: SecretRef は実効 auth サーフェスの一部であり、解決されなければなりません。
-- `inactive`: SecretRef は、このランタイムでは別の auth サーフェスが勝つか、
-  remote auth が無効/非アクティブであるため無視されます。
+これらのエントリは `SECRETS_GATEWAY_AUTH_SURFACE` としてログに記録され、active-surface ポリシーが使用した理由も含まれるため、なぜその認証情報が active または inactive と扱われたのかが分かります。
 
-これらのエントリーは `SECRETS_GATEWAY_AUTH_SURFACE` で記録され、アクティブサーフェスポリシーが使った理由を含むため、その認証情報がなぜアクティブまたは非アクティブとして扱われたのかを確認できます。
+## オンボーディング参照の事前検証
 
-## オンボーディング参照事前検証
-
-オンボーディングが対話モードで実行され、SecretRef ストレージを選択した場合、OpenClaw は保存前に事前検証を行います。
+オンボーディングが対話モードで実行され、SecretRef 保存を選択した場合、OpenClaw は保存前に事前検証を実行します。
 
 - Env ref: env var 名を検証し、セットアップ中に空でない値が見えていることを確認します。
 - Provider ref（`file` または `exec`）: provider 選択を検証し、`id` を解決し、解決された値の型を確認します。
-- クイックスタート再利用パス: `gateway.auth.token` がすでに SecretRef の場合、オンボーディングは probe/dashboard ブートストラップ前にそれを解決します（`env`, `file`, `exec` ref に対応）。同じ fail-fast ゲートを使います。
+- クイックスタート再利用経路: `gateway.auth.token` がすでに SecretRef の場合、オンボーディングは probe/dashboard ブートストラップ前にそれを解決します（`env`、`file`、`exec` ref について）。“fail-fast” ゲートも同じです。
 
 検証に失敗した場合、オンボーディングはエラーを表示し、再試行できます。
 
 ## SecretRef 契約
 
-どこでも 1 つのオブジェクト形状を使います。
+どこでも同じオブジェクト形状を使います。
 
 ```json5
 { source: "env" | "file" | "exec", provider: "default", id: "..." }
 ```
 
-### `source: "env"`
+<Tabs>
+  <Tab title="env">
+    ```json5
+    { source: "env", provider: "default", id: "OPENAI_API_KEY" }
+    ```
 
-```json5
-{ source: "env", provider: "default", id: "OPENAI_API_KEY" }
-```
+    検証:
 
-検証:
+    - `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
+    - `id` は `^[A-Z][A-Z0-9_]{0,127}$` に一致する必要があります
 
-- `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
-- `id` は `^[A-Z][A-Z0-9_]{0,127}$` に一致する必要があります
+  </Tab>
+  <Tab title="file">
+    ```json5
+    { source: "file", provider: "filemain", id: "/providers/openai/apiKey" }
+    ```
 
-### `source: "file"`
+    検証:
 
-```json5
-{ source: "file", provider: "filemain", id: "/providers/openai/apiKey" }
-```
+    - `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
+    - `id` は絶対 JSON pointer（`/...`）である必要があります
+    - セグメントでの RFC6901 エスケープ: `~` => `~0`、`/` => `~1`
 
-検証:
+  </Tab>
+  <Tab title="exec">
+    ```json5
+    { source: "exec", provider: "vault", id: "providers/openai/apiKey" }
+    ```
 
-- `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
-- `id` は絶対 JSON pointer（`/...`）である必要があります
-- セグメント内の RFC6901 エスケープ: `~` => `~0`, `/` => `~1`
+    検証:
 
-### `source: "exec"`
+    - `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
+    - `id` は `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$` に一致する必要があります
+    - `id` は `/` 区切りパスセグメントとして `.` または `..` を含んではいけません（たとえば `a/../b` は拒否されます）
 
-```json5
-{ source: "exec", provider: "vault", id: "providers/openai/apiKey" }
-```
+  </Tab>
+</Tabs>
 
-検証:
-
-- `provider` は `^[a-z][a-z0-9_-]{0,63}$` に一致する必要があります
-- `id` は `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$` に一致する必要があります
-- `id` は `/` 区切りパスセグメントとして `.` または `..` を含んではいけません（たとえば `a/../b` は拒否されます）
-
-## Provider 設定
+## Provider config
 
 provider は `secrets.providers` 配下で定義します。
 
@@ -161,142 +162,143 @@ provider は `secrets.providers` 配下で定義します。
 }
 ```
 
-### Env provider
+<AccordionGroup>
+  <Accordion title="Env provider">
+    - `allowlist` による任意の allowlist。
+    - env 値が欠落または空の場合、解決は失敗します。
+  </Accordion>
+  <Accordion title="File provider">
+    - `path` からローカルファイルを読み取ります。
+    - `mode: "json"` は JSON オブジェクトのペイロードを期待し、`id` を pointer として解決します。
+    - `mode: "singleValue"` は ref id として `"value"` を期待し、ファイル内容を返します。
+    - パスは所有権/権限チェックを通過する必要があります。
+    - Windows の fail-closed に関する注記: パスの ACL 検証が利用できない場合、解決は失敗します。信頼できるパスに限り、その provider に `allowInsecurePath: true` を設定するとパスセキュリティチェックを回避できます。
+  </Accordion>
+  <Accordion title="Exec provider">
+    - 設定された絶対バイナリパスを実行します。shell は使いません。
+    - デフォルトでは、`command` は通常ファイルを指している必要があります（symlink では不可）。
+    - symlink の command パス（たとえば Homebrew shim）を許可するには `allowSymlinkCommand: true` を設定します。OpenClaw は解決先ターゲットパスを検証します。
+    - パッケージマネージャのパス（たとえば `["/opt/homebrew"]`）には、`allowSymlinkCommand` を `trustedDirs` と組み合わせて使ってください。
+    - timeout、出力なし timeout、出力バイト上限、env allowlist、trusted dirs をサポートします。
+    - Windows の fail-closed に関する注記: command パスの ACL 検証が利用できない場合、解決は失敗します。信頼できるパスに限り、その provider に `allowInsecurePath: true` を設定するとパスセキュリティチェックを回避できます。
 
-- 任意の allowlist を `allowlist` で設定できます。
-- 欠落または空の env 値は解決失敗になります。
+    リクエストペイロード（stdin）:
 
-### File provider
+    ```json
+    { "protocolVersion": 1, "provider": "vault", "ids": ["providers/openai/apiKey"] }
+    ```
 
-- `path` からローカルファイルを読み取ります。
-- `mode: "json"` は JSON オブジェクト payload を期待し、`id` を pointer として解決します。
-- `mode: "singleValue"` は ref id `"value"` を期待し、ファイル内容を返します。
-- パスは所有者/権限チェックを通過する必要があります。
-- Windows の fail-closed 注記: パスに対する ACL 検証が利用できない場合、解決は失敗します。信頼できるパスに限り、その provider に `allowInsecurePath: true` を設定するとパスセキュリティチェックを回避できます。
+    レスポンスペイロード（stdout）:
 
-### Exec provider
+    ```jsonc
+    { "protocolVersion": 1, "values": { "providers/openai/apiKey": "<openai-api-key>" } } // pragma: allowlist secret
+    ```
 
-- 設定された絶対バイナリパスを shell なしで実行します。
-- デフォルトでは、`command` は通常ファイルを指している必要があります（symlink は不可）。
-- Homebrew shim のような symlink コマンドパスを許可するには `allowSymlinkCommand: true` を設定します。OpenClaw は解決後のターゲットパスを検証します。
-- package manager パスでは `allowSymlinkCommand` を `trustedDirs`（たとえば `["/opt/homebrew"]`）と組み合わせてください。
-- timeout、no-output timeout、出力バイト制限、env allowlist、trusted dirs をサポートします。
-- Windows の fail-closed 注記: コマンドパスに対する ACL 検証が利用できない場合、解決は失敗します。信頼できるパスに限り、その provider に `allowInsecurePath: true` を設定するとパスセキュリティチェックを回避できます。
+    任意の id ごとのエラー:
 
-リクエスト payload（stdin）:
+    ```json
+    {
+      "protocolVersion": 1,
+      "values": {},
+      "errors": { "providers/openai/apiKey": { "message": "not found" } }
+    }
+    ```
 
-```json
-{ "protocolVersion": 1, "provider": "vault", "ids": ["providers/openai/apiKey"] }
-```
-
-レスポンス payload（stdout）:
-
-```jsonc
-{ "protocolVersion": 1, "values": { "providers/openai/apiKey": "<openai-api-key>" } } // pragma: allowlist secret
-```
-
-任意の ID ごとのエラー:
-
-```json
-{
-  "protocolVersion": 1,
-  "values": {},
-  "errors": { "providers/openai/apiKey": { "message": "not found" } }
-}
-```
+  </Accordion>
+</AccordionGroup>
 
 ## Exec 統合例
 
-### 1Password CLI
-
-```json5
-{
-  secrets: {
-    providers: {
-      onepassword_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/op",
-        allowSymlinkCommand: true, // Homebrew の symlink バイナリには必須
-        trustedDirs: ["/opt/homebrew"],
-        args: ["read", "op://Personal/OpenClaw QA API Key/password"],
-        passEnv: ["HOME"],
-        jsonOnly: false,
+<AccordionGroup>
+  <Accordion title="1Password CLI">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          onepassword_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/op",
+            allowSymlinkCommand: true, // Homebrew の symlink バイナリに必要
+            trustedDirs: ["/opt/homebrew"],
+            args: ["read", "op://Personal/OpenClaw QA API Key/password"],
+            passEnv: ["HOME"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "onepassword_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "onepassword_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
-
-### HashiCorp Vault CLI
-
-```json5
-{
-  secrets: {
-    providers: {
-      vault_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/vault",
-        allowSymlinkCommand: true, // Homebrew の symlink バイナリには必須
-        trustedDirs: ["/opt/homebrew"],
-        args: ["kv", "get", "-field=OPENAI_API_KEY", "secret/openclaw"],
-        passEnv: ["VAULT_ADDR", "VAULT_TOKEN"],
-        jsonOnly: false,
+    }
+    ```
+  </Accordion>
+  <Accordion title="HashiCorp Vault CLI">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          vault_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/vault",
+            allowSymlinkCommand: true, // Homebrew の symlink バイナリに必要
+            trustedDirs: ["/opt/homebrew"],
+            args: ["kv", "get", "-field=OPENAI_API_KEY", "secret/openclaw"],
+            passEnv: ["VAULT_ADDR", "VAULT_TOKEN"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "vault_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "vault_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
-
-### `sops`
-
-```json5
-{
-  secrets: {
-    providers: {
-      sops_openai: {
-        source: "exec",
-        command: "/opt/homebrew/bin/sops",
-        allowSymlinkCommand: true, // Homebrew の symlink バイナリには必須
-        trustedDirs: ["/opt/homebrew"],
-        args: ["-d", "--extract", '["providers"]["openai"]["apiKey"]', "/path/to/secrets.enc.json"],
-        passEnv: ["SOPS_AGE_KEY_FILE"],
-        jsonOnly: false,
+    }
+    ```
+  </Accordion>
+  <Accordion title="sops">
+    ```json5
+    {
+      secrets: {
+        providers: {
+          sops_openai: {
+            source: "exec",
+            command: "/opt/homebrew/bin/sops",
+            allowSymlinkCommand: true, // Homebrew の symlink バイナリに必要
+            trustedDirs: ["/opt/homebrew"],
+            args: ["-d", "--extract", '["providers"]["openai"]["apiKey"]', "/path/to/secrets.enc.json"],
+            passEnv: ["SOPS_AGE_KEY_FILE"],
+            jsonOnly: false,
+          },
+        },
       },
-    },
-  },
-  models: {
-    providers: {
-      openai: {
-        baseUrl: "https://api.openai.com/v1",
-        models: [{ id: "gpt-5", name: "gpt-5" }],
-        apiKey: { source: "exec", provider: "sops_openai", id: "value" },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [{ id: "gpt-5", name: "gpt-5" }],
+            apiKey: { source: "exec", provider: "sops_openai", id: "value" },
+          },
+        },
       },
-    },
-  },
-}
-```
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
 
 ## MCP サーバー環境変数
 
-`plugins.entries.acpx.config.mcpServers` 経由で設定される MCP サーバー env var は SecretInput をサポートします。これにより、API key や token をプレーンテキスト config から除外できます。
+`plugins.entries.acpx.config.mcpServers` で設定される MCP サーバー env var は SecretInput をサポートします。これにより API キーやトークンを平文 config に置かずに済みます。
 
 ```json5
 {
@@ -325,11 +327,11 @@ provider は `secrets.providers` 配下で定義します。
 }
 ```
 
-プレーンテキスト文字列値も引き続き使えます。`${MCP_SERVER_API_KEY}` のような env-template ref と SecretRef オブジェクトは、MCP サーバープロセス起動前に gateway アクティベーション中に解決されます。他の SecretRef サーフェスと同様に、未解決 ref がアクティベーションをブロックするのは、`acpx` Plugin が実効的にアクティブな場合だけです。
+平文文字列値も引き続き利用できます。`${MCP_SERVER_API_KEY}` のような env-template ref と SecretRef オブジェクトは、MCP サーバープロセスの起動前に、Gateway の有効化中に解決されます。他の SecretRef サーフェスと同様に、未解決の ref が有効化をブロックするのは `acpx` Plugin が実効的に active な場合だけです。
 
-## Sandbox SSH 認証素材
+## Sandbox SSH 認証マテリアル
 
-コアの `ssh` sandbox backend も SSH 認証素材に対する SecretRef をサポートします。
+コアの `ssh` sandbox backend も、SSH 認証マテリアルに対する SecretRef をサポートします。
 
 ```json5
 {
@@ -352,58 +354,60 @@ provider は `secrets.providers` 配下で定義します。
 
 ランタイム動作:
 
-- OpenClaw はこれらの ref を、各 SSH 呼び出し時に遅延解決するのではなく、sandbox アクティベーション中に解決します。
-- 解決済み値は厳格な権限を持つ一時ファイルに書き込まれ、生成される SSH config で使用されます。
-- 実効 sandbox backend が `ssh` でない場合、これらの ref は非アクティブのままで、起動をブロックしません。
+- OpenClaw はこれらの ref を各 SSH 呼び出し時に遅延解決するのではなく、sandbox 有効化中に解決します。
+- 解決された値は厳格な権限を持つ一時ファイルに書き込まれ、生成される SSH config で使われます。
+- 実効的な sandbox backend が `ssh` でない場合、これらの ref は非アクティブのままとなり、起動をブロックしません。
 
-## サポートされる認証情報サーフェス
+## 対応する認証情報サーフェス
 
-正規のサポート対象/非対象の認証情報は次に一覧があります。
+正式に対応/非対応の認証情報は次に一覧があります。
 
 - [SecretRef Credential Surface](/ja-JP/reference/secretref-credential-surface)
 
-ランタイム生成またはローテーションされる認証情報、および OAuth リフレッシュ素材は、読み取り専用 SecretRef 解決から意図的に除外されています。
+<Note>
+ランタイムで発行される認証情報、ローテーションされる認証情報、および OAuth リフレッシュマテリアルは、読み取り専用 SecretRef 解決の対象から意図的に除外されています。
+</Note>
 
 ## 必須動作と優先順位
 
 - ref のないフィールド: 変更なし。
-- ref のあるフィールド: アクティブサーフェスではアクティベーション中に必須です。
-- プレーンテキストと ref の両方がある場合、サポートされる優先順位パスでは ref が優先されます。
-- マスキング用 sentinel `__OPENCLAW_REDACTED__` は内部の config redaction/restore 用に予約されており、リテラルの送信 config データとしては拒否されます。
+- ref のあるフィールド: active サーフェスでは有効化中に必須。
+- 平文と ref の両方がある場合、対応する優先パスでは ref が優先されます。
+- redaction センチネル `__OPENCLAW_REDACTED__` は内部の config redaction/restore 用に予約されており、文字どおりの送信 config データとしては拒否されます。
 
-警告と監査シグナル:
+警告および監査シグナル:
 
 - `SECRETS_REF_OVERRIDES_PLAINTEXT`（ランタイム警告）
 - `REF_SHADOWED`（`auth-profiles.json` の認証情報が `openclaw.json` の ref より優先される場合の監査結果）
 
 Google Chat の互換動作:
 
-- `serviceAccountRef` はプレーンテキストの `serviceAccount` より優先されます。
-- sibling ref が設定されている場合、プレーンテキスト値は無視されます。
+- `serviceAccountRef` は平文の `serviceAccount` より優先されます。
+- 兄弟 ref が設定されている場合、平文値は無視されます。
 
-## アクティベーショントリガー
+## 有効化トリガー
 
-シークレットのアクティベーションは次のタイミングで実行されます。
+シークレット有効化は次で実行されます。
 
-- 起動時（preflight と最終アクティベーション）
-- Config リロードのホット適用パス
-- Config リロードの再起動チェックパス
-- `secrets.reload` による手動リロード
-- Gateway config 書き込み RPC preflight（`config.set` / `config.apply` / `config.patch`）で、編集を永続化する前に、送信された config payload 内にあるアクティブサーフェス SecretRef の解決可能性を検証
+- 起動時（事前検証 + 最終有効化）
+- Config reload の hot-apply 経路
+- Config reload の restart-check 経路
+- `secrets.reload` による手動 reload
+- 永続化前に、送信された config ペイロード内の active-surface SecretRef 解決可能性を検証する Gateway config write RPC 事前検証（`config.set` / `config.apply` / `config.patch`）
 
-アクティベーション契約:
+有効化契約:
 
-- 成功するとスナップショットが atomic に swap されます。
-- 起動失敗は gateway 起動を中断します。
-- ランタイムリロード失敗時は last-known-good スナップショットを維持します。
-- Write-RPC preflight 失敗時は送信された config を拒否し、ディスク上の config もアクティブなランタイムスナップショットも変更しません。
-- 送信 helper/tool 呼び出しに対して明示的な per-call チャンネルトークンを渡しても SecretRef アクティベーションはトリガーされません。アクティベーションポイントは起動、リロード、明示的な `secrets.reload` のままです。
+- 成功するとスナップショットをアトミックに入れ替えます。
+- 起動失敗は Gateway 起動を中止します。
+- ランタイム reload 失敗時は last-known-good スナップショットを維持します。
+- Write-RPC の事前検証失敗時は送信された config を拒否し、ディスク上の config と active ランタイムスナップショットの両方を変更しません。
+- 送信ヘルパー/ツール呼び出しに明示的な per-call チャネルトークンを渡しても SecretRef 有効化は発生しません。有効化ポイントは引き続き起動時、reload 時、明示的な `secrets.reload` のみです。
 
-## 劣化と回復のシグナル
+## 劣化および回復シグナル
 
-健全な状態の後で、リロード時アクティベーションが失敗すると、OpenClaw はシークレット劣化状態に入ります。
+健全な状態の後に reload 時有効化が失敗すると、OpenClaw は劣化した secrets 状態に入ります。
 
-単発の system event とログコード:
+単発の system event およびログコード:
 
 - `SECRETS_RELOADER_DEGRADED`
 - `SECRETS_RELOADER_RECOVERED`
@@ -411,135 +415,157 @@ Google Chat の互換動作:
 動作:
 
 - 劣化時: ランタイムは last-known-good スナップショットを維持します。
-- 回復時: 次に成功したアクティベーションの後に一度だけ発行されます。
-- すでに劣化状態のときに失敗が繰り返されても、警告ログは出ますが event はスパムしません。
-- 起動時 fail-fast は、ランタイムが一度もアクティブになっていないため、劣化 event を発行しません。
+- 回復時: 次回の有効化成功後に一度だけ出力されます。
+- すでに劣化している間の繰り返し失敗は警告ログのみで、イベントを連発しません。
+- 起動時 fail-fast は劣化イベントを出しません。ランタイムが一度も active になっていないためです。
 
 ## コマンドパス解決
 
-コマンドパスは、gateway スナップショット RPC 経由で、サポートされる SecretRef 解決にオプトインできます。
+コマンドパスは、Gateway スナップショット RPC を通じて対応する SecretRef 解決にオプトインできます。
 
 大きく 2 つの動作があります。
 
-- 厳格なコマンドパス（たとえば `openclaw memory` の remote-memory パスや、remote shared-secret ref を必要とする `openclaw qr --remote`）はアクティブスナップショットから読み取り、必要な SecretRef が利用できない場合は fail-fast します。
-- 読み取り専用コマンドパス（たとえば `openclaw status`, `openclaw status --all`, `openclaw channels status`, `openclaw channels resolve`, `openclaw security audit`、および読み取り専用の doctor/config repair フロー）もアクティブスナップショットを優先しますが、そのコマンドパスで対象 SecretRef が利用できない場合は中断せず、劣化します。
+<Tabs>
+  <Tab title="厳格なコマンドパス">
+    たとえば `openclaw memory` の remote-memory 経路や、リモート共有シークレット ref が必要な場合の `openclaw qr --remote` です。これらは active スナップショットから読み取り、必要な SecretRef がそのコマンドパスで利用できない場合は fail-fast します。
+  </Tab>
+  <Tab title="読み取り専用コマンドパス">
+    たとえば `openclaw status`、`openclaw status --all`、`openclaw channels status`、`openclaw channels resolve`、`openclaw security audit`、および読み取り専用の doctor/config 修復フローです。これらも active スナップショットを優先しますが、対象 SecretRef がそのコマンドパスで利用できない場合、abort ではなく劣化動作になります。
 
-読み取り専用の動作:
+    読み取り専用動作:
 
-- gateway が動作中の場合、これらのコマンドはまずアクティブスナップショットから読み取ります。
-- gateway 解決が不完全、または gateway が利用できない場合、対象コマンドサーフェスに対してローカルフォールバックを試みます。
-- 対象 SecretRef がまだ利用できない場合、そのコマンドは「configured but unavailable in this command path」のような明示的診断付きの劣化した読み取り専用出力で続行します。
-- この劣化動作はコマンドローカルに限られます。ランタイムの起動、リロード、送信/auth パスを弱めるものではありません。
+    - Gateway 実行中は、これらのコマンドはまず active スナップショットから読み取ります。
+    - Gateway 解決が不完全、または Gateway が利用できない場合は、そのコマンドサーフェス向けの限定的なローカルフォールバックを試みます。
+    - 対象 SecretRef が依然として利用できない場合でも、コマンドは「configured but unavailable in this command path」のような明示的な診断付きの劣化した読み取り専用出力で継続します。
+    - この劣化動作はコマンドローカルに限られます。ランタイムの起動、reload、send/auth 経路は弱めません。
+
+  </Tab>
+</Tabs>
 
 その他の注記:
 
-- backend secret のローテーション後のスナップショット更新は `openclaw secrets reload` で処理されます。
-- これらのコマンドパスが使用する Gateway RPC メソッド: `secrets.resolve`
+- バックエンドシークレットのローテーション後のスナップショット更新は `openclaw secrets reload` で処理されます。
+- これらのコマンドパスが使う Gateway RPC メソッド: `secrets.resolve`。
 
-## 監査と設定ワークフロー
+## 監査と設定のワークフロー
 
-デフォルトの operator フロー:
+デフォルトのオペレーターフロー:
 
-```bash
-openclaw secrets audit --check
-openclaw secrets configure
-openclaw secrets audit --check
-```
+<Steps>
+  <Step title="現在の状態を監査する">
+    ```bash
+    openclaw secrets audit --check
+    ```
+  </Step>
+  <Step title="SecretRef を設定する">
+    ```bash
+    openclaw secrets configure
+    ```
+  </Step>
+  <Step title="再監査する">
+    ```bash
+    openclaw secrets audit --check
+    ```
+  </Step>
+</Steps>
 
-### `secrets audit`
+<AccordionGroup>
+  <Accordion title="secrets audit">
+    結果には次が含まれます。
 
-結果には次が含まれます。
+    - 保存時の平文値（`openclaw.json`、`auth-profiles.json`、`.env`、生成された `agents/*/agent/models.json`）
+    - 生成された `models.json` エントリ内の、平文の機微な provider header の残留
+    - 未解決 ref
+    - 優先順位によるシャドーイング（`auth-profiles.json` が `openclaw.json` の ref より優先される）
+    - レガシーな残留物（`auth.json`、OAuth リマインダー）
 
-- 保存時プレーンテキスト値（`openclaw.json`, `auth-profiles.json`, `.env`, および生成された `agents/*/agent/models.json`）
-- 生成された `models.json` エントリー内の、プレーンテキストの機密プロバイダーヘッダー残留
-- 未解決 ref
-- 優先順位によるシャドーイング（`auth-profiles.json` が `openclaw.json` の ref より優先される）
-- 旧式残留（`auth.json`, OAuth リマインダー）
+    Exec に関する注記:
 
-exec 注記:
+    - デフォルトでは、audit はコマンド副作用を避けるため exec SecretRef の解決可能性チェックをスキップします。
+    - 監査中に exec provider を実行するには `openclaw secrets audit --allow-exec` を使ってください。
 
-- デフォルトでは、audit はコマンド副作用を避けるため exec SecretRef の解決可能性チェックをスキップします。
-- 監査中に exec provider を実行するには `openclaw secrets audit --allow-exec` を使ってください。
+    Header 残留に関する注記:
 
-ヘッダー残留の注記:
+    - 機微な provider header の検出は、名前ヒューリスティックベースです（一般的な auth/credential header 名と、`authorization`、`x-api-key`、`token`、`secret`、`password`、`credential` などの断片）。
 
-- 機密プロバイダーヘッダー検出は名前ヒューリスティックベースです（一般的な auth/credential ヘッダー名や `authorization`, `x-api-key`, `token`, `secret`, `password`, `credential` などの断片）。
+  </Accordion>
+  <Accordion title="secrets configure">
+    対話型ヘルパーで、次を行います。
 
-### `secrets configure`
+    - まず `secrets.providers`（`env`/`file`/`exec`、追加/編集/削除）を設定
+    - 1 つの agent スコープについて、`openclaw.json` と `auth-profiles.json` 内の対応するシークレット保持フィールドを選択可能
+    - 対象ピッカー内で新しい `auth-profiles.json` マッピングを直接作成可能
+    - SecretRef の詳細（`source`、`provider`、`id`）を取得
+    - 事前解決を実行
+    - 即時適用可能
 
-対話型 helper で、次を行います。
+    Exec に関する注記:
 
-- 最初に `secrets.providers` を設定する（`env`/`file`/`exec`、追加/編集/削除）
-- `openclaw.json` と、1 つの agent スコープに対する `auth-profiles.json` 内のサポートされた secret 保持フィールドを選択できる
-- target picker 内で新しい `auth-profiles.json` マッピングを直接作成できる
-- SecretRef の詳細（`source`, `provider`, `id`）を収集する
-- preflight 解決を実行する
-- すぐに適用することもできる
+    - `--allow-exec` が設定されていない限り、事前検証では exec SecretRef チェックをスキップします。
+    - `configure --apply` から直接適用し、プランに exec ref/provider が含まれる場合は、適用ステップでも `--allow-exec` を付けたままにしてください。
 
-exec 注記:
+    便利なモード:
 
-- `--allow-exec` が設定されていない限り、preflight は exec SecretRef チェックをスキップします。
-- `configure --apply` から直接適用し、計画に exec ref/provider が含まれる場合は、適用ステップでも `--allow-exec` を有効にしたままにしてください。
+    - `openclaw secrets configure --providers-only`
+    - `openclaw secrets configure --skip-provider-setup`
+    - `openclaw secrets configure --agent <id>`
 
-便利なモード:
+    `configure` の apply デフォルト:
 
-- `openclaw secrets configure --providers-only`
-- `openclaw secrets configure --skip-provider-setup`
-- `openclaw secrets configure --agent <id>`
+    - 対象 provider について、`auth-profiles.json` から一致する静的認証情報をスクラブ
+    - `auth.json` からレガシーな静的 `api_key` エントリをスクラブ
+    - `<config-dir>/.env` から一致する既知のシークレット行をスクラブ
 
-`configure` の apply デフォルト:
+  </Accordion>
+  <Accordion title="secrets apply">
+    保存済みプランを適用します。
 
-- 対象プロバイダーについて、`auth-profiles.json` から一致する静的認証情報をスクラブする
-- `auth.json` から旧式の静的 `api_key` エントリーをスクラブする
-- `<config-dir>/.env` から一致する既知の secret 行をスクラブする
+    ```bash
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --allow-exec
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run
+    openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-exec
+    ```
 
-### `secrets apply`
+    Exec に関する注記:
 
-保存済み計画を適用します。
+    - dry-run では、`--allow-exec` が設定されていない限り exec チェックをスキップします。
+    - 書き込みモードでは、`--allow-exec` が設定されていない限り、exec SecretRef/provider を含むプランは拒否されます。
 
-```bash
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --allow-exec
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run
-openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-exec
-```
+    厳格な対象/パス契約の詳細と正確な拒否ルールについては [Secrets Apply Plan Contract](/ja-JP/gateway/secrets-plan-contract) を参照してください。
 
-exec 注記:
+  </Accordion>
+</AccordionGroup>
 
-- `--allow-exec` がない限り、dry-run は exec チェックをスキップします。
-- 書き込みモードでは、`--allow-exec` が設定されていないと exec SecretRef/provider を含む計画は拒否されます。
+## 一方向の安全ポリシー
 
-厳密な target/path 契約の詳細と正確な拒否ルールについては、次を参照してください。
-
-- [Secrets Apply Plan Contract](/ja-JP/gateway/secrets-plan-contract)
-
-## 一方向安全ポリシー
-
-OpenClaw は、過去のプレーンテキストシークレット値を含む rollback バックアップを意図的に書き込みません。
+<Warning>
+OpenClaw は、過去の平文シークレット値を含むロールバックバックアップを意図的に書き込みません。
+</Warning>
 
 安全モデル:
 
-- 書き込みモードの前に preflight が成功していなければならない
-- ランタイムアクティベーションは commit 前に検証される
-- apply は atomic file replacement を使ってファイルを更新し、失敗時には best-effort で復元する
+- 書き込みモードの前に事前検証が成功している必要があります
+- コミット前にランタイム有効化が検証されます
+- apply はアトミックなファイル置換と、失敗時のベストエフォート復元でファイルを更新します
 
-## 旧式 auth 互換性注記
+## レガシー認証互換に関する注記
 
-静的認証情報については、ランタイムはもはやプレーンテキストの旧式 auth ストレージに依存しません。
+静的認証情報について、ランタイムはもはや平文のレガシー認証保存に依存しません。
 
 - ランタイム認証情報ソースは解決済みインメモリスナップショットです。
-- 旧式の静的 `api_key` エントリーは見つかり次第スクラブされます。
+- レガシーな静的 `api_key` エントリは、見つかったときにスクラブされます。
 - OAuth 関連の互換動作は別扱いのままです。
 
-## Web UI 注記
+## Web UI に関する注記
 
-一部の SecretInput union は、フォームモードより raw editor モードの方が設定しやすい場合があります。
+一部の SecretInput union は、フォームモードより raw editor モードの方が設定しやすいことがあります。
 
-## 関連ドキュメント
+## 関連
 
-- CLI コマンド: [secrets](/ja-JP/cli/secrets)
-- 計画契約の詳細: [Secrets Apply Plan Contract](/ja-JP/gateway/secrets-plan-contract)
-- 認証情報サーフェス: [SecretRef Credential Surface](/ja-JP/reference/secretref-credential-surface)
-- Auth セットアップ: [Authentication](/ja-JP/gateway/authentication)
-- セキュリティ姿勢: [Security](/ja-JP/gateway/security)
-- 環境変数の優先順位: [Environment Variables](/ja-JP/help/environment)
+- [認証](/ja-JP/gateway/authentication) — 認証セットアップ
+- [CLI: secrets](/ja-JP/cli/secrets) — CLI コマンド
+- [環境変数](/ja-JP/help/environment) — 環境変数の優先順位
+- [SecretRef Credential Surface](/ja-JP/reference/secretref-credential-surface) — 認証情報サーフェス
+- [Secrets Apply Plan Contract](/ja-JP/gateway/secrets-plan-contract) — プラン契約の詳細
+- [セキュリティ](/ja-JP/gateway/security) — セキュリティ方針

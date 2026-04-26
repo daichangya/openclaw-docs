@@ -1,22 +1,20 @@
 ---
 read_when:
-    - バグレポートまたはサポート依頼を準備しています
-    - Gateway クラッシュ、再起動、メモリ圧迫、または過大なペイロードをデバッグしています
-    - 記録またはリダクトされる診断データの内容を確認しています
-summary: バグレポート用の共有可能な Gateway 診断バンドルを作成する
+    - バグレポートまたはサポート依頼の準備
+    - Gatewayのクラッシュ、再起動、メモリ圧迫、または巨大すぎるpayloadのデバッグ
+    - 記録またはマスクされる診断データの確認
+summary: バグレポート用に共有可能なGateway診断バンドルを作成する
 title: 診断エクスポート
 x-i18n:
-    generated_at: "2026-04-24T04:56:49Z"
+    generated_at: "2026-04-26T11:29:17Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 3773b623a3f94a1f1340f2d278d9f5236f18fbf9aa38f84ec9ddbe41aea44e8c
+    source_hash: 64866d929ed42f8484aa7c153e3056bad7b594d9e02705c095b7005f3094ec36
     source_path: gateway/diagnostics.md
     workflow: 15
 ---
 
-OpenClaw は、バグレポートに安全に添付できるローカル診断 zip を作成できます。
-これは、サニタイズされた Gateway の状態、ヘルス、ログ、設定の形状、および
-最近のペイロードなし安定性イベントをまとめたものです。
+OpenClawは、バグレポートに添付しても安全なローカル診断zipを作成できます。これは、サニタイズ済みのGateway status、health、logs、config形状、および最近のpayloadを含まないstability eventをまとめたものです。
 
 ## クイックスタート
 
@@ -24,7 +22,7 @@ OpenClaw は、バグレポートに安全に添付できるローカル診断 z
 openclaw gateway diagnostics export
 ```
 
-このコマンドは、書き込まれた zip パスを表示します。パスを指定するには:
+このコマンドは、書き込まれたzipパスを表示します。パスを指定するには:
 
 ```bash
 openclaw gateway diagnostics export --output openclaw-diagnostics.zip
@@ -36,49 +34,43 @@ openclaw gateway diagnostics export --output openclaw-diagnostics.zip
 openclaw gateway diagnostics export --json
 ```
 
-## エクスポートに含まれるもの
+## エクスポート内容
 
-zip には次が含まれます。
+zipには次が含まれます:
 
-- `summary.md`: サポート向けの人間が読める概要
-- `diagnostics.json`: 設定、ログ、状態、ヘルス、
-  安定性データの機械可読サマリー
-- `manifest.json`: エクスポートメタデータとファイル一覧
-- サニタイズされた設定の形状と非シークレットな設定詳細
-- サニタイズされたログサマリーと最近のリダクト済みログ行
-- ベストエフォートの Gateway 状態およびヘルスのスナップショット
-- `stability/latest.json`: 利用可能な場合、最新の永続化された安定性バンドル
+- `summary.md`: サポート向けの人間が読める概要。
+- `diagnostics.json`: config、logs、status、health、stabilityデータの機械可読サマリー。
+- `manifest.json`: エクスポートmetadataとfile一覧。
+- サニタイズ済みconfig形状と非secretのconfig詳細。
+- サニタイズ済みlogサマリーと最近のマスク済みlog行。
+- ベストエフォートのGateway statusおよびhealthスナップショット。
+- `stability/latest.json`: 利用可能な場合の最新の永続化stability bundle。
 
-このエクスポートは、Gateway が不健全な場合でも有用です。Gateway が
-状態またはヘルス要求に応答できない場合でも、ローカルログ、設定の形状、最新の
-安定性バンドルは、利用可能であれば収集されます。
+このエクスポートは、Gatewayが不健全な場合でも役立ちます。Gatewayがstatusやhealthリクエストに応答できない場合でも、ローカルlogs、config形状、最新stability bundleは利用可能な限り収集されます。
 
 ## プライバシーモデル
 
-診断データは共有可能になるよう設計されています。エクスポートには、デバッグに役立つ
-運用データが保持されます。たとえば:
+診断は共有可能になるよう設計されています。エクスポートには、デバッグに役立つ運用データが保持されます。たとえば:
 
-- サブシステム名、Plugin ID、プロバイダー ID、チャンネル ID、設定済みモード
-- ステータスコード、所要時間、バイト数、キュー状態、メモリ測定値
-- サニタイズ済みログメタデータとリダクト済み運用メッセージ
-- 設定の形状と非シークレットな機能設定
+- subsystem名、plugin id、provider id、channel id、設定済みmode
+- status code、duration、byte count、queue state、memory reading
+- サニタイズ済みlog metadataとマスク済み運用メッセージ
+- config形状と非secretのfeature設定
 
-エクスポートでは次が省略またはリダクトされます。
+エクスポートでは、次を省略またはマスクします:
 
-- チャットテキスト、プロンプト、指示、Webhook 本文、ツール出力
-- 認証情報、API キー、トークン、Cookie、シークレット値
-- 生のリクエストまたはレスポンス本文
-- account ID、message ID、生の session ID、ホスト名、ローカルユーザー名
+- チャットテキスト、プロンプト、instruction、Webhook body、tool出力
+- 認証情報、API key、token、cookie、secret値
+- 生のrequest bodyまたはresponse body
+- account id、message id、生のsession id、hostname、ローカルusername
 
-ログメッセージがユーザー、チャット、プロンプト、またはツールのペイロードテキストに見える場合、
-エクスポートでは、そのメッセージが省略されたこととバイト数のみを保持します。
+log messageがユーザー、チャット、プロンプト、またはtool payloadテキストに見える場合、エクスポートは「メッセージが省略された」という情報とbyte数だけを保持します。
 
 ## Stability recorder
 
-診断が有効な場合、Gateway はデフォルトで、制限付きのペイロードなし安定性ストリームを記録します。
-これは内容ではなく、運用上の事実のためのものです。
+diagnosticsが有効な場合、Gatewayはデフォルトで、上限付きのpayloadを含まないstability streamを記録します。これはcontentではなく運用上の事実のためのものです。
 
-ライブ recorder を確認する:
+ライブrecorderを確認:
 
 ```bash
 openclaw gateway stability
@@ -86,20 +78,19 @@ openclaw gateway stability --type payload.large
 openclaw gateway stability --json
 ```
 
-致命的終了、シャットダウンタイムアウト、
-または再起動時の起動失敗後に、最新の永続化安定性バンドルを確認する:
+fatal exit、shutdown timeout、またはrestart startup failure後の最新の永続化stability bundleを確認:
 
 ```bash
 openclaw gateway stability --bundle latest
 ```
 
-最新の永続化バンドルから診断 zip を作成する:
+最新の永続化bundleから診断zipを作成:
 
 ```bash
 openclaw gateway stability --bundle latest --export
 ```
 
-イベントが存在する場合、永続化バンドルは `~/.openclaw/logs/stability/` 配下に保存されます。
+永続化bundleは、eventが存在する場合 `~/.openclaw/logs/stability/` 配下に保存されます。
 
 ## 便利なオプション
 
@@ -110,20 +101,19 @@ openclaw gateway diagnostics export \
   --log-bytes 1000000
 ```
 
-- `--output <path>`: 特定の zip パスに書き込みます。
-- `--log-lines <count>`: 含めるサニタイズ済みログ行の最大数。
-- `--log-bytes <bytes>`: 確認するログバイト数の上限。
-- `--url <url>`: 状態およびヘルススナップショット用の Gateway WebSocket URL。
-- `--token <token>`: 状態およびヘルススナップショット用の Gateway トークン。
-- `--password <password>`: 状態およびヘルススナップショット用の Gateway パスワード。
-- `--timeout <ms>`: 状態およびヘルススナップショットのタイムアウト。
-- `--no-stability-bundle`: 永続化された安定性バンドルの検索をスキップします。
-- `--json`: 機械可読なエクスポートメタデータを出力します。
+- `--output <path>`: 特定のzipパスに書き込みます。
+- `--log-lines <count>`: 含めるサニタイズ済みlog行の最大数。
+- `--log-bytes <bytes>`: 調査するlog byte数の最大値。
+- `--url <url>`: statusおよびhealthスナップショット用のGateway WebSocket URL。
+- `--token <token>`: statusおよびhealthスナップショット用のGateway token。
+- `--password <password>`: statusおよびhealthスナップショット用のGateway password。
+- `--timeout <ms>`: statusおよびhealthスナップショットのタイムアウト。
+- `--no-stability-bundle`: 永続化stability bundleの検索をスキップします。
+- `--json`: 機械可読のエクスポートmetadataを出力します。
 
-## 診断を無効にする
+## diagnosticsを無効化
 
-診断はデフォルトで有効です。stability recorder と
-診断イベント収集を無効にするには:
+diagnosticsはデフォルトで有効です。stability recorderとdiagnostic event collectionを無効にするには:
 
 ```json5
 {
@@ -133,12 +123,12 @@ openclaw gateway diagnostics export \
 }
 ```
 
-診断を無効にすると、バグレポートの詳細は減ります。通常の
-Gateway ログには影響しません。
+diagnosticsを無効化すると、バグレポートの詳細は減ります。通常のGateway loggingには影響しません。
 
-## 関連ドキュメント
+## 関連
 
-- [Health Checks](/ja-JP/gateway/health)
+- [Health checks](/ja-JP/gateway/health)
 - [Gateway CLI](/ja-JP/cli/gateway#gateway-diagnostics-export)
-- [Gateway Protocol](/ja-JP/gateway/protocol#system-and-identity)
+- [Gateway protocol](/ja-JP/gateway/protocol#system-and-identity)
 - [Logging](/ja-JP/logging)
+- [OpenTelemetry export](/ja-JP/gateway/opentelemetry) — collectorへ診断をストリーミングするための別フロー
