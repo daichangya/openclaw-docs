@@ -125,7 +125,7 @@ Crestodian 使用类型化操作，而不是临时编辑配置。
 `openclaw onboard --modern` 会将 Crestodian 作为现代新手引导预览启动。
 普通的 `openclaw onboard` 仍然运行经典新手引导。
 
-## Setup Bootstrap
+## Setup bootstrap
 
 `setup` 是一种以聊天优先的新手引导 bootstrap。它只通过类型化配置操作进行写入，并且会先请求批准。
 

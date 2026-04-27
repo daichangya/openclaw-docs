@@ -1,72 +1,72 @@
 ---
 read_when:
-    - Вам потрібна точна семантика полів конфігурації або значення за замовчуванням
+    - Вам потрібні точні семантики конфігурації на рівні полів або значення за замовчуванням
     - Ви перевіряєте блоки конфігурації каналу, моделі, Gateway або інструмента
-summary: Довідник з конфігурації Gateway для основних ключів OpenClaw, значень за замовчуванням і посилань на окремі довідники підсистем
-title: Довідник з конфігурації
+summary: Довідник конфігурації Gateway для основних ключів OpenClaw, значень за замовчуванням і посилань на окремі довідники підсистем
+title: Довідник конфігурації
 x-i18n:
-    generated_at: "2026-04-26T19:17:02Z"
+    generated_at: "2026-04-27T09:03:53Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 2579a59555d480b116955cad0508392240ee6ae4f19cf46b8fc754c0ce48f870
+    source_hash: f394e6a9ed0de3f8e8677fb4a2f611979dae24619723f99d342430c4898d5be9
     source_path: gateway/configuration-reference.md
     workflow: 15
 ---
 
-Довідник з основної конфігурації для `~/.openclaw/openclaw.json`. Для огляду, орієнтованого на завдання, див. [Configuration](/uk/gateway/configuration).
+Основний довідник конфігурації для `~/.openclaw/openclaw.json`. Огляд, орієнтований на завдання, див. у [Configuration](/uk/gateway/configuration).
 
-Охоплює основні поверхні конфігурації OpenClaw і дає посилання назовні, коли підсистема має власний глибший довідник. Каталоги команд, що належать каналам і Plugin, а також детальні параметри пам’яті/QMD винесені на окремі сторінки, а не на цю.
+Охоплює основні поверхні конфігурації OpenClaw і дає посилання назовні, коли підсистема має власний глибший довідник. Каталоги команд, що належать каналам і plugin, а також глибокі параметри пам’яті/QMD розміщені на окремих сторінках, а не тут.
 
-Код як джерело істини:
+Джерело істини в коді:
 
-- `openclaw config schema` виводить актуальну JSON Schema, що використовується для валідації та Control UI, із вбудованими метаданими bundled/plugin/channel, об’єднаними за наявності
-- `config.schema.lookup` повертає один вузол схеми з прив’язкою до шляху для інструментів детального перегляду
-- `pnpm config:docs:check` / `pnpm config:docs:gen` перевіряють хеш базового рівня документації конфігурації відносно поточної поверхні схеми
+- `openclaw config schema` виводить актуальну JSON Schema, яка використовується для валідації та Control UI, із об’єднаними метаданими bundled/plugin/channel, коли вони доступні
+- `config.schema.lookup` повертає один вузол схеми з прив’язкою до шляху для інструментів деталізації
+- `pnpm config:docs:check` / `pnpm config:docs:gen` перевіряють базовий хеш документації конфігурації щодо поточної поверхні схеми
 
 Шлях пошуку для агента: використовуйте дію інструмента `gateway` `config.schema.lookup` для
 точної документації та обмежень на рівні полів перед редагуванням. Використовуйте
-[Configuration](/uk/gateway/configuration) для рекомендацій, орієнтованих на завдання, а цю сторінку —
+[Configuration](/uk/gateway/configuration) для настанов, орієнтованих на завдання, а цю сторінку —
 для ширшої карти полів, значень за замовчуванням і посилань на довідники підсистем.
 
 Окремі поглиблені довідники:
 
-- [Довідник з конфігурації пам’яті](/uk/reference/memory-config) для `agents.defaults.memorySearch.*`, `memory.qmd.*`, `memory.citations` і конфігурації dreaming у `plugins.entries.memory-core.config.dreaming`
-- [Косі команди](/uk/tools/slash-commands) для поточного вбудованого + bundled каталогу команд
-- сторінки власників channel/plugin для поверхонь команд, специфічних для каналів
+- [Memory configuration reference](/uk/reference/memory-config) для `agents.defaults.memorySearch.*`, `memory.qmd.*`, `memory.citations` і конфігурації Dreaming у `plugins.entries.memory-core.config.dreaming`
+- [Slash commands](/uk/tools/slash-commands) для поточного вбудованого + bundled каталогу команд
+- сторінки каналу/plugin-власника для поверхонь команд, специфічних для каналу
 
-Формат конфігурації — **JSON5** (дозволені коментарі й кінцеві коми). Усі поля необов’язкові — OpenClaw використовує безпечні значення за замовчуванням, якщо їх не вказано.
+Формат конфігурації — **JSON5** (дозволені коментарі + кінцеві коми). Усі поля необов’язкові — OpenClaw використовує безпечні значення за замовчуванням, якщо їх пропущено.
 
 ---
 
 ## Канали
 
-Ключі конфігурації для кожного каналу перенесені на окрему сторінку — див.
+Ключі конфігурації для кожного каналу перенесено на окрему сторінку — див.
 [Configuration — channels](/uk/gateway/config-channels) для `channels.*`,
-включно зі Slack, Discord, Telegram, WhatsApp, Matrix, iMessage та іншими
-bundled каналами (автентифікація, контроль доступу, кілька облікових записів, обмеження згадок).
+зокрема Slack, Discord, Telegram, WhatsApp, Matrix, iMessage та інших
+bundled каналів (автентифікація, контроль доступу, кілька облікових записів, керування згадками).
 
-## Значення агента за замовчуванням, multi-agent, сесії та повідомлення
+## Типові налаштування агентів, multi-agent, сесії та повідомлення
 
 Перенесено на окрему сторінку — див.
 [Configuration — agents](/uk/gateway/config-agents) для:
 
-- `agents.defaults.*` (робочий простір, модель, thinking, heartbeat, пам’ять, медіа, skills, sandbox)
+- `agents.defaults.*` (робочий простір, модель, thinking, heartbeat, пам’ять, медіа, Skills, sandbox)
 - `multiAgent.*` (маршрутизація та прив’язки multi-agent)
 - `session.*` (життєвий цикл сесії, Compaction, очищення)
 - `messages.*` (доставка повідомлень, TTS, рендеринг markdown)
 - `talk.*` (режим Talk)
   - `talk.speechLocale`: необов’язковий ідентифікатор локалі BCP 47 для розпізнавання мовлення Talk на iOS/macOS
-  - `talk.silenceTimeoutMs`: якщо не встановлено, Talk зберігає стандартне для платформи вікно паузи перед надсиланням транскрипту (`700 ms on macOS and Android, 900 ms on iOS`)
+  - `talk.silenceTimeoutMs`: якщо не задано, Talk зберігає типове для платформи вікно паузи перед надсиланням транскрипту (`700 ms на macOS і Android, 900 ms на iOS`)
 
-## Інструменти та custom providers
+## Інструменти та кастомні провайдери
 
-Політика інструментів, експериментальні перемикачі, конфігурація інструментів із backing provider, а також налаштування custom
-provider / base-URL перенесені на окрему сторінку — див.
+Політики інструментів, експериментальні перемикачі, конфігурація інструментів із підтримкою провайдерів і налаштування кастомних
+провайдерів / base-URL перенесено на окрему сторінку — див.
 [Configuration — tools and custom providers](/uk/gateway/config-tools).
 
 ## MCP
 
-Визначення MCP-серверів, якими керує OpenClaw, розміщуються в `mcp.servers` і
+Визначення MCP-серверів, якими керує OpenClaw, зберігаються в `mcp.servers` і
 використовуються вбудованим Pi та іншими адаптерами середовища виконання. Команди `openclaw mcp list`,
 `show`, `set` і `unset` керують цим блоком без підключення до
 цільового сервера під час редагування конфігурації.
@@ -93,17 +93,17 @@ provider / base-URL перенесені на окрему сторінку — 
 }
 ```
 
-- `mcp.servers`: іменовані визначення stdio або віддалених MCP-серверів для середовищ виконання, які
+- `mcp.servers`: іменовані визначення stdio або віддалених MCP-серверів для середовищ виконання, що
   надають налаштовані MCP-інструменти.
-- `mcp.sessionIdleTtlMs`: idle TTL для bundled MCP runtime на рівні сесії.
-  Одноразові вбудовані запуски запитують очищення після завершення виконання; цей TTL є
-  запобіжним механізмом для довготривалих сесій і майбутніх викликів.
-- Зміни в `mcp.*` застосовуються гаряче через вивільнення кешованих session MCP runtime.
-  Наступне виявлення/використання інструмента створює їх заново з нової конфігурації, тому видалені
-  записи `mcp.servers` прибираються негайно, а не очікують завершення idle TTL.
+- `mcp.sessionIdleTtlMs`: TTL бездіяльності для bundled MCP runtime, прив’язаних до сесії.
+  Одноразові вбудовані запуски запитують очищення після завершення; цей TTL є резервним механізмом для
+  довготривалих сесій і майбутніх викликів.
+- Зміни в `mcp.*` застосовуються гарячо через вивільнення кешованих session MCP runtime.
+  Наступне виявлення/використання інструмента повторно створює їх із нової конфігурації, тому видалені
+  записи `mcp.servers` прибираються негайно, а не чекають TTL бездіяльності.
 
 Див. [MCP](/uk/cli/mcp#openclaw-as-an-mcp-client-registry) і
-[CLI backends](/uk/gateway/cli-backends#bundle-mcp-overlays) для поведінки під час виконання.
+[CLI backends](/uk/gateway/cli-backends#bundle-mcp-overlays) для поведінки runtime.
 
 ## Skills
 
@@ -130,18 +130,18 @@ provider / base-URL перенесені на окрему сторінку — 
 }
 ```
 
-- `allowBundled`: необов’язковий список дозволених лише для bundled skills (керовані/workspace skills не зачіпаються).
-- `load.extraDirs`: додаткові спільні кореневі каталоги skills (найнижчий пріоритет).
-- `install.preferBrew`: якщо `true`, віддавати перевагу інсталяторам Homebrew, коли `brew`
-  доступний, перш ніж переходити до інших типів інсталяторів.
-- `install.nodeManager`: пріоритет менеджера node для специфікацій `metadata.openclaw.install`
+- `allowBundled`: необов’язковий список дозволу лише для bundled Skills (керовані/робочі Skills не зачіпаються).
+- `load.extraDirs`: додаткові спільні кореневі каталоги Skills (найнижчий пріоритет).
+- `install.preferBrew`: якщо `true`, за наявності `brew` спершу віддається перевага інсталяторам Homebrew
+  перед переходом до інших типів інсталяторів.
+- `install.nodeManager`: пріоритет інсталятора node для специфікацій `metadata.openclaw.install`
   (`npm` | `pnpm` | `yarn` | `bun`).
-- `entries.<skillKey>.enabled: false` вимикає skill, навіть якщо він bundled/встановлений.
-- `entries.<skillKey>.apiKey`: зручне поле для skills, які оголошують основну env-змінну (простий текстовий рядок або об’єкт SecretRef).
+- `entries.<skillKey>.enabled: false` вимикає Skill, навіть якщо він bundled/встановлений.
+- `entries.<skillKey>.apiKey`: зручне поле для Skills, що оголошують основну змінну середовища (простий текстовий рядок або об’єкт SecretRef).
 
 ---
 
-## Plugins
+## Plugin
 
 ```json5
 {
@@ -166,45 +166,45 @@ provider / base-URL перенесені на окрему сторінку — 
 ```
 
 - Завантажуються з `~/.openclaw/extensions`, `<workspace>/.openclaw/extensions`, а також `plugins.load.paths`.
-- Виявлення приймає нативні OpenClaw plugins, а також сумісні bundled Codex і Claude, включно з пакетами Claude стандартної структури без manifest.
-- **Зміни конфігурації потребують перезапуску Gateway.**
-- `allow`: необов’язковий список дозволених (завантажуються лише перелічені plugins). `deny` має пріоритет.
+- Виявлення підтримує рідні plugin OpenClaw, а також сумісні bundles Codex і Claude, включно з bundles Claude типового компонування без manifest.
+- **Зміни конфігурації вимагають перезапуску Gateway.**
+- `allow`: необов’язковий список дозволу (завантажуються лише plugin зі списку). `deny` має пріоритет.
 - `plugins.entries.<id>.apiKey`: зручне поле API-ключа на рівні plugin (коли plugin це підтримує).
-- `plugins.entries.<id>.env`: мапа env-змінних у межах plugin.
-- `plugins.entries.<id>.hooks.allowPromptInjection`: коли `false`, ядро блокує `before_prompt_build` та ігнорує поля, що змінюють prompt, із застарілого `before_agent_start`, водночас зберігаючи застарілі `modelOverride` і `providerOverride`. Застосовується до нативних plugin hooks і підтримуваних каталогів hook, наданих bundle.
-- `plugins.entries.<id>.hooks.allowConversationAccess`: коли `true`, довірені не-bundled plugins можуть читати необроблений вміст розмови з типізованих hooks, як-от `llm_input`, `llm_output`, `before_agent_finalize` і `agent_end`.
-- `plugins.entries.<id>.subagent.allowModelOverride`: явно довіряти цьому plugin запитувати перевизначення `provider` і `model` для окремих запусків фонових subagent.
-- `plugins.entries.<id>.subagent.allowedModels`: необов’язковий список дозволених канонічних цілей `provider/model` для довірених перевизначень subagent. Використовуйте `"*"` лише тоді, коли ви свідомо хочете дозволити будь-яку модель.
-- `plugins.entries.<id>.config`: об’єкт конфігурації, визначений plugin (валідується за схемою нативного OpenClaw plugin, якщо вона доступна).
-- Налаштування облікових записів/виконання channel plugin розміщуються в `channels.<id>` і мають описуватися метаданими `channelConfigs` manifest власного plugin, а не центральним реєстром параметрів OpenClaw.
-- `plugins.entries.firecrawl.config.webFetch`: налаштування провайдера Firecrawl web-fetch.
-  - `apiKey`: API-ключ Firecrawl (приймає SecretRef). Резервно використовує `plugins.entries.firecrawl.config.webSearch.apiKey`, застаріле `tools.web.fetch.firecrawl.apiKey` або env-змінну `FIRECRAWL_API_KEY`.
+- `plugins.entries.<id>.env`: мапа змінних середовища в межах plugin.
+- `plugins.entries.<id>.hooks.allowPromptInjection`: коли `false`, ядро блокує `before_prompt_build` і ігнорує поля мутації prompt із застарілого `before_agent_start`, зберігаючи застарілі `modelOverride` і `providerOverride`. Застосовується до рідних hook plugin і підтримуваних каталогів hook, наданих bundle.
+- `plugins.entries.<id>.hooks.allowConversationAccess`: коли `true`, довірені небудовані plugin можуть читати необроблений вміст розмови з типізованих hook, таких як `llm_input`, `llm_output`, `before_agent_finalize` і `agent_end`.
+- `plugins.entries.<id>.subagent.allowModelOverride`: явно довіряти цьому plugin запитувати перевизначення `provider` і `model` для кожного запуску фонових subagent.
+- `plugins.entries.<id>.subagent.allowedModels`: необов’язковий список дозволу канонічних цілей `provider/model` для довірених перевизначень subagent. Використовуйте `"*"` лише коли свідомо хочете дозволити будь-яку модель.
+- `plugins.entries.<id>.config`: об’єкт конфігурації, визначений plugin (валідується схемою рідного plugin OpenClaw, якщо вона доступна).
+- Налаштування облікового запису/runtime для channel plugin зберігаються в `channels.<id>` і мають описуватися метаданими `channelConfigs` у manifest plugin-власника, а не центральним реєстром параметрів OpenClaw.
+- `plugins.entries.firecrawl.config.webFetch`: параметри провайдера web-fetch Firecrawl.
+  - `apiKey`: API-ключ Firecrawl (підтримує SecretRef). Використовує як запасний варіант `plugins.entries.firecrawl.config.webSearch.apiKey`, застарілий `tools.web.fetch.firecrawl.apiKey` або змінну середовища `FIRECRAWL_API_KEY`.
   - `baseUrl`: базова URL-адреса API Firecrawl (типово: `https://api.firecrawl.dev`).
   - `onlyMainContent`: витягувати лише основний вміст сторінок (типово: `true`).
   - `maxAgeMs`: максимальний вік кешу в мілісекундах (типово: `172800000` / 2 дні).
-  - `timeoutSeconds`: тайм-аут запиту на збирання в секундах (типово: `60`).
-- `plugins.entries.xai.config.xSearch`: налаштування xAI X Search (пошук у вебі Grok).
-  - `enabled`: увімкнути провайдера X Search.
-  - `model`: модель Grok, яку слід використовувати для пошуку (наприклад, `"grok-4-1-fast"`).
-- `plugins.entries.memory-core.config.dreaming`: налаштування memory dreaming. Див. [Dreaming](/uk/concepts/dreaming) для фаз і порогів.
-  - `enabled`: головний перемикач dreaming (типово `false`).
-  - `frequency`: Cron-розклад для кожного повного циклу dreaming (типово `"0 3 * * *"`).
+  - `timeoutSeconds`: тайм-аут запиту scrape у секундах (типово: `60`).
+- `plugins.entries.xai.config.xSearch`: параметри X Search xAI (вебпошук Grok).
+  - `enabled`: увімкнути провайдер X Search.
+  - `model`: модель Grok для використання в пошуку (наприклад, `"grok-4-1-fast"`).
+- `plugins.entries.memory-core.config.dreaming`: параметри Dreaming для пам’яті. Див. [Dreaming](/uk/concepts/dreaming) для фаз і порогів.
+  - `enabled`: головний перемикач Dreaming (типово `false`).
+  - `frequency`: Cron-ритм для кожного повного проходу Dreaming (типово `"0 3 * * *"`).
   - політика фаз і пороги є деталями реалізації (не користувацькими ключами конфігурації).
-- Повна конфігурація пам’яті міститься в [Довіднику з конфігурації пам’яті](/uk/reference/memory-config):
+- Повна конфігурація пам’яті наведена в [Memory configuration reference](/uk/reference/memory-config):
   - `agents.defaults.memorySearch.*`
   - `memory.backend`
   - `memory.citations`
   - `memory.qmd.*`
   - `plugins.entries.memory-core.config.dreaming`
-- Увімкнені Claude bundled plugins також можуть надавати вбудовані типові значення Pi з `settings.json`; OpenClaw застосовує їх як санітизовані налаштування агента, а не як необроблені патчі конфігурації OpenClaw.
-- `plugins.slots.memory`: вибрати id активного plugin пам’яті або `"none"`, щоб вимкнути plugins пам’яті.
-- `plugins.slots.contextEngine`: вибрати id активного plugin рушія контексту; типово `"legacy"`, якщо ви не встановите й не виберете інший рушій.
+- Увімкнені Claude bundle plugin також можуть додавати вбудовані типові налаштування Pi із `settings.json`; OpenClaw застосовує їх як санітизовані налаштування агента, а не як сирі патчі конфігурації OpenClaw.
+- `plugins.slots.memory`: виберіть id активного plugin пам’яті або `"none"`, щоб вимкнути plugin пам’яті.
+- `plugins.slots.contextEngine`: виберіть id активного plugin рушія контексту; типово `"legacy"`, якщо ви не встановите й не виберете інший рушій.
 
 Див. [Plugins](/uk/tools/plugin).
 
 ---
 
-## Browser
+## Браузер
 
 ```json5
 {
@@ -254,50 +254,50 @@ provider / base-URL перенесені на окрему сторінку — 
 - `tabCleanup` очищає відстежувані вкладки основного агента після простою або коли
   сесія перевищує свій ліміт. Установіть `idleMinutes: 0` або `maxTabsPerSession: 0`, щоб
   вимкнути ці окремі режими очищення.
-- `ssrfPolicy.dangerouslyAllowPrivateNetwork` вимкнено, якщо не встановлено, тому навігація браузера типово залишається суворо обмеженою.
+- `ssrfPolicy.dangerouslyAllowPrivateNetwork` вимкнено, якщо не задано, тому навігація браузера типово залишається суворо обмеженою.
 - Установлюйте `ssrfPolicy.dangerouslyAllowPrivateNetwork: true` лише тоді, коли ви свідомо довіряєте навігації браузера в приватній мережі.
-- У суворому режимі віддалені кінцеві точки профілю CDP (`profiles.*.cdpUrl`) підпадають під те саме блокування приватної мережі під час перевірок доступності/виявлення.
+- У суворому режимі кінцеві точки віддалених профілів CDP (`profiles.*.cdpUrl`) підпадають під те саме блокування приватної мережі під час перевірок доступності/виявлення.
 - `ssrfPolicy.allowPrivateNetwork` і далі підтримується як застарілий псевдонім.
 - У суворому режимі використовуйте `ssrfPolicy.hostnameAllowlist` і `ssrfPolicy.allowedHostnames` для явних винятків.
-- Віддалені профілі працюють лише в режимі підключення (запуск/зупинка/скидання вимкнені).
+- Віддалені профілі працюють лише в режимі приєднання (start/stop/reset вимкнено).
 - `profiles.*.cdpUrl` приймає `http://`, `https://`, `ws://` і `wss://`.
-  Використовуйте HTTP(S), коли хочете, щоб OpenClaw виявив `/json/version`; використовуйте WS(S),
-  коли ваш провайдер надає прямий URL DevTools WebSocket.
-- `remoteCdpTimeoutMs` і `remoteCdpHandshakeTimeoutMs` застосовуються до перевірки доступності віддаленого та
-  `attachOnly` CDP, а також до запитів на відкриття вкладок. Керовані профілі loopback
-  зберігають локальні типові значення CDP.
+  Використовуйте HTTP(S), якщо хочете, щоб OpenClaw виявив `/json/version`; використовуйте WS(S),
+  якщо ваш провайдер надає вам прямий URL DevTools WebSocket.
+- `remoteCdpTimeoutMs` і `remoteCdpHandshakeTimeoutMs` застосовуються до віддалених і
+  `attachOnly` перевірок доступності CDP, а також до запитів на відкриття вкладок. Керовані профілі
+  local loopback зберігають типові локальні значення CDP.
 - Якщо зовнішньо керований сервіс CDP доступний через loopback, установіть для цього
-  профілю `attachOnly: true`; інакше OpenClaw сприйматиме порт loopback як
-  локальний керований профіль браузера й може повідомляти про помилки володіння локальним портом.
-- Профілі `existing-session` використовують Chrome MCP замість CDP і можуть підключатися на
-  вибраному хості або через підключений вузол браузера.
+  профілю `attachOnly: true`; інакше OpenClaw трактуватиме порт loopback як
+  локальний керований профіль браузера і може повідомляти про помилки володіння локальним портом.
+- Профілі `existing-session` використовують Chrome MCP замість CDP і можуть приєднуватися до
+  вибраного хоста або через підключений вузол браузера.
 - Профілі `existing-session` можуть задавати `userDataDir`, щоб націлитися на конкретний
-  профіль браузера на основі Chromium, наприклад Brave або Edge.
+  профіль браузера на базі Chromium, наприклад Brave або Edge.
 - Профілі `existing-session` зберігають поточні обмеження маршруту Chrome MCP:
-  дії на основі snapshot/ref замість націлювання через CSS-селектори, hooks завантаження
-  одного файлу, без перевизначення тайм-ауту діалогів, без `wait --load networkidle`, а також без
+  дії на основі snapshot/ref замість націлювання через CSS-селектори, hook завантаження
+  одного файлу, без перевизначення тайм-аутів діалогів, без `wait --load networkidle`, а також без
   `responsebody`, експорту PDF, перехоплення завантажень чи пакетних дій.
 - Локальні керовані профілі `openclaw` автоматично призначають `cdpPort` і `cdpUrl`; явно
   задавайте `cdpUrl` лише для віддаленого CDP.
 - Локальні керовані профілі можуть задавати `executablePath`, щоб перевизначити глобальний
   `browser.executablePath` для цього профілю. Використовуйте це, щоб запускати один профіль у
-  Chrome, а інший — у Brave.
+  Chrome, а інший у Brave.
 - Локальні керовані профілі використовують `browser.localLaunchTimeoutMs` для HTTP-виявлення Chrome CDP
   після запуску процесу та `browser.localCdpReadyTimeoutMs` для
   готовності CDP websocket після запуску. Збільшуйте їх на повільніших хостах, де Chrome
-  запускається успішно, але перевірки готовності змагаються із запуском. Обидва значення мають бути
+  успішно запускається, але перевірки готовності випереджають завершення запуску. Обидва значення мають бути
   додатними цілими числами до `120000` мс; некоректні значення конфігурації відхиляються.
-- Порядок автовиявлення: типовий браузер, якщо на основі Chromium → Chrome → Brave → Edge → Chromium → Chrome Canary.
+- Порядок автовиявлення: типовий браузер, якщо він на базі Chromium → Chrome → Brave → Edge → Chromium → Chrome Canary.
 - `browser.executablePath` і `browser.profiles.<name>.executablePath` обидва
   приймають `~` і `~/...` для домашнього каталогу вашої ОС перед запуском Chromium.
-  `userDataDir` для кожного профілю `existing-session` також розгортається з тильдою.
-- Служба керування: лише loopback (порт виводиться з `gateway.port`, типово `18791`).
-- `extraArgs` додає додаткові прапорці запуску до локального старту Chromium (наприклад,
-  `--disable-gpu`, розміри вікна або прапорці налагодження).
+  `userDataDir` для `existing-session` профілів також розгортається з тильдою.
+- Служба керування: лише loopback (порт похідний від `gateway.port`, типово `18791`).
+- `extraArgs` додає додаткові прапорці запуску до старту локального Chromium (наприклад
+  `--disable-gpu`, розмір вікна або налагоджувальні прапорці).
 
 ---
 
-## UI
+## Інтерфейс
 
 ```json5
 {
@@ -311,8 +311,8 @@ provider / base-URL перенесені на окрему сторінку — 
 }
 ```
 
-- `seamColor`: колір акценту для chrome UI нативного застосунку (відтінок бульбашки Talk Mode тощо).
-- `assistant`: перевизначення ідентичності для Control UI. Резервно використовується ідентичність активного агента.
+- `seamColor`: акцентний колір для chrome нативного інтерфейсу застосунку (тон бульбашки Talk Mode тощо).
+- `assistant`: перевизначення ідентичності Control UI. Інакше використовується ідентичність активного агента.
 
 ---
 
@@ -387,69 +387,69 @@ provider / base-URL перенесені на окрему сторінку — 
 }
 ```
 
-<Accordion title="Подробиці полів Gateway">
+<Accordion title="Докладно про поля Gateway">
 
-- `mode`: `local` (запустити gateway) або `remote` (підключитися до віддаленого gateway). Gateway відмовляється запускатися, якщо не `local`.
+- `mode`: `local` (запускати gateway) або `remote` (підключатися до віддаленого gateway). Gateway відмовляється запускатися, якщо не `local`.
 - `port`: єдиний мультиплексований порт для WS + HTTP. Пріоритет: `--port` > `OPENCLAW_GATEWAY_PORT` > `gateway.port` > `18789`.
 - `bind`: `auto`, `loopback` (типово), `lan` (`0.0.0.0`), `tailnet` (лише IP Tailscale) або `custom`.
 - **Застарілі псевдоніми bind**: використовуйте значення режиму bind у `gateway.bind` (`auto`, `loopback`, `lan`, `tailnet`, `custom`), а не псевдоніми хоста (`0.0.0.0`, `127.0.0.1`, `localhost`, `::`, `::1`).
-- **Примітка щодо Docker**: типовий bind `loopback` слухає `127.0.0.1` усередині контейнера. За bridge-мережі Docker (`-p 18789:18789`) трафік надходить через `eth0`, тому gateway недосяжний. Використовуйте `--network host` або встановіть `bind: "lan"` (або `bind: "custom"` з `customBindHost: "0.0.0.0"`), щоб слухати на всіх інтерфейсах.
-- **Auth**: типово обов’язкова. Bind не-loopback вимагають auth gateway. На практиці це означає спільний token/password або reverse proxy з урахуванням ідентичності з `gateway.auth.mode: "trusted-proxy"`. Майстер онбордингу типово генерує token.
-- Якщо налаштовано і `gateway.auth.token`, і `gateway.auth.password` (включно з SecretRef), явно встановіть `gateway.auth.mode` у `token` або `password`. Потоки запуску й встановлення/відновлення служби завершуються помилкою, коли налаштовано обидва параметри, а режим не вказано.
-- `gateway.auth.mode: "none"`: явний режим без auth. Використовуйте лише для довірених локальних конфігурацій local loopback; цей варіант навмисно не пропонується в запитах онбордингу.
-- `gateway.auth.mode: "trusted-proxy"`: делегувати auth reverse proxy з урахуванням ідентичності та довіряти заголовкам ідентичності від `gateway.trustedProxies` (див. [Trusted Proxy Auth](/uk/gateway/trusted-proxy-auth)). Цей режим очікує **не-loopback** джерело proxy; reverse proxy loopback на тому ж хості не задовольняють auth trusted-proxy.
-- `gateway.auth.allowTailscale`: коли `true`, заголовки ідентичності Tailscale Serve можуть задовольняти auth для Control UI/WebSocket (перевіряється через `tailscale whois`). Кінцеві точки HTTP API **не** використовують цю auth заголовків Tailscale; вони натомість дотримуються звичайного режиму HTTP auth gateway. Цей безтокеновий потік передбачає, що хост gateway є довіреним. Типово `true`, коли `tailscale.mode = "serve"`.
-- `gateway.auth.rateLimit`: необов’язковий обмежувач невдалих спроб auth. Застосовується для кожного IP клієнта й для кожної області auth (спільний секрет і token пристрою відстежуються окремо). Заблоковані спроби повертають `429` + `Retry-After`.
-  - В асинхронному шляху Tailscale Serve Control UI невдалі спроби для того самого `{scope, clientIp}` серіалізуються перед записом невдачі. Тому одночасні некоректні спроби від того самого клієнта можуть активувати лімітер на другому запиті, замість того щоб обидві одночасно пройти як звичайні невідповідності.
-  - `gateway.auth.rateLimit.exemptLoopback` типово має значення `true`; установіть `false`, коли ви навмисно хочете також обмежувати localhost-трафік (для тестових конфігурацій або суворих розгортань proxy).
-- Спроби auth WS із походження браузера завжди обмежуються без винятку для loopback (додатковий захист від перебору localhost із браузера).
-- На loopback такі блокування для походження браузера ізолюються за нормалізованим значенням `Origin`,
-  тож повторні невдачі з одного походження localhost не блокують автоматично
-  інше походження.
-- `tailscale.mode`: `serve` (лише tailnet, bind loopback) або `funnel` (публічний, потребує auth).
-- `controlUi.allowedOrigins`: явний список дозволених джерел браузера для підключень Gateway WebSocket. Обов’язковий, коли очікуються браузерні клієнти з не-loopback джерел.
-- `controlUi.dangerouslyAllowHostHeaderOriginFallback`: небезпечний режим, що вмикає резервне визначення джерела за заголовком Host для розгортань, які навмисно покладаються на політику джерела за заголовком Host.
-- `remote.transport`: `ssh` (типово) або `direct` (ws/wss). Для `direct` `remote.url` має бути `ws://` або `wss://`.
+- **Примітка щодо Docker**: типове значення bind `loopback` слухає `127.0.0.1` усередині контейнера. Із bridge-мережею Docker (`-p 18789:18789`) трафік надходить на `eth0`, тому gateway недоступний. Використовуйте `--network host` або задайте `bind: "lan"` (або `bind: "custom"` із `customBindHost: "0.0.0.0"`), щоб слухати на всіх інтерфейсах.
+- **Автентифікація**: типово обов’язкова. Прив’язки не до loopback вимагають автентифікації gateway. На практиці це означає спільний токен/пароль або reverse proxy з урахуванням ідентичності з `gateway.auth.mode: "trusted-proxy"`. Майстер початкового налаштування типово генерує токен.
+- Якщо налаштовано і `gateway.auth.token`, і `gateway.auth.password` (включно з SecretRef), явно задайте `gateway.auth.mode` як `token` або `password`. Запуск і потоки встановлення/відновлення сервісу завершуються помилкою, якщо налаштовано обидва параметри, а режим не задано.
+- `gateway.auth.mode: "none"`: явний режим без автентифікації. Використовуйте лише для довірених локальних loopback-схем; цей варіант навмисно не пропонується в підказках початкового налаштування.
+- `gateway.auth.mode: "trusted-proxy"`: делегувати автентифікацію reverse proxy з урахуванням ідентичності та довіряти заголовкам ідентичності від `gateway.trustedProxies` (див. [Trusted Proxy Auth](/uk/gateway/trusted-proxy-auth)). Цей режим очікує **не-loopback** джерело proxy; reverse proxy на тому ж хості через loopback не задовольняють автентифікацію trusted-proxy.
+- `gateway.auth.allowTailscale`: коли `true`, заголовки ідентичності Tailscale Serve можуть задовольняти автентифікацію Control UI/WebSocket (перевіряється через `tailscale whois`). Кінцеві точки HTTP API **не** використовують цю автентифікацію через заголовки Tailscale; натомість вони дотримуються звичайного режиму HTTP-автентифікації gateway. Цей безтокеновий потік передбачає, що хост gateway є довіреним. Типово `true`, коли `tailscale.mode = "serve"`.
+- `gateway.auth.rateLimit`: необов’язковий обмежувач невдалих спроб автентифікації. Застосовується для кожної IP-адреси клієнта та для кожної області автентифікації (спільний секрет і токен пристрою відстежуються окремо). Заблоковані спроби повертають `429` + `Retry-After`.
+  - В асинхронному шляху Tailscale Serve для Control UI невдалі спроби для того самого `{scope, clientIp}` серіалізуються перед записом невдачі. Тому одночасні хибні спроби від одного клієнта можуть спрацювати на обмежувач на другому запиті, замість того щоб обидві пройшли як звичайні невідповідності.
+  - `gateway.auth.rateLimit.exemptLoopback` типово має значення `true`; задайте `false`, якщо ви свідомо хочете також обмежувати трафік localhost (для тестових схем або суворих proxy-розгортань).
+- Спроби WS-автентифікації з browser-origin завжди обмежуються з вимкненим винятком для loopback (додатковий рівень захисту від brute force localhost із браузера).
+- На loopback ці блокування для browser-origin ізольовані за нормалізованим значенням `Origin`,
+  тому повторні невдачі з одного localhost-origin не призводять автоматично
+  до блокування іншого origin.
+- `tailscale.mode`: `serve` (лише tailnet, bind на loopback) або `funnel` (публічно, потрібна автентифікація).
+- `controlUi.allowedOrigins`: явний список дозволених browser-origin для підключень Gateway WebSocket. Обов’язковий, коли очікуються браузерні клієнти з не-loopback origin.
+- `controlUi.dangerouslyAllowHostHeaderOriginFallback`: небезпечний режим, який вмикає резервне визначення origin через заголовок Host для розгортань, що свідомо покладаються на політику origin за заголовком Host.
+- `remote.transport`: `ssh` (типово) або `direct` (ws/wss). Для `direct` значення `remote.url` має бути `ws://` або `wss://`.
 - `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1`: клієнтське аварійне перевизначення через
-  змінну середовища процесу, яке дозволяє незашифрований `ws://` до довірених IP
-  приватної мережі; типово незашифрований трафік і далі дозволено лише для loopback. Еквівалента в `openclaw.json`
-  немає, а конфігурація приватної мережі браузера, така як
+  змінну середовища процесу, яке дозволяє відкритий `ws://` до довірених IP
+  приватної мережі; типово відкритий трафік дозволено лише для loopback. Еквівалента в `openclaw.json`
+  немає, і конфігурація приватної мережі браузера, така як
   `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork`, не впливає на клієнти
   Gateway WebSocket.
-- `gateway.remote.token` / `.password` — це поля облікових даних віддаленого клієнта. Вони самі по собі не налаштовують auth gateway.
-- `gateway.push.apns.relay.baseUrl`: базова HTTPS-URL-адреса зовнішнього APNs relay, який використовують офіційні/TestFlight збірки iOS після публікації ними реєстрацій із relay-підтримкою до gateway. Ця URL-адреса має збігатися з URL relay, скомпільованою в збірку iOS.
+- `gateway.remote.token` / `.password` — це поля облікових даних віддаленого клієнта. Вони самі по собі не налаштовують автентифікацію gateway.
+- `gateway.push.apns.relay.baseUrl`: базова HTTPS URL-адреса для зовнішнього relay APNs, який використовують офіційні/TestFlight-збірки iOS після публікації relay-реєстрацій до gateway. Ця URL-адреса має збігатися з URL relay, скомпільованою в iOS-збірку.
 - `gateway.push.apns.relay.timeoutMs`: тайм-аут надсилання від gateway до relay у мілісекундах. Типово `10000`.
-- Реєстрації з relay-підтримкою делегуються конкретній ідентичності gateway. Спарений застосунок iOS отримує `gateway.identity.get`, включає цю ідентичність у реєстрацію relay і пересилає до gateway право надсилання в межах реєстрації. Інший gateway не може повторно використати цю збережену реєстрацію.
-- `OPENCLAW_APNS_RELAY_BASE_URL` / `OPENCLAW_APNS_RELAY_TIMEOUT_MS`: тимчасові перевизначення через env для конфігурації relay вище.
-- `OPENCLAW_APNS_RELAY_ALLOW_HTTP=true`: аварійний варіант лише для розробки для loopback HTTP URL-адрес relay. URL-адреси relay у production мають залишатися на HTTPS.
-- `gateway.channelHealthCheckMinutes`: інтервал моніторингу стану каналу в хвилинах. Установіть `0`, щоб глобально вимкнути перезапуски моніторингу стану. Типово: `5`.
-- `gateway.channelStaleEventThresholdMinutes`: поріг застарілого сокета в хвилинах. Це значення має бути більшим або рівним `gateway.channelHealthCheckMinutes`. Типово: `30`.
-- `gateway.channelMaxRestartsPerHour`: максимальна кількість перезапусків моніторингу стану на канал/обліковий запис за ковзну годину. Типово: `10`.
-- `channels.<provider>.healthMonitor.enabled`: вимкнення на рівні каналу для перезапусків моніторингу стану за збереження глобального монітора.
-- `channels.<provider>.accounts.<accountId>.healthMonitor.enabled`: перевизначення на рівні облікового запису для каналів із кількома обліковими записами. Якщо встановлено, має пріоритет над перевизначенням на рівні каналу.
-- Локальні шляхи виклику gateway можуть використовувати `gateway.remote.*` як резервний варіант лише тоді, коли `gateway.auth.*` не встановлено.
-- Якщо `gateway.auth.token` / `gateway.auth.password` явно налаштовано через SecretRef і не розв’язано, розв’язання завершується в закритий бік помилкою (без маскування резервним варіантом remote).
-- `trustedProxies`: IP-адреси reverse proxy, які завершують TLS або вставляють заголовки forwarded-client. Указуйте лише proxy, які ви контролюєте. Записи loopback і далі є чинними для конфігурацій proxy/локального виявлення на тому ж хості (наприклад, Tailscale Serve або локальний reverse proxy), але вони **не** роблять loopback-запити придатними для `gateway.auth.mode: "trusted-proxy"`.
-- `allowRealIpFallback`: коли `true`, gateway приймає `X-Real-IP`, якщо відсутній `X-Forwarded-For`. Типово `false` для поведінки fail-closed.
-- `gateway.nodes.pairing.autoApproveCidrs`: необов’язковий список дозволених CIDR/IP для автоматичного схвалення першого спарювання пристрою Node без запитаних областей доступу. Якщо не встановлено, вимкнено. Це не схвалює автоматично спарювання operator/browser/Control UI/WebChat, а також не схвалює автоматично оновлення ролі, області доступу, метаданих чи публічного ключа.
-- `gateway.nodes.allowCommands` / `gateway.nodes.denyCommands`: глобальне формування дозволу/заборони для оголошених команд вузла після спарювання та оцінювання списку дозволених.
+- Реєстрації через relay делегуються конкретній ідентичності gateway. Спарений застосунок iOS викликає `gateway.identity.get`, включає цю ідентичність у реєстрацію relay і пересилає до gateway дозвіл на надсилання в межах цієї реєстрації. Інший gateway не може повторно використати цю збережену реєстрацію.
+- `OPENCLAW_APNS_RELAY_BASE_URL` / `OPENCLAW_APNS_RELAY_TIMEOUT_MS`: тимчасові перевизначення через змінні середовища для вказаної вище конфігурації relay.
+- `OPENCLAW_APNS_RELAY_ALLOW_HTTP=true`: аварійний варіант лише для розробки, який дозволяє loopback HTTP URL для relay. Промислові URL relay мають залишатися на HTTPS.
+- `gateway.channelHealthCheckMinutes`: інтервал моніторингу стану каналів у хвилинах. Установіть `0`, щоб глобально вимкнути перезапуски монітора стану. Типово: `5`.
+- `gateway.channelStaleEventThresholdMinutes`: поріг застарілого сокета в хвилинах. Зберігайте це значення більшим або рівним `gateway.channelHealthCheckMinutes`. Типово: `30`.
+- `gateway.channelMaxRestartsPerHour`: максимальна кількість перезапусків монітора стану на канал/обліковий запис за ковзну годину. Типово: `10`.
+- `channels.<provider>.healthMonitor.enabled`: відмова від перезапусків монітора стану для окремого каналу зі збереженням увімкненого глобального монітора.
+- `channels.<provider>.accounts.<accountId>.healthMonitor.enabled`: перевизначення на рівні облікового запису для каналів із кількома обліковими записами. Якщо задано, має пріоритет над перевизначенням на рівні каналу.
+- Локальні шляхи виклику gateway можуть використовувати `gateway.remote.*` як резервний варіант лише тоді, коли `gateway.auth.*` не задано.
+- Якщо `gateway.auth.token` / `gateway.auth.password` явно налаштовано через SecretRef і їх не вдалося розв’язати, розв’язання завершується із закритою відмовою (без маскування резервним віддаленим варіантом).
+- `trustedProxies`: IP-адреси reverse proxy, які завершують TLS або вставляють заголовки пересланого клієнта. Указуйте лише proxy, які ви контролюєте. Записи loopback все ще коректні для схем proxy на тому ж хості/локального виявлення (наприклад, Tailscale Serve або локальний reverse proxy), але вони **не** роблять loopback-запити придатними для `gateway.auth.mode: "trusted-proxy"`.
+- `allowRealIpFallback`: коли `true`, gateway приймає `X-Real-IP`, якщо відсутній `X-Forwarded-For`. Типово `false` для fail-closed-поведінки.
+- `gateway.nodes.pairing.autoApproveCidrs`: необов’язковий список дозволених CIDR/IP для автоматичного схвалення першого спарювання пристрою node без запитаних областей доступу. Якщо не задано, вимкнено. Це не схвалює автоматично спарювання operator/browser/Control UI/WebChat і не схвалює автоматично оновлення ролі, області доступу, метаданих або публічного ключа.
+- `gateway.nodes.allowCommands` / `gateway.nodes.denyCommands`: глобальне формування списків дозволу/заборони для оголошених команд node після спарювання та оцінки списку дозволу.
 - `gateway.tools.deny`: додаткові назви інструментів, заблоковані для HTTP `POST /tools/invoke` (розширює типовий список заборон).
-- `gateway.tools.allow`: видаляє назви інструментів із типового списку заборон.
+- `gateway.tools.allow`: вилучає назви інструментів із типового HTTP-списку заборон.
 
 </Accordion>
 
-### OpenAI-сумісні кінцеві точки
+### Кінцеві точки, сумісні з OpenAI
 
 - Chat Completions: типово вимкнено. Увімкніть через `gateway.http.endpoints.chatCompletions.enabled: true`.
-- Responses API: `gateway.http.endpoints.responses.enabled`.
-- Посилення захисту URL-входів Responses:
+- API Responses: `gateway.http.endpoints.responses.enabled`.
+- Посилене захист URL-входу Responses:
   - `gateway.http.endpoints.responses.maxUrlParts`
   - `gateway.http.endpoints.responses.files.urlAllowlist`
   - `gateway.http.endpoints.responses.images.urlAllowlist`
-    Порожні списки дозволених трактуються як невстановлені; використовуйте `gateway.http.endpoints.responses.files.allowUrl=false`
-    та/або `gateway.http.endpoints.responses.images.allowUrl=false`, щоб вимкнути отримання URL.
-- Необов’язковий заголовок посилення захисту відповіді:
-  - `gateway.http.securityHeaders.strictTransportSecurity` (установлюйте лише для HTTPS-джерел, які ви контролюєте; див. [Trusted Proxy Auth](/uk/gateway/trusted-proxy-auth#tls-termination-and-hsts))
+    Порожні списки дозволу трактуються як не задані; використовуйте `gateway.http.endpoints.responses.files.allowUrl=false`
+    і/або `gateway.http.endpoints.responses.images.allowUrl=false`, щоб вимкнути отримання URL.
+- Необов’язковий заголовок посиленого захисту відповіді:
+  - `gateway.http.securityHeaders.strictTransportSecurity` (задавайте лише для HTTPS-origin, які ви контролюєте; див. [Trusted Proxy Auth](/uk/gateway/trusted-proxy-auth#tls-termination-and-hsts))
 
 ### Ізоляція кількох екземплярів
 
@@ -482,10 +482,10 @@ openclaw gateway --port 19001
 ```
 
 - `enabled`: вмикає завершення TLS на слухачі gateway (HTTPS/WSS) (типово: `false`).
-- `autoGenerate`: автоматично генерує локальну самопідписану пару cert/key, коли явні файли не налаштовано; лише для локального/dev використання.
-- `certPath`: шлях файлової системи до файла сертифіката TLS.
-- `keyPath`: шлях файлової системи до файла приватного ключа TLS; обмежуйте доступ правами.
-- `caPath`: необов’язковий шлях до пакета CA для перевірки клієнта або нетипових ланцюжків довіри.
+- `autoGenerate`: автоматично генерує локальну самопідписану пару сертифікат/ключ, якщо явні файли не налаштовано; лише для локального/dev використання.
+- `certPath`: шлях у файловій системі до файлу TLS-сертифіката.
+- `keyPath`: шлях у файловій системі до файлу приватного TLS-ключа; обмежуйте доступ через дозволи.
+- `caPath`: необов’язковий шлях до CA bundle для перевірки клієнтів або нестандартних ланцюжків довіри.
 
 ### `gateway.reload`
 
@@ -502,12 +502,12 @@ openclaw gateway --port 19001
 ```
 
 - `mode`: керує тим, як зміни конфігурації застосовуються під час виконання.
-  - `"off"`: ігнорувати зміни в реальному часі; зміни потребують явного перезапуску.
+  - `"off"`: ігнорувати зміни наживо; зміни вимагають явного перезапуску.
   - `"restart"`: завжди перезапускати процес gateway при зміні конфігурації.
-  - `"hot"`: застосовувати зміни в поточному процесі без перезапуску.
-  - `"hybrid"` (типово): спершу спробувати hot reload; за потреби перейти до перезапуску.
+  - `"hot"`: застосовувати зміни в процесі без перезапуску.
+  - `"hybrid"` (типово): спершу спробувати гаряче перезавантаження; за потреби перейти до перезапуску.
 - `debounceMs`: вікно debounce у мс перед застосуванням змін конфігурації (невід’ємне ціле число).
-- `deferralTimeoutMs`: необов’язковий максимальний час у мс очікування завершення поточних операцій перед примусовим перезапуском. Не вказуйте його або встановіть `0`, щоб чекати необмежено довго й періодично журналювати попередження про те, що очікування ще триває.
+- `deferralTimeoutMs`: необов’язковий максимальний час у мс очікування завершення поточних операцій перед примусовим перезапуском. Не вказуйте його або задайте `0`, щоб чекати необмежено довго й періодично журналювати попередження про те, що ще є незавершені операції.
 
 ---
 
@@ -544,38 +544,38 @@ openclaw gateway --port 19001
 }
 ```
 
-Auth: `Authorization: Bearer <token>` або `x-openclaw-token: <token>`.
-Hook-token у рядку запиту відхиляються.
+Автентифікація: `Authorization: Bearer <token>` або `x-openclaw-token: <token>`.
+Токени hook у рядку запиту відхиляються.
 
 Примітки щодо валідації та безпеки:
 
 - `hooks.enabled=true` вимагає непорожній `hooks.token`.
-- `hooks.token` має **відрізнятися** від `gateway.auth.token`; повторне використання token Gateway відхиляється.
+- `hooks.token` має **відрізнятися** від `gateway.auth.token`; повторне використання токена Gateway відхиляється.
 - `hooks.path` не може бути `/`; використовуйте окремий підшлях, наприклад `/hooks`.
-- Якщо `hooks.allowRequestSessionKey=true`, обмежуйте `hooks.allowedSessionKeyPrefixes` (наприклад `["hook:"]`).
-- Якщо mapping або preset використовує шаблонний `sessionKey`, установіть `hooks.allowedSessionKeyPrefixes` і `hooks.allowRequestSessionKey=true`. Статичні ключі mapping цього дозволу не потребують.
+- Якщо `hooks.allowRequestSessionKey=true`, обмежте `hooks.allowedSessionKeyPrefixes` (наприклад `["hook:"]`).
+- Якщо mapping або preset використовує шаблонізований `sessionKey`, задайте `hooks.allowedSessionKeyPrefixes` і `hooks.allowRequestSessionKey=true`. Статичні ключі mapping цього ввімкнення не потребують.
 
 **Кінцеві точки:**
 
 - `POST /hooks/wake` → `{ text, mode?: "now"|"next-heartbeat" }`
 - `POST /hooks/agent` → `{ message, name?, agentId?, sessionKey?, wakeMode?, deliver?, channel?, to?, model?, thinking?, timeoutSeconds? }`
-  - `sessionKey` із тіла запиту приймається лише тоді, коли `hooks.allowRequestSessionKey=true` (типово: `false`).
+  - `sessionKey` із payload запиту приймається лише тоді, коли `hooks.allowRequestSessionKey=true` (типово: `false`).
 - `POST /hooks/<name>` → розв’язується через `hooks.mappings`
-  - Значення `sessionKey` у mapping, згенеровані шаблоном, вважаються наданими ззовні й також вимагають `hooks.allowRequestSessionKey=true`.
+  - Значення `sessionKey` у mapping, зрендерені з шаблону, вважаються зовнішньо наданими й також вимагають `hooks.allowRequestSessionKey=true`.
 
-<Accordion title="Подробиці mapping">
+<Accordion title="Докладно про mappings">
 
-- `match.path` зіставляється з підшляхом після `/hooks` (наприклад, `/hooks/gmail` → `gmail`).
-- `match.source` зіставляється з полем тіла запиту для загальних шляхів.
-- Шаблони на кшталт `{{messages[0].subject}}` читають дані з тіла запиту.
-- `transform` може вказувати на модуль JS/TS, що повертає дію hook.
-  - `transform.module` має бути відносним шляхом і залишатися в межах `hooks.transformsDir` (абсолютні шляхи та traversal відхиляються).
-- `agentId` маршрутизує до конкретного агента; невідомі ID резервно переходять до типового.
-- `allowedAgentIds`: обмежує явну маршрутизацію (`*` або відсутнє = дозволити всі, `[]` = заборонити всі).
-- `defaultSessionKey`: необов’язковий фіксований ключ сесії для запусків агента hook без явного `sessionKey`.
+- `match.path` зіставляє підшлях після `/hooks` (наприклад, `/hooks/gmail` → `gmail`).
+- `match.source` зіставляє поле payload для загальних шляхів.
+- Шаблони на кшталт `{{messages[0].subject}}` читають дані з payload.
+- `transform` може вказувати на модуль JS/TS, який повертає дію hook.
+  - `transform.module` має бути відносним шляхом і залишатися в межах `hooks.transformsDir` (абсолютні шляхи та вихід за межі каталогу відхиляються).
+- `agentId` маршрутизує до конкретного агента; невідомі ID повертаються до типового.
+- `allowedAgentIds`: обмежує явну маршрутизацію (`*` або пропущено = дозволити все, `[]` = заборонити все).
+- `defaultSessionKey`: необов’язковий фіксований ключ сесії для запусків hook-агента без явного `sessionKey`.
 - `allowRequestSessionKey`: дозволити викликачам `/hooks/agent` і ключам сесії mapping на основі шаблонів установлювати `sessionKey` (типово: `false`).
-- `allowedSessionKeyPrefixes`: необов’язковий список дозволених префіксів для явних значень `sessionKey` (запит + mapping), наприклад `["hook:"]`. Стає обов’язковим, коли будь-який mapping або preset використовує шаблонний `sessionKey`.
-- `deliver: true` надсилає фінальну відповідь у канал; `channel` типово дорівнює `last`.
+- `allowedSessionKeyPrefixes`: необов’язковий список дозволених префіксів для явних значень `sessionKey` (запит + mapping), наприклад `["hook:"]`. Стає обов’язковим, коли будь-який mapping або preset використовує шаблонізований `sessionKey`.
+- `deliver: true` надсилає фінальну відповідь до каналу; `channel` типово має значення `last`.
 - `model` перевизначає LLM для цього запуску hook (має бути дозволено, якщо задано каталог моделей).
 
 </Accordion>
@@ -583,7 +583,7 @@ Hook-token у рядку запиту відхиляються.
 ### Інтеграція Gmail
 
 - Вбудований preset Gmail використовує `sessionKey: "hook:gmail:{{messages[0].id}}"`.
-- Якщо ви зберігаєте цю маршрутизацію для кожного повідомлення, установіть `hooks.allowRequestSessionKey: true` і обмежте `hooks.allowedSessionKeyPrefixes`, щоб вони відповідали простору імен Gmail, наприклад `["hook:", "hook:gmail:"]`.
+- Якщо ви зберігаєте цю маршрутизацію для кожного повідомлення, задайте `hooks.allowRequestSessionKey: true` і обмежте `hooks.allowedSessionKeyPrefixes` так, щоб вони відповідали простору імен Gmail, наприклад `["hook:", "hook:gmail:"]`.
 - Якщо вам потрібне `hooks.allowRequestSessionKey: false`, перевизначте preset статичним `sessionKey` замість шаблонного типового значення.
 
 ```json5
@@ -612,7 +612,7 @@ Hook-token у рядку запиту відхиляються.
 
 ---
 
-## Хост Canvas
+## Canvas host
 
 ```json5
 {
@@ -624,17 +624,17 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- Обслуговує HTML/CSS/JS, які редагує агент, і A2UI через HTTP під портом Gateway:
+- Обслуговує HTML/CSS/JS і A2UI, які агент може редагувати, через HTTP на порту Gateway:
   - `http://<gateway-host>:<gateway.port>/__openclaw__/canvas/`
   - `http://<gateway-host>:<gateway.port>/__openclaw__/a2ui/`
 - Лише локально: зберігайте `gateway.bind: "loopback"` (типово).
-- Bind не-loopback: маршрути canvas вимагають auth Gateway (token/password/trusted-proxy), як і інші HTTP-поверхні Gateway.
-- Node WebView зазвичай не надсилають заголовки auth; після спарювання та підключення вузла Gateway рекламує URL-адреси можливостей із областю Node для доступу до canvas/A2UI.
-- URL-адреси можливостей прив’язані до активної WS-сесії вузла й швидко спливають. Резервний варіант на основі IP не використовується.
-- Вставляє клієнт live reload у обслуговуваний HTML.
-- Автоматично створює стартовий `index.html`, якщо каталог порожній.
+- Для не-loopback bind: маршрути canvas вимагають автентифікації Gateway (token/password/trusted-proxy), так само як і інші HTTP-поверхні Gateway.
+- Node WebView зазвичай не надсилають заголовки автентифікації; після спарювання та підключення node Gateway рекламує URL можливостей у межах node-сеансу для доступу до canvas/A2UI.
+- URL можливостей прив’язані до активної WS-сесії node і швидко спливають. Резервний варіант на основі IP не використовується.
+- Впроваджує клієнт live-reload у HTML, що віддається.
+- Автоматично створює початковий `index.html`, якщо каталог порожній.
 - Також обслуговує A2UI за адресою `/__openclaw__/a2ui/`.
-- Зміни потребують перезапуску gateway.
+- Зміни вимагають перезапуску gateway.
 - Вимкніть live reload для великих каталогів або при помилках `EMFILE`.
 
 ---
@@ -653,9 +653,9 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `minimal` (типово): не включає `cliPath` + `sshPort` із TXT-записів.
+- `minimal` (типово): пропускає `cliPath` + `sshPort` із TXT-записів.
 - `full`: включає `cliPath` + `sshPort`.
-- Ім’я хоста типово `openclaw`. Перевизначається через `OPENCLAW_MDNS_HOSTNAME`.
+- Типове ім’я хоста — `openclaw`. Перевизначайте через `OPENCLAW_MDNS_HOSTNAME`.
 
 ### Wide-area (DNS-SD)
 
@@ -675,7 +675,7 @@ Hook-token у рядку запиту відхиляються.
 
 ## Середовище
 
-### `env` (вбудовані env-змінні)
+### `env` (вбудовані змінні середовища)
 
 ```json5
 {
@@ -692,14 +692,14 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- Вбудовані env-змінні застосовуються лише тоді, коли у середовищі процесу бракує цього ключа.
-- Файли `.env`: `.env` у CWD + `~/.openclaw/.env` (жоден із них не перевизначає наявні змінні).
+- Вбудовані змінні середовища застосовуються лише тоді, коли в середовищі процесу відсутній цей ключ.
+- Файли `.env`: `.env` поточного робочого каталогу + `~/.openclaw/.env` (жоден із них не перевизначає наявні змінні).
 - `shellEnv`: імпортує відсутні очікувані ключі з профілю вашої оболонки входу.
-- Див. [Environment](/uk/help/environment) для повного пріоритету.
+- Повний порядок пріоритету див. у [Environment](/uk/help/environment).
 
-### Підстановка env-змінних
+### Підстановка змінних середовища
 
-Посилайтеся на env-змінні в будь-якому рядку конфігурації через `${VAR_NAME}`:
+Посилайтеся на змінні середовища в будь-якому рядку конфігурації через `${VAR_NAME}`:
 
 ```json5
 {
@@ -718,7 +718,7 @@ Hook-token у рядку запиту відхиляються.
 
 ## Секрети
 
-Посилання на секрети є адитивними: прості текстові значення й надалі працюють.
+Посилання на секрети є адитивними: значення відкритим текстом також продовжують працювати.
 
 ### `SecretRef`
 
@@ -734,13 +734,13 @@ Hook-token у рядку запиту відхиляються.
 - шаблон `id` для `source: "env"`: `^[A-Z][A-Z0-9_]{0,127}$`
 - `id` для `source: "file"`: абсолютний JSON pointer (наприклад `"/providers/openai/apiKey"`)
 - шаблон `id` для `source: "exec"`: `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$`
-- `id` для `source: "exec"` не повинні містити сегменти шляху `.` або `..`, розділені символом `/` (наприклад, `a/../b` відхиляється)
+- `id` для `source: "exec"` не повинні містити сегменти шляху `.` або `..`, розділені `/` (наприклад, `a/../b` відхиляється)
 
 ### Підтримувана поверхня облікових даних
 
-- Канонічна матриця: [Поверхня облікових даних SecretRef](/uk/reference/secretref-credential-surface)
+- Канонічна матриця: [SecretRef Credential Surface](/uk/reference/secretref-credential-surface)
 - `secrets apply` націлюється на підтримувані шляхи облікових даних у `openclaw.json`.
-- Посилання в `auth-profiles.json` входять до розв’язання під час виконання та покриття аудиту.
+- Посилання в `auth-profiles.json` включені в runtime-розв’язання та охоплення аудиту.
 
 ### Конфігурація провайдерів секретів
 
@@ -772,18 +772,18 @@ Hook-token у рядку запиту відхиляються.
 
 Примітки:
 
-- Провайдер `file` підтримує `mode: "json"` і `mode: "singleValue"` (у режимі singleValue `id` має бути `"value"`).
-- Шляхи провайдерів file і exec завершуються в закритий бік помилкою, коли перевірка Windows ACL недоступна. Установлюйте `allowInsecurePath: true` лише для довірених шляхів, які неможливо перевірити.
+- Провайдер `file` підтримує `mode: "json"` і `mode: "singleValue"` (у режимі singleValue значення `id` має бути `"value"`).
+- Шляхи провайдерів file і exec завершуються закритою відмовою, якщо перевірка Windows ACL недоступна. Установлюйте `allowInsecurePath: true` лише для довірених шляхів, які неможливо перевірити.
 - Провайдер `exec` вимагає абсолютний шлях `command` і використовує корисні навантаження протоколу через stdin/stdout.
-- Типово шляхи команд-символічних посилань відхиляються. Установіть `allowSymlinkCommand: true`, щоб дозволити шляхи-символічні посилання з перевіркою шляху до фактично розв’язаного цільового файла.
-- Якщо налаштовано `trustedDirs`, перевірка довірених каталогів застосовується до шляху розв’язаного цільового файла.
+- Типово символьні шляхи command відхиляються. Установіть `allowSymlinkCommand: true`, щоб дозволити шляхи-символічні посилання, водночас перевіряючи розв’язаний цільовий шлях.
+- Якщо налаштовано `trustedDirs`, перевірка довірених каталогів застосовується до розв’язаного цільового шляху.
 - Дочірнє середовище `exec` типово мінімальне; явно передавайте потрібні змінні через `passEnv`.
-- Посилання на секрети розв’язуються під час активації у знімок у пам’яті, а далі шляхи запитів читають лише цей знімок.
-- Під час активації застосовується фільтрація активної поверхні: нерозв’язані посилання на увімкнених поверхнях спричиняють помилку запуску/перезавантаження, тоді як неактивні поверхні пропускаються з діагностикою.
+- Посилання на секрети розв’язуються під час активації в знімок у пам’яті, після чого шляхи запитів читають лише цей знімок.
+- Фільтрація активної поверхні застосовується під час активації: нерозв’язані посилання на увімкнених поверхнях призводять до помилки запуску/перезавантаження, тоді як неактивні поверхні пропускаються з діагностикою.
 
 ---
 
-## Сховище auth
+## Сховище автентифікації
 
 ```json5
 {
@@ -802,12 +802,12 @@ Hook-token у рядку запиту відхиляються.
 ```
 
 - Профілі для кожного агента зберігаються в `<agentDir>/auth-profiles.json`.
-- `auth-profiles.json` підтримує посилання на рівні значень (`keyRef` для `api_key`, `tokenRef` для `token`) для статичних режимів облікових даних.
-- Профілі в режимі OAuth (`auth.profiles.<id>.mode = "oauth"`) не підтримують облікові дані профілю auth на базі SecretRef.
-- Статичні облікові дані runtime надходять із розв’язаних знімків у пам’яті; застарілі статичні записи `auth.json` очищуються, коли їх виявлено.
+- `auth-profiles.json` підтримує посилання на рівні значень (`keyRef` для `api_key`, `tokenRef` для `token`) для режимів статичних облікових даних.
+- Профілі в режимі OAuth (`auth.profiles.<id>.mode = "oauth"`) не підтримують облікові дані auth-profile на основі SecretRef.
+- Статичні runtime-облікові дані надходять із розв’язаних знімків у пам’яті; застарілі статичні записи `auth.json` очищаються під час виявлення.
 - Імпорт застарілого OAuth виконується з `~/.openclaw/credentials/oauth.json`.
 - Див. [OAuth](/uk/concepts/oauth).
-- Поведінка runtime для секретів та інструменти `audit/configure/apply`: [Керування секретами](/uk/gateway/secrets).
+- Поведінка runtime для секретів та інструменти `audit/configure/apply`: [Secrets Management](/uk/gateway/secrets).
 
 ### `auth.cooldowns`
 
@@ -829,20 +829,20 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `billingBackoffHours`: базовий backoff у годинах, коли профіль зазнає помилки через справжні
-  помилки billing/недостатнього кредиту (типово: `5`). Явний текст billing усе ще
-  може потрапити сюди навіть для відповідей `401`/`403`, але текстові
-  зіставлювачі, специфічні для провайдера, залишаються обмеженими провайдером, якому вони належать (наприклад, OpenRouter
-  `Key limit exceeded`). Повторювані `402` usage-window або
-  повідомлення про ліміт витрат організації/робочого простору натомість залишаються в шляху `rate_limit`.
-- `billingBackoffHoursByProvider`: необов’язкові перевизначення годин backoff billing для кожного провайдера.
-- `billingMaxHours`: обмеження в годинах для експоненційного зростання backoff billing (типово: `24`).
-- `authPermanentBackoffMinutes`: базовий backoff у хвилинах для помилок `auth_permanent` з високою впевненістю (типово: `10`).
-- `authPermanentMaxMinutes`: обмеження в хвилинах для зростання backoff `auth_permanent` (типово: `60`).
-- `failureWindowHours`: ковзне вікно в годинах, яке використовується для лічильників backoff (типово: `24`).
-- `overloadedProfileRotations`: максимальна кількість ротацій auth-профілю в межах того самого провайдера для помилок перевантаження перед перемиканням на резервну модель (типово: `1`). Сюди потрапляють форми на кшталт `ModelNotReadyException`, коли провайдер зайнятий.
+- `billingBackoffHours`: базова затримка повторної спроби в годинах, коли профіль завершується помилкою через справжні помилки білінгу/недостатнього кредиту (типово: `5`). Явний текст про білінг
+  усе ще може потрапляти сюди навіть для відповідей `401`/`403`, але
+  зіставлення тексту, специфічного для провайдера, залишається обмеженим тим провайдером,
+  якому воно належить (наприклад, OpenRouter
+  `Key limit exceeded`). Повторювані повідомлення HTTP `402` про вікно використання або
+  ліміт витрат організації/робочого простору натомість залишаються в гілці `rate_limit`.
+- `billingBackoffHoursByProvider`: необов’язкові перевизначення годин затримки для білінгу на рівні провайдера.
+- `billingMaxHours`: верхня межа в годинах для експоненційного зростання затримки білінгу (типово: `24`).
+- `authPermanentBackoffMinutes`: базова затримка в хвилинах для збоїв `auth_permanent` із високою впевненістю (типово: `10`).
+- `authPermanentMaxMinutes`: верхня межа в хвилинах для зростання затримки `auth_permanent` (типово: `60`).
+- `failureWindowHours`: ковзне вікно в годинах, що використовується для лічильників затримки (типово: `24`).
+- `overloadedProfileRotations`: максимальна кількість ротацій auth-profile того самого провайдера для помилок перевантаження перед переходом до резервної моделі (типово: `1`). Такі форми зайнятості провайдера, як `ModelNotReadyException`, потрапляють сюди.
 - `overloadedBackoffMs`: фіксована затримка перед повторною спробою ротації перевантаженого провайдера/профілю (типово: `0`).
-- `rateLimitedProfileRotations`: максимальна кількість ротацій auth-профілю в межах того самого провайдера для помилок обмеження частоти перед перемиканням на резервну модель (типово: `1`). Цей кошик обмеження частоти включає текстові форми провайдерів, як-от `Too many concurrent requests`, `ThrottlingException`, `concurrency limit reached`, `workers_ai ... quota limit exceeded` і `resource exhausted`.
+- `rateLimitedProfileRotations`: максимальна кількість ротацій auth-profile того самого провайдера для помилок обмеження швидкості перед переходом до резервної моделі (типово: `1`). Цей кошик rate-limit включає сформульований провайдером текст, такий як `Too many concurrent requests`, `ThrottlingException`, `concurrency limit reached`, `workers_ai ... quota limit exceeded` і `resource exhausted`.
 
 ---
 
@@ -863,9 +863,9 @@ Hook-token у рядку запиту відхиляються.
 
 - Типовий файл журналу: `/tmp/openclaw/openclaw-YYYY-MM-DD.log`.
 - Установіть `logging.file` для стабільного шляху.
-- `consoleLevel` підвищується до `debug` з `--verbose`.
-- `maxFileBytes`: максимальний розмір активного файла журналу в байтах перед ротацією (додатне ціле число; типово: `104857600` = 100 MB). OpenClaw зберігає до п’яти нумерованих архівів поруч з активним файлом.
-- `redactSensitive` / `redactPatterns`: маскування за принципом best-effort для виводу в консоль, файлів журналу, записів журналу OTLP і збереженого тексту транскрипту сесії.
+- `consoleLevel` підвищується до `debug`, коли використано `--verbose`.
+- `maxFileBytes`: максимальний розмір активного файлу журналу в байтах перед ротацією (додатне ціле число; типово: `104857600` = 100 MB). OpenClaw зберігає до п’яти нумерованих архівів поруч з активним файлом.
+- `redactSensitive` / `redactPatterns`: маскування за принципом best-effort для виводу в консоль, файлів журналів, записів журналів OTLP і збереженого тексту транскриптів сесій.
 
 ---
 
@@ -914,23 +914,23 @@ Hook-token у рядку запиту відхиляються.
 ```
 
 - `enabled`: головний перемикач для виводу інструментування (типово: `true`).
-- `flags`: масив рядків-прапорців, що вмикають цільовий вивід журналу (підтримує шаблони з підстановками, як-от `"telegram.*"` або `"*"`).
+- `flags`: масив рядків-прапорців, що вмикають цільовий вивід журналів (підтримує шаблони з підстановками, як-от `"telegram.*"` або `"*"`).
 - `stuckSessionWarnMs`: поріг віку в мс для виведення попереджень про завислі сесії, поки сесія залишається в стані обробки.
 - `otel.enabled`: вмикає конвеєр експорту OpenTelemetry (типово: `false`). Повну конфігурацію, каталог сигналів і модель конфіденційності див. у [OpenTelemetry export](/uk/gateway/opentelemetry).
 - `otel.endpoint`: URL колектора для експорту OTel.
-- `otel.tracesEndpoint` / `otel.metricsEndpoint` / `otel.logsEndpoint`: необов’язкові кінцеві точки OTLP для конкретних сигналів. Якщо встановлено, вони перевизначають `otel.endpoint` лише для відповідного сигналу.
+- `otel.tracesEndpoint` / `otel.metricsEndpoint` / `otel.logsEndpoint`: необов’язкові специфічні для сигналу кінцеві точки OTLP. Якщо задано, вони перевизначають `otel.endpoint` лише для цього сигналу.
 - `otel.protocol`: `"http/protobuf"` (типово) або `"grpc"`.
-- `otel.headers`: додаткові заголовки метаданих HTTP/gRPC, що надсилаються із запитами експорту OTel.
+- `otel.headers`: додаткові заголовки метаданих HTTP/gRPC, що надсилаються разом із запитами експорту OTel.
 - `otel.serviceName`: назва служби для атрибутів ресурсу.
 - `otel.traces` / `otel.metrics` / `otel.logs`: увімкнути експорт trace, metrics або logs.
 - `otel.sampleRate`: частота семплювання trace `0`–`1`.
 - `otel.flushIntervalMs`: інтервал періодичного скидання телеметрії в мс.
-- `otel.captureContent`: добровільне захоплення сирого вмісту для атрибутів span OTEL. Типово вимкнено. Булеве значення `true` захоплює вміст повідомлень/інструментів, крім system; форма об’єкта дозволяє явно ввімкнути `inputMessages`, `outputMessages`, `toolInputs`, `toolOutputs` і `systemPrompt`.
-- `OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental`: перемикач середовища для найновіших експериментальних атрибутів провайдера span GenAI. Типово span зберігають застарілий атрибут `gen_ai.system` для сумісності; метрики GenAI використовують обмежені семантичні атрибути.
-- `OPENCLAW_OTEL_PRELOADED=1`: перемикач середовища для хостів, які вже зареєстрували глобальний SDK OpenTelemetry. Тоді OpenClaw пропускає запуск/завершення SDK, що належить Plugin, зберігаючи активні діагностичні слухачі.
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` і `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`: env-змінні кінцевих точок для конкретних сигналів, що використовуються, коли відповідний ключ конфігурації не встановлено.
+- `otel.captureContent`: опціональне захоплення сирого вмісту для атрибутів span OTEL. Типово вимкнено. Булеве значення `true` захоплює вміст повідомлень/інструментів, крім системного; форма об’єкта дозволяє явно ввімкнути `inputMessages`, `outputMessages`, `toolInputs`, `toolOutputs` і `systemPrompt`.
+- `OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental`: перемикач середовища для найновіших експериментальних атрибутів провайдера span GenAI. Типово spans зберігають застарілий атрибут `gen_ai.system` для сумісності; метрики GenAI використовують обмежені семантичні атрибути.
+- `OPENCLAW_OTEL_PRELOADED=1`: перемикач середовища для хостів, які вже зареєстрували глобальний SDK OpenTelemetry. Тоді OpenClaw пропускає запуск/завершення SDK, яким володіє plugin, зберігаючи активними слухачі діагностики.
+- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` і `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT`: специфічні для сигналу змінні середовища кінцевих точок, що використовуються, коли відповідний ключ конфігурації не задано.
 - `cacheTrace.enabled`: журналювати знімки trace кешу для вбудованих запусків (типово: `false`).
-- `cacheTrace.filePath`: шлях виводу для JSONL trace кешу (типово: `$OPENCLAW_STATE_DIR/logs/cache-trace.jsonl`).
+- `cacheTrace.filePath`: вихідний шлях для JSONL trace кешу (типово: `$OPENCLAW_STATE_DIR/logs/cache-trace.jsonl`).
 - `cacheTrace.includeMessages` / `includePrompt` / `includeSystem`: керують тим, що включається у вивід trace кешу (усі типово: `true`).
 
 ---
@@ -953,12 +953,12 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `channel`: канал випуску для інсталяцій npm/git — `"stable"`, `"beta"` або `"dev"`.
-- `checkOnStart`: перевіряти оновлення npm під час запуску gateway (типово: `true`).
-- `auto.enabled`: увімкнути фонове автооновлення для пакетних інсталяцій (типово: `false`).
-- `auto.stableDelayHours`: мінімальна затримка в годинах перед автоматичним застосуванням на каналі stable (типово: `6`; максимум: `168`).
-- `auto.stableJitterHours`: додаткове вікно розподілу розгортання каналу stable в годинах (типово: `12`; максимум: `168`).
-- `auto.betaCheckIntervalHours`: як часто виконуються перевірки каналу beta в годинах (типово: `1`; максимум: `24`).
+- `channel`: канал релізу для встановлень npm/git — `"stable"`, `"beta"` або `"dev"`.
+- `checkOnStart`: перевіряти наявність оновлень npm під час запуску gateway (типово: `true`).
+- `auto.enabled`: увімкнути фонове автооновлення для встановлень пакетів (типово: `false`).
+- `auto.stableDelayHours`: мінімальна затримка в годинах перед автоматичним застосуванням для stable-каналу (типово: `6`; максимум: `168`).
+- `auto.stableJitterHours`: додаткове вікно розподілу rollout для stable-каналу в годинах (типово: `12`; максимум: `168`).
+- `auto.betaCheckIntervalHours`: як часто виконуються перевірки beta-каналу, у годинах (типово: `1`; максимум: `24`).
 
 ---
 
@@ -991,23 +991,23 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `enabled`: глобальний перемикач можливостей ACP (типово: `true`; установіть `false`, щоб приховати affordances dispatch і spawn ACP).
-- `dispatch.enabled`: незалежний перемикач для dispatch ходів сесії ACP (типово: `true`). Установіть `false`, щоб залишити доступними команди ACP, але заблокувати виконання.
-- `backend`: ідентифікатор типового backend runtime ACP (має відповідати зареєстрованому Plugin runtime ACP).
-  Якщо встановлено `plugins.allow`, включіть ідентифікатор plugin backend (наприклад `acpx`), інакше bundled типовий plugin не завантажиться.
-- `defaultAgent`: резервний ідентифікатор цільового агента ACP, коли spawn не вказує явну ціль.
-- `allowedAgents`: список дозволених ідентифікаторів агентів для сесій runtime ACP; порожній означає відсутність додаткових обмежень.
+- `enabled`: глобальний прапорець функції ACP (типово: `true`; задайте `false`, щоб приховати можливості dispatch і spawn ACP).
+- `dispatch.enabled`: незалежний прапорець для dispatch ходів сесії ACP (типово: `true`). Задайте `false`, щоб залишити команди ACP доступними, але заблокувати виконання.
+- `backend`: ідентифікатор типового runtime backend ACP (має відповідати зареєстрованому runtime plugin ACP).
+  Якщо задано `plugins.allow`, включіть ідентифікатор backend plugin (наприклад `acpx`), інакше bundled plugin за замовчуванням не завантажиться.
+- `defaultAgent`: резервний ідентифікатор цільового агента ACP, коли spawn не задають явну ціль.
+- `allowedAgents`: список дозволених ідентифікаторів агентів для runtime-сесій ACP; порожній означає відсутність додаткових обмежень.
 - `maxConcurrentSessions`: максимальна кількість одночасно активних сесій ACP.
-- `stream.coalesceIdleMs`: вікно idle-flush у мс для потокового тексту.
-- `stream.maxChunkChars`: максимальний розмір фрагмента перед розбиттям проєкції потокового блока.
-- `stream.repeatSuppression`: пригнічувати повторювані рядки стану/інструментів на кожному ході (типово: `true`).
-- `stream.deliveryMode`: `"live"` передає потік поступово; `"final_only"` буферизує до термінальних подій ходу.
-- `stream.hiddenBoundarySeparator`: роздільник перед видимим текстом після прихованих подій інструмента (типово: `"paragraph"`).
-- `stream.maxOutputChars`: максимальна кількість символів виводу помічника, що проєктується на хід ACP.
-- `stream.maxSessionUpdateChars`: максимальна кількість символів для проєктованих рядків стану/оновлення ACP.
-- `stream.tagVisibility`: запис назв тегів у перевизначення видимості подій потоків у форматі boolean.
-- `runtime.ttlMinutes`: idle TTL у хвилинах для воркерів сесій ACP до моменту, коли їх можна очищати.
-- `runtime.installCommand`: необов’язкова команда встановлення, яку слід виконати під час початкового налаштування середовища runtime ACP.
+- `stream.coalesceIdleMs`: вікно idle flush у мс для потокового тексту.
+- `stream.maxChunkChars`: максимальний розмір чанка перед розбиттям проєкції потокового блоку.
+- `stream.repeatSuppression`: придушувати повторювані рядки статусу/інструментів на хід (типово: `true`).
+- `stream.deliveryMode`: `"live"` передає потоково поступово; `"final_only"` буферизує до термінальних подій ходу.
+- `stream.hiddenBoundarySeparator`: роздільник перед видимим текстом після прихованих подій інструментів (типово: `"paragraph"`).
+- `stream.maxOutputChars`: максимальна кількість символів виводу асистента, що проєктується на хід ACP.
+- `stream.maxSessionUpdateChars`: максимальна кількість символів для проєктованих рядків статусу/оновлення ACP.
+- `stream.tagVisibility`: запис назв тегів у булеві перевизначення видимості для потокових подій.
+- `runtime.ttlMinutes`: idle TTL у хвилинах для worker сесій ACP до можливості очищення.
+- `runtime.installCommand`: необов’язкова команда встановлення для запуску під час bootstrap середовища runtime ACP.
 
 ---
 
@@ -1023,17 +1023,17 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `cli.banner.taglineMode` керує стилем слогана банера:
-  - `"random"` (типово): змінні кумедні/сезонні слогани.
+- `cli.banner.taglineMode` керує стилем слогана в банері:
+  - `"random"` (типово): ротаційні кумедні/сезонні слогани.
   - `"default"`: фіксований нейтральний слоган (`Усі ваші чати, один OpenClaw.`).
-  - `"off"`: без тексту слогана (заголовок/версія банера все одно показуються).
-- Щоб приховати весь банер (а не лише слогани), установіть env `OPENCLAW_HIDE_BANNER=1`.
+  - `"off"`: без тексту слогана (назва/версія банера все одно показуються).
+- Щоб приховати весь банер (а не лише слогани), задайте змінну середовища `OPENCLAW_HIDE_BANNER=1`.
 
 ---
 
 ## Wizard
 
-Метадані, які записуються потоками керованого налаштування CLI (`onboard`, `configure`, `doctor`):
+Метадані, які записують потоки керованого налаштування CLI (`onboard`, `configure`, `doctor`):
 
 ```json5
 {
@@ -1049,15 +1049,15 @@ Hook-token у рядку запиту відхиляються.
 
 ---
 
-## Identity
+## Ідентичність
 
-Див. поля identity у `agents.list` в розділі [Типові значення агента](/uk/gateway/config-agents#agent-defaults).
+Див. поля ідентичності `agents.list` у розділі [Agent defaults](/uk/gateway/config-agents#agent-defaults).
 
 ---
 
 ## Bridge (застарілий, вилучений)
 
-Поточні збірки більше не містять TCP bridge. Nodes підключаються через Gateway WebSocket. Ключі `bridge.*` більше не є частиною схеми конфігурації (валідація завершується помилкою, доки їх не буде вилучено; `openclaw doctor --fix` може прибрати невідомі ключі).
+Поточні збірки більше не містять TCP bridge. Nodes підключаються через Gateway WebSocket. Ключі `bridge.*` більше не входять до схеми конфігурації (валідація завершується помилкою, доки їх не буде видалено; `openclaw doctor --fix` може прибрати невідомі ключі).
 
 <Accordion title="Застаріла конфігурація bridge (історична довідка)">
 
@@ -1085,7 +1085,7 @@ Hook-token у рядку запиту відхиляються.
 {
   cron: {
     enabled: true,
-    maxConcurrentRuns: 2,
+    maxConcurrentRuns: 2, // cron dispatch + isolated cron agent-turn execution
     webhook: "https://example.invalid/legacy", // deprecated fallback for stored notify:true jobs
     webhookToken: "replace-with-dedicated-token", // optional bearer token for outbound webhook auth
     sessionRetention: "24h", // duration string or false
@@ -1097,11 +1097,11 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `sessionRetention`: як довго зберігати завершені ізольовані сесії запусків cron перед очищенням із `sessions.json`. Також керує очищенням архівованих видалених транскриптів cron. Типово: `24h`; установіть `false`, щоб вимкнути.
-- `runLog.maxBytes`: максимальний розмір файла журналу на запуск (`cron/runs/<jobId>.jsonl`) перед очищенням. Типово: `2_000_000` байт.
-- `runLog.keepLines`: кількість найновіших рядків, що зберігаються при спрацюванні очищення журналу запуску. Типово: `2000`.
-- `webhookToken`: bearer-token, що використовується для доставки POST cron Webhook (`delivery.mode = "webhook"`); якщо не вказано, заголовок auth не надсилається.
-- `webhook`: застаріла резервна URL-адреса Webhook (http/https), що використовується лише для збережених завдань, які все ще мають `notify: true`.
+- `sessionRetention`: як довго зберігати завершені ізольовані сесії запуску Cron перед очищенням із `sessions.json`. Також керує очищенням архівованих видалених транскриптів Cron. Типово: `24h`; задайте `false`, щоб вимкнути.
+- `runLog.maxBytes`: максимальний розмір файла журналу на запуск (`cron/runs/<jobId>.jsonl`) перед очищенням. Типово: `2_000_000` байтів.
+- `runLog.keepLines`: найновіші рядки, які зберігаються, коли запускається очищення журналу. Типово: `2000`.
+- `webhookToken`: bearer-токен, що використовується для POST-доставки webhook Cron (`delivery.mode = "webhook"`); якщо його пропущено, заголовок автентифікації не надсилається.
+- `webhook`: застарілий резервний URL webhook (http/https), що використовується лише для збережених завдань, які все ще мають `notify: true`.
 
 ### `cron.retry`
 
@@ -1118,10 +1118,10 @@ Hook-token у рядку запиту відхиляються.
 ```
 
 - `maxAttempts`: максимальна кількість повторних спроб для одноразових завдань при тимчасових помилках (типово: `3`; діапазон: `0`–`10`).
-- `backoffMs`: масив затримок backoff у мс для кожної повторної спроби (типово: `[30000, 60000, 300000]`; 1–10 записів).
-- `retryOn`: типи помилок, які запускають повторні спроби — `"rate_limit"`, `"overloaded"`, `"network"`, `"timeout"`, `"server_error"`. Не вказуйте, щоб повторювати всі тимчасові типи.
+- `backoffMs`: масив затримок повторної спроби в мс для кожної повторної спроби (типово: `[30000, 60000, 300000]`; 1–10 записів).
+- `retryOn`: типи помилок, що запускають повторні спроби — `"rate_limit"`, `"overloaded"`, `"network"`, `"timeout"`, `"server_error"`. Пропустіть, щоб повторювати всі тимчасові типи.
 
-Застосовується лише до одноразових завдань cron. Для повторюваних завдань використовується окрема обробка помилок.
+Застосовується лише до одноразових завдань Cron. Для повторюваних завдань використовується окрема обробка помилок.
 
 ### `cron.failureAlert`
 
@@ -1132,6 +1132,7 @@ Hook-token у рядку запиту відхиляються.
       enabled: false,
       after: 3,
       cooldownMs: 3600000,
+      includeSkipped: false,
       mode: "announce",
       accountId: "main",
     },
@@ -1139,11 +1140,12 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- `enabled`: увімкнути сповіщення про помилки для завдань cron (типово: `false`).
-- `after`: кількість послідовних помилок перед спрацюванням сповіщення (додатне ціле число, мінімум: `1`).
+- `enabled`: увімкнути сповіщення про збої для завдань Cron (типово: `false`).
+- `after`: кількість послідовних збоїв перед спрацьовуванням сповіщення (додатне ціле число, мін.: `1`).
 - `cooldownMs`: мінімальна кількість мілісекунд між повторними сповіщеннями для того самого завдання (невід’ємне ціле число).
-- `mode`: режим доставки — `"announce"` надсилає через повідомлення каналу; `"webhook"` надсилає POST на налаштований Webhook.
-- `accountId`: необов’язковий ідентифікатор облікового запису або каналу для обмеження доставки сповіщення.
+- `includeSkipped`: зараховувати послідовні пропущені запуски до порога сповіщення (типово: `false`). Пропущені запуски відстежуються окремо й не впливають на затримку при помилках виконання.
+- `mode`: режим доставки — `"announce"` надсилає через повідомлення каналу; `"webhook"` виконує POST до налаштованого webhook.
+- `accountId`: необов’язковий ідентифікатор облікового запису або каналу для обмеження доставки сповіщень.
 
 ### `cron.failureDestination`
 
@@ -1160,16 +1162,16 @@ Hook-token у рядку запиту відхиляються.
 }
 ```
 
-- Типовий пункт призначення для сповіщень про помилки cron у всіх завданнях.
-- `mode`: `"announce"` або `"webhook"`; типово `"announce"`, коли достатньо даних цілі.
-- `channel`: перевизначення каналу для доставки announce. `"last"` повторно використовує останній відомий канал доставки.
-- `to`: явна ціль announce або URL-адреса Webhook. Обов’язково для режиму webhook.
+- Типове місце призначення для сповіщень про збої Cron для всіх завдань.
+- `mode`: `"announce"` або `"webhook"`; типово `"announce"`, коли є достатньо цільових даних.
+- `channel`: перевизначення каналу для announce-доставки. `"last"` повторно використовує останній відомий канал доставки.
+- `to`: явна ціль announce або URL webhook. Обов’язкове для режиму webhook.
 - `accountId`: необов’язкове перевизначення облікового запису для доставки.
-- `delivery.failureDestination` для окремого завдання перевизначає це глобальне значення.
-- Коли не встановлено ні глобальний, ні окремий пункт призначення для помилок, завдання, які вже доставляють через `announce`, при помилці резервно використовують цю основну ціль announce.
+- `delivery.failureDestination` на рівні завдання перевизначає це глобальне типове значення.
+- Коли не задано ні глобальне, ні для конкретного завдання місце призначення при збої, завдання, які вже доставляють через `announce`, при збої повертаються до цієї основної цілі announce.
 - `delivery.failureDestination` підтримується лише для завдань `sessionTarget="isolated"`, якщо тільки основний `delivery.mode` завдання не дорівнює `"webhook"`.
 
-Див. [Cron Jobs](/uk/automation/cron-jobs). Ізольовані виконання cron відстежуються як [фонові завдання](/uk/automation/tasks).
+Див. [Cron Jobs](/uk/automation/cron-jobs). Ізольовані виконання Cron відстежуються як [background tasks](/uk/automation/tasks).
 
 ---
 
@@ -1179,23 +1181,23 @@ Hook-token у рядку запиту відхиляються.
 
 | Змінна             | Опис                                              |
 | ------------------ | ------------------------------------------------- |
-| `{{Body}}`         | Повний вхідний текст повідомлення                 |
-| `{{RawBody}}`      | Сире тіло повідомлення (без обгорток історії/відправника) |
-| `{{BodyStripped}}` | Тіло повідомлення без згадок групи                |
+| `{{Body}}`         | Повний текст вхідного повідомлення                |
+| `{{RawBody}}`      | Сирий текст (без обгорток історії/відправника)    |
+| `{{BodyStripped}}` | Текст без згадок у групі                          |
 | `{{From}}`         | Ідентифікатор відправника                         |
-| `{{To}}`           | Ідентифікатор одержувача                          |
+| `{{To}}`           | Ідентифікатор призначення                         |
 | `{{MessageSid}}`   | Ідентифікатор повідомлення каналу                 |
 | `{{SessionId}}`    | UUID поточної сесії                               |
-| `{{IsNewSession}}` | `"true"`, якщо створено нову сесію                |
+| `{{IsNewSession}}` | `"true"`, коли створено нову сесію                |
 | `{{MediaUrl}}`     | Псевдо-URL вхідного медіа                         |
 | `{{MediaPath}}`    | Локальний шлях до медіа                           |
-| `{{MediaType}}`    | Тип медіа (image/audio/document/…)                |
+| `{{MediaType}}`    | Тип медіа (зображення/аудіо/документ/…)           |
 | `{{Transcript}}`   | Аудіотранскрипт                                   |
 | `{{Prompt}}`       | Розв’язаний медіа-prompt для записів CLI          |
-| `{{MaxChars}}`     | Розв’язаний максимум символів виводу для записів CLI |
+| `{{MaxChars}}`     | Розв’язана макс. кількість символів виводу для записів CLI |
 | `{{ChatType}}`     | `"direct"` або `"group"`                          |
-| `{{GroupSubject}}` | Тема групи (best effort)                          |
-| `{{GroupMembers}}` | Попередній перегляд учасників групи (best effort) |
+| `{{GroupSubject}}` | Назва групи (best effort)                         |
+| `{{GroupMembers}}` | Попередній список учасників групи (best effort)   |
 | `{{SenderName}}`   | Відображуване ім’я відправника (best effort)      |
 | `{{SenderE164}}`   | Номер телефону відправника (best effort)          |
 | `{{Provider}}`     | Підказка провайдера (whatsapp, telegram, discord тощо) |
@@ -1204,7 +1206,7 @@ Hook-token у рядку запиту відхиляються.
 
 ## Include конфігурації (`$include`)
 
-Розділіть конфігурацію на кілька файлів:
+Розділяйте конфігурацію на кілька файлів:
 
 ```json5
 // ~/.openclaw/openclaw.json
@@ -1219,20 +1221,20 @@ Hook-token у рядку запиту відхиляються.
 
 **Поведінка злиття:**
 
-- Один файл: замінює об’єкт-контейнер.
-- Масив файлів: глибоко зливається за порядком (пізніші перевизначають раніші).
+- Один файл: замінює об’єкт, що його містить.
+- Масив файлів: глибоко зливається в заданому порядку (пізніші перевизначають раніші).
 - Сусідні ключі: зливаються після include (перевизначають включені значення).
 - Вкладені include: до 10 рівнів глибини.
-- Шляхи: розв’язуються відносно файла, який включає, але мають залишатися в межах каталогу конфігурації верхнього рівня (`dirname` для `openclaw.json`). Абсолютні форми/форми `../` дозволені лише тоді, коли вони все одно розв’язуються в межах цієї межі.
-- Записи під керуванням OpenClaw, які змінюють лише один розділ верхнього рівня, підтримуваний include одного файла, записуються безпосередньо в цей включений файл. Наприклад, `plugins install` оновлює `plugins: { $include: "./plugins.json5" }` у `plugins.json5` і залишає `openclaw.json` без змін.
-- Include кореня, масиви include та include із сусідніми перевизначеннями є лише для читання для записів під керуванням OpenClaw; такі записи завершуються в закритий бік помилкою замість сплощення конфігурації.
-- Помилки: зрозумілі повідомлення для відсутніх файлів, помилок синтаксичного аналізу та циклічних include.
+- Шляхи: розв’язуються відносно файла, що включає, але мають залишатися в межах каталогу конфігурації верхнього рівня (`dirname` для `openclaw.json`). Абсолютні форми/`../` дозволені лише тоді, коли вони все одно розв’язуються в межах цієї межі.
+- Записи, якими володіє OpenClaw, що змінюють лише один розділ верхнього рівня, підкріплений include одного файла, записуються безпосередньо в цей включений файл. Наприклад, `plugins install` оновлює `plugins: { $include: "./plugins.json5" }` у `plugins.json5` і залишає `openclaw.json` без змін.
+- Кореневі include, масиви include та include із сусідніми перевизначеннями доступні для OpenClaw лише для читання; такі записи завершуються закритою відмовою замість сплощення конфігурації.
+- Помилки: зрозумілі повідомлення для відсутніх файлів, помилок розбору та циклічних include.
 
 ---
 
-_Пов’язане: [Configuration](/uk/gateway/configuration) · [Приклади конфігурації](/uk/gateway/configuration-examples) · [Doctor](/uk/gateway/doctor)_
+_Пов’язане: [Configuration](/uk/gateway/configuration) · [Configuration Examples](/uk/gateway/configuration-examples) · [Doctor](/uk/gateway/doctor)_
 
 ## Пов’язане
 
 - [Configuration](/uk/gateway/configuration)
-- [Приклади конфігурації](/uk/gateway/configuration-examples)
+- [Configuration examples](/uk/gateway/configuration-examples)

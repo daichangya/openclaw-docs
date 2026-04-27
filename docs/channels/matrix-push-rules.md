@@ -139,6 +139,8 @@ curl -sS \
 
     如果你在反向代理或 workers 后面运行 Synapse，请确保 `/_matrix/client/.../pushrules/` 能正确到达 Synapse。推送传递由主进程或 `synapse.app.pusher` / 已配置的 pusher workers 处理 —— 请确保它们运行正常。
 
+    The rule uses the `event_property_is` push-rule condition (MSC3758, push rule v1.10), which was added to Synapse in 2023. Older Synapse releases accept the `PUT pushrules/...` call but silently never match the condition — upgrade Synapse if no notification arrives on a finalized preview edit.
+
   </Accordion>
 
   <Accordion title="Tuwunel">

@@ -79,6 +79,10 @@ x-i18n:
 
 如果 `enabled: true`，但所选提供商缺少凭证，Gateway 网关启动日志会记录一条“设置未完成”警告，列出缺失的键，并跳过运行时启动。命令、RPC 调用和智能体工具在被使用时，仍会返回确切缺失的提供商配置。
 
+<Note>
+Voice-call credentials accept SecretRefs. `plugins.entries.voice-call.config.twilio.authToken` and `plugins.entries.voice-call.config.tts.providers.*.apiKey` resolve through the standard SecretRef surface; see [SecretRef credential surface](/reference/secretref-credential-surface).
+</Note>
+
 ```json5
 {
   plugins: {

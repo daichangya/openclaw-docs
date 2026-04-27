@@ -1651,6 +1651,8 @@
                 "pages": [
                   "install/updating",
                   "install/migrating",
+                  "install/migrating-claude",
+                  "install/migrating-hermes",
                   "install/migrating-matrix",
                   "install/uninstall",
                   "install/development-channels"
@@ -2212,6 +2214,7 @@
                       "cli/gateway",
                       "cli/health",
                       "cli/logs",
+                      "cli/migrate",
                       "cli/onboard",
                       "cli/reset",
                       "cli/secrets",
@@ -2490,6 +2493,8 @@
                 "pages": [
                   "ja-JP/install/updating",
                   "ja-JP/install/migrating",
+                  "ja-JP/install/migrating-claude",
+                  "ja-JP/install/migrating-hermes",
                   "ja-JP/install/migrating-matrix",
                   "ja-JP/install/uninstall",
                   "ja-JP/install/development-channels"
@@ -3051,6 +3056,7 @@
                       "ja-JP/cli/gateway",
                       "ja-JP/cli/health",
                       "ja-JP/cli/logs",
+                      "ja-JP/cli/migrate",
                       "ja-JP/cli/onboard",
                       "ja-JP/cli/reset",
                       "ja-JP/cli/secrets",
@@ -3329,6 +3335,8 @@
                 "pages": [
                   "es/install/updating",
                   "es/install/migrating",
+                  "es/install/migrating-claude",
+                  "es/install/migrating-hermes",
                   "es/install/migrating-matrix",
                   "es/install/uninstall",
                   "es/install/development-channels"
@@ -3890,6 +3898,7 @@
                       "es/cli/gateway",
                       "es/cli/health",
                       "es/cli/logs",
+                      "es/cli/migrate",
                       "es/cli/onboard",
                       "es/cli/reset",
                       "es/cli/secrets",
@@ -4168,6 +4177,8 @@
                 "pages": [
                   "pt-BR/install/updating",
                   "pt-BR/install/migrating",
+                  "pt-BR/install/migrating-claude",
+                  "pt-BR/install/migrating-hermes",
                   "pt-BR/install/migrating-matrix",
                   "pt-BR/install/uninstall",
                   "pt-BR/install/development-channels"
@@ -4729,6 +4740,7 @@
                       "pt-BR/cli/gateway",
                       "pt-BR/cli/health",
                       "pt-BR/cli/logs",
+                      "pt-BR/cli/migrate",
                       "pt-BR/cli/onboard",
                       "pt-BR/cli/reset",
                       "pt-BR/cli/secrets",
@@ -5007,6 +5019,8 @@
                 "pages": [
                   "ko/install/updating",
                   "ko/install/migrating",
+                  "ko/install/migrating-claude",
+                  "ko/install/migrating-hermes",
                   "ko/install/migrating-matrix",
                   "ko/install/uninstall",
                   "ko/install/development-channels"
@@ -5568,6 +5582,7 @@
                       "ko/cli/gateway",
                       "ko/cli/health",
                       "ko/cli/logs",
+                      "ko/cli/migrate",
                       "ko/cli/onboard",
                       "ko/cli/reset",
                       "ko/cli/secrets",
@@ -5846,6 +5861,8 @@
                 "pages": [
                   "de/install/updating",
                   "de/install/migrating",
+                  "de/install/migrating-claude",
+                  "de/install/migrating-hermes",
                   "de/install/migrating-matrix",
                   "de/install/uninstall",
                   "de/install/development-channels"
@@ -6407,6 +6424,7 @@
                       "de/cli/gateway",
                       "de/cli/health",
                       "de/cli/logs",
+                      "de/cli/migrate",
                       "de/cli/onboard",
                       "de/cli/reset",
                       "de/cli/secrets",
@@ -6685,6 +6703,8 @@
                 "pages": [
                   "fr/install/updating",
                   "fr/install/migrating",
+                  "fr/install/migrating-claude",
+                  "fr/install/migrating-hermes",
                   "fr/install/migrating-matrix",
                   "fr/install/uninstall",
                   "fr/install/development-channels"
@@ -7246,6 +7266,7 @@
                       "fr/cli/gateway",
                       "fr/cli/health",
                       "fr/cli/logs",
+                      "fr/cli/migrate",
                       "fr/cli/onboard",
                       "fr/cli/reset",
                       "fr/cli/secrets",
@@ -7524,6 +7545,8 @@
                 "pages": [
                   "ar/install/updating",
                   "ar/install/migrating",
+                  "ar/install/migrating-claude",
+                  "ar/install/migrating-hermes",
                   "ar/install/migrating-matrix",
                   "ar/install/uninstall",
                   "ar/install/development-channels"
@@ -8085,6 +8108,7 @@
                       "ar/cli/gateway",
                       "ar/cli/health",
                       "ar/cli/logs",
+                      "ar/cli/migrate",
                       "ar/cli/onboard",
                       "ar/cli/reset",
                       "ar/cli/secrets",
@@ -8363,6 +8387,8 @@
                 "pages": [
                   "it/install/updating",
                   "it/install/migrating",
+                  "it/install/migrating-claude",
+                  "it/install/migrating-hermes",
                   "it/install/migrating-matrix",
                   "it/install/uninstall",
                   "it/install/development-channels"
@@ -8924,6 +8950,7 @@
                       "it/cli/gateway",
                       "it/cli/health",
                       "it/cli/logs",
+                      "it/cli/migrate",
                       "it/cli/onboard",
                       "it/cli/reset",
                       "it/cli/secrets",
@@ -9202,6 +9229,8 @@
                 "pages": [
                   "tr/install/updating",
                   "tr/install/migrating",
+                  "tr/install/migrating-claude",
+                  "tr/install/migrating-hermes",
                   "tr/install/migrating-matrix",
                   "tr/install/uninstall",
                   "tr/install/development-channels"
@@ -9763,6 +9792,7 @@
                       "tr/cli/gateway",
                       "tr/cli/health",
                       "tr/cli/logs",
+                      "tr/cli/migrate",
                       "tr/cli/onboard",
                       "tr/cli/reset",
                       "tr/cli/secrets",
@@ -10041,6 +10071,8 @@
                 "pages": [
                   "uk/install/updating",
                   "uk/install/migrating",
+                  "uk/install/migrating-claude",
+                  "uk/install/migrating-hermes",
                   "uk/install/migrating-matrix",
                   "uk/install/uninstall",
                   "uk/install/development-channels"
@@ -10602,6 +10634,7 @@
                       "uk/cli/gateway",
                       "uk/cli/health",
                       "uk/cli/logs",
+                      "uk/cli/migrate",
                       "uk/cli/onboard",
                       "uk/cli/reset",
                       "uk/cli/secrets",
@@ -10880,6 +10913,8 @@
                 "pages": [
                   "id/install/updating",
                   "id/install/migrating",
+                  "id/install/migrating-claude",
+                  "id/install/migrating-hermes",
                   "id/install/migrating-matrix",
                   "id/install/uninstall",
                   "id/install/development-channels"
@@ -11441,6 +11476,7 @@
                       "id/cli/gateway",
                       "id/cli/health",
                       "id/cli/logs",
+                      "id/cli/migrate",
                       "id/cli/onboard",
                       "id/cli/reset",
                       "id/cli/secrets",
@@ -11719,6 +11755,8 @@
                 "pages": [
                   "pl/install/updating",
                   "pl/install/migrating",
+                  "pl/install/migrating-claude",
+                  "pl/install/migrating-hermes",
                   "pl/install/migrating-matrix",
                   "pl/install/uninstall",
                   "pl/install/development-channels"
@@ -12280,6 +12318,7 @@
                       "pl/cli/gateway",
                       "pl/cli/health",
                       "pl/cli/logs",
+                      "pl/cli/migrate",
                       "pl/cli/onboard",
                       "pl/cli/reset",
                       "pl/cli/secrets",

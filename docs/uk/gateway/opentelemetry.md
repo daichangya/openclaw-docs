@@ -1,38 +1,38 @@
 ---
 read_when:
     - Ви хочете надсилати дані про використання моделей OpenClaw, потік повідомлень або метрики сесій до колектора OpenTelemetry
-    - Ви налаштовуєте трасування, метрики або журнали для Grafana, Datadog, Honeycomb, New Relic, Tempo чи іншого бекенда OTLP
-    - Вам потрібні точні назви метрик, назви спанів або форми атрибутів, щоб створювати інформаційні панелі чи сповіщення
+    - Ви налаштовуєте traces, метрики або журнали для Grafana, Datadog, Honeycomb, New Relic, Tempo чи іншого OTLP-бекенда
+    - Вам потрібні точні назви метрик, spans або форми атрибутів, щоб створювати інформаційні панелі чи сповіщення
 summary: Експортуйте діагностику OpenClaw до будь-якого колектора OpenTelemetry через Plugin diagnostics-otel (OTLP/HTTP)
-title: експорт OpenTelemetry
+title: Експорт OpenTelemetry
 x-i18n:
-    generated_at: "2026-04-26T21:17:06Z"
+    generated_at: "2026-04-27T08:31:11Z"
     model: gpt-5.4
     provider: openai
-    source_hash: 1ad923fff12ff89766999370fe39a75c1aa5f386ce4641fde1c385b24439cc1b
+    source_hash: e9d06589d281223ebb57e76f6f19441d30c138b9f7b0636198ab7bae5fad3c8a
     source_path: gateway/opentelemetry.md
     workflow: 15
 ---
 
 OpenClaw експортує діагностику через вбудований Plugin `diagnostics-otel`
-з використанням **OTLP/HTTP (protobuf)**. Будь-який колектор або бекенд, що приймає OTLP/HTTP,
-працює без змін у коді. Для локальних файлових журналів і того, як їх читати, див.
+за допомогою **OTLP/HTTP (protobuf)**. Будь-який колектор або бекенд, що приймає OTLP/HTTP,
+працює без змін у коді. Для локальних файлових журналів і способів їх читання див.
 [Журналювання](/uk/logging).
 
 ## Як це працює разом
 
-- **Діагностичні події** — це структуровані внутрішньопроцесні записи, які створюються
-  Gateway і вбудованими плагінами для запусків моделей, потоку повідомлень, сесій, черг
+- **Події діагностики** — це структуровані внутрішньопроцесні записи, які видають
+  Gateway і вбудовані plugins для запусків моделей, потоку повідомлень, сесій, черг
   та exec.
-- **Plugin `diagnostics-otel`** підписується на ці події й експортує їх як
-  OpenTelemetry **метрики**, **трасування** та **журнали** через OTLP/HTTP.
-- **Виклики провайдера** отримують заголовок W3C `traceparent` із контексту
-  довіреного span виклику моделі OpenClaw, якщо транспорт провайдера приймає власні
-  заголовки. Контекст трасування, створений Plugin, не передається далі.
-- Експортери підключаються лише тоді, коли увімкнено і поверхню діагностики, і Plugin,
-  тому внутрішньопроцесна вартість за замовчуванням залишається майже нульовою.
+- **Plugin `diagnostics-otel`** підписується на ці події та експортує їх як
+  OpenTelemetry **метрики**, **traces** і **журнали** через OTLP/HTTP.
+- **Виклики провайдера** отримують заголовок W3C `traceparent` із довіреного
+  контексту span виклику моделі OpenClaw, якщо транспорт провайдера приймає
+  користувацькі заголовки. Контекст trace, який видає Plugin, не поширюється.
+- Експортери підключаються лише тоді, коли ввімкнено і поверхню діагностики, і plugin,
+  тому внутрішньопроцесні витрати за замовчуванням залишаються майже нульовими.
 
-## Швидкий старт
+## Швидкий початок
 
 ```json5
 {
@@ -59,7 +59,7 @@ OpenClaw експортує діагностику через вбудовани
 }
 ```
 
-Ви також можете увімкнути Plugin з CLI:
+Ви також можете ввімкнути plugin з CLI:
 
 ```bash
 openclaw plugins enable diagnostics-otel
@@ -71,13 +71,13 @@ openclaw plugins enable diagnostics-otel
 
 ## Експортовані сигнали
 
-| Сигнал      | Що до нього входить                                                                                                                       |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Метрики** | Лічильники та гістограми для використання токенів, вартості, тривалості запуску, потоку повідомлень, смуг черги, стану сесії, exec і тиску пам’яті. |
-| **Трасування**  | Спани для використання моделей, викликів моделей, життєвого циклу harness, виконання інструментів, exec, обробки webhook/повідомлень, збирання контексту та циклів інструментів. |
-| **Журнали**    | Структуровані записи `logging.file`, експортовані через OTLP, коли ввімкнено `diagnostics.otel.logs`.                                  |
+| Signal      | Що в нього входить                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Metrics** | Лічильники та гістограми для використання токенів, вартості, тривалості запуску, потоку повідомлень, смуг черги, стану сесії, exec і тиску пам’яті. |
+| **Traces**  | Spans для використання моделей, викликів моделей, життєвого циклу harness, виконання інструментів, exec, обробки webhook/повідомлень, збирання контексту та циклів інструментів. |
+| **Logs**    | Структуровані записи `logging.file`, експортовані через OTLP, коли ввімкнено `diagnostics.otel.logs`.                                    |
 
-Перемикайте `traces`, `metrics` і `logs` незалежно. За замовчуванням усі три
+Перемикайте `traces`, `metrics` і `logs` незалежно. Усі три параметри за замовчуванням
 увімкнені, коли `diagnostics.otel.enabled` має значення true.
 
 ## Довідник конфігурації
@@ -99,7 +99,7 @@ openclaw plugins enable diagnostics-otel
       metrics: true,
       logs: true,
       sampleRate: 0.2, // root-span sampler, 0.0..1.0
-      flushIntervalMs: 60000, // metric export interval (min 1000ms)
+      flushIntervalMs: 60000, // interval exportu метрик (мінімум 1000ms)
       captureContent: {
         enabled: false,
         inputMessages: false,
@@ -115,68 +115,68 @@ openclaw plugins enable diagnostics-otel
 
 ### Змінні середовища
 
-| Змінна                                                                                                           | Призначення                                                                                                                                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OTEL_EXPORTER_OTLP_ENDPOINT`                                                                                    | Перевизначає `diagnostics.otel.endpoint`. Якщо значення вже містить `/v1/traces`, `/v1/metrics` або `/v1/logs`, воно використовується як є.                                                                                              |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` / `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` / `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | Перевизначення кінцевих точок для конкретних сигналів, які використовуються, коли не задано відповідний ключ конфігурації `diagnostics.otel.*Endpoint`. Конфігурація для конкретного сигналу має пріоритет над змінною середовища для конкретного сигналу, яка має пріоритет над спільною кінцевою точкою. |
-| `OTEL_SERVICE_NAME`                                                                                              | Перевизначає `diagnostics.otel.serviceName`.                                                                                                                                                                                                |
-| `OTEL_EXPORTER_OTLP_PROTOCOL`                                                                                    | Перевизначає wire protocol (сьогодні враховується лише `http/protobuf`).                                                                                                                                                                   |
-| `OTEL_SEMCONV_STABILITY_OPT_IN`                                                                                  | Установіть значення `gen_ai_latest_experimental`, щоб виводити останній експериментальний атрибут span GenAI (`gen_ai.provider.name`) замість застарілого `gen_ai.system`. Метрики GenAI завжди використовують обмежені семантичні атрибути з низькою кардинальністю незалежно від цього. |
-| `OPENCLAW_OTEL_PRELOADED`                                                                                        | Установіть значення `1`, якщо інше preload-рішення або хост-процес уже зареєстрував глобальний OpenTelemetry SDK. Тоді Plugin пропускає власний життєвий цикл NodeSDK, але все одно підключає слухачі діагностики та враховує `traces`/`metrics`/`logs`. |
+| Variable                                                                                                          | Призначення                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`                                                                                     | Перевизначає `diagnostics.otel.endpoint`. Якщо значення вже містить `/v1/traces`, `/v1/metrics` або `/v1/logs`, воно використовується як є.                                                                                              |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` / `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` / `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | Перевизначення кінцевих точок для окремих сигналів, що використовуються, коли не задано відповідний ключ конфігурації `diagnostics.otel.*Endpoint`. Конфігурація для конкретного сигналу має пріоритет над env для конкретного сигналу, яке має пріоритет над спільною кінцевою точкою. |
+| `OTEL_SERVICE_NAME`                                                                                               | Перевизначає `diagnostics.otel.serviceName`.                                                                                                                                                                                                |
+| `OTEL_EXPORTER_OTLP_PROTOCOL`                                                                                     | Перевизначає wire protocol (сьогодні враховується лише `http/protobuf`).                                                                                                                                                                   |
+| `OTEL_SEMCONV_STABILITY_OPT_IN`                                                                                   | Установіть значення `gen_ai_latest_experimental`, щоб видавати найновіший експериментальний атрибут span GenAI (`gen_ai.provider.name`) замість застарілого `gen_ai.system`. Метрики GenAI завжди використовують обмежені семантичні атрибути з низькою кардинальністю незалежно від цього. |
+| `OPENCLAW_OTEL_PRELOADED`                                                                                         | Установіть значення `1`, якщо інший preload або host process уже зареєстрував глобальний SDK OpenTelemetry. Тоді plugin пропустить власний життєвий цикл NodeSDK, але все одно підключить слухачі діагностики та врахує `traces`/`metrics`/`logs`. |
 
 ## Конфіденційність і захоплення вмісту
 
-Необроблений вміст моделей/інструментів **не** експортується за замовчуванням. Спани містять
-обмежені ідентифікатори (канал, провайдер, модель, категорія помилки, лише хешовані request id)
-і ніколи не включають текст промпту, текст відповіді, вхідні дані інструментів, вихідні дані
-інструментів або ключі сесій.
+Необроблений вміст моделі/інструментів **не** експортується за замовчуванням. Spans містять
+обмежені ідентифікатори (канал, провайдер, модель, категорію помилки, ідентифікатори запитів
+лише у вигляді хешів) і ніколи не включають текст prompt, текст відповіді, вхідні дані
+інструментів, вихідні дані інструментів або ключі сесії.
 
 Вихідні запити до моделі можуть містити заголовок W3C `traceparent`. Цей заголовок
-генерується лише з діагностичного контексту трасування, що належить OpenClaw, для активного виклику
-моделі. Наявні заголовки `traceparent`, передані викликачем, замінюються, тому Plugins або
-власні параметри провайдера не можуть підробити походження трасування між сервісами.
+генерується лише з контексту trace діагностики, що належить OpenClaw, для активного
+виклику моделі. Наявні заголовки `traceparent`, передані викликачем, замінюються, тому plugins або
+користувацькі параметри провайдера не можуть підробити походження cross-service trace.
 
-Установлюйте `diagnostics.otel.captureContent.*` у значення `true` лише тоді, коли ваш колектор і
-політика зберігання схвалені для тексту промптів, відповідей, інструментів або системних промптів.
-Кожен підключ окремо вмикається явно:
+Установлюйте `diagnostics.otel.captureContent.*` у значення `true` лише тоді, коли ваш колектор
+і політика зберігання схвалені для тексту prompt, відповіді, інструментів або system prompt.
+Кожен вкладений ключ вмикається окремо:
 
-- `inputMessages` — вміст користувацького промпту.
+- `inputMessages` — вміст prompt користувача.
 - `outputMessages` — вміст відповіді моделі.
-- `toolInputs` — корисні навантаження аргументів інструментів.
-- `toolOutputs` — корисні навантаження результатів інструментів.
-- `systemPrompt` — зібраний системний/розробницький промпт.
+- `toolInputs` — payload аргументів інструментів.
+- `toolOutputs` — payload результатів інструментів.
+- `systemPrompt` — зібраний system/developer prompt.
 
-Коли ввімкнено будь-який підключ, спани моделі та інструментів отримують обмежені, відредаговані
-атрибути `openclaw.content.*` лише для цього класу.
+Коли ввімкнено будь-який вкладений ключ, spans моделей та інструментів отримують обмежені,
+відредаговані атрибути `openclaw.content.*` лише для цього класу.
 
 ## Семплювання та скидання
 
-- **Трасування:** `diagnostics.otel.sampleRate` (лише root-span, `0.0` відкидає все,
-  `1.0` зберігає все).
-- **Метрики:** `diagnostics.otel.flushIntervalMs` (мінімум `1000`).
-- **Журнали:** журнали OTLP враховують `logging.level` (рівень файлового журналу). Вони використовують
-  шлях редагування діагностичних log record, а не форматування консолі. Для інсталяцій із великим
-  обсягом даних краще використовувати семплювання/фільтрацію в колекторі OTLP, а не локальне семплювання.
-- **Кореляція файлових журналів:** журнали JSONL включають верхньорівневі `traceId`,
-  `spanId`, `parentSpanId` і `traceFlags`, коли виклик журналювання містить коректний
-  діагностичний контекст трасування, що дає змогу обробникам журналів поєднувати локальні рядки журналу
-  з експортованими спанами.
+- **Traces:** `diagnostics.otel.sampleRate` (лише root-span, `0.0` відкидає всі,
+  `1.0` зберігає всі).
+- **Metrics:** `diagnostics.otel.flushIntervalMs` (мінімум `1000`).
+- **Logs:** OTLP logs враховують `logging.level` (рівень файлового журналу). Вони використовують
+  шлях редагування діагностичних log record, а не форматування консолі. Для інсталяцій із
+  великим обсягом даних слід надавати перевагу семплюванню/фільтрації в колекторі OTLP, а не локальному семплюванню.
+- **Кореляція файлових журналів:** JSONL-файли журналів містять верхньорівневі `traceId`,
+  `spanId`, `parentSpanId` і `traceFlags`, коли виклик журналу несе чинний діагностичний
+  контекст trace, що дозволяє процесорам журналів поєднувати локальні рядки журналу з
+  експортованими spans.
 - **Кореляція запитів:** HTTP-запити Gateway і кадри WebSocket створюють внутрішню
-  область трасування запиту. Журнали та діагностичні події в цій області за замовчуванням
-  успадковують трасування запиту, тоді як спани запуску агента та виклику моделі
-  створюються як дочірні, щоб заголовки провайдера `traceparent` залишалися в межах того самого трасування.
+  область trace запиту. Журнали й події діагностики в цій області за замовчуванням
+  успадковують trace запиту, тоді як spans запуску агента та виклику моделі
+  створюються як дочірні, щоб заголовки провайдера `traceparent` залишалися в межах того самого trace.
 
 ## Експортовані метрики
 
-### Використання моделей
+### Використання моделі
 
 - `openclaw.tokens` (лічильник, attrs: `openclaw.token`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.agent`)
 - `openclaw.cost.usd` (лічильник, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
 - `openclaw.run.duration_ms` (гістограма, attrs: `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
 - `openclaw.context.tokens` (гістограма, attrs: `openclaw.context`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`)
-- `gen_ai.client.token.usage` (гістограма, метрика семантичних конвенцій GenAI, attrs: `gen_ai.token.type` = `input`/`output`, `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`)
-- `gen_ai.client.operation.duration` (гістограма, секунди, метрика семантичних конвенцій GenAI, attrs: `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`, необов’язковий `error.type`)
-- `openclaw.model_call.duration_ms` (гістограма, attrs: `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`)
+- `gen_ai.client.token.usage` (гістограма, метрика семантичних угод GenAI, attrs: `gen_ai.token.type` = `input`/`output`, `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`)
+- `gen_ai.client.operation.duration` (гістограма, секунди, метрика семантичних угод GenAI, attrs: `gen_ai.provider.name`, `gen_ai.operation.name`, `gen_ai.request.model`, необов’язково `error.type`)
+- `openclaw.model_call.duration_ms` (гістограма, attrs: `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`, а також `openclaw.errorCategory` і `openclaw.failureKind` для класифікованих помилок)
 - `openclaw.model_call.request_bytes` (гістограма, розмір у байтах UTF-8 фінального payload запиту до моделі; без необробленого вмісту payload)
 - `openclaw.model_call.response_bytes` (гістограма, розмір у байтах UTF-8 потокових подій відповіді моделі; без необробленого вмісту відповіді)
 - `openclaw.model_call.time_to_first_byte_ms` (гістограма, час до першої потокової події відповіді)
@@ -203,9 +203,9 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.session.stuck_age_ms` (гістограма, attrs: `openclaw.state`)
 - `openclaw.run.attempt` (лічильник, attrs: `openclaw.attempt`)
 
-### Життєвий цикл harness
+### Життєвий цикл Harness
 
-- `openclaw.harness.duration_ms` (гістограма, attrs: `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.harness.phase` для помилок)
+- `openclaw.harness.duration_ms` (гістограма, attrs: `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.harness.phase` у разі помилок)
 
 ### Exec
 
@@ -219,23 +219,24 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.tool.loop.iterations` (лічильник, attrs: `openclaw.toolName`, `openclaw.outcome`)
 - `openclaw.tool.loop.duration_ms` (гістограма, attrs: `openclaw.toolName`, `openclaw.outcome`)
 
-## Експортовані спани
+## Експортовані spans
 
 - `openclaw.model.usage`
   - `openclaw.channel`, `openclaw.provider`, `openclaw.model`
   - `openclaw.tokens.*` (input/output/cache_read/cache_write/total)
-  - `gen_ai.system` за замовчуванням або `gen_ai.provider.name`, якщо ввімкнено найновіші семантичні конвенції GenAI
+  - `gen_ai.system` за замовчуванням або `gen_ai.provider.name`, якщо ввімкнено найновіші семантичні угоди GenAI
   - `gen_ai.request.model`, `gen_ai.operation.name`, `gen_ai.usage.*`
 - `openclaw.run`
   - `openclaw.outcome`, `openclaw.channel`, `openclaw.provider`, `openclaw.model`, `openclaw.errorCategory`
 - `openclaw.model.call`
-  - `gen_ai.system` за замовчуванням або `gen_ai.provider.name`, якщо ввімкнено найновіші семантичні конвенції GenAI
+  - `gen_ai.system` за замовчуванням або `gen_ai.provider.name`, якщо ввімкнено найновіші семантичні угоди GenAI
   - `gen_ai.request.model`, `gen_ai.operation.name`, `openclaw.provider`, `openclaw.model`, `openclaw.api`, `openclaw.transport`
+  - `openclaw.errorCategory` і необов’язковий `openclaw.failureKind` у разі помилок
   - `openclaw.model_call.request_bytes`, `openclaw.model_call.response_bytes`, `openclaw.model_call.time_to_first_byte_ms`
-  - `openclaw.provider.request_id_hash` (обмежений хеш на основі SHA для upstream request id провайдера; сирі id не експортуються)
+  - `openclaw.provider.request_id_hash` (обмежений хеш на основі SHA для upstream request id провайдера; необроблені id не експортуються)
 - `openclaw.harness.run`
   - `openclaw.harness.id`, `openclaw.harness.plugin`, `openclaw.outcome`, `openclaw.provider`, `openclaw.model`, `openclaw.channel`
-  - Під час завершення: `openclaw.harness.result_classification`, `openclaw.harness.yield_detected`, `openclaw.harness.items.started`, `openclaw.harness.items.completed`, `openclaw.harness.items.active`
+  - Після завершення: `openclaw.harness.result_classification`, `openclaw.harness.yield_detected`, `openclaw.harness.items.started`, `openclaw.harness.items.completed`, `openclaw.harness.items.active`
   - У разі помилки: `openclaw.harness.phase`, `openclaw.errorCategory`, необов’язковий `openclaw.harness.cleanup_failed`
 - `openclaw.tool.execution`
   - `gen_ai.tool.name`, `openclaw.toolName`, `openclaw.errorCategory`, `openclaw.tool.params.*`
@@ -252,27 +253,27 @@ openclaw plugins enable diagnostics-otel
 - `openclaw.session.stuck`
   - `openclaw.state`, `openclaw.ageMs`, `openclaw.queueDepth`
 - `openclaw.context.assembled`
-  - `openclaw.prompt.size`, `openclaw.history.size`, `openclaw.context.tokens`, `openclaw.errorCategory` (без вмісту промпту, історії, відповіді або ключа сесії)
+  - `openclaw.prompt.size`, `openclaw.history.size`, `openclaw.context.tokens`, `openclaw.errorCategory` (без вмісту prompt, history, response або session key)
 - `openclaw.tool.loop`
-  - `openclaw.toolName`, `openclaw.outcome`, `openclaw.iterations`, `openclaw.errorCategory` (без повідомлень циклу, параметрів або виводу інструмента)
+  - `openclaw.toolName`, `openclaw.outcome`, `openclaw.iterations`, `openclaw.errorCategory` (без повідомлень циклу, params або виводу інструмента)
 - `openclaw.memory.pressure`
   - `openclaw.memory.level`, `openclaw.memory.heap_used_bytes`, `openclaw.memory.rss_bytes`
 
-Коли захоплення вмісту явно ввімкнене, спани моделі та інструментів також можуть
+Якщо захоплення вмісту явно ввімкнено, spans моделей та інструментів також можуть
 включати обмежені, відредаговані атрибути `openclaw.content.*` для конкретних
-класів вмісту, на які ви дали згоду.
+класів вмісту, які ви ввімкнули.
 
-## Каталог діагностичних подій
+## Каталог подій діагностики
 
-Наведені нижче події лежать в основі метрик і спанів вище. Plugins також можуть
-підписуватися на них безпосередньо без експорту OTLP.
+Наведені нижче події є основою для метрик і spans вище. Plugins також можуть підписуватися
+на них напряму без експорту OTLP.
 
-**Використання моделей**
+**Використання моделі**
 
 - `model.usage` — токени, вартість, тривалість, контекст, провайдер/модель/канал,
-  id сесій. `usage` — це облік провайдера/ходу для вартості й телеметрії;
-  `context.used` — це поточний знімок промпту/контексту і він може бути меншим за
-  `usage.total` провайдера, коли задіяно кешоване введення або виклики циклу інструментів.
+  id сесії. `usage` — це облік провайдера/ходу для вартості й телеметрії;
+  `context.used` — це поточний знімок prompt/контексту, який може бути меншим за
+  `usage.total` провайдера, коли задіяно кешований ввід або виклики циклу інструментів.
 
 **Потік повідомлень**
 
@@ -285,15 +286,15 @@ openclaw plugins enable diagnostics-otel
 - `queue.lane.enqueue` / `queue.lane.dequeue`
 - `session.state` / `session.stuck`
 - `run.attempt`
-- `diagnostic.heartbeat` (агреговані лічильники: webhook/черга/сесія)
+- `diagnostic.heartbeat` (агреговані лічильники: webhooks/queue/session)
 
-**Життєвий цикл harness**
+**Життєвий цикл Harness**
 
 - `harness.run.started` / `harness.run.completed` / `harness.run.error` —
-  життєвий цикл кожного запуску для harness агента. Включає `harnessId`, необов’язковий
-  `pluginId`, провайдер/модель/канал і id запуску. Завершення додає
+  життєвий цикл agent harness для кожного запуску. Включає `harnessId`, необов’язковий
+  `pluginId`, провайдера/модель/канал і id запуску. Завершення додає
   `durationMs`, `outcome`, необов’язкові `resultClassification`, `yieldDetected`
-  і лічильники `itemLifecycle`. Помилки додають `phase`
+  та лічильники `itemLifecycle`. Помилки додають `phase`
   (`prepare`/`start`/`send`/`resolve`/`cleanup`), `errorCategory` і
   необов’язковий `cleanupFailed`.
 
@@ -305,7 +306,7 @@ openclaw plugins enable diagnostics-otel
 
 ## Без експортера
 
-Ви можете залишити діагностичні події доступними для Plugins або власних приймачів без
+Ви можете залишити події діагностики доступними для plugins або користувацьких sinks без
 запуску `diagnostics-otel`:
 
 ```json5
@@ -314,8 +315,8 @@ openclaw plugins enable diagnostics-otel
 }
 ```
 
-Для цільового виводу налагодження без підвищення `logging.level` використовуйте
-прапорці діагностики. Прапорці нечутливі до регістру й підтримують шаблони (наприклад, `telegram.*` або
+Для цільового налагоджувального виводу без підвищення `logging.level` використовуйте
+прапорці діагностики. Прапорці нечутливі до регістру та підтримують wildcard-вирази (наприклад, `telegram.*` або
 `*`):
 
 ```json5
@@ -324,13 +325,13 @@ openclaw plugins enable diagnostics-otel
 }
 ```
 
-Або як одноразове перевизначення через змінну середовища:
+Або як одноразове перевизначення через env:
 
 ```bash
 OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
 ```
 
-Вивід прапорців потрапляє до стандартного файла журналу (`logging.file`) і все ще
+Вивід прапорців надходить до стандартного файла журналу (`logging.file`) і все ще
 редагується через `logging.redactSensitive`. Повний посібник:
 [Прапорці діагностики](/uk/diagnostics/flags).
 
@@ -347,8 +348,8 @@ OPENCLAW_DIAGNOSTICS=telegram.http,telegram.payload openclaw gateway
 
 ## Пов’язане
 
-- [Журналювання](/uk/logging) — файлові журнали, вивід у консоль, перегляд через CLI та вкладка Журнали в Control UI
-- [Внутрішня будова журналювання Gateway](/uk/gateway/logging) — стилі журналів WS, префікси підсистем і захоплення консолі
-- [Прапорці діагностики](/uk/diagnostics/flags) — прапорці цільового журналювання для налагодження
-- [Експорт діагностики](/uk/gateway/diagnostics) — інструмент підтримки для збору пакета даних оператора (окремо від експорту OTEL)
+- [Журналювання](/uk/logging) — файлові журнали, вивід у консоль, tailing у CLI та вкладка Logs у Control UI
+- [Внутрішні механізми журналювання Gateway](/uk/gateway/logging) — стилі журналів WS, префікси підсистем і захоплення консолі
+- [Прапорці діагностики](/uk/diagnostics/flags) — цільові прапорці журналів налагодження
+- [Експорт діагностики](/uk/gateway/diagnostics) — інструмент operator support bundle (окремо від експорту OTEL)
 - [Довідник конфігурації](/uk/gateway/configuration-reference#diagnostics) — повний довідник полів `diagnostics.*`

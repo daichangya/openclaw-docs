@@ -124,6 +124,8 @@ register(api) {
     模型覆盖（`provider`/`model`）需要操作员在配置中通过 `plugins.entries.<id>.subagent.allowModelOverride: true` 显式启用。不受信任的插件仍然可以运行子智能体，但覆盖请求会被拒绝。
     </Warning>
 
+    `deleteSession(...)` can delete sessions created by the same plugin through `api.runtime.subagent.run(...)`. Deleting arbitrary user or operator sessions still requires an admin-scoped Gateway request.
+
   </Accordion>
   <Accordion title="api.runtime.nodes">
     列出已连接节点，并从 Gateway 网关加载的插件代码或插件 CLI 命令中调用节点宿主命令。当某个插件拥有配对设备上的本地工作时使用它，例如另一台 Mac 上的浏览器或音频桥接。

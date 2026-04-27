@@ -497,7 +497,7 @@ Guardian 模式使用 Codex 原生的自动审核审批路径。当 Codex 请求
 `OPENCLAW_CODEX_APP_SERVER_MODE=guardian`。对于可重复部署，优先使用配置，
 因为这样可以将插件行为与 Codex harness 设置的其余部分一起保存在同一个已审查文件中。
 
-## Computer Use
+## Computer use
 
 Computer Use 是一个 Codex 原生 MCP 插件。OpenClaw 不会内置桌面
 控制应用，也不会自行执行桌面操作；它会启用 Codex app-server

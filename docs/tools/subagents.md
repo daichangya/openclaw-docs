@@ -127,6 +127,12 @@ x-i18n:
 <ParamField path="runtime" type='"subagent" | "acp"' default="subagent">
   `acp` 仅用于外部 ACP harness（`claude`、`droid`、`gemini`、`opencode` 或显式请求的 Codex ACP/acpx），以及 `agents.list[]` 中 `runtime.type` 为 `acp` 的条目。
 </ParamField>
+<ParamField path="resumeSessionId" type="string">
+  ACP-only. Resumes an existing ACP harness session when `runtime: "acp"`; ignored for native sub-agent spawns.
+</ParamField>
+<ParamField path="streamTo" type='"parent"'>
+  ACP-only. Streams ACP run output to the parent session when `runtime: "acp"`; omit for native sub-agent spawns.
+</ParamField>
 <ParamField path="model" type="string">
   覆盖子智能体模型。无效值会被跳过，子智能体会使用默认模型运行，并在工具结果中给出警告。
 </ParamField>
