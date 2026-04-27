@@ -1,120 +1,127 @@
 ---
-summary: "All configuration knobs for memory search, embedding providers, QMD, hybrid search, and multimodal indexing"
-title: "Memory configuration reference"
-sidebarTitle: "Memory config"
 read_when:
-  - You want to configure memory search providers or embedding models
-  - You want to set up the QMD backend
-  - You want to tune hybrid search, MMR, or temporal decay
-  - You want to enable multimodal memory indexing
+    - 你想要配置 Memory 搜索提供商或嵌入模型
+    - 你想要设置 QMD 后端
+    - 你想要调优混合搜索、MMR 或时间衰减
+    - 你想要启用多模态 Memory 索引
+sidebarTitle: Memory config
+summary: Memory 搜索、嵌入提供商、QMD、混合搜索和多模态索引的所有配置项
+title: Memory 配置参考
+x-i18n:
+    generated_at: "2026-04-26T07:51:16Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 15fd747abc6d0d43cfc869faa0b5e6c1618681ef3b02068207321d60d449a901
+    source_path: reference/memory-config.md
+    workflow: 15
 ---
 
-This page lists every configuration knob for OpenClaw memory search. For conceptual overviews, see:
+此页面列出了 OpenClaw Memory 搜索的所有配置项。有关概念概览，请参见：
 
 <CardGroup cols={2}>
-  <Card title="Memory overview" href="/concepts/memory">
-    How memory works.
+  <Card title="Memory 概览" href="/zh-CN/concepts/memory">
+    Memory 的工作方式。
   </Card>
-  <Card title="Builtin engine" href="/concepts/memory-builtin">
-    Default SQLite backend.
+  <Card title="内置引擎" href="/zh-CN/concepts/memory-builtin">
+    默认的 SQLite 后端。
   </Card>
-  <Card title="QMD engine" href="/concepts/memory-qmd">
-    Local-first sidecar.
+  <Card title="QMD 引擎" href="/zh-CN/concepts/memory-qmd">
+    本地优先的 sidecar。
   </Card>
-  <Card title="Memory search" href="/concepts/memory-search">
-    Search pipeline and tuning.
+  <Card title="Memory 搜索" href="/zh-CN/concepts/memory-search">
+    搜索管线和调优。
   </Card>
-  <Card title="Active memory" href="/concepts/active-memory">
-    Memory sub-agent for interactive sessions.
+  <Card title="Active Memory" href="/zh-CN/concepts/active-memory">
+    用于交互式会话的 Memory 子智能体。
   </Card>
 </CardGroup>
 
-All memory search settings live under `agents.defaults.memorySearch` in `openclaw.json` unless noted otherwise.
+除非另有说明，所有 Memory 搜索设置都位于 `openclaw.json` 的 `agents.defaults.memorySearch` 下。
 
 <Note>
-If you are looking for the **active memory** feature toggle and sub-agent config, that lives under `plugins.entries.active-memory` instead of `memorySearch`.
+如果你要找的是 **Active Memory** 功能开关和子智能体配置，它位于 `plugins.entries.active-memory` 下，而不是 `memorySearch`。
 
-Active memory uses a two-gate model:
+Active Memory 使用双门控模型：
 
-1. the plugin must be enabled and target the current agent id
-2. the request must be an eligible interactive persistent chat session
+1. 插件必须已启用，并以当前智能体 id 为目标
+2. 请求必须是符合条件的交互式持久聊天会话
 
-See [Active Memory](/concepts/active-memory) for the activation model, plugin-owned config, transcript persistence, and safe rollout pattern.
+有关激活模型、插件自有配置、transcript 持久化和安全发布模式，请参见 [Active Memory](/zh-CN/concepts/active-memory)。
 </Note>
 
 ---
 
-## Provider selection
+## 提供商选择
 
-| Key        | Type      | Default          | Description                                                                                                   |
+| 键 | 类型 | 默认值 | 说明 |
 | ---------- | --------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
-| `provider` | `string`  | auto-detected    | Embedding adapter ID: `bedrock`, `gemini`, `github-copilot`, `local`, `mistral`, `ollama`, `openai`, `voyage` |
-| `model`    | `string`  | provider default | Embedding model name                                                                                          |
-| `fallback` | `string`  | `"none"`         | Fallback adapter ID when the primary fails                                                                    |
-| `enabled`  | `boolean` | `true`           | Enable or disable memory search                                                                               |
+| `provider` | `string`  | 自动检测 | 嵌入适配器 id：`bedrock`、`gemini`、`github-copilot`、`local`、`mistral`、`ollama`、`openai`、`voyage` |
+| `model`    | `string`  | 提供商默认值 | 嵌入模型名称 |
+| `fallback` | `string`  | `"none"`         | 当主适配器失败时使用的回退适配器 id |
+| `enabled`  | `boolean` | `true`           | 启用或禁用 Memory 搜索 |
 
-### Auto-detection order
+### 自动检测顺序
 
-When `provider` is not set, OpenClaw selects the first available:
+当未设置 `provider` 时，OpenClaw 会选择第一个可用项：
 
 <Steps>
   <Step title="local">
-    Selected if `memorySearch.local.modelPath` is configured and the file exists.
+    如果配置了 `memorySearch.local.modelPath` 且文件存在，则选择它。
   </Step>
   <Step title="github-copilot">
-    Selected if a GitHub Copilot token can be resolved (env var or auth profile).
+    如果可以解析到 GitHub Copilot token（环境变量或认证配置文件），则选择它。
   </Step>
   <Step title="openai">
-    Selected if an OpenAI key can be resolved.
+    如果可以解析到 OpenAI key，则选择它。
   </Step>
   <Step title="gemini">
-    Selected if a Gemini key can be resolved.
+    如果可以解析到 Gemini key，则选择它。
   </Step>
   <Step title="voyage">
-    Selected if a Voyage key can be resolved.
+    如果可以解析到 Voyage key，则选择它。
   </Step>
   <Step title="mistral">
-    Selected if a Mistral key can be resolved.
+    如果可以解析到 Mistral key，则选择它。
   </Step>
   <Step title="bedrock">
-    Selected if the AWS SDK credential chain resolves (instance role, access keys, profile, SSO, web identity, or shared config).
+    如果 AWS SDK 凭证链可以解析成功（实例角色、访问密钥、profile、SSO、Web identity 或共享配置），则选择它。
   </Step>
 </Steps>
 
-`ollama` is supported but not auto-detected (set it explicitly).
+支持 `ollama`，但不会自动检测（需要显式设置）。
 
-### API key resolution
+### API 密钥解析
 
-Remote embeddings require an API key. Bedrock uses the AWS SDK default credential chain instead (instance roles, SSO, access keys).
+远程嵌入需要 API key。Bedrock 则使用 AWS SDK 默认凭证链（实例角色、SSO、访问密钥）。
 
-| Provider       | Env var                                            | Config key                        |
+| 提供商 | 环境变量 | 配置键 |
 | -------------- | -------------------------------------------------- | --------------------------------- |
-| Bedrock        | AWS credential chain                               | No API key needed                 |
+| Bedrock        | AWS 凭证链 | 不需要 API key |
 | Gemini         | `GEMINI_API_KEY`                                   | `models.providers.google.apiKey`  |
-| GitHub Copilot | `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, `GITHUB_TOKEN` | Auth profile via device login     |
+| GitHub Copilot | `COPILOT_GITHUB_TOKEN`、`GH_TOKEN`、`GITHUB_TOKEN` | 通过设备登录的认证配置文件 |
 | Mistral        | `MISTRAL_API_KEY`                                  | `models.providers.mistral.apiKey` |
-| Ollama         | `OLLAMA_API_KEY` (placeholder)                     | --                                |
+| Ollama         | `OLLAMA_API_KEY`（占位符）                     | --                                |
 | OpenAI         | `OPENAI_API_KEY`                                   | `models.providers.openai.apiKey`  |
 | Voyage         | `VOYAGE_API_KEY`                                   | `models.providers.voyage.apiKey`  |
 
 <Note>
-Codex OAuth covers chat/completions only and does not satisfy embedding requests.
+Codex OAuth 仅覆盖 chat/completions，不满足嵌入请求。
 </Note>
 
 ---
 
-## Remote endpoint config
+## 远程端点配置
 
-For custom OpenAI-compatible endpoints or overriding provider defaults:
+用于自定义兼容 OpenAI 的端点或覆盖提供商默认值：
 
 <ParamField path="remote.baseUrl" type="string">
-  Custom API base URL.
+  自定义 API 基础 URL。
 </ParamField>
 <ParamField path="remote.apiKey" type="string">
-  Override API key.
+  覆盖 API key。
 </ParamField>
 <ParamField path="remote.headers" type="object">
-  Extra HTTP headers (merged with provider defaults).
+  额外的 HTTP headers（与提供商默认值合并）。
 </ParamField>
 
 ```json5
@@ -136,22 +143,22 @@ For custom OpenAI-compatible endpoints or overriding provider defaults:
 
 ---
 
-## Provider-specific config
+## 提供商特定配置
 
 <AccordionGroup>
   <Accordion title="Gemini">
-    | Key                    | Type     | Default                | Description                                |
+    | 键 | 类型 | 默认值 | 说明 |
     | ---------------------- | -------- | ---------------------- | ------------------------------------------ |
-    | `model`                | `string` | `gemini-embedding-001` | Also supports `gemini-embedding-2-preview` |
-    | `outputDimensionality` | `number` | `3072`                 | For Embedding 2: 768, 1536, or 3072        |
+    | `model`                | `string` | `gemini-embedding-001` | 也支持 `gemini-embedding-2-preview` |
+    | `outputDimensionality` | `number` | `3072`                 | 对于 Embedding 2：768、1536 或 3072 |
 
     <Warning>
-    Changing model or `outputDimensionality` triggers an automatic full reindex.
+    更改模型或 `outputDimensionality` 会触发自动全量重新索引。
     </Warning>
 
   </Accordion>
   <Accordion title="Bedrock">
-    Bedrock uses the AWS SDK default credential chain — no API keys needed. If OpenClaw runs on EC2 with a Bedrock-enabled instance role, just set the provider and model:
+    Bedrock 使用 AWS SDK 默认凭证链——不需要 API key。如果 OpenClaw 运行在启用了 Bedrock 实例角色的 EC2 上，只需设置提供商和模型：
 
     ```json5
     {
@@ -166,39 +173,39 @@ For custom OpenAI-compatible endpoints or overriding provider defaults:
     }
     ```
 
-    | Key                    | Type     | Default                        | Description                     |
+    | 键 | 类型 | 默认值 | 说明 |
     | ---------------------- | -------- | ------------------------------ | ------------------------------- |
-    | `model`                | `string` | `amazon.titan-embed-text-v2:0` | Any Bedrock embedding model ID  |
-    | `outputDimensionality` | `number` | model default                  | For Titan V2: 256, 512, or 1024 |
+    | `model`                | `string` | `amazon.titan-embed-text-v2:0` | 任意 Bedrock 嵌入模型 id |
+    | `outputDimensionality` | `number` | 模型默认值 | 对于 Titan V2：256、512 或 1024 |
 
-    **Supported models** (with family detection and dimension defaults):
+    **支持的模型**（含家族检测和默认维度）：
 
-    | Model ID                                   | Provider   | Default Dims | Configurable Dims    |
+    | 模型 ID | 提供商 | 默认维度 | 可配置维度 |
     | ------------------------------------------ | ---------- | ------------ | -------------------- |
-    | `amazon.titan-embed-text-v2:0`             | Amazon     | 1024         | 256, 512, 1024       |
+    | `amazon.titan-embed-text-v2:0`             | Amazon     | 1024         | 256、512、1024       |
     | `amazon.titan-embed-text-v1`               | Amazon     | 1536         | --                   |
     | `amazon.titan-embed-g1-text-02`            | Amazon     | 1536         | --                   |
     | `amazon.titan-embed-image-v1`              | Amazon     | 1024         | --                   |
-    | `amazon.nova-2-multimodal-embeddings-v1:0` | Amazon     | 1024         | 256, 384, 1024, 3072 |
+    | `amazon.nova-2-multimodal-embeddings-v1:0` | Amazon     | 1024         | 256、384、1024、3072 |
     | `cohere.embed-english-v3`                  | Cohere     | 1024         | --                   |
     | `cohere.embed-multilingual-v3`             | Cohere     | 1024         | --                   |
     | `cohere.embed-v4:0`                        | Cohere     | 1536         | 256-1536             |
     | `twelvelabs.marengo-embed-3-0-v1:0`        | TwelveLabs | 512          | --                   |
     | `twelvelabs.marengo-embed-2-7-v1:0`        | TwelveLabs | 1024         | --                   |
 
-    Throughput-suffixed variants (e.g., `amazon.titan-embed-text-v1:2:8k`) inherit the base model's configuration.
+    带吞吐量后缀的变体（例如 `amazon.titan-embed-text-v1:2:8k`）会继承基础模型的配置。
 
-    **Authentication:** Bedrock auth uses the standard AWS SDK credential resolution order:
+    **认证：** Bedrock 认证使用标准 AWS SDK 凭证解析顺序：
 
-    1. Environment variables (`AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`)
-    2. SSO token cache
-    3. Web identity token credentials
-    4. Shared credentials and config files
-    5. ECS or EC2 metadata credentials
+    1. 环境变量（`AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`）
+    2. SSO token 缓存
+    3. Web identity token 凭证
+    4. 共享凭证和配置文件
+    5. ECS 或 EC2 元数据凭证
 
-    Region is resolved from `AWS_REGION`, `AWS_DEFAULT_REGION`, the `amazon-bedrock` provider `baseUrl`, or defaults to `us-east-1`.
+    区域会从 `AWS_REGION`、`AWS_DEFAULT_REGION`、`amazon-bedrock` provider 的 `baseUrl` 中解析，否则默认使用 `us-east-1`。
 
-    **IAM permissions:** the IAM role or user needs:
+    **IAM 权限：** IAM 角色或用户需要：
 
     ```json
     {
@@ -208,74 +215,74 @@ For custom OpenAI-compatible endpoints or overriding provider defaults:
     }
     ```
 
-    For least-privilege, scope `InvokeModel` to the specific model:
+    为了实现最小权限，请将 `InvokeModel` 限定到特定模型：
 
     ```
     arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v2:0
     ```
 
   </Accordion>
-  <Accordion title="Local (GGUF + node-llama-cpp)">
-    | Key                   | Type               | Default                | Description                                                                                                                                                                                                                                                                                                          |
+  <Accordion title="Local（GGUF + node-llama-cpp）">
+    | 键 | 类型 | 默认值 | 说明 |
     | --------------------- | ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | `local.modelPath`     | `string`           | auto-downloaded        | Path to GGUF model file                                                                                                                                                                                                                                                                                              |
-    | `local.modelCacheDir` | `string`           | node-llama-cpp default | Cache dir for downloaded models                                                                                                                                                                                                                                                                                      |
-    | `local.contextSize`   | `number \| "auto"` | `4096`                 | Context window size for the embedding context. 4096 covers typical chunks (128–512 tokens) while bounding non-weight VRAM. Lower to 1024–2048 on constrained hosts. `"auto"` uses the model's trained maximum — not recommended for 8B+ models (Qwen3-Embedding-8B: 40 960 tokens → ~32 GB VRAM vs ~8.8 GB at 4096). |
+    | `local.modelPath`     | `string`           | 自动下载 | GGUF 模型文件路径 |
+    | `local.modelCacheDir` | `string`           | node-llama-cpp 默认值 | 下载模型的缓存目录 |
+    | `local.contextSize`   | `number \| "auto"` | `4096`                 | 嵌入上下文的上下文窗口大小。4096 可覆盖典型分块（128–512 tokens），同时限制非权重 VRAM。对于受限主机，可降到 1024–2048。`"auto"` 使用模型训练时的最大值——不建议用于 8B+ 模型（Qwen3-Embedding-8B：40 960 tokens → 大约 32 GB VRAM，而 4096 时约为 8.8 GB）。 |
 
-    Default model: `embeddinggemma-300m-qat-Q8_0.gguf` (~0.6 GB, auto-downloaded). Requires native build: `pnpm approve-builds` then `pnpm rebuild node-llama-cpp`.
+    默认模型：`embeddinggemma-300m-qat-Q8_0.gguf`（约 0.6 GB，自动下载）。需要原生构建：`pnpm approve-builds` 然后 `pnpm rebuild node-llama-cpp`。
 
-    Use the standalone CLI to verify the same provider path the Gateway uses:
+    使用独立 CLI 验证 Gateway 网关所使用的同一提供商路径：
 
     ```bash
     openclaw memory status --deep --agent main
     openclaw memory index --force --agent main
     ```
 
-    If `provider` is `auto`, `local` is selected only when `local.modelPath` points to an existing local file. `hf:` and HTTP(S) model references can still be used explicitly with `provider: "local"`, but they do not make `auto` select local before the model is available on disk.
+    如果 `provider` 是 `auto`，只有当 `local.modelPath` 指向一个已存在的本地文件时，才会选择 `local`。`hf:` 和 HTTP(S) 模型引用仍可通过 `provider: "local"` 显式使用，但在模型实际落盘之前，它们不会让 `auto` 优先选择 local。
 
   </Accordion>
 </AccordionGroup>
 
-### Inline embedding timeout
+### 内联嵌入超时
 
 <ParamField path="sync.embeddingBatchTimeoutSeconds" type="number">
-  Override the timeout for inline embedding batches during memory indexing.
+  覆盖 Memory 索引期间内联嵌入批次的超时时间。
 
-Unset uses the provider default: 600 seconds for local/self-hosted providers such as `local`, `ollama`, and `lmstudio`, and 120 seconds for hosted providers. Increase this when local CPU-bound embedding batches are healthy but slow.
+未设置时使用提供商默认值：对于 `local`、`ollama` 和 `lmstudio` 等本地 / 自托管提供商为 600 秒，对于托管提供商为 120 秒。当本地 CPU 密集型嵌入批次运行正常但较慢时，可增大该值。
 </ParamField>
 
 ---
 
-## Hybrid search config
+## 混合搜索配置
 
-All under `memorySearch.query.hybrid`:
+全部位于 `memorySearch.query.hybrid` 下：
 
-| Key                   | Type      | Default | Description                        |
+| 键 | 类型 | 默认值 | 说明 |
 | --------------------- | --------- | ------- | ---------------------------------- |
-| `enabled`             | `boolean` | `true`  | Enable hybrid BM25 + vector search |
-| `vectorWeight`        | `number`  | `0.7`   | Weight for vector scores (0-1)     |
-| `textWeight`          | `number`  | `0.3`   | Weight for BM25 scores (0-1)       |
-| `candidateMultiplier` | `number`  | `4`     | Candidate pool size multiplier     |
+| `enabled`             | `boolean` | `true`  | 启用混合 BM25 + 向量搜索 |
+| `vectorWeight`        | `number`  | `0.7`   | 向量分数权重（0-1） |
+| `textWeight`          | `number`  | `0.3`   | BM25 分数权重（0-1） |
+| `candidateMultiplier` | `number`  | `4`     | 候选池大小乘数 |
 
 <Tabs>
-  <Tab title="MMR (diversity)">
-    | Key           | Type      | Default | Description                          |
+  <Tab title="MMR（多样性）">
+    | 键 | 类型 | 默认值 | 说明 |
     | ------------- | --------- | ------- | ------------------------------------ |
-    | `mmr.enabled` | `boolean` | `false` | Enable MMR re-ranking                |
-    | `mmr.lambda`  | `number`  | `0.7`   | 0 = max diversity, 1 = max relevance |
+    | `mmr.enabled` | `boolean` | `false` | 启用 MMR 重排序 |
+    | `mmr.lambda`  | `number`  | `0.7`   | 0 = 最大多样性，1 = 最大相关性 |
   </Tab>
-  <Tab title="Temporal decay (recency)">
-    | Key                          | Type      | Default | Description               |
+  <Tab title="时间衰减（新近性）">
+    | 键 | 类型 | 默认值 | 说明 |
     | ---------------------------- | --------- | ------- | ------------------------- |
-    | `temporalDecay.enabled`      | `boolean` | `false` | Enable recency boost      |
-    | `temporalDecay.halfLifeDays` | `number`  | `30`    | Score halves every N days |
+    | `temporalDecay.enabled`      | `boolean` | `false` | 启用新近性加权 |
+    | `temporalDecay.halfLifeDays` | `number`  | `30`    | 分数每 N 天减半 |
 
-    Evergreen files (`MEMORY.md`, non-dated files in `memory/`) are never decayed.
+    常青文件（`MEMORY.md`、`memory/` 中无日期的文件）永不衰减。
 
   </Tab>
 </Tabs>
 
-### Full example
+### 完整示例
 
 ```json5
 {
@@ -298,11 +305,11 @@ All under `memorySearch.query.hybrid`:
 
 ---
 
-## Additional memory paths
+## 附加 Memory 路径
 
-| Key          | Type       | Description                              |
+| 键 | 类型 | 说明 |
 | ------------ | ---------- | ---------------------------------------- |
-| `extraPaths` | `string[]` | Additional directories or files to index |
+| `extraPaths` | `string[]` | 需要索引的附加目录或文件 |
 
 ```json5
 {
@@ -316,137 +323,137 @@ All under `memorySearch.query.hybrid`:
 }
 ```
 
-Paths can be absolute or workspace-relative. Directories are scanned recursively for `.md` files. Symlink handling depends on the active backend: the builtin engine ignores symlinks, while QMD follows the underlying QMD scanner behavior.
+路径可以是绝对路径，也可以是相对工作区路径。目录会递归扫描 `.md` 文件。符号链接处理取决于当前后端：内置引擎会忽略符号链接，而 QMD 会遵循底层 QMD 扫描器的行为。
 
-For agent-scoped cross-agent transcript search, use `agents.list[].memorySearch.qmd.extraCollections` instead of `memory.qmd.paths`. Those extra collections follow the same `{ path, name, pattern? }` shape, but they are merged per agent and can preserve explicit shared names when the path points outside the current workspace. If the same resolved path appears in both `memory.qmd.paths` and `memorySearch.qmd.extraCollections`, QMD keeps the first entry and skips the duplicate.
+对于按智能体范围的跨智能体 transcript 搜索，请使用 `agents.list[].memorySearch.qmd.extraCollections`，而不是 `memory.qmd.paths`。这些额外集合遵循相同的 `{ path, name, pattern? }` 结构，但它们会按智能体合并，并且当路径指向当前工作区之外时，可以保留显式共享名称。如果同一个解析后的路径同时出现在 `memory.qmd.paths` 和 `memorySearch.qmd.extraCollections` 中，QMD 会保留第一个条目并跳过重复项。
 
 ---
 
-## Multimodal memory (Gemini)
+## 多模态 Memory（Gemini）
 
-Index images and audio alongside Markdown using Gemini Embedding 2:
+使用 Gemini Embedding 2，为图像和音频与 Markdown 一起建立索引：
 
-| Key                       | Type       | Default    | Description                            |
+| 键 | 类型 | 默认值 | 说明 |
 | ------------------------- | ---------- | ---------- | -------------------------------------- |
-| `multimodal.enabled`      | `boolean`  | `false`    | Enable multimodal indexing             |
-| `multimodal.modalities`   | `string[]` | --         | `["image"]`, `["audio"]`, or `["all"]` |
-| `multimodal.maxFileBytes` | `number`   | `10000000` | Max file size for indexing             |
+| `multimodal.enabled`      | `boolean`  | `false`    | 启用多模态索引 |
+| `multimodal.modalities`   | `string[]` | --         | `["image"]`、`["audio"]` 或 `["all"]` |
+| `multimodal.maxFileBytes` | `number`   | `10000000` | 建立索引的最大文件大小 |
 
 <Note>
-Only applies to files in `extraPaths`. Default memory roots stay Markdown-only. Requires `gemini-embedding-2-preview`. `fallback` must be `"none"`.
+仅适用于 `extraPaths` 中的文件。默认 Memory 根目录仍然只支持 Markdown。需要 `gemini-embedding-2-preview`。`fallback` 必须是 `"none"`。
 </Note>
 
-Supported formats: `.jpg`, `.jpeg`, `.png`, `.webp`, `.gif`, `.heic`, `.heif` (images); `.mp3`, `.wav`, `.ogg`, `.opus`, `.m4a`, `.aac`, `.flac` (audio).
+支持的格式：`.jpg`、`.jpeg`、`.png`、`.webp`、`.gif`、`.heic`、`.heif`（图像）；`.mp3`、`.wav`、`.ogg`、`.opus`、`.m4a`、`.aac`、`.flac`（音频）。
 
 ---
 
-## Embedding cache
+## 嵌入缓存
 
-| Key                | Type      | Default | Description                      |
+| 键 | 类型 | 默认值 | 说明 |
 | ------------------ | --------- | ------- | -------------------------------- |
-| `cache.enabled`    | `boolean` | `false` | Cache chunk embeddings in SQLite |
-| `cache.maxEntries` | `number`  | `50000` | Max cached embeddings            |
+| `cache.enabled`    | `boolean` | `false` | 在 SQLite 中缓存分块嵌入 |
+| `cache.maxEntries` | `number`  | `50000` | 最大缓存嵌入数量 |
 
-Prevents re-embedding unchanged text during reindex or transcript updates.
+防止在重新索引或 transcript 更新期间，对未更改的文本重复执行嵌入。
 
 ---
 
-## Batch indexing
+## 批量索引
 
-| Key                           | Type      | Default | Description                |
+| 键 | 类型 | 默认值 | 说明 |
 | ----------------------------- | --------- | ------- | -------------------------- |
-| `remote.batch.enabled`        | `boolean` | `false` | Enable batch embedding API |
-| `remote.batch.concurrency`    | `number`  | `2`     | Parallel batch jobs        |
-| `remote.batch.wait`           | `boolean` | `true`  | Wait for batch completion  |
-| `remote.batch.pollIntervalMs` | `number`  | --      | Poll interval              |
-| `remote.batch.timeoutMinutes` | `number`  | --      | Batch timeout              |
+| `remote.batch.enabled`        | `boolean` | `false` | 启用批量嵌入 API |
+| `remote.batch.concurrency`    | `number`  | `2`     | 并行批处理作业数 |
+| `remote.batch.wait`           | `boolean` | `true`  | 等待批处理完成 |
+| `remote.batch.pollIntervalMs` | `number`  | --      | 轮询间隔 |
+| `remote.batch.timeoutMinutes` | `number`  | --      | 批处理超时 |
 
-Available for `openai`, `gemini`, and `voyage`. OpenAI batch is typically fastest and cheapest for large backfills.
+适用于 `openai`、`gemini` 和 `voyage`。对于大型回填，OpenAI 批处理通常最快且最便宜。
 
-This is separate from `sync.embeddingBatchTimeoutSeconds`, which controls inline embedding calls used by local/self-hosted providers and hosted providers when provider batch APIs are not active.
+这与 `sync.embeddingBatchTimeoutSeconds` 是分开的；后者控制的是本地 / 自托管提供商使用的内联嵌入调用，以及在未启用提供商批量 API 时托管提供商使用的内联嵌入调用。
 
 ---
 
-## Session memory search (experimental)
+## 会话 Memory 搜索（实验性）
 
-Index session transcripts and surface them via `memory_search`:
+将会话 transcript 建立索引，并通过 `memory_search` 暴露：
 
-| Key                           | Type       | Default      | Description                             |
+| 键 | 类型 | 默认值 | 说明 |
 | ----------------------------- | ---------- | ------------ | --------------------------------------- |
-| `experimental.sessionMemory`  | `boolean`  | `false`      | Enable session indexing                 |
-| `sources`                     | `string[]` | `["memory"]` | Add `"sessions"` to include transcripts |
-| `sync.sessions.deltaBytes`    | `number`   | `100000`     | Byte threshold for reindex              |
-| `sync.sessions.deltaMessages` | `number`   | `50`         | Message threshold for reindex           |
+| `experimental.sessionMemory`  | `boolean`  | `false`      | 启用会话索引 |
+| `sources`                     | `string[]` | `["memory"]` | 添加 `"sessions"` 以包含 transcript |
+| `sync.sessions.deltaBytes`    | `number`   | `100000`     | 触发重新索引的字节阈值 |
+| `sync.sessions.deltaMessages` | `number`   | `50`         | 触发重新索引的消息阈值 |
 
 <Warning>
-Session indexing is opt-in and runs asynchronously. Results can be slightly stale. Session logs live on disk, so treat filesystem access as the trust boundary.
+会话索引为选择性启用，并以异步方式运行。结果可能会略有滞后。会话日志保存在磁盘上，因此应将文件系统访问视为信任边界。
 </Warning>
 
 ---
 
-## SQLite vector acceleration (sqlite-vec)
+## SQLite 向量加速（sqlite-vec）
 
-| Key                          | Type      | Default | Description                       |
+| 键 | 类型 | 默认值 | 说明 |
 | ---------------------------- | --------- | ------- | --------------------------------- |
-| `store.vector.enabled`       | `boolean` | `true`  | Use sqlite-vec for vector queries |
-| `store.vector.extensionPath` | `string`  | bundled | Override sqlite-vec path          |
+| `store.vector.enabled`       | `boolean` | `true`  | 对向量查询使用 sqlite-vec |
+| `store.vector.extensionPath` | `string`  | 内置 | 覆盖 sqlite-vec 路径 |
 
-When sqlite-vec is unavailable, OpenClaw falls back to in-process cosine similarity automatically.
+当 sqlite-vec 不可用时，OpenClaw 会自动回退到进程内余弦相似度计算。
 
 ---
 
-## Index storage
+## 索引存储
 
-| Key                   | Type     | Default                               | Description                                 |
+| 键 | 类型 | 默认值 | 说明 |
 | --------------------- | -------- | ------------------------------------- | ------------------------------------------- |
-| `store.path`          | `string` | `~/.openclaw/memory/{agentId}.sqlite` | Index location (supports `{agentId}` token) |
-| `store.fts.tokenizer` | `string` | `unicode61`                           | FTS5 tokenizer (`unicode61` or `trigram`)   |
+| `store.path`          | `string` | `~/.openclaw/memory/{agentId}.sqlite` | 索引位置（支持 `{agentId}` token） |
+| `store.fts.tokenizer` | `string` | `unicode61`                           | FTS5 tokenizer（`unicode61` 或 `trigram`） |
 
 ---
 
-## QMD backend config
+## QMD 后端配置
 
-Set `memory.backend = "qmd"` to enable. All QMD settings live under `memory.qmd`:
+设置 `memory.backend = "qmd"` 以启用。所有 QMD 设置都位于 `memory.qmd` 下：
 
-| Key                      | Type      | Default  | Description                                  |
+| 键 | 类型 | 默认值 | 说明 |
 | ------------------------ | --------- | -------- | -------------------------------------------- |
-| `command`                | `string`  | `qmd`    | QMD executable path                          |
-| `searchMode`             | `string`  | `search` | Search command: `search`, `vsearch`, `query` |
-| `includeDefaultMemory`   | `boolean` | `true`   | Auto-index `MEMORY.md` + `memory/**/*.md`    |
-| `paths[]`                | `array`   | --       | Extra paths: `{ name, path, pattern? }`      |
-| `sessions.enabled`       | `boolean` | `false`  | Index session transcripts                    |
-| `sessions.retentionDays` | `number`  | --       | Transcript retention                         |
-| `sessions.exportDir`     | `string`  | --       | Export directory                             |
+| `command`                | `string`  | `qmd`    | QMD 可执行文件路径 |
+| `searchMode`             | `string`  | `search` | 搜索命令：`search`、`vsearch`、`query` |
+| `includeDefaultMemory`   | `boolean` | `true`   | 自动索引 `MEMORY.md` + `memory/**/*.md` |
+| `paths[]`                | `array`   | --       | 额外路径：`{ name, path, pattern? }` |
+| `sessions.enabled`       | `boolean` | `false`  | 索引会话 transcript |
+| `sessions.retentionDays` | `number`  | --       | transcript 保留期 |
+| `sessions.exportDir`     | `string`  | --       | 导出目录 |
 
-OpenClaw prefers the current QMD collection and MCP query shapes, but keeps older QMD releases working by falling back to legacy `--mask` collection flags and older MCP tool names when needed.
+OpenClaw 优先使用当前的 QMD collection 和 MCP query 结构，但在需要时会回退到旧版 `--mask` collection 标志和旧版 MCP 工具名，以保持旧版 QMD 仍可工作。
 
 <Note>
-QMD model overrides stay on the QMD side, not OpenClaw config. If you need to override QMD's models globally, set environment variables such as `QMD_EMBED_MODEL`, `QMD_RERANK_MODEL`, and `QMD_GENERATE_MODEL` in the gateway runtime environment.
+QMD 模型覆盖保留在 QMD 一侧，而不是 OpenClaw 配置中。如果你需要全局覆盖 QMD 的模型，请在 Gateway 网关运行时环境中设置环境变量，例如 `QMD_EMBED_MODEL`、`QMD_RERANK_MODEL` 和 `QMD_GENERATE_MODEL`。
 </Note>
 
 <AccordionGroup>
-  <Accordion title="Update schedule">
-    | Key                       | Type      | Default | Description                           |
+  <Accordion title="更新计划">
+    | 键 | 类型 | 默认值 | 说明 |
     | ------------------------- | --------- | ------- | ------------------------------------- |
-    | `update.interval`         | `string`  | `5m`    | Refresh interval                      |
-    | `update.debounceMs`       | `number`  | `15000` | Debounce file changes                 |
-    | `update.onBoot`           | `boolean` | `true`  | Refresh on startup                    |
-    | `update.waitForBootSync`  | `boolean` | `false` | Block startup until refresh completes |
-    | `update.embedInterval`    | `string`  | --      | Separate embed cadence                |
-    | `update.commandTimeoutMs` | `number`  | --      | Timeout for QMD commands              |
-    | `update.updateTimeoutMs`  | `number`  | --      | Timeout for QMD update operations     |
-    | `update.embedTimeoutMs`   | `number`  | --      | Timeout for QMD embed operations      |
+    | `update.interval`         | `string`  | `5m`    | 刷新间隔 |
+    | `update.debounceMs`       | `number`  | `15000` | 文件变更防抖 |
+    | `update.onBoot`           | `boolean` | `true`  | 启动时刷新 |
+    | `update.waitForBootSync`  | `boolean` | `false` | 在刷新完成前阻塞启动 |
+    | `update.embedInterval`    | `string`  | --      | 单独的嵌入频率 |
+    | `update.commandTimeoutMs` | `number`  | --      | QMD 命令超时 |
+    | `update.updateTimeoutMs`  | `number`  | --      | QMD 更新操作超时 |
+    | `update.embedTimeoutMs`   | `number`  | --      | QMD 嵌入操作超时 |
   </Accordion>
-  <Accordion title="Limits">
-    | Key                       | Type     | Default | Description                |
+  <Accordion title="限制">
+    | 键 | 类型 | 默认值 | 说明 |
     | ------------------------- | -------- | ------- | -------------------------- |
-    | `limits.maxResults`       | `number` | `6`     | Max search results         |
-    | `limits.maxSnippetChars`  | `number` | --      | Clamp snippet length       |
-    | `limits.maxInjectedChars` | `number` | --      | Clamp total injected chars |
-    | `limits.timeoutMs`        | `number` | `4000`  | Search timeout             |
+    | `limits.maxResults`       | `number` | `6`     | 最大搜索结果数 |
+    | `limits.maxSnippetChars`  | `number` | --      | 限制片段长度 |
+    | `limits.maxInjectedChars` | `number` | --      | 限制注入总字符数 |
+    | `limits.timeoutMs`        | `number` | `4000`  | 搜索超时 |
   </Accordion>
-  <Accordion title="Scope">
-    Controls which sessions can receive QMD search results. Same schema as [`session.sendPolicy`](/gateway/config-agents#session):
+  <Accordion title="作用域">
+    控制哪些会话可以接收 QMD 搜索结果。schema 与 [`session.sendPolicy`](/zh-CN/gateway/config-agents#session) 相同：
 
     ```json5
     {
@@ -461,24 +468,24 @@ QMD model overrides stay on the QMD side, not OpenClaw config. If you need to ov
     }
     ```
 
-    The shipped default allows direct and channel sessions, while still denying groups.
+    内置默认值允许 direct 和渠道会话，同时仍然拒绝群组。
 
-    Default is DM-only. `match.keyPrefix` matches the normalized session key; `match.rawKeyPrefix` matches the raw key including `agent:<id>:`.
+    默认仅限私信。`match.keyPrefix` 匹配规范化后的会话键；`match.rawKeyPrefix` 匹配包含 `agent:<id>:` 的原始键。
 
   </Accordion>
-  <Accordion title="Citations">
-    `memory.citations` applies to all backends:
+  <Accordion title="引用">
+    `memory.citations` 适用于所有后端：
 
-    | Value            | Behavior                                            |
+    | 值 | 行为 |
     | ---------------- | --------------------------------------------------- |
-    | `auto` (default) | Include `Source: <path#line>` footer in snippets    |
-    | `on`             | Always include footer                               |
-    | `off`            | Omit footer (path still passed to agent internally) |
+    | `auto`（默认） | 在片段中包含 `Source: <path#line>` 页脚 |
+    | `on`             | 始终包含页脚 |
+    | `off`            | 省略页脚（路径仍会在内部传递给智能体） |
 
   </Accordion>
 </AccordionGroup>
 
-### Full QMD example
+### 完整 QMD 示例
 
 ```json5
 {
@@ -503,20 +510,20 @@ QMD model overrides stay on the QMD side, not OpenClaw config. If you need to ov
 
 ## Dreaming
 
-Dreaming is configured under `plugins.entries.memory-core.config.dreaming`, not under `agents.defaults.memorySearch`.
+Dreaming 配置位于 `plugins.entries.memory-core.config.dreaming` 下，而不是 `agents.defaults.memorySearch` 下。
 
-Dreaming runs as one scheduled sweep and uses internal light/deep/REM phases as an implementation detail.
+Dreaming 以一次计划扫描运行，并将内部的 light / deep / REM 阶段作为实现细节使用。
 
-For conceptual behavior and slash commands, see [Dreaming](/concepts/dreaming).
+关于概念性行为和斜杠命令，请参见 [Dreaming](/zh-CN/concepts/dreaming)。
 
-### User settings
+### 用户设置
 
-| Key         | Type      | Default     | Description                                       |
+| 键 | 类型 | 默认值 | 说明 |
 | ----------- | --------- | ----------- | ------------------------------------------------- |
-| `enabled`   | `boolean` | `false`     | Enable or disable dreaming entirely               |
-| `frequency` | `string`  | `0 3 * * *` | Optional cron cadence for the full dreaming sweep |
+| `enabled`   | `boolean` | `false`     | 完全启用或禁用 Dreaming |
+| `frequency` | `string`  | `0 3 * * *` | 完整 Dreaming 扫描的可选 cron 频率 |
 
-### Example
+### 示例
 
 ```json5
 {
@@ -536,13 +543,13 @@ For conceptual behavior and slash commands, see [Dreaming](/concepts/dreaming).
 ```
 
 <Note>
-- Dreaming writes machine state to `memory/.dreams/`.
-- Dreaming writes human-readable narrative output to `DREAMS.md` (or existing `dreams.md`).
-- The light/deep/REM phase policy and thresholds are internal behavior, not user-facing config.
+- Dreaming 会将机器状态写入 `memory/.dreams/`。
+- Dreaming 会将人类可读的叙事输出写入 `DREAMS.md`（或现有的 `dreams.md`）。
+- light / deep / REM 阶段策略和阈值属于内部行为，不是面向用户的配置。
 </Note>
 
-## Related
+## 相关内容
 
-- [Configuration reference](/gateway/configuration-reference)
-- [Memory overview](/concepts/memory)
-- [Memory search](/concepts/memory-search)
+- [配置参考](/zh-CN/gateway/configuration-reference)
+- [Memory 概览](/zh-CN/concepts/memory)
+- [Memory 搜索](/zh-CN/concepts/memory-search)

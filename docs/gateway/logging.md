@@ -1,123 +1,123 @@
 ---
-summary: "Logging surfaces, file logs, WS log styles, and console formatting"
 read_when:
-  - Changing logging output or formats
-  - Debugging CLI or gateway output
-title: "Gateway logging"
+    - 更改日志输出或格式
+    - 调试 CLI 或 Gateway 网关输出
+summary: 日志展示界面、文件日志、WS 日志样式，以及控制台格式化
+title: Gateway 网关日志记录
+x-i18n:
+    generated_at: "2026-04-26T19:16:56Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 52b3904ee693bdabc74b56e6dd924f12215ce741496a03eafc15f74258ad036e
+    source_path: gateway/logging.md
+    workflow: 15
 ---
 
-# Logging
+# 日志记录
 
-For a user-facing overview (CLI + Control UI + config), see [/logging](/logging).
+如需面向用户的概览（CLI + Control UI + 配置），请参见 [/logging](/zh-CN/logging)。
 
-OpenClaw has two log “surfaces”:
+OpenClaw 有两个日志“展示界面”：
 
-- **Console output** (what you see in the terminal / Debug UI).
-- **File logs** (JSON lines) written by the gateway logger.
+- **控制台输出**（你在终端 / 调试 UI 中看到的内容）。
+- **文件日志**（JSON 行格式），由 Gateway 网关日志记录器写入。
 
-## File-based logger
+## 基于文件的日志记录器
 
-- Default rolling log file is under `/tmp/openclaw/` (one file per day): `openclaw-YYYY-MM-DD.log`
-  - Date uses the gateway host's local timezone.
-- Active log files rotate at `logging.maxFileBytes` (default: 100 MB), keeping
-  up to five numbered archives and continuing to write a fresh active file.
-- The log file path and level can be configured via `~/.openclaw/openclaw.json`:
+- 默认的滚动日志文件位于 `/tmp/openclaw/` 下（每天一个文件）：`openclaw-YYYY-MM-DD.log`
+  - 日期使用 Gateway 网关主机的本地时区。
+- 活动日志文件会在达到 `logging.maxFileBytes` 时轮转（默认：100 MB），最多保留五个带编号的归档文件，并继续写入一个新的活动文件。
+- 可以通过 `~/.openclaw/openclaw.json` 配置日志文件路径和级别：
   - `logging.file`
   - `logging.level`
 
-The file format is one JSON object per line.
+文件格式为每行一个 JSON 对象。
 
-The Control UI Logs tab tails this file via the gateway (`logs.tail`).
-CLI can do the same:
+Control UI 的 Logs 选项卡会通过 Gateway 网关（`logs.tail`）持续跟踪这个文件。
+CLI 也可以执行相同操作：
 
 ```bash
 openclaw logs --follow
 ```
 
-**Verbose vs. log levels**
+**详细输出与日志级别**
 
-- **File logs** are controlled exclusively by `logging.level`.
-- `--verbose` only affects **console verbosity** (and WS log style); it does **not**
-  raise the file log level.
-- To capture verbose-only details in file logs, set `logging.level` to `debug` or
-  `trace`.
+- **文件日志**仅由 `logging.level` 控制。
+- `--verbose` 只影响**控制台详细程度**（以及 WS 日志样式）；它**不会**提高文件日志级别。
+- 若要在文件日志中捕获仅详细模式下可见的细节，请将 `logging.level` 设置为 `debug` 或 `trace`。
 
-## Console capture
+## 控制台捕获
 
-The CLI captures `console.log/info/warn/error/debug/trace` and writes them to file logs,
-while still printing to stdout/stderr.
+CLI 会捕获 `console.log/info/warn/error/debug/trace`，并将其写入文件日志，同时仍然输出到 stdout/stderr。
 
-You can tune console verbosity independently via:
+你可以通过以下配置独立调整控制台详细程度：
 
-- `logging.consoleLevel` (default `info`)
-- `logging.consoleStyle` (`pretty` | `compact` | `json`)
+- `logging.consoleLevel`（默认 `info`）
+- `logging.consoleStyle`（`pretty` | `compact` | `json`）
 
-## Redaction
+## 脱敏
 
-OpenClaw can mask sensitive tokens before log or transcript output leaves the
-process. The same redaction policy is applied at console, file-log, OTLP
-log-record, and session transcript text sinks, so matching secret values are
-masked before JSONL lines or messages are written to disk.
+OpenClaw 可以在日志或转录输出离开进程之前屏蔽敏感令牌。同一套脱敏策略会应用到控制台、文件日志、OTLP 日志记录以及会话转录文本输出端，因此匹配到的敏感值会在 JSONL 行或消息写入磁盘之前被屏蔽。
 
-- `logging.redactSensitive`: `off` | `tools` (default: `tools`)
-- `logging.redactPatterns`: array of regex strings (overrides defaults)
-  - Use raw regex strings (auto `gi`), or `/pattern/flags` if you need custom flags.
-  - Matches are masked by keeping the first 6 + last 4 chars (length >= 18), otherwise `***`.
-  - Defaults cover common key assignments, CLI flags, JSON fields, bearer headers, PEM blocks, and popular token prefixes.
+- `logging.redactSensitive`：`off` | `tools`（默认：`tools`）
+- `logging.redactPatterns`：正则表达式字符串数组（覆盖默认值）
+  - 使用原始正则字符串（自动附加 `gi`），如果你需要自定义标志，可使用 `/pattern/flags`。
+  - 匹配项会保留前 6 个字符和后 4 个字符进行遮罩（长度 >= 18），否则显示为 `***`。
+  - 默认规则涵盖常见的密钥赋值、CLI 标志、JSON 字段、bearer 标头、PEM 块以及常见令牌前缀。
 
-## Gateway WebSocket logs
+## Gateway 网关 WebSocket 日志
 
-The gateway prints WebSocket protocol logs in two modes:
+Gateway 网关会以两种模式打印 WebSocket 协议日志：
 
-- **Normal mode (no `--verbose`)**: only “interesting” RPC results are printed:
-  - errors (`ok=false`)
-  - slow calls (default threshold: `>= 50ms`)
-  - parse errors
-- **Verbose mode (`--verbose`)**: prints all WS request/response traffic.
+- **普通模式（不使用 `--verbose`）**：仅打印“值得关注”的 RPC 结果：
+  - 错误（`ok=false`）
+  - 慢调用（默认阈值：`>= 50ms`）
+  - 解析错误
+- **详细模式（`--verbose`）**：打印所有 WS 请求/响应流量。
 
-### WS log style
+### WS 日志样式
 
-`openclaw gateway` supports a per-gateway style switch:
+`openclaw gateway` 支持按 Gateway 网关切换样式：
 
-- `--ws-log auto` (default): normal mode is optimized; verbose mode uses compact output
-- `--ws-log compact`: compact output (paired request/response) when verbose
-- `--ws-log full`: full per-frame output when verbose
-- `--compact`: alias for `--ws-log compact`
+- `--ws-log auto`（默认）：普通模式下会进行优化；详细模式下使用紧凑输出
+- `--ws-log compact`：详细模式下使用紧凑输出（配对的请求/响应）
+- `--ws-log full`：详细模式下使用完整的逐帧输出
+- `--compact`：`--ws-log compact` 的别名
 
-Examples:
+示例：
 
 ```bash
-# optimized (only errors/slow)
+# 优化模式（仅错误/慢调用）
 openclaw gateway
 
-# show all WS traffic (paired)
+# 显示所有 WS 流量（配对）
 openclaw gateway --verbose --ws-log compact
 
-# show all WS traffic (full meta)
+# 显示所有 WS 流量（完整元数据）
 openclaw gateway --verbose --ws-log full
 ```
 
-## Console formatting (subsystem logging)
+## 控制台格式化（子系统日志记录）
 
-The console formatter is **TTY-aware** and prints consistent, prefixed lines.
-Subsystem loggers keep output grouped and scannable.
+控制台格式化器会**感知 TTY**，并输出一致且带前缀的行。
+子系统日志记录器会让输出保持分组并便于快速扫描。
 
-Behavior:
+行为：
 
-- **Subsystem prefixes** on every line (e.g. `[gateway]`, `[canvas]`, `[tailscale]`)
-- **Subsystem colors** (stable per subsystem) plus level coloring
-- **Color when output is a TTY or the environment looks like a rich terminal** (`TERM`/`COLORTERM`/`TERM_PROGRAM`), respects `NO_COLOR`
-- **Shortened subsystem prefixes**: drops leading `gateway/` + `channels/`, keeps last 2 segments (e.g. `whatsapp/outbound`)
-- **Sub-loggers by subsystem** (auto prefix + structured field `{ subsystem }`)
-- **`logRaw()`** for QR/UX output (no prefix, no formatting)
-- **Console styles** (e.g. `pretty | compact | json`)
-- **Console log level** separate from file log level (file keeps full detail when `logging.level` is set to `debug`/`trace`)
-- **WhatsApp message bodies** are logged at `debug` (use `--verbose` to see them)
+- 每行都有**子系统前缀**（例如 `[gateway]`、`[canvas]`、`[tailscale]`）
+- **子系统颜色**（每个子系统颜色稳定）以及级别颜色
+- **当输出为 TTY 或环境看起来像是富终端时启用颜色**（`TERM`/`COLORTERM`/`TERM_PROGRAM`），并遵循 `NO_COLOR`
+- **缩短的子系统前缀**：去掉前导 `gateway/` 和 `channels/`，保留最后 2 个段（例如 `whatsapp/outbound`）
+- **按子系统划分的子日志记录器**（自动加前缀 + 结构化字段 `{ subsystem }`）
+- 用于 QR/UX 输出的 **`logRaw()`**（无前缀、无格式化）
+- **控制台样式**（例如 `pretty | compact | json`）
+- **控制台日志级别**与文件日志级别分离（当 `logging.level` 设置为 `debug`/`trace` 时，文件仍保留完整细节）
+- **WhatsApp 消息正文**会以 `debug` 级别记录（使用 `--verbose` 才能看到）
 
-This keeps existing file logs stable while making interactive output scannable.
+这样既能保持现有文件日志稳定，又能让交互式输出更便于扫描。
 
-## Related
+## 相关内容
 
-- [Logging](/logging)
-- [OpenTelemetry export](/gateway/opentelemetry)
-- [Diagnostics export](/gateway/diagnostics)
+- [日志记录](/zh-CN/logging)
+- [OpenTelemetry 导出](/zh-CN/gateway/opentelemetry)
+- [诊断导出](/zh-CN/gateway/diagnostics)

@@ -1,154 +1,158 @@
 ---
-summary: "Run the ACP bridge for IDE integrations"
 read_when:
-  - Setting up ACP-based IDE integrations
-  - Debugging ACP session routing to the Gateway
-title: "ACP"
+    - 设置基于 ACP 的 IDE 集成
+    - 调试到 Gateway 网关的 ACP 会话路由
+summary: 为 IDE 集成运行 ACP 桥接器
+title: ACP
+x-i18n:
+    generated_at: "2026-04-24T04:00:21Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 88b4d5de9e8e7464fd929ace0471af7d85afc94789c0c45a1f4a00d39b7871e1
+    source_path: cli/acp.md
+    workflow: 15
 ---
 
-Run the [Agent Client Protocol (ACP)](https://agentclientprotocol.com/) bridge that talks to an OpenClaw Gateway.
+运行与 OpenClaw Gateway 网关通信的 [Agent Client Protocol (ACP)](https://agentclientprotocol.com/) 桥接器。
 
-This command speaks ACP over stdio for IDEs and forwards prompts to the Gateway
-over WebSocket. It keeps ACP sessions mapped to Gateway session keys.
+此命令通过 `stdio` 为 IDE 提供 ACP，并通过 WebSocket 将提示转发到 Gateway 网关。
+它会让 ACP 会话保持映射到 Gateway 网关的会话键。
 
-`openclaw acp` is a Gateway-backed ACP bridge, not a full ACP-native editor
-runtime. It focuses on session routing, prompt delivery, and basic streaming
-updates.
+`openclaw acp` 是一个由 Gateway 网关支持的 ACP 桥接器，而不是完整的 ACP 原生编辑器
+运行时。它专注于会话路由、提示传递和基础流式更新。
 
-If you want an external MCP client to talk directly to OpenClaw channel
-conversations instead of hosting an ACP harness session, use
-[`openclaw mcp serve`](/cli/mcp) instead.
+如果你希望外部 MCP 客户端直接与 OpenClaw 渠道对话通信，
+而不是托管 ACP harness 会话，请改用
+[`openclaw mcp serve`](/zh-CN/cli/mcp)。
 
-## What this is not
+## 这不是什么
 
-This page is often confused with ACP harness sessions.
+此页面经常与 ACP harness 会话混淆。
 
-`openclaw acp` means:
+`openclaw acp` 的含义是：
 
-- OpenClaw acts as an ACP server
-- an IDE or ACP client connects to OpenClaw
-- OpenClaw forwards that work into a Gateway session
+- OpenClaw 充当 ACP 服务器
+- IDE 或 ACP 客户端连接到 OpenClaw
+- OpenClaw 将这些工作转发到 Gateway 网关会话中
 
-This is different from [ACP Agents](/tools/acp-agents), where OpenClaw runs an
-external harness such as Codex or Claude Code through `acpx`.
+这不同于 [ACP Agents](/zh-CN/tools/acp-agents)，后者中 OpenClaw 通过
+`acpx` 运行外部 harness，例如 Codex 或 Claude Code。
 
-Quick rule:
+快速规则：
 
-- editor/client wants to talk ACP to OpenClaw: use `openclaw acp`
-- OpenClaw should launch Codex/Claude/Gemini as an ACP harness: use `/acp spawn` and [ACP Agents](/tools/acp-agents)
+- 编辑器/客户端想通过 ACP 与 OpenClaw 通信：使用 `openclaw acp`
+- OpenClaw 应启动 Codex/Claude/Gemini 作为 ACP harness：使用 `/acp spawn` 和 [ACP Agents](/zh-CN/tools/acp-agents)
 
-## Compatibility Matrix
+## 兼容性矩阵
 
-| ACP area                                                              | Status      | Notes                                                                                                                                                                                                                                            |
-| --------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `initialize`, `newSession`, `prompt`, `cancel`                        | Implemented | Core bridge flow over stdio to Gateway chat/send + abort.                                                                                                                                                                                        |
-| `listSessions`, slash commands                                        | Implemented | Session list works against Gateway session state; commands are advertised via `available_commands_update`.                                                                                                                                       |
-| `loadSession`                                                         | Partial     | Rebinds the ACP session to a Gateway session key and replays stored user/assistant text history. Tool/system history is not reconstructed yet.                                                                                                   |
-| Prompt content (`text`, embedded `resource`, images)                  | Partial     | Text/resources are flattened into chat input; images become Gateway attachments.                                                                                                                                                                 |
-| Session modes                                                         | Partial     | `session/set_mode` is supported and the bridge exposes initial Gateway-backed session controls for thought level, tool verbosity, reasoning, usage detail, and elevated actions. Broader ACP-native mode/config surfaces are still out of scope. |
-| Session info and usage updates                                        | Partial     | The bridge emits `session_info_update` and best-effort `usage_update` notifications from cached Gateway session snapshots. Usage is approximate and only sent when Gateway token totals are marked fresh.                                        |
-| Tool streaming                                                        | Partial     | `tool_call` / `tool_call_update` events include raw I/O, text content, and best-effort file locations when Gateway tool args/results expose them. Embedded terminals and richer diff-native output are still not exposed.                        |
-| Per-session MCP servers (`mcpServers`)                                | Unsupported | Bridge mode rejects per-session MCP server requests. Configure MCP on the OpenClaw gateway or agent instead.                                                                                                                                     |
-| Client filesystem methods (`fs/read_text_file`, `fs/write_text_file`) | Unsupported | The bridge does not call ACP client filesystem methods.                                                                                                                                                                                          |
-| Client terminal methods (`terminal/*`)                                | Unsupported | The bridge does not create ACP client terminals or stream terminal ids through tool calls.                                                                                                                                                       |
-| Session plans / thought streaming                                     | Unsupported | The bridge currently emits output text and tool status, not ACP plan or thought updates.                                                                                                                                                         |
+| ACP 区域                                                              | 状态 | 说明                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `initialize`, `newSession`, `prompt`, `cancel`                        | 已实现 | 通过 `stdio` 到 Gateway 网关 `chat/send` + 中止的核心桥接流程。                                                                                                                                                             |
+| `listSessions`, 斜杠命令                                               | 已实现 | 会话列表可基于 Gateway 网关会话状态工作；命令通过 `available_commands_update` 宣告。                                                                                                                                       |
+| `loadSession`                                                         | 部分支持 | 将 ACP 会话重新绑定到 Gateway 网关会话键，并重放已存储的用户/助手文本历史。工具/系统历史尚未重建。                                                                                                                        |
+| 提示内容（`text`、嵌入式 `resource`、图像）                           | 部分支持 | 文本/资源会被展平为聊天输入；图像会变为 Gateway 网关附件。                                                                                                                                                                  |
+| 会话模式                                                              | 部分支持 | 支持 `session/set_mode`，并且该桥接器会公开初始的、由 Gateway 网关支持的会话控制项，包括 thought level、tool verbosity、reasoning、usage detail 和 elevated actions。更广泛的 ACP 原生模式/配置表面目前仍不在范围内。 |
+| 会话信息和使用量更新                                                  | 部分支持 | 桥接器会从缓存的 Gateway 网关会话快照中发出 `session_info_update` 和尽力而为的 `usage_update` 通知。使用量是近似值，且仅当 Gateway 网关将 token 总量标记为最新时才会发送。                                              |
+| 工具流式传输                                                          | 部分支持 | `tool_call` / `tool_call_update` 事件会包含原始 I/O、文本内容，以及当 Gateway 网关工具参数/结果暴露相关信息时的尽力而为文件位置。嵌入式终端和更丰富的 Diffs 原生输出仍未暴露。                                          |
+| 每会话 MCP 服务器（`mcpServers`）                                     | 不支持 | 桥接模式会拒绝每会话 MCP 服务器请求。请改为在 OpenClaw gateway 或智能体上配置 MCP。                                                                                                                                         |
+| 客户端文件系统方法（`fs/read_text_file`, `fs/write_text_file`）       | 不支持 | 桥接器不会调用 ACP 客户端文件系统方法。                                                                                                                                                                                     |
+| 客户端终端方法（`terminal/*`）                                        | 不支持 | 桥接器不会创建 ACP 客户端终端，也不会通过工具调用流式传输终端 id。                                                                                                                                                         |
+| 会话计划 / thought 流式传输                                           | 不支持 | 桥接器当前会发出输出文本和工具状态，而不是 ACP 计划或 thought 更新。                                                                                                                                                       |
 
-## Known Limitations
+## 已知限制
 
-- `loadSession` replays stored user and assistant text history, but it does not
-  reconstruct historic tool calls, system notices, or richer ACP-native event
-  types.
-- If multiple ACP clients share the same Gateway session key, event and cancel
-  routing are best-effort rather than strictly isolated per client. Prefer the
-  default isolated `acp:<uuid>` sessions when you need clean editor-local
-  turns.
-- Gateway stop states are translated into ACP stop reasons, but that mapping is
-  less expressive than a fully ACP-native runtime.
-- Initial session controls currently surface a focused subset of Gateway knobs:
-  thought level, tool verbosity, reasoning, usage detail, and elevated
-  actions. Model selection and exec-host controls are not yet exposed as ACP
-  config options.
-- `session_info_update` and `usage_update` are derived from Gateway session
-  snapshots, not live ACP-native runtime accounting. Usage is approximate,
-  carries no cost data, and is only emitted when the Gateway marks total token
-  data as fresh.
-- Tool follow-along data is best-effort. The bridge can surface file paths that
-  appear in known tool args/results, but it does not yet emit ACP terminals or
-  structured file diffs.
+- `loadSession` 会重放已存储的用户和助手文本历史，但不会
+  重建历史工具调用、系统通知或更丰富的 ACP 原生事件
+  类型。
+- 如果多个 ACP 客户端共享同一个 Gateway 网关会话键，事件和取消
+  路由将是尽力而为，而不是严格按客户端隔离。若你需要干净的编辑器本地
+  回合，请优先使用默认隔离的 `acp:<uuid>` 会话。
+- Gateway 网关停止状态会被转换为 ACP 停止原因，但这种映射的
+  表达能力不如完整的 ACP 原生运行时。
+- 初始会话控制目前只暴露一组聚焦的 Gateway 网关旋钮子集：
+  thought level、tool verbosity、reasoning、usage detail 和 elevated
+  actions。模型选择和 exec-host 控制尚未作为 ACP
+  配置选项暴露。
+- `session_info_update` 和 `usage_update` 源自 Gateway 网关会话
+  快照，而非实时 ACP 原生运行时核算。使用量是近似值，
+  不包含成本数据，并且仅当 Gateway 网关将总 token
+  数据标记为最新时才会发出。
+- 工具跟随数据是尽力而为的。桥接器可以显示出现在已知工具参数/结果中的
+  文件路径，但尚不会发出 ACP 终端或结构化文件 Diffs。
 
-## Usage
+## 用法
 
 ```bash
 openclaw acp
 
-# Remote Gateway
+# 远程 Gateway 网关
 openclaw acp --url wss://gateway-host:18789 --token <token>
 
-# Remote Gateway (token from file)
+# 远程 Gateway 网关（从文件读取 token）
 openclaw acp --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
 
-# Attach to an existing session key
+# 附加到现有会话键
 openclaw acp --session agent:main:main
 
-# Attach by label (must already exist)
+# 按标签附加（必须已存在）
 openclaw acp --session-label "support inbox"
 
-# Reset the session key before the first prompt
+# 在第一个提示之前重置会话键
 openclaw acp --session agent:main:main --reset-session
 ```
 
-## ACP client (debug)
+## ACP 客户端（调试）
 
-Use the built-in ACP client to sanity-check the bridge without an IDE.
-It spawns the ACP bridge and lets you type prompts interactively.
+使用内置 ACP 客户端可在没有 IDE 的情况下对桥接器进行安装完整性检查。
+它会生成 ACP 桥接器，并允许你以交互方式输入提示。
 
 ```bash
 openclaw acp client
 
-# Point the spawned bridge at a remote Gateway
+# 让生成的桥接器指向远程 Gateway 网关
 openclaw acp client --server-args --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
 
-# Override the server command (default: openclaw)
+# 覆盖服务器命令（默认：openclaw）
 openclaw acp client --server "node" --server-args openclaw.mjs acp --url ws://127.0.0.1:19001
 ```
 
-Permission model (client debug mode):
+权限模型（客户端调试模式）：
 
-- Auto-approval is allowlist-based and only applies to trusted core tool IDs.
-- `read` auto-approval is scoped to the current working directory (`--cwd` when set).
-- ACP only auto-approves narrow readonly classes: scoped `read` calls under the active cwd plus readonly search tools (`search`, `web_search`, `memory_search`). Unknown/non-core tools, out-of-scope reads, exec-capable tools, control-plane tools, mutating tools, and interactive flows always require explicit prompt approval.
-- Server-provided `toolCall.kind` is treated as untrusted metadata (not an authorization source).
-- This ACP bridge policy is separate from ACPX harness permissions. If you run OpenClaw through the `acpx` backend, `plugins.entries.acpx.config.permissionMode=approve-all` is the break-glass “yolo” switch for that harness session.
+- 自动批准基于 allowlist，并且仅适用于受信任的核心工具 id。
+- `read` 自动批准仅限于当前工作目录（设置了 `--cwd` 时）。
+- ACP 仅自动批准范围很窄的只读类别：活动 cwd 下有范围限制的 `read` 调用，以及只读搜索工具（`search`、`web_search`、`memory_search`）。未知/非核心工具、超出范围的读取、具备 exec 能力的工具、控制平面工具、可变更工具和交互式流程始终需要显式提示批准。
+- 服务器提供的 `toolCall.kind` 会被视为不受信任的元数据（而不是授权来源）。
+- 此 ACP 桥接策略独立于 ACPX harness 权限。如果你通过 `acpx` 后端运行 OpenClaw，`plugins.entries.acpx.config.permissionMode=approve-all` 是该 harness 会话的紧急放开式 “yolo” 开关。
 
-## How to use this
+## 如何使用
 
-Use ACP when an IDE (or other client) speaks Agent Client Protocol and you want
-it to drive an OpenClaw Gateway session.
+当 IDE（或其他客户端）支持 Agent Client Protocol，并且你希望
+它驱动 OpenClaw Gateway 网关会话时，请使用 ACP。
 
-1. Ensure the Gateway is running (local or remote).
-2. Configure the Gateway target (config or flags).
-3. Point your IDE to run `openclaw acp` over stdio.
+1. 确保 Gateway 网关正在运行（本地或远程）。
+2. 配置 Gateway 网关目标（配置或标志）。
+3. 将你的 IDE 配置为通过 `stdio` 运行 `openclaw acp`。
 
-Example config (persisted):
+示例配置（持久化）：
 
 ```bash
 openclaw config set gateway.remote.url wss://gateway-host:18789
 openclaw config set gateway.remote.token <token>
 ```
 
-Example direct run (no config write):
+示例直接运行（不写入配置）：
 
 ```bash
 openclaw acp --url wss://gateway-host:18789 --token <token>
-# preferred for local process safety
+# 为了本地进程安全，推荐使用
 openclaw acp --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
 ```
 
-## Selecting agents
+## 选择智能体
 
-ACP does not pick agents directly. It routes by the Gateway session key.
+ACP 不会直接选择智能体。它按 Gateway 网关会话键进行路由。
 
-Use agent-scoped session keys to target a specific agent:
+使用带智能体作用域的会话键来指定特定智能体：
 
 ```bash
 openclaw acp --session agent:main:main
@@ -156,45 +160,45 @@ openclaw acp --session agent:design:main
 openclaw acp --session agent:qa:bug-123
 ```
 
-Each ACP session maps to a single Gateway session key. One agent can have many
-sessions; ACP defaults to an isolated `acp:<uuid>` session unless you override
-the key or label.
+每个 ACP 会话都会映射到一个 Gateway 网关会话键。一个智能体可以拥有多个
+会话；除非你覆盖该键或标签，否则 ACP 默认使用隔离的 `acp:<uuid>`
+会话。
 
-Per-session `mcpServers` are not supported in bridge mode. If an ACP client
-sends them during `newSession` or `loadSession`, the bridge returns a clear
-error instead of silently ignoring them.
+桥接模式不支持每会话 `mcpServers`。如果 ACP 客户端
+在 `newSession` 或 `loadSession` 期间发送它们，桥接器会返回清晰的
+错误，而不是静默忽略。
 
-If you want ACPX-backed sessions to see OpenClaw plugin tools or selected
-built-in tools such as `cron`, enable the gateway-side ACPX MCP bridges instead
-of trying to pass per-session `mcpServers`. See
-[ACP Agents](/tools/acp-agents-setup#plugin-tools-mcp-bridge) and
-[OpenClaw tools MCP bridge](/tools/acp-agents-setup#openclaw-tools-mcp-bridge).
+如果你希望 ACPX 支持的会话能够看到 OpenClaw 渠道插件工具或选定的
+内置工具（例如 `cron`），请启用 gateway 侧的 ACPX MCP 桥接，
+而不是尝试传递每会话 `mcpServers`。请参见
+[ACP Agents](/zh-CN/tools/acp-agents-setup#plugin-tools-mcp-bridge) 和
+[OpenClaw 工具 MCP 桥接](/zh-CN/tools/acp-agents-setup#openclaw-tools-mcp-bridge)。
 
-## Use from `acpx` (Codex, Claude, other ACP clients)
+## 从 `acpx` 使用（Codex、Claude、其他 ACP 客户端）
 
-If you want a coding agent such as Codex or Claude Code to talk to your
-OpenClaw bot over ACP, use `acpx` with its built-in `openclaw` target.
+如果你希望 Codex 或 Claude Code 这样的编码智能体通过 ACP 与你的
+OpenClaw 机器人通信，请使用带内置 `openclaw` 目标的 `acpx`。
 
-Typical flow:
+典型流程：
 
-1. Run the Gateway and make sure the ACP bridge can reach it.
-2. Point `acpx openclaw` at `openclaw acp`.
-3. Target the OpenClaw session key you want the coding agent to use.
+1. 运行 Gateway 网关，并确保 ACP 桥接器可以连接到它。
+2. 将 `acpx openclaw` 指向 `openclaw acp`。
+3. 指定你希望编码智能体使用的 OpenClaw 会话键。
 
-Examples:
+示例：
 
 ```bash
-# One-shot request into your default OpenClaw ACP session
+# 向你的默认 OpenClaw ACP 会话发起一次性请求
 acpx openclaw exec "Summarize the active OpenClaw session state."
 
-# Persistent named session for follow-up turns
+# 用于后续回合的持久命名会话
 acpx openclaw sessions ensure --name codex-bridge
 acpx openclaw -s codex-bridge --cwd /path/to/repo \
   "Ask my OpenClaw work agent for recent context relevant to this repo."
 ```
 
-If you want `acpx openclaw` to target a specific Gateway and session key every
-time, override the `openclaw` agent command in `~/.acpx/config.json`:
+如果你希望 `acpx openclaw` 每次都指向特定的 Gateway 网关和会话键，
+请在 `~/.acpx/config.json` 中覆盖 `openclaw` 智能体命令：
 
 ```json
 {
@@ -206,19 +210,19 @@ time, override the `openclaw` agent command in `~/.acpx/config.json`:
 }
 ```
 
-For a repo-local OpenClaw checkout, use the direct CLI entrypoint instead of the
-dev runner so the ACP stream stays clean. For example:
+对于仓库本地的 OpenClaw 检出，请使用直接 CLI 入口点，而不是
+开发运行器，这样 ACP 流才能保持干净。例如：
 
 ```bash
 env OPENCLAW_HIDE_BANNER=1 OPENCLAW_SUPPRESS_NOTES=1 node openclaw.mjs acp ...
 ```
 
-This is the easiest way to let Codex, Claude Code, or another ACP-aware client
-pull contextual information from an OpenClaw agent without scraping a terminal.
+这是让 Codex、Claude Code 或其他支持 ACP 的客户端
+从 OpenClaw 智能体中提取上下文信息、而无需抓取终端内容的最简单方法。
 
-## Zed editor setup
+## Zed 编辑器设置
 
-Add a custom ACP agent in `~/.config/zed/settings.json` (or use Zed’s Settings UI):
+在 `~/.config/zed/settings.json` 中添加自定义 ACP 智能体（或使用 Zed 的设置 UI）：
 
 ```json
 {
@@ -233,7 +237,7 @@ Add a custom ACP agent in `~/.config/zed/settings.json` (or use Zed’s Settings
 }
 ```
 
-To target a specific Gateway or agent:
+要指定特定的 Gateway 网关或智能体：
 
 ```json
 {
@@ -256,18 +260,18 @@ To target a specific Gateway or agent:
 }
 ```
 
-In Zed, open the Agent panel and select “OpenClaw ACP” to start a thread.
+在 Zed 中，打开 Agent 面板并选择 “OpenClaw ACP” 以开始一个线程。
 
-## Session mapping
+## 会话映射
 
-By default, ACP sessions get an isolated Gateway session key with an `acp:` prefix.
-To reuse a known session, pass a session key or label:
+默认情况下，ACP 会话会获得一个带有 `acp:` 前缀的隔离 Gateway 网关会话键。
+要复用已知会话，请传入会话键或标签：
 
-- `--session <key>`: use a specific Gateway session key.
-- `--session-label <label>`: resolve an existing session by label.
-- `--reset-session`: mint a fresh session id for that key (same key, new transcript).
+- `--session <key>`：使用特定的 Gateway 网关会话键。
+- `--session-label <label>`：按标签解析现有会话。
+- `--reset-session`：为该键生成新的会话 id（相同键，全新转录）。
 
-If your ACP client supports metadata, you can override per session:
+如果你的 ACP 客户端支持元数据，你可以按会话覆盖：
 
 ```json
 {
@@ -279,43 +283,43 @@ If your ACP client supports metadata, you can override per session:
 }
 ```
 
-Learn more about session keys at [/concepts/session](/concepts/session).
+在 [/concepts/session](/zh-CN/concepts/session) 了解有关会话键的更多信息。
 
-## Options
+## 选项
 
-- `--url <url>`: Gateway WebSocket URL (defaults to gateway.remote.url when configured).
-- `--token <token>`: Gateway auth token.
-- `--token-file <path>`: read Gateway auth token from file.
-- `--password <password>`: Gateway auth password.
-- `--password-file <path>`: read Gateway auth password from file.
-- `--session <key>`: default session key.
-- `--session-label <label>`: default session label to resolve.
-- `--require-existing`: fail if the session key/label does not exist.
-- `--reset-session`: reset the session key before first use.
-- `--no-prefix-cwd`: do not prefix prompts with the working directory.
-- `--provenance <off|meta|meta+receipt>`: include ACP provenance metadata or receipts.
-- `--verbose, -v`: verbose logging to stderr.
+- `--url <url>`：Gateway 网关 WebSocket URL（如果已配置，则默认使用 `gateway.remote.url`）。
+- `--token <token>`：Gateway 网关身份验证 token。
+- `--token-file <path>`：从文件读取 Gateway 网关身份验证 token。
+- `--password <password>`：Gateway 网关身份验证密码。
+- `--password-file <path>`：从文件读取 Gateway 网关身份验证密码。
+- `--session <key>`：默认会话键。
+- `--session-label <label>`：要解析的默认会话标签。
+- `--require-existing`：如果会话键/标签不存在则失败。
+- `--reset-session`：在首次使用前重置会话键。
+- `--no-prefix-cwd`：不要在提示前加上工作目录前缀。
+- `--provenance <off|meta|meta+receipt>`：包含 ACP provenance 元数据或 receipts。
+- `--verbose, -v`：将详细日志输出到 `stderr`。
 
-Security note:
+安全说明：
 
-- `--token` and `--password` can be visible in local process listings on some systems.
-- Prefer `--token-file`/`--password-file` or environment variables (`OPENCLAW_GATEWAY_TOKEN`, `OPENCLAW_GATEWAY_PASSWORD`).
-- Gateway auth resolution follows the shared contract used by other Gateway clients:
-  - local mode: env (`OPENCLAW_GATEWAY_*`) -> `gateway.auth.*` -> `gateway.remote.*` fallback only when `gateway.auth.*` is unset (configured-but-unresolved local SecretRefs fail closed)
-  - remote mode: `gateway.remote.*` with env/config fallback per remote precedence rules
-  - `--url` is override-safe and does not reuse implicit config/env credentials; pass explicit `--token`/`--password` (or file variants)
-- ACP runtime backend child processes receive `OPENCLAW_SHELL=acp`, which can be used for context-specific shell/profile rules.
-- `openclaw acp client` sets `OPENCLAW_SHELL=acp-client` on the spawned bridge process.
+- 在某些系统上，`--token` 和 `--password` 可能会在本地进程列表中可见。
+- 推荐使用 `--token-file`/`--password-file` 或环境变量（`OPENCLAW_GATEWAY_TOKEN`、`OPENCLAW_GATEWAY_PASSWORD`）。
+- Gateway 网关身份验证解析遵循其他 Gateway 网关客户端使用的共享契约：
+  - 本地模式：环境变量（`OPENCLAW_GATEWAY_*`）-> `gateway.auth.*` -> 仅当 `gateway.auth.*` 未设置时才回退到 `gateway.remote.*`（已配置但未解析的本地 SecretRefs 会以失败关闭方式处理）
+  - 远程模式：`gateway.remote.*`，并按远程优先级规则使用环境变量/配置回退
+  - `--url` 可安全覆盖，不会复用隐式配置/环境变量凭据；请传入显式的 `--token`/`--password`（或文件变体）
+- ACP 运行时后端子进程会接收 `OPENCLAW_SHELL=acp`，可用于特定上下文的 shell/profile 规则。
+- `openclaw acp client` 会在生成的桥接器进程上设置 `OPENCLAW_SHELL=acp-client`。
 
-### `acp client` options
+### `acp client` 选项
 
-- `--cwd <dir>`: working directory for the ACP session.
-- `--server <command>`: ACP server command (default: `openclaw`).
-- `--server-args <args...>`: extra arguments passed to the ACP server.
-- `--server-verbose`: enable verbose logging on the ACP server.
-- `--verbose, -v`: verbose client logging.
+- `--cwd <dir>`：ACP 会话的工作目录。
+- `--server <command>`：ACP 服务器命令（默认：`openclaw`）。
+- `--server-args <args...>`：传递给 ACP 服务器的额外参数。
+- `--server-verbose`：在 ACP 服务器上启用详细日志。
+- `--verbose, -v`：详细客户端日志。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
-- [ACP agents](/tools/acp-agents)
+- [CLI 参考](/zh-CN/cli)
+- [ACP agents](/zh-CN/tools/acp-agents)

@@ -1,82 +1,89 @@
 ---
-summary: "Expose an OpenResponses-compatible /v1/responses HTTP endpoint from the Gateway"
 read_when:
-  - Integrating clients that speak the OpenResponses API
-  - You want item-based inputs, client tool calls, or SSE events
-title: "OpenResponses API"
+    - 集成使用 OpenResponses API 的客户端
+    - 你需要基于 item 的输入、客户端工具调用或 SSE 事件
+summary: 从 Gateway 网关公开一个与 OpenResponses 兼容的 `/v1/responses` HTTP 端点
+title: OpenResponses API
+x-i18n:
+    generated_at: "2026-04-25T00:41:23Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: b48685ab42d6f031849990b60a57af9501c216f058dc38abce184b963b05cedb
+    source_path: gateway/openresponses-http-api.md
+    workflow: 15
 ---
 
-OpenClaw’s Gateway can serve an OpenResponses-compatible `POST /v1/responses` endpoint.
+OpenClaw 的 Gateway 网关可以提供一个与 OpenResponses 兼容的 `POST /v1/responses` 端点。
 
-This endpoint is **disabled by default**. Enable it in config first.
+此端点**默认禁用**。请先在配置中启用它。
 
 - `POST /v1/responses`
-- Same port as the Gateway (WS + HTTP multiplex): `http://<gateway-host>:<port>/v1/responses`
+- 与 Gateway 网关相同的端口（WS + HTTP 多路复用）：`http://<gateway-host>:<port>/v1/responses`
 
-Under the hood, requests are executed as a normal Gateway agent run (same codepath as
-`openclaw agent`), so routing/permissions/config match your Gateway.
+在底层，请求会作为一次普通的 Gateway 网关智能体运行来执行（与
+`openclaw agent` 使用相同的代码路径），因此路由/权限/配置会与你的 Gateway 网关保持一致。
 
-## Authentication, security, and routing
+## 认证、安全性与路由
 
-Operational behavior matches [OpenAI Chat Completions](/gateway/openai-http-api):
+操作行为与 [OpenAI Chat Completions](/zh-CN/gateway/openai-http-api) 一致：
 
-- use the matching Gateway HTTP auth path:
-  - shared-secret auth (`gateway.auth.mode="token"` or `"password"`): `Authorization: Bearer <token-or-password>`
-  - trusted-proxy auth (`gateway.auth.mode="trusted-proxy"`): identity-aware proxy headers from a configured non-loopback trusted proxy source
-  - private-ingress open auth (`gateway.auth.mode="none"`): no auth header
-- treat the endpoint as full operator access for the gateway instance
-- for shared-secret auth modes (`token` and `password`), ignore narrower bearer-declared `x-openclaw-scopes` values and restore the normal full operator defaults
-- for trusted identity-bearing HTTP modes (for example trusted proxy auth or `gateway.auth.mode="none"`), honor `x-openclaw-scopes` when present and otherwise fall back to the normal operator default scope set
-- select agents with `model: "openclaw"`, `model: "openclaw/default"`, `model: "openclaw/<agentId>"`, or `x-openclaw-agent-id`
-- use `x-openclaw-model` when you want to override the selected agent's backend model
-- use `x-openclaw-session-key` for explicit session routing
-- use `x-openclaw-message-channel` when you want a non-default synthetic ingress channel context
+- 使用匹配的 Gateway 网关 HTTP 认证路径：
+  - 共享密钥认证（`gateway.auth.mode="token"` 或 `"password"`）：`Authorization: Bearer <token-or-password>`
+  - 受信任代理认证（`gateway.auth.mode="trusted-proxy"`）：来自已配置的非 loopback 受信任代理源的身份感知代理头
+  - 私有入口开放认证（`gateway.auth.mode="none"`）：无需认证头
+- 将该端点视为对网关实例的完整操作员访问权限
+- 对于共享密钥认证模式（`token` 和 `password`），忽略更窄的 bearer 声明 `x-openclaw-scopes` 值，并恢复正常的完整操作员默认值
+- 对于受信任且携带身份的 HTTP 模式（例如受信任代理认证，或私有入口上的 `gateway.auth.mode="none"`），若存在 `x-openclaw-scopes` 则予以遵循，否则回退到正常的操作员默认作用域集合
+- 使用 `model: "openclaw"`、`model: "openclaw/default"`、`model: "openclaw/<agentId>"` 或 `x-openclaw-agent-id` 选择智能体
+- 当你想覆盖所选智能体的后端模型时，使用 `x-openclaw-model`
+- 使用 `x-openclaw-session-key` 进行显式会话路由
+- 当你想要非默认的合成入口渠道上下文时，使用 `x-openclaw-message-channel`
 
-Auth matrix:
+认证矩阵：
 
-- `gateway.auth.mode="token"` or `"password"` + `Authorization: Bearer ...`
-  - proves possession of the shared gateway operator secret
-  - ignores narrower `x-openclaw-scopes`
-  - restores the full default operator scope set:
+- `gateway.auth.mode="token"` 或 `"password"` + `Authorization: Bearer ...`
+  - 证明持有共享 Gateway 网关操作员密钥
+  - 忽略更窄的 `x-openclaw-scopes`
+  - 恢复完整的默认操作员作用域集合：
     `operator.admin`, `operator.approvals`, `operator.pairing`,
     `operator.read`, `operator.talk.secrets`, `operator.write`
-  - treats chat turns on this endpoint as owner-sender turns
-- trusted identity-bearing HTTP modes (for example trusted proxy auth, or `gateway.auth.mode="none"` on private ingress)
-  - honor `x-openclaw-scopes` when the header is present
-  - fall back to the normal operator default scope set when the header is absent
-  - only lose owner semantics when the caller explicitly narrows scopes and omits `operator.admin`
+  - 将此端点上的聊天轮次视为 owner-sender 轮次
+- 受信任且携带身份的 HTTP 模式（例如受信任代理认证，或私有入口上的 `gateway.auth.mode="none"`）
+  - 当请求头存在时遵循 `x-openclaw-scopes`
+  - 当请求头缺失时回退到正常的默认操作员作用域集合
+  - 只有在调用方显式收窄作用域且省略 `operator.admin` 时，才会失去 owner 语义
 
-Enable or disable this endpoint with `gateway.http.endpoints.responses.enabled`.
+使用 `gateway.http.endpoints.responses.enabled` 启用或禁用此端点。
 
-The same compatibility surface also includes:
+相同的兼容性表面还包括：
 
 - `GET /v1/models`
 - `GET /v1/models/{id}`
 - `POST /v1/embeddings`
 - `POST /v1/chat/completions`
 
-For the canonical explanation of how agent-target models, `openclaw/default`, embeddings pass-through, and backend model overrides fit together, see [OpenAI Chat Completions](/gateway/openai-http-api#agent-first-model-contract) and [Model list and agent routing](/gateway/openai-http-api#model-list-and-agent-routing).
+关于面向智能体的模型、`openclaw/default`、embeddings 透传以及后端模型覆盖如何配合工作的规范说明，请参见 [OpenAI Chat Completions](/zh-CN/gateway/openai-http-api#agent-first-model-contract) 和 [模型列表与智能体路由](/zh-CN/gateway/openai-http-api#model-list-and-agent-routing)。
 
-## Session behavior
+## 会话行为
 
-By default the endpoint is **stateless per request** (a new session key is generated each call).
+默认情况下，此端点对每个请求都是**无状态的**（每次调用都会生成一个新的会话键）。
 
-If the request includes an OpenResponses `user` string, the Gateway derives a stable session key
-from it, so repeated calls can share an agent session.
+如果请求包含 OpenResponses 的 `user` 字符串，Gateway 网关会从中派生出一个稳定的会话键，
+这样重复调用就可以共享同一个智能体会话。
 
-## Request shape (supported)
+## 请求形状（支持）
 
-The request follows the OpenResponses API with item-based input. Current support:
+请求遵循使用基于 item 输入的 OpenResponses API。当前支持：
 
-- `input`: string or array of item objects.
-- `instructions`: merged into the system prompt.
-- `tools`: client tool definitions (function tools).
-- `tool_choice`: filter or require client tools.
-- `stream`: enables SSE streaming.
-- `max_output_tokens`: best-effort output limit (provider dependent).
-- `user`: stable session routing.
+- `input`：字符串或 item 对象数组。
+- `instructions`：合并到系统提示词中。
+- `tools`：客户端工具定义（function 工具）。
+- `tool_choice`：过滤或强制使用客户端工具。
+- `stream`：启用 SSE 流式传输。
+- `max_output_tokens`：尽力限制输出长度（取决于提供商）。
+- `user`：稳定会话路由。
 
-Accepted but **currently ignored**:
+可接受但**当前会忽略**：
 
 - `max_tool_calls`
 - `reasoning`
@@ -84,23 +91,23 @@ Accepted but **currently ignored**:
 - `store`
 - `truncation`
 
-Supported:
+支持：
 
-- `previous_response_id`: OpenClaw reuses the earlier response session when the request stays within the same agent/user/requested-session scope.
+- `previous_response_id`：当请求保持在同一个智能体/用户/请求会话作用域内时，OpenClaw 会复用先前响应的会话。
 
-## Items (input)
+## Items（输入）
 
 ### `message`
 
-Roles: `system`, `developer`, `user`, `assistant`.
+角色：`system`、`developer`、`user`、`assistant`。
 
-- `system` and `developer` are appended to the system prompt.
-- The most recent `user` or `function_call_output` item becomes the “current message.”
-- Earlier user/assistant messages are included as history for context.
+- `system` 和 `developer` 会附加到系统提示词中。
+- 最近的 `user` 或 `function_call_output` item 会成为“当前消息”。
+- 更早的 user/assistant 消息会作为历史记录纳入上下文。
 
-### `function_call_output` (turn-based tools)
+### `function_call_output`（基于轮次的工具）
 
-Send tool results back to the model:
+将工具结果返回给模型：
 
 ```json
 {
@@ -110,20 +117,20 @@ Send tool results back to the model:
 }
 ```
 
-### `reasoning` and `item_reference`
+### `reasoning` 和 `item_reference`
 
-Accepted for schema compatibility but ignored when building the prompt.
+为保持 schema 兼容性而接受，但在构建提示词时会被忽略。
 
-## Tools (client-side function tools)
+## 工具（客户端 function 工具）
 
-Provide tools with `tools: [{ type: "function", function: { name, description?, parameters? } }]`.
+使用 `tools: [{ type: "function", function: { name, description?, parameters? } }]` 提供工具。
 
-If the agent decides to call a tool, the response returns a `function_call` output item.
-You then send a follow-up request with `function_call_output` to continue the turn.
+如果智能体决定调用某个工具，响应会返回一个 `function_call` 输出 item。
+然后你发送一个带有 `function_call_output` 的后续请求，以继续该轮对话。
 
-## Images (`input_image`)
+## 图片（`input_image`）
 
-Supports base64 or URL sources:
+支持 base64 或 URL 来源：
 
 ```json
 {
@@ -132,12 +139,12 @@ Supports base64 or URL sources:
 }
 ```
 
-Allowed MIME types (current): `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/heic`, `image/heif`.
-Max size (current): 10MB.
+允许的 MIME 类型（当前）：`image/jpeg`、`image/png`、`image/gif`、`image/webp`、`image/heic`、`image/heif`。
+最大大小（当前）：10 MB。
 
-## Files (`input_file`)
+## 文件（`input_file`）
 
-Supports base64 or URL sources:
+支持 base64 或 URL 来源：
 
 ```json
 {
@@ -151,46 +158,46 @@ Supports base64 or URL sources:
 }
 ```
 
-Allowed MIME types (current): `text/plain`, `text/markdown`, `text/html`, `text/csv`,
-`application/json`, `application/pdf`.
+允许的 MIME 类型（当前）：`text/plain`、`text/markdown`、`text/html`、`text/csv`、
+`application/json`、`application/pdf`。
 
-Max size (current): 5MB.
+最大大小（当前）：5 MB。
 
-Current behavior:
+当前行为：
 
-- File content is decoded and added to the **system prompt**, not the user message,
-  so it stays ephemeral (not persisted in session history).
-- Decoded file text is wrapped as **untrusted external content** before it is added,
-  so file bytes are treated as data, not trusted instructions.
-- The injected block uses explicit boundary markers like
+- 文件内容会被解码并添加到**系统提示词**中，而不是用户消息中，
+  因此它保持为临时内容（不会持久化到会话历史中）。
+- 解码后的文件文本在添加前会被包装为**不受信任的外部内容**，
+  因此文件字节会被视为数据，而不是受信任的指令。
+- 注入的块会使用明确的边界标记，例如
   `<<<EXTERNAL_UNTRUSTED_CONTENT id="...">>>` /
-  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>` and includes a
-  `Source: External` metadata line.
-- This file-input path intentionally omits the long `SECURITY NOTICE:` banner to
-  preserve prompt budget; the boundary markers and metadata still stay in place.
-- PDFs are parsed for text first. If little text is found, the first pages are
-  rasterized into images and passed to the model, and the injected file block uses
-  the placeholder `[PDF content rendered to images]`.
+  `<<<END_EXTERNAL_UNTRUSTED_CONTENT id="...">>>`，并包含一行
+  `Source: External` 元数据。
+- 此文件输入路径会刻意省略冗长的 `SECURITY NOTICE:` 横幅，
+  以保留提示词预算；边界标记和元数据仍会保留。
+- PDF 会先解析文本。如果检测到的文本很少，则会将前几页
+  栅格化为图片并传递给模型，此时注入的文件块会使用占位符
+  `[PDF content rendered to images]`。
 
-PDF parsing is provided by the bundled `document-extract` plugin, which uses the
-Node-friendly `pdfjs-dist` legacy build (no worker). The modern PDF.js build
-expects browser workers/DOM globals, so it is not used in the Gateway.
+PDF 解析由内置的 `document-extract` 插件提供，它使用
+适用于 Node 的 `pdfjs-dist` legacy 构建（不使用 worker）。现代的 PDF.js 构建
+依赖浏览器 worker/DOM 全局对象，因此不会在 Gateway 网关中使用。
 
-URL fetch defaults:
+URL 抓取默认值：
 
-- `files.allowUrl`: `true`
-- `images.allowUrl`: `true`
-- `maxUrlParts`: `8` (total URL-based `input_file` + `input_image` parts per request)
-- Requests are guarded (DNS resolution, private IP blocking, redirect caps, timeouts).
-- Optional hostname allowlists are supported per input type (`files.urlAllowlist`, `images.urlAllowlist`).
-  - Exact host: `"cdn.example.com"`
-  - Wildcard subdomains: `"*.assets.example.com"` (does not match apex)
-  - Empty or omitted allowlists mean no hostname allowlist restriction.
-- To disable URL-based fetches entirely, set `files.allowUrl: false` and/or `images.allowUrl: false`.
+- `files.allowUrl`：`true`
+- `images.allowUrl`：`true`
+- `maxUrlParts`：`8`（每个请求中基于 URL 的 `input_file` + `input_image` 部分总数）
+- 请求会受到保护（DNS 解析、私有 IP 阻止、重定向上限、超时）。
+- 每种输入类型都支持可选的主机名 allowlist（`files.urlAllowlist`、`images.urlAllowlist`）。
+  - 精确主机：`"cdn.example.com"`
+  - 通配子域名：`"*.assets.example.com"`（不匹配 apex）
+  - 空 allowlist 或省略 allowlist 表示不限制主机名 allowlist。
+- 若要完全禁用基于 URL 的抓取，请设置 `files.allowUrl: false` 和/或 `images.allowUrl: false`。
 
-## File + image limits (config)
+## 文件与图片限制（配置）
 
-Defaults can be tuned under `gateway.http.endpoints.responses`:
+默认值可在 `gateway.http.endpoints.responses` 下调整：
 
 ```json5
 {
@@ -244,38 +251,38 @@ Defaults can be tuned under `gateway.http.endpoints.responses`:
 }
 ```
 
-Defaults when omitted:
+省略时的默认值：
 
-- `maxBodyBytes`: 20MB
-- `maxUrlParts`: 8
-- `files.maxBytes`: 5MB
-- `files.maxChars`: 200k
-- `files.maxRedirects`: 3
-- `files.timeoutMs`: 10s
-- `files.pdf.maxPages`: 4
-- `files.pdf.maxPixels`: 4,000,000
-- `files.pdf.minTextChars`: 200
-- `images.maxBytes`: 10MB
-- `images.maxRedirects`: 3
-- `images.timeoutMs`: 10s
-- HEIC/HEIF `input_image` sources are accepted and normalized to JPEG before provider delivery.
+- `maxBodyBytes`：20 MB
+- `maxUrlParts`：8
+- `files.maxBytes`：5 MB
+- `files.maxChars`：200k
+- `files.maxRedirects`：3
+- `files.timeoutMs`：10 秒
+- `files.pdf.maxPages`：4
+- `files.pdf.maxPixels`：4,000,000
+- `files.pdf.minTextChars`：200
+- `images.maxBytes`：10 MB
+- `images.maxRedirects`：3
+- `images.timeoutMs`：10 秒
+- HEIC/HEIF `input_image` 来源会被接受，并在传递给提供商之前规范化为 JPEG。
 
-Security note:
+安全说明：
 
-- URL allowlists are enforced before fetch and on redirect hops.
-- Allowlisting a hostname does not bypass private/internal IP blocking.
-- For internet-exposed gateways, apply network egress controls in addition to app-level guards.
-  See [Security](/gateway/security).
+- URL allowlist 会在抓取前以及每次重定向跳转时强制执行。
+- 将某个主机名加入 allowlist 并不会绕过对私有/内部 IP 的阻止。
+- 对于暴露在互联网中的网关，除了应用层保护外，还应实施网络出口控制。
+  参见 [安全性](/zh-CN/gateway/security)。
 
-## Streaming (SSE)
+## 流式传输（SSE）
 
-Set `stream: true` to receive Server-Sent Events (SSE):
+设置 `stream: true` 以接收服务器发送事件（SSE）：
 
 - `Content-Type: text/event-stream`
-- Each event line is `event: <type>` and `data: <json>`
-- Stream ends with `data: [DONE]`
+- 每一行事件格式为 `event: <type>` 和 `data: <json>`
+- 流以 `data: [DONE]` 结束
 
-Event types currently emitted:
+当前发出的事件类型：
 
 - `response.created`
 - `response.in_progress`
@@ -286,32 +293,32 @@ Event types currently emitted:
 - `response.content_part.done`
 - `response.output_item.done`
 - `response.completed`
-- `response.failed` (on error)
+- `response.failed`（出错时）
 
-## Usage
+## 用量
 
-`usage` is populated when the underlying provider reports token counts.
-OpenClaw normalizes common OpenAI-style aliases before those counters reach
-downstream status/session surfaces, including `input_tokens` / `output_tokens`
-and `prompt_tokens` / `completion_tokens`.
+当底层提供商报告 token 计数时，`usage` 会被填充。
+在这些计数进入下游状态/会话表面之前，OpenClaw 会规范化常见的 OpenAI 风格别名，
+包括 `input_tokens` / `output_tokens`
+以及 `prompt_tokens` / `completion_tokens`。
 
-## Errors
+## 错误
 
-Errors use a JSON object like:
+错误使用如下 JSON 对象：
 
 ```json
 { "error": { "message": "...", "type": "invalid_request_error" } }
 ```
 
-Common cases:
+常见情况：
 
-- `401` missing/invalid auth
-- `400` invalid request body
-- `405` wrong method
+- `401` 缺少认证或认证无效
+- `400` 请求体无效
+- `405` 方法错误
 
-## Examples
+## 示例
 
-Non-streaming:
+非流式：
 
 ```bash
 curl -sS http://127.0.0.1:18789/v1/responses \
@@ -324,7 +331,7 @@ curl -sS http://127.0.0.1:18789/v1/responses \
   }'
 ```
 
-Streaming:
+流式：
 
 ```bash
 curl -N http://127.0.0.1:18789/v1/responses \
@@ -338,7 +345,7 @@ curl -N http://127.0.0.1:18789/v1/responses \
   }'
 ```
 
-## Related
+## 相关内容
 
-- [OpenAI chat completions](/gateway/openai-http-api)
-- [OpenAI](/providers/openai)
+- [OpenAI chat completions](/zh-CN/gateway/openai-http-api)
+- [OpenAI](/zh-CN/providers/openai)

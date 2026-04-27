@@ -1,40 +1,47 @@
 ---
-summary: "Elevated exec mode: run commands outside the sandbox from a sandboxed agent"
 read_when:
-  - Adjusting elevated mode defaults, allowlists, or slash command behavior
-  - Understanding how sandboxed agents can access the host
-title: "Elevated mode"
+    - 调整提升权限模式的默认值、允许列表或 slash 命令行为
+    - 了解沙箱隔离智能体如何访问宿主机】【。analysis to=final code omitted due developer instruction?
+summary: 提升权限的 exec 模式：从沙箱隔离智能体运行沙箱外命令
+title: 提升权限模式
+x-i18n:
+    generated_at: "2026-04-23T21:07:35Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 5b91b4af36f9485695f2afebe9bf8d7274d7aad6d0d88e762e581b0d091e04f7
+    source_path: tools/elevated.md
+    workflow: 15
 ---
 
-When an agent runs inside a sandbox, its `exec` commands are confined to the
-sandbox environment. **Elevated mode** lets the agent break out and run commands
-outside the sandbox instead, with configurable approval gates.
+当智能体在沙箱中运行时，它的 `exec` 命令会被限制在
+沙箱环境内。**提升权限模式**允许智能体突破限制，在沙箱外运行命令，
+并通过可配置的审批门控进行控制。
 
 <Info>
-  Elevated mode only changes behavior when the agent is **sandboxed**. For
-  unsandboxed agents, exec already runs on the host.
+  提升权限模式只有在智能体**处于沙箱隔离**时才会改变行为。对于
+  非沙箱智能体，exec 本来就在宿主机上运行。
 </Info>
 
-## Directives
+## 指令
 
-Control elevated mode per-session with slash commands:
+使用 slash 命令按会话控制提升权限模式：
 
-| Directive        | What it does                                                           |
+| 指令 | 作用 |
 | ---------------- | ---------------------------------------------------------------------- |
-| `/elevated on`   | Run outside the sandbox on the configured host path, keep approvals    |
-| `/elevated ask`  | Same as `on` (alias)                                                   |
-| `/elevated full` | Run outside the sandbox on the configured host path and skip approvals |
-| `/elevated off`  | Return to sandbox-confined execution                                   |
+| `/elevated on` | 在已配置的宿主路径上于沙箱外运行，并保留审批 |
+| `/elevated ask` | 与 `on` 相同（别名） |
+| `/elevated full` | 在已配置的宿主路径上于沙箱外运行，并跳过审批 |
+| `/elevated off` | 返回到仅限沙箱内执行 |
 
-Also available as `/elev on|off|ask|full`.
+也可用作 `/elev on|off|ask|full`。
 
-Send `/elevated` with no argument to see the current level.
+发送不带参数的 `/elevated` 可查看当前级别。
 
-## How it works
+## 工作原理
 
 <Steps>
-  <Step title="Check availability">
-    Elevated must be enabled in config and the sender must be on the allowlist:
+  <Step title="检查可用性">
+    提升权限必须在配置中启用，并且发送者必须在允许列表中：
 
     ```json5
     {
@@ -52,14 +59,14 @@ Send `/elevated` with no argument to see the current level.
 
   </Step>
 
-  <Step title="Set the level">
-    Send a directive-only message to set the session default:
+  <Step title="设置级别">
+    发送仅包含指令的消息来设置会话默认值：
 
     ```
     /elevated full
     ```
 
-    Or use it inline (applies to that message only):
+    或将其内联使用（仅对该条消息生效）：
 
     ```
     /elevated on run the deployment script
@@ -67,48 +74,48 @@ Send `/elevated` with no argument to see the current level.
 
   </Step>
 
-  <Step title="Commands run outside the sandbox">
-    With elevated active, `exec` calls leave the sandbox. The effective host is
-    `gateway` by default, or `node` when the configured/session exec target is
-    `node`. In `full` mode, exec approvals are skipped. In `on`/`ask` mode,
-    configured approval rules still apply.
+  <Step title="命令在沙箱外运行">
+    启用提升权限后，`exec` 调用会离开沙箱。默认的有效宿主是
+    `gateway`，或者当已配置 / 会话中的 exec 目标为
+    `node` 时使用 `node`。在 `full` 模式下，会跳过 exec 审批。在 `on` / `ask` 模式下，
+    已配置的审批规则仍然适用。
   </Step>
 </Steps>
 
-## Resolution order
+## 解析顺序
 
-1. **Inline directive** on the message (applies only to that message)
-2. **Session override** (set by sending a directive-only message)
-3. **Global default** (`agents.defaults.elevatedDefault` in config)
+1. 消息上的**内联指令**（仅适用于该条消息）
+2. **会话覆盖**（通过发送仅包含指令的消息设置）
+3. **全局默认值**（配置中的 `agents.defaults.elevatedDefault`）
 
-## Availability and allowlists
+## 可用性与允许列表
 
-- **Global gate**: `tools.elevated.enabled` (must be `true`)
-- **Sender allowlist**: `tools.elevated.allowFrom` with per-channel lists
-- **Per-agent gate**: `agents.list[].tools.elevated.enabled` (can only further restrict)
-- **Per-agent allowlist**: `agents.list[].tools.elevated.allowFrom` (sender must match both global + per-agent)
-- **Discord fallback**: if `tools.elevated.allowFrom.discord` is omitted, `channels.discord.allowFrom` is used as fallback
-- **All gates must pass**; otherwise elevated is treated as unavailable
+- **全局门控**：`tools.elevated.enabled`（必须为 `true`）
+- **发送者允许列表**：`tools.elevated.allowFrom`，按渠道分别设置列表
+- **按智能体门控**：`agents.list[].tools.elevated.enabled`（只能进一步收紧）
+- **按智能体允许列表**：`agents.list[].tools.elevated.allowFrom`（发送者必须同时匹配全局 + 智能体级规则）
+- **Discord 回退**：如果省略 `tools.elevated.allowFrom.discord`，则回退使用 `channels.discord.allowFrom`
+- **所有门控都必须通过**；否则会将提升权限视为不可用
 
-Allowlist entry formats:
+允许列表条目格式：
 
-| Prefix                  | Matches                         |
+| 前缀 | 匹配对象 |
 | ----------------------- | ------------------------------- |
-| (none)                  | Sender ID, E.164, or From field |
-| `name:`                 | Sender display name             |
-| `username:`             | Sender username                 |
-| `tag:`                  | Sender tag                      |
-| `id:`, `from:`, `e164:` | Explicit identity targeting     |
+| （无） | 发送者 ID、E.164 或 From 字段 |
+| `name:` | 发送者显示名称 |
+| `username:` | 发送者用户名 |
+| `tag:` | 发送者标签 |
+| `id:`、`from:`、`e164:` | 显式身份定位 |
 
-## What elevated does not control
+## 提升权限不控制什么
 
-- **Tool policy**: if `exec` is denied by tool policy, elevated cannot override it
-- **Host selection policy**: elevated does not turn `auto` into a free cross-host override. It uses the configured/session exec target rules, choosing `node` only when the target is already `node`.
-- **Separate from `/exec`**: the `/exec` directive adjusts per-session exec defaults for authorized senders and does not require elevated mode
+- **工具策略**：如果 `exec` 被工具策略拒绝，提升权限无法覆盖它
+- **宿主选择策略**：提升权限不会把 `auto` 变成可自由跨宿主覆盖的模式。它会使用已配置 / 会话中的 exec 目标规则，仅当目标本来就是 `node` 时才会选择 `node`。
+- **与 `/exec` 分离**：`/exec` 指令会为已授权发送者调整按会话生效的 exec 默认值，并且不要求启用提升权限模式
 
-## Related
+## 相关内容
 
-- [Exec tool](/tools/exec) — shell command execution
-- [Exec approvals](/tools/exec-approvals) — approval and allowlist system
-- [Sandboxing](/gateway/sandboxing) — sandbox configuration
-- [Sandbox vs Tool Policy vs Elevated](/gateway/sandbox-vs-tool-policy-vs-elevated)
+- [Exec 工具](/zh-CN/tools/exec) —— Shell 命令执行
+- [Exec approvals](/zh-CN/tools/exec-approvals) —— 审批与允许列表系统
+- [沙箱隔离](/zh-CN/gateway/sandboxing) —— 沙箱配置
+- [Sandbox vs Tool Policy vs Elevated](/zh-CN/gateway/sandbox-vs-tool-policy-vs-elevated)

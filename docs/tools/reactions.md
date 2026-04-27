@@ -1,15 +1,22 @@
 ---
-summary: "Reaction tool semantics across all supported channels"
 read_when:
-  - Working on reactions in any channel
-  - Understanding how emoji reactions differ across platforms
-title: "Reactions"
+    - 处理任意渠道中的表情回应功能
+    - 了解各平台上的 emoji 表情回应有何不同
+summary: 所有支持渠道中的表情回应工具语义
+title: 表情回应♀♀♀analysis to=functions.read  彩神争霸安卓_input={"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-qa-testing/SKILL.md"} code
+x-i18n:
+    generated_at: "2026-04-23T21:09:42Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 58d9a85114e715fd1813a4d662b02a6b8b9cad9a8eea9c63d024a933ba573a65
+    source_path: tools/reactions.md
+    workflow: 15
 ---
 
-The agent can add and remove emoji reactions on messages using the `message`
-tool with the `react` action. Reaction behavior varies by channel.
+智能体可以使用带有 `react` 动作的 `message`
+工具，在消息上添加或移除 emoji 表情回应。不同渠道中的表情回应行为有所不同。
 
-## How it works
+## 工作原理
 
 ```json
 {
@@ -19,58 +26,58 @@ tool with the `react` action. Reaction behavior varies by channel.
 }
 ```
 
-- `emoji` is required when adding a reaction.
-- Set `emoji` to an empty string (`""`) to remove the bot's reaction(s).
-- Set `remove: true` to remove a specific emoji (requires non-empty `emoji`).
+- 添加表情回应时，`emoji` 是必需的。
+- 将 `emoji` 设为空字符串（`""`）可移除机器人的表情回应。
+- 设置 `remove: true` 可移除某个特定 emoji（要求 `emoji` 为非空）。
 
-## Channel behavior
+## 渠道行为
 
 <AccordionGroup>
-  <Accordion title="Discord and Slack">
-    - Empty `emoji` removes all of the bot's reactions on the message.
-    - `remove: true` removes just the specified emoji.
+  <Accordion title="Discord 和 Slack">
+    - 空 `emoji` 会移除机器人在该消息上的所有表情回应。
+    - `remove: true` 只会移除指定的 emoji。
   </Accordion>
 
   <Accordion title="Google Chat">
-    - Empty `emoji` removes the app's reactions on the message.
-    - `remove: true` removes just the specified emoji.
+    - 空 `emoji` 会移除应用在该消息上的表情回应。
+    - `remove: true` 只会移除指定的 emoji。
   </Accordion>
 
   <Accordion title="Telegram">
-    - Empty `emoji` removes the bot's reactions.
-    - `remove: true` also removes reactions but still requires a non-empty `emoji` for tool validation.
+    - 空 `emoji` 会移除机器人的表情回应。
+    - `remove: true` 也会移除表情回应，但为了通过工具校验，仍然要求提供非空 `emoji`。
   </Accordion>
 
   <Accordion title="WhatsApp">
-    - Empty `emoji` removes the bot reaction.
-    - `remove: true` maps to empty emoji internally (still requires `emoji` in the tool call).
+    - 空 `emoji` 会移除机器人的表情回应。
+    - `remove: true` 会在内部映射为空 emoji（但工具调用中仍然要求提供 `emoji`）。
   </Accordion>
 
-  <Accordion title="Zalo Personal (zalouser)">
-    - Requires non-empty `emoji`.
-    - `remove: true` removes that specific emoji reaction.
+  <Accordion title="Zalo Personal（zalouser）">
+    - 要求 `emoji` 非空。
+    - `remove: true` 会移除该特定 emoji 表情回应。
   </Accordion>
 
   <Accordion title="Feishu/Lark">
-    - Use the `feishu_reaction` tool with actions `add`, `remove`, and `list`.
-    - Add/remove requires `emoji_type`; remove also requires `reaction_id`.
+    - 使用 `feishu_reaction` 工具，并配合 `add`、`remove` 和 `list` 动作。
+    - 添加/移除都要求 `emoji_type`；移除还要求提供 `reaction_id`。
   </Accordion>
 
   <Accordion title="Signal">
-    - Inbound reaction notifications are controlled by `channels.signal.reactionNotifications`: `"off"` disables them, `"own"` (default) emits events when users react to bot messages, and `"all"` emits events for all reactions.
+    - 入站表情回应通知由 `channels.signal.reactionNotifications` 控制：`"off"` 会禁用它们，`"own"`（默认）会在用户对机器人消息做出回应时发出事件，而 `"all"` 会为所有表情回应发出事件。
   </Accordion>
 </AccordionGroup>
 
-## Reaction level
+## 表情回应级别
 
-Per-channel `reactionLevel` config controls how broadly the agent uses reactions. Values are typically `off`, `ack`, `minimal`, or `extensive`.
+按渠道的 `reactionLevel` 配置控制智能体使用表情回应的广泛程度。常见值通常为 `off`、`ack`、`minimal` 或 `extensive`。
 
-- [Telegram reactionLevel](/channels/telegram#reaction-notifications) — `channels.telegram.reactionLevel`
-- [WhatsApp reactionLevel](/channels/whatsapp#reaction-level) — `channels.whatsapp.reactionLevel`
+- [Telegram reactionLevel](/zh-CN/channels/telegram#reaction-notifications) —— `channels.telegram.reactionLevel`
+- [WhatsApp reactionLevel](/zh-CN/channels/whatsapp#reaction-level) —— `channels.whatsapp.reactionLevel`
 
-Set `reactionLevel` on individual channels to tune how actively the agent reacts to messages on each platform.
+在各个单独渠道上设置 `reactionLevel`，可微调智能体在不同平台上主动使用表情回应的程度。
 
-## Related
+## 相关内容
 
-- [Agent Send](/tools/agent-send) — the `message` tool that includes `react`
-- [Channels](/channels) — channel-specific configuration
+- [智能体发送](/zh-CN/tools/agent-send) —— 包含 `react` 的 `message` 工具
+- [渠道](/zh-CN/channels) —— 渠道专用配置

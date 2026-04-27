@@ -1,47 +1,54 @@
 ---
-summary: "Run OpenClaw with vLLM (OpenAI-compatible local server)"
 read_when:
-  - You want to run OpenClaw against a local vLLM server
-  - You want OpenAI-compatible /v1 endpoints with your own models
-title: "vLLM"
+    - 你想让 OpenClaw 对接本地 vLLM 服务器运行
+    - 你希望使用兼容 OpenAI 的 `/v1` 端点，并接入你自己的模型
+summary: 使用 vLLM（兼容 OpenAI 的本地服务器）运行 OpenClaw
+title: vLLM
+x-i18n:
+    generated_at: "2026-04-26T03:01:23Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: fbf424cb532f2b3e188c39545b187e5db6274ff2fadc01c9e4cb0901dbe9824c
+    source_path: providers/vllm.md
+    workflow: 15
 ---
 
-vLLM can serve open-source (and some custom) models via an **OpenAI-compatible** HTTP API. OpenClaw connects to vLLM using the `openai-completions` API.
+vLLM 可以通过 **兼容 OpenAI** 的 HTTP API 提供开源模型（以及一些自定义模型）。OpenClaw 使用 `openai-completions` API 连接到 vLLM。
 
-OpenClaw can also **auto-discover** available models from vLLM when you opt in with `VLLM_API_KEY` (any value works if your server does not enforce auth) and you do not define an explicit `models.providers.vllm` entry.
+当你设置 `VLLM_API_KEY` 以启用此功能时（如果你的服务器不强制验证，任意值都可以），并且你没有定义显式的 `models.providers.vllm` 条目，OpenClaw 还可以从 vLLM **自动发现** 可用模型。
 
-OpenClaw treats `vllm` as a local OpenAI-compatible provider that supports
-streamed usage accounting, so status/context token counts can update from
-`stream_options.include_usage` responses.
+OpenClaw 将 `vllm` 视为本地的兼容 OpenAI 的提供商，并支持
+流式使用量统计，因此状态 / 上下文令牌计数可以根据
+`stream_options.include_usage` 响应进行更新。
 
-| Property         | Value                                    |
+| 属性 | 值 |
 | ---------------- | ---------------------------------------- |
-| Provider ID      | `vllm`                                   |
-| API              | `openai-completions` (OpenAI-compatible) |
-| Auth             | `VLLM_API_KEY` environment variable      |
-| Default base URL | `http://127.0.0.1:8000/v1`               |
+| 提供商 ID | `vllm` |
+| API | `openai-completions`（兼容 OpenAI） |
+| 认证 | `VLLM_API_KEY` 环境变量 |
+| 默认 base URL | `http://127.0.0.1:8000/v1` |
 
-## Getting started
+## 入门指南
 
 <Steps>
-  <Step title="Start vLLM with an OpenAI-compatible server">
-    Your base URL should expose `/v1` endpoints (e.g. `/v1/models`, `/v1/chat/completions`). vLLM commonly runs on:
+  <Step title="使用兼容 OpenAI 的服务器启动 vLLM">
+    你的 base URL 应该暴露 `/v1` 端点（例如 `/v1/models`、`/v1/chat/completions`）。vLLM 通常运行在：
 
     ```
     http://127.0.0.1:8000/v1
     ```
 
   </Step>
-  <Step title="Set the API key environment variable">
-    Any value works if your server does not enforce auth:
+  <Step title="设置 API 密钥环境变量">
+    如果你的服务器不强制认证，任意值都可以：
 
     ```bash
     export VLLM_API_KEY="vllm-local"
     ```
 
   </Step>
-  <Step title="Select a model">
-    Replace with one of your vLLM model IDs:
+  <Step title="选择一个模型">
+    替换为你的某个 vLLM 模型 ID：
 
     ```json5
     {
@@ -54,35 +61,35 @@ streamed usage accounting, so status/context token counts can update from
     ```
 
   </Step>
-  <Step title="Verify the model is available">
+  <Step title="验证模型可用">
     ```bash
     openclaw models list --provider vllm
     ```
   </Step>
 </Steps>
 
-## Model discovery (implicit provider)
+## 模型发现（隐式提供商）
 
-When `VLLM_API_KEY` is set (or an auth profile exists) and you **do not** define `models.providers.vllm`, OpenClaw queries:
+当设置了 `VLLM_API_KEY`（或存在认证配置文件），并且你**没有**定义 `models.providers.vllm` 时，OpenClaw 会查询：
 
 ```
 GET http://127.0.0.1:8000/v1/models
 ```
 
-and converts the returned IDs into model entries.
+并将返回的 ID 转换为模型条目。
 
 <Note>
-If you set `models.providers.vllm` explicitly, auto-discovery is skipped and you must define models manually.
+如果你显式设置了 `models.providers.vllm`，则会跳过自动发现，你必须手动定义模型。
 </Note>
 
-## Explicit configuration (manual models)
+## 显式配置（手动模型）
 
-Use explicit config when:
+在以下情况下使用显式配置：
 
-- vLLM runs on a different host or port
-- You want to pin `contextWindow` or `maxTokens` values
-- Your server requires a real API key (or you want to control headers)
-- You connect to a trusted loopback, LAN, or Tailscale vLLM endpoint
+- vLLM 运行在不同的主机或端口上
+- 你想固定 `contextWindow` 或 `maxTokens` 的值
+- 你的服务器需要真实的 API 密钥（或者你想控制请求头）
+- 你连接到受信任的 loopback、LAN 或 Tailscale vLLM 端点
 
 ```json5
 {
@@ -110,28 +117,28 @@ Use explicit config when:
 }
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Proxy-style behavior">
-    vLLM is treated as a proxy-style OpenAI-compatible `/v1` backend, not a native
-    OpenAI endpoint. This means:
+  <Accordion title="代理式行为">
+    vLLM 被视为代理式的兼容 OpenAI 的 `/v1` 后端，而不是原生
+    OpenAI 端点。这意味着：
 
-    | Behavior | Applied? |
+    | 行为 | 是否应用？ |
     |----------|----------|
-    | Native OpenAI request shaping | No |
-    | `service_tier` | Not sent |
-    | Responses `store` | Not sent |
-    | Prompt-cache hints | Not sent |
-    | OpenAI reasoning-compat payload shaping | Not applied |
-    | Hidden OpenClaw attribution headers | Not injected on custom base URLs |
+    | 原生 OpenAI 请求塑形 | 否 |
+    | `service_tier` | 不发送 |
+    | 响应 `store` | 不发送 |
+    | 提示缓存提示 | 不发送 |
+    | OpenAI 推理兼容载荷塑形 | 不应用 |
+    | 隐藏的 OpenClaw 归因请求头 | 在自定义 base URL 上不注入 |
 
   </Accordion>
 
-  <Accordion title="Nemotron 3 thinking controls">
-    vLLM/Nemotron 3 can use chat-template kwargs to control whether reasoning is
-    returned as hidden reasoning or visible answer text. When an OpenClaw session
-    uses `vllm/nemotron-3-*` with thinking off, OpenClaw sends:
+  <Accordion title="Nemotron 3 思考控制">
+    vLLM / Nemotron 3 可以使用聊天模板 kwargs 来控制推理内容是
+    作为隐藏推理返回，还是作为可见答案文本返回。当 OpenClaw 会话
+    使用 `vllm/nemotron-3-*` 且关闭 thinking 时，OpenClaw 会发送：
 
     ```json
     {
@@ -142,9 +149,9 @@ Use explicit config when:
     }
     ```
 
-    To customize these values, set `chat_template_kwargs` under the model params.
-    If you also set `params.extra_body.chat_template_kwargs`, that value has
-    final precedence because `extra_body` is the last request-body override.
+    要自定义这些值，请在模型参数下设置 `chat_template_kwargs`。
+    如果你还设置了 `params.extra_body.chat_template_kwargs`，该值将拥有
+    最终优先级，因为 `extra_body` 是对请求体的最后覆盖。
 
     ```json5
     {
@@ -167,8 +174,8 @@ Use explicit config when:
 
   </Accordion>
 
-  <Accordion title="Custom base URL">
-    If your vLLM server runs on a non-default host or port, set `baseUrl` in the explicit provider config:
+  <Accordion title="自定义 base URL">
+    如果你的 vLLM 服务器运行在非默认主机或端口上，请在显式提供商配置中设置 `baseUrl`：
 
     ```json5
     {
@@ -198,55 +205,55 @@ Use explicit config when:
   </Accordion>
 </AccordionGroup>
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
-  <Accordion title="Server not reachable">
-    Check that the vLLM server is running and accessible:
+  <Accordion title="服务器不可达">
+    检查 vLLM 服务器是否正在运行并且可访问：
 
     ```bash
     curl http://127.0.0.1:8000/v1/models
     ```
 
-    If you see a connection error, verify the host, port, and that vLLM started with the OpenAI-compatible server mode.
-    For explicit loopback, LAN, or Tailscale endpoints, also set
-    `models.providers.vllm.request.allowPrivateNetwork: true`; provider
-    requests block private-network URLs by default unless the provider is
-    explicitly trusted.
+    如果你看到连接错误，请确认主机、端口，以及 vLLM 是否以兼容 OpenAI 的服务器模式启动。
+    对于显式的 loopback、LAN 或 Tailscale 端点，还需要设置
+    `models.providers.vllm.request.allowPrivateNetwork: true`；提供商
+    请求默认会阻止私有网络 URL，除非该提供商被
+    显式信任。
 
   </Accordion>
 
-  <Accordion title="Auth errors on requests">
-    If requests fail with auth errors, set a real `VLLM_API_KEY` that matches your server configuration, or configure the provider explicitly under `models.providers.vllm`.
+  <Accordion title="请求出现认证错误">
+    如果请求因认证错误而失败，请设置与你的服务器配置匹配的真实 `VLLM_API_KEY`，或者在 `models.providers.vllm` 下显式配置该提供商。
 
     <Tip>
-    If your vLLM server does not enforce auth, any non-empty value for `VLLM_API_KEY` works as an opt-in signal for OpenClaw.
+    如果你的 vLLM 服务器不强制认证，任意非空的 `VLLM_API_KEY` 值都可以作为 OpenClaw 的启用信号。
     </Tip>
 
   </Accordion>
 
-  <Accordion title="No models discovered">
-    Auto-discovery requires `VLLM_API_KEY` to be set **and** no explicit `models.providers.vllm` config entry. If you have defined the provider manually, OpenClaw skips discovery and uses only your declared models.
+  <Accordion title="未发现任何模型">
+    自动发现要求设置 `VLLM_API_KEY`，**并且**不能存在显式的 `models.providers.vllm` 配置条目。如果你已经手动定义了该提供商，OpenClaw 会跳过发现，只使用你声明的模型。
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-More help: [Troubleshooting](/help/troubleshooting) and [FAQ](/help/faq).
+更多帮助：[故障排除](/zh-CN/help/troubleshooting) 和 [常见问题](/zh-CN/help/faq)。
 </Warning>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障切换行为。
   </Card>
-  <Card title="OpenAI" href="/providers/openai" icon="bolt">
-    Native OpenAI provider and OpenAI-compatible route behavior.
+  <Card title="OpenAI" href="/zh-CN/providers/openai" icon="bolt">
+    原生 OpenAI provider 和兼容 OpenAI 的路由行为。
   </Card>
-  <Card title="OAuth and auth" href="/gateway/authentication" icon="key">
-    Auth details and credential reuse rules.
+  <Card title="OAuth 和认证" href="/zh-CN/gateway/authentication" icon="key">
+    认证细节和凭证复用规则。
   </Card>
-  <Card title="Troubleshooting" href="/help/troubleshooting" icon="wrench">
-    Common issues and how to resolve them.
+  <Card title="故障排除" href="/zh-CN/help/troubleshooting" icon="wrench">
+    常见问题及其解决方法。
   </Card>
 </CardGroup>

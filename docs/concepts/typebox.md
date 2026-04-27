@@ -1,38 +1,40 @@
 ---
-summary: "TypeBox schemas as the single source of truth for the gateway protocol"
 read_when:
-  - Updating protocol schemas or codegen
-title: "TypeBox"
+    - 更新协议 schema 或代码生成
+summary: 将 TypeBox schemas 作为 Gateway 网关协议的单一事实来源
+title: TypeBox
+x-i18n:
+    generated_at: "2026-04-23T22:57:31Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 0496db919ee5c50a5932aa9e51eb54e1f54791bc0a271f39d6fb9e6fe17a2a28
+    source_path: concepts/typebox.md
+    workflow: 15
 ---
 
-# TypeBox as protocol source of truth
+# TypeBox 作为协议的单一事实来源
 
-Last updated: 2026-01-10
+最后更新：2026-01-10
 
-TypeBox is a TypeScript-first schema library. We use it to define the **Gateway
-WebSocket protocol** (handshake, request/response, server events). Those schemas
-drive **runtime validation**, **JSON Schema export**, and **Swift codegen** for
-the macOS app. One source of truth; everything else is generated.
+TypeBox 是一个 TypeScript 优先的 schema 库。我们使用它来定义 **Gateway 网关 WebSocket 协议**（握手、请求/响应、服务器事件）。这些 schema 驱动 **运行时验证**、**JSON Schema 导出** 和用于 macOS 应用的 **Swift 代码生成**。单一事实来源；其他所有内容都由此生成。
 
-If you want the higher-level protocol context, start with
-[Gateway architecture](/concepts/architecture).
+如果你想先了解更高层的协议背景，请从
+[Gateway 网关架构](/zh-CN/concepts/architecture) 开始。
 
-## Mental model (30 seconds)
+## 心智模型（30 秒）
 
-Every Gateway WS message is one of three frames:
+每条 Gateway 网关 WS 消息都属于以下三种帧之一：
 
-- **Request**: `{ type: "req", id, method, params }`
-- **Response**: `{ type: "res", id, ok, payload | error }`
-- **Event**: `{ type: "event", event, payload, seq?, stateVersion? }`
+- **请求**：`{ type: "req", id, method, params }`
+- **响应**：`{ type: "res", id, ok, payload | error }`
+- **事件**：`{ type: "event", event, payload, seq?, stateVersion? }`
 
-The first frame **must** be a `connect` request. After that, clients can call
-methods (e.g. `health`, `send`, `chat.send`) and subscribe to events (e.g.
-`presence`, `tick`, `agent`).
+第一条帧**必须**是一个 `connect` 请求。之后，客户端可以调用方法（例如 `health`、`send`、`chat.send`）并订阅事件（例如 `presence`、`tick`、`agent`）。
 
-Connection flow (minimal):
+连接流程（最简）：
 
-```
-Client                    Gateway
+```text
+客户端                    Gateway 网关
   |---- req:connect -------->|
   |<---- res:hello-ok --------|
   |<---- event:tick ----------|
@@ -40,57 +42,51 @@ Client                    Gateway
   |<---- res:health ----------|
 ```
 
-Common methods + events:
+常见方法 + 事件：
 
-| Category   | Examples                                                   | Notes                              |
+| 类别 | 示例 | 说明 |
 | ---------- | ---------------------------------------------------------- | ---------------------------------- |
-| Core       | `connect`, `health`, `status`                              | `connect` must be first            |
-| Messaging  | `send`, `agent`, `agent.wait`, `system-event`, `logs.tail` | side-effects need `idempotencyKey` |
-| Chat       | `chat.history`, `chat.send`, `chat.abort`                  | WebChat uses these                 |
-| Sessions   | `sessions.list`, `sessions.patch`, `sessions.delete`       | session admin                      |
-| Automation | `wake`, `cron.list`, `cron.run`, `cron.runs`               | wake + cron control                |
-| Nodes      | `node.list`, `node.invoke`, `node.pair.*`                  | Gateway WS + node actions          |
-| Events     | `tick`, `presence`, `agent`, `chat`, `health`, `shutdown`  | server push                        |
+| 核心 | `connect`、`health`、`status` | `connect` 必须最先发送 |
+| 消息 | `send`、`agent`、`agent.wait`、`system-event`、`logs.tail` | 有副作用的操作需要 `idempotencyKey` |
+| 聊天 | `chat.history`、`chat.send`、`chat.abort` | WebChat 使用这些 |
+| 会话 | `sessions.list`、`sessions.patch`、`sessions.delete` | 会话管理 |
+| 自动化 | `wake`、`cron.list`、`cron.run`、`cron.runs` | 唤醒 + cron 控制 |
+| 节点 | `node.list`、`node.invoke`、`node.pair.*` | Gateway 网关 WS + 节点操作 |
+| 事件 | `tick`、`presence`、`agent`、`chat`、`health`、`shutdown` | 服务器推送 |
 
-Authoritative advertised **discovery** inventory lives in
-`src/gateway/server-methods-list.ts` (`listGatewayMethods`, `GATEWAY_EVENTS`).
+权威的已公布 **设备发现** 清单位于
+`src/gateway/server-methods-list.ts`（`listGatewayMethods`、`GATEWAY_EVENTS`）。
 
-## Where the schemas live
+## schema 位于何处
 
-- Source: `src/gateway/protocol/schema.ts`
-- Runtime validators (AJV): `src/gateway/protocol/index.ts`
-- Advertised feature/discovery registry: `src/gateway/server-methods-list.ts`
-- Server handshake + method dispatch: `src/gateway/server.impl.ts`
-- Node client: `src/gateway/client.ts`
-- Generated JSON Schema: `dist/protocol.schema.json`
-- Generated Swift models: `apps/macos/Sources/OpenClawProtocol/GatewayModels.swift`
+- 源文件：`src/gateway/protocol/schema.ts`
+- 运行时验证器（AJV）：`src/gateway/protocol/index.ts`
+- 已公布功能/设备发现注册表：`src/gateway/server-methods-list.ts`
+- 服务器握手 + 方法分发：`src/gateway/server.impl.ts`
+- 节点客户端：`src/gateway/client.ts`
+- 生成的 JSON Schema：`dist/protocol.schema.json`
+- 生成的 Swift 模型：`apps/macos/Sources/OpenClawProtocol/GatewayModels.swift`
 
-## Current pipeline
+## 当前流水线
 
 - `pnpm protocol:gen`
-  - writes JSON Schema (draft‑07) to `dist/protocol.schema.json`
+  - 将 JSON Schema（draft‑07）写入 `dist/protocol.schema.json`
 - `pnpm protocol:gen:swift`
-  - generates Swift gateway models
+  - 生成 Swift Gateway 网关模型
 - `pnpm protocol:check`
-  - runs both generators and verifies the output is committed
+  - 运行两个生成器并验证输出已提交
 
-## How the schemas are used at runtime
+## schema 在运行时如何使用
 
-- **Server side**: every inbound frame is validated with AJV. The handshake only
-  accepts a `connect` request whose params match `ConnectParams`.
-- **Client side**: the JS client validates event and response frames before
-  using them.
-- **Feature discovery**: the Gateway sends a conservative `features.methods`
-  and `features.events` list in `hello-ok` from `listGatewayMethods()` and
-  `GATEWAY_EVENTS`.
-- That discovery list is not a generated dump of every callable helper in
-  `coreGatewayHandlers`; some helper RPCs are implemented in
-  `src/gateway/server-methods/*.ts` without being enumerated in the advertised
-  feature list.
+- **服务器端**：每个入站帧都会使用 AJV 进行验证。握手仅接受一个 `connect` 请求，并且其参数必须匹配 `ConnectParams`。
+- **客户端**：JS 客户端在使用事件帧和响应帧之前会先验证它们。
+- **功能发现**：Gateway 网关会在 `hello-ok` 中通过 `listGatewayMethods()` 和 `GATEWAY_EVENTS` 发送一个保守的 `features.methods` 和 `features.events` 列表。
+- 该发现列表并不是 `coreGatewayHandlers` 中所有可调用辅助函数的自动生成导出；某些辅助 RPC 实现在
+  `src/gateway/server-methods/*.ts` 中，但并未枚举到已公布的功能列表里。
 
-## Example frames
+## 示例帧
 
-Connect (first message):
+Connect（第一条消息）：
 
 ```json
 {
@@ -112,7 +108,7 @@ Connect (first message):
 }
 ```
 
-Hello-ok response:
+hello-ok 响应：
 
 ```json
 {
@@ -135,7 +131,7 @@ Hello-ok response:
 }
 ```
 
-Request + response:
+请求 + 响应：
 
 ```json
 { "type": "req", "id": "r1", "method": "health" }
@@ -145,15 +141,15 @@ Request + response:
 { "type": "res", "id": "r1", "ok": true, "payload": { "ok": true } }
 ```
 
-Event:
+事件：
 
 ```json
 { "type": "event", "event": "tick", "payload": { "ts": 1730000000 }, "seq": 12 }
 ```
 
-## Minimal client (Node.js)
+## 最小客户端（Node.js）
 
-Smallest useful flow: connect + health.
+最小可用流程：connect + health。
 
 ```ts
 import { WebSocket } from "ws";
@@ -193,13 +189,13 @@ ws.on("message", (data) => {
 });
 ```
 
-## Worked example: add a method end-to-end
+## 完整示例：端到端添加一个方法
 
-Example: add a new `system.echo` request that returns `{ ok: true, text }`.
+示例：添加一个新的 `system.echo` 请求，返回 `{ ok: true, text }`。
 
-1. **Schema (source of truth)**
+1. **Schema（单一事实来源）**
 
-Add to `src/gateway/protocol/schema.ts`:
+添加到 `src/gateway/protocol/schema.ts`：
 
 ```ts
 export const SystemEchoParamsSchema = Type.Object(
@@ -213,7 +209,7 @@ export const SystemEchoResultSchema = Type.Object(
 );
 ```
 
-Add both to `ProtocolSchemas` and export types:
+将两者添加到 `ProtocolSchemas`，并导出类型：
 
 ```ts
   SystemEchoParams: SystemEchoParamsSchema,
@@ -225,17 +221,17 @@ export type SystemEchoParams = Static<typeof SystemEchoParamsSchema>;
 export type SystemEchoResult = Static<typeof SystemEchoResultSchema>;
 ```
 
-2. **Validation**
+2. **验证**
 
-In `src/gateway/protocol/index.ts`, export an AJV validator:
+在 `src/gateway/protocol/index.ts` 中，导出一个 AJV 验证器：
 
 ```ts
 export const validateSystemEchoParams = ajv.compile<SystemEchoParams>(SystemEchoParamsSchema);
 ```
 
-3. **Server behavior**
+3. **服务器行为**
 
-Add a handler in `src/gateway/server-methods/system.ts`:
+在 `src/gateway/server-methods/system.ts` 中添加一个处理器：
 
 ```ts
 export const systemHandlers: GatewayRequestHandlers = {
@@ -246,67 +242,63 @@ export const systemHandlers: GatewayRequestHandlers = {
 };
 ```
 
-Register it in `src/gateway/server-methods.ts` (already merges `systemHandlers`),
-then add `"system.echo"` to `listGatewayMethods` input in
-`src/gateway/server-methods-list.ts`.
+在 `src/gateway/server-methods.ts` 中注册它（该文件已合并 `systemHandlers`），然后将 `"system.echo"` 添加到
+`src/gateway/server-methods-list.ts` 中 `listGatewayMethods` 的输入里。
 
-If the method is callable by operator or node clients, also classify it in
-`src/gateway/method-scopes.ts` so scope enforcement and `hello-ok` feature
-advertising stay aligned.
+如果该方法可供 operator 或节点客户端调用，还需要在
+`src/gateway/method-scopes.ts` 中对其进行分类，以保持作用域强制和 `hello-ok` 功能公布的一致性。
 
-4. **Regenerate**
+4. **重新生成**
 
 ```bash
 pnpm protocol:check
 ```
 
-5. **Tests + docs**
+5. **测试 + 文档**
 
-Add a server test in `src/gateway/server.*.test.ts` and note the method in docs.
+在 `src/gateway/server.*.test.ts` 中添加服务器测试，并在文档中记录该方法。
 
-## Swift codegen behavior
+## Swift 代码生成行为
 
-The Swift generator emits:
+Swift 生成器会输出：
 
-- `GatewayFrame` enum with `req`, `res`, `event`, and `unknown` cases
-- Strongly typed payload structs/enums
-- `ErrorCode` values and `GATEWAY_PROTOCOL_VERSION`
+- `GatewayFrame` 枚举，包含 `req`、`res`、`event` 和 `unknown` 分支
+- 强类型的 payload 结构体/枚举
+- `ErrorCode` 值和 `GATEWAY_PROTOCOL_VERSION`
 
-Unknown frame types are preserved as raw payloads for forward compatibility.
+未知帧类型会以原始 payload 的形式保留，以实现前向兼容。
 
-## Versioning + compatibility
+## 版本控制 + 兼容性
 
-- `PROTOCOL_VERSION` lives in `src/gateway/protocol/schema.ts`.
-- Clients send `minProtocol` + `maxProtocol`; the server rejects mismatches.
-- The Swift models keep unknown frame types to avoid breaking older clients.
+- `PROTOCOL_VERSION` 位于 `src/gateway/protocol/schema.ts`。
+- 客户端会发送 `minProtocol` + `maxProtocol`；服务器会拒绝不匹配的情况。
+- Swift 模型会保留未知帧类型，以避免破坏旧客户端。
 
-## Schema patterns and conventions
+## Schema 模式和约定
 
-- Most objects use `additionalProperties: false` for strict payloads.
-- `NonEmptyString` is the default for IDs and method/event names.
-- The top-level `GatewayFrame` uses a **discriminator** on `type`.
-- Methods with side effects usually require an `idempotencyKey` in params
-  (example: `send`, `poll`, `agent`, `chat.send`).
-- `agent` accepts optional `internalEvents` for runtime-generated orchestration context
-  (for example subagent/cron task completion handoff); treat this as internal API surface.
+- 大多数对象使用 `additionalProperties: false` 来保证严格的 payload。
+- `NonEmptyString` 是 ID 以及方法/事件名称的默认类型。
+- 顶层 `GatewayFrame` 在 `type` 上使用 **discriminator**。
+- 带副作用的方法通常要求在参数中提供 `idempotencyKey`
+  （例如：`send`、`poll`、`agent`、`chat.send`）。
+- `agent` 接受可选的 `internalEvents`，用于运行时生成的编排上下文
+  （例如子智能体/cron 任务完成交接）；请将其视为内部 API 接口。
 
-## Live schema JSON
+## 实时 schema JSON
 
-Generated JSON Schema is in the repo at `dist/protocol.schema.json`. The
-published raw file is typically available at:
+生成的 JSON Schema 位于仓库中的 `dist/protocol.schema.json`。已发布的原始文件通常可在以下地址获取：
 
 - [https://raw.githubusercontent.com/openclaw/openclaw/main/dist/protocol.schema.json](https://raw.githubusercontent.com/openclaw/openclaw/main/dist/protocol.schema.json)
 
-## When you change schemas
+## 当你修改 schema 时
 
-1. Update the TypeBox schemas.
-2. Register the method/event in `src/gateway/server-methods-list.ts`.
-3. Update `src/gateway/method-scopes.ts` when the new RPC needs operator or
-   node scope classification.
-4. Run `pnpm protocol:check`.
-5. Commit the regenerated schema + Swift models.
+1. 更新 TypeBox schema。
+2. 在 `src/gateway/server-methods-list.ts` 中注册该方法/事件。
+3. 当新的 RPC 需要 operator 或节点作用域分类时，更新 `src/gateway/method-scopes.ts`。
+4. 运行 `pnpm protocol:check`。
+5. 提交重新生成后的 schema 和 Swift 模型。
 
-## Related
+## 相关内容
 
-- [Rich output protocol](/reference/rich-output-protocol)
-- [RPC adapters](/reference/rpc)
+- [富输出协议](/zh-CN/reference/rich-output-protocol)
+- [RPC 适配器](/zh-CN/reference/rpc)

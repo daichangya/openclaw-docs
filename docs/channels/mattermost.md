@@ -1,21 +1,28 @@
 ---
-summary: "Mattermost bot setup and OpenClaw config"
 read_when:
-  - Setting up Mattermost
-  - Debugging Mattermost routing
-title: "Mattermost"
-sidebarTitle: "Mattermost"
+    - 设置 Mattermost
+    - 调试 Mattermost 路由
+sidebarTitle: Mattermost
+summary: Mattermost 机器人设置和 OpenClaw 配置
+title: Mattermost
+x-i18n:
+    generated_at: "2026-04-26T08:13:18Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 22916fcff2eeccf53055f2ebf60fc621d595991d0ca4cd148015b61cce09c52f
+    source_path: channels/mattermost.md
+    workflow: 15
 ---
 
-Status: bundled plugin (bot token + WebSocket events). Channels, groups, and DMs are supported. Mattermost is a self-hostable team messaging platform; see the official site at [mattermost.com](https://mattermost.com) for product details and downloads.
+Status：内置插件（bot token + WebSocket 事件）。支持渠道、群组和私信。Mattermost 是一个可自托管的团队消息平台；产品详情和下载请参见官方网站 [mattermost.com](https://mattermost.com)。
 
-## Bundled plugin
+## 内置插件
 
 <Note>
-Mattermost ships as a bundled plugin in current OpenClaw releases, so normal packaged builds do not need a separate install.
+Mattermost 在当前的 OpenClaw 版本中作为内置插件提供，因此常规打包构建不需要单独安装。
 </Note>
 
-If you are on an older build or a custom install that excludes Mattermost, install it manually:
+如果你使用的是较旧版本，或排除了 Mattermost 的自定义安装，请手动安装：
 
 <Tabs>
   <Tab title="npm registry">
@@ -30,22 +37,22 @@ If you are on an older build or a custom install that excludes Mattermost, insta
   </Tab>
 </Tabs>
 
-Details: [Plugins](/tools/plugin)
+详情： [Plugins](/zh-CN/tools/plugin)
 
-## Quick setup
+## 快速设置
 
 <Steps>
-  <Step title="Ensure plugin is available">
-    Current packaged OpenClaw releases already bundle it. Older/custom installs can add it manually with the commands above.
+  <Step title="确保插件可用">
+    当前打包的 OpenClaw 版本已内置该插件。较旧版本或自定义安装可使用上面的命令手动添加。
   </Step>
-  <Step title="Create a Mattermost bot">
-    Create a Mattermost bot account and copy the **bot token**.
+  <Step title="创建 Mattermost 机器人">
+    创建一个 Mattermost 机器人账户，并复制 **bot token**。
   </Step>
-  <Step title="Copy the base URL">
-    Copy the Mattermost **base URL** (e.g., `https://chat.example.com`).
+  <Step title="复制基础 URL">
+    复制 Mattermost 的 **base URL**（例如 `https://chat.example.com`）。
   </Step>
-  <Step title="Configure OpenClaw and start the gateway">
-    Minimal config:
+  <Step title="配置 OpenClaw 并启动 Gateway 网关">
+    最小配置：
 
     ```json5
     {
@@ -63,9 +70,9 @@ Details: [Plugins](/tools/plugin)
   </Step>
 </Steps>
 
-## Native slash commands
+## 原生斜杠命令
 
-Native slash commands are opt-in. When enabled, OpenClaw registers `oc_*` slash commands via the Mattermost API and receives callback POSTs on the gateway HTTP server.
+原生斜杠命令为可选启用。启用后，OpenClaw 会通过 Mattermost API 注册 `oc_*` 斜杠命令，并在 Gateway 网关 HTTP 服务器上接收回调 `POST` 请求。
 
 ```json5
 {
@@ -75,7 +82,7 @@ Native slash commands are opt-in. When enabled, OpenClaw registers `oc_*` slash 
         native: true,
         nativeSkills: true,
         callbackPath: "/api/channels/mattermost/command",
-        // Use when Mattermost cannot reach the gateway directly (reverse proxy/public URL).
+        // 当 Mattermost 无法直接访问 Gateway 网关时使用（反向代理/公共 URL）。
         callbackUrl: "https://gateway.example.com/api/channels/mattermost/command",
       },
     },
@@ -84,62 +91,62 @@ Native slash commands are opt-in. When enabled, OpenClaw registers `oc_*` slash 
 ```
 
 <AccordionGroup>
-  <Accordion title="Behavior notes">
-    - `native: "auto"` defaults to disabled for Mattermost. Set `native: true` to enable.
-    - If `callbackUrl` is omitted, OpenClaw derives one from gateway host/port + `callbackPath`.
-    - For multi-account setups, `commands` can be set at the top level or under `channels.mattermost.accounts.<id>.commands` (account values override top-level fields).
-    - Command callbacks are validated with the per-command tokens returned by Mattermost when OpenClaw registers `oc_*` commands.
-    - Slash callbacks fail closed when registration failed, startup was partial, or the callback token does not match one of the registered commands.
+  <Accordion title="行为说明">
+    - `native: "auto"` 对 Mattermost 默认禁用。设置 `native: true` 以启用。
+    - 如果省略 `callbackUrl`，OpenClaw 会根据 Gateway 网关的 host/port 和 `callbackPath` 推导出一个地址。
+    - 对于多账户设置，`commands` 可以设置在顶层，也可以设置在 `channels.mattermost.accounts.<id>.commands` 下（账户级值会覆盖顶层字段）。
+    - 命令回调会使用 OpenClaw 注册 `oc_*` 命令时 Mattermost 返回的每命令 token 进行校验。
+    - 当注册失败、启动不完整，或回调 token 与已注册命令都不匹配时，斜杠命令回调会以失败关闭方式处理。
   </Accordion>
-  <Accordion title="Reachability requirement">
-    The callback endpoint must be reachable from the Mattermost server.
+  <Accordion title="可达性要求">
+    回调端点必须可从 Mattermost 服务器访问。
 
-    - Do not set `callbackUrl` to `localhost` unless Mattermost runs on the same host/network namespace as OpenClaw.
-    - Do not set `callbackUrl` to your Mattermost base URL unless that URL reverse-proxies `/api/channels/mattermost/command` to OpenClaw.
-    - A quick check is `curl https://<gateway-host>/api/channels/mattermost/command`; a GET should return `405 Method Not Allowed` from OpenClaw, not `404`.
+    - 除非 Mattermost 与 OpenClaw 运行在同一主机/网络命名空间中，否则不要将 `callbackUrl` 设置为 `localhost`。
+    - 除非该 URL 会将 `/api/channels/mattermost/command` 反向代理到 OpenClaw，否则不要将 `callbackUrl` 设置为你的 Mattermost 基础 URL。
+    - 一个快速检查方法是运行 `curl https://<gateway-host>/api/channels/mattermost/command`；`GET` 应返回来自 OpenClaw 的 `405 Method Not Allowed`，而不是 `404`。
 
   </Accordion>
-  <Accordion title="Mattermost egress allowlist">
-    If your callback targets private/tailnet/internal addresses, set Mattermost `ServiceSettings.AllowedUntrustedInternalConnections` to include the callback host/domain.
+  <Accordion title="Mattermost 出站访问允许列表">
+    如果你的回调目标是私有地址、tailnet 地址或内部地址，请将 Mattermost 的 `ServiceSettings.AllowedUntrustedInternalConnections` 设置为包含该回调 host/domain。
 
-    Use host/domain entries, not full URLs.
+    使用 host/domain 条目，而不是完整 URL。
 
-    - Good: `gateway.tailnet-name.ts.net`
-    - Bad: `https://gateway.tailnet-name.ts.net`
+    - 正确：`gateway.tailnet-name.ts.net`
+    - 错误：`https://gateway.tailnet-name.ts.net`
 
   </Accordion>
 </AccordionGroup>
 
-## Environment variables (default account)
+## 环境变量（默认账户）
 
-Set these on the gateway host if you prefer env vars:
+如果你更喜欢使用环境变量，请在 Gateway 网关主机上设置：
 
 - `MATTERMOST_BOT_TOKEN=...`
 - `MATTERMOST_URL=https://chat.example.com`
 
 <Note>
-Env vars apply only to the **default** account (`default`). Other accounts must use config values.
+环境变量仅适用于 **default** 账户（`default`）。其他账户必须使用配置值。
 
-`MATTERMOST_URL` cannot be set from a workspace `.env`; see [Workspace `.env` files](/gateway/security).
+`MATTERMOST_URL` 不能通过工作区 `.env` 设置；请参见 [Workspace `.env` files](/zh-CN/gateway/security)。
 </Note>
 
-## Chat modes
+## 聊天模式
 
-Mattermost responds to DMs automatically. Channel behavior is controlled by `chatmode`:
+Mattermost 会自动响应私信。渠道行为由 `chatmode` 控制：
 
 <Tabs>
   <Tab title="oncall (default)">
-    Respond only when @mentioned in channels.
+    仅在渠道中被 @提及时响应。
   </Tab>
   <Tab title="onmessage">
-    Respond to every channel message.
+    响应每一条渠道消息。
   </Tab>
   <Tab title="onchar">
-    Respond when a message starts with a trigger prefix.
+    当消息以触发前缀开头时响应。
   </Tab>
 </Tabs>
 
-Config example:
+配置示例：
 
 ```json5
 {
@@ -152,21 +159,21 @@ Config example:
 }
 ```
 
-Notes:
+说明：
 
-- `onchar` still responds to explicit @mentions.
-- `channels.mattermost.requireMention` is honored for legacy configs but `chatmode` is preferred.
+- `onchar` 仍会响应显式的 @提及。
+- `channels.mattermost.requireMention` 会继续兼容旧配置，但更推荐使用 `chatmode`。
 
-## Threading and sessions
+## 线程和会话
 
-Use `channels.mattermost.replyToMode` to control whether channel and group replies stay in the main channel or start a thread under the triggering post.
+使用 `channels.mattermost.replyToMode` 控制渠道和群组回复是保留在主渠道中，还是在触发消息下开启线程。
 
-- `off` (default): only reply in a thread when the inbound post is already in one.
-- `first`: for top-level channel/group posts, start a thread under that post and route the conversation to a thread-scoped session.
-- `all`: same behavior as `first` for Mattermost today.
-- Direct messages ignore this setting and stay non-threaded.
+- `off`（默认）：仅当传入消息本身已经在线程中时，才在线程中回复。
+- `first`：对于渠道/群组中的顶层消息，在该消息下开启线程，并将对话路由到线程作用域的会话。
+- `all`：当前在 Mattermost 中与 `first` 行为相同。
+- 私信会忽略此设置，并保持非线程模式。
 
-Config example:
+配置示例：
 
 ```json5
 {
@@ -178,29 +185,29 @@ Config example:
 }
 ```
 
-Notes:
+说明：
 
-- Thread-scoped sessions use the triggering post id as the thread root.
-- `first` and `all` are currently equivalent because once Mattermost has a thread root, follow-up chunks and media continue in that same thread.
+- 线程作用域的会话使用触发消息的 post id 作为线程根。
+- `first` 和 `all` 当前等价，因为一旦 Mattermost 已有线程根，后续分块和媒体内容都会继续发送到同一线程。
 
-## Access control (DMs)
+## 访问控制（私信）
 
-- Default: `channels.mattermost.dmPolicy = "pairing"` (unknown senders get a pairing code).
-- Approve via:
+- 默认：`channels.mattermost.dmPolicy = "pairing"`（未知发送者会收到配对码）。
+- 通过以下命令批准：
   - `openclaw pairing list mattermost`
   - `openclaw pairing approve mattermost <CODE>`
-- Public DMs: `channels.mattermost.dmPolicy="open"` plus `channels.mattermost.allowFrom=["*"]`.
+- 公开私信：`channels.mattermost.dmPolicy="open"` 加上 `channels.mattermost.allowFrom=["*"]`。
 
-## Channels (groups)
+## 渠道（群组）
 
-- Default: `channels.mattermost.groupPolicy = "allowlist"` (mention-gated).
-- Allowlist senders with `channels.mattermost.groupAllowFrom` (user IDs recommended).
-- Per-channel mention overrides live under `channels.mattermost.groups.<channelId>.requireMention` or `channels.mattermost.groups["*"].requireMention` for a default.
-- `@username` matching is mutable and only enabled when `channels.mattermost.dangerouslyAllowNameMatching: true`.
-- Open channels: `channels.mattermost.groupPolicy="open"` (mention-gated).
-- Runtime note: if `channels.mattermost` is completely missing, runtime falls back to `groupPolicy="allowlist"` for group checks (even if `channels.defaults.groupPolicy` is set).
+- 默认：`channels.mattermost.groupPolicy = "allowlist"`（提及门控）。
+- 使用 `channels.mattermost.groupAllowFrom` 将发送者加入允许列表（推荐使用用户 ID）。
+- 每个渠道的提及覆盖配置位于 `channels.mattermost.groups.<channelId>.requireMention`，或者使用 `channels.mattermost.groups["*"].requireMention` 作为默认值。
+- `@username` 匹配是可变的，且仅在 `channels.mattermost.dangerouslyAllowNameMatching: true` 时启用。
+- 公开渠道：`channels.mattermost.groupPolicy="open"`（提及门控）。
+- 运行时说明：如果 `channels.mattermost` 完全缺失，运行时在群组检查中会回退为 `groupPolicy="allowlist"`（即使已设置 `channels.defaults.groupPolicy` 也是如此）。
 
-Example:
+示例：
 
 ```json5
 {
@@ -216,30 +223,30 @@ Example:
 }
 ```
 
-## Targets for outbound delivery
+## 出站投递目标
 
-Use these target formats with `openclaw message send` or cron/webhooks:
+将以下目标格式与 `openclaw message send` 或 cron/webhooks 一起使用：
 
-- `channel:<id>` for a channel
-- `user:<id>` for a DM
-- `@username` for a DM (resolved via the Mattermost API)
+- `channel:<id>` 表示一个渠道
+- `user:<id>` 表示一个私信
+- `@username` 表示一个私信（通过 Mattermost API 解析）
 
 <Warning>
-Bare opaque IDs (like `64ifufp...`) are **ambiguous** in Mattermost (user ID vs channel ID).
+裸的不透明 ID（如 `64ifufp...`）在 Mattermost 中是 **有歧义的**（用户 ID 或渠道 ID）。
 
-OpenClaw resolves them **user-first**:
+OpenClaw 会按 **优先用户** 的顺序解析：
 
-- If the ID exists as a user (`GET /api/v4/users/<id>` succeeds), OpenClaw sends a **DM** by resolving the direct channel via `/api/v4/channels/direct`.
-- Otherwise the ID is treated as a **channel ID**.
+- 如果该 ID 作为用户存在（`GET /api/v4/users/<id>` 成功），OpenClaw 会先通过 `/api/v4/channels/direct` 解析直连渠道，然后发送 **私信**。
+- 否则，该 ID 会被视为 **渠道 ID**。
 
-If you need deterministic behavior, always use the explicit prefixes (`user:<id>` / `channel:<id>`).
+如果你需要确定性行为，请始终使用显式前缀（`user:<id>` / `channel:<id>`）。
 </Warning>
 
-## DM channel retry
+## 私信渠道重试
 
-When OpenClaw sends to a Mattermost DM target and needs to resolve the direct channel first, it retries transient direct-channel creation failures by default.
+当 OpenClaw 向 Mattermost 私信目标发送消息，且需要先解析直连渠道时，默认会重试临时性的直连渠道创建失败。
 
-Use `channels.mattermost.dmChannelRetry` to tune that behavior globally for the Mattermost plugin, or `channels.mattermost.accounts.<id>.dmChannelRetry` for one account.
+使用 `channels.mattermost.dmChannelRetry` 可为 Mattermost 插件全局调整该行为，或使用 `channels.mattermost.accounts.<id>.dmChannelRetry` 只为某个账户调整。
 
 ```json5
 {
@@ -256,17 +263,17 @@ Use `channels.mattermost.dmChannelRetry` to tune that behavior globally for the 
 }
 ```
 
-Notes:
+说明：
 
-- This applies only to DM channel creation (`/api/v4/channels/direct`), not every Mattermost API call.
-- Retries apply to transient failures such as rate limits, 5xx responses, and network or timeout errors.
-- 4xx client errors other than `429` are treated as permanent and are not retried.
+- 这仅适用于私信渠道创建（`/api/v4/channels/direct`），并不适用于每一次 Mattermost API 调用。
+- 重试适用于限流、5xx 响应，以及网络或超时错误等临时性失败。
+- 除 `429` 外的 4xx 客户端错误会被视为永久性错误，不会重试。
 
-## Preview streaming
+## 预览流式传输
 
-Mattermost streams thinking, tool activity, and partial reply text into a single **draft preview post** that finalizes in place when the final answer is safe to send. The preview updates on the same post id instead of spamming the channel with per-chunk messages. Media/error finals cancel pending preview edits and use normal delivery instead of flushing a throwaway preview post.
+Mattermost 会将思考过程、工具活动和部分回复文本流式写入单个 **草稿预览消息**，并在最终答案可安全发送时原地完成定稿。预览会在同一个 post id 上更新，而不是通过逐块消息刷屏。媒体/错误类型的最终消息会取消待处理的预览编辑，并改用常规投递，而不是刷新一个无用的预览消息。
 
-Enable via `channels.mattermost.streaming`:
+通过 `channels.mattermost.streaming` 启用：
 
 ```json5
 {
@@ -279,44 +286,44 @@ Enable via `channels.mattermost.streaming`:
 ```
 
 <AccordionGroup>
-  <Accordion title="Streaming modes">
-    - `partial` is the usual choice: one preview post that is edited as the reply grows, then finalized with the complete answer.
-    - `block` uses append-style draft chunks inside the preview post.
-    - `progress` shows a status preview while generating and only posts the final answer at completion.
-    - `off` disables preview streaming.
+  <Accordion title="流式传输模式">
+    - `partial` 是常见选择：一个预览消息会随着回复增长而被编辑，最后用完整答案定稿。
+    - `block` 在预览消息中使用追加式草稿分块。
+    - `progress` 在生成期间显示状态预览，并仅在完成时发送最终答案。
+    - `off` 会禁用预览流式传输。
   </Accordion>
-  <Accordion title="Streaming behavior notes">
-    - If the stream cannot be finalized in place (for example the post was deleted mid-stream), OpenClaw falls back to sending a fresh final post so the reply is never lost.
-    - Reasoning-only payloads are suppressed from channel posts, including text that arrives as a `> Reasoning:` blockquote. Set `/reasoning on` to see thinking in other surfaces; the Mattermost final post keeps the answer only.
-    - See [Streaming](/concepts/streaming#preview-streaming-modes) for the channel-mapping matrix.
+  <Accordion title="流式传输行为说明">
+    - 如果流无法原地定稿（例如消息在流过程中被删除），OpenClaw 会回退为发送一条新的最终消息，因此回复不会丢失。
+    - 纯推理负载不会显示在渠道消息中，包括以 `> Reasoning:` 引述块形式到达的文本。设置 `/reasoning on` 可在其他界面中查看思考过程；Mattermost 的最终消息只保留答案。
+    - 渠道映射矩阵请参见 [Streaming](/zh-CN/concepts/streaming#preview-streaming-modes)。
   </Accordion>
 </AccordionGroup>
 
-## Reactions (message tool)
+## 表情回应（消息工具）
 
-- Use `message action=react` with `channel=mattermost`.
-- `messageId` is the Mattermost post id.
-- `emoji` accepts names like `thumbsup` or `:+1:` (colons are optional).
-- Set `remove=true` (boolean) to remove a reaction.
-- Reaction add/remove events are forwarded as system events to the routed agent session.
+- 使用 `message action=react`，并设置 `channel=mattermost`。
+- `messageId` 是 Mattermost 的 post id。
+- `emoji` 接受如 `thumbsup` 或 `:+1:` 之类的名称（冒号可选）。
+- 设置 `remove=true`（布尔值）可移除一个回应。
+- 添加/移除表情回应事件会作为系统事件转发到已路由的智能体会话。
 
-Examples:
+示例：
 
 ```
 message action=react channel=mattermost target=channel:<channelId> messageId=<postId> emoji=thumbsup
 message action=react channel=mattermost target=channel:<channelId> messageId=<postId> emoji=thumbsup remove=true
 ```
 
-Config:
+配置：
 
-- `channels.mattermost.actions.reactions`: enable/disable reaction actions (default true).
-- Per-account override: `channels.mattermost.accounts.<id>.actions.reactions`.
+- `channels.mattermost.actions.reactions`：启用/禁用表情回应操作（默认 true）。
+- 每账户覆盖：`channels.mattermost.accounts.<id>.actions.reactions`。
 
-## Interactive buttons (message tool)
+## 交互式按钮（消息工具）
 
-Send messages with clickable buttons. When a user clicks a button, the agent receives the selection and can respond.
+发送带可点击按钮的消息。当用户点击按钮时，智能体会收到所选内容并可作出响应。
 
-Enable buttons by adding `inlineButtons` to the channel capabilities:
+通过在渠道能力中添加 `inlineButtons` 来启用按钮：
 
 ```json5
 {
@@ -328,56 +335,56 @@ Enable buttons by adding `inlineButtons` to the channel capabilities:
 }
 ```
 
-Use `message action=send` with a `buttons` parameter. Buttons are a 2D array (rows of buttons):
+使用 `message action=send` 并带上 `buttons` 参数。按钮是一个二维数组（按钮行）：
 
 ```
 message action=send channel=mattermost target=channel:<channelId> buttons=[[{"text":"Yes","callback_data":"yes"},{"text":"No","callback_data":"no"}]]
 ```
 
-Button fields:
+按钮字段：
 
 <ParamField path="text" type="string" required>
-  Display label.
+  显示标签。
 </ParamField>
 <ParamField path="callback_data" type="string" required>
-  Value sent back on click (used as the action ID).
+  点击后回传的值（用作动作 ID）。
 </ParamField>
 <ParamField path="style" type='"default" | "primary" | "danger"'>
-  Button style.
+  按钮样式。
 </ParamField>
 
-When a user clicks a button:
+当用户点击按钮时：
 
 <Steps>
-  <Step title="Buttons replaced with confirmation">
-    All buttons are replaced with a confirmation line (e.g., "✓ **Yes** selected by @user").
+  <Step title="按钮会被替换为确认信息">
+    所有按钮都会被替换为一行确认文本（例如：“✓ **Yes** selected by @user”）。
   </Step>
-  <Step title="Agent receives the selection">
-    The agent receives the selection as an inbound message and responds.
+  <Step title="智能体接收所选内容">
+    智能体会将该选择作为一条入站消息接收，并作出响应。
   </Step>
 </Steps>
 
 <AccordionGroup>
-  <Accordion title="Implementation notes">
-    - Button callbacks use HMAC-SHA256 verification (automatic, no config needed).
-    - Mattermost strips callback data from its API responses (security feature), so all buttons are removed on click — partial removal is not possible.
-    - Action IDs containing hyphens or underscores are sanitized automatically (Mattermost routing limitation).
+  <Accordion title="实现说明">
+    - 按钮回调使用 HMAC-SHA256 校验（自动完成，无需配置）。
+    - Mattermost 会从其 API 响应中移除回调数据（安全特性），因此按钮在点击后都会被移除——无法只移除部分按钮。
+    - 包含连字符或下划线的动作 ID 会被自动净化处理（Mattermost 路由限制）。
   </Accordion>
-  <Accordion title="Config and reachability">
-    - `channels.mattermost.capabilities`: array of capability strings. Add `"inlineButtons"` to enable the buttons tool description in the agent system prompt.
-    - `channels.mattermost.interactions.callbackBaseUrl`: optional external base URL for button callbacks (for example `https://gateway.example.com`). Use this when Mattermost cannot reach the gateway at its bind host directly.
-    - In multi-account setups, you can also set the same field under `channels.mattermost.accounts.<id>.interactions.callbackBaseUrl`.
-    - If `interactions.callbackBaseUrl` is omitted, OpenClaw derives the callback URL from `gateway.customBindHost` + `gateway.port`, then falls back to `http://localhost:<port>`.
-    - Reachability rule: the button callback URL must be reachable from the Mattermost server. `localhost` only works when Mattermost and OpenClaw run on the same host/network namespace.
-    - If your callback target is private/tailnet/internal, add its host/domain to Mattermost `ServiceSettings.AllowedUntrustedInternalConnections`.
+  <Accordion title="配置和可达性">
+    - `channels.mattermost.capabilities`：能力字符串数组。添加 `"inlineButtons"` 可在智能体系统提示词中启用按钮工具描述。
+    - `channels.mattermost.interactions.callbackBaseUrl`：按钮回调可选的外部基础 URL（例如 `https://gateway.example.com`）。当 Mattermost 无法直接访问 Gateway 网关绑定的 host 时使用此项。
+    - 在多账户设置中，你也可以在 `channels.mattermost.accounts.<id>.interactions.callbackBaseUrl` 下设置相同字段。
+    - 如果省略 `interactions.callbackBaseUrl`，OpenClaw 会根据 `gateway.customBindHost` + `gateway.port` 推导回调 URL，然后回退到 `http://localhost:<port>`。
+    - 可达性规则：按钮回调 URL 必须可从 Mattermost 服务器访问。只有当 Mattermost 和 OpenClaw 运行在同一主机/网络命名空间中时，`localhost` 才可用。
+    - 如果你的回调目标是私有地址、tailnet 地址或内部地址，请将其 host/domain 添加到 Mattermost 的 `ServiceSettings.AllowedUntrustedInternalConnections` 中。
   </Accordion>
 </AccordionGroup>
 
-### Direct API integration (external scripts)
+### 直接 API 集成（外部脚本）
 
-External scripts and webhooks can post buttons directly via the Mattermost REST API instead of going through the agent's `message` tool. Use `buildButtonAttachments()` from the plugin when possible; if posting raw JSON, follow these rules:
+外部脚本和 webhooks 可以直接通过 Mattermost REST API 发送按钮，而不必经过智能体的 `message` 工具。尽量使用插件中的 `buildButtonAttachments()`；如果直接发送原始 JSON，请遵循以下规则：
 
-**Payload structure:**
+**负载结构：**
 
 ```json5
 {
@@ -388,17 +395,17 @@ External scripts and webhooks can post buttons directly via the Mattermost REST 
       {
         actions: [
           {
-            id: "mybutton01", // alphanumeric only — see below
-            type: "button", // required, or clicks are silently ignored
-            name: "Approve", // display label
-            style: "primary", // optional: "default", "primary", "danger"
+            id: "mybutton01", // 仅限字母数字 —— 见下文
+            type: "button", // 必填，否则点击会被静默忽略
+            name: "Approve", // 显示标签
+            style: "primary", // 可选："default"、"primary"、"danger"
             integration: {
               url: "https://gateway.example.com/mattermost/interactions/default",
               context: {
-                action_id: "mybutton01", // must match button id (for name lookup)
+                action_id: "mybutton01", // 必须与按钮 id 一致（用于名称查找）
                 action: "approve",
                 // ... any custom fields ...
-                _token: "<hmac>", // see HMAC section below
+                _token: "<hmac>", // 见下方 HMAC 小节
               },
             },
           },
@@ -410,39 +417,39 @@ External scripts and webhooks can post buttons directly via the Mattermost REST 
 ```
 
 <Warning>
-**Critical rules**
+**关键规则**
 
-1. Attachments go in `props.attachments`, not top-level `attachments` (silently ignored).
-2. Every action needs `type: "button"` — without it, clicks are swallowed silently.
-3. Every action needs an `id` field — Mattermost ignores actions without IDs.
-4. Action `id` must be **alphanumeric only** (`[a-zA-Z0-9]`). Hyphens and underscores break Mattermost's server-side action routing (returns 404). Strip them before use.
-5. `context.action_id` must match the button's `id` so the confirmation message shows the button name (e.g., "Approve") instead of a raw ID.
-6. `context.action_id` is required — the interaction handler returns 400 without it.
+1. attachments 放在 `props.attachments` 中，而不是顶层 `attachments`（否则会被静默忽略）。
+2. 每个动作都需要 `type: "button"` —— 没有它，点击会被静默吞掉。
+3. 每个动作都需要 `id` 字段 —— 没有 ID 的动作会被 Mattermost 忽略。
+4. 动作 `id` 必须 **仅包含字母数字**（`[a-zA-Z0-9]`）。连字符和下划线会破坏 Mattermost 服务端动作路由（返回 404）。使用前请先移除它们。
+5. `context.action_id` 必须与按钮的 `id` 一致，这样确认消息才会显示按钮名称（例如 “Approve”），而不是原始 ID。
+6. `context.action_id` 是必填项 —— 没有它，交互处理器会返回 400。
    </Warning>
 
-**HMAC token generation**
+**HMAC token 生成**
 
-The gateway verifies button clicks with HMAC-SHA256. External scripts must generate tokens that match the gateway's verification logic:
+Gateway 网关使用 HMAC-SHA256 校验按钮点击。外部脚本必须生成与 Gateway 网关校验逻辑一致的 token：
 
 <Steps>
-  <Step title="Derive the secret from the bot token">
+  <Step title="从 bot token 派生 secret">
     `HMAC-SHA256(key="openclaw-mattermost-interactions", data=botToken)`
   </Step>
-  <Step title="Build the context object">
-    Build the context object with all fields **except** `_token`.
+  <Step title="构建 context 对象">
+    构建包含除 `_token` 之外所有字段的 context 对象。
   </Step>
-  <Step title="Serialize with sorted keys">
-    Serialize with **sorted keys** and **no spaces** (the gateway uses `JSON.stringify` with sorted keys, which produces compact output).
+  <Step title="按已排序的键序列化">
+    使用 **已排序的键** 且 **不带空格** 进行序列化（Gateway 网关使用带排序键的 `JSON.stringify`，输出为紧凑格式）。
   </Step>
-  <Step title="Sign the payload">
+  <Step title="对负载签名">
     `HMAC-SHA256(key=secret, data=serializedContext)`
   </Step>
-  <Step title="Add the token">
-    Add the resulting hex digest as `_token` in the context.
+  <Step title="添加 token">
+    将生成的十六进制摘要作为 `_token` 添加到 context 中。
   </Step>
 </Steps>
 
-Python example:
+Python 示例：
 
 ```python
 import hmac, hashlib, json
@@ -460,23 +467,23 @@ context = {**ctx, "_token": token}
 ```
 
 <AccordionGroup>
-  <Accordion title="Common HMAC pitfalls">
-    - Python's `json.dumps` adds spaces by default (`{"key": "val"}`). Use `separators=(",", ":")` to match JavaScript's compact output (`{"key":"val"}`).
-    - Always sign **all** context fields (minus `_token`). The gateway strips `_token` then signs everything remaining. Signing a subset causes silent verification failure.
-    - Use `sort_keys=True` — the gateway sorts keys before signing, and Mattermost may reorder context fields when storing the payload.
-    - Derive the secret from the bot token (deterministic), not random bytes. The secret must be the same across the process that creates buttons and the gateway that verifies.
+  <Accordion title="常见 HMAC 陷阱">
+    - Python 的 `json.dumps` 默认会添加空格（`{"key": "val"}`）。使用 `separators=(",", ":")` 以匹配 JavaScript 的紧凑输出（`{"key":"val"}`）。
+    - 始终对 **所有** context 字段（除 `_token` 外）进行签名。Gateway 网关会先移除 `_token`，然后对剩余全部字段签名。只签名子集会导致静默校验失败。
+    - 使用 `sort_keys=True` —— Gateway 网关会在签名前对键排序，而 Mattermost 在存储负载时可能会重排 context 字段。
+    - 应从 bot token 派生 secret（确定性），而不是使用随机字节。创建按钮的进程和负责校验的 Gateway 网关必须使用相同的 secret。
   </Accordion>
 </AccordionGroup>
 
-## Directory adapter
+## 目录适配器
 
-The Mattermost plugin includes a directory adapter that resolves channel and user names via the Mattermost API. This enables `#channel-name` and `@username` targets in `openclaw message send` and cron/webhook deliveries.
+Mattermost 插件包含一个目录适配器，可通过 Mattermost API 解析渠道名和用户名。这使得在 `openclaw message send` 和 cron/webhook 投递中可以使用 `#channel-name` 和 `@username` 目标。
 
-No configuration is needed — the adapter uses the bot token from the account config.
+无需配置——该适配器会使用账户配置中的 bot token。
 
-## Multi-account
+## 多账户
 
-Mattermost supports multiple accounts under `channels.mattermost.accounts`:
+Mattermost 支持在 `channels.mattermost.accounts` 下配置多个账户：
 
 ```json5
 {
@@ -491,40 +498,40 @@ Mattermost supports multiple accounts under `channels.mattermost.accounts`:
 }
 ```
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
-  <Accordion title="No replies in channels">
-    Ensure the bot is in the channel and mention it (oncall), use a trigger prefix (onchar), or set `chatmode: "onmessage"`.
+  <Accordion title="渠道中没有回复">
+    确保机器人已加入该渠道，并提及它（oncall），使用触发前缀（onchar），或设置 `chatmode: "onmessage"`。
   </Accordion>
-  <Accordion title="Auth or multi-account errors">
-    - Check the bot token, base URL, and whether the account is enabled.
-    - Multi-account issues: env vars only apply to the `default` account.
+  <Accordion title="身份验证或多账户错误">
+    - 检查 bot token、base URL，以及账户是否已启用。
+    - 多账户问题：环境变量仅适用于 `default` 账户。
   </Accordion>
-  <Accordion title="Native slash commands fail">
-    - `Unauthorized: invalid command token.`: OpenClaw did not accept the callback token. Typical causes:
-      - slash command registration failed or only partially completed at startup
-      - the callback is hitting the wrong gateway/account
-      - Mattermost still has old commands pointing at a previous callback target
-      - the gateway restarted without reactivating slash commands
-    - If native slash commands stop working, check logs for `mattermost: failed to register slash commands` or `mattermost: native slash commands enabled but no commands could be registered`.
-    - If `callbackUrl` is omitted and logs warn that the callback resolved to `http://127.0.0.1:18789/...`, that URL is probably only reachable when Mattermost runs on the same host/network namespace as OpenClaw. Set an explicit externally reachable `commands.callbackUrl` instead.
+  <Accordion title="原生斜杠命令失败">
+    - `Unauthorized: invalid command token.`：OpenClaw 未接受该回调 token。常见原因：
+      - 斜杠命令注册失败，或启动时仅部分完成
+      - 回调命中了错误的 Gateway 网关/账户
+      - Mattermost 仍保留指向旧回调目标的旧命令
+      - Gateway 网关重启后未重新激活斜杠命令
+    - 如果原生斜杠命令停止工作，请检查日志中是否有 `mattermost: failed to register slash commands` 或 `mattermost: native slash commands enabled but no commands could be registered`。
+    - 如果省略了 `callbackUrl`，且日志警告回调被解析为 `http://127.0.0.1:18789/...`，那么该 URL 很可能只有在 Mattermost 与 OpenClaw 运行于同一主机/网络命名空间时才可访问。请改为设置一个显式、外部可访问的 `commands.callbackUrl`。
   </Accordion>
-  <Accordion title="Buttons issues">
-    - Buttons appear as white boxes: the agent may be sending malformed button data. Check that each button has both `text` and `callback_data` fields.
-    - Buttons render but clicks do nothing: verify `AllowedUntrustedInternalConnections` in Mattermost server config includes `127.0.0.1 localhost`, and that `EnablePostActionIntegration` is `true` in ServiceSettings.
-    - Buttons return 404 on click: the button `id` likely contains hyphens or underscores. Mattermost's action router breaks on non-alphanumeric IDs. Use `[a-zA-Z0-9]` only.
-    - Gateway logs `invalid _token`: HMAC mismatch. Check that you sign all context fields (not a subset), use sorted keys, and use compact JSON (no spaces). See the HMAC section above.
-    - Gateway logs `missing _token in context`: the `_token` field is not in the button's context. Ensure it is included when building the integration payload.
-    - Confirmation shows raw ID instead of button name: `context.action_id` does not match the button's `id`. Set both to the same sanitized value.
-    - Agent doesn't know about buttons: add `capabilities: ["inlineButtons"]` to the Mattermost channel config.
+  <Accordion title="按钮问题">
+    - 按钮显示为白框：智能体可能发送了格式错误的按钮数据。检查每个按钮是否都同时包含 `text` 和 `callback_data` 字段。
+    - 按钮已渲染，但点击无反应：请确认 Mattermost 服务器配置中的 `AllowedUntrustedInternalConnections` 包含 `127.0.0.1 localhost`，并且 `ServiceSettings` 中的 `EnablePostActionIntegration` 为 `true`。
+    - 点击按钮返回 404：按钮的 `id` 很可能包含连字符或下划线。Mattermost 的动作路由器无法处理非字母数字 ID。请仅使用 `[a-zA-Z0-9]`。
+    - Gateway 网关日志出现 `invalid _token`：HMAC 不匹配。请检查你是否对所有 context 字段（而不是子集）进行了签名，是否使用了已排序的键，以及是否使用了紧凑 JSON（无空格）。参见上方 HMAC 小节。
+    - Gateway 网关日志出现 `missing _token in context`：按钮的 context 中没有 `_token` 字段。请确保在构建 integration 负载时包含该字段。
+    - 确认信息显示原始 ID 而不是按钮名称：`context.action_id` 与按钮的 `id` 不匹配。请将二者设置为相同的净化值。
+    - 智能体不了解按钮：请在 Mattermost 渠道配置中添加 `capabilities: ["inlineButtons"]`。
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
-- [Channel Routing](/channels/channel-routing) — session routing for messages
-- [Channels Overview](/channels) — all supported channels
-- [Groups](/channels/groups) — group chat behavior and mention gating
-- [Pairing](/channels/pairing) — DM authentication and pairing flow
-- [Security](/gateway/security) — access model and hardening
+- [Channel Routing](/zh-CN/channels/channel-routing) — 消息的会话路由
+- [Channels Overview](/zh-CN/channels) — 所有受支持的渠道
+- [Groups](/zh-CN/channels/groups) — 群聊行为和提及门控
+- [Pairing](/zh-CN/channels/pairing) — 私信身份验证和配对流程
+- [Security](/zh-CN/gateway/security) — 访问模型和加固措施

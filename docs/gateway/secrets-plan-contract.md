@@ -1,19 +1,26 @@
 ---
-summary: "Contract for `secrets apply` plans: target validation, path matching, and `auth-profiles.json` target scope"
 read_when:
-  - Generating or reviewing `openclaw secrets apply` plans
-  - Debugging `Invalid plan target path` errors
-  - Understanding target type and path validation behavior
-title: "Secrets apply plan contract"
+    - 生成或审查 `openclaw secrets apply` 计划
+    - 调试 `Invalid plan target path` 错误
+    - 理解目标类型和路径验证行为
+summary: '`secrets apply` 计划的契约：目标验证、路径匹配，以及 `auth-profiles.json` 目标范围'
+title: Secrets apply 计划契约
+x-i18n:
+    generated_at: "2026-04-23T20:50:02Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 80214353a1368b249784aa084c714e043c2d515706357d4ba1f111a3c68d1a84
+    source_path: gateway/secrets-plan-contract.md
+    workflow: 15
 ---
 
-This page defines the strict contract enforced by `openclaw secrets apply`.
+本页定义了 `openclaw secrets apply` 强制执行的严格契约。
 
-If a target does not match these rules, apply fails before mutating configuration.
+如果某个目标不符合这些规则，apply 会在修改配置之前失败。
 
-## Plan file shape
+## 计划文件结构
 
-`openclaw secrets apply --from <plan.json>` expects a `targets` array of plan targets:
+`openclaw secrets apply --from <plan.json>` 期望接收一个包含计划目标的 `targets` 数组：
 
 ```json5
 {
@@ -38,77 +45,77 @@ If a target does not match these rules, apply fails before mutating configuratio
 }
 ```
 
-## Supported target scope
+## 支持的目标范围
 
-Plan targets are accepted for supported credential paths in:
+在以下位置中的受支持凭证路径，接受计划目标：
 
-- [SecretRef Credential Surface](/reference/secretref-credential-surface)
+- [SecretRef Credential Surface](/zh-CN/reference/secretref-credential-surface)
 
-## Target type behavior
+## 目标类型行为
 
-General rule:
+通用规则：
 
-- `target.type` must be recognized and must match the normalized `target.path` shape.
+- `target.type` 必须是已识别类型，并且必须匹配规范化后的 `target.path` 结构。
 
-Compatibility aliases remain accepted for existing plans:
+出于兼容性考虑，现有计划仍接受以下别名：
 
 - `models.providers.apiKey`
 - `skills.entries.apiKey`
 - `channels.googlechat.serviceAccount`
 
-## Path validation rules
+## 路径验证规则
 
-Each target is validated with all of the following:
+每个目标都会按以下所有规则进行验证：
 
-- `type` must be a recognized target type.
-- `path` must be a non-empty dot path.
-- `pathSegments` can be omitted. If provided, it must normalize to exactly the same path as `path`.
-- Forbidden segments are rejected: `__proto__`, `prototype`, `constructor`.
-- The normalized path must match the registered path shape for the target type.
-- If `providerId` or `accountId` is set, it must match the id encoded in the path.
-- `auth-profiles.json` targets require `agentId`.
-- When creating a new `auth-profiles.json` mapping, include `authProfileProvider`.
+- `type` 必须是已识别的目标类型。
+- `path` 必须是非空的点路径。
+- `pathSegments` 可以省略。如果提供，它在规范化后必须与 `path` 完全一致。
+- 以下禁止的段会被拒绝：`__proto__`、`prototype`、`constructor`。
+- 规范化后的路径必须匹配该目标类型已注册的路径结构。
+- 如果设置了 `providerId` 或 `accountId`，它必须与路径中编码的 id 匹配。
+- `auth-profiles.json` 目标需要 `agentId`。
+- 创建新的 `auth-profiles.json` 映射时，请包含 `authProfileProvider`。
 
-## Failure behavior
+## 失败行为
 
-If a target fails validation, apply exits with an error like:
+如果目标验证失败，apply 会退出并报错，例如：
 
 ```text
 Invalid plan target path for models.providers.apiKey: models.providers.openai.baseUrl
 ```
 
-No writes are committed for an invalid plan.
+无效计划不会提交任何写入。
 
-## Exec provider consent behavior
+## 执行提供商同意行为
 
-- `--dry-run` skips exec SecretRef checks by default.
-- Plans containing exec SecretRefs/providers are rejected in write mode unless `--allow-exec` is set.
-- When validating/applying exec-containing plans, pass `--allow-exec` in both dry-run and write commands.
+- `--dry-run` 默认跳过执行 SecretRef 检查。
+- 包含执行 SecretRefs / 提供商的计划，在写入模式下如果未设置 `--allow-exec` 会被拒绝。
+- 验证 / 应用包含执行内容的计划时，请在 dry-run 和写入命令中都传入 `--allow-exec`。
 
-## Runtime and audit scope notes
+## 运行时与审计范围说明
 
-- Ref-only `auth-profiles.json` entries (`keyRef`/`tokenRef`) are included in runtime resolution and audit coverage.
-- `secrets apply` writes supported `openclaw.json` targets, supported `auth-profiles.json` targets, and optional scrub targets.
+- 仅引用形式的 `auth-profiles.json` 条目（`keyRef` / `tokenRef`）会纳入运行时解析和审计覆盖范围。
+- `secrets apply` 会写入受支持的 `openclaw.json` 目标、受支持的 `auth-profiles.json` 目标，以及可选的清理目标。
 
-## Operator checks
+## 操作员检查
 
 ```bash
-# Validate plan without writes
+# 验证计划但不写入
 openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run
 
-# Then apply for real
+# 然后正式应用
 openclaw secrets apply --from /tmp/openclaw-secrets-plan.json
 
-# For exec-containing plans, opt in explicitly in both modes
+# 对于包含执行内容的计划，在两种模式下都要显式选择启用
 openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --dry-run --allow-exec
 openclaw secrets apply --from /tmp/openclaw-secrets-plan.json --allow-exec
 ```
 
-If apply fails with an invalid target path message, regenerate the plan with `openclaw secrets configure` or fix the target path to a supported shape above.
+如果 apply 因目标路径无效消息而失败，请使用 `openclaw secrets configure` 重新生成计划，或将目标路径修正为上述支持的结构。
 
-## Related docs
+## 相关文档
 
-- [Secrets Management](/gateway/secrets)
-- [CLI `secrets`](/cli/secrets)
-- [SecretRef Credential Surface](/reference/secretref-credential-surface)
-- [Configuration Reference](/gateway/configuration-reference)
+- [Secrets Management](/zh-CN/gateway/secrets)
+- [CLI `secrets`](/zh-CN/cli/secrets)
+- [SecretRef Credential Surface](/zh-CN/reference/secretref-credential-surface)
+- [Configuration Reference](/zh-CN/gateway/configuration-reference)

@@ -1,31 +1,36 @@
 ---
-summary: "Use ElevenLabs speech, Scribe STT, and realtime transcription with OpenClaw"
 read_when:
-  - You want ElevenLabs text-to-speech in OpenClaw
-  - You want ElevenLabs Scribe speech-to-text for audio attachments
-  - You want ElevenLabs realtime transcription for Voice Call
-title: "ElevenLabs"
+    - 你想在 OpenClaw 中使用 ElevenLabs 文本转语音
+    - 你想将 ElevenLabs Scribe 语音转文本用于音频附件
+    - 你想将 ElevenLabs 实时转录用于语音通话
+summary: 使用 ElevenLabs 语音、Scribe STT 和 OpenClaw 实现实时转录
+title: ElevenLabs
+x-i18n:
+    generated_at: "2026-04-25T09:09:35Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 1f858a344228c6355cd5fdc3775cddac39e0075f2e9fcf7683271f11be03a31a
+    source_path: providers/elevenlabs.md
+    workflow: 15
 ---
 
-OpenClaw uses ElevenLabs for text-to-speech, batch speech-to-text with Scribe
-v2, and Voice Call streaming STT with Scribe v2 Realtime.
+OpenClaw 使用 ElevenLabs 提供文本转语音、基于 Scribe v2 的批量语音转文本，以及基于 Scribe v2 Realtime 的 Voice Call 流式 STT。
 
-| Capability               | OpenClaw surface                              | Default                  |
+| 能力 | OpenClaw 界面 | 默认值 |
 | ------------------------ | --------------------------------------------- | ------------------------ |
-| Text-to-speech           | `messages.tts` / `talk`                       | `eleven_multilingual_v2` |
-| Batch speech-to-text     | `tools.media.audio`                           | `scribe_v2`              |
-| Streaming speech-to-text | Voice Call `streaming.provider: "elevenlabs"` | `scribe_v2_realtime`     |
+| 文本转语音 | `messages.tts` / `talk` | `eleven_multilingual_v2` |
+| 批量语音转文本 | `tools.media.audio` | `scribe_v2` |
+| 流式语音转文本 | Voice Call `streaming.provider: "elevenlabs"` | `scribe_v2_realtime` |
 
-## Authentication
+## 认证
 
-Set `ELEVENLABS_API_KEY` in the environment. `XI_API_KEY` is also accepted for
-compatibility with existing ElevenLabs tooling.
+在环境中设置 `ELEVENLABS_API_KEY`。为兼容现有的 ElevenLabs 工具，也接受 `XI_API_KEY`。
 
 ```bash
 export ELEVENLABS_API_KEY="..."
 ```
 
-## Text-to-speech
+## 文本转语音
 
 ```json5
 {
@@ -43,12 +48,11 @@ export ELEVENLABS_API_KEY="..."
 }
 ```
 
-Set `modelId` to `eleven_v3` to use ElevenLabs v3 TTS. OpenClaw keeps
-`eleven_multilingual_v2` as the default for existing installs.
+将 `modelId` 设置为 `eleven_v3` 以使用 ElevenLabs v3 TTS。对于现有安装，OpenClaw 仍将 `eleven_multilingual_v2` 作为默认值。
 
-## Speech-to-text
+## 语音转文本
 
-Use Scribe v2 for inbound audio attachments and short recorded voice segments:
+对入站音频附件和较短的录制语音片段使用 Scribe v2：
 
 ```json5
 {
@@ -63,22 +67,20 @@ Use Scribe v2 for inbound audio attachments and short recorded voice segments:
 }
 ```
 
-OpenClaw sends multipart audio to ElevenLabs `/v1/speech-to-text` with
-`model_id: "scribe_v2"`. Language hints map to `language_code` when present.
+OpenClaw 会将多部分音频发送到 ElevenLabs `/v1/speech-to-text`，并使用 `model_id: "scribe_v2"`。如果存在语言提示，则会映射到 `language_code`。
 
-## Voice Call streaming STT
+## Voice Call 流式 STT
 
-The bundled `elevenlabs` plugin registers Scribe v2 Realtime for Voice Call
-streaming transcription.
+内置的 `elevenlabs` 插件会为 Voice Call 流式转录注册 Scribe v2 Realtime。
 
-| Setting         | Config path                                                               | Default                                           |
+| 设置 | 配置路径 | 默认值 |
 | --------------- | ------------------------------------------------------------------------- | ------------------------------------------------- |
-| API key         | `plugins.entries.voice-call.config.streaming.providers.elevenlabs.apiKey` | Falls back to `ELEVENLABS_API_KEY` / `XI_API_KEY` |
-| Model           | `...elevenlabs.modelId`                                                   | `scribe_v2_realtime`                              |
-| Audio format    | `...elevenlabs.audioFormat`                                               | `ulaw_8000`                                       |
-| Sample rate     | `...elevenlabs.sampleRate`                                                | `8000`                                            |
-| Commit strategy | `...elevenlabs.commitStrategy`                                            | `vad`                                             |
-| Language        | `...elevenlabs.languageCode`                                              | (unset)                                           |
+| API 密钥 | `plugins.entries.voice-call.config.streaming.providers.elevenlabs.apiKey` | 回退到 `ELEVENLABS_API_KEY` / `XI_API_KEY` |
+| 模型 | `...elevenlabs.modelId` | `scribe_v2_realtime` |
+| 音频格式 | `...elevenlabs.audioFormat` | `ulaw_8000` |
+| 采样率 | `...elevenlabs.sampleRate` | `8000` |
+| 提交策略 | `...elevenlabs.commitStrategy` | `vad` |
+| 语言 | `...elevenlabs.languageCode` | （未设置） |
 
 ```json5
 {
@@ -106,12 +108,10 @@ streaming transcription.
 ```
 
 <Note>
-Voice Call receives Twilio media as 8 kHz G.711 u-law. The ElevenLabs realtime
-provider defaults to `ulaw_8000`, so telephony frames can be forwarded without
-transcoding.
+Voice Call 以 8 kHz G.711 u-law 接收 Twilio 媒体。ElevenLabs 实时 provider 默认为 `ulaw_8000`，因此可以在无需转码的情况下直接转发电话音频帧。
 </Note>
 
-## Related
+## 相关内容
 
-- [Text-to-speech](/tools/tts)
-- [Model selection](/concepts/model-providers)
+- [文本转语音](/zh-CN/tools/tts)
+- [模型选择](/zh-CN/concepts/model-providers)

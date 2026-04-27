@@ -1,85 +1,92 @@
 ---
-summary: "Delegate gateway authentication to a trusted reverse proxy (Pomerium, Caddy, nginx + OAuth)"
-title: "Trusted proxy auth"
-sidebarTitle: "Trusted proxy auth"
 read_when:
-  - Running OpenClaw behind an identity-aware proxy
-  - Setting up Pomerium, Caddy, or nginx with OAuth in front of OpenClaw
-  - Fixing WebSocket 1008 unauthorized errors with reverse proxy setups
-  - Deciding where to set HSTS and other HTTP hardening headers
+    - 在身份感知代理后运行 OpenClaw
+    - 在 OpenClaw 前面使用 OAuth 设置 Pomerium、Caddy 或 nginx
+    - 修复反向代理设置中的 WebSocket 1008 未授权错误
+    - 决定在哪里设置 HSTS 和其他 HTTP 强化标头
+sidebarTitle: Trusted proxy auth
+summary: 将 Gateway 网关身份验证委托给受信任的反向代理（Pomerium、Caddy、nginx + OAuth）
+title: 受信任代理身份验证
+x-i18n:
+    generated_at: "2026-04-26T08:13:22Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 64e0f4dee942aedec548135f0408e7773e7b498f8262af13a4d0eff262cae646
+    source_path: gateway/trusted-proxy-auth.md
+    workflow: 15
 ---
 
 <Warning>
-**Security-sensitive feature.** This mode delegates authentication entirely to your reverse proxy. Misconfiguration can expose your Gateway to unauthorized access. Read this page carefully before enabling.
+**安全敏感功能。** 此模式会将身份验证完全委托给你的反向代理。配置错误可能会让未经授权的访问暴露你的 Gateway 网关。启用前请仔细阅读本页。
 </Warning>
 
-## When to use
+## 何时使用
 
-Use `trusted-proxy` auth mode when:
+在以下情况下使用 `trusted-proxy` 身份验证模式：
 
-- You run OpenClaw behind an **identity-aware proxy** (Pomerium, Caddy + OAuth, nginx + oauth2-proxy, Traefik + forward auth).
-- Your proxy handles all authentication and passes user identity via headers.
-- You're in a Kubernetes or container environment where the proxy is the only path to the Gateway.
-- You're hitting WebSocket `1008 unauthorized` errors because browsers can't pass tokens in WS payloads.
+- 你在**身份感知代理**后运行 OpenClaw（Pomerium、Caddy + OAuth、nginx + oauth2-proxy、Traefik + forward auth）。
+- 你的代理处理所有身份验证，并通过标头传递用户身份。
+- 你处于 Kubernetes 或容器环境中，并且代理是访问 Gateway 网关的唯一入口。
+- 你遇到了 WebSocket `1008 unauthorized` 错误，因为浏览器无法在 WS 负载中传递令牌。
 
-## When NOT to use
+## 何时**不要**使用
 
-- If your proxy doesn't authenticate users (just a TLS terminator or load balancer).
-- If there's any path to the Gateway that bypasses the proxy (firewall holes, internal network access).
-- If you're unsure whether your proxy correctly strips/overwrites forwarded headers.
-- If you only need personal single-user access (consider Tailscale Serve + loopback for simpler setup).
+- 如果你的代理不验证用户身份（只是 TLS 终止器或负载均衡器）。
+- 如果存在任何绕过代理直接访问 Gateway 网关的路径（防火墙漏洞、内部网络访问）。
+- 如果你不确定你的代理是否会正确剥离/覆盖转发标头。
+- 如果你只需要个人单用户访问（可考虑使用 Tailscale Serve + loopback，以获得更简单的设置）。
 
-## How it works
+## 工作原理
 
 <Steps>
-  <Step title="Proxy authenticates the user">
-    Your reverse proxy authenticates users (OAuth, OIDC, SAML, etc.).
+  <Step title="代理验证用户身份">
+    你的反向代理会验证用户身份（OAuth、OIDC、SAML 等）。
   </Step>
-  <Step title="Proxy adds an identity header">
-    Proxy adds a header with the authenticated user identity (e.g., `x-forwarded-user: nick@example.com`).
+  <Step title="代理添加身份标头">
+    代理会添加一个包含已验证用户身份的标头（例如 `x-forwarded-user: nick@example.com`）。
   </Step>
-  <Step title="Gateway verifies trusted source">
-    OpenClaw checks that the request came from a **trusted proxy IP** (configured in `gateway.trustedProxies`).
+  <Step title="Gateway 网关验证受信任来源">
+    OpenClaw 会检查请求是否来自**受信任的代理 IP**（在 `gateway.trustedProxies` 中配置）。
   </Step>
-  <Step title="Gateway extracts identity">
-    OpenClaw extracts the user identity from the configured header.
+  <Step title="Gateway 网关提取身份">
+    OpenClaw 会从已配置的标头中提取用户身份。
   </Step>
-  <Step title="Authorize">
-    If everything checks out, the request is authorized.
+  <Step title="授权">
+    如果一切检查通过，则请求会被授权。
   </Step>
 </Steps>
 
-## Control UI pairing behavior
+## Control UI 配对行为
 
-When `gateway.auth.mode = "trusted-proxy"` is active and the request passes trusted-proxy checks, Control UI WebSocket sessions can connect without device pairing identity.
+当 `gateway.auth.mode = "trusted-proxy"` 处于启用状态，且请求通过了受信任代理检查时，Control UI WebSocket 会话可以在没有设备配对身份的情况下连接。
 
-Implications:
+影响：
 
-- Pairing is no longer the primary gate for Control UI access in this mode.
-- Your reverse proxy auth policy and `allowUsers` become the effective access control.
-- Keep gateway ingress locked to trusted proxy IPs only (`gateway.trustedProxies` + firewall).
+- 在此模式下，配对不再是 Control UI 访问的主要门槛。
+- 你的反向代理身份验证策略和 `allowUsers` 将成为实际的访问控制。
+- 让 Gateway 网关入口仅对受信任代理 IP 开放（`gateway.trustedProxies` + 防火墙）。
 
-## Configuration
+## 配置
 
 ```json5
 {
   gateway: {
-    // Trusted-proxy auth expects requests from a non-loopback trusted proxy source
+    // 受信任代理身份验证要求请求来自非 loopback 的受信任代理来源
     bind: "lan",
 
-    // CRITICAL: Only add your proxy's IP(s) here
+    // 关键：这里只添加你的代理 IP
     trustedProxies: ["10.0.0.1", "172.17.0.1"],
 
     auth: {
       mode: "trusted-proxy",
       trustedProxy: {
-        // Header containing authenticated user identity (required)
+        // 包含已验证用户身份的标头（必需）
         userHeader: "x-forwarded-user",
 
-        // Optional: headers that MUST be present (proxy verification)
+        // 可选：必须存在的标头（代理验证）
         requiredHeaders: ["x-forwarded-proto", "x-forwarded-host"],
 
-        // Optional: restrict to specific users (empty = allow all)
+        // 可选：限制为特定用户（空 = 允许所有用户）
         allowUsers: ["nick@example.com", "admin@company.org"],
       },
     },
@@ -88,54 +95,54 @@ Implications:
 ```
 
 <Warning>
-**Important runtime rules**
+**重要运行时规则**
 
-- Trusted-proxy auth rejects loopback-source requests (`127.0.0.1`, `::1`, loopback CIDRs).
-- Same-host loopback reverse proxies do **not** satisfy trusted-proxy auth.
-- For same-host loopback proxy setups, use token/password auth instead, or route through a non-loopback trusted proxy address that OpenClaw can verify.
-- Non-loopback Control UI deployments still need explicit `gateway.controlUi.allowedOrigins`.
-- **Forwarded-header evidence overrides loopback locality.** If a request arrives on loopback but carries `X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` headers pointing at a non-local origin, that evidence disqualifies the loopback locality claim. The request is treated as remote for pairing, trusted-proxy auth, and Control UI device-identity gating. This prevents a same-host loopback proxy from laundering forwarded-header identity into trusted-proxy auth.
+- 受信任代理身份验证会拒绝来自 loopback 源的请求（`127.0.0.1`、`::1`、loopback CIDR）。
+- 同主机 loopback 反向代理**不**满足受信任代理身份验证要求。
+- 对于同主机 loopback 代理设置，请改用令牌/密码身份验证，或通过 OpenClaw 可以验证的非 loopback 受信任代理地址进行路由。
+- 非 loopback 的 Control UI 部署仍需要显式设置 `gateway.controlUi.allowedOrigins`。
+- **转发标头证据会覆盖 loopback 本地性。** 如果请求到达于 loopback，但携带的 `X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` 标头指向非本地来源，那么这些证据会使 loopback 本地性声明失效。该请求会被视为远程请求，用于配对、受信任代理身份验证以及 Control UI 设备身份门控。这可防止同主机 loopback 代理将转发标头身份“洗白”进受信任代理身份验证。
   </Warning>
 
-### Configuration reference
+### 配置参考
 
 <ParamField path="gateway.trustedProxies" type="string[]" required>
-  Array of proxy IP addresses to trust. Requests from other IPs are rejected.
+  要信任的代理 IP 地址数组。来自其他 IP 的请求会被拒绝。
 </ParamField>
 <ParamField path="gateway.auth.mode" type="string" required>
-  Must be `"trusted-proxy"`.
+  必须为 `"trusted-proxy"`。
 </ParamField>
 <ParamField path="gateway.auth.trustedProxy.userHeader" type="string" required>
-  Header name containing the authenticated user identity.
+  包含已验证用户身份的标头名称。
 </ParamField>
 <ParamField path="gateway.auth.trustedProxy.requiredHeaders" type="string[]">
-  Additional headers that must be present for the request to be trusted.
+  请求要被信任时必须存在的附加标头。
 </ParamField>
 <ParamField path="gateway.auth.trustedProxy.allowUsers" type="string[]">
-  Allowlist of user identities. Empty means allow all authenticated users.
+  用户身份允许列表。为空表示允许所有已验证用户。
 </ParamField>
 
-## TLS termination and HSTS
+## TLS 终止与 HSTS
 
-Use one TLS termination point and apply HSTS there.
+使用一个 TLS 终止点，并在那里应用 HSTS。
 
 <Tabs>
-  <Tab title="Proxy TLS termination (recommended)">
-    When your reverse proxy handles HTTPS for `https://control.example.com`, set `Strict-Transport-Security` at the proxy for that domain.
+  <Tab title="代理 TLS 终止（推荐）">
+    当你的反向代理为 `https://control.example.com` 处理 HTTPS 时，请在该域名的代理处设置 `Strict-Transport-Security`。
 
-    - Good fit for internet-facing deployments.
-    - Keeps certificate + HTTP hardening policy in one place.
-    - OpenClaw can stay on loopback HTTP behind the proxy.
+    - 非常适合面向互联网的部署。
+    - 将证书和 HTTP 强化策略集中在同一处。
+    - OpenClaw 可以在代理后继续使用 loopback HTTP。
 
-    Example header value:
+    标头值示例：
 
     ```text
     Strict-Transport-Security: max-age=31536000; includeSubDomains
     ```
 
   </Tab>
-  <Tab title="Gateway TLS termination">
-    If OpenClaw itself serves HTTPS directly (no TLS-terminating proxy), set:
+  <Tab title="Gateway 网关 TLS 终止">
+    如果 OpenClaw 本身直接提供 HTTPS 服务（没有执行 TLS 终止的代理），请设置：
 
     ```json5
     {
@@ -150,30 +157,30 @@ Use one TLS termination point and apply HSTS there.
     }
     ```
 
-    `strictTransportSecurity` accepts a string header value, or `false` to disable explicitly.
+    `strictTransportSecurity` 接受字符串类型的标头值，或使用 `false` 来显式禁用。
 
   </Tab>
 </Tabs>
 
-### Rollout guidance
+### 发布指导
 
-- Start with a short max age first (for example `max-age=300`) while validating traffic.
-- Increase to long-lived values (for example `max-age=31536000`) only after confidence is high.
-- Add `includeSubDomains` only if every subdomain is HTTPS-ready.
-- Use preload only if you intentionally meet preload requirements for your full domain set.
-- Loopback-only local development does not benefit from HSTS.
+- 开始时先使用较短的 max age（例如 `max-age=300`）来验证流量。
+- 只有在确信无误后，再增加到长期值（例如 `max-age=31536000`）。
+- 仅当每个子域都已准备好支持 HTTPS 时，才添加 `includeSubDomains`。
+- 仅当你有意满足整个域名集合的 preload 要求时，才使用 preload。
+- 仅限 loopback 的本地开发不会从 HSTS 中获益。
 
-## Proxy setup examples
+## 代理设置示例
 
 <AccordionGroup>
   <Accordion title="Pomerium">
-    Pomerium passes identity in `x-pomerium-claim-email` (or other claim headers) and a JWT in `x-pomerium-jwt-assertion`.
+    Pomerium 通过 `x-pomerium-claim-email`（或其他声明标头）传递身份，并通过 `x-pomerium-jwt-assertion` 传递 JWT。
 
     ```json5
     {
       gateway: {
         bind: "lan",
-        trustedProxies: ["10.0.0.1"], // Pomerium's IP
+        trustedProxies: ["10.0.0.1"], // Pomerium 的 IP
         auth: {
           mode: "trusted-proxy",
           trustedProxy: {
@@ -185,7 +192,7 @@ Use one TLS termination point and apply HSTS there.
     }
     ```
 
-    Pomerium config snippet:
+    Pomerium 配置片段：
 
     ```yaml
     routes:
@@ -200,14 +207,14 @@ Use one TLS termination point and apply HSTS there.
     ```
 
   </Accordion>
-  <Accordion title="Caddy with OAuth">
-    Caddy with the `caddy-security` plugin can authenticate users and pass identity headers.
+  <Accordion title="带 OAuth 的 Caddy">
+    带有 `caddy-security` 插件的 Caddy 可以验证用户身份并传递身份标头。
 
     ```json5
     {
       gateway: {
         bind: "lan",
-        trustedProxies: ["10.0.0.1"], // Caddy/sidecar proxy IP
+        trustedProxies: ["10.0.0.1"], // Caddy/sidecar 代理 IP
         auth: {
           mode: "trusted-proxy",
           trustedProxy: {
@@ -218,7 +225,7 @@ Use one TLS termination point and apply HSTS there.
     }
     ```
 
-    Caddyfile snippet:
+    Caddyfile 片段：
 
     ```
     openclaw.example.com {
@@ -233,7 +240,7 @@ Use one TLS termination point and apply HSTS there.
 
   </Accordion>
   <Accordion title="nginx + oauth2-proxy">
-    oauth2-proxy authenticates users and passes identity in `x-auth-request-email`.
+    oauth2-proxy 会验证用户身份，并通过 `x-auth-request-email` 传递身份。
 
     ```json5
     {
@@ -250,7 +257,7 @@ Use one TLS termination point and apply HSTS there.
     }
     ```
 
-    nginx config snippet:
+    nginx 配置片段：
 
     ```nginx
     location / {
@@ -266,12 +273,12 @@ Use one TLS termination point and apply HSTS there.
     ```
 
   </Accordion>
-  <Accordion title="Traefik with forward auth">
+  <Accordion title="带 forward auth 的 Traefik">
     ```json5
     {
       gateway: {
         bind: "lan",
-        trustedProxies: ["172.17.0.1"], // Traefik container IP
+        trustedProxies: ["172.17.0.1"], // Traefik 容器 IP
         auth: {
           mode: "trusted-proxy",
           trustedProxy: {
@@ -284,153 +291,153 @@ Use one TLS termination point and apply HSTS there.
   </Accordion>
 </AccordionGroup>
 
-## Mixed token configuration
+## 混合令牌配置
 
-OpenClaw rejects ambiguous configurations where both a `gateway.auth.token` (or `OPENCLAW_GATEWAY_TOKEN`) and `trusted-proxy` mode are active at the same time. Mixed token configs can cause loopback requests to silently authenticate on the wrong auth path.
+当 `gateway.auth.token`（或 `OPENCLAW_GATEWAY_TOKEN`）与 `trusted-proxy` 模式同时启用时，OpenClaw 会拒绝这种有歧义的配置。混合令牌配置可能导致 loopback 请求在错误的身份验证路径上被静默验证通过。
 
-If you see a `mixed_trusted_proxy_token` error on startup:
+如果你在启动时看到 `mixed_trusted_proxy_token` 错误：
 
-- Remove the shared token when using trusted-proxy mode, or
-- Switch `gateway.auth.mode` to `"token"` if you intend token-based auth.
+- 在使用 trusted-proxy 模式时移除共享令牌，或者
+- 如果你打算使用基于令牌的身份验证，请将 `gateway.auth.mode` 切换为 `"token"`。
 
-Loopback trusted-proxy auth also fails closed: same-host callers must supply the configured identity headers through a trusted proxy instead of being silently authenticated.
+loopback 的受信任代理身份验证也会以失败关闭方式处理：同主机调用方必须通过受信任代理提供已配置的身份标头，而不是被静默验证通过。
 
-## Operator scopes header
+## Operator scopes 标头
 
-Trusted-proxy auth is an **identity-bearing** HTTP mode, so callers may optionally declare operator scopes with `x-openclaw-scopes`.
+受信任代理身份验证是一种**携带身份信息的** HTTP 模式，因此调用方可以选择通过 `x-openclaw-scopes` 声明 operator scope。
 
-Examples:
+示例：
 
 - `x-openclaw-scopes: operator.read`
 - `x-openclaw-scopes: operator.read,operator.write`
 - `x-openclaw-scopes: operator.admin,operator.write`
 
-Behavior:
+行为：
 
-- When the header is present, OpenClaw honors the declared scope set.
-- When the header is present but empty, the request declares **no** operator scopes.
-- When the header is absent, normal identity-bearing HTTP APIs fall back to the standard operator default scope set.
-- Gateway-auth **plugin HTTP routes** are narrower by default: when `x-openclaw-scopes` is absent, their runtime scope falls back to `operator.write`.
-- Browser-origin HTTP requests still have to pass `gateway.controlUi.allowedOrigins` (or deliberate Host-header fallback mode) even after trusted-proxy auth succeeds.
+- 当该标头存在时，OpenClaw 会采用所声明的 scope 集合。
+- 当该标头存在但为空时，请求声明的是**无** operator scope。
+- 当该标头缺失时，普通的携带身份信息 HTTP API 会回退到标准的 operator 默认 scope 集合。
+- Gateway 网关身份验证的**插件 HTTP 路由**默认更窄：当 `x-openclaw-scopes` 缺失时，其运行时 scope 会回退到 `operator.write`。
+- 来自浏览器源的 HTTP 请求即使在受信任代理身份验证成功后，仍然必须通过 `gateway.controlUi.allowedOrigins`（或有意启用的 Host 标头回退模式）。
 
-Practical rule: send `x-openclaw-scopes` explicitly when you want a trusted-proxy request to be narrower than the defaults, or when a gateway-auth plugin route needs something stronger than write scope.
+实用规则：当你希望某个受信任代理请求比默认值更窄，或者某个 Gateway 网关身份验证插件路由需要比写入 scope 更强的权限时，请显式发送 `x-openclaw-scopes`。
 
-## Security checklist
+## 安全检查清单
 
-Before enabling trusted-proxy auth, verify:
+启用受信任代理身份验证前，请确认：
 
-- [ ] **Proxy is the only path**: The Gateway port is firewalled from everything except your proxy.
-- [ ] **trustedProxies is minimal**: Only your actual proxy IPs, not entire subnets.
-- [ ] **No loopback proxy source**: trusted-proxy auth fails closed for loopback-source requests.
-- [ ] **Proxy strips headers**: Your proxy overwrites (not appends) `x-forwarded-*` headers from clients.
-- [ ] **TLS termination**: Your proxy handles TLS; users connect via HTTPS.
-- [ ] **allowedOrigins is explicit**: Non-loopback Control UI uses explicit `gateway.controlUi.allowedOrigins`.
-- [ ] **allowUsers is set** (recommended): Restrict to known users rather than allowing anyone authenticated.
-- [ ] **No mixed token config**: Do not set both `gateway.auth.token` and `gateway.auth.mode: "trusted-proxy"`.
+- [ ] **代理是唯一入口**：Gateway 网关端口已通过防火墙限制，除你的代理外其他来源均无法访问。
+- [ ] **trustedProxies 最小化**：只包含你实际使用的代理 IP，而不是整个子网。
+- [ ] **没有 loopback 代理来源**：对于来自 loopback 源的请求，受信任代理身份验证会以失败关闭方式处理。
+- [ ] **代理会剥离标头**：你的代理会覆盖（而不是追加）来自客户端的 `x-forwarded-*` 标头。
+- [ ] **TLS 终止**：你的代理处理 TLS；用户通过 HTTPS 连接。
+- [ ] **allowedOrigins 已显式设置**：非 loopback 的 Control UI 使用显式的 `gateway.controlUi.allowedOrigins`。
+- [ ] **已设置 allowUsers**（推荐）：限制为已知用户，而不是允许任何已验证用户。
+- [ ] **没有混合令牌配置**：不要同时设置 `gateway.auth.token` 和 `gateway.auth.mode: "trusted-proxy"`。
 
-## Security audit
+## 安全审计
 
-`openclaw security audit` will flag trusted-proxy auth with a **critical** severity finding. This is intentional — it's a reminder that you're delegating security to your proxy setup.
+`openclaw security audit` 会将受信任代理身份验证标记为**严重**级别发现。这是有意为之——它是在提醒你：你正在将安全性委托给你的代理配置。
 
-The audit checks for:
+审计会检查：
 
-- Base `gateway.trusted_proxy_auth` warning/critical reminder
-- Missing `trustedProxies` configuration
-- Missing `userHeader` configuration
-- Empty `allowUsers` (allows any authenticated user)
-- Wildcard or missing browser-origin policy on exposed Control UI surfaces
+- 基础 `gateway.trusted_proxy_auth` 警告/严重提醒
+- 缺少 `trustedProxies` 配置
+- 缺少 `userHeader` 配置
+- `allowUsers` 为空（允许任何已验证用户）
+- 在暴露的 Control UI 表面上，浏览器来源策略为通配符或缺失
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
   <Accordion title="trusted_proxy_untrusted_source">
-    The request didn't come from an IP in `gateway.trustedProxies`. Check:
+    请求并非来自 `gateway.trustedProxies` 中的 IP。请检查：
 
-    - Is the proxy IP correct? (Docker container IPs can change.)
-    - Is there a load balancer in front of your proxy?
-    - Use `docker inspect` or `kubectl get pods -o wide` to find actual IPs.
+    - 代理 IP 是否正确？（Docker 容器 IP 可能会变化。）
+    - 你的代理前面是否还有负载均衡器？
+    - 使用 `docker inspect` 或 `kubectl get pods -o wide` 查找实际 IP。
 
   </Accordion>
   <Accordion title="trusted_proxy_loopback_source">
-    OpenClaw rejected a loopback-source trusted-proxy request.
+    OpenClaw 拒绝了来自 loopback 源的 trusted-proxy 请求。
 
-    Check:
+    请检查：
 
-    - Is the proxy connecting from `127.0.0.1` / `::1`?
-    - Are you trying to use trusted-proxy auth with a same-host loopback reverse proxy?
+    - 代理是否从 `127.0.0.1` / `::1` 发起连接？
+    - 你是否正在尝试将 trusted-proxy 身份验证用于同主机 loopback 反向代理？
 
-    Fix:
+    修复方法：
 
-    - Use token/password auth for same-host loopback proxy setups, or
-    - Route through a non-loopback trusted proxy address and keep that IP in `gateway.trustedProxies`.
+    - 对同主机 loopback 代理设置使用令牌/密码身份验证，或者
+    - 通过非 loopback 的受信任代理地址进行路由，并将该 IP 保留在 `gateway.trustedProxies` 中。
 
   </Accordion>
   <Accordion title="trusted_proxy_user_missing">
-    The user header was empty or missing. Check:
+    用户标头为空或缺失。请检查：
 
-    - Is your proxy configured to pass identity headers?
-    - Is the header name correct? (case-insensitive, but spelling matters)
-    - Is the user actually authenticated at the proxy?
+    - 你的代理是否已配置为传递身份标头？
+    - 标头名称是否正确？（大小写不敏感，但拼写很重要）
+    - 用户是否确实已在代理处完成身份验证？
 
   </Accordion>
   <Accordion title="trusted_proxy_missing_header_*">
-    A required header wasn't present. Check:
+    某个必需标头不存在。请检查：
 
-    - Your proxy configuration for those specific headers.
-    - Whether headers are being stripped somewhere in the chain.
+    - 你的代理中针对这些特定标头的配置。
+    - 标头是否在链路中的某处被剥离。
 
   </Accordion>
   <Accordion title="trusted_proxy_user_not_allowed">
-    The user is authenticated but not in `allowUsers`. Either add them or remove the allowlist.
+    用户已通过身份验证，但不在 `allowUsers` 中。请将其加入，或移除允许列表。
   </Accordion>
   <Accordion title="trusted_proxy_origin_not_allowed">
-    Trusted-proxy auth succeeded, but the browser `Origin` header did not pass Control UI origin checks.
+    trusted-proxy 身份验证已成功，但浏览器的 `Origin` 标头未通过 Control UI 来源检查。
 
-    Check:
+    请检查：
 
-    - `gateway.controlUi.allowedOrigins` includes the exact browser origin.
-    - You are not relying on wildcard origins unless you intentionally want allow-all behavior.
-    - If you intentionally use Host-header fallback mode, `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` is set deliberately.
+    - `gateway.controlUi.allowedOrigins` 是否包含精确的浏览器来源。
+    - 你是否没有依赖通配符来源，除非你确实想要允许所有来源的行为。
+    - 如果你有意使用 Host 标头回退模式，是否已明确设置 `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true`。
 
   </Accordion>
-  <Accordion title="WebSocket still failing">
-    Make sure your proxy:
+  <Accordion title="WebSocket 仍然失败">
+    请确保你的代理：
 
-    - Supports WebSocket upgrades (`Upgrade: websocket`, `Connection: upgrade`).
-    - Passes the identity headers on WebSocket upgrade requests (not just HTTP).
-    - Doesn't have a separate auth path for WebSocket connections.
+    - 支持 WebSocket 升级（`Upgrade: websocket`、`Connection: upgrade`）。
+    - 在 WebSocket 升级请求中传递身份标头（而不只是 HTTP）。
+    - 没有为 WebSocket 连接设置单独的身份验证路径。
 
   </Accordion>
 </AccordionGroup>
 
-## Migration from token auth
+## 从令牌身份验证迁移
 
-If you're moving from token auth to trusted-proxy:
+如果你正在从令牌身份验证迁移到 trusted-proxy：
 
 <Steps>
-  <Step title="Configure the proxy">
-    Configure your proxy to authenticate users and pass headers.
+  <Step title="配置代理">
+    配置你的代理来验证用户身份并传递标头。
   </Step>
-  <Step title="Test the proxy independently">
-    Test the proxy setup independently (curl with headers).
+  <Step title="独立测试代理">
+    独立测试代理设置（使用带标头的 curl）。
   </Step>
-  <Step title="Update OpenClaw config">
-    Update OpenClaw config with trusted-proxy auth.
+  <Step title="更新 OpenClaw 配置">
+    使用 trusted-proxy 身份验证更新 OpenClaw 配置。
   </Step>
-  <Step title="Restart the Gateway">
-    Restart the Gateway.
+  <Step title="重启 Gateway 网关">
+    重启 Gateway 网关。
   </Step>
-  <Step title="Test WebSocket">
-    Test WebSocket connections from the Control UI.
+  <Step title="测试 WebSocket">
+    从 Control UI 测试 WebSocket 连接。
   </Step>
-  <Step title="Audit">
-    Run `openclaw security audit` and review findings.
+  <Step title="审计">
+    运行 `openclaw security audit` 并查看发现项。
   </Step>
 </Steps>
 
-## Related
+## 相关内容
 
-- [Configuration](/gateway/configuration) — config reference
-- [Remote access](/gateway/remote) — other remote access patterns
-- [Security](/gateway/security) — full security guide
-- [Tailscale](/gateway/tailscale) — simpler alternative for tailnet-only access
+- [配置](/zh-CN/gateway/configuration) — 配置参考
+- [远程访问](/zh-CN/gateway/remote) — 其他远程访问模式
+- [安全](/zh-CN/gateway/security) — 完整安全指南
+- [Tailscale](/zh-CN/gateway/tailscale) — 仅限 tailnet 访问的更简单替代方案

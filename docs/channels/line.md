@@ -1,63 +1,69 @@
 ---
-summary: "LINE Messaging API plugin setup, config, and usage"
 read_when:
-  - You want to connect OpenClaw to LINE
-  - You need LINE webhook + credential setup
-  - You want LINE-specific message options
+    - 你想将 OpenClaw 连接到 LINE
+    - 你需要设置 LINE webhook 和凭证
+    - 你需要 LINE 专用的消息选项
+summary: LINE Messaging API 插件设置、配置和用法
 title: LINE
+x-i18n:
+    generated_at: "2026-04-23T20:41:31Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: a8c3187486033ab01c243f1d44518cad2b28f744a9d0cde1de9117bd26452ed4
+    source_path: channels/line.md
+    workflow: 15
 ---
 
-LINE connects to OpenClaw via the LINE Messaging API. The plugin runs as a webhook
-receiver on the gateway and uses your channel access token + channel secret for
-authentication.
+LINE 通过 LINE Messaging API 连接到 OpenClaw。该插件作为运行在 Gateway 网关上的 webhook
+接收器，并使用你的渠道访问令牌和渠道密钥进行
+身份验证。
 
-Status: bundled plugin. Direct messages, group chats, media, locations, Flex
-messages, template messages, and quick replies are supported. Reactions and threads
-are not supported.
+状态：内置插件。支持私信、群聊、媒体、位置、Flex
+消息、模板消息和快捷回复。不支持回应和线程。
 
-## Bundled plugin
+## 内置插件
 
-LINE ships as a bundled plugin in current OpenClaw releases, so normal
-packaged builds do not need a separate install.
+LINE 在当前的 OpenClaw 版本中作为内置插件提供，因此普通的
+打包构建无需单独安装。
 
-If you are on an older build or a custom install that excludes LINE, install it
-manually:
+如果你使用的是较旧的构建版本，或排除了 LINE 的自定义安装，则需要
+手动安装：
 
 ```bash
 openclaw plugins install @openclaw/line
 ```
 
-Local checkout (when running from a git repo):
+本地检出安装（在 git 仓库中运行时）：
 
 ```bash
 openclaw plugins install ./path/to/local/line-plugin
 ```
 
-## Setup
+## 设置
 
-1. Create a LINE Developers account and open the Console:
+1. 创建一个 LINE Developers 账户并打开 Console：
    [https://developers.line.biz/console/](https://developers.line.biz/console/)
-2. Create (or pick) a Provider and add a **Messaging API** channel.
-3. Copy the **Channel access token** and **Channel secret** from the channel settings.
-4. Enable **Use webhook** in the Messaging API settings.
-5. Set the webhook URL to your gateway endpoint (HTTPS required):
+2. 创建（或选择）一个 Provider，并添加一个 **Messaging API** 渠道。
+3. 从渠道设置中复制 **Channel access token** 和 **Channel secret**。
+4. 在 Messaging API 设置中启用 **Use webhook**。
+5. 将 webhook URL 设置为你的 Gateway 网关端点（必须使用 HTTPS）：
 
 ```
 https://gateway-host/line/webhook
 ```
 
-The gateway responds to LINE’s webhook verification (GET) and inbound events (POST).
-If you need a custom path, set `channels.line.webhookPath` or
-`channels.line.accounts.<id>.webhookPath` and update the URL accordingly.
+Gateway 网关会响应 LINE 的 webhook 验证（GET）和入站事件（POST）。
+如果你需要自定义路径，请设置 `channels.line.webhookPath` 或
+`channels.line.accounts.<id>.webhookPath`，并相应更新 URL。
 
-Security note:
+安全说明：
 
-- LINE signature verification is body-dependent (HMAC over the raw body), so OpenClaw applies strict pre-auth body limits and timeout before verification.
-- OpenClaw processes webhook events from the verified raw request bytes. Upstream middleware-transformed `req.body` values are ignored for signature-integrity safety.
+- LINE 签名验证依赖请求体内容（对原始请求体进行 HMAC），因此 OpenClaw 会在验证前应用严格的预身份验证请求体大小限制和超时控制。
+- OpenClaw 会根据已验证请求的原始字节处理 webhook 事件。出于签名完整性安全考虑，上游中间件转换后的 `req.body` 值会被忽略。
 
-## Configure
+## 配置
 
-Minimal config:
+最小配置：
 
 ```json5
 {
@@ -72,12 +78,12 @@ Minimal config:
 }
 ```
 
-Env vars (default account only):
+环境变量（仅默认账户）：
 
 - `LINE_CHANNEL_ACCESS_TOKEN`
 - `LINE_CHANNEL_SECRET`
 
-Token/secret files:
+令牌 / 密钥文件：
 
 ```json5
 {
@@ -90,9 +96,9 @@ Token/secret files:
 }
 ```
 
-`tokenFile` and `secretFile` must point to regular files. Symlinks are rejected.
+`tokenFile` 和 `secretFile` 必须指向常规文件。符号链接会被拒绝。
 
-Multiple accounts:
+多个账户：
 
 ```json5
 {
@@ -110,44 +116,44 @@ Multiple accounts:
 }
 ```
 
-## Access control
+## 访问控制
 
-Direct messages default to pairing. Unknown senders get a pairing code and their
-messages are ignored until approved.
+私信默认使用配对。未知发送者会收到一个配对码，他们的
+消息在获批之前会被忽略。
 
 ```bash
 openclaw pairing list line
 openclaw pairing approve line <CODE>
 ```
 
-Allowlists and policies:
+允许列表和策略：
 
-- `channels.line.dmPolicy`: `pairing | allowlist | open | disabled`
-- `channels.line.allowFrom`: allowlisted LINE user IDs for DMs
-- `channels.line.groupPolicy`: `allowlist | open | disabled`
-- `channels.line.groupAllowFrom`: allowlisted LINE user IDs for groups
-- Per-group overrides: `channels.line.groups.<groupId>.allowFrom`
-- Runtime note: if `channels.line` is completely missing, runtime falls back to `groupPolicy="allowlist"` for group checks (even if `channels.defaults.groupPolicy` is set).
+- `channels.line.dmPolicy`：`pairing | allowlist | open | disabled`
+- `channels.line.allowFrom`：用于私信的允许列表 LINE 用户 ID
+- `channels.line.groupPolicy`：`allowlist | open | disabled`
+- `channels.line.groupAllowFrom`：用于群组的允许列表 LINE 用户 ID
+- 每个群组的覆盖项：`channels.line.groups.<groupId>.allowFrom`
+- 运行时说明：如果完全缺少 `channels.line`，运行时在群组检查中会回退为 `groupPolicy="allowlist"`（即使设置了 `channels.defaults.groupPolicy` 也是如此）。
 
-LINE IDs are case-sensitive. Valid IDs look like:
+LINE ID 区分大小写。有效 ID 形式如下：
 
-- User: `U` + 32 hex chars
-- Group: `C` + 32 hex chars
-- Room: `R` + 32 hex chars
+- 用户：`U` + 32 个十六进制字符
+- 群组：`C` + 32 个十六进制字符
+- 房间：`R` + 32 个十六进制字符
 
-## Message behavior
+## 消息行为
 
-- Text is chunked at 5000 characters.
-- Markdown formatting is stripped; code blocks and tables are converted into Flex
-  cards when possible.
-- Streaming responses are buffered; LINE receives full chunks with a loading
-  animation while the agent works.
-- Media downloads are capped by `channels.line.mediaMaxMb` (default 10).
+- 文本会按 5000 个字符分块。
+- Markdown 格式会被移除；代码块和表格会在可能时转换为 Flex
+  卡片。
+- 流式响应会被缓冲；当智能体工作时，LINE 会收到带有加载动画的完整
+  分块。
+- 媒体下载受 `channels.line.mediaMaxMb` 限制（默认 10）。
 
-## Channel data (rich messages)
+## 渠道数据（富消息）
 
-Use `channelData.line` to send quick replies, locations, Flex cards, or template
-messages.
+使用 `channelData.line` 发送快捷回复、位置、Flex 卡片或模板
+消息。
 
 ```json5
 {
@@ -180,46 +186,45 @@ messages.
 }
 ```
 
-The LINE plugin also ships a `/card` command for Flex message presets:
+LINE 插件还附带一个用于 Flex 消息预设的 `/card` 命令：
 
 ```
 /card info "Welcome" "Thanks for joining!"
 ```
 
-## ACP support
+## ACP 支持
 
-LINE supports ACP (Agent Communication Protocol) conversation bindings:
+LINE 支持 ACP（智能体通信协议）对话绑定：
 
-- `/acp spawn <agent> --bind here` binds the current LINE chat to an ACP session without creating a child thread.
-- Configured ACP bindings and active conversation-bound ACP sessions work on LINE like other conversation channels.
+- `/acp spawn <agent> --bind here` 会将当前 LINE 聊天绑定到一个 ACP 会话，而不会创建子线程。
+- 已配置的 ACP 绑定和活动中的会话绑定 ACP 会话，在 LINE 上的工作方式与其他对话渠道相同。
 
-See [ACP agents](/tools/acp-agents) for details.
+详情请参阅 [ACP agents](/zh-CN/tools/acp-agents)。
 
-## Outbound media
+## 出站媒体
 
-The LINE plugin supports sending images, videos, and audio files through the agent message tool. Media is sent via the LINE-specific delivery path with appropriate preview and tracking handling:
+LINE 插件支持通过智能体消息工具发送图像、视频和音频文件。媒体会通过 LINE 专用的投递路径发送，并带有适当的预览和跟踪处理：
 
-- **Images**: sent as LINE image messages with automatic preview generation.
-- **Videos**: sent with explicit preview and content-type handling.
-- **Audio**: sent as LINE audio messages.
+- **图像**：作为 LINE 图像消息发送，并自动生成预览。
+- **视频**：发送时带有显式预览和内容类型处理。
+- **音频**：作为 LINE 音频消息发送。
 
-Outbound media URLs must be public HTTPS URLs. OpenClaw validates the target hostname before handing the URL to LINE and rejects loopback, link-local, and private-network targets.
+出站媒体 URL 必须是公开的 HTTPS URL。OpenClaw 会在将 URL 交给 LINE 之前验证目标主机名，并拒绝 loopback、链路本地和私有网络目标。
 
-Generic media sends fall back to the existing image-only route when a LINE-specific path is not available.
+当 LINE 专用路径不可用时，通用媒体发送会回退到现有的仅图像路径。
 
-## Troubleshooting
+## 故障排除
 
-- **Webhook verification fails:** ensure the webhook URL is HTTPS and the
-  `channelSecret` matches the LINE console.
-- **No inbound events:** confirm the webhook path matches `channels.line.webhookPath`
-  and that the gateway is reachable from LINE.
-- **Media download errors:** raise `channels.line.mediaMaxMb` if media exceeds the
-  default limit.
+- **Webhook 验证失败：** 请确保 webhook URL 使用 HTTPS，且
+  `channelSecret` 与 LINE Console 中的一致。
+- **没有入站事件：** 请确认 webhook 路径与 `channels.line.webhookPath`
+  匹配，并且 Gateway 网关可被 LINE 访问。
+- **媒体下载错误：** 如果媒体超过默认限制，请提高 `channels.line.mediaMaxMb`。
 
-## Related
+## 相关内容
 
-- [Channels Overview](/channels) — all supported channels
-- [Pairing](/channels/pairing) — DM authentication and pairing flow
-- [Groups](/channels/groups) — group chat behavior and mention gating
-- [Channel Routing](/channels/channel-routing) — session routing for messages
-- [Security](/gateway/security) — access model and hardening
+- [Channels Overview](/zh-CN/channels) —— 所有支持的渠道
+- [Pairing](/zh-CN/channels/pairing) —— 私信身份验证和配对流程
+- [Groups](/zh-CN/channels/groups) —— 群聊行为和提及门控
+- [Channel Routing](/zh-CN/channels/channel-routing) —— 消息的会话路由
+- [Security](/zh-CN/gateway/security) —— 访问模型与加固措施

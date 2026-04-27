@@ -1,35 +1,42 @@
 ---
-summary: "CLI reference for `openclaw approvals` and `openclaw exec-policy`"
 read_when:
-  - You want to edit exec approvals from the CLI
-  - You need to manage allowlists on gateway or node hosts
-title: "Approvals"
+    - 你想通过 CLI 编辑执行批准设置
+    - 你需要在 Gateway 网关或节点主机上管理允许列表
+summary: CLI 参考：`openclaw approvals` 和 `openclaw exec-policy`
+title: 批准
+x-i18n:
+    generated_at: "2026-04-24T03:14:46Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 7403f0e35616db5baf3d1564c8c405b3883fc3e5032da9c6a19a32dba8c5fb7d
+    source_path: cli/approvals.md
+    workflow: 15
 ---
 
 # `openclaw approvals`
 
-Manage exec approvals for the **local host**, **gateway host**, or a **node host**.
-By default, commands target the local approvals file on disk. Use `--gateway` to target the gateway, or `--node` to target a specific node.
+管理**本地主机**、**Gateway 网关主机**或**节点主机**的执行批准设置。
+默认情况下，命令会针对磁盘上的本地 approvals 文件。使用 `--gateway` 可将目标设为 Gateway 网关，或使用 `--node` 将目标设为特定节点。
 
-Alias: `openclaw exec-approvals`
+别名：`openclaw exec-approvals`
 
-Related:
+相关内容：
 
-- Exec approvals: [Exec approvals](/tools/exec-approvals)
-- Nodes: [Nodes](/nodes)
+- 执行批准： [Exec approvals](/zh-CN/tools/exec-approvals)
+- 节点： [Nodes](/zh-CN/nodes)
 
 ## `openclaw exec-policy`
 
-`openclaw exec-policy` is the local convenience command for keeping the requested
-`tools.exec.*` config and the local host approvals file aligned in one step.
+`openclaw exec-policy` 是一个本地方便命令，用于一步保持请求的
+`tools.exec.*` 配置与本地主机 approvals 文件对齐。
 
-Use it when you want to:
+在以下情况下使用它：
 
-- inspect the local requested policy, host approvals file, and effective merge
-- apply a local preset such as YOLO or deny-all
-- synchronize local `tools.exec.*` and local `~/.openclaw/exec-approvals.json`
+- 检查本地请求策略、主机 approvals 文件和生效后的合并结果
+- 应用本地预设，例如 YOLO 或全部拒绝
+- 同步本地 `tools.exec.*` 和本地 `~/.openclaw/exec-approvals.json`
 
-Examples:
+示例：
 
 ```bash
 openclaw exec-policy show
@@ -41,23 +48,23 @@ openclaw exec-policy preset cautious --json
 openclaw exec-policy set --host gateway --security full --ask off --ask-fallback full
 ```
 
-Output modes:
+输出模式：
 
-- no `--json`: prints the human-readable table view
-- `--json`: prints machine-readable structured output
+- 不使用 `--json`：打印便于阅读的表格视图
+- `--json`：打印适合机器读取的结构化输出
 
-Current scope:
+当前范围：
 
-- `exec-policy` is **local-only**
-- it updates the local config file and the local approvals file together
-- it does **not** push policy to the gateway host or a node host
-- `--host node` is rejected in this command because node exec approvals are fetched from the node at runtime and must be managed through node-targeted approvals commands instead
-- `openclaw exec-policy show` marks `host=node` scopes as node-managed at runtime instead of deriving an effective policy from the local approvals file
+- `exec-policy` **仅限本地**
+- 它会同时更新本地配置文件和本地 approvals 文件
+- 它**不会**将策略推送到 Gateway 网关主机或节点主机
+- 在此命令中，`--host node` 会被拒绝，因为节点执行批准是在运行时从节点获取的，必须改用面向节点的 approvals 命令来管理
+- `openclaw exec-policy show` 会将 `host=node` 范围标记为运行时由节点管理，而不是根据本地 approvals 文件推导生效策略
 
-If you need to edit remote host approvals directly, keep using `openclaw approvals set --gateway`
-or `openclaw approvals set --node <id|name|ip>`.
+如果你需要直接编辑远程主机 approvals，请继续使用 `openclaw approvals set --gateway`
+或 `openclaw approvals set --node <id|name|ip>`。
 
-## Common commands
+## 常用命令
 
 ```bash
 openclaw approvals get
@@ -65,20 +72,20 @@ openclaw approvals get --node <id|name|ip>
 openclaw approvals get --gateway
 ```
 
-`openclaw approvals get` now shows the effective exec policy for local, gateway, and node targets:
+`openclaw approvals get` 现在会显示本地、Gateway 网关和节点目标的生效执行策略：
 
-- requested `tools.exec` policy
-- host approvals-file policy
-- effective result after precedence rules are applied
+- 请求的 `tools.exec` 策略
+- 主机 approvals 文件策略
+- 应用优先级规则后的生效结果
 
-Precedence is intentional:
+这种优先级设计是有意为之：
 
-- the host approvals file is the enforceable source of truth
-- requested `tools.exec` policy can narrow or broaden intent, but the effective result is still derived from the host rules
-- `--node` combines the node host approvals file with gateway `tools.exec` policy, because both still apply at runtime
-- if gateway config is unavailable, the CLI falls back to the node approvals snapshot and notes that the final runtime policy could not be computed
+- 主机 approvals 文件是可执行的事实来源
+- 请求的 `tools.exec` 策略可以收紧或放宽意图，但生效结果仍然由主机规则推导得出
+- `--node` 会将节点主机 approvals 文件与 Gateway 网关 `tools.exec` 策略组合，因为两者在运行时仍然会同时生效
+- 如果 Gateway 网关配置不可用，CLI 会回退到节点 approvals 快照，并注明无法计算最终运行时策略
 
-## Replace approvals from a file
+## 从文件替换 approvals
 
 ```bash
 openclaw approvals set --file ./exec-approvals.json
@@ -89,11 +96,11 @@ openclaw approvals set --node <id|name|ip> --file ./exec-approvals.json
 openclaw approvals set --gateway --file ./exec-approvals.json
 ```
 
-`set` accepts JSON5, not only strict JSON. Use either `--file` or `--stdin`, not both.
+`set` 接受 JSON5，而不只是严格 JSON。使用 `--file` 或 `--stdin` 其中之一，不要同时使用两者。
 
-## "Never prompt" / YOLO example
+## “永不提示” / YOLO 示例
 
-For a host that should never stop on exec approvals, set the host approvals defaults to `full` + `off`:
+对于一个不应因执行批准而中断的主机，将主机 approvals 默认值设置为 `full` + `off`：
 
 ```bash
 openclaw approvals set --stdin <<'EOF'
@@ -108,7 +115,7 @@ openclaw approvals set --stdin <<'EOF'
 EOF
 ```
 
-Node variant:
+节点变体：
 
 ```bash
 openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
@@ -123,7 +130,7 @@ openclaw approvals set --node <id|name|ip> --stdin <<'EOF'
 EOF
 ```
 
-This changes the **host approvals file** only. To keep the requested OpenClaw policy aligned, also set:
+这只会更改**主机 approvals 文件**。要让请求的 OpenClaw 策略也保持一致，还需要设置：
 
 ```bash
 openclaw config set tools.exec.host gateway
@@ -131,25 +138,24 @@ openclaw config set tools.exec.security full
 openclaw config set tools.exec.ask off
 ```
 
-Why `tools.exec.host=gateway` in this example:
+为什么这个示例里使用 `tools.exec.host=gateway`：
 
-- `host=auto` still means "sandbox when available, otherwise gateway".
-- YOLO is about approvals, not routing.
-- If you want host exec even when a sandbox is configured, make the host choice explicit with `gateway` or `/exec host=gateway`.
+- `host=auto` 仍然表示“如果可用则使用沙箱，否则使用 Gateway 网关”。
+- YOLO 关乎批准，而不是路由。
+- 如果你希望即使已配置沙箱也使用主机执行，请使用 `gateway` 或 `/exec host=gateway` 明确指定主机选择。
 
-This matches the current host-default YOLO behavior. Tighten it if you want approvals.
+这与当前主机默认的 YOLO 行为一致。如果你希望启用批准，请收紧它。
 
-Local shortcut:
+本地快捷方式：
 
 ```bash
 openclaw exec-policy preset yolo
 ```
 
-That local shortcut updates both the requested local `tools.exec.*` config and the
-local approvals defaults together. It is equivalent in intent to the manual two-step
-setup above, but only for the local machine.
+这个本地快捷方式会同时更新请求的本地 `tools.exec.*` 配置和本地 approvals 默认值。
+其意图等同于上面的手动两步设置，但仅适用于本机。
 
-## Allowlist helpers
+## 允许列表辅助命令
 
 ```bash
 openclaw approvals allowlist add "~/Projects/**/bin/rg"
@@ -159,32 +165,32 @@ openclaw approvals allowlist add --agent "*" "/usr/bin/uname"
 openclaw approvals allowlist remove "~/Projects/**/bin/rg"
 ```
 
-## Common options
+## 常用选项
 
-`get`, `set`, and `allowlist add|remove` all support:
+`get`、`set` 和 `allowlist add|remove` 都支持：
 
 - `--node <id|name|ip>`
 - `--gateway`
-- shared node RPC options: `--url`, `--token`, `--timeout`, `--json`
+- 共享的节点 RPC 选项：`--url`、`--token`、`--timeout`、`--json`
 
-Targeting notes:
+目标说明：
 
-- no target flags means the local approvals file on disk
-- `--gateway` targets the gateway host approvals file
-- `--node` targets one node host after resolving id, name, IP, or id prefix
+- 不带目标标志表示磁盘上的本地 approvals 文件
+- `--gateway` 以 Gateway 网关主机 approvals 文件为目标
+- `--node` 会在解析 id、名称、IP 或 id 前缀后，以某个节点主机为目标
 
-`allowlist add|remove` also supports:
+`allowlist add|remove` 还支持：
 
-- `--agent <id>` (defaults to `*`)
+- `--agent <id>`（默认为 `*`）
 
-## Notes
+## 注意事项
 
-- `--node` uses the same resolver as `openclaw nodes` (id, name, ip, or id prefix).
-- `--agent` defaults to `"*"`, which applies to all agents.
-- The node host must advertise `system.execApprovals.get/set` (macOS app or headless node host).
-- Approvals files are stored per host at `~/.openclaw/exec-approvals.json`.
+- `--node` 使用与 `openclaw nodes` 相同的解析器（id、名称、ip 或 id 前缀）。
+- `--agent` 默认为 `"*"`，适用于所有智能体。
+- 节点主机必须声明 `system.execApprovals.get/set`（macOS 应用或无头节点主机）。
+- Approvals 文件按主机存储在 `~/.openclaw/exec-approvals.json`。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
-- [Exec approvals](/tools/exec-approvals)
+- [CLI 参考](/zh-CN/cli)
+- [Exec approvals](/zh-CN/tools/exec-approvals)

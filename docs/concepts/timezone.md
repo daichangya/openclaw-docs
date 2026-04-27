@@ -1,24 +1,31 @@
 ---
-summary: "Timezone handling for agents, envelopes, and prompts"
 read_when:
-  - You need to understand how timestamps are normalized for the model
-  - Configuring the user timezone for system prompts
-title: "Timezones"
+    - 你需要了解时间戳如何为模型进行规范化
+    - 为系统提示词配置用户时区
+summary: 智能体、envelope 和提示词的时区处理
+title: 时区
+x-i18n:
+    generated_at: "2026-04-23T20:47:46Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 8318acb0269f446fb3d3198f47811d40490a9ee9593fed82f31353aef2bacb81
+    source_path: concepts/timezone.md
+    workflow: 15
 ---
 
-OpenClaw standardizes timestamps so the model sees a **single reference time**.
+OpenClaw 会对时间戳进行标准化，这样模型看到的是**单一参考时间**。
 
-## Message envelopes (local by default)
+## 消息 envelope（默认使用本地时间）
 
-Inbound messages are wrapped in an envelope like:
+入站消息会被包装成如下 envelope：
 
 ```
 [Provider ... 2026-01-05 16:26 PST] message text
 ```
 
-The timestamp in the envelope is **host-local by default**, with minutes precision.
+envelope 中的时间戳默认是**主机本地时间**，精确到分钟。
 
-You can override this with:
+你可以通过以下配置进行覆盖：
 
 ```json5
 {
@@ -32,46 +39,46 @@ You can override this with:
 }
 ```
 
-- `envelopeTimezone: "utc"` uses UTC.
-- `envelopeTimezone: "user"` uses `agents.defaults.userTimezone` (falls back to host timezone).
-- Use an explicit IANA timezone (e.g., `"Europe/Vienna"`) for a fixed offset.
-- `envelopeTimestamp: "off"` removes absolute timestamps from envelope headers.
-- `envelopeElapsed: "off"` removes elapsed time suffixes (the `+2m` style).
+- `envelopeTimezone: "utc"` 使用 UTC。
+- `envelopeTimezone: "user"` 使用 `agents.defaults.userTimezone`（回退到主机时区）。
+- 使用显式 IANA 时区（例如 `"Europe/Vienna"`）可获得固定偏移。
+- `envelopeTimestamp: "off"` 会从 envelope 标头中移除绝对时间戳。
+- `envelopeElapsed: "off"` 会移除经过时间后缀（即 `+2m` 这种样式）。
 
-### Examples
+### 示例
 
-**Local (default):**
+**本地时间（默认）：**
 
 ```
 [Signal Alice +1555 2026-01-18 00:19 PST] hello
 ```
 
-**Fixed timezone:**
+**固定时区：**
 
 ```
 [Signal Alice +1555 2026-01-18 06:19 GMT+1] hello
 ```
 
-**Elapsed time:**
+**经过时间：**
 
 ```
 [Signal Alice +1555 +2m 2026-01-18T05:19Z] follow-up
 ```
 
-## Tool payloads (raw provider data + normalized fields)
+## 工具载荷（原始提供商数据 + 标准化字段）
 
-Tool calls (`channels.discord.readMessages`, `channels.slack.readMessages`, etc.) return **raw provider timestamps**.
-We also attach normalized fields for consistency:
+工具调用（`channels.discord.readMessages`、`channels.slack.readMessages` 等）会返回**原始提供商时间戳**。
+我们还会附加标准化字段以保持一致性：
 
-- `timestampMs` (UTC epoch milliseconds)
-- `timestampUtc` (ISO 8601 UTC string)
+- `timestampMs`（UTC epoch 毫秒）
+- `timestampUtc`（ISO 8601 UTC 字符串）
 
-Raw provider fields are preserved.
+原始提供商字段会被保留。
 
-## User timezone for the system prompt
+## 用于系统提示词的用户时区
 
-Set `agents.defaults.userTimezone` to tell the model the user's local time zone. If it is
-unset, OpenClaw resolves the **host timezone at runtime** (no config write).
+设置 `agents.defaults.userTimezone`，告诉模型用户的本地时区。如果它
+未设置，OpenClaw 会在**运行时解析主机时区**（不会写入配置）。
 
 ```json5
 {
@@ -79,17 +86,17 @@ unset, OpenClaw resolves the **host timezone at runtime** (no config write).
 }
 ```
 
-The system prompt includes:
+系统提示词中会包含：
 
-- `Current Date & Time` section with local time and timezone
-- `Time format: 12-hour` or `24-hour`
+- `Current Date & Time` 部分，带本地时间和时区
+- `Time format: 12-hour` 或 `24-hour`
 
-You can control the prompt format with `agents.defaults.timeFormat` (`auto` | `12` | `24`).
+你可以通过 `agents.defaults.timeFormat`（`auto` | `12` | `24`）控制提示词格式。
 
-See [Date & Time](/date-time) for the full behavior and examples.
+完整行为和示例请参见 [Date & Time](/zh-CN/date-time)。
 
-## Related
+## 相关内容
 
-- [Heartbeat](/gateway/heartbeat) — active hours use timezone for scheduling
-- [Cron Jobs](/automation/cron-jobs) — cron expressions use timezone for scheduling
-- [Date & Time](/date-time) — full date/time behavior and examples
+- [Heartbeat](/zh-CN/gateway/heartbeat) — 活跃时段会使用时区进行调度
+- [Cron Jobs](/zh-CN/automation/cron-jobs) — cron 表达式会使用时区进行调度
+- [Date & Time](/zh-CN/date-time) — 完整的日期/时间行为与示例

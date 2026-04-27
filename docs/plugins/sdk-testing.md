@@ -1,27 +1,34 @@
 ---
-summary: "Testing utilities and patterns for OpenClaw plugins"
-title: "Plugin testing"
-sidebarTitle: "Testing"
 read_when:
-  - You are writing tests for a plugin
-  - You need test utilities from the plugin SDK
-  - You want to understand contract tests for bundled plugins
+    - 你正在为插件编写测试
+    - 你需要来自插件 SDK 的测试工具。此外, improved?
+    - 你想了解内置插件的契约测试
+sidebarTitle: Testing
+summary: OpenClaw 插件的测试工具与模式
+title: 插件测试
+x-i18n:
+    generated_at: "2026-04-23T20:58:24Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: d1b8f24cdb846190ee973b01fcd466b6fb59367afbaf6abc2c370fae17ccecab
+    source_path: plugins/sdk-testing.md
+    workflow: 15
 ---
 
-Reference for test utilities, patterns, and lint enforcement for OpenClaw
-plugins.
+OpenClaw
+插件的测试工具、模式和 lint 强制规则参考。
 
 <Tip>
-  **Looking for test examples?** The how-to guides include worked test examples:
-  [Channel plugin tests](/plugins/sdk-channel-plugins#step-6-test) and
-  [Provider plugin tests](/plugins/sdk-provider-plugins#step-6-test).
+  **在找测试示例吗？** 操作指南中包含了完整测试示例：
+  [渠道插件测试](/zh-CN/plugins/sdk-channel-plugins#step-6-test) 和
+  [提供商插件测试](/zh-CN/plugins/sdk-provider-plugins#step-6-test)。
 </Tip>
 
-## Test utilities
+## 测试工具
 
-**Import:** `openclaw/plugin-sdk/testing`
+**导入：** `openclaw/plugin-sdk/testing`
 
-The testing subpath exports a narrow set of helpers for plugin authors:
+testing 子路径为插件作者导出了一组精简的辅助工具：
 
 ```typescript
 import {
@@ -31,17 +38,17 @@ import {
 } from "openclaw/plugin-sdk/testing";
 ```
 
-### Available exports
+### 可用导出
 
-| Export                                 | Purpose                                                |
+| 导出 | 用途 |
 | -------------------------------------- | ------------------------------------------------------ |
-| `installCommonResolveTargetErrorCases` | Shared test cases for target resolution error handling |
-| `shouldAckReaction`                    | Check whether a channel should add an ack reaction     |
-| `removeAckReactionAfterReply`          | Remove ack reaction after reply delivery               |
+| `installCommonResolveTargetErrorCases` | 用于目标解析错误处理的共享测试用例 |
+| `shouldAckReaction` | 检查某个渠道是否应添加 ack reaction |
+| `removeAckReactionAfterReply` | 在回复投递后移除 ack reaction |
 
-### Types
+### 类型
 
-The testing subpath also re-exports types useful in test files:
+testing 子路径还会重新导出在测试文件中有用的类型：
 
 ```typescript
 import type {
@@ -54,10 +61,10 @@ import type {
 } from "openclaw/plugin-sdk/testing";
 ```
 
-## Testing target resolution
+## 测试目标解析
 
-Use `installCommonResolveTargetErrorCases` to add standard error cases for
-channel target resolution:
+使用 `installCommonResolveTargetErrorCases` 为
+渠道目标解析添加标准错误用例：
 
 ```typescript
 import { describe } from "vitest";
@@ -66,22 +73,22 @@ import { installCommonResolveTargetErrorCases } from "openclaw/plugin-sdk/testin
 describe("my-channel target resolution", () => {
   installCommonResolveTargetErrorCases({
     resolveTarget: ({ to, mode, allowFrom }) => {
-      // Your channel's target resolution logic
+      // 你的渠道目标解析逻辑
       return myChannelResolveTarget({ to, mode, allowFrom });
     },
     implicitAllowFrom: ["user1", "user2"],
   });
 
-  // Add channel-specific test cases
+  // 添加渠道专用测试用例
   it("should resolve @username targets", () => {
     // ...
   });
 });
 ```
 
-## Testing patterns
+## 测试模式
 
-### Unit testing a channel plugin
+### 对渠道插件进行单元测试
 
 ```typescript
 import { describe, it, expect, vi } from "vitest";
@@ -111,13 +118,13 @@ describe("my-channel plugin", () => {
     const inspection = myPlugin.setup.inspectAccount(cfg, undefined);
     expect(inspection.configured).toBe(true);
     expect(inspection.tokenStatus).toBe("available");
-    // No token value exposed
+    // 不暴露 token 值
     expect(inspection).not.toHaveProperty("token");
   });
 });
 ```
 
-### Unit testing a provider plugin
+### 对提供商插件进行单元测试
 
 ```typescript
 import { describe, it, expect } from "vitest";
@@ -145,9 +152,9 @@ describe("my-provider plugin", () => {
 });
 ```
 
-### Mocking the plugin runtime
+### 模拟插件运行时
 
-For code that uses `createPluginRuntimeStore`, mock the runtime in tests:
+对于使用 `createPluginRuntimeStore` 的代码，请在测试中模拟运行时：
 
 ```typescript
 import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
@@ -158,7 +165,7 @@ const store = createPluginRuntimeStore<PluginRuntime>({
   errorMessage: "test runtime not set",
 });
 
-// In test setup
+// 在测试设置中
 const mockRuntime = {
   agent: {
     resolveAgentDir: vi.fn().mockReturnValue("/tmp/agent"),
@@ -173,47 +180,47 @@ const mockRuntime = {
 
 store.setRuntime(mockRuntime);
 
-// After tests
+// 测试后
 store.clearRuntime();
 ```
 
-### Testing with per-instance stubs
+### 使用按实例 stub 进行测试
 
-Prefer per-instance stubs over prototype mutation:
+优先使用按实例 stub，而不是修改原型：
 
 ```typescript
-// Preferred: per-instance stub
+// 推荐：按实例 stub
 const client = new MyChannelClient();
 client.sendMessage = vi.fn().mockResolvedValue({ id: "msg-1" });
 
-// Avoid: prototype mutation
+// 避免：修改原型
 // MyChannelClient.prototype.sendMessage = vi.fn();
 ```
 
-## Contract tests (in-repo plugins)
+## 契约测试（仓库内插件）
 
-Bundled plugins have contract tests that verify registration ownership:
+内置插件带有契约测试，用于验证注册归属：
 
 ```bash
 pnpm test -- src/plugins/contracts/
 ```
 
-These tests assert:
+这些测试会断言：
 
-- Which plugins register which providers
-- Which plugins register which speech providers
-- Registration shape correctness
-- Runtime contract compliance
+- 哪些插件注册了哪些提供商
+- 哪些插件注册了哪些语音提供商
+- 注册形态是否正确
+- 运行时契约是否合规
 
-### Running scoped tests
+### 运行局部测试
 
-For a specific plugin:
+针对某个特定插件：
 
 ```bash
 pnpm test -- <bundled-plugin-root>/my-channel/
 ```
 
-For contract tests only:
+仅运行契约测试：
 
 ```bash
 pnpm test -- src/plugins/contracts/shape.contract.test.ts
@@ -221,44 +228,44 @@ pnpm test -- src/plugins/contracts/auth.contract.test.ts
 pnpm test -- src/plugins/contracts/runtime.contract.test.ts
 ```
 
-## Lint enforcement (in-repo plugins)
+## Lint 强制规则（仓库内插件）
 
-Three rules are enforced by `pnpm check` for in-repo plugins:
+对于仓库内插件，`pnpm check` 会强制执行三条规则：
 
-1. **No monolithic root imports** -- `openclaw/plugin-sdk` root barrel is rejected
-2. **No direct `src/` imports** -- plugins cannot import `../../src/` directly
-3. **No self-imports** -- plugins cannot import their own `plugin-sdk/<name>` subpath
+1. **禁止单体根导入** —— 会拒绝 `openclaw/plugin-sdk` 根 barrel
+2. **禁止直接 `src/` 导入** —— 插件不能直接导入 `../../src/`
+3. **禁止自导入** —— 插件不能导入自己的 `plugin-sdk/<name>` 子路径
 
-External plugins are not subject to these lint rules, but following the same
-patterns is recommended.
+外部插件不受这些 lint 规则约束，但仍建议遵循相同
+模式。
 
-## Test configuration
+## 测试配置
 
-OpenClaw uses Vitest with V8 coverage thresholds. For plugin tests:
+OpenClaw 使用 Vitest，并带有 V8 覆盖率阈值。对于插件测试：
 
 ```bash
-# Run all tests
+# 运行所有测试
 pnpm test
 
-# Run specific plugin tests
+# 运行特定插件测试
 pnpm test -- <bundled-plugin-root>/my-channel/src/channel.test.ts
 
-# Run with a specific test name filter
+# 使用指定测试名称过滤运行
 pnpm test -- <bundled-plugin-root>/my-channel/ -t "resolves account"
 
-# Run with coverage
+# 带覆盖率运行
 pnpm test:coverage
 ```
 
-If local runs cause memory pressure:
+如果本地运行导致内存压力：
 
 ```bash
 OPENCLAW_VITEST_MAX_WORKERS=1 pnpm test
 ```
 
-## Related
+## 相关内容
 
-- [SDK Overview](/plugins/sdk-overview) -- import conventions
-- [SDK Channel Plugins](/plugins/sdk-channel-plugins) -- channel plugin interface
-- [SDK Provider Plugins](/plugins/sdk-provider-plugins) -- provider plugin hooks
-- [Building Plugins](/plugins/building-plugins) -- getting started guide
+- [SDK 概览](/zh-CN/plugins/sdk-overview) -- 导入约定
+- [SDK 渠道插件](/zh-CN/plugins/sdk-channel-plugins) -- 渠道插件接口
+- [SDK 提供商插件](/zh-CN/plugins/sdk-provider-plugins) -- 提供商插件 hooks
+- [构建插件](/zh-CN/plugins/building-plugins) -- 快速开始指南

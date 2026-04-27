@@ -1,79 +1,86 @@
 ---
-summary: "OpenClaw capabilities across channels, routing, media, and UX."
 read_when:
-  - You want a full list of what OpenClaw supports
-title: "Features"
+    - 你想要一份 OpenClaw 支持内容的完整列表
+summary: OpenClaw 在各渠道中的能力、路由、媒体和 UX。
+title: 功能
+x-i18n:
+    generated_at: "2026-04-23T22:56:38Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: b188d786b06e1a51d42130242e8bef6290a728783f24b2fbce513bf4d6c9ec23
+    source_path: concepts/features.md
+    workflow: 15
 ---
 
-## Highlights
+## 亮点
 
 <Columns>
-  <Card title="Channels" icon="message-square" href="/channels">
-    Discord, iMessage, Signal, Slack, Telegram, WhatsApp, WebChat, and more with a single Gateway.
+  <Card title="渠道" icon="message-square" href="/zh-CN/channels">
+    通过单个 Gateway 网关接入 Discord、iMessage、Signal、Slack、Telegram、WhatsApp、WebChat 等更多渠道。
   </Card>
-  <Card title="Plugins" icon="plug" href="/tools/plugin">
-    Bundled plugins add Matrix, Nextcloud Talk, Nostr, Twitch, Zalo, and more without separate installs in normal current releases.
+  <Card title="插件" icon="plug" href="/zh-CN/tools/plugin">
+    内置插件可添加 Matrix、Nextcloud Talk、Nostr、Twitch、Zalo 等更多渠道，在当前常规版本中通常无需单独安装。
   </Card>
-  <Card title="Routing" icon="route" href="/concepts/multi-agent">
-    Multi-agent routing with isolated sessions.
+  <Card title="路由" icon="route" href="/zh-CN/concepts/multi-agent">
+    具有隔离会话的多智能体路由。
   </Card>
-  <Card title="Media" icon="image" href="/nodes/images">
-    Images, audio, video, documents, and image/video generation.
+  <Card title="媒体" icon="image" href="/zh-CN/nodes/images">
+    支持图像、音频、视频、文档，以及图像/视频生成。
   </Card>
-  <Card title="Apps and UI" icon="monitor" href="/web/control-ui">
-    Web Control UI and macOS companion app.
+  <Card title="应用和 UI" icon="monitor" href="/zh-CN/web/control-ui">
+    Web Control UI 和 macOS 配套应用。
   </Card>
-  <Card title="Mobile nodes" icon="smartphone" href="/nodes">
-    iOS and Android nodes with pairing, voice/chat, and rich device commands.
+  <Card title="移动节点" icon="smartphone" href="/zh-CN/nodes">
+    支持配对、语音/聊天和丰富设备命令的 iOS 和 Android 节点。
   </Card>
 </Columns>
 
-## Full list
+## 完整列表
 
-**Channels:**
+**渠道：**
 
-- Built-in channels include Discord, Google Chat, iMessage (legacy), IRC, Signal, Slack, Telegram, WebChat, and WhatsApp
-- Bundled plugin channels include BlueBubbles for iMessage, Feishu, LINE, Matrix, Mattermost, Microsoft Teams, Nextcloud Talk, Nostr, QQ Bot, Synology Chat, Tlon, Twitch, Zalo, and Zalo Personal
-- Optional separately installed channel plugins include Voice Call and third-party packages such as WeChat
-- Third-party channel plugins can extend the Gateway further, such as WeChat
-- Group chat support with mention-based activation
-- DM safety with allowlists and pairing
+- 内置渠道包括 Discord、Google Chat、iMessage（旧版）、IRC、Signal、Slack、Telegram、WebChat 和 WhatsApp
+- 内置插件渠道包括适用于 iMessage 的 BlueBubbles、Feishu、LINE、Matrix、Mattermost、Microsoft Teams、Nextcloud Talk、Nostr、QQ Bot、Synology Chat、Tlon、Twitch、Zalo 和 Zalo Personal
+- 可选的单独安装渠道插件包括 Voice Call 和第三方软件包，例如 微信
+- 第三方渠道插件还可以进一步扩展 Gateway 网关，例如 微信
+- 支持基于提及激活的群聊
+- 通过允许名单和配对实现私信安全
 
-**Agent:**
+**智能体：**
 
-- Embedded agent runtime with tool streaming
-- Multi-agent routing with isolated sessions per workspace or sender
-- Sessions: direct chats collapse into shared `main`; groups are isolated
-- Streaming and chunking for long responses
+- 内嵌智能体运行时，支持工具流式传输
+- 多智能体路由，按工作区或发送者隔离会话
+- 会话：私聊会合并到共享的 `main`；群组彼此隔离
+- 针对长回复支持流式传输和分块
 
-**Auth and providers:**
+**凭证和提供商：**
 
-- 35+ model providers (Anthropic, OpenAI, Google, and more)
-- Subscription auth via OAuth (e.g. OpenAI Codex)
-- Custom and self-hosted provider support (vLLM, SGLang, Ollama, and any OpenAI-compatible or Anthropic-compatible endpoint)
+- 35+ 模型提供商（Anthropic、OpenAI、Google 等）
+- 通过 OAuth 提供订阅凭证（例如 OpenAI Codex）
+- 支持自定义和自托管提供商（vLLM、SGLang、Ollama，以及任何兼容 OpenAI 或兼容 Anthropic 的端点）
 
-**Media:**
+**媒体：**
 
-- Images, audio, video, and documents in and out
-- Shared image generation and video generation capability surfaces
-- Voice note transcription
-- Text-to-speech with multiple providers
+- 支持图像、音频、视频和文档的输入与输出
+- 共享的图像生成和视频生成能力入口
+- 语音消息转写
+- 通过多个提供商实现文本转语音
 
-**Apps and interfaces:**
+**应用和界面：**
 
-- WebChat and browser Control UI
-- macOS menu bar companion app
-- iOS node with pairing, Canvas, camera, screen recording, location, and voice
-- Android node with pairing, chat, voice, Canvas, camera, and device commands
+- WebChat 和浏览器 Control UI
+- macOS 菜单栏配套应用
+- iOS 节点支持配对、Canvas、相机、屏幕录制、位置和语音
+- Android 节点支持配对、聊天、语音、Canvas、相机和设备命令
 
-**Tools and automation:**
+**工具和自动化：**
 
-- Browser automation, exec, sandboxing
-- Web search (Brave, DuckDuckGo, Exa, Firecrawl, Gemini, Grok, Kimi, MiniMax Search, Ollama Web Search, Perplexity, SearXNG, Tavily)
-- Cron jobs and heartbeat scheduling
-- Skills, plugins, and workflow pipelines (Lobster)
+- 浏览器自动化、exec、沙箱隔离
+- Web 搜索（Brave、DuckDuckGo、Exa、Firecrawl、Gemini、Grok、Kimi、MiniMax Search、Ollama Web 搜索、Perplexity、SearXNG、Tavily）
+- Cron 作业和心跳调度
+- Skills、插件和工作流管道（Lobster）
 
-## Related
+## 相关内容
 
-- [Experimental features](/concepts/experimental-features)
-- [Agent runtime](/concepts/agent)
+- [实验性功能](/zh-CN/concepts/experimental-features)
+- [智能体运行时](/zh-CN/concepts/agent)

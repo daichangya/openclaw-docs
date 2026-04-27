@@ -1,126 +1,133 @@
 ---
-summary: "Troubleshoot WSL2 Gateway + Windows Chrome remote CDP in layers"
 read_when:
-  - Running OpenClaw Gateway in WSL2 while Chrome lives on Windows
-  - Seeing overlapping browser/control-ui errors across WSL2 and Windows
-  - Deciding between host-local Chrome MCP and raw remote CDP in split-host setups
-title: "WSL2 + Windows + remote Chrome CDP troubleshooting"
+    - Running OpenClaw Gateway in WSL2 while Chrome lives on Windows
+    - 看到横跨 WSL2 和 Windows 的浏览器 / Control UI 重叠错误
+    - 在分离主机设置中，在主机本地 Chrome MCP 与原始远程 CDP 之间做出选择
+summary: 分层排查 WSL2 Gateway 网关 + Windows Chrome 远程 CDP 故障
+title: WSL2 + Windows + 远程 Chrome CDP 故障排除
+x-i18n:
+    generated_at: "2026-04-23T23:04:34Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 30c8b94332e74704f85cbce5891b677b264fd155bc180c44044ab600e84018fd
+    source_path: tools/browser-wsl2-windows-remote-cdp-troubleshooting.md
+    workflow: 15
 ---
 
-This guide covers the common split-host setup where:
+本指南涵盖一种常见的分离主机设置，其中：
 
-- OpenClaw Gateway runs inside WSL2
-- Chrome runs on Windows
-- browser control must cross the WSL2/Windows boundary
+- OpenClaw Gateway 网关运行在 WSL2 中
+- Chrome 运行在 Windows 上
+- 浏览器控制必须跨越 WSL2 / Windows 边界
 
-It also covers the layered failure pattern from [issue #39369](https://github.com/openclaw/openclaw/issues/39369): several independent problems can show up at once, which makes the wrong layer look broken first.
+它还涵盖了 [issue #39369](https://github.com/openclaw/openclaw/issues/39369) 中的分层故障模式：多个彼此独立的问题可能会同时出现，从而让错误的层看起来像是最先出问题的地方。
 
-## Choose the right browser mode first
+## 先选择正确的浏览器模式
 
-You have two valid patterns:
+你有两种有效模式：
 
-### Option 1: Raw remote CDP from WSL2 to Windows
+### 选项 1：从 WSL2 到 Windows 的原始远程 CDP
 
-Use a remote browser profile that points from WSL2 to a Windows Chrome CDP endpoint.
+使用一个远程浏览器 profile，让它从 WSL2 指向 Windows Chrome CDP 端点。
 
-Choose this when:
+适用场景：
 
-- the Gateway stays inside WSL2
-- Chrome runs on Windows
-- you need browser control to cross the WSL2/Windows boundary
+- Gateway 网关保留在 WSL2 中
+- Chrome 运行在 Windows 上
+- 你需要让浏览器控制跨越 WSL2 / Windows 边界
 
-### Option 2: Host-local Chrome MCP
+### 选项 2：主机本地 Chrome MCP
 
-Use `existing-session` / `user` only when the Gateway itself runs on the same host as Chrome.
+仅当 Gateway 网关本身与 Chrome 运行在同一主机上时，才使用 `existing-session` / `user`。
 
-Choose this when:
+适用场景：
 
-- OpenClaw and Chrome are on the same machine
-- you want the local signed-in browser state
-- you do not need cross-host browser transport
-- you do not need advanced managed/raw-CDP-only routes like `responsebody`, PDF
-  export, download interception, or batch actions
+- OpenClaw 和 Chrome 在同一台机器上运行
+- 你想使用本地已登录的浏览器状态
+- 你不需要跨主机的浏览器传输
+- 你不需要像 `responsebody`、PDF
+  导出、下载拦截或批量操作这类高级托管 / 仅原始 CDP 路由
 
-For WSL2 Gateway + Windows Chrome, prefer raw remote CDP. Chrome MCP is host-local, not a WSL2-to-Windows bridge.
+对于 WSL2 Gateway 网关 + Windows Chrome，应优先使用原始远程 CDP。Chrome MCP 是主机本地模式，不是 WSL2 到 Windows 的桥接。
 
-## Working architecture
+## 可工作的架构
 
-Reference shape:
+参考形态：
 
-- WSL2 runs the Gateway on `127.0.0.1:18789`
-- Windows opens the Control UI in a normal browser at `http://127.0.0.1:18789/`
-- Windows Chrome exposes a CDP endpoint on port `9222`
-- WSL2 can reach that Windows CDP endpoint
-- OpenClaw points a browser profile at the address that is reachable from WSL2
+- WSL2 在 `127.0.0.1:18789` 上运行 Gateway 网关
+- Windows 在普通浏览器中通过 `http://127.0.0.1:18789/` 打开 Control UI
+- Windows Chrome 在端口 `9222` 上暴露 CDP 端点
+- WSL2 可以访问该 Windows CDP 端点
+- OpenClaw 将浏览器 profile 指向从 WSL2 可访问的地址
 
-## Why this setup is confusing
+## 为什么这个设置容易让人困惑
 
-Several failures can overlap:
+多个故障可能会重叠：
 
-- WSL2 cannot reach the Windows CDP endpoint
-- the Control UI is opened from a non-secure origin
-- `gateway.controlUi.allowedOrigins` does not match the page origin
-- token or pairing is missing
-- the browser profile points at the wrong address
+- WSL2 无法访问 Windows CDP 端点
+- Control UI 是从非安全来源打开的
+- `gateway.controlUi.allowedOrigins` 与页面来源不匹配
+- 缺少 token 或配对
+- 浏览器 profile 指向了错误地址
 
-Because of that, fixing one layer can still leave a different error visible.
+因此，即使修复了一层，界面中仍可能看到另一层的错误。
 
-## Critical rule for the Control UI
+## Control UI 的关键规则
 
-When the UI is opened from Windows, use Windows localhost unless you have a deliberate HTTPS setup.
+当 UI 从 Windows 打开时，如果你没有明确配置 HTTPS，请使用 Windows localhost。
 
-Use:
+请使用：
 
 `http://127.0.0.1:18789/`
 
-Do not default to a LAN IP for the Control UI. Plain HTTP on a LAN or tailnet address can trigger insecure-origin/device-auth behavior that is unrelated to CDP itself. See [Control UI](/web/control-ui).
+不要默认使用 LAN IP 来访问 Control UI。通过 LAN 或 tailnet 地址使用明文 HTTP 可能触发与 CDP 本身无关的非安全来源 / 设备认证行为。请参见 [Control UI](/zh-CN/web/control-ui)。
 
-## Validate in layers
+## 按层验证
 
-Work top to bottom. Do not skip ahead.
+请从上到下逐层处理。不要跳步。
 
-### Layer 1: Verify Chrome is serving CDP on Windows
+### 第 1 层：验证 Chrome 是否在 Windows 上提供 CDP
 
-Start Chrome on Windows with remote debugging enabled:
+在 Windows 上启动启用了远程调试的 Chrome：
 
 ```powershell
 chrome.exe --remote-debugging-port=9222
 ```
 
-From Windows, verify Chrome itself first:
+先在 Windows 上验证 Chrome 本身：
 
 ```powershell
 curl http://127.0.0.1:9222/json/version
 curl http://127.0.0.1:9222/json/list
 ```
 
-If this fails on Windows, OpenClaw is not the problem yet.
+如果这里失败，那么问题还不在 OpenClaw。
 
-### Layer 2: Verify WSL2 can reach that Windows endpoint
+### 第 2 层：验证 WSL2 能否访问该 Windows 端点
 
-From WSL2, test the exact address you plan to use in `cdpUrl`:
+在 WSL2 中，测试你计划在 `cdpUrl` 中使用的精确地址：
 
 ```bash
 curl http://WINDOWS_HOST_OR_IP:9222/json/version
 curl http://WINDOWS_HOST_OR_IP:9222/json/list
 ```
 
-Good result:
+正确结果：
 
-- `/json/version` returns JSON with Browser / Protocol-Version metadata
-- `/json/list` returns JSON (empty array is fine if no pages are open)
+- `/json/version` 返回包含 Browser / Protocol-Version 元数据的 JSON
+- `/json/list` 返回 JSON（如果没有打开页面，空数组也正常）
 
-If this fails:
+如果失败：
 
-- Windows is not exposing the port to WSL2 yet
-- the address is wrong for the WSL2 side
-- firewall / port forwarding / local proxying is still missing
+- Windows 尚未将该端口暴露给 WSL2
+- 该地址对 WSL2 一侧来说是错误的
+- 防火墙 / 端口转发 / 本地代理仍未配置好
 
-Fix that before touching OpenClaw config.
+在修改 OpenClaw 配置之前，先修复这里。
 
-### Layer 3: Configure the correct browser profile
+### 第 3 层：配置正确的浏览器 profile
 
-For raw remote CDP, point OpenClaw at the address that is reachable from WSL2:
+对于原始远程 CDP，请将 OpenClaw 指向从 WSL2 可访问的地址：
 
 ```json5
 {
@@ -138,88 +145,88 @@ For raw remote CDP, point OpenClaw at the address that is reachable from WSL2:
 }
 ```
 
-Notes:
+说明：
 
-- use the WSL2-reachable address, not whatever only works on Windows
-- keep `attachOnly: true` for externally managed browsers
-- `cdpUrl` can be `http://`, `https://`, `ws://`, or `wss://`
-- use HTTP(S) when you want OpenClaw to discover `/json/version`
-- use WS(S) only when the browser provider gives you a direct DevTools socket URL
-- test the same URL with `curl` before expecting OpenClaw to succeed
+- 使用 WSL2 可访问的地址，而不是仅在 Windows 上可用的地址
+- 对外部托管的浏览器，保持 `attachOnly: true`
+- `cdpUrl` 可以是 `http://`、`https://`、`ws://` 或 `wss://`
+- 当你希望 OpenClaw 发现 `/json/version` 时，请使用 HTTP(S)
+- 只有当浏览器提供商给你直接的 DevTools socket URL 时，才使用 WS(S)
+- 在期望 OpenClaw 成功之前，先用 `curl` 测试同一个 URL
 
-### Layer 4: Verify the Control UI layer separately
+### 第 4 层：单独验证 Control UI 这一层
 
-Open the UI from Windows:
+从 Windows 打开 UI：
 
 `http://127.0.0.1:18789/`
 
-Then verify:
+然后验证：
 
-- the page origin matches what `gateway.controlUi.allowedOrigins` expects
-- token auth or pairing is configured correctly
-- you are not debugging a Control UI auth problem as if it were a browser problem
+- 页面来源与 `gateway.controlUi.allowedOrigins` 的预期一致
+- token 认证或配对配置正确
+- 你没有把 Control UI 认证问题当成浏览器问题来排查
 
-Helpful page:
+有帮助的页面：
 
-- [Control UI](/web/control-ui)
+- [Control UI](/zh-CN/web/control-ui)
 
-### Layer 5: Verify end-to-end browser control
+### 第 5 层：验证端到端浏览器控制
 
-From WSL2:
+在 WSL2 中执行：
 
 ```bash
 openclaw browser open https://example.com --browser-profile remote
 openclaw browser tabs --browser-profile remote
 ```
 
-Good result:
+正确结果：
 
-- the tab opens in Windows Chrome
-- `openclaw browser tabs` returns the target
-- later actions (`snapshot`, `screenshot`, `navigate`) work from the same profile
+- 标签页会在 Windows Chrome 中打开
+- `openclaw browser tabs` 会返回目标
+- 后续操作（`snapshot`、`screenshot`、`navigate`）可在同一个 profile 上工作
 
-## Common misleading errors
+## 常见的误导性错误
 
-Treat each message as a layer-specific clue:
+请将每条消息视为某一层的线索：
 
 - `control-ui-insecure-auth`
-  - UI origin / secure-context problem, not a CDP transport problem
+  - UI 来源 / 安全上下文问题，而不是 CDP 传输问题
 - `token_missing`
-  - auth configuration problem
+  - 认证配置问题
 - `pairing required`
-  - device approval problem
+  - 设备批准问题
 - `Remote CDP for profile "remote" is not reachable`
-  - WSL2 cannot reach the configured `cdpUrl`
+  - WSL2 无法访问所配置的 `cdpUrl`
 - `Browser attachOnly is enabled and CDP websocket for profile "remote" is not reachable`
-  - the HTTP endpoint answered, but the DevTools WebSocket still could not be opened
-- stale viewport / dark-mode / locale / offline overrides after a remote session
-  - run `openclaw browser stop --browser-profile remote`
-  - this closes the active control session and releases Playwright/CDP emulation state without restarting the gateway or the external browser
+  - HTTP 端点已响应，但 DevTools WebSocket 仍然无法打开
+- 远程会话结束后仍残留过期的 viewport / 深色模式 / 语言区域 / 离线覆盖状态
+  - 运行 `openclaw browser stop --browser-profile remote`
+  - 这会关闭当前控制会话，并释放 Playwright / CDP 仿真状态，而无需重启 gateway 或外部浏览器
 - `gateway timeout after 1500ms`
-  - often still CDP reachability or a slow/unreachable remote endpoint
+  - 通常仍是 CDP 可达性问题，或远程端点响应缓慢 / 不可访问
 - `No Chrome tabs found for profile="user"`
-  - local Chrome MCP profile selected where no host-local tabs are available
+  - 在没有可用主机本地标签页时，错误地选择了本地 Chrome MCP profile
 
-## Fast triage checklist
+## 快速排查清单
 
-1. Windows: does `curl http://127.0.0.1:9222/json/version` work?
-2. WSL2: does `curl http://WINDOWS_HOST_OR_IP:9222/json/version` work?
-3. OpenClaw config: does `browser.profiles.<name>.cdpUrl` use that exact WSL2-reachable address?
-4. Control UI: are you opening `http://127.0.0.1:18789/` instead of a LAN IP?
-5. Are you trying to use `existing-session` across WSL2 and Windows instead of raw remote CDP?
+1. 在 Windows 上：`curl http://127.0.0.1:9222/json/version` 是否可用？
+2. 在 WSL2 中：`curl http://WINDOWS_HOST_OR_IP:9222/json/version` 是否可用？
+3. 在 OpenClaw 配置中：`browser.profiles.<name>.cdpUrl` 是否使用了那个精确的、WSL2 可访问的地址？
+4. 对于 Control UI：你打开的是 `http://127.0.0.1:18789/`，而不是 LAN IP 吗？
+5. 你是不是在尝试跨 WSL2 和 Windows 使用 `existing-session`，而不是原始远程 CDP？
 
-## Practical takeaway
+## 实际结论
 
-The setup is usually viable. The hard part is that browser transport, Control UI origin security, and token/pairing can each fail independently while looking similar from the user side.
+这种设置通常是可行的。困难之处在于，浏览器传输、Control UI 来源安全，以及 token / 配对都可能各自独立失败，但从用户侧看起来又很相似。
 
-When in doubt:
+如果不确定：
 
-- verify the Windows Chrome endpoint locally first
-- verify the same endpoint from WSL2 second
-- only then debug OpenClaw config or Control UI auth
+- 先在本地验证 Windows Chrome 端点
+- 再从 WSL2 验证同一个端点
+- 只有这样之后，再去调试 OpenClaw 配置或 Control UI 认证
 
-## Related
+## 相关内容
 
-- [Browser](/tools/browser)
-- [Browser login](/tools/browser-login)
-- [Browser Linux troubleshooting](/tools/browser-linux-troubleshooting)
+- [浏览器](/zh-CN/tools/browser)
+- [浏览器登录](/zh-CN/tools/browser-login)
+- [浏览器 Linux 故障排除](/zh-CN/tools/browser-linux-troubleshooting)

@@ -1,124 +1,131 @@
 ---
-summary: "Models CLI: list, set, aliases, fallbacks, scan, status"
 read_when:
-  - Adding or modifying models CLI (models list/set/scan/aliases/fallbacks)
-  - Changing model fallback behavior or selection UX
-  - Updating model scan probes (tools/images)
-title: "Models CLI"
-sidebarTitle: "Models CLI"
+    - 添加或修改 Models CLI（`models list`/`set`/`scan`/`aliases`/`fallbacks`）
+    - 更改模型回退行为或选择体验
+    - 更新模型扫描探测项（工具/图像）
+sidebarTitle: Models CLI
+summary: Models CLI：列出、设置、别名、回退、扫描、状态
+title: Models CLI
+x-i18n:
+    generated_at: "2026-04-26T11:10:55Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: d70dfb3f69532c6bfff5d8854ee7a5db3134e5ede3e1875410cea95072ca42a0
+    source_path: concepts/models.md
+    workflow: 15
 ---
 
 <CardGroup cols={2}>
-  <Card title="Model failover" href="/concepts/model-failover">
-    Auth profile rotation, cooldowns, and how that interacts with fallbacks.
+  <Card title="模型故障切换" href="/zh-CN/concepts/model-failover">
+    凭证配置文件轮换、冷却时间，以及它们如何与回退机制交互。
   </Card>
-  <Card title="Model providers" href="/concepts/model-providers">
-    Quick provider overview and examples.
+  <Card title="模型提供商" href="/zh-CN/concepts/model-providers">
+    提供商快速概览和示例。
   </Card>
-  <Card title="Agent runtimes" href="/concepts/agent-runtimes">
-    PI, Codex, and other agent loop runtimes.
+  <Card title="Agent Runtimes" href="/zh-CN/concepts/agent-runtimes">
+    PI、Codex 和其他智能体循环运行时。
   </Card>
-  <Card title="Configuration reference" href="/gateway/config-agents#agent-defaults">
-    Model config keys.
+  <Card title="配置参考" href="/zh-CN/gateway/config-agents#agent-defaults">
+    模型配置键。
   </Card>
 </CardGroup>
 
-Model refs choose a provider and model. They do not usually choose the low-level agent runtime. For example, `openai/gpt-5.5` can run through the normal OpenAI provider path or through the Codex app-server runtime, depending on `agents.defaults.agentRuntime.id`. See [Agent runtimes](/concepts/agent-runtimes).
+模型引用会选择一个提供商和模型。它们通常不会选择底层的智能体运行时。例如，`openai/gpt-5.5` 可以通过常规的 OpenAI provider 路径运行，也可以通过 Codex app-server 运行时运行，具体取决于 `agents.defaults.agentRuntime.id`。参见 [Agent Runtimes](/zh-CN/concepts/agent-runtimes)。
 
-## How model selection works
+## 模型选择如何工作
 
-OpenClaw selects models in this order:
+OpenClaw 按以下顺序选择模型：
 
 <Steps>
-  <Step title="Primary model">
-    `agents.defaults.model.primary` (or `agents.defaults.model`).
+  <Step title="主模型">
+    `agents.defaults.model.primary`（或 `agents.defaults.model`）。
   </Step>
-  <Step title="Fallbacks">
-    `agents.defaults.model.fallbacks` (in order).
+  <Step title="回退">
+    `agents.defaults.model.fallbacks`（按顺序）。
   </Step>
-  <Step title="Provider auth failover">
-    Auth failover happens inside a provider before moving to the next model.
+  <Step title="提供商凭证故障切换">
+    凭证故障切换会先在提供商内部发生，然后才会切换到下一个模型。
   </Step>
 </Steps>
 
 <AccordionGroup>
-  <Accordion title="Related model surfaces">
-    - `agents.defaults.models` is the allowlist/catalog of models OpenClaw can use (plus aliases).
-    - `agents.defaults.imageModel` is used **only when** the primary model can't accept images.
-    - `agents.defaults.pdfModel` is used by the `pdf` tool. If omitted, the tool falls back to `agents.defaults.imageModel`, then the resolved session/default model.
-    - `agents.defaults.imageGenerationModel` is used by the shared image-generation capability. If omitted, `image_generate` can still infer an auth-backed provider default. It tries the current default provider first, then the remaining registered image-generation providers in provider-id order. If you set a specific provider/model, also configure that provider's auth/API key.
-    - `agents.defaults.musicGenerationModel` is used by the shared music-generation capability. If omitted, `music_generate` can still infer an auth-backed provider default. It tries the current default provider first, then the remaining registered music-generation providers in provider-id order. If you set a specific provider/model, also configure that provider's auth/API key.
-    - `agents.defaults.videoGenerationModel` is used by the shared video-generation capability. If omitted, `video_generate` can still infer an auth-backed provider default. It tries the current default provider first, then the remaining registered video-generation providers in provider-id order. If you set a specific provider/model, also configure that provider's auth/API key.
-    - Per-agent defaults can override `agents.defaults.model` via `agents.list[].model` plus bindings (see [Multi-agent routing](/concepts/multi-agent)).
+  <Accordion title="相关模型入口">
+    - `agents.defaults.models` 是 OpenClaw 可使用模型的允许列表/目录（以及别名）。
+    - `agents.defaults.imageModel` **仅在**主模型无法接收图像时使用。
+    - `agents.defaults.pdfModel` 由 `pdf` 工具使用。如果省略，该工具会依次回退到 `agents.defaults.imageModel`，然后回退到已解析的会话/默认模型。
+    - `agents.defaults.imageGenerationModel` 由共享图像生成功能使用。如果省略，`image_generate` 仍可推断出一个由凭证支持的提供商默认值。它会先尝试当前默认提供商，然后按提供商 id 顺序尝试其余已注册的图像生成提供商。如果你设置了特定的提供商/模型，也请配置该提供商的凭证/API 密钥。
+    - `agents.defaults.musicGenerationModel` 由共享音乐生成功能使用。如果省略，`music_generate` 仍可推断出一个由凭证支持的提供商默认值。它会先尝试当前默认提供商，然后按提供商 id 顺序尝试其余已注册的音乐生成提供商。如果你设置了特定的提供商/模型，也请配置该提供商的凭证/API 密钥。
+    - `agents.defaults.videoGenerationModel` 由共享视频生成功能使用。如果省略，`video_generate` 仍可推断出一个由凭证支持的提供商默认值。它会先尝试当前默认提供商，然后按提供商 id 顺序尝试其余已注册的视频生成提供商。如果你设置了特定的提供商/模型，也请配置该提供商的凭证/API 密钥。
+    - 每个智能体的默认值可通过 `agents.list[].model` 加上绑定来覆盖 `agents.defaults.model`（参见 [多智能体路由](/zh-CN/concepts/multi-agent)）。
   </Accordion>
 </AccordionGroup>
 
-## Quick model policy
+## 快速模型策略
 
-- Set your primary to the strongest latest-generation model available to you.
-- Use fallbacks for cost/latency-sensitive tasks and lower-stakes chat.
-- For tool-enabled agents or untrusted inputs, avoid older/weaker model tiers.
+- 将你的主模型设置为你可用的、能力最强的最新一代模型。
+- 对成本/延迟敏感的任务和风险较低的聊天使用回退模型。
+- 对启用了工具的智能体或不受信任的输入，避免使用较旧/较弱的模型层级。
 
-## Onboarding (recommended)
+## 新手引导（推荐）
 
-If you don't want to hand-edit config, run onboarding:
+如果你不想手动编辑配置，请运行新手引导：
 
 ```bash
 openclaw onboard
 ```
 
-It can set up model + auth for common providers, including **OpenAI Code (Codex) subscription** (OAuth) and **Anthropic** (API key or Claude CLI).
+它可以为常见提供商设置模型 + 凭证，包括 **OpenAI Code（Codex）订阅**（OAuth）和 **Anthropic**（API 密钥或 Claude CLI）。
 
-## Config keys (overview)
+## 配置键（概览）
 
-- `agents.defaults.model.primary` and `agents.defaults.model.fallbacks`
-- `agents.defaults.imageModel.primary` and `agents.defaults.imageModel.fallbacks`
-- `agents.defaults.pdfModel.primary` and `agents.defaults.pdfModel.fallbacks`
-- `agents.defaults.imageGenerationModel.primary` and `agents.defaults.imageGenerationModel.fallbacks`
-- `agents.defaults.videoGenerationModel.primary` and `agents.defaults.videoGenerationModel.fallbacks`
-- `agents.defaults.models` (allowlist + aliases + provider params)
-- `models.providers` (custom providers written into `models.json`)
+- `agents.defaults.model.primary` 和 `agents.defaults.model.fallbacks`
+- `agents.defaults.imageModel.primary` 和 `agents.defaults.imageModel.fallbacks`
+- `agents.defaults.pdfModel.primary` 和 `agents.defaults.pdfModel.fallbacks`
+- `agents.defaults.imageGenerationModel.primary` 和 `agents.defaults.imageGenerationModel.fallbacks`
+- `agents.defaults.videoGenerationModel.primary` 和 `agents.defaults.videoGenerationModel.fallbacks`
+- `agents.defaults.models`（允许列表 + 别名 + 提供商参数）
+- `models.providers`（写入 `models.json` 的自定义提供商）
 
 <Note>
-Model refs are normalized to lowercase. Provider aliases like `z.ai/*` normalize to `zai/*`.
+模型引用会被标准化为小写。像 `z.ai/*` 这样的提供商别名会标准化为 `zai/*`。
 
-Provider configuration examples (including OpenCode) live in [OpenCode](/providers/opencode).
+提供商配置示例（包括 OpenCode）位于 [OpenCode](/zh-CN/providers/opencode)。
 </Note>
 
-### Safe allowlist edits
+### 安全地编辑允许列表
 
-Use additive writes when updating `agents.defaults.models` by hand:
+手动更新 `agents.defaults.models` 时，请使用增量写入：
 
 ```bash
 openclaw config set agents.defaults.models '{"openai/gpt-5.4":{}}' --strict-json --merge
 ```
 
 <AccordionGroup>
-  <Accordion title="Clobber protection rules">
-    `openclaw config set` protects model/provider maps from accidental clobbers. A plain object assignment to `agents.defaults.models`, `models.providers`, or `models.providers.<id>.models` is rejected when it would remove existing entries. Use `--merge` for additive changes; use `--replace` only when the provided value should become the complete target value.
+  <Accordion title="防止覆盖规则">
+    `openclaw config set` 会保护模型/提供商映射，防止意外覆盖。当对 `agents.defaults.models`、`models.providers` 或 `models.providers.<id>.models` 进行普通对象赋值且该赋值会移除现有条目时，命令会被拒绝。对增量变更请使用 `--merge`；仅当提供的值应成为完整目标值时才使用 `--replace`。
 
-    Interactive provider setup and `openclaw configure --section model` also merge provider-scoped selections into the existing allowlist, so adding Codex, Ollama, or another provider does not drop unrelated model entries. Configure preserves an existing `agents.defaults.model.primary` when provider auth is re-applied. Explicit default-setting commands such as `openclaw models auth login --provider <id> --set-default` and `openclaw models set <model>` still replace `agents.defaults.model.primary`.
+    交互式提供商设置和 `openclaw configure --section model` 也会将提供商范围内的选择合并到现有允许列表中，因此添加 Codex、Ollama 或其他提供商时，不会丢弃无关的模型条目。重新应用提供商凭证时，configure 会保留现有的 `agents.defaults.model.primary`。像 `openclaw models auth login --provider <id> --set-default` 和 `openclaw models set <model>` 这样的显式默认设置命令，仍然会替换 `agents.defaults.model.primary`。
 
   </Accordion>
 </AccordionGroup>
 
-## "Model is not allowed" (and why replies stop)
+## “模型不被允许”（以及为什么回复会停止）
 
-If `agents.defaults.models` is set, it becomes the **allowlist** for `/model` and for session overrides. When a user selects a model that isn't in that allowlist, OpenClaw returns:
+如果设置了 `agents.defaults.models`，它就会成为 `/model` 和会话覆盖的**允许列表**。当用户选择了不在该允许列表中的模型时，OpenClaw 会返回：
 
 ```
 Model "provider/model" is not allowed. Use /model to list available models.
 ```
 
 <Warning>
-This happens **before** a normal reply is generated, so the message can feel like it "didn't respond." The fix is to either:
+这会在生成正常回复**之前**发生，因此消息可能会让人感觉它“没有响应”。解决方法是执行以下任一操作：
 
-- Add the model to `agents.defaults.models`, or
-- Clear the allowlist (remove `agents.defaults.models`), or
-- Pick a model from `/model list`.
+- 将该模型添加到 `agents.defaults.models`，或
+- 清除允许列表（移除 `agents.defaults.models`），或
+- 从 `/model list` 中选择一个模型。
   </Warning>
 
-Example allowlist config:
+允许列表示例配置：
 
 ```json5
 {
@@ -132,9 +139,9 @@ Example allowlist config:
 }
 ```
 
-## Switching models in chat (`/model`)
+## 在聊天中切换模型（`/model`）
 
-You can switch models for the current session without restarting:
+你可以为当前会话切换模型，而无需重启：
 
 ```
 /model
@@ -145,32 +152,32 @@ You can switch models for the current session without restarting:
 ```
 
 <AccordionGroup>
-  <Accordion title="Picker behavior">
-    - `/model` (and `/model list`) is a compact, numbered picker (model family + available providers).
-    - On Discord, `/model` and `/models` open an interactive picker with provider and model dropdowns plus a Submit step.
-    - `/models add` is deprecated and now returns a deprecation message instead of registering models from chat.
-    - `/model <#>` selects from that picker.
+  <Accordion title="选择器行为">
+    - `/model`（以及 `/model list`）是一个紧凑的编号选择器（模型家族 + 可用提供商）。
+    - 在 Discord 上，`/model` 和 `/models` 会打开一个交互式选择器，包含提供商和模型下拉菜单，以及一个提交步骤。
+    - `/models add` 已弃用，现在会返回弃用提示消息，而不是从聊天中注册模型。
+    - `/model <#>` 会从该选择器中进行选择。
   </Accordion>
-  <Accordion title="Persistence and live switching">
-    - `/model` persists the new session selection immediately.
-    - If the agent is idle, the next run uses the new model right away.
-    - If a run is already active, OpenClaw marks a live switch as pending and only restarts into the new model at a clean retry point.
-    - If tool activity or reply output has already started, the pending switch can stay queued until a later retry opportunity or the next user turn.
-    - `/model status` is the detailed view (auth candidates and, when configured, provider endpoint `baseUrl` + `api` mode).
+  <Accordion title="持久化与实时切换">
+    - `/model` 会立即持久化新的会话选择。
+    - 如果智能体处于空闲状态，下一次运行会立即使用新模型。
+    - 如果某次运行已经处于活动状态，OpenClaw 会将实时切换标记为待处理，并且只会在一个干净的重试点重启进入新模型。
+    - 如果工具活动或回复输出已经开始，待处理切换可能会一直排队，直到稍后的重试机会或下一个用户轮次。
+    - `/model status` 是详细视图（凭证候选项，以及在已配置时显示提供商端点 `baseUrl` + `api` 模式）。
   </Accordion>
-  <Accordion title="Ref parsing">
-    - Model refs are parsed by splitting on the **first** `/`. Use `provider/model` when typing `/model <ref>`.
-    - If the model ID itself contains `/` (OpenRouter-style), you must include the provider prefix (example: `/model openrouter/moonshotai/kimi-k2`).
-    - If you omit the provider, OpenClaw resolves the input in this order:
-      1. alias match
-      2. unique configured-provider match for that exact unprefixed model id
-      3. deprecated fallback to the configured default provider — if that provider no longer exposes the configured default model, OpenClaw instead falls back to the first configured provider/model to avoid surfacing a stale removed-provider default.
+  <Accordion title="引用解析">
+    - 模型引用会通过在**第一个** `/` 处分割来解析。输入 `/model <ref>` 时请使用 `provider/model`。
+    - 如果模型 id 本身包含 `/`（OpenRouter 风格），你必须包含提供商前缀（示例：`/model openrouter/moonshotai/kimi-k2`）。
+    - 如果你省略了提供商，OpenClaw 会按以下顺序解析输入：
+      1. 别名匹配
+      2. 对该精确无前缀模型 id 的唯一已配置提供商匹配
+      3. 已弃用的回退：回退到已配置的默认提供商——如果该提供商不再暴露已配置的默认模型，OpenClaw 会改为回退到第一个已配置的提供商/模型，以避免暴露过时的、已移除提供商默认值。
   </Accordion>
 </AccordionGroup>
 
-Full command behavior/config: [Slash commands](/tools/slash-commands).
+完整命令行为/配置：参见 [Slash 命令](/zh-CN/tools/slash-commands)。
 
-## CLI commands
+## CLI 命令
 
 ```bash
 openclaw models list
@@ -193,127 +200,127 @@ openclaw models image-fallbacks remove <provider/model>
 openclaw models image-fallbacks clear
 ```
 
-`openclaw models` (no subcommand) is a shortcut for `models status`.
+`openclaw models`（无子命令）是 `models status` 的快捷方式。
 
 ### `models list`
 
-Shows configured models by default. Useful flags:
+默认显示已配置的模型。常用标志：
 
 <ParamField path="--all" type="boolean">
-  Full catalog. Includes bundled provider-owned static catalog rows before auth is configured, so discovery-only views can show models that are unavailable until you add matching provider credentials.
+  完整目录。包括在配置凭证之前由内置提供商拥有的静态目录行，因此仅发现视图也能显示那些在你添加匹配提供商凭证之前不可用的模型。
 </ParamField>
 <ParamField path="--local" type="boolean">
-  Local providers only.
+  仅本地提供商。
 </ParamField>
 <ParamField path="--provider <id>" type="string">
-  Filter by provider id, for example `moonshot`. Display labels from interactive pickers are not accepted.
+  按提供商 id 过滤，例如 `moonshot`。不接受交互式选择器中的显示标签。
 </ParamField>
 <ParamField path="--plain" type="boolean">
-  One model per line.
+  每行一个模型。
 </ParamField>
 <ParamField path="--json" type="boolean">
-  Machine-readable output.
+  机器可读输出。
 </ParamField>
 
 ### `models status`
 
-Shows the resolved primary model, fallbacks, image model, and an auth overview of configured providers. It also surfaces OAuth expiry status for profiles found in the auth store (warns within 24h by default). `--plain` prints only the resolved primary model.
+显示已解析的主模型、回退模型、图像模型，以及已配置提供商的凭证概览。它还会显示在凭证存储中找到的配置文件的 OAuth 到期状态（默认会在 24 小时内发出警告）。`--plain` 仅打印已解析的主模型。
 
 <AccordionGroup>
-  <Accordion title="Auth and probe behavior">
-    - OAuth status is always shown (and included in `--json` output). If a configured provider has no credentials, `models status` prints a **Missing auth** section.
-    - JSON includes `auth.oauth` (warn window + profiles) and `auth.providers` (effective auth per provider, including env-backed credentials). `auth.oauth` is auth-store profile health only; env-only providers do not appear there.
-    - Use `--check` for automation (exit `1` when missing/expired, `2` when expiring).
-    - Use `--probe` for live auth checks; probe rows can come from auth profiles, env credentials, or `models.json`.
-    - If explicit `auth.order.<provider>` omits a stored profile, probe reports `excluded_by_auth_order` instead of trying it. If auth exists but no probeable model can be resolved for that provider, probe reports `status: no_model`.
+  <Accordion title="凭证与探测行为">
+    - OAuth 状态始终会显示（并包含在 `--json` 输出中）。如果某个已配置提供商没有凭证，`models status` 会打印 **缺少凭证** 部分。
+    - JSON 包含 `auth.oauth`（警告窗口 + 配置文件）和 `auth.providers`（每个提供商的有效凭证，包括由环境变量支持的凭证）。`auth.oauth` 仅表示凭证存储配置文件的健康状态；仅使用环境变量的提供商不会出现在其中。
+    - 自动化场景请使用 `--check`（缺失/已过期时退出码为 `1`，即将过期时为 `2`）。
+    - 实时凭证检查请使用 `--probe`；探测行可来自凭证配置文件、环境变量凭证或 `models.json`。
+    - 如果显式的 `auth.order.<provider>` 省略了某个已存储的配置文件，探测会报告 `excluded_by_auth_order`，而不是尝试它。如果凭证存在但无法为该提供商解析出可探测模型，探测会报告 `status: no_model`。
   </Accordion>
 </AccordionGroup>
 
 <Note>
-Auth choice is provider/account dependent. For always-on gateway hosts, API keys are usually the most predictable; Claude CLI reuse and existing Anthropic OAuth/token profiles are also supported.
+凭证选择取决于提供商/账户。对于始终在线的 Gateway 网关主机，API 密钥通常是最可预测的；也支持重用 Claude CLI 以及现有的 Anthropic OAuth/token 配置文件。
 </Note>
 
-Example (Claude CLI):
+示例（Claude CLI）：
 
 ```bash
 claude auth login
 openclaw models status
 ```
 
-## Scanning (OpenRouter free models)
+## 扫描（OpenRouter 免费模型）
 
-`openclaw models scan` inspects OpenRouter's **free model catalog** and can optionally probe models for tool and image support.
+`openclaw models scan` 会检查 OpenRouter 的**免费模型目录**，并且可以选择性地探测模型是否支持工具和图像。
 
 <ParamField path="--no-probe" type="boolean">
-  Skip live probes (metadata only).
+  跳过实时探测（仅元数据）。
 </ParamField>
 <ParamField path="--min-params <b>" type="number">
-  Minimum parameter size (billions).
+  最小参数规模（十亿）。
 </ParamField>
 <ParamField path="--max-age-days <days>" type="number">
-  Skip older models.
+  跳过较旧的模型。
 </ParamField>
 <ParamField path="--provider <name>" type="string">
-  Provider prefix filter.
+  提供商前缀过滤器。
 </ParamField>
 <ParamField path="--max-candidates <n>" type="number">
-  Fallback list size.
+  回退列表大小。
 </ParamField>
 <ParamField path="--set-default" type="boolean">
-  Set `agents.defaults.model.primary` to the first selection.
+  将 `agents.defaults.model.primary` 设置为第一个选中的模型。
 </ParamField>
 <ParamField path="--set-image" type="boolean">
-  Set `agents.defaults.imageModel.primary` to the first image selection.
+  将 `agents.defaults.imageModel.primary` 设置为第一个选中的图像模型。
 </ParamField>
 
 <Note>
-The OpenRouter `/models` catalog is public, so metadata-only scans can list free candidates without a key. Probing and inference still require an OpenRouter API key (from auth profiles or `OPENROUTER_API_KEY`). If no key is available, `openclaw models scan` falls back to metadata-only output and leaves config unchanged. Use `--no-probe` to request metadata-only mode explicitly.
+OpenRouter 的 `/models` 目录是公开的，因此仅元数据扫描无需密钥也可列出免费候选模型。探测和推理仍然需要 OpenRouter API 密钥（来自凭证配置文件或 `OPENROUTER_API_KEY`）。如果没有可用密钥，`openclaw models scan` 会回退为仅元数据输出，并保持配置不变。使用 `--no-probe` 可显式请求仅元数据模式。
 </Note>
 
-Scan results are ranked by:
+扫描结果按以下标准排序：
 
-1. Image support
-2. Tool latency
-3. Context size
-4. Parameter count
+1. 图像支持
+2. 工具延迟
+3. 上下文大小
+4. 参数数量
 
-Input:
+输入：
 
-- OpenRouter `/models` list (filter `:free`)
-- Live probes require OpenRouter API key from auth profiles or `OPENROUTER_API_KEY` (see [Environment variables](/help/environment))
-- Optional filters: `--max-age-days`, `--min-params`, `--provider`, `--max-candidates`
-- Request/probe controls: `--timeout`, `--concurrency`
+- OpenRouter `/models` 列表（过滤 `:free`）
+- 实时探测需要来自凭证配置文件或 `OPENROUTER_API_KEY` 的 OpenRouter API 密钥（参见 [环境变量](/zh-CN/help/environment)）
+- 可选过滤器：`--max-age-days`、`--min-params`、`--provider`、`--max-candidates`
+- 请求/探测控制：`--timeout`、`--concurrency`
 
-When live probes run in a TTY, you can select fallbacks interactively. In non-interactive mode, pass `--yes` to accept defaults. Metadata-only results are informational; `--set-default` and `--set-image` require live probes so OpenClaw does not configure an unusable keyless OpenRouter model.
+当实时探测在 TTY 中运行时，你可以以交互方式选择回退模型。在非交互模式下，传入 `--yes` 以接受默认值。仅元数据结果仅供参考；`--set-default` 和 `--set-image` 需要实时探测，这样 OpenClaw 才不会配置一个无法使用、且无密钥的 OpenRouter 模型。
 
-## Models registry (`models.json`)
+## 模型注册表（`models.json`）
 
-Custom providers in `models.providers` are written into `models.json` under the agent directory (default `~/.openclaw/agents/<agentId>/agent/models.json`). This file is merged by default unless `models.mode` is set to `replace`.
+`models.providers` 中的自定义提供商会写入智能体目录下的 `models.json`（默认是 `~/.openclaw/agents/<agentId>/agent/models.json`）。默认情况下，该文件会被合并，除非将 `models.mode` 设置为 `replace`。
 
 <AccordionGroup>
-  <Accordion title="Merge mode precedence">
-    Merge mode precedence for matching provider IDs:
+  <Accordion title="合并模式优先级">
+    匹配的提供商 ID 的合并模式优先级：
 
-    - Non-empty `baseUrl` already present in the agent `models.json` wins.
-    - Non-empty `apiKey` in the agent `models.json` wins only when that provider is not SecretRef-managed in current config/auth-profile context.
-    - SecretRef-managed provider `apiKey` values are refreshed from source markers (`ENV_VAR_NAME` for env refs, `secretref-managed` for file/exec refs) instead of persisting resolved secrets.
-    - SecretRef-managed provider header values are refreshed from source markers (`secretref-env:ENV_VAR_NAME` for env refs, `secretref-managed` for file/exec refs).
-    - Empty or missing agent `apiKey`/`baseUrl` fall back to config `models.providers`.
-    - Other provider fields are refreshed from config and normalized catalog data.
+    - 智能体 `models.json` 中已存在的非空 `baseUrl` 优先。
+    - 智能体 `models.json` 中的非空 `apiKey` 仅在当前配置/凭证配置文件上下文中该提供商不是 SecretRef 管理时优先。
+    - 由 SecretRef 管理的提供商 `apiKey` 值会从源标记刷新（环境变量引用使用 `ENV_VAR_NAME`，文件/exec 引用使用 `secretref-managed`），而不是持久化已解析的密钥。
+    - 由 SecretRef 管理的提供商请求头值会从源标记刷新（环境变量引用使用 `secretref-env:ENV_VAR_NAME`，文件/exec 引用使用 `secretref-managed`）。
+    - 智能体中为空或缺失的 `apiKey`/`baseUrl` 会回退到配置中的 `models.providers`。
+    - 其他提供商字段会从配置和标准化后的目录数据中刷新。
 
   </Accordion>
 </AccordionGroup>
 
 <Note>
-Marker persistence is source-authoritative: OpenClaw writes markers from the active source config snapshot (pre-resolution), not from resolved runtime secret values. This applies whenever OpenClaw regenerates `models.json`, including command-driven paths like `openclaw agent`.
+标记持久化以源为准：OpenClaw 从活动源配置快照（预解析）中写入标记，而不是从已解析的运行时密钥值中写入。只要 OpenClaw 重新生成 `models.json`，这一点就适用，包括像 `openclaw agent` 这样的命令驱动路径。
 </Note>
 
-## Related
+## 相关内容
 
-- [Agent runtimes](/concepts/agent-runtimes) — PI, Codex, and other agent loop runtimes
-- [Configuration reference](/gateway/config-agents#agent-defaults) — model config keys
-- [Image generation](/tools/image-generation) — image model configuration
-- [Model failover](/concepts/model-failover) — fallback chains
-- [Model providers](/concepts/model-providers) — provider routing and auth
-- [Music generation](/tools/music-generation) — music model configuration
-- [Video generation](/tools/video-generation) — video model configuration
+- [Agent Runtimes](/zh-CN/concepts/agent-runtimes) — PI、Codex 和其他智能体循环运行时
+- [配置参考](/zh-CN/gateway/config-agents#agent-defaults) — 模型配置键
+- [图像生成](/zh-CN/tools/image-generation) — 图像模型配置
+- [模型故障切换](/zh-CN/concepts/model-failover) — 回退链
+- [模型提供商](/zh-CN/concepts/model-providers) — 提供商路由与凭证
+- [音乐生成](/zh-CN/tools/music-generation) — 音乐模型配置
+- [视频生成](/zh-CN/tools/video-generation) — 视频模型配置

@@ -1,33 +1,38 @@
 ---
-summary: "Community-maintained OpenClaw plugins: browse, install, and submit your own"
 read_when:
-  - You want to find third-party OpenClaw plugins
-  - You want to publish or list your own plugin
-title: "Community plugins"
+    - 你想查找第三方 OpenClaw 插件
+    - 你想发布或列出你自己的插件
+summary: 社区维护的 OpenClaw 插件：浏览、安装并提交你自己的插件
+title: 社区插件
+x-i18n:
+    generated_at: "2026-04-26T00:16:04Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 3af2f0be5e5e75fe26a58576e6f44bce52a1ff8d597f86cafd8fb893f6c6b8f4
+    source_path: plugins/community.md
+    workflow: 15
 ---
 
-Community plugins are third-party packages that extend OpenClaw with new
-channels, tools, providers, or other capabilities. They are built and maintained
-by the community, published on [ClawHub](/tools/clawhub) or npm, and
-installable with a single command.
+社区插件是用于扩展 OpenClaw 的第三方软件包，可添加新的
+渠道、工具、提供商或其他能力。它们由社区构建和维护，发布到 [ClawHub](/zh-CN/tools/clawhub) 或 npm，并且
+可通过一条命令安装。
 
-ClawHub is the canonical discovery surface for community plugins. Do not open
-docs-only PRs just to add your plugin here for discoverability; publish it on
-ClawHub instead.
+ClawHub 是社区插件的权威发现入口。不要仅仅为了让你的插件能在这里被发现而提交只改文档的 PR；请改为将它发布到
+ClawHub。
 
 ```bash
 openclaw plugins install <package-name>
 ```
 
-OpenClaw checks ClawHub first and falls back to npm automatically.
+OpenClaw 会先检查 ClawHub，并自动回退到 npm。
 
-## Listed plugins
+## 已列出的插件
 
 ### Apify
 
-Scrape data from any website with 20,000+ ready-made scrapers. Let your agent
-extract data from Instagram, Facebook, TikTok, YouTube, Google Maps, Google
-Search, e-commerce sites, and more — just by asking.
+使用 20,000 多个现成爬虫从任意网站抓取数据。只需提出请求，你的智能体
+就能从 Instagram、Facebook、TikTok、YouTube、Google Maps、Google
+Search、电商网站等提取数据。
 
 - **npm:** `@apify/apify-openclaw-plugin`
 - **repo:** [github.com/apify/apify-openclaw-plugin](https://github.com/apify/apify-openclaw-plugin)
@@ -38,9 +43,8 @@ openclaw plugins install @apify/apify-openclaw-plugin
 
 ### Codex App Server Bridge
 
-Independent OpenClaw bridge for Codex App Server conversations. Bind a chat to
-a Codex thread, talk to it with plain text, and control it with chat-native
-commands for resume, planning, review, model selection, compaction, and more.
+面向 Codex App Server 对话的独立 OpenClaw 桥接插件。将聊天绑定到
+Codex 线程，使用纯文本与其交流，并通过聊天原生命令控制恢复、规划、审查、模型选择、压缩等功能。
 
 - **npm:** `openclaw-codex-app-server`
 - **repo:** [github.com/pwrdrvr/openclaw-codex-app-server](https://github.com/pwrdrvr/openclaw-codex-app-server)
@@ -51,8 +55,8 @@ openclaw plugins install openclaw-codex-app-server
 
 ### DingTalk
 
-Enterprise robot integration using Stream mode. Supports text, images, and
-file messages via any DingTalk client.
+使用 Stream 模式的企业机器人集成。支持通过任意 DingTalk 客户端发送文本、图片和
+文件消息。
 
 - **npm:** `@largezhou/ddingtalk`
 - **repo:** [github.com/largezhou/openclaw-dingtalk](https://github.com/largezhou/openclaw-dingtalk)
@@ -63,9 +67,8 @@ openclaw plugins install @largezhou/ddingtalk
 
 ### Lossless Claw (LCM)
 
-Lossless Context Management plugin for OpenClaw. DAG-based conversation
-summarization with incremental compaction — preserves full context fidelity
-while reducing token usage.
+面向 OpenClaw 的无损上下文管理插件。基于 DAG 的会话摘要
+和增量压缩——在减少 token 使用量的同时保留完整上下文保真度。
 
 - **npm:** `@martian-engineering/lossless-claw`
 - **repo:** [github.com/Martian-Engineering/lossless-claw](https://github.com/Martian-Engineering/lossless-claw)
@@ -76,8 +79,8 @@ openclaw plugins install @martian-engineering/lossless-claw
 
 ### Opik
 
-Official plugin that exports agent traces to Opik. Monitor agent behavior,
-cost, tokens, errors, and more.
+将智能体追踪导出到 Opik 的官方插件。可监控智能体行为、
+成本、token、错误等。
 
 - **npm:** `@opik/opik-openclaw`
 - **repo:** [github.com/comet-ml/opik-openclaw](https://github.com/comet-ml/opik-openclaw)
@@ -88,9 +91,9 @@ openclaw plugins install @opik/opik-openclaw
 
 ### Prometheus Avatar
 
-Give your OpenClaw agent a Live2D avatar with real-time lip-sync, emotion
-expressions, and text-to-speech. Includes creator tools for AI asset generation
-and one-click deployment to the Prometheus Marketplace. Currently in alpha.
+为你的 OpenClaw 智能体提供一个具有实时口型同步、情绪
+表情和文本转语音功能的 Live2D 虚拟形象。包含用于 AI 资产生成的创作者工具，
+以及一键部署到 Prometheus Marketplace 的能力。目前处于 alpha 阶段。
 
 - **npm:** `@prometheusavatar/openclaw-plugin`
 - **repo:** [github.com/myths-labs/prometheus-avatar](https://github.com/myths-labs/prometheus-avatar)
@@ -101,13 +104,13 @@ openclaw plugins install @prometheusavatar/openclaw-plugin
 
 ### QQbot
 
-Connect OpenClaw to QQ via the QQ Bot API. Supports private chats, group
-mentions, channel messages, and rich media including voice, images, videos,
-and files.
+通过 QQ Bot API 将 OpenClaw 连接到 QQ。支持私聊、群组
+提及、渠道消息，以及包括语音、图片、视频
+和文件在内的富媒体。
 
-Current OpenClaw releases bundle QQ Bot. Use the bundled setup in
-[QQ Bot](/channels/qqbot) for normal installs; install this external plugin only
-when you intentionally want the Tencent-maintained standalone package.
+当前的 OpenClaw 版本已内置 QQ Bot。正常安装请使用
+[QQ Bot](/zh-CN/channels/qqbot) 中的内置设置；仅当你明确希望使用腾讯维护的独立软件包时，
+才安装这个外部插件。
 
 - **npm:** `@tencent-connect/openclaw-qqbot`
 - **repo:** [github.com/tencent-connect/openclaw-qqbot](https://github.com/tencent-connect/openclaw-qqbot)
@@ -118,10 +121,10 @@ openclaw plugins install @tencent-connect/openclaw-qqbot
 
 ### wecom
 
-WeCom channel plugin for OpenClaw by the Tencent WeCom team. Powered by
-WeCom Bot WebSocket persistent connections, it supports direct messages & group
-chats, streaming replies, proactive messaging, image/file processing, Markdown
-formatting, built-in access control, and document/meeting/messaging skills.
+由腾讯 WeCom 团队开发的 OpenClaw WeCom 渠道插件。基于
+WeCom Bot WebSocket 持久连接，
+支持私信和群聊、流式回复、主动消息发送、图片/文件处理、Markdown
+格式化、内置访问控制，以及文档/会议/消息技能。
 
 - **npm:** `@wecom/wecom-openclaw-plugin`
 - **repo:** [github.com/WecomTeam/wecom-openclaw-plugin](https://github.com/WecomTeam/wecom-openclaw-plugin)
@@ -130,48 +133,48 @@ formatting, built-in access control, and document/meeting/messaging skills.
 openclaw plugins install @wecom/wecom-openclaw-plugin
 ```
 
-## Submit your plugin
+## 提交你的插件
 
-We welcome community plugins that are useful, documented, and safe to operate.
+我们欢迎实用、有文档并且可安全运行的社区插件。
 
 <Steps>
-  <Step title="Publish to ClawHub or npm">
-    Your plugin must be installable via `openclaw plugins install \<package-name\>`.
-    Publish to [ClawHub](/tools/clawhub) (preferred) or npm.
-    See [Building Plugins](/plugins/building-plugins) for the full guide.
+  <Step title="发布到 ClawHub 或 npm">
+    你的插件必须可通过 `openclaw plugins install \<package-name\>` 安装。
+    发布到 [ClawHub](/zh-CN/tools/clawhub)（推荐）或 npm。
+    完整指南请参见[构建插件](/zh-CN/plugins/building-plugins)。
 
   </Step>
 
-  <Step title="Host on GitHub">
-    Source code must be in a public repository with setup docs and an issue
-    tracker.
+  <Step title="托管在 GitHub 上">
+    源代码必须位于带有设置文档和 issue
+    跟踪器的公开仓库中。
 
   </Step>
 
-  <Step title="Use docs PRs only for source-doc changes">
-    You do not need a docs PR just to make your plugin discoverable. Publish it
-    on ClawHub instead.
+  <Step title="仅在源文档需要更改时使用文档 PR">
+    你不需要仅为了让你的插件可被发现而提交文档 PR。请改为将它发布到
+    ClawHub。
 
-    Open a docs PR only when OpenClaw's source docs need an actual content
-    change, such as correcting install guidance or adding cross-repo
-    documentation that belongs in the main docs set.
+    只有当 OpenClaw 的源文档确实需要内容
+    更改时，才提交文档 PR，例如更正安装指引，或添加属于主文档集的
+    跨仓库文档。
 
   </Step>
 </Steps>
 
-## Quality bar
+## 质量门槛
 
-| Requirement                 | Why                                           |
+| 要求 | 原因 |
 | --------------------------- | --------------------------------------------- |
-| Published on ClawHub or npm | Users need `openclaw plugins install` to work |
-| Public GitHub repo          | Source review, issue tracking, transparency   |
-| Setup and usage docs        | Users need to know how to configure it        |
-| Active maintenance          | Recent updates or responsive issue handling   |
+| 发布到 ClawHub 或 npm | 用户需要 `openclaw plugins install` 能正常工作 |
+| 公开的 GitHub 仓库 | 便于审查源码、跟踪 issue，并保证透明度 |
+| 设置和使用文档 | 用户需要知道如何配置它 |
+| 持续维护 | 有近期更新或能及时响应 issue 处理 |
 
-Low-effort wrappers, unclear ownership, or unmaintained packages may be declined.
+低质量封装、归属不明确或无人维护的软件包可能会被拒绝。
 
-## Related
+## 相关内容
 
-- [Install and Configure Plugins](/tools/plugin) — how to install any plugin
-- [Building Plugins](/plugins/building-plugins) — create your own
-- [Plugin Manifest](/plugins/manifest) — manifest schema
+- [安装和配置插件](/zh-CN/tools/plugin) — 如何安装任意插件
+- [构建插件](/zh-CN/plugins/building-plugins) — 创建你自己的插件
+- [插件清单](/zh-CN/plugins/manifest) — 清单 schema

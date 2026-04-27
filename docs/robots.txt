@@ -1,0 +1,21 @@
+# 允许所有搜索引擎爬取
+User-agent: *
+Allow: /
+
+# Mintlify 会自动生成 sitemap.xml
+# Sitemap: https://clawcn.me/sitemap.xml
+
+# 禁止爬取敏感路径
+Disallow: /api/
+Disallow: /.generated/
+Disallow: /.i18n/
+
+# 针对 Googlebot 的优化
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# 针对 Bingbot 的优化
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1

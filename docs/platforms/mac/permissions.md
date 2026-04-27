@@ -1,36 +1,43 @@
 ---
-summary: "macOS permission persistence (TCC) and signing requirements"
 read_when:
-  - Debugging missing or stuck macOS permission prompts
-  - Packaging or signing the macOS app
-  - Changing bundle IDs or app install paths
-title: "macOS permissions"
+    - 调试缺失或卡住的 macOS 权限提示框
+    - 打包或签名 macOS 应用
+    - 更改 bundle ID 或应用安装路径
+summary: macOS 权限持久化（TCC）与签名要求
+title: macOS 权限
+x-i18n:
+    generated_at: "2026-04-24T04:05:47Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c9ee8ee6409577094a0ba1bc4a50c73560741c12cbb1b3c811cb684ac150e05e
+    source_path: platforms/mac/permissions.md
+    workflow: 15
 ---
 
-macOS permission grants are fragile. TCC associates a permission grant with the
-app's code signature, bundle identifier, and on-disk path. If any of those change,
-macOS treats the app as new and may drop or hide prompts.
+macOS 权限授予很脆弱。TCC 会将权限授予与应用的
+代码签名、bundle identifier 以及磁盘路径关联起来。如果其中任何一项发生变化，
+macOS 都会将该应用视为新应用，并可能丢弃或隐藏提示框。
 
-## Requirements for stable permissions
+## 稳定权限的要求
 
-- Same path: run the app from a fixed location (for OpenClaw, `dist/OpenClaw.app`).
-- Same bundle identifier: changing the bundle ID creates a new permission identity.
-- Signed app: unsigned or ad-hoc signed builds do not persist permissions.
-- Consistent signature: use a real Apple Development or Developer ID certificate
-  so the signature stays stable across rebuilds.
+- 相同路径：从固定位置运行应用（对于 OpenClaw，即 `dist/OpenClaw.app`）。
+- 相同 bundle identifier：更改 bundle ID 会创建新的权限身份。
+- 已签名应用：未签名或 ad-hoc 签名的构建不会持久保留权限。
+- 一致的签名：使用真实的 Apple Development 或 Developer ID 证书，
+  这样签名在多次重建之间才能保持稳定。
 
-Ad-hoc signatures generate a new identity every build. macOS will forget previous
-grants, and prompts can disappear entirely until the stale entries are cleared.
+ad-hoc 签名每次构建都会生成一个新的身份。macOS 会忘记之前的
+授权，而且在清除过期条目之前，提示框甚至可能完全消失。
 
-## Recovery checklist when prompts disappear
+## 当提示框消失时的恢复清单
 
-1. Quit the app.
-2. Remove the app entry in System Settings -> Privacy & Security.
-3. Relaunch the app from the same path and re-grant permissions.
-4. If the prompt still does not appear, reset TCC entries with `tccutil` and try again.
-5. Some permissions only reappear after a full macOS restart.
+1. 退出应用。
+2. 在系统设置 -> 隐私与安全性中移除该应用条目。
+3. 从相同路径重新启动应用，并重新授予权限。
+4. 如果提示框仍未出现，使用 `tccutil` 重置 TCC 条目后再试一次。
+5. 某些权限只有在 macOS 完全重启后才会再次出现。
 
-Example resets (replace bundle ID as needed):
+重置示例（根据需要替换 bundle ID）：
 
 ```bash
 sudo tccutil reset Accessibility ai.openclaw.mac
@@ -38,16 +45,16 @@ sudo tccutil reset ScreenCapture ai.openclaw.mac
 sudo tccutil reset AppleEvents
 ```
 
-## Files and folders permissions (Desktop/Documents/Downloads)
+## 文件与文件夹权限（Desktop/Documents/Downloads）
 
-macOS may also gate Desktop, Documents, and Downloads for terminal/background processes. If file reads or directory listings hang, grant access to the same process context that performs file operations (for example Terminal/iTerm, LaunchAgent-launched app, or SSH process).
+macOS 也可能会对终端/后台进程访问 Desktop、Documents 和 Downloads 进行限制。如果文件读取或目录列举卡住，请将访问权限授予执行文件操作的同一进程上下文（例如 Terminal/iTerm、由 LaunchAgent 启动的应用，或 SSH 进程）。
 
-Workaround: move files into the OpenClaw workspace (`~/.openclaw/workspace`) if you want to avoid per-folder grants.
+变通方法：如果你想避免按文件夹分别授权，可将文件移动到 OpenClaw 工作区（`~/.openclaw/workspace`）。
 
-If you are testing permissions, always sign with a real certificate. Ad-hoc
-builds are only acceptable for quick local runs where permissions do not matter.
+如果你在测试权限，请始终使用真实证书签名。ad-hoc
+构建只适用于权限无关的快速本地运行。
 
-## Related
+## 相关内容
 
-- [macOS app](/platforms/macos)
-- [macOS signing](/platforms/mac/signing)
+- [macOS 应用](/zh-CN/platforms/macos)
+- [macOS 签名](/zh-CN/platforms/mac/signing)

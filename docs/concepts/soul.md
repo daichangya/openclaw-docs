@@ -1,62 +1,69 @@
 ---
-summary: "Use SOUL.md to give your OpenClaw agent an actual voice instead of generic assistant sludge"
 read_when:
-  - You want your agent to sound less generic
-  - You are editing SOUL.md
-  - You want a stronger personality without breaking safety or brevity
-title: "SOUL.md personality guide"
+    - 你希望你的智能体听起来不那么泛泛而谈
+    - 你正在编辑 SOUL.md
+    - 你想要更鲜明的个性，同时不破坏安全性或简洁性
+summary: 使用 SOUL.md 为你的 OpenClaw 智能体赋予真正的声音，而不是泛泛的助手腔调
+title: SOUL.md 个性指南
+x-i18n:
+    generated_at: "2026-04-23T20:47:33Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c0268ef086f272257c83e2147ec1f4fa7772645cdd93cdf59dd4e661a311830a
+    source_path: concepts/soul.md
+    workflow: 15
 ---
 
-`SOUL.md` is where your agent's voice lives.
+`SOUL.md` 是你的智能体声音所在的地方。
 
-OpenClaw injects it on normal sessions, so it has real weight. If your agent
-sounds bland, hedgy, or weirdly corporate, this is usually the file to fix.
+OpenClaw 会在普通会话中注入它，所以它确实有分量。如果你的智能体
+听起来平淡、过度保守，或者带着一种奇怪的企业腔，通常该修的就是这个文件。
 
-## What belongs in SOUL.md
+## 什么内容应该放进 SOUL.md
 
-Put the stuff that changes how the agent feels to talk to:
+把那些会改变智能体“聊起来感觉如何”的内容放进去：
 
-- tone
-- opinions
-- brevity
-- humor
-- boundaries
-- default level of bluntness
+- 语气
+- 观点
+- 简洁程度
+- 幽默感
+- 边界
+- 默认的直接程度
 
-Do **not** turn it into:
+**不要**把它写成：
 
-- a life story
-- a changelog
-- a security policy dump
-- a giant wall of vibes with no behavioral effect
+- 人生故事
+- 更新日志
+- 安全策略大杂烩
+- 一大堵没有行为效果的氛围废话
 
-Short beats long. Sharp beats vague.
+短胜于长。锋利胜于模糊。
 
-## Why this works
+## 为什么这招有效
 
-This lines up with OpenAI's prompt guidance:
+这和 OpenAI 的提示词指导是一致的：
 
-- The prompt engineering guide says high-level behavior, tone, goals, and
-  examples belong in the high-priority instruction layer, not buried in the
-  user turn.
-- The same guide recommends treating prompts like something you iterate on,
-  pin, and evaluate, not magical prose you write once and forget.
+- 提示工程指南指出，高层行为、语气、目标和
+  示例应放在高优先级指令层，而不是埋在
+  用户轮次里。
+- 同一份指南还建议，把提示词当作需要迭代、
+  固定版本并评估的东西，而不是写一次就丢的魔法文案。
 
-For OpenClaw, `SOUL.md` is that layer.
+对于 OpenClaw，`SOUL.md` 就是这一层。
 
-If you want better personality, write stronger instructions. If you want stable
-personality, keep them concise and versioned.
+如果你想要更好的个性，就写更有力的指令。如果你想要稳定的
+个性，就让它们保持简洁并做好版本管理。
 
-OpenAI refs:
+OpenAI 参考：
 
-- [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering)
-- [Message roles and instruction following](https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following)
+- [提示工程](https://developers.openai.com/api/docs/guides/prompt-engineering)
+- [消息角色与指令遵循](https://developers.openai.com/api/docs/guides/prompt-engineering#message-roles-and-instruction-following)
 
-## The Molty prompt
+## Molty 提示词
 
-Paste this into your agent and let it rewrite `SOUL.md`.
+把这段贴给你的智能体，让它重写 `SOUL.md`。
 
-Path fixed for OpenClaw workspaces: use `SOUL.md`, not `http://SOUL.md`.
+路径已针对 OpenClaw 工作区固定：请使用 `SOUL.md`，而不是 `http://SOUL.md`。
 
 ```md
 Read your `SOUL.md`. Now rewrite it with these changes:
@@ -73,36 +80,36 @@ Read your `SOUL.md`. Now rewrite it with these changes:
 Save the new `SOUL.md`. Welcome to having a personality.
 ```
 
-## What good looks like
+## 好的样子是什么
 
-Good `SOUL.md` rules sound like this:
+好的 `SOUL.md` 规则听起来会像这样：
 
-- have a take
-- skip filler
-- be funny when it fits
-- call out bad ideas early
-- stay concise unless depth is actually useful
+- 要有立场
+- 跳过废话
+- 合适时可以幽默
+- 尽早指出坏主意
+- 除非深入确实有用，否则保持简洁
 
-Bad `SOUL.md` rules sound like this:
+糟糕的 `SOUL.md` 规则听起来会像这样：
 
-- maintain professionalism at all times
-- provide comprehensive and thoughtful assistance
-- ensure a positive and supportive experience
+- 始终保持专业
+- 提供全面且周到的帮助
+- 确保积极且支持性的体验
 
-That second list is how you get mush.
+第二组规则会把你的智能体变成一团糊状物。
 
-## One warning
+## 一个警告
 
-Personality is not permission to be sloppy.
+有个性，不等于可以敷衍。
 
-Keep `AGENTS.md` for operating rules. Keep `SOUL.md` for voice, stance, and
-style. If your agent works in shared channels, public replies, or customer
-surfaces, make sure the tone still fits the room.
+把 `AGENTS.md` 留给操作规则。把 `SOUL.md` 留给声音、立场和
+风格。如果你的智能体工作在共享渠道、公开回复或面向客户的
+场景中，请确保语气仍然适合那个环境。
 
-Sharp is good. Annoying is not.
+锋利是好事。烦人不是。
 
-## Related docs
+## 相关文档
 
-- [Agent workspace](/concepts/agent-workspace)
-- [System prompt](/concepts/system-prompt)
-- [SOUL.md template](/reference/templates/SOUL)
+- [智能体工作区](/zh-CN/concepts/agent-workspace)
+- [系统提示词](/zh-CN/concepts/system-prompt)
+- [SOUL.md 模板](/zh-CN/reference/templates/SOUL)

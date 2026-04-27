@@ -1,58 +1,63 @@
 ---
-summary: "Run OpenClaw with Ollama (cloud and local models)"
 read_when:
-  - You want to run OpenClaw with cloud or local models via Ollama
-  - You need Ollama setup and configuration guidance
-  - You want Ollama vision models for image understanding
-title: "Ollama"
+    - 你想通过 Ollama 使用云端或本地模型运行 OpenClaw
+    - 你需要 Ollama 的设置和配置指南
+    - 你想使用 Ollama 视觉模型进行图像理解
+summary: 使用 Ollama（云端和本地模型）运行 OpenClaw
+title: Ollama
+x-i18n:
+    generated_at: "2026-04-27T02:57:26Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 2347bab12354fbcf4065eec923695f1cc71eb2740f6fd589c9b70c0b71794469
+    source_path: providers/ollama.md
+    workflow: 15
 ---
 
-OpenClaw integrates with Ollama's native API (`/api/chat`) for hosted cloud models and local/self-hosted Ollama servers. You can use Ollama in three modes: `Cloud + Local` through a reachable Ollama host, `Cloud only` against `https://ollama.com`, or `Local only` against a reachable Ollama host.
+OpenClaw 可通过 Ollama 的原生 API（`/api/chat`）集成托管云模型以及本地/自托管 Ollama 服务器。你可以通过三种模式使用 Ollama：通过可访问的 Ollama 主机使用 `Cloud + Local`、针对 `https://ollama.com` 使用 `Cloud only`，或针对可访问的 Ollama 主机使用 `Local only`。
 
 <Warning>
-**Remote Ollama users**: Do not use the `/v1` OpenAI-compatible URL (`http://host:11434/v1`) with OpenClaw. This breaks tool calling and models may output raw tool JSON as plain text. Use the native Ollama API URL instead: `baseUrl: "http://host:11434"` (no `/v1`).
+**远程 Ollama 用户**：不要在 OpenClaw 中使用 `/v1` OpenAI 兼容 URL（`http://host:11434/v1`）。这会破坏工具调用，模型还可能把原始工具 JSON 当作纯文本输出。请改用原生 Ollama API URL：`baseUrl: "http://host:11434"`（不带 `/v1`）。
 </Warning>
 
-Ollama provider config uses `baseUrl` as the canonical key. OpenClaw also accepts `baseURL` for compatibility with OpenAI SDK-style examples, but new config should prefer `baseUrl`.
+Ollama 提供商配置使用 `baseUrl` 作为规范键名。OpenClaw 也接受 `baseURL`，以兼容 OpenAI SDK 风格的示例，但新配置应优先使用 `baseUrl`。
 
-Local and LAN Ollama hosts do not need a real bearer token; OpenClaw uses the local `ollama-local` marker only for loopback, private-network, `.local`, and bare-hostname Ollama base URLs. Remote public hosts and Ollama Cloud (`https://ollama.com`) require a real credential through `OLLAMA_API_KEY`, an auth profile, or the provider's `apiKey`.
+本地和局域网 Ollama 主机不需要真实的 bearer token；对于 loopback、私有网络、`.local` 和裸主机名 Ollama base URL，OpenClaw 仅使用本地 `ollama-local` 标记。远程公共主机和 Ollama Cloud（`https://ollama.com`）则需要通过 `OLLAMA_API_KEY`、auth profile 或提供商的 `apiKey` 提供真实凭证。
 
-Custom provider ids that set `api: "ollama"` use the same auth rules. For example, an `ollama-remote` provider that points at a private LAN Ollama host can use `apiKey: "ollama-local"` and sub-agents will resolve that marker through the Ollama provider hook instead of treating it as a missing credential.
+当 Ollama 用于 memory embeddings 时，bearer 认证会限定在声明它的主机范围内。提供商级别的密钥只会发送到该提供商的 Ollama 主机；`agents.*.memorySearch.remote.apiKey` 只会发送到其远程 embedding 主机；单独的 `OLLAMA_API_KEY` 环境变量值则会被视为 Ollama Cloud 的约定，而不会默认发送到本地/自托管主机。
 
-When Ollama is used for memory embeddings, bearer auth is scoped to the host where it was declared. A provider-level key is sent only to that provider's Ollama host; `agents.*.memorySearch.remote.apiKey` is sent only to its remote embedding host; and a pure `OLLAMA_API_KEY` env value is treated as the Ollama Cloud convention rather than being sent to local/self-hosted hosts by default.
+## 入门指南
 
-## Getting started
-
-Choose your preferred setup method and mode.
+选择你偏好的设置方式和模式。
 
 <Tabs>
-  <Tab title="Onboarding (recommended)">
-    **Best for:** fastest path to a working Ollama cloud or local setup.
+  <Tab title="新手引导（推荐）">
+    **最适合：** 以最快路径完成可用的 Ollama 云端或本地设置。
 
     <Steps>
-      <Step title="Run onboarding">
+      <Step title="运行新手引导">
         ```bash
         openclaw onboard
         ```
 
-        Select **Ollama** from the provider list.
+        从提供商列表中选择 **Ollama**。
       </Step>
-      <Step title="Choose your mode">
-        - **Cloud + Local** — local Ollama host plus cloud models routed through that host
-        - **Cloud only** — hosted Ollama models via `https://ollama.com`
-        - **Local only** — local models only
+      <Step title="选择你的模式">
+        - **Cloud + Local** — 本地 Ollama 主机，加上经由该主机路由的云模型
+        - **Cloud only** — 通过 `https://ollama.com` 使用托管 Ollama 模型
+        - **Local only** — 仅使用本地模型
       </Step>
-      <Step title="Select a model">
-        `Cloud only` prompts for `OLLAMA_API_KEY` and suggests hosted cloud defaults. `Cloud + Local` and `Local only` ask for an Ollama base URL, discover available models, and auto-pull the selected local model if it is not available yet. `Cloud + Local` also checks whether that Ollama host is signed in for cloud access.
+      <Step title="选择一个模型">
+        `Cloud only` 会提示输入 `OLLAMA_API_KEY`，并建议使用托管云默认模型。`Cloud + Local` 和 `Local only` 会要求提供 Ollama base URL，发现可用模型，并在所选本地模型尚不可用时自动拉取该模型。`Cloud + Local` 还会检查该 Ollama 主机是否已登录并具备云访问能力。
       </Step>
-      <Step title="Verify the model is available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list --provider ollama
         ```
       </Step>
     </Steps>
 
-    ### Non-interactive mode
+    ### 非交互模式
 
     ```bash
     openclaw onboard --non-interactive \
@@ -60,7 +65,7 @@ Choose your preferred setup method and mode.
       --accept-risk
     ```
 
-    Optionally specify a custom base URL or model:
+    你也可以选择性指定自定义 base URL 或模型：
 
     ```bash
     openclaw onboard --non-interactive \
@@ -72,45 +77,45 @@ Choose your preferred setup method and mode.
 
   </Tab>
 
-  <Tab title="Manual setup">
-    **Best for:** full control over cloud or local setup.
+  <Tab title="手动设置">
+    **最适合：** 完全控制云端或本地设置。
 
     <Steps>
-      <Step title="Choose cloud or local">
-        - **Cloud + Local**: install Ollama, sign in with `ollama signin`, and route cloud requests through that host
-        - **Cloud only**: use `https://ollama.com` with an `OLLAMA_API_KEY`
-        - **Local only**: install Ollama from [ollama.com/download](https://ollama.com/download)
+      <Step title="选择云端或本地">
+        - **Cloud + Local**：安装 Ollama，使用 `ollama signin` 登录，并通过该主机路由云请求
+        - **Cloud only**：使用 `https://ollama.com` 并提供 `OLLAMA_API_KEY`
+        - **Local only**：从 [ollama.com/download](https://ollama.com/download) 安装 Ollama
       </Step>
-      <Step title="Pull a local model (local only)">
+      <Step title="拉取本地模型（仅本地）">
         ```bash
         ollama pull gemma4
-        # or
+        # 或
         ollama pull gpt-oss:20b
-        # or
+        # 或
         ollama pull llama3.3
         ```
       </Step>
-      <Step title="Enable Ollama for OpenClaw">
-        For `Cloud only`, use your real `OLLAMA_API_KEY`. For host-backed setups, any placeholder value works:
+      <Step title="为 OpenClaw 启用 Ollama">
+        对于 `Cloud only`，请使用真实的 `OLLAMA_API_KEY`。对于基于主机的设置，任意占位值都可以：
 
         ```bash
-        # Cloud
+        # 云端
         export OLLAMA_API_KEY="your-ollama-api-key"
 
-        # Local-only
+        # 仅本地
         export OLLAMA_API_KEY="ollama-local"
 
-        # Or configure in your config file
+        # 或在你的配置文件中设置
         openclaw config set models.providers.ollama.apiKey "OLLAMA_API_KEY"
         ```
       </Step>
-      <Step title="Inspect and set your model">
+      <Step title="查看并设置你的模型">
         ```bash
         openclaw models list
         openclaw models set ollama/gemma4
         ```
 
-        Or set the default in config:
+        或者在配置中设置默认值：
 
         ```json5
         {
@@ -127,80 +132,80 @@ Choose your preferred setup method and mode.
   </Tab>
 </Tabs>
 
-## Cloud models
+## 云模型
 
 <Tabs>
   <Tab title="Cloud + Local">
-    `Cloud + Local` uses a reachable Ollama host as the control point for both local and cloud models. This is Ollama's preferred hybrid flow.
+    `Cloud + Local` 使用可访问的 Ollama 主机作为本地和云模型的统一控制点。这是 Ollama 首选的混合流程。
 
-    Use **Cloud + Local** during setup. OpenClaw prompts for the Ollama base URL, discovers local models from that host, and checks whether the host is signed in for cloud access with `ollama signin`. When the host is signed in, OpenClaw also suggests hosted cloud defaults such as `kimi-k2.5:cloud`, `minimax-m2.7:cloud`, and `glm-5.1:cloud`.
+    在设置期间使用 **Cloud + Local**。OpenClaw 会提示输入 Ollama base URL，从该主机发现本地模型，并检查该主机是否已通过 `ollama signin` 登录并具备云访问能力。当主机已登录时，OpenClaw 还会建议托管云默认模型，例如 `kimi-k2.5:cloud`、`minimax-m2.7:cloud` 和 `glm-5.1:cloud`。
 
-    If the host is not signed in yet, OpenClaw keeps the setup local-only until you run `ollama signin`.
+    如果该主机尚未登录，OpenClaw 会将设置保持为仅本地，直到你运行 `ollama signin`。
 
   </Tab>
 
   <Tab title="Cloud only">
-    `Cloud only` runs against Ollama's hosted API at `https://ollama.com`.
+    `Cloud only` 直接针对 Ollama 的托管 API `https://ollama.com` 运行。
 
-    Use **Cloud only** during setup. OpenClaw prompts for `OLLAMA_API_KEY`, sets `baseUrl: "https://ollama.com"`, and seeds the hosted cloud model list. This path does **not** require a local Ollama server or `ollama signin`.
+    在设置期间使用 **Cloud only**。OpenClaw 会提示输入 `OLLAMA_API_KEY`，设置 `baseUrl: "https://ollama.com"`，并初始化托管云模型列表。此路径 **不** 需要本地 Ollama 服务器或 `ollama signin`。
 
-    The cloud model list shown during `openclaw onboard` is populated live from `https://ollama.com/api/tags`, capped at 500 entries, so the picker reflects the current hosted catalog rather than a static seed. If `ollama.com` is unreachable or returns no models at setup time, OpenClaw falls back to the previous hardcoded suggestions so onboarding still completes.
+    `openclaw onboard` 期间显示的云模型列表会从 `https://ollama.com/api/tags` 实时获取，最多 500 项，因此选择器反映的是当前托管目录，而不是静态预设。如果在设置时无法访问 `ollama.com` 或没有返回模型，OpenClaw 会回退到先前的硬编码建议，以便新手引导仍可完成。
 
   </Tab>
 
   <Tab title="Local only">
-    In local-only mode, OpenClaw discovers models from the configured Ollama instance. This path is for local or self-hosted Ollama servers.
+    在仅本地模式下，OpenClaw 会从已配置的 Ollama 实例中发现模型。此路径适用于本地或自托管 Ollama 服务器。
 
-    OpenClaw currently suggests `gemma4` as the local default.
+    OpenClaw 当前建议 `gemma4` 作为本地默认模型。
 
   </Tab>
 </Tabs>
 
-## Model discovery (implicit provider)
+## 模型发现（隐式提供商）
 
-When you set `OLLAMA_API_KEY` (or an auth profile) and **do not** define `models.providers.ollama`, OpenClaw discovers models from the local Ollama instance at `http://127.0.0.1:11434`.
+当你设置了 `OLLAMA_API_KEY`（或 auth profile），并且**没有**定义 `models.providers.ollama` 时，OpenClaw 会从 `http://127.0.0.1:11434` 的本地 Ollama 实例发现模型。
 
-| Behavior             | Detail                                                                                                                                                              |
+| 行为 | 详情 |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Catalog query        | Queries `/api/tags`                                                                                                                                                 |
-| Capability detection | Uses best-effort `/api/show` lookups to read `contextWindow`, expanded `num_ctx` Modelfile parameters, and capabilities including vision/tools                      |
-| Vision models        | Models with a `vision` capability reported by `/api/show` are marked as image-capable (`input: ["text", "image"]`), so OpenClaw auto-injects images into the prompt |
-| Reasoning detection  | Marks `reasoning` with a model-name heuristic (`r1`, `reasoning`, `think`)                                                                                          |
-| Token limits         | Sets `maxTokens` to the default Ollama max-token cap used by OpenClaw                                                                                               |
-| Costs                | Sets all costs to `0`                                                                                                                                               |
+| 目录查询 | 查询 `/api/tags` |
+| 能力检测 | 使用尽力而为的 `/api/show` 查询来读取 `contextWindow`、展开后的 `num_ctx` Modelfile 参数，以及包括 vision/tools 在内的能力 |
+| 视觉模型 | 若 `/api/show` 报告模型具备 `vision` 能力，则该模型会被标记为支持图像（`input: ["text", "image"]`），因此 OpenClaw 会自动将图像注入提示词 |
+| 推理检测 | 使用模型名称启发式（`r1`、`reasoning`、`think`）标记 `reasoning` |
+| Token 限制 | 将 `maxTokens` 设置为 OpenClaw 使用的默认 Ollama 最大 token 上限 |
+| 成本 | 将所有成本设置为 `0` |
 
-This avoids manual model entries while keeping the catalog aligned with the local Ollama instance.
+这样可以避免手动添加模型条目，同时让目录与本地 Ollama 实例保持一致。
 
 ```bash
-# See what models are available
+# 查看有哪些可用模型
 ollama list
 openclaw models list
 ```
 
-To add a new model, simply pull it with Ollama:
+要添加新模型，只需用 Ollama 拉取它：
 
 ```bash
 ollama pull mistral
 ```
 
-The new model will be automatically discovered and available to use.
+新模型会被自动发现并可供使用。
 
 <Note>
-If you set `models.providers.ollama` explicitly, auto-discovery is skipped and you must define models manually. See the explicit config section below.
+如果你显式设置了 `models.providers.ollama`，则会跳过自动发现，你必须手动定义模型。请参见下方的显式配置部分。
 </Note>
 
-## Vision and image description
+## 视觉与图像描述
 
-The bundled Ollama plugin registers Ollama as an image-capable media-understanding provider. This lets OpenClaw route explicit image-description requests and configured image-model defaults through local or hosted Ollama vision models.
+内置的 Ollama 插件会将 Ollama 注册为支持图像的媒体理解提供商。这使 OpenClaw 能够通过本地或托管的 Ollama 视觉模型来路由显式图像描述请求以及已配置的默认图像模型。
 
-For local vision, pull a model that supports images:
+对于本地视觉模型，请拉取一个支持图像的模型：
 
 ```bash
 ollama pull qwen2.5vl:7b
 export OLLAMA_API_KEY="ollama-local"
 ```
 
-Then verify with the infer CLI:
+然后用 infer CLI 进行验证：
 
 ```bash
 openclaw infer image describe \
@@ -209,9 +214,9 @@ openclaw infer image describe \
   --json
 ```
 
-`--model` must be a full `<provider/model>` ref. When it is set, `openclaw infer image describe` runs that model directly instead of skipping description because the model supports native vision.
+`--model` 必须是完整的 `<provider/model>` 引用。设置后，`openclaw infer image describe` 会直接运行该模型，而不会因为该模型支持原生视觉能力而跳过描述。
 
-To make Ollama the default image-understanding model for inbound media, configure `agents.defaults.imageModel`:
+要让 Ollama 成为入站媒体的默认图像理解模型，请配置 `agents.defaults.imageModel`：
 
 ```json5
 {
@@ -225,7 +230,7 @@ To make Ollama the default image-understanding model for inbound media, configur
 }
 ```
 
-If you define `models.providers.ollama.models` manually, mark vision models with image input support:
+如果你手动定义 `models.providers.ollama.models`，请将视觉模型标记为支持图像输入：
 
 ```json5
 {
@@ -237,26 +242,26 @@ If you define `models.providers.ollama.models` manually, mark vision models with
 }
 ```
 
-OpenClaw rejects image-description requests for models that are not marked image-capable. With implicit discovery, OpenClaw reads this from Ollama when `/api/show` reports a vision capability.
+OpenClaw 会拒绝未标记为支持图像的模型的图像描述请求。在隐式发现模式下，当 `/api/show` 报告 vision 能力时，OpenClaw 会从 Ollama 中读取此信息。
 
-## Configuration
+## 配置
 
 <Tabs>
-  <Tab title="Basic (implicit discovery)">
-    The simplest local-only enablement path is via environment variable:
+  <Tab title="基础（隐式发现）">
+    最简单的仅本地启用方式是通过环境变量：
 
     ```bash
     export OLLAMA_API_KEY="ollama-local"
     ```
 
     <Tip>
-    If `OLLAMA_API_KEY` is set, you can omit `apiKey` in the provider entry and OpenClaw will fill it for availability checks.
+    如果已设置 `OLLAMA_API_KEY`，你可以在提供商条目中省略 `apiKey`，OpenClaw 会为可用性检查自动填充它。
     </Tip>
 
   </Tab>
 
-  <Tab title="Explicit (manual models)">
-    Use explicit config when you want hosted cloud setup, Ollama runs on another host/port, you want to force specific context windows or model lists, or you want fully manual model definitions.
+  <Tab title="显式（手动模型）">
+    当你需要托管云设置、Ollama 运行在其他主机/端口上、你想强制指定特定上下文窗口或模型列表，或你希望完全手动定义模型时，请使用显式配置。
 
     ```json5
     {
@@ -285,8 +290,8 @@ OpenClaw rejects image-description requests for models that are not marked image
 
   </Tab>
 
-  <Tab title="Custom base URL">
-    If Ollama is running on a different host or port (explicit config disables auto-discovery, so define models manually):
+  <Tab title="自定义 base URL">
+    如果 Ollama 运行在不同的主机或端口上（显式配置会禁用自动发现，因此你需要手动定义模型）：
 
     ```json5
     {
@@ -294,8 +299,8 @@ OpenClaw rejects image-description requests for models that are not marked image
         providers: {
           ollama: {
             apiKey: "ollama-local",
-            baseUrl: "http://ollama-host:11434", // No /v1 - use native Ollama API URL
-            api: "ollama", // Set explicitly to guarantee native tool-calling behavior
+            baseUrl: "http://ollama-host:11434", // 不要加 /v1 - 使用原生 Ollama API URL
+            api: "ollama", // 显式设置，以确保原生工具调用行为
           },
         },
       },
@@ -303,15 +308,15 @@ OpenClaw rejects image-description requests for models that are not marked image
     ```
 
     <Warning>
-    Do not add `/v1` to the URL. The `/v1` path uses OpenAI-compatible mode, where tool calling is not reliable. Use the base Ollama URL without a path suffix.
+    不要在 URL 中添加 `/v1`。`/v1` 路径使用 OpenAI 兼容模式，而该模式下工具调用并不可靠。请使用不带路径后缀的 Ollama 基础 URL。
     </Warning>
 
   </Tab>
 </Tabs>
 
-### Model selection
+### 模型选择
 
-Once configured, all your Ollama models are available:
+配置完成后，你的所有 Ollama 模型都会可用：
 
 ```json5
 {
@@ -326,21 +331,19 @@ Once configured, all your Ollama models are available:
 }
 ```
 
-Custom Ollama provider ids are also supported. When a model ref uses the active
-provider prefix, such as `ollama-spark/qwen3:32b`, OpenClaw strips only that
-prefix before calling Ollama so the server receives `qwen3:32b`.
+也支持自定义 Ollama 提供商 id。当模型引用使用活动提供商前缀时，例如 `ollama-spark/qwen3:32b`，OpenClaw 在调用 Ollama 前只会去掉该前缀，因此服务器接收到的是 `qwen3:32b`。
 
-## Ollama Web Search
+## Ollama Web 搜索
 
-OpenClaw supports **Ollama Web Search** as a bundled `web_search` provider.
+OpenClaw 支持将 **Ollama Web 搜索** 作为内置的 `web_search` 提供商。
 
-| Property    | Detail                                                                                                                                                               |
+| 属性 | 详情 |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Host        | Uses your configured Ollama host (`models.providers.ollama.baseUrl` when set, otherwise `http://127.0.0.1:11434`); `https://ollama.com` uses the hosted API directly |
-| Auth        | Key-free for signed-in local Ollama hosts; `OLLAMA_API_KEY` or configured provider auth for direct `https://ollama.com` search or auth-protected hosts               |
-| Requirement | Local/self-hosted hosts must be running and signed in with `ollama signin`; direct hosted search requires `baseUrl: "https://ollama.com"` plus a real Ollama API key |
+| 主机 | 使用你配置的 Ollama 主机（设置了 `models.providers.ollama.baseUrl` 时使用其值，否则为 `http://127.0.0.1:11434`）；`https://ollama.com` 直接使用托管 API |
+| 认证 | 对已登录的本地 Ollama 主机无需密钥；对于直接使用 `https://ollama.com` 进行搜索或受保护的主机，需要 `OLLAMA_API_KEY` 或配置好的提供商认证 |
+| 要求 | 本地/自托管主机必须正在运行并已通过 `ollama signin` 登录；直接使用托管搜索则需要 `baseUrl: "https://ollama.com"` 加真实的 Ollama API 密钥 |
 
-Choose **Ollama Web Search** during `openclaw onboard` or `openclaw configure --section web`, or set:
+在 `openclaw onboard` 或 `openclaw configure --section web` 期间选择 **Ollama Web 搜索**，或者设置：
 
 ```json5
 {
@@ -355,18 +358,18 @@ Choose **Ollama Web Search** during `openclaw onboard` or `openclaw configure --
 ```
 
 <Note>
-For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-search).
+完整的设置与行为细节，请参见 [Ollama Web 搜索](/zh-CN/tools/ollama-search)。
 </Note>
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Legacy OpenAI-compatible mode">
+  <Accordion title="旧版 OpenAI 兼容模式">
     <Warning>
-    **Tool calling is not reliable in OpenAI-compatible mode.** Use this mode only if you need OpenAI format for a proxy and do not depend on native tool calling behavior.
+    **在 OpenAI 兼容模式下，工具调用并不可靠。** 仅当你需要为代理使用 OpenAI 格式且不依赖原生工具调用行为时，才使用此模式。
     </Warning>
 
-    If you need to use the OpenAI-compatible endpoint instead (for example, behind a proxy that only supports OpenAI format), set `api: "openai-completions"` explicitly:
+    如果你确实需要改用 OpenAI 兼容端点（例如位于只支持 OpenAI 格式的代理之后），请显式设置 `api: "openai-completions"`：
 
     ```json5
     {
@@ -375,7 +378,7 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
           ollama: {
             baseUrl: "http://ollama-host:11434/v1",
             api: "openai-completions",
-            injectNumCtxForOpenAICompat: true, // default: true
+            injectNumCtxForOpenAICompat: true, // 默认值：true
             apiKey: "ollama-local",
             models: [...]
           }
@@ -384,9 +387,9 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
     }
     ```
 
-    This mode may not support streaming and tool calling simultaneously. You may need to disable streaming with `params: { streaming: false }` in model config.
+    该模式可能无法同时支持流式传输和工具调用。你可能需要在模型配置中通过 `params: { streaming: false }` 禁用流式传输。
 
-    When `api: "openai-completions"` is used with Ollama, OpenClaw injects `options.num_ctx` by default so Ollama does not silently fall back to a 4096 context window. If your proxy/upstream rejects unknown `options` fields, disable this behavior:
+    当 Ollama 使用 `api: "openai-completions"` 时，OpenClaw 默认会注入 `options.num_ctx`，这样 Ollama 就不会静默回退到 4096 的上下文窗口。如果你的代理/上游会拒绝未知的 `options` 字段，请禁用此行为：
 
     ```json5
     {
@@ -406,12 +409,12 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
 
   </Accordion>
 
-  <Accordion title="Context windows">
-    For auto-discovered models, OpenClaw uses the context window reported by Ollama when available, including larger `PARAMETER num_ctx` values from custom Modelfiles. Otherwise it falls back to the default Ollama context window used by OpenClaw.
+  <Accordion title="上下文窗口">
+    对于自动发现的模型，OpenClaw 会在可用时使用 Ollama 报告的上下文窗口，包括来自自定义 Modelfiles 的更大 `PARAMETER num_ctx` 值。否则，它会回退到 OpenClaw 使用的默认 Ollama 上下文窗口。
 
-    You can override `contextWindow` and `maxTokens` in explicit provider config. To cap Ollama's per-request runtime context without rebuilding a Modelfile, set `params.num_ctx`; OpenClaw sends it as `options.num_ctx` for both native Ollama and the OpenAI-compatible Ollama adapter. Invalid, zero, negative, and non-finite values are ignored and fall back to `contextWindow`.
+    你可以在显式提供商配置中覆盖 `contextWindow` 和 `maxTokens`。若要在不重建 Modelfile 的情况下限制 Ollama 每次请求的运行时上下文，可设置 `params.num_ctx`；OpenClaw 会在原生 Ollama 和 OpenAI 兼容的 Ollama 适配器中都将其作为 `options.num_ctx` 发送。无效、零、负数和非有限值会被忽略，并回退到 `contextWindow`。
 
-    Native Ollama model entries also accept the common Ollama runtime options under `params`, including `temperature`, `top_p`, `top_k`, `min_p`, `num_predict`, `stop`, `repeat_penalty`, `num_batch`, `num_thread`, and `use_mmap`. OpenClaw forwards only Ollama request keys, so OpenClaw runtime params such as `streaming` are not leaked to Ollama. Use `params.think` or `params.thinking` to send top-level Ollama `think`; `false` disables API-level thinking for Qwen-style thinking models.
+    原生 Ollama 模型条目也接受 `params` 下常见的 Ollama 运行时选项，包括 `temperature`、`top_p`、`top_k`、`min_p`、`num_predict`、`stop`、`repeat_penalty`、`num_batch`、`num_thread` 和 `use_mmap`。OpenClaw 只会转发 Ollama 请求键，因此像 `streaming` 这样的 OpenClaw 运行时参数不会泄露给 Ollama。使用 `params.think` 或 `params.thinking` 可以发送顶层 Ollama `think`；对于 Qwen 风格的思考模型，`false` 会禁用 API 级别的思考。
 
     ```json5
     {
@@ -437,37 +440,34 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
     }
     ```
 
-    Per-model `agents.defaults.models["ollama/<model>"].params.num_ctx` works too. If both are configured, the explicit provider model entry wins over the agent default.
+    每个模型的 `agents.defaults.models["ollama/<model>"].params.num_ctx` 也同样有效。如果两者都已配置，则显式提供商模型条目的优先级高于智能体默认值。
 
   </Accordion>
 
-  <Accordion title="Reasoning models">
-    OpenClaw treats models with names such as `deepseek-r1`, `reasoning`, or `think` as reasoning-capable by default.
+  <Accordion title="推理模型">
+    OpenClaw 默认会将名称中包含 `deepseek-r1`、`reasoning` 或 `think` 的模型视为具备推理能力。
 
     ```bash
     ollama pull deepseek-r1:32b
     ```
 
-    No additional configuration is needed -- OpenClaw marks them automatically.
+    不需要额外配置 —— OpenClaw 会自动标记它们。
 
   </Accordion>
 
-  <Accordion title="Model costs">
-    Ollama is free and runs locally, so all model costs are set to $0. This applies to both auto-discovered and manually defined models.
+  <Accordion title="模型成本">
+    Ollama 是免费的并且在本地运行，因此所有模型成本都设置为 $0。这同时适用于自动发现和手动定义的模型。
   </Accordion>
 
   <Accordion title="Memory embeddings">
-    The bundled Ollama plugin registers a memory embedding provider for
-    [memory search](/concepts/memory). It uses the configured Ollama base URL
-    and API key, calls Ollama's current `/api/embed` endpoint, and batches
-    multiple memory chunks into one `input` request when possible.
+    内置的 Ollama 插件为 [memory search](/zh-CN/concepts/memory) 注册了一个 memory embedding 提供商。它使用配置好的 Ollama base URL 和 API 密钥，调用 Ollama 当前的 `/api/embed` 端点，并在可能时将多个 memory chunk 批量合并到一次 `input` 请求中。
 
-    | Property      | Value               |
+    | 属性 | 值 |
     | ------------- | ------------------- |
-    | Default model | `nomic-embed-text`  |
-    | Auto-pull     | Yes — the embedding model is pulled automatically if not present locally |
+    | 默认模型 | `nomic-embed-text` |
+    | 自动拉取 | 是 —— 如果 embedding 模型尚未在本地存在，会自动拉取 |
 
-    To select Ollama as the memory search embedding provider:
+    要将 Ollama 选为 memory search 的 embedding 提供商：
 
     ```json5
     {
@@ -481,29 +481,29 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
 
   </Accordion>
 
-  <Accordion title="Streaming configuration">
-    OpenClaw's Ollama integration uses the **native Ollama API** (`/api/chat`) by default, which fully supports streaming and tool calling simultaneously. No special configuration is needed.
+  <Accordion title="流式传输配置">
+    OpenClaw 的 Ollama 集成默认使用 **原生 Ollama API**（`/api/chat`），可同时完整支持流式传输和工具调用。不需要任何特殊配置。
 
-    For native `/api/chat` requests, OpenClaw also forwards thinking control directly to Ollama: `/think off` and `openclaw agent --thinking off` send top-level `think: false`, while `/think low|medium|high` send the matching top-level `think` effort string. `/think max` maps to Ollama's highest native effort, `think: "high"`.
+    对于原生 `/api/chat` 请求，OpenClaw 也会将思考控制直接转发给 Ollama：`/think off` 和 `openclaw agent --thinking off` 会发送顶层 `think: false`，而 `/think low|medium|high` 会发送匹配的顶层 `think` 强度字符串。`/think max` 会映射为 Ollama 的最高原生强度，即 `think: "high"`。
 
     <Tip>
-    If you need to use the OpenAI-compatible endpoint, see the "Legacy OpenAI-compatible mode" section above. Streaming and tool calling may not work simultaneously in that mode.
+    如果你需要使用 OpenAI 兼容端点，请参阅上方的“旧版 OpenAI 兼容模式”部分。在该模式下，流式传输和工具调用可能无法同时工作。
     </Tip>
 
   </Accordion>
 </AccordionGroup>
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
-  <Accordion title="Ollama not detected">
-    Make sure Ollama is running and that you set `OLLAMA_API_KEY` (or an auth profile), and that you did **not** define an explicit `models.providers.ollama` entry:
+  <Accordion title="未检测到 Ollama">
+    请确保 Ollama 正在运行，并且你已设置 `OLLAMA_API_KEY`（或 auth profile），同时你**没有**定义显式的 `models.providers.ollama` 条目：
 
     ```bash
     ollama serve
     ```
 
-    Verify that the API is accessible:
+    验证 API 可访问：
 
     ```bash
     curl http://localhost:11434/api/tags
@@ -511,26 +511,26 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
 
   </Accordion>
 
-  <Accordion title="No models available">
-    If your model is not listed, either pull the model locally or define it explicitly in `models.providers.ollama`.
+  <Accordion title="没有可用模型">
+    如果你的模型未列出，请在本地拉取该模型，或在 `models.providers.ollama` 中显式定义它。
 
     ```bash
-    ollama list  # See what's installed
+    ollama list  # 查看已安装内容
     ollama pull gemma4
     ollama pull gpt-oss:20b
-    ollama pull llama3.3     # Or another model
+    ollama pull llama3.3     # 或其他模型
     ```
 
   </Accordion>
 
-  <Accordion title="Connection refused">
-    Check that Ollama is running on the correct port:
+  <Accordion title="连接被拒绝">
+    检查 Ollama 是否在正确的端口上运行：
 
     ```bash
-    # Check if Ollama is running
+    # 检查 Ollama 是否正在运行
     ps aux | grep ollama
 
-    # Or restart Ollama
+    # 或重启 Ollama
     ollama serve
     ```
 
@@ -538,22 +538,22 @@ For the full setup and behavior details, see [Ollama Web Search](/tools/ollama-s
 </AccordionGroup>
 
 <Note>
-More help: [Troubleshooting](/help/troubleshooting) and [FAQ](/help/faq).
+更多帮助：[故障排除](/zh-CN/help/troubleshooting) 和 [常见问题](/zh-CN/help/faq)。
 </Note>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Overview of all providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    所有提供商、模型引用和故障切换行为的概览。
   </Card>
-  <Card title="Model selection" href="/concepts/models" icon="brain">
-    How to choose and configure models.
+  <Card title="模型选择" href="/zh-CN/concepts/models" icon="brain">
+    如何选择和配置模型。
   </Card>
-  <Card title="Ollama Web Search" href="/tools/ollama-search" icon="magnifying-glass">
-    Full setup and behavior details for Ollama-powered web search.
+  <Card title="Ollama Web 搜索" href="/zh-CN/tools/ollama-search" icon="magnifying-glass">
+    由 Ollama 驱动的 web 搜索的完整设置与行为细节。
   </Card>
-  <Card title="Configuration" href="/gateway/configuration" icon="gear">
-    Full config reference.
+  <Card title="配置" href="/zh-CN/gateway/configuration" icon="gear">
+    完整的配置参考。
   </Card>
 </CardGroup>

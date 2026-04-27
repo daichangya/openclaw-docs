@@ -1,19 +1,26 @@
 ---
-summary: "CLI reference for `openclaw webhooks` (webhook helpers + Gmail Pub/Sub)"
 read_when:
-  - You want to wire Gmail Pub/Sub events into OpenClaw
-  - You want webhook helper commands
-title: "Webhooks"
+    - 你希望将 Gmail Pub/Sub 事件接入 OpenClaw
+    - 你希望使用 webhook 辅助命令
+summary: '`openclaw webhooks` 的 CLI 参考（webhook 辅助命令 + Gmail Pub/Sub）'
+title: Webhooks
+x-i18n:
+    generated_at: "2026-04-24T04:01:49Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: ce9b085904918f1fea4daa7728470d492ab3e7d92ad43a6b1e7efe8d9f70868f
+    source_path: cli/webhooks.md
+    workflow: 15
 ---
 
 # `openclaw webhooks`
 
-Webhook helpers and integrations (Gmail Pub/Sub, webhook helpers).
+Webhook 辅助命令和集成（Gmail Pub/Sub、webhook 辅助命令）。
 
-Related:
+相关内容：
 
-- Webhooks: [Webhooks](/automation/cron-jobs#webhooks)
-- Gmail Pub/Sub: [Gmail Pub/Sub](/automation/cron-jobs#gmail-pubsub-integration)
+- Webhooks：[Webhooks](/zh-CN/automation/cron-jobs#webhooks)
+- Gmail Pub/Sub：[Gmail Pub/Sub](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)
 
 ## Gmail
 
@@ -24,13 +31,13 @@ openclaw webhooks gmail run
 
 ### `webhooks gmail setup`
 
-Configure Gmail watch, Pub/Sub, and OpenClaw webhook delivery.
+配置 Gmail watch、Pub/Sub 和 OpenClaw webhook 投递。
 
-Required:
+必需项：
 
 - `--account <email>`
 
-Options:
+选项：
 
 - `--project <id>`
 - `--topic <name>`
@@ -51,7 +58,7 @@ Options:
 - `--push-endpoint <url>`
 - `--json`
 
-Examples:
+示例：
 
 ```bash
 openclaw webhooks gmail setup --account you@example.com
@@ -61,9 +68,9 @@ openclaw webhooks gmail setup --account you@example.com --hook-url https://gatew
 
 ### `webhooks gmail run`
 
-Run `gog watch serve` plus the watch auto-renew loop.
+运行 `gog watch serve` 以及 watch 自动续期循环。
 
-Options:
+选项：
 
 - `--account <email>`
 - `--topic <topic>`
@@ -82,15 +89,15 @@ Options:
 - `--tailscale-path <path>`
 - `--tailscale-target <target>`
 
-Example:
+示例：
 
 ```bash
 openclaw webhooks gmail run --account you@example.com
 ```
 
-See [Gmail Pub/Sub documentation](/automation/cron-jobs#gmail-pubsub-integration) for the end-to-end setup flow and operational details.
+有关端到端设置流程和操作细节，请参阅 [Gmail Pub/Sub documentation](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
-- [Webhook automation](/automation/webhook)
+- [CLI 参考](/zh-CN/cli)
+- [Webhook 自动化](/zh-CN/automation/cron-jobs)

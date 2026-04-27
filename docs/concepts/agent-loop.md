@@ -1,180 +1,178 @@
 ---
-summary: "Agent loop lifecycle, streams, and wait semantics"
 read_when:
-  - You need an exact walkthrough of the agent loop or lifecycle events
-  - You are changing session queueing, transcript writes, or session write lock behavior
-title: "Agent loop"
+    - 你需要一份关于智能体循环或生命周期事件的精确演练说明
+    - 你正在更改会话排队、转录写入或会话写锁行为
+summary: 智能体循环生命周期、流和等待语义
+title: 智能体循环
+x-i18n:
+    generated_at: "2026-04-24T18:07:44Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: de41180af291cf804f2e74106c70eb8582b63e7066738ba3059c1319510f1b44
+    source_path: concepts/agent-loop.md
+    workflow: 15
 ---
 
-An agentic loop is the full “real” run of an agent: intake → context assembly → model inference →
-tool execution → streaming replies → persistence. It’s the authoritative path that turns a message
-into actions and a final reply, while keeping session state consistent.
+智能体循环是一次智能体完整而“真实”的运行：接收输入 → 组装上下文 → 模型推理 →
+工具执行 → 流式回复 → 持久化。它是将一条消息转化为动作和最终回复的权威路径，同时保持会话状态一致。
 
-In OpenClaw, a loop is a single, serialized run per session that emits lifecycle and stream events
-as the model thinks, calls tools, and streams output. This doc explains how that authentic loop is
-wired end-to-end.
+在 OpenClaw 中，循环是每个会话一次单独的串行运行，在模型思考、调用工具和流式输出时发出生命周期和流事件。本文档解释了这一真实循环是如何端到端连接起来的。
 
-## Entry points
+## 入口点
 
-- Gateway RPC: `agent` and `agent.wait`.
-- CLI: `agent` command.
+- Gateway 网关 RPC：`agent` 和 `agent.wait`。
+- CLI：`agent` 命令。
 
-## How it works (high-level)
+## 工作原理（高层概览）
 
-1. `agent` RPC validates params, resolves session (sessionKey/sessionId), persists session metadata, returns `{ runId, acceptedAt }` immediately.
-2. `agentCommand` runs the agent:
-   - resolves model + thinking/verbose/trace defaults
-   - loads skills snapshot
-   - calls `runEmbeddedPiAgent` (pi-agent-core runtime)
-   - emits **lifecycle end/error** if the embedded loop does not emit one
-3. `runEmbeddedPiAgent`:
-   - serializes runs via per-session + global queues
-   - resolves model + auth profile and builds the pi session
-   - subscribes to pi events and streams assistant/tool deltas
-   - enforces timeout -> aborts run if exceeded
-   - returns payloads + usage metadata
-4. `subscribeEmbeddedPiSession` bridges pi-agent-core events to OpenClaw `agent` stream:
-   - tool events => `stream: "tool"`
-   - assistant deltas => `stream: "assistant"`
-   - lifecycle events => `stream: "lifecycle"` (`phase: "start" | "end" | "error"`)
-5. `agent.wait` uses `waitForAgentRun`:
-   - waits for **lifecycle end/error** for `runId`
-   - returns `{ status: ok|error|timeout, startedAt, endedAt, error? }`
+1. `agent` RPC 验证参数，解析会话（`sessionKey`/`sessionId`），持久化会话元数据，并立即返回 `{ runId, acceptedAt }`。
+2. `agentCommand` 运行智能体：
+   - 解析模型以及 thinking/verbose/trace 默认值
+   - 加载 Skills 快照
+   - 调用 `runEmbeddedPiAgent`（pi-agent-core 运行时）
+   - 如果嵌入式循环没有发出，则发出 **lifecycle end/error**
+3. `runEmbeddedPiAgent`：
+   - 通过按会话和全局队列对运行进行串行化
+   - 解析模型和 auth profile，并构建 pi 会话
+   - 订阅 pi 事件并流式传输 assistant/tool 增量
+   - 强制执行超时；超出时中止运行
+   - 返回负载和使用情况元数据
+4. `subscribeEmbeddedPiSession` 将 pi-agent-core 事件桥接到 OpenClaw `agent` 流：
+   - 工具事件 => `stream: "tool"`
+   - 助手增量 => `stream: "assistant"`
+   - 生命周期事件 => `stream: "lifecycle"`（`phase: "start" | "end" | "error"`）
+5. `agent.wait` 使用 `waitForAgentRun`：
+   - 等待 `runId` 的 **lifecycle end/error**
+   - 返回 `{ status: ok|error|timeout, startedAt, endedAt, error? }`
 
-## Queueing + concurrency
+## 队列 + 并发
 
-- Runs are serialized per session key (session lane) and optionally through a global lane.
-- This prevents tool/session races and keeps session history consistent.
-- Messaging channels can choose queue modes (collect/steer/followup) that feed this lane system.
-  See [Command Queue](/concepts/queue).
-- Transcript writes are also protected by a session write lock on the session file. The lock is
-  process-aware and file-based, so it catches writers that bypass the in-process queue or come from
-  another process.
-- Session write locks are non-reentrant by default. If a helper intentionally nests acquisition of
-  the same lock while preserving one logical writer, it must opt in explicitly with
-  `allowReentrant: true`.
+- 运行按会话键（会话通道）串行化，并可选地经过一个全局通道。
+- 这样可以防止工具 / 会话竞争，并保持会话历史一致。
+- 消息渠道可以选择队列模式（collect/steer/followup）来接入该通道系统。
+  参见 [命令队列](/zh-CN/concepts/queue)。
+- 转录写入也受会话文件上的会话写锁保护。该锁具备进程感知能力，并且基于文件，因此它可以捕获绕过进程内队列或来自其他进程的写入者。
+- 默认情况下，会话写锁是不可重入的。如果某个辅助函数有意在保持单一逻辑写入者的同时嵌套获取同一个锁，则必须显式选择加入
+  `allowReentrant: true`。
 
-## Session + workspace preparation
+## 会话 + 工作区准备
 
-- Workspace is resolved and created; sandboxed runs may redirect to a sandbox workspace root.
-- Skills are loaded (or reused from a snapshot) and injected into env and prompt.
-- Bootstrap/context files are resolved and injected into the system prompt report.
-- A session write lock is acquired; `SessionManager` is opened and prepared before streaming. Any
-  later transcript rewrite, compaction, or truncation path must take the same lock before opening or
-  mutating the transcript file.
+- 工作区会被解析并创建；沙箱隔离运行可能会重定向到沙箱工作区根目录。
+- Skills 会被加载（或从快照复用），并注入到环境变量和提示词中。
+- Bootstrap / 上下文文件会被解析并注入系统提示词报告。
+- 会获取一个会话写锁；`SessionManager` 会在流式传输开始前打开并完成准备。任何后续的转录重写、压缩或截断路径，在打开或修改转录文件之前，都必须获取同一个锁。
 
-## Prompt assembly + system prompt
+## 提示词组装 + 系统提示词
 
-- System prompt is built from OpenClaw’s base prompt, skills prompt, bootstrap context, and per-run overrides.
-- Model-specific limits and compaction reserve tokens are enforced.
-- See [System prompt](/concepts/system-prompt) for what the model sees.
+- 系统提示词由 OpenClaw 的基础提示词、Skills 提示词、bootstrap 上下文和每次运行的覆盖项共同构建。
+- 会强制执行特定于模型的限制和压缩保留 token。
+- 关于模型实际看到的内容，参见 [系统提示词](/zh-CN/concepts/system-prompt)。
 
-## Hook points (where you can intercept)
+## 钩子点（你可以拦截的位置）
 
-OpenClaw has two hook systems:
+OpenClaw 有两套钩子系统：
 
-- **Internal hooks** (Gateway hooks): event-driven scripts for commands and lifecycle events.
-- **Plugin hooks**: extension points inside the agent/tool lifecycle and gateway pipeline.
+- **内部钩子**（Gateway 网关钩子）：用于命令和生命周期事件的事件驱动脚本。
+- **插件钩子**：位于智能体 / 工具生命周期和 Gateway 网关流水线内部的扩展点。
 
-### Internal hooks (Gateway hooks)
+### 内部钩子（Gateway 网关钩子）
 
-- **`agent:bootstrap`**: runs while building bootstrap files before the system prompt is finalized.
-  Use this to add/remove bootstrap context files.
-- **Command hooks**: `/new`, `/reset`, `/stop`, and other command events (see Hooks doc).
+- **`agent:bootstrap`**：在系统提示词最终确定之前、构建 bootstrap 文件时运行。
+  用它来添加 / 移除 bootstrap 上下文文件。
+- **命令钩子**：`/new`、`/reset`、`/stop` 和其他命令事件（参见 Hooks 文档）。
 
-See [Hooks](/automation/hooks) for setup and examples.
+设置和示例参见 [Hooks](/zh-CN/automation/hooks)。
 
-### Plugin hooks (agent + gateway lifecycle)
+### 插件钩子（智能体 + Gateway 网关生命周期）
 
-These run inside the agent loop or gateway pipeline:
+这些钩子在智能体循环或 Gateway 网关流水线内部运行：
 
-- **`before_model_resolve`**: runs pre-session (no `messages`) to deterministically override provider/model before model resolution.
-- **`before_prompt_build`**: runs after session load (with `messages`) to inject `prependContext`, `systemPrompt`, `prependSystemContext`, or `appendSystemContext` before prompt submission. Use `prependContext` for per-turn dynamic text and system-context fields for stable guidance that should sit in system prompt space.
-- **`before_agent_start`**: legacy compatibility hook that may run in either phase; prefer the explicit hooks above.
-- **`before_agent_reply`**: runs after inline actions and before the LLM call, letting a plugin claim the turn and return a synthetic reply or silence the turn entirely.
-- **`agent_end`**: inspect the final message list and run metadata after completion.
-- **`before_compaction` / `after_compaction`**: observe or annotate compaction cycles.
-- **`before_tool_call` / `after_tool_call`**: intercept tool params/results.
-- **`before_install`**: inspect built-in scan findings and optionally block skill or plugin installs.
-- **`tool_result_persist`**: synchronously transform tool results before they are written to an OpenClaw-owned session transcript.
-- **`message_received` / `message_sending` / `message_sent`**: inbound + outbound message hooks.
-- **`session_start` / `session_end`**: session lifecycle boundaries.
-- **`gateway_start` / `gateway_stop`**: gateway lifecycle events.
+- **`before_model_resolve`**：在会话前运行（无 `messages`），以在模型解析前确定性地覆盖 provider / model。
+- **`before_prompt_build`**：在会话加载后运行（带有 `messages`），在提交提示词前注入 `prependContext`、`systemPrompt`、`prependSystemContext` 或 `appendSystemContext`。对每轮动态文本使用 `prependContext`，对应该位于系统提示词空间中的稳定指导使用系统上下文字段。
+- **`before_agent_start`**：旧版兼容钩子，可能在任一阶段运行；优先使用上面明确的钩子。
+- **`before_agent_reply`**：在内联动作之后、LLM 调用之前运行，允许插件接管本轮并返回合成回复，或完全静默该轮。
+- **`agent_end`**：在完成后检查最终消息列表和运行元数据。
+- **`before_compaction` / `after_compaction`**：观察或注释压缩周期。
+- **`before_tool_call` / `after_tool_call`**：拦截工具参数 / 结果。
+- **`before_install`**：检查内置扫描结果，并可选择阻止 Skills 或插件安装。
+- **`tool_result_persist`**：在工具结果写入 OpenClaw 拥有的会话转录之前，同步转换这些结果。
+- **`message_received` / `message_sending` / `message_sent`**：入站 + 出站消息钩子。
+- **`session_start` / `session_end`**：会话生命周期边界。
+- **`gateway_start` / `gateway_stop`**：Gateway 网关生命周期事件。
 
-Hook decision rules for outbound/tool guards:
+用于出站 / 工具防护的钩子判定规则：
 
-- `before_tool_call`: `{ block: true }` is terminal and stops lower-priority handlers.
-- `before_tool_call`: `{ block: false }` is a no-op and does not clear a prior block.
-- `before_install`: `{ block: true }` is terminal and stops lower-priority handlers.
-- `before_install`: `{ block: false }` is a no-op and does not clear a prior block.
-- `message_sending`: `{ cancel: true }` is terminal and stops lower-priority handlers.
-- `message_sending`: `{ cancel: false }` is a no-op and does not clear a prior cancel.
+- `before_tool_call`：`{ block: true }` 是终态，并会停止更低优先级处理器。
+- `before_tool_call`：`{ block: false }` 是空操作，不会清除先前的阻止状态。
+- `before_install`：`{ block: true }` 是终态，并会停止更低优先级处理器。
+- `before_install`：`{ block: false }` 是空操作，不会清除先前的阻止状态。
+- `message_sending`：`{ cancel: true }` 是终态，并会停止更低优先级处理器。
+- `message_sending`：`{ cancel: false }` 是空操作，不会清除先前的取消状态。
 
-See [Plugin hooks](/plugins/hooks) for the hook API and registration details.
+关于钩子 API 和注册细节，参见 [插件钩子](/zh-CN/plugins/hooks)。
 
-Harnesses may adapt these hooks differently. The Codex app-server harness keeps
-OpenClaw plugin hooks as the compatibility contract for documented mirrored
-surfaces, while Codex native hooks remain a separate lower-level Codex mechanism.
+不同的 Harness 可能会以不同方式适配这些钩子。Codex app-server harness 将
+OpenClaw 插件钩子保留为已记录镜像界面的兼容性契约，而 Codex 原生钩子则仍是独立的更底层 Codex 机制。
 
-## Streaming + partial replies
+## 流式传输 + 部分回复
 
-- Assistant deltas are streamed from pi-agent-core and emitted as `assistant` events.
-- Block streaming can emit partial replies either on `text_end` or `message_end`.
-- Reasoning streaming can be emitted as a separate stream or as block replies.
-- See [Streaming](/concepts/streaming) for chunking and block reply behavior.
+- 助手增量从 pi-agent-core 流出，并作为 `assistant` 事件发出。
+- 分块流式传输可以在 `text_end` 或 `message_end` 时发出部分回复。
+- 推理流式传输可以作为单独的流发出，也可以作为块回复发出。
+- 关于分块和块回复行为，参见 [流式传输](/zh-CN/concepts/streaming)。
 
-## Tool execution + messaging tools
+## 工具执行 + 消息工具
 
-- Tool start/update/end events are emitted on the `tool` stream.
-- Tool results are sanitized for size and image payloads before logging/emitting.
-- Messaging tool sends are tracked to suppress duplicate assistant confirmations.
+- 工具 start/update/end 事件会在 `tool` 流上发出。
+- 在记录 / 发出之前，工具结果会针对大小和图像负载进行净化处理。
+- 会跟踪消息工具发送，以抑制重复的助手确认。
 
-## Reply shaping + suppression
+## 回复整形 + 抑制
 
-- Final payloads are assembled from:
-  - assistant text (and optional reasoning)
-  - inline tool summaries (when verbose + allowed)
-  - assistant error text when the model errors
-- The exact silent token `NO_REPLY` / `no_reply` is filtered from outgoing
-  payloads.
-- Messaging tool duplicates are removed from the final payload list.
-- If no renderable payloads remain and a tool errored, a fallback tool error reply is emitted
-  (unless a messaging tool already sent a user-visible reply).
+- 最终负载由以下内容组装而成：
+  - 助手文本（以及可选的推理）
+  - 内联工具摘要（当 verbose 开启且允许时）
+  - 当模型出错时的助手错误文本
+- 精确的静默标记 `NO_REPLY` / `no_reply` 会从出站
+  负载中过滤掉。
+- 来自消息工具的重复内容会从最终负载列表中移除。
+- 如果没有可渲染负载剩余且某个工具出错，则会发出一个回退工具错误回复
+  （除非某个消息工具已经发送了用户可见的回复）。
 
-## Compaction + retries
+## 压缩 + 重试
 
-- Auto-compaction emits `compaction` stream events and can trigger a retry.
-- On retry, in-memory buffers and tool summaries are reset to avoid duplicate output.
-- See [Compaction](/concepts/compaction) for the compaction pipeline.
+- 自动压缩会发出 `compaction` 流事件，并且可以触发重试。
+- 在重试时，内存缓冲区和工具摘要会被重置，以避免重复输出。
+- 关于压缩流水线，参见 [压缩](/zh-CN/concepts/compaction)。
 
-## Event streams (today)
+## 事件流（当前）
 
-- `lifecycle`: emitted by `subscribeEmbeddedPiSession` (and as a fallback by `agentCommand`)
-- `assistant`: streamed deltas from pi-agent-core
-- `tool`: streamed tool events from pi-agent-core
+- `lifecycle`：由 `subscribeEmbeddedPiSession` 发出（并作为 `agentCommand` 的回退）
+- `assistant`：来自 pi-agent-core 的流式增量
+- `tool`：来自 pi-agent-core 的流式工具事件
 
-## Chat channel handling
+## 聊天渠道处理
 
-- Assistant deltas are buffered into chat `delta` messages.
-- A chat `final` is emitted on **lifecycle end/error**.
+- 助手增量会被缓冲到聊天 `delta` 消息中。
+- 聊天 `final` 会在 **lifecycle end/error** 时发出。
 
-## Timeouts
+## 超时
 
-- `agent.wait` default: 30s (just the wait). `timeoutMs` param overrides.
-- Agent runtime: `agents.defaults.timeoutSeconds` default 172800s (48 hours); enforced in `runEmbeddedPiAgent` abort timer.
-- LLM idle timeout: `agents.defaults.llm.idleTimeoutSeconds` aborts a model request when no response chunks arrive before the idle window. Set it explicitly for slow local models or reasoning/tool-call providers; set it to 0 to disable. If it is not set, OpenClaw uses `agents.defaults.timeoutSeconds` when configured, otherwise 120s. Cron-triggered runs with no explicit LLM or agent timeout disable the idle watchdog and rely on the cron outer timeout.
+- `agent.wait` 默认值：30 秒（仅等待）。可通过 `timeoutMs` 参数覆盖。
+- 智能体运行时：`agents.defaults.timeoutSeconds` 默认值为 172800 秒（48 小时）；在 `runEmbeddedPiAgent` 的中止定时器中强制执行。
+- LLM 空闲超时：`agents.defaults.llm.idleTimeoutSeconds` 会在空闲窗口内未收到任何响应分块时中止模型请求。对于缓慢的本地模型或推理 / 工具调用 provider，请显式设置它；设为 0 则禁用。如果未设置，OpenClaw 会在配置了 `agents.defaults.timeoutSeconds` 时使用该值，否则使用 120 秒。对于没有显式 LLM 或智能体超时的 cron 触发运行，会禁用空闲 watchdog，并依赖 cron 的外层超时。
 
-## Where things can end early
+## 可能提前结束的地方
 
-- Agent timeout (abort)
-- AbortSignal (cancel)
-- Gateway disconnect or RPC timeout
-- `agent.wait` timeout (wait-only, does not stop agent)
+- 智能体超时（中止）
+- AbortSignal（取消）
+- Gateway 网关断开或 RPC 超时
+- `agent.wait` 超时（仅等待，不会停止智能体）
 
-## Related
+## 相关内容
 
-- [Tools](/tools) — available agent tools
-- [Hooks](/automation/hooks) — event-driven scripts triggered by agent lifecycle events
-- [Compaction](/concepts/compaction) — how long conversations are summarized
-- [Exec Approvals](/tools/exec-approvals) — approval gates for shell commands
-- [Thinking](/tools/thinking) — thinking/reasoning level configuration
+- [工具](/zh-CN/tools) — 可用的智能体工具
+- [Hooks](/zh-CN/automation/hooks) — 由智能体生命周期事件触发的事件驱动脚本
+- [压缩](/zh-CN/concepts/compaction) — 长对话如何被总结
+- [Exec 审批](/zh-CN/tools/exec-approvals) — shell 命令的审批门控
+- [Thinking](/zh-CN/tools/thinking) — thinking / reasoning 级别配置

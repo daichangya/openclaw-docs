@@ -1,38 +1,40 @@
 ---
-summary: "Gateway-owned node pairing (Option B) for iOS and other remote nodes"
 read_when:
-  - Implementing node pairing approvals without macOS UI
-  - Adding CLI flows for approving remote nodes
-  - Extending gateway protocol with node management
-title: "Gateway-owned pairing"
+    - 在没有 macOS UI 的情况下实现节点配对审批
+    - 添加用于批准远程节点的 CLI 流程
+    - 用节点管理扩展 Gateway 网关协议
+summary: iOS 和其他远程节点的 Gateway 网关拥有式节点配对（选项 B）
+title: Gateway 网关拥有式配对
+x-i18n:
+    generated_at: "2026-04-25T20:04:13Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 436391f7576b7285733eb4a8283b73d7b4c52f22b227dd915c09313cfec776bd
+    source_path: gateway/pairing.md
+    workflow: 15
 ---
 
-In Gateway-owned pairing, the **Gateway** is the source of truth for which nodes
-are allowed to join. UIs (macOS app, future clients) are just frontends that
-approve or reject pending requests.
+在 Gateway 网关拥有式配对中，**Gateway 网关** 是决定哪些节点被允许加入的事实来源。UI（macOS 应用、未来的客户端）只是用于批准或拒绝待处理请求的前端。
 
-**Important:** WS nodes use **device pairing** (role `node`) during `connect`.
-`node.pair.*` is a separate pairing store and does **not** gate the WS handshake.
-Only clients that explicitly call `node.pair.*` use this flow.
+**重要：** WS 节点在 `connect` 期间使用**设备配对**（角色 `node`）。`node.pair.*` 是一个独立的配对存储，**不会**决定 WS 握手是否通过。只有显式调用 `node.pair.*` 的客户端才会使用这套流程。
 
-## Concepts
+## 概念
 
-- **Pending request**: a node asked to join; requires approval.
-- **Paired node**: approved node with an issued auth token.
-- **Transport**: the Gateway WS endpoint forwards requests but does not decide
-  membership. (Legacy TCP bridge support has been removed.)
+- **待处理请求**：某个节点请求加入；需要批准。
+- **已配对节点**：已获批准并已签发身份验证令牌的节点。
+- **传输协议**：Gateway 网关的 WS 端点会转发请求，但不决定成员资格。（旧版 TCP bridge 支持已被移除。）
 
-## How pairing works
+## 配对如何工作
 
-1. A node connects to the Gateway WS and requests pairing.
-2. The Gateway stores a **pending request** and emits `node.pair.requested`.
-3. You approve or reject the request (CLI or UI).
-4. On approval, the Gateway issues a **new token** (tokens are rotated on re‑pair).
-5. The node reconnects using the token and is now “paired”.
+1. 节点连接到 Gateway 网关 WS 并请求配对。
+2. Gateway 网关存储一个**待处理请求**并发出 `node.pair.requested`。
+3. 你批准或拒绝该请求（通过 CLI 或 UI）。
+4. 批准后，Gateway 网关会签发一个**新令牌**（重新配对时会轮换令牌）。
+5. 节点使用该令牌重新连接，此时即为“已配对”。
 
-Pending requests expire automatically after **5 minutes**.
+待处理请求会在 **5 分钟**后自动过期。
 
-## CLI workflow (headless friendly)
+## CLI 工作流（适合无头环境）
 
 ```bash
 openclaw nodes pending
@@ -42,84 +44,76 @@ openclaw nodes status
 openclaw nodes rename --node <id|name|ip> --name "Living Room iPad"
 ```
 
-`nodes status` shows paired/connected nodes and their capabilities.
+`nodes status` 会显示已配对/已连接的节点及其能力。
 
-## API surface (gateway protocol)
+## API 表面（Gateway 网关协议）
 
-Events:
+事件：
 
-- `node.pair.requested` — emitted when a new pending request is created.
-- `node.pair.resolved` — emitted when a request is approved/rejected/expired.
+- `node.pair.requested` — 在创建新的待处理请求时发出。
+- `node.pair.resolved` — 在请求被批准/拒绝/过期时发出。
 
-Methods:
+方法：
 
-- `node.pair.request` — create or reuse a pending request.
-- `node.pair.list` — list pending + paired nodes (`operator.pairing`).
-- `node.pair.approve` — approve a pending request (issues token).
-- `node.pair.reject` — reject a pending request.
-- `node.pair.verify` — verify `{ nodeId, token }`.
+- `node.pair.request` — 创建或复用一个待处理请求。
+- `node.pair.list` — 列出待处理节点和已配对节点（`operator.pairing`）。
+- `node.pair.approve` — 批准一个待处理请求（签发令牌）。
+- `node.pair.reject` — 拒绝一个待处理请求。
+- `node.pair.verify` — 验证 `{ nodeId, token }`。
 
-Notes:
+说明：
 
-- `node.pair.request` is idempotent per node: repeated calls return the same
-  pending request.
-- Repeated requests for the same pending node also refresh the stored node
-  metadata and the latest allowlisted declared command snapshot for operator visibility.
-- Approval **always** generates a fresh token; no token is ever returned from
-  `node.pair.request`.
-- Requests may include `silent: true` as a hint for auto-approval flows.
-- `node.pair.approve` uses the pending request's declared commands to enforce
-  extra approval scopes:
-  - commandless request: `operator.pairing`
-  - non-exec command request: `operator.pairing` + `operator.write`
-  - `system.run` / `system.run.prepare` / `system.which` request:
+- `node.pair.request` 对每个节点都是幂等的：重复调用会返回相同的待处理请求。
+- 对同一待处理节点的重复请求还会刷新已存储的节点元数据，以及最新的已列入允许名单的声明命令快照，方便操作员查看。
+- 批准**总是**会生成一个新的令牌；`node.pair.request` **绝不会**返回令牌。
+- 请求可以包含 `silent: true`，作为自动批准流程的提示。
+- `node.pair.approve` 使用待处理请求中声明的命令来强制额外的批准范围：
+  - 无命令请求：`operator.pairing`
+  - 非 exec 命令请求：`operator.pairing` + `operator.write`
+  - `system.run` / `system.run.prepare` / `system.which` 请求：
     `operator.pairing` + `operator.admin`
 
-Important:
+重要：
 
-- Node pairing is a trust/identity flow plus token issuance.
-- It does **not** pin the live node command surface per node.
-- Live node commands come from what the node declares on connect after the
-  gateway's global node command policy (`gateway.nodes.allowCommands` /
-  `denyCommands`) is applied.
-- Per-node `system.run` allow/ask policy lives on the node in
-  `exec.approvals.node.*`, not in the pairing record.
+- 节点配对是一个信任/身份流加令牌签发流程。
+- 它**不会**按节点固定实时节点命令表面。
+- 实时节点命令来自节点在连接时声明的内容，并且会在应用网关全局节点命令策略（`gateway.nodes.allowCommands` / `denyCommands`）后生效。
+- 每个节点的 `system.run` allow/ask 策略保存在节点端的
+  `exec.approvals.node.*` 中，而不在配对记录里。
 
-## Node command gating (2026.3.31+)
+## 节点命令门控（2026.3.31+）
 
 <Warning>
-**Breaking change:** Starting with `2026.3.31`, node commands are disabled until node pairing is approved. Device pairing alone is no longer enough to expose declared node commands.
+**重大变更：** 从 `2026.3.31` 开始，在节点配对获得批准之前，节点命令将被禁用。仅靠设备配对已不足以暴露已声明的节点命令。
 </Warning>
 
-When a node connects for the first time, pairing is requested automatically. Until the pairing request is approved, all pending node commands from that node are filtered and will not execute. Once trust is established through pairing approval, the node's declared commands become available subject to the normal command policy.
+当节点首次连接时，会自动请求配对。在配对请求获批之前，来自该节点的所有待处理节点命令都会被过滤，且不会执行。一旦通过配对批准建立信任，节点声明的命令就会在正常命令策略约束下变为可用。
 
-This means:
+这意味着：
 
-- Nodes that were previously relying on device pairing alone to expose commands must now complete node pairing.
-- Commands queued before pairing approval are dropped, not deferred.
+- 之前仅依赖设备配对来暴露命令的节点，现在必须完成节点配对。
+- 在配对批准前排队的命令会被丢弃，而不是延后执行。
 
-## Node event trust boundaries (2026.3.31+)
+## 节点事件信任边界（2026.3.31+）
 
 <Warning>
-**Breaking change:** Node-originated runs now stay on a reduced trusted surface.
+**重大变更：** 现在由节点发起的运行会停留在受限的可信表面内。
 </Warning>
 
-Node-originated summaries and related session events are restricted to the intended trusted surface. Notification-driven or node-triggered flows that previously relied on broader host or session tool access may need adjustment. This hardening ensures that node events cannot escalate into host-level tool access beyond what the node's trust boundary permits.
+由节点发起的摘要及相关会话事件会被限制在预期的可信表面内。此前依赖更广泛主机或会话工具访问的通知驱动型或节点触发型流程，可能需要调整。此项加固可确保节点事件不能升级为超出节点信任边界所允许范围的主机级工具访问。
 
-## Auto-approval (macOS app)
+## 自动批准（macOS 应用）
 
-The macOS app can optionally attempt a **silent approval** when:
+在以下情况下，macOS 应用可以选择尝试**静默批准**：
 
-- the request is marked `silent`, and
-- the app can verify an SSH connection to the gateway host using the same user.
+- 请求被标记为 `silent`，并且
+- 应用可以使用同一用户验证到 gateway 主机的 SSH 连接。
 
-If silent approval fails, it falls back to the normal “Approve/Reject” prompt.
+如果静默批准失败，它会回退到正常的“批准/拒绝”提示。
 
-## Trusted-CIDR device auto-approval
+## 受信任 CIDR 设备自动批准
 
-WS device pairing for `role: node` remains manual by default. For private
-node networks where the Gateway already trusts the network path, operators can
-opt in with explicit CIDRs or exact IPs:
+`role: node` 的 WS 设备配对默认仍为手动。对于 Gateway 网关已经信任网络路径的私有节点网络，操作员可以通过显式 CIDR 或精确 IP 选择启用：
 
 ```json5
 {
@@ -133,69 +127,52 @@ opt in with explicit CIDRs or exact IPs:
 }
 ```
 
-Security boundary:
+安全边界：
 
-- Disabled when `gateway.nodes.pairing.autoApproveCidrs` is unset.
-- No blanket LAN or private-network auto-approve mode exists.
-- Only fresh `role: node` device pairing with no requested scopes is eligible.
-- Operator, browser, Control UI, and WebChat clients stay manual.
-- Role, scope, metadata, and public-key upgrades stay manual.
-- Same-host loopback trusted-proxy header paths are not eligible because that
-  path can be spoofed by local callers.
+- 当 `gateway.nodes.pairing.autoApproveCidrs` 未设置时，此功能禁用。
+- 不存在对整个局域网或私有网络的一键自动批准模式。
+- 只有不带请求范围的全新 `role: node` 设备配对才符合条件。
+- 操作员、浏览器、Control UI 和 WebChat 客户端仍保持手动。
+- 角色、范围、元数据和公钥升级仍保持手动。
+- 同主机 loopback 受信任代理头路径不符合条件，因为该路径可被本地调用方伪造。
 
-## Metadata-upgrade auto-approval
+## 元数据升级自动批准
 
-When an already paired device reconnects with only non-sensitive metadata
-changes (for example, display name or client platform hints), OpenClaw treats
-that as a `metadata-upgrade`. Silent auto-approval is narrow: it applies only
-to trusted non-browser local reconnects that already proved possession of local
-or shared credentials, including same-host native app reconnects after OS
-version metadata changes. Browser/Control UI clients and remote clients still
-use the explicit re-approval flow. Scope upgrades (read to write/admin) and
-public key changes are **not** eligible for metadata-upgrade auto-approval —
-they stay as explicit re-approval requests.
+当一个已配对设备重新连接，且仅包含非敏感元数据变更时（例如显示名称或客户端平台提示），OpenClaw 会将其视为 `metadata-upgrade`。静默自动批准的适用范围非常窄：它仅适用于受信任的非浏览器本地重新连接，这些连接已证明持有本地或共享凭证，包括因操作系统版本元数据变化而在同一主机上重新连接的原生应用。浏览器/Control UI 客户端和远程客户端仍使用显式重新批准流程。范围升级（从 read 到 write/admin）和公钥变更**不**符合元数据升级自动批准条件——它们仍然是显式重新批准请求。
 
-## QR pairing helpers
+## QR 配对辅助工具
 
-`/pair qr` renders the pairing payload as structured media so mobile and
-browser clients can scan it directly.
+`/pair qr` 会将配对载荷渲染为结构化媒体，以便移动端和浏览器客户端直接扫描。
 
-Deleting a device also sweeps any stale pending pairing requests for that
-device id, so `nodes pending` does not show orphaned rows after a revoke.
+删除设备时，也会一并清除该设备 id 的任何陈旧待处理配对请求，因此 `nodes pending` 不会在撤销后显示孤立条目。
 
-## Locality and forwarded headers
+## 本地性与转发头
 
-Gateway pairing treats a connection as loopback only when both the raw socket
-and any upstream proxy evidence agree. If a request arrives on loopback but
-carries `X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` headers
-that point at a non-local origin, that forwarded-header evidence disqualifies
-the loopback locality claim. The pairing path then requires explicit approval
-instead of silently treating the request as a same-host connect. See
-[Trusted Proxy Auth](/gateway/trusted-proxy-auth) for the equivalent rule on
-operator auth.
+只有当原始套接字和任何上游代理证据都一致时，Gateway 网关配对才会将某个连接视为 loopback。如果一个请求到达于 loopback，但携带了指向非本地来源的 `X-Forwarded-For` / `X-Forwarded-Host` / `X-Forwarded-Proto` 头，那么这些转发头证据会使 loopback 本地性声明失效。此时，配对路径将要求显式批准，而不是静默地将该请求视为同主机连接。关于操作员身份验证中的等效规则，请参阅
+[Trusted Proxy Auth](/zh-CN/gateway/trusted-proxy-auth)。
 
-## Storage (local, private)
+## 存储（本地，私有）
 
-Pairing state is stored under the Gateway state directory (default `~/.openclaw`):
+配对状态存储在 Gateway 网关状态目录下（默认是 `~/.openclaw`）：
 
 - `~/.openclaw/nodes/paired.json`
 - `~/.openclaw/nodes/pending.json`
 
-If you override `OPENCLAW_STATE_DIR`, the `nodes/` folder moves with it.
+如果你覆盖了 `OPENCLAW_STATE_DIR`，`nodes/` 文件夹也会随之移动。
 
-Security notes:
+安全说明：
 
-- Tokens are secrets; treat `paired.json` as sensitive.
-- Rotating a token requires re-approval (or deleting the node entry).
+- 令牌属于机密；请将 `paired.json` 视为敏感文件。
+- 轮换令牌需要重新批准（或删除该节点条目）。
 
-## Transport behavior
+## 传输行为
 
-- The transport is **stateless**; it does not store membership.
-- If the Gateway is offline or pairing is disabled, nodes cannot pair.
-- If the Gateway is in remote mode, pairing still happens against the remote Gateway’s store.
+- 传输协议是**无状态的**；它不存储成员资格。
+- 如果 Gateway 网关离线或配对被禁用，节点将无法配对。
+- 如果 Gateway 网关处于远程模式，配对仍会针对远程 Gateway 网关的存储进行。
 
-## Related
+## 相关内容
 
-- [Channel pairing](/channels/pairing)
-- [Nodes](/nodes)
-- [Devices CLI](/cli/devices)
+- [渠道配对](/zh-CN/channels/pairing)
+- [节点](/zh-CN/nodes)
+- [设备 CLI](/zh-CN/cli/devices)

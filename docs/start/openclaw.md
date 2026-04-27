@@ -1,61 +1,68 @@
 ---
-summary: "End-to-end guide for running OpenClaw as a personal assistant with safety cautions"
 read_when:
-  - Onboarding a new assistant instance
-  - Reviewing safety/permission implications
-title: "Personal assistant setup"
+    - 为新的助理实例进行新手引导
+    - 审查安全性/权限影响
+summary: 将 OpenClaw 作为个人助理运行的端到端指南，并附带安全注意事项
+title: 个人助理设置
+x-i18n:
+    generated_at: "2026-04-24T19:58:22Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 1647b78e8cf23a3a025969c52fbd8a73aed78df27698abf36bbf62045dc30e3b
+    source_path: start/openclaw.md
+    workflow: 15
 ---
 
-# Building a personal assistant with OpenClaw
+# 使用 OpenClaw 构建个人助理
 
-OpenClaw is a self-hosted gateway that connects Discord, Google Chat, iMessage, Matrix, Microsoft Teams, Signal, Slack, Telegram, WhatsApp, Zalo, and more to AI agents. This guide covers the "personal assistant" setup: a dedicated WhatsApp number that behaves like your always-on AI assistant.
+OpenClaw 是一个自托管 Gateway 网关，可将 Discord、Google Chat、iMessage、Matrix、Microsoft Teams、Signal、Slack、Telegram、WhatsApp、Zalo 等连接到 AI 智能体。本指南介绍“个人助理”设置：一个专用的 WhatsApp 号码，作为你始终在线的 AI 助理运行。
 
-## ⚠️ Safety first
+## ⚠️ 安全第一
 
-You’re putting an agent in a position to:
+你正在让一个智能体处于能够执行以下操作的位置：
 
-- run commands on your machine (depending on your tool policy)
-- read/write files in your workspace
-- send messages back out via WhatsApp/Telegram/Discord/Mattermost and other bundled channels
+- 在你的机器上运行命令（取决于你的工具策略）
+- 读取/写入你的工作区中的文件
+- 通过 WhatsApp/Telegram/Discord/Mattermost 和其他内置渠道将消息发回外部
 
-Start conservative:
+一开始要保守：
 
-- Always set `channels.whatsapp.allowFrom` (never run open-to-the-world on your personal Mac).
-- Use a dedicated WhatsApp number for the assistant.
-- Heartbeats now default to every 30 minutes. Disable until you trust the setup by setting `agents.defaults.heartbeat.every: "0m"`.
+- 始终设置 `channels.whatsapp.allowFrom`（绝不要在你的个人 Mac 上对全世界开放运行）。
+- 为助理使用一个专用的 WhatsApp 号码。
+- 心跳现在默认每 30 分钟运行一次。在你信任这套设置之前，请通过设置 `agents.defaults.heartbeat.every: "0m"` 禁用它。
 
-## Prerequisites
+## 前提条件
 
-- OpenClaw installed and onboarded — see [Getting Started](/start/getting-started) if you haven't done this yet
-- A second phone number (SIM/eSIM/prepaid) for the assistant
+- 已安装并完成 OpenClaw 新手引导 —— 如果你还没做，请参见 [入门指南](/zh-CN/start/getting-started)
+- 一个供助理使用的第二个电话号码（SIM/eSIM/预付费都可以）
 
-## The two-phone setup (recommended)
+## 双手机设置（推荐）
 
-You want this:
+你需要的是这个：
 
 ```mermaid
 flowchart TB
-    A["<b>Your Phone (personal)<br></b><br>Your WhatsApp<br>+1-555-YOU"] -- message --> B["<b>Second Phone (assistant)<br></b><br>Assistant WA<br>+1-555-ASSIST"]
-    B -- linked via QR --> C["<b>Your Mac (openclaw)<br></b><br>AI agent"]
+    A["<b>你的手机（个人）<br></b><br>你的 WhatsApp<br>+1-555-YOU"] -- message --> B["<b>第二部手机（助理）<br></b><br>助理 WA<br>+1-555-ASSIST"]
+    B -- linked via QR --> C["<b>你的 Mac（openclaw）<br></b><br>AI 智能体"]
 ```
 
-If you link your personal WhatsApp to OpenClaw, every message to you becomes “agent input”. That’s rarely what you want.
+如果你将个人 WhatsApp 关联到 OpenClaw，那么发给你的每一条消息都会变成“智能体输入”。这通常并不是你想要的。
 
-## 5-minute quick start
+## 5 分钟快速开始
 
-1. Pair WhatsApp Web (shows QR; scan with the assistant phone):
+1. 配对 WhatsApp Web（会显示二维码；使用助理手机扫描）：
 
 ```bash
 openclaw channels login
 ```
 
-2. Start the Gateway (leave it running):
+2. 启动 Gateway 网关（保持它持续运行）：
 
 ```bash
 openclaw gateway --port 18789
 ```
 
-3. Put a minimal config in `~/.openclaw/openclaw.json`:
+3. 在 `~/.openclaw/openclaw.json` 中放入一个最小配置：
 
 ```json5
 {
@@ -64,26 +71,26 @@ openclaw gateway --port 18789
 }
 ```
 
-Now message the assistant number from your allowlisted phone.
+现在，从你已加入允许名单的手机向助理号码发送消息。
 
-When onboarding finishes, OpenClaw auto-opens the dashboard and prints a clean (non-tokenized) link. If the dashboard prompts for auth, paste the configured shared secret into Control UI settings. Onboarding uses a token by default (`gateway.auth.token`), but password auth works too if you switched `gateway.auth.mode` to `password`. To reopen later: `openclaw dashboard`.
+新手引导完成后，OpenClaw 会自动打开仪表盘并打印一个简洁的（非 token 化）链接。如果仪表盘提示需要认证，请将已配置的共享密钥粘贴到 Control UI 设置中。新手引导默认使用 token（`gateway.auth.token`），但如果你已将 `gateway.auth.mode` 切换为 `password`，密码认证同样可用。要稍后重新打开：`openclaw dashboard`。
 
-## Give the agent a workspace (AGENTS)
+## 给智能体一个工作区（AGENTS）
 
-OpenClaw reads operating instructions and “memory” from its workspace directory.
+OpenClaw 会从其工作区目录中读取操作说明和“记忆”。
 
-By default, OpenClaw uses `~/.openclaw/workspace` as the agent workspace, and will create it (plus starter `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`) automatically on setup/first agent run. `BOOTSTRAP.md` is only created when the workspace is brand new (it should not come back after you delete it). `MEMORY.md` is optional (not auto-created); when present, it is loaded for normal sessions. Subagent sessions only inject `AGENTS.md` and `TOOLS.md`.
+默认情况下，OpenClaw 使用 `~/.openclaw/workspace` 作为智能体工作区，并会在设置/首次运行智能体时自动创建它（以及初始的 `AGENTS.md`、`SOUL.md`、`TOOLS.md`、`IDENTITY.md`、`USER.md`、`HEARTBEAT.md`）。`BOOTSTRAP.md` 仅会在工作区是全新时创建（删除后不应再次出现）。`MEMORY.md` 是可选的（不会自动创建）；如果存在，它会在正常会话中加载。子智能体会话只会注入 `AGENTS.md` 和 `TOOLS.md`。
 
-Tip: treat this folder like OpenClaw’s “memory” and make it a git repo (ideally private) so your `AGENTS.md` + memory files are backed up. If git is installed, brand-new workspaces are auto-initialized.
+提示：把这个文件夹当作 OpenClaw 的“记忆”，并把它变成一个 git 仓库（最好是私有仓库），这样你的 `AGENTS.md` 和记忆文件就会被备份。如果系统已安装 git，全新的工作区会自动初始化。
 
 ```bash
 openclaw setup
 ```
 
-Full workspace layout + backup guide: [Agent workspace](/concepts/agent-workspace)
-Memory workflow: [Memory](/concepts/memory)
+完整工作区布局和备份指南：[智能体工作区](/zh-CN/concepts/agent-workspace)
+记忆工作流：[记忆](/zh-CN/concepts/memory)
 
-Optional: choose a different workspace with `agents.defaults.workspace` (supports `~`).
+可选：使用 `agents.defaults.workspace` 选择不同的工作区（支持 `~`）。
 
 ```json5
 {
@@ -95,7 +102,7 @@ Optional: choose a different workspace with `agents.defaults.workspace` (support
 }
 ```
 
-If you already ship your own workspace files from a repo, you can disable bootstrap file creation entirely:
+如果你已经从某个仓库中提供了自己的工作区文件，可以完全禁用引导文件创建：
 
 ```json5
 {
@@ -107,15 +114,15 @@ If you already ship your own workspace files from a repo, you can disable bootst
 }
 ```
 
-## The config that turns it into "an assistant"
+## 将其变成“一个助理”的配置
 
-OpenClaw defaults to a good assistant setup, but you’ll usually want to tune:
+OpenClaw 默认就适合助理场景，但你通常会想要调整：
 
-- persona/instructions in [`SOUL.md`](/concepts/soul)
-- thinking defaults (if desired)
-- heartbeats (once you trust it)
+- [`SOUL.md`](/zh-CN/concepts/soul) 中的人设/说明
+- 思考默认值（如果需要）
+- 心跳（在你信任它之后再启用）
 
-Example:
+示例：
 
 ```json5
 {
@@ -125,7 +132,7 @@ Example:
     workspace: "~/.openclaw/workspace",
     thinkingDefault: "high",
     timeoutSeconds: 1800,
-    // Start with 0; enable later.
+    // 一开始设为 0；之后再启用。
     heartbeat: { every: "0m" },
   },
   channels: {
@@ -153,24 +160,24 @@ Example:
 }
 ```
 
-## Sessions and memory
+## 会话和记忆
 
-- Session files: `~/.openclaw/agents/<agentId>/sessions/{{SessionId}}.jsonl`
-- Session metadata (token usage, last route, etc): `~/.openclaw/agents/<agentId>/sessions/sessions.json` (legacy: `~/.openclaw/sessions/sessions.json`)
-- `/new` or `/reset` starts a fresh session for that chat (configurable via `resetTriggers`). If sent alone, the agent replies with a short hello to confirm the reset.
-- `/compact [instructions]` compacts the session context and reports the remaining context budget.
+- 会话文件：`~/.openclaw/agents/<agentId>/sessions/{{SessionId}}.jsonl`
+- 会话元数据（token 用量、上一条路由等）：`~/.openclaw/agents/<agentId>/sessions/sessions.json`（旧版：`~/.openclaw/sessions/sessions.json`）
+- `/new` 或 `/reset` 会为该聊天开启一个全新会话（可通过 `resetTriggers` 配置）。如果单独发送，智能体会回复一条简短问候以确认已重置。
+- `/compact [instructions]` 会压缩会话上下文，并报告剩余上下文预算。
 
-## Heartbeats (proactive mode)
+## 心跳（主动模式）
 
-By default, OpenClaw runs a heartbeat every 30 minutes with the prompt:
+默认情况下，OpenClaw 每 30 分钟运行一次心跳，提示词为：
 `Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
-Set `agents.defaults.heartbeat.every: "0m"` to disable.
+设置 `agents.defaults.heartbeat.every: "0m"` 可禁用。
 
-- If `HEARTBEAT.md` exists but is effectively empty (only blank lines and markdown headers like `# Heading`), OpenClaw skips the heartbeat run to save API calls.
-- If the file is missing, the heartbeat still runs and the model decides what to do.
-- If the agent replies with `HEARTBEAT_OK` (optionally with short padding; see `agents.defaults.heartbeat.ackMaxChars`), OpenClaw suppresses outbound delivery for that heartbeat.
-- By default, heartbeat delivery to DM-style `user:<id>` targets is allowed. Set `agents.defaults.heartbeat.directPolicy: "block"` to suppress direct-target delivery while keeping heartbeat runs active.
-- Heartbeats run full agent turns — shorter intervals burn more tokens.
+- 如果 `HEARTBEAT.md` 存在但实际上为空（只有空行和 Markdown 标题，例如 `# Heading`），OpenClaw 会跳过该次心跳运行，以节省 API 调用。
+- 如果文件缺失，心跳仍会运行，并由模型决定该做什么。
+- 如果智能体回复 `HEARTBEAT_OK`（可带少量补充字符；见 `agents.defaults.heartbeat.ackMaxChars`），OpenClaw 会抑制该次心跳的外发投递。
+- 默认情况下，允许将心跳投递到类似私信的 `user:<id>` 目标。设置 `agents.defaults.heartbeat.directPolicy: "block"` 可抑制直接目标投递，同时保留心跳运行。
+- 心跳会运行完整的智能体轮次 —— 间隔越短，消耗的 token 越多。
 
 ```json5
 {
@@ -180,56 +187,56 @@ Set `agents.defaults.heartbeat.every: "0m"` to disable.
 }
 ```
 
-## Media in and out
+## 媒体输入和输出
 
-Inbound attachments (images/audio/docs) can be surfaced to your command via templates:
+入站附件（图像/音频/文档）可以通过模板暴露给你的命令：
 
-- `{{MediaPath}}` (local temp file path)
-- `{{MediaUrl}}` (pseudo-URL)
-- `{{Transcript}}` (if audio transcription is enabled)
+- `{{MediaPath}}`（本地临时文件路径）
+- `{{MediaUrl}}`（伪 URL）
+- `{{Transcript}}`（如果启用了音频转录）
 
-Outbound attachments from the agent: include `MEDIA:<path-or-url>` on its own line (no spaces). Example:
+来自智能体的出站附件：在单独一行中包含 `MEDIA:<path-or-url>`（无空格）。示例：
 
 ```
 Here’s the screenshot.
 MEDIA:https://example.com/screenshot.png
 ```
 
-OpenClaw extracts these and sends them as media alongside the text.
+OpenClaw 会提取这些内容，并将其作为媒体与文本一起发送。
 
-Local-path behavior follows the same file-read trust model as the agent:
+本地路径行为遵循与智能体相同的文件读取信任模型：
 
-- If `tools.fs.workspaceOnly` is `true`, outbound `MEDIA:` local paths stay restricted to the OpenClaw temp root, the media cache, agent workspace paths, and sandbox-generated files.
-- If `tools.fs.workspaceOnly` is `false`, outbound `MEDIA:` can use host-local files the agent is already allowed to read.
-- Host-local sends still only allow media and safe document types (images, audio, video, PDF, and Office documents). Plain text and secret-like files are not treated as sendable media.
+- 如果 `tools.fs.workspaceOnly` 为 `true`，则出站 `MEDIA:` 本地路径仍限制在 OpenClaw 临时根目录、媒体缓存、智能体工作区路径以及由沙箱生成的文件中。
+- 如果 `tools.fs.workspaceOnly` 为 `false`，则出站 `MEDIA:` 可以使用智能体已被允许读取的主机本地文件。
+- 主机本地发送仍然只允许媒体和安全文档类型（图像、音频、视频、PDF 和 Office 文档）。纯文本和类似机密的文件不会被视为可发送媒体。
 
-That means generated images/files outside the workspace can now send when your fs policy already allows those reads, without reopening arbitrary host-text attachment exfiltration.
+这意味着，当你的 fs 策略已经允许这些读取时，工作区之外生成的图像/文件现在也可以发送，而不会重新开放任意主机文本附件外传。
 
-## Operations checklist
+## 操作检查清单
 
 ```bash
-openclaw status          # local status (creds, sessions, queued events)
-openclaw status --all    # full diagnosis (read-only, pasteable)
-openclaw status --deep   # asks the gateway for a live health probe with channel probes when supported
-openclaw health --json   # gateway health snapshot (WS; default can return a fresh cached snapshot)
+openclaw status          # 本地状态（凭证、会话、排队事件）
+openclaw status --all    # 完整诊断（只读，可直接粘贴）
+openclaw status --deep   # 通过 Gateway 网关请求实时健康探测，并在支持时包含渠道探测
+openclaw health --json   # Gateway 网关健康快照（WS；默认可返回一个新的缓存快照）
 ```
 
-Logs live under `/tmp/openclaw/` (default: `openclaw-YYYY-MM-DD.log`).
+日志位于 `/tmp/openclaw/` 下（默认：`openclaw-YYYY-MM-DD.log`）。
 
-## Next steps
+## 后续步骤
 
-- WebChat: [WebChat](/web/webchat)
-- Gateway ops: [Gateway runbook](/gateway)
-- Cron + wakeups: [Cron jobs](/automation/cron-jobs)
-- macOS menu bar companion: [OpenClaw macOS app](/platforms/macos)
-- iOS node app: [iOS app](/platforms/ios)
-- Android node app: [Android app](/platforms/android)
-- Windows status: [Windows (WSL2)](/platforms/windows)
-- Linux status: [Linux app](/platforms/linux)
-- Security: [Security](/gateway/security)
+- WebChat：[WebChat](/zh-CN/web/webchat)
+- Gateway 网关运维：[Gateway 网关运行手册](/zh-CN/gateway)
+- Cron + 唤醒：[Cron jobs](/zh-CN/automation/cron-jobs)
+- macOS 菜单栏配套应用：[OpenClaw macOS 应用](/zh-CN/platforms/macos)
+- iOS 节点应用：[iOS 应用](/zh-CN/platforms/ios)
+- Android 节点应用：[Android 应用](/zh-CN/platforms/android)
+- Windows 状态：[Windows（WSL2）](/zh-CN/platforms/windows)
+- Linux 状态：[Linux 应用](/zh-CN/platforms/linux)
+- 安全性：[安全性](/zh-CN/gateway/security)
 
-## Related
+## 相关内容
 
-- [Getting started](/start/getting-started)
-- [Setup](/start/setup)
-- [Channels overview](/channels)
+- [入门指南](/zh-CN/start/getting-started)
+- [设置](/zh-CN/start/setup)
+- [渠道概览](/zh-CN/channels)

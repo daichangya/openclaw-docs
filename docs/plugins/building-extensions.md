@@ -1,13 +1,20 @@
 ---
-summary: "Redirects to the current Building Plugins guide"
-title: "Building plugins (redirect)"
 read_when:
-  - Legacy link to building-extensions
+    - 指向 building-extensions 的旧链接
+summary: 重定向到当前的《构建插件》指南
+title: 构建插件（重定向）
+x-i18n:
+    generated_at: "2026-04-23T22:59:49Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: d687ccddfe7dcadf8bdd0fc903bf8a5da112902a8d23086b04da25df752facaf
+    source_path: plugins/building-extensions.md
+    workflow: 15
 ---
 
-This page has moved to [Building Plugins](/plugins/building-plugins).
+此页面已迁移至[构建插件](/zh-CN/plugins/building-plugins)。
 
-## Related
+## 相关内容
 
-- [Building plugins](/plugins/building-plugins)
-- [Plugin architecture](/plugins/architecture)
+- [构建插件](/zh-CN/plugins/building-plugins)
+- [插件架构](/zh-CN/plugins/architecture)

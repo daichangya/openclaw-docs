@@ -1,78 +1,85 @@
 ---
-summary: "Install and configure Node.js for OpenClaw — version requirements, install options, and PATH troubleshooting"
-title: "Node.js"
 read_when:
-  - "You need to install Node.js before installing OpenClaw"
-  - "You installed OpenClaw but `openclaw` is command not found"
-  - "npm install -g fails with permissions or PATH issues"
+    - 你需要先安装 Node.js，才能安装 OpenClaw
+    - 你已经安装了 OpenClaw，但 `openclaw` 提示 command not found
+    - '`npm install -g` 因权限或 PATH 问题而失败'
+summary: 为 OpenClaw 安装和配置 Node.js —— 版本要求、安装方式和 PATH 故障排除
+title: Node.js
+x-i18n:
+    generated_at: "2026-04-23T20:52:46Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 99c72b917fa8beba136ee6010799c0183cff8b2420b5a1bd256d9155e50f065a
+    source_path: install/node.md
+    workflow: 15
 ---
 
-OpenClaw requires **Node 22.14 or newer**. **Node 24 is the default and recommended runtime** for installs, CI, and release workflows. Node 22 remains supported via the active LTS line. The [installer script](/install#alternative-install-methods) will detect and install Node automatically — this page is for when you want to set up Node yourself and make sure everything is wired up correctly (versions, PATH, global installs).
+OpenClaw 要求使用 **Node 22.14 或更高版本**。**Node 24 是安装、CI 和发布工作流的默认且推荐运行时**。Node 22 仍通过当前 LTS 线路受支持。[安装脚本](/zh-CN/install#alternative-install-methods) 会自动检测并安装 Node —— 本页适用于你想自行设置 Node，并确保所有内容都正确连接（版本、PATH、全局安装）的情况。
 
-## Check your version
+## 检查你的版本
 
 ```bash
 node -v
 ```
 
-If this prints `v24.x.x` or higher, you're on the recommended default. If it prints `v22.14.x` or higher, you're on the supported Node 22 LTS path, but we still recommend upgrading to Node 24 when convenient. If Node isn't installed or the version is too old, pick an install method below.
+如果输出为 `v24.x.x` 或更高，你正在使用推荐的默认版本。如果输出为 `v22.14.x` 或更高，你处于受支持的 Node 22 LTS 路径，但我们仍建议你在方便时升级到 Node 24。如果尚未安装 Node，或版本过旧，请从下面选择一种安装方式。
 
-## Install Node
+## 安装 Node
 
 <Tabs>
   <Tab title="macOS">
-    **Homebrew** (recommended):
+    **Homebrew**（推荐）：
 
     ```bash
     brew install node
     ```
 
-    Or download the macOS installer from [nodejs.org](https://nodejs.org/).
+    或从 [nodejs.org](https://nodejs.org/) 下载 macOS 安装程序。
 
   </Tab>
   <Tab title="Linux">
-    **Ubuntu / Debian:**
+    **Ubuntu / Debian：**
 
     ```bash
     curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
     sudo apt-get install -y nodejs
     ```
 
-    **Fedora / RHEL:**
+    **Fedora / RHEL：**
 
     ```bash
     sudo dnf install nodejs
     ```
 
-    Or use a version manager (see below).
+    或使用版本管理器（见下文）。
 
   </Tab>
   <Tab title="Windows">
-    **winget** (recommended):
+    **winget**（推荐）：
 
     ```powershell
     winget install OpenJS.NodeJS.LTS
     ```
 
-    **Chocolatey:**
+    **Chocolatey：**
 
     ```powershell
     choco install nodejs-lts
     ```
 
-    Or download the Windows installer from [nodejs.org](https://nodejs.org/).
+    或从 [nodejs.org](https://nodejs.org/) 下载 Windows 安装程序。
 
   </Tab>
 </Tabs>
 
-<Accordion title="Using a version manager (nvm, fnm, mise, asdf)">
-  Version managers let you switch between Node versions easily. Popular options:
+<Accordion title="使用版本管理器（nvm、fnm、mise、asdf）">
+  版本管理器可以让你轻松切换不同的 Node 版本。常见选项：
 
-- [**fnm**](https://github.com/Schniz/fnm) — fast, cross-platform
-- [**nvm**](https://github.com/nvm-sh/nvm) — widely used on macOS/Linux
-- [**mise**](https://mise.jdx.dev/) — polyglot (Node, Python, Ruby, etc.)
+- [**fnm**](https://github.com/Schniz/fnm) —— 快速、跨平台
+- [**nvm**](https://github.com/nvm-sh/nvm) —— 在 macOS / Linux 上广泛使用
+- [**mise**](https://mise.jdx.dev/) —— 多语言（Node、Python、Ruby 等）
 
-Example with fnm:
+以 fnm 为例：
 
 ```bash
 fnm install 24
@@ -80,52 +87,52 @@ fnm use 24
 ```
 
   <Warning>
-  Make sure your version manager is initialized in your shell startup file (`~/.zshrc` or `~/.bashrc`). If it isn't, `openclaw` may not be found in new terminal sessions because the PATH won't include Node's bin directory.
+  请确保你的版本管理器已在 shell 启动文件（`~/.zshrc` 或 `~/.bashrc`）中完成初始化。否则，在新的终端会话中可能找不到 `openclaw`，因为 PATH 中不会包含 Node 的 bin 目录。
   </Warning>
 </Accordion>
 
-## Troubleshooting
+## 故障排除
 
 ### `openclaw: command not found`
 
-This almost always means npm's global bin directory isn't on your PATH.
+这几乎总是意味着 npm 的全局 bin 目录不在你的 PATH 中。
 
 <Steps>
-  <Step title="Find your global npm prefix">
+  <Step title="找到你的全局 npm 前缀">
     ```bash
     npm prefix -g
     ```
   </Step>
-  <Step title="Check if it's on your PATH">
+  <Step title="检查它是否在 PATH 中">
     ```bash
     echo "$PATH"
     ```
 
-    Look for `<npm-prefix>/bin` (macOS/Linux) or `<npm-prefix>` (Windows) in the output.
+    请在输出中查找 `<npm-prefix>/bin`（macOS / Linux）或 `<npm-prefix>`（Windows）。
 
   </Step>
-  <Step title="Add it to your shell startup file">
+  <Step title="将它添加到 shell 启动文件中">
     <Tabs>
       <Tab title="macOS / Linux">
-        Add to `~/.zshrc` or `~/.bashrc`:
+        添加到 `~/.zshrc` 或 `~/.bashrc`：
 
         ```bash
         export PATH="$(npm prefix -g)/bin:$PATH"
         ```
 
-        Then open a new terminal (or run `rehash` in zsh / `hash -r` in bash).
+        然后打开一个新终端（或在 zsh 中运行 `rehash` / 在 bash 中运行 `hash -r`）。
       </Tab>
       <Tab title="Windows">
-        Add the output of `npm prefix -g` to your system PATH via Settings → System → Environment Variables.
+        通过“设置 → 系统 → 环境变量”将 `npm prefix -g` 的输出添加到系统 PATH 中。
       </Tab>
     </Tabs>
 
   </Step>
 </Steps>
 
-### Permission errors on `npm install -g` (Linux)
+### `npm install -g` 的权限错误（Linux）
 
-If you see `EACCES` errors, switch npm's global prefix to a user-writable directory:
+如果你看到 `EACCES` 错误，请将 npm 的全局前缀切换到一个用户可写目录：
 
 ```bash
 mkdir -p "$HOME/.npm-global"
@@ -133,10 +140,10 @@ npm config set prefix "$HOME/.npm-global"
 export PATH="$HOME/.npm-global/bin:$PATH"
 ```
 
-Add the `export PATH=...` line to your `~/.bashrc` or `~/.zshrc` to make it permanent.
+将 `export PATH=...` 这一行添加到 `~/.bashrc` 或 `~/.zshrc` 中，使其永久生效。
 
-## Related
+## 相关内容
 
-- [Install Overview](/install) — all installation methods
-- [Updating](/install/updating) — keeping OpenClaw up to date
-- [Getting Started](/start/getting-started) — first steps after install
+- [安装概览](/zh-CN/install) —— 所有安装方式
+- [Updating](/zh-CN/install/updating) —— 让 OpenClaw 保持最新
+- [入门指南](/zh-CN/start/getting-started) —— 安装后的第一步

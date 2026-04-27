@@ -1,29 +1,36 @@
 ---
-summary: "Dev agent tools notes (C-3PO)"
-title: "TOOLS.dev template"
 read_when:
-  - Using the dev gateway templates
-  - Updating the default dev agent identity
+    - 使用开发 Gateway 网关模板
+    - 更新默认开发智能体身份
+summary: 开发智能体工具说明（C-3PO）
+title: '`TOOLS.dev` 模板'
+x-i18n:
+    generated_at: "2026-04-24T04:07:22Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 23c11e2832ed0dcf9ddd43e5472e0c025c1a91a33299019c16f00a7230e8e99c
+    source_path: reference/templates/TOOLS.dev.md
+    workflow: 15
 ---
 
-# TOOLS.md - User Tool Notes (editable)
+# TOOLS.md - 用户工具说明（可编辑）
 
-This file is for _your_ notes about external tools and conventions.
-It does not define which tools exist; OpenClaw provides built-in tools internally.
+此文件用于记录_你自己的_外部工具和约定说明。
+它不定义有哪些工具；OpenClaw 会在内部提供内置工具。
 
-## Examples
+## 示例
 
 ### imsg
 
-- Send an iMessage/SMS: describe who/what, confirm before sending.
-- Prefer short messages; avoid sending secrets.
+- 发送 iMessage / SMS：描述发送给谁 / 发送什么，并在发送前确认。
+- 优先使用简短消息；避免发送敏感信息。
 
 ### sag
 
-- Text-to-speech: specify voice, target speaker/room, and whether to stream.
+- 文本转语音：指定声音、目标扬声器 / 房间，以及是否流式播放。
 
-Add whatever else you want the assistant to know about your local toolchain.
+你可以添加任何其他希望助手了解的本地工具链信息。
 
-## Related
+## 相关内容
 
-- [TOOLS.md template](/reference/templates/TOOLS)
+- [TOOLS.md 模板](/zh-CN/reference/templates/TOOLS)

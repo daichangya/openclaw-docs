@@ -1,34 +1,41 @@
 ---
-summary: "Together AI setup (auth + model selection)"
-title: "Together AI"
 read_when:
-  - You want to use Together AI with OpenClaw
-  - You need the API key env var or CLI auth choice
+    - 你想在 OpenClaw 中使用 Together AI
+    - 你需要 API key 环境变量或 CLI 认证方式选择
+summary: Together AI 设置（认证 + 模型选择）
+title: Together AI
+x-i18n:
+    generated_at: "2026-04-23T21:02:17Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c6a11f212fbef79e399d4a50cec88150bf0b7abf80ad765f0a617786bb051c8e
+    source_path: providers/together.md
+    workflow: 15
 ---
 
-[Together AI](https://together.ai) provides access to leading open-source
-models including Llama, DeepSeek, Kimi, and more through a unified API.
+[Together AI](https://together.ai) 通过统一 API 提供对领先开源
+模型的访问，包括 Llama、DeepSeek、Kimi 等。
 
-| Property | Value                         |
+| 属性 | 值 |
 | -------- | ----------------------------- |
-| Provider | `together`                    |
-| Auth     | `TOGETHER_API_KEY`            |
-| API      | OpenAI-compatible             |
+| 提供商 | `together` |
+| 认证 | `TOGETHER_API_KEY` |
+| API | 与 OpenAI 兼容 |
 | Base URL | `https://api.together.xyz/v1` |
 
-## Getting started
+## 快速开始
 
 <Steps>
-  <Step title="Get an API key">
-    Create an API key at
-    [api.together.ai/settings/api-keys](https://api.together.ai/settings/api-keys).
+  <Step title="获取 API key">
+    在
+    [api.together.ai/settings/api-keys](https://api.together.ai/settings/api-keys) 创建一个 API key。
   </Step>
-  <Step title="Run onboarding">
+  <Step title="运行新手引导">
     ```bash
     openclaw onboard --auth-choice together-api-key
     ```
   </Step>
-  <Step title="Set a default model">
+  <Step title="设置默认模型">
     ```json5
     {
       agents: {
@@ -41,7 +48,7 @@ models including Llama, DeepSeek, Kimi, and more through a unified API.
   </Step>
 </Steps>
 
-### Non-interactive example
+### 非交互式示例
 
 ```bash
 openclaw onboard --non-interactive \
@@ -51,37 +58,37 @@ openclaw onboard --non-interactive \
 ```
 
 <Note>
-The onboarding preset sets `together/moonshotai/Kimi-K2.5` as the default
-model.
+该新手引导预设会将 `together/moonshotai/Kimi-K2.5` 设为默认
+模型。
 </Note>
 
-## Built-in catalog
+## 内置目录
 
-OpenClaw ships this bundled Together catalog:
+OpenClaw 内置了以下 Together 目录：
 
-| Model ref                                                    | Name                                   | Input       | Context    | Notes                            |
+| 模型引用 | 名称 | 输入 | 上下文 | 说明 |
 | ------------------------------------------------------------ | -------------------------------------- | ----------- | ---------- | -------------------------------- |
-| `together/moonshotai/Kimi-K2.5`                              | Kimi K2.5                              | text, image | 262,144    | Default model; reasoning enabled |
-| `together/zai-org/GLM-4.7`                                   | GLM 4.7 Fp8                            | text        | 202,752    | General-purpose text model       |
-| `together/meta-llama/Llama-3.3-70B-Instruct-Turbo`           | Llama 3.3 70B Instruct Turbo           | text        | 131,072    | Fast instruction model           |
-| `together/meta-llama/Llama-4-Scout-17B-16E-Instruct`         | Llama 4 Scout 17B 16E Instruct         | text, image | 10,000,000 | Multimodal                       |
-| `together/meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8` | Llama 4 Maverick 17B 128E Instruct FP8 | text, image | 20,000,000 | Multimodal                       |
-| `together/deepseek-ai/DeepSeek-V3.1`                         | DeepSeek V3.1                          | text        | 131,072    | General text model               |
-| `together/deepseek-ai/DeepSeek-R1`                           | DeepSeek R1                            | text        | 131,072    | Reasoning model                  |
-| `together/moonshotai/Kimi-K2-Instruct-0905`                  | Kimi K2-Instruct 0905                  | text        | 262,144    | Secondary Kimi text model        |
+| `together/moonshotai/Kimi-K2.5` | Kimi K2.5 | text, image | 262,144 | 默认模型；启用推理 |
+| `together/zai-org/GLM-4.7` | GLM 4.7 Fp8 | text | 202,752 | 通用文本模型 |
+| `together/meta-llama/Llama-3.3-70B-Instruct-Turbo` | Llama 3.3 70B Instruct Turbo | text | 131,072 | 快速指令模型 |
+| `together/meta-llama/Llama-4-Scout-17B-16E-Instruct` | Llama 4 Scout 17B 16E Instruct | text, image | 10,000,000 | 多模态 |
+| `together/meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8` | Llama 4 Maverick 17B 128E Instruct FP8 | text, image | 20,000,000 | 多模态 |
+| `together/deepseek-ai/DeepSeek-V3.1` | DeepSeek V3.1 | text | 131,072 | 通用文本模型 |
+| `together/deepseek-ai/DeepSeek-R1` | DeepSeek R1 | text | 131,072 | 推理模型 |
+| `together/moonshotai/Kimi-K2-Instruct-0905` | Kimi K2-Instruct 0905 | text | 262,144 | 次级 Kimi 文本模型 |
 
-## Video generation
+## 视频生成
 
-The bundled `together` plugin also registers video generation through the
-shared `video_generate` tool.
+内置的 `together` 插件还通过共享的
+`video_generate` 工具注册了视频生成能力。
 
-| Property             | Value                                 |
+| 属性 | 值 |
 | -------------------- | ------------------------------------- |
-| Default video model  | `together/Wan-AI/Wan2.2-T2V-A14B`     |
-| Modes                | text-to-video, single-image reference |
-| Supported parameters | `aspectRatio`, `resolution`           |
+| 默认视频模型 | `together/Wan-AI/Wan2.2-T2V-A14B` |
+| 模式 | 文生视频、单图参考 |
+| 支持的参数 | `aspectRatio`、`resolution` |
 
-To use Together as the default video provider:
+要将 Together 设为默认视频提供商：
 
 ```json5
 {
@@ -96,45 +103,44 @@ To use Together as the default video provider:
 ```
 
 <Tip>
-See [Video Generation](/tools/video-generation) for the shared tool parameters,
-provider selection, and failover behavior.
+共享工具参数、提供商选择和故障转移行为请参阅 [视频生成](/zh-CN/tools/video-generation)。
 </Tip>
 
 <AccordionGroup>
-  <Accordion title="Environment note">
-    If the Gateway runs as a daemon (launchd/systemd), make sure
-    `TOGETHER_API_KEY` is available to that process (for example, in
-    `~/.openclaw/.env` or via `env.shellEnv`).
+  <Accordion title="环境说明">
+    如果 Gateway 网关以守护进程方式运行（launchd / systemd），请确保
+    `TOGETHER_API_KEY` 对该进程可用（例如放在
+    `~/.openclaw/.env` 中，或通过 `env.shellEnv` 提供）。
 
     <Warning>
-    Keys set only in your interactive shell are not visible to daemon-managed
-    gateway processes. Use `~/.openclaw/.env` or `env.shellEnv` config for
-    persistent availability.
+    仅在交互式 shell 中设置的 key 对守护进程管理的
+    Gateway 网关进程不可见。请使用 `~/.openclaw/.env` 或 `env.shellEnv` 配置以实现
+    持久可用。
     </Warning>
 
   </Accordion>
 
-  <Accordion title="Troubleshooting">
-    - Verify your key works: `openclaw models list --provider together`
-    - If models are not appearing, confirm the API key is set in the correct
-      environment for your Gateway process.
-    - Model refs use the form `together/<model-id>`.
+  <Accordion title="故障排除">
+    - 验证你的 key 是否可用：`openclaw models list --provider together`
+    - 如果模型未显示，请确认 API key 是否已在你的 Gateway 网关进程所使用的正确
+      环境中设置。
+    - 模型引用的格式是 `together/<model-id>`。
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Provider rules, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    提供商规则、模型引用和故障转移行为。
   </Card>
-  <Card title="Video generation" href="/tools/video-generation" icon="video">
-    Shared video generation tool parameters and provider selection.
+  <Card title="视频生成" href="/zh-CN/tools/video-generation" icon="video">
+    共享视频生成工具参数和提供商选择。
   </Card>
-  <Card title="Configuration reference" href="/gateway/configuration-reference" icon="gear">
-    Full config schema including provider settings.
+  <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
+    包含提供商设置在内的完整配置 schema。
   </Card>
   <Card title="Together AI" href="https://together.ai" icon="arrow-up-right-from-square">
-    Together AI dashboard, API docs, and pricing.
+    Together AI 控制台、API 文档和定价。
   </Card>
 </CardGroup>

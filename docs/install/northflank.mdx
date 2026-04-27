@@ -1,44 +1,51 @@
 ---
-summary: "Deploy OpenClaw on Northflank with one-click template"
 read_when:
-  - Deploying OpenClaw to Northflank
-  - You want a one-click cloud deploy with browser-based Control UI
-title: "Northflank"
+    - 将 OpenClaw 部署到 Northflank
+    - 你希望通过一键云部署获得基于浏览器的 Control UI
+summary: 通过一键模板在 Northflank 上部署 OpenClaw
+title: Northflank
+x-i18n:
+    generated_at: "2026-04-23T06:41:06Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 5610e076b09d50c23186f1f8db16c039c99d287c34ef6fd71d4272bc527b0388
+    source_path: install/northflank.mdx
+    workflow: 15
 ---
 
 # Northflank
 
-Deploy OpenClaw on Northflank with a one-click template and access it through the web Control UI.
-This is the easiest "no terminal on the server" path: Northflank runs the Gateway for you.
+通过一键模板在 Northflank 上部署 OpenClaw，并通过网页 Control UI 访问它。
+这是最简单的“服务器上无需终端”路径：Northflank 会为你运行 Gateway 网关。
 
-## How to get started
+## 如何开始
 
-1. Click [Deploy OpenClaw](https://northflank.com/stacks/deploy-openclaw) to open the template.
-2. Create an [account on Northflank](https://app.northflank.com/signup) if you don't already have one.
-3. Click **Deploy OpenClaw now**.
-4. Set the required environment variable: `OPENCLAW_GATEWAY_TOKEN` (use a strong random value).
-5. Click **Deploy stack** to build and run the OpenClaw template.
-6. Wait for the deployment to complete, then click **View resources**.
-7. Open the OpenClaw service.
-8. Open the public OpenClaw URL at `/openclaw` and connect using the configured shared secret. This template uses `OPENCLAW_GATEWAY_TOKEN` by default; if you replace it with password auth, use that password instead.
+1. 点击 [部署 OpenClaw](https://northflank.com/stacks/deploy-openclaw) 打开模板。
+2. 如果你还没有账号，请先在 [Northflank 注册账号](https://app.northflank.com/signup)。
+3. 点击 **立即部署 OpenClaw**。
+4. 设置必需的环境变量：`OPENCLAW_GATEWAY_TOKEN`（请使用强随机值）。
+5. 点击 **部署堆栈** 以构建并运行 OpenClaw 模板。
+6. 等待部署完成，然后点击 **查看资源**。
+7. 打开 OpenClaw 服务。
+8. 打开公开的 OpenClaw URL，并访问 `/openclaw`，然后使用已配置的共享密钥连接。此模板默认使用 `OPENCLAW_GATEWAY_TOKEN`；如果你改用密码认证，请改用该密码。
 
-## What you get
+## 你将获得
 
-- Hosted OpenClaw Gateway + Control UI
-- Persistent storage via Northflank Volume (`/data`) so `openclaw.json`,
-  per-agent `auth-profiles.json`, channel/provider state, sessions, and
-  workspace survive redeploys
+- 托管的 OpenClaw Gateway 网关 + Control UI
+- 通过 Northflank Volume（`/data`）提供的持久化存储，因此 `openclaw.json`、
+  每个智能体的 `auth-profiles.json`、渠道/提供商状态、会话以及
+  工作区都能在重新部署后保留
 
-## Connect a channel
+## 连接一个渠道
 
-Use the Control UI at `/openclaw` or run `openclaw onboard` via SSH for channel setup instructions:
+使用 `/openclaw` 下的 Control UI，或通过 SSH 运行 `openclaw onboard` 获取渠道设置说明：
 
-- [Telegram](/channels/telegram) (fastest — just a bot token)
-- [Discord](/channels/discord)
-- [All channels](/channels)
+- [Telegram](/zh-CN/channels/telegram)（最快 —— 只需要一个机器人令牌）
+- [Discord](/zh-CN/channels/discord)
+- [所有渠道](/zh-CN/channels)
 
-## Next steps
+## 后续步骤
 
-- Set up messaging channels: [Channels](/channels)
-- Configure the Gateway: [Gateway configuration](/gateway/configuration)
-- Keep OpenClaw up to date: [Updating](/install/updating)
+- 设置消息渠道：[Channels](/zh-CN/channels)
+- 配置 Gateway 网关：[Gateway 配置](/zh-CN/gateway/configuration)
+- 保持 OpenClaw 为最新版本：[更新](/zh-CN/install/updating)

@@ -1,92 +1,86 @@
 ---
-summary: "Historical bridge protocol (legacy nodes): TCP JSONL, pairing, scoped RPC"
 read_when:
-  - Building or debugging node clients (iOS/Android/macOS node mode)
-  - Investigating pairing or bridge auth failures
-  - Auditing the node surface exposed by the gateway
-title: "Bridge protocol"
+    - 构建或调试节点客户端（iOS/Android/macOS 节点模式）
+    - 排查配对或 Bridge 认证失败
+    - 审查 Gateway 网关暴露的节点接口
+summary: 历史 Bridge protocol（旧版节点）：TCP JSONL、配对、作用域 RPC
+title: Bridge 协议
+x-i18n:
+    generated_at: "2026-04-24T18:08:07Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: cb07ec4dab4394dd03b4c0002d6a842a9d77d12a1fc2f141f01d5a306fab1615
+    source_path: gateway/bridge-protocol.md
+    workflow: 15
 ---
 
 <Warning>
-The TCP bridge has been **removed**. Current OpenClaw builds do not ship the bridge listener and `bridge.*` config keys are no longer in the schema. This page is kept for historical reference only. Use the [Gateway Protocol](/gateway/protocol) for all node/operator clients.
+TCP Bridge 已被**移除**。当前 OpenClaw 构建不再提供 bridge 监听器，`bridge.*` 配置键也已不再包含在 schema 中。此页面仅保留作历史参考。所有节点/运维客户端请使用 [Gateway Protocol](/zh-CN/gateway/protocol)。
 </Warning>
 
-## Why it existed
+## 为什么它曾存在
 
-- **Security boundary**: the bridge exposes a small allowlist instead of the
-  full gateway API surface.
-- **Pairing + node identity**: node admission is owned by the gateway and tied
-  to a per-node token.
-- **Discovery UX**: nodes can discover gateways via Bonjour on LAN, or connect
-  directly over a tailnet.
-- **Loopback WS**: the full WS control plane stays local unless tunneled via SSH.
+- **安全边界**：bridge 暴露的是一个小型允许列表，而不是完整的 Gateway 网关 API 接口。
+- **配对 + 节点身份**：节点接入由 Gateway 网关管理，并绑定到每节点令牌。
+- **设备发现体验**：节点可以通过局域网中的 Bonjour 发现 Gateway 网关，或通过 tailnet 直接连接。
+- **回环 WS**：完整的 WS 控制平面保持本地，除非通过 SSH 建立隧道。
 
-## Transport
+## 传输
 
-- TCP, one JSON object per line (JSONL).
-- Optional TLS (when `bridge.tls.enabled` is true).
-- Historical default listener port was `18790` (current builds do not start a
-  TCP bridge).
+- TCP，每行一个 JSON 对象（JSONL）。
+- 可选 TLS（当 `bridge.tls.enabled` 为 true 时）。
+- 历史上的默认监听端口为 `18790`（当前构建不会启动 TCP bridge）。
 
-When TLS is enabled, discovery TXT records include `bridgeTls=1` plus
-`bridgeTlsSha256` as a non-secret hint. Note that Bonjour/mDNS TXT records are
-unauthenticated; clients must not treat the advertised fingerprint as an
-authoritative pin without explicit user intent or other out-of-band verification.
+启用 TLS 时，设备发现 TXT 记录会包含 `bridgeTls=1`，以及作为非机密提示的 `bridgeTlsSha256`。请注意，Bonjour/mDNS TXT 记录未经认证；除非用户明确同意或有其他带外验证方式，否则客户端不得将通告的指纹视为权威 pin。
 
-## Handshake + pairing
+## 握手 + 配对
 
-1. Client sends `hello` with node metadata + token (if already paired).
-2. If not paired, gateway replies `error` (`NOT_PAIRED`/`UNAUTHORIZED`).
-3. Client sends `pair-request`.
-4. Gateway waits for approval, then sends `pair-ok` and `hello-ok`.
+1. 客户端发送 `hello`，包含节点元数据和令牌（如果已完成配对）。
+2. 如果尚未配对，Gateway 网关会回复 `error`（`NOT_PAIRED`/`UNAUTHORIZED`）。
+3. 客户端发送 `pair-request`。
+4. Gateway 网关等待批准，然后发送 `pair-ok` 和 `hello-ok`。
 
-Historically, `hello-ok` returned `serverName` and could include
-`canvasHostUrl`.
+历史上，`hello-ok` 会返回 `serverName`，并且可能包含 `canvasHostUrl`。
 
-## Frames
+## 帧
 
-Client → Gateway:
+客户端 → Gateway 网关：
 
-- `req` / `res`: scoped gateway RPC (chat, sessions, config, health, voicewake, skills.bins)
-- `event`: node signals (voice transcript, agent request, chat subscribe, exec lifecycle)
+- `req` / `res`：有作用域的 Gateway 网关 RPC（chat、sessions、config、health、voicewake、skills.bins）
+- `event`：节点信号（语音转写、智能体请求、聊天订阅、exec 生命周期）
 
-Gateway → Client:
+Gateway 网关 → 客户端：
 
-- `invoke` / `invoke-res`: node commands (`canvas.*`, `camera.*`, `screen.record`,
-  `location.get`, `sms.send`)
-- `event`: chat updates for subscribed sessions
-- `ping` / `pong`: keepalive
+- `invoke` / `invoke-res`：节点命令（`canvas.*`、`camera.*`、`screen.record`、`location.get`、`sms.send`）
+- `event`：已订阅会话的聊天更新
+- `ping` / `pong`：保活
 
-Legacy allowlist enforcement lived in `src/gateway/server-bridge.ts` (removed).
+旧版允许列表强制逻辑位于 `src/gateway/server-bridge.ts` 中（现已移除）。
 
-## Exec lifecycle events
+## Exec 生命周期事件
 
-Nodes can emit `exec.finished` or `exec.denied` events to surface system.run activity.
-These are mapped to system events in the gateway. (Legacy nodes may still emit `exec.started`.)
+节点可以发出 `exec.finished` 或 `exec.denied` 事件，以暴露 system.run 活动。
+这些事件会映射为 Gateway 网关中的系统事件。（旧版节点可能仍会发出 `exec.started`。）
 
-Payload fields (all optional unless noted):
+载荷字段（除非另有说明，均为可选）：
 
-- `sessionKey` (required): agent session to receive the system event.
-- `runId`: unique exec id for grouping.
-- `command`: raw or formatted command string.
-- `exitCode`, `timedOut`, `success`, `output`: completion details (finished only).
-- `reason`: denial reason (denied only).
+- `sessionKey`（必填）：接收系统事件的智能体会话。
+- `runId`：用于分组的唯一 exec ID。
+- `command`：原始或格式化后的命令字符串。
+- `exitCode`、`timedOut`、`success`、`output`：完成详情（仅适用于 finished）。
+- `reason`：拒绝原因（仅适用于 denied）。
 
-## Historical tailnet usage
+## 历史上的 tailnet 用法
 
-- Bind the bridge to a tailnet IP: `bridge.bind: "tailnet"` in
-  `~/.openclaw/openclaw.json` (historical only; `bridge.*` is no longer valid).
-- Clients connect via MagicDNS name or tailnet IP.
-- Bonjour does **not** cross networks; use manual host/port or wide-area DNS‑SD
-  when needed.
+- 将 bridge 绑定到 tailnet IP：在 `~/.openclaw/openclaw.json` 中设置 `bridge.bind: "tailnet"`（仅历史参考；`bridge.*` 已不再有效）。
+- 客户端通过 MagicDNS 名称或 tailnet IP 连接。
+- Bonjour **不会**跨网络工作；有需要时请使用手动 host/port 或广域 DNS‑SD。
 
-## Versioning
+## 版本控制
 
-The bridge was **implicit v1** (no min/max negotiation). This section is
-historical reference only; current node/operator clients use the WebSocket
-[Gateway Protocol](/gateway/protocol).
+bridge 曾是**隐式 v1**（没有最小/最大协商）。本节仅作历史参考；当前节点/运维客户端使用 WebSocket [Gateway Protocol](/zh-CN/gateway/protocol)。
 
-## Related
+## 相关
 
-- [Gateway protocol](/gateway/protocol)
-- [Nodes](/nodes)
+- [Gateway protocol](/zh-CN/gateway/protocol)
+- [节点](/zh-CN/nodes)

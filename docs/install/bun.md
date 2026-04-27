@@ -1,33 +1,40 @@
 ---
-summary: "Bun workflow (experimental): installs and gotchas vs pnpm"
 read_when:
-  - You want the fastest local dev loop (bun + watch)
-  - You hit Bun install/patch/lifecycle script issues
-title: "Bun (experimental)"
+    - 你想要最快的本地开发循环（bun + watch）
+    - 你遇到了 Bun 安装 / patch / 生命周期脚本问题
+summary: Bun 工作流（实验性）：与 pnpm 相比的安装方式和注意事项
+title: Bun（实验性）
+x-i18n:
+    generated_at: "2026-04-24T03:16:57Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 5637f64fe272faf74915e8de115f21fdf9c9dd0406e5c471932323b2c1d4c0bd
+    source_path: install/bun.md
+    workflow: 15
 ---
 
 <Warning>
-Bun is **not recommended for gateway runtime** (known issues with WhatsApp and Telegram). Use Node for production.
+不建议将 Bun **用于 Gateway 网关运行时**（已知会与 WhatsApp 和 Telegram 出现问题）。生产环境请使用 Node。
 </Warning>
 
-Bun is an optional local runtime for running TypeScript directly (`bun run ...`, `bun --watch ...`). The default package manager remains `pnpm`, which is fully supported and used by docs tooling. Bun cannot use `pnpm-lock.yaml` and will ignore it.
+Bun 是一个可选的本地运行时，可用于直接运行 TypeScript（`bun run ...`、`bun --watch ...`）。默认的包管理器仍然是 `pnpm`，它是完全受支持的，并被文档工具链使用。Bun 不能使用 `pnpm-lock.yaml`，并且会忽略它。
 
-## Install
+## 安装
 
 <Steps>
-  <Step title="Install dependencies">
+  <Step title="安装依赖">
     ```sh
     bun install
     ```
 
-    `bun.lock` / `bun.lockb` are gitignored, so there is no repo churn. To skip lockfile writes entirely:
+    `bun.lock` / `bun.lockb` 已被加入 gitignore，因此不会造成仓库变更。如果你想完全跳过 lockfile 写入：
 
     ```sh
     bun install --no-save
     ```
 
   </Step>
-  <Step title="Build and test">
+  <Step title="构建和测试">
     ```sh
     bun run build
     bun run vitest run
@@ -35,25 +42,25 @@ Bun is an optional local runtime for running TypeScript directly (`bun run ...`,
   </Step>
 </Steps>
 
-## Lifecycle Scripts
+## 生命周期脚本
 
-Bun blocks dependency lifecycle scripts unless explicitly trusted. For this repo, the commonly blocked scripts are not required:
+除非被显式信任，否则 Bun 会阻止依赖的生命周期脚本。对于这个仓库，常见被阻止的脚本并非必需：
 
-- `@whiskeysockets/baileys` `preinstall` -- checks Node major >= 20 (OpenClaw defaults to Node 24 and still supports Node 22 LTS, currently `22.14+`)
-- `protobufjs` `postinstall` -- emits warnings about incompatible version schemes (no build artifacts)
+- `@whiskeysockets/baileys` 的 `preinstall` —— 检查 Node 主版本是否 >= 20（OpenClaw 默认使用 Node 24，也仍支持 Node 22 LTS，目前为 `22.14+`）
+- `protobufjs` 的 `postinstall` —— 输出关于不兼容版本方案的警告（不会生成构建产物）
 
-If you hit a runtime issue that requires these scripts, trust them explicitly:
+如果你遇到需要这些脚本的运行时问题，请显式信任它们：
 
 ```sh
 bun pm trust @whiskeysockets/baileys protobufjs
 ```
 
-## Caveats
+## 注意事项
 
-Some scripts still hardcode pnpm (for example `docs:build`, `ui:*`, `protocol:check`). Run those via pnpm for now.
+某些脚本仍然硬编码为 pnpm（例如 `docs:build`、`ui:*`、`protocol:check`）。目前请仍通过 pnpm 运行这些脚本。
 
-## Related
+## 相关内容
 
-- [Install overview](/install)
-- [Node.js](/install/node)
-- [Updating](/install/updating)
+- [Install overview](/zh-CN/install)
+- [Node.js](/zh-CN/install/node)
+- [Updating](/zh-CN/install/updating)

@@ -1,42 +1,44 @@
 ---
-summary: "Model authentication: OAuth, API keys, Claude CLI reuse, and Anthropic setup-token"
 read_when:
-  - Debugging model auth or OAuth expiry
-  - Documenting authentication or credential storage
-title: "Authentication"
+    - 调试模型认证或 OAuth 过期问题
+    - 记录认证或凭证存储方式
+summary: 模型认证：OAuth、API 密钥、Claude CLI 复用，以及 Anthropic 设置令牌
+title: 认证
+x-i18n:
+    generated_at: "2026-04-24T18:08:22Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: bc8dbd0ccb9b167720a03f9e7486c1498d8d9eb500b8174e2a27ea0523285f70
+    source_path: gateway/authentication.md
+    workflow: 15
 ---
 
 <Note>
-This page covers **model provider** authentication (API keys, OAuth, Claude CLI reuse, and Anthropic setup-token). For **gateway connection** authentication (token, password, trusted-proxy), see [Configuration](/gateway/configuration) and [Trusted Proxy Auth](/gateway/trusted-proxy-auth).
+本页介绍的是**模型提供商**认证（API 密钥、OAuth、Claude CLI 复用，以及 Anthropic 设置令牌）。关于**Gateway 网关连接**认证（令牌、密码、trusted-proxy），请参见 [配置](/zh-CN/gateway/configuration) 和 [Trusted Proxy Auth](/zh-CN/gateway/trusted-proxy-auth)。
 </Note>
 
-OpenClaw supports OAuth and API keys for model providers. For always-on gateway
-hosts, API keys are usually the most predictable option. Subscription/OAuth
-flows are also supported when they match your provider account model.
+OpenClaw 支持模型提供商使用 OAuth 和 API 密钥。对于持续运行的 Gateway 网关主机，API 密钥通常是最可预测的选项。当订阅 / OAuth 流程与你的提供商账户模型匹配时，也支持这些方式。
 
-See [/concepts/oauth](/concepts/oauth) for the full OAuth flow and storage
-layout.
-For SecretRef-based auth (`env`/`file`/`exec` providers), see [Secrets Management](/gateway/secrets).
-For credential eligibility/reason-code rules used by `models status --probe`, see
-[Auth Credential Semantics](/auth-credential-semantics).
+完整的 OAuth 流程和存储布局，请参见 [/concepts/oauth](/zh-CN/concepts/oauth)。
+关于基于 SecretRef 的认证（`env` / `file` / `exec` 提供商），请参见 [Secrets Management](/zh-CN/gateway/secrets)。
+关于 `models status --probe` 使用的凭证资格 / 原因码规则，请参见
+[认证凭证语义](/zh-CN/auth-credential-semantics)。
 
-## Recommended setup (API key, any provider)
+## 推荐设置（API 密钥，任意提供商）
 
-If you’re running a long-lived gateway, start with an API key for your chosen
-provider.
-For Anthropic specifically, API key auth is still the most predictable server
-setup, but OpenClaw also supports reusing a local Claude CLI login.
+如果你正在运行长期存活的 Gateway 网关，请先为你选择的提供商使用 API 密钥。
+对于 Anthropic 而言，API 密钥认证仍然是最可预测的服务器端设置，不过 OpenClaw 也支持复用本地 Claude CLI 登录。
 
-1. Create an API key in your provider console.
-2. Put it on the **gateway host** (the machine running `openclaw gateway`).
+1. 在你的提供商控制台中创建一个 API 密钥。
+2. 将其放在**Gateway 网关主机**上（即运行 `openclaw gateway` 的机器）。
 
 ```bash
 export <PROVIDER>_API_KEY="..."
 openclaw models status
 ```
 
-3. If the Gateway runs under systemd/launchd, prefer putting the key in
-   `~/.openclaw/.env` so the daemon can read it:
+3. 如果 Gateway 网关 运行在 systemd / launchd 下，建议将密钥放在
+   `~/.openclaw/.env` 中，以便守护进程能够读取：
 
 ```bash
 cat >> ~/.openclaw/.env <<'EOF'
@@ -44,32 +46,25 @@ cat >> ~/.openclaw/.env <<'EOF'
 EOF
 ```
 
-Then restart the daemon (or restart your Gateway process) and re-check:
+然后重启守护进程（或重启你的 Gateway 网关进程），并重新检查：
 
 ```bash
 openclaw models status
 openclaw doctor
 ```
 
-If you’d rather not manage env vars yourself, onboarding can store
-API keys for daemon use: `openclaw onboard`.
+如果你不想自己管理环境变量，新手引导也可以为守护进程使用场景存储
+API 密钥：`openclaw onboard`。
 
-See [Help](/help) for details on env inheritance (`env.shellEnv`,
-`~/.openclaw/.env`, systemd/launchd).
+关于环境继承（`env.shellEnv`、`~/.openclaw/.env`、systemd / launchd）的详细信息，请参见 [帮助](/zh-CN/help)。
 
-## Anthropic: Claude CLI and token compatibility
+## Anthropic：Claude CLI 和令牌兼容性
 
-Anthropic setup-token auth is still available in OpenClaw as a supported token
-path. Anthropic staff has since told us that OpenClaw-style Claude CLI usage is
-allowed again, so OpenClaw treats Claude CLI reuse and `claude -p` usage as
-sanctioned for this integration unless Anthropic publishes a new policy. When
-Claude CLI reuse is available on the host, that is now the preferred path.
+Anthropic 设置令牌认证在 OpenClaw 中仍然可作为受支持的令牌路径使用。此后，Anthropic 员工告诉我们，OpenClaw 风格的 Claude CLI 用法再次被允许，因此除非 Anthropic 发布新的政策，否则 OpenClaw 将 Claude CLI 复用和 `claude -p` 用法视为该集成下被认可的方式。当主机上可用 Claude CLI 复用时，这现在是首选路径。
 
-For long-lived gateway hosts, an Anthropic API key is still the most predictable
-setup. If you want to reuse an existing Claude login on the same host, use the
-Anthropic Claude CLI path in onboarding/configure.
+对于长期运行的 Gateway 网关主机，Anthropic API 密钥仍然是最可预测的设置。如果你想在同一台主机上复用现有的 Claude 登录，请在新手引导 / 配置中使用 Anthropic Claude CLI 路径。
 
-Recommended host setup for Claude CLI reuse:
+Claude CLI 复用的推荐主机设置：
 
 ```bash
 # Run on the gateway host
@@ -78,99 +73,95 @@ claude auth status --text
 openclaw models auth login --provider anthropic --method cli --set-default
 ```
 
-This is a two-step setup:
+这是一个两步设置：
 
-1. Log Claude Code itself into Anthropic on the gateway host.
-2. Tell OpenClaw to switch Anthropic model selection to the local `claude-cli`
-   backend and store the matching OpenClaw auth profile.
+1. 在 Gateway 网关主机上，将 Claude Code 本身登录到 Anthropic。
+2. 告诉 OpenClaw 将 Anthropic 模型选择切换到本地 `claude-cli`
+   后端，并存储匹配的 OpenClaw 认证配置文件。
 
-If `claude` is not on `PATH`, either install Claude Code first or set
-`agents.defaults.cliBackends.claude-cli.command` to the real binary path.
+如果 `claude` 不在 `PATH` 中，请先安装 Claude Code，或将
+`agents.defaults.cliBackends.claude-cli.command` 设置为真实的二进制路径。
 
-Manual token entry (any provider; writes `auth-profiles.json` + updates config):
+手动输入令牌（任意提供商；写入 `auth-profiles.json` 并更新配置）：
 
 ```bash
 openclaw models auth paste-token --provider openrouter
 ```
 
-Auth profile refs are also supported for static credentials:
+认证配置文件引用也支持静态凭证：
 
-- `api_key` credentials can use `keyRef: { source, provider, id }`
-- `token` credentials can use `tokenRef: { source, provider, id }`
-- OAuth-mode profiles do not support SecretRef credentials; if `auth.profiles.<id>.mode` is set to `"oauth"`, SecretRef-backed `keyRef`/`tokenRef` input for that profile is rejected.
+- `api_key` 凭证可使用 `keyRef: { source, provider, id }`
+- `token` 凭证可使用 `tokenRef: { source, provider, id }`
+- OAuth 模式的配置文件不支持 SecretRef 凭证；如果 `auth.profiles.<id>.mode` 被设置为 `"oauth"`，则该配置文件的基于 SecretRef 的 `keyRef` / `tokenRef` 输入会被拒绝。
 
-Automation-friendly check (exit `1` when expired/missing, `2` when expiring):
+适合自动化的检查（缺失 / 过期时退出码为 `1`，即将过期时为 `2`）：
 
 ```bash
 openclaw models status --check
 ```
 
-Live auth probes:
+实时认证探测：
 
 ```bash
 openclaw models status --probe
 ```
 
-Notes:
+说明：
 
-- Probe rows can come from auth profiles, env credentials, or `models.json`.
-- If explicit `auth.order.<provider>` omits a stored profile, probe reports
-  `excluded_by_auth_order` for that profile instead of trying it.
-- If auth exists but OpenClaw cannot resolve a probeable model candidate for
-  that provider, probe reports `status: no_model`.
-- Rate-limit cooldowns can be model-scoped. A profile cooling down for one
-  model can still be usable for a sibling model on the same provider.
+- 探测行可能来自认证配置文件、环境凭证或 `models.json`。
+- 如果显式的 `auth.order.<provider>` 省略了某个已存储配置文件，探测会为该配置文件报告
+  `excluded_by_auth_order`，而不是尝试使用它。
+- 如果认证存在，但 OpenClaw 无法为该提供商解析出可探测的模型候选项，则探测会报告 `status: no_model`。
+- 限流冷却可以按模型范围生效。某个配置文件若对一个
+  模型处于冷却中，仍可能对同一提供商下的兄弟模型可用。
 
-Optional ops scripts (systemd/Termux) are documented here:
-[Auth monitoring scripts](/help/scripts#auth-monitoring-scripts)
+可选的运维脚本（systemd / Termux）记录在这里：
+[认证监控脚本](/zh-CN/help/scripts#auth-monitoring-scripts)
 
-## Anthropic note
+## Anthropic 说明
 
-The Anthropic `claude-cli` backend is supported again.
+Anthropic `claude-cli` 后端现已再次受支持。
 
-- Anthropic staff told us this OpenClaw integration path is allowed again.
-- OpenClaw therefore treats Claude CLI reuse and `claude -p` usage as sanctioned
-  for Anthropic-backed runs unless Anthropic publishes a new policy.
-- Anthropic API keys remain the most predictable choice for long-lived gateway
-  hosts and explicit server-side billing control.
+- Anthropic 员工告诉我们，这条 OpenClaw 集成路径再次被允许。
+- 因此，除非 Anthropic 发布新的政策，否则 OpenClaw 会将 Claude CLI 复用和 `claude -p` 用法视为用于 Anthropic 支持运行的认可方式。
+- 对于长期运行的 Gateway 网关主机以及需要明确服务器端计费控制的场景，Anthropic API 密钥仍然是最可预测的选择。
 
-## Checking model auth status
+## 检查模型认证状态
 
 ```bash
 openclaw models status
 openclaw doctor
 ```
 
-## API key rotation behavior (gateway)
+## API 密钥轮换行为（Gateway 网关）
 
-Some providers support retrying a request with alternative keys when an API call
-hits a provider rate limit.
+某些提供商支持在 API 调用触发提供商限流时，使用备用密钥重试请求。
 
-- Priority order:
-  - `OPENCLAW_LIVE_<PROVIDER>_KEY` (single override)
+- 优先级顺序：
+  - `OPENCLAW_LIVE_<PROVIDER>_KEY`（单一覆盖）
   - `<PROVIDER>_API_KEYS`
   - `<PROVIDER>_API_KEY`
   - `<PROVIDER>_API_KEY_*`
-- Google providers also include `GOOGLE_API_KEY` as an additional fallback.
-- The same key list is deduplicated before use.
-- OpenClaw retries with the next key only for rate-limit errors (for example
-  `429`, `rate_limit`, `quota`, `resource exhausted`, `Too many concurrent
-requests`, `ThrottlingException`, `concurrency limit reached`, or
-  `workers_ai ... quota limit exceeded`).
-- Non-rate-limit errors are not retried with alternate keys.
-- If all keys fail, the final error from the last attempt is returned.
+- Google 提供商还会将 `GOOGLE_API_KEY` 作为额外回退项。
+- 相同的密钥列表在使用前会先去重。
+- OpenClaw 仅在限流错误时使用下一个密钥重试（例如
+  `429`、`rate_limit`、`quota`、`resource exhausted`、`Too many concurrent
+requests`、`ThrottlingException`、`concurrency limit reached`，或
+  `workers_ai ... quota limit exceeded`）。
+- 非限流错误不会使用备用密钥重试。
+- 如果所有密钥都失败，则返回最后一次尝试产生的最终错误。
 
-## Controlling which credential is used
+## 控制使用哪个凭证
 
-### Per-session (chat command)
+### 按会话（聊天命令）
 
-Use `/model <alias-or-id>@<profileId>` to pin a specific provider credential for the current session (example profile ids: `anthropic:default`, `anthropic:work`).
+使用 `/model <alias-or-id>@<profileId>` 为当前会话固定特定的提供商凭证（示例配置文件 id：`anthropic:default`、`anthropic:work`）。
 
-Use `/model` (or `/model list`) for a compact picker; use `/model status` for the full view (candidates + next auth profile, plus provider endpoint details when configured).
+使用 `/model`（或 `/model list`）查看简洁选择器；使用 `/model status` 查看完整视图（候选项 + 下一个认证配置文件，以及在已配置时显示提供商端点详情）。
 
-### Per-agent (CLI override)
+### 按智能体（CLI 覆盖）
 
-Set an explicit auth profile order override for an agent (stored in that agent’s `auth-state.json`):
+为某个智能体设置显式的认证配置文件顺序覆盖（存储在该智能体的 `auth-state.json` 中）：
 
 ```bash
 openclaw models auth order get --provider anthropic
@@ -178,31 +169,27 @@ openclaw models auth order set --provider anthropic anthropic:default
 openclaw models auth order clear --provider anthropic
 ```
 
-Use `--agent <id>` to target a specific agent; omit it to use the configured default agent.
-When you debug order issues, `openclaw models status --probe` shows omitted
-stored profiles as `excluded_by_auth_order` instead of silently skipping them.
-When you debug cooldown issues, remember that rate-limit cooldowns can be tied
-to one model id rather than the whole provider profile.
+使用 `--agent <id>` 可指定特定智能体；省略它则使用已配置的默认智能体。
+当你调试顺序问题时，`openclaw models status --probe` 会将被省略的已存储配置文件显示为 `excluded_by_auth_order`，而不是静默跳过它们。
+当你调试冷却问题时，请记住限流冷却可能绑定到某一个模型 id，而不是整个提供商配置文件。
 
-## Troubleshooting
+## 故障排除
 
-### "No credentials found"
+### “No credentials found”
 
-If the Anthropic profile is missing, configure an Anthropic API key on the
-**gateway host** or set up the Anthropic setup-token path, then re-check:
+如果 Anthropic 配置文件缺失，请在**Gateway 网关主机**上配置 Anthropic API 密钥，或设置 Anthropic 设置令牌路径，然后重新检查：
 
 ```bash
 openclaw models status
 ```
 
-### Token expiring/expired
+### 令牌即将过期 / 已过期
 
-Run `openclaw models status` to confirm which profile is expiring. If an
-Anthropic token profile is missing or expired, refresh that setup via
-setup-token or migrate to an Anthropic API key.
+运行 `openclaw models status` 以确认哪个配置文件即将过期。如果某个
+Anthropic 令牌配置文件缺失或已过期，请通过 setup-token 刷新该设置，或迁移到 Anthropic API 密钥。
 
-## Related
+## 相关内容
 
-- [Secrets management](/gateway/secrets)
-- [Remote access](/gateway/remote)
-- [Auth storage](/concepts/oauth)
+- [Secrets management](/zh-CN/gateway/secrets)
+- [远程访问](/zh-CN/gateway/remote)
+- [认证存储](/zh-CN/concepts/oauth)

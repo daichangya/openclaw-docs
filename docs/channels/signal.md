@@ -1,31 +1,38 @@
 ---
-summary: "Signal support via signal-cli (JSON-RPC + SSE), setup paths, and number model"
 read_when:
-  - Setting up Signal support
-  - Debugging Signal send/receive
-title: "Signal"
+    - 设置 Signal 支持
+    - 调试 Signal 的发送/接收
+summary: 通过 `signal-cli`（JSON-RPC + SSE）提供的 Signal 支持、设置路径，以及号码模型
+title: Signal
+x-i18n:
+    generated_at: "2026-04-25T05:53:13Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: cb1ff4328aae73576a78b00be3dd79e9768badfc6193843ed3c05439765ae295
+    source_path: channels/signal.md
+    workflow: 15
 ---
 
-Status: external CLI integration. Gateway talks to `signal-cli` over HTTP JSON-RPC + SSE.
+状态：外部 CLI 集成。Gateway 网关通过 HTTP JSON-RPC + SSE 与 `signal-cli` 通信。
 
-## Prerequisites
+## 前提条件
 
-- OpenClaw installed on your server (Linux flow below tested on Ubuntu 24).
-- `signal-cli` available on the host where the gateway runs.
-- A phone number that can receive one verification SMS (for SMS registration path).
-- Browser access for Signal captcha (`signalcaptchas.org`) during registration.
+- 你的服务器上已安装 OpenClaw（下方 Linux 流程已在 Ubuntu 24 上测试）。
+- 运行 Gateway 网关的主机上可用 `signal-cli`。
+- 一个可以接收一次验证码短信的电话号码（用于短信注册路径）。
+- 注册期间可访问 Signal 验证码页面（`signalcaptchas.org`）的浏览器。
 
-## Quick setup (beginner)
+## 快速设置（初学者）
 
-1. Use a **separate Signal number** for the bot (recommended).
-2. Install `signal-cli` (Java required if you use the JVM build).
-3. Choose one setup path:
-   - **Path A (QR link):** `signal-cli link -n "OpenClaw"` and scan with Signal.
-   - **Path B (SMS register):** register a dedicated number with captcha + SMS verification.
-4. Configure OpenClaw and restart the gateway.
-5. Send a first DM and approve pairing (`openclaw pairing approve signal <CODE>`).
+1. 为机器人使用一个**单独的 Signal 号码**（推荐）。
+2. 安装 `signal-cli`（如果你使用 JVM 构建版本，则需要 Java）。
+3. 选择一种设置路径：
+   - **路径 A（QR 链接）：** `signal-cli link -n "OpenClaw"`，然后用 Signal 扫描。
+   - **路径 B（短信注册）：** 使用验证码 + 短信验证注册一个专用号码。
+4. 配置 OpenClaw 并重启 Gateway 网关。
+5. 发送第一条私信并批准配对（`openclaw pairing approve signal <CODE>`）。
 
-Minimal config:
+最小配置：
 
 ```json5
 {
@@ -41,26 +48,26 @@ Minimal config:
 }
 ```
 
-Field reference:
+字段说明：
 
-| Field       | Description                                       |
+| 字段 | 说明 |
 | ----------- | ------------------------------------------------- |
-| `account`   | Bot phone number in E.164 format (`+15551234567`) |
-| `cliPath`   | Path to `signal-cli` (`signal-cli` if on `PATH`)  |
-| `dmPolicy`  | DM access policy (`pairing` recommended)          |
-| `allowFrom` | Phone numbers or `uuid:<id>` values allowed to DM |
+| `account`   | 机器人电话号码，采用 E.164 格式（`+15551234567`） |
+| `cliPath`   | `signal-cli` 的路径（如果在 `PATH` 中则写 `signal-cli`） |
+| `dmPolicy`  | 私信访问策略（推荐使用 `pairing`） |
+| `allowFrom` | 允许发送私信的电话号码或 `uuid:<id>` 值 |
 
-## What it is
+## 它是什么
 
-- Signal channel via `signal-cli` (not embedded libsignal).
-- Deterministic routing: replies always go back to Signal.
-- DMs share the agent's main session; groups are isolated (`agent:<agentId>:signal:group:<groupId>`).
+- 通过 `signal-cli` 提供的 Signal 渠道（不是嵌入式 libsignal）。
+- 确定性路由：回复始终返回到 Signal。
+- 私信共享智能体的主会话；群组彼此隔离（`agent:<agentId>:signal:group:<groupId>`）。
 
-## Config writes
+## 配置写入
 
-By default, Signal is allowed to write config updates triggered by `/config set|unset` (requires `commands.config: true`).
+默认情况下，Signal 允许写入由 `/config set|unset` 触发的配置更新（需要 `commands.config: true`）。
 
-Disable with:
+可通过以下方式禁用：
 
 ```json5
 {
@@ -68,20 +75,20 @@ Disable with:
 }
 ```
 
-## The number model (important)
+## 号码模型（重要）
 
-- The gateway connects to a **Signal device** (the `signal-cli` account).
-- If you run the bot on **your personal Signal account**, it will ignore your own messages (loop protection).
-- For "I text the bot and it replies," use a **separate bot number**.
+- Gateway 网关连接到一个 **Signal 设备**（即 `signal-cli` 账户）。
+- 如果你在**自己的个人 Signal 账户**上运行机器人，它会忽略你自己发送的消息（循环保护）。
+- 如果你想要“我给机器人发消息，它再回复我”，请使用一个**单独的机器人号码**。
 
-## Setup path A: link existing Signal account (QR)
+## 设置路径 A：链接现有 Signal 账户（QR）
 
-1. Install `signal-cli` (JVM or native build).
-2. Link a bot account:
-   - `signal-cli link -n "OpenClaw"` then scan the QR in Signal.
-3. Configure Signal and start the gateway.
+1. 安装 `signal-cli`（JVM 或原生构建版本）。
+2. 链接一个机器人账户：
+   - `signal-cli link -n "OpenClaw"`，然后在 Signal 中扫描 QR 码。
+3. 配置 Signal 并启动 Gateway 网关。
 
-Example:
+示例：
 
 ```json5
 {
@@ -97,15 +104,15 @@ Example:
 }
 ```
 
-Multi-account support: use `channels.signal.accounts` with per-account config and optional `name`. See [`gateway/configuration`](/gateway/config-channels#multi-account-all-channels) for the shared pattern.
+多账户支持：使用 `channels.signal.accounts` 配合每个账户的独立配置，以及可选的 `name`。共享模式请参见 [`gateway/configuration`](/zh-CN/gateway/config-channels#multi-account-all-channels)。
 
-## Setup path B: register dedicated bot number (SMS, Linux)
+## 设置路径 B：注册专用机器人号码（短信，Linux）
 
-Use this when you want a dedicated bot number instead of linking an existing Signal app account.
+当你想使用专用机器人号码，而不是链接现有 Signal 应用账户时，请使用此方式。
 
-1. Get a number that can receive SMS (or voice verification for landlines).
-   - Use a dedicated bot number to avoid account/session conflicts.
-2. Install `signal-cli` on the gateway host:
+1. 获取一个可以接收短信的号码（或座机语音验证号码）。
+   - 使用专用机器人号码以避免账户/会话冲突。
+2. 在 Gateway 网关主机上安装 `signal-cli`：
 
 ```bash
 VERSION=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/AsamK/signal-cli/releases/latest | sed -e 's/^.*\/v//')
@@ -115,54 +122,54 @@ sudo ln -sf /opt/signal-cli /usr/local/bin/
 signal-cli --version
 ```
 
-If you use the JVM build (`signal-cli-${VERSION}.tar.gz`), install JRE 25+ first.
-Keep `signal-cli` updated; upstream notes that old releases can break as Signal server APIs change.
+如果你使用 JVM 构建版本（`signal-cli-${VERSION}.tar.gz`），请先安装 JRE 25+。
+请保持 `signal-cli` 为最新版本；上游说明，随着 Signal 服务器 API 变化，旧版本可能会失效。
 
-3. Register and verify the number:
+3. 注册并验证该号码：
 
 ```bash
 signal-cli -a +<BOT_PHONE_NUMBER> register
 ```
 
-If captcha is required:
+如果需要验证码：
 
-1. Open `https://signalcaptchas.org/registration/generate.html`.
-2. Complete captcha, copy the `signalcaptcha://...` link target from "Open Signal".
-3. Run from the same external IP as the browser session when possible.
-4. Run registration again immediately (captcha tokens expire quickly):
+1. 打开 `https://signalcaptchas.org/registration/generate.html`。
+2. 完成验证码，并从“Open Signal”复制 `signalcaptcha://...` 链接目标。
+3. 尽量使用与浏览器会话相同的外部 IP 重新执行命令。
+4. 立即再次运行注册（验证码令牌过期很快）：
 
 ```bash
 signal-cli -a +<BOT_PHONE_NUMBER> register --captcha '<SIGNALCAPTCHA_URL>'
 signal-cli -a +<BOT_PHONE_NUMBER> verify <VERIFICATION_CODE>
 ```
 
-4. Configure OpenClaw, restart gateway, verify channel:
+4. 配置 OpenClaw，重启 Gateway 网关，并验证渠道：
 
 ```bash
-# If you run the gateway as a user systemd service:
+# 如果你以用户级 systemd 服务运行 Gateway 网关：
 systemctl --user restart openclaw-gateway.service
 
-# Then verify:
+# 然后验证：
 openclaw doctor
 openclaw channels status --probe
 ```
 
-5. Pair your DM sender:
-   - Send any message to the bot number.
-   - Approve code on the server: `openclaw pairing approve signal <PAIRING_CODE>`.
-   - Save the bot number as a contact on your phone to avoid "Unknown contact".
+5. 配对你的私信发送者：
+   - 向机器人号码发送任意消息。
+   - 在服务器上批准代码：`openclaw pairing approve signal <PAIRING_CODE>`。
+   - 将机器人号码保存为你手机中的联系人，以避免显示“Unknown contact”。
 
-Important: registering a phone number account with `signal-cli` can de-authenticate the main Signal app session for that number. Prefer a dedicated bot number, or use QR link mode if you need to keep your existing phone app setup.
+重要：使用 `signal-cli` 注册一个电话号码账户，可能会使该号码在主 Signal 应用中的会话失去认证。优先使用专用机器人号码，或者如果你需要保留现有手机应用设置，请使用 QR 链接模式。
 
-Upstream references:
+上游参考：
 
-- `signal-cli` README: `https://github.com/AsamK/signal-cli`
-- Captcha flow: `https://github.com/AsamK/signal-cli/wiki/Registration-with-captcha`
-- Linking flow: `https://github.com/AsamK/signal-cli/wiki/Linking-other-devices-(Provisioning)`
+- `signal-cli` README：`https://github.com/AsamK/signal-cli`
+- 验证码流程：`https://github.com/AsamK/signal-cli/wiki/Registration-with-captcha`
+- 链接流程：`https://github.com/AsamK/signal-cli/wiki/Linking-other-devices-(Provisioning)`
 
-## External daemon mode (httpUrl)
+## 外部守护进程模式（httpUrl）
 
-If you want to manage `signal-cli` yourself (slow JVM cold starts, container init, or shared CPUs), run the daemon separately and point OpenClaw at it:
+如果你想自己管理 `signal-cli`（例如 JVM 冷启动较慢、容器初始化，或共享 CPU 的情况），可以单独运行守护进程，并让 OpenClaw 指向它：
 
 ```json5
 {
@@ -175,58 +182,58 @@ If you want to manage `signal-cli` yourself (slow JVM cold starts, container ini
 }
 ```
 
-This skips auto-spawn and the startup wait inside OpenClaw. For slow starts when auto-spawning, set `channels.signal.startupTimeoutMs`.
+这会跳过 OpenClaw 内部的自动启动和启动等待。对于自动启动但启动较慢的情况，可设置 `channels.signal.startupTimeoutMs`。
 
-## Access control (DMs + groups)
+## 访问控制（私信 + 群组）
 
-DMs:
+私信：
 
-- Default: `channels.signal.dmPolicy = "pairing"`.
-- Unknown senders receive a pairing code; messages are ignored until approved (codes expire after 1 hour).
-- Approve via:
+- 默认值：`channels.signal.dmPolicy = "pairing"`。
+- 未知发送者会收到一个配对码；在批准之前，消息会被忽略（代码 1 小时后过期）。
+- 批准方式：
   - `openclaw pairing list signal`
   - `openclaw pairing approve signal <CODE>`
-- Pairing is the default token exchange for Signal DMs. Details: [Pairing](/channels/pairing)
-- UUID-only senders (from `sourceUuid`) are stored as `uuid:<id>` in `channels.signal.allowFrom`.
+- 配对是 Signal 私信的默认令牌交换方式。详情见：[配对](/zh-CN/channels/pairing)
+- 仅 UUID 的发送者（来自 `sourceUuid`）会以 `uuid:<id>` 的形式存储在 `channels.signal.allowFrom` 中。
 
-Groups:
+群组：
 
-- `channels.signal.groupPolicy = open | allowlist | disabled`.
-- `channels.signal.groupAllowFrom` controls who can trigger in groups when `allowlist` is set.
-- `channels.signal.groups["<group-id>" | "*"]` can override group behavior with `requireMention`, `tools`, and `toolsBySender`.
-- Use `channels.signal.accounts.<id>.groups` for per-account overrides in multi-account setups.
-- Runtime note: if `channels.signal` is completely missing, runtime falls back to `groupPolicy="allowlist"` for group checks (even if `channels.defaults.groupPolicy` is set).
+- `channels.signal.groupPolicy = open | allowlist | disabled`。
+- 当设置为 `allowlist` 时，`channels.signal.groupAllowFrom` 控制哪些人可以在群组中触发。
+- `channels.signal.groups["<group-id>" | "*"]` 可以使用 `requireMention`、`tools` 和 `toolsBySender` 覆盖群组行为。
+- 在多账户设置中，使用 `channels.signal.accounts.<id>.groups` 进行每个账户的独立覆盖。
+- 运行时说明：如果完全缺少 `channels.signal`，运行时在执行群组检查时会回退为 `groupPolicy="allowlist"`（即使设置了 `channels.defaults.groupPolicy` 也是如此）。
 
-## How it works (behavior)
+## 工作原理（行为）
 
-- `signal-cli` runs as a daemon; the gateway reads events via SSE.
-- Inbound messages are normalized into the shared channel envelope.
-- Replies always route back to the same number or group.
+- `signal-cli` 作为守护进程运行；Gateway 网关通过 SSE 读取事件。
+- 入站消息会被标准化为共享的渠道信封格式。
+- 回复始终路由回相同的号码或群组。
 
-## Media + limits
+## 媒体 + 限制
 
-- Outbound text is chunked to `channels.signal.textChunkLimit` (default 4000).
-- Optional newline chunking: set `channels.signal.chunkMode="newline"` to split on blank lines (paragraph boundaries) before length chunking.
-- Attachments supported (base64 fetched from `signal-cli`).
-- Voice-note attachments use the `signal-cli` filename as a MIME fallback when `contentType` is missing, so audio transcription can still classify AAC voice memos.
-- Default media cap: `channels.signal.mediaMaxMb` (default 8).
-- Use `channels.signal.ignoreAttachments` to skip downloading media.
-- Group history context uses `channels.signal.historyLimit` (or `channels.signal.accounts.*.historyLimit`), falling back to `messages.groupChat.historyLimit`. Set `0` to disable (default 50).
+- 出站文本会按 `channels.signal.textChunkLimit` 分块（默认 4000）。
+- 可选换行分块：设置 `channels.signal.chunkMode="newline"`，先按空行（段落边界）拆分，再按长度分块。
+- 支持附件（从 `signal-cli` 获取 base64）。
+- 语音便笺附件在缺少 `contentType` 时，会使用 `signal-cli` 的文件名作为 MIME 回退，因此音频转写仍可识别 AAC 语音备忘录。
+- 默认媒体上限：`channels.signal.mediaMaxMb`（默认 8）。
+- 使用 `channels.signal.ignoreAttachments` 可跳过媒体下载。
+- 群组历史上下文使用 `channels.signal.historyLimit`（或 `channels.signal.accounts.*.historyLimit`），并回退到 `messages.groupChat.historyLimit`。设为 `0` 可禁用（默认 50）。
 
-## Typing + read receipts
+## 正在输入 + 已读回执
 
-- **Typing indicators**: OpenClaw sends typing signals via `signal-cli sendTyping` and refreshes them while a reply is running.
-- **Read receipts**: when `channels.signal.sendReadReceipts` is true, OpenClaw forwards read receipts for allowed DMs.
-- Signal-cli does not expose read receipts for groups.
+- **正在输入指示器**：OpenClaw 通过 `signal-cli sendTyping` 发送正在输入信号，并在回复执行期间持续刷新。
+- **已读回执**：当 `channels.signal.sendReadReceipts` 为 true 时，OpenClaw 会为允许的私信转发已读回执。
+- Signal-cli 不提供群组的已读回执。
 
-## Reactions (message tool)
+## 表情回应（消息工具）
 
-- Use `message action=react` with `channel=signal`.
-- Targets: sender E.164 or UUID (use `uuid:<id>` from pairing output; bare UUID works too).
-- `messageId` is the Signal timestamp for the message you’re reacting to.
-- Group reactions require `targetAuthor` or `targetAuthorUuid`.
+- 使用 `message action=react`，并设置 `channel=signal`。
+- 目标：发送者 E.164 或 UUID（使用配对输出中的 `uuid:<id>`；裸 UUID 也可以）。
+- `messageId` 是你要回应的那条消息的 Signal 时间戳。
+- 群组回应需要 `targetAuthor` 或 `targetAuthorUuid`。
 
-Examples:
+示例：
 
 ```
 message action=react channel=signal target=uuid:123e4567-e89b-12d3-a456-426614174000 messageId=1737630212345 emoji=🔥
@@ -234,24 +241,24 @@ message action=react channel=signal target=+15551234567 messageId=1737630212345 
 message action=react channel=signal target=signal:group:<groupId> targetAuthor=uuid:<sender-uuid> messageId=1737630212345 emoji=✅
 ```
 
-Config:
+配置：
 
-- `channels.signal.actions.reactions`: enable/disable reaction actions (default true).
-- `channels.signal.reactionLevel`: `off | ack | minimal | extensive`.
-  - `off`/`ack` disables agent reactions (message tool `react` will error).
-  - `minimal`/`extensive` enables agent reactions and sets the guidance level.
-- Per-account overrides: `channels.signal.accounts.<id>.actions.reactions`, `channels.signal.accounts.<id>.reactionLevel`.
+- `channels.signal.actions.reactions`：启用/禁用回应操作（默认 true）。
+- `channels.signal.reactionLevel`：`off | ack | minimal | extensive`。
+  - `off`/`ack` 会禁用智能体回应（消息工具 `react` 会报错）。
+  - `minimal`/`extensive` 会启用智能体回应，并设置指导级别。
+- 每账户覆盖：`channels.signal.accounts.<id>.actions.reactions`、`channels.signal.accounts.<id>.reactionLevel`。
 
-## Delivery targets (CLI/cron)
+## 投递目标（CLI/cron）
 
-- DMs: `signal:+15551234567` (or plain E.164).
-- UUID DMs: `uuid:<id>` (or bare UUID).
-- Groups: `signal:group:<groupId>`.
-- Usernames: `username:<name>` (if supported by your Signal account).
+- 私信：`signal:+15551234567`（或纯 E.164）。
+- UUID 私信：`uuid:<id>`（或裸 UUID）。
+- 群组：`signal:group:<groupId>`。
+- 用户名：`username:<name>`（如果你的 Signal 账户支持）。
 
-## Troubleshooting
+## 故障排除
 
-Run this ladder first:
+先运行这一组检查步骤：
 
 ```bash
 openclaw status
@@ -261,21 +268,21 @@ openclaw doctor
 openclaw channels status --probe
 ```
 
-Then confirm DM pairing state if needed:
+然后在需要时确认私信配对状态：
 
 ```bash
 openclaw pairing list signal
 ```
 
-Common failures:
+常见故障：
 
-- Daemon reachable but no replies: verify account/daemon settings (`httpUrl`, `account`) and receive mode.
-- DMs ignored: sender is pending pairing approval.
-- Group messages ignored: group sender/mention gating blocks delivery.
-- Config validation errors after edits: run `openclaw doctor --fix`.
-- Signal missing from diagnostics: confirm `channels.signal.enabled: true`.
+- 守护进程可访问但没有回复：验证账户/守护进程设置（`httpUrl`、`account`）以及接收模式。
+- 私信被忽略：发送者正在等待配对批准。
+- 群组消息被忽略：群组发送者/提及门控阻止了投递。
+- 编辑后出现配置校验错误：运行 `openclaw doctor --fix`。
+- 诊断中缺少 Signal：确认 `channels.signal.enabled: true`。
 
-Extra checks:
+额外检查：
 
 ```bash
 openclaw pairing list signal
@@ -283,54 +290,54 @@ pgrep -af signal-cli
 grep -i "signal" "/tmp/openclaw/openclaw-$(date +%Y-%m-%d).log" | tail -20
 ```
 
-For triage flow: [/channels/troubleshooting](/channels/troubleshooting).
+排查流程请见：[/channels/troubleshooting](/zh-CN/channels/troubleshooting)。
 
-## Security notes
+## 安全说明
 
-- `signal-cli` stores account keys locally (typically `~/.local/share/signal-cli/data/`).
-- Back up Signal account state before server migration or rebuild.
-- Keep `channels.signal.dmPolicy: "pairing"` unless you explicitly want broader DM access.
-- SMS verification is only needed for registration or recovery flows, but losing control of the number/account can complicate re-registration.
+- `signal-cli` 会在本地存储账户密钥（通常位于 `~/.local/share/signal-cli/data/`）。
+- 在服务器迁移或重建前，请备份 Signal 账户状态。
+- 除非你明确希望更广泛的私信访问，否则请保持 `channels.signal.dmPolicy: "pairing"`。
+- 短信验证仅在注册或恢复流程中需要，但如果失去对号码/账户的控制，重新注册会变得复杂。
 
-## Configuration reference (Signal)
+## 配置参考（Signal）
 
-Full configuration: [Configuration](/gateway/configuration)
+完整配置：[配置](/zh-CN/gateway/configuration)
 
-Provider options:
+提供商选项：
 
-- `channels.signal.enabled`: enable/disable channel startup.
-- `channels.signal.account`: E.164 for the bot account.
-- `channels.signal.cliPath`: path to `signal-cli`.
-- `channels.signal.httpUrl`: full daemon URL (overrides host/port).
-- `channels.signal.httpHost`, `channels.signal.httpPort`: daemon bind (default 127.0.0.1:8080).
-- `channels.signal.autoStart`: auto-spawn daemon (default true if `httpUrl` unset).
-- `channels.signal.startupTimeoutMs`: startup wait timeout in ms (cap 120000).
-- `channels.signal.receiveMode`: `on-start | manual`.
-- `channels.signal.ignoreAttachments`: skip attachment downloads.
-- `channels.signal.ignoreStories`: ignore stories from the daemon.
-- `channels.signal.sendReadReceipts`: forward read receipts.
-- `channels.signal.dmPolicy`: `pairing | allowlist | open | disabled` (default: pairing).
-- `channels.signal.allowFrom`: DM allowlist (E.164 or `uuid:<id>`). `open` requires `"*"`. Signal has no usernames; use phone/UUID ids.
-- `channels.signal.groupPolicy`: `open | allowlist | disabled` (default: allowlist).
-- `channels.signal.groupAllowFrom`: group sender allowlist.
-- `channels.signal.groups`: per-group overrides keyed by Signal group id (or `"*"`). Supported fields: `requireMention`, `tools`, `toolsBySender`.
-- `channels.signal.accounts.<id>.groups`: per-account version of `channels.signal.groups` for multi-account setups.
-- `channels.signal.historyLimit`: max group messages to include as context (0 disables).
-- `channels.signal.dmHistoryLimit`: DM history limit in user turns. Per-user overrides: `channels.signal.dms["<phone_or_uuid>"].historyLimit`.
-- `channels.signal.textChunkLimit`: outbound chunk size (chars).
-- `channels.signal.chunkMode`: `length` (default) or `newline` to split on blank lines (paragraph boundaries) before length chunking.
-- `channels.signal.mediaMaxMb`: inbound/outbound media cap (MB).
+- `channels.signal.enabled`：启用/禁用渠道启动。
+- `channels.signal.account`：机器人账户的 E.164 号码。
+- `channels.signal.cliPath`：`signal-cli` 的路径。
+- `channels.signal.httpUrl`：完整的守护进程 URL（覆盖 host/port）。
+- `channels.signal.httpHost`、`channels.signal.httpPort`：守护进程绑定地址（默认 `127.0.0.1:8080`）。
+- `channels.signal.autoStart`：自动启动守护进程（如果未设置 `httpUrl`，默认 true）。
+- `channels.signal.startupTimeoutMs`：启动等待超时时间，单位为毫秒（上限 120000）。
+- `channels.signal.receiveMode`：`on-start | manual`。
+- `channels.signal.ignoreAttachments`：跳过附件下载。
+- `channels.signal.ignoreStories`：忽略来自守护进程的动态。
+- `channels.signal.sendReadReceipts`：转发已读回执。
+- `channels.signal.dmPolicy`：`pairing | allowlist | open | disabled`（默认：pairing）。
+- `channels.signal.allowFrom`：私信允许列表（E.164 或 `uuid:<id>`）。`open` 需要 `"*"`。Signal 不支持用户名；请使用电话号码/UUID 标识。
+- `channels.signal.groupPolicy`：`open | allowlist | disabled`（默认：allowlist）。
+- `channels.signal.groupAllowFrom`：群组发送者允许列表。
+- `channels.signal.groups`：按 Signal 群组 id（或 `"*"`）键控的每群组覆盖。支持的字段：`requireMention`、`tools`、`toolsBySender`。
+- `channels.signal.accounts.<id>.groups`：用于多账户设置的 `channels.signal.groups` 每账户版本。
+- `channels.signal.historyLimit`：作为上下文包含的最大群组消息数（0 表示禁用）。
+- `channels.signal.dmHistoryLimit`：以用户轮次计的私信历史记录上限。每用户覆盖：`channels.signal.dms["<phone_or_uuid>"].historyLimit`。
+- `channels.signal.textChunkLimit`：出站分块大小（字符数）。
+- `channels.signal.chunkMode`：`length`（默认）或 `newline`，先按空行（段落边界）拆分，再按长度分块。
+- `channels.signal.mediaMaxMb`：入站/出站媒体上限（MB）。
 
-Related global options:
+相关全局选项：
 
-- `agents.list[].groupChat.mentionPatterns` (Signal does not support native mentions).
-- `messages.groupChat.mentionPatterns` (global fallback).
-- `messages.responsePrefix`.
+- `agents.list[].groupChat.mentionPatterns`（Signal 不支持原生提及）。
+- `messages.groupChat.mentionPatterns`（全局回退）。
+- `messages.responsePrefix`。
 
-## Related
+## 相关内容
 
-- [Channels Overview](/channels) — all supported channels
-- [Pairing](/channels/pairing) — DM authentication and pairing flow
-- [Groups](/channels/groups) — group chat behavior and mention gating
-- [Channel Routing](/channels/channel-routing) — session routing for messages
-- [Security](/gateway/security) — access model and hardening
+- [渠道概览](/zh-CN/channels) — 所有支持的渠道
+- [配对](/zh-CN/channels/pairing) — 私信身份验证与配对流程
+- [群组](/zh-CN/channels/groups) — 群聊行为与提及门控
+- [渠道路由](/zh-CN/channels/channel-routing) — 消息的会话路由
+- [安全](/zh-CN/gateway/security) — 访问模型与加固措施

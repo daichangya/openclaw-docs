@@ -1,98 +1,105 @@
 ---
-summary: "Host OpenClaw on Hostinger"
 read_when:
-  - Setting up OpenClaw on Hostinger
-  - Looking for a managed VPS for OpenClaw
-  - Using Hostinger 1-Click OpenClaw
-title: "Hostinger"
+    - 在 Hostinger 上设置 OpenClaw
+    - 正在为 OpenClaw 寻找托管型 VPS
+    - 使用 Hostinger 一键部署 OpenClaw
+summary: 在 Hostinger 上托管 OpenClaw
+title: Hostinger
+x-i18n:
+    generated_at: "2026-04-24T03:17:29Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: d9d221f54d6cd1697a48615c09616ad86968937941899ea7018622302e6ceb53
+    source_path: install/hostinger.md
+    workflow: 15
 ---
 
-Run a persistent OpenClaw Gateway on [Hostinger](https://www.hostinger.com/openclaw) via a **1-Click** managed deployment or a **VPS** install.
+通过 **1-Click** 托管部署或 **VPS** 安装，在 [Hostinger](https://www.hostinger.com/openclaw) 上运行一个持久化的 OpenClaw Gateway 网关。
 
-## Prerequisites
+## 前置条件
 
-- Hostinger account ([signup](https://www.hostinger.com/openclaw))
-- About 5-10 minutes
+- Hostinger 账户（[注册](https://www.hostinger.com/openclaw)）
+- 大约 5 - 10 分钟
 
-## Option A: 1-Click OpenClaw
+## 方案 A：1-Click OpenClaw
 
-The fastest way to get started. Hostinger handles infrastructure, Docker, and automatic updates.
+最快的入门方式。Hostinger 负责基础设施、Docker 和自动更新。
 
 <Steps>
-  <Step title="Purchase and launch">
-    1. From the [Hostinger OpenClaw page](https://www.hostinger.com/openclaw), choose a Managed OpenClaw plan and complete checkout.
+  <Step title="购买并启动">
+    1. 前往 [Hostinger OpenClaw 页面](https://www.hostinger.com/openclaw)，选择一个 Managed OpenClaw 套餐并完成结账。
 
     <Note>
-    During checkout you can select **Ready-to-Use AI** credits that are pre-purchased and integrated instantly inside OpenClaw -- no external accounts or API keys from other providers needed. You can start chatting right away. Alternatively, provide your own key from Anthropic, OpenAI, Google Gemini, or xAI during setup.
+    在结账过程中，你可以选择 **Ready-to-Use AI** 积分，这些积分会预先购买并立即集成到 OpenClaw 中——无需其他提供商的外部账户或 API key。你可以立刻开始聊天。或者，你也可以在设置过程中提供来自 Anthropic、OpenAI、Google Gemini 或 xAI 的自有 key。
     </Note>
 
   </Step>
 
-  <Step title="Select a messaging channel">
-    Choose one or more channels to connect:
+  <Step title="选择一个消息渠道">
+    选择一个或多个要连接的渠道：
 
-    - **WhatsApp** -- scan the QR code shown in the setup wizard.
-    - **Telegram** -- paste the bot token from [BotFather](https://t.me/BotFather).
+    - **WhatsApp** —— 扫描设置向导中显示的二维码。
+    - **Telegram** —— 粘贴来自 [BotFather](https://t.me/BotFather) 的机器人 token。
 
   </Step>
 
-  <Step title="Complete installation">
-    Click **Finish** to deploy the instance. Once ready, access the OpenClaw dashboard from **OpenClaw Overview** in hPanel.
+  <Step title="完成安装">
+    点击 **Finish** 以部署实例。准备就绪后，可从 hPanel 中的 **OpenClaw Overview** 访问 OpenClaw 仪表板。
   </Step>
 
 </Steps>
 
-## Option B: OpenClaw on VPS
+## 方案 B：在 VPS 上运行 OpenClaw
 
-More control over your server. Hostinger deploys OpenClaw via Docker on your VPS and you manage it through the **Docker Manager** in hPanel.
+你可以对服务器拥有更多控制权。Hostinger 会通过 Docker 在你的 VPS 上部署 OpenClaw，而你可通过 hPanel 中的 **Docker Manager** 进行管理。
 
 <Steps>
-  <Step title="Purchase a VPS">
-    1. From the [Hostinger OpenClaw page](https://www.hostinger.com/openclaw), choose an OpenClaw on VPS plan and complete checkout.
+  <Step title="购买 VPS">
+    1. 前往 [Hostinger OpenClaw 页面](https://www.hostinger.com/openclaw)，选择一个 OpenClaw on VPS 套餐并完成结账。
 
     <Note>
-    You can select **Ready-to-Use AI** credits during checkout -- these are pre-purchased and integrated instantly inside OpenClaw, so you can start chatting without any external accounts or API keys from other providers.
+    你可以在结账时选择 **Ready-to-Use AI** 积分——这些积分会预先购买并立即集成到 OpenClaw 中，因此你无需任何外部账户或其他提供商的 API key 就可以开始聊天。
     </Note>
 
   </Step>
 
-  <Step title="Configure OpenClaw">
-    Once the VPS is provisioned, fill in the configuration fields:
+  <Step title="配置 OpenClaw">
+    在 VPS 配置完成后，填写以下配置字段：
 
-    - **Gateway token** -- auto-generated; save it for later use.
-    - **WhatsApp number** -- your number with country code (optional).
-    - **Telegram bot token** -- from [BotFather](https://t.me/BotFather) (optional).
-    - **API keys** -- only needed if you did not select Ready-to-Use AI credits during checkout.
+    - **Gateway token** —— 自动生成；请保存以备后用。
+    - **WhatsApp number** —— 带国家区号的你的号码（可选）。
+    - **Telegram bot token** —— 来自 [BotFather](https://t.me/BotFather)（可选）。
+    - **API keys** —— 仅当你在结账时没有选择 Ready-to-Use AI 积分时才需要。
 
   </Step>
 
-  <Step title="Start OpenClaw">
-    Click **Deploy**. Once running, open the OpenClaw dashboard from the hPanel by clicking on **Open**.
+  <Step title="启动 OpenClaw">
+    点击 **Deploy**。运行后，在 hPanel 中点击 **Open** 打开 OpenClaw 仪表板。
   </Step>
 
 </Steps>
 
-Logs, restarts, and updates are managed directly from the Docker Manager interface in hPanel. To update, press on **Update** in Docker Manager and that will pull the latest image.
+日志、重启和更新都可直接在 hPanel 的 Docker Manager 界面中管理。要更新，请在 Docker Manager 中点击 **Update**，这会拉取最新镜像。
 
-## Verify your setup
+## 验证你的设置
 
-Send "Hi" to your assistant on the channel you connected. OpenClaw will reply and walk you through initial preferences.
+向你已连接渠道中的助手发送 “Hi”。OpenClaw 会回复，并引导你完成初始偏好设置。
 
-## Troubleshooting
+## 故障排除
 
-**Dashboard not loading** -- Wait a few minutes for the container to finish provisioning. Check the Docker Manager logs in hPanel.
+**仪表板无法加载** —— 等待几分钟，让容器完成配置。在 hPanel 中检查 Docker Manager 日志。
 
-**Docker container keeps restarting** -- Open Docker Manager logs and look for configuration errors (missing tokens, invalid API keys).
+**Docker 容器持续重启** —— 打开 Docker Manager 日志，查找配置错误（缺少 token、无效 API keys）。
 
-**Telegram bot not responding** -- Send your pairing code message from Telegram directly as a message inside your OpenClaw chat to complete the connection.
+**Telegram 机器人无响应** —— 直接从 Telegram 将你的配对码消息发送到 OpenClaw 聊天中，以完成连接。
 
-## Next steps
+## 后续步骤
 
-- [Channels](/channels) -- connect Telegram, WhatsApp, Discord, and more
-- [Gateway configuration](/gateway/configuration) -- all config options
+- [Channels](/zh-CN/channels) —— 连接 Telegram、WhatsApp、Discord 等
+- [Gateway configuration](/zh-CN/gateway/configuration) —— 所有配置选项
 
-## Related
+## 相关内容
 
-- [Install overview](/install)
-- [VPS hosting](/vps)
-- [DigitalOcean](/install/digitalocean)
+- [Install overview](/zh-CN/install)
+- [VPS hosting](/zh-CN/vps)
+- [DigitalOcean](/zh-CN/install/digitalocean)

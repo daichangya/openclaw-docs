@@ -1,25 +1,32 @@
 ---
-summary: "Quick start has moved to Getting Started."
 read_when:
-  - You are looking for the fastest setup steps
-  - You were sent here from an older link
-title: "Quick start"
+    - 你正在寻找最快的设置步骤。
+    - 你是从旧链接跳转到这里的。
+summary: 快速开始已移至入门指南。
+title: 快速开始
+x-i18n:
+    generated_at: "2026-04-24T04:08:14Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: faff0c266d7e509952e1492ef224a83c39379461c7258e379296b167beb68ad0
+    source_path: start/quickstart.md
+    workflow: 15
 ---
 
 <Info>
-Quick start is now part of [Getting Started](/start/getting-started).
+快速开始现已并入 [入门指南](/zh-CN/start/getting-started)。
 </Info>
 
 <Columns>
-  <Card title="Getting Started" href="/start/getting-started">
-    Install OpenClaw and run your first chat in minutes.
+  <Card title="入门指南" href="/zh-CN/start/getting-started">
+    安装 OpenClaw，并在几分钟内开始你的第一次聊天。
   </Card>
-  <Card title="Onboarding (CLI)" href="/start/wizard">
-    Full CLI onboarding reference and advanced options.
+  <Card title="新手引导（CLI）" href="/zh-CN/start/wizard">
+    完整的 CLI 新手引导参考和高级选项。
   </Card>
 </Columns>
 
-## Related
+## 相关内容
 
-- [Getting started](/start/getting-started)
-- [Install overview](/install)
+- [入门指南](/zh-CN/start/getting-started)
+- [安装概览](/zh-CN/install)

@@ -1,112 +1,119 @@
 ---
-summary: "Setup guide for developers working on the OpenClaw macOS app"
 read_when:
-  - Setting up the macOS development environment
-title: "macOS dev setup"
+    - 设置 macOS 开发环境
+summary: OpenClaw macOS 应用开发者设置指南
+title: macOS 开发设置
+x-i18n:
+    generated_at: "2026-04-24T04:05:21Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 30f98b3249096fa1e125a7beb77562b7bd36e2c17f524f30a1c58de61bd04da0
+    source_path: platforms/mac/dev-setup.md
+    workflow: 15
 ---
 
-# macOS Developer Setup
+# macOS 开发者设置
 
-This guide covers the necessary steps to build and run the OpenClaw macOS application from source.
+本指南介绍从源码构建并运行 OpenClaw macOS 应用所需的步骤。
 
-## Prerequisites
+## 前置条件
 
-Before building the app, ensure you have the following installed:
+在构建应用之前，请确保你已安装以下内容：
 
-1. **Xcode 26.2+**: Required for Swift development.
-2. **Node.js 24 & pnpm**: Recommended for the gateway, CLI, and packaging scripts. Node 22 LTS, currently `22.14+`, remains supported for compatibility.
+1. **Xcode 26.2+**：Swift 开发所必需。
+2. **Node.js 24 和 pnpm**：推荐用于 Gateway 网关、CLI 和打包脚本。Node 22 LTS（当前为 `22.14+`）出于兼容性考虑仍受支持。
 
-## 1. Install Dependencies
+## 1. 安装依赖
 
-Install the project-wide dependencies:
+安装整个项目范围的依赖：
 
 ```bash
 pnpm install
 ```
 
-## 2. Build and Package the App
+## 2. 构建并打包应用
 
-To build the macOS app and package it into `dist/OpenClaw.app`, run:
+要构建 macOS 应用并将其打包到 `dist/OpenClaw.app`，请运行：
 
 ```bash
 ./scripts/package-mac-app.sh
 ```
 
-If you don't have an Apple Developer ID certificate, the script will automatically use **ad-hoc signing** (`-`).
+如果你没有 Apple Developer ID 证书，该脚本会自动使用**临时签名**（`-`）。
 
-For dev run modes, signing flags, and Team ID troubleshooting, see the macOS app README:
+有关 dev 运行模式、签名标志和 Team ID 故障排除，请参阅 macOS 应用 README：
 [https://github.com/openclaw/openclaw/blob/main/apps/macos/README.md](https://github.com/openclaw/openclaw/blob/main/apps/macos/README.md)
 
-> **Note**: Ad-hoc signed apps may trigger security prompts. If the app crashes immediately with "Abort trap 6", see the [Troubleshooting](#troubleshooting) section.
+> **注意**：使用临时签名的应用可能会触发安全提示。如果应用立即因 “Abort trap 6” 崩溃，请参阅[故障排除](#故障排除)部分。
 
-## 3. Install the CLI
+## 3. 安装 CLI
 
-The macOS app expects a global `openclaw` CLI install to manage background tasks.
+macOS 应用依赖全局安装的 `openclaw` CLI 来管理后台任务。
 
-**To install it (recommended):**
+**安装方式（推荐）：**
 
-1. Open the OpenClaw app.
-2. Go to the **General** settings tab.
-3. Click **"Install CLI"**.
+1. 打开 OpenClaw 应用。
+2. 前往**常规**设置标签页。
+3. 点击 **“Install CLI”**。
 
-Alternatively, install it manually:
+或者，也可以手动安装：
 
 ```bash
 npm install -g openclaw@<version>
 ```
 
-`pnpm add -g openclaw@<version>` and `bun add -g openclaw@<version>` also work.
-For the Gateway runtime, Node remains the recommended path.
+`pnpm add -g openclaw@<version>` 和 `bun add -g openclaw@<version>` 也可以。
+对于 Gateway 网关运行时，Node 仍然是推荐方案。
 
-## Troubleshooting
+## 故障排除
 
-### Build Fails: Toolchain or SDK Mismatch
+### 构建失败：工具链或 SDK 不匹配
 
-The macOS app build expects the latest macOS SDK and Swift 6.2 toolchain.
+macOS 应用构建要求使用最新的 macOS SDK 和 Swift 6.2 工具链。
 
-**System dependencies (required):**
+**系统依赖（必需）：**
 
-- **Latest macOS version available in Software Update** (required by Xcode 26.2 SDKs)
-- **Xcode 26.2** (Swift 6.2 toolchain)
+- **Software Update 中可用的最新 macOS 版本**（Xcode 26.2 SDK 所必需）
+- **Xcode 26.2**（Swift 6.2 工具链）
 
-**Checks:**
+**检查命令：**
 
 ```bash
 xcodebuild -version
 xcrun swift --version
 ```
 
-If versions don’t match, update macOS/Xcode and re-run the build.
+如果版本不匹配，请更新 macOS/Xcode，然后重新运行构建。
 
-### App Crashes on Permission Grant
+### 应用在授予权限时崩溃
 
-If the app crashes when you try to allow **Speech Recognition** or **Microphone** access, it may be due to a corrupted TCC cache or signature mismatch.
+如果你在允许**语音识别**或**麦克风**访问时应用崩溃，可能是因为 TCC 缓存损坏或签名不匹配。
 
-**Fix:**
+**修复方法：**
 
-1. Reset the TCC permissions:
+1. 重置 TCC 权限：
 
    ```bash
    tccutil reset All ai.openclaw.mac.debug
    ```
 
-2. If that fails, change the `BUNDLE_ID` temporarily in [`scripts/package-mac-app.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/package-mac-app.sh) to force a "clean slate" from macOS.
+2. 如果仍然失败，请临时修改 [`scripts/package-mac-app.sh`](https://github.com/openclaw/openclaw/blob/main/scripts/package-mac-app.sh) 中的 `BUNDLE_ID`，以强制 macOS 生成一个“全新状态”。
 
-### Gateway "Starting..." indefinitely
+### Gateway 网关一直显示 “Starting...”
 
-If the gateway status stays on "Starting...", check if a zombie process is holding the port:
+如果 gateway 状态始终停留在 “Starting...”，请检查是否有僵尸进程占用了端口：
 
 ```bash
 openclaw gateway status
 openclaw gateway stop
 
-# If you're not using a LaunchAgent (dev mode / manual runs), find the listener:
+# 如果你没有使用 LaunchAgent（dev 模式 / 手动运行），请查找监听进程：
 lsof -nP -iTCP:18789 -sTCP:LISTEN
 ```
 
-If a manual run is holding the port, stop that process (Ctrl+C). As a last resort, kill the PID you found above.
+如果是手动运行的进程占用了端口，请停止该进程（Ctrl+C）。作为最后手段，可以终止上面找到的 PID。
 
-## Related
+## 相关内容
 
-- [macOS app](/platforms/macos)
-- [Install overview](/install)
+- [macOS 应用](/zh-CN/platforms/macos)
+- [安装概览](/zh-CN/install)

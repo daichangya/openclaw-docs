@@ -1,21 +1,28 @@
 ---
-summary: "api.runtime -- the injected runtime helpers available to plugins"
-title: "Plugin runtime helpers"
-sidebarTitle: "Runtime helpers"
 read_when:
-  - You need to call core helpers from a plugin (TTS, STT, image gen, web search, subagent, nodes)
-  - You want to understand what api.runtime exposes
-  - You are accessing config, agent, or media helpers from plugin code
+    - 你需要从插件调用核心辅助函数（TTS、STT、图像生成、网络搜索、子智能体、节点）
+    - 你想了解 `api.runtime` 暴露了什么
+    - 你正在从插件代码访问配置、智能体或媒体辅助函数
+sidebarTitle: Runtime helpers
+summary: api.runtime —— 可供插件使用的注入式运行时辅助函数
+title: 插件运行时辅助函数
+x-i18n:
+    generated_at: "2026-04-26T07:50:36Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: db9e57f3129b33bd05a58949a4090a97014472d9c984af82c6aa3b4e16faa1b3
+    source_path: plugins/sdk-runtime.md
+    workflow: 15
 ---
 
-Reference for the `api.runtime` object injected into every plugin during registration. Use these helpers instead of importing host internals directly.
+每个插件在注册期间都会注入 `api.runtime` 对象，本页是它的参考文档。使用这些辅助函数，而不是直接导入宿主内部实现。
 
 <CardGroup cols={2}>
-  <Card title="Channel plugins" href="/plugins/sdk-channel-plugins">
-    Step-by-step guide that uses these helpers in context for channel plugins.
+  <Card title="渠道插件" href="/zh-CN/plugins/sdk-channel-plugins">
+    分步指南，在渠道插件的上下文中使用这些辅助函数。
   </Card>
-  <Card title="Provider plugins" href="/plugins/sdk-provider-plugins">
-    Step-by-step guide that uses these helpers in context for provider plugins.
+  <Card title="提供商插件" href="/zh-CN/plugins/sdk-provider-plugins">
+    分步指南，在提供商插件的上下文中使用这些辅助函数。
   </Card>
 </CardGroup>
 
@@ -25,48 +32,48 @@ register(api) {
 }
 ```
 
-## Runtime namespaces
+## 运行时命名空间
 
 <AccordionGroup>
   <Accordion title="api.runtime.agent">
-    Agent identity, directories, and session management.
+    智能体身份、目录和会话管理。
 
     ```typescript
-    // Resolve the agent's working directory
+    // 解析智能体工作目录
     const agentDir = api.runtime.agent.resolveAgentDir(cfg);
 
-    // Resolve agent workspace
+    // 解析智能体工作区
     const workspaceDir = api.runtime.agent.resolveAgentWorkspaceDir(cfg);
 
-    // Get agent identity
+    // 获取智能体身份
     const identity = api.runtime.agent.resolveAgentIdentity(cfg);
 
-    // Get default thinking level
+    // 获取默认思考等级
     const thinking = api.runtime.agent.resolveThinkingDefault(cfg, provider, model);
 
-    // Get agent timeout
+    // 获取智能体超时时间
     const timeoutMs = api.runtime.agent.resolveAgentTimeoutMs(cfg);
 
-    // Ensure workspace exists
+    // 确保工作区存在
     await api.runtime.agent.ensureAgentWorkspace(cfg);
 
-    // Run an embedded agent turn
+    // 运行一次嵌入式智能体轮次
     const agentDir = api.runtime.agent.resolveAgentDir(cfg);
     const result = await api.runtime.agent.runEmbeddedAgent({
       sessionId: "my-plugin:task-1",
       runId: crypto.randomUUID(),
       sessionFile: path.join(agentDir, "sessions", "my-plugin-task-1.jsonl"),
       workspaceDir: api.runtime.agent.resolveAgentWorkspaceDir(cfg),
-      prompt: "Summarize the latest changes",
+      prompt: "总结最新的更改",
       timeoutMs: api.runtime.agent.resolveAgentTimeoutMs(cfg),
     });
     ```
 
-    `runEmbeddedAgent(...)` is the neutral helper for starting a normal OpenClaw agent turn from plugin code. It uses the same provider/model resolution and agent-harness selection as channel-triggered replies.
+    `runEmbeddedAgent(...)` 是用于从插件代码启动普通 OpenClaw 智能体轮次的中立辅助函数。它使用与渠道触发回复相同的提供商/模型解析和智能体 harness 选择逻辑。
 
-    `runEmbeddedPiAgent(...)` remains as a compatibility alias.
+    `runEmbeddedPiAgent(...)` 仍然保留为兼容性别名。
 
-    **Session store helpers** are under `api.runtime.agent.session`:
+    **会话存储辅助函数** 位于 `api.runtime.agent.session` 下：
 
     ```typescript
     const storePath = api.runtime.agent.session.resolveStorePath(cfg);
@@ -77,49 +84,49 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.agent.defaults">
-    Default model and provider constants:
+    默认模型和提供商常量：
 
     ```typescript
-    const model = api.runtime.agent.defaults.model; // e.g. "anthropic/claude-sonnet-4-6"
-    const provider = api.runtime.agent.defaults.provider; // e.g. "anthropic"
+    const model = api.runtime.agent.defaults.model; // 例如 "anthropic/claude-sonnet-4-6"
+    const provider = api.runtime.agent.defaults.provider; // 例如 "anthropic"
     ```
 
   </Accordion>
   <Accordion title="api.runtime.subagent">
-    Launch and manage background subagent runs.
+    启动并管理后台子智能体运行。
 
     ```typescript
-    // Start a subagent run
+    // 启动一个子智能体运行
     const { runId } = await api.runtime.subagent.run({
       sessionKey: "agent:main:subagent:search-helper",
-      message: "Expand this query into focused follow-up searches.",
-      provider: "openai", // optional override
-      model: "gpt-4.1-mini", // optional override
+      message: "将这个查询扩展为更聚焦的后续搜索。",
+      provider: "openai", // 可选覆盖
+      model: "gpt-4.1-mini", // 可选覆盖
       deliver: false,
     });
 
-    // Wait for completion
+    // 等待完成
     const result = await api.runtime.subagent.waitForRun({ runId, timeoutMs: 30000 });
 
-    // Read session messages
+    // 读取会话消息
     const { messages } = await api.runtime.subagent.getSessionMessages({
       sessionKey: "agent:main:subagent:search-helper",
       limit: 10,
     });
 
-    // Delete a session
+    // 删除一个会话
     await api.runtime.subagent.deleteSession({
       sessionKey: "agent:main:subagent:search-helper",
     });
     ```
 
     <Warning>
-    Model overrides (`provider`/`model`) require operator opt-in via `plugins.entries.<id>.subagent.allowModelOverride: true` in config. Untrusted plugins can still run subagents, but override requests are rejected.
+    模型覆盖（`provider`/`model`）需要操作员在配置中通过 `plugins.entries.<id>.subagent.allowModelOverride: true` 显式启用。不受信任的插件仍然可以运行子智能体，但覆盖请求会被拒绝。
     </Warning>
 
   </Accordion>
   <Accordion title="api.runtime.nodes">
-    List connected nodes and invoke a node-host command from Gateway-loaded plugin code or from plugin CLI commands. Use this when a plugin owns local work on a paired device, for example a browser or audio bridge on another Mac.
+    列出已连接节点，并从 Gateway 网关加载的插件代码或插件 CLI 命令中调用节点宿主命令。当某个插件拥有配对设备上的本地工作时使用它，例如另一台 Mac 上的浏览器或音频桥接。
 
     ```typescript
     const { nodes } = await api.runtime.nodes.list({ connected: true });
@@ -132,25 +139,25 @@ register(api) {
     });
     ```
 
-    Inside the Gateway this runtime is in-process. In plugin CLI commands it calls the configured Gateway over RPC, so commands such as `openclaw googlemeet recover-tab` can inspect paired nodes from the terminal. Node commands still go through normal Gateway node pairing, command allowlists, and node-local command handling.
+    在 Gateway 网关内部，这个运行时是进程内的。在插件 CLI 命令中，它会通过 RPC 调用已配置的 Gateway 网关，因此像 `openclaw googlemeet recover-tab` 这样的命令可以从终端检查已配对节点。节点命令仍然会经过常规的 Gateway 网关节点配对、命令允许列表和节点本地命令处理。
 
   </Accordion>
   <Accordion title="api.runtime.taskFlow">
-    Bind a Task Flow runtime to an existing OpenClaw session key or trusted tool context, then create and manage Task Flows without passing an owner on every call.
+    将 Task Flow 运行时绑定到现有的 OpenClaw 会话键或受信任工具上下文，然后在每次调用时无需传递 owner 即可创建和管理 Task Flows。
 
     ```typescript
     const taskFlow = api.runtime.taskFlow.fromToolContext(ctx);
 
     const created = taskFlow.createManaged({
       controllerId: "my-plugin/review-batch",
-      goal: "Review new pull requests",
+      goal: "审查新的拉取请求",
     });
 
     const child = taskFlow.runTask({
       flowId: created.flowId,
       runtime: "acp",
       childSessionKey: "agent:main:subagent:reviewer",
-      task: "Review PR #123",
+      task: "审查 PR #123",
       status: "running",
       startedAt: Date.now(),
     });
@@ -163,79 +170,79 @@ register(api) {
     });
     ```
 
-    Use `bindSession({ sessionKey, requesterOrigin })` when you already have a trusted OpenClaw session key from your own binding layer. Do not bind from raw user input.
+    当你已经从自己的绑定层拿到一个受信任的 OpenClaw 会话键时，请使用 `bindSession({ sessionKey, requesterOrigin })`。不要直接根据原始用户输入进行绑定。
 
   </Accordion>
   <Accordion title="api.runtime.tts">
-    Text-to-speech synthesis.
+    文本转语音合成。
 
     ```typescript
-    // Standard TTS
+    // 标准 TTS
     const clip = await api.runtime.tts.textToSpeech({
       text: "Hello from OpenClaw",
       cfg: api.config,
     });
 
-    // Telephony-optimized TTS
+    // 面向电话场景优化的 TTS
     const telephonyClip = await api.runtime.tts.textToSpeechTelephony({
       text: "Hello from OpenClaw",
       cfg: api.config,
     });
 
-    // List available voices
+    // 列出可用声音
     const voices = await api.runtime.tts.listVoices({
       provider: "elevenlabs",
       cfg: api.config,
     });
     ```
 
-    Uses core `messages.tts` configuration and provider selection. Returns PCM audio buffer + sample rate.
+    使用核心 `messages.tts` 配置和提供商选择。返回 PCM 音频缓冲区 + 采样率。
 
   </Accordion>
   <Accordion title="api.runtime.mediaUnderstanding">
-    Image, audio, and video analysis.
+    图像、音频和视频分析。
 
     ```typescript
-    // Describe an image
+    // 描述图像
     const image = await api.runtime.mediaUnderstanding.describeImageFile({
       filePath: "/tmp/inbound-photo.jpg",
       cfg: api.config,
       agentDir: "/tmp/agent",
     });
 
-    // Transcribe audio
+    // 转录音频
     const { text } = await api.runtime.mediaUnderstanding.transcribeAudioFile({
       filePath: "/tmp/inbound-audio.ogg",
       cfg: api.config,
-      mime: "audio/ogg", // optional, for when MIME cannot be inferred
+      mime: "audio/ogg", // 可选，用于无法推断 MIME 时
     });
 
-    // Describe a video
+    // 描述视频
     const video = await api.runtime.mediaUnderstanding.describeVideoFile({
       filePath: "/tmp/inbound-video.mp4",
       cfg: api.config,
     });
 
-    // Generic file analysis
+    // 通用文件分析
     const result = await api.runtime.mediaUnderstanding.runFile({
       filePath: "/tmp/inbound-file.pdf",
       cfg: api.config,
     });
     ```
 
-    Returns `{ text: undefined }` when no output is produced (e.g. skipped input).
+    当没有产生输出时返回 `{ text: undefined }`（例如输入被跳过时）。
 
     <Info>
-    `api.runtime.stt.transcribeAudioFile(...)` remains as a compatibility alias for `api.runtime.mediaUnderstanding.transcribeAudioFile(...)`.
+    `api.runtime.stt.transcribeAudioFile(...)` 仍然保留为 `api.runtime.mediaUnderstanding.transcribeAudioFile(...)` 的兼容性别名。
     </Info>
 
   </Accordion>
   <Accordion title="api.runtime.imageGeneration">
-    Image generation.
+    图像生成。
 
     ```typescript
     const result = await api.runtime.imageGeneration.generate({
-      prompt: "A robot painting a sunset",
+      prompt: "一个正在为夕阳作画的机器人",
       cfg: api.config,
     });
 
@@ -244,7 +251,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.webSearch">
-    Web search.
+    网络搜索。
 
     ```typescript
     const providers = api.runtime.webSearch.listProviders({ config: api.config });
@@ -257,7 +264,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.media">
-    Low-level media utilities.
+    底层媒体工具函数。
 
     ```typescript
     const webMedia = await api.runtime.media.loadWebMedia(url);
@@ -282,7 +289,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.config">
-    Config load and write.
+    加载和写入配置。
 
     ```typescript
     const cfg = await api.runtime.config.loadConfig();
@@ -291,7 +298,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.system">
-    System-level utilities.
+    系统级工具函数。
 
     ```typescript
     await api.runtime.system.enqueueSystemEvent(event);
@@ -302,7 +309,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.events">
-    Event subscriptions.
+    事件订阅。
 
     ```typescript
     api.runtime.events.onAgentEvent((event) => {
@@ -315,7 +322,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.logging">
-    Logging.
+    日志记录。
 
     ```typescript
     const verbose = api.runtime.logging.shouldLogVerbose();
@@ -324,7 +331,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.modelAuth">
-    Model and provider auth resolution.
+    模型和提供商认证解析。
 
     ```typescript
     const auth = await api.runtime.modelAuth.getApiKeyForModel({ model, cfg });
@@ -336,7 +343,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.state">
-    State directory resolution.
+    状态目录解析。
 
     ```typescript
     const stateDir = api.runtime.state.resolveStateDir();
@@ -344,7 +351,7 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.tools">
-    Memory tool factories and CLI.
+    Memory 工具工厂和 CLI。
 
     ```typescript
     const getTool = api.runtime.tools.createMemoryGetTool(/* ... */);
@@ -354,9 +361,9 @@ register(api) {
 
   </Accordion>
   <Accordion title="api.runtime.channel">
-    Channel-specific runtime helpers (available when a channel plugin is loaded).
+    渠道专用运行时辅助函数（在加载渠道插件时可用）。
 
-    `api.runtime.channel.mentions` is the shared inbound mention-policy surface for bundled channel plugins that use runtime injection:
+    `api.runtime.channel.mentions` 是供使用运行时注入的内置渠道插件共享的入站提及策略接口：
 
     ```typescript
     const mentionMatch = api.runtime.channel.mentions.matchesMentionWithExplicit(text, {
@@ -383,7 +390,7 @@ register(api) {
     });
     ```
 
-    Available mention helpers:
+    可用的提及辅助函数：
 
     - `buildMentionRegexes`
     - `matchesMentionPatterns`
@@ -391,17 +398,17 @@ register(api) {
     - `implicitMentionKindWhen`
     - `resolveInboundMentionDecision`
 
-    `api.runtime.channel.mentions` intentionally does not expose the older `resolveMentionGating*` compatibility helpers. Prefer the normalized `{ facts, policy }` path.
+    `api.runtime.channel.mentions` 有意不暴露较旧的 `resolveMentionGating*` 兼容性辅助函数。请优先使用标准化的 `{ facts, policy }` 路径。
 
   </Accordion>
 </AccordionGroup>
 
-## Storing runtime references
+## 存储运行时引用
 
-Use `createPluginRuntimeStore` to store the runtime reference for use outside the `register` callback:
+使用 `createPluginRuntimeStore` 来存储运行时引用，以便在 `register` 回调之外使用：
 
 <Steps>
-  <Step title="Create the store">
+  <Step title="创建存储">
     ```typescript
     import { createPluginRuntimeStore } from "openclaw/plugin-sdk/runtime-store";
     import type { PluginRuntime } from "openclaw/plugin-sdk/runtime-store";
@@ -413,7 +420,7 @@ Use `createPluginRuntimeStore` to store the runtime reference for use outside th
     ```
 
   </Step>
-  <Step title="Wire into the entry point">
+  <Step title="接入入口点">
     ```typescript
     export default defineChannelPluginEntry({
       id: "my-plugin",
@@ -424,7 +431,7 @@ Use `createPluginRuntimeStore` to store the runtime reference for use outside th
     });
     ```
   </Step>
-  <Step title="Access from other files">
+  <Step title="从其他文件访问">
     ```typescript
     export function getRuntime() {
       return store.getRuntime(); // throws if not initialized
@@ -439,37 +446,37 @@ Use `createPluginRuntimeStore` to store the runtime reference for use outside th
 </Steps>
 
 <Note>
-Prefer `pluginId` for the runtime-store identity. The lower-level `key` form is for uncommon cases where one plugin intentionally needs more than one runtime slot.
+对于 runtime-store 标识，优先使用 `pluginId`。更底层的 `key` 形式仅适用于少见场景：某个插件有意需要多个运行时槽位。
 </Note>
 
-## Other top-level `api` fields
+## 其他顶层 `api` 字段
 
-Beyond `api.runtime`, the API object also provides:
+除了 `api.runtime` 之外，API 对象还提供：
 
 <ParamField path="api.id" type="string">
-  Plugin id.
+  插件 id。
 </ParamField>
 <ParamField path="api.name" type="string">
-  Plugin display name.
+  插件显示名称。
 </ParamField>
 <ParamField path="api.config" type="OpenClawConfig">
-  Current config snapshot (active in-memory runtime snapshot when available).
+  当前配置快照（可用时为活动的内存中运行时快照）。
 </ParamField>
 <ParamField path="api.pluginConfig" type="Record<string, unknown>">
-  Plugin-specific config from `plugins.entries.<id>.config`.
+  来自 `plugins.entries.<id>.config` 的插件专用配置。
 </ParamField>
 <ParamField path="api.logger" type="PluginLogger">
-  Scoped logger (`debug`, `info`, `warn`, `error`).
+  作用域日志记录器（`debug`、`info`、`warn`、`error`）。
 </ParamField>
 <ParamField path="api.registrationMode" type="PluginRegistrationMode">
-  Current load mode; `"setup-runtime"` is the lightweight pre-full-entry startup/setup window.
+  当前加载模式；`"setup-runtime"` 是完整入口启动/设置之前的轻量级预启动/设置窗口。
 </ParamField>
 <ParamField path="api.resolvePath(input)" type="(string) => string">
-  Resolve a path relative to the plugin root.
+  解析相对于插件根目录的路径。
 </ParamField>
 
-## Related
+## 相关内容
 
-- [Plugin internals](/plugins/architecture) — capability model and registry
-- [SDK entry points](/plugins/sdk-entrypoints) — `definePluginEntry` options
-- [SDK overview](/plugins/sdk-overview) — subpath reference
+- [插件架构内部机制](/zh-CN/plugins/architecture) — 能力模型与注册表
+- [插件入口点](/zh-CN/plugins/sdk-entrypoints) — `definePluginEntry` 选项
+- [插件 SDK 概览](/zh-CN/plugins/sdk-overview) — 子路径参考

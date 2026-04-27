@@ -1,77 +1,84 @@
 ---
-summary: "ClawDock shell helpers for Docker-based OpenClaw installs"
 read_when:
-  - You run OpenClaw with Docker often and want shorter day-to-day commands
-  - You want a helper layer for dashboard, logs, token setup, and pairing flows
-title: "ClawDock"
+    - 你经常用 Docker 运行 OpenClaw，并希望日常命令更简短
+    - 你想要一个用于 dashboard、日志、令牌设置和配对流程的辅助层
+summary: 用于基于 Docker 的 OpenClaw 安装的 ClawDock shell 辅助工具
+title: ClawDock
+x-i18n:
+    generated_at: "2026-04-23T20:51:31Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 308ac338cb8a94d7996489ef9d751a9359b22ddd3c44d64774c6a2275b29aa22
+    source_path: install/clawdock.md
+    workflow: 15
 ---
 
-ClawDock is a small shell-helper layer for Docker-based OpenClaw installs.
+ClawDock 是一层面向基于 Docker 的 OpenClaw 安装的小型 shell 辅助工具。
 
-It gives you short commands like `clawdock-start`, `clawdock-dashboard`, and `clawdock-fix-token` instead of longer `docker compose ...` invocations.
+它提供像 `clawdock-start`、`clawdock-dashboard` 和 `clawdock-fix-token` 这样的短命令，而不是更长的 `docker compose ...` 调用。
 
-If you have not set up Docker yet, start with [Docker](/install/docker).
+如果你还没有设置 Docker，请先从 [Docker](/zh-CN/install/docker) 开始。
 
-## Install
+## 安装
 
-Use the canonical helper path:
+使用规范的辅助脚本路径：
 
 ```bash
 mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/openclaw/openclaw/main/scripts/clawdock/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
 echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
-If you previously installed ClawDock from `scripts/shell-helpers/clawdock-helpers.sh`, reinstall from the new `scripts/clawdock/clawdock-helpers.sh` path. The old raw GitHub path was removed.
+如果你之前是从 `scripts/shell-helpers/clawdock-helpers.sh` 安装 ClawDock，请改为从新的 `scripts/clawdock/clawdock-helpers.sh` 路径重新安装。旧的 raw GitHub 路径已被移除。
 
-## What you get
+## 你将获得什么
 
-### Basic operations
+### 基本操作
 
-| Command            | Description            |
+| 命令 | 说明 |
 | ------------------ | ---------------------- |
-| `clawdock-start`   | Start the gateway      |
-| `clawdock-stop`    | Stop the gateway       |
-| `clawdock-restart` | Restart the gateway    |
-| `clawdock-status`  | Check container status |
-| `clawdock-logs`    | Follow gateway logs    |
+| `clawdock-start` | 启动 Gateway 网关 |
+| `clawdock-stop` | 停止 Gateway 网关 |
+| `clawdock-restart` | 重启 Gateway 网关 |
+| `clawdock-status` | 检查容器状态 |
+| `clawdock-logs` | 跟踪 Gateway 网关日志 |
 
-### Container access
+### 容器访问
 
-| Command                   | Description                                   |
+| 命令 | 说明 |
 | ------------------------- | --------------------------------------------- |
-| `clawdock-shell`          | Open a shell inside the gateway container     |
-| `clawdock-cli <command>`  | Run OpenClaw CLI commands in Docker           |
-| `clawdock-exec <command>` | Execute an arbitrary command in the container |
+| `clawdock-shell` | 在 Gateway 网关容器内打开 shell |
+| `clawdock-cli <command>` | 在 Docker 中运行 OpenClaw CLI 命令 |
+| `clawdock-exec <command>` | 在容器中执行任意命令 |
 
-### Web UI and pairing
+### Web UI 和配对
 
-| Command                 | Description                  |
+| 命令 | 说明 |
 | ----------------------- | ---------------------------- |
-| `clawdock-dashboard`    | Open the Control UI URL      |
-| `clawdock-devices`      | List pending device pairings |
-| `clawdock-approve <id>` | Approve a pairing request    |
+| `clawdock-dashboard` | 打开 Control UI URL |
+| `clawdock-devices` | 列出待处理的设备配对 |
+| `clawdock-approve <id>` | 批准一个配对请求 |
 
-### Setup and maintenance
+### 设置与维护
 
-| Command              | Description                                      |
+| 命令 | 说明 |
 | -------------------- | ------------------------------------------------ |
-| `clawdock-fix-token` | Configure the gateway token inside the container |
-| `clawdock-update`    | Pull, rebuild, and restart                       |
-| `clawdock-rebuild`   | Rebuild the Docker image only                    |
-| `clawdock-clean`     | Remove containers and volumes                    |
+| `clawdock-fix-token` | 在容器内配置 Gateway 网关令牌 |
+| `clawdock-update` | 拉取、重建并重启 |
+| `clawdock-rebuild` | 仅重建 Docker 镜像 |
+| `clawdock-clean` | 移除容器和卷 |
 
-### Utilities
+### 实用工具
 
-| Command                | Description                             |
+| 命令 | 说明 |
 | ---------------------- | --------------------------------------- |
-| `clawdock-health`      | Run a gateway health check              |
-| `clawdock-token`       | Print the gateway token                 |
-| `clawdock-cd`          | Jump to the OpenClaw project directory  |
-| `clawdock-config`      | Open `~/.openclaw`                      |
-| `clawdock-show-config` | Print config files with redacted values |
-| `clawdock-workspace`   | Open the workspace directory            |
+| `clawdock-health` | 运行 Gateway 网关健康检查 |
+| `clawdock-token` | 打印 Gateway 网关令牌 |
+| `clawdock-cd` | 跳转到 OpenClaw 项目目录 |
+| `clawdock-config` | 打开 `~/.openclaw` |
+| `clawdock-show-config` | 打印配置文件并隐藏敏感值 |
+| `clawdock-workspace` | 打开工作区目录 |
 
-## First-time flow
+## 首次使用流程
 
 ```bash
 clawdock-start
@@ -79,26 +86,26 @@ clawdock-fix-token
 clawdock-dashboard
 ```
 
-If the browser says pairing is required:
+如果浏览器提示需要配对：
 
 ```bash
 clawdock-devices
 clawdock-approve <request-id>
 ```
 
-## Config and secrets
+## 配置与 secrets
 
-ClawDock works with the same Docker config split described in [Docker](/install/docker):
+ClawDock 使用与 [Docker](/zh-CN/install/docker) 中描述相同的 Docker 配置拆分：
 
-- `<project>/.env` for Docker-specific values like image name, ports, and the gateway token
-- `~/.openclaw/.env` for env-backed provider keys and bot tokens
-- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` for stored provider OAuth/API-key auth
-- `~/.openclaw/openclaw.json` for behavior config
+- `<project>/.env` 用于 Docker 专用值，例如镜像名称、端口和 Gateway 网关令牌
+- `~/.openclaw/.env` 用于基于环境变量的提供商 key 和 bot token
+- `~/.openclaw/agents/<agentId>/agent/auth-profiles.json` 用于存储提供商 OAuth / API-key 认证
+- `~/.openclaw/openclaw.json` 用于行为配置
 
-Use `clawdock-show-config` when you want to inspect the `.env` files and `openclaw.json` quickly. It redacts `.env` values in its printed output.
+当你想快速检查 `.env` 文件和 `openclaw.json` 时，请使用 `clawdock-show-config`。它会在打印输出中隐藏 `.env` 值。
 
-## Related pages
+## 相关页面
 
-- [Docker](/install/docker)
-- [Docker VM Runtime](/install/docker-vm-runtime)
-- [Updating](/install/updating)
+- [Docker](/zh-CN/install/docker)
+- [Docker VM Runtime](/zh-CN/install/docker-vm-runtime)
+- [Updating](/zh-CN/install/updating)

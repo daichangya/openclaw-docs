@@ -1,25 +1,32 @@
 ---
-summary: "MiniMax Search via the Coding Plan search API"
 read_when:
-  - You want to use MiniMax for web_search
-  - You need a MiniMax Coding Plan key
-  - You want MiniMax CN/global search host guidance
-title: "MiniMax search"
+    - 你想将 MiniMax 用于 `web_search`
+    - 你需要一个 MiniMax Coding Plan key
+    - 你想了解 MiniMax 中国区 / 全球搜索主机的配置指引
+summary: 通过 Coding Plan 搜索 API 使用 MiniMax Search
+title: MiniMax 搜索
+x-i18n:
+    generated_at: "2026-04-23T21:09:10Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 20a91bfae72661efd5e0bc3b6247ab05c3487db40ecd9cd5a874858bf3c69df3
+    source_path: tools/minimax-search.md
+    workflow: 15
 ---
 
-OpenClaw supports MiniMax as a `web_search` provider through the MiniMax
-Coding Plan search API. It returns structured search results with titles, URLs,
-snippets, and related queries.
+OpenClaw 支持将 MiniMax 作为 `web_search` 提供商，通过 MiniMax
+Coding Plan 搜索 API 使用。它会返回结构化搜索结果，包括标题、URL、
+摘要以及相关查询。
 
-## Get a Coding Plan key
+## 获取 Coding Plan key
 
 <Steps>
-  <Step title="Create a key">
-    Create or copy a MiniMax Coding Plan key from
-    [MiniMax Platform](https://platform.minimax.io/user-center/basic-information/interface-key).
+  <Step title="创建 key">
+    在
+    [MiniMax Platform](https://platform.minimax.io/user-center/basic-information/interface-key) 创建或复制一个 MiniMax Coding Plan key。
   </Step>
-  <Step title="Store the key">
-    Set `MINIMAX_CODE_PLAN_KEY` in the Gateway environment, or configure via:
+  <Step title="存储 key">
+    在 Gateway 网关环境中设置 `MINIMAX_CODE_PLAN_KEY`，或通过以下命令配置：
 
     ```bash
     openclaw configure --section web
@@ -28,10 +35,10 @@ snippets, and related queries.
   </Step>
 </Steps>
 
-OpenClaw also accepts `MINIMAX_CODING_API_KEY` as an env alias. `MINIMAX_API_KEY`
-is still read as a compatibility fallback when it already points at a coding-plan token.
+OpenClaw 也接受 `MINIMAX_CODING_API_KEY` 作为环境变量别名。当 `MINIMAX_API_KEY`
+已经指向 coding-plan token 时，它仍会作为兼容性回退被读取。
 
-## Config
+## 配置
 
 ```json5
 {
@@ -40,7 +47,7 @@ is still read as a compatibility fallback when it already points at a coding-pla
       minimax: {
         config: {
           webSearch: {
-            apiKey: "sk-cp-...", // optional if MINIMAX_CODE_PLAN_KEY is set
+            apiKey: "sk-cp-...", // 如果已设置 MINIMAX_CODE_PLAN_KEY，则可选
             region: "global", // or "cn"
           },
         },
@@ -57,41 +64,41 @@ is still read as a compatibility fallback when it already points at a coding-pla
 }
 ```
 
-**Environment alternative:** set `MINIMAX_CODE_PLAN_KEY` in the Gateway environment.
-For a gateway install, put it in `~/.openclaw/.env`.
+**环境变量替代方式：** 在 Gateway 网关环境中设置 `MINIMAX_CODE_PLAN_KEY`。
+对于 Gateway 网关安装，请将其放入 `~/.openclaw/.env`。
 
-## Region selection
+## 地区选择
 
-MiniMax Search uses these endpoints:
+MiniMax Search 使用以下端点：
 
-- Global: `https://api.minimax.io/v1/coding_plan/search`
-- CN: `https://api.minimaxi.com/v1/coding_plan/search`
+- 全球：`https://api.minimax.io/v1/coding_plan/search`
+- 中国区：`https://api.minimaxi.com/v1/coding_plan/search`
 
-If `plugins.entries.minimax.config.webSearch.region` is unset, OpenClaw resolves
-the region in this order:
+如果未设置 `plugins.entries.minimax.config.webSearch.region`，OpenClaw 会按以下顺序解析
+地区：
 
-1. `tools.web.search.minimax.region` / plugin-owned `webSearch.region`
+1. `tools.web.search.minimax.region` / 插件自有 `webSearch.region`
 2. `MINIMAX_API_HOST`
 3. `models.providers.minimax.baseUrl`
 4. `models.providers.minimax-portal.baseUrl`
 
-That means CN onboarding or `MINIMAX_API_HOST=https://api.minimaxi.com/...`
-automatically keeps MiniMax Search on the CN host too.
+这意味着，中国区新手引导，或设置了 `MINIMAX_API_HOST=https://api.minimaxi.com/...`
+时，也会自动让 MiniMax Search 走中国区主机。
 
-Even when you authenticated MiniMax through the OAuth `minimax-portal` path,
-web search still registers as provider id `minimax`; the OAuth provider base URL
-is only used as a region hint for CN/global host selection.
+即使你是通过 OAuth `minimax-portal` 路径完成 MiniMax 认证，
+网页搜索仍然会注册为提供商 id `minimax`；OAuth 提供商 base URL
+仅用于作为中国区 / 全球主机选择的地区提示。
 
-## Supported parameters
+## 支持的参数
 
-MiniMax Search supports:
+MiniMax Search 支持：
 
 - `query`
-- `count` (OpenClaw trims the returned result list to the requested count)
+- `count`（OpenClaw 会将返回的结果列表裁剪到所请求的数量）
 
-Provider-specific filters are not currently supported.
+目前尚不支持提供商专用过滤项。
 
-## Related
+## 相关内容
 
-- [Web Search overview](/tools/web) -- all providers and auto-detection
-- [MiniMax](/providers/minimax) -- model, image, speech, and auth setup
+- [网页搜索概览](/zh-CN/tools/web) -- 所有提供商与自动检测
+- [MiniMax](/zh-CN/providers/minimax) -- 模型、图像、语音与认证设置

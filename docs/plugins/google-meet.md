@@ -1,36 +1,36 @@
 ---
-summary: "Google Meet plugin: join explicit Meet URLs through Chrome or Twilio with realtime voice defaults"
 read_when:
-  - You want an OpenClaw agent to join a Google Meet call
-  - You want an OpenClaw agent to create a new Google Meet call
-  - You are configuring Chrome, Chrome node, or Twilio as a Google Meet transport
-title: "Google Meet plugin"
+    - 你想让一个 OpenClaw 智能体加入一个 Google Meet 通话
+    - 你想让一个 OpenClaw 智能体创建一个新的 Google Meet 通话
+    - 你正在将 Chrome、Chrome 节点或 Twilio 配置为 Google Meet 传输方式
+summary: Google Meet 插件：通过 Chrome 或 Twilio 加入显式的 Meet URL，并使用实时语音默认设置
+title: Google Meet 插件
+x-i18n:
+    generated_at: "2026-04-26T11:10:54Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 1bd53db711e4729a9a7b18f7aaa3eedffd71a1e19349fc858537652b5d17cfcb
+    source_path: plugins/google-meet.md
+    workflow: 15
 ---
 
-Google Meet participant support for OpenClaw — the plugin is explicit by design:
+OpenClaw 的 Google Meet 参与者支持——该插件在设计上是显式的：
 
-- It only joins an explicit `https://meet.google.com/...` URL.
-- It can create a new Meet space through the Google Meet API, then join the
-  returned URL.
-- `realtime` voice is the default mode.
-- Realtime voice can call back into the full OpenClaw agent when deeper
-  reasoning or tools are needed.
-- Agents choose the join behavior with `mode`: use `realtime` for live
-  listen/talk-back, or `transcribe` to join/control the browser without the
-  realtime voice bridge.
-- Auth starts as personal Google OAuth or an already signed-in Chrome profile.
-- There is no automatic consent announcement.
-- The default Chrome audio backend is `BlackHole 2ch`.
-- Chrome can run locally or on a paired node host.
-- Twilio accepts a dial-in number plus optional PIN or DTMF sequence.
-- The CLI command is `googlemeet`; `meet` is reserved for broader agent
-  teleconference workflows.
+- 它只会加入显式的 `https://meet.google.com/...` URL。
+- 它可以通过 Google Meet API 创建一个新的 Meet 空间，然后加入返回的 URL。
+- `realtime` 语音是默认模式。
+- 当需要更深入的推理或工具时，实时语音可以回调到完整的 OpenClaw 智能体。
+- 智能体通过 `mode` 选择加入行为：实时收听/回话请使用 `realtime`，若要在不启用实时语音桥接的情况下加入/控制浏览器，则使用 `transcribe`。
+- 身份验证从个人 Google OAuth 或已登录的 Chrome 配置文件开始。
+- 不会自动播报同意声明。
+- 默认的 Chrome 音频后端是 `BlackHole 2ch`。
+- Chrome 可以在本地运行，也可以在已配对的节点主机上运行。
+- Twilio 接受拨入号码，以及可选的 PIN 或 DTMF 序列。
+- CLI 命令是 `googlemeet`；`meet` 保留给更广义的智能体电话会议工作流。
 
-## Quick start
+## 快速开始
 
-Install the local audio dependencies and configure a backend realtime voice
-provider. OpenAI is the default; Google Gemini Live also works with
-`realtime.provider: "google"`:
+安装本地音频依赖，并配置一个后端实时语音提供商。OpenAI 是默认选项；Google Gemini Live 也可配合 `realtime.provider: "google"` 使用：
 
 ```bash
 brew install blackhole-2ch sox
@@ -39,21 +39,20 @@ export OPENAI_API_KEY=sk-...
 export GEMINI_API_KEY=...
 ```
 
-`blackhole-2ch` installs the `BlackHole 2ch` virtual audio device. Homebrew's
-installer requires a reboot before macOS exposes the device:
+`blackhole-2ch` 会安装 `BlackHole 2ch` 虚拟音频设备。Homebrew 的安装程序要求重启后，macOS 才会暴露该设备：
 
 ```bash
 sudo reboot
 ```
 
-After reboot, verify both pieces:
+重启后，验证这两项都已就绪：
 
 ```bash
 system_profiler SPAudioDataType | grep -i BlackHole
 command -v rec play
 ```
 
-Enable the plugin:
+启用该插件：
 
 ```json5
 {
@@ -68,27 +67,21 @@ Enable the plugin:
 }
 ```
 
-Check setup:
+检查设置：
 
 ```bash
 openclaw googlemeet setup
 ```
 
-The setup output is meant to be agent-readable. It reports Chrome profile,
-audio bridge, node pinning, delayed realtime intro, and, when Twilio delegation
-is configured, whether the `voice-call` plugin and Twilio credentials are ready.
-Treat any `ok: false` check as a blocker before asking an agent to join.
-Use `openclaw googlemeet setup --json` for scripts or machine-readable output.
-Use `--transport chrome`, `--transport chrome-node`, or `--transport twilio`
-to preflight a specific transport before an agent tries it.
+设置输出旨在供智能体读取。它会报告 Chrome 配置文件、音频桥接、节点固定、延迟的实时介绍，以及在配置了 Twilio 委派时，`voice-call` 插件和 Twilio 凭证是否已就绪。把任何 `ok: false` 检查都视为阻塞项，在要求智能体加入之前先解决。脚本或机器可读输出请使用 `openclaw googlemeet setup --json`。使用 `--transport chrome`、`--transport chrome-node` 或 `--transport twilio`，可在智能体尝试前预检特定传输方式。
 
-Join a meeting:
+加入会议：
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij
 ```
 
-Or let an agent join through the `google_meet` tool:
+或者让智能体通过 `google_meet` 工具加入：
 
 ```json
 {
@@ -99,41 +92,27 @@ Or let an agent join through the `google_meet` tool:
 }
 ```
 
-Create a new meeting and join it:
+创建新会议并加入：
 
 ```bash
 openclaw googlemeet create --transport chrome-node --mode realtime
 ```
 
-Create only the URL without joining:
+只创建 URL 而不加入：
 
 ```bash
 openclaw googlemeet create --no-join
 ```
 
-`googlemeet create` has two paths:
+`googlemeet create` 有两条路径：
 
-- API create: used when Google Meet OAuth credentials are configured. This is
-  the most deterministic path and does not depend on browser UI state.
-- Browser fallback: used when OAuth credentials are absent. OpenClaw uses the
-  pinned Chrome node, opens `https://meet.google.com/new`, waits for Google to
-  redirect to a real meeting-code URL, then returns that URL. This path requires
-  the OpenClaw Chrome profile on the node to already be signed in to Google.
-  Browser automation handles Meet's own first-run microphone prompt; that prompt
-  is not treated as a Google login failure.
-  Join and create flows also try to reuse an existing Meet tab before opening a
-  new one. Matching ignores harmless URL query strings such as `authuser`, so an
-  agent retry should focus the already-open meeting instead of creating a second
-  Chrome tab.
+- API 创建：当已配置 Google Meet OAuth 凭证时使用。这是最确定的路径，不依赖浏览器 UI 状态。
+- 浏览器回退：当 OAuth 凭证不存在时使用。OpenClaw 会使用固定的 Chrome 节点，打开 `https://meet.google.com/new`，等待 Google 重定向到真实的会议代码 URL，然后返回该 URL。这一路径要求节点上的 OpenClaw Chrome 配置文件已登录 Google。浏览器自动化会处理 Meet 自身的首次运行麦克风提示；该提示不会被视为 Google 登录失败。
+  加入和创建流程也会尽量复用现有的 Meet 标签页，而不是打开新标签页。匹配时会忽略无害的 URL 查询字符串，例如 `authuser`，因此智能体重试时应聚焦到已打开的会议，而不是创建第二个 Chrome 标签页。
 
-The command/tool output includes a `source` field (`api` or `browser`) so agents
-can explain which path was used. `create` joins the new meeting by default and
-returns `joined: true` plus the join session. To only mint the URL, use
-`create --no-join` on the CLI or pass `"join": false` to the tool.
+命令/工具输出包含 `source` 字段（`api` 或 `browser`），这样智能体就能说明使用了哪条路径。`create` 默认会加入新会议，并返回 `joined: true` 以及加入会话。若只想生成 URL，请在 CLI 中使用 `create --no-join`，或向工具传入 `"join": false`。
 
-Or tell an agent: "Create a Google Meet, join it with realtime voice, and send
-me the link." The agent should call `google_meet` with `action: "create"` and
-then share the returned `meetingUri`.
+或者你也可以告诉智能体：“创建一个 Google Meet，用实时语音加入它，并把链接发给我。” 智能体应调用 `google_meet`，使用 `action: "create"`，然后分享返回的 `meetingUri`。
 
 ```json
 {
@@ -143,79 +122,61 @@ then share the returned `meetingUri`.
 }
 ```
 
-For an observe-only/browser-control join, set `"mode": "transcribe"`. That does
-not start the duplex realtime model bridge, so it will not talk back into the
-meeting.
+如果要进行仅观察/浏览器控制的加入，请设置 `"mode": "transcribe"`。这不会启动双工实时模型桥接，因此它不会在会议中回话。
 
-During realtime sessions, `google_meet` status includes browser and audio bridge
-health such as `inCall`, `manualActionRequired`, `providerConnected`,
-`realtimeReady`, `audioInputActive`, `audioOutputActive`, last input/output
-timestamps, byte counters, and bridge closed state. If a safe Meet page prompt
-appears, browser automation handles it when it can. Login, host admission, and
-browser/OS permission prompts are reported as manual action with a reason and
-message for the agent to relay.
+在实时会话期间，`google_meet` 状态会包含浏览器和音频桥接健康信息，例如 `inCall`、`manualActionRequired`、`providerConnected`、`realtimeReady`、`audioInputActive`、`audioOutputActive`、最近输入/输出时间戳、字节计数以及桥接关闭状态。如果出现安全的 Meet 页面提示，浏览器自动化会在可能时处理它。登录、主持人准入以及浏览器/操作系统权限提示会被报告为手动操作，并附带原因和消息，供智能体转达。
 
-Chrome joins as the signed-in Chrome profile. In Meet, pick `BlackHole 2ch` for
-the microphone/speaker path used by OpenClaw. For clean duplex audio, use
-separate virtual devices or a Loopback-style graph; a single BlackHole device is
-enough for a first smoke test but can echo.
+Chrome 会以已登录的 Chrome 配置文件身份加入。在 Meet 中，为 OpenClaw 使用的麦克风/扬声器路径选择 `BlackHole 2ch`。为了获得干净的双工音频，请使用独立的虚拟设备或类似 Loopback 的音频图；单个 BlackHole 设备足以完成首次冒烟测试，但可能会产生回声。
 
-### Local gateway + Parallels Chrome
+### 本地 Gateway 网关 + Parallels Chrome
 
-You do **not** need a full OpenClaw Gateway or model API key inside a macOS VM
-just to make the VM own Chrome. Run the Gateway and agent locally, then run a
-node host in the VM. Enable the bundled plugin on the VM once so the node
-advertises the Chrome command:
+你**不**需要在 macOS 虚拟机中部署完整的 OpenClaw Gateway 网关或模型 API 密钥，只是为了让虚拟机承载 Chrome。可以在本地运行 Gateway 网关和智能体，然后在虚拟机中运行一个节点主机。只需在虚拟机中启用一次内置插件，让节点宣告 Chrome 命令即可：
 
-What runs where:
+各部分运行位置：
 
-- Gateway host: OpenClaw Gateway, agent workspace, model/API keys, realtime
-  provider, and the Google Meet plugin config.
-- Parallels macOS VM: OpenClaw CLI/node host, Google Chrome, SoX, BlackHole 2ch,
-  and a Chrome profile signed in to Google.
-- Not needed in the VM: Gateway service, agent config, OpenAI/GPT key, or model
-  provider setup.
+- Gateway 网关主机：OpenClaw Gateway 网关、智能体工作区、模型/API 密钥、实时提供商，以及 Google Meet 插件配置。
+- Parallels macOS 虚拟机：OpenClaw CLI/节点主机、Google Chrome、SoX、BlackHole 2ch，以及一个已登录 Google 的 Chrome 配置文件。
+- 虚拟机中不需要：Gateway 网关服务、智能体配置、OpenAI/GPT 密钥或模型提供商设置。
 
-Install the VM dependencies:
+安装虚拟机依赖：
 
 ```bash
 brew install blackhole-2ch sox
 ```
 
-Reboot the VM after installing BlackHole so macOS exposes `BlackHole 2ch`:
+安装 BlackHole 后重启虚拟机，让 macOS 暴露 `BlackHole 2ch`：
 
 ```bash
 sudo reboot
 ```
 
-After reboot, verify the VM can see the audio device and SoX commands:
+重启后，验证虚拟机可以看到该音频设备和 SoX 命令：
 
 ```bash
 system_profiler SPAudioDataType | grep -i BlackHole
 command -v rec play
 ```
 
-Install or update OpenClaw in the VM, then enable the bundled plugin there:
+在虚拟机中安装或更新 OpenClaw，然后在那里启用内置插件：
 
 ```bash
 openclaw plugins enable google-meet
 ```
 
-Start the node host in the VM:
+在虚拟机中启动节点主机：
 
 ```bash
 openclaw node run --host <gateway-host> --port 18789 --display-name parallels-macos
 ```
 
-If `<gateway-host>` is a LAN IP and you are not using TLS, the node refuses the
-plaintext WebSocket unless you opt in for that trusted private network:
+如果 `<gateway-host>` 是局域网 IP，并且你没有使用 TLS，除非你为这个受信任的私有网络显式启用明文 WebSocket，否则节点会拒绝它：
 
 ```bash
 OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
   openclaw node run --host <gateway-lan-ip> --port 18789 --display-name parallels-macos
 ```
 
-Use the same environment variable when installing the node as a LaunchAgent:
+将节点安装为 LaunchAgent 时，也要使用同一个环境变量：
 
 ```bash
 OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
@@ -223,25 +184,22 @@ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
 openclaw node restart
 ```
 
-`OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1` is process environment, not an
-`openclaw.json` setting. `openclaw node install` stores it in the LaunchAgent
-environment when it is present on the install command.
+`OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1` 是进程环境，而不是 `openclaw.json` 设置。当 `openclaw node install` 执行安装命令时，如果该变量存在，就会将其存储到 LaunchAgent 环境中。
 
-Approve the node from the Gateway host:
+在 Gateway 网关主机上批准该节点：
 
 ```bash
 openclaw devices list
 openclaw devices approve <requestId>
 ```
 
-Confirm the Gateway sees the node and that it advertises both `googlemeet.chrome`
-and browser capability/`browser.proxy`:
+确认 Gateway 网关能看到该节点，并且它同时宣告了 `googlemeet.chrome` 和浏览器能力/`browser.proxy`：
 
 ```bash
 openclaw nodes status
 ```
 
-Route Meet through that node on the Gateway host:
+在 Gateway 网关主机上将 Meet 路由到该节点：
 
 ```json5
 {
@@ -271,111 +229,64 @@ Route Meet through that node on the Gateway host:
 }
 ```
 
-Now join normally from the Gateway host:
+现在你可以像平常一样从 Gateway 网关主机加入：
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij
 ```
 
-or ask the agent to use the `google_meet` tool with `transport: "chrome-node"`.
+或者要求智能体使用 `google_meet` 工具，并设置 `transport: "chrome-node"`。
 
-For a one-command smoke test that creates or reuses a session, speaks a known
-phrase, and prints session health:
+要进行单命令冒烟测试，以创建或复用会话、说出一段已知短语并打印会话健康状态，请运行：
 
 ```bash
 openclaw googlemeet test-speech https://meet.google.com/abc-defg-hij
 ```
 
-During join, OpenClaw browser automation fills the guest name, clicks Join/Ask
-to join, and accepts Meet's first-run "Use microphone" choice when that prompt
-appears. During browser-only meeting creation, it can also continue past the
-same prompt without microphone if Meet does not expose the use-microphone button.
-If the browser profile is not signed in, Meet is waiting for host
-admission, Chrome needs microphone/camera permission, or Meet is stuck on a
-prompt automation could not resolve, the join/test-speech result reports
-`manualActionRequired: true` with `manualActionReason` and
-`manualActionMessage`. Agents should stop retrying the join, report that exact
-message plus the current `browserUrl`/`browserTitle`, and retry only after the
-manual browser action is complete.
+在加入过程中，OpenClaw 浏览器自动化会填写访客名称，点击 Join/Ask to join，并在出现提示时接受 Meet 首次运行的 “Use microphone” 选项。在仅浏览器会议创建期间，如果 Meet 没有暴露使用麦克风按钮，它也可以在不使用麦克风的情况下继续通过相同提示。如果浏览器配置文件未登录、Meet 正在等待主持人准入、Chrome 需要麦克风/摄像头权限，或者 Meet 卡在自动化无法解决的提示上，则 join/test-speech 结果会报告 `manualActionRequired: true`，并附带 `manualActionReason` 和 `manualActionMessage`。智能体应停止重试加入，报告该确切消息以及当前的 `browserUrl`/`browserTitle`，并且只在手动浏览器操作完成后再重试。
 
-If `chromeNode.node` is omitted, OpenClaw auto-selects only when exactly one
-connected node advertises both `googlemeet.chrome` and browser control. If
-several capable nodes are connected, set `chromeNode.node` to the node id,
-display name, or remote IP.
+如果省略了 `chromeNode.node`，只有在恰好有一个已连接节点同时宣告 `googlemeet.chrome` 和浏览器控制时，OpenClaw 才会自动选择。如果连接了多个具备能力的节点，请将 `chromeNode.node` 设置为节点 id、显示名称或远程 IP。
 
-Common failure checks:
+常见故障检查：
 
-- `Configured Google Meet node ... is not usable: offline`: the pinned node is
-  known to the Gateway but unavailable. Agents should treat that node as
-  diagnostic state, not as a usable Chrome host, and report the setup blocker
-  instead of falling back to another transport unless the user asked for that.
-- `No connected Google Meet-capable node`: start `openclaw node run` in the VM,
-  approve pairing, and make sure `openclaw plugins enable google-meet` and
-  `openclaw plugins enable browser` were run in the VM. Also confirm the
-  Gateway host allows both node commands with
-  `gateway.nodes.allowCommands: ["googlemeet.chrome", "browser.proxy"]`.
-- `BlackHole 2ch audio device not found`: install `blackhole-2ch` on the host
-  being checked and reboot before using local Chrome audio.
-- `BlackHole 2ch audio device not found on the node`: install `blackhole-2ch`
-  in the VM and reboot the VM.
-- Chrome opens but cannot join: sign in to the browser profile inside the VM, or
-  keep `chrome.guestName` set for guest join. Guest auto-join uses OpenClaw
-  browser automation through the node browser proxy; make sure the node browser
-  config points at the profile you want, for example
-  `browser.defaultProfile: "user"` or a named existing-session profile.
-- Duplicate Meet tabs: leave `chrome.reuseExistingTab: true` enabled. OpenClaw
-  activates an existing tab for the same Meet URL before opening a new one, and
-  browser meeting creation reuses an in-progress `https://meet.google.com/new`
-  or Google account prompt tab before opening another one.
-- No audio: in Meet, route microphone/speaker through the virtual audio device
-  path used by OpenClaw; use separate virtual devices or Loopback-style routing
-  for clean duplex audio.
+- `Configured Google Meet node ... is not usable: offline`：固定的节点已被 Gateway 网关识别，但当前不可用。智能体应将该节点视为诊断状态，而不是可用的 Chrome 主机，并报告设置阻塞项，而不是回退到其他传输方式，除非用户明确要求这样做。
+- `No connected Google Meet-capable node`：在虚拟机中启动 `openclaw node run`，批准配对，并确保已在虚拟机中运行 `openclaw plugins enable google-meet` 和 `openclaw plugins enable browser`。另外还要确认 Gateway 网关主机允许这两个节点命令，配置如下：
+  `gateway.nodes.allowCommands: ["googlemeet.chrome", "browser.proxy"]`。
+- `BlackHole 2ch audio device not found`：在被检查的主机上安装 `blackhole-2ch`，并在使用本地 Chrome 音频前重启。
+- `BlackHole 2ch audio device not found on the node`：在虚拟机中安装 `blackhole-2ch` 并重启虚拟机。
+- Chrome 打开但无法加入：在虚拟机内登录浏览器配置文件，或保持设置 `chrome.guestName` 以进行访客加入。访客自动加入会通过节点浏览器代理使用 OpenClaw 浏览器自动化；请确保节点浏览器配置指向你希望使用的配置文件，例如 `browser.defaultProfile: "user"` 或一个已命名的现有会话配置文件。
+- 重复的 Meet 标签页：保持启用 `chrome.reuseExistingTab: true`。OpenClaw 会在打开新标签页前激活相同 Meet URL 的现有标签页，而浏览器会议创建也会复用进行中的 `https://meet.google.com/new` 或 Google 账号提示标签页，而不是再打开一个。
+- 没有音频：在 Meet 中，将麦克风/扬声器路由到 OpenClaw 使用的虚拟音频设备路径；为了获得干净的双工音频，请使用独立的虚拟设备或类似 Loopback 的路由。
 
-## Install notes
+## 安装说明
 
-The Chrome realtime default uses two external tools:
+Chrome 的 `realtime` 默认设置使用两个外部工具：
 
-- `sox`: command-line audio utility. The plugin uses its `rec` and `play`
-  commands for the default 8 kHz G.711 mu-law audio bridge.
-- `blackhole-2ch`: macOS virtual audio driver. It creates the `BlackHole 2ch`
-  audio device that Chrome/Meet can route through.
+- `sox`：命令行音频工具。该插件使用它的 `rec` 和 `play` 命令来实现默认的 8 kHz G.711 mu-law 音频桥接。
+- `blackhole-2ch`：macOS 虚拟音频驱动。它会创建 `BlackHole 2ch` 音频设备，供 Chrome/Meet 路由使用。
 
-OpenClaw does not bundle or redistribute either package. The docs ask users to
-install them as host dependencies through Homebrew. SoX is licensed as
-`LGPL-2.0-only AND GPL-2.0-only`; BlackHole is GPL-3.0. If you build an
-installer or appliance that bundles BlackHole with OpenClaw, review BlackHole's
-upstream licensing terms or get a separate license from Existential Audio.
+OpenClaw 不捆绑也不重新分发这两个软件包。文档要求用户通过 Homebrew 将它们作为主机依赖安装。SoX 的许可证为 `LGPL-2.0-only AND GPL-2.0-only`；BlackHole 为 GPL-3.0。如果你要构建一个将 BlackHole 与 OpenClaw 一起捆绑的安装程序或设备，请审查 BlackHole 上游许可条款，或从 Existential Audio 获取单独许可证。
 
-## Transports
+## 传输方式
 
 ### Chrome
 
-Chrome transport opens the Meet URL in Google Chrome and joins as the signed-in
-Chrome profile. On macOS, the plugin checks for `BlackHole 2ch` before launch.
-If configured, it also runs an audio bridge health command and startup command
-before opening Chrome. Use `chrome` when Chrome/audio live on the Gateway host;
-use `chrome-node` when Chrome/audio live on a paired node such as a Parallels
-macOS VM.
+Chrome 传输方式会在 Google Chrome 中打开 Meet URL，并以已登录的 Chrome 配置文件身份加入。在 macOS 上，插件会在启动前检查 `BlackHole 2ch`。如果已配置，它还会在打开 Chrome 之前运行音频桥接健康检查命令和启动命令。当 Chrome/音频运行在 Gateway 网关主机上时，请使用 `chrome`；当 Chrome/音频运行在已配对节点（例如 Parallels macOS 虚拟机）上时，请使用 `chrome-node`。
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij --transport chrome
 openclaw googlemeet join https://meet.google.com/abc-defg-hij --transport chrome-node
 ```
 
-Route Chrome microphone and speaker audio through the local OpenClaw audio
-bridge. If `BlackHole 2ch` is not installed, the join fails with a setup error
-instead of silently joining without an audio path.
+将 Chrome 的麦克风和扬声器音频通过本地 OpenClaw 音频桥接进行路由。如果未安装 `BlackHole 2ch`，加入会因设置错误而失败，而不是在没有音频路径的情况下静默加入。
 
 ### Twilio
 
-Twilio transport is a strict dial plan delegated to the Voice Call plugin. It
-does not parse Meet pages for phone numbers.
+Twilio 传输方式是一个严格的拨号计划，委派给 Voice Call 插件。它不会从 Meet 页面解析电话号码。
 
-Use this when Chrome participation is not available or you want a phone dial-in
-fallback. Google Meet must expose a phone dial-in number and PIN for the
-meeting; OpenClaw does not discover those from the Meet page.
+当 Chrome 参与不可用，或者你想使用电话拨入作为回退方案时，请使用此方式。Google Meet 必须为该会议提供电话拨入号码和 PIN；OpenClaw 不会从 Meet 页面发现这些信息。
 
-Enable the Voice Call plugin on the Gateway host, not on the Chrome node:
+在 Gateway 网关主机上启用 Voice Call 插件，而不是在 Chrome 节点上：
 
 ```json5
 {
@@ -400,8 +311,7 @@ Enable the Voice Call plugin on the Gateway host, not on the Chrome node:
 }
 ```
 
-Provide Twilio credentials through environment or config. Environment keeps
-secrets out of `openclaw.json`:
+通过环境变量或配置提供 Twilio 凭证。环境变量可以让密钥不出现在 `openclaw.json` 中：
 
 ```bash
 export TWILIO_ACCOUNT_SID=AC...
@@ -409,10 +319,9 @@ export TWILIO_AUTH_TOKEN=...
 export TWILIO_FROM_NUMBER=+15550001234
 ```
 
-Restart or reload the Gateway after enabling `voice-call`; plugin config changes
-do not appear in an already running Gateway process until it reloads.
+启用 `voice-call` 后，重新启动或重新加载 Gateway 网关；插件配置更改在 Gateway 网关进程重新加载之前，不会出现在已运行的进程中。
 
-Then verify:
+然后验证：
 
 ```bash
 openclaw config validate
@@ -420,8 +329,7 @@ openclaw plugins list | grep -E 'google-meet|voice-call'
 openclaw googlemeet setup
 ```
 
-When Twilio delegation is wired, `googlemeet setup` includes successful
-`twilio-voice-call-plugin` and `twilio-voice-call-credentials` checks.
+当 Twilio 委派连通后，`googlemeet setup` 会包含成功的 `twilio-voice-call-plugin` 和 `twilio-voice-call-credentials` 检查项。
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij \
@@ -430,7 +338,7 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
   --pin 123456
 ```
 
-Use `--dtmf-sequence` when the meeting needs a custom sequence:
+当会议需要自定义序列时，使用 `--dtmf-sequence`：
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij \
@@ -439,67 +347,50 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
   --dtmf-sequence ww123456#
 ```
 
-## OAuth and preflight
+## OAuth 和预检
 
-OAuth is optional for creating a Meet link because `googlemeet create` can fall
-back to browser automation. Configure OAuth when you want official API create,
-space resolution, or Meet Media API preflight checks.
+OAuth 对于创建 Meet 链接来说是可选的，因为 `googlemeet create` 可以回退到浏览器自动化。当你想使用官方 API 创建、空间解析或 Meet Media API 预检时，请配置 OAuth。
 
-Google Meet API access uses user OAuth: create a Google Cloud OAuth client,
-request the required scopes, authorize a Google account, then store the
-resulting refresh token in the Google Meet plugin config or provide the
-`OPENCLAW_GOOGLE_MEET_*` environment variables.
+Google Meet API 访问使用用户 OAuth：创建一个 Google Cloud OAuth 客户端，请求所需作用域，授权一个 Google 账号，然后将生成的刷新令牌存储在 Google Meet 插件配置中，或者提供 `OPENCLAW_GOOGLE_MEET_*` 环境变量。
 
-OAuth does not replace the Chrome join path. Chrome and Chrome-node transports
-still join through a signed-in Chrome profile, BlackHole/SoX, and a connected
-node when you use browser participation. OAuth is only for the official Google
-Meet API path: create meeting spaces, resolve spaces, and run Meet Media API
-preflight checks.
+OAuth 不会取代 Chrome 加入路径。当你使用浏览器参与时，Chrome 和 chrome-node 传输方式仍然通过已登录的 Chrome 配置文件、BlackHole/SoX 以及一个已连接节点来加入。OAuth 仅用于官方 Google Meet API 路径：创建会议空间、解析空间，以及运行 Meet Media API 预检。
 
-### Create Google credentials
+### 创建 Google 凭证
 
-In Google Cloud Console:
+在 Google Cloud Console 中：
 
-1. Create or select a Google Cloud project.
-2. Enable **Google Meet REST API** for that project.
-3. Configure the OAuth consent screen.
-   - **Internal** is simplest for a Google Workspace organization.
-   - **External** works for personal/test setups; while the app is in Testing,
-     add each Google account that will authorize the app as a test user.
-4. Add the scopes OpenClaw requests:
+1. 创建或选择一个 Google Cloud 项目。
+2. 为该项目启用 **Google Meet REST API**。
+3. 配置 OAuth 同意屏幕。
+   - **Internal** 对 Google Workspace 组织来说最简单。
+   - **External** 适用于个人/测试设置；当应用处于 Testing 状态时，将每个会授权该应用的 Google 账号添加为测试用户。
+4. 添加 OpenClaw 请求的作用域：
    - `https://www.googleapis.com/auth/meetings.space.created`
    - `https://www.googleapis.com/auth/meetings.space.readonly`
    - `https://www.googleapis.com/auth/meetings.conference.media.readonly`
-5. Create an OAuth client ID.
-   - Application type: **Web application**.
-   - Authorized redirect URI:
+5. 创建一个 OAuth client ID。
+   - Application type：**Web application**。
+   - Authorized redirect URI：
 
      ```text
      http://localhost:8085/oauth2callback
      ```
 
-6. Copy the client ID and client secret.
+6. 复制 client ID 和 client secret。
 
-`meetings.space.created` is required by Google Meet `spaces.create`.
-`meetings.space.readonly` lets OpenClaw resolve Meet URLs/codes to spaces.
-`meetings.conference.media.readonly` is for Meet Media API preflight and media
-work; Google may require Developer Preview enrollment for actual Media API use.
-If you only need browser-based Chrome joins, skip OAuth entirely.
+`meetings.space.created` 是 Google Meet `spaces.create` 所必需的。`meetings.space.readonly` 允许 OpenClaw 将 Meet URL/代码解析为空间。`meetings.conference.media.readonly` 用于 Meet Media API 预检和媒体相关工作；Google 可能要求加入 Developer Preview 才能实际使用 Media API。如果你只需要基于浏览器的 Chrome 加入，可以完全跳过 OAuth。
 
-### Mint the refresh token
+### 生成刷新令牌
 
-Configure `oauth.clientId` and optionally `oauth.clientSecret`, or pass them as
-environment variables, then run:
+配置 `oauth.clientId`，并可选配置 `oauth.clientSecret`，或者将它们作为环境变量传入，然后运行：
 
 ```bash
 openclaw googlemeet auth login --json
 ```
 
-The command prints an `oauth` config block with a refresh token. It uses PKCE,
-localhost callback on `http://localhost:8085/oauth2callback`, and a manual
-copy/paste flow with `--manual`.
+该命令会输出一个带有刷新令牌的 `oauth` 配置块。它使用 PKCE、本地回调 `http://localhost:8085/oauth2callback`，以及带 `--manual` 的手动复制/粘贴流程。
 
-Examples:
+示例：
 
 ```bash
 OPENCLAW_GOOGLE_MEET_CLIENT_ID="your-client-id" \
@@ -507,7 +398,7 @@ OPENCLAW_GOOGLE_MEET_CLIENT_SECRET="your-client-secret" \
 openclaw googlemeet auth login --json
 ```
 
-Use manual mode when the browser cannot reach the local callback:
+当浏览器无法访问本地回调时，请使用手动模式：
 
 ```bash
 OPENCLAW_GOOGLE_MEET_CLIENT_ID="your-client-id" \
@@ -515,7 +406,7 @@ OPENCLAW_GOOGLE_MEET_CLIENT_SECRET="your-client-secret" \
 openclaw googlemeet auth login --json --manual
 ```
 
-The JSON output includes:
+JSON 输出包括：
 
 ```json
 {
@@ -530,7 +421,7 @@ The JSON output includes:
 }
 ```
 
-Store the `oauth` object under the Google Meet plugin config:
+将 `oauth` 对象存储到 Google Meet 插件配置下：
 
 ```json5
 {
@@ -551,92 +442,73 @@ Store the `oauth` object under the Google Meet plugin config:
 }
 ```
 
-Prefer environment variables when you do not want the refresh token in config.
-If both config and environment values are present, the plugin resolves config
-first and then environment fallback.
+如果你不想将刷新令牌放在配置中，优先使用环境变量。如果同时存在配置值和环境变量值，插件会优先解析配置，然后回退到环境变量。
 
-The OAuth consent includes Meet space creation, Meet space read access, and Meet
-conference media read access. If you authenticated before meeting creation
-support existed, rerun `openclaw googlemeet auth login --json` so the refresh
-token has the `meetings.space.created` scope.
+OAuth 同意内容包括 Meet 空间创建、Meet 空间读取访问以及 Meet 会议媒体读取访问。如果你在支持会议创建之前就已经完成认证，请重新运行 `openclaw googlemeet auth login --json`，以便刷新令牌具备 `meetings.space.created` 作用域。
 
-### Verify OAuth with doctor
+### 使用 doctor 验证 OAuth
 
-Run the OAuth doctor when you want a fast, non-secret health check:
+当你需要快速、无密钥的健康检查时，请运行 OAuth Doctor：
 
 ```bash
 openclaw googlemeet doctor --oauth --json
 ```
 
-This does not load the Chrome runtime or require a connected Chrome node. It
-checks that OAuth config exists and that the refresh token can mint an access
-token. The JSON report includes only status fields such as `ok`, `configured`,
-`tokenSource`, `expiresAt`, and check messages; it does not print the access
-token, refresh token, or client secret.
+这不会加载 Chrome 运行时，也不需要已连接的 Chrome 节点。它会检查 OAuth 配置是否存在，以及刷新令牌是否能够生成访问令牌。JSON 报告仅包含状态字段，例如 `ok`、`configured`、`tokenSource`、`expiresAt` 和检查消息；不会打印访问令牌、刷新令牌或 client secret。
 
-Common results:
+常见结果：
 
-| Check                | Meaning                                                                                 |
-| -------------------- | --------------------------------------------------------------------------------------- |
-| `oauth-config`       | `oauth.clientId` plus `oauth.refreshToken`, or a cached access token, is present.       |
-| `oauth-token`        | The cached access token is still valid, or the refresh token minted a new access token. |
-| `meet-spaces-get`    | Optional `--meeting` check resolved an existing Meet space.                             |
-| `meet-spaces-create` | Optional `--create-space` check created a new Meet space.                               |
+| 检查项                | 含义                                                                 |
+| --------------------- | -------------------------------------------------------------------- |
+| `oauth-config`        | 存在 `oauth.clientId` 加 `oauth.refreshToken`，或存在缓存的访问令牌。 |
+| `oauth-token`         | 缓存的访问令牌仍然有效，或者刷新令牌已生成新的访问令牌。             |
+| `meet-spaces-get`     | 可选的 `--meeting` 检查已解析一个现有 Meet 空间。                    |
+| `meet-spaces-create`  | 可选的 `--create-space` 检查已创建一个新的 Meet 空间。               |
 
-To prove Google Meet API enablement and `spaces.create` scope as well, run the
-side-effecting create check:
+如果还要证明 Google Meet API 已启用以及具备 `spaces.create` 作用域，请运行带副作用的创建检查：
 
 ```bash
 openclaw googlemeet doctor --oauth --create-space --json
 openclaw googlemeet create --no-join --json
 ```
 
-`--create-space` creates a throwaway Meet URL. Use it when you need to confirm
-that the Google Cloud project has the Meet API enabled and that the authorized
-account has the `meetings.space.created` scope.
+`--create-space` 会创建一个一次性的 Meet URL。当你需要确认 Google Cloud 项目已启用 Meet API，并且已授权账号具备 `meetings.space.created` 作用域时，请使用它。
 
-To prove read access for an existing meeting space:
+要证明对现有会议空间的读取访问权限：
 
 ```bash
 openclaw googlemeet doctor --oauth --meeting https://meet.google.com/abc-defg-hij --json
 openclaw googlemeet resolve-space --meeting https://meet.google.com/abc-defg-hij
 ```
 
-`doctor --oauth --meeting` and `resolve-space` prove read access to an existing
-space that the authorized Google account can access. A `403` from these checks
-usually means the Google Meet REST API is disabled, the consented refresh token
-is missing the required scope, or the Google account cannot access that Meet
-space. A refresh-token error means rerun `openclaw googlemeet auth login
---json` and store the new `oauth` block.
+`doctor --oauth --meeting` 和 `resolve-space` 可证明已授权的 Google 账号对其可访问的现有空间具有读取权限。这些检查返回 `403` 通常意味着 Google Meet REST API 已禁用、已同意的刷新令牌缺少所需作用域，或者该 Google 账号无法访问该 Meet 空间。刷新令牌错误则表示需要重新运行 `openclaw googlemeet auth login --json` 并存储新的 `oauth` 配置块。
 
-No OAuth credentials are needed for the browser fallback. In that mode, Google
-auth comes from the signed-in Chrome profile on the selected node, not from
-OpenClaw config.
+浏览器回退不需要 OAuth 凭证。在该模式下，Google 身份验证来自所选节点上已登录的 Chrome 配置文件，而不是 OpenClaw 配置。
 
-These environment variables are accepted as fallbacks:
+以下环境变量可作为回退值：
 
-- `OPENCLAW_GOOGLE_MEET_CLIENT_ID` or `GOOGLE_MEET_CLIENT_ID`
-- `OPENCLAW_GOOGLE_MEET_CLIENT_SECRET` or `GOOGLE_MEET_CLIENT_SECRET`
-- `OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN` or `GOOGLE_MEET_REFRESH_TOKEN`
-- `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN` or `GOOGLE_MEET_ACCESS_TOKEN`
-- `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT` or
+- `OPENCLAW_GOOGLE_MEET_CLIENT_ID` 或 `GOOGLE_MEET_CLIENT_ID`
+- `OPENCLAW_GOOGLE_MEET_CLIENT_SECRET` 或 `GOOGLE_MEET_CLIENT_SECRET`
+- `OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN` 或 `GOOGLE_MEET_REFRESH_TOKEN`
+- `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN` 或 `GOOGLE_MEET_ACCESS_TOKEN`
+- `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT` 或
   `GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT`
-- `OPENCLAW_GOOGLE_MEET_DEFAULT_MEETING` or `GOOGLE_MEET_DEFAULT_MEETING`
-- `OPENCLAW_GOOGLE_MEET_PREVIEW_ACK` or `GOOGLE_MEET_PREVIEW_ACK`
+- `OPENCLAW_GOOGLE_MEET_DEFAULT_MEETING` 或 `GOOGLE_MEET_DEFAULT_MEETING`
+- `OPENCLAW_GOOGLE_MEET_PREVIEW_ACK` 或 `GOOGLE_MEET_PREVIEW_ACK`
 
-Resolve a Meet URL, code, or `spaces/{id}` through `spaces.get`:
+通过 `spaces.get` 解析 Meet URL、代码或 `spaces/{id}`：
 
 ```bash
 openclaw googlemeet resolve-space --meeting https://meet.google.com/abc-defg-hij
 ```
 
-Run preflight before media work:
+在进行媒体相关工作前运行预检：
 
 ```bash
 openclaw googlemeet preflight --meeting https://meet.google.com/abc-defg-hij
 ```
 
-List meeting artifacts and attendance after Meet has created conference records:
+在 Meet 创建会议记录后，列出会议工件和出席情况：
 
 ```bash
 openclaw googlemeet artifacts --meeting https://meet.google.com/abc-defg-hij
@@ -644,12 +516,9 @@ openclaw googlemeet attendance --meeting https://meet.google.com/abc-defg-hij
 openclaw googlemeet export --meeting https://meet.google.com/abc-defg-hij --output ./meet-export
 ```
 
-With `--meeting`, `artifacts` and `attendance` use the latest conference record
-by default. Pass `--all-conference-records` when you want every retained record
-for that meeting.
+带上 `--meeting` 时，`artifacts` 和 `attendance` 默认使用最新的会议记录。如果你希望获取该会议的所有保留记录，请传入 `--all-conference-records`。
 
-Calendar lookup can resolve the meeting URL from Google Calendar before reading
-Meet artifacts:
+Calendar 查找可以先从 Google Calendar 解析会议 URL，再读取 Meet 工件：
 
 ```bash
 openclaw googlemeet latest --today
@@ -658,14 +527,10 @@ openclaw googlemeet artifacts --event "Weekly sync"
 openclaw googlemeet attendance --today --format csv --output attendance.csv
 ```
 
-`--today` searches today's `primary` calendar for a Calendar event with a
-Google Meet link. Use `--event <query>` to search matching event text, and
-`--calendar <id>` for a non-primary calendar. Calendar lookup requires a fresh
-OAuth login that includes the Calendar events readonly scope.
-`calendar-events` previews the matching Meet events and marks the event that
-`latest`, `artifacts`, `attendance`, or `export` will choose.
+`--today` 会在今天的 `primary` 日历中搜索带有 Google Meet 链接的 Calendar 事件。使用 `--event <query>` 搜索匹配的事件文本，使用 `--calendar <id>` 指定非主日历。Calendar 查找需要一次新的 OAuth 登录，并包含 Calendar events readonly 作用域。
+`calendar-events` 会预览匹配的 Meet 事件，并标记 `latest`、`artifacts`、`attendance` 或 `export` 将会选择的事件。
 
-If you already know the conference record id, address it directly:
+如果你已经知道 conference record id，可以直接指定它：
 
 ```bash
 openclaw googlemeet latest --meeting https://meet.google.com/abc-defg-hij
@@ -673,7 +538,7 @@ openclaw googlemeet artifacts --conference-record conferenceRecords/abc123 --jso
 openclaw googlemeet attendance --conference-record conferenceRecords/abc123 --json
 ```
 
-Write a readable report:
+写出一份可读报告：
 
 ```bash
 openclaw googlemeet artifacts --conference-record conferenceRecords/abc123 \
@@ -688,34 +553,12 @@ openclaw googlemeet export --conference-record conferenceRecords/abc123 \
   --include-doc-bodies --dry-run
 ```
 
-`artifacts` returns conference record metadata plus participant, recording,
-transcript, structured transcript-entry, and smart-note resource metadata when
-Google exposes it for the meeting. Use `--no-transcript-entries` to skip
-entry lookup for large meetings. `attendance` expands participants into
-participant-session rows with first/last seen times, total session duration,
-late/early-leave flags, and duplicate participant resources merged by signed-in
-user or display name. Pass `--no-merge-duplicates` to keep raw participant
-resources separate, `--late-after-minutes` to tune late detection, and
-`--early-before-minutes` to tune early-leave detection.
+`artifacts` 会返回会议记录元数据，以及当 Google 为该会议提供这些数据时的参与者、录制、转录、结构化 transcript-entry 和智能笔记资源元数据。对大型会议可使用 `--no-transcript-entries` 跳过条目查找。`attendance` 会将参与者展开为 participant-session 行，包含首次/最后出现时间、总会话时长、迟到/提前离开标记，并按已登录用户或显示名称合并重复的参与者资源。传入 `--no-merge-duplicates` 可保持原始参与者资源彼此分离，传入 `--late-after-minutes` 可调整迟到判定，传入 `--early-before-minutes` 可调整提前离开判定。
 
-`export` writes a folder containing `summary.md`, `attendance.csv`,
-`transcript.md`, `artifacts.json`, `attendance.json`, and `manifest.json`.
-`manifest.json` records the chosen input, export options, conference records,
-output files, counts, token source, Calendar event when one was used, and any
-partial retrieval warnings. Pass `--zip` to also write a portable archive next
-to the folder. Pass `--include-doc-bodies` to export linked transcript and
-smart-note Google Docs text through Google Drive `files.export`; this requires a
-fresh OAuth login that includes the Drive Meet readonly scope. Without
-`--include-doc-bodies`, exports include Meet metadata and structured transcript
-entries only. If Google returns a partial artifact failure, such as a smart-note
-listing, transcript-entry, or Drive document-body error, the summary and
-manifest keep the warning instead of failing the whole export.
-Use `--dry-run` to fetch the same artifact/attendance data and print the
-manifest JSON without creating the folder or ZIP. That is useful before writing
-a large export or when an agent only needs counts, selected records, and
-warnings.
+`export` 会写出一个文件夹，其中包含 `summary.md`、`attendance.csv`、`transcript.md`、`artifacts.json`、`attendance.json` 和 `manifest.json`。`manifest.json` 会记录所选输入、导出选项、会议记录、输出文件、计数、令牌来源、使用到的 Calendar 事件，以及任何部分检索警告。传入 `--zip` 可在该文件夹旁边额外写出一个可移植归档文件。传入 `--include-doc-bodies` 可通过 Google Drive `files.export` 导出已链接的 transcript 和智能笔记 Google Docs 文本；这需要一次新的 OAuth 登录，并包含 Drive Meet readonly 作用域。不使用 `--include-doc-bodies` 时，导出内容只包含 Meet 元数据和结构化 transcript-entry。如果 Google 返回部分工件失败，例如智能笔记列表、transcript-entry 或 Drive 文档正文错误，摘要和清单会保留该警告，而不会让整个导出失败。
+使用 `--dry-run` 可获取同样的工件/出席数据，并打印 manifest JSON，而不会创建文件夹或 ZIP。这在写出大型导出之前，或者当智能体只需要计数、所选记录和警告时很有用。
 
-Agents can also create the same bundle through the `google_meet` tool:
+智能体也可以通过 `google_meet` 工具创建同样的打包结果：
 
 ```json
 {
@@ -727,9 +570,9 @@ Agents can also create the same bundle through the `google_meet` tool:
 }
 ```
 
-Set `"dryRun": true` to return only the export manifest and skip file writes.
+将 `"dryRun": true` 设置为只返回导出清单并跳过文件写入。
 
-Run the guarded live smoke against a real retained meeting:
+对真实保留会议运行受保护的实时冒烟测试：
 
 ```bash
 OPENCLAW_LIVE_TEST=1 \
@@ -737,40 +580,28 @@ OPENCLAW_GOOGLE_MEET_LIVE_MEETING=https://meet.google.com/abc-defg-hij \
 pnpm test:live -- extensions/google-meet/google-meet.live.test.ts
 ```
 
-Live smoke environment:
+实时冒烟测试环境：
 
-- `OPENCLAW_LIVE_TEST=1` enables guarded live tests.
-- `OPENCLAW_GOOGLE_MEET_LIVE_MEETING` points at a retained Meet URL, code, or
-  `spaces/{id}`.
-- `OPENCLAW_GOOGLE_MEET_CLIENT_ID` or `GOOGLE_MEET_CLIENT_ID` provides the OAuth
-  client id.
-- `OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN` or `GOOGLE_MEET_REFRESH_TOKEN` provides
-  the refresh token.
-- Optional: `OPENCLAW_GOOGLE_MEET_CLIENT_SECRET`,
-  `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN`, and
-  `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT` use the same fallback names
-  without the `OPENCLAW_` prefix.
+- `OPENCLAW_LIVE_TEST=1` 启用受保护的实时测试。
+- `OPENCLAW_GOOGLE_MEET_LIVE_MEETING` 指向一个保留的 Meet URL、代码或 `spaces/{id}`。
+- `OPENCLAW_GOOGLE_MEET_CLIENT_ID` 或 `GOOGLE_MEET_CLIENT_ID` 提供 OAuth client id。
+- `OPENCLAW_GOOGLE_MEET_REFRESH_TOKEN` 或 `GOOGLE_MEET_REFRESH_TOKEN` 提供刷新令牌。
+- 可选：`OPENCLAW_GOOGLE_MEET_CLIENT_SECRET`、`OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN` 和 `OPENCLAW_GOOGLE_MEET_ACCESS_TOKEN_EXPIRES_AT` 使用相同的回退名称，只是不带 `OPENCLAW_` 前缀。
 
-The base artifact/attendance live smoke needs
-`https://www.googleapis.com/auth/meetings.space.readonly` and
-`https://www.googleapis.com/auth/meetings.conference.media.readonly`. Calendar
-lookup needs `https://www.googleapis.com/auth/calendar.events.readonly`. Drive
-document-body export needs
-`https://www.googleapis.com/auth/drive.meet.readonly`.
+基础的工件/出席实时冒烟测试需要
+`https://www.googleapis.com/auth/meetings.space.readonly` 和
+`https://www.googleapis.com/auth/meetings.conference.media.readonly`。Calendar 查找需要 `https://www.googleapis.com/auth/calendar.events.readonly`。Drive 文档正文导出需要
+`https://www.googleapis.com/auth/drive.meet.readonly`。
 
-Create a fresh Meet space:
+创建一个新的 Meet 空间：
 
 ```bash
 openclaw googlemeet create
 ```
 
-The command prints the new `meeting uri`, source, and join session. With OAuth
-credentials it uses the official Google Meet API. Without OAuth credentials it
-uses the pinned Chrome node's signed-in browser profile as a fallback. Agents can
-use the `google_meet` tool with `action: "create"` to create and join in one
-step. For URL-only creation, pass `"join": false`.
+该命令会打印新的 `meeting uri`、来源和加入会话。有 OAuth 凭证时，它会使用官方 Google Meet API。没有 OAuth 凭证时，它会使用固定 Chrome 节点上已登录的浏览器配置文件作为回退。智能体可以使用 `google_meet` 工具并设置 `action: "create"`，一步完成创建和加入。若只创建 URL，请传入 `"join": false`。
 
-Example JSON output from the browser fallback:
+来自浏览器回退的 JSON 输出示例：
 
 ```json
 {
@@ -790,9 +621,7 @@ Example JSON output from the browser fallback:
 }
 ```
 
-If the browser fallback hits Google login or a Meet permission blocker before it
-can create the URL, the Gateway method returns a failed response and the
-`google_meet` tool returns structured details instead of a plain string:
+如果浏览器回退在创建 URL 之前遇到 Google 登录或 Meet 权限阻塞，Gateway 网关方法会返回失败响应，而 `google_meet` 工具会返回结构化详情，而不是普通字符串：
 
 ```json
 {
@@ -810,11 +639,9 @@ can create the URL, the Gateway method returns a failed response and the
 }
 ```
 
-When an agent sees `manualActionRequired: true`, it should report the
-`manualActionMessage` plus the browser node/tab context and stop opening new
-Meet tabs until the operator completes the browser step.
+当智能体看到 `manualActionRequired: true` 时，它应报告 `manualActionMessage`，再加上浏览器节点/标签页上下文，并停止打开新的 Meet 标签页，直到操作员完成浏览器步骤。
 
-Example JSON output from API create:
+来自 API 创建的 JSON 输出示例：
 
 ```json
 {
@@ -835,21 +662,13 @@ Example JSON output from API create:
 }
 ```
 
-Creating a Meet joins by default. The Chrome or Chrome-node transport still
-needs a signed-in Google Chrome profile to join through the browser. If the
-profile is signed out, OpenClaw reports `manualActionRequired: true` or a
-browser fallback error and asks the operator to finish Google login before
-retrying.
+创建 Meet 默认会加入会议。Chrome 或 chrome-node 传输方式仍然需要一个已登录 Google 的 Chrome 配置文件，才能通过浏览器加入。如果该配置文件已退出登录，OpenClaw 会报告 `manualActionRequired: true` 或浏览器回退错误，并要求操作员先完成 Google 登录再重试。
 
-Set `preview.enrollmentAcknowledged: true` only after confirming your Cloud
-project, OAuth principal, and meeting participants are enrolled in the Google
-Workspace Developer Preview Program for Meet media APIs.
+仅在确认你的 Cloud 项目、OAuth principal 和会议参与者都已加入用于 Meet 媒体 API 的 Google Workspace Developer Preview Program 后，再设置 `preview.enrollmentAcknowledged: true`。
 
-## Config
+## 配置
 
-The common Chrome realtime path only needs the plugin enabled, BlackHole, SoX,
-and a backend realtime voice provider key. OpenAI is the default; set
-`realtime.provider: "google"` to use Google Gemini Live:
+常见的 Chrome `realtime` 路径只需要启用插件、BlackHole、SoX，以及一个后端实时语音提供商密钥。OpenAI 是默认选项；设置 `realtime.provider: "google"` 可使用 Google Gemini Live：
 
 ```bash
 brew install blackhole-2ch sox
@@ -858,7 +677,7 @@ export OPENAI_API_KEY=sk-...
 export GEMINI_API_KEY=...
 ```
 
-Set the plugin config under `plugins.entries.google-meet.config`:
+在 `plugins.entries.google-meet.config` 下设置插件配置：
 
 ```json5
 {
@@ -873,32 +692,24 @@ Set the plugin config under `plugins.entries.google-meet.config`:
 }
 ```
 
-Defaults:
+默认值：
 
 - `defaultTransport: "chrome"`
 - `defaultMode: "realtime"`
-- `chromeNode.node`: optional node id/name/IP for `chrome-node`
+- `chromeNode.node`：`chrome-node` 的可选节点 id/名称/IP
 - `chrome.audioBackend: "blackhole-2ch"`
-- `chrome.guestName: "OpenClaw Agent"`: name used on the signed-out Meet guest
-  screen
-- `chrome.autoJoin: true`: best-effort guest-name fill and Join Now click
-  through OpenClaw browser automation on `chrome-node`
-- `chrome.reuseExistingTab: true`: activate an existing Meet tab instead of
-  opening duplicates
-- `chrome.waitForInCallMs: 20000`: wait for the Meet tab to report in-call
-  before the realtime intro is triggered
-- `chrome.audioInputCommand`: SoX `rec` command writing 8 kHz G.711 mu-law
-  audio to stdout
-- `chrome.audioOutputCommand`: SoX `play` command reading 8 kHz G.711 mu-law
-  audio from stdin
+- `chrome.guestName: "OpenClaw Agent"`：在已退出登录的 Meet 访客界面上使用的名称
+- `chrome.autoJoin: true`：通过 OpenClaw 浏览器自动化在 `chrome-node` 上尽力完成访客名填写并点击 Join Now
+- `chrome.reuseExistingTab: true`：激活现有 Meet 标签页，而不是打开重复标签页
+- `chrome.waitForInCallMs: 20000`：等待 Meet 标签页报告已在通话中，然后才触发实时介绍
+- `chrome.audioInputCommand`：将 8 kHz G.711 mu-law 音频写入 stdout 的 SoX `rec` 命令
+- `chrome.audioOutputCommand`：从 stdin 读取 8 kHz G.711 mu-law 音频的 SoX `play` 命令
 - `realtime.provider: "openai"`
 - `realtime.toolPolicy: "safe-read-only"`
-- `realtime.instructions`: brief spoken replies, with
-  `openclaw_agent_consult` for deeper answers
-- `realtime.introMessage`: short spoken readiness check when the realtime bridge
-  connects; set it to `""` to join silently
+- `realtime.instructions`：简短口头回复，并在需要更深入回答时使用 `openclaw_agent_consult`
+- `realtime.introMessage`：实时桥接连接时的简短口头就绪检查；将其设为 `""` 可静默加入
 
-Optional overrides:
+可选覆盖项：
 
 ```json5
 {
@@ -927,7 +738,7 @@ Optional overrides:
 }
 ```
 
-Twilio-only config:
+仅 Twilio 配置：
 
 ```json5
 {
@@ -942,14 +753,11 @@ Twilio-only config:
 }
 ```
 
-`voiceCall.enabled` defaults to `true`; with Twilio transport it delegates the
-actual PSTN call and DTMF to the Voice Call plugin. If `voice-call` is not
-enabled, Google Meet can still validate and record the dial plan, but it cannot
-place the Twilio call.
+`voiceCall.enabled` 默认为 `true`；使用 Twilio 传输方式时，它会将实际的 PSTN 呼叫和 DTMF 委派给 Voice Call 插件。如果未启用 `voice-call`，Google Meet 仍然可以验证并记录拨号计划，但无法发起 Twilio 呼叫。
 
-## Tool
+## 工具
 
-Agents can use the `google_meet` tool:
+智能体可以使用 `google_meet` 工具：
 
 ```json
 {
@@ -960,26 +768,17 @@ Agents can use the `google_meet` tool:
 }
 ```
 
-Use `transport: "chrome"` when Chrome runs on the Gateway host. Use
-`transport: "chrome-node"` when Chrome runs on a paired node such as a Parallels
-VM. In both cases the realtime model and `openclaw_agent_consult` run on the
-Gateway host, so model credentials stay there.
+当 Chrome 运行在 Gateway 网关主机上时，请使用 `transport: "chrome"`。当 Chrome 运行在已配对节点（例如 Parallels 虚拟机）上时，请使用 `transport: "chrome-node"`。在这两种情况下，实时模型和 `openclaw_agent_consult` 都运行在 Gateway 网关主机上，因此模型凭证也保留在那里。
 
-Use `action: "status"` to list active sessions or inspect a session ID. Use
-`action: "speak"` with `sessionId` and `message` to make the realtime agent
-speak immediately. Use `action: "test_speech"` to create or reuse the session,
-trigger a known phrase, and return `inCall` health when the Chrome host can
-report it. Use `action: "leave"` to mark a session ended.
+使用 `action: "status"` 可列出活跃会话或检查某个会话 ID。使用带有 `sessionId` 和 `message` 的 `action: "speak"` 可让实时智能体立即发言。使用 `action: "test_speech"` 可创建或复用会话、触发一段已知短语，并在 Chrome 主机可报告时返回 `inCall` 健康状态。使用 `action: "leave"` 可将会话标记为已结束。
 
-`status` includes Chrome health when available:
+`status` 在可用时包含 Chrome 健康信息：
 
-- `inCall`: Chrome appears to be inside the Meet call
-- `micMuted`: best-effort Meet microphone state
-- `manualActionRequired` / `manualActionReason` / `manualActionMessage`: the
-  browser profile needs manual login, Meet host admission, permissions, or
-  browser-control repair before speech can work
-- `providerConnected` / `realtimeReady`: realtime voice bridge state
-- `lastInputAt` / `lastOutputAt`: last audio seen from or sent to the bridge
+- `inCall`：Chrome 看起来已在 Meet 通话中
+- `micMuted`：尽力推断的 Meet 麦克风状态
+- `manualActionRequired` / `manualActionReason` / `manualActionMessage`：浏览器配置文件需要手动登录、Meet 主持人准入、权限处理或浏览器控制修复，之后语音才能工作
+- `providerConnected` / `realtimeReady`：实时语音桥接状态
+- `lastInputAt` / `lastOutputAt`：最近一次从桥接收到或发送到桥接的音频时间
 
 ```json
 {
@@ -989,37 +788,27 @@ report it. Use `action: "leave"` to mark a session ended.
 }
 ```
 
-## Realtime agent consult
+## 实时智能体咨询
 
-Chrome realtime mode is optimized for a live voice loop. The realtime voice
-provider hears the meeting audio and speaks through the configured audio bridge.
-When the realtime model needs deeper reasoning, current information, or normal
-OpenClaw tools, it can call `openclaw_agent_consult`.
+Chrome `realtime` 模式针对实时语音循环进行了优化。实时语音提供商会听取会议音频，并通过已配置的音频桥接发声。当实时模型需要更深入的推理、当前信息或普通 OpenClaw 工具时，它可以调用 `openclaw_agent_consult`。
 
-The consult tool runs the regular OpenClaw agent behind the scenes with recent
-meeting transcript context and returns a concise spoken answer to the realtime
-voice session. The voice model can then speak that answer back into the meeting.
-It uses the same shared realtime consult tool as Voice Call.
+咨询工具会在后台运行常规 OpenClaw 智能体，附带最近的会议转录上下文，并向实时语音会话返回一个简洁的口头回答。随后语音模型就可以将该回答说回会议中。它与 Voice Call 共用同一个实时咨询工具。
 
-`realtime.toolPolicy` controls the consult run:
+`realtime.toolPolicy` 控制咨询运行方式：
 
-- `safe-read-only`: expose the consult tool and limit the regular agent to
-  `read`, `web_search`, `web_fetch`, `x_search`, `memory_search`, and
-  `memory_get`.
-- `owner`: expose the consult tool and let the regular agent use the normal
-  agent tool policy.
-- `none`: do not expose the consult tool to the realtime voice model.
+- `safe-read-only`：暴露咨询工具，并将常规智能体限制为使用 `read`、`web_search`、`web_fetch`、`x_search`、`memory_search` 和 `memory_get`。
+- `owner`：暴露咨询工具，并允许常规智能体使用正常的智能体工具策略。
+- `none`：不向实时语音模型暴露咨询工具。
 
-The consult session key is scoped per Meet session, so follow-up consult calls
-can reuse prior consult context during the same meeting.
+咨询会话键按 Meet 会话分别限定，因此后续咨询调用可以在同一场会议期间复用先前的咨询上下文。
 
-To force a spoken readiness check after Chrome has fully joined the call:
+要在 Chrome 完全加入通话后强制执行一次口头就绪检查：
 
 ```bash
 openclaw googlemeet speak meet_... "Say exactly: I'm here and listening."
 ```
 
-For the full join-and-speak smoke:
+用于完整的加入并发言冒烟测试：
 
 ```bash
 openclaw googlemeet test-speech https://meet.google.com/abc-defg-hij \
@@ -1027,9 +816,9 @@ openclaw googlemeet test-speech https://meet.google.com/abc-defg-hij \
   --message "Say exactly: I'm here and listening."
 ```
 
-## Live test checklist
+## 实时测试检查清单
 
-Use this sequence before handing a meeting to an unattended agent:
+在把会议交给无人值守的智能体之前，使用以下顺序：
 
 ```bash
 openclaw googlemeet setup
@@ -1039,18 +828,15 @@ openclaw googlemeet test-speech https://meet.google.com/abc-defg-hij \
   --message "Say exactly: Google Meet speech test complete."
 ```
 
-Expected Chrome-node state:
+预期的 chrome-node 状态：
 
-- `googlemeet setup` is all green.
-- `googlemeet setup` includes `chrome-node-connected` when Chrome-node is the
-  default transport or a node is pinned.
-- `nodes status` shows the selected node connected.
-- The selected node advertises both `googlemeet.chrome` and `browser.proxy`.
-- The Meet tab joins the call and `test-speech` returns Chrome health with
-  `inCall: true`.
+- `googlemeet setup` 全部为绿色。
+- 当 chrome-node 是默认传输方式或已固定某个节点时，`googlemeet setup` 会包含 `chrome-node-connected`。
+- `nodes status` 显示所选节点已连接。
+- 所选节点同时宣告 `googlemeet.chrome` 和 `browser.proxy`。
+- Meet 标签页加入通话，且 `test-speech` 返回的 Chrome 健康状态中 `inCall: true`。
 
-For a remote Chrome host such as a Parallels macOS VM, this is the shortest
-safe check after updating the Gateway or the VM:
+对于远程 Chrome 主机（例如 Parallels macOS 虚拟机），这是在更新 Gateway 网关或虚拟机之后最短且安全的检查方式：
 
 ```bash
 openclaw googlemeet setup
@@ -1061,11 +847,9 @@ openclaw nodes invoke \
   --params '{"action":"setup"}'
 ```
 
-That proves the Gateway plugin is loaded, the VM node is connected with the
-current token, and the Meet audio bridge is available before an agent opens a
-real meeting tab.
+这可以证明 Gateway 网关插件已加载、虚拟机节点使用当前令牌已连接，并且在智能体打开真实会议标签页之前，Meet 音频桥接已可用。
 
-For a Twilio smoke, use a meeting that exposes phone dial-in details:
+对于 Twilio 冒烟测试，请使用一个会暴露电话拨入详情的会议：
 
 ```bash
 openclaw googlemeet setup
@@ -1075,32 +859,29 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
   --pin 123456
 ```
 
-Expected Twilio state:
+预期的 Twilio 状态：
 
-- `googlemeet setup` includes green `twilio-voice-call-plugin` and
-  `twilio-voice-call-credentials` checks.
-- `voicecall` is available in the CLI after Gateway reload.
-- The returned session has `transport: "twilio"` and a `twilio.voiceCallId`.
-- `googlemeet leave <sessionId>` hangs up the delegated voice call.
+- `googlemeet setup` 包含绿色的 `twilio-voice-call-plugin` 和 `twilio-voice-call-credentials` 检查项。
+- Gateway 网关重新加载后，CLI 中可用 `voicecall`。
+- 返回的会话具有 `transport: "twilio"` 和一个 `twilio.voiceCallId`。
+- `googlemeet leave <sessionId>` 会挂断已委派的语音呼叫。
 
-## Troubleshooting
+## 故障排除
 
-### Agent cannot see the Google Meet tool
+### 智能体看不到 Google Meet 工具
 
-Confirm the plugin is enabled in the Gateway config and reload the Gateway:
+确认插件已在 Gateway 网关配置中启用，并重新加载 Gateway 网关：
 
 ```bash
 openclaw plugins list | grep google-meet
 openclaw googlemeet setup
 ```
 
-If you just edited `plugins.entries.google-meet`, restart or reload the Gateway.
-The running agent only sees plugin tools registered by the current Gateway
-process.
+如果你刚刚编辑了 `plugins.entries.google-meet`，请重启或重新加载 Gateway 网关。正在运行的智能体只能看到当前 Gateway 网关进程已注册的插件工具。
 
-### No connected Google Meet-capable node
+### 没有已连接的具备 Google Meet 能力的节点
 
-On the node host, run:
+在节点主机上运行：
 
 ```bash
 openclaw plugins enable google-meet
@@ -1109,7 +890,7 @@ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
   openclaw node run --host <gateway-lan-ip> --port 18789 --display-name parallels-macos
 ```
 
-On the Gateway host, approve the node and verify commands:
+在 Gateway 网关主机上，批准该节点并验证命令：
 
 ```bash
 openclaw devices list
@@ -1117,8 +898,8 @@ openclaw devices approve <requestId>
 openclaw nodes status
 ```
 
-The node must be connected and list `googlemeet.chrome` plus `browser.proxy`.
-The Gateway config must allow those node commands:
+该节点必须已连接，并列出 `googlemeet.chrome` 和 `browser.proxy`。
+Gateway 网关配置必须允许这些节点命令：
 
 ```json5
 {
@@ -1130,9 +911,7 @@ The Gateway config must allow those node commands:
 }
 ```
 
-If `googlemeet setup` fails `chrome-node-connected` or the Gateway log reports
-`gateway token mismatch`, reinstall or restart the node with the current Gateway
-token. For a LAN Gateway this usually means:
+如果 `googlemeet setup` 的 `chrome-node-connected` 检查失败，或 Gateway 网关日志报告 `gateway token mismatch`，请使用当前 Gateway 网关令牌重新安装或重启该节点。对于局域网 Gateway 网关，这通常意味着：
 
 ```bash
 OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
@@ -1143,116 +922,72 @@ OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1 \
   --force
 ```
 
-Then reload the node service and re-run:
+然后重新加载节点服务，并重新运行：
 
 ```bash
 openclaw googlemeet setup
 openclaw nodes status --connected
 ```
 
-### Browser opens but agent cannot join
+### 浏览器打开了，但智能体无法加入
 
-Run `googlemeet test-speech` and inspect the returned Chrome health. If it
-reports `manualActionRequired: true`, show `manualActionMessage` to the operator
-and stop retrying until the browser action is complete.
+运行 `googlemeet test-speech` 并检查返回的 Chrome 健康状态。如果其中报告 `manualActionRequired: true`，请向操作员显示 `manualActionMessage`，并在浏览器操作完成前停止重试。
 
-Common manual actions:
+常见的手动操作：
 
-- Sign in to the Chrome profile.
-- Admit the guest from the Meet host account.
-- Grant Chrome microphone/camera permissions when Chrome's native permission
-  prompt appears.
-- Close or repair a stuck Meet permission dialog.
+- 登录 Chrome 配置文件。
+- 通过 Meet 主持账号批准访客加入。
+- 当出现 Chrome 原生权限提示时，授予 Chrome 麦克风/摄像头权限。
+- 关闭或修复卡住的 Meet 权限对话框。
 
-Do not report "not signed in" just because Meet shows "Do you want people to
-hear you in the meeting?" That is Meet's audio-choice interstitial; OpenClaw
-clicks **Use microphone** through browser automation when available and keeps
-waiting for the real meeting state. For create-only browser fallback, OpenClaw
-may click **Continue without microphone** because creating the URL does not need
-the realtime audio path.
+不要仅因为 Meet 显示 “Do you want people to hear you in the meeting?” 就报告“未登录”。这是 Meet 的音频选择过渡页；OpenClaw 会在可用时通过浏览器自动化点击 **Use microphone**，并继续等待真实的会议状态。对于仅创建 URL 的浏览器回退，由于创建 URL 不需要 `realtime` 音频路径，OpenClaw 可能会点击 **Continue without microphone**。
 
-### Meeting creation fails
+### 会议创建失败
 
-`googlemeet create` first uses the Google Meet API `spaces.create` endpoint
-when OAuth credentials are configured. Without OAuth credentials it falls back
-to the pinned Chrome node browser. Confirm:
+配置了 OAuth 凭证时，`googlemeet create` 会首先使用 Google Meet API 的 `spaces.create` 端点。没有 OAuth 凭证时，它会回退到固定的 Chrome 节点浏览器。请确认：
 
-- For API creation: `oauth.clientId` and `oauth.refreshToken` are configured,
-  or matching `OPENCLAW_GOOGLE_MEET_*` environment variables are present.
-- For API creation: the refresh token was minted after create support was
-  added. Older tokens may be missing the `meetings.space.created` scope; rerun
-  `openclaw googlemeet auth login --json` and update plugin config.
-- For browser fallback: `defaultTransport: "chrome-node"` and
-  `chromeNode.node` point at a connected node with `browser.proxy` and
-  `googlemeet.chrome`.
-- For browser fallback: the OpenClaw Chrome profile on that node is signed in
-  to Google and can open `https://meet.google.com/new`.
-- For browser fallback: retries reuse an existing `https://meet.google.com/new`
-  or Google account prompt tab before opening a new tab. If an agent times out,
-  retry the tool call rather than manually opening another Meet tab.
-- For browser fallback: if the tool returns `manualActionRequired: true`, use
-  the returned `browser.nodeId`, `browser.targetId`, `browserUrl`, and
-  `manualActionMessage` to guide the operator. Do not retry in a loop until that
-  action is complete.
-- For browser fallback: if Meet shows "Do you want people to hear you in the
-  meeting?", leave the tab open. OpenClaw should click **Use microphone** or, for
-  create-only fallback, **Continue without microphone** through browser
-  automation and continue waiting for the generated Meet URL. If it cannot, the
-  error should mention `meet-audio-choice-required`, not `google-login-required`.
+- 对于 API 创建：已配置 `oauth.clientId` 和 `oauth.refreshToken`，或者存在匹配的 `OPENCLAW_GOOGLE_MEET_*` 环境变量。
+- 对于 API 创建：刷新令牌是在支持创建功能之后生成的。较旧的令牌可能缺少 `meetings.space.created` 作用域；请重新运行 `openclaw googlemeet auth login --json` 并更新插件配置。
+- 对于浏览器回退：`defaultTransport: "chrome-node"` 且 `chromeNode.node` 指向一个已连接、具备 `browser.proxy` 和 `googlemeet.chrome` 的节点。
+- 对于浏览器回退：该节点上的 OpenClaw Chrome 配置文件已登录 Google，并且可以打开 `https://meet.google.com/new`。
+- 对于浏览器回退：重试会复用现有的 `https://meet.google.com/new` 或 Google 账号提示标签页，而不是打开新标签页。如果智能体超时，请重试工具调用，而不是手动再打开一个 Meet 标签页。
+- 对于浏览器回退：如果工具返回 `manualActionRequired: true`，请使用返回的 `browser.nodeId`、`browser.targetId`、`browserUrl` 和 `manualActionMessage` 来指导操作员。在该操作完成前，不要循环重试。
+- 对于浏览器回退：如果 Meet 显示 “Do you want people to hear you in the meeting?”，请保持该标签页打开。OpenClaw 应通过浏览器自动化点击 **Use microphone**，或者在仅创建的回退场景中点击 **Continue without microphone**，然后继续等待生成的 Meet URL。如果无法做到，错误中应提到 `meet-audio-choice-required`，而不是 `google-login-required`。
 
-### Agent joins but does not talk
+### 智能体加入了，但不说话
 
-Check the realtime path:
+检查 `realtime` 路径：
 
 ```bash
 openclaw googlemeet setup
 openclaw googlemeet doctor
 ```
 
-Use `mode: "realtime"` for listen/talk-back. `mode: "transcribe"` intentionally
-does not start the duplex realtime voice bridge.
+使用 `mode: "realtime"` 进行收听/回话。`mode: "transcribe"` 会有意不启动双工实时语音桥接。
 
-Also verify:
+还要验证：
 
-- A realtime provider key is available on the Gateway host, such as
-  `OPENAI_API_KEY` or `GEMINI_API_KEY`.
-- `BlackHole 2ch` is visible on the Chrome host.
-- `rec` and `play` exist on the Chrome host.
-- Meet microphone and speaker are routed through the virtual audio path used by
-  OpenClaw.
+- Gateway 网关主机上有可用的实时提供商密钥，例如 `OPENAI_API_KEY` 或 `GEMINI_API_KEY`。
+- `BlackHole 2ch` 在 Chrome 主机上可见。
+- `rec` 和 `play` 在 Chrome 主机上存在。
+- Meet 的麦克风和扬声器已通过 OpenClaw 使用的虚拟音频路径进行路由。
 
-`googlemeet doctor [session-id]` prints the session, node, in-call state,
-manual action reason, realtime provider connection, `realtimeReady`, audio
-input/output activity, last audio timestamps, byte counters, and browser URL.
-Use `googlemeet status [session-id]` when you need the raw JSON. Use
-`googlemeet doctor --oauth` when you need to verify Google Meet OAuth refresh
-without exposing tokens; add `--meeting` or `--create-space` when you need a
-Google Meet API proof as well.
+`googlemeet doctor [session-id]` 会打印会话、节点、通话中状态、手动操作原因、实时提供商连接、`realtimeReady`、音频输入/输出活动、最近音频时间戳、字节计数和浏览器 URL。当你需要原始 JSON 时，请使用 `googlemeet status [session-id]`。当你需要在不暴露令牌的情况下验证 Google Meet OAuth 刷新时，请使用 `googlemeet doctor --oauth`；当你还需要 Google Meet API 证明时，可额外加上 `--meeting` 或 `--create-space`。
 
-If an agent timed out and you can see a Meet tab already open, inspect that tab
-without opening another one:
+如果智能体已超时，而你能看到一个已经打开的 Meet 标签页，请在不再打开新标签页的情况下检查该标签页：
 
 ```bash
 openclaw googlemeet recover-tab
 openclaw googlemeet recover-tab https://meet.google.com/abc-defg-hij
 ```
 
-The equivalent tool action is `recover_current_tab`. It focuses and inspects an
-existing Meet tab for the selected transport. With `chrome`, it uses local
-browser control through the Gateway; with `chrome-node`, it uses the configured
-Chrome node. It does not open a new tab or create a new session; it reports the
-current blocker, such as login, admission, permissions, or audio-choice state.
-The CLI command talks to the configured Gateway, so the Gateway must be running;
-`chrome-node` also requires the Chrome node to be connected.
+对应的工具动作是 `recover_current_tab`。它会为所选传输方式聚焦并检查现有的 Meet 标签页。使用 `chrome` 时，它通过 Gateway 网关进行本地浏览器控制；使用 `chrome-node` 时，它使用已配置的 Chrome 节点。它不会打开新标签页，也不会创建新会话；它会报告当前阻塞项，例如登录、准入、权限或音频选择状态。CLI 命令会与已配置的 Gateway 网关通信，因此 Gateway 网关必须正在运行；`chrome-node` 还要求 Chrome 节点已连接。
 
-### Twilio setup checks fail
+### Twilio 设置检查失败
 
-`twilio-voice-call-plugin` fails when `voice-call` is not allowed or not enabled.
-Add it to `plugins.allow`, enable `plugins.entries.voice-call`, and reload the
-Gateway.
+当 `voice-call` 未被允许或未启用时，`twilio-voice-call-plugin` 会失败。请将其添加到 `plugins.allow`，启用 `plugins.entries.voice-call`，然后重新加载 Gateway 网关。
 
-`twilio-voice-call-credentials` fails when the Twilio backend is missing account
-SID, auth token, or caller number. Set these on the Gateway host:
+当 Twilio 后端缺少 account SID、auth token 或主叫号码时，`twilio-voice-call-credentials` 会失败。请在 Gateway 网关主机上设置以下内容：
 
 ```bash
 export TWILIO_ACCOUNT_SID=AC...
@@ -1260,7 +995,7 @@ export TWILIO_AUTH_TOKEN=...
 export TWILIO_FROM_NUMBER=+15550001234
 ```
 
-Then restart or reload the Gateway and run:
+然后重启或重新加载 Gateway 网关，并运行：
 
 ```bash
 openclaw googlemeet setup
@@ -1268,23 +1003,21 @@ openclaw voicecall setup
 openclaw voicecall smoke
 ```
 
-`voicecall smoke` is readiness-only by default. To dry-run a specific number:
+`voicecall smoke` 默认仅进行就绪性检查。若要对特定号码执行 dry-run：
 
 ```bash
 openclaw voicecall smoke --to "+15555550123"
 ```
 
-Only add `--yes` when you intentionally want to place a live outbound notify
-call:
+只有在你明确想发起一次真实的外呼通知电话时，才添加 `--yes`：
 
 ```bash
 openclaw voicecall smoke --to "+15555550123" --yes
 ```
 
-### Twilio call starts but never enters the meeting
+### Twilio 呼叫已开始，但始终未进入会议
 
-Confirm the Meet event exposes phone dial-in details. Pass the exact dial-in
-number and PIN or a custom DTMF sequence:
+确认 Meet 事件暴露了电话拨入详情。请传入精确的拨入号码和 PIN，或一个自定义 DTMF 序列：
 
 ```bash
 openclaw googlemeet join https://meet.google.com/abc-defg-hij \
@@ -1293,34 +1026,23 @@ openclaw googlemeet join https://meet.google.com/abc-defg-hij \
   --dtmf-sequence ww123456#
 ```
 
-Use leading `w` or commas in `--dtmf-sequence` if the provider needs a pause
-before entering the PIN.
+如果提供商在输入 PIN 前需要暂停，请在 `--dtmf-sequence` 中使用前导 `w` 或逗号。
 
-## Notes
+## 说明
 
-Google Meet's official media API is receive-oriented, so speaking into a Meet
-call still needs a participant path. This plugin keeps that boundary visible:
-Chrome handles browser participation and local audio routing; Twilio handles
-phone dial-in participation.
+Google Meet 的官方媒体 API 偏向接收，因此要向 Meet 通话中发言，仍然需要一个参与者路径。该插件明确保留了这条边界：Chrome 负责浏览器参与和本地音频路由；Twilio 负责电话拨入参与。
 
-Chrome realtime mode needs either:
+Chrome `realtime` 模式需要以下其一：
 
-- `chrome.audioInputCommand` plus `chrome.audioOutputCommand`: OpenClaw owns the
-  realtime model bridge and pipes 8 kHz G.711 mu-law audio between those
-  commands and the selected realtime voice provider.
-- `chrome.audioBridgeCommand`: an external bridge command owns the whole local
-  audio path and must exit after starting or validating its daemon.
+- `chrome.audioInputCommand` 加 `chrome.audioOutputCommand`：OpenClaw 拥有实时模型桥接，并在这些命令与所选实时语音提供商之间传输 8 kHz G.711 mu-law 音频。
+- `chrome.audioBridgeCommand`：一个外部桥接命令拥有整个本地音频路径，并且必须在启动或验证其守护进程后退出。
 
-For clean duplex audio, route Meet output and Meet microphone through separate
-virtual devices or a Loopback-style virtual device graph. A single shared
-BlackHole device can echo other participants back into the call.
+为了获得干净的双工音频，请将 Meet 输出和 Meet 麦克风通过独立的虚拟设备，或类似 Loopback 的虚拟设备图来路由。单个共享的 BlackHole 设备可能会将其他参与者的声音回送到通话中。
 
-`googlemeet speak` triggers the active realtime audio bridge for a Chrome
-session. `googlemeet leave` stops that bridge. For Twilio sessions delegated
-through the Voice Call plugin, `leave` also hangs up the underlying voice call.
+`googlemeet speak` 会触发某个 Chrome 会话当前活跃的实时音频桥接。`googlemeet leave` 会停止该桥接。对于通过 Voice Call 插件委派的 Twilio 会话，`leave` 还会挂断底层语音呼叫。
 
-## Related
+## 相关内容
 
-- [Voice call plugin](/plugins/voice-call)
-- [Talk mode](/nodes/talk)
-- [Building plugins](/plugins/building-plugins)
+- [Voice call 插件](/zh-CN/plugins/voice-call)
+- [Talk 模式](/zh-CN/nodes/talk)
+- [构建插件](/zh-CN/plugins/building-plugins)

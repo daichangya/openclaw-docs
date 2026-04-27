@@ -1,53 +1,55 @@
 ---
-summary: "How memory search finds relevant notes using embeddings and hybrid retrieval"
-title: "Memory search"
 read_when:
-  - You want to understand how memory_search works
-  - You want to choose an embedding provider
-  - You want to tune search quality
+    - 你想了解 memory_search 的工作原理
+    - 你想选择一个嵌入提供商
+    - 你想优化搜索质量
+summary: 内存搜索如何使用嵌入和混合检索来找到相关笔记
+title: 内存搜索
+x-i18n:
+    generated_at: "2026-04-25T23:14:59Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 95d86fb3efe79aae92f5e3590f1c15fb0d8f3bb3301f8fe9a41f891e290d7a14
+    source_path: concepts/memory-search.md
+    workflow: 15
 ---
 
-`memory_search` finds relevant notes from your memory files, even when the
-wording differs from the original text. It works by indexing memory into small
-chunks and searching them using embeddings, keywords, or both.
+`memory_search` 会从你的内存文件中找到相关笔记，即使措辞与原始文本不同也可以。它通过将内存索引为小块，并使用嵌入、关键词或两者结合来进行搜索。
 
-## Quick start
+## 快速开始
 
-If you have a GitHub Copilot subscription, OpenAI, Gemini, Voyage, or Mistral
-API key configured, memory search works automatically. To set a provider
-explicitly:
+如果你已配置 GitHub Copilot 订阅、OpenAI、Gemini、Voyage 或 Mistral API 密钥，内存搜索会自动工作。若要显式设置提供商：
 
 ```json5
 {
   agents: {
     defaults: {
       memorySearch: {
-        provider: "openai", // or "gemini", "local", "ollama", etc.
+        provider: "openai", // 或 "gemini"、"local"、"ollama" 等
       },
     },
   },
 }
 ```
 
-For local embeddings with no API key, install the optional `node-llama-cpp`
-runtime package next to OpenClaw and use `provider: "local"`.
+如果要在没有 API 密钥的情况下使用本地嵌入，请在 OpenClaw 旁边安装可选的 `node-llama-cpp` 运行时包，并使用 `provider: "local"`。
 
-## Supported providers
+## 支持的提供商
 
-| Provider       | ID               | Needs API key | Notes                                                |
+| 提供商 | ID | 需要 API 密钥 | 说明 |
 | -------------- | ---------------- | ------------- | ---------------------------------------------------- |
-| Bedrock        | `bedrock`        | No            | Auto-detected when the AWS credential chain resolves |
-| Gemini         | `gemini`         | Yes           | Supports image/audio indexing                        |
-| GitHub Copilot | `github-copilot` | No            | Auto-detected, uses Copilot subscription             |
-| Local          | `local`          | No            | GGUF model, ~0.6 GB download                         |
-| Mistral        | `mistral`        | Yes           | Auto-detected                                        |
-| Ollama         | `ollama`         | No            | Local, must set explicitly                           |
-| OpenAI         | `openai`         | Yes           | Auto-detected, fast                                  |
-| Voyage         | `voyage`         | Yes           | Auto-detected                                        |
+| Bedrock | `bedrock` | 否 | 当 AWS 凭证链可解析时自动检测 |
+| Gemini | `gemini` | 是 | 支持图像/音频索引 |
+| GitHub Copilot | `github-copilot` | 否 | 自动检测，使用 Copilot 订阅 |
+| Local | `local` | 否 | GGUF 模型，下载大小约 0.6 GB |
+| Mistral | `mistral` | 是 | 自动检测 |
+| Ollama | `ollama` | 否 | 本地，必须显式设置 |
+| OpenAI | `openai` | 是 | 自动检测，速度快 |
+| Voyage | `voyage` | 是 | 自动检测 |
 
-## How search works
+## 搜索如何工作
 
-OpenClaw runs two retrieval paths in parallel and merges the results:
+OpenClaw 会并行运行两条检索路径，并合并结果：
 
 ```mermaid
 flowchart LR
@@ -60,41 +62,34 @@ flowchart LR
     M --> R["Top Results"]
 ```
 
-- **Vector search** finds notes with similar meaning ("gateway host" matches
-  "the machine running OpenClaw").
-- **BM25 keyword search** finds exact matches (IDs, error strings, config
-  keys).
+- **向量搜索** 会找到含义相近的笔记（“gateway host” 可匹配 “the machine running OpenClaw”）。
+- **BM25 关键词搜索** 会找到精确匹配（ID、错误字符串、配置键）。
 
-If only one path is available (no embeddings or no FTS), the other runs alone.
+如果只有一条路径可用（没有嵌入或没有 FTS），则只运行另一条路径。
 
-When embeddings are unavailable, OpenClaw still uses lexical ranking over FTS results instead of falling back to raw exact-match ordering only. That degraded mode boosts chunks with stronger query-term coverage and relevant file paths, which keeps recall useful even without `sqlite-vec` or an embedding provider.
+当嵌入不可用时，OpenClaw 仍会对 FTS 结果使用词法排序，而不是仅退回到原始精确匹配排序。这种降级模式会提升那些查询词覆盖更强、文件路径更相关的分块，因此即使没有 `sqlite-vec` 或嵌入提供商，也能保持不错的召回效果。
 
-## Improving search quality
+## 提升搜索质量
 
-Two optional features help when you have a large note history:
+当你有大量笔记历史时，有两个可选功能会很有帮助：
 
-### Temporal decay
+### 时间衰减
 
-Old notes gradually lose ranking weight so recent information surfaces first.
-With the default half-life of 30 days, a note from last month scores at 50% of
-its original weight. Evergreen files like `MEMORY.md` are never decayed.
+旧笔记的排名权重会逐渐降低，因此最近的信息会优先显示。默认半衰期为 30 天，因此上个月的笔记得分会降为原始权重的 50%。像 `MEMORY.md` 这样的常青文件永远不会衰减。
 
 <Tip>
-Enable temporal decay if your agent has months of daily notes and stale
-information keeps outranking recent context.
+如果你的智能体有数月的每日笔记，且过时信息总是排在最近上下文之前，请启用时间衰减。
 </Tip>
 
-### MMR (diversity)
+### MMR（多样性）
 
-Reduces redundant results. If five notes all mention the same router config, MMR
-ensures the top results cover different topics instead of repeating.
+减少重复结果。如果五条笔记都提到了同一个路由器配置，MMR 会确保顶部结果覆盖不同主题，而不是重复相似内容。
 
 <Tip>
-Enable MMR if `memory_search` keeps returning near-duplicate snippets from
-different daily notes.
+如果 `memory_search` 总是从不同的每日笔记中返回近似重复的片段，请启用 MMR。
 </Tip>
 
-### Enable both
+### 同时启用两者
 
 ```json5
 {
@@ -113,44 +108,32 @@ different daily notes.
 }
 ```
 
-## Multimodal memory
+## 多模态内存
 
-With Gemini Embedding 2, you can index images and audio files alongside
-Markdown. Search queries remain text, but they match against visual and audio
-content. See the [Memory configuration reference](/reference/memory-config) for
-setup.
+使用 Gemini Embedding 2 时，你可以在 Markdown 之外一并索引图像和音频文件。搜索查询仍然是文本，但会匹配视觉和音频内容。设置方式请参见[内存配置参考](/zh-CN/reference/memory-config)。
 
-## Session memory search
+## 会话内存搜索
 
-You can optionally index session transcripts so `memory_search` can recall
-earlier conversations. This is opt-in via
-`memorySearch.experimental.sessionMemory`. See the
-[configuration reference](/reference/memory-config) for details.
+你还可以选择为会话转录建立索引，这样 `memory_search` 就能回忆更早的对话。这是通过 `memorySearch.experimental.sessionMemory` 选择启用的。详情请参见[配置参考](/zh-CN/reference/memory-config)。
 
-## Troubleshooting
+## 故障排除
 
-**No results?** Run `openclaw memory status` to check the index. If empty, run
-`openclaw memory index --force`.
+**没有结果？** 运行 `openclaw memory status` 检查索引。如果为空，请运行 `openclaw memory index --force`。
 
-**Only keyword matches?** Your embedding provider may not be configured. Check
-`openclaw memory status --deep`.
+**只有关键词匹配？** 你的嵌入提供商可能未配置。请检查 `openclaw memory status --deep`。
 
-**Local embeddings time out?** `ollama`, `lmstudio`, and `local` use a longer
-inline batch timeout by default. If the host is simply slow, set
-`agents.defaults.memorySearch.sync.embeddingBatchTimeoutSeconds` and rerun
-`openclaw memory index --force`.
+**本地嵌入超时？** `ollama`、`lmstudio` 和 `local` 默认使用更长的内联批处理超时时间。如果只是宿主机较慢，请设置 `agents.defaults.memorySearch.sync.embeddingBatchTimeoutSeconds`，然后重新运行 `openclaw memory index --force`。
 
-**CJK text not found?** Rebuild the FTS index with
-`openclaw memory index --force`.
+**找不到 CJK 文本？** 请使用 `openclaw memory index --force` 重建 FTS 索引。
 
-## Further reading
+## 延伸阅读
 
-- [Active Memory](/concepts/active-memory) -- sub-agent memory for interactive chat sessions
-- [Memory](/concepts/memory) -- file layout, backends, tools
-- [Memory configuration reference](/reference/memory-config) -- all config knobs
+- [Active Memory](/zh-CN/concepts/active-memory) -- 用于交互式聊天会话的子智能体内存
+- [内存](/zh-CN/concepts/memory) -- 文件布局、后端、工具
+- [内存配置参考](/zh-CN/reference/memory-config) -- 所有配置项
 
-## Related
+## 相关内容
 
-- [Memory overview](/concepts/memory)
-- [Active memory](/concepts/active-memory)
-- [Builtin memory engine](/concepts/memory-builtin)
+- [内存概览](/zh-CN/concepts/memory)
+- [Active Memory](/zh-CN/concepts/active-memory)
+- [内置内存引擎](/zh-CN/concepts/memory-builtin)

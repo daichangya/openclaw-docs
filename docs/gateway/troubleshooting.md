@@ -1,17 +1,24 @@
 ---
-summary: "Deep troubleshooting runbook for gateway, channels, automation, nodes, and browser"
 read_when:
-  - The troubleshooting hub pointed you here for deeper diagnosis
-  - You need stable symptom based runbook sections with exact commands
-title: "Troubleshooting"
-sidebarTitle: "Troubleshooting"
+    - 故障排除中心将你引导到这里，以进行更深入的诊断
+    - 你需要按症状划分、稳定可靠且包含精确命令的操作手册章节
+sidebarTitle: Troubleshooting
+summary: Gateway 网关、渠道、自动化、节点和浏览器的深度故障排除操作手册
+title: 故障排除
+x-i18n:
+    generated_at: "2026-04-26T06:47:43Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: eacc6b2a0e8522a761dcee0a3b9bc024eefbd7a5ab4118fc090401868a571bcf
+    source_path: gateway/troubleshooting.md
+    workflow: 15
 ---
 
-This page is the deep runbook. Start at [/help/troubleshooting](/help/troubleshooting) if you want the fast triage flow first.
+此页面是深度操作手册。如果你想先走快速分诊流程，请从 [/help/troubleshooting](/zh-CN/help/troubleshooting) 开始。
 
-## Command ladder
+## 命令阶梯
 
-Run these first, in this order:
+先按以下顺序运行这些命令：
 
 ```bash
 openclaw status
@@ -21,17 +28,17 @@ openclaw doctor
 openclaw channels status --probe
 ```
 
-Expected healthy signals:
+预期的健康信号：
 
-- `openclaw gateway status` shows `Runtime: running`, `Connectivity probe: ok`, and a `Capability: ...` line.
-- `openclaw doctor` reports no blocking config/service issues.
-- `openclaw channels status --probe` shows live per-account transport status and, where supported, probe/audit results such as `works` or `audit ok`.
+- `openclaw gateway status` 显示 `Runtime: running`、`Connectivity probe: ok`，以及一行 `Capability: ...`。
+- `openclaw doctor` 报告没有阻塞性的配置或服务问题。
+- `openclaw channels status --probe` 显示每个账号的实时传输状态，并在支持的情况下显示探测/审计结果，例如 `works` 或 `audit ok`。
 
-## Split brain installs and newer config guard
+## 安装分裂与较新配置保护
 
-Use this when a gateway service unexpectedly stops after an update, or logs show that one `openclaw` binary is older than the version that last wrote `openclaw.json`.
+当 Gateway 网关服务在更新后意外停止，或者日志显示某个 `openclaw` 二进制版本早于最后一次写入 `openclaw.json` 的版本时，请使用本节。
 
-OpenClaw stamps config writes with `meta.lastTouchedVersion`. Read-only commands can still inspect a config written by a newer OpenClaw, but process and service mutations refuse to continue from an older binary. Blocked actions include gateway service start, stop, restart, uninstall, forced service reinstall, service-mode gateway startup, and `gateway --force` port cleanup.
+OpenClaw 会用 `meta.lastTouchedVersion` 标记配置写入。只读命令仍然可以检查由较新版本 OpenClaw 写入的配置，但进程和服务变更操作会拒绝由较旧二进制继续执行。被阻止的操作包括：Gateway 网关服务启动、停止、重启、卸载、强制重装服务、以服务模式启动 Gateway 网关，以及 `gateway --force` 端口清理。
 
 ```bash
 which openclaw
@@ -41,11 +48,11 @@ openclaw config get meta.lastTouchedVersion
 ```
 
 <Steps>
-  <Step title="Fix PATH">
-    Fix `PATH` so `openclaw` resolves to the newer install, then rerun the action.
+  <Step title="修复 PATH">
+    修复 `PATH`，使 `openclaw` 解析到较新的安装版本，然后重新运行该操作。
   </Step>
-  <Step title="Reinstall the gateway service">
-    Reinstall the intended gateway service from the newer install:
+  <Step title="重新安装 Gateway 网关服务">
+    从较新的安装版本重新安装预期的 Gateway 网关服务：
 
     ```bash
     openclaw gateway install --force
@@ -53,18 +60,18 @@ openclaw config get meta.lastTouchedVersion
     ```
 
   </Step>
-  <Step title="Remove stale wrappers">
-    Remove stale system package or old wrapper entries that still point at an old `openclaw` binary.
+  <Step title="移除过时包装器">
+    移除仍然指向旧 `openclaw` 二进制的过时系统包或旧包装器条目。
   </Step>
 </Steps>
 
 <Warning>
-For intentional downgrade or emergency recovery only, set `OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1` for the single command. Leave it unset for normal operation.
+仅在有意降级或紧急恢复时，才为单条命令设置 `OPENCLAW_ALLOW_OLDER_BINARY_DESTRUCTIVE_ACTIONS=1`。正常运行时请保持未设置。
 </Warning>
 
-## Anthropic 429 extra usage required for long context
+## Anthropic 429：长上下文需要额外配额
 
-Use this when logs/errors include: `HTTP 429: rate_limit_error: Extra usage is required for long context requests`.
+当日志或错误中包含以下内容时，请使用本节：`HTTP 429: rate_limit_error: Extra usage is required for long context requests`。
 
 ```bash
 openclaw logs --follow
@@ -72,39 +79,39 @@ openclaw models status
 openclaw config get agents.defaults.models
 ```
 
-Look for:
+检查以下内容：
 
-- Selected Anthropic Opus/Sonnet model has `params.context1m: true`.
-- Current Anthropic credential is not eligible for long-context usage.
-- Requests fail only on long sessions/model runs that need the 1M beta path.
+- 选定的 Anthropic Opus/Sonnet 模型设置了 `params.context1m: true`。
+- 当前 Anthropic 凭证不具备长上下文使用资格。
+- 请求仅在需要走 1M beta 路径的长会话或模型运行中失败。
 
-Fix options:
+修复选项：
 
 <Steps>
-  <Step title="Disable context1m">
-    Disable `context1m` for that model to fall back to the normal context window.
+  <Step title="禁用 context1m">
+    为该模型禁用 `context1m`，回退到普通上下文窗口。
   </Step>
-  <Step title="Use an eligible credential">
-    Use an Anthropic credential that is eligible for long-context requests, or switch to an Anthropic API key.
+  <Step title="使用符合条件的凭证">
+    使用具备长上下文请求资格的 Anthropic 凭证，或切换为 Anthropic API 密钥。
   </Step>
-  <Step title="Configure fallback models">
-    Configure fallback models so runs continue when Anthropic long-context requests are rejected.
+  <Step title="配置回退模型">
+    配置回退模型，以便在 Anthropic 长上下文请求被拒绝时，运行仍可继续。
   </Step>
 </Steps>
 
-Related:
+相关内容：
 
-- [Anthropic](/providers/anthropic)
-- [Token use and costs](/reference/token-use)
-- [Why am I seeing HTTP 429 from Anthropic?](/help/faq-first-run#why-am-i-seeing-http-429-ratelimiterror-from-anthropic)
+- [Anthropic](/zh-CN/providers/anthropic)
+- [Token 使用量与成本](/zh-CN/reference/token-use)
+- [为什么我会看到来自 Anthropic 的 HTTP 429？](/zh-CN/help/faq-first-run#why-am-i-seeing-http-429-ratelimiterror-from-anthropic)
 
-## Local OpenAI-compatible backend passes direct probes but agent runs fail
+## 本地 OpenAI-compatible 后端可通过直接探测，但智能体运行失败
 
-Use this when:
+当出现以下情况时，请使用本节：
 
-- `curl ... /v1/models` works
-- tiny direct `/v1/chat/completions` calls work
-- OpenClaw model runs fail only on normal agent turns
+- `curl ... /v1/models` 可用
+- 很小的直接 `/v1/chat/completions` 调用可用
+- OpenClaw 模型运行仅在正常智能体轮次中失败
 
 ```bash
 curl http://127.0.0.1:1234/v1/models
@@ -115,35 +122,35 @@ openclaw infer model run --model <provider/model> --prompt "hi" --json
 openclaw logs --follow
 ```
 
-Look for:
+检查以下内容：
 
-- direct tiny calls succeed, but OpenClaw runs fail only on larger prompts
-- backend errors about `messages[].content` expecting a string
-- backend crashes that appear only with larger prompt-token counts or full agent runtime prompts
+- 很小的直接调用成功，但 OpenClaw 运行仅在较大提示词下失败
+- 后端报错 `messages[].content` 期望为字符串
+- 后端崩溃仅出现在更大的提示词 token 数量或完整 Agent Runtimes 提示词下
 
 <AccordionGroup>
-  <Accordion title="Common signatures">
-    - `messages[...].content: invalid type: sequence, expected a string` → backend rejects structured Chat Completions content parts. Fix: set `models.providers.<provider>.models[].compat.requiresStringContent: true`.
-    - direct tiny requests succeed, but OpenClaw agent runs fail with backend/model crashes (for example Gemma on some `inferrs` builds) → OpenClaw transport is likely already correct; the backend is failing on the larger agent-runtime prompt shape.
-    - failures shrink after disabling tools but do not disappear → tool schemas were part of the pressure, but the remaining issue is still upstream model/server capacity or a backend bug.
+  <Accordion title="常见特征">
+    - `messages[...].content: invalid type: sequence, expected a string` → 后端拒绝结构化的 Chat Completions 内容片段。修复方法：设置 `models.providers.<provider>.models[].compat.requiresStringContent: true`。
+    - 很小的直接请求成功，但 OpenClaw 智能体运行因后端/模型崩溃而失败（例如某些 `inferrs` 构建中的 Gemma）→ OpenClaw 传输层很可能已经正确；是后端在更大的 Agent Runtimes 提示词形态下失败。
+    - 禁用工具后失败减少但未消失 → 工具 schema 是压力来源之一，但剩余问题仍是上游模型/服务器容量限制或后端 bug。
   </Accordion>
-  <Accordion title="Fix options">
-    1. Set `compat.requiresStringContent: true` for string-only Chat Completions backends.
-    2. Set `compat.supportsTools: false` for models/backends that cannot handle OpenClaw's tool schema surface reliably.
-    3. Lower prompt pressure where possible: smaller workspace bootstrap, shorter session history, lighter local model, or a backend with stronger long-context support.
-    4. If tiny direct requests keep passing while OpenClaw agent turns still crash inside the backend, treat it as an upstream server/model limitation and file a repro there with the accepted payload shape.
+  <Accordion title="修复选项">
+    1. 为仅支持字符串的 Chat Completions 后端设置 `compat.requiresStringContent: true`。
+    2. 为无法可靠处理 OpenClaw 工具 schema 表面的模型/后端设置 `compat.supportsTools: false`。
+    3. 在可能的情况下降低提示词压力：更小的工作区引导、更短的会话历史、更轻量的本地模型，或支持更强长上下文能力的后端。
+    4. 如果很小的直接请求持续通过，而 OpenClaw 智能体轮次仍在后端内部崩溃，请将其视为上游服务器/模型限制，并按其接受的载荷形态提交复现。
   </Accordion>
 </AccordionGroup>
 
-Related:
+相关内容：
 
-- [Configuration](/gateway/configuration)
-- [Local models](/gateway/local-models)
-- [OpenAI-compatible endpoints](/gateway/configuration-reference#openai-compatible-endpoints)
+- [配置](/zh-CN/gateway/configuration)
+- [本地模型](/zh-CN/gateway/local-models)
+- [OpenAI-compatible 端点](/zh-CN/gateway/configuration-reference#openai-compatible-endpoints)
 
-## No replies
+## 无回复
 
-If channels are up but nothing answers, check routing and policy before reconnecting anything.
+如果渠道已经在线，但没有任何响应，请先检查路由和策略，再决定是否重连任何内容。
 
 ```bash
 openclaw status
@@ -153,27 +160,27 @@ openclaw config get channels
 openclaw logs --follow
 ```
 
-Look for:
+检查以下内容：
 
-- Pairing pending for DM senders.
-- Group mention gating (`requireMention`, `mentionPatterns`).
-- Channel/group allowlist mismatches.
+- 私信发送者仍在等待配对批准。
+- 群组提及门控（`requireMention`、`mentionPatterns`）。
+- 渠道/群组允许列表不匹配。
 
-Common signatures:
+常见特征：
 
-- `drop guild message (mention required` → group message ignored until mention.
-- `pairing request` → sender needs approval.
-- `blocked` / `allowlist` → sender/channel was filtered by policy.
+- `drop guild message (mention required` → 群消息在被提及之前会被忽略。
+- `pairing request` → 发送者需要批准。
+- `blocked` / `allowlist` → 发送者/渠道被策略过滤。
 
-Related:
+相关内容：
 
-- [Channel troubleshooting](/channels/troubleshooting)
-- [Groups](/channels/groups)
-- [Pairing](/channels/pairing)
+- [渠道故障排除](/zh-CN/channels/troubleshooting)
+- [群组](/zh-CN/channels/groups)
+- [配对](/zh-CN/channels/pairing)
 
-## Dashboard control UI connectivity
+## Dashboard 控制 UI 连接性
 
-When dashboard/control UI will not connect, validate URL, auth mode, and secure context assumptions.
+当 dashboard/control UI 无法连接时，请验证 URL、认证模式和安全上下文假设。
 
 ```bash
 openclaw gateway status
@@ -183,44 +190,44 @@ openclaw doctor
 openclaw gateway status --json
 ```
 
-Look for:
+检查以下内容：
 
-- Correct probe URL and dashboard URL.
-- Auth mode/token mismatch between client and gateway.
-- HTTP usage where device identity is required.
+- 正确的探测 URL 和 dashboard URL。
+- 客户端与 Gateway 网关之间的认证模式/token 不匹配。
+- 在需要设备身份的情况下却使用了 HTTP。
 
 <AccordionGroup>
-  <Accordion title="Connect / auth signatures">
-    - `device identity required` → non-secure context or missing device auth.
-    - `origin not allowed` → browser `Origin` is not in `gateway.controlUi.allowedOrigins` (or you are connecting from a non-loopback browser origin without an explicit allowlist).
-    - `device nonce required` / `device nonce mismatch` → client is not completing the challenge-based device auth flow (`connect.challenge` + `device.nonce`).
-    - `device signature invalid` / `device signature expired` → client signed the wrong payload (or stale timestamp) for the current handshake.
-    - `AUTH_TOKEN_MISMATCH` with `canRetryWithDeviceToken=true` → client can do one trusted retry with cached device token.
-    - That cached-token retry reuses the cached scope set stored with the paired device token. Explicit `deviceToken` / explicit `scopes` callers keep their requested scope set instead.
-    - Outside that retry path, connect auth precedence is explicit shared token/password first, then explicit `deviceToken`, then stored device token, then bootstrap token.
-    - On the async Tailscale Serve Control UI path, failed attempts for the same `{scope, ip}` are serialized before the limiter records the failure. Two bad concurrent retries from the same client can therefore surface `retry later` on the second attempt instead of two plain mismatches.
-    - `too many failed authentication attempts (retry later)` from a browser-origin loopback client → repeated failures from that same normalized `Origin` are locked out temporarily; another localhost origin uses a separate bucket.
-    - repeated `unauthorized` after that retry → shared token/device token drift; refresh token config and re-approve/rotate device token if needed.
-    - `gateway connect failed:` → wrong host/port/url target.
+  <Accordion title="连接 / 认证特征">
+    - `device identity required` → 非安全上下文，或缺少设备认证。
+    - `origin not allowed` → 浏览器的 `Origin` 不在 `gateway.controlUi.allowedOrigins` 中（或者你正从非 loopback 的浏览器来源连接，但没有显式允许列表）。
+    - `device nonce required` / `device nonce mismatch` → 客户端未完成基于挑战的设备认证流程（`connect.challenge` + `device.nonce`）。
+    - `device signature invalid` / `device signature expired` → 客户端为当前握手签署了错误的载荷（或使用了过期时间戳）。
+    - `AUTH_TOKEN_MISMATCH` 且 `canRetryWithDeviceToken=true` → 客户端可以使用缓存的设备 token 进行一次受信任重试。
+    - 该缓存 token 重试会复用与已配对设备 token 一起存储的缓存作用域集合。显式 `deviceToken` / 显式 `scopes` 调用方则保留其请求的作用域集合。
+    - 在该重试路径之外，连接认证优先级依次为：显式共享 token/密码、显式 `deviceToken`、已存储的设备 token、引导 token。
+    - 在异步 Tailscale Serve Control UI 路径上，同一 `{scope, ip}` 的失败尝试会在限流器记录失败之前被串行化。因此，同一客户端并发两次错误重试时，第二次可能返回 `retry later`，而不是两个普通的不匹配错误。
+    - 来自浏览器来源 loopback 客户端的 `too many failed authentication attempts (retry later)` → 来自同一标准化 `Origin` 的重复失败会被临时锁定；另一个 localhost 来源会使用独立的限流桶。
+    - 在该重试之后仍反复出现 `unauthorized` → 共享 token/设备 token 已漂移；如有需要，请刷新 token 配置并重新批准/轮换设备 token。
+    - `gateway connect failed:` → 主机/端口/URL 目标错误。
   </Accordion>
 </AccordionGroup>
 
-### Auth detail codes quick map
+### 认证详情代码速查表
 
-Use `error.details.code` from the failed `connect` response to pick the next action:
+使用失败 `connect` 响应中的 `error.details.code` 来选择下一步操作：
 
-| Detail code                  | Meaning                                                                                                                                                                                      | Recommended action                                                                                                                                                                                                                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AUTH_TOKEN_MISSING`         | Client did not send a required shared token.                                                                                                                                                 | Paste/set token in the client and retry. For dashboard paths: `openclaw config get gateway.auth.token` then paste into Control UI settings.                                                                                                                                              |
-| `AUTH_TOKEN_MISMATCH`        | Shared token did not match gateway auth token.                                                                                                                                               | If `canRetryWithDeviceToken=true`, allow one trusted retry. Cached-token retries reuse stored approved scopes; explicit `deviceToken` / `scopes` callers keep requested scopes. If still failing, run the [token drift recovery checklist](/cli/devices#token-drift-recovery-checklist). |
-| `AUTH_DEVICE_TOKEN_MISMATCH` | Cached per-device token is stale or revoked.                                                                                                                                                 | Rotate/re-approve device token using [devices CLI](/cli/devices), then reconnect.                                                                                                                                                                                                        |
-| `PAIRING_REQUIRED`           | Device identity needs approval. Check `error.details.reason` for `not-paired`, `scope-upgrade`, `role-upgrade`, or `metadata-upgrade`, and use `requestId` / `remediationHint` when present. | Approve pending request: `openclaw devices list` then `openclaw devices approve <requestId>`. Scope/role upgrades use the same flow after you review the requested access.                                                                                                               |
+| 详情代码                     | 含义                                                                                                                                                           | 建议操作                                                                                                                                                                                                                                                                     |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_TOKEN_MISSING`         | 客户端未发送必需的共享 token。                                                                                                                                 | 在客户端中粘贴/设置 token，然后重试。对于 dashboard 路径：`openclaw config get gateway.auth.token`，然后将其粘贴到 Control UI 设置中。                                                                                                                                       |
+| `AUTH_TOKEN_MISMATCH`        | 共享 token 与 Gateway 网关认证 token 不匹配。                                                                                                                  | 如果 `canRetryWithDeviceToken=true`，允许进行一次受信任重试。缓存 token 重试会复用已批准作用域；显式 `deviceToken` / `scopes` 调用方则保留所请求的作用域。如果仍然失败，请运行 [token 漂移恢复清单](/zh-CN/cli/devices#token-drift-recovery-checklist)。                         |
+| `AUTH_DEVICE_TOKEN_MISMATCH` | 按设备缓存的 token 已过期或被撤销。                                                                                                                            | 使用 [devices CLI](/zh-CN/cli/devices) 轮换或重新批准设备 token，然后重新连接。                                                                                                                                                                                                     |
+| `PAIRING_REQUIRED`           | 设备身份需要批准。请检查 `error.details.reason`，其值可能为 `not-paired`、`scope-upgrade`、`role-upgrade` 或 `metadata-upgrade`，并在存在时使用 `requestId` / `remediationHint`。 | 批准待处理请求：`openclaw devices list`，然后执行 `openclaw devices approve <requestId>`。作用域/角色升级在你审查所请求的访问权限后，使用相同流程处理。                                                                                                                       |
 
 <Note>
-Direct loopback backend RPCs authenticated with the shared gateway token/password should not depend on the CLI's paired-device scope baseline. If subagents or other internal calls still fail with `scope-upgrade`, verify the caller is using `client.id: "gateway-client"` and `client.mode: "backend"` and is not forcing an explicit `deviceIdentity` or device token.
+使用共享 Gateway 网关 token/密码进行认证的直接 loopback 后端 RPC，不应依赖 CLI 的已配对设备作用域基线。如果子智能体或其他内部调用仍然因 `scope-upgrade` 失败，请确认调用方使用的是 `client.id: "gateway-client"` 和 `client.mode: "backend"`，并且没有强制指定显式 `deviceIdentity` 或设备 token。
 </Note>
 
-Device auth v2 migration check:
+设备认证 v2 迁移检查：
 
 ```bash
 openclaw --version
@@ -228,71 +235,71 @@ openclaw doctor
 openclaw gateway status
 ```
 
-If logs show nonce/signature errors, update the connecting client and verify it:
+如果日志显示 nonce/签名错误，请更新连接客户端并验证以下内容：
 
 <Steps>
-  <Step title="Wait for connect.challenge">
-    Client waits for the gateway-issued `connect.challenge`.
+  <Step title="等待 connect.challenge">
+    客户端等待 Gateway 网关发出的 `connect.challenge`。
   </Step>
-  <Step title="Sign the payload">
-    Client signs the challenge-bound payload.
+  <Step title="对载荷签名">
+    客户端对绑定 challenge 的载荷进行签名。
   </Step>
-  <Step title="Send the device nonce">
-    Client sends `connect.params.device.nonce` with the same challenge nonce.
+  <Step title="发送设备 nonce">
+    客户端通过 `connect.params.device.nonce` 发送与该 challenge nonce 相同的值。
   </Step>
 </Steps>
 
-If `openclaw devices rotate` / `revoke` / `remove` is denied unexpectedly:
+如果 `openclaw devices rotate` / `revoke` / `remove` 意外被拒绝：
 
-- paired-device token sessions can manage only **their own** device unless the caller also has `operator.admin`
-- `openclaw devices rotate --scope ...` can only request operator scopes that the caller session already holds
+- 已配对设备 token 会话只能管理**它们自己的**设备，除非调用方还具有 `operator.admin`
+- `openclaw devices rotate --scope ...` 只能请求调用方会话已经持有的 operator 作用域
 
-Related:
+相关内容：
 
-- [Configuration](/gateway/configuration) (gateway auth modes)
-- [Control UI](/web/control-ui)
-- [Devices](/cli/devices)
-- [Remote access](/gateway/remote)
-- [Trusted proxy auth](/gateway/trusted-proxy-auth)
+- [配置](/zh-CN/gateway/configuration)（Gateway 网关认证模式）
+- [Control UI](/zh-CN/web/control-ui)
+- [Devices](/zh-CN/cli/devices)
+- [远程访问](/zh-CN/gateway/remote)
+- [受信任代理认证](/zh-CN/gateway/trusted-proxy-auth)
 
-## Gateway service not running
+## Gateway 网关服务未运行
 
-Use this when service is installed but process does not stay up.
+当服务已安装但进程无法保持运行时，请使用本节。
 
 ```bash
 openclaw gateway status
 openclaw status
 openclaw logs --follow
 openclaw doctor
-openclaw gateway status --deep   # also scan system-level services
+openclaw gateway status --deep   # 也扫描系统级服务
 ```
 
-Look for:
+检查以下内容：
 
-- `Runtime: stopped` with exit hints.
-- Service config mismatch (`Config (cli)` vs `Config (service)`).
-- Port/listener conflicts.
-- Extra launchd/systemd/schtasks installs when `--deep` is used.
-- `Other gateway-like services detected (best effort)` cleanup hints.
+- `Runtime: stopped`，并带有退出提示。
+- 服务配置不匹配（`Config (cli)` 与 `Config (service)`）。
+- 端口/监听器冲突。
+- 使用 `--deep` 时发现额外的 launchd/systemd/schtasks 安装。
+- `Other gateway-like services detected (best effort)` 清理提示。
 
 <AccordionGroup>
-  <Accordion title="Common signatures">
-    - `Gateway start blocked: set gateway.mode=local` or `existing config is missing gateway.mode` → local gateway mode is not enabled, or the config file was clobbered and lost `gateway.mode`. Fix: set `gateway.mode="local"` in your config, or re-run `openclaw onboard --mode local` / `openclaw setup` to restamp the expected local-mode config. If you are running OpenClaw via Podman, the default config path is `~/.openclaw/openclaw.json`.
-    - `refusing to bind gateway ... without auth` → non-loopback bind without a valid gateway auth path (token/password, or trusted-proxy where configured).
-    - `another gateway instance is already listening` / `EADDRINUSE` → port conflict.
-    - `Other gateway-like services detected (best effort)` → stale or parallel launchd/systemd/schtasks units exist. Most setups should keep one gateway per machine; if you do need more than one, isolate ports + config/state/workspace. See [/gateway#multiple-gateways-same-host](/gateway#multiple-gateways-same-host).
+  <Accordion title="常见特征">
+    - `Gateway start blocked: set gateway.mode=local` 或 `existing config is missing gateway.mode` → 未启用本地 Gateway 网关模式，或者配置文件被覆盖后丢失了 `gateway.mode`。修复方法：在配置中设置 `gateway.mode="local"`，或重新运行 `openclaw onboard --mode local` / `openclaw setup`，以重新写入预期的本地模式配置。如果你通过 Podman 运行 OpenClaw，默认配置路径是 `~/.openclaw/openclaw.json`。
+    - `refusing to bind gateway ... without auth` → 非 loopback 绑定，但没有有效的 Gateway 网关认证路径（token/密码，或在已配置情况下使用 trusted-proxy）。
+    - `another gateway instance is already listening` / `EADDRINUSE` → 端口冲突。
+    - `Other gateway-like services detected (best effort)` → 存在过时或并行的 launchd/systemd/schtasks 单元。大多数部署应在每台机器上只保留一个 Gateway 网关；如果你确实需要多个，请隔离端口 + 配置/状态/工作区。参见 [/gateway#multiple-gateways-same-host](/zh-CN/gateway#multiple-gateways-same-host)。
   </Accordion>
 </AccordionGroup>
 
-Related:
+相关内容：
 
-- [Background exec and process tool](/gateway/background-process)
-- [Configuration](/gateway/configuration)
-- [Doctor](/gateway/doctor)
+- [后台执行与进程工具](/zh-CN/gateway/background-process)
+- [配置](/zh-CN/gateway/configuration)
+- [Doctor](/zh-CN/gateway/doctor)
 
-## Gateway restored last-known-good config
+## Gateway 网关恢复了最后已知正常配置
 
-Use this when the Gateway starts, but logs say it restored `openclaw.json`.
+当 Gateway 网关能够启动，但日志显示它恢复了 `openclaw.json` 时，请使用本节。
 
 ```bash
 openclaw logs --follow
@@ -301,23 +308,23 @@ openclaw config validate
 openclaw doctor
 ```
 
-Look for:
+检查以下内容：
 
 - `Config auto-restored from last-known-good`
 - `gateway: invalid config was restored from last-known-good backup`
 - `config reload restored last-known-good config after invalid-config`
-- A timestamped `openclaw.json.clobbered.*` file beside the active config
-- A main-agent system event that starts with `Config recovery warning`
+- 活动配置旁边是否存在带时间戳的 `openclaw.json.clobbered.*` 文件
+- 是否存在以 `Config recovery warning` 开头的主智能体系统事件
 
 <AccordionGroup>
-  <Accordion title="What happened">
-    - The rejected config did not validate during startup or hot reload.
-    - OpenClaw preserved the rejected payload as `.clobbered.*`.
-    - The active config was restored from the last validated last-known-good copy.
-    - The next main-agent turn is warned not to blindly rewrite the rejected config.
-    - If all validation issues were under `plugins.entries.<id>...`, OpenClaw would not restore the whole file. Plugin-local failures stay loud while unrelated user settings remain in the active config.
+  <Accordion title="发生了什么">
+    - 被拒绝的配置在启动或热重载期间未通过验证。
+    - OpenClaw 将被拒绝的载荷保留为 `.clobbered.*`。
+    - 活动配置已从最后一次通过验证的最后已知正常副本中恢复。
+    - 下一个主智能体轮次会收到警告，不要盲目重写被拒绝的配置。
+    - 如果所有验证问题都位于 `plugins.entries.<id>...` 之下，OpenClaw 不会恢复整个文件。插件局部失败会保持显式报错，而不相关的用户设置仍保留在活动配置中。
   </Accordion>
-  <Accordion title="Inspect and repair">
+  <Accordion title="检查与修复">
     ```bash
     CONFIG="$(openclaw config file)"
     ls -lt "$CONFIG".clobbered.* "$CONFIG".rejected.* 2>/dev/null | head
@@ -326,31 +333,31 @@ Look for:
     openclaw doctor
     ```
   </Accordion>
-  <Accordion title="Common signatures">
-    - `.clobbered.*` exists → an external direct edit or startup read was restored.
-    - `.rejected.*` exists → an OpenClaw-owned config write failed schema or clobber checks before commit.
-    - `Config write rejected:` → the write tried to drop required shape, shrink the file sharply, or persist invalid config.
-    - `missing-meta-vs-last-good`, `gateway-mode-missing-vs-last-good`, or `size-drop-vs-last-good:*` → startup treated the current file as clobbered because it lost fields or size compared with the last-known-good backup.
-    - `Config last-known-good promotion skipped` → the candidate contained redacted secret placeholders such as `***`.
+  <Accordion title="常见特征">
+    - 存在 `.clobbered.*` → 外部直接编辑或启动读取时的内容已被恢复。
+    - 存在 `.rejected.*` → 一次由 OpenClaw 发起的配置写入在提交前未通过 schema 或 clobber 检查。
+    - `Config write rejected:` → 该写入试图删除必需结构、显著缩小文件，或持久化无效配置。
+    - `missing-meta-vs-last-good`、`gateway-mode-missing-vs-last-good` 或 `size-drop-vs-last-good:*` → 启动时将当前文件视为已被覆盖，因为与最后已知正常备份相比，它丢失了字段或体积异常缩小。
+    - `Config last-known-good promotion skipped` → 候选配置包含被打码的 secret 占位符，例如 `***`。
   </Accordion>
-  <Accordion title="Fix options">
-    1. Keep the restored active config if it is correct.
-    2. Copy only the intended keys from `.clobbered.*` or `.rejected.*`, then apply them with `openclaw config set` or `config.patch`.
-    3. Run `openclaw config validate` before restarting.
-    4. If you edit by hand, keep the full JSON5 config, not just the partial object you wanted to change.
+  <Accordion title="修复选项">
+    1. 如果恢复后的活动配置是正确的，就保留它。
+    2. 只从 `.clobbered.*` 或 `.rejected.*` 中复制你想要的键，然后通过 `openclaw config set` 或 `config.patch` 应用。
+    3. 重启前运行 `openclaw config validate`。
+    4. 如果你手动编辑，请保留完整的 JSON5 配置，而不是只保留你想修改的那部分对象。
   </Accordion>
 </AccordionGroup>
 
-Related:
+相关内容：
 
-- [Config](/cli/config)
-- [Configuration: hot reload](/gateway/configuration#config-hot-reload)
-- [Configuration: strict validation](/gateway/configuration#strict-validation)
-- [Doctor](/gateway/doctor)
+- [配置](/zh-CN/cli/config)
+- [配置：热重载](/zh-CN/gateway/configuration#config-hot-reload)
+- [配置：严格校验](/zh-CN/gateway/configuration#strict-validation)
+- [Doctor](/zh-CN/gateway/doctor)
 
-## Gateway probe warnings
+## Gateway 网关探测警告
 
-Use this when `openclaw gateway probe` reaches something, but still prints a warning block.
+当 `openclaw gateway probe` 能够探测到目标，但仍然打印出警告块时，请使用本节。
 
 ```bash
 openclaw gateway probe
@@ -358,28 +365,28 @@ openclaw gateway probe --json
 openclaw gateway probe --ssh user@gateway-host
 ```
 
-Look for:
+检查以下内容：
 
-- `warnings[].code` and `primaryTargetId` in JSON output.
-- Whether the warning is about SSH fallback, multiple gateways, missing scopes, or unresolved auth refs.
+- JSON 输出中的 `warnings[].code` 和 `primaryTargetId`。
+- 警告是否与 SSH 回退、多个 Gateway 网关、缺少作用域或未解析的认证引用有关。
 
-Common signatures:
+常见特征：
 
-- `SSH tunnel failed to start; falling back to direct probes.` → SSH setup failed, but the command still tried direct configured/loopback targets.
-- `multiple reachable gateways detected` → more than one target answered. Usually this means an intentional multi-gateway setup or stale/duplicate listeners.
-- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → connect worked, but detail RPC is scope-limited; pair device identity or use credentials with `operator.read`.
-- `Capability: pairing-pending` or `gateway closed (1008): pairing required` → the gateway answered, but this client still needs pairing/approval before normal operator access.
-- unresolved `gateway.auth.*` / `gateway.remote.*` SecretRef warning text → auth material was unavailable in this command path for the failed target.
+- `SSH tunnel failed to start; falling back to direct probes.` → SSH 设置失败，但命令仍尝试了直接配置目标/loopback 目标。
+- `multiple reachable gateways detected` → 有多个目标做出了响应。这通常意味着有意的多 Gateway 网关部署，或存在过时/重复监听器。
+- `Read-probe diagnostics are limited by gateway scopes (missing operator.read)` → 连接成功，但详细 RPC 受作用域限制；请配对设备身份，或使用带有 `operator.read` 的凭证。
+- `Capability: pairing-pending` 或 `gateway closed (1008): pairing required` → Gateway 网关已响应，但该客户端在获得正常 operator 访问前仍需要配对/批准。
+- 未解析的 `gateway.auth.*` / `gateway.remote.*` SecretRef 警告文本 → 在本次命令路径中，失败目标所需的认证材料不可用。
 
-Related:
+相关内容：
 
-- [Gateway](/cli/gateway)
-- [Multiple gateways on the same host](/gateway#multiple-gateways-same-host)
-- [Remote access](/gateway/remote)
+- [Gateway 网关](/zh-CN/cli/gateway)
+- [同一主机上的多个 Gateway 网关](/zh-CN/gateway#multiple-gateways-same-host)
+- [远程访问](/zh-CN/gateway/remote)
 
-## Channel connected, messages not flowing
+## 渠道已连接，但消息未流动
 
-If channel state is connected but message flow is dead, focus on policy, permissions, and channel specific delivery rules.
+如果渠道状态为已连接，但消息流完全中断，请重点检查策略、权限和渠道特定的投递规则。
 
 ```bash
 openclaw channels status --probe
@@ -389,28 +396,28 @@ openclaw logs --follow
 openclaw config get channels
 ```
 
-Look for:
+检查以下内容：
 
-- DM policy (`pairing`, `allowlist`, `open`, `disabled`).
-- Group allowlist and mention requirements.
-- Missing channel API permissions/scopes.
+- 私信策略（`pairing`、`allowlist`、`open`、`disabled`）。
+- 群组允许列表和提及要求。
+- 缺失的渠道 API 权限/作用域。
 
-Common signatures:
+常见特征：
 
-- `mention required` → message ignored by group mention policy.
-- `pairing` / pending approval traces → sender is not approved.
-- `missing_scope`, `not_in_channel`, `Forbidden`, `401/403` → channel auth/permissions issue.
+- `mention required` → 消息被群组提及策略忽略。
+- `pairing` / 待批准痕迹 → 发送者尚未获批。
+- `missing_scope`、`not_in_channel`、`Forbidden`、`401/403` → 渠道认证/权限问题。
 
-Related:
+相关内容：
 
-- [Channel troubleshooting](/channels/troubleshooting)
-- [Discord](/channels/discord)
-- [Telegram](/channels/telegram)
-- [WhatsApp](/channels/whatsapp)
+- [渠道故障排除](/zh-CN/channels/troubleshooting)
+- [Discord](/zh-CN/channels/discord)
+- [Telegram](/zh-CN/channels/telegram)
+- [WhatsApp](/zh-CN/channels/whatsapp)
 
-## Cron and heartbeat delivery
+## Cron 与心跳投递
 
-If cron or heartbeat did not run or did not deliver, verify scheduler state first, then delivery target.
+如果 cron 或心跳未运行，或运行了但未投递，请先检查调度器状态，再检查投递目标。
 
 ```bash
 openclaw cron status
@@ -420,33 +427,33 @@ openclaw system heartbeat last
 openclaw logs --follow
 ```
 
-Look for:
+检查以下内容：
 
-- Cron enabled and next wake present.
-- Job run history status (`ok`, `skipped`, `error`).
-- Heartbeat skip reasons (`quiet-hours`, `requests-in-flight`, `alerts-disabled`, `empty-heartbeat-file`, `no-tasks-due`).
+- Cron 已启用，且存在下一次唤醒时间。
+- 任务运行历史状态（`ok`、`skipped`、`error`）。
+- 心跳跳过原因（`quiet-hours`、`requests-in-flight`、`alerts-disabled`、`empty-heartbeat-file`、`no-tasks-due`）。
 
 <AccordionGroup>
-  <Accordion title="Common signatures">
-    - `cron: scheduler disabled; jobs will not run automatically` → cron disabled.
-    - `cron: timer tick failed` → scheduler tick failed; check file/log/runtime errors.
-    - `heartbeat skipped` with `reason=quiet-hours` → outside active hours window.
-    - `heartbeat skipped` with `reason=empty-heartbeat-file` → `HEARTBEAT.md` exists but only contains blank lines / markdown headers, so OpenClaw skips the model call.
-    - `heartbeat skipped` with `reason=no-tasks-due` → `HEARTBEAT.md` contains a `tasks:` block, but none of the tasks are due on this tick.
-    - `heartbeat: unknown accountId` → invalid account id for heartbeat delivery target.
-    - `heartbeat skipped` with `reason=dm-blocked` → heartbeat target resolved to a DM-style destination while `agents.defaults.heartbeat.directPolicy` (or per-agent override) is set to `block`.
+  <Accordion title="常见特征">
+    - `cron: scheduler disabled; jobs will not run automatically` → cron 已禁用。
+    - `cron: timer tick failed` → 调度器 tick 失败；请检查文件/日志/运行时错误。
+    - `heartbeat skipped` 且 `reason=quiet-hours` → 当前不在活跃时间窗口内。
+    - `heartbeat skipped` 且 `reason=empty-heartbeat-file` → `HEARTBEAT.md` 存在，但只包含空行 / markdown 标题，因此 OpenClaw 会跳过模型调用。
+    - `heartbeat skipped` 且 `reason=no-tasks-due` → `HEARTBEAT.md` 包含 `tasks:` 块，但本次 tick 没有任何任务到期。
+    - `heartbeat: unknown accountId` → 心跳投递目标的账号 id 无效。
+    - `heartbeat skipped` 且 `reason=dm-blocked` → 心跳目标解析为私信式目的地，而 `agents.defaults.heartbeat.directPolicy`（或每个智能体的覆盖设置）被设为 `block`。
   </Accordion>
 </AccordionGroup>
 
-Related:
+相关内容：
 
-- [Heartbeat](/gateway/heartbeat)
-- [Scheduled tasks](/automation/cron-jobs)
-- [Scheduled tasks: troubleshooting](/automation/cron-jobs#troubleshooting)
+- [Heartbeat](/zh-CN/gateway/heartbeat)
+- [定时任务](/zh-CN/automation/cron-jobs)
+- [定时任务：故障排除](/zh-CN/automation/cron-jobs#troubleshooting)
 
-## Node paired, tool fails
+## 节点已配对，但工具失败
 
-If a node is paired but tools fail, isolate foreground, permission, and approval state.
+如果节点已配对但工具失败，请隔离前台状态、权限和批准状态。
 
 ```bash
 openclaw nodes status
@@ -456,28 +463,28 @@ openclaw logs --follow
 openclaw status
 ```
 
-Look for:
+检查以下内容：
 
-- Node online with expected capabilities.
-- OS permission grants for camera/mic/location/screen.
-- Exec approvals and allowlist state.
+- 节点在线，并具有预期能力。
+- 相机/麦克风/位置/屏幕的操作系统权限是否已授予。
+- Exec 批准和允许列表状态。
 
-Common signatures:
+常见特征：
 
-- `NODE_BACKGROUND_UNAVAILABLE` → node app must be in foreground.
-- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → missing OS permission.
-- `SYSTEM_RUN_DENIED: approval required` → exec approval pending.
-- `SYSTEM_RUN_DENIED: allowlist miss` → command blocked by allowlist.
+- `NODE_BACKGROUND_UNAVAILABLE` → 节点应用必须位于前台。
+- `*_PERMISSION_REQUIRED` / `LOCATION_PERMISSION_REQUIRED` → 缺少操作系统权限。
+- `SYSTEM_RUN_DENIED: approval required` → Exec 批准待处理。
+- `SYSTEM_RUN_DENIED: allowlist miss` → 命令被允许列表拦截。
 
-Related:
+相关内容：
 
-- [Exec approvals](/tools/exec-approvals)
-- [Node troubleshooting](/nodes/troubleshooting)
-- [Nodes](/nodes/index)
+- [Exec 批准](/zh-CN/tools/exec-approvals)
+- [节点故障排除](/zh-CN/nodes/troubleshooting)
+- [节点](/zh-CN/nodes/index)
 
-## Browser tool fails
+## 浏览器工具失败
 
-Use this when browser tool actions fail even though the gateway itself is healthy.
+当浏览器工具操作失败，但 Gateway 网关本身是健康的，请使用本节。
 
 ```bash
 openclaw browser status
@@ -487,53 +494,53 @@ openclaw logs --follow
 openclaw doctor
 ```
 
-Look for:
+检查以下内容：
 
-- Whether `plugins.allow` is set and includes `browser`.
-- Valid browser executable path.
-- CDP profile reachability.
-- Local Chrome availability for `existing-session` / `user` profiles.
+- 是否设置了 `plugins.allow`，且其中包含 `browser`。
+- 浏览器可执行文件路径是否有效。
+- CDP 配置文件是否可达。
+- `existing-session` / `user` 配置文件所需的本地 Chrome 是否可用。
 
 <AccordionGroup>
-  <Accordion title="Plugin / executable signatures">
-    - `unknown command "browser"` or `unknown command 'browser'` → the bundled browser plugin is excluded by `plugins.allow`.
-    - browser tool missing / unavailable while `browser.enabled=true` → `plugins.allow` excludes `browser`, so the plugin never loaded.
-    - `Failed to start Chrome CDP on port` → browser process failed to launch.
-    - `browser.executablePath not found` → configured path is invalid.
-    - `browser.cdpUrl must be http(s) or ws(s)` → the configured CDP URL uses an unsupported scheme such as `file:` or `ftp:`.
-    - `browser.cdpUrl has invalid port` → the configured CDP URL has a bad or out-of-range port.
-    - `Playwright is not available in this gateway build; '<feature>' is unsupported.` → the current gateway install lacks the bundled browser plugin's `playwright-core` runtime dependency; run `openclaw doctor --fix`, then restart the gateway. ARIA snapshots and basic page screenshots can still work, but navigation, AI snapshots, CSS-selector element screenshots, and PDF export stay unavailable.
+  <Accordion title="插件 / 可执行文件特征">
+    - `unknown command "browser"` 或 `unknown command 'browser'` → 内置的浏览器插件被 `plugins.allow` 排除。
+    - 在 `browser.enabled=true` 时浏览器工具缺失 / 不可用 → `plugins.allow` 排除了 `browser`，因此插件从未加载。
+    - `Failed to start Chrome CDP on port` → 浏览器进程启动失败。
+    - `browser.executablePath not found` → 配置的路径无效。
+    - `browser.cdpUrl must be http(s) or ws(s)` → 配置的 CDP URL 使用了不受支持的协议，例如 `file:` 或 `ftp:`。
+    - `browser.cdpUrl has invalid port` → 配置的 CDP URL 端口无效或超出范围。
+    - `Playwright is not available in this gateway build; '<feature>' is unsupported.` → 当前 Gateway 网关安装缺少内置浏览器插件所需的 `playwright-core` 运行时依赖；请运行 `openclaw doctor --fix`，然后重启 Gateway 网关。ARIA 快照和基础页面截图仍然可用，但导航、AI 快照、基于 CSS 选择器的元素截图以及 PDF 导出仍不可用。
   </Accordion>
-  <Accordion title="Chrome MCP / existing-session signatures">
-    - `Could not find DevToolsActivePort for chrome` → Chrome MCP existing-session could not attach to the selected browser data dir yet. Open the browser inspect page, enable remote debugging, keep the browser open, approve the first attach prompt, then retry. If signed-in state is not required, prefer the managed `openclaw` profile.
-    - `No Chrome tabs found for profile="user"` → the Chrome MCP attach profile has no open local Chrome tabs.
-    - `Remote CDP for profile "<name>" is not reachable` → the configured remote CDP endpoint is not reachable from the gateway host.
-    - `Browser attachOnly is enabled ... not reachable` or `Browser attachOnly is enabled and CDP websocket ... is not reachable` → attach-only profile has no reachable target, or the HTTP endpoint answered but the CDP WebSocket still could not be opened.
+  <Accordion title="Chrome MCP / existing-session 特征">
+    - `Could not find DevToolsActivePort for chrome` → Chrome MCP existing-session 还无法附加到所选浏览器数据目录。请打开浏览器检查页面，启用远程调试，保持浏览器打开，批准首次附加提示，然后重试。如果不需要登录态，优先使用托管的 `openclaw` 配置文件。
+    - `No Chrome tabs found for profile="user"` → Chrome MCP 附加配置文件没有打开的本地 Chrome 标签页。
+    - `Remote CDP for profile "<name>" is not reachable` → 配置的远程 CDP 端点从 Gateway 网关主机无法访问。
+    - `Browser attachOnly is enabled ... not reachable` 或 `Browser attachOnly is enabled and CDP websocket ... is not reachable` → 仅附加配置文件没有可访问目标，或者 HTTP 端点虽然有响应，但 CDP WebSocket 仍然无法打开。
   </Accordion>
-  <Accordion title="Element / screenshot / upload signatures">
-    - `fullPage is not supported for element screenshots` → screenshot request mixed `--full-page` with `--ref` or `--element`.
-    - `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session` screenshot calls must use page capture or a snapshot `--ref`, not CSS `--element`.
-    - `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCP upload hooks need snapshot refs, not CSS selectors.
-    - `existing-session file uploads currently support one file at a time.` → send one upload per call on Chrome MCP profiles.
-    - `existing-session dialog handling does not support timeoutMs.` → dialog hooks on Chrome MCP profiles do not support timeout overrides.
-    - `existing-session type does not support timeoutMs overrides.` → omit `timeoutMs` for `act:type` on `profile="user"` / Chrome MCP existing-session profiles, or use a managed/CDP browser profile when a custom timeout is required.
-    - `existing-session evaluate does not support timeoutMs overrides.` → omit `timeoutMs` for `act:evaluate` on `profile="user"` / Chrome MCP existing-session profiles, or use a managed/CDP browser profile when a custom timeout is required.
-    - `response body is not supported for existing-session profiles yet.` → `responsebody` still requires a managed browser or raw CDP profile.
-    - stale viewport / dark-mode / locale / offline overrides on attach-only or remote CDP profiles → run `openclaw browser stop --browser-profile <name>` to close the active control session and release Playwright/CDP emulation state without restarting the whole gateway.
+  <Accordion title="元素 / 截图 / 上传特征">
+    - `fullPage is not supported for element screenshots` → 截图请求将 `--full-page` 与 `--ref` 或 `--element` 混用。
+    - `element screenshots are not supported for existing-session profiles; use ref from snapshot.` → Chrome MCP / `existing-session` 截图调用必须使用页面捕获或快照 `--ref`，而不是 CSS `--element`。
+    - `existing-session file uploads do not support element selectors; use ref/inputRef.` → Chrome MCP 上传钩子需要使用快照引用，而不是 CSS 选择器。
+    - `existing-session file uploads currently support one file at a time.` → 在 Chrome MCP 配置文件中，每次调用只能上传一个文件。
+    - `existing-session dialog handling does not support timeoutMs.` → Chrome MCP 配置文件上的对话框钩子不支持超时覆盖。
+    - `existing-session type does not support timeoutMs overrides.` → 对 `profile="user"` / Chrome MCP existing-session 配置文件上的 `act:type`，请省略 `timeoutMs`；如果需要自定义超时，请改用托管/CDP 浏览器配置文件。
+    - `existing-session evaluate does not support timeoutMs overrides.` → 对 `profile="user"` / Chrome MCP existing-session 配置文件上的 `act:evaluate`，请省略 `timeoutMs`；如果需要自定义超时，请改用托管/CDP 浏览器配置文件。
+    - `response body is not supported for existing-session profiles yet.` → `responsebody` 仍然需要托管浏览器或原始 CDP 配置文件。
+    - attach-only 或远程 CDP 配置文件上残留的 viewport / dark-mode / locale / offline 覆盖状态 → 运行 `openclaw browser stop --browser-profile <name>`，关闭当前活动控制会话并释放 Playwright/CDP 仿真状态，而无需重启整个 Gateway 网关。
   </Accordion>
 </AccordionGroup>
 
-Related:
+相关内容：
 
-- [Browser (OpenClaw-managed)](/tools/browser)
-- [Browser troubleshooting](/tools/browser-linux-troubleshooting)
+- [浏览器（OpenClaw 托管）](/zh-CN/tools/browser)
+- [浏览器故障排除](/zh-CN/tools/browser-linux-troubleshooting)
 
-## If you upgraded and something suddenly broke
+## 如果你升级后突然出现故障
 
-Most post-upgrade breakage is config drift or stricter defaults now being enforced.
+大多数升级后的故障都与配置漂移或现在开始强制执行的更严格默认值有关。
 
 <AccordionGroup>
-  <Accordion title="1. Auth and URL override behavior changed">
+  <Accordion title="1. 认证和 URL 覆盖行为已更改">
     ```bash
     openclaw gateway status
     openclaw config get gateway.mode
@@ -541,18 +548,18 @@ Most post-upgrade breakage is config drift or stricter defaults now being enforc
     openclaw config get gateway.auth.mode
     ```
 
-    What to check:
+    需要检查：
 
-    - If `gateway.mode=remote`, CLI calls may be targeting remote while your local service is fine.
-    - Explicit `--url` calls do not fall back to stored credentials.
+    - 如果 `gateway.mode=remote`，CLI 调用可能正在指向远程，而你的本地服务其实是正常的。
+    - 显式 `--url` 调用不会回退到已存储凭证。
 
-    Common signatures:
+    常见特征：
 
-    - `gateway connect failed:` → wrong URL target.
-    - `unauthorized` → endpoint reachable but wrong auth.
+    - `gateway connect failed:` → URL 目标错误。
+    - `unauthorized` → 端点可访问，但认证错误。
 
   </Accordion>
-  <Accordion title="2. Bind and auth guardrails are stricter">
+  <Accordion title="2. 绑定和认证护栏更严格了">
     ```bash
     openclaw config get gateway.bind
     openclaw config get gateway.auth.mode
@@ -561,18 +568,18 @@ Most post-upgrade breakage is config drift or stricter defaults now being enforc
     openclaw logs --follow
     ```
 
-    What to check:
+    需要检查：
 
-    - Non-loopback binds (`lan`, `tailnet`, `custom`) need a valid gateway auth path: shared token/password auth, or a correctly configured non-loopback `trusted-proxy` deployment.
-    - Old keys like `gateway.token` do not replace `gateway.auth.token`.
+    - 非 loopback 绑定（`lan`、`tailnet`、`custom`）需要有效的 Gateway 网关认证路径：共享 token/密码认证，或正确配置的非 loopback `trusted-proxy` 部署。
+    - 旧键如 `gateway.token` 不会替代 `gateway.auth.token`。
 
-    Common signatures:
+    常见特征：
 
-    - `refusing to bind gateway ... without auth` → non-loopback bind without a valid gateway auth path.
-    - `Connectivity probe: failed` while runtime is running → gateway alive but inaccessible with current auth/url.
+    - `refusing to bind gateway ... without auth` → 非 loopback 绑定，但没有有效的 Gateway 网关认证路径。
+    - `Connectivity probe: failed`，而运行时仍在运行 → Gateway 网关存活，但以当前认证/URL 无法访问。
 
   </Accordion>
-  <Accordion title="3. Pairing and device identity state changed">
+  <Accordion title="3. 配对和设备身份状态已更改">
     ```bash
     openclaw devices list
     openclaw pairing list --channel <channel> [--account <id>]
@@ -580,34 +587,34 @@ Most post-upgrade breakage is config drift or stricter defaults now being enforc
     openclaw doctor
     ```
 
-    What to check:
+    需要检查：
 
-    - Pending device approvals for dashboard/nodes.
-    - Pending DM pairing approvals after policy or identity changes.
+    - dashboard/节点是否有待处理的设备批准。
+    - 在策略或身份变更后，私信配对批准是否待处理。
 
-    Common signatures:
+    常见特征：
 
-    - `device identity required` → device auth not satisfied.
-    - `pairing required` → sender/device must be approved.
+    - `device identity required` → 设备认证未满足。
+    - `pairing required` → 发送者/设备必须获批。
 
   </Accordion>
 </AccordionGroup>
 
-If the service config and runtime still disagree after checks, reinstall service metadata from the same profile/state directory:
+如果在检查后服务配置与运行时仍不一致，请从同一配置文件/状态目录重新安装服务元数据：
 
 ```bash
 openclaw gateway install --force
 openclaw gateway restart
 ```
 
-Related:
+相关内容：
 
-- [Authentication](/gateway/authentication)
-- [Background exec and process tool](/gateway/background-process)
-- [Gateway-owned pairing](/gateway/pairing)
+- [认证](/zh-CN/gateway/authentication)
+- [后台执行与进程工具](/zh-CN/gateway/background-process)
+- [Gateway 网关配对](/zh-CN/gateway/pairing)
 
-## Related
+## 相关内容
 
-- [Doctor](/gateway/doctor)
-- [FAQ](/help/faq)
-- [Gateway runbook](/gateway)
+- [Doctor](/zh-CN/gateway/doctor)
+- [常见问题](/zh-CN/help/faq)
+- [Gateway 网关操作手册](/zh-CN/gateway)

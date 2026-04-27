@@ -1,17 +1,23 @@
 ---
-summary: "CLI reference for `openclaw tasks` (background task ledger and Task Flow state)"
 read_when:
-  - You want to inspect, audit, or cancel background task records
-  - You are documenting Task Flow commands under `openclaw tasks flow`
-title: "`openclaw tasks`"
+    - 你想要检查、审计或取消后台任务记录
+    - 你正在记录 `openclaw tasks flow` 下的 Task Flow 命令
+summary: '`openclaw tasks` 的 CLI 参考（后台任务账本和 Task Flow 状态）'
+title: '`openclaw tasks`'
+x-i18n:
+    generated_at: "2026-04-26T06:29:03Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 6e61fb0b67a2bdd932b29543199fb219890f256260a66881c8e7ffeb9fadee33
+    source_path: cli/tasks.md
+    workflow: 15
 ---
 
-Inspect durable background tasks and Task Flow state. With no subcommand,
-`openclaw tasks` is equivalent to `openclaw tasks list`.
+检查持久化后台任务和 Task Flow 状态。没有子命令时，`openclaw tasks` 等同于 `openclaw tasks list`。
 
-See [Background Tasks](/automation/tasks) for the lifecycle and delivery model.
+有关生命周期和投递模型，请参阅 [后台任务](/zh-CN/automation/tasks)。
 
-## Usage
+## 用法
 
 ```bash
 openclaw tasks
@@ -29,13 +35,13 @@ openclaw tasks flow show <lookup>
 openclaw tasks flow cancel <lookup>
 ```
 
-## Root Options
+## 根选项
 
-- `--json`: output JSON.
-- `--runtime <name>`: filter by kind: `subagent`, `acp`, `cron`, or `cli`.
-- `--status <name>`: filter by status: `queued`, `running`, `succeeded`, `failed`, `timed_out`, `cancelled`, or `lost`.
+- `--json`：输出 JSON。
+- `--runtime <name>`：按类型筛选：`subagent`、`acp`、`cron` 或 `cli`。
+- `--status <name>`：按状态筛选：`queued`、`running`、`succeeded`、`failed`、`timed_out`、`cancelled` 或 `lost`。
 
-## Subcommands
+## 子命令
 
 ### `list`
 
@@ -43,7 +49,7 @@ openclaw tasks flow cancel <lookup>
 openclaw tasks list [--runtime <name>] [--status <name>] [--json]
 ```
 
-Lists tracked background tasks newest first.
+按从新到旧列出已跟踪的后台任务。
 
 ### `show`
 
@@ -51,7 +57,7 @@ Lists tracked background tasks newest first.
 openclaw tasks show <lookup> [--json]
 ```
 
-Shows one task by task ID, run ID, or session key.
+按任务 ID、运行 ID 或会话键显示单个任务。
 
 ### `notify`
 
@@ -59,7 +65,7 @@ Shows one task by task ID, run ID, or session key.
 openclaw tasks notify <lookup> <done_only|state_changes|silent>
 ```
 
-Changes the notification policy for a running task.
+更改运行中任务的通知策略。
 
 ### `cancel`
 
@@ -67,7 +73,7 @@ Changes the notification policy for a running task.
 openclaw tasks cancel <lookup>
 ```
 
-Cancels a running background task.
+取消正在运行的后台任务。
 
 ### `audit`
 
@@ -75,7 +81,7 @@ Cancels a running background task.
 openclaw tasks audit [--severity <warn|error>] [--code <name>] [--limit <n>] [--json]
 ```
 
-Surfaces stale, lost, delivery-failed, or otherwise inconsistent task and Task Flow records. Lost tasks retained until `cleanupAfter` are warnings; expired or unstamped lost tasks are errors.
+显示陈旧、丢失、投递失败或其他不一致的任务和 Task Flow 记录。保留到 `cleanupAfter` 的丢失任务属于警告；已过期或未打标记的丢失任务属于错误。
 
 ### `maintenance`
 
@@ -83,11 +89,9 @@ Surfaces stale, lost, delivery-failed, or otherwise inconsistent task and Task F
 openclaw tasks maintenance [--apply] [--json]
 ```
 
-Previews or applies task and Task Flow reconciliation, cleanup stamping, and pruning.
-For cron tasks, reconciliation uses persisted run logs/job state before marking an
-old active task `lost`, so completed cron runs do not become false audit errors
-just because the in-memory Gateway runtime state is gone. Offline CLI audit is
-not authoritative for the Gateway's process-local cron active-job set.
+预览或应用任务和 Task Flow 对账、清理标记以及修剪。
+对于 cron 任务，对账会在将旧的活动任务标记为 `lost` 之前，先使用持久化的运行日志/作业状态，因此已完成的 cron 运行不会仅因为内存中的 Gateway 网关运行时状态消失而变成错误的审计错误。
+离线 CLI 审计并不能作为 Gateway 网关进程本地 cron 活动作业集合的权威依据。
 
 ### `flow`
 
@@ -97,9 +101,9 @@ openclaw tasks flow show <lookup> [--json]
 openclaw tasks flow cancel <lookup>
 ```
 
-Inspects or cancels durable Task Flow state under the task ledger.
+检查或取消任务账本下持久化的 Task Flow 状态。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
-- [Background tasks](/automation/tasks)
+- [CLI 参考](/zh-CN/cli)
+- [后台任务](/zh-CN/automation/tasks)

@@ -1,213 +1,220 @@
 ---
-summary: "Browser-based control UI for the Gateway (chat, nodes, config)"
 read_when:
-  - You want to operate the Gateway from a browser
-  - You want Tailnet access without SSH tunnels
-title: "Control UI"
-sidebarTitle: "Control UI"
+    - 你想通过浏览器操作 Gateway 网关
+    - 你希望在不使用 SSH 隧道的情况下获得 Tailnet 访问能力
+sidebarTitle: Control UI
+summary: 用于 Gateway 网关的基于浏览器的控制 UI（聊天、节点、配置）
+title: 控制 UI
+x-i18n:
+    generated_at: "2026-04-26T18:01:45Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: a1021dbac736269d04a08639f484289ccd387676525011de4e54f03ed3a747ad
+    source_path: web/control-ui.md
+    workflow: 15
 ---
 
-The Control UI is a small **Vite + Lit** single-page app served by the Gateway:
+Control UI 是一个由 Gateway 网关提供服务的小型 **Vite + Lit** 单页应用：
 
-- default: `http://<host>:18789/`
-- optional prefix: set `gateway.controlUi.basePath` (e.g. `/openclaw`)
+- 默认：`http://<host>:18789/`
+- 可选前缀：设置 `gateway.controlUi.basePath`（例如 `/openclaw`）
 
-It speaks **directly to the Gateway WebSocket** on the same port.
+它会在同一端口上**直接连接到 Gateway WebSocket**。
 
-## Quick open (local)
+## 快速打开（本地）
 
-If the Gateway is running on the same computer, open:
+如果 Gateway 网关运行在同一台电脑上，请打开：
 
-- [http://127.0.0.1:18789/](http://127.0.0.1:18789/) (or [http://localhost:18789/](http://localhost:18789/))
+- [http://127.0.0.1:18789/](http://127.0.0.1:18789/)（或 [http://localhost:18789/](http://localhost:18789/)）
 
-If the page fails to load, start the Gateway first: `openclaw gateway`.
+如果页面加载失败，请先启动 Gateway 网关：`openclaw gateway`。
 
-Auth is supplied during the WebSocket handshake via:
+认证会在 WebSocket 握手期间通过以下方式提供：
 
 - `connect.params.auth.token`
 - `connect.params.auth.password`
-- Tailscale Serve identity headers when `gateway.auth.allowTailscale: true`
-- trusted-proxy identity headers when `gateway.auth.mode: "trusted-proxy"`
+- 当 `gateway.auth.allowTailscale: true` 时，使用 Tailscale Serve 身份标头
+- 当 `gateway.auth.mode: "trusted-proxy"` 时，使用受信任代理身份标头
 
-The dashboard settings panel keeps a token for the current browser tab session and selected gateway URL; passwords are not persisted. Onboarding usually generates a gateway token for shared-secret auth on first connect, but password auth works too when `gateway.auth.mode` is `"password"`.
+仪表板设置面板会为当前浏览器标签页会话和所选 Gateway 网关 URL 保存一个 token；密码不会被持久化。新手引导通常会在首次连接时为共享密钥认证生成一个 gateway token，但当 `gateway.auth.mode` 为 `"password"` 时，密码认证也可以使用。
 
-## Device pairing (first connection)
+## 设备配对（首次连接）
 
-When you connect to the Control UI from a new browser or device, the Gateway usually requires a **one-time pairing approval**. This is a security measure to prevent unauthorized access.
+当你从新的浏览器或设备连接到 Control UI 时，Gateway 网关通常会要求进行**一次性配对批准**。这是一项安全措施，用于防止未授权访问。
 
-**What you'll see:** "disconnected (1008): pairing required"
+**你会看到：** “已断开连接（1008）：需要配对”
 
 <Steps>
-  <Step title="List pending requests">
+  <Step title="列出待处理请求">
     ```bash
     openclaw devices list
     ```
   </Step>
-  <Step title="Approve by request ID">
+  <Step title="按请求 ID 批准">
     ```bash
     openclaw devices approve <requestId>
     ```
   </Step>
 </Steps>
 
-If the browser retries pairing with changed auth details (role/scopes/public key), the previous pending request is superseded and a new `requestId` is created. Re-run `openclaw devices list` before approval.
+如果浏览器在认证详情发生变化后重试配对（角色 / 作用域 / 公钥），之前待处理的请求会被新请求取代，并创建新的 `requestId`。请在批准前重新运行 `openclaw devices list`。
 
-If the browser is already paired and you change it from read access to write/admin access, this is treated as an approval upgrade, not a silent reconnect. OpenClaw keeps the old approval active, blocks the broader reconnect, and asks you to approve the new scope set explicitly.
+如果浏览器已经完成配对，而你将其权限从只读改为写入 / 管理员权限，这会被视为批准升级，而不是静默重新连接。OpenClaw 会保持旧批准有效，阻止更高权限的重新连接，并要求你显式批准新的作用域集合。
 
-Once approved, the device is remembered and won't require re-approval unless you revoke it with `openclaw devices revoke --device <id> --role <role>`. See [Devices CLI](/cli/devices) for token rotation and revocation.
+一旦获得批准，该设备就会被记住，除非你使用 `openclaw devices revoke --device <id> --role <role>` 撤销它，否则无需再次批准。有关 token 轮换和撤销的信息，请参阅 [Devices CLI](/zh-CN/cli/devices)。
 
 <Note>
-- Direct local loopback browser connections (`127.0.0.1` / `localhost`) are auto-approved.
-- Tailscale Serve can skip the pairing round trip for Control UI operator sessions when `gateway.auth.allowTailscale: true`, Tailscale identity verifies, and the browser presents its device identity.
-- Direct Tailnet binds, LAN browser connects, and browser profiles without device identity still require explicit approval.
-- Each browser profile generates a unique device ID, so switching browsers or clearing browser data will require re-pairing.
+- 直接的本地 local loopback 浏览器连接（`127.0.0.1` / `localhost`）会被自动批准。
+- 当 `gateway.auth.allowTailscale: true`、Tailscale 身份校验通过且浏览器提供其设备身份时，Tailscale Serve 可以跳过 Control UI 操作员会话的配对往返过程。
+- 直接 Tailnet 绑定、LAN 浏览器连接以及不带设备身份的浏览器配置文件仍然需要显式批准。
+- 每个浏览器配置文件都会生成唯一的设备 ID，因此切换浏览器或清除浏览器数据都需要重新配对。
 </Note>
 
-## Personal identity (browser-local)
+## 个人身份（浏览器本地）
 
-The Control UI supports a per-browser personal identity (display name and avatar) attached to outgoing messages for attribution in shared sessions. It lives in browser storage, is scoped to the current browser profile, and is not synced to other devices or persisted server-side beyond the normal transcript authorship metadata on messages you actually send. Clearing site data or switching browsers resets it to empty.
+Control UI 支持按浏览器设置个人身份（显示名称和头像），并将其附加到发出的消息中，以便在共享会话中标注归属。它保存在浏览器存储中，仅限当前浏览器配置文件使用，不会同步到其他设备，也不会在服务端持久化，除了你实际发送消息上的常规消息作者元数据之外。清除站点数据或切换浏览器会将其重置为空。
 
-The same browser-local pattern applies to the assistant avatar override. Uploaded assistant avatars overlay the gateway-resolved identity on the local browser only and never round-trip through `config.patch`. The shared `ui.assistant.avatar` config field is still available for non-UI clients writing the field directly (such as scripted gateways or custom dashboards).
+同样的浏览器本地模式也适用于助手头像覆盖。上传的助手头像只会在本地浏览器中覆盖 gateway 解析出的身份，绝不会通过 `config.patch` 往返。共享的 `ui.assistant.avatar` 配置字段仍然可供直接写入该字段的非 UI 客户端使用（例如脚本化的 gateways 或自定义仪表板）。
 
-## Runtime config endpoint
+## 运行时配置端点
 
-The Control UI fetches its runtime settings from `/__openclaw/control-ui-config.json`. That endpoint is gated by the same gateway auth as the rest of the HTTP surface: unauthenticated browsers cannot fetch it, and a successful fetch requires either an already valid gateway token/password, Tailscale Serve identity, or a trusted-proxy identity.
+Control UI 会从 `/__openclaw/control-ui-config.json` 获取其运行时设置。该端点受与其余 HTTP 表面相同的 gateway 认证保护：未认证的浏览器无法获取它，成功获取要求已具备有效的 gateway token / 密码、Tailscale Serve 身份或受信任代理身份之一。
 
-## Language support
+## 语言支持
 
-The Control UI can localize itself on first load based on your browser locale. To override it later, open **Overview -> Gateway Access -> Language**. The locale picker lives in the Gateway Access card, not under Appearance.
+Control UI 可以在首次加载时根据你的浏览器语言环境进行本地化。若要稍后覆盖它，请打开 **Overview -> Gateway Access -> Language**。语言选择器位于 Gateway Access 卡片中，而不在 Appearance 下。
 
-- Supported locales: `en`, `zh-CN`, `zh-TW`, `pt-BR`, `de`, `es`, `ja-JP`, `ko`, `fr`, `tr`, `uk`, `id`, `pl`, `th`
-- Non-English translations are lazy-loaded in the browser.
-- The selected locale is saved in browser storage and reused on future visits.
-- Missing translation keys fall back to English.
+- 支持的语言环境：`en`、`zh-CN`、`zh-TW`、`pt-BR`、`de`、`es`、`ja-JP`、`ko`、`fr`、`tr`、`uk`、`id`、`pl`、`th`
+- 非英语翻译会在浏览器中按需延迟加载。
+- 所选语言环境会保存在浏览器存储中，并在未来访问时复用。
+- 缺失的翻译键会回退为英语。
 
-## What it can do (today)
+## 它目前能做什么
 
 <AccordionGroup>
-  <Accordion title="Chat and Talk">
-    - Chat with the model via Gateway WS (`chat.history`, `chat.send`, `chat.abort`, `chat.inject`).
-    - Talk to OpenAI Realtime directly from the browser via WebRTC. The Gateway mints a short-lived Realtime client secret with `talk.realtime.session`; the browser sends microphone audio directly to OpenAI and relays `openclaw_agent_consult` tool calls back through `chat.send` for the larger configured OpenClaw model.
-    - Stream tool calls + live tool output cards in Chat (agent events).
+  <Accordion title="聊天与通话">
+    - 通过 Gateway WS 与模型聊天（`chat.history`、`chat.send`、`chat.abort`、`chat.inject`）。
+    - 通过 WebRTC 直接从浏览器与 OpenAI Realtime 通话。Gateway 网关通过 `talk.realtime.session` 铸造一个短期有效的 Realtime 客户端密钥；浏览器将麦克风音频直接发送给 OpenAI，并通过 `chat.send` 将 `openclaw_agent_consult` 工具调用中继回去，以供更大且已配置的 OpenClaw 模型使用。
+    - 在聊天中流式显示工具调用 + 实时工具输出卡片（智能体事件）。
   </Accordion>
-  <Accordion title="Channels, instances, sessions, dreams">
-    - Channels: built-in plus bundled/external plugin channels status, QR login, and per-channel config (`channels.status`, `web.login.*`, `config.patch`).
-    - Instances: presence list + refresh (`system-presence`).
-    - Sessions: list + per-session model/thinking/fast/verbose/trace/reasoning overrides (`sessions.list`, `sessions.patch`).
-    - Dreams: dreaming status, enable/disable toggle, and Dream Diary reader (`doctor.memory.status`, `doctor.memory.dreamDiary`, `config.patch`).
+  <Accordion title="渠道、实例、会话、Dreaming">
+    - 渠道：内置以及内置 / 外部渠道插件的状态、二维码登录和按渠道配置（`channels.status`、`web.login.*`、`config.patch`）。
+    - 实例：在线状态列表 + 刷新（`system-presence`）。
+    - 会话：列表 + 按会话设置模型 / thinking / fast / verbose / trace / reasoning 覆盖（`sessions.list`、`sessions.patch`）。
+    - Dreaming：Dreaming 状态、启用 / 禁用切换和 Dream Diary 读取器（`doctor.memory.status`、`doctor.memory.dreamDiary`、`config.patch`）。
   </Accordion>
-  <Accordion title="Cron, skills, nodes, exec approvals">
-    - Cron jobs: list/add/edit/run/enable/disable + run history (`cron.*`).
-    - Skills: status, enable/disable, install, API key updates (`skills.*`).
-    - Nodes: list + caps (`node.list`).
-    - Exec approvals: edit gateway or node allowlists + ask policy for `exec host=gateway/node` (`exec.approvals.*`).
+  <Accordion title="Cron、Skills、节点、exec 批准">
+    - Cron 作业：列出 / 添加 / 编辑 / 运行 / 启用 / 禁用 + 运行历史（`cron.*`）。
+    - Skills：状态、启用 / 禁用、安装、API 密钥更新（`skills.*`）。
+    - 节点：列表 + 能力上限（`node.list`）。
+    - Exec 批准：编辑 gateway 或节点 allowlist + 为 `exec host=gateway/node` 询问策略（`exec.approvals.*`）。
   </Accordion>
-  <Accordion title="Config">
-    - View/edit `~/.openclaw/openclaw.json` (`config.get`, `config.set`).
-    - Apply + restart with validation (`config.apply`) and wake the last active session.
-    - Writes include a base-hash guard to prevent clobbering concurrent edits.
-    - Writes (`config.set`/`config.apply`/`config.patch`) preflight active SecretRef resolution for refs in the submitted config payload; unresolved active submitted refs are rejected before write.
-    - Schema + form rendering (`config.schema` / `config.schema.lookup`, including field `title` / `description`, matched UI hints, immediate child summaries, docs metadata on nested object/wildcard/array/composition nodes, plus plugin + channel schemas when available); Raw JSON editor is available only when the snapshot has a safe raw round-trip.
-    - If a snapshot cannot safely round-trip raw text, Control UI forces Form mode and disables Raw mode for that snapshot.
-    - Raw JSON editor "Reset to saved" preserves the raw-authored shape (formatting, comments, `$include` layout) instead of re-rendering a flattened snapshot, so external edits survive a reset when the snapshot can safely round-trip.
-    - Structured SecretRef object values are rendered read-only in form text inputs to prevent accidental object-to-string corruption.
+  <Accordion title="配置">
+    - 查看 / 编辑 `~/.openclaw/openclaw.json`（`config.get`、`config.set`）。
+    - 带验证地应用 + 重启（`config.apply`），并唤醒上次活动的会话。
+    - 写入操作包含 base-hash 防护，以防覆盖并发编辑。
+    - 写入（`config.set` / `config.apply` / `config.patch`）会对提交的配置负载中的 SecretRef 引用预先执行活动解析；未解析的活动提交引用会在写入前被拒绝。
+    - Schema + 表单渲染（`config.schema` / `config.schema.lookup`，包括字段 `title` / `description`、匹配的 UI 提示、直接子项摘要、嵌套对象 / 通配符 / 数组 / 组合节点上的文档元数据，以及可用时的插件 + 渠道 schema）；仅当快照可以安全进行原始往返时，才提供原始 JSON 编辑器。
+    - 如果某个快照无法安全进行原始往返，Control UI 会强制使用表单模式，并为该快照禁用原始模式。
+    - 原始 JSON 编辑器中的“重置为已保存”会保留原始编写形态（格式、注释、`$include` 布局），而不是重新渲染扁平化快照，因此在快照可安全往返时，外部编辑在重置后仍会保留。
+    - 结构化 SecretRef 对象值会在表单文本输入中以只读方式呈现，以防止意外将对象破坏为字符串。
   </Accordion>
-  <Accordion title="Debug, logs, update">
-    - Debug: status/health/models snapshots + event log + manual RPC calls (`status`, `health`, `models.list`).
-    - Logs: live tail of gateway file logs with filter/export (`logs.tail`).
-    - Update: run a package/git update + restart (`update.run`) with a restart report.
+  <Accordion title="调试、日志、更新">
+    - 调试：状态 / 健康 / 模型快照 + 事件日志 + 手动 RPC 调用（`status`、`health`、`models.list`）。
+    - 日志：带过滤 / 导出的 gateway 文件日志实时尾部查看（`logs.tail`）。
+    - 更新：运行 package / git 更新 + 重启（`update.run`），并生成重启报告。
   </Accordion>
-  <Accordion title="Cron jobs panel notes">
-    - For isolated jobs, delivery defaults to announce summary. You can switch to none if you want internal-only runs.
-    - Channel/target fields appear when announce is selected.
-    - Webhook mode uses `delivery.mode = "webhook"` with `delivery.to` set to a valid HTTP(S) webhook URL.
-    - For main-session jobs, webhook and none delivery modes are available.
-    - Advanced edit controls include delete-after-run, clear agent override, cron exact/stagger options, agent model/thinking overrides, and best-effort delivery toggles.
-    - Form validation is inline with field-level errors; invalid values disable the save button until fixed.
-    - Set `cron.webhookToken` to send a dedicated bearer token, if omitted the webhook is sent without an auth header.
-    - Deprecated fallback: stored legacy jobs with `notify: true` can still use `cron.webhook` until migrated.
+  <Accordion title="Cron 作业面板说明">
+    - 对于隔离作业，投递默认值为公告摘要。如果你只想进行内部运行，可以切换为 none。
+    - 选择 announce 时会显示渠道 / 目标字段。
+    - Webhook 模式使用 `delivery.mode = "webhook"`，并将 `delivery.to` 设置为有效的 HTTP(S) webhook URL。
+    - 对于主会话作业，支持 webhook 和 none 投递模式。
+    - 高级编辑控件包括：运行后删除、清除智能体覆盖、cron 精确 / 错开选项、智能体模型 / thinking 覆盖，以及尽力投递切换。
+    - 表单验证为内联字段级错误；在修复前，无效值会禁用保存按钮。
+    - 设置 `cron.webhookToken` 以发送专用 bearer token；如果省略，则 webhook 会在不带认证标头的情况下发送。
+    - 已弃用的回退：存储的旧版作业若带有 `notify: true`，在迁移前仍可使用 `cron.webhook`。
   </Accordion>
 </AccordionGroup>
 
-## Chat behavior
+## 聊天行为
 
 <AccordionGroup>
-  <Accordion title="Send and history semantics">
-    - `chat.send` is **non-blocking**: it acks immediately with `{ runId, status: "started" }` and the response streams via `chat` events.
-    - Chat uploads accept images plus non-video files. Images keep the native image path; other files are stored as managed media and shown in history as attachment links.
-    - Re-sending with the same `idempotencyKey` returns `{ status: "in_flight" }` while running, and `{ status: "ok" }` after completion.
-    - `chat.history` responses are size-bounded for UI safety. When transcript entries are too large, Gateway may truncate long text fields, omit heavy metadata blocks, and replace oversized messages with a placeholder (`[chat.history omitted: message too large]`).
-    - Assistant/generated images are persisted as managed media references and served back through authenticated Gateway media URLs, so reloads do not depend on raw base64 image payloads staying in the chat history response.
-    - `chat.history` also strips display-only inline directive tags from visible assistant text (for example `[[reply_to_*]]` and `[[audio_as_voice]]`), plain-text tool-call XML payloads (including `<tool_call>...</tool_call>`, `<function_call>...</function_call>`, `<tool_calls>...</tool_calls>`, `<function_calls>...</function_calls>`, and truncated tool-call blocks), and leaked ASCII/full-width model control tokens, and omits assistant entries whose whole visible text is only the exact silent token `NO_REPLY` / `no_reply`.
-    - During an active send and the final history refresh, the chat view keeps local optimistic user/assistant messages visible if `chat.history` briefly returns an older snapshot; the canonical transcript replaces those local messages once the Gateway history catches up.
-    - `chat.inject` appends an assistant note to the session transcript and broadcasts a `chat` event for UI-only updates (no agent run, no channel delivery).
-    - The chat header model and thinking pickers patch the active session immediately through `sessions.patch`; they are persistent session overrides, not one-turn-only send options.
-    - When fresh Gateway session usage reports show high context pressure, the chat composer area shows a context notice and, at recommended compaction levels, a compact button that runs the normal session compaction path. Stale token snapshots are hidden until the Gateway reports fresh usage again.
+  <Accordion title="发送与历史语义">
+    - `chat.send` 是**非阻塞**的：它会立即以 `{ runId, status: "started" }` 确认，随后响应通过 `chat` 事件流式传输。
+    - 聊天上传支持图片以及非视频文件。图片保留原生图片路径；其他文件会存储为受管媒体，并在历史中显示为附件链接。
+    - 使用相同的 `idempotencyKey` 重新发送时，运行中会返回 `{ status: "in_flight" }`，完成后会返回 `{ status: "ok" }`。
+    - 出于 UI 安全考虑，`chat.history` 响应有大小限制。当转录条目过大时，Gateway 网关可能会截断长文本字段、省略较重的元数据块，并用占位符替换超大消息（`[chat.history omitted: message too large]`）。
+    - 助手 / 生成的图片会作为受管媒体引用持久化，并通过经认证的 Gateway 网关媒体 URL 返回，因此重新加载时不依赖原始 base64 图片负载仍保留在 `chat.history` 响应中。
+    - `chat.history` 还会从可见的助手文本中移除仅用于显示的内联指令标签（例如 `[[reply_to_*]]` 和 `[[audio_as_voice]]`）、纯文本工具调用 XML 负载（包括 `<tool_call>...</tool_call>`、`<function_call>...</function_call>`、`<tool_calls>...</tool_calls>`、`<function_calls>...</function_calls>` 以及被截断的工具调用块）、以及泄漏的 ASCII / 全角模型控制 token，并省略那些整个可见文本仅为精确静默 token `NO_REPLY` / `no_reply` 的助手条目。
+    - 在主动发送期间以及最终历史刷新时，如果 `chat.history` 短暂返回较旧快照，聊天视图会保持本地乐观用户 / 助手消息可见；一旦 Gateway 网关历史追上，规范转录就会替换这些本地消息。
+    - `chat.inject` 会向会话转录追加一条助手备注，并广播一个 `chat` 事件用于仅 UI 更新（不运行智能体，不进行渠道投递）。
+    - 聊天头部中的模型和 thinking 选择器会立即通过 `sessions.patch` 修补当前活动会话；它们是持久的会话覆盖，而不是仅单轮发送选项。
+    - 当新的 Gateway 网关会话用量报告显示上下文压力较高时，聊天输入区域会显示上下文提示，并在建议压缩级别下显示一个压缩按钮，以运行正常的会话压缩路径。在 Gateway 网关再次报告新的用量之前，过期的 token 快照会被隐藏。
   </Accordion>
-  <Accordion title="Talk mode (browser WebRTC)">
-    Talk mode uses a registered realtime voice provider that supports browser WebRTC sessions. Configure OpenAI with `talk.provider: "openai"` plus `talk.providers.openai.apiKey`, or reuse the Voice Call realtime provider config. The browser never receives the standard OpenAI API key; it receives only the ephemeral Realtime client secret. Google Live realtime voice is supported for backend Voice Call and Google Meet bridges, but not this browser WebRTC path yet. The Realtime session prompt is assembled by the Gateway; `talk.realtime.session` does not accept caller-provided instruction overrides.
+  <Accordion title="通话模式（浏览器 WebRTC）">
+    通话模式使用已注册的实时语音提供商，该提供商支持浏览器 WebRTC 会话。请配置 OpenAI，设置 `talk.provider: "openai"` 以及 `talk.providers.openai.apiKey`，或复用 Voice Call 实时提供商配置。浏览器永远不会接收到标准 OpenAI API 密钥；它只会接收临时的 Realtime 客户端密钥。Google Live 实时语音支持后端 Voice Call 和 Google Meet 桥接，但尚不支持此浏览器 WebRTC 路径。Realtime 会话提示词由 Gateway 网关组装；`talk.realtime.session` 不接受调用方提供的指令覆盖。
 
-    In the Chat composer, the Talk control is the waves button next to the microphone dictation button. When Talk starts, the composer status row shows `Connecting Talk...`, then `Talk live` while audio is connected, or `Asking OpenClaw...` while a realtime tool call is consulting the configured larger model through `chat.send`.
+    在聊天输入框中，Talk 控件是麦克风听写按钮旁边的波形按钮。当 Talk 启动时，输入框状态行会显示 `Connecting Talk...`，音频连接后显示 `Talk live`，而当实时工具调用通过 `chat.send` 向已配置的更大 OpenClaw 模型发起咨询时，则显示 `Asking OpenClaw...`。
 
   </Accordion>
-  <Accordion title="Stop and abort">
-    - Click **Stop** (calls `chat.abort`).
-    - While a run is active, normal follow-ups queue. Click **Steer** on a queued message to inject that follow-up into the running turn.
-    - Type `/stop` (or standalone abort phrases like `stop`, `stop action`, `stop run`, `stop openclaw`, `please stop`) to abort out-of-band.
-    - `chat.abort` supports `{ sessionKey }` (no `runId`) to abort all active runs for that session.
+  <Accordion title="停止与中止">
+    - 点击 **Stop**（调用 `chat.abort`）。
+    - 当某次运行处于活动状态时，普通后续消息会排队。点击已排队消息上的 **Steer** 可将该后续内容注入到正在运行的当前轮次中。
+    - 输入 `/stop`（或单独的中止短语，例如 `stop`、`stop action`、`stop run`、`stop openclaw`、`please stop`）即可进行带外中止。
+    - `chat.abort` 支持 `{ sessionKey }`（无需 `runId`）以中止该会话的所有活动运行。
   </Accordion>
-  <Accordion title="Abort partial retention">
-    - When a run is aborted, partial assistant text can still be shown in the UI.
-    - Gateway persists aborted partial assistant text into transcript history when buffered output exists.
-    - Persisted entries include abort metadata so transcript consumers can tell abort partials from normal completion output.
+  <Accordion title="中止后的部分内容保留">
+    - 当某次运行被中止时，UI 中仍可能显示部分助手文本。
+    - 当存在缓冲输出时，Gateway 网关会将中止时的部分助手文本持久化到转录历史中。
+    - 持久化条目会包含中止元数据，以便转录消费者区分“中止的部分内容”和正常完成输出。
   </Accordion>
 </AccordionGroup>
 
-## PWA install and web push
+## PWA 安装与 Web Push
 
-The Control UI ships a `manifest.webmanifest` and a service worker, so modern browsers can install it as a standalone PWA. Web Push lets the Gateway wake the installed PWA with notifications even when the tab or browser window is not open.
+Control UI 提供了 `manifest.webmanifest` 和 service worker，因此现代浏览器可以将其安装为独立的 PWA。Web Push 允许 Gateway 网关通过通知唤醒已安装的 PWA，即使标签页或浏览器窗口未打开也是如此。
 
-| Surface                                               | What it does                                                       |
+| 表面                                                  | 作用                                                               |
 | ----------------------------------------------------- | ------------------------------------------------------------------ |
-| `ui/public/manifest.webmanifest`                      | PWA manifest. Browsers offer "Install app" once it is reachable.   |
-| `ui/public/sw.js`                                     | Service worker that handles `push` events and notification clicks. |
-| `push/vapid-keys.json` (under the OpenClaw state dir) | Auto-generated VAPID keypair used to sign Web Push payloads.       |
-| `push/web-push-subscriptions.json`                    | Persisted browser subscription endpoints.                          |
+| `ui/public/manifest.webmanifest`                      | PWA 清单。一旦可访问，浏览器就会提供“安装应用”选项。               |
+| `ui/public/sw.js`                                     | 处理 `push` 事件和通知点击的 service worker。                      |
+| `push/vapid-keys.json`（位于 OpenClaw 状态目录下）    | 自动生成的 VAPID 密钥对，用于签名 Web Push 负载。                  |
+| `push/web-push-subscriptions.json`                    | 持久化的浏览器订阅端点。                                           |
 
-Override the VAPID keypair through env vars on the Gateway process when you want to pin keys (for multi-host deployments, secrets rotation, or tests):
+如果你希望固定密钥（用于多主机部署、密钥轮换或测试），可以通过 Gateway 网关进程上的环境变量覆盖 VAPID 密钥对：
 
 - `OPENCLAW_VAPID_PUBLIC_KEY`
 - `OPENCLAW_VAPID_PRIVATE_KEY`
-- `OPENCLAW_VAPID_SUBJECT` (defaults to `mailto:openclaw@localhost`)
+- `OPENCLAW_VAPID_SUBJECT`（默认为 `mailto:openclaw@localhost`）
 
-The Control UI uses these scope-gated Gateway methods to register and test browser subscriptions:
+Control UI 使用以下受作用域限制的 Gateway 网关方法来注册和测试浏览器订阅：
 
-- `push.web.vapidPublicKey` — fetches the active VAPID public key.
-- `push.web.subscribe` — registers an `endpoint` plus `keys.p256dh`/`keys.auth`.
-- `push.web.unsubscribe` — removes a registered endpoint.
-- `push.web.test` — sends a test notification to the caller's subscription.
+- `push.web.vapidPublicKey` — 获取当前激活的 VAPID 公钥。
+- `push.web.subscribe` — 注册 `endpoint` 以及 `keys.p256dh` / `keys.auth`。
+- `push.web.unsubscribe` — 移除已注册的端点。
+- `push.web.test` — 向调用者的订阅发送测试通知。
 
 <Note>
-Web Push is independent of the iOS APNS relay path (see [Configuration](/gateway/configuration) for relay-backed push) and the existing `push.test` method, which target native mobile pairing.
+Web Push 独立于 iOS APNS 中继路径（有关基于中继的推送，请参阅 [Configuration](/zh-CN/gateway/configuration)）以及现有的 `push.test` 方法，后两者针对的是原生移动端配对。
 </Note>
 
-## Hosted embeds
+## 托管嵌入
 
-Assistant messages can render hosted web content inline with the `[embed ...]` shortcode. The iframe sandbox policy is controlled by `gateway.controlUi.embedSandbox`:
+助手消息可以使用 `[embed ...]` shortcode 内联渲染托管网页内容。iframe 的 sandbox 策略由 `gateway.controlUi.embedSandbox` 控制：
 
 <Tabs>
   <Tab title="strict">
-    Disables script execution inside hosted embeds.
+    禁止在托管嵌入内容中执行脚本。
   </Tab>
   <Tab title="scripts (default)">
-    Allows interactive embeds while keeping origin isolation; this is the default and is usually enough for self-contained browser games/widgets.
+    允许交互式嵌入，同时保持源隔离；这是默认值，通常足以支持自包含的浏览器游戏 / 小组件。
   </Tab>
   <Tab title="trusted">
-    Adds `allow-same-origin` on top of `allow-scripts` for same-site documents that intentionally need stronger privileges.
+    在 `allow-scripts` 之上额外添加 `allow-same-origin`，用于那些有意需要更高权限的同站点文档。
   </Tab>
 </Tabs>
 
-Example:
+示例：
 
 ```json5
 {
@@ -220,65 +227,65 @@ Example:
 ```
 
 <Warning>
-Use `trusted` only when the embedded document genuinely needs same-origin behavior. For most agent-generated games and interactive canvases, `scripts` is the safer choice.
+只有当被嵌入文档确实需要 same-origin 行为时才使用 `trusted`。对于大多数由智能体生成的游戏和交互式画布，`scripts` 是更安全的选择。
 </Warning>
 
-Absolute external `http(s)` embed URLs stay blocked by default. If you intentionally want `[embed url="https://..."]` to load third-party pages, set `gateway.controlUi.allowExternalEmbedUrls: true`.
+绝对外部 `http(s)` 嵌入 URL 默认仍会被阻止。如果你确实希望 `[embed url="https://..."]` 加载第三方页面，请设置 `gateway.controlUi.allowExternalEmbedUrls: true`。
 
-## Tailnet access (recommended)
+## Tailnet 访问（推荐）
 
 <Tabs>
-  <Tab title="Integrated Tailscale Serve (preferred)">
-    Keep the Gateway on loopback and let Tailscale Serve proxy it with HTTPS:
+  <Tab title="集成式 Tailscale Serve（首选）">
+    将 Gateway 网关保持在 loopback 上，并让 Tailscale Serve 通过 HTTPS 代理它：
 
     ```bash
     openclaw gateway --tailscale serve
     ```
 
-    Open:
+    打开：
 
-    - `https://<magicdns>/` (or your configured `gateway.controlUi.basePath`)
+    - `https://<magicdns>/`（或你配置的 `gateway.controlUi.basePath`）
 
-    By default, Control UI/WebSocket Serve requests can authenticate via Tailscale identity headers (`tailscale-user-login`) when `gateway.auth.allowTailscale` is `true`. OpenClaw verifies the identity by resolving the `x-forwarded-for` address with `tailscale whois` and matching it to the header, and only accepts these when the request hits loopback with Tailscale's `x-forwarded-*` headers. For Control UI operator sessions with browser device identity, this verified Serve path also skips the device-pairing round trip; device-less browsers and node-role connections still follow the normal device checks. Set `gateway.auth.allowTailscale: false` if you want to require explicit shared-secret credentials even for Serve traffic. Then use `gateway.auth.mode: "token"` or `"password"`.
+    默认情况下，当 `gateway.auth.allowTailscale` 为 `true` 时，Control UI / WebSocket Serve 请求可以通过 Tailscale 身份标头（`tailscale-user-login`）进行认证。OpenClaw 会通过 `tailscale whois` 解析 `x-forwarded-for` 地址并与该标头进行匹配来验证身份，而且只有当请求命中 loopback 且带有 Tailscale 的 `x-forwarded-*` 标头时才会接受这些信息。对于带有浏览器设备身份的 Control UI 操作员会话，这条经过验证的 Serve 路径还会跳过设备配对往返过程；不带设备身份的浏览器以及 node 角色连接仍然遵循正常的设备检查。如果你希望即使对 Serve 流量也要求显式共享密钥凭证，请将 `gateway.auth.allowTailscale: false`。然后使用 `gateway.auth.mode: "token"` 或 `"password"`。
 
-    For that async Serve identity path, failed auth attempts for the same client IP and auth scope are serialized before rate-limit writes. Concurrent bad retries from the same browser can therefore show `retry later` on the second request instead of two plain mismatches racing in parallel.
+    对于该异步 Serve 身份路径，来自同一客户端 IP 和认证作用域的失败认证尝试会在写入限速记录前进行串行化。因此，同一浏览器的并发错误重试在第二个请求上可能显示 `retry later`，而不是两个普通不匹配并行竞争。
 
     <Warning>
-    Tokenless Serve auth assumes the gateway host is trusted. If untrusted local code may run on that host, require token/password auth.
+    无 token 的 Serve 认证假定 gateway 主机是可信的。如果该主机上可能运行不受信任的本地代码，请要求使用 token / password 认证。
     </Warning>
 
   </Tab>
-  <Tab title="Bind to tailnet + token">
+  <Tab title="绑定到 tailnet + token">
     ```bash
     openclaw gateway --bind tailnet --token "$(openssl rand -hex 32)"
     ```
 
-    Then open:
+    然后打开：
 
-    - `http://<tailscale-ip>:18789/` (or your configured `gateway.controlUi.basePath`)
+    - `http://<tailscale-ip>:18789/`（或你配置的 `gateway.controlUi.basePath`）
 
-    Paste the matching shared secret into the UI settings (sent as `connect.params.auth.token` or `connect.params.auth.password`).
+    将匹配的共享密钥粘贴到 UI 设置中（作为 `connect.params.auth.token` 或 `connect.params.auth.password` 发送）。
 
   </Tab>
 </Tabs>
 
-## Insecure HTTP
+## 不安全的 HTTP
 
-If you open the dashboard over plain HTTP (`http://<lan-ip>` or `http://<tailscale-ip>`), the browser runs in a **non-secure context** and blocks WebCrypto. By default, OpenClaw **blocks** Control UI connections without device identity.
+如果你通过纯 HTTP 打开仪表板（`http://<lan-ip>` 或 `http://<tailscale-ip>`），浏览器会运行在**非安全上下文**中，并阻止 WebCrypto。默认情况下，OpenClaw 会**阻止**没有设备身份的 Control UI 连接。
 
-Documented exceptions:
+已记录的例外情况：
 
-- localhost-only insecure HTTP compatibility with `gateway.controlUi.allowInsecureAuth=true`
-- successful operator Control UI auth through `gateway.auth.mode: "trusted-proxy"`
-- break-glass `gateway.controlUi.dangerouslyDisableDeviceAuth=true`
+- 使用 `gateway.controlUi.allowInsecureAuth=true` 的仅 localhost 不安全 HTTP 兼容模式
+- 通过 `gateway.auth.mode: "trusted-proxy"` 成功完成的操作员 Control UI 认证
+- 紧急兜底用法 `gateway.controlUi.dangerouslyDisableDeviceAuth=true`
 
-**Recommended fix:** use HTTPS (Tailscale Serve) or open the UI locally:
+**推荐修复方式：** 使用 HTTPS（Tailscale Serve）或在本地打开 UI：
 
-- `https://<magicdns>/` (Serve)
-- `http://127.0.0.1:18789/` (on the gateway host)
+- `https://<magicdns>/`（Serve）
+- `http://127.0.0.1:18789/`（在 gateway 主机上）
 
 <AccordionGroup>
-  <Accordion title="Insecure-auth toggle behavior">
+  <Accordion title="不安全认证开关行为">
     ```json5
     {
       gateway: {
@@ -289,14 +296,14 @@ Documented exceptions:
     }
     ```
 
-    `allowInsecureAuth` is a local compatibility toggle only:
+    `allowInsecureAuth` 仅是本地兼容性开关：
 
-    - It allows localhost Control UI sessions to proceed without device identity in non-secure HTTP contexts.
-    - It does not bypass pairing checks.
-    - It does not relax remote (non-localhost) device identity requirements.
+    - 它允许 localhost 上的 Control UI 会话在非安全 HTTP 上下文中无设备身份继续进行。
+    - 它不会绕过配对检查。
+    - 它不会放宽远程（非 localhost）设备身份要求。
 
   </Accordion>
-  <Accordion title="Break-glass only">
+  <Accordion title="仅限紧急兜底">
     ```json5
     {
       gateway: {
@@ -308,80 +315,80 @@ Documented exceptions:
     ```
 
     <Warning>
-    `dangerouslyDisableDeviceAuth` disables Control UI device identity checks and is a severe security downgrade. Revert quickly after emergency use.
+    `dangerouslyDisableDeviceAuth` 会禁用 Control UI 设备身份检查，是严重的安全降级。紧急使用后请尽快恢复。
     </Warning>
 
   </Accordion>
-  <Accordion title="Trusted-proxy note">
-    - Successful trusted-proxy auth can admit **operator** Control UI sessions without device identity.
-    - This does **not** extend to node-role Control UI sessions.
-    - Same-host loopback reverse proxies still do not satisfy trusted-proxy auth; see [Trusted proxy auth](/gateway/trusted-proxy-auth).
+  <Accordion title="受信任代理说明">
+    - 成功的受信任代理认证可以允许**操作员** Control UI 会话在没有设备身份的情况下接入。
+    - 这**不**适用于 node 角色的 Control UI 会话。
+    - 同主机 loopback 反向代理仍不能满足受信任代理认证；请参阅 [Trusted proxy auth](/zh-CN/gateway/trusted-proxy-auth)。
   </Accordion>
 </AccordionGroup>
 
-See [Tailscale](/gateway/tailscale) for HTTPS setup guidance.
+有关 HTTPS 设置指导，请参阅 [Tailscale](/zh-CN/gateway/tailscale)。
 
-## Content Security Policy
+## 内容安全策略
 
-The Control UI ships with a tight `img-src` policy: only **same-origin** assets, `data:` URLs, and locally generated `blob:` URLs are allowed. Remote `http(s)` and protocol-relative image URLs are rejected by the browser and do not issue network fetches.
+Control UI 采用了严格的 `img-src` 策略：只允许**同源**资源、`data:` URL 和本地生成的 `blob:` URL。远程 `http(s)` 和协议相对图片 URL 会被浏览器拒绝，并且不会发起网络请求。
 
-What this means in practice:
+这在实际中意味着：
 
-- Avatars and images served under relative paths (for example `/avatars/<id>`) still render, including authenticated avatar routes that the UI fetches and converts into local `blob:` URLs.
-- Inline `data:image/...` URLs still render (useful for in-protocol payloads).
-- Local `blob:` URLs created by the Control UI still render.
-- Remote avatar URLs emitted by channel metadata are stripped at the Control UI's avatar helpers and replaced with the built-in logo/badge, so a compromised or malicious channel cannot force arbitrary remote image fetches from an operator browser.
+- 通过相对路径提供的头像和图片（例如 `/avatars/<id>`）仍然会显示，包括那些 UI 获取后转换为本地 `blob:` URL 的、需要认证的头像路由。
+- 内联 `data:image/...` URL 仍然会显示（适用于协议内负载）。
+- 由 Control UI 创建的本地 `blob:` URL 仍然会显示。
+- 由渠道元数据输出的远程头像 URL 会在 Control UI 的头像辅助函数中被剥离，并替换为内置 logo / badge，因此即使渠道被攻陷或是恶意的，也无法强制操作员浏览器任意抓取远程图片。
 
-You do not need to change anything to get this behavior — it is always on and not configurable.
+你无需做任何修改即可获得此行为——它始终启用且不可配置。
 
-## Avatar route auth
+## 头像路由认证
 
-When gateway auth is configured, the Control UI avatar endpoint requires the same gateway token as the rest of the API:
+当配置了 gateway 认证后，Control UI 头像端点要求与其余 API 相同的 gateway token：
 
-- `GET /avatar/<agentId>` returns the avatar image only to authenticated callers. `GET /avatar/<agentId>?meta=1` returns the avatar metadata under the same rule.
-- Unauthenticated requests to either route are rejected (matching the sibling assistant-media route). This prevents the avatar route from leaking agent identity on hosts that are otherwise protected.
-- The Control UI itself forwards the gateway token as a bearer header when fetching avatars, and uses authenticated blob URLs so the image still renders in dashboards.
+- `GET /avatar/<agentId>` 仅向已认证调用者返回头像图片。`GET /avatar/<agentId>?meta=1` 在同样规则下返回头像元数据。
+- 对任一路由的未认证请求都会被拒绝（与相邻的 assistant-media 路由保持一致）。这可防止头像路由在其他部分已受保护的主机上泄露智能体身份。
+- Control UI 自身在获取头像时会以 bearer 标头转发 gateway token，并使用已认证的 blob URL，因此图片仍可在仪表板中显示。
 
-If you disable gateway auth (not recommended on shared hosts), the avatar route also becomes unauthenticated, in line with the rest of the gateway.
+如果你禁用了 gateway 认证（不建议在共享主机上这样做），头像路由也会随之变为未认证状态，与 gateway 的其余部分保持一致。
 
-## Building the UI
+## 构建 UI
 
-The Gateway serves static files from `dist/control-ui`. Build them with:
+Gateway 网关从 `dist/control-ui` 提供静态文件。使用以下命令构建：
 
 ```bash
 pnpm ui:build
 ```
 
-Optional absolute base (when you want fixed asset URLs):
+可选的绝对 base（当你希望使用固定资源 URL 时）：
 
 ```bash
 OPENCLAW_CONTROL_UI_BASE_PATH=/openclaw/ pnpm ui:build
 ```
 
-For local development (separate dev server):
+用于本地开发（单独的开发服务器）：
 
 ```bash
 pnpm ui:dev
 ```
 
-Then point the UI at your Gateway WS URL (e.g. `ws://127.0.0.1:18789`).
+然后将 UI 指向你的 Gateway WS URL（例如 `ws://127.0.0.1:18789`）。
 
-## Debugging/testing: dev server + remote Gateway
+## 调试 / 测试：开发服务器 + 远程 Gateway
 
-The Control UI is static files; the WebSocket target is configurable and can be different from the HTTP origin. This is handy when you want the Vite dev server locally but the Gateway runs elsewhere.
+Control UI 是静态文件；WebSocket 目标是可配置的，并且可以与 HTTP 源不同。当你希望在本地运行 Vite 开发服务器，而 Gateway 网关运行在其他地方时，这非常方便。
 
 <Steps>
-  <Step title="Start the UI dev server">
+  <Step title="启动 UI 开发服务器">
     ```bash
     pnpm ui:dev
     ```
   </Step>
-  <Step title="Open with gatewayUrl">
+  <Step title="使用 gatewayUrl 打开">
     ```text
     http://localhost:5173/?gatewayUrl=ws://<gateway-host>:18789
     ```
 
-    Optional one-time auth (if needed):
+    可选的一次性认证（如需要）：
 
     ```text
     http://localhost:5173/?gatewayUrl=wss://<gateway-host>:18789#token=<gateway-token>
@@ -391,21 +398,21 @@ The Control UI is static files; the WebSocket target is configurable and can be 
 </Steps>
 
 <AccordionGroup>
-  <Accordion title="Notes">
-    - `gatewayUrl` is stored in localStorage after load and removed from the URL.
-    - `token` should be passed via the URL fragment (`#token=...`) whenever possible. Fragments are not sent to the server, which avoids request-log and Referer leakage. Legacy `?token=` query params are still imported once for compatibility, but only as a fallback, and are stripped immediately after bootstrap.
-    - `password` is kept in memory only.
-    - When `gatewayUrl` is set, the UI does not fall back to config or environment credentials. Provide `token` (or `password`) explicitly. Missing explicit credentials is an error.
-    - Use `wss://` when the Gateway is behind TLS (Tailscale Serve, HTTPS proxy, etc.).
-    - `gatewayUrl` is only accepted in a top-level window (not embedded) to prevent clickjacking.
-    - Non-loopback Control UI deployments must set `gateway.controlUi.allowedOrigins` explicitly (full origins). This includes remote dev setups.
-    - Gateway startup may seed local origins such as `http://localhost:<port>` and `http://127.0.0.1:<port>` from the effective runtime bind and port, but remote browser origins still need explicit entries.
-    - Do not use `gateway.controlUi.allowedOrigins: ["*"]` except for tightly controlled local testing. It means allow any browser origin, not "match whatever host I am using."
-    - `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` enables Host-header origin fallback mode, but it is a dangerous security mode.
+  <Accordion title="说明">
+    - `gatewayUrl` 会在加载后存储到 `localStorage` 中，并从 URL 里移除。
+    - `token` 应尽可能通过 URL 片段传递（`#token=...`）。片段不会发送到服务器，这样可以避免请求日志和 Referer 泄露。为了兼容性，旧版 `?token=` 查询参数仍会被一次性导入，但仅作为后备方式，并会在引导完成后立即移除。
+    - `password` 仅保存在内存中。
+    - 当设置了 `gatewayUrl` 时，UI 不会回退到配置或环境变量凭证。请显式提供 `token`（或 `password`）。缺少显式凭证会报错。
+    - 当 Gateway 网关位于 TLS 后面时（Tailscale Serve、HTTPS 代理等），请使用 `wss://`。
+    - `gatewayUrl` 仅在顶层窗口中接受（非嵌入式），以防止点击劫持。
+    - 非 loopback 的 Control UI 部署必须显式设置 `gateway.controlUi.allowedOrigins`（完整 origin）。这也包括远程开发设置。
+    - Gateway 网关启动时可能会根据实际运行时绑定和端口，预填充本地 origins，例如 `http://localhost:<port>` 和 `http://127.0.0.1:<port>`，但远程浏览器 origin 仍然需要显式条目。
+    - 除非是严格受控的本地测试，否则不要使用 `gateway.controlUi.allowedOrigins: ["*"]`。它的含义是允许任意浏览器 origin，而不是“匹配我正在使用的任意主机”。
+    - `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback=true` 会启用 Host 标头 origin 回退模式，但这是一种危险的安全模式。
   </Accordion>
 </AccordionGroup>
 
-Example:
+示例：
 
 ```json5
 {
@@ -417,11 +424,11 @@ Example:
 }
 ```
 
-Remote access setup details: [Remote access](/gateway/remote).
+远程访问设置详情： [Remote access](/zh-CN/gateway/remote)。
 
-## Related
+## 相关内容
 
-- [Dashboard](/web/dashboard) — gateway dashboard
-- [Health Checks](/gateway/health) — gateway health monitoring
-- [TUI](/web/tui) — terminal user interface
-- [WebChat](/web/webchat) — browser-based chat interface
+- [Dashboard](/zh-CN/web/dashboard) — gateway 仪表板
+- [Health Checks](/zh-CN/gateway/health) — gateway 健康监控
+- [TUI](/zh-CN/web/tui) — 终端用户界面
+- [WebChat](/zh-CN/web/webchat) — 基于浏览器的聊天界面

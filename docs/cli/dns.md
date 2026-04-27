@@ -1,21 +1,28 @@
 ---
-summary: "CLI reference for `openclaw dns` (wide-area discovery helpers)"
 read_when:
-  - You want wide-area discovery (DNS-SD) via Tailscale + CoreDNS
-  - You’re setting up split DNS for a custom discovery domain (example: openclaw.internal)
-title: "DNS"
+    - 你想通过 Tailscale + CoreDNS 实现广域发现（DNS-SD）
+    - You’re setting up split DNS for a custom discovery domain (example: openclaw.internal)
+summary: '`openclaw dns` 的 CLI 参考（广域发现辅助工具）'
+title: DNS
+x-i18n:
+    generated_at: "2026-04-24T04:00:51Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 99dcf7c8c76833784a2b712b02f9e40c6c0548c37c9743a89b9d650fe503d385
+    source_path: cli/dns.md
+    workflow: 15
 ---
 
 # `openclaw dns`
 
-DNS helpers for wide-area discovery (Tailscale + CoreDNS). Currently focused on macOS + Homebrew CoreDNS.
+用于广域发现的 DNS 辅助工具（Tailscale + CoreDNS）。目前主要面向 macOS + Homebrew CoreDNS。
 
-Related:
+相关内容：
 
-- Gateway discovery: [Discovery](/gateway/discovery)
-- Wide-area discovery config: [Configuration](/gateway/configuration)
+- Gateway 网关发现：[设备发现](/zh-CN/gateway/discovery)
+- 广域发现配置：[配置](/zh-CN/gateway/configuration)
 
-## Setup
+## 设置
 
 ```bash
 openclaw dns setup
@@ -25,29 +32,29 @@ openclaw dns setup --apply
 
 ## `dns setup`
 
-Plan or apply CoreDNS setup for unicast DNS-SD discovery.
+为单播 DNS-SD 发现规划或应用 CoreDNS 设置。
 
-Options:
+选项：
 
-- `--domain <domain>`: wide-area discovery domain (for example `openclaw.internal`)
-- `--apply`: install or update CoreDNS config and restart the service (requires sudo; macOS only)
+- `--domain <domain>`：广域发现域名（例如 `openclaw.internal`）
+- `--apply`：安装或更新 CoreDNS 配置并重启服务（需要 sudo；仅支持 macOS）
 
-What it shows:
+显示内容：
 
-- resolved discovery domain
-- zone file path
-- current tailnet IPs
-- recommended `openclaw.json` discovery config
-- the Tailscale Split DNS nameserver/domain values to set
+- 已解析的发现域名
+- 区域文件路径
+- 当前 tailnet IP
+- 推荐的 `openclaw.json` 发现配置
+- 需要设置的 Tailscale Split DNS nameserver/domain 值
 
-Notes:
+说明：
 
-- Without `--apply`, the command is a planning helper only and prints the recommended setup.
-- If `--domain` is omitted, OpenClaw uses `discovery.wideArea.domain` from config.
-- `--apply` currently supports macOS only and expects Homebrew CoreDNS.
-- `--apply` bootstraps the zone file if needed, ensures the CoreDNS import stanza exists, and restarts the `coredns` brew service.
+- 不使用 `--apply` 时，该命令仅作为规划辅助工具，并打印推荐的设置。
+- 如果省略 `--domain`，OpenClaw 会使用配置中的 `discovery.wideArea.domain`。
+- `--apply` 目前仅支持 macOS，并要求使用 Homebrew CoreDNS。
+- `--apply` 会在需要时引导创建区域文件，确保存在 CoreDNS import 配置段，并重启 `coredns` brew 服务。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
-- [Discovery](/gateway/discovery)
+- [CLI 参考](/zh-CN/cli)
+- [设备发现](/zh-CN/gateway/discovery)

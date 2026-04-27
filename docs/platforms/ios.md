@@ -1,51 +1,58 @@
 ---
-summary: "iOS node app: connect to the Gateway, pairing, canvas, and troubleshooting"
 read_when:
-  - Pairing or reconnecting the iOS node
-  - Running the iOS app from source
-  - Debugging gateway discovery or canvas commands
-title: "iOS app"
+    - 配对或重新连接 iOS 节点
+    - 从源码运行 iOS 应用
+    - 调试 Gateway 网关发现或 canvas 命令
+summary: iOS 节点应用：连接到 Gateway 网关、配对、canvas 和故障排除
+title: iOS 应用
+x-i18n:
+    generated_at: "2026-04-25T05:54:50Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: ad0088cd135168248cfad10c24715f74117a66efaa52a572579c04f96a806538
+    source_path: platforms/ios.md
+    workflow: 15
 ---
 
-Availability: internal preview. The iOS app is not publicly distributed yet.
+可用性：内部预览。iOS 应用尚未公开分发。
 
-## What it does
+## 功能说明
 
-- Connects to a Gateway over WebSocket (LAN or tailnet).
-- Exposes node capabilities: Canvas, Screen snapshot, Camera capture, Location, Talk mode, Voice wake.
-- Receives `node.invoke` commands and reports node status events.
+- 通过 WebSocket 连接到 Gateway 网关（LAN 或 tailnet）。
+- 暴露节点能力：Canvas、屏幕快照、相机捕获、位置、Talk 模式、语音唤醒。
+- 接收 `node.invoke` 命令并上报节点 Status 事件。
 
-## Requirements
+## 要求
 
-- Gateway running on another device (macOS, Linux, or Windows via WSL2).
-- Network path:
-  - Same LAN via Bonjour, **or**
-  - Tailnet via unicast DNS-SD (example domain: `openclaw.internal.`), **or**
-  - Manual host/port (fallback).
+- Gateway 网关运行在另一台设备上（macOS、Linux，或通过 WSL2 运行的 Windows）。
+- 网络路径：
+  - 通过 Bonjour 处于同一 LAN，**或**
+  - 通过单播 DNS-SD 处于 tailnet（示例域名：`openclaw.internal.`），**或**
+  - 手动输入主机/端口（回退方案）。
 
-## Quick start (pair + connect)
+## 快速开始（配对 + 连接）
 
-1. Start the Gateway:
+1. 启动 Gateway 网关：
 
 ```bash
 openclaw gateway --port 18789
 ```
 
-2. In the iOS app, open Settings and pick a discovered gateway (or enable Manual Host and enter host/port).
+2. 在 iOS 应用中，打开“设置”并选择一个已发现的网关（或启用“手动主机”并输入主机/端口）。
 
-3. Approve the pairing request on the gateway host:
+3. 在网关主机上批准配对请求：
 
 ```bash
 openclaw devices list
 openclaw devices approve <requestId>
 ```
 
-If the app retries pairing with changed auth details (role/scopes/public key),
-the previous pending request is superseded and a new `requestId` is created.
-Run `openclaw devices list` again before approval.
+如果应用使用变更后的认证详情（角色/作用域/公钥）重试配对，
+之前的待处理请求会被替换，并创建新的 `requestId`。
+请在批准前再次运行 `openclaw devices list`。
 
-Optional: if the iOS node always connects from a tightly controlled subnet, you
-can opt in to first-time node auto-approval with explicit CIDRs or exact IPs:
+可选：如果 iOS 节点始终从严格受控的子网连接，
+你可以通过显式 CIDR 或精确 IP 选择启用首次节点自动批准：
 
 ```json5
 {
@@ -59,23 +66,23 @@ can opt in to first-time node auto-approval with explicit CIDRs or exact IPs:
 }
 ```
 
-This is disabled by default. It applies only to fresh `role: node` pairing with
-no requested scopes. Operator/browser pairing and any role, scope, metadata, or
-public-key change still require manual approval.
+此功能默认禁用。它仅适用于没有请求作用域的全新 `role: node` 配对。
+运维人员/浏览器配对，以及任何角色、作用域、元数据或
+公钥变更，仍然需要手动批准。
 
-4. Verify connection:
+4. 验证连接：
 
 ```bash
 openclaw nodes status
 openclaw gateway call node.list --params "{}"
 ```
 
-## Relay-backed push for official builds
+## 官方构建的中继支持推送
 
-Official distributed iOS builds use the external push relay instead of publishing the raw APNs
-token to the gateway.
+官方分发的 iOS 构建会使用外部推送中继，而不是将原始 APNs
+令牌发布到网关。
 
-Gateway-side requirement:
+Gateway 网关侧要求：
 
 ```json5
 {
@@ -91,86 +98,84 @@ Gateway-side requirement:
 }
 ```
 
-How the flow works:
+流程工作方式：
 
-- The iOS app registers with the relay using App Attest and the app receipt.
-- The relay returns an opaque relay handle plus a registration-scoped send grant.
-- The iOS app fetches the paired gateway identity and includes it in relay registration, so the relay-backed registration is delegated to that specific gateway.
-- The app forwards that relay-backed registration to the paired gateway with `push.apns.register`.
-- The gateway uses that stored relay handle for `push.test`, background wakes, and wake nudges.
-- The gateway relay base URL must match the relay URL baked into the official/TestFlight iOS build.
-- If the app later connects to a different gateway or a build with a different relay base URL, it refreshes the relay registration instead of reusing the old binding.
+- iOS 应用使用 App Attest 和应用回执向中继注册。
+- 中继返回一个不透明的中继句柄以及一个注册作用域的发送授权。
+- iOS 应用会获取已配对 Gateway 网关的身份，并将其包含在中继注册中，因此该中继支持的注册会委派给这个特定的 Gateway 网关。
+- 应用通过 `push.apns.register` 将该中继支持的注册转发给已配对的 Gateway 网关。
+- Gateway 网关会将这个已存储的中继句柄用于 `push.test`、后台唤醒和唤醒提示。
+- Gateway 网关中继基础 URL 必须与官方/TestFlight iOS 构建中内置的中继 URL 匹配。
+- 如果应用之后连接到不同的 Gateway 网关，或连接到使用不同中继基础 URL 的构建，它会刷新中继注册，而不是复用旧绑定。
 
-What the gateway does **not** need for this path:
+对于此路径，Gateway 网关**不**需要：
 
-- No deployment-wide relay token.
-- No direct APNs key for official/TestFlight relay-backed sends.
+- 不需要部署范围的中继令牌。
+- 官方/TestFlight 中继支持发送不需要直接 APNs 密钥。
 
-Expected operator flow:
+预期的运维流程：
 
-1. Install the official/TestFlight iOS build.
-2. Set `gateway.push.apns.relay.baseUrl` on the gateway.
-3. Pair the app to the gateway and let it finish connecting.
-4. The app publishes `push.apns.register` automatically after it has an APNs token, the operator session is connected, and relay registration succeeds.
-5. After that, `push.test`, reconnect wakes, and wake nudges can use the stored relay-backed registration.
+1. 安装官方/TestFlight iOS 构建。
+2. 在网关上设置 `gateway.push.apns.relay.baseUrl`。
+3. 将应用与网关配对，并等待它完成连接。
+4. 在应用获得 APNs 令牌、运维会话已连接且中继注册成功后，应用会自动发布 `push.apns.register`。
+5. 之后，`push.test`、重连唤醒和唤醒提示都可以使用已存储的中继支持注册。
 
-Compatibility note:
+兼容性说明：
 
-- `OPENCLAW_APNS_RELAY_BASE_URL` still works as a temporary env override for the gateway.
+- `OPENCLAW_APNS_RELAY_BASE_URL` 仍可作为网关的临时环境变量覆盖。
 
-## Authentication and trust flow
+## 认证和信任流
 
-The relay exists to enforce two constraints that direct APNs-on-gateway cannot provide for
-official iOS builds:
+设置中继是为了强制执行两个约束，而网关直连 APNs 无法为
+官方 iOS 构建提供这些约束：
 
-- Only genuine OpenClaw iOS builds distributed through Apple can use the hosted relay.
-- A gateway can send relay-backed pushes only for iOS devices that paired with that specific
-  gateway.
+- 只有通过 Apple 分发的真实 OpenClaw iOS 构建才能使用托管中继。
+- Gateway 网关只能为与该特定 Gateway 网关配对的 iOS 设备发送中继支持的推送。
 
-Hop by hop:
+逐跳说明：
 
 1. `iOS app -> gateway`
-   - The app first pairs with the gateway through the normal Gateway auth flow.
-   - That gives the app an authenticated node session plus an authenticated operator session.
-   - The operator session is used to call `gateway.identity.get`.
+   - 应用首先通过常规 Gateway 网关认证流与网关配对。
+   - 这会给应用一个已认证的节点会话和一个已认证的运维会话。
+   - 运维会话用于调用 `gateway.identity.get`。
 
 2. `iOS app -> relay`
-   - The app calls the relay registration endpoints over HTTPS.
-   - Registration includes App Attest proof plus the app receipt.
-   - The relay validates the bundle ID, App Attest proof, and Apple receipt, and requires the
-     official/production distribution path.
-   - This is what blocks local Xcode/dev builds from using the hosted relay. A local build may be
-     signed, but it does not satisfy the official Apple distribution proof the relay expects.
+   - 应用通过 HTTPS 调用中继注册端点。
+   - 注册包含 App Attest 证明和应用回执。
+   - 中继会验证 bundle ID、App Attest 证明和 Apple 回执，并要求使用
+     官方/生产分发路径。
+   - 这就是为什么本地 Xcode/开发构建无法使用托管中继。本地构建也许已签名，
+     但它不满足中继所要求的官方 Apple 分发证明。
 
 3. `gateway identity delegation`
-   - Before relay registration, the app fetches the paired gateway identity from
-     `gateway.identity.get`.
-   - The app includes that gateway identity in the relay registration payload.
-   - The relay returns a relay handle and a registration-scoped send grant that are delegated to
-     that gateway identity.
+   - 在中继注册之前，应用会从
+     `gateway.identity.get` 获取已配对 Gateway 网关的身份。
+   - 应用会在中继注册负载中包含该 Gateway 网关身份。
+   - 中继会返回一个中继句柄和一个注册作用域的发送授权，并将其委派给
+     该 Gateway 网关身份。
 
 4. `gateway -> relay`
-   - The gateway stores the relay handle and send grant from `push.apns.register`.
-   - On `push.test`, reconnect wakes, and wake nudges, the gateway signs the send request with its
-     own device identity.
-   - The relay verifies both the stored send grant and the gateway signature against the delegated
-     gateway identity from registration.
-   - Another gateway cannot reuse that stored registration, even if it somehow obtains the handle.
+   - Gateway 网关会存储来自 `push.apns.register` 的中继句柄和发送授权。
+   - 在 `push.test`、重连唤醒和唤醒提示时，Gateway 网关会使用其
+     自身设备身份对发送请求进行签名。
+   - 中继会根据注册时委派的 Gateway 网关身份，验证已存储的发送授权和 Gateway 网关签名。
+   - 其他 Gateway 网关即使设法获取了该句柄，也无法复用该已存储注册。
 
 5. `relay -> APNs`
-   - The relay owns the production APNs credentials and the raw APNs token for the official build.
-   - The gateway never stores the raw APNs token for relay-backed official builds.
-   - The relay sends the final push to APNs on behalf of the paired gateway.
+   - 中继持有官方构建的生产 APNs 凭证和原始 APNs 令牌。
+   - 对于中继支持的官方构建，Gateway 网关永远不会存储原始 APNs 令牌。
+   - 中继代表已配对的 Gateway 网关向 APNs 发送最终推送。
 
-Why this design was created:
+创建此设计的原因：
 
-- To keep production APNs credentials out of user gateways.
-- To avoid storing raw official-build APNs tokens on the gateway.
-- To allow hosted relay usage only for official/TestFlight OpenClaw builds.
-- To prevent one gateway from sending wake pushes to iOS devices owned by a different gateway.
+- 让生产 APNs 凭证不出现在用户 Gateway 网关中。
+- 避免在 Gateway 网关上存储官方构建的原始 APNs 令牌。
+- 仅允许官方/TestFlight OpenClaw 构建使用托管中继。
+- 防止某个 Gateway 网关向属于其他 Gateway 网关的 iOS 设备发送唤醒推送。
 
-Local/manual builds remain on direct APNs. If you are testing those builds without the relay, the
-gateway still needs direct APNs credentials:
+本地/手动构建仍然使用直连 APNs。如果你在没有中继的情况下测试这些构建，
+Gateway 网关仍然需要直接 APNs 凭证：
 
 ```bash
 export OPENCLAW_APNS_TEAM_ID="TEAMID"
@@ -178,11 +183,11 @@ export OPENCLAW_APNS_KEY_ID="KEYID"
 export OPENCLAW_APNS_PRIVATE_KEY_P8="$(cat /path/to/AuthKey_KEYID.p8)"
 ```
 
-These are gateway-host runtime env vars, not Fastlane settings. `apps/ios/fastlane/.env` only stores
-App Store Connect / TestFlight auth such as `ASC_KEY_ID` and `ASC_ISSUER_ID`; it does not configure
-direct APNs delivery for local iOS builds.
+这些是 Gateway 网关主机运行时环境变量，而不是 Fastlane 设置。`apps/ios/fastlane/.env` 只存储
+App Store Connect / TestFlight 认证信息，例如 `ASC_KEY_ID` 和 `ASC_ISSUER_ID`；它不会为本地 iOS 构建配置
+直连 APNs 投递。
 
-Recommended gateway-host storage:
+推荐的 Gateway 网关主机存储方式：
 
 ```bash
 mkdir -p ~/.openclaw/credentials/apns
@@ -192,40 +197,40 @@ chmod 600 ~/.openclaw/credentials/apns/AuthKey_KEYID.p8
 export OPENCLAW_APNS_PRIVATE_KEY_PATH="$HOME/.openclaw/credentials/apns/AuthKey_KEYID.p8"
 ```
 
-Do not commit the `.p8` file or place it under the repo checkout.
+不要提交 `.p8` 文件，也不要将其放在仓库检出目录下。
 
-## Discovery paths
+## 设备发现路径
 
-### Bonjour (LAN)
+### Bonjour（LAN）
 
-The iOS app browses `_openclaw-gw._tcp` on `local.` and, when configured, the same
-wide-area DNS-SD discovery domain. Same-LAN gateways appear automatically from `local.`;
-cross-network discovery can use the configured wide-area domain without changing the beacon type.
+iOS 应用会在 `local.` 上浏览 `_openclaw-gw._tcp`，并且在已配置时，也会浏览相同的
+广域 DNS-SD 设备发现域。同一 LAN 上的 Gateway 网关会通过 `local.` 自动出现；
+跨网络设备发现可以使用已配置的广域域名，而无需更改 beacon 类型。
 
-### Tailnet (cross-network)
+### Tailnet（跨网络）
 
-If mDNS is blocked, use a unicast DNS-SD zone (choose a domain; example:
-`openclaw.internal.`) and Tailscale split DNS.
-See [Bonjour](/gateway/bonjour) for the CoreDNS example.
+如果 mDNS 被阻止，请使用单播 DNS-SD 区域（选择一个域名；示例：
+`openclaw.internal.`）以及 Tailscale split DNS。
+CoreDNS 示例请参见 [Bonjour](/zh-CN/gateway/bonjour)。
 
-### Manual host/port
+### 手动主机/端口
 
-In Settings, enable **Manual Host** and enter the gateway host + port (default `18789`).
+在“设置”中，启用**手动主机**并输入 Gateway 网关主机 + 端口（默认 `18789`）。
 
 ## Canvas + A2UI
 
-The iOS node renders a WKWebView canvas. Use `node.invoke` to drive it:
+iOS 节点会渲染一个 WKWebView canvas。使用 `node.invoke` 驱动它：
 
 ```bash
 openclaw nodes invoke --node "iOS Node" --command canvas.navigate --params '{"url":"http://<gateway-host>:18789/__openclaw__/canvas/"}'
 ```
 
-Notes:
+说明：
 
-- The Gateway canvas host serves `/__openclaw__/canvas/` and `/__openclaw__/a2ui/`.
-- It is served from the Gateway HTTP server (same port as `gateway.port`, default `18789`).
-- The iOS node auto-navigates to A2UI on connect when a canvas host URL is advertised.
-- Return to the built-in scaffold with `canvas.navigate` and `{"url":""}`.
+- Gateway 网关 canvas 主机会提供 `/__openclaw__/canvas/` 和 `/__openclaw__/a2ui/`。
+- 它由 Gateway 网关 HTTP 服务器提供（与 `gateway.port` 使用相同端口，默认 `18789`）。
+- 当广播了 canvas 主机 URL 时，iOS 节点会在连接时自动导航到 A2UI。
+- 使用 `canvas.navigate` 和 `{"url":""}` 返回内置 scaffold。
 
 ### Canvas eval / snapshot
 
@@ -237,20 +242,20 @@ openclaw nodes invoke --node "iOS Node" --command canvas.eval --params '{"javaSc
 openclaw nodes invoke --node "iOS Node" --command canvas.snapshot --params '{"maxWidth":900,"format":"jpeg"}'
 ```
 
-## Voice wake + talk mode
+## 语音唤醒 + Talk 模式
 
-- Voice wake and talk mode are available in Settings.
-- iOS may suspend background audio; treat voice features as best-effort when the app is not active.
+- 语音唤醒和 Talk 模式可在“设置”中启用。
+- iOS 可能会暂停后台音频；当应用未处于活动状态时，请将语音功能视为尽力而为。
 
-## Common errors
+## 常见错误
 
-- `NODE_BACKGROUND_UNAVAILABLE`: bring the iOS app to the foreground (canvas/camera/screen commands require it).
-- `A2UI_HOST_NOT_CONFIGURED`: the Gateway did not advertise a canvas host URL; check `canvasHost` in [Gateway configuration](/gateway/configuration).
-- Pairing prompt never appears: run `openclaw devices list` and approve manually.
-- Reconnect fails after reinstall: the Keychain pairing token was cleared; re-pair the node.
+- `NODE_BACKGROUND_UNAVAILABLE`：将 iOS 应用切换到前台（canvas/相机/屏幕命令需要它）。
+- `A2UI_HOST_NOT_CONFIGURED`：Gateway 网关没有广播 canvas 主机 URL；请检查 [Gateway 网关配置](/zh-CN/gateway/configuration) 中的 `canvasHost`。
+- 配对提示始终不出现：运行 `openclaw devices list` 并手动批准。
+- 重新安装后重连失败：Keychain 配对令牌已被清除；请重新配对该节点。
 
-## Related docs
+## 相关文档
 
-- [Pairing](/channels/pairing)
-- [Discovery](/gateway/discovery)
-- [Bonjour](/gateway/bonjour)
+- [配对](/zh-CN/channels/pairing)
+- [设备发现](/zh-CN/gateway/discovery)
+- [Bonjour](/zh-CN/gateway/bonjour)

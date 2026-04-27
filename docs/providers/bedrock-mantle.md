@@ -1,108 +1,115 @@
 ---
-summary: "Use Amazon Bedrock Mantle (OpenAI-compatible) models with OpenClaw"
 read_when:
-  - You want to use Bedrock Mantle hosted OSS models with OpenClaw
-  - You need the Mantle OpenAI-compatible endpoint for GPT-OSS, Qwen, Kimi, or GLM
-title: "Amazon Bedrock Mantle"
+    - 你想在 OpenClaw 中使用由 Bedrock Mantle 托管的 OSS 模型
+    - 你需要 Mantle 的兼容 OpenAI 端点来使用 GPT-OSS、Qwen、Kimi 或 GLM
+summary: 在 OpenClaw 中使用 Amazon Bedrock Mantle（兼容 OpenAI）模型
+title: Amazon Bedrock Mantle
+x-i18n:
+    generated_at: "2026-04-23T20:59:29Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c5e9fb65cd5f5151470f0d8eeb9edceb9b035863dcd863d2bcabe233c1cfce41
+    source_path: providers/bedrock-mantle.md
+    workflow: 15
 ---
 
-OpenClaw includes a bundled **Amazon Bedrock Mantle** provider that connects to
-the Mantle OpenAI-compatible endpoint. Mantle hosts open-source and
-third-party models (GPT-OSS, Qwen, Kimi, GLM, and similar) through a standard
-`/v1/chat/completions` surface backed by Bedrock infrastructure.
+OpenClaw 内置了一个 **Amazon Bedrock Mantle** 提供商，用于连接
+Mantle 的兼容 OpenAI 端点。Mantle 通过一个标准的
+`/v1/chat/completions` 接口并依托 Bedrock 基础设施托管开源和
+第三方模型（GPT-OSS、Qwen、Kimi、GLM 等）。
 
-| Property       | Value                                                                                       |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| Provider ID    | `amazon-bedrock-mantle`                                                                     |
-| API            | `openai-completions` (OpenAI-compatible) or `anthropic-messages` (Anthropic Messages route) |
-| Auth           | Explicit `AWS_BEARER_TOKEN_BEDROCK` or IAM credential-chain bearer-token generation         |
-| Default region | `us-east-1` (override with `AWS_REGION` or `AWS_DEFAULT_REGION`)                            |
+| 属性           | 值                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| 提供商 ID      | `amazon-bedrock-mantle`                                                                      |
+| API            | `openai-completions`（兼容 OpenAI）或 `anthropic-messages`（Anthropic Messages 路由）        |
+| 身份验证       | 显式 `AWS_BEARER_TOKEN_BEDROCK` 或通过 IAM 凭证链生成 bearer token                            |
+| 默认区域       | `us-east-1`（可通过 `AWS_REGION` 或 `AWS_DEFAULT_REGION` 覆盖）                              |
 
-## Getting started
+## 入门指南
 
-Choose your preferred auth method and follow the setup steps.
+选择你偏好的身份验证方式，并按照设置步骤操作。
 
 <Tabs>
-  <Tab title="Explicit bearer token">
-    **Best for:** environments where you already have a Mantle bearer token.
+  <Tab title="显式 bearer token">
+    **最适合：** 已经拥有 Mantle bearer token 的环境。
 
     <Steps>
-      <Step title="Set the bearer token on the gateway host">
+      <Step title="在 gateway 主机上设置 bearer token">
         ```bash
         export AWS_BEARER_TOKEN_BEDROCK="..."
         ```
 
-        Optionally set a region (defaults to `us-east-1`):
+        也可以选择设置区域（默认是 `us-east-1`）：
 
         ```bash
         export AWS_REGION="us-west-2"
         ```
       </Step>
-      <Step title="Verify models are discovered">
+      <Step title="验证模型已被发现">
         ```bash
         openclaw models list
         ```
 
-        Discovered models appear under the `amazon-bedrock-mantle` provider. No
-        additional config is required unless you want to override defaults.
+        已发现的模型会出现在 `amazon-bedrock-mantle` 提供商下。除非你想覆盖默认值，否则无需
+        额外配置。
       </Step>
     </Steps>
 
   </Tab>
 
-  <Tab title="IAM credentials">
-    **Best for:** using AWS SDK-compatible credentials (shared config, SSO, web identity, instance or task roles).
+  <Tab title="IAM 凭证">
+    **最适合：** 使用兼容 AWS SDK 的凭证（共享配置、SSO、web identity、实例角色或任务角色）。
 
     <Steps>
-      <Step title="Configure AWS credentials on the gateway host">
-        Any AWS SDK-compatible auth source works:
+      <Step title="在 gateway 主机上配置 AWS 凭证">
+        任何兼容 AWS SDK 的身份验证来源都可使用：
 
         ```bash
         export AWS_PROFILE="default"
         export AWS_REGION="us-west-2"
         ```
       </Step>
-      <Step title="Verify models are discovered">
+      <Step title="验证模型已被发现">
         ```bash
         openclaw models list
         ```
 
-        OpenClaw generates a Mantle bearer token from the credential chain automatically.
+        OpenClaw 会自动从凭证链生成 Mantle bearer token。
       </Step>
     </Steps>
 
     <Tip>
-    When `AWS_BEARER_TOKEN_BEDROCK` is not set, OpenClaw mints the bearer token for you from the AWS default credential chain, including shared credentials/config profiles, SSO, web identity, and instance or task roles.
+    当未设置 `AWS_BEARER_TOKEN_BEDROCK` 时，OpenClaw 会通过 AWS 默认凭证链为你生成 bearer token，其中包括共享 credentials/config 配置文件、SSO、web identity，以及实例角色或任务角色。
     </Tip>
 
   </Tab>
 </Tabs>
 
-## Automatic model discovery
+## 自动模型发现
 
-When `AWS_BEARER_TOKEN_BEDROCK` is set, OpenClaw uses it directly. Otherwise,
-OpenClaw attempts to generate a Mantle bearer token from the AWS default
-credential chain. It then discovers available Mantle models by querying the
-region's `/v1/models` endpoint.
+设置了 `AWS_BEARER_TOKEN_BEDROCK` 时，OpenClaw 会直接使用它。否则，
+OpenClaw 会尝试从 AWS 默认
+凭证链生成 Mantle bearer token。然后它会通过查询该
+区域的 `/v1/models` 端点来发现可用的 Mantle 模型。
 
-| Behavior          | Detail                    |
-| ----------------- | ------------------------- |
-| Discovery cache   | Results cached for 1 hour |
-| IAM token refresh | Hourly                    |
+| 行为             | 详情                    |
+| ---------------- | ----------------------- |
+| 发现缓存         | 结果缓存 1 小时         |
+| IAM 令牌刷新     | 每小时一次              |
 
 <Note>
-The bearer token is the same `AWS_BEARER_TOKEN_BEDROCK` used by the standard [Amazon Bedrock](/providers/bedrock) provider.
+该 bearer token 与标准 [Amazon Bedrock](/zh-CN/providers/bedrock) 提供商使用的 `AWS_BEARER_TOKEN_BEDROCK` 是同一个。
 </Note>
 
-### Supported regions
+### 支持的区域
 
-`us-east-1`, `us-east-2`, `us-west-2`, `ap-northeast-1`,
-`ap-south-1`, `ap-southeast-3`, `eu-central-1`, `eu-west-1`, `eu-west-2`,
-`eu-south-1`, `eu-north-1`, `sa-east-1`.
+`us-east-1`、`us-east-2`、`us-west-2`、`ap-northeast-1`、
+`ap-south-1`、`ap-southeast-3`、`eu-central-1`、`eu-west-1`、`eu-west-2`、
+`eu-south-1`、`eu-north-1`、`sa-east-1`。
 
-## Manual configuration
+## 手动配置
 
-If you prefer explicit config instead of auto-discovery:
+如果你更倾向于显式配置而不是自动发现：
 
 ```json5
 {
@@ -130,25 +137,24 @@ If you prefer explicit config instead of auto-discovery:
 }
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Reasoning support">
-    Reasoning support is inferred from model IDs containing patterns like
-    `thinking`, `reasoner`, or `gpt-oss-120b`. OpenClaw sets `reasoning: true`
-    automatically for matching models during discovery.
+  <Accordion title="推理支持">
+    推理支持会根据模型 ID 中是否包含诸如
+    `thinking`、`reasoner` 或 `gpt-oss-120b` 之类的模式来推断。OpenClaw 会在发现阶段自动为匹配的模型设置 `reasoning: true`。
   </Accordion>
 
-  <Accordion title="Endpoint unavailability">
-    If the Mantle endpoint is unavailable or returns no models, the provider is
-    silently skipped. OpenClaw does not error; other configured providers
-    continue to work normally.
+  <Accordion title="端点不可用">
+    如果 Mantle 端点不可用或未返回任何模型，该提供商会被
+    静默跳过。OpenClaw 不会报错；其他已配置提供商
+    仍会正常工作。
   </Accordion>
 
-  <Accordion title="Claude Opus 4.7 via the Anthropic Messages route">
-    Mantle also exposes an Anthropic Messages route that carries Claude models through the same bearer-authenticated streaming path. Claude Opus 4.7 (`amazon-bedrock-mantle/claude-opus-4.7`) is callable through this route with provider-owned streaming, so AWS bearer tokens are not treated like Anthropic API keys.
+  <Accordion title="通过 Anthropic Messages 路由使用 Claude Opus 4.7">
+    Mantle 还暴露了一个 Anthropic Messages 路由，可通过相同的 bearer 身份验证流式路径承载 Claude 模型。Claude Opus 4.7（`amazon-bedrock-mantle/claude-opus-4.7`）可以通过该路由调用，并由提供商自有流式传输支持，因此 AWS bearer token 不会被当作 Anthropic API 密钥处理。
 
-    When you pin an Anthropic Messages model on the Mantle provider, OpenClaw uses the `anthropic-messages` API surface instead of `openai-completions` for that model. Auth still comes from `AWS_BEARER_TOKEN_BEDROCK` (or the minted IAM bearer token).
+    当你在 Mantle 提供商上固定一个 Anthropic Messages 模型时，OpenClaw 会对此模型使用 `anthropic-messages` API 接口，而不是 `openai-completions`。身份验证仍然来自 `AWS_BEARER_TOKEN_BEDROCK`（或通过 IAM 生成的 bearer token）。
 
     ```json5
     {
@@ -174,31 +180,30 @@ If you prefer explicit config instead of auto-discovery:
 
   </Accordion>
 
-  <Accordion title="Relationship to Amazon Bedrock provider">
-    Bedrock Mantle is a separate provider from the standard
-    [Amazon Bedrock](/providers/bedrock) provider. Mantle uses an
-    OpenAI-compatible `/v1` surface, while the standard Bedrock provider uses
-    the native Bedrock API.
+  <Accordion title="与 Amazon Bedrock 提供商的关系">
+    Bedrock Mantle 与标准
+    [Amazon Bedrock](/zh-CN/providers/bedrock) 提供商是分开的。Mantle 使用兼容 OpenAI 的
+    `/v1` 接口，而标准 Bedrock 提供商使用
+    原生 Bedrock API。
 
-    Both providers share the same `AWS_BEARER_TOKEN_BEDROCK` credential when
-    present.
+    当存在时，这两个提供商共享同一个 `AWS_BEARER_TOKEN_BEDROCK` 凭证。
 
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关
 
 <CardGroup cols={2}>
-  <Card title="Amazon Bedrock" href="/providers/bedrock" icon="cloud">
-    Native Bedrock provider for Anthropic Claude, Titan, and other models.
+  <Card title="Amazon Bedrock" href="/zh-CN/providers/bedrock" icon="cloud">
+    Anthropic Claude、Titan 及其他模型的原生 Bedrock 提供商。
   </Card>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    如何选择提供商、模型引用和故障切换行为。
   </Card>
-  <Card title="OAuth and auth" href="/gateway/authentication" icon="key">
-    Auth details and credential reuse rules.
+  <Card title="OAuth 和身份验证" href="/zh-CN/gateway/authentication" icon="key">
+    身份验证细节和凭证复用规则。
   </Card>
-  <Card title="Troubleshooting" href="/help/troubleshooting" icon="wrench">
-    Common issues and how to resolve them.
+  <Card title="故障排除" href="/zh-CN/help/troubleshooting" icon="wrench">
+    常见问题及其解决方法。
   </Card>
 </CardGroup>

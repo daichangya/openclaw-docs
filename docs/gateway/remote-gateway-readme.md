@@ -1,31 +1,38 @@
 ---
-summary: "SSH tunnel setup for OpenClaw.app connecting to a remote gateway"
-read_when: "Connecting the macOS app to a remote gateway over SSH"
-title: "Remote gateway setup"
+read_when: Connecting the macOS app to a remote gateway over SSH
+summary: OpenClaw.app 连接远程 Gateway 网关的 SSH 隧道设置
+title: 远程 Gateway 网关设置
+x-i18n:
+    generated_at: "2026-04-24T04:02:25Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: cc5df551839db87a36be7c1b29023c687c418d13337075490436335a8bb1635d
+    source_path: gateway/remote-gateway-readme.md
+    workflow: 15
 ---
 
-> This content has been merged into [Remote Access](/gateway/remote#macos-persistent-ssh-tunnel-via-launchagent). See that page for the current guide.
+> 此内容已合并到 [远程访问](/zh-CN/gateway/remote#macos-persistent-ssh-tunnel-via-launchagent)。当前指南请参见该页面。
 
-# Running OpenClaw.app with a Remote Gateway
+# 使用远程 Gateway 网关运行 OpenClaw.app
 
-OpenClaw.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
+OpenClaw.app 使用 SSH 隧道连接到远程 gateway。本指南将向你展示如何进行设置。
 
-## Overview
+## 概览
 
 ```mermaid
 flowchart TB
-    subgraph Client["Client Machine"]
+    subgraph Client["客户端机器"]
         direction TB
         A["OpenClaw.app"]
-        B["ws://127.0.0.1:18789\n(local port)"]
-        T["SSH Tunnel"]
+        B["ws://127.0.0.1:18789\n（本地端口）"]
+        T["SSH 隧道"]
 
         A --> B
         B --> T
     end
-    subgraph Remote["Remote Machine"]
+    subgraph Remote["远程机器"]
         direction TB
-        C["Gateway WebSocket"]
+        C["Gateway 网关 WebSocket"]
         D["ws://127.0.0.1:18789"]
 
         C --> D
@@ -33,64 +40,64 @@ flowchart TB
     T --> C
 ```
 
-## Quick Setup
+## 快速设置
 
-### Step 1: Add SSH Config
+### 第 1 步：添加 SSH 配置
 
-Edit `~/.ssh/config` and add:
+编辑 `~/.ssh/config` 并添加：
 
 ```ssh
 Host remote-gateway
-    HostName <REMOTE_IP>          # e.g., 172.27.187.184
-    User <REMOTE_USER>            # e.g., jefferson
+    HostName <REMOTE_IP>          # 例如：172.27.187.184
+    User <REMOTE_USER>            # 例如：jefferson
     LocalForward 18789 127.0.0.1:18789
     IdentityFile ~/.ssh/id_rsa
 ```
 
-Replace `<REMOTE_IP>` and `<REMOTE_USER>` with your values.
+将 `<REMOTE_IP>` 和 `<REMOTE_USER>` 替换为你的实际值。
 
-### Step 2: Copy SSH Key
+### 第 2 步：复制 SSH 密钥
 
-Copy your public key to the remote machine (enter password once):
+将你的公钥复制到远程机器上（输入一次密码）：
 
 ```bash
 ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ```
 
-### Step 3: Configure Remote Gateway Auth
+### 第 3 步：配置远程 Gateway 网关认证
 
 ```bash
 openclaw config set gateway.remote.token "<your-token>"
 ```
 
-Use `gateway.remote.password` instead if your remote gateway uses password auth.
-`OPENCLAW_GATEWAY_TOKEN` is still valid as a shell-level override, but the durable
-remote-client setup is `gateway.remote.token` / `gateway.remote.password`.
+如果你的远程 gateway 使用密码认证，请改用 `gateway.remote.password`。
+`OPENCLAW_GATEWAY_TOKEN` 仍然可作为 shell 层级的覆盖项使用，但持久化的
+远程客户端设置应使用 `gateway.remote.token` / `gateway.remote.password`。
 
-### Step 4: Start SSH Tunnel
+### 第 4 步：启动 SSH 隧道
 
 ```bash
 ssh -N remote-gateway &
 ```
 
-### Step 5: Restart OpenClaw.app
+### 第 5 步：重启 OpenClaw.app
 
 ```bash
-# Quit OpenClaw.app (⌘Q), then reopen:
+# 退出 OpenClaw.app（⌘Q），然后重新打开：
 open /path/to/OpenClaw.app
 ```
 
-The app will now connect to the remote gateway through the SSH tunnel.
+应用现在将通过 SSH 隧道连接到远程 gateway。
 
 ---
 
-## Auto-Start Tunnel on Login
+## 登录时自动启动隧道
 
-To have the SSH tunnel start automatically when you log in, create a Launch Agent.
+如果你希望 SSH 隧道在登录时自动启动，请创建一个 Launch Agent。
 
-### Create the PLIST file
+### 创建 PLIST 文件
 
-Save this as `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`:
+将以下内容保存为 `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -113,38 +120,38 @@ Save this as `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`:
 </plist>
 ```
 
-### Load the Launch Agent
+### 加载 Launch Agent
 
 ```bash
 launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist
 ```
 
-The tunnel will now:
+现在，该隧道将会：
 
-- Start automatically when you log in
-- Restart if it crashes
-- Keep running in the background
+- 在你登录时自动启动
+- 如果崩溃会自动重启
+- 持续在后台运行
 
-Legacy note: remove any leftover `com.openclaw.ssh-tunnel` LaunchAgent if present.
+旧版说明：如果存在残留的 `com.openclaw.ssh-tunnel` LaunchAgent，请将其移除。
 
 ---
 
-## Troubleshooting
+## 故障排除
 
-**Check if tunnel is running:**
+**检查隧道是否正在运行：**
 
 ```bash
 ps aux | grep "ssh -N remote-gateway" | grep -v grep
 lsof -i :18789
 ```
 
-**Restart the tunnel:**
+**重启隧道：**
 
 ```bash
 launchctl kickstart -k gui/$UID/ai.openclaw.ssh-tunnel
 ```
 
-**Stop the tunnel:**
+**停止隧道：**
 
 ```bash
 launchctl bootout gui/$UID/ai.openclaw.ssh-tunnel
@@ -152,18 +159,18 @@ launchctl bootout gui/$UID/ai.openclaw.ssh-tunnel
 
 ---
 
-## How It Works
+## 工作原理
 
-| Component                            | What It Does                                                 |
+| 组件 | 作用 |
 | ------------------------------------ | ------------------------------------------------------------ |
-| `LocalForward 18789 127.0.0.1:18789` | Forwards local port 18789 to remote port 18789               |
-| `ssh -N`                             | SSH without executing remote commands (just port forwarding) |
-| `KeepAlive`                          | Automatically restarts tunnel if it crashes                  |
-| `RunAtLoad`                          | Starts tunnel when the agent loads                           |
+| `LocalForward 18789 127.0.0.1:18789` | 将本地端口 18789 转发到远程端口 18789 |
+| `ssh -N` | 运行 SSH 但不执行远程命令（仅进行端口转发） |
+| `KeepAlive` | 如果隧道崩溃则自动重启 |
+| `RunAtLoad` | 在 agent 加载时启动隧道 |
 
-OpenClaw.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.
+OpenClaw.app 会连接到你客户端机器上的 `ws://127.0.0.1:18789`。SSH 隧道会将该连接转发到远程机器上的 18789 端口，也就是 Gateway 网关正在运行的位置。
 
-## Related
+## 相关内容
 
-- [Remote access](/gateway/remote)
-- [Tailscale](/gateway/tailscale)
+- [远程访问](/zh-CN/gateway/remote)
+- [Tailscale](/zh-CN/gateway/tailscale)

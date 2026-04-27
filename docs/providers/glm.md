@@ -1,29 +1,36 @@
 ---
-summary: "GLM model family overview + how to use it in OpenClaw"
 read_when:
-  - You want GLM models in OpenClaw
-  - You need the model naming convention and setup
-title: "GLM (Zhipu)"
+    - 你想在 OpenClaw 中使用 GLM 模型
+    - 你需要了解模型命名约定和设置方法
+summary: GLM 模型家族概览及其在 OpenClaw 中的使用方式
+title: GLM（智谱）
+x-i18n:
+    generated_at: "2026-04-23T23:02:13Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 0272f0621559c0aba2c939dc52771ac2c94a20f9f7201c1f71d80a9c2197c7e7
+    source_path: providers/glm.md
+    workflow: 15
 ---
 
-# GLM models
+# GLM 模型
 
-GLM is a **model family** (not a company) available through the Z.AI platform. In OpenClaw, GLM
-models are accessed via the `zai` provider and model IDs like `zai/glm-5`.
+GLM 是一个**模型家族**（不是公司），可通过 Z.AI 平台使用。在 OpenClaw 中，GLM
+模型通过 `zai` 提供商访问，模型 ID 形式如 `zai/glm-5`。
 
-## Getting started
+## 入门指南
 
 <Steps>
-  <Step title="Choose an auth route and run onboarding">
-    Pick the onboarding choice that matches your Z.AI plan and region:
+  <Step title="选择一种 auth 方式并运行新手引导">
+    选择与你的 Z.AI 套餐和区域匹配的新手引导选项：
 
-    | Auth choice | Best for |
+    | Auth 选项 | 最适合 |
     | ----------- | -------- |
-    | `zai-api-key` | Generic API-key setup with endpoint auto-detection |
-    | `zai-coding-global` | Coding Plan users (global) |
-    | `zai-coding-cn` | Coding Plan users (China region) |
-    | `zai-global` | General API (global) |
-    | `zai-cn` | General API (China region) |
+    | `zai-api-key` | 通用 API 密钥设置，并自动检测端点 |
+    | `zai-coding-global` | Coding Plan 用户（全球） |
+    | `zai-coding-cn` | Coding Plan 用户（中国区） |
+    | `zai-global` | 通用 API（全球） |
+    | `zai-cn` | 通用 API（中国区） |
 
     ```bash
     # Example: generic auto-detect
@@ -34,19 +41,19 @@ models are accessed via the `zai` provider and model IDs like `zai/glm-5`.
     ```
 
   </Step>
-  <Step title="Set GLM as the default model">
+  <Step title="将 GLM 设为默认模型">
     ```bash
     openclaw config set agents.defaults.model.primary "zai/glm-5.1"
     ```
   </Step>
-  <Step title="Verify models are available">
+  <Step title="验证模型是否可用">
     ```bash
     openclaw models list --provider zai
     ```
   </Step>
 </Steps>
 
-## Config example
+## 配置示例
 
 ```json5
 {
@@ -56,16 +63,15 @@ models are accessed via the `zai` provider and model IDs like `zai/glm-5`.
 ```
 
 <Tip>
-`zai-api-key` lets OpenClaw detect the matching Z.AI endpoint from the key and
-apply the correct base URL automatically. Use the explicit regional choices when
-you want to force a specific Coding Plan or general API surface.
+`zai-api-key` 允许 OpenClaw 根据密钥检测匹配的 Z.AI 端点，并自动
+应用正确的 base URL。当你希望强制使用特定的 Coding Plan 或通用 API 接口时，请使用显式的区域选项。
 </Tip>
 
-## Built-in catalog
+## 内置目录
 
-OpenClaw currently seeds the bundled `zai` provider with these GLM refs:
+OpenClaw 当前为内置 `zai` 提供商预置了以下 GLM 引用：
 
-| Model           | Model            |
+| 模型           | 模型            |
 | --------------- | ---------------- |
 | `glm-5.1`       | `glm-4.7`        |
 | `glm-5`         | `glm-4.7-flash`  |
@@ -77,34 +83,34 @@ OpenClaw currently seeds the bundled `zai` provider with these GLM refs:
 | `glm-4.5v`      |                  |
 
 <Note>
-The default bundled model ref is `zai/glm-5.1`. GLM versions and availability
-can change; check Z.AI's docs for the latest.
+默认的内置模型引用是 `zai/glm-5.1`。GLM 版本和可用性
+可能会变化；请查看 Z.AI 文档了解最新信息。
 </Note>
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Endpoint auto-detection">
-    When you use the `zai-api-key` auth choice, OpenClaw inspects the key format
-    to determine the correct Z.AI base URL. Explicit regional choices
-    (`zai-coding-global`, `zai-coding-cn`, `zai-global`, `zai-cn`) override
-    auto-detection and pin the endpoint directly.
+  <Accordion title="端点自动检测">
+    当你使用 `zai-api-key` auth 选项时，OpenClaw 会检查密钥格式，
+    以确定正确的 Z.AI base URL。显式的区域选项
+    （`zai-coding-global`、`zai-coding-cn`、`zai-global`、`zai-cn`）会覆盖
+    自动检测，并直接固定端点。
   </Accordion>
 
-  <Accordion title="Provider details">
-    GLM models are served by the `zai` runtime provider. For full provider
-    configuration, regional endpoints, and additional capabilities, see
-    [Z.AI provider docs](/providers/zai).
+  <Accordion title="提供商详情">
+    GLM 模型由 `zai` 运行时提供商提供。有关完整的提供商
+    配置、区域端点和附加能力，请参阅
+    [Z.AI 提供商文档](/zh-CN/providers/zai)。
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Z.AI provider" href="/providers/zai" icon="server">
-    Full Z.AI provider configuration and regional endpoints.
+  <Card title="Z.AI 提供商" href="/zh-CN/providers/zai" icon="server">
+    完整的 Z.AI 提供商配置和区域端点。
   </Card>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和回退行为。
   </Card>
 </CardGroup>

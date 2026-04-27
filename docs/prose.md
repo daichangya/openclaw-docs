@@ -1,41 +1,48 @@
 ---
-summary: "OpenProse: .prose workflows, slash commands, and state in OpenClaw"
 read_when:
-  - You want to run or write .prose workflows
-  - You want to enable the OpenProse plugin
-  - You need to understand state storage
-title: "OpenProse"
+    - 你想运行或编写 `.prose` 工作流
+    - 你想启用 OpenProse 插件
+    - 你需要了解状态存储
+summary: OpenProse：OpenClaw 中的 `.prose` 工作流、斜杠命令和状态
+title: OpenProse
+x-i18n:
+    generated_at: "2026-04-24T04:06:25Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: e1d6f3aa64c403daedaeaa2d7934b8474c0756fe09eed09efd1efeef62413e9e
+    source_path: prose.md
+    workflow: 15
 ---
 
-OpenProse is a portable, markdown-first workflow format for orchestrating AI sessions. In OpenClaw it ships as a plugin that installs an OpenProse skill pack plus a `/prose` slash command. Programs live in `.prose` files and can spawn multiple sub-agents with explicit control flow.
+OpenProse 是一种可移植、以 Markdown 为先的工作流格式，用于编排 AI 会话。在 OpenClaw 中，它以插件形式提供，会安装一个 OpenProse Skills 包以及一个 `/prose` 斜杠命令。程序存放在 `.prose` 文件中，并且可以通过显式控制流生成多个子智能体。
 
-Official site: [https://www.prose.md](https://www.prose.md)
+官方网站：[https://www.prose.md](https://www.prose.md)
 
-## What it can do
+## 它可以做什么
 
-- Multi-agent research + synthesis with explicit parallelism.
-- Repeatable approval-safe workflows (code review, incident triage, content pipelines).
-- Reusable `.prose` programs you can run across supported agent runtimes.
+- 通过显式并行机制执行多智能体研究 + 综合。
+- 可重复、审批安全的工作流（代码审查、事件分诊、内容流水线）。
+- 可复用的 `.prose` 程序，可在受支持的智能体运行时之间运行。
 
-## Install + enable
+## 安装 + 启用
 
-Bundled plugins are disabled by default. Enable OpenProse:
+内置插件默认处于禁用状态。启用 OpenProse：
 
 ```bash
 openclaw plugins enable open-prose
 ```
 
-Restart the Gateway after enabling the plugin.
+启用插件后，重启 Gateway 网关。
 
-Dev/local checkout: `openclaw plugins install ./path/to/local/open-prose-plugin`
+开发 / 本地检出：`openclaw plugins install ./path/to/local/open-prose-plugin`
 
-Related docs: [Plugins](/tools/plugin), [Plugin manifest](/plugins/manifest), [Skills](/tools/skills).
+相关文档：[插件](/zh-CN/tools/plugin)、[插件清单](/zh-CN/plugins/manifest)、[Skills](/zh-CN/tools/skills)。
 
-## Slash command
+## 斜杠命令
 
-OpenProse registers `/prose` as a user-invocable skill command. It routes to the OpenProse VM instructions and uses OpenClaw tools under the hood.
+OpenProse 将 `/prose` 注册为一个可由用户调用的 skill 命令。它会路由到 OpenProse VM 指令，并在底层使用 OpenClaw 工具。
 
-Common commands:
+常用命令：
 
 ```
 /prose help
@@ -47,7 +54,7 @@ Common commands:
 /prose update
 ```
 
-## Example: a simple `.prose` file
+## 示例：一个简单的 `.prose` 文件
 
 ```prose
 # Research + synthesis with two agents running in parallel.
@@ -72,9 +79,9 @@ session "Merge the findings + draft into a final answer."
 context: { findings, draft }
 ```
 
-## File locations
+## 文件位置
 
-OpenProse keeps state under `.prose/` in your workspace:
+OpenProse 将状态保存在你的工作区下的 `.prose/` 中：
 
 ```
 .prose/
@@ -88,50 +95,50 @@ OpenProse keeps state under `.prose/` in your workspace:
 └── agents/
 ```
 
-User-level persistent agents live at:
+用户级持久智能体位于：
 
 ```
 ~/.prose/agents/
 ```
 
-## State modes
+## 状态模式
 
-OpenProse supports multiple state backends:
+OpenProse 支持多种状态后端：
 
-- **filesystem** (default): `.prose/runs/...`
-- **in-context**: transient, for small programs
-- **sqlite** (experimental): requires `sqlite3` binary
-- **postgres** (experimental): requires `psql` and a connection string
+- **filesystem**（默认）：`.prose/runs/...`
+- **in-context**：瞬态，用于小型程序
+- **sqlite**（实验性）：需要 `sqlite3` 二进制文件
+- **postgres**（实验性）：需要 `psql` 和连接字符串
 
-Notes:
+说明：
 
-- sqlite/postgres are opt-in and experimental.
-- postgres credentials flow into subagent logs; use a dedicated, least-privileged DB.
+- sqlite / postgres 为选择启用且属于实验性功能。
+- postgres 凭证会流入子智能体日志；请使用专用且最小权限的数据库。
 
-## Remote programs
+## 远程程序
 
-`/prose run <handle/slug>` resolves to `https://p.prose.md/<handle>/<slug>`.
-Direct URLs are fetched as-is. This uses the `web_fetch` tool (or `exec` for POST).
+`/prose run <handle/slug>` 会解析为 `https://p.prose.md/<handle>/<slug>`。
+直接 URL 会按原样抓取。这会使用 `web_fetch` 工具（或针对 POST 使用 `exec`）。
 
-## OpenClaw runtime mapping
+## OpenClaw 运行时映射
 
-OpenProse programs map to OpenClaw primitives:
+OpenProse 程序会映射到 OpenClaw 原语：
 
-| OpenProse concept         | OpenClaw tool    |
+| OpenProse 概念 | OpenClaw 工具 |
 | ------------------------- | ---------------- |
-| Spawn session / Task tool | `sessions_spawn` |
-| File read/write           | `read` / `write` |
-| Web fetch                 | `web_fetch`      |
+| 生成会话 / Task 工具 | `sessions_spawn` |
+| 文件读取 / 写入 | `read` / `write` |
+| Web 抓取 | `web_fetch` |
 
-If your tool allowlist blocks these tools, OpenProse programs will fail. See [Skills config](/tools/skills-config).
+如果你的工具允许列表阻止了这些工具，OpenProse 程序将无法运行。参见 [Skills 配置](/zh-CN/tools/skills-config)。
 
-## Security + approvals
+## 安全 + 审批
 
-Treat `.prose` files like code. Review before running. Use OpenClaw tool allowlists and approval gates to control side effects.
+请像对待代码一样对待 `.prose` 文件。运行前先审查。使用 OpenClaw 工具允许列表和审批门控来控制副作用。
 
-For deterministic, approval-gated workflows, compare with [Lobster](/tools/lobster).
+对于确定性、带审批门控的工作流，可与 [Lobster](/zh-CN/tools/lobster) 对比。
 
-## Related
+## 相关内容
 
-- [Text-to-speech](/tools/tts)
-- [Markdown formatting](/concepts/markdown-formatting)
+- [文本转语音](/zh-CN/tools/tts)
+- [Markdown 格式化](/zh-CN/concepts/markdown-formatting)

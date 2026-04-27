@@ -1,19 +1,26 @@
 ---
-summary: "Scripted onboarding and agent setup for the OpenClaw CLI"
 read_when:
-  - You are automating onboarding in scripts or CI
-  - You need non-interactive examples for specific providers
-title: "CLI automation"
-sidebarTitle: "CLI automation"
+    - 你正在脚本或 CI 中自动化新手引导
+    - 你需要面向特定 provider 的非交互式示例
+sidebarTitle: CLI automation
+summary: 面向 OpenClaw CLI 的脚本化新手引导和智能体设置
+title: CLI 自动化
+x-i18n:
+    generated_at: "2026-04-25T17:31:48Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 50b6ef35554ec085012a84b8abb8d52013934ada5293d941babea56eaacf4a9f
+    source_path: start/wizard-cli-automation.md
+    workflow: 15
 ---
 
-Use `--non-interactive` to automate `openclaw onboard`.
+使用 `--non-interactive` 来自动化 `openclaw onboard`。
 
 <Note>
-`--json` does not imply non-interactive mode. Use `--non-interactive` (and `--workspace`) for scripts.
+`--json` 并不意味着非交互模式。脚本中请使用 `--non-interactive`（以及 `--workspace`）。
 </Note>
 
-## Baseline non-interactive example
+## 基础非交互式示例
 
 ```bash
 openclaw onboard --non-interactive \
@@ -29,17 +36,17 @@ openclaw onboard --non-interactive \
   --skip-skills
 ```
 
-Add `--json` for a machine-readable summary.
+添加 `--json` 可获得机器可读的摘要。
 
-Use `--skip-bootstrap` when your automation pre-seeds workspace files and does not want onboarding to create the default bootstrap files.
+当你的自动化会预先填充工作区文件，并且不希望新手引导创建默认的 bootstrap 文件时，请使用 `--skip-bootstrap`。
 
-Use `--secret-input-mode ref` to store env-backed refs in auth profiles instead of plaintext values.
-Interactive selection between env refs and configured provider refs (`file` or `exec`) is available in the onboarding flow.
+使用 `--secret-input-mode ref` 可在认证配置档案中存储由环境变量支持的引用，而不是明文值。
+在新手引导流程中，还可以交互式选择环境变量引用和已配置的 provider 引用（`file` 或 `exec`）。
 
-In non-interactive `ref` mode, provider env vars must be set in the process environment.
-Passing inline key flags without the matching env var now fails fast.
+在非交互 `ref` 模式下，provider 环境变量必须已在进程环境中设置。
+传递内联 key 标志而没有匹配的环境变量时，现在会快速失败。
 
-Example:
+示例：
 
 ```bash
 openclaw onboard --non-interactive \
@@ -49,10 +56,10 @@ openclaw onboard --non-interactive \
   --accept-risk
 ```
 
-## Provider-specific examples
+## 特定 provider 示例
 
 <AccordionGroup>
-  <Accordion title="Anthropic API key example">
+  <Accordion title="Anthropic API key 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -62,7 +69,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Gemini example">
+  <Accordion title="Gemini 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -72,7 +79,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Z.AI example">
+  <Accordion title="Z.AI 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -82,7 +89,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Vercel AI Gateway example">
+  <Accordion title="Vercel AI Gateway 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -92,7 +99,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Cloudflare AI Gateway example">
+  <Accordion title="Cloudflare AI Gateway 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -104,7 +111,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Moonshot example">
+  <Accordion title="Moonshot 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -114,7 +121,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Mistral example">
+  <Accordion title="Mistral 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -124,7 +131,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Synthetic example">
+  <Accordion title="Synthetic 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -134,7 +141,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="OpenCode example">
+  <Accordion title="OpenCode 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -143,9 +150,9 @@ openclaw onboard --non-interactive \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
-    Swap to `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"` for the Go catalog.
+    如需切换到 Go 目录，请改用 `--auth-choice opencode-go --opencode-go-api-key "$OPENCODE_API_KEY"`。
   </Accordion>
-  <Accordion title="Ollama example">
+  <Accordion title="Ollama 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -156,7 +163,7 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Custom provider example">
+  <Accordion title="自定义 provider 示例">
     ```bash
     openclaw onboard --non-interactive \
       --mode local \
@@ -170,9 +177,9 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    `--custom-api-key` is optional. If omitted, onboarding checks `CUSTOM_API_KEY`.
+    `--custom-api-key` 是可选的。如果省略，新手引导会检查 `CUSTOM_API_KEY`。
 
-    Ref-mode variant:
+    ref 模式变体：
 
     ```bash
     export CUSTOM_API_KEY="your-key"
@@ -188,18 +195,18 @@ openclaw onboard --non-interactive \
       --gateway-bind loopback
     ```
 
-    In this mode, onboarding stores `apiKey` as `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`.
+    在此模式下，新手引导会将 `apiKey` 存储为 `{ source: "env", provider: "default", id: "CUSTOM_API_KEY" }`。
 
   </Accordion>
 </AccordionGroup>
 
-Anthropic setup-token remains available as a supported onboarding token path, but OpenClaw now prefers Claude CLI reuse when available.
-For production, prefer an Anthropic API key.
+Anthropic setup-token 仍然作为受支持的新手引导令牌路径可用，但 OpenClaw 现在在可用时更倾向于复用 Claude CLI。
+对于生产环境，优先使用 Anthropic API key。
 
-## Add another agent
+## 添加另一个智能体
 
-Use `openclaw agents add <name>` to create a separate agent with its own workspace,
-sessions, and auth profiles. Running without `--workspace` launches the wizard.
+使用 `openclaw agents add <name>` 创建一个独立的智能体，它拥有自己的工作区、
+会话和认证配置档案。不带 `--workspace` 运行会启动向导。
 
 ```bash
 openclaw agents add work \
@@ -210,20 +217,20 @@ openclaw agents add work \
   --json
 ```
 
-What it sets:
+它会设置：
 
 - `agents.list[].name`
 - `agents.list[].workspace`
 - `agents.list[].agentDir`
 
-Notes:
+说明：
 
-- Default workspaces follow `~/.openclaw/workspace-<agentId>`.
-- Add `bindings` to route inbound messages (the wizard can do this).
-- Non-interactive flags: `--model`, `--agent-dir`, `--bind`, `--non-interactive`.
+- 默认工作区遵循 `~/.openclaw/workspace-<agentId>`。
+- 添加 `bindings` 来路由传入消息（向导可以完成这件事）。
+- 非交互标志：`--model`、`--agent-dir`、`--bind`、`--non-interactive`。
 
-## Related docs
+## 相关文档
 
-- Onboarding hub: [Onboarding (CLI)](/start/wizard)
-- Full reference: [CLI Setup Reference](/start/wizard-cli-reference)
-- Command reference: [`openclaw onboard`](/cli/onboard)
+- 新手引导中心：[设置向导（CLI）](/zh-CN/start/wizard)
+- 完整参考：[CLI 设置参考](/zh-CN/start/wizard-cli-reference)
+- 命令参考：[`openclaw onboard`](/zh-CN/cli/onboard)

@@ -1,38 +1,39 @@
 ---
-summary: "Place outbound and accept inbound voice calls via Twilio, Telnyx, or Plivo, with optional realtime voice and streaming transcription"
 read_when:
-  - You want to place an outbound voice call from OpenClaw
-  - You are configuring or developing the voice-call plugin
-  - You need realtime voice or streaming transcription on telephony
-title: "Voice call plugin"
-sidebarTitle: "Voice call"
+    - 你想从 OpenClaw 发起一个外呼语音通话
+    - 你正在配置或开发语音通话插件
+    - 你需要在电话通信中使用实时语音或流式转录
+sidebarTitle: Voice call
+summary: 通过 Twilio、Telnyx 或 Plivo 发起外呼并接听来电，并可选择使用实时语音和流式转录
+title: 语音通话插件
+x-i18n:
+    generated_at: "2026-04-26T05:46:05Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 77b5e4b338b0c39c71accea7065af70fab695c8f34488ba0fbf7023f2f36f377
+    source_path: plugins/voice-call.md
+    workflow: 15
 ---
 
-Voice calls for OpenClaw via a plugin. Supports outbound notifications,
-multi-turn conversations, full-duplex realtime voice, streaming
-transcription, and inbound calls with allowlist policies.
+通过插件为 OpenClaw 提供语音通话。支持外呼通知、多轮对话、全双工实时语音、流式转录，以及带 allowlist 策略的来电接听。
 
-**Current providers:** `twilio` (Programmable Voice + Media Streams),
-`telnyx` (Call Control v2), `plivo` (Voice API + XML transfer + GetInput
-speech), `mock` (dev/no network).
+**当前提供商：** `twilio`（Programmable Voice + Media Streams）、`telnyx`（Call Control v2）、`plivo`（Voice API + XML transfer + GetInput speech）、`mock`（开发 / 无网络）。
 
 <Note>
-The Voice Call plugin runs **inside the Gateway process**. If you use a
-remote Gateway, install and configure the plugin on the machine running
-the Gateway, then restart the Gateway to load it.
+语音通话插件运行**在 Gateway 网关进程内部**。如果你使用远程 Gateway 网关，请在运行 Gateway 网关的机器上安装并配置该插件，然后重启 Gateway 网关以加载它。
 </Note>
 
-## Quick start
+## 快速开始
 
 <Steps>
-  <Step title="Install the plugin">
+  <Step title="安装插件">
     <Tabs>
-      <Tab title="From npm (recommended)">
+      <Tab title="从 npm 安装（推荐）">
         ```bash
         openclaw plugins install @openclaw/voice-call
         ```
       </Tab>
-      <Tab title="From a local folder (dev)">
+      <Tab title="从本地文件夹安装（开发）">
         ```bash
         PLUGIN_SRC=./path/to/local/voice-call-plugin
         openclaw plugins install "$PLUGIN_SRC"
@@ -41,34 +42,27 @@ the Gateway, then restart the Gateway to load it.
       </Tab>
     </Tabs>
 
-    Restart the Gateway afterwards so the plugin loads.
+    之后重启 Gateway 网关，使插件被加载。
 
   </Step>
-  <Step title="Configure provider and webhook">
-    Set config under `plugins.entries.voice-call.config` (see
-    [Configuration](#configuration) below for the full shape). At minimum:
-    `provider`, provider credentials, `fromNumber`, and a publicly
-    reachable webhook URL.
+  <Step title="配置提供商和 webhook">
+    在 `plugins.entries.voice-call.config` 下设置配置（完整结构见下方的[配置](#configuration)）。至少需要设置：`provider`、提供商凭证、`fromNumber`，以及一个可从公网访问的 webhook URL。
   </Step>
-  <Step title="Verify setup">
+  <Step title="验证设置">
     ```bash
     openclaw voicecall setup
     ```
 
-    The default output is readable in chat logs and terminals. It checks
-    plugin enablement, provider credentials, webhook exposure, and that
-    only one audio mode (`streaming` or `realtime`) is active. Use
-    `--json` for scripts.
+    默认输出在聊天日志和终端中都易于阅读。它会检查插件是否已启用、提供商凭证、webhook 暴露情况，以及是否只启用了一个音频模式（`streaming` 或 `realtime`）。脚本场景可使用 `--json`。
 
   </Step>
-  <Step title="Smoke test">
+  <Step title="冒烟测试">
     ```bash
     openclaw voicecall smoke
     openclaw voicecall smoke --to "+15555550123"
     ```
 
-    Both are dry runs by default. Add `--yes` to actually place a short
-    outbound notify call:
+    两者默认都是空跑。添加 `--yes` 可真正发起一次简短的外呼通知电话：
 
     ```bash
     openclaw voicecall smoke --to "+15555550123" --yes
@@ -78,18 +72,12 @@ the Gateway, then restart the Gateway to load it.
 </Steps>
 
 <Warning>
-For Twilio, Telnyx, and Plivo, setup must resolve to a **public webhook URL**.
-If `publicUrl`, the tunnel URL, the Tailscale URL, or the serve fallback
-resolves to loopback or private network space, setup fails instead of
-starting a provider that cannot receive carrier webhooks.
+对于 Twilio、Telnyx 和 Plivo，设置必须解析为一个**公网可访问的 webhook URL**。如果 `publicUrl`、隧道 URL、Tailscale URL 或 serve 回退地址解析为 loopback 或私有网络地址空间，设置将失败，而不是启动一个无法接收运营商 webhook 的提供商。
 </Warning>
 
-## Configuration
+## 配置
 
-If `enabled: true` but the selected provider is missing credentials,
-Gateway startup logs a setup-incomplete warning with the missing keys and
-skips starting the runtime. Commands, RPC calls, and agent tools still
-return the exact missing provider configuration when used.
+如果 `enabled: true`，但所选提供商缺少凭证，Gateway 网关启动日志会记录一条“设置未完成”警告，列出缺失的键，并跳过运行时启动。命令、RPC 调用和智能体工具在被使用时，仍会返回确切缺失的提供商配置。
 
 ```json5
 {
@@ -98,8 +86,8 @@ return the exact missing provider configuration when used.
       "voice-call": {
         enabled: true,
         config: {
-          provider: "twilio", // or "telnyx" | "plivo" | "mock"
-          fromNumber: "+15550001234", // or TWILIO_FROM_NUMBER for Twilio
+          provider: "twilio", // 或 "telnyx" | "plivo" | "mock"
+          fromNumber: "+15550001234", // 或者 Twilio 的 TWILIO_FROM_NUMBER
           toNumber: "+15550005678",
 
           twilio: {
@@ -109,8 +97,8 @@ return the exact missing provider configuration when used.
           telnyx: {
             apiKey: "...",
             connectionId: "...",
-            // Telnyx webhook public key from the Mission Control Portal
-            // (Base64; can also be set via TELNYX_PUBLIC_KEY).
+            // 来自 Mission Control Portal 的 Telnyx webhook 公钥
+            // （Base64；也可通过 TELNYX_PUBLIC_KEY 设置）。
             publicKey: "...",
           },
           plivo: {
@@ -118,19 +106,19 @@ return the exact missing provider configuration when used.
             authToken: "...",
           },
 
-          // Webhook server
+          // Webhook 服务器
           serve: {
             port: 3334,
             path: "/voice/webhook",
           },
 
-          // Webhook security (recommended for tunnels/proxies)
+          // Webhook 安全性（推荐用于隧道 / 代理）
           webhookSecurity: {
             allowedHosts: ["voice.example.com"],
             trustedProxyIPs: ["100.64.0.1"],
           },
 
-          // Public exposure (pick one)
+          // 公网暴露方式（任选一种）
           // publicUrl: "https://example.ngrok.app/voice/webhook",
           // tunnel: { provider: "ngrok" },
           // tailscale: { mode: "funnel", path: "/voice/webhook" },
@@ -139,8 +127,8 @@ return the exact missing provider configuration when used.
             defaultMode: "notify", // notify | conversation
           },
 
-          streaming: { enabled: true /* see Streaming transcription */ },
-          realtime: { enabled: false /* see Realtime voice */ },
+          streaming: { enabled: true /* 参见“流式转录” */ },
+          realtime: { enabled: false /* 参见“实时语音” */ },
         },
       },
     },
@@ -149,29 +137,25 @@ return the exact missing provider configuration when used.
 ```
 
 <AccordionGroup>
-  <Accordion title="Provider exposure and security notes">
-    - Twilio, Telnyx, and Plivo all require a **publicly reachable** webhook URL.
-    - `mock` is a local dev provider (no network calls).
-    - Telnyx requires `telnyx.publicKey` (or `TELNYX_PUBLIC_KEY`) unless `skipSignatureVerification` is true.
-    - `skipSignatureVerification` is for local testing only.
-    - On ngrok free tier, set `publicUrl` to the exact ngrok URL; signature verification is always enforced.
-    - `tunnel.allowNgrokFreeTierLoopbackBypass: true` allows Twilio webhooks with invalid signatures **only** when `tunnel.provider="ngrok"` and `serve.bind` is loopback (ngrok local agent). Local dev only.
-    - Ngrok free-tier URLs can change or add interstitial behaviour; if `publicUrl` drifts, Twilio signatures fail. Production: prefer a stable domain or a Tailscale funnel.
+  <Accordion title="提供商暴露与安全说明">
+    - Twilio、Telnyx 和 Plivo 都要求一个**公网可访问**的 webhook URL。
+    - `mock` 是本地开发提供商（不发起网络调用）。
+    - 除非 `skipSignatureVerification` 为 true，否则 Telnyx 要求设置 `telnyx.publicKey`（或 `TELNYX_PUBLIC_KEY`）。
+    - `skipSignatureVerification` 仅用于本地测试。
+    - 在 ngrok 免费套餐上，请将 `publicUrl` 设置为精确的 ngrok URL；签名校验始终会强制执行。
+    - `tunnel.allowNgrokFreeTierLoopbackBypass: true` 仅在 `tunnel.provider="ngrok"` 且 `serve.bind` 为 loopback（ngrok 本地代理）时，允许 Twilio webhook 使用无效签名。仅用于本地开发。
+    - Ngrok 免费套餐 URL 可能变化，或增加中间拦截行为；如果 `publicUrl` 漂移，Twilio 签名校验会失败。生产环境中，优先使用稳定域名或 Tailscale funnel。
   </Accordion>
-  <Accordion title="Streaming connection caps">
-    - `streaming.preStartTimeoutMs` closes sockets that never send a valid `start` frame.
-    - `streaming.maxPendingConnections` caps total unauthenticated pre-start sockets.
-    - `streaming.maxPendingConnectionsPerIp` caps unauthenticated pre-start sockets per source IP.
-    - `streaming.maxConnections` caps total open media stream sockets (pending + active).
+  <Accordion title="流式连接上限">
+    - `streaming.preStartTimeoutMs` 会关闭那些始终未发送有效 `start` 帧的套接字。
+    - `streaming.maxPendingConnections` 限制未经认证、启动前套接字的总数。
+    - `streaming.maxPendingConnectionsPerIp` 限制每个源 IP 未经认证、启动前套接字的数量。
+    - `streaming.maxConnections` 限制所有已打开媒体流套接字的总数（待启动 + 活跃）。
   </Accordion>
-  <Accordion title="Legacy config migrations">
-    Older configs using `provider: "log"`, `twilio.from`, or legacy
-    `streaming.*` OpenAI keys are rewritten by `openclaw doctor --fix`.
-    Runtime fallback still accepts the old voice-call keys for now, but
-    the rewrite path is `openclaw doctor --fix` and the compat shim is
-    temporary.
+  <Accordion title="旧版配置迁移">
+    旧配置中使用 `provider: "log"`、`twilio.from` 或旧版 `streaming.*` OpenAI 键名的情况，可通过 `openclaw doctor --fix` 重写。运行时回退当前仍接受旧的 voice-call 键，但推荐的重写路径是 `openclaw doctor --fix`，兼容垫片只是临时方案。
 
-    Auto-migrated streaming keys:
+    自动迁移的流式键名：
 
     - `streaming.sttProvider` → `streaming.provider`
     - `streaming.openaiApiKey` → `streaming.providers.openai.apiKey`
@@ -182,44 +166,39 @@ return the exact missing provider configuration when used.
   </Accordion>
 </AccordionGroup>
 
-## Realtime voice conversations
+## 实时语音对话
 
-`realtime` selects a full-duplex realtime voice provider for live call
-audio. It is separate from `streaming`, which only forwards audio to
-realtime transcription providers.
+`realtime` 选择一个用于实时通话音频的全双工实时语音提供商。它不同于 `streaming`，后者只会将音频转发给实时转录提供商。
 
 <Warning>
-`realtime.enabled` cannot be combined with `streaming.enabled`. Pick one
-audio mode per call.
+`realtime.enabled` 不能与 `streaming.enabled` 同时使用。每个通话只能选择一种音频模式。
 </Warning>
 
-Current runtime behaviour:
+当前运行时行为：
 
-- `realtime.enabled` is supported for Twilio Media Streams.
-- `realtime.provider` is optional. If unset, Voice Call uses the first registered realtime voice provider.
-- Bundled realtime voice providers: Google Gemini Live (`google`) and OpenAI (`openai`), registered by their provider plugins.
-- Provider-owned raw config lives under `realtime.providers.<providerId>`.
-- Voice Call exposes the shared `openclaw_agent_consult` realtime tool by default. The realtime model can call it when the caller asks for deeper reasoning, current information, or normal OpenClaw tools.
-- If `realtime.provider` points at an unregistered provider, or no realtime voice provider is registered at all, Voice Call logs a warning and skips realtime media instead of failing the whole plugin.
-- Consult session keys reuse the existing voice session when available, then fall back to the caller/callee phone number so follow-up consult calls keep context during the call.
+- `realtime.enabled` 支持用于 Twilio Media Streams。
+- `realtime.provider` 是可选项。如果未设置，语音通话将使用第一个已注册的实时语音提供商。
+- 内置实时语音提供商：Google Gemini Live（`google`）和 OpenAI（`openai`），由各自的提供商插件注册。
+- 提供商原始配置位于 `realtime.providers.<providerId>` 下。
+- 语音通话默认会暴露共享的 `openclaw_agent_consult` 实时工具。当来电者需要更深入的推理、当前信息或常规 OpenClaw 工具时，实时模型可以调用它。
+- 如果 `realtime.provider` 指向一个未注册的提供商，或根本没有注册任何实时语音提供商，语音通话会记录一条警告，并跳过实时媒体，而不是让整个插件失败。
+- consult 会话键会优先复用现有语音会话；如果不可用，则回退为来电 / 被叫电话号码，以便后续 consult 调用在通话期间保持上下文。
 
-### Tool policy
+### 工具策略
 
-`realtime.toolPolicy` controls the consult run:
+`realtime.toolPolicy` 控制 consult 运行：
 
-| Policy           | Behavior                                                                                                                                 |
+| 策略 | 行为 |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `safe-read-only` | Expose the consult tool and limit the regular agent to `read`, `web_search`, `web_fetch`, `x_search`, `memory_search`, and `memory_get`. |
-| `owner`          | Expose the consult tool and let the regular agent use the normal agent tool policy.                                                      |
-| `none`           | Do not expose the consult tool. Custom `realtime.tools` are still passed through to the realtime provider.                               |
+| `safe-read-only` | 暴露 consult 工具，并将常规智能体限制为 `read`、`web_search`、`web_fetch`、`x_search`、`memory_search` 和 `memory_get`。 |
+| `owner` | 暴露 consult 工具，并允许常规智能体使用普通的智能体工具策略。 |
+| `none` | 不暴露 consult 工具。自定义 `realtime.tools` 仍会透传给实时提供商。 |
 
-### Realtime provider examples
+### 实时提供商示例
 
 <Tabs>
   <Tab title="Google Gemini Live">
-    Defaults: API key from `realtime.providers.google.apiKey`,
-    `GEMINI_API_KEY`, or `GOOGLE_GENERATIVE_AI_API_KEY`; model
-    `gemini-2.5-flash-native-audio-preview-12-2025`; voice `Kore`.
+    默认值：API 密钥来自 `realtime.providers.google.apiKey`、`GEMINI_API_KEY` 或 `GOOGLE_GENERATIVE_AI_API_KEY`；模型为 `gemini-2.5-flash-native-audio-preview-12-2025`；语音为 `Kore`。
 
     ```json5
     {
@@ -233,7 +212,7 @@ Current runtime behaviour:
               realtime: {
                 enabled: true,
                 provider: "google",
-                instructions: "Speak briefly. Call openclaw_agent_consult before using deeper tools.",
+                instructions: "简短回答。使用更深入的工具前先调用 openclaw_agent_consult。",
                 toolPolicy: "safe-read-only",
                 providers: {
                   google: {
@@ -274,28 +253,24 @@ Current runtime behaviour:
   </Tab>
 </Tabs>
 
-See [Google provider](/providers/google) and
-[OpenAI provider](/providers/openai) for provider-specific realtime voice
-options.
+有关提供商特定的实时语音选项，请参见 [Google provider](/zh-CN/providers/google) 和 [OpenAI provider](/zh-CN/providers/openai)。
 
-## Streaming transcription
+## 流式转录
 
-`streaming` selects a realtime transcription provider for live call audio.
+`streaming` 选择一个用于实时通话音频的实时转录提供商。
 
-Current runtime behavior:
+当前运行时行为：
 
-- `streaming.provider` is optional. If unset, Voice Call uses the first registered realtime transcription provider.
-- Bundled realtime transcription providers: Deepgram (`deepgram`), ElevenLabs (`elevenlabs`), Mistral (`mistral`), OpenAI (`openai`), and xAI (`xai`), registered by their provider plugins.
-- Provider-owned raw config lives under `streaming.providers.<providerId>`.
-- If `streaming.provider` points at an unregistered provider, or none is registered, Voice Call logs a warning and skips media streaming instead of failing the whole plugin.
+- `streaming.provider` 是可选项。如果未设置，语音通话将使用第一个已注册的实时转录提供商。
+- 内置实时转录提供商：Deepgram（`deepgram`）、ElevenLabs（`elevenlabs`）、Mistral（`mistral`）、OpenAI（`openai`）和 xAI（`xai`），由各自的提供商插件注册。
+- 提供商原始配置位于 `streaming.providers.<providerId>` 下。
+- 如果 `streaming.provider` 指向一个未注册的提供商，或根本没有注册任何提供商，语音通话会记录一条警告，并跳过媒体流传输，而不是让整个插件失败。
 
-### Streaming provider examples
+### 流式提供商示例
 
 <Tabs>
   <Tab title="OpenAI">
-    Defaults: API key `streaming.providers.openai.apiKey` or
-    `OPENAI_API_KEY`; model `gpt-4o-transcribe`; `silenceDurationMs: 800`;
-    `vadThreshold: 0.5`.
+    默认值：API 密钥为 `streaming.providers.openai.apiKey` 或 `OPENAI_API_KEY`；模型为 `gpt-4o-transcribe`；`silenceDurationMs: 800`；`vadThreshold: 0.5`。
 
     ```json5
     {
@@ -309,7 +284,7 @@ Current runtime behavior:
                 streamPath: "/voice/stream",
                 providers: {
                   openai: {
-                    apiKey: "sk-...", // optional if OPENAI_API_KEY is set
+                    apiKey: "sk-...", // 如果已设置 OPENAI_API_KEY，则可选
                     model: "gpt-4o-transcribe",
                     silenceDurationMs: 800,
                     vadThreshold: 0.5,
@@ -325,9 +300,7 @@ Current runtime behavior:
 
   </Tab>
   <Tab title="xAI">
-    Defaults: API key `streaming.providers.xai.apiKey` or `XAI_API_KEY`;
-    endpoint `wss://api.x.ai/v1/stt`; encoding `mulaw`; sample rate `8000`;
-    `endpointingMs: 800`; `interimResults: true`.
+    默认值：API 密钥为 `streaming.providers.xai.apiKey` 或 `XAI_API_KEY`；端点为 `wss://api.x.ai/v1/stt`；编码为 `mulaw`；采样率为 `8000`；`endpointingMs: 800`；`interimResults: true`。
 
     ```json5
     {
@@ -341,7 +314,7 @@ Current runtime behavior:
                 streamPath: "/voice/stream",
                 providers: {
                   xai: {
-                    apiKey: "${XAI_API_KEY}", // optional if XAI_API_KEY is set
+                    apiKey: "${XAI_API_KEY}", // 如果已设置 XAI_API_KEY，则可选
                     endpointingMs: 800,
                     language: "en",
                   },
@@ -357,11 +330,9 @@ Current runtime behavior:
   </Tab>
 </Tabs>
 
-## TTS for calls
+## 通话的 TTS
 
-Voice Call uses the core `messages.tts` configuration for streaming
-speech on calls. You can override it under the plugin config with the
-**same shape** — it deep-merges with `messages.tts`.
+语音通话在通话中使用核心 `messages.tts` 配置来进行流式语音播放。你可以在插件配置下用**相同的结构**覆盖它——它会与 `messages.tts` 深度合并。
 
 ```json5
 {
@@ -378,22 +349,21 @@ speech on calls. You can override it under the plugin config with the
 ```
 
 <Warning>
-**Microsoft speech is ignored for voice calls.** Telephony audio needs PCM;
-the current Microsoft transport does not expose telephony PCM output.
+**语音通话会忽略 Microsoft speech。** 电话音频需要 PCM；当前的 Microsoft 传输不提供电话所需的 PCM 输出。
 </Warning>
 
-Behavior notes:
+行为说明：
 
-- Legacy `tts.<provider>` keys inside plugin config (`openai`, `elevenlabs`, `microsoft`, `edge`) are repaired by `openclaw doctor --fix`; committed config should use `tts.providers.<provider>`.
-- Core TTS is used when Twilio media streaming is enabled; otherwise calls fall back to provider-native voices.
-- If a Twilio media stream is already active, Voice Call does not fall back to TwiML `<Say>`. If telephony TTS is unavailable in that state, the playback request fails instead of mixing two playback paths.
-- When telephony TTS falls back to a secondary provider, Voice Call logs a warning with the provider chain (`from`, `to`, `attempts`) for debugging.
-- When Twilio barge-in or stream teardown clears the pending TTS queue, queued playback requests settle instead of hanging callers awaiting playback completion.
+- 插件配置中的旧版 `tts.<provider>` 键（`openai`、`elevenlabs`、`microsoft`、`edge`）会由 `openclaw doctor --fix` 修复；提交的配置应使用 `tts.providers.<provider>`。
+- 当启用了 Twilio 媒体流时，会使用核心 TTS；否则通话会回退到提供商原生语音。
+- 如果 Twilio 媒体流已处于活动状态，语音通话不会回退到 TwiML `<Say>`。如果该状态下电话 TTS 不可用，播放请求会失败，而不是混用两种播放路径。
+- 当电话 TTS 回退到次级提供商时，语音通话会记录一条包含提供商链（`from`、`to`、`attempts`）的警告，便于调试。
+- 当 Twilio barge-in 或流关闭清空待处理的 TTS 队列时，排队中的播放请求会结束，而不会让等待播放完成的来电者一直挂起。
 
-### TTS examples
+### TTS 示例
 
 <Tabs>
-  <Tab title="Core TTS only">
+  <Tab title="仅核心 TTS">
 ```json5
 {
   messages: {
@@ -407,7 +377,7 @@ Behavior notes:
 }
 ```
   </Tab>
-  <Tab title="Override to ElevenLabs (calls only)">
+  <Tab title="覆盖为 ElevenLabs（仅通话）">
 ```json5
 {
   plugins: {
@@ -431,7 +401,7 @@ Behavior notes:
 }
 ```
   </Tab>
-  <Tab title="OpenAI model override (deep-merge)">
+  <Tab title="OpenAI 模型覆盖（深度合并）">
 ```json5
 {
   plugins: {
@@ -455,77 +425,65 @@ Behavior notes:
   </Tab>
 </Tabs>
 
-## Inbound calls
+## 来电
 
-Inbound policy defaults to `disabled`. To enable inbound calls, set:
+来电策略默认是 `disabled`。要启用来电，请设置：
 
 ```json5
 {
   inboundPolicy: "allowlist",
   allowFrom: ["+15550001234"],
-  inboundGreeting: "Hello! How can I help?",
+  inboundGreeting: "你好！我能帮你什么？",
 }
 ```
 
 <Warning>
-`inboundPolicy: "allowlist"` is a low-assurance caller-ID screen. The
-plugin normalizes the provider-supplied `From` value and compares it to
-`allowFrom`. Webhook verification authenticates provider delivery and
-payload integrity, but it does **not** prove PSTN/VoIP caller-number
-ownership. Treat `allowFrom` as caller-ID filtering, not strong caller
-identity.
+`inboundPolicy: "allowlist"` 是一种低保障的主叫号码筛选。插件会对提供商给出的 `From` 值进行标准化，并将其与 `allowFrom` 进行比较。Webhook 验证能够认证提供商投递及负载完整性，但它**不能**证明 PSTN/VoIP 主叫号码的实际所有权。应将 `allowFrom` 视为主叫号码过滤，而不是强主叫身份认证。
 </Warning>
 
-Auto-responses use the agent system. Tune with `responseModel`,
-`responseSystemPrompt`, and `responseTimeoutMs`.
+自动回复使用智能体系统。可通过 `responseModel`、`responseSystemPrompt` 和 `responseTimeoutMs` 进行调优。
 
-### Spoken output contract
+### 口语化输出约定
 
-For auto-responses, Voice Call appends a strict spoken-output contract to
-the system prompt:
+对于自动回复，语音通话会向系统提示追加一个严格的口语化输出约定：
 
 ```text
 {"spoken":"..."}
 ```
 
-Voice Call extracts speech text defensively:
+语音通话会以防御性方式提取语音文本：
 
-- Ignores payloads marked as reasoning/error content.
-- Parses direct JSON, fenced JSON, or inline `"spoken"` keys.
-- Falls back to plain text and removes likely planning/meta lead-in paragraphs.
+- 忽略被标记为推理 / 错误内容的负载。
+- 解析直接 JSON、围栏 JSON 或内联 `"spoken"` 键。
+- 回退为纯文本，并移除可能属于规划 / 元信息引导的前导段落。
 
-This keeps spoken playback focused on caller-facing text and avoids
-leaking planning text into audio.
+这样可以让播放语音聚焦于面向来电者的文本，并避免将规划文本泄露到音频中。
 
-### Conversation startup behavior
+### 对话启动行为
 
-For outbound `conversation` calls, first-message handling is tied to live
-playback state:
+对于外呼 `conversation` 通话，首条消息处理与实时播放状态绑定：
 
-- Barge-in queue clear and auto-response are suppressed only while the initial greeting is actively speaking.
-- If initial playback fails, the call returns to `listening` and the initial message remains queued for retry.
-- Initial playback for Twilio streaming starts on stream connect without extra delay.
-- Barge-in aborts active playback and clears queued-but-not-yet-playing Twilio TTS entries. Cleared entries resolve as skipped, so follow-up response logic can continue without waiting on audio that will never play.
-- Realtime voice conversations use the realtime stream's own opening turn. Voice Call does **not** post a legacy `<Say>` TwiML update for that initial message, so outbound `<Connect><Stream>` sessions stay attached.
+- 只有在初始问候语正在主动播放时，才会抑制 barge-in 队列清理和自动回复。
+- 如果初始播放失败，通话会返回 `listening`，初始消息会保留在队列中以便重试。
+- 对于 Twilio 流式传输，初始播放会在流连接建立时立即开始，无额外延迟。
+- Barge-in 会中止当前播放，并清空已排队但尚未播放的 Twilio TTS 条目。被清空的条目会以已跳过状态结束，因此后续回复逻辑可以继续，而无需等待那些永远不会播放的音频。
+- 实时语音对话使用实时流自己的开场轮次。语音通话**不会**为该初始消息发送旧版 `<Say>` TwiML 更新，因此外呼 `<Connect><Stream>` 会话会保持连接。
 
-### Twilio stream disconnect grace
+### Twilio 流断开宽限期
 
-When a Twilio media stream disconnects, Voice Call waits **2000 ms** before
-auto-ending the call:
+当 Twilio 媒体流断开时，语音通话会等待 **2000 ms** 后再自动结束通话：
 
-- If the stream reconnects during that window, auto-end is canceled.
-- If no stream re-registers after the grace period, the call is ended to prevent stuck active calls.
+- 如果流在该时间窗口内重新连接，将取消自动结束。
+- 如果宽限期过后仍没有流重新注册，则会结束通话，以防出现卡住的活动通话。
 
-## Stale call reaper
+## 过期通话清理器
 
-Use `staleCallReaperSeconds` to end calls that never receive a terminal
-webhook (for example, notify-mode calls that never complete). The default
-is `0` (disabled).
+使用 `staleCallReaperSeconds` 结束那些始终未收到终态 webhook 的通话（例如始终未完成的 notify 模式通话）。默认值是 `0`（禁用）。
 
-Recommended ranges:
+推荐范围：
 
-- **Production:** `120`–`300` seconds for notify-style flows.
-- Keep this value **higher than `maxDurationSeconds`** so normal calls can finish. A good starting point is `maxDurationSeconds + 30–60` seconds.
+- **生产环境：** notify 风格流程建议设为 `120`–`300` 秒。
+- 保持该值**高于 `maxDurationSeconds`**，以便正常通话可以完成。一个好的起始值是 `maxDurationSeconds + 30–60` 秒。
 
 ```json5
 {
@@ -542,30 +500,28 @@ Recommended ranges:
 }
 ```
 
-## Webhook security
+## Webhook 安全性
 
-When a proxy or tunnel sits in front of the Gateway, the plugin
-reconstructs the public URL for signature verification. These options
-control which forwarded headers are trusted:
+当前面有代理或隧道位于 Gateway 网关之前时，插件会重建用于签名校验的公网 URL。以下选项控制信任哪些转发头：
 
 <ParamField path="webhookSecurity.allowedHosts" type="string[]">
-  Allowlist hosts from forwarding headers.
+  来自转发头的 allowlist 主机名。
 </ParamField>
 <ParamField path="webhookSecurity.trustForwardingHeaders" type="boolean">
-  Trust forwarded headers without an allowlist.
+  在没有 allowlist 的情况下信任转发头。
 </ParamField>
 <ParamField path="webhookSecurity.trustedProxyIPs" type="string[]">
-  Only trust forwarded headers when the request remote IP matches the list.
+  仅当请求的远端 IP 匹配列表时，才信任转发头。
 </ParamField>
 
-Additional protections:
+附加保护：
 
-- Webhook **replay protection** is enabled for Twilio and Plivo. Replayed valid webhook requests are acknowledged but skipped for side effects.
-- Twilio conversation turns include a per-turn token in `<Gather>` callbacks, so stale/replayed speech callbacks cannot satisfy a newer pending transcript turn.
-- Unauthenticated webhook requests are rejected before body reads when the provider's required signature headers are missing.
-- The voice-call webhook uses the shared pre-auth body profile (64 KB / 5 seconds) plus a per-IP in-flight cap before signature verification.
+- 针对 Twilio 和 Plivo，已启用 webhook **重放保护**。被重放的有效 webhook 请求会收到确认，但会跳过副作用处理。
+- Twilio 对话轮次在 `<Gather>` 回调中包含每轮 token，因此过期 / 重放的语音回调无法满足较新的待处理转录轮次。
+- 当缺少提供商要求的签名头时，未认证的 webhook 请求会在读取请求体之前被拒绝。
+- voice-call webhook 在签名校验前使用共享的预认证请求体配置（64 KB / 5 秒），并施加每个 IP 的进行中请求上限。
 
-Example with a stable public host:
+使用稳定公网主机的示例：
 
 ```json5
 {
@@ -587,28 +543,26 @@ Example with a stable public host:
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall start --to "+15555550123"   # alias for call
-openclaw voicecall continue --call-id <id> --message "Any questions?"
-openclaw voicecall speak --call-id <id> --message "One moment"
+openclaw voicecall call --to "+15555550123" --message "来自 OpenClaw 的问候"
+openclaw voicecall start --to "+15555550123"   # call 的别名
+openclaw voicecall continue --call-id <id> --message "还有什么问题吗？"
+openclaw voicecall speak --call-id <id> --message "请稍等"
 openclaw voicecall dtmf --call-id <id> --digits "ww123456#"
 openclaw voicecall end --call-id <id>
 openclaw voicecall status --call-id <id>
 openclaw voicecall tail
-openclaw voicecall latency                      # summarize turn latency from logs
+openclaw voicecall latency                      # 从日志汇总轮次延迟
 openclaw voicecall expose --mode funnel
 ```
 
-`latency` reads `calls.jsonl` from the default voice-call storage path.
-Use `--file <path>` to point at a different log and `--last <n>` to limit
-analysis to the last N records (default 200). Output includes p50/p90/p99
-for turn latency and listen-wait times.
+`latency` 会从默认的 voice-call 存储路径读取 `calls.jsonl`。
+使用 `--file <path>` 可指向其他日志文件，使用 `--last <n>` 可将分析限制为最近 N 条记录（默认 200）。输出包括轮次延迟和监听等待时间的 p50/p90/p99。
 
-## Agent tool
+## 智能体工具
 
-Tool name: `voice_call`.
+工具名称：`voice_call`。
 
-| Action          | Args                      |
+| 操作 | 参数 |
 | --------------- | ------------------------- |
 | `initiate_call` | `message`, `to?`, `mode?` |
 | `continue_call` | `callId`, `message`       |
@@ -617,11 +571,11 @@ Tool name: `voice_call`.
 | `end_call`      | `callId`                  |
 | `get_status`    | `callId`                  |
 
-This repo ships a matching skill doc at `skills/voice-call/SKILL.md`.
+此仓库附带对应的技能文档：`skills/voice-call/SKILL.md`。
 
-## Gateway RPC
+## Gateway 网关 RPC
 
-| Method               | Args                      |
+| 方法 | 参数 |
 | -------------------- | ------------------------- |
 | `voicecall.initiate` | `to?`, `message`, `mode?` |
 | `voicecall.continue` | `callId`, `message`       |
@@ -630,8 +584,8 @@ This repo ships a matching skill doc at `skills/voice-call/SKILL.md`.
 | `voicecall.end`      | `callId`                  |
 | `voicecall.status`   | `callId`                  |
 
-## Related
+## 相关内容
 
-- [Talk mode](/nodes/talk)
-- [Text-to-speech](/tools/tts)
-- [Voice wake](/nodes/voicewake)
+- [Talk mode](/zh-CN/nodes/talk)
+- [Text-to-speech](/zh-CN/tools/tts)
+- [Voice wake](/zh-CN/nodes/voicewake)

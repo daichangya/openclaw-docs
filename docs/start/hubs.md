@@ -1,202 +1,209 @@
 ---
-summary: "Hubs that link to every OpenClaw doc"
 read_when:
-  - You want a complete map of the documentation
-title: "Docs hubs"
+    - 你想要一份完整的文档地图
+summary: 链接到所有 OpenClaw 文档的中心页
+title: 文档中心页
+x-i18n:
+    generated_at: "2026-04-24T17:31:33Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: db591029047b57e65141c5992760a81b838580602b1073e94d1bc2690415c0aa
+    source_path: start/hubs.md
+    workflow: 15
 ---
 
 <Note>
-If you are new to OpenClaw, start with [Getting Started](/start/getting-started).
+如果你刚开始使用 OpenClaw，请先从 [入门指南](/zh-CN/start/getting-started) 开始。
 </Note>
 
-Use these hubs to discover every page, including deep dives and reference docs that don’t appear in the left nav.
+使用这些中心页来发现每一页文档，包括左侧导航中未显示的深度解析和参考文档。
 
-## Start here
+## 从这里开始
 
-- [Index](/)
-- [Getting Started](/start/getting-started)
-- [Onboarding](/start/onboarding)
-- [Onboarding (CLI)](/start/wizard)
-- [Setup](/start/setup)
-- [Dashboard (local Gateway)](http://127.0.0.1:18789/)
-- [Help](/help)
-- [Docs directory](/start/docs-directory)
-- [Configuration](/gateway/configuration)
-- [Configuration examples](/gateway/configuration-examples)
-- [OpenClaw assistant](/start/openclaw)
-- [Showcase](/start/showcase)
-- [Lore](/start/lore)
+- [索引](/zh-CN)
+- [入门指南](/zh-CN/start/getting-started)
+- [新手引导](/zh-CN/start/onboarding)
+- [新手引导（CLI）](/zh-CN/start/wizard)
+- [设置](/zh-CN/start/setup)
+- [Dashboard（本地 Gateway 网关）](http://127.0.0.1:18789/)
+- [帮助](/zh-CN/help)
+- [文档目录](/zh-CN/start/docs-directory)
+- [配置](/zh-CN/gateway/configuration)
+- [配置示例](/zh-CN/gateway/configuration-examples)
+- [OpenClaw 助手](/zh-CN/start/openclaw)
+- [展示](/zh-CN/start/showcase)
+- [设定](/zh-CN/start/lore)
 
-## Installation + updates
+## 安装 + 更新
 
-- [Docker](/install/docker)
-- [Nix](/install/nix)
-- [Updating / rollback](/install/updating)
-- [Bun workflow (experimental)](/install/bun)
+- [Docker](/zh-CN/install/docker)
+- [Nix](/zh-CN/install/nix)
+- [更新 / 回滚](/zh-CN/install/updating)
+- [Bun 工作流（实验性）](/zh-CN/install/bun)
 
-## Core concepts
+## 核心概念
 
-- [Architecture](/concepts/architecture)
-- [Features](/concepts/features)
-- [Network hub](/network)
-- [Agent runtime](/concepts/agent)
-- [Agent workspace](/concepts/agent-workspace)
-- [Memory](/concepts/memory)
-- [Agent loop](/concepts/agent-loop)
-- [Streaming + chunking](/concepts/streaming)
-- [Multi-agent routing](/concepts/multi-agent)
-- [Compaction](/concepts/compaction)
-- [Sessions](/concepts/session)
-- [Session pruning](/concepts/session-pruning)
-- [Session tools](/concepts/session-tool)
-- [Queue](/concepts/queue)
-- [Slash commands](/tools/slash-commands)
-- [RPC adapters](/reference/rpc)
-- [TypeBox schemas](/concepts/typebox)
-- [Timezone handling](/concepts/timezone)
-- [Presence](/concepts/presence)
-- [Discovery + transports](/gateway/discovery)
-- [Bonjour](/gateway/bonjour)
-- [Channel routing](/channels/channel-routing)
-- [Groups](/channels/groups)
-- [Group messages](/channels/group-messages)
-- [Model failover](/concepts/model-failover)
-- [OAuth](/concepts/oauth)
+- [架构](/zh-CN/concepts/architecture)
+- [功能](/zh-CN/concepts/features)
+- [网络中心](/zh-CN/network)
+- [智能体运行时](/zh-CN/concepts/agent)
+- [智能体工作区](/zh-CN/concepts/agent-workspace)
+- [记忆](/zh-CN/concepts/memory)
+- [智能体循环](/zh-CN/concepts/agent-loop)
+- [流式传输 + 分块](/zh-CN/concepts/streaming)
+- [多智能体路由](/zh-CN/concepts/multi-agent)
+- [压缩](/zh-CN/concepts/compaction)
+- [会话](/zh-CN/concepts/session)
+- [会话裁剪](/zh-CN/concepts/session-pruning)
+- [会话工具](/zh-CN/concepts/session-tool)
+- [队列](/zh-CN/concepts/queue)
+- [斜杠命令](/zh-CN/tools/slash-commands)
+- [RPC 适配器](/zh-CN/reference/rpc)
+- [TypeBox 模式](/zh-CN/concepts/typebox)
+- [时区处理](/zh-CN/concepts/timezone)
+- [在线状态](/zh-CN/concepts/presence)
+- [设备发现 + 传输协议](/zh-CN/gateway/discovery)
+- [Bonjour](/zh-CN/gateway/bonjour)
+- [渠道路由](/zh-CN/channels/channel-routing)
+- [群组](/zh-CN/channels/groups)
+- [群组消息](/zh-CN/channels/group-messages)
+- [模型故障切换](/zh-CN/concepts/model-failover)
+- [OAuth](/zh-CN/concepts/oauth)
 
-## Providers + ingress
+## 提供商 + 接入
 
-- [Chat channels hub](/channels)
-- [Model providers hub](/providers/models)
-- [WhatsApp](/channels/whatsapp)
-- [Telegram](/channels/telegram)
-- [Slack](/channels/slack)
-- [Discord](/channels/discord)
-- [Mattermost](/channels/mattermost)
-- [Signal](/channels/signal)
-- [BlueBubbles (iMessage)](/channels/bluebubbles)
-- [QQ Bot](/channels/qqbot)
-- [iMessage (legacy)](/channels/imessage)
-- [Location parsing](/channels/location)
-- [WebChat](/web/webchat)
-- [Webhooks](/automation/cron-jobs#webhooks)
-- [Gmail Pub/Sub](/automation/cron-jobs#gmail-pubsub-integration)
+- [聊天渠道中心](/zh-CN/channels)
+- [模型提供商中心](/zh-CN/providers/models)
+- [WhatsApp](/zh-CN/channels/whatsapp)
+- [Telegram](/zh-CN/channels/telegram)
+- [Slack](/zh-CN/channels/slack)
+- [Discord](/zh-CN/channels/discord)
+- [Mattermost](/zh-CN/channels/mattermost)
+- [Signal](/zh-CN/channels/signal)
+- [BlueBubbles（iMessage）](/zh-CN/channels/bluebubbles)
+- [QQ Bot](/zh-CN/channels/qqbot)
+- [iMessage（旧版）](/zh-CN/channels/imessage)
+- [位置解析](/zh-CN/channels/location)
+- [WebChat](/zh-CN/web/webchat)
+- [Webhooks](/zh-CN/automation/cron-jobs#webhooks)
+- [Gmail Pub/Sub](/zh-CN/automation/cron-jobs#gmail-pubsub-integration)
 
-## Gateway + operations
+## Gateway 网关 + 运维
 
-- [Gateway runbook](/gateway)
-- [Network model](/gateway/network-model)
-- [Gateway pairing](/gateway/pairing)
-- [Gateway lock](/gateway/gateway-lock)
-- [Background process](/gateway/background-process)
-- [Health](/gateway/health)
-- [Heartbeat](/gateway/heartbeat)
-- [Doctor](/gateway/doctor)
-- [Logging](/gateway/logging)
-- [Sandboxing](/gateway/sandboxing)
-- [Dashboard](/web/dashboard)
-- [Control UI](/web/control-ui)
-- [Remote access](/gateway/remote)
-- [Remote gateway README](/gateway/remote-gateway-readme)
-- [Tailscale](/gateway/tailscale)
-- [Security](/gateway/security)
-- [Troubleshooting](/gateway/troubleshooting)
+- [Gateway 网关运行手册](/zh-CN/gateway)
+- [网络模型](/zh-CN/gateway/network-model)
+- [Gateway 网关配对](/zh-CN/gateway/pairing)
+- [Gateway 网关锁](/zh-CN/gateway/gateway-lock)
+- [后台进程](/zh-CN/gateway/background-process)
+- [健康状态](/zh-CN/gateway/health)
+- [心跳](/zh-CN/gateway/heartbeat)
+- [Doctor](/zh-CN/gateway/doctor)
+- [日志](/zh-CN/gateway/logging)
+- [沙箱隔离](/zh-CN/gateway/sandboxing)
+- [Dashboard](/zh-CN/web/dashboard)
+- [控制 UI](/zh-CN/web/control-ui)
+- [远程访问](/zh-CN/gateway/remote)
+- [远程 Gateway 网关 README](/zh-CN/gateway/remote-gateway-readme)
+- [Tailscale](/zh-CN/gateway/tailscale)
+- [安全](/zh-CN/gateway/security)
+- [故障排除](/zh-CN/gateway/troubleshooting)
 
-## Tools + automation
+## 工具 + 自动化
 
-- [Tools surface](/tools)
-- [OpenProse](/prose)
-- [CLI reference](/cli)
-- [Exec tool](/tools/exec)
-- [PDF tool](/tools/pdf)
-- [Elevated mode](/tools/elevated)
-- [Cron jobs](/automation/cron-jobs)
-- [Automation & Tasks](/automation)
-- [Thinking + verbose](/tools/thinking)
-- [Models](/concepts/models)
-- [Sub-agents](/tools/subagents)
-- [Agent send CLI](/tools/agent-send)
-- [Terminal UI](/web/tui)
-- [Browser control](/tools/browser)
-- [Browser (Linux troubleshooting)](/tools/browser-linux-troubleshooting)
-- [Polls](/cli/message)
+- [工具总览](/zh-CN/tools)
+- [OpenProse](/zh-CN/prose)
+- [CLI 参考](/zh-CN/cli)
+- [Exec 工具](/zh-CN/tools/exec)
+- [PDF 工具](/zh-CN/tools/pdf)
+- [提升模式](/zh-CN/tools/elevated)
+- [Cron 作业](/zh-CN/automation/cron-jobs)
+- [自动化与任务](/zh-CN/automation)
+- [思考 + 详细输出](/zh-CN/tools/thinking)
+- [模型](/zh-CN/concepts/models)
+- [子智能体](/zh-CN/tools/subagents)
+- [智能体发送 CLI](/zh-CN/tools/agent-send)
+- [终端 UI](/zh-CN/web/tui)
+- [浏览器控制](/zh-CN/tools/browser)
+- [浏览器（Linux 故障排除）](/zh-CN/tools/browser-linux-troubleshooting)
+- [投票](/zh-CN/cli/message)
 
-## Nodes, media, voice
+## 节点、媒体、语音
 
-- [Nodes overview](/nodes)
-- [Camera](/nodes/camera)
-- [Images](/nodes/images)
-- [Audio](/nodes/audio)
-- [Location command](/nodes/location-command)
-- [Voice wake](/nodes/voicewake)
-- [Talk mode](/nodes/talk)
+- [节点概览](/zh-CN/nodes)
+- [相机](/zh-CN/nodes/camera)
+- [图像](/zh-CN/nodes/images)
+- [音频](/zh-CN/nodes/audio)
+- [位置命令](/zh-CN/nodes/location-command)
+- [语音唤醒](/zh-CN/nodes/voicewake)
+- [对话模式](/zh-CN/nodes/talk)
 
-## Platforms
+## 平台
 
-- [Platforms overview](/platforms)
-- [macOS](/platforms/macos)
-- [iOS](/platforms/ios)
-- [Android](/platforms/android)
-- [Windows (WSL2)](/platforms/windows)
-- [Linux](/platforms/linux)
-- [Web surfaces](/web)
+- [平台概览](/zh-CN/platforms)
+- [macOS](/zh-CN/platforms/macos)
+- [iOS](/zh-CN/platforms/ios)
+- [Android](/zh-CN/platforms/android)
+- [Windows（WSL2）](/zh-CN/platforms/windows)
+- [Linux](/zh-CN/platforms/linux)
+- [Web 界面](/zh-CN/web)
 
-## macOS companion app (advanced)
+## macOS 配套应用（高级）
 
-- [macOS dev setup](/platforms/mac/dev-setup)
-- [macOS menu bar](/platforms/mac/menu-bar)
-- [macOS voice wake](/platforms/mac/voicewake)
-- [macOS voice overlay](/platforms/mac/voice-overlay)
-- [macOS WebChat](/platforms/mac/webchat)
-- [macOS Canvas](/platforms/mac/canvas)
-- [macOS child process](/platforms/mac/child-process)
-- [macOS health](/platforms/mac/health)
-- [macOS icon](/platforms/mac/icon)
-- [macOS logging](/platforms/mac/logging)
-- [macOS permissions](/platforms/mac/permissions)
-- [macOS remote](/platforms/mac/remote)
-- [macOS signing](/platforms/mac/signing)
-- [macOS gateway (launchd)](/platforms/mac/bundled-gateway)
-- [macOS XPC](/platforms/mac/xpc)
-- [macOS skills](/platforms/mac/skills)
-- [macOS Peekaboo](/platforms/mac/peekaboo)
+- [macOS 开发设置](/zh-CN/platforms/mac/dev-setup)
+- [macOS 菜单栏](/zh-CN/platforms/mac/menu-bar)
+- [macOS 语音唤醒](/zh-CN/platforms/mac/voicewake)
+- [macOS 语音浮层](/zh-CN/platforms/mac/voice-overlay)
+- [macOS WebChat](/zh-CN/platforms/mac/webchat)
+- [macOS Canvas](/zh-CN/platforms/mac/canvas)
+- [macOS 子进程](/zh-CN/platforms/mac/child-process)
+- [macOS 健康状态](/zh-CN/platforms/mac/health)
+- [macOS 图标](/zh-CN/platforms/mac/icon)
+- [macOS 日志](/zh-CN/platforms/mac/logging)
+- [macOS 权限](/zh-CN/platforms/mac/permissions)
+- [macOS 远程访问](/zh-CN/platforms/mac/remote)
+- [macOS 签名](/zh-CN/platforms/mac/signing)
+- [macOS Gateway 网关（launchd）](/zh-CN/platforms/mac/bundled-gateway)
+- [macOS XPC](/zh-CN/platforms/mac/xpc)
+- [macOS Skills](/zh-CN/platforms/mac/skills)
+- [macOS Peekaboo](/zh-CN/platforms/mac/peekaboo)
 
-## Plugins
+## 插件
 
-- [Plugins overview](/tools/plugin)
-- [Building plugins](/plugins/building-plugins)
-- [Plugin hooks](/plugins/hooks)
-- [Plugin manifest](/plugins/manifest)
-- [Agent tools](/plugins/building-plugins#registering-agent-tools)
-- [Plugin bundles](/plugins/bundles)
-- [Community plugins](/plugins/community)
-- [Capability cookbook](/tools/capability-cookbook)
-- [Voice call plugin](/plugins/voice-call)
-- [Zalo user plugin](/plugins/zalouser)
+- [插件概览](/zh-CN/tools/plugin)
+- [构建插件](/zh-CN/plugins/building-plugins)
+- [插件钩子](/zh-CN/plugins/hooks)
+- [插件清单](/zh-CN/plugins/manifest)
+- [智能体工具](/zh-CN/plugins/building-plugins#registering-agent-tools)
+- [插件包](/zh-CN/plugins/bundles)
+- [社区插件](/zh-CN/plugins/community)
+- [能力扩展手册](/zh-CN/plugins/architecture)
+- [语音通话插件](/zh-CN/plugins/voice-call)
+- [Zalo 用户插件](/zh-CN/plugins/zalouser)
 
-## Workspace + templates
+## 工作区 + 模板
 
-- [Skills](/tools/skills)
-- [ClawHub](/tools/clawhub)
-- [Skills config](/tools/skills-config)
-- [Default AGENTS](/reference/AGENTS.default)
-- [Templates: AGENTS](/reference/templates/AGENTS)
-- [Templates: BOOTSTRAP](/reference/templates/BOOTSTRAP)
-- [Templates: HEARTBEAT](/reference/templates/HEARTBEAT)
-- [Templates: IDENTITY](/reference/templates/IDENTITY)
-- [Templates: SOUL](/reference/templates/SOUL)
-- [Templates: TOOLS](/reference/templates/TOOLS)
-- [Templates: USER](/reference/templates/USER)
+- [Skills](/zh-CN/tools/skills)
+- [ClawHub](/zh-CN/tools/clawhub)
+- [Skills 配置](/zh-CN/tools/skills-config)
+- [默认 AGENTS](/zh-CN/reference/AGENTS.default)
+- [模板：AGENTS](/zh-CN/reference/templates/AGENTS)
+- [模板：BOOTSTRAP](/zh-CN/reference/templates/BOOTSTRAP)
+- [模板：HEARTBEAT](/zh-CN/reference/templates/HEARTBEAT)
+- [模板：IDENTITY](/zh-CN/reference/templates/IDENTITY)
+- [模板：SOUL](/zh-CN/reference/templates/SOUL)
+- [模板：TOOLS](/zh-CN/reference/templates/TOOLS)
+- [模板：USER](/zh-CN/reference/templates/USER)
 
-## Project
+## 项目
 
-- [Credits](/reference/credits)
+- [致谢](/zh-CN/reference/credits)
 
-## Testing + release
+## 测试 + 发布
 
-- [Testing](/reference/test)
-- [Release policy](/reference/RELEASING)
-- [Device models](/reference/device-models)
+- [测试](/zh-CN/reference/test)
+- [发布策略](/zh-CN/reference/RELEASING)
+- [设备型号](/zh-CN/reference/device-models)
 
-## Related
+## 相关内容
 
-- [Getting started](/start/getting-started)
+- [入门指南](/zh-CN/start/getting-started)

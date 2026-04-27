@@ -1,30 +1,37 @@
 ---
-summary: "Broadcast a WhatsApp message to multiple agents"
 read_when:
-  - Configuring broadcast groups
-  - Debugging multi-agent replies in WhatsApp
+    - 配置广播组
+    - 在 WhatsApp 中调试多智能体回复
+sidebarTitle: Broadcast groups
 status: experimental
-title: "Broadcast groups"
-sidebarTitle: "Broadcast groups"
+summary: 将 WhatsApp 消息广播给多个智能体
+title: 广播组
+x-i18n:
+    generated_at: "2026-04-26T09:05:34Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: b7b36710d9cc3eb4e2b8ba3d57031bd020aedbb6a502b400ec02a835a320d609
+    source_path: channels/broadcast-groups.md
+    workflow: 15
 ---
 
 <Note>
-**Status:** Experimental. Added in 2026.1.9.
+**Status：** 实验性功能。新增于 2026.1.9。
 </Note>
 
-## Overview
+## 概览
 
-Broadcast Groups enable multiple agents to process and respond to the same message simultaneously. This allows you to create specialized agent teams that work together in a single WhatsApp group or DM — all using one phone number.
+广播组允许多个智能体同时处理并响应同一条消息。这样你就可以创建协同工作的专业化智能体团队，在同一个 WhatsApp 群组或私信中一起工作——而且只使用一个电话号码。
 
-Current scope: **WhatsApp only** (web channel).
+当前范围：**仅支持 WhatsApp**（web 渠道）。
 
-Broadcast groups are evaluated after channel allowlists and group activation rules. In WhatsApp groups, this means broadcasts happen when OpenClaw would normally reply (for example: on mention, depending on your group settings).
+广播组会在渠道 allowlist 和群组激活规则之后进行评估。在 WhatsApp 群组中，这意味着只有在 OpenClaw 原本会回复时才会触发广播（例如：根据你的群组设置，在被提及时）。
 
-## Use cases
+## 使用场景
 
 <AccordionGroup>
-  <Accordion title="1. Specialized agent teams">
-    Deploy multiple agents with atomic, focused responsibilities:
+  <Accordion title="1. 专业化智能体团队">
+    部署多个职责原子化且聚焦明确的智能体：
 
     ```
     Group: "Development Team"
@@ -35,10 +42,10 @@ Broadcast groups are evaluated after channel allowlists and group activation rul
       - TestGenerator (suggests test cases)
     ```
 
-    Each agent processes the same message and provides its specialized perspective.
+    每个智能体都会处理同一条消息，并提供自己专业领域的视角。
 
   </Accordion>
-  <Accordion title="2. Multi-language support">
+  <Accordion title="2. 多语言支持">
     ```
     Group: "International Support"
     Agents:
@@ -47,7 +54,7 @@ Broadcast groups are evaluated after channel allowlists and group activation rul
       - Agent_ES (responds in Spanish)
     ```
   </Accordion>
-  <Accordion title="3. Quality assurance workflows">
+  <Accordion title="3. 质量保证工作流">
     ```
     Group: "Customer Support"
     Agents:
@@ -55,7 +62,7 @@ Broadcast groups are evaluated after channel allowlists and group activation rul
       - QAAgent (reviews quality, only responds if issues found)
     ```
   </Accordion>
-  <Accordion title="4. Task automation">
+  <Accordion title="4. 任务自动化">
     ```
     Group: "Project Management"
     Agents:
@@ -66,14 +73,14 @@ Broadcast groups are evaluated after channel allowlists and group activation rul
   </Accordion>
 </AccordionGroup>
 
-## Configuration
+## 配置
 
-### Basic setup
+### 基本设置
 
-Add a top-level `broadcast` section (next to `bindings`). Keys are WhatsApp peer ids:
+添加一个顶层 `broadcast` 部分（与 `bindings` 同级）。键是 WhatsApp peer id：
 
-- group chats: group JID (e.g. `120363403215116621@g.us`)
-- DMs: E.164 phone number (e.g. `+15551234567`)
+- 群聊：群组 JID（例如 `120363403215116621@g.us`）
+- 私信：E.164 电话号码（例如 `+15551234567`）
 
 ```json
 {
@@ -83,15 +90,15 @@ Add a top-level `broadcast` section (next to `bindings`). Keys are WhatsApp peer
 }
 ```
 
-**Result:** When OpenClaw would reply in this chat, it will run all three agents.
+**结果：** 当 OpenClaw 在这个聊天中原本会回复时，它将运行这三个智能体。
 
-### Processing strategy
+### 处理策略
 
-Control how agents process messages:
+控制智能体如何处理消息：
 
 <Tabs>
   <Tab title="parallel (default)">
-    All agents process simultaneously:
+    所有智能体同时处理：
 
     ```json
     {
@@ -104,7 +111,7 @@ Control how agents process messages:
 
   </Tab>
   <Tab title="sequential">
-    Agents process in order (one waits for previous to finish):
+    智能体按顺序处理（一个会等待前一个完成）：
 
     ```json
     {
@@ -118,7 +125,7 @@ Control how agents process messages:
   </Tab>
 </Tabs>
 
-### Complete example
+### 完整示例
 
 ```json
 {
@@ -153,52 +160,52 @@ Control how agents process messages:
 }
 ```
 
-## How it works
+## 工作原理
 
-### Message flow
+### 消息流
 
 <Steps>
-  <Step title="Incoming message arrives">
-    A WhatsApp group or DM message arrives.
+  <Step title="收到传入消息">
+    收到一条 WhatsApp 群组或私信消息。
   </Step>
-  <Step title="Broadcast check">
-    System checks if peer ID is in `broadcast`.
+  <Step title="广播检查">
+    系统检查 peer ID 是否在 `broadcast` 中。
   </Step>
-  <Step title="If in broadcast list">
-    - All listed agents process the message.
-    - Each agent has its own session key and isolated context.
-    - Agents process in parallel (default) or sequentially.
+  <Step title="如果在广播列表中">
+    - 所有列出的智能体都会处理这条消息。
+    - 每个智能体都有自己的会话键和隔离上下文。
+    - 智能体会以并行（默认）或串行方式处理。
   </Step>
-  <Step title="If not in broadcast list">
-    Normal routing applies (first matching binding).
+  <Step title="如果不在广播列表中">
+    应用正常路由规则（第一个匹配的绑定）。
   </Step>
 </Steps>
 
 <Note>
-Broadcast groups do not bypass channel allowlists or group activation rules (mentions/commands/etc). They only change _which agents run_ when a message is eligible for processing.
+广播组不会绕过渠道 allowlist 或群组激活规则（提及 / 命令 / 等）。它们只会改变当一条消息符合处理条件时，_由哪些智能体运行_。
 </Note>
 
-### Session isolation
+### 会话隔离
 
-Each agent in a broadcast group maintains completely separate:
+广播组中的每个智能体都会维护完全独立的以下内容：
 
-- **Session keys** (`agent:alfred:whatsapp:group:120363...` vs `agent:baerbel:whatsapp:group:120363...`)
-- **Conversation history** (agent doesn't see other agents' messages)
-- **Workspace** (separate sandboxes if configured)
-- **Tool access** (different allow/deny lists)
-- **Memory/context** (separate IDENTITY.md, SOUL.md, etc.)
-- **Group context buffer** (recent group messages used for context) is shared per peer, so all broadcast agents see the same context when triggered
+- **会话键**（`agent:alfred:whatsapp:group:120363...` vs `agent:baerbel:whatsapp:group:120363...`）
+- **对话历史**（智能体看不到其他智能体的消息）
+- **工作区**（如果已配置，则使用独立沙箱）
+- **工具访问权限**（不同的允许 / 拒绝列表）
+- **记忆 / 上下文**（独立的 `IDENTITY.md`、`SOUL.md` 等）
+- **群组上下文缓冲区**（用于上下文的近期群组消息）按 peer 共享，因此所有广播智能体在触发时都能看到相同上下文
 
-This allows each agent to have:
+这让每个智能体都可以拥有：
 
-- Different personalities
-- Different tool access (e.g., read-only vs. read-write)
-- Different models (e.g., opus vs. sonnet)
-- Different skills installed
+- 不同的人格
+- 不同的工具访问权限（例如，只读 vs. 读写）
+- 不同的模型（例如，opus vs. sonnet）
+- 安装不同的 Skills
 
-### Example: isolated sessions
+### 示例：隔离会话
 
-In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
+在群组 `120363403215116621@g.us` 中，智能体为 `["alfred", "baerbel"]`：
 
 <Tabs>
   <Tab title="Alfred's context">
@@ -219,11 +226,11 @@ In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
   </Tab>
 </Tabs>
 
-## Best practices
+## 最佳实践
 
 <AccordionGroup>
-  <Accordion title="1. Keep agents focused">
-    Design each agent with a single, clear responsibility:
+  <Accordion title="1. 保持智能体职责聚焦">
+    为每个智能体设计单一、明确的职责：
 
     ```json
     {
@@ -233,11 +240,11 @@ In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
     }
     ```
 
-    ✅ **Good:** Each agent has one job. ❌ **Bad:** One generic "dev-helper" agent.
+    ✅ **推荐：** 每个智能体只做一项工作。❌ **不推荐：** 使用一个通用的“dev-helper”智能体。
 
   </Accordion>
-  <Accordion title="2. Use descriptive names">
-    Make it clear what each agent does:
+  <Accordion title="2. 使用描述性名称">
+    让每个智能体的作用一目了然：
 
     ```json
     {
@@ -250,33 +257,33 @@ In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
     ```
 
   </Accordion>
-  <Accordion title="3. Configure different tool access">
-    Give agents only the tools they need:
+  <Accordion title="3. 配置不同的工具访问权限">
+    只给智能体分配它们需要的工具：
 
     ```json
     {
       "agents": {
         "reviewer": {
-          "tools": { "allow": ["read", "exec"] } // Read-only
+          "tools": { "allow": ["read", "exec"] } // 只读
         },
         "fixer": {
-          "tools": { "allow": ["read", "write", "edit", "exec"] } // Read-write
+          "tools": { "allow": ["read", "write", "edit", "exec"] } // 读写
         }
       }
     }
     ```
 
   </Accordion>
-  <Accordion title="4. Monitor performance">
-    With many agents, consider:
+  <Accordion title="4. 监控性能">
+    当智能体较多时，请考虑：
 
-    - Using `"strategy": "parallel"` (default) for speed
-    - Limiting broadcast groups to 5-10 agents
-    - Using faster models for simpler agents
+    - 为了速度使用 `"strategy": "parallel"`（默认）
+    - 将每个广播组的智能体数量限制在 5–10 个
+    - 为较简单的智能体使用更快的模型
 
   </Accordion>
-  <Accordion title="5. Handle failures gracefully">
-    Agents fail independently. One agent's error doesn't block others:
+  <Accordion title="5. 优雅地处理失败">
+    智能体会独立失败。一个智能体出错不会阻塞其他智能体：
 
     ```
     Message → [Agent A ✓, Agent B ✗ error, Agent C ✓]
@@ -286,20 +293,20 @@ In group `120363403215116621@g.us` with agents `["alfred", "baerbel"]`:
   </Accordion>
 </AccordionGroup>
 
-## Compatibility
+## 兼容性
 
-### Providers
+### 提供商
 
-Broadcast groups currently work with:
+广播组当前可用于：
 
-- ✅ WhatsApp (implemented)
-- 🚧 Telegram (planned)
-- 🚧 Discord (planned)
-- 🚧 Slack (planned)
+- ✅ WhatsApp（已实现）
+- 🚧 Telegram（计划中）
+- 🚧 Discord（计划中）
+- 🚧 Slack（计划中）
 
-### Routing
+### 路由
 
-Broadcast groups work alongside existing routing:
+广播组可与现有路由机制同时使用：
 
 ```json
 {
@@ -315,50 +322,50 @@ Broadcast groups work alongside existing routing:
 }
 ```
 
-- `GROUP_A`: Only alfred responds (normal routing).
-- `GROUP_B`: agent1 AND agent2 respond (broadcast).
+- `GROUP_A`：只有 alfred 回复（正常路由）。
+- `GROUP_B`：agent1 和 agent2 都会回复（广播）。
 
 <Note>
-**Precedence:** `broadcast` takes priority over `bindings`.
+**优先级：** `broadcast` 的优先级高于 `bindings`。
 </Note>
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
-  <Accordion title="Agents not responding">
-    **Check:**
+  <Accordion title="智能体没有响应">
+    **检查：**
 
-    1. Agent IDs exist in `agents.list`.
-    2. Peer ID format is correct (e.g., `120363403215116621@g.us`).
-    3. Agents are not in deny lists.
+    1. 智能体 ID 存在于 `agents.list` 中。
+    2. Peer ID 格式正确（例如 `120363403215116621@g.us`）。
+    3. 智能体不在拒绝列表中。
 
-    **Debug:**
+    **调试：**
 
     ```bash
     tail -f ~/.openclaw/logs/gateway.log | grep broadcast
     ```
 
   </Accordion>
-  <Accordion title="Only one agent responding">
-    **Cause:** Peer ID might be in `bindings` but not `broadcast`.
+  <Accordion title="只有一个智能体响应">
+    **原因：** Peer ID 可能在 `bindings` 中，但不在 `broadcast` 中。
 
-    **Fix:** Add to broadcast config or remove from bindings.
+    **修复：** 将其添加到广播配置中，或从 bindings 中移除。
 
   </Accordion>
-  <Accordion title="Performance issues">
-    If slow with many agents:
+  <Accordion title="性能问题">
+    如果在有很多智能体时运行缓慢：
 
-    - Reduce number of agents per group.
-    - Use lighter models (sonnet instead of opus).
-    - Check sandbox startup time.
+    - 减少每个群组中的智能体数量。
+    - 使用更轻量的模型（用 sonnet 代替 opus）。
+    - 检查沙箱启动时间。
 
   </Accordion>
 </AccordionGroup>
 
-## Examples
+## 示例
 
 <AccordionGroup>
-  <Accordion title="Example 1: Code review team">
+  <Accordion title="示例 1：代码审查团队">
     ```json
     {
       "broadcast": {
@@ -393,17 +400,17 @@ Broadcast groups work alongside existing routing:
     }
     ```
 
-    **User sends:** Code snippet.
+    **用户发送：** 代码片段。
 
-    **Responses:**
+    **回复：**
 
-    - code-formatter: "Fixed indentation and added type hints"
-    - security-scanner: "⚠️ SQL injection vulnerability in line 12"
-    - test-coverage: "Coverage is 45%, missing tests for error cases"
-    - docs-checker: "Missing docstring for function `process_data`"
+    - code-formatter：“已修复缩进并添加类型提示”
+    - security-scanner：“⚠️ 第 12 行存在 SQL 注入漏洞”
+    - test-coverage：“覆盖率为 45%，缺少错误场景的测试”
+    - docs-checker：“函数 `process_data` 缺少文档字符串”
 
   </Accordion>
-  <Accordion title="Example 2: Multi-language support">
+  <Accordion title="示例 2：多语言支持">
     ```json
     {
       "broadcast": {
@@ -422,9 +429,9 @@ Broadcast groups work alongside existing routing:
   </Accordion>
 </AccordionGroup>
 
-## API reference
+## API 参考
 
-### Config schema
+### 配置 schema
 
 ```typescript
 interface OpenClawConfig {
@@ -435,35 +442,35 @@ interface OpenClawConfig {
 }
 ```
 
-### Fields
+### 字段
 
 <ParamField path="strategy" type='"parallel" | "sequential"' default='"parallel"'>
-  How to process agents. `parallel` runs all agents simultaneously; `sequential` runs them in array order.
+  指定智能体的处理方式。`parallel` 会同时运行所有智能体；`sequential` 会按数组顺序运行它们。
 </ParamField>
 <ParamField path="[peerId]" type="string[]">
-  WhatsApp group JID, E.164 number, or other peer ID. Value is the array of agent IDs that should process messages.
+  WhatsApp 群组 JID、E.164 号码或其他 peer ID。值是应处理消息的智能体 ID 数组。
 </ParamField>
 
-## Limitations
+## 限制
 
-1. **Max agents:** No hard limit, but 10+ agents may be slow.
-2. **Shared context:** Agents don't see each other's responses (by design).
-3. **Message ordering:** Parallel responses may arrive in any order.
-4. **Rate limits:** All agents count toward WhatsApp rate limits.
+1. **最大智能体数量：** 没有硬性上限，但 10 个以上智能体可能会较慢。
+2. **共享上下文：** 智能体看不到彼此的回复（这是设计如此）。
+3. **消息顺序：** 并行回复可能以任意顺序到达。
+4. **速率限制：** 所有智能体的请求都会计入 WhatsApp 的速率限制。
 
-## Future enhancements
+## 未来增强
 
-Planned features:
+计划中的功能：
 
-- [ ] Shared context mode (agents see each other's responses)
-- [ ] Agent coordination (agents can signal each other)
-- [ ] Dynamic agent selection (choose agents based on message content)
-- [ ] Agent priorities (some agents respond before others)
+- [ ] 共享上下文模式（智能体可以看到彼此的回复）
+- [ ] 智能体协调（智能体可以互相发送信号）
+- [ ] 动态选择智能体（根据消息内容选择智能体）
+- [ ] 智能体优先级（某些智能体先于其他智能体回复）
 
-## Related
+## 相关内容
 
-- [Channel routing](/channels/channel-routing)
-- [Groups](/channels/groups)
-- [Multi-agent sandbox tools](/tools/multi-agent-sandbox-tools)
-- [Pairing](/channels/pairing)
-- [Session management](/concepts/session)
+- [渠道路由](/zh-CN/channels/channel-routing)
+- [群组](/zh-CN/channels/groups)
+- [多智能体沙箱工具](/zh-CN/tools/multi-agent-sandbox-tools)
+- [配对](/zh-CN/channels/pairing)
+- [会话管理](/zh-CN/concepts/session)

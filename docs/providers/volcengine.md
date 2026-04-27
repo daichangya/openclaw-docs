@@ -1,38 +1,42 @@
 ---
-summary: "Volcano Engine setup (Doubao models, coding endpoints, and Seed Speech TTS)"
-title: "Volcengine (Doubao)"
 read_when:
-  - You want to use Volcano Engine or Doubao models with OpenClaw
-  - You need the Volcengine API key setup
-  - You want to use Volcengine Speech text-to-speech
+    - 你想在 OpenClaw 中使用火山引擎或 Doubao 模型
+    - 你需要设置 Volcengine API 密钥
+    - 你想使用 Volcengine Speech 文本转语音功能
+summary: Volcano Engine 设置（Doubao 模型、编码端点和 Seed Speech TTS）
+title: 火山引擎（Doubao）
+x-i18n:
+    generated_at: "2026-04-25T22:53:00Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: b7948a26cc898e125d445e9ae091704f5cf442266d29e712c0dcedbe0dc0cce7
+    source_path: providers/volcengine.md
+    workflow: 15
 ---
 
-The Volcengine provider gives access to Doubao models and third-party models
-hosted on Volcano Engine, with separate endpoints for general and coding
-workloads. The same bundled plugin can also register Volcengine Speech as a TTS
-provider.
+Volcengine 提供商可访问托管在火山引擎上的 Doubao 模型和第三方模型，并为通用工作负载和编码工作负载提供独立端点。同一个内置插件还可以将 Volcengine Speech 注册为 TTS 提供商。
 
-| Detail     | Value                                                      |
+| 详情 | 值 |
 | ---------- | ---------------------------------------------------------- |
-| Providers  | `volcengine` (general + TTS) + `volcengine-plan` (coding)  |
-| Model auth | `VOLCANO_ENGINE_API_KEY`                                   |
-| TTS auth   | `VOLCENGINE_TTS_API_KEY` or `BYTEPLUS_SEED_SPEECH_API_KEY` |
-| API        | OpenAI-compatible models, BytePlus Seed Speech TTS         |
+| 提供商 | `volcengine`（通用 + TTS）+ `volcengine-plan`（编码） |
+| 模型凭证 | `VOLCANO_ENGINE_API_KEY` |
+| TTS 凭证 | `VOLCENGINE_TTS_API_KEY` 或 `BYTEPLUS_SEED_SPEECH_API_KEY` |
+| API | 与 OpenAI 兼容的模型，BytePlus Seed Speech TTS |
 
-## Getting started
+## 入门指南
 
 <Steps>
-  <Step title="Set the API key">
-    Run interactive onboarding:
+  <Step title="设置 API 密钥">
+    运行交互式新手引导：
 
     ```bash
     openclaw onboard --auth-choice volcengine-api-key
     ```
 
-    This registers both the general (`volcengine`) and coding (`volcengine-plan`) providers from a single API key.
+    这会使用同一个 API 密钥同时注册通用提供商（`volcengine`）和编码提供商（`volcengine-plan`）。
 
   </Step>
-  <Step title="Set a default model">
+  <Step title="设置默认模型">
     ```json5
     {
       agents: {
@@ -43,7 +47,7 @@ provider.
     }
     ```
   </Step>
-  <Step title="Verify the model is available">
+  <Step title="验证模型可用">
     ```bash
     openclaw models list --provider volcengine
     openclaw models list --provider volcengine-plan
@@ -52,7 +56,7 @@ provider.
 </Steps>
 
 <Tip>
-For non-interactive setup (CI, scripting), pass the key directly:
+对于非交互式设置（CI、脚本），可直接传入密钥：
 
 ```bash
 openclaw onboard --non-interactive \
@@ -63,53 +67,51 @@ openclaw onboard --non-interactive \
 
 </Tip>
 
-## Providers and endpoints
+## 提供商和端点
 
-| Provider          | Endpoint                                  | Use case       |
+| 提供商 | 端点 | 用例 |
 | ----------------- | ----------------------------------------- | -------------- |
-| `volcengine`      | `ark.cn-beijing.volces.com/api/v3`        | General models |
-| `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | Coding models  |
+| `volcengine` | `ark.cn-beijing.volces.com/api/v3` | 通用模型 |
+| `volcengine-plan` | `ark.cn-beijing.volces.com/api/coding/v3` | 编码模型 |
 
 <Note>
-Both providers are configured from a single API key. Setup registers both automatically.
+这两个提供商都通过同一个 API 密钥进行配置。设置时会自动同时注册两者。
 </Note>
 
-## Built-in catalog
+## 内置目录
 
 <Tabs>
-  <Tab title="General (volcengine)">
-    | Model ref                                    | Name                            | Input       | Context |
+  <Tab title="通用（volcengine）">
+    | 模型引用 | 名称 | 输入 | 上下文 |
     | -------------------------------------------- | ------------------------------- | ----------- | ------- |
-    | `volcengine/doubao-seed-1-8-251228`          | Doubao Seed 1.8                 | text, image | 256,000 |
-    | `volcengine/doubao-seed-code-preview-251028` | doubao-seed-code-preview-251028 | text, image | 256,000 |
-    | `volcengine/kimi-k2-5-260127`                | Kimi K2.5                       | text, image | 256,000 |
-    | `volcengine/glm-4-7-251222`                  | GLM 4.7                         | text, image | 200,000 |
-    | `volcengine/deepseek-v3-2-251201`            | DeepSeek V3.2                   | text, image | 128,000 |
+    | `volcengine/doubao-seed-1-8-251228` | Doubao Seed 1.8 | 文本、图像 | 256,000 |
+    | `volcengine/doubao-seed-code-preview-251028` | doubao-seed-code-preview-251028 | 文本、图像 | 256,000 |
+    | `volcengine/kimi-k2-5-260127` | Kimi K2.5 | 文本、图像 | 256,000 |
+    | `volcengine/glm-4-7-251222` | GLM 4.7 | 文本、图像 | 200,000 |
+    | `volcengine/deepseek-v3-2-251201` | DeepSeek V3.2 | 文本、图像 | 128,000 |
   </Tab>
-  <Tab title="Coding (volcengine-plan)">
-    | Model ref                                         | Name                     | Input | Context |
+  <Tab title="编码（volcengine-plan）">
+    | 模型引用 | 名称 | 输入 | 上下文 |
     | ------------------------------------------------- | ------------------------ | ----- | ------- |
-    | `volcengine-plan/ark-code-latest`                 | Ark Coding Plan          | text  | 256,000 |
-    | `volcengine-plan/doubao-seed-code`                | Doubao Seed Code         | text  | 256,000 |
-    | `volcengine-plan/glm-4.7`                         | GLM 4.7 Coding           | text  | 200,000 |
-    | `volcengine-plan/kimi-k2-thinking`                | Kimi K2 Thinking         | text  | 256,000 |
-    | `volcengine-plan/kimi-k2.5`                       | Kimi K2.5 Coding         | text  | 256,000 |
-    | `volcengine-plan/doubao-seed-code-preview-251028` | Doubao Seed Code Preview | text  | 256,000 |
+    | `volcengine-plan/ark-code-latest` | Ark Coding Plan | 文本 | 256,000 |
+    | `volcengine-plan/doubao-seed-code` | Doubao Seed Code | 文本 | 256,000 |
+    | `volcengine-plan/glm-4.7` | GLM 4.7 Coding | 文本 | 200,000 |
+    | `volcengine-plan/kimi-k2-thinking` | Kimi K2 Thinking | 文本 | 256,000 |
+    | `volcengine-plan/kimi-k2.5` | Kimi K2.5 Coding | 文本 | 256,000 |
+    | `volcengine-plan/doubao-seed-code-preview-251028` | Doubao Seed Code Preview | 文本 | 256,000 |
   </Tab>
 </Tabs>
 
-## Text-to-speech
+## 文本转语音
 
-Volcengine TTS uses the BytePlus Seed Speech HTTP API and is configured
-separately from the OpenAI-compatible Doubao model API key. In the BytePlus
-console, open Seed Speech > Settings > API Keys and copy the API key, then set:
+Volcengine TTS 使用 BytePlus Seed Speech HTTP API，并且与兼容 OpenAI 的 Doubao 模型 API 密钥分开配置。在 BytePlus 控制台中，打开 Seed Speech > Settings > API Keys，复制 API 密钥，然后设置：
 
 ```bash
 export VOLCENGINE_TTS_API_KEY="byteplus_seed_speech_api_key"
 export VOLCENGINE_TTS_RESOURCE_ID="seed-tts-1.0"
 ```
 
-Then enable it in `openclaw.json`:
+然后在 `openclaw.json` 中启用它：
 
 ```json5
 {
@@ -129,21 +131,15 @@ Then enable it in `openclaw.json`:
 }
 ```
 
-For voice-note targets, OpenClaw asks Volcengine for provider-native
-`ogg_opus`. For normal audio attachments, it asks for `mp3`. Provider aliases
-`bytedance` and `doubao` also resolve to the same speech provider.
+对于语音便笺目标，OpenClaw 会向 Volcengine 请求提供商原生的 `ogg_opus`。对于普通音频附件，则会请求 `mp3`。提供商别名 `bytedance` 和 `doubao` 也会解析到同一个语音提供商。
 
-The default resource id is `seed-tts-1.0` because that is what BytePlus grants
-to newly created Seed Speech API keys in the default project. If your project
-has TTS 2.0 entitlement, set `VOLCENGINE_TTS_RESOURCE_ID=seed-tts-2.0`.
+默认资源 ID 是 `seed-tts-1.0`，因为 BytePlus 会将它授予默认项目中新创建的 Seed Speech API 密钥。如果你的项目具有 TTS 2.0 权限，请设置 `VOLCENGINE_TTS_RESOURCE_ID=seed-tts-2.0`。
 
 <Warning>
-`VOLCANO_ENGINE_API_KEY` is for the ModelArk/Doubao model endpoints and is not a
-Seed Speech API key. TTS needs a Seed Speech API key from the BytePlus Speech
-Console, or a legacy Speech Console AppID/token pair.
+`VOLCANO_ENGINE_API_KEY` 用于 ModelArk/Doubao 模型端点，并不是 Seed Speech API 密钥。TTS 需要来自 BytePlus Speech Console 的 Seed Speech API 密钥，或者旧版 Speech Console AppID/token 对。
 </Warning>
 
-Legacy AppID/token auth remains supported for older Speech Console applications:
+旧版 AppID/token 凭证方式仍然支持较早的 Speech Console 应用：
 
 ```bash
 export VOLCENGINE_TTS_APPID="speech_app_id"
@@ -151,49 +147,46 @@ export VOLCENGINE_TTS_TOKEN="speech_access_token"
 export VOLCENGINE_TTS_CLUSTER="volcano_tts"
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Default model after onboarding">
-    `openclaw onboard --auth-choice volcengine-api-key` currently sets
-    `volcengine-plan/ark-code-latest` as the default model while also registering
-    the general `volcengine` catalog.
+  <Accordion title="新手引导后的默认模型">
+    `openclaw onboard --auth-choice volcengine-api-key` 目前会将
+    `volcengine-plan/ark-code-latest` 设置为默认模型，同时也会注册通用的 `volcengine` 目录。
   </Accordion>
 
-  <Accordion title="Model picker fallback behavior">
-    During onboarding/configure model selection, the Volcengine auth choice prefers
-    both `volcengine/*` and `volcengine-plan/*` rows. If those models are not
-    loaded yet, OpenClaw falls back to the unfiltered catalog instead of showing an
-    empty provider-scoped picker.
+  <Accordion title="模型选择器回退行为">
+    在新手引导/配置模型选择期间，Volcengine 凭证选项会优先选择
+    `volcengine/*` 和 `volcengine-plan/*` 两类条目。如果这些模型尚未加载，
+    OpenClaw 会回退到未筛选的目录，而不是显示一个空的按提供商范围筛选的选择器。
   </Accordion>
 
-  <Accordion title="Environment variables for daemon processes">
-    If the Gateway runs as a daemon (launchd/systemd), make sure model and TTS
-    env vars such as `VOLCANO_ENGINE_API_KEY`, `VOLCENGINE_TTS_API_KEY`,
-    `BYTEPLUS_SEED_SPEECH_API_KEY`, `VOLCENGINE_TTS_APPID`, and
-    `VOLCENGINE_TTS_TOKEN` are available to that process (for example, in
-    `~/.openclaw/.env` or via `env.shellEnv`).
+  <Accordion title="守护进程的环境变量">
+    如果 Gateway 网关 以守护进程方式运行（launchd/systemd），请确保模型和 TTS
+    环境变量（如 `VOLCANO_ENGINE_API_KEY`、`VOLCENGINE_TTS_API_KEY`、
+    `BYTEPLUS_SEED_SPEECH_API_KEY`、`VOLCENGINE_TTS_APPID` 和
+    `VOLCENGINE_TTS_TOKEN`）对该进程可用（例如在
+    `~/.openclaw/.env` 中，或通过 `env.shellEnv` 提供）。
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-When running OpenClaw as a background service, environment variables set in your
-interactive shell are not automatically inherited. See the daemon note above.
+当 OpenClaw 作为后台服务运行时，你在交互式 shell 中设置的环境变量不会自动被继承。参见上面的守护进程说明。
 </Warning>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障转移行为。
   </Card>
-  <Card title="Configuration" href="/gateway/configuration" icon="gear">
-    Full config reference for agents, models, and providers.
+  <Card title="配置" href="/zh-CN/gateway/configuration" icon="gear">
+    智能体、模型和提供商的完整配置参考。
   </Card>
-  <Card title="Troubleshooting" href="/help/troubleshooting" icon="wrench">
-    Common issues and debugging steps.
+  <Card title="故障排除" href="/zh-CN/help/troubleshooting" icon="wrench">
+    常见问题和调试步骤。
   </Card>
-  <Card title="FAQ" href="/help/faq" icon="circle-question">
-    Frequently asked questions about OpenClaw setup.
+  <Card title="常见问题" href="/zh-CN/help/faq" icon="circle-question">
+    关于 OpenClaw 设置的常见问题解答。
   </Card>
 </CardGroup>

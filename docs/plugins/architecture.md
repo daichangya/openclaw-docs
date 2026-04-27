@@ -1,181 +1,188 @@
 ---
-summary: "Plugin internals: capability model, ownership, contracts, load pipeline, and runtime helpers"
 read_when:
-  - Building or debugging native OpenClaw plugins
-  - Understanding the plugin capability model or ownership boundaries
-  - Working on the plugin load pipeline or registry
-  - Implementing provider runtime hooks or channel plugins
-title: "Plugin internals"
-sidebarTitle: "Internals"
+    - 构建或调试原生 OpenClaw 插件
+    - 理解插件能力模型或归属边界
+    - 处理插件加载管线或注册表
+    - 实现提供商运行时钩子或渠道插件
+sidebarTitle: Internals
+summary: 插件内部机制：能力模型、归属、契约、加载管线和运行时辅助工具
+title: 插件架构内部机制
+x-i18n:
+    generated_at: "2026-04-26T07:50:09Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 16664d284a8bfbfcb9914bb012d1f36dfdd60406636d6bf4b011f76e886cb518
+    source_path: plugins/architecture.md
+    workflow: 15
 ---
 
-This is the **deep architecture reference** for the OpenClaw plugin system. For practical guides, start with one of the focused pages below.
+这是 OpenClaw 插件系统的**深度架构参考**。如果你想看实用指南，请先从下面这些聚焦页面之一开始。
 
 <CardGroup cols={2}>
-  <Card title="Install and use plugins" icon="plug" href="/tools/plugin">
-    End-user guide for adding, enabling, and troubleshooting plugins.
+  <Card title="安装和使用插件" icon="plug" href="/zh-CN/tools/plugin">
+    面向最终用户的指南，介绍如何添加、启用以及排查插件问题。
   </Card>
-  <Card title="Building plugins" icon="rocket" href="/plugins/building-plugins">
-    First-plugin tutorial with the smallest working manifest.
+  <Card title="构建插件" icon="rocket" href="/zh-CN/plugins/building-plugins">
+    第一个插件教程，包含最小可工作的 manifest。
   </Card>
-  <Card title="Channel plugins" icon="comments" href="/plugins/sdk-channel-plugins">
-    Build a messaging channel plugin.
+  <Card title="渠道插件" icon="comments" href="/zh-CN/plugins/sdk-channel-plugins">
+    构建一个消息渠道插件。
   </Card>
-  <Card title="Provider plugins" icon="microchip" href="/plugins/sdk-provider-plugins">
-    Build a model provider plugin.
+  <Card title="提供商插件" icon="microchip" href="/zh-CN/plugins/sdk-provider-plugins">
+    构建一个模型提供商插件。
   </Card>
-  <Card title="SDK overview" icon="book" href="/plugins/sdk-overview">
-    Import map and registration API reference.
+  <Card title="插件 SDK 概览" icon="book" href="/zh-CN/plugins/sdk-overview">
+    导入映射和注册 API 参考。
   </Card>
 </CardGroup>
 
-## Public capability model
+## 公共能力模型
 
-Capabilities are the public **native plugin** model inside OpenClaw. Every native OpenClaw plugin registers against one or more capability types:
+能力是 OpenClaw 内部公共的**原生插件**模型。每个原生 OpenClaw 插件都会针对一种或多种能力类型进行注册：
 
-| Capability             | Registration method                              | Example plugins                      |
+| 能力 | 注册方法 | 示例插件 |
 | ---------------------- | ------------------------------------------------ | ------------------------------------ |
-| Text inference         | `api.registerProvider(...)`                      | `openai`, `anthropic`                |
-| CLI inference backend  | `api.registerCliBackend(...)`                    | `openai`, `anthropic`                |
-| Speech                 | `api.registerSpeechProvider(...)`                | `elevenlabs`, `microsoft`            |
-| Realtime transcription | `api.registerRealtimeTranscriptionProvider(...)` | `openai`                             |
-| Realtime voice         | `api.registerRealtimeVoiceProvider(...)`         | `openai`                             |
-| Media understanding    | `api.registerMediaUnderstandingProvider(...)`    | `openai`, `google`                   |
-| Image generation       | `api.registerImageGenerationProvider(...)`       | `openai`, `google`, `fal`, `minimax` |
-| Music generation       | `api.registerMusicGenerationProvider(...)`       | `google`, `minimax`                  |
-| Video generation       | `api.registerVideoGenerationProvider(...)`       | `qwen`                               |
-| Web fetch              | `api.registerWebFetchProvider(...)`              | `firecrawl`                          |
-| Web search             | `api.registerWebSearchProvider(...)`             | `google`                             |
-| Channel / messaging    | `api.registerChannel(...)`                       | `msteams`, `matrix`                  |
-| Gateway discovery      | `api.registerGatewayDiscoveryService(...)`       | `bonjour`                            |
+| 文本推理 | `api.registerProvider(...)` | `openai`、`anthropic` |
+| CLI 推理后端 | `api.registerCliBackend(...)` | `openai`、`anthropic` |
+| 语音 | `api.registerSpeechProvider(...)` | `elevenlabs`、`microsoft` |
+| 实时转写 | `api.registerRealtimeTranscriptionProvider(...)` | `openai` |
+| 实时语音 | `api.registerRealtimeVoiceProvider(...)` | `openai` |
+| 媒体理解 | `api.registerMediaUnderstandingProvider(...)` | `openai`、`google` |
+| 图像生成 | `api.registerImageGenerationProvider(...)` | `openai`、`google`、`fal`、`minimax` |
+| 音乐生成 | `api.registerMusicGenerationProvider(...)` | `google`、`minimax` |
+| 视频生成 | `api.registerVideoGenerationProvider(...)` | `qwen` |
+| Web 抓取 | `api.registerWebFetchProvider(...)` | `firecrawl` |
+| Web 搜索 | `api.registerWebSearchProvider(...)` | `google` |
+| 渠道 / 消息传递 | `api.registerChannel(...)` | `msteams`、`matrix` |
+| Gateway 网关发现 | `api.registerGatewayDiscoveryService(...)` | `bonjour` |
 
 <Note>
-A plugin that registers zero capabilities but provides hooks, tools, discovery services, or background services is a **legacy hook-only** plugin. That pattern is still fully supported.
+一个注册了零能力、但提供钩子、工具、发现服务或后台服务的插件，属于**旧式纯钩子**插件。该模式目前仍然被完全支持。
 </Note>
 
-### External compatibility stance
+### 外部兼容性立场
 
-The capability model is landed in core and used by bundled/native plugins today, but external plugin compatibility still needs a tighter bar than "it is exported, therefore it is frozen."
+能力模型已经落地到核心中，并已被今天的内置 / 原生插件使用，但外部插件兼容性仍然需要比“它已导出，因此它已冻结”更严格的标准。
 
-| Plugin situation                                  | Guidance                                                                                         |
+| 插件情况 | 指导原则 |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Existing external plugins                         | Keep hook-based integrations working; this is the compatibility baseline.                        |
-| New bundled/native plugins                        | Prefer explicit capability registration over vendor-specific reach-ins or new hook-only designs. |
-| External plugins adopting capability registration | Allowed, but treat capability-specific helper surfaces as evolving unless docs mark them stable. |
+| 现有外部插件 | 保持基于钩子的集成可用；这是兼容性的基线。 |
+| 新的内置 / 原生插件 | 优先使用显式能力注册，而不是针对特定厂商的深入调用或新的纯钩子设计。 |
+| 采用能力注册的外部插件 | 允许，但除非文档将其标记为稳定，否则应将特定能力的辅助表面视为仍在演进中。 |
 
-Capability registration is the intended direction. Legacy hooks remain the safest no-breakage path for external plugins during the transition. Exported helper subpaths are not all equal — prefer narrow documented contracts over incidental helper exports.
+能力注册是预期的发展方向。在过渡期间，旧式钩子仍然是对外部插件最安全、最不易破坏的路径。已导出的辅助子路径并不都同样稳定——应优先使用范围收窄、且有文档说明的契约，而不是偶然暴露出来的辅助导出。
 
-### Plugin shapes
+### 插件形态
 
-OpenClaw classifies every loaded plugin into a shape based on its actual registration behavior (not just static metadata):
+OpenClaw 会根据每个已加载插件的实际注册行为（而不只是静态元数据）将其归类为某种形态：
 
 <AccordionGroup>
   <Accordion title="plain-capability">
-    Registers exactly one capability type (for example a provider-only plugin like `mistral`).
+    只注册一种能力类型（例如像 `mistral` 这样的仅提供商插件）。
   </Accordion>
   <Accordion title="hybrid-capability">
-    Registers multiple capability types (for example `openai` owns text inference, speech, media understanding, and image generation).
+    注册多种能力类型（例如 `openai` 同时拥有文本推理、语音、媒体理解和图像生成）。
   </Accordion>
   <Accordion title="hook-only">
-    Registers only hooks (typed or custom), no capabilities, tools, commands, or services.
+    只注册钩子（类型化或自定义），不注册任何能力、工具、命令或服务。
   </Accordion>
   <Accordion title="non-capability">
-    Registers tools, commands, services, or routes but no capabilities.
+    注册工具、命令、服务或路由，但不注册能力。
   </Accordion>
 </AccordionGroup>
 
-Use `openclaw plugins inspect <id>` to see a plugin's shape and capability breakdown. See [CLI reference](/cli/plugins#inspect) for details.
+使用 `openclaw plugins inspect <id>` 可以查看插件的形态和能力拆分。详情请参见 [CLI 参考](/zh-CN/cli/plugins#inspect)。
 
-### Legacy hooks
+### 旧式钩子
 
-The `before_agent_start` hook remains supported as a compatibility path for hook-only plugins. Legacy real-world plugins still depend on it.
+`before_agent_start` 钩子仍然作为纯钩子插件的兼容路径被支持。现实中的旧插件仍然依赖它。
 
-Direction:
+方向如下：
 
-- keep it working
-- document it as legacy
-- prefer `before_model_resolve` for model/provider override work
-- prefer `before_prompt_build` for prompt mutation work
-- remove only after real usage drops and fixture coverage proves migration safety
+- 保持其可用
+- 在文档中标记为旧式
+- 涉及模型 / 提供商覆盖工作时，优先使用 `before_model_resolve`
+- 涉及提示词变更工作时，优先使用 `before_prompt_build`
+- 仅在真实使用下降，且 fixture 覆盖证明迁移安全之后，才移除
 
-### Compatibility signals
+### 兼容性信号
 
-When you run `openclaw doctor` or `openclaw plugins inspect <id>`, you may see one of these labels:
+当你运行 `openclaw doctor` 或 `openclaw plugins inspect <id>` 时，可能会看到以下标签之一：
 
-| Signal                     | Meaning                                                      |
+| 信号 | 含义 |
 | -------------------------- | ------------------------------------------------------------ |
-| **config valid**           | Config parses fine and plugins resolve                       |
-| **compatibility advisory** | Plugin uses a supported-but-older pattern (e.g. `hook-only`) |
-| **legacy warning**         | Plugin uses `before_agent_start`, which is deprecated        |
-| **hard error**             | Config is invalid or plugin failed to load                   |
+| **config valid** | 配置解析正常，插件可解析 |
+| **compatibility advisory** | 插件使用了受支持但较旧的模式（例如 `hook-only`） |
+| **legacy warning** | 插件使用了 `before_agent_start`，该功能已弃用 |
+| **hard error** | 配置无效，或插件加载失败 |
 
-Neither `hook-only` nor `before_agent_start` will break your plugin today: `hook-only` is advisory, and `before_agent_start` only triggers a warning. These signals also appear in `openclaw status --all` and `openclaw plugins doctor`.
+如今，`hook-only` 和 `before_agent_start` 都不会破坏你的插件：`hook-only` 只是提示信息，而 `before_agent_start` 只会触发警告。这些信号也会出现在 `openclaw status --all` 和 `openclaw plugins doctor` 中。
 
-## Architecture overview
+## 架构概览
 
-OpenClaw's plugin system has four layers:
+OpenClaw 的插件系统有四层：
 
 <Steps>
-  <Step title="Manifest + discovery">
-    OpenClaw finds candidate plugins from configured paths, workspace roots, global plugin roots, and bundled plugins. Discovery reads native `openclaw.plugin.json` manifests plus supported bundle manifests first.
+  <Step title="Manifest + 设备发现">
+    OpenClaw 会从已配置路径、工作区根目录、全局插件根目录以及内置插件中查找候选插件。设备发现会优先读取原生 `openclaw.plugin.json` manifest 以及受支持的 bundle manifest。
   </Step>
-  <Step title="Enablement + validation">
-    Core decides whether a discovered plugin is enabled, disabled, blocked, or selected for an exclusive slot such as memory.
+  <Step title="启用 + 验证">
+    核心决定某个已发现插件是启用、禁用、阻止，还是被选中用于某个独占插槽，例如 memory。
   </Step>
-  <Step title="Runtime loading">
-    Native OpenClaw plugins are loaded in-process via jiti and register capabilities into a central registry. Compatible bundles are normalized into registry records without importing runtime code.
+  <Step title="运行时加载">
+    原生 OpenClaw 插件会通过 jiti 在进程内加载，并将能力注册到中央注册表中。兼容的 bundle 会被标准化为注册表记录，而无需导入运行时代码。
   </Step>
-  <Step title="Surface consumption">
-    The rest of OpenClaw reads the registry to expose tools, channels, provider setup, hooks, HTTP routes, CLI commands, and services.
+  <Step title="表面消费">
+    OpenClaw 的其余部分会读取注册表，以暴露工具、渠道、提供商设置、钩子、HTTP 路由、CLI 命令和服务。
   </Step>
 </Steps>
 
-For plugin CLI specifically, root command discovery is split in two phases:
+就插件 CLI 而言，根命令发现分为两个阶段：
 
-- parse-time metadata comes from `registerCli(..., { descriptors: [...] })`
-- the real plugin CLI module can stay lazy and register on first invocation
+- 解析时元数据来自 `registerCli(..., { descriptors: [...] })`
+- 真正的插件 CLI 模块可以保持懒加载，并在第一次调用时注册
 
-That keeps plugin-owned CLI code inside the plugin while still letting OpenClaw reserve root command names before parsing.
+这样既能让插件自有的 CLI 代码保留在插件内部，又能让 OpenClaw 在解析前预留根命令名称。
 
-The important design boundary:
+重要的设计边界是：
 
-- manifest/config validation should work from **manifest/schema metadata** without executing plugin code
-- native capability discovery may load trusted plugin entry code to build a non-activating registry snapshot
-- native runtime behavior comes from the plugin module's `register(api)` path with `api.registrationMode === "full"`
+- manifest / 配置验证应仅根据 **manifest / schema 元数据** 即可完成，而无需执行插件代码
+- 原生能力发现可以加载受信任的插件入口代码，以构建一个不激活的注册表快照
+- 原生运行时行为来自插件模块的 `register(api)` 路径，并带有 `api.registrationMode === "full"`
 
-That split lets OpenClaw validate config, explain missing/disabled plugins, and build UI/schema hints before the full runtime is active.
+这种拆分让 OpenClaw 能够在完整运行时尚未激活前，验证配置、解释缺失 / 禁用的插件，并构建 UI / schema 提示。
 
-### Activation planning
+### 激活规划
 
-Activation planning is part of the control plane. Callers can ask which plugins are relevant to a concrete command, provider, channel, route, agent harness, or capability before loading broader runtime registries.
+激活规划是控制平面的一部分。调用方可以在加载更广泛的运行时注册表之前，先询问哪些插件与某个具体命令、提供商、渠道、路由、智能体 harness 或能力相关。
 
-The planner keeps current manifest behavior compatible:
+规划器会保持当前 manifest 行为兼容：
 
-- `activation.*` fields are explicit planner hints
-- `providers`, `channels`, `commandAliases`, `setup.providers`, `contracts.tools`, and hooks remain manifest ownership fallback
-- the ids-only planner API stays available for existing callers
-- the plan API reports reason labels so diagnostics can distinguish explicit hints from ownership fallback
+- `activation.*` 字段是显式的规划器提示
+- `providers`、`channels`、`commandAliases`、`setup.providers`、`contracts.tools` 和钩子仍然保留为 manifest 归属回退
+- 仅返回 id 的规划器 API 仍然可供现有调用方使用
+- plan API 会报告原因标签，以便诊断信息区分显式提示与归属回退
 
 <Warning>
-Do not treat `activation` as a lifecycle hook or a replacement for `register(...)`. It is metadata used to narrow loading. Prefer ownership fields when they already describe the relationship; use `activation` only for extra planner hints.
+不要把 `activation` 当作生命周期钩子，或当作 `register(...)` 的替代品。它只是用于缩小加载范围的元数据。当归属字段已经能够描述该关系时，应优先使用归属字段；只有在需要额外规划器提示时才使用 `activation`。
 </Warning>
 
-### Channel plugins and the shared message tool
+### 渠道插件和共享 message 工具
 
-Channel plugins do not need to register a separate send/edit/react tool for normal chat actions. OpenClaw keeps one shared `message` tool in core, and channel plugins own the channel-specific discovery and execution behind it.
+对于普通聊天动作，渠道插件不需要单独注册发送 / 编辑 / 反应工具。OpenClaw 在核心中保留了一个共享的 `message` 工具，而渠道插件负责其背后的渠道特定发现与执行。
 
-The current boundary is:
+当前边界如下：
 
-- core owns the shared `message` tool host, prompt wiring, session/thread bookkeeping, and execution dispatch
-- channel plugins own scoped action discovery, capability discovery, and any channel-specific schema fragments
-- channel plugins own provider-specific session conversation grammar, such as how conversation ids encode thread ids or inherit from parent conversations
-- channel plugins execute the final action through their action adapter
+- 核心拥有共享 `message` 工具宿主、提示词接线、会话 / 线程簿记以及执行分发
+- 渠道插件拥有带作用域的动作发现、能力发现以及任何渠道特定的 schema 片段
+- 渠道插件拥有提供商特定的会话对话语法，例如对话 id 如何编码线程 id，或如何从父对话继承
+- 渠道插件通过其动作适配器执行最终动作
 
-For channel plugins, the SDK surface is `ChannelMessageActionAdapter.describeMessageTool(...)`. That unified discovery call lets a plugin return its visible actions, capabilities, and schema contributions together so those pieces do not drift apart.
+对于渠道插件，SDK 表面是 `ChannelMessageActionAdapter.describeMessageTool(...)`。这种统一的发现调用让插件可以把可见动作、能力和 schema 贡献一起返回，从而避免这些部分彼此漂移。
 
-When a channel-specific message-tool param carries a media source such as a local path or remote media URL, the plugin should also return `mediaSourceParams` from `describeMessageTool(...)`. Core uses that explicit list to apply sandbox path normalization and outbound media-access hints without hardcoding plugin-owned param names. Prefer action-scoped maps there, not one channel-wide flat list, so a profile-only media param does not get normalized on unrelated actions like `send`.
+当某个渠道特定的 message-tool 参数携带媒体源（例如本地路径或远程媒体 URL）时，插件还应从 `describeMessageTool(...)` 返回 `mediaSourceParams`。核心会使用这个显式列表来应用沙箱路径规范化以及出站媒体访问提示，而不是对插件自有参数名进行硬编码。这里应优先使用按动作划分的映射，而不是整个渠道范围的扁平列表，这样某个仅用于 profile 的媒体参数就不会在 `send` 这类无关动作上被规范化。
 
-Core passes runtime scope into that discovery step. Important fields include:
+核心会将运行时作用域传入该发现步骤。重要字段包括：
 
 - `accountId`
 - `currentChannelId`
@@ -184,106 +191,106 @@ Core passes runtime scope into that discovery step. Important fields include:
 - `sessionKey`
 - `sessionId`
 - `agentId`
-- trusted inbound `requesterSenderId`
+- 受信任的入站 `requesterSenderId`
 
-That matters for context-sensitive plugins. A channel can hide or expose message actions based on the active account, current room/thread/message, or trusted requester identity without hardcoding channel-specific branches in the core `message` tool.
+这对于依赖上下文的插件很重要。渠道可以根据当前活跃账号、当前房间 / 线程 / 消息，或受信任的请求者身份，隐藏或暴露消息动作，而无需在核心 `message` 工具中硬编码渠道特定分支。
 
-This is why embedded-runner routing changes are still plugin work: the runner is responsible for forwarding the current chat/session identity into the plugin discovery boundary so the shared `message` tool exposes the right channel-owned surface for the current turn.
+这也是为什么嵌入式运行器路由变更仍然属于插件工作：运行器负责将当前聊天 / 会话身份转发到插件发现边界，从而让共享 `message` 工具为当前轮次暴露正确的渠道自有表面。
 
-For channel-owned execution helpers, bundled plugins should keep the execution runtime inside their own extension modules. Core no longer owns the Discord, Slack, Telegram, or WhatsApp message-action runtimes under `src/agents/tools`. We do not publish separate `plugin-sdk/*-action-runtime` subpaths, and bundled plugins should import their own local runtime code directly from their extension-owned modules.
+对于渠道自有的执行辅助工具，内置插件应将执行运行时保留在各自的扩展模块内部。核心不再拥有位于 `src/agents/tools` 下的 Discord、Slack、Telegram 或 WhatsApp 消息动作运行时。我们不会发布单独的 `plugin-sdk/*-action-runtime` 子路径，内置插件应直接从各自扩展自有模块导入本地运行时代码。
 
-The same boundary applies to provider-named SDK seams in general: core should not import channel-specific convenience barrels for Slack, Discord, Signal, WhatsApp, or similar extensions. If core needs a behavior, either consume the bundled plugin's own `api.ts` / `runtime-api.ts` barrel or promote the need into a narrow generic capability in the shared SDK.
+同样的边界原则也适用于一般性的、以提供商命名的 SDK 接缝：核心不应导入 Slack、Discord、Signal、WhatsApp 或类似扩展的渠道专用便捷 barrel。如果核心需要某种行为，要么使用内置插件自己的 `api.ts` / `runtime-api.ts` barrel，要么将该需求提升为共享 SDK 中一个范围收窄的通用能力。
 
-For polls specifically, there are two execution paths:
+对于投票，具体有两条执行路径：
 
-- `outbound.sendPoll` is the shared baseline for channels that fit the common poll model
-- `actions.handleAction("poll")` is the preferred path for channel-specific poll semantics or extra poll parameters
+- `outbound.sendPoll` 是适用于符合通用投票模型的渠道的共享基线
+- `actions.handleAction("poll")` 是处理渠道特定投票语义或额外投票参数的首选路径
 
-Core now defers shared poll parsing until after plugin poll dispatch declines the action, so plugin-owned poll handlers can accept channel-specific poll fields without being blocked by the generic poll parser first.
+现在，核心会在插件投票分发拒绝该动作之后，才延后执行共享投票解析，因此插件自有的投票处理器可以接受渠道特定的投票字段，而不会先被通用投票解析器拦住。
 
-See [Plugin architecture internals](/plugins/architecture-internals) for the full startup sequence.
+完整启动顺序请参见 [插件架构内部机制](/zh-CN/plugins/architecture-internals)。
 
-## Capability ownership model
+## 能力归属模型
 
-OpenClaw treats a native plugin as the ownership boundary for a **company** or a **feature**, not as a grab bag of unrelated integrations.
+OpenClaw 将一个原生插件视为某个**公司**或某项**功能**的归属边界，而不是一堆彼此无关集成的杂物袋。
 
-That means:
+这意味着：
 
-- a company plugin should usually own all of that company's OpenClaw-facing surfaces
-- a feature plugin should usually own the full feature surface it introduces
-- channels should consume shared core capabilities instead of re-implementing provider behavior ad hoc
+- 一个公司插件通常应拥有该公司的所有 OpenClaw 对外表面
+- 一个功能插件通常应拥有它所引入的完整功能表面
+- 渠道应消费共享的核心能力，而不是临时性地重复实现提供商行为
 
 <AccordionGroup>
   <Accordion title="Vendor multi-capability">
-    `openai` owns text inference, speech, realtime voice, media understanding, and image generation. `google` owns text inference plus media understanding, image generation, and web search. `qwen` owns text inference plus media understanding and video generation.
+    `openai` 拥有文本推理、语音、实时语音、媒体理解和图像生成。`google` 拥有文本推理，以及媒体理解、图像生成和 Web 搜索。`qwen` 拥有文本推理，以及媒体理解和视频生成。
   </Accordion>
   <Accordion title="Vendor single-capability">
-    `elevenlabs` and `microsoft` own speech; `firecrawl` owns web-fetch; `minimax` / `mistral` / `moonshot` / `zai` own media-understanding backends.
+    `elevenlabs` 和 `microsoft` 拥有语音；`firecrawl` 拥有 Web 抓取；`minimax` / `mistral` / `moonshot` / `zai` 拥有媒体理解后端。
   </Accordion>
   <Accordion title="Feature plugin">
-    `voice-call` owns call transport, tools, CLI, routes, and Twilio media-stream bridging, but consumes shared speech, realtime transcription, and realtime voice capabilities instead of importing vendor plugins directly.
+    `voice-call` 拥有呼叫传输、工具、CLI、路由和 Twilio 媒体流桥接，但它会消费共享的语音、实时转写和实时语音能力，而不是直接导入厂商插件。
   </Accordion>
 </AccordionGroup>
 
-The intended end state is:
+预期的最终状态是：
 
-- OpenAI lives in one plugin even if it spans text models, speech, images, and future video
-- another vendor can do the same for its own surface area
-- channels do not care which vendor plugin owns the provider; they consume the shared capability contract exposed by core
+- OpenAI 即使横跨文本模型、语音、图像以及未来的视频，也仍然驻留在一个插件中
+- 其他厂商也可以对自己的表面区域采取同样做法
+- 渠道并不关心是哪一个厂商插件拥有该提供商；它们消费的是核心暴露出的共享能力契约
 
-This is the key distinction:
+这里的关键区别是：
 
-- **plugin** = ownership boundary
-- **capability** = core contract that multiple plugins can implement or consume
+- **plugin** = 归属边界
+- **capability** = 可由多个插件实现或消费的核心契约
 
-So if OpenClaw adds a new domain such as video, the first question is not "which provider should hardcode video handling?" The first question is "what is the core video capability contract?" Once that contract exists, vendor plugins can register against it and channel/feature plugins can consume it.
+因此，如果 OpenClaw 新增了一个像视频这样的领域，第一个问题不应该是“哪个提供商应该硬编码视频处理？”第一个问题应该是“核心的视频能力契约是什么？”一旦这个契约存在，厂商插件就可以针对它注册，而渠道 / 功能插件也可以消费它。
 
-If the capability does not exist yet, the right move is usually:
+如果该能力尚不存在，通常正确的做法是：
 
 <Steps>
-  <Step title="Define the capability">
-    Define the missing capability in core.
+  <Step title="定义能力">
+    在核心中定义缺失的能力。
   </Step>
-  <Step title="Expose through the SDK">
-    Expose it through the plugin API/runtime in a typed way.
+  <Step title="通过 SDK 暴露">
+    以类型化方式通过插件 API / 运行时将其暴露出来。
   </Step>
-  <Step title="Wire consumers">
-    Wire channels/features against that capability.
+  <Step title="接线消费者">
+    将渠道 / 功能接入该能力。
   </Step>
-  <Step title="Vendor implementations">
-    Let vendor plugins register implementations.
+  <Step title="厂商实现">
+    让厂商插件注册其实现。
   </Step>
 </Steps>
 
-This keeps ownership explicit while avoiding core behavior that depends on a single vendor or a one-off plugin-specific code path.
+这样既能保持归属清晰，又能避免核心行为依赖于单一厂商或某条一次性的插件专用代码路径。
 
-### Capability layering
+### 能力分层
 
-Use this mental model when deciding where code belongs:
+当你决定代码应该放在哪里时，请使用这个思维模型：
 
 <Tabs>
-  <Tab title="Core capability layer">
-    Shared orchestration, policy, fallback, config merge rules, delivery semantics, and typed contracts.
+  <Tab title="核心能力层">
+    共享的编排、策略、回退、配置合并规则、投递语义和类型化契约。
   </Tab>
-  <Tab title="Vendor plugin layer">
-    Vendor-specific APIs, auth, model catalogs, speech synthesis, image generation, future video backends, usage endpoints.
+  <Tab title="厂商插件层">
+    厂商特定 API、认证、模型目录、语音合成、图像生成、未来的视频后端、用量端点。
   </Tab>
-  <Tab title="Channel/feature plugin layer">
-    Slack/Discord/voice-call/etc. integration that consumes core capabilities and presents them on a surface.
+  <Tab title="渠道/功能插件层">
+    Slack / Discord / voice-call / 等集成，它们消费核心能力并在某个表面上呈现出来。
   </Tab>
 </Tabs>
 
-For example, TTS follows this shape:
+例如，TTS 遵循这种结构：
 
-- core owns reply-time TTS policy, fallback order, prefs, and channel delivery
-- `openai`, `elevenlabs`, and `microsoft` own synthesis implementations
-- `voice-call` consumes the telephony TTS runtime helper
+- 核心拥有回复时 TTS 策略、回退顺序、偏好设置和渠道投递
+- `openai`、`elevenlabs` 和 `microsoft` 拥有语音合成实现
+- `voice-call` 消费电话 TTS 运行时辅助工具
 
-That same pattern should be preferred for future capabilities.
+对于未来能力，也应优先采用同样的模式。
 
-### Multi-capability company plugin example
+### 多能力公司插件示例
 
-A company plugin should feel cohesive from the outside. If OpenClaw has shared contracts for models, speech, realtime transcription, realtime voice, media understanding, image generation, video generation, web fetch, and web search, a vendor can own all of its surfaces in one place:
+从外部看，一个公司插件应当具有一致性。如果 OpenClaw 拥有针对模型、语音、实时转写、实时语音、媒体理解、图像生成、视频生成、Web 抓取和 Web 搜索的共享契约，那么一个厂商就可以在一个地方拥有其所有表面：
 
 ```ts
 import type { OpenClawPluginDefinition } from "openclaw/plugin-sdk/plugin-entry";
@@ -337,126 +344,126 @@ const plugin: OpenClawPluginDefinition = {
 export default plugin;
 ```
 
-What matters is not the exact helper names. The shape matters:
+重要的不是确切的辅助函数名，而是这种结构：
 
-- one plugin owns the vendor surface
-- core still owns the capability contracts
-- channels and feature plugins consume `api.runtime.*` helpers, not vendor code
-- contract tests can assert that the plugin registered the capabilities it claims to own
+- 一个插件拥有厂商表面
+- 核心仍然拥有能力契约
+- 渠道和功能插件消费 `api.runtime.*` 辅助工具，而不是厂商代码
+- 契约测试可以断言该插件确实注册了它声称拥有的能力
 
-### Capability example: video understanding
+### 能力示例：视频理解
 
-OpenClaw already treats image/audio/video understanding as one shared capability. The same ownership model applies there:
+OpenClaw 已经将图像 / 音频 / 视频理解视为一个共享能力。这里同样适用相同的归属模型：
 
 <Steps>
-  <Step title="Core defines the contract">
-    Core defines the media-understanding contract.
+  <Step title="核心定义契约">
+    核心定义媒体理解契约。
   </Step>
-  <Step title="Vendor plugins register">
-    Vendor plugins register `describeImage`, `transcribeAudio`, and `describeVideo` as applicable.
+  <Step title="厂商插件注册">
+    厂商插件按需注册 `describeImage`、`transcribeAudio` 和 `describeVideo`。
   </Step>
-  <Step title="Consumers use the shared behavior">
-    Channels and feature plugins consume the shared core behavior instead of wiring directly to vendor code.
+  <Step title="消费者使用共享行为">
+    渠道和功能插件消费共享的核心行为，而不是直接接线到厂商代码。
   </Step>
 </Steps>
 
-That avoids baking one provider's video assumptions into core. The plugin owns the vendor surface; core owns the capability contract and fallback behavior.
+这避免了把某个提供商对视频的假设烘焙进核心。插件拥有厂商表面；核心拥有能力契约和回退行为。
 
-Video generation already uses that same sequence: core owns the typed capability contract and runtime helper, and vendor plugins register `api.registerVideoGenerationProvider(...)` implementations against it.
+视频生成已经采用了同样的顺序：核心拥有类型化能力契约和运行时辅助工具，而厂商插件则针对其注册 `api.registerVideoGenerationProvider(...)` 实现。
 
-Need a concrete rollout checklist? See [Capability Cookbook](/tools/capability-cookbook).
+需要一个具体的发布清单吗？请参见 [能力扩展手册](/zh-CN/plugins/architecture)。
 
-## Contracts and enforcement
+## 契约与约束执行
 
-The plugin API surface is intentionally typed and centralized in `OpenClawPluginApi`. That contract defines the supported registration points and the runtime helpers a plugin may rely on.
+插件 API 表面有意在 `OpenClawPluginApi` 中集中并做了类型化。该契约定义了受支持的注册点，以及插件可以依赖的运行时辅助工具。
 
-Why this matters:
+这很重要，因为：
 
-- plugin authors get one stable internal standard
-- core can reject duplicate ownership such as two plugins registering the same provider id
-- startup can surface actionable diagnostics for malformed registration
-- contract tests can enforce bundled-plugin ownership and prevent silent drift
+- 插件作者可以得到一套稳定的内部标准
+- 核心可以拒绝重复归属，例如两个插件注册相同的提供商 id
+- 启动过程可以为格式错误的注册暴露可执行的诊断信息
+- 契约测试可以强制执行内置插件的归属，并防止静默漂移
 
-There are two layers of enforcement:
+这里有两层约束执行：
 
 <AccordionGroup>
-  <Accordion title="Runtime registration enforcement">
-    The plugin registry validates registrations as plugins load. Examples: duplicate provider ids, duplicate speech provider ids, and malformed registrations produce plugin diagnostics instead of undefined behavior.
+  <Accordion title="运行时注册约束执行">
+    插件注册表会在插件加载时验证注册。例如：重复的提供商 id、重复的语音提供商 id，以及格式错误的注册，都会产生插件诊断信息，而不是导致未定义行为。
   </Accordion>
-  <Accordion title="Contract tests">
-    Bundled plugins are captured in contract registries during test runs so OpenClaw can assert ownership explicitly. Today this is used for model providers, speech providers, web search providers, and bundled registration ownership.
+  <Accordion title="契约测试">
+    在测试运行期间，内置插件会被捕获到契约注册表中，这样 OpenClaw 就可以显式断言归属。当前这用于模型提供商、语音提供商、Web 搜索提供商和内置注册归属。
   </Accordion>
 </AccordionGroup>
 
-The practical effect is that OpenClaw knows, up front, which plugin owns which surface. That lets core and channels compose seamlessly because ownership is declared, typed, and testable rather than implicit.
+实际效果是，OpenClaw 可以预先知道哪个插件拥有哪个表面。这使得核心和渠道能够无缝组合，因为归属是被声明、被类型化且可测试的，而不是隐式的。
 
-### What belongs in a contract
+### 什么应该属于契约
 
 <Tabs>
-  <Tab title="Good contracts">
-    - typed
-    - small
-    - capability-specific
-    - owned by core
-    - reusable by multiple plugins
-    - consumable by channels/features without vendor knowledge
+  <Tab title="好契约">
+    - 类型化
+    - 小而精
+    - 能力特定
+    - 由核心拥有
+    - 可被多个插件复用
+    - 可在不了解厂商细节的情况下被渠道 / 功能消费
   </Tab>
-  <Tab title="Bad contracts">
-    - vendor-specific policy hidden in core
-    - one-off plugin escape hatches that bypass the registry
-    - channel code reaching straight into a vendor implementation
-    - ad hoc runtime objects that are not part of `OpenClawPluginApi` or `api.runtime`
+  <Tab title="坏契约">
+    - 隐藏在核心中的厂商特定策略
+    - 绕过注册表的一次性插件逃生口
+    - 直接深入调用厂商实现的渠道代码
+    - 不属于 `OpenClawPluginApi` 或 `api.runtime` 的临时运行时对象
   </Tab>
 </Tabs>
 
-When in doubt, raise the abstraction level: define the capability first, then let plugins plug into it.
+拿不准时，就提升抽象层级：先定义能力，再让插件接入它。
 
-## Execution model
+## 执行模型
 
-Native OpenClaw plugins run **in-process** with the Gateway. They are not sandboxed. A loaded native plugin has the same process-level trust boundary as core code.
+原生 OpenClaw 插件与 Gateway 网关**在同一进程中**运行。它们没有沙箱隔离。一个已加载的原生插件与核心代码具有相同的进程级信任边界。
 
 <Warning>
-Implications:
+影响包括：
 
-- a native plugin can register tools, network handlers, hooks, and services
-- a native plugin bug can crash or destabilize the gateway
-- a malicious native plugin is equivalent to arbitrary code execution inside the OpenClaw process
+- 原生插件可以注册工具、网络处理器、钩子和服务
+- 原生插件的 bug 可能导致 Gateway 网关崩溃或不稳定
+- 恶意原生插件等同于在 OpenClaw 进程内部执行任意代码
   </Warning>
 
-Compatible bundles are safer by default because OpenClaw currently treats them as metadata/content packs. In current releases, that mostly means bundled skills.
+兼容的 bundle 默认情况下更安全，因为 OpenClaw 当前将其视为元数据 / 内容包。在当前版本中，这主要指内置 Skills。
 
-Use allowlists and explicit install/load paths for non-bundled plugins. Treat workspace plugins as development-time code, not production defaults.
+对于非内置插件，请使用允许列表和显式安装 / 加载路径。应将工作区插件视为开发时代码，而不是生产默认值。
 
-For bundled workspace package names, keep the plugin id anchored in the npm name: `@openclaw/<id>` by default, or an approved typed suffix such as `-provider`, `-plugin`, `-speech`, `-sandbox`, or `-media-understanding` when the package intentionally exposes a narrower plugin role.
+对于内置工作区 package 名称，请让插件 id 锚定在 npm 名称中：默认使用 `@openclaw/<id>`，或者在该 package 有意暴露更窄的插件角色时，使用经批准的类型化后缀，例如 `-provider`、`-plugin`、`-speech`、`-sandbox` 或 `-media-understanding`。
 
 <Note>
-**Trust note:**
+**信任说明：**
 
-- `plugins.allow` trusts **plugin ids**, not source provenance.
-- A workspace plugin with the same id as a bundled plugin intentionally shadows the bundled copy when that workspace plugin is enabled/allowlisted.
-- This is normal and useful for local development, patch testing, and hotfixes.
-- Bundled-plugin trust is resolved from the source snapshot — the manifest and code on disk at load time — rather than from install metadata. A corrupted or substituted install record cannot silently widen a bundled plugin's trust surface beyond what the actual source claims.
+- `plugins.allow` 信任的是**插件 id**，而不是来源出处。
+- 当启用 / 加入允许列表的工作区插件与某个内置插件具有相同 id 时，它会有意遮蔽该内置副本。
+- 这在本地开发、补丁测试和热修复中是正常且有用的。
+- 内置插件信任是根据源快照解析的——也就是加载时磁盘上的 manifest 和代码——而不是根据安装元数据。一个被破坏或被替换的安装记录，不能在实际源代码未声明的情况下，静默扩大某个内置插件的信任表面。
   </Note>
 
-## Export boundary
+## 导出边界
 
-OpenClaw exports capabilities, not implementation convenience.
+OpenClaw 导出的是能力，而不是实现层面的便捷工具。
 
-Keep capability registration public. Trim non-contract helper exports:
+保持能力注册为公共接口。收紧非契约辅助导出：
 
-- bundled-plugin-specific helper subpaths
-- runtime plumbing subpaths not intended as public API
-- vendor-specific convenience helpers
-- setup/onboarding helpers that are implementation details
+- 内置插件专用的辅助子路径
+- 不打算作为公共 API 的运行时管线子路径
+- 厂商特定的便捷辅助工具
+- 属于实现细节的设置 / 新手引导辅助工具
 
-Some bundled-plugin helper subpaths still remain in the generated SDK export map for compatibility and bundled-plugin maintenance. Current examples include `plugin-sdk/feishu`, `plugin-sdk/feishu-setup`, `plugin-sdk/zalo`, `plugin-sdk/zalo-setup`, and several `plugin-sdk/matrix*` seams. Treat those as reserved implementation-detail exports, not as the recommended SDK pattern for new third-party plugins.
+为了兼容性和内置插件维护，一些内置插件辅助子路径仍然保留在生成的 SDK 导出映射中。当前示例包括 `plugin-sdk/feishu`、`plugin-sdk/feishu-setup`、`plugin-sdk/zalo`、`plugin-sdk/zalo-setup` 以及若干 `plugin-sdk/matrix*` 接缝。应将这些视为保留的实现细节导出，而不是为新的第三方插件推荐的 SDK 模式。
 
-## Internals and reference
+## 内部机制与参考
 
-For the load pipeline, registry model, provider runtime hooks, Gateway HTTP routes, message tool schemas, channel target resolution, provider catalogs, context engine plugins, and the guide to adding a new capability, see [Plugin architecture internals](/plugins/architecture-internals).
+关于加载管线、注册表模型、提供商运行时钩子、Gateway 网关 HTTP 路由、消息工具 schema、渠道目标解析、提供商目录、上下文引擎插件以及添加新能力的指南，请参见 [插件架构内部机制](/zh-CN/plugins/architecture-internals)。
 
-## Related
+## 相关内容
 
-- [Building plugins](/plugins/building-plugins)
-- [Plugin manifest](/plugins/manifest)
-- [Plugin SDK setup](/plugins/sdk-setup)
+- [构建插件](/zh-CN/plugins/building-plugins)
+- [插件 manifest](/zh-CN/plugins/manifest)
+- [插件 SDK 设置](/zh-CN/plugins/sdk-setup)

@@ -1,19 +1,26 @@
 ---
-summary: "Why a tool is blocked: sandbox runtime, tool allow/deny policy, and elevated exec gates"
-title: Sandbox vs tool policy vs elevated
-read_when: "You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change."
+read_when: You hit 'sandbox jail' or see a tool/elevated refusal and want the exact config key to change.
 status: active
+summary: 为什么某个工具会被阻止：沙箱运行时、工具允许/拒绝策略，以及提升权限的 exec 门控
+title: 沙箱 vs 工具策略 vs 提升权限
+x-i18n:
+    generated_at: "2026-04-23T22:57:59Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 74bb73023a3f7a85a0c020b2e8df69610ab8f8e60f8ab6142f8da7810dc08429
+    source_path: gateway/sandbox-vs-tool-policy-vs-elevated.md
+    workflow: 15
 ---
 
-OpenClaw has three related (but different) controls:
+OpenClaw 有三种相关但不同的控制机制：
 
-1. **Sandbox** (`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`) decides **where tools run** (sandbox backend vs host).
-2. **Tool policy** (`tools.*`, `tools.sandbox.tools.*`, `agents.list[].tools.*`) decides **which tools are available/allowed**.
-3. **Elevated** (`tools.elevated.*`, `agents.list[].tools.elevated.*`) is an **exec-only escape hatch** to run outside the sandbox when you’re sandboxed (`gateway` by default, or `node` when the exec target is configured to `node`).
+1. **沙箱**（`agents.defaults.sandbox.*` / `agents.list[].sandbox.*`）决定**工具在哪里运行**（沙箱后端还是主机）。
+2. **工具策略**（`tools.*`、`tools.sandbox.tools.*`、`agents.list[].tools.*`）决定**哪些工具可用/允许调用**。
+3. **提升权限**（`tools.elevated.*`、`agents.list[].tools.elevated.*`）是一个**仅限 exec 的逃生舱口**，当你处于沙箱中时可在沙箱外运行（默认是 `gateway`，或者当 exec 目标配置为 `node` 时使用 `node`）。
 
-## Quick debug
+## 快速调试
 
-Use the inspector to see what OpenClaw is _actually_ doing:
+使用检查器查看 OpenClaw **实际**在做什么：
 
 ```bash
 openclaw sandbox explain
@@ -22,54 +29,54 @@ openclaw sandbox explain --agent work
 openclaw sandbox explain --json
 ```
 
-It prints:
+它会输出：
 
-- effective sandbox mode/scope/workspace access
-- whether the session is currently sandboxed (main vs non-main)
-- effective sandbox tool allow/deny (and whether it came from agent/global/default)
-- elevated gates and fix-it key paths
+- 生效的沙箱 mode/scope/workspace access
+- 该会话当前是否处于沙箱中（main vs non-main）
+- 生效的沙箱工具 allow/deny（以及它来自智能体/全局/默认值中的哪一层）
+- 提升权限门控和修复用键路径
 
-## Sandbox: where tools run
+## 沙箱：工具在哪里运行
 
-Sandboxing is controlled by `agents.defaults.sandbox.mode`:
+沙箱隔离由 `agents.defaults.sandbox.mode` 控制：
 
-- `"off"`: everything runs on the host.
-- `"non-main"`: only non-main sessions are sandboxed (common “surprise” for groups/channels).
-- `"all"`: everything is sandboxed.
+- `"off"`：所有内容都在主机上运行。
+- `"non-main"`：只有非主会话会进入沙箱（这是群组/渠道场景中常见的“意外”来源）。
+- `"all"`：所有内容都在沙箱中运行。
 
-See [Sandboxing](/gateway/sandboxing) for the full matrix (scope, workspace mounts, images).
+完整矩阵（scope、workspace mounts、镜像）请参见[沙箱隔离](/zh-CN/gateway/sandboxing)。
 
-### Bind mounts (security quick check)
+### 绑定挂载（安全快速检查）
 
-- `docker.binds` _pierces_ the sandbox filesystem: whatever you mount is visible inside the container with the mode you set (`:ro` or `:rw`).
-- Default is read-write if you omit the mode; prefer `:ro` for source/secrets.
-- `scope: "shared"` ignores per-agent binds (only global binds apply).
-- OpenClaw validates bind sources twice: first on the normalized source path, then again after resolving through the deepest existing ancestor. Symlink-parent escapes do not bypass blocked-path or allowed-root checks.
-- Non-existent leaf paths are still checked safely. If `/workspace/alias-out/new-file` resolves through a symlinked parent to a blocked path or outside the configured allowed roots, the bind is rejected.
-- Binding `/var/run/docker.sock` effectively hands host control to the sandbox; only do this intentionally.
-- Workspace access (`workspaceAccess: "ro"`/`"rw"`) is independent of bind modes.
+- `docker.binds` 会**穿透**沙箱文件系统：你挂载的任何内容都会按你设置的模式（`:ro` 或 `:rw`）在容器内可见。
+- 如果省略模式，默认是读写；对于源码/密钥，优先使用 `:ro`。
+- `scope: "shared"` 会忽略按智能体设置的 binds（仅应用全局 binds）。
+- OpenClaw 会对绑定源进行两次验证：先对归一化后的源路径验证，然后在通过最深已存在祖先路径解析后再次验证。通过符号链接父路径逃逸无法绕过受阻路径或允许根目录检查。
+- 不存在的叶子路径也会被安全检查。如果 `/workspace/alias-out/new-file` 通过某个符号链接父目录解析到受阻路径，或落在配置的允许根目录之外，该绑定会被拒绝。
+- 绑定 `/var/run/docker.sock` 实际上等同于把主机控制权交给沙箱；只有在你明确有意这样做时才应使用。
+- 工作区访问（`workspaceAccess: "ro"`/`"rw"`）与绑定模式彼此独立。
 
-## Tool policy: which tools exist/are callable
+## 工具策略：哪些工具存在/可调用
 
-Two layers matter:
+有两层很重要：
 
-- **Tool profile**: `tools.profile` and `agents.list[].tools.profile` (base allowlist)
-- **Provider tool profile**: `tools.byProvider[provider].profile` and `agents.list[].tools.byProvider[provider].profile`
-- **Global/per-agent tool policy**: `tools.allow`/`tools.deny` and `agents.list[].tools.allow`/`agents.list[].tools.deny`
-- **Provider tool policy**: `tools.byProvider[provider].allow/deny` and `agents.list[].tools.byProvider[provider].allow/deny`
-- **Sandbox tool policy** (only applies when sandboxed): `tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` and `agents.list[].tools.sandbox.tools.*`
+- **工具配置文件**：`tools.profile` 和 `agents.list[].tools.profile`（基础允许名单）
+- **提供商工具配置文件**：`tools.byProvider[provider].profile` 和 `agents.list[].tools.byProvider[provider].profile`
+- **全局/按智能体工具策略**：`tools.allow`/`tools.deny` 和 `agents.list[].tools.allow`/`agents.list[].tools.deny`
+- **提供商工具策略**：`tools.byProvider[provider].allow/deny` 和 `agents.list[].tools.byProvider[provider].allow/deny`
+- **沙箱工具策略**（仅在处于沙箱时适用）：`tools.sandbox.tools.allow`/`tools.sandbox.tools.deny` 和 `agents.list[].tools.sandbox.tools.*`
 
-Rules of thumb:
+经验法则：
 
-- `deny` always wins.
-- If `allow` is non-empty, everything else is treated as blocked.
-- Tool policy is the hard stop: `/exec` cannot override a denied `exec` tool.
-- `/exec` only changes session defaults for authorized senders; it does not grant tool access.
-  Provider tool keys accept either `provider` (e.g. `google-antigravity`) or `provider/model` (e.g. `openai/gpt-5.4`).
+- `deny` 永远优先。
+- 如果 `allow` 非空，其余所有项都会被视为阻止。
+- 工具策略是硬性终点：`/exec` 不能覆盖被拒绝的 `exec` 工具。
+- `/exec` 只会为已授权发送者更改会话默认值；它不会授予工具访问权限。
+  提供商工具键既可使用 `provider`（例如 `google-antigravity`），也可使用 `provider/model`（例如 `openai/gpt-5.4`）。
 
-### Tool groups (shorthands)
+### 工具组（简写）
 
-Tool policies (global, agent, sandbox) support `group:*` entries that expand to multiple tools:
+工具策略（全局、智能体、沙箱）支持 `group:*` 条目，它们会展开为多个工具：
 
 ```json5
 {
@@ -83,57 +90,56 @@ Tool policies (global, agent, sandbox) support `group:*` entries that expand to 
 }
 ```
 
-Available groups:
+可用的组：
 
-- `group:runtime`: `exec`, `process`, `code_execution` (`bash` is accepted as
-  an alias for `exec`)
-- `group:fs`: `read`, `write`, `edit`, `apply_patch`
-- `group:sessions`: `sessions_list`, `sessions_history`, `sessions_send`, `sessions_spawn`, `sessions_yield`, `subagents`, `session_status`
-- `group:memory`: `memory_search`, `memory_get`
-- `group:web`: `web_search`, `x_search`, `web_fetch`
-- `group:ui`: `browser`, `canvas`
-- `group:automation`: `cron`, `gateway`
-- `group:messaging`: `message`
-- `group:nodes`: `nodes`
-- `group:agents`: `agents_list`
-- `group:media`: `image`, `image_generate`, `video_generate`, `tts`
-- `group:openclaw`: all built-in OpenClaw tools (excludes provider plugins)
+- `group:runtime`：`exec`、`process`、`code_execution`（`bash` 可作为 `exec` 的别名接受）
+- `group:fs`：`read`、`write`、`edit`、`apply_patch`
+- `group:sessions`：`sessions_list`、`sessions_history`、`sessions_send`、`sessions_spawn`、`sessions_yield`、`subagents`、`session_status`
+- `group:memory`：`memory_search`、`memory_get`
+- `group:web`：`web_search`、`x_search`、`web_fetch`
+- `group:ui`：`browser`、`canvas`
+- `group:automation`：`cron`、`gateway`
+- `group:messaging`：`message`
+- `group:nodes`：`nodes`
+- `group:agents`：`agents_list`
+- `group:media`：`image`、`image_generate`、`video_generate`、`tts`
+- `group:openclaw`：所有内置 OpenClaw 工具（不包括提供商插件）
 
-## Elevated: exec-only "run on host"
+## 提升权限：仅限 exec 的“在主机上运行”
 
-Elevated does **not** grant extra tools; it only affects `exec`.
+提升权限**不会**授予额外工具；它只影响 `exec`。
 
-- If you’re sandboxed, `/elevated on` (or `exec` with `elevated: true`) runs outside the sandbox (approvals may still apply).
-- Use `/elevated full` to skip exec approvals for the session.
-- If you’re already running direct, elevated is effectively a no-op (still gated).
-- Elevated is **not** skill-scoped and does **not** override tool allow/deny.
-- Elevated does not grant arbitrary cross-host overrides from `host=auto`; it follows the normal exec target rules and only preserves `node` when the configured/session target is already `node`.
-- `/exec` is separate from elevated. It only adjusts per-session exec defaults for authorized senders.
+- 如果你在沙箱中，`/elevated on`（或带 `elevated: true` 的 `exec`）会在沙箱外运行（可能仍然需要审批）。
+- 使用 `/elevated full` 可跳过该会话中的 exec 审批。
+- 如果你已经在直接运行环境中，提升权限基本等同于无操作（但仍受门控）。
+- 提升权限**不是**按 Skills 作用域控制的，也**不会**覆盖工具 allow/deny。
+- 提升权限不会从 `host=auto` 授予任意跨主机覆盖；它遵循正常的 exec 目标规则，并且仅当配置的/会话目标本身已是 `node` 时才保留 `node`。
+- `/exec` 与提升权限是分开的。它只会为已授权发送者调整按会话的 exec 默认值。
 
-Gates:
+门控：
 
-- Enablement: `tools.elevated.enabled` (and optionally `agents.list[].tools.elevated.enabled`)
-- Sender allowlists: `tools.elevated.allowFrom.<provider>` (and optionally `agents.list[].tools.elevated.allowFrom.<provider>`)
+- 启用开关：`tools.elevated.enabled`（以及可选的 `agents.list[].tools.elevated.enabled`）
+- 发送者允许名单：`tools.elevated.allowFrom.<provider>`（以及可选的 `agents.list[].tools.elevated.allowFrom.<provider>`）
 
-See [Elevated Mode](/tools/elevated).
+参见 [提升权限模式](/zh-CN/tools/elevated)。
 
-## Common "sandbox jail" fixes
+## 常见“沙箱牢笼”修复方法
 
-### "Tool X blocked by sandbox tool policy"
+### “工具 X 被沙箱工具策略阻止”
 
-Fix-it keys (pick one):
+修复键（任选其一）：
 
-- Disable sandbox: `agents.defaults.sandbox.mode=off` (or per-agent `agents.list[].sandbox.mode=off`)
-- Allow the tool inside sandbox:
-  - remove it from `tools.sandbox.tools.deny` (or per-agent `agents.list[].tools.sandbox.tools.deny`)
-  - or add it to `tools.sandbox.tools.allow` (or per-agent allow)
+- 禁用沙箱：`agents.defaults.sandbox.mode=off`（或按智能体设置 `agents.list[].sandbox.mode=off`）
+- 在沙箱内允许该工具：
+  - 将其从 `tools.sandbox.tools.deny` 中移除（或按智能体从 `agents.list[].tools.sandbox.tools.deny` 中移除）
+  - 或将其添加到 `tools.sandbox.tools.allow`（或按智能体 allow）
 
-### "I thought this was main, why is it sandboxed?"
+### “我以为这是 main，为什么它被放进沙箱了？”
 
-In `"non-main"` mode, group/channel keys are _not_ main. Use the main session key (shown by `sandbox explain`) or switch mode to `"off"`.
+在 `"non-main"` 模式下，群组/渠道键**不是** main。请使用 main 会话键（`sandbox explain` 会显示），或将模式切换为 `"off"`。
 
-## Related
+## 相关内容
 
-- [Sandboxing](/gateway/sandboxing) -- full sandbox reference (modes, scopes, backends, images)
-- [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) -- per-agent overrides and precedence
-- [Elevated Mode](/tools/elevated)
+- [沙箱隔离](/zh-CN/gateway/sandboxing) —— 完整沙箱参考（模式、作用域、后端、镜像）
+- [多智能体沙箱与工具](/zh-CN/tools/multi-agent-sandbox-tools) —— 按智能体覆盖和优先级
+- [提升权限模式](/zh-CN/tools/elevated)

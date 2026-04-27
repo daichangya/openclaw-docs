@@ -1,47 +1,52 @@
 ---
-summary: "Run OpenClaw with SGLang (OpenAI-compatible self-hosted server)"
 read_when:
-  - You want to run OpenClaw against a local SGLang server
-  - You want OpenAI-compatible /v1 endpoints with your own models
-title: "SGLang"
+    - 你想让 OpenClaw 连接到本地 SGLang 服务器运行
+    - 你想使用 OpenAI 兼容的 `/v1` 端点和你自己的模型】【。analysis to=functions.read commentary  腾讯天天中彩票json 754  content omitted due to length?
+summary: 通过 SGLang（OpenAI 兼容的自托管服务器）运行 OpenClaw
+title: SGLang
+x-i18n:
+    generated_at: "2026-04-23T21:02:02Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 8ed6767f85bcf099fb25dfe72a48b8a09e04ba13212125651616d2d93607beba
+    source_path: providers/sglang.md
+    workflow: 15
 ---
 
-SGLang can serve open-source models via an **OpenAI-compatible** HTTP API.
-OpenClaw can connect to SGLang using the `openai-completions` API.
+SGLang 可以通过 **OpenAI 兼容**的 HTTP API 提供开源模型服务。
+OpenClaw 可以使用 `openai-completions` API 连接到 SGLang。
 
-OpenClaw can also **auto-discover** available models from SGLang when you opt
-in with `SGLANG_API_KEY` (any value works if your server does not enforce auth)
-and you do not define an explicit `models.providers.sglang` entry.
+当你选择启用 `SGLANG_API_KEY` 时（如果你的服务器未启用认证，则任意值都可用），且你未显式定义 `models.providers.sglang` 条目，OpenClaw 还可以**自动发现** SGLang 上可用的模型。
 
-OpenClaw treats `sglang` as a local OpenAI-compatible provider that supports
-streamed usage accounting, so status/context token counts can update from
-`stream_options.include_usage` responses.
+OpenClaw 将 `sglang` 视为一个本地的 OpenAI 兼容提供商，并支持
+流式使用量统计，因此状态/上下文 token 计数可以根据
+`stream_options.include_usage` 响应进行更新。
 
-## Getting started
+## 入门指南
 
 <Steps>
-  <Step title="Start SGLang">
-    Launch SGLang with an OpenAI-compatible server. Your base URL should expose
-    `/v1` endpoints (for example `/v1/models`, `/v1/chat/completions`). SGLang
-    commonly runs on:
+  <Step title="启动 SGLang">
+    使用 OpenAI 兼容服务器启动 SGLang。你的 base URL 应暴露
+    `/v1` 端点（例如 `/v1/models`、`/v1/chat/completions`）。SGLang
+    通常运行在：
 
     - `http://127.0.0.1:30000/v1`
 
   </Step>
-  <Step title="Set an API key">
-    Any value works if no auth is configured on your server:
+  <Step title="设置 API key">
+    如果你的服务器未配置认证，任意值都可用：
 
     ```bash
     export SGLANG_API_KEY="sglang-local"
     ```
 
   </Step>
-  <Step title="Run onboarding or set a model directly">
+  <Step title="运行新手引导或直接设置模型">
     ```bash
     openclaw onboard
     ```
 
-    Or configure the model manually:
+    或手动配置模型：
 
     ```json5
     {
@@ -56,27 +61,27 @@ streamed usage accounting, so status/context token counts can update from
   </Step>
 </Steps>
 
-## Model discovery (implicit provider)
+## 模型发现（隐式提供商）
 
-When `SGLANG_API_KEY` is set (or an auth profile exists) and you **do not**
-define `models.providers.sglang`, OpenClaw will query:
+当设置了 `SGLANG_API_KEY`（或存在 auth profile），并且你**没有**
+定义 `models.providers.sglang` 时，OpenClaw 会查询：
 
 - `GET http://127.0.0.1:30000/v1/models`
 
-and convert the returned IDs into model entries.
+并将返回的 ID 转换为模型条目。
 
 <Note>
-If you set `models.providers.sglang` explicitly, auto-discovery is skipped and
-you must define models manually.
+如果你显式设置了 `models.providers.sglang`，则会跳过自动发现，
+你必须手动定义模型。
 </Note>
 
-## Explicit configuration (manual models)
+## 显式配置（手动模型）
 
-Use explicit config when:
+在以下情况下请使用显式配置：
 
-- SGLang runs on a different host/port.
-- You want to pin `contextWindow`/`maxTokens` values.
-- Your server requires a real API key (or you want to control headers).
+- SGLang 运行在不同的主机/端口上。
+- 你希望固定 `contextWindow`/`maxTokens` 值。
+- 你的服务器需要真实 API key（或你希望控制 headers）。
 
 ```json5
 {
@@ -103,52 +108,51 @@ Use explicit config when:
 }
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Proxy-style behavior">
-    SGLang is treated as a proxy-style OpenAI-compatible `/v1` backend, not a
-    native OpenAI endpoint.
+  <Accordion title="代理式行为">
+    SGLang 会被视为代理式 OpenAI 兼容 `/v1` 后端，而不是
+    原生 OpenAI 端点。
 
-    | Behavior | SGLang |
+    | 行为 | SGLang |
     |----------|--------|
-    | OpenAI-only request shaping | Not applied |
-    | `service_tier`, Responses `store`, prompt-cache hints | Not sent |
-    | Reasoning-compat payload shaping | Not applied |
-    | Hidden attribution headers (`originator`, `version`, `User-Agent`) | Not injected on custom SGLang base URLs |
+    | 仅 OpenAI 的请求整形 | 不应用 |
+    | `service_tier`、Responses `store`、提示缓存提示 | 不发送 |
+    | Reasoning 兼容负载整形 | 不应用 |
+    | 隐式归属请求头（`originator`、`version`、`User-Agent`） | 不会注入到自定义 SGLang base URL 上 |
 
   </Accordion>
 
-  <Accordion title="Troubleshooting">
-    **Server not reachable**
+  <Accordion title="故障排除">
+    **服务器不可达**
 
-    Verify the server is running and responding:
+    请验证服务器正在运行并且有响应：
 
     ```bash
     curl http://127.0.0.1:30000/v1/models
     ```
 
-    **Auth errors**
+    **认证错误**
 
-    If requests fail with auth errors, set a real `SGLANG_API_KEY` that matches
-    your server configuration, or configure the provider explicitly under
-    `models.providers.sglang`.
+    如果请求因认证错误失败，请设置与你服务器配置匹配的真实 `SGLANG_API_KEY`，
+    或在 `models.providers.sglang` 下显式配置该提供商。
 
     <Tip>
-    If you run SGLang without authentication, any non-empty value for
-    `SGLANG_API_KEY` is sufficient to opt in to model discovery.
+    如果你在无认证模式下运行 SGLang，只需为
+    `SGLANG_API_KEY` 设置任意非空值，即可选择启用模型发现。
     </Tip>
 
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    如何选择提供商、模型引用和故障转移行为。
   </Card>
-  <Card title="Configuration reference" href="/gateway/configuration-reference" icon="gear">
-    Full config schema including provider entries.
+  <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
+    包括提供商条目在内的完整配置 schema。
   </Card>
 </CardGroup>

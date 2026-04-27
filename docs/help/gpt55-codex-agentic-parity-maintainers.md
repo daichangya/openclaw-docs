@@ -1,196 +1,203 @@
 ---
-summary: "How to review the GPT-5.5 / Codex parity program as four merge units"
-title: "GPT-5.5 / Codex parity maintainer notes"
 read_when:
-  - Reviewing the GPT-5.5 / Codex parity PR series
-  - Maintaining the six-contract agentic architecture behind the parity program
+    - 审查 GPT-5.5 / Codex 一致性 PR 系列
+    - 维护支撑一致性计划的六契约智能体架构
+summary: 如何将 GPT-5.5 / Codex 一致性计划按四个合并单元进行审查
+title: GPT-5.5 / Codex 一致性维护者说明
+x-i18n:
+    generated_at: "2026-04-25T17:09:40Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 8de69081f5985954b88583880c36388dc47116c3351c15d135b8ab3a660058e3
+    source_path: help/gpt55-codex-agentic-parity-maintainers.md
+    workflow: 15
 ---
 
-This note explains how to review the GPT-5.5 / Codex parity program as four merge units without losing the original six-contract architecture.
+这份说明解释了如何将 GPT-5.5 / Codex 一致性计划按四个合并单元进行审查，同时不丢失原有的六契约架构。
 
-## Merge units
+## 合并单元
 
-### PR A: strict-agentic execution
+### PR A：严格智能体式执行
 
-Owns:
+负责：
 
 - `executionContract`
-- GPT-5-first same-turn follow-through
-- `update_plan` as non-terminal progress tracking
-- explicit blocked states instead of plan-only silent stops
+- GPT-5 优先的同轮后续执行
+- 将 `update_plan` 作为非终结性的进度跟踪
+- 使用明确的阻塞状态，而不是仅有计划的静默停止
 
-Does not own:
+不负责：
 
-- auth/runtime failure classification
-- permission truthfulness
-- replay/continuation redesign
-- parity benchmarking
+- 凭证 / 运行时失败分类
+- 权限真实性
+- 重放 / 续接重设计
+- 一致性基准测试
 
-### PR B: runtime truthfulness
+### PR B：运行时真实性
 
-Owns:
+负责：
 
-- Codex OAuth scope correctness
-- typed provider/runtime failure classification
-- truthful `/elevated full` availability and blocked reasons
+- Codex OAuth scope 正确性
+- 类型化的提供商 / 运行时失败分类
+- 真实的 `/elevated full` 可用性与阻塞原因
 
-Does not own:
+不负责：
 
-- tool schema normalization
-- replay/liveness state
-- benchmark gating
+- 工具 schema 归一化
+- 重放 / 存活性状态
+- 基准测试门禁
 
-### PR C: execution correctness
+### PR C：执行正确性
 
-Owns:
+负责：
 
-- provider-owned OpenAI/Codex tool compatibility
-- parameter-free strict schema handling
-- replay-invalid surfacing
-- paused, blocked, and abandoned long-task state visibility
+- 由提供商负责的 OpenAI / Codex 工具兼容性
+- 无参数严格 schema 处理
+- replay-invalid 暴露
+- paused、blocked 和 abandoned 长任务状态可见性
 
-Does not own:
+不负责：
 
-- self-elected continuation
-- generic Codex dialect behavior outside provider hooks
-- benchmark gating
+- 自行选择的续接
+- 提供商钩子之外的通用 Codex 方言行为
+- 基准测试门禁
 
-### PR D: parity harness
+### PR D：一致性 harness
 
-Owns:
+负责：
 
-- first-wave GPT-5.5 vs Opus 4.6 scenario pack
-- parity documentation
-- parity report and release-gate mechanics
+- 第一波 GPT-5.5 对比 Opus 4.6 的场景包
+- 一致性文档
+- 一致性报告与发布门禁机制
 
-Does not own:
+不负责：
 
-- runtime behavior changes outside QA-lab
-- auth/proxy/DNS simulation inside the harness
+- QA-lab 之外的运行时行为变更
+- harness 内的凭证 / 代理 / DNS 模拟
 
-## Mapping back to the original six contracts
+## 映射回原始六项契约
 
-| Original contract                        | Merge unit |
+| 原始契约 | 合并单元 |
 | ---------------------------------------- | ---------- |
-| Provider transport/auth correctness      | PR B       |
-| Tool contract/schema compatibility       | PR C       |
-| Same-turn execution                      | PR A       |
-| Permission truthfulness                  | PR B       |
-| Replay/continuation/liveness correctness | PR C       |
-| Benchmark/release gate                   | PR D       |
+| 提供商传输 / 凭证正确性 | PR B       |
+| 工具契约 / schema 兼容性 | PR C       |
+| 同轮执行 | PR A       |
+| 权限真实性 | PR B       |
+| 重放 / 续接 / 存活性正确性 | PR C       |
+| 基准测试 / 发布门禁 | PR D       |
 
-## Review order
+## 审查顺序
 
 1. PR A
 2. PR B
 3. PR C
 4. PR D
 
-PR D is the proof layer. It should not be the reason runtime-correctness PRs are delayed.
+PR D 是证据层。它不应成为运行时正确性 PR 被延迟的理由。
 
-## What to look for
+## 审查要点
 
 ### PR A
 
-- GPT-5 runs act or fail closed instead of stopping at commentary
-- `update_plan` no longer looks like progress by itself
-- behavior stays GPT-5-first and embedded-Pi scoped
+- GPT-5 运行会执行或以封闭失败方式结束，而不是停在说明性内容
+- `update_plan` 本身不再看起来像进展
+- 行为仍保持 GPT-5 优先，并限定在嵌入式 Pi 范围内
 
 ### PR B
 
-- auth/proxy/runtime failures stop collapsing into generic “model failed” handling
-- `/elevated full` is only described as available when it is actually available
-- blocked reasons are visible to both the model and the user-facing runtime
+- 凭证 / 代理 / 运行时失败不再被折叠成通用的“模型失败”处理
+- 只有在实际可用时，才将 `/elevated full` 描述为可用
+- 模型和面向用户的运行时都能看到阻塞原因
 
 ### PR C
 
-- strict OpenAI/Codex tool registration behaves predictably
-- parameter-free tools do not fail strict schema checks
-- replay and compaction outcomes preserve truthful liveness state
+- 严格的 OpenAI / Codex 工具注册行为可预测
+- 无参数工具不会因严格 schema 检查而失败
+- 重放和压缩结果会保留真实的存活性状态
 
 ### PR D
 
-- the scenario pack is understandable and reproducible
-- the pack includes a mutating replay-safety lane, not only read-only flows
-- reports are readable by humans and automation
-- parity claims are evidence-backed, not anecdotal
+- 场景包易于理解且可复现
+- 场景包包含会变更状态的重放安全通道，而不只是只读流程
+- 报告对人工和自动化都可读
+- 一致性声明有证据支撑，而不是轶事式结论
 
-Expected artifacts from PR D:
+PR D 的预期产物：
 
-- `qa-suite-report.md` / `qa-suite-summary.json` for each model run
-- `qa-agentic-parity-report.md` with aggregate and scenario-level comparison
-- `qa-agentic-parity-summary.json` with a machine-readable verdict
+- 每次模型运行的 `qa-suite-report.md` / `qa-suite-summary.json`
+- 包含聚合与场景级比较的 `qa-agentic-parity-report.md`
+- 带有机器可读结论的 `qa-agentic-parity-summary.json`
 
-## Release gate
+## 发布门禁
 
-Do not claim GPT-5.5 parity or superiority over Opus 4.6 until:
+在以下条件满足之前，不要声称 GPT-5.5 与 Opus 4.6 一致，或优于 Opus 4.6：
 
-- PR A, PR B, and PR C are merged
-- PR D runs the first-wave parity pack cleanly
-- runtime-truthfulness regression suites remain green
-- the parity report shows no fake-success cases and no regression in stop behavior
+- PR A、PR B 和 PR C 已合并
+- PR D 干净地跑通第一波一致性场景包
+- 运行时真实性回归测试套件保持绿色
+- 一致性报告显示没有虚假成功案例，也没有停止行为回归
 
 ```mermaid
 flowchart LR
-    A["PR A-C merged"] --> B["Run GPT-5.5 parity pack"]
-    A --> C["Run Opus 4.6 parity pack"]
+    A["PR A-C 已合并"] --> B["运行 GPT-5.5 一致性场景包"]
+    A --> C["运行 Opus 4.6 一致性场景包"]
     B --> D["qa-suite-summary.json"]
     C --> E["qa-suite-summary.json"]
     D --> F["qa parity-report"]
     E --> F
-    F --> G["Markdown report + JSON verdict"]
-    G --> H{"Pass?"}
-    H -- "yes" --> I["Parity claim allowed"]
-    H -- "no" --> J["Keep runtime fixes / review loop open"]
+    F --> G["Markdown 报告 + JSON 结论"]
+    G --> H{"通过？"}
+    H -- "是" --> I["允许声明一致性"]
+    H -- "否" --> J["继续保持运行时修复 / 审查循环开启"]
 ```
 
-The parity harness is not the only evidence source. Keep this split explicit in review:
+一致性 harness 不是唯一的证据来源。审查时要明确保持这种拆分：
 
-- PR D owns the scenario-based GPT-5.5 vs Opus 4.6 comparison
-- PR B deterministic suites still own auth/proxy/DNS and full-access truthfulness evidence
+- PR D 负责基于场景的 GPT-5.5 与 Opus 4.6 对比
+- PR B 的确定性测试套件仍然负责凭证 / 代理 / DNS 和完全访问真实性证据
 
-## Quick maintainer merge workflow
+## 快速维护者合并工作流
 
-Use this when you are ready to land a parity PR and want a repeatable, low-risk sequence.
+当你准备落地一个一致性 PR，并希望采用可重复、低风险的顺序时，请使用这个流程。
 
-1. Confirm evidence bar is met before merge:
-   - reproducible symptom or failing test
-   - verified root cause in touched code
-   - fix in the implicated path
-   - regression test or explicit manual verification note
-2. Triage/label before merge:
-   - apply any `r:*` auto-close labels when the PR should not land
-   - keep merge candidates free of unresolved blocker threads
-3. Validate locally on the touched surface:
+1. 在合并前确认达到证据门槛：
+   - 可复现的症状或失败测试
+   - 在被修改代码中验证过的根因
+   - 位于相关路径中的修复
+   - 回归测试或明确的手动验证说明
+2. 合并前进行分流 / 打标签：
+   - 当 PR 不应落地时，应用任何 `r:*` 自动关闭标签
+   - 保持候选合并 PR 没有未解决的阻塞讨论线程
+3. 在本地验证被修改的范围：
    - `pnpm check:changed`
-   - `pnpm test:changed` when tests changed or bug-fix confidence depends on test coverage
-4. Land with the standard maintainer flow (`/landpr` process), then verify:
-   - linked issues auto-close behavior
-   - CI and post-merge status on `main`
-5. After landing, run duplicate search for related open PRs/issues and close only with a canonical reference.
+   - 如果测试有改动，或缺陷修复的信心依赖测试覆盖，则运行 `pnpm test:changed`
+4. 使用标准维护者流程落地（`/landpr` 流程），然后验证：
+   - 已关联 issue 的自动关闭行为
+   - `main` 上的 CI 和合并后状态
+5. 落地后，对相关未关闭 PR / issue 进行重复搜索，只在提供规范引用时关闭。
 
-If any one of the evidence bar items is missing, request changes instead of merging.
+如果证据门槛中的任意一项缺失，请请求修改，而不是合并。
 
-## Goal-to-evidence map
+## 目标到证据映射
 
-| Completion gate item                     | Primary owner | Review artifact                                                     |
+| 完成门禁项 | 主要负责人 | 审查产物 |
 | ---------------------------------------- | ------------- | ------------------------------------------------------------------- |
-| No plan-only stalls                      | PR A          | strict-agentic runtime tests and `approval-turn-tool-followthrough` |
-| No fake progress or fake tool completion | PR A + PR D   | parity fake-success count plus scenario-level report details        |
-| No false `/elevated full` guidance       | PR B          | deterministic runtime-truthfulness suites                           |
-| Replay/liveness failures remain explicit | PR C + PR D   | lifecycle/replay suites plus `compaction-retry-mutating-tool`       |
-| GPT-5.5 matches or beats Opus 4.6        | PR D          | `qa-agentic-parity-report.md` and `qa-agentic-parity-summary.json`  |
+| 没有仅计划式停滞 | PR A          | 严格智能体式运行时测试和 `approval-turn-tool-followthrough` |
+| 没有虚假进展或虚假工具完成 | PR A + PR D   | 一致性虚假成功计数，加上场景级报告细节 |
+| 没有错误的 `/elevated full` 指引 | PR B          | 确定性的运行时真实性测试套件 |
+| 重放 / 存活性失败仍然保持显式 | PR C + PR D   | 生命周期 / 重放测试套件，加上 `compaction-retry-mutating-tool` |
+| GPT-5.5 达到或超过 Opus 4.6 | PR D          | `qa-agentic-parity-report.md` 和 `qa-agentic-parity-summary.json` |
 
-## Reviewer shorthand: before vs after
+## 审查者速记：前后对比
 
-| User-visible problem before                                 | Review signal after                                                                     |
+| 之前用户可见的问题 | 之后的审查信号 |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| GPT-5.5 stopped after planning                              | PR A shows act-or-block behavior instead of commentary-only completion                  |
-| Tool use felt brittle with strict OpenAI/Codex schemas      | PR C keeps tool registration and parameter-free invocation predictable                  |
-| `/elevated full` hints were sometimes misleading            | PR B ties guidance to actual runtime capability and blocked reasons                     |
-| Long tasks could disappear into replay/compaction ambiguity | PR C emits explicit paused, blocked, abandoned, and replay-invalid state                |
-| Parity claims were anecdotal                                | PR D produces a report plus JSON verdict with the same scenario coverage on both models |
+| GPT-5.5 在规划后停止 | PR A 展示的是执行或阻塞行为，而不是只完成说明性内容 |
+| 在严格 OpenAI / Codex schema 下，工具使用感觉脆弱 | PR C 让工具注册和无参数调用保持可预测 |
+| `/elevated full` 提示有时会产生误导 | PR B 将提示与实际运行时能力和阻塞原因绑定 |
+| 长任务可能消失在重放 / 压缩歧义中 | PR C 发出明确的 paused、blocked、abandoned 和 replay-invalid 状态 |
+| 一致性声明只是轶事式结论 | PR D 生成报告以及 JSON 结论，并在两个模型上使用相同的场景覆盖 |
 
-## Related
+## 相关内容
 
-- [GPT-5.5 / Codex agentic parity](/help/gpt55-codex-agentic-parity)
+- [GPT-5.5 / Codex 智能体一致性](/zh-CN/help/gpt55-codex-agentic-parity)

@@ -1,36 +1,42 @@
 ---
-summary: "Google Gemini setup (API key + OAuth, image generation, media understanding, TTS, web search)"
-title: "Google (Gemini)"
 read_when:
-  - You want to use Google Gemini models with OpenClaw
-  - You need the API key or OAuth auth flow
+    - 你想在 OpenClaw 中使用 Google Gemini 模型
+    - 你需要 API 密钥或 OAuth 认证流程
+summary: Google Gemini 设置（API 密钥 + OAuth、图像生成、媒体理解、TTS、web 搜索）
+title: Google（Gemini）
+x-i18n:
+    generated_at: "2026-04-26T07:50:46Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 312c7a5bc433831d98d1d47c42c5cac6a4cd8d4948ddbf16f1ae11aaec7a0339
+    source_path: providers/google.md
+    workflow: 15
 ---
 
-The Google plugin provides access to Gemini models through Google AI Studio, plus
-image generation, media understanding (image/audio/video), text-to-speech, and web search via
-Gemini Grounding.
+Google 插件通过 Google AI Studio 提供对 Gemini 模型的访问，还提供通过
+Gemini Grounding 实现的图像生成、媒体理解（图像/音频/视频）、文本转语音和 web 搜索。
 
-- Provider: `google`
-- Auth: `GEMINI_API_KEY` or `GOOGLE_API_KEY`
-- API: Google Gemini API
-- Runtime option: `agents.defaults.agentRuntime.id: "google-gemini-cli"`
-  reuses Gemini CLI OAuth while keeping model refs canonical as `google/*`.
+- 提供商：`google`
+- 认证：`GEMINI_API_KEY` 或 `GOOGLE_API_KEY`
+- API：Google Gemini API
+- 运行时选项：`agents.defaults.agentRuntime.id: "google-gemini-cli"`
+  会复用 Gemini CLI OAuth，同时保持模型引用规范为 `google/*`。
 
-## Getting started
+## 入门指南
 
-Choose your preferred auth method and follow the setup steps.
+选择你偏好的认证方式，并按照设置步骤操作。
 
 <Tabs>
   <Tab title="API key">
-    **Best for:** standard Gemini API access through Google AI Studio.
+    **最适合：** 通过 Google AI Studio 进行标准 Gemini API 访问。
 
     <Steps>
-      <Step title="Run onboarding">
+      <Step title="运行新手引导">
         ```bash
         openclaw onboard --auth-choice gemini-api-key
         ```
 
-        Or pass the key directly:
+        或直接传入密钥：
 
         ```bash
         openclaw onboard --non-interactive \
@@ -39,7 +45,7 @@ Choose your preferred auth method and follow the setup steps.
           --gemini-api-key "$GEMINI_API_KEY"
         ```
       </Step>
-      <Step title="Set a default model">
+      <Step title="设置默认模型">
         ```json5
         {
           agents: {
@@ -50,7 +56,7 @@ Choose your preferred auth method and follow the setup steps.
         }
         ```
       </Step>
-      <Step title="Verify the model is available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list --provider google
         ```
@@ -58,22 +64,22 @@ Choose your preferred auth method and follow the setup steps.
     </Steps>
 
     <Tip>
-    The environment variables `GEMINI_API_KEY` and `GOOGLE_API_KEY` are both accepted. Use whichever you already have configured.
+    环境变量 `GEMINI_API_KEY` 和 `GOOGLE_API_KEY` 都受支持。使用你已经配置好的那个即可。
     </Tip>
 
   </Tab>
 
   <Tab title="Gemini CLI (OAuth)">
-    **Best for:** reusing an existing Gemini CLI login via PKCE OAuth instead of a separate API key.
+    **最适合：** 复用现有 Gemini CLI 登录的 PKCE OAuth，而不是单独使用 API 密钥。
 
     <Warning>
-    The `google-gemini-cli` provider is an unofficial integration. Some users
-    report account restrictions when using OAuth this way. Use at your own risk.
+    `google-gemini-cli` provider 是非官方集成。一些用户
+    报告使用这种 OAuth 方式时会遇到账户限制。请自行承担风险。
     </Warning>
 
     <Steps>
-      <Step title="Install the Gemini CLI">
-        The local `gemini` command must be available on `PATH`.
+      <Step title="安装 Gemini CLI">
+        本地 `gemini` 命令必须可在 `PATH` 中找到。
 
         ```bash
         # Homebrew
@@ -83,93 +89,93 @@ Choose your preferred auth method and follow the setup steps.
         npm install -g @google/gemini-cli
         ```
 
-        OpenClaw supports both Homebrew installs and global npm installs, including
-        common Windows/npm layouts.
+        OpenClaw 同时支持 Homebrew 安装和全局 npm 安装，包括
+        常见的 Windows/npm 布局。
       </Step>
-      <Step title="Log in via OAuth">
+      <Step title="通过 OAuth 登录">
         ```bash
         openclaw models auth login --provider google-gemini-cli --set-default
         ```
       </Step>
-      <Step title="Verify the model is available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list --provider google
         ```
       </Step>
     </Steps>
 
-    - Default model: `google/gemini-3.1-pro-preview`
-    - Runtime: `google-gemini-cli`
-    - Alias: `gemini-cli`
+    - 默认模型：`google/gemini-3.1-pro-preview`
+    - 运行时：`google-gemini-cli`
+    - 别名：`gemini-cli`
 
-    **Environment variables:**
+    **环境变量：**
 
     - `OPENCLAW_GEMINI_OAUTH_CLIENT_ID`
     - `OPENCLAW_GEMINI_OAUTH_CLIENT_SECRET`
 
-    (Or the `GEMINI_CLI_*` variants.)
+    （或使用 `GEMINI_CLI_*` 变体。）
 
     <Note>
-    If Gemini CLI OAuth requests fail after login, set `GOOGLE_CLOUD_PROJECT` or
-    `GOOGLE_CLOUD_PROJECT_ID` on the gateway host and retry.
+    如果 Gemini CLI OAuth 请求在登录后失败，请在 Gateway 网关 主机上设置 `GOOGLE_CLOUD_PROJECT` 或
+    `GOOGLE_CLOUD_PROJECT_ID`，然后重试。
     </Note>
 
     <Note>
-    If login fails before the browser flow starts, make sure the local `gemini`
-    command is installed and on `PATH`.
+    如果在浏览器流程开始之前登录失败，请确保本地 `gemini`
+    命令已安装并位于 `PATH` 中。
     </Note>
 
-    `google-gemini-cli/*` model refs are legacy compatibility aliases. New
-    configs should use `google/*` model refs plus the `google-gemini-cli`
-    runtime when they want local Gemini CLI execution.
+    `google-gemini-cli/*` 模型引用是旧版兼容别名。新配置
+    应使用 `google/*` 模型引用，并在需要本地 Gemini CLI 执行时
+    搭配 `google-gemini-cli` 运行时。
 
   </Tab>
 </Tabs>
 
-## Capabilities
+## 功能
 
-| Capability             | Supported                     |
+| 能力 | 支持情况 |
 | ---------------------- | ----------------------------- |
-| Chat completions       | Yes                           |
-| Image generation       | Yes                           |
-| Music generation       | Yes                           |
-| Text-to-speech         | Yes                           |
-| Realtime voice         | Yes (Google Live API)         |
-| Image understanding    | Yes                           |
-| Audio transcription    | Yes                           |
-| Video understanding    | Yes                           |
-| Web search (Grounding) | Yes                           |
-| Thinking/reasoning     | Yes (Gemini 2.5+ / Gemini 3+) |
-| Gemma 4 models         | Yes                           |
+| 聊天补全 | 是 |
+| 图像生成 | 是 |
+| 音乐生成 | 是 |
+| 文本转语音 | 是 |
+| 实时语音 | 是（Google Live API） |
+| 图像理解 | 是 |
+| 音频转录 | 是 |
+| 视频理解 | 是 |
+| web 搜索（Grounding） | 是 |
+| thinking/reasoning | 是（Gemini 2.5+ / Gemini 3+） |
+| Gemma 4 模型 | 是 |
 
 <Tip>
-Gemini 3 models use `thinkingLevel` rather than `thinkingBudget`. OpenClaw maps
-Gemini 3, Gemini 3.1, and `gemini-*-latest` alias reasoning controls to
-`thinkingLevel` so default/low-latency runs do not send disabled
-`thinkingBudget` values.
+Gemini 3 模型使用 `thinkingLevel`，而不是 `thinkingBudget`。OpenClaw 会将
+Gemini 3、Gemini 3.1 和 `gemini-*-latest` 别名的推理控制映射到
+`thinkingLevel`，这样默认/低延迟运行就不会发送已禁用的
+`thinkingBudget` 值。
 
-`/think adaptive` keeps Google's dynamic thinking semantics instead of choosing
-a fixed OpenClaw level. Gemini 3 and Gemini 3.1 omit a fixed `thinkingLevel` so
-Google can choose the level; Gemini 2.5 sends Google's dynamic sentinel
-`thinkingBudget: -1`.
+`/think adaptive` 会保留 Google 的动态 thinking 语义，而不是选择
+固定的 OpenClaw 级别。Gemini 3 和 Gemini 3.1 会省略固定的 `thinkingLevel`，以便
+让 Google 自行选择级别；Gemini 2.5 会发送 Google 的动态哨兵值
+`thinkingBudget: -1`。
 
-Gemma 4 models (for example `gemma-4-26b-a4b-it`) support thinking mode. OpenClaw
-rewrites `thinkingBudget` to a supported Google `thinkingLevel` for Gemma 4.
-Setting thinking to `off` preserves thinking disabled instead of mapping to
-`MINIMAL`.
+Gemma 4 模型（例如 `gemma-4-26b-a4b-it`）支持 thinking 模式。OpenClaw
+会将 `thinkingBudget` 重写为 Google 支持的 `thinkingLevel`，以用于 Gemma 4。
+将 thinking 设置为 `off` 时，会保留 thinking 已禁用状态，而不会映射到
+`MINIMAL`。
 </Tip>
 
-## Image generation
+## 图像生成
 
-The bundled `google` image-generation provider defaults to
-`google/gemini-3.1-flash-image-preview`.
+内置的 `google` 图像生成 provider 默认使用
+`google/gemini-3.1-flash-image-preview`。
 
-- Also supports `google/gemini-3-pro-image-preview`
-- Generate: up to 4 images per request
-- Edit mode: enabled, up to 5 input images
-- Geometry controls: `size`, `aspectRatio`, and `resolution`
+- 也支持 `google/gemini-3-pro-image-preview`
+- 生成：每个请求最多 4 张图像
+- 编辑模式：已启用，最多 5 张输入图像
+- 几何控制：`size`、`aspectRatio` 和 `resolution`
 
-To use Google as the default image provider:
+要将 Google 用作默认图像提供商：
 
 ```json5
 {
@@ -184,20 +190,20 @@ To use Google as the default image provider:
 ```
 
 <Note>
-See [Image Generation](/tools/image-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [图像生成](/zh-CN/tools/image-generation)。
 </Note>
 
-## Video generation
+## 视频生成
 
-The bundled `google` plugin also registers video generation through the shared
-`video_generate` tool.
+内置的 `google` 插件也通过共享的
+`video_generate` 工具注册视频生成。
 
-- Default video model: `google/veo-3.1-fast-generate-preview`
-- Modes: text-to-video, image-to-video, and single-video reference flows
-- Supports `aspectRatio`, `resolution`, and `audio`
-- Current duration clamp: **4 to 8 seconds**
+- 默认视频模型：`google/veo-3.1-fast-generate-preview`
+- 模式：文生视频、图生视频和单视频参考流程
+- 支持 `aspectRatio`、`resolution` 和 `audio`
+- 当前时长限制：**4 到 8 秒**
 
-To use Google as the default video provider:
+要将 Google 用作默认视频提供商：
 
 ```json5
 {
@@ -212,22 +218,22 @@ To use Google as the default video provider:
 ```
 
 <Note>
-See [Video Generation](/tools/video-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [视频生成](/zh-CN/tools/video-generation)。
 </Note>
 
-## Music generation
+## 音乐生成
 
-The bundled `google` plugin also registers music generation through the shared
-`music_generate` tool.
+内置的 `google` 插件也通过共享的
+`music_generate` 工具注册音乐生成。
 
-- Default music model: `google/lyria-3-clip-preview`
-- Also supports `google/lyria-3-pro-preview`
-- Prompt controls: `lyrics` and `instrumental`
-- Output format: `mp3` by default, plus `wav` on `google/lyria-3-pro-preview`
-- Reference inputs: up to 10 images
-- Session-backed runs detach through the shared task/status flow, including `action: "status"`
+- 默认音乐模型：`google/lyria-3-clip-preview`
+- 也支持 `google/lyria-3-pro-preview`
+- 提示控制：`lyrics` 和 `instrumental`
+- 输出格式：默认 `mp3`，并且 `google/lyria-3-pro-preview` 支持 `wav`
+- 参考输入：最多 10 张图像
+- 基于会话的运行会通过共享的任务/状态流程分离执行，包括 `action: "status"`
 
-To use Google as the default music provider:
+要将 Google 用作默认音乐提供商：
 
 ```json5
 {
@@ -242,20 +248,20 @@ To use Google as the default music provider:
 ```
 
 <Note>
-See [Music Generation](/tools/music-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [音乐生成](/zh-CN/tools/music-generation)。
 </Note>
 
-## Text-to-speech
+## 文本转语音
 
-The bundled `google` speech provider uses the Gemini API TTS path with
-`gemini-3.1-flash-tts-preview`.
+内置的 `google` 语音 provider 通过
+`gemini-3.1-flash-tts-preview` 使用 Gemini API TTS 路径。
 
-- Default voice: `Kore`
-- Auth: `messages.tts.providers.google.apiKey`, `models.providers.google.apiKey`, `GEMINI_API_KEY`, or `GOOGLE_API_KEY`
-- Output: WAV for regular TTS attachments, Opus for voice-note targets, PCM for Talk/telephony
-- Voice-note output: Google PCM is wrapped as WAV and transcoded to 48 kHz Opus with `ffmpeg`
+- 默认语音：`Kore`
+- 认证：`messages.tts.providers.google.apiKey`、`models.providers.google.apiKey`、`GEMINI_API_KEY` 或 `GOOGLE_API_KEY`
+- 输出：常规 TTS 附件使用 WAV，语音便笺目标使用 Opus，Talk/电话场景使用 PCM
+- 语音便笺输出：Google PCM 会被封装为 WAV，并通过 `ffmpeg` 转码为 48 kHz Opus
 
-To use Google as the default TTS provider:
+要将 Google 用作默认 TTS provider：
 
 ```json5
 {
@@ -275,14 +281,13 @@ To use Google as the default TTS provider:
 }
 ```
 
-Gemini API TTS uses natural-language prompting for style control. Set
-`audioProfile` to prepend a reusable style prompt before the spoken text. Set
-`speakerName` when your prompt text refers to a named speaker.
+Gemini API TTS 使用自然语言提示进行风格控制。设置
+`audioProfile` 以在朗读文本前附加可复用的风格提示。若你的提示文本引用了具名说话者，请设置
+`speakerName`。
 
-Gemini API TTS also accepts expressive square-bracket audio tags in the text,
-such as `[whispers]` or `[laughs]`. To keep tags out of the visible chat reply
-while sending them to TTS, put them inside a `[[tts:text]]...[[/tts:text]]`
-block:
+Gemini API TTS 也接受文本中的方括号音频标签，
+例如 `[whispers]` 或 `[laughs]`。为了在将这些标签发送给 TTS 的同时，不让它们出现在可见聊天回复中，请将其放入 `[[tts:text]]...[[/tts:text]]`
+块内：
 
 ```text
 Here is the clean reply text.
@@ -291,26 +296,26 @@ Here is the clean reply text.
 ```
 
 <Note>
-A Google Cloud Console API key restricted to the Gemini API is valid for this
-provider. This is not the separate Cloud Text-to-Speech API path.
+限制为 Gemini API 的 Google Cloud Console API 密钥对该
+provider 有效。这不是单独的 Cloud Text-to-Speech API 路径。
 </Note>
 
-## Realtime voice
+## 实时语音
 
-The bundled `google` plugin registers a realtime voice provider backed by the
-Gemini Live API for backend audio bridges such as Voice Call and Google Meet.
+内置的 `google` 插件注册了一个由
+Gemini Live API 支持的实时语音 provider，适用于 Voice Call 和 Google Meet 等后端音频桥接。
 
-| Setting               | Config path                                                         | Default                                                                               |
+| 设置 | 配置路径 | 默认值 |
 | --------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Model                 | `plugins.entries.voice-call.config.realtime.providers.google.model` | `gemini-2.5-flash-native-audio-preview-12-2025`                                       |
-| Voice                 | `...google.voice`                                                   | `Kore`                                                                                |
-| Temperature           | `...google.temperature`                                             | (unset)                                                                               |
-| VAD start sensitivity | `...google.startSensitivity`                                        | (unset)                                                                               |
-| VAD end sensitivity   | `...google.endSensitivity`                                          | (unset)                                                                               |
-| Silence duration      | `...google.silenceDurationMs`                                       | (unset)                                                                               |
-| API key               | `...google.apiKey`                                                  | Falls back to `models.providers.google.apiKey`, `GEMINI_API_KEY`, or `GOOGLE_API_KEY` |
+| 模型 | `plugins.entries.voice-call.config.realtime.providers.google.model` | `gemini-2.5-flash-native-audio-preview-12-2025` |
+| 语音 | `...google.voice` | `Kore` |
+| Temperature | `...google.temperature` | （未设置） |
+| VAD 开始灵敏度 | `...google.startSensitivity` | （未设置） |
+| VAD 结束灵敏度 | `...google.endSensitivity` | （未设置） |
+| 静音时长 | `...google.silenceDurationMs` | （未设置） |
+| API 密钥 | `...google.apiKey` | 回退到 `models.providers.google.apiKey`、`GEMINI_API_KEY` 或 `GOOGLE_API_KEY` |
 
-Example Voice Call realtime config:
+Voice Call 实时配置示例：
 
 ```json5
 {
@@ -337,34 +342,31 @@ Example Voice Call realtime config:
 ```
 
 <Note>
-Google Live API uses bidirectional audio and function calling over a WebSocket.
-OpenClaw adapts telephony/Meet bridge audio to Gemini's PCM Live API stream and
-keeps tool calls on the shared realtime voice contract. Leave `temperature`
-unset unless you need sampling changes; OpenClaw omits non-positive values
-because Google Live can return transcripts without audio for `temperature: 0`.
-Gemini API transcription is enabled without `languageCodes`; the current Google
-SDK rejects language-code hints on this API path.
+Google Live API 通过 WebSocket 使用双向音频和函数调用。
+OpenClaw 会将电话/Meet 桥接音频适配到 Gemini 的 PCM Live API 流中，并
+在共享实时语音约定上保留工具调用。除非你需要调整采样，否则请保持 `temperature`
+未设置；OpenClaw 会省略非正值，因为 Google Live 在 `temperature: 0` 时
+可能返回只有转录而没有音频的结果。
+Gemini API 转录在不设置 `languageCodes` 的情况下启用；当前 Google
+SDK 会在此 API 路径上拒绝语言代码提示。
 </Note>
 
 <Note>
-Control UI Talk browser sessions still require a realtime voice provider with a
-browser WebRTC session implementation. Today that path is OpenAI Realtime; the
-Google provider is for backend realtime bridges.
+Control UI Talk 浏览器会话仍然需要带有浏览器 WebRTC 会话实现的实时语音 provider。当前该路径是 OpenAI Realtime；Google provider 用于后端实时桥接。
 </Note>
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Direct Gemini cache reuse">
-    For direct Gemini API runs (`api: "google-generative-ai"`), OpenClaw
-    passes a configured `cachedContent` handle through to Gemini requests.
+  <Accordion title="直接复用 Gemini 缓存">
+    对于直接 Gemini API 运行（`api: "google-generative-ai"`），OpenClaw
+    会将已配置的 `cachedContent` 句柄透传给 Gemini 请求。
 
-    - Configure per-model or global params with either
-      `cachedContent` or legacy `cached_content`
-    - If both are present, `cachedContent` wins
-    - Example value: `cachedContents/prebuilt-context`
-    - Gemini cache-hit usage is normalized into OpenClaw `cacheRead` from
-      upstream `cachedContentTokenCount`
+    - 使用以下任一字段按模型或全局配置参数：
+      `cachedContent` 或旧版 `cached_content`
+    - 如果两者都存在，`cachedContent` 优先
+    - 示例值：`cachedContents/prebuilt-context`
+    - Gemini 缓存命中用量会从上游 `cachedContentTokenCount` 规范化为 OpenClaw `cacheRead`
 
     ```json5
     {
@@ -384,38 +386,38 @@ Google provider is for backend realtime bridges.
 
   </Accordion>
 
-  <Accordion title="Gemini CLI JSON usage notes">
-    When using the `google-gemini-cli` OAuth provider, OpenClaw normalizes
-    the CLI JSON output as follows:
+  <Accordion title="Gemini CLI JSON 使用说明">
+    使用 `google-gemini-cli` OAuth provider 时，OpenClaw 会按如下方式规范化
+    CLI JSON 输出：
 
-    - Reply text comes from the CLI JSON `response` field.
-    - Usage falls back to `stats` when the CLI leaves `usage` empty.
-    - `stats.cached` is normalized into OpenClaw `cacheRead`.
-    - If `stats.input` is missing, OpenClaw derives input tokens from
-      `stats.input_tokens - stats.cached`.
+    - 回复文本来自 CLI JSON 的 `response` 字段。
+    - 当 CLI 将 `usage` 留空时，用量会回退到 `stats`。
+    - `stats.cached` 会被规范化为 OpenClaw `cacheRead`。
+    - 如果缺少 `stats.input`，OpenClaw 会根据
+      `stats.input_tokens - stats.cached` 推导输入 token。
 
   </Accordion>
 
-  <Accordion title="Environment and daemon setup">
-    If the Gateway runs as a daemon (launchd/systemd), make sure `GEMINI_API_KEY`
-    is available to that process (for example, in `~/.openclaw/.env` or via
-    `env.shellEnv`).
+  <Accordion title="环境和守护进程设置">
+    如果 Gateway 网关 作为守护进程运行（`launchd`/`systemd`），请确保 `GEMINI_API_KEY`
+    对该进程可用（例如，在 `~/.openclaw/.env` 中或通过
+    `env.shellEnv`）。
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障转移行为。
   </Card>
-  <Card title="Image generation" href="/tools/image-generation" icon="image">
-    Shared image tool parameters and provider selection.
+  <Card title="图像生成" href="/zh-CN/tools/image-generation" icon="image">
+    共享图像工具参数和提供商选择。
   </Card>
-  <Card title="Video generation" href="/tools/video-generation" icon="video">
-    Shared video tool parameters and provider selection.
+  <Card title="视频生成" href="/zh-CN/tools/video-generation" icon="video">
+    共享视频工具参数和提供商选择。
   </Card>
-  <Card title="Music generation" href="/tools/music-generation" icon="music">
-    Shared music tool parameters and provider selection.
+  <Card title="音乐生成" href="/zh-CN/tools/music-generation" icon="music">
+    共享音乐工具参数和提供商选择。
   </Card>
 </CardGroup>

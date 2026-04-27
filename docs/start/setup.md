@@ -1,178 +1,185 @@
 ---
-summary: "Advanced setup and development workflows for OpenClaw"
 read_when:
-  - Setting up a new machine
-  - You want “latest + greatest” without breaking your personal setup
-title: "Setup"
+    - 设置一台新机器
+    - 你想要“最新最强”，同时又不破坏你的个人设置
+summary: OpenClaw 的高级设置与开发工作流
+title: 设置
+x-i18n:
+    generated_at: "2026-04-24T03:43:41Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: c4a965f39a14697a677c89ccadeb2b11b10c8e704e81e00619fffd5abe2ebc83
+    source_path: start/setup.md
+    workflow: 15
 ---
 
 <Note>
-If you are setting up for the first time, start with [Getting Started](/start/getting-started).
-For onboarding details, see [Onboarding (CLI)](/start/wizard).
+如果这是你第一次设置，请先阅读[入门指南](/zh-CN/start/getting-started)。
+有关新手引导的详细信息，请参阅[设置向导（CLI）](/zh-CN/start/wizard)。
 </Note>
 
 ## TL;DR
 
-Pick a setup workflow based on how often you want updates and whether you want to run the Gateway yourself:
+根据你希望更新的频率，以及你是否想自己运行 Gateway 网关，选择一种设置工作流：
 
-- **Tailoring lives outside the repo:** keep your config and workspace in `~/.openclaw/openclaw.json` and `~/.openclaw/workspace/` so repo updates don't touch them.
-- **Stable workflow (recommended for most):** install the macOS app and let it run the bundled Gateway.
-- **Bleeding edge workflow (dev):** run the Gateway yourself via `pnpm gateway:watch`, then let the macOS app attach in Local mode.
+- **个性化内容放在仓库之外：** 将你的配置和工作区保存在 `~/.openclaw/openclaw.json` 和 `~/.openclaw/workspace/` 中，这样仓库更新就不会影响它们。
+- **稳定工作流（推荐大多数人使用）：** 安装 macOS 应用，并让它运行内置的 Gateway 网关。
+- **前沿工作流（开发）：** 通过 `pnpm gateway:watch` 自行运行 Gateway 网关，然后让 macOS 应用在本地模式下连接上来。
 
-## Prereqs (from source)
+## 前置要求（从源码）
 
-- Node 24 recommended (Node 22 LTS, currently `22.14+`, still supported)
-- `pnpm` preferred (or Bun if you intentionally use the [Bun workflow](/install/bun))
-- Docker (optional; only for containerized setup/e2e — see [Docker](/install/docker))
+- 推荐使用 Node 24（仍支持 Node 22 LTS，目前为 `22.14+`）
+- 推荐使用 `pnpm`（或者如果你明确要使用 [Bun 工作流](/zh-CN/install/bun)，也可以用 Bun）
+- Docker（可选；仅用于容器化设置/e2e——请参阅 [Docker](/zh-CN/install/docker)）
 
-## Tailoring strategy (so updates do not hurt)
+## 个性化策略（这样更新就不会伤到你）
 
-If you want “100% tailored to me” _and_ easy updates, keep your customization in:
+如果你想要“100% 按我定制”**并且**易于更新，请将你的自定义内容保存在：
 
-- **Config:** `~/.openclaw/openclaw.json` (JSON/JSON5-ish)
-- **Workspace:** `~/.openclaw/workspace` (skills, prompts, memories; make it a private git repo)
+- **配置：** `~/.openclaw/openclaw.json`（JSON/近似 JSON5）
+- **工作区：** `~/.openclaw/workspace`（skills、提示词、记忆；建议将其设为私有 git 仓库）
 
-Bootstrap once:
-
-```bash
-openclaw setup
-```
-
-From inside this repo, use the local CLI entry:
+一次性初始化：
 
 ```bash
 openclaw setup
 ```
 
-If you don’t have a global install yet, run it via `pnpm openclaw setup` (or `bun run openclaw setup` if you are using the Bun workflow).
+在这个仓库内，使用本地 CLI 入口：
 
-## Run the Gateway from this repo
+```bash
+openclaw setup
+```
 
-After `pnpm build`, you can run the packaged CLI directly:
+如果你还没有全局安装，请通过 `pnpm openclaw setup` 运行（如果你使用的是 Bun 工作流，则用 `bun run openclaw setup`）。
+
+## 从此仓库运行 Gateway 网关
+
+执行 `pnpm build` 后，你可以直接运行打包后的 CLI：
 
 ```bash
 node openclaw.mjs gateway --port 18789 --verbose
 ```
 
-## Stable workflow (macOS app first)
+## 稳定工作流（先用 macOS 应用）
 
-1. Install + launch **OpenClaw.app** (menu bar).
-2. Complete the onboarding/permissions checklist (TCC prompts).
-3. Ensure Gateway is **Local** and running (the app manages it).
-4. Link surfaces (example: WhatsApp):
+1. 安装并启动 **OpenClaw.app**（菜单栏应用）。
+2. 完成新手引导/权限检查清单（TCC 提示）。
+3. 确保 Gateway 网关处于 **Local** 模式并正在运行（由应用管理）。
+4. 连接各个接口（例如：WhatsApp）：
 
 ```bash
 openclaw channels login
 ```
 
-5. Sanity check:
+5. 完整性检查：
 
 ```bash
 openclaw health
 ```
 
-If onboarding is not available in your build:
+如果你的构建中没有新手引导：
 
-- Run `openclaw setup`, then `openclaw channels login`, then start the Gateway manually (`openclaw gateway`).
+- 运行 `openclaw setup`，然后运行 `openclaw channels login`，再手动启动 Gateway 网关（`openclaw gateway`）。
 
-## Bleeding edge workflow (Gateway in a terminal)
+## 前沿工作流（在终端中运行 Gateway 网关）
 
-Goal: work on the TypeScript Gateway, get hot reload, keep the macOS app UI attached.
+目标：开发 TypeScript Gateway 网关，获得热重载，同时保持 macOS 应用 UI 已连接。
 
-### 0) (Optional) Run the macOS app from source too
+### 0）（可选）也从源码运行 macOS 应用
 
-If you also want the macOS app on the bleeding edge:
+如果你也想让 macOS 应用使用前沿版本：
 
 ```bash
 ./scripts/restart-mac.sh
 ```
 
-### 1) Start the dev Gateway
+### 1）启动开发版 Gateway 网关
 
 ```bash
 pnpm install
-# First run only (or after resetting local OpenClaw config/workspace)
+# 仅首次运行（或在重置本地 OpenClaw 配置/工作区之后）
 pnpm openclaw setup
 pnpm gateway:watch
 ```
 
-`gateway:watch` runs the gateway in watch mode and reloads on relevant source,
-config, and bundled-plugin metadata changes.
-`pnpm openclaw setup` is the one-time local config/workspace initialization step for a fresh checkout.
-`pnpm gateway:watch` does not rebuild `dist/control-ui`, so rerun `pnpm ui:build` after `ui/` changes or use `pnpm ui:dev` while developing the Control UI.
+`gateway:watch` 会以 watch 模式运行 gateway，并在相关源码、
+配置以及内置插件元数据变更时重新加载。
+`pnpm openclaw setup` 是全新 checkout 时，用于初始化本地配置/工作区的一次性步骤。
+`pnpm gateway:watch` 不会重建 `dist/control-ui`，因此在 `ui/` 变更后请重新运行 `pnpm ui:build`，或在开发 Control UI 时使用 `pnpm ui:dev`。
 
-If you are intentionally using the Bun workflow, the equivalent commands are:
+如果你明确使用的是 Bun 工作流，对应命令为：
 
 ```bash
 bun install
-# First run only (or after resetting local OpenClaw config/workspace)
+# 仅首次运行（或在重置本地 OpenClaw 配置/工作区之后）
 bun run openclaw setup
 bun run gateway:watch
 ```
 
-### 2) Point the macOS app at your running Gateway
+### 2）让 macOS 应用连接到你正在运行的 Gateway 网关
 
-In **OpenClaw.app**:
+在 **OpenClaw.app** 中：
 
-- Connection Mode: **Local**
-  The app will attach to the running gateway on the configured port.
+- 连接模式：**Local**
+  应用会连接到已配置端口上正在运行的 gateway。
 
-### 3) Verify
+### 3）验证
 
-- In-app Gateway status should read **“Using existing gateway …”**
-- Or via CLI:
+- 应用内的 Gateway 网关状态应显示为 **“Using existing gateway …”**
+- 或通过 CLI：
 
 ```bash
 openclaw health
 ```
 
-### Common footguns
+### 常见陷阱
 
-- **Wrong port:** Gateway WS defaults to `ws://127.0.0.1:18789`; keep app + CLI on the same port.
-- **Where state lives:**
-  - Channel/provider state: `~/.openclaw/credentials/`
-  - Model auth profiles: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
-  - Sessions: `~/.openclaw/agents/<agentId>/sessions/`
-  - Logs: `/tmp/openclaw/`
+- **端口错误：** Gateway WebSocket 默认是 `ws://127.0.0.1:18789`；请确保应用和 CLI 使用同一个端口。
+- **状态存储位置：**
+  - 渠道/提供商状态：`~/.openclaw/credentials/`
+  - 模型认证配置文件：`~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+  - 会话：`~/.openclaw/agents/<agentId>/sessions/`
+  - 日志：`/tmp/openclaw/`
 
-## Credential storage map
+## 凭证存储映射
 
-Use this when debugging auth or deciding what to back up:
+在调试认证问题或决定备份哪些内容时，可参考这里：
 
-- **WhatsApp**: `~/.openclaw/credentials/whatsapp/<accountId>/creds.json`
-- **Telegram bot token**: config/env or `channels.telegram.tokenFile` (regular file only; symlinks rejected)
-- **Discord bot token**: config/env or SecretRef (env/file/exec providers)
-- **Slack tokens**: config/env (`channels.slack.*`)
-- **Pairing allowlists**:
-  - `~/.openclaw/credentials/<channel>-allowFrom.json` (default account)
-  - `~/.openclaw/credentials/<channel>-<accountId>-allowFrom.json` (non-default accounts)
-- **Model auth profiles**: `~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
-- **File-backed secrets payload (optional)**: `~/.openclaw/secrets.json`
-- **Legacy OAuth import**: `~/.openclaw/credentials/oauth.json`
-  More detail: [Security](/gateway/security#credential-storage-map).
+- **WhatsApp**：`~/.openclaw/credentials/whatsapp/<accountId>/creds.json`
+- **Telegram bot token**：配置/env 或 `channels.telegram.tokenFile`（仅允许普通文件；拒绝符号链接）
+- **Discord bot token**：配置/env 或 SecretRef（env/file/exec 提供商）
+- **Slack tokens**：配置/env（`channels.slack.*`）
+- **配对允许列表：**
+  - `~/.openclaw/credentials/<channel>-allowFrom.json`（默认账户）
+  - `~/.openclaw/credentials/<channel>-<accountId>-allowFrom.json`（非默认账户）
+- **模型认证配置文件**：`~/.openclaw/agents/<agentId>/agent/auth-profiles.json`
+- **基于文件的 secrets 负载（可选）**：`~/.openclaw/secrets.json`
+- **旧版 OAuth 导入**：`~/.openclaw/credentials/oauth.json`
+  更多细节请参阅：[安全](/zh-CN/gateway/security#credential-storage-map)。
 
-## Updating (without wrecking your setup)
+## 更新（不破坏你的设置）
 
-- Keep `~/.openclaw/workspace` and `~/.openclaw/` as “your stuff”; don’t put personal prompts/config into the `openclaw` repo.
-- Updating source: `git pull` + your chosen package-manager install step (`pnpm install` by default; `bun install` for Bun workflow) + keep using the matching `gateway:watch` command.
+- 将 `~/.openclaw/workspace` 和 `~/.openclaw/` 视为“你的内容”；不要把个人提示词/配置放进 `openclaw` 仓库中。
+- 更新源码：`git pull` + 你所选包管理器的安装步骤（默认是 `pnpm install`；Bun 工作流使用 `bun install`）+ 继续使用对应的 `gateway:watch` 命令。
 
-## Linux (systemd user service)
+## Linux（systemd 用户服务）
 
-Linux installs use a systemd **user** service. By default, systemd stops user
-services on logout/idle, which kills the Gateway. Onboarding attempts to enable
-lingering for you (may prompt for sudo). If it’s still off, run:
+Linux 安装使用 systemd **用户**服务。默认情况下，systemd 会在用户
+注销/空闲时停止用户服务，这会终止 Gateway 网关。新手引导会尝试为你启用
+lingering（可能会提示输入 sudo）。如果仍未启用，请运行：
 
 ```bash
 sudo loginctl enable-linger $USER
 ```
 
-For always-on or multi-user servers, consider a **system** service instead of a
-user service (no lingering needed). See [Gateway runbook](/gateway) for the systemd notes.
+对于始终在线或多用户服务器，可考虑使用**系统**服务而不是
+用户服务（这样就不需要 lingering）。有关 systemd 的说明，请参阅 [Gateway runbook](/zh-CN/gateway)。
 
-## Related docs
+## 相关文档
 
-- [Gateway runbook](/gateway) (flags, supervision, ports)
-- [Gateway configuration](/gateway/configuration) (config schema + examples)
-- [Discord](/channels/discord) and [Telegram](/channels/telegram) (reply tags + replyToMode settings)
-- [OpenClaw assistant setup](/start/openclaw)
-- [macOS app](/platforms/macos) (gateway lifecycle)
+- [Gateway runbook](/zh-CN/gateway)（标志、托管、端口）
+- [Gateway 网关配置](/zh-CN/gateway/configuration)（配置 schema + 示例）
+- [Discord](/zh-CN/channels/discord) 和 [Telegram](/zh-CN/channels/telegram)（回复标签 + `replyToMode` 设置）
+- [OpenClaw assistant 设置](/zh-CN/start/openclaw)
+- [macOS 应用](/zh-CN/platforms/macos)（gateway 生命周期）

@@ -1,59 +1,66 @@
 ---
-summary: "Use MiniMax models in OpenClaw"
 read_when:
-  - You want MiniMax models in OpenClaw
-  - You need MiniMax setup guidance
-title: "MiniMax"
+    - 你想在 OpenClaw 中使用 MiniMax 模型
+    - 你需要 MiniMax 设置指南
+summary: 在 OpenClaw 中使用 MiniMax 模型
+title: MiniMax
+x-i18n:
+    generated_at: "2026-04-25T20:33:40Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 8b91f8c4c12c993457fb1535bbb2f3401474a3ec432b24189792a20041e756dc
+    source_path: providers/minimax.md
+    workflow: 15
 ---
 
-OpenClaw's MiniMax provider defaults to **MiniMax M2.7**.
+OpenClaw 的 MiniMax 提供商默认使用 **MiniMax M2.7**。
 
-MiniMax also provides:
+MiniMax 还提供：
 
-- Bundled speech synthesis via T2A v2
-- Bundled image understanding via `MiniMax-VL-01`
-- Bundled music generation via `music-2.6`
-- Bundled `web_search` through the MiniMax Coding Plan search API
+- 通过 T2A v2 内置语音合成
+- 通过 `MiniMax-VL-01` 内置图像理解
+- 通过 `music-2.6` 内置音乐生成
+- 通过 MiniMax Coding Plan 搜索 API 内置 `web_search`
 
-Provider split:
+提供商拆分：
 
-| Provider ID      | Auth    | Capabilities                                                                                        |
-| ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
-| `minimax`        | API key | Text, image generation, music generation, video generation, image understanding, speech, web search |
-| `minimax-portal` | OAuth   | Text, image generation, music generation, video generation, image understanding, speech             |
+| Provider ID      | 认证方式 | 能力                                                                                               |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `minimax`        | API key  | 文本、图像生成、音乐生成、视频生成、图像理解、语音、网页搜索 |
+| `minimax-portal` | OAuth    | 文本、图像生成、音乐生成、视频生成、图像理解、语音             |
 
-## Built-in catalog
+## 内置目录
 
-| Model                    | Type             | Description                              |
-| ------------------------ | ---------------- | ---------------------------------------- |
-| `MiniMax-M2.7`           | Chat (reasoning) | Default hosted reasoning model           |
-| `MiniMax-M2.7-highspeed` | Chat (reasoning) | Faster M2.7 reasoning tier               |
-| `MiniMax-VL-01`          | Vision           | Image understanding model                |
-| `image-01`               | Image generation | Text-to-image and image-to-image editing |
-| `music-2.6`              | Music generation | Default music model                      |
-| `music-2.5`              | Music generation | Previous music generation tier           |
-| `music-2.0`              | Music generation | Legacy music generation tier             |
-| `MiniMax-Hailuo-2.3`     | Video generation | Text-to-video and image reference flows  |
+| 模型                     | 类型             | 描述                           |
+| ------------------------ | ---------------- | ------------------------------ |
+| `MiniMax-M2.7`           | 聊天（推理）     | 默认托管推理模型               |
+| `MiniMax-M2.7-highspeed` | 聊天（推理）     | 更快的 M2.7 推理层级           |
+| `MiniMax-VL-01`          | 视觉             | 图像理解模型                   |
+| `image-01`               | 图像生成         | 文生图和图生图编辑             |
+| `music-2.6`              | 音乐生成         | 默认音乐模型                   |
+| `music-2.5`              | 音乐生成         | 上一代音乐生成层级             |
+| `music-2.0`              | 音乐生成         | 旧版音乐生成层级               |
+| `MiniMax-Hailuo-2.3`     | 视频生成         | 文生视频和图像参考工作流       |
 
-## Getting started
+## 入门指南
 
-Choose your preferred auth method and follow the setup steps.
+选择你偏好的认证方式，并按照设置步骤操作。
 
 <Tabs>
   <Tab title="OAuth (Coding Plan)">
-    **Best for:** quick setup with MiniMax Coding Plan via OAuth, no API key required.
+    **最适合：** 通过 OAuth 快速设置 MiniMax Coding Plan，无需 API key。
 
     <Tabs>
       <Tab title="International">
         <Steps>
-          <Step title="Run onboarding">
+          <Step title="运行新手引导">
             ```bash
             openclaw onboard --auth-choice minimax-global-oauth
             ```
 
-            This authenticates against `api.minimax.io`.
+            这会针对 `api.minimax.io` 进行认证。
           </Step>
-          <Step title="Verify the model is available">
+          <Step title="验证模型可用">
             ```bash
             openclaw models list --provider minimax-portal
             ```
@@ -62,14 +69,14 @@ Choose your preferred auth method and follow the setup steps.
       </Tab>
       <Tab title="China">
         <Steps>
-          <Step title="Run onboarding">
+          <Step title="运行新手引导">
             ```bash
             openclaw onboard --auth-choice minimax-cn-oauth
             ```
 
-            This authenticates against `api.minimaxi.com`.
+            这会针对 `api.minimaxi.com` 进行认证。
           </Step>
-          <Step title="Verify the model is available">
+          <Step title="验证模型可用">
             ```bash
             openclaw models list --provider minimax-portal
             ```
@@ -79,29 +86,29 @@ Choose your preferred auth method and follow the setup steps.
     </Tabs>
 
     <Note>
-    OAuth setups use the `minimax-portal` provider id. Model refs follow the form `minimax-portal/MiniMax-M2.7`.
+    OAuth 设置使用 `minimax-portal` provider id。模型引用采用 `minimax-portal/MiniMax-M2.7` 这种格式。
     </Note>
 
     <Tip>
-    Referral link for MiniMax Coding Plan (10% off): [MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
+    MiniMax Coding Plan 推荐链接（九折优惠）：[MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
     </Tip>
 
   </Tab>
 
   <Tab title="API key">
-    **Best for:** hosted MiniMax with Anthropic-compatible API.
+    **最适合：** 使用兼容 Anthropic API 的托管 MiniMax。
 
     <Tabs>
       <Tab title="International">
         <Steps>
-          <Step title="Run onboarding">
+          <Step title="运行新手引导">
             ```bash
             openclaw onboard --auth-choice minimax-global-api
             ```
 
-            This configures `api.minimax.io` as the base URL.
+            这会将 `api.minimax.io` 配置为基础 URL。
           </Step>
-          <Step title="Verify the model is available">
+          <Step title="验证模型可用">
             ```bash
             openclaw models list --provider minimax
             ```
@@ -110,14 +117,14 @@ Choose your preferred auth method and follow the setup steps.
       </Tab>
       <Tab title="China">
         <Steps>
-          <Step title="Run onboarding">
+          <Step title="运行新手引导">
             ```bash
             openclaw onboard --auth-choice minimax-cn-api
             ```
 
-            This configures `api.minimaxi.com` as the base URL.
+            这会将 `api.minimaxi.com` 配置为基础 URL。
           </Step>
-          <Step title="Verify the model is available">
+          <Step title="验证模型可用">
             ```bash
             openclaw models list --provider minimax
             ```
@@ -126,7 +133,7 @@ Choose your preferred auth method and follow the setup steps.
       </Tab>
     </Tabs>
 
-    ### Config example
+    ### 配置示例
 
     ```json5
     {
@@ -166,58 +173,58 @@ Choose your preferred auth method and follow the setup steps.
     ```
 
     <Warning>
-    On the Anthropic-compatible streaming path, OpenClaw disables MiniMax thinking by default unless you explicitly set `thinking` yourself. MiniMax's streaming endpoint emits `reasoning_content` in OpenAI-style delta chunks instead of native Anthropic thinking blocks, which can leak internal reasoning into visible output if left enabled implicitly.
+    在兼容 Anthropic 的流式传输路径上，除非你自行显式设置 `thinking`，否则 OpenClaw 默认会禁用 MiniMax thinking。MiniMax 的流式端点会以 OpenAI 风格的 delta 分块而不是原生 Anthropic thinking 块来输出 `reasoning_content`，如果在未显式控制的情况下启用，可能会把内部推理泄露到可见输出中。
     </Warning>
 
     <Note>
-    API-key setups use the `minimax` provider id. Model refs follow the form `minimax/MiniMax-M2.7`.
+    API-key 设置使用 `minimax` provider id。模型引用采用 `minimax/MiniMax-M2.7` 这种格式。
     </Note>
 
   </Tab>
 </Tabs>
 
-## Configure via `openclaw configure`
+## 通过 `openclaw configure` 配置
 
-Use the interactive config wizard to set MiniMax without editing JSON:
+使用交互式配置向导来设置 MiniMax，无需编辑 JSON：
 
 <Steps>
-  <Step title="Launch the wizard">
+  <Step title="启动向导">
     ```bash
     openclaw configure
     ```
   </Step>
-  <Step title="Select Model/auth">
-    Choose **Model/auth** from the menu.
+  <Step title="选择模型/认证">
+    从菜单中选择 **模型/认证**。
   </Step>
-  <Step title="Choose a MiniMax auth option">
-    Pick one of the available MiniMax options:
+  <Step title="选择一个 MiniMax 认证选项">
+    从可用的 MiniMax 选项中选择一个：
 
-    | Auth choice | Description |
+    | 认证选项 | 描述 |
     | --- | --- |
-    | `minimax-global-oauth` | International OAuth (Coding Plan) |
-    | `minimax-cn-oauth` | China OAuth (Coding Plan) |
-    | `minimax-global-api` | International API key |
-    | `minimax-cn-api` | China API key |
+    | `minimax-global-oauth` | 国际版 OAuth（Coding Plan） |
+    | `minimax-cn-oauth` | 中国版 OAuth（Coding Plan） |
+    | `minimax-global-api` | 国际版 API key |
+    | `minimax-cn-api` | 中国版 API key |
 
   </Step>
-  <Step title="Pick your default model">
-    Select your default model when prompted.
+  <Step title="选择你的默认模型">
+    在提示时选择你的默认模型。
   </Step>
 </Steps>
 
-## Capabilities
+## 功能
 
-### Image generation
+### 图像生成
 
-The MiniMax plugin registers the `image-01` model for the `image_generate` tool. It supports:
+MiniMax 插件为 `image_generate` 工具注册了 `image-01` 模型。它支持：
 
-- **Text-to-image generation** with aspect ratio control
-- **Image-to-image editing** (subject reference) with aspect ratio control
-- Up to **9 output images** per request
-- Up to **1 reference image** per edit request
-- Supported aspect ratios: `1:1`, `16:9`, `4:3`, `3:2`, `2:3`, `3:4`, `9:16`, `21:9`
+- **文生图生成**，支持宽高比控制
+- **图生图编辑**（主体参考），支持宽高比控制
+- 每次请求最多 **9 张输出图像**
+- 每次编辑请求最多 **1 张参考图像**
+- 支持的宽高比：`1:1`、`16:9`、`4:3`、`3:2`、`2:3`、`3:4`、`9:16`、`21:9`
 
-To use MiniMax for image generation, set it as the image generation provider:
+要使用 MiniMax 进行图像生成，请将其设置为图像生成提供商：
 
 ```json5
 {
@@ -229,74 +236,71 @@ To use MiniMax for image generation, set it as the image generation provider:
 }
 ```
 
-The plugin uses the same `MINIMAX_API_KEY` or OAuth auth as the text models. No additional configuration is needed if MiniMax is already set up.
+该插件与文本模型使用相同的 `MINIMAX_API_KEY` 或 OAuth 认证。如果 MiniMax 已经设置完成，则不需要额外配置。
 
-Both `minimax` and `minimax-portal` register `image_generate` with the same
-`image-01` model. API-key setups use `MINIMAX_API_KEY`; OAuth setups can use
-the bundled `minimax-portal` auth path instead.
+`minimax` 和 `minimax-portal` 都会使用相同的 `image-01` 模型注册 `image_generate`。API-key 设置使用 `MINIMAX_API_KEY`；OAuth 设置则可以改用内置的 `minimax-portal` 认证路径。
 
-Image generation always uses MiniMax's dedicated image endpoint
-(`/v1/image_generation`) and ignores `models.providers.minimax.baseUrl`,
-since that field configures the chat/Anthropic-compatible base URL. Set
-`MINIMAX_API_HOST=https://api.minimaxi.com` to route image generation
-through the CN endpoint; the default global endpoint is
-`https://api.minimax.io`.
+图像生成始终使用 MiniMax 专用的图像端点
+(`/v1/image_generation`)，并忽略 `models.providers.minimax.baseUrl`，
+因为该字段用于配置聊天 / 兼容 Anthropic 的基础 URL。设置
+`MINIMAX_API_HOST=https://api.minimaxi.com` 可将图像生成路由到
+中国区端点；默认的全球端点为
+`https://api.minimax.io`。
 
-When onboarding or API-key setup writes explicit `models.providers.minimax`
-entries, OpenClaw materializes `MiniMax-M2.7` and
-`MiniMax-M2.7-highspeed` as text-only chat models. Image understanding is
-exposed separately through the plugin-owned `MiniMax-VL-01` media provider.
+当新手引导或 API-key 设置写入显式的 `models.providers.minimax`
+条目时，OpenClaw 会将 `MiniMax-M2.7` 和
+`MiniMax-M2.7-highspeed` 具体化为仅文本的聊天模型。图像理解则通过由插件拥有的 `MiniMax-VL-01` 媒体提供商单独暴露。
 
 <Note>
-See [Image Generation](/tools/image-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [图像生成](/zh-CN/tools/image-generation)。
 </Note>
 
-### Text-to-speech
+### 文本转语音
 
-The bundled `minimax` plugin registers MiniMax T2A v2 as a speech provider for
-`messages.tts`.
+内置的 `minimax` 插件将 MiniMax T2A v2 注册为
+`messages.tts` 的语音提供商。
 
-- Default TTS model: `speech-2.8-hd`
-- Default voice: `English_expressive_narrator`
-- Supported bundled model ids include `speech-2.8-hd`, `speech-2.8-turbo`,
-  `speech-2.6-hd`, `speech-2.6-turbo`, `speech-02-hd`,
-  `speech-02-turbo`, `speech-01-hd`, and `speech-01-turbo`.
-- Auth resolution is `messages.tts.providers.minimax.apiKey`, then
-  `minimax-portal` OAuth/token auth profiles, then Token Plan environment
-  keys (`MINIMAX_OAUTH_TOKEN`, `MINIMAX_CODE_PLAN_KEY`,
-  `MINIMAX_CODING_API_KEY`), then `MINIMAX_API_KEY`.
-- If no TTS host is configured, OpenClaw reuses the configured
-  `minimax-portal` OAuth host and strips Anthropic-compatible path suffixes
-  such as `/anthropic`.
-- Normal audio attachments stay MP3.
-- Voice-note targets such as Feishu and Telegram are transcoded from MiniMax
-  MP3 to 48kHz Opus with `ffmpeg`, because the Feishu/Lark file API only
-  accepts `file_type: "opus"` for native audio messages.
-- MiniMax T2A accepts fractional `speed` and `vol`, but `pitch` is sent as an
-  integer; OpenClaw truncates fractional `pitch` values before the API request.
+- 默认 TTS 模型：`speech-2.8-hd`
+- 默认语音：`English_expressive_narrator`
+- 支持的内置模型 id 包括 `speech-2.8-hd`、`speech-2.8-turbo`、
+  `speech-2.6-hd`、`speech-2.6-turbo`、`speech-02-hd`、
+  `speech-02-turbo`、`speech-01-hd` 和 `speech-01-turbo`。
+- 认证解析顺序为 `messages.tts.providers.minimax.apiKey`，然后是
+  `minimax-portal` OAuth/token auth profiles，然后是 Token Plan 环境变量
+  键（`MINIMAX_OAUTH_TOKEN`、`MINIMAX_CODE_PLAN_KEY`、
+  `MINIMAX_CODING_API_KEY`），最后是 `MINIMAX_API_KEY`。
+- 如果未配置 TTS 主机，OpenClaw 会复用已配置的
+  `minimax-portal` OAuth 主机，并去除兼容 Anthropic 的路径后缀，
+  例如 `/anthropic`。
+- 常规音频附件保持为 MP3。
+- Feishu 和 Telegram 等语音便笺目标会通过 `ffmpeg` 从 MiniMax
+  MP3 转码为 48kHz Opus，因为 Feishu/Lark 文件 API 仅接受
+  `file_type: "opus"` 作为原生音频消息。
+- MiniMax T2A 接受小数 `speed` 和 `vol`，但 `pitch` 会以整数发送；
+  OpenClaw 会在 API 请求前截断带小数的 `pitch` 值。
 
-| Setting                                  | Env var                | Default                       | Description                      |
-| ---------------------------------------- | ---------------------- | ----------------------------- | -------------------------------- |
-| `messages.tts.providers.minimax.baseUrl` | `MINIMAX_API_HOST`     | `https://api.minimax.io`      | MiniMax T2A API host.            |
-| `messages.tts.providers.minimax.model`   | `MINIMAX_TTS_MODEL`    | `speech-2.8-hd`               | TTS model id.                    |
-| `messages.tts.providers.minimax.voiceId` | `MINIMAX_TTS_VOICE_ID` | `English_expressive_narrator` | Voice id used for speech output. |
-| `messages.tts.providers.minimax.speed`   |                        | `1.0`                         | Playback speed, `0.5..2.0`.      |
-| `messages.tts.providers.minimax.vol`     |                        | `1.0`                         | Volume, `(0, 10]`.               |
-| `messages.tts.providers.minimax.pitch`   |                        | `0`                           | Integer pitch shift, `-12..12`.  |
+| 设置                                     | 环境变量               | 默认值                        | 描述                         |
+| ---------------------------------------- | ---------------------- | ----------------------------- | ---------------------------- |
+| `messages.tts.providers.minimax.baseUrl` | `MINIMAX_API_HOST`     | `https://api.minimax.io`      | MiniMax T2A API 主机。       |
+| `messages.tts.providers.minimax.model`   | `MINIMAX_TTS_MODEL`    | `speech-2.8-hd`               | TTS 模型 id。                |
+| `messages.tts.providers.minimax.voiceId` | `MINIMAX_TTS_VOICE_ID` | `English_expressive_narrator` | 用于语音输出的语音 id。      |
+| `messages.tts.providers.minimax.speed`   |                        | `1.0`                         | 播放速度，`0.5..2.0`。       |
+| `messages.tts.providers.minimax.vol`     |                        | `1.0`                         | 音量，`(0, 10]`。            |
+| `messages.tts.providers.minimax.pitch`   |                        | `0`                           | 整数音高偏移，`-12..12`。    |
 
-### Music generation
+### 音乐生成
 
-The bundled MiniMax plugin registers music generation through the shared
-`music_generate` tool for both `minimax` and `minimax-portal`.
+内置的 MiniMax 插件通过共享的
+`music_generate` 工具为 `minimax` 和 `minimax-portal` 都注册了音乐生成能力。
 
-- Default music model: `minimax/music-2.6`
-- OAuth music model: `minimax-portal/music-2.6`
-- Also supports `minimax/music-2.5` and `minimax/music-2.0`
-- Prompt controls: `lyrics`, `instrumental`, `durationSeconds`
-- Output format: `mp3`
-- Session-backed runs detach through the shared task/status flow, including `action: "status"`
+- 默认音乐模型：`minimax/music-2.6`
+- OAuth 音乐模型：`minimax-portal/music-2.6`
+- 也支持 `minimax/music-2.5` 和 `minimax/music-2.0`
+- 提示词控制项：`lyrics`、`instrumental`、`durationSeconds`
+- 输出格式：`mp3`
+- 基于会话的运行会通过共享的任务 / 状态流程分离执行，包括 `action: "status"`
 
-To use MiniMax as the default music provider:
+要将 MiniMax 用作默认音乐提供商：
 
 ```json5
 {
@@ -311,20 +315,20 @@ To use MiniMax as the default music provider:
 ```
 
 <Note>
-See [Music Generation](/tools/music-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [音乐生成](/zh-CN/tools/music-generation)。
 </Note>
 
-### Video generation
+### 视频生成
 
-The bundled MiniMax plugin registers video generation through the shared
-`video_generate` tool for both `minimax` and `minimax-portal`.
+内置的 MiniMax 插件通过共享的
+`video_generate` 工具为 `minimax` 和 `minimax-portal` 都注册了视频生成能力。
 
-- Default video model: `minimax/MiniMax-Hailuo-2.3`
-- OAuth video model: `minimax-portal/MiniMax-Hailuo-2.3`
-- Modes: text-to-video and single-image reference flows
-- Supports `aspectRatio` and `resolution`
+- 默认视频模型：`minimax/MiniMax-Hailuo-2.3`
+- OAuth 视频模型：`minimax-portal/MiniMax-Hailuo-2.3`
+- 模式：文生视频和单图参考工作流
+- 支持 `aspectRatio` 和 `resolution`
 
-To use MiniMax as the default video provider:
+要将 MiniMax 用作默认视频提供商：
 
 ```json5
 {
@@ -339,68 +343,67 @@ To use MiniMax as the default video provider:
 ```
 
 <Note>
-See [Video Generation](/tools/video-generation) for shared tool parameters, provider selection, and failover behavior.
+有关共享工具参数、提供商选择和故障转移行为，请参见 [视频生成](/zh-CN/tools/video-generation)。
 </Note>
 
-### Image understanding
+### 图像理解
 
-The MiniMax plugin registers image understanding separately from the text
-catalog:
+MiniMax 插件将图像理解与文本
+目录分开注册：
 
-| Provider ID      | Default image model |
-| ---------------- | ------------------- |
-| `minimax`        | `MiniMax-VL-01`     |
-| `minimax-portal` | `MiniMax-VL-01`     |
+| Provider ID      | 默认图像模型      |
+| ---------------- | ----------------- |
+| `minimax`        | `MiniMax-VL-01`   |
+| `minimax-portal` | `MiniMax-VL-01`   |
 
-That is why automatic media routing can use MiniMax image understanding even
-when the bundled text-provider catalog still shows text-only M2.7 chat refs.
+这就是为什么即使内置的文本提供商目录仍然显示仅文本的 M2.7 聊天引用，自动媒体路由仍然可以使用 MiniMax 图像理解。
 
-### Web search
+### 网页搜索
 
-The MiniMax plugin also registers `web_search` through the MiniMax Coding Plan
-search API.
+MiniMax 插件还通过 MiniMax Coding Plan
+搜索 API 注册了 `web_search`。
 
-- Provider id: `minimax`
-- Structured results: titles, URLs, snippets, related queries
-- Preferred env var: `MINIMAX_CODE_PLAN_KEY`
-- Accepted env alias: `MINIMAX_CODING_API_KEY`
-- Compatibility fallback: `MINIMAX_API_KEY` when it already points at a coding-plan token
-- Region reuse: `plugins.entries.minimax.config.webSearch.region`, then `MINIMAX_API_HOST`, then MiniMax provider base URLs
-- Search stays on provider id `minimax`; OAuth CN/global setup can still steer region indirectly through `models.providers.minimax-portal.baseUrl`
+- 提供商 id：`minimax`
+- 结构化结果：标题、URL、摘要、相关查询
+- 首选环境变量：`MINIMAX_CODE_PLAN_KEY`
+- 可接受的环境变量别名：`MINIMAX_CODING_API_KEY`
+- 兼容性回退：如果 `MINIMAX_API_KEY` 已指向 coding-plan token，则使用它
+- 区域复用：`plugins.entries.minimax.config.webSearch.region`，然后是 `MINIMAX_API_HOST`，再然后是 MiniMax 提供商基础 URL
+- 搜索始终保留在提供商 id `minimax` 上；OAuth 中国区 / 国际版设置仍然可以通过 `models.providers.minimax-portal.baseUrl` 间接引导区域
 
-Config lives under `plugins.entries.minimax.config.webSearch.*`.
+配置位于 `plugins.entries.minimax.config.webSearch.*` 下。
 
 <Note>
-See [MiniMax Search](/tools/minimax-search) for full web search configuration and usage.
+有关完整的网页搜索配置和用法，请参见 [MiniMax 搜索](/zh-CN/tools/minimax-search)。
 </Note>
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Configuration options">
-    | Option | Description |
+  <Accordion title="配置选项">
+    | 选项 | 描述 |
     | --- | --- |
-    | `models.providers.minimax.baseUrl` | Prefer `https://api.minimax.io/anthropic` (Anthropic-compatible); `https://api.minimax.io/v1` is optional for OpenAI-compatible payloads |
-    | `models.providers.minimax.api` | Prefer `anthropic-messages`; `openai-completions` is optional for OpenAI-compatible payloads |
-    | `models.providers.minimax.apiKey` | MiniMax API key (`MINIMAX_API_KEY`) |
-    | `models.providers.minimax.models` | Define `id`, `name`, `reasoning`, `contextWindow`, `maxTokens`, `cost` |
-    | `agents.defaults.models` | Alias models you want in the allowlist |
-    | `models.mode` | Keep `merge` if you want to add MiniMax alongside built-ins |
+    | `models.providers.minimax.baseUrl` | 优先使用 `https://api.minimax.io/anthropic`（兼容 Anthropic）；`https://api.minimax.io/v1` 可选，用于兼容 OpenAI 的负载 |
+    | `models.providers.minimax.api` | 优先使用 `anthropic-messages`；`openai-completions` 可选，用于兼容 OpenAI 的负载 |
+    | `models.providers.minimax.apiKey` | MiniMax API key（`MINIMAX_API_KEY`） |
+    | `models.providers.minimax.models` | 定义 `id`、`name`、`reasoning`、`contextWindow`、`maxTokens`、`cost` |
+    | `agents.defaults.models` | 为你想加入 allowlist 的模型设置别名 |
+    | `models.mode` | 如果你想将 MiniMax 与内置模型一起添加，请保持为 `merge` |
   </Accordion>
 
-  <Accordion title="Thinking defaults">
-    On `api: "anthropic-messages"`, OpenClaw injects `thinking: { type: "disabled" }` unless thinking is already explicitly set in params/config.
+  <Accordion title="Thinking 默认值">
+    在 `api: "anthropic-messages"` 下，除非参数 / 配置中已经显式设置了 thinking，否则 OpenClaw 会注入 `thinking: { type: "disabled" }`。
 
-    This prevents MiniMax's streaming endpoint from emitting `reasoning_content` in OpenAI-style delta chunks, which would leak internal reasoning into visible output.
+    这样可以防止 MiniMax 的流式端点以 OpenAI 风格的 delta 分块输出 `reasoning_content`，从而把内部推理泄露到可见输出中。
 
   </Accordion>
 
-  <Accordion title="Fast mode">
-    `/fast on` or `params.fastMode: true` rewrites `MiniMax-M2.7` to `MiniMax-M2.7-highspeed` on the Anthropic-compatible stream path.
+  <Accordion title="快速模式">
+    `/fast on` 或 `params.fastMode: true` 会在兼容 Anthropic 的流式路径上将 `MiniMax-M2.7` 重写为 `MiniMax-M2.7-highspeed`。
   </Accordion>
 
-  <Accordion title="Fallback example">
-    **Best for:** keep your strongest latest-generation model as primary, fail over to MiniMax M2.7. Example below uses Opus as a concrete primary; swap to your preferred latest-gen primary model.
+  <Accordion title="回退示例">
+    **最适合：** 将你最强的最新一代模型保留为主模型，并在失败时回退到 MiniMax M2.7。下面的示例使用 Opus 作为具体主模型；你可以替换为你偏好的最新一代主模型。
 
     ```json5
     {
@@ -422,51 +425,51 @@ See [MiniMax Search](/tools/minimax-search) for full web search configuration an
 
   </Accordion>
 
-  <Accordion title="Coding Plan usage details">
-    - Coding Plan usage API: `https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains` (requires a coding plan key).
-    - OpenClaw normalizes MiniMax coding-plan usage to the same `% left` display used by other providers. MiniMax's raw `usage_percent` / `usagePercent` fields are remaining quota, not consumed quota, so OpenClaw inverts them. Count-based fields win when present.
-    - When the API returns `model_remains`, OpenClaw prefers the chat-model entry, derives the window label from `start_time` / `end_time` when needed, and includes the selected model name in the plan label so coding-plan windows are easier to distinguish.
-    - Usage snapshots treat `minimax`, `minimax-cn`, and `minimax-portal` as the same MiniMax quota surface, and prefer stored MiniMax OAuth before falling back to Coding Plan key env vars.
+  <Accordion title="Coding Plan 使用详情">
+    - Coding Plan 用量 API：`https://api.minimaxi.com/v1/api/openplatform/coding_plan/remains`（需要 coding plan key）。
+    - OpenClaw 会将 MiniMax coding-plan 用量标准化为与其他提供商相同的 “% left” 显示方式。MiniMax 原始的 `usage_percent` / `usagePercent` 字段表示的是剩余额度，而不是已消耗额度，因此 OpenClaw 会将其反转。有计数字段时优先使用计数字段。
+    - 当 API 返回 `model_remains` 时，OpenClaw 会优先选择聊天模型条目，在需要时根据 `start_time` / `end_time` 推导窗口标签，并在计划标签中包含所选模型名称，以便更容易区分 coding-plan 窗口。
+    - 用量快照将 `minimax`、`minimax-cn` 和 `minimax-portal` 视为同一个 MiniMax 配额面，并优先使用已存储的 MiniMax OAuth，然后才回退到 Coding Plan key 环境变量。
   </Accordion>
 </AccordionGroup>
 
-## Notes
+## 说明
 
-- Model refs follow the auth path:
-  - API-key setup: `minimax/<model>`
-  - OAuth setup: `minimax-portal/<model>`
-- Default chat model: `MiniMax-M2.7`
-- Alternate chat model: `MiniMax-M2.7-highspeed`
-- Onboarding and direct API-key setup write text-only model definitions for both M2.7 variants
-- Image understanding uses the plugin-owned `MiniMax-VL-01` media provider
-- Update pricing values in `models.json` if you need exact cost tracking
-- Use `openclaw models list` to confirm the current provider id, then switch with `openclaw models set minimax/MiniMax-M2.7` or `openclaw models set minimax-portal/MiniMax-M2.7`
+- 模型引用遵循认证路径：
+  - API-key 设置：`minimax/<model>`
+  - OAuth 设置：`minimax-portal/<model>`
+- 默认聊天模型：`MiniMax-M2.7`
+- 备用聊天模型：`MiniMax-M2.7-highspeed`
+- 新手引导和直接 API-key 设置会为两个 M2.7 变体写入仅文本模型定义
+- 图像理解使用由插件拥有的 `MiniMax-VL-01` 媒体提供商
+- 如果你需要精确的成本跟踪，请更新 `models.json` 中的定价值
+- 使用 `openclaw models list` 确认当前的提供商 id，然后通过 `openclaw models set minimax/MiniMax-M2.7` 或 `openclaw models set minimax-portal/MiniMax-M2.7` 进行切换
 
 <Tip>
-Referral link for MiniMax Coding Plan (10% off): [MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
+MiniMax Coding Plan 推荐链接（九折优惠）：[MiniMax Coding Plan](https://platform.minimax.io/subscribe/coding-plan?code=DbXJTRClnb&source=link)
 </Tip>
 
 <Note>
-See [Model providers](/concepts/model-providers) for provider rules.
+有关提供商规则，请参见 [模型提供商](/zh-CN/concepts/model-providers)。
 </Note>
 
-## Troubleshooting
+## 故障排除
 
 <AccordionGroup>
   <Accordion title='"Unknown model: minimax/MiniMax-M2.7"'>
-    This usually means the **MiniMax provider is not configured** (no matching provider entry and no MiniMax auth profile/env key found). A fix for this detection is in **2026.1.12**. Fix by:
+    这通常意味着 **MiniMax 提供商未配置**（没有匹配的提供商条目，也没有找到 MiniMax auth profile / 环境变量 key）。该检测问题的修复已包含在 **2026.1.12** 中。可通过以下方式修复：
 
-    - Upgrading to **2026.1.12** (or run from source `main`), then restarting the gateway.
-    - Running `openclaw configure` and selecting a **MiniMax** auth option, or
-    - Adding the matching `models.providers.minimax` or `models.providers.minimax-portal` block manually, or
-    - Setting `MINIMAX_API_KEY`, `MINIMAX_OAUTH_TOKEN`, or a MiniMax auth profile so the matching provider can be injected.
+    - 升级到 **2026.1.12**（或从源码 `main` 运行），然后重启 Gateway 网关。
+    - 运行 `openclaw configure` 并选择一个 **MiniMax** 认证选项，或
+    - 手动添加匹配的 `models.providers.minimax` 或 `models.providers.minimax-portal` 代码块，或
+    - 设置 `MINIMAX_API_KEY`、`MINIMAX_OAUTH_TOKEN` 或 MiniMax auth profile，以便注入匹配的提供商。
 
-    Make sure the model id is **case-sensitive**:
+    请确保模型 id **区分大小写**：
 
-    - API-key path: `minimax/MiniMax-M2.7` or `minimax/MiniMax-M2.7-highspeed`
-    - OAuth path: `minimax-portal/MiniMax-M2.7` or `minimax-portal/MiniMax-M2.7-highspeed`
+    - API-key 路径：`minimax/MiniMax-M2.7` 或 `minimax/MiniMax-M2.7-highspeed`
+    - OAuth 路径：`minimax-portal/MiniMax-M2.7` 或 `minimax-portal/MiniMax-M2.7-highspeed`
 
-    Then recheck with:
+    然后使用以下命令重新检查：
 
     ```bash
     openclaw models list
@@ -476,28 +479,28 @@ See [Model providers](/concepts/model-providers) for provider rules.
 </AccordionGroup>
 
 <Note>
-More help: [Troubleshooting](/help/troubleshooting) and [FAQ](/help/faq).
+更多帮助：[故障排除](/zh-CN/help/troubleshooting) 和 [常见问题](/zh-CN/help/faq)。
 </Note>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障转移行为。
   </Card>
-  <Card title="Image generation" href="/tools/image-generation" icon="image">
-    Shared image tool parameters and provider selection.
+  <Card title="图像生成" href="/zh-CN/tools/image-generation" icon="image">
+    共享图像工具参数和提供商选择。
   </Card>
-  <Card title="Music generation" href="/tools/music-generation" icon="music">
-    Shared music tool parameters and provider selection.
+  <Card title="音乐生成" href="/zh-CN/tools/music-generation" icon="music">
+    共享音乐工具参数和提供商选择。
   </Card>
-  <Card title="Video generation" href="/tools/video-generation" icon="video">
-    Shared video tool parameters and provider selection.
+  <Card title="视频生成" href="/zh-CN/tools/video-generation" icon="video">
+    共享视频工具参数和提供商选择。
   </Card>
-  <Card title="MiniMax Search" href="/tools/minimax-search" icon="magnifying-glass">
-    Web search configuration via MiniMax Coding Plan.
+  <Card title="MiniMax 搜索" href="/zh-CN/tools/minimax-search" icon="magnifying-glass">
+    通过 MiniMax Coding Plan 进行网页搜索配置。
   </Card>
-  <Card title="Troubleshooting" href="/help/troubleshooting" icon="wrench">
-    General troubleshooting and FAQ.
+  <Card title="故障排除" href="/zh-CN/help/troubleshooting" icon="wrench">
+    常规故障排除和常见问题。
   </Card>
 </CardGroup>

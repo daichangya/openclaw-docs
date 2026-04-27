@@ -2,8 +2,9 @@
 read_when:
     - 从零开始的首次设置
     - 你想用最快的方式开始一次可用的聊天
-summary: 在几分钟内安装 OpenClaw 并开始你的第一次聊天。
-title: 入门指南
+summary: 在几分钟内安装 OpenClaw 并开始你的第一次聊天。中文用户专属的快速入门指南。
+title: 入门指南 - 中文社区版
+description: "OpenClaw 中文快速入门指南，包含针对中国用户的安装建议、网络配置和本土化提示。"
 x-i18n:
     generated_at: "2026-04-24T04:07:39Z"
     model: gpt-5.4
@@ -12,6 +13,10 @@ x-i18n:
     source_path: start/getting-started.md
     workflow: 15
 ---
+
+<Note type="info">
+**中文用户提示：** 本文档已针对中国用户优化，包含国内网络环境下的安装建议和常见问题解答。如遇到网络连接问题，请参考下方的“中国用户特别提示”部分。
+</Note>
 
 安装 OpenClaw，运行新手引导，并与你的 AI 助手聊天 —— 整个过程大约只需
 5 分钟。完成后，你将拥有一个正在运行的 Gateway 网关、已配置好的认证，
@@ -154,3 +159,75 @@ openclaw dashboard
 - [安装概览](/zh-CN/install)
 - [渠道概览](/zh-CN/channels)
 - [设置](/zh-CN/start/setup)
+
+---
+
+## 🇨🇳 中国用户特别提示
+
+### 网络环境配置
+
+如果你在中国大陆使用，可能会遇到以下网络问题：
+
+#### 1. npm 安装慢或失败
+
+使用国内镜像源加速：
+
+```bash
+# 设置淘宝镜像
+npm config set registry https://registry.npmmirror.com
+
+# 然后安装
+npm install -g openclaw@latest
+```
+
+#### 2. API 访问问题
+
+部分 AI 模型提供商可能需要特殊网络配置：
+
+- **OpenAI**: 需要代理或国内代理服务
+- **Anthropic**: 需要代理或国内代理服务
+- **国内替代方案**: 
+  - [阿里云通义千问](/zh-CN/providers/qwen)
+  - [百度文心一言](/zh-CN/providers/qianfan)
+  - [月之暗面 Kimi](/zh-CN/providers/moonshot)
+
+#### 3. Docker 镜像拉取慢
+
+使用国内 Docker 镜像源：
+
+```bash
+# 配置 Docker 镜像加速器
+# 编辑 /etc/docker/daemon.json (Linux) 或 Docker Desktop 设置 (macOS/Windows)
+{
+  "registry-mirrors": [
+    "https://docker.m.daocloud.io",
+    "https://huecker.io"
+  ]
+}
+```
+
+### 推荐的国内模型提供商
+
+对于中国用户，我们推荐使用以下国内模型提供商，无需特殊网络配置：
+
+| 提供商 | 优势 | 文档 |
+|--------|------|------|
+| 阿里云通义千问 | 稳定、快速、中文理解好 | [Qwen 配置](/zh-CN/providers/qwen) |
+| 百度文心一言 | 中文能力强、企业级服务 | [千帆配置](/zh-CN/providers/qianfan) |
+| 月之暗面 Kimi | 长文本处理优秀 | [Kimi 配置](/zh-CN/providers/moonshot) |
+| MiniMax | 性价比高 | [MiniMax 配置](/zh-CN/providers/minimax) |
+
+### 常见问题
+
+**Q: 安装时提示网络连接超时？**  
+A: 使用上述的 npm 镜像源配置。
+
+**Q: Gateway 启动后无法访问？**  
+A: 检查防火墙设置，确保端口 18789 已开放。
+
+**Q: 如何选择合适的模型提供商？**  
+A: 如果在国内，优先选择阿里云、百度等国内提供商；如果有海外网络条件，可以选择 OpenAI 或 Anthropic。
+
+---
+
+> **需要帮助？** 如果在安装过程中遇到问题，欢迎在 [GitHub Issues](https://github.com/openclaw/openclaw/issues) 中提问，或使用标签 `i18n-zh` 以便中文社区成员更快响应。

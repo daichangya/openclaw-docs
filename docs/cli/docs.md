@@ -1,19 +1,26 @@
 ---
-summary: "CLI reference for `openclaw docs` (search the live docs index)"
 read_when:
-  - You want to search the live OpenClaw docs from the terminal
-title: "Docs"
+    - 你想从终端搜索实时的 OpenClaw 文档
+summary: '`openclaw docs` 的 CLI 参考（搜索实时文档索引）'
+title: 文档
+x-i18n:
+    generated_at: "2026-04-24T04:00:50Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 0d208f5b9a3576ce0597abca600df109db054d20068359a9f2070ac30b1a8f69
+    source_path: cli/docs.md
+    workflow: 15
 ---
 
 # `openclaw docs`
 
-Search the live docs index.
+搜索实时文档索引。
 
-Arguments:
+参数：
 
-- `[query...]`: search terms to send to the live docs index
+- `[query...]`：发送到实时文档索引的搜索词
 
-Examples:
+示例：
 
 ```bash
 openclaw docs
@@ -22,11 +29,11 @@ openclaw docs sandbox allowHostControl
 openclaw docs gateway token secretref
 ```
 
-Notes:
+说明：
 
-- With no query, `openclaw docs` opens the live docs search entrypoint.
-- Multi-word queries are passed through as one search request.
+- 不带查询词时，`openclaw docs` 会打开实时文档搜索入口。
+- 多词查询会作为一次搜索请求一并传递。
 
-## Related
+## 相关内容
 
-- [CLI reference](/cli)
+- [CLI 参考](/zh-CN/cli)

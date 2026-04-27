@@ -1,50 +1,57 @@
 ---
-summary: "Define permanent operating authority for autonomous agent programs"
 read_when:
-  - Setting up autonomous agent workflows that run without per-task prompting
-  - Defining what the agent can do independently vs. what needs human approval
-  - Structuring multi-program agents with clear boundaries and escalation rules
-title: "Standing orders"
+    - 设置无需逐任务提示即可运行的自治智能体工作流
+    - 定义智能体可以独立完成的事项，以及哪些事项需要人工批准
+    - 构建多程序智能体，并明确边界和升级规则
+summary: 为自治智能体程序定义永久运行权限
+title: 长期指令
+x-i18n:
+    generated_at: "2026-04-24T16:35:15Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 4a18777284a12e99b2e9f1ce660a0dc4d18ba5782d6a6a6673b495ab32b2d8cf
+    source_path: automation/standing-orders.md
+    workflow: 15
 ---
 
-Standing orders grant your agent **permanent operating authority** for defined programs. Instead of giving individual task instructions each time, you define programs with clear scope, triggers, and escalation rules — and the agent executes autonomously within those boundaries.
+长期指令会为你的智能体授予针对已定义程序的**永久运行权限**。你不必每次都单独下达任务指令，而是通过明确范围、触发条件和升级规则来定义程序——然后智能体会在这些边界内自主执行。
 
-This is the difference between telling your assistant "send the weekly report" every Friday vs. granting standing authority: "You own the weekly report. Compile it every Friday, send it, and only escalate if something looks wrong."
+这相当于：不是每周五都对助手说“发送每周报告”，而是授予长期权限：“每周报告由你负责。每周五完成汇总并发送，只有在发现异常时才升级给我处理。”
 
-## Why Standing Orders?
+## 为什么要使用长期指令？
 
-**Without standing orders:**
+**没有长期指令时：**
 
-- You must prompt the agent for every task
-- The agent sits idle between requests
-- Routine work gets forgotten or delayed
-- You become the bottleneck
+- 你必须为每个任务都提示智能体
+- 智能体会在请求之间处于空闲状态
+- 例行工作容易被遗忘或延迟
+- 你会成为整个流程的瓶颈
 
-**With standing orders:**
+**有了长期指令后：**
 
-- The agent executes autonomously within defined boundaries
-- Routine work happens on schedule without prompting
-- You only get involved for exceptions and approvals
-- The agent fills idle time productively
+- 智能体会在已定义边界内自主执行
+- 例行工作会按计划完成，无需提示
+- 你只需要参与异常情况和审批事项
+- 智能体会高效利用空闲时间
 
-## How they work
+## 它们如何工作
 
-Standing orders are defined in your [agent workspace](/concepts/agent-workspace) files. The recommended approach is to include them directly in `AGENTS.md` (which is auto-injected every session) so the agent always has them in context. For larger configurations, you can also place them in a dedicated file like `standing-orders.md` and reference it from `AGENTS.md`.
+长期指令定义在你的[智能体工作区](/zh-CN/concepts/agent-workspace)文件中。推荐做法是将它们直接写入 `AGENTS.md`（该文件会在每次会话中自动注入），这样智能体始终会在上下文中看到这些指令。对于更大的配置，你也可以将其放在专用文件中，例如 `standing-orders.md`，然后在 `AGENTS.md` 中引用它。
 
-Each program specifies:
+每个程序都应指定：
 
-1. **Scope** — what the agent is authorized to do
-2. **Triggers** — when to execute (schedule, event, or condition)
-3. **Approval gates** — what requires human sign-off before acting
-4. **Escalation rules** — when to stop and ask for help
+1. **范围** —— 智能体被授权执行哪些内容
+2. **触发条件** —— 何时执行（按计划、事件触发或条件触发）
+3. **审批关卡** —— 哪些操作需要先获得人工签字确认
+4. **升级规则** —— 何时停止并请求帮助
 
-The agent loads these instructions every session via the workspace bootstrap files (see [Agent Workspace](/concepts/agent-workspace) for the full list of auto-injected files) and executes against them, combined with [cron jobs](/automation/cron-jobs) for time-based enforcement.
+智能体会在每次会话中通过工作区引导文件加载这些指令（完整自动注入文件列表参见[智能体工作区](/zh-CN/concepts/agent-workspace)），并结合 [cron jobs](/zh-CN/automation/cron-jobs) 来执行基于时间的强制调度。
 
 <Tip>
-Put standing orders in `AGENTS.md` to guarantee they're loaded every session. The workspace bootstrap automatically injects `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `IDENTITY.md`, `USER.md`, `HEARTBEAT.md`, `BOOTSTRAP.md`, and `MEMORY.md` — but not arbitrary files in subdirectories.
+把长期指令放在 `AGENTS.md` 中，以确保它们会在每次会话中加载。工作区引导流程会自动注入 `AGENTS.md`、`SOUL.md`、`TOOLS.md`、`IDENTITY.md`、`USER.md`、`HEARTBEAT.md`、`BOOTSTRAP.md` 和 `MEMORY.md`——但不会自动注入子目录中的任意文件。
 </Tip>
 
-## Anatomy of a Standing Order
+## 长期指令的结构
 
 ```markdown
 ## Program: Weekly Status Report
@@ -69,9 +76,9 @@ Put standing orders in `AGENTS.md` to guarantee they're loaded every session. Th
 - Do not skip delivery if metrics look bad — report accurately
 ```
 
-## Standing Orders + Cron Jobs
+## 长期指令 + Cron Jobs
 
-Standing orders define **what** the agent is authorized to do. [Cron jobs](/automation/cron-jobs) define **when** it happens. They work together:
+长期指令定义智能体被授权做**什么**。[Cron Jobs](/zh-CN/automation/cron-jobs) 定义事情在**什么时候**发生。两者协同工作：
 
 ```
 Standing Order: "You own the daily inbox triage"
@@ -81,7 +88,7 @@ Cron Job (8 AM daily): "Execute inbox triage per standing orders"
 Agent: Reads standing orders → executes steps → reports results
 ```
 
-The cron job prompt should reference the standing order rather than duplicating it:
+`cron job` 提示应当引用长期指令，而不是重复书写其内容：
 
 ```bash
 openclaw cron add \
@@ -95,9 +102,9 @@ openclaw cron add \
   --message "Execute daily inbox triage per standing orders. Check mail for new alerts. Parse, categorize, and persist each item. Report summary to owner. Escalate unknowns."
 ```
 
-## Examples
+## 示例
 
-### Example 1: Content & Social Media (Weekly Cycle)
+### 示例 1：内容与社交媒体（每周循环）
 
 ```markdown
 ## Program: Content & Social Media
@@ -120,7 +127,7 @@ openclaw cron add \
 - Focus on value to audience, not self-promotion
 ```
 
-### Example 2: Finance Operations (Event-Triggered)
+### 示例 2：财务运营（事件触发）
 
 ```markdown
 ## Program: Financial Processing
@@ -146,7 +153,7 @@ openclaw cron add \
 - Failed processing after 2 retries: report failure, do not guess
 ```
 
-### Example 3: Monitoring & Alerts (Continuous)
+### 示例 3：监控与告警（持续运行）
 
 ```markdown
 ## Program: System Monitoring
@@ -172,13 +179,13 @@ openclaw cron add \
 | Channel offline  | Log and retry next cycle | If offline > 2 hours     |
 ```
 
-## The Execute-Verify-Report Pattern
+## 执行-验证-汇报模式
 
-Standing orders work best when combined with strict execution discipline. Every task in a standing order should follow this loop:
+长期指令在与严格的执行纪律结合时效果最好。长期指令中的每个任务都应遵循以下循环：
 
-1. **Execute** — Do the actual work (don't just acknowledge the instruction)
-2. **Verify** — Confirm the result is correct (file exists, message delivered, data parsed)
-3. **Report** — Tell the owner what was done and what was verified
+1. **执行** —— 完成实际工作（不要只是确认收到指令）
+2. **验证** —— 确认结果正确无误（文件存在、消息已送达、数据已解析）
+3. **汇报** —— 告诉所有者你做了什么，以及验证了什么
 
 ```markdown
 ### Execution Rules
@@ -191,11 +198,11 @@ Standing orders work best when combined with strict execution discipline. Every 
 - Never retry indefinitely — 3 attempts max, then escalate.
 ```
 
-This pattern prevents the most common agent failure mode: acknowledging a task without completing it.
+这种模式可以防止智能体最常见的失败方式：只确认任务，却没有真正完成任务。
 
-## Multi-Program Architecture
+## 多程序架构
 
-For agents managing multiple concerns, organize standing orders as separate programs with clear boundaries:
+对于需要管理多个事项的智能体，应将长期指令组织为多个独立程序，并明确它们之间的边界：
 
 ```markdown
 ## Program 1: [Domain A] (Weekly)
@@ -216,35 +223,35 @@ For agents managing multiple concerns, organize standing orders as separate prog
 - [Approval gates that apply across programs]
 ```
 
-Each program should have:
+每个程序都应具备：
 
-- Its own **trigger cadence** (weekly, monthly, event-driven, continuous)
-- Its own **approval gates** (some programs need more oversight than others)
-- Clear **boundaries** (the agent should know where one program ends and another begins)
+- 自己的**触发节奏**（每周、每月、事件驱动、持续运行）
+- 自己的**审批关卡**（有些程序比其他程序需要更多监督）
+- 清晰的**边界**（智能体应当知道一个程序在哪里结束，另一个程序从哪里开始）
 
-## Best Practices
+## 最佳实践
 
-### Do
+### 建议这样做
 
-- Start with narrow authority and expand as trust builds
-- Define explicit approval gates for high-risk actions
-- Include "What NOT to do" sections — boundaries matter as much as permissions
-- Combine with cron jobs for reliable time-based execution
-- Review agent logs weekly to verify standing orders are being followed
-- Update standing orders as your needs evolve — they're living documents
+- 一开始只授予较窄的权限，并随着信任建立逐步扩大
+- 为高风险操作定义明确的审批关卡
+- 加入“不要做什么”部分——边界和权限同样重要
+- 结合 Cron Jobs 使用，以实现可靠的定时执行
+- 每周检查智能体日志，确认长期指令正在被正确遵循
+- 随着需求演变更新长期指令——它们是动态文档
 
-### Avoid
+### 避免这样做
 
-- Grant broad authority on day one ("do whatever you think is best")
-- Skip escalation rules — every program needs a "when to stop and ask" clause
-- Assume the agent will remember verbal instructions — put everything in the file
-- Mix concerns in a single program — separate programs for separate domains
-- Forget to enforce with cron jobs — standing orders without triggers become suggestions
+- 第一天就授予过宽权限（“你觉得怎么最好就怎么做”）
+- 跳过升级规则——每个程序都需要“什么时候停止并询问”的条款
+- 假设智能体会记住口头指令——把所有内容都写进文件里
+- 在同一个程序中混合多个事项——不同领域应拆分为不同程序
+- 忘记通过 `cron jobs` 强制执行——没有触发器的长期指令只会变成建议
 
-## Related
+## 相关内容
 
-- [Automation & Tasks](/automation) — all automation mechanisms at a glance
-- [Cron Jobs](/automation/cron-jobs) — schedule enforcement for standing orders
-- [Hooks](/automation/hooks) — event-driven scripts for agent lifecycle events
-- [Webhooks](/automation/cron-jobs#webhooks) — inbound HTTP event triggers
-- [Agent Workspace](/concepts/agent-workspace) — where standing orders live, including the full list of auto-injected bootstrap files (AGENTS.md, SOUL.md, etc.)
+- [Automation & Tasks](/zh-CN/automation) —— 各类自动化机制总览
+- [Cron Jobs](/zh-CN/automation/cron-jobs) —— 长期指令的调度执行机制
+- [Hooks](/zh-CN/automation/hooks) —— 用于智能体生命周期事件的事件驱动脚本
+- [Webhooks](/zh-CN/automation/cron-jobs#webhooks) —— 入站 HTTP 事件触发器
+- [Agent Workspace](/zh-CN/concepts/agent-workspace) —— 长期指令的存放位置，包括完整的自动注入引导文件列表（AGENTS.md、SOUL.md 等）

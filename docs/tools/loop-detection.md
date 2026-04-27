@@ -1,26 +1,33 @@
 ---
-summary: "How to enable and tune guardrails that detect repetitive tool-call loops"
-title: "Tool-loop detection"
 read_when:
-  - A user reports agents getting stuck repeating tool calls
-  - You need to tune repetitive-call protection
-  - You are editing agent tool/runtime policies
+    - 有用户报告智能体会卡在重复调用工具的循环中
+    - 你需要调优重复调用保护
+    - 你正在编辑智能体工具 / 运行时策略
+summary: 如何启用并调优用于检测重复工具调用循环的护栏
+title: 工具循环检测
+x-i18n:
+    generated_at: "2026-04-23T23:05:05Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 0f5824d511ec33eb1f46c77250cb779b5e3bd5b3e5f16fab9e6c0b67297f87df
+    source_path: tools/loop-detection.md
+    workflow: 15
 ---
 
-OpenClaw can keep agents from getting stuck in repeated tool-call patterns.
-The guard is **disabled by default**.
+OpenClaw 可以防止智能体陷入重复工具调用模式。
+该护栏**默认关闭**。
 
-Enable it only where needed, because it can block legitimate repeated calls with strict settings.
+仅在确有需要时启用它，因为在设置过严时，它可能会阻止合法的重复调用。
 
-## Why this exists
+## 为什么需要这个功能
 
-- Detect repetitive sequences that do not make progress.
-- Detect high-frequency no-result loops (same tool, same inputs, repeated errors).
-- Detect specific repeated-call patterns for known polling tools.
+- 检测没有进展的重复序列。
+- 检测高频、无结果的循环（相同工具、相同输入、重复错误）。
+- 检测已知轮询工具的特定重复调用模式。
 
-## Configuration block
+## 配置块
 
-Global defaults:
+全局默认值：
 
 ```json5
 {
@@ -41,7 +48,7 @@ Global defaults:
 }
 ```
 
-Per-agent override (optional):
+按智能体覆盖（可选）：
 
 ```json5
 {
@@ -62,43 +69,43 @@ Per-agent override (optional):
 }
 ```
 
-### Field behavior
+### 字段行为
 
-- `enabled`: Master switch. `false` means no loop detection is performed.
-- `historySize`: number of recent tool calls kept for analysis.
-- `warningThreshold`: threshold before classifying a pattern as warning-only.
-- `criticalThreshold`: threshold for blocking repetitive loop patterns.
-- `globalCircuitBreakerThreshold`: global no-progress breaker threshold.
-- `detectors.genericRepeat`: detects repeated same-tool + same-params patterns.
-- `detectors.knownPollNoProgress`: detects known polling-like patterns with no state change.
-- `detectors.pingPong`: detects alternating ping-pong patterns.
+- `enabled`：总开关。`false` 表示不执行任何循环检测。
+- `historySize`：用于分析的最近工具调用保留数量。
+- `warningThreshold`：在将某种模式归类为仅警告之前的阈值。
+- `criticalThreshold`：用于阻止重复循环模式的阈值。
+- `globalCircuitBreakerThreshold`：全局无进展熔断阈值。
+- `detectors.genericRepeat`：检测“相同工具 + 相同参数”的重复模式。
+- `detectors.knownPollNoProgress`：检测无状态变化的已知轮询类模式。
+- `detectors.pingPong`：检测交替出现的乒乓模式。
 
-## Recommended setup
+## 推荐设置
 
-- Start with `enabled: true`, defaults unchanged.
-- Keep thresholds ordered as `warningThreshold < criticalThreshold < globalCircuitBreakerThreshold`.
-- If false positives occur:
-  - raise `warningThreshold` and/or `criticalThreshold`
-  - (optionally) raise `globalCircuitBreakerThreshold`
-  - disable only the detector causing issues
-  - reduce `historySize` for less strict historical context
+- 从 `enabled: true` 开始，其余默认值保持不变。
+- 保持阈值顺序为 `warningThreshold < criticalThreshold < globalCircuitBreakerThreshold`。
+- 如果出现误报：
+  - 提高 `warningThreshold` 和 / 或 `criticalThreshold`
+  - （可选）提高 `globalCircuitBreakerThreshold`
+  - 仅禁用引发问题的 detector
+  - 减小 `historySize`，以降低历史上下文的严格程度
 
-## Logs and expected behavior
+## 日志和预期行为
 
-When a loop is detected, OpenClaw reports a loop event and blocks or dampens the next tool-cycle depending on severity.
-This protects users from runaway token spend and lockups while preserving normal tool access.
+当检测到循环时，OpenClaw 会报告一个循环事件，并根据严重程度阻止或抑制下一次工具循环。
+这可以在保留正常工具访问能力的同时，防止 token 开销失控和卡死。
 
-- Prefer warning and temporary suppression first.
-- Escalate only when repeated evidence accumulates.
+- 优先采用警告和临时抑制。
+- 只有在重复证据持续积累时才升级处理。
 
-## Notes
+## 说明
 
-- `tools.loopDetection` is merged with agent-level overrides.
-- Per-agent config fully overrides or extends global values.
-- If no config exists, guardrails stay off.
+- `tools.loopDetection` 会与智能体级覆盖配置合并。
+- 按智能体配置会完整覆盖或扩展全局值。
+- 如果不存在任何配置，护栏将保持关闭。
 
-## Related
+## 相关内容
 
-- [Exec approvals](/tools/exec-approvals)
-- [Thinking levels](/tools/thinking)
-- [Sub-agents](/tools/subagents)
+- [Exec 批准](/zh-CN/tools/exec-approvals)
+- [思考级别](/zh-CN/tools/thinking)
+- [子智能体](/zh-CN/tools/subagents)

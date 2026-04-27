@@ -1,39 +1,38 @@
 ---
-summary: "Generate music via music_generate across Google Lyria, MiniMax, and ComfyUI workflows"
 read_when:
-  - Generating music or audio via the agent
-  - Configuring music-generation providers and models
-  - Understanding the music_generate tool parameters
-title: "Music generation"
-sidebarTitle: "Music generation"
+    - 通过智能体生成音乐或音频
+    - 配置音乐生成提供商和模型
+    - 了解 `music_generate` 工具参数
+sidebarTitle: Music generation
+summary: 通过 `music_generate` 在 Google Lyria、MiniMax 和 ComfyUI 工作流中生成音乐
+title: 音乐生成
+x-i18n:
+    generated_at: "2026-04-26T05:36:57Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 4eda549dbb93cbfe15e04462e08b7c86ff0718160244e3e5de3b041c62ee81ea
+    source_path: tools/music-generation.md
+    workflow: 15
 ---
 
-The `music_generate` tool lets the agent create music or audio through the
-shared music-generation capability with configured providers — Google,
-MiniMax, and workflow-configured ComfyUI today.
+`music_generate` 工具让智能体能够通过已配置提供商的共享音乐生成能力来创作音乐或音频——目前支持 Google、MiniMax，以及按工作流配置的 ComfyUI。
 
-For session-backed agent runs, OpenClaw starts music generation as a
-background task, tracks it in the task ledger, then wakes the agent again
-when the track is ready so the agent can post the finished audio back into
-the original channel.
+对于基于会话的智能体运行，OpenClaw 会将音乐生成作为后台任务启动，在任务台账中跟踪它，然后在音轨准备好后再次唤醒智能体，以便智能体将完成的音频发布回原始渠道。
 
 <Note>
-The built-in shared tool only appears when at least one music-generation
-provider is available. If you do not see `music_generate` in your agent's
-tools, configure `agents.defaults.musicGenerationModel` or set up a
-provider API key.
+只有在至少有一个音乐生成提供商可用时，内置共享工具才会出现。如果你在智能体工具中看不到 `music_generate`，请配置 `agents.defaults.musicGenerationModel` 或设置提供商 API 密钥。
 </Note>
 
-## Quick start
+## 快速开始
 
 <Tabs>
-  <Tab title="Shared provider-backed">
+  <Tab title="共享提供商支持">
     <Steps>
-      <Step title="Configure auth">
-        Set an API key for at least one provider — for example
-        `GEMINI_API_KEY` or `MINIMAX_API_KEY`.
+      <Step title="配置认证">
+        为至少一个提供商设置 API 密钥——例如
+        `GEMINI_API_KEY` 或 `MINIMAX_API_KEY`。
       </Step>
-      <Step title="Pick a default model (optional)">
+      <Step title="选择默认模型（可选）">
         ```json5
         {
           agents: {
@@ -46,30 +45,25 @@ provider API key.
         }
         ```
       </Step>
-      <Step title="Ask the agent">
-        _"Generate an upbeat synthpop track about a night drive through a
-        neon city."_
+      <Step title="向智能体发出请求">
+        _“生成一首关于夜晚驾车穿越霓虹都市的欢快 synthpop 音轨。”_
 
-        The agent calls `music_generate` automatically. No tool
-        allow-listing needed.
+        智能体会自动调用 `music_generate`。无需工具允许列表。
       </Step>
     </Steps>
 
-    For direct synchronous contexts without a session-backed agent run,
-    the built-in tool still falls back to inline generation and returns
-    the final media path in the tool result.
+    对于没有基于会话的智能体运行的直接同步上下文，内置工具仍会回退为内联生成，并在工具结果中返回最终媒体路径。
 
   </Tab>
-  <Tab title="ComfyUI workflow">
+  <Tab title="ComfyUI 工作流">
     <Steps>
-      <Step title="Configure the workflow">
-        Configure `plugins.entries.comfy.config.music` with a workflow
-        JSON and prompt/output nodes.
+      <Step title="配置工作流">
+        使用工作流 JSON 以及提示词/输出节点配置 `plugins.entries.comfy.config.music`。
       </Step>
-      <Step title="Cloud auth (optional)">
-        For Comfy Cloud, set `COMFY_API_KEY` or `COMFY_CLOUD_API_KEY`.
+      <Step title="云端认证（可选）">
+        对于 Comfy Cloud，设置 `COMFY_API_KEY` 或 `COMFY_CLOUD_API_KEY`。
       </Step>
-      <Step title="Call the tool">
+      <Step title="调用工具">
         ```text
         /tool music_generate prompt="Warm ambient synth loop with soft tape texture"
         ```
@@ -78,7 +72,7 @@ provider API key.
   </Tab>
 </Tabs>
 
-Example prompts:
+示例提示词：
 
 ```text
 Generate a cinematic piano track with soft strings and no vocals.
@@ -88,118 +82,100 @@ Generate a cinematic piano track with soft strings and no vocals.
 Generate an energetic chiptune loop about launching a rocket at sunrise.
 ```
 
-## Supported providers
+## 支持的提供商
 
-| Provider | Default model          | Reference inputs | Supported controls                                        | Auth                                   |
-| -------- | ---------------------- | ---------------- | --------------------------------------------------------- | -------------------------------------- |
-| ComfyUI  | `workflow`             | Up to 1 image    | Workflow-defined music or audio                           | `COMFY_API_KEY`, `COMFY_CLOUD_API_KEY` |
-| Google   | `lyria-3-clip-preview` | Up to 10 images  | `lyrics`, `instrumental`, `format`                        | `GEMINI_API_KEY`, `GOOGLE_API_KEY`     |
-| MiniMax  | `music-2.6`            | None             | `lyrics`, `instrumental`, `durationSeconds`, `format=mp3` | `MINIMAX_API_KEY` or MiniMax OAuth     |
+| 提供商 | 默认模型               | 参考输入      | 支持的控制项                                              | 认证                                   |
+| ------ | ---------------------- | ------------- | --------------------------------------------------------- | -------------------------------------- |
+| ComfyUI  | `workflow`             | 最多 1 张图片 | 工作流定义的音乐或音频                                    | `COMFY_API_KEY`, `COMFY_CLOUD_API_KEY` |
+| Google   | `lyria-3-clip-preview` | 最多 10 张图片 | `lyrics`、`instrumental`、`format`                        | `GEMINI_API_KEY`, `GOOGLE_API_KEY`     |
+| MiniMax  | `music-2.6`            | 无            | `lyrics`、`instrumental`、`durationSeconds`、`format=mp3` | `MINIMAX_API_KEY` 或 MiniMax OAuth     |
 
-### Capability matrix
+### 能力矩阵
 
-The explicit mode contract used by `music_generate`, contract tests, and the
-shared live sweep:
+`music_generate`、契约测试以及共享实时扫描使用的显式模式契约：
 
-| Provider | `generate` | `edit` | Edit limit | Shared live lanes                                                         |
-| -------- | :--------: | :----: | ---------- | ------------------------------------------------------------------------- |
-| ComfyUI  |     ✓      |   ✓    | 1 image    | Not in the shared sweep; covered by `extensions/comfy/comfy.live.test.ts` |
-| Google   |     ✓      |   ✓    | 10 images  | `generate`, `edit`                                                        |
-| MiniMax  |     ✓      |   —    | None       | `generate`                                                                |
+| 提供商 | `generate` | `edit` | 编辑上限 | 共享实时测试通道                                                       |
+| ------ | :--------: | :----: | -------- | ---------------------------------------------------------------------- |
+| ComfyUI  |     ✓      |   ✓    | 1 张图片 | 不在共享扫描中；由 `extensions/comfy/comfy.live.test.ts` 覆盖 |
+| Google   |     ✓      |   ✓    | 10 张图片 | `generate`、`edit`                                                     |
+| MiniMax  |     ✓      |   —    | 无       | `generate`                                                             |
 
-Use `action: "list"` to inspect available shared providers and models at
-runtime:
+使用 `action: "list"` 可在运行时检查可用的共享提供商和模型：
 
 ```text
 /tool music_generate action=list
 ```
 
-Use `action: "status"` to inspect the active session-backed music task:
+使用 `action: "status"` 可检查当前处于活动状态的基于会话的音乐任务：
 
 ```text
 /tool music_generate action=status
 ```
 
-Direct generation example:
+直接生成示例：
 
 ```text
 /tool music_generate prompt="Dreamy lo-fi hip hop with vinyl texture and gentle rain" instrumental=true
 ```
 
-## Tool parameters
+## 工具参数
 
 <ParamField path="prompt" type="string" required>
-  Music generation prompt. Required for `action: "generate"`.
+  音乐生成提示词。对于 `action: "generate"` 为必填。
 </ParamField>
 <ParamField path="action" type='"generate" | "status" | "list"' default="generate">
-  `"status"` returns the current session task; `"list"` inspects providers.
+  `"status"` 返回当前会话任务；`"list"` 检查提供商。
 </ParamField>
 <ParamField path="model" type="string">
-  Provider/model override (e.g. `google/lyria-3-pro-preview`,
-  `comfy/workflow`).
+  提供商/模型覆盖（例如 `google/lyria-3-pro-preview`、
+  `comfy/workflow`）。
 </ParamField>
 <ParamField path="lyrics" type="string">
-  Optional lyrics when the provider supports explicit lyric input.
+  当提供商支持显式歌词输入时的可选歌词。
 </ParamField>
 <ParamField path="instrumental" type="boolean">
-  Request instrumental-only output when the provider supports it.
+  当提供商支持时，请求仅器乐输出。
 </ParamField>
 <ParamField path="image" type="string">
-  Single reference image path or URL.
+  单个参考图片路径或 URL。
 </ParamField>
 <ParamField path="images" type="string[]">
-  Multiple reference images (up to 10 on supporting providers).
+  多张参考图片（在支持的提供商上最多 10 张）。
 </ParamField>
 <ParamField path="durationSeconds" type="number">
-  Target duration in seconds when the provider supports duration hints.
+  当提供商支持时长提示时的目标时长（秒）。
 </ParamField>
 <ParamField path="format" type='"mp3" | "wav"'>
-  Output format hint when the provider supports it.
+  当提供商支持时的输出格式提示。
 </ParamField>
-<ParamField path="filename" type="string">Output filename hint.</ParamField>
-<ParamField path="timeoutMs" type="number">Optional provider request timeout in milliseconds.</ParamField>
+<ParamField path="filename" type="string">输出文件名提示。</ParamField>
+<ParamField path="timeoutMs" type="number">可选的提供商请求超时时间（毫秒）。</ParamField>
 
 <Note>
-Not all providers support all parameters. OpenClaw still validates hard
-limits such as input counts before submission. When a provider supports
-duration but uses a shorter maximum than the requested value, OpenClaw
-clamps to the closest supported duration. Truly unsupported optional hints
-are ignored with a warning when the selected provider or model cannot honor
-them. Tool results report applied settings; `details.normalization`
-captures any requested-to-applied mapping.
+并非所有提供商都支持所有参数。OpenClaw 仍会在提交前验证硬性限制，例如输入数量。当提供商支持时长但其最大值短于请求值时，OpenClaw 会限制到最接近的受支持时长。对于真正不受支持的可选提示，当所选提供商或模型无法满足时，会忽略并给出警告。工具结果会报告已应用的设置；`details.normalization` 会记录从请求值到应用值的映射。
 </Note>
 
-## Async behavior
+## 异步行为
 
-Session-backed music generation runs as a background task:
+基于会话的音乐生成会作为后台任务运行：
 
-- **Background task:** `music_generate` creates a background task, returns a
-  started/task response immediately, and posts the finished track later in
-  a follow-up agent message.
-- **Duplicate prevention:** while a task is `queued` or `running`, later
-  `music_generate` calls in the same session return task status instead of
-  starting another generation. Use `action: "status"` to check explicitly.
-- **Status lookup:** `openclaw tasks list` or `openclaw tasks show <taskId>`
-  inspects queued, running, and terminal status.
-- **Completion wake:** OpenClaw injects an internal completion event back
-  into the same session so the model can write the user-facing follow-up
-  itself.
-- **Prompt hint:** later user/manual turns in the same session get a small
-  runtime hint when a music task is already in flight, so the model does
-  not blindly call `music_generate` again.
-- **No-session fallback:** direct/local contexts without a real agent
-  session run inline and return the final audio result in the same turn.
+- **后台任务：** `music_generate` 会创建一个后台任务，立即返回已启动/任务响应，并在稍后的后续智能体消息中发布完成的音轨。
+- **防止重复：** 当任务处于 `queued` 或 `running` 状态时，同一会话中后续的 `music_generate` 调用会返回任务状态，而不是再次启动生成。使用 `action: "status"` 可显式检查。
+- **Status 查询：** `openclaw tasks list` 或 `openclaw tasks show <taskId>` 可检查排队中、运行中和终态状态。
+- **完成唤醒：** OpenClaw 会将内部完成事件重新注入同一会话，以便模型自行编写面向用户的后续消息。
+- **提示提示：** 当音乐任务已经在进行中时，同一会话中的后续用户/手动轮次会收到一个小型运行时提示，因此模型不会盲目再次调用 `music_generate`。
+- **无会话回退：** 没有真实智能体会话的直接/本地上下文会以内联方式运行，并在同一轮中返回最终音频结果。
 
-### Task lifecycle
+### 任务生命周期
 
-| State       | Meaning                                                                                        |
-| ----------- | ---------------------------------------------------------------------------------------------- |
-| `queued`    | Task created, waiting for the provider to accept it.                                           |
-| `running`   | Provider is processing (typically 30 seconds to 3 minutes depending on provider and duration). |
-| `succeeded` | Track ready; the agent wakes and posts it to the conversation.                                 |
-| `failed`    | Provider error or timeout; the agent wakes with error details.                                 |
+| 状态        | 含义                                                                                         |
+| ----------- | -------------------------------------------------------------------------------------------- |
+| `queued`    | 任务已创建，正在等待提供商接受。                                                             |
+| `running`   | 提供商正在处理（通常需要 30 秒到 3 分钟，取决于提供商和时长）。                              |
+| `succeeded` | 音轨已准备好；智能体被唤醒并将其发布到对话中。                                               |
+| `failed`    | 提供商错误或超时；智能体被唤醒并附带错误详情。                                               |
 
-Check status from the CLI:
+从 CLI 检查状态：
 
 ```bash
 openclaw tasks list
@@ -207,9 +183,9 @@ openclaw tasks show <taskId>
 openclaw tasks cancel <taskId>
 ```
 
-## Configuration
+## 配置
 
-### Model selection
+### 模型选择
 
 ```json5
 {
@@ -224,63 +200,52 @@ openclaw tasks cancel <taskId>
 }
 ```
 
-### Provider selection order
+### 提供商选择顺序
 
-OpenClaw tries providers in this order:
+OpenClaw 会按以下顺序尝试提供商：
 
-1. `model` parameter from the tool call (if the agent specifies one).
-2. `musicGenerationModel.primary` from config.
-3. `musicGenerationModel.fallbacks` in order.
-4. Auto-detection using auth-backed provider defaults only:
-   - current default provider first;
-   - remaining registered music-generation providers in provider-id order.
+1. 工具调用中的 `model` 参数（如果智能体指定了一个）。
+2. 配置中的 `musicGenerationModel.primary`。
+3. 按顺序使用 `musicGenerationModel.fallbacks`。
+4. 仅使用具备认证支持的提供商默认值进行自动检测：
+   - 当前默认提供商优先；
+   - 剩余已注册的音乐生成提供商按提供商 ID 顺序。
 
-If a provider fails, the next candidate is tried automatically. If all
-fail, the error includes details from each attempt.
+如果某个提供商失败，会自动尝试下一个候选项。如果全部失败，错误中会包含每次尝试的详细信息。
 
-Set `agents.defaults.mediaGenerationAutoProviderFallback: false` to use only
-explicit `model`, `primary`, and `fallbacks` entries.
+设置 `agents.defaults.mediaGenerationAutoProviderFallback: false` 可仅使用显式的 `model`、`primary` 和 `fallbacks` 条目。
 
-## Provider notes
+## 提供商说明
 
 <AccordionGroup>
   <Accordion title="ComfyUI">
-    Workflow-driven and depends on the configured graph plus node mapping
-    for prompt/output fields. The bundled `comfy` plugin plugs into the
-    shared `music_generate` tool through the music-generation provider
-    registry.
+    由工作流驱动，并依赖已配置的图以及提示词/输出字段的节点映射。内置的 `comfy` 插件通过音乐生成提供商注册表接入共享 `music_generate` 工具。
   </Accordion>
   <Accordion title="Google (Lyria 3)">
-    Uses Lyria 3 batch generation. The current bundled flow supports
-    prompt, optional lyrics text, and optional reference images.
+    使用 Lyria 3 批量生成。当前内置流程支持提示词、可选歌词文本以及可选参考图片。
   </Accordion>
   <Accordion title="MiniMax">
-    Uses the batch `music_generation` endpoint. Supports prompt, optional
-    lyrics, instrumental mode, duration steering, and mp3 output through
-    either `minimax` API-key auth or `minimax-portal` OAuth.
+    使用批量 `music_generation` 端点。支持提示词、可选歌词、器乐模式、时长控制，以及通过 `minimax` API 密钥认证或 `minimax-portal` OAuth 输出 mp3。
   </Accordion>
 </AccordionGroup>
 
-## Choosing the right path
+## 选择合适的路径
 
-- **Shared provider-backed** when you want model selection, provider
-  failover, and the built-in async task/status flow.
-- **Plugin path (ComfyUI)** when you need a custom workflow graph or a
-  provider that is not part of the shared bundled music capability.
+- **共享提供商支持**：当你需要模型选择、提供商故障切换以及内置的异步任务/状态流程时。
+- **插件路径（ComfyUI）**：当你需要自定义工作流图，或需要不属于共享内置音乐能力的提供商时。
 
-If you are debugging ComfyUI-specific behavior, see
-[ComfyUI](/providers/comfy). If you are debugging shared provider
-behavior, start with [Google (Gemini)](/providers/google) or
-[MiniMax](/providers/minimax).
+如果你正在调试 ComfyUI 特有行为，请参阅
+[ComfyUI](/zh-CN/providers/comfy)。如果你正在调试共享提供商行为，请先查看 [Google (Gemini)](/zh-CN/providers/google) 或
+[MiniMax](/zh-CN/providers/minimax)。
 
-## Provider capability modes
+## 提供商能力模式
 
-The shared music-generation contract supports explicit mode declarations:
+共享音乐生成契约支持显式模式声明：
 
-- `generate` for prompt-only generation.
-- `edit` when the request includes one or more reference images.
+- `generate` 用于仅基于提示词的生成。
+- 当请求包含一张或多张参考图片时，使用 `edit`。
 
-New provider implementations should prefer explicit mode blocks:
+新的提供商实现应优先使用显式模式块：
 
 ```typescript
 capabilities: {
@@ -298,50 +263,43 @@ capabilities: {
 }
 ```
 
-Legacy flat fields such as `maxInputImages`, `supportsLyrics`, and
-`supportsFormat` are **not** enough to advertise edit support. Providers
-should declare `generate` and `edit` explicitly so live tests, contract
-tests, and the shared `music_generate` tool can validate mode support
-deterministically.
+旧版扁平字段（如 `maxInputImages`、`supportsLyrics` 和
+`supportsFormat`）**不足以**宣告支持编辑。提供商应显式声明 `generate` 和 `edit`，以便实时测试、契约测试以及共享 `music_generate` 工具能够以确定性方式验证模式支持。
 
-## Live tests
+## 实时测试
 
-Opt-in live coverage for the shared bundled providers:
+为共享内置提供商启用的实时覆盖：
 
 ```bash
 OPENCLAW_LIVE_TEST=1 pnpm test:live -- extensions/music-generation-providers.live.test.ts
 ```
 
-Repo wrapper:
+仓库封装命令：
 
 ```bash
 pnpm test:live:media music
 ```
 
-This live file loads missing provider env vars from `~/.profile`, prefers
-live/env API keys ahead of stored auth profiles by default, and runs both
-`generate` and declared `edit` coverage when the provider enables edit
-mode. Coverage today:
+此实时文件会从 `~/.profile` 加载缺失的提供商环境变量，默认优先使用实时/环境 API 密钥而不是已存储的认证配置文件，并在提供商启用编辑模式时同时运行 `generate` 和已声明的 `edit` 覆盖。当前覆盖范围：
 
-- `google`: `generate` plus `edit`
-- `minimax`: `generate` only
-- `comfy`: separate Comfy live coverage, not the shared provider sweep
+- `google`：`generate` 加 `edit`
+- `minimax`：仅 `generate`
+- `comfy`：单独的 Comfy 实时覆盖，不属于共享提供商扫描
 
-Opt-in live coverage for the bundled ComfyUI music path:
+为内置 ComfyUI 音乐路径启用的实时覆盖：
 
 ```bash
 OPENCLAW_LIVE_TEST=1 COMFY_LIVE_TEST=1 pnpm test:live -- extensions/comfy/comfy.live.test.ts
 ```
 
-The Comfy live file also covers comfy image and video workflows when those
-sections are configured.
+当相应部分已配置时，Comfy 实时文件还会覆盖 comfy 图片和视频工作流。
 
-## Related
+## 相关内容
 
-- [Background tasks](/automation/tasks) — task tracking for detached `music_generate` runs
-- [ComfyUI](/providers/comfy)
-- [Configuration reference](/gateway/config-agents#agent-defaults) — `musicGenerationModel` config
-- [Google (Gemini)](/providers/google)
-- [MiniMax](/providers/minimax)
-- [Models](/concepts/models) — model configuration and failover
-- [Tools overview](/tools)
+- [后台任务](/zh-CN/automation/tasks) — 用于分离式 `music_generate` 运行的任务跟踪
+- [ComfyUI](/zh-CN/providers/comfy)
+- [配置参考](/zh-CN/gateway/config-agents#agent-defaults) — `musicGenerationModel` 配置
+- [Google (Gemini)](/zh-CN/providers/google)
+- [MiniMax](/zh-CN/providers/minimax)
+- [Models](/zh-CN/concepts/models) — 模型配置和故障切换
+- [工具概览](/zh-CN/tools)

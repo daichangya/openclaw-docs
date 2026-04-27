@@ -1,45 +1,51 @@
 ---
-summary: "Use Amazon Bedrock (Converse API) models with OpenClaw"
 read_when:
-  - You want to use Amazon Bedrock models with OpenClaw
-  - You need AWS credential/region setup for model calls
-title: "Amazon Bedrock"
+    - 你想在 OpenClaw 中使用 Amazon Bedrock 模型
+    - 你需要为模型调用设置 AWS 凭证/区域
+summary: 在 OpenClaw 中使用 Amazon Bedrock（Converse API）模型
+title: Amazon Bedrock
+x-i18n:
+    generated_at: "2026-04-23T20:59:36Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 7e37aaead5c9bd730b4dd1f2878ff63bebf5537d75ff9df786813c58b1ac2fc0
+    source_path: providers/bedrock.md
+    workflow: 15
 ---
 
-OpenClaw can use **Amazon Bedrock** models via pi-ai's **Bedrock Converse**
-streaming provider. Bedrock auth uses the **AWS SDK default credential chain**,
-not an API key.
+OpenClaw 可以通过 pi-ai 的 **Bedrock Converse**
+流式提供商使用 **Amazon Bedrock** 模型。Bedrock 认证使用的是 **AWS SDK 默认凭证链**，而不是 API key。
 
-| Property | Value                                                       |
+| 属性 | 值 |
 | -------- | ----------------------------------------------------------- |
-| Provider | `amazon-bedrock`                                            |
-| API      | `bedrock-converse-stream`                                   |
-| Auth     | AWS credentials (env vars, shared config, or instance role) |
-| Region   | `AWS_REGION` or `AWS_DEFAULT_REGION` (default: `us-east-1`) |
+| 提供商 | `amazon-bedrock` |
+| API | `bedrock-converse-stream` |
+| 认证 | AWS 凭证（环境变量、共享配置或实例角色） |
+| 区域 | `AWS_REGION` 或 `AWS_DEFAULT_REGION`（默认：`us-east-1`） |
 
-## Getting started
+## 入门指南
 
-Choose your preferred auth method and follow the setup steps.
+请选择你偏好的认证方式，并按照相应步骤进行设置。
 
 <Tabs>
-  <Tab title="Access keys / env vars">
-    **Best for:** developer machines, CI, or hosts where you manage AWS credentials directly.
+  <Tab title="访问密钥 / 环境变量">
+    **最适合：** 开发者机器、CI，或你直接管理 AWS 凭证的主机。
 
     <Steps>
-      <Step title="Set AWS credentials on the gateway host">
+      <Step title="在 gateway 主机上设置 AWS 凭证">
         ```bash
         export AWS_ACCESS_KEY_ID="AKIA..."
         export AWS_SECRET_ACCESS_KEY="..."
         export AWS_REGION="us-east-1"
-        # Optional:
+        # 可选：
         export AWS_SESSION_TOKEN="..."
         export AWS_PROFILE="your-profile"
-        # Optional (Bedrock API key/bearer token):
+        # 可选（Bedrock API key/bearer token）：
         export AWS_BEARER_TOKEN_BEDROCK="..."
         ```
       </Step>
-      <Step title="Add a Bedrock provider and model to your config">
-        No `apiKey` is required. Configure the provider with `auth: "aws-sdk"`:
+      <Step title="在配置中添加 Bedrock 提供商和模型">
+        不需要 `apiKey`。请使用 `auth: "aws-sdk"` 配置该提供商：
 
         ```json5
         {
@@ -71,7 +77,7 @@ Choose your preferred auth method and follow the setup steps.
         }
         ```
       </Step>
-      <Step title="Verify models are available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list
         ```
@@ -79,34 +85,34 @@ Choose your preferred auth method and follow the setup steps.
     </Steps>
 
     <Tip>
-    With env-marker auth (`AWS_ACCESS_KEY_ID`, `AWS_PROFILE`, or `AWS_BEARER_TOKEN_BEDROCK`), OpenClaw auto-enables the implicit Bedrock provider for model discovery without extra config.
+    使用 env-marker 认证（`AWS_ACCESS_KEY_ID`、`AWS_PROFILE` 或 `AWS_BEARER_TOKEN_BEDROCK`）时，OpenClaw 会自动启用隐式 Bedrock 提供商，以便在无需额外配置的情况下进行模型发现。
     </Tip>
 
   </Tab>
 
-  <Tab title="EC2 instance roles (IMDS)">
-    **Best for:** EC2 instances with an IAM role attached, using the instance metadata service for authentication.
+  <Tab title="EC2 实例角色（IMDS）">
+    **最适合：** 已附加 IAM 角色的 EC2 实例，并通过实例元数据服务进行认证。
 
     <Steps>
-      <Step title="Enable discovery explicitly">
-        When using IMDS, OpenClaw cannot detect AWS auth from env markers alone, so you must opt in:
+      <Step title="显式启用发现">
+        使用 IMDS 时，OpenClaw 无法仅凭 env markers 检测 AWS 认证，因此你必须显式开启：
 
         ```bash
         openclaw config set plugins.entries.amazon-bedrock.config.discovery.enabled true
         openclaw config set plugins.entries.amazon-bedrock.config.discovery.region us-east-1
         ```
       </Step>
-      <Step title="Optionally add an env marker for auto mode">
-        If you also want the env-marker auto-detection path to work (for example, for `openclaw status` surfaces):
+      <Step title="可选：添加 env marker 以支持自动模式">
+        如果你还希望 env-marker 自动检测路径生效（例如用于 `openclaw status` 界面）：
 
         ```bash
         export AWS_PROFILE=default
         export AWS_REGION=us-east-1
         ```
 
-        You do **not** need a fake API key.
+        你**不**需要伪造 API key。
       </Step>
-      <Step title="Verify models are discovered">
+      <Step title="验证模型已被发现">
         ```bash
         openclaw models list
         ```
@@ -114,49 +120,48 @@ Choose your preferred auth method and follow the setup steps.
     </Steps>
 
     <Warning>
-    The IAM role attached to your EC2 instance must have the following permissions:
+    附加到 EC2 实例的 IAM 角色必须具备以下权限：
 
     - `bedrock:InvokeModel`
     - `bedrock:InvokeModelWithResponseStream`
-    - `bedrock:ListFoundationModels` (for automatic discovery)
-    - `bedrock:ListInferenceProfiles` (for inference profile discovery)
+    - `bedrock:ListFoundationModels`（用于自动发现）
+    - `bedrock:ListInferenceProfiles`（用于推理配置档案发现）
 
-    Or attach the managed policy `AmazonBedrockFullAccess`.
+    或者直接附加托管策略 `AmazonBedrockFullAccess`。
     </Warning>
 
     <Note>
-    You only need `AWS_PROFILE=default` if you specifically want an env marker for auto mode or status surfaces. The actual Bedrock runtime auth path uses the AWS SDK default chain, so IMDS instance-role auth works even without env markers.
+    只有当你明确希望自动模式或状态界面使用 env marker 时，才需要 `AWS_PROFILE=default`。实际的 Bedrock 运行时认证路径使用的是 AWS SDK 默认链，因此即使没有 env markers，IMDS 实例角色认证也能工作。
     </Note>
 
   </Tab>
 </Tabs>
 
-## Automatic model discovery
+## 自动模型发现
 
-OpenClaw can automatically discover Bedrock models that support **streaming**
-and **text output**. Discovery uses `bedrock:ListFoundationModels` and
-`bedrock:ListInferenceProfiles`, and results are cached (default: 1 hour).
+OpenClaw 可以自动发现支持**流式传输**
+和**文本输出**的 Bedrock 模型。发现过程使用 `bedrock:ListFoundationModels` 和
+`bedrock:ListInferenceProfiles`，结果会被缓存（默认：1 小时）。
 
-How the implicit provider is enabled:
+隐式 provider 的启用方式：
 
-- If `plugins.entries.amazon-bedrock.config.discovery.enabled` is `true`,
-  OpenClaw will try discovery even when no AWS env marker is present.
-- If `plugins.entries.amazon-bedrock.config.discovery.enabled` is unset,
-  OpenClaw only auto-adds the
-  implicit Bedrock provider when it sees one of these AWS auth markers:
-  `AWS_BEARER_TOKEN_BEDROCK`, `AWS_ACCESS_KEY_ID` +
-  `AWS_SECRET_ACCESS_KEY`, or `AWS_PROFILE`.
-- The actual Bedrock runtime auth path still uses the AWS SDK default chain, so
-  shared config, SSO, and IMDS instance-role auth can work even when discovery
-  needed `enabled: true` to opt in.
+- 如果 `plugins.entries.amazon-bedrock.config.discovery.enabled` 为 `true`，
+  即使没有 AWS env marker，OpenClaw 也会尝试进行发现。
+- 如果 `plugins.entries.amazon-bedrock.config.discovery.enabled` 未设置，
+  OpenClaw 只有在检测到以下某种 AWS 认证标记时，才会自动添加
+  隐式 Bedrock provider：
+  `AWS_BEARER_TOKEN_BEDROCK`、`AWS_ACCESS_KEY_ID` +
+  `AWS_SECRET_ACCESS_KEY`，或 `AWS_PROFILE`。
+- 实际的 Bedrock 运行时认证路径仍然使用 AWS SDK 默认链，因此
+  即使发现过程需要通过 `enabled: true` 显式启用，共享配置、SSO 和 IMDS 实例角色认证仍然可以工作。
 
 <Note>
-For explicit `models.providers["amazon-bedrock"]` entries, OpenClaw can still resolve Bedrock env-marker auth early from AWS env markers such as `AWS_BEARER_TOKEN_BEDROCK` without forcing full runtime auth loading. The actual model-call auth path still uses the AWS SDK default chain.
+对于显式的 `models.providers["amazon-bedrock"]` 条目，OpenClaw 仍然可以通过 AWS env markers（例如 `AWS_BEARER_TOKEN_BEDROCK`）提前解析 Bedrock env-marker 认证，而无需强制加载完整运行时认证。实际的模型调用认证路径仍然使用 AWS SDK 默认链。
 </Note>
 
 <AccordionGroup>
-  <Accordion title="Discovery config options">
-    Config options live under `plugins.entries.amazon-bedrock.config.discovery`:
+  <Accordion title="发现配置选项">
+    配置项位于 `plugins.entries.amazon-bedrock.config.discovery` 下：
 
     ```json5
     {
@@ -179,25 +184,25 @@ For explicit `models.providers["amazon-bedrock"]` entries, OpenClaw can still re
     }
     ```
 
-    | Option | Default | Description |
+    | 选项 | 默认值 | 描述 |
     | ------ | ------- | ----------- |
-    | `enabled` | auto | In auto mode, OpenClaw only enables the implicit Bedrock provider when it sees a supported AWS env marker. Set `true` to force discovery. |
-    | `region` | `AWS_REGION` / `AWS_DEFAULT_REGION` / `us-east-1` | AWS region used for discovery API calls. |
-    | `providerFilter` | (all) | Matches Bedrock provider names (for example `anthropic`, `amazon`). |
-    | `refreshInterval` | `3600` | Cache duration in seconds. Set to `0` to disable caching. |
-    | `defaultContextWindow` | `32000` | Context window used for discovered models (override if you know your model limits). |
-    | `defaultMaxTokens` | `4096` | Max output tokens used for discovered models (override if you know your model limits). |
+    | `enabled` | auto | 在自动模式下，OpenClaw 只有在检测到受支持的 AWS env marker 时，才会启用隐式 Bedrock provider。设置为 `true` 可强制启用发现。 |
+    | `region` | `AWS_REGION` / `AWS_DEFAULT_REGION` / `us-east-1` | 发现 API 调用所使用的 AWS 区域。 |
+    | `providerFilter` | （全部） | 匹配 Bedrock provider 名称（例如 `anthropic`、`amazon`）。 |
+    | `refreshInterval` | `3600` | 缓存时长（秒）。设为 `0` 可禁用缓存。 |
+    | `defaultContextWindow` | `32000` | 用于已发现模型的上下文窗口（如果你清楚模型限制，可覆盖）。 |
+    | `defaultMaxTokens` | `4096` | 用于已发现模型的最大输出 tokens（如果你清楚模型限制，可覆盖）。 |
 
   </Accordion>
 </AccordionGroup>
 
-## Quick setup (AWS path)
+## 快速设置（AWS 路径）
 
-This walkthrough creates an IAM role, attaches Bedrock permissions, associates
-the instance profile, and enables OpenClaw discovery on the EC2 host.
+本演练将创建一个 IAM 角色、附加 Bedrock 权限、关联
+实例配置档案，并在 EC2 主机上启用 OpenClaw 发现。
 
 ```bash
-# 1. Create IAM role and instance profile
+# 1. 创建 IAM 角色和实例配置档案
 aws iam create-role --role-name EC2-Bedrock-Access \
   --assume-role-policy-document '{
     "Version": "2012-10-17",
@@ -216,52 +221,47 @@ aws iam add-role-to-instance-profile \
   --instance-profile-name EC2-Bedrock-Access \
   --role-name EC2-Bedrock-Access
 
-# 2. Attach to your EC2 instance
+# 2. 附加到你的 EC2 实例
 aws ec2 associate-iam-instance-profile \
   --instance-id i-xxxxx \
   --iam-instance-profile Name=EC2-Bedrock-Access
 
-# 3. On the EC2 instance, enable discovery explicitly
+# 3. 在 EC2 实例上显式启用发现
 openclaw config set plugins.entries.amazon-bedrock.config.discovery.enabled true
 openclaw config set plugins.entries.amazon-bedrock.config.discovery.region us-east-1
 
-# 4. Optional: add an env marker if you want auto mode without explicit enable
+# 4. 可选：如果你想在不显式启用的情况下使用自动模式，可添加一个 env marker
 echo 'export AWS_PROFILE=default' >> ~/.bashrc
 echo 'export AWS_REGION=us-east-1' >> ~/.bashrc
 source ~/.bashrc
 
-# 5. Verify models are discovered
+# 5. 验证模型已被发现
 openclaw models list
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Inference profiles">
-    OpenClaw discovers **regional and global inference profiles** alongside
-    foundation models. When a profile maps to a known foundation model, the
-    profile inherits that model's capabilities (context window, max tokens,
-    reasoning, vision) and the correct Bedrock request region is injected
-    automatically. This means cross-region Claude profiles work without manual
-    provider overrides.
+  <Accordion title="推理配置档案">
+    OpenClaw 会同时发现**区域和全局推理配置档案**以及
+    foundation models。当某个配置档案映射到已知 foundation model 时，该
+    配置档案会继承该模型的能力（上下文窗口、最大 tokens、reasoning、vision），并且会自动注入正确的 Bedrock 请求区域。这意味着跨区域 Claude 配置档案无需手动 provider 覆盖即可工作。
 
-    Inference profile IDs look like `us.anthropic.claude-opus-4-6-v1:0` (regional)
-    or `anthropic.claude-opus-4-6-v1:0` (global). If the backing model is already
-    in the discovery results, the profile inherits its full capability set;
-    otherwise safe defaults apply.
+    推理配置档案 ID 的形式如 `us.anthropic.claude-opus-4-6-v1:0`（区域）
+    或 `anthropic.claude-opus-4-6-v1:0`（全局）。如果其后端模型已经
+    出现在发现结果中，则该配置档案会继承其完整能力集；否则会应用安全默认值。
 
-    No extra configuration is needed. As long as discovery is enabled and the IAM
-    principal has `bedrock:ListInferenceProfiles`, profiles appear alongside
-    foundation models in `openclaw models list`.
+    无需额外配置。只要启用了发现，并且 IAM
+    principal 具有 `bedrock:ListInferenceProfiles`，配置档案就会与
+    foundation models 一同出现在 `openclaw models list` 中。
 
   </Accordion>
 
   <Accordion title="Guardrails">
-    You can apply [Amazon Bedrock Guardrails](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html)
-    to all Bedrock model invocations by adding a `guardrail` object to the
-    `amazon-bedrock` plugin config. Guardrails let you enforce content filtering,
-    topic denial, word filters, sensitive information filters, and contextual
-    grounding checks.
+    你可以通过在
+    `amazon-bedrock` 插件配置中添加 `guardrail` 对象，将 [Amazon Bedrock Guardrails](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html)
+    应用于所有 Bedrock 模型调用。Guardrails 可让你强制执行内容过滤、
+    主题拒绝、词过滤、敏感信息过滤和上下文 grounding 检查。
 
     ```json5
     {
@@ -270,10 +270,10 @@ openclaw models list
           "amazon-bedrock": {
             config: {
               guardrail: {
-                guardrailIdentifier: "abc123", // guardrail ID or full ARN
-                guardrailVersion: "1", // version number or "DRAFT"
-                streamProcessingMode: "sync", // optional: "sync" or "async"
-                trace: "enabled", // optional: "enabled", "disabled", or "enabled_full"
+                guardrailIdentifier: "abc123", // guardrail ID 或完整 ARN
+                guardrailVersion: "1", // 版本号或 "DRAFT"
+                streamProcessingMode: "sync", // 可选："sync" 或 "async"
+                trace: "enabled", // 可选："enabled"、"disabled" 或 "enabled_full"
               },
             },
           },
@@ -282,23 +282,23 @@ openclaw models list
     }
     ```
 
-    | Option | Required | Description |
+    | 选项 | 必需 | 描述 |
     | ------ | -------- | ----------- |
-    | `guardrailIdentifier` | Yes | Guardrail ID (e.g. `abc123`) or full ARN (e.g. `arn:aws:bedrock:us-east-1:123456789012:guardrail/abc123`). |
-    | `guardrailVersion` | Yes | Published version number, or `"DRAFT"` for the working draft. |
-    | `streamProcessingMode` | No | `"sync"` or `"async"` for guardrail evaluation during streaming. If omitted, Bedrock uses its default. |
-    | `trace` | No | `"enabled"` or `"enabled_full"` for debugging; omit or set `"disabled"` for production. |
+    | `guardrailIdentifier` | 是 | Guardrail ID（例如 `abc123`）或完整 ARN（例如 `arn:aws:bedrock:us-east-1:123456789012:guardrail/abc123`）。 |
+    | `guardrailVersion` | 是 | 已发布版本号，或工作草稿的 `"DRAFT"`。 |
+    | `streamProcessingMode` | 否 | 流式传输期间 guardrail 评估的 `"sync"` 或 `"async"`。若省略，则使用 Bedrock 默认值。 |
+    | `trace` | 否 | 用于调试时可设为 `"enabled"` 或 `"enabled_full"`；生产环境中请省略或设为 `"disabled"`。 |
 
     <Warning>
-    The IAM principal used by the gateway must have the `bedrock:ApplyGuardrail` permission in addition to the standard invoke permissions.
+    gateway 使用的 IAM principal 除标准调用权限外，还必须具备 `bedrock:ApplyGuardrail` 权限。
     </Warning>
 
   </Accordion>
 
-  <Accordion title="Embeddings for memory search">
-    Bedrock can also serve as the embedding provider for
-    [memory search](/concepts/memory-search). This is configured separately from the
-    inference provider -- set `agents.defaults.memorySearch.provider` to `"bedrock"`:
+  <Accordion title="用于记忆搜索的 Embeddings">
+    Bedrock 还可以作为
+    [记忆搜索](/zh-CN/concepts/memory-search) 的 embedding 提供商。它与
+    推理 provider 分开配置——请将 `agents.defaults.memorySearch.provider` 设为 `"bedrock"`：
 
     ```json5
     {
@@ -306,55 +306,54 @@ openclaw models list
         defaults: {
           memorySearch: {
             provider: "bedrock",
-            model: "amazon.titan-embed-text-v2:0", // default
+            model: "amazon.titan-embed-text-v2:0", // 默认值
           },
         },
       },
     }
     ```
 
-    Bedrock embeddings use the same AWS SDK credential chain as inference (instance
-    roles, SSO, access keys, shared config, and web identity). No API key is
-    needed. When `provider` is `"auto"`, Bedrock is auto-detected if that
-    credential chain resolves successfully.
+    Bedrock embeddings 使用与推理相同的 AWS SDK 凭证链（实例
+    角色、SSO、访问密钥、共享配置和 web identity）。不需要 API key。
+    当 `provider` 为 `"auto"` 时，如果该
+    凭证链成功解析，Bedrock 会被自动检测出来。
 
-    Supported embedding models include Amazon Titan Embed (v1, v2), Amazon Nova
-    Embed, Cohere Embed (v3, v4), and TwelveLabs Marengo. See
-    [Memory configuration reference -- Bedrock](/reference/memory-config#bedrock-embedding-config)
-    for the full model list and dimension options.
+    支持的 embedding 模型包括 Amazon Titan Embed（v1、v2）、Amazon Nova
+    Embed、Cohere Embed（v3、v4）以及 TwelveLabs Marengo。完整模型列表和维度选项请参阅
+    [记忆配置参考——Bedrock](/zh-CN/reference/memory-config#bedrock-embedding-config)。
 
   </Accordion>
 
-  <Accordion title="Notes and caveats">
-    - Bedrock requires **model access** enabled in your AWS account/region.
-    - Automatic discovery needs the `bedrock:ListFoundationModels` and
-      `bedrock:ListInferenceProfiles` permissions.
-    - If you rely on auto mode, set one of the supported AWS auth env markers on the
-      gateway host. If you prefer IMDS/shared-config auth without env markers, set
-      `plugins.entries.amazon-bedrock.config.discovery.enabled: true`.
-    - OpenClaw surfaces the credential source in this order: `AWS_BEARER_TOKEN_BEDROCK`,
-      then `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`, then `AWS_PROFILE`, then the
-      default AWS SDK chain.
-    - Reasoning support depends on the model; check the Bedrock model card for
-      current capabilities.
-    - If you prefer a managed key flow, you can also place an OpenAI-compatible
-      proxy in front of Bedrock and configure it as an OpenAI provider instead.
+  <Accordion title="说明与注意事项">
+    - Bedrock 要求你在 AWS 账户/区域中启用**模型访问**。
+    - 自动发现需要 `bedrock:ListFoundationModels` 和
+      `bedrock:ListInferenceProfiles` 权限。
+    - 如果你依赖自动模式，请在
+      gateway 主机上设置受支持的 AWS 认证环境变量标记之一。如果你更倾向于使用不带 env markers 的 IMDS/共享配置认证，请设置
+      `plugins.entries.amazon-bedrock.config.discovery.enabled: true`。
+    - OpenClaw 会按以下顺序呈现凭证来源：`AWS_BEARER_TOKEN_BEDROCK`，
+      然后是 `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`，再然后是 `AWS_PROFILE`，最后才是
+      默认 AWS SDK 链。
+    - 是否支持 reasoning 取决于具体模型；请查看对应 Bedrock 模型卡片以了解
+      当前能力。
+    - 如果你更喜欢托管密钥流程，也可以在 Bedrock 前面放一个兼容 OpenAI 的
+      代理，并将其作为 OpenAI provider 进行配置。
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择 provider、模型引用和故障转移行为。
   </Card>
-  <Card title="Memory search" href="/concepts/memory-search" icon="magnifying-glass">
-    Bedrock embeddings for memory search configuration.
+  <Card title="记忆搜索" href="/zh-CN/concepts/memory-search" icon="magnifying-glass">
+    用于记忆搜索配置的 Bedrock embeddings。
   </Card>
-  <Card title="Memory config reference" href="/reference/memory-config#bedrock-embedding-config" icon="database">
-    Full Bedrock embedding model list and dimension options.
+  <Card title="记忆配置参考" href="/zh-CN/reference/memory-config#bedrock-embedding-config" icon="database">
+    完整的 Bedrock embedding 模型列表和维度选项。
   </Card>
-  <Card title="Troubleshooting" href="/help/troubleshooting" icon="wrench">
-    General troubleshooting and FAQ.
+  <Card title="故障排除" href="/zh-CN/help/troubleshooting" icon="wrench">
+    通用故障排除和常见问题。
   </Card>
 </CardGroup>

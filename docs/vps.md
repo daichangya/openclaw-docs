@@ -1,69 +1,74 @@
 ---
-summary: "Run OpenClaw on a Linux server or cloud VPS — provider picker, architecture, and tuning"
 read_when:
-  - You want to run the Gateway on a Linux server or cloud VPS
-  - You need a quick map of hosting guides
-  - You want generic Linux server tuning for OpenClaw
-title: "Linux server"
-sidebarTitle: "Linux Server"
+    - 你想在 Linux 服务器或云 VPS 上运行 Gateway 网关
+    - 你需要一份托管指南的快速导览
+    - 你想了解 OpenClaw 的通用 Linux 服务器调优内容
+sidebarTitle: Linux Server
+summary: 在 Linux 服务器或云 VPS 上运行 OpenClaw——提供商选择器、架构与调优
+title: Linux 服务器
+x-i18n:
+    generated_at: "2026-04-24T04:08:19Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: ec71c7dcceedc20ecbeb3bdbbb7ea0047c1d1164e8049781171d3bdcac37cf95
+    source_path: vps.md
+    workflow: 15
 ---
 
-Run the OpenClaw Gateway on any Linux server or cloud VPS. This page helps you
-pick a provider, explains how cloud deployments work, and covers generic Linux
-tuning that applies everywhere.
+在任意 Linux 服务器或云 VPS 上运行 OpenClaw Gateway 网关。本页可帮助你选择提供商、解释云部署的工作方式，并介绍适用于各类环境的通用 Linux 调优。
 
-## Pick a provider
+## 选择提供商
 
 <CardGroup cols={2}>
-  <Card title="Railway" href="/install/railway">One-click, browser setup</Card>
-  <Card title="Northflank" href="/install/northflank">One-click, browser setup</Card>
-  <Card title="DigitalOcean" href="/install/digitalocean">Simple paid VPS</Card>
-  <Card title="Oracle Cloud" href="/install/oracle">Always Free ARM tier</Card>
-  <Card title="Fly.io" href="/install/fly">Fly Machines</Card>
-  <Card title="Hetzner" href="/install/hetzner">Docker on Hetzner VPS</Card>
-  <Card title="Hostinger" href="/install/hostinger">VPS with one-click setup</Card>
-  <Card title="GCP" href="/install/gcp">Compute Engine</Card>
-  <Card title="Azure" href="/install/azure">Linux VM</Card>
-  <Card title="exe.dev" href="/install/exe-dev">VM with HTTPS proxy</Card>
-  <Card title="Raspberry Pi" href="/install/raspberry-pi">ARM self-hosted</Card>
+  <Card title="Railway" href="/zh-CN/install/railway">一键式浏览器设置</Card>
+  <Card title="Northflank" href="/zh-CN/install/northflank">一键式浏览器设置</Card>
+  <Card title="DigitalOcean" href="/zh-CN/install/digitalocean">简单的付费 VPS</Card>
+  <Card title="Oracle Cloud" href="/zh-CN/install/oracle">永久免费 ARM 层级</Card>
+  <Card title="Fly.io" href="/zh-CN/install/fly">Fly Machines</Card>
+  <Card title="Hetzner" href="/zh-CN/install/hetzner">在 Hetzner VPS 上运行 Docker</Card>
+  <Card title="Hostinger" href="/zh-CN/install/hostinger">支持一键设置的 VPS</Card>
+  <Card title="GCP" href="/zh-CN/install/gcp">Compute Engine</Card>
+  <Card title="Azure" href="/zh-CN/install/azure">Linux VM</Card>
+  <Card title="exe.dev" href="/zh-CN/install/exe-dev">带 HTTPS 代理的 VM</Card>
+  <Card title="Raspberry Pi" href="/zh-CN/install/raspberry-pi">ARM 自托管</Card>
 </CardGroup>
 
-**AWS (EC2 / Lightsail / free tier)** also works well.
-A community video walkthrough is available at
+**AWS（EC2 / Lightsail / 免费层）** 也同样适用。
+可参考社区视频演示：
 [x.com/techfrenAJ/status/2014934471095812547](https://x.com/techfrenAJ/status/2014934471095812547)
-(community resource -- may become unavailable).
+（社区资源——未来可能失效）。
 
-## How cloud setups work
+## 云端设置如何工作
 
-- The **Gateway runs on the VPS** and owns state + workspace.
-- You connect from your laptop or phone via the **Control UI** or **Tailscale/SSH**.
-- Treat the VPS as the source of truth and **back up** the state + workspace regularly.
-- Secure default: keep the Gateway on loopback and access it via SSH tunnel or Tailscale Serve.
-  If you bind to `lan` or `tailnet`, require `gateway.auth.token` or `gateway.auth.password`.
+- **Gateway 网关运行在 VPS 上**，并负责状态和工作区。
+- 你可以通过 **Control UI** 或 **Tailscale/SSH** 从笔记本电脑或手机连接。
+- 请将 VPS 视为事实来源，并定期**备份**状态和工作区。
+- 安全默认值：将 Gateway 网关保持在 loopback 上，并通过 SSH 隧道或 Tailscale Serve 访问。
+  如果你绑定到 `lan` 或 `tailnet`，请要求设置 `gateway.auth.token` 或 `gateway.auth.password`。
 
-Related pages: [Gateway remote access](/gateway/remote), [Platforms hub](/platforms).
+相关页面：[Gateway 网关远程访问](/zh-CN/gateway/remote)、[平台中心](/zh-CN/platforms)。
 
-## Shared company agent on a VPS
+## 在 VPS 上运行共享公司智能体
 
-Running a single agent for a team is a valid setup when every user is in the same trust boundary and the agent is business-only.
+当所有用户都处于相同信任边界内，且智能体仅用于业务时，为团队运行单个智能体是有效的设置。
 
-- Keep it on a dedicated runtime (VPS/VM/container + dedicated OS user/accounts).
-- Do not sign that runtime into personal Apple/Google accounts or personal browser/password-manager profiles.
-- If users are adversarial to each other, split by gateway/host/OS user.
+- 将其保留在专用运行时上（VPS/VM/容器 + 专用 OS 用户/账号）。
+- 不要让该运行时登录个人 Apple/Google 账号，或个人浏览器/密码管理器配置文件。
+- 如果用户彼此具有对抗性，请按 Gateway 网关/主机/OS 用户进行拆分。
 
-Security model details: [Security](/gateway/security).
+安全模型细节请参阅：[安全](/zh-CN/gateway/security)。
 
-## Using nodes with a VPS
+## 在 VPS 上使用节点
 
-You can keep the Gateway in the cloud and pair **nodes** on your local devices
-(Mac/iOS/Android/headless). Nodes provide local screen/camera/canvas and `system.run`
-capabilities while the Gateway stays in the cloud.
+你可以将 Gateway 网关保留在云端，并在本地设备上配对**节点**
+（Mac/iOS/Android/无头环境）。节点提供本地屏幕/摄像头/Canvas 和 `system.run`
+能力，而 Gateway 网关保持在云端。
 
-Docs: [Nodes](/nodes), [Nodes CLI](/cli/nodes).
+文档：[节点](/zh-CN/nodes)、[Nodes CLI](/zh-CN/cli/nodes)。
 
-## Startup tuning for small VMs and ARM hosts
+## 小型 VM 和 ARM 主机的启动调优
 
-If CLI commands feel slow on low-power VMs (or ARM hosts), enable Node's module compile cache:
+如果在低功耗 VM（或 ARM 主机）上 CLI 命令感觉较慢，请启用 Node 的模块编译缓存：
 
 ```bash
 grep -q 'NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache' ~/.bashrc || cat >> ~/.bashrc <<'EOF'
@@ -74,25 +79,25 @@ EOF
 source ~/.bashrc
 ```
 
-- `NODE_COMPILE_CACHE` improves repeated command startup times.
-- `OPENCLAW_NO_RESPAWN=1` avoids extra startup overhead from a self-respawn path.
-- First command run warms the cache; subsequent runs are faster.
-- For Raspberry Pi specifics, see [Raspberry Pi](/install/raspberry-pi).
+- `NODE_COMPILE_CACHE` 可提升重复命令的启动速度。
+- `OPENCLAW_NO_RESPAWN=1` 可避免自重启路径带来的额外启动开销。
+- 第一次运行命令会预热缓存；后续运行会更快。
+- 关于 Raspberry Pi 的专门说明，请参阅 [Raspberry Pi](/zh-CN/install/raspberry-pi)。
 
-### systemd tuning checklist (optional)
+### systemd 调优清单（可选）
 
-For VM hosts using `systemd`, consider:
+对于使用 `systemd` 的 VM 主机，可考虑：
 
-- Add service env for a stable startup path:
+- 为稳定启动路径添加服务环境变量：
   - `OPENCLAW_NO_RESPAWN=1`
   - `NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache`
-- Keep restart behavior explicit:
+- 保持重启行为显式：
   - `Restart=always`
   - `RestartSec=2`
   - `TimeoutStartSec=90`
-- Prefer SSD-backed disks for state/cache paths to reduce random-I/O cold-start penalties.
+- 对状态/缓存路径优先使用 SSD 支持的磁盘，以降低随机 I/O 冷启动代价。
 
-For the standard `openclaw onboard --install-daemon` path, edit the user unit:
+对于标准的 `openclaw onboard --install-daemon` 路径，请编辑用户单元：
 
 ```bash
 systemctl --user edit openclaw-gateway.service
@@ -107,18 +112,19 @@ RestartSec=2
 TimeoutStartSec=90
 ```
 
-If you deliberately installed a system unit instead, edit
-`openclaw-gateway.service` via `sudo systemctl edit openclaw-gateway.service`.
+如果你有意安装的是系统单元，请改为使用
+`sudo systemctl edit openclaw-gateway.service` 编辑
+`openclaw-gateway.service`。
 
-How `Restart=` policies help automated recovery:
-[systemd can automate service recovery](https://www.redhat.com/en/blog/systemd-automate-recovery).
+关于 `Restart=` 策略如何帮助自动恢复，请参阅：
+[systemd can automate service recovery](https://www.redhat.com/en/blog/systemd-automate-recovery)。
 
-For Linux OOM behavior, child process victim selection, and `exit 137`
-diagnostics, see [Linux memory pressure and OOM kills](/platforms/linux#memory-pressure-and-oom-kills).
+关于 Linux OOM 行为、子进程受害者选择以及 `exit 137`
+诊断，请参阅[Linux 内存压力与 OOM kills](/zh-CN/platforms/linux#memory-pressure-and-oom-kills)。
 
-## Related
+## 相关内容
 
-- [Install overview](/install)
-- [DigitalOcean](/install/digitalocean)
-- [Fly.io](/install/fly)
-- [Hetzner](/install/hetzner)
+- [安装概览](/zh-CN/install)
+- [DigitalOcean](/zh-CN/install/digitalocean)
+- [Fly.io](/zh-CN/install/fly)
+- [Hetzner](/zh-CN/install/hetzner)

@@ -1,60 +1,64 @@
 ---
-summary: "Use the OpenCode Go catalog with the shared OpenCode setup"
 read_when:
-  - You want the OpenCode Go catalog
-  - You need the runtime model refs for Go-hosted models
-title: "OpenCode Go"
+    - 你想要 OpenCode Go 目录
+    - 你需要 Go 托管模型的运行时模型引用
+summary: 使用 OpenCode Go 目录和共享的 OpenCode 设置
+title: OpenCode Go
+x-i18n:
+    generated_at: "2026-04-25T17:15:11Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 2b2b5ba7f81cc101c3e9abdd79a18dc523a4f18b10242a0513b288fcbcc975e4
+    source_path: providers/opencode-go.md
+    workflow: 15
 ---
 
-OpenCode Go is the Go catalog within [OpenCode](/providers/opencode).
-It uses the same `OPENCODE_API_KEY` as the Zen catalog, but keeps the runtime
-provider id `opencode-go` so upstream per-model routing stays correct.
+OpenCode Go 是 [OpenCode](/zh-CN/providers/opencode) 中的 Go 目录。
+它使用与 Zen 目录相同的 `OPENCODE_API_KEY`，但保留运行时提供商 id `opencode-go`，以便上游按模型路由保持正确。
 
-| Property         | Value                           |
+| 属性 | 值 |
 | ---------------- | ------------------------------- |
-| Runtime provider | `opencode-go`                   |
-| Auth             | `OPENCODE_API_KEY`              |
-| Parent setup     | [OpenCode](/providers/opencode) |
+| 运行时提供商 | `opencode-go` |
+| 认证 | `OPENCODE_API_KEY` |
+| 上级设置 | [OpenCode](/zh-CN/providers/opencode) |
 
-## Built-in catalog
+## 内置目录
 
-OpenClaw sources most Go catalog rows from the bundled pi model registry and
-supplements current upstream rows while the registry catches up. Run
-`openclaw models list --provider opencode-go` for the current model list.
+OpenClaw 从内置的 Pi 模型注册表中获取大多数 Go 目录条目，并在注册表完成更新前补充当前上游条目。运行 `openclaw models list --provider opencode-go` 查看当前模型列表。
 
-The provider includes:
+该提供商包括：
 
-| Model ref                       | Name                  |
+| 模型引用 | 名称 |
 | ------------------------------- | --------------------- |
-| `opencode-go/glm-5`             | GLM-5                 |
-| `opencode-go/glm-5.1`           | GLM-5.1               |
-| `opencode-go/kimi-k2.5`         | Kimi K2.5             |
-| `opencode-go/kimi-k2.6`         | Kimi K2.6 (3x limits) |
-| `opencode-go/deepseek-v4-pro`   | DeepSeek V4 Pro       |
-| `opencode-go/deepseek-v4-flash` | DeepSeek V4 Flash     |
-| `opencode-go/mimo-v2-omni`      | MiMo V2 Omni          |
-| `opencode-go/mimo-v2-pro`       | MiMo V2 Pro           |
-| `opencode-go/minimax-m2.5`      | MiniMax M2.5          |
-| `opencode-go/minimax-m2.7`      | MiniMax M2.7          |
-| `opencode-go/qwen3.5-plus`      | Qwen3.5 Plus          |
-| `opencode-go/qwen3.6-plus`      | Qwen3.6 Plus          |
+| `opencode-go/glm-5` | GLM-5 |
+| `opencode-go/glm-5.1` | GLM-5.1 |
+| `opencode-go/kimi-k2.5` | Kimi K2.5 |
+| `opencode-go/kimi-k2.6` | Kimi K2.6（3 倍限制） |
+| `opencode-go/deepseek-v4-pro` | DeepSeek V4 Pro |
+| `opencode-go/deepseek-v4-flash` | DeepSeek V4 Flash |
+| `opencode-go/mimo-v2-omni` | MiMo V2 Omni |
+| `opencode-go/mimo-v2-pro` | MiMo V2 Pro |
+| `opencode-go/minimax-m2.5` | MiniMax M2.5 |
+| `opencode-go/minimax-m2.7` | MiniMax M2.7 |
+| `opencode-go/qwen3.5-plus` | Qwen3.5 Plus |
+| `opencode-go/qwen3.6-plus` | Qwen3.6 Plus |
 
-## Getting started
+## 入门指南
 
 <Tabs>
-  <Tab title="Interactive">
+  <Tab title="交互式">
     <Steps>
-      <Step title="Run onboarding">
+      <Step title="运行新手引导">
         ```bash
         openclaw onboard --auth-choice opencode-go
         ```
       </Step>
-      <Step title="Set a Go model as default">
+      <Step title="将一个 Go 模型设为默认值">
         ```bash
         openclaw config set agents.defaults.model.primary "opencode-go/kimi-k2.6"
         ```
       </Step>
-      <Step title="Verify models are available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -62,14 +66,14 @@ The provider includes:
     </Steps>
   </Tab>
 
-  <Tab title="Non-interactive">
+  <Tab title="非交互式">
     <Steps>
-      <Step title="Pass the key directly">
+      <Step title="直接传入密钥">
         ```bash
         openclaw onboard --opencode-go-api-key "$OPENCODE_API_KEY"
         ```
       </Step>
-      <Step title="Verify models are available">
+      <Step title="验证模型可用">
         ```bash
         openclaw models list --provider opencode-go
         ```
@@ -78,7 +82,7 @@ The provider includes:
   </Tab>
 </Tabs>
 
-## Config example
+## 配置示例
 
 ```json5
 {
@@ -87,37 +91,34 @@ The provider includes:
 }
 ```
 
-## Advanced configuration
+## 高级配置
 
 <AccordionGroup>
-  <Accordion title="Routing behavior">
-    OpenClaw handles per-model routing automatically when the model ref uses
-    `opencode-go/...`. No additional provider config is required.
+  <Accordion title="路由行为">
+    当模型引用使用 `opencode-go/...` 时，OpenClaw 会自动处理按模型路由。不需要额外的提供商配置。
   </Accordion>
 
-  <Accordion title="Runtime ref convention">
-    Runtime refs stay explicit: `opencode/...` for Zen, `opencode-go/...` for Go.
-    This keeps upstream per-model routing correct across both catalogs.
+  <Accordion title="运行时引用约定">
+    运行时引用保持明确：Zen 使用 `opencode/...`，Go 使用 `opencode-go/...`。
+    这样可以让两个目录的上游按模型路由都保持正确。
   </Accordion>
 
-  <Accordion title="Shared credentials">
-    The same `OPENCODE_API_KEY` is used by both the Zen and Go catalogs. Entering
-    the key during setup stores credentials for both runtime providers.
+  <Accordion title="共享凭证">
+    Zen 和 Go 目录都使用同一个 `OPENCODE_API_KEY`。在设置期间输入该密钥后，会为两个运行时提供商都存储凭证。
   </Accordion>
 </AccordionGroup>
 
 <Tip>
-See [OpenCode](/providers/opencode) for the shared onboarding overview and the full
-Zen + Go catalog reference.
+有关共享新手引导概览以及完整的 Zen + Go 目录参考，请参见 [OpenCode](/zh-CN/providers/opencode)。
 </Tip>
 
-## Related
+## 相关内容
 
 <CardGroup cols={2}>
-  <Card title="OpenCode (parent)" href="/providers/opencode" icon="server">
-    Shared onboarding, catalog overview, and advanced notes.
+  <Card title="OpenCode（上级）" href="/zh-CN/providers/opencode" icon="server">
+    共享新手引导、目录概览和高级说明。
   </Card>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障切换行为。
   </Card>
 </CardGroup>

@@ -1,22 +1,29 @@
 ---
-summary: "Brave Search API setup for web_search"
 read_when:
-  - You want to use Brave Search for web_search
-  - You need a BRAVE_API_KEY or plan details
-title: "Brave search (legacy path)"
+    - 你想将 Brave Search 用于 `web_search`
+    - 你需要 `BRAVE_API_KEY` 或套餐详情
+summary: 用于 `web_search` 的 Brave Search API 设置
+title: Brave 搜索（旧版路径）
+x-i18n:
+    generated_at: "2026-04-24T04:00:28Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: e2769da4db2ff5b94217c09b13ef5ee4106ba108a828db2a99892a4a15d7b517
+    source_path: brave-search.md
+    workflow: 15
 ---
 
 # Brave Search API
 
-OpenClaw supports Brave Search API as a `web_search` provider.
+OpenClaw 支持将 Brave Search API 作为 `web_search` 提供商。
 
-## Get an API key
+## 获取 API 密钥
 
-1. Create a Brave Search API account at [https://brave.com/search/api/](https://brave.com/search/api/)
-2. In the dashboard, choose the **Search** plan and generate an API key.
-3. Store the key in config or set `BRAVE_API_KEY` in the Gateway environment.
+1. 在 [https://brave.com/search/api/](https://brave.com/search/api/) 创建一个 Brave Search API 账户
+2. 在控制台中，选择 **Search** 套餐并生成一个 API 密钥。
+3. 将该密钥存储在配置中，或在 Gateway 网关环境中设置 `BRAVE_API_KEY`。
 
-## Config example
+## 配置示例
 
 ```json5
 {
@@ -26,7 +33,7 @@ OpenClaw supports Brave Search API as a `web_search` provider.
         config: {
           webSearch: {
             apiKey: "BRAVE_API_KEY_HERE",
-            mode: "web", // or "llm-context"
+            mode: "web", // 或 "llm-context"
           },
         },
       },
@@ -44,45 +51,45 @@ OpenClaw supports Brave Search API as a `web_search` provider.
 }
 ```
 
-Provider-specific Brave search settings now live under `plugins.entries.brave.config.webSearch.*`.
-Legacy `tools.web.search.apiKey` still loads through the compatibility shim, but it is no longer the canonical config path.
+提供商专属的 Brave 搜索设置现在位于 `plugins.entries.brave.config.webSearch.*` 下。
+旧版的 `tools.web.search.apiKey` 仍可通过兼容性 shim 加载，但它不再是规范的配置路径。
 
-`webSearch.mode` controls the Brave transport:
+`webSearch.mode` 控制 Brave 的传输方式：
 
-- `web` (default): normal Brave web search with titles, URLs, and snippets
-- `llm-context`: Brave LLM Context API with pre-extracted text chunks and sources for grounding
+- `web`（默认）：普通的 Brave 网页搜索，返回标题、URL 和摘要
+- `llm-context`：Brave LLM Context API，返回预提取的文本块和用于溯源的来源
 
-## Tool parameters
+## 工具参数
 
-| Parameter     | Description                                                         |
+| 参数 | 描述 |
 | ------------- | ------------------------------------------------------------------- |
-| `query`       | Search query (required)                                             |
-| `count`       | Number of results to return (1-10, default: 5)                      |
-| `country`     | 2-letter ISO country code (e.g., "US", "DE")                        |
-| `language`    | ISO 639-1 language code for search results (e.g., "en", "de", "fr") |
-| `search_lang` | Brave search-language code (e.g., `en`, `en-gb`, `zh-hans`)         |
-| `ui_lang`     | ISO language code for UI elements                                   |
-| `freshness`   | Time filter: `day` (24h), `week`, `month`, or `year`                |
-| `date_after`  | Only results published after this date (YYYY-MM-DD)                 |
-| `date_before` | Only results published before this date (YYYY-MM-DD)                |
+| `query` | 搜索查询（必填） |
+| `count` | 要返回的结果数量（1-10，默认：5） |
+| `country` | 2 字母 ISO 国家代码（例如 `"US"`、`"DE"`） |
+| `language` | 搜索结果的 ISO 639-1 语言代码（例如 `"en"`、`"de"`、`"fr"`） |
+| `search_lang` | Brave 搜索语言代码（例如 `en`、`en-gb`、`zh-hans`） |
+| `ui_lang` | UI 元素的 ISO 语言代码 |
+| `freshness` | 时间筛选：`day`（24 小时）、`week`、`month` 或 `year` |
+| `date_after` | 仅返回在此日期之后发布的结果（YYYY-MM-DD） |
+| `date_before` | 仅返回在此日期之前发布的结果（YYYY-MM-DD） |
 
-**Examples:**
+**示例：**
 
 ```javascript
-// Country and language-specific search
+// 按国家和语言限定的搜索
 await web_search({
   query: "renewable energy",
   country: "DE",
   language: "de",
 });
 
-// Recent results (past week)
+// 最近结果（过去一周）
 await web_search({
   query: "AI news",
   freshness: "week",
 });
 
-// Date range search
+// 日期范围搜索
 await web_search({
   query: "AI developments",
   date_after: "2024-01-01",
@@ -90,18 +97,18 @@ await web_search({
 });
 ```
 
-## Notes
+## 说明
 
-- OpenClaw uses the Brave **Search** plan. If you have a legacy subscription (e.g. the original Free plan with 2,000 queries/month), it remains valid but does not include newer features like LLM Context or higher rate limits.
-- Each Brave plan includes **\$5/month in free credit** (renewing). The Search plan costs \$5 per 1,000 requests, so the credit covers 1,000 queries/month. Set your usage limit in the Brave dashboard to avoid unexpected charges. See the [Brave API portal](https://brave.com/search/api/) for current plans.
-- The Search plan includes the LLM Context endpoint and AI inference rights. Storing results to train or tune models requires a plan with explicit storage rights. See the Brave [Terms of Service](https://api-dashboard.search.brave.com/terms-of-service).
-- `llm-context` mode returns grounded source entries instead of the normal web-search snippet shape.
-- `llm-context` mode does not support `ui_lang`, `freshness`, `date_after`, or `date_before`.
-- `ui_lang` must include a region subtag like `en-US`.
-- Results are cached for 15 minutes by default (configurable via `cacheTtlMinutes`).
+- OpenClaw 使用 Brave 的 **Search** 套餐。如果你使用的是旧版订阅（例如最初的免费套餐，每月 2,000 次查询），它仍然有效，但不包含较新的功能，例如 LLM Context 或更高的速率限制。
+- 每个 Brave 套餐都包含**每月 5 美元免费额度**（按月续期）。Search 套餐的费用为每 1,000 次请求 5 美元，因此该额度可覆盖每月 1,000 次查询。请在 Brave 控制台中设置你的使用上限，以避免产生意外费用。有关当前套餐，请参阅 [Brave API portal](https://brave.com/search/api/)。
+- Search 套餐包含 LLM Context 端点和 AI 推理权利。若要存储结果以训练或微调模型，则需要具备明确存储权利的套餐。请参阅 Brave 的 [Terms of Service](https://api-dashboard.search.brave.com/terms-of-service)。
+- `llm-context` 模式返回带有依据来源的条目，而不是普通网页搜索摘要的结果形态。
+- `llm-context` 模式不支持 `ui_lang`、`freshness`、`date_after` 或 `date_before`。
+- `ui_lang` 必须包含区域子标签，例如 `en-US`。
+- 结果默认缓存 15 分钟（可通过 `cacheTtlMinutes` 配置）。
 
-See [Web tools](/tools/web) for the full web_search configuration.
+有关完整的 `web_search` 配置，请参阅 [Web tools](/zh-CN/tools/web)。
 
-## Related
+## 相关内容
 
-- [Brave search](/tools/brave-search)
+- [Brave 搜索](/zh-CN/tools/brave-search)

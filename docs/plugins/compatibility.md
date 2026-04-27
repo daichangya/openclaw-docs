@@ -1,140 +1,102 @@
 ---
-summary: "Plugin compatibility contracts, deprecation metadata, and migration expectations"
-title: "Plugin compatibility"
 read_when:
-  - You maintain an OpenClaw plugin
-  - You see a plugin compatibility warning
-  - You are planning a plugin SDK or manifest migration
+    - 你维护一个 OpenClaw 插件
+    - 你看到一个插件兼容性警告
+    - 你正在规划插件 SDK 或清单迁移
+summary: 插件兼容性契约、弃用元数据和迁移预期
+title: 插件兼容性
+x-i18n:
+    generated_at: "2026-04-26T11:10:53Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 3b4e11dc57c29eac72844b91bec75a9d48005bbd3c89a2a9d7a5634ab782e5fc
+    source_path: plugins/compatibility.md
+    workflow: 15
 ---
 
-OpenClaw keeps older plugin contracts wired through named compatibility
-adapters before removing them. This protects existing bundled and external
-plugins while the SDK, manifest, setup, config, and agent runtime contracts
-evolve.
+OpenClaw 会在移除旧插件契约之前，通过具名兼容适配器继续接通较旧的插件契约。这样可以在 SDK、清单、设置、配置和智能体运行时契约演进期间，保护现有的内置插件和外部插件。
 
-## Compatibility registry
+## 兼容性注册表
 
-Plugin compatibility contracts are tracked in the core registry at
-`src/plugins/compat/registry.ts`.
+插件兼容性契约记录在核心注册表 `src/plugins/compat/registry.ts` 中。
 
-Each record has:
+每条记录包含：
 
-- a stable compatibility code
-- status: `active`, `deprecated`, `removal-pending`, or `removed`
-- owner: SDK, config, setup, channel, provider, plugin execution, agent runtime,
-  or core
-- introduction and deprecation dates when applicable
-- replacement guidance
-- docs, diagnostics, and tests that cover the old and new behavior
+- 稳定的兼容性代码
+- 状态：`active`、`deprecated`、`removal-pending` 或 `removed`
+- 所有者：SDK、配置、设置、渠道、提供商、插件执行、智能体运行时或核心
+- 适用时的引入日期和弃用日期
+- 替代指引
+- 覆盖旧行为和新行为的文档、诊断信息和测试
 
-The registry is the source for maintainer planning and future plugin inspector
-checks. If a plugin-facing behavior changes, add or update the compatibility
-record in the same change that adds the adapter.
+该注册表是维护者规划和未来插件检查器校验的来源。如果面向插件的行为发生变化，请在添加适配器的同一变更中添加或更新兼容性记录。
 
-Doctor repair and migration compatibility is tracked separately at
-`src/commands/doctor/shared/deprecation-compat.ts`. Those records cover old
-config shapes, install-ledger layouts, and repair shims that may need to stay
-available after the runtime compatibility path is removed.
+Doctor 修复和迁移兼容性会单独记录在 `src/commands/doctor/shared/deprecation-compat.ts` 中。这些记录涵盖旧配置结构、安装账本布局以及修复垫片；即使运行时兼容路径已移除，它们也可能仍需保留。
 
-Release sweeps should check both registries. Do not delete a doctor migration
-just because the matching runtime or config compatibility record expired; first
-verify there is no supported upgrade path that still needs the repair. Also
-revalidate each replacement annotation during release planning because plugin
-ownership and config footprint can change as providers and channels move out of
-core.
+发布前的整体检查应同时检查这两个注册表。不要仅因为对应的运行时或配置兼容性记录已过期，就删除某个 Doctor 迁移；首先要确认是否仍存在需要该修复的受支持升级路径。还要在发布规划期间重新验证每条替代说明，因为随着提供商和渠道从核心中迁出，插件归属和配置范围可能会发生变化。
 
-## Plugin inspector package
+## 插件检查器包
 
-The plugin inspector should live outside the core OpenClaw repo as a separate
-package/repository backed by the versioned compatibility and manifest
-contracts.
+插件检查器应位于核心 OpenClaw 仓库之外，作为一个独立的软件包/仓库，并以有版本控制的兼容性契约和清单契约为基础。
 
-The day-one CLI should be:
+首日 CLI 应为：
 
 ```sh
 openclaw-plugin-inspector ./my-plugin
 ```
 
-It should emit:
+它应输出：
 
-- manifest/schema validation
-- the contract compatibility version being checked
-- install/source metadata checks
-- cold-path import checks
-- deprecation and compatibility warnings
+- 清单/模式校验
+- 正在检查的契约兼容版本
+- 安装/来源元数据检查
+- 冷路径导入检查
+- 弃用和兼容性警告
 
-Use `--json` for stable machine-readable output in CI annotations. OpenClaw
-core should expose contracts and fixtures the inspector can consume, but should
-not publish the inspector binary from the main `openclaw` package.
+在 CI 注释中，请使用 `--json` 获取稳定的机器可读输出。OpenClaw 核心应暴露供检查器使用的契约和夹具，但不应从主 `openclaw` 包发布检查器二进制文件。
 
-## Deprecation policy
+## 弃用策略
 
-OpenClaw should not remove a documented plugin contract in the same release
-that introduces its replacement.
+OpenClaw 不应在引入替代方案的同一版本中移除已文档化的插件契约。
 
-The migration sequence is:
+迁移顺序如下：
 
-1. Add the new contract.
-2. Keep the old behavior wired through a named compatibility adapter.
-3. Emit diagnostics or warnings when plugin authors can act.
-4. Document the replacement and timeline.
-5. Test both old and new paths.
-6. Wait through the announced migration window.
-7. Remove only with explicit breaking-release approval.
+1. 添加新契约。
+2. 通过具名兼容适配器保留旧行为接通。
+3. 在插件作者可以采取行动时发出诊断信息或警告。
+4. 记录替代方案和时间线。
+5. 测试旧路径和新路径。
+6. 等待已宣布的迁移窗口结束。
+7. 仅在获得明确的破坏性版本发布批准后移除。
 
-Deprecated records must include a warning start date, replacement, docs link,
-and final removal date no more than three months after the warning starts. Do
-not add a deprecated compatibility path with an open-ended removal window unless
-maintainers explicitly decide it is permanent compatibility and mark it `active`
-instead.
+已弃用记录必须包含警告开始日期、替代方案、文档链接以及最终移除日期，且最终移除日期不得晚于警告开始后三个月。不要添加一个移除窗口无限期开放的已弃用兼容路径，除非维护者明确决定它是永久兼容，并将其标记为 `active`。
 
-## Current compatibility areas
+## 当前兼容性领域
 
-Current compatibility records include:
+当前兼容性记录包括：
 
-- legacy broad SDK imports such as `openclaw/plugin-sdk/compat`
-- legacy hook-only plugin shapes and `before_agent_start`
-- legacy `activate(api)` plugin entrypoints while plugins migrate to
-  `register(api)`
-- legacy SDK aliases such as `openclaw/extension-api`,
-  `openclaw/plugin-sdk/channel-runtime`, `openclaw/plugin-sdk/command-auth`
-  status builders, `openclaw/plugin-sdk/test-utils`, and the `ClawdbotConfig` /
-  `OpenClawSchemaType` type aliases
-- bundled plugin allowlist and enablement behavior
-- legacy provider/channel env-var manifest metadata
-- legacy provider plugin hooks and type aliases while providers move to
-  explicit catalog, auth, thinking, replay, and transport hooks
-- legacy runtime aliases such as `api.runtime.taskFlow`,
-  `api.runtime.subagent.getSession`, and `api.runtime.stt`
-- legacy memory-plugin split registration while memory plugins move to
-  `registerMemoryCapability`
-- legacy channel SDK helpers for native message schemas, mention gating,
-  inbound envelope formatting, and approval capability nesting
-- activation hints that are being replaced by manifest contribution ownership
-- `setup-api` runtime fallback while setup descriptors move to cold
-  `setup.requiresRuntime: false` metadata
-- provider `discovery` hooks while provider catalog hooks move to
-  `catalog.run(...)`
-- channel `showConfigured` / `showInSetup` metadata while channel packages move
-  to `openclaw.channel.exposure`
-- legacy runtime-policy config keys while doctor migrates operators to
-  `agentRuntime`
-- generated bundled channel config metadata fallback while registry-first
-  `channelConfigs` metadata lands
-- persisted plugin registry disable and install-migration env flags while
-  repair flows migrate operators to `openclaw plugins registry --refresh` and
-  `openclaw doctor --fix`
-- legacy plugin-owned web search, web fetch, and x_search config paths while
-  doctor migrates them to `plugins.entries.<plugin>.config`
-- legacy `plugins.installs` authored config and bundled plugin load-path
-  aliases while install metadata moves into the state-managed plugin ledger
+- 旧版宽泛 SDK 导入，例如 `openclaw/plugin-sdk/compat`
+- 旧版仅钩子插件形态以及 `before_agent_start`
+- 旧版 `activate(api)` 插件入口点，同时插件迁移到 `register(api)`
+- 旧版 SDK 别名，例如 `openclaw/extension-api`、`openclaw/plugin-sdk/channel-runtime`、`openclaw/plugin-sdk/command-auth` 状态构建器、`openclaw/plugin-sdk/test-utils`，以及 `ClawdbotConfig` / `OpenClawSchemaType` 类型别名
+- 内置插件允许列表和启用行为
+- 旧版提供商/渠道环境变量清单元数据
+- 旧版提供商插件钩子和类型别名，同时提供商迁移到显式的目录、认证、思考、重放和传输钩子
+- 旧版运行时别名，例如 `api.runtime.taskFlow`、`api.runtime.subagent.getSession` 和 `api.runtime.stt`
+- 旧版 memory 插件拆分注册，同时 memory 插件迁移到 `registerMemoryCapability`
+- 旧版渠道 SDK 辅助工具，用于原生消息模式、提及门控、入站信封格式化和审批能力嵌套
+- 正在由清单贡献归属替代的激活提示
+- `setup-api` 运行时回退，同时设置描述符迁移到冷路径 `setup.requiresRuntime: false` 元数据
+- 提供商 `discovery` 钩子，同时提供商目录钩子迁移到 `catalog.run(...)`
+- 渠道 `showConfigured` / `showInSetup` 元数据，同时渠道包迁移到 `openclaw.channel.exposure`
+- 旧版 runtime-policy 配置键，同时 Doctor 将操作员迁移到 `agentRuntime`
+- 生成的内置渠道配置元数据回退，同时以注册表优先的 `channelConfigs` 元数据正在落地
+- 持久化插件注册表禁用和安装迁移环境变量标记，同时修复流程将操作员迁移到 `openclaw plugins registry --refresh` 和 `openclaw doctor --fix`
+- 旧版由插件持有的 web search、web fetch 和 x_search 配置路径，同时 Doctor 将它们迁移到 `plugins.entries.<plugin>.config`
+- 旧版 `plugins.installs` 手写配置和内置插件加载路径别名，同时安装元数据迁移到状态管理的插件账本中
 
-New plugin code should prefer the replacement listed in the registry and in the
-specific migration guide. Existing plugins can keep using a compatibility path
-until the docs, diagnostics, and release notes announce a removal window.
+新的插件代码应优先使用注册表和具体迁移指南中列出的替代方案。现有插件可以继续使用兼容路径，直到文档、诊断信息和发布说明宣布移除窗口。
 
-## Release notes
+## 发布说明
 
-Release notes should include upcoming plugin deprecations with target dates and
-links to migration docs. That warning needs to happen before a compatibility
-path moves to `removal-pending` or `removed`.
+发布说明应包含即将到来的插件弃用项，并附上目标日期和迁移文档链接。必须在某个兼容路径转为 `removal-pending` 或 `removed` 之前发出该警告。

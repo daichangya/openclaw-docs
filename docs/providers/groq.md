@@ -1,33 +1,38 @@
 ---
-summary: "Groq setup (auth + model selection)"
-title: "Groq"
 read_when:
-  - You want to use Groq with OpenClaw
-  - You need the API key env var or CLI auth choice
+    - 你想在 OpenClaw 中使用 Groq
+    - 你需要 API key 环境变量或 CLI 凭证选择
+summary: Groq 设置（凭证 + 模型选择）
+title: Groq
+x-i18n:
+    generated_at: "2026-04-23T23:02:12Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 1c711297d42dea7fabe8ba941f75ef9dc82bd9b838f78d5dc4385210d9f65ade
+    source_path: providers/groq.md
+    workflow: 15
 ---
 
-[Groq](https://groq.com) provides ultra-fast inference on open-source models
-(Llama, Gemma, Mistral, and more) using custom LPU hardware. OpenClaw connects
-to Groq through its OpenAI-compatible API.
+[Groq](https://groq.com) 使用自定义 LPU 硬件，为开源模型（Llama、Gemma、Mistral 等）提供超高速推理。OpenClaw 通过其兼容 OpenAI 的 API 连接到 Groq。
 
-| Property | Value             |
+| 属性 | 值 |
 | -------- | ----------------- |
-| Provider | `groq`            |
-| Auth     | `GROQ_API_KEY`    |
-| API      | OpenAI-compatible |
+| 提供商 | `groq` |
+| 凭证 | `GROQ_API_KEY` |
+| API | 兼容 OpenAI |
 
-## Getting started
+## 入门指南
 
 <Steps>
-  <Step title="Get an API key">
-    Create an API key at [console.groq.com/keys](https://console.groq.com/keys).
+  <Step title="获取 API key">
+    在 [console.groq.com/keys](https://console.groq.com/keys) 创建一个 API key。
   </Step>
-  <Step title="Set the API key">
+  <Step title="设置 API key">
     ```bash
     export GROQ_API_KEY="gsk_..."
     ```
   </Step>
-  <Step title="Set a default model">
+  <Step title="设置默认模型">
     ```json5
     {
       agents: {
@@ -40,7 +45,7 @@ to Groq through its OpenAI-compatible API.
   </Step>
 </Steps>
 
-### Config file example
+### 配置文件示例
 
 ```json5
 {
@@ -53,30 +58,26 @@ to Groq through its OpenAI-compatible API.
 }
 ```
 
-## Built-in catalog
+## 内置目录
 
-Groq's model catalog changes frequently. Run `openclaw models list | grep groq`
-to see currently available models, or check
-[console.groq.com/docs/models](https://console.groq.com/docs/models).
+Groq 的模型目录变化频繁。运行 `openclaw models list | grep groq`
+查看当前可用模型，或访问
+[console.groq.com/docs/models](https://console.groq.com/docs/models)。
 
-| Model                       | Notes                              |
+| 模型 | 说明 |
 | --------------------------- | ---------------------------------- |
-| **Llama 3.3 70B Versatile** | General-purpose, large context     |
-| **Llama 3.1 8B Instant**    | Fast, lightweight                  |
-| **Gemma 2 9B**              | Compact, efficient                 |
-| **Mixtral 8x7B**            | MoE architecture, strong reasoning |
+| **Llama 3.3 70B Versatile** | 通用型，大上下文 |
+| **Llama 3.1 8B Instant** | 快速、轻量 |
+| **Gemma 2 9B** | 紧凑、高效 |
+| **Mixtral 8x7B** | MoE 架构，推理能力强 |
 
 <Tip>
-Use `openclaw models list --provider groq` for the most up-to-date list of
-models available on your account.
+使用 `openclaw models list --provider groq` 获取你账户当前可用模型的最新列表。
 </Tip>
 
-## Audio transcription
+## 音频转录
 
-Groq also provides fast Whisper-based audio transcription. When configured as a
-media-understanding provider, OpenClaw uses Groq's `whisper-large-v3-turbo`
-model to transcribe voice messages through the shared `tools.media.audio`
-surface.
+Groq 还提供基于 Whisper 的高速音频转录。当配置为媒体理解提供商时，OpenClaw 会通过共享的 `tools.media.audio` 能力面，使用 Groq 的 `whisper-large-v3-turbo` 模型转录语音消息。
 
 ```json5
 {
@@ -91,42 +92,38 @@ surface.
 ```
 
 <AccordionGroup>
-  <Accordion title="Audio transcription details">
-    | Property | Value |
+  <Accordion title="音频转录细节">
+    | 属性 | 值 |
     |----------|-------|
-    | Shared config path | `tools.media.audio` |
-    | Default base URL   | `https://api.groq.com/openai/v1` |
-    | Default model      | `whisper-large-v3-turbo` |
-    | API endpoint       | OpenAI-compatible `/audio/transcriptions` |
+    | 共享配置路径 | `tools.media.audio` |
+    | 默认 base URL | `https://api.groq.com/openai/v1` |
+    | 默认模型 | `whisper-large-v3-turbo` |
+    | API 端点 | 兼容 OpenAI 的 `/audio/transcriptions` |
   </Accordion>
 
-  <Accordion title="Environment note">
-    If the Gateway runs as a daemon (launchd/systemd), make sure `GROQ_API_KEY` is
-    available to that process (for example, in `~/.openclaw/.env` or via
-    `env.shellEnv`).
+  <Accordion title="环境说明">
+    如果 Gateway 网关作为守护进程运行（launchd/systemd），请确保 `GROQ_API_KEY` 对该进程可见（例如放在 `~/.openclaw/.env` 中，或通过 `env.shellEnv`）。
 
     <Warning>
-    Keys set only in your interactive shell are not visible to daemon-managed
-    gateway processes. Use `~/.openclaw/.env` or `env.shellEnv` config for
-    persistent availability.
+    仅在交互式 shell 中设置的 key 对守护进程管理的 Gateway 网关进程不可见。请使用 `~/.openclaw/.env` 或 `env.shellEnv` 配置以实现持久可用性。
     </Warning>
 
   </Accordion>
 </AccordionGroup>
 
-## Related
+## 相关
 
 <CardGroup cols={2}>
-  <Card title="Model selection" href="/concepts/model-providers" icon="layers">
-    Choosing providers, model refs, and failover behavior.
+  <Card title="模型选择" href="/zh-CN/concepts/model-providers" icon="layers">
+    选择提供商、模型引用和故障转移行为。
   </Card>
-  <Card title="Configuration reference" href="/gateway/configuration-reference" icon="gear">
-    Full config schema including provider and audio settings.
+  <Card title="配置参考" href="/zh-CN/gateway/configuration-reference" icon="gear">
+    完整配置 schema，包括提供商和音频设置。
   </Card>
   <Card title="Groq Console" href="https://console.groq.com" icon="arrow-up-right-from-square">
-    Groq dashboard, API docs, and pricing.
+    Groq 控制台、API 文档和定价。
   </Card>
-  <Card title="Groq model list" href="https://console.groq.com/docs/models" icon="list">
-    Official Groq model catalog.
+  <Card title="Groq 模型列表" href="https://console.groq.com/docs/models" icon="list">
+    官方 Groq 模型目录。
   </Card>
 </CardGroup>

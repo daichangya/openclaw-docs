@@ -1,37 +1,40 @@
 ---
-summary: "Integrated browser control service + action commands"
 read_when:
-  - Adding agent-controlled browser automation
-  - Debugging why openclaw is interfering with your own Chrome
-  - Implementing browser settings + lifecycle in the macOS app
-title: "Browser (OpenClaw-managed)"
+    - 添加由智能体控制的浏览器自动化
+    - 排查为什么 openclaw 会干扰你自己的 Chrome
+    - 在 macOS 应用中实现浏览器设置和生命周期
+summary: 集成式浏览器控制服务 + 操作命令
+title: 浏览器（由 OpenClaw 管理）
+x-i18n:
+    generated_at: "2026-04-26T03:54:50Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: aba4c06f351296145b7a282bb692c2d10dba0668f90aabf1d981fb18199c3d74
+    source_path: tools/browser.md
+    workflow: 15
 ---
 
-OpenClaw can run a **dedicated Chrome/Brave/Edge/Chromium profile** that the agent controls.
-It is isolated from your personal browser and is managed through a small local
-control service inside the Gateway (loopback only).
+OpenClaw 可以运行一个**专用的 Chrome / Brave / Edge / Chromium 配置文件**，由智能体控制。
+它与你的个人浏览器隔离，并通过 Gateway 网关内部的一个小型本地控制服务进行管理（仅限 loopback）。
 
-Beginner view:
+面向初学者的理解：
 
-- Think of it as a **separate, agent-only browser**.
-- The `openclaw` profile does **not** touch your personal browser profile.
-- The agent can **open tabs, read pages, click, and type** in a safe lane.
-- The built-in `user` profile attaches to your real signed-in Chrome session via Chrome MCP.
+- 可以把它看作一个**独立的、仅供智能体使用的浏览器**。
+- `openclaw` 配置文件**不会**触碰你的个人浏览器配置文件。
+- 智能体可以在一个安全通道中**打开标签页、读取页面、点击和输入**。
+- 内置的 `user` 配置文件会通过 Chrome MCP 附加到你真实的、已登录的 Chrome 会话。
 
-## What you get
+## 你将获得什么
 
-- A separate browser profile named **openclaw** (orange accent by default).
-- Deterministic tab control (list/open/focus/close).
-- Agent actions (click/type/drag/select), snapshots, screenshots, PDFs.
-- A bundled `browser-automation` skill that teaches agents the snapshot,
-  stable-tab, stale-ref, and manual-blocker recovery loop when the browser
-  plugin is enabled.
-- Optional multi-profile support (`openclaw`, `work`, `remote`, ...).
+- 一个名为 **openclaw** 的独立浏览器配置文件（默认使用橙色强调色）。
+- 可预测的标签页控制（列出 / 打开 / 聚焦 / 关闭）。
+- 智能体操作（点击 / 输入 / 拖动 / 选择）、快照、截图、PDF。
+- 一个内置的 `browser-automation` Skills，在启用浏览器插件时，它会教会智能体使用 snapshot、stable-tab、stale-ref 和 manual-blocker 恢复循环。
+- 可选的多配置文件支持（`openclaw`、`work`、`remote` 等）。
 
-This browser is **not** your daily driver. It is a safe, isolated surface for
-agent automation and verification.
+这个浏览器**不是**你的日常主浏览器。它是一个安全、隔离的表面，用于智能体自动化和验证。
 
-## Quick start
+## 快速开始
 
 ```bash
 openclaw browser --browser-profile openclaw doctor
@@ -42,15 +45,13 @@ openclaw browser --browser-profile openclaw open https://example.com
 openclaw browser --browser-profile openclaw snapshot
 ```
 
-If you get “Browser disabled”, enable it in config (see below) and restart the
-Gateway.
+如果你看到“Browser disabled”，请在配置中启用它（见下文），然后重启 Gateway 网关。
 
-If `openclaw browser` is missing entirely, or the agent says the browser tool
-is unavailable, jump to [Missing browser command or tool](/tools/browser#missing-browser-command-or-tool).
+如果根本没有 `openclaw browser`，或者智能体提示浏览器工具不可用，请跳转到 [缺少浏览器命令或工具](/zh-CN/tools/browser#missing-browser-command-or-tool)。
 
-## Plugin control
+## 插件控制
 
-The default `browser` tool is a bundled plugin. Disable it to replace it with another plugin that registers the same `browser` tool name:
+默认的 `browser` 工具是一个内置插件。若要用另一个注册相同 `browser` 工具名的插件来替换它，请将其禁用：
 
 ```json5
 {
@@ -64,16 +65,13 @@ The default `browser` tool is a bundled plugin. Disable it to replace it with an
 }
 ```
 
-Defaults need both `plugins.entries.browser.enabled` **and** `browser.enabled=true`. Disabling only the plugin removes the `openclaw browser` CLI, `browser.request` gateway method, agent tool, and control service as one unit; your `browser.*` config stays intact for a replacement.
+默认情况下，需要同时设置 `plugins.entries.browser.enabled` **以及** `browser.enabled=true`。仅禁用插件会把 `openclaw browser` CLI、`browser.request` Gateway 网关方法、智能体工具和控制服务作为一个整体一并移除；你的 `browser.*` 配置会保持不变，以供替代实现使用。
 
-Browser config changes require a Gateway restart so the plugin can re-register its service.
+浏览器配置变更需要重启 Gateway 网关，以便插件重新注册其服务。
 
-## Agent guidance
+## 智能体指引
 
-Tool-profile note: `tools.profile: "coding"` includes `web_search` and
-`web_fetch`, but it does not include the full `browser` tool. If the agent or a
-spawned sub-agent should use browser automation, add browser at the profile
-stage:
+工具配置文件说明：`tools.profile: "coding"` 包含 `web_search` 和 `web_fetch`，但不包含完整的 `browser` 工具。如果智能体或其生成的子智能体需要使用浏览器自动化，请在配置文件阶段加入 browser：
 
 ```json5
 {
@@ -84,27 +82,19 @@ stage:
 }
 ```
 
-For a single agent, use `agents.list[].tools.alsoAllow: ["browser"]`.
-`tools.subagents.tools.allow: ["browser"]` alone is not enough because sub-agent
-policy is applied after profile filtering.
+对于单个智能体，使用 `agents.list[].tools.alsoAllow: ["browser"]`。
+仅设置 `tools.subagents.tools.allow: ["browser"]` 还不够，因为子智能体策略是在配置文件过滤之后才应用的。
 
-The browser plugin ships two levels of agent guidance:
+浏览器插件提供两层智能体指引：
 
-- The `browser` tool description carries the compact always-on contract: pick
-  the right profile, keep refs on the same tab, use `tabId`/labels for tab
-  targeting, and load the browser skill for multi-step work.
-- The bundled `browser-automation` skill carries the longer operating loop:
-  check status/tabs first, label task tabs, snapshot before acting, resnapshot
-  after UI changes, recover stale refs once, and report login/2FA/captcha or
-  camera/microphone blockers as manual action instead of guessing.
+- `browser` 工具描述中携带了始终启用的精简契约：选择正确的配置文件、在同一标签页中保持 refs、使用 `tabId` / 标签来定位标签页，以及在多步骤任务中加载浏览器 skill。
+- 内置的 `browser-automation` Skills 则提供更长的操作循环：先检查 status / tabs、给任务标签页打标签、在操作前创建 snapshot、在 UI 变化后重新创建快照、对 stale refs 恢复一次，并将登录 / 2FA / captcha 或 camera / microphone 阻塞报告为需要手动操作，而不是猜测。
 
-Plugin-bundled skills are listed in the agent's available skills when the
-plugin is enabled. The full skill instructions are loaded on demand, so routine
-turns do not pay the full token cost.
+插件内置的 Skills 会在插件启用时列在智能体的可用 Skills 中。完整的 skill 指令按需加载，因此常规轮次不会承担全部 token 成本。
 
-## Missing browser command or tool
+## 缺少浏览器命令或工具
 
-If `openclaw browser` is unknown after an upgrade, `browser.request` is missing, or the agent reports the browser tool as unavailable, the usual cause is a `plugins.allow` list that omits `browser`. Add it:
+如果升级后 `openclaw browser` 变成未知命令、`browser.request` 缺失，或智能体报告浏览器工具不可用，通常原因是 `plugins.allow` 列表里没有包含 `browser`。把它加上：
 
 ```json5
 {
@@ -114,26 +104,24 @@ If `openclaw browser` is unknown after an upgrade, `browser.request` is missing,
 }
 ```
 
-`browser.enabled=true`, `plugins.entries.browser.enabled=true`, and `tools.alsoAllow: ["browser"]` do not substitute for allowlist membership — the allowlist gates plugin loading, and tool policy only runs after load. Removing `plugins.allow` entirely also restores the default.
+`browser.enabled=true`、`plugins.entries.browser.enabled=true` 和 `tools.alsoAllow: ["browser"]` 都不能替代 allowlist 成员资格——allowlist 控制插件加载，而工具策略只有在加载之后才会运行。完全移除 `plugins.allow` 也会恢复默认行为。
 
-## Profiles: `openclaw` vs `user`
+## 配置文件：`openclaw` 与 `user`
 
-- `openclaw`: managed, isolated browser (no extension required).
-- `user`: built-in Chrome MCP attach profile for your **real signed-in Chrome**
-  session.
+- `openclaw`：受管理、隔离的浏览器（无需扩展）。
+- `user`：内置的 Chrome MCP 附加配置文件，用于连接你**真实已登录的 Chrome** 会话。
 
-For agent browser tool calls:
+对于智能体浏览器工具调用：
 
-- Default: use the isolated `openclaw` browser.
-- Prefer `profile="user"` when existing logged-in sessions matter and the user
-  is at the computer to click/approve any attach prompt.
-- `profile` is the explicit override when you want a specific browser mode.
+- 默认：使用隔离的 `openclaw` 浏览器。
+- 当现有登录会话很重要，并且用户就在电脑前可以点击 / 批准任何附加提示时，优先使用 `profile="user"`。
+- 当你希望使用某个特定浏览器模式时，`profile` 是显式覆盖项。
 
-Set `browser.defaultProfile: "openclaw"` if you want managed mode by default.
+如果你希望默认使用受管理模式，请设置 `browser.defaultProfile: "openclaw"`。
 
-## Configuration
+## 配置
 
-Browser settings live in `~/.openclaw/openclaw.json`.
+浏览器设置位于 `~/.openclaw/openclaw.json`。
 
 ```json5
 {
@@ -190,77 +178,56 @@ Browser settings live in `~/.openclaw/openclaw.json`.
 
 <AccordionGroup>
 
-<Accordion title="Ports and reachability">
+<Accordion title="端口与可达性">
 
-- Control service binds to loopback on a port derived from `gateway.port` (default `18791` = gateway + 2). Overriding `gateway.port` or `OPENCLAW_GATEWAY_PORT` shifts the derived ports in the same family.
-- Local `openclaw` profiles auto-assign `cdpPort`/`cdpUrl`; set those only for remote CDP. `cdpUrl` defaults to the managed local CDP port when unset.
-- `remoteCdpTimeoutMs` applies to remote and `attachOnly` CDP HTTP reachability
-  checks and tab-opening HTTP requests; `remoteCdpHandshakeTimeoutMs` applies to
-  their CDP WebSocket handshakes.
-- `localLaunchTimeoutMs` is the budget for a locally launched managed Chrome
-  process to expose its CDP HTTP endpoint. `localCdpReadyTimeoutMs` is the
-  follow-up budget for CDP websocket readiness after the process is discovered.
-  Raise these on Raspberry Pi, low-end VPS, or older hardware where Chromium
-  starts slowly. Values must be positive integers up to `120000` ms; invalid
-  config values are rejected.
-- `actionTimeoutMs` is the default budget for browser `act` requests when the caller does not pass `timeoutMs`. The client transport adds a small slack window so long waits can finish instead of timing out at the HTTP boundary.
-- `tabCleanup` is best-effort cleanup for tabs opened by primary-agent browser sessions. Subagent, cron, and ACP lifecycle cleanup still closes their explicit tracked tabs at session end; primary sessions keep active tabs reusable, then close idle or excess tracked tabs in the background.
+- 控制服务绑定到 loopback，端口由 `gateway.port` 派生而来（默认 `18791` = gateway + 2）。覆盖 `gateway.port` 或 `OPENCLAW_GATEWAY_PORT` 会同步移动同一组派生端口。
+- 本地 `openclaw` 配置文件会自动分配 `cdpPort` / `cdpUrl`；只有远程 CDP 才需要设置这些。未设置时，`cdpUrl` 默认指向受管理的本地 CDP 端口。
+- `remoteCdpTimeoutMs` 适用于远程和 `attachOnly` CDP HTTP 可达性检查，以及打开标签页的 HTTP 请求；`remoteCdpHandshakeTimeoutMs` 适用于它们的 CDP WebSocket 握手。
+- `localLaunchTimeoutMs` 是本地启动的受管理 Chrome 进程暴露其 CDP HTTP 端点的时间预算。`localCdpReadyTimeoutMs` 是在发现该进程后，为 CDP websocket 就绪预留的后续时间预算。在 Raspberry Pi、低配 VPS 或较老硬件上，如果 Chromium 启动较慢，请提高这些值。取值必须是最大不超过 `120000` ms 的正整数；无效配置值会被拒绝。
+- `actionTimeoutMs` 是浏览器 `act` 请求在调用方未传入 `timeoutMs` 时的默认时间预算。客户端传输层会额外加上一个小的缓冲窗口，以便长时间等待能够完成，而不是在 HTTP 边界超时。
+- `tabCleanup` 是对主智能体浏览器会话所打开标签页的尽力清理。子智能体、cron 和 ACP 生命周期清理仍会在会话结束时关闭其显式跟踪的标签页；主会话会保留活跃标签页以供复用，然后在后台关闭空闲或超出上限的已跟踪标签页。
 
 </Accordion>
 
-<Accordion title="SSRF policy">
+<Accordion title="SSRF 策略">
 
-- Browser navigation and open-tab are SSRF-guarded before navigation and best-effort re-checked on the final `http(s)` URL afterwards.
-- In strict SSRF mode, remote CDP endpoint discovery and `/json/version` probes (`cdpUrl`) are checked too.
-- Gateway/provider `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` environment variables do not automatically proxy the OpenClaw-managed browser. Managed Chrome launches direct by default so provider proxy settings do not weaken browser SSRF checks.
-- To proxy the managed browser itself, pass explicit Chrome proxy flags through `browser.extraArgs`, such as `--proxy-server=...` or `--proxy-pac-url=...`. Strict SSRF mode blocks explicit browser proxy routing unless private-network browser access is intentionally enabled.
-- `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork` is off by default; enable only when private-network browser access is intentionally trusted.
-- `browser.ssrfPolicy.allowPrivateNetwork` remains supported as a legacy alias.
+- 浏览器导航和打开标签页在导航前会经过 SSRF 防护，并在导航结束后的最终 `http(s)` URL 上尽力再次检查。
+- 在严格 SSRF 模式下，远程 CDP 端点发现和 `/json/version` 探测（`cdpUrl`）也会被检查。
+- Gateway 网关 / 提供商的 `HTTP_PROXY`、`HTTPS_PROXY`、`ALL_PROXY` 和 `NO_PROXY` 环境变量不会自动为 OpenClaw 管理的浏览器启用代理。默认情况下，受管理的 Chrome 直接启动，因此提供商代理设置不会削弱浏览器的 SSRF 检查。
+- 若要为受管理浏览器本身设置代理，请通过 `browser.extraArgs` 传入显式的 Chrome 代理参数，例如 `--proxy-server=...` 或 `--proxy-pac-url=...`。严格 SSRF 模式会阻止显式的浏览器代理路由，除非你有意启用了私有网络浏览器访问。
+- `browser.ssrfPolicy.dangerouslyAllowPrivateNetwork` 默认关闭；仅在你明确可信任私有网络浏览器访问时启用。
+- `browser.ssrfPolicy.allowPrivateNetwork` 仍作为旧版别名受支持。
 
 </Accordion>
 
-<Accordion title="Profile behavior">
+<Accordion title="配置文件行为">
 
-- `attachOnly: true` means never launch a local browser; only attach if one is already running.
-- `headless` can be set globally or per local managed profile. Per-profile values override `browser.headless`, so one locally launched profile can stay headless while another remains visible.
-- `POST /start?headless=true` and `openclaw browser start --headless` request a
-  one-shot headless launch for local managed profiles without rewriting
-  `browser.headless` or profile config. Existing-session, attach-only, and
-  remote CDP profiles reject the override because OpenClaw does not launch those
-  browser processes.
-- On Linux hosts without `DISPLAY` or `WAYLAND_DISPLAY`, local managed profiles
-  default to headless automatically when neither the environment nor profile/global
-  config explicitly chooses headed mode. `openclaw browser status --json`
-  reports `headlessSource` as `env`, `profile`, `config`,
-  `request`, `linux-display-fallback`, or `default`.
-- `OPENCLAW_BROWSER_HEADLESS=1` forces local managed launches headless for the
-  current process. `OPENCLAW_BROWSER_HEADLESS=0` forces headed mode for ordinary
-  starts and returns an actionable error on Linux hosts without a display server;
-  an explicit `start --headless` request still wins for that one launch.
-- `executablePath` can be set globally or per local managed profile. Per-profile values override `browser.executablePath`, so different managed profiles can launch different Chromium-based browsers. Both forms accept `~` for your OS home directory.
-- `color` (top-level and per-profile) tints the browser UI so you can see which profile is active.
-- Default profile is `openclaw` (managed standalone). Use `defaultProfile: "user"` to opt into the signed-in user browser.
-- Auto-detect order: system default browser if Chromium-based; otherwise Chrome → Brave → Edge → Chromium → Chrome Canary.
-- `driver: "existing-session"` uses Chrome DevTools MCP instead of raw CDP. Do not set `cdpUrl` for that driver.
-- Set `browser.profiles.<name>.userDataDir` when an existing-session profile should attach to a non-default Chromium user profile (Brave, Edge, etc.). This path also accepts `~` for your OS home directory.
+- `attachOnly: true` 表示绝不启动本地浏览器；仅在浏览器已运行时附加。
+- `headless` 可以在全局或每个本地受管理配置文件上设置。每配置文件的值会覆盖 `browser.headless`，因此一个本地启动的配置文件可以保持 headless，而另一个保持可见。
+- `POST /start?headless=true` 和 `openclaw browser start --headless` 会请求对本地受管理配置文件执行一次性的 headless 启动，而不会改写 `browser.headless` 或配置文件配置。现有会话、仅附加和远程 CDP 配置文件会拒绝该覆盖，因为 OpenClaw 不会启动这些浏览器进程。
+- 在没有 `DISPLAY` 或 `WAYLAND_DISPLAY` 的 Linux 主机上，如果环境或配置文件 / 全局配置都没有显式选择有界面模式，本地受管理配置文件会默认自动使用 headless。`openclaw browser status --json` 会将 `headlessSource` 报告为 `env`、`profile`、`config`、`request`、`linux-display-fallback` 或 `default`。
+- `OPENCLAW_BROWSER_HEADLESS=1` 会为当前进程强制本地受管理启动使用 headless。`OPENCLAW_BROWSER_HEADLESS=0` 会为普通启动强制使用有界面模式，并在 Linux 主机没有显示服务器时返回可操作的错误；显式的 `start --headless` 请求仍会在那一次启动中优先生效。
+- `executablePath` 可以在全局或每个本地受管理配置文件上设置。每配置文件的值会覆盖 `browser.executablePath`，因此不同的受管理配置文件可以启动不同的基于 Chromium 的浏览器。这两种形式都支持使用 `~` 表示你的操作系统主目录。
+- `color`（顶层和每配置文件）会为浏览器 UI 着色，便于你识别当前激活的是哪个配置文件。
+- 默认配置文件是 `openclaw`（受管理的独立模式）。使用 `defaultProfile: "user"` 可以切换为默认使用已登录的用户浏览器。
+- 自动检测顺序：若系统默认浏览器是基于 Chromium 的则优先使用它；否则按 Chrome → Brave → Edge → Chromium → Chrome Canary 的顺序检测。
+- `driver: "existing-session"` 使用 Chrome DevTools MCP，而不是原始 CDP。不要为该驱动设置 `cdpUrl`。
+- 当某个 existing-session 配置文件需要附加到非默认的 Chromium 用户配置文件（Brave、Edge 等）时，请设置 `browser.profiles.<name>.userDataDir`。该路径同样支持使用 `~` 表示你的操作系统主目录。
 
 </Accordion>
 
 </AccordionGroup>
 
-## Use Brave (or another Chromium-based browser)
+## 使用 Brave（或其他基于 Chromium 的浏览器）
 
-If your **system default** browser is Chromium-based (Chrome/Brave/Edge/etc),
-OpenClaw uses it automatically. Set `browser.executablePath` to override
-auto-detection. Top-level and per-profile `executablePath` values accept `~`
-for your OS home directory:
+如果你的**系统默认**浏览器是基于 Chromium 的（Chrome / Brave / Edge 等），OpenClaw 会自动使用它。设置 `browser.executablePath` 可以覆盖自动检测。顶层和每配置文件的 `executablePath` 值都支持使用 `~` 表示你的操作系统主目录：
 
 ```bash
 openclaw config set browser.executablePath "/usr/bin/google-chrome"
 openclaw config set browser.profiles.work.executablePath "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-Or set it in config, per platform:
+或者按平台在配置中设置：
 
 <Tabs>
   <Tab title="macOS">
@@ -292,66 +259,48 @@ Or set it in config, per platform:
   </Tab>
 </Tabs>
 
-Per-profile `executablePath` only affects local managed profiles that OpenClaw
-launches. `existing-session` profiles attach to an already-running browser
-instead, and remote CDP profiles use the browser behind `cdpUrl`.
+每个配置文件的 `executablePath` 只会影响由 OpenClaw 启动的本地受管理配置文件。`existing-session` 配置文件会附加到一个已经在运行的浏览器，而远程 CDP 配置文件则使用 `cdpUrl` 背后的浏览器。
 
-## Local vs remote control
+## 本地控制与远程控制
 
-- **Local control (default):** the Gateway starts the loopback control service and can launch a local browser.
-- **Remote control (node host):** run a node host on the machine that has the browser; the Gateway proxies browser actions to it.
-- **Remote CDP:** set `browser.profiles.<name>.cdpUrl` (or `browser.cdpUrl`) to
-  attach to a remote Chromium-based browser. In this case, OpenClaw will not launch a local browser.
-- For externally managed CDP services on loopback (for example Browserless in
-  Docker published to `127.0.0.1`), also set `attachOnly: true`. Loopback CDP
-  without `attachOnly` is treated as a local OpenClaw-managed browser profile.
-- `headless` only affects local managed profiles that OpenClaw launches. It does not restart or change existing-session or remote CDP browsers.
-- `executablePath` follows the same local managed profile rule. Changing it on a
-  running local managed profile marks that profile for restart/reconcile so the
-  next launch uses the new binary.
+- **本地控制（默认）：** Gateway 网关会启动 loopback 控制服务，并且可以启动本地浏览器。
+- **远程控制（节点主机）：** 在拥有浏览器的机器上运行节点主机；Gateway 网关会将浏览器操作代理到该节点主机。
+- **远程 CDP：** 设置 `browser.profiles.<name>.cdpUrl`（或 `browser.cdpUrl`）以附加到远程的基于 Chromium 的浏览器。在这种情况下，OpenClaw 不会启动本地浏览器。
+- 对于运行在 loopback 上、由外部管理的 CDP 服务（例如在 Docker 中运行并发布到 `127.0.0.1` 的 Browserless），还需要设置 `attachOnly: true`。如果 loopback CDP 没有设置 `attachOnly`，它会被视为本地由 OpenClaw 管理的浏览器配置文件。
+- `headless` 只影响由 OpenClaw 启动的本地受管理配置文件。它不会重启或更改 existing-session 或远程 CDP 浏览器。
+- `executablePath` 也遵循相同的本地受管理配置文件规则。在一个正在运行的本地受管理配置文件上更改它时，该配置文件会被标记为需要重启 / 协调，以便下次启动时使用新的二进制文件。
 
-Stopping behavior differs by profile mode:
+停止行为会因配置文件模式而异：
 
-- local managed profiles: `openclaw browser stop` stops the browser process that
-  OpenClaw launched
-- attach-only and remote CDP profiles: `openclaw browser stop` closes the active
-  control session and releases Playwright/CDP emulation overrides (viewport,
-  color scheme, locale, timezone, offline mode, and similar state), even
-  though no browser process was launched by OpenClaw
+- 本地受管理配置文件：`openclaw browser stop` 会停止由 OpenClaw 启动的浏览器进程
+- 仅附加和远程 CDP 配置文件：`openclaw browser stop` 会关闭当前控制会话，并释放 Playwright / CDP 模拟覆盖项（viewport、color scheme、locale、timezone、offline mode 及类似状态），即使并没有由 OpenClaw 启动任何浏览器进程
 
-Remote CDP URLs can include auth:
+远程 CDP URL 可以包含认证信息：
 
-- Query tokens (e.g., `https://provider.example?token=<token>`)
-- HTTP Basic auth (e.g., `https://user:pass@provider.example`)
+- 查询参数 token（例如 `https://provider.example?token=<token>`）
+- HTTP Basic auth（例如 `https://user:pass@provider.example`）
 
-OpenClaw preserves the auth when calling `/json/*` endpoints and when connecting
-to the CDP WebSocket. Prefer environment variables or secrets managers for
-tokens instead of committing them to config files.
+OpenClaw 会在调用 `/json/*` 端点以及连接到 CDP WebSocket 时保留这些认证信息。对于 token，优先使用环境变量或 secrets manager，而不是将其提交到配置文件中。
 
-## Node browser proxy (zero-config default)
+## 节点浏览器代理（默认零配置）
 
-If you run a **node host** on the machine that has your browser, OpenClaw can
-auto-route browser tool calls to that node without any extra browser config.
-This is the default path for remote gateways.
+如果你在拥有浏览器的机器上运行**节点主机**，OpenClaw 可以在无需任何额外浏览器配置的情况下，自动将浏览器工具调用路由到该节点。这是远程 Gateway 网关的默认路径。
 
-Notes:
+说明：
 
-- The node host exposes its local browser control server via a **proxy command**.
-- Profiles come from the node’s own `browser.profiles` config (same as local).
-- `nodeHost.browserProxy.allowProfiles` is optional. Leave it empty for the legacy/default behavior: all configured profiles remain reachable through the proxy, including profile create/delete routes.
-- If you set `nodeHost.browserProxy.allowProfiles`, OpenClaw treats it as a least-privilege boundary: only allowlisted profiles can be targeted, and persistent profile create/delete routes are blocked on the proxy surface.
-- Disable if you don’t want it:
-  - On the node: `nodeHost.browserProxy.enabled=false`
-  - On the gateway: `gateway.nodes.browser.mode="off"`
+- 节点主机会通过一个**代理命令**暴露其本地浏览器控制服务器。
+- 配置文件来自节点自身的 `browser.profiles` 配置（与本地相同）。
+- `nodeHost.browserProxy.allowProfiles` 是可选的。将其留空可保留旧版 / 默认行为：所有已配置的配置文件都可通过代理访问，包括配置文件创建 / 删除路由。
+- 如果你设置了 `nodeHost.browserProxy.allowProfiles`，OpenClaw 会将其视为最小权限边界：只有 allowlist 中的配置文件可以被指定，并且持久化配置文件的创建 / 删除路由会在代理表面被阻止。
+- 如果你不想启用它，可以禁用：
+  - 在节点上：`nodeHost.browserProxy.enabled=false`
+  - 在 gateway 上：`gateway.nodes.browser.mode="off"`
 
-## Browserless (hosted remote CDP)
+## Browserless（托管远程 CDP）
 
-[Browserless](https://browserless.io) is a hosted Chromium service that exposes
-CDP connection URLs over HTTPS and WebSocket. OpenClaw can use either form, but
-for a remote browser profile the simplest option is the direct WebSocket URL
-from Browserless' connection docs.
+[Browserless](https://browserless.io) 是一个托管的 Chromium 服务，通过 HTTPS 和 WebSocket 暴露 CDP 连接 URL。OpenClaw 可以使用任一种形式，但对于远程浏览器配置文件来说，最简单的选项通常是 Browserless 连接文档中给出的直接 WebSocket URL。
 
-Example:
+示例：
 
 ```json5
 {
@@ -370,18 +319,15 @@ Example:
 }
 ```
 
-Notes:
+说明：
 
-- Replace `<BROWSERLESS_API_KEY>` with your real Browserless token.
-- Choose the region endpoint that matches your Browserless account (see their docs).
-- If Browserless gives you an HTTPS base URL, you can either convert it to
-  `wss://` for a direct CDP connection or keep the HTTPS URL and let OpenClaw
-  discover `/json/version`.
+- 将 `<BROWSERLESS_API_KEY>` 替换为你真实的 Browserless token。
+- 选择与你的 Browserless 账户匹配的区域端点（见其文档）。
+- 如果 Browserless 给你的是 HTTPS 基础 URL，你可以将其转换为 `wss://` 来建立直接 CDP 连接，或者保留该 HTTPS URL，让 OpenClaw 去发现 `/json/version`。
 
-### Browserless Docker on the same host
+### 同一主机上的 Browserless Docker
 
-When Browserless is self-hosted in Docker and OpenClaw runs on the host, treat
-Browserless as an externally managed CDP service:
+当 Browserless 以 Docker 方式自托管，而 OpenClaw 运行在宿主机上时，应将 Browserless 视为外部管理的 CDP 服务：
 
 ```json5
 {
@@ -399,49 +345,23 @@ Browserless as an externally managed CDP service:
 }
 ```
 
-The address in `browser.profiles.browserless.cdpUrl` must be reachable from the
-OpenClaw process. Browserless must also advertise a matching reachable endpoint;
-set Browserless `EXTERNAL` to that same public-to-OpenClaw WebSocket base, such
-as `ws://127.0.0.1:3000`, `ws://browserless:3000`, or a stable private Docker
-network address. If `/json/version` returns `webSocketDebuggerUrl` pointing at
-an address OpenClaw cannot reach, CDP HTTP can look healthy while the WebSocket
-attach still fails.
+`browser.profiles.browserless.cdpUrl` 中的地址必须对 OpenClaw 进程可达。Browserless 还必须广播一个匹配且可达的端点；将 Browserless 的 `EXTERNAL` 设置为同一个对 OpenClaw 可达的 WebSocket 基地址，例如 `ws://127.0.0.1:3000`、`ws://browserless:3000`，或稳定的私有 Docker 网络地址。如果 `/json/version` 返回的 `webSocketDebuggerUrl` 指向的是 OpenClaw 无法访问的地址，那么即使 CDP HTTP 看起来健康，WebSocket 附加仍会失败。
 
-Do not leave `attachOnly` unset for a loopback Browserless profile. Without
-`attachOnly`, OpenClaw treats the loopback port as a local managed browser
-profile and may report that the port is in use but not owned by OpenClaw.
+不要对 loopback Browserless 配置文件省略 `attachOnly`。如果没有 `attachOnly`，OpenClaw 会将该 loopback 端口视为本地受管理浏览器配置文件，并可能报告该端口已被占用但不归 OpenClaw 所有。
 
-## Direct WebSocket CDP providers
+## 直接 WebSocket CDP 提供商
 
-Some hosted browser services expose a **direct WebSocket** endpoint rather than
-the standard HTTP-based CDP discovery (`/json/version`). OpenClaw accepts three
-CDP URL shapes and picks the right connection strategy automatically:
+有些托管浏览器服务暴露的是**直接 WebSocket** 端点，而不是标准的基于 HTTP 的 CDP 发现（`/json/version`）。OpenClaw 接受三种 CDP URL 形式，并会自动选择正确的连接策略：
 
-- **HTTP(S) discovery** — `http://host[:port]` or `https://host[:port]`.
-  OpenClaw calls `/json/version` to discover the WebSocket debugger URL, then
-  connects. No WebSocket fallback.
-- **Direct WebSocket endpoints** — `ws://host[:port]/devtools/<kind>/<id>` or
-  `wss://...` with a `/devtools/browser|page|worker|shared_worker|service_worker/<id>`
-  path. OpenClaw connects directly via a WebSocket handshake and skips
-  `/json/version` entirely.
-- **Bare WebSocket roots** — `ws://host[:port]` or `wss://host[:port]` with no
-  `/devtools/...` path (e.g. [Browserless](https://browserless.io),
-  [Browserbase](https://www.browserbase.com)). OpenClaw tries HTTP
-  `/json/version` discovery first (normalising the scheme to `http`/`https`);
-  if discovery returns a `webSocketDebuggerUrl` it is used, otherwise OpenClaw
-  falls back to a direct WebSocket handshake at the bare root. If the advertised
-  WebSocket endpoint rejects the CDP handshake but the configured bare root
-  accepts it, OpenClaw falls back to that root as well. This lets a bare `ws://`
-  pointed at a local Chrome still connect, since Chrome only accepts WebSocket
-  upgrades on the specific per-target path from `/json/version`, while hosted
-  providers can still use their root WebSocket endpoint when their discovery
-  endpoint advertises a short-lived URL that is not suitable for Playwright CDP.
+- **HTTP(S) 发现** — `http://host[:port]` 或 `https://host[:port]`。  
+  OpenClaw 会调用 `/json/version` 以发现 WebSocket 调试器 URL，然后连接。不会回退到 WebSocket。
+- **直接 WebSocket 端点** — `ws://host[:port]/devtools/<kind>/<id>` 或
+  `wss://...`，路径形式为 `/devtools/browser|page|worker|shared_worker|service_worker/<id>`。OpenClaw 会直接通过 WebSocket 握手连接，并完全跳过 `/json/version`。
+- **裸 WebSocket 根路径** — `ws://host[:port]` 或 `wss://host[:port]`，且没有 `/devtools/...` 路径（例如 [Browserless](https://browserless.io)、[Browserbase](https://www.browserbase.com)）。OpenClaw 会先尝试 HTTP `/json/version` 发现（将协议规范化为 `http` / `https`）；如果发现返回了 `webSocketDebuggerUrl`，则使用它；否则 OpenClaw 会回退到在裸根路径上执行直接 WebSocket 握手。如果广播的 WebSocket 端点拒绝 CDP 握手，而已配置的裸根路径接受，则 OpenClaw 也会回退到该根路径。这样一来，指向本地 Chrome 的裸 `ws://` 仍然可以连接，因为 Chrome 只接受 `/json/version` 返回的特定每目标路径上的 WebSocket 升级；而托管提供商在其发现端点广播了一个不适合 Playwright CDP 的短期 URL 时，仍可以使用其根 WebSocket 端点。
 
 ### Browserbase
 
-[Browserbase](https://www.browserbase.com) is a cloud platform for running
-headless browsers with built-in CAPTCHA solving, stealth mode, and residential
-proxies.
+[Browserbase](https://www.browserbase.com) 是一个云平台，用于运行 headless 浏览器，内置 CAPTCHA 求解、隐身模式和住宅代理。
 
 ```json5
 {
@@ -460,83 +380,70 @@ proxies.
 }
 ```
 
-Notes:
+说明：
 
-- [Sign up](https://www.browserbase.com/sign-up) and copy your **API Key**
-  from the [Overview dashboard](https://www.browserbase.com/overview).
-- Replace `<BROWSERBASE_API_KEY>` with your real Browserbase API key.
-- Browserbase auto-creates a browser session on WebSocket connect, so no
-  manual session creation step is needed.
-- The free tier allows one concurrent session and one browser hour per month.
-  See [pricing](https://www.browserbase.com/pricing) for paid plan limits.
-- See the [Browserbase docs](https://docs.browserbase.com) for full API
-  reference, SDK guides, and integration examples.
+- [注册](https://www.browserbase.com/sign-up)，然后从 [Overview dashboard](https://www.browserbase.com/overview) 复制你的 **API Key**。
+- 将 `<BROWSERBASE_API_KEY>` 替换为你真实的 Browserbase API key。
+- Browserbase 会在 WebSocket 连接时自动创建浏览器会话，因此无需手动创建会话。
+- 免费套餐每月允许一个并发会话和一个浏览器小时。付费套餐限制见 [pricing](https://www.browserbase.com/pricing)。
+- 完整的 API 参考、SDK 指南和集成示例见 [Browserbase docs](https://docs.browserbase.com)。
 
-## Security
+## 安全性
 
-Key ideas:
+关键概念：
 
-- Browser control is loopback-only; access flows through the Gateway’s auth or node pairing.
-- The standalone loopback browser HTTP API uses **shared-secret auth only**:
-  gateway token bearer auth, `x-openclaw-password`, or HTTP Basic auth with the
-  configured gateway password.
-- Tailscale Serve identity headers and `gateway.auth.mode: "trusted-proxy"` do
-  **not** authenticate this standalone loopback browser API.
-- If browser control is enabled and no shared-secret auth is configured, OpenClaw
-  auto-generates `gateway.auth.token` on startup and persists it to config.
-- OpenClaw does **not** auto-generate that token when `gateway.auth.mode` is
-  already `password`, `none`, or `trusted-proxy`.
-- Keep the Gateway and any node hosts on a private network (Tailscale); avoid public exposure.
-- Treat remote CDP URLs/tokens as secrets; prefer env vars or a secrets manager.
+- 浏览器控制仅限 loopback；访问通过 Gateway 网关的认证或节点配对进行。
+- 独立的 loopback 浏览器 HTTP API **仅使用共享密钥认证**：gateway token bearer auth、`x-openclaw-password`，或携带已配置 gateway 密码的 HTTP Basic auth。
+- Tailscale Serve 身份头和 `gateway.auth.mode: "trusted-proxy"` **不会**为这个独立的 loopback 浏览器 API 提供认证。
+- 如果启用了浏览器控制，但没有配置共享密钥认证，OpenClaw 会在启动时自动生成 `gateway.auth.token`，并将其持久化到配置中。
+- 当 `gateway.auth.mode` 已经是 `password`、`none` 或 `trusted-proxy` 时，OpenClaw **不会**自动生成该 token。
+- 将 Gateway 网关和任何节点主机保持在私有网络中（Tailscale）；避免暴露到公网。
+- 将远程 CDP URL / token 视为密钥；优先使用环境变量或 secrets manager。
 
-Remote CDP tips:
+远程 CDP 提示：
 
-- Prefer encrypted endpoints (HTTPS or WSS) and short-lived tokens where possible.
-- Avoid embedding long-lived tokens directly in config files.
+- 尽可能优先使用加密端点（HTTPS 或 WSS）和短期 token。
+- 避免将长期 token 直接嵌入配置文件。
 
-## Profiles (multi-browser)
+## 配置文件（多浏览器）
 
-OpenClaw supports multiple named profiles (routing configs). Profiles can be:
+OpenClaw 支持多个命名配置文件（路由配置）。配置文件可以是：
 
-- **openclaw-managed**: a dedicated Chromium-based browser instance with its own user data directory + CDP port
-- **remote**: an explicit CDP URL (Chromium-based browser running elsewhere)
-- **existing session**: your existing Chrome profile via Chrome DevTools MCP auto-connect
+- **由 OpenClaw 管理**：一个专用的基于 Chromium 的浏览器实例，拥有自己的用户数据目录和 CDP 端口
+- **远程**：一个显式的 CDP URL（运行在其他地方的基于 Chromium 的浏览器）
+- **现有会话**：通过 Chrome DevTools MCP 自动连接到你现有的 Chrome 配置文件
 
-Defaults:
+默认值：
 
-- The `openclaw` profile is auto-created if missing.
-- The `user` profile is built-in for Chrome MCP existing-session attach.
-- Existing-session profiles are opt-in beyond `user`; create them with `--driver existing-session`.
-- Local CDP ports allocate from **18800–18899** by default.
-- Deleting a profile moves its local data directory to Trash.
+- 如果缺失，`openclaw` 配置文件会被自动创建。
+- `user` 配置文件是内置的，用于 Chrome MCP existing-session 附加。
+- 除 `user` 之外，existing-session 配置文件需要显式启用；使用 `--driver existing-session` 创建它们。
+- 本地 CDP 端口默认从 **18800–18899** 范围内分配。
+- 删除配置文件时，会将其本地数据目录移到废纸篓。
 
-All control endpoints accept `?profile=<name>`; the CLI uses `--browser-profile`.
+所有控制端点都接受 `?profile=<name>`；CLI 使用 `--browser-profile`。
 
-## Existing session via Chrome DevTools MCP
+## 通过 Chrome DevTools MCP 使用现有会话
 
-OpenClaw can also attach to a running Chromium-based browser profile through the
-official Chrome DevTools MCP server. This reuses the tabs and login state
-already open in that browser profile.
+OpenClaw 还可以通过官方的 Chrome DevTools MCP 服务器附加到一个正在运行的基于 Chromium 的浏览器配置文件。这会复用该浏览器配置文件中已经打开的标签页和登录状态。
 
-Official background and setup references:
+官方背景与设置参考：
 
-- [Chrome for Developers: Use Chrome DevTools MCP with your browser session](https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session)
+- [Chrome for Developers: 使用 Chrome DevTools MCP 连接你的浏览器会话](https://developer.chrome.com/blog/chrome-devtools-mcp-debug-your-browser-session)
 - [Chrome DevTools MCP README](https://github.com/ChromeDevTools/chrome-devtools-mcp)
 
-Built-in profile:
+内置配置文件：
 
 - `user`
 
-Optional: create your own custom existing-session profile if you want a
-different name, color, or browser data directory.
+可选：如果你想要不同的名称、颜色或浏览器数据目录，可以创建你自己的自定义 existing-session 配置文件。
 
-Default behavior:
+默认行为：
 
-- The built-in `user` profile uses Chrome MCP auto-connect, which targets the
-  default local Google Chrome profile.
+- 内置的 `user` 配置文件使用 Chrome MCP 自动连接，目标是默认的本地 Google Chrome 配置文件。
 
-Use `userDataDir` for Brave, Edge, Chromium, or a non-default Chrome profile.
-`~` expands to your OS home directory:
+对于 Brave、Edge、Chromium 或非默认的 Chrome 配置文件，请使用 `userDataDir`。
+`~` 会展开为你的操作系统主目录：
 
 ```json5
 {
@@ -553,19 +460,19 @@ Use `userDataDir` for Brave, Edge, Chromium, or a non-default Chrome profile.
 }
 ```
 
-Then in the matching browser:
+然后在对应的浏览器中：
 
-1. Open that browser's inspect page for remote debugging.
-2. Enable remote debugging.
-3. Keep the browser running and approve the connection prompt when OpenClaw attaches.
+1. 打开该浏览器的远程调试 inspect 页面。
+2. 启用远程调试。
+3. 保持浏览器运行，并在 OpenClaw 附加时批准连接提示。
 
-Common inspect pages:
+常见的 inspect 页面：
 
-- Chrome: `chrome://inspect/#remote-debugging`
-- Brave: `brave://inspect/#remote-debugging`
-- Edge: `edge://inspect/#remote-debugging`
+- Chrome：`chrome://inspect/#remote-debugging`
+- Brave：`brave://inspect/#remote-debugging`
+- Edge：`edge://inspect/#remote-debugging`
 
-Live attach smoke test:
+实时附加 smoke 测试：
 
 ```bash
 openclaw browser --browser-profile user start
@@ -574,87 +481,72 @@ openclaw browser --browser-profile user tabs
 openclaw browser --browser-profile user snapshot --format ai
 ```
 
-What success looks like:
+成功时应表现为：
 
-- `status` shows `driver: existing-session`
-- `status` shows `transport: chrome-mcp`
-- `status` shows `running: true`
-- `tabs` lists your already-open browser tabs
-- `snapshot` returns refs from the selected live tab
+- `status` 显示 `driver: existing-session`
+- `status` 显示 `transport: chrome-mcp`
+- `status` 显示 `running: true`
+- `tabs` 列出你已经打开的浏览器标签页
+- `snapshot` 返回所选实时标签页中的 refs
 
-What to check if attach does not work:
+如果附加失败，请检查：
 
-- the target Chromium-based browser is version `144+`
-- remote debugging is enabled in that browser's inspect page
-- the browser showed and you accepted the attach consent prompt
-- `openclaw doctor` migrates old extension-based browser config and checks that
-  Chrome is installed locally for default auto-connect profiles, but it cannot
-  enable browser-side remote debugging for you
+- 目标的基于 Chromium 的浏览器版本是否为 `144+`
+- 该浏览器的 inspect 页面中是否启用了远程调试
+- 浏览器是否弹出了附加同意提示，并且你已接受
+- `openclaw doctor` 会迁移旧的基于扩展的浏览器配置，并检查默认自动连接配置文件所需的 Chrome 是否已在本地安装，但它不能替你在浏览器端启用远程调试
 
-Agent use:
+智能体使用方式：
 
-- Use `profile="user"` when you need the user’s logged-in browser state.
-- If you use a custom existing-session profile, pass that explicit profile name.
-- Only choose this mode when the user is at the computer to approve the attach
-  prompt.
-- the Gateway or node host can spawn `npx chrome-devtools-mcp@latest --autoConnect`
+- 当你需要用户已登录的浏览器状态时，使用 `profile="user"`。
+- 如果你使用自定义的 existing-session 配置文件，请传入该显式配置文件名。
+- 只有当用户就在电脑前、能够批准附加提示时，才选择这种模式。
+- Gateway 网关或节点主机可以启动 `npx chrome-devtools-mcp@latest --autoConnect`
 
-Notes:
+说明：
 
-- This path is higher-risk than the isolated `openclaw` profile because it can
-  act inside your signed-in browser session.
-- OpenClaw does not launch the browser for this driver; it only attaches.
-- OpenClaw uses the official Chrome DevTools MCP `--autoConnect` flow here. If
-  `userDataDir` is set, it is passed through to target that user data directory.
-- Existing-session can attach on the selected host or through a connected
-  browser node. If Chrome lives elsewhere and no browser node is connected, use
-  remote CDP or a node host instead.
+- 与隔离的 `openclaw` 配置文件相比，这条路径风险更高，因为它可以在你已登录的浏览器会话中执行操作。
+- 对于这个驱动，OpenClaw 不会启动浏览器；它只会附加。
+- OpenClaw 在这里使用官方的 Chrome DevTools MCP `--autoConnect` 流程。如果设置了 `userDataDir`，它会被透传，以定位该用户数据目录。
+- existing-session 可以附加到选定主机上，或通过已连接的浏览器节点进行附加。如果 Chrome 位于其他地方，而又没有连接浏览器节点，请改用远程 CDP 或节点主机。
 
-### Custom Chrome MCP launch
+### 自定义 Chrome MCP 启动
 
-Override the spawned Chrome DevTools MCP server per profile when the default
-`npx chrome-devtools-mcp@latest` flow is not what you want (offline hosts,
-pinned versions, vendored binaries):
+当默认的 `npx chrome-devtools-mcp@latest` 流程不是你想要的方式时（例如离线主机、固定版本、供应商自带二进制），可以按配置文件覆盖所启动的 Chrome DevTools MCP 服务器：
 
-| Field        | What it does                                                                                                               |
+| 字段 | 作用 |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `mcpCommand` | Executable to spawn instead of `npx`. Resolved as-is; absolute paths are honored.                                          |
-| `mcpArgs`    | Argument array passed verbatim to `mcpCommand`. Replaces the default `chrome-devtools-mcp@latest --autoConnect` arguments. |
+| `mcpCommand` | 要启动的可执行文件，用来替代 `npx`。按原样解析；绝对路径会被直接使用。 |
+| `mcpArgs` | 逐字传递给 `mcpCommand` 的参数数组。会替代默认的 `chrome-devtools-mcp@latest --autoConnect` 参数。 |
 
-When `cdpUrl` is set on an existing-session profile, OpenClaw skips
-`--autoConnect` and forwards the endpoint to Chrome MCP automatically:
+当在 existing-session 配置文件上设置了 `cdpUrl` 时，OpenClaw 会跳过
+`--autoConnect`，并自动将该端点转发给 Chrome MCP：
 
-- `http(s)://...` → `--browserUrl <url>` (DevTools HTTP discovery endpoint).
-- `ws(s)://...` → `--wsEndpoint <url>` (direct CDP WebSocket).
+- `http(s)://...` → `--browserUrl <url>`（DevTools HTTP 发现端点）。
+- `ws(s)://...` → `--wsEndpoint <url>`（直接 CDP WebSocket）。
 
-Endpoint flags and `userDataDir` cannot be combined: when `cdpUrl` is set,
-`userDataDir` is ignored for Chrome MCP launch, since Chrome MCP attaches to
-the running browser behind the endpoint rather than opening a profile
-directory.
+端点参数与 `userDataDir` 不能同时使用：当设置了 `cdpUrl` 时，Chrome MCP 启动会忽略 `userDataDir`，因为 Chrome MCP 会附加到该端点背后的运行中浏览器，而不是打开某个配置文件目录。
 
-<Accordion title="Existing-session feature limitations">
+<Accordion title="existing-session 功能限制">
 
-Compared to the managed `openclaw` profile, existing-session drivers are more constrained:
+与受管理的 `openclaw` 配置文件相比，existing-session 驱动限制更多：
 
-- **Screenshots** — page captures and `--ref` element captures work; CSS `--element` selectors do not. `--full-page` cannot combine with `--ref` or `--element`. Playwright is not required for page or ref-based element screenshots.
-- **Actions** — `click`, `type`, `hover`, `scrollIntoView`, `drag`, and `select` require snapshot refs (no CSS selectors). `click-coords` clicks visible viewport coordinates and does not require a snapshot ref. `click` is left-button only. `type` does not support `slowly=true`; use `fill` or `press`. `press` does not support `delayMs`. `type`, `hover`, `scrollIntoView`, `drag`, `select`, `fill`, and `evaluate` do not support per-call timeouts. `select` accepts a single value.
-- **Wait / upload / dialog** — `wait --url` supports exact, substring, and glob patterns; `wait --load networkidle` is not supported. Upload hooks require `ref` or `inputRef`, one file at a time, no CSS `element`. Dialog hooks do not support timeout overrides.
-- **Managed-only features** — batch actions, PDF export, download interception, and `responsebody` still require the managed browser path.
+- **截图** —— 支持页面截图和 `--ref` 元素截图；不支持 CSS `--element` 选择器。`--full-page` 不能与 `--ref` 或 `--element` 组合使用。页面或基于 ref 的元素截图不需要 Playwright。
+- **操作** —— `click`、`type`、`hover`、`scrollIntoView`、`drag` 和 `select` 需要 snapshot refs（不支持 CSS 选择器）。`click-coords` 点击可见视口坐标，不需要 snapshot ref。`click` 仅支持左键。`type` 不支持 `slowly=true`；请使用 `fill` 或 `press`。`press` 不支持 `delayMs`。`type`、`hover`、`scrollIntoView`、`drag`、`select`、`fill` 和 `evaluate` 不支持按调用单独设置超时。`select` 仅接受单个值。
+- **等待 / 上传 / 对话框** —— `wait --url` 支持精确、子串和 glob 模式；不支持 `wait --load networkidle`。上传钩子需要 `ref` 或 `inputRef`，一次只能传一个文件，不支持 CSS `element`。对话框钩子不支持超时覆盖。
+- **仅受管理模式支持的功能** —— 批量操作、PDF 导出、下载拦截和 `responsebody` 仍然需要受管理浏览器路径。
 
 </Accordion>
 
-## Isolation guarantees
+## 隔离保证
 
-- **Dedicated user data dir**: never touches your personal browser profile.
-- **Dedicated ports**: avoids `9222` to prevent collisions with dev workflows.
-- **Deterministic tab control**: `tabs` returns `suggestedTargetId` first, then
-  stable `tabId` handles such as `t1`, optional labels, and the raw `targetId`.
-  Agents should reuse `suggestedTargetId`; raw ids remain available for
-  debugging and compatibility.
+- **专用用户数据目录**：绝不会触碰你的个人浏览器配置文件。
+- **专用端口**：避免使用 `9222`，防止与你的开发工作流冲突。
+- **可预测的标签页控制**：`tabs` 会优先返回 `suggestedTargetId`，然后是稳定的 `tabId` 句柄（如 `t1`）、可选标签以及原始的 `targetId`。智能体应复用 `suggestedTargetId`；原始 ID 仍保留用于调试和兼容性场景。
 
-## Browser selection
+## 浏览器选择
 
-When launching locally, OpenClaw picks the first available:
+在本地启动时，OpenClaw 会选择第一个可用的浏览器：
 
 1. Chrome
 2. Brave
@@ -662,49 +554,43 @@ When launching locally, OpenClaw picks the first available:
 4. Chromium
 5. Chrome Canary
 
-You can override with `browser.executablePath`.
+你可以通过 `browser.executablePath` 进行覆盖。
 
-Platforms:
+平台说明：
 
-- macOS: checks `/Applications` and `~/Applications`.
-- Linux: checks common Chrome/Brave/Edge/Chromium locations under `/usr/bin`,
-  `/snap/bin`, `/opt/google`, `/opt/brave.com`, `/usr/lib/chromium`, and
-  `/usr/lib/chromium-browser`.
-- Windows: checks common install locations.
+- macOS：检查 `/Applications` 和 `~/Applications`。
+- Linux：检查 `/usr/bin`、`/snap/bin`、`/opt/google`、`/opt/brave.com`、`/usr/lib/chromium` 和 `/usr/lib/chromium-browser` 下常见的 Chrome / Brave / Edge / Chromium 路径。
+- Windows：检查常见安装位置。
 
-## Control API (optional)
+## 控制 API（可选）
 
-For scripting and debugging, the Gateway exposes a small **loopback-only HTTP
-control API** plus a matching `openclaw browser` CLI (snapshots, refs, wait
-power-ups, JSON output, debug workflows). See
-[Browser control API](/tools/browser-control) for the full reference.
+为了便于脚本编写和调试，Gateway 网关暴露了一个小型的**仅限 loopback 的 HTTP 控制 API**，以及配套的 `openclaw browser` CLI（快照、refs、wait 增强功能、JSON 输出、调试工作流）。完整参考见 [Browser 控制 API](/zh-CN/tools/browser-control)。
 
-## Troubleshooting
+## 故障排除
 
-For Linux-specific issues (especially snap Chromium), see
-[Browser troubleshooting](/tools/browser-linux-troubleshooting).
+对于 Linux 特有问题（尤其是 snap Chromium），请参见
+[浏览器故障排除](/zh-CN/tools/browser-linux-troubleshooting)。
 
-For WSL2 Gateway + Windows Chrome split-host setups, see
-[WSL2 + Windows + remote Chrome CDP troubleshooting](/tools/browser-wsl2-windows-remote-cdp-troubleshooting).
+对于 WSL2 Gateway 网关 + Windows Chrome 分离主机配置，请参见
+[WSL2 + Windows + 远程 Chrome CDP 故障排除](/zh-CN/tools/browser-wsl2-windows-remote-cdp-troubleshooting)。
 
-### CDP startup failure vs navigation SSRF block
+### CDP 启动失败与导航 SSRF 阻止
 
-These are different failure classes and they point to different code paths.
+这两者属于不同的失败类型，对应不同的代码路径。
 
-- **CDP startup or readiness failure** means OpenClaw cannot confirm that the browser control plane is healthy.
-- **Navigation SSRF block** means the browser control plane is healthy, but a page navigation target is rejected by policy.
+- **CDP 启动或就绪失败** 表示 OpenClaw 无法确认浏览器控制平面处于健康状态。
+- **导航 SSRF 阻止** 表示浏览器控制平面是健康的，但某个页面导航目标因策略被拒绝。
 
-Common examples:
+常见示例：
 
-- CDP startup or readiness failure:
+- CDP 启动或就绪失败：
   - `Chrome CDP websocket for profile "openclaw" is not reachable after start`
   - `Remote CDP for profile "<name>" is not reachable at <cdpUrl>`
-  - `Port <port> is in use for profile "<name>" but not by openclaw` when a
-    loopback external CDP service is configured without `attachOnly: true`
-- Navigation SSRF block:
-  - `open`, `navigate`, snapshot, or tab-opening flows fail with a browser/network policy error while `start` and `tabs` still work
+  - 当 loopback 外部 CDP 服务未设置 `attachOnly: true` 时，出现 `Port <port> is in use for profile "<name>" but not by openclaw`
+- 导航 SSRF 阻止：
+  - 当 `start` 和 `tabs` 仍然可用时，`open`、`navigate`、snapshot 或打开标签页流程因浏览器 / 网络策略错误而失败
 
-Use this minimal sequence to separate the two:
+使用以下最小流程来区分这两类问题：
 
 ```bash
 openclaw browser --browser-profile openclaw start
@@ -712,48 +598,48 @@ openclaw browser --browser-profile openclaw tabs
 openclaw browser --browser-profile openclaw open https://example.com
 ```
 
-How to read the results:
+结果解读方式：
 
-- If `start` fails with `not reachable after start`, troubleshoot CDP readiness first.
-- If `start` succeeds but `tabs` fails, the control plane is still unhealthy. Treat this as a CDP reachability problem, not a page-navigation problem.
-- If `start` and `tabs` succeed but `open` or `navigate` fails, the browser control plane is up and the failure is in navigation policy or the target page.
-- If `start`, `tabs`, and `open` all succeed, the basic managed-browser control path is healthy.
+- 如果 `start` 因 `not reachable after start` 失败，先排查 CDP 就绪性。
+- 如果 `start` 成功但 `tabs` 失败，则控制平面仍然不健康。应将其视为 CDP 可达性问题，而不是页面导航问题。
+- 如果 `start` 和 `tabs` 成功，但 `open` 或 `navigate` 失败，则说明浏览器控制平面已经就绪，失败点在导航策略或目标页面。
+- 如果 `start`、`tabs` 和 `open` 全部成功，则说明基础的受管理浏览器控制路径是健康的。
 
-Important behavior details:
+重要行为细节：
 
-- Browser config defaults to a fail-closed SSRF policy object even when you do not configure `browser.ssrfPolicy`.
-- For the local loopback `openclaw` managed profile, CDP health checks intentionally skip browser SSRF reachability enforcement for OpenClaw's own local control plane.
-- Navigation protection is separate. A successful `start` or `tabs` result does not mean a later `open` or `navigate` target is allowed.
+- 即使你没有配置 `browser.ssrfPolicy`，浏览器配置默认也会使用失败即关闭的 SSRF 策略对象。
+- 对于本地 loopback 的 `openclaw` 受管理配置文件，CDP 健康检查会有意跳过浏览器 SSRF 可达性强制，以便 OpenClaw 自身的本地控制平面可以工作。
+- 导航保护是独立的。`start` 或 `tabs` 成功，并不意味着后续的 `open` 或 `navigate` 目标一定被允许。
 
-Security guidance:
+安全建议：
 
-- Do **not** relax browser SSRF policy by default.
-- Prefer narrow host exceptions such as `hostnameAllowlist` or `allowedHostnames` over broad private-network access.
-- Use `dangerouslyAllowPrivateNetwork: true` only in intentionally trusted environments where private-network browser access is required and reviewed.
+- 默认情况下**不要**放宽浏览器 SSRF 策略。
+- 相比于宽泛的私有网络访问，优先使用 `hostnameAllowlist` 或 `allowedHostnames` 这类更窄的主机例外。
+- 仅在明确受信任、确实需要并经过审查的私有网络浏览器访问环境中，才使用 `dangerouslyAllowPrivateNetwork: true`。
 
-## Agent tools + how control works
+## 智能体工具以及控制方式
 
-The agent gets **one tool** for browser automation:
+智能体只会获得**一个工具**用于浏览器自动化：
 
-- `browser` — doctor/status/start/stop/tabs/open/focus/close/snapshot/screenshot/navigate/act
+- `browser` — doctor / status / start / stop / tabs / open / focus / close / snapshot / screenshot / navigate / act
 
-How it maps:
+其映射关系如下：
 
-- `browser snapshot` returns a stable UI tree (AI or ARIA).
-- `browser act` uses the snapshot `ref` IDs to click/type/drag/select.
-- `browser screenshot` captures pixels (full page, element, or labeled refs).
-- `browser doctor` checks Gateway, plugin, profile, browser, and tab readiness.
-- `browser` accepts:
-  - `profile` to choose a named browser profile (openclaw, chrome, or remote CDP).
-  - `target` (`sandbox` | `host` | `node`) to select where the browser lives.
-  - In sandboxed sessions, `target: "host"` requires `agents.defaults.sandbox.browser.allowHostControl=true`.
-  - If `target` is omitted: sandboxed sessions default to `sandbox`, non-sandbox sessions default to `host`.
-  - If a browser-capable node is connected, the tool may auto-route to it unless you pin `target="host"` or `target="node"`.
+- `browser snapshot` 返回稳定的 UI 树（AI 或 ARIA）。
+- `browser act` 使用 snapshot `ref` ID 来执行 click / type / drag / select。
+- `browser screenshot` 捕获像素内容（整页、元素或带标签的 refs）。
+- `browser doctor` 检查 Gateway 网关、插件、配置文件、浏览器和标签页就绪情况。
+- `browser` 接受：
+  - `profile`，用于选择命名浏览器配置文件（openclaw、chrome 或远程 CDP）。
+  - `target`（`sandbox` | `host` | `node`），用于选择浏览器所在位置。
+  - 在沙箱隔离会话中，`target: "host"` 需要 `agents.defaults.sandbox.browser.allowHostControl=true`。
+  - 如果省略 `target`：沙箱隔离会话默认使用 `sandbox`，非沙箱隔离会话默认使用 `host`。
+  - 如果已连接支持浏览器的节点，该工具可能会自动路由到该节点，除非你显式固定 `target="host"` 或 `target="node"`。
 
-This keeps the agent deterministic and avoids brittle selectors.
+这样可以让智能体保持可预测，并避免脆弱的选择器。
 
-## Related
+## 相关内容
 
-- [Tools Overview](/tools) — all available agent tools
-- [Sandboxing](/gateway/sandboxing) — browser control in sandboxed environments
-- [Security](/gateway/security) — browser control risks and hardening
+- [Tools Overview](/zh-CN/tools) —— 所有可用的智能体工具
+- [沙箱隔离](/zh-CN/gateway/sandboxing) —— 沙箱隔离环境中的浏览器控制
+- [安全性](/zh-CN/gateway/security) —— 浏览器控制的风险与加固

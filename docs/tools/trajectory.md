@@ -1,64 +1,67 @@
 ---
-summary: "Export redacted trajectory bundles for debugging an OpenClaw agent session"
 read_when:
-  - Debugging why an agent answered, failed, or called tools a certain way
-  - Exporting a support bundle for an OpenClaw session
-  - Investigating prompt context, tool calls, runtime errors, or usage metadata
-  - Disabling or relocating trajectory capture
-title: "Trajectory bundles"
+    - 调试智能体为什么会那样回答、失败或调用工具
+    - 为 OpenClaw 会话导出支持包
+    - 调查提示词上下文、工具调用、运行时错误或用量元数据
+    - 禁用或迁移轨迹捕获位置
+summary: 导出经过脱敏处理的轨迹打包文件，用于调试 OpenClaw 智能体会话
+title: 轨迹打包文件
+x-i18n:
+    generated_at: "2026-04-23T23:05:48Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: be799691e0c3375efd24e3bec9ce8f9ab22f01a0f8a9ce4288b7e6e952c29da4
+    source_path: tools/trajectory.md
+    workflow: 15
 ---
 
-Trajectory capture is OpenClaw's per-session flight recorder. It records a
-structured timeline for each agent run, then `/export-trajectory` packages the
-current session into a redacted support bundle.
+轨迹捕获是 OpenClaw 的按会话飞行记录器。它会为每次智能体运行记录结构化时间线，然后 `/export-trajectory` 会将当前会话打包为一个经过脱敏处理的支持包。
 
-Use it when you need to answer questions like:
+当你需要回答以下问题时，请使用它：
 
-- What prompt, system prompt, and tools were sent to the model?
-- Which transcript messages and tool calls led to this answer?
-- Did the run time out, abort, compact, or hit a provider error?
-- Which model, plugins, skills, and runtime settings were active?
-- What usage and prompt-cache metadata did the provider return?
+- 发送给模型的提示词、系统提示词和工具分别是什么？
+- 哪些转录消息和工具调用导致了这次回答？
+- 这次运行是超时、中止、压缩了，还是遇到了 provider 错误？
+- 哪些模型、插件、Skills 和运行时设置处于激活状态？
+- provider 返回了哪些用量和提示词缓存元数据？
 
-## Quick start
+## 快速开始
 
-Send this in the active session:
+在当前活动会话中发送：
 
 ```text
 /export-trajectory
 ```
 
-Alias:
+别名：
 
 ```text
 /trajectory
 ```
 
-OpenClaw writes the bundle under the workspace:
+OpenClaw 会将打包文件写入工作区下：
 
 ```text
 .openclaw/trajectory-exports/openclaw-trajectory-<session>-<timestamp>/
 ```
 
-You can choose a relative output directory name:
+你可以指定一个相对输出目录名：
 
 ```text
 /export-trajectory bug-1234
 ```
 
-The custom path is resolved inside `.openclaw/trajectory-exports/`. Absolute
-paths and `~` paths are rejected.
+自定义路径会在 `.openclaw/trajectory-exports/` 内解析。绝对路径和 `~` 路径都会被拒绝。
 
-## Access
+## 访问权限
 
-Trajectory export is an owner command. The sender must pass the normal command
-authorization checks and owner checks for the channel.
+轨迹导出是 owner 命令。发送者必须通过该渠道的常规命令授权检查和 owner 检查。
 
-## What gets recorded
+## 会记录什么
 
-Trajectory capture is on by default for OpenClaw agent runs.
+对于 OpenClaw 智能体运行，轨迹捕获默认开启。
 
-Runtime events include:
+运行时事件包括：
 
 - `session.started`
 - `trace.metadata`
@@ -68,17 +71,17 @@ Runtime events include:
 - `trace.artifacts`
 - `session.ended`
 
-Transcript events are also reconstructed from the active session branch:
+转录事件也会从当前活动会话分支中重建：
 
-- user messages
-- assistant messages
-- tool calls
-- tool results
-- compactions
-- model changes
-- labels and custom session entries
+- 用户消息
+- 助手消息
+- 工具调用
+- 工具结果
+- 压缩
+- 模型变更
+- 标签和自定义会话条目
 
-Events are written as JSON Lines with this schema marker:
+事件会按 JSON Lines 格式写入，并带有以下 schema 标记：
 
 ```json
 {
@@ -87,102 +90,95 @@ Events are written as JSON Lines with this schema marker:
 }
 ```
 
-## Bundle files
+## 打包文件内容
 
-An exported bundle can contain:
+导出的打包文件可包含：
 
-| File                  | Contents                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------- |
-| `manifest.json`       | Bundle schema, source files, event counts, and generated file list                             |
-| `events.jsonl`        | Ordered runtime and transcript timeline                                                        |
-| `session-branch.json` | Redacted active transcript branch and session header                                           |
-| `metadata.json`       | OpenClaw version, OS/runtime, model, config snapshot, plugins, skills, and prompt metadata     |
-| `artifacts.json`      | Final status, errors, usage, prompt cache, compaction count, assistant text, and tool metadata |
-| `prompts.json`        | Submitted prompts and selected prompt-building details                                         |
-| `system-prompt.txt`   | Latest compiled system prompt, when captured                                                   |
-| `tools.json`          | Tool definitions sent to the model, when captured                                              |
+| 文件                  | 内容                                                                                         |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| `manifest.json`       | 打包 schema、源文件、事件计数和已生成文件列表                                                |
+| `events.jsonl`        | 有序的运行时和转录时间线                                                                     |
+| `session-branch.json` | 已脱敏的活动转录分支和会话头                                                                 |
+| `metadata.json`       | OpenClaw 版本、OS / 运行时、模型、配置快照、插件、Skills 和提示词元数据                     |
+| `artifacts.json`      | 最终状态、错误、用量、提示词缓存、压缩计数、助手文本和工具元数据                            |
+| `prompts.json`        | 已提交的提示词和选定的提示词构建细节                                                         |
+| `system-prompt.txt`   | 最新编译后的系统提示词（如果有捕获）                                                         |
+| `tools.json`          | 发送给模型的工具定义（如果有捕获）                                                           |
 
-`manifest.json` lists the files present in that bundle. Some files are omitted
-when the session did not capture the corresponding runtime data.
+`manifest.json` 会列出该打包文件中实际存在的文件。若该会话未捕获对应的运行时数据，则某些文件会被省略。
 
-## Capture location
+## 捕获位置
 
-By default, runtime trajectory events are written beside the session file:
+默认情况下，运行时轨迹事件会写在会话文件旁边：
 
 ```text
 <session>.trajectory.jsonl
 ```
 
-OpenClaw also writes a best-effort pointer file beside the session:
+OpenClaw 还会尽力在会话文件旁写入一个指针文件：
 
 ```text
 <session>.trajectory-path.json
 ```
 
-Set `OPENCLAW_TRAJECTORY_DIR` to store runtime trajectory sidecars in a
-dedicated directory:
+设置 `OPENCLAW_TRAJECTORY_DIR` 可将运行时轨迹 sidecar 存储到一个专用目录中：
 
 ```bash
 export OPENCLAW_TRAJECTORY_DIR=/var/lib/openclaw/trajectories
 ```
 
-When this variable is set, OpenClaw writes one JSONL file per session id in that
-directory.
+设置该变量后，OpenClaw 会在该目录中按每个会话 id 写入一个 JSONL 文件。
 
-## Disable capture
+## 禁用捕获
 
-Set `OPENCLAW_TRAJECTORY=0` before starting OpenClaw:
+在启动 OpenClaw 之前设置 `OPENCLAW_TRAJECTORY=0`：
 
 ```bash
 export OPENCLAW_TRAJECTORY=0
 ```
 
-This disables runtime trajectory capture. `/export-trajectory` can still export
-the transcript branch, but runtime-only files such as compiled context,
-provider artifacts, and prompt metadata may be missing.
+这会禁用运行时轨迹捕获。`/export-trajectory` 仍然可以导出转录分支，但仅运行时文件（例如已编译上下文、provider artifacts 和提示词元数据）可能会缺失。
 
-## Privacy and limits
+## 隐私和限制
 
-Trajectory bundles are designed for support and debugging, not public posting.
-OpenClaw redacts sensitive values before writing export files:
+轨迹打包文件是为支持和调试而设计的，不适合公开发布。
+OpenClaw 会在写入导出文件前对敏感值进行脱敏：
 
-- credentials and known secret-like payload fields
-- image data
-- local state paths
-- workspace paths, replaced with `$WORKSPACE_DIR`
-- home directory paths, where detected
+- 凭证和已知类似密钥的负载字段
+- 图像数据
+- 本地状态路径
+- 工作区路径，会替换为 `$WORKSPACE_DIR`
+- 检测到的主目录路径
 
-The exporter also bounds input size:
+导出器还会限制输入大小：
 
-- runtime sidecar files: 50 MiB
-- session files: 50 MiB
-- runtime events: 200,000
-- total exported events: 250,000
-- individual runtime event lines are truncated above 256 KiB
+- 运行时 sidecar 文件：50 MiB
+- 会话文件：50 MiB
+- 运行时事件：200,000 条
+- 导出的总事件数：250,000 条
+- 单条运行时事件行在超过 256 KiB 时会被截断
 
-Review bundles before sharing them outside your team. Redaction is best-effort
-and cannot know every application-specific secret.
+在与团队外部共享之前，请先审查打包文件。脱敏是尽力而为的，无法识别所有应用专属密钥。
 
-## Troubleshooting
+## 故障排除
 
-If the export has no runtime events:
+如果导出结果中没有运行时事件：
 
-- confirm OpenClaw was started without `OPENCLAW_TRAJECTORY=0`
-- check whether `OPENCLAW_TRAJECTORY_DIR` points to a writable directory
-- run another message in the session, then export again
-- inspect `manifest.json` for `runtimeEventCount`
+- 确认 OpenClaw 启动时未设置 `OPENCLAW_TRAJECTORY=0`
+- 检查 `OPENCLAW_TRAJECTORY_DIR` 是否指向可写目录
+- 在该会话中再运行一条消息，然后重新导出
+- 检查 `manifest.json` 中的 `runtimeEventCount`
 
-If the command rejects the output path:
+如果命令拒绝输出路径：
 
-- use a relative name like `bug-1234`
-- do not pass `/tmp/...` or `~/...`
-- keep the export inside `.openclaw/trajectory-exports/`
+- 使用类似 `bug-1234` 的相对名称
+- 不要传入 `/tmp/...` 或 `~/...`
+- 将导出保留在 `.openclaw/trajectory-exports/` 内
 
-If the export fails with a size error, the session or sidecar exceeded the
-export safety limits. Start a new session or export a smaller reproduction.
+如果导出因大小错误而失败，则说明会话或 sidecar 超出了导出安全限制。请启动一个新会话，或导出一个更小的复现案例。
 
-## Related
+## 相关内容
 
-- [Diffs](/tools/diffs)
-- [Session management](/concepts/session)
-- [Exec tool](/tools/exec)
+- [Diffs](/zh-CN/tools/diffs)
+- [会话管理](/zh-CN/concepts/session)
+- [Exec 工具](/zh-CN/tools/exec)

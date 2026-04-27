@@ -1,89 +1,96 @@
 ---
-summary: "Remote access using SSH tunnels (Gateway WS) and tailnets"
 read_when:
-  - Running or troubleshooting remote gateway setups
-title: "Remote access"
+    - 运行或排查远程 Gateway 网关设置故障
+summary: 使用 SSH 隧道（Gateway 网关 WS）和 tailnet 进行远程访问
+title: 远程访问
+x-i18n:
+    generated_at: "2026-04-26T04:11:39Z"
+    model: gpt-5.4
+    provider: openai
+    source_hash: 208f0e6a4dbb342df878ea99d70606327efdfd3df36b07dfa3e68aafcae98e5c
+    source_path: gateway/remote.md
+    workflow: 15
 ---
 
-This repo supports “remote over SSH” by keeping a single Gateway (the master) running on a dedicated host (desktop/server) and connecting clients to it.
+这个仓库通过在专用主机（桌面机/服务器）上保持单个 Gateway 网关（主实例）运行，并让客户端连接到它，来支持“通过 SSH 远程访问”。
 
-- For **operators (you / the macOS app)**: SSH tunneling is the universal fallback.
-- For **nodes (iOS/Android and future devices)**: connect to the Gateway **WebSocket** (LAN/tailnet or SSH tunnel as needed).
+- 对于**操作端（你 / macOS 应用）**：SSH 隧道是通用的回退方案。
+- 对于**节点（iOS/Android 和未来设备）**：连接到 Gateway 网关 **WebSocket**（根据需要通过局域网 / tailnet 或 SSH 隧道）。
 
-## The core idea
+## 核心思路
 
-- The Gateway WebSocket binds to **loopback** on your configured port (defaults to 18789).
-- For remote use, you forward that loopback port over SSH (or use a tailnet/VPN and tunnel less).
+- Gateway 网关 WebSocket 绑定到你配置端口上的**回环地址**（默认是 `18789`）。
+- 要远程使用时，你可以通过 SSH 转发这个回环端口（或者使用 tailnet/VPN 来减少隧道需求）。
 
-## Common VPN/tailnet setups (where the agent lives)
+## 常见的 VPN/tailnet 部署方式（智能体所在位置）
 
-Think of the **Gateway host** as “where the agent lives.” It owns sessions, auth profiles, channels, and state.
-Your laptop/desktop (and nodes) connect to that host.
+把 **Gateway 网关主机**理解为“智能体所在的位置”。它负责会话、认证配置、渠道和状态。
+你的笔记本/台式机（以及节点）连接到这台主机。
 
-### 1) Always-on Gateway in your tailnet (VPS or home server)
+### 1）在你的 tailnet 中始终在线的 Gateway 网关（VPS 或家用服务器）
 
-Run the Gateway on a persistent host and reach it via **Tailscale** or SSH.
+在持久运行的主机上运行 Gateway 网关，并通过 **Tailscale** 或 SSH 访问它。
 
-- **Best UX:** keep `gateway.bind: "loopback"` and use **Tailscale Serve** for the Control UI.
-- **Fallback:** keep loopback + SSH tunnel from any machine that needs access.
-- **Examples:** [exe.dev](/install/exe-dev) (easy VM) or [Hetzner](/install/hetzner) (production VPS).
+- **最佳体验：** 保持 `gateway.bind: "loopback"`，并为 Control UI 使用 **Tailscale Serve**。
+- **回退方案：** 保持回环绑定 + 从任何需要访问的机器建立 SSH 隧道。
+- **示例：** [exe.dev](/zh-CN/install/exe-dev)（简单 VM）或 [Hetzner](/zh-CN/install/hetzner)（生产 VPS）。
 
-This is ideal when your laptop sleeps often but you want the agent always-on.
+当你的笔记本经常休眠，但你希望智能体始终在线时，这种方式非常理想。
 
-### 2) Home desktop runs the Gateway, laptop is remote control
+### 2）家里的台式机运行 Gateway 网关，笔记本作为远程控制端
 
-The laptop does **not** run the agent. It connects remotely:
+笔记本**不**运行智能体。它以远程方式连接：
 
-- Use the macOS app’s **Remote over SSH** mode (Settings → General → “OpenClaw runs”).
-- The app opens and manages the tunnel, so WebChat + health checks “just work.”
+- 使用 macOS 应用的**通过 SSH 远程访问**模式（设置 → 通用 → “OpenClaw 运行于”）。
+- 应用会打开并管理隧道，因此 WebChat 和健康检查都能“正常工作”。
 
-Runbook: [macOS remote access](/platforms/mac/remote).
+操作手册：[macOS 远程访问](/zh-CN/platforms/mac/remote)。
 
-### 3) Laptop runs the Gateway, remote access from other machines
+### 3）笔记本运行 Gateway 网关，从其他机器远程访问
 
-Keep the Gateway local but expose it safely:
+保持 Gateway 网关在本机运行，但安全地暴露它：
 
-- SSH tunnel to the laptop from other machines, or
-- Tailscale Serve the Control UI and keep the Gateway loopback-only.
+- 从其他机器通过 SSH 隧道连接到笔记本，或者
+- 通过 Tailscale Serve 提供 Control UI，同时让 Gateway 网关仅绑定回环地址。
 
-Guide: [Tailscale](/gateway/tailscale) and [Web overview](/web).
+指南：[Tailscale](/zh-CN/gateway/tailscale) 和 [Web 概览](/zh-CN/web)。
 
-## Command flow (what runs where)
+## 命令流（哪些组件运行在哪里）
 
-One gateway service owns state + channels. Nodes are peripherals.
+一个 Gateway 网关服务负责状态 + 渠道。节点是外围设备。
 
-Flow example (Telegram → node):
+流程示例（Telegram → 节点）：
 
-- Telegram message arrives at the **Gateway**.
-- Gateway runs the **agent** and decides whether to call a node tool.
-- Gateway calls the **node** over the Gateway WebSocket (`node.*` RPC).
-- Node returns the result; Gateway replies back out to Telegram.
+- Telegram 消息到达 **Gateway 网关**。
+- Gateway 网关运行**智能体**，并决定是否调用节点工具。
+- Gateway 网关通过 Gateway 网关 WebSocket（`node.*` RPC）调用**节点**。
+- 节点返回结果；Gateway 网关再把回复发回 Telegram。
 
-Notes:
+说明：
 
-- **Nodes do not run the gateway service.** Only one gateway should run per host unless you intentionally run isolated profiles (see [Multiple gateways](/gateway/multiple-gateways)).
-- macOS app “node mode” is just a node client over the Gateway WebSocket.
+- **节点不运行 gateway 服务。** 每台主机通常只应运行一个 gateway，除非你有意运行隔离配置文件（参见 [多个 Gateway 网关](/zh-CN/gateway/multiple-gateways)）。
+- macOS 应用的“节点模式”只是一个通过 Gateway 网关 WebSocket 连接的节点客户端。
 
-## SSH tunnel (CLI + tools)
+## SSH 隧道（CLI + 工具）
 
-Create a local tunnel to the remote Gateway WS:
+为远程 Gateway 网关 WS 创建本地隧道：
 
 ```bash
 ssh -N -L 18789:127.0.0.1:18789 user@host
 ```
 
-With the tunnel up:
+隧道建立后：
 
-- `openclaw health` and `openclaw status --deep` now reach the remote gateway via `ws://127.0.0.1:18789`.
-- `openclaw gateway status`, `openclaw gateway health`, `openclaw gateway probe`, and `openclaw gateway call` can also target the forwarded URL via `--url` when needed.
+- `openclaw health` 和 `openclaw status --deep` 现在会通过 `ws://127.0.0.1:18789` 访问远程 gateway。
+- `openclaw gateway status`、`openclaw gateway health`、`openclaw gateway probe` 和 `openclaw gateway call` 也可以在需要时通过 `--url` 指向这个转发后的 URL。
 
-Note: replace `18789` with your configured `gateway.port` (or `--port`/`OPENCLAW_GATEWAY_PORT`).
-Note: when you pass `--url`, the CLI does not fall back to config or environment credentials.
-Include `--token` or `--password` explicitly. Missing explicit credentials is an error.
+注意：请将 `18789` 替换为你配置的 `gateway.port`（或 `--port` / `OPENCLAW_GATEWAY_PORT`）。
+注意：当你传入 `--url` 时，CLI 不会回退到配置或环境中的凭证。
+请显式包含 `--token` 或 `--password`。缺少显式凭证会报错。
 
-## CLI remote defaults
+## CLI 远程默认值
 
-You can persist a remote target so CLI commands use it by default:
+你可以持久化保存一个远程目标，让 CLI 命令默认使用它：
 
 ```json5
 {
@@ -97,73 +104,71 @@ You can persist a remote target so CLI commands use it by default:
 }
 ```
 
-When the gateway is loopback-only, keep the URL at `ws://127.0.0.1:18789` and open the SSH tunnel first.
-In the macOS app’s SSH tunnel transport, discovered gateway hostnames belong in
-`gateway.remote.sshTarget`; `gateway.remote.url` remains the local tunnel URL.
+当 gateway 仅绑定回环地址时，请将 URL 保持为 `ws://127.0.0.1:18789`，并先建立 SSH 隧道。
+在 macOS 应用的 SSH 隧道传输中，发现到的 gateway 主机名应放在
+`gateway.remote.sshTarget` 中；`gateway.remote.url` 仍然保持为本地隧道 URL。
 
-## Credential precedence
+## 凭证优先级
 
-Gateway credential resolution follows one shared contract across call/probe/status paths and Discord exec-approval monitoring. Node-host uses the same base contract with one local-mode exception (it intentionally ignores `gateway.remote.*`):
+Gateway 网关凭证解析在 call/probe/status 路径以及 Discord exec-approval 监控中遵循同一个共享约定。node-host 使用相同的基础约定，但有一个本地模式例外（它会有意忽略 `gateway.remote.*`）：
 
-- Explicit credentials (`--token`, `--password`, or tool `gatewayToken`) always win on call paths that accept explicit auth.
-- URL override safety:
-  - CLI URL overrides (`--url`) never reuse implicit config/env credentials.
-  - Env URL overrides (`OPENCLAW_GATEWAY_URL`) may use env credentials only (`OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`).
-- Local mode defaults:
-  - token: `OPENCLAW_GATEWAY_TOKEN` -> `gateway.auth.token` -> `gateway.remote.token` (remote fallback applies only when local auth token input is unset)
-  - password: `OPENCLAW_GATEWAY_PASSWORD` -> `gateway.auth.password` -> `gateway.remote.password` (remote fallback applies only when local auth password input is unset)
-- Remote mode defaults:
-  - token: `gateway.remote.token` -> `OPENCLAW_GATEWAY_TOKEN` -> `gateway.auth.token`
-  - password: `OPENCLAW_GATEWAY_PASSWORD` -> `gateway.remote.password` -> `gateway.auth.password`
-- Node-host local-mode exception: `gateway.remote.token` / `gateway.remote.password` are ignored.
-- Remote probe/status token checks are strict by default: they use `gateway.remote.token` only (no local token fallback) when targeting remote mode.
-- Gateway env overrides use `OPENCLAW_GATEWAY_*` only.
+- 显式凭证（`--token`、`--password` 或工具中的 `gatewayToken`）在接受显式认证的调用路径中始终优先。
+- URL 覆盖安全规则：
+  - CLI URL 覆盖（`--url`）绝不会复用隐式的配置/环境凭证。
+  - 环境 URL 覆盖（`OPENCLAW_GATEWAY_URL`）只能使用环境凭证（`OPENCLAW_GATEWAY_TOKEN` / `OPENCLAW_GATEWAY_PASSWORD`）。
+- 本地模式默认值：
+  - token：`OPENCLAW_GATEWAY_TOKEN` -> `gateway.auth.token` -> `gateway.remote.token`（只有在本地认证 token 输入未设置时，才会应用远程回退）
+  - password：`OPENCLAW_GATEWAY_PASSWORD` -> `gateway.auth.password` -> `gateway.remote.password`（只有在本地认证 password 输入未设置时，才会应用远程回退）
+- 远程模式默认值：
+  - token：`gateway.remote.token` -> `OPENCLAW_GATEWAY_TOKEN` -> `gateway.auth.token`
+  - password：`OPENCLAW_GATEWAY_PASSWORD` -> `gateway.remote.password` -> `gateway.auth.password`
+- node-host 本地模式例外：会忽略 `gateway.remote.token` / `gateway.remote.password`。
+- 远程 probe/status token 检查默认是严格的：在以远程模式为目标时，它们只使用 `gateway.remote.token`（不回退到本地 token）。
+- Gateway 网关环境覆盖仅使用 `OPENCLAW_GATEWAY_*`。
 
-## Chat UI over SSH
+## 通过 SSH 使用聊天 UI
 
-WebChat no longer uses a separate HTTP port. The SwiftUI chat UI connects directly to the Gateway WebSocket.
+WebChat 不再使用单独的 HTTP 端口。SwiftUI 聊天 UI 直接连接到 Gateway 网关 WebSocket。
 
-- Forward `18789` over SSH (see above), then connect clients to `ws://127.0.0.1:18789`.
-- On macOS, prefer the app’s “Remote over SSH” mode, which manages the tunnel automatically.
+- 通过 SSH 转发 `18789`（见上文），然后让客户端连接到 `ws://127.0.0.1:18789`。
+- 在 macOS 上，优先使用应用的“通过 SSH 远程访问”模式，它会自动管理隧道。
 
-## macOS app "Remote over SSH"
+## macOS 应用“通过 SSH 远程访问”
 
-The macOS menu bar app can drive the same setup end-to-end (remote status checks, WebChat, and Voice Wake forwarding).
+macOS 菜单栏应用可以端到端驱动同一套方案（远程状态检查、WebChat 和 Voice Wake 转发）。
 
-Runbook: [macOS remote access](/platforms/mac/remote).
+操作手册：[macOS 远程访问](/zh-CN/platforms/mac/remote)。
 
-## Security rules (remote/VPN)
+## 安全规则（远程 / VPN）
 
-Short version: **keep the Gateway loopback-only** unless you’re sure you need a bind.
+简短版本：除非你确定需要绑定到非回环地址，否则**保持 Gateway 网关仅绑定回环地址**。
 
-- **Loopback + SSH/Tailscale Serve** is the safest default (no public exposure).
-- Plaintext `ws://` is loopback-only by default. For trusted private networks,
-  set `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1` on the client process as
-  break-glass. There is no `openclaw.json` equivalent; this must be process
-  environment for the client making the WebSocket connection.
-- **Non-loopback binds** (`lan`/`tailnet`/`custom`, or `auto` when loopback is unavailable) must use gateway auth: token, password, or an identity-aware reverse proxy with `gateway.auth.mode: "trusted-proxy"`.
-- `gateway.remote.token` / `.password` are client credential sources. They do **not** configure server auth by themselves.
-- Local call paths can use `gateway.remote.*` as fallback only when `gateway.auth.*` is unset.
-- If `gateway.auth.token` / `gateway.auth.password` is explicitly configured via SecretRef and unresolved, resolution fails closed (no remote fallback masking).
-- `gateway.remote.tlsFingerprint` pins the remote TLS cert when using `wss://`.
-- **Tailscale Serve** can authenticate Control UI/WebSocket traffic via identity
-  headers when `gateway.auth.allowTailscale: true`; HTTP API endpoints do not
-  use that Tailscale header auth and instead follow the gateway's normal HTTP
-  auth mode. This tokenless flow assumes the gateway host is trusted. Set it to
-  `false` if you want shared-secret auth everywhere.
-- **Trusted-proxy** auth is for non-loopback identity-aware proxy setups only.
-  Same-host loopback reverse proxies do not satisfy `gateway.auth.mode: "trusted-proxy"`.
-- Treat browser control like operator access: tailnet-only + deliberate node pairing.
+- **回环地址 + SSH/Tailscale Serve** 是最安全的默认方案（不会公开暴露）。
+- 明文 `ws://` 默认仅限回环地址。对于受信任的私有网络，
+  在客户端进程上设置 `OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1`
+  作为紧急放行手段。没有对应的 `openclaw.json` 配置项；这必须在发起 WebSocket 连接的客户端进程
+  环境中设置。
+- **非回环绑定**（`lan` / `tailnet` / `custom`，或在回环不可用时的 `auto`）必须使用 gateway 认证：token、password，或带 `gateway.auth.mode: "trusted-proxy"` 的身份感知反向代理。
+- `gateway.remote.token` / `.password` 是客户端凭证来源。它们**不会**单独配置服务器认证。
+- 本地调用路径只有在 `gateway.auth.*` 未设置时，才可以将 `gateway.remote.*` 用作回退。
+- 如果通过 SecretRef 显式配置了 `gateway.auth.token` / `gateway.auth.password` 但未解析成功，则解析会失败关闭（不会用远程回退来掩盖问题）。
+- 使用 `wss://` 时，`gateway.remote.tlsFingerprint` 会固定远程 TLS 证书。
+- 当 `gateway.auth.allowTailscale: true` 时，**Tailscale Serve** 可以通过身份标头为 Control UI/WebSocket 流量提供认证；HTTP API 端点不使用这种 Tailscale 标头认证，而是遵循 gateway 的常规 HTTP
+  认证模式。这个无 token 流程默认假设 gateway 主机是受信任的。如果你希望所有地方都使用共享密钥认证，请将其设为
+  `false`。
+- **trusted-proxy** 认证仅适用于绑定到非回环地址、并使用身份感知代理的部署场景。
+  同主机上的回环反向代理不满足 `gateway.auth.mode: "trusted-proxy"` 的要求。
+- 将浏览器控制视为操作端访问：仅限 tailnet + 明确的节点配对。
 
-Deep dive: [Security](/gateway/security).
+深入说明：[安全性](/zh-CN/gateway/security)。
 
-### macOS: persistent SSH tunnel via LaunchAgent
+### macOS：通过 LaunchAgent 持久化 SSH 隧道
 
-For macOS clients connecting to a remote gateway, the easiest persistent setup uses an SSH `LocalForward` config entry plus a LaunchAgent to keep the tunnel alive across reboots and crashes.
+对于连接到远程 gateway 的 macOS 客户端，最简单的持久化方案是使用 SSH `LocalForward` 配置项加上 LaunchAgent，使隧道在重启和崩溃后仍能保持存活。
 
-#### Step 1: add SSH config
+#### 第 1 步：添加 SSH 配置
 
-Edit `~/.ssh/config`:
+编辑 `~/.ssh/config`：
 
 ```ssh
 Host remote-gateway
@@ -173,25 +178,25 @@ Host remote-gateway
     IdentityFile ~/.ssh/id_rsa
 ```
 
-Replace `<REMOTE_IP>` and `<REMOTE_USER>` with your values.
+将 `<REMOTE_IP>` 和 `<REMOTE_USER>` 替换为你的值。
 
-#### Step 2: copy SSH key (one-time)
+#### 第 2 步：复制 SSH 密钥（一次性）
 
 ```bash
 ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ```
 
-#### Step 3: configure the gateway token
+#### 第 3 步：配置 gateway token
 
-Store the token in config so it persists across restarts:
+将 token 存储到配置中，以便它在重启后仍然保留：
 
 ```bash
 openclaw config set gateway.remote.token "<your-token>"
 ```
 
-#### Step 4: create the LaunchAgent
+#### 第 4 步：创建 LaunchAgent
 
-Save this as `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`:
+将以下内容保存为 `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -214,46 +219,46 @@ Save this as `~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist`:
 </plist>
 ```
 
-#### Step 5: load the LaunchAgent
+#### 第 5 步：加载 LaunchAgent
 
 ```bash
 launchctl bootstrap gui/$UID ~/Library/LaunchAgents/ai.openclaw.ssh-tunnel.plist
 ```
 
-The tunnel will start automatically at login, restart on crash, and keep the forwarded port live.
+隧道会在登录时自动启动、在崩溃后自动重启，并保持转发端口持续可用。
 
-Note: if you have a leftover `com.openclaw.ssh-tunnel` LaunchAgent from an older setup, unload and delete it.
+注意：如果你还有旧部署遗留的 `com.openclaw.ssh-tunnel` LaunchAgent，请先卸载并删除它。
 
-#### Troubleshooting
+#### 故障排除
 
-Check if the tunnel is running:
+检查隧道是否正在运行：
 
 ```bash
 ps aux | grep "ssh -N remote-gateway" | grep -v grep
 lsof -i :18789
 ```
 
-Restart the tunnel:
+重启隧道：
 
 ```bash
 launchctl kickstart -k gui/$UID/ai.openclaw.ssh-tunnel
 ```
 
-Stop the tunnel:
+停止隧道：
 
 ```bash
 launchctl bootout gui/$UID/ai.openclaw.ssh-tunnel
 ```
 
-| Config entry                         | What it does                                                 |
+| 配置项 | 作用 |
 | ------------------------------------ | ------------------------------------------------------------ |
-| `LocalForward 18789 127.0.0.1:18789` | Forwards local port 18789 to remote port 18789               |
-| `ssh -N`                             | SSH without executing remote commands (port-forwarding only) |
-| `KeepAlive`                          | Automatically restarts the tunnel if it crashes              |
-| `RunAtLoad`                          | Starts the tunnel when the LaunchAgent loads at login        |
+| `LocalForward 18789 127.0.0.1:18789` | 将本地端口 `18789` 转发到远程端口 `18789` |
+| `ssh -N` | SSH 连接但不执行远程命令（仅做端口转发） |
+| `KeepAlive` | 如果隧道崩溃则自动重启 |
+| `RunAtLoad` | 在登录时 LaunchAgent 加载后启动隧道 |
 
-## Related
+## 相关内容
 
-- [Tailscale](/gateway/tailscale)
-- [Authentication](/gateway/authentication)
-- [Remote gateway setup](/gateway/remote-gateway-readme)
+- [Tailscale](/zh-CN/gateway/tailscale)
+- [身份验证](/zh-CN/gateway/authentication)
+- [远程 gateway 设置](/zh-CN/gateway/remote-gateway-readme)
