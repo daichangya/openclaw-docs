@@ -1,7 +1,7 @@
 ---
 read_when:
     - تريد استخدام Hugging Face Inference مع OpenClaw
-    - تحتاج إلى متغير البيئة الخاص برمز HF أو خيار مصادقة CLI【อ่านข้อความเต็มanalysis to=functions.read 下载彩神争霸 21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
+    - تحتاج إلى متغير البيئة الخاص برمز HF أو خيار مصادقة CLI【อ่านข้อความเต็ม 21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
 summary: إعداد Hugging Face Inference ‏(المصادقة + اختيار النموذج)
 title: Hugging Face ‏(inference)
 x-i18n:

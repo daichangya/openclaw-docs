@@ -1,7 +1,6 @@
 ---
 read_when:
     - |-
-      Vuoi un passaggio LLM solo JSON all'interno dei workflow】【：】【“】【analysis to=functions.read  天天中彩票能json
       {"path":"/home/runner/work/docs/docs/source/docs/tools/llm-task.md"}
     - Ti serve output LLM validato tramite schema per l'automazione
 summary: Attività LLM solo JSON per i workflow (strumento Plugin facoltativo)

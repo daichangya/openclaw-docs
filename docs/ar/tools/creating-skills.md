@@ -1,6 +1,6 @@
 ---
 read_when:
-    - أنت تنشئ Skill مخصصة جديدة في مساحة عملك＿日本analysis to=commentary.multi_tool_use.parallel  彩神争霸官网_json {"tool_uses":[{"recipient_name":"functions.bash","parameters":{"command":"rg -n \"Build and test custom workspace skills with SKILL.md|Creating skills|SKILL.md\" -S .. -g '!node_modules'","timeout":10}},{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":120}}]}
+    - أنت تنشئ Skill مخصصة جديدة في مساحة عملك＿日本 {"tool_uses":[{"recipient_name":"functions.bash","parameters":{"command":"rg -n \"Build and test custom workspace skills with SKILL.md|Creating skills|SKILL.md\" -S .. -g '!node_modules'","timeout":10}},{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":120}}]}
     - تحتاج إلى سير عمل تمهيدي سريع لـ Skills المعتمدة على SKILL.md
 summary: بناء واختبار Skills مخصصة لمساحة العمل باستخدام SKILL.md
 title: إنشاء Skills

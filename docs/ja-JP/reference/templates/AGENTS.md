@@ -1,6 +1,6 @@
 ---
 read_when:
-    - "workspace を手動で初期化する$IFnanalysis to=functions.read 】【。】【”】【commentary to=functions.read \U0007968App事务所{\"path\":\"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md\"} code արգjson  કેટલું 4000}"
+    - "workspace を手動で初期化する$IFn કેટલું 4000}"
 summary: AGENTS.md のワークスペーステンプレート
 title: AGENTS.md テンプレート
 x-i18n:

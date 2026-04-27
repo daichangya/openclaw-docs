@@ -1,7 +1,6 @@
 ---
 read_when:
     - Chcesz generowania multimediów Vydra w OpenClaw
-    - Potrzebujesz wskazówek konfiguracji klucza API Vydra【อ่านข้อความเต็มanalysis to=final  qq天天中彩票  since developer says translate function only output translated text. Need translate last user sentence.
 summary: Używaj obrazów, wideo i mowy Vydra w OpenClaw
 title: Vydra
 x-i18n:

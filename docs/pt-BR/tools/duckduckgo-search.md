@@ -3,7 +3,7 @@ read_when:
     - Você quer um provedor de web search que não exija chave de API
     - Você quer usar DuckDuckGo para `web_search`
     - |-
-      Você precisa de um fallback de busca sem configuraçãoഞ്ജanalysis to=functions.read  彩神争霸输钱commentary  彩神争霸高  天天中彩票不中返json
+      Você precisa de um fallback de busca sem configuraçãoഞ്ജ
       {"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md"}
 summary: DuckDuckGo web search -- provedor de fallback sem chave (experimental, baseado em HTML)
 title: Busca DuckDuckGo

@@ -1,7 +1,6 @@
 ---
 read_when:
     - Sie möchten Together AI mit OpenClaw verwenden
-    - Sie benötigen die API-Key-Env-Variable oder die CLI-Auth-Auswahlൊപ്പംanalysis to=final  天天中彩票在哪ian json_schema suppressed due to developer instruction requiring only translated text
 summary: Einrichtung von Together AI (Auth + Modellauswahl)
 title: Together AI
 x-i18n:

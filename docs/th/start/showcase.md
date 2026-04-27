@@ -2,8 +2,7 @@
 description: Real-world OpenClaw projects from the community
 read_when:
     - |-
-      กำลังมองหาตัวอย่างการใช้งาน OpenClaw จริง最新高清无码 to=functions.write  კომენტary  天天中彩票双色球json
-      {"path":"showcase.txt","content":"ผลงานเด่น"}】【。】【”】【analysis to=functions.write ӡамېرىಯing  天天爱彩票网站 code  大发快三走势图json
+      กำลังมองหาตัวอย่างการใช้งาน OpenClaw จริง
       {"path":"noop.txt","content":"noop"}
     - การอัปเดตไฮไลต์โปรเจกต์ของชุมชน
 summary: โปรเจกต์และการเชื่อมต่อที่สร้างโดยชุมชนซึ่งขับเคลื่อนด้วย OpenClaw

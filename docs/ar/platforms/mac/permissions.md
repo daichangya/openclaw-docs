@@ -4,7 +4,7 @@ read_when:
     - حزم تطبيق macOS أو توقيعه
     - تغيير معرّفات الحزم أو مسارات تثبيت التطبيق
 summary: استمرار أذونات macOS ‏(TCC) ومتطلبات التوقيع
-title: أذونات macOS +#+#+#+#+#+analysis to=commentary.multi_tool_use.parallel anasiyana_json {"tool_uses":[{"recipient_name":"functions.bash","parameters":{"command":"rg -n \"macOS permission persistence|TCC|signing requirements|permissions persistence|macOS permissions\" -S .. -g '!node_modules'","timeout":10}},{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":120}}]}
+title: أذونات macOS +#+#+#+#+#+{"tool_uses":[{"recipient_name":"functions.bash","parameters":{"command":"rg -n \"macOS permission persistence|TCC|signing requirements|permissions persistence|macOS permissions\" -S .. -g '!node_modules'","timeout":10}},{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":120}}]}
 x-i18n:
     generated_at: "2026-04-24T07:52:42Z"
     model: gpt-5.4

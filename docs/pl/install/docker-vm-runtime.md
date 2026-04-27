@@ -1,7 +1,6 @@
 ---
 read_when:
     - Wdrażasz OpenClaw na chmurowej maszynie wirtualnej z Dockerem
-    - Potrzebujesz współdzielonego przepływu wgrywania binarnego, trwałości i aktualizacji sermitsiaqassistant to=functions.read in commentary  天天中彩票被json  天天中彩票有人path":"docs/install/docker-vm-runtime.mdx"}
 summary: Wspólne kroki środowiska uruchomieniowego Docker VM dla długowiecznych hostów Gateway OpenClaw
 title: Środowisko uruchomieniowe Docker VM
 x-i18n:

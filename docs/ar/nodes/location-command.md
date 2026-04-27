@@ -1,6 +1,6 @@
 ---
 read_when:
-    - إضافة دعم Node للموقع أو واجهة أذونات المستخدم_北京赛车pkanalysis to=commentary.multi_tool_use.parallel  大发pk_json {"tool_uses":[{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":200}},{"recipient_name":"functions.bash","parameters":{"command":"pwd && ls -la && rg -n \"Location command|location.get|permission modes|Android foreground behavior\" -S .. -g '!node_modules'","timeout":10}}]}
+    - إضافة دعم Node للموقع أو واجهة أذونات المستخدم_北京赛车pk{"tool_uses":[{"recipient_name":"functions.read","parameters":{"path":"docs/AGENTS.md","offset":1,"limit":200}},{"recipient_name":"functions.bash","parameters":{"command":"pwd && ls -la && rg -n \"Location command|location.get|permission modes|Android foreground behavior\" -S .. -g '!node_modules'","timeout":10}}]}
     - تصميم أذونات الموقع أو سلوك التشغيل في المقدمة على Android
 summary: أمر الموقع لـ nodes ‏(`location.get`)، وأوضاع الأذونات، وسلوك Android في المقدمة
 title: أمر الموقع

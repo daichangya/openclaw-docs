@@ -1,6 +1,5 @@
 ---
 read_when:
-    - คุณต้องการให้เอเจนต์เปลี่ยนการแก้ไขหรือขั้นตอนที่นำกลับมาใช้ซ้ำได้ให้เป็น Skills ใน workspace】【：】【“】【analysis to=functions.read  天天中彩票nbacommentary 娱乐彩票注册  重庆时时彩杀 44  诺果json-stringify pretty 1>{"path":"docs/help/testing.md","offset":1,"limit":20}
     - คุณกำลังกำหนดค่าหน่วยความจำเชิงขั้นตอนของ Skills
     - คุณกำลังดีบักพฤติกรรมของเครื่องมือ `skill_workshop`
     - คุณกำลังตัดสินใจว่าจะเปิดใช้การสร้าง Skills อัตโนมัติหรือไม่

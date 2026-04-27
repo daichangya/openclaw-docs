@@ -2,10 +2,10 @@
 read_when:
     - 你希望通过脚本或命令行触发智能体运行
     - |-
-      你需要以编程方式将智能体回复投递到聊天渠道大发官网 to=functions.read 】【。】【”】【json
+      你需要以编程方式将智能体回复投递到聊天渠道
       {"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/","offset":1,"limit":1}
 summary: |-
-    从 CLI 运行智能体轮次，并可选择将回复投递到渠道	RTLUanalysis to=functions.read code  彩神争霸电脑版=json
+    从 CLI 运行智能体轮次，并可选择将回复投递到渠道
     {"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/","offset":1,"limit":1}
 title: 智能体发送
 x-i18n:

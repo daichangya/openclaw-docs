@@ -1,7 +1,6 @@
 ---
 read_when:
     - |-
-      คุณต้องการสร้าง Plugin OpenClaw ใหม่♀♀♀♀♀♀analysis to=final  六和彩აყოფിയassistant final  format=markdown
       คุณต้องการสร้าง Plugin OpenClaw ใหม่
     - คุณต้องการคู่มือเริ่มต้นอย่างรวดเร็วสำหรับการพัฒนา Plugin
     - คุณกำลังเพิ่มช่องทาง ผู้ให้บริการ tool หรือความสามารถอื่นใหม่ให้กับ OpenClaw

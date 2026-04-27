@@ -1,6 +1,5 @@
 ---
 read_when:
-    - تشغيل OpenClaw Gateway داخل WSL2 بينما يوجد Chrome على Windowsԥсanalysis to=functions.bash даҩ్యcommentary  大发快三是国家{"command":"printf '%s' 'تشغيل OpenClaw Gateway داخل WSL2 بينما يوجد Chrome على Windows'"}
     - رؤية أخطاء متداخلة بين المتصفح وControl UI عبر WSL2 وWindows
     - تحديد الاختيار بين Chrome MCP المحلي على المضيف وCDP البعيد الخام في إعدادات المضيف المنقسم
 summary: استكشف أخطاء Gateway في WSL2 + Chrome على Windows عبر CDP البعيد على شكل طبقات

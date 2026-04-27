@@ -1,6 +1,5 @@
 ---
 read_when:
-    - การดีบักมุมมอง WebChat บน Mac หรือพอร์ต loopback【อ่านข้อความเต็มanalysis to=none  大发快三大小单双ಿಲ್ಲ
 summary: วิธีที่แอป Mac ฝัง Gateway WebChat และวิธีดีบักมัน
 title: WebChat (macOS)
 x-i18n:

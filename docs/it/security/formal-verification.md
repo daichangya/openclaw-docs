@@ -2,7 +2,6 @@
 permalink: /security/formal-verification/
 read_when:
     - Esaminare le garanzie o i limiti dei modelli formali di sicurezza
-    - "Riprodurre o aggiornare i controlli dei modelli di sicurezza TLA+/TLC】【：】【“】【analysis to=functions.read  qq天天中彩票commentary \U0007968Appjson\n{\"path\":\"docs/.i18n/glossary.it.json\",\"offset\":1,\"limit\":200}"
 summary: Modelli di sicurezza verificati automaticamente per i percorsi a rischio più elevato di OpenClaw.
 title: Verifica formale (modelli di sicurezza)
 x-i18n:

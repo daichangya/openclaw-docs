@@ -1,6 +1,6 @@
 ---
 read_when:
-    - Chrome が Windows 側にあり、OpenClaw Gateway を WSL2 で実行する შემთხვევაშიanalysis to=functions.read  კომენტary to=functions.read 】【：】【“】【json  时时彩后രം 4000} code արգjson{"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md"}
+    - Chrome が Windows 側にあり、OpenClaw Gateway を WSL2 で実行する შემთხვევაში 时时彩后രം 4000} code արգjson{"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md"}
     - Seeing overlapping browser/control-ui errors across WSL2 and Windows
     - 分離ホスト構成で host-local Chrome MCP と生のリモート CDP のどちらを使うかを判断する
 summary: WSL2 Gateway + Windows Chrome のリモート CDP をレイヤーごとにトラブルシュートする

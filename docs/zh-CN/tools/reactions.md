@@ -3,7 +3,7 @@ read_when:
     - 处理任意渠道中的表情回应功能
     - 了解各平台上的 emoji 表情回应有何不同
 summary: 所有支持渠道中的表情回应工具语义
-title: 表情回应♀♀♀analysis to=functions.read  彩神争霸安卓_input={"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-qa-testing/SKILL.md"} code
+title: "Reactions"
 x-i18n:
     generated_at: "2026-04-23T21:09:42Z"
     model: gpt-5.4

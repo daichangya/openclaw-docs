@@ -2,7 +2,6 @@
 read_when:
     - Vuoi OpenClaw in esecuzione 24/7 su Azure con hardening del Network Security Group
     - |-
-      Vuoi un Gateway OpenClaw sempre attivo, di livello produzione, sulla tua VM Linux Azureեփականassistant to=multi_tool_use.parallel in commentary  天天中彩票是  东臣िखាមार्फत  大发快三是国家json
       {"tool_uses":[{"recipient_name":"functions.read","parameters":{"path":"/home/runner/work/docs/docs/source/docs/install/azure.md"}},{"recipient_name":"functions.bash","parameters":{"command":"pwd && rg -n \"Azure|azure\" -S /home/runner/work/docs/docs/source/docs | head -200","timeout":20}}]}
     - Vuoi un'amministrazione sicura con SSH Azure Bastion
 summary: Eseguire OpenClaw Gateway 24/7 su una VM Linux Azure con stato persistente

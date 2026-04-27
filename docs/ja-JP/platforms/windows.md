@@ -2,7 +2,6 @@
 read_when:
     - Windows に OpenClaw をインストールする
     - ネイティブ Windows と WSL2 のどちらを選ぶか
-    - "Windows コンパニオンアプリの状況を確認する\tRTLUanalysis to=functions.read  大发快三开奖_commentary ,超碰ুদ্ধিমান{\"path\":\"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md\"}"
 summary: 'Windows サポート: ネイティブおよび WSL2 のインストール経路、デーモン、現在の注意点'
 title: Windows
 x-i18n:

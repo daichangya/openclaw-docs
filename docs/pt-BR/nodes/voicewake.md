@@ -1,7 +1,7 @@
 ---
 read_when:
     - Alterando o comportamento ou os padrões de palavras de ativação por voz
-    - Adicionando novas plataformas de Node que precisam de sincronização de palavras de ativação给主人留下些什么吧analysis to=functions.read ￣奇米commentary 彩票开号json {"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-pr-maintainer/SKILL.md"}
+    - Adicionando novas plataformas de Node que precisam de sincronização de palavras de ativação给主人留下些什么吧{"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-pr-maintainer/SKILL.md"}
 summary: Palavras de ativação globais de voz (controladas pelo Gateway) e como elas sincronizam entre Nodes
 title: Ativação por voz
 x-i18n:

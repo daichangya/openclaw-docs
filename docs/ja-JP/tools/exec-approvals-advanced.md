@@ -1,6 +1,6 @@
 ---
 read_when:
-    - safe bin またはカスタム safe-bin profile を設定する＿日本assistant to=functions.read մեկնաբանություն  天天中彩票网站  大发快三大小单双  天天中彩票足球json  content={"path":"/home/runner/work/docs/docs/source/docs/help/testing.md","offset":1,"limit":40}
+    - safe bin またはカスタム safe-bin profile を設定する＿日本 content={"path":"/home/runner/work/docs/docs/source/docs/help/testing.md","offset":1,"limit":40}
     - 承認を Slack/Discord/Telegram または他のチャットチャネルへ転送する
     - チャネル向けのネイティブ承認クライアントを実装する
 summary: '高度な exec 承認: safe bin、interpreter binding、承認転送、ネイティブ配信'

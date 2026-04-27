@@ -1,7 +1,7 @@
 ---
 read_when:
     - |-
-      loreに触れるドキュメントやUXコピーを書く】【。 to=functions.read in commentary  大发官网  快三大发 to=functions.read  北京赛车有json
+      loreに触れるドキュメントやUXコピーを書く】【。 to=functions.read in commentary  
       {"path":"docs/reference/true-lore.md","offset":1,"limit":320}
 summary: OpenClawの背景設定と世界観（コンテキストとトーンのため）
 title: OpenClaw lore

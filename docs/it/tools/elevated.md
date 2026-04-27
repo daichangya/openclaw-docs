@@ -5,7 +5,6 @@ read_when:
       Regolare i valori predefiniti della modalità elevata, le allowlist o il comportamento dei comandi slash
       ```
     - |-
-      Capire come gli agenti in sandbox possono accedere all’host分分彩 to=final code```
       Capire come gli agenti in sandbox possono accedere all’host
       ```
 summary: 'Modalità exec elevata: eseguire comandi fuori dalla sandbox da un agente in sandbox'

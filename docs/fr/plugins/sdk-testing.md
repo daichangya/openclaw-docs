@@ -1,7 +1,7 @@
 ---
 read_when:
     - |-
-      Vous écrivez des tests pour un plugin不中返ుంజassistant to=functions.read వ్యాఖ్యary  玩彩神争霸  天天中彩票双色球json
+      Vous écrivez des tests pour un plugin
       {"path":"/home/runner/work/docs/docs/source/AGENTS.md","offset":1,"limit":40}
     - Vous avez besoin des utilitaires de test du SDK Plugin
     - Vous voulez comprendre les tests de contrat pour les plugins intégrés

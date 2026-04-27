@@ -3,7 +3,6 @@ read_when:
     - OS サポートやインストール方法を探している場合
     - Gateway をどこで実行するか決める場合
 summary: プラットフォーム対応の概要（Gateway + コンパニオンアプリ）
-title: プラットフォーム＿日本ี่ปุ่น assistant to=final code  天天爱彩票.close
 x-i18n:
     generated_at: "2026-04-24T05:07:32Z"
     model: gpt-5.4

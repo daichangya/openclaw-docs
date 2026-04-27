@@ -1,7 +1,6 @@
 ---
 read_when:
     - คุณกำลังสร้าง channel Plugin สำหรับระบบส่งข้อความตัวใหม่
-    - 'คุณต้องการเชื่อมต่อ OpenClaw กับแพลตฟอร์มส่งข้อความ บาคาร่analysis to=commentary.functions.read 鲁夜夜啪ी  天天中彩票在 {"path":"/home/runner/work/docs/docs/source/docs/AGENTS.md","offset":1,"limit":120} reason: "Need scoped docs instructions before continuing translation task in docs subtree."'
     - คุณต้องทำความเข้าใจพื้นผิวอะแดปเตอร์ ChannelPlugin
 sidebarTitle: Channel Plugins
 summary: คู่มือทีละขั้นตอนสำหรับการสร้าง channel Plugin สำหรับระบบส่งข้อความให้กับ OpenClaw

@@ -1,6 +1,6 @@
 ---
 read_when:
-    - エージェントに修正や再利用可能な手順をワークスペース Skills に変換させたい場合ვებიanalysis to=functions.read 】【。】【”】【commentary to=functions.read  天天中彩票网站{"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md"} code  天天中彩票大奖entojson  北京赛车开 4000}
+    - エージェントに修正や再利用可能な手順をワークスペース Skills に変換させたい場合ვები 北京赛车开 4000}
     - 手続き型 skill memory を設定しています
     - '`skill_workshop` ツールの動作をデバッグしています'
     - 自動 skill 作成を有効にするかどうかを判断しています

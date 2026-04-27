@@ -1,6 +1,5 @@
 ---
 read_when:
-    - Bir ajanın neden belirli şekilde yanıt verdiğini, başarısız olduğunu veya araç çağırdığını hata ayıklama】【：】【“】【analysis to=functions.read 彩票娱乐注册json 和天天中彩票{"path":"/home/runner/work/docs/docs/source/scripts/docs-i18n/AGENTS.md"}
     - Bir OpenClaw oturumu için destek paketi dışa aktarma
     - İstem bağlamını, araç çağrılarını, çalışma zamanı hatalarını veya kullanım meta verilerini inceleme
     - Trajectory yakalamayı devre dışı bırakma veya yerini değiştirme

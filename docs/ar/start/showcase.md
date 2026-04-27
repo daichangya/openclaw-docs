@@ -4,7 +4,7 @@ read_when:
     - |-
       البحث عن أمثلة حقيقية لاستخدام OpenClaw】【。】
 
-      analysis to=functions.read  大发时时彩json 21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
+      21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
     - تحديث أبرز مشاريع المجتمع
 summary: مشاريع وتكاملات من بناء المجتمع ومدعومة بواسطة OpenClaw
 title: العرض

@@ -1,6 +1,6 @@
 ---
 read_when:
-    - 你想在 OpenClaw 中使用 Vercel AI Gateway әскәрanalysis to=functions.read commentary  玩彩神争霸json 736  content omitted due to length?
+    - 你想在 OpenClaw 中使用 Vercel AI Gateway 
     - 你需要配置 API key 环境变量或 CLI 认证选项
 summary: Vercel AI Gateway 设置（认证 + 模型选择）
 title: Vercel AI Gateway

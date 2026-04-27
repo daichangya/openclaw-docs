@@ -1,6 +1,5 @@
 ---
 read_when:
-    - メディアパイプラインまたは添付の変更ోదિયાનuser to=functions.read in commentary  天天彩票怎么  天天爱彩票提现json  content{"path":"../AGENTS.md"}/Subthresholdassistant to=functions.read in commentary  ฝ่ายขายออนไลน์  手机天天中彩票 ադարձjson  content{"path":"../AGENTS.md"}  天天爱彩票提现json
 summary: 送信、Gateway、エージェント返信における画像とメディア処理ルール
 title: 画像とメディアのサポート
 x-i18n:

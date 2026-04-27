@@ -1,7 +1,7 @@
 ---
 read_when:
     - تريد استخدام Synthetic بوصفه موفر نماذج
-    - تحتاج إلى مفتاح API أو إعداد base URL لـ Synthetic_北京pkanalysis to=functions.read  海南天天中彩票json 21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
+    - تحتاج إلى مفتاح API أو إعداد base URL لـ Synthetic_北京pk21 0 2000 {"path":"/home/runner/work/docs/docs/source/.i18n/glossary.ar.json"}
 summary: استخدم API المتوافقة مع Anthropic الخاصة بـ Synthetic في OpenClaw
 title: Synthetic
 x-i18n:

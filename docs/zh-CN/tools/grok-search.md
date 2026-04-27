@@ -1,6 +1,6 @@
 ---
 read_when:
-    - 你想将 Grok 用于 `web_search`ҷкәынanalysis to=functions.read commentary  天天中彩票粤json 720  content omitted due to length?
+    - 你想将 Grok 用于 `web_search`ҷкәын720  content omitted due to length?
     - 你需要为 Web 搜索配置 `XAI_API_KEY`
 summary: 通过 xAI 的 Web-grounded 响应使用 Grok Web 搜索
 title: Grok 搜索

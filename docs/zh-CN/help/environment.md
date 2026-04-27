@@ -1,6 +1,6 @@
 ---
 read_when:
-    - 你需要了解会加载哪些环境变量，以及它们的顺序】【：】【“】【analysis to=functions.read  天天中彩票会json  大发官网评论ary  天天中彩票的 ／久久output േജसन code? Let's just answer translation. user asks English prose. Need Chinese only.
+    - 你需要了解会加载哪些环境变量，以及它们的顺序
     - 你正在调试 Gateway 网关中缺失的 API 密钥
     - 你正在编写提供商身份验证或部署环境相关文档
 summary: OpenClaw 从哪里加载环境变量及其优先级顺序

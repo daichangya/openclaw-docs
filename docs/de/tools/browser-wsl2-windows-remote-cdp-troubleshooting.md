@@ -1,7 +1,6 @@
 ---
 read_when:
     - |-
-      OpenClaw Gateway in WSL2 ausführen, während Chrome auf Windows läuft】【：】【“】【assistant to=functions.read  კომენტary  海南天天中彩票 ￣亚洲json
       {"path":"/home/runner/work/docs/docs/source/.agents/skills/openclaw-qa-testing/SKILL.md"}
     - Überlappende Browser-/Control-UI-Fehler in WSL2 und Windows sehen
     - Zwischen hostlokalem Chrome MCP und rohem Remote-CDP in Setups mit getrennten Hosts entscheiden

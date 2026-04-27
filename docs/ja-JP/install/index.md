@@ -2,7 +2,6 @@
 read_when:
     - はじめに のクイックスタート以外のインストール方法が必要な場合
     - |-
-      クラウドプラットフォームにデプロイしたい場合＿日本assistant to=commentary.functions.read 娱乐彩票注册 ￣第四色ائج  大发快三走势图  天天中彩票有人 json
       {"path":"/home/runner/work/docs/docs/source/AGENTS.md","offset":1,"limit":40}
     - 更新、移行、またはアンインストールが必要な場合
 summary: OpenClaw をインストールする — インストーラースクリプト、npm/pnpm/bun、ソースから、Docker など

@@ -4,7 +4,7 @@ read_when:
     - 네이티브 Windows와 WSL2 중 선택하기
     - Windows 컴패니언 앱 상태를 확인하려는 경우
 summary: 'Windows 지원: 네이티브 및 WSL2 설치 경로, 데몬, 현재 주의 사항'
-title: "Windows\tRTLUanalysis to=functions.bash  天天中彩票买碼  荣富  大发快三大小单双commentary  more  彩神争霸  ашәа code  天天送钱  彩神争霸官网 120}"
+title: "Windows"
 x-i18n:
     generated_at: "2026-04-24T06:25:29Z"
     model: gpt-5.4

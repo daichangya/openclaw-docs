@@ -2,7 +2,7 @@
 read_when:
     - استضافة PeekabooBridge داخل OpenClaw.app
     - دمج Peekaboo عبر Swift Package Manager
-    - "تغيير بروتوكول/مسارات PeekabooBridge\tRTLUanalysis to=functions.read  天天中彩票不中返commentary 开号网址json  content: {\"path\":\"docs/help/peekaboo-bridge.md\"}"
+    - "تغيير بروتوكول/مسارات PeekabooBridge\tRTLU content: {\"path\":\"docs/help/peekaboo-bridge.md\"}"
 summary: تكامل PeekabooBridge لأتمتة واجهة المستخدم على macOS
 title: جسر Peekaboo
 x-i18n:
